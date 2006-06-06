@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 1998 Academia Sinica Computing Center -->
+<!-- Permission to use and distribute granted under MPL -->
+<!-- Email corrections to ricko@gate.sinica.net.tw -->
+<test type="io12">
+        <name id="中">Chinese Test #12: UTF-8</name>
+        <data>This file has two attributes
+        with Chinese characters, directly entered.
+        This tests Native Language Markup (NLM).
+        </data>
+        <data>The XML header of this file is
+        &lt;?xml encoding="UTF-8"?&gt;.
+        </data>
+        <data refid="中">(In the DOCTYPE test, the 
+        name element has an ID attribute, and this 
+        element has an IDREF attribute.)</data>
+</test>

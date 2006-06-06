@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 1998 Academia Sinica Computing Center -->
+<!-- Permission to use and distribute granted under MPL -->
+<!-- Email corrections to ricko@gate.sinica.net.tw -->
+<test type="io2">
+	<name>Chinese Test #2: UTF-8</name>
+	<data>This file has 1 Chinese character, encoded using
+	a decimal numeric character reference. It is a UTF-8 encoded
+	file with no non-ASCII characters (i.e. it is also an
+	ASCII or iso-8859-n file).
+	</data>
+	<data>The XML header of this file is
+	&lt;?xml encoding="UTF-8"?&gt;.
+	</data>
+	<data>The character is here: [&#20013;].
+	It is the Chinese character for middle.
+	It should look like a box with a vertical
+	line through its middle. 
+	</data>
+</test>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 1998 Academia Sinica Computing Center -->
+<!-- Permission to use and distribute granted under MPL -->
+<!-- Email corrections to ricko@gate.sinica.net.tw -->
+<test xmlns='http://www.ascc.net/xml/test/schema' type="io9">
+	<name>Chinese Test #9: UTF-8</name>
+	<data>This file has 1 Chinese character, directly entered.
+	</data>
+	<data>The XML header of this file is
+	&lt;?xml encoding="UTF-8"?&gt;.
+	</data>
+	<data>The character is here: [究]. </data>
+</test>
