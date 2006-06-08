@@ -4214,33 +4214,6 @@ UpnpSetContentLength( IN UpnpClient_Handle Hnd,
                                /** Permissible content length  */
      )
 {
-    return UpnpSetMaxContentLength (contentLength);
-}
-	
-/**************************************************************************
- * Function: UpnpSetMaxContentLength
- *
- * Parameters:	
- *	IN int contentLength: The maximum size to be set 
- *	
- * Description:
- *	Sets the maximum content-length that the SDK will process on an 
- *	incoming SOAP requests or responses. This API allows devices that have
- *	memory constraints to exhibit consistent behaviour if the size of the 
- *	incoming SOAP message exceeds the memory that device can allocate. 
- *	The default maximum content-length is {\tt DEFAULT_SOAP_CONTENT_LENGTH}
- *	= 16K bytes.
- *
- * Return Values: int
- *	UPNP_E_SUCCESS: The operation completed successfully.
- *		
- ***************************************************************************/
-int
-UpnpSetMaxContentLength (
-                      IN size_t contentLength
-                               /** Permissible content length, in bytes  */
-     )
-{
     int errCode = UPNP_E_SUCCESS;
     struct Handle_Info *HInfo = NULL;
 
@@ -4269,6 +4242,47 @@ UpnpSetMaxContentLength (
     } while( 0 );
 
     HandleUnlock(  );
+    return errCode;
+
+}
+
+
+/**************************************************************************
+ * Function: UpnpSetMaxContentLength
+ *
+ * Parameters:	
+ *	IN int contentLength: The maximum size to be set 
+ *	
+ * Description:
+ *	Sets the maximum content-length that the SDK will process on an 
+ *	incoming SOAP requests or responses. This API allows devices that have
+ *	memory constraints to exhibit consistent behaviour if the size of the 
+ *	incoming SOAP message exceeds the memory that device can allocate. 
+ *	The default maximum content-length is {\tt DEFAULT_SOAP_CONTENT_LENGTH}
+ *	= 16K bytes.
+ *
+ * Return Values: int
+ *	UPNP_E_SUCCESS: The operation completed successfully.
+ *		
+ ***************************************************************************/
+int
+UpnpSetMaxContentLength (
+                      IN size_t contentLength
+                               /** Permissible content length, in bytes  */
+     )
+{
+    int errCode = UPNP_E_SUCCESS;
+
+    do {
+        if( UpnpSdkInit != 1 ) {
+            errCode = UPNP_E_FINISH;
+            break;
+        }
+
+        g_maxContentLength = contentLength;
+
+    } while( 0 );
+
     return errCode;
 
 }
