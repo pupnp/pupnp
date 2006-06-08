@@ -64,6 +64,8 @@ iasnprintf( char **ret,
     assert( fmt );
     ( *ret ) = ( char * )malloc( incr );
 
+    if( ( *ret ) == NULL ) return -1;
+
     while( 1 ) {
         va_start( ap, fmt );
         retc = vsnprintf( ( *ret ), size, fmt, ap );

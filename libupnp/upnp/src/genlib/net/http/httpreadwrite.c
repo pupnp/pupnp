@@ -854,7 +854,7 @@ http_WriteHttpPost( IN void *Handle,
 
     if( ( !handle ) || ( !size ) || ( ( ( *size ) > 0 ) && !buf )
         || ( ( *size ) < 0 ) ) {
-        ( *size ) = 0;
+        if(size) ( *size ) = 0;
         return UPNP_E_INVALID_PARAM;
     }
     if( handle->contentLength == UPNP_USING_CHUNKED ) {
@@ -864,6 +864,9 @@ http_WriteHttpPost( IN void *Handle,
             tempbuf =
                 ( char * )malloc( ( *size ) + CHUNK_HEADER_SIZE +
                                   CHUNK_TAIL_SIZE );
+
+            if ( tempbuf == NULL) return UPNP_E_OUTOF_MEMORY;
+
             sprintf( tempbuf, "%x\r\n", ( *size ) );    //begin chunk
             tempSize = strlen( tempbuf );
             memcpy( tempbuf + tempSize, buf, ( *size ) );
@@ -1300,7 +1303,7 @@ http_ReadHttpGet( IN void *Handle,
 
     if( ( !handle ) || ( !size ) || ( ( ( *size ) > 0 ) && !buf )
         || ( ( *size ) < 0 ) ) {
-        ( *size ) = 0;
+        if(size) ( *size ) = 0;
         return UPNP_E_INVALID_PARAM;
     }
     //first parse what has already been gotten
@@ -2388,7 +2391,7 @@ get_sdk_info( OUT char *info )
         *info = '\0';
     }
 
-    sprintf( info, "%s/%s, UPnP/1.0, Intel SDK for UPnP devices/"
+    sprintf( info, "%s/%s, UPnP/1.0, Portable SDK for UPnP devices/"
 	     PACKAGE_VERSION "\r\n",
              sys_info.sysname, sys_info.release );
 }

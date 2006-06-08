@@ -1684,6 +1684,7 @@ parser_parse_headers( INOUT http_parser_t * parser )
                 || membuffer_assign( &header->value, hdr_value.buf,
                                      hdr_value.length ) != 0 ) {
                 // not enuf mem
+		free (header);
                 parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
                 return PARSE_FAILURE;
             }
@@ -1695,10 +1696,12 @@ parser_parse_headers( INOUT http_parser_t * parser )
             ListAddTail( &parser->msg.headers, header );
 
             //NNS:          ret = dlist_append( &parser->msg.headers, header );
+/** remove that? */
             if( ret == UPNP_E_OUTOF_MEMORY ) {
                 parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
                 return PARSE_FAILURE;
             }
+/** end of remove that? */
         } else if( hdr_value.length > 0 ) {
             //
             // append value to existing header

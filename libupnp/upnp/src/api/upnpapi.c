@@ -2501,6 +2501,9 @@ UpnpSendAction( IN UpnpClient_Handle Hnd,
     DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
                          "Inside UpnpSendAction \n" );
          )
+    if(DevUDN_const !=NULL)
+	DBGONLY(UpnpPrintf(UPNP_ALL,API,__FILE__,__LINE__,"non NULL DevUDN is ignored\n"););
+    DevUDN_const = NULL;
 
         HandleLock(  );
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
@@ -2512,8 +2515,10 @@ UpnpSendAction( IN UpnpClient_Handle Hnd,
     if( ActionURL == NULL ) {
         return UPNP_E_INVALID_PARAM;
     }
+
     if( ServiceType == NULL || Action == NULL || RespNodePtr == NULL
         || DevUDN_const != NULL ) {
+
         return UPNP_E_INVALID_PARAM;
     }
 
@@ -4237,6 +4242,7 @@ UpnpSetMaxContentLength (
      )
 {
     int errCode = UPNP_E_SUCCESS;
+    struct Handle_Info *HInfo = NULL;
 
     do {
         if( UpnpSdkInit != 1 ) {
@@ -4244,10 +4250,25 @@ UpnpSetMaxContentLength (
             break;
         }
 
+        HandleLock(  );
+
+        errCode = GetHandleInfo( Hnd, &HInfo );
+
+        if( errCode != HND_DEVICE ) {
+            errCode = UPNP_E_INVALID_HANDLE;
+            break;
+        }
+
+        if( contentLength > MAX_SOAP_CONTENT_LENGTH ) {
+            errCode = UPNP_E_OUTOF_BOUNDS;
+            break;
+        }
+
         g_maxContentLength = contentLength;
 
     } while( 0 );
 
+    HandleUnlock(  );
     return errCode;
 
 }

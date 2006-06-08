@@ -61,9 +61,13 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
             memcpy( out->sid, in->sid, SID_SIZE );
             out->sid[SID_SIZE] = 0;
             out->ActualSID = ( char * )malloc( len );
+            if( out->ActualSID == NULL )
+                return UPNP_E_OUTOF_MEMORY;
             out->EventURL = ( char * )malloc( len1 );
-            if( ( out->EventURL == NULL ) || ( out->ActualSID == NULL ) )
-            return UPNP_E_OUTOF_MEMORY;
+            if( out->EventURL == NULL ) {
+                free(out->ActualSID);
+                return UPNP_E_OUTOF_MEMORY;
+            }
             memcpy( out->ActualSID, in->ActualSID, len );
             memcpy( out->EventURL, in->EventURL, len1 );
             //copies do not get RenewEvent Ids or next

@@ -54,7 +54,10 @@
 
 #define DEFAULT_MAXAGE 1800
 
-extern size_t g_maxContentLength;
+#define DEFAULT_SOAP_CONTENT_LENGTH 16000
+#define MAX_SOAP_CONTENT_LENGTH 32000
+
+extern int g_maxContentLength;
 
 // 30-second timeout
 #define UPNP_TIMEOUT	30

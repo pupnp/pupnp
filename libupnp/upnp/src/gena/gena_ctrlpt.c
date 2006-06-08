@@ -283,9 +283,11 @@ gena_subscribe( IN char *url,
     *sid = NULL;                // init
 
     // request timeout to string
-    if( ( timeout == NULL ) ||
-        ( ( *timeout > 0 )
-          && ( *timeout < CP_MINIMUM_SUBSCRIPTION_TIME ) ) ) {
+    if ( timeout == NULL ) {
+        timeout = (int *)malloc(sizeof(int));
+        if(timeout == 0) return  UPNP_E_OUTOF_MEMORY;
+        sprintf( timeout_str, "%d", CP_MINIMUM_SUBSCRIPTION_TIME );
+    } else if( ( *timeout > 0 )&& ( *timeout < CP_MINIMUM_SUBSCRIPTION_TIME ) ) {
         sprintf( timeout_str, "%d", CP_MINIMUM_SUBSCRIPTION_TIME );
     } else if( *timeout >= 0 ) {
         sprintf( timeout_str, "%d", *timeout );

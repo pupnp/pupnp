@@ -783,11 +783,13 @@ StartMiniServer( unsigned short listen_port )
 
     if( ( success = get_ssdp_sockets( miniSocket ) ) != UPNP_E_SUCCESS ) {
 
-        free( miniSocket );
         shutdown( miniSocket->miniServerSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerSock );
         shutdown( miniSocket->miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerStopSock );
+
+        free( miniSocket );
+
         return success;
     }
 

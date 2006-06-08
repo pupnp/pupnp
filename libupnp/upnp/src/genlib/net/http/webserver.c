@@ -1550,6 +1550,7 @@ http_RecvPostMessage( http_parser_t * parser,
                    && ( status != PARSE_CONTINUE_1 )
                    && ( status != PARSE_INCOMPLETE ) ) {
             //error
+            fclose( Fp );
             return HTTP_BAD_REQUEST;
         }
         //read more if necessary entity

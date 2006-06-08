@@ -929,6 +929,7 @@ ixmlNode_cloneElement( IN IXML_Element * nodeptr )
     rc = ixmlElement_setTagName( newElement, nodeptr->tagName );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
+	return NULL;
     }
 
     elementNode = ( IXML_Node * ) newElement;
@@ -936,26 +937,31 @@ ixmlNode_cloneElement( IN IXML_Element * nodeptr )
     rc = ixmlNode_setNodeName( elementNode, srcNode->nodeName );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
+        return NULL;
     }
 
     rc = ixmlNode_setNodeValue( elementNode, srcNode->nodeValue );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
+        return NULL;
     }
 
     rc = ixmlNode_setNamespaceURI( elementNode, srcNode->namespaceURI );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
+        return NULL;
     }
 
     rc = ixmlNode_setPrefix( elementNode, srcNode->prefix );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
+        return NULL;
     }
 
     rc = ixmlNode_setLocalName( elementNode, srcNode->localName );
     if( rc != IXML_SUCCESS ) {
         ixmlElement_free( newElement );
+        return NULL;
     }
 
     elementNode->nodeType = eELEMENT_NODE;
@@ -1247,6 +1253,10 @@ ixmlNode_cloneNodeTree( IN IXML_Node * nodeptr,
         case eDOCUMENT_TYPE_NODE:
         case eDOCUMENT_FRAGMENT_NODE:
         case eNOTATION_NODE:
+/* create a new node here?            newNode = (IXML_Node *)malloc(sizeof(IXML_Node));
+            if( newNode == NULL ) {
+                return NULL;
+            }*/
             break;
     }
 

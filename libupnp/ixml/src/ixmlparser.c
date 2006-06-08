@@ -1712,11 +1712,13 @@ Parser_xmlNamespace( IN Parser * xmlParser,
         if( pCur->namespaceUri != NULL ) {
             free( pCur->namespaceUri );
         }
-
-        pCur->namespaceUri = strdup( newNode->nodeValue );
-        if( pCur->namespaceUri == NULL ) {
-            return IXML_INSUFFICIENT_MEMORY;
-        }
+///here it goes to segfault on "" when not copying
+	if(newNode->nodeValue){
+         pCur->namespaceUri = strdup( newNode->nodeValue );
+         if( pCur->namespaceUri == NULL ) {
+             return IXML_INSUFFICIENT_MEMORY;
+         }
+    }
 
     } else if( strncmp( newNode->nodeName, "xmlns:", strlen( "xmlns:" ) ) == 0 ) {  // namespace definition
         rc = Parser_setNodePrefixAndLocalName( newNode );
@@ -2458,7 +2460,8 @@ Parser_getNextNode( IN Parser * xmlParser,
             *bETag = TRUE;
 
             return IXML_SUCCESS;
-        } else if( xmlParser->state == eATTRIBUTE ) {
+        } else if( (xmlParser->state == eATTRIBUTE) && 
+                   (xmlParser->pCurElement != NULL) ) {
             if( Parser_processAttribute( xmlParser, node ) !=
                 IXML_SUCCESS ) {
                 return IXML_SYNTAX_ERR;

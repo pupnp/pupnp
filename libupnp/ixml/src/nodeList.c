@@ -75,6 +75,8 @@ ixmlNodeList_item( IXML_NodeList * nList,
         next = next->next;
     }
 
+    if( next == NULL ) return NULL;
+
     return next->nodeItem;
 
 }

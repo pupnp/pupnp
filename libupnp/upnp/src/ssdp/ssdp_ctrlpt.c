@@ -138,8 +138,9 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
     // MAX-AGE
     param.Expires = -1;         // assume error
     if( httpmsg_find_hdr( hmsg, HDR_CACHE_CONTROL, &hdr_value ) != NULL ) {
-        matchstr( hdr_value.buf, hdr_value.length,
-                  "%imax-age = %d%0", &param.Expires );
+        if( matchstr( hdr_value.buf, hdr_value.length,
+                      "%imax-age = %d%0", &param.Expires ) != PARSE_OK )
+            return;
     }
 
     // DATE
