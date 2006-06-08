@@ -1,3 +1,8 @@
+2006-06-08 Oxy <virtual_worlds@gmx.de>
+
+      * Patch to fix memory leaks and reasons for crashes added (thanks
+        to loigu)
+
 *************************************************************************
 Release of version 1.4.0
 *************************************************************************
