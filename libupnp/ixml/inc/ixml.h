@@ -303,7 +303,7 @@ ixmlNode_setNodeValue(IXML_Node *nodeptr,
    *          {\bf Node}.
    */
 
-EXPORT_SPEC const unsigned short    
+EXPORT_SPEC unsigned short    
 ixmlNode_getNodeType(IXML_Node *nodeptr  
 		       /** The {\bf Node} from which to retrieve the type. */
                     );

@@ -359,7 +359,7 @@ ixmlNode_setNodeValue( IN IXML_Node * nodeptr,
 *       External function.
 *
 *=================================================================*/
-const unsigned short
+unsigned short
 ixmlNode_getNodeType( IN IXML_Node * nodeptr )
 {
     if( nodeptr != NULL ) {
