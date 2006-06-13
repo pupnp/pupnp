@@ -40,6 +40,7 @@
 #include <string.h>
 #include <membuffer.h>
 #include "upnp.h"
+#include "unixutil.h"
 
 /************************************************************************
 *								 string									*

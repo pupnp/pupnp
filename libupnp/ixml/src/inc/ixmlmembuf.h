@@ -38,7 +38,9 @@
 #define MINVAL( a, b ) ( (a) < (b) ? (a) : (b) )
 #define MAXVAL( a, b ) ( (a) > (b) ? (a) : (b) )
 
-#define	XINLINE inline
+#ifndef WIN32
+ #define	XINLINE inline
+#endif
 
 #define MEMBUF_DEF_SIZE_INC		20
 

@@ -42,6 +42,12 @@
 #include "httpparser.h"
 #include "httpreadwrite.h"
 
+#ifdef WIN32
+ #include <winsock2.h>
+ #include <ws2tcpip.h>
+ #include "unixutil.h"
+#endif
+
 #define MAX_TIME_TOREAD  45
 
 CLIENTONLY( SOCKET gSsdpReqSocket = 0;
@@ -455,14 +461,17 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
 int
 Make_Socket_NoBlocking( int sock )
 {
-
+#ifdef WIN32
+     u_long val=1;
+     return ioctlsocket(sock, FIONBIO, &val);
+#else
     int val;
 
     val = fcntl( sock, F_GETFL, 0 );
     if( fcntl( sock, F_SETFL, val | O_NONBLOCK ) == -1 ) {
         return -1;
     }
-
+#endif
     return 0;
 }
 

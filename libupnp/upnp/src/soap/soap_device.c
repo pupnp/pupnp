@@ -47,6 +47,10 @@
 #include "soaplib.h"
 #include "ssdplib.h"
 
+#ifdef WIN32
+ #define snprintf _snprintf
+#endif
+
 // timeout duration in secs for transmission/reception
 #define SOAP_TIMEOUT UPNP_TIMEOUT
 

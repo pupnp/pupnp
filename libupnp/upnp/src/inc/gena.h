@@ -47,7 +47,9 @@
 #ifdef __cplusplus
 #define EXTERN_C extern "C"
 #else 
-#define EXTERN_C 
+#ifndef EXTERN_C
+ #define EXTERN_C 
+#endif
 #endif
 
 #define XML_VERSION "<?xml version='1.0' encoding='ISO-8859-1' ?>\n"

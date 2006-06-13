@@ -40,6 +40,10 @@
 #include "util.h"
 #include "statcodes.h"
 
+#ifdef WIN32
+ #include "unixutil.h"
+#endif
+
 #define NUM_1XX_CODES   2
 static const char *Http1xxCodes[NUM_1XX_CODES];
 static const char *Http1xxStr = "Continue\0" "Switching Protocols\0";

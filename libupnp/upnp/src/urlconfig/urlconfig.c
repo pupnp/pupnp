@@ -31,15 +31,20 @@
 
 #include "config.h"
 #include <assert.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#ifndef WIN32
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+#else
+ #include <winsock2.h>
+#endif
 #include "upnp.h"
 #include "util.h"
 #include "webserver.h"
 #include "uri.h"
 #include "membuffer.h"
 #include "urlconfig.h"
+#include "unixutil.h"
 
 /************************************************************************
 *	Function :	addrToString

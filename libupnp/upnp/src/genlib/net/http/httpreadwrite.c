@@ -40,15 +40,20 @@
 #include <assert.h>
 #include <stdarg.h>
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <sys/utsname.h>
-#include <fcntl.h>
+#ifndef WIN32
+ #include <arpa/inet.h>
+ #include <netinet/in.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/time.h>
+ #include <sys/wait.h>
+ #include <unistd.h>
+ #include <sys/utsname.h>
+ #include <fcntl.h>
+#else
+ #include <winsock2.h>
+ #include <malloc.h>
+#endif
 #include "unixutil.h"
 #include "upnp.h"
 #include "upnpapi.h"
@@ -2383,6 +2388,15 @@ http_OpenHttpGetEx( IN const char *url_str,
 void
 get_sdk_info( OUT char *info )
 {
+#ifdef WIN32
+ 	OSVERSIONINFO versioninfo;
+ 	versioninfo.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
+ 	if (GetVersionEx(&versioninfo)!=0)
+ 		sprintf( info, "%d.%d.%d %d/%s, UPnP/1.0, Portable SDK for UPnP devices/"PACKAGE_VERSION"\r\n",
+ 				versioninfo.dwMajorVersion, versioninfo.dwMinorVersion, versioninfo.dwBuildNumber, versioninfo.dwPlatformId, versioninfo.szCSDVersion );
+ 	else
+     *info = '\0';
+#else
     int ret_code;
     struct utsname sys_info;
 
@@ -2394,4 +2408,5 @@ get_sdk_info( OUT char *info )
     sprintf( info, "%s/%s, UPnP/1.0, Portable SDK for UPnP devices/"
 	     PACKAGE_VERSION "\r\n",
              sys_info.sysname, sys_info.release );
+#endif
 }

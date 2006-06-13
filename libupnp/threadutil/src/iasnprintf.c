@@ -39,6 +39,10 @@
 #define NULL 0
 #endif
 
+#ifdef WIN32
+ #define vsnprintf _vsnprintf
+#endif
+
 /**
  * Allocates enough memory for the
  * Formatted string, up to max

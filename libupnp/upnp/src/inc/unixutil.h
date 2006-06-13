@@ -35,6 +35,13 @@
 #define	GENLIB_NET_UNIXUTIL_H
 
 #include <sys/types.h>
-#include <sys/socket.h>
+#ifndef WIN32
+ #include <sys/socket.h>
+#else
+ #define XINLINE
+
+ #define socklen_t int
+ #define EAFNOSUPPORT 97
+#endif
 
 #endif // GENLIB_NET_UNIXUTIL_H

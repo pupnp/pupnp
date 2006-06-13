@@ -32,6 +32,10 @@
 #include <string.h>
 #include "ixmlparser.h"
 
+#ifdef WIN32
+ #define strncasecmp strnicmp
+#endif
+
 static char g_error_char = '\0';
 
 static const char LESSTHAN = '<';

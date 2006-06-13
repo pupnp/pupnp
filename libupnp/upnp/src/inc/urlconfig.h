@@ -31,9 +31,13 @@
 
 #ifndef URLCONFIG_H
 #define URLCONFIG_H
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#ifndef WIN32
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+#else
+ #include <winsock2.h>
+#endif
 
 // functions available only if the web server is included 
 

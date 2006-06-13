@@ -41,12 +41,16 @@
 
 #include "sock.h"
 #include "upnp.h"
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <unistd.h>
+#ifndef WIN32
+ #include <arpa/inet.h>
+ #include <netinet/in.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/time.h>
+ #include <unistd.h>
+#else
+ #include <winsock2.h>
+#endif
 #include "unixutil.h"
 
 /************************************************************************

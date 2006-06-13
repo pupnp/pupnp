@@ -58,10 +58,10 @@
 #define EVENT_TERMINATE	-3
 
 
-
-#define max(a, b)   (((a)>(b))? (a):(b))
-#define min(a, b)   (((a)<(b))? (a):(b))
-
+#ifndef WIN32
+ #define max(a, b)   (((a)>(b))? (a):(b))
+ #define min(a, b)   (((a)<(b))? (a):(b))
+#endif
 
 
 // boolean type in C
@@ -146,7 +146,26 @@ void linecopylen( OUT char dest[LINE_SIZE], IN const char* src, IN size_t srclen
 // C specific
 #ifndef __cplusplus
 
-#define		XINLINE inline
+#ifndef WIN32
+ #define		XINLINE inline
+#else
+
+ #ifndef S_ISREG
+ #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+ #endif
+ 
+ #ifndef S_ISDIR
+ #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+ #endif
+
+ #define EADDRINUSE WSAEADDRINUSE
+
+ #define strcasecmp stricmp
+ #define strncasecmp strnicmp
+
+ #define sleep Sleep
+ #define usleep(a) Sleep((a)/1000)
+#endif
 
 #endif // __cplusplus
 

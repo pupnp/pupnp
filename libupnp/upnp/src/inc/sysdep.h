@@ -18,7 +18,9 @@
   */
 
 #include <sys/types.h>
-#include <sys/time.h>
+#ifndef WIN32
+ #include <sys/time.h>
+#endif
 //#include <sys/sysinfo.h>
 #include "ithread.h"
 
@@ -45,8 +47,12 @@ typedef unsigned char   unsigned8;
 typedef unsigned char   byte;
 
 /* Set this to what your compiler uses for 64 bit data type */
-#define unsigned64_t unsigned long long
-#define I64(C) C##LL
+#ifndef WIN32
+ #define unsigned64_t unsigned long long
+ #define I64(C) C##LL
+#else
+ #define unsigned64_t __int64
+#endif
 
 typedef unsigned64_t uuid_time_t;
 typedef struct {

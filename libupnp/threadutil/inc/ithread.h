@@ -43,7 +43,9 @@ extern "C" {
 #endif
 
 #include <pthread.h>
-#include <unistd.h>
+#ifndef WIN32
+ #include <unistd.h>
+#endif
 
 #define ITHREAD_MUTEX_FAST_NP PTHREAD_MUTEX_FAST_NP
 #define ITHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE_NP
@@ -524,10 +526,14 @@ extern "C" {
  *****************************************************************************/
 #define imillisleep(x) usleep(1000*x)
 
-
+#ifdef WIN32
+ #define __DLLEXPORT __declspec( dllexport )
+#else
+ #define __DLLEXPORT
+#endif
 
 //NK: Added for satisfying the gcc compiler  
-int pthread_mutexattr_setkind_np(pthread_mutexattr_t *attr, int kind);
+__DLLEXPORT int pthread_mutexattr_setkind_np(pthread_mutexattr_t *attr, int kind);
 
 #ifdef __cplusplus
 }

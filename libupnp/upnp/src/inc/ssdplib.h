@@ -40,14 +40,17 @@
 #include "httpparser.h"
 #include "httpreadwrite.h"
 #include "miniserver.h"
-#include <syslog.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/in_systm.h>
-#include <netinet/ip.h>
-#include <netinet/ip_icmp.h>
-#include <sys/time.h>
-#include <arpa/inet.h>
+#ifndef WIN32
+ #include <syslog.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <netinet/in_systm.h>
+ #include <netinet/ip.h>
+ #include <netinet/ip_icmp.h>
+ #include <sys/time.h>
+ #include <arpa/inet.h>
+#else
+#endif
 
 //Enumeration to define all different types of ssdp searches
 typedef enum SsdpSearchType{

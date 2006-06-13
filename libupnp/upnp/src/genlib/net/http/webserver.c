@@ -48,7 +48,9 @@
 #include "upnpapi.h"
 #include "ssdplib.h"
 
-#include <unistd.h>
+#ifndef WIN32
+ #include <unistd.h>
+#endif
 #include <sys/stat.h>
 #include "ithread.h"
 #include "unixutil.h"

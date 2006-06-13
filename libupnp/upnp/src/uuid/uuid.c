@@ -22,7 +22,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <netinet/in.h>
+#ifndef WIN32
+ #include <netinet/in.h>
+#else
+ #include <winsock2.h>
+#endif
 #include "sysdep.h"
 #include "uuid.h"
 

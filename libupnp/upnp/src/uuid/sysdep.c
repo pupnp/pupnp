@@ -18,7 +18,11 @@
  */
 
 #include "config.h"
-#include <unistd.h>
+#ifndef WIN32
+ #include <unistd.h>
+#else
+ #include <winsock2.h>
+#endif
 #include <string.h>
 #include <stdio.h>
 #include "sysdep.h"

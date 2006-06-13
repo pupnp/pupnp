@@ -43,12 +43,23 @@
 #	include "upnpdebug.h"
 #endif
 
-#define UpnpCloseSocket         close
+#ifndef WIN32
+ #define UpnpCloseSocket         close
+#else
+ #define UpnpCloseSocket         closesocket
+#endif
 #define UPNP_SOCKETERROR        -1
 #define UPNP_INVALID_SOCKET     -1
-#define SOCKET                  int
+#ifndef WIN32
+ #define SOCKET                  int
+#endif
 
-#include <netinet/in.h>
+#ifndef WIN32
+ #include <netinet/in.h>
+#else
+ #include <winsock2.h>
+ #include <time.h>
+#endif
 
 #define NUM_HANDLE 200
 #define LINE_SIZE  180

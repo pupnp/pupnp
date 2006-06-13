@@ -36,6 +36,11 @@
 #include "config.h"
 #include "uri.h"
 
+#ifdef WIN32
+ #include "inet_pton.h"
+#endif
+
+
 /************************************************************************
 *	Function :	is_reserved
 *
@@ -535,8 +540,10 @@ parse_hostport( char *in,
     int begin_port;
     int hostport_size = 0;
     int host_size = 0;
-    struct hostent h_buf;
+#ifndef WIN32
     char temp_hostbyname_buff[BUFFER_SIZE];
+    struct hostent h_buf;
+#endif
     struct hostent *h = NULL;
     int errcode = 0;
     char *temp_host_name = NULL;
@@ -601,16 +608,20 @@ parse_hostport( char *in,
         int errCode = 0;
 
         //call gethostbyname_r (reentrant form of gethostbyname)
-        #ifndef SPARC_SOLARIS
-        errCode = gethostbyname_r( temp_host_name,
-                                   &h_buf,
-                                   temp_hostbyname_buff,
-                                   BUFFER_SIZE, &h, &errcode );
+        #ifdef WIN32
+		 h=gethostbyname(temp_host_name);
         #else
-        errCode = gethostbyname_r( temp_host_name,
-                                   &h,
-                                   temp_hostbyname_buff,
-                                   BUFFER_SIZE, &errcode );
+         #ifndef SPARC_SOLARIS
+         errCode = gethostbyname_r( temp_host_name,
+                                    &h_buf,
+                                    temp_hostbyname_buff,
+                                    BUFFER_SIZE, &h, &errcode );
+         #else
+         errCode = gethostbyname_r( temp_host_name,
+                                    &h,
+                                    temp_hostbyname_buff,
+                                    BUFFER_SIZE, &errcode );
+         #endif 
         #endif
 
         if( errCode == 0 ) {

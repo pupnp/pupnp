@@ -92,11 +92,15 @@ FreeThreadPoolJob( ThreadPool * tp,
 static int
 SetPolicyType( PolicyType in )
 {
-    struct sched_param current;
+    #ifdef WIN32
+     return sched_setscheduler( 0, in);
+    #else
+     struct sched_param current;
 
-    sched_getparam( 0, &current );
-    current.sched_priority = DEFAULT_SCHED_PARAM;
-    return sched_setscheduler( 0, in, &current );
+     sched_getparam( 0, &current );
+     current.sched_priority = DEFAULT_SCHED_PARAM;
+     return sched_setscheduler( 0, in, &current );
+    #endif
 }
 
 /****************************************************************************
@@ -341,7 +345,11 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
     struct timeb t;
 
     ftime( &t );
-    srand( ( unsigned int )t.millitm + ithread_get_current_thread_id(  ) );
+    srand( (unsigned int)t.millitm 
+     #ifndef WIN32
+      + ithread_get_current_thread_id()
+     #endif
+     );
     }
 
 /****************************************************************************

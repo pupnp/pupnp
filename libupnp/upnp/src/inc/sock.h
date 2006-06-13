@@ -34,7 +34,9 @@
 
 #include "util.h"
 
-#include <netinet/in.h>
+#ifndef WIN32
+ #include <netinet/in.h>
+#endif
 
 //Following variable is not defined under winsock.h
 #ifndef SD_RECEIVE

@@ -42,6 +42,11 @@
 #include "statcodes.h"
 #include "unixutil.h"
 
+#ifdef WIN32
+ #include <ws2tcpip.h>
+ #include <winsock2.h>
+#endif
+
 #define MSGTYPE_SHUTDOWN		0
 #define MSGTYPE_ADVERTISEMENT	1
 #define MSGTYPE_REPLY			2

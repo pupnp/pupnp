@@ -45,6 +45,15 @@
 
 #include "unixutil.h"
 
+#ifdef WIN32
+ #include <ws2tcpip.h>
+ #include <winsock2.h>
+ #ifndef imillisleep
+ #define imillisleep Sleep
+ #endif
+#endif
+
+
 /************************************************************************
 * Function : send_search_result											
 *																	

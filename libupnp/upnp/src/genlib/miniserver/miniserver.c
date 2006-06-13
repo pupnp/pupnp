@@ -35,18 +35,19 @@
 ************************************************************************/
 
 #include "config.h"
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
+#ifndef WIN32
+ #include <arpa/inet.h>
+ #include <netinet/in.h>
+ #include <sys/socket.h>
+ #include <sys/wait.h>
+ #include <unistd.h>
+ #include <sys/time.h>
+#else
+ #include <winsock2.h>
+
+ #define socklen_t int
+ #define EAFNOSUPPORT 97
+#endif
 #include "unixutil.h"
 #include "ithread.h"
 

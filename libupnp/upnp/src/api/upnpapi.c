@@ -36,16 +36,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#ifndef SPARC_SOLARIS
+#ifndef WIN32
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+
+ #ifndef SPARC_SOLARIS
 // #include <linux/if.h>
- #include <net/if.h>
-#else
- #include <fcntl.h>
- #include <net/if.h>
- #include <sys/sockio.h>
+  #include <net/if.h>
+ #else
+  #include <fcntl.h>
+  #include <net/if.h>
+  #include <sys/sockio.h>
+ #endif
+
+ #include <sys/ioctl.h>
+ #include <sys/utsname.h>
+ #include <unistd.h>
 #endif
 #include "upnpapi.h"
 #include "httpreadwrite.h"
@@ -53,9 +60,6 @@
 #include "soaplib.h"
 #include "ThreadPool.h"
 #include "membuffer.h"
-#include <sys/ioctl.h>
-#include <sys/utsname.h>
-#include <unistd.h>
 
 #include "httpreadwrite.h"
 
@@ -3752,6 +3756,19 @@ DBGONLY(
  ***************************************************************************/
     int getlocalhostname( OUT char *out ) {
 
+#ifdef WIN32
+ 	 struct hostent *h=NULL;
+    struct sockaddr_in LocalAddr;
+
+ 		gethostname(out,LINE_SIZE);
+ 		h=gethostbyname(out);
+ 		if (h!=NULL){
+ 			memcpy(&LocalAddr.sin_addr,h->h_addr_list[0],4);
+ 			strcpy( out, inet_ntoa(LocalAddr.sin_addr));
+ 		}
+ 		return UPNP_E_SUCCESS;
+#else
+
     char szBuffer[MAX_INTERFACES * sizeof( struct ifreq )];
     struct ifconf ifConf;
     struct ifreq ifReq;
@@ -3828,6 +3845,7 @@ DBGONLY(
                          out );
          )
         return UPNP_E_SUCCESS;
+#endif
     }
 
 #ifdef INCLUDE_DEVICE_APIS
