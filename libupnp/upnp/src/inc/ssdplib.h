@@ -50,6 +50,7 @@
  #include <sys/time.h>
  #include <arpa/inet.h>
 #else
+#include <winsock2.h>
 #endif
 
 //Enumeration to define all different types of ssdp searches

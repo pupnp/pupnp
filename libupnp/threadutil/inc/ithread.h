@@ -527,13 +527,19 @@ extern "C" {
 #define imillisleep(x) usleep(1000*x)
 
 #ifdef WIN32
- #define __DLLEXPORT __declspec( dllexport )
+ #ifdef LIBUPNP_EXPORTS
+  // set up declspec for dll export to make functions visible to library users
+  #define EXPORT_SPEC __declspec(dllexport)
+ #else
+  #define EXPORT_SPEC __declspec(dllimport)
+ #endif
 #else
- #define __DLLEXPORT
+ #define EXPORT_SPEC
 #endif
 
+
 //NK: Added for satisfying the gcc compiler  
-__DLLEXPORT int pthread_mutexattr_setkind_np(pthread_mutexattr_t *attr, int kind);
+EXPORT_SPEC int pthread_mutexattr_setkind_np(pthread_mutexattr_t *attr, int kind);
 
 #ifdef __cplusplus
 }

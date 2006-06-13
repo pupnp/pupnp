@@ -43,6 +43,17 @@
 #	include "upnpdebug.h"
 #endif
 
+#ifdef WIN32
+ #ifdef LIBUPNP_EXPORTS
+  // set up declspec for dll export to make functions visible to library users
+  #define EXPORT_SPEC __declspec(dllexport)
+ #else
+  #define EXPORT_SPEC __declspec(dllimport)
+ #endif
+#else
+ #define EXPORT_SPEC
+#endif
+
 #ifndef WIN32
  #define UpnpCloseSocket         close
 #else
@@ -1050,7 +1061,7 @@ extern "C" {
  *      \item {\tt UPNP_E_INTERNAL_ERROR}: An internal error ocurred.
  *    \end{itemize} */
 
-int UpnpInit(
+EXPORT_SPEC int UpnpInit(
     IN const char *HostIP,      /** The host IP address to use, in 
                                     string format, for example "192.168.0.1", 
                                     or {\tt NULL} to use the first adapter's 
@@ -1070,7 +1081,7 @@ int UpnpInit(
  *                                 it is not initialized. 
  *    \end{itemize} */
 
-int UpnpFinish();
+EXPORT_SPEC int UpnpFinish();
 
 /** If '0' is used as the port number in {\bf UpnpInit}, then this
  *  function can be used to retrieve the actual port allocated to
@@ -1080,7 +1091,7 @@ int UpnpFinish();
  *  @return [unsigned short] The port on which an internal server is 
  *                           listening for UPnP related requests. 
  */
-unsigned short UpnpGetServerPort(void);
+EXPORT_SPEC unsigned short UpnpGetServerPort(void);
 
 /** If {\tt NULL} is used as the IP address in {\bf UpnpInit}, then this
  *  function can be used to retrieve the actual interface address
@@ -1090,7 +1101,7 @@ unsigned short UpnpGetServerPort(void);
  *  @return [char*] The IP address on which an internal server is listening 
  *                  for UPnP related requests. 
  */
-char * UpnpGetServerIpAddress(void);
+EXPORT_SPEC char * UpnpGetServerIpAddress(void);
 
 /** {\bf UpnpRegisterClient} registers a control point application with the
  *  SDK.  A control point application cannot make any other API calls
@@ -1111,7 +1122,7 @@ char * UpnpGetServerIpAddress(void);
  *    \end{itemize}
  */
 
-int UpnpRegisterClient(
+EXPORT_SPEC int UpnpRegisterClient(
     IN Upnp_FunPtr Callback,   /** Pointer to a function for receiving 
                                    asynchronous events. */
     IN const void *Cookie,     /** Pointer to user data returned with the 
@@ -1155,7 +1166,7 @@ int UpnpRegisterClient(
  *              register this root device.
  *    \end{itemize} */
 
-int UpnpRegisterRootDevice(
+EXPORT_SPEC int UpnpRegisterRootDevice(
     IN const char *DescUrl,    /** Pointer to a string containing the 
                                    description URL for this root device 
                                    instance. */
@@ -1234,7 +1245,7 @@ int UpnpRegisterRootDevice(
  *              description document.
  *    \end{itemize} */
  
-int UpnpRegisterRootDevice2(
+EXPORT_SPEC int UpnpRegisterRootDevice2(
     IN Upnp_DescType descriptionType,/** The type of the description 
                                          document. */
     IN const char* description,      /** Treated as a URL, file name or 
@@ -1273,7 +1284,7 @@ int UpnpRegisterRootDevice2(
  *                   point handle.
  *    \end{itemize} */
 
-int UpnpUnRegisterClient(
+EXPORT_SPEC int UpnpUnRegisterClient(
     IN UpnpClient_Handle Hnd  /** The handle of the control point instance 
                                   to unregister. */
     );
@@ -1296,7 +1307,7 @@ int UpnpUnRegisterClient(
  *    \end{itemize}
  */
 
-int UpnpUnRegisterRootDevice(
+EXPORT_SPEC int UpnpUnRegisterRootDevice(
    IN UpnpDevice_Handle /** The handle of the root device instance to 
                             unregister. */
    );
@@ -1307,7 +1318,7 @@ int UpnpUnRegisterRootDevice(
  * of this function is global to the SDK (= same as 
  * {\bf UpnpSetMaxContentLength} ).
  */
-int UpnpSetContentLength(
+EXPORT_SPEC int UpnpSetContentLength(
     IN UpnpClient_Handle Hnd,  
     IN int contentLength       
     );
@@ -1325,7 +1336,7 @@ int UpnpSetContentLength(
  *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
  *    \end{itemize}
  */
-int UpnpSetMaxContentLength(
+EXPORT_SPEC int UpnpSetMaxContentLength(
     IN size_t contentLength    /** The maximum permissible content length 
 			           for incoming SOAP actions, in bytes. */
     );
@@ -1363,7 +1374,7 @@ int UpnpSetMaxContentLength(
  *      \item {\tt UPNP_E_INVALID_PARAM}: {\bf Target} is {\tt NULL}.
  *    \end{itemize} */
 
-int UpnpSearchAsync(
+EXPORT_SPEC int UpnpSearchAsync(
     IN UpnpClient_Handle Hnd, /** The handle of the client performing 
                                   the search. */
     IN int Mx,                /** The time, in seconds, to wait for 
@@ -1393,7 +1404,7 @@ int UpnpSearchAsync(
  *              send future advertisements.
  *    \end{itemize}
  */
-int UpnpSendAdvertisement(
+EXPORT_SPEC int UpnpSendAdvertisement(
     IN UpnpDevice_Handle Hnd, /** The device handle for which to send out the 
                                   announcements. */
     IN int Exp                /** The expiration age, in seconds, of 
@@ -1436,7 +1447,7 @@ int UpnpSendAdvertisement(
  *    \end{itemize}
  */
 
-int UpnpGetServiceVarStatus(
+EXPORT_SPEC int UpnpGetServiceVarStatus(
     IN UpnpClient_Handle Hnd,     /** The handle of the control point. */
     IN const char *ActionURL,     /** The URL of the service. */
     IN const char *VarName,       /** The name of the variable to query. */
@@ -1464,7 +1475,7 @@ int UpnpGetServiceVarStatus(
  *    \end{itemize}
  */
 
-int UpnpGetServiceVarStatusAsync(
+EXPORT_SPEC int UpnpGetServiceVarStatusAsync(
     IN UpnpClient_Handle Hnd, /** The handle of the control point. */
     IN const char *ActionURL, /** The URL of the service. */
     IN const char *VarName,   /** The name of the variable to query. */
@@ -1499,7 +1510,7 @@ int UpnpGetServiceVarStatusAsync(
  *    \end{itemize}
  */
 
-int UpnpSendAction(
+EXPORT_SPEC int UpnpSendAction(
     IN UpnpClient_Handle Hnd,     /** The handle of the control point 
                                       sending the action. */
     IN const char *ActionURL,     /** The action URL of the service. */
@@ -1538,7 +1549,7 @@ int UpnpSendAction(
  *    \end{itemize}
  */
 
-int UpnpSendActionEx(
+EXPORT_SPEC int UpnpSendActionEx(
     IN UpnpClient_Handle Hnd,    /** The handle of the control point 
                                      sending the action. */
     IN const char *ActionURL,    /** The action URL of the service. */
@@ -1577,7 +1588,7 @@ int UpnpSendActionEx(
  *    \end{itemize}
  */
 
-int UpnpSendActionAsync(
+EXPORT_SPEC int UpnpSendActionAsync(
     IN UpnpClient_Handle Hnd,   /** The handle of the control point 
                                     sending the action. */
     IN const char *ActionURL,   /** The action URL of the service. */
@@ -1615,7 +1626,7 @@ int UpnpSendActionAsync(
  *    \end{itemize}
  */
 
-int UpnpSendActionExAsync(
+EXPORT_SPEC int UpnpSendActionExAsync(
     IN UpnpClient_Handle Hnd,   /** The handle of the control point 
                                     sending the action. */
     IN const char *ActionURL,   /** The action URL of the service. */
@@ -1673,7 +1684,7 @@ int UpnpSendActionExAsync(
  *    \end{itemize}
  */
 
-int UpnpAcceptSubscription(
+EXPORT_SPEC int UpnpAcceptSubscription(
     IN UpnpDevice_Handle Hnd, /** The handle of the device. */
     IN const char *DevID,     /** The device ID of the subdevice of the 
                                   service generating the event. */
@@ -1713,7 +1724,7 @@ int UpnpAcceptSubscription(
  *    \end{itemize}
  */
 
-int UpnpAcceptSubscriptionExt(
+EXPORT_SPEC int UpnpAcceptSubscriptionExt(
     IN UpnpDevice_Handle Hnd,  /** The handle of the device. */
     IN const char *DevID,      /** The device ID of the subdevice of the 
                                    service generating the event. */
@@ -1750,7 +1761,7 @@ int UpnpAcceptSubscriptionExt(
  *    \end{itemize}
  */
 
-int UpnpNotify(
+EXPORT_SPEC int UpnpNotify(
     IN UpnpDevice_Handle,   /** The handle to the device sending the event. */
     IN const char *DevID,   /** The device ID of the subdevice of the service 
                                 generating the event. */
@@ -1786,7 +1797,7 @@ int UpnpNotify(
  *    \end{itemize}
  */
 
-int UpnpNotifyExt(
+EXPORT_SPEC int UpnpNotifyExt(
     IN UpnpDevice_Handle,       /** The handle to the device sending the 
                                     event. */
     IN const char *DevID,       /** The device ID of the subdevice of the 
@@ -1829,7 +1840,7 @@ int UpnpNotifyExt(
  *    \end{itemize}
  */
 
-int UpnpRenewSubscription(
+EXPORT_SPEC int UpnpRenewSubscription(
     IN UpnpClient_Handle Hnd, /** The handle of the control point that 
                                   is renewing the subscription. */
     INOUT int *TimeOut,       /** Pointer to a variable containing the 
@@ -1887,7 +1898,7 @@ int UpnpRenewSubscription(
  *    \end{itemize}
  */
 
-int UpnpRenewSubscriptionAsync(
+EXPORT_SPEC int UpnpRenewSubscriptionAsync(
     IN UpnpClient_Handle Hnd, /** The handle of the control point that 
                                   is renewing the subscription. */
     IN int TimeOut,           /** The requested subscription time.  The 
@@ -1915,7 +1926,7 @@ int UpnpRenewSubscriptionAsync(
  *    \end{itemize}
  */
 
-int UpnpSetMaxSubscriptions(  
+EXPORT_SPEC int UpnpSetMaxSubscriptions(  
     IN UpnpDevice_Handle Hnd, /** The handle of the device for which 
 				  the maximum number of subscriptions is 
 				  being set. */
@@ -1938,7 +1949,7 @@ int UpnpSetMaxSubscriptions(
  *    \end{itemize}
  */
 
-int UpnpSetMaxSubscriptionTimeOut(  
+EXPORT_SPEC int UpnpSetMaxSubscriptionTimeOut(  
     IN UpnpDevice_Handle Hnd,       /** The handle of the device for which 
 				        the maximum subscription time-out is 
                                         being set. */
@@ -1975,7 +1986,7 @@ int UpnpSetMaxSubscriptionTimeOut(
  *    \end{itemize}
  */
 
-int UpnpSubscribe(
+EXPORT_SPEC int UpnpSubscribe(
     IN UpnpClient_Handle Hnd,    /** The handle of the control point. */
     IN const char *PublisherUrl, /** The URL of the service to subscribe to. */
     INOUT int *TimeOut,          /** Pointer to a variable containing 
@@ -2037,7 +2048,7 @@ int UpnpSubscribe(
  *    \end{itemize}
  */
 
-int UpnpSubscribeAsync(
+EXPORT_SPEC int UpnpSubscribeAsync(
     IN UpnpClient_Handle Hnd,      /** The handle of the control point that 
                                        is subscribing. */
     IN const char *PublisherUrl,   /** The URL of the service to subscribe 
@@ -2082,7 +2093,7 @@ int UpnpSubscribeAsync(
  *    \end{itemize}
  */
 
-int UpnpUnSubscribe(
+EXPORT_SPEC int UpnpUnSubscribe(
     IN UpnpClient_Handle Hnd, /** The handle of the subscribed control 
                                   point. */
     IN Upnp_SID SubsId        /** The ID returned when the control point 
@@ -2137,7 +2148,7 @@ int UpnpUnSubscribe(
  *              Upnp_Event_Subscribe.ErrCode} field as part of the callback).
  *    \end{itemize} */
 
-int UpnpUnSubscribeAsync(
+EXPORT_SPEC int UpnpUnSubscribeAsync(
     IN UpnpClient_Handle Hnd, /** The handle of the subscribed control 
                                   point. */
     IN Upnp_SID SubsId,       /** The ID returned when the 
@@ -2190,7 +2201,7 @@ int UpnpUnSubscribeAsync(
  *    \end{itemize}
  */
 
-int UpnpDownloadUrlItem(
+EXPORT_SPEC int UpnpDownloadUrlItem(
     IN const char *url,          /** URL of an item to download. */
     OUT char **outBuf,           /** Buffer to store the downloaded item. */
     OUT char *contentType        /** HTTP header value content type if 
@@ -2227,7 +2238,7 @@ int UpnpDownloadUrlItem(
  *    \end{itemize}
  */
 
-int UpnpOpenHttpGet(
+EXPORT_SPEC int UpnpOpenHttpGet(
 	IN const char *url,	    /** The URL of an item to get. */
 	IN OUT void **handle,       /** A pointer to store the handle for 
 				        this connection. */
@@ -2274,7 +2285,7 @@ int UpnpOpenHttpGet(
  *    \end{itemize}
  */
 
-int UpnpOpenHttpGetProxy(
+EXPORT_SPEC int UpnpOpenHttpGetProxy(
 	IN const char *url,	    /** The URL of an item to get. */
     IN const char *proxy_str,    /** The URL of the proxy. */
 	IN OUT void **handle,       /** A pointer to store the handle for 
@@ -2322,7 +2333,7 @@ int UpnpOpenHttpGetProxy(
  *    \end{itemize}
  */
 
-int UpnpOpenHttpGetProxy(
+EXPORT_SPEC int UpnpOpenHttpGetProxy(
 	IN const char *url,	    /** The URL of an item to get. */
     IN const char *proxy_str,    /** The URL of the proxy. */
 	IN OUT void **handle,       /** A pointer to store the handle for 
@@ -2371,7 +2382,7 @@ int UpnpOpenHttpGetProxy(
  *    \end{itemize}
  */
 
-int UpnpOpenHttpGetEx(
+EXPORT_SPEC int UpnpOpenHttpGetEx(
 	IN const char *url,         /** The URL of the item to get. */
 	IN OUT void **handle,       /** A pointer to store the handle for 
 				        this connection. */
@@ -2412,7 +2423,7 @@ int UpnpOpenHttpGetEx(
  *        value.
  */
 
-int UpnpReadHttpGet(
+EXPORT_SPEC int UpnpReadHttpGet(
 	IN void *handle,           /** The token created by the call to 
 				       {\bf UpnpOpenHttpGet}. */
 	IN OUT char *buf,          /** The buffer to store the read item. */
@@ -2435,7 +2446,7 @@ int UpnpReadHttpGet(
  *    \end{itemize}
  *
  */
-int UpnpHttpGetProgress(
+EXPORT_SPEC int UpnpHttpGetProgress(
     IN void *handle,           /** The token created by the call to
 				       {\bf UpnpOpenHttpGet}. */
 	OUT unsigned int *length, /** The number of bytes received. */
@@ -2453,7 +2464,7 @@ int UpnpHttpGetProgress(
  *    \end{itemize}
  */  
 
-int UpnpCancelHttpGet(IN void *handle);
+EXPORT_SPEC int UpnpCancelHttpGet(IN void *handle);
 
 
 /** {\bf UpnpHttpGetProgress} rettrieve progress information of a http-get 
@@ -2467,7 +2478,7 @@ int UpnpCancelHttpGet(IN void *handle);
  *    \end{itemize}
  *
  */
-int UpnpHttpGetProgress(
+EXPORT_SPEC int UpnpHttpGetProgress(
     IN void *handle,           /** The token created by the call to
 				       {\bf UpnpOpenHttpGet}. */
 	OUT unsigned int *length, /** The number of bytes received. */
@@ -2485,7 +2496,7 @@ int UpnpHttpGetProgress(
  *    \end{itemize}
  */  
 
-int UpnpCancelHttpGet(IN void *handle);
+EXPORT_SPEC int UpnpCancelHttpGet(IN void *handle);
 
 
 /** {\bf UpnpCloseHttpGet} closes the connection and frees memory that was 
@@ -2498,7 +2509,7 @@ int UpnpCancelHttpGet(IN void *handle);
  *    \end{itemize}
  */  
 
-int UpnpCloseHttpGet(IN void *handle);
+EXPORT_SPEC int UpnpCloseHttpGet(IN void *handle);
 
 
 /** {\bf UpnpOpenHttpPost} makes an HTTP POST request message, opens a 
@@ -2527,7 +2538,7 @@ int UpnpCloseHttpGet(IN void *handle);
  *    \end{itemize}
  */
 
-int UpnpOpenHttpPost(
+EXPORT_SPEC int UpnpOpenHttpPost(
 	IN const char *url,         /** The URL in which to send the POST 
 				        request. */
 	IN OUT void **handle,	    /** A pointer in which to store the 
@@ -2560,7 +2571,7 @@ int UpnpOpenHttpPost(
  *    \end{itemize}
  */
 
-int UpnpWriteHttpPost(
+EXPORT_SPEC int UpnpWriteHttpPost(
 	IN void *handle,          /** The handle of the connection created 
 				      by the call to {\bf UpnpOpenHttpPost}. */
 	IN char *buf,             /** The buffer to be posted. */
@@ -2587,7 +2598,7 @@ int UpnpWriteHttpPost(
  *    \end{itemize}
  */
   
-int UpnpCloseHttpPost(
+EXPORT_SPEC int UpnpCloseHttpPost(
 	IN void *handle,          /** The handle of the connection to close, 
 				      created by the call to 
 				      {\bf UpnpOpenHttpPost}. */
@@ -2628,7 +2639,7 @@ int UpnpCloseHttpPost(
  *    \end{itemize}
  */
 
-int UpnpDownloadXmlDoc(
+EXPORT_SPEC int UpnpDownloadXmlDoc(
     IN const char *url,          /** URL of the XML document. */
     OUT IXML_Document **xmlDoc   /** A pointer in which to store the 
 				     XML document. */
@@ -2666,7 +2677,7 @@ int UpnpDownloadXmlDoc(
  *    \end{itemize}
  */
  
-int UpnpSetWebServerRootDir( 
+EXPORT_SPEC int UpnpSetWebServerRootDir( 
     IN const char* rootDir  /** Path of the root directory of the web 
                                 server. */
     );
@@ -2683,7 +2694,7 @@ int UpnpSetWebServerRootDir(
  *    \end{itemize}
  */
 
-int UpnpSetVirtualDirCallbacks(
+EXPORT_SPEC int UpnpSetVirtualDirCallbacks(
     IN struct UpnpVirtualDirCallbacks *callbacks /** Pointer to a structure 
                                                      containing points to the 
                                                      virtual interface 
@@ -2700,7 +2711,7 @@ int UpnpSetVirtualDirCallbacks(
  *    \end{itemize}
  */
 
-int UpnpEnableWebserver(
+EXPORT_SPEC int UpnpEnableWebserver(
     IN int enable /** {\tt TRUE} to enable, {\tt FALSE} to disable. */
     );
 
@@ -2714,7 +2725,7 @@ int UpnpEnableWebserver(
  *    \end{itemize}
  */
 
-int UpnpIsWebserverEnabled();
+EXPORT_SPEC int UpnpIsWebserverEnabled();
 
 /** {\bf UpnpAddVirtualDir} adds a virtual directory mapping.
  *
@@ -2729,7 +2740,7 @@ int UpnpIsWebserverEnabled();
  *    \end{itemize}
  */
 
-int UpnpAddVirtualDir(
+EXPORT_SPEC int UpnpAddVirtualDir(
     IN const char *dirName /** The name of the new directory mapping to add. 
 							*/
     );
@@ -2744,7 +2755,7 @@ int UpnpAddVirtualDir(
  *    \end{itemize}
  */
 
-int UpnpRemoveVirtualDir(
+EXPORT_SPEC int UpnpRemoveVirtualDir(
     IN const char *dirName /** The name of the virtual directory mapping to 
                                remove. */
     );
@@ -2755,9 +2766,9 @@ int UpnpRemoveVirtualDir(
  *
  */
 
-void UpnpRemoveAllVirtualDirs( );
+EXPORT_SPEC void UpnpRemoveAllVirtualDirs( );
 
-void UpnpFree(
+EXPORT_SPEC void UpnpFree(
     IN void *item /* The item to free. */
     );
 

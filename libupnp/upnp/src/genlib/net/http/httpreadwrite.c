@@ -162,6 +162,12 @@ http_Connect( IN uri_type * destination_url,
 
     if( connect( connfd, ( struct sockaddr * )&url->hostport.IPv4address,
                  sizeof( struct sockaddr_in ) ) == -1 ) {
+#ifdef WIN32
+		DBGONLY(
+			UpnpPrintf(UPNP_CRITICAL, HTTP, __FILE__, __LINE__,
+			"connect error: %d\n", WSAGetLastError());
+		)
+#endif
         shutdown( connfd, SD_BOTH );
         UpnpCloseSocket( connfd );
         return UPNP_E_SOCKET_CONNECT;

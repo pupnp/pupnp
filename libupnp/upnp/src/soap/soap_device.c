@@ -194,8 +194,9 @@ send_error_response( IN SOCKINFO * info,
     int major,
       minor;
     const char *start_body =
-        "<s:Envelope\n"
-        "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+//		"<?xml version=\"1.0\"?>\n" required??
+        "<s:Envelope "
+        "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
         "<s:Body>\n"
         "<s:Fault>\n"
@@ -272,8 +273,9 @@ send_var_query_response( IN SOCKINFO * info,
     int major,
       minor;
     const char *start_body =
-        "<s:Envelope\n"
-        "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+//		"<?xml version=\"1.0\"?>\n" required??
+        "<s:Envelope "
+        "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
         "<s:Body>\n"
         "<u:QueryStateVariableResponse "
@@ -697,6 +699,7 @@ send_action_response( IN SOCKINFO * info,
     int ret_code;
     int timeout_secs = SOAP_TIMEOUT;
     static char *start_body =
+//        "<?xml version=\"1.0\"?>" required??
         "<s:Envelope xmlns:s=\"http://schemas.xmlsoap."
         "org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap."
         "org/soap/encoding/\"><s:Body>\n";

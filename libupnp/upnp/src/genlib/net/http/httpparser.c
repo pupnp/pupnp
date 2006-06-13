@@ -1696,7 +1696,7 @@ parser_parse_headers( INOUT http_parser_t * parser )
             ListAddTail( &parser->msg.headers, header );
 
             //NNS:          ret = dlist_append( &parser->msg.headers, header );
-/** remove that? */
+/** TODO: remove that? */
             if( ret == UPNP_E_OUTOF_MEMORY ) {
                 parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
                 return PARSE_FAILURE;

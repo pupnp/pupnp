@@ -66,7 +66,7 @@ extern "C" {
  *    \end{itemize}
  */
 
-int UpnpResolveURL(
+EXPORT_SPEC int UpnpResolveURL(
     IN const char * BaseURL,  /** The base URL to combine. */
     IN const char * RelURL,   /** The relative URL to {\bf BaseURL}. */
     OUT char * AbsURL   /** A pointer to a buffer to store the 
@@ -82,7 +82,7 @@ int UpnpResolveURL(
  *                      {\tt NULL} if the operation failed.
  */
 
-IXML_Document* UpnpMakeAction(
+EXPORT_SPEC IXML_Document* UpnpMakeAction(
     IN const char * ActionName, /** The action name. */
     IN const char * ServType,   /** The service type.  */
     IN int NumArg,              /** Number of argument pairs to be passed. */ 
@@ -107,7 +107,7 @@ IXML_Document* UpnpMakeAction(
  *    \end{itemize}
  */
 
-int UpnpAddToAction(
+EXPORT_SPEC int UpnpAddToAction(
         IN OUT IXML_Document ** ActionDoc, 
 	                              /** A pointer to store the action 
 				          document node. */
@@ -126,7 +126,7 @@ int UpnpAddToAction(
  *                           {\tt NULL} if the operation failed.
  */
 
-IXML_Document* UpnpMakeActionResponse(
+EXPORT_SPEC IXML_Document* UpnpMakeActionResponse(
     IN const char * ActionName, /** The action name. */
     IN const char * ServType,   /** The service type.  */
     IN int NumArg,              /** The number of argument pairs passed. */  
@@ -152,7 +152,7 @@ IXML_Document* UpnpMakeActionResponse(
  *    \end{itemize}
  */
 
-int UpnpAddToActionResponse(
+EXPORT_SPEC int UpnpAddToActionResponse(
         IN OUT IXML_Document ** ActionResponse, 
 	                                   /** Pointer to a document to 
 					       store the action document 
@@ -181,7 +181,7 @@ int UpnpAddToActionResponse(
  *
  */
 
-int UpnpAddToPropertySet(
+EXPORT_SPEC int UpnpAddToPropertySet(
     IN OUT IXML_Document **PropSet,    
                                   /** A pointer to the document containing 
 				      the property set document node. */
@@ -199,7 +199,7 @@ int UpnpAddToPropertySet(
  *
  */
 
-IXML_Document* UpnpCreatePropertySet(
+EXPORT_SPEC IXML_Document* UpnpCreatePropertySet(
     IN int NumArg,        /** The number of argument pairs passed. */
     IN const char* Arg,   /** The status variable name and value pair. */
     IN ...
@@ -213,7 +213,7 @@ IXML_Document* UpnpCreatePropertySet(
  *                  associated with the error code. 
  */
 
-const char * UpnpGetErrorMessage(
+EXPORT_SPEC const char * UpnpGetErrorMessage(
         int errorcode  /** The SDK error code to convert. */
         );
 

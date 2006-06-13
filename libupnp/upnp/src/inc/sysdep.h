@@ -49,10 +49,10 @@ typedef unsigned char   byte;
 /* Set this to what your compiler uses for 64 bit data type */
 #ifndef WIN32
  #define unsigned64_t unsigned long long
- #define I64(C) C##LL
 #else
  #define unsigned64_t __int64
 #endif
+#define I64(C) C##LL
 
 typedef unsigned64_t uuid_time_t;
 typedef struct {

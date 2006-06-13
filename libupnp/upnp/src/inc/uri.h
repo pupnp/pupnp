@@ -77,7 +77,10 @@ extern "C" {
 enum hostType { HOSTNAME, IPv4address };
 enum pathType { ABS_PATH, REL_PATH, OPAQUE_PART };
 #ifndef WIN32
- enum uriType  { ABSOLUTE, RELATIVE };
+// there is a conflict in windows with other symbols
+enum uriType  { ABSOLUTE, RELATIVE };
+#else
+enum uriType  { absolute, relative };
 #endif
 
 /*	Buffer used in parsinghttp messages, urls, etc. generally this simply

@@ -345,11 +345,11 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
     struct timeb t;
 
     ftime( &t );
-    srand( (unsigned int)t.millitm 
-     #ifndef WIN32
-      + ithread_get_current_thread_id()
-     #endif
-     );
+#ifndef WIN32
+    srand( ( unsigned int )t.millitm + ithread_get_current_thread_id(  ) );
+#else
+    srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id(  ).p );
+#endif
     }
 
 /****************************************************************************

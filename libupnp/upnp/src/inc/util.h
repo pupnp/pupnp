@@ -82,7 +82,7 @@ typedef char xboolean;
 extern "C" {
 #endif
 
-//void log_error( IN const char *fmt, ... );
+void log_error( IN const char *fmt, ... );
 
 /************************************************************************
 *	Function :	linecopy

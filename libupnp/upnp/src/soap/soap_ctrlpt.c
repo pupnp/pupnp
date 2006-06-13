@@ -602,7 +602,8 @@ SoapSendAction( IN char *action_url,
     xboolean got_response = FALSE;
 
     char *xml_start =
-        "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+//        "<?xml version=\"1.0\"?>\n" required??
+		"<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
         "<s:Body>";
     char *xml_end = "</s:Body>\n" "</s:Envelope>\n";
@@ -735,7 +736,8 @@ SoapSendActionEx( IN char *action_url,
     xboolean got_response = FALSE;
 
     char *xml_start =
-        "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+//		"<?xml version=\"1.0\"?>\n" required??
+        "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n";
     char *xml_body_start = "<s:Body>";
     char *xml_end = "</s:Body>\n" "</s:Envelope>\n";
@@ -880,7 +882,8 @@ SoapGetServiceVarStatus( IN char *action_url,
     int upnp_error_code;
 
     char *xml_start =
-        "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+//		"<?xml version=\"1.0\"?>\n" required??
+        "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
         "<s:Body>\n"
         "<u:QueryStateVariable xmlns:u=\"urn:schemas-upnp-org:control-1-0\">\n"

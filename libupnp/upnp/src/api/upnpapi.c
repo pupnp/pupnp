@@ -158,11 +158,43 @@ int UpnpInit( IN const char *HostIP,
 {
     int retVal = 0;
     ThreadPoolAttr attr;
+#ifdef WIN32
+	WORD wVersionRequested;
+	WSADATA wsaData;
+	int err;
+#endif
 
     if( UpnpSdkInit == 1 ) {
         // already initialized
         return UPNP_E_INIT;
     }
+
+#ifdef WIN32
+	wVersionRequested = MAKEWORD( 2, 2 );
+
+	err = WSAStartup( wVersionRequested, &wsaData );
+	if ( err != 0 ) {
+		/* Tell the user that we could not find a usable */
+		/* WinSock DLL.                                  */
+		return UPNP_E_INIT_FAILED;
+	}
+
+	/* Confirm that the WinSock DLL supports 2.2.*/
+	/* Note that if the DLL supports versions greater    */
+	/* than 2.2 in addition to 2.2, it will still return */
+	/* 2.2 in wVersion since that is the version we      */
+	/* requested.                                        */
+	 
+	if ( LOBYTE( wsaData.wVersion ) != 2 ||
+			HIBYTE( wsaData.wVersion ) != 2 ) {
+		/* Tell the user that we could not find a usable */
+		/* WinSock DLL.                                  */
+		WSACleanup( );
+		return UPNP_E_INIT_FAILED; 
+	}
+
+	/* The WinSock DLL is acceptable. Proceed. */
+#endif
 
     membuffer_init( &gDocumentRootDir );
 
@@ -330,6 +362,10 @@ UpnpFinish(  )
 
     DBGONLY( ThreadPoolStats stats;
          )
+
+#ifdef WIN32
+//	WSACleanup( );
+#endif
 
         if( UpnpSdkInit != 1 )
         return UPNP_E_FINISH;
@@ -3296,6 +3332,11 @@ UpnpDownloadXmlDoc( const char *url,
             return ret_code;
     }
 
+	/* TODO: MoNKi: Do not check this?? Some routers (Linksys WRT54GS) sends
+	   "CONTENT-TYPE: application/octet-stream". If the data sended is not
+	   an xml file, ixmlParseBufferEx will fail and the function will return
+	   UPNP_E_INVALID_DESC too.*/
+
     if( strncasecmp( content_type, "text/xml", strlen( "text/xml" ) ) ) {
         free( xml_buf );
         DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
@@ -3303,6 +3344,7 @@ UpnpDownloadXmlDoc( const char *url,
              )
             return UPNP_E_INVALID_DESC;
     }
+    // end of TODO Do not check this
 
     ret_code = ixmlParseBufferEx( xml_buf, xmlDoc );
     free( xml_buf );
