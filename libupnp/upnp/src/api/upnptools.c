@@ -345,7 +345,7 @@ UpnpMakeAction( const char *ActionName,
                 const char *Arg,
                 ... )
 {
-    va_list ArgList=NULL;
+    va_list ArgList;
     IXML_Document *out = NULL;
 
     if( NumArg > 0 ) {
@@ -387,7 +387,7 @@ UpnpMakeActionResponse( const char *ActionName,
                         const char *Arg,
                         ... )
 {
-    va_list ArgList=NULL;
+    va_list ArgList;
     IXML_Document *out = NULL;
 
     if( NumArg > 0 ) {
