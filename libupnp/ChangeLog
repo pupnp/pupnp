@@ -1,12 +1,16 @@
+2006-06-26 Marcelo Jimenez <mroberto@users.sourceforge.net>
+
+	* Fix for va_list initialization in x86_64 architectures.
+
 2006-06-12 Oxy <virtual_worlds@gmx.de>
- 
-      * Windows support added, it compiles and exports DLL-symbols but
-        it is not fully tested yet
+
+	* Windows support added, it compiles and exports DLL-symbols but
+	it is not fully tested yet
 
 2006-06-08 Oxy <virtual_worlds@gmx.de>
 
-      * Patch to fix memory leaks and reasons for crashes added (thanks
-        to loigu)
+	* Patch to fix memory leaks and reasons for crashes added (thanks
+	to loigu)
 
 *************************************************************************
 Release of version 1.4.0
