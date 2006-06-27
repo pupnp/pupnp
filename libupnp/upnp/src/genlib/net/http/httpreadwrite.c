@@ -1948,7 +1948,7 @@ http_MakeMessage( INOUT membuffer * buf,
         }
 
 /* --- PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld@users.sourceforge.net> */
-        if( c == 'X' )          // C string
+	else if( c == 'X' )          // C string
         {
             s = ( char * )va_arg( argp, char * );
 

@@ -1,5 +1,10 @@
 2006-06-26 Marcelo Jimenez <mroberto@users.sourceforge.net>
 
+	* Fix for missing "else" in httpreadwrite.c. Thanks to npapadop
+	for the patch.
+
+2006-06-26 Marcelo Jimenez <mroberto@users.sourceforge.net>
+
 	* Fix for va_list initialization in x86_64 architectures.
 
 2006-06-12 Oxy <virtual_worlds@gmx.de>
