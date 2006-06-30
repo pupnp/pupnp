@@ -2303,54 +2303,6 @@ EXPORT_SPEC int UpnpOpenHttpGetProxy(
 					the user. */		 
 	  );
 
-/** {\bf UpnpOpenHttpGetProxy} gets a file specified in a URL through the
- * specified proxy.
- *  The SDK allocates the memory for {\bf handle} and 
- *  {\bf contentType}, the application is responsible for freeing this memory.
- *
- *  @return [int] An integer representing one of the following:
- *    \begin{itemize}
- *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_PARAM}: Either {\bf url}, {\bf handle},  
- *              {\bf contentType}, {\bf contentLength} or {\bf httpStatus} 
- *		is not a valid pointer.
- *      \item {\tt UPNP_E_INVALID_URL}: The {\bf url} is not a valid 
- *              URL.
- *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
- *              download this file.
- *      \item {\tt UPNP_E_NETWORK_ERROR}: A network error occurred.
- *      \item {\tt UPNP_E_SOCKET_WRITE}: An error or timeout occurred writing 
- *              to a socket.
- *      \item {\tt UPNP_E_SOCKET_READ}: An error or timeout occurred reading 
- *              from a socket.
- *      \item {\tt UPNP_E_SOCKET_BIND}: An error occurred binding a socket.
- *      \item {\tt UPNP_E_SOCKET_CONNECT}: An error occurred connecting a 
- *              socket.
- *      \item {\tt UPNP_E_OUTOF_SOCKET}: Too many sockets are currently 
- *              allocated.
- *	\item {\tt UPNP_E_BAD_RESPONSE}: A bad response was received from the 
- *	        remote server.
- *    \end{itemize}
- */
-
-EXPORT_SPEC int UpnpOpenHttpGetProxy(
-	IN const char *url,	    /** The URL of an item to get. */
-    IN const char *proxy_str,    /** The URL of the proxy. */
-	IN OUT void **handle,       /** A pointer to store the handle for 
-				        this connection. */
-	IN OUT char **contentType,  /** A buffer to store the media type of 
-				        the item. */
-	IN OUT int *contentLength,  /** A pointer to store the length of the 
-				        item. */
-	IN OUT int *httpStatus,	    /** The status returned on receiving a 
-				        response message. */
-	IN int timeout		    /** The time out value sent with the 
-				        request during which a response is 
-					expected from the server, failing 
-					which, an error is reported back to 
-					the user. */		 
-	  );
-
 /** {\bf UpnpOpenHttpGetEx} gets specified number of bytes from a file 
  *  specified in the URL. The number of bytes is specified through a low 
  *  count and a high count which are passed as a range of bytes for the 
@@ -2465,39 +2417,6 @@ EXPORT_SPEC int UpnpHttpGetProgress(
  */  
 
 EXPORT_SPEC int UpnpCancelHttpGet(IN void *handle);
-
-
-/** {\bf UpnpHttpGetProgress} rettrieve progress information of a http-get 
- *  transfer. 
- *
- *  @return [int] An integer representing one of the following:
- *    \begin{itemize}
- *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_PARAM}: Either {\bf handle}, {\bf length} 
- *              or {\bf total} is not a valid pointer.
- *    \end{itemize}
- *
- */
-EXPORT_SPEC int UpnpHttpGetProgress(
-    IN void *handle,           /** The token created by the call to
-				       {\bf UpnpOpenHttpGet}. */
-	OUT unsigned int *length, /** The number of bytes received. */
-	OUT unsigned int *total   /** The content length. */
-    );
-
-
-/** {\bf UpnpCancelHttpGet} set the cancel flag of the  {\bf handle}
- * parameter. 
- *
- *  @return [int] An integer representing one of the following:
- *    \begin{itemize}
- *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_PARAM}: {\bf handle} is not a valid pointer.
- *    \end{itemize}
- */  
-
-EXPORT_SPEC int UpnpCancelHttpGet(IN void *handle);
-
 
 /** {\bf UpnpCloseHttpGet} closes the connection and frees memory that was 
  *	allocated for the {\bf handle} parameter.
