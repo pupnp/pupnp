@@ -345,10 +345,12 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
     struct timeb t;
 
     ftime( &t );
-#ifndef WIN32
-    srand( ( unsigned int )t.millitm + ithread_get_current_thread_id(  ) );
-#else
+#if defined(WIN32)
     srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id(  ).p );
+#elif defined(__FreeBSD__)
+    srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id(  ) );
+#else
+    srand( ( unsigned int )t.millitm + ithread_get_current_thread_id(  ) );
 #endif
     }
 
@@ -1463,7 +1465,11 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
                assert( stats != NULL ); if( stats == NULL ) {
                return;}
 
+	       #ifdef __FreeBSD__
+               printf( "ThreadPoolStats at Time: %d\n", time( NULL ) );
+	       #else
                printf( "ThreadPoolStats at Time: %ld\n", time( NULL ) );
+	       #endif
                printf
                ( "Average Wait in High Priority Q in milliseconds: %lf\n",
                  stats->avgWaitHQ );

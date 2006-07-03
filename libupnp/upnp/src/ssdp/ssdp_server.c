@@ -960,6 +960,22 @@ get_ssdp_sockets( MiniServerSockArray * out )
         UpnpCloseSocket( ssdpSock );
         return UPNP_E_SOCKET_ERROR;
     }
+    
+    #ifdef __FreeBSD__
+    if( setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEPORT,
+                    ( char * )&onOff, sizeof( onOff ) ) != 0 ) {
+
+        DBGONLY( UpnpPrintf( UPNP_CRITICAL,
+                             SSDP, __FILE__, __LINE__,
+                             "Error in set reuse port !!!\n" );
+             )
+            CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
+        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
+        shutdown( ssdpSock, SD_BOTH );
+        UpnpCloseSocket( ssdpSock );
+        return UPNP_E_SOCKET_ERROR;
+    }
+    #endif
 
     memset( ( void * )&ssdpAddr, 0, sizeof( struct sockaddr_in ) );
     ssdpAddr.sin_family = AF_INET;

@@ -37,6 +37,9 @@
 //@{
 
 #include <stdio.h>
+#ifdef __FreeBSD__
+#include <time.h>
+#endif
 #include "ixml.h"
 #include "upnpconfig.h"
 #if UPNP_HAVE_DEBUG

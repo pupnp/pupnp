@@ -1,3 +1,7 @@
+2006-07-03 Marcelo Jimenez <mroberto@users.sourceforge.net>
+
+	* Patch for FreeBSD, thanks to Markus Strobl.
+
 2006-06-26 Marcelo Jimenez <mroberto@users.sourceforge.net>
 
 	* Fix for missing "else" in httpreadwrite.c. Thanks to npapadop

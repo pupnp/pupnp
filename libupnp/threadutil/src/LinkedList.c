@@ -30,7 +30,11 @@
 ///////////////////////////////////////////////////////////////////////////
 
 #include "LinkedList.h"
+#ifdef __FreeBSD__
+#include <stdlib.h>
+#else
 #include <malloc.h>
+#endif
 #include <assert.h>
 
 static int

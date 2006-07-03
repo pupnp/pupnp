@@ -33,6 +33,9 @@
 * Purpose: This file contains functions for uri, url parsing utility. 
 ************************************************************************/
 
+#ifdef __FreeBSD__
+#include <lwres/netdb.h>
+#endif
 #include "config.h"
 #include "uri.h"
 
@@ -608,21 +611,27 @@ parse_hostport( char *in,
         int errCode = 0;
 
         //call gethostbyname_r (reentrant form of gethostbyname)
-        #ifdef WIN32
-		 h=gethostbyname(temp_host_name);
-        #else
-         #ifndef SPARC_SOLARIS
-         errCode = gethostbyname_r( temp_host_name,
-                                    &h_buf,
-                                    temp_hostbyname_buff,
-                                    BUFFER_SIZE, &h, &errcode );
-         #else
-         errCode = gethostbyname_r( temp_host_name,
-                                    &h,
-                                    temp_hostbyname_buff,
-                                    BUFFER_SIZE, &errcode );
-         #endif 
-        #endif
+#if defined(WIN32)
+        h=gethostbyname(temp_host_name);
+#elif defined(SPARC_SOLARIS)
+        errCode = gethostbyname_r( temp_host_name,
+                                   &h,
+                                   temp_hostbyname_buff,
+                                   BUFFER_SIZE, &errcode );
+#elif defined(__FreeBSD__)
+        h = lwres_gethostbyname_r( temp_host_name,
+                                   &h_buf,
+                                   temp_hostbyname_buff,
+                                   BUFFER_SIZE, &errcode );
+        if ( h == NULL ) {
+            errCode = 1;
+        }
+#else
+        errCode = gethostbyname_r( temp_host_name,
+                                   &h_buf,
+                                   temp_hostbyname_buff,
+                                   BUFFER_SIZE, &h, &errcode );
+#endif 
 
         if( errCode == 0 ) {
             if( h ) {
