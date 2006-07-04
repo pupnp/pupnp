@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.05.03"/>
+    <PROJECT value="cbuilder.dll"/>
+    <OBJFILES value="cbuilder.obj ..\ixml\src\nodeList.obj ..\ixml\src\attr.obj 
+      ..\ixml\src\document.obj ..\ixml\src\element.obj ..\ixml\src\ixml.obj 
+      ..\ixml\src\ixmlmembuf.obj ..\ixml\src\ixmlparser.obj 
+      ..\ixml\src\namedNodeMap.obj ..\ixml\src\node.obj 
+      ..\threadutil\src\TimerThread.obj ..\threadutil\src\FreeList.obj 
+      ..\threadutil\src\iasnprintf.obj ..\threadutil\src\LinkedList.obj 
+      ..\threadutil\src\ThreadPool.obj ..\upnp\src\api\upnpapi.obj 
+      ..\upnp\src\api\upnptools.obj ..\upnp\src\gena\gena_device.obj 
+      ..\upnp\src\gena\gena_callback2.obj ..\upnp\src\gena\gena_ctrlpt.obj 
+      ..\upnp\src\genlib\client_table\client_table.obj 
+      ..\upnp\src\genlib\miniserver\miniserver.obj 
+      ..\upnp\src\genlib\net\http\webserver.obj 
+      ..\upnp\src\genlib\net\http\httpparser.obj 
+      ..\upnp\src\genlib\net\http\httpreadwrite.obj 
+      ..\upnp\src\genlib\net\http\parsetools.obj 
+      ..\upnp\src\genlib\net\http\statcodes.obj 
+      ..\upnp\src\genlib\net\uri\uri.obj ..\upnp\src\genlib\net\sock.obj 
+      ..\upnp\src\genlib\service_table\service_table.obj 
+      ..\upnp\src\soap\soap_device.obj ..\upnp\src\soap\soap_common.obj 
+      ..\upnp\src\soap\soap_ctrlpt.obj ..\upnp\src\ssdp\ssdp_server.obj 
+      ..\upnp\src\ssdp\ssdp_ctrlpt.obj ..\upnp\src\ssdp\ssdp_device.obj 
+      ..\upnp\src\urlconfig\urlconfig.obj ..\upnp\src\uuid\uuid.obj 
+      ..\upnp\src\uuid\md5.obj ..\upnp\src\uuid\sysdep.obj 
+      ..\upnp\src\win_dll.obj ..\upnp\src\inet_pton.obj"/>
+    <RESFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES)"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value=""/>
+    <SPARELIBS value=""/>
+    <PACKAGES value=""/>
+    <PATHCPP value=".;..\ixml\src;..\threadutil\src;..\upnp\src\api;..\upnp\src\gena;..\upnp\src\genlib\client_table;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\net\http;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net;..\upnp\src\genlib\service_table;..\upnp\src\soap;..\upnp\src\ssdp;..\upnp\src\urlconfig;..\upnp\src\uuid;..\upnp\src"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="tlink32"/>
+    <USERDEFINES value="WIN32"/>
+    <SYSDEFINES value="NO_STRICT;_NO_VCL"/>
+    <MAINSOURCE value="cbuilder.bpf"/>
+    <INCLUDEPATH value="..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc;..\ixml\src\inc;..\upnp\src\inc"/>
+    <LIBPATH value="..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <WARNINGS value="-w-par"/>
+  </MACROS>
+  <OPTIONS>
+    <CFLAG1 value="-WD -O2 -H=$(BCB)\lib\vcl50.csm -Hc -Vx -Ve -X- -a8 -6 -b- -k- -vi -tWD 
+      -tWM -c"/>
+    <PFLAGS value="-$Y- -$L- -$D- -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zd"/>
+    <LFLAGS value="-D&quot;&quot; -aa -Tpd -x -Gn -Gi"/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0d32.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cw32mt.lib"/>
+  </LINKER>
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1031
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=4
+Item0=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc;D:\DEVELOP\pupnp\trunk\ixml\src\inc;D:\DEVELOP\pupnp\trunk\upnp\src\inc
+Item1=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc
+Item2=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;D:\DEVELOP\pupnp\trunk\ixml\inc;D:\DEVELOP\pupnp\trunk\threadutil\inc;D:\DEVELOP\pupnp\trunk\upnp\inc;D:\DEVELOP\pupnp\trunk\build\inc
+Item3=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=1
+Item0=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=1
+Item0=WIN32
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+  </IDEOPTIONS>
+</PROJECT>
