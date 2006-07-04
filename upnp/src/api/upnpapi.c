@@ -1553,7 +1553,7 @@ UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
 #ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
- * Function: UpnpSendAdvertisement 
+ * Function: UpnpSearchAsync 
  *
  * Parameters:	
  *	IN UpnpClient_Handle Hnd: handle of the control point instance
