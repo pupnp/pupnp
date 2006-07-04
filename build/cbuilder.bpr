@@ -3,16 +3,16 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="cbuilder.dll"/>
-    <OBJFILES value="cbuilder.obj ..\ixml\src\nodeList.obj ..\ixml\src\attr.obj 
-      ..\ixml\src\document.obj ..\ixml\src\element.obj ..\ixml\src\ixml.obj 
-      ..\ixml\src\ixmlmembuf.obj ..\ixml\src\ixmlparser.obj 
-      ..\ixml\src\namedNodeMap.obj ..\ixml\src\node.obj 
-      ..\threadutil\src\TimerThread.obj ..\threadutil\src\FreeList.obj 
-      ..\threadutil\src\iasnprintf.obj ..\threadutil\src\LinkedList.obj 
-      ..\threadutil\src\ThreadPool.obj ..\upnp\src\api\upnpapi.obj 
-      ..\upnp\src\api\upnptools.obj ..\upnp\src\gena\gena_device.obj 
-      ..\upnp\src\gena\gena_callback2.obj ..\upnp\src\gena\gena_ctrlpt.obj 
+    <PROJECT value="..\cbuilder.dll"/>
+    <OBJFILES value="..\ixml\src\nodeList.obj ..\ixml\src\attr.obj ..\ixml\src\document.obj 
+      ..\ixml\src\element.obj ..\ixml\src\ixml.obj ..\ixml\src\ixmlmembuf.obj 
+      ..\ixml\src\ixmlparser.obj ..\ixml\src\namedNodeMap.obj 
+      ..\ixml\src\node.obj ..\threadutil\src\TimerThread.obj 
+      ..\threadutil\src\FreeList.obj ..\threadutil\src\iasnprintf.obj 
+      ..\threadutil\src\LinkedList.obj ..\threadutil\src\ThreadPool.obj 
+      ..\upnp\src\api\upnpapi.obj ..\upnp\src\api\upnptools.obj 
+      ..\upnp\src\gena\gena_device.obj ..\upnp\src\gena\gena_callback2.obj 
+      ..\upnp\src\gena\gena_ctrlpt.obj 
       ..\upnp\src\genlib\client_table\client_table.obj 
       ..\upnp\src\genlib\miniserver\miniserver.obj 
       ..\upnp\src\genlib\net\http\webserver.obj 
@@ -55,7 +55,7 @@
     <PFLAGS value="-$Y- -$L- -$D- -v -JPHNE -M"/>
     <RFLAGS value=""/>
     <AFLAGS value="/mx /w2 /zd"/>
-    <LFLAGS value="-D&quot;&quot; -aa -Tpd -x -Gn -Gi"/>
+    <LFLAGS value="-l&quot;D:\DEVELOP\pupnp\trunk\&quot; -D&quot;&quot; -aa -Tpd -x -Gn -Gi"/>
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="c0d32.obj $(OBJFILES)"/>
@@ -91,11 +91,12 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=4
-Item0=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc;D:\DEVELOP\pupnp\trunk\ixml\src\inc;D:\DEVELOP\pupnp\trunk\upnp\src\inc
-Item1=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc
-Item2=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;D:\DEVELOP\pupnp\trunk\ixml\inc;D:\DEVELOP\pupnp\trunk\threadutil\inc;D:\DEVELOP\pupnp\trunk\upnp\inc;D:\DEVELOP\pupnp\trunk\build\inc
-Item3=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl
+Count=5
+Item0=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc;..\ixml\src\inc;..\upnp\src\inc
+Item1=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc;D:\DEVELOP\pupnp\trunk\ixml\src\inc;D:\DEVELOP\pupnp\trunk\upnp\src\inc
+Item2=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc
+Item3=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;D:\DEVELOP\pupnp\trunk\ixml\inc;D:\DEVELOP\pupnp\trunk\threadutil\inc;D:\DEVELOP\pupnp\trunk\upnp\inc;D:\DEVELOP\pupnp\trunk\build\inc
+Item4=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=1
@@ -108,6 +109,14 @@ Item0=$(BCB)\source\vcl
 [HistoryLists\hlConditionals]
 Count=1
 Item0=WIN32
+
+[HistoryLists\hlFinalOutputDir]
+Count=1
+Item0=D:\DEVELOP\pupnp\trunk
+
+[HistoryLists\hIBPIOutputDir]
+Count=1
+Item0=D:\DEVELOP\pupnp\trunk
 
 [Debugging]
 DebugSourceDirs=$(BCB)\source\vcl

@@ -1,4 +1,3 @@
-USEUNIT("cbuilder.bpr");
 USEUNIT("..\ixml\src\nodeList.c");
 USEUNIT("..\ixml\src\attr.c");
 USEUNIT("..\ixml\src\document.c");
