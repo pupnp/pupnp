@@ -305,12 +305,10 @@
   */
 
 //@{
-#ifndef WIN32
- #ifdef DEBUG
-  #define DBGONLY(x) x
- #else
-  #define DBGONLY(x)
- #endif
+#ifdef DEBUG
+ #define DBGONLY(x) x
+#else
+ #define DBGONLY(x)
 #endif
 //@}
 

@@ -3,7 +3,7 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="..\cbuilder.dll"/>
+    <PROJECT value="libupnp.dll"/>
     <OBJFILES value="..\ixml\src\nodeList.obj ..\ixml\src\attr.obj ..\ixml\src\document.obj 
       ..\ixml\src\element.obj ..\ixml\src\ixml.obj ..\ixml\src\ixmlmembuf.obj 
       ..\ixml\src\ixmlparser.obj ..\ixml\src\namedNodeMap.obj 
@@ -44,18 +44,18 @@
     <LINKER value="tlink32"/>
     <USERDEFINES value="WIN32"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL"/>
-    <MAINSOURCE value="cbuilder.bpf"/>
+    <MAINSOURCE value="libupnp.bpf"/>
     <INCLUDEPATH value="..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc;..\ixml\src\inc;..\upnp\src\inc"/>
-    <LIBPATH value="..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <LIBPATH value="$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par"/>
   </MACROS>
   <OPTIONS>
-    <CFLAG1 value="-WD -O2 -H=$(BCB)\lib\vcl50.csm -Hc -Vx -Ve -X- -a8 -6 -b- -k- -vi -tWD 
-      -tWM -c"/>
-    <PFLAGS value="-$Y- -$L- -$D- -v -JPHNE -M"/>
+    <CFLAG1 value="-tWD -tWM -Od -H=$(BCB)\lib\vcl50.csm -Hc -Vx -Ve -X- -r- -a8 -b- -k -y -v 
+      -vi- -c"/>
+    <PFLAGS value="-$YD -$W -$O- -v -JPHNE -M"/>
     <RFLAGS value=""/>
     <AFLAGS value="/mx /w2 /zd"/>
-    <LFLAGS value="-l&quot;D:\DEVELOP\pupnp\trunk\&quot; -D&quot;&quot; -aa -Tpd -x -Gn -Gi"/>
+    <LFLAGS value="-Tpd -aa -Gi -D&quot;&quot; -x -Gn -v"/>
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="c0d32.obj $(OBJFILES)"/>
@@ -89,34 +89,6 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
-
-[HistoryLists\hlIncludePath]
-Count=5
-Item0=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc;..\ixml\src\inc;..\upnp\src\inc
-Item1=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc;D:\DEVELOP\pupnp\trunk\ixml\src\inc;D:\DEVELOP\pupnp\trunk\upnp\src\inc
-Item2=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc
-Item3=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;D:\DEVELOP\pupnp\trunk\ixml\inc;D:\DEVELOP\pupnp\trunk\threadutil\inc;D:\DEVELOP\pupnp\trunk\upnp\inc;D:\DEVELOP\pupnp\trunk\build\inc
-Item4=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl
-
-[HistoryLists\hlLibraryPath]
-Count=1
-Item0=..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\lib\obj;$(BCB)\lib
-
-[HistoryLists\hlDebugSourcePath]
-Count=1
-Item0=$(BCB)\source\vcl
-
-[HistoryLists\hlConditionals]
-Count=1
-Item0=WIN32
-
-[HistoryLists\hlFinalOutputDir]
-Count=1
-Item0=D:\DEVELOP\pupnp\trunk
-
-[HistoryLists\hIBPIOutputDir]
-Count=1
-Item0=D:\DEVELOP\pupnp\trunk
 
 [Debugging]
 DebugSourceDirs=$(BCB)\source\vcl
