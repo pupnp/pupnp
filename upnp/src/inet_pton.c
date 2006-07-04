@@ -193,9 +193,7 @@ inet_ntop6(src, dst, size)
  *	Paul Vixie, 1996.
  */
 static int
-inet_pton4(src, dst)
-	const char *src;
-	u_char *dst;
+inet_pton4(const char *src,u_char *dst)
 {
 	int saw_digit, octets, ch;
 	u_char tmp[4], *tp;
@@ -345,12 +343,7 @@ inet_pton6(src, dst)
  * author:
  *	Paul Vixie, 1996.
  */
-extern const char *
-inet_ntop(af, src, dst, size)
-	int af;
-	const void *src;
-	char *dst;
-	socklen_t size;
+extern const char *inet_ntop(int af,const void *src,char *dst,socklen_t size)
 {
 	switch (af) {
 	case AF_INET:
@@ -378,11 +371,7 @@ inet_ntop(af, src, dst, size)
  * author:
  *	Paul Vixie, 1996.
  */
-extern int
-inet_pton(af, src, dst)
-	int af;
-	const char *src;
-	void *dst;
+int inet_pton(int af,const char *src,void *dst)
 {
 	switch (af) {
 	case AF_INET:
