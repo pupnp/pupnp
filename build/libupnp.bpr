@@ -34,7 +34,7 @@
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
-    <LIBFILES value=""/>
+    <LIBFILES value="..\..\..\pthreads-w32-1-10-0-release\pthreadBC1.lib"/>
     <LIBRARIES value=""/>
     <SPARELIBS value=""/>
     <PACKAGES value=""/>
@@ -45,7 +45,7 @@
     <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
     <RELEASELIBPATH value="$(BCB)\lib\release"/>
     <LINKER value="tlink32"/>
-    <USERDEFINES value="WIN32;EXPORT_SPEC"/>
+    <USERDEFINES value="WIN32;LIBUPNP_EXPORTS"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL"/>
     <MAINSOURCE value="libupnp.bpf"/>
     <INCLUDEPATH value="..\upnp\src\genlib\util;..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc;..\ixml\src\inc;..\upnp\src\inc"/>
@@ -53,8 +53,8 @@
     <WARNINGS value="-w-par"/>
   </MACROS>
   <OPTIONS>
-    <CFLAG1 value="-WD -O2 -H=$(BCB)\lib\vcl50.csm -Hc -Vx -Ve -X- -a8 -6 -b- -k- -vi -tWD 
-      -tWM -c"/>
+    <CFLAG1 value="-WD -O2 -H=$(BCB)\lib\vcl50.csm -Hc -Vx -Ve -fp -ff -X- -a4 -6 -b- -k- -vi 
+      -tWD -tWM -c"/>
     <PFLAGS value="-$Y- -$L- -$D- -v -JPHNE -M"/>
     <RFLAGS value=""/>
     <AFLAGS value="/mx /w2 /zd"/>
@@ -106,9 +106,10 @@ Count=1
 Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
-Count=2
-Item0=WIN32;EXPORT_SPEC
-Item1=WIN32
+Count=3
+Item0=WIN32;LIBUPNP_EXPORTS
+Item1=WIN32;EXPORT_SPEC
+Item2=WIN32
 
 [Debugging]
 DebugSourceDirs=$(BCB)\source\vcl

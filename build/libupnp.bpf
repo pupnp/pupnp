@@ -43,6 +43,7 @@ USEUNIT("..\upnp\src\urlconfig\urlconfig.c");
 USEUNIT("..\upnp\src\uuid\uuid.c");
 USEUNIT("..\upnp\src\uuid\md5.c");
 USEUNIT("..\upnp\src\uuid\sysdep.c");
+USELIB("..\..\..\pthreads-w32-1-10-0-release\pthreadBC1.lib");
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 

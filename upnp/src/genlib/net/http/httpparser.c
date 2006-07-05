@@ -973,21 +973,21 @@ skip_to_end_of_header( INOUT scanner_t * scanner )
 }
 
 /************************************************************************
-* Function: match_char													
-*																		
-* Parameters:															
-*	INOUT scanner_t* scanner ;  Scanner Object											
-*	IN char c ;					Character to be compared with 															
-*	IN xboolean case_sensitive; Flag indicating whether comparison should 
+* Function: match_char
+*
+* Parameters:
+*	INOUT scanner_t* scanner ;  Scanner Object
+*	IN char c ;					Character to be compared with
+*	IN xboolean case_sensitive; Flag indicating whether comparison should
 *								be case sensitive
-*																		
-* Description: Compares a character to the next char in the scanner;	
-*	on error, scanner chars are not restored							
-*																		
-* Returns:																
-*   PARSE_OK															
-*   PARSE_NO_MATCH														
-*   PARSE_INCOMPLETE													
+*
+* Description: Compares a character to the next char in the scanner;
+*	on error, scanner chars are not restored
+*
+* Returns:
+*   PARSE_OK
+*   PARSE_NO_MATCH
+*   PARSE_INCOMPLETE
 ************************************************************************/
 static XINLINE parse_status_t
 match_char( INOUT scanner_t * scanner,
