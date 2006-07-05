@@ -34,11 +34,7 @@
 #if EXCLUDE_SOAP == 0
 
 #define SOAP_BODY "Body"
-#ifdef WIN32 // escaping necessary for CBuilder
- #define SOAP_URN "http:\/\/schemas.xmlsoap.org/soap/envelope/"
-#else
- #define SOAP_URN "http://schemas.xmlsoap.org/soap/envelope/"
-#endif
+#define SOAP_URN "http:/""/schemas.xmlsoap.org/soap/envelope/"
 
 #define QUERY_STATE_VAR_URN "urn:schemas-upnp-org:control-1-0"
 
