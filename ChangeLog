@@ -1,3 +1,7 @@
+2006-06-12 Oxy <virtual_worlds@gmx.de>
+
+	* full support for Windows added, DLL is fully working
+
 2006-07-03 Marcelo Jimenez <mroberto@users.sourceforge.net>
 
 	* Patch for FreeBSD, thanks to Markus Strobl.
