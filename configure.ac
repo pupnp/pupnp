@@ -10,7 +10,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([libupnp], [1.4.0], [virtual_worlds@gmx.de])
+AC_INIT([libupnp], [1.4.1], [virtual_worlds@gmx.de])
 # *Independently* of the above libupnp package version, the libtool version
 # of the 3 libraries need to be updated whenever there is a change released :
 # "current:revision:age" (this is NOT the same as the package version), where:
@@ -19,9 +19,9 @@ AC_INIT([libupnp], [1.4.0], [virtual_worlds@gmx.de])
 # 	- interfaces added: 			age++
 # 	- interfaces removed:			age=0
 # *please update only once, before a formal release, not for each change*
-AC_SUBST([LT_VERSION_IXML],       [2:1:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [2:1:0])
-AC_SUBST([LT_VERSION_UPNP],       [2:1:0])
+AC_SUBST([LT_VERSION_IXML],       [2:2:0])
+AC_SUBST([LT_VERSION_THREADUTIL], [2:2:0])
+AC_SUBST([LT_VERSION_UPNP],       [2:2:0])
 
 
 AC_CONFIG_AUX_DIR(config.aux)
@@ -129,6 +129,7 @@ AM_PROG_CC_C_O
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
+AC_PROG_EGREP
 
 
 #
