@@ -1,3 +1,8 @@
+2006-07-05 Nektarios K. Papadopoulos <npapadop@inaccessnetworks.com>
+
+	* Include prebuilt documentation (html,pdf), dropping doc++ 
+	dependancy.
+
 2006-06-12 Oxy <virtual_worlds@gmx.de>
 
 	* full support for Windows added, DLL is fully working

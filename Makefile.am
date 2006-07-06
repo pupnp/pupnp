@@ -9,7 +9,7 @@ ACLOCAL_AMFLAGS 	= -I m4
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-debug --enable-samples
 
-SUBDIRS 		= ixml threadutil upnp
+SUBDIRS 		= ixml threadutil upnp docs/dist
 
 
 EXTRA_DIST		= libupnp.pc.in LICENSE THANKS

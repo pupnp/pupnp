@@ -187,6 +187,7 @@ AC_CONFIG_FILES([Makefile
                  threadutil/Makefile
 		 upnp/Makefile
 		 upnp/doc/Makefile
+		 docs/dist/Makefile
 		 libupnp.pc
                  ])
 
