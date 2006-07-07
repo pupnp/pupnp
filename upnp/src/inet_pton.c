@@ -73,7 +73,7 @@ inet_ntop4(const u_char *src, char *dst, socklen_t size)
 	}
 	tmp[i - 1] = '\0';
 
-	if (strlen(tmp)>size) {
+	if ((socklen_t)strlen(tmp)>size) {
 		//__set_errno (ENOSPC);
 		return (NULL);
 	}

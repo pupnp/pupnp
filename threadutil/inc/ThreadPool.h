@@ -67,6 +67,10 @@ typedef enum priority {LOW_PRIORITY,
 
 
 //Statistics 
+#ifdef WIN32 // todo: check why STATSONLY fails during compilation
+ #undef STATS
+#endif
+
 #ifdef STATS
 #define STATSONLY(x) x
 #else
