@@ -51,7 +51,7 @@ extern const char * inet_ntop6(src, dst, size);
  * author:
  *	Paul Vixie, 1996.
  */
-extern int inet_pton4(src, dst);
+extern inet_pton4(const char *src,u_char *dst);
 
 /* int
  * inet_pton6(src, dst)
@@ -83,7 +83,7 @@ extern int inet_pton6(src, dst);
  * author:
  *	Paul Vixie, 1996.
  */
-extern const char * inet_ntop(af, src, dst, size);
+extern const char *inet_ntop(int af,const void *src,char *dst,socklen_t size);
 
 
 /* int
@@ -97,7 +97,7 @@ extern const char * inet_ntop(af, src, dst, size);
  * author:
  *	Paul Vixie, 1996.
  */
-extern int inet_pton(af, src, dst);
+extern int inet_pton(int af,const char *src,void *dst);
 
 #endif
 #endif

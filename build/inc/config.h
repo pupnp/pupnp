@@ -294,7 +294,7 @@
 
 
 /** @name DBGONLY
-          The {\bf DBGONLY} macro allows code to be marked so that it 
+          The {\bf DBGONLY} macro allows code to be marked so that it
           is only included in the DEBUG build and not the release.  To
           use this macro, put the code inside of the parentheses:
 
@@ -305,55 +305,53 @@
   */
 
 //@{
-#ifndef WIN32
- #ifdef DEBUG
- #	define DBGONLY(x) x
- #else
- #	define DBGONLY(x)  
- #endif
+#ifdef DEBUG
+ #define DBGONLY(x) x
+#else
+ #define DBGONLY(x)
 #endif
 //@}
 
 
 
-#undef  EXCLUDE_WEB_SERVER 
-#undef  EXCLUDE_MINISERVER 
+#undef  EXCLUDE_WEB_SERVER
+#undef  EXCLUDE_MINISERVER
 #ifdef  INTERNAL_WEB_SERVER
-#	define EXCLUDE_WEB_SERVER 0
-#	define EXCLUDE_MINISERVER 0
+ #define EXCLUDE_WEB_SERVER 0
+ #define EXCLUDE_MINISERVER 0
 #else
-#	define EXCLUDE_WEB_SERVER 1
-#	define EXCLUDE_MINISERVER 1
+ #define EXCLUDE_WEB_SERVER 1
+ #define EXCLUDE_MINISERVER 1
 #endif
 
 #if EXCLUDE_GENA == 1 && EXCLUDE_SOAP == 1 && EXCLUDE_WEB_SERVER == 1
-#	undef  EXCLUDE_MINISERVER 
-#	define EXCLUDE_MINISERVER 1
-#	if INTERNAL_WEB_SERVER
-#		error "conflicting settings: use configure --disable-webserver"
-#	endif
+ #undef  EXCLUDE_MINISERVER
+ #define EXCLUDE_MINISERVER 1
+ #if INTERNAL_WEB_SERVER
+  #	error "conflicting settings: use configure --disable-webserver"
+ #endif
 #endif
 
 #if EXCLUDE_GENA == 0 || EXCLUDE_SOAP == 0 || EXCLUDE_WEB_SERVER == 0
-#	undef  EXCLUDE_MINISERVER 
-#	define EXCLUDE_MINISERVER 0
-#	if EXCLUDE_WEB_SERVER == 0 && !defined INTERNAL_WEB_SERVER
-#		error "conflicting settings : use configure --enable-webserver"
-#	endif
+ #undef  EXCLUDE_MINISERVER
+ #define EXCLUDE_MINISERVER 0
+ #if EXCLUDE_WEB_SERVER == 0 && !defined INTERNAL_WEB_SERVER
+  #error "conflicting settings : use configure --enable-webserver"
+ #endif
 #endif
 
 
 
 #ifdef INCLUDE_CLIENT_APIS
-#	define CLIENTONLY(x) x
-#else 
-#	define CLIENTONLY(x)
+ #define CLIENTONLY(x) x
+#else
+ #define CLIENTONLY(x)
 #endif
 
 #ifdef INCLUDE_DEVICE_APIS
-#	define DEVICEONLY(x) x
-#else 
-#	define DEVICEONLY(x) 
+ #define DEVICEONLY(x) x
+#else
+ #define DEVICEONLY(x)
 #endif
 
 //@}

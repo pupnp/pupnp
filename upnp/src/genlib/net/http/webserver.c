@@ -751,15 +751,15 @@ isFileInVirtualDir( IN char *filePath )
 }
 
 /************************************************************************
-* Function: ToUpperCase													
-*																		
-* Parameters:															
-*	INOUT char * Str ; Input string to be converted					
-*																		
-* Description: Converts input string to upper case						
-*																		
-* Returns:																
-*	int																	
+* Function: ToUpperCase
+*
+* Parameters:
+*	INOUT char * Str ; Input string to be converted
+*
+* Description: Converts input string to upper case
+*
+* Returns:
+*	int
 ************************************************************************/
 int
 ToUpperCase( char *Str )
@@ -773,15 +773,15 @@ ToUpperCase( char *Str )
 }
 
 /************************************************************************
-* Function: StrStr														
-*																		
-* Parameters:															
+* Function: StrStr
+*
+* Parameters:
 *	IN char * S1 ; Input string
-*	IN char * S2 ; Input sub-string										
-*																		
-* Description: Finds a substring from a string							
-*																		
-* Returns:																
+*	IN char * S2 ; Input sub-string
+*
+* Description: Finds a substring from a string
+*
+* Returns:
 *	char * ptr - pointer to the first occurence of S2 in S1				
 ************************************************************************/
 char *

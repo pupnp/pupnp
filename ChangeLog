@@ -1,3 +1,14 @@
+2006-07-07 Oxy <virtual_worlds@gmx.de>
+
+	* full support for Windows added, static library and DLL are fully
+        working, code compiles with Borland Builder C++ and MS Visual
+        C/C++
+
+2006-07-05 Nektarios K. Papadopoulos <npapadop@inaccessnetworks.com>
+
+	* Include prebuilt documentation (html,pdf), dropping doc++ 
+	dependancy.
+
 2006-07-03 Marcelo Jimenez <mroberto@users.sourceforge.net>
 
 	* Patch for FreeBSD, thanks to Markus Strobl.
@@ -10,11 +21,6 @@
 2006-06-26 Marcelo Jimenez <mroberto@users.sourceforge.net>
 
 	* Fix for va_list initialization in x86_64 architectures.
-
-2006-06-12 Oxy <virtual_worlds@gmx.de>
-
-	* Windows support added, it compiles and exports DLL-symbols but
-	it is not fully tested yet
 
 2006-06-08 Oxy <virtual_worlds@gmx.de>
 

@@ -35,15 +35,8 @@
 #
 ##########################################################################
 
-EXTRA_DIST		= UPnP_Programming_Guide.pdf \
-			  callback.dxx docxx.sty intro.dxx \
+EXTRA_DIST		= callback.dxx docxx.sty intro.dxx \
 			  license.dxx upnpsdk.dxx
-
-if WITH_DOCDIR
-    docdir		= @DOCDIR@
-    doc_DATA 		= UPnP_Programming_Guide.pdf
-endif
-
 
 html-local:
 	@if [ -d html ]; then rm -rf html; fi

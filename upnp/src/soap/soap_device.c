@@ -34,7 +34,7 @@
 #if EXCLUDE_SOAP == 0
 
 #define SOAP_BODY "Body"
-#define SOAP_URN "http://schemas.xmlsoap.org/soap/envelope/"
+#define SOAP_URN "http:/""/schemas.xmlsoap.org/soap/envelope/"
 
 #define QUERY_STATE_VAR_URN "urn:schemas-upnp-org:control-1-0"
 
