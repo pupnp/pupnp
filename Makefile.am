@@ -12,7 +12,7 @@ DISTCHECK_CONFIGURE_FLAGS = --enable-debug --enable-samples
 SUBDIRS 		= ixml threadutil upnp docs/dist
 
 
-EXTRA_DIST		= libupnp.pc.in LICENSE THANKS
+EXTRA_DIST		= libupnp.pc.in LICENSE THANKS libupnp.spec
 
 
 # This variable must have 'exec' in its name, in order to be installed 
