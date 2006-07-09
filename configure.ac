@@ -155,7 +155,7 @@ AC_SYS_LARGEFILE
 AC_HEADER_STDC
 # libupnp code doesn't use autoconf variables yet,
 # so just abort if a header file is not found.
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h malloc.h netdb.h netinet/in.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h sys/timeb.h syslog.h unistd.h],[],[AC_MSG_ERROR([required header file missing])])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h sys/timeb.h syslog.h unistd.h],[],[AC_MSG_ERROR([required header file missing])])
 
 
 #
