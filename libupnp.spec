@@ -44,6 +44,10 @@ make install DESTDIR=$RPM_BUILD_ROOT
 	%{buildroot}%{docdeveldir}/
 %{__mv} %{buildroot}%{docdir}/UPnP_Programming_Guide.pdf \
 	%{buildroot}%{docdeveldir}/
+%{__mv} %{buildroot}%{docdir}/IXML_Programming_Guide.pdf \
+	%{buildroot}%{docdeveldir}/
+%{__mv} %{buildroot}%{docdir}/html \
+	%{buildroot}%{docdeveldir}/
 
 %{__rm} %{buildroot}%{_libdir}/{libixml.la,libthreadutil.la,libupnp.la}
 
