@@ -150,7 +150,10 @@ EXTRA_DIST 		= LICENSE \
 			sample/tvdevice/web/tvcontrolSCPD.xml \
 			sample/tvdevice/web/tvdevicedesc.xml \
 			sample/tvdevice/web/tvdevicepres.html \
-			sample/tvdevice/web/tvpictureSCPD.xml
+			sample/tvdevice/web/tvpictureSCPD.xml \
+			src/inc/inet_pton.h \
+			src/inet_pton.c \
+			src/win_dll.c
 
 
 
