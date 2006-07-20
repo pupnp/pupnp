@@ -1,4 +1,4 @@
-Linux* SDK for UPnP* Devices (libupnp)
+Portable SDK for UPnP* Devices (libupnp)
 
 Copyright (c) 2000-2003 Intel Corporation - All Rights Reserved.
 Copyright (c) 2005-2006 Rémi Turboult <r3mi@users.sourceforge.net>
@@ -22,8 +22,8 @@ sections:
 1) Release Contents
 -------------------------------------------
 
-The Linux SDK for UPnP Devices is an SDK for development of UPnP device 
-and control point applications for Linux.  It consists of the core UPnP 
+The Portable SDK for UPnP Devices is an SDK for development of UPnP device 
+and control point applications.  It consists of the core UPnP 
 protocols along with a UPnP-specific eXtensible Markup Language (XML) parser 
 supporting the Document Object Model (DOM) Level 2 API and an optional, 
 integrated mini web server for serving UPnP related documents.
@@ -32,7 +32,7 @@ integrated mini web server for serving UPnP related documents.
 2) Package Contents
 -------------------------------------------
 
-The Linux SDK for UPnP Devices contains the following: 
+The SDK for UPnP Devices contains the following: 
 
 README    	This file.  Contains the installation and build instructions.
 LICENSE   	The licensing terms the SDK is distributed under.
@@ -55,11 +55,10 @@ upnp\sample	A sample device and control point application, illustrating the
 3) System Requirements
 -------------------------------------------
 
-The SDK for UPnP Devices is designed to compile and run under the 
-Linux operating system.  It does, however, have dependencies on some
+The SDK for UPnP Devices is designed to compile and run under several
+operating systems.  It does, however, have dependencies on some
 packages that may not be installed by default.  All packages that it
-requires are listed below.  The name of the package and where it can be 
-found is dependent on the distribution of Linux being used.
+requires are listed below.
 
 libpthread  The header and library are installed as part of the glibc-devel
             package (or equivalent).
@@ -83,7 +82,7 @@ ps2pdf      The final step to making the PDF is converting the PostStript
             into Portable Document Format.  The ghostscript package provides
             this tool.
 
-For the UPnP library to function correctly, Linux networking must be configured
+For the UPnP library to function correctly, networking must be configured
 properly for multicasting.  To do this:
 
 route add -net 239.0.0.0 netmask 255.0.0.0 eth0
@@ -91,14 +90,6 @@ route add -net 239.0.0.0 netmask 255.0.0.0 eth0
 where 'eth0' is the network adapter that the UPnP library will use.  Without
 this addition, device advertisements and control point searches will not
 function.
-
-
-libupnp has been built and tested on the following configurations:
-
-* MandrakeLinux 10.1 (kernel 2.6.8.1-12mdk, gcc 3.4.1, glibc-2.3.3)
-
-* Ubuntu 5.10 "Breezy Badger" (Linux kernel 2.6.12-9-386, gcc 4.0.2 20050808
-  prerelease, libc6 2.3.5-1ubuntu12)
 
 
 
@@ -169,7 +160,7 @@ To build without:
 % make 
 
 
-The SDK for Linux also contains some additional helper APIs, declared in
+The SDK also contains some additional helper APIs, declared in
 inc/tools/upnptools.h.  If these additional tools are not required, they can
 be compiled out:
 
@@ -249,6 +240,25 @@ sub-directory. Example :
 % ../../upnp_tv_device
 
 
+
+SOLARIS BUILD
+
+The building process for the Solaris operating system is similar to the one
+described above. Only the call to ./configure has to be done using an
+additional parameter:
+
+./configure CFLAGS="-mcpu=<cputype> -mtune=<cputype> -DSPARC_SOLARIS"
+
+where <cputype> has to be replaced by the appropriate CPU tuning flag (e.g.
+"supersparc"). Afterwards
+
+make
+make install
+
+can be called as described above.
+
+
+
 WINDOWS BUILD
 
 In order to build libupnp under Windows the pthreads-w32 package is required.
@@ -304,9 +314,8 @@ See NEWS file.
 8) Support and Contact Information
 -------------------------------------------
 
-Intel is not providing support for the Linux SDK for UPnP Devices.  Two 
-mailing lists for the SDK are available on http://upnp.sourceforge.net/.  
-Questions and problems should be addressed on the appropriate mailing list.
+Intel is not providing support for the SDK for UPnP Devices. Mailing lists
+and discussion boards can be found at http://www.libupnp.org/.
 
 If you find this SDK useful, please send an email to upnp@intel.com and let
 us know.
