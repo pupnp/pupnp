@@ -249,6 +249,20 @@ sub-directory. Example :
 % ../../upnp_tv_device
 
 
+WINDOWS BUILD
+
+In order to build libupnp under Windows the pthreads-w32 package is required.
+You can download a self-extracting ZIP file from the following location:
+
+ftp://sources.redhat.com/pub/pthreads-win32/pthreads-w32-2-7-0-release.exe
+
+Execute the self-extracting archive and copy the Pre-build.2 folder to the
+top level source folder.
+Rename Pre-build.2 to pthreads. 
+Open the provided workspace build\libupnp.dsw with Visual C++ 6.0 and select
+Build->Build libupnp.dll (F7)
+
+
 5) Install/Uninstall Instructions
 -------------------------------------------
 
