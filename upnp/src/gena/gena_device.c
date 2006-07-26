@@ -756,8 +756,8 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
     }
 
     sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%d\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
-             strlen( propertySet ) + 1 );
+             "%ld\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
+             (long) strlen( propertySet ) + 1 );
 
     //schedule thread for initial notification
 
@@ -893,8 +893,8 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
     //changed to add null terminator at end of content
     //content length = (length in bytes of property set) + null char
     sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%d\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
-             strlen( propertySet ) + 1 );
+             "%ld\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
+             (long) strlen( propertySet ) + 1 );
 
     HandleLock(  );
 
@@ -1054,9 +1054,9 @@ genaNotifyAll( IN UpnpDevice_Handle device_handle,
     }
     //changed to add null terminator at end of content
     //content length = (length in bytes of property set) + null char
-    sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: %d\r\nNT:"
+    sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: %ld\r\nNT:"
              " upnp:event\r\nNTS: upnp:propchange\r\n",
-             strlen( propertySet ) + 1 );
+             (long) strlen( propertySet ) + 1 );
 
     HandleLock(  );
 
