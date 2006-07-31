@@ -415,6 +415,13 @@ UpnpFinish(  )
 
     // remove all virtual dirs
     UpnpRemoveAllVirtualDirs(  );
+    //leuk_he allow static linking:
+	 #ifdef WIN32
+	  #ifdef PTW32_STATIC_LIB
+	   pthread_win32_thread_detach_np ();
+	  #endif
+	 #endif
+
 
     UpnpSdkInit = 0;
 

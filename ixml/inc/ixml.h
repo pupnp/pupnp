@@ -38,11 +38,15 @@
 #include <assert.h>
 
 #ifdef WIN32
- #ifdef LIBUPNP_EXPORTS
- // set up declspec for dll export to make functions visible to library users
-  #define EXPORT_SPEC __declspec(dllexport)
+ #ifndef UPNP_STATIC_LIB
+  #ifdef LIBUPNP_EXPORTS
+  // set up declspec for dll export to make functions visible to library users
+   #define EXPORT_SPEC __declspec(dllexport)
+  #else
+   #define EXPORT_SPEC __declspec(dllimport)
+  #endif
  #else
-  #define EXPORT_SPEC __declspec(dllimport)
+  #define EXPORT_SPEC
  #endif
 #else
  #define EXPORT_SPEC
