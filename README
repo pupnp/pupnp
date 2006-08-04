@@ -272,6 +272,12 @@ Rename Pre-build.2 to pthreads.
 Open the provided workspace build\libupnp.dsw with Visual C++ 6.0 and select
 Build->Build libupnp.dll (F7)
 
+For building a static library instead of a DLL and for using the static
+pthreads-w32 library following switches need to be defined additionally:
+
+UPNP_STATIC_LIB - for creating a statically linkable UPnP-library
+PTW32_STATIC_LIB - for using the static pthreads32 library
+
 
 5) Install/Uninstall Instructions
 -------------------------------------------

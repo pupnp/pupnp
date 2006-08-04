@@ -348,14 +348,9 @@ UpnpMakeAction( const char *ActionName,
     va_list ArgList;
     IXML_Document *out = NULL;
 
-    if( NumArg > 0 ) {
-        va_start( ArgList, Arg );
-    }
-
+    va_start( ArgList, Arg );
     out = makeAction( 0, ActionName, ServType, NumArg, Arg, ArgList );
-    if( NumArg > 0 ) {
-        va_end( ArgList );
-    }
+    va_end( ArgList );
 
     return out;
 }
@@ -390,14 +385,9 @@ UpnpMakeActionResponse( const char *ActionName,
     va_list ArgList;
     IXML_Document *out = NULL;
 
-    if( NumArg > 0 ) {
-        va_start( ArgList, Arg );
-    }
-
+    va_start( ArgList, Arg );
     out = makeAction( 1, ActionName, ServType, NumArg, Arg, ArgList );
-    if( NumArg > 0 ) {
-        va_end( ArgList );
-    }
+    va_end( ArgList );
 
     return out;
 }
