@@ -53,6 +53,10 @@
 #endif
 #include "unixutil.h"
 
+#ifndef MSG_NOSIGNAL
+ #define MSG_NOSIGNAL 0
+#endif
+
 /************************************************************************
 *	Function :	sock_init
 *
@@ -229,7 +233,7 @@ sock_read_write( IN SOCKINFO * info,
 
     if( bRead ) {
         // read data
-        numBytes = recv( sockfd, buffer, bufsize,0); // MSG_NOSIGNAL is not a good idea in portable code, here SIGPIPE/SIGEPIPE has to be used instead
+        numBytes = recv( sockfd, buffer, bufsize,MSG_NOSIGNAL);
     } else {
         byte_left = bufsize;
         bytes_sent = 0;
@@ -237,7 +241,7 @@ sock_read_write( IN SOCKINFO * info,
             // write data
             num_written =
                 send( sockfd, buffer + bytes_sent, byte_left,
-                      MSG_DONTROUTE); // | MSG_NOSIGNAL is not a good idea in portable code, here SIGPIPE/SIGEPIPE has to be used instead
+                      MSG_DONTROUTE|MSG_NOSIGNAL);
             if( num_written == -1 ) {
                 return num_written;
             }
