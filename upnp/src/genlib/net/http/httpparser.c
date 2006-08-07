@@ -868,11 +868,11 @@ match_int( INOUT scanner_t * scanner,
            OUT int *value )
 {
     memptr token;
-    token_type_t tok_type;
+    token_type_t   tok_type;
     parse_status_t status;
-    int num;
-    char *end_ptr;
-    size_t save_pos;
+    long           num;
+    char          *end_ptr;
+    size_t         save_pos;
 
     save_pos = scanner->cursor;
 
@@ -2391,7 +2391,7 @@ int
 raw_to_int( IN memptr * raw_value,
             IN int base )
 {
-    int num;
+    long  num;
     char *end_ptr;
 
     if( raw_value->length == 0 ) {
