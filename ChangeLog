@@ -1,5 +1,14 @@
 2006-07-07 Oxy <virtual_worlds(at)gmx.de>
 
+    * support for large files (>2 GBytes) added
+
+*************************************************************************
+Release of version 1.4.1
+*************************************************************************
+
+
+2006-07-07 Oxy <virtual_worlds(at)gmx.de>
+
 	* full support for Windows added, static library and DLL are fully
         working, code compiles with Borland Builder C++ and MS Visual
         C/C++

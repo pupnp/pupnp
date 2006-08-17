@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LIBUPNP_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\pthreads\include" /I "..\ixml\src\inc" /I "..\ixml\inc" /I "..\threadutil\inc" /I "..\upnp\inc" /I "..\upnp\src\inc" /I ".\inc" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LIBUPNP_EXPORTS" /FR /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\pthreads\include" /I "..\ixml\src\inc" /I "..\ixml\inc" /I "..\threadutil\inc" /I "..\upnp\inc" /I "..\upnp\src\inc" /I ".\inc" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LIBUPNP_EXPORTS" /D "PTW32_STATIC_LIB" /D "UPNP_STATIC_LIB" /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
@@ -53,7 +53,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ..\pthreads\lib\pthreadvc2.lib ws2_32.lib /nologo /dll /machine:I386
+# ADD LINK32 kernel32.lib user32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib pthreads\lib\pthreadvc2.lib ws2_32.lib /nologo /dll /machine:I386
+# SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "libupnp - Win32 Debug"
 
@@ -274,6 +275,146 @@ SOURCE=..\upnp\src\win_dll.c
 # Begin Group "Header-Dateien"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\client_table.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\gena.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\gena_ctrlpt.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\gena_device.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\global.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\gmtdate.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\http_client.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\httpparser.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\httpreadwrite.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\inet_pton.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\md5.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\membuffer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\miniserver.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\netall.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\parsetools.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\server.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\service_table.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\soaplib.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\sock.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\ssdplib.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\statcodes.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\statuscodes.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\strintmap.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\sysdep.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\unixutil.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\upnp_timeout.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\upnpapi.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\upnpclosesocket.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\uri.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\urlconfig.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\util.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\utilall.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\uuid.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\upnp\src\inc\webserver.h
+# End Source File
 # End Group
 # Begin Group "Ressourcendateien"
 

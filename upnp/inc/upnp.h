@@ -38,9 +38,9 @@
 
 #if defined MYLIB_LARGEFILE_SENSITIVE && _FILE_OFFSET_BITS+0 != 64
   #if defined __GNUC__
-  #warning libupnp requires largefile mode - use AC_SYS_LARGEFILE
+   #warning libupnp requires largefile mode - use AC_SYS_LARGEFILE
   #else
-  # error  libupnp requires largefile mode - use AC_SYS_LARGEFILE
+   #error  libupnp requires largefile mode - use AC_SYS_LARGEFILE
   #endif
 #endif 
 
@@ -73,6 +73,7 @@
  #define UpnpCloseSocket         close
 #else
  #define UpnpCloseSocket         closesocket
+ #define fseeko fseek
 #endif
 #define UPNP_SOCKETERROR        -1
 #define UPNP_INVALID_SOCKET     -1
@@ -86,6 +87,8 @@
  #include <winsock2.h>
  #include <time.h>
 #endif
+
+#include <sys/types.h>
 
 #define NUM_HANDLE 200
 #define LINE_SIZE  180
