@@ -42,6 +42,7 @@ AM_INIT_AUTOMAKE([1.8 -Wall foreign subdir-objects])
 #    installed libraries.
 #
 AC_CONFIG_HEADERS([autoconfig.h upnp/inc/upnpconfig.h])
+#AC_SYS_LARGEFILE_SENSITIVE
 
 AC_REVISION([$Revision: 1.11 $])
 
@@ -144,9 +145,12 @@ else
 fi
 AX_CFLAGS_WARN_ALL
 
-# Arrange for large-file support (can be disabled with --disable-largefile).
-# Define _FILE_OFFSET_BITS and _LARGE_FILES if necessary
-AC_SYS_LARGEFILE
+#
+# Lot's of stuff to ensure large file support
+#
+AC_TYPE_OFF_T
+AC_DEFINE(_LARGE_FILE_SOURCE, [], [Large files support])
+AC_DEFINE(_FILE_OFFSET_BITS, [64], [File Offset size])
 
 
 #
