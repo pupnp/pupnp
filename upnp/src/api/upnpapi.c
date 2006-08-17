@@ -955,7 +955,7 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
     char aliasStr[LINE_SIZE];
     char *temp_str = NULL;
     FILE *fp = NULL;
-    unsigned fileLen;
+    off_t fileLen;
     unsigned num_read;
     time_t last_modified;
     struct stat file_info;
