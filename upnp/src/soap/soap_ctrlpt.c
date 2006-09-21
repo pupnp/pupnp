@@ -650,7 +650,8 @@ SoapSendAction( IN char *action_url,
 
     // make request msg
     request.size_inc = 50;
-    if( http_MakeMessage( &request, 1, 1, "q" "N" "s" "sssbs" "U" "c" "bbb", SOAPMETHOD_POST, &url, xml_start_len + action_str_len + xml_end_len,   // content-length
+    if( http_MakeMessage( &request, 1, 1, "q" "N" "s" "sssbs" "U" "c" "bbb", SOAPMETHOD_POST, &url, 
+                          (off_t)xml_start_len + action_str_len + xml_end_len,   // content-length
                           ContentTypeHeader,
                           "SOAPACTION: \"", service_type, "#", name.buf,
                           name.length, "\"\r\n", xml_start, xml_start_len,
