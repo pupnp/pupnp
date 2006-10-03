@@ -1974,9 +1974,7 @@ TvDeviceStart( char *ip_address,
         ip_address = UpnpGetServerIpAddress(  );
     }
 
-    if( port == 0 ) {
         port = UpnpGetServerPort(  );
-    }
 
     SampleUtil_Print( "UPnP Initialized\n \t ipaddress= %s port = %d\n",
                       ip_address, port );
