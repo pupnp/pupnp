@@ -63,7 +63,7 @@ typedef enum priority {LOW_PRIORITY,
 #define DEFAULT_IDLE_TIME 10 * 1000   //default idle time used by TPAttrInit
 #define DEFAULT_FREE_ROUTINE NULL     //default free routine used TPJobInit
 
-//#define STATS 1 //always include stats because code change is minimal
+#define STATS 1 //always include stats because code change is minimal
 
 
 //Statistics
