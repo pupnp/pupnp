@@ -230,7 +230,7 @@ send_error_response( IN SOCKINFO * info,
     membuffer_init( &headers );
 /* -- PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld at users.sourceforge.net> */    
     if( http_MakeMessage( &headers, major, minor,
-                          "RNsDsSXc" "sssss",
+                          "RNsDsSXcc" "sssss",
                           500,
                           content_length,
                           ContentTypeHeader,
