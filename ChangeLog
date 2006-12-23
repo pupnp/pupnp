@@ -1,3 +1,25 @@
+*************************************************************************
+Trunk
+*************************************************************************
+
+2006-12-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	* Thorough revision of every call of http_MakeMessage() due to a
+	bug introduced in rev.79 "largefile patch added".
+	http_MakeMessage() has a worst than brain damaged "printf" like
+	interface. In rev.79, the "N" format parameter must be an off_t.
+	Every call of this function with an "N" format parameter and an
+	int passed on the stack would fail terribly.
+
+
+2006-07-07 Oxy <virtual_worlds(at)gmx.de>
+
+	* support for large files (>2 GBytes) added
+
+*************************************************************************
+Version 1.4.2
+*************************************************************************
+
 2006-12-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
 	* Finished const-ifications as suggested by Erik Johansson in
@@ -23,24 +45,9 @@
 	* Erik Johansson's patch for typo in ixmlparser.c.
 	SF Bug tracker [ 1590469 ].
 
-2006-12-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-
-	* Thorough revision of every call of http_MakeMessage() due to a
-	bug introduced in rev.79 "largefile patch added".
-	http_MakeMessage() has a worst than brain damaged "printf" like
-	interface. In rev.79, the "N" format parameter must be an off_t.
-	Every call of this function with an "N" format parameter and an
-	int passed on the stack would fail terribly.
-
-
-2006-07-07 Oxy <virtual_worlds(at)gmx.de>
-
-	* support for large files (>2 GBytes) added
-
 *************************************************************************
-Release of version 1.4.1
+Version 1.4.1
 *************************************************************************
-
 
 2006-07-07 Oxy <virtual_worlds(at)gmx.de>
 
@@ -72,7 +79,7 @@ Release of version 1.4.1
 	to loigu)
 
 *************************************************************************
-Release of version 1.4.0
+Version 1.4.0
 *************************************************************************
 
 2006-05-26 Oxy <virtual_worlds(at)gmx.de>
