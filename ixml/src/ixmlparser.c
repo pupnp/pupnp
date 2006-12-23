@@ -232,13 +232,13 @@ static BOOL Parser_ElementPrefixDefined( Parser * myParser,
                                          IXML_Node * newNode,
                                          char **nsURI );
 static int Parser_setElementNamespace( IXML_Element * newElement,
-                                       char *nsURI );
+                                       const char *nsURI );
 static int Parser_parseDocument( IXML_Document ** retDoc,
                                  Parser * domParser );
 static BOOL Parser_hasDefaultNamespace( Parser * xmlParser,
                                         IXML_Node * newNode,
                                         char **nsURI );
-static int Parser_getChar( IN char *src,
+static int Parser_getChar( IN const char *src,
                            INOUT int *cLen );
 
 /*==============================================================================*
@@ -312,9 +312,9 @@ Parser_isNameChar( IN int c,
 *
 *===============================================================================*/
 BOOL
-Parser_isValidXmlName( IN DOMString name )
+Parser_isValidXmlName( IN const DOMString name )
 {
-    char *pstr = NULL;
+    const char *pstr = NULL;
     int i = 0,
       nameLen = 0;
 
@@ -419,11 +419,11 @@ Parser_intToUTF8( IN int c,
 *          
 *===============================================================================*/
 static int
-Parser_UTF8ToInt( IN char *ss,
+Parser_UTF8ToInt( IN const char *ss,
                   OUT int *len )
 {
 
-    unsigned char *s = ( unsigned char * )ss;
+    const unsigned char *s = ( const unsigned char * )ss;
     int c = *s;
 
     if( c <= 127 ) {            // if c<=127, c is just the character.
@@ -602,7 +602,7 @@ Parser_popElement( IN Parser * xmlParser )
 *=================================================================*/
 static int
 Parser_readFileOrBuffer( IN Parser * xmlParser,
-                         IN char *xmlFileName,
+                         IN const char *xmlFileName,
                          IN BOOL file )
 {
     int fileSize = 0;
@@ -651,7 +651,7 @@ Parser_readFileOrBuffer( IN Parser * xmlParser,
 *=================================================================*/
 int
 Parser_LoadDocument( OUT IXML_Document ** retDoc,
-                     IN char *xmlFileName,
+                     IN const char *xmlFileName,
                      IN BOOL file )
 {
     int rc = IXML_SUCCESS;
@@ -1117,10 +1117,10 @@ Parser_skipWhiteSpaces( IN Parser * xmlParser )
 *
 *===============================================================================*/
 static int
-Parser_getChar( IN char *src,
+Parser_getChar( IN const char *src,
                 INOUT int *cLen )
 {
-    char *pnum;
+    const char *pnum;
     int sum;
     char c;
     int i;
@@ -1213,13 +1213,13 @@ fail_entity:
 *===============================================================================*/
 static int
 Parser_copyToken( IN Parser * xmlParser,
-                  IN char *src,
+                  IN const char *src,
                   IN int len )
 {
     int i,
       c,
       cl;
-    char *psrc,
+    const char *psrc,
      *pend;
     utf8char uch;
 
@@ -1563,7 +1563,7 @@ Parser_getNextToken( IN Parser * xmlParser )
 *===============================================================================*/
 static char *
 Parser_getNameSpace( IN Parser * xmlParser,
-                     IN char *prefix )
+                     IN const char *prefix )
 {
     IXML_ElementStack *pCur;
     IXML_NamespaceURI *pNsUri;
@@ -1597,7 +1597,7 @@ Parser_addNamespace( IN Parser * xmlParser )
 {
     IXML_Node *pNode;
     IXML_ElementStack *pCur;
-    char *namespaceUri;
+    const char *namespaceUri;
 
     pNode = xmlParser->pNeedPrefixNode;
     pCur = xmlParser->pCurElement;
@@ -2002,7 +2002,7 @@ Parser_processCDSect( IN char **pSrc,
 *===============================================================================*/
 static int
 Parser_setElementNamespace( IN IXML_Element * newElement,
-                            IN char *nsURI )
+                            IN const char *nsURI )
 {
     if( newElement != NULL ) {
         if( newElement->n.namespaceURI != NULL ) {
