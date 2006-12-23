@@ -778,7 +778,7 @@ get_var_name( IN IXML_Document * TempDoc,
     IXML_Node *VarNameNode = NULL;
     IXML_Node *VarNode = NULL;
     const DOMString StNodeName = NULL;
-    DOMString Temp = NULL;
+    const DOMString Temp = NULL;
     int ret_val = -1;
 
     // Got the Envelop node here

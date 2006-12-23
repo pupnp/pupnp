@@ -212,11 +212,11 @@ dom_find_deep_node( IN char *names[],
 *
 *	Note :The given node must have a text node as its first child
 ****************************************************************************/
-static DOMString
+static const DOMString
 get_node_value( IN IXML_Node * node )
 {
     IXML_Node *text_node = NULL;
-    DOMString text_value = NULL;
+    const DOMString text_value = NULL;
 
     text_node = ixmlNode_getFirstChild( node );
     if( text_node == NULL ) {
@@ -414,12 +414,12 @@ get_response_value( IN http_message_t * hmsg,
     IXML_Node *error_node = NULL;
     IXML_Document *doc = NULL;
     char *node_str = NULL;
-    char *temp_str = NULL;
+    const char *temp_str = NULL;
     DOMString error_node_str = NULL;
     int err_code;
     xboolean done = FALSE;
     char *names[5];
-    DOMString nodeValue;
+    const DOMString nodeValue;
 
     err_code = UPNP_E_BAD_RESPONSE; // default error
 

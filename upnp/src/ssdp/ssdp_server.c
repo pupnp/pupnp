@@ -112,7 +112,7 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
     IXML_Node *tmpNode = NULL;
     IXML_Node *tmpNode2 = NULL;
     IXML_Node *textNode = NULL;
-    DOMString tmpStr;
+    const DOMString tmpStr;
     char SERVER[200];
 
     DBGONLY( const DOMString dbgStr;
