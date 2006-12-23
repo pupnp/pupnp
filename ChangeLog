@@ -1,6 +1,24 @@
+2006-12-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	* Erik Johansson's patch for invalid xml output.
+
+2006-12-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	* Erik Johansson's patch for typo in ixmlparser.c.
+
+2006-12-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	* Thorough revision of every call of http_MakeMessage() due to a
+	bug introduced in rev.79 "largefile patch added".
+	http_MakeMessage() has a worst than brain damaged "printf" like
+	interface. In rev.79, the "N" format parameter must be an off_t.
+	Every call of this function with an "N" format parameter and an
+	int passed on the stack would fail terribly.
+
+
 2006-07-07 Oxy <virtual_worlds(at)gmx.de>
 
-    * support for large files (>2 GBytes) added
+	* support for large files (>2 GBytes) added
 
 *************************************************************************
 Release of version 1.4.1
@@ -10,8 +28,8 @@ Release of version 1.4.1
 2006-07-07 Oxy <virtual_worlds(at)gmx.de>
 
 	* full support for Windows added, static library and DLL are fully
-        working, code compiles with Borland Builder C++ and MS Visual
-        C/C++
+	working, code compiles with Borland Builder C++ and MS Visual
+	C/C++
 
 2006-07-05 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
 
