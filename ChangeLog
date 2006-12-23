@@ -1,8 +1,20 @@
+2006-12-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	* Erik Johansson's patch for invalid xml output.
+
+2006-12-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	* Erik Johansson's patch for typo in ixmlparser.c.
+
+*************************************************************************
+Release of version 1.4.1
+*************************************************************************
+
 2006-07-07 Oxy <virtual_worlds(at)gmx.de>
 
 	* full support for Windows added, static library and DLL are fully
-        working, code compiles with Borland Builder C++ and MS Visual
-        C/C++
+	working, code compiles with Borland Builder C++ and MS Visual
+	C/C++
 
 2006-07-05 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
 
