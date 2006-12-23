@@ -3712,7 +3712,7 @@ FreeHandle( int Upnp_Handle )
 }  /****************** End of FreeHandle *********************/
 
 // **DBG****************************************************
-DBGONLY(
+//DBGONLY(
 
 /**************************************************************************
  * Function: PrintHandleInfo 
@@ -3753,7 +3753,7 @@ DBGONLY(
             IXML_NodeList * NodeList1;
             IXML_Node * ChildNode1;
             unsigned short NodeType;
-            DOMString NodeValue;
+            const DOMString NodeValue;
             const DOMString NodeName;
             NodeList1 = ixmlNode_getChildNodes( tmpRoot );
             for( i = 0; i < 100; i++ ) {
@@ -3774,7 +3774,7 @@ DBGONLY(
             }
    /****************** End of printNodes *********************/
 
- )                              // dbgonly
+// )                              // dbgonly
 
     //********************************************************
     //* Name: getlocalhostname

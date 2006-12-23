@@ -1,5 +1,10 @@
 2006-12-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
+	* Finished const-ifications as suggested by Erik Johansson in
+	SF Patch tracker [ 1587272 ].
+
+2006-12-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
 	* Erik Johansson's patch for const-ified ixml
 	SF Patch tracker [ 1587272 ].
 
