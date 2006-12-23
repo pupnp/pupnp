@@ -325,7 +325,7 @@ Parser_isValidXmlName( IN DOMString name )
     pstr = name;
     if( Parser_isNameChar( *pstr, FALSE ) == TRUE ) {
         for( i = 1; i < nameLen; i++ ) {
-            if( Parser_isNameChar( *( pstr + 1 ), TRUE ) == FALSE ) {   //illegal char
+            if( Parser_isNameChar( *( pstr + i ), TRUE ) == FALSE ) {   //illegal char
                 return FALSE;
             }
         }
