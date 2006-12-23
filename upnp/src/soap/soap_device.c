@@ -603,13 +603,13 @@ get_device_info( IN http_message_t * request,
     service_info *serv_info;
     char save_char;
     int ret_code = -1;          // error by default
-    char *control_url;
+    const char *control_url;
     char *actionName = NULL;
 
     // null-terminate pathquery of url
     control_url = request->uri.pathquery.buff;
     save_char = control_url[request->uri.pathquery.size];
-    control_url[request->uri.pathquery.size] = '\0';
+    ((char *)control_url)[request->uri.pathquery.size] = '\0';
 
     HandleLock(  );
 
@@ -666,7 +666,7 @@ get_device_info( IN http_message_t * request,
     ret_code = 0;
 
   error_handler:
-    control_url[request->uri.pathquery.size] = save_char;   // restore
+    ((char *)control_url)[request->uri.pathquery.size] = save_char;   // restore
     HandleUnlock(  );
     return ret_code;
 }

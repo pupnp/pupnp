@@ -246,18 +246,19 @@ get_node_value( IN IXML_Node * node )
 ****************************************************************************/
 static XINLINE int
 get_host_and_path( IN char *ctrl_url,
-                   OUT memptr * host,
-                   OUT memptr * path,
+                   OUT const memptr *host,
+                   OUT const memptr *path,
                    OUT uri_type * url )
 {
     if( parse_uri( ctrl_url, strlen( ctrl_url ), url ) != HTTP_SUCCESS ) {
         return -1;
     }
-    host->buf = url->hostport.text.buff;
-    host->length = url->hostport.text.size;
+    // This is done to ensure that the buffer is kept const
+    ((memptr *)host)->buf = (char *)url->hostport.text.buff;
+    ((memptr *)host)->length = url->hostport.text.size;
 
-    path->buf = url->pathquery.buff;
-    path->length = url->pathquery.size;
+    ((memptr *)path)->buf = (char *)url->pathquery.buff;
+    ((memptr *)path)->length = url->pathquery.size;
 
     return 0;
 }
@@ -873,8 +874,8 @@ SoapGetServiceVarStatus( IN char *action_url,
                          IN char *var_name,
                          OUT char **var_value )
 {
-    memptr host;                // value for HOST header
-    memptr path;                // ctrl path in first line in msg
+    const memptr host;                // value for HOST header
+    const memptr path;                // ctrl path in first line in msg
     uri_type url;
     membuffer request;
     int ret_code;

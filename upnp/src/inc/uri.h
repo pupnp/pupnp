@@ -86,7 +86,7 @@ enum uriType  { absolute, relative };
 /*	Buffer used in parsinghttp messages, urls, etc. generally this simply
 *	holds a pointer into a larger array									*/
 typedef struct TOKEN {
-   char * buff;
+  const char *buff;
   int size;
 } token;
 
@@ -276,7 +276,7 @@ int token_cmp( token *in1,  token *in2);
 *
 *	Note :
 ************************************************************************/
-int parse_port(int max,   char * port, unsigned short int * out);
+int parse_port(int max, const char *port, unsigned short int *out);
 
 /************************************************************************
 *	Function :	parse_hostport
@@ -296,7 +296,7 @@ int parse_port(int max,   char * port, unsigned short int * out);
 *
 *	Note :
 ************************************************************************/
-int parse_hostport(  char* in, int max, hostport_type *out );
+int parse_hostport(const char *in, int max, hostport_type *out );
 
 /************************************************************************
 *	Function :	remove_escaped_chars
@@ -391,7 +391,7 @@ char * resolve_rel_url( char * base_url,  char * rel_url);
 *
 *	Note :
 ************************************************************************/
-int parse_uri(  char * in, int max, uri_type * out);
+int parse_uri(const char * in, int max, uri_type * out);
 
 /************************************************************************
 *	Function :	parse_uri_and_unescape

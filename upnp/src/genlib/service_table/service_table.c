@@ -398,7 +398,7 @@ FindServiceEventURLPath( service_table * table,
 ************************************************************************/
 service_info *
 FindServiceControlURLPath( service_table * table,
-                           char *controlURLPath )
+                           const char *controlURLPath )
 {
     service_info *finger = NULL;
     uri_type parsed_url;
