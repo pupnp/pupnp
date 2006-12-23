@@ -45,7 +45,7 @@
 #else
  #include <winsock2.h>
 
- #define socklen_t int
+ typedef int socklen_t;
  #define EAFNOSUPPORT 97
 #endif
 #include "unixutil.h"
