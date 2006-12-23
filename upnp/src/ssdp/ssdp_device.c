@@ -295,16 +295,16 @@ CreateServicePacket( IN int msg_type,
     *packet = NULL;
 
     if( msg_type == MSGTYPE_REPLY ) {
-/* -- PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld at users.sourceforge.net> */
-        ret_code = http_MakeMessage( &buf, 1, 1,
-                                     "R" "sdc" "D" "s" "ssc" "S" "Xc" "ssc"
-                                     "ssc" "c", HTTP_OK,
-                                     "CACHE-CONTROL: max-age=", duration,
-                                     "EXT:\r\n", "LOCATION: ", location,
-                                     X_USER_AGENT,
-                                     "ST: ", nt, "USN: ", usn );
-/* -- PATCH END - */
-        
+        ret_code = http_MakeMessage(
+            &buf, 1, 1,
+            "R" "sdc" "D" "sc" "ssc" "S" "Xc" "ssc" "sscc",
+            HTTP_OK,
+            "CACHE-CONTROL: max-age=", duration,
+	    "EXT:",
+            "LOCATION: ", location,
+            X_USER_AGENT,
+            "ST: ", nt,
+            "USN: ", usn);
         if( ret_code != 0 ) {
             return;
         }
@@ -320,15 +320,17 @@ CreateServicePacket( IN int msg_type,
         // NOTE: The CACHE-CONTROL and LOCATION headers are not present in
         //  a shutdown msg, but are present here for MS WinMe interop.
         
-/* -- PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld at users.sourceforge.net> */
-        ret_code = http_MakeMessage( &buf, 1, 1,
-                                     "Q" "sssdc" "sdc" "ssc" "ssc" "ssc"
-                                     "S" "Xc" "ssc" "c", HTTPMETHOD_NOTIFY, "*",
-                                     1, "HOST: ", SSDP_IP, ":", SSDP_PORT,
-                                     "CACHE-CONTROL: max-age=", duration,
-                                     "LOCATION: ", location, "NT: ", nt,
-                                     "NTS: ", nts, X_USER_AGENT, "USN: ", usn );
-/* -- PATCH END - */        
+        ret_code = http_MakeMessage(
+            &buf, 1, 1,
+            "Q" "sssdc" "sdc" "ssc" "ssc" "ssc" "S" "Xc" "sscc",
+            HTTPMETHOD_NOTIFY, "*",
+            1, "HOST: ", SSDP_IP, ":", SSDP_PORT,
+            "CACHE-CONTROL: max-age=", duration,
+            "LOCATION: ", location,
+            "NT: ", nt,
+            "NTS: ", nts,
+            X_USER_AGENT,
+            "USN: ", usn );
         if( ret_code != 0 ) {
             return;
         }

@@ -219,10 +219,11 @@ gena_unsubscribe( IN char *url,
     // make request msg
     membuffer_init( &request );
     request.size_inc = 30;
-    return_code = http_MakeMessage( &request, 1, 1,
-                                    "q" "ssc" "U" "c",
-                                    HTTPMETHOD_UNSUBSCRIBE, &dest_url,
-                                    "SID: ", sid );
+    return_code = http_MakeMessage(
+        &request, 1, 1,
+        "q" "ssc" "Uc",
+        HTTPMETHOD_UNSUBSCRIBE, &dest_url,
+        "SID: ", sid );
 
     //Not able to make the message so destroy the existing buffer
     if( return_code != 0 ) {
@@ -305,20 +306,21 @@ gena_subscribe( IN char *url,
     request.size_inc = 30;
     if( renewal_sid ) {
         // renew subscription
-        return_code = http_MakeMessage( &request, 1, 1,
-                                        "q" "ssc" "ssc" "c",
-                                        HTTPMETHOD_SUBSCRIBE, &dest_url,
-                                        "SID: ", renewal_sid,
-                                        "TIMEOUT: Second-", timeout_str );
+        return_code = http_MakeMessage(
+            &request, 1, 1,
+            "q" "ssc" "sscc",
+            HTTPMETHOD_SUBSCRIBE, &dest_url,
+            "SID: ", renewal_sid,
+            "TIMEOUT: Second-", timeout_str );
     } else {
         // subscribe
-        return_code = http_MakeMessage( &request, 1, 1,
-                                        "q" "sssdsscc",
-                                        HTTPMETHOD_SUBSCRIBE, &dest_url,
-                                        "CALLBACK: <http://", LOCAL_HOST,
-                                        ":", LOCAL_PORT,
-                                        "/>\r\n" "NT: upnp:event\r\n"
-                                        "TIMEOUT: Second-", timeout_str );
+        return_code = http_MakeMessage(
+            &request, 1, 1,
+            "q" "sssdsc" "sc" "sscc",
+            HTTPMETHOD_SUBSCRIBE, &dest_url,
+            "CALLBACK: <http://", LOCAL_HOST, ":", LOCAL_PORT, "/>",
+            "NT: upnp:event",
+	    "TIMEOUT: Second-", timeout_str );
     }
     if( return_code != 0 ) {
         return return_code;

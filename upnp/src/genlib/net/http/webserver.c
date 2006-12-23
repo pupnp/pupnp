@@ -1377,21 +1377,19 @@ process_request( IN http_message_t * req,
 
     if( RespInstr->IsRangeActive && RespInstr->IsChunkActive ) {
 
-/* - PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld at users.sourceforge.net>
- * added X-User-Agent header
- */
-        
         //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
         //Transfer-Encoding: chunked
         // K means add chunky header ang G means range header.
-        if( http_MakeMessage( headers, resp_major, resp_minor, "RTGKDstcSXcCc", HTTP_PARTIAL_CONTENT, // status code
-                              // RespInstr->ReadSendSize,// content length
-                              finfo.content_type,
-                              //     content_type.buf,            // content type
-                              RespInstr,    // Range
-                              "LAST-MODIFIED: ",
-                              &finfo.last_modified,
-                              X_USER_AGENT) != 0 ) {
+        if (http_MakeMessage(
+            headers, resp_major, resp_minor,
+            "RTGKDstcSXcCc",
+            HTTP_PARTIAL_CONTENT, // status code
+            // RespInstr->ReadSendSize,// content length
+            finfo.content_type,
+            // content_type.buf,            // content type
+            RespInstr,    // Range
+            "LAST-MODIFIED: ", &finfo.last_modified,
+            X_USER_AGENT) != 0 ) {
             goto error_handler;
         }
     } else if( RespInstr->IsRangeActive && !RespInstr->IsChunkActive ) {
@@ -1399,14 +1397,16 @@ process_request( IN http_message_t * req,
         //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
         //Transfer-Encoding: chunked
         // K means add chunky header ang G means range header.
-        if( http_MakeMessage( headers, resp_major, resp_minor, "RNTGDstcSXcCc", HTTP_PARTIAL_CONTENT, // status code
-                              RespInstr->ReadSendSize,  // content length
-                              finfo.content_type,
-                              //content_type.buf,            // content type
-                              RespInstr,    //Range Info
-                              "LAST-MODIFIED: ",
-                              &finfo.last_modified,
-                              X_USER_AGENT) != 0 ) {
+        if (http_MakeMessage(
+            headers, resp_major, resp_minor,
+            "RNTGDstcSXcCc",
+            HTTP_PARTIAL_CONTENT, // status code
+            (off_t)RespInstr->ReadSendSize,  // content length
+            finfo.content_type,
+            //content_type.buf,  // content type
+            RespInstr,    //Range Info
+            "LAST-MODIFIED: ", &finfo.last_modified,
+            X_USER_AGENT) != 0 ) {
             goto error_handler;
         }
 
@@ -1415,46 +1415,51 @@ process_request( IN http_message_t * req,
         //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
         //Transfer-Encoding: chunked
         // K means add chunky header ang G means range header.
-        if( http_MakeMessage( headers, resp_major, resp_minor, "RKTDstcSXcCc", HTTP_OK,   // status code
-                              //RespInstr->ReadSendSize,// content length
-                              finfo.content_type,
-                              // content_type.buf,            // content type
-                              "LAST-MODIFIED: ",
-                              &finfo.last_modified,
-                              X_USER_AGENT) != 0 ) {
+        if (http_MakeMessage(
+            headers, resp_major, resp_minor,
+            "RKTDstcSXcCc",
+            HTTP_OK, // status code
+            //RespInstr->ReadSendSize, // content length
+            finfo.content_type,
+            // content_type.buf, // content type
+            "LAST-MODIFIED: ", &finfo.last_modified,
+            X_USER_AGENT) != 0 ) {
             goto error_handler;
         }
 
     } else {
-        if( RespInstr->ReadSendSize >= 0 ) {
+        if (RespInstr->ReadSendSize >= 0) {
             //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
             //Transfer-Encoding: chunked
             // K means add chunky header ang G means range header.
-            if( http_MakeMessage( headers, resp_major, resp_minor, "RNTDstcSXcCc", HTTP_OK,   // status code
-                                  RespInstr->ReadSendSize,  // content length
-                                  finfo.content_type,
-                                  //content_type.buf,          // content type
-                                  "LAST-MODIFIED: ",
-                                  &finfo.last_modified,
-                                  X_USER_AGENT) != 0 ) {
+            if (http_MakeMessage(
+                headers, resp_major, resp_minor,
+                "RNTDstcSXcCc",
+                HTTP_OK,   // status code
+                (off_t)RespInstr->ReadSendSize,  // content length
+                finfo.content_type,
+                //content_type.buf, // content type
+                "LAST-MODIFIED: ", &finfo.last_modified,
+                X_USER_AGENT) != 0 ) {
                 goto error_handler;
             }
         } else {
             //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
             //Transfer-Encoding: chunked
             // K means add chunky header ang G means range header.
-            if( http_MakeMessage( headers, resp_major, resp_minor, "RTDstcSXcCc", HTTP_OK,    // status code
-                                  //RespInstr->ReadSendSize,// content length
-                                  finfo.content_type,
-                                  //content_type.buf,          // content type
-                                  "LAST-MODIFIED: ",
-                                  &finfo.last_modified,
-                                  X_USER_AGENT) != 0 ) {
+            if (http_MakeMessage(
+                headers, resp_major, resp_minor,
+                "RTDstcSXcCc",
+                HTTP_OK,    // status code
+                //RespInstr->ReadSendSize,// content length
+                finfo.content_type,
+                //content_type.buf,          // content type
+                "LAST-MODIFIED: ", &finfo.last_modified,
+                X_USER_AGENT) != 0 ) {
                 goto error_handler;
             }
         }
     }
-/* -- PATCH END -- */
 
     if( req->method == HTTPMETHOD_HEAD ) {
         *rtype = RESP_HEADERS;
@@ -1738,12 +1743,12 @@ web_server_callback( IN http_parser_t * parser,
                                           &RespInstr );
                 //Send response.
 
-/* - PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld at users.sourceforge.net>
- * added X-User-Agent header
- */
-                http_MakeMessage( &headers, 1, 1, "RTDSXcCc", ret,
-                                  "text/html", X_USER_AGENT );
-/* - PATCH END --- */
+                http_MakeMessage(
+                    &headers, 1, 1,
+                    "RTDSXcCc",
+                    ret,
+                    "text/html",
+                    X_USER_AGENT );
 
                 http_SendMessage( info, &timeout, "b", headers.buf,
                                   headers.length );
