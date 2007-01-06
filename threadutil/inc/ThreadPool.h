@@ -62,6 +62,7 @@ typedef enum priority {LOW_PRIORITY,
 #define DEFAULT_STARVATION_TIME	500   //default starvation time used by TPAttrInit
 #define DEFAULT_IDLE_TIME 10 * 1000   //default idle time used by TPAttrInit
 #define DEFAULT_FREE_ROUTINE NULL     //default free routine used TPJobInit
+#define DEFAULT_MAX_JOBS_TOTAL 100    //default max jobs used TPAttrInit
 
 #define STATS 1 //always include stats because code change is minimal
 
@@ -119,23 +120,25 @@ typedef void (*free_routine)(void *arg);
  *****************************************************************************/
 typedef struct THREADPOOLATTR
 {
-  int minThreads; //minThreads, ThreadPool will always maintain at least
-                  //this many threads
+  int minThreads;     // minThreads, ThreadPool will always maintain at least
+                      // this many threads
 
-  int maxThreads; //maxThreads, ThreadPool will never have more than this
-                  //number of threads
+  int maxThreads;     // maxThreads, ThreadPool will never have more than this
+                      // number of threads
 
-  int maxIdleTime;   //maxIdleTime (in milliseconds)
-                     // this is the maximum time a thread will remain idle
-                     // before dying
+  int maxIdleTime;    // maxIdleTime (in milliseconds)
+                      // this is the maximum time a thread will remain idle
+                      // before dying
 
-  int jobsPerThread; //jobs per thread to maintain
+  int jobsPerThread;  // jobs per thread to maintain
 
-  int starvationTime;   //the time a low priority or med priority
-	                    //job waits before getting bumped
-                        //up a priority (in milliseconds)
+  int maxJobsTotal;   // maximum number of jobs that can be queued totally.
 
-  PolicyType schedPolicy; //scheduling policy to use
+  int starvationTime; // the time a low priority or med priority
+	              // job waits before getting bumped
+                      // up a priority (in milliseconds)
+
+  PolicyType schedPolicy; // scheduling policy to use
 
 } ThreadPoolAttr;
 
@@ -520,6 +523,19 @@ int TPAttrSetStarvationTime(ThreadPoolAttr *attr, int starvationTime);
  *****************************************************************************/
 int TPAttrSetSchedPolicy(ThreadPoolAttr *attr, PolicyType schedPolicy);
 
+
+/****************************************************************************
+ * Function: TPAttrSetMaxJobsTotal
+ *
+ *  Description:
+ *      Sets the maximum number jobs that can be qeued totally.
+ *  Parameters:
+ *      attr - must be valid thread pool attributes.
+ *      maxJobsTotal - maximum number of jobs
+ *  Returns:
+ *      Always returns 0.
+ *****************************************************************************/
+int TPAttrSetMaxJobsTotal(ThreadPoolAttr *attr, int maxJobsTotal);
 
 /****************************************************************************
  * Function: ThreadPoolGetStats

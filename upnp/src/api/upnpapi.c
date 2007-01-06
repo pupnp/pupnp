@@ -244,6 +244,7 @@ int UpnpInit( IN const char *HostIP,
     TPAttrSetMinThreads( &attr, MIN_THREADS );
     TPAttrSetJobsPerThread( &attr, JOBS_PER_THREAD );
     TPAttrSetIdleTime( &attr, THREAD_IDLE_TIME );
+    TPAttrSetMaxJobsTotal( &attr, MAX_JOBS_TOTAL );
 
     if( ThreadPoolInit( &gSendThreadPool, &attr ) != UPNP_E_SUCCESS ) {
         UpnpSdkInit = 0;

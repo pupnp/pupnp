@@ -19,9 +19,27 @@ AC_INIT([libupnp], [1.4.1], [virtual_worlds@gmx.de])
 # 	- interfaces added: 			age++
 # 	- interfaces removed:			age=0
 # *please update only once, before a formal release, not for each change*
-AC_SUBST([LT_VERSION_IXML],       [2:2:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [2:2:0])
-AC_SUBST([LT_VERSION_UPNP],       [2:2:0])
+#
+# For release 1.4.1, we had:
+#AC_SUBST([LT_VERSION_IXML],       [2:2:0])
+#AC_SUBST([LT_VERSION_THREADUTIL], [2:2:0])
+#AC_SUBST([LT_VERSION_UPNP],       [2:2:0])
+#
+# "current:revision:age"
+#
+# - Code has changed in ixml
+#	revision: 2 -> 3
+# - Code has changed in threadutil
+#	revision: 2 -> 3
+# - Interface added in threadutil
+#	current: 2 -> 3
+#	revisiion: 3 -> 0
+#	age: 0 -> 1
+# - Code has changed in upnp (revision 2 -> 3)
+#	revision: 2 -> 3
+AC_SUBST([LT_VERSION_IXML],       [2:3:0])
+AC_SUBST([LT_VERSION_THREADUTIL], [3:0:1])
+AC_SUBST([LT_VERSION_UPNP],       [2:3:0])
 
 
 AC_CONFIG_AUX_DIR(config.aux)
