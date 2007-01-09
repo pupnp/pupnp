@@ -196,11 +196,11 @@ addToAction( IN int response,
 
         if( response ) {
             sprintf( ActBuff,
-                "<u:%sResponse xmlns:u=\"%s\"></u:%sResponse>",
+                "<u:%sResponse xmlns:u=\"%s\">\r\n</u:%sResponse>",
                 ActionName, ServType, ActionName );
         } else {
             sprintf( ActBuff,
-                "<u:%s xmlns:u=\"%s\"></u:%s>",
+                "<u:%s xmlns:u=\"%s\">\r\n</u:%s>",
                 ActionName, ServType, ActionName );
         }
 
@@ -276,11 +276,11 @@ makeAction( IN int response,
 
     if( response ) {
         sprintf( ActBuff,
-            "<u:%sResponse xmlns:u=\"%s\"></u:%sResponse>",
+            "<u:%sResponse xmlns:u=\"%s\">\r\n</u:%sResponse>",
             ActionName, ServType, ActionName );
     } else {
         sprintf( ActBuff,
-            "<u:%s xmlns:u=\"%s\"></u:%s>",
+            "<u:%s xmlns:u=\"%s\">\r\n</u:%s>",
             ActionName, ServType, ActionName );
     }
 
