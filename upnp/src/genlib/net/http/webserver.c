@@ -871,8 +871,8 @@ StrTok( char **Src,
 ************************************************************************/
 int
 GetNextRange( char **SrcRangeStr,
-              int *FirstByte,
-              int *LastByte )
+              off_t *FirstByte,
+              off_t *LastByte )
 {
     char *Ptr,
      *Tok;
@@ -936,11 +936,11 @@ GetNextRange( char **SrcRangeStr,
 ************************************************************************/
 int
 CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
-                               long FileLength,
+                               off_t FileLength,
                                OUT struct SendInstruction *Instr )
 {
 
-    int FirstByte,
+    off_t FirstByte,
       LastByte;
     char *RangeInput,
      *Ptr;
@@ -984,26 +984,26 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
 
             Instr->RangeOffset = FirstByte;
             Instr->ReadSendSize = LastByte - FirstByte + 1;
-            sprintf( Instr->RangeHeader, "CONTENT-RANGE: bytes %d-%d/%ld\r\n", FirstByte, LastByte, FileLength );   //Data between two range.
+            sprintf( Instr->RangeHeader, "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n", FirstByte, LastByte, FileLength );   //Data between two range.
         } else if( FirstByte >= 0 && LastByte == -1
                    && FirstByte < FileLength ) {
             Instr->RangeOffset = FirstByte;
             Instr->ReadSendSize = FileLength - FirstByte;
             sprintf( Instr->RangeHeader,
-                     "CONTENT-RANGE: bytes %d-%ld/%ld\r\n", FirstByte,
+                     "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n", FirstByte,
                      FileLength - 1, FileLength );
         } else if( FirstByte == -1 && LastByte > 0 ) {
             if( LastByte >= FileLength ) {
                 Instr->RangeOffset = 0;
                 Instr->ReadSendSize = FileLength;
                 sprintf( Instr->RangeHeader,
-                         "CONTENT-RANGE: bytes 0-%ld/%ld\r\n",
+                         "CONTENT-RANGE: bytes 0-%lld/%lld\r\n",
                          FileLength - 1, FileLength );
             } else {
                 Instr->RangeOffset = FileLength - LastByte;
                 Instr->ReadSendSize = LastByte;
                 sprintf( Instr->RangeHeader,
-                         "CONTENT-RANGE: bytes %ld-%ld/%ld\r\n",
+                         "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
                          FileLength - LastByte + 1, FileLength,
                          FileLength );
             }
@@ -1042,7 +1042,7 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
 int
 CheckOtherHTTPHeaders( IN http_message_t * Req,
                        OUT struct SendInstruction *RespInstr,
-                       int FileSize )
+                       off_t FileSize )
 {
     http_header_t *header;
     ListNode *node;
@@ -1184,7 +1184,6 @@ process_request( IN http_message_t * req,
     int code;
     int err_code;
 
-    //membuffer content_type;
     char *request_doc;
     struct File_Info finfo;
     xboolean using_alias;
@@ -1208,7 +1207,6 @@ process_request( IN http_message_t * req,
     // init
     request_doc = NULL;
     finfo.content_type = NULL;
-    //membuffer_init( &content_type );
     alias_grabbed = FALSE;
     err_code = HTTP_INTERNAL_SERVER_ERROR;  // default error
     using_virtual_dir = FALSE;
@@ -1362,7 +1360,7 @@ process_request( IN http_message_t * req,
 
     RespInstr->ReadSendSize = finfo.file_length;
 
-    //Check other header field.
+    // Check other header field.
     if( ( err_code =
           CheckOtherHTTPHeaders( req, RespInstr,
                                  finfo.file_length ) ) != HTTP_OK ) {
@@ -1376,85 +1374,75 @@ process_request( IN http_message_t * req,
     }
 
     if( RespInstr->IsRangeActive && RespInstr->IsChunkActive ) {
-
-        //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-        //Transfer-Encoding: chunked
-        // K means add chunky header ang G means range header.
+        // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
+        // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "RTGKDstcSXcCc",
+            "R" "T" "GKD" "s" "tcS" "XcCc",
             HTTP_PARTIAL_CONTENT, // status code
-            // RespInstr->ReadSendSize,// content length
-            finfo.content_type,
-            // content_type.buf,            // content type
-            RespInstr,    // Range
-            "LAST-MODIFIED: ", &finfo.last_modified,
+            finfo.content_type,   // content type
+            RespInstr,            // range info
+            "LAST-MODIFIED: ",
+	    &finfo.last_modified,
             X_USER_AGENT) != 0 ) {
             goto error_handler;
         }
     } else if( RespInstr->IsRangeActive && !RespInstr->IsChunkActive ) {
 
-        //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-        //Transfer-Encoding: chunked
-        // K means add chunky header ang G means range header.
+        // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
+        // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "RNTGDstcSXcCc",
-            HTTP_PARTIAL_CONTENT, // status code
-            (off_t)RespInstr->ReadSendSize,  // content length
-            finfo.content_type,
-            //content_type.buf,  // content type
-            RespInstr,    //Range Info
-            "LAST-MODIFIED: ", &finfo.last_modified,
+            "R" "N" "T" "GD" "s" "tcS" "XcCc",
+            HTTP_PARTIAL_CONTENT,     // status code
+            RespInstr->ReadSendSize,  // content length
+            finfo.content_type,       // content type
+            RespInstr,                // range info
+            "LAST-MODIFIED: ",
+	    &finfo.last_modified,
             X_USER_AGENT) != 0 ) {
             goto error_handler;
         }
 
     } else if( !RespInstr->IsRangeActive && RespInstr->IsChunkActive ) {
-
-        //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-        //Transfer-Encoding: chunked
-        // K means add chunky header ang G means range header.
+        // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
+        // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "RKTDstcSXcCc",
-            HTTP_OK, // status code
-            //RespInstr->ReadSendSize, // content length
-            finfo.content_type,
-            // content_type.buf, // content type
-            "LAST-MODIFIED: ", &finfo.last_modified,
+            "RK" "TD" "s" "tcS" "XcCc",
+            HTTP_OK,            // status code
+            finfo.content_type, // content type
+            "LAST-MODIFIED: ",
+	    &finfo.last_modified,
             X_USER_AGENT) != 0 ) {
             goto error_handler;
         }
 
-    } else {
+    } else { // !RespInstr->IsRangeActive && !RespInstr->IsChunkActive
         if (RespInstr->ReadSendSize >= 0) {
-            //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-            //Transfer-Encoding: chunked
-            // K means add chunky header ang G means range header.
+            // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
+            // Transfer-Encoding: chunked
             if (http_MakeMessage(
                 headers, resp_major, resp_minor,
-                "RNTDstcSXcCc",
-                HTTP_OK,   // status code
-                (off_t)RespInstr->ReadSendSize,  // content length
-                finfo.content_type,
-                //content_type.buf, // content type
-                "LAST-MODIFIED: ", &finfo.last_modified,
+                "R" "N" "TD" "s" "tcS" "XcCc",
+                HTTP_OK,                 // status code
+                RespInstr->ReadSendSize, // content length
+                finfo.content_type,      // content type
+                "LAST-MODIFIED: ",
+		&finfo.last_modified,
                 X_USER_AGENT) != 0 ) {
                 goto error_handler;
             }
         } else {
-            //Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-            //Transfer-Encoding: chunked
-            // K means add chunky header ang G means range header.
+            // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
+            // Transfer-Encoding: chunked
             if (http_MakeMessage(
                 headers, resp_major, resp_minor,
-                "RTDstcSXcCc",
-                HTTP_OK,    // status code
-                //RespInstr->ReadSendSize,// content length
-                finfo.content_type,
-                //content_type.buf,          // content type
-                "LAST-MODIFIED: ", &finfo.last_modified,
+                "R" "TD" "s" "tcS" "XcCc",
+                HTTP_OK,            // status code
+                finfo.content_type, // content type
+                "LAST-MODIFIED: ",
+		&finfo.last_modified,
                 X_USER_AGENT) != 0 ) {
                 goto error_handler;
             }
@@ -1473,8 +1461,8 @@ process_request( IN http_message_t * req,
         *rtype = RESP_FILEDOC;
     }
 
-    //simple get http 0.9 as specified in http 1.0
-    //don't send headers
+    // simple get http 0.9 as specified in http 1.0
+    // don't send headers
     if( req->method == HTTPMETHOD_SIMPLEGET ) {
         membuffer_destroy( headers );
     }
@@ -1484,7 +1472,6 @@ process_request( IN http_message_t * req,
   error_handler:
     free( request_doc );
     ixmlFreeDOMString( finfo.content_type );
-    //  membuffer_destroy( &content_type );
     if( err_code != UPNP_E_SUCCESS && alias_grabbed ) {
         alias_release( alias );
     }

@@ -306,8 +306,8 @@ http_SendMessage( IN SOCKINFO * info,
     char *filename = NULL;
     FILE *Fp;
     int num_read,
-      num_written,
-      amount_to_be_read = 0;
+      num_written;
+    off_t amount_to_be_read = 0;
     va_list argp;
     char *file_buf = NULL,
      *ChunkBuf = NULL;
@@ -1769,27 +1769,29 @@ http_SendStatusResponse( IN SOCKINFO * info,
 *		specified in the input parameters.
 *
 *		fmt types:
-*		's':	arg = const char* C_string
+*		'B':	arg = int status_code 
+*				appends content-length, content-type and HTML body for given code
 *		'b':	arg1 = const char* buf; arg2 = size_t buf_length 
 *				memory ptr
-*		'c':	(no args) appends CRLF "\r\n"
-*		'd':	arg = int number		// appends decimal number
-*		'h':	arg = off_t number		// appends off_t number
-*		't':	arg = time_t * gmt_time	// appends time in RFC 1123 fmt
-*		'D':	(no args) appends HTTP DATE: header
-*		'S':	(no args) appends HTTP SERVER: header
-*		'U':	(no args) appends HTTP USER-AGENT: header
 *		'C':	(no args) appends a HTTP CONNECTION: close header 
 *				depending on major,minor version
+*		'c':	(no args) appends CRLF "\r\n"
+*		'D':	(no args) appends HTTP DATE: header
+*		'd':	arg = int number		// appends decimal number
+*		'G':	arg = range information         // add range header
+*		'h':	arg = off_t number		// appends off_t number
+*		'K':	(no args)                       // add chunky header
 *		'N':	arg1 = int content_length	// content-length header
 *               'q':    arg1 = http_method_t, arg2 = (uri_type *) // request start line and HOST header
 *		'Q':	arg1 = http_method_t; arg2 = char* url; 
 *				arg3 = int url_length // start line of request
 *		'R':	arg = int status_code // adds a response start line
-*		'B':	arg = int status_code 
-*				appends content-length, content-type and HTML body for given code
+*		'S':	(no args) appends HTTP SERVER: header
+*		's':	arg = const char* C_string
 *		'T':	arg = char * content_type; format e.g: "text/html";	
 *				 content-type header
+*		't':	arg = time_t * gmt_time	// appends time in RFC 1123 fmt
+*		'U':	(no args) appends HTTP USER-AGENT: header
 *               'X':    arg = const char useragent; "redsonic" HTTP X-User-Agent: useragent
 *
 *	Return : int;
