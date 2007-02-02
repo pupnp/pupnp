@@ -8,9 +8,9 @@
 # (C) Copyright 2005-2006 Rémi Turboult <r3mi@users.sourceforge.net>
 #
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.4.1], [virtual_worlds@gmx.de])
+AC_INIT([libupnp], [1.4.2], [mroberto@users.sourceforge.net])
 # *Independently* of the above libupnp package version, the libtool version
 # of the 3 libraries need to be updated whenever there is a change released :
 # "current:revision:age" (this is NOT the same as the package version), where:
@@ -125,19 +125,24 @@ RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 
 
 # doc installation
-AC_MSG_CHECKING([documentation installation])
-AC_ARG_WITH([docdir], 
-AC_HELP_STRING([--with-docdir=DIR],
-       	       [where documentation is installed 
-	        @<:@[DATADIR/doc/]AC_PACKAGE_NAME[-]AC_PACKAGE_VERSION@:>@])
-AC_HELP_STRING([--without-docdir],
-       	       [do not install the documentation]),
-	[DOCDIR="$with_docdir"],
-	[DOCDIR="${datadir}/doc/${PACKAGE_NAME}-${PACKAGE_VERSION}"])
+# autoconf >= 2.60 already defines ${docdir}.
+AC_MSG_CHECKING([for documentation directory])
+AC_ARG_WITH([documentation], 
+	AS_HELP_STRING([--with-documentation=directory_name],
+		[where documentation is installed 
+		 @<:@[DATADIR/doc/]AC_PACKAGE_NAME[-]AC_PACKAGE_VERSION@:>@])
+AS_HELP_STRING([--without-documentation],
+		[do not install the documentation]),
+	[],
+	[with_documentation=no])
 
-AM_CONDITIONAL(WITH_DOCDIR, test x"$with_docdir" != xno)
-AC_SUBST(DOCDIR)
-AC_MSG_RESULT($DOCDIR)
+# If something has been entered after an equal sign, assume it is the directory
+if test x"$with_documentation" != xyes -a x"$with_documentation" != xno; then
+	docdir="$with_documentation"
+fi
+AM_CONDITIONAL(WITH_DOCUMENTATION, test x"$with_documentation" != xno)
+AC_SUBST(docdir)
+AC_MSG_RESULT($docdir)
 
 
 #

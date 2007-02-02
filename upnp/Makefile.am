@@ -132,8 +132,7 @@ upnp_tv_ctrlpt_SOURCES = \
 			sample/tvctrlpt/upnp_tv_ctrlpt.h \
 			sample/tvctrlpt/linux/upnp_tv_ctrlpt_main.c
 
-if WITH_DOCDIR
-    docdir		= @DOCDIR@
+if WITH_DOCUMENTATION
     examplesdir 	= $(docdir)/examples
     examples_DATA 	= $(upnp_tv_ctrlpt_SOURCES) $(upnp_tv_device_SOURCES)
 endif

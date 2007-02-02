@@ -2,6 +2,16 @@
 Trunk
 *************************************************************************
 
+2007-02-02 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	* Bumped the program version to 1.4.2 in config.ac.
+
+	* Now requires autoconf 2.60.
+
+	* Fixed docdir use.
+
+	* Does not install the documentation by default.
+
 2007-01-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
 	* SF Tracker [ 1634922 ] Support for large files (>= 2 GiB), part 2
