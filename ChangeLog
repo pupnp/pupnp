@@ -12,6 +12,8 @@ Version 1.4.2
 
 	* Does not install the documentation by default.
 
+	* Use dist-bzip2 to create a .bz2 distribution file.
+
 2007-01-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
 	* SF Tracker [ 1634922 ] Support for large files (>= 2 GiB), part 2
