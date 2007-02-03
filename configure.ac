@@ -125,7 +125,11 @@ RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 
 
 # doc installation
-# autoconf >= 2.60 already defines ${docdir}.
+# autoconf >= 2.60 already defines ${docdir}, but we will not use its 
+# default value, which is ${datarootdir}/doc/${PACKAGE_TARNAME}.
+# That would give us ${datarootdir}/doc/libupnp, and we want the package
+# version on that.
+docdir="${datadir}/doc/${PACKAGE_NAME}-${PACKAGE_VERSION}"
 AC_MSG_CHECKING([for documentation directory])
 AC_ARG_WITH([documentation], 
 	AS_HELP_STRING([--with-documentation=directory_name],
