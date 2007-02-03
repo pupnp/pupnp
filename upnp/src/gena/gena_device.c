@@ -219,9 +219,11 @@ notify_send_and_recv( IN uri_type * destination_url,
     }
     // make start line and HOST header
     membuffer_init( &start_msg );
-    if( http_MakeMessage( &start_msg, 1, 1,
-                          "q" "s",
-                          HTTPMETHOD_NOTIFY, &url, mid_msg->buf ) != 0 ) {
+    if (http_MakeMessage(
+        &start_msg, 1, 1,
+        "q" "s",
+        HTTPMETHOD_NOTIFY, &url,
+        mid_msg->buf ) != 0 ) {
         membuffer_destroy( &start_msg );
         sock_destroy( &info, SD_BOTH );
         return UPNP_E_OUTOF_MEMORY;
@@ -296,11 +298,12 @@ genaNotify( IN char *headers,
 
     // make 'end' msg (the part that won't vary with the destination)
     endmsg.size_inc = 30;
-    if( http_MakeMessage( &mid_msg, 1, 1,
-                          "s" "ssc" "sdcc",
-                          headers,
-                          "SID: ", sub->sid,
-                          "SEQ: ", sub->ToSendEventKey ) != 0 ) {
+    if( http_MakeMessage(
+        &mid_msg, 1, 1,
+        "s" "ssc" "sdcc",
+        headers,
+        "SID: ", sub->sid,
+        "SEQ: ", sub->ToSendEventKey ) != 0 ) {
         membuffer_destroy( &mid_msg );
         return UPNP_E_OUTOF_MEMORY;
     }
@@ -1165,10 +1168,14 @@ respond_ok( IN SOCKINFO * info,
 
     membuffer_init( &response );
     response.size_inc = 30;
-    if( http_MakeMessage( &response, major, minor,
-                          "R" "D" "S" "N" "Xc" "ssc" "sc" "c",
-                          HTTP_OK, 0, X_USER_AGENT,
-                          "SID: ", sub->sid, timeout_str ) != 0 ) {
+    if( http_MakeMessage(
+        &response, major, minor,
+        "R" "D" "S" "N" "Xc" "ssc" "scc",
+        HTTP_OK,
+        (off_t)0,
+        X_USER_AGENT,
+        "SID: ", sub->sid,
+        timeout_str ) != 0 ) {
         membuffer_destroy( &response );
         error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
         return UPNP_E_OUTOF_MEMORY;

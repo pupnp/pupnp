@@ -306,8 +306,8 @@ http_SendMessage( IN SOCKINFO * info,
     char *filename = NULL;
     FILE *Fp;
     int num_read,
-      num_written,
-      amount_to_be_read = 0;
+      num_written;
+    off_t amount_to_be_read = 0;
     va_list argp;
     char *file_buf = NULL,
      *ChunkBuf = NULL;
@@ -367,7 +367,7 @@ http_SendMessage( IN SOCKINFO * info,
                     return UPNP_E_FILE_READ_ERROR;
                 }
             } else if( Instr && Instr->IsRangeActive ) {
-                if( fseek( Fp, Instr->RangeOffset, SEEK_CUR ) != 0 ) {
+                if( fseeko( Fp, Instr->RangeOffset, SEEK_CUR ) != 0 ) {
                     free( ChunkBuf );
                     return UPNP_E_FILE_READ_ERROR;
                 }
@@ -640,10 +640,11 @@ http_Download( IN const char *url_str,
                "HOSTNAME : %s Length : %d\n", hoststr, hostlen );
          )
 
-        ret_code = http_MakeMessage( &request, 1, 1, "QsbcDCUc",
-                                     HTTPMETHOD_GET, url.pathquery.buff,
-                                     url.pathquery.size, "HOST: ", hoststr,
-                                     hostlen );
+        ret_code = http_MakeMessage(
+            &request, 1, 1,
+            "QsbcDCUc",
+            HTTPMETHOD_GET, url.pathquery.buff, url.pathquery.size,
+            "HOST: ", hoststr, hostlen );
     if( ret_code != 0 ) {
         DBGONLY( UpnpPrintf
                  ( UPNP_INFO, HTTP, __FILE__, __LINE__,
@@ -796,21 +797,27 @@ MakePostMessage( const char *url_str,
          )
 
         if( contentLength >= 0 ) {
-        ret_code = http_MakeMessage( request, 1, 1, "QsbcDCUTNc",
-                                     HTTPMETHOD_POST, url->pathquery.buff,
-                                     url->pathquery.size, "HOST: ",
-                                     hoststr, hostlen, contentType,
-                                     contentLength );
+        ret_code = http_MakeMessage(
+            request, 1, 1,
+            "QsbcDCUTNc",
+            HTTPMETHOD_POST, url->pathquery.buff, url->pathquery.size,
+            "HOST: ", hoststr, hostlen,
+            contentType,
+            (off_t)contentLength );
     } else if( contentLength == UPNP_USING_CHUNKED ) {
-        ret_code = http_MakeMessage( request, 1, 1, "QsbcDCUTKc",
-                                     HTTPMETHOD_POST, url->pathquery.buff,
-                                     url->pathquery.size, "HOST: ",
-                                     hoststr, hostlen, contentType );
+        ret_code = http_MakeMessage(
+            request, 1, 1,
+            "QsbcDCUTKc",
+            HTTPMETHOD_POST, url->pathquery.buff, url->pathquery.size,
+            "HOST: ", hoststr, hostlen,
+            contentType );
     } else if( contentLength == UPNP_UNTIL_CLOSE ) {
-        ret_code = http_MakeMessage( request, 1, 1, "QsbcDCUTc",
-                                     HTTPMETHOD_POST, url->pathquery.buff,
-                                     url->pathquery.size, "HOST: ",
-                                     hoststr, hostlen, contentType );
+        ret_code = http_MakeMessage(
+            request, 1, 1,
+            "QsbcDCUTc",
+            HTTPMETHOD_POST, url->pathquery.buff, url->pathquery.size,
+            "HOST: ", hoststr, hostlen,
+            contentType );
     } else {
         ret_code = UPNP_E_INVALID_PARAM;
     }
@@ -1131,9 +1138,11 @@ MakeGetMessage( const char *url_str,
         querylen = url->pathquery.size;
     }
 
-    ret_code = http_MakeMessage( request, 1, 1, "QsbcDCUc",
-                                 HTTPMETHOD_GET, querystr, querylen,
-                                 "HOST: ", hoststr, hostlen );
+    ret_code = http_MakeMessage(
+        request, 1, 1,
+        "QsbcDCUc",
+        HTTPMETHOD_GET, querystr, querylen,
+        "HOST: ", hoststr, hostlen );
 
     if( ret_code != 0 ) {
         DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
@@ -1729,8 +1738,11 @@ http_SendStatusResponse( IN SOCKINFO * info,
     membuffer_init( &membuf );
     membuf.size_inc = 70;
 
-    ret = http_MakeMessage( &membuf, response_major, response_minor, "RSCB", http_status_code,  // response start line
-                            http_status_code ); // body
+    ret = http_MakeMessage(
+        &membuf, response_major, response_minor,
+        "RSCB",
+        http_status_code,  // response start line
+        http_status_code ); // body
     if( ret == 0 ) {
         timeout = HTTP_DEFAULT_TIMEOUT;
         ret = http_SendMessage( info, &timeout, "b",
@@ -1757,28 +1769,30 @@ http_SendStatusResponse( IN SOCKINFO * info,
 *		specified in the input parameters.
 *
 *		fmt types:
-*		's':	arg = const char* C_string
+*		'B':	arg = int status_code 
+*				appends content-length, content-type and HTML body for given code
 *		'b':	arg1 = const char* buf; arg2 = size_t buf_length 
 *				memory ptr
-*		'c':	(no args) appends CRLF "\r\n"
-*		'd':	arg = int number		// appends decimal number
-*		't':	arg = time_t * gmt_time	// appends time in RFC 1123 fmt
-*		'D':	(no args) appends HTTP DATE: header
-*		'S':	(no args) appends HTTP SERVER: header
-*		'U':	(no args) appends HTTP USER-AGENT: header
 *		'C':	(no args) appends a HTTP CONNECTION: close header 
 *				depending on major,minor version
+*		'c':	(no args) appends CRLF "\r\n"
+*		'D':	(no args) appends HTTP DATE: header
+*		'd':	arg = int number		// appends decimal number
+*		'G':	arg = range information         // add range header
+*		'h':	arg = off_t number		// appends off_t number
+*		'K':	(no args)                       // add chunky header
 *		'N':	arg1 = int content_length	// content-length header
+*               'q':    arg1 = http_method_t, arg2 = (uri_type *) // request start line and HOST header
 *		'Q':	arg1 = http_method_t; arg2 = char* url; 
 *				arg3 = int url_length // start line of request
 *		'R':	arg = int status_code // adds a response start line
-*		'B':	arg = int status_code 
-*				appends content-length, content-type and HTML body for given code
+*		'S':	(no args) appends HTTP SERVER: header
+*		's':	arg = const char* C_string
 *		'T':	arg = char * content_type; format e.g: "text/html";	
 *				 content-type header
-* --- PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld@users.sourceforge.net>
-*       'X':    arg = const char useragent; "redsonic" HTTP X-User-Agent: useragent
-* --- PATCH END ---
+*		't':	arg = time_t * gmt_time	// appends time in RFC 1123 fmt
+*		'U':	(no args) appends HTTP USER-AGENT: header
+*               'X':    arg = const char useragent; "redsonic" HTTP X-User-Agent: useragent
 *
 *	Return : int;
 *		0 - On Success
@@ -1797,6 +1811,7 @@ http_MakeMessage( INOUT membuffer * buf,
     char c;
     char *s = NULL;
     int num;
+    off_t bignum;
     size_t length;
     time_t *loc_time;
     time_t curr_time;
@@ -1884,6 +1899,16 @@ http_MakeMessage( INOUT membuffer * buf,
             }
         }
 
+        else if( c == 'h' )     // off_t
+        {
+            bignum = ( off_t )va_arg( argp, off_t );
+
+            sprintf( tempbuf, "%lld", bignum );
+            if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
+                goto error_handler;
+            }
+        }
+
         else if( c == 't' || c == 'D' ) // date
         {
             if( c == 'D' ) {
@@ -1925,12 +1950,13 @@ http_MakeMessage( INOUT membuffer * buf,
 
         else if( c == 'N' ) {
             // content-length header
-            num = ( int )va_arg( argp, int );
+            bignum = ( off_t )va_arg( argp, off_t );
 
-            assert( num >= 0 );
-            if( http_MakeMessage
-                ( buf, http_major_version, http_minor_version, "sdc",
-                  "CONTENT-LENGTH: ", num ) != 0 ) {
+            assert( bignum >= 0 );
+            if (http_MakeMessage(
+                buf, http_major_version, http_minor_version,
+                "shc",
+                "CONTENT-LENGTH: ", bignum ) != 0 ) {
                 goto error_handler;
             }
         }
@@ -1940,14 +1966,14 @@ http_MakeMessage( INOUT membuffer * buf,
 
             temp_str = ( c == 'S' ) ? "SERVER: " : "USER-AGENT: ";
             get_sdk_info( tempbuf );
-            if( http_MakeMessage
-                ( buf, http_major_version, http_minor_version, "ss",
-                  temp_str, tempbuf ) != 0 ) {
+            if (http_MakeMessage(
+                buf, http_major_version, http_minor_version,
+                "ss",
+                temp_str, tempbuf ) != 0 ) {
                 goto error_handler;
             }
         }
 
-/* --- PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld@users.sourceforge.net> */
 	else if( c == 'X' )          // C string
         {
             s = ( char * )va_arg( argp, char * );
@@ -1962,9 +1988,6 @@ http_MakeMessage( INOUT membuffer * buf,
             }
         }
         
-/* --- PATCH END --- */
-    
-
         else if( c == 'R' ) {
             // response start line
             //   e.g.: 'HTTP/1.1 200 OK'
@@ -1979,9 +2002,11 @@ http_MakeMessage( INOUT membuffer * buf,
 
             // str
             status_msg = http_get_code_text( status_code );
-            if( http_MakeMessage
-                ( buf, http_major_version, http_minor_version, "ssc",
-                  tempbuf, status_msg ) != 0 ) {
+            if (http_MakeMessage(
+                buf, http_major_version, http_minor_version,
+                "ssc",
+                tempbuf,
+                status_msg ) != 0 ) {
                 goto error_handler;
             }
         }
@@ -1996,11 +2021,14 @@ http_MakeMessage( INOUT membuffer * buf,
                      "<html><body><h1>",
                      status_code, http_get_code_text( status_code ),
                      "</h1></body></html>" );
-            num = strlen( tempbuf );
+            bignum = strlen( tempbuf );
 
-            if( http_MakeMessage( buf, http_major_version, http_minor_version, "NTcs", num, // content-length
-                                  "text/html",  // content-type
-                                  tempbuf ) != 0 )  // body
+            if (http_MakeMessage(
+                    buf, http_major_version, http_minor_version,
+                    "NTcs",
+                    bignum, // content-length
+                    "text/html",  // content-type
+                    tempbuf ) != 0 )  // body
             {
                 goto error_handler;
             }
@@ -2009,17 +2037,18 @@ http_MakeMessage( INOUT membuffer * buf,
         else if( c == 'Q' ) {
             // request start line
             // GET /foo/bar.html HTTP/1.1\r\n
-            //
 
             method = ( http_method_t ) va_arg( argp, http_method_t );
             method_str = method_to_str( method );
             url_str = ( const char * )va_arg( argp, const char * );
             num = ( int )va_arg( argp, int );   // length of url_str
 
-            if( http_MakeMessage( buf, http_major_version, http_minor_version, "ssbsdsdc", method_str,  // method
-                                  " ", url_str, num,    // url
-                                  " HTTP/", http_major_version, ".",
-                                  http_minor_version ) != 0 ) {
+            if (http_MakeMessage(
+                buf, http_major_version, http_minor_version,
+                "ssbsdsdc",
+                method_str,  // method
+                " ", url_str, num,    // url
+                " HTTP/", http_major_version, ".", http_minor_version ) != 0 ) {
                 goto error_handler;
             }
         }
@@ -2036,10 +2065,11 @@ http_MakeMessage( INOUT membuffer * buf,
                 goto error_handler;
             }
 
-            if( http_MakeMessage
-                ( buf, http_major_version, http_minor_version, "Q" "sbc",
-                  method, url.pathquery.buff, url.pathquery.size, "HOST: ",
-                  url.hostport.text.buff, url.hostport.text.size ) != 0 ) {
+            if (http_MakeMessage(
+                buf, http_major_version, http_minor_version,
+                "Q" "sbc",
+                method, url.pathquery.buff, url.pathquery.size,
+                "HOST: ", url.hostport.text.buff, url.hostport.text.size ) != 0 ) {
                 goto error_handler;
             }
         }
@@ -2048,9 +2078,10 @@ http_MakeMessage( INOUT membuffer * buf,
             // content type header
             temp_str = ( const char * )va_arg( argp, const char * );    // type/subtype format
 
-            if( http_MakeMessage
-                ( buf, http_major_version, http_minor_version, "ssc",
-                  "CONTENT-TYPE: ", temp_str ) != 0 ) {
+            if (http_MakeMessage(
+                buf, http_major_version, http_minor_version,
+		"ssc",
+                "CONTENT-TYPE: ", temp_str ) != 0 ) {
                 goto error_handler;
             }
         }
@@ -2174,16 +2205,13 @@ MakeGetMessageEx( const char *url_str,
                              hostlen );
              )
 
-            errCode = http_MakeMessage( request,
-                                        1,
-                                        1,
-                                        "QsbcGDCUc",
-                                        HTTPMETHOD_GET,
-                                        url->pathquery.buff,
-                                        url->pathquery.size,
-                                        "HOST: ",
-                                        hoststr,
-                                        hostlen, pRangeSpecifier );
+            errCode = http_MakeMessage(
+                request, 1, 1,
+                "QsbcGDCUc",
+                HTTPMETHOD_GET,
+                url->pathquery.buff, url->pathquery.size,
+                "HOST: ", hoststr, hostlen,
+                pRangeSpecifier );
 
         if( errCode != 0 ) {
             DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,

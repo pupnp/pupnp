@@ -146,7 +146,7 @@ ixmlPrintDomTreeRecursive( IN IXML_Node * nodeptr,
                 if( ( child != NULL )
                     && ( ixmlNode_getNodeType( child ) ==
                          eELEMENT_NODE ) ) {
-                    ixml_membuf_append_str( buf, ">\n" );
+                    ixml_membuf_append_str( buf, ">\r\n" );
                 } else {
                     ixml_membuf_append_str( buf, ">" );
                 }
@@ -164,7 +164,7 @@ ixmlPrintDomTreeRecursive( IN IXML_Node * nodeptr,
                     && ixmlNode_getNodeType( sibling ) == eTEXT_NODE ) {
                     ixml_membuf_append_str( buf, ">" );
                 } else {
-                    ixml_membuf_append_str( buf, ">\n" );
+                    ixml_membuf_append_str( buf, ">\r\n" );
                 }
                 ixmlPrintDomTreeRecursive( ixmlNode_getNextSibling
                                            ( nodeptr ), buf );
@@ -227,7 +227,7 @@ ixmlPrintDomTree( IN IXML_Node * nodeptr,
             child = ixmlNode_getFirstChild( nodeptr );
             if( ( child != NULL )
                 && ( ixmlNode_getNodeType( child ) == eELEMENT_NODE ) ) {
-                ixml_membuf_append_str( buf, ">\n" );
+                ixml_membuf_append_str( buf, ">\r\n" );
             } else {
                 ixml_membuf_append_str( buf, ">" );
             }
@@ -239,7 +239,7 @@ ixmlPrintDomTree( IN IXML_Node * nodeptr,
             // Done with children.  Output the end tag.
             ixml_membuf_append_str( buf, "</" );
             ixml_membuf_append_str( buf, nodeName );
-            ixml_membuf_append_str( buf, ">\n" );
+            ixml_membuf_append_str( buf, ">\r\n" );
             break;
 
         default:
@@ -372,7 +372,7 @@ ixmlPrintDocument(IXML_Document *doc)
     }
 
     ixml_membuf_init( buf );
-    ixml_membuf_append_str( buf, "<?xml version=\"1.0\"?>\n" );
+    ixml_membuf_append_str( buf, "<?xml version=\"1.0\"?>\r\n" );
     ixmlPrintDomTree( rootNode, buf );
     return buf->buf;
 
@@ -421,7 +421,7 @@ ixmlDocumenttoString(IXML_Document *doc)
     }
 
     ixml_membuf_init( buf );
-    ixml_membuf_append_str( buf, "<?xml version=\"1.0\"?>\n" );
+    ixml_membuf_append_str( buf, "<?xml version=\"1.0\"?>\r\n" );
     ixmlDomTreetoString( rootNode, buf );
     return buf->buf;
 

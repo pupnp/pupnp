@@ -244,6 +244,7 @@ int UpnpInit( IN const char *HostIP,
     TPAttrSetMinThreads( &attr, MIN_THREADS );
     TPAttrSetJobsPerThread( &attr, JOBS_PER_THREAD );
     TPAttrSetIdleTime( &attr, THREAD_IDLE_TIME );
+    TPAttrSetMaxJobsTotal( &attr, MAX_JOBS_TOTAL );
 
     if( ThreadPoolInit( &gSendThreadPool, &attr ) != UPNP_E_SUCCESS ) {
         UpnpSdkInit = 0;
@@ -955,7 +956,7 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
     char aliasStr[LINE_SIZE];
     char *temp_str = NULL;
     FILE *fp = NULL;
-    unsigned fileLen;
+    off_t fileLen;
     unsigned num_read;
     time_t last_modified;
     struct stat file_info;
@@ -3339,19 +3340,20 @@ UpnpDownloadXmlDoc( const char *url,
             return ret_code;
     }
 
-	/* TODO: MoNKi: Do not check this?? Some routers (Linksys WRT54GS) sends
-	   "CONTENT-TYPE: application/octet-stream". If the data sended is not
-	   an xml file, ixmlParseBufferEx will fail and the function will return
-	   UPNP_E_INVALID_DESC too.*/
-
     if( strncasecmp( content_type, "text/xml", strlen( "text/xml" ) ) ) {
+        DBGONLY(
+            UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Not text/xml\n" );
+        )
+        // Linksys WRT54G router returns 
+        // "CONTENT-TYPE: application/octet-stream".
+        // Let's be nice to Linksys and try to parse document anyway.
+        // If the data sended is not a xml file, ixmlParseBufferEx
+        // will fail and the function will return UPNP_E_INVALID_DESC too.
+#if 0
         free( xml_buf );
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-                             "Not text/xml\n" );
-             )
-            return UPNP_E_INVALID_DESC;
+        return UPNP_E_INVALID_DESC;
+#endif
     }
-    // end of TODO Do not check this
 
     ret_code = ixmlParseBufferEx( xml_buf, xmlDoc );
     free( xml_buf );

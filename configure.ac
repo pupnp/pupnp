@@ -8,9 +8,9 @@
 # (C) Copyright 2005-2006 Rémi Turboult <r3mi@users.sourceforge.net>
 #
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.4.1], [virtual_worlds@gmx.de])
+AC_INIT([libupnp], [1.4.2], [mroberto@users.sourceforge.net])
 # *Independently* of the above libupnp package version, the libtool version
 # of the 3 libraries need to be updated whenever there is a change released :
 # "current:revision:age" (this is NOT the same as the package version), where:
@@ -19,16 +19,34 @@ AC_INIT([libupnp], [1.4.1], [virtual_worlds@gmx.de])
 # 	- interfaces added: 			age++
 # 	- interfaces removed:			age=0
 # *please update only once, before a formal release, not for each change*
-AC_SUBST([LT_VERSION_IXML],       [2:2:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [2:2:0])
-AC_SUBST([LT_VERSION_UPNP],       [2:2:0])
+#
+# For release 1.4.1, we had:
+#AC_SUBST([LT_VERSION_IXML],       [2:2:0])
+#AC_SUBST([LT_VERSION_THREADUTIL], [2:2:0])
+#AC_SUBST([LT_VERSION_UPNP],       [2:2:0])
+#
+# "current:revision:age"
+#
+# - Code has changed in ixml
+#	revision: 2 -> 3
+# - Code has changed in threadutil
+#	revision: 2 -> 3
+# - Interface added in threadutil
+#	current: 2 -> 3
+#	revisiion: 3 -> 0
+#	age: 0 -> 1
+# - Code has changed in upnp (revision 2 -> 3)
+#	revision: 2 -> 3
+AC_SUBST([LT_VERSION_IXML],       [2:3:0])
+AC_SUBST([LT_VERSION_THREADUTIL], [3:0:1])
+AC_SUBST([LT_VERSION_UPNP],       [2:3:0])
 
 
 AC_CONFIG_AUX_DIR(config.aux)
 AC_CONFIG_MACRO_DIR(m4)
 AC_CONFIG_SRCDIR(upnp/inc/upnp.h)
 
-AM_INIT_AUTOMAKE([1.8 -Wall foreign subdir-objects])
+AM_INIT_AUTOMAKE([1.8 -Wall foreign subdir-objects dist-bzip2])
 
 #
 # There are 3 configuration files :
@@ -42,6 +60,7 @@ AM_INIT_AUTOMAKE([1.8 -Wall foreign subdir-objects])
 #    installed libraries.
 #
 AC_CONFIG_HEADERS([autoconfig.h upnp/inc/upnpconfig.h])
+#AC_SYS_LARGEFILE_SENSITIVE
 
 AC_REVISION([$Revision: 1.11 $])
 
@@ -106,19 +125,28 @@ RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 
 
 # doc installation
-AC_MSG_CHECKING([documentation installation])
-AC_ARG_WITH([docdir], 
-AC_HELP_STRING([--with-docdir=DIR],
-       	       [where documentation is installed 
-	        @<:@[DATADIR/doc/]AC_PACKAGE_NAME[-]AC_PACKAGE_VERSION@:>@])
-AC_HELP_STRING([--without-docdir],
-       	       [do not install the documentation]),
-	[DOCDIR="$with_docdir"],
-	[DOCDIR="${datadir}/doc/${PACKAGE_NAME}-${PACKAGE_VERSION}"])
+# autoconf >= 2.60 already defines ${docdir}, but we will not use its 
+# default value, which is ${datarootdir}/doc/${PACKAGE_TARNAME}.
+# That would give us ${datarootdir}/doc/libupnp, and we want the package
+# version on that.
+docdir="${datadir}/doc/${PACKAGE_NAME}-${PACKAGE_VERSION}"
+AC_MSG_CHECKING([for documentation directory])
+AC_ARG_WITH([documentation], 
+	AS_HELP_STRING([--with-documentation=directory_name],
+		[where documentation is installed 
+		 @<:@[DATADIR/doc/]AC_PACKAGE_NAME[-]AC_PACKAGE_VERSION@:>@])
+AS_HELP_STRING([--without-documentation],
+		[do not install the documentation]),
+	[],
+	[with_documentation=no])
 
-AM_CONDITIONAL(WITH_DOCDIR, test x"$with_docdir" != xno)
-AC_SUBST(DOCDIR)
-AC_MSG_RESULT($DOCDIR)
+# If something has been entered after an equal sign, assume it is the directory
+if test x"$with_documentation" != xyes -a x"$with_documentation" != xno; then
+	docdir="$with_documentation"
+fi
+AM_CONDITIONAL(WITH_DOCUMENTATION, test x"$with_documentation" != xno)
+AC_SUBST(docdir)
+AC_MSG_RESULT($docdir)
 
 
 #
@@ -144,9 +172,12 @@ else
 fi
 AX_CFLAGS_WARN_ALL
 
-# Arrange for large-file support (can be disabled with --disable-largefile).
-# Define _FILE_OFFSET_BITS and _LARGE_FILES if necessary
-AC_SYS_LARGEFILE
+#
+# Lot's of stuff to ensure large file support
+#
+AC_TYPE_OFF_T
+AC_DEFINE(_LARGE_FILE_SOURCE, [], [Large files support])
+AC_DEFINE(_FILE_OFFSET_BITS, [64], [File Offset size])
 
 
 #

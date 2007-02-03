@@ -189,7 +189,7 @@ send_error_response( IN SOCKINFO * info,
                      IN const char *err_msg,
                      IN http_message_t * hmsg )
 {
-    int content_length;
+    off_t content_length;
     int timeout_secs = SOAP_TIMEOUT;
     int major,
       minor;
@@ -228,20 +228,19 @@ send_error_response( IN SOCKINFO * info,
 
     // make headers
     membuffer_init( &headers );
-/* -- PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld at users.sourceforge.net> */    
-    if( http_MakeMessage( &headers, major, minor,
-                          "RNsDsSXc" "sssss",
-                          500,
-                          content_length,
-                          ContentTypeHeader,
-                          "EXT:\r\n",
-                          X_USER_AGENT,
-                          start_body, err_code_str, mid_body, err_msg,
-                          end_body ) != 0 ) {
+    if (http_MakeMessage(
+        &headers, major, minor,
+        "RNsDsSXcc" "sssss",
+        500,
+        content_length,
+        ContentTypeHeader,
+        "EXT:\r\n",
+        X_USER_AGENT,
+        start_body, err_code_str, mid_body, err_msg,
+        end_body ) != 0 ) {
         membuffer_destroy( &headers );
         return;                 // out of mem
     }
-/*-- PATCH END - */
     // send err msg
     http_SendMessage( info, &timeout_secs, "b",
                       headers.buf, headers.length );
@@ -268,12 +267,11 @@ send_var_query_response( IN SOCKINFO * info,
                          IN const char *var_value,
                          IN http_message_t * hmsg )
 {
-    int content_length;
+    off_t content_length;
     int timeout_secs = SOAP_TIMEOUT;
-    int major,
-      minor;
+    int major;
+    int minor;
     const char *start_body =
-//		"<?xml version=\"1.0\"?>\n" required??
         "<s:Envelope "
         "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
@@ -297,19 +295,18 @@ send_var_query_response( IN SOCKINFO * info,
     // make headers
     membuffer_init( &response );
     
-/* -- PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld at users.sourceforge.net> */
-    if( http_MakeMessage( &response, major, minor,
-                          "RNsDsSXcc" "sss",
-                          HTTP_OK,
-                          content_length,
-                          ContentTypeHeader,
-                          "EXT:\r\n",
-                          X_USER_AGENT,
-                          start_body, var_value, end_body ) != 0 ) {
+    if (http_MakeMessage(
+        &response, major, minor,
+        "RNsDsSXcc" "sss",
+        HTTP_OK,
+        content_length,
+        ContentTypeHeader,
+        "EXT:\r\n",
+        X_USER_AGENT,
+        start_body, var_value, end_body ) != 0 ) {
         membuffer_destroy( &response );
         return;                 // out of mem
     }
-/* -- PATCH END - */
     
     // send msg
     http_SendMessage( info, &timeout_secs, "b",
@@ -695,7 +692,7 @@ send_action_response( IN SOCKINFO * info,
     int major,
       minor;
     int err_code;
-    int content_length;
+    off_t content_length;
     int ret_code;
     int timeout_secs = SOAP_TIMEOUT;
     static char *start_body =
@@ -717,17 +714,22 @@ send_action_response( IN SOCKINFO * info,
         goto error_handler;
     }
 
-    content_length = strlen( start_body ) + strlen( xml_response ) +
+    content_length =
+        strlen( start_body ) +
+        strlen( xml_response ) +
         strlen( end_body );
 
     // make headers
-/* -- PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld at users.sourceforge.net> */    
-    if( http_MakeMessage( &headers, major, minor, "RNsDsSXcc", HTTP_OK,   // status code
-                          content_length, ContentTypeHeader, "EXT:\r\n", X_USER_AGENT // EXT header
-         ) != 0 ) {
+    if (http_MakeMessage(
+        &headers, major, minor,
+        "RNsDsSXcc",
+        HTTP_OK,   // status code
+        content_length,
+        ContentTypeHeader,
+        "EXT:\r\n",
+        X_USER_AGENT) != 0 ) {
         goto error_handler;
     }
-/* -- PATCH END - */
 
     // send whole msg
     ret_code = http_SendMessage( info, &timeout_secs, "bbbb",

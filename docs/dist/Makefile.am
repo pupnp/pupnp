@@ -1,4 +1,7 @@
-EXTRA_DIST = ./UPnP_Programming_Guide.pdf \
+
+
+EXTRA_DIST = \
+    ./UPnP_Programming_Guide.pdf \
     ./IXML_Programming_Guide.pdf \
     ./html/upnp/icon1.gif \
     ./html/upnp/icon2.gif \
@@ -251,9 +254,10 @@ EXTRA_DIST = ./UPnP_Programming_Guide.pdf \
     ./html/ixml/ixmlCloneDOMString.html \
     ./html/ixml/ixmlFreeDOMString.html
     
-if WITH_DOCDIR
-    docsdir        = @DOCDIR@
-    nobase_docs_DATA = ./UPnP_Programming_Guide.pdf \
+if WITH_DOCUMENTATION
+    docsdir = @docdir@
+    nobase_docs_DATA = \
+        ./UPnP_Programming_Guide.pdf \
         ./IXML_Programming_Guide.pdf \
         ./html/upnp/icon1.gif \
         ./html/upnp/icon2.gif \
@@ -506,3 +510,4 @@ if WITH_DOCDIR
         ./html/ixml/ixmlCloneDOMString.html \
         ./html/ixml/ixmlFreeDOMString.html
 endif
+

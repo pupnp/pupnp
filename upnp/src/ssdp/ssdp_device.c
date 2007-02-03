@@ -234,7 +234,17 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
 
     for( Index = 0; Index < NumPacket; Index++ ) {
         int rc;
-
+        // The reason to keep this loop is purely historical/documentation,
+        // according to section 9.2 of HTTPU spec:
+        // 
+        // "If a multicast resource would send a response(s) to any copy of the 
+        //  request, it SHOULD send its response(s) to each copy of the request 
+        //  it receives. It MUST NOT repeat its response(s) per copy of the 
+        //  reuqest."
+        //  
+        // http://www.upnp.org/download/draft-goland-http-udp-04.txt
+        //
+        // So, NUM_COPY has been changed from 2 to 1.
         NumCopy = 0;
         while( NumCopy < NUM_COPY ) {
             DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
@@ -295,16 +305,16 @@ CreateServicePacket( IN int msg_type,
     *packet = NULL;
 
     if( msg_type == MSGTYPE_REPLY ) {
-/* -- PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld at users.sourceforge.net> */
-        ret_code = http_MakeMessage( &buf, 1, 1,
-                                     "R" "sdc" "D" "s" "ssc" "S" "Xc" "ssc"
-                                     "ssc" "c", HTTP_OK,
-                                     "CACHE-CONTROL: max-age=", duration,
-                                     "EXT:\r\n", "LOCATION: ", location,
-                                     X_USER_AGENT,
-                                     "ST: ", nt, "USN: ", usn );
-/* -- PATCH END - */
-        
+        ret_code = http_MakeMessage(
+            &buf, 1, 1,
+            "R" "sdc" "D" "sc" "ssc" "S" "Xc" "ssc" "sscc",
+            HTTP_OK,
+            "CACHE-CONTROL: max-age=", duration,
+	    "EXT:",
+            "LOCATION: ", location,
+            X_USER_AGENT,
+            "ST: ", nt,
+            "USN: ", usn);
         if( ret_code != 0 ) {
             return;
         }
@@ -320,15 +330,17 @@ CreateServicePacket( IN int msg_type,
         // NOTE: The CACHE-CONTROL and LOCATION headers are not present in
         //  a shutdown msg, but are present here for MS WinMe interop.
         
-/* -- PATCH START - Sergey 'Jin' Bostandzhyan <jin_eld at users.sourceforge.net> */
-        ret_code = http_MakeMessage( &buf, 1, 1,
-                                     "Q" "sssdc" "sdc" "ssc" "ssc" "ssc"
-                                     "S" "Xc" "ssc" "c", HTTPMETHOD_NOTIFY, "*",
-                                     1, "HOST: ", SSDP_IP, ":", SSDP_PORT,
-                                     "CACHE-CONTROL: max-age=", duration,
-                                     "LOCATION: ", location, "NT: ", nt,
-                                     "NTS: ", nts, X_USER_AGENT, "USN: ", usn );
-/* -- PATCH END - */        
+        ret_code = http_MakeMessage(
+            &buf, 1, 1,
+            "Q" "sssdc" "sdc" "ssc" "ssc" "ssc" "S" "Xc" "sscc",
+            HTTPMETHOD_NOTIFY, "*",
+            1, "HOST: ", SSDP_IP, ":", SSDP_PORT,
+            "CACHE-CONTROL: max-age=", duration,
+            "LOCATION: ", location,
+            "NT: ", nt,
+            "NTS: ", nts,
+            X_USER_AGENT,
+            "USN: ", usn );
         if( ret_code != 0 ) {
             return;
         }
