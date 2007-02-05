@@ -34,9 +34,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#ifdef STATS
 #include <stdio.h>
-#endif
 
 /****************************************************************************
  * Function: CmpThreadPoolJob
