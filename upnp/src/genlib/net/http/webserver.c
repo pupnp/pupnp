@@ -633,7 +633,7 @@ get_file_info( IN const char *filename,
 
     DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
                          "file info: %s, length: %lld, last_mod=%s readable=%d\n",
-                         filename, info->file_length,
+                         filename, (long long)info->file_length,
                          asctime( gmtime( &info->last_modified ) ),
                          info->is_readable ); )
 
@@ -984,28 +984,36 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
 
             Instr->RangeOffset = FirstByte;
             Instr->ReadSendSize = LastByte - FirstByte + 1;
-            sprintf( Instr->RangeHeader, "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n", FirstByte, LastByte, FileLength );   //Data between two range.
+            sprintf( Instr->RangeHeader,
+                "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
+                (long long)FirstByte,
+                (long long)LastByte,
+                (long long)FileLength );   //Data between two range.
         } else if( FirstByte >= 0 && LastByte == -1
                    && FirstByte < FileLength ) {
             Instr->RangeOffset = FirstByte;
             Instr->ReadSendSize = FileLength - FirstByte;
             sprintf( Instr->RangeHeader,
-                     "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n", FirstByte,
-                     FileLength - 1, FileLength );
+                     "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
+                     (long long)FirstByte,
+                     (long long)(FileLength - 1),
+                     (long long)FileLength );
         } else if( FirstByte == -1 && LastByte > 0 ) {
             if( LastByte >= FileLength ) {
                 Instr->RangeOffset = 0;
                 Instr->ReadSendSize = FileLength;
                 sprintf( Instr->RangeHeader,
                          "CONTENT-RANGE: bytes 0-%lld/%lld\r\n",
-                         FileLength - 1, FileLength );
+                         (long long)(FileLength - 1),
+                         (long long)FileLength );
             } else {
                 Instr->RangeOffset = FileLength - LastByte;
                 Instr->ReadSendSize = LastByte;
                 sprintf( Instr->RangeHeader,
                          "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
-                         FileLength - LastByte + 1, FileLength,
-                         FileLength );
+                         (long long)(FileLength - LastByte + 1),
+                         (long long)FileLength,
+                         (long long)FileLength );
             }
         } else {
             free( RangeInput );
