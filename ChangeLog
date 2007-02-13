@@ -2,6 +2,11 @@
 Version 1.4.2
 *************************************************************************
 
+2007-02-09 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	* 32/64 bits portability issues on *printf.
+	Use %zd for size_t, and cast to (long long) for off_t.
+
 2007-02-02 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
 	* Bumped the program version to 1.4.2 in config.ac.

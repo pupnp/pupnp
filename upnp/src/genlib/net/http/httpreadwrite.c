@@ -637,7 +637,7 @@ http_Download( IN const char *url_str,
     *temp = '/';
     DBGONLY( UpnpPrintf
              ( UPNP_INFO, HTTP, __FILE__, __LINE__,
-               "HOSTNAME : %s Length : %d\n", hoststr, hostlen );
+               "HOSTNAME : %s Length : %zu\n", hoststr, hostlen );
          )
 
         ret_code = http_MakeMessage(
@@ -1903,7 +1903,7 @@ http_MakeMessage( INOUT membuffer * buf,
         {
             bignum = ( off_t )va_arg( argp, off_t );
 
-            sprintf( tempbuf, "%lld", bignum );
+            sprintf( tempbuf, "%lld", (long long)bignum );
             if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
                 goto error_handler;
             }

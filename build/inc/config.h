@@ -34,6 +34,7 @@
 
 #include "autoconfig.h"
 
+#define MAX_JOBS_TOTAL 10
 
 /** @name Compile time configuration options
  *  The Linux SDK for UPnP Devices contains some compile-time parameters 

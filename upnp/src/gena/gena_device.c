@@ -574,7 +574,7 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
     }
 
     sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%d\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
+             "%zd\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
              strlen( propertySet ) + 1 );
 
     //schedule thread for initial notification
