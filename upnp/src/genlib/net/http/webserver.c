@@ -986,34 +986,34 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
             Instr->ReadSendSize = LastByte - FirstByte + 1;
             sprintf( Instr->RangeHeader,
                 "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
-                (long long)FirstByte,
-                (long long)LastByte,
-                (long long)FileLength );   //Data between two range.
+                (ulong64)FirstByte,
+                (ulong64)LastByte,
+                (ulong64)FileLength );   //Data between two range.
         } else if( FirstByte >= 0 && LastByte == -1
                    && FirstByte < FileLength ) {
             Instr->RangeOffset = FirstByte;
             Instr->ReadSendSize = FileLength - FirstByte;
             sprintf( Instr->RangeHeader,
                      "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
-                     (long long)FirstByte,
-                     (long long)(FileLength - 1),
-                     (long long)FileLength );
+                     (ulong64)FirstByte,
+                     (ulong64)(FileLength - 1),
+                     (ulong64)FileLength );
         } else if( FirstByte == -1 && LastByte > 0 ) {
             if( LastByte >= FileLength ) {
                 Instr->RangeOffset = 0;
                 Instr->ReadSendSize = FileLength;
                 sprintf( Instr->RangeHeader,
                          "CONTENT-RANGE: bytes 0-%lld/%lld\r\n",
-                         (long long)(FileLength - 1),
-                         (long long)FileLength );
+                         (ulong64)(FileLength - 1),
+                         (ulong64)FileLength );
             } else {
                 Instr->RangeOffset = FileLength - LastByte;
                 Instr->ReadSendSize = LastByte;
                 sprintf( Instr->RangeHeader,
                          "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
-                         (long long)(FileLength - LastByte + 1),
-                         (long long)FileLength,
-                         (long long)FileLength );
+                         (ulong64)(FileLength - LastByte + 1),
+                         (ulong64)FileLength,
+                         (ulong64)FileLength );
             }
         } else {
             free( RangeInput );

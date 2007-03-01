@@ -1903,7 +1903,7 @@ http_MakeMessage( INOUT membuffer * buf,
         {
             bignum = ( off_t )va_arg( argp, off_t );
 
-            sprintf( tempbuf, "%lld", (long long)bignum );
+            sprintf( tempbuf, "%lld", (ulong64)bignum );
             if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
                 goto error_handler;
             }

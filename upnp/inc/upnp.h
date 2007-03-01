@@ -65,8 +65,10 @@
  #else
   #define EXPORT_SPEC
  #endif
+ typedef __int64 ulong64;
 #else
  #define EXPORT_SPEC
+ typedef long long ulong64;
 #endif
 
 #ifndef WIN32
