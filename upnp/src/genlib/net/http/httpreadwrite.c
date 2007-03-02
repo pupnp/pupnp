@@ -39,6 +39,9 @@
 
 #include <assert.h>
 #include <stdarg.h>
+#ifndef UPNP_USE_MSVCPP
+ #include <stdint.h>
+#endif
 
 #ifndef WIN32
  #include <arpa/inet.h>
@@ -1903,7 +1906,7 @@ http_MakeMessage( INOUT membuffer * buf,
         {
             bignum = ( off_t )va_arg( argp, off_t );
 
-            sprintf( tempbuf, "%lld", (ulong64)bignum );
+            sprintf( tempbuf, "%lld", (int64_t)bignum );
             if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
                 goto error_handler;
             }

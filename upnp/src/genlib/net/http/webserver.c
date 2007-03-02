@@ -37,6 +37,9 @@
 #include "config.h"
 #include <assert.h>
 #include <fcntl.h>
+#ifndef UPNP_USE_MSVCPP
+ #include <stdint.h>
+#endif
 #include "util.h"
 #include "strintmap.h"
 #include "membuffer.h"
@@ -986,34 +989,34 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
             Instr->ReadSendSize = LastByte - FirstByte + 1;
             sprintf( Instr->RangeHeader,
                 "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
-                (ulong64)FirstByte,
-                (ulong64)LastByte,
-                (ulong64)FileLength );   //Data between two range.
+                (int64_t)FirstByte,
+                (int64_t)LastByte,
+                (int64_t)FileLength );   //Data between two range.
         } else if( FirstByte >= 0 && LastByte == -1
                    && FirstByte < FileLength ) {
             Instr->RangeOffset = FirstByte;
             Instr->ReadSendSize = FileLength - FirstByte;
             sprintf( Instr->RangeHeader,
                      "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
-                     (ulong64)FirstByte,
-                     (ulong64)(FileLength - 1),
-                     (ulong64)FileLength );
+                     (int64_t)FirstByte,
+                     (int64_t)(FileLength - 1),
+                     (int64_t)FileLength );
         } else if( FirstByte == -1 && LastByte > 0 ) {
             if( LastByte >= FileLength ) {
                 Instr->RangeOffset = 0;
                 Instr->ReadSendSize = FileLength;
                 sprintf( Instr->RangeHeader,
                          "CONTENT-RANGE: bytes 0-%lld/%lld\r\n",
-                         (ulong64)(FileLength - 1),
-                         (ulong64)FileLength );
+                         (int64_t)(FileLength - 1),
+                         (int64_t)FileLength );
             } else {
                 Instr->RangeOffset = FileLength - LastByte;
                 Instr->ReadSendSize = LastByte;
                 sprintf( Instr->RangeHeader,
                          "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
-                         (ulong64)(FileLength - LastByte + 1),
-                         (ulong64)FileLength,
-                         (ulong64)FileLength );
+                         (int64_t)(FileLength - LastByte + 1),
+                         (int64_t)FileLength,
+                         (int64_t)FileLength );
             }
         } else {
             free( RangeInput );

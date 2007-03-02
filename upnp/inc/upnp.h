@@ -65,10 +65,11 @@
  #else
   #define EXPORT_SPEC
  #endif
- typedef __int64 ulong64;
+ #ifdef UPNP_USE_MSVCPP // define some things the stupid M$ VC++ doesn't knows
+  typedef __int64 int64_t;
+ #endif
 #else
  #define EXPORT_SPEC
- typedef long long ulong64;
 #endif
 
 #ifndef WIN32
