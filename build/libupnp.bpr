@@ -45,7 +45,7 @@
     <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
     <RELEASELIBPATH value="$(BCB)\lib\release"/>
     <LINKER value="tlink32"/>
-    <USERDEFINES value="WIN32;LIBUPNP_EXPORTS"/>
+    <USERDEFINES value="WIN32;LIBUPNP_EXPORTS;UPNP_USE_BCBPP"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL"/>
     <MAINSOURCE value="libupnp.bpf"/>
     <INCLUDEPATH value="..\upnp\src\genlib\util;..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc;..\ixml\src\inc;..\upnp\src\inc;..\..\pthreads-w32-1-10-0-release"/>
@@ -100,19 +100,21 @@ Item1=..\upnp\src\genlib\util;..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig
 Item2=..\upnp\src\genlib\util;..\upnp\src;..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\threadutil\src;..\ixml\src;$(BCB)\include;$(BCB)\include\vcl;..\ixml\inc;..\threadutil\inc;..\upnp\inc;inc;..\ixml\src\inc;..\upnp\src\inc
 
 [HistoryLists\hlLibraryPath]
-Count=2
-Item0=..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\util;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\net;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\upnp\src;..\threadutil\src;..\ixml\src;$(BCB)\lib\obj;$(BCB)\lib;D:\DEVELOP\pthreads-w32-1-10-0-release
-Item1=..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\util;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\net;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\upnp\src;..\threadutil\src;..\ixml\src;$(BCB)\lib\obj;$(BCB)\lib
+Count=3
+Item0=..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\util;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\net;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\upnp\src;..\threadutil\src;..\ixml\src;$(BCB)\lib\obj;$(BCB)\lib;..\..\pthreads-w32-1-10-0-release
+Item1=..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\util;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\net;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\upnp\src;..\threadutil\src;..\ixml\src;$(BCB)\lib\obj;$(BCB)\lib;D:\DEVELOP\pthreads-w32-1-10-0-release
+Item2=..\upnp\src\uuid;..\upnp\src\urlconfig;..\upnp\src\ssdp;..\upnp\src\soap;..\upnp\src\genlib\util;..\upnp\src\genlib\service_table;..\upnp\src\genlib\net\uri;..\upnp\src\genlib\net\http;..\upnp\src\genlib\net;..\upnp\src\genlib\miniserver;..\upnp\src\genlib\client_table;..\upnp\src\gena;..\upnp\src\api;..\upnp\src;..\threadutil\src;..\ixml\src;$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]
 Count=1
 Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
-Count=3
-Item0=WIN32;LIBUPNP_EXPORTS
-Item1=WIN32;EXPORT_SPEC
-Item2=WIN32
+Count=4
+Item0=WIN32;LIBUPNP_EXPORTS;UPNP_USE_BCBPP
+Item1=WIN32;LIBUPNP_EXPORTS
+Item2=WIN32;EXPORT_SPEC
+Item3=WIN32
 
 [Debugging]
 DebugSourceDirs=$(BCB)\source\vcl

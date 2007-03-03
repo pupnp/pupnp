@@ -65,7 +65,10 @@
  #else
   #define EXPORT_SPEC
  #endif
- #ifdef UPNP_USE_MSVCPP // define some things the stupid M$ VC++ doesn't knows
+ #ifdef UPNP_USE_MSVCPP // define some things the M$ VC++ doesn't knows
+  typedef __int64 int64_t;
+ #endif
+ #ifdef UPNP_USE_BCBPP // define some things Borland Builder doesn't knows
   typedef __int64 int64_t;
  #endif
 #else

@@ -37,8 +37,10 @@
 #include "config.h"
 #include <assert.h>
 #include <fcntl.h>
+#ifndef UPNP_USE_BCBPP
 #ifndef UPNP_USE_MSVCPP
  #include <stdint.h>
+#endif
 #endif
 #include "util.h"
 #include "strintmap.h"

@@ -39,8 +39,10 @@
 
 #include <assert.h>
 #include <stdarg.h>
+#ifndef UPNP_USE_BCBPP
 #ifndef UPNP_USE_MSVCPP
  #include <stdint.h>
+#endif
 #endif
 
 #ifndef WIN32
