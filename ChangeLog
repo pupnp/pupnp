@@ -1,3 +1,16 @@
+
+*************************************************************************
+Version 1.4.3
+*************************************************************************
+
+2007-03-05 Oxy <oxygenic(at)users.sourceforge.net>
+    * Code adapted and typedefs added to compile cleanly under Windows
+	with Borland C++ Builder and MS Visual C++
+
+2007-03-03 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	* Fixed nasty segmentation fault bug on membuffer.c.
+
 *************************************************************************
 Version 1.4.2
 *************************************************************************

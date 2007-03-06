@@ -39,6 +39,11 @@
 
 #include <assert.h>
 #include <stdarg.h>
+#ifndef UPNP_USE_BCBPP
+#ifndef UPNP_USE_MSVCPP
+ #include <stdint.h>
+#endif
+#endif
 
 #ifndef WIN32
  #include <arpa/inet.h>
@@ -708,7 +713,7 @@ http_Download( IN const char *url_str,
 
         // save mem for body only
         *document = realloc( msg_start, *doc_length + 1 );  //LEAK_FIX_MK
-        //*document = Realloc( msg_start,msg_length, *doc_length + 1 );//LEAK_FIX_MK
+        // *document = Realloc( msg_start,msg_length, *doc_length + 1 );//LEAK_FIX_MK
 
         // shrink can't fail
         assert( ( int )msg_length > *doc_length );
@@ -1903,7 +1908,7 @@ http_MakeMessage( INOUT membuffer * buf,
         {
             bignum = ( off_t )va_arg( argp, off_t );
 
-            sprintf( tempbuf, "%lld", (long long)bignum );
+            sprintf( tempbuf, "%lld", (int64_t)bignum );
             if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
                 goto error_handler;
             }
