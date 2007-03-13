@@ -41,12 +41,14 @@
 #include <stdarg.h>
 #ifndef UPNP_USE_BCBPP
 #ifndef UPNP_USE_MSVCPP
+ #include <inttypes.h>
  #include <stdint.h>
 #endif
 #endif
 
 #ifndef WIN32
  #include <arpa/inet.h>
+ #include <fcntl.h>
  #include <netinet/in.h>
  #include <sys/types.h>
  #include <sys/socket.h>
@@ -54,7 +56,6 @@
  #include <sys/wait.h>
  #include <unistd.h>
  #include <sys/utsname.h>
- #include <fcntl.h>
 #else
  #include <winsock2.h>
  #include <malloc.h>
@@ -1908,7 +1909,7 @@ http_MakeMessage( INOUT membuffer * buf,
         {
             bignum = ( off_t )va_arg( argp, off_t );
 
-            sprintf( tempbuf, "%lld", (int64_t)bignum );
+            sprintf( tempbuf, "%"PRId64, (int64_t)bignum );
             if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
                 goto error_handler;
             }
