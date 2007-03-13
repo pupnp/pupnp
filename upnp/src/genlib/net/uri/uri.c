@@ -611,7 +611,9 @@ parse_hostport( const char *in,
         int errCode = 0;
 
         //call gethostbyname_r (reentrant form of gethostbyname)
-#if defined(WIN32)
+        // TODO: Use autoconf to discover this rather than the
+        // platform-specific stuff below
+#if defined(WIN32) || defined(__CYGWIN__)
         h=gethostbyname(temp_host_name);
 #elif defined(SPARC_SOLARIS)
         errCode = gethostbyname_r( temp_host_name,

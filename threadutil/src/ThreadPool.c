@@ -90,6 +90,10 @@ FreeThreadPoolJob( ThreadPool * tp,
 static int
 SetPolicyType( PolicyType in )
 {
+    #ifdef __CYGWIN__
+     /* TODO not currently working... */
+     return 0;
+    #else
     #ifdef WIN32
      return sched_setscheduler( 0, in);
     #else
@@ -98,6 +102,7 @@ SetPolicyType( PolicyType in )
      sched_getparam( 0, &current );
      current.sched_priority = DEFAULT_SCHED_PARAM;
      return sched_setscheduler( 0, in, &current );
+    #endif
     #endif
 }
 

@@ -47,11 +47,21 @@ extern "C" {
  #include <unistd.h>
 #endif
 
+#ifdef PTHREAD_MUTEX_RECURSIVE
+/* This system has SuS2-compliant mutex attributes.
+ * E.g. on Cygwin, where we don't have the old nonportable (NP) symbols
+ */
+#define ITHREAD_MUTEX_FAST_NP PTHREAD_MUTEX_NORMAL
+#define ITHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
+#define ITHREAD_MUTEX_ERRORCHECK_NP PTHREAD_MUTEX_ERRORCHECK
+#else
 #define ITHREAD_MUTEX_FAST_NP PTHREAD_MUTEX_FAST_NP
 #define ITHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE_NP
 #define ITHREAD_MUTEX_ERRORCHECK_NP PTHREAD_MUTEX_ERRORCHECK_NP
+#endif
+
 #define ITHREAD_CANCELED PTHREAD_CANCELED
-  
+
   
   /***************************************************************************
    * Name: ithread_t
@@ -181,8 +191,11 @@ extern "C" {
  *      Returns EINVAL if the kind is not supported.
  *      See man page for pthread_mutexattr_setkind_np
  *****************************************************************************/
+#ifdef PTHREAD_MUTEX_RECURSIVE
+#define ithread_mutexattr_setkind_np pthread_mutexattr_settype
+#else
 #define ithread_mutexattr_setkind_np pthread_mutexattr_setkind_np
-
+#endif
 
 /****************************************************************************
  * Function: ithread_mutexattr_getkind_np
@@ -203,7 +216,11 @@ extern "C" {
  *      Always returns 0.
  *      See man page for pthread_mutexattr_getkind_np
  *****************************************************************************/
+#ifdef PTHREAD_MUTEX_RECURSIVE
+#define ithread_mutexattr_getkind_np pthread_mutexattr_gettype
+#else
 #define ithread_mutexattr_getkind_np pthread_mutexattr_getkind_np
+#endif
 
   
 /****************************************************************************
@@ -542,8 +559,10 @@ extern "C" {
 #endif
 
 
+#ifndef PTHREAD_MUTEX_RECURSIVE
 //NK: Added for satisfying the gcc compiler  
 EXPORT_SPEC int pthread_mutexattr_setkind_np(pthread_mutexattr_t *attr, int kind);
+#endif
 
 #ifdef __cplusplus
 }
