@@ -7,6 +7,34 @@ Version 1.4.4
 	Submitted By: Luke Kim - nereusuj
 	Unix sleep is in seconds but WIN32 Sleep is in milliseconds.
 
+2007-04-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Tracker [ 1652827 ] UpnpRegisterRootDevice returned -104
+	Submitted By: Michael Andersen - miwer
+	
+	Issue was found to be related to sizeof (size_t) != sizeof (int)
+	on AMD64 systems. Emil Ljungdahl's AMD64 patch has been applied along
+	with some other fixes. Original user report follows:
+
+	When I run upnpd I get the above mentioned error (UPNP_E_OUTOF_MEMORY).
+	I've tried with 1.4.1 and 1.4.2-RC3, it's the same. I don't understand why,
+	because I have plenty of RAM, and I even tried closing some applications,
+	but it didn't help.
+
+	$ upnpd eth1 br0
+
+	The following is logged in the /var/log/messages:
+	Feb 6 01:33:47 server upnpd[6933]: Error registering the root device with
+	descDocUrl: http://192.168.0.1:49152/gatedesc.xml
+	Feb 6 01:33:47 server upnpd[6933]: UpnpRegisterRootDevice returned -104
+
+
+	I tried enabling debugging and it looks like it cannot allocate memory
+	through the membuffer_append function. It's wierd because it's only a few
+	bytes.
+
+	Please note, that I enabled some extra debugging lines that were commented,
+	in order to get more information. See attached files.
+
 *************************************************************************
 Version 1.4.3
 *************************************************************************

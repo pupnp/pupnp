@@ -157,7 +157,7 @@ is_escaped( const char *in )
 int
 replace_escaped( char *in,
                  int index,
-                 int *max )
+                 size_t *max )
 {
     int tempInt = 0;
     char tempChar = 0;
@@ -733,7 +733,7 @@ parse_scheme( const char *in,
 ************************************************************************/
 int
 remove_escaped_chars( INOUT char *in,
-                      INOUT int *size )
+                      INOUT size_t *size )
 {
     int i = 0;
 
@@ -1069,7 +1069,7 @@ parse_uri( const char *in,
 int
 parse_uri_and_unescape( char *in,
                         int max,
-                        uri_type * out )
+                        uri_type *out )
 {
     int ret;
 

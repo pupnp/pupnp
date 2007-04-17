@@ -1207,7 +1207,7 @@ process_request( IN http_message_t * req,
     int resp_major,
       resp_minor;
     xboolean alias_grabbed;
-    int dummy;
+    size_t dummy;
     struct UpnpVirtualDirCallbacks *pVirtualDirCallback;
 
     print_http_headers( req );
