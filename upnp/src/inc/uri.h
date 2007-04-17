@@ -87,7 +87,7 @@ enum uriType  { absolute, relative };
 *	holds a pointer into a larger array									*/
 typedef struct TOKEN {
   const char *buff;
-  int size;
+  size_t size;
 } token;
 
 
@@ -124,7 +124,7 @@ typedef struct URL_LIST {
 *	Parameters :
 *		char * in ;	string of characters
 *		int index ;	index at which to start checking the characters
-*		int *max ;	
+*		size_t *max ;	
 *
 *	Description : Replaces an escaped sequence with its unescaped version 
 *		as in http://www.ietf.org/rfc/rfc2396.txt  (RFC explaining URIs)
@@ -137,7 +137,7 @@ typedef struct URL_LIST {
 *		string are shifted over, and NULL characters are placed at the 
 *		end of the string.
 ************************************************************************/
-int replace_escaped(char * in, int index, int *max);
+int replace_escaped(char * in, int index, size_t *max);
 
 /************************************************************************
 *	Function :	copy_URL_list
@@ -303,7 +303,7 @@ int parse_hostport(const char *in, int max, hostport_type *out );
 *
 *	Parameters :
 *		INOUT char *in ;	string of characters to be modified
-*		INOUT int *size ;	size limit for the number of characters
+*		INOUT size_t *size ;	size limit for the number of characters
 *
 *	Description : removes http escaped characters such as: "%20" and 
 *		replaces them with their character representation. i.e. 
@@ -315,7 +315,7 @@ int parse_hostport(const char *in, int max, hostport_type *out );
 *
 *	Note :
 ************************************************************************/
-int remove_escaped_chars(char *in,int *size);
+int remove_escaped_chars(char *in, size_t *size);
 
 /************************************************************************
 *	Function :	remove_dots

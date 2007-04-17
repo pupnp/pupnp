@@ -157,7 +157,7 @@ is_escaped( const char *in )
 int
 replace_escaped( char *in,
                  int index,
-                 int *max )
+                 size_t *max )
 {
     int tempInt = 0;
     char tempChar = 0;
@@ -611,7 +611,9 @@ parse_hostport( const char *in,
         int errCode = 0;
 
         //call gethostbyname_r (reentrant form of gethostbyname)
-#if defined(WIN32)
+        // TODO: Use autoconf to discover this rather than the
+        // platform-specific stuff below
+#if defined(WIN32) || defined(__CYGWIN__)
         h=gethostbyname(temp_host_name);
 #elif defined(SPARC_SOLARIS)
         errCode = gethostbyname_r( temp_host_name,
@@ -731,7 +733,7 @@ parse_scheme( const char *in,
 ************************************************************************/
 int
 remove_escaped_chars( INOUT char *in,
-                      INOUT int *size )
+                      INOUT size_t *size )
 {
     int i = 0;
 
@@ -1067,7 +1069,7 @@ parse_uri( const char *in,
 int
 parse_uri_and_unescape( char *in,
                         int max,
-                        uri_type * out )
+                        uri_type *out )
 {
     int ret;
 

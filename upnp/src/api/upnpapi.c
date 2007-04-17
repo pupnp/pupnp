@@ -207,6 +207,11 @@ int UpnpInit( IN const char *HostIP,
              ( UPNP_INFO, API, __FILE__, __LINE__, "Inside UpnpInit \n" );
          )
         //initialize mutex
+#ifdef __CYGWIN__
+        /* On Cygwin, pthread_mutex_init() fails without this memset. */
+        /* TODO: Fix Cygwin so we don't need this memset(). */
+        memset(&GlobalHndMutex, 0, sizeof(GlobalHndMutex));
+#endif
         if( ithread_mutex_init( &GlobalHndMutex, NULL ) != 0 ) {
         return UPNP_E_INIT_FAILED;
     }

@@ -51,8 +51,7 @@ typedef struct // memptr
 // note: Total length/capacity should not exceed MAX_INT
 typedef struct // membuffer
 {
-	char	*buf;			// mem buffer; must not write 
-							//   beyond buf[length-1] (read/write)
+	char	*buf;			// mem buffer; must not write beyond buf[length-1] (read/write)
 	size_t	length;			// length of buffer (read-only)
 	size_t	capacity;		// total allocated memory (read-only)
 	size_t	size_inc;		// used to increase size; MUST be > 0; (read/write)
@@ -148,8 +147,7 @@ int memptr_cmp_nocase( IN memptr* m, IN const char* s );
 *
 *	Note :
 ************************************************************************/
-int membuffer_set_size( INOUT membuffer* m, 
-			IN size_t new_length );
+int membuffer_set_size( INOUT membuffer* m, IN size_t new_length );
 
 /************************************************************************
 *	Function :	membuffer_init
@@ -200,8 +198,7 @@ void membuffer_destroy( INOUT membuffer* m );
 *
 *	Note :
 ************************************************************************/
-int membuffer_assign( INOUT membuffer* m, IN const void* buf, 
-					 IN size_t buf_len );
+int membuffer_assign( INOUT membuffer* m, IN const void* buf, IN size_t buf_len );
 
 /************************************************************************
 *	Function :	membuffer_assign_str
@@ -237,8 +234,7 @@ int membuffer_assign_str( INOUT membuffer* m, IN const char* c_str );
 *
 *	Note :
 ************************************************************************/
-int membuffer_append( INOUT membuffer* m, IN const void* buf,
-					 IN size_t buf_len );
+int membuffer_append( INOUT membuffer* m, IN const void* buf, IN size_t buf_len );
 
 /************************************************************************
 *	Function :	membuffer_append_str
@@ -276,8 +272,7 @@ int membuffer_append_str( INOUT membuffer* m, IN const char* c_str );
 *
 *	Note :
 ************************************************************************/
-int membuffer_insert( INOUT membuffer* m, IN const void* buf, 
-					 IN size_t buf_len, int index );
+int membuffer_insert( INOUT membuffer* m, IN const void* buf, IN size_t buf_len, int index );
 
 
 /************************************************************************
@@ -298,8 +293,7 @@ int membuffer_insert( INOUT membuffer* m, IN const void* buf,
 *
 *	Note :
 ************************************************************************/
-void membuffer_delete( INOUT membuffer* m, IN int index, 
-					 IN size_t num_bytes );
+void membuffer_delete( INOUT membuffer* m, IN int index, IN size_t num_bytes );
 
 
 /************************************************************************
@@ -336,8 +330,7 @@ char* membuffer_detach( INOUT membuffer* m );
 *	Note : 'new_buf' must be allocted using malloc or realloc so
 *		that it can be freed using free()
 ************************************************************************/
-void membuffer_attach( INOUT membuffer* m, IN char* new_buf,
-					   IN size_t buf_len );
+void membuffer_attach( INOUT membuffer* m, IN char* new_buf, IN size_t buf_len );
 #ifdef __cplusplus
 }		// extern "C"
 #endif	// __cplusplus

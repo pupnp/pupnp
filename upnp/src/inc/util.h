@@ -163,7 +163,7 @@ void linecopylen( OUT char dest[LINE_SIZE], IN const char* src, IN size_t srclen
  #define strcasecmp stricmp
  #define strncasecmp strnicmp
 
- #define sleep Sleep
+ #define sleep(a) Sleep((a)*1000)
  #define usleep(a) Sleep((a)/1000)
 #endif
 

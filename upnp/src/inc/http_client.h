@@ -96,7 +96,7 @@ typedef struct SOCKET_BUFFER{
 //holds a pointer into a larger array
 typedef struct TOKEN {
    char * buff;
-  int size;
+  size_t size;
 } token;
 
 

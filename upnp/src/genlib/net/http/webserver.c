@@ -39,7 +39,8 @@
 #include <fcntl.h>
 #ifndef UPNP_USE_BCBPP
 #ifndef UPNP_USE_MSVCPP
- #include <stdint.h>
+    #include <inttypes.h>
+    #include <stdint.h>
 #endif
 #endif
 #include "util.h"
@@ -54,7 +55,7 @@
 #include "ssdplib.h"
 
 #ifndef WIN32
- #include <unistd.h>
+    #include <unistd.h>
 #endif
 #include <sys/stat.h>
 #include "ithread.h"
@@ -990,7 +991,7 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
             Instr->RangeOffset = FirstByte;
             Instr->ReadSendSize = LastByte - FirstByte + 1;
             sprintf( Instr->RangeHeader,
-                "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
+                "CONTENT-RANGE: bytes %"PRId64"-%"PRId64"/%"PRId64"\r\n",
                 (int64_t)FirstByte,
                 (int64_t)LastByte,
                 (int64_t)FileLength );   //Data between two range.
@@ -999,7 +1000,7 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
             Instr->RangeOffset = FirstByte;
             Instr->ReadSendSize = FileLength - FirstByte;
             sprintf( Instr->RangeHeader,
-                     "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
+                     "CONTENT-RANGE: bytes %"PRId64"-%"PRId64"/%"PRId64"\r\n",
                      (int64_t)FirstByte,
                      (int64_t)(FileLength - 1),
                      (int64_t)FileLength );
@@ -1008,14 +1009,14 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
                 Instr->RangeOffset = 0;
                 Instr->ReadSendSize = FileLength;
                 sprintf( Instr->RangeHeader,
-                         "CONTENT-RANGE: bytes 0-%lld/%lld\r\n",
+                         "CONTENT-RANGE: bytes 0-%"PRId64"/%"PRId64"\r\n",
                          (int64_t)(FileLength - 1),
                          (int64_t)FileLength );
             } else {
                 Instr->RangeOffset = FileLength - LastByte;
                 Instr->ReadSendSize = LastByte;
                 sprintf( Instr->RangeHeader,
-                         "CONTENT-RANGE: bytes %lld-%lld/%lld\r\n",
+                         "CONTENT-RANGE: bytes %"PRId64"-%"PRId64"/%"PRId64"\r\n",
                          (int64_t)(FileLength - LastByte + 1),
                          (int64_t)FileLength,
                          (int64_t)FileLength );
@@ -1206,7 +1207,7 @@ process_request( IN http_message_t * req,
     int resp_major,
       resp_minor;
     xboolean alias_grabbed;
-    int dummy;
+    size_t dummy;
     struct UpnpVirtualDirCallbacks *pVirtualDirCallback;
 
     print_http_headers( req );

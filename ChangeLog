@@ -1,16 +1,77 @@
+*************************************************************************
+Version 1.4.4
+*************************************************************************
+
+2007-04-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Tracker [ 1695399 ] Typo in util.h
+	Submitted By: Luke Kim - nereusuj
+	Unix sleep is in seconds but WIN32 Sleep is in milliseconds.
+
+2007-04-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Tracker [ 1652827 ] UpnpRegisterRootDevice returned -104
+	Submitted By: Michael Andersen - miwer
+	
+	Issue was found to be related to sizeof (size_t) != sizeof (int)
+	on AMD64 systems. Emil Ljungdahl's AMD64 patch has been applied along
+	with some other fixes. Original user report follows:
+
+	When I run upnpd I get the above mentioned error (UPNP_E_OUTOF_MEMORY).
+	I've tried with 1.4.1 and 1.4.2-RC3, it's the same. I don't understand why,
+	because I have plenty of RAM, and I even tried closing some applications,
+	but it didn't help.
+
+	$ upnpd eth1 br0
+
+	The following is logged in the /var/log/messages:
+	Feb 6 01:33:47 server upnpd[6933]: Error registering the root device with
+	descDocUrl: http://192.168.0.1:49152/gatedesc.xml
+	Feb 6 01:33:47 server upnpd[6933]: UpnpRegisterRootDevice returned -104
+
+
+	I tried enabling debugging and it looks like it cannot allocate memory
+	through the membuffer_append function. It's wierd because it's only a few
+	bytes.
+
+	Please note, that I enabled some extra debugging lines that were commented,
+	in order to get more information. See attached files.
 
 *************************************************************************
 Version 1.4.3
 *************************************************************************
 
+2007-03-13 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Tracker [ 1663004 ] Compile on Cygwin
+	Submitted By: Jon Foster - jongfoster
+	This patch gives basic support for building under Cygwin - it compiles,
+	links, and a simple UPnP device application can initialise. I'm not sure
+	if it actually works yet, but this is definitely a step in the right
+	direction.
+	
+	Patch is against the 1.4.1 release. Changes are:
+	
+	* threadutil/inc/ithread.h: Fix the ithread mutex support to use
+	documented, portable APIs (if present) rather than the Non-Portable (_NP)
+	ones it uses now. This is required because Cygwin implements only the
+	portable API.
+	
+	* threadutil/src/ThreadPool.c: Fake SetPolicyType() to do nothing on Cygwin
+	because otherwise it fails. Should probably investigate why it fails and
+	add a proper implementation later.
+	
+	* upnp/src/api/upnpapi.c: On Cygwin, zero out the GlobalHndMutex structure
+	before initialising it. Without this, the initialisation fails. This
+	appears to be a bug in Cygwin.
+	
+	* upnp/src/genlib/net/uri/uri.c: Use gethostbyname() on Cygwin.
+	
 2007-03-05 Oxy <oxygenic(at)users.sourceforge.net>
 	* Code adapted and typedefs added to compile cleanly under Windows
 	with Borland C++ Builder and MS Visual C++
 
 2007-03-03 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-
+	
 	* Fixed nasty segmentation fault bug on membuffer.c.
-
+	
 *************************************************************************
 Version 1.4.2
 *************************************************************************

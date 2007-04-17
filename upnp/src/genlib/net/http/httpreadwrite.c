@@ -41,12 +41,14 @@
 #include <stdarg.h>
 #ifndef UPNP_USE_BCBPP
 #ifndef UPNP_USE_MSVCPP
+ #include <inttypes.h>
  #include <stdint.h>
 #endif
 #endif
 
 #ifndef WIN32
  #include <arpa/inet.h>
+ #include <fcntl.h>
  #include <netinet/in.h>
  #include <sys/types.h>
  #include <sys/socket.h>
@@ -54,7 +56,6 @@
  #include <sys/wait.h>
  #include <unistd.h>
  #include <sys/utsname.h>
- #include <fcntl.h>
 #else
  #include <winsock2.h>
  #include <malloc.h>
@@ -801,27 +802,30 @@ MakePostMessage( const char *url_str,
                          "HOSTNAME : %s Length : %d\n", hoststr, hostlen );
          )
 
-        if( contentLength >= 0 ) {
+    if( contentLength >= 0 ) {
         ret_code = http_MakeMessage(
             request, 1, 1,
-            "QsbcDCUTNc",
+            "Q" "s" "bcDCU" "T" "Nc",
             HTTPMETHOD_POST, url->pathquery.buff, url->pathquery.size,
-            "HOST: ", hoststr, hostlen,
+            "HOST: ",
+	    hoststr, hostlen,
             contentType,
             (off_t)contentLength );
     } else if( contentLength == UPNP_USING_CHUNKED ) {
         ret_code = http_MakeMessage(
             request, 1, 1,
-            "QsbcDCUTKc",
+            "Q" "s" "bcDCU" "TKc",
             HTTPMETHOD_POST, url->pathquery.buff, url->pathquery.size,
-            "HOST: ", hoststr, hostlen,
+            "HOST: ",
+	    hoststr, hostlen,
             contentType );
     } else if( contentLength == UPNP_UNTIL_CLOSE ) {
         ret_code = http_MakeMessage(
             request, 1, 1,
-            "QsbcDCUTc",
+            "Q" "s" "bcDCU" "Tc",
             HTTPMETHOD_POST, url->pathquery.buff, url->pathquery.size,
-            "HOST: ", hoststr, hostlen,
+            "HOST: ",
+	    hoststr, hostlen,
             contentType );
     } else {
         ret_code = UPNP_E_INVALID_PARAM;
@@ -1815,7 +1819,7 @@ http_MakeMessage( INOUT membuffer * buf,
 {
     char c;
     char *s = NULL;
-    int num;
+    size_t num;
     off_t bignum;
     size_t length;
     time_t *loc_time;
@@ -1898,7 +1902,7 @@ http_MakeMessage( INOUT membuffer * buf,
         {
             num = ( int )va_arg( argp, int );
 
-            sprintf( tempbuf, "%d", num );
+            sprintf( tempbuf, "%zu", num );
             if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
                 goto error_handler;
             }
@@ -1908,7 +1912,7 @@ http_MakeMessage( INOUT membuffer * buf,
         {
             bignum = ( off_t )va_arg( argp, off_t );
 
-            sprintf( tempbuf, "%lld", (int64_t)bignum );
+            sprintf( tempbuf, "%"PRId64, (int64_t)bignum );
             if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
                 goto error_handler;
             }
@@ -2046,7 +2050,7 @@ http_MakeMessage( INOUT membuffer * buf,
             method = ( http_method_t ) va_arg( argp, http_method_t );
             method_str = method_to_str( method );
             url_str = ( const char * )va_arg( argp, const char * );
-            num = ( int )va_arg( argp, int );   // length of url_str
+            num = ( size_t )va_arg( argp, size_t );   // length of url_str
 
             if (http_MakeMessage(
                 buf, http_major_version, http_minor_version,
