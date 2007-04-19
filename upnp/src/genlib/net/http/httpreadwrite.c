@@ -231,10 +231,10 @@ http_RecvMessage( IN SOCKINFO * info,
                            "<<< (RECVD) <<<\n%s\n-----------------\n",
                            parser->msg.msg.buf );
                          //print_http_headers( &parser->msg );
-                     )
+                       )
 
-                    if( parser->content_length >
-                        ( unsigned int )g_maxContentLength ) {
+                if( parser->content_length >
+                    ( unsigned int )g_maxContentLength ) {
                     *http_error_code = HTTP_REQ_ENTITY_TOO_LARGE;
                     return UPNP_E_OUTOF_BOUNDS;
                 }
