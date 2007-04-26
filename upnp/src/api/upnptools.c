@@ -298,7 +298,7 @@ makeAction( IN int response,
     if( NumArg > 0 ) {
         //va_start(ArgList, Arg);
         ArgName = Arg;
-        while( Idx++ != NumArg ) {
+        for(;;;) {
             ArgValue = va_arg( ArgList, const char * );
 
             if( ArgName != NULL ) {
@@ -311,6 +311,10 @@ makeAction( IN int response,
                 }
 
                 ixmlNode_appendChild( node, ( IXML_Node * ) Ele );
+            }
+
+            if ( ++Idx == NumArg ) {
+                break;
             }
 
             ArgName = va_arg( ArgList, const char * );
