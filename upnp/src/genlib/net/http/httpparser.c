@@ -34,6 +34,7 @@
 * messages.
 ************************************************************************/
 
+#define _GNU_SOURCE	// For strcasestr() in string.h
 #include "config.h"
 #include <assert.h>
 #include <string.h>
