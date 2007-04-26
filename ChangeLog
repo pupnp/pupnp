@@ -7,6 +7,10 @@ Version 1.4.5
 	suggested by Craig Nelson in SF Tracker [ 1689382 ] DLINK DIR-625
 	patch.
 
+2007-04-07 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
+	* Fix for a bug in makeAction where va_arg was beeing called one
+	extra time.
+
 *************************************************************************
 Version 1.4.4
 *************************************************************************

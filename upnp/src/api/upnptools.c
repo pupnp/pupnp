@@ -256,8 +256,8 @@ makeAction( IN int response,
             IN const char *Arg,
             IN va_list ArgList )
 {
-    const char *ArgName,
-     *ArgValue;
+    const char *ArgName;
+    const char *ArgValue;
     char *ActBuff;
     int Idx = 0;
     IXML_Document *ActionDoc;
@@ -298,7 +298,7 @@ makeAction( IN int response,
     if( NumArg > 0 ) {
         //va_start(ArgList, Arg);
         ArgName = Arg;
-        for(;;;) {
+        for(;;) {
             ArgValue = va_arg( ArgList, const char * );
 
             if( ArgName != NULL ) {
