@@ -34,6 +34,7 @@
 * messages.
 ************************************************************************/
 
+#define _GNU_SOURCE	// For strcasestr() in string.h
 #include "config.h"
 #include <assert.h>
 #include <string.h>
@@ -2434,7 +2435,8 @@ raw_find_str( IN memptr * raw_value,
     c = raw_value->buf[raw_value->length];  // save
     raw_value->buf[raw_value->length] = 0;  // null-terminate
 
-    ptr = strstr( raw_value->buf, str );
+    // Use strcasestr because the string may not always be exact case
+    ptr = strcasestr( raw_value->buf, str );
 
     raw_value->buf[raw_value->length] = c;  // restore
 

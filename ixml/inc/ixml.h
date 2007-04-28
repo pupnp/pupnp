@@ -620,7 +620,7 @@ ixmlNode_cloneNode(IXML_Node *nodeptr,
    */
 
 EXPORT_SPEC BOOL    
-ixmlNode_hasAttributes(IXML_Node *node  
+ixmlNode_hasAttributes(IXML_Node *nodeptr
 		         /** The {\bf Node} to query for attributes. */
                       );
 
@@ -630,7 +630,7 @@ ixmlNode_hasAttributes(IXML_Node *node
    */
 
 EXPORT_SPEC void    
-ixmlNode_free(IXML_Node *IXML_Node  
+ixmlNode_free(IXML_Node *nodeptr
 		/** The {\bf Node} to free. */
              );
 

@@ -34,7 +34,10 @@
 ************************************************************************/
 
 #ifdef __FreeBSD__
+#include <osreldate.h>
+#if __FreeBSD_version < 601103
 #include <lwres/netdb.h>
+#endif
 #endif
 #include "config.h"
 #include "uri.h"
@@ -620,7 +623,7 @@ parse_hostport( const char *in,
                                    &h,
                                    temp_hostbyname_buff,
                                    BUFFER_SIZE, &errcode );
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) && __FreeBSD_version < 601103
         h = lwres_gethostbyname_r( temp_host_name,
                                    &h_buf,
                                    temp_hostbyname_buff,

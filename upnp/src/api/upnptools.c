@@ -256,8 +256,8 @@ makeAction( IN int response,
             IN const char *Arg,
             IN va_list ArgList )
 {
-    const char *ArgName,
-     *ArgValue;
+    const char *ArgName;
+    const char *ArgValue;
     char *ActBuff;
     int Idx = 0;
     IXML_Document *ActionDoc;
@@ -298,7 +298,7 @@ makeAction( IN int response,
     if( NumArg > 0 ) {
         //va_start(ArgList, Arg);
         ArgName = Arg;
-        while( Idx++ != NumArg ) {
+        for ( ; ; ) {
             ArgValue = va_arg( ArgList, const char * );
 
             if( ArgName != NULL ) {
@@ -313,7 +313,11 @@ makeAction( IN int response,
                 ixmlNode_appendChild( node, ( IXML_Node * ) Ele );
             }
 
-            ArgName = va_arg( ArgList, const char * );
+            if (++Idx < NumArg) {
+                ArgName = va_arg( ArgList, const char * );
+            } else {
+                break;
+            }
         }
         //va_end(ArgList);
     }

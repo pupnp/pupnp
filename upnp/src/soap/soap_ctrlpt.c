@@ -611,9 +611,9 @@ SoapSendAction( IN char *action_url,
     char *xml_end =
         "</s:Body>\r\n"
         "</s:Envelope>\r\n\r\n";
-    int xml_start_len;
-    int xml_end_len;
-    int action_str_len;
+    size_t xml_start_len;
+    size_t xml_end_len;
+    size_t action_str_len;
 
     *response_node = NULL;      // init
 
@@ -693,7 +693,7 @@ SoapSendAction( IN char *action_url,
         err_code = ret_code;
     }
 
-  error_handler:
+error_handler:
     ixmlFreeDOMString( action_str );
     membuffer_destroy( &request );
     membuffer_destroy( &responsename );
@@ -757,13 +757,13 @@ SoapSendActionEx( IN char *action_url,
     char *xml_end =
         "</s:Body>\r\n"
         "</s:Envelope>\r\n";
-    int xml_start_len;
-    int xml_header_start_len;
-    int xml_header_str_len;
-    int xml_header_end_len;
-    int xml_body_start_len;
-    int action_str_len;
-    int xml_end_len;
+    size_t xml_start_len;
+    size_t xml_header_start_len;
+    size_t xml_header_str_len;
+    size_t xml_header_end_len;
+    size_t xml_body_start_len;
+    size_t action_str_len;
+    size_t xml_end_len;
     off_t content_length;
 
     *response_node = NULL;      // init
@@ -821,7 +821,7 @@ SoapSendActionEx( IN char *action_url,
         xml_body_start_len + action_str_len + xml_end_len;
     if (http_MakeMessage(
         &request, 1, 1,
-        "q" "N" "s" "sssbsc" "Uc" "bbbbbbb",
+        "q" "N" "s" "sssbsc" "Uc" "b" "b" "b" "b" "b" "b" "b",
         SOAPMETHOD_POST, &url,
         content_length,
         ContentTypeHeader,

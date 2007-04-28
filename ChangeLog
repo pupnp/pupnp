@@ -1,4 +1,32 @@
 *************************************************************************
+Version 1.4.5
+*************************************************************************
+
+2007-04-19 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Case insensitive comparison in raw_find_str() (httpparser.c) as
+	suggested by Craig Nelson in SF Tracker [ 1689382 ] DLINK DIR-625
+	patch.
+
+2007-04-07 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
+	* Fix for a bug in makeAction where va_arg was beeing called one
+	extra time.
+
+2007-04-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Tracker [ 1703533 ] Patch to make it compile under FreeBSD
+	Submitted By: Timothy Redaelli - drittz
+	I made some patches to make it compile under FreeBSD using
+	gethostbyaddr_r when supported.
+
+2007-04-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* [pupnp-devel] Type mixup on x86_64 causes UPNP_E_OUTOF_MEMORY
+	Submitted By: Glen Masgai
+	after an UpnpSendActionAsync() for example, i get UPNP_E_OUTOF_MEMORY
+	in the callback using 1.4.4 on a x86_64 system. This happens in
+	http_MakeMessage(), which in some cases get called with wrong types
+	(int instead of size_t) in combination with format "b" and "Q".
+	The attached patch should fix this.
+
+*************************************************************************
 Version 1.4.4
 *************************************************************************
 

@@ -47,6 +47,10 @@ extern "C" {
  #include <unistd.h>
 #endif
 
+#ifdef __FreeBSD__
+#define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
+#endif
+
 #ifdef PTHREAD_MUTEX_RECURSIVE
 /* This system has SuS2-compliant mutex attributes.
  * E.g. on Cygwin, where we don't have the old nonportable (NP) symbols

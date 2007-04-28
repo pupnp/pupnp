@@ -231,10 +231,10 @@ http_RecvMessage( IN SOCKINFO * info,
                            "<<< (RECVD) <<<\n%s\n-----------------\n",
                            parser->msg.msg.buf );
                          //print_http_headers( &parser->msg );
-                     )
+                       )
 
-                    if( parser->content_length >
-                        ( unsigned int )g_maxContentLength ) {
+                if( parser->content_length >
+                    ( unsigned int )g_maxContentLength ) {
                     *http_error_code = HTTP_REQ_ENTITY_TOO_LARGE;
                     return UPNP_E_OUTOF_BOUNDS;
                 }
@@ -606,8 +606,8 @@ http_Download( IN const char *url_str,
      *hoststr,
      *temp;
     http_parser_t response;
-    size_t msg_length,
-      hostlen;
+    size_t msg_length;
+    size_t hostlen;
     memptr ctype;
     size_t copy_len;
     membuffer request;
@@ -648,9 +648,10 @@ http_Download( IN const char *url_str,
 
         ret_code = http_MakeMessage(
             &request, 1, 1,
-            "QsbcDCUc",
+            "Q" "s" "bcDCUc",
             HTTPMETHOD_GET, url.pathquery.buff, url.pathquery.size,
-            "HOST: ", hoststr, hostlen );
+            "HOST: ",
+            hoststr, hostlen );
     if( ret_code != 0 ) {
         DBGONLY( UpnpPrintf
                  ( UPNP_INFO, HTTP, __FILE__, __LINE__,
@@ -766,7 +767,7 @@ MakePostMessage( const char *url_str,
 {
     int ret_code = 0;
     char *urlPath = alloca( strlen( url_str ) + 1 );
-    int hostlen = 0;
+    size_t hostlen = 0;
     char *hoststr,
      *temp;
 
@@ -799,7 +800,7 @@ MakePostMessage( const char *url_str,
     hostlen = strlen( hoststr );
     *temp = '/';
     DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "HOSTNAME : %s Length : %d\n", hoststr, hostlen );
+                         "HOSTNAME : %s Length : %zd\n", hoststr, hostlen );
          )
 
     if( contentLength >= 0 ) {
@@ -1101,9 +1102,9 @@ MakeGetMessage( const char *url_str,
 {
     int ret_code;
     char *urlPath = alloca( strlen( url_str ) + 1 );
-    int querylen = 0;
+    size_t querylen = 0;
     const char *querystr;
-    int hostlen = 0;
+    size_t hostlen = 0;
     char *hoststr,
      *temp;
 
@@ -1136,7 +1137,7 @@ MakeGetMessage( const char *url_str,
     hostlen = strlen( hoststr );
     *temp = '/';
     DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "HOSTNAME : %s Length : %d\n", hoststr, hostlen );
+                         "HOSTNAME : %s Length : %zd\n", hoststr, hostlen );
          )
 
     if( proxy_str ) {
@@ -1149,9 +1150,10 @@ MakeGetMessage( const char *url_str,
 
     ret_code = http_MakeMessage(
         request, 1, 1,
-        "QsbcDCUc",
+        "Q" "s" "bcDCUc",
         HTTPMETHOD_GET, querystr, querylen,
-        "HOST: ", hoststr, hostlen );
+        "HOST: ",
+        hoststr, hostlen );
 
     if( ret_code != 0 ) {
         DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
@@ -1780,8 +1782,8 @@ http_SendStatusResponse( IN SOCKINFO * info,
 *		fmt types:
 *		'B':	arg = int status_code 
 *				appends content-length, content-type and HTML body for given code
-*		'b':	arg1 = const char* buf; arg2 = size_t buf_length 
-*				memory ptr
+*		'b':	arg1 = const char* buf;
+*			arg2 = size_t buf_length memory ptr
 *		'C':	(no args) appends a HTTP CONNECTION: close header 
 *				depending on major,minor version
 *		'c':	(no args) appends CRLF "\r\n"
@@ -1790,16 +1792,18 @@ http_SendStatusResponse( IN SOCKINFO * info,
 *		'G':	arg = range information         // add range header
 *		'h':	arg = off_t number		// appends off_t number
 *		'K':	(no args)                       // add chunky header
-*		'N':	arg1 = int content_length	// content-length header
-*               'q':    arg1 = http_method_t, arg2 = (uri_type *) // request start line and HOST header
-*		'Q':	arg1 = http_method_t; arg2 = char* url; 
-*				arg3 = int url_length // start line of request
-*		'R':	arg = int status_code // adds a response start line
+*		'N':	arg1 = off_t content_length       // content-length header
+*		'q':    arg1 = http_method_t            // request start line and HOST header
+*			arg2 = (uri_type *)
+*		'Q':	arg1 = http_method_t;           // start line of request
+*			arg2 = char* url; 
+*			arg3 = size_t url_length 
+*		'R':	arg = int status_code           // adds a response start line
 *		'S':	(no args) appends HTTP SERVER: header
 *		's':	arg = const char* C_string
-*		'T':	arg = char * content_type; format e.g: "text/html";	
-*				 content-type header
-*		't':	arg = time_t * gmt_time	// appends time in RFC 1123 fmt
+*		'T':	arg = char * content_type; format
+*			e.g: "text/html"; content-type header
+*		't':	arg = time_t * gmt_time         // appends time in RFC 1123 fmt
 *		'U':	(no args) appends HTTP USER-AGENT: header
 *               'X':    arg = const char useragent; "redsonic" HTTP X-User-Agent: useragent
 *
@@ -2165,7 +2169,7 @@ MakeGetMessageEx( const char *url_str,
 {
     int errCode = UPNP_E_SUCCESS;
     char *urlPath = NULL;
-    int hostlen = 0;
+    size_t hostlen = 0;
     char *hoststr,
      *temp;
 
@@ -2210,16 +2214,16 @@ MakeGetMessageEx( const char *url_str,
         *temp = '/';
 
         DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                             "HOSTNAME : %s Length : %d\n", hoststr,
-                             hostlen );
+                             "HOSTNAME : %s Length : %zd\n",
+                             hoststr, hostlen );
              )
 
             errCode = http_MakeMessage(
                 request, 1, 1,
-                "QsbcGDCUc",
-                HTTPMETHOD_GET,
-                url->pathquery.buff, url->pathquery.size,
-                "HOST: ", hoststr, hostlen,
+                "Q" "s" "bc" "GDCUc",
+                HTTPMETHOD_GET, url->pathquery.buff, url->pathquery.size,
+                "HOST: ",
+		hoststr, hostlen,
                 pRangeSpecifier );
 
         if( errCode != 0 ) {
