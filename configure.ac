@@ -49,6 +49,11 @@ AC_CONFIG_SRCDIR(upnp/inc/upnp.h)
 AM_INIT_AUTOMAKE([1.8 -Wall foreign subdir-objects dist-bzip2])
 
 #
+# Get canonical host names in host and host_os
+#
+AC_CANONICAL_HOST
+
+#
 # There are 3 configuration files :
 # 1) "./autoconfig.h" is auto-generated and used only internally during build
 #    (usually named "config.h" but conflicts with the file below)
@@ -131,11 +136,14 @@ RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 # version on that.
 docdir="${datadir}/doc/${PACKAGE_NAME}-${PACKAGE_VERSION}"
 AC_MSG_CHECKING([for documentation directory])
-AC_ARG_WITH([documentation], 
-	AS_HELP_STRING([--with-documentation=directory_name],
+AC_ARG_WITH(
+	[documentation], 
+	AS_HELP_STRING(
+		[--with-documentation=directory_name],
 		[where documentation is installed 
 		 @<:@[DATADIR/doc/]AC_PACKAGE_NAME[-]AC_PACKAGE_VERSION@:>@])
-AS_HELP_STRING([--without-documentation],
+AS_HELP_STRING(
+		[--without-documentation],
 		[do not install the documentation]),
 	[],
 	[with_documentation=no])
@@ -159,25 +167,40 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_EGREP
 
-
 #
 # Default compilation flags
 #
-if test x"$enable_debug" = xyes; then
-	# AC_PROG_CC already sets CFLAGS to "-g -O2" by default
-	:
-else
-	# add optimise for size
-	AX_CFLAGS_GCC_OPTION([-Os])
-fi
+echo "--------------------- Default compilation flags -------------------------------"
+echo host is $host
+echo host_os is $host_os
+case $host_os in
+FreeBSD*)
+	echo "Using FreeBSD specific compiler settings"
+	# Put FreeBSD specific compiler flags here
+	;;
+*)
+	echo "Using non-specific system compiler settings"
+	if test x"$enable_debug" = xyes; then
+		# AC_PROG_CC already sets CFLAGS to "-g -O2" by default
+		:
+	else
+		# add optimise for size
+		AX_CFLAGS_GCC_OPTION([-Os])
+	fi
+	;;
+esac
+
 AX_CFLAGS_WARN_ALL
+echo "-------------------------------------------------------------------------------"
+
 
 #
 # Lot's of stuff to ensure large file support
 #
+AC_TYPE_SIZE_T
 AC_TYPE_OFF_T
-AC_DEFINE(_LARGE_FILE_SOURCE, [], [Large files support])
-AC_DEFINE(_FILE_OFFSET_BITS, [64], [File Offset size])
+AC_DEFINE([_LARGE_FILE_SOURCE], [], [Large files support])
+AC_DEFINE([_FILE_OFFSET_BITS], [64], [File Offset size])
 
 
 #
@@ -186,7 +209,24 @@ AC_DEFINE(_FILE_OFFSET_BITS, [64], [File Offset size])
 AC_HEADER_STDC
 # libupnp code doesn't use autoconf variables yet,
 # so just abort if a header file is not found.
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h sys/timeb.h syslog.h unistd.h],[],[AC_MSG_ERROR([required header file missing])])
+AC_CHECK_HEADERS(
+	[ \
+	arpa/inet.h \
+	fcntl.h \
+	limits.h \
+	netdb.h \
+	netinet/in.h \
+	stdlib.h \
+	string.h \
+	sys/ioctl.h \
+	sys/socket.h \
+	sys/time.h \
+	sys/timeb.h \
+	syslog.h \
+	unistd.h \
+	],
+	[],
+	[AC_MSG_ERROR([required header file missing])])
 
 
 #
@@ -202,25 +242,28 @@ TYPE_SOCKLEN_T
 #
 AC_FUNC_VPRINTF
 AC_FUNC_FSEEKO
+AC_CHECK_FUNCS(ftime,, [AC_CHECK_LIB(compat, ftime)])
 
 
 #
 # Checks for POSIX Threads
 #
-ACX_PTHREAD([],[AC_MSG_ERROR([POSIX threads are required to build this program])])
+ACX_PTHREAD(
+	[],
+	[AC_MSG_ERROR([POSIX threads are required to build this program])])
 
 
+AC_CONFIG_FILES([
+	Makefile
+	ixml/Makefile
+	ixml/doc/Makefile
+	threadutil/Makefile
+	upnp/Makefile
+	upnp/doc/Makefile
+	docs/dist/Makefile
+	libupnp.pc
+	])
 
-
-AC_CONFIG_FILES([Makefile
-		 ixml/Makefile
-		 ixml/doc/Makefile
-                 threadutil/Makefile
-		 upnp/Makefile
-		 upnp/doc/Makefile
-		 docs/dist/Makefile
-		 libupnp.pc
-                 ])
 
 AC_OUTPUT
 
