@@ -174,7 +174,7 @@ echo "--------------------- Default compilation flags --------------------------
 echo host is $host
 echo host_os is $host_os
 case $host_os in
-FreeBSD*)
+freebsd*)
 	echo "Using FreeBSD specific compiler settings"
 	# Put FreeBSD specific compiler flags here
 	;;
