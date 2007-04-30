@@ -10,7 +10,7 @@
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.4.5], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp], [1.4.6], [mroberto@users.sourceforge.net])
 # *Independently* of the above libupnp package version, the libtool version
 # of the 3 libraries need to be updated whenever there is a change released :
 # "current:revision:age" (this is NOT the same as the package version), where:
@@ -174,7 +174,7 @@ echo "--------------------- Default compilation flags --------------------------
 echo host is $host
 echo host_os is $host_os
 case $host_os in
-FreeBSD*)
+freebsd*)
 	echo "Using FreeBSD specific compiler settings"
 	# Put FreeBSD specific compiler flags here
 	;;
