@@ -205,7 +205,7 @@ notify_send_and_recv( IN uri_type * destination_url,
     // connect
     DBGONLY( UpnpPrintf( UPNP_ALL, GENA, __FILE__, __LINE__,
                          "gena notify to: %.*s\n",
-                         destination_url->hostport.text.size,
+                         (int)destination_url->hostport.text.size,
                          destination_url->hostport.text.buff ); )
 
         conn_fd = http_Connect( destination_url, &url );

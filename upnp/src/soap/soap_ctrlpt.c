@@ -644,8 +644,9 @@ SoapSendAction( IN char *action_url,
 
     DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
                          "path=%.*s, hostport=%.*s\n",
-                         url.pathquery.size, url.pathquery.buff,
-                         url.hostport.text.size,
+                         (int)url.pathquery.size,
+                         url.pathquery.buff,
+                         (int)url.hostport.text.size,
                          url.hostport.text.buff ); )
 
     xml_start_len = strlen( xml_start );
@@ -800,8 +801,9 @@ SoapSendActionEx( IN char *action_url,
 
     DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
                          "path=%.*s, hostport=%.*s\n",
-                         url.pathquery.size, url.pathquery.buff,
-                         url.hostport.text.size,
+                         (int)url.pathquery.size,
+                         url.pathquery.buff,
+                         (int)url.hostport.text.size,
                          url.hostport.text.buff ); )
 
     xml_start_len = strlen( xml_start );
