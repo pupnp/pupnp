@@ -213,6 +213,7 @@ AC_CHECK_HEADERS(
 	[ \
 	arpa/inet.h \
 	fcntl.h \
+	inttypes.h \
 	limits.h \
 	netdb.h \
 	netinet/in.h \

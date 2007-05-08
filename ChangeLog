@@ -2,6 +2,12 @@
 Version 1.4.7
 *************************************************************************
 
+2007-05-08 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fix for debug printf format strings. size_t are not expected
+	in a string format like "%.*s".
+
+2007-05-08 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added inttypes.h as a header requirement in configure.ac.
 
 *************************************************************************
 Version 1.4.6
