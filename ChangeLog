@@ -9,6 +9,13 @@ Version 1.4.7
 2007-05-08 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added inttypes.h as a header requirement in configure.ac.
 
+2007-05-11 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Moved upnp_tv_ctrlpt and upnp_tv_device executables from folder
+	upnp to folder upnp/sample. Moved folder upnp/sample/tvdevice/web
+	to folder upnp/sample/web. This way, if someone compiles the
+	tarball and executes upnp_tv_device from its creation directory,
+	there will be no error -108 for not finding directory web.
+
 *************************************************************************
 Version 1.4.6
 *************************************************************************

@@ -1,5 +1,4 @@
 # -*- Autoconf -*-
-# $Id: configure.ac,v 1.11 2006/04/09 13:59:44 r3mi Exp $
 #
 # Top-level configure.ac file for libupnp
 #
@@ -261,6 +260,7 @@ AC_CONFIG_FILES([
 	threadutil/Makefile
 	upnp/Makefile
 	upnp/doc/Makefile
+	upnp/sample/Makefile
 	docs/dist/Makefile
 	libupnp.pc
 	])

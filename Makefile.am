@@ -1,4 +1,3 @@
-# $Id: Makefile.am,v 1.5 2006/04/29 20:12:50 r3mi Exp $
 #
 # Top-level "Makefile.am" for libupnp
 #
@@ -9,7 +8,11 @@ ACLOCAL_AMFLAGS = -I m4
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-debug --enable-samples
 
-SUBDIRS = ixml threadutil upnp docs/dist
+SUBDIRS = \
+	ixml \
+	threadutil \
+	upnp \
+	docs/dist
 
 
 EXTRA_DIST = \
@@ -31,11 +34,12 @@ EXTRA_DIST = \
 pkgconfigexecdir = $(libdir)/pkgconfig
 pkgconfigexec_DATA = libupnp.pc
 
+
 $(pkgconfigexec_DATA): config.status
 
 
 if WITH_DOCUMENTATION
-    doc_DATA = LICENSE README NEWS TODO THANKS
+	doc_DATA = LICENSE README NEWS TODO THANKS
 endif
 
 
