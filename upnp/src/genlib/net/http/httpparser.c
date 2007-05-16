@@ -2414,37 +2414,50 @@ raw_to_int( IN memptr * raw_value,
 }
 
 /************************************************************************
-* Function: raw_find_str												
-*																		
-* Parameters:															
-*	IN memptr* raw_value ; Buffer containg the string												
-*	IN const char* str ;	Substring to be found													
-*																		
-* Description: Find a substring from raw character string buffer					
-*																		
-* Returns:																
+* Function: raw_find_str
+*
+* Parameters:
+*	IN memptr* raw_value ; Buffer containg the string
+*	IN const char* str ;	Substring to be found
+*
+* Description: Find a substring from raw character string buffer
+*
+* Side effects: raw_value is transformed to lowercase.
+*
+* Returns:
 *	 int - index at which the substring is found.						
 ************************************************************************/
 int
-raw_find_str( IN memptr * raw_value,
+raw_find_str( IN memptr *raw_value,
               IN const char *str )
 {
     char c;
     char *ptr;
+    int i = 0;
 
-    c = raw_value->buf[raw_value->length];  // save
-    raw_value->buf[raw_value->length] = 0;  // null-terminate
+    // save
+    c = raw_value->buf[raw_value->length];
 
-    // Use strcasestr because the string may not always be exact case
-    ptr = strcasestr( raw_value->buf, str );
+    // Make it lowercase
+    for (i = 0; raw_value->buf[i]; ++i) {
+        raw_value->buf[i] = tolower(raw_value->buf[i]);
+    }
 
-    raw_value->buf[raw_value->length] = c;  // restore
+    // null-terminate
+    raw_value->buf[raw_value->length] = 0;
+
+    // Find the substring position
+    ptr = strstr( raw_value->buf, str );
+
+    // restore the "length" byte
+    raw_value->buf[raw_value->length] = c;
 
     if( ptr == 0 ) {
         return -1;
     }
 
-    return ptr - raw_value->buf;    // return index
+    // return index
+    return ptr - raw_value->buf;
 }
 
 /************************************************************************

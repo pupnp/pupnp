@@ -643,7 +643,7 @@ http_Download( IN const char *url_str,
     *temp = '/';
     DBGONLY( UpnpPrintf
              ( UPNP_INFO, HTTP, __FILE__, __LINE__,
-               "HOSTNAME : %s Length : %zu\n", hoststr, hostlen );
+               "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
          )
 
         ret_code = http_MakeMessage(
@@ -800,7 +800,7 @@ MakePostMessage( const char *url_str,
     hostlen = strlen( hoststr );
     *temp = '/';
     DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "HOSTNAME : %s Length : %zd\n", hoststr, hostlen );
+                         "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
          )
 
     if( contentLength >= 0 ) {
@@ -1137,7 +1137,7 @@ MakeGetMessage( const char *url_str,
     hostlen = strlen( hoststr );
     *temp = '/';
     DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "HOSTNAME : %s Length : %zd\n", hoststr, hostlen );
+                         "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
          )
 
     if( proxy_str ) {
@@ -1906,7 +1906,7 @@ http_MakeMessage( INOUT membuffer * buf,
         {
             num = ( int )va_arg( argp, int );
 
-            sprintf( tempbuf, "%zu", num );
+            sprintf( tempbuf, "%"PRIzu, num );
             if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
                 goto error_handler;
             }
@@ -2214,7 +2214,7 @@ MakeGetMessageEx( const char *url_str,
         *temp = '/';
 
         DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                             "HOSTNAME : %s Length : %zd\n",
+                             "HOSTNAME : %s Length : %"PRIzu"\n",
                              hoststr, hostlen );
              )
 

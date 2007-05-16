@@ -36,65 +36,76 @@
 
 //@{
 
+
 #if defined MYLIB_LARGEFILE_SENSITIVE && _FILE_OFFSET_BITS+0 != 64
-  #if defined __GNUC__
-   #warning libupnp requires largefile mode - use AC_SYS_LARGEFILE
-  #else
-   #error  libupnp requires largefile mode - use AC_SYS_LARGEFILE
-  #endif
+	#if defined __GNUC__
+		#warning libupnp requires largefile mode - use AC_SYS_LARGEFILE
+	#else
+		#error  libupnp requires largefile mode - use AC_SYS_LARGEFILE
+	#endif
 #endif 
+
 
 #include <stdio.h>
 #ifdef __FreeBSD__
-#include <time.h>
+	#include <time.h>
 #endif
 #include "ixml.h"
 #include "upnpconfig.h"
 #if UPNP_HAVE_DEBUG
-#	include "upnpdebug.h"
+	#include "upnpdebug.h"
 #endif
+
 
 #ifdef WIN32
- #ifndef UPNP_STATIC_LIB
-  #ifdef LIBUPNP_EXPORTS
-   // set up declspec for dll export to make functions visible to library users
-   #define EXPORT_SPEC __declspec(dllexport)
-  #else
-   #define EXPORT_SPEC __declspec(dllimport)
-  #endif
- #else
-  #define EXPORT_SPEC
- #endif
- #ifdef UPNP_USE_MSVCPP // define some things the M$ VC++ doesn't knows
-  typedef __int64 int64_t;
- #endif
- #ifdef UPNP_USE_BCBPP // define some things Borland Builder doesn't knows
-  typedef __int64 int64_t;
- #endif
+	#ifndef UPNP_STATIC_LIB
+		#ifdef LIBUPNP_EXPORTS
+			// set up declspec for dll export to make functions visible to library users
+			#define EXPORT_SPEC __declspec(dllexport)
+		#else
+			#define EXPORT_SPEC __declspec(dllimport)
+		#endif
+	#else
+		#define EXPORT_SPEC
+	#endif
+	#ifdef UPNP_USE_MSVCPP // define some things the M$ VC++ doesn't know
+		typedef __int64 int64_t;
+		#define PRId64 "I64d"
+		#define PRIzu "lu"
+	#endif
+	#ifdef UPNP_USE_BCBPP // define some things Borland Builder doesn't know
+		typedef __int64 int64_t;
+		#define PRIzu "zu"
+	#endif
 #else
- #define EXPORT_SPEC
+	#define EXPORT_SPEC
+	#define PRIzu "zu"
 #endif
 
+
 #ifndef WIN32
- #define UpnpCloseSocket         close
+	#define UpnpCloseSocket         close
 #else
- #define UpnpCloseSocket         closesocket
- #define fseeko fseek
+	#define UpnpCloseSocket         closesocket
+	#define fseeko fseek
 #endif
 #define UPNP_SOCKETERROR        -1
 #define UPNP_INVALID_SOCKET     -1
 #ifndef WIN32
- #define SOCKET                  int
+	#define SOCKET                  int
 #endif
+
 
 #ifndef WIN32
- #include <netinet/in.h>
+	#include <netinet/in.h>
 #else
- #include <winsock2.h>
- #include <time.h>
+	#include <winsock2.h>
+	#include <time.h>
 #endif
 
+
 #include <sys/types.h>
+
 
 #define NUM_HANDLE 200
 #define LINE_SIZE  180
@@ -104,7 +115,6 @@
 #define SERL_NUMR_SIZE  64
 #define MODL_DESC_SIZE  64
 #define UPNP_INFINITE -1
-
 #define UPNP_USING_CHUNKED			-3
 #define UPNP_UNTIL_CLOSE			-4
 
@@ -2724,3 +2734,4 @@ EXPORT_SPEC void UpnpFree(
 //@} The API
 
 #endif
+

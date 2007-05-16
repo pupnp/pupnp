@@ -393,7 +393,7 @@ DBGONLY( void print_uri( uri_type * in ) {
 ************************************************************************/
 DBGONLY( void print_token( token * in ) {
          int i = 0;
-         printf( "Token Size : %zd\n\'", in->size );
+         printf( "Token Size : %"PRIzu"\n\'", in->size );
          for( i = 0; i < in->size; i++ ) {
          putchar( in->buff[i] );}
          putchar( '\'' ); putchar( '\n' );}

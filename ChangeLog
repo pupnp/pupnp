@@ -2,6 +2,21 @@
 Version 1.4.7
 *************************************************************************
 
+2007-05-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* EXPORT_SPEC missing on some declarations in ixml/inc/ixml.h.
+	Thanks to David Maass.
+
+2007-05-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* sizeof is unsigned, so %zu is more adequate than %zd.
+
+2007-05-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Using an invented printf directive PRIzu that on MSVC
+	expands to "lu", and on normal C99 compilers expands to "zu".
+
+2007-05-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Rewrote raw_find_str. Now it no longer uses strcasestr(), but it
+	transforms the first input buffer into lowercase.
+
 2007-05-08 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fix for debug printf format strings. size_t are not expected
 	in a string format like "%.*s".

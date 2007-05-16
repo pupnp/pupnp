@@ -448,15 +448,17 @@ int matchstr( IN char *str, IN size_t slen, IN const char* fmt, ... );
 int raw_to_int( IN memptr* raw_value, int base );
 
 /************************************************************************
-* Function: raw_find_str												
-*																		
-* Parameters:															
-*	IN memptr* raw_value ; Buffer containg the string												
-*	IN const char* str ;	Substring to be found													
-*																		
-* Description: Find a substring from raw character string buffer					
-*																		
-* Returns:																
+* Function: raw_find_str
+*
+* Parameters:
+*	IN memptr* raw_value ; Buffer containg the string
+*	IN const char* str ;	Substring to be found
+*
+* Description: Find a substring from raw character string buffer
+*
+* Side effects: raw_value is transformed to lowercase.
+*
+* Returns:
 *	 int - index at which the substring is found.						
 ************************************************************************/
 int raw_find_str( IN memptr* raw_value, IN const char* str );

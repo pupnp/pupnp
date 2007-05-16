@@ -1738,7 +1738,7 @@ ixmlNodeList_free(IXML_NodeList *nList
    *                      of the DOM tree or {\tt NULL} on an error.
    */
 
-DOMString
+EXPORT_SPEC DOMString
 ixmlPrintDocument(IXML_Document *doc);
 
   /** Renders a {\bf Node} and all sub-elements into an XML text
@@ -1756,7 +1756,7 @@ ixmlPrintDocument(IXML_Document *doc);
    *                      of the DOM tree or {\tt NULL} on an error.
    */
 
-DOMString   
+EXPORT_SPEC DOMString   
 ixmlPrintNode(IXML_Node *doc  
                 /** The root of the {\bf Node} tree to render to XML text. */
              );
@@ -1777,7 +1777,7 @@ ixmlPrintNode(IXML_Node *doc
    *                      of the DOM tree or {\tt NULL} on an error.
    */
 
-DOMString
+EXPORT_SPEC DOMString
 ixmlDocumenttoString(IXML_Document *doc);
 
   /** Renders a {\bf Node} and all sub-elements into an XML text
@@ -1809,7 +1809,7 @@ ixmlNodetoString(IXML_Node *doc
    * characters are replaced by the {\bf errorChar}, and invalid "&" entities 
    * are left untranslated. The parsing is then allowed to continue.
    */
-void
+EXPORT_SPEC void
 ixmlRelaxParser(char errorChar);
 
 
