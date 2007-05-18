@@ -72,14 +72,14 @@ GenaAutoRenewSubscription( IN void *input )
     int eventType = 0;
 
     if( AUTO_RENEW_TIME == 0 ) {
-        DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-                             "GENA SUB EXPIRED" ) );
+        UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+            "GENA SUB EXPIRED" );
         sub_struct->ErrCode = UPNP_E_SUCCESS;
         send_callback = 1;
         eventType = UPNP_EVENT_SUBSCRIPTION_EXPIRED;
     } else {
-        DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-                             "GENA AUTO RENEW" ) );
+        UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+            "GENA AUTO RENEW" );
         if( ( ( sub_struct->ErrCode = genaRenewSubscription( event->handle,
                                                              sub_struct->
                                                              Sid,
@@ -93,17 +93,17 @@ GenaAutoRenewSubscription( IN void *input )
         }
     }
     if( send_callback ) {
-        HandleLock(  );
+        HandleLock();
         if( GetHandleInfo( event->handle, &handle_info ) != HND_CLIENT ) {
-            HandleUnlock(  );
+            HandleUnlock();
             free_upnp_timeout( event );
             return;
         }
-        DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-                             "HANDLE IS VALID" ) );
+        UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+            "HANDLE IS VALID" );
         callback_fun = handle_info->Callback;
         cookie = handle_info->Cookie;
-        HandleUnlock(  );
+        HandleUnlock();
         //make callback
 
         callback_fun( eventType, event->Event, cookie );
@@ -397,9 +397,9 @@ genaUnregisterClient( IN UpnpClient_Handle client_handle )
     http_parser_t response;
 
     while( TRUE ) {
-        HandleLock(  );
+        HandleLock();
         if( GetHandleInfo( client_handle, &handle_info ) != HND_CLIENT ) {
-            HandleUnlock(  );
+            HandleUnlock();
             return GENA_E_BAD_HANDLE;
         }
 
@@ -417,7 +417,7 @@ genaUnregisterClient( IN UpnpClient_Handle client_handle )
         RemoveClientSubClientSID( &handle_info->ClientSubList,
                                   sub_copy.sid );
 
-        HandleUnlock(  );
+        HandleUnlock();
 
         return_code = gena_unsubscribe( sub_copy.EventURL,
                                         sub_copy.ActualSID, &response );
@@ -429,7 +429,7 @@ genaUnregisterClient( IN UpnpClient_Handle client_handle )
     }
 
     freeClientSubList( handle_info->ClientSubList );
-    HandleUnlock(  );
+    HandleUnlock();
     return return_code;
 }
 
@@ -459,25 +459,25 @@ genaUnSubscribe( IN UpnpClient_Handle client_handle,
     client_subscription sub_copy;
     http_parser_t response;
 
-    HandleLock(  );
+    HandleLock();
 
     // validate handle and sid
 
     if( GetHandleInfo( client_handle, &handle_info ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return GENA_E_BAD_HANDLE;
     }
 
     if( ( sub =
           GetClientSubClientSID( handle_info->ClientSubList, in_sid ) )
         == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return GENA_E_BAD_SID;
     }
 
     return_code = copy_client_subscription( sub, &sub_copy );
 
-    HandleUnlock(  );
+    HandleUnlock();
 
     return_code = gena_unsubscribe( sub_copy.EventURL, sub_copy.ActualSID,
                                     &response );
@@ -488,16 +488,16 @@ genaUnSubscribe( IN UpnpClient_Handle client_handle,
 
     free_client_subscription( &sub_copy );
 
-    HandleLock(  );
+    HandleLock();
 
     if( GetHandleInfo( client_handle, &handle_info ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return GENA_E_BAD_HANDLE;
     }
 
     RemoveClientSubClientSID( &handle_info->ClientSubList, in_sid );
 
-    HandleUnlock(  );
+    HandleUnlock();
 
     return return_code;
 }
@@ -538,28 +538,28 @@ genaSubscribe( IN UpnpClient_Handle client_handle,
     struct Handle_Info *handle_info;
     char *EventURL = NULL;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-                         "GENA SUBSCRIBE BEGIN" ) );
-    HandleLock(  );
+    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+        "GENA SUBSCRIBE BEGIN" );
+    HandleLock();
 
     memset( out_sid, 0, sizeof( Upnp_SID ) );
 
     // validate handle
     if( GetHandleInfo( client_handle, &handle_info ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return GENA_E_BAD_HANDLE;
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
     // subscribe
-    SubscribeLock(  );
+    SubscribeLock();
     return_code =
         gena_subscribe( PublisherURL, TimeOut, NULL, &ActualSID );
-    HandleLock(  );
+    HandleLock();
     if( return_code != UPNP_E_SUCCESS ) {
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL, GENA, __FILE__, __LINE__,
-                             "SUBSCRIBE FAILED in transfer error code: %d returned\n",
-                             return_code ) );
+        UpnpPrintf( UPNP_CRITICAL, GENA, __FILE__, __LINE__,
+            "SUBSCRIBE FAILED in transfer error code: %d returned\n",
+            return_code );
         goto error_handler;
     }
 
@@ -605,8 +605,8 @@ genaSubscribe( IN UpnpClient_Handle client_handle,
         free( EventURL );
         free( newSubscription );
     }
-    HandleUnlock(  );
-    SubscribeUnlock(  );
+    HandleUnlock();
+    SubscribeUnlock();
     return return_code;
 }
 
@@ -643,17 +643,17 @@ genaRenewSubscription( IN UpnpClient_Handle client_handle,
     char *ActualSID;
     ThreadPoolJob tempJob;
 
-    HandleLock(  );
+    HandleLock();
 
     // validate handle and sid
     if( GetHandleInfo( client_handle, &handle_info ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return GENA_E_BAD_HANDLE;
     }
 
     if( ( sub = GetClientSubClientSID( handle_info->ClientSubList,
                                        in_sid ) ) == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return GENA_E_BAD_SID;
     }
     // remove old events
@@ -663,13 +663,13 @@ genaRenewSubscription( IN UpnpClient_Handle client_handle,
         free_upnp_timeout( ( upnp_timeout * ) tempJob.arg );
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-                         "REMOVED AUTO RENEW  EVENT" ) );
+    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+        "REMOVED AUTO RENEW  EVENT" );
 
     sub->RenewEventId = -1;
     return_code = copy_client_subscription( sub, &sub_copy );
 
-    HandleUnlock(  );
+    HandleUnlock();
 
     if( return_code != HTTP_SUCCESS ) {
         return return_code;
@@ -677,10 +677,10 @@ genaRenewSubscription( IN UpnpClient_Handle client_handle,
 
     return_code = gena_subscribe( sub_copy.EventURL, TimeOut,
                                   sub_copy.ActualSID, &ActualSID );
-    HandleLock(  );
+    HandleLock();
 
     if( GetHandleInfo( client_handle, &handle_info ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         if( return_code == UPNP_E_SUCCESS ) {
             free( ActualSID );
         }
@@ -693,7 +693,7 @@ genaRenewSubscription( IN UpnpClient_Handle client_handle,
         // network failure (remove client sub)
         RemoveClientSubClientSID( &handle_info->ClientSubList, in_sid );
         free_client_subscription( &sub_copy );
-        HandleUnlock(  );
+        HandleUnlock();
         return return_code;
     }
     // get subscription
@@ -701,7 +701,7 @@ genaRenewSubscription( IN UpnpClient_Handle client_handle,
                                        in_sid ) ) == NULL ) {
         free( ActualSID );
         free_client_subscription( &sub_copy );
-        HandleUnlock(  );
+        HandleUnlock();
         return GENA_E_BAD_SID;
     }
     // store actual sid
@@ -714,7 +714,7 @@ genaRenewSubscription( IN UpnpClient_Handle client_handle,
         RemoveClientSubClientSID( &handle_info->ClientSubList, sub->sid );
     }
     free_client_subscription( &sub_copy );
-    HandleUnlock(  );
+    HandleUnlock();
     return return_code;
 }
 
@@ -795,12 +795,12 @@ gena_process_notification_event( IN SOCKINFO * info,
         return;
     }
 
-    HandleLock(  );
+    HandleLock();
 
     // get client info
     if( GetClientHandleInfo( &client_handle, &handle_info ) != HND_CLIENT ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, event );
-        HandleUnlock(  );
+        HandleUnlock();
         ixmlDocument_free( ChangedVars );
 
         return;
@@ -813,20 +813,20 @@ gena_process_notification_event( IN SOCKINFO * info,
             //   (if we are in the middle)
             // this is to avoid mistakenly rejecting the first event if we 
             //   receive it before the subscription response
-            HandleUnlock(  );
+            HandleUnlock();
 
             // try and get Subscription Lock 
             //   (in case we are in the process of subscribing)
-            SubscribeLock(  );
+            SubscribeLock();
 
             // get HandleLock again
-            HandleLock(  );
+            HandleLock();
 
             if( GetClientHandleInfo( &client_handle, &handle_info )
                 != HND_CLIENT ) {
                 error_respond( info, HTTP_PRECONDITION_FAILED, event );
-                SubscribeUnlock(  );
-                HandleUnlock(  );
+                SubscribeUnlock();
+                HandleUnlock();
                 ixmlDocument_free( ChangedVars );
 
                 return;
@@ -836,17 +836,17 @@ gena_process_notification_event( IN SOCKINFO * info,
                   GetClientSubActualSID( handle_info->ClientSubList,
                                          &sid ) ) == NULL ) {
                 error_respond( info, HTTP_PRECONDITION_FAILED, event );
-                SubscribeUnlock(  );
-                HandleUnlock(  );
+                SubscribeUnlock();
+                HandleUnlock();
                 ixmlDocument_free( ChangedVars );
 
                 return;
             }
 
-            SubscribeUnlock(  );
+            SubscribeUnlock();
         } else {
             error_respond( info, HTTP_PRECONDITION_FAILED, event );
-            HandleUnlock(  );
+            HandleUnlock();
             ixmlDocument_free( ChangedVars );
 
             return;
@@ -864,7 +864,7 @@ gena_process_notification_event( IN SOCKINFO * info,
     callback = handle_info->Callback;
     cookie = handle_info->Cookie;
 
-    HandleUnlock(  );
+    HandleUnlock();
 
     // make callback with event struct
     // In future, should find a way of mainting

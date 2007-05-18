@@ -34,7 +34,6 @@
 
 #include "autoconfig.h"
 
-#define MAX_JOBS_TOTAL 10
 
 /** @name Compile time configuration options
  *  The Linux SDK for UPnP Devices contains some compile-time parameters 
@@ -94,6 +93,17 @@
 
 //@{
 #define MAX_THREADS 12 
+//@}
+
+/** @name MAX_JOBS_TOTAL
+ *  The {\tt MAX_JOBS_TOTAL} constant determines the maximum number of jobs
+ *  that can be queued. If this limit is reached further jobs will be thrown
+ *  to avoid memory exhaustion. The default value 100.
+ *  (Added by Axis.)
+ */
+
+//@{
+#define MAX_JOBS_TOTAL 100
 //@}
 
 /** @name DEFAULT_SOAP_CONTENT_LENGTH
@@ -294,68 +304,46 @@
 
 
 
-/** @name DBGONLY
-          The {\bf DBGONLY} macro allows code to be marked so that it
-          is only included in the DEBUG build and not the release.  To
-          use this macro, put the code inside of the parentheses:
-
-          {\tt DBGONLY(int i;)}
-
-          This will cause a declaration of the integer {\tt i} only
-          in the debug build.
-  */
-
-//@{
-#ifdef DEBUG
- #define DBGONLY(x) x
-#else
- #define DBGONLY(x)
-#endif
-//@}
-
-
-
-#undef  EXCLUDE_WEB_SERVER
-#undef  EXCLUDE_MINISERVER
+#undef  EXCLUDE_WEB_SERVER 
+#undef  EXCLUDE_MINISERVER 
 #ifdef  INTERNAL_WEB_SERVER
- #define EXCLUDE_WEB_SERVER 0
- #define EXCLUDE_MINISERVER 0
+#	define EXCLUDE_WEB_SERVER 0
+#	define EXCLUDE_MINISERVER 0
 #else
- #define EXCLUDE_WEB_SERVER 1
- #define EXCLUDE_MINISERVER 1
+#	define EXCLUDE_WEB_SERVER 1
+#	define EXCLUDE_MINISERVER 1
 #endif
 
 #if EXCLUDE_GENA == 1 && EXCLUDE_SOAP == 1 && EXCLUDE_WEB_SERVER == 1
- #undef  EXCLUDE_MINISERVER
- #define EXCLUDE_MINISERVER 1
- #if INTERNAL_WEB_SERVER
-  #	error "conflicting settings: use configure --disable-webserver"
- #endif
+#	undef  EXCLUDE_MINISERVER 
+#	define EXCLUDE_MINISERVER 1
+#	if INTERNAL_WEB_SERVER
+#		error "conflicting settings: use configure --disable-webserver"
+#	endif
 #endif
 
 #if EXCLUDE_GENA == 0 || EXCLUDE_SOAP == 0 || EXCLUDE_WEB_SERVER == 0
- #undef  EXCLUDE_MINISERVER
- #define EXCLUDE_MINISERVER 0
- #if EXCLUDE_WEB_SERVER == 0 && !defined INTERNAL_WEB_SERVER
-  #error "conflicting settings : use configure --enable-webserver"
- #endif
+#	undef  EXCLUDE_MINISERVER 
+#	define EXCLUDE_MINISERVER 0
+#	if EXCLUDE_WEB_SERVER == 0 && !defined INTERNAL_WEB_SERVER
+#		error "conflicting settings : use configure --enable-webserver"
+#	endif
 #endif
 
 
 
 #ifdef INCLUDE_CLIENT_APIS
- #define CLIENTONLY(x) x
-#else
- #define CLIENTONLY(x)
+#	define CLIENTONLY(x) x
+#else 
+#	define CLIENTONLY(x)
 #endif
 
 #ifdef INCLUDE_DEVICE_APIS
- #define DEVICEONLY(x) x
-#else
- #define DEVICEONLY(x)
+#	define DEVICEONLY(x) x
+#else 
+#	define DEVICEONLY(x) 
 #endif
 
 //@}
 #endif
-
 

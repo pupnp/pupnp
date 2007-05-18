@@ -174,11 +174,9 @@ dispatch_request( IN SOCKINFO * info,
         case HTTPMETHOD_NOTIFY:
         case HTTPMETHOD_SUBSCRIBE:
         case HTTPMETHOD_UNSUBSCRIBE:
-            DBGONLY( UpnpPrintf
-                     ( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                       "miniserver %d: got GENA msg\n", info->socket );
-                 )
-                callback = gGenaCallback;
+            UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                "miniserver %d: got GENA msg\n", info->socket );
+            callback = gGenaCallback;
             break;
 
             //HTTP server call
@@ -275,12 +273,10 @@ handle_request( void *args )
     struct mserv_request_t *request = ( struct mserv_request_t * )args;
     int connfd = request->connfd;
 
-    DBGONLY( UpnpPrintf
-             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
-               "miniserver %d: READING\n", connfd );
-         )
-        //parser_request_init( &parser ); ////LEAK_FIX_MK
-        hmsg = &parser.msg;
+    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+        "miniserver %d: READING\n", connfd );
+    //parser_request_init( &parser ); ////LEAK_FIX_MK
+    hmsg = &parser.msg;
 
     if( sock_init_with_ip( &info, connfd, request->foreign_ip_addr,
                            request->foreign_ip_port ) != UPNP_E_SUCCESS ) {
@@ -295,12 +291,10 @@ handle_request( void *args )
         goto error_handler;
     }
 
-    DBGONLY( UpnpPrintf
-             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
-               "miniserver %d: PROCESSING...\n", connfd );
-         )
-        // dispatch
-        http_error_code = dispatch_request( &info, &parser );
+    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+        "miniserver %d: PROCESSING...\n", connfd );
+    // dispatch
+    http_error_code = dispatch_request( &info, &parser );
     if( http_error_code != 0 ) {
         goto error_handler;
     }
@@ -316,11 +310,9 @@ handle_request( void *args )
         handle_error( &info, http_error_code, major, minor );
     }
 
-    DBGONLY( UpnpPrintf
-             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
-               "miniserver %d: COMPLETE\n", connfd );
-         )
-        sock_destroy( &info, SD_BOTH ); //should shutdown completely
+    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+        "miniserver %d: COMPLETE\n", connfd );
+    sock_destroy( &info, SD_BOTH ); //should shutdown completely
 
     httpmsg_destroy( hmsg );
     free( request );
@@ -352,11 +344,9 @@ schedule_request_job( IN int connfd,
         ( struct mserv_request_t * )
         malloc( sizeof( struct mserv_request_t ) );
     if( request == NULL ) {
-        DBGONLY( UpnpPrintf
-                 ( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                   "mserv %d: out of memory\n", connfd );
-             )
-            shutdown( request->connfd, SD_BOTH );
+        UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+            "mserv %d: out of memory\n", connfd );
+        shutdown( request->connfd, SD_BOTH );
         UpnpCloseSocket( connfd );
         return;
     }
@@ -370,10 +360,8 @@ schedule_request_job( IN int connfd,
     TPJobSetPriority( &job, MED_PRIORITY );
 
     if( ThreadPoolAdd( &gRecvThreadPool, &job, NULL ) != 0 ) {
-        DBGONLY( UpnpPrintf
-                 ( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                   "mserv %d: cannot schedule request\n", connfd );
-             )
+        UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+            "mserv %d: cannot schedule request\n", connfd );
             free( request );
         shutdown( connfd, SD_BOTH );
         UpnpCloseSocket( connfd );
@@ -446,11 +434,9 @@ RunMiniServer( MiniServerSockArray * miniSock )
 
         if( select( maxMiniSock, &rdSet, NULL, &expSet, NULL ) ==
             UPNP_SOCKETERROR ) {
-            DBGONLY( UpnpPrintf
-                     ( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-                       "Error in select call !!!\n" );
-                 )
-                continue;
+            UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+                "Error in select call !!!\n" );
+            continue;
         } else {
 
             if( FD_ISSET( miniServSock, &rdSet ) ) {
@@ -459,12 +445,10 @@ RunMiniServer( MiniServerSockArray * miniSock )
                                      ( struct sockaddr * )&clientAddr,
                                      &clientLen );
                 if( connectHnd == UPNP_INVALID_SOCKET ) {
-                    DBGONLY( UpnpPrintf
-                             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                               "miniserver: Error"
-                               " in accepting connection\n" );
-                         )
-                        continue;
+                    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                        "miniserver: Error"
+                        " in accepting connection\n" );
+                    continue;
                 }
                 schedule_request_job( connectHnd, &clientAddr );
             }
@@ -489,24 +473,19 @@ RunMiniServer( MiniServerSockArray * miniSock )
                               &clientLen );
                 if( byteReceived > 0 ) {
                     requestBuf[byteReceived] = '\0';
-                    DBGONLY( UpnpPrintf
-                             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                               "Received response !!!  %s From host %s \n",
-                               requestBuf,
-                               inet_ntoa( clientAddr.sin_addr ) );
-                         )
-                        DBGONLY( UpnpPrintf
-                                 ( UPNP_PACKET, MSERV, __FILE__, __LINE__,
-                                   "Received multicast packet: \n %s\n",
-                                   requestBuf );
-                         )
+                    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                        "Received response !!!  %s From host %s \n",
+                        requestBuf, inet_ntoa( clientAddr.sin_addr ) );
+                    UpnpPrintf( UPNP_PACKET, MSERV, __FILE__, __LINE__,
+                        "Received multicast packet: \n %s\n",
+                        requestBuf );
 
-                        if( NULL != strstr( requestBuf, "ShutDown" ) )
+                    if( NULL != strstr( requestBuf, "ShutDown" ) ) {
                         break;
+		    }
                 }
             }
         }
-
     }
 
     shutdown( miniServSock, SD_BOTH );
@@ -555,12 +534,10 @@ get_port( int sockfd )
     }
 
     port = ntohs( sockinfo.sin_port );
-    DBGONLY( UpnpPrintf
-             ( UPNP_INFO, MSERV, __FILE__, __LINE__,
-               "sockfd = %d, .... port = %d\n", sockfd, port );
-         )
+    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+        "sockfd = %d, .... port = %d\n", sockfd, port );
 
-        return port;
+    return port;
 }
 
 /************************************************************************
@@ -623,16 +600,10 @@ get_miniserver_sockets( MiniServerSockArray * out,
         //THIS MAY CAUSE TCP TO BECOME LESS RELIABLE
         //HOWEVER IT HAS BEEN SUGESTED FOR TCP SERVERS
 
-        DBGONLY( UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                             "mserv start: resuseaddr set\n" );
-             )
-
-            sockError = setsockopt( listenfd,
-                                    SOL_SOCKET,
-                                    SO_REUSEADDR,
-                                    ( const char * )&reuseaddr_on,
-                                    sizeof( int )
-             );
+        UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+            "mserv start: resuseaddr set\n" );
+        sockError = setsockopt( listenfd, SOL_SOCKET, SO_REUSEADDR,
+            ( const char * )&reuseaddr_on, sizeof( int ));
         if( sockError == UPNP_SOCKETERROR ) {
             shutdown( listenfd, SD_BOTH );
             UpnpCloseSocket( listenfd );
@@ -652,9 +623,9 @@ get_miniserver_sockets( MiniServerSockArray * out,
                  );
             if( sockError == UPNP_SOCKETERROR ) {
 #ifdef WIN32
-				errCode = WSAGetLastError();
+                errCode = WSAGetLastError();
 #else
-				errCode = errno; 
+                errCode = errno; 
 #endif
                 if( errno == EADDRINUSE )
                     errCode = 1;
@@ -665,18 +636,16 @@ get_miniserver_sockets( MiniServerSockArray * out,
     }
 
     if( sockError == UPNP_SOCKETERROR ) {
-        DBGONLY( perror( "mserv start: bind failed" );
-             )
-            shutdown( listenfd, SD_BOTH );
+        perror( "mserv start: bind failed" );
+        shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
         return UPNP_E_SOCKET_BIND;  // bind failed
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                         "mserv start: bind success\n" );
-         )
+    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+        "mserv start: bind success\n" );
 
-        success = listen( listenfd, SOMAXCONN );
+    success = listen( listenfd, SOMAXCONN );
     if( success == UPNP_SOCKETERROR ) {
         shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
@@ -694,11 +663,10 @@ get_miniserver_sockets( MiniServerSockArray * out,
 
     if( ( miniServerStopSock = socket( AF_INET, SOCK_DGRAM, 0 ) ) ==
         UPNP_INVALID_SOCKET ) {
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL,
-                             MSERV, __FILE__, __LINE__,
-                             "Error in socket operation !!!\n" );
-             )
-            shutdown( listenfd, SD_BOTH );
+        UpnpPrintf( UPNP_CRITICAL,
+            MSERV, __FILE__, __LINE__,
+            "Error in socket operation !!!\n" );
+        shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
         return UPNP_E_OUTOF_SOCKET;
     }
@@ -711,11 +679,10 @@ get_miniserver_sockets( MiniServerSockArray * out,
     if( bind( miniServerStopSock, ( struct sockaddr * )&serverAddr,
               sizeof( serverAddr ) ) == UPNP_SOCKETERROR ) {
 
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL,
-                             MSERV, __FILE__, __LINE__,
-                             "Error in binding localhost!!!\n" );
-             )
-            shutdown( listenfd, SD_BOTH );
+        UpnpPrintf( UPNP_CRITICAL,
+            MSERV, __FILE__, __LINE__,
+            "Error in binding localhost!!!\n" );
+        shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
         shutdown( miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniServerStopSock );
@@ -877,11 +844,9 @@ StopMiniServer( void )
 
     sock = socket( AF_INET, SOCK_DGRAM, 0 );
     if( sock == UPNP_INVALID_SOCKET ) {
-        DBGONLY( UpnpPrintf
-                 ( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                   "SSDP_SERVER:StopSSDPServer: Error in socket operation !!!\n" );
-             )
-            return 0;
+        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            "SSDP_SERVER:StopSSDPServer: Error in socket operation !!!\n" );
+        return 0;
     }
 
     while( gMServState != MSERV_IDLE ) {

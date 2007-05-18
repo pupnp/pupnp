@@ -182,13 +182,16 @@ void free_URL_list(URL_list * list);
 *		uri_type *in ;	URI object
 *
 *	Description : Function useful in debugging for printing a parsed uri.
-*		Compiled out with DBGONLY macro. 
 *
 *	Return : void ;
 *
 *	Note :
 ************************************************************************/
-DBGONLY(void print_uri( uri_type *in);)
+#ifdef DEBUG
+void print_uri(uri_type *in);
+#else
+static inline void print_uri(uri_type *in) {}
+#endif
 
 /************************************************************************
 *	Function :	print_token
@@ -197,13 +200,16 @@ DBGONLY(void print_uri( uri_type *in);)
 *		token * in ;	
 *
 *	Description : Function useful in debugging for printing a token.
-*		Compiled out with DBGONLY macro. 
 *
 *	Return : void ;
 *
 *	Note :
 ************************************************************************/
-void print_token(  token * in);
+#ifdef DEBUG
+void print_token(token *in);
+#else
+static inline void print_token(token * in) {}
+#endif
 
 /************************************************************************
 *	Function :	token_string_casecmp

@@ -43,22 +43,22 @@
 #include "unixutil.h"
 
 #ifdef WIN32
- #include <ws2tcpip.h>
- #include <winsock2.h>
+	#include <ws2tcpip.h>
+	#include <winsock2.h>
 #endif
 
-#define MSGTYPE_SHUTDOWN		0
+#define MSGTYPE_SHUTDOWN	0
 #define MSGTYPE_ADVERTISEMENT	1
-#define MSGTYPE_REPLY			2
+#define MSGTYPE_REPLY		2
 
 /************************************************************************
-* Function : advertiseAndReplyThread									
-*																	
-* Parameters:														
-*		IN void *data: Structure containing the search request
+* Function : advertiseAndReplyThread
 *
-* Description:														
-*	This function is a wrapper function to reply the search request 
+* Parameters:
+*	IN void *data: Structure containing the search request
+*
+* Description:
+*	This function is a wrapper function to reply the search request
 *	coming from the control point.
 *
 * Returns: void *
@@ -81,11 +81,11 @@ advertiseAndReplyThread( IN void *data )
 }
 
 /************************************************************************
-* Function : ssdp_handle_device_request									
-*																	
+* Function : ssdp_handle_device_request
+*
 * Parameters:														
-*		IN http_message_t* hmsg: SSDP search request from the control point
-*		IN struct sockaddr_in* dest_addr: The address info of control point
+*	IN http_message_t* hmsg: SSDP search request from the control point
+*	IN struct sockaddr_in* dest_addr: The address info of control point
 *
 * Description:														
 *	This function handles the search request. It do the sanity checks of
@@ -135,30 +135,30 @@ ssdp_handle_device_request( IN http_message_t * hmsg,
         return;                 // bad ST header
     }
 
-    HandleLock(  );
+    HandleLock();
     // device info
     if( GetDeviceHandleInfo( &handle, &dev_info ) != HND_DEVICE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return;                 // no info found
     }
     maxAge = dev_info->MaxAge;
-    HandleUnlock(  );
+    HandleUnlock();
 
-    DBGONLY( UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-                         "ssdp_handle_device_request with Cmd %d SEARCH\n",
-                         event.Cmd );
-             UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-                         "MAX-AGE     =  %d\n", maxAge );
-             UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-                         "MX     =  %d\n", event.Mx );
-             UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-                         "DeviceType   =  %s\n", event.DeviceType );
-             UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-                         "DeviceUuid   =  %s\n", event.UDN );
-             UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
-                         "ServiceType =  %s\n", event.ServiceType ); )
+    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+        "ssdp_handle_device_request with Cmd %d SEARCH\n",
+        event.Cmd );
+    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+        "MAX-AGE     =  %d\n", maxAge );
+    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+        "MX     =  %d\n", event.Mx );
+    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+        "DeviceType   =  %s\n", event.DeviceType );
+    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+        "DeviceUuid   =  %s\n", event.UDN );
+    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+        "ServiceType =  %s\n", event.ServiceType );
 
-        threadArg =
+    threadArg =
         ( SsdpSearchReply * ) malloc( sizeof( SsdpSearchReply ) );
 
     if( threadArg == NULL ) {
@@ -185,7 +185,7 @@ ssdp_handle_device_request( IN http_message_t * hmsg,
         mx = 1;
     }
 
-    replyTime = rand(  ) % mx;
+    replyTime = rand() % mx;
 
     TimerThreadSchedule( &gTimerThread, replyTime, REL_SEC, &job,
                          SHORT_TERM, NULL );
@@ -220,9 +220,9 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
 
     ReplySock = socket( AF_INET, SOCK_DGRAM, 0 );
     if( ReplySock == UPNP_INVALID_SOCKET ) {
-        DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                             "SSDP_LIB: New Request Handler:"
-                             "Error in socket operation !!!\n" ) );
+        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            "SSDP_LIB: New Request Handler:"
+            "Error in socket operation !!!\n" );
 
         return UPNP_E_OUTOF_SOCKET;
     }
@@ -247,13 +247,12 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
         // So, NUM_COPY has been changed from 2 to 1.
         NumCopy = 0;
         while( NumCopy < NUM_COPY ) {
-            DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                                 ">>> SSDP SEND >>>\n%s\n",
-                                 *( RqPacket + Index ) );
-                 )
-                rc = sendto( ReplySock, *( RqPacket + Index ),
-                             strlen( *( RqPacket + Index ) ),
-                             0, ( struct sockaddr * )DestAddr, socklen );
+            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                ">>> SSDP SEND >>>\n%s\n",
+                *( RqPacket + Index ) );
+            rc = sendto( ReplySock, *( RqPacket + Index ),
+                         strlen( *( RqPacket + Index ) ),
+                         0, ( struct sockaddr * )DestAddr, socklen );
             imillisleep( SSDP_PAUSE );
             ++NumCopy;
         }
@@ -388,11 +387,10 @@ DeviceAdvertisement( IN char *DevType,
     char *msgs[3];
     int ret_code;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                         "In function SendDeviceAdvertisemenrt\n" );
-         )
+    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+        "In function SendDeviceAdvertisemenrt\n" );
 
-        DestAddr.sin_family = AF_INET;
+    DestAddr.sin_family = AF_INET;
     DestAddr.sin_addr.s_addr = inet_addr( SSDP_IP );
     DestAddr.sin_port = htons( SSDP_PORT );
 
@@ -783,11 +781,11 @@ DeviceShutdown( IN char *DevType,
                              Mil_Usn, Location, Duration, &msgs[0] );
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                         "In function DeviceShutdown\n" ); )
-        // both root and sub-devices need to send these two messages
-        CreateServicePacket( MSGTYPE_SHUTDOWN, Udn, Udn,
-                             Location, Duration, &msgs[1] );
+    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+        "In function DeviceShutdown\n" );
+    // both root and sub-devices need to send these two messages
+    CreateServicePacket( MSGTYPE_SHUTDOWN, Udn, Udn,
+                         Location, Duration, &msgs[1] );
 
     sprintf( Mil_Usn, "%s::%s", Udn, DevType );
     CreateServicePacket( MSGTYPE_SHUTDOWN, DevType, Mil_Usn,

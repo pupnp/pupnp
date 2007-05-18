@@ -637,13 +637,13 @@ get_file_info( IN const char *filename,
 
     rc = get_content_type( filename, &info->content_type );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "file info: %s, length: %lld, last_mod=%s readable=%d\n",
-                         filename, (long long)info->file_length,
-                         asctime( gmtime( &info->last_modified ) ),
-                         info->is_readable ); )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "file info: %s, length: %lld, last_mod=%s readable=%d\n",
+        filename, (long long)info->file_length,
+        asctime( gmtime( &info->last_modified ) ),
+        info->is_readable );
 
-        return rc;
+    return rc;
 }
 
 /************************************************************************
@@ -1586,14 +1586,11 @@ http_RecvPostMessage( http_parser_t * parser,
                 }
             } else if( num_read == 0 ) {
                 if( ok_on_close ) {
-                    DBGONLY( UpnpPrintf
-                             ( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                               "<<< (RECVD) <<<\n%s\n-----------------\n",
-                               parser->msg.msg.buf );
-                             //print_http_headers( &parser->msg );
-                         )
-
-                        parser->position = POS_COMPLETE;
+                    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                        "<<< (RECVD) <<<\n%s\n-----------------\n",
+                        parser->msg.msg.buf );
+                    print_http_headers( &parser->msg );
+                    parser->position = POS_COMPLETE;
                 } else {
                     // partial msg
                     parser->http_error_code = HTTP_BAD_REQUEST; // or response
@@ -1760,10 +1757,9 @@ web_server_callback( IN http_parser_t * parser,
         }
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "webserver: request processed...\n" );
-         )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "webserver: request processed...\n" );
 
-        membuffer_destroy( &headers );
+    membuffer_destroy( &headers );
     membuffer_destroy( &filename );
 }

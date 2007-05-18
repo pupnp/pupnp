@@ -82,15 +82,6 @@ typedef enum priority {LOW_PRIORITY,
  #define DEBUG 1
 #endif
 
-//DEBUGGING
-#ifndef WIN32
- #ifdef DEBUG
-  #define DBGONLY(x) x
- #else
-  #define DBGONLY(x)
- #endif
-#endif
-
 #include "LinkedList.h"
 #include <sys/timeb.h>
 #include "FreeList.h"

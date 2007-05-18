@@ -91,14 +91,14 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
-     int AdvertiseAndReply( IN int AdFlag,
-                            IN UpnpDevice_Handle Hnd,
-                            IN enum SsdpSearchType SearchType,
-                            IN struct sockaddr_in *DestAddr,
-                            IN char *DeviceType,
-                            IN char *DeviceUDN,
-                            IN char *ServiceType,
-                            int Exp )
+int AdvertiseAndReply( IN int AdFlag,
+                       IN UpnpDevice_Handle Hnd,
+                       IN enum SsdpSearchType SearchType,
+                       IN struct sockaddr_in *DestAddr,
+                       IN char *DeviceType,
+                       IN char *DeviceUDN,
+                       IN char *ServiceType,
+                       int Exp )
 {
     int i,
       j;
@@ -115,14 +115,14 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
     const DOMString tmpStr;
     char SERVER[200];
 
-    DBGONLY( const DOMString dbgStr;
-             UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside AdvertiseAndReply with AdFlag = %d\n",
-                         AdFlag ); )
+    const DOMString dbgStr;
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside AdvertiseAndReply with AdFlag = %d\n",
+        AdFlag );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     defaultExp = SInfo->MaxAge;
@@ -139,24 +139,20 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
     // parse the device list and send advertisements/replies 
     for( i = 0;; i++ ) {
 
-        DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "Entering new device list with i = %d\n\n",
-                             i );
-             )
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "Entering new device list with i = %d\n\n", i );
 
-            tmpNode = ixmlNodeList_item( SInfo->DeviceList, i );
+        tmpNode = ixmlNodeList_item( SInfo->DeviceList, i );
         if( tmpNode == NULL ) {
-            DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                                 "Exiting new device list with i = %d\n\n",
-                                 i );
-                 )
-                break;
+            UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+                "Exiting new device list with i = %d\n\n", i );
+            break;
         }
 
-        DBGONLY( dbgStr = ixmlNode_getNodeName( tmpNode );
+        dbgStr = ixmlNode_getNodeName( tmpNode );
                  UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "Extracting device type once for %s\n",
-                             dbgStr ); )
+                     "Extracting device type once for %s\n",
+                     dbgStr );
             // extract device type 
             ixmlNodeList_free( nodeList );
         nodeList = NULL;
@@ -167,15 +163,14 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
             continue;
         }
 
-        DBGONLY( dbgStr = ixmlNode_getNodeName( tmpNode );
-                 UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "Extracting UDN for %s\n", dbgStr ); )
+        dbgStr = ixmlNode_getNodeName( tmpNode );
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "Extracting UDN for %s\n", dbgStr );
 
-            DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                                 "Extracting device type\n" );
-             )
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "Extracting device type\n" );
 
-            tmpNode2 = ixmlNodeList_item( nodeList, 0 );
+        tmpNode2 = ixmlNodeList_item( nodeList, 0 );
         if( tmpNode2 == NULL ) {
             continue;
         }
@@ -184,11 +179,10 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
             continue;
         }
 
-        DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "Extracting device type \n" );
-             )
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "Extracting device type \n" );
 
-            tmpStr = ixmlNode_getNodeValue( textNode );
+        tmpStr = ixmlNode_getNodeValue( textNode );
         if( tmpStr == NULL ) {
             continue;
         }
@@ -198,47 +192,41 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
             continue;
         }
 
-        DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "Extracting device type = %s\n", devType );
-                 if( tmpNode == NULL ) {
-                 UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "TempNode is NULL\n" );}
-                 dbgStr = ixmlNode_getNodeName( tmpNode );
-                 UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "Extracting UDN for %s\n", dbgStr ); )
-            // extract UDN 
-            ixmlNodeList_free( nodeList );
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "Extracting device type = %s\n", devType );
+        if( tmpNode == NULL ) {
+            UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+                "TempNode is NULL\n" );
+	}
+        dbgStr = ixmlNode_getNodeName( tmpNode );
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "Extracting UDN for %s\n", dbgStr );
+        // extract UDN 
+        ixmlNodeList_free( nodeList );
         nodeList = NULL;
         nodeList = ixmlElement_getElementsByTagName( ( IXML_Element * )
                                                      tmpNode, "UDN" );
         if( nodeList == NULL ) {
-
-            DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__,
-                                 __LINE__, "UDN not found!!!\n" );
-                 )
+            UpnpPrintf( UPNP_CRITICAL, API, __FILE__,
+                __LINE__, "UDN not found!!!\n" );
                 continue;
         }
         tmpNode2 = ixmlNodeList_item( nodeList, 0 );
         if( tmpNode2 == NULL ) {
-
-            DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__,
-                                 __LINE__, "UDN not found!!!\n" );
-                 )
-                continue;
+            UpnpPrintf( UPNP_CRITICAL, API, __FILE__,
+                __LINE__, "UDN not found!!!\n" );
+            continue;
         }
         textNode = ixmlNode_getFirstChild( tmpNode2 );
         if( textNode == NULL ) {
-
-            DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__,
-                                 __LINE__, "UDN not found!!!\n" );
-                 )
-                continue;
+            UpnpPrintf( UPNP_CRITICAL, API, __FILE__,
+                __LINE__, "UDN not found!!!\n" );
+            continue;
         }
         tmpStr = ixmlNode_getNodeValue( textNode );
         if( tmpStr == NULL ) {
-            DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-                                 "UDN not found!!!!\n" );
-                 )
+            UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+                "UDN not found!!!!\n" );
                 continue;
         }
         strcpy( UDNstr, tmpStr );
@@ -246,9 +234,8 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
             continue;
         }
 
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "Sending UDNStr = %s \n", UDNstr );
-             )
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "Sending UDNStr = %s \n", UDNstr );
             if( AdFlag ) {
             // send the device advertisement 
             if( AdFlag == 1 ) {
@@ -278,22 +265,16 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
                     {
                         if( DeviceUDN != NULL && strlen( DeviceUDN ) != 0 ) {
                             if( strcasecmp( DeviceUDN, UDNstr ) ) {
-                                DBGONLY( UpnpPrintf
-                                         ( UPNP_INFO, API, __FILE__,
-                                           __LINE__,
-                                           "DeviceUDN=%s and search "
-                                           "UDN=%s did not match\n",
-                                           UDNstr, DeviceUDN );
-                                     )
+                                UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+                                    "DeviceUDN=%s and search "
+                                    "UDN=%s did not match\n",
+                                    UDNstr, DeviceUDN );
                                     break;
                             } else {
-                                DBGONLY( UpnpPrintf
-                                         ( UPNP_INFO, API, __FILE__,
-                                           __LINE__,
-                                           "DeviceUDN=%s and search "
-                                           "UDN=%s MATCH\n", UDNstr,
-                                           DeviceUDN );
-                                     )
+                                UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+                                    "DeviceUDN=%s and search "
+                                    "UDN=%s MATCH\n", UDNstr,
+                                    DeviceUDN );
                                     SendReply( DestAddr, devType, 0,
                                                UDNstr, SInfo->DescURL,
                                                defaultExp, 0 );
@@ -306,25 +287,18 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
                         if( !strncasecmp
                             ( DeviceType, devType,
                               strlen( DeviceType ) ) ) {
-                            DBGONLY( UpnpPrintf
-                                     ( UPNP_INFO, API, __FILE__, __LINE__,
-                                       "DeviceType=%s and search devType=%s MATCH\n",
-                                       devType, DeviceType );
-                                 )
-                                SendReply( DestAddr, devType, 0, UDNstr,
-                                           SInfo->DescURL, defaultExp, 1 );
-                        }
-
-                        DBGONLY(
-                                    else
-                                    UpnpPrintf( UPNP_INFO, API, __FILE__,
-                                                __LINE__,
-                                                "DeviceType=%s and search devType=%s"
-                                                " DID NOT MATCH\n",
-                                                devType, DeviceType );
-                             )
-
-                            break;
+                            UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+                                "DeviceType=%s and search devType=%s MATCH\n",
+                                devType, DeviceType );
+                            SendReply( DestAddr, devType, 0, UDNstr,
+                                       SInfo->DescURL, defaultExp, 1 );
+                        } else {
+                            UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+                                "DeviceType=%s and search devType=%s"
+                                " DID NOT MATCH\n",
+                                devType, DeviceType );
+			}
+                        break;
                     }
                 default:
                     break;
@@ -332,11 +306,10 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
         }
         // send service advertisements for services corresponding 
         // to the same device 
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "Sending service Advertisement\n" );
-             )
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "Sending service Advertisement\n" );
 
-            tmpNode = ixmlNodeList_item( SInfo->ServiceList, i );
+        tmpNode = ixmlNodeList_item( SInfo->ServiceList, i );
         if( tmpNode == NULL ) {
             continue;
         }
@@ -345,10 +318,9 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
         nodeList = ixmlElement_getElementsByTagName( ( IXML_Element * )
                                                      tmpNode, "service" );
         if( nodeList == NULL ) {
-            DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                                 "Service not found 3\n" );
-                 )
-                continue;
+            UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+                "Service not found 3\n" );
+            continue;
         }
         for( j = 0;; j++ ) {
             tmpNode = ixmlNodeList_item( nodeList, j );
@@ -357,15 +329,11 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
 
             ixmlNodeList_free( tmpNodeList );
             tmpNodeList = NULL;
-            tmpNodeList = ixmlElement_getElementsByTagName( ( IXML_Element
-                                                              * ) tmpNode,
-                                                            "serviceType" );
-
+            tmpNodeList = ixmlElement_getElementsByTagName(
+                ( IXML_Element *)tmpNode, "serviceType" );
             if( tmpNodeList == NULL ) {
-                DBGONLY( UpnpPrintf
-                         ( UPNP_CRITICAL, API, __FILE__, __LINE__,
-                           "ServiceType not found \n" );
-                     )
+                UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+                    "ServiceType not found \n" );
                     continue;
             }
             tmpNode2 = ixmlNodeList_item( tmpNodeList, 0 );
@@ -386,19 +354,16 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
                 continue;
             }
 
-            DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                                 "ServiceType = %s\n", servType );
-                 )
-                if( AdFlag ) {
+            UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+                "ServiceType = %s\n", servType );
+            if( AdFlag ) {
                 if( AdFlag == 1 ) {
                     ServiceAdvertisement( UDNstr, servType,
                                           SInfo->DescURL, Exp );
-                } else          // AdFlag == -1
-                {
+                } else {         // AdFlag == -1
                     ServiceShutdown( UDNstr, servType,
                                      SInfo->DescURL, Exp );
                 }
-
             } else {
                 switch ( SearchType ) {
                     case SSDP_ALL:
@@ -433,11 +398,10 @@ CLIENTONLY( SOCKET gSsdpReqSocket = 0;
         ixmlNodeList_free( nodeList );
         nodeList = NULL;
     }
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting AdvertiseAndReply : \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting AdvertiseAndReply : \n" );
 
-        HandleUnlock(  );
+    HandleUnlock(  );
 
     return UPNP_E_SUCCESS;
 
@@ -733,20 +697,18 @@ start_event_handler( void *Data )
     if( status == PARSE_FAILURE ) {
         if( parser->msg.method != HTTPMETHOD_NOTIFY ||
             !parser->valid_ssdp_notify_hack ) {
-            DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                                 "SSDP recvd bad msg code = %d\n",
-                                 status );
-                 )
-                // ignore bad msg, or not enuf mem
-                goto error_handler;
+            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                "SSDP recvd bad msg code = %d\n",
+                status );
+            // ignore bad msg, or not enuf mem
+            goto error_handler;
         }
         // valid notify msg
     } else if( status != PARSE_SUCCESS ) {
-        DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                             "SSDP recvd bad msg code = %d\n", status );
-             )
+        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            "SSDP recvd bad msg code = %d\n", status );
 
-            goto error_handler;
+        goto error_handler;
     }
     // check msg
     if( !valid_ssdp_msg( &parser->msg ) ) {
@@ -863,21 +825,18 @@ readFromSSDPSocket( SOCKET socket )
     if( byteReceived > 0 ) {
 
         requestBuf[byteReceived] = '\0';
-        DBGONLY( UpnpPrintf( UPNP_INFO, SSDP,
+        UpnpPrintf( UPNP_INFO, SSDP,
                              __FILE__, __LINE__,
                              "Received response !!!  "
                              "%s From host %s \n",
                              requestBuf,
                              inet_ntoa( clientAddr.sin_addr ) );
-             )
 
-            DBGONLY( UpnpPrintf( UPNP_PACKET, SSDP,
-                                 __FILE__, __LINE__,
-                                 "Received multicast packet:"
-                                 "\n %s\n", requestBuf );
-             )
-            //add thread pool job to handle request
-            if( data != NULL ) {
+        UpnpPrintf( UPNP_PACKET, SSDP, __FILE__, __LINE__,
+            "Received multicast packet:"
+            "\n %s\n", requestBuf );
+        //add thread pool job to handle request
+        if( data != NULL ) {
             data->parser.msg.msg.length += byteReceived;
             // null-terminate
             data->parser.msg.msg.buf[byteReceived] = 0;
@@ -891,7 +850,6 @@ readFromSSDPSocket( SOCKET socket )
                 free_ssdp_event_handler_data( data );
             }
         }
-
     } else {
         free_ssdp_event_handler_data( data );
     }
@@ -926,9 +884,9 @@ get_ssdp_sockets( MiniServerSockArray * out )
 
     CLIENTONLY( if( ( ssdpReqSock = socket( AF_INET, SOCK_DGRAM, 0 ) )
                     == UPNP_INVALID_SOCKET ) {
-                DBGONLY( UpnpPrintf( UPNP_CRITICAL,
-                                     SSDP, __FILE__, __LINE__,
-                                     "Error in socket operation !!!\n" ); )
+                UpnpPrintf( UPNP_CRITICAL,
+                    SSDP, __FILE__, __LINE__,
+                    "Error in socket operation !!!\n" );
                 return UPNP_E_OUTOF_SOCKET;}
                 setsockopt( ssdpReqSock,
                             IPPROTO_IP,
@@ -938,11 +896,10 @@ get_ssdp_sockets( MiniServerSockArray * out )
 
         if( ( ssdpSock = socket( AF_INET, SOCK_DGRAM, 0 ) )
             == UPNP_INVALID_SOCKET ) {
-            DBGONLY( UpnpPrintf( UPNP_CRITICAL,
-                                 SSDP, __FILE__, __LINE__,
-                                 "Error in socket operation !!!\n" );
-                 )
-                CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
+            UpnpPrintf( UPNP_CRITICAL,
+                SSDP, __FILE__, __LINE__,
+                "Error in socket operation !!!\n" );
+            CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
             CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
             return UPNP_E_OUTOF_SOCKET;
         }
@@ -951,11 +908,10 @@ get_ssdp_sockets( MiniServerSockArray * out )
     if( setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEADDR,
                     ( char * )&onOff, sizeof( onOff ) ) != 0 ) {
 
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL,
-                             SSDP, __FILE__, __LINE__,
-                             "Error in set reuse addr !!!\n" );
-             )
-            CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
+        UpnpPrintf( UPNP_CRITICAL,
+            SSDP, __FILE__, __LINE__,
+            "Error in set reuse addr !!!\n" );
+        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
         shutdown( ssdpSock, SD_BOTH );
         UpnpCloseSocket( ssdpSock );
@@ -966,11 +922,10 @@ get_ssdp_sockets( MiniServerSockArray * out )
     if( setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEPORT,
                     ( char * )&onOff, sizeof( onOff ) ) != 0 ) {
 
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL,
-                             SSDP, __FILE__, __LINE__,
-                             "Error in set reuse port !!!\n" );
-             )
-            CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
+        UpnpPrintf( UPNP_CRITICAL,
+            SSDP, __FILE__, __LINE__,
+            "Error in set reuse port !!!\n" );
+        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
         shutdown( ssdpSock, SD_BOTH );
         UpnpCloseSocket( ssdpSock );
@@ -986,10 +941,9 @@ get_ssdp_sockets( MiniServerSockArray * out )
     if( bind
         ( ssdpSock, ( struct sockaddr * )&ssdpAddr,
           sizeof( ssdpAddr ) ) != 0 ) {
-        DBGONLY( UpnpPrintf
-                 ( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-                   "Error in binding !!!\n" );
-             )
+        UpnpPrintf( UPNP_CRITICAL,
+            SSDP, __FILE__, __LINE__,
+            "Error in binding !!!\n" );
             shutdown( ssdpSock, SD_BOTH );
         UpnpCloseSocket( ssdpSock );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
@@ -1003,11 +957,10 @@ get_ssdp_sockets( MiniServerSockArray * out )
     if( setsockopt( ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                     ( char * )&ssdpMcastAddr,
                     sizeof( struct ip_mreq ) ) != 0 ) {
-        DBGONLY( UpnpPrintf
-                 ( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-                   "Error in joining" " multicast group !!!\n" );
-             )
-            shutdown( ssdpSock, SD_BOTH );
+        UpnpPrintf( UPNP_CRITICAL,
+            SSDP, __FILE__, __LINE__,
+            "Error in joining" " multicast group !!!\n" );
+        shutdown( ssdpSock, SD_BOTH );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
         UpnpCloseSocket( ssdpSock );
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
@@ -1019,8 +972,8 @@ get_ssdp_sockets( MiniServerSockArray * out )
     addr.s_addr = inet_addr(LOCAL_HOST);
     if (setsockopt(ssdpSock, IPPROTO_IP, IP_MULTICAST_IF,
                    (char *)&addr, sizeof addr) != 0) {
-        DBGONLY(UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                            "Couldn't set multicast interface.\n" ));
+        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            "Couldn't set multicast interface.\n" );
         /* This is probably not a critical error, so let's continue. */
     }
 
@@ -1029,11 +982,10 @@ get_ssdp_sockets( MiniServerSockArray * out )
                 IP_MULTICAST_TTL, &ttl, sizeof( ttl ) );
     if( setsockopt( ssdpSock, SOL_SOCKET, SO_BROADCAST,
                     ( char * )&option, sizeof( option ) ) != 0 ) {
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL,
-                             SSDP, __FILE__, __LINE__,
-                             "Error in setting broadcast !!!\n" );
-             )
-            shutdown( ssdpSock, SD_BOTH );
+        UpnpPrintf( UPNP_CRITICAL,
+            SSDP, __FILE__, __LINE__,
+            "Error in setting broadcast !!!\n" );
+        shutdown( ssdpSock, SD_BOTH );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
         UpnpCloseSocket( ssdpSock );
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );

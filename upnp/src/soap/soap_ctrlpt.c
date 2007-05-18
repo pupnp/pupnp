@@ -619,11 +619,10 @@ SoapSendAction( IN char *action_url,
 
     err_code = UPNP_E_OUTOF_MEMORY; // default error
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Inside SoapSendAction():" );
-         )
-        // init
-        membuffer_init( &request );
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "Inside SoapSendAction():" );
+    // init
+    membuffer_init( &request );
     membuffer_init( &responsename );
 
     // print action
@@ -642,12 +641,12 @@ SoapSendAction( IN char *action_url,
         goto error_handler;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "path=%.*s, hostport=%.*s\n",
-                         (int)url.pathquery.size,
-                         url.pathquery.buff,
-                         (int)url.hostport.text.size,
-                         url.hostport.text.buff ); )
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "path=%.*s, hostport=%.*s\n",
+        (int)url.pathquery.size,
+        url.pathquery.buff,
+        (int)url.hostport.text.size,
+        url.hostport.text.buff );
 
     xml_start_len = strlen( xml_start );
     xml_end_len = strlen( xml_end );
@@ -771,11 +770,10 @@ SoapSendActionEx( IN char *action_url,
 
     err_code = UPNP_E_OUTOF_MEMORY; // default error
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Inside SoapSendActionEx():" );
-         )
-        // init
-        membuffer_init( &request );
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "Inside SoapSendActionEx():" );
+    // init
+    membuffer_init( &request );
     membuffer_init( &responsename );
 
     // header string
@@ -799,12 +797,12 @@ SoapSendActionEx( IN char *action_url,
         goto error_handler;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "path=%.*s, hostport=%.*s\n",
-                         (int)url.pathquery.size,
-                         url.pathquery.buff,
-                         (int)url.hostport.text.size,
-                         url.hostport.text.buff ); )
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "path=%.*s, hostport=%.*s\n",
+        (int)url.pathquery.size,
+        url.pathquery.buff,
+        (int)url.hostport.text.size,
+        url.hostport.text.buff );
 
     xml_start_len = strlen( xml_start );
     xml_body_start_len = strlen( xml_body_start );

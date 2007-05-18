@@ -89,25 +89,26 @@
 #define DEFAULT_TIMEOUT 1801
 
 
-
 extern ithread_mutex_t GlobalClientSubscribeMutex;
 
-//Lock the subscription
+// Lock the subscription
 #define SubscribeLock() \
-	DBGONLY(UpnpPrintf(UPNP_INFO,GENA,__FILE__,__LINE__, \
-	"Trying Subscribe Lock"));  \
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
+		"Trying Subscribe Lock");  \
 	ithread_mutex_lock(&GlobalClientSubscribeMutex); \
-	DBGONLY(UpnpPrintf(UPNP_INFO,GENA,__FILE__,__LINE__,"Subscribe Lock");)
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
+		"Subscribe Lock");
 
-//Unlock the subscription
+// Unlock the subscription
 #define SubscribeUnlock() \
-	DBGONLY(UpnpPrintf(UPNP_INFO,GENA,__FILE__,__LINE__, \
-		"Trying Subscribe UnLock")); \
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
+		"Trying Subscribe UnLock"); \
 	ithread_mutex_unlock(&GlobalClientSubscribeMutex); \
-	DBGONLY(UpnpPrintf(UPNP_INFO,GENA,__FILE__,__LINE__,"Subscribe UnLock");)
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
+		"Subscribe UnLock");
 
 
-//Structure to send NOTIFY message to all subscribed control points
+// Structure to send NOTIFY message to all subscribed control points
 typedef struct NOTIFY_THREAD_STRUCT {
   char * headers;
   DOMString propertySet;

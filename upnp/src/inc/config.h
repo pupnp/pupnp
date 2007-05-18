@@ -304,27 +304,6 @@
 
 
 
-/** @name DBGONLY
-          The {\bf DBGONLY} macro allows code to be marked so that it 
-          is only included in the DEBUG build and not the release.  To
-          use this macro, put the code inside of the parentheses:
-
-          {\tt DBGONLY(int i;)}
-
-          This will cause a declaration of the integer {\tt i} only
-          in the debug build.
-  */
-
-//@{
-#ifdef DEBUG
-#	define DBGONLY(x) x
-#else
-#	define DBGONLY(x)  
-#endif
-//@}
-
-
-
 #undef  EXCLUDE_WEB_SERVER 
 #undef  EXCLUDE_MINISERVER 
 #ifdef  INTERNAL_WEB_SERVER
@@ -367,5 +346,4 @@
 
 //@}
 #endif
-
 

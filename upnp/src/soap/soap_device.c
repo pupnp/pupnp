@@ -344,11 +344,10 @@ get_action_node( IN IXML_Document * TempDoc,
     int ret_code = -1;          // error, by default
     IXML_NodeList *nl = NULL;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "get_action_node(): node name =%s\n ", NodeName );
-         )
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "get_action_node(): node name =%s\n ", NodeName );
 
-        * RespNode = NULL;
+    *RespNode = NULL;
 
     // Got the Envelope node here
     EnvpNode = ixmlNode_getFirstChild( ( IXML_Node * ) TempDoc );
@@ -738,15 +737,15 @@ send_action_response( IN SOCKINFO * info,
                                  xml_response, strlen( xml_response ),
                                  end_body, strlen( end_body ) );
 
-    DBGONLY( if( ret_code != 0 ) {
-             UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Failed to send response: err code = %d\n",
-                         ret_code );}
-     )
+    if( ret_code != 0 ) {
+        UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+            "Failed to send response: err code = %d\n",
+            ret_code );
+    }
 
-        err_code = 0;
+    err_code = 0;
 
-  error_handler:
+error_handler:
     ixmlFreeDOMString( xml_response );
     membuffer_destroy( &headers );
     if( err_code != 0 ) {
@@ -814,14 +813,13 @@ get_var_name( IN IXML_Document * TempDoc,
     Temp = ixmlNode_getNodeValue( VarNode );
     linecopy( VarName, Temp );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Received query for variable  name %s\n",
-                         VarName );
-         )
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "Received query for variable  name %s\n",
+        VarName );
 
-        ret_val = 0;            // success
+    ret_val = 0;            // success
 
-  error_handler:
+error_handler:
     return ret_val;
 }
 
@@ -878,8 +876,8 @@ handle_query_variable( IN SOCKINFO * info,
     // send event
     soap_event_callback( UPNP_CONTROL_GET_VAR_REQUEST, &variable, cookie );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Return from callback for var request\n" ) );
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "Return from callback for var request\n" );
 
     // validate, and handle result
     if( variable.CurrentVal == NULL ) {
@@ -968,8 +966,8 @@ handle_invoke_action( IN SOCKINFO * info,
     action.ErrCode = UPNP_E_SUCCESS;
     action.CtrlPtIPAddr = info->foreign_ip_addr;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Calling Callback\n" ) );
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+                         "Calling Callback\n" );
 
     soap_event_callback( UPNP_CONTROL_ACTION_REQUEST, &action, cookie );
 

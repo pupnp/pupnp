@@ -104,9 +104,8 @@ genaCallback( IN http_parser_t * parser,
                     // subscribe
                     gena_process_subscription_request( info, request );}
 
-                    DBGONLY( UpnpPrintf
-                             ( UPNP_ALL, GENA, __FILE__, __LINE__,
-                               "got subscription request\n" ); )
+                    UpnpPrintf( UPNP_ALL, GENA, __FILE__, __LINE__,
+                        "got subscription request\n" );
              )
             }
             else

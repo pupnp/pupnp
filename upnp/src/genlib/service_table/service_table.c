@@ -443,31 +443,47 @@ FindServiceControlURLPath( service_table * table,
 *
 *	Note :
 ************************************************************************/
-DBGONLY( void printService( service_info * service, Dbg_Level level,
-                            Dbg_Module module ) {
-         if( service ) {
-         if( service->serviceType )
-         UpnpPrintf( level, module, __FILE__, __LINE__,
-                     "serviceType: %s\n", service->serviceType );
-         if( service->serviceId )
-         UpnpPrintf( level, module, __FILE__, __LINE__, "serviceId: %s\n",
-                     service->serviceId ); if( service->SCPDURL )
-         UpnpPrintf( level, module, __FILE__, __LINE__, "SCPDURL: %s\n",
-                     service->SCPDURL ); if( service->controlURL )
-         UpnpPrintf( level, module, __FILE__, __LINE__, "controlURL: %s\n",
-                     service->controlURL ); if( service->eventURL )
-         UpnpPrintf( level, module, __FILE__, __LINE__, "eventURL: %s\n",
-                     service->eventURL ); if( service->UDN )
-         UpnpPrintf( level, module, __FILE__, __LINE__, "UDN: %s\n\n",
-                     service->UDN ); if( service->active )
-         UpnpPrintf( level, module, __FILE__, __LINE__,
-                     "Service is active\n" );
-         else
-         UpnpPrintf( level, module, __FILE__, __LINE__,
-                     "Service is inactive\n" );}
-         }
-
- )
+#ifdef DEBUG
+void printService(
+    service_info *service,
+    Dbg_Level level,
+    Dbg_Module module )
+{
+    if( service ) {
+        if( service->serviceType ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "serviceType: %s\n", service->serviceType );
+        }
+        if( service->serviceId ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "serviceId: %s\n", service->serviceId );
+        }
+	if( service->SCPDURL ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "SCPDURL: %s\n", service->SCPDURL );
+        }
+	if( service->controlURL ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "controlURL: %s\n", service->controlURL );
+        }
+	if( service->eventURL ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "eventURL: %s\n", service->eventURL );
+        }
+	if( service->UDN ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "UDN: %s\n\n", service->UDN );
+        }
+	if( service->active ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+            "Service is active\n" );
+        } else {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+            "Service is inactive\n" );
+        }
+    }
+}
+#endif
 
 /************************************************************************
 *	Function :	printServiceList
@@ -484,36 +500,48 @@ DBGONLY( void printService( service_info * service, Dbg_Level level,
 *
 *	Note :
 ************************************************************************/
-    DBGONLY( void printServiceList( service_info * service,
-                                    Dbg_Level level,
-                                    Dbg_Module module ) {
-             while( service ) {
-             if( service->serviceType )
-             UpnpPrintf( level, module, __FILE__, __LINE__,
-                         "serviceType: %s\n", service->serviceType );
-             if( service->serviceId )
-             UpnpPrintf( level, module, __FILE__, __LINE__,
-                         "serviceId: %s\n", service->serviceId );
-             if( service->SCPDURL )
-             UpnpPrintf( level, module, __FILE__, __LINE__,
-                         "SCPDURL: %s\n", service->SCPDURL );
-             if( service->controlURL )
-             UpnpPrintf( level, module, __FILE__, __LINE__,
-                         "controlURL: %s\n", service->controlURL );
-             if( service->eventURL )
-             UpnpPrintf( level, module, __FILE__, __LINE__,
-                         "eventURL: %s\n", service->eventURL );
-             if( service->UDN )
-             UpnpPrintf( level, module, __FILE__, __LINE__, "UDN: %s\n\n",
-                         service->UDN ); if( service->active )
-             UpnpPrintf( level, module, __FILE__, __LINE__,
-                         "Service is active\n" );
-             else
-             UpnpPrintf( level, module, __FILE__, __LINE__,
-                         "Service is inactive\n" );
-             service = service->next;}
-             }
- )
+#ifdef DEBUG
+void printServiceList(
+    service_info * service,
+    Dbg_Level level,
+    Dbg_Module module )
+{
+    while( service ) {
+        if( service->serviceType ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "serviceType: %s\n", service->serviceType );
+        }
+        if( service->serviceId ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "serviceId: %s\n", service->serviceId );
+        }
+        if( service->SCPDURL ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "SCPDURL: %s\n", service->SCPDURL );
+        }
+        if( service->controlURL ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "controlURL: %s\n", service->controlURL );
+        }
+        if( service->eventURL ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "eventURL: %s\n", service->eventURL );
+        }
+        if( service->UDN ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "UDN: %s\n\n", service->UDN );
+        }
+        if( service->active ) {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "Service is active\n" );
+        } else {
+            UpnpPrintf( level, module, __FILE__, __LINE__,
+                "Service is inactive\n" );
+        }
+        service = service->next;
+    }
+}
+#endif
 
 /************************************************************************
 *	Function :	printServiceTable
@@ -531,15 +559,18 @@ DBGONLY( void printService( service_info * service, Dbg_Level level,
 *
 *	Note :
 ************************************************************************/
-    DBGONLY( void printServiceTable( service_table * table,
-                                     Dbg_Level level,
-                                     Dbg_Module module ) {
-             UpnpPrintf( level, module, __FILE__, __LINE__,
-                         "URL_BASE: %s\n", table->URLBase );
-             UpnpPrintf( level, module, __FILE__, __LINE__,
-                         "Services: \n" );
-             printServiceList( table->serviceList, level, module );}
- )
+#ifdef DEBUG
+void printServiceTable(
+    service_table * table,
+    Dbg_Level level,
+    Dbg_Module module )
+{
+    UpnpPrintf( level, module, __FILE__, __LINE__,
+        "URL_BASE: %s\n", table->URLBase );
+    UpnpPrintf( level, module, __FILE__, __LINE__,
+        "Services: \n" );
+    printServiceList( table->serviceList, level, module );}
+#endif
 
 /************************************************************************
 *	Function :	freeService
@@ -554,7 +585,7 @@ DBGONLY( void printService( service_info * service, Dbg_Level level,
 *
 *	Note :
 ************************************************************************/
-     void freeService( service_info * in )
+void freeService( service_info * in )
 {
     if( in ) {
         if( in->serviceType )
@@ -849,12 +880,10 @@ getServiceList( IXML_Node * node,
                     ( !
                       ( current->controlURL =
                         resolve_rel_url( URLBase, tempDOMString ) ) ) ) {
-                    DBGONLY( UpnpPrintf
-                             ( UPNP_INFO, GENA, __FILE__, __LINE__,
-                               "BAD OR MISSING CONTROL URL" ) );
-                    DBGONLY( UpnpPrintf
-                             ( UPNP_INFO, GENA, __FILE__, __LINE__,
-                               "CONTROL URL SET TO NULL IN SERVICE INFO" ) );
+                    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                        "BAD OR MISSING CONTROL URL" );
+                    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                        "CONTROL URL SET TO NULL IN SERVICE INFO" );
                     current->controlURL = NULL;
                     fail = 0;
                 }
@@ -870,12 +899,10 @@ getServiceList( IXML_Node * node,
                     ( !
                       ( current->eventURL =
                         resolve_rel_url( URLBase, tempDOMString ) ) ) ) {
-                    DBGONLY( UpnpPrintf
-                             ( UPNP_INFO, GENA, __FILE__, __LINE__,
-                               "BAD OR MISSING EVENT URL" ) );
-                    DBGONLY( UpnpPrintf
-                             ( UPNP_INFO, GENA, __FILE__, __LINE__,
-                               "EVENT URL SET TO NULL IN SERVICE INFO" ) );
+                    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                        "BAD OR MISSING EVENT URL" );
+                    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                        "EVENT URL SET TO NULL IN SERVICE INFO" );
                     current->eventURL = NULL;
                     fail = 0;
                 }

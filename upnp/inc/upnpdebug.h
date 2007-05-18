@@ -33,10 +33,8 @@
 #ifndef UPNP_DEBUG_H
 #define UPNP_DEBUG_H 
 
+#include "upnp.h"
 #include "upnpconfig.h"
-
-// Function declarations only if debug compiled into the library
-#if UPNP_HAVE_DEBUG
 
 #include <stdio.h>
 
@@ -70,7 +68,17 @@ extern "C" {
  *  \end{itemize}
  */
 
-typedef enum Upnp_Module {SSDP,SOAP,GENA,TPOOL,MSERV,DOM,API, HTTP} Dbg_Module;
+typedef enum Upnp_Module {
+	SSDP,
+	SOAP,
+	GENA,
+	TPOOL,
+	MSERV,
+	DOM,
+	API,
+	HTTP
+} Dbg_Module;
+
 //@{
 typedef enum Upnp_LogLevel_e {
 	UPNP_CRITICAL,
@@ -81,7 +89,7 @@ typedef enum Upnp_LogLevel_e {
 //@}
 
 // for backward compatibility
-#define Dbg_Level	Upnp_LogLevel
+#define Dbg_Level Upnp_LogLevel
 
 
 /**
@@ -102,22 +110,30 @@ typedef enum Upnp_LogLevel_e {
  *	-1 : If fails
  *	UPNP_E_SUCCESS : if success
  ***************************************************************************/
+#ifdef DEBUG
 int UpnpInitLog();
+#else
+static inline int UpnpInitLog() { return UPNP_E_SUCCESS; }
+#endif
 
 // for backward compatibility
-#define InitLog		UpnpInitLog
+#define InitLog	UpnpInitLog
 
 
 /***************************************************************************
  * Function : UpnpSetLogLevel
  *				
- * Parameters:	void
+ * Parameters: Upnp_LogLevel log_level
  *
  * Description:							
  *	This functions set the log level (see {\tt Upnp_LogLevel}
  * Returns: void
  ***************************************************************************/
-void UpnpSetLogLevel (Upnp_LogLevel);
+#ifdef DEBUG
+void UpnpSetLogLevel(Upnp_LogLevel log_level);
+#else
+static inline void UpnpSetLogLevel(Upnp_LogLevel log_level) {}
+#endif
 
 
 /***************************************************************************
@@ -129,7 +145,11 @@ void UpnpSetLogLevel (Upnp_LogLevel);
  *	This functions closes the log files
  * Returns: void
  ***************************************************************************/
+#ifdef DEBUG
 void UpnpCloseLog();
+#else
+static inline void UpnpCloseLog() {}
+#endif
 
 // for backward compatibility
 #define CloseLog	UpnpCloseLog
@@ -149,7 +169,15 @@ void UpnpCloseLog();
  *	per the requested banner	
  * Returns: void
  ***************************************************************************/
-void UpnpSetLogFileNames (const char* ErrFileName, const char* InfoFileName);
+#ifdef DEBUG
+void UpnpSetLogFileNames(
+	const char *ErrFileName,
+	const char *InfoFileName);
+#else
+static inline void UpnpSetLogFileNames(
+	const char *ErrFileName,
+	const char *InfoFileName) {}
+#endif
 
 // for backward compatibility
 #define SetLogFileNames		UpnpSetLogFileNames
@@ -171,10 +199,43 @@ void UpnpSetLogFileNames (const char* ErrFileName, const char* InfoFileName);
  *	NULL : if the module is turn off for debug 
  *	else returns the right file descriptor
  ***************************************************************************/
-FILE* UpnpGetDebugFile (Upnp_LogLevel level, Dbg_Module module);
+#ifdef DEBUG
+FILE *UpnpGetDebugFile(Upnp_LogLevel level, Dbg_Module module);
+#else
+static inline FILE *UpnpGetDebugFile(Upnp_LogLevel level, Dbg_Module module)
+{
+	return NULL;
+}
+#endif
 
 // for backward compatibility
 #define GetDebugFile	UpnpGetDebugFile
+
+
+/***************************************************************************
+ * Function : DebugAtThisLevel					
+ *									
+ * Parameters:			
+ *	IN Dbg_Level DLevel: The level of the debug logging. It will decide 
+ *		whether debug statement will go to standard output, 
+ *		or any of the log files.
+ *	IN Dbg_Module Module: debug will go in the name of this module
+ *					
+ * Description:					
+ *	This functions returns true if debug output should be done in this
+ *	module.
+ *
+ * Returns: int
+ ***************************************************************************/
+#ifdef DEBUG
+int DebugAtThisLevel(
+	IN Upnp_LogLevel DLevel,
+	IN Dbg_Module Module);
+#else
+static inline int DebugAtThisLevel(
+	IN Upnp_LogLevel DLevel,
+	IN Dbg_Module Module) { return 0; }
+#endif
 
 
 /***************************************************************************
@@ -198,6 +259,7 @@ FILE* UpnpGetDebugFile (Upnp_LogLevel level, Dbg_Module module);
  *	debug statement is coming
  * Returns: void
  ***************************************************************************/ 
+#ifdef DEBUG
 void UpnpPrintf (Upnp_LogLevel DLevel, Dbg_Module Module,
 		 const char* DbgFileName, int DbgLineNo,
 		 const char* FmtStr,
@@ -206,6 +268,15 @@ void UpnpPrintf (Upnp_LogLevel DLevel, Dbg_Module Module,
 	__attribute__((format (__printf__, 5, 6)))
 #endif
 ;
+#else
+static inline void UpnpPrintf(
+	Upnp_LogLevel DLevel,
+	Dbg_Module Module,
+	const char* DbgFileName,
+	int DbgLineNo,
+	const char* FmtStr,
+	...) {}
+#endif
 
 
 /***************************************************************************
@@ -222,8 +293,19 @@ void UpnpPrintf (Upnp_LogLevel DLevel, Dbg_Module Module,
  *	per the requested banner			
  * Returns: void
  ***************************************************************************/
-void UpnpDisplayBanner (FILE *fd,
-			const char** lines, size_t size, int starlength);
+#ifdef DEBUG
+void UpnpDisplayBanner(
+	FILE *fd,
+	const char **lines,
+	size_t size,
+	int starlength);
+#else
+static inline void UpnpDisplayBanner(
+	FILE *fd,
+	const char **lines,
+	size_t size,
+	int starlength) {}
+#endif
 
 
 /***************************************************************************
@@ -240,19 +322,23 @@ void UpnpDisplayBanner (FILE *fd,
  *		debug statement is coming to the log file
  * Returns: void
  ***************************************************************************/
-void UpnpDisplayFileAndLine (FILE *fd, const char *DbgFileName, int DbgLineNo);
-
+#ifdef DEBUG
+void UpnpDisplayFileAndLine(
+	FILE *fd,
+	const char *DbgFileName,
+	int DbgLineNo);
+#else
+static inline void UpnpDisplayFileAndLine(
+	FILE *fd,
+	const char *DbgFileName,
+	int DbgLineNo) {}
+#endif
 
 //@}
-
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // UPNP_HAVE_DEBUG
-
 #endif // UPNP_DEBUG_H
-
-
 

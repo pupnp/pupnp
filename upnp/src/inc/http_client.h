@@ -214,37 +214,101 @@ EXTERN_C ssize_t readLine(int fd, char *out, int max, int *timeout);
 EXTERN_C int remove_dots(char * in, int size);
 
 
-DBGONLY(EXTERN_C void print_http_request(http_message
-					 *message,Dbg_Level DLevel,
-					 Dbg_Module Module,char *DbgFileName,
-					 int DbgLineNo););
+#ifdef DEBUG
+EXTERN_C void print_http_request(
+	http_message *message,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo);
+#else
+static inline void print_http_request(
+	http_message *message,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo) {}
+#endif
 
-DBGONLY(EXTERN_C void print_http_response(http_message *message,
-					  Dbg_Level DLevel,
-					  Dbg_Module Module,char *DbgFileName,
-					  int DbgLineNo););
+#ifdef DEBUG
+EXTERN_C void print_http_response(
+	http_message *message,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo);
+#else
+static inline void print_http_response(
+	http_message *message,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo) {}
+#endif
 
-DBGONLY(EXTERN_C void print_token(  token * in,
-				    Dbg_Level DLevel,
-				    Dbg_Module Module,
-				    char *DbgFileName,
-				    int DbgLineNo););
+#ifdef DEBUG
+EXTERN_C void print_token(
+	token *in,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo);
+#else
+static inline void print_token(
+	token *in,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo) {}
+#endif
 
-DBGONLY(EXTERN_C void print_status_line(http_status *in,
-					Dbg_Level DLevel,
-					Dbg_Module Module,
-					char *DbgFileName,
-					int DbgLineNo););
+#ifdef DEBUG
+EXTERN_C void print_status_line(
+	http_status *in,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo);
+#else
+static inline void print_status_line(
+	http_status *in,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo) {}
+#endif
 
-DBGONLY(EXTERN_C void print_request_line(http_request *in,
-					 Dbg_Level DLevel,
-					 Dbg_Module Module,
-					 char *DbgFileName,int DbgLineNo));
+#ifdef DEBUG
+EXTERN_C void print_request_line(
+	http_request *in,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo);
+#else
+static inline void print_request_line(
+	http_request *in,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo) {}
+#endif
 
-DBGONLY(EXTERN_C void print_uri( uri_type *in,
-				 Dbg_Level DLevel,
-				 Dbg_Module Module,
-				 char *DbgFileName,
-				 int DbgLineNo););
+#ifdef DEBUG
+EXTERN_C void print_uri(
+	uri_type *in,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo);
+#else
+static inline void print_uri(
+	uri_type *in,
+	Dbg_Level DLevel,
+	Dbg_Module Module,
+	char *DbgFileName,
+	int DbgLineNo) {}
+#endif
 
 #endif
+

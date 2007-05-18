@@ -96,8 +96,16 @@ struct Handle_Info
 extern ithread_mutex_t GlobalHndMutex;
 Upnp_Handle_Type GetHandleInfo(int Hnd, struct Handle_Info **HndInfo); 
 
-#define HandleLock()  DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"Trying Lock")); ithread_mutex_lock(&GlobalHndMutex); DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"LOCK"));
-#define HandleUnlock() DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"Trying Unlock")); ithread_mutex_unlock(&GlobalHndMutex); DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"Unlock"));
+#define HandleLock()  \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying Lock"); \
+	ithread_mutex_lock(&GlobalHndMutex); \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "LOCK");
+
+#define HandleUnlock() \
+	UpnpPrintf(UPNP_INFO, API,__FILE__, __LINE__, "Trying Unlock"); \
+	ithread_mutex_unlock(&GlobalHndMutex); \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Unlock");
+
 Upnp_Handle_Type GetClientHandleInfo(int *client_handle_out, 
                                      struct Handle_Info **HndInfo);
 Upnp_Handle_Type GetDeviceHandleInfo(int *device_handle_out, 

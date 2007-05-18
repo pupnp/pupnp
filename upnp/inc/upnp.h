@@ -52,9 +52,6 @@
 #endif
 #include "ixml.h"
 #include "upnpconfig.h"
-#if UPNP_HAVE_DEBUG
-	#include "upnpdebug.h"
-#endif
 
 
 #ifdef WIN32
@@ -488,6 +485,8 @@
 #ifndef INOUT
 #define INOUT
 #endif
+
+#include "upnpdebug.h"
 
 enum UpnpOpenFileMode{UPNP_READ, UPNP_WRITE};
 

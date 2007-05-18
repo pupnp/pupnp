@@ -367,16 +367,20 @@ free_URL_list( URL_list * list )
 *		uri_type *in ;	URI object
 *
 *	Description : Function useful in debugging for printing a parsed uri.
-*		Compiled out with DBGONLY macro. 
 *
 *	Return : void ;
 *
 *	Note :
 ************************************************************************/
-DBGONLY( void print_uri( uri_type * in ) {
-         print_token( &in->scheme );
-         print_token( &in->hostport.text );
-         print_token( &in->pathquery ); print_token( &in->fragment );} )
+#ifdef DEBUG
+void print_uri( uri_type *in )
+{
+    print_token( &in->scheme );
+    print_token( &in->hostport.text );
+    print_token( &in->pathquery );
+    print_token( &in->fragment );
+}
+#endif
 
 /************************************************************************
 *	Function :	print_token
@@ -385,20 +389,23 @@ DBGONLY( void print_uri( uri_type * in ) {
 *		token * in ;	token
 *
 *	Description : Function useful in debugging for printing a token.
-*		Compiled out with DBGONLY macro. 
 *
 *	Return : void ;
 *
 *	Note :
 ************************************************************************/
-DBGONLY( void print_token( token * in ) {
-         int i = 0;
-         printf( "Token Size : %"PRIzu"\n\'", in->size );
-         for( i = 0; i < in->size; i++ ) {
-         putchar( in->buff[i] );}
-         putchar( '\'' ); putchar( '\n' );}
-
- )
+#ifdef DEBUG
+void print_token(token * in)
+{
+    int i = 0;
+    printf( "Token Size : %"PRIzu"\n\'", in->size );
+    for( i = 0; i < in->size; i++ ) {
+        putchar( in->buff[i] );
+    }
+    putchar( '\'' );
+    putchar( '\n' );
+}
+#endif
 
 /************************************************************************
 *	Function :	token_string_casecmp
@@ -417,8 +424,10 @@ DBGONLY( void print_token( token * in ) {
 *
 *	Note :
 ************************************************************************/
-    int token_string_casecmp( token * in1,
-                              char *in2 ) {
+int token_string_casecmp(
+    token * in1,
+    char *in2 )
+{
     int in2_length = strlen( in2 );
 
     if( in1->size != in2_length )
@@ -790,9 +799,8 @@ remove_dots( char *in,
         return UPNP_E_OUTOF_MEMORY;
 
     Segments[0] = NULL;
-    DBGONLY( UpnpPrintf
-             ( UPNP_ALL, API, __FILE__, __LINE__,
-               "REMOVE_DOTS: before: %s\n", in ) );
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "REMOVE_DOTS: before: %s\n", in );
     while( ( copyFrom < max ) && ( *copyFrom != '?' )
            && ( *copyFrom != '#' ) ) {
 
@@ -837,9 +845,8 @@ remove_dots( char *in,
     }
     ( *copyTo ) = 0;
     free( Segments );
-    DBGONLY( UpnpPrintf
-             ( UPNP_ALL, API, __FILE__, __LINE__,
-               "REMOVE_DOTS: after: %s\n", in ) );
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "REMOVE_DOTS: after: %s\n", in );
     return UPNP_E_SUCCESS;
 }
 

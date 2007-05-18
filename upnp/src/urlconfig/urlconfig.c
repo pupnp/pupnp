@@ -168,11 +168,10 @@ calc_descURL( IN const char *ipPortStr,
     strcat( descURL, ipPortStr );
     strcat( descURL, alias );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "desc url: %s\n", descURL );
-         )
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "desc url: %s\n", descURL );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 }
 
 /************************************************************************
@@ -408,18 +407,16 @@ configure_urlbase( INOUT IXML_Document * doc,
         goto error_handler;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "desc url: %s\n", docURL );
-         )
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "doc = %s\n", xml_str );
-         )
-        // store in web server
-        err_code =
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "desc url: %s\n", docURL );
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "doc = %s\n", xml_str );
+    // store in web server
+    err_code =
         web_server_set_alias( new_alias, xml_str, strlen( xml_str ),
                               last_modified );
 
-  error_handler:
+error_handler:
     free( root_path );
     free( new_alias );
 

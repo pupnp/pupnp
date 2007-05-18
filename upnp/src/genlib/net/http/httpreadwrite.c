@@ -40,25 +40,25 @@
 #include <assert.h>
 #include <stdarg.h>
 #ifndef UPNP_USE_BCBPP
-#ifndef UPNP_USE_MSVCPP
- #include <inttypes.h>
- #include <stdint.h>
-#endif
+	#ifndef UPNP_USE_MSVCPP
+		#include <inttypes.h>
+		#include <stdint.h>
+	#endif
 #endif
 
 #ifndef WIN32
- #include <arpa/inet.h>
- #include <fcntl.h>
- #include <netinet/in.h>
- #include <sys/types.h>
- #include <sys/socket.h>
- #include <sys/time.h>
- #include <sys/wait.h>
- #include <unistd.h>
- #include <sys/utsname.h>
+	#include <arpa/inet.h>
+	#include <fcntl.h>
+	#include <netinet/in.h>
+	#include <sys/types.h>
+	#include <sys/socket.h>
+	#include <sys/time.h>
+	#include <sys/wait.h>
+	#include <unistd.h>
+	#include <sys/utsname.h>
 #else
- #include <winsock2.h>
- #include <malloc.h>
+	#include <winsock2.h>
+	#include <malloc.h>
 #endif
 #include "unixutil.h"
 #include "upnp.h"
@@ -74,17 +74,17 @@
 #define DOSOCKET_WRITE	0
 
 /************************************************************************
-* Function: http_FixUrl													
-*																		
-* Parameters:															
-*	IN uri_type* url ;			URL to be validated and fixed
+* Function: http_FixUrl	
+*
+* Parameters:
+*	IN uri_type* url ;		URL to be validated and fixed
 *	OUT uri_type* fixed_url ;	URL after being fixed.
-*																		
-* Description: Validates URL											
-*																		
-* Returns:																
-*	 UPNP_E_INVALID_URL													
-* 	 UPNP_E_SUCCESS														
+*
+* Description: Validates URL
+*
+* Returns:
+*	 UPNP_E_INVALID_URL
+* 	 UPNP_E_SUCCESS	
 ************************************************************************/
 int
 http_FixUrl( IN uri_type * url,
@@ -111,18 +111,18 @@ http_FixUrl( IN uri_type * url,
 }
 
 /************************************************************************
-* Function: http_FixStrUrl												
-*																		
-* Parameters:															
-*	IN char* urlstr ; 			Character string as a URL											
-*	IN int urlstrlen ; 			Length of the character string								
+* Function: http_FixStrUrl
+*
+* Parameters:
+*	IN char* urlstr ; 		Character string as a URL
+*	IN int urlstrlen ; 		Length of the character string
 *	OUT uri_type* fixed_url	;	Fixed and corrected URL
-*																		
-* Description: Parses URL and then validates URL						
-*																		
-* Returns:																
-*	 UPNP_E_INVALID_URL													
-* 	 UPNP_E_SUCCESS														
+*
+* Description: Parses URL and then validates URL
+*
+* Returns:
+*	 UPNP_E_INVALID_URL
+* 	 UPNP_E_SUCCESS	
 ************************************************************************/
 int
 http_FixStrUrl( IN char *urlstr,
@@ -139,18 +139,18 @@ http_FixStrUrl( IN char *urlstr,
 }
 
 /************************************************************************
-* Function: http_Connect												
-*																		
-* Parameters:															
-*	IN uri_type* destination_url ; URL containing destination information					
-*	OUT uri_type *url ;			   Fixed and corrected URL
-*																		
+* Function: http_Connect
+*
+* Parameters:
+*	IN uri_type* destination_url ;	URL containing destination information					
+*	OUT uri_type *url ;		Fixed and corrected URL
+*
 * Description: Gets destination address from URL and then connects to the 
 *	remote end
-*																		
-* Returns:																
-*	socket descriptor on sucess											
-*	UPNP_E_OUTOF_SOCKET													
+*
+* Returns:
+*	socket descriptor on sucess
+*	UPNP_E_OUTOF_SOCKET
 *	UPNP_E_SOCKET_CONNECT on error										
 ************************************************************************/
 int
@@ -169,10 +169,8 @@ http_Connect( IN uri_type * destination_url,
     if( connect( connfd, ( struct sockaddr * )&url->hostport.IPv4address,
                  sizeof( struct sockaddr_in ) ) == -1 ) {
 #ifdef WIN32
-		DBGONLY(
-			UpnpPrintf(UPNP_CRITICAL, HTTP, __FILE__, __LINE__,
-			"connect error: %d\n", WSAGetLastError());
-		)
+        UpnpPrintf(UPNP_CRITICAL, HTTP, __FILE__, __LINE__,
+            "connect error: %d\n", WSAGetLastError());
 #endif
         shutdown( connfd, SD_BOTH );
         UpnpCloseSocket( connfd );
@@ -183,23 +181,23 @@ http_Connect( IN uri_type * destination_url,
 }
 
 /************************************************************************
-* Function: http_RecvMessage											
-*																		
-* Parameters:															
-*	IN SOCKINFO *info ;					Socket information object
-*	OUT http_parser_t* parser,			HTTP parser object
-*	IN http_method_t request_method ;	HTTP request method					
-*	IN OUT int* timeout_secs ;			time out											
-*	OUT int* http_error_code ;			HTTP error code returned
-*																		
+* Function: http_RecvMessage
+*
+* Parameters:
+*	IN SOCKINFO *info ;			Socket information object
+*	OUT http_parser_t* parser,		HTTP parser object
+*	IN http_method_t request_method ;	HTTP request method
+*	IN OUT int* timeout_secs ;		time out
+*	OUT int* http_error_code ;		HTTP error code returned
+*
 * Description: Get the data on the socket and take actions based on the 
 *	read data to modify the parser objects buffer. If an error is reported 
 *	while parsing the data, the error code is passed in the http_errr_code 
 *	parameter
-*																		
-* Returns:																
-*	 UPNP_E_BAD_HTTPMSG													
-* 	 UPNP_E_SUCCESS														
+*
+* Returns:
+*	 UPNP_E_BAD_HTTPMSG
+* 	 UPNP_E_SUCCESS	
 ************************************************************************/
 int
 http_RecvMessage( IN SOCKINFO * info,
@@ -226,12 +224,10 @@ http_RecvMessage( IN SOCKINFO * info,
             status = parser_append( parser, buf, num_read );
 
             if( status == PARSE_SUCCESS ) {
-                DBGONLY( UpnpPrintf
-                         ( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                           "<<< (RECVD) <<<\n%s\n-----------------\n",
-                           parser->msg.msg.buf );
-                         //print_http_headers( &parser->msg );
-                       )
+                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                    "<<< (RECVD) <<<\n%s\n-----------------\n",
+                    parser->msg.msg.buf );
+                    print_http_headers( &parser->msg );
 
                 if( parser->content_length >
                     ( unsigned int )g_maxContentLength ) {
@@ -252,12 +248,10 @@ http_RecvMessage( IN SOCKINFO * info,
             }
         } else if( num_read == 0 ) {
             if( ok_on_close ) {
-                DBGONLY( UpnpPrintf
-                         ( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                           "<<< (RECVD) <<<\n%s\n-----------------\n",
-                           parser->msg.msg.buf );
-                         //print_http_headers( &parser->msg );
-                     )
+                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                    "<<< (RECVD) <<<\n%s\n-----------------\n",
+                    parser->msg.msg.buf );
+                    print_http_headers( &parser->msg );
 
                     return 0;
             } else {
@@ -273,29 +267,29 @@ http_RecvMessage( IN SOCKINFO * info,
 }
 
 /************************************************************************
-* Function: http_SendMessage											
-*																		
-* Parameters:															
+* Function: http_SendMessage
+*
+* Parameters:
 *	IN SOCKINFO *info ;		Socket information object
-*	IN OUT int * TimeOut ; 	time out value											
-*	IN const char* fmt, ...	 Pattern format to take actions upon								
-*																		
-* Description: Sends a message to the destination based on the			
-*	IN const char* fmt parameter										
-*	fmt types:															
-*		'f':	arg = const char * file name							
-*		'm':	arg1 = const char * mem_buffer; arg2= size_t buf_length	
-*	E.g.:																
-*		char *buf = "POST /xyz.cgi http/1.1\r\n\r\n";					
-*		char *filename = "foo.dat";										
-*		int status = http_SendMessage( tcpsock, "mf",					
-*					buf, strlen(buf),	// args for memory buffer		
-*					filename );			// arg for file					
-*																		
-* Returns:																
-*	UPNP_E_OUTOF_MEMORY													
-* 	UPNP_E_FILE_READ_ERROR												
-*	UPNP_E_SUCCESS														
+*	IN OUT int * TimeOut ;		time out value
+*	IN const char* fmt, ...	 Pattern format to take actions upon
+*
+* Description: Sends a message to the destination based on the
+*	IN const char* fmt parameter
+*	fmt types:
+*		'f':	arg = const char * file name
+*		'm':	arg1 = const char * mem_buffer; arg2= size_t buf_length
+*	E.g.:
+*		char *buf = "POST /xyz.cgi http/1.1\r\n\r\n";
+*		char *filename = "foo.dat";
+*		int status = http_SendMessage( tcpsock, "mf",
+*			buf, strlen(buf),	// args for memory buffer		
+*			filename );		// arg for file	
+*
+* Returns:
+*	UPNP_E_OUTOF_MEMORY
+* 	UPNP_E_FILE_READ_ERROR
+*	UPNP_E_SUCCESS
 ************************************************************************/
 int
 http_SendMessage( IN SOCKINFO * info,
@@ -455,11 +449,9 @@ http_SendMessage( IN SOCKINFO * info,
                     num_written = sock_write( info, file_buf, num_read,
                                               TimeOut );
 
-                    DBGONLY( UpnpPrintf
-                             ( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                               ">>> (SENT) >>>\n%.*s\n------------\n",
-                               ( int )num_written, file_buf );
-                         )
+                    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                        ">>> (SENT) >>>\n%.*s\n------------\n",
+                        ( int )num_written, file_buf );
 
                         //Send error nothing we can do
                         if( num_written != num_read ) {
@@ -485,10 +477,9 @@ http_SendMessage( IN SOCKINFO * info,
                 num_written = sock_write( info, buf, buf_length, TimeOut );
                 if( ( size_t ) num_written != buf_length )
                     goto end;
-                DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                                     ">>> (SENT) >>>\n%.*s\n------------\n",
-                                     ( int )buf_length, buf );
-                     )
+                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                    ">>> (SENT) >>>\n%.*s\n------------\n",
+                    ( int )buf_length, buf );
             }
         }
     }
@@ -500,24 +491,24 @@ http_SendMessage( IN SOCKINFO * info,
 }
 
 /************************************************************************
-* Function: http_RequestAndResponse										
-*																		
-* Parameters:															
-*	IN uri_type* destination ;		Destination URI object which contains 
-*									remote IP address among other elements
-*	IN const char* request ;		Request to be sent
-*	IN size_t request_length ;		Length of the request
+* Function: http_RequestAndResponse
+*
+* Parameters:
+*	IN uri_type* destination ;	Destination URI object which contains
+*					remote IP address among other elements
+*	IN const char* request ;	Request to be sent
+*	IN size_t request_length ;	Length of the request
 *	IN http_method_t req_method ;	HTTP Request method
-*	IN int timeout_secs ;			time out value
-*	OUT http_parser_t* response	;	Parser object to receive the repsonse
-*																		
-* Description: Initiates socket, connects to the destination, sends a	
-*	request and waits for the response from the remote end				
-*																		
-* Returns:																
-*	UPNP_E_SOCKET_ERROR													
-* 	UPNP_E_SOCKET_CONNECT												
-*	Error Codes returned by http_SendMessage							
+*	IN int timeout_secs ;		time out value
+*	OUT http_parser_t* response;	Parser object to receive the repsonse
+*
+* Description: Initiates socket, connects to the destination, sends a
+*	request and waits for the response from the remote end
+*
+* Returns:
+*	UPNP_E_SOCKET_ERROR
+* 	UPNP_E_SOCKET_CONNECT
+*	Error Codes returned by http_SendMessage
 *	Error Codes returned by http_RecvMessage							
 ************************************************************************/
 int
@@ -572,25 +563,24 @@ http_RequestAndResponse( IN uri_type * destination,
 }
 
 /************************************************************************
-*	Function :	http_Download
+* Function :	http_Download
 *
-*	Parameters :
-*		IN const char* url_str :	String as a URL
-*		IN int timeout_secs :		time out value
-*		OUT char** document :		buffer to store the document extracted
-*									from the donloaded message.
-*		OUT int* doc_length :		length of the extracted document
-*	    OUT char* content_type :	Type of content
+* Parameters :
+*	IN const char* url_str:	String as a URL
+*	IN int timeout_secs:	time out value
+*	OUT char** document:	buffer to store the document extracted
+*				from the donloaded message.
+*	OUT int* doc_length:	length of the extracted document
+*	OUT char* content_type:	Type of content
 *
-*	Description :	Download the document message and extract the document 
+* Description :	Download the document message and extract the document 
 *		from the message.
 *
-*	Return : int;
-*		UPNP_E_SUCCESS;
-*		UPNP_E_INVALID_URL;
-*			
+* Return : int;
+*	UPNP_E_SUCCESS;
+*	UPNP_E_INVALID_URL;
 *
-*	Note :
+* Note :
 ************************************************************************/
 int
 http_Download( IN const char *url_str,
@@ -601,10 +591,10 @@ http_Download( IN const char *url_str,
 {
     int ret_code;
     uri_type url;
-    char *msg_start,
-     *entity_start,
-     *hoststr,
-     *temp;
+    char *msg_start;
+    char *entity_start;
+    char *hoststr;
+    char *temp;
     http_parser_t response;
     size_t msg_length;
     size_t hostlen;
@@ -614,11 +604,9 @@ http_Download( IN const char *url_str,
     char *urlPath = alloca( strlen( url_str ) + 1 );
 
     //ret_code = parse_uri( (char*)url_str, strlen(url_str), &url );
-    DBGONLY( UpnpPrintf
-             ( UPNP_INFO, HTTP, __FILE__, __LINE__, "DOWNLOAD URL : %s\n",
-               url_str );
-         )
-        ret_code =
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__, "DOWNLOAD URL : %s\n",
+        url_str );
+    ret_code =
         http_FixStrUrl( ( char * )url_str, strlen( url_str ), &url );
     if( ret_code != UPNP_E_SUCCESS ) {
         return ret_code;
@@ -641,32 +629,26 @@ http_Download( IN const char *url_str,
     *temp = '\0';
     hostlen = strlen( hoststr );
     *temp = '/';
-    DBGONLY( UpnpPrintf
-             ( UPNP_INFO, HTTP, __FILE__, __LINE__,
-               "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
-         )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
 
-        ret_code = http_MakeMessage(
-            &request, 1, 1,
-            "Q" "s" "bcDCUc",
-            HTTPMETHOD_GET, url.pathquery.buff, url.pathquery.size,
-            "HOST: ",
-            hoststr, hostlen );
+    ret_code = http_MakeMessage(
+        &request, 1, 1,
+        "Q" "s" "bcDCUc",
+        HTTPMETHOD_GET, url.pathquery.buff, url.pathquery.size,
+        "HOST: ",
+        hoststr, hostlen );
     if( ret_code != 0 ) {
-        DBGONLY( UpnpPrintf
-                 ( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                   "HTTP Makemessage failed\n" );
-             )
+        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+            "HTTP Makemessage failed\n" );
             membuffer_destroy( &request );
         return ret_code;
     }
 
-    DBGONLY( UpnpPrintf
-             ( UPNP_INFO, HTTP, __FILE__, __LINE__,
-               "HTTP Buffer:\n %s\n----------END--------\n", request.buf );
-         )
-        // get doc msg
-        ret_code =
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "HTTP Buffer:\n %s\n----------END--------\n", request.buf );
+    // get doc msg
+    ret_code =
         http_RequestAndResponse( &url, request.buf, request.length,
                                  HTTPMETHOD_GET, timeout_secs, &response );
 
@@ -676,11 +658,8 @@ http_Download( IN const char *url_str,
         return ret_code;
     }
 
-    DBGONLY( UpnpPrintf
-             ( UPNP_INFO, HTTP, __FILE__, __LINE__, "Response\n" );
-         )
-        DBGONLY( print_http_headers( &response.msg );
-         )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__, "Response\n" );
+    print_http_headers( &response.msg );
 
         // optional content-type
         if( content_type ) {
@@ -771,13 +750,10 @@ MakePostMessage( const char *url_str,
     char *hoststr,
      *temp;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
                          "DOWNLOAD URL : %s\n", url_str );
-         )
-
-        ret_code =
+    ret_code =
         http_FixStrUrl( ( char * )url_str, strlen( url_str ), url );
-
     if( ret_code != UPNP_E_SUCCESS ) {
         return ret_code;
     }
@@ -799,9 +775,8 @@ MakePostMessage( const char *url_str,
     *temp = '\0';
     hostlen = strlen( hoststr );
     *temp = '/';
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
-         )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
 
     if( contentLength >= 0 ) {
         ret_code = http_MakeMessage(
@@ -833,19 +808,18 @@ MakePostMessage( const char *url_str,
     }
 
     if( ret_code != 0 ) {
-        DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                             "HTTP Makemessage failed\n" );
-             )
-            membuffer_destroy( request );
+        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+            "HTTP Makemessage failed\n" );
+        membuffer_destroy( request );
+
         return ret_code;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "HTTP Buffer:\n %s\n" "----------END--------\n",
-                         request->buf );
-         )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "HTTP Buffer:\n %s\n" "----------END--------\n",
+        request->buf );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 }
 
 /************************************************************************
@@ -1108,11 +1082,10 @@ MakeGetMessage( const char *url_str,
     char *hoststr,
      *temp;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "DOWNLOAD URL : %s\n", url_str );
-         )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "DOWNLOAD URL : %s\n", url_str );
 
-        ret_code =
+    ret_code =
         http_FixStrUrl( ( char * )url_str, strlen( url_str ), url );
 
     if( ret_code != UPNP_E_SUCCESS ) {
@@ -1136,9 +1109,8 @@ MakeGetMessage( const char *url_str,
     *temp = '\0';
     hostlen = strlen( hoststr );
     *temp = '/';
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
-         )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
 
     if( proxy_str ) {
         querystr = url_str;
@@ -1156,19 +1128,18 @@ MakeGetMessage( const char *url_str,
         hoststr, hostlen );
 
     if( ret_code != 0 ) {
-        DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                             "HTTP Makemessage failed\n" );
-             )
-            membuffer_destroy( request );
+        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+            "HTTP Makemessage failed\n" );
+        membuffer_destroy( request );
+
         return ret_code;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "HTTP Buffer:\n %s\n" "----------END--------\n",
-                         request->buf );
-         )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "HTTP Buffer:\n %s\n" "----------END--------\n",
+        request->buf );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 }
 
 /************************************************************************
@@ -1297,25 +1268,25 @@ ReadResponseLineAndHeaders( IN SOCKINFO * info,
 }
 
 /************************************************************************
-*	Function :	http_ReadHttpGet
+* Function :	http_ReadHttpGet
 *
-*	Parameters :
-*		IN void *Handle :			Handle to the HTTP get object
-*		IN OUT char *buf :			Buffer to get the read and parsed data
-*		IN OUT unsigned int *size :	Size of the buffer passed
-*		IN int timeout :			time out value
+* Parameters :
+*	IN void *Handle :		Handle to the HTTP get object
+*	IN OUT char *buf :		Buffer to get the read and parsed data
+*	IN OUT unsigned int *size :	Size of the buffer passed
+*	IN int timeout :		time out value
 *
-*	Description :	Parses already existing data, then gets new data.
+* Description :	Parses already existing data, then gets new data.
 *		Parses and extracts information from the new data.
 *
-*	Return : int ;
-*		UPNP_E_SUCCESS - On Sucess ;
-*		UPNP_E_INVALID_PARAM  - Invalid Parameter;
-*		UPNP_E_BAD_RESPONSE ;
-*		UPNP_E_BAD_HTTPMSG ;
-*		UPNP_E_CANCELED ;
+* Return : int ;
+*	UPNP_E_SUCCESS - On Sucess ;
+*	UPNP_E_INVALID_PARAM  - Invalid Parameter;
+*	UPNP_E_BAD_RESPONSE ;
+*	UPNP_E_BAD_HTTPMSG ;
+*	UPNP_E_CANCELED ;
 *
-*	Note :
+* Note :
 ************************************************************************/
 int
 http_ReadHttpGet( IN void *Handle,
@@ -1386,11 +1357,9 @@ http_ReadHttpGet( IN void *Handle,
             }
         } else if( num_read == 0 ) {
             if( ok_on_close ) {
-                DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                                     "<<< (RECVD) <<<\n%s\n-----------------\n",
-                                     handle->response.msg.msg.buf );
-                         //print_http_headers( &parser->msg );
-                     )
+                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                    "<<< (RECVD) <<<\n%s\n-----------------\n",
+                    handle->response.msg.msg.buf );
                     handle->response.position = POS_COMPLETE;
             } else {
                 // partial msg
@@ -1850,31 +1819,26 @@ http_MakeMessage( INOUT membuffer * buf,
     va_start( argp, fmt );
 
     while( ( c = *fmt++ ) != 0 ) {
-
-        if( c == 's' )          // C string
-        {
+        if( c == 's' ) {
+            // C string
             s = ( char * )va_arg( argp, char * );
-
             assert( s );
-
-            //DBGONLY(UpnpPrintf(UPNP_ALL,HTTP,__FILE__,__LINE__,"Adding a string : %s\n", s);) 
+            UpnpPrintf(UPNP_ALL,HTTP,__FILE__,__LINE__,"Adding a string : %s\n", s); 
             if( membuffer_append( buf, s, strlen( s ) ) != 0 ) {
                 goto error_handler;
             }
-        } else if( c == 'K' )   // Add Chunky header
-        {
+        } else if( c == 'K' ) {
+            // Add Chunky header
             if( membuffer_append
                 ( buf, "TRANSFER-ENCODING: chunked\r\n",
                   strlen( "Transfer-Encoding: chunked\r\n" ) ) != 0 ) {
                 goto error_handler;
             }
-        } else if( c == 'G' )   // Add Range header
-        {
+        } else if( c == 'G' ) {
+            // Add Range header
             struct SendInstruction *RespInstr;
-            RespInstr =
-                ( struct SendInstruction * )va_arg( argp,
-                                                    struct SendInstruction
-                                                    * );
+            RespInstr = (struct SendInstruction *)
+                va_arg( argp, struct SendInstruction *);
             assert( RespInstr );
             // connection header
             if( membuffer_append
@@ -1882,38 +1846,34 @@ http_MakeMessage( INOUT membuffer * buf,
                   strlen( RespInstr->RangeHeader ) ) != 0 ) {
                 goto error_handler;
             }
-
-        } else if( c == 'b' )   // mem buffer
-        {
+        } else if( c == 'b' ) {
+            // mem buffer
             s = ( char * )va_arg( argp, char * );
 
-            //DBGONLY(UpnpPrintf(UPNP_ALL,HTTP,__FILE__,__LINE__,"Adding a char Buffer starting with: %c\n", s[0]);)
+            UpnpPrintf(UPNP_ALL,HTTP,__FILE__,__LINE__,
+                "Adding a char Buffer starting with: %c\n", s[0]);
             assert( s );
             length = ( size_t ) va_arg( argp, size_t );
             if( membuffer_append( buf, s, length ) != 0 ) {
                 goto error_handler;
             }
         }
-
-        else if( c == 'c' )     // crlf
-        {
+        else if( c == 'c' ) {
+            // crlf
             if( membuffer_append( buf, "\r\n", 2 ) != 0 ) {
                 goto error_handler;
             }
         }
-
-        else if( c == 'd' )     // integer
-        {
+        else if( c == 'd' ) {
+            // integer
             num = ( int )va_arg( argp, int );
-
             sprintf( tempbuf, "%"PRIzu, num );
             if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
                 goto error_handler;
             }
         }
-
-        else if( c == 'h' )     // off_t
-        {
+        else if( c == 'h' ) {
+            // off_t
             bignum = ( off_t )va_arg( argp, off_t );
 
             sprintf( tempbuf, "%"PRId64, (int64_t)bignum );
@@ -1921,9 +1881,8 @@ http_MakeMessage( INOUT membuffer * buf,
                 goto error_handler;
             }
         }
-
-        else if( c == 't' || c == 'D' ) // date
-        {
+        else if( c == 't' || c == 'D' ) {
+            // date
             if( c == 'D' ) {
                 // header
                 start_str = "DATE: ";
@@ -1947,9 +1906,7 @@ http_MakeMessage( INOUT membuffer * buf,
             if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
                 goto error_handler;
             }
-        }
-
-        else if( c == 'C' ) {
+        } else if( c == 'C' ) {
             if( ( http_major_version > 1 ) ||
                 ( http_major_version == 1 && http_minor_version == 1 )
                  ) {
@@ -1959,9 +1916,7 @@ http_MakeMessage( INOUT membuffer * buf,
                     goto error_handler;
                 }
             }
-        }
-
-        else if( c == 'N' ) {
+        } else if( c == 'N' ) {
             // content-length header
             bignum = ( off_t )va_arg( argp, off_t );
 
@@ -1972,11 +1927,8 @@ http_MakeMessage( INOUT membuffer * buf,
                 "CONTENT-LENGTH: ", bignum ) != 0 ) {
                 goto error_handler;
             }
-        }
-
-        else if( c == 'S' || c == 'U' ) {
+        } else if( c == 'S' || c == 'U' ) {
             // SERVER or USER-AGENT header
-
             temp_str = ( c == 'S' ) ? "SERVER: " : "USER-AGENT: ";
             get_sdk_info( tempbuf );
             if (http_MakeMessage(
@@ -1985,34 +1937,25 @@ http_MakeMessage( INOUT membuffer * buf,
                 temp_str, tempbuf ) != 0 ) {
                 goto error_handler;
             }
-        }
-
-	else if( c == 'X' )          // C string
-        {
+        } else if( c == 'X' ) {
+            // C string
             s = ( char * )va_arg( argp, char * );
-
             assert( s );
-
             if( membuffer_append_str( buf, "X-User-Agent: ") != 0 ) {
                 goto error_handler;
             }
             if( membuffer_append( buf, s, strlen( s ) ) != 0 ) {
                 goto error_handler;
             }
-        }
-        
-        else if( c == 'R' ) {
+        } else if( c == 'R' ) {
             // response start line
             //   e.g.: 'HTTP/1.1 200 OK'
             //
-
             // code
             status_code = ( int )va_arg( argp, int );
-
             assert( status_code > 0 );
             sprintf( tempbuf, "HTTP/%d.%d %d ",
                      http_major_version, http_minor_version, status_code );
-
             // str
             status_msg = http_get_code_text( status_code );
             if (http_MakeMessage(
@@ -2022,40 +1965,31 @@ http_MakeMessage( INOUT membuffer * buf,
                 status_msg ) != 0 ) {
                 goto error_handler;
             }
-        }
-
-        else if( c == 'B' ) {
+        } else if( c == 'B' ) {
             // body of a simple reply
             // 
-
             status_code = ( int )va_arg( argp, int );
-
             sprintf( tempbuf, "%s%d %s%s",
                      "<html><body><h1>",
                      status_code, http_get_code_text( status_code ),
                      "</h1></body></html>" );
             bignum = strlen( tempbuf );
-
             if (http_MakeMessage(
                     buf, http_major_version, http_minor_version,
                     "NTcs",
                     bignum, // content-length
                     "text/html",  // content-type
-                    tempbuf ) != 0 )  // body
-            {
+                    tempbuf ) != 0 // body
+            ) {
                 goto error_handler;
             }
-        }
-
-        else if( c == 'Q' ) {
+        } else if( c == 'Q' ) {
             // request start line
             // GET /foo/bar.html HTTP/1.1\r\n
-
             method = ( http_method_t ) va_arg( argp, http_method_t );
             method_str = method_to_str( method );
             url_str = ( const char * )va_arg( argp, const char * );
             num = ( size_t )va_arg( argp, size_t );   // length of url_str
-
             if (http_MakeMessage(
                 buf, http_major_version, http_minor_version,
                 "ssbsdsdc",
@@ -2064,20 +1998,15 @@ http_MakeMessage( INOUT membuffer * buf,
                 " HTTP/", http_major_version, ".", http_minor_version ) != 0 ) {
                 goto error_handler;
             }
-        }
-
-        else if( c == 'q' ) {
+        } else if( c == 'q' ) {
             // request start line and HOST header
-
             method = ( http_method_t ) va_arg( argp, http_method_t );
-
             uri_ptr = ( uri_type * ) va_arg( argp, uri_type * );
             assert( uri_ptr );
             if( http_FixUrl( uri_ptr, &url ) != 0 ) {
                 error_code = UPNP_E_INVALID_URL;
                 goto error_handler;
             }
-
             if (http_MakeMessage(
                 buf, http_major_version, http_minor_version,
                 "Q" "sbc",
@@ -2085,28 +2014,23 @@ http_MakeMessage( INOUT membuffer * buf,
                 "HOST: ", url.hostport.text.buff, url.hostport.text.size ) != 0 ) {
                 goto error_handler;
             }
-        }
-
-        else if( c == 'T' ) {
+        } else if( c == 'T' ) {
             // content type header
             temp_str = ( const char * )va_arg( argp, const char * );    // type/subtype format
-
             if (http_MakeMessage(
                 buf, http_major_version, http_minor_version,
 		"ssc",
                 "CONTENT-TYPE: ", temp_str ) != 0 ) {
                 goto error_handler;
             }
-        }
-
-        else {
+        } else {
             assert( 0 );
         }
     }
 
     return 0;
 
-  error_handler:
+error_handler:
     va_end( argp );
     membuffer_destroy( buf );
     return error_code;
@@ -2174,18 +2098,15 @@ MakeGetMessageEx( const char *url_str,
      *temp;
 
     do {
-        DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                             "DOWNLOAD URL : %s\n", url_str );
-             )
+        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+            "DOWNLOAD URL : %s\n", url_str );
 
-            if( ( errCode = http_FixStrUrl( ( char * )url_str,
-                                            strlen( url_str ),
-                                            url ) ) != UPNP_E_SUCCESS ) {
+        if( ( errCode = http_FixStrUrl( ( char * )url_str,
+            strlen( url_str ), url ) ) != UPNP_E_SUCCESS ) {
             break;
         }
         // make msg
         membuffer_init( request );
-
         urlPath = alloca( strlen( url_str ) + 1 );
         if( !urlPath ) {
             errCode = UPNP_E_OUTOF_MEMORY;
@@ -2193,9 +2114,7 @@ MakeGetMessageEx( const char *url_str,
         }
 
         memset( urlPath, 0, strlen( url_str ) + 1 );
-
         strcpy( urlPath, url_str );
-
         hoststr = strstr( urlPath, "//" );
         if( hoststr == NULL ) {
             errCode = UPNP_E_INVALID_URL;
@@ -2212,13 +2131,11 @@ MakeGetMessageEx( const char *url_str,
         *temp = '\0';
         hostlen = strlen( hoststr );
         *temp = '/';
+        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+            "HOSTNAME : %s Length : %"PRIzu"\n",
+            hoststr, hostlen );
 
-        DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                             "HOSTNAME : %s Length : %"PRIzu"\n",
-                             hoststr, hostlen );
-             )
-
-            errCode = http_MakeMessage(
+        errCode = http_MakeMessage(
                 request, 1, 1,
                 "Q" "s" "bc" "GDCUc",
                 HTTPMETHOD_GET, url->pathquery.buff, url->pathquery.size,
@@ -2227,49 +2144,48 @@ MakeGetMessageEx( const char *url_str,
                 pRangeSpecifier );
 
         if( errCode != 0 ) {
-            DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                                 "HTTP Makemessage failed\n" );
-                 )
-                membuffer_destroy( request );
+            UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                "HTTP Makemessage failed\n" );
+            membuffer_destroy( request );
+
             return errCode;
         }
     } while( 0 );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "HTTP Buffer:\n %s\n" "----------END--------\n",
-                         request->buf );
-         )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "HTTP Buffer:\n %s\n" "----------END--------\n",
+        request->buf );
 
-        return errCode;
+    return errCode;
 }
 
 #define SIZE_RANGE_BUFFER 50
 
 /************************************************************************
-*	Function :	http_OpenHttpGetEx
+* Function :	http_OpenHttpGetEx
 *
-*	Parameters :
-*		IN const char *url_str :	String as a URL
-*		IN OUT void **Handle :		Pointer to buffer to store HTTP
-*									post handle
-*		IN OUT char **contentType :	Type of content
-*		OUT int *contentLength :	length of content
-*		OUT int *httpStatus :		HTTP status returned on receiving a
-*									response message
-*		IN int timeout :			time out value
+* Parameters :
+*	IN const char *url_str :	String as a URL
+*	IN OUT void **Handle :		Pointer to buffer to store HTTP
+*					post handle
+*	IN OUT char **contentType :	Type of content
+*	OUT int *contentLength :	length of content
+*	OUT int *httpStatus :		HTTP status returned on receiving a
+*					response message
+*	IN int timeout :			time out value
 *
-*	Description :	Makes the HTTP GET message, connects to the peer, 
+* Description :	Makes the HTTP GET message, connects to the peer, 
 *		sends the HTTP GET request, gets the response and parses the 
 *		response.
 *
-*	Return : int;
-*		UPNP_E_SUCCESS - On Success ;
-*		UPNP_E_INVALID_PARAM - Invalid Paramters ;
-*		UPNP_E_OUTOF_MEMORY ;
-*		UPNP_E_SOCKET_ERROR ;
-*		UPNP_E_BAD_RESPONSE ;
+* Return : int;
+*	UPNP_E_SUCCESS - On Success ;
+*	UPNP_E_INVALID_PARAM - Invalid Paramters ;
+*	UPNP_E_OUTOF_MEMORY ;
+*	UPNP_E_SOCKET_ERROR ;
+*	UPNP_E_BAD_RESPONSE ;
 *
-*	Note :
+* Note :
 *
 ************************************************************************/
 int

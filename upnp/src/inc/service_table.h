@@ -47,7 +47,7 @@ extern "C" {
 
 #define SID_SIZE  41
 
-DEVICEONLY(
+#ifdef INCLUDE_DEVICE_APIS
 
 typedef struct SUBSCRIPTION {
   Upnp_SID sid;
@@ -263,9 +263,17 @@ service_info * FindServiceControlURLPath( service_table *table,
 *
 *	Note :
 ************************************************************************/
-DBGONLY(void printService(service_info *service,Dbg_Level
-				   level,
-				   Dbg_Module module));
+#ifdef DEBUG
+void printService(
+	service_info *service,
+	Dbg_Level level,
+	Dbg_Module module);
+#else
+static inline void printService(
+	service_info *service,
+	Dbg_Level level,
+	Dbg_Module module) {}
+#endif
 
 /************************************************************************
 *	Function :	printServiceList
@@ -282,8 +290,17 @@ DBGONLY(void printService(service_info *service,Dbg_Level
 *
 *	Note :
 ************************************************************************/
-DBGONLY(void printServiceList(service_info *service,
-				       Dbg_Level level, Dbg_Module module));
+#ifdef DEBUG
+void printServiceList(
+	service_info *service,
+	Dbg_Level level,
+	Dbg_Module module);
+#else
+static inline void printServiceList(
+	service_info *service,
+	Dbg_Level level,
+	Dbg_Module module) {}
+#endif
 
 /************************************************************************
 *	Function :	printServiceTable
@@ -301,9 +318,17 @@ DBGONLY(void printServiceList(service_info *service,
 *
 *	Note :
 ************************************************************************/
-DBGONLY(void printServiceTable(service_table *
-					table,Dbg_Level
-					level,Dbg_Module module));
+#ifdef DEBUG
+void printServiceTable(
+	service_table *table,
+	Dbg_Level level,
+	Dbg_Module module);
+#else
+static inline void printServiceTable(
+	service_table *table,
+	Dbg_Level level,
+	Dbg_Module module) {}
+#endif
 
 /************************************************************************
 *	Function :	freeService
@@ -451,10 +476,11 @@ int getSubElement(const char *element_name, IXML_Node *node,
 		  IXML_Node **out);
 
 
-)	/* DEVICEONLY */
+#endif /* INCLUDE_DEVICE_APIS */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* _SERVICE_TABLE */
+

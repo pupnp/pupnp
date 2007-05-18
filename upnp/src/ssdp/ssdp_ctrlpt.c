@@ -536,11 +536,10 @@ SearchByTarget( IN int Mx,
     if( ReqBuf == NULL )
         return UPNP_E_OUTOF_MEMORY;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                         ">>> SSDP SEND >>>\n%s\n", ReqBuf );
-         )
+    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+        ">>> SSDP SEND >>>\n%s\n", ReqBuf );
 
-        timeTillRead = Mx;
+    timeTillRead = Mx;
 
     if( timeTillRead < MIN_SEARCH_TIME ) {
         timeTillRead = MIN_SEARCH_TIME;
@@ -589,26 +588,23 @@ SearchByTarget( IN int Mx,
 
     if( select( gSsdpReqSocket + 1, NULL, &wrSet, NULL, NULL )
         == UPNP_SOCKETERROR ) {
-        DBGONLY( if( errno == EBADF ) {
-                 UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                             "SSDP_LIB :RequestHandler:An invalid file descriptor"
-                             " was givenin one of the sets. \n" );}
-                 else
-                 if( errno == EINTR ) {
-                 UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                             "SSDP_LIB :RequestHandler:  A non blocked "
-                             "signal was caught.    \n" );}
-                 else
-                 if( errno == EINVAL ) {
-                 UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                             "SSDP_LIB :RequestHandler: n is negative.  \n" );}
-                 else
-                 if( errno == ENOMEM ) {
-                 UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                             "SSDP_LIB : RequestHandler:select was unable to "
-                             "allocate memory for internal tables.\n" );}
- )
-shutdown( gSsdpReqSocket, SD_BOTH );
+        if( errno == EBADF ) {
+            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                "SSDP_LIB :RequestHandler:An invalid file descriptor"
+                " was givenin one of the sets. \n" );
+        } else if( errno == EINTR ) {
+            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                "SSDP_LIB :RequestHandler:  A non blocked "
+                "signal was caught.    \n" );
+        } else if( errno == EINVAL ) {
+            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                "SSDP_LIB :RequestHandler: n is negative.  \n" );
+        } else if( errno == ENOMEM ) {
+            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                "SSDP_LIB : RequestHandler:select was unable to "
+                "allocate memory for internal tables.\n" );
+        }
+	shutdown( gSsdpReqSocket, SD_BOTH );
         UpnpCloseSocket( gSsdpReqSocket );
         free( ReqBuf );
         return UPNP_E_INTERNAL_ERROR;

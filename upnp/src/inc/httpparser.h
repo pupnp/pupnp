@@ -478,17 +478,21 @@ int raw_find_str( IN memptr* raw_value, IN const char* str );
 const char* method_to_str( IN http_method_t method );
 
 /************************************************************************
-* Function: print_http_headers											
-*																		
-* Parameters:															
-*	http_message_t* hmsg ; HTTP Message object									
-*																		
-* Description:															
-*																		
-* Returns:																
-*	 void																
+* Function: print_http_headers
+*
+* Parameters:
+*	http_message_t* hmsg ; HTTP Message object
+*
+* Description:
+*
+* Returns:
+*	 void
 ************************************************************************/
-void print_http_headers( IN http_message_t* hmsg );
+#ifdef DEBUG
+void print_http_headers( IN http_message_t *hmsg );
+#else
+static inline void print_http_headers( IN http_message_t *hmsg ) {}
+#endif
 
 #ifdef __cplusplus
 }		// extern "C"
@@ -496,3 +500,4 @@ void print_http_headers( IN http_message_t* hmsg );
 
 
 #endif // GENLIB_NET_HTTP_HTTPPARSER_H
+
