@@ -36,15 +36,9 @@ extern "C" {
 #endif
 
 
-#ifdef DEBUG
-#define DEBUG_ONLY(x) x
-#else
-#define DEBUG_ONLY(x)
-#endif
-
 #include <pthread.h>
 #ifndef WIN32
- #include <unistd.h>
+	#include <unistd.h>
 #endif
 
 #ifdef __FreeBSD__

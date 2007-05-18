@@ -47,12 +47,6 @@
 #endif
 
 
-#ifdef NO_DEBUG
-#define DBG(x)
-#else
-#define DBG(x) x
-#endif
-
 #define GEMD_OUT_OF_MEMORY -1
 #define EVENT_TIMEDOUT -2
 #define EVENT_TERMINATE	-3

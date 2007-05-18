@@ -79,7 +79,7 @@ typedef enum priority {LOW_PRIORITY,
 #endif
 
 #ifdef _DEBUG
- #define DEBUG 1
+	#define DEBUG 1
 #endif
 
 #include "LinkedList.h"
