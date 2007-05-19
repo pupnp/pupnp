@@ -162,11 +162,13 @@ EXTERN_C void genaCallback (IN http_parser_t *parser,
 *	return UPNP_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
-CLIENTONLY(
-	EXTERN_C int genaSubscribe(UpnpClient_Handle client_handle,
-				char * PublisherURL,
-				int * TimeOut, 
-				Upnp_SID  out_sid );)
+#ifdef INCLUDE_CLIENT_APIS
+EXTERN_C int genaSubscribe(
+	UpnpClient_Handle client_handle,
+	char * PublisherURL,
+	int * TimeOut, 
+	Upnp_SID  out_sid );
+#endif
 
 
 /************************************************************************
@@ -185,8 +187,11 @@ CLIENTONLY(
 *	return UPNP_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
-CLIENTONLY(EXTERN_C int genaUnSubscribe(UpnpClient_Handle client_handle,
-		   const Upnp_SID in_sid);)
+#ifdef INCLUDE_CLIENT_APIS
+EXTERN_C int genaUnSubscribe(
+	UpnpClient_Handle client_handle,
+	const Upnp_SID in_sid);
+#endif
 
 /************************************************************************
 * Function : genaUnregisterClient									
@@ -203,8 +208,9 @@ CLIENTONLY(EXTERN_C int genaUnSubscribe(UpnpClient_Handle client_handle,
 * Returns: int
 *	return UPNP_E_SUCCESS if successful else returns appropriate error
 ***************************************************************************/
-CLIENTONLY(EXTERN_C int genaUnregisterClient(
-			UpnpClient_Handle client_handle);)
+#ifdef INCLUDE_CLIENT_APIS
+EXTERN_C int genaUnregisterClient(UpnpClient_Handle client_handle);
+#endif
 
 //server
 /************************************************************************
@@ -244,10 +250,12 @@ EXTERN_C int genaUnregisterDevice(UpnpDevice_Handle device_handle);
 *	return UPNP_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
-CLIENTONLY(EXTERN_C int genaRenewSubscription(
-							IN UpnpClient_Handle client_handle,
-							IN const Upnp_SID in_sid,
-							OUT int * TimeOut);)
+#ifdef INCLUDE_CLIENT_APIS
+EXTERN_C int genaRenewSubscription(
+	IN UpnpClient_Handle client_handle,
+	IN const Upnp_SID in_sid,
+	OUT int * TimeOut);
+#endif
 /****************************************************************************
 *	Function :	genaNotifyAll
 *

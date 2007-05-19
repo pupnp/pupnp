@@ -212,12 +212,12 @@ int UpnpInit( IN const char *HostIP,
     if( ithread_mutex_init( &gUUIDMutex, NULL ) != 0 ) {
         return UPNP_E_INIT_FAILED;
     }
-    //initialize subscribe mutex
-    CLIENTONLY( if
-                ( ithread_mutex_init( &GlobalClientSubscribeMutex, NULL )
-                  != 0 ) {
-                return UPNP_E_INIT_FAILED;}
-     )
+    // initialize subscribe mutex
+#ifdef INCLUDE_CLIENT_APIS
+    if ( ithread_mutex_init( &GlobalClientSubscribeMutex, NULL ) != 0 ) {
+        return UPNP_E_INIT_FAILED;
+    }
+#endif
 
         HandleLock();
     if( HostIP != NULL )
@@ -418,9 +418,9 @@ UpnpFinish()
     CloseLog();
 #endif
 
-    CLIENTONLY( ithread_mutex_destroy( &GlobalClientSubscribeMutex );
-         )
-
+#ifdef INCLUDE_CLIENT_APIS
+    ithread_mutex_destroy( &GlobalClientSubscribeMutex );
+#endif
     ithread_mutex_destroy( &GlobalHndMutex );
     ithread_mutex_destroy( &gUUIDMutex );
 
@@ -621,11 +621,9 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
     HInfo->DeviceList = NULL;
     HInfo->ServiceList = NULL;
     HInfo->DescDocument = NULL;
-    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL );
-         );
-    CLIENTONLY( HInfo->ClientSubList = NULL;
-         )
-        HInfo->MaxSubscriptions = UPNP_INFINITE;
+    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
+    CLIENTONLY( HInfo->ClientSubList = NULL; )
+    HInfo->MaxSubscriptions = UPNP_INFINITE;
     HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 
     if( ( retVal =
@@ -682,7 +680,7 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
             "Here are the known services: \n" );
         printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
     } else {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
+        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
         FreeHandle( *Hnd );
         HandleUnlock();
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
@@ -835,7 +833,7 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
     ixmlNodeList_free( HInfo->ServiceList );
     ixmlDocument_free( HInfo->DescDocument );
 
-    CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
+    CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
 
 #ifdef INTERNAL_WEB_SERVER
     if( HInfo->aliasInstalled ) {
@@ -1189,7 +1187,6 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
     retVal = GetDescDocumentAndURL( descriptionType, description,
                                     bufferLen, config_baseURL,
                                     &HInfo->DescDocument, HInfo->DescURL );
-    //HInfo->DescAlias );
 
     if( retVal != UPNP_E_SUCCESS ) {
         FreeHandle( *Hnd );
@@ -1205,10 +1202,8 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
     HInfo->MaxAge = DEFAULT_MAXAGE;
     HInfo->DeviceList = NULL;
     HInfo->ServiceList = NULL;
-    CLIENTONLY( HInfo->ClientSubList = NULL;
-         )
-    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL );
-         );
+    CLIENTONLY( HInfo->ClientSubList = NULL; )
+    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
     HInfo->MaxSubscriptions = UPNP_INFINITE;
     HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 
@@ -1222,7 +1217,7 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
         ixmlDocument_getElementsByTagName( HInfo->DescDocument, "device" );
 
     if( HInfo->DeviceList == NULL ) {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
+        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
         ixmlDocument_free( HInfo->DescDocument );
         FreeHandle( *Hnd );
         HandleUnlock();
@@ -1236,7 +1231,7 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
                                            "serviceList" );
 
     if( HInfo->ServiceList == NULL ) {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
+        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
         ixmlNodeList_free( HInfo->DeviceList );
         ixmlDocument_free( HInfo->DescDocument );
         FreeHandle( *Hnd );
@@ -1256,7 +1251,7 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
         UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
             "UpnpRegisterRootDevice2: GENA Service Table \n" );
     } else {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
+        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
         FreeHandle( *Hnd );
         HandleUnlock();
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
@@ -1350,7 +1345,6 @@ UpnpRegisterClient( IN Upnp_FunPtr Fun,
 }  /****************** End of UpnpRegisterClient   *********************/
 #endif // INCLUDE_CLIENT_APIS
 
-#ifdef INCLUDE_CLIENT_APIS
 
 /****************************************************************************
  * Function: UpnpUnRegisterClient
@@ -1367,6 +1361,7 @@ UpnpRegisterClient( IN Upnp_FunPtr Fun,
  * Return Values:
  *	UPNP_E_SUCCESS on success, nonzero on failure.
  *****************************************************************************/
+#ifdef INCLUDE_CLIENT_APIS
 int
 UpnpUnRegisterClient( IN UpnpClient_Handle Hnd )
 {
@@ -3326,7 +3321,6 @@ UpnpDownloadXmlDoc( const char *url,
 //
 //----------------------------------------------------------------------------
 
-#ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
  * Function: UpnpThreadDistribution 
@@ -3339,6 +3333,7 @@ UpnpDownloadXmlDoc( const char *url,
  * Return Values: VOID
  *      
  ***************************************************************************/
+#ifdef INCLUDE_CLIENT_APIS
 void
 UpnpThreadDistribution( struct UpnpNonblockParam *Param )
 {
@@ -3348,95 +3343,83 @@ UpnpThreadDistribution( struct UpnpNonblockParam *Param )
 
     switch ( Param->FunName ) {
 #if EXCLUDE_GENA == 0
-        CLIENTONLY( case SUBSCRIBE:
-{
-struct Upnp_Event_Subscribe Evt;
-Evt.ErrCode = genaSubscribe( Param->Handle, Param->Url,
-                            ( int * )&( Param->TimeOut ),
-                            ( char * )Evt.Sid );
-strcpy( Evt.PublisherUrl, Param->Url ); Evt.TimeOut = Param->TimeOut;
-Param->Fun( UPNP_EVENT_SUBSCRIBE_COMPLETE, &Evt, Param->Cookie );
-free( Param ); break;}
-        case UNSUBSCRIBE:
-                            {
-                            struct Upnp_Event_Subscribe Evt;
-                            Evt.ErrCode =
-                            genaUnSubscribe( Param->Handle,
-                                             Param->SubsId );
-                            strcpy( ( char * )Evt.Sid, Param->SubsId );
-                            strcpy( Evt.PublisherUrl, "" );
-                            Evt.TimeOut = 0;
-                            Param->Fun( UPNP_EVENT_UNSUBSCRIBE_COMPLETE,
-                                        &Evt, Param->Cookie );
-                            free( Param ); break;}
-        case RENEW:
-                            {
-                            struct Upnp_Event_Subscribe Evt;
-                            Evt.ErrCode =
-                            genaRenewSubscription( Param->Handle,
-                                                   Param->SubsId,
-                                                   &( Param->TimeOut ) );
-                            Evt.TimeOut = Param->TimeOut;
-                            strcpy( ( char * )Evt.Sid, Param->SubsId );
-                            Param->Fun( UPNP_EVENT_RENEWAL_COMPLETE, &Evt,
-                                        Param->Cookie ); free( Param );
-                            break;}
-             )
-#endif
+        case SUBSCRIBE: {
+            struct Upnp_Event_Subscribe Evt;
+            Evt.ErrCode = genaSubscribe(
+                Param->Handle, Param->Url,
+                ( int * )&( Param->TimeOut ),
+                ( char * )Evt.Sid );
+            strcpy( Evt.PublisherUrl, Param->Url );
+            Evt.TimeOut = Param->TimeOut;
+            Param->Fun( UPNP_EVENT_SUBSCRIBE_COMPLETE, &Evt, Param->Cookie );
+            free( Param );
+            break;
+        }
+        case UNSUBSCRIBE: {
+	    struct Upnp_Event_Subscribe Evt;
+	    Evt.ErrCode =
+	    genaUnSubscribe( Param->Handle,
+			     Param->SubsId );
+	    strcpy( ( char * )Evt.Sid, Param->SubsId );
+	    strcpy( Evt.PublisherUrl, "" );
+	    Evt.TimeOut = 0;
+	    Param->Fun( UPNP_EVENT_UNSUBSCRIBE_COMPLETE,
+			&Evt, Param->Cookie );
+	    free( Param );
+            break;
+        }
+        case RENEW: {
+	    struct Upnp_Event_Subscribe Evt;
+	    Evt.ErrCode =
+	    genaRenewSubscription( Param->Handle,
+				   Param->SubsId,
+				   &( Param->TimeOut ) );
+	    Evt.TimeOut = Param->TimeOut;
+	    strcpy( ( char * )Evt.Sid, Param->SubsId );
+	    Param->Fun( UPNP_EVENT_RENEWAL_COMPLETE, &Evt,
+			Param->Cookie );
+            free( Param );
+	    break;
+        }
+#endif // EXCLUDE_GENA == 0
 #if EXCLUDE_SOAP == 0
-        case ACTION:
-            {
-                struct Upnp_Action_Complete Evt;
-
-                Evt.ActionResult = NULL;
-#ifdef INCLUDE_CLIENT_APIS
-
+        case ACTION: {
+            struct Upnp_Action_Complete Evt;
+            Evt.ActionResult = NULL;
                 Evt.ErrCode =
                     SoapSendAction( Param->Url, Param->ServiceType,
                                     Param->Act, &Evt.ActionResult );
-#endif
-
                 Evt.ActionRequest = Param->Act;
                 strcpy( Evt.CtrlUrl, Param->Url );
-
                 Param->Fun( UPNP_CONTROL_ACTION_COMPLETE, &Evt,
                             Param->Cookie );
-
                 ixmlDocument_free( Evt.ActionRequest );
                 ixmlDocument_free( Evt.ActionResult );
                 free( Param );
                 break;
-            }
-        case STATUS:
-            {
+        }
+        case STATUS: {
                 struct Upnp_State_Var_Complete Evt;
-
-#ifdef INCLUDE_CLIENT_APIS
-
-                Evt.ErrCode = SoapGetServiceVarStatus( Param->Url,
-                                                       Param->VarName,
-                                                       &( Evt.
-                                                          CurrentVal ) );
-#endif
+                Evt.ErrCode = SoapGetServiceVarStatus(
+                    Param->Url, Param->VarName, &( Evt.CurrentVal ) );
                 strcpy( Evt.StateVarName, Param->VarName );
                 strcpy( Evt.CtrlUrl, Param->Url );
-
                 Param->Fun( UPNP_CONTROL_GET_VAR_COMPLETE, &Evt,
                             Param->Cookie );
                 free( Evt.CurrentVal );
                 free( Param );
                 break;
             }
-#endif //EXCLUDE_SOAP
+#endif // EXCLUDE_SOAP == 0
         default:
             break;
-    }                           // end of switch(Param->FunName)
+    } // end of switch(Param->FunName)
 
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting UpnpThreadDistribution \n" );
 
 }  /****************** End of UpnpThreadDistribution  *********************/
-#endif
+#endif // INCLUDE_CLIENT_APIS
 
 /**************************************************************************
  * Function: GetCallBackFn 

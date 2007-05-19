@@ -449,6 +449,7 @@ genaUnregisterClient( IN UpnpClient_Handle client_handle )
 *	return UPNP_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
+#ifdef INCLUDE_CLIENT_APIS
 int
 genaUnSubscribe( IN UpnpClient_Handle client_handle,
                  IN const Upnp_SID in_sid )
@@ -501,6 +502,7 @@ genaUnSubscribe( IN UpnpClient_Handle client_handle,
 
     return return_code;
 }
+#endif
 
 /************************************************************************
 * Function : genaSubscribe
@@ -524,6 +526,7 @@ genaUnSubscribe( IN UpnpClient_Handle client_handle,
 *	return UPNP_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
+#ifdef INCLUDE_CLIENT_APIS
 int
 genaSubscribe( IN UpnpClient_Handle client_handle,
                IN char *PublisherURL,
@@ -609,6 +612,7 @@ genaSubscribe( IN UpnpClient_Handle client_handle,
     SubscribeUnlock();
     return return_code;
 }
+#endif
 
 /************************************************************************
 * Function : genaRenewSubscription
