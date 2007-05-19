@@ -2,6 +2,9 @@
 Version 1.4.7
 *******************************************************************************
 
+2007-05-18 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Removed all uses of the DEVICEONLY(x) macro.
+
 2007-05-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Removed all uses of the DBGONLY(x) macro. A static inline empty
 	function now is used and the compiler takes care of optimizing it out.

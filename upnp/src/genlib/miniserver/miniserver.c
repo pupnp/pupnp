@@ -106,16 +106,16 @@ SetHTTPGetCallback( MiniServerCallback callback )
 }
 
 /************************************************************************
-*	Function :	SetSoapCallback
+* Function :	SetSoapCallback
 *
-*	Parameters :
-*		MiniServerCallback callback ; - SOAP Callback to be invoked 
+* Parameters :
+*	MiniServerCallback callback ; - SOAP Callback to be invoked 
 *
-*	Description :	Set SOAP Callback
+* Description :	Set SOAP Callback
 *
-*	Return :	void
+* Return :	void
 *
-*	Note :
+* Note :
 ************************************************************************/
 void
 SetSoapCallback( MiniServerCallback callback )

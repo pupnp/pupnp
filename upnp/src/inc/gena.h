@@ -219,8 +219,9 @@ CLIENTONLY(EXTERN_C int genaUnregisterClient(
 * Returns: int
 *	returns UPNP_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
 ****************************************************************************/
-DEVICEONLY(EXTERN_C int genaUnregisterDevice(
-				UpnpDevice_Handle device_handle);)
+#ifdef INCLUDE_DEVICE_APIS
+EXTERN_C int genaUnregisterDevice(UpnpDevice_Handle device_handle);
+#endif
 
 
 /************************************************************************
@@ -266,33 +267,40 @@ CLIENTONLY(EXTERN_C int genaRenewSubscription(
 *	Note : This function is similar to the genaNotifyAllExt. The only difference
 *			is it takes event variable array instead of xml document.
 ****************************************************************************/
-DEVICEONLY(EXTERN_C int genaNotifyAll(UpnpDevice_Handle device_handle,
-			   char *UDN,
-			   char *servId,
-			   char **VarNames,
-			   char **VarValues,
-		    int var_count
-				      );)
+#ifdef INCLUDE_DEVICE_APIS
+EXTERN_C int genaNotifyAll(
+	UpnpDevice_Handle device_handle,
+	char *UDN,
+	char *servId,
+	char **VarNames,
+	char **VarValues,
+	int var_count);
+#endif
 
 /****************************************************************************
-*	Function :	genaNotifyAllExt
+* Function :	genaNotifyAllExt
 *
-*	Parameters :
-*			IN UpnpDevice_Handle device_handle : Device handle
-*			IN char *UDN :	Device udn
-*			IN char *servId :	Service ID
-*           IN IXML_Document *PropSet :	XML document Event varible property set
+* Parameters :
+*	IN UpnpDevice_Handle device_handle : Device handle
+*	IN char *UDN :			Device udn
+*	IN char *servId :		Service ID
+*	IN IXML_Document *PropSet :	XML document Event varible property set
 *
-*	Description : 	This function sends a notification to all the subscribed
+* Description : This function sends a notification to all the subscribed
 *	control points
 *
-*	Return :	int
+* Return : int
 *
-*	Note : This function is similar to the genaNotifyAll. the only difference
-*			is it takes the document instead of event variable array
+* Note : This function is similar to the genaNotifyAll. the only difference
+*	is it takes the document instead of event variable array
 ****************************************************************************/
-DEVICEONLY(EXTERN_C int genaNotifyAllExt(UpnpDevice_Handle device_handle, 
-		   char *UDN, char *servId,IN IXML_Document *PropSet);)
+#ifdef INCLUDE_DEVICE_APIS
+EXTERN_C int genaNotifyAllExt(
+	UpnpDevice_Handle device_handle, 
+	char *UDN,
+	char *servId,
+	IN IXML_Document *PropSet);
+#endif
 
 /****************************************************************************
 *	Function :	genaInitNotify
@@ -315,13 +323,15 @@ DEVICEONLY(EXTERN_C int genaNotifyAllExt(UpnpDevice_Handle device_handle,
 *	Note : No other event will be sent to this control point before the 
 *			intial state table dump.
 ****************************************************************************/
-DEVICEONLY(EXTERN_C int genaInitNotify(IN UpnpDevice_Handle device_handle,
-			    IN char *UDN,
-			    IN char *servId,
-			    IN char **VarNames,
-			    IN char **VarValues,
-				IN int var_count,
-				IN Upnp_SID sid);)
+#ifdef INCLUDE_DEVICE_APIS
+EXTERN_C int genaInitNotify(IN UpnpDevice_Handle device_handle,
+	IN char *UDN,
+	IN char *servId,
+	IN char **VarNames,
+	IN char **VarValues,
+	IN int var_count,
+	IN Upnp_SID sid);
+#endif
 
 /****************************************************************************
 *	Function :	genaInitNotifyExt
@@ -343,12 +353,14 @@ DEVICEONLY(EXTERN_C int genaInitNotify(IN UpnpDevice_Handle device_handle,
 *	Note : No other event will be sent to this control point before the 
 *			intial state table dump.
 ****************************************************************************/
-DEVICEONLY(EXTERN_C  int genaInitNotifyExt(
-		   IN UpnpDevice_Handle device_handle, 
-		   IN char *UDN, 
-		   IN char *servId,
-		   IN IXML_Document *PropSet, 
-		   IN Upnp_SID sid);)
+#ifdef INCLUDE_DEVICE_APIS
+EXTERN_C  int genaInitNotifyExt(
+	IN UpnpDevice_Handle device_handle, 
+	IN char *UDN, 
+	IN char *servId,
+	IN IXML_Document *PropSet, 
+	IN Upnp_SID sid);
+#endif
 
 
 /************************************************************************

@@ -2505,7 +2505,7 @@ print_http_headers( http_message_t * hmsg )
     if( hmsg->is_request ) {
         printf( "method = %d, version = %d.%d, url = %.*s\n", 
             hmsg->method, hmsg->major_version, hmsg->minor_version,
-            hmsg->uri.pathquery.size, hmsg->uri.pathquery.buff);
+            (int)hmsg->uri.pathquery.size, hmsg->uri.pathquery.buff);
     } else {
         printf( "resp status = %d, version = %d.%d, status msg = %.*s\n",
             hmsg->status_code, hmsg->major_version, hmsg->minor_version,

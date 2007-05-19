@@ -71,27 +71,32 @@ struct Handle_Info
     Upnp_FunPtr  Callback; // Callback function pointer.
     char * Cookie;
 
-    DEVICEONLY(char  DescURL[LINE_SIZE];)   // URL for the use of SSDP
-    DEVICEONLY(char  DescXML[LINE_SIZE];)   // XML file path for device 
-                                            //description
+    // Device Only
+#ifdef INCLUDE_DEVICE_APIS
+    char  DescURL[LINE_SIZE];   // URL for the use of SSDP
+    char  DescXML[LINE_SIZE];   // XML file path for device 
+                                //description
 
-    DEVICEONLY(int MaxAge;)                 // Advertisement timeout
-    DEVICEONLY(IXML_Document *DescDocument;)     // Description parsed in 
-                                            //terms of DOM document 
-    DEVICEONLY(IXML_NodeList *DeviceList;)       // List of devices in the 
-                                            //description document
-    DEVICEONLY(IXML_NodeList *ServiceList;)      // List of services in the 
-                                            // description document
-    DEVICEONLY(service_table ServiceTable;) //table holding subscriptions and 
+    int MaxAge;                 // Advertisement timeout
+    IXML_Document *DescDocument;// Description parsed in 
+                                //terms of DOM document 
+    IXML_NodeList *DeviceList;  // List of devices in the 
+                                //description document
+    IXML_NodeList *ServiceList; // List of services in the 
+                                // description document
+    service_table ServiceTable; //table holding subscriptions and 
                                 //URL information
-    DEVICEONLY(int MaxSubscriptions;)
-    DEVICEONLY(int MaxSubscriptionTimeOut;)
+    int MaxSubscriptions;
+    int MaxSubscriptionTimeOut;
+#endif
      
-       //Client only
-    CLIENTONLY(client_subscription * ClientSubList;) //client subscription list
-    CLIENTONLY(LinkedList SsdpSearchList;) // active ssdp searches   
+    // Client only
+#ifdef INCLUDE_CLIENT_APIS
+    client_subscription *ClientSubList; //client subscription list
+    LinkedList SsdpSearchList; // active ssdp searches   
+#endif
     int   aliasInstalled;       // 0 = not installed; otherwise installed
-} ;
+};
 
 extern ithread_mutex_t GlobalHndMutex;
 Upnp_Handle_Type GetHandleInfo(int Hnd, struct Handle_Info **HndInfo); 

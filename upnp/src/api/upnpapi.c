@@ -29,7 +29,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-//File upnpapi.c
+
 #include "config.h"
 #include <assert.h>
 #include <signal.h>
@@ -37,22 +37,22 @@
 #include <string.h>
 #include <sys/stat.h>
 #ifndef WIN32
- #include <sys/socket.h>
- #include <netinet/in.h>
- #include <arpa/inet.h>
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
 
- #ifndef SPARC_SOLARIS
-// #include <linux/if.h>
-  #include <net/if.h>
- #else
-  #include <fcntl.h>
-  #include <net/if.h>
-  #include <sys/sockio.h>
- #endif
+	#ifndef SPARC_SOLARIS
+//		#include <linux/if.h>
+		#include <net/if.h>
+	#else
+		#include <fcntl.h>
+		#include <net/if.h>
+		#include <sys/sockio.h>
+	#endif
 
- #include <sys/ioctl.h>
- #include <sys/utsname.h>
- #include <unistd.h>
+	#include <sys/ioctl.h>
+	#include <sys/utsname.h>
+	#include <unistd.h>
 #endif
 #include "upnpapi.h"
 #include "httpreadwrite.h"
@@ -63,36 +63,30 @@
 
 #include "httpreadwrite.h"
 
-//************************************
-//Needed for GENA
+// Needed for GENA
 #include "gena.h"
 #include "service_table.h"
 #include "miniserver.h"
-//*******************************************
 
-/*
- ********************* */
 #ifdef INTERNAL_WEB_SERVER
-#include "webserver.h"
-#include "urlconfig.h"
+	#include "webserver.h"
+	#include "urlconfig.h"
 #endif // INTERNAL_WEB_SERVER
-/*
- ****************** */
 
-//Mutex to synchronize the subscription handling at the client side
-CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex;
-     )
-    //Mutex to synchronize handles ( root device or control point handle)
-     ithread_mutex_t GlobalHndMutex;
+// Mutex to synchronize the subscription handling at the client side
+CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
 
-//Mutex to synchronize the uuid creation process
-     ithread_mutex_t gUUIDMutex;
+//Mutex to synchronize handles ( root device or control point handle)
+    ithread_mutex_t GlobalHndMutex;
 
-     TimerThread gTimerThread;
+// Mutex to synchronize the uuid creation process
+    ithread_mutex_t gUUIDMutex;
 
-     ThreadPool gRecvThreadPool;
+    TimerThread gTimerThread;
 
-     ThreadPool gSendThreadPool;
+    ThreadPool gRecvThreadPool;
+
+    ThreadPool gSendThreadPool;
 
 //Flag to indicate the state of web server
      WebServerState bWebServerState = WEB_SERVER_DISABLED;
@@ -264,8 +258,7 @@ int UpnpInit( IN const char *HostIP,
 
     UpnpSdkInit = 1;
 #if EXCLUDE_SOAP == 0
-    DEVICEONLY( SetSoapCallback( soap_device_callback );
-         );
+    SetSoapCallback( soap_device_callback );
 #endif
 #if EXCLUDE_GENA == 0
     SetGenaCallback( genaCallback );
@@ -357,10 +350,12 @@ PrintThreadPoolStats (const char* DbgFileName, int DbgLineNo,
 int
 UpnpFinish()
 {
-    DEVICEONLY( UpnpDevice_Handle device_handle;
-         )
-    CLIENTONLY( UpnpClient_Handle client_handle;
-         )
+#ifdef INCLUDE_DEVICE_APIS
+    UpnpDevice_Handle device_handle;
+#endif
+#ifdef INCLUDE_CLIENT_APIS
+    UpnpClient_Handle client_handle;
+#endif
     struct Handle_Info *temp;
 
 #ifdef DEBUG
@@ -371,8 +366,9 @@ UpnpFinish()
 //	WSACleanup( );
 #endif
 
-    if( UpnpSdkInit != 1 )
+    if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
+    }
 
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
         "Inside UpnpFinish : UpnpSdkInit is :%d:\n",
@@ -1308,10 +1304,8 @@ UpnpRegisterClient( IN Upnp_FunPtr Fun,
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
     }
-
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpRegisterClient \n" );
-
     if( Fun == NULL || Hnd == NULL ) {
         return UPNP_E_INVALID_PARAM;
     }
@@ -1322,7 +1316,6 @@ UpnpRegisterClient( IN Upnp_FunPtr Fun,
         HandleUnlock();
         return UPNP_E_ALREADY_REGISTERED;
     }
-
     if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
         HandleUnlock();
         return UPNP_E_OUTOF_MEMORY;
@@ -1336,17 +1329,15 @@ UpnpRegisterClient( IN Upnp_FunPtr Fun,
     HInfo->HType = HND_CLIENT;
     HInfo->Callback = Fun;
     HInfo->Cookie = ( void * )Cookie;
-    DEVICEONLY( HInfo->MaxAge = 0;
-		)
     HInfo->ClientSubList = NULL;
     ListInit( &HInfo->SsdpSearchList, NULL, NULL );
-    DEVICEONLY( HInfo->MaxSubscriptions = UPNP_INFINITE;
-         )
-        DEVICEONLY( HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
-         )
+#ifdef INCLUDE_DEVICE_APIS
+    HInfo->MaxAge = 0;
+    HInfo->MaxSubscriptions = UPNP_INFINITE;
+    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+#endif
 
-        HandleTable[*Hnd] = HInfo;
-
+    HandleTable[*Hnd] = HInfo;
     UpnpSdkClientRegistered = 1;
 
     HandleUnlock();
@@ -3674,11 +3665,11 @@ int PrintHandleInfo( IN UpnpClient_Handle Hnd )
                 "Printing information for Handle_%d\n", Hnd);
             UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
                 "HType_%d\n", HndInfo->HType);
-            DEVICEONLY(
+#ifdef INCLUDE_DEVICE_APIS
                 if(HndInfo->HType != HND_CLIENT)
                     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
                         "DescURL_%s\n", HndInfo->DescURL );
-            )
+#endif
 #endif
     } else {
         return UPNP_E_INVALID_HANDLE;

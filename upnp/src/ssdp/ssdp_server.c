@@ -746,14 +746,10 @@ ssdp_event_handler_thread( void *the_data )
     // send msg to device or ctrlpt
     if( ( hmsg->method == HTTPMETHOD_NOTIFY ) ||
         ( hmsg->request_method == HTTPMETHOD_MSEARCH ) ) {
-
         CLIENTONLY( ssdp_handle_ctrlpt_msg( hmsg, &data->dest_addr,
-                                            FALSE, NULL );
-             );
+                                            FALSE, NULL ););
     } else {
-
-        DEVICEONLY( ssdp_handle_device_request( hmsg, &data->dest_addr );
-             );
+        ssdp_handle_device_request( hmsg, &data->dest_addr );
     }
 
     // free data

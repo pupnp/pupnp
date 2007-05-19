@@ -211,8 +211,15 @@ int Make_Socket_NoBlocking (int sock);
 * Returns: void *
 *	1 if successful else appropriate error
 ***************************************************************************/
-void ssdp_handle_device_request( IN http_message_t* hmsg, 
-							 IN struct sockaddr_in* dest_addr );
+#ifdef INCLUDE_DEVICE_APIS
+void ssdp_handle_device_request(
+	IN http_message_t* hmsg, 
+	IN struct sockaddr_in* dest_addr );
+#else
+static inline void ssdp_handle_device_request(
+	IN http_message_t* hmsg, 
+	IN struct sockaddr_in* dest_addr ) {}
+#endif
 
 /************************************************************************
 * Function : ssdp_handle_ctrlpt_msg											

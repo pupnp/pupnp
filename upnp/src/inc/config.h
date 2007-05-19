@@ -338,12 +338,6 @@
 #	define CLIENTONLY(x)
 #endif
 
-#ifdef INCLUDE_DEVICE_APIS
-#	define DEVICEONLY(x) x
-#else 
-#	define DEVICEONLY(x) 
-#endif
-
 //@}
 #endif
 
