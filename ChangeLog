@@ -2,6 +2,10 @@
 Version 1.4.7
 *******************************************************************************
 
+2007-05-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added the file build/inc/msvc/inttypes.h. This file is for use with
+	MSVC only, because it does not provide C99 compatibility.
+
 2007-05-18 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Removed all uses of the DEVICEONLY(x) macro.
 
