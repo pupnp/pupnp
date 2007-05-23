@@ -26,7 +26,8 @@ EXTRA_DIST = \
 	build/libupnp.dsw \
 	build/inc/autoconfig.h \
 	build/inc/config.h \
-	build/inc/upnpconfig.h
+	build/inc/upnpconfig.h \
+	build/msvc/inttypes.h
 
 
 # This variable must have 'exec' in its name, in order to be installed 
