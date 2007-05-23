@@ -184,12 +184,12 @@ typedef int (*ParserFun)(char *, Event *);
 //int AnalyzeCommand(char * szCommand, Event * Evt);
 
 /************************************************************************
-* Function : Make_Socket_NoBlocking									
-*																	
-* Parameters:														
-*	IN int sock: socket 
+* Function : Make_Socket_NoBlocking
 *
-* Description:														
+* Parameters:
+*	IN int sock: socket
+*
+* Description:
 *	This function to make ssdp socket non-blocking.
 *
 * Returns: int
@@ -198,12 +198,12 @@ typedef int (*ParserFun)(char *, Event *);
 int Make_Socket_NoBlocking (int sock);
 
 /************************************************************************
-* Function : ssdp_handle_device_request									
-*																	
-* Parameters:														
+* Function : ssdp_handle_device_request
+*
+* Parameters:
 *		IN void *data:
 *
-* Description:														
+* Description:
 *	This function handles the search request. It do the sanity checks of
 *	the request and then schedules a thread to send a random time reply (
 *	random within maximum time given by the control point to reply).
@@ -222,18 +222,18 @@ static inline void ssdp_handle_device_request(
 #endif
 
 /************************************************************************
-* Function : ssdp_handle_ctrlpt_msg											
-*																	
-* Parameters:														
+* Function : ssdp_handle_ctrlpt_msg
+*
+* Parameters:
 *	IN http_message_t* hmsg: SSDP message from the device
 *	IN struct sockaddr_in* dest_addr: Address of the device
 *	IN xboolean timeout: timeout kept by the control point while sending 
-*						search message
+*		search message
 *	IN void* cookie: Cookie stored by the control point application. 
-*					This cookie will be returned to the control point
-*					in the callback 
-*																	
-* Description:														
+*		This cookie will be returned to the control point
+*		in the callback
+*
+* Description:
 *	This function handles the ssdp messages from the devices. These 
 *	messages includes the search replies, advertisement of device coming 
 *	alive and bye byes.
@@ -241,20 +241,21 @@ static inline void ssdp_handle_device_request(
 * Returns: void
 *
 ***************************************************************************/
-void ssdp_handle_ctrlpt_msg( IN http_message_t* hmsg, 
-							 IN struct sockaddr_in* dest_addr,
-							 IN xboolean timeout,
-							 IN void* cookie );
+void ssdp_handle_ctrlpt_msg(
+	IN http_message_t* hmsg, 
+	IN struct sockaddr_in* dest_addr,
+	IN xboolean timeout,
+	IN void* cookie );
 
 /************************************************************************
-* Function : unique_service_name								
-*																	
-* Parameters:														
-*	IN char *cmd: Service Name string 
-*	OUT SsdpEvent *Evt: The SSDP event structure partially filled 
-*						by all the function.
+* Function : unique_service_name
 *
-* Description:														
+* Parameters:
+*	IN char *cmd: Service Name string
+*	OUT SsdpEvent *Evt: The SSDP event structure partially filled
+*		by all the function.
+*
+* Description:
 *	This function fills the fields of the event structure like DeviceType,
 *	Device UDN and Service Type
 *
@@ -265,12 +266,12 @@ int unique_service_name(char * cmd, SsdpEvent * Evt);
 
 
 /************************************************************************
-* Function : get_ssdp_sockets								
-*																	
-* Parameters:														
+* Function : get_ssdp_sockets
+*
+* Parameters:
 *	OUT MiniServerSockArray *out: Arrays of SSDP sockets
 *
-* Description:														
+* Description:
 *	This function creates the ssdp sockets. It set their option to listen 
 *	for multicast traffic.
 *
@@ -281,12 +282,12 @@ int get_ssdp_sockets(MiniServerSockArray *out);
 
 
 /************************************************************************
-* Function : readFromSSDPSocket								
-*																	
-* Parameters:														
+* Function : readFromSSDPSocket	
+*
+* Parameters:
 *	IN SOCKET socket: SSDP socket
 *
-* Description:														
+* Description:
 *	This function reads the data from the ssdp socket.
 *
 * Returns: void
@@ -296,13 +297,13 @@ void readFromSSDPSocket(SOCKET socket);
 
 
 /************************************************************************
-* Function : ssdp_request_type1								
-*																	
-* Parameters:														
+* Function : ssdp_request_type1
+*
+* Parameters:
 *	IN char *cmd: command came in the ssdp request
 *
-* Description:														
-*	This function figures out the type of the SSDP search in the 
+* Description:
+*	This function figures out the type of the SSDP search in the
 *	in the request.
 *
 * Returns: enum SsdpSearchType
@@ -312,14 +313,14 @@ enum SsdpSearchType ssdp_request_type1(IN char *cmd);
 
 
 /************************************************************************
-* Function : ssdp_request_type								
-*																	
-* Parameters:														
+* Function : ssdp_request_type
+*
+* Parameters:
 *	IN char *cmd: command came in the ssdp request
 *	OUT SsdpEvent *Evt: The event structure partially filled by
 *		 this function.
 *
-* Description:														
+* Description:
 *	This function starts filling the SSDP event structure based upon the 
 *	request received. 
 *
@@ -330,17 +331,15 @@ int ssdp_request_type(IN char * cmd, OUT SsdpEvent * Evt);
 
 
 /************************************************************************
-* Function : SearchByTarget											
-*																	
-* Parameters:														
-*		IN int Mx:Number of seconds to wait, to collect all the 
-*					responses.
-*		char *St: Search target.
-*		void *Cookie: cookie provided by control point application. This
-*						cokie will be returned to application in the 
-*						callback.
+* Function : SearchByTarget
 *
-* Description:														
+* Parameters:
+*	IN int Mx:Number of seconds to wait, to collect all the	responses.
+*	char *St: Search target.
+*	void *Cookie: cookie provided by control point application. This
+*		cokie will be returned to application in the callback.
+*
+* Description:
 *	This function creates and send the search request for a specific URL.
 *
 * Returns: int
@@ -349,214 +348,224 @@ int ssdp_request_type(IN char * cmd, OUT SsdpEvent * Evt);
 int SearchByTarget(IN int Mx, IN char *St, IN void *Cookie);
 
 /************************************************************************
-* Function : DeviceAdvertisement									
-*																	
-* Parameters:														
-*	IN char * DevType : type of the device
-*	IN int RootDev: flag to indicate if the device is root device
-*	IN char * nt : value of NT
-*	IN char * usn :
-*	IN char * location :Location URL.
-*	IN int  duration :Service duration in sec.
+* Function : DeviceAdvertisement
 *
-* Description:														
-*	This function creates the device advertisement request based on 
+* Parameters:
+*	IN char *DevType : type of the device
+*	IN int RootDev   : flag to indicate if the device is root device
+*	IN char *Udn     :
+*	IN char *Location: Location URL.
+*	IN int Duration  : Service duration in sec.
+*
+* Description:
+*	This function creates the device advertisement request based on
 *	the input parameter, and send it to the multicast channel.
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
-int DeviceAdvertisement(IN char * DevType, int RootDev,char * Udn, 
-						IN char * Location, IN int  Duration);
+int DeviceAdvertisement(
+	IN char *DevType,
+	IN int RootDev,
+	IN char *Udn, 
+	IN char *Location,
+	IN int Duration);
 
 
 /************************************************************************
-* Function : DeviceShutdown									
-*																	
+* Function : DeviceShutdown
+*
 * Parameters:	
 *	IN char *DevType: Device Type.
 *	IN int RootDev:1 means root device.
-*	IN char * Udn: Device UDN
+*	IN char *Udn: Device UDN
 *	IN char *_Server:
-*	IN char * Location: Location URL
-*	IN int  Duration :Device duration in sec.
+*	IN char *Location: Location URL
+*	IN int Duration :Device duration in sec.
 *
-* Description:														
+* Description:
 *	This function creates a HTTP device shutdown request packet 
 *	and sent it to the multicast channel through RequestHandler.
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
-int DeviceShutdown( IN char * DevType, 
-				    IN int RootDev,
-					IN char * Udn, 
-					IN char * _Server, 
-					IN char * Location, 
-					IN int  Duration );
+int DeviceShutdown(
+	IN char *DevType, 
+	IN int RootDev,
+	IN char *Udn, 
+	IN char *_Server, 
+	IN char *Location, 
+	IN int Duration);
 
 /************************************************************************
-* Function : DeviceReply									
-*																	
+* Function : DeviceReply
+*
 * Parameters:	
 *	IN struct sockaddr_in * DestAddr:destination IP address.
 *	IN char *DevType: Device type
 *	IN int RootDev: 1 means root device 0 means embedded device.
-*	IN char * Udn: Device UDN
-*	IN char * Location: Location of Device description document.
-*	IN int  Duration :Life time of this device.
-
-* Description:														
+*	IN char *Udn: Device UDN
+*	IN char *Location: Location of Device description document.
+*	IN int Duration :Life time of this device.
+*
+* Description:
 *	This function creates the reply packet based on the input parameter, 
 *	and send it to the client address given in its input parameter DestAddr.
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
-int DeviceReply(IN struct sockaddr_in * DestAddr, 
-				IN char *DevType, 
-				IN int RootDev, 
-				IN char * Udn, 
-				IN char * Location, IN int  Duration);
+int DeviceReply(
+	IN struct sockaddr_in * DestAddr, 
+	IN char *DevType, 
+	IN int RootDev, 
+	IN char *Udn, 
+	IN char *Location, IN int  Duration);
 
 /************************************************************************
-* Function : SendReply									
-*																	
+* Function : SendReply
+*
 * Parameters:	
 *	IN struct sockaddr_in * DestAddr:destination IP address.
 *	IN char *DevType: Device type
 *	IN int RootDev: 1 means root device 0 means embedded device.
 *	IN char * Udn: Device UDN
 *	IN char *_Server:
-*	IN char * Location: Location of Device description document.
-*	IN int  Duration :Life time of this device.
+*	IN char *Location: Location of Device description document.
+*	IN int Duration :Life time of this device.
 *	IN int ByType:
 *
-* Description:														
+* Description:
 *	This function creates the reply packet based on the input parameter, 
 *	and send it to the client addesss given in its input parameter DestAddr.
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
-int SendReply(IN struct sockaddr_in * DestAddr, 
-			  IN char *DevType, 
-			  IN int RootDev, 
-			  IN char * Udn, 
-			  IN char * Location, 
-			  IN int  Duration, 
-			  IN int ByType );
+int SendReply(
+	IN struct sockaddr_in * DestAddr, 
+	IN char *DevType, 
+	IN int RootDev, 
+	IN char *Udn, 
+	IN char *Location, 
+	IN int Duration, 
+	IN int ByType );
 
 /************************************************************************
-* Function : ServiceAdvertisement									
-*																	
+* Function : ServiceAdvertisement
+*
 * Parameters:	
 *	IN char * Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char * Location: Location of Device description document.
-*	IN int  Duration :Life time of this device.
-
-* Description:														
+*	IN int Duration :Life time of this device.
+*
+* Description:
 *	This function creates the advertisement packet based 
 *	on the input parameter, and send it to the multicast channel.
-
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
-int ServiceAdvertisement( IN char * Udn, 
-						 IN char * ServType,
-						 IN char * Location,
-						 IN int  Duration);
+int ServiceAdvertisement(
+	IN char *Udn, 
+	IN char *ServType,
+	IN char *Location,
+	IN int Duration);
 
 /************************************************************************
-* Function : ServiceReply									
-*																	
+* Function : ServiceReply
+*
 * Parameters:	
 *	IN struct sockaddr_in *DestAddr:
-*	IN char * Udn: Device UDN
+*	IN char *Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char *Server: Not used
-*	IN char * Location: Location of Device description document.
-*	IN int  Duration :Life time of this device.
-
-* Description:														
+*	IN char *Location: Location of Device description document.
+*	IN int Duration :Life time of this device.
+*
+* Description:
 *	This function creates the advertisement packet based 
 *	on the input parameter, and send it to the multicast channel.
-
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
-int ServiceReply(IN struct sockaddr_in *DestAddr,  
-				 IN char * ServType, 
-				 IN char * Udn, 
-				 IN char * Location,
-				 IN int  Duration);
+int ServiceReply(
+	IN struct sockaddr_in *DestAddr,  
+	IN char *ServType, 
+	IN char *Udn, 
+	IN char *Location,
+	IN int Duration);
 
 /************************************************************************
-* Function : ServiceShutdown									
-*																	
-* Parameters:	
-*	IN char * Udn: Device UDN
+* Function : ServiceShutdown
+*
+* Parameters:
+*	IN char *Udn: Device UDN
 *	IN char *ServType: Service Type.
-*	IN char * Location: Location of Device description document.
-*	IN int  Duration :Service duration in sec.
-
-* Description:														
+*	IN char *Location: Location of Device description document.
+*	IN int Duration :Service duration in sec.
+*
+* Description:
 *	This function creates a HTTP service shutdown request packet 
 *	and sent it to the multicast channel through RequestHandler.
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
-int ServiceShutdown( IN char * Udn, IN char * ServType,
-					IN char * Location,
-					IN int  Duration);
+int ServiceShutdown(
+	IN char *Udn,
+	IN char *ServType,
+	IN char *Location,
+	IN int Duration);
 
 
 /************************************************************************
-* Function : advertiseAndReplyThread									
-*																	
-* Parameters:														
-*		IN void *data: Structure containing the search request
+* Function : advertiseAndReplyThread
 *
-* Description:														
+* Parameters:
+*	IN void *data: Structure containing the search request
+*
+* Description:
 *	This function is a wrapper function to reply the search request 
 *	coming from the control point.
 *
 * Returns: void *
 *	always return NULL
 ***************************************************************************/
-void * advertiseAndReplyThread(IN void * data);
+void *advertiseAndReplyThread(IN void * data);
 
 /************************************************************************
-* Function : AdvertiseAndReply									
-*																	
-* Parameters:														
-*	IN int AdFlag: -1 = Send shutdown, 0 = send reply, 
-*					1 = Send Advertisement
+* Function : AdvertiseAndReply
+*
+* Parameters:
+*	IN int AdFlag: -1 = Send shutdown,
+*			0 = send reply, 
+*			1 = Send Advertisement
 *	IN UpnpDevice_Handle Hnd: Device handle
 *	IN enum SsdpSearchType SearchType:Search type for sending replies
 *	IN struct sockaddr_in *DestAddr:Destination address
-*   IN char *DeviceType:Device type
+*	IN char *DeviceType:Device type
 *	IN char *DeviceUDN:Device UDN
-*   IN char *ServiceType:Service type
+*	IN char *ServiceType:Service type
 *	IN int Exp:Advertisement age
 *
-* Description:														
+* Description:
 *	This function to send SSDP advertisements, replies and shutdown messages.
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
-int AdvertiseAndReply(IN int AdFlag, 
-					IN UpnpDevice_Handle Hnd, 
-					IN enum SsdpSearchType SearchType, 
-					IN struct sockaddr_in *DestAddr,
-                    IN char *DeviceType, 
-					IN char *DeviceUDN, 
-                    IN char *ServiceType, int Exp);
+int AdvertiseAndReply(
+	IN int AdFlag, 
+	IN UpnpDevice_Handle Hnd, 
+	IN enum SsdpSearchType SearchType, 
+	IN struct sockaddr_in *DestAddr,
+	IN char *DeviceType, 
+	IN char *DeviceUDN, 
+	IN char *ServiceType, int Exp);
 
 #endif
 

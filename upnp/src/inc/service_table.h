@@ -269,7 +269,7 @@ void printService(
 	Dbg_Level level,
 	Dbg_Module module);
 #else
-static inline void printService(
+static UPNP_INLINE void printService(
 	service_info *service,
 	Dbg_Level level,
 	Dbg_Module module) {}
@@ -296,7 +296,7 @@ void printServiceList(
 	Dbg_Level level,
 	Dbg_Module module);
 #else
-static inline void printServiceList(
+static UPNP_INLINE void printServiceList(
 	service_info *service,
 	Dbg_Level level,
 	Dbg_Module module) {}
@@ -324,7 +324,7 @@ void printServiceTable(
 	Dbg_Level level,
 	Dbg_Module module);
 #else
-static inline void printServiceTable(
+static UPNP_INLINE void printServiceTable(
 	service_table *table,
 	Dbg_Level level,
 	Dbg_Module module) {}

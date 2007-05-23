@@ -190,7 +190,7 @@ void free_URL_list(URL_list * list);
 #ifdef DEBUG
 void print_uri(uri_type *in);
 #else
-static inline void print_uri(uri_type *in) {}
+static UPNP_INLINE void print_uri(uri_type *in) {}
 #endif
 
 /************************************************************************
@@ -208,7 +208,7 @@ static inline void print_uri(uri_type *in) {}
 #ifdef DEBUG
 void print_token(token *in);
 #else
-static inline void print_token(token * in) {}
+static UPNP_INLINE void print_token(token * in) {}
 #endif
 
 /************************************************************************

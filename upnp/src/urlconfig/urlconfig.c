@@ -62,7 +62,7 @@
 *
 *	Note :
 ************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 addrToString( IN const struct sockaddr_in *addr,
               OUT char ipaddr_port[] )
 {
@@ -87,7 +87,7 @@ addrToString( IN const struct sockaddr_in *addr,
 *
 *	Note : 'newAlias' should be freed using free()
 ************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 calc_alias( IN const char *alias,
             IN const char *rootPath,
             OUT char **newAlias )
@@ -148,7 +148,7 @@ calc_alias( IN const char *alias,
 *
 *	Note :
 ************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 calc_descURL( IN const char *ipPortStr,
               IN const char *alias,
               OUT char descURL[LINE_SIZE] )

@@ -188,7 +188,7 @@ free_notify_struct( IN notify_thread_struct * input )
 *
 *	Note : called by genaNotify
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 notify_send_and_recv( IN uri_type * destination_url,
                       IN membuffer * mid_msg,
                       IN char *propertySet,

@@ -36,12 +36,11 @@
 
 #include <sys/types.h>
 #ifndef WIN32
- #include <sys/socket.h>
+	#include <sys/socket.h>
 #else
- #define XINLINE
-
- typedef int socklen_t;
- #define EAFNOSUPPORT 97
+	typedef int socklen_t;
+	#define EAFNOSUPPORT 97
 #endif
 
 #endif // GENLIB_NET_UNIXUTIL_H
+

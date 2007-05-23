@@ -244,7 +244,7 @@ get_node_value( IN IXML_Node * node )
 *
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_host_and_path( IN char *ctrl_url,
                    OUT const memptr *host,
                    OUT const memptr *path,
@@ -277,7 +277,7 @@ get_host_and_path( IN char *ctrl_url,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_action_name( IN char *action,
                  OUT memptr * name )
 {
@@ -303,7 +303,7 @@ get_action_name( IN char *action,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 add_man_header( INOUT membuffer * headers )
 {
     char *soap_action_hdr;

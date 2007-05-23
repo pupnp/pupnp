@@ -205,7 +205,7 @@ extern str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES];
 * Returns:																
 *	 void																
 ************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 media_list_init( void )
 {
     int i;
@@ -243,7 +243,7 @@ media_list_init( void )
 *	 0 on success;														
 *	-1 on error															
 ************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 search_extension( IN const char *extension,
                   OUT const char **con_type,
                   OUT const char **con_subtype )
@@ -290,7 +290,7 @@ search_extension( IN const char *extension,
 *	 0 - On Sucess														
 *	 UPNP_E_OUTOF_MEMORY - on memory allocation failures				
 ************************************************************************/
-XINLINE int
+UPNP_INLINE int
 get_content_type( IN const char *filename,
                   OUT DOMString * content_type )
 {
@@ -348,7 +348,7 @@ get_content_type( IN const char *filename,
 * Returns:																
 *	 void																
 ************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 glob_alias_init( void )
 {
     struct xml_alias_t *alias = &gAliasDoc;
@@ -370,7 +370,7 @@ glob_alias_init( void )
 * Returns:																
 *	 BOOLEAN															
 ************************************************************************/
-static XINLINE xboolean
+static UPNP_INLINE xboolean
 is_valid_alias( IN const struct xml_alias_t *alias )
 {
     return alias->doc.buf != NULL;
@@ -700,7 +700,7 @@ web_server_set_root_dir( IN const char *root_dir )
 *	TRUE - On Success													
 *	FALSE if request is not an alias									
 ************************************************************************/
-static XINLINE xboolean
+static UPNP_INLINE xboolean
 get_alias( IN const char *request_file,
            OUT struct xml_alias_t *alias,
            OUT struct File_Info *info )

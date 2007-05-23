@@ -641,7 +641,7 @@ free_ssdp_event_handler_data( void *the_data )
 * Returns: xboolean
 *	returns TRUE if msg is valid else FALSE
 ***************************************************************************/
-static XINLINE xboolean
+static UPNP_INLINE xboolean
 valid_ssdp_msg( IN http_message_t * hmsg )
 {
     memptr hdr_value;
@@ -683,7 +683,7 @@ valid_ssdp_msg( IN http_message_t * hmsg )
 * Returns: int
 *	0 if successful -1 if error
 ***************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 start_event_handler( void *Data )
 {
 

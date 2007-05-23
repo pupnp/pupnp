@@ -85,7 +85,7 @@ const char *ContentTypeHeader =
 *		0 if successful else returns appropriate error.
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_request_type( IN http_message_t * request,
                   OUT memptr * action_name )
 {
@@ -262,7 +262,7 @@ send_error_response( IN SOCKINFO * info,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 send_var_query_response( IN SOCKINFO * info,
                          IN const char *var_value,
                          IN http_message_t * hmsg )
@@ -326,12 +326,12 @@ send_var_query_response( IN SOCKINFO * info,
 *	Description :	This function separates the action node from 
 *	the root DOM node.
 *
-*	Return :	static XINLINE int
+*	Return :	static UPNP_INLINE int
 *		0 if successful, or -1 if fails.
 *
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_action_node( IN IXML_Document * TempDoc,
                  IN char *NodeName,
                  OUT IXML_Document ** RespNode )
@@ -681,7 +681,7 @@ get_device_info( IN http_message_t * request,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 send_action_response( IN SOCKINFO * info,
                       IN IXML_Document * action_resp,
                       IN http_message_t * request )
@@ -769,7 +769,7 @@ error_handler:
 *		returns 0 if successful else returns -1.
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_var_name( IN IXML_Document * TempDoc,
               OUT char *VarName )
 {
@@ -840,7 +840,7 @@ error_handler:
 *
 *	Note :
 ****************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 handle_query_variable( IN SOCKINFO * info,
                        IN http_message_t * request,
                        IN IXML_Document * xml_doc )

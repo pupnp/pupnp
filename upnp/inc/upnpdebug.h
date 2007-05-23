@@ -100,12 +100,13 @@ typedef enum Upnp_LogLevel_e {
 
 
 /***************************************************************************
- * Function : UpnpInitLog						
- *								
- * Parameters:	void						
- *									
- * Description:								
+ * Function : UpnpInitLog
+ *
+ * Parameters:	void
+ *
+ * Description:
  *	This functions initializes the log files
+ *
  * Returns: int
  *	-1 : If fails
  *	UPNP_E_SUCCESS : if success
@@ -113,7 +114,7 @@ typedef enum Upnp_LogLevel_e {
 #ifdef DEBUG
 int UpnpInitLog();
 #else
-static inline int UpnpInitLog() { return UPNP_E_SUCCESS; }
+static UPNP_INLINE int UpnpInitLog() { return UPNP_E_SUCCESS; }
 #endif
 
 // for backward compatibility
@@ -132,7 +133,7 @@ static inline int UpnpInitLog() { return UPNP_E_SUCCESS; }
 #ifdef DEBUG
 void UpnpSetLogLevel(Upnp_LogLevel log_level);
 #else
-static inline void UpnpSetLogLevel(Upnp_LogLevel log_level) {}
+static UPNP_INLINE void UpnpSetLogLevel(Upnp_LogLevel log_level) {}
 #endif
 
 
@@ -148,7 +149,7 @@ static inline void UpnpSetLogLevel(Upnp_LogLevel log_level) {}
 #ifdef DEBUG
 void UpnpCloseLog();
 #else
-static inline void UpnpCloseLog() {}
+static UPNP_INLINE void UpnpCloseLog() {}
 #endif
 
 // for backward compatibility
@@ -174,7 +175,7 @@ void UpnpSetLogFileNames(
 	const char *ErrFileName,
 	const char *InfoFileName);
 #else
-static inline void UpnpSetLogFileNames(
+static UPNP_INLINE void UpnpSetLogFileNames(
 	const char *ErrFileName,
 	const char *InfoFileName) {}
 #endif
@@ -202,7 +203,7 @@ static inline void UpnpSetLogFileNames(
 #ifdef DEBUG
 FILE *UpnpGetDebugFile(Upnp_LogLevel level, Dbg_Module module);
 #else
-static inline FILE *UpnpGetDebugFile(Upnp_LogLevel level, Dbg_Module module)
+static UPNP_INLINE FILE *UpnpGetDebugFile(Upnp_LogLevel level, Dbg_Module module)
 {
 	return NULL;
 }
@@ -232,7 +233,7 @@ int DebugAtThisLevel(
 	IN Upnp_LogLevel DLevel,
 	IN Dbg_Module Module);
 #else
-static inline int DebugAtThisLevel(
+static UPNP_INLINE int DebugAtThisLevel(
 	IN Upnp_LogLevel DLevel,
 	IN Dbg_Module Module) { return 0; }
 #endif
@@ -269,7 +270,7 @@ void UpnpPrintf (Upnp_LogLevel DLevel, Dbg_Module Module,
 #endif
 ;
 #else
-static inline void UpnpPrintf(
+static UPNP_INLINE void UpnpPrintf(
 	Upnp_LogLevel DLevel,
 	Dbg_Module Module,
 	const char* DbgFileName,
@@ -300,7 +301,7 @@ void UpnpDisplayBanner(
 	size_t size,
 	int starlength);
 #else
-static inline void UpnpDisplayBanner(
+static UPNP_INLINE void UpnpDisplayBanner(
 	FILE *fd,
 	const char **lines,
 	size_t size,
@@ -328,7 +329,7 @@ void UpnpDisplayFileAndLine(
 	const char *DbgFileName,
 	int DbgLineNo);
 #else
-static inline void UpnpDisplayFileAndLine(
+static UPNP_INLINE void UpnpDisplayFileAndLine(
 	FILE *fd,
 	const char *DbgFileName,
 	int DbgLineNo) {}

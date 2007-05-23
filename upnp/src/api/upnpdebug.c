@@ -88,18 +88,19 @@ UpnpSetLogFileNames ( IN const char *ErrFileName,
 
 
 /***************************************************************************
- * Function : UpnpInitLog					
- *									
- * Parameters:	void							
- *						
- * Description:							
+ * Function : UpnpInitLog
+ *
+ * Parameters:	void
+ *
+ * Description:
  *	This functions initializes the log files
+ *
  * Returns: int
  *	-1 : If fails
  *	UPNP_E_SUCCESS : if success
  ***************************************************************************/
 int
-UpnpInitLog(  )
+UpnpInitLog()
 {
     ithread_mutex_init( &GlobalDebugMutex, NULL );
 
@@ -139,7 +140,7 @@ UpnpSetLogLevel (Upnp_LogLevel log_level)
  * Returns: void
  ***************************************************************************/
 void
-UpnpCloseLog(  )
+UpnpCloseLog()
 {
     if( DEBUG_TARGET == 1 ) {
         fflush( ErrFileHnd );

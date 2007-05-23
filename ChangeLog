@@ -3,6 +3,11 @@ Version 1.4.7
 *******************************************************************************
 
 2007-05-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* More MSVC fixes, using XINLINE instead of inline, MSVC has troubles
+	with inline. Thanks to David Maass for reporting.
+	* Changed XINLINE to UPNP_INLINE.
+
+2007-05-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added the file build/inc/msvc/inttypes.h. This file is for use with
 	MSVC only, because it does not provide C99 compatibility.
 

@@ -215,7 +215,7 @@ dispatch_request( IN SOCKINFO * info,
 *
 *	Note :
 ************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 handle_error( IN SOCKINFO * info,
               int http_error_code,
               int major,
@@ -333,7 +333,7 @@ handle_request( void *args )
 *
 *	Note :
 ************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 schedule_request_job( IN int connfd,
                       IN struct sockaddr_in *clientAddr )
 {

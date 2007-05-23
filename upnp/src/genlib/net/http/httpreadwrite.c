@@ -2343,7 +2343,7 @@ http_OpenHttpGetEx( IN const char *url_str,
 *	Description :	Returns the server information for the operating 
 *		system
 *
-*	Return :	XINLINE void
+*	Return :	UPNP_INLINE void
 *
 *	Note :
 ************************************************************************/
