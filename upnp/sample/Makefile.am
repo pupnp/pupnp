@@ -31,6 +31,7 @@ upnp_tv_ctrlpt_CPPFLAGS = \
 if ENABLE_DEVICE
 noinst_PROGRAMS += upnp_tv_combo
 upnp_tv_combo_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(srcdir)/common/ \
 	-I$(srcdir)/tvcombo
 endif
 endif

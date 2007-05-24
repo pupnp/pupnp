@@ -14,7 +14,7 @@
     <modelNumber>1.0</modelNumber>
     <modelURL>http://www.manufacturer.com/TVEmulator/</modelURL>
     <serialNumber>123456789001</serialNumber>
-    <UDN>uuid:Upnp-TVEmulator-1_0-1234567890001</UDN>
+    <UDN>uuid:Upnp-TVEmulator-1_0-1234567890002</UDN>
     <UPC>123456789</UPC>
     <serviceList>
       <service>

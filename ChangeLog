@@ -3,6 +3,10 @@ Version 1.4.7
 *******************************************************************************
 
 2007-05-24 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
+	* Added tvcombo sample that demonstrates coexistence of a device and a
+	control point in the same application.
+
+2007-05-24 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
 	* SF Tracker FR [ 1570020 ].
 	* Enable both device and control point in the same application. Resolve
 	deadlock in the SSDP processing threads.
