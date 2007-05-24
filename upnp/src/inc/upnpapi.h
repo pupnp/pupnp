@@ -124,7 +124,7 @@ extern unsigned short LOCAL_PORT;
 extern TimerThread gTimerThread;
 extern ThreadPool gRecvThreadPool;
 extern ThreadPool gSendThreadPool;
-
+extern ThreadPool gMiniServerThreadPool;
 
 typedef enum {
     SUBSCRIBE,

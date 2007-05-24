@@ -359,7 +359,7 @@ schedule_request_job( IN int connfd,
     TPJobSetFreeFunction( &job, free_handle_request_arg );
     TPJobSetPriority( &job, MED_PRIORITY );
 
-    if( ThreadPoolAdd( &gRecvThreadPool, &job, NULL ) != 0 ) {
+    if( ThreadPoolAdd( &gMiniServerThreadPool, &job, NULL ) != 0 ) {
         UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
             "mserv %d: cannot schedule request\n", connfd );
             free( request );
@@ -772,7 +772,7 @@ StartMiniServer( unsigned short listen_port )
 
     TPJobSetFreeFunction( &job, ( free_routine ) free );
 
-    success = ThreadPoolAddPersistent( &gRecvThreadPool, &job, NULL );
+    success = ThreadPoolAddPersistent( &gMiniServerThreadPool, &job, NULL );
 
     if( success < 0 ) {
         shutdown( miniSocket->miniServerSock, SD_BOTH );

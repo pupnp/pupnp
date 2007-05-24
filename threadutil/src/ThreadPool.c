@@ -674,7 +674,7 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
         threads = tp->totalThreads - tp->persistentThreads;
 
         while( ( threads == 0 )
-               || ( ( jobs / threads ) > tp->attr.jobsPerThread ) ) {
+               || ( ( jobs / threads ) >= tp->attr.jobsPerThread ) ) {
 
             if( CreateWorker( tp ) != 0 )
                 return;

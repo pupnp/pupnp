@@ -88,6 +88,8 @@ CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
 
     ThreadPool gSendThreadPool;
 
+     ThreadPool gMiniServerThreadPool;
+
 //Flag to indicate the state of web server
      WebServerState bWebServerState = WEB_SERVER_DISABLED;
 
@@ -253,6 +255,12 @@ int UpnpInit( IN const char *HostIP,
     if( ThreadPoolInit( &gRecvThreadPool, &attr ) != UPNP_E_SUCCESS ) {
         UpnpSdkInit = 0;
         UpnpFinish();
+        return UPNP_E_INIT_FAILED;
+    }
+
+    if( ThreadPoolInit( &gMiniServerThreadPool, &attr ) != UPNP_E_SUCCESS ) {
+        UpnpSdkInit = 0;
+        UpnpFinish(  );
         return UPNP_E_INIT_FAILED;
     }
 
