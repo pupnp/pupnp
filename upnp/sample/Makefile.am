@@ -28,6 +28,11 @@ upnp_tv_ctrlpt_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-I$(srcdir)/common/ \
 	-I$(srcdir)/tvctrlpt
+if ENABLE_DEVICE
+noinst_PROGRAMS += upnp_tv_combo
+upnp_tv_combo_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(srcdir)/tvcombo
+endif
 endif
 if ENABLE_DEVICE
 noinst_PROGRAMS += upnp_tv_device
@@ -53,6 +58,15 @@ upnp_tv_ctrlpt_SOURCES = \
 	tvctrlpt/upnp_tv_ctrlpt.c \
 	tvctrlpt/upnp_tv_ctrlpt.h \
 	tvctrlpt/linux/upnp_tv_ctrlpt_main.c
+
+upnp_tv_combo_SOURCES = \
+	common/sample_util.c \
+	common/sample_util.h \
+	tvcombo/upnp_tv_ctrlpt.c \
+	tvcombo/upnp_tv_ctrlpt.h \
+	tvcombo/upnp_tv_device.c \
+	tvcombo/upnp_tv_device.h \
+	tvcombo/linux/upnp_tv_combo_main.c
 
 
 if WITH_DOCUMENTATION
