@@ -2,6 +2,13 @@
 Version 1.4.7
 *******************************************************************************
 
+2007-05-24 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
+	* Modified tvdevice (control and picture) service descriptions to make
+	compatible with WinXP/IE control point. 'in' arguments must appear before
+	'out' arguments in argument list.
+	Thanks to Martin Tremblay for pointing out the solution originally provided
+	by MORIOKA Yasuhiro.
+
 2007-05-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* More MSVC fixes, using XINLINE instead of inline, MSVC has troubles
 	with inline. Thanks to David Maass for reporting.
