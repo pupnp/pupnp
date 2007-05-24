@@ -3,6 +3,13 @@ Version 1.4.7
 *******************************************************************************
 
 2007-05-24 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
+	* SF Tracker FR [ 1570020 ].
+	* Enable both device and control point in the same application. Resolve
+	deadlock in the SSDP processing threads.
+	* Fix Threadpool expansion condition.
+	Thanks to Siva Chandran P. for the original patch.
+
+2007-05-24 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
 	* Modified tvdevice (control and picture) service descriptions to make
 	compatible with WinXP/IE control point. 'in' arguments must appear before
 	'out' arguments in argument list.
