@@ -131,7 +131,7 @@ SetPriority( ThreadPriority priority )
     int midPriority = 0;
     struct sched_param newPriority;
 
-    pthread_getschedparam( ithread_self(  ), &currentPolicy,
+    pthread_getschedparam( ithread_self(), &currentPolicy,
                            &newPriority );
     minPriority = sched_get_priority_min( currentPolicy );
     maxPriority = sched_get_priority_max( currentPolicy );
@@ -153,7 +153,7 @@ SetPriority( ThreadPriority priority )
 
     newPriority.sched_priority = actPriority;
 
-    return pthread_setschedparam( ithread_self(  ), currentPolicy,
+    return pthread_setschedparam( ithread_self(), currentPolicy,
                                   &newPriority );
 
 }
@@ -220,10 +220,8 @@ BumpPriority( ThreadPool * tp )
                 //starvation time
                 //bump priority (add to higher priority Q)
 
-                STATSONLY( tp->stats.totalJobsMQ++;
-                     );
-                STATSONLY( tp->stats.totalTimeMQ += diffTime;
-                     );
+                STATSONLY( tp->stats.totalJobsMQ++; )
+                STATSONLY( tp->stats.totalTimeMQ += diffTime; )
 
                 ListDelNode( &tp->medJobQ, tp->medJobQ.head.next, 0 );
                 ListAddTail( &tp->highJobQ, tempJob );
@@ -241,10 +239,8 @@ BumpPriority( ThreadPool * tp )
                 //starvation time
                 //bump priority (add to higher priority Q)
 
-                STATSONLY( tp->stats.totalJobsLQ++;
-                     );
-                STATSONLY( tp->stats.totalTimeLQ += diffTime;
-                     );
+                STATSONLY( tp->stats.totalJobsLQ++; )
+                STATSONLY( tp->stats.totalTimeLQ += diffTime; )
 
                 ListDelNode( &tp->lowJobQ, tp->lowJobQ.head.next, 0 );
                 ListAddTail( &tp->medJobQ, tempJob );
@@ -293,14 +289,26 @@ SetRelTimeout( struct timespec *time,
  *      ThreadPoolStats *stats must be valid non null stats structure
  *****************************************************************************/
 #ifdef STATS
-static void StatsInit( ThreadPoolStats * stats ) {
-           assert( stats != NULL ); stats->totalIdleTime = 0; stats->totalJobsHQ = 0; stats->totalJobsLQ = 0; stats->totalJobsMQ = 0; stats->totalTimeHQ = 0; stats->totalTimeMQ = 0; stats->totalTimeLQ = 0; stats->totalWorkTime = 0; stats->totalIdleTime = 0; stats->avgWaitHQ = 0; //average wait in HQ
-           stats->avgWaitMQ = 0;    //average wait in MQ
+static void StatsInit( ThreadPoolStats * stats )
+{
+           assert( stats != NULL );
+	   stats->totalIdleTime = 0;
+	   stats->totalJobsHQ = 0;
+	   stats->totalJobsLQ = 0;
+	   stats->totalJobsMQ = 0;
+	   stats->totalTimeHQ = 0;
+	   stats->totalTimeMQ = 0;
+	   stats->totalTimeLQ = 0;
+	   stats->totalWorkTime = 0;
+	   stats->totalIdleTime = 0;
+	   stats->avgWaitHQ = 0;
+           stats->avgWaitMQ = 0;
            stats->avgWaitLQ = 0;
            stats->workerThreads = 0;
            stats->idleThreads = 0;
            stats->persistentThreads = 0;
-           stats->maxThreads = 0; stats->totalThreads = 0;}
+           stats->maxThreads = 0; stats->totalThreads = 0;
+}
 #endif
 
 /****************************************************************************
@@ -346,16 +354,16 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
  *  Parameters:
  *      
  *****************************************************************************/
-    static void SetSeed(  ) {
+    static void SetSeed() {
     struct timeb t;
 
     ftime( &t );
 #if defined(WIN32)
-    srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id(  ).p );
+    srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id().p );
 #elif defined(__FreeBSD__)
-    srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id(  ) );
+    srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id() );
 #else
-    srand( ( unsigned int )t.millitm + ithread_get_current_thread_id(  ) );
+    srand( ( unsigned int )t.millitm + ithread_get_current_thread_id() );
 #endif
     }
 
@@ -375,8 +383,7 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
  *****************************************************************************/
     static void *WorkerThread( void *arg ) {
 
-        STATSONLY( time_t start = 0;
-             )
+        STATSONLY( time_t start = 0; )
 
         ThreadPoolJob *job = NULL;
         ListNode *head = NULL;
@@ -400,10 +407,9 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
         ithread_cond_broadcast( &tp->start_and_shutdown );
         ithread_mutex_unlock( &tp->mutex );
 
-        SetSeed(  );
+        SetSeed();
 
-        STATSONLY( time( &start );
-             );
+        STATSONLY( time( &start ); )
 
         while( 1 ) {
 
@@ -418,12 +424,9 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
 
             retCode = 0;
 
-            STATSONLY( tp->stats.idleThreads++;
-                 );
-            STATSONLY( tp->stats.totalWorkTime += ( time( NULL ) - start );
-                 );             //work time
-            STATSONLY( time( &start );
-                 );             //idle time
+            STATSONLY( tp->stats.idleThreads++; )
+            STATSONLY( tp->stats.totalWorkTime += ( time( NULL ) - start ); ) //work time
+            STATSONLY( time( &start ); )  // idle time
 
             if( persistent == 1 ) {
                 //Persistent thread
@@ -431,8 +434,7 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
                 tp->persistentThreads--;
             }
 
-            STATSONLY( if( persistent == 0 )
-                       tp->stats.workerThreads--; );
+            STATSONLY( if( persistent == 0 ) tp->stats.workerThreads--; )
 
             //Check for a job or shutdown
             while( ( tp->lowJobQ.size == 0 )
@@ -453,7 +455,7 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
                          && ( ( tp->totalThreads ) >
                               tp->attr.maxThreads ) ) ) {
 
-                    STATSONLY( tp->stats.idleThreads-- );
+                    STATSONLY( tp->stats.idleThreads--; )
 
                     tp->totalThreads--;
                     ithread_cond_broadcast( &tp->start_and_shutdown );
@@ -475,12 +477,9 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
 
             }
 
-            STATSONLY( tp->stats.idleThreads--;
-                 );
-            STATSONLY( tp->stats.totalIdleTime += ( time( NULL ) - start );
-                 );             //idle time
-            STATSONLY( time( &start );
-                 );             //work time
+            STATSONLY( tp->stats.idleThreads--; )
+            STATSONLY( tp->stats.totalIdleTime += ( time( NULL ) - start ); )  // idle time
+            STATSONLY( time( &start ); ) // work time
 
             //bump priority of starved jobs
             BumpPriority( tp );
@@ -512,34 +511,33 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
                     ithread_cond_broadcast( &tp->start_and_shutdown );
 
                 } else {
-                    STATSONLY( tp->stats.workerThreads++ );
+                    STATSONLY( tp->stats.workerThreads++; )
                     persistent = 0;
 
                     //Pick the highest priority job
                     if( tp->highJobQ.size > 0 ) {
                         head = ListHead( &tp->highJobQ );
                         job = ( ThreadPoolJob * ) head->item;
-                        STATSONLY( CalcWaitTime
-                                   ( tp, HIGH_PRIORITY, job ) );
+                        STATSONLY( CalcWaitTime( tp, HIGH_PRIORITY, job ); )
                         ListDelNode( &tp->highJobQ, head, 0 );
 
                     } else if( tp->medJobQ.size > 0 ) {
                         head = ListHead( &tp->medJobQ );
                         job = ( ThreadPoolJob * ) head->item;
-                        STATSONLY( CalcWaitTime( tp, MED_PRIORITY, job ) );
+                        STATSONLY( CalcWaitTime( tp, MED_PRIORITY, job ); )
                         ListDelNode( &tp->medJobQ, head, 0 );
 
                     } else if( tp->lowJobQ.size > 0 ) {
                         head = ListHead( &tp->lowJobQ );
                         job = ( ThreadPoolJob * ) head->item;
-                        STATSONLY( CalcWaitTime( tp, LOW_PRIORITY, job ) );
+                        STATSONLY( CalcWaitTime( tp, LOW_PRIORITY, job ); )
                         ListDelNode( &tp->lowJobQ, head, 0 );
 
                     } else {
 
                         // Should never get here
                         assert( 0 );
-                        STATSONLY( tp->stats.workerThreads-- );
+                        STATSONLY( tp->stats.workerThreads--; )
                         tp->totalThreads--;
                         ithread_cond_broadcast( &tp->start_and_shutdown );
                         ithread_mutex_unlock( &tp->mutex );
@@ -644,9 +642,11 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
 
         }
 
-        STATSONLY( if( tp->stats.maxThreads < tp->totalThreads ) {
-                   tp->stats.maxThreads = tp->totalThreads;}
-         )
+#ifdef STATS
+        if( tp->stats.maxThreads < tp->totalThreads ) {
+                   tp->stats.maxThreads = tp->totalThreads;
+        }
+#endif
 
             return rc;
     }
@@ -766,7 +766,7 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
                                  JOBFREELISTSIZE );
         assert( retCode == 0 );
 
-        STATSONLY( StatsInit( &tp->stats ) );
+        STATSONLY( StatsInit( &tp->stats ); )
 
         retCode += ListInit( &tp->highJobQ, CmpThreadPoolJob, NULL );
         assert( retCode == 0 );
