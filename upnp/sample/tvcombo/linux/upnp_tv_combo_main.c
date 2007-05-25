@@ -29,9 +29,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-#include <stdio.h>
+
 #include "sample_util.h"
 #include "upnp_tv_ctrlpt.h"
+#include "upnp_tv_device.h"
+
+
+#include <stdio.h>
 #include <string.h>
 
 /*
@@ -124,108 +128,72 @@ TvCtrlPointPrintLongHelp( void )
     SampleUtil_Print( "* TV Control Point Help Info *" );
     SampleUtil_Print( "******************************" );
     SampleUtil_Print( "" );
-    SampleUtil_Print
-        ( "This sample control point application automatically searches" );
-    SampleUtil_Print
-        ( "for and subscribes to the services of television device emulator" );
-    SampleUtil_Print
-        ( "devices. While registers a tv device itself." );
+    SampleUtil_Print( "This sample control point application automatically searches" );
+    SampleUtil_Print( "for and subscribes to the services of television device emulator" );
+    SampleUtil_Print( "devices. While registers a tv device itself." );
     SampleUtil_Print( "" );
     SampleUtil_Print( "Commands:" );
     SampleUtil_Print( "  Help" );
     SampleUtil_Print( "       Print this help info." );
     SampleUtil_Print( "  ListDev" );
-    SampleUtil_Print
-        ( "       Print the current list of TV Device Emulators that this" );
-    SampleUtil_Print
-        ( "         control point is aware of.  Each device is preceded by a" );
-    SampleUtil_Print
-        ( "         device number which corresponds to the devnum argument of" );
+    SampleUtil_Print( "       Print the current list of TV Device Emulators that this" );
+    SampleUtil_Print( "         control point is aware of.  Each device is preceded by a" );
+    SampleUtil_Print( "         device number which corresponds to the devnum argument of" );
     SampleUtil_Print( "         commands listed below." );
     SampleUtil_Print( "  Refresh" );
-    SampleUtil_Print
-        ( "       Delete all of the devices from the device list and issue new" );
-    SampleUtil_Print
-        ( "         search request to rebuild the list from scratch." );
+    SampleUtil_Print( "       Delete all of the devices from the device list and issue new" );
+    SampleUtil_Print( "         search request to rebuild the list from scratch." );
     SampleUtil_Print( "  PrintDev       <devnum>" );
-    SampleUtil_Print
-        ( "       Print the state table for the device <devnum>." );
-    SampleUtil_Print
-        ( "         e.g., 'PrintDev 1' prints the state table for the first" );
+    SampleUtil_Print( "       Print the state table for the device <devnum>." );
+    SampleUtil_Print( "         e.g., 'PrintDev 1' prints the state table for the first" );
     SampleUtil_Print( "         device in the device list." );
     SampleUtil_Print( "  PowerOn        <devnum>" );
-    SampleUtil_Print
-        ( "       Sends the PowerOn action to the Control Service of" );
+    SampleUtil_Print( "       Sends the PowerOn action to the Control Service of" );
     SampleUtil_Print( "         device <devnum>." );
     SampleUtil_Print( "  PowerOff       <devnum>" );
-    SampleUtil_Print
-        ( "       Sends the PowerOff action to the Control Service of" );
+    SampleUtil_Print( "       Sends the PowerOff action to the Control Service of" );
     SampleUtil_Print( "         device <devnum>." );
     SampleUtil_Print( "  SetChannel     <devnum> <channel>" );
-    SampleUtil_Print
-        ( "       Sends the SetChannel action to the Control Service of" );
-    SampleUtil_Print
-        ( "         device <devnum>, requesting the channel to be changed" );
+    SampleUtil_Print( "       Sends the SetChannel action to the Control Service of" );
+    SampleUtil_Print( "         device <devnum>, requesting the channel to be changed" );
     SampleUtil_Print( "         to <channel>." );
     SampleUtil_Print( "  SetVolume      <devnum> <volume>" );
-    SampleUtil_Print
-        ( "       Sends the SetVolume action to the Control Service of" );
-    SampleUtil_Print
-        ( "         device <devnum>, requesting the volume to be changed" );
+    SampleUtil_Print( "       Sends the SetVolume action to the Control Service of" );
+    SampleUtil_Print( "         device <devnum>, requesting the volume to be changed" );
     SampleUtil_Print( "         to <volume>." );
     SampleUtil_Print( "  SetColor       <devnum> <color>" );
-    SampleUtil_Print
-        ( "       Sends the SetColor action to the Control Service of" );
-    SampleUtil_Print
-        ( "         device <devnum>, requesting the color to be changed" );
+    SampleUtil_Print( "       Sends the SetColor action to the Control Service of" );
+    SampleUtil_Print( "         device <devnum>, requesting the color to be changed" );
     SampleUtil_Print( "         to <color>." );
     SampleUtil_Print( "  SetTint        <devnum> <tint>" );
-    SampleUtil_Print
-        ( "       Sends the SetTint action to the Control Service of" );
-    SampleUtil_Print
-        ( "         device <devnum>, requesting the tint to be changed" );
+    SampleUtil_Print( "       Sends the SetTint action to the Control Service of" );
+    SampleUtil_Print( "         device <devnum>, requesting the tint to be changed" );
     SampleUtil_Print( "         to <tint>." );
     SampleUtil_Print( "  SetContrast    <devnum> <contrast>" );
-    SampleUtil_Print
-        ( "       Sends the SetContrast action to the Control Service of" );
-    SampleUtil_Print
-        ( "         device <devnum>, requesting the contrast to be changed" );
+    SampleUtil_Print( "       Sends the SetContrast action to the Control Service of" );
+    SampleUtil_Print( "         device <devnum>, requesting the contrast to be changed" );
     SampleUtil_Print( "         to <contrast>." );
     SampleUtil_Print( "  SetBrightness  <devnum> <brightness>" );
-    SampleUtil_Print
-        ( "       Sends the SetBrightness action to the Control Service of" );
-    SampleUtil_Print
-        ( "         device <devnum>, requesting the brightness to be changed" );
+    SampleUtil_Print( "       Sends the SetBrightness action to the Control Service of" );
+    SampleUtil_Print( "         device <devnum>, requesting the brightness to be changed" );
     SampleUtil_Print( "         to <brightness>." );
     SampleUtil_Print( "  CtrlAction     <devnum> <action>" );
-    SampleUtil_Print
-        ( "       Sends an action request specified by the string <action>" );
-    SampleUtil_Print
-        ( "         to the Control Service of device <devnum>.  This command" );
-    SampleUtil_Print
-        ( "         only works for actions that have no arguments." );
-    SampleUtil_Print
-        ( "         (e.g., \"CtrlAction 1 IncreaseChannel\")" );
+    SampleUtil_Print( "       Sends an action request specified by the string <action>" );
+    SampleUtil_Print( "         to the Control Service of device <devnum>.  This command" );
+    SampleUtil_Print( "         only works for actions that have no arguments." );
+    SampleUtil_Print( "         (e.g., \"CtrlAction 1 IncreaseChannel\")" );
     SampleUtil_Print( "  PictAction     <devnum> <action>" );
-    SampleUtil_Print
-        ( "       Sends an action request specified by the string <action>" );
-    SampleUtil_Print
-        ( "         to the Picture Service of device <devnum>.  This command" );
-    SampleUtil_Print
-        ( "         only works for actions that have no arguments." );
-    SampleUtil_Print
-        ( "         (e.g., \"PictAction 1 DecreaseContrast\")" );
+    SampleUtil_Print( "       Sends an action request specified by the string <action>" );
+    SampleUtil_Print( "         to the Picture Service of device <devnum>.  This command" );
+    SampleUtil_Print( "         only works for actions that have no arguments." );
+    SampleUtil_Print( "         (e.g., \"PictAction 1 DecreaseContrast\")" );
     SampleUtil_Print( "  CtrlGetVar     <devnum> <varname>" );
-    SampleUtil_Print
-        ( "       Requests the value of a variable specified by the string <varname>" );
-    SampleUtil_Print
-        ( "         from the Control Service of device <devnum>." );
+    SampleUtil_Print( "       Requests the value of a variable specified by the string <varname>" );
+    SampleUtil_Print( "         from the Control Service of device <devnum>." );
     SampleUtil_Print( "         (e.g., \"CtrlGetVar 1 Volume\")" );
     SampleUtil_Print( "  PictGetVar     <devnum> <action>" );
-    SampleUtil_Print
-        ( "       Requests the value of a variable specified by the string <varname>" );
-    SampleUtil_Print
-        ( "         from the Picture Service of device <devnum>." );
+    SampleUtil_Print( "       Requests the value of a variable specified by the string <varname>" );
+    SampleUtil_Print( "         from the Picture Service of device <devnum>." );
     SampleUtil_Print( "         (e.g., \"PictGetVar 1 Tint\")" );
     SampleUtil_Print( "  Exit" );
     SampleUtil_Print( "       Exits the control point application." );
@@ -242,7 +210,7 @@ TvCtrlPointPrintLongHelp( void )
  *
  ********************************************************************************/
 void
-TvCtrlPointPrintCommands(  )
+TvCtrlPointPrintCommands()
 {
     int i;
     int numofcmds = sizeof( cmdloop_cmdlist ) / sizeof( cmdloop_commands );
@@ -321,11 +289,11 @@ TvCtrlPointProcessCommand( char *cmdline )
 
     switch ( cmdnum ) {
         case PRTHELP:
-            TvCtrlPointPrintShortHelp(  );
+            TvCtrlPointPrintShortHelp();
             break;
 
         case PRTFULLHELP:
-            TvCtrlPointPrintLongHelp(  );
+            TvCtrlPointPrintLongHelp();
             break;
 
         case POWON:
@@ -411,15 +379,15 @@ TvCtrlPointProcessCommand( char *cmdline )
             break;
 
         case LSTDEV:
-            TvCtrlPointPrintList(  );
+            TvCtrlPointPrintList();
             break;
 
         case REFRESH:
-            TvCtrlPointRefresh(  );
+            TvCtrlPointRefresh();
             break;
 
         case EXITCMD:
-            rc = TvCtrlPointStop(  );
+            rc = TvCtrlPointStop();
             exit( rc );
             break;
 
@@ -435,8 +403,7 @@ TvCtrlPointProcessCommand( char *cmdline )
 }
 
 int
-device_main( int argc,
-      char **argv )
+device_main( int argc, char **argv )
 {
 
     unsigned int portTemp = 0;
@@ -449,7 +416,7 @@ device_main( int argc,
 
     SampleUtil_Initialize( linux_print );
 
-    //Parse options
+    // Parse options
     for( i = 1; i < argc; i++ ) {
         if( strcmp( argv[i], "-ip" ) == 0 ) {
             ip_address = argv[++i];
@@ -476,20 +443,18 @@ device_main( int argc,
                 ( "\tweb_dir_path: Filesystem path where web files "
                   "related to the device are stored\n" );
             SampleUtil_Print( "\t\te.g.: /upnp/sample/web\n" );
-            exit( 1 );
+            return 1;
         }
     }
 
     port = ( unsigned short )portTemp;
 
-    TvDeviceStart( ip_address, port, desc_doc_name, web_dir_path,
-                   linux_print );
-
+    return TvDeviceStart(
+        ip_address, port, desc_doc_name, web_dir_path, linux_print );
 }
 
 int
-main( int argc,
-      char **argv )
+main( int argc, char **argv )
 {
     int rc;
     ithread_t cmdloop_thread;
@@ -501,7 +466,7 @@ main( int argc,
     rc = TvCtrlPointStart( linux_print, NULL );
     if( rc != TV_SUCCESS ) {
         SampleUtil_Print( "Error starting UPnP TV Control Point" );
-        exit( rc );
+        return rc;
     }
     // start a command loop thread
     code =
@@ -516,7 +481,9 @@ main( int argc,
     sigwait( &sigs_to_catch, &sig );
 
     SampleUtil_Print( "Shutting down on signal %d...", sig );
-    TvDeviceStop(  );
-    rc = TvCtrlPointStop(  );
-    exit( rc );
+    TvDeviceStop();
+    rc = TvCtrlPointStop();
+    
+    return rc;
 }
+
