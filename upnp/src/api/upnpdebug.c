@@ -157,7 +157,7 @@ UpnpCloseLog()
  * Function : DebugAtThisLevel					
  *									
  * Parameters:			
- *	IN Dbg_Level DLevel: The level of the debug logging. It will decide 
+ *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -193,7 +193,7 @@ int DebugAtThisLevel(
  * Function : UpnpPrintf					
  *									
  * Parameters:			
- *	IN Dbg_Level DLevel: The level of the debug logging. It will decide 
+ *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -256,7 +256,7 @@ void UpnpPrintf(
  * Function : UpnpGetDebugFile					
  *				
  * Parameters:			
- *	IN Dbg_Level DLevel: The level of the debug logging. It will decide 
+ *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module

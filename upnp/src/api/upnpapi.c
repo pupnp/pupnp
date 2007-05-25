@@ -423,7 +423,7 @@ UpnpFinish()
     ThreadPoolGetStats( &gSendThreadPool, &stats );
     PrintThreadPoolStats(__FILE__, __LINE__,
         "Send Thread Pool", &stats);
-    CloseLog();
+    UpnpCloseLog();
 #endif
 
 #ifdef INCLUDE_CLIENT_APIS

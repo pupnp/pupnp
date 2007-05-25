@@ -2,6 +2,14 @@
 Version 1.4.7
 *******************************************************************************
 
+2007-05-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Removing the Dbg_Level, InitLog, SetLogFileNames and CloseLog
+	defines. These were just aliases, no reason to keep them.
+
+2007-05-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Changed the comments of the include files that expose the UPnP API
+	to use only C89 comments and no C99 comments.
+
 2007-05-24 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
 	* Added tvcombo sample that demonstrates coexistence of a device and a
 	control point in the same application.

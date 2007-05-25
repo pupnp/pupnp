@@ -1,34 +1,34 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// Copyright (c) 2006 Rémi Turboult <r3mi@users.sourceforge.net>
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * Copyright (c) 2006 Rémi Turboult <r3mi@users.sourceforge.net>
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * * Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * * Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * * Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
 #ifndef UPNP_DEBUG_H
 #define UPNP_DEBUG_H 
@@ -47,7 +47,7 @@ extern "C" {
           The UPnP SDK contains other features to aid in debugging.
  */
 
-//@{
+/*! @{ */
 
 /** @name Upnp_LogLevel
  *  The user has the option to select 4 different types of debugging levels,
@@ -79,17 +79,14 @@ typedef enum Upnp_Module {
 	HTTP
 } Dbg_Module;
 
-//@{
+/*! @{ */
 typedef enum Upnp_LogLevel_e {
 	UPNP_CRITICAL,
 	UPNP_PACKET,
 	UPNP_INFO,
 	UPNP_ALL
 } Upnp_LogLevel;
-//@}
-
-// for backward compatibility
-#define Dbg_Level Upnp_LogLevel
+/*! @} */
 
 
 /**
@@ -116,9 +113,6 @@ int UpnpInitLog();
 #else
 static UPNP_INLINE int UpnpInitLog() { return UPNP_E_SUCCESS; }
 #endif
-
-// for backward compatibility
-#define InitLog	UpnpInitLog
 
 
 /***************************************************************************
@@ -152,9 +146,6 @@ void UpnpCloseLog();
 static UPNP_INLINE void UpnpCloseLog() {}
 #endif
 
-// for backward compatibility
-#define CloseLog	UpnpCloseLog
-
 
 /***************************************************************************
  * Function : UpnpSetLogFileNames		
@@ -180,15 +171,12 @@ static UPNP_INLINE void UpnpSetLogFileNames(
 	const char *InfoFileName) {}
 #endif
 
-// for backward compatibility
-#define SetLogFileNames		UpnpSetLogFileNames
-
 
 /***************************************************************************
  * Function : UpnpGetDebugFile		
  *						
  * Parameters:					
- *	IN Dbg_Level DLevel: The level of the debug logging. It will decide 
+ *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -209,15 +197,12 @@ static UPNP_INLINE FILE *UpnpGetDebugFile(Upnp_LogLevel level, Dbg_Module module
 }
 #endif
 
-// for backward compatibility
-#define GetDebugFile	UpnpGetDebugFile
-
 
 /***************************************************************************
  * Function : DebugAtThisLevel					
  *									
  * Parameters:			
- *	IN Dbg_Level DLevel: The level of the debug logging. It will decide 
+ *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -243,7 +228,7 @@ static UPNP_INLINE int DebugAtThisLevel(
  * Function : UpnpPrintf				
  *									
  * Parameters:								
- *	IN Dbg_Level DLevel: The level of the debug logging. It will decide 
+ *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -335,11 +320,11 @@ static UPNP_INLINE void UpnpDisplayFileAndLine(
 	int DbgLineNo) {}
 #endif
 
-//@}
+/*! @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // UPNP_DEBUG_H
+#endif /* UPNP_DEBUG_H */
 

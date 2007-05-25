@@ -433,7 +433,7 @@ FindServiceControlURLPath( service_table * table,
 *
 *	Parameters :
 *		service_info *service ;Service whose information is to be printed
-*		Dbg_Level level ; Debug level specified to the print function
+*		Upnp_LogLevel level ; Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints information from the 
@@ -446,7 +446,7 @@ FindServiceControlURLPath( service_table * table,
 #ifdef DEBUG
 void printService(
     service_info *service,
-    Dbg_Level level,
+    Upnp_LogLevel level,
     Dbg_Module module )
 {
     if( service ) {
@@ -490,7 +490,7 @@ void printService(
 *
 *	Parameters :
 *		service_info *service ;	Service whose information is to be printed
-*		Dbg_Level level ;	Debug level specified to the print function
+*		Upnp_LogLevel level ;	Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints information of each 
@@ -503,7 +503,7 @@ void printService(
 #ifdef DEBUG
 void printServiceList(
     service_info * service,
-    Dbg_Level level,
+    Upnp_LogLevel level,
     Dbg_Module module )
 {
     while( service ) {
@@ -548,7 +548,7 @@ void printServiceList(
 *
 *	Parameters :
 *		service_table * table ;	Service table to be printed
-*		Dbg_Level level ;	Debug level specified to the print function
+*		Upnp_LogLevel level ;	Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints the URL base of the table
@@ -562,7 +562,7 @@ void printServiceList(
 #ifdef DEBUG
 void printServiceTable(
     service_table * table,
-    Dbg_Level level,
+    Upnp_LogLevel level,
     Dbg_Module module )
 {
     UpnpPrintf( level, module, __FILE__, __LINE__,
