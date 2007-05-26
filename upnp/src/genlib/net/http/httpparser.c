@@ -396,7 +396,7 @@ scanner_get_str( IN scanner_t * scanner )
 * Note :
 ************************************************************************/
 #warning The only use of the function 'scanner_pushback()' in the code is commented out.
-#warning 'scanner_pushback()' is a good candidate for removal.
+#warning 'scanner_pushback()' is a candidate for removal.
 static UPNP_INLINE void
 scanner_pushback( INOUT scanner_t * scanner,
                   IN size_t pushback_bytes )
@@ -966,7 +966,7 @@ read_until_crlf( INOUT scanner_t * scanner,
 *   PARSE_INCOMPLETE
 ************************************************************************/
 #warning There are currently no uses of the function 'skip_to_end_of_header()' in the code.
-#warning 'skip_to_end_of_header()' is a good candidate for removal.
+#warning 'skip_to_end_of_header()' is a candidate for removal.
 static UPNP_INLINE int
 skip_to_end_of_header( INOUT scanner_t * scanner )
 {

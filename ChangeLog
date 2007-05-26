@@ -1,6 +1,18 @@
 *******************************************************************************
-Version 1.4.7
+Version 1.6.0
 *******************************************************************************
+
+2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 1711325 ] Bad DestAddr in Upnp_Discovery structure
+	Submitted By: Bob Ciora
+	The field DestAddr of the structure Upnp_Discovery is now a full
+	SOCKADDRIN instead of a pointer to SOCKADDRIN. Commented code sugests
+	that in a previous moment, the function ssdp_handle_ctrlpt_msg() did
+	not use a postponed thread to call ctrlpt_callback(). Now the code
+	uses a thread, and most probably the original data would get lost and
+	the pointer would point to an invalid memory region. This fix caused
+	an interface change in the library and the minor library version was
+	bumped. Also, the libtool library numbers were changed accordingly.
 
 2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added support for the Basic Device

@@ -159,7 +159,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
     }
 
     // dest addr
-    param.DestAddr = dest_addr;
+    memcpy(&param.DestAddr, dest_addr, sizeof(struct sockaddr_in) );
 
     // EXT
     param.Ext[0] = '\0';
@@ -267,7 +267,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
             strlen( param.Location ) == 0 || !usn_found || !st_found ) {
             return;             // bad reply
         }
-        //check each current search
+        // check each current search
         HandleLock();
         if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
             HandleUnlock();
@@ -275,14 +275,14 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
         }
         node = ListHead( &ctrlpt_info->SsdpSearchList );
 
-        //temporary add null termination
+        // temporary add null termination
         //save_char = hdr_value.buf[ hdr_value.length ];
         //hdr_value.buf[ hdr_value.length ] = '\0';
 
         while( node != NULL ) {
             searchArg = node->item;
             matched = 0;
-            //check for match of ST header and search target
+            // check for match of ST header and search target
             switch ( searchArg->requestType ) {
                 case SSDP_ALL:
                     {
@@ -327,7 +327,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
             }
 
             if( matched ) {
-                //schedule call back
+                // schedule call back
                 threadData =
                     ( ResultData * ) malloc( sizeof( ResultData ) );
                 if( threadData != NULL ) {
@@ -366,7 +366,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
 *
 ***************************************************************************/
 #warning There are currently no uses of the function 'process_reply()' in the code.
-#warning 'process_reply()' is a good candidate for removal.
+#warning 'process_reply()' is a candidate for removal.
 static UPNP_INLINE void
 process_reply( IN char *request_buf,
                IN int buf_len,

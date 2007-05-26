@@ -9,7 +9,7 @@
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.4.7], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp], [1.6.0], [mroberto@users.sourceforge.net])
 # *Independently* of the above libupnp package version, the libtool version
 # of the 3 libraries need to be updated whenever there is a change released :
 # "current:revision:age" (this is NOT the same as the package version), where:
@@ -34,11 +34,35 @@ AC_INIT([libupnp], [1.4.7], [mroberto@users.sourceforge.net])
 #	current: 2 -> 3
 #	revisiion: 3 -> 0
 #	age: 0 -> 1
-# - Code has changed in upnp (revision 2 -> 3)
+# - Code has changed in upnp
 #	revision: 2 -> 3
-AC_SUBST([LT_VERSION_IXML],       [2:3:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [3:0:1])
-AC_SUBST([LT_VERSION_UPNP],       [2:3:0])
+#
+# For release 1.4.6, we had:
+#AC_SUBST([LT_VERSION_IXML],       [2:3:0])
+#AC_SUBST([LT_VERSION_THREADUTIL], [3:0:1])
+#AC_SUBST([LT_VERSION_UPNP],       [2:3:0])
+#
+# "current:revision:age"
+#
+# - Code has changed in ixml
+#	revision: 3 -> 4
+# - Code has changed in threadutil
+#	revision: 0 -> 1
+# - Code has changed in upnp
+#	revision: 3 -> 4
+# - Interface changed in upnp
+#	current: 2 -> 3
+#	revision: 4 -> 0
+# - Interface removed in upnp
+#	age: 0 -> 0
+#
+# For release 1.6.0, we had:
+#AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+#AC_SUBST([LT_VERSION_THREADUTIL], [3:1:1])
+#AC_SUBST([LT_VERSION_UPNP],       [3:0:0])
+AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+AC_SUBST([LT_VERSION_THREADUTIL], [3:1:1])
+AC_SUBST([LT_VERSION_UPNP],       [3:0:0])
 
 
 AC_CONFIG_AUX_DIR(config.aux)
