@@ -2,6 +2,11 @@
 Version 1.4.7
 *******************************************************************************
 
+2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added support for the Basic Device
+	(http://www.upnp.org/standardizeddcps/basic.asp) as suggested by
+	Titus Winters.
+
 2007-05-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fixed the file libupnp.pc.in to generate a correct path for the
 	include files.

@@ -61,17 +61,18 @@ typedef struct SUBSCRIPTION {
 
 
 typedef struct SERVICE_INFO {
-  DOMString serviceType;
-  DOMString serviceId;
+  DOMString	serviceType;
+  DOMString	serviceId;
   char		*SCPDURL ;
   char		*controlURL;
   char		*eventURL;
-  DOMString UDN;
+  DOMString	UDN;
   int		active;
   int		TotalSubscriptions;
-  subscription			*subscriptionList;
+  subscription	*subscriptionList;
   struct SERVICE_INFO	 *next;
 } service_info;
+
 
 typedef struct SERVICE_TABLE {
   DOMString URLBase;
@@ -80,7 +81,7 @@ typedef struct SERVICE_TABLE {
 } service_table;
 
 
-/*			Functions for Subscriptions				*/
+/* Functions for Subscriptions */
 
 /************************************************************************
 *	Function :	copy_subscription

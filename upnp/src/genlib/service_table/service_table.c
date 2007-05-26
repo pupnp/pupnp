@@ -935,20 +935,20 @@ getServiceList( IXML_Node * node,
 }
 
 /************************************************************************
-*	Function :	getAllServiceList
+* Function : getAllServiceList
 *
-*	Parameters :
-*		IXML_Node *node ;	XML node information
-*		char * URLBase ;	provides Base URL to resolve relative URL 
-*		service_info **out_end ; service added is returned to the output
-*							parameter
+* Parameters :
+*	IXML_Node *node ;	XML node information
+*	char * URLBase ;	provides Base URL to resolve relative URL 
+*	service_info **out_end ; service added is returned to the output
+*				parameter
 *
-*	Description :	Returns pointer to service info after getting the 
+* Description :	Returns pointer to service info after getting the 
 *		sub-elements of the service info. 
 *
-*	Return : service_info * ;
+* Return : service_info * ;
 *
-*	Note :
+* Note :
 ************************************************************************/
 service_info *
 getAllServiceList( IXML_Node * node,
@@ -1119,20 +1119,20 @@ addServiceTable( IXML_Node * node,
 }
 
 /************************************************************************
-*	Function :	getServiceTable
-*
-*	Parameters :
-*		IXML_Node *node ;	XML node information
-*		service_table *out ;	output parameter which will contain the 
-*							service list and URL 
-*		const char *DefaultURLBase ; Default base URL on which the URL 
-*							will be returned.
-*
-*	Description :	Retrieve service from the table
-*
-*	Return : int ;
-*
-*	Note :
+ * Function : getServiceTable
+ *
+ * Parameters :
+ * 	IXML_Node *node ;	XML node information
+ *	service_table *out ;	output parameter which will contain the
+ *				service list and URL
+ *	const char *DefaultURLBase ; Default base URL on which the URL
+ *				will be returned.
+ *
+ * Description : Retrieve service from the table
+ *
+ * Return : int ;
+ *
+ * Note :
 ************************************************************************/
 int
 getServiceTable( IXML_Node * node,
@@ -1153,9 +1153,8 @@ getServiceTable( IXML_Node * node,
             }
         }
 
-        if( ( out->serviceList = getAllServiceList( root, out->URLBase,
-                                                    &out->
-                                                    endServiceList ) ) ) {
+        if( ( out->serviceList = getAllServiceList(
+            root, out->URLBase, &out->endServiceList ) ) ) {
             return 1;
         }
 

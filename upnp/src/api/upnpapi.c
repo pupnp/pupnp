@@ -591,9 +591,9 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
     }
 
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpRegisterRootDevice \n" );
+        "Inside UpnpRegisterRootDevice\n" );
+    
     HandleLock();
-
     if( UpnpSdkDeviceRegistered ) {
         HandleUnlock();
         return UPNP_E_ALREADY_REGISTERED;
@@ -651,7 +651,7 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
 
     HInfo->DeviceList =
         ixmlDocument_getElementsByTagName( HInfo->DescDocument, "device" );
-    if( HInfo->DeviceList == NULL ) {
+    if( !HInfo->DeviceList ) {
         CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
         ixmlDocument_free( HInfo->DescDocument );
         FreeHandle( *Hnd );
@@ -661,18 +661,11 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
         return UPNP_E_INVALID_DESC;
     }
 
-    HInfo->ServiceList =
-        ixmlDocument_getElementsByTagName( HInfo->DescDocument,
-                                           "serviceList" );
-    if( HInfo->ServiceList == NULL ) {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
-        ixmlNodeList_free( HInfo->DeviceList );
-        ixmlDocument_free( HInfo->DescDocument );
-        FreeHandle( *Hnd );
-        HandleUnlock();
+    HInfo->ServiceList = ixmlDocument_getElementsByTagName(
+        HInfo->DescDocument, "serviceList" );
+    if( !HInfo->ServiceList ) {
         UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
             "UpnpRegisterRootDevice: No services found for RootDevice\n" );
-        return UPNP_E_INVALID_DESC;
     }
 
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
@@ -680,31 +673,25 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
     //*******************************
     // GENA SET UP
     //*******************************
-     if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
-                             &HInfo->ServiceTable, HInfo->DescURL ) ) {
+    if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
+            &HInfo->ServiceTable, HInfo->DescURL ) ) {
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
             "UpnpRegisterRootDevice: GENA Service Table \n" );
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
             "Here are the known services: \n" );
         printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
     } else {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
-        FreeHandle( *Hnd );
-        HandleUnlock();
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "\nUpnpRegisterRootDevice: Errors retrieving service table \n" );
-        return UPNP_E_INVALID_DESC;
+            "\nUpnpRegisterRootDevice2: Empty service table\n" );
     }
 
     UpnpSdkDeviceRegistered = 1;
     HandleUnlock();
-
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
         "Exiting RegisterRootDevice Successfully\n" );
 
     return UPNP_E_SUCCESS;
-
-}  /****************** End of UpnpRegisterRootDevice  *********************/
+}
 
 #endif // INCLUDE_DEVICE_APIS
 
@@ -1158,20 +1145,18 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
     struct Handle_Info *HInfo;
     int retVal = 0;
     char *description = ( char * )description_const;
-
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
     }
 
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpRegisterRootDevice2 \n" );
+        "Inside UpnpRegisterRootDevice2\n" );
 
     if( Hnd == NULL || Fun == NULL ) {
         return UPNP_E_INVALID_PARAM;
     }
 
     HandleLock();
-
     if( UpnpSdkDeviceRegistered ) {
         HandleUnlock();
         return UPNP_E_ALREADY_REGISTERED;
@@ -1192,9 +1177,9 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
     // prevent accidental removal of a non-existent alias
     HInfo->aliasInstalled = 0;
 
-    retVal = GetDescDocumentAndURL( descriptionType, description,
-                                    bufferLen, config_baseURL,
-                                    &HInfo->DescDocument, HInfo->DescURL );
+    retVal = GetDescDocumentAndURL(
+        descriptionType, description, bufferLen,
+        config_baseURL, &HInfo->DescDocument, HInfo->DescURL );
 
     if( retVal != UPNP_E_SUCCESS ) {
         FreeHandle( *Hnd );
@@ -1203,15 +1188,16 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
     }
 
     HInfo->aliasInstalled = ( config_baseURL != 0 );
-
     HInfo->HType = HND_DEVICE;
+
     HInfo->Callback = Fun;
     HInfo->Cookie = ( void * )Cookie;
     HInfo->MaxAge = DEFAULT_MAXAGE;
     HInfo->DeviceList = NULL;
     HInfo->ServiceList = NULL;
-    CLIENTONLY( HInfo->ClientSubList = NULL; )
+
     CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
+    CLIENTONLY( HInfo->ClientSubList = NULL; )
     HInfo->MaxSubscriptions = UPNP_INFINITE;
     HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 
@@ -1224,7 +1210,7 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
     HInfo->DeviceList =
         ixmlDocument_getElementsByTagName( HInfo->DescDocument, "device" );
 
-    if( HInfo->DeviceList == NULL ) {
+    if( !HInfo->DeviceList ) {
         CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
         ixmlDocument_free( HInfo->DescDocument );
         FreeHandle( *Hnd );
@@ -1234,47 +1220,39 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
         return UPNP_E_INVALID_DESC;
     }
 
-    HInfo->ServiceList =
-        ixmlDocument_getElementsByTagName( HInfo->DescDocument,
-                                           "serviceList" );
-
-    if( HInfo->ServiceList == NULL ) {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
-        ixmlNodeList_free( HInfo->DeviceList );
-        ixmlDocument_free( HInfo->DescDocument );
-        FreeHandle( *Hnd );
-        HandleUnlock();
+    HInfo->ServiceList = ixmlDocument_getElementsByTagName(
+        HInfo->DescDocument, "serviceList" );
+    if( !HInfo->ServiceList ) {
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
             "UpnpRegisterRootDevice2: No services found for RootDevice\n" );
-        return UPNP_E_INVALID_DESC;
     }
 
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "UpnpRegisterRootDevice2: Gena Check\n" );
-        //*******************************
-        //GENA SET UP
-        //*******************************
-        if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
-                             &HInfo->ServiceTable, HInfo->DescURL ) ) {
+    //*******************************
+    // GENA SET UP
+    //*******************************
+    if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
+            &HInfo->ServiceTable, HInfo->DescURL ) ) {
         UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice2: GENA Service Table \n" );
-    } else {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
-        FreeHandle( *Hnd );
-        HandleUnlock();
+            "UpnpRegisterRootDevice2: GENA Service Table\n" );
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "\nUpnpRegisterRootDevice: Errors retrieving service table \n" );
-        return UPNP_E_INVALID_DESC;
+            "Here are the known services: \n" );
+        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
+    } else {
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "\nUpnpRegisterRootDevice2: Empty service table\n" );
     }
+
     UpnpSdkDeviceRegistered = 1;
     HandleUnlock();
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting RegisterRootDevice2 Successfully\n" );
+
     return UPNP_E_SUCCESS;
+}
 
-}  /****************** End of UpnpRegisterRootDevice2  *********************/
-
-#endif //INCLUDE_DEVICE_APIS
+#endif // INCLUDE_DEVICE_APIS
 
 #ifdef INCLUDE_CLIENT_APIS
 
