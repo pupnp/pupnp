@@ -3,6 +3,16 @@ Version 1.6.0
 *******************************************************************************
 
 2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Updated the macro files acx_pthread.m4, ax_cflags_gcc_option.m4,
+	ax_cflags_warn_all.m4, m4/ax_cflags_warn_all_ansi.m4,
+	m4/type_socklen_t.m4.
+
+2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fixed an issue with the instalation of the file upnpdebug.h. Since
+	the last modifications that removed the macro DEBUV_ONLY, this file
+	must be installed even on a non-debug build.
+
+2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 1711325 ] Bad DestAddr in Upnp_Discovery structure
 	Submitted By: Bob Ciora
 	The field DestAddr of the structure Upnp_Discovery is now a full

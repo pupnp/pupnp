@@ -9,4 +9,3 @@ Version: @VERSION@
 Libs: @PTHREAD_LIBS@ -L${libdir} -lupnp -lthreadutil -lixml 
 Cflags: @PTHREAD_CFLAGS@ -I${includedir}/upnp
 
-

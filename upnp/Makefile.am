@@ -22,13 +22,13 @@ LDADD = \
 
 
 upnpincludedir = $(includedir)/upnp
-upnpinclude_HEADERS = inc/upnp.h 
+upnpinclude_HEADERS = \
+	inc/upnp.h \
+	inc/upnpdebug.h
+
 nodist_upnpinclude_HEADERS = inc/upnpconfig.h 
 if ENABLE_TOOLS
 upnpinclude_HEADERS += inc/upnptools.h 
-endif
-if ENABLE_DEBUG
-upnpinclude_HEADERS += inc/upnpdebug.h
 endif
 
 
