@@ -3,6 +3,10 @@ Version 1.4.7
 *******************************************************************************
 
 2007-05-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fixed the file libupnp.pc.in to generate a correct path for the
+	include files.
+
+2007-05-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Removing the Dbg_Level, InitLog, SetLogFileNames and CloseLog
 	defines. These were just aliases, no reason to keep them.
 
