@@ -231,6 +231,15 @@ sock_read_write( IN SOCKINFO * info,
         }
     }
 
+#ifdef SO_NOSIGPIPE
+    {
+	int old;
+	int set = 1;
+	socklen_t olen = sizeof(old);
+	getsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, &olen);
+	setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof(set));
+#endif
+
     if( bRead ) {
         // read data
         numBytes = recv( sockfd, buffer, bufsize,MSG_NOSIGNAL);
@@ -243,6 +252,9 @@ sock_read_write( IN SOCKINFO * info,
                 send( sockfd, buffer + bytes_sent, byte_left,
                       MSG_DONTROUTE|MSG_NOSIGNAL);
             if( num_written == -1 ) {
+#ifdef SO_NOSIGPIPE
+	        setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, olen);
+#endif
                 return num_written;
             }
 
@@ -252,6 +264,11 @@ sock_read_write( IN SOCKINFO * info,
 
         numBytes = bytes_sent;
     }
+
+#ifdef SO_NOSIGPIPE
+	setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, olen);
+    }
+#endif
 
     if( numBytes < 0 ) {
         return UPNP_E_SOCKET_ERROR;

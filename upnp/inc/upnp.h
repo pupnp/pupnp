@@ -47,7 +47,8 @@
 
 
 #include <stdio.h>
-#ifdef __FreeBSD__
+#include <sys/param.h>
+#if (defined(BSD) && BSD >= 199306)
 	#include <time.h>
 #endif
 #include "ixml.h"

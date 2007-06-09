@@ -73,6 +73,8 @@
 	#include "urlconfig.h"
 #endif // INTERNAL_WEB_SERVER
 
+virtualDirList *pVirtualDirList;
+
 // Mutex to synchronize the subscription handling at the client side
 CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
 
@@ -3287,17 +3289,15 @@ UpnpDownloadXmlDoc( const char *url,
     } else {
 #ifdef DEBUG
         xml_buf = ixmlPrintNode( ( IXML_Node * ) * xmlDoc );
-                 UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "Printing the Parsed xml document \n %s\n",
-                             xml_buf );
-                 UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "****************** END OF Parsed XML Doc *****************\n" );
-                 ixmlFreeDOMString( xml_buf );
-                 UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "Exiting UpnpDownloadXmlDoc\n" );
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "Printing the Parsed xml document \n %s\n", xml_buf );
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "****************** END OF Parsed XML Doc *****************\n" );
+        ixmlFreeDOMString( xml_buf );
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "Exiting UpnpDownloadXmlDoc\n" );
 #endif
-
-            return UPNP_E_SUCCESS;
+        return UPNP_E_SUCCESS;
     }
 }
 

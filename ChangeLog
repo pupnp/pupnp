@@ -2,6 +2,10 @@
 Version 1.6.0
 *******************************************************************************
 
+2007-06-09 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* [pupnp-devel] NetBSD & Mac OS X packages and patches.
+	Rene Hexel's <rh@netbsd.org> patch to compile in NetBSD and Mac OS X.
+
 2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Updated the macro files acx_pthread.m4, ax_cflags_gcc_option.m4,
 	ax_cflags_warn_all.m4, m4/ax_cflags_warn_all_ansi.m4,

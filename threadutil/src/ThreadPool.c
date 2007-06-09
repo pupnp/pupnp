@@ -354,18 +354,25 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
  *  Parameters:
  *      
  *****************************************************************************/
-    static void SetSeed() {
-    struct timeb t;
+static void SetSeed() {
+	struct timeb t;
 
-    ftime( &t );
+	ftime( &t );
 #if defined(WIN32)
-    srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id().p );
+	srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id().p );
 #elif defined(__FreeBSD__)
-    srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id() );
+	srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id() );
+#elif defined(__linux__)
+	srand( ( unsigned int )t.millitm + ithread_get_current_thread_id() );
 #else
-    srand( ( unsigned int )t.millitm + ithread_get_current_thread_id() );
+	{
+		volatile union { volatile pthread_t tid; volatile unsigned i; } idu;
+
+		idu.tid = ithread_get_current_thread_id();
+		srand( ( unsigned int )t.millitm + idu.i );
+	}
 #endif
-    }
+}
 
 /****************************************************************************
  * Function: WorkerThread

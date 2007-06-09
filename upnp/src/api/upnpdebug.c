@@ -173,7 +173,7 @@ int DebugAtThisLevel(
 	IN Upnp_LogLevel DLevel,
 	IN Dbg_Module Module)
 {
-	int ret = g_log_level >= DLevel;
+	int ret = DLevel <= g_log_level;
 	ret &=
 		DEBUG_ALL ||
 		(Module == SSDP  && DEBUG_SSDP ) ||

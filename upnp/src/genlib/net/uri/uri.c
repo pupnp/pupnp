@@ -640,11 +640,38 @@ parse_hostport( const char *in,
         if ( h == NULL ) {
             errCode = 1;
         }
-#else
+#elif defined(__linux__)
         errCode = gethostbyname_r( temp_host_name,
                                    &h_buf,
                                    temp_hostbyname_buff,
                                    BUFFER_SIZE, &h, &errcode );
+#else
+{
+           struct addrinfo hints, *res, *res0;
+
+	   h = NULL;
+           memset(&hints, 0, sizeof(hints));
+           hints.ai_family = PF_INET;
+           hints.ai_socktype = SOCK_STREAM;
+           errCode = getaddrinfo(temp_host_name, "http", &hints, &res0);
+
+           if (!errCode) {
+               for (res = res0; res; res = res->ai_next) {
+                   if (res->ai_family == PF_INET &&
+                       res->ai_addr->sa_family == AF_INET)
+                   {
+                       h = &h_buf;
+                       h->h_addrtype = res->ai_addr->sa_family;
+                       h->h_length = 4;
+                       h->h_addr = (void *) temp_hostbyname_buff;
+                       *(struct in_addr *)h->h_addr =
+				((struct sockaddr_in *)res->ai_addr)->sin_addr;
+                       break;
+                   }
+               }
+               freeaddrinfo(res0);
+           }
+}
 #endif 
 
         if( errCode == 0 ) {

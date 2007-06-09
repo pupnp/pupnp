@@ -246,11 +246,15 @@ static UPNP_INLINE int DebugAtThisLevel(
  * Returns: void
  ***************************************************************************/ 
 #ifdef DEBUG
-void UpnpPrintf (Upnp_LogLevel DLevel, Dbg_Module Module,
-		 const char* DbgFileName, int DbgLineNo,
-		 const char* FmtStr,
-		 ...)
+void UpnpPrintf(
+	Upnp_LogLevel DLevel,
+	Dbg_Module Module,
+	const char* DbgFileName,
+	int DbgLineNo,
+	const char* FmtStr,
+	...)
 #if (__GNUC__ >= 3)
+	/* This enables printf like format checking by the compiler */
 	__attribute__((format (__printf__, 5, 6)))
 #endif
 ;

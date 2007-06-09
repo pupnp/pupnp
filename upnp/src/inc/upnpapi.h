@@ -176,7 +176,6 @@ void UpnpThreadDistribution(struct UpnpNonblockParam * Param);
 void AutoAdvertise(void *input); 
 int getlocalhostname(char *out);
 
-virtualDirList *pVirtualDirList;
 extern WebServerState bWebServerState;
 
 #endif
