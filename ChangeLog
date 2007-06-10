@@ -2,6 +2,30 @@
 Version 1.6.0
 *******************************************************************************
 
+2007-06-10 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* More fixes to Mac OS X and NetBSD from Rene Hexel:
+	[pupnp-devel] NetBSD & Mac OS X packages and patches
+
+	  Okay, I found a couple more things.  I have attached a patch file
+	against the trunk (version 206) that make the repository code compile
+	and run on both Mac OS X and NetBSD.
+
+	This fixes the following issues:
+
+	   upnp/src/api/upnpapi.c: SIOCGIFCONF didn't work properly, use
+	getifaddrs() instead (on BSD systems).
+
+	  threadutil/src/ThreadPool.c: priorities only work if
+	_POSIX_PRIORITY_SCHEDULING is defined (and greater than 0).
+
+	  threadutil/src/LinkedList.c and threadutil/src/iasnprintf.c: use
+	stdlib.h instead of malloc.h on all BSD systems (not just FreeBSD).
+	This is important, because malloc.h does not exist on Darwin/Mac OS X.
+
+	  Cheers
+	      ,
+	   Rene
+
 2007-06-09 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* [pupnp-devel] NetBSD & Mac OS X packages and patches.
 	Rene Hexel's <rh@netbsd.org> patch to compile in NetBSD and Mac OS X.
