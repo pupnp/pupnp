@@ -37,6 +37,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #ifndef WIN32
+	#include <sys/types.h>
 	#include <sys/socket.h>
 	#include <netinet/in.h>
 	#include <arpa/inet.h>
@@ -53,6 +54,11 @@
 	#include <sys/ioctl.h>
 	#include <sys/utsname.h>
 	#include <unistd.h>
+
+	#include <sys/param.h>
+	#if (defined(BSD) && BSD >= 199306)
+		#include <ifaddrs.h>
+	#endif
 #endif
 #include "upnpapi.h"
 #include "httpreadwrite.h"
@@ -3717,8 +3723,44 @@ void printNodes( IXML_Node * tmpRoot, int depth )
  			strcpy( out, inet_ntoa(LocalAddr.sin_addr));
  		}
  		return UPNP_E_SUCCESS;
-#else
+#elif (defined(BSD) && BSD >= 199306)
+    struct ifaddrs *ifap, *ifa;
 
+    if (getifaddrs(&ifap) != 0) {
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "DiscoverInterfaces: getifaddrs() returned error\n" );
+        return UPNP_E_INIT;
+    }
+
+    // cycle through available interfaces
+    for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next) {
+        // Skip loopback, point-to-point and down interfaces, 
+        // except don't skip down interfaces
+        // if we're trying to get a list of configurable interfaces. 
+        if( ( ifa->ifa_flags & IFF_LOOPBACK )
+            || ( !( ifa->ifa_flags & IFF_UP ) ) ) {
+            continue;
+        }
+        if( ifa->ifa_addr->sa_family == AF_INET ) {
+            // We don't want the loopback interface. 
+            if( ((struct sockaddr_in *)(ifa->ifa_addr))->sin_addr.s_addr ==
+                htonl( INADDR_LOOPBACK ) ) {
+                continue;
+            }
+
+            strncpy( out, inet_ntoa( ((struct sockaddr_in *)(ifa->ifa_addr))->
+                sin_addr ), LINE_SIZE );
+            out[LINE_SIZE-1] = '\0';
+            UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+                "Inside getlocalhostname : after strncpy %s\n",
+                out );
+            break;
+        }
+    }
+    freeifaddrs(ifap);
+
+    return ifa ? UPNP_E_SUCCESS : UPNP_E_INIT;
+#else
     char szBuffer[MAX_INTERFACES * sizeof( struct ifreq )];
     struct ifconf ifConf;
     struct ifreq ifReq;

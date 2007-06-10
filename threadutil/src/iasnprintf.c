@@ -31,7 +31,8 @@
 
 #include <stdarg.h>
 #include <assert.h>
-#ifdef __FreeBSD__
+#include <sys/param.h>
+#if (defined(BSD) && BSD >= 199306)
 #include <stdlib.h>
 #else
 #include <malloc.h>

@@ -96,12 +96,14 @@ SetPolicyType( PolicyType in )
     #else
     #ifdef WIN32
      return sched_setscheduler( 0, in);
-    #else
+    #elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
      struct sched_param current;
 
      sched_getparam( 0, &current );
      current.sched_priority = DEFAULT_SCHED_PARAM;
      return sched_setscheduler( 0, in, &current );
+    #else
+     return 0;
     #endif
     #endif
 }
@@ -123,7 +125,7 @@ SetPolicyType( PolicyType in )
 static int
 SetPriority( ThreadPriority priority )
 {
-
+#if defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
     int currentPolicy;
     int minPriority = 0;
     int maxPriority = 0;
@@ -155,7 +157,9 @@ SetPriority( ThreadPriority priority )
 
     return pthread_setschedparam( ithread_self(), currentPolicy,
                                   &newPriority );
-
+#else
+    return 0;
+#endif
 }
 
 /****************************************************************************
