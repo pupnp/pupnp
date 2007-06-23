@@ -4,14 +4,15 @@
 #
 # Process this file with autoconf to produce a configure script.
 #
-# (C) Copyright 2005-2006 Rémi Turboult <r3mi@users.sourceforge.net>
+# (C) Copyright 2005-2007 Rémi Turboult <r3mi@users.sourceforge.net>
 #
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.6.0], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp], [1.6.1], [mroberto@users.sourceforge.net])
+###############################################################################
 # *Independently* of the above libupnp package version, the libtool version
-# of the 3 libraries need to be updated whenever there is a change released :
+# of the 3 libraries need to be updated whenever there is a change released:
 # "current:revision:age" (this is NOT the same as the package version), where:
 # 	- library code modified:		revision++
 # 	- interfaces changed/added/removed:	current++ and revision=0
@@ -19,11 +20,14 @@ AC_INIT([libupnp], [1.6.0], [mroberto@users.sourceforge.net])
 # 	- interfaces removed:			age=0
 # *please update only once, before a formal release, not for each change*
 #
-# For release 1.4.1, we had:
+###############################################################################
+# Release 1.4.1:
 #AC_SUBST([LT_VERSION_IXML],       [2:2:0])
 #AC_SUBST([LT_VERSION_THREADUTIL], [2:2:0])
 #AC_SUBST([LT_VERSION_UPNP],       [2:2:0])
 #
+###############################################################################
+# Release 1.4.6:
 # "current:revision:age"
 #
 # - Code has changed in ixml
@@ -37,11 +41,12 @@ AC_INIT([libupnp], [1.6.0], [mroberto@users.sourceforge.net])
 # - Code has changed in upnp
 #	revision: 2 -> 3
 #
-# For release 1.4.6, we had:
 #AC_SUBST([LT_VERSION_IXML],       [2:3:0])
 #AC_SUBST([LT_VERSION_THREADUTIL], [3:0:1])
 #AC_SUBST([LT_VERSION_UPNP],       [2:3:0])
 #
+###############################################################################
+# Release 1.6.0:
 # "current:revision:age"
 #
 # - Code has changed in ixml
@@ -56,20 +61,31 @@ AC_INIT([libupnp], [1.6.0], [mroberto@users.sourceforge.net])
 # - Interface removed in upnp
 #	age: 0 -> 0
 #
-# For release 1.6.0, we had:
 #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
 #AC_SUBST([LT_VERSION_THREADUTIL], [3:1:1])
 #AC_SUBST([LT_VERSION_UPNP],       [3:0:0])
+#
+###############################################################################
 AC_SUBST([LT_VERSION_IXML],       [2:4:0])
 AC_SUBST([LT_VERSION_THREADUTIL], [3:1:1])
 AC_SUBST([LT_VERSION_UPNP],       [3:0:0])
+###############################################################################
+# Repeating the algorithm so that it is closer to the modificatin place:
+# 	- library code modified:		revision++
+# 	- interfaces changed/added/removed:	current++ and revision=0
+# 	- interfaces added: 			age++
+# 	- interfaces removed:			age=0
+# *please update only once, before a formal release, not for each change*
+###############################################################################
 
 
 AC_CONFIG_AUX_DIR(config.aux)
 AC_CONFIG_MACRO_DIR(m4)
 AC_CONFIG_SRCDIR(upnp/inc/upnp.h)
 
+
 AM_INIT_AUTOMAKE([1.8 -Wall foreign subdir-objects dist-bzip2])
+
 
 #
 # Get canonical host names in host and host_os
