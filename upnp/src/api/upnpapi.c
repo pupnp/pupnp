@@ -953,7 +953,7 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
     char *temp_str = NULL;
     FILE *fp = NULL;
     off_t fileLen;
-    unsigned num_read;
+    size_t num_read;
     time_t last_modified;
     struct stat file_info;
     struct sockaddr_in serverAddr;

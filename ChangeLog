@@ -2,6 +2,22 @@
 Version 1.6.0
 *******************************************************************************
 
+2007-08-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Merge of patch submitted By Keith Brindley - brindlk
+	SF Bug Tracker [ 1762758 ] Seek not working for large files
+	Problem:
+	Requests from the uPnP client to seek to a position beyond 2GB in a large
+	file are handled as a request to see from the 2GB point.
+
+	Impact:
+	Varies depending on client. The Xbox 360 kills the connection when it
+	realises.
+
+	Solution:
+	GetNextRange function (webserver.c) is updated to handle large file sizes.
+	Fix should also recognise when built on a 32bit platform rather than 64 and
+	handle accordingly.
+
 2007-08-05 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Merge of Mac OS X patch from Stéphane Corthésy (davelopper),
 	SF Bug Tracker [ 1686420 ] Modifications for MacOSX.

@@ -880,22 +880,24 @@ GetNextRange( char **SrcRangeStr,
               off_t *FirstByte,
               off_t *LastByte )
 {
-    char *Ptr,
-     *Tok;
-    int i,
-      F = -1,
-      L = -1;
+    char *Ptr;
+    char *Tok;
+    int i;
+    int64_t F = -1;
+    int64_t L = -1;
     int Is_Suffix_byte_Range = 1;
 
-    if( *SrcRangeStr == NULL )
+    if( *SrcRangeStr == NULL ) {
         return -1;
+    }
 
     Tok = StrTok( SrcRangeStr, "," );
 
-    if( ( Ptr = strstr( Tok, "-" ) ) == NULL )
+    if( ( Ptr = strstr( Tok, "-" ) ) == NULL ) {
         return -1;
+    }
     *Ptr = ' ';
-    sscanf( Tok, "%d%d", &F, &L );
+    sscanf( Tok, "%"SCNd64"%"SCNd64, &F, &L );
 
     if( F == -1 || L == -1 ) {
         *Ptr = '-';
@@ -910,16 +912,15 @@ GetNextRange( char **SrcRangeStr,
         }
 
         if( Is_Suffix_byte_Range ) {
-            *FirstByte = L;
-            *LastByte = F;
+            *FirstByte = (off_t)L;
+            *LastByte = (off_t)F;
             return 1;
         }
     }
+    *FirstByte = (off_t)F;
+    *LastByte = (off_t)L;
 
-    *FirstByte = F;
-    *LastByte = L;
     return 1;
-
 }
 
 /************************************************************************
