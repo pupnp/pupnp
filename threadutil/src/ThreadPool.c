@@ -90,22 +90,23 @@ FreeThreadPoolJob( ThreadPool * tp,
 static int
 SetPolicyType( PolicyType in )
 {
-    #ifdef __CYGWIN__
-     /* TODO not currently working... */
-     return 0;
-    #else
-    #ifdef WIN32
+#ifdef __CYGWIN__
+    /* TODO not currently working... */
+    return 0;
+#elif defined(__OSX__)
+    setpriority(PRIO_PROCESS, 0, 0);
+    return 0;
+#elif defined(WIN32)
      return sched_setscheduler( 0, in);
-    #elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
+#elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
      struct sched_param current;
 
      sched_getparam( 0, &current );
      current.sched_priority = DEFAULT_SCHED_PARAM;
      return sched_setscheduler( 0, in, &current );
-    #else
+#else
      return 0;
-    #endif
-    #endif
+#endif
 }
 
 /****************************************************************************
@@ -364,7 +365,7 @@ static void SetSeed() {
 	ftime( &t );
 #if defined(WIN32)
 	srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id().p );
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__OSX__)
 	srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id() );
 #elif defined(__linux__)
 	srand( ( unsigned int )t.millitm + ithread_get_current_thread_id() );

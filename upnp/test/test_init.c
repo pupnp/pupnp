@@ -105,7 +105,7 @@ main (int argc, char* argv[])
 	 * Test library initialisation
 	 */
 	printf ("\n");
-	printf ("Intializing UPnP ... \n");
+	printf ("Initializing UPnP ... \n");
 	rc = UpnpInit (NULL, 0);
 	if ( UPNP_E_SUCCESS == rc ) {
 		const char* ip_address = UpnpGetServerIpAddress();

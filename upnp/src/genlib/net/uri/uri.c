@@ -555,7 +555,7 @@ parse_hostport( const char *in,
     int begin_port;
     int hostport_size = 0;
     int host_size = 0;
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__OSX__)
     char temp_hostbyname_buff[BUFFER_SIZE];
     struct hostent h_buf;
 #endif
@@ -626,54 +626,61 @@ parse_hostport( const char *in,
         // TODO: Use autoconf to discover this rather than the
         // platform-specific stuff below
 #if defined(WIN32) || defined(__CYGWIN__)
-        h=gethostbyname(temp_host_name);
+        h = gethostbyname(temp_host_name);
 #elif defined(SPARC_SOLARIS)
-        errCode = gethostbyname_r( temp_host_name,
-                                   &h,
-                                   temp_hostbyname_buff,
-                                   BUFFER_SIZE, &errcode );
+        errCode = gethostbyname_r(
+                temp_host_name,
+                &h,
+                temp_hostbyname_buff,
+                BUFFER_SIZE, &errcode );
 #elif defined(__FreeBSD__) && __FreeBSD_version < 601103
-        h = lwres_gethostbyname_r( temp_host_name,
-                                   &h_buf,
-                                   temp_hostbyname_buff,
-                                   BUFFER_SIZE, &errcode );
+        h = lwres_gethostbyname_r(
+                temp_host_name,
+                &h_buf,
+                temp_hostbyname_buff,
+                BUFFER_SIZE, &errcode );
         if ( h == NULL ) {
-            errCode = 1;
+                errCode = 1;
+        }
+#elif defined(__OSX__)
+        h = gethostbyname(temp_host_name);
+        if ( h == NULL ) {
+                errCode = 1;
         }
 #elif defined(__linux__)
-        errCode = gethostbyname_r( temp_host_name,
-                                   &h_buf,
-                                   temp_hostbyname_buff,
-                                   BUFFER_SIZE, &h, &errcode );
+        errCode = gethostbyname_r(
+                temp_host_name,
+                &h_buf,
+                temp_hostbyname_buff,
+                BUFFER_SIZE, &h, &errcode );
 #else
-{
-           struct addrinfo hints, *res, *res0;
+        {
+        struct addrinfo hints, *res, *res0;
 
-	   h = NULL;
-           memset(&hints, 0, sizeof(hints));
-           hints.ai_family = PF_INET;
-           hints.ai_socktype = SOCK_STREAM;
-           errCode = getaddrinfo(temp_host_name, "http", &hints, &res0);
+        h = NULL;
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = PF_INET;
+        hints.ai_socktype = SOCK_STREAM;
+        errCode = getaddrinfo(temp_host_name, "http", &hints, &res0);
 
-           if (!errCode) {
-               for (res = res0; res; res = res->ai_next) {
-                   if (res->ai_family == PF_INET &&
-                       res->ai_addr->sa_family == AF_INET)
-                   {
-                       h = &h_buf;
-                       h->h_addrtype = res->ai_addr->sa_family;
-                       h->h_length = 4;
-                       h->h_addr = (void *) temp_hostbyname_buff;
-                       *(struct in_addr *)h->h_addr =
-				((struct sockaddr_in *)res->ai_addr)->sin_addr;
-                       break;
-                   }
-               }
-               freeaddrinfo(res0);
-           }
-}
+        if (!errCode) {
+            for (res = res0; res; res = res->ai_next) {
+                if (res->ai_family == PF_INET &&
+                    res->ai_addr->sa_family == AF_INET)
+                {
+                    h = &h_buf;
+                    h->h_addrtype = res->ai_addr->sa_family;
+                    h->h_length = 4;
+                    h->h_addr = (void *) temp_hostbyname_buff;
+                    *(struct in_addr *)h->h_addr =
+                        ((struct sockaddr_in *)res->ai_addr)->sin_addr;
+                        break;
+                }
+            }
+            freeaddrinfo(res0);
+        }
+        }
 #endif 
-
         if( errCode == 0 ) {
             if( h ) {
                 if( ( h->h_addrtype == AF_INET ) && ( h->h_length == 4 ) ) {

@@ -1362,7 +1362,7 @@ TvCtrlPointStart( print_string printFunctionPtr,
 
     ithread_mutex_init( &DeviceListMutex, 0 );
 
-    SampleUtil_Print( "Intializing UPnP with ipaddress=%s port=%d",
+    SampleUtil_Print( "Initializing UPnP with ipaddress=%s port=%d",
                       ip_address, port );
     rc = UpnpInit( ip_address, port );
     if( UPNP_E_SUCCESS != rc ) {

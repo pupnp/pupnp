@@ -2,6 +2,11 @@
 Version 1.6.0
 *******************************************************************************
 
+2007-08-05 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Merge of Mac OS X patch from Stéphane Corthésy (davelopper),
+	SF Bug Tracker [ 1686420 ] Modifications for MacOSX.
+	Some of the proposed changes were already done by Rene Hexel's patch.
+
 2007-06-10 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* More fixes to Mac OS X and NetBSD from Rene Hexel:
 	[pupnp-devel] NetBSD & Mac OS X packages and patches
