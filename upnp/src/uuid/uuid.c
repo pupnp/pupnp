@@ -55,8 +55,8 @@ static unsigned16 true_random( void );
 int
 uuid_create( uuid_upnp * uid )
 {
-    uuid_time_t timestamp,
-      last_time;
+    uuid_time_t timestamp;
+    uuid_time_t last_time;
     unsigned16 clockseq;
     uuid_node_t node;
     uuid_node_t last_node;
@@ -65,7 +65,7 @@ uuid_create( uuid_upnp * uid )
     /*
        acquire system wide lock so we're alone 
      */
-    UUIDLock(  );
+    UUIDLock();
 
     /*
        get current time 
@@ -86,10 +86,11 @@ uuid_create( uuid_upnp * uid )
        if no NV state, or if clock went backwards, or node ID changed
        (e.g., net card swap) change clockseq 
      */
-    if( !f || memcmp( &node, &last_node, sizeof( uuid_node_t ) ) )
-        clockseq = true_random(  );
-    else if( timestamp < last_time )
+    if (!f || memcmp(&node, &last_node, sizeof(uuid_node_t))) {
+        clockseq = true_random();
+    } else if (timestamp < last_time) {
         clockseq++;
+    }
 
     /*
        stuff fields into the UUID 
@@ -101,8 +102,8 @@ uuid_create( uuid_upnp * uid )
      */
     write_state( clockseq, timestamp, node );
 
-    UUIDUnlock(  );
-    return ( 1 );
+    UUIDUnlock();
+    return 1;
 };
 
 /*-----------------------------------------------------------------------------*/
@@ -110,7 +111,6 @@ void
 uuid_unpack( uuid_upnp * u,
              char *out )
 {
-
     sprintf( out,
              "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x",
              ( unsigned int )u->time_low, u->time_mid,
@@ -137,11 +137,10 @@ format_uuid_v1( uuid_upnp * uid,
        Construct a version 1 uuid with the information we've gathered
        * plus a few constants. 
      */
-    uid->time_low = ( unsigned long )( timestamp & 0xFFFFFFFF );
-    uid->time_mid = ( unsigned short )( ( timestamp >> 32 ) & 0xFFFF );
-    uid->time_hi_and_version = ( unsigned short )( ( timestamp >> 48 ) &
-                                                   0x0FFF );
-    uid->time_hi_and_version |= ( 1 << 12 );
+    uid->time_low = (unsigned long)(timestamp & 0xFFFFFFFF);
+    uid->time_mid = (unsigned short)((timestamp >> 32) & 0xFFFF);
+    uid->time_hi_and_version = (unsigned short)((timestamp >> 48) & 0x0FFF);
+    uid->time_hi_and_version |= (1 << 12);
     uid->clock_seq_low = clock_seq & 0xFF;
     uid->clock_seq_hi_and_reserved = ( clock_seq & 0x3F00 ) >> 8;
     uid->clock_seq_hi_and_reserved |= 0x80;
