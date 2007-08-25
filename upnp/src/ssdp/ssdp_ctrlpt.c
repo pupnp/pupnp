@@ -538,8 +538,7 @@ SearchByTarget( IN int Mx,
     if( ReqBuf == NULL )
         return UPNP_E_OUTOF_MEMORY;
 
-    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-        ">>> SSDP SEND >>>\n%s\n", ReqBuf );
+    UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, ">>> SSDP SEND >>>\n");
 
     timeTillRead = Mx;
 
