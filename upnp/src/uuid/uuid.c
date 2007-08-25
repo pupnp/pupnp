@@ -117,9 +117,6 @@ uuid_unpack( uuid_upnp * u,
              u->time_hi_and_version, u->clock_seq_hi_and_reserved,
              u->clock_seq_low, u->node[0], u->node[1], u->node[2],
              u->node[3], u->node[4], u->node[5] );
-
-    *( out + 36 ) = '\0';
-
 };
 
 /*-----------------------------------------------------------------------------*/
@@ -226,7 +223,6 @@ get_current_time( uuid_time_t * timestamp )
     static int inited = 0;
 
     if( !inited ) {
-        get_system_time( &time_now );
         uuids_this_tick = UUIDS_PER_TICK;
         inited = 1;
     };
