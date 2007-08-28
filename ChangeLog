@@ -2,6 +2,10 @@
 Version 1.6.1
 *******************************************************************************
 
+2007-08-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Initialization of the "randomness" struct so that valgrind does not
+	complain.
+
 2007-08-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Merge of patch submitted By Keith Brindley - brindlk
 	SF Bug Tracker [ 1762758 ] Seek not working for large files
