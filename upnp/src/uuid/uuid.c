@@ -53,7 +53,7 @@ static unsigned16 true_random( void );
    uuid_create -- generator a UUID 
  */
 int
-uuid_create( uuid_upnp * uid )
+uuid_create(uuid_upnp *uid)
 {
     uuid_time_t timestamp;
     uuid_time_t last_time;
@@ -70,17 +70,17 @@ uuid_create( uuid_upnp * uid )
     /*
        get current time 
      */
-    get_current_time( &timestamp );
+    get_current_time(&timestamp);
 
     /*
        get node ID 
      */
-    get_ieee_node_identifier( &node );
+    get_ieee_node_identifier(&node);
 
     /*
        get saved state from NV storage 
      */
-    f = read_state( &clockseq, &last_time, &last_node );
+    f = read_state(&clockseq, &last_time, &last_node);
 
     /*
        if no NV state, or if clock went backwards, or node ID changed
@@ -95,12 +95,12 @@ uuid_create( uuid_upnp * uid )
     /*
        stuff fields into the UUID 
      */
-    format_uuid_v1( uid, clockseq, timestamp, node );
+    format_uuid_v1(uid, clockseq, timestamp, node);
 
     /*
        save the state for next time 
      */
-    write_state( clockseq, timestamp, node );
+    write_state(clockseq, timestamp, node);
 
     UUIDUnlock();
     return 1;
@@ -108,15 +108,21 @@ uuid_create( uuid_upnp * uid )
 
 /*-----------------------------------------------------------------------------*/
 void
-uuid_unpack( uuid_upnp * u,
-             char *out )
+uuid_unpack(uuid_upnp *u, char *out)
 {
-    sprintf( out,
-             "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x",
-             ( unsigned int )u->time_low, u->time_mid,
-             u->time_hi_and_version, u->clock_seq_hi_and_reserved,
-             u->clock_seq_low, u->node[0], u->node[1], u->node[2],
-             u->node[3], u->node[4], u->node[5] );
+	sprintf(out,
+		"%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x",
+		(unsigned int)u->time_low,
+		u->time_mid,
+		u->time_hi_and_version,
+		u->clock_seq_hi_and_reserved,
+		u->clock_seq_low,
+		u->node[0],
+		u->node[1],
+		u->node[2],
+		u->node[3],
+		u->node[4],
+		u->node[5]);
 };
 
 /*-----------------------------------------------------------------------------*/

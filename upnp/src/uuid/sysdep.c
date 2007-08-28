@@ -33,17 +33,16 @@
    This sample implementation generates a random node ID
  */
 void
-get_ieee_node_identifier( uuid_node_t * node )
+get_ieee_node_identifier(uuid_node_t *node)
 {
     char seed[16];
     static int inited = 0;
     static uuid_node_t saved_node;
 
-    if( !inited ) {
-        get_random_info( seed );
+    if (!inited) {
+        get_random_info(seed);
         seed[0] |= 0x80;
-        memcpy( &saved_node, seed, sizeof( uuid_node_t ) );
-
+        memcpy(&saved_node, seed, sizeof (uuid_node_t));
         inited = 1;
     };
 
@@ -124,11 +123,12 @@ get_random_info( char seed[16] )
     MD5Update( &c, &r, sizeof( randomness ) );
     MD5Final( seed, &c );
 };
-#else
+
+#else /* _WINDOWS_ */
 
 /*-----------------------------------------------------------------------------*/
 void
-get_system_time( uuid_time_t * uuid_time )
+get_system_time(uuid_time_t *uuid_time)
 {
     struct timeval tp;
 
@@ -145,7 +145,7 @@ get_system_time( uuid_time_t * uuid_time )
 
 /*-----------------------------------------------------------------------------*/
 void
-get_random_info( char seed[16] )
+get_random_info(char seed[16])
 {
     MD5_CTX c;
     typedef struct {
@@ -163,4 +163,5 @@ get_random_info( char seed[16] )
     MD5Final( seed, &c );
 };
 
-#endif
+#endif /* _WINDOWS_ */
+
