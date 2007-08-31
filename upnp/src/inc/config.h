@@ -261,7 +261,7 @@
 
 /** @name Other debugging features
           The UPnP SDK contains other features to aid in debugging:
-	  see <upnp/upnpdebug.h>
+	  see <upnp/inc/upnpdebug.h>
  */
 
 #define DEBUG_ALL		1   
