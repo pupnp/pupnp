@@ -1532,7 +1532,7 @@ http_RecvPostMessage( http_parser_t * parser,
 
     if( Instr && Instr->IsVirtualFile ) {
 
-        Fp = virtualDirCallback.open( filename, UPNP_WRITE );
+        Fp = (virtualDirCallback.open)( filename, UPNP_WRITE );
         if( Fp == NULL ) {
             return HTTP_INTERNAL_SERVER_ERROR;
         }

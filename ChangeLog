@@ -3,6 +3,12 @@ Version 1.6.1
 *******************************************************************************
 
 2007-08-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Changed the calls to virtualDirCallback.open(filename, UPNP_WRITE)
+	to (virtualDirCallback.open)(filename, UPNP_WRITE) (notice the
+	parenthesis) due to a change in glibc that produces compilation
+	errors.
+
+2007-08-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Initialization of the "randomness" struct so that valgrind does not
 	complain.
 

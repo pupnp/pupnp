@@ -349,7 +349,7 @@ http_SendMessage( IN SOCKINFO * info,
             filename = ( char * )va_arg( argp, char * );
 
             if( Instr && Instr->IsVirtualFile )
-                Fp = virtualDirCallback.open( filename, UPNP_READ );
+                Fp = (virtualDirCallback.open)( filename, UPNP_READ );
             else
                 Fp = fopen( filename, "rb" );
 
