@@ -264,15 +264,15 @@
 	  see <upnp/inc/upnpdebug.h>
  */
 
-#define DEBUG_ALL		1   
-#define DEBUG_SSDP		0    
-#define DEBUG_SOAP		0    
-#define DEBUG_GENA		0    
-#define DEBUG_TPOOL		0     
+#define DEBUG_ALL		1
+#define DEBUG_SSDP		0
+#define DEBUG_SOAP		0
+#define DEBUG_GENA		0
+#define DEBUG_TPOOL		0
 #define DEBUG_MSERV		0
 #define DEBUG_DOM		0
 #define DEBUG_HTTP		0
-#define DEBUG_API		0    
+#define DEBUG_API		0
 
 //@} // Compile time configuration options
 
