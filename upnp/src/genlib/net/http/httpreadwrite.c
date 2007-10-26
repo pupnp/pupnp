@@ -475,11 +475,13 @@ http_SendMessage( IN SOCKINFO * info,
             buf_length = ( size_t ) va_arg( argp, size_t );
             if( buf_length > 0 ) {
                 num_written = sock_write( info, buf, buf_length, TimeOut );
+                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                    ">>> (SENT) >>>\n"
+		    "%.*s\nbuf_length=%d, num_written=%d\n"
+		    "------------\n",
+                    (int)buf_length, buf, (int)buf_length, num_written );
                 if( ( size_t ) num_written != buf_length )
                     goto end;
-                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                    ">>> (SENT) >>>\n%.*s\n------------\n",
-                    ( int )buf_length, buf );
             }
         }
     }
