@@ -258,7 +258,7 @@ void UpnpPrintf(
 	__attribute__((format (__printf__, 5, 6)))
 #endif
 ;
-#else
+#else /* DEBUG */
 static UPNP_INLINE void UpnpPrintf(
 	Upnp_LogLevel DLevel,
 	Dbg_Module Module,
@@ -266,7 +266,7 @@ static UPNP_INLINE void UpnpPrintf(
 	int DbgLineNo,
 	const char* FmtStr,
 	...) {}
-#endif
+#endif /* DEBUG */
 
 
 /***************************************************************************
