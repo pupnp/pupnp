@@ -322,8 +322,9 @@ int AdvertiseAndReply( IN int AdFlag,
         }
         for( j = 0;; j++ ) {
             tmpNode = ixmlNodeList_item( nodeList, j );
-            if( tmpNode == NULL )
+            if( tmpNode == NULL ) {
                 break;
+            }
 
             ixmlNodeList_free( tmpNodeList );
             tmpNodeList = NULL;
@@ -332,7 +333,7 @@ int AdvertiseAndReply( IN int AdFlag,
             if( tmpNodeList == NULL ) {
                 UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
                     "ServiceType not found \n" );
-                    continue;
+                continue;
             }
             tmpNode2 = ixmlNodeList_item( tmpNodeList, 0 );
             if( tmpNode2 == NULL ) {
@@ -365,26 +366,21 @@ int AdvertiseAndReply( IN int AdFlag,
             } else {
                 switch ( SearchType ) {
                     case SSDP_ALL:
-                        {
-                            ServiceReply( DestAddr, servType,
-                                          UDNstr, SInfo->DescURL,
-                                          defaultExp );
-                            break;
-                        }
+                        ServiceReply( DestAddr, servType,
+                                      UDNstr, SInfo->DescURL,
+                                      defaultExp );
+                        break;
                     case SSDP_SERVICE:
-                        {
-                            if( ServiceType != NULL ) {
-                                if( !strncasecmp( ServiceType,
-                                                  servType,
-                                                  strlen( ServiceType ) ) )
-                                {
-                                    ServiceReply( DestAddr, servType,
-                                                  UDNstr, SInfo->DescURL,
-                                                  defaultExp );
-                                }
+                        if( ServiceType != NULL ) {
+                            if( !strncasecmp( ServiceType,
+                                              servType,
+                                              strlen( ServiceType ) ) ) {
+                                ServiceReply( DestAddr, servType,
+                                              UDNstr, SInfo->DescURL,
+                                              defaultExp );
                             }
-                            break;
                         }
+                        break;
                     default:
                         break;
                 }               // switch(SearchType)               

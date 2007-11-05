@@ -242,7 +242,7 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
         // "If a multicast resource would send a response(s) to any copy of the 
         //  request, it SHOULD send its response(s) to each copy of the request 
         //  it receives. It MUST NOT repeat its response(s) per copy of the 
-        //  reuqest."
+        //  request."
         //  
         // http://www.upnp.org/download/draft-goland-http-udp-04.txt
         //
@@ -530,7 +530,6 @@ SendReply( IN struct sockaddr_in *DestAddr,
 *	IN char * Udn: Device UDN
 *	IN char * Location: Location of Device description document.
 *	IN int  Duration :Life time of this device.
-
 * Description:
 *	This function creates the reply packet based on the input parameter, 
 *	and send it to the client address given in its input parameter DestAddr.
