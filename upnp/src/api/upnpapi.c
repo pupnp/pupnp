@@ -323,27 +323,54 @@ int UpnpInit( IN const char *HostIP,
 
 #ifdef DEBUG
 static void 
-PrintThreadPoolStats (const char* DbgFileName, int DbgLineNo,
-		      const char* msg, const ThreadPoolStats* const stats)
+PrintThreadPoolStats(
+	ThreadPool *tp, 
+	const char *DbgFileName,
+	int DbgLineNo,
+	const char *msg)
 {
-	UpnpPrintf (UPNP_INFO, API, DbgFileName, DbgLineNo, 
-		    "%s \n High Jobs pending = %d \nMed Jobs Pending = %d\n"
-		    " Low Jobs Pending = %d \nWorker Threads = %d\n"
-		    "Idle Threads = %d\nPersistent Threads = %d\n"
-		    "Average Time spent in High Q = %lf\n"
-		    "Average Time spent in Med Q = %lf\n"
-		    "Average Time spent in Low Q = %lf\n"
-		    "Max Threads Used: %d\nTotal Work Time= %lf\n"
-		    "Total Idle Time = %lf\n",
-		    msg,
-		    stats->currentJobsHQ, stats->currentJobsMQ,
-		    stats->currentJobsLQ, stats->workerThreads,
-		    stats->idleThreads, stats->persistentThreads,
-		    stats->avgWaitHQ, stats->avgWaitMQ, stats->avgWaitLQ,
-		    stats->maxThreads, stats->totalWorkTime,
-		    stats->totalIdleTime );
+	ThreadPoolStats stats;
+	ThreadPoolGetStats(tp, &stats);
+	UpnpPrintf(UPNP_INFO, API, DbgFileName, DbgLineNo, 
+		"%s \n"
+		"High Jobs pending: %d\n"
+		"Med Jobs Pending: %d\n"
+		"Low Jobs Pending: %d\n"
+		"Average wait in High Q in milliseconds: %lf\n"
+		"Average wait in Med Q in milliseconds: %lf\n"
+		"Average wait in Low Q in milliseconds: %lf\n"
+		"Max Threads Used: %d\n"
+		"Worker Threads: %d\n"
+		"Persistent Threads: %d\n"
+		"Idle Threads: %d\n"
+		"Total Threads: %d\n"
+		"Total Work Time: %lf\n"
+		"Total Idle Time: %lf\n",
+		msg,
+		stats.currentJobsHQ,
+		stats.currentJobsMQ,
+		stats.currentJobsLQ,
+		stats.avgWaitHQ,
+		stats.avgWaitMQ,
+		stats.avgWaitLQ,
+		stats.maxThreads,
+		stats.workerThreads,
+		stats.persistentThreads,
+		stats.idleThreads,
+		stats.totalThreads,
+		stats.totalWorkTime,
+		stats.totalIdleTime);
 }
-#endif
+#else /* DEBUG */
+static UPNP_INLINE void 
+PrintThreadPoolStats(
+	ThreadPool *tp, 
+	const char *DbgFileName,
+	int DbgLineNo,
+	const char *msg)
+{
+}
+#endif /* DEBUG */
 
 
 /****************************************************************************
@@ -374,10 +401,6 @@ UpnpFinish()
 #endif
     struct Handle_Info *temp;
 
-#ifdef DEBUG
-    ThreadPoolStats stats;
-#endif
-
 #ifdef WIN32
 //	WSACleanup( );
 #endif
@@ -393,14 +416,8 @@ UpnpFinish()
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
             "UpnpFinish : UpnpSdkInit is ONE\n" );
     }
-#ifdef DEBUG
-    ThreadPoolGetStats( &gRecvThreadPool, &stats );
-    PrintThreadPoolStats (__FILE__, __LINE__,
-	"Recv Thread Pool", &stats);
-    ThreadPoolGetStats( &gSendThreadPool, &stats );
-    PrintThreadPoolStats (__FILE__, __LINE__,
-	"Send Thread Pool", &stats);
-#endif
+    PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
+    PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
 #ifdef INCLUDE_DEVICE_APIS
     if( GetDeviceHandleInfo( &device_handle, &temp ) == HND_DEVICE )
         UpnpUnRegisterRootDevice( device_handle );
@@ -419,44 +436,38 @@ UpnpFinish()
     web_server_destroy();
 #endif
 
-    ThreadPoolShutdown( &gSendThreadPool );
-    ThreadPoolShutdown( &gRecvThreadPool );
+    ThreadPoolShutdown(&gSendThreadPool);
+    ThreadPoolShutdown(&gRecvThreadPool);
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Exiting UpnpFinish : UpnpSdkInit is :%d:\n",
-	UpnpSdkInit );
-#ifdef DEBUG
-    ThreadPoolGetStats( &gRecvThreadPool, &stats );
-    PrintThreadPoolStats( __FILE__, __LINE__,
-        "Recv Thread Pool", &stats);
-    ThreadPoolGetStats( &gSendThreadPool, &stats );
-    PrintThreadPoolStats(__FILE__, __LINE__,
-        "Send Thread Pool", &stats);
-#endif
+        "Exiting UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit);
+    PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
+    PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
     UpnpCloseLog();
 
 #ifdef INCLUDE_CLIENT_APIS
-    ithread_mutex_destroy( &GlobalClientSubscribeMutex );
+    ithread_mutex_destroy(&GlobalClientSubscribeMutex);
 #endif
-    ithread_mutex_destroy( &GlobalHndMutex );
-    ithread_mutex_destroy( &gUUIDMutex );
+    ithread_mutex_destroy(&GlobalHndMutex);
+    ithread_mutex_destroy(&gUUIDMutex);
 
     // remove all virtual dirs
     UpnpRemoveAllVirtualDirs();
-    // leuk_he allow static linking:
+
+    // allow static linking
 #ifdef WIN32
 #ifdef PTW32_STATIC_LIB
     pthread_win32_thread_detach_np ();
 #endif
 #endif
 
-
     UpnpSdkInit = 0;
 
     return UPNP_E_SUCCESS;
 
-}  /********************* End of  UpnpFinish  *************************/
+}
+/*************************** End of  UpnpFinish  *****************************/
 
-/****************************************************************************
+/******************************************************************************
  * Function: UpnpGetServerPort
  *
  * Parameters: NONE

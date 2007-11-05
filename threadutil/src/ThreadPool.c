@@ -1523,6 +1523,9 @@ void ThreadPoolPrintStats(ThreadPoolStats * stats)
 #else /* __FreeBSD__ */
 	printf("ThreadPoolStats at Time: %ld\n", time(NULL));
 #endif /* __FreeBSD__ */
+	printf("High Jobs pending: %d\n", stats->currentJobsHQ);
+	printf("Med Jobs Pending: %d\n", stats->currentJobsMQ);
+	printf("Low Jobs Pending: %d\n", stats->currentJobsLQ);
 	printf("Average Wait in High Priority Q in milliseconds: %f\n", stats->avgWaitHQ);
 	printf("Average Wait in Med Priority Q in milliseconds: %f\n", stats->avgWaitMQ);
 	printf("Averate Wait in Low Priority Q in milliseconds: %f\n", stats->avgWaitLQ);
