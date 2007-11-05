@@ -152,15 +152,13 @@ int AdvertiseAndReply( IN int AdFlag,
         }
 
         dbgStr = ixmlNode_getNodeName( tmpNode );
-                 UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                     "Extracting device type once for %s\n",
-                     dbgStr );
-            // extract device type 
-            ixmlNodeList_free( nodeList );
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "Extracting device type once for %s\n", dbgStr );
+        // extract device type 
+        ixmlNodeList_free( nodeList );
         nodeList = NULL;
-        nodeList =
-            ixmlElement_getElementsByTagName( ( IXML_Element * ) tmpNode,
-                                              "deviceType" );
+        nodeList = ixmlElement_getElementsByTagName(
+            ( IXML_Element * ) tmpNode, "deviceType" );
         if( nodeList == NULL ) {
             continue;
         }
@@ -168,7 +166,6 @@ int AdvertiseAndReply( IN int AdFlag,
         dbgStr = ixmlNode_getNodeName( tmpNode );
         UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
             "Extracting UDN for %s\n", dbgStr );
-
         UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
             "Extracting device type\n" );
 
@@ -238,13 +235,12 @@ int AdvertiseAndReply( IN int AdFlag,
 
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
             "Sending UDNStr = %s \n", UDNstr );
-            if( AdFlag ) {
+        if( AdFlag ) {
             // send the device advertisement 
             if( AdFlag == 1 ) {
                 DeviceAdvertisement( devType, i == 0,
                                      UDNstr, SInfo->DescURL, Exp );
-            } else              // AdFlag == -1
-            {
+            } else {             // AdFlag == -1
                 DeviceShutdown( devType, i == 0, UDNstr,
                                 SERVER, SInfo->DescURL, Exp );
             }
@@ -403,7 +399,7 @@ int AdvertiseAndReply( IN int AdFlag,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting AdvertiseAndReply : \n" );
 
-    HandleUnlock(  );
+    HandleUnlock();
 
     return UPNP_E_SUCCESS;
 
