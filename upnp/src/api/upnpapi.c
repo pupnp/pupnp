@@ -345,7 +345,7 @@ PrintThreadPoolStats (const char* DbgFileName, int DbgLineNo,
 }
 #endif
 
-     
+
 /****************************************************************************
  * Function: UpnpFinish
  *
@@ -389,11 +389,11 @@ UpnpFinish()
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
         "Inside UpnpFinish : UpnpSdkInit is :%d:\n",
         UpnpSdkInit );
-#ifdef DEBUG
     if( UpnpSdkInit == 1 ) {
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
             "UpnpFinish : UpnpSdkInit is ONE\n" );
     }
+#ifdef DEBUG
     ThreadPoolGetStats( &gRecvThreadPool, &stats );
     PrintThreadPoolStats (__FILE__, __LINE__,
 	"Recv Thread Pool", &stats);
@@ -419,20 +419,20 @@ UpnpFinish()
     web_server_destroy();
 #endif
 
-#ifdef DEBUG
     ThreadPoolShutdown( &gSendThreadPool );
     ThreadPoolShutdown( &gRecvThreadPool );
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
         "Exiting UpnpFinish : UpnpSdkInit is :%d:\n",
 	UpnpSdkInit );
+#ifdef DEBUG
     ThreadPoolGetStats( &gRecvThreadPool, &stats );
     PrintThreadPoolStats( __FILE__, __LINE__,
         "Recv Thread Pool", &stats);
     ThreadPoolGetStats( &gSendThreadPool, &stats );
     PrintThreadPoolStats(__FILE__, __LINE__,
         "Send Thread Pool", &stats);
-    UpnpCloseLog();
 #endif
+    UpnpCloseLog();
 
 #ifdef INCLUDE_CLIENT_APIS
     ithread_mutex_destroy( &GlobalClientSubscribeMutex );
@@ -3300,9 +3300,9 @@ UpnpDownloadXmlDoc( const char *url,
         UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
             "****************** END OF Parsed XML Doc *****************\n" );
         ixmlFreeDOMString( xml_buf );
+#endif
         UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
             "Exiting UpnpDownloadXmlDoc\n" );
-#endif
         return UPNP_E_SUCCESS;
     }
 }
@@ -3635,7 +3635,6 @@ int PrintHandleInfo( IN UpnpClient_Handle Hnd )
     struct Handle_Info * HndInfo;
     if (HandleTable[Hnd] != NULL) {
         HndInfo = HandleTable[Hnd];
-#ifdef DEBUG
             UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
                 "Printing information for Handle_%d\n", Hnd);
             UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -3644,7 +3643,6 @@ int PrintHandleInfo( IN UpnpClient_Handle Hnd )
                 if(HndInfo->HType != HND_CLIENT)
                     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
                         "DescURL_%s\n", HndInfo->DescURL );
-#endif
 #endif
     } else {
         return UPNP_E_INVALID_HANDLE;

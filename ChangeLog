@@ -2,6 +2,16 @@
 Version 1.6.1
 *******************************************************************************
 
+2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 1825929 ] woker thread still alive after UpnpFinish()
+	Submitted By: Luke Kim - nereusuj
+	Worker thread still alive after calling UpnpFinish() because
+	ThreadPoolShutdown() is in the #ifdef DEBUG block.
+	421
+	422 #ifdef DEBUG
+	423 ThreadPoolShutdown( &gSendThreadPool );
+	424 ThreadPoolShutdown( &gRecvThreadPool );
+
 2007-08-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Changed the calls to virtualDirCallback.open(filename, UPNP_WRITE)
 	to (virtualDirCallback.open)(filename, UPNP_WRITE) (notice the
