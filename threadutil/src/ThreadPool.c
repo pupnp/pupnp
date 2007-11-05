@@ -1547,17 +1547,19 @@ void ThreadPoolPrintStats(ThreadPoolStats * stats)
  *  Returns:
  *      Always returns 0.
  *****************************************************************************/
-    int TPAttrSetMaxJobsTotal( ThreadPoolAttr * attr,
-                               int  maxJobsTotal ) {
-        assert( attr != NULL );
+int TPAttrSetMaxJobsTotal(
+	ThreadPoolAttr * attr,
+	int  maxJobsTotal )
+{
+	assert( attr != NULL );
 
-        if( attr == NULL ) {
-            return EINVAL;
-        }
+	if( attr == NULL ) {
+		return EINVAL;
+	}
 
-        attr->maxJobsTotal = maxJobsTotal;
-        return 0;
-    }
+	attr->maxJobsTotal = maxJobsTotal;
+	return 0;
+}
 
 /****************************************************************************
  * Function: ThreadPoolGetStats
