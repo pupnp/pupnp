@@ -3,6 +3,9 @@ Version 1.6.1
 *******************************************************************************
 
 2007-11-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Adjusting libtool library numbers to reflect the last changes.
+
+2007-11-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* GlobalHndMutex, which was a mutex is now GlobalHndRWLock, which is a
 	rwlock. HandleLock() is mapped to HandleWriteLock() while all other
 	instances have not been checked. One instance in AdvertiseAndReply()
