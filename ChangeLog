@@ -2,7 +2,10 @@
 Version 1.6.1
 *******************************************************************************
 
-2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+2007-11-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added support for rwlocks.
+
+2007-11-05 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 1825929 ] woker thread still alive after UpnpFinish()
 	Submitted By: Luke Kim - nereusuj
 	Worker thread still alive after calling UpnpFinish() because
