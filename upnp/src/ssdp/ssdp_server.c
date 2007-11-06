@@ -122,16 +122,13 @@ int AdvertiseAndReply( IN int AdFlag,
         "Inside AdvertiseAndReply with AdFlag = %d\n",
         AdFlag );
 
-    HandleLock();
+    // Use a read lock
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     defaultExp = SInfo->MaxAge;
-
-    //Modifed to prevent more than one thread from accessing the 
-    //UpnpDocument stored with the handle at the same time
-    // HandleUnlock();
     nodeList = NULL;
 
     //get server info

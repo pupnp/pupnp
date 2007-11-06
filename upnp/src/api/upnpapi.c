@@ -84,8 +84,8 @@ virtualDirList *pVirtualDirList;
 // Mutex to synchronize the subscription handling at the client side
 CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
 
-//Mutex to synchronize handles ( root device or control point handle)
-    ithread_mutex_t GlobalHndMutex;
+// rwlock to synchronize handles (root device or control point handle)
+    ithread_rwlock_t GlobalHndRWLock;
 
 // Mutex to synchronize the uuid creation process
     ithread_mutex_t gUUIDMutex;
@@ -213,26 +213,26 @@ int UpnpInit( IN const char *HostIP,
 #ifdef __CYGWIN__
         /* On Cygwin, pthread_mutex_init() fails without this memset. */
         /* TODO: Fix Cygwin so we don't need this memset(). */
-        memset(&GlobalHndMutex, 0, sizeof(GlobalHndMutex));
+        memset(&GlobalHndRWLock, 0, sizeof(GlobalHndRWLock));
 #endif
-        if( ithread_mutex_init( &GlobalHndMutex, NULL ) != 0 ) {
+    if (ithread_rwlock_init(&GlobalHndRWLock, NULL) != 0) {
         return UPNP_E_INIT_FAILED;
     }
 
-    if( ithread_mutex_init( &gUUIDMutex, NULL ) != 0 ) {
+    if (ithread_mutex_init(&gUUIDMutex, NULL) != 0) {
         return UPNP_E_INIT_FAILED;
     }
     // initialize subscribe mutex
 #ifdef INCLUDE_CLIENT_APIS
-    if ( ithread_mutex_init( &GlobalClientSubscribeMutex, NULL ) != 0 ) {
+    if (ithread_mutex_init(&GlobalClientSubscribeMutex, NULL) != 0) {
         return UPNP_E_INIT_FAILED;
     }
 #endif
 
-        HandleLock();
-    if( HostIP != NULL )
+    HandleLock();
+    if( HostIP != NULL ) {
         strcpy( LOCAL_HOST, HostIP );
-    else {
+    } else {
         if( getlocalhostname( LOCAL_HOST ) != UPNP_E_SUCCESS ) {
             HandleUnlock();
             return UPNP_E_INIT_FAILED;
@@ -447,7 +447,7 @@ UpnpFinish()
 #ifdef INCLUDE_CLIENT_APIS
     ithread_mutex_destroy(&GlobalClientSubscribeMutex);
 #endif
-    ithread_mutex_destroy(&GlobalHndMutex);
+    ithread_rwlock_destroy(&GlobalHndRWLock);
     ithread_mutex_destroy(&gUUIDMutex);
 
     // remove all virtual dirs
