@@ -2,6 +2,11 @@
 Version 1.6.1
 *******************************************************************************
 
+2007-11-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 1825278 ] AdvertiseAndReply sleeps with handle lock out
+	Applied patch from Alex (afaucher) to change some write locks to read
+	locks.
+
 2007-11-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Adjusting libtool library numbers to reflect the last changes.
 

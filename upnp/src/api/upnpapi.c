@@ -1570,7 +1570,7 @@ UpnpSearchAsync( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpSearchAsync \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -1746,7 +1746,7 @@ UpnpSubscribeAsync( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpSubscribeAsync \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -1763,15 +1763,13 @@ UpnpSubscribeAsync( IN UpnpClient_Handle Hnd,
         HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
+    HandleUnlock();
 
-    Param =
-        ( struct UpnpNonblockParam * )
-        malloc( sizeof( struct UpnpNonblockParam ) );
+    Param = (struct UpnpNonblockParam *)
+        malloc(sizeof (struct UpnpNonblockParam));
     if( Param == NULL ) {
-        HandleUnlock();
         return UPNP_E_OUTOF_MEMORY;
     }
-    HandleUnlock();
 
     Param->FunName = SUBSCRIBE;
     Param->Handle = Hnd;
@@ -1831,7 +1829,7 @@ UpnpSubscribe( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpSubscribe \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -1891,7 +1889,7 @@ UpnpUnSubscribe( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpUnSubscribe \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -1950,7 +1948,7 @@ UpnpUnSubscribeAsync( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpUnSubscribeAsync \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2024,7 +2022,7 @@ UpnpRenewSubscription( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpRenewSubscription \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2089,7 +2087,7 @@ UpnpRenewSubscriptionAsync( IN UpnpClient_Handle Hnd,
 
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpRenewSubscriptionAsync \n" );
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2184,7 +2182,7 @@ UpnpNotify( IN UpnpDevice_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpNotify \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2255,7 +2253,7 @@ UpnpNotifyExt( IN UpnpDevice_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpNotify \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2332,7 +2330,7 @@ UpnpAcceptSubscription( IN UpnpDevice_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpAcceptSubscription \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2408,7 +2406,7 @@ UpnpAcceptSubscriptionExt( IN UpnpDevice_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpAcceptSubscription \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2504,7 +2502,7 @@ UpnpSendAction( IN UpnpClient_Handle Hnd,
     }
     DevUDN_const = NULL;
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2588,7 +2586,7 @@ UpnpSendActionEx( IN UpnpClient_Handle Hnd,
         return retVal;
     }
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2664,7 +2662,7 @@ UpnpSendActionAsync( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpSendActionAsync \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2784,7 +2782,7 @@ UpnpSendActionExAsync( IN UpnpClient_Handle Hnd,
         return retVal;
     }
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2898,7 +2896,7 @@ UpnpGetServiceVarStatusAsync( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpGetServiceVarStatusAsync \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2978,7 +2976,7 @@ UpnpGetServiceVarStatus( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpGetServiceVarStatus \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;

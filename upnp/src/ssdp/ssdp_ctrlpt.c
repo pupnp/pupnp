@@ -125,7 +125,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
 
     // we are assuming that there can be only one client supported at a time
 
-    HandleLock();
+    HandleReadLock();
 
     if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
         HandleUnlock();
