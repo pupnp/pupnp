@@ -268,7 +268,7 @@ int UpnpInit( IN const char *HostIP,
 
     if( ThreadPoolInit( &gMiniServerThreadPool, &attr ) != UPNP_E_SUCCESS ) {
         UpnpSdkInit = 0;
-        UpnpFinish(  );
+        UpnpFinish();
         return UPNP_E_INIT_FAILED;
     }
 
@@ -402,7 +402,7 @@ UpnpFinish()
     struct Handle_Info *temp;
 
 #ifdef WIN32
-//	WSACleanup( );
+//	WSACleanup();
 #endif
 
     if( UpnpSdkInit != 1 ) {
@@ -410,14 +410,14 @@ UpnpFinish()
     }
 
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpFinish : UpnpSdkInit is :%d:\n",
-        UpnpSdkInit );
+        "Inside UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit );
     if( UpnpSdkInit == 1 ) {
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
             "UpnpFinish : UpnpSdkInit is ONE\n" );
     }
     PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
     PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
+
 #ifdef INCLUDE_DEVICE_APIS
     if( GetDeviceHandleInfo( &device_handle, &temp ) == HND_DEVICE )
         UpnpUnRegisterRootDevice( device_handle );
@@ -429,7 +429,6 @@ UpnpFinish()
 #endif
 
     TimerThreadShutdown( &gTimerThread );
-
     StopMiniServer();
 
 #if EXCLUDE_WEB_SERVER == 0
@@ -438,11 +437,9 @@ UpnpFinish()
 
     ThreadPoolShutdown(&gSendThreadPool);
     ThreadPoolShutdown(&gRecvThreadPool);
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Exiting UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit);
+
     PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
     PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
-    UpnpCloseLog();
 
 #ifdef INCLUDE_CLIENT_APIS
     ithread_mutex_destroy(&GlobalClientSubscribeMutex);
@@ -456,11 +453,14 @@ UpnpFinish()
     // allow static linking
 #ifdef WIN32
 #ifdef PTW32_STATIC_LIB
-    pthread_win32_thread_detach_np ();
+    pthread_win32_thread_detach_np();
 #endif
 #endif
 
     UpnpSdkInit = 0;
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Exiting UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit);
+    UpnpCloseLog();
 
     return UPNP_E_SUCCESS;
 
