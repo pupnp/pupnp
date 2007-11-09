@@ -378,11 +378,13 @@ RunMiniServer( MiniServerSockArray * miniSock )
 {
     struct sockaddr_in clientAddr;
     socklen_t clientLen;
-    SOCKET miniServSock;
     SOCKET connectHnd;
-    SOCKET miniServStopSock;
-    SOCKET ssdpSock;
-    CLIENTONLY( SOCKET ssdpReqSock; )
+    SOCKET miniServSock = miniSock->miniServerSock;
+    SOCKET miniServStopSock =  miniSock->miniServerStopSock;
+    SOCKET ssdpSock = miniSock->ssdpSock;
+#ifdef INCLUDE_CLIENT_APIS
+    SOCKET ssdpReqSock = miniSock->ssdpReqSock;
+#endif
 
     fd_set expSet;
     fd_set rdSet;
@@ -390,18 +392,14 @@ RunMiniServer( MiniServerSockArray * miniSock )
     int byteReceived;
     char requestBuf[256];
 
-    miniServSock = miniSock->miniServerSock;
-    miniServStopSock = miniSock->miniServerStopSock;
-    ssdpSock = miniSock->ssdpSock;
-    CLIENTONLY( ssdpReqSock = miniSock->ssdpReqSock; );
+    maxMiniSock = max( miniServSock, miniServStopSock) ;
+    maxMiniSock = max( maxMiniSock, (SOCKET)(ssdpSock) );
+#ifdef INCLUDE_CLIENT_APIS
+    maxMiniSock = max( maxMiniSock, (SOCKET)(ssdpReqSock) );
+#endif
+    ++maxMiniSock;
 
     gMServState = MSERV_RUNNING;
-    maxMiniSock = max( miniServSock, miniServStopSock );
-    maxMiniSock = max( maxMiniSock, ( SOCKET ) ( ssdpSock ) );
-    CLIENTONLY( maxMiniSock =
-                max( maxMiniSock, ( SOCKET ) ( ssdpReqSock ) ) );
-
-    ++maxMiniSock;
     while( TRUE ) {
         FD_ZERO( &rdSet );
         FD_ZERO( &expSet );
@@ -410,33 +408,33 @@ RunMiniServer( MiniServerSockArray * miniSock )
         FD_SET( miniServSock, &rdSet );
         FD_SET( miniServStopSock, &rdSet );
         FD_SET( ssdpSock, &rdSet );
-        CLIENTONLY( FD_SET( ssdpReqSock, &rdSet ) );
+#ifdef INCLUDE_CLIENT_APIS
+        FD_SET( ssdpReqSock, &rdSet );
+#endif
 
         if( select( maxMiniSock, &rdSet, NULL, &expSet, NULL ) ==
             UPNP_SOCKETERROR ) {
             UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-                "Error in select call !!!\n" );
+                "Error in select call!\n" );
             continue;
         } else {
             if( FD_ISSET( miniServSock, &rdSet ) ) {
                 clientLen = sizeof( struct sockaddr_in );
                 connectHnd = accept( miniServSock,
-                                     ( struct sockaddr * )&clientAddr,
-                                     &clientLen );
+                    ( struct sockaddr * )&clientAddr, &clientLen );
                 if( connectHnd == UPNP_INVALID_SOCKET ) {
                     UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                        "miniserver: Error"
-                        " in accepting connection\n" );
+                        "miniserver: Error in accepting connection\n" );
                     continue;
                 }
                 schedule_request_job( connectHnd, &clientAddr );
             }
-            //ssdp
-            CLIENTONLY(
-                if( FD_ISSET( ssdpReqSock, &rdSet ) ) {
-                    readFromSSDPSocket( ssdpReqSock );
-		}
-            )
+#ifdef INCLUDE_CLIENT_APIS
+            // ssdp
+            if( FD_ISSET( ssdpReqSock, &rdSet ) ) {
+                readFromSSDPSocket( ssdpReqSock );
+            }
+#endif
             if( FD_ISSET( ssdpSock, &rdSet ) ) {
                     readFromSSDPSocket( ssdpSock );
             }
@@ -470,11 +468,12 @@ RunMiniServer( MiniServerSockArray * miniSock )
     UpnpCloseSocket( miniServStopSock );
     shutdown( ssdpSock, SD_BOTH );
     UpnpCloseSocket( ssdpSock );
-    CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
-    CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
+#ifdef INCLUDE_CLIENT_APIS
+    shutdown( ssdpReqSock, SD_BOTH );
+    UpnpCloseSocket( ssdpReqSock );
+#endif
 
     free( miniSock );
-
     gMServState = MSERV_IDLE;
 
     return;
@@ -666,8 +665,8 @@ get_miniserver_sockets( MiniServerSockArray * out,
     miniStopSockPort = get_port( miniServerStopSock );
     if( miniStopSockPort <= 0 ) {
         shutdown( miniServerStopSock, SD_BOTH );
-        shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( miniServerStopSock );
+        shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
         return UPNP_E_INTERNAL_ERROR;
     }
@@ -704,9 +703,7 @@ get_miniserver_sockets( MiniServerSockArray * out,
 int
 StartMiniServer( unsigned short listen_port )
 {
-
     int success;
-
     int count;
     int max_count = 10000;
 
@@ -729,12 +726,10 @@ StartMiniServer( unsigned short listen_port )
     }
 
     if( ( success = get_ssdp_sockets( miniSocket ) ) != UPNP_E_SUCCESS ) {
-
         shutdown( miniSocket->miniServerSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerSock );
         shutdown( miniSocket->miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerStopSock );
-
         free( miniSocket );
 
         return success;
@@ -750,14 +745,15 @@ StartMiniServer( unsigned short listen_port )
 
     if( success < 0 ) {
         shutdown( miniSocket->miniServerSock, SD_BOTH );
-        shutdown( miniSocket->miniServerStopSock, SD_BOTH );
-        shutdown( miniSocket->ssdpSock, SD_BOTH );
-        CLIENTONLY( shutdown( miniSocket->ssdpReqSock, SD_BOTH ) );
         UpnpCloseSocket( miniSocket->miniServerSock );
+        shutdown( miniSocket->miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerStopSock );
+        shutdown( miniSocket->ssdpSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->ssdpSock );
-
-        CLIENTONLY( UpnpCloseSocket( miniSocket->ssdpReqSock ) );
+#ifdef INCLUDE_CLIENT_APIS
+        shutdown( miniSocket->ssdpReqSock, SD_BOTH );
+        UpnpCloseSocket( miniSocket->ssdpReqSock );
+#endif
 
         return UPNP_E_OUTOF_MEMORY;
     }
@@ -770,16 +766,16 @@ StartMiniServer( unsigned short listen_port )
 
     // taking too long to start that thread
     if( count >= max_count ) {
-
         shutdown( miniSocket->miniServerSock, SD_BOTH );
-        shutdown( miniSocket->miniServerStopSock, SD_BOTH );
-        shutdown( miniSocket->ssdpSock, SD_BOTH );
-        CLIENTONLY( shutdown( miniSocket->ssdpReqSock, SD_BOTH ) );
-
         UpnpCloseSocket( miniSocket->miniServerSock );
+        shutdown( miniSocket->miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerStopSock );
+        shutdown( miniSocket->ssdpSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->ssdpSock );
-        CLIENTONLY( UpnpCloseSocket( miniSocket->ssdpReqSock ) );
+#ifdef INCLUDE_CLIENT_APIS
+        shutdown( miniSocket->ssdpReqSock, SD_BOTH );
+        UpnpCloseSocket( miniSocket->ssdpReqSock );
+#endif
 
         return UPNP_E_INTERNAL_ERROR;
     }
@@ -804,16 +800,17 @@ int
 StopMiniServer( void )
 {
 
-    int socklen = sizeof( struct sockaddr_in ),
-      sock;
+    int socklen = sizeof( struct sockaddr_in );
+    int sock;
     struct sockaddr_in ssdpAddr;
     char buf[256] = "ShutDown";
     int bufLen = strlen( buf );
 
-    if( gMServState == MSERV_RUNNING )
+    if( gMServState == MSERV_RUNNING ) {
         gMServState = MSERV_STOPPING;
-    else
+    } else {
         return 0;
+    }
 
     sock = socket( AF_INET, SOCK_DGRAM, 0 );
     if( sock == UPNP_INVALID_SOCKET ) {
