@@ -2,6 +2,11 @@
 Version 1.6.2
 *******************************************************************************
 
+2007-11-09 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added a isleep() call to the error handler of select() in
+	RunMiniServer(), so that it does not take 100% cpu in case select()
+	fails repeatedly.
+
 
 *******************************************************************************
 Version 1.6.1
