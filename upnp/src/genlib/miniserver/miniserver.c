@@ -416,6 +416,8 @@ RunMiniServer( MiniServerSockArray * miniSock )
             UPNP_SOCKETERROR ) {
             UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
                 "Error in select call!\n" );
+	    /* Avoid 100% CPU in case of repeated error in select() */
+	    isleep( 1 );
             continue;
         } else {
             if( FD_ISSET( miniServSock, &rdSet ) ) {
