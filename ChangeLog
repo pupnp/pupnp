@@ -7,6 +7,9 @@ Version 1.6.2
 	RunMiniServer(), so that it does not take 100% cpu in case select()
 	fails repeatedly.
 
+2007-11-12 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* "make check" was failing because ixml/test/test_document.sh did not
+	have the executable flag set. Thanks to Steve Bresson.
 
 *******************************************************************************
 Version 1.6.1
