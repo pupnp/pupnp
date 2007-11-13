@@ -70,22 +70,25 @@
 #include "sock.h"
 #include "webserver.h"
 
-#define DOSOCKET_READ	1
-#define DOSOCKET_WRITE	0
+
+const int CHUNK_HEADER_SIZE = 10;
+const int CHUNK_TAIL_SIZE = 10;
+
 
 /************************************************************************
-* Function: http_FixUrl	
-*
-* Parameters:
-*	IN uri_type* url ;		URL to be validated and fixed
-*	OUT uri_type* fixed_url ;	URL after being fixed.
-*
-* Description: Validates URL
-*
-* Returns:
-*	 UPNP_E_INVALID_URL
-* 	 UPNP_E_SUCCESS	
-************************************************************************/
+ * Function: http_FixUrl
+ *
+ * Parameters:
+ *	IN uri_type* url;		URL to be validated and fixed
+ *	OUT uri_type* fixed_url;	URL after being fixed.
+ *
+ * Description:
+ *	Validates URL
+ *
+ * Returns:
+ *	 UPNP_E_INVALID_URL
+ * 	 UPNP_E_SUCCESS
+ ************************************************************************/
 int
 http_FixUrl( IN uri_type * url,
              OUT uri_type * fixed_url )
@@ -110,20 +113,22 @@ http_FixUrl( IN uri_type * url,
     return UPNP_E_SUCCESS;
 }
 
+
 /************************************************************************
-* Function: http_FixStrUrl
-*
-* Parameters:
-*	IN char* urlstr ; 		Character string as a URL
-*	IN int urlstrlen ; 		Length of the character string
-*	OUT uri_type* fixed_url	;	Fixed and corrected URL
-*
-* Description: Parses URL and then validates URL
-*
-* Returns:
-*	 UPNP_E_INVALID_URL
-* 	 UPNP_E_SUCCESS	
-************************************************************************/
+ * Function: http_FixStrUrl
+ *
+ * Parameters:
+ *	IN char* urlstr ; 		Character string as a URL
+ *	IN int urlstrlen ; 		Length of the character string
+ *	OUT uri_type* fixed_url	;	Fixed and corrected URL
+ *
+ * Description:
+ *	Parses URL and then validates URL
+ *
+ * Returns:
+ *	 UPNP_E_INVALID_URL
+ * 	 UPNP_E_SUCCESS
+ ************************************************************************/
 int
 http_FixStrUrl( IN char *urlstr,
                 IN int urlstrlen,
@@ -138,21 +143,22 @@ http_FixStrUrl( IN char *urlstr,
     return http_FixUrl( &url, fixed_url );
 }
 
+
 /************************************************************************
-* Function: http_Connect
-*
-* Parameters:
-*	IN uri_type* destination_url ;	URL containing destination information					
-*	OUT uri_type *url ;		Fixed and corrected URL
-*
-* Description: Gets destination address from URL and then connects to the 
-*	remote end
-*
-* Returns:
-*	socket descriptor on sucess
-*	UPNP_E_OUTOF_SOCKET
-*	UPNP_E_SOCKET_CONNECT on error										
-************************************************************************/
+ * Function: http_Connect
+ *
+ * Parameters:
+ *	IN uri_type* destination_url;	URL containing destination information
+ *	OUT uri_type *url;		Fixed and corrected URL
+ *
+ * Description:
+ *	Gets destination address from URL and then connects to the remote end
+ *
+ *  Returns:
+ *	socket descriptor on sucess
+ *	UPNP_E_OUTOF_SOCKET
+ *	UPNP_E_SOCKET_CONNECT on error
+ ************************************************************************/
 int
 http_Connect( IN uri_type * destination_url,
               OUT uri_type * url )
@@ -180,25 +186,27 @@ http_Connect( IN uri_type * destination_url,
     return connfd;
 }
 
+
 /************************************************************************
-* Function: http_RecvMessage
-*
-* Parameters:
-*	IN SOCKINFO *info ;			Socket information object
-*	OUT http_parser_t* parser,		HTTP parser object
-*	IN http_method_t request_method ;	HTTP request method
-*	IN OUT int* timeout_secs ;		time out
-*	OUT int* http_error_code ;		HTTP error code returned
-*
-* Description: Get the data on the socket and take actions based on the 
-*	read data to modify the parser objects buffer. If an error is reported 
-*	while parsing the data, the error code is passed in the http_errr_code 
-*	parameter
-*
-* Returns:
-*	 UPNP_E_BAD_HTTPMSG
-* 	 UPNP_E_SUCCESS	
-************************************************************************/
+ * Function: http_RecvMessage
+ *
+ * Parameters:
+ *	IN SOCKINFO *info;			Socket information object
+ *	OUT http_parser_t* parser;		HTTP parser object
+ *	IN http_method_t request_method;	HTTP request method
+ *	IN OUT int* timeout_secs;		time out
+ *	OUT int* http_error_code;		HTTP error code returned
+ *
+ * Description:
+ *	Get the data on the socket and take actions based on the read data
+ *	to modify the parser objects buffer. If an error is reported while
+ *	parsing the data, the error code is passed in the http_errr_code
+ *	parameter
+ *
+ * Returns:
+ *	 UPNP_E_BAD_HTTPMSG
+ * 	 UPNP_E_SUCCESS
+ ************************************************************************/
 int
 http_RecvMessage( IN SOCKINFO * info,
                   OUT http_parser_t * parser,
@@ -266,53 +274,52 @@ http_RecvMessage( IN SOCKINFO * info,
     }
 }
 
+
 /************************************************************************
-* Function: http_SendMessage
-*
-* Parameters:
-*	IN SOCKINFO *info ;		Socket information object
-*	IN OUT int * TimeOut ;		time out value
-*	IN const char* fmt, ...	 Pattern format to take actions upon
-*
-* Description: Sends a message to the destination based on the
-*	IN const char* fmt parameter
-*	fmt types:
-*		'f':	arg = const char * file name
-*		'm':	arg1 = const char * mem_buffer; arg2= size_t buf_length
-*	E.g.:
-*		char *buf = "POST /xyz.cgi http/1.1\r\n\r\n";
-*		char *filename = "foo.dat";
-*		int status = http_SendMessage( tcpsock, "mf",
-*			buf, strlen(buf),	// args for memory buffer		
-*			filename );		// arg for file	
-*
-* Returns:
-*	UPNP_E_OUTOF_MEMORY
-* 	UPNP_E_FILE_READ_ERROR
-*	UPNP_E_SUCCESS
-************************************************************************/
+ * Function: http_SendMessage
+ *
+ * Parameters:
+ *	IN SOCKINFO *info ;		Socket information object
+ *	IN OUT int * TimeOut ;		time out value
+ *	IN const char* fmt, ...	 Pattern format to take actions upon
+ *
+ * Description:
+ *	Sends a message to the destination based on the
+ *	IN const char* fmt parameter
+ *	fmt types:
+ *		'f':	arg = const char * file name
+ *		'm':	arg1 = const char * mem_buffer; arg2= size_t buf_length
+ *	E.g.:
+ *		char *buf = "POST /xyz.cgi http/1.1\r\n\r\n";
+ *		char *filename = "foo.dat";
+ *		int status = http_SendMessage( tcpsock, "mf",
+ *			buf, strlen(buf),	// args for memory buffer
+ *			filename );		// arg for file
+ *
+ * Returns:
+ *	UPNP_E_OUTOF_MEMORY
+ * 	UPNP_E_FILE_READ_ERROR
+ *	UPNP_E_SUCCESS
+ ************************************************************************/
 int
 http_SendMessage( IN SOCKINFO * info,
                   IN OUT int *TimeOut,
                   IN const char *fmt,
                   ... )
 {
-#define CHUNK_HEADER_SIZE 10
-#define CHUNK_TAIL_SIZE 10
-
     char c;
     char *buf = NULL;
     size_t buf_length;
     char *filename = NULL;
     FILE *Fp;
-    int num_read,
-      num_written;
+    int num_read;
+    int num_written;
     off_t amount_to_be_read = 0;
     va_list argp;
-    char *file_buf = NULL,
-     *ChunkBuf = NULL;
+    char *file_buf = NULL;
+    char *ChunkBuf = NULL;
     struct SendInstruction *Instr = NULL;
-    char Chunk_Header[10];
+    char Chunk_Header[CHUNK_HEADER_SIZE];
     int RetVal = 0;
 
     // 10 byte allocated for chunk header.
@@ -322,43 +329,39 @@ http_SendMessage( IN SOCKINFO * info,
 
     while( ( c = *fmt++ ) != 0 ) {
         if( c == 'I' ) {
-            Instr = ( struct SendInstruction * )
-                va_arg( argp, struct SendInstruction * );
+            Instr = va_arg(argp, struct SendInstruction *);
 
             assert( Instr );
 
-            if( Instr->ReadSendSize >= 0 )
+            if( Instr->ReadSendSize >= 0 ) {
                 amount_to_be_read = Instr->ReadSendSize;
-            else
+            } else {
                 amount_to_be_read = Data_Buf_Size;
+            }
 
-            if( amount_to_be_read < WEB_SERVER_BUF_SIZE )
+            if( amount_to_be_read < WEB_SERVER_BUF_SIZE ) {
                 Data_Buf_Size = amount_to_be_read;
+            }
 
-            ChunkBuf = ( char * )malloc( Data_Buf_Size +
-                                         CHUNK_HEADER_SIZE +
-                                         CHUNK_TAIL_SIZE );
-            if( !ChunkBuf )
+            ChunkBuf = (char *)malloc(
+                Data_Buf_Size + CHUNK_HEADER_SIZE + CHUNK_TAIL_SIZE);
+            if( !ChunkBuf ) {
                 return UPNP_E_OUTOF_MEMORY;
+            }
 
-            file_buf = ChunkBuf + 10;
-        }
-
-        if( c == 'f' ) {        // file name
-
-            filename = ( char * )va_arg( argp, char * );
-
-            if( Instr && Instr->IsVirtualFile )
+            file_buf = ChunkBuf + CHUNK_HEADER_SIZE;
+        } else if( c == 'f' ) {
+            // file name
+            filename = va_arg(argp, char *);
+            if( Instr && Instr->IsVirtualFile ) {
                 Fp = (virtualDirCallback.open)( filename, UPNP_READ );
-            else
+            } else  {
                 Fp = fopen( filename, "rb" );
-
+            }
             if( Fp == NULL ) {
                 free( ChunkBuf );
                 return UPNP_E_FILE_READ_ERROR;
             }
-
-            assert( Fp );
 
             if( Instr && Instr->IsRangeActive && Instr->IsVirtualFile ) {
                 if( virtualDirCallback.seek( Fp, Instr->RangeOffset,
@@ -375,40 +378,27 @@ http_SendMessage( IN SOCKINFO * info,
 
             while( amount_to_be_read ) {
                 if( Instr ) {
-                    if( amount_to_be_read >= Data_Buf_Size ) {
-                        if( Instr->IsVirtualFile )
-                            num_read = virtualDirCallback.read( Fp,
-                                                                file_buf,
-                                                                Data_Buf_Size );
-                        else
-                            num_read = fread( file_buf, 1, Data_Buf_Size,
-                                              Fp );
+                    int n = (amount_to_be_read >= Data_Buf_Size) ?
+                        Data_Buf_Size : amount_to_be_read;
+                    if( Instr->IsVirtualFile ) {
+                        num_read = virtualDirCallback.read( Fp, file_buf, n );
                     } else {
-                        if( Instr->IsVirtualFile )
-                            num_read = virtualDirCallback.read( Fp,
-                                                                file_buf,
-                                                                amount_to_be_read );
-                        else
-                            num_read = fread( file_buf, 1,
-                                              amount_to_be_read, Fp );
+                        num_read = fread( file_buf, 1, n, Fp );
                     }
-
                     amount_to_be_read = amount_to_be_read - num_read;
-
                     if( Instr->ReadSendSize < 0 ) {
-                        //read until close
+                        // read until close
                         amount_to_be_read = Data_Buf_Size;
                     }
                 } else {
                     num_read = fread( file_buf, 1, Data_Buf_Size, Fp );
                 }
 
-                if( num_read == 0 ) // EOF so no more to send.
-                {
+                if( num_read == 0 ) {
+                    // EOF so no more to send.
                     if( Instr && Instr->IsChunkActive ) {
-                        num_written = sock_write( info, "0\r\n\r\n",
-                                                  strlen( "0\r\n\r\n" ),
-                                                  TimeOut );
+                        char *str = "0\r\n\r\n";
+                        num_written = sock_write(info, str, strlen(str), TimeOut);
                     } else {
                         RetVal = UPNP_E_FILE_READ_ERROR;
                     }
@@ -416,63 +406,57 @@ http_SendMessage( IN SOCKINFO * info,
                 }
                 // Create chunk for the current buffer.
                 if( Instr && Instr->IsChunkActive ) {
-                    //Copy CRLF at the end of the chunk
+                    // Copy CRLF at the end of the chunk
                     memcpy( file_buf + num_read, "\r\n", 2 );
 
-                    //Hex length for the chunk size.
+                    // Hex length for the chunk size.
                     sprintf( Chunk_Header, "%x", num_read );
 
                     //itoa(num_read,Chunk_Header,16); 
                     strcat( Chunk_Header, "\r\n" );
 
-                    //Copy the chunk size header 
+                    // Copy the chunk size header 
                     memcpy( file_buf - strlen( Chunk_Header ),
                             Chunk_Header, strlen( Chunk_Header ) );
 
                     // on the top of the buffer.
                     //file_buf[num_read+strlen(Chunk_Header)] = NULL;
                     //printf("Sending %s\n",file_buf-strlen(Chunk_Header));
-                    num_written = sock_write( info,
-                                              file_buf -
-                                              strlen( Chunk_Header ),
-                                              num_read +
-                                              strlen( Chunk_Header ) + 2,
-                                              TimeOut );
+                    num_written = sock_write(
+                        info, file_buf - strlen( Chunk_Header ),
+                        num_read + strlen( Chunk_Header ) + 2, TimeOut );
 
                     if( num_written !=
-                        num_read + ( int )strlen( Chunk_Header )
-                        + 2 ) {
-                        goto Cleanup_File;  //Send error nothing we can do.
+                        num_read + ( int )strlen( Chunk_Header ) + 2 ) {
+                        // Send error nothing we can do.
+                        goto Cleanup_File;
                     }
                 } else {
                     // write data
-                    num_written = sock_write( info, file_buf, num_read,
-                                              TimeOut );
-
+                    num_written = sock_write( info, file_buf, num_read, TimeOut );
                     UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
                         ">>> (SENT) >>>\n%.*s\n------------\n",
                         ( int )num_written, file_buf );
-
-                        //Send error nothing we can do
-                        if( num_written != num_read ) {
+                    // Send error nothing we can do
+                    if( num_written != num_read ) {
                         goto Cleanup_File;
                     }
                 }
-            }                   //While
-          Cleanup_File:
+            } // while
+Cleanup_File:
             va_end( argp );
-            if( Instr && Instr->IsVirtualFile )
+            if( Instr && Instr->IsVirtualFile ) {
                 virtualDirCallback.close( Fp );
-            else
+	    } else {
                 fclose( Fp );
+	    }
             free( ChunkBuf );
             return RetVal;
 
-        } else if( c == 'b' ) { // memory buffer
-
-            buf = ( char * )va_arg( argp, char * );
-
-            buf_length = ( size_t ) va_arg( argp, size_t );
+        } else if( c == 'b' ) {
+            // memory buffer
+            buf = va_arg(argp, char *);
+            buf_length = va_arg(argp, size_t);
             if( buf_length > 0 ) {
                 num_written = sock_write( info, buf, buf_length, TimeOut );
                 UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
@@ -480,39 +464,42 @@ http_SendMessage( IN SOCKINFO * info,
 		    "%.*s\nbuf_length=%d, num_written=%d\n"
 		    "------------\n",
                     (int)buf_length, buf, (int)buf_length, num_written );
-                if( ( size_t ) num_written != buf_length )
+                if( (size_t)num_written != buf_length ) {
                     goto end;
+		}
             }
         }
     }
 
-  end:
+end:
     va_end( argp );
     free( ChunkBuf );
     return 0;
 }
 
+
 /************************************************************************
-* Function: http_RequestAndResponse
-*
-* Parameters:
-*	IN uri_type* destination ;	Destination URI object which contains
-*					remote IP address among other elements
-*	IN const char* request ;	Request to be sent
-*	IN size_t request_length ;	Length of the request
-*	IN http_method_t req_method ;	HTTP Request method
-*	IN int timeout_secs ;		time out value
-*	OUT http_parser_t* response;	Parser object to receive the repsonse
-*
-* Description: Initiates socket, connects to the destination, sends a
-*	request and waits for the response from the remote end
-*
-* Returns:
-*	UPNP_E_SOCKET_ERROR
-* 	UPNP_E_SOCKET_CONNECT
-*	Error Codes returned by http_SendMessage
-*	Error Codes returned by http_RecvMessage							
-************************************************************************/
+ * Function: http_RequestAndResponse
+ *
+ * Parameters:
+ *	IN uri_type* destination;	Destination URI object which contains
+ *					remote IP address among other elements
+ *	IN const char* request;		Request to be sent
+ *	IN size_t request_length;	Length of the request
+ *	IN http_method_t req_method;	HTTP Request method
+ *	IN int timeout_secs;		time out value
+ *	OUT http_parser_t* response;	Parser object to receive the repsonse
+ *
+ * Description:
+ *	Initiates socket, connects to the destination, sends a
+ *	request and waits for the response from the remote end
+ *
+ * Returns:
+ *	UPNP_E_SOCKET_ERROR
+ * 	UPNP_E_SOCKET_CONNECT
+ *	Error Codes returned by http_SendMessage
+ *	Error Codes returned by http_RecvMessage
+ ************************************************************************/
 int
 http_RequestAndResponse( IN uri_type * destination,
                          IN const char *request,
@@ -564,26 +551,26 @@ http_RequestAndResponse( IN uri_type * destination,
     return ret_code;
 }
 
+
 /************************************************************************
-* Function :	http_Download
-*
-* Parameters :
-*	IN const char* url_str:	String as a URL
-*	IN int timeout_secs:	time out value
-*	OUT char** document:	buffer to store the document extracted
-*				from the donloaded message.
-*	OUT int* doc_length:	length of the extracted document
-*	OUT char* content_type:	Type of content
-*
-* Description :	Download the document message and extract the document 
-*		from the message.
-*
-* Return : int;
-*	UPNP_E_SUCCESS;
-*	UPNP_E_INVALID_URL;
-*
-* Note :
-************************************************************************/
+ * Function: http_Download
+ *
+ * Parameters:
+ *	IN const char* url_str;	String as a URL
+ *	IN int timeout_secs;	time out value
+ *	OUT char** document;	buffer to store the document extracted
+ *				from the donloaded message.
+ *	OUT int* doc_length;	length of the extracted document
+ *	OUT char* content_type;	Type of content
+ *
+ * Description:
+ *	Download the document message and extract the document 
+ *	from the message.
+ *
+ * Return: int
+ *	UPNP_E_SUCCESS
+ *	UPNP_E_INVALID_URL
+ ************************************************************************/
 int
 http_Download( IN const char *url_str,
                IN int timeout_secs,
@@ -684,8 +671,8 @@ http_Download( IN const char *url_str,
     if( ( *doc_length = ( int )response.msg.entity.length ) == 0 ) {
         // 0-length msg
         *document = NULL;
-    } else if( response.msg.status_code == HTTP_OK )    //LEAK_FIX_MK
-    {
+    } else if( response.msg.status_code == HTTP_OK ) {
+        //LEAK_FIX_MK
         // copy entity
         entity_start = response.msg.entity.buf; // what we want
         msg_length = response.msg.msg.length;   // save for posterity   
@@ -722,23 +709,24 @@ typedef struct HTTPPOSTHANDLE {
 } http_post_handle_t;
 
 /************************************************************************
-* Function: MakePostMessage												
-*																		
-* Parameters:															
-*	const char *url_str ;		String as a URL
-*	membuffer *request ;		Buffer containing the request									
-*	uri_type *url ; 			URI object containing the scheme, path 
-*								query token, etc.
-*	int contentLength ;			length of content
-*	const char *contentType	;	Type of content
-*																		
-* Description: Makes the message for the HTTP POST message				
-*																		
-* Returns:																
-*	UPNP_E_INVALID_URL													
-* 	UPNP_E_INVALID_PARAM												
-*	UPNP_E_SUCCESS														
-************************************************************************/
+ * Function: MakePostMessage
+ *
+ * Parameters:
+ *	const char *url_str;		String as a URL
+ *	membuffer *request;		Buffer containing the request
+ *	uri_type *url; 			URI object containing the scheme,
+ *					path query token, etc.
+ *	int contentLength;		length of content
+ *	const char *contentType;	Type of content
+ *
+ * Description:
+ *	Makes the message for the HTTP POST message
+ *
+ * Returns:
+ *	UPNP_E_INVALID_URL
+ * 	UPNP_E_INVALID_PARAM
+ *	UPNP_E_SUCCESS
+ ************************************************************************/
 int
 MakePostMessage( const char *url_str,
                  membuffer * request,
@@ -825,25 +813,24 @@ MakePostMessage( const char *url_str,
 }
 
 /************************************************************************
-*	Function :	http_WriteHttpPost
-*
-*	Parameters :
-*		IN void *Handle :		Handle to the http post object
-*		IN char *buf :			Buffer to send to peer, if format used
-*								is not UPNP_USING_CHUNKED, 
-*		IN unsigned int *size :	Size of the data to be sent.
-*		IN int timeout :		time out value
-*
-*	Description :	Formats data if format used is UPNP_USING_CHUNKED.
-*		Writes data on the socket connected to the peer.
-*
-*	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_INVALID_PARAM - Invalid Parameter
-*		-1 - On Socket Error.
-*
-*	Note :
-************************************************************************/
+ * Function: http_WriteHttpPost
+ *
+ * Parameters:
+ *	IN void *Handle:	Handle to the http post object
+ *	IN char *buf:		Buffer to send to peer, if format used
+ *				is not UPNP_USING_CHUNKED, 
+ *	IN unsigned int *size:	Size of the data to be sent.
+ *	IN int timeout:		time out value
+ *
+ * Description:
+ *	Formats data if format used is UPNP_USING_CHUNKED.
+ *	Writes data on the socket connected to the peer.
+ *
+ * Return: int
+ *	UPNP_E_SUCCESS - On Success
+ *	UPNP_E_INVALID_PARAM - Invalid Parameter
+ *	-1 - On Socket Error.
+ ************************************************************************/
 int
 http_WriteHttpPost( IN void *Handle,
                     IN char *buf,
@@ -864,17 +851,18 @@ http_WriteHttpPost( IN void *Handle,
     if( handle->contentLength == UPNP_USING_CHUNKED ) {
         if( ( *size ) ) {
             int tempSize = 0;
+            tempbuf = ( char * )malloc(
+                *size + CHUNK_HEADER_SIZE + CHUNK_TAIL_SIZE );
+            if ( tempbuf == NULL) {
+                return UPNP_E_OUTOF_MEMORY;
+            }
 
-            tempbuf =
-                ( char * )malloc( ( *size ) + CHUNK_HEADER_SIZE +
-                                  CHUNK_TAIL_SIZE );
-
-            if ( tempbuf == NULL) return UPNP_E_OUTOF_MEMORY;
-
-            sprintf( tempbuf, "%x\r\n", ( *size ) );    //begin chunk
+	    // begin chunk
+            sprintf( tempbuf, "%x\r\n", ( *size ) );
             tempSize = strlen( tempbuf );
             memcpy( tempbuf + tempSize, buf, ( *size ) );
-            memcpy( tempbuf + tempSize + ( *size ), "\r\n", 2 );    //end of chunk
+            memcpy( tempbuf + tempSize + ( *size ), "\r\n", 2 );
+            // end of chunk
             tempbufSize = tempSize + ( *size ) + 2;
             freeTempbuf = 1;
         }
@@ -900,24 +888,23 @@ http_WriteHttpPost( IN void *Handle,
 }
 
 /************************************************************************
-*	Function :	http_CloseHttpPost
-*
-*	Parameters :
-*		IN void *Handle :			Handle to the http post object
-*		IN OUT int *httpStatus :	HTTP status returned on receiving a
-*									response message
-*		IN int timeout :			time out value
-*
-*	Description :	Sends remaining data if using  UPNP_USING_CHUNKED 
-*		format. Receives any more messages. Destroys socket and any socket
-*		associated memory. Frees handle associated with the HTTP POST msg.
-*
-*	Return : int ;
-*		UPNP_E_SUCCESS - On Sucess ;
-*		UPNP_E_INVALID_PARAM  - Invalid Parameter;
-*
-*	Note :
-************************************************************************/
+ * Function: http_CloseHttpPost
+ *
+ * Parameters:
+ *	IN void *Handle;	Handle to the http post object
+ *	IN OUT int *httpStatus;	HTTP status returned on receiving a
+ *				response message
+ *	IN int timeout;		time out value
+ *
+ * Description:
+ *	Sends remaining data if using  UPNP_USING_CHUNKED 
+ *	format. Receives any more messages. Destroys socket and any socket
+ *	associated memory. Frees handle associated with the HTTP POST msg.
+ *
+ * Return: int
+ *	UPNP_E_SUCCESS		- On Sucess
+ *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ ************************************************************************/
 int
 http_CloseHttpPost( IN void *Handle,
                     IN OUT int *httpStatus,
@@ -954,29 +941,28 @@ http_CloseHttpPost( IN void *Handle,
 }
 
 /************************************************************************
-*	Function :	http_OpenHttpPost
-*
-*	Parameters :
-*		IN const char *url_str :		String as a URL	
-*		IN OUT void **Handle :			Pointer to buffer to store HTTP
-*										post handle
-*		IN const char *contentType :	Type of content
-*		IN int contentLength :			length of content
-*		IN int timeout :				time out value
-*
-*	Description :	Makes the HTTP POST message, connects to the peer, 
-*		sends the HTTP POST request. Adds the post handle to buffer of 
-*		such handles
-*
-*	Return : int;
-*		UPNP_E_SUCCESS - On Sucess ;
-*		UPNP_E_INVALID_PARAM - Invalid Paramter ;
-*		UPNP_E_OUTOF_MEMORY ;
-*		UPNP_E_SOCKET_ERROR ;
-*		UPNP_E_SOCKET_CONNECT ;
-*
-*	Note :
-************************************************************************/
+ * Function: http_OpenHttpPost
+ *
+ * Parameters:
+ *	IN const char *url_str;		String as a URL	
+ *	IN OUT void **Handle;		Pointer to buffer to store HTTP
+ *					post handle
+ *	IN const char *contentType;	Type of content
+ *	IN int contentLength;		length of content
+ *	IN int timeout;			time out value
+ *
+ * Description:
+ *	Makes the HTTP POST message, connects to the peer, 
+ *	sends the HTTP POST request. Adds the post handle to buffer of 
+ *	such handles
+ *
+ * Return : int;
+ *	UPNP_E_SUCCESS		- On Sucess
+ *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ *	UPNP_E_OUTOF_MEMORY
+ *	UPNP_E_SOCKET_ERROR
+ *	UPNP_E_SOCKET_CONNECT
+ ************************************************************************/
 int
 http_OpenHttpPost( IN const char *url_str,
                    IN OUT void **Handle,
@@ -1054,21 +1040,22 @@ typedef struct HTTPGETHANDLE {
 } http_get_handle_t;
 
 /************************************************************************
-* Function: MakeGetMessage												
-*																		
-* Parameters:															
+* Function: MakeGetMessage
+*
+* Parameters:
 *	const char *url_str ;	String as a URL
 *	const char *proxy_str ;	String as a URL of proxy to use
-*	membuffer *request ;	Buffer containing the request									
-*	uri_type *url ; 		URI object containing the scheme, path 
-*							query token, etc.
-*																		
-* Description: Makes the message for the HTTP GET method				
-*																		
-* Returns:																
-*	UPNP_E_INVALID_URL													
-* 	Error Codes returned by http_MakeMessage							
-*	UPNP_E_SUCCESS														
+*	membuffer *request ;	Buffer containing the request
+*	uri_type *url ; 	URI object containing the scheme, path 
+*				query token, etc.
+*
+* Description:
+*	Makes the message for the HTTP GET method
+*
+* Returns:
+*	UPNP_E_INVALID_URL
+* 	Error Codes returned by http_MakeMessage
+*	UPNP_E_SUCCESS
 ************************************************************************/
 int
 MakeGetMessage( const char *url_str,
@@ -1145,25 +1132,24 @@ MakeGetMessage( const char *url_str,
 }
 
 /************************************************************************
-*	Function :	ReadResponseLineAndHeaders
-*
-*	Parameters :
-*		IN SOCKINFO *info ;				Socket information object
-*		IN OUT http_parser_t *parser ;	HTTP Parser object
-*		IN OUT int *timeout_secs ;		time out value
-*		IN OUT int *http_error_code ;	HTTP errror code returned
-*
-*	Description : Parses already exiting data. If not complete reads more 
-*		data on the connected socket. The read data is then parsed. The 
-*		same methid is carried out for headers.
-*
-*	Return : int ;
-*		PARSE_OK - On Success
-*		PARSE_FAILURE - Failure to parse data correctly
-*		UPNP_E_BAD_HTTPMSG - Socker read() returns an error
-*
-*	Note :
-************************************************************************/
+ * Function: ReadResponseLineAndHeaders
+ *
+ * Parameters:
+ *	IN SOCKINFO *info;		Socket information object
+ *	IN OUT http_parser_t *parser;	HTTP Parser object
+ *	IN OUT int *timeout_secs;	time out value
+ *	IN OUT int *http_error_code;	HTTP errror code returned
+ *
+ * Description:
+ *	Parses already exiting data. If not complete reads more 
+ *	data on the connected socket. The read data is then parsed. The 
+ *	same methid is carried out for headers.
+ *
+ * Return: int
+ *	PARSE_OK - On Success
+ *	PARSE_FAILURE - Failure to parse data correctly
+ *	UPNP_E_BAD_HTTPMSG - Socker read() returns an error
+ ************************************************************************/
 int
 ReadResponseLineAndHeaders( IN SOCKINFO * info,
                             IN OUT http_parser_t * parser,
@@ -1270,26 +1256,25 @@ ReadResponseLineAndHeaders( IN SOCKINFO * info,
 }
 
 /************************************************************************
-* Function :	http_ReadHttpGet
-*
-* Parameters :
-*	IN void *Handle :		Handle to the HTTP get object
-*	IN OUT char *buf :		Buffer to get the read and parsed data
-*	IN OUT unsigned int *size :	Size of the buffer passed
-*	IN int timeout :		time out value
-*
-* Description :	Parses already existing data, then gets new data.
-*		Parses and extracts information from the new data.
-*
-* Return : int ;
-*	UPNP_E_SUCCESS - On Sucess ;
-*	UPNP_E_INVALID_PARAM  - Invalid Parameter;
-*	UPNP_E_BAD_RESPONSE ;
-*	UPNP_E_BAD_HTTPMSG ;
-*	UPNP_E_CANCELED ;
-*
-* Note :
-************************************************************************/
+ * Function: http_ReadHttpGet
+ *
+ * Parameters:
+ *	IN void *Handle;		Handle to the HTTP get object
+ *	IN OUT char *buf;		Buffer to get the read and parsed data
+ *	IN OUT unsigned int *size;	Size of the buffer passed
+ *	IN int timeout;			time out value
+ *
+ * Description:
+ *	Parses already existing data, then gets new data.
+ *	Parses and extracts information from the new data.
+ *
+ * Return: int
+ *	UPNP_E_SUCCESS		- On Sucess
+ *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ *	UPNP_E_BAD_RESPONSE
+ *	UPNP_E_BAD_HTTPMSG
+ *	UPNP_E_CANCELED
+ ************************************************************************/
 int
 http_ReadHttpGet( IN void *Handle,
                   IN OUT char *buf,
@@ -1395,22 +1380,20 @@ http_ReadHttpGet( IN void *Handle,
 }
 
 /************************************************************************
-*	Function :	http_HttpGetProgress
-*
-*	Parameters :
-*		IN void *Handle :			Handle to the HTTP get object
-*		OUT unsigned int *length :	Buffer to get the read and parsed data
-*		OUT unsigned int *total :	Size of tge buffer passed
-*
-*	Description :	Extracts information from the Handle to the HTTP get
-*					object.
-*
-*	Return : int ;
-*		UPNP_E_SUCCESS - On Sucess ;
-*		UPNP_E_INVALID_PARAM  - Invalid Parameter;
-*
-*	Note :
-************************************************************************/
+ * Function: http_HttpGetProgress
+ *
+ * Parameters:
+ *	IN void *Handle;		Handle to the HTTP get object
+ *	OUT unsigned int *length;	Buffer to get the read and parsed data
+ *	OUT unsigned int *total;	Size of tge buffer passed
+ *
+ * Description:
+ *	Extracts information from the Handle to the HTTP get object.
+ *
+ * Return: int
+ *	UPNP_E_SUCCESS		- On Sucess
+ *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ ************************************************************************/
 int http_HttpGetProgress( IN void *Handle, 
                       OUT unsigned int *length,
                       OUT unsigned int *total )
@@ -1426,19 +1409,18 @@ int http_HttpGetProgress( IN void *Handle,
 }
 
 /************************************************************************
-*	Function :	http_CancelHttpGet
-*
-*	Parameters :
-*		IN void *Handle ;	Handle to HTTP get object
-*
-*	Description :	Set the cancel flag of the HttpGet handle
-*
-*	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_INVALID_PARAM - Invalid Parameter
-*
-*	Note :
-************************************************************************/
+ * Function: http_CancelHttpGet
+ *
+ * Parameters:
+ *	IN void *Handle;	Handle to HTTP get object
+ *
+ * Description:
+ *	Set the cancel flag of the HttpGet handle
+ *
+ * Return: int
+ *	UPNP_E_SUCCESS		- On Success
+ *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ ************************************************************************/
 int
 http_CancelHttpGet( IN void *Handle )
 {
@@ -1455,20 +1437,19 @@ http_CancelHttpGet( IN void *Handle )
 
 
 /************************************************************************
-*	Function :	http_CloseHttpGet
-*
-*	Parameters :
-*		IN void *Handle ;	Handle to HTTP get object
-*
-*	Description :	Clears the handle allocated for the HTTP GET operation
-*		Clears socket states and memory allocated for socket operations. 
-*
-*	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_INVALID_PARAM - Invalid Parameter
-*
-*	Note :
-************************************************************************/
+ * Function: http_CloseHttpGet
+ *
+ * Parameters:
+ *	IN void *Handle;	Handle to HTTP get object
+ *
+ * Description:
+ *	Clears the handle allocated for the HTTP GET operation
+ *	Clears socket states and memory allocated for socket operations. 
+ *
+ * Return: int
+ *	UPNP_E_SUCCESS		- On Success
+ *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ ************************************************************************/
 int
 http_CloseHttpGet( IN void *Handle )
 {
@@ -1486,32 +1467,30 @@ http_CloseHttpGet( IN void *Handle )
 }
 
 /************************************************************************
-*	Function :	http_OpenHttpGet
-*
-*	Parameters :
-*		IN const char *url_str :	String as a URL
-*		IN OUT void **Handle :		Pointer to buffer to store HTTP
-*									post handle
-*		IN OUT char **contentType :	Type of content
-*		OUT int *contentLength :	length of content
-*		OUT int *httpStatus :		HTTP status returned on receiving a
-*									response message
-*		IN int timeout :			time out value
-*
-*	Description :	Makes the HTTP GET message, connects to the peer, 
-*		sends the HTTP GET request, gets the response and parses the 
-*		response.
-*
-*	Return : int;
-*		UPNP_E_SUCCESS - On Success ;
-*		UPNP_E_INVALID_PARAM - Invalid Paramters ;
-*		UPNP_E_OUTOF_MEMORY ;
-*		UPNP_E_SOCKET_ERROR ;
-*		UPNP_E_BAD_RESPONSE ;
-*
-*	Note :
-*
-************************************************************************/
+ * Function: http_OpenHttpGet
+ *
+ * Parameters:
+ *	IN const char *url_str:		String as a URL
+ *	IN OUT void **Handle:		Pointer to buffer to store HTTP
+ *					post handle
+ *	IN OUT char **contentType:	Type of content
+ *	OUT int *contentLength:		length of content
+ *	OUT int *httpStatus:		HTTP status returned on receiving a
+ *					response message
+ *	IN int timeout:			time out value
+ *
+ * Description:
+ *	Makes the HTTP GET message, connects to the peer, 
+ *	sends the HTTP GET request, gets the response and parses the 
+ *	response.
+ *
+ * Return: int
+ *	UPNP_E_SUCCESS		- On Success
+ *	UPNP_E_INVALID_PARAM	- Invalid Paramters
+ *	UPNP_E_OUTOF_MEMORY
+ *	UPNP_E_SOCKET_ERROR
+ *	UPNP_E_BAD_RESPONSE
+ ************************************************************************/
 int
 http_OpenHttpGet( IN const char *url_str,
                   IN OUT void **Handle,
@@ -1524,34 +1503,31 @@ http_OpenHttpGet( IN const char *url_str,
 }
 
 /************************************************************************
-*	Function :	http_OpenHttpGetProxy
-*
-*	Parameters :
-*		IN const char *url_str :	String as a URL
-*		IN const char *proxy_str :	String as a URL
-*		IN OUT void **Handle :		Pointer to buffer to store HTTP
-*									post handle
-*		IN OUT char **contentType :	Type of content
-*		OUT int *contentLength :	length of content
-*		OUT int *httpStatus :		HTTP status returned on receiving a
-*									response message
-*		IN int timeout :			time out value
-*
-*	Description :	Makes the HTTP GET message, connects to the peer, 
-*		sends the HTTP GET request, gets the response and parses the 
-*		response.
-*		If a proxy URL is defined then the connection is made there.
-*
-*	Return : int;
-*		UPNP_E_SUCCESS - On Success ;
-*		UPNP_E_INVALID_PARAM - Invalid Paramters ;
-*		UPNP_E_OUTOF_MEMORY ;
-*		UPNP_E_SOCKET_ERROR ;
-*		UPNP_E_BAD_RESPONSE ;
-*
-*	Note :
-*
-************************************************************************/
+ * Function: http_OpenHttpGetProxy
+ *
+ * Parameters:
+ *	IN const char *url_str;		String as a URL
+ *	IN const char *proxy_str;	String as a URL
+ *	IN OUT void **Handle;		Pointer to buffer to store HTTP
+ *					post handle
+ *	IN OUT char **contentType;	Type of content
+ *	OUT int *contentLength;		length of content
+ *	OUT int *httpStatus;		HTTP status returned on receiving a
+ *					response message
+ *	IN int timeout:			time out value
+ *
+ * Description:
+ *	Makes the HTTP GET message, connects to the peer, 
+ *	sends the HTTP GET request, gets the response and parses the response.
+ *	If a proxy URL is defined then the connection is made there.
+ *
+ * Return: int
+ *	UPNP_E_SUCCESS		- On Success
+ *	UPNP_E_INVALID_PARAM	- Invalid Paramters
+ *	UPNP_E_OUTOF_MEMORY
+ *	UPNP_E_SOCKET_ERROR
+ *	UPNP_E_BAD_RESPONSE
+ ************************************************************************/
 int
 http_OpenHttpGetProxy( IN const char *url_str,
                   IN const char *proxy_str,
@@ -1682,26 +1658,25 @@ http_OpenHttpGetProxy( IN const char *url_str,
 }
 
 /************************************************************************
-*	Function :	http_SendStatusResponse
-*
-*	Parameters :
-*		IN SOCKINFO *info :				Socket information object
-*		IN int http_status_code :		error code returned while making 
-*										or sending the response message
-*		IN int request_major_version :	request major version
-*		IN int request_minor_version :	request minor version
-*
-*	Description :	Generate a response message for the status query and
-*		send the status response.
-*
-*	Return : int;
-*		0 -- success
-*		UPNP_E_OUTOF_MEMORY
-*		UPNP_E_SOCKET_WRITE
-*		UPNP_E_TIMEDOUT
-*
-*	Note :
-************************************************************************/
+ * Function: http_SendStatusResponse
+ *
+ * Parameters:
+ *	IN SOCKINFO *info;		Socket information object
+ *	IN int http_status_code;	error code returned while making 
+ *					or sending the response message
+ *	IN int request_major_version;	request major version
+ *	IN int request_minor_version;	request minor version
+ *
+ * Description:
+ *	Generate a response message for the status query and send the
+ *	status response.
+ *
+ * Return: int
+ *	0 -- success
+ *	UPNP_E_OUTOF_MEMORY
+ *	UPNP_E_SOCKET_WRITE
+ *	UPNP_E_TIMEDOUT
+ ************************************************************************/
 int
 http_SendStatusResponse( IN SOCKINFO * info,
                          IN int http_status_code,
@@ -1736,55 +1711,56 @@ http_SendStatusResponse( IN SOCKINFO * info,
     return ret;
 }
 
+
 /************************************************************************
-*	Function :	http_MakeMessage
-*
-*	Parameters :
-*		INOUT membuffer* buf :		buffer with the contents of the 
-*									message
-*		IN int http_major_version :	HTTP major version
-*		IN int http_minor_version :	HTTP minor version
-*		IN const char* fmt :		Pattern format 
-*		... :	
-*
-*	Description :	Generate an HTTP message based on the format that is 
-*		specified in the input parameters.
-*
-*		fmt types:
-*		'B':	arg = int status_code 
-*				appends content-length, content-type and HTML body for given code
-*		'b':	arg1 = const char* buf;
-*			arg2 = size_t buf_length memory ptr
-*		'C':	(no args) appends a HTTP CONNECTION: close header 
-*				depending on major,minor version
-*		'c':	(no args) appends CRLF "\r\n"
-*		'D':	(no args) appends HTTP DATE: header
-*		'd':	arg = int number		// appends decimal number
-*		'G':	arg = range information         // add range header
-*		'h':	arg = off_t number		// appends off_t number
-*		'K':	(no args)                       // add chunky header
-*		'N':	arg1 = off_t content_length       // content-length header
-*		'q':    arg1 = http_method_t            // request start line and HOST header
-*			arg2 = (uri_type *)
-*		'Q':	arg1 = http_method_t;           // start line of request
-*			arg2 = char* url; 
-*			arg3 = size_t url_length 
-*		'R':	arg = int status_code           // adds a response start line
-*		'S':	(no args) appends HTTP SERVER: header
-*		's':	arg = const char* C_string
-*		'T':	arg = char * content_type; format
-*			e.g: "text/html"; content-type header
-*		't':	arg = time_t * gmt_time         // appends time in RFC 1123 fmt
-*		'U':	(no args) appends HTTP USER-AGENT: header
-*               'X':    arg = const char useragent; "redsonic" HTTP X-User-Agent: useragent
-*
-*	Return : int;
-*		0 - On Success
-*		UPNP_E_OUTOF_MEMORY
-*		UPNP_E_INVALID_URL;
-*
-*	Note :
-************************************************************************/
+ * Function: http_MakeMessage
+ *
+ * Parameters:
+ *	INOUT membuffer* buf;		buffer with the contents of the 
+ *					message
+ *	IN int http_major_version;	HTTP major version
+ *	IN int http_minor_version;	HTTP minor version
+ *	IN const char* fmt;		Pattern format 
+ *	...;	
+ *
+ * Description:
+ *	Generate an HTTP message based on the format that is specified
+ *	in the input parameters.
+ *
+ * fmt types:
+ *	'B':	arg = int status_code 
+ *		appends content-length, content-type and HTML body
+ *		for given code
+ *	'b':	arg1 = const char* buf;
+ *		arg2 = size_t buf_length memory ptr
+ *	'C':	(no args) appends a HTTP CONNECTION: close header 
+ *			depending on major,minor version
+ *	'c':	(no args) appends CRLF "\r\n"
+ *	'D':	(no args) appends HTTP DATE: header
+ *	'd':	arg = int number            // appends decimal number
+ *	'G':	arg = range information     // add range header
+ *	'h':	arg = off_t number          // appends off_t number
+ *	'K':	(no args)                   // add chunky header
+ *	'N':	arg1 = off_t content_length // content-length header
+ *	'q':    arg1 = http_method_t        // request start line and HOST header
+ *		arg2 = (uri_type *)
+ *	'Q':	arg1 = http_method_t;       // start line of request
+ *		arg2 = char* url; 
+ *		arg3 = size_t url_length 
+ *	'R':	arg = int status_code       // adds a response start line
+ *	'S':	(no args) appends HTTP SERVER: header
+ *	's':	arg = const char* C_string
+ *	'T':	arg = char * content_type; format
+ *		e.g: "text/html"; content-type header
+ *	't':	arg = time_t * gmt_time     // appends time in RFC 1123 fmt
+ *	'U':	(no args) appends HTTP USER-AGENT: header
+ *      'X':    arg = const char useragent; "redsonic" HTTP X-User-Agent: useragent
+ *
+ * Return: int
+ *	0 - On Success
+ *	UPNP_E_OUTOF_MEMORY
+ *	UPNP_E_INVALID_URL
+ ************************************************************************/
 int
 http_MakeMessage( INOUT membuffer * buf,
                   IN int http_major_version,
@@ -2038,22 +2014,21 @@ error_handler:
     return error_code;
 }
 
+
 /************************************************************************
-*	Function :	http_CalcResponseVersion
-*
-*	Parameters :
-*		IN int request_major_vers :		Request major version
-*		IN int request_minor_vers :		Request minor version
-*		OUT int* response_major_vers :	Response mojor version
-*		OUT int* response_minor_vers :	Response minor version
-*
-*	Description :	Calculate HTTP response versions based on the request
-*		versions.
-*
-*	Return :	void
-*
-*	Note :
-************************************************************************/
+ * Function: http_CalcResponseVersion
+ *
+ * Parameters:
+ *	IN int request_major_vers;	Request major version
+ *	IN int request_minor_vers;	Request minor version
+ *	OUT int* response_major_vers;	Response mojor version
+ *	OUT int* response_minor_vers;	Response minor version
+ *
+ * Description:
+ *	Calculate HTTP response versions based on the request versions.
+ *
+ * Return: void
+ ************************************************************************/
 void
 http_CalcResponseVersion( IN int request_major_vers,
                           IN int request_minor_vers,
@@ -2072,20 +2047,21 @@ http_CalcResponseVersion( IN int request_major_vers,
 }
 
 /************************************************************************
-* Function: MakeGetMessageEx												
-*																		
-* Parameters:															
-*	const char *url_str ;	String as a URL
-*	membuffer *request ;	Buffer containing the request									
-*	uri_type *url ; 		URI object containing the scheme, path 
-*							query token, etc.
-*																		
-* Description: Makes the message for the HTTP GET method				
-*																		
-* Returns:																
-*	UPNP_E_INVALID_URL													
-* 	Error Codes returned by http_MakeMessage							
-*	UPNP_E_SUCCESS														
+* Function: MakeGetMessageEx
+*
+* Parameters:
+*	const char *url_str;	String as a URL
+*	membuffer *request;	Buffer containing the request
+*	uri_type *url; 		URI object containing the scheme, path
+*				query token, etc.
+*
+* Description:
+*	Makes the message for the HTTP GET method
+*
+* Returns:
+*	UPNP_E_INVALID_URL
+* 	Error Codes returned by http_MakeMessage
+*	UPNP_E_SUCCESS
 ************************************************************************/
 int
 MakeGetMessageEx( const char *url_str,
@@ -2164,32 +2140,30 @@ MakeGetMessageEx( const char *url_str,
 #define SIZE_RANGE_BUFFER 50
 
 /************************************************************************
-* Function :	http_OpenHttpGetEx
-*
-* Parameters :
-*	IN const char *url_str :	String as a URL
-*	IN OUT void **Handle :		Pointer to buffer to store HTTP
-*					post handle
-*	IN OUT char **contentType :	Type of content
-*	OUT int *contentLength :	length of content
-*	OUT int *httpStatus :		HTTP status returned on receiving a
-*					response message
-*	IN int timeout :			time out value
-*
-* Description :	Makes the HTTP GET message, connects to the peer, 
-*		sends the HTTP GET request, gets the response and parses the 
-*		response.
-*
-* Return : int;
-*	UPNP_E_SUCCESS - On Success ;
-*	UPNP_E_INVALID_PARAM - Invalid Paramters ;
-*	UPNP_E_OUTOF_MEMORY ;
-*	UPNP_E_SOCKET_ERROR ;
-*	UPNP_E_BAD_RESPONSE ;
-*
-* Note :
-*
-************************************************************************/
+ * Function: http_OpenHttpGetEx
+ *
+ * Parameters:
+ *	IN const char *url_str;		String as a URL
+ *	IN OUT void **Handle;		Pointer to buffer to store HTTP
+ *					post handle
+ *	IN OUT char **contentType;	Type of content
+ *	OUT int *contentLength;		length of content
+ *	OUT int *httpStatus;		HTTP status returned on receiving a
+ *					response message
+ *	IN int timeout;			time out value
+ *
+ * Description:
+ *	Makes the HTTP GET message, connects to the peer, 
+ *	sends the HTTP GET request, gets the response and parses the 
+ *	response.
+ *
+ * Return: int
+ *	UPNP_E_SUCCESS		- On Success
+ *	UPNP_E_INVALID_PARAM	- Invalid Paramters
+ *	UPNP_E_OUTOF_MEMORY
+ *	UPNP_E_SOCKET_ERROR
+ *	UPNP_E_BAD_RESPONSE
+ ************************************************************************/
 int
 http_OpenHttpGetEx( IN const char *url_str,
                     IN OUT void **Handle,
@@ -2335,32 +2309,38 @@ http_OpenHttpGetEx( IN const char *url_str,
     return errCode;
 }
 
+
 /************************************************************************
-*	Function :	get_sdk_info
-*
-*	Parameters :
-*		OUT char *info :	buffer to store the operating system 
-*							information
-*
-*	Description :	Returns the server information for the operating 
-*		system
-*
-*	Return :	UPNP_INLINE void
-*
-*	Note :
-************************************************************************/
+ * Function: get_sdk_info
+ *
+ * Parameters:
+ *	OUT char *info;	buffer to store the operating system information
+ *
+ * Description:
+ *	Returns the server information for the operating system
+ *
+ * Return:
+ *	UPNP_INLINE void
+ ************************************************************************/
 // 'info' should have a size of at least 100 bytes
 void
 get_sdk_info( OUT char *info )
 {
 #ifdef WIN32
- 	OSVERSIONINFO versioninfo;
- 	versioninfo.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
- 	if (GetVersionEx(&versioninfo)!=0)
- 		sprintf( info, "%d.%d.%d %d/%s, UPnP/1.0, Portable SDK for UPnP devices/"PACKAGE_VERSION"\r\n",
- 				versioninfo.dwMajorVersion, versioninfo.dwMinorVersion, versioninfo.dwBuildNumber, versioninfo.dwPlatformId, versioninfo.szCSDVersion );
- 	else
-     *info = '\0';
+    OSVERSIONINFO versioninfo;
+    versioninfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+    if (GetVersionEx(&versioninfo)!=0) {
+        sprintf( info,
+            "%d.%d.%d %d/%s, UPnP/1.0, Portable SDK for UPnP devices/"PACKAGE_VERSION"\r\n",
+            versioninfo.dwMajorVersion,
+            versioninfo.dwMinorVersion,
+            versioninfo.dwBuildNumber,
+            versioninfo.dwPlatformId,
+            versioninfo.szCSDVersion );
+    } else {
+        *info = '\0';
+    }
 #else
     int ret_code;
     struct utsname sys_info;
@@ -2369,9 +2349,10 @@ get_sdk_info( OUT char *info )
     if( ret_code == -1 ) {
         *info = '\0';
     }
-
-    sprintf( info, "%s/%s, UPnP/1.0, Portable SDK for UPnP devices/"
-	     PACKAGE_VERSION "\r\n",
-             sys_info.sysname, sys_info.release );
+    sprintf( info,
+        "%s/%s, UPnP/1.0, Portable SDK for UPnP devices/"PACKAGE_VERSION "\r\n",
+        sys_info.sysname,
+        sys_info.release );
 #endif
 }
+
