@@ -129,6 +129,10 @@ Version 1.6.0
 	an interface change in the library and the minor library version was
 	bumped. Also, the libtool library numbers were changed accordingly.
 
+*******************************************************************************
+Version 1.4.7
+*******************************************************************************
+
 2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added support for the Basic Device
 	(http://www.upnp.org/standardizeddcps/basic.asp) as suggested by
