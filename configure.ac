@@ -1,16 +1,15 @@
 # -*- Autoconf -*-
-# $Id: configure.ac,v 1.11 2006/04/09 13:59:44 r3mi Exp $
 #
 # Top-level configure.ac file for libupnp
 #
 # Process this file with autoconf to produce a configure script.
 #
-# (C) Copyright 2005-2006 Rémi Turboult <r3mi@users.sourceforge.net>
+# (C) Copyright 2005-2006 Rï¿½mi Turboult <r3mi@users.sourceforge.net>
 #
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.4.6], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp], [1.4.7], [mroberto@users.sourceforge.net])
 # *Independently* of the above libupnp package version, the libtool version
 # of the 3 libraries need to be updated whenever there is a change released :
 # "current:revision:age" (this is NOT the same as the package version), where:
@@ -213,6 +212,7 @@ AC_CHECK_HEADERS(
 	[ \
 	arpa/inet.h \
 	fcntl.h \
+	inttypes.h \
 	limits.h \
 	netdb.h \
 	netinet/in.h \
@@ -260,6 +260,7 @@ AC_CONFIG_FILES([
 	threadutil/Makefile
 	upnp/Makefile
 	upnp/doc/Makefile
+	upnp/sample/Makefile
 	docs/dist/Makefile
 	libupnp.pc
 	])

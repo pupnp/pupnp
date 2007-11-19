@@ -29,7 +29,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-//File upnpapi.c
+
 #include "config.h"
 #include <assert.h>
 #include <signal.h>
@@ -37,22 +37,22 @@
 #include <string.h>
 #include <sys/stat.h>
 #ifndef WIN32
- #include <sys/socket.h>
- #include <netinet/in.h>
- #include <arpa/inet.h>
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
 
- #ifndef SPARC_SOLARIS
-// #include <linux/if.h>
-  #include <net/if.h>
- #else
-  #include <fcntl.h>
-  #include <net/if.h>
-  #include <sys/sockio.h>
- #endif
+	#ifndef SPARC_SOLARIS
+//		#include <linux/if.h>
+		#include <net/if.h>
+	#else
+		#include <fcntl.h>
+		#include <net/if.h>
+		#include <sys/sockio.h>
+	#endif
 
- #include <sys/ioctl.h>
- #include <sys/utsname.h>
- #include <unistd.h>
+	#include <sys/ioctl.h>
+	#include <sys/utsname.h>
+	#include <unistd.h>
 #endif
 #include "upnpapi.h"
 #include "httpreadwrite.h"
@@ -63,36 +63,32 @@
 
 #include "httpreadwrite.h"
 
-//************************************
-//Needed for GENA
+// Needed for GENA
 #include "gena.h"
 #include "service_table.h"
 #include "miniserver.h"
-//*******************************************
 
-/*
- ********************* */
 #ifdef INTERNAL_WEB_SERVER
-#include "webserver.h"
-#include "urlconfig.h"
+	#include "webserver.h"
+	#include "urlconfig.h"
 #endif // INTERNAL_WEB_SERVER
-/*
- ****************** */
 
-//Mutex to synchronize the subscription handling at the client side
-CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex;
-     )
-    //Mutex to synchronize handles ( root device or control point handle)
-     ithread_mutex_t GlobalHndMutex;
+// Mutex to synchronize the subscription handling at the client side
+CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
 
-//Mutex to synchronize the uuid creation process
-     ithread_mutex_t gUUIDMutex;
+//Mutex to synchronize handles ( root device or control point handle)
+    ithread_mutex_t GlobalHndMutex;
 
-     TimerThread gTimerThread;
+// Mutex to synchronize the uuid creation process
+    ithread_mutex_t gUUIDMutex;
 
-     ThreadPool gRecvThreadPool;
+    TimerThread gTimerThread;
 
-     ThreadPool gSendThreadPool;
+    ThreadPool gRecvThreadPool;
+
+    ThreadPool gSendThreadPool;
+
+     ThreadPool gMiniServerThreadPool;
 
 //Flag to indicate the state of web server
      WebServerState bWebServerState = WEB_SERVER_DISABLED;
@@ -200,13 +196,12 @@ int UpnpInit( IN const char *HostIP,
 
     srand( time( NULL ) );      // needed by SSDP or other parts
 
-    DBGONLY( if( InitLog(  ) != UPNP_E_SUCCESS )
-             return UPNP_E_INIT_FAILED; );
+    if( UpnpInitLog() != UPNP_E_SUCCESS ) {
+             return UPNP_E_INIT_FAILED;
+    }
 
-    DBGONLY( UpnpPrintf
-             ( UPNP_INFO, API, __FILE__, __LINE__, "Inside UpnpInit \n" );
-         )
-        //initialize mutex
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Inside UpnpInit \n" );
+    // initialize mutex
 #ifdef __CYGWIN__
         /* On Cygwin, pthread_mutex_init() fails without this memset. */
         /* TODO: Fix Cygwin so we don't need this memset(). */
@@ -219,30 +214,30 @@ int UpnpInit( IN const char *HostIP,
     if( ithread_mutex_init( &gUUIDMutex, NULL ) != 0 ) {
         return UPNP_E_INIT_FAILED;
     }
-    //initialize subscribe mutex
-    CLIENTONLY( if
-                ( ithread_mutex_init( &GlobalClientSubscribeMutex, NULL )
-                  != 0 ) {
-                return UPNP_E_INIT_FAILED;}
-     )
+    // initialize subscribe mutex
+#ifdef INCLUDE_CLIENT_APIS
+    if ( ithread_mutex_init( &GlobalClientSubscribeMutex, NULL ) != 0 ) {
+        return UPNP_E_INIT_FAILED;
+    }
+#endif
 
-        HandleLock(  );
+        HandleLock();
     if( HostIP != NULL )
         strcpy( LOCAL_HOST, HostIP );
     else {
         if( getlocalhostname( LOCAL_HOST ) != UPNP_E_SUCCESS ) {
-            HandleUnlock(  );
+            HandleUnlock();
             return UPNP_E_INIT_FAILED;
         }
     }
 
     if( UpnpSdkInit != 0 ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INIT;
     }
 
-    InitHandleList(  );
-    HandleUnlock(  );
+    InitHandleList();
+    HandleUnlock();
 
     TPAttrInit( &attr );
     TPAttrSetMaxThreads( &attr, MAX_THREADS );
@@ -253,11 +248,17 @@ int UpnpInit( IN const char *HostIP,
 
     if( ThreadPoolInit( &gSendThreadPool, &attr ) != UPNP_E_SUCCESS ) {
         UpnpSdkInit = 0;
-        UpnpFinish(  );
+        UpnpFinish();
         return UPNP_E_INIT_FAILED;
     }
 
     if( ThreadPoolInit( &gRecvThreadPool, &attr ) != UPNP_E_SUCCESS ) {
+        UpnpSdkInit = 0;
+        UpnpFinish();
+        return UPNP_E_INIT_FAILED;
+    }
+
+    if( ThreadPoolInit( &gMiniServerThreadPool, &attr ) != UPNP_E_SUCCESS ) {
         UpnpSdkInit = 0;
         UpnpFinish(  );
         return UPNP_E_INIT_FAILED;
@@ -265,8 +266,7 @@ int UpnpInit( IN const char *HostIP,
 
     UpnpSdkInit = 1;
 #if EXCLUDE_SOAP == 0
-    DEVICEONLY( SetSoapCallback( soap_device_callback );
-         );
+    SetSoapCallback( soap_device_callback );
 #endif
 #if EXCLUDE_GENA == 0
     SetGenaCallback( genaCallback );
@@ -276,15 +276,14 @@ int UpnpInit( IN const char *HostIP,
                                     &gSendThreadPool ) ) !=
         UPNP_E_SUCCESS ) {
         UpnpSdkInit = 0;
-        UpnpFinish(  );
+        UpnpFinish();
         return retVal;
     }
 #if EXCLUDE_MINISERVER == 0
     if( ( retVal = StartMiniServer( DestPort ) ) <= 0 ) {
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-                             "Miniserver failed to start" );
-             )
-            UpnpFinish(  );
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "Miniserver failed to start" );
+        UpnpFinish();
         UpnpSdkInit = 0;
         if( retVal != -1 )
             return retVal;
@@ -298,25 +297,23 @@ int UpnpInit( IN const char *HostIP,
 #if EXCLUDE_WEB_SERVER == 0
     if( ( retVal =
           UpnpEnableWebserver( WEB_SERVER_ENABLED ) ) != UPNP_E_SUCCESS ) {
-        UpnpFinish(  );
+        UpnpFinish();
         UpnpSdkInit = 0;
         return retVal;
     }
 #endif
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "Host Ip: %s Host Port: %d\n", LOCAL_HOST,
-                         LOCAL_PORT ) );
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Host Ip: %s Host Port: %d\n", LOCAL_HOST,
+        LOCAL_PORT );
 
-    DBGONLY( UpnpPrintf
-             ( UPNP_INFO, API, __FILE__, __LINE__, "Exiting UpnpInit \n" );
-         )
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Exiting UpnpInit \n" );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 
 } /***************** end of UpnpInit ******************/
 
-DBGONLY(
+#ifdef DEBUG
 static void 
 PrintThreadPoolStats (const char* DbgFileName, int DbgLineNo,
 		      const char* msg, const ThreadPoolStats* const stats)
@@ -337,7 +334,8 @@ PrintThreadPoolStats (const char* DbgFileName, int DbgLineNo,
 		    stats->avgWaitHQ, stats->avgWaitMQ, stats->avgWaitLQ,
 		    stats->maxThreads, stats->totalWorkTime,
 		    stats->totalIdleTime );
-})
+}
+#endif
 
      
 /****************************************************************************
@@ -358,39 +356,46 @@ PrintThreadPoolStats (const char* DbgFileName, int DbgLineNo,
  *	UPNP_E_SUCCESS on success, nonzero on failure.
  *****************************************************************************/
 int
-UpnpFinish(  )
+UpnpFinish()
 {
-    DEVICEONLY( UpnpDevice_Handle device_handle;
-         )
-        CLIENTONLY( UpnpClient_Handle client_handle;
-         )
+#ifdef INCLUDE_DEVICE_APIS
+    UpnpDevice_Handle device_handle;
+#endif
+#ifdef INCLUDE_CLIENT_APIS
+    UpnpClient_Handle client_handle;
+#endif
     struct Handle_Info *temp;
 
-    DBGONLY( ThreadPoolStats stats;
-         )
+#ifdef DEBUG
+    ThreadPoolStats stats;
+#endif
 
 #ifdef WIN32
 //	WSACleanup( );
 #endif
 
-        if( UpnpSdkInit != 1 )
+    if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
+    }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "Inside UpnpFinish : UpnpSdkInit is :%d:\n",
-                         UpnpSdkInit ); if( UpnpSdkInit == 1 ) {
-             UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "UpnpFinish : UpnpSdkInit is ONE\n" );}
-             ThreadPoolGetStats( &gRecvThreadPool, &stats );
-             PrintThreadPoolStats (__FILE__, __LINE__,
-				   "Recv Thread Pool", &stats);
-             ThreadPoolGetStats( &gSendThreadPool, &stats );
-             PrintThreadPoolStats (__FILE__, __LINE__,
-				   "Send Thread Pool", &stats);
-	    )
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Inside UpnpFinish : UpnpSdkInit is :%d:\n",
+        UpnpSdkInit );
+#ifdef DEBUG
+    if( UpnpSdkInit == 1 ) {
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "UpnpFinish : UpnpSdkInit is ONE\n" );
+    }
+    ThreadPoolGetStats( &gRecvThreadPool, &stats );
+    PrintThreadPoolStats (__FILE__, __LINE__,
+	"Recv Thread Pool", &stats);
+    ThreadPoolGetStats( &gSendThreadPool, &stats );
+    PrintThreadPoolStats (__FILE__, __LINE__,
+	"Send Thread Pool", &stats);
+#endif
 #ifdef INCLUDE_DEVICE_APIS
-        if( GetDeviceHandleInfo( &device_handle, &temp ) == HND_DEVICE )
-            UpnpUnRegisterRootDevice( device_handle );
+    if( GetDeviceHandleInfo( &device_handle, &temp ) == HND_DEVICE )
+        UpnpUnRegisterRootDevice( device_handle );
 #endif
 
 #ifdef INCLUDE_CLIENT_APIS
@@ -400,33 +405,41 @@ UpnpFinish(  )
 
     TimerThreadShutdown( &gTimerThread );
 
-    StopMiniServer(  );
+    StopMiniServer();
 
 #if EXCLUDE_WEB_SERVER == 0
-    web_server_destroy(  );
+    web_server_destroy();
 #endif
 
+#ifdef DEBUG
     ThreadPoolShutdown( &gSendThreadPool );
     ThreadPoolShutdown( &gRecvThreadPool );
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Exiting UpnpFinish : UpnpSdkInit is :%d:\n",
+	UpnpSdkInit );
+    ThreadPoolGetStats( &gRecvThreadPool, &stats );
+    PrintThreadPoolStats( __FILE__, __LINE__,
+        "Recv Thread Pool", &stats);
+    ThreadPoolGetStats( &gSendThreadPool, &stats );
+    PrintThreadPoolStats(__FILE__, __LINE__,
+        "Send Thread Pool", &stats);
+    UpnpCloseLog();
+#endif
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Exiting UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit ); ThreadPoolGetStats( &gRecvThreadPool, &stats ); PrintThreadPoolStats ( __FILE__, __LINE__, "Recv Thread Pool", &stats); ThreadPoolGetStats( &gSendThreadPool, &stats ); PrintThreadPoolStats (__FILE__, __LINE__, "Send Thread Pool", &stats); )   // DBGONLY
-        DBGONLY( CloseLog(  );
-         );
-
-    CLIENTONLY( ithread_mutex_destroy( &GlobalClientSubscribeMutex );
-         )
-
-        ithread_mutex_destroy( &GlobalHndMutex );
+#ifdef INCLUDE_CLIENT_APIS
+    ithread_mutex_destroy( &GlobalClientSubscribeMutex );
+#endif
+    ithread_mutex_destroy( &GlobalHndMutex );
     ithread_mutex_destroy( &gUUIDMutex );
 
     // remove all virtual dirs
-    UpnpRemoveAllVirtualDirs(  );
-    //leuk_he allow static linking:
-	 #ifdef WIN32
-	  #ifdef PTW32_STATIC_LIB
-	   pthread_win32_thread_detach_np ();
-	  #endif
-	 #endif
+    UpnpRemoveAllVirtualDirs();
+    // leuk_he allow static linking:
+#ifdef WIN32
+#ifdef PTW32_STATIC_LIB
+    pthread_win32_thread_detach_np ();
+#endif
+#endif
 
 
     UpnpSdkInit = 0;
@@ -512,9 +525,9 @@ UpnpAddRootDevice( IN const char *DescURL,
         return retVal;
     }
 
-    HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         ixmlDocument_free( temp );
         return UPNP_E_INVALID_HANDLE;
     }
@@ -522,20 +535,18 @@ UpnpAddRootDevice( IN const char *DescURL,
     if( addServiceTable
         ( ( IXML_Node * ) temp, &HInfo->ServiceTable, DescURL ) ) {
 
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "UpnpAddRootDevice: GENA Service Table \n" );
-                 UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "Here are the known services: \n" );
-                 printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
-             )
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "UpnpAddRootDevice: GENA Service Table \n" );
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "Here are the known services: \n" );
+        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
     } else {
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "\nUpnpAddRootDevice: No Eventing Support Found \n" );
-             )
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "\nUpnpAddRootDevice: No Eventing Support Found \n" );
     }
 
     ixmlDocument_free( temp );
-    HandleUnlock(  );
+    HandleUnlock();
 
     return UPNP_E_SUCCESS;
 }
@@ -579,39 +590,37 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "Inside UpnpRegisterRootDevice \n" );
-         )
-        HandleLock(  );
-
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Inside UpnpRegisterRootDevice\n" );
+    
+    HandleLock();
     if( UpnpSdkDeviceRegistered ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_ALREADY_REGISTERED;
     }
 
     if( Hnd == NULL || Fun == NULL ||
         DescUrl == NULL || strlen( DescUrl ) == 0 ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
 
-    if( ( *Hnd = GetFreeHandle(  ) ) == UPNP_E_OUTOF_HANDLE ) {
-        HandleUnlock(  );
+    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
+        HandleUnlock();
         return UPNP_E_OUTOF_MEMORY;
     }
 
     HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
     if( HInfo == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_OUTOF_MEMORY;
     }
     HandleTable[*Hnd] = HInfo;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "Root device URL is %s\n", DescUrl );
-         )
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Root device URL is %s\n", DescUrl );
 
-        HInfo->aliasInstalled = 0;
+    HInfo->aliasInstalled = 0;
     HInfo->HType = HND_DEVICE;
     strcpy( HInfo->DescURL, DescUrl );
     HInfo->Callback = Fun;
@@ -620,11 +629,9 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
     HInfo->DeviceList = NULL;
     HInfo->ServiceList = NULL;
     HInfo->DescDocument = NULL;
-    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL );
-         );
-    CLIENTONLY( HInfo->ClientSubList = NULL;
-         )
-        HInfo->MaxSubscriptions = UPNP_INFINITE;
+    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
+    CLIENTONLY( HInfo->ClientSubList = NULL; )
+    HInfo->MaxSubscriptions = UPNP_INFINITE;
     HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 
     if( ( retVal =
@@ -632,79 +639,59 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
         != UPNP_E_SUCCESS ) {
         CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
         FreeHandle( *Hnd );
-        HandleUnlock(  );
+        HandleUnlock();
         return retVal;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "UpnpRegisterRootDevice: Valid Description\n" );
-             UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "UpnpRegisterRootDevice: DescURL : %s\n",
-                         HInfo->DescURL );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice: Valid Description\n" );
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice: DescURL : %s\n",
+        HInfo->DescURL );
 
-        HInfo->DeviceList =
+    HInfo->DeviceList =
         ixmlDocument_getElementsByTagName( HInfo->DescDocument, "device" );
-    if( HInfo->DeviceList == NULL ) {
+    if( !HInfo->DeviceList ) {
         CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
         ixmlDocument_free( HInfo->DescDocument );
         FreeHandle( *Hnd );
-        HandleUnlock(  );
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-                             "UpnpRegisterRootDevice: No devices found for RootDevice\n" );
-             )
-            return UPNP_E_INVALID_DESC;
+        HandleUnlock();
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice: No devices found for RootDevice\n" );
+        return UPNP_E_INVALID_DESC;
     }
 
-    HInfo->ServiceList =
-        ixmlDocument_getElementsByTagName( HInfo->DescDocument,
-                                           "serviceList" );
-    if( HInfo->ServiceList == NULL ) {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
-        ixmlNodeList_free( HInfo->DeviceList );
-        ixmlDocument_free( HInfo->DescDocument );
-        FreeHandle( *Hnd );
-        HandleUnlock(  );
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-                             "UpnpRegisterRootDevice: No services found for RootDevice\n" );
-             )
-            return UPNP_E_INVALID_DESC;
+    HInfo->ServiceList = ixmlDocument_getElementsByTagName(
+        HInfo->DescDocument, "serviceList" );
+    if( !HInfo->ServiceList ) {
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice: No services found for RootDevice\n" );
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "UpnpRegisterRootDevice: Gena Check\n" );
-         )
-        //*******************************
-        //GENA SET UP
-        //*******************************
-        if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
-                             &HInfo->ServiceTable, HInfo->DescURL ) ) {
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "UpnpRegisterRootDevice: GENA Service Table \n" );
-                 UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "Here are the known services: \n" );
-                 printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
-             )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice: Gena Check\n" );
+    //*******************************
+    // GENA SET UP
+    //*******************************
+    if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
+            &HInfo->ServiceTable, HInfo->DescURL ) ) {
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice: GENA Service Table \n" );
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "Here are the known services: \n" );
+        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
     } else {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
-        FreeHandle( *Hnd );
-        HandleUnlock(  );
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "\nUpnpRegisterRootDevice: Errors retrieving service table \n" );
-             )
-            return UPNP_E_INVALID_DESC;
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "\nUpnpRegisterRootDevice2: Empty service table\n" );
     }
 
     UpnpSdkDeviceRegistered = 1;
-    HandleUnlock(  );
+    HandleUnlock();
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Exiting RegisterRootDevice Successfully\n" );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "Exiting RegisterRootDevice Successfully\n" );
-         )
-
-        return UPNP_E_SUCCESS;
-
-}  /****************** End of UpnpRegisterRootDevice  *********************/
+    return UPNP_E_SUCCESS;
+}
 
 #endif // INCLUDE_DEVICE_APIS
 
@@ -744,31 +731,29 @@ UpnpRemoveRootDevice( IN const char *DescURL,
         return retVal;
     }
 
-    HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         ixmlDocument_free( temp );
         return UPNP_E_INVALID_HANDLE;
     }
 
     if( removeServiceTable( ( IXML_Node * ) temp, &HInfo->ServiceTable ) ) {
 
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "UpnpRemoveRootDevice: GENA Service Table \n" );
-                 UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "Here are the known services: \n" );
-                 printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
-             )
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "UpnpRemoveRootDevice: GENA Service Table \n" );
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "Here are the known services: \n" );
+        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
     } else {
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "\nUpnpRemoveRootDevice: No Services Removed\n" );
-                 UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "Here are the known services: \n" );
-                 printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
-             )
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "\nUpnpRemoveRootDevice: No Services Removed\n" );
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "Here are the known services: \n" );
+        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
     }
 
-    HandleUnlock(  );
+    HandleUnlock();
 
     ixmlDocument_free( temp );
     return UPNP_E_SUCCESS;
@@ -806,27 +791,26 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
         return UPNP_E_FINISH;
     }
 
-    HandleLock(  );
+    HandleLock();
     if( !UpnpSdkDeviceRegistered ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "Inside UpnpUnRegisterRootDevice \n" );
-         )
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Inside UpnpUnRegisterRootDevice \n" );
 #if EXCLUDE_GENA == 0
-        if( genaUnregisterDevice( Hnd ) != UPNP_E_SUCCESS )
+    if( genaUnregisterDevice( Hnd ) != UPNP_E_SUCCESS )
         return UPNP_E_INVALID_HANDLE;
 #endif
 
-    HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
 #if EXCLUDE_SSDP == 0
     retVal = AdvertiseAndReply( -1, Hnd, 0, ( struct sockaddr_in * )NULL,
@@ -834,9 +818,9 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
                                 ( char * )NULL, HInfo->MaxAge );
 #endif
 
-    HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     //info = (struct Handle_Info *) HandleTable[Hnd];
@@ -844,7 +828,7 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
     ixmlNodeList_free( HInfo->ServiceList );
     ixmlDocument_free( HInfo->DescDocument );
 
-    CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
+    CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
 
 #ifdef INTERNAL_WEB_SERVER
     if( HInfo->aliasInstalled ) {
@@ -854,13 +838,12 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
 
     FreeHandle( Hnd );
     UpnpSdkDeviceRegistered = 0;
-    HandleUnlock(  );
+    HandleUnlock();
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "Exiting UpnpUnRegisterRootDevice \n" );
-         )
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Exiting UpnpUnRegisterRootDevice \n" );
 
-        return retVal;
+    return retVal;
 
 }  /****************** End of UpnpUnRegisterRootDevice *********************/
 
@@ -1162,34 +1145,31 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
     struct Handle_Info *HInfo;
     int retVal = 0;
     char *description = ( char * )description_const;
-
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "Inside UpnpRegisterRootDevice2 \n" );
-         )
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Inside UpnpRegisterRootDevice2\n" );
 
-        if( Hnd == NULL || Fun == NULL ) {
+    if( Hnd == NULL || Fun == NULL ) {
         return UPNP_E_INVALID_PARAM;
     }
 
-    HandleLock(  );
-
+    HandleLock();
     if( UpnpSdkDeviceRegistered ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_ALREADY_REGISTERED;
     }
 
-    if( ( *Hnd = GetFreeHandle(  ) ) == UPNP_E_OUTOF_HANDLE ) {
-        HandleUnlock(  );
+    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
+        HandleUnlock();
         return UPNP_E_OUTOF_MEMORY;
     }
 
     HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
     if( HInfo == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_OUTOF_MEMORY;
     }
     HandleTable[*Hnd] = HInfo;
@@ -1197,99 +1177,82 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
     // prevent accidental removal of a non-existent alias
     HInfo->aliasInstalled = 0;
 
-    retVal = GetDescDocumentAndURL( descriptionType, description,
-                                    bufferLen, config_baseURL,
-                                    &HInfo->DescDocument, HInfo->DescURL );
-    //HInfo->DescAlias );
+    retVal = GetDescDocumentAndURL(
+        descriptionType, description, bufferLen,
+        config_baseURL, &HInfo->DescDocument, HInfo->DescURL );
 
     if( retVal != UPNP_E_SUCCESS ) {
         FreeHandle( *Hnd );
-        HandleUnlock(  );
+        HandleUnlock();
         return retVal;
     }
 
     HInfo->aliasInstalled = ( config_baseURL != 0 );
-
     HInfo->HType = HND_DEVICE;
+
     HInfo->Callback = Fun;
     HInfo->Cookie = ( void * )Cookie;
     HInfo->MaxAge = DEFAULT_MAXAGE;
     HInfo->DeviceList = NULL;
     HInfo->ServiceList = NULL;
-    CLIENTONLY( HInfo->ClientSubList = NULL;
-         )
-        CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL );
-         );
+
+    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
+    CLIENTONLY( HInfo->ClientSubList = NULL; )
     HInfo->MaxSubscriptions = UPNP_INFINITE;
     HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "UpnpRegisterRootDevice2: Valid Description\n" );
-             UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "UpnpRegisterRootDevice2: DescURL : %s\n",
-                         HInfo->DescURL );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice2: Valid Description\n" );
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice2: DescURL : %s\n",
+        HInfo->DescURL );
 
-        HInfo->DeviceList =
+    HInfo->DeviceList =
         ixmlDocument_getElementsByTagName( HInfo->DescDocument, "device" );
 
-    if( HInfo->DeviceList == NULL ) {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
+    if( !HInfo->DeviceList ) {
+        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
         ixmlDocument_free( HInfo->DescDocument );
         FreeHandle( *Hnd );
-        HandleUnlock(  );
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "UpnpRegisterRootDevice2: No devices found for RootDevice\n" );
-             )
-            return UPNP_E_INVALID_DESC;
+        HandleUnlock();
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice2: No devices found for RootDevice\n" );
+        return UPNP_E_INVALID_DESC;
     }
 
-    HInfo->ServiceList =
-        ixmlDocument_getElementsByTagName( HInfo->DescDocument,
-                                           "serviceList" );
-
-    if( HInfo->ServiceList == NULL ) {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
-        ixmlNodeList_free( HInfo->DeviceList );
-        ixmlDocument_free( HInfo->DescDocument );
-        FreeHandle( *Hnd );
-        HandleUnlock(  );
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "UpnpRegisterRootDevice2: No services found for RootDevice\n" );
-             )
-            return UPNP_E_INVALID_DESC;
+    HInfo->ServiceList = ixmlDocument_getElementsByTagName(
+        HInfo->DescDocument, "serviceList" );
+    if( !HInfo->ServiceList ) {
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice2: No services found for RootDevice\n" );
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "UpnpRegisterRootDevice2: Gena Check\n" );
-         )
-        //*******************************
-        //GENA SET UP
-        //*******************************
-        if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
-                             &HInfo->ServiceTable, HInfo->DescURL ) ) {
-        DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "UpnpRegisterRootDevice2: GENA Service Table \n" );
-             )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice2: Gena Check\n" );
+    //*******************************
+    // GENA SET UP
+    //*******************************
+    if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
+            &HInfo->ServiceTable, HInfo->DescURL ) ) {
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice2: GENA Service Table\n" );
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "Here are the known services: \n" );
+        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
     } else {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
-        FreeHandle( *Hnd );
-        HandleUnlock(  );
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "\nUpnpRegisterRootDevice: Errors retrieving service table \n" );
-             )
-            return UPNP_E_INVALID_DESC;
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "\nUpnpRegisterRootDevice2: Empty service table\n" );
     }
+
     UpnpSdkDeviceRegistered = 1;
-    HandleUnlock(  );
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting RegisterRootDevice2 Successfully\n" );
-         )
-        return UPNP_E_SUCCESS;
+    HandleUnlock();
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting RegisterRootDevice2 Successfully\n" );
 
-}  /****************** End of UpnpRegisterRootDevice2  *********************/
+    return UPNP_E_SUCCESS;
+}
 
-#endif //INCLUDE_DEVICE_APIS
+#endif // INCLUDE_DEVICE_APIS
 
 #ifdef INCLUDE_CLIENT_APIS
 
@@ -1322,60 +1285,52 @@ UpnpRegisterClient( IN Upnp_FunPtr Fun,
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
     }
-
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpRegisterClient \n" );
-         )
-
-        if( Fun == NULL || Hnd == NULL ) {
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpRegisterClient \n" );
+    if( Fun == NULL || Hnd == NULL ) {
         return UPNP_E_INVALID_PARAM;
     }
 
-    HandleLock(  );
+    HandleLock();
 
     if( UpnpSdkClientRegistered ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_ALREADY_REGISTERED;
     }
-
-    if( ( *Hnd = GetFreeHandle(  ) ) == UPNP_E_OUTOF_HANDLE ) {
-        HandleUnlock(  );
+    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
+        HandleUnlock();
         return UPNP_E_OUTOF_MEMORY;
     }
     HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
     if( HInfo == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_OUTOF_MEMORY;
     }
 
     HInfo->HType = HND_CLIENT;
     HInfo->Callback = Fun;
     HInfo->Cookie = ( void * )Cookie;
-    DEVICEONLY( HInfo->MaxAge = 0;
-		)
     HInfo->ClientSubList = NULL;
     ListInit( &HInfo->SsdpSearchList, NULL, NULL );
-    DEVICEONLY( HInfo->MaxSubscriptions = UPNP_INFINITE;
-         )
-        DEVICEONLY( HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
-         )
+#ifdef INCLUDE_DEVICE_APIS
+    HInfo->MaxAge = 0;
+    HInfo->MaxSubscriptions = UPNP_INFINITE;
+    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+#endif
 
-        HandleTable[*Hnd] = HInfo;
-
+    HandleTable[*Hnd] = HInfo;
     UpnpSdkClientRegistered = 1;
 
-    HandleUnlock(  );
+    HandleUnlock();
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpRegisterClient \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpRegisterClient \n" );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 
 }  /****************** End of UpnpRegisterClient   *********************/
 #endif // INCLUDE_CLIENT_APIS
 
-#ifdef INCLUDE_CLIENT_APIS
 
 /****************************************************************************
  * Function: UpnpUnRegisterClient
@@ -1392,6 +1347,7 @@ UpnpRegisterClient( IN Upnp_FunPtr Fun,
  * Return Values:
  *	UPNP_E_SUCCESS on success, nonzero on failure.
  *****************************************************************************/
+#ifdef INCLUDE_CLIENT_APIS
 int
 UpnpUnRegisterClient( IN UpnpClient_Handle Hnd )
 {
@@ -1403,23 +1359,22 @@ UpnpUnRegisterClient( IN UpnpClient_Handle Hnd )
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpUnRegisterClient \n" );
-         )
-        HandleLock(  );
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpUnRegisterClient \n" );
+    HandleLock();
     if( !UpnpSdkClientRegistered ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
 #if EXCLUDE_GENA == 0
     if( genaUnregisterClient( Hnd ) != UPNP_E_SUCCESS )
         return UPNP_E_INVALID_HANDLE;
 #endif
-    HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     //clean up search list
@@ -1437,11 +1392,10 @@ UpnpUnRegisterClient( IN UpnpClient_Handle Hnd )
     ListDestroy( &HInfo->SsdpSearchList, 0 );
     FreeHandle( Hnd );
     UpnpSdkClientRegistered = 0;
-    HandleUnlock(  );
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpUnRegisterClient \n" );
-         )
-        return UPNP_E_SUCCESS;
+    HandleUnlock();
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpUnRegisterClient \n" );
+    return UPNP_E_SUCCESS;
 
 }  /****************** End of UpnpUnRegisterClient *********************/
 #endif // INCLUDE_CLIENT_APIS
@@ -1483,19 +1437,18 @@ UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpSendAdvertisement \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpSendAdvertisement \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( Exp < 1 )
         Exp = DEFAULT_MAXAGE;
     SInfo->MaxAge = Exp;
-    HandleUnlock(  );
+    HandleUnlock();
     retVal = AdvertiseAndReply( 1, Hnd, 0, ( struct sockaddr_in * )NULL,
                                 ( char * )NULL, ( char * )NULL,
                                 ( char * )NULL, Exp );
@@ -1515,9 +1468,9 @@ UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
     adEvent->handle = Hnd;
     adEvent->Event = ptrMx;
 
-    HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         free( adEvent );
         free( ptrMx );
         return UPNP_E_INVALID_HANDLE;
@@ -1532,7 +1485,7 @@ UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
                                         REL_SEC, &job, SHORT_TERM,
                                         &( adEvent->eventId ) ) )
         != UPNP_E_SUCCESS ) {
-        HandleUnlock(  );
+        HandleUnlock();
         free( adEvent );
         free( ptrMx );
         return retVal;
@@ -1546,18 +1499,18 @@ UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
                                         REL_SEC, &job, SHORT_TERM,
                                         &( adEvent->eventId ) ) )
         != UPNP_E_SUCCESS ) {
-        HandleUnlock(  );
+        HandleUnlock();
         free( adEvent );
         free( ptrMx );
         return retVal;
     }
 #endif
 
-    HandleUnlock(  );
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpSendAdvertisement \n" ); )
+    HandleUnlock();
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpSendAdvertisement \n" );
 
-        return retVal;
+    return retVal;
 
 }  /****************** End of UpnpSendAdvertisement *********************/
 #endif // INCLUDE_DEVICE_APIS
@@ -1595,33 +1548,31 @@ UpnpSearchAsync( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpSearchAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpSearchAsync \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( Mx < 1 )
         Mx = DEFAULT_MX;
 
     if( Target == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
 
-    HandleUnlock(  );
+    HandleUnlock();
     SearchByTarget( Mx, Target, ( void * )Cookie_const );
 
     //HandleUnlock();
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpSearchAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpSearchAsync \n" );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 
 }  /****************** End of UpnpSearchAsync *********************/
 #endif // INCLUDE_CLIENT_APIS
@@ -1659,25 +1610,23 @@ UpnpSetMaxSubscriptions( IN UpnpDevice_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpSetMaxSubscriptions \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpSetMaxSubscriptions \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( ( ( MaxSubscriptions != UPNP_INFINITE )
           && ( MaxSubscriptions < 0 ) )
         || ( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     SInfo->MaxSubscriptions = MaxSubscriptions;
-    HandleUnlock(  );
+    HandleUnlock();
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpSetMaxSubscriptions \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpSetMaxSubscriptions \n" );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 
 }  /***************** End of UpnpSetMaxSubscriptions ********************/
 #endif // INCLUDE_DEVICE_APIS
@@ -1710,27 +1659,25 @@ UpnpSetMaxSubscriptionTimeOut( IN UpnpDevice_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpSetMaxSubscriptionTimeOut \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpSetMaxSubscriptionTimeOut \n" );
 
-        HandleLock(  );
+    HandleLock();
 
     if( ( ( MaxSubscriptionTimeOut != UPNP_INFINITE )
           && ( MaxSubscriptionTimeOut < 0 ) )
         || ( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
 
     SInfo->MaxSubscriptionTimeOut = MaxSubscriptionTimeOut;
-    HandleUnlock(  );
+    HandleUnlock();
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpSetMaxSubscriptionTimeOut \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpSetMaxSubscriptionTimeOut \n" );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 
 }  /****************** End of UpnpSetMaxSubscriptionTimeOut ******************/
 #endif // INCLUDE_DEVICE_APIS
@@ -1777,25 +1724,24 @@ UpnpSubscribeAsync( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpSubscribeAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpSubscribeAsync \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( EvtUrl == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( TimeOut != UPNP_INFINITE && TimeOut < 1 ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( Fun == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
 
@@ -1803,10 +1749,10 @@ UpnpSubscribeAsync( IN UpnpClient_Handle Hnd,
         ( struct UpnpNonblockParam * )
         malloc( sizeof( struct UpnpNonblockParam ) );
     if( Param == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_OUTOF_MEMORY;
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
     Param->FunName = SUBSCRIBE;
     Param->Handle = Hnd;
@@ -1820,11 +1766,10 @@ UpnpSubscribeAsync( IN UpnpClient_Handle Hnd,
     TPJobSetPriority( &job, MED_PRIORITY );
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpSubscribeAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpSubscribeAsync \n" );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 
 }  /****************** End of UpnpSubscribeAsync *********************/
 #endif // INCLUDE_CLIENT_APIS
@@ -1864,35 +1809,33 @@ UpnpSubscribe( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpSubscribe \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpSubscribe \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( EvtUrl == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( TimeOut == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( SubsId == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
-    HandleUnlock(  );
+    HandleUnlock();
     RetVal = genaSubscribe( Hnd, EvtUrl, TimeOut, SubsId );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpSubscribe \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpSubscribe \n" );
 
-        return RetVal;
+    return RetVal;
 
 }  /****************** End of UpnpSubscribe  *********************/
 #endif // INCLUDE_CLIENT_APIS
@@ -1926,27 +1869,25 @@ UpnpUnSubscribe( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpUnSubscribe \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpUnSubscribe \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( SubsId == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
-    HandleUnlock(  );
+    HandleUnlock();
     RetVal = genaUnSubscribe( Hnd, SubsId );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpUnSubscribe \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpUnSubscribe \n" );
 
-        return RetVal;
+    return RetVal;
 
 }  /****************** End of UpnpUnSubscribe  *********************/
 #endif // INCLUDE_CLIENT_APIS
@@ -1987,25 +1928,24 @@ UpnpUnSubscribeAsync( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpUnSubscribeAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpUnSubscribeAsync \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( SubsId == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( Fun == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
 
-    HandleUnlock(  );
+    HandleUnlock();
     Param =
         ( struct UpnpNonblockParam * )
         malloc( sizeof( struct UpnpNonblockParam ) );
@@ -2022,11 +1962,10 @@ UpnpUnSubscribeAsync( IN UpnpClient_Handle Hnd,
     TPJobSetPriority( &job, MED_PRIORITY );
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpUnSubscribeAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpUnSubscribeAsync \n" );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 
 }  /****************** End of UpnpUnSubscribeAsync  *********************/
 #endif // INCLUDE_CLIENT_APIS
@@ -2063,31 +2002,29 @@ UpnpRenewSubscription( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpRenewSubscription \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpRenewSubscription \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( TimeOut == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( SubsId == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
-    HandleUnlock(  );
+    HandleUnlock();
     RetVal = genaRenewSubscription( Hnd, SubsId, TimeOut );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpRenewSubscription \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpRenewSubscription \n" );
 
-        return RetVal;
+    return RetVal;
 
 }  /****************** End of UpnpRenewSubscription  *********************/
 #endif // INCLUDE_CLIENT_APIS
@@ -2131,27 +2068,26 @@ UpnpRenewSubscriptionAsync( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpRenewSubscriptionAsync \n" );
-         )
-        HandleLock(  );
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpRenewSubscriptionAsync \n" );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( TimeOut != UPNP_INFINITE && TimeOut < 1 ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( SubsId == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( Fun == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
     Param =
         ( struct UpnpNonblockParam * )
@@ -2172,11 +2108,10 @@ UpnpRenewSubscriptionAsync( IN UpnpClient_Handle Hnd,
     TPJobSetPriority( &job, MED_PRIORITY );
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpRenewSubscriptionAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpRenewSubscriptionAsync \n" );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 
 }  /****************** End of UpnpRenewSubscriptionAsync *******************/
 #endif // INCLUDE_CLIENT_APIS
@@ -2227,37 +2162,35 @@ UpnpNotify( IN UpnpDevice_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpNotify \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpNotify \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( DevID == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( ServName == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( VarName == NULL || NewVal == NULL || cVariables < 0 ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
 
-    HandleUnlock(  );
+    HandleUnlock();
     retVal =
         genaNotifyAll( Hnd, DevID, ServName, VarName, NewVal, cVariables );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpNotify \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpNotify \n" );
 
-        return retVal;
+    return retVal;
 
 } /****************** End of UpnpNotify *********************/
 
@@ -2300,32 +2233,30 @@ UpnpNotifyExt( IN UpnpDevice_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpNotify \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpNotify \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( DevID == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( ServName == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
 
-    HandleUnlock(  );
+    HandleUnlock();
     retVal = genaNotifyAllExt( Hnd, DevID, ServName, PropSet );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpNotify \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpNotify \n" );
 
-        return retVal;
+    return retVal;
 
 }  /****************** End of UpnpNotify *********************/
 
@@ -2379,41 +2310,39 @@ UpnpAcceptSubscription( IN UpnpDevice_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpAcceptSubscription \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpAcceptSubscription \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( DevID == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( ServName == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( SubsId == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( VarName == NULL || NewVal == NULL || cVariables < 0 ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
 
-    HandleUnlock(  );
+    HandleUnlock();
     retVal =
         genaInitNotify( Hnd, DevID, ServName, VarName, NewVal, cVariables,
                         SubsId );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpAcceptSubscription \n" );
-         )
-        return retVal;
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpAcceptSubscription \n" );
+    return retVal;
 
 }  /***************** End of UpnpAcceptSubscription *********************/
 
@@ -2457,41 +2386,39 @@ UpnpAcceptSubscriptionExt( IN UpnpDevice_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpAcceptSubscription \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpAcceptSubscription \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
     if( DevID == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( ServName == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
     if( SubsId == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
 
     if( PropSet == NULL ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
 
-    HandleUnlock(  );
+    HandleUnlock();
     retVal = genaInitNotifyExt( Hnd, DevID, ServName, PropSet, SubsId );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpAcceptSubscription \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpAcceptSubscription \n" );
 
-        return retVal;
+    return retVal;
 
 }  /****************** End of UpnpAcceptSubscription *********************/
 
@@ -2551,19 +2478,19 @@ UpnpSendAction( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpSendAction \n" );
-         )
-    if(DevUDN_const !=NULL)
-	DBGONLY(UpnpPrintf(UPNP_ALL,API,__FILE__,__LINE__,"non NULL DevUDN is ignored\n"););
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpSendAction \n" );
+    if(DevUDN_const !=NULL) {
+	UpnpPrintf(UPNP_ALL,API,__FILE__,__LINE__,"non NULL DevUDN is ignored\n");
+    }
     DevUDN_const = NULL;
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
     if( ActionURL == NULL ) {
         return UPNP_E_INVALID_PARAM;
@@ -2577,11 +2504,10 @@ UpnpSendAction( IN UpnpClient_Handle Hnd,
 
     retVal = SoapSendAction( ActionURL, ServiceType, Action, RespNodePtr );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpSendAction \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpSendAction \n" );
 
-        return retVal;
+    return retVal;
 
 }  /****************** End of UpnpSendAction *********************/
 
@@ -2634,22 +2560,21 @@ UpnpSendActionEx( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpSendActionEx \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpSendActionEx \n" );
 
-        if( Header == NULL ) {
+    if( Header == NULL ) {
         retVal = UpnpSendAction( Hnd, ActionURL_const, ServiceType_const,
                                  DevUDN_const, Action, RespNodePtr );
         return retVal;
     }
 
-    HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
     if( ActionURL == NULL ) {
         return UPNP_E_INVALID_PARAM;
@@ -2661,11 +2586,10 @@ UpnpSendActionEx( IN UpnpClient_Handle Hnd,
     retVal = SoapSendActionEx( ActionURL, ServiceType, Header,
                                Action, RespNodePtr );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpSendAction \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpSendAction \n" );
 
-        return retVal;
+    return retVal;
 
 }  /****************** End of UpnpSendActionEx *********************/
 
@@ -2718,16 +2642,15 @@ UpnpSendActionAsync( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpSendActionAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpSendActionAsync \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
     if( ActionURL == NULL ) {
         return UPNP_E_INVALID_PARAM;
@@ -2774,11 +2697,10 @@ UpnpSendActionAsync( IN UpnpClient_Handle Hnd,
     TPJobSetPriority( &job, MED_PRIORITY );
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpSendActionAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpSendActionAsync \n" );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 
 }  /****************** End of UpnpSendActionAsync *********************/
 
@@ -2833,23 +2755,22 @@ UpnpSendActionExAsync( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpSendActionExAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpSendActionExAsync \n" );
 
-        if( Header == NULL ) {
+    if( Header == NULL ) {
         retVal = UpnpSendActionAsync( Hnd, ActionURL_const,
                                       ServiceType_const, DevUDN_const, Act,
                                       Fun, Cookie_const );
         return retVal;
     }
 
-    HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
     if( ActionURL == NULL ) {
         return UPNP_E_INVALID_PARAM;
@@ -2912,11 +2833,10 @@ UpnpSendActionExAsync( IN UpnpClient_Handle Hnd,
     TPJobSetPriority( &job, MED_PRIORITY );
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpSendActionAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpSendActionAsync \n" );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 
 }  /****************** End of UpnpSendActionExAsync *********************/
 
@@ -2956,16 +2876,15 @@ UpnpGetServiceVarStatusAsync( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpGetServiceVarStatusAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpGetServiceVarStatusAsync \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
     if( ActionURL == NULL ) {
         return UPNP_E_INVALID_PARAM;
@@ -2994,11 +2913,10 @@ UpnpGetServiceVarStatusAsync( IN UpnpClient_Handle Hnd,
 
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpGetServiceVarStatusAsync \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpGetServiceVarStatusAsync \n" );
 
-        return UPNP_E_SUCCESS;
+    return UPNP_E_SUCCESS;
 
 }  /****************** End of UpnpGetServiceVarStatusAsync ****************/
 
@@ -3038,17 +2956,16 @@ UpnpGetServiceVarStatus( IN UpnpClient_Handle Hnd,
         return UPNP_E_FINISH;
     }
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpGetServiceVarStatus \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpGetServiceVarStatus \n" );
 
-        HandleLock(  );
+    HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
 
-    HandleUnlock(  );
+    HandleUnlock();
 
     if( ActionURL == NULL ) {
         return UPNP_E_INVALID_PARAM;
@@ -3060,11 +2977,10 @@ UpnpGetServiceVarStatus( IN UpnpClient_Handle Hnd,
     retVal = SoapGetServiceVarStatus( ActionURL, VarName, &StVarPtr );
     *StVar = StVarPtr;
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpGetServiceVarStatus \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpGetServiceVarStatus \n" );
 
-        return retVal;
+    return retVal;
 
 }  /****************** End of UpnpGetServiceVarStatus *********************/
 #endif // INCLUDE_CLIENT_APIS
@@ -3339,16 +3255,13 @@ UpnpDownloadXmlDoc( const char *url,
 
     ret_code = UpnpDownloadUrlItem( url, &xml_buf, content_type );
     if( ret_code != UPNP_E_SUCCESS ) {
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-                             "retCode: %d\n", ret_code );
-             )
-            return ret_code;
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "retCode: %d\n", ret_code );
+        return ret_code;
     }
 
     if( strncasecmp( content_type, "text/xml", strlen( "text/xml" ) ) ) {
-        DBGONLY(
-            UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Not text/xml\n" );
-        )
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Not text/xml\n" );
         // Linksys WRT54G router returns 
         // "CONTENT-TYPE: application/octet-stream".
         // Let's be nice to Linksys and try to parse document anyway.
@@ -3364,16 +3277,16 @@ UpnpDownloadXmlDoc( const char *url,
     free( xml_buf );
 
     if( ret_code != IXML_SUCCESS ) {
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-                             "Invalid desc\n" );
-             )
-            if( ret_code == IXML_INSUFFICIENT_MEMORY ) {
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "Invalid desc\n" );
+        if( ret_code == IXML_INSUFFICIENT_MEMORY ) {
             return UPNP_E_OUTOF_MEMORY;
         } else {
             return UPNP_E_INVALID_DESC;
         }
     } else {
-        DBGONLY( xml_buf = ixmlPrintNode( ( IXML_Node * ) * xmlDoc );
+#ifdef DEBUG
+        xml_buf = ixmlPrintNode( ( IXML_Node * ) * xmlDoc );
                  UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
                              "Printing the Parsed xml document \n %s\n",
                              xml_buf );
@@ -3381,7 +3294,8 @@ UpnpDownloadXmlDoc( const char *url,
                              "****************** END OF Parsed XML Doc *****************\n" );
                  ixmlFreeDOMString( xml_buf );
                  UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "Exiting UpnpDownloadXmlDoc\n" ); )
+                             "Exiting UpnpDownloadXmlDoc\n" );
+#endif
 
             return UPNP_E_SUCCESS;
     }
@@ -3393,7 +3307,6 @@ UpnpDownloadXmlDoc( const char *url,
 //
 //----------------------------------------------------------------------------
 
-#ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
  * Function: UpnpThreadDistribution 
@@ -3406,106 +3319,93 @@ UpnpDownloadXmlDoc( const char *url,
  * Return Values: VOID
  *      
  ***************************************************************************/
+#ifdef INCLUDE_CLIENT_APIS
 void
 UpnpThreadDistribution( struct UpnpNonblockParam *Param )
 {
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside UpnpThreadDistribution \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpThreadDistribution \n" );
 
-        switch ( Param->FunName ) {
+    switch ( Param->FunName ) {
 #if EXCLUDE_GENA == 0
-        CLIENTONLY( case SUBSCRIBE:
-{
-struct Upnp_Event_Subscribe Evt;
-Evt.ErrCode = genaSubscribe( Param->Handle, Param->Url,
-                            ( int * )&( Param->TimeOut ),
-                            ( char * )Evt.Sid );
-strcpy( Evt.PublisherUrl, Param->Url ); Evt.TimeOut = Param->TimeOut;
-Param->Fun( UPNP_EVENT_SUBSCRIBE_COMPLETE, &Evt, Param->Cookie );
-free( Param ); break;}
-        case UNSUBSCRIBE:
-                            {
-                            struct Upnp_Event_Subscribe Evt;
-                            Evt.ErrCode =
-                            genaUnSubscribe( Param->Handle,
-                                             Param->SubsId );
-                            strcpy( ( char * )Evt.Sid, Param->SubsId );
-                            strcpy( Evt.PublisherUrl, "" );
-                            Evt.TimeOut = 0;
-                            Param->Fun( UPNP_EVENT_UNSUBSCRIBE_COMPLETE,
-                                        &Evt, Param->Cookie );
-                            free( Param ); break;}
-        case RENEW:
-                            {
-                            struct Upnp_Event_Subscribe Evt;
-                            Evt.ErrCode =
-                            genaRenewSubscription( Param->Handle,
-                                                   Param->SubsId,
-                                                   &( Param->TimeOut ) );
-                            Evt.TimeOut = Param->TimeOut;
-                            strcpy( ( char * )Evt.Sid, Param->SubsId );
-                            Param->Fun( UPNP_EVENT_RENEWAL_COMPLETE, &Evt,
-                                        Param->Cookie ); free( Param );
-                            break;}
-             )
-#endif
+        case SUBSCRIBE: {
+            struct Upnp_Event_Subscribe Evt;
+            Evt.ErrCode = genaSubscribe(
+                Param->Handle, Param->Url,
+                ( int * )&( Param->TimeOut ),
+                ( char * )Evt.Sid );
+            strcpy( Evt.PublisherUrl, Param->Url );
+            Evt.TimeOut = Param->TimeOut;
+            Param->Fun( UPNP_EVENT_SUBSCRIBE_COMPLETE, &Evt, Param->Cookie );
+            free( Param );
+            break;
+        }
+        case UNSUBSCRIBE: {
+	    struct Upnp_Event_Subscribe Evt;
+	    Evt.ErrCode =
+	    genaUnSubscribe( Param->Handle,
+			     Param->SubsId );
+	    strcpy( ( char * )Evt.Sid, Param->SubsId );
+	    strcpy( Evt.PublisherUrl, "" );
+	    Evt.TimeOut = 0;
+	    Param->Fun( UPNP_EVENT_UNSUBSCRIBE_COMPLETE,
+			&Evt, Param->Cookie );
+	    free( Param );
+            break;
+        }
+        case RENEW: {
+	    struct Upnp_Event_Subscribe Evt;
+	    Evt.ErrCode =
+	    genaRenewSubscription( Param->Handle,
+				   Param->SubsId,
+				   &( Param->TimeOut ) );
+	    Evt.TimeOut = Param->TimeOut;
+	    strcpy( ( char * )Evt.Sid, Param->SubsId );
+	    Param->Fun( UPNP_EVENT_RENEWAL_COMPLETE, &Evt,
+			Param->Cookie );
+            free( Param );
+	    break;
+        }
+#endif // EXCLUDE_GENA == 0
 #if EXCLUDE_SOAP == 0
-        case ACTION:
-            {
-                struct Upnp_Action_Complete Evt;
-
-                Evt.ActionResult = NULL;
-#ifdef INCLUDE_CLIENT_APIS
-
+        case ACTION: {
+            struct Upnp_Action_Complete Evt;
+            Evt.ActionResult = NULL;
                 Evt.ErrCode =
                     SoapSendAction( Param->Url, Param->ServiceType,
                                     Param->Act, &Evt.ActionResult );
-#endif
-
                 Evt.ActionRequest = Param->Act;
                 strcpy( Evt.CtrlUrl, Param->Url );
-
                 Param->Fun( UPNP_CONTROL_ACTION_COMPLETE, &Evt,
                             Param->Cookie );
-
                 ixmlDocument_free( Evt.ActionRequest );
                 ixmlDocument_free( Evt.ActionResult );
                 free( Param );
                 break;
-            }
-        case STATUS:
-            {
+        }
+        case STATUS: {
                 struct Upnp_State_Var_Complete Evt;
-
-#ifdef INCLUDE_CLIENT_APIS
-
-                Evt.ErrCode = SoapGetServiceVarStatus( Param->Url,
-                                                       Param->VarName,
-                                                       &( Evt.
-                                                          CurrentVal ) );
-#endif
+                Evt.ErrCode = SoapGetServiceVarStatus(
+                    Param->Url, Param->VarName, &( Evt.CurrentVal ) );
                 strcpy( Evt.StateVarName, Param->VarName );
                 strcpy( Evt.CtrlUrl, Param->Url );
-
                 Param->Fun( UPNP_CONTROL_GET_VAR_COMPLETE, &Evt,
                             Param->Cookie );
                 free( Evt.CurrentVal );
                 free( Param );
                 break;
             }
-#endif //EXCLUDE_SOAP
+#endif // EXCLUDE_SOAP == 0
         default:
             break;
-    }                           // end of switch(Param->FunName)
+    } // end of switch(Param->FunName)
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Exiting UpnpThreadDistribution \n" );
-         )
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpThreadDistribution \n" );
 
 }  /****************** End of UpnpThreadDistribution  *********************/
-#endif
+#endif // INCLUDE_CLIENT_APIS
 
 /**************************************************************************
  * Function: GetCallBackFn 
@@ -3537,7 +3437,7 @@ GetCallBackFn( UpnpClient_Handle Hnd )
  *      
  ***************************************************************************/
 void
-InitHandleList(  )
+InitHandleList()
 {
     int i;
 
@@ -3558,7 +3458,7 @@ InitHandleList(  )
  *      
  ***************************************************************************/
 int
-GetFreeHandle(  )
+GetFreeHandle()
 {
     int i = 1;
 
@@ -3662,28 +3562,22 @@ GetHandleInfo( UpnpClient_Handle Hnd,
                struct Handle_Info ** HndInfo )
 {
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                         "GetHandleInfo: Handle is %d\n", Hnd );
-         )
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "GetHandleInfo: Handle is %d\n", Hnd );
 
-        if( Hnd < 1 || Hnd >= NUM_HANDLE ) {
-
-        DBGONLY( UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-                             "GetHandleInfo : Handle out of range\n" );
-             )
-            return UPNP_E_INVALID_HANDLE;
+    if( Hnd < 1 || Hnd >= NUM_HANDLE ) {
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "GetHandleInfo : Handle out of range\n" );
+        return UPNP_E_INVALID_HANDLE;
     }
     if( HandleTable[Hnd] != NULL ) {
-
         *HndInfo = ( struct Handle_Info * )HandleTable[Hnd];
         return ( ( struct Handle_Info * )*HndInfo )->HType;
     }
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "GetHandleInfo : exiting\n" );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "GetHandleInfo : exiting\n" );
-         )
-
-        return UPNP_E_INVALID_HANDLE;
+    return UPNP_E_INVALID_HANDLE;
 
 }  /****************** End of GetHandleInfo *********************/
 
@@ -3703,10 +3597,9 @@ int
 FreeHandle( int Upnp_Handle )
 {
     if( Upnp_Handle < 1 || Upnp_Handle >= NUM_HANDLE ) {
-        DBGONLY( UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-                             "FreeHandleInfo : Handle out of range\n" );
-             )
-            return UPNP_E_INVALID_HANDLE;
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "FreeHandleInfo : Handle out of range\n" );
+        return UPNP_E_INVALID_HANDLE;
     }
 
     if( HandleTable[Upnp_Handle] == NULL ) {
@@ -3736,17 +3629,17 @@ int PrintHandleInfo( IN UpnpClient_Handle Hnd )
     struct Handle_Info * HndInfo;
     if (HandleTable[Hnd] != NULL) {
         HndInfo = HandleTable[Hnd];
-        DBGONLY(
+#ifdef DEBUG
             UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
                 "Printing information for Handle_%d\n", Hnd);
             UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
                 "HType_%d\n", HndInfo->HType);
-            DEVICEONLY(
+#ifdef INCLUDE_DEVICE_APIS
                 if(HndInfo->HType != HND_CLIENT)
                     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
                         "DescURL_%s\n", HndInfo->DescURL );
-            )
-        )
+#endif
+#endif
     } else {
         return UPNP_E_INVALID_HANDLE;
     }
@@ -3775,12 +3668,10 @@ void printNodes( IXML_Node * tmpRoot, int depth )
         NodeType = ixmlNode_getNodeType(ChildNode1);
         NodeValue = ixmlNode_getNodeValue(ChildNode1);
         NodeName = ixmlNode_getNodeName(ChildNode1);
-        DBGONLY(
-            UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-                "DEPTH-%2d-IXML_Node Type %d, "
-                "IXML_Node Name: %s, IXML_Node Value: %s\n",
-                depth, NodeType, NodeName, NodeValue);
-	)
+        UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+            "DEPTH-%2d-IXML_Node Type %d, "
+            "IXML_Node Name: %s, IXML_Node Value: %s\n",
+            depth, NodeType, NodeName, NodeValue);
     }
 }
 
@@ -3839,10 +3730,9 @@ void printNodes( IXML_Node * tmpRoot, int depth )
 
     // Create an unbound datagram socket to do the SIOCGIFADDR ioctl on. 
     if( ( LocalSock = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP ) ) < 0 ) {
-        DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "Can't create addrlist socket\n" );
-             )
-            return UPNP_E_INIT;
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "Can't create addrlist socket\n" );
+        return UPNP_E_INIT;
     }
     // Get the interface configuration information... 
     ifConf.ifc_len = sizeof szBuffer;
@@ -3850,11 +3740,10 @@ void printNodes( IXML_Node * tmpRoot, int depth )
     nResult = ioctl( LocalSock, SIOCGIFCONF, &ifConf );
 
     if( nResult < 0 ) {
-        DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                             "DiscoverInterfaces: SIOCGIFCONF returned error\n" );
-             )
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "DiscoverInterfaces: SIOCGIFCONF returned error\n" );
 
-            return UPNP_E_INIT;
+        return UPNP_E_INIT;
     }
     // Cycle through the list of interfaces looking for IP addresses. 
 
@@ -3866,11 +3755,9 @@ void printNodes( IXML_Node * tmpRoot, int depth )
         // See if this is the sort of interface we want to deal with.
         strcpy( ifReq.ifr_name, pifReq->ifr_name );
         if( ioctl( LocalSock, SIOCGIFFLAGS, &ifReq ) < 0 ) {
-            DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                                 "Can't get interface flags for %s:\n",
-                                 ifReq.ifr_name );
-                 )
-
+            UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+                "Can't get interface flags for %s:\n",
+                ifReq.ifr_name );
         }
         // Skip loopback, point-to-point and down interfaces, 
         // except don't skip down interfaces
@@ -3899,11 +3786,10 @@ void printNodes( IXML_Node * tmpRoot, int depth )
 
     strncpy( out, inet_ntoa( LocalAddr.sin_addr ), LINE_SIZE );
 
-    DBGONLY( UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                         "Inside getlocalhostname : after strncpy %s\n",
-                         out );
-         )
-        return UPNP_E_SUCCESS;
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside getlocalhostname : after strncpy %s\n",
+        out );
+    return UPNP_E_SUCCESS;
 #endif
     }
 
@@ -4128,7 +4014,7 @@ UpnpRemoveVirtualDir( IN const char *dirName )
  *     
  ***************************************************************************/
 void
-UpnpRemoveAllVirtualDirs(  )
+UpnpRemoveAllVirtualDirs()
 {
 
     virtualDirList *pCur;
@@ -4176,7 +4062,7 @@ UpnpEnableWebserver( IN int enable )
     switch ( enable ) {
 #ifdef INTERNAL_WEB_SERVER
         case TRUE:
-            if( ( retVal = web_server_init(  ) ) != UPNP_E_SUCCESS ) {
+            if( ( retVal = web_server_init() ) != UPNP_E_SUCCESS ) {
                 return retVal;
             }
             bWebServerState = WEB_SERVER_ENABLED;
@@ -4184,7 +4070,7 @@ UpnpEnableWebserver( IN int enable )
             break;
 
         case FALSE:
-            web_server_destroy(  );
+            web_server_destroy();
             bWebServerState = WEB_SERVER_DISABLED;
             SetHTTPGetCallback( NULL );
             break;
@@ -4209,7 +4095,7 @@ UpnpEnableWebserver( IN int enable )
  *	0, if webserver disabled
  ***************************************************************************/
 int
-UpnpIsWebserverEnabled(  )
+UpnpIsWebserverEnabled()
 {
     if( UpnpSdkInit != 1 ) {
         return 0;
@@ -4300,7 +4186,7 @@ UpnpSetContentLength( IN UpnpClient_Handle Hnd,
             break;
         }
 
-        HandleLock(  );
+        HandleLock();
 
         errCode = GetHandleInfo( Hnd, &HInfo );
 
@@ -4318,7 +4204,7 @@ UpnpSetContentLength( IN UpnpClient_Handle Hnd,
 
     } while( 0 );
 
-    HandleUnlock(  );
+    HandleUnlock();
     return errCode;
 
 }

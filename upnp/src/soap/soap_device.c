@@ -85,7 +85,7 @@ const char *ContentTypeHeader =
 *		0 if successful else returns appropriate error.
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_request_type( IN http_message_t * request,
                   OUT memptr * action_name )
 {
@@ -262,7 +262,7 @@ send_error_response( IN SOCKINFO * info,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 send_var_query_response( IN SOCKINFO * info,
                          IN const char *var_value,
                          IN http_message_t * hmsg )
@@ -326,12 +326,12 @@ send_var_query_response( IN SOCKINFO * info,
 *	Description :	This function separates the action node from 
 *	the root DOM node.
 *
-*	Return :	static XINLINE int
+*	Return :	static UPNP_INLINE int
 *		0 if successful, or -1 if fails.
 *
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_action_node( IN IXML_Document * TempDoc,
                  IN char *NodeName,
                  OUT IXML_Document ** RespNode )
@@ -344,11 +344,10 @@ get_action_node( IN IXML_Document * TempDoc,
     int ret_code = -1;          // error, by default
     IXML_NodeList *nl = NULL;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "get_action_node(): node name =%s\n ", NodeName );
-         )
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "get_action_node(): node name =%s\n ", NodeName );
 
-        * RespNode = NULL;
+    *RespNode = NULL;
 
     // Got the Envelope node here
     EnvpNode = ixmlNode_getFirstChild( ( IXML_Node * ) TempDoc );
@@ -682,7 +681,7 @@ get_device_info( IN http_message_t * request,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 send_action_response( IN SOCKINFO * info,
                       IN IXML_Document * action_resp,
                       IN http_message_t * request )
@@ -738,15 +737,15 @@ send_action_response( IN SOCKINFO * info,
                                  xml_response, strlen( xml_response ),
                                  end_body, strlen( end_body ) );
 
-    DBGONLY( if( ret_code != 0 ) {
-             UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Failed to send response: err code = %d\n",
-                         ret_code );}
-     )
+    if( ret_code != 0 ) {
+        UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+            "Failed to send response: err code = %d\n",
+            ret_code );
+    }
 
-        err_code = 0;
+    err_code = 0;
 
-  error_handler:
+error_handler:
     ixmlFreeDOMString( xml_response );
     membuffer_destroy( &headers );
     if( err_code != 0 ) {
@@ -770,7 +769,7 @@ send_action_response( IN SOCKINFO * info,
 *		returns 0 if successful else returns -1.
 *	Note :
 ****************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 get_var_name( IN IXML_Document * TempDoc,
               OUT char *VarName )
 {
@@ -814,14 +813,13 @@ get_var_name( IN IXML_Document * TempDoc,
     Temp = ixmlNode_getNodeValue( VarNode );
     linecopy( VarName, Temp );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Received query for variable  name %s\n",
-                         VarName );
-         )
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "Received query for variable  name %s\n",
+        VarName );
 
-        ret_val = 0;            // success
+    ret_val = 0;            // success
 
-  error_handler:
+error_handler:
     return ret_val;
 }
 
@@ -842,7 +840,7 @@ get_var_name( IN IXML_Document * TempDoc,
 *
 *	Note :
 ****************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 handle_query_variable( IN SOCKINFO * info,
                        IN http_message_t * request,
                        IN IXML_Document * xml_doc )
@@ -878,8 +876,8 @@ handle_query_variable( IN SOCKINFO * info,
     // send event
     soap_event_callback( UPNP_CONTROL_GET_VAR_REQUEST, &variable, cookie );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Return from callback for var request\n" ) );
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        "Return from callback for var request\n" );
 
     // validate, and handle result
     if( variable.CurrentVal == NULL ) {
@@ -968,8 +966,8 @@ handle_invoke_action( IN SOCKINFO * info,
     action.ErrCode = UPNP_E_SUCCESS;
     action.CtrlPtIPAddr = info->foreign_ip_addr;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Calling Callback\n" ) );
+    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+                         "Calling Callback\n" );
 
     soap_event_callback( UPNP_CONTROL_ACTION_REQUEST, &action, cookie );
 

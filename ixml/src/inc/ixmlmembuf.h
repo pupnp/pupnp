@@ -39,7 +39,7 @@
 #define MAXVAL( a, b ) ( (a) > (b) ? (a) : (b) )
 
 #ifndef WIN32
- #define	XINLINE inline
+ #define	UPNP_INLINE inline
 #endif
 
 #define MEMBUF_DEF_SIZE_INC		20

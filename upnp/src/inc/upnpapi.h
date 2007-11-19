@@ -71,33 +71,46 @@ struct Handle_Info
     Upnp_FunPtr  Callback; // Callback function pointer.
     char * Cookie;
 
-    DEVICEONLY(char  DescURL[LINE_SIZE];)   // URL for the use of SSDP
-    DEVICEONLY(char  DescXML[LINE_SIZE];)   // XML file path for device 
-                                            //description
+    // Device Only
+#ifdef INCLUDE_DEVICE_APIS
+    char  DescURL[LINE_SIZE];   // URL for the use of SSDP
+    char  DescXML[LINE_SIZE];   // XML file path for device 
+                                //description
 
-    DEVICEONLY(int MaxAge;)                 // Advertisement timeout
-    DEVICEONLY(IXML_Document *DescDocument;)     // Description parsed in 
-                                            //terms of DOM document 
-    DEVICEONLY(IXML_NodeList *DeviceList;)       // List of devices in the 
-                                            //description document
-    DEVICEONLY(IXML_NodeList *ServiceList;)      // List of services in the 
-                                            // description document
-    DEVICEONLY(service_table ServiceTable;) //table holding subscriptions and 
+    int MaxAge;                 // Advertisement timeout
+    IXML_Document *DescDocument;// Description parsed in 
+                                //terms of DOM document 
+    IXML_NodeList *DeviceList;  // List of devices in the 
+                                //description document
+    IXML_NodeList *ServiceList; // List of services in the 
+                                // description document
+    service_table ServiceTable; //table holding subscriptions and 
                                 //URL information
-    DEVICEONLY(int MaxSubscriptions;)
-    DEVICEONLY(int MaxSubscriptionTimeOut;)
+    int MaxSubscriptions;
+    int MaxSubscriptionTimeOut;
+#endif
      
-       //Client only
-    CLIENTONLY(client_subscription * ClientSubList;) //client subscription list
-    CLIENTONLY(LinkedList SsdpSearchList;) // active ssdp searches   
+    // Client only
+#ifdef INCLUDE_CLIENT_APIS
+    client_subscription *ClientSubList; //client subscription list
+    LinkedList SsdpSearchList; // active ssdp searches   
+#endif
     int   aliasInstalled;       // 0 = not installed; otherwise installed
-} ;
+};
 
 extern ithread_mutex_t GlobalHndMutex;
 Upnp_Handle_Type GetHandleInfo(int Hnd, struct Handle_Info **HndInfo); 
 
-#define HandleLock()  DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"Trying Lock")); ithread_mutex_lock(&GlobalHndMutex); DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"LOCK"));
-#define HandleUnlock() DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"Trying Unlock")); ithread_mutex_unlock(&GlobalHndMutex); DBGONLY(UpnpPrintf(UPNP_INFO,API,__FILE__,__LINE__,"Unlock"));
+#define HandleLock()  \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying Lock"); \
+	ithread_mutex_lock(&GlobalHndMutex); \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "LOCK");
+
+#define HandleUnlock() \
+	UpnpPrintf(UPNP_INFO, API,__FILE__, __LINE__, "Trying Unlock"); \
+	ithread_mutex_unlock(&GlobalHndMutex); \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Unlock");
+
 Upnp_Handle_Type GetClientHandleInfo(int *client_handle_out, 
                                      struct Handle_Info **HndInfo);
 Upnp_Handle_Type GetDeviceHandleInfo(int *device_handle_out, 
@@ -111,7 +124,7 @@ extern unsigned short LOCAL_PORT;
 extern TimerThread gTimerThread;
 extern ThreadPool gRecvThreadPool;
 extern ThreadPool gSendThreadPool;
-
+extern ThreadPool gMiniServerThreadPool;
 
 typedef enum {
     SUBSCRIBE,

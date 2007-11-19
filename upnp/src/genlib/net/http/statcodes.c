@@ -118,7 +118,7 @@ static xboolean gInitialized = FALSE;
 * Returns:																
 *	 void																
 ************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 init_table( IN const char *encoded_str,
             OUT const char *table[],
             IN int tbl_size )
@@ -144,7 +144,7 @@ init_table( IN const char *encoded_str,
 * Returns:																
 *	 void																
 ************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 init_tables( void )
 {
     init_table( Http1xxStr, Http1xxCodes, NUM_1XX_CODES );

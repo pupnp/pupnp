@@ -47,12 +47,6 @@
 #endif
 
 
-#ifdef NO_DEBUG
-#define DBG(x)
-#else
-#define DBG(x) x
-#endif
-
 #define GEMD_OUT_OF_MEMORY -1
 #define EVENT_TIMEDOUT -2
 #define EVENT_TERMINATE	-3
@@ -142,31 +136,28 @@ void linecopylen( OUT char dest[LINE_SIZE], IN const char* src, IN size_t srclen
 #endif
 
 //////////////////////////////////
-
 // C specific
 #ifndef __cplusplus
 
-#ifndef WIN32
- #define		XINLINE inline
-#else
+#ifdef WIN32
+	#ifndef S_ISREG
+		#define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+	#endif
 
- #ifndef S_ISREG
- #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
- #endif
- 
- #ifndef S_ISDIR
- #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
- #endif
+	#ifndef S_ISDIR
+		#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+	#endif
 
- #define EADDRINUSE WSAEADDRINUSE
+	#define EADDRINUSE WSAEADDRINUSE
 
- #define strcasecmp stricmp
- #define strncasecmp strnicmp
+	#define strcasecmp stricmp
+	#define strncasecmp strnicmp
 
- #define sleep(a) Sleep((a)*1000)
- #define usleep(a) Sleep((a)/1000)
+	#define sleep(a) Sleep((a)*1000)
+	#define usleep(a) Sleep((a)/1000)
 #endif
 
 #endif // __cplusplus
 
 #endif /* GENLIB_UTIL_UTIL_H */
+

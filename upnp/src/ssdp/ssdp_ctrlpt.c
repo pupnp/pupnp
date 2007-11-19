@@ -55,12 +55,12 @@
 
 
 /************************************************************************
-* Function : send_search_result											
-*																	
-* Parameters:														
+* Function : send_search_result
+*
+* Parameters:
 *	IN void *data: Search reply from the device
-*																	
-* Description:														
+*
+* Description:
 *	This function sends a callback to the control point application with 
 *	a SEARCH result
 *
@@ -125,16 +125,16 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
 
     // we are assuming that there can be only one client supported at a time
 
-    HandleLock(  );
+    HandleLock();
 
     if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         return;
     }
     // copy
     ctrlpt_callback = ctrlpt_info->Callback;
     ctrlpt_cookie = ctrlpt_info->Cookie;
-    HandleUnlock(  );
+    HandleUnlock();
 
     // search timeout
     if( timeout ) {
@@ -268,9 +268,9 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
             return;             // bad reply
         }
         //check each current search
-        HandleLock(  );
+        HandleLock();
         if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
-            HandleUnlock(  );
+            HandleUnlock();
             return;
         }
         node = ListHead( &ctrlpt_info->SsdpSearchList );
@@ -344,28 +344,30 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
             node = ListNext( &ctrlpt_info->SsdpSearchList, node );
         }
 
-        HandleUnlock(  );
+        HandleUnlock();
         //ctrlpt_callback( UPNP_DISCOVERY_SEARCH_RESULT, &param, cookie );
     }
 }
 
 /************************************************************************
-* Function : process_reply											
-*																	
-* Parameters:														
-*		IN char* request_buf: the response came from the device
-*		IN int buf_len: The length of the response buffer
-*	    IN struct sockaddr_in* dest_addr: The address of the device
-*		IN void *cookie : cookie passed by the control point application
-*							at the time of sending search message
+* Function : process_reply
 *
-* Description:														
+* Parameters:
+*	IN char* request_buf: the response came from the device
+*	IN int buf_len: The length of the response buffer
+*	IN struct sockaddr_in* dest_addr: The address of the device
+*	IN void *cookie : cookie passed by the control point application
+*		at the time of sending search message
+*
+* Description:
 *	This function processes reply recevied from a search
 *
 * Returns: void
 *
 ***************************************************************************/
-static XINLINE void
+#warning There are currently no uses of the function 'process_reply()' in the code.
+#warning 'process_reply()' is a good candidate for removal.
+static UPNP_INLINE void
 process_reply( IN char *request_buf,
                IN int buf_len,
                IN struct sockaddr_in *dest_addr,
@@ -388,17 +390,17 @@ process_reply( IN char *request_buf,
 }
 
 /************************************************************************
-* Function : CreateClientRequestPacket											
-*																	
-* Parameters:														
-*		IN char * RqstBuf:Output string in HTTP format.
-*		IN char *SearchTarget:Search Target
-*	    IN int Mx dest_addr: Number of seconds to wait to 
-*							collect all the responses
+* Function : CreateClientRequestPacket
 *
-* Description:														
+* Parameters:
+*	IN char * RqstBuf:Output string in HTTP format.
+*	IN char *SearchTarget:Search Target
+*	IN int Mx dest_addr: Number of seconds to wait to 
+*		collect all the responses
+*
+* Description:
 *	This function creates a HTTP search request packet 
-* depending on the input parameter.
+* 	depending on the input parameter.
 *
 * Returns: void
 *
@@ -430,12 +432,12 @@ CreateClientRequestPacket( IN char *RqstBuf,
 }
 
 /************************************************************************
-* Function : searchExpired											
-*																	
-* Parameters:														
+* Function : searchExpired
+*
+* Parameters:
 *		IN void * arg:
 *
-* Description:														
+* Description:
 *	This function 
 *
 * Returns: void
@@ -456,13 +458,13 @@ searchExpired( void *arg )
     void *cookie = NULL;
     int found = 0;
 
-    HandleLock(  );
+    HandleLock();
 
     //remove search target from search list
 
     if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
         free( id );
-        HandleUnlock(  );
+        HandleUnlock();
         return;
     }
 
@@ -483,7 +485,7 @@ searchExpired( void *arg )
         }
         node = ListNext( &ctrlpt_info->SsdpSearchList, node );
     }
-    HandleUnlock(  );
+    HandleUnlock();
 
     if( found ) {
         ctrlpt_callback( UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie );
@@ -536,11 +538,10 @@ SearchByTarget( IN int Mx,
     if( ReqBuf == NULL )
         return UPNP_E_OUTOF_MEMORY;
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                         ">>> SSDP SEND >>>\n%s\n", ReqBuf );
-         )
+    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+        ">>> SSDP SEND >>>\n%s\n", ReqBuf );
 
-        timeTillRead = Mx;
+    timeTillRead = Mx;
 
     if( timeTillRead < MIN_SEARCH_TIME ) {
         timeTillRead = MIN_SEARCH_TIME;
@@ -559,9 +560,9 @@ SearchByTarget( IN int Mx,
     FD_SET( gSsdpReqSocket, &wrSet );
 
     //add search criteria to list
-    HandleLock(  );
+    HandleLock();
     if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
-        HandleUnlock(  );
+        HandleUnlock();
         free( ReqBuf );
         return UPNP_E_INTERNAL_ERROR;
     }
@@ -582,33 +583,30 @@ SearchByTarget( IN int Mx,
     newArg->timeoutEventId = ( *id );
 
     ListAddTail( &ctrlpt_info->SsdpSearchList, newArg );
-    HandleUnlock(  );
+    HandleUnlock();
 
     setsockopt( gSsdpReqSocket, IPPROTO_IP, IP_MULTICAST_IF,
                 ( char * )&addr, sizeof( addr ) );
 
     if( select( gSsdpReqSocket + 1, NULL, &wrSet, NULL, NULL )
         == UPNP_SOCKETERROR ) {
-        DBGONLY( if( errno == EBADF ) {
-                 UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                             "SSDP_LIB :RequestHandler:An invalid file descriptor"
-                             " was givenin one of the sets. \n" );}
-                 else
-                 if( errno == EINTR ) {
-                 UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                             "SSDP_LIB :RequestHandler:  A non blocked "
-                             "signal was caught.    \n" );}
-                 else
-                 if( errno == EINVAL ) {
-                 UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                             "SSDP_LIB :RequestHandler: n is negative.  \n" );}
-                 else
-                 if( errno == ENOMEM ) {
-                 UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                             "SSDP_LIB : RequestHandler:select was unable to "
-                             "allocate memory for internal tables.\n" );}
- )
-shutdown( gSsdpReqSocket, SD_BOTH );
+        if( errno == EBADF ) {
+            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                "SSDP_LIB :RequestHandler:An invalid file descriptor"
+                " was givenin one of the sets. \n" );
+        } else if( errno == EINTR ) {
+            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                "SSDP_LIB :RequestHandler:  A non blocked "
+                "signal was caught.    \n" );
+        } else if( errno == EINVAL ) {
+            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                "SSDP_LIB :RequestHandler: n is negative.  \n" );
+        } else if( errno == ENOMEM ) {
+            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                "SSDP_LIB : RequestHandler:select was unable to "
+                "allocate memory for internal tables.\n" );
+        }
+	shutdown( gSsdpReqSocket, SD_BOTH );
         UpnpCloseSocket( gSsdpReqSocket );
         free( ReqBuf );
         return UPNP_E_INTERNAL_ERROR;

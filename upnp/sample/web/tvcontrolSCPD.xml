@@ -7,7 +7,6 @@
   </specVersion>
 
 
-
   <actionList>
 
     <action>
@@ -39,17 +38,18 @@
       <argumentList>
 
         <argument>
+        <name>Channel</name>
+          <relatedStateVariable>Channel</relatedStateVariable>
+          <direction>in</direction>
+        </argument>
+
+        <argument>
          <name>NewChannel</name>
          <retval />
          <relatedStateVariable>Channel</relatedStateVariable>
          <direction>out</direction>
         </argument>
 
-        <argument>
-        <name>Channel</name>
-          <relatedStateVariable>Channel</relatedStateVariable>
-          <direction>in</direction>
-        </argument>
       </argumentList>
     </action>
 
@@ -80,6 +80,11 @@
     <action>
       <name>SetVolume</name>
       <argumentList>
+        <argument>
+        <name>Volume</name>
+          <relatedStateVariable>Volume</relatedStateVariable>
+          <direction>in</direction>
+        </argument>
 
         <argument>
          <name>NewVolume</name>
@@ -87,11 +92,6 @@
          <relatedStateVariable>Volume</relatedStateVariable>
          <direction>out</direction>
          </argument>
-        <argument>
-        <name>Volume</name>
-          <relatedStateVariable>Volume</relatedStateVariable>
-          <direction>in</direction>
-        </argument>
       </argumentList>
     </action>
 
@@ -123,9 +123,6 @@
     </action>
 
   </actionList>
-
-
-
 
   <serviceStateTable>
 

@@ -205,7 +205,7 @@ extern str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES];
 * Returns:																
 *	 void																
 ************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 media_list_init( void )
 {
     int i;
@@ -243,7 +243,7 @@ media_list_init( void )
 *	 0 on success;														
 *	-1 on error															
 ************************************************************************/
-static XINLINE int
+static UPNP_INLINE int
 search_extension( IN const char *extension,
                   OUT const char **con_type,
                   OUT const char **con_subtype )
@@ -290,7 +290,7 @@ search_extension( IN const char *extension,
 *	 0 - On Sucess														
 *	 UPNP_E_OUTOF_MEMORY - on memory allocation failures				
 ************************************************************************/
-XINLINE int
+UPNP_INLINE int
 get_content_type( IN const char *filename,
                   OUT DOMString * content_type )
 {
@@ -348,7 +348,7 @@ get_content_type( IN const char *filename,
 * Returns:																
 *	 void																
 ************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 glob_alias_init( void )
 {
     struct xml_alias_t *alias = &gAliasDoc;
@@ -370,7 +370,7 @@ glob_alias_init( void )
 * Returns:																
 *	 BOOLEAN															
 ************************************************************************/
-static XINLINE xboolean
+static UPNP_INLINE xboolean
 is_valid_alias( IN const struct xml_alias_t *alias )
 {
     return alias->doc.buf != NULL;
@@ -637,13 +637,13 @@ get_file_info( IN const char *filename,
 
     rc = get_content_type( filename, &info->content_type );
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "file info: %s, length: %lld, last_mod=%s readable=%d\n",
-                         filename, (long long)info->file_length,
-                         asctime( gmtime( &info->last_modified ) ),
-                         info->is_readable ); )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "file info: %s, length: %lld, last_mod=%s readable=%d\n",
+        filename, (long long)info->file_length,
+        asctime( gmtime( &info->last_modified ) ),
+        info->is_readable );
 
-        return rc;
+    return rc;
 }
 
 /************************************************************************
@@ -700,7 +700,7 @@ web_server_set_root_dir( IN const char *root_dir )
 *	TRUE - On Success													
 *	FALSE if request is not an alias									
 ************************************************************************/
-static XINLINE xboolean
+static UPNP_INLINE xboolean
 get_alias( IN const char *request_file,
            OUT struct xml_alias_t *alias,
            OUT struct File_Info *info )
@@ -1586,14 +1586,11 @@ http_RecvPostMessage( http_parser_t * parser,
                 }
             } else if( num_read == 0 ) {
                 if( ok_on_close ) {
-                    DBGONLY( UpnpPrintf
-                             ( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                               "<<< (RECVD) <<<\n%s\n-----------------\n",
-                               parser->msg.msg.buf );
-                             //print_http_headers( &parser->msg );
-                         )
-
-                        parser->position = POS_COMPLETE;
+                    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                        "<<< (RECVD) <<<\n%s\n-----------------\n",
+                        parser->msg.msg.buf );
+                    print_http_headers( &parser->msg );
+                    parser->position = POS_COMPLETE;
                 } else {
                     // partial msg
                     parser->http_error_code = HTTP_BAD_REQUEST; // or response
@@ -1760,10 +1757,9 @@ web_server_callback( IN http_parser_t * parser,
         }
     }
 
-    DBGONLY( UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                         "webserver: request processed...\n" );
-         )
+    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "webserver: request processed...\n" );
 
-        membuffer_destroy( &headers );
+    membuffer_destroy( &headers );
     membuffer_destroy( &filename );
 }

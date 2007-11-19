@@ -1,15 +1,19 @@
-# $Id: Makefile.am,v 1.5 2006/04/29 20:12:50 r3mi Exp $
+
 #
 # Top-level "Makefile.am" for libupnp
 #
-# Copyright (C) 2005 Rémi Turboult <r3mi@users.sourceforge.net>
+# Copyright (C) 2005 Rï¿½mi Turboult <r3mi@users.sourceforge.net>
 #
 
 ACLOCAL_AMFLAGS = -I m4
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-debug --enable-samples
 
-SUBDIRS = ixml threadutil upnp docs/dist
+SUBDIRS = \
+	ixml \
+	threadutil \
+	upnp \
+	docs/dist
 
 
 EXTRA_DIST = \
@@ -23,7 +27,8 @@ EXTRA_DIST = \
 	build/libupnp.dsw \
 	build/inc/autoconfig.h \
 	build/inc/config.h \
-	build/inc/upnpconfig.h
+	build/inc/upnpconfig.h \
+	build/msvc/inttypes.h
 
 
 # This variable must have 'exec' in its name, in order to be installed 
@@ -31,11 +36,12 @@ EXTRA_DIST = \
 pkgconfigexecdir = $(libdir)/pkgconfig
 pkgconfigexec_DATA = libupnp.pc
 
+
 $(pkgconfigexec_DATA): config.status
 
 
 if WITH_DOCUMENTATION
-    doc_DATA = LICENSE README NEWS TODO THANKS
+	doc_DATA = LICENSE README NEWS TODO THANKS
 endif
 
 

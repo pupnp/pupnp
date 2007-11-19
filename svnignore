@@ -1,0 +1,14 @@
+.deps
+.dirstamp
+.libs
+.*.swp
+*~
+Makefile
+Makefile.in
+aclocal.m4
+autoconfig.h*
+autom4te.cache
+config*
+libtool
+libupnp.pc
+stamp-h*

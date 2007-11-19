@@ -1,58 +1,60 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * * Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * * Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * * Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
 #ifndef _IXML_H_
 #define _IXML_H_
 
+
 #include <stdio.h>
 #include <string.h>
-//#include <malloc.h>
 #include <assert.h>
 
+
 #ifdef WIN32
- #ifndef UPNP_STATIC_LIB
-  #ifdef LIBUPNP_EXPORTS
-  // set up declspec for dll export to make functions visible to library users
-   #define EXPORT_SPEC __declspec(dllexport)
-  #else
-   #define EXPORT_SPEC __declspec(dllimport)
-  #endif
- #else
-  #define EXPORT_SPEC
- #endif
+	#ifndef UPNP_STATIC_LIB
+		#ifdef LIBUPNP_EXPORTS
+			/* set up declspec for dll export to make functions visible to library users */
+			#define EXPORT_SPEC __declspec(dllexport)
+		#else
+			#define EXPORT_SPEC __declspec(dllimport)
+		#endif
+	#else
+		#define EXPORT_SPEC
+	#endif
 #else
- #define EXPORT_SPEC
+	#define EXPORT_SPEC
 #endif
 
 typedef int BOOL;
+
 
 #define DOMString   char *
 
@@ -88,7 +90,7 @@ typedef int BOOL;
  * etc., refer to section 1.1 of the DOM2-Core recommendation.
  */
 
-//@{
+/*! @{ */
 
 /*================================================================
 *
@@ -121,7 +123,7 @@ typedef enum
 *
 *=================================================================*/
 typedef enum 
-{   // see DOM spec
+{   /* see DOM spec */
     IXML_INDEX_SIZE_ERR                 = 1,
     IXML_DOMSTRING_SIZE_ERR             = 2,
     IXML_HIERARCHY_REQUEST_ERR          = 3,
@@ -240,7 +242,7 @@ extern "C" {
  * its functionality.  For more information, refer to DOM2-Core page 34.
  */
 
-//@{
+/*! @{ */
 
   /** Returns the name of the {\bf Node}, depending on what type of 
    *  {\bf Node} it is, in a read-only string. Refer to the table in the 
@@ -634,7 +636,7 @@ ixmlNode_free(IXML_Node *nodeptr
 		/** The {\bf Node} to free. */
              );
 
-//@}
+/*! @} */
 
 /*================================================================
 *
@@ -649,7 +651,7 @@ ixmlNode_free(IXML_Node *nodeptr
  * allowable attributes and values for a particular element.  For more 
  * information, refer to the {\it Interface Attr} section in the DOM2-Core.
  */
-//@{
+/*! @{ */
 
 
   /** Frees an {\bf Attr} node.
@@ -662,7 +664,7 @@ ixmlAttr_free(IXML_Attr *attrNode
 		/** The {\bf Attr} node to free.  */
              );
 
-//@}
+/*! @} */
 
 
 /*================================================================
@@ -680,7 +682,7 @@ ixmlAttr_free(IXML_Attr *attrNode
  * information, refer to the {\it Interface CDATASection} section in the
  * DOM2-Core.
  */
-//@{
+/*! @{ */
 
 
   /** Initializes a {\bf CDATASection} node.
@@ -704,7 +706,7 @@ ixmlCDATASection_free(IXML_CDATASection *nodeptr
 		        /** The {\bf CDATASection} node to free. */
                      );
 
-//@}
+/*! @} */
 
 /*================================================================
 *
@@ -719,7 +721,7 @@ ixmlCDATASection_free(IXML_CDATASection *nodeptr
  * primary interface to the elements of the document.  For more information,
  * refer to the {\it Interface Document} section in the DOM2Core.
  */
-//@{
+/*! @{ */
 
   /** Initializes a {\bf Document} node.
    *
@@ -947,7 +949,7 @@ ixmlDocument_getElementsByTagName(IXML_Document *doc,
 				    /** The tag name to find. */
                                  );
 
-// introduced in DOM level 2
+/* introduced in DOM level 2 */
 
   /** Creates a new {\bf Element} node in the given qualified name and
    *  namespace URI.
@@ -1128,7 +1130,7 @@ ixmlDocument_importNode(IXML_Document* doc,
 			  /** A pointer to a new {\bf Node} owned by {\bf 
 			      doc}. */
                        );
-//@}
+/*! @} */
 
 /*================================================================
 *
@@ -1144,7 +1146,7 @@ ixmlDocument_importNode(IXML_Document* doc,
  * extends the {\bf Node} interface and adds more operations to manipulate
  * attributes.
  */
-//@{
+/*! @{ */
 
   /** Initializes a {\bf IXML_Element} node.
    *
@@ -1314,7 +1316,7 @@ ixmlElement_getElementsByTagName(IXML_Element* element,
 				       search. */
                                 );
 
-// introduced in DOM 2
+/* introduced in DOM 2 */
 
   /** Retrieves an attribute value using the local name and namespace URI.
    *
@@ -1493,7 +1495,7 @@ ixmlElement_free(IXML_Element* element
 		   /** The {\bf Element} to free. */
                 );
 
-//@}
+/*! @} */
 
 /*================================================================
 *
@@ -1508,7 +1510,7 @@ ixmlElement_free(IXML_Element* element
  * no particular order.  The {\bf Node} interface uses a {\bf NamedNodeMap}
  * to maintain the attributes of a node.
  */
-//@{
+/*! @{ */
 
   /** Returns the number of items contained in this {\bf NamedNodeMap}.
    *
@@ -1579,7 +1581,7 @@ ixmlNamedNodeMap_item(IXML_NamedNodeMap *nnMap,
 		        /** The index into the map to remove. */
                      );
 
-// introduced in DOM level 2
+/* introduced in DOM level 2 */
 
   /** Retrieves a {\bf Node} from a {\bf NamedNodeMap} specified by
    *  namespace URI and local name.
@@ -1646,7 +1648,7 @@ ixmlNamedNodeMap_free(IXML_NamedNodeMap *nnMap
 		        /** The {\bf NamedNodeMap to free}. */
                      );
 
-//@}
+/*! @} */
 
 /*================================================================
 *
@@ -1661,7 +1663,7 @@ ixmlNamedNodeMap_free(IXML_NamedNodeMap *nnMap
  * the nodes contained in a {\bf NodeList}.  The DOM2-Core refers to
  * this as being {\it live}.
  */
-//@{
+/*! @{ */
 
   /** Retrieves a {\bf Node} from a {\bf NodeList} specified by a 
    *  numerical index.
@@ -1701,8 +1703,8 @@ ixmlNodeList_free(IXML_NodeList *nList
 		    /** The {\bf NodeList} to free.  */
                  );
 
-//@} Interface NodeList
-//@} DOM Interfaces
+/*! @} */ /* Interface NodeList */
+/*! @} */ /* DOM Interfaces */
 
 /**@name IXML API
  * The IXML API contains utility functions that are not part of the standard
@@ -1710,7 +1712,7 @@ ixmlNodeList_free(IXML_NodeList *nList
  * file or buffer, create an XML file from a DOM structure, and manipulate 
  * DOMString objects.
  */
-//@{
+/*! @{ */
 
 /*================================================================
 * 
@@ -1738,7 +1740,7 @@ ixmlNodeList_free(IXML_NodeList *nList
    *                      of the DOM tree or {\tt NULL} on an error.
    */
 
-DOMString
+EXPORT_SPEC DOMString
 ixmlPrintDocument(IXML_Document *doc);
 
   /** Renders a {\bf Node} and all sub-elements into an XML text
@@ -1756,7 +1758,7 @@ ixmlPrintDocument(IXML_Document *doc);
    *                      of the DOM tree or {\tt NULL} on an error.
    */
 
-DOMString   
+EXPORT_SPEC DOMString   
 ixmlPrintNode(IXML_Node *doc  
                 /** The root of the {\bf Node} tree to render to XML text. */
              );
@@ -1777,7 +1779,7 @@ ixmlPrintNode(IXML_Node *doc
    *                      of the DOM tree or {\tt NULL} on an error.
    */
 
-DOMString
+EXPORT_SPEC DOMString
 ixmlDocumenttoString(IXML_Document *doc);
 
   /** Renders a {\bf Node} and all sub-elements into an XML text
@@ -1809,7 +1811,7 @@ ixmlNodetoString(IXML_Node *doc
    * characters are replaced by the {\bf errorChar}, and invalid "&" entities 
    * are left untranslated. The parsing is then allowed to continue.
    */
-void
+EXPORT_SPEC void
 ixmlRelaxParser(char errorChar);
 
 
@@ -1913,6 +1915,7 @@ ixmlFreeDOMString(DOMString buf
 }
 #endif
 
-//@} IXML API
+/*! @} */ /* IXML API */
 
-#endif  // _IXML_H_
+#endif  /* _IXML_H_ */
+

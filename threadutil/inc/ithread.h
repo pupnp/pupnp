@@ -1,33 +1,33 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * * Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * * Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * * Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
 #ifndef ITHREADH
 #define ITHREADH
@@ -36,15 +36,9 @@ extern "C" {
 #endif
 
 
-#ifdef DEBUG
-#define DEBUG_ONLY(x) x
-#else
-#define DEBUG_ONLY(x)
-#endif
-
 #include <pthread.h>
 #ifndef WIN32
- #include <unistd.h>
+	#include <unistd.h>
 #endif
 
 #ifdef __FreeBSD__
@@ -548,23 +542,23 @@ extern "C" {
 #define imillisleep(x) usleep(1000*x)
 
 #ifdef WIN32
- #ifndef UPNP_STATIC_LIB
-  #ifdef LIBUPNP_EXPORTS
-   // set up declspec for dll export to make functions visible to library users
-   #define EXPORT_SPEC __declspec(dllexport)
-  #else
-   #define EXPORT_SPEC __declspec(dllimport)
-  #endif
- #else
-  #define EXPORT_SPEC
- #endif
+	#ifndef UPNP_STATIC_LIB
+		#ifdef LIBUPNP_EXPORTS
+			/* set up declspec for dll export to make functions visible to library users */
+			#define EXPORT_SPEC __declspec(dllexport)
+		#else
+			#define EXPORT_SPEC __declspec(dllimport)
+		#endif
+	#else
+		#define EXPORT_SPEC
+	#endif
 #else
- #define EXPORT_SPEC
+	#define EXPORT_SPEC
 #endif
 
 
 #ifndef PTHREAD_MUTEX_RECURSIVE
-//NK: Added for satisfying the gcc compiler  
+/* NK: Added for satisfying the gcc compiler */
 EXPORT_SPEC int pthread_mutexattr_setkind_np(pthread_mutexattr_t *attr, int kind);
 #endif
 
@@ -572,4 +566,5 @@ EXPORT_SPEC int pthread_mutexattr_setkind_np(pthread_mutexattr_t *attr, int kind
 }
 #endif
 
-#endif //ITHREADH
+#endif /* ITHREADH */
+

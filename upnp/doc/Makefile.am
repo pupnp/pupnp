@@ -2,7 +2,7 @@
 #
 # "Makefile.am" for "libunp/upnp/doc" 
 #
-# (C) Copyright 2005 Rémi Turboult <r3mi@users.sourceforge.net>
+# (C) Copyright 2005 Rï¿½mi Turboult <r3mi@users.sourceforge.net>
 #
 ##########################################################################
 #

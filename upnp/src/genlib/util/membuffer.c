@@ -171,7 +171,7 @@ memptr_cmp_nocase( IN memptr * m,
 *
 *	Note :
 ************************************************************************/
-static XINLINE void
+static UPNP_INLINE void
 membuffer_initialize( INOUT membuffer * m )
 {
     m->buf = NULL;

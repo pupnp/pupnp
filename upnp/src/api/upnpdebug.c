@@ -88,18 +88,19 @@ UpnpSetLogFileNames ( IN const char *ErrFileName,
 
 
 /***************************************************************************
- * Function : UpnpInitLog					
- *									
- * Parameters:	void							
- *						
- * Description:							
+ * Function : UpnpInitLog
+ *
+ * Parameters:	void
+ *
+ * Description:
  *	This functions initializes the log files
+ *
  * Returns: int
  *	-1 : If fails
  *	UPNP_E_SUCCESS : if success
  ***************************************************************************/
 int
-UpnpInitLog(  )
+UpnpInitLog()
 {
     ithread_mutex_init( &GlobalDebugMutex, NULL );
 
@@ -116,7 +117,7 @@ UpnpInitLog(  )
 /***************************************************************************
  * Function : UpnpSetLogLevel
  *				
- * Parameters:	void
+ * Parameters:	Upnp_LogLevel log_level
  *
  * Description:							
  *	This functions set the log level (see {\tt Upnp_LogLevel}
@@ -139,7 +140,7 @@ UpnpSetLogLevel (Upnp_LogLevel log_level)
  * Returns: void
  ***************************************************************************/
 void
-UpnpCloseLog(  )
+UpnpCloseLog()
 {
     if( DEBUG_TARGET == 1 ) {
         fflush( ErrFileHnd );
@@ -153,10 +154,46 @@ UpnpCloseLog(  )
 
 
 /***************************************************************************
+ * Function : DebugAtThisLevel					
+ *									
+ * Parameters:			
+ *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
+ *		whether debug statement will go to standard output, 
+ *		or any of the log files.
+ *	IN Dbg_Module Module: debug will go in the name of this module
+ *					
+ * Description:					
+ *	This functions returns true if debug output should be done in this
+ *	module.
+ *
+ * Returns: int
+ ***************************************************************************/
+#ifdef DEBUG
+int DebugAtThisLevel(
+	IN Upnp_LogLevel DLevel,
+	IN Dbg_Module Module)
+{
+	int ret = g_log_level >= DLevel;
+	ret &=
+		DEBUG_ALL ||
+		(Module == SSDP  && DEBUG_SSDP ) ||
+		(Module == SOAP  && DEBUG_SOAP ) ||
+		(Module == GENA  && DEBUG_GENA ) ||
+		(Module == TPOOL && DEBUG_TPOOL) ||
+		(Module == MSERV && DEBUG_MSERV) ||
+		(Module == DOM   && DEBUG_DOM  ) ||
+		(Module == HTTP  && DEBUG_HTTP );
+	
+	return ret;
+}
+#endif
+
+
+/***************************************************************************
  * Function : UpnpPrintf					
  *									
  * Parameters:			
- *	IN Dbg_Level DLevel: The level of the debug logging. It will decide 
+ *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -173,71 +210,53 @@ UpnpCloseLog(  )
  *	statement is coming
  * Returns: void
  ***************************************************************************/
-DBGONLY( void UpnpPrintf( IN Upnp_LogLevel DLevel,
-                          IN Dbg_Module Module,
-                          IN const char *DbgFileName,
-                          IN int DbgLineNo,
-                          IN const char *FmtStr,
-                          ... ) {
-
-         va_list ArgList;
-         va_start( ArgList, FmtStr );
-         if( g_log_level < DLevel ) return; if( DEBUG_ALL == 0 ) {
-         switch ( Module ) {
-case SSDP:
-         if( DEBUG_SSDP == 1 ) break;
-         else
-return; case SOAP:
-         if( DEBUG_SOAP == 1 ) break;
-         else
-return; case GENA:
-         if( DEBUG_GENA == 1 ) break;
-         else
-return; case TPOOL:
-         if( DEBUG_TPOOL == 1 ) break;
-         else
-return; case MSERV:
-         if( DEBUG_MSERV == 1 ) break;
-         else
-return; case DOM:
-         if( DEBUG_DOM == 1 ) break;
-         else
-return; case HTTP:
-         if( DEBUG_HTTP == 1 ) break;
-         else
-return; case API:
-         if( DEBUG_API == 1 ) break;
-         else
-return; default:
-         return;}
-         }
-
-         ithread_mutex_lock( &GlobalDebugMutex ); if( DEBUG_TARGET == 0 ) {
-         if( DbgFileName ) {
-         UpnpDisplayFileAndLine( stdout, DbgFileName, DbgLineNo );}
-         vfprintf( stdout, FmtStr, ArgList ); fflush( stdout );}
-         else
-         {
-         if( DLevel == 0 ) {
-         if( DbgFileName ) {
-         UpnpDisplayFileAndLine( ErrFileHnd, DbgFileName, DbgLineNo );}
-         vfprintf( ErrFileHnd, FmtStr, ArgList ); fflush( ErrFileHnd );}
-         else
-         {
-         if( DbgFileName ) {
-         UpnpDisplayFileAndLine( InfoFileHnd, DbgFileName, DbgLineNo );}
-         vfprintf( InfoFileHnd, FmtStr, ArgList ); fflush( InfoFileHnd );}
-         }
-         va_end( ArgList ); ithread_mutex_unlock( &GlobalDebugMutex );}
-
- )
+#ifdef DEBUG
+void UpnpPrintf(
+	IN Upnp_LogLevel DLevel,
+	IN Dbg_Module Module,
+	IN const char *DbgFileName,
+	IN int DbgLineNo,
+	IN const char *FmtStr,
+	... )
+{
+	va_list ArgList;
+	
+	if (!DebugAtThisLevel(DLevel, Module)) {
+		return;
+	}
+	
+	ithread_mutex_lock(&GlobalDebugMutex);
+	va_start(ArgList, FmtStr);
+	if (!DEBUG_TARGET) {
+		if( DbgFileName ) {
+			UpnpDisplayFileAndLine(stdout, DbgFileName, DbgLineNo);
+		}
+		vfprintf(stdout, FmtStr, ArgList);
+		fflush(stdout);
+	} else if (DLevel == 0) {
+		if (DbgFileName) {
+			UpnpDisplayFileAndLine(ErrFileHnd, DbgFileName, DbgLineNo);
+		}
+		vfprintf(ErrFileHnd, FmtStr, ArgList);
+		fflush(ErrFileHnd);
+	} else {
+		if (DbgFileName) {
+			UpnpDisplayFileAndLine(InfoFileHnd, DbgFileName, DbgLineNo);
+		}
+		vfprintf(InfoFileHnd, FmtStr, ArgList);
+		fflush(InfoFileHnd);
+	}
+	va_end(ArgList);
+	ithread_mutex_unlock(&GlobalDebugMutex);
+}
+#endif
 
 
 /***************************************************************************
  * Function : UpnpGetDebugFile					
  *				
  * Parameters:			
- *	IN Dbg_Level DLevel: The level of the debug logging. It will decide 
+ *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -249,46 +268,26 @@ return; default:
  *	NULL : if the module is turn off for debug 
  *	else returns the right file descriptor
  ***************************************************************************/
-    DBGONLY( FILE * GetDebugFile( Upnp_LogLevel DLevel, Dbg_Module Module ) {
-             if( g_log_level < DLevel ) return NULL; if( DEBUG_ALL == 0 ) {
-             switch ( Module ) {
-case SSDP:
-             if( DEBUG_SSDP == 1 ) break;
-             else
-return NULL; case SOAP:
-             if( DEBUG_SOAP == 1 ) break;
-             else
-return NULL; case GENA:
-             if( DEBUG_GENA == 1 ) break;
-             else
-return NULL; case TPOOL:
-             if( DEBUG_TPOOL == 1 ) break;
-             else
-return NULL; case MSERV:
-             if( DEBUG_MSERV == 1 ) break;
-             else
-return NULL; case DOM:
-             if( DEBUG_DOM == 1 ) break;
-             else
-return NULL; case API:
-             if( DEBUG_API == 1 ) break;
-             else
-return NULL; default:
-             return NULL;}
-             }
+#ifdef DEBUG
+FILE *GetDebugFile( Upnp_LogLevel DLevel, Dbg_Module Module )
+{
+	FILE *ret;
 
-             if( DEBUG_TARGET == 0 ) {
-             return stdout;}
-             else
-             {
-             if( DLevel == 0 ) {
-             return ErrFileHnd;}
-             else
-             {
-             return InfoFileHnd;}
-             }
-             }
- )
+	if (!DebugAtThisLevel(DLevel, Module)) {
+		ret = NULL;
+	}
+	
+	if (!DEBUG_TARGET) {
+		ret = stdout;
+	} else if (DLevel == 0) {
+		ret = ErrFileHnd;
+	} else {
+		ret = InfoFileHnd;
+	}
+
+	return ret;
+}
+#endif
 
 
 /***************************************************************************
@@ -305,17 +304,26 @@ return NULL; default:
  *		debug statement is coming to the log file
  * Returns: void
  ***************************************************************************/
-    DBGONLY( void UpnpDisplayFileAndLine( IN FILE * fd,
-                                          IN const char *DbgFileName,
-                                          IN int DbgLineNo ) {
-             int starlength = 66;
-             const char *lines[2];
-             char FileAndLine[500]; lines[0] = "DEBUG"; if( DbgFileName ) {
-             sprintf( FileAndLine, "FILE: %s, LINE: %d", DbgFileName,
-                      DbgLineNo ); lines[1] = FileAndLine;}
-
-             UpnpDisplayBanner( fd, lines, 2, starlength ); fflush( fd );}
- )
+#ifdef DEBUG
+void UpnpDisplayFileAndLine(
+	IN FILE * fd,
+	IN const char *DbgFileName,
+	IN int DbgLineNo)
+{
+	int starlength = 66;
+	const char *lines[2];
+	char FileAndLine[500];
+	lines[0] = "DEBUG";
+	if (DbgFileName) {
+		sprintf(FileAndLine,
+			"FILE: %s, LINE: %d",
+			DbgFileName, DbgLineNo);
+		lines[1] = FileAndLine;
+	}
+	UpnpDisplayBanner(fd, lines, 2, starlength);
+	fflush(fd);
+}
+#endif
 
 
 /***************************************************************************
@@ -332,47 +340,58 @@ return NULL; default:
  *	per the requested banner
  * Returns: void
  ***************************************************************************/
-    DBGONLY( void UpnpDisplayBanner( IN FILE * fd,
-                                     IN const char **lines,
-                                     IN size_t size,
-                                     IN int starLength ) {
-             char *stars = ( char * )malloc( starLength + 1 );
-             const char *line = NULL;
-             int leftMarginLength = starLength / 2 + 1;
-             int rightMarginLength = starLength / 2 + 1;
-             char *leftMargin = ( char * )malloc( leftMarginLength );
-             char *rightMargin = ( char * )malloc( rightMarginLength );
-             int i = 0;
-             int LineSize = 0;
-             char *currentLine = ( char * )malloc( starLength + 1 );
-             memset( stars, '*', starLength );
-             stars[starLength] = 0;
-             memset( leftMargin, 0, leftMarginLength );
-             memset( rightMargin, 0, rightMarginLength );
-             fprintf( fd, "\n%s\n", stars ); for( i = 0; i < size; i++ ) {
-             LineSize = strlen( lines[i] );
-             line = lines[i]; while( LineSize > ( starLength - 2 ) ) {
-             memcpy( currentLine, line, ( starLength - 2 ) );
-             currentLine[( starLength - 2 )] = 0;
-             fprintf( fd, "*%s*\n", currentLine );
-             LineSize -= ( starLength - 2 ); line += ( starLength - 2 );}
+#ifdef DEBUG
+void UpnpDisplayBanner(
+	IN FILE * fd,
+	IN const char **lines,
+	IN size_t size,
+	IN int starLength)
+{
+	int leftMarginLength = starLength / 2 + 1;
+	int rightMarginLength = starLength / 2 + 1;
+	int i = 0;
+	int LineSize = 0;
+	int starLengthMinus2 = starLength - 2;
 
-             if( LineSize % 2 == 0 ) {
-             leftMarginLength = rightMarginLength =
-             ( ( starLength - 2 ) - LineSize ) / 2;}
-             else
-             {
-             leftMarginLength = ( ( starLength - 2 ) - LineSize ) / 2;
-             rightMarginLength =
-             ( ( starLength - 2 ) - LineSize ) / 2 + 1;}
+	char *leftMargin = ( char * )malloc( leftMarginLength );
+	char *rightMargin = ( char * )malloc( rightMarginLength );
+	char *stars = ( char * )malloc( starLength + 1 );
+	char *currentLine = ( char * )malloc( starLength + 1 );
+	const char *line = NULL;
 
-             memset( leftMargin, ' ', leftMarginLength );
-             memset( rightMargin, ' ', rightMarginLength );
-             leftMargin[leftMarginLength] = 0;
-             rightMargin[rightMarginLength] = 0;
-             fprintf( fd, "*%s%s%s*\n", leftMargin, line, rightMargin );}
+	memset( stars, '*', starLength );
+	stars[starLength] = 0;
+	memset( leftMargin, 0, leftMarginLength );
+	memset( rightMargin, 0, rightMarginLength );
+	fprintf( fd, "\n%s\n", stars );
+	for( i = 0; i < size; i++ ) {
+		LineSize = strlen( lines[i] );
+		line = lines[i];
+		while( LineSize > starLengthMinus2 ) {
+			memcpy( currentLine, line, starLengthMinus2 );
+			currentLine[starLengthMinus2] = 0;
+			fprintf( fd, "*%s*\n", currentLine );
+			LineSize -= starLengthMinus2;
+			line += starLengthMinus2;
+		}
+		leftMarginLength = (starLengthMinus2 - LineSize)/2;
+		if( LineSize % 2 == 0 ) {
+			rightMarginLength = leftMarginLength;
+		} else {
+			rightMarginLength = leftMarginLength + 1;
+		}
+		memset( leftMargin, ' ', leftMarginLength );
+		memset( rightMargin, ' ', rightMarginLength );
+		leftMargin[leftMarginLength] = 0;
+		rightMargin[rightMarginLength] = 0;
+		fprintf( fd, "*%s%s%s*\n", leftMargin, line, rightMargin );
+	}
+	fprintf( fd, "%s\n\n", stars );
 
-             fprintf( fd, "%s\n\n", stars );
-             free( leftMargin );
-             free( rightMargin ); free( stars ); free( currentLine );}
- )
+	free( currentLine );
+	free( stars );
+	free( rightMargin );
+	free( leftMargin );
+}
+#endif
+ 

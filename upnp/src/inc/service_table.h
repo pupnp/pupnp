@@ -47,7 +47,7 @@ extern "C" {
 
 #define SID_SIZE  41
 
-DEVICEONLY(
+#ifdef INCLUDE_DEVICE_APIS
 
 typedef struct SUBSCRIPTION {
   Upnp_SID sid;
@@ -61,17 +61,18 @@ typedef struct SUBSCRIPTION {
 
 
 typedef struct SERVICE_INFO {
-  DOMString serviceType;
-  DOMString serviceId;
+  DOMString	serviceType;
+  DOMString	serviceId;
   char		*SCPDURL ;
   char		*controlURL;
   char		*eventURL;
-  DOMString UDN;
+  DOMString	UDN;
   int		active;
   int		TotalSubscriptions;
-  subscription			*subscriptionList;
+  subscription	*subscriptionList;
   struct SERVICE_INFO	 *next;
 } service_info;
+
 
 typedef struct SERVICE_TABLE {
   DOMString URLBase;
@@ -80,7 +81,7 @@ typedef struct SERVICE_TABLE {
 } service_table;
 
 
-/*			Functions for Subscriptions				*/
+/* Functions for Subscriptions */
 
 /************************************************************************
 *	Function :	copy_subscription
@@ -253,7 +254,7 @@ service_info * FindServiceControlURLPath( service_table *table,
 *
 *	Parameters :
 *		service_info *service ;Service whose information is to be printed
-*		Dbg_Level level ; Debug level specified to the print function
+*		Upnp_LogLevel level ; Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints information from the 
@@ -263,16 +264,24 @@ service_info * FindServiceControlURLPath( service_table *table,
 *
 *	Note :
 ************************************************************************/
-DBGONLY(void printService(service_info *service,Dbg_Level
-				   level,
-				   Dbg_Module module));
+#ifdef DEBUG
+void printService(
+	service_info *service,
+	Upnp_LogLevel level,
+	Dbg_Module module);
+#else
+static UPNP_INLINE void printService(
+	service_info *service,
+	Upnp_LogLevel level,
+	Dbg_Module module) {}
+#endif
 
 /************************************************************************
 *	Function :	printServiceList
 *
 *	Parameters :
 *		service_info *service ;	Service whose information is to be printed
-*		Dbg_Level level ;	Debug level specified to the print function
+*		Upnp_LogLevel level ;	Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints information of each 
@@ -282,15 +291,24 @@ DBGONLY(void printService(service_info *service,Dbg_Level
 *
 *	Note :
 ************************************************************************/
-DBGONLY(void printServiceList(service_info *service,
-				       Dbg_Level level, Dbg_Module module));
+#ifdef DEBUG
+void printServiceList(
+	service_info *service,
+	Upnp_LogLevel level,
+	Dbg_Module module);
+#else
+static UPNP_INLINE void printServiceList(
+	service_info *service,
+	Upnp_LogLevel level,
+	Dbg_Module module) {}
+#endif
 
 /************************************************************************
 *	Function :	printServiceTable
 *
 *	Parameters :
 *		service_table * table ;	Service table to be printed
-*		Dbg_Level level ;	Debug level specified to the print function
+*		Upnp_LogLevel level ;	Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints the URL base of the table
@@ -301,9 +319,17 @@ DBGONLY(void printServiceList(service_info *service,
 *
 *	Note :
 ************************************************************************/
-DBGONLY(void printServiceTable(service_table *
-					table,Dbg_Level
-					level,Dbg_Module module));
+#ifdef DEBUG
+void printServiceTable(
+	service_table *table,
+	Upnp_LogLevel level,
+	Dbg_Module module);
+#else
+static UPNP_INLINE void printServiceTable(
+	service_table *table,
+	Upnp_LogLevel level,
+	Dbg_Module module) {}
+#endif
 
 /************************************************************************
 *	Function :	freeService
@@ -451,10 +477,11 @@ int getSubElement(const char *element_name, IXML_Node *node,
 		  IXML_Node **out);
 
 
-)	/* DEVICEONLY */
+#endif /* INCLUDE_DEVICE_APIS */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* _SERVICE_TABLE */
+
