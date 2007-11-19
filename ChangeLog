@@ -1,4 +1,81 @@
 *******************************************************************************
+Version 1.6.2
+*******************************************************************************
+
+2007-11-09 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added a isleep() call to the error handler of select() in
+	RunMiniServer(), so that it does not take 100% cpu in case select()
+	fails repeatedly.
+
+2007-11-12 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* "make check" was failing because ixml/test/test_document.sh did not
+	have the executable flag set. Thanks to Steve Bresson.
+
+*******************************************************************************
+Version 1.6.1
+*******************************************************************************
+
+2007-11-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 1825278 ] AdvertiseAndReply sleeps with handle lock out
+	Applied patch from Alex (afaucher) to change some write locks to read
+	locks.
+
+2007-11-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Adjusting libtool library numbers to reflect the last changes.
+
+2007-11-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 1825278 ] AdvertiseAndReply sleeps with handle lock out
+	GlobalHndMutex, which was a mutex is now GlobalHndRWLock, which is a
+	rwlock. HandleLock() is mapped to HandleWriteLock() while all other
+	instances have not been checked. One instance in AdvertiseAndReply()
+	has been changed to HandleReadLock(). Thanks to Alex (afaucher) for the 
+	bug report and suggestions.
+
+2007-11-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added support for rwlocks.
+
+2007-11-05 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 1825929 ] woker thread still alive after UpnpFinish()
+	Submitted By: Luke Kim - nereusuj
+	Worker thread still alive after calling UpnpFinish() because
+	ThreadPoolShutdown() is in the #ifdef DEBUG block.
+	421
+	422 #ifdef DEBUG
+	423 ThreadPoolShutdown( &gSendThreadPool );
+	424 ThreadPoolShutdown( &gRecvThreadPool );
+
+2007-08-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Changed the calls to virtualDirCallback.open(filename, UPNP_WRITE)
+	to (virtualDirCallback.open)(filename, UPNP_WRITE) (notice the
+	parenthesis) due to a change in glibc that produces compilation
+	errors.
+
+2007-08-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Initialization of the "randomness" struct so that valgrind does not
+	complain.
+
+2007-08-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Merge of patch submitted By Keith Brindley - brindlk
+	SF Bug Tracker [ 1762758 ] Seek not working for large files
+	Problem:
+	Requests from the uPnP client to seek to a position beyond 2GB in a large
+	file are handled as a request to see from the 2GB point.
+
+	Impact:
+	Varies depending on client. The Xbox 360 kills the connection when it
+	realises.
+
+	Solution:
+	GetNextRange function (webserver.c) is updated to handle large file sizes.
+	Fix should also recognise when built on a 32bit platform rather than 64 and
+	handle accordingly.
+
+2007-08-05 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Merge of Mac OS X patch from Stï¿½phane Corthï¿½sy (davelopper),
+	SF Bug Tracker [ 1686420 ] Modifications for MacOSX.
+	Some of the proposed changes were already done by Rene Hexel's patch.
+
+*******************************************************************************
 Version 1.6.0
 *******************************************************************************
 
@@ -414,14 +491,14 @@ Version 1.4.0
 FORK FROM DEAD libupnp
 *******************************************************************************
 
-2006-04-29  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-04-29  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* THANKS: new file with list of contributors
 
 	* upnp/src/gena/gena_device.c (respond_ok): add 'Content-Length: 0'
 	  in subscription response. Patch by Chaos (Bug # 1455367).
 
-2006-04-08  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-04-08  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/doc/UPnP_Programming_Guide.pdf: replace this document with 
 	  the one in libupnp-doc-1.2.1 because current CVS version 
@@ -432,20 +509,20 @@ FORK FROM DEAD libupnp
 	* changes applied to several files to work under Sparc Solaris, temporarily
 	  requiring a define SPARC_SOLARIS
 
-2006-04-03  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-04-03  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/Makefile.am: install upnp samples in $(docdir)/examples
 
-2006-03-28  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-03-28  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* configure.ac: add --with-docdir option to choose where documentation
 	  is installed (or -without-docdir to not install the documentation)
 
-2006-03-27  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-03-27  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* ixml/test: add simple test suite for xml parser
 
-2006-03-26  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-03-26  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* ixml/src/ixmlparser.c (Parser_processCDSect): fix bug which prevents
 	  CDATA sections which contain a 0 (zero) to be parsed (instead the
@@ -456,18 +533,18 @@ FORK FROM DEAD libupnp
 	  option, and move samples compilation from check_PROGRAMS to
 	  noinst_PROGRAMS
 
-2006-03-25  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-03-25  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/src/genlib/miniserver/miniserver.c (get_miniserver_sockets): 
 	  fix bug if new socket created has fd 0 (can only occur when stdin
 	  has been closed). Patch by Oskar Liljeblad 2004-07-02 :
 	  http://sourceforge.net/mailarchive/message.php?msg_id=8870528
 	
-2006-03-21  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-03-21  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/test/test_init.c: add some version checks and exit if failure
 
-2006-03-05  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-03-05  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* libupnp version 1.3.1
 
@@ -482,11 +559,11 @@ FORK FROM DEAD libupnp
 	  dependencies between upnp and ixml / threadutil, so that programs 
 	  linking against upnp only still work.
 
-2006-03-04  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-03-04  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* libupnp version 1.3.0
 
-2006-03-03  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-03-03  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/src/genlib/net/http/httpreadwrite.c (get_sdk_info): use
 	  package version string from configure to set sdk info
@@ -494,7 +571,7 @@ FORK FROM DEAD libupnp
 	* upnp/Makefile.am: add sample/tvdevice/web/ files in EXTRA_DIST
 	  + do not distribute generated upnpconfig.h file.
 
-2006-02-28  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-02-28  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/src/inc/config.h, configure.ac: use only new defines
 	  UPNP_HAVE_xx instead of INCLUDE_yyy_APIS and INTERNAL_WEB_SERVER
@@ -503,7 +580,7 @@ FORK FROM DEAD libupnp
 	  the librarie LDFLAGS in order to export only the symbols defined 
 	  in the API
 
-2006-02-27  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-02-27  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* configure.ac: add libtool versions for the 3 libraries
 
@@ -511,7 +588,7 @@ FORK FROM DEAD libupnp
 
 	* threadutil/src/ThreadPool.c (SetSeed): add missing 'static' 
 
-2006-02-26  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-02-26  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* threadutil/inc/iasnprintf.h: add gcc __printf__ format attribute
 	  to "iasnprintf"
@@ -532,11 +609,11 @@ FORK FROM DEAD libupnp
 	  the configuration of the installed libraries (generates installed
 	  file <upnp/upnpconfig.h>)
 
-2006-02-22  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-02-22  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/ : add missing include of config.h in some .c files
 
-2006-02-21  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-02-21  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/inc/upnp.h: move some definitions which should not be
 	  exported into "upnp/src/inc/util.h"
@@ -544,12 +621,12 @@ FORK FROM DEAD libupnp
 	* import all modifications below from libupnp in djmount 0.51
 	  into official libupnp
 	
-2006-01-17  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-01-17  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* threadutil/Makefile.am (libthreadutil_la_SOURCES): remove extraneous
 	  file
 
-2006-01-15  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-01-15  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* configure.ac: add checks for large-file support
 
@@ -569,53 +646,53 @@ FORK FROM DEAD libupnp
 	* ixml/src/node.c (ixmlNode_getNodeType): fix compilation warning
 	  on const return type
 
-2006-01-12  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-01-12  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/src/inc/readwrite.h : suppress unused C++ header file
 
-2006-01-11  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2006-01-11  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/inc/config.h, upnp/src/inc/upnpapi.h, 
 	  upnp/src/inc/httpreadwrite.h: remove internal configuration variable 
 	  MINIMUM_DELAY (no clear purpose)
 
-2005-12-05  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2005-12-05  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/inc/upnp.h: re-declare obsolete method UpnpSetContentLength,
 	  for binary compatibility with previous libupnp version.
 
 	* upnp/src/api/upnpapi.c: correct type of g_maxContentLength to size_t
 
-2005-11-01  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2005-11-01  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* autoconfiscate library : replace all makefiles by Makefile.am
 	  for automake support, + preliminary autoconf support
 	  (generated config.h not yet used in source files)
 
-2005-10-18  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2005-10-18  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/src/makefile: fix location of DEBUG STATIC libupnp library
 	
 	* upnp/sample/tvctrlpt/linux/Makefile, 
 	  upnp/sample/tvdevice/linux/Makefile: fix STATIC library support
 
-2005-10-16  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2005-10-16  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* threadutil/src/Makefile (clean): remove built library
 
-2005-08-28  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2005-08-28  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* ixml/src/ixml.h, ixml/src/ixml.c (ixmlRelaxParser) : new function
 
 	* ixml/src/ixmlparser.h, ixml/src/ixmlparser.c (Parser_setErrorChar) :
 	  new function
 
-2005-08-02  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2005-08-02  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* ixml/src/Makefile: correct bug for static library being incorrectly 
 	  stripped when building non-debug
 
-2005-06-09  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2005-06-09  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* ixml/src/element.c (ixmlElement_removeAttributeNode): 
 	  remove some compilation warning
@@ -626,7 +703,7 @@ FORK FROM DEAD libupnp
 	* upnp/inc/upnptools.h, upnp/src/api/upnptools.c : 
 	  add missing const's in public API
 
-2005-05-28  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2005-05-28  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/inc/config.h: suppress HTTP_READ_BYTES (unused)
 	  and replace by DEFAULT_SOAP_CONTENT_LENGTH (previously in upnpapi.h)
@@ -647,7 +724,7 @@ FORK FROM DEAD libupnp
 	* upnp/src/genlib/net/http/httpreadwrite.c : corrected an incorrect
 	  sprintf format
 	
-2005-05-27  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2005-05-27  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/makefile, upnp/src/makefile, 
 	  ixml/Makefile, ixml/src/Makefile, 
@@ -655,7 +732,7 @@ FORK FROM DEAD libupnp
 	  implement STATIC library support (from patch at 
 	  http://sourceforge.net/tracker/?group_id=7189&atid=307189 )
 
-2005-05-26  Rémi Turboult  <r3mi(at)users.sourceforge.net>
+2005-05-26  Rï¿½mi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/src/api/upnpapi.c, upnp/src/soap/soap_device.c,
 	  upnp/src/soap/makefile : 

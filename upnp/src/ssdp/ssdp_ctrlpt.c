@@ -125,7 +125,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
 
     // we are assuming that there can be only one client supported at a time
 
-    HandleLock();
+    HandleReadLock();
 
     if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
         HandleUnlock();
@@ -538,8 +538,7 @@ SearchByTarget( IN int Mx,
     if( ReqBuf == NULL )
         return UPNP_E_OUTOF_MEMORY;
 
-    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-        ">>> SSDP SEND >>>\n%s\n", ReqBuf );
+    UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, ">>> SSDP SEND >>>\n");
 
     timeTillRead = Mx;
 

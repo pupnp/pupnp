@@ -45,12 +45,12 @@
 extern ithread_mutex_t GlobalClientSubscribeMutex;
 
 /************************************************************************
-* Function : GenaAutoRenewSubscription									
-*																	
+* Function : GenaAutoRenewSubscription
+*
 * Parameters:														
 *	IN void *input: Thread data(upnp_timeout *) needed to send the renewal
 *
-* Description:														
+* Description:
 *	This is a thread function to send the renewal just before the 
 *	subscription times out.
 *
@@ -93,7 +93,7 @@ GenaAutoRenewSubscription( IN void *input )
         }
     }
     if( send_callback ) {
-        HandleLock();
+        HandleReadLock();
         if( GetHandleInfo( event->handle, &handle_info ) != HND_CLIENT ) {
             HandleUnlock();
             free_upnp_timeout( event );
@@ -113,14 +113,14 @@ GenaAutoRenewSubscription( IN void *input )
 }
 
 /************************************************************************
-* Function : ScheduleGenaAutoRenew									
-*																	
+* Function : ScheduleGenaAutoRenew
+*
 * Parameters:														
 *	IN int client_handle: Handle that also contains the subscription list
 *	IN int TimeOut: The time out value of the subscription
 *	IN client_subscription * sub: Subscription being renewed
 *
-* Description:														
+* Description:
 *	This function schedules a job to renew the subscription just before
 *	time out.
 *
@@ -188,14 +188,14 @@ ScheduleGenaAutoRenew( IN int client_handle,
 }
 
 /************************************************************************
-* Function : gena_unsubscribe									
-*																	
+* Function : gena_unsubscribe
+*
 * Parameters:														
 *	IN char *url: Event URL of the service
 *	IN char *sid: The subcription ID.
 *	OUT http_parser_t* response: The UNSUBCRIBE response from the device
 *
-* Description:														
+* Description:
 *	This function sends the UNSUBCRIBE gena request and recieves the 
 *	response from the device and returns it as a parameter
 *
@@ -251,9 +251,9 @@ gena_unsubscribe( IN char *url,
 }
 
 /************************************************************************
-* Function : gena_subscribe									
-*																	
-* Parameters:														
+* Function : gena_subscribe
+*
+* Parameters:
 *	IN char *url: url of service to subscribe
 *	INOUT int* timeout:subscription time desired (in secs)
 *	IN char* renewal_sid:for renewal, this contains a currently h
@@ -261,7 +261,7 @@ gena_unsubscribe( IN char *url,
 *						 subscription, this must be NULL
 *	OUT char** sid: SID returned by the subscription or renew msg
 *
-* Description:														
+* Description:
 *	This function subscribes or renew subscription
 *
 * Returns: int
@@ -374,13 +374,13 @@ gena_subscribe( IN char *url,
 }
 
 /************************************************************************
-* Function : genaUnregisterClient									
-*																	
-* Parameters:														
+* Function : genaUnregisterClient
+*
+* Parameters:
 *	IN UpnpClient_Handle client_handle: Handle containing all the control
 *			point related information
 *
-* Description:														
+* Description:
 *	This function unsubcribes all the outstanding subscriptions and cleans
 *	the subscription list. This function is called when control point 
 *	unregisters.
@@ -435,12 +435,12 @@ genaUnregisterClient( IN UpnpClient_Handle client_handle )
 
 /************************************************************************
 * Function : genaUnSubscribe
-*																	
-* Parameters:														
+*
+* Parameters:
 *	IN UpnpClient_Handle client_handle: UPnP client handle
 *	IN SID in_sid: The subscription ID
 *
-* Description:														
+* Description:
 *	This function unsubscribes a SID. It first validates the SID and 
 *	client_handle,copies the subscription, sends UNSUBSCRIBE http request 
 *	to service processes request and finally removes the subscription
@@ -506,8 +506,8 @@ genaUnSubscribe( IN UpnpClient_Handle client_handle,
 
 /************************************************************************
 * Function : genaSubscribe
-*																	
-* Parameters:														
+*
+* Parameters:
 *	IN UpnpClient_Handle client_handle: 
 *	IN char * PublisherURL: NULL Terminated, of the form : 
 *						"http://134.134.156.80:4000/RedBulb/Event"
@@ -516,7 +516,7 @@ genaUnSubscribe( IN UpnpClient_Handle client_handle,
 *						by Service, -1 for infinite
 *	OUT Upnp_SID out_sid:sid of subscription, memory passed in by caller
 *
-* Description:														
+* Description:
 *	This function subscribes to a PublisherURL ( also mentioned as EventURL
 *	some places). It sends SUBSCRIBE http request to service processes 
 *	request. Finally adds a Subscription to 
@@ -543,10 +543,10 @@ genaSubscribe( IN UpnpClient_Handle client_handle,
 
     UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
         "GENA SUBSCRIBE BEGIN" );
-    HandleLock();
 
     memset( out_sid, 0, sizeof( Upnp_SID ) );
 
+    HandleReadLock();
     // validate handle
     if( GetHandleInfo( client_handle, &handle_info ) != HND_CLIENT ) {
         HandleUnlock();
@@ -616,15 +616,15 @@ genaSubscribe( IN UpnpClient_Handle client_handle,
 
 /************************************************************************
 * Function : genaRenewSubscription
-*																	
-* Parameters:														
+*
+* Parameters:
 *	IN UpnpClient_Handle client_handle: Client handle
 *	IN const Upnp_SID in_sid: subscription ID
 *	INOUT int * TimeOut: requested Duration, if -1, then "infinite".
 *						in the OUT case: actual Duration granted 
 *						by Service, -1 for infinite
 *
-* Description:														
+* Description:
 *	This function renews a SID. It first validates the SID and 
 *	client_handle and copies the subscription. It sends RENEW 
 *	(modified SUBSCRIBE) http request to service and processes
@@ -724,14 +724,14 @@ genaRenewSubscription( IN UpnpClient_Handle client_handle,
 
 /************************************************************************
 * Function : gena_process_notification_event
-*																	
-* Parameters:														
+*
+* Parameters:
 *	IN SOCKINFO *info: Socket structure containing the device socket 
 *					information
 *	IN http_message_t* event: The http message contains the GENA 
 *								notification
 *
-* Description:														
+* Description:
 *	This function processes NOTIFY events that are sent by devices. 
 *	called by genacallback()
 *
@@ -881,3 +881,4 @@ gena_process_notification_event( IN SOCKINFO * info,
 
 #endif // INCLUDE_CLIENT_APIS
 #endif // EXCLUDE_GENA
+

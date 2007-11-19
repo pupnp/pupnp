@@ -1,30 +1,30 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2000-2003 Intel Corporation 
+// Copyright (c) 2000-2003 Intel Corporation
 // All rights reserved. 
 //
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
 //
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
+// * Redistributions of source code must retain the above copyright notice,
+// this list of conditions and the following disclaimer.
+// * Redistributions in binary form must reproduce the above copyright notice,
+// this list of conditions and the following disclaimer in the documentation
+// and/or other materials provided with the distribution.
+// * Neither name of Intel Corporation nor the names of its contributors
+// may be used to endorse or promote products derived from this software
 // without specific prior written permission.
 // 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
 // OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 ///////////////////////////////////////////////////////////////////////////
@@ -83,11 +83,11 @@ advertiseAndReplyThread( IN void *data )
 /************************************************************************
 * Function : ssdp_handle_device_request
 *
-* Parameters:														
+* Parameters:
 *	IN http_message_t* hmsg: SSDP search request from the control point
 *	IN struct sockaddr_in* dest_addr: The address info of control point
 *
-* Description:														
+* Description:
 *	This function handles the search request. It do the sanity checks of
 *	the request and then schedules a thread to send a random time reply (
 *	random within maximum time given by the control point to reply).
@@ -194,15 +194,15 @@ ssdp_handle_device_request( IN http_message_t * hmsg,
 #endif
 
 /************************************************************************
-* Function : NewRequestHandler									
-*																	
-* Parameters:														
+* Function : NewRequestHandler
+*
+* Parameters:
 *		IN struct sockaddr_in * DestAddr: Ip address, to send the reply.
 *		IN int NumPacket: Number of packet to be sent.
 *		IN char **RqPacket:Number of packet to be sent.
 *
-* Description:														
-*	This function works as a request handler which passes the HTTP 
+* Description:
+*	This function works as a request handler which passes the HTTP
 *	request string to multicast channel then
 *
 * Returns: void *
@@ -242,7 +242,7 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
         // "If a multicast resource would send a response(s) to any copy of the 
         //  request, it SHOULD send its response(s) to each copy of the request 
         //  it receives. It MUST NOT repeat its response(s) per copy of the 
-        //  reuqest."
+        //  request."
         //  
         // http://www.upnp.org/download/draft-goland-http-udp-04.txt
         //
@@ -266,24 +266,24 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
 }
 
 /************************************************************************
-* Function : CreateServiceRequestPacket									
-*																	
-* Parameters:														
-*	IN int msg_type : type of the message ( Search Reply, Advertisement 
-*												or Shutdown )
+* Function : CreateServiceRequestPacket
+*
+* Parameters:
+*	IN int msg_type : type of the message ( Search Reply, Advertisement
+*		or Shutdown )
 *	IN char * nt : ssdp type
 *	IN char * usn : unique service name ( go in the HTTP Header)
 *	IN char * location :Location URL.
 *	IN int  duration :Service duration in sec.
 *	OUT char** packet :Output buffer filled with HTTP statement.
 *
-* Description:														
-*	This function creates a HTTP request packet.  Depending 
+* Description:
+*	This function creates a HTTP request packet.  Depending
 *	on the input parameter it either creates a service advertisement
-*   request or service shutdown request etc.
+*	request or service shutdown request etc.
 *
 * Returns: void
-*	
+*
 ***************************************************************************/
 void
 CreateServicePacket( IN int msg_type,
@@ -358,9 +358,9 @@ CreateServicePacket( IN int msg_type,
 }
 
 /************************************************************************
-* Function : DeviceAdvertisement									
-*																	
-* Parameters:														
+* Function : DeviceAdvertisement
+*
+* Parameters:
 *	IN char * DevType : type of the device
 *	IN int RootDev: flag to indicate if the device is root device
 *	IN char * nt : ssdp type
@@ -368,7 +368,7 @@ CreateServicePacket( IN int msg_type,
 *	IN char * location :Location URL.
 *	IN int  duration :Service duration in sec.
 *
-* Description:														
+* Description:
 *	This function creates the device advertisement request based on 
 *	the input parameter, and send it to the multicast channel.
 *
@@ -444,9 +444,9 @@ DeviceAdvertisement( IN char *DevType,
 }
 
 /************************************************************************
-* Function : SendReply									
-*																	
-* Parameters:	
+* Function : SendReply
+*
+* Parameters:
 *	IN struct sockaddr_in * DestAddr:destination IP address.
 *	IN char *DevType: Device type
 *	IN int RootDev: 1 means root device 0 means embedded device.
@@ -455,7 +455,7 @@ DeviceAdvertisement( IN char *DevType,
 *	IN int  Duration :Life time of this device.
 *	IN int ByType:
 *
-* Description:														
+* Description:
 *	This function creates the reply packet based on the input parameter, 
 *	and send it to the client addesss given in its input parameter DestAddr.
 *
@@ -521,17 +521,16 @@ SendReply( IN struct sockaddr_in *DestAddr,
 }
 
 /************************************************************************
-* Function : DeviceReply									
-*																	
-* Parameters:	
+* Function : DeviceReply
+*
+* Parameters:
 *	IN struct sockaddr_in * DestAddr:destination IP address.
 *	IN char *DevType: Device type
 *	IN int RootDev: 1 means root device 0 means embedded device.
 *	IN char * Udn: Device UDN
 *	IN char * Location: Location of Device description document.
 *	IN int  Duration :Life time of this device.
-
-* Description:														
+* Description:
 *	This function creates the reply packet based on the input parameter, 
 *	and send it to the client address given in its input parameter DestAddr.
 *
@@ -600,18 +599,16 @@ DeviceReply( IN struct sockaddr_in *DestAddr,
 }
 
 /************************************************************************
-* Function : ServiceAdvertisement									
-*																	
-* Parameters:	
+* Function : ServiceAdvertisement
+*
+* Parameters:
 *	IN char * Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char * Location: Location of Device description document.
 *	IN int  Duration :Life time of this device.
-
-* Description:														
-*	This function creates the advertisement packet based 
+* Description:
+*	This function creates the advertisement packet based
 *	on the input parameter, and send it to the multicast channel.
-
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
@@ -648,19 +645,17 @@ ServiceAdvertisement( IN char *Udn,
 }
 
 /************************************************************************
-* Function : ServiceReply									
-*																	
-* Parameters:	
+* Function : ServiceReply
+*
+* Parameters:
 *	IN struct sockaddr_in *DestAddr:
 *	IN char * Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char * Location: Location of Device description document.
 *	IN int  Duration :Life time of this device.
-
-* Description:														
+* Description:
 *	This function creates the advertisement packet based 
 *	on the input parameter, and send it to the multicast channel.
-
 *
 * Returns: int
 *	UPNP_E_SUCCESS if successful else appropriate error
@@ -693,15 +688,14 @@ ServiceReply( IN struct sockaddr_in *DestAddr,
 }
 
 /************************************************************************
-* Function : ServiceShutdown									
-*																	
-* Parameters:	
+* Function : ServiceShutdown
+*
+* Parameters:
 *	IN char * Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char * Location: Location of Device description document.
 *	IN int  Duration :Service duration in sec.
-
-* Description:														
+* Description:
 *	This function creates a HTTP service shutdown request packet 
 *	and sent it to the multicast channel through RequestHandler.
 *
@@ -739,16 +733,16 @@ ServiceShutdown( IN char *Udn,
 }
 
 /************************************************************************
-* Function : DeviceShutdown									
-*																	
-* Parameters:	
+* Function : DeviceShutdown
+*
+* Parameters:
 *	IN char *DevType: Device Type.
 *	IN int RootDev:1 means root device.
 *	IN char * Udn: Device UDN
 *	IN char * Location: Location URL
 *	IN int  Duration :Device duration in sec.
 *
-* Description:														
+* Description:
 *	This function creates a HTTP device shutdown request packet 
 *	and sent it to the multicast channel through RequestHandler.
 *
@@ -821,3 +815,4 @@ DeviceShutdown( IN char *DevType,
 
 #endif // EXCLUDE_SSDP
 #endif // INCLUDE_DEVICE_APIS
+

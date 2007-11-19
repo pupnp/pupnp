@@ -365,7 +365,7 @@ genaNotifyThread( IN void *input )
     struct Handle_Info *handle_info;
     ThreadPoolJob job;
 
-    HandleLock();
+    HandleReadLock();
     //validate context
 
     if( GetHandleInfo( in->device_handle, &handle_info ) != HND_DEVICE ) {

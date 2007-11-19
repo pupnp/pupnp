@@ -31,7 +31,7 @@
 
 #include "LinkedList.h"
 #include <sys/param.h>
-#if (defined(BSD) && BSD >= 199306)
+#if (defined(BSD) && BSD >= 199306) || defined(__OSX__)
 #include <stdlib.h>
 #else
 #include <malloc.h>

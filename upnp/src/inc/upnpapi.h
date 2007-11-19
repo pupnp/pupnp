@@ -98,18 +98,25 @@ struct Handle_Info
     int   aliasInstalled;       // 0 = not installed; otherwise installed
 };
 
-extern ithread_mutex_t GlobalHndMutex;
+extern ithread_rwlock_t GlobalHndRWLock;
 Upnp_Handle_Type GetHandleInfo(int Hnd, struct Handle_Info **HndInfo); 
 
-#define HandleLock()  \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying Lock"); \
-	ithread_mutex_lock(&GlobalHndMutex); \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "LOCK");
+#define HandleLock() HandleWriteLock()
+
+#define HandleWriteLock()  \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying a write lock"); \
+	ithread_rwlock_wrlock(&GlobalHndRWLock); \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Write lock acquired");
+
+#define HandleReadLock()  \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying a read lock"); \
+	ithread_rwlock_rdlock(&GlobalHndRWLock); \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Read lock acquired");
 
 #define HandleUnlock() \
 	UpnpPrintf(UPNP_INFO, API,__FILE__, __LINE__, "Trying Unlock"); \
-	ithread_mutex_unlock(&GlobalHndMutex); \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Unlock");
+	ithread_rwlock_unlock(&GlobalHndRWLock); \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Unlocked rwlock");
 
 Upnp_Handle_Type GetClientHandleInfo(int *client_handle_out, 
                                      struct Handle_Info **HndInfo);

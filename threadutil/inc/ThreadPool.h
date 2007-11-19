@@ -547,6 +547,10 @@ int TPAttrSetMaxJobsTotal(ThreadPoolAttr *attr, int maxJobsTotal);
 	EXPORT int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats);
 
 	EXPORT void ThreadPoolPrintStats(ThreadPoolStats *stats);
+#else
+	static UPNP_INLINE int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats) {}
+
+	static UPNP_INLINE void ThreadPoolPrintStats(ThreadPoolStats *stats) {}
 #endif
 
 #ifdef __cplusplus

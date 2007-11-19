@@ -84,8 +84,8 @@ virtualDirList *pVirtualDirList;
 // Mutex to synchronize the subscription handling at the client side
 CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
 
-//Mutex to synchronize handles ( root device or control point handle)
-    ithread_mutex_t GlobalHndMutex;
+// rwlock to synchronize handles (root device or control point handle)
+    ithread_rwlock_t GlobalHndRWLock;
 
 // Mutex to synchronize the uuid creation process
     ithread_mutex_t gUUIDMutex;
@@ -213,26 +213,26 @@ int UpnpInit( IN const char *HostIP,
 #ifdef __CYGWIN__
         /* On Cygwin, pthread_mutex_init() fails without this memset. */
         /* TODO: Fix Cygwin so we don't need this memset(). */
-        memset(&GlobalHndMutex, 0, sizeof(GlobalHndMutex));
+        memset(&GlobalHndRWLock, 0, sizeof(GlobalHndRWLock));
 #endif
-        if( ithread_mutex_init( &GlobalHndMutex, NULL ) != 0 ) {
+    if (ithread_rwlock_init(&GlobalHndRWLock, NULL) != 0) {
         return UPNP_E_INIT_FAILED;
     }
 
-    if( ithread_mutex_init( &gUUIDMutex, NULL ) != 0 ) {
+    if (ithread_mutex_init(&gUUIDMutex, NULL) != 0) {
         return UPNP_E_INIT_FAILED;
     }
     // initialize subscribe mutex
 #ifdef INCLUDE_CLIENT_APIS
-    if ( ithread_mutex_init( &GlobalClientSubscribeMutex, NULL ) != 0 ) {
+    if (ithread_mutex_init(&GlobalClientSubscribeMutex, NULL) != 0) {
         return UPNP_E_INIT_FAILED;
     }
 #endif
 
-        HandleLock();
-    if( HostIP != NULL )
+    HandleLock();
+    if( HostIP != NULL ) {
         strcpy( LOCAL_HOST, HostIP );
-    else {
+    } else {
         if( getlocalhostname( LOCAL_HOST ) != UPNP_E_SUCCESS ) {
             HandleUnlock();
             return UPNP_E_INIT_FAILED;
@@ -268,7 +268,7 @@ int UpnpInit( IN const char *HostIP,
 
     if( ThreadPoolInit( &gMiniServerThreadPool, &attr ) != UPNP_E_SUCCESS ) {
         UpnpSdkInit = 0;
-        UpnpFinish(  );
+        UpnpFinish();
         return UPNP_E_INIT_FAILED;
     }
 
@@ -323,29 +323,56 @@ int UpnpInit( IN const char *HostIP,
 
 #ifdef DEBUG
 static void 
-PrintThreadPoolStats (const char* DbgFileName, int DbgLineNo,
-		      const char* msg, const ThreadPoolStats* const stats)
+PrintThreadPoolStats(
+	ThreadPool *tp, 
+	const char *DbgFileName,
+	int DbgLineNo,
+	const char *msg)
 {
-	UpnpPrintf (UPNP_INFO, API, DbgFileName, DbgLineNo, 
-		    "%s \n High Jobs pending = %d \nMed Jobs Pending = %d\n"
-		    " Low Jobs Pending = %d \nWorker Threads = %d\n"
-		    "Idle Threads = %d\nPersistent Threads = %d\n"
-		    "Average Time spent in High Q = %lf\n"
-		    "Average Time spent in Med Q = %lf\n"
-		    "Average Time spent in Low Q = %lf\n"
-		    "Max Threads Used: %d\nTotal Work Time= %lf\n"
-		    "Total Idle Time = %lf\n",
-		    msg,
-		    stats->currentJobsHQ, stats->currentJobsMQ,
-		    stats->currentJobsLQ, stats->workerThreads,
-		    stats->idleThreads, stats->persistentThreads,
-		    stats->avgWaitHQ, stats->avgWaitMQ, stats->avgWaitLQ,
-		    stats->maxThreads, stats->totalWorkTime,
-		    stats->totalIdleTime );
+	ThreadPoolStats stats;
+	ThreadPoolGetStats(tp, &stats);
+	UpnpPrintf(UPNP_INFO, API, DbgFileName, DbgLineNo, 
+		"%s \n"
+		"High Jobs pending: %d\n"
+		"Med Jobs Pending: %d\n"
+		"Low Jobs Pending: %d\n"
+		"Average wait in High Q in milliseconds: %lf\n"
+		"Average wait in Med Q in milliseconds: %lf\n"
+		"Average wait in Low Q in milliseconds: %lf\n"
+		"Max Threads Used: %d\n"
+		"Worker Threads: %d\n"
+		"Persistent Threads: %d\n"
+		"Idle Threads: %d\n"
+		"Total Threads: %d\n"
+		"Total Work Time: %lf\n"
+		"Total Idle Time: %lf\n",
+		msg,
+		stats.currentJobsHQ,
+		stats.currentJobsMQ,
+		stats.currentJobsLQ,
+		stats.avgWaitHQ,
+		stats.avgWaitMQ,
+		stats.avgWaitLQ,
+		stats.maxThreads,
+		stats.workerThreads,
+		stats.persistentThreads,
+		stats.idleThreads,
+		stats.totalThreads,
+		stats.totalWorkTime,
+		stats.totalIdleTime);
 }
-#endif
+#else /* DEBUG */
+static UPNP_INLINE void 
+PrintThreadPoolStats(
+	ThreadPool *tp, 
+	const char *DbgFileName,
+	int DbgLineNo,
+	const char *msg)
+{
+}
+#endif /* DEBUG */
 
-     
+
 /****************************************************************************
  * Function: UpnpFinish
  *
@@ -374,12 +401,8 @@ UpnpFinish()
 #endif
     struct Handle_Info *temp;
 
-#ifdef DEBUG
-    ThreadPoolStats stats;
-#endif
-
 #ifdef WIN32
-//	WSACleanup( );
+//	WSACleanup();
 #endif
 
     if( UpnpSdkInit != 1 ) {
@@ -387,20 +410,14 @@ UpnpFinish()
     }
 
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpFinish : UpnpSdkInit is :%d:\n",
-        UpnpSdkInit );
-#ifdef DEBUG
+        "Inside UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit );
     if( UpnpSdkInit == 1 ) {
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
             "UpnpFinish : UpnpSdkInit is ONE\n" );
     }
-    ThreadPoolGetStats( &gRecvThreadPool, &stats );
-    PrintThreadPoolStats (__FILE__, __LINE__,
-	"Recv Thread Pool", &stats);
-    ThreadPoolGetStats( &gSendThreadPool, &stats );
-    PrintThreadPoolStats (__FILE__, __LINE__,
-	"Send Thread Pool", &stats);
-#endif
+    PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
+    PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
+
 #ifdef INCLUDE_DEVICE_APIS
     if( GetDeviceHandleInfo( &device_handle, &temp ) == HND_DEVICE )
         UpnpUnRegisterRootDevice( device_handle );
@@ -412,51 +429,45 @@ UpnpFinish()
 #endif
 
     TimerThreadShutdown( &gTimerThread );
-
     StopMiniServer();
 
 #if EXCLUDE_WEB_SERVER == 0
     web_server_destroy();
 #endif
 
-#ifdef DEBUG
-    ThreadPoolShutdown( &gSendThreadPool );
-    ThreadPoolShutdown( &gRecvThreadPool );
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Exiting UpnpFinish : UpnpSdkInit is :%d:\n",
-	UpnpSdkInit );
-    ThreadPoolGetStats( &gRecvThreadPool, &stats );
-    PrintThreadPoolStats( __FILE__, __LINE__,
-        "Recv Thread Pool", &stats);
-    ThreadPoolGetStats( &gSendThreadPool, &stats );
-    PrintThreadPoolStats(__FILE__, __LINE__,
-        "Send Thread Pool", &stats);
-    UpnpCloseLog();
-#endif
+    ThreadPoolShutdown(&gSendThreadPool);
+    ThreadPoolShutdown(&gRecvThreadPool);
+
+    PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
+    PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
 
 #ifdef INCLUDE_CLIENT_APIS
-    ithread_mutex_destroy( &GlobalClientSubscribeMutex );
+    ithread_mutex_destroy(&GlobalClientSubscribeMutex);
 #endif
-    ithread_mutex_destroy( &GlobalHndMutex );
-    ithread_mutex_destroy( &gUUIDMutex );
+    ithread_rwlock_destroy(&GlobalHndRWLock);
+    ithread_mutex_destroy(&gUUIDMutex);
 
     // remove all virtual dirs
     UpnpRemoveAllVirtualDirs();
-    // leuk_he allow static linking:
+
+    // allow static linking
 #ifdef WIN32
 #ifdef PTW32_STATIC_LIB
-    pthread_win32_thread_detach_np ();
+    pthread_win32_thread_detach_np();
 #endif
 #endif
-
 
     UpnpSdkInit = 0;
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Exiting UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit);
+    UpnpCloseLog();
 
     return UPNP_E_SUCCESS;
 
-}  /********************* End of  UpnpFinish  *************************/
+}
+/*************************** End of  UpnpFinish  *****************************/
 
-/****************************************************************************
+/******************************************************************************
  * Function: UpnpGetServerPort
  *
  * Parameters: NONE
@@ -953,7 +964,7 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
     char *temp_str = NULL;
     FILE *fp = NULL;
     off_t fileLen;
-    unsigned num_read;
+    size_t num_read;
     time_t last_modified;
     struct stat file_info;
     struct sockaddr_in serverAddr;
@@ -1559,7 +1570,7 @@ UpnpSearchAsync( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpSearchAsync \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -1735,7 +1746,7 @@ UpnpSubscribeAsync( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpSubscribeAsync \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -1752,15 +1763,13 @@ UpnpSubscribeAsync( IN UpnpClient_Handle Hnd,
         HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
+    HandleUnlock();
 
-    Param =
-        ( struct UpnpNonblockParam * )
-        malloc( sizeof( struct UpnpNonblockParam ) );
+    Param = (struct UpnpNonblockParam *)
+        malloc(sizeof (struct UpnpNonblockParam));
     if( Param == NULL ) {
-        HandleUnlock();
         return UPNP_E_OUTOF_MEMORY;
     }
-    HandleUnlock();
 
     Param->FunName = SUBSCRIBE;
     Param->Handle = Hnd;
@@ -1820,7 +1829,7 @@ UpnpSubscribe( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpSubscribe \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -1880,7 +1889,7 @@ UpnpUnSubscribe( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpUnSubscribe \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -1939,7 +1948,7 @@ UpnpUnSubscribeAsync( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpUnSubscribeAsync \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2013,7 +2022,7 @@ UpnpRenewSubscription( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpRenewSubscription \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2078,7 +2087,7 @@ UpnpRenewSubscriptionAsync( IN UpnpClient_Handle Hnd,
 
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpRenewSubscriptionAsync \n" );
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2173,7 +2182,7 @@ UpnpNotify( IN UpnpDevice_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpNotify \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2244,7 +2253,7 @@ UpnpNotifyExt( IN UpnpDevice_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpNotify \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2321,7 +2330,7 @@ UpnpAcceptSubscription( IN UpnpDevice_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpAcceptSubscription \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2397,7 +2406,7 @@ UpnpAcceptSubscriptionExt( IN UpnpDevice_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpAcceptSubscription \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2493,7 +2502,7 @@ UpnpSendAction( IN UpnpClient_Handle Hnd,
     }
     DevUDN_const = NULL;
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2577,7 +2586,7 @@ UpnpSendActionEx( IN UpnpClient_Handle Hnd,
         return retVal;
     }
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2653,7 +2662,7 @@ UpnpSendActionAsync( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpSendActionAsync \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2773,7 +2782,7 @@ UpnpSendActionExAsync( IN UpnpClient_Handle Hnd,
         return retVal;
     }
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2887,7 +2896,7 @@ UpnpGetServiceVarStatusAsync( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpGetServiceVarStatusAsync \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -2967,7 +2976,7 @@ UpnpGetServiceVarStatus( IN UpnpClient_Handle Hnd,
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside UpnpGetServiceVarStatus \n" );
 
-    HandleLock();
+    HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
@@ -3300,9 +3309,9 @@ UpnpDownloadXmlDoc( const char *url,
         UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
             "****************** END OF Parsed XML Doc *****************\n" );
         ixmlFreeDOMString( xml_buf );
+#endif
         UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
             "Exiting UpnpDownloadXmlDoc\n" );
-#endif
         return UPNP_E_SUCCESS;
     }
 }
@@ -3635,7 +3644,6 @@ int PrintHandleInfo( IN UpnpClient_Handle Hnd )
     struct Handle_Info * HndInfo;
     if (HandleTable[Hnd] != NULL) {
         HndInfo = HandleTable[Hnd];
-#ifdef DEBUG
             UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
                 "Printing information for Handle_%d\n", Hnd);
             UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -3644,7 +3652,6 @@ int PrintHandleInfo( IN UpnpClient_Handle Hnd )
                 if(HndInfo->HType != HND_CLIENT)
                     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
                         "DescURL_%s\n", HndInfo->DescURL );
-#endif
 #endif
     } else {
         return UPNP_E_INVALID_HANDLE;

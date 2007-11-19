@@ -90,22 +90,23 @@ FreeThreadPoolJob( ThreadPool * tp,
 static int
 SetPolicyType( PolicyType in )
 {
-    #ifdef __CYGWIN__
-     /* TODO not currently working... */
-     return 0;
-    #else
-    #ifdef WIN32
+#ifdef __CYGWIN__
+    /* TODO not currently working... */
+    return 0;
+#elif defined(__OSX__)
+    setpriority(PRIO_PROCESS, 0, 0);
+    return 0;
+#elif defined(WIN32)
      return sched_setscheduler( 0, in);
-    #elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
+#elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
      struct sched_param current;
 
      sched_getparam( 0, &current );
      current.sched_priority = DEFAULT_SCHED_PARAM;
      return sched_setscheduler( 0, in, &current );
-    #else
+#else
      return 0;
-    #endif
-    #endif
+#endif
 }
 
 /****************************************************************************
@@ -364,7 +365,7 @@ static void SetSeed() {
 	ftime( &t );
 #if defined(WIN32)
 	srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id().p );
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__OSX__)
 	srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id() );
 #elif defined(__linux__)
 	srand( ( unsigned int )t.millitm + ithread_get_current_thread_id() );
@@ -1510,36 +1511,33 @@ static void SetSeed() {
     }
 
 #ifdef STATS
-    void ThreadPoolPrintStats( ThreadPoolStats * stats ) {
-               assert( stats != NULL ); if( stats == NULL ) {
-               return;}
+void ThreadPoolPrintStats(ThreadPoolStats * stats)
+{
+	assert( stats != NULL );
+	if (stats == NULL) {
+		return;
+	}
 
-	       #ifdef __FreeBSD__
-               printf( "ThreadPoolStats at Time: %d\n", time( NULL ) );
-	       #else
-               printf( "ThreadPoolStats at Time: %ld\n", time( NULL ) );
-	       #endif
-               printf
-               ( "Average Wait in High Priority Q in milliseconds: %f\n",
-                 stats->avgWaitHQ );
-               printf
-               ( "Average Wait in Med Priority Q in milliseconds: %f\n",
-                 stats->avgWaitMQ );
-               printf
-               ( "Averate Wait in Low Priority Q in milliseconds: %f\n",
-                 stats->avgWaitLQ );
-               printf( "Max Threads Active: %d\n", stats->maxThreads );
-               printf( "Current Worker Threads: %d\n",
-                       stats->workerThreads );
-               printf( "Current Persistent Threads: %d\n",
-                       stats->persistentThreads );
-               printf( "Current Idle Threads: %d\n", stats->idleThreads );
-               printf( "Total Threads : %d\n", stats->totalThreads );
-               printf( "Total Time spent Working in seconds: %f\n",
-                       stats->totalWorkTime );
-               printf( "Total Time spent Idle in seconds : %f\n",
-                       stats->totalIdleTime );}
-#endif
+#ifdef __FreeBSD__
+	printf("ThreadPoolStats at Time: %d\n", time(NULL));
+#else /* __FreeBSD__ */
+	printf("ThreadPoolStats at Time: %ld\n", time(NULL));
+#endif /* __FreeBSD__ */
+	printf("High Jobs pending: %d\n", stats->currentJobsHQ);
+	printf("Med Jobs Pending: %d\n", stats->currentJobsMQ);
+	printf("Low Jobs Pending: %d\n", stats->currentJobsLQ);
+	printf("Average Wait in High Priority Q in milliseconds: %f\n", stats->avgWaitHQ);
+	printf("Average Wait in Med Priority Q in milliseconds: %f\n", stats->avgWaitMQ);
+	printf("Averate Wait in Low Priority Q in milliseconds: %f\n", stats->avgWaitLQ);
+	printf("Max Threads Active: %d\n", stats->maxThreads);
+	printf("Current Worker Threads: %d\n", stats->workerThreads);
+	printf("Current Persistent Threads: %d\n", stats->persistentThreads);
+	printf("Current Idle Threads: %d\n", stats->idleThreads);
+	printf("Total Threads : %d\n", stats->totalThreads);
+	printf("Total Time spent Working in seconds: %f\n", stats->totalWorkTime);
+	printf("Total Time spent Idle in seconds : %f\n", stats->totalIdleTime);
+}
+#endif /* STATS */
 
  /****************************************************************************
  * Function: TPAttrSetMaxJobsTotal
@@ -1552,17 +1550,19 @@ static void SetSeed() {
  *  Returns:
  *      Always returns 0.
  *****************************************************************************/
-    int TPAttrSetMaxJobsTotal( ThreadPoolAttr * attr,
-                               int  maxJobsTotal ) {
-        assert( attr != NULL );
+int TPAttrSetMaxJobsTotal(
+	ThreadPoolAttr * attr,
+	int  maxJobsTotal )
+{
+	assert( attr != NULL );
 
-        if( attr == NULL ) {
-            return EINVAL;
-        }
+	if( attr == NULL ) {
+		return EINVAL;
+	}
 
-        attr->maxJobsTotal = maxJobsTotal;
-        return 0;
-    }
+	attr->maxJobsTotal = maxJobsTotal;
+	return 0;
+}
 
 /****************************************************************************
  * Function: ThreadPoolGetStats
@@ -1579,40 +1579,54 @@ static void SetSeed() {
  *****************************************************************************/
 #ifdef STATS
 int
-                   ThreadPoolGetStats( ThreadPool * tp,
-                                       ThreadPoolStats * stats ) {
+ThreadPoolGetStats(
+    ThreadPool *tp,
+    ThreadPoolStats *stats)
+{
+	assert(tp != NULL);
+	assert(stats != NULL);
 
-                   assert( tp != NULL );
-                   assert( stats != NULL );
-                   if( ( tp == NULL ) || ( stats == NULL ) ) {
-                   return EINVAL;}
+	if (tp == NULL || stats == NULL) {
+		return EINVAL;
+	}
 
-                   //if not shutdown then acquire mutex
-                   if( !tp->shutdown ) {
-                   ithread_mutex_lock( &tp->mutex );}
+	//if not shutdown then acquire mutex
+	if (!tp->shutdown) {
+		ithread_mutex_lock(&tp->mutex);
+	}
 
-                   ( *stats ) = tp->stats; if( stats->totalJobsHQ > 0 )
-                   stats->avgWaitHQ =
-                   stats->totalTimeHQ / stats->totalJobsHQ;
-                   else
-                   stats->avgWaitHQ = 0; if( stats->totalJobsMQ > 0 )
-                   stats->avgWaitMQ =
-                   stats->totalTimeMQ / stats->totalJobsMQ;
-                   else
-                   stats->avgWaitMQ = 0; if( stats->totalJobsLQ > 0 )
-                   stats->avgWaitLQ =
-                   stats->totalTimeLQ / stats->totalJobsLQ;
-                   else
-                   stats->avgWaitLQ = 0;
-                   stats->totalThreads = tp->totalThreads;
-                   stats->persistentThreads = tp->persistentThreads;
-                   stats->currentJobsHQ = ListSize( &tp->highJobQ );
-                   stats->currentJobsLQ = ListSize( &tp->lowJobQ );
-                   stats->currentJobsMQ = ListSize( &tp->medJobQ );
-                   //if not shutdown then release mutex
-                   if( !tp->shutdown ) {
-                   ithread_mutex_unlock( &tp->mutex );}
+	*stats = tp->stats;
+	if (stats->totalJobsHQ > 0) {
+		stats->avgWaitHQ = stats->totalTimeHQ / stats->totalJobsHQ;
+	} else {
+		stats->avgWaitHQ = 0;
+	}
+	
+	if( stats->totalJobsMQ > 0 ) {
+		stats->avgWaitMQ = stats->totalTimeMQ / stats->totalJobsMQ;
+	} else {
+		stats->avgWaitMQ = 0;
+	}
+	
+	if( stats->totalJobsLQ > 0 ) {
+		stats->avgWaitLQ = stats->totalTimeLQ / stats->totalJobsLQ;
+	} else {
+		stats->avgWaitLQ = 0;
+	}
 
-                   return 0;}
+	stats->totalThreads = tp->totalThreads;
+	stats->persistentThreads = tp->persistentThreads;
+	stats->currentJobsHQ = ListSize( &tp->highJobQ );
+	stats->currentJobsLQ = ListSize( &tp->lowJobQ );
+	stats->currentJobsMQ = ListSize( &tp->medJobQ );
 
-#endif
+	//if not shutdown then release mutex
+	if( !tp->shutdown ) {
+		ithread_mutex_unlock( &tp->mutex );
+	}
+
+	return 0;
+}
+
+#endif /* STATS */
+

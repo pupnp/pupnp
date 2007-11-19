@@ -1,4 +1,4 @@
-Version: 1.4.2
+Version: 1.6.2
 Summary: Universal Plug and Play (UPnP) SDK
 Name: libupnp
 Release: 1%{?dist}
@@ -77,6 +77,12 @@ make install DESTDIR=$RPM_BUILD_ROOT
 rm -rf %{buildroot}
 
 %changelog
+* Mon Nov 19 2007 Marcelo Jimenez <mroberto@users.sourceforge.net> - 1.6.2-1
+- Update to version 1.6.2
+
+* Mon Nov 19 2007 Marcelo Jimenez <mroberto@users.sourceforge.net> - 1.4.7-1
+- Update to version 1.4.7
+
 * Fri Feb 02 2007 Eric Tanguy <eric.tanguy@univ-nantes.fr> - 1.4.2-1
 - Update to version 1.4.2
 

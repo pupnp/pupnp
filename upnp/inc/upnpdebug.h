@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
- * Copyright (c) 2006 Rémi Turboult <r3mi@users.sourceforge.net>
+ * Copyright (c) 2006 Rï¿½mi Turboult <r3mi@users.sourceforge.net>
  * All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
@@ -258,7 +258,7 @@ void UpnpPrintf(
 	__attribute__((format (__printf__, 5, 6)))
 #endif
 ;
-#else
+#else /* DEBUG */
 static UPNP_INLINE void UpnpPrintf(
 	Upnp_LogLevel DLevel,
 	Dbg_Module Module,
@@ -266,7 +266,7 @@ static UPNP_INLINE void UpnpPrintf(
 	int DbgLineNo,
 	const char* FmtStr,
 	...) {}
-#endif
+#endif /* DEBUG */
 
 
 /***************************************************************************
