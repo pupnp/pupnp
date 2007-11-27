@@ -129,7 +129,6 @@ int AdvertiseAndReply( IN int AdFlag,
         return UPNP_E_INVALID_HANDLE;
     }
     defaultExp = SInfo->MaxAge;
-    nodeList = NULL;
 
     //get server info
 
