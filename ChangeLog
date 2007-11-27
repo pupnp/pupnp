@@ -11,6 +11,10 @@ Version 1.6.2
 	* "make check" was failing because ixml/test/test_document.sh did not
 	have the executable flag set. Thanks to Steve Bresson.
 
+2007-11-12 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fixed a memory leak in upnpapi.c to delete gMiniServerThreadPool in
+	the call to UpnpFinish(). Thanks to Fabrice Fontaine.
+
 *******************************************************************************
 Version 1.6.1
 *******************************************************************************

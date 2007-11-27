@@ -92,11 +92,9 @@ CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
 
     TimerThread gTimerThread;
 
-    ThreadPool gRecvThreadPool;
-
     ThreadPool gSendThreadPool;
-
-     ThreadPool gMiniServerThreadPool;
+    ThreadPool gRecvThreadPool;
+    ThreadPool gMiniServerThreadPool;
 
 //Flag to indicate the state of web server
      WebServerState bWebServerState = WEB_SERVER_DISABLED;
@@ -415,8 +413,9 @@ UpnpFinish()
         UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
             "UpnpFinish : UpnpSdkInit is ONE\n" );
     }
-    PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
     PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
+    PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
+    PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__, "MiniServer Thread Pool");
 
 #ifdef INCLUDE_DEVICE_APIS
     if( GetDeviceHandleInfo( &device_handle, &temp ) == HND_DEVICE )
@@ -435,11 +434,13 @@ UpnpFinish()
     web_server_destroy();
 #endif
 
-    ThreadPoolShutdown(&gSendThreadPool);
+    ThreadPoolShutdown(&gMiniServerThreadPool);
     ThreadPoolShutdown(&gRecvThreadPool);
+    ThreadPoolShutdown(&gSendThreadPool);
 
-    PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
     PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
+    PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
+    PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__, "MiniServer Thread Pool");
 
 #ifdef INCLUDE_CLIENT_APIS
     ithread_mutex_destroy(&GlobalClientSubscribeMutex);
