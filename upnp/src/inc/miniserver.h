@@ -90,9 +90,9 @@ void SetHTTPGetCallback( MiniServerCallback callback );
 ************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 void SetSoapCallback( MiniServerCallback callback );
-#else 
+#else  /* INCLUDE_DEVICE_APIS */
 static inline void SetSoapCallback( MiniServerCallback callback ) {}
-#endif
+#endif /* INCLUDE_DEVICE_APIS */
 
 /************************************************************************
 *	Function :	SetGenaCallback
