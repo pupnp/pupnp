@@ -32,62 +32,62 @@
 #ifndef MINISERVER_H
 #define MINISERVER_H
 
+
 #include "sock.h"
 #include "httpparser.h"
 
+
 extern SOCKET gMiniServerStopSock;
 
+
 typedef struct MServerSockArray {
-  int miniServerSock;     //socket for listening for miniserver
-                          //requests
-  int miniServerStopSock; //socket for stopping miniserver 
-  int ssdpSock; //socket for incoming advertisments and search requests
+	// socket for listening for miniserver requests
+	int miniServerSock;
+	// socket for stopping miniserver 
+	int miniServerStopSock;
+	// socket for incoming advertisments and search requests
+	int ssdpSock;
 
-  int stopPort;
-  int miniServerPort;
+	int stopPort;
+	int miniServerPort;
 
-  CLIENTONLY(int ssdpReqSock;) //socket for sending search 
-       //requests and receiving
-       // search replies
-      
+	// socket for sending search requests and receiving search replies
+	CLIENTONLY(int ssdpReqSock;)
 } MiniServerSockArray;
 
-//typedef void (*MiniServerCallback) ( const char* document, int sockfd );
 
-typedef void (*MiniServerCallback) ( IN http_parser_t *parser,
-									 IN http_message_t* request, 
-									 IN SOCKINFO *info );
+typedef void (*MiniServerCallback)(
+	IN http_parser_t *parser,
+	IN http_message_t* request, 
+	IN SOCKINFO *info );
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /************************************************************************
-*	Function :	SetHTTPGetCallback
-*
-*	Parameters :
-*		MiniServerCallback callback ; - HTTP Callback to be invoked 
-*
-*	Description :	Set HTTP Get Callback
-*
-*	Return :	void
-*
-*	Note :
-************************************************************************/
+ * Function: SetHTTPGetCallback
+ *
+ * Parameters:
+ *	MiniServerCallback callback; - HTTP Callback to be invoked 
+ *
+ * Description:	Set HTTP Get Callback
+ *
+ * Return: void
+ ************************************************************************/
 void SetHTTPGetCallback( MiniServerCallback callback );
 
 /************************************************************************
-*	Function :	SetSoapCallback
-*
-*	Parameters :
-*		MiniServerCallback callback ; - SOAP Callback to be invoked 
-*
-*	Description :	Set SOAP Callback
-*
-*	Return :	void
-*
-*	Note :
-************************************************************************/
+ * Function: SetSoapCallback
+ *
+ * Parameters:
+ *	MiniServerCallback callback; - SOAP Callback to be invoked 
+ *
+ * Description: Set SOAP Callback
+ *
+ * Return: void
+ ************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 void SetSoapCallback( MiniServerCallback callback );
 #else  /* INCLUDE_DEVICE_APIS */
@@ -95,60 +95,56 @@ static inline void SetSoapCallback( MiniServerCallback callback ) {}
 #endif /* INCLUDE_DEVICE_APIS */
 
 /************************************************************************
-*	Function :	SetGenaCallback
-*
-*	Parameters :
-*		MiniServerCallback callback ; - GENA Callback to be invoked
-*
-*	Description :	Set GENA Callback
-*
-*	Return :	void
-*
-*	Note :
-************************************************************************/
+ * Function: SetGenaCallback
+ *
+ * Parameters:
+ *	MiniServerCallback callback; - GENA Callback to be invoked
+ *
+ * D6escription: Set GENA Callback
+ *
+ * Return: void
+ ************************************************************************/
 void SetGenaCallback( MiniServerCallback callback );
 
 /************************************************************************
-*	Function :	StartMiniServer
-*
-*	Parameters :
-*		unsigned short listen_port ; Port on which the server listens for 
-*									incoming connections
-*
-*	Description :	Initialize the sockets functionality for the 
-*		Miniserver. Initialize a thread pool job to run the MiniServer
-*		and the job to the thread pool. If listen port is 0, port is 
-*		dynamically picked
-*
-*		Use timer mechanism to start the MiniServer, failure to meet the 
-*		allowed delay aborts the attempt to launch the MiniServer.
-*
-*	Return : int ;
-*		Actual port socket is bound to - On Success: 
-*		A negative number UPNP_E_XXX - On Error   			
-*	Note :
-************************************************************************/
+ * Function: StartMiniServer
+ *
+ * Parameters:
+ *	unsigned short listen_port ; Port on which the server listens for 
+ *	incoming connections
+ *
+ * Description: Initialize the sockets functionality for the 
+ *	Miniserver. Initialize a thread pool job to run the MiniServer
+ *	and the job to the thread pool. If listen port is 0, port is 
+ *	dynamically picked
+ *
+ * 	Use timer mechanism to start the MiniServer, failure to meet the 
+ *	allowed delay aborts the attempt to launch the MiniServer.
+ *
+ * Return: int;
+ *	Actual port socket is bound to - On Success: 
+ *	A negative number UPNP_E_XXX - On Error   			
+ ************************************************************************/
 int StartMiniServer( unsigned short listen_port );
 
 /************************************************************************
-*	Function :	StopMiniServer
-*
-*	Parameters :
-*		void ;	
-*
-*	Description :	Stop and Shutdown the MiniServer and free socket 
-*		resources.
-*
-*	Return : int ;
-*		Always returns 0 
-*
-*	Note :
-************************************************************************/
-int StopMiniServer( void );
+ * Function: StopMiniServer
+ *
+ * Parameters:
+ *	void;	
+ *
+ * Description: Stop and Shutdown the MiniServer and free socket resources.
+ *
+ * Return : int;
+ *	Always returns 0 
+ ************************************************************************/
+int StopMiniServer();
 
 
 #ifdef __cplusplus
 }   /* extern C */
 #endif
 
+
 #endif /* MINISERVER_H */
+
