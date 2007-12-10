@@ -43,56 +43,54 @@
 #include "httpreadwrite.h"
 
 #ifdef WIN32
- #include <winsock2.h>
- #include <ws2tcpip.h>
- #include "unixutil.h"
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
+	#include "unixutil.h"
 #endif
 
 #define MAX_TIME_TOREAD  45
 
-CLIENTONLY( SOCKET gSsdpReqSocket = 0;
-     )
+CLIENTONLY( SOCKET gSsdpReqSocket = 0; )
 
-     void RequestHandler(  );
-     Event ErrotEvt;
+void RequestHandler();
+Event ErrotEvt;
 
-     enum Listener { Idle, Stopping, Running };
+enum Listener { Idle, Stopping, Running };
 
-     unsigned short ssdpStopPort;
+unsigned short ssdpStopPort;
 
-     struct SSDPSockArray {
-         int ssdpSock;          //socket for incoming advertisments and search requests
-           CLIENTONLY( int ssdpReqSock;
-              )                 //socket for sending search 
-             //requests and receiving
-             // search replies
-     };
+struct SSDPSockArray {
+	// socket for incoming advertisments and search requests
+	int ssdpSock;
+	// socket for sending search requests and receiving search replies
+	CLIENTONLY( int ssdpReqSock; )
+};
 
 #ifdef INCLUDE_DEVICE_APIS
 #if EXCLUDE_SSDP == 0
 
 /************************************************************************
-* Function : AdvertiseAndReply
-*
-* Parameters:
-*	IN int AdFlag:
-*		-1 = Send shutdown,
-*		 0 = send reply, 
-*		 1 = Send Advertisement
-*	IN UpnpDevice_Handle Hnd: Device handle
-*	IN enum SsdpSearchType SearchType:Search type for sending replies
-*	IN struct sockaddr_in *DestAddr:Destination address
-*   IN char *DeviceType:Device type
-*	IN char *DeviceUDN:Device UDN
-*   IN char *ServiceType:Service type
-*	IN int Exp:Advertisement age
-*
-* Description:
-*	This function sends SSDP advertisements, replies and shutdown messages.
-*
-* Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
-***************************************************************************/
+ * Function : AdvertiseAndReply
+ *
+ * Parameters:
+ *	IN int AdFlag:
+ *		-1 = Send shutdown,
+ *		 0 = send reply, 
+ *		 1 = Send Advertisement
+ *	IN UpnpDevice_Handle Hnd: Device handle
+ *	IN enum SsdpSearchType SearchType:Search type for sending replies
+ *	IN struct sockaddr_in *DestAddr:Destination address
+ *   IN char *DeviceType:Device type
+ *	IN char *DeviceUDN:Device UDN
+ *   IN char *ServiceType:Service type
+ *	IN int Exp:Advertisement age
+ *
+ * Description:
+ *	This function sends SSDP advertisements, replies and shutdown messages.
+ *
+ * Returns: int
+ *	UPNP_E_SUCCESS if successful else appropriate error
+ ***************************************************************************/
 int AdvertiseAndReply( IN int AdFlag,
                        IN UpnpDevice_Handle Hnd,
                        IN enum SsdpSearchType SearchType,
@@ -129,7 +127,6 @@ int AdvertiseAndReply( IN int AdFlag,
         return UPNP_E_INVALID_HANDLE;
     }
     defaultExp = SInfo->MaxAge;
-    nodeList = NULL;
 
     //get server info
 
@@ -398,21 +395,21 @@ int AdvertiseAndReply( IN int AdFlag,
 
 }  /****************** End of AdvertiseAndReply *********************/
 
-#endif
-#endif
+#endif /* EXCLUDE_SSDP == 0 */
+#endif /* INCLUDE_DEVICE_APIS */
 
 /************************************************************************
-* Function : Make_Socket_NoBlocking
-*
-* Parameters:
-*	IN int sock: socket
-*
-* Description:
-*	This function makes socket non-blocking.
-*
-* Returns: int
-*	0 if successful else -1 
-***************************************************************************/
+ * Function : Make_Socket_NoBlocking
+ *
+ * Parameters:
+ *	IN int sock: socket
+ *
+ * Description:
+ *	This function makes socket non-blocking.
+ *
+ * Returns: int
+ *	0 if successful else -1 
+ ***************************************************************************/
 int
 Make_Socket_NoBlocking( int sock )
 {
@@ -431,20 +428,20 @@ Make_Socket_NoBlocking( int sock )
 }
 
 /************************************************************************
-* Function : unique_service_name
-*
-* Parameters:
-*	IN char *cmd: Service Name string
-*	OUT SsdpEvent *Evt: The SSDP event structure partially filled
-*		by all the function.
-*
-* Description:
-*	This function fills the fields of the event structure like DeviceType,
-*	Device UDN and Service Type
-*
-* Returns: int
-*	0 if successful else -1
-***************************************************************************/
+ * Function : unique_service_name
+ *
+ * Parameters:
+ *	IN char *cmd: Service Name string
+ *	OUT SsdpEvent *Evt: The SSDP event structure partially filled
+ *		by all the function.
+ *
+ * Description:
+ *	This function fills the fields of the event structure like DeviceType,
+ *	Device UDN and Service Type
+ *
+ * Returns: int
+ *	0 if successful else -1
+ ***************************************************************************/
 int
 unique_service_name( IN char *cmd,
                      IN SsdpEvent * Evt )
@@ -526,18 +523,18 @@ unique_service_name( IN char *cmd,
 }
 
 /************************************************************************
-* Function : ssdp_request_type1
-*
-* Parameters:
-*	IN char *cmd: command came in the ssdp request
-*
-* Description:
-*	This function figures out the type of the SSDP search in the
-*	in the request.
-*
-* Returns: enum SsdpSearchType
-*	return appropriate search type else returns SSDP_ERROR
-***************************************************************************/
+ * Function : ssdp_request_type1
+ *
+ * Parameters:
+ *	IN char *cmd: command came in the ssdp request
+ *
+ * Description:
+ *	This function figures out the type of the SSDP search in the
+ *	in the request.
+ *
+ * Returns: enum SsdpSearchType
+ *	return appropriate search type else returns SSDP_ERROR
+ ***************************************************************************/
 enum SsdpSearchType
 ssdp_request_type1( IN char *cmd )
 {
@@ -562,20 +559,20 @@ ssdp_request_type1( IN char *cmd )
 }
 
 /************************************************************************
-* Function : ssdp_request_type
-*
-* Parameters:
-*	IN char *cmd: command came in the ssdp request
-*	OUT SsdpEvent *Evt: The event structure partially filled by
-*		 this function.
-*
-* Description:
-*	This function starts filling the SSDP event structure based upon the 
-*	request received.
-*
-* Returns: int
-*	0 on success; -1 on error
-***************************************************************************/
+ * Function : ssdp_request_type
+ *
+ * Parameters:
+ *	IN char *cmd: command came in the ssdp request
+ *	OUT SsdpEvent *Evt: The event structure partially filled by
+ *		 this function.
+ *
+ * Description:
+ *	This function starts filling the SSDP event structure based upon the 
+ *	request received.
+ *
+ * Returns: int
+ *	0 on success; -1 on error
+ ***************************************************************************/
 int
 ssdp_request_type( IN char *cmd,
                    OUT SsdpEvent * Evt )
@@ -593,18 +590,18 @@ ssdp_request_type( IN char *cmd,
 }
 
 /************************************************************************
-* Function : free_ssdp_event_handler_data
-*
-* Parameters:
-*	IN void *the_data: ssdp_thread_data structure. This structure contains
-*			SSDP request message.
-*
-* Description:
-*	This function frees the ssdp request
-*
-* Returns: VOID
-*
-***************************************************************************/
+ * Function : free_ssdp_event_handler_data
+ *
+ * Parameters:
+ *	IN void *the_data: ssdp_thread_data structure. This structure contains
+ *			SSDP request message.
+ *
+ * Description:
+ *	This function frees the ssdp request
+ *
+ * Returns: VOID
+ *
+ ***************************************************************************/
 static void
 free_ssdp_event_handler_data( void *the_data )
 {
@@ -620,18 +617,18 @@ free_ssdp_event_handler_data( void *the_data )
 }
 
 /************************************************************************
-* Function : valid_ssdp_msg
-*
-* Parameters:
-*	IN void *the_data: ssdp_thread_data structure. This structure contains
-*			SSDP request message.
-*
-* Description:
-*	This function do some quick checking of the ssdp msg
-*
-* Returns: xboolean
-*	returns TRUE if msg is valid else FALSE
-***************************************************************************/
+ * Function : valid_ssdp_msg
+ *
+ * Parameters:
+ *	IN void *the_data: ssdp_thread_data structure. This structure contains
+ *			SSDP request message.
+ *
+ * Description:
+ *	This function do some quick checking of the ssdp msg
+ *
+ * Returns: xboolean
+ *	returns TRUE if msg is valid else FALSE
+ ***************************************************************************/
 static UPNP_INLINE xboolean
 valid_ssdp_msg( IN http_message_t * hmsg )
 {
@@ -661,19 +658,19 @@ valid_ssdp_msg( IN http_message_t * hmsg )
 }
 
 /************************************************************************
-* Function : start_event_handler
-*
-* Parameters:
-*	IN void *the_data: ssdp_thread_data structure. This structure contains
-*			SSDP request message.
-*
-* Description:
-*	This function parses the message and dispatches it to a handler
-*	which handles the ssdp request msg
-*
-* Returns: int
-*	0 if successful -1 if error
-***************************************************************************/
+ * Function : start_event_handler
+ *
+ * Parameters:
+ *	IN void *the_data: ssdp_thread_data structure. This structure contains
+ *			SSDP request message.
+ *
+ * Description:
+ *	This function parses the message and dispatches it to a handler
+ *	which handles the ssdp request msg
+ *
+ * Returns: int
+ *	0 if successful -1 if error
+ ***************************************************************************/
 static UPNP_INLINE int
 start_event_handler( void *Data )
 {
@@ -713,18 +710,18 @@ start_event_handler( void *Data )
 }
 
 /************************************************************************
-* Function : ssdp_event_handler_thread
-*
-* Parameters:
-*	IN void *the_data: ssdp_thread_data structure. This structure contains
-*			SSDP request message.
-*
-* Description:
-*	This function is a thread that handles SSDP requests.
-*
-* Returns: void
-*
-***************************************************************************/
+ * Function : ssdp_event_handler_thread
+ *
+ * Parameters:
+ *	IN void *the_data: ssdp_thread_data structure. This structure contains
+ *			SSDP request message.
+ *
+ * Description:
+ *	This function is a thread that handles SSDP requests.
+ *
+ * Returns: void
+ *
+ ***************************************************************************/
 static void
 ssdp_event_handler_thread( void *the_data )
 {
@@ -737,8 +734,7 @@ ssdp_event_handler_thread( void *the_data )
     // send msg to device or ctrlpt
     if( ( hmsg->method == HTTPMETHOD_NOTIFY ) ||
         ( hmsg->request_method == HTTPMETHOD_MSEARCH ) ) {
-        CLIENTONLY( ssdp_handle_ctrlpt_msg( hmsg, &data->dest_addr,
-                                            FALSE, NULL ););
+        CLIENTONLY( ssdp_handle_ctrlpt_msg( hmsg, &data->dest_addr, FALSE, NULL );)
     } else {
         ssdp_handle_device_request( hmsg, &data->dest_addr );
     }
@@ -748,17 +744,17 @@ ssdp_event_handler_thread( void *the_data )
 }
 
 /************************************************************************
-* Function : readFromSSDPSocket
-*
-* Parameters:
-*	IN SOCKET socket: SSDP socket
-*
-* Description:
-*	This function reads the data from the ssdp socket.
-*
-* Returns: void
-*
-***************************************************************************/
+ * Function : readFromSSDPSocket
+ *
+ * Parameters:
+ *	IN SOCKET socket: SSDP socket
+ *
+ * Description:
+ *	This function reads the data from the ssdp socket.
+ *
+ * Returns: void
+ *
+ ***************************************************************************/
 void
 readFromSSDPSocket( SOCKET socket )
 {
@@ -845,32 +841,31 @@ readFromSSDPSocket( SOCKET socket )
 }
 
 /************************************************************************
-* Function : get_ssdp_sockets								
-*
-* Parameters:
-*	OUT MiniServerSockArray *out: Arrays of SSDP sockets
-*
-* Description:
-*	This function creates the ssdp sockets. It set their option to listen
-*	for multicast traffic.
-*
-* Returns: int
-*	return UPNP_E_SUCCESS if successful else returns appropriate error
-***************************************************************************/
+ * Function : get_ssdp_sockets								
+ *
+ * Parameters:
+ *	OUT MiniServerSockArray *out: Arrays of SSDP sockets
+ *
+ * Description:
+ *	This function creates the ssdp sockets. It set their option to listen
+ *	for multicast traffic.
+ *
+ * Returns: int
+ *	return UPNP_E_SUCCESS if successful else returns appropriate error
+ ***************************************************************************/
 int
 get_ssdp_sockets( MiniServerSockArray * out )
 {
-    SOCKET ssdpSock;
-
-    CLIENTONLY( SOCKET ssdpReqSock; )
     int onOff = 1;
     u_char ttl = 4;
     struct ip_mreq ssdpMcastAddr;
     struct sockaddr_in ssdpAddr;
     int option = 1;
     struct in_addr addr;
+    SOCKET ssdpSock;
+#if INCLUDE_CLIENT_APIS
+    SOCKET ssdpReqSock;
 
-CLIENTONLY(
     if( ( ssdpReqSock = socket( AF_INET, SOCK_DGRAM, 0 ) ) == UPNP_INVALID_SOCKET ) {
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
@@ -880,15 +875,15 @@ CLIENTONLY(
     setsockopt( ssdpReqSock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof( ttl ) );
     // just do it, regardless if fails or not.
     Make_Socket_NoBlocking( ssdpReqSock );
-    gSsdpReqSocket = ssdpReqSock; )
-// END CLIENTONLY
+    gSsdpReqSocket = ssdpReqSock;
+#endif /* INCLUDE_CLIENT_APIS */
 
     if( ( ssdpSock = socket( AF_INET, SOCK_DGRAM, 0 ) ) == UPNP_INVALID_SOCKET ) {
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in socket operation !!!\n" );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
+        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
+        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
         return UPNP_E_OUTOF_SOCKET;
     }
 
@@ -898,26 +893,26 @@ CLIENTONLY(
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in set reuse addr !!!\n" );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
+        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
+        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
         shutdown( ssdpSock, SD_BOTH );
         UpnpCloseSocket( ssdpSock );
         return UPNP_E_SOCKET_ERROR;
     }
     
-    #ifdef __FreeBSD__
+#ifdef __FreeBSD__
     if( setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEPORT,
             ( char * )&onOff, sizeof( onOff ) ) != 0 ) {
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in set reuse port !!!\n" );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
+        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
+        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
         shutdown( ssdpSock, SD_BOTH );
         UpnpCloseSocket( ssdpSock );
         return UPNP_E_SOCKET_ERROR;
     }
-    #endif
+#endif /* __FreeBSD__ */
 
     memset( ( void * )&ssdpAddr, 0, sizeof( struct sockaddr_in ) );
     ssdpAddr.sin_family = AF_INET;
@@ -931,8 +926,8 @@ CLIENTONLY(
             "Error in binding !!!\n" );
             shutdown( ssdpSock, SD_BOTH );
         UpnpCloseSocket( ssdpSock );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
+        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
+        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
         return UPNP_E_SOCKET_BIND;
     }
 
@@ -945,9 +940,9 @@ CLIENTONLY(
             SSDP, __FILE__, __LINE__,
             "Error in joining" " multicast group !!!\n" );
         shutdown( ssdpSock, SD_BOTH );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
+        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         UpnpCloseSocket( ssdpSock );
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
+        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
         return UPNP_E_SOCKET_ERROR;
     }
 
@@ -961,7 +956,7 @@ CLIENTONLY(
         /* This is probably not a critical error, so let's continue. */
     }
 
-    // result is not checked becuase it will fail in WinMe and Win9x.
+    /* result is not checked becuase it will fail in WinMe and Win9x. */
     setsockopt( ssdpSock, IPPROTO_IP,
                 IP_MULTICAST_TTL, &ttl, sizeof( ttl ) );
     if( setsockopt( ssdpSock, SOL_SOCKET, SO_BROADCAST,
@@ -970,16 +965,16 @@ CLIENTONLY(
             SSDP, __FILE__, __LINE__,
             "Error in setting broadcast !!!\n" );
         shutdown( ssdpSock, SD_BOTH );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
+        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         UpnpCloseSocket( ssdpSock );
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
+        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
         return UPNP_E_NETWORK_ERROR;
     }
 
-    CLIENTONLY( out->ssdpReqSock = ssdpReqSock; );
+    CLIENTONLY( out->ssdpReqSock = ssdpReqSock; )
     out->ssdpSock = ssdpSock;
     return UPNP_E_SUCCESS;
 }
 
-#endif // EXCLUDE_SSDP
+#endif /* EXCLUDE_SSDP */
 

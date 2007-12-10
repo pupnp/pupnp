@@ -2,14 +2,22 @@
 Version 1.6.2
 *******************************************************************************
 
-2007-11-09 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-	* Added a isleep() call to the error handler of select() in
-	RunMiniServer(), so that it does not take 100% cpu in case select()
-	fails repeatedly.
+2007-12-10 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fixed a compilation error due to a missing #ifdef in
+	upnp/src/genlib/miniserver/miniserver.c. Thanks to Eugene Christensen.
 
 2007-11-12 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* "make check" was failing because ixml/test/test_document.sh did not
 	have the executable flag set. Thanks to Steve Bresson.
+
+2007-11-12 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fixed a memory leak in upnpapi.c to delete gMiniServerThreadPool in
+	the call to UpnpFinish(). Thanks to Fabrice Fontaine.
+
+2007-11-09 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added a isleep() call to the error handler of select() in
+	RunMiniServer(), so that it does not take 100% cpu in case select()
+	fails repeatedly.
 
 *******************************************************************************
 Version 1.6.1
@@ -128,6 +136,10 @@ Version 1.6.0
 	the pointer would point to an invalid memory region. This fix caused
 	an interface change in the library and the minor library version was
 	bumped. Also, the libtool library numbers were changed accordingly.
+
+*******************************************************************************
+Version 1.4.7
+*******************************************************************************
 
 2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added support for the Basic Device
