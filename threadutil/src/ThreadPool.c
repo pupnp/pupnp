@@ -168,26 +168,36 @@ SetPriority( ThreadPriority priority )
  *
  *  Description:
  *      Returns the difference in milliseconds between two
- *      timeb structures.
+ *      timeval structures.
  *      Internal Only.
  *  Parameters:
- *      struct timeb *time1,
- *      struct timeb *time2,
+ *      struct timeval *time1,
+ *      struct timeval *time2,
  *  Returns:
  *       the difference in milliseconds, time1-time2.
  *****************************************************************************/
-static double
-DiffMillis( struct timeb *time1,
-            struct timeb *time2 )
+static unsigned long
+DiffMillis( struct timeval *time1,
+            struct timeval *time2 )
 {
     double temp = 0;
 
     assert( time1 != NULL );
     assert( time2 != NULL );
+     
+	struct timeval {
+             time_t          tv_sec;         /* seconds */
+             suseconds_t     tv_usec;        /* and microseconds */
+     };
 
-    temp = ( ( double )( time1->time ) - time2->time );
-    temp = temp * 1000;
-    temp += ( time1->millitm - time2->millitm );
+	temp = time1->tv_sec - time2->tv_sec;
+	/* convert to milliseconds */
+	temp *= 1000;
+
+	/* convert microseconds to milliseconds and add to temp */
+	/* implicit flooring of unsigned long data type */
+	temp += ( (time1->tv_usec - time2->tv_usec) / 1000 );
+
     return temp;
 }
 
@@ -207,13 +217,13 @@ static void
 BumpPriority( ThreadPool * tp )
 {
     int done = 0;
-    struct timeb now;
-    double diffTime = 0;
+	struct timeval now;
+    unsigned long diffTime = 0;
     ThreadPoolJob *tempJob = NULL;
 
     assert( tp != NULL );
 
-    ftime( &now );
+	gettimeofday(&now, NULL);	
 
     while( !done ) {
         if( tp->medJobQ.size ) {
@@ -272,16 +282,16 @@ static void
 SetRelTimeout( struct timespec *time,
                int relMillis )
 {
-    struct timeb now;
+    struct timeval now;
     int sec = relMillis / 1000;
     int milliSeconds = relMillis % 1000;
 
     assert( time != NULL );
 
-    ftime( &now );
+	gettimeofday(&now, NULL);
 
-    time->tv_sec = now.time + sec;
-    time->tv_nsec = ( now.millitm + milliSeconds ) * 1000000;
+    time->tv_sec = now.tv_sec + sec;
+    time->tv_nsec = ( (now.tv_usec/1000) + milliSeconds ) * 1000000;
 }
 
 /****************************************************************************
@@ -334,11 +344,11 @@ static void StatsInit( ThreadPoolStats * stats )
 static void CalcWaitTime( ThreadPool * tp,
                                      ThreadPriority p,
                                      ThreadPoolJob * job ) {
-           struct timeb now;
-           double diff;
+           struct timeval now;
+           unsigned long diff;
            assert( tp != NULL );
            assert( job != NULL );
-           ftime( &now );
+           gettimeofday(&now, NULL);
            diff = DiffMillis( &now, &job->requestTime ); switch ( p ) {
 case HIGH_PRIORITY:
 tp->stats.totalJobsHQ++; tp->stats.totalTimeHQ += diff; break; case MED_PRIORITY:
@@ -360,15 +370,15 @@ tp->stats.totalJobsLQ++; tp->stats.totalTimeLQ += diff; break; default:
  *      
  *****************************************************************************/
 static void SetSeed() {
-	struct timeb t;
-
-	ftime( &t );
+ 	struct timeval t;
+  
+ 	gettimeofday(&t, NULL);
 #if defined(WIN32)
-	srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id().p );
-#elif defined(__FreeBSD__) || defined(__OSX__)
-	srand( ( unsigned int )t.millitm + (unsigned int)ithread_get_current_thread_id() );
+ 	srand( ( unsigned int )t.tv_usec + (unsigned int)ithread_get_current_thread_id().p );
+#elif defined(__FreeBSD__)
+ 	srand( ( unsigned int )t.tv_usec + (unsigned int)ithread_get_current_thread_id() );
 #elif defined(__linux__)
-	srand( ( unsigned int )t.millitm + ithread_get_current_thread_id() );
+ 	srand( ( unsigned int )t.tv_usec + ithread_get_current_thread_id() );
 #else
 	{
 		volatile union { volatile pthread_t tid; volatile unsigned i; } idu;
@@ -607,7 +617,7 @@ static void SetSeed() {
         if( newJob ) {
             ( *newJob ) = ( *job );
             newJob->jobId = id;
-            ftime( &newJob->requestTime );
+            gettimeofday( &newJob->requestTime, NULL );
         }
         return newJob;
     }

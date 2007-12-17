@@ -2,6 +2,10 @@
 Version 1.6.3
 *******************************************************************************
 
+2007-12-16 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Library was not compiling on FreeBSD 7. Code now no longer uses
+	ftime(), using gettimeofday() instead. Thanks to Josh Carroll.
+
 
 *******************************************************************************
 Version 1.6.2

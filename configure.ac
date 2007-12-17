@@ -98,13 +98,16 @@ AC_INIT([libupnp], [1.6.3], [mroberto@users.sourceforge.net])
 # Release 1.6.3:
 # "current:revision:age"
 #
+# - Code has changed in threadutil
+#	revision: 0 -> 1
+#
 #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-#AC_SUBST([LT_VERSION_THREADUTIL], [4:0:2])
+#AC_SUBST([LT_VERSION_THREADUTIL], [4:1:2])
 #AC_SUBST([LT_VERSION_UPNP],       [3:2:0])
 #
 ###############################################################################
 AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [4:0:2])
+AC_SUBST([LT_VERSION_THREADUTIL], [4:1:2])
 AC_SUBST([LT_VERSION_UPNP],       [3:2:0])
 ###############################################################################
 # Repeating the algorithm so that it is closer to the modificatin place:
