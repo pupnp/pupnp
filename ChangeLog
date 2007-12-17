@@ -3,6 +3,9 @@ Version 1.6.3
 *******************************************************************************
 
 2007-12-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Removed unused iasnprintf.{c,h} files.
+
+2007-12-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Removed STATSONLY() macro from ThreadPool.{c,h}.
 	* Removed time() usage from ThreadPool.c.
 	* Fixed STATS = 0 compilation.
