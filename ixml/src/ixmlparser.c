@@ -921,6 +921,8 @@ Parser_parseDocument( OUT IXML_Document ** retDoc,
     int rc = IXML_SUCCESS;
     IXML_CDATASection *cdataSecNode = NULL;
 
+    // It is important that the node gets initialized here, otherwise things
+    // can go wrong on the error handler.
     ixmlNode_init( &newNode );
 
     rc = ixmlDocument_createDocumentEx( &gRootDoc );
@@ -936,7 +938,9 @@ Parser_parseDocument( OUT IXML_Document ** retDoc,
     }
 
     while( bETag == FALSE ) {
-        // clear the newNode contents
+        // clear the newNode contents. Redundant on the first iteration,
+	// but nonetheless, necessary due to the possible calls to
+	// ErrorHandler above. Currently, this is just a memset to zero.
         ixmlNode_init( &newNode );
 
         if( Parser_getNextNode( xmlParser, &newNode, &bETag ) ==
@@ -1030,7 +1034,7 @@ Parser_parseDocument( OUT IXML_Document ** retDoc,
     Parser_free( xmlParser );
     return rc;
 
-  ErrorHandler:
+ErrorHandler:
     Parser_freeNodeContent( &newNode );
     ixmlDocument_free( gRootDoc );
     Parser_free( xmlParser );
