@@ -2,6 +2,11 @@
 Version 1.6.3
 *******************************************************************************
 
+2007-12-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Removed STATSONLY() macro from ThreadPool.{c,h}.
+	* Removed time() usage from ThreadPool.c.
+	* Fixed STATS = 0 compilation.
+
 2007-12-16 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Library was not compiling on FreeBSD 7. Code now no longer uses
 	ftime(), using gettimeofday() instead. Thanks to Josh Carroll.
