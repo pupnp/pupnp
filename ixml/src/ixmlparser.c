@@ -501,17 +501,22 @@ Parser_init(  )
 }
 
 /*================================================================
-*   Parser_isValidEndElement
-*       check if a new node->nodeName matches top of element stack.
-*       Internal to parser only.
-*
-*=================================================================*/
+ * Parser_isValidEndElement
+ *	check if a new node->nodeName matches top of element stack.
+ *	Internal to parser only.
+ *=================================================================*/
 static int
-Parser_isValidEndElement( IN Parser * xmlParser,
-                          IN IXML_Node * newNode )
+Parser_isValidEndElement(
+	IN Parser * xmlParser,
+	IN IXML_Node * newNode )
 {
-    return ( strcmp( xmlParser->pCurElement->element, newNode->nodeName )
-             == 0 );
+    assert( xmlParser );
+    assert( xmlParser->pCurElement );
+    assert( xmlParser->pCurElement->element );
+    assert( newNode );
+    assert( newNode->nodeName );
+
+    return strcmp( xmlParser->pCurElement->element, newNode->nodeName ) == 0;
 }
 
 /*===============================================================
@@ -2501,3 +2506,4 @@ Parser_getNextNode( IN Parser * xmlParser,
     return IXML_SYNTAX_ERR;
 
 }
+
