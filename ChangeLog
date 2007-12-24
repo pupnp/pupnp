@@ -6,7 +6,8 @@ Version 1.6.3
 	* Added a configure test to check if pthread_rwlock_t is available.
 	Define _GNU_SOURCE if needed. The fallback behaviou will only be
 	implemented if _GNU_SOURCE prooves to be insufficient on some
-	platforms.
+	platforms. Thanks to Jonathan Casiot (no_dice) and Robert Gingher
+	(robsbox).
 
 2007-12-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Removed unused iasnprintf.{c,h} files.
@@ -381,7 +382,7 @@ Version 1.4.2
 2007-01-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
 	* SF Tracker [ 1634922 ] Support for large files (>= 2 GiB), part 2
-	Submitted By: Jonathan - no_dice
+	Submitted By: Jonathan Casiot - no_dice
 	Summary: This patch hopefully fixes the remaining types and related
 	code to enable files >= 2 GiB to be streamed. Jonathan claims to have
 	tested this with a patched version of ushare-0.9.8 and a D-Link DSM-520.
