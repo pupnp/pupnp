@@ -328,9 +328,31 @@ AC_CHECK_FUNCS(ftime,, [AC_CHECK_LIB(compat, ftime)])
 #
 # Checks for POSIX Threads
 #
+echo "--------------------------- pthread stuff -------------------------------------"
 ACX_PTHREAD(
 	[],
 	[AC_MSG_ERROR([POSIX threads are required to build this program])])
+dnl # Determine if RW-mutex is available
+echo "----------------------- pthread_rwlock_t stuff --------------------------------"
+AC_MSG_CHECKING([if pthread_rwlock_t is available])
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM(
+		[#include <pthread.h>],
+		[pthread_rwlock_t *x;])],
+	[AC_DEFINE([UPNP_USE_RWLOCK], [1], [Use pthread_rwlock_t])
+		AC_MSG_RESULT([yes, supported without any options])],
+	[AC_COMPILE_IFELSE(
+		[AC_LANG_PROGRAM(
+			[#define _GNU_SOURCE],
+			[#include <pthread.h>],
+			[pthread_rwlock_t *x;])],
+		[AC_DEFINE([UPNP_USE_RWLOCK], [1], [Use pthread_rwlock_t])
+			AC_DEFINE([_GNU_SOURCE], [], [_GNU_SOURCE needed for pthread_rwlock_t in this platform])
+			AC_MSG_RESULT([yes, definition of _GNU_SOURCE required])],
+		[AC_DEFINE([UPNP_USE_RWLOCK], [0], [Do not use pthread_rwlock_t])
+			AC_MSG_RESULT([no, needs to fallback to pthread_mutex])
+			AC_MSG_ERROR([pthread_rwlock_t not available])])])
+echo "-------------------------------------------------------------------------------"
 
 
 AC_CONFIG_FILES([

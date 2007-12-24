@@ -2,6 +2,12 @@
 Version 1.6.3
 *******************************************************************************
 
+2007-12-24 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added a configure test to check if pthread_rwlock_t is available.
+	Define _GNU_SOURCE if needed. The fallback behaviou will only be
+	implemented if _GNU_SOURCE prooves to be insufficient on some
+	platforms.
+
 2007-12-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Removed unused iasnprintf.{c,h} files.
 
