@@ -313,7 +313,6 @@ AC_CHECK_HEADERS(
 # Checks for typedefs, structures, and compiler characteristics
 #	
 AC_C_CONST
-AC_TYPE_SIZE_T
 TYPE_SOCKLEN_T
 
 
