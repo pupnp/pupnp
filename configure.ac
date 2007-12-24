@@ -346,7 +346,7 @@ AC_COMPILE_IFELSE(
 			[#include <pthread.h>],
 			[pthread_rwlock_t *x;])],
 		[AC_DEFINE([UPNP_USE_RWLOCK], [1], [Use pthread_rwlock_t])
-			AC_DEFINE([_GNU_SOURCE], [], [_GNU_SOURCE needed for pthread_rwlock_t in this platform])
+			CFLAGS="$CFLAGS -D_GNU_SOURCE"
 			AC_MSG_RESULT([yes, definition of _GNU_SOURCE required])],
 		[AC_DEFINE([UPNP_USE_RWLOCK], [0], [Do not use pthread_rwlock_t])
 			AC_MSG_RESULT([no, needs to fallback to pthread_mutex])
