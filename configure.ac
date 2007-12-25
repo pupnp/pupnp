@@ -339,6 +339,7 @@ ACX_PTHREAD(
 #
 echo "----------------------- pthread_rwlock_t stuff --------------------------------"
 AC_MSG_CHECKING([if pthread_rwlock_t is available])
+AC_LANG([C])
 AC_COMPILE_IFELSE(
 	[AC_LANG_PROGRAM(
 		[#include <pthread.h>],
