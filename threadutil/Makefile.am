@@ -6,7 +6,6 @@
 #
 
 AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc
-AM_CFLAGS		= $(PTHREAD_CFLAGS)
 
 if ENABLE_DEBUG
     AM_CPPFLAGS		+= -DDEBUG -DSTATS

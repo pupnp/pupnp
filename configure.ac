@@ -335,6 +335,12 @@ ACX_PTHREAD(
 	[],
 	[AC_MSG_ERROR([POSIX threads are required to build this program])])
 #
+# Update environment variables for pthreads
+#
+CC="$PTHREAD_CC"
+CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
+LIBS="$PTHREAD_LIBS $LIBS"
+#
 # Determine if pthread_rwlock_t is available
 #
 echo "----------------------- pthread_rwlock_t stuff --------------------------------"

@@ -2,6 +2,11 @@
 Version 1.6.3
 *******************************************************************************
 
+2007-12-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Using pthread flags for the whole project, not just at the places
+	individually indicated by several Makefile.am files spread all over
+	the directories. That was too much error prone.
+
 2007-12-24 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added a configure test to check if pthread_rwlock_t is available.
 	Define _GNU_SOURCE if needed. The fallback behaviou will only be
