@@ -342,8 +342,8 @@ AC_COMPILE_IFELSE(
 		AC_MSG_RESULT([yes, supported without any options])],
 	[AC_COMPILE_IFELSE(
 		[AC_LANG_PROGRAM(
-			[#define _GNU_SOURCE],
-			[#include <pthread.h>],
+			[#define _GNU_SOURCE
+			#include <pthread.h>],
 			[pthread_rwlock_t *x;])],
 		[AC_DEFINE([UPNP_USE_RWLOCK], [1], [Use pthread_rwlock_t])
 			CFLAGS="$CFLAGS -D_GNU_SOURCE"
