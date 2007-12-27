@@ -9,10 +9,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/threadutil/inc \
 	-I$(top_srcdir)/ixml/inc
 
-AM_CFLAGS = $(PTHREAD_CFLAGS)
-
-AM_LDFLAGS = $(PTHREAD_LIBS)
-
 LDADD = \
 	$(top_builddir)/upnp/libupnp.la \
 	$(top_builddir)/threadutil/libthreadutil.la \

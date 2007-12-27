@@ -38,11 +38,7 @@
 #define MINVAL( a, b ) ( (a) < (b) ? (a) : (b) )
 #define MAXVAL( a, b ) ( (a) > (b) ? (a) : (b) )
 
-#ifndef WIN32
- #define	UPNP_INLINE inline
-#endif
-
-#define MEMBUF_DEF_SIZE_INC		20
+#define MEMBUF_DEF_SIZE_INC 20
 
 
 typedef struct // ixml_membuf 

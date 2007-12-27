@@ -1,4 +1,33 @@
 *******************************************************************************
+Version 1.6.3
+*******************************************************************************
+
+2007-12-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Using pthread flags for the whole project, not just at the places
+	individually indicated by several Makefile.am files spread all over
+	the directories. That was too much error prone.
+
+2007-12-24 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added a configure test to check if pthread_rwlock_t is available.
+	Define _GNU_SOURCE if needed. The fallback behaviou will only be
+	implemented if _GNU_SOURCE prooves to be insufficient on some
+	platforms. Thanks to Jonathan Casiot (no_dice) and Robert Gingher
+	(robsbox).
+
+2007-12-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Removed unused iasnprintf.{c,h} files.
+
+2007-12-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Removed STATSONLY() macro from ThreadPool.{c,h}.
+	* Removed time() usage from ThreadPool.c.
+	* Fixed STATS = 0 compilation.
+
+2007-12-16 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Library was not compiling on FreeBSD 7. Code now no longer uses
+	ftime(), using gettimeofday() instead. Thanks to Josh Carroll.
+
+
+*******************************************************************************
 Version 1.6.2
 *******************************************************************************
 
@@ -358,7 +387,7 @@ Version 1.4.2
 2007-01-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
 	* SF Tracker [ 1634922 ] Support for large files (>= 2 GiB), part 2
-	Submitted By: Jonathan - no_dice
+	Submitted By: Jonathan Casiot - no_dice
 	Summary: This patch hopefully fixes the remaining types and related
 	code to enable files >= 2 GiB to be streamed. Jonathan claims to have
 	tested this with a patched version of ushare-0.9.8 and a D-Link DSM-520.

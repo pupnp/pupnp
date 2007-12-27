@@ -9,103 +9,115 @@
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.6.2], [mroberto@users.sourceforge.net])
-###############################################################################
-# *Independently* of the above libupnp package version, the libtool version
-# of the 3 libraries need to be updated whenever there is a change released:
-# "current:revision:age" (this is NOT the same as the package version), where:
-# 	- library code modified:		revision++
-# 	- interfaces changed/added/removed:	current++ and revision=0
-# 	- interfaces added: 			age++
-# 	- interfaces removed:			age=0
-# *please update only once, before a formal release, not for each change*
-#
-###############################################################################
-# Release 1.4.1:
-#AC_SUBST([LT_VERSION_IXML],       [2:2:0])
-#AC_SUBST([LT_VERSION_THREADUTIL], [2:2:0])
-#AC_SUBST([LT_VERSION_UPNP],       [2:2:0])
-#
-###############################################################################
-# Release 1.4.6:
-# "current:revision:age"
-#
-# - Code has changed in ixml
-#	revision: 2 -> 3
-# - Code has changed in threadutil
-#	revision: 2 -> 3
-# - Interface added in threadutil
-#	current: 2 -> 3
-#	revisiion: 3 -> 0
-#	age: 0 -> 1
-# - Code has changed in upnp
-#	revision: 2 -> 3
-#
-#AC_SUBST([LT_VERSION_IXML],       [2:3:0])
-#AC_SUBST([LT_VERSION_THREADUTIL], [3:0:1])
-#AC_SUBST([LT_VERSION_UPNP],       [2:3:0])
-#
-###############################################################################
-# Release 1.6.0:
-# "current:revision:age"
-#
-# - Code has changed in ixml
-#	revision: 3 -> 4
-# - Code has changed in threadutil
-#	revision: 0 -> 1
-# - Code has changed in upnp
-#	revision: 3 -> 4
-# - Interface changed in upnp
-#	current: 2 -> 3
-#	revision: 4 -> 0
-# - Interface removed in upnp
-#	age: 0 -> 0
-#
-#AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-#AC_SUBST([LT_VERSION_THREADUTIL], [3:1:1])
-#AC_SUBST([LT_VERSION_UPNP],       [3:0:0])
-#
-###############################################################################
-# Release 1.6.1:
-# "current:revision:age"
-#
-# - Code has changed in threadutil
-#	revision: 1 -> 2
-# - Interface added in threadutil
-#	current: 3 -> 4
-#	revision: 2 -> 0
-# - Interface added in threadutil
-#	age: 1 -> 2
-# - Code has changed in upnp
-#	revision: 0 -> 1
-#
-#AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-#AC_SUBST([LT_VERSION_THREADUTIL], [4:0:2])
-#AC_SUBST([LT_VERSION_UPNP],       [3:1:0])
-#
-###############################################################################
-# Release 1.6.2:
-# "current:revision:age"
-#
-# - Code has changed in upnp
-#	revision: 1 -> 2
-#
-#AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-#AC_SUBST([LT_VERSION_THREADUTIL], [4:0:2])
-#AC_SUBST([LT_VERSION_UPNP],       [3:2:0])
-#
-###############################################################################
+AC_INIT([libupnp], [1.6.3], [mroberto@users.sourceforge.net])
+dnl ############################################################################
+dnl # *Independently* of the above libupnp package version, the libtool version
+dnl # of the 3 libraries need to be updated whenever there is a change released:
+dnl # "current:revision:age" (this is NOT the same as the package version),
+dnl # where:
+dnl # 	- library code modified:		revision++
+dnl # 	- interfaces changed/added/removed:	current++ and revision=0
+dnl # 	- interfaces added: 			age++
+dnl # 	- interfaces removed:			age=0
+dnl # *please update only once, before a formal release, not for each change*
+dnl #
+dnl ############################################################################
+dnl # Release 1.4.1:
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:2:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [2:2:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [2:2:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.4.6:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in ixml
+dnl #	revision: 2 -> 3
+dnl # - Code has changed in threadutil
+dnl #	revision: 2 -> 3
+dnl # - Interface added in threadutil
+dnl #	current: 2 -> 3
+dnl #	revisiion: 3 -> 0
+dnl #	age: 0 -> 1
+dnl # - Code has changed in upnp
+dnl #	revision: 2 -> 3
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:3:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [3:0:1])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [2:3:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.0:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in ixml
+dnl #	revision: 3 -> 4
+dnl # - Code has changed in threadutil
+dnl #	revision: 0 -> 1
+dnl # - Code has changed in upnp
+dnl #	revision: 3 -> 4
+dnl # - Interface changed in upnp
+dnl #	current: 2 -> 3
+dnl #	revision: 4 -> 0
+dnl # - Interface removed in upnp
+dnl #	age: 0 -> 0
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [3:1:1])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:0:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.1:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in threadutil
+dnl #	revision: 1 -> 2
+dnl # - Interface added in threadutil
+dnl #	current: 3 -> 4
+dnl #	revision: 2 -> 0
+dnl # - Interface added in threadutil
+dnl #	age: 1 -> 2
+dnl # - Code has changed in upnp
+dnl #	revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:0:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:1:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.2:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #	revision: 1 -> 2
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:0:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:2:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.3:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in threadutil
+dnl #	revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:1:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:2:0])
+dnl #
+dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [4:0:2])
+AC_SUBST([LT_VERSION_THREADUTIL], [4:1:2])
 AC_SUBST([LT_VERSION_UPNP],       [3:2:0])
-###############################################################################
-# Repeating the algorithm so that it is closer to the modificatin place:
-# 	- library code modified:		revision++
-# 	- interfaces changed/added/removed:	current++ and revision=0
-# 	- interfaces added: 			age++
-# 	- interfaces removed:			age=0
-# *please update only once, before a formal release, not for each change*
-###############################################################################
+dnl ############################################################################
+dnl # Repeating the algorithm to place it closer to the modificatin place:
+dnl # 	- library code modified:		revision++
+dnl # 	- interfaces changed/added/removed:	current++ and revision=0
+dnl # 	- interfaces added: 			age++
+dnl # 	- interfaces removed:			age=0
+dnl # *please update only once, before a formal release, not for each change*
+dnl ############################################################################
 
 
 AC_CONFIG_AUX_DIR(config.aux)
@@ -140,8 +152,7 @@ AC_REVISION([$Revision: 1.11 $])
 upnpmaj=`echo "$PACKAGE_VERSION" | sed 's/\..*//' `
 upnpmin=[`echo "$PACKAGE_VERSION" | sed 's/^[^.]\.// ; s/[^0-9].*$//' `]
 upnppatch=[`echo "$PACKAGE_VERSION" | sed 's/^[^.]\.[^.]\.// ; s/[^0-9].*$//' `]
-AC_DEFINE_UNQUOTED([UPNP_VERSION_STRING], "$PACKAGE_VERSION",
-	[see upnpconfig.h])
+AC_DEFINE_UNQUOTED([UPNP_VERSION_STRING], "$PACKAGE_VERSION", [see upnpconfig.h])
 AC_DEFINE_UNQUOTED([UPNP_VERSION_MAJOR], $upnpmaj, [see upnpconfig.h])
 AC_DEFINE_UNQUOTED([UPNP_VERSION_MINOR], $upnpmin, [see upnpconfig.h])
 AC_DEFINE_UNQUOTED([UPNP_VERSION_PATCH], $upnppatch, [see upnpconfig.h])
@@ -163,7 +174,6 @@ fi
 #
 # Check for libupnp subsets
 #
-
 RT_BOOL_ARG_ENABLE([client], [yes], [control point code (client)])
 if test "x$enable_client" = xyes ; then
 	AC_DEFINE(UPNP_HAVE_CLIENT, 1, [see upnpconfig.h])
@@ -197,11 +207,13 @@ fi
 RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 
 
+#
 # doc installation
 # autoconf >= 2.60 already defines ${docdir}, but we will not use its 
 # default value, which is ${datarootdir}/doc/${PACKAGE_TARNAME}.
 # That would give us ${datarootdir}/doc/libupnp, and we want the package
 # version on that.
+#
 docdir="${datadir}/doc/${PACKAGE_NAME}-${PACKAGE_VERSION}"
 AC_MSG_CHECKING([for documentation directory])
 AC_ARG_WITH(
@@ -216,7 +228,9 @@ AS_HELP_STRING(
 	[],
 	[with_documentation=no])
 
+#
 # If something has been entered after an equal sign, assume it is the directory
+#
 if test x"$with_documentation" != xyes -a x"$with_documentation" != xno; then
 	docdir="$with_documentation"
 fi
@@ -302,7 +316,6 @@ AC_CHECK_HEADERS(
 # Checks for typedefs, structures, and compiler characteristics
 #	
 AC_C_CONST
-AC_TYPE_SIZE_T
 TYPE_SOCKLEN_T
 
 
@@ -317,9 +330,40 @@ AC_CHECK_FUNCS(ftime,, [AC_CHECK_LIB(compat, ftime)])
 #
 # Checks for POSIX Threads
 #
+echo "--------------------------- pthread stuff -------------------------------------"
 ACX_PTHREAD(
 	[],
 	[AC_MSG_ERROR([POSIX threads are required to build this program])])
+#
+# Update environment variables for pthreads
+#
+CC="$PTHREAD_CC"
+CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
+LIBS="$PTHREAD_LIBS $LIBS"
+#
+# Determine if pthread_rwlock_t is available
+#
+echo "----------------------- pthread_rwlock_t stuff --------------------------------"
+AC_MSG_CHECKING([if pthread_rwlock_t is available])
+AC_LANG([C])
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM(
+		[#include <pthread.h>],
+		[pthread_rwlock_t *x;])],
+	[AC_DEFINE([UPNP_USE_RWLOCK], [1], [Use pthread_rwlock_t])
+		AC_MSG_RESULT([yes, supported without any options])],
+	[AC_COMPILE_IFELSE(
+		[AC_LANG_PROGRAM(
+			[#define _GNU_SOURCE
+			#include <pthread.h>],
+			[pthread_rwlock_t *x;])],
+		[AC_DEFINE([UPNP_USE_RWLOCK], [1], [Use pthread_rwlock_t])
+			CPPFLAGS="$CPPFLAGS -D_GNU_SOURCE"
+			AC_MSG_RESULT([yes, definition of _GNU_SOURCE required])],
+		[AC_DEFINE([UPNP_USE_RWLOCK], [0], [Do not use pthread_rwlock_t])
+			AC_MSG_RESULT([no, needs to fallback to pthread_mutex])
+			AC_MSG_ERROR([pthread_rwlock_t not available])])])
+echo "-------------------------------------------------------------------------------"
 
 
 AC_CONFIG_FILES([
