@@ -39,7 +39,7 @@ EXTRA_DIST = \
     ./html/upnp/UPNP_E_SOCKET_ERROR-208.html \
     ./html/upnp/UPNP_E_CANCELED-210.html \
     ./html/upnp/UPNP_E_SUBSCRIBE_UNACCEPTED-301.html \
-    ./html/upnp/UPNP_E_UNSUBSCRIBE_UNACCAPTED-302.html \
+    ./html/upnp/UPNP_E_UNSUBSCRIBE_UNACCEPTED-302.html \
     ./html/upnp/UPNP_E_NOTIFY_UNACCEPTED-303.html \
     ./html/upnp/UPNP_E_INVALID_ARGUMENT-501.html \
     ./html/upnp/UPNP_E_FILE_NOT_FOUND-502.html \
@@ -295,7 +295,7 @@ if WITH_DOCUMENTATION
         ./html/upnp/UPNP_E_SOCKET_ERROR-208.html \
         ./html/upnp/UPNP_E_CANCELED-210.html \
         ./html/upnp/UPNP_E_SUBSCRIBE_UNACCEPTED-301.html \
-        ./html/upnp/UPNP_E_UNSUBSCRIBE_UNACCAPTED-302.html \
+        ./html/upnp/UPNP_E_UNSUBSCRIBE_UNACCEPTED-302.html \
         ./html/upnp/UPNP_E_NOTIFY_UNACCEPTED-303.html \
         ./html/upnp/UPNP_E_INVALID_ARGUMENT-501.html \
         ./html/upnp/UPNP_E_FILE_NOT_FOUND-502.html \

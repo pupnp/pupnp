@@ -2,6 +2,13 @@
 Version 1.6.4
 *******************************************************************************
 
+2008-01-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patches Tracker [ 1865812 ] typo in docs comment
+	Submitted By: Hartmut Holzgraefe - hholzgra
+	typo in docs comment ACCAPTED instead of ACCEPTED in
+	@name UPNP_E_UNSUBSCRIBE_UNACCAPTED [-302]
+	Also, the documentation file name was mispelled and was corrected in
+	the Makefile.am.
 
 *******************************************************************************
 Version 1.6.3
