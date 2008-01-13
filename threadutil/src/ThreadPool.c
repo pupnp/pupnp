@@ -389,7 +389,7 @@ static void SetSeed()
 	gettimeofday(&t, NULL);
 #if defined(WIN32)
  	srand( ( unsigned int )t.tv_usec + (unsigned int)ithread_get_current_thread_id().p );
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__OSX__)
  	srand( ( unsigned int )t.tv_usec + (unsigned int)ithread_get_current_thread_id() );
 #elif defined(__linux__)
  	srand( ( unsigned int )t.tv_usec + ithread_get_current_thread_id() );
