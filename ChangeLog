@@ -2,6 +2,18 @@
 Version 1.6.4
 *******************************************************************************
 
+2008-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Using defined(__OSX__) || defined(__APPLE__) instead of just
+	  defined(__OSX__) in the code. Thanks to Ingo Hofmann and Chris
+	  Pickel.
+
+2008-01-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fix for isFileInVirtualDir. Thanks to Peter Hartley for the patch.
+
+2008-01-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Putting back a "defined(__OSX__)" that has been removed in the
+	previous *BSD patch. Thanks to Chris Pickel for pointing it out.
+
 2008-01-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patches Tracker [ 1865812 ] typo in docs comment
 	Submitted By: Hartmut Holzgraefe - hholzgra
@@ -9,13 +21,6 @@ Version 1.6.4
 	@name UPNP_E_UNSUBSCRIBE_UNACCAPTED [-302]
 	Also, the documentation file name was mispelled and was corrected in
 	the Makefile.am.
-
-2008-01-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-	* Putting back a "defined(__OSX__)" that has been removed in the
-	previous *BSD patch. Thanks to Chris Pickel for pointing it out.
-
-2008-01-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-	* Fix for isFileInVirtualDir. Thanks to Peter Hartley for the patch.
 
 *******************************************************************************
 Version 1.6.3
