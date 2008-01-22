@@ -3,6 +3,10 @@ Version 1.6.4
 *******************************************************************************
 
 2008-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fix for setsockopt() in Threadpool.c to allow more than one process
+	  to join the multicast-group on OSX. Thanks to Ingo Hofmann.
+
+2008-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Using defined(__OSX__) || defined(__APPLE__) instead of just
 	  defined(__OSX__) in the code. Thanks to Ingo Hofmann and Chris
 	  Pickel.
