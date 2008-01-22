@@ -4,17 +4,17 @@ Version 1.6.4
 
 2008-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added quoting to macros AC_CONFIG_AUX_DIR, AC_CONFIG_MACRO_DIR and
-	  AC_CONFIG_SRCDIR in configure.ac. Also changed the name of the
-	  auxiliary directory in AC_CONFIG_AUX_DIR to build-aux.
+	AC_CONFIG_SRCDIR in configure.ac. Also changed the name of the
+	auxiliary directory in AC_CONFIG_AUX_DIR to build-aux.
 
 2008-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fix for setsockopt() in Threadpool.c to allow more than one process
-	  to join the multicast-group on OSX. Thanks to Ingo Hofmann.
+	to join the multicast-group on OSX. Thanks to Ingo Hofmann.
 
 2008-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Using defined(__OSX__) || defined(__APPLE__) instead of just
-	  defined(__OSX__) in the code. Thanks to Ingo Hofmann and Chris
-	  Pickel.
+	defined(__OSX__) in the code. Thanks to Ingo Hofmann and Chris
+	Pickel.
 
 2008-01-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fix for isFileInVirtualDir. Thanks to Peter Hartley for the patch.
