@@ -128,9 +128,9 @@ dnl # *please update only once, before a formal release, not for each change*
 dnl ############################################################################
 
 
-AC_CONFIG_AUX_DIR(config.aux)
-AC_CONFIG_MACRO_DIR(m4)
-AC_CONFIG_SRCDIR(upnp/inc/upnp.h)
+AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_SRCDIR([upnp/inc/upnp.h])
 
 
 AM_INIT_AUTOMAKE([1.8 -Wall foreign subdir-objects dist-bzip2])

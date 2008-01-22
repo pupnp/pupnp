@@ -3,6 +3,11 @@ Version 1.6.4
 *******************************************************************************
 
 2008-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added quoting to macros AC_CONFIG_AUX_DIR, AC_CONFIG_MACRO_DIR and
+	  AC_CONFIG_SRCDIR in configure.ac. Also changed the name of the
+	  auxiliary directory in AC_CONFIG_AUX_DIR to build-aux.
+
+2008-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fix for setsockopt() in Threadpool.c to allow more than one process
 	  to join the multicast-group on OSX. Thanks to Ingo Hofmann.
 
