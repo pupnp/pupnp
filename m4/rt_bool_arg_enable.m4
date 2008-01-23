@@ -41,7 +41,7 @@ AC_DEFUN([RT_BOOL_ARG_ENABLE],[
 		               )])
 	test "x$enable_[$1]" != [x]m4_if([$2],[yes],[no],[yes]) dnl
 		&& enable_[]Name=[$2]
-	AC_MSG_RESULT($enable_[]Name)dnl
+	AC_MSG_RESULT($enable_[]Name)
 	AM_CONDITIONAL([ENABLE_]NAME, test x"$enable_[]Name" = xyes)
 	dnl
 	m4_popdef([NAME])dnl

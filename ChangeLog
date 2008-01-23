@@ -2,6 +2,11 @@
 Version 1.6.4
 *******************************************************************************
 
+2008-01-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Workaround for a problem with the new automake AM_CONDITIONAL macro
+	from autotools-1.10. Thanks to Ingo Hofmann for helping with debugging
+	this one.
+
 2008-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added quoting to macros AC_CONFIG_AUX_DIR, AC_CONFIG_MACRO_DIR and
 	AC_CONFIG_SRCDIR in configure.ac. Also changed the name of the
