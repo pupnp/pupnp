@@ -930,9 +930,13 @@ struct File_Info
   /** The content type of the file. This string needs to be allocated 
    *  by the caller using {\bf ixmlCloneDOMString}.  When finished 
    *  with it, the SDK frees the {\bf DOMString}. */
-   
   DOMString content_type;
 
+  /** Additional HTTP headers to return. This string needs to be allocated 
+   *  by the caller using {\bf ixmlCloneDOMString}. When finished 
+   *  with it, the SDK frees the {\bf DOMString}. Each header line should be
+   *  followed by "\r\n". */
+  DOMString extra_headers;
 };
 
 /* The type of handle returned by the web server for open requests. */

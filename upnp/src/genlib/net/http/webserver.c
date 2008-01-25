@@ -1221,6 +1221,7 @@ process_request( IN http_message_t * req,
     // init
     request_doc = NULL;
     finfo.content_type = NULL;
+    finfo.extra_headers = NULL;
     alias_grabbed = FALSE;
     err_code = HTTP_INTERNAL_SERVER_ERROR;  // default error
     using_virtual_dir = FALSE;
@@ -1387,18 +1388,22 @@ process_request( IN http_message_t * req,
         goto error_handler;
     }
 
+    const char *extra_headers = finfo.extra_headers ? finfo.extra_headers
+                                                    : "";
+
     if( RespInstr->IsRangeActive && RespInstr->IsChunkActive ) {
         // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "R" "T" "GKD" "s" "tcS" "XcCc",
+            "R" "T" "GKD" "s" "tcS" "Xc" "sCc",
             HTTP_PARTIAL_CONTENT, // status code
             finfo.content_type,   // content type
             RespInstr,            // range info
             "LAST-MODIFIED: ",
 	    &finfo.last_modified,
-            X_USER_AGENT) != 0 ) {
+            X_USER_AGENT,
+	    extra_headers) != 0 ) {
             goto error_handler;
         }
     } else if( RespInstr->IsRangeActive && !RespInstr->IsChunkActive ) {
@@ -1407,14 +1412,15 @@ process_request( IN http_message_t * req,
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "R" "N" "T" "GD" "s" "tcS" "XcCc",
+            "R" "N" "T" "GD" "s" "tcS" "Xc" "sCc",
             HTTP_PARTIAL_CONTENT,     // status code
             RespInstr->ReadSendSize,  // content length
             finfo.content_type,       // content type
             RespInstr,                // range info
             "LAST-MODIFIED: ",
 	    &finfo.last_modified,
-            X_USER_AGENT) != 0 ) {
+            X_USER_AGENT,
+	    extra_headers) != 0 ) {
             goto error_handler;
         }
 
@@ -1423,12 +1429,13 @@ process_request( IN http_message_t * req,
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "RK" "TD" "s" "tcS" "XcCc",
+            "RK" "TD" "s" "tcS" "Xc" "sCc",
             HTTP_OK,            // status code
             finfo.content_type, // content type
             "LAST-MODIFIED: ",
 	    &finfo.last_modified,
-            X_USER_AGENT) != 0 ) {
+            X_USER_AGENT,
+	    extra_headers) != 0 ) {
             goto error_handler;
         }
 
@@ -1438,13 +1445,14 @@ process_request( IN http_message_t * req,
             // Transfer-Encoding: chunked
             if (http_MakeMessage(
                 headers, resp_major, resp_minor,
-                "R" "N" "TD" "s" "tcS" "XcCc",
+                "R" "N" "TD" "s" "tcS" "Xc" "sCc",
                 HTTP_OK,                 // status code
                 RespInstr->ReadSendSize, // content length
                 finfo.content_type,      // content type
                 "LAST-MODIFIED: ",
 		&finfo.last_modified,
-                X_USER_AGENT) != 0 ) {
+                X_USER_AGENT,
+		extra_headers) != 0 ) {
                 goto error_handler;
             }
         } else {
@@ -1452,12 +1460,13 @@ process_request( IN http_message_t * req,
             // Transfer-Encoding: chunked
             if (http_MakeMessage(
                 headers, resp_major, resp_minor,
-                "R" "TD" "s" "tcS" "XcCc",
+                "R" "TD" "s" "tcS" "b" "Xc" "sCc",
                 HTTP_OK,            // status code
                 finfo.content_type, // content type
                 "LAST-MODIFIED: ",
 		&finfo.last_modified,
-                X_USER_AGENT) != 0 ) {
+                X_USER_AGENT,
+		extra_headers) != 0 ) {
                 goto error_handler;
             }
         }
@@ -1486,6 +1495,7 @@ process_request( IN http_message_t * req,
   error_handler:
     free( request_doc );
     ixmlFreeDOMString( finfo.content_type );
+    ixmlFreeDOMString( finfo.extra_headers );
     if( err_code != UPNP_E_SUCCESS && alias_grabbed ) {
         alias_release( alias );
     }

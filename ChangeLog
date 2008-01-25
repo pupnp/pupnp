@@ -3,6 +3,37 @@ Version 1.6.4
 *******************************************************************************
 
 2008-01-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Peter Hartley's patch for "extra-headers". In his words:
+	Hi there,
+
+	The attached patch adds an "extra_headers" field to the libupnp web
+	server's File_Info structure, allowing VirtualDirCallbacks to, if they
+	choose, specify extra HTTP headers to be sent back in the response. The
+	string lifetime strategy is the same as that of the content_type field
+	in the same structure: caller does ixmlCloneDOMString, callee does
+	ixmlFreeDOMString.
+
+	Again this is aimed at supporting Rio Receiver service as well as UPnP
+	service in the same web server. The Receiver firmware has an unfortunate
+	bug whereby it does a case-sensitive comparison looking for a
+	"Content-Length" header. As libupnp sends "CONTENT-LENGTH", it doesn't
+	work out of the box. So I thought about changing libupnp to send the
+	version Receivers expect, but it's a bit inelegant IMO to change
+	specifics of a general-purpose library for the benefit of one client --
+	plus, it might break existing clients of libupnp. Instead, I suggest
+	this patch, which lets the Receiver server (only) choose to send an
+	additional "Content-Length" header. Other clients/servers are not
+	impacted, and indeed other users of libupnp might even find the facility
+	useful for their own purposes.
+
+	As the extra_headers field is added at the end of the File_Info
+	structure, and as (at least in the normal course of events) File_Info
+	structures are never allocated except by libupnp itself, this hopefully
+	doesn't count as an ABI or API change.
+
+	Peter
+
+2008-01-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Workaround for a problem with the new automake AM_CONDITIONAL macro
 	from autotools-1.10. Thanks to Ingo Hofmann for helping with debugging
 	this one.
