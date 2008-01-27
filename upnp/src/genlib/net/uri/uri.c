@@ -555,7 +555,7 @@ parse_hostport( const char *in,
     int begin_port;
     int hostport_size = 0;
     int host_size = 0;
-#if !defined(WIN32) && !defined(__OSX__)
+#if !defined(WIN32) && !(defined(__OSX__) || defined(__APPLE__))
     char temp_hostbyname_buff[BUFFER_SIZE];
     struct hostent h_buf;
 #endif
@@ -642,7 +642,7 @@ parse_hostport( const char *in,
         if ( h == NULL ) {
                 errCode = 1;
         }
-#elif defined(__OSX__)
+#elif defined(__OSX__) || defined(__APPLE__)
         h = gethostbyname(temp_host_name);
         if ( h == NULL ) {
                 errCode = 1;

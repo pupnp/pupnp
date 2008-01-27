@@ -413,7 +413,7 @@
 #define UPNP_E_SUBSCRIBE_UNACCEPTED   -301
 /*! @} */
 
-/** @name UPNP_E_UNSUBSCRIBE_UNACCAPTED [-302]
+/** @name UPNP_E_UNSUBSCRIBE_UNACCEPTED [-302]
  *  {\tt UPNP_E_UNSUBSCRIBE_UNACCEPTED} signifies that an unsubscribe
  *  request was rejected from the remote side.
  */

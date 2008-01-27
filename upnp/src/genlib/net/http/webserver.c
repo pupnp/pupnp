@@ -745,7 +745,7 @@ isFileInVirtualDir( IN char *filePath )
                 return TRUE;
         } else {
             if( ( strncmp( pCurVirtualDir->dirName, filePath, webDirLen )
-                  == 0 ) && ( filePath[webDirLen] == '/' ) )
+                  == 0 ) && ( filePath[webDirLen] == '/' || filePath[webDirLen] == '\0' || filePath[webDirLen] == '?' ) )
                 return TRUE;
         }
 

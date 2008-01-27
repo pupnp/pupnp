@@ -870,6 +870,7 @@ get_ssdp_sockets( MiniServerSockArray * out )
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in socket operation !!!\n" );
+
             return UPNP_E_OUTOF_SOCKET;
     }
     setsockopt( ssdpReqSock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof( ttl ) );
@@ -884,6 +885,7 @@ get_ssdp_sockets( MiniServerSockArray * out )
             "Error in socket operation !!!\n" );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+
         return UPNP_E_OUTOF_SOCKET;
     }
 
@@ -897,10 +899,11 @@ get_ssdp_sockets( MiniServerSockArray * out )
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
         shutdown( ssdpSock, SD_BOTH );
         UpnpCloseSocket( ssdpSock );
+
         return UPNP_E_SOCKET_ERROR;
     }
     
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) || defined(__OSX__) || defined(__APPLE__)
     if( setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEPORT,
             ( char * )&onOff, sizeof( onOff ) ) != 0 ) {
         UpnpPrintf( UPNP_CRITICAL,
@@ -910,6 +913,7 @@ get_ssdp_sockets( MiniServerSockArray * out )
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
         shutdown( ssdpSock, SD_BOTH );
         UpnpCloseSocket( ssdpSock );
+
         return UPNP_E_SOCKET_ERROR;
     }
 #endif /* __FreeBSD__ */
@@ -928,6 +932,7 @@ get_ssdp_sockets( MiniServerSockArray * out )
         UpnpCloseSocket( ssdpSock );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+
         return UPNP_E_SOCKET_BIND;
     }
 
@@ -943,6 +948,7 @@ get_ssdp_sockets( MiniServerSockArray * out )
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         UpnpCloseSocket( ssdpSock );
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+
         return UPNP_E_SOCKET_ERROR;
     }
 
@@ -968,11 +974,13 @@ get_ssdp_sockets( MiniServerSockArray * out )
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         UpnpCloseSocket( ssdpSock );
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+
         return UPNP_E_NETWORK_ERROR;
     }
 
     CLIENTONLY( out->ssdpReqSock = ssdpReqSock; )
     out->ssdpSock = ssdpSock;
+
     return UPNP_E_SUCCESS;
 }
 
