@@ -2,6 +2,10 @@
 Version 1.6.5
 *******************************************************************************
 
+2008-02-02 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Peter Hartley's fix for wrong sized variable beeing passed to
+	http_MakeMessage() on 64 bit architectures.
+
 
 *******************************************************************************
 Version 1.6.4
