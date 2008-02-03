@@ -1,7 +1,7 @@
 #
 # "Makefile.am" for "libupnp/upnp"
 #
-# Copyright (C) 2005 Rï¿½mi Turboult <r3mi@users.sourceforge.net>
+# Copyright (C) 2005 Rémi Turboult <r3mi@users.sourceforge.net>
 #
 
 SUBDIRS = doc . sample

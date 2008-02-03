@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
- * Copyright (c) 2006 Rï¿½mi Turboult <r3mi@users.sourceforge.net>
+ * Copyright (c) 2006 Rémi Turboult <r3mi@users.sourceforge.net>
  * All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 

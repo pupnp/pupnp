@@ -4,7 +4,7 @@
 #
 # Process this file with autoconf to produce a configure script.
 #
-# (C) Copyright 2005-2007 Rï¿½mi Turboult <r3mi@users.sourceforge.net>
+# (C) Copyright 2005-2007 Rémi Turboult <r3mi@users.sourceforge.net>
 #
 
 AC_PREREQ(2.60)
