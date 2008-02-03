@@ -2,7 +2,7 @@
 #
 # "Makefile.am" for "libupnp/threadutil"
 #
-# (C) Copyright 2005 Rï¿½mi Turboult <r3mi@users.sourceforge.net>
+# (C) Copyright 2005 Rémi Turboult <r3mi@users.sourceforge.net>
 #
 
 AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc
