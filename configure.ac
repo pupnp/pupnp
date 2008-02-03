@@ -4,12 +4,12 @@
 #
 # Process this file with autoconf to produce a configure script.
 #
-# (C) Copyright 2005-2007 Rï¿½mi Turboult <r3mi@users.sourceforge.net>
+# (C) Copyright 2005-2007 Rémi Turboult <r3mi@users.sourceforge.net>
 #
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.6.4], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp], [1.6.5], [mroberto@users.sourceforge.net])
 dnl ############################################################################
 dnl # *Independently* of the above libupnp package version, the libtool version
 dnl # of the 3 libraries need to be updated whenever there is a change released:
@@ -120,9 +120,20 @@ dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:2:2])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [3:3:0])
 dnl #
 dnl ############################################################################
+dnl # Release 1.6.5:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #	revision: 3 -> 4
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:2:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:4:0])
+dnl #
+dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [2:4:0])
 AC_SUBST([LT_VERSION_THREADUTIL], [4:2:2])
-AC_SUBST([LT_VERSION_UPNP],       [3:3:0])
+AC_SUBST([LT_VERSION_UPNP],       [3:4:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++

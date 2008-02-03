@@ -12,7 +12,7 @@ dnl $2 = default value, shall be m4 constant, either [yes] or [no]
 dnl $3 = help string (default value is appended) e.g. [compile debugging code]
 dnl
 dnl @version $Id: rt_bool_arg_enable.m4,v 1.2 2006/02/18 14:35:09 r3mi Exp $
-dnl @author Rï¿½mi Turboult <r3mi@users.sourceforge.net>
+dnl @author Rémi Turboult <r3mi@users.sourceforge.net>
 dnl @license GPLWithACException
 dnl
 dnl This file is free software, distributed under the terms of the GNU
