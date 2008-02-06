@@ -943,7 +943,7 @@ get_ssdp_sockets( MiniServerSockArray * out )
             ( char * )&ssdpMcastAddr, sizeof( struct ip_mreq ) ) != 0 ) {
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
-            "Error in joining" " multicast group !!!\n" );
+            "Error in joining multicast group !!!\n" );
         shutdown( ssdpSock, SD_BOTH );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         UpnpCloseSocket( ssdpSock );

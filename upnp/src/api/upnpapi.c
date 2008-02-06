@@ -206,7 +206,7 @@ int UpnpInit( IN const char *HostIP,
              return UPNP_E_INIT_FAILED;
     }
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Inside UpnpInit \n" );
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Inside UpnpInit\n" );
     // initialize mutex
 #ifdef __CYGWIN__
         /* On Cygwin, pthread_mutex_init() fails without this memset. */
@@ -313,7 +313,7 @@ int UpnpInit( IN const char *HostIP,
         "Host Ip: %s Host Port: %d\n", LOCAL_HOST,
         LOCAL_PORT );
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Exiting UpnpInit \n" );
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Exiting UpnpInit\n" );
 
     return UPNP_E_SUCCESS;
 
@@ -330,7 +330,7 @@ PrintThreadPoolStats(
 	ThreadPoolStats stats;
 	ThreadPoolGetStats(tp, &stats);
 	UpnpPrintf(UPNP_INFO, API, DbgFileName, DbgLineNo, 
-		"%s \n"
+		"%s\n"
 		"High Jobs pending: %d\n"
 		"Med Jobs Pending: %d\n"
 		"Low Jobs Pending: %d\n"
