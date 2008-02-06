@@ -516,6 +516,7 @@ SearchByTarget( IN int Mx,
 {
     int socklen = sizeof( struct sockaddr_in );
     int *id = NULL;
+    int ret = 0;
     char *ReqBuf;
     struct sockaddr_in destAddr;
     fd_set wrSet;
@@ -534,9 +535,10 @@ SearchByTarget( IN int Mx,
         return UPNP_E_INVALID_PARAM;
     }
 
-    ReqBuf = ( char * )malloc( BUFSIZE );
-    if( ReqBuf == NULL )
+    ReqBuf = (char *)malloc( BUFSIZE );
+    if( ReqBuf == NULL ) {
         return UPNP_E_OUTOF_MEMORY;
+    }
 
     UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, ">>> SSDP SEND >>>\n");
 
@@ -558,7 +560,7 @@ SearchByTarget( IN int Mx,
     FD_ZERO( &wrSet );
     FD_SET( gSsdpReqSocket, &wrSet );
 
-    //add search criteria to list
+    // add search criteria to list
     HandleLock();
     if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
         HandleUnlock();
@@ -576,7 +578,7 @@ SearchByTarget( IN int Mx,
     TPJobSetPriority( &job, MED_PRIORITY );
     TPJobSetFreeFunction( &job, ( free_routine ) free );
 
-    //Schdule a timeout event to remove search Arg
+    // Schedule a timeout event to remove search Arg
     TimerThreadSchedule( &gTimerThread, timeTillRead,
                          REL_SEC, &job, SHORT_TERM, id );
     newArg->timeoutEventId = ( *id );
@@ -584,37 +586,24 @@ SearchByTarget( IN int Mx,
     ListAddTail( &ctrlpt_info->SsdpSearchList, newArg );
     HandleUnlock();
 
-    setsockopt( gSsdpReqSocket, IPPROTO_IP, IP_MULTICAST_IF,
-                ( char * )&addr, sizeof( addr ) );
+    ret = setsockopt( gSsdpReqSocket, IPPROTO_IP, IP_MULTICAST_IF,
+        (char *)&addr, sizeof (addr) );
 
-    if( select( gSsdpReqSocket + 1, NULL, &wrSet, NULL, NULL )
-        == UPNP_SOCKETERROR ) {
-        if( errno == EBADF ) {
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                "SSDP_LIB :RequestHandler:An invalid file descriptor"
-                " was givenin one of the sets. \n" );
-        } else if( errno == EINTR ) {
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                "SSDP_LIB :RequestHandler:  A non blocked "
-                "signal was caught.    \n" );
-        } else if( errno == EINVAL ) {
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                "SSDP_LIB :RequestHandler: n is negative.  \n" );
-        } else if( errno == ENOMEM ) {
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                "SSDP_LIB : RequestHandler:select was unable to "
-                "allocate memory for internal tables.\n" );
-        }
+    ret = select( gSsdpReqSocket + 1, NULL, &wrSet, NULL, NULL );
+    if( ret == -1 ) {
+        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            "SSDP_LIB: Error in select(): %s\n",
+            sys_errlist[errno] );
 	shutdown( gSsdpReqSocket, SD_BOTH );
         UpnpCloseSocket( gSsdpReqSocket );
         free( ReqBuf );
+
         return UPNP_E_INTERNAL_ERROR;
     } else if( FD_ISSET( gSsdpReqSocket, &wrSet ) ) {
         int NumCopy = 0;
-
         while( NumCopy < NUM_SSDP_COPY ) {
             sendto( gSsdpReqSocket, ReqBuf, strlen( ReqBuf ), 0,
-                    ( struct sockaddr * )&destAddr, socklen );
+                (struct sockaddr *)&destAddr, socklen );
             NumCopy++;
             imillisleep( SSDP_PAUSE );
         }
@@ -626,3 +615,4 @@ SearchByTarget( IN int Mx,
 
 #endif // EXCLUDE_SSDP
 #endif // INCLUDE_CLIENT_APIS
+

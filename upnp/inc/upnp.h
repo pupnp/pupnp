@@ -102,8 +102,6 @@
 	#define UpnpCloseSocket closesocket
 	#define fseeko fseek
 #endif
-#define UPNP_SOCKETERROR -1
-#define UPNP_INVALID_SOCKET -1
 #ifndef WIN32
 	#define SOCKET int
 #endif

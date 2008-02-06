@@ -861,28 +861,34 @@ get_ssdp_sockets( MiniServerSockArray * out )
     struct ip_mreq ssdpMcastAddr;
     struct sockaddr_in ssdpAddr;
     int option = 1;
+    int ret = 0;
     struct in_addr addr;
     SOCKET ssdpSock;
 #if INCLUDE_CLIENT_APIS
     SOCKET ssdpReqSock;
 
-    if( ( ssdpReqSock = socket( AF_INET, SOCK_DGRAM, 0 ) ) == UPNP_INVALID_SOCKET ) {
+    ssdpReqSock = socket( AF_INET, SOCK_DGRAM, 0 );
+    if ( ssdpReqSock == -1 ) {
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
-            "Error in socket operation !!!\n" );
+            "Error in socket(): %s\n",
+            sys_errlist[errno] );
 
             return UPNP_E_OUTOF_SOCKET;
     }
-    setsockopt( ssdpReqSock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof( ttl ) );
+    ret = setsockopt( ssdpReqSock, IPPROTO_IP, IP_MULTICAST_TTL,
+        &ttl, sizeof (ttl) );
     // just do it, regardless if fails or not.
     Make_Socket_NoBlocking( ssdpReqSock );
     gSsdpReqSocket = ssdpReqSock;
 #endif /* INCLUDE_CLIENT_APIS */
 
-    if( ( ssdpSock = socket( AF_INET, SOCK_DGRAM, 0 ) ) == UPNP_INVALID_SOCKET ) {
+    ssdpSock = socket( AF_INET, SOCK_DGRAM, 0 );
+    if ( ssdpSock == -1 ) {
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
-            "Error in socket operation !!!\n" );
+            "Error in socket(): %s\n",
+            sys_errlist[errno] );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
 
@@ -890,11 +896,13 @@ get_ssdp_sockets( MiniServerSockArray * out )
     }
 
     onOff = 1;
-    if( setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEADDR,
-            ( char * )&onOff, sizeof( onOff ) ) != 0 ) {
+    ret = setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEADDR,
+        (char *)&onOff, sizeof(onOff) );
+    if ( ret == -1) {
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
-            "Error in set reuse addr !!!\n" );
+            "Error in setsockopt() SO_REUSEADDR: %s\n",
+            sys_errlist[errno] );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
         shutdown( ssdpSock, SD_BOTH );
@@ -904,11 +912,13 @@ get_ssdp_sockets( MiniServerSockArray * out )
     }
     
 #if defined(__FreeBSD__) || defined(__OSX__) || defined(__APPLE__)
-    if( setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEPORT,
-            ( char * )&onOff, sizeof( onOff ) ) != 0 ) {
+    ret = setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEPORT,
+        (char *)&onOff, sizeof (onOff) );
+    if ( ret == -1 ) {
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
-            "Error in set reuse port !!!\n" );
+            "Error in setsockopt() SO_REUSEPORT: %s\n",
+            sys_errlist[errno] );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
         shutdown( ssdpSock, SD_BOTH );
@@ -918,16 +928,18 @@ get_ssdp_sockets( MiniServerSockArray * out )
     }
 #endif /* __FreeBSD__ */
 
-    memset( ( void * )&ssdpAddr, 0, sizeof( struct sockaddr_in ) );
+    memset( (void *)&ssdpAddr, 0, sizeof( struct sockaddr_in ) );
     ssdpAddr.sin_family = AF_INET;
     //  ssdpAddr.sin_addr.s_addr = inet_addr(LOCAL_HOST);
     ssdpAddr.sin_addr.s_addr = htonl( INADDR_ANY );
     ssdpAddr.sin_port = htons( SSDP_PORT );
-    if( bind( ssdpSock, ( struct sockaddr * )&ssdpAddr,
-            sizeof( ssdpAddr ) ) != 0 ) {
+    ret = bind( ssdpSock, (struct sockaddr *)&ssdpAddr, sizeof (ssdpAddr) );
+    if ( ret == -1 ) {
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
-            "Error in binding !!!\n" );
+            "Error in bind(), addr=0x%08X, port=%d: %s\n",
+            INADDR_ANY, SSDP_PORT,
+            sys_errlist[errno] );
             shutdown( ssdpSock, SD_BOTH );
         UpnpCloseSocket( ssdpSock );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
@@ -936,14 +948,16 @@ get_ssdp_sockets( MiniServerSockArray * out )
         return UPNP_E_SOCKET_BIND;
     }
 
-    memset( ( void * )&ssdpMcastAddr, 0, sizeof( struct ip_mreq ) );
+    memset( (void *)&ssdpMcastAddr, 0, sizeof (struct ip_mreq) );
     ssdpMcastAddr.imr_interface.s_addr = inet_addr( LOCAL_HOST );
     ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr( SSDP_IP );
-    if( setsockopt( ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-            ( char * )&ssdpMcastAddr, sizeof( struct ip_mreq ) ) != 0 ) {
+    ret = setsockopt( ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+        (char *)&ssdpMcastAddr, sizeof (struct ip_mreq) );
+    if ( ret == -1 ) {
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
-            "Error in joining multicast group !!!\n" );
+            "Error in setsockopt() IP_ADD_MEMBERSHIP (join multicast group): %s\n",
+            sys_errlist[errno] );
         shutdown( ssdpSock, SD_BOTH );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         UpnpCloseSocket( ssdpSock );
@@ -953,23 +967,28 @@ get_ssdp_sockets( MiniServerSockArray * out )
     }
 
     /* Set multicast interface. */
-    memset( ( void * )&addr, 0, sizeof( struct in_addr ));
+    memset( (void *)&addr, 0, sizeof (struct in_addr) );
     addr.s_addr = inet_addr(LOCAL_HOST);
-    if ( setsockopt(ssdpSock, IPPROTO_IP, IP_MULTICAST_IF,
-            (char *)&addr, sizeof addr) != 0) {
+    ret = setsockopt(ssdpSock, IPPROTO_IP, IP_MULTICAST_IF,
+        (char *)&addr, sizeof addr);
+    if ( ret == -1 ) {
         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-            "Couldn't set multicast interface.\n" );
+            "Error in setsockopt() IP_MULTICAST_IF (set multicast interface): %s\n",
+            sys_errlist[errno] );
         /* This is probably not a critical error, so let's continue. */
     }
 
     /* result is not checked becuase it will fail in WinMe and Win9x. */
-    setsockopt( ssdpSock, IPPROTO_IP,
-                IP_MULTICAST_TTL, &ttl, sizeof( ttl ) );
-    if( setsockopt( ssdpSock, SOL_SOCKET, SO_BROADCAST,
-            (char *)&option, sizeof(option) ) != 0) {
+    ret = setsockopt( ssdpSock, IPPROTO_IP,
+        IP_MULTICAST_TTL, &ttl, sizeof (ttl) );
+
+    ret = setsockopt( ssdpSock, SOL_SOCKET, SO_BROADCAST,
+        (char *)&option, sizeof (option) );
+    if( ret == -1) {
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
-            "Error in setting broadcast !!!\n" );
+            "Error in setsockopt() SO_BROADCAST (set broadcast): %s\n",
+            sys_errlist[errno] );
         shutdown( ssdpSock, SD_BOTH );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
         UpnpCloseSocket( ssdpSock );
