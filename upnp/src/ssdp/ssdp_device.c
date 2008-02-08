@@ -213,26 +213,27 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
                    IN int NumPacket,
                    IN char **RqPacket )
 {
-    int ReplySock,
-      socklen = sizeof( struct sockaddr_in );
-    int NumCopy,
-      Index;
+    int ReplySock;
+    int socklen = sizeof( struct sockaddr_in );
+    int NumCopy;
+    int Index;
     unsigned long replyAddr = inet_addr( LOCAL_HOST );
-    int ttl = 4;                //a/c to UPNP Spec
+    int ttl = 4; // a/c to UPNP Spec
 
     ReplySock = socket( AF_INET, SOCK_DGRAM, 0 );
-    if( ReplySock == UPNP_INVALID_SOCKET ) {
+    if ( ReplySock == -1 ) {
         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
             "SSDP_LIB: New Request Handler:"
-            "Error in socket operation !!!\n" );
+            "Error in socket(): %s\n",
+            sys_errlist[errno] );
 
         return UPNP_E_OUTOF_SOCKET;
     }
 
     setsockopt( ReplySock, IPPROTO_IP, IP_MULTICAST_IF,
-                ( char * )&replyAddr, sizeof( replyAddr ) );
+        (char *)&replyAddr, sizeof (replyAddr) );
     setsockopt( ReplySock, IPPROTO_IP, IP_MULTICAST_TTL,
-                ( char * )&ttl, sizeof( int ) );
+        (char *)&ttl, sizeof (int) );
 
     for( Index = 0; Index < NumPacket; Index++ ) {
         int rc;
@@ -262,6 +263,7 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
 
     shutdown( ReplySock, SD_BOTH );
     UpnpCloseSocket( ReplySock );
+
     return UPNP_E_SUCCESS;
 }
 
