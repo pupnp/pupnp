@@ -514,6 +514,10 @@ SearchByTarget( IN int Mx,
                 IN char *St,
                 IN void *Cookie )
 {
+    // strerror_r() buffer
+    const int ERROR_BUFFER_LEN = 256;
+    char errorBuffer[ERROR_BUFFER_LEN];
+
     int socklen = sizeof( struct sockaddr_in );
     int *id = NULL;
     int ret = 0;
@@ -591,9 +595,10 @@ SearchByTarget( IN int Mx,
 
     ret = select( gSsdpReqSocket + 1, NULL, &wrSet, NULL, NULL );
     if( ret == -1 ) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
             "SSDP_LIB: Error in select(): %s\n",
-            sys_errlist[errno] );
+            errorBuffer );
 	shutdown( gSsdpReqSocket, SD_BOTH );
         UpnpCloseSocket( gSsdpReqSocket );
         free( ReqBuf );
