@@ -213,6 +213,10 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
                    IN int NumPacket,
                    IN char **RqPacket )
 {
+    // strerror_r() buffer
+    const int ERROR_BUFFER_LEN = 256;
+    char errorBuffer[ERROR_BUFFER_LEN];
+
     int ReplySock;
     int socklen = sizeof( struct sockaddr_in );
     int NumCopy;
@@ -222,10 +226,10 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
 
     ReplySock = socket( AF_INET, SOCK_DGRAM, 0 );
     if ( ReplySock == -1 ) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
             "SSDP_LIB: New Request Handler:"
-            "Error in socket(): %s\n",
-            sys_errlist[errno] );
+            "Error in socket(): %s\n", errorBuffer );
 
         return UPNP_E_OUTOF_SOCKET;
     }

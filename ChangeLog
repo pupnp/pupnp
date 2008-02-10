@@ -2,6 +2,10 @@
 Version 1.6.6
 *******************************************************************************
 
+2008-02-10 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Changed "sys_errlist[errno]", which is deprecated, by
+	"strerror_r()", which is thread safe.
+
 2008-02-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Slightly improved error report by showing the sys_errlist string
 	corresponding to errno.

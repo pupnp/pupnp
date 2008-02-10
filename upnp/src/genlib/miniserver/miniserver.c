@@ -376,8 +376,12 @@ schedule_request_job( IN int connfd,
  * Return: void
  ************************************************************************/
 static void
-RunMiniServer( MiniServerSockArray * miniSock )
+RunMiniServer( MiniServerSockArray *miniSock )
 {
+    // strerror_r() buffer
+    const int ERROR_BUFFER_LEN = 256;
+    char errorBuffer[ERROR_BUFFER_LEN];
+
     struct sockaddr_in clientAddr;
     socklen_t clientLen;
     SOCKET connectHnd;
@@ -417,9 +421,9 @@ RunMiniServer( MiniServerSockArray * miniSock )
 
         ret = select( maxMiniSock, &rdSet, NULL, &expSet, NULL );
         if ( ret == -1 ) {
+            strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
             UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-                "Error in select(): %s\n",
-                sys_errlist[errno] );
+                "Error in select(): %s\n", errorBuffer );
 	    /* Avoid 100% CPU in case of repeated error in select() */
 	    isleep( 1 );
             continue;
@@ -429,9 +433,9 @@ RunMiniServer( MiniServerSockArray * miniSock )
                 connectHnd = accept( miniServSock,
                     ( struct sockaddr * )&clientAddr, &clientLen );
                 if( connectHnd == -1 ) {
+                    strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
                     UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-                        "miniserver: Error in accept(): %s\n",
-                        sys_errlist[errno] );
+                        "miniserver: Error in accept(): %s\n", errorBuffer );
                     continue;
                 }
                 schedule_request_job( connectHnd, &clientAddr );
@@ -546,6 +550,10 @@ int
 get_miniserver_sockets( MiniServerSockArray * out,
                         unsigned short listen_port )
 {
+    // strerror_r() buffer
+    const int ERROR_BUFFER_LEN = 256;
+    char errorBuffer[ERROR_BUFFER_LEN];
+
     struct sockaddr_in serverAddr;
     int listenfd;
     int success;
@@ -613,9 +621,9 @@ get_miniserver_sockets( MiniServerSockArray * out,
     }
 
     if ( sockError == -1 ) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-            "mserv start: Error in bind(): %s\n",
-            sys_errlist[errno] );
+            "mserv start: Error in bind(): %s\n", errorBuffer );
         shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
 
@@ -627,9 +635,9 @@ get_miniserver_sockets( MiniServerSockArray * out,
 
     success = listen( listenfd, SOMAXCONN );
     if ( success == -1 ) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
-            "mserv start: Error in listen(): %s\n",
-            sys_errlist[errno] );
+            "mserv start: Error in listen(): %s\n", errorBuffer );
         shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
 
@@ -648,10 +656,9 @@ get_miniserver_sockets( MiniServerSockArray * out,
 
     miniServerStopSock = socket( AF_INET, SOCK_DGRAM, 0 );
     if ( miniServerStopSock == -1 ) {
-        UpnpPrintf( UPNP_CRITICAL,
-            MSERV, __FILE__, __LINE__,
-            "Error in socket(): %s\n",
-            sys_errlist[errno] );
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+        UpnpPrintf( UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
+            "Error in socket(): %s\n", errorBuffer );
         shutdown( listenfd, SD_BOTH );
         UpnpCloseSocket( listenfd );
 
@@ -691,7 +698,6 @@ get_miniserver_sockets( MiniServerSockArray * out,
     out->miniServerStopSock = miniServerStopSock;
 
     return UPNP_E_SUCCESS;
-
 }
 
 /************************************************************************
@@ -811,6 +817,9 @@ StartMiniServer( unsigned short listen_port )
 int
 StopMiniServer()
 {
+    // strerror_r() buffer
+    const int ERROR_BUFFER_LEN = 256;
+    char errorBuffer[ERROR_BUFFER_LEN];
 
     int socklen = sizeof( struct sockaddr_in );
     int sock;
@@ -826,9 +835,9 @@ StopMiniServer()
 
     sock = socket( AF_INET, SOCK_DGRAM, 0 );
     if ( sock == -1 ) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-            "SSDP_SERVER: StopSSDPServer: Error in socket() %s\n",
-            sys_errlist[errno] );
+            "SSDP_SERVER: StopSSDPServer: Error in socket() %s\n", errorBuffer );
         return 0;
     }
 
