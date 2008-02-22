@@ -442,20 +442,18 @@ Make_Socket_NoBlocking( int sock )
  * Returns: int
  *	0 if successful else -1
  ***************************************************************************/
-int
-unique_service_name( IN char *cmd,
-                     IN SsdpEvent * Evt )
+int unique_service_name(IN char *cmd, IN SsdpEvent *Evt)
 {
-    char *TempPtr,
-      TempBuf[COMMAND_LEN],
-     *Ptr,
-     *ptr1,
-     *ptr2,
-     *ptr3;
+    char TempBuf[COMMAND_LEN];
+    char *TempPtr = NULL;
+    char *Ptr = NULL;
+    char *ptr1 = NULL;
+    char *ptr2 = NULL;
+    char *ptr3 = NULL;
     int CommandFound = 0;
+    int length = 0;
 
     if( ( TempPtr = strstr( cmd, "uuid:schemas" ) ) != NULL ) {
-
         ptr1 = strstr( cmd, ":device" );
         if( ptr1 != NULL ) {
             ptr2 = strstr( ptr1 + 1, ":" );
@@ -487,7 +485,6 @@ unique_service_name( IN char *cmd,
     }
 
     if( ( TempPtr = strstr( cmd, "uuid" ) ) != NULL ) {
-        //printf("cmd = %s\n",cmd);
         if( ( Ptr = strstr( cmd, "::" ) ) != NULL ) {
             strncpy( Evt->UDN, TempPtr, Ptr - TempPtr );
             Evt->UDN[Ptr - TempPtr] = '\0';
@@ -499,7 +496,6 @@ unique_service_name( IN char *cmd,
 
     if( strstr( cmd, "urn:" ) != NULL
         && strstr( cmd, ":service:" ) != NULL ) {
-
         if( ( TempPtr = strstr( cmd, "urn" ) ) != NULL ) {
             strcpy( Evt->ServiceType, TempPtr );
             CommandFound = 1;
@@ -514,8 +510,17 @@ unique_service_name( IN char *cmd,
         }
     }
 
+    if( ( TempPtr = strstr( cmd, "::upnp:rootdevice" ) ) != NULL ) {
+        /* Everything before "::upnp::rootdevice" is the UDN. */
+        if( TempPtr != cmd ) {
+            length = TempPtr - cmd;
+            strncpy(Evt->UDN, cmd, length);
+            Evt->UDN[length] = 0;
+            CommandFound = 1;
+        }
+    }
+   
     if( CommandFound == 0 ) {
-
         return -1;
     }
 
