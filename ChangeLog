@@ -2,6 +2,9 @@
 Version 1.6.6
 *******************************************************************************
 
+2008-02-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* No longer ignore "upnp:rootdevice" advertisement. Thanks to Bob Ciora.
+
 2008-02-10 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Changed "sys_errlist[errno]", which is deprecated, by
 	"strerror_r()", which is thread safe.
