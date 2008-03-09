@@ -3,6 +3,12 @@ Version 1.6.6
 *******************************************************************************
 
 2008-03-08 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fixed a printf format problem on the upnp_tv_device.c from both
+	upnp/sample/tvdevie and upnp/sample/tvcombo directories. The variable
+	port was a short int instead of an unsigned short and it was beeing
+	print as a negative value.
+
+2008-03-08 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 1902668 ] Cannot compile on MSVC
 	Submitted By Luke Kim - nereusuj
 	Version 1.6.5 cannot be compiled because of some changes in 1.6.3.
