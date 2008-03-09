@@ -2,6 +2,17 @@
 Version 1.6.6
 *******************************************************************************
 
+2008-03-08 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 1902668 ] Cannot compile on MSVC
+	Submitted By Luke Kim - nereusuj
+	Version 1.6.5 cannot be compiled because of some changes in 1.6.3.
+	MSVC does not support stdint.h, gettimeofday(), sys/param.h, const int
+	variables in array size and Windows does not define _WINDOWS_ but define
+	_WINDOWS.
+	* MSVC does not understand "const int"'s as declarators of array
+	dimensions, we must use #define'd constants.
+	* Use WIN32 instead of _WINDOWS_ or _WINDOWS.
+
 2008-02-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* No longer ignore "upnp:rootdevice" advertisement. Thanks to Bob Ciora.
 

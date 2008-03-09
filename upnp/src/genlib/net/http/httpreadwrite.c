@@ -71,8 +71,16 @@
 #include "webserver.h"
 
 
+/* 
+ * Please, do not change these to const int while MSVC cannot understand
+ * const int in array dimensions.
+ */
+/*
 const int CHUNK_HEADER_SIZE = 10;
 const int CHUNK_TAIL_SIZE = 10;
+*/
+#define CHUNK_HEADER_SIZE 10
+#define CHUNK_TAIL_SIZE 10
 
 
 /************************************************************************

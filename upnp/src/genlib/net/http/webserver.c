@@ -38,10 +38,8 @@
 #include <assert.h>
 #include <fcntl.h>
 #ifndef UPNP_USE_BCBPP
-#ifndef UPNP_USE_MSVCPP
     #include <inttypes.h>
     #include <stdint.h>
-#endif
 #endif
 #include "util.h"
 #include "strintmap.h"
