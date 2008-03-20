@@ -36,11 +36,7 @@
 
 #include "upnp.h"
 #include "client_table.h"
-
 //#include "../ssdp/ssdplib.h"
-
-
-
 
 #define MAX_INTERFACES 256
 

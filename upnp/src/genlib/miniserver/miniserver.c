@@ -35,6 +35,7 @@
 ************************************************************************/
 
 #include "config.h"
+
 #ifndef WIN32
 	#include <arpa/inet.h>
 	#include <netinet/in.h>
@@ -48,6 +49,7 @@
 	typedef int socklen_t;
 	#define EAFNOSUPPORT 97
 #endif /* WIN32 */
+
 #include "unixutil.h"
 #include "ithread.h"
 
@@ -65,7 +67,6 @@
 #include "ThreadPool.h"
 #include "httpreadwrite.h"
 #include "statcodes.h"
-#include "upnp.h"
 #include "upnpapi.h"
 
 #define APPLICATION_LISTENING_PORT 49152
@@ -378,10 +379,7 @@ schedule_request_job( IN int connfd,
 static void
 RunMiniServer( MiniServerSockArray *miniSock )
 {
-    // strerror_r() buffer
-    const int ERROR_BUFFER_LEN = 256;
     char errorBuffer[ERROR_BUFFER_LEN];
-
     struct sockaddr_in clientAddr;
     socklen_t clientLen;
     SOCKET connectHnd;
@@ -550,10 +548,7 @@ int
 get_miniserver_sockets( MiniServerSockArray * out,
                         unsigned short listen_port )
 {
-    // strerror_r() buffer
-    const int ERROR_BUFFER_LEN = 256;
     char errorBuffer[ERROR_BUFFER_LEN];
-
     struct sockaddr_in serverAddr;
     int listenfd;
     int success;
@@ -817,10 +812,7 @@ StartMiniServer( unsigned short listen_port )
 int
 StopMiniServer()
 {
-    // strerror_r() buffer
-    const int ERROR_BUFFER_LEN = 256;
     char errorBuffer[ERROR_BUFFER_LEN];
-
     int socklen = sizeof( struct sockaddr_in );
     int sock;
     struct sockaddr_in ssdpAddr;

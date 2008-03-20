@@ -46,12 +46,13 @@
 #include "unixutil.h"
 
 #ifdef WIN32
- #include <ws2tcpip.h>
- #include <winsock2.h>
- #ifndef imillisleep
- #define imillisleep Sleep
- #endif
-#endif
+	#include <ws2tcpip.h>
+	#include <winsock2.h>
+	#include <string.h>
+
+	#undef imillisleep
+	#define imillisleep Sleep
+#endif /* WIN32 */
 
 
 /************************************************************************
@@ -365,8 +366,13 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
 * Returns: void
 *
 ***************************************************************************/
+#ifndef WIN32
 #warning There are currently no uses of the function 'process_reply()' in the code.
 #warning 'process_reply()' is a candidate for removal.
+#else
+#pragma message("There are currently no uses of the function 'process_reply()' in the code.")
+#pragma message("'process_reply()' is a candidate for removal.")
+#endif
 static UPNP_INLINE void
 process_reply( IN char *request_buf,
                IN int buf_len,
@@ -514,10 +520,7 @@ SearchByTarget( IN int Mx,
                 IN char *St,
                 IN void *Cookie )
 {
-    // strerror_r() buffer
-    const int ERROR_BUFFER_LEN = 256;
     char errorBuffer[ERROR_BUFFER_LEN];
-
     int socklen = sizeof( struct sockaddr_in );
     int *id = NULL;
     int ret = 0;
