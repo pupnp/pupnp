@@ -31,19 +31,22 @@
 
 #ifndef UTIL_H
 #define UTIL_H
+
+
 #include "upnp.h"
+
 
 // usually used to specify direction of parameters in functions
 #ifndef IN
-#define IN
+	#define IN
 #endif
 
 #ifndef OUT
-#define OUT
+	#define OUT
 #endif
 
 #ifndef INOUT
-#define INOUT
+	#define INOUT
 #endif
 
 
@@ -52,22 +55,17 @@
 #define EVENT_TERMINATE	-3
 
 
-#ifndef WIN32
- #define max(a, b)   (((a)>(b))? (a):(b))
- #define min(a, b)   (((a)<(b))? (a):(b))
-#endif
-
-
 // boolean type in C
 typedef char xboolean;
 
 #ifndef TRUE
-#define TRUE 1
+	#define TRUE 1
 #endif
 
 #ifndef FALSE
-#define FALSE 0
+	#define FALSE 0
 #endif
+
 
 ///////////////////////////
 // funcs
@@ -76,64 +74,71 @@ typedef char xboolean;
 extern "C" {
 #endif
 
+/************************************************************************
+ * Function: logerror
+ *
+ * Parameters:
+ * 	IN const char *fmt;	format string
+ *
+ * Description: Log an error message.
+ *
+ * Return: void
+ ************************************************************************/
 void log_error( IN const char *fmt, ... );
 
 /************************************************************************
-*	Function :	linecopy
-*
-*	Parameters :
-*		OUT char dest[LINE_SIZE] ;	output buffer
-*		IN const char* src ;	input buffer
-*
-*	Description : Copy no of bytes spcified by the LINE_SIZE constant, 
-*		from the source buffer. Null terminate the destination buffer
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
+ * Function: linecopy
+ *
+ * Parameters:
+ *	OUT char dest[LINE_SIZE];	output buffer
+ *	IN const char *src;		input buffer
+ *
+ * Description: Copy no of bytes spcified by the LINE_SIZE constant, 
+ *	from the source buffer. Null terminate the destination buffer.
+ *
+ * Return: void
+ ************************************************************************/
 void linecopy( OUT char dest[LINE_SIZE], IN const char* src );
 
 /************************************************************************
-*	Function :	namecopy
-*
-*	Parameters :
-*		OUT char dest[NAME_SIZE] ;	output buffer
-*		IN const char* src ;	input buffer
-*
-*	Description : Copy no of bytes spcified by the NAME_SIZE constant, 
-*		from the source buffer. Null terminate the destination buffer
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
+ * Function: namecopy
+ *
+ * Parameters:
+ * 	OUT char dest[NAME_SIZE];	output buffer
+ * 	IN const char *src;		input buffer
+ *
+ * Description: Copy no of bytes spcified by the NAME_SIZE constant, 
+ * 	from the source buffer. Null terminate the destination buffer
+ *
+ * Return: void
+ ************************************************************************/
 void namecopy( OUT char dest[NAME_SIZE], IN const char* src );
 
 /************************************************************************
-*	Function :	linecopylen
-*
-*	Parameters :
-*		OUT char dest[LINE_SIZE] ;	output buffer
-*		IN const char* src ;	input buffer
-*		IN size_t srclen ;	bytes to be copied.
-*
-*	Description : Determine if the srclen passed in paramter is less than 
-*		the permitted LINE_SIZE. If it is use the passed parameter, if not
-*		use the permitted LINE_SIZE as the length parameter
-*		Copy no of bytes spcified by the LINE_SIZE constant, 
-*		from the source buffer. Null terminate the destination buffer
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
+ * Function:	linecopylen
+ *
+ * Parameters:
+ *	OUT char dest[LINE_SIZE];	output buffer
+ *	IN const char *src;		input buffer
+ *	IN size_t srclen;		bytes to be copied.
+ *
+ * Description : Determine if the srclen passed in paramter is less than 
+ *	the permitted LINE_SIZE. If it is use the passed parameter, if not
+ *	use the permitted LINE_SIZE as the length parameter
+ *	Copy no of bytes spcified by the LINE_SIZE constant, 
+ *	from the source buffer. Null terminate the destination buffer
+ *
+ * Return: void
+ ************************************************************************/
 void linecopylen( OUT char dest[LINE_SIZE], IN const char* src, IN size_t srclen );
 
 
 #ifdef __cplusplus
 } // extern C
 #endif
+
+/* Size of the errorBuffer variable, passed to the strerror_r() function */
+#define ERROR_BUFFER_LEN 256
 
 //////////////////////////////////
 // C specific
@@ -148,16 +153,21 @@ void linecopylen( OUT char dest[LINE_SIZE], IN const char* src, IN size_t srclen
 		#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 	#endif
 
-	#define EADDRINUSE WSAEADDRINUSE
+	#define EADDRINUSE		WSAEADDRINUSE
 
-	#define strcasecmp stricmp
-	#define strncasecmp strnicmp
+	#define strcasecmp		stricmp
+	#define strncasecmp		strnicmp
 
-	#define sleep(a) Sleep((a)*1000)
-	#define usleep(a) Sleep((a)/1000)
-#endif
+	#define sleep(a)		Sleep((a)*1000)
+	#define usleep(a)		Sleep((a)/1000)
+
+	#define strerror_r(a,b,c)	(strerror_s((b),(c),(a)))
+#else
+	#define max(a, b)   (((a)>(b))? (a):(b))
+	#define min(a, b)   (((a)<(b))? (a):(b))
+#endif /* WIN32 */
 
 #endif // __cplusplus
 
-#endif /* GENLIB_UTIL_UTIL_H */
+#endif /* UTIL_H */
 

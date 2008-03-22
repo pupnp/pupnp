@@ -49,9 +49,6 @@
 	#include <ws2tcpip.h>
 	#include <winsock2.h>
 	#include <string.h>
-
-	#undef imillisleep
-	#define imillisleep Sleep
 #endif /* WIN32 */
 
 

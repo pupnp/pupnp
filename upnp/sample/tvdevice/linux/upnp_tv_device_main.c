@@ -29,9 +29,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-#include <stdio.h>
+
 #include "sample_util.h"
 #include "upnp_tv_device.h"
+
+
+#include <stdio.h>
+
 
 /******************************************************************************
  * linux_print
@@ -82,7 +86,7 @@ TvDeviceCommandLoop( void *args )
 
         if( strcasecmp( cmd, "exit" ) == 0 ) {
             SampleUtil_Print( "Shutting down...\n" );
-            TvDeviceStop(  );
+            TvDeviceStop();
             exit( 0 );
         } else {
             SampleUtil_Print( "\n   Unknown command: %s\n\n", cmd );
@@ -117,26 +121,26 @@ TvDeviceCommandLoop( void *args )
  *                 
  *
  *****************************************************************************/
-int
-main( IN int argc,
-      IN char **argv )
+int main( IN int argc, IN char **argv )
 {
 
     unsigned int portTemp = 0;
     char *ip_address = NULL,
      *desc_doc_name = NULL,
      *web_dir_path = NULL;
+    int rc;
     ithread_t cmdloop_thread;
-    int code;
-    unsigned int port = 0;
+#ifndef WIN32
     int sig;
     sigset_t sigs_to_catch;
-
+#endif
+    int code;
+    unsigned int port = 0;
     int i = 0;
 
     SampleUtil_Initialize( linux_print );
 
-    //Parse options
+    // Parse options
     for( i = 1; i < argc; i++ ) {
         if( strcmp( argv[i], "-ip" ) == 0 ) {
             ip_address = argv[++i];
@@ -163,21 +167,18 @@ main( IN int argc,
                 ( "\tweb_dir_path: Filesystem path where web files "
                   "related to the device are stored\n" );
             SampleUtil_Print( "\t\te.g.: /upnp/sample/tvdevice/web\n" );
-            exit( 1 );
+            return 1;
         }
     }
 
     port = ( unsigned short )portTemp;
 
-    TvDeviceStart( ip_address, port, desc_doc_name, web_dir_path,
-                   linux_print );
+    TvDeviceStart( ip_address, port, desc_doc_name, web_dir_path, linux_print );
 
-    /*
-       start a command loop thread 
-     */
-    code = ithread_create( &cmdloop_thread, NULL, TvDeviceCommandLoop,
-                           NULL );
+    /* start a command loop thread */
+    code = ithread_create( &cmdloop_thread, NULL, TvDeviceCommandLoop, NULL );
 
+#ifndef WIN32
     /*
        Catch Ctrl-C and properly shutdown 
      */
@@ -186,6 +187,11 @@ main( IN int argc,
     sigwait( &sigs_to_catch, &sig );
 
     SampleUtil_Print( "Shutting down on signal %d...\n", sig );
-    TvDeviceStop(  );
-    exit( 0 );
+#else
+	ithread_join(cmdloop_thread, NULL);
+#endif
+    rc = TvDeviceStop();
+    
+    return rc;
 }
+

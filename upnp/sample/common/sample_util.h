@@ -34,24 +34,26 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
+
 
 #include <stdlib.h>
-
 #include <string.h>
 
-#include "upnptools.h"
 #include "ithread.h"
 #include "ixml.h"
+#include "upnptools.h"
 
-//mutex to control displaying of events
-extern ithread_mutex_t display_mutex ;
+
+// mutex to control displaying of events
+extern ithread_mutex_t display_mutex;
+
 
 typedef enum {
 	STATE_UPDATE = 0,
-	DEVICE_ADDED =1,
-	DEVICE_REMOVED=2,
-	GET_VAR_COMPLETE=3
+	DEVICE_ADDED = 1,
+	DEVICE_REMOVED = 2,
+	GET_VAR_COMPLETE = 3
 } eventType;
 
 
@@ -68,7 +70,7 @@ typedef enum {
  *   node -- The DOM node from which to extract the value
  *
  ********************************************************************************/
-char * SampleUtil_GetElementValue(IN IXML_Element *element);
+char *SampleUtil_GetElementValue(IN IXML_Element *element);
 
 /********************************************************************************
  * SampleUtil_GetFirstServiceList
@@ -85,7 +87,7 @@ char * SampleUtil_GetElementValue(IN IXML_Element *element);
  *
  ********************************************************************************/
 
-IXML_NodeList *SampleUtil_GetFirstServiceList(IN IXML_Document * doc); 
+IXML_NodeList *SampleUtil_GetFirstServiceList(IN IXML_Document *doc); 
 
 
 /********************************************************************************
@@ -100,7 +102,7 @@ IXML_NodeList *SampleUtil_GetFirstServiceList(IN IXML_Document * doc);
  *   item -- The item to search for
  *
  ********************************************************************************/
-char * SampleUtil_GetFirstDocumentItem(IN IXML_Document *doc, IN const char *item); 
+char *SampleUtil_GetFirstDocumentItem(IN IXML_Document *doc, IN const char *item); 
 
 
 
@@ -116,7 +118,7 @@ char * SampleUtil_GetFirstDocumentItem(IN IXML_Document *doc, IN const char *ite
  *   item -- The item to search for
  *
  ********************************************************************************/
-char * SampleUtil_GetFirstElementItem(IN IXML_Element *element, IN const char *item); 
+char *SampleUtil_GetFirstElementItem(IN IXML_Element *element, IN const char *item); 
 
 /********************************************************************************
  * SampleUtil_PrintEventType
@@ -162,9 +164,13 @@ int SampleUtil_PrintEvent(IN Upnp_EventType EventType,
  *   controlURL -- OUT -- The control URL for the service
  *
  ********************************************************************************/
-int SampleUtil_FindAndParseService (IN IXML_Document *DescDoc, IN char* location, 
-				    IN char *serviceType, OUT char **serviceId, 
-				    OUT char **eventURL, OUT char **controlURL);
+int SampleUtil_FindAndParseService (
+	IN IXML_Document *DescDoc,
+	IN char* location, 
+	IN char *serviceType,
+	OUT char **serviceId, 
+	OUT char **eventURL,
+	OUT char **controlURL);
 
 
 /********************************************************************************
@@ -196,8 +202,11 @@ extern print_string gPrintFun;
  *   const char * UDN
  *   int          newDevice
  ********************************************************************************/
-typedef void (*state_update)( const char *varName, const char *varValue, const char *UDN,
-							 eventType type);
+typedef void (*state_update)(
+	const char *varName,
+	const char *varValue,
+	const char *UDN,
+	eventType type);
 
 //global state update function used by smaple util
 extern state_update gStateUpdateFun;
@@ -224,7 +233,7 @@ int SampleUtil_Initialize(print_string print_function);
  * Parameters:
  *
  ********************************************************************************/
-int SampleUtil_Finish(void);
+int SampleUtil_Finish();
 
 /********************************************************************************
  * SampleUtil_Print
@@ -238,7 +247,7 @@ int SampleUtil_Finish(void);
  *   . . .  - variable number of args. (see printf)
  *
  ********************************************************************************/
-int SampleUtil_Print( char *fmt, ... );
+int SampleUtil_Print(char *fmt, ...);
 
 /********************************************************************************
  * SampleUtil_RegisterUpdateFunction
@@ -248,7 +257,7 @@ int SampleUtil_Print( char *fmt, ... );
  * Parameters:
  *
  ********************************************************************************/
-int SampleUtil_RegisterUpdateFunction( state_update update_function );
+int SampleUtil_RegisterUpdateFunction(state_update update_function);
 
 /********************************************************************************
  * SampleUtil_StateUpdate
@@ -258,11 +267,22 @@ int SampleUtil_RegisterUpdateFunction( state_update update_function );
  * Parameters:
  *
  ********************************************************************************/
-void SampleUtil_StateUpdate( const char *varName, const char *varValue, const char *UDN,
-							eventType type);
+void SampleUtil_StateUpdate(
+	const char *varName,
+	const char *varValue,
+	const char *UDN,
+	eventType type);
 
 #ifdef __cplusplus
 };
+#endif /* __cplusplus */
+
+
+#ifdef WIN32
+	#define snprintf	_snprintf
+	#define strcasecmp	stricmp
 #endif
 
-#endif /* UPNPSDK_UTIL_H */
+
+#endif /* SAMPLE_UTIL_H */
+

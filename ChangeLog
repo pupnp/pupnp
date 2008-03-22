@@ -4,7 +4,11 @@ Version 1.6.6
 
 2008-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Andre Sodermans (wienerschnitzel) patch for building libupnp under
-	windows systems.
+	windows systems with VC9.
+
+2008-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Andre Sodermans (wienerschnitzel) patch for building libupnp under
+	windows systems with VC8.
 
 2008-03-08 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fixed a printf format problem on the upnp_tv_device.c from both

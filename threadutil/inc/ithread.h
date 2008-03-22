@@ -715,7 +715,11 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *		0 on success, Nonzero on failure.
  *              See man page for sleep (man 3 sleep)
  *****************************************************************************/
+#ifndef WIN32
 #define isleep sleep
+#else
+#define isleep(x) Sleep((x)*1000)
+#endif
 
 /****************************************************************************
  * Function: isleep
@@ -730,7 +734,11 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *		0 on success, Nonzero on failure.
  *              See man page for sleep (man 3 sleep)
  *****************************************************************************/
+#ifndef WIN32
 #define imillisleep(x) usleep(1000*x)
+#else
+#define imillisleep	Sleep
+#endif
 
 #ifdef WIN32
 	#ifndef UPNP_STATIC_LIB

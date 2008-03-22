@@ -32,13 +32,9 @@
 #ifndef INTERNAL_CONFIG_H
 #define INTERNAL_CONFIG_H 
 
+
 #include "autoconfig.h"
 
-/* Size of the errorBuffer variable, passed to the strerror_r() function */
-#define ERROR_BUFFER_LEN 256
-#ifdef WIN32
-	#define strerror_r(a,b,c)	(strerror_s((b),(c),(a)))
-#endif /* WIN32 */
 
 /** @name Compile time configuration options
  *  The Linux SDK for UPnP Devices contains some compile-time parameters 
