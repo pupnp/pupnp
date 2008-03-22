@@ -1915,11 +1915,11 @@ TvDeviceCallbackEventHandler( Upnp_EventType EventType,
  *
  *****************************************************************************/
 int
-TvDeviceStop(  )
+TvDeviceStop()
 {
     UpnpUnRegisterRootDevice( device_handle );
-    UpnpFinish(  );
-    SampleUtil_Finish(  );
+    UpnpFinish();
+    SampleUtil_Finish();
     ithread_mutex_destroy( &TVDevMutex );
     return UPNP_E_SUCCESS;
 }

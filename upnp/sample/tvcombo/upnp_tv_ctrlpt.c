@@ -224,7 +224,7 @@ TvCtrlPointRefresh( void )
 {
     int rc;
 
-    TvCtrlPointRemoveAll(  );
+    TvCtrlPointRemoveAll();
 
     /*
        Search for all devices of type tvdevice version 1, 
@@ -539,7 +539,7 @@ TvCtrlPointGetDevice( int devnum,
  *
  ********************************************************************************/
 int
-TvCtrlPointPrintList(  )
+TvCtrlPointPrintList()
 {
     struct TvDeviceNode *tmpdevnode;
     int i = 0;
@@ -1096,7 +1096,7 @@ TvCtrlPointCallbackEventHandler( Upnp_EventType EventType,
                 if( DescDoc )
                     ixmlDocument_free( DescDoc );
 
-                TvCtrlPointPrintList(  );
+                TvCtrlPointPrintList();
                 break;
             }
 
@@ -1122,7 +1122,7 @@ TvCtrlPointCallbackEventHandler( Upnp_EventType EventType,
                 TvCtrlPointRemoveDevice( d_event->DeviceId );
 
                 SampleUtil_Print( "After byebye:" );
-                TvCtrlPointPrintList(  );
+                TvCtrlPointPrintList();
 
                 break;
             }
@@ -1408,10 +1408,10 @@ TvCtrlPointStart( print_string printFunctionPtr,
 int
 TvCtrlPointStop( void )
 {
-    TvCtrlPointRemoveAll(  );
+    TvCtrlPointRemoveAll();
     UpnpUnRegisterClient( ctrlpt_handle );
-    UpnpFinish(  );
-    SampleUtil_Finish(  );
+    UpnpFinish();
+    SampleUtil_Finish();
 
     return TV_SUCCESS;
 }

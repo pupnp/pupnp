@@ -534,9 +534,9 @@ web_server_init( void )
     int ret_code;
 
     if( bWebServerState == WEB_SERVER_DISABLED ) {
-        media_list_init(  );    // decode media list
+        media_list_init();    // decode media list
         membuffer_init( &gDocumentRootDir );
-        glob_alias_init(  );
+        glob_alias_init();
 
         pVirtualDirList = NULL;
 

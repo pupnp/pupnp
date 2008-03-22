@@ -105,7 +105,7 @@ SampleUtil_RegisterUpdateFunction( state_update update_function )
  *
  ********************************************************************************/
 int
-SampleUtil_Finish(  )
+SampleUtil_Finish()
 {
     ithread_mutex_destroy( &display_mutex );
     gPrintFun = NULL;

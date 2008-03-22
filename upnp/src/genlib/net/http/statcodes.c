@@ -176,7 +176,7 @@ http_get_code_text( int statusCode )
     int table_num;
 
     if( !gInitialized ) {
-        init_tables(  );
+        init_tables();
     }
 
     if( statusCode < 100 && statusCode >= 600 ) {
