@@ -483,7 +483,7 @@ Parser_UTF8ToInt( IN const char *ss,
 *			
 *===============================================================================*/
 static Parser *
-Parser_init(  )
+Parser_init()
 {
     Parser *newParser = NULL;
 
@@ -677,7 +677,7 @@ Parser_LoadDocument( OUT IXML_Document ** retDoc,
     int rc = IXML_SUCCESS;
     Parser *xmlParser = NULL;
 
-    xmlParser = Parser_init(  );
+    xmlParser = Parser_init();
     if( xmlParser == NULL ) {
         return IXML_INSUFFICIENT_MEMORY;
     }

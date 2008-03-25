@@ -39,7 +39,9 @@ extern "C" {
 #include <stdio.h>
 
 #include "ithread.h"
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <stdarg.h>
 #include <stdlib.h>
 #include <signal.h>

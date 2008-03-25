@@ -30,10 +30,14 @@
 ///////////////////////////////////////////////////////////////////////////
 
 #include "config.h"
+
 #ifdef INCLUDE_DEVICE_APIS
 #if EXCLUDE_SSDP == 0
+
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
+
 #include "ssdplib.h"
 #include "upnpapi.h"
 #include "ThreadPool.h"
@@ -45,7 +49,7 @@
 #ifdef WIN32
 	#include <ws2tcpip.h>
 	#include <winsock2.h>
-#endif
+#endif /* WIN32 */
 
 #define MSGTYPE_SHUTDOWN	0
 #define MSGTYPE_ADVERTISEMENT	1
@@ -213,10 +217,7 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
                    IN int NumPacket,
                    IN char **RqPacket )
 {
-    // strerror_r() buffer
-    const int ERROR_BUFFER_LEN = 256;
     char errorBuffer[ERROR_BUFFER_LEN];
-
     int ReplySock;
     int socklen = sizeof( struct sockaddr_in );
     int NumCopy;

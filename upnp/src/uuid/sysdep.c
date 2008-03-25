@@ -18,11 +18,11 @@
  */
 
 #include "config.h"
-#ifndef WIN32
- #include <unistd.h>
-#else
- #include <winsock2.h>
-#endif
+#ifdef WIN32
+	#include <winsock2.h>
+#else /* WIN32 */
+	#include <unistd.h>
+#endif /* WIN32 */
 #include <string.h>
 #include <stdio.h>
 #include "sysdep.h"
@@ -56,7 +56,7 @@ get_ieee_node_identifier(uuid_node_t *node)
    less than 100ns.
  */
 
-#ifdef _WINDOWS_
+#ifdef WIN32
 
 void
 get_system_time( uuid_time_t * uuid_time )
@@ -119,7 +119,7 @@ get_random_info(char seed[16])
 	MD5Final(seed, &c);
 };
 
-#else /* _WINDOWS_ */
+#else /* WIN32 */
 
 /*-----------------------------------------------------------------------------*/
 void
@@ -163,5 +163,5 @@ get_random_info(char seed[16])
 	MD5Final(seed, &c);
 };
 
-#endif /* _WINDOWS_ */
+#endif /* WIN32 */
 

@@ -268,7 +268,7 @@ ixmlDocument_createDocumentEx( OUT IXML_Document ** rtDoc )
 *
 *=================================================================*/
 IXML_Document *
-ixmlDocument_createDocument(  )
+ixmlDocument_createDocument()
 {
     IXML_Document *doc = NULL;
 

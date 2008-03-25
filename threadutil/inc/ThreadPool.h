@@ -79,7 +79,20 @@ typedef enum priority {LOW_PRIORITY,
 #endif
 
 #include "LinkedList.h"
-#include <sys/time.h> /* for gettimeofday() */
+
+#ifdef WIN32
+    #include <time.h>
+    #include <winsock2.h>
+    struct timezone 
+    {
+        int  tz_minuteswest; /* minutes W of Greenwich */
+        int  tz_dsttime;     /* type of dst correction */
+    };
+    int gettimeofday(struct timeval *tv, struct timezone *tz);
+#else /* WIN32 */
+    #include <sys/time.h> /* for gettimeofday() */
+#endif
+
 #include "FreeList.h"
 
 #include "ithread.h"

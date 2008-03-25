@@ -30,11 +30,13 @@
 ///////////////////////////////////////////////////////////////////////////
 
 #include "LinkedList.h"
-#include <sys/param.h>
+#ifndef WIN32
+	#include <sys/param.h>
+#endif
 #if (defined(BSD) && BSD >= 199306) || defined(__OSX__) || defined(__APPLE__)
-#include <stdlib.h>
+	#include <stdlib.h>
 #else
-#include <malloc.h>
+	#include <malloc.h>
 #endif
 #include <assert.h>
 
@@ -532,3 +534,4 @@ ListSize( LinkedList * list )
 
     return list->size;
 }
+

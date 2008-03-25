@@ -43,6 +43,7 @@
 #include "httpreadwrite.h"
 
 #ifdef WIN32
+	#include <string.h>
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
 	#include "unixutil.h"
@@ -861,10 +862,7 @@ readFromSSDPSocket( SOCKET socket )
 int
 get_ssdp_sockets( MiniServerSockArray * out )
 {
-    // strerror_r() buffer
-    const int ERROR_BUFFER_LEN = 256;
     char errorBuffer[ERROR_BUFFER_LEN];
-
     int onOff = 1;
     u_char ttl = 4;
     struct ip_mreq ssdpMcastAddr;

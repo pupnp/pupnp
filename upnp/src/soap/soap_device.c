@@ -607,7 +607,7 @@ get_device_info( IN http_message_t * request,
     save_char = control_url[request->uri.pathquery.size];
     ((char *)control_url)[request->uri.pathquery.size] = '\0';
 
-    HandleLock(  );
+    HandleLock();
 
     if( GetDeviceHandleInfo( &device_hnd, &device_info ) != HND_DEVICE ) {
         goto error_handler;
@@ -663,7 +663,7 @@ get_device_info( IN http_message_t * request,
 
   error_handler:
     ((char *)control_url)[request->uri.pathquery.size] = save_char;   // restore
-    HandleUnlock(  );
+    HandleUnlock();
     return ret_code;
 }
 

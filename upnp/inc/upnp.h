@@ -47,7 +47,9 @@
 
 
 #include <stdio.h>
-#include <sys/param.h>
+#ifndef WIN32
+	#include <sys/param.h>
+#endif
 #if (defined(BSD) && BSD >= 199306)
 	#include <time.h>
 #endif

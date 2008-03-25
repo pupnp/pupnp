@@ -449,17 +449,17 @@ device_main( int argc, char **argv )
 
     port = ( unsigned short )portTemp;
 
-    return TvDeviceStart(
-        ip_address, port, desc_doc_name, web_dir_path, linux_print );
+    return TvDeviceStart( ip_address, port, desc_doc_name, web_dir_path, linux_print );
 }
 
-int
-main( int argc, char **argv )
+int main( int argc, char **argv )
 {
     int rc;
     ithread_t cmdloop_thread;
+#ifndef WIN32
     int sig;
     sigset_t sigs_to_catch;
+#endif
     int code;
 
     device_main(argc, argv);
@@ -468,11 +468,10 @@ main( int argc, char **argv )
         SampleUtil_Print( "Error starting UPnP TV Control Point" );
         return rc;
     }
-    // start a command loop thread
-    code =
-        ithread_create( &cmdloop_thread, NULL, TvCtrlPointCommandLoop,
-                        NULL );
+    /* start a command loop thread */
+    code = ithread_create( &cmdloop_thread, NULL, TvCtrlPointCommandLoop, NULL );
 
+#ifndef WIN32
     /*
        Catch Ctrl-C and properly shutdown 
      */
@@ -480,7 +479,10 @@ main( int argc, char **argv )
     sigaddset( &sigs_to_catch, SIGINT );
     sigwait( &sigs_to_catch, &sig );
 
-    SampleUtil_Print( "Shutting down on signal %d...", sig );
+    SampleUtil_Print( "Shutting down on signal %d...\n", sig );
+#else
+	ithread_join(cmdloop_thread, NULL);
+#endif
     TvDeviceStop();
     rc = TvCtrlPointStop();
     

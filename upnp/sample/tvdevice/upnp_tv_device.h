@@ -41,7 +41,9 @@ extern "C" {
 
 #include "ithread.h"
 #include <stdlib.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <string.h>
 #include "upnp.h"
 #include "sample_util.h"
