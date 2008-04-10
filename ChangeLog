@@ -2,6 +2,9 @@
 Version 1.6.6
 *******************************************************************************
 
+2008-04-10 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Apostolos Syropoulos changes for OpenSolaris x86.
+
 2008-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Andre Sodermans (wienerschnitzel) patch for building libupnp under
 	windows systems with VC9.
