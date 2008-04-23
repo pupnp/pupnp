@@ -261,7 +261,7 @@ ixmlNode_setLocalName( IN IXML_Node * nodeptr,
 }
 
 /*================================================================
-*   ixmlNode_getNodeNamespaceURI
+*   ixmlNode_getNamespaceURI
 *       Returns the node namespaceURI
 *       External function.
 *   Returns:		
