@@ -2,6 +2,9 @@
 Version 1.6.6
 *******************************************************************************
 
+2008-04-23 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Use -O0 in debug builds so that variables do not get optimized out.
+
 2008-04-10 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Apostolos Syropoulos changes for OpenSolaris x86.
 
