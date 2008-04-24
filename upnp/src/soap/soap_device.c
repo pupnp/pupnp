@@ -443,9 +443,9 @@ check_soap_body( IN IXML_Document * doc,
             if( actionNode ) {
                 ns = ixmlNode_getNamespaceURI( actionNode );
                 name = ixmlNode_getLocalName( actionNode );
-
-                if( ( !strcmp( actionName, name ) )
-                    && ( !strcmp( urn, ns ) ) ) {
+                if (name && ns &&
+                    !strcmp( actionName, name ) &&
+                    !strcmp( urn, ns ) ) {
                     ret_code = UPNP_E_SUCCESS;
                 }
             }
