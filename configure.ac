@@ -134,16 +134,18 @@ dnl ############################################################################
 dnl # Release 1.6.6:
 dnl # "current:revision:age"
 dnl #
+dnl # - Code has changed in threadutil
+dnl #	revision: 2 -> 3
 dnl # - Code has changed in upnp
 dnl #	revision: 4 -> 5
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:2:2])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:3:2])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
 dnl #
 dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [4:2:2])
+AC_SUBST([LT_VERSION_THREADUTIL], [4:3:2])
 AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
