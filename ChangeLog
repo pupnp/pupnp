@@ -3,6 +3,10 @@ Version 1.6.6
 *******************************************************************************
 
 2008-04-24 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added thread id's to the UpnpPrintf debug messages. Thanks to
+	Charles Nepveu for the idea.
+
+2008-04-24 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	*  SF Bug Tracker [ 1948586 ]
 	Uppercase U in in "xmlns:U" in Invoke Action causes seg. f.
 	Submitted By: Thomas Norheim - kjakan_no

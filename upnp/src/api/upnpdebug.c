@@ -310,17 +310,30 @@ void UpnpDisplayFileAndLine(
 	IN const char *DbgFileName,
 	IN int DbgLineNo)
 {
-	int starlength = 66;
-	const char *lines[2];
-	char FileAndLine[500];
-	lines[0] = "DEBUG";
-	if (DbgFileName) {
-		sprintf(FileAndLine,
-			"FILE: %s, LINE: %d",
-			DbgFileName, DbgLineNo);
-		lines[1] = FileAndLine;
+#define NLINES 2
+#define MAX_LINE_SIZE 512
+#define NUMBER_OF_STARS 80
+	const char *lines[NLINES];
+	char buf[NLINES][MAX_LINE_SIZE];
+	int i;
+
+	/* Initialize the pointer array */
+	for (i = 0; i < NLINES; i++) {
+		lines[i] = buf[i];
 	}
-	UpnpDisplayBanner(fd, lines, 2, starlength);
+
+	/* Put the debug lines in the buffer */
+	sprintf(buf[0], "DEBUG - THREAD ID: 0x%lX",
+		(unsigned long int)ithread_self());
+	if (DbgFileName) {
+		sprintf(buf[1],
+			"FILE: %s, LINE: %d",
+			DbgFileName,
+			DbgLineNo);
+	}
+
+	/* Show the lines centered */
+	UpnpDisplayBanner(fd, lines, NLINES, NUMBER_OF_STARS);
 	fflush(fd);
 }
 #endif
