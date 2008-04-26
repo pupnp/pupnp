@@ -31,54 +31,61 @@
 
 
 #include "config.h"
+
+
+#include <sys/stat.h>
+
+
 #include <assert.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
+
+
 #ifndef WIN32
-	#include <sys/types.h>
-	#include <sys/socket.h>
-	#include <netinet/in.h>
 	#include <arpa/inet.h>
-
-	#ifndef SPARC_SOLARIS
-//		#include <linux/if.h>
-		#include <net/if.h>
-	#else
-		#include <fcntl.h>
-		#include <net/if.h>
-		#include <sys/sockio.h>
-	#endif
-
+	#include <net/if.h>
+	#include <netinet/in.h>
 	#include <sys/ioctl.h>
+	#include <sys/param.h>
+	#include <sys/socket.h>
+	#include <sys/types.h>
 	#include <sys/utsname.h>
+
+
 	#include <unistd.h>
 
-	#include <sys/param.h>
-	#if (defined(BSD) && BSD >= 199306)
+
+	#if defined(_sun)
+		#include <sys/sockio.h>
+		#include <fcntl.h>
+	#elif defined(BSD) && BSD >= 199306
 		#include <ifaddrs.h>
 	#endif
-#endif
+#endif /* WIN32 */
+
+
 #include "upnpapi.h"
 #include "httpreadwrite.h"
+#include "membuffer.h"
 #include "ssdplib.h"
 #include "soaplib.h"
 #include "ThreadPool.h"
-#include "membuffer.h"
 
-#include "httpreadwrite.h"
 
 // Needed for GENA
 #include "gena.h"
-#include "service_table.h"
 #include "miniserver.h"
+#include "service_table.h"
+
 
 #ifdef INTERNAL_WEB_SERVER
 	#include "webserver.h"
 	#include "urlconfig.h"
 #endif // INTERNAL_WEB_SERVER
 
+
+//
 virtualDirList *pVirtualDirList;
 
 // Mutex to synchronize the subscription handling at the client side
