@@ -127,9 +127,9 @@
 #define MODL_NAME_SIZE  32
 #define SERL_NUMR_SIZE  64
 #define MODL_DESC_SIZE  64
-#define UPNP_INFINITE -1
-#define UPNP_USING_CHUNKED			-3
-#define UPNP_UNTIL_CLOSE			-4
+#define UPNP_INFINITE		-1
+#define UPNP_USING_CHUNKED	-3
+#define UPNP_UNTIL_CLOSE	-4
 
 
 /** @name Error codes 
@@ -504,7 +504,22 @@
 
 #include "upnpdebug.h"
 
-enum UpnpOpenFileMode{UPNP_READ, UPNP_WRITE};
+
+#include "ActionComplete.h"
+#include "ActionRequest.h"
+#include "Discovery.h"
+#include "EventSubscribe.h"
+#include "FileInfo.h"
+#include "StateVarComplete.h"
+#include "StateVarRequest.h"
+
+
+enum UpnpOpenFileMode
+{
+	UPNP_READ,
+	UPNP_WRITE
+};
+
 
 /*! @name Constants, Structures, and Types */
 /*! @{ */
@@ -536,26 +551,26 @@ enum Upnp_EventType_e {
 
   /** Received by a device when a control point issues a control
    *  request.  The {\bf Event} parameter contains a pointer to a {\bf
-   *  Upnp_Action_Request} structure containing the action.  The application
+   *  UpnpActionRequest} structure containing the action.  The application
    *  stores the results of the action in this structure. */
 
   UPNP_CONTROL_ACTION_REQUEST,
 
   /** A {\bf UpnpSendActionAsync} call completed. The {\bf Event}
-   *  parameter contains a pointer to a {\bf Upnp_Action_Complete} structure
+   *  parameter contains a pointer to a {\bf UpnpActionComplete} structure
    *  with the results of the action.  */
 
   UPNP_CONTROL_ACTION_COMPLETE,
 
   /** Received by a device when a query for a single service variable
    *  arrives.  The {\bf Event} parameter contains a pointer to a {\bf
-   *  Upnp_State_Var_Request} structure containing the name of the variable
+   *  UpnpStateVarRequest} structure containing the name of the variable
    *  and value.  */
 
   UPNP_CONTROL_GET_VAR_REQUEST,
 
   /** A {\bf UpnpGetServiceVarStatus} call completed. The {\bf Event}
-   *  parameter contains a pointer to a {\bf Upnp_State_Var_Complete} structure
+   *  parameter contains a pointer to a {\bf UpnpStateVarComplete} structure
    *  containing the value for the variable.  */
 
   UPNP_CONTROL_GET_VAR_COMPLETE,
@@ -566,13 +581,13 @@ enum Upnp_EventType_e {
 
   /** Received by a control point when a new device or service is available.  
    *  The {\bf Event} parameter contains a pointer to a {\bf
-   *  Upnp_Discovery} structure with the information about the device
+   *  UpnpDiscovery} structure with the information about the device
    *  or service.  */
 
   UPNP_DISCOVERY_ADVERTISEMENT_ALIVE,
 
   /** Received by a control point when a device or service shuts down. The {\bf
-   *  Event} parameter contains a pointer to a {\bf Upnp_Discovery}
+   *  Event} parameter contains a pointer to a {\bf UpnpDiscovery}
    *  structure containing the information about the device or
    *  service.  */
 
@@ -580,7 +595,7 @@ enum Upnp_EventType_e {
 
   /** Received by a control point when a matching device or service responds.
    *  The {\bf Event} parameter contains a pointer to a {\bf
-   *  Upnp_Discovery} structure containing the information about
+   *  UpnpDiscovery} structure containing the information about
    *  the reply to the search request.  */
 
   UPNP_DISCOVERY_SEARCH_RESULT,
@@ -627,12 +642,12 @@ enum Upnp_EventType_e {
 
   /** A {\bf UpnpUnSubscribeAsync} call completed. The status of the
    *  subscription is in the {\bf Event} parameter as a {\bf
-   *  Upnp_Event_Subscribe} structure.  */
+   *  EventSubscribe} structure.  */
 
   UPNP_EVENT_UNSUBSCRIBE_COMPLETE,
 
   /** The auto-renewal of a client subscription failed.   
-   *  The {\bf Event} parameter is a {\bf Upnp_Event_Subscribe} structure 
+   *  The {\bf Event} parameter is a {\bf EventSubscribe} structure 
    *  with the error code set appropriately. The subscription is no longer 
    *  valid. */
 
@@ -640,7 +655,7 @@ enum Upnp_EventType_e {
 
   /** A client subscription has expired. This will only occur 
    *  if auto-renewal of subscriptions is disabled.
-   *  The {\bf Event} parameter is a {\bf Upnp_Event_Subscribe}
+   *  The {\bf Event} parameter is a {\bf EventSubscribe}
    *  structure. The subscription is no longer valid. */
   
   UPNP_EVENT_SUBSCRIPTION_EXPIRED
@@ -708,109 +723,8 @@ enum Upnp_DescType_e {
 
 typedef enum Upnp_DescType_e Upnp_DescType;
 
-/** Returned as part of a {\bf UPNP_CONTROL_ACTION_COMPLETE} callback.  */
-
-struct Upnp_Action_Request
-{
-  /** The result of the operation. */
-  int ErrCode;
-
-  /** The socket number of the connection to the requestor. */
-  int Socket;
-
-  /** The error string in case of error. */
-  char ErrStr[LINE_SIZE];
-
- /** The Action Name. */
-  char ActionName[NAME_SIZE];
-
-  /** The unique device ID. */
-  char DevUDN[NAME_SIZE];
-
-  /** The service ID. */
-  char ServiceID[NAME_SIZE];
-
-  /** The DOM document describing the action. */
-  IXML_Document *ActionRequest;
-
-  /** The DOM document describing the result of the action. */
-  IXML_Document *ActionResult;
-
-  /** IP address of the control point requesting this action. */
-  struct in_addr CtrlPtIPAddr;
-
-  /** The DOM document containing the information from the
-      the SOAP header. */
-  IXML_Document *SoapHeader;
-};
-
-struct Upnp_Action_Complete
-{
-  /** The result of the operation. */
-  int ErrCode;
-
-  /** The control URL for service. */
-  char CtrlUrl[NAME_SIZE];
-
-  /** The DOM document describing the action. */
-  IXML_Document *ActionRequest;
-
-  /** The DOM document describing the result of the action. */
-  IXML_Document *ActionResult;
-
-};
-
-/** Represents the request for current value of a state variable in a service
- *  state table.  */
-
-struct Upnp_State_Var_Request
-{
-  /** The result of the operation. */
-  int ErrCode;
-
-  /** The socket number of the connection to the requestor. */
-  int Socket;
-
-  /** The error string in case of error. */
-  char ErrStr[LINE_SIZE];
-
-  /** The unique device ID. */
-  char DevUDN[NAME_SIZE];
-
-  /** The  service ID. */
-  char ServiceID[NAME_SIZE];
-
-  /** The name of the variable. */
-  char StateVarName[NAME_SIZE];
-
-  /** IP address of sender requesting the state variable. */
-  struct in_addr CtrlPtIPAddr;
-
-  /** The current value of the variable. This needs to be allocated by 
-   *  the caller.  When finished with it, the SDK frees this {\bf DOMString}. */
-  DOMString CurrentVal;
-};
-
-/** Represents the reply for the current value of a state variable in an
-    asynchronous call. */
-
-struct Upnp_State_Var_Complete
-{
-  /** The result of the operation. */
-  int ErrCode;
-
-  /** The control URL for the service. */
-  char CtrlUrl[NAME_SIZE];
-
-  /** The name of the variable. */
-  char StateVarName[NAME_SIZE];
-
-  /** The current value of the variable or error string in case of error. */
-  DOMString CurrentVal;
-};
 
 /** Returned along with a {\bf UPNP_EVENT_RECEIVED} callback.  */
-
 struct Upnp_Event
 {
   /** The subscription ID for this subscription. */
@@ -821,76 +735,9 @@ struct Upnp_Event
 
   /** The DOM tree representing the changes generating the event. */
   IXML_Document *ChangedVariables;
-
 };
 
-/*
- * This typedef is required by Doc++ to parse the last entry of the 
- * Upnp_Discovery structure correctly.
- */
 
-
-/** Returned in a {\bf UPNP_DISCOVERY_RESULT} callback. */
-struct Upnp_Discovery
-{
-	/** The result code of the {\bf UpnpSearchAsync} call. */
-	int  ErrCode;                  
-				     
-	/** The expiration time of the advertisement. */
-	int  Expires;                  
-				     
-	/** The unique device identifier. */
-	char DeviceId[LINE_SIZE];      
-
-	/** The device type. */
-	char DeviceType[LINE_SIZE];    
-
-	/** The service type. */
-	char ServiceType[LINE_SIZE];
-
-	/** The service version. */
-	char ServiceVer[LINE_SIZE];    
-
-	/** The URL to the UPnP description document for the device. */
-	char Location[LINE_SIZE];      
-
-	/** The operating system the device is running. */
-	char Os[LINE_SIZE];            
-				     
-	/** Date when the response was generated. */
-	char Date[LINE_SIZE];            
-				     
-	/** Confirmation that the MAN header was understood by the device. */
-	char Ext[LINE_SIZE];           
-				     
-	/** The host address of the device responding to the search. */
-	struct sockaddr_in DestAddr; 
-};
-
-/** Returned along with a {\bf UPNP_EVENT_SUBSCRIBE_COMPLETE} or {\bf
- * UPNP_EVENT_UNSUBSCRIBE_COMPLETE} callback.  */
-
-struct Upnp_Event_Subscribe {
-
-  /** The SID for this subscription.  For subscriptions, this only
-   *  contains a valid SID if the {\bf Upnp_EventSubscribe.result} field
-   *  contains a {\tt UPNP_E_SUCCESS} result code.  For unsubscriptions,
-   *  this contains the SID from which the subscription is being
-   *  unsubscribed.  */
-
-  Upnp_SID Sid;            
-
-  /** The result of the operation. */
-  int ErrCode;              
-
-  /** The event URL being subscribed to or removed from. */
-  char PublisherUrl[NAME_SIZE]; 
-
-  /** The actual subscription time (for subscriptions only). */
-  int TimeOut;              
-                              
-};
-  
 /** Returned along with a {\bf UPNP_EVENT_SUBSCRIPTION_REQUEST}
  *  callback.  */
 
@@ -904,36 +751,8 @@ struct Upnp_Subscription_Request
 
   /** The assigned subscription ID for this subscription. */
   Upnp_SID Sid;
-
 };
 
-
-struct File_Info
-{
-  /** The length of the file. A length less than 0 indicates the size 
-   *  is unknown, and data will be sent until 0 bytes are returned from
-   *  a read call. */
-  off_t file_length;
-
-  /** The time at which the contents of the file was modified;
-   *  The time system is always local (not GMT). */
-  time_t last_modified;
-
-  /** If the file is a directory, {\bf is_directory} contains
-   * a non-zero value. For a regular file, it should be 0. */
-  int is_directory;
-
-  /** If the file or directory is readable, this contains 
-   * a non-zero value. If unreadable, it should be set to 0. */
-  int is_readable;
-
-  /** The content type of the file. This string needs to be allocated 
-   *  by the caller using {\bf ixmlCloneDOMString}.  When finished 
-   *  with it, the SDK frees the {\bf DOMString}. */
-   
-  DOMString content_type;
-
-};
 
 /* The type of handle returned by the web server for open requests. */
 
@@ -945,22 +764,22 @@ typedef void *UpnpWebFileHandle;
  */
 struct UpnpVirtualDirCallbacks
 {
-  /** Called by the web server to query information on a file.  The callback
-   *  should return 0 on success or -1 on an error. */
-  int (*get_info) (
-    IN  const char *filename,     /** The name of the file to query. */
-    OUT struct File_Info *info    /** Pointer to a structure to store the 
+    /** Called by the web server to query information on a file.  The callback
+     *  should return 0 on success or -1 on an error. */
+    int (*get_info) (
+        IN  const char *filename, /** The name of the file to query. */
+        OUT UpnpFileInfo *info       /** Pointer to a structure to store the 
                                       information on the file. */
     );
                                   
-  /** Called by the web server to open a file.  The callback should return
-   *  a valid handle if the file can be opened.  Otherwise, it should return
-   *  {\tt NULL} to signify an error. */
-  UpnpWebFileHandle (*open)(
-    IN const char *filename,       /** The name of the file to open. */ 
-    IN enum UpnpOpenFileMode Mode  /** The mode in which to open the file. 
-                                       Valid values are {\tt UPNP_READ} or 
-                                       {\tt UPNP_WRITE}. */
+    /** Called by the web server to open a file.  The callback should return
+     *  a valid handle if the file can be opened.  Otherwise, it should return
+     *  {\tt NULL} to signify an error. */
+    UpnpWebFileHandle (*open)(
+        IN const char *filename,       /** The name of the file to open. */ 
+        IN enum UpnpOpenFileMode Mode  /** The mode in which to open the file. 
+                                           Valid values are {\tt UPNP_READ} or 
+                                           {\tt UPNP_WRITE}. */
     );
 
   /** Called by the web server to perform a sequential read from an open
@@ -1062,11 +881,7 @@ typedef struct virtual_Dir_List
  *  in the future to communicate results back to the SDK.
  */
 
-typedef int  (*Upnp_FunPtr) (
-    IN Upnp_EventType EventType, 
-    IN void *Event, 
-    IN void *Cookie
-    );
+typedef int (*Upnp_FunPtr)(IN Upnp_EventType EventType, IN void *Event, IN void *Cookie);
 
 /*! @} */ /* Constants, Structures, and Types */
 
@@ -1891,16 +1706,16 @@ EXPORT_SPEC int UpnpRenewSubscription(
     INOUT int *TimeOut,       /** Pointer to a variable containing the 
                                   requested subscription time.  Upon return, 
                                   it contains the actual renewal time. */
-    IN Upnp_SID SubsId        /** The ID for the subscription to renew. */
+    IN const Upnp_SID SubsId        /** The ID for the subscription to renew. */
     );
 
 /** {\bf UpnpRenewSubscriptionAsync} renews a subscription that is about
  *  to expire, generating a callback when the operation is complete.
  *
  *  Note that many of the error codes for this function are returned in
- *  the {\bf Upnp_Event_Subscribe} structure.  In those cases, the function
+ *  the {\bf EventSubscribe} structure.  In those cases, the function
  *  returns {\tt UPNP_E_SUCCESS} and the appropriate error code will
- *  be in the {\bf Upnp_Event_Subscribe.ErrCode} field in the {\bf Event}
+ *  be in the {\bf EventSubscribe.ErrCode} field in the {\bf Event}
  *  structure passed to the callback.
  *
  *  @return [int] An integer representing one of the following:
@@ -1916,30 +1731,30 @@ EXPORT_SPEC int UpnpRenewSubscription(
  *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
  *              complete this operation.
  *      \item {\tt UPNP_E_NETWORK_ERROR}: A network error occured (returned in 
- *              the {\bf Upnp_Event_Subscribe.ErrCode} field as part of the 
+ *              the {\bf EventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_WRITE}: An error or timeout occurred writing 
- *              to a socket (returned in the {\bf Upnp_Event_Subscribe.ErrCode} 
+ *              to a socket (returned in the {\bf EventSubscribe.ErrCode} 
  *              field as part of the callback).
  *      \item {\tt UPNP_E_SOCKET_READ}: An error or timeout occurred reading  
  *              from a socket (returned in the 
- *              {\bf Upnp_Event_Subscribe.ErrCode} field as part of the 
+ *              {\bf EventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_BIND}: An error occurred binding the socket 
- *              (returned in the {\bf Upnp_Event_Subscribe.ErrCode} field as 
+ *              (returned in the {\bf EventSubscribe.ErrCode} field as 
  *              part of the callback).
  *      \item {\tt UPNP_E_SOCKET_CONNECT}: An error occurred connecting to 
  *              {\bf PublisherUrl} (returned in the {\bf 
- *              Upnp_Event_Subscribe.ErrCode} field as part of the callback).
+ *              EventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_OUTOF_SOCKET}: An error occurred creating socket (
- *              returned in the {\bf Upnp_Event_Subscribe.ErrCode} field as 
+ *              returned in the {\bf EventSubscribe.ErrCode} field as 
  *              part of the callback).
  *      \item {\tt UPNP_E_BAD_RESPONSE}: An error occurred in response from 
  *              the publisher (returned in the {\bf 
- *              Upnp_Event_Subscribe.ErrCode} field as part of the callback).
+ *              EventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_SUBSCRIBE_UNACCEPTED}: The publisher refused 
  *              the subscription request (returned in the {\bf 
- *              Upnp_Event_Subscribe.ErrCode} field as part of the callback).
+ *              EventSubscribe.ErrCode} field as part of the callback).
  *    \end{itemize}
  */
 
@@ -2048,9 +1863,9 @@ EXPORT_SPEC int UpnpSubscribe(
  *  callback function when the operation is complete.
  *
  *  Note that many of the error codes for this function are returned in
- *  the {\bf Upnp_Event_Subscribe} structure.  In those cases, the function
+ *  the {\bf EventSubscribe} structure.  In those cases, the function
  *  returns {\tt UPNP_E_SUCCESS} and the appropriate error code will
- *  be in the {\bf Upnp_Event_Subscribe.ErrCode} field in the {\bf Event}
+ *  be in the {\bf EventSubscribe.ErrCode} field in the {\bf Event}
  *  structure passed to the callback.
  *
  *  @return [int] An integer representing one of the following:
@@ -2065,31 +1880,31 @@ EXPORT_SPEC int UpnpSubscribe(
  *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
  *              complete this operation.
  *      \item {\tt UPNP_E_NETWORK_ERROR}: A network error occured (returned in 
- *              the {\bf Upnp_Event_Subscribe.ErrCode} field as part of the 
+ *              the {\bf EventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_WRITE}: An error or timeout occurred writing 
  *              to a socket (returned in the 
- *              {\bf Upnp_Event_Subscribe.ErrCode} field as part of the 
+ *              {\bf EventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_READ}: An error or timeout occurred reading 
  *              from a socket (returned in the 
- *              {\bf Upnp_Event_Subscribe.ErrCode} field as part of the 
+ *              {\bf EventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_BIND}: An error occurred binding the socket 
- *              (returned in the {\bf Upnp_Event_Subscribe.ErrCode} field as 
+ *              (returned in the {\bf EventSubscribe.ErrCode} field as 
  *              part of the callback).
  *      \item {\tt UPNP_E_SOCKET_CONNECT}: An error occurred connecting to 
  *              {\bf PublisherUrl} (returned in the {\bf 
- *              Upnp_Event_Subscribe.ErrCode} field as part of the callback).
+ *              EventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_OUTOF_SOCKET}: An error occurred creating  the 
- *              socket (returned in the {\bf Upnp_Event_Subscribe.ErrCode} 
+ *              socket (returned in the {\bf EventSubscribe.ErrCode} 
  *              field as part of the callback).
  *      \item {\tt UPNP_E_BAD_RESPONSE}: An error occurred in response from 
  *              the publisher (returned in the {\bf 
- *              Upnp_Event_Subscribe.ErrCode} field as part of the callback).
+ *              EventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_SUBSCRIBE_UNACCEPTED}: The publisher refused 
  *              the subscription request (returned in the {\bf 
- *              Upnp_Event_Subscribe.ErrCode} field as part of the callback).
+ *              EventSubscribe.ErrCode} field as part of the callback).
  *    \end{itemize}
  */
 
@@ -2141,7 +1956,7 @@ EXPORT_SPEC int UpnpSubscribeAsync(
 EXPORT_SPEC int UpnpUnSubscribe(
     IN UpnpClient_Handle Hnd, /** The handle of the subscribed control 
                                   point. */
-    IN Upnp_SID SubsId        /** The ID returned when the control point 
+    IN const Upnp_SID SubsId        /** The ID returned when the control point 
                                   subscribed to the service. */
     );
 
@@ -2151,9 +1966,9 @@ EXPORT_SPEC int UpnpUnSubscribe(
  *  when the operation is complete.
  *
  *  Note that many of the error codes for this function are returned in
- *  the {\bf Upnp_Event_Subscribe} structure.  In those cases, the function
+ *  the {\bf EventSubscribe} structure.  In those cases, the function
  *  returns {\tt UPNP_E_SUCCESS} and the appropriate error code will
- *  be in the {\bf Upnp_Event_Subscribe.ErrCode} field in the {\bf Event}
+ *  be in the {\bf EventSubscribe.ErrCode} field in the {\bf Event}
  *  structure passed to the callback.
  *
  *  @return [int] An integer representing one of the following:
@@ -2167,30 +1982,30 @@ EXPORT_SPEC int UpnpUnSubscribe(
  *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
  *              complete this operation.
  *      \item {\tt UPNP_E_NETWORK_ERROR}: A network error occured (returned in 
- *              the {\bf Upnp_Event_Subscribe.ErrCode} field as part of the 
+ *              the {\bf EventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_WRITE}: An error or timeout occurred writing 
  *              to a socket (returned in the {\bf 
- *              Upnp_Event_Subscribe.ErrCode} field as part of the callback).
+ *              EventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_SOCKET_READ}: An error or timeout occurred reading 
  *              from a socket (returned in the 
- *              {\bf Upnp_Event_Subscribe.ErrCode} field as part of the 
+ *              {\bf EventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_BIND}: An error occurred binding the socket 
- *              (returned in the {\bf Upnp_Event_Subscribe.ErrCode} field as 
+ *              (returned in the {\bf EventSubscribe.ErrCode} field as 
  *              part of the callback).
  *      \item {\tt UPNP_E_SOCKET_CONNECT}: An error occurred connecting to 
  *              {\bf PublisherUrl} (returned in the {\bf 
- *              Upnp_Event_Subscribe.ErrCode} field as part of the callback).
+ *              EventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_OUTOF_SOCKET}: An error occurred creating a socket (
- *              returned in the {\bf Upnp_Event_Subscribe.ErrCode} field as 
+ *              returned in the {\bf EventSubscribe.ErrCode} field as 
  *              part of the callback).
  *      \item {\tt UPNP_E_BAD_RESPONSE}: An error occurred in response from 
  *              the publisher (returned in the {\bf 
- *              Upnp_Event_Subscribe.ErrCode} field as part of the callback).
+ *              EventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_UNSUBSCRIBE_UNACCEPTED}: The publisher refused 
  *              the subscription request (returned in the {\bf 
- *              Upnp_Event_Subscribe.ErrCode} field as part of the callback).
+ *              EventSubscribe.ErrCode} field as part of the callback).
  *    \end{itemize} */
 
 EXPORT_SPEC int UpnpUnSubscribeAsync(

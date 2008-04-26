@@ -110,11 +110,11 @@ extern ithread_mutex_t DeviceListMutex;
 
 extern UpnpClient_Handle ctrlpt_handle;
 
-void	TvCtrlPointPrintHelp( void );
+void	TvCtrlPointPrintHelp();
 int		TvCtrlPointDeleteNode(struct TvDeviceNode*);
-int		TvCtrlPointRemoveDevice(char*);
-int		TvCtrlPointRemoveAll( void );
-int		TvCtrlPointRefresh( void );
+int		TvCtrlPointRemoveDevice(const char *);
+int		TvCtrlPointRemoveAll();
+int		TvCtrlPointRefresh();
 
 
 int		TvCtrlPointSendAction(int, int, char *, char **, char **, int);
@@ -140,11 +140,11 @@ int		TvCtrlPointGetBrightness(int);
 int		TvCtrlPointGetDevice(int, struct TvDeviceNode **);
 int		TvCtrlPointPrintList( void );
 int		TvCtrlPointPrintDevice(int);
-void	TvCtrlPointAddDevice (IXML_Document *, char *, int); 
-void    TvCtrlPointHandleGetVar(char *,char *,DOMString);
+void	TvCtrlPointAddDevice(IXML_Document *, const char *, int); 
+void    TvCtrlPointHandleGetVar(const char *, const char *, const DOMString);
 void	TvStateUpdate(char*,int, IXML_Document * , char **);
 void	TvCtrlPointHandleEvent(Upnp_SID, int, IXML_Document *); 
-void	TvCtrlPointHandleSubscribeUpdate(char *, Upnp_SID, int); 
+void	TvCtrlPointHandleSubscribeUpdate(const char *, const Upnp_SID, int); 
 int		TvCtrlPointCallbackEventHandler(Upnp_EventType, void *, void *);
 void	TvCtrlPointVerifyTimeouts(int);
 void	TvCtrlPointPrintCommands( void );

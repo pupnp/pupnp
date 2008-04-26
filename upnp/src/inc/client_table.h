@@ -29,139 +29,155 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef _CLIENT_TABLE
-#define _CLIENT_TABLE
+
+#ifndef CLIENT_TABLE_H
+#define CLIENT_TABLE_H
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "upnp.h"
 
 #include <stdio.h>
-//#include <malloc.h>
 #include <stdlib.h>
 #include <time.h>
-#include "uri.h"
-#include "service_table.h"
 
+
+#include "service_table.h"
+#include "String.h"        // for UpnpString
 #include "TimerThread.h"
+#include "upnp.h"
 #include "upnp_timeout.h"
+#include "uri.h"
+
 
 extern TimerThread gTimerThread;
 
-CLIENTONLY(
-typedef struct CLIENT_SUBSCRIPTION {
-  Upnp_SID sid;
-  char * ActualSID;
-  char * EventURL;
-  int RenewEventId;
-  struct CLIENT_SUBSCRIPTION * next;
-} client_subscription;
+
+#ifdef INCLUDE_CLIENT_APIS
+
+
+typedef struct {} ClientSubscription;
+
+
+/** Constructor */
+ClientSubscription *UpnpClientSubscription_new();
+
+/** Destructor */
+void UpnpClientSubscription_delete(ClientSubscription *p);
+
+/** Copy Constructor */
+ClientSubscription *UpnpClientSubscription_dup(const ClientSubscription *p);
+
+/** Assignment operator */
+void UpnpClientSubscription_assign(ClientSubscription *q, const ClientSubscription *p);
+
+/*  */
+int UpnpClientSubscription_get_RenewEventId(const ClientSubscription *p);
+void UpnpClientSubscription_set_RenewEventId(ClientSubscription *p, int n);
+
+/*  */
+const UpnpString *UpnpClientSubscription_get_SID(const ClientSubscription *p);
+void UpnpClientSubscription_set_SID(ClientSubscription *p, const UpnpString *s);
+void UpnpClientSubscription_strcpy_SID(ClientSubscription *p, const char *s);
+
+/*  */
+const UpnpString *UpnpClientSubscription_get_ActualSID(const ClientSubscription *p);
+void UpnpClientSubscription_set_ActualSID(ClientSubscription *p, const UpnpString *s);
+void UpnpClientSubscription_strcpy_ActualSID(ClientSubscription *p, const char *s);
+
+/*  */
+const UpnpString *UpnpClientSubscription_get_EventURL(const ClientSubscription *p);
+void UpnpClientSubscription_set_EventURL(ClientSubscription *p, const UpnpString *s);
+void UpnpClientSubscription_strcpy_EventURL(ClientSubscription *p, const char *s);
+
+/*  */
+ClientSubscription *UpnpClientSubscription_get_Next(const ClientSubscription *p);
+void UpnpClientSubscription_set_Next(ClientSubscription *p, ClientSubscription *q);
+
+
 
 /************************************************************************
-*	Function :	copy_client_subscription
-*
-*	Parameters :
-*		client_subscription * in ;	- source client subscription
-*		client_subscription * out ;	- destination client subscription
-*
-*	Description :	Make a copy of the client subscription data
-*
-*	Return : int ;
-*		UPNP_E_OUTOF_MEMORY - On Failure to allocate memory
-*		HTTP_SUCCESS - On Success
-*
-*	Note :
-************************************************************************/
-int copy_client_subscription(client_subscription * in, client_subscription * out);
-
-/************************************************************************
-*	Function :	free_client_subscription
-*
-*	Parameters :
-*		client_subscription * sub ;	- Client subscription to be freed
-*
-*	Description :	Free memory allocated for client subscription data.
-*		Remove timer thread associated with this subscription event.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void free_client_subscription(client_subscription * sub);
+ * Function: free_client_subscription
+ *
+ * Parameters:
+ *	ClientSubscription *sub;	- Client subscription to be freed
+ *
+ * Description: Free memory allocated for client subscription data.
+ *	Remove timer thread associated with this subscription event.
+ ************************************************************************/
+void free_client_subscription(ClientSubscription * sub);
 
 
 /************************************************************************
-*	Function :	freeClientSubList
-*
-*	Parameters :
-*		client_subscription * list ; Client subscription 
-*
-*	Description :	Free the client subscription table.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void freeClientSubList(client_subscription * list);
+ * Function: freeClientSubList
+ *
+ * Parameters:
+ *	ClientSubscription *list;	Client subscription 
+ *
+ * Description: Free the client subscription table.
+ *
+ * Return: void
+ ************************************************************************/
+void freeClientSubList(ClientSubscription *list);
+
 
 /************************************************************************
-*	Function :	RemoveClientSubClientSID
-*
-*	Parameters :
-*		client_subscription **head ; Head of the subscription list	
-*		const Upnp_SID sid ;		 Subscription ID to be mactched
-*
-*	Description :	Remove the client subscription matching the 
-*		subscritpion id represented by the const Upnp_SID sid parameter 
-*		from the table and update the table.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void RemoveClientSubClientSID(client_subscription **head, 
-				       const Upnp_SID sid);
+ * Function: RemoveClientSubClientSID
+ *
+ * Parameters:
+ *	ClientSubscription **head;	Head of the subscription list	
+ *	const UpnpString sid;		Subscription ID to be mactched
+ *
+ * Description: Remove the client subscription matching the 
+ *	subscritpion id represented by the const Upnp_SID sid parameter 
+ *	from the table and update the table.
+ *
+ * Return: void
+ ************************************************************************/
+void RemoveClientSubClientSID(ClientSubscription **head, const UpnpString *sid);
+
 
 /************************************************************************
-*	Function :	GetClientSubClientSID
-*
-*	Parameters :
-*		client_subscription *head ; Head of the subscription list	
-*		const Upnp_SID sid ;		Subscription ID to be matched
-*
-*	Description :	Return the client subscription from the client table 
-*		that matches const Upnp_SID sid subscrition id value. 
-*
-*	Return : client_subscription * ; The matching subscription
-*
-*	Note :
-************************************************************************/
-client_subscription * GetClientSubClientSID(client_subscription *head
-						     , const Upnp_SID sid);
+ * Function: GetClientSubClientSID
+ *
+ * Parameters:
+ *	ClientSubscription *head;	Head of the subscription list	
+ *	const UpnpString *sid;		Subscription ID to be matched
+ *
+ * Description: Return the client subscription from the client table 
+ *	that matches const Upnp_SID sid subscrition id value. 
+ *
+ * Return: ClientSubscription *	The matching subscription
+ ************************************************************************/
+ClientSubscription *GetClientSubClientSID(
+	ClientSubscription *head,
+	const UpnpString *sid);
+
 
 /************************************************************************
-*	Function :	GetClientSubActualSID
-*
-*	Parameters :
-*		client_subscription *head ;	Head of the subscription list		
-*		token * sid ;				Subscription ID to be matched
-*
-*	Description :	Returns the client subscription from the client 
-*		subscription table that has the matching token * sid buffer
-*		value.
-*
-*	Return : client_subscription * ; The matching subscription
-*
-*	Note :
-************************************************************************/
-client_subscription * GetClientSubActualSID(client_subscription *head
-						     , token * sid);
-)
+ * Function: GetClientSubActualSID
+ *
+ * Parameters:
+ *	ClientSubscription *head;	Head of the subscription list		
+ *	token *sid;			Subscription ID to be matched
+ *
+ * Description: Returns the client subscription from the client 
+ *	subscription table that has the matching token *sid buffer value.
+ *
+ * Return: ClientSubscription *;	The matching subscription
+ ************************************************************************/
+ClientSubscription *GetClientSubActualSID(ClientSubscription *head, token *sid);
+
+
+#endif /* INCLUDE_CLIENT_APIS */
+
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
-#endif /*	_CLIENT_TABLE */
+
+#endif /* CLIENT_TABLE_H */
+

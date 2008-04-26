@@ -88,7 +88,7 @@ struct Handle_Info
      
     // Client only
 #ifdef INCLUDE_CLIENT_APIS
-    client_subscription *ClientSubList; //client subscription list
+    ClientSubscription *ClientSubList; //client subscription list
     LinkedList SsdpSearchList; // active ssdp searches   
 #endif
     int   aliasInstalled;       // 0 = not installed; otherwise installed

@@ -29,28 +29,36 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef _GENA_
-#define _GENA_
+#ifndef GENA_H
+#define GENA_H
+
+
 #include "config.h"
-#include "service_table.h"
+
+
+#include <string.h>
+#include <time.h>
+
+
+#include "client_table.h"
+#include "httpparser.h"
 #include "miniserver.h"
+#include "service_table.h"
+#include "sock.h"
+#include "String.h"
+#include "ThreadPool.h"
 #include "uri.h"
 #include "upnp.h"
 
-#include <time.h>
-#include "ThreadPool.h"
-#include <string.h>
-#include "client_table.h"
-#include "httpparser.h"
-#include "sock.h"
 
 #ifdef __cplusplus
-#define EXTERN_C extern "C"
-#else 
-#ifndef EXTERN_C
- #define EXTERN_C 
-#endif
-#endif
+	#define EXTERN_C extern "C"
+#else /* __cplusplus */
+	#ifndef EXTERN_C
+		#define EXTERN_C 
+	#endif /* EXTERN_C */
+#endif /* __cplusplus */
+
 
 #define XML_VERSION "<?xml version='1.0' encoding='ISO-8859-1' ?>\n"
 #define XML_PROPERTYSET_HEADER \
@@ -74,6 +82,7 @@
 #define MAX_SECONDS 10
 #define MAX_EVENTS 20
 #define MAX_PORT_SIZE 10
+
 #define GENA_E_BAD_RESPONSE UPNP_E_BAD_RESPONSE
 #define GENA_E_BAD_SERVICE UPNP_E_INVALID_SERVICE
 #define GENA_E_SUBSCRIPTION_UNACCEPTED UPNP_E_SUBSCRIBE_UNACCEPTED
@@ -82,9 +91,11 @@
 #define GENA_E_NOTIFY_UNACCEPTED UPNP_E_NOTIFY_UNACCEPTED
 #define GENA_E_NOTIFY_UNACCEPTED_REMOVE_SUB -9
 #define GENA_E_BAD_HANDLE UPNP_E_INVALID_HANDLE
+
 #define XML_ERROR -5
 #define XML_SUCCESS UPNP_E_SUCCESS
 #define GENA_SUCCESS UPNP_E_SUCCESS
+
 #define CALLBACK_SUCCESS 0
 #define DEFAULT_TIMEOUT 1801
 
@@ -110,171 +121,173 @@ extern ithread_mutex_t GlobalClientSubscribeMutex;
 
 // Structure to send NOTIFY message to all subscribed control points
 typedef struct NOTIFY_THREAD_STRUCT {
-  char * headers;
-  DOMString propertySet;
-  char * servId;
-  char * UDN;
-  Upnp_SID sid;
-  int eventKey;
-  int *reference_count;
-  UpnpDevice_Handle device_handle;
+	char *headers;
+	DOMString propertySet;
+	char *servId;
+	char *UDN;
+	Upnp_SID sid;
+	int eventKey;
+	int *reference_count;
+	UpnpDevice_Handle device_handle;
 } notify_thread_struct;
 
 
 /************************************************************************
-* Function : genaCallback									
-*																	
-* Parameters:														
-*	IN http_parser_t *parser: represents the parse state of the request
-*	IN http_message_t* request: HTTP message containing GENA request
-*	INOUT SOCKINFO *info: Structure containing information about the socket
-*
-* Description:														
-*	This is the callback function called by the miniserver to handle 
-*	incoming GENA requests. 
-*
-* Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
-***************************************************************************/
-EXTERN_C void genaCallback (IN http_parser_t *parser, 
-							IN http_message_t* request, 
-							IN SOCKINFO *info);
-
+ * Function : genaCallback
+ *
+ * Parameters:
+ *	IN http_parser_t *parser: represents the parse state of the request
+ *	IN http_message_t* request: HTTP message containing GENA request
+ *	INOUT SOCKINFO *info: Structure containing information about the socket
+ *
+ * Description:
+ *	This is the callback function called by the miniserver to handle
+ *	incoming GENA requests.
+ *
+ * Returns: int
+ *	UPNP_E_SUCCESS if successful else appropriate error
+ ***************************************************************************/
+EXTERN_C void genaCallback(
+	IN http_parser_t *parser, 
+	IN http_message_t* request, 
+	IN SOCKINFO *info);
+ 
 /************************************************************************
-* Function : genaSubscribe
-*																	
-* Parameters:														
-*	IN UpnpClient_Handle client_handle: 
-*	IN char * PublisherURL: NULL Terminated, of the form : 
-*						"http://134.134.156.80:4000/RedBulb/Event"
-*	INOUT int * TimeOut: requested Duration, if -1, then "infinite".
-*						in the OUT case: actual Duration granted 
-*						by Service, -1 for infinite
-*	OUT Upnp_SID out_sid:sid of subscription, memory passed in by caller
-*
-* Description:														
-*	This function subscribes to a PublisherURL ( also mentioned as EventURL
-*	some places). It sends SUBSCRIBE http request to service processes 
-*	request. Finally adds a Subscription to 
-*	the clients subscription list, if service responds with OK
-*
-* Returns: int
-*	return UPNP_E_SUCCESS if service response is OK else 
-*	returns appropriate error
-***************************************************************************/
+ * Function: genaSubscribe
+ *
+ * Parameters:
+ *	IN UpnpClient_Handle client_handle:
+ *	IN const UpnpString *PublisherURL: Of the form:
+ *		"http://134.134.156.80:4000/RedBulb/Event"
+ *	INOUT int * TimeOut: requested Duration, if -1, then "infinite".
+ *		in the OUT case: actual Duration granted 
+ *		by Service, -1 for infinite
+ *	OUT UpnpString *out_sid: sid of subscription, memory passed in by caller
+ *
+ * Description:
+ *	This function subscribes to a PublisherURL ( also mentioned as EventURL
+ *	some places). It sends SUBSCRIBE http request to service processes 
+ *	request. Finally adds a Subscription to 
+ *	the clients subscription list, if service responds with OK
+ *
+ * Returns: int
+ *	return UPNP_E_SUCCESS if service response is OK else 
+ *	returns appropriate error
+ ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaSubscribe(
-	UpnpClient_Handle client_handle,
-	char * PublisherURL,
-	int * TimeOut, 
-	Upnp_SID  out_sid );
-#endif
+	IN UpnpClient_Handle client_handle,
+	IN const UpnpString *PublisherURL,
+	INOUT int *TimeOut,
+	OUT UpnpString *out_sid);
+#endif /* INCLUDE_CLIENT_APIS */
 
 
 /************************************************************************
-* Function : genaUnSubscribe
-*																	
-* Parameters:														
-*	IN UpnpClient_Handle client_handle: UPnP client handle
-*	IN SID in_sid: The subscription ID
-*
-* Description:														
-*	This function unsubscribes a SID. It first validates the SID and 
-*	client_handle,copies the subscription, sends UNSUBSCRIBE http request 
-*	to service processes request and finally removes the subscription
-*
-* Returns: int
-*	return UPNP_E_SUCCESS if service response is OK else 
-*	returns appropriate error
-***************************************************************************/
+ * Function: genaUnSubscribe
+ *
+ * Parameters:
+ *	IN UpnpClient_Handle client_handle: UPnP client handle
+ *	IN const UpnpString *in_sid: The subscription ID
+ *
+ * Description:
+ *	This function unsubscribes a SID. It first validates the SID and
+ *	client_handle,copies the subscription, sends UNSUBSCRIBE http request
+ *	to service processes request and finally removes the subscription
+ *
+ * Returns: int
+ *	return UPNP_E_SUCCESS if service response is OK else
+ *	returns appropriate error
+ ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaUnSubscribe(
-	UpnpClient_Handle client_handle,
-	const Upnp_SID in_sid);
-#endif
+	IN UpnpClient_Handle client_handle,
+	IN const UpnpString *in_sid);
+#endif /* INCLUDE_CLIENT_APIS */
 
 /************************************************************************
-* Function : genaUnregisterClient									
-*																	
-* Parameters:														
-*	IN UpnpClient_Handle client_handle: Handle containing all the control
-*			point related information
-*
-* Description:														
-*	This function unsubcribes all the outstanding subscriptions and cleans
-*	the subscription list. This function is called when control point 
-*	unregisters.
-*
-* Returns: int
-*	return UPNP_E_SUCCESS if successful else returns appropriate error
-***************************************************************************/
+ * Function : genaUnregisterClient
+ *
+ * Parameters:
+ *	IN UpnpClient_Handle client_handle: Handle containing all the control
+ *		point related information
+ *
+ * Description:
+ *	This function unsubcribes all the outstanding subscriptions and cleans
+ *	the subscription list. This function is called when control point
+ *	unregisters.
+ *
+ * Returns: int
+ *	return UPNP_E_SUCCESS if successful else returns appropriate error
+ ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaUnregisterClient(UpnpClient_Handle client_handle);
-#endif
+#endif /* INCLUDE_CLIENT_APIS */
 
 //server
 /************************************************************************
-* Function : genaUnregisterDevice
-*																	
-* Parameters:														
-*	IN UpnpDevice_Handle device_handle: Handle of the root device
-*
-* Description:														
-*	This function cleans the service table of the device. 
-*
-* Returns: int
-*	returns UPNP_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
-****************************************************************************/
+ * Function : genaUnregisterDevice
+ *
+ * Parameters:
+ *	IN UpnpDevice_Handle device_handle: Handle of the root device
+ *
+ * Description:
+ *	This function cleans the service table of the device.
+ *
+ * Returns: int
+ *	returns UPNP_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
+ ****************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaUnregisterDevice(UpnpDevice_Handle device_handle);
-#endif
+#endif /* INCLUDE_CLIENT_APIS */
 
 
 /************************************************************************
-* Function : genaRenewSubscription
-*																	
-* Parameters:														
-*	IN UpnpClient_Handle client_handle: Client handle
-*	IN const Upnp_SID in_sid: subscription ID
-*	INOUT int * TimeOut: requested Duration, if -1, then "infinite".
-*						in the OUT case: actual Duration granted 
-*						by Service, -1 for infinite
-*
-* Description:														
-*	This function renews a SID. It first validates the SID and 
-*	client_handle and copies the subscription. It sends RENEW 
-*	(modified SUBSCRIBE) http request to service and processes
-*	the response.
-*
-* Returns: int
-*	return UPNP_E_SUCCESS if service response is OK else 
-*	returns appropriate error
-***************************************************************************/
+ * Function : genaRenewSubscription
+ *
+ * Parameters:
+ *	IN UpnpClient_Handle client_handle: Client handle
+ *	IN const UpnpString *in_sid: subscription ID
+ *	INOUT int * TimeOut:
+ *		requested Duration, if -1, then "infinite".
+ *		in the OUT case: actual Duration granted by Service, -1 for infinite
+ *
+ * Description:
+ *	This function renews a SID. It first validates the SID and
+ *	client_handle and copies the subscription. It sends RENEW
+ *	(modified SUBSCRIBE) http request to service and processes
+ *	the response.
+ *
+ * Returns: int
+ *	return UPNP_E_SUCCESS if service response is OK else
+ *	returns appropriate error
+ ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaRenewSubscription(
 	IN UpnpClient_Handle client_handle,
-	IN const Upnp_SID in_sid,
+	IN const UpnpString *in_sid,
 	OUT int * TimeOut);
-#endif
+#endif /* INCLUDE_CLIENT_APIS */
+
 /****************************************************************************
-*	Function :	genaNotifyAll
-*
-*	Parameters :
-*		IN UpnpDevice_Handle device_handle : Device handle
-*		IN char *UDN :	Device udn
-*		IN char *servId :	Service ID
-*	    IN char **VarNames : array of varible names
-*	    IN char **VarValues :	array of variable values
-*		IN int var_count	 :	number of variables
-*
-*	Description : 	This function sends a notification to all the subscribed
-*	control points
-*
-*	Return :	int
-*
-*	Note : This function is similar to the genaNotifyAllExt. The only difference
-*			is it takes event variable array instead of xml document.
-****************************************************************************/
+ * Function: genaNotifyAll
+ *
+ * Parameters:
+ *	IN UpnpDevice_Handle device_handle: Device handle
+ *	IN char *UDN: Device udn
+ *	IN char *servId: Service ID
+ *	IN char **VarNames: array of varible names
+ *	IN char **VarValues: array of variable values
+ *	IN int var_count: number of variables
+ *
+ * Description: This function sends a notification to all the subscribed
+ *	control points
+ *
+ * Return: int
+ *
+ * Note: This function is similar to the genaNotifyAllExt. The only difference
+ *	is it takes event variable array instead of xml document.
+ ****************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaNotifyAll(
 	UpnpDevice_Handle device_handle,
@@ -283,54 +296,55 @@ EXTERN_C int genaNotifyAll(
 	char **VarNames,
 	char **VarValues,
 	int var_count);
-#endif
+#endif /* INCLUDE_DEVICE_APIS */
 
 /****************************************************************************
-* Function :	genaNotifyAllExt
-*
-* Parameters :
-*	IN UpnpDevice_Handle device_handle : Device handle
-*	IN char *UDN :			Device udn
-*	IN char *servId :		Service ID
-*	IN IXML_Document *PropSet :	XML document Event varible property set
-*
-* Description : This function sends a notification to all the subscribed
-*	control points
-*
-* Return : int
-*
-* Note : This function is similar to the genaNotifyAll. the only difference
-*	is it takes the document instead of event variable array
-****************************************************************************/
+ * Function: genaNotifyAllExt
+ *
+ * Parameters:
+ *	IN UpnpDevice_Handle device_handle: Device handle
+ *	IN char *UDN: Device udn
+ *	IN char *servId: Service ID
+ *	IN IXML_Document *PropSet: XML document Event varible property set
+ *
+ * Description : This function sends a notification to all the subscribed
+ *	control points
+ *
+ * Return: int
+ *
+ * Note: This function is similar to the genaNotifyAll. the only difference
+ *	is it takes the document instead of event variable array
+ ****************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaNotifyAllExt(
 	UpnpDevice_Handle device_handle, 
 	char *UDN,
 	char *servId,
 	IN IXML_Document *PropSet);
-#endif
+#endif /* INCLUDE_DEVICE_APIS */
+
 
 /****************************************************************************
-*	Function :	genaInitNotify
-*
-*	Parameters :
-*		   IN UpnpDevice_Handle device_handle :	Device handle
-*		   IN char *UDN :	Device udn
-*		   IN char *servId :	Service ID
-*		   IN char **VarNames :	Array of variable names
-*		   IN char **VarValues :	Array of variable values
-*		   IN int var_count :	array size
-*		   IN Upnp_SID sid :	subscription ID
-*
-*	Description :	This function sends the intial state table dump to 
-*		newly subscribed control point. 
-*
-*	Return :	int
-*		returns GENA_E_SUCCESS if successful else returns appropriate error
-* 
-*	Note : No other event will be sent to this control point before the 
-*			intial state table dump.
-****************************************************************************/
+ * Function: genaInitNotify
+ *
+ * Parameters:
+ *	IN UpnpDevice_Handle device_handle: Device handle
+ *	IN char *UDN: Device udn
+ *	IN char *servId: Service ID
+ *	IN char **VarNames: Array of variable names
+ *	IN char **VarValues: Array of variable values
+ *	IN int var_count: array size
+ *	IN Upnp_SID sid: subscription ID
+ *
+ * Description: This function sends the intial state table dump to 
+ *	newly subscribed control point. 
+ *
+ * Return: int
+ *	returns GENA_E_SUCCESS if successful else returns appropriate error
+ * 
+ * Note: No other event will be sent to this control point before the 
+ *	intial state table dump.
+ ****************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaInitNotify(IN UpnpDevice_Handle device_handle,
 	IN char *UDN,
@@ -339,28 +353,29 @@ EXTERN_C int genaInitNotify(IN UpnpDevice_Handle device_handle,
 	IN char **VarValues,
 	IN int var_count,
 	IN Upnp_SID sid);
-#endif
+#endif /* INCLUDE_DEVICE_APIS */
+
 
 /****************************************************************************
-*	Function :	genaInitNotifyExt
-*
-*	Parameters :
-*		   IN UpnpDevice_Handle device_handle :	Device handle
-*		   IN char *UDN :	Device udn
-*		   IN char *servId :	Service ID
-*		   IN IXML_Document *PropSet :	Document of the state table
-*		   IN Upnp_SID sid :	subscription ID
-*
-*	Description :	This function is similar to the genaInitNofity. The only 
-*	difference is that it takes the xml document for the state table and 
-*	sends the intial state table dump to newly subscribed control point. 
-*
-*	Return :	int
-*		returns GENA_E_SUCCESS if successful else returns appropriate error
-* 
-*	Note : No other event will be sent to this control point before the 
-*			intial state table dump.
-****************************************************************************/
+ *	Function :	genaInitNotifyExt
+ *
+ *	Parameters :
+ *		   IN UpnpDevice_Handle device_handle :	Device handle
+ *		   IN char *UDN :	Device udn
+ *		   IN char *servId :	Service ID
+ *		   IN IXML_Document *PropSet :	Document of the state table
+ *		   IN Upnp_SID sid :	subscription ID
+ *
+ *	Description :	This function is similar to the genaInitNofity. The only 
+ *	difference is that it takes the xml document for the state table and 
+ *	sends the intial state table dump to newly subscribed control point. 
+ *
+ *	Return :	int
+ *		returns GENA_E_SUCCESS if successful else returns appropriate error
+ * 
+ *	Note : No other event will be sent to this control point before the 
+ *			intial state table dump.
+ ****************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C  int genaInitNotifyExt(
 	IN UpnpDevice_Handle device_handle, 
@@ -368,35 +383,29 @@ EXTERN_C  int genaInitNotifyExt(
 	IN char *servId,
 	IN IXML_Document *PropSet, 
 	IN Upnp_SID sid);
-#endif
+#endif /* INCLUDE_DEVICE_APIS */
 
 
 /************************************************************************
-* Function : error_respond									
-*																	
-* Parameters:														
-*	IN SOCKINFO *info: Structure containing information about the socket
-*	IN int error_code: error code that will be in the GENA response
-*	IN http_message_t* hmsg: GENA request Packet 
-*
-* Description:														
-*	This function send an error message to the control point in the case
-*	incorrect GENA requests.
-*
-* Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
-***************************************************************************/
-void error_respond( IN SOCKINFO *info, IN int error_code,
-				    IN http_message_t* hmsg );
+ * Function : error_respond
+ *
+ * Parameters:
+ *	IN SOCKINFO *info: Structure containing information about the socket
+ *	IN int error_code: error code that will be in the GENA response
+ *	IN http_message_t* hmsg: GENA request Packet
+ *
+ * Description:
+ *	This function send an error message to the control point in the case
+ *	incorrect GENA requests.
+ *
+ * Returns: int
+ *	UPNP_E_SUCCESS if successful else appropriate error
+ ***************************************************************************/
+void error_respond(
+	IN SOCKINFO *info,
+	IN int error_code,
+	IN http_message_t* hmsg);
 
 
-#endif // GENA
-
-
-
-
-
-
-
-
+#endif /* GENA_H */
 

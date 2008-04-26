@@ -379,26 +379,28 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
         case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE:
         case UPNP_DISCOVERY_SEARCH_RESULT:
             {
-                struct Upnp_Discovery *d_event =
-                    ( struct Upnp_Discovery * )Event;
-
-                SampleUtil_Print( "ErrCode     =  %d\n",
-                                  d_event->ErrCode );
-                SampleUtil_Print( "Expires     =  %d\n",
-                                  d_event->Expires );
-                SampleUtil_Print( "DeviceId    =  %s\n",
-                                  d_event->DeviceId );
-                SampleUtil_Print( "DeviceType  =  %s\n",
-                                  d_event->DeviceType );
-                SampleUtil_Print( "ServiceType =  %s\n",
-                                  d_event->ServiceType );
-                SampleUtil_Print( "ServiceVer  =  %s\n",
-                                  d_event->ServiceVer );
-                SampleUtil_Print( "Location    =  %s\n",
-                                  d_event->Location );
-                SampleUtil_Print( "OS          =  %s\n", d_event->Os );
-                SampleUtil_Print( "Ext         =  %s\n", d_event->Ext );
-
+                UpnpDiscovery *d_event = (UpnpDiscovery *)Event;
+                SampleUtil_Print(
+                    "ErrCode     =  %d\n"
+                    "Expires     =  %d\n"
+                    "DeviceId    =  %s\n"
+                    "DeviceType  =  %s\n"
+                    "ServiceType =  %s\n"
+                    "ServiceVer  =  %s\n"
+                    "Location    =  %s\n"
+                    "OS          =  %s\n"
+                    "Date        =  %s\n"
+                    "Ext         =  %s\n",
+                    UpnpDiscovery_get_ErrCode(d_event),
+                    UpnpDiscovery_get_Expires(d_event),
+                    UpnpString_get_String(UpnpDiscovery_get_DeviceID(d_event)),
+                    UpnpString_get_String(UpnpDiscovery_get_DeviceType(d_event)),
+                    UpnpString_get_String(UpnpDiscovery_get_ServiceType(d_event)),
+                    UpnpString_get_String(UpnpDiscovery_get_ServiceVer(d_event)),
+                    UpnpString_get_String(UpnpDiscovery_get_Location(d_event)),
+                    UpnpString_get_String(UpnpDiscovery_get_Os(d_event)),
+                    UpnpString_get_String(UpnpDiscovery_get_Date(d_event)),
+                    UpnpString_get_String(UpnpDiscovery_get_Ext(d_event)));
             }
             break;
 
@@ -411,35 +413,41 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
              */
         case UPNP_CONTROL_ACTION_REQUEST:
             {
-                struct Upnp_Action_Request *a_event =
-                    ( struct Upnp_Action_Request * )Event;
+                UpnpActionRequest *a_event = (UpnpActionRequest *)Event;
+		IXML_Document *actionRequestDoc = NULL;
+		IXML_Document *actionResultDoc = NULL;
                 char *xmlbuff = NULL;
 
-                SampleUtil_Print( "ErrCode     =  %d\n",
-                                  a_event->ErrCode );
-                SampleUtil_Print( "ErrStr      =  %s\n", a_event->ErrStr );
-                SampleUtil_Print( "ActionName  =  %s\n",
-                                  a_event->ActionName );
-                SampleUtil_Print( "UDN         =  %s\n", a_event->DevUDN );
-                SampleUtil_Print( "ServiceID   =  %s\n",
-                                  a_event->ServiceID );
-                if( a_event->ActionRequest ) {
-                    xmlbuff = ixmlPrintNode( ( IXML_Node * ) a_event->ActionRequest );
-                    if( xmlbuff )
+                SampleUtil_Print(
+			"ErrCode     =  %d\n"
+			"ErrStr      =  %s\n"
+			"ActionName  =  %s\n"
+			"UDN         =  %s\n"
+			"ServiceID   =  %s\n",
+			UpnpActionRequest_get_ErrCode(a_event),
+			UpnpString_get_String(UpnpActionRequest_get_ErrStr(a_event)),
+			UpnpString_get_String(UpnpActionRequest_get_ActionName(a_event)),
+			UpnpString_get_String(UpnpActionRequest_get_DevUDN(a_event)),
+			UpnpString_get_String(UpnpActionRequest_get_ServiceID(a_event)));
+
+		actionRequestDoc = UpnpActionRequest_get_ActionRequest(a_event);
+                if ( actionRequestDoc ) {
+                    xmlbuff = ixmlPrintNode( (IXML_Node *)actionRequestDoc );
+                    if ( xmlbuff ) {
                         SampleUtil_Print( "ActRequest  =  %s\n", xmlbuff );
-                    if( xmlbuff )
                         ixmlFreeDOMString( xmlbuff );
+                    }
                     xmlbuff = NULL;
                 } else {
                     SampleUtil_Print( "ActRequest  =  (null)\n" );
                 }
-
-                if( a_event->ActionResult ) {
-                    xmlbuff = ixmlPrintNode( ( IXML_Node * ) a_event->ActionResult );
-                    if( xmlbuff )
+                actionResultDoc = UpnpActionRequest_get_ActionResult(a_event);
+                if ( actionResultDoc ) {
+                    xmlbuff = ixmlPrintNode( (IXML_Node *)actionResultDoc );
+                    if ( xmlbuff ) {
                         SampleUtil_Print( "ActResult   =  %s\n", xmlbuff );
-                    if( xmlbuff )
                         ixmlFreeDOMString( xmlbuff );
+		    }
                     xmlbuff = NULL;
                 } else {
                     SampleUtil_Print( "ActResult   =  (null)\n" );
@@ -449,31 +457,37 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
 
         case UPNP_CONTROL_ACTION_COMPLETE:
             {
-                struct Upnp_Action_Complete *a_event =
-                    ( struct Upnp_Action_Complete * )Event;
+                UpnpActionComplete *a_event = (UpnpActionComplete *)Event;
                 char *xmlbuff = NULL;
+		int errCode = UpnpActionComplete_get_ErrCode(a_event);
+		const char *ctrlURL = UpnpString_get_String(
+                    UpnpActionComplete_get_CtrlUrl(a_event));
+		IXML_Document *actionRequest =
+                    UpnpActionComplete_get_ActionRequest(a_event);
+		IXML_Document *actionResult =
+                    UpnpActionComplete_get_ActionResult(a_event);
 
-                SampleUtil_Print( "ErrCode     =  %d\n",
-                                  a_event->ErrCode );
-                SampleUtil_Print( "CtrlUrl     =  %s\n",
-                                  a_event->CtrlUrl );
-                if( a_event->ActionRequest ) {
-                    xmlbuff = ixmlPrintNode( ( IXML_Node * ) a_event->ActionRequest );
-                    if( xmlbuff )
+                SampleUtil_Print(
+                    "ErrCode     =  %d\n"
+                    "CtrlUrl     =  %s\n",
+                    errCode, ctrlURL);
+                if( actionRequest ) {
+                    xmlbuff = ixmlPrintNode((IXML_Node *)actionRequest);
+                    if( xmlbuff ) {
                         SampleUtil_Print( "ActRequest  =  %s\n", xmlbuff );
-                    if( xmlbuff )
                         ixmlFreeDOMString( xmlbuff );
+		    }
                     xmlbuff = NULL;
                 } else {
                     SampleUtil_Print( "ActRequest  =  (null)\n" );
                 }
 
-                if( a_event->ActionResult ) {
-                    xmlbuff = ixmlPrintNode( ( IXML_Node * ) a_event->ActionResult );
-                    if( xmlbuff )
+                if( actionResult ) {
+                    xmlbuff = ixmlPrintNode((IXML_Node *)actionResult);
+                    if( xmlbuff ) {
                         SampleUtil_Print( "ActResult   =  %s\n", xmlbuff );
-                    if( xmlbuff )
                         ixmlFreeDOMString( xmlbuff );
+		    }
                     xmlbuff = NULL;
                 } else {
                     SampleUtil_Print( "ActResult   =  (null)\n" );
@@ -483,37 +497,35 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
 
         case UPNP_CONTROL_GET_VAR_REQUEST:
             {
-                struct Upnp_State_Var_Request *sv_event =
-                    ( struct Upnp_State_Var_Request * )Event;
-
-                SampleUtil_Print( "ErrCode     =  %d\n",
-                                  sv_event->ErrCode );
-                SampleUtil_Print( "ErrStr      =  %s\n",
-                                  sv_event->ErrStr );
-                SampleUtil_Print( "UDN         =  %s\n",
-                                  sv_event->DevUDN );
-                SampleUtil_Print( "ServiceID   =  %s\n",
-                                  sv_event->ServiceID );
-                SampleUtil_Print( "StateVarName=  %s\n",
-                                  sv_event->StateVarName );
-                SampleUtil_Print( "CurrentVal  =  %s\n",
-                                  sv_event->CurrentVal );
+                UpnpStateVarRequest *sv_event = (UpnpStateVarRequest *)Event;
+                SampleUtil_Print(
+                    "ErrCode     =  %d\n"
+                    "ErrStr      =  %s\n"
+                    "UDN         =  %s\n"
+                    "ServiceID   =  %s\n"
+                    "StateVarName=  %s\n"
+                    "CurrentVal  =  %s\n",
+                    UpnpStateVarRequest_get_ErrCode(sv_event),
+                    UpnpString_get_String(UpnpStateVarRequest_get_ErrStr(sv_event)),
+                    UpnpString_get_String(UpnpStateVarRequest_get_DevUDN(sv_event)),
+                    UpnpString_get_String(UpnpStateVarRequest_get_ServiceID(sv_event)),
+                    UpnpString_get_String(UpnpStateVarRequest_get_StateVarName(sv_event)),
+                    UpnpStateVarRequest_get_CurrentVal(sv_event));
             }
             break;
 
         case UPNP_CONTROL_GET_VAR_COMPLETE:
             {
-                struct Upnp_State_Var_Complete *sv_event =
-                    ( struct Upnp_State_Var_Complete * )Event;
-
-                SampleUtil_Print( "ErrCode     =  %d\n",
-                                  sv_event->ErrCode );
-                SampleUtil_Print( "CtrlUrl     =  %s\n",
-                                  sv_event->CtrlUrl );
-                SampleUtil_Print( "StateVarName=  %s\n",
-                                  sv_event->StateVarName );
-                SampleUtil_Print( "CurrentVal  =  %s\n",
-                                  sv_event->CurrentVal );
+                UpnpStateVarComplete *sv_event = (UpnpStateVarComplete *)Event;
+                SampleUtil_Print(
+                    "ErrCode     =  %d\n"
+                    "CtrlUrl     =  %s\n"
+                    "StateVarName=  %s\n"
+                    "CurrentVal  =  %s\n",
+                    UpnpStateVarComplete_get_ErrCode(sv_event),
+                    UpnpString_get_String(UpnpStateVarComplete_get_CtrlUrl(sv_event)),
+                    UpnpString_get_String(UpnpStateVarComplete_get_StateVarName(sv_event)),
+                    UpnpStateVarComplete_get_CurrentVal(sv_event));
             }
             break;
 
@@ -523,83 +535,85 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
         case UPNP_EVENT_SUBSCRIPTION_REQUEST:
             {
                 struct Upnp_Subscription_Request *sr_event =
-                    ( struct Upnp_Subscription_Request * )Event;
-
-                SampleUtil_Print( "ServiceID   =  %s\n",
-                                  sr_event->ServiceId );
-                SampleUtil_Print( "UDN         =  %s\n", sr_event->UDN );
-                SampleUtil_Print( "SID         =  %s\n", sr_event->Sid );
+                    (struct Upnp_Subscription_Request *)Event;
+                SampleUtil_Print(
+                    "ServiceID   =  %s\n"
+                    "UDN         =  %s\n"
+                    "SID         =  %s\n",
+                    sr_event->ServiceId,
+                    sr_event->UDN,
+                    sr_event->Sid );
             }
             break;
 
         case UPNP_EVENT_RECEIVED:
             {
-                struct Upnp_Event *e_event = ( struct Upnp_Event * )Event;
+                struct Upnp_Event *e_event = (struct Upnp_Event *)Event;
                 char *xmlbuff = NULL;
-
-                SampleUtil_Print( "SID         =  %s\n", e_event->Sid );
-                SampleUtil_Print( "EventKey    =  %d\n",
-                                  e_event->EventKey );
-                xmlbuff = ixmlPrintNode( ( IXML_Node * ) e_event->ChangedVariables );
-                SampleUtil_Print( "ChangedVars =  %s\n", xmlbuff );
+                xmlbuff = ixmlPrintNode( (IXML_Node *) e_event->ChangedVariables );
+                SampleUtil_Print(
+                    "SID         =  %s\n"
+                    "EventKey    =  %d\n"
+                    "ChangedVars =  %s\n",
+                    e_event->Sid,
+                    e_event->EventKey,
+                    xmlbuff );
                 ixmlFreeDOMString( xmlbuff );
-                xmlbuff = NULL;
             }
             break;
 
         case UPNP_EVENT_RENEWAL_COMPLETE:
             {
-                struct Upnp_Event_Subscribe *es_event =
-                    ( struct Upnp_Event_Subscribe * )Event;
-
-                SampleUtil_Print( "SID         =  %s\n", es_event->Sid );
-                SampleUtil_Print( "ErrCode     =  %d\n",
-                                  es_event->ErrCode );
-                SampleUtil_Print( "TimeOut     =  %d\n",
-                                  es_event->TimeOut );
+                EventSubscribe *es_event = (EventSubscribe *)Event;
+                SampleUtil_Print(
+                    "SID         =  %s\n"
+                    "ErrCode     =  %d\n"
+                    "TimeOut     =  %d\n",
+                    UpnpString_get_String(UpnpEventSubscribe_get_SID(es_event)),
+                    UpnpEventSubscribe_get_ErrCode(es_event),
+                    UpnpEventSubscribe_get_TimeOut(es_event));
             }
             break;
 
         case UPNP_EVENT_SUBSCRIBE_COMPLETE:
         case UPNP_EVENT_UNSUBSCRIBE_COMPLETE:
             {
-                struct Upnp_Event_Subscribe *es_event =
-                    ( struct Upnp_Event_Subscribe * )Event;
-
-                SampleUtil_Print( "SID         =  %s\n", es_event->Sid );
-                SampleUtil_Print( "ErrCode     =  %d\n",
-                                  es_event->ErrCode );
-                SampleUtil_Print( "PublisherURL=  %s\n",
-                                  es_event->PublisherUrl );
-                SampleUtil_Print( "TimeOut     =  %d\n",
-                                  es_event->TimeOut );
+                EventSubscribe *es_event = (EventSubscribe *)Event;
+                SampleUtil_Print(
+                    "SID         =  %s\n"
+                    "ErrCode     =  %d\n"
+                    "PublisherURL=  %s\n"
+                    "TimeOut     =  %d\n",
+                    UpnpString_get_String(UpnpEventSubscribe_get_SID(es_event)),
+                    UpnpEventSubscribe_get_ErrCode(es_event),
+                    UpnpString_get_String(UpnpEventSubscribe_get_PublisherUrl(es_event)),
+                    UpnpEventSubscribe_get_TimeOut(es_event));
             }
             break;
 
         case UPNP_EVENT_AUTORENEWAL_FAILED:
         case UPNP_EVENT_SUBSCRIPTION_EXPIRED:
             {
-                struct Upnp_Event_Subscribe *es_event =
-                    ( struct Upnp_Event_Subscribe * )Event;
-
-                SampleUtil_Print( "SID         =  %s\n", es_event->Sid );
-                SampleUtil_Print( "ErrCode     =  %d\n",
-                                  es_event->ErrCode );
-                SampleUtil_Print( "PublisherURL=  %s\n",
-                                  es_event->PublisherUrl );
-                SampleUtil_Print( "TimeOut     =  %d\n",
-                                  es_event->TimeOut );
+                EventSubscribe *es_event = (EventSubscribe *)Event;
+                SampleUtil_Print(
+                    "SID         =  %s\n"
+                    "ErrCode     =  %d\n"
+                    "PublisherURL=  %s\n"
+                    "TimeOut     =  %d\n",
+                    UpnpString_get_String(UpnpEventSubscribe_get_SID(es_event)),
+                    UpnpEventSubscribe_get_ErrCode(es_event),
+                    UpnpString_get_String(UpnpEventSubscribe_get_PublisherUrl(es_event)),
+                    UpnpEventSubscribe_get_TimeOut(es_event));
             }
             break;
 
     }
-    SampleUtil_Print
-        ( "----------------------------------------------------------------------\n" );
-    SampleUtil_Print
-        ( "======================================================================\n\n\n\n" );
+    SampleUtil_Print(
+        "----------------------------------------------------------------------\n"
+        "======================================================================\n\n\n\n" );
 
     ithread_mutex_unlock( &display_mutex );
-    return ( 0 );
+    return 0;
 }
 
 /********************************************************************************
@@ -620,7 +634,7 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
  ********************************************************************************/
 int
 SampleUtil_FindAndParseService( IN IXML_Document * DescDoc,
-                                IN char *location,
+                                IN const char *location,
                                 IN char *serviceType,
                                 OUT char **serviceId,
                                 OUT char **eventURL,
@@ -632,18 +646,18 @@ SampleUtil_FindAndParseService( IN IXML_Document * DescDoc,
     int ret;
     char *tempServiceType = NULL;
     char *baseURL = NULL;
-    char *base;
+    const char *base = NULL;
     char *relcontrolURL = NULL,
      *releventURL = NULL;
     IXML_NodeList *serviceList = NULL;
     IXML_Element *service = NULL;
 
     baseURL = SampleUtil_GetFirstDocumentItem( DescDoc, "URLBase" );
-
-    if( baseURL )
+    if (baseURL) {
         base = baseURL;
-    else
+    } else {
         base = location;
+    }
 
     serviceList = SampleUtil_GetFirstServiceList( DescDoc );
     length = ixmlNodeList_length( serviceList );
@@ -753,22 +767,23 @@ uprint1( char *fmt,
  *		Same as printf()
  *
  ********************************************************************************/
-int
-SampleUtil_Print( char *fmt,
-                  ... )
+int SampleUtil_Print(char *fmt, ...)
 {
+#define MAX_BUF 1024
     va_list ap;
-    char buf[200];
+    static char buf[MAX_BUF];
     int rc;
 
-    va_start( ap, fmt );
-    rc = vsnprintf( buf, 200, fmt, ap );
-    va_end( ap );
+    /* Protect both the display and the static buffer with the mutex */
+    ithread_mutex_lock(&display_mutex);
+    va_start(ap, fmt);
+    rc = vsnprintf(buf, MAX_BUF, fmt, ap);
+    va_end(ap);
 
-    ithread_mutex_lock( &display_mutex );
-    if( gPrintFun )
-        gPrintFun( buf );
-    ithread_mutex_unlock( &display_mutex );
+    if (gPrintFun) {
+        gPrintFun(buf);
+    }
+    ithread_mutex_unlock(&display_mutex);
 
     return rc;
 }

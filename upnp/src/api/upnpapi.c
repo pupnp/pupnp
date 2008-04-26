@@ -1820,50 +1820,71 @@ UpnpSubscribeAsync( IN UpnpClient_Handle Hnd,
  * Return Values: int
  *	UPNP_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
-int
-UpnpSubscribe( IN UpnpClient_Handle Hnd,
-               IN const char *EvtUrl_const,
-               INOUT int *TimeOut,
-               OUT Upnp_SID SubsId )
+int UpnpSubscribe(
+	IN UpnpClient_Handle Hnd,
+	IN const char *EvtUrl_const,
+	INOUT int *TimeOut,
+	OUT Upnp_SID SubsId)
 {
-    struct Handle_Info *SInfo = NULL;
-    int RetVal;
-    char *EvtUrl = ( char * )EvtUrl_const;
+	int retVal;
+	struct Handle_Info *SInfo = NULL;
+	UpnpString *EvtUrl = UpnpString_new();
+	UpnpString *SubsIdTmp = UpnpString_new();
+	
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpSubscribe\n");
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
+	if (UpnpSdkInit != 1) {
+		retVal = UPNP_E_FINISH;
+		goto exit_function;
+	}
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSubscribe \n" );
+	if (EvtUrl == NULL) {
+		retVal = UPNP_E_OUTOF_MEMORY;
+		goto exit_function;
+	}
+	if (EvtUrl_const == NULL) {
+		retVal = UPNP_E_INVALID_PARAM;
+		goto exit_function;
+	}
+	UpnpString_set_String(EvtUrl, EvtUrl_const);
 
-    HandleReadLock();
-    if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    if( EvtUrl == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    if( TimeOut == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    if( SubsId == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    HandleUnlock();
-    RetVal = genaSubscribe( Hnd, EvtUrl, TimeOut, SubsId );
+	if (SubsIdTmp == NULL) {
+		retVal = UPNP_E_OUTOF_MEMORY;
+		goto exit_function;
+	}
+	if (SubsId == NULL) {
+		retVal = UPNP_E_INVALID_PARAM;
+		goto exit_function;
+	}
+	UpnpString_set_String(SubsIdTmp, SubsId);
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSubscribe \n" );
+	if (TimeOut == NULL) {
+		retVal = UPNP_E_INVALID_PARAM;
+		goto exit_function;
+	}
 
-    return RetVal;
+	HandleReadLock();
+	if (GetHandleInfo(Hnd, &SInfo) != HND_CLIENT) {
+		HandleUnlock();
+		retVal = UPNP_E_INVALID_HANDLE;
+		goto exit_function;
+	}
+	HandleUnlock();
 
-}  /****************** End of UpnpSubscribe  *********************/
-#endif // INCLUDE_CLIENT_APIS
+	retVal = genaSubscribe(Hnd, EvtUrl, TimeOut, SubsIdTmp);
+	strcpy(SubsId, UpnpString_get_String(SubsIdTmp));
+
+exit_function:
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Exiting UpnpSubscribe, retVal=%d\n", retVal);
+
+	UpnpString_delete(SubsIdTmp);
+	UpnpString_delete(EvtUrl);
+
+	return retVal;
+}
+#endif /* INCLUDE_CLIENT_APIS */
+
 
 #ifdef INCLUDE_CLIENT_APIS
 
@@ -1872,7 +1893,7 @@ UpnpSubscribe( IN UpnpClient_Handle Hnd,
  *
  *  Parameters:	
  *	IN UpnpClient_Handle Hnd: The handle of the control point.
- *	IN Upnp_SID SubsId: The ID returned when the control point 
+ *	IN const Upnp_SID SubsId: The ID returned when the control point 
  *		subscribed to the service.
  *
  * Description:
@@ -1883,39 +1904,49 @@ UpnpSubscribe( IN UpnpClient_Handle Hnd,
  * Return Values: int
  *	UPNP_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
-int
-UpnpUnSubscribe( IN UpnpClient_Handle Hnd,
-                 IN Upnp_SID SubsId )
+int UpnpUnSubscribe(IN UpnpClient_Handle Hnd, IN const Upnp_SID SubsId)
 {
-    struct Handle_Info *SInfo = NULL;
-    int RetVal;
+	struct Handle_Info *SInfo = NULL;
+	int retVal;
+	UpnpString *SubsIdTmp = UpnpString_new();
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
+	UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpUnSubscribe\n");
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpUnSubscribe \n" );
+	if (UpnpSdkInit != 1) {
+		retVal = UPNP_E_FINISH;
+		goto exit_function;
+	}
 
-    HandleReadLock();
-    if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    if( SubsId == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    HandleUnlock();
-    RetVal = genaUnSubscribe( Hnd, SubsId );
+	if (SubsIdTmp == NULL) {
+		retVal = UPNP_E_OUTOF_MEMORY;
+		goto exit_function;
+	}
+	if (SubsId == NULL) {
+		HandleUnlock();
+		return UPNP_E_INVALID_PARAM;
+	}
+	UpnpString_set_String(SubsIdTmp, SubsId);
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpUnSubscribe \n" );
+	HandleReadLock();
+	if (GetHandleInfo(Hnd, &SInfo) != HND_CLIENT) {
+		HandleUnlock();
+		retVal = UPNP_E_INVALID_HANDLE;
+		goto exit_function;
+	}
+	HandleUnlock();
 
-    return RetVal;
+	retVal = genaUnSubscribe(Hnd, SubsIdTmp);
 
-}  /****************** End of UpnpUnSubscribe  *********************/
-#endif // INCLUDE_CLIENT_APIS
+exit_function:
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Exiting UpnpUnSubscribe, retVal=%d\n", retVal);
+
+	UpnpString_delete(SubsIdTmp);
+
+	return retVal;
+}
+#endif /* INCLUDE_CLIENT_APIS */
+
 
 #ifdef INCLUDE_CLIENT_APIS
 
@@ -1939,61 +1970,64 @@ UpnpUnSubscribe( IN UpnpClient_Handle Hnd,
  *  Return Values: int
  *      UPNP_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
-int
-UpnpUnSubscribeAsync( IN UpnpClient_Handle Hnd,
-                      IN Upnp_SID SubsId,
-                      IN Upnp_FunPtr Fun,
-                      IN const void *Cookie_const )
+int UpnpUnSubscribeAsync(
+	IN UpnpClient_Handle Hnd,
+	IN Upnp_SID SubsId,
+	IN Upnp_FunPtr Fun,
+	IN const void *Cookie_const )
 {
-    ThreadPoolJob job;
-    struct Handle_Info *SInfo = NULL;
-    struct UpnpNonblockParam *Param;
+	int retVal;
+	ThreadPoolJob job;
+	struct Handle_Info *SInfo = NULL;
+	struct UpnpNonblockParam *Param;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpUnSubscribeAsync\n");
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpUnSubscribeAsync \n" );
+	if (UpnpSdkInit != 1) {
+		retVal = UPNP_E_FINISH;
+		goto exit_function;
+	}
 
-    HandleReadLock();
-    if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    if( SubsId == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    if( Fun == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
+	if (SubsId == NULL) {
+		retVal = UPNP_E_INVALID_PARAM;
+		goto exit_function;
+	}
+	if (Fun == NULL) {
+		retVal = UPNP_E_INVALID_PARAM;
+		goto exit_function;
+	}
 
-    HandleUnlock();
-    Param =
-        ( struct UpnpNonblockParam * )
-        malloc( sizeof( struct UpnpNonblockParam ) );
-    if( Param == NULL )
-        return UPNP_E_OUTOF_MEMORY;
+	HandleReadLock();
+	if (GetHandleInfo(Hnd, &SInfo) != HND_CLIENT) {
+		HandleUnlock();
+		retVal = UPNP_E_INVALID_HANDLE;
+		goto exit_function;
+	}
+	HandleUnlock();
 
-    Param->FunName = UNSUBSCRIBE;
-    Param->Handle = Hnd;
-    strcpy( Param->SubsId, SubsId );
-    Param->Fun = Fun;
-    Param->Cookie = ( void * )Cookie_const;
-    TPJobInit( &job, ( start_routine ) UpnpThreadDistribution, Param );
-    TPJobSetFreeFunction( &job, ( free_routine ) free );
-    TPJobSetPriority( &job, MED_PRIORITY );
-    ThreadPoolAdd( &gSendThreadPool, &job, NULL );
+	Param = (struct UpnpNonblockParam *)malloc(sizeof(struct UpnpNonblockParam));
+	if (Param == NULL) {
+		retVal = UPNP_E_OUTOF_MEMORY;
+		goto exit_function;
+	}
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpUnSubscribeAsync \n" );
+	Param->FunName = UNSUBSCRIBE;
+	Param->Handle = Hnd;
+	strcpy( Param->SubsId, SubsId );
+	Param->Fun = Fun;
+	Param->Cookie = (void *)Cookie_const;
+	TPJobInit( &job, ( start_routine ) UpnpThreadDistribution, Param );
+	TPJobSetFreeFunction( &job, ( free_routine ) free );
+	TPJobSetPriority( &job, MED_PRIORITY );
+	ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    return UPNP_E_SUCCESS;
+exit_function:
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Exiting UpnpUnSubscribeAsync\n");
 
-}  /****************** End of UpnpUnSubscribeAsync  *********************/
-#endif // INCLUDE_CLIENT_APIS
+	return UPNP_E_SUCCESS;
+}
+#endif /* INCLUDE_CLIENT_APIS */
+
 
 #ifdef INCLUDE_CLIENT_APIS
 
@@ -2006,7 +2040,7 @@ UpnpUnSubscribeAsync( IN UpnpClient_Handle Hnd,
  *	INOUT int *TimeOut: Pointer to a variable containing the 
  *		requested subscription time.  Upon return, 
  *		it contains the actual renewal time. 
- *	IN Upnp_SID SubsId: The ID for the subscription to renew. 
+ *	IN const Upnp_SID SubsId: The ID for the subscription to renew. 
  *
  * Description:
  *	This function renews a subscription that is about to 
@@ -2015,44 +2049,56 @@ UpnpUnSubscribeAsync( IN UpnpClient_Handle Hnd,
  * Return Values: int
  *	UPNP_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
-int
-UpnpRenewSubscription( IN UpnpClient_Handle Hnd,
-                       INOUT int *TimeOut,
-                       IN Upnp_SID SubsId )
+int UpnpRenewSubscription(
+	IN UpnpClient_Handle Hnd,
+	INOUT int *TimeOut,
+	IN const Upnp_SID SubsId )
 {
-    struct Handle_Info *SInfo = NULL;
-    int RetVal;
+	struct Handle_Info *SInfo = NULL;
+	int retVal;
+	UpnpString *SubsIdTmp = UpnpString_new();
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpRenewSubscription\n");
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpRenewSubscription \n" );
+	if (UpnpSdkInit != 1) {
+		return UPNP_E_FINISH;
+	}
 
-    HandleReadLock();
-    if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    if( TimeOut == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    if( SubsId == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    HandleUnlock();
-    RetVal = genaRenewSubscription( Hnd, SubsId, TimeOut );
+	if (SubsIdTmp == NULL) {
+		retVal = UPNP_E_OUTOF_MEMORY;
+		goto exit_function;
+	}
+	if (SubsId == NULL) {
+		retVal = UPNP_E_INVALID_PARAM;
+		goto exit_function;
+	}
+	UpnpString_set_String(SubsIdTmp, SubsId);
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpRenewSubscription \n" );
+	if (TimeOut == NULL) {
+		retVal = UPNP_E_INVALID_PARAM;
+		goto exit_function;
+	}
 
-    return RetVal;
+	HandleReadLock();
+	if (GetHandleInfo(Hnd, &SInfo) != HND_CLIENT) {
+		HandleUnlock();
+		retVal = UPNP_E_INVALID_HANDLE;
+		goto exit_function;
+	}
+	HandleUnlock();
 
-}  /****************** End of UpnpRenewSubscription  *********************/
-#endif // INCLUDE_CLIENT_APIS
+	retVal = genaRenewSubscription(Hnd, SubsIdTmp, TimeOut);
+
+exit_function:
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Exiting UpnpRenewSubscription, retVal=%d\n", retVal);
+
+	UpnpString_delete(SubsIdTmp);
+
+	return retVal;
+}
+#endif /* INCLUDE_CLIENT_APIS */
+
 
 #ifdef INCLUDE_CLIENT_APIS
 
@@ -3344,79 +3390,88 @@ UpnpDownloadXmlDoc( const char *url,
  ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 void
-UpnpThreadDistribution( struct UpnpNonblockParam *Param )
+UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 {
+	int errCode = 0;
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpThreadDistribution \n" );
+	UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+		"Inside UpnpThreadDistribution \n" );
 
-    switch ( Param->FunName ) {
+	switch ( Param->FunName ) {
 #if EXCLUDE_GENA == 0
-        case SUBSCRIBE: {
-            struct Upnp_Event_Subscribe Evt;
-            Evt.ErrCode = genaSubscribe(
-                Param->Handle, Param->Url,
-                ( int * )&( Param->TimeOut ),
-                ( char * )Evt.Sid );
-            strcpy( Evt.PublisherUrl, Param->Url );
-            Evt.TimeOut = Param->TimeOut;
-            Param->Fun( UPNP_EVENT_SUBSCRIBE_COMPLETE, &Evt, Param->Cookie );
-            free( Param );
-            break;
+	case SUBSCRIBE: {
+		EventSubscribe *evt = UpnpEventSubscribe_new();
+		// cast away constness
+		UpnpString *sid = (UpnpString *)UpnpEventSubscribe_get_SID(evt);
+		UpnpEventSubscribe_strcpy_PublisherUrl(evt, Param->Url);
+		errCode = genaSubscribe(
+			Param->Handle,
+			UpnpEventSubscribe_get_PublisherUrl(evt),
+        	        (int *)&(Param->TimeOut),
+	                sid);
+		UpnpEventSubscribe_set_ErrCode(evt, errCode);
+		UpnpEventSubscribe_set_TimeOut(evt, Param->TimeOut);
+		Param->Fun(UPNP_EVENT_SUBSCRIBE_COMPLETE, evt, Param->Cookie);
+	    	UpnpEventSubscribe_delete(evt);
+		free(Param);
+		break;
         }
         case UNSUBSCRIBE: {
-	    struct Upnp_Event_Subscribe Evt;
-	    Evt.ErrCode =
-	    genaUnSubscribe( Param->Handle,
-			     Param->SubsId );
-	    strcpy( ( char * )Evt.Sid, Param->SubsId );
-	    strcpy( Evt.PublisherUrl, "" );
-	    Evt.TimeOut = 0;
-	    Param->Fun( UPNP_EVENT_UNSUBSCRIBE_COMPLETE,
-			&Evt, Param->Cookie );
-	    free( Param );
-            break;
+		EventSubscribe *evt = UpnpEventSubscribe_new();
+		UpnpEventSubscribe_strcpy_SID(evt, Param->SubsId);
+		errCode = genaUnSubscribe(
+			Param->Handle,
+			UpnpEventSubscribe_get_SID(evt));
+		UpnpEventSubscribe_set_ErrCode(evt, errCode);
+		UpnpEventSubscribe_strcpy_PublisherUrl(evt, "");
+		UpnpEventSubscribe_set_TimeOut(evt, 0);
+		Param->Fun(UPNP_EVENT_UNSUBSCRIBE_COMPLETE, evt, Param->Cookie);
+	    	UpnpEventSubscribe_delete(evt);
+		free(Param);
+		break;
         }
         case RENEW: {
-	    struct Upnp_Event_Subscribe Evt;
-	    Evt.ErrCode =
-	    genaRenewSubscription( Param->Handle,
-				   Param->SubsId,
-				   &( Param->TimeOut ) );
-	    Evt.TimeOut = Param->TimeOut;
-	    strcpy( ( char * )Evt.Sid, Param->SubsId );
-	    Param->Fun( UPNP_EVENT_RENEWAL_COMPLETE, &Evt,
-			Param->Cookie );
-            free( Param );
-	    break;
+		EventSubscribe *evt = UpnpEventSubscribe_new();
+		UpnpEventSubscribe_strcpy_SID(evt, Param->SubsId);
+		errCode = genaRenewSubscription(
+			Param->Handle,
+			UpnpEventSubscribe_get_SID(evt),
+			&(Param->TimeOut));
+		UpnpEventSubscribe_set_ErrCode(evt, errCode);
+		UpnpEventSubscribe_set_TimeOut(evt, Param->TimeOut);
+		Param->Fun(UPNP_EVENT_RENEWAL_COMPLETE, evt, Param->Cookie);
+	    	UpnpEventSubscribe_delete(evt);
+		free(Param);
+		break;
         }
 #endif // EXCLUDE_GENA == 0
 #if EXCLUDE_SOAP == 0
         case ACTION: {
-            struct Upnp_Action_Complete Evt;
-            Evt.ActionResult = NULL;
-                Evt.ErrCode =
-                    SoapSendAction( Param->Url, Param->ServiceType,
-                                    Param->Act, &Evt.ActionResult );
-                Evt.ActionRequest = Param->Act;
-                strcpy( Evt.CtrlUrl, Param->Url );
-                Param->Fun( UPNP_CONTROL_ACTION_COMPLETE, &Evt,
-                            Param->Cookie );
-                ixmlDocument_free( Evt.ActionRequest );
-                ixmlDocument_free( Evt.ActionResult );
-                free( Param );
-                break;
+            UpnpActionComplete *Evt = UpnpActionComplete_new();
+	    IXML_Document *actionResult = NULL;
+	    int errCode = SoapSendAction(
+                Param->Url, Param->ServiceType, Param->Act, &actionResult );
+            UpnpActionComplete_set_ErrCode(Evt, errCode);
+            UpnpActionComplete_set_ActionRequest(Evt, Param->Act);
+            UpnpActionComplete_set_ActionResult(Evt, actionResult);
+            UpnpActionComplete_strcpy_CtrlUrl(Evt, Param->Url );
+            Param->Fun( UPNP_CONTROL_ACTION_COMPLETE, Evt, Param->Cookie );
+            free(Param);
+            UpnpActionComplete_delete(Evt);
+            break;
         }
         case STATUS: {
-                struct Upnp_State_Var_Complete Evt;
-                Evt.ErrCode = SoapGetServiceVarStatus(
-                    Param->Url, Param->VarName, &( Evt.CurrentVal ) );
-                strcpy( Evt.StateVarName, Param->VarName );
-                strcpy( Evt.CtrlUrl, Param->Url );
-                Param->Fun( UPNP_CONTROL_GET_VAR_COMPLETE, &Evt,
-                            Param->Cookie );
-                free( Evt.CurrentVal );
+                UpnpStateVarComplete *Evt = UpnpStateVarComplete_new();
+		DOMString currentVal = NULL;
+		int errCode = SoapGetServiceVarStatus(
+                    Param->Url, Param->VarName, &currentVal );
+                UpnpStateVarComplete_set_ErrCode(Evt, errCode);
+                UpnpStateVarComplete_strcpy_CtrlUrl(Evt, Param->Url);
+                UpnpStateVarComplete_strcpy_StateVarName(Evt, Param->VarName);
+                UpnpStateVarComplete_set_CurrentVal(Evt, currentVal);
+                Param->Fun( UPNP_CONTROL_GET_VAR_COMPLETE, Evt, Param->Cookie );
                 free( Param );
+                UpnpStateVarComplete_delete(Evt);
                 break;
             }
 #endif // EXCLUDE_SOAP == 0
@@ -3441,64 +3496,59 @@ UpnpThreadDistribution( struct UpnpNonblockParam *Param )
  * Return Values: Upnp_FunPtr
  *      
  ***************************************************************************/
-Upnp_FunPtr
-GetCallBackFn( UpnpClient_Handle Hnd )
+Upnp_FunPtr GetCallBackFn(UpnpClient_Handle Hnd)
 {
-    return ( ( struct Handle_Info * )HandleTable[Hnd] )->Callback;
-
-}  /****************** End of GetCallBackFn *********************/
+	return ((struct Handle_Info *)HandleTable[Hnd])->Callback;
+}
 
 /**************************************************************************
  * Function: InitHandleList 
  *
- * Parameters: VOID
+ * Parameters:
  *  
  * Description:
  *	This function is to initialize handle table
  *
- * Return Values: VOID
+ * Return Values:
  *      
  ***************************************************************************/
-void
-InitHandleList()
+void InitHandleList()
 {
-    int i;
+	int i;
 
-    for( i = 0; i < NUM_HANDLE; i++ )
-        HandleTable[i] = NULL;
-
-}  /****************** End of InitHandleList *********************/
+	for (i = 0; i < NUM_HANDLE; ++i) {
+		HandleTable[i] = NULL;
+	}
+}
 
 /**************************************************************************
  * Function: GetFreeHandle 
  *
- * Parameters: VOID
+ * Parameters:
  *  
  * Description:
  *	This function is to get a free handle
  *
- * Return Values: VOID
+ * Return Values:
+ * 	integer greater than zero
+ * 	UPNP_E_OUTOF_HANDLE
  *      
  ***************************************************************************/
-int
-GetFreeHandle()
+int GetFreeHandle()
 {
-    int i = 1;
+	/* Handle 0 is not used as NULL translates to 0 when passed as a handle */
+	int i = 1;
 
-    /*
-       Handle 0 is not used as NULL translates to 0 when passed as a handle 
-     */
-    while( i < NUM_HANDLE ) {
-        if( HandleTable[i++] == NULL )
-            break;
-    }
+	while (i < NUM_HANDLE && HandleTable[i] != NULL) {
+		++i;
+	}
 
-    if( i == NUM_HANDLE )
-        return UPNP_E_OUTOF_HANDLE; //Error
-    else
-        return --i;
-
-}  /****************** End of GetFreeHandle *********************/
+	if (i == NUM_HANDLE) {
+		return UPNP_E_OUTOF_HANDLE;
+	} else {
+		return i;
+	}
+}
 
 /**************************************************************************
  * Function: GetClientHandleInfo 
@@ -3512,58 +3562,64 @@ GetFreeHandle()
  * Description:
  *	This function is to get client handle info
  *
- *  Return Values: HND_CLIENT
+ *  Return Values: HND_CLIENT, HND_INVALID
  *      
  ***************************************************************************/
 //Assumes at most one client
-Upnp_Handle_Type
-GetClientHandleInfo( IN UpnpClient_Handle * client_handle_out,
-                     OUT struct Handle_Info ** HndInfo )
+Upnp_Handle_Type GetClientHandleInfo(
+	IN UpnpClient_Handle *client_handle_out,
+	OUT struct Handle_Info **HndInfo)
 {
-    ( *client_handle_out ) = 1;
-    if( GetHandleInfo( 1, HndInfo ) == HND_CLIENT ) {
-        return HND_CLIENT;
-    }
-    ( *client_handle_out ) = 2;
-    if( GetHandleInfo( 2, HndInfo ) == HND_CLIENT ) {
-        return HND_CLIENT;
-    }
-    ( *client_handle_out ) = -1;
-    return HND_INVALID;
+	Upnp_Handle_Type ret = HND_CLIENT;
+	UpnpClient_Handle client;
 
-}  /****************** End of GetClientHandleInfo *********************/
+	if (GetHandleInfo(1, HndInfo) == HND_CLIENT) {
+		client = 1;
+	} else if (GetHandleInfo(2, HndInfo) == HND_CLIENT) {
+		client = 2;
+	} else {
+		client = -1;
+		ret = HND_INVALID;
+	}
+
+	*client_handle_out = client;
+	return ret;
+}
 
 /**************************************************************************
  * Function: GetDeviceHandleInfo 
  *
  * Parameters:	
- * 	IN UpnpDevice_Handle * device_handle_out: device handle pointer
- * 		(key for the client handle structure).
- *	OUT struct Handle_Info **HndInfo: Device handle structure passed by
- *		this function.
+ * 	IN UpnpDevice_Handle *device_handle_out:
+ * 		device handle pointer (key for the client handle structure).
+ *	OUT struct Handle_Info **HndInfo:
+ *		Device handle structure passed by this function.
  *  
  *  Description:
  *		This function is to get device handle info.
  *
- *  Return Values: HND_DEVICE
+ *  Return Values: HND_DEVICE, HND_INVALID
  *      
  ***************************************************************************/
-Upnp_Handle_Type
-GetDeviceHandleInfo( UpnpDevice_Handle * device_handle_out,
-                     struct Handle_Info ** HndInfo )
+Upnp_Handle_Type GetDeviceHandleInfo(
+	UpnpDevice_Handle *device_handle_out,
+	struct Handle_Info **HndInfo)
 {
-    ( *device_handle_out ) = 1;
-    if( GetHandleInfo( 1, HndInfo ) == HND_DEVICE )
-        return HND_DEVICE;
+	Upnp_Handle_Type ret = HND_DEVICE;
+	UpnpDevice_Handle device;
 
-    ( *device_handle_out ) = 2;
-    if( GetHandleInfo( 2, HndInfo ) == HND_DEVICE )
-        return HND_DEVICE;
-    ( *device_handle_out ) = -1;
+	if (GetHandleInfo(1, HndInfo) == HND_DEVICE) {
+		device = 1;
+	} else if (GetHandleInfo(2, HndInfo) == HND_DEVICE) {
+		device = 2;
+	} else {
+		device = -1;
+		ret = HND_INVALID;
+	}
 
-    return HND_INVALID;
-
-}  /****************** End of GetDeviceHandleInfo *********************/
+	*device_handle_out = device;
+	return ret;
+}
 
 /**************************************************************************
  * Function: GetDeviceHandleInfo 
@@ -3577,32 +3633,34 @@ GetDeviceHandleInfo( UpnpDevice_Handle * device_handle_out,
  * Description:
  *	This function is to get  handle info.
  *
- * Return Values: HND_DEVICE
+ * Return Values: HND_DEVICE, UPNP_E_INVALID_HANDLE
  *      
  ***************************************************************************/
-Upnp_Handle_Type
-GetHandleInfo( UpnpClient_Handle Hnd,
-               struct Handle_Info ** HndInfo )
+Upnp_Handle_Type GetHandleInfo(
+	UpnpClient_Handle Hnd,
+	struct Handle_Info **HndInfo)
 {
+	Upnp_Handle_Type ret = UPNP_E_INVALID_HANDLE;
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "GetHandleInfo: Handle is %d\n", Hnd );
+	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+		"GetHandleInfo: entering, Handle is %d\n", Hnd);
 
-    if( Hnd < 1 || Hnd >= NUM_HANDLE ) {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "GetHandleInfo : Handle out of range\n" );
-        return UPNP_E_INVALID_HANDLE;
-    }
-    if( HandleTable[Hnd] != NULL ) {
-        *HndInfo = ( struct Handle_Info * )HandleTable[Hnd];
-        return ( ( struct Handle_Info * )*HndInfo )->HType;
-    }
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "GetHandleInfo : exiting\n" );
+	if (Hnd < 1 || Hnd >= NUM_HANDLE) {
+		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+			"GetHandleInfo: Handle out of range\n");
+	} else if (HandleTable[Hnd] == NULL) {
+		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+			"GetHandleInfo: HandleTable[%d] is NULL\n",
+			Hnd);
+	} else if (HandleTable[Hnd] != NULL) {
+		*HndInfo = (struct Handle_Info *)HandleTable[Hnd];
+		ret = ((struct Handle_Info *)*HndInfo)->HType;
+	}
 
-    return UPNP_E_INVALID_HANDLE;
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "GetHandleInfo: exiting\n");
 
-}  /****************** End of GetHandleInfo *********************/
+	return ret;
+}
 
 /**************************************************************************
  * Function: FreeHandle 
@@ -3614,25 +3672,34 @@ GetHandleInfo( UpnpClient_Handle Hnd,
  *	This function is to to free handle info.
  *	
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else return appropriate error
+ *	UPNP_E_SUCCESS if successful
+ *	UPNP_E_INVALID_HANDLE if not.
  ***************************************************************************/
-int
-FreeHandle( int Upnp_Handle )
+int FreeHandle(int Upnp_Handle)
 {
-    if( Upnp_Handle < 1 || Upnp_Handle >= NUM_HANDLE ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-            "FreeHandleInfo : Handle out of range\n" );
-        return UPNP_E_INVALID_HANDLE;
-    }
+	int ret = UPNP_E_INVALID_HANDLE;
 
-    if( HandleTable[Upnp_Handle] == NULL ) {
-        return UPNP_E_INVALID_HANDLE;
-    }
-    free( HandleTable[Upnp_Handle] );
-    HandleTable[Upnp_Handle] = NULL;
-    return UPNP_E_SUCCESS;
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+		"FreeHandleInfo: entering, Handle is %d\n", Upnp_Handle);
 
-}  /****************** End of FreeHandle *********************/
+	if (Upnp_Handle < 1 || Upnp_Handle >= NUM_HANDLE) {
+		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+			"FreeHandleInfo: Handle %d is out of range\n",
+			Upnp_Handle);
+	} else if (HandleTable[Upnp_Handle] == NULL) {
+		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+			"FreeHandleInfo: HandleTable[%d] is NULL\n",
+			Upnp_Handle);
+	} else {
+		free( HandleTable[Upnp_Handle] );
+		HandleTable[Upnp_Handle] = NULL;
+		ret = UPNP_E_SUCCESS;
+	}
+
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "FreeHandleInfo: exiting\n");
+
+	return ret;
+}
 
 
 /**************************************************************************
@@ -3668,7 +3735,6 @@ int PrintHandleInfo( IN UpnpClient_Handle Hnd )
     return UPNP_E_SUCCESS;
 }
 
-   /****************** End of PrintHandleInfo *********************/
 
 void printNodes( IXML_Node * tmpRoot, int depth )
 {

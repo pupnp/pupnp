@@ -1,4 +1,15 @@
 *******************************************************************************
+Version 1.8.0
+*******************************************************************************
+
+2008-02-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Breaking API so that we now hide internal data structures.
+
+2008-02-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Rewrote Peter Hartley's patch to include a new extra header field in
+	FileInfo.
+
+*******************************************************************************
 Version 1.6.6
 *******************************************************************************
 

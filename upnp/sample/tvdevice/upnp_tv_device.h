@@ -148,8 +148,7 @@ extern char *TvServiceType[];
  *
  *****************************************************************************/
 
-typedef int (*upnp_action) (IXML_Document *request, IXML_Document **out, 
-			    char **errorString);
+typedef int (*upnp_action) (IXML_Document *request, IXML_Document **out, char **errorString);
 
 /* Structure for storing Tv Service
    identifiers and state table */
@@ -193,7 +192,7 @@ extern ithread_mutex_t TVDevMutex;
  *   struct TvService *out - service containing action table to set.
  *
  *****************************************************************************/
-int SetActionTable(int serviceType, struct TvService * out);
+int SetActionTable(int serviceType, struct TvService *out);
 
 /******************************************************************************
  * TvDeviceStateTableInit
@@ -241,7 +240,7 @@ int TvDeviceHandleSubscriptionRequest(struct Upnp_Subscription_Request *);
  *   cgv_event -- The control get variable request event structure
  *
  *****************************************************************************/
-int TvDeviceHandleGetVarRequest(struct Upnp_State_Var_Request *);
+int TvDeviceHandleGetVarRequest(UpnpStateVarRequest *);
 
 /******************************************************************************
  * TvDeviceHandleActionRequest
@@ -255,7 +254,7 @@ int TvDeviceHandleGetVarRequest(struct Upnp_State_Var_Request *);
  *   ca_event -- The control action request event structure
  *
  *****************************************************************************/
-int TvDeviceHandleActionRequest(struct Upnp_Action_Request *);
+int TvDeviceHandleActionRequest(UpnpActionRequest *);
 
 /******************************************************************************
  * TvDeviceCallbackEventHandler
@@ -313,8 +312,7 @@ int TvDeviceSetServiceTableVar(unsigned int, unsigned int, char*);
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDevicePowerOn(IN IXML_Document * in, OUT IXML_Document **out, 
-		    OUT char **errorString);
+int TvDevicePowerOn(IN IXML_Document * in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDevicePowerOff
@@ -329,8 +327,7 @@ int TvDevicePowerOn(IN IXML_Document * in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDevicePowerOff(IN IXML_Document *in, OUT IXML_Document **out, 
-		     OUT char **errorString);
+int TvDevicePowerOff(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDeviceSetChannel
@@ -347,8 +344,7 @@ int TvDevicePowerOff(IN IXML_Document *in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceSetChannel(IN IXML_Document *in, OUT IXML_Document **out, 
-		       OUT char **errorString);
+int TvDeviceSetChannel(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDeviceIncreaseChannel
@@ -363,8 +359,7 @@ int TvDeviceSetChannel(IN IXML_Document *in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceIncreaseChannel(IN IXML_Document *in, OUT IXML_Document **out, 
-			    OUT char **errorString);
+int TvDeviceIncreaseChannel(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 /******************************************************************************
  * TvDeviceDecreaseChannel
  *
@@ -378,8 +373,7 @@ int TvDeviceIncreaseChannel(IN IXML_Document *in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceDecreaseChannel(IN IXML_Document *in, OUT IXML_Document **out, 
-			    OUT char **errorString);
+int TvDeviceDecreaseChannel(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 /******************************************************************************
  * TvDeviceSetVolume
  *
@@ -395,8 +389,7 @@ int TvDeviceDecreaseChannel(IN IXML_Document *in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceSetVolume(IN IXML_Document *in, OUT IXML_Document **out, 
-		      OUT char **errorString);
+int TvDeviceSetVolume(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDeviceIncreaseVolume
@@ -411,8 +404,7 @@ int TvDeviceSetVolume(IN IXML_Document *in, OUT IXML_Document **out,
  *    IXML_Document **out - action result document
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
-int TvDeviceIncreaseVolume(IN IXML_Document *in, OUT IXML_Document**out, 
-			   OUT char **errorString);
+int TvDeviceIncreaseVolume(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 
 /******************************************************************************
@@ -428,8 +420,7 @@ int TvDeviceIncreaseVolume(IN IXML_Document *in, OUT IXML_Document**out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceDecreaseVolume(IN IXML_Document *in, OUT IXML_Document**out, 
-			   OUT char **errorString);
+int TvDeviceDecreaseVolume(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 
 //Picture Service Actions
@@ -449,8 +440,7 @@ int TvDeviceDecreaseVolume(IN IXML_Document *in, OUT IXML_Document**out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceSetColor(IN IXML_Document *in, OUT IXML_Document **out, 
-		     OUT char **errorString);
+int TvDeviceSetColor(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 
 /******************************************************************************
@@ -465,8 +455,7 @@ int TvDeviceSetColor(IN IXML_Document *in, OUT IXML_Document **out,
  *    IXML_Document **out - action result document
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
-int TvDeviceIncreaseColor(IN IXML_Document * in, OUT IXML_Document **out, 
-			  OUT char **errorString);
+int TvDeviceIncreaseColor(IN IXML_Document * in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDeviceDecreaseColor
@@ -480,8 +469,7 @@ int TvDeviceIncreaseColor(IN IXML_Document * in, OUT IXML_Document **out,
  *    IXML_Document **out - action result document
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
-int TvDeviceDecreaseColor(IN IXML_Document * in, OUT IXML_Document **out, 
-			  OUT char **errorString);
+int TvDeviceDecreaseColor(IN IXML_Document * in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDeviceSetTint
@@ -498,8 +486,7 @@ int TvDeviceDecreaseColor(IN IXML_Document * in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceSetTint(IN IXML_Document *in, OUT IXML_Document **out, 
-		    OUT char **errorString);
+int TvDeviceSetTint(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDeviceIncreaseTint
@@ -514,8 +501,7 @@ int TvDeviceSetTint(IN IXML_Document *in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceIncreaseTint(IN IXML_Document *in, OUT IXML_Document **out, 
-			 OUT char **errorString);
+int TvDeviceIncreaseTint(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDeviceDecreaseTint
@@ -530,8 +516,7 @@ int TvDeviceIncreaseTint(IN IXML_Document *in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceDecreaseTint(IN IXML_Document *in, OUT IXML_Document **out, 
-			 OUT char **errorString);
+int TvDeviceDecreaseTint(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 /*****************************************************************************
  * TvDeviceSetContrast
@@ -548,8 +533,7 @@ int TvDeviceDecreaseTint(IN IXML_Document *in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  ****************************************************************************/
-int TvDeviceSetContrast(IN IXML_Document *in, OUT IXML_Document **out, 
-			OUT char **errorString);
+int TvDeviceSetContrast(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDeviceIncreaseContrast
@@ -565,8 +549,7 @@ int TvDeviceSetContrast(IN IXML_Document *in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceIncreaseContrast(IN IXML_Document *in, OUT IXML_Document **out, 
-			     OUT char **errorString);
+int TvDeviceIncreaseContrast(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 /******************************************************************************
  * TvDeviceDecreaseContrast
  *
@@ -580,8 +563,7 @@ int TvDeviceIncreaseContrast(IN IXML_Document *in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceDecreaseContrast(IN IXML_Document *in, OUT IXML_Document **out, 
-			     OUT char **errorString);
+int TvDeviceDecreaseContrast(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDeviceSetBrightness
@@ -595,8 +577,7 @@ int TvDeviceDecreaseContrast(IN IXML_Document *in, OUT IXML_Document **out,
  *   brightness -- The brightness value to change to.
  *
  *****************************************************************************/
-int TvDeviceSetBrightness(IN IXML_Document *in, OUT IXML_Document **out, 
-			  OUT char **errorString);
+int TvDeviceSetBrightness(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDeviceIncreaseBrightness
@@ -611,8 +592,7 @@ int TvDeviceSetBrightness(IN IXML_Document *in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceIncreaseBrightness(IN IXML_Document *in, OUT IXML_Document **out, 
-			       OUT char **errorString);
+int TvDeviceIncreaseBrightness(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 /******************************************************************************
  * TvDeviceDecreaseBrightness
@@ -626,8 +606,7 @@ int TvDeviceIncreaseBrightness(IN IXML_Document *in, OUT IXML_Document **out,
  *    char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceDecreaseBrightness(IN IXML_Document *in, OUT IXML_Document **out, 
-			       OUT char **errorString);
+int TvDeviceDecreaseBrightness(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 int TvDeviceStart(char * ip_address, unsigned short port,char * desc_doc_name,
 				  char *web_dir_path, print_string pfun);

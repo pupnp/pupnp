@@ -35,22 +35,30 @@
  ******************************************************************************/
 
 #include "config.h"
+
+
+#include "webserver.h"
+
+
 #include <assert.h>
 #include <fcntl.h>
 #ifndef UPNP_USE_BCBPP
     #include <inttypes.h>
     #include <stdint.h>
-#endif
-#include "util.h"
-#include "strintmap.h"
-#include "membuffer.h"
+#endif /* !UPNP_USE_BCBPP */
+
+
+#include "FileInfo.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
+#include "membuffer.h"
+#include "ssdplib.h"
 #include "statcodes.h"
-#include "webserver.h"
+#include "strintmap.h"
 #include "upnp.h"
 #include "upnpapi.h"
-#include "ssdplib.h"
+#include "util.h"
+
 
 #ifndef WIN32
     #include <unistd.h>
@@ -279,38 +287,39 @@ search_extension( IN const char *extension,
  *
  * Parameters:
  *	IN const char* filename,
- *	OUT DOMString* content_type
+ *	OUT UpnpFileInfo *fileInfo
  *
- * Description: Based on the extension, clones an XML string based on
- *	type and content subtype. If content type and sub type are not
- *	found, unknown types are used
+ * Description: Based on the extension, sets the content type of fileInfo
+ *	based on type and content subtype. If content type and sub type
+ *	are not found, unknown types are used
  *
  * Returns:
  *	 0 - On Sucess
  *	 UPNP_E_OUTOF_MEMORY - on memory allocation failures
  ************************************************************************/
 UPNP_INLINE int
-get_content_type( IN const char *filename,
-                  OUT DOMString * content_type )
+get_content_type(
+	IN const char *filename,
+	OUT UpnpFileInfo *fileInfo)
 {
     const char *extension;
-    const char *type,
-     *subtype;
+    const char *type;
+    const char *subtype;
     xboolean ctype_found = FALSE;
     char *temp = NULL;
     int length = 0;
 
-    ( *content_type ) = NULL;
+    UpnpFileInfo_set_ContentType(fileInfo, NULL);
 
     // get ext
     extension = strrchr( filename, '.' );
-    if( extension != NULL ) {
+    if (extension != NULL) {
         if( search_extension( extension + 1, &type, &subtype ) == 0 ) {
             ctype_found = TRUE;
         }
     }
 
-    if( !ctype_found ) {
+    if (!ctype_found) {
         // unknown content type
         type = gMediaTypes[APPLICATION_INDEX];
         subtype = "octet-stream";
@@ -318,17 +327,14 @@ get_content_type( IN const char *filename,
 
     length = strlen( type ) + strlen( "/" ) + strlen( subtype ) + 1;
     temp = ( char * )malloc( length );
-
-    if( !temp ) {
+    if (!temp) {
         return UPNP_E_OUTOF_MEMORY;
     }
-
     sprintf( temp, "%s/%s", type, subtype );
-    ( *content_type ) = ixmlCloneDOMString( temp );
+    UpnpFileInfo_set_ContentType(fileInfo, temp);
+    free(temp);
 
-    free( temp );
-
-    if( !content_type ) {
+    if (!UpnpFileInfo_get_ContentType(fileInfo)) {
         return UPNP_E_OUTOF_MEMORY;
     }
 
@@ -586,8 +592,8 @@ web_server_destroy( void )
  * Function: get_file_info
  *
  * Parameters:
- *	IN const char* filename ;     Filename having the description document
- *	OUT struct File_Info * info ; File information object having file 
+ *	IN const char *filename;   Filename having the description document
+ *	OUT UpnpFileInfo *info;        File information object having file 
  *		attributes such as filelength, when was the file last
  *		modified, whether a file or a directory and whether the
  *		file or directory is readable.
@@ -600,48 +606,50 @@ web_server_destroy( void )
  *	int
  ************************************************************************/
 static int
-get_file_info( IN const char *filename,
-               OUT struct File_Info *info )
+get_file_info(
+	IN const char *filename,
+	OUT UpnpFileInfo *info)
 {
-    int code;
-    struct stat s;
-    FILE *fp;
-    int rc = 0;
+	int code;
+	struct stat s;
+	FILE *fp;
+	int rc = 0;
 
-    info->content_type = NULL;
+	UpnpFileInfo_set_ContentType(info, NULL);
 
-    code = stat( filename, &s );
-    if( code == -1 ) {
-        return -1;
-    }
+	code = stat(filename, &s);
+	if (code == -1) {
+		return -1;
+	}
 
-    if( S_ISDIR( s.st_mode ) ) {
-        info->is_directory = TRUE;
-    } else if( S_ISREG( s.st_mode ) ) {
-        info->is_directory = FALSE;
-    } else {
-        return -1;
-    }
+	if (S_ISDIR(s.st_mode)) {
+		UpnpFileInfo_set_IsDirectory(info, TRUE);
+	} else if (S_ISREG(s.st_mode)) {
+		UpnpFileInfo_set_IsDirectory(info, FALSE);
+	} else {
+		return -1;
+	}
 
-    // check readable
-    fp = fopen( filename, "r" );
-    info->is_readable = ( fp != NULL );
-    if( fp ) {
-        fclose( fp );
-    }
+	// check readable
+	fp = fopen(filename, "r");
+	UpnpFileInfo_set_IsReadable(info, fp != NULL);
+	if (fp) {
+		fclose(fp);
+	}
 
-    info->file_length = s.st_size;
-    info->last_modified = s.st_mtime;
+	UpnpFileInfo_set_FileLength(info, s.st_size);
+	UpnpFileInfo_set_LastModified(info, &s.st_mtime);
 
-    rc = get_content_type( filename, &info->content_type );
+	rc = get_content_type(filename, info);
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-        "file info: %s, length: %lld, last_mod=%s readable=%d\n",
-        filename, (long long)info->file_length,
-        asctime( gmtime( &info->last_modified ) ),
-        info->is_readable );
+	UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+		"file info: %s, length: %lld, last_mod=%s readable=%d\n",
+		filename,
+		(long long)UpnpFileInfo_get_FileLength(info),
+		asctime(gmtime(UpnpFileInfo_get_LastModified(info))),
+		UpnpFileInfo_get_IsReadable(info));
 
-    return rc;
+	return rc;
 }
 
 /************************************************************************
@@ -683,10 +691,10 @@ web_server_set_root_dir( IN const char *root_dir )
  * Function: get_alias
  *
  * Parameters:
- *	IN const char* request_file ; request file passed in to be compared with
+ *	IN const char *request_file;    request file passed in to be compared with
  *	OUT struct xml_alias_t* alias ; xml alias object which has a file name
  *		stored
- *   OUT struct File_Info * info	 ; File information object which will be
+ *      OUT UpnpFileInfo *info;             File information object which will be
  *		filled up if the file comparison succeeds
  *
  * Description: Compare the files names between the one on the XML alias
@@ -698,22 +706,21 @@ web_server_set_root_dir( IN const char *root_dir )
  *	FALSE if request is not an alias
  ************************************************************************/
 static UPNP_INLINE xboolean
-get_alias( IN const char *request_file,
-           OUT struct xml_alias_t *alias,
-           OUT struct File_Info *info )
+get_alias(
+	IN const char *request_file,
+	OUT struct xml_alias_t *alias,
+	OUT UpnpFileInfo *info)
 {
-    int cmp;
+	int cmp = strcmp(alias->name.buf, request_file);
+	if (cmp == 0) {
+		// fill up info
+		UpnpFileInfo_set_FileLength(info, alias->doc.length);
+		UpnpFileInfo_set_IsDirectory(info, FALSE);
+		UpnpFileInfo_set_IsReadable(info, TRUE);
+		UpnpFileInfo_set_LastModified(info, &alias->last_modified);
+	}
 
-    cmp = strcmp( alias->name.buf, request_file );
-    if( cmp == 0 ) {
-        // fill up info
-        info->file_length = alias->doc.length;
-        info->is_readable = TRUE;
-        info->is_directory = FALSE;
-        info->last_modified = alias->last_modified;
-    }
-
-    return cmp == 0;
+	return cmp == 0;
 }
 
 /************************************************************************
@@ -1197,16 +1204,17 @@ process_request( IN http_message_t * req,
     int err_code;
 
     char *request_doc;
-    struct File_Info finfo;
+    UpnpFileInfo *finfo;
     xboolean using_alias;
     xboolean using_virtual_dir;
     uri_type *url;
     char *temp_str;
-    int resp_major,
-      resp_minor;
+    int resp_major;
+    int resp_minor;
     xboolean alias_grabbed;
     size_t dummy;
     struct UpnpVirtualDirCallbacks *pVirtualDirCallback;
+    const char *extra_headers;
 
     print_http_headers( req );
 
@@ -1218,7 +1226,7 @@ process_request( IN http_message_t * req,
 
     // init
     request_doc = NULL;
-    finfo.content_type = NULL;
+    finfo = UpnpFileInfo_new();
     alias_grabbed = FALSE;
     err_code = HTTP_INTERNAL_SERVER_ERROR;  // default error
     using_virtual_dir = FALSE;
@@ -1261,50 +1269,46 @@ process_request( IN http_message_t * req,
         //
         // try using alias
         //
-        if( is_valid_alias( &gAliasDoc ) ) {
-            alias_grab( alias );
+        if (is_valid_alias(&gAliasDoc)) {
+            alias_grab(alias);
             alias_grabbed = TRUE;
-
-            using_alias = get_alias( request_doc, alias, &finfo );
-            if( using_alias == TRUE ) {
-                finfo.content_type = ixmlCloneDOMString( "text/xml" );
-
-                if( finfo.content_type == NULL ) {
+            using_alias = get_alias(request_doc, alias, finfo);
+            if (using_alias == TRUE) {
+                UpnpFileInfo_set_ContentType(finfo, "text/xml");
+                if (UpnpFileInfo_get_ContentType(finfo) == NULL) {
                     goto error_handler;
                 }
             }
         }
     }
 
-    if( using_virtual_dir ) {
-        if( req->method != HTTPMETHOD_POST ) {
+    if (using_virtual_dir) {
+        if (req->method != HTTPMETHOD_POST) {
             // get file info
             pVirtualDirCallback = &virtualDirCallback;
-            if( pVirtualDirCallback->get_info( filename->buf, &finfo ) !=
-                0 ) {
+            if (pVirtualDirCallback->get_info(filename->buf, finfo) != 0) {
                 err_code = HTTP_NOT_FOUND;
                 goto error_handler;
             }
             // try index.html if req is a dir
-            if( finfo.is_directory ) {
-                if( filename->buf[filename->length - 1] == '/' ) {
+            if (UpnpFileInfo_get_IsDirectory(finfo)) {
+                if (filename->buf[filename->length - 1] == '/') {
                     temp_str = "index.html";
                 } else {
                     temp_str = "/index.html";
                 }
-                if( membuffer_append_str( filename, temp_str ) != 0 ) {
+                if ( membuffer_append_str(filename, temp_str) != 0) {
                     goto error_handler;
                 }
                 // get info
-                if( ( pVirtualDirCallback->
-                      get_info( filename->buf, &finfo ) != UPNP_E_SUCCESS )
-                    || finfo.is_directory ) {
+                if( pVirtualDirCallback->get_info(filename->buf, finfo) != UPNP_E_SUCCESS ||
+                    UpnpFileInfo_get_IsDirectory(finfo)) {
                     err_code = HTTP_NOT_FOUND;
                     goto error_handler;
                 }
             }
             // not readable
-            if( !finfo.is_readable ) {
+            if (!UpnpFileInfo_get_IsReadable(finfo)) {
                 err_code = HTTP_FORBIDDEN;
                 goto error_handler;
             }
@@ -1314,7 +1318,7 @@ process_request( IN http_message_t * req,
             //  goto error_handler;
             // }
         }
-    } else if( !using_alias ) {
+    } else if (!using_alias) {
         if( gDocumentRootDir.length == 0 ) {
             goto error_handler;
         }
@@ -1335,12 +1339,12 @@ process_request( IN http_message_t * req,
 
         if( req->method != HTTPMETHOD_POST ) {
             // get info on file
-            if( get_file_info( filename->buf, &finfo ) != 0 ) {
+            if (get_file_info(filename->buf, finfo) != 0) {
                 err_code = HTTP_NOT_FOUND;
                 goto error_handler;
             }
             // try index.html if req is a dir
-            if( finfo.is_directory ) {
+            if (UpnpFileInfo_get_IsDirectory(finfo)) {
                 if( filename->buf[filename->length - 1] == '/' ) {
                     temp_str = "index.html";
                 } else {
@@ -1350,14 +1354,14 @@ process_request( IN http_message_t * req,
                     goto error_handler;
                 }
                 // get info
-                if( get_file_info( filename->buf, &finfo ) != 0 ||
-                    finfo.is_directory ) {
+                if (get_file_info(filename->buf, finfo) != 0 ||
+                    UpnpFileInfo_get_IsDirectory(finfo)) {
                     err_code = HTTP_NOT_FOUND;
                     goto error_handler;
                 }
             }
             // not readable
-            if( !finfo.is_readable ) {
+            if (!UpnpFileInfo_get_IsReadable(finfo)) {
                 err_code = HTTP_FORBIDDEN;
                 goto error_handler;
             }
@@ -1370,12 +1374,12 @@ process_request( IN http_message_t * req,
         //      }
     }
 
-    RespInstr->ReadSendSize = finfo.file_length;
+    RespInstr->ReadSendSize = UpnpFileInfo_get_FileLength(finfo);
 
     // Check other header field.
-    if( ( err_code =
-          CheckOtherHTTPHeaders( req, RespInstr,
-                                 finfo.file_length ) ) != HTTP_OK ) {
+    err_code =
+        CheckOtherHTTPHeaders(req, RespInstr, UpnpFileInfo_get_FileLength(finfo));
+    if ( err_code != HTTP_OK ) {
         goto error_handler;
     }
 
@@ -1385,34 +1389,40 @@ process_request( IN http_message_t * req,
         goto error_handler;
     }
 
+    extra_headers = UpnpFileInfo_get_ExtraHeaders(finfo);
+    if (!extra_headers) {
+	    extra_headers = "";
+    }
+
     if( RespInstr->IsRangeActive && RespInstr->IsChunkActive ) {
         // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "R" "T" "GKD" "s" "tcS" "XcCc",
-            HTTP_PARTIAL_CONTENT, // status code
-            finfo.content_type,   // content type
-            RespInstr,            // range info
+            "R" "T" "GKD" "s" "tcS" "Xc" "sCc",
+            HTTP_PARTIAL_CONTENT,           // status code
+            UpnpFileInfo_get_ContentType(finfo), // content type
+            RespInstr,                      // range info
             "LAST-MODIFIED: ",
-	    &finfo.last_modified,
-            X_USER_AGENT) != 0 ) {
+	    UpnpFileInfo_get_LastModified(finfo),
+            X_USER_AGENT,
+            extra_headers) != 0 ) {
             goto error_handler;
         }
     } else if( RespInstr->IsRangeActive && !RespInstr->IsChunkActive ) {
-
         // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "R" "N" "T" "GD" "s" "tcS" "XcCc",
-            HTTP_PARTIAL_CONTENT,     // status code
-            RespInstr->ReadSendSize,  // content length
-            finfo.content_type,       // content type
-            RespInstr,                // range info
+            "R" "N" "T" "GD" "s" "tcS" "Xc" "sCc",
+            HTTP_PARTIAL_CONTENT,           // status code
+            RespInstr->ReadSendSize,        // content length
+            UpnpFileInfo_get_ContentType(finfo), // content type
+            RespInstr,                      // range info
             "LAST-MODIFIED: ",
-	    &finfo.last_modified,
-            X_USER_AGENT) != 0 ) {
+	    UpnpFileInfo_get_LastModified(finfo),
+            X_USER_AGENT,
+            extra_headers) != 0 ) {
             goto error_handler;
         }
 
@@ -1421,12 +1431,13 @@ process_request( IN http_message_t * req,
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "RK" "TD" "s" "tcS" "XcCc",
-            HTTP_OK,            // status code
-            finfo.content_type, // content type
+            "RK" "TD" "s" "tcS" "Xc" "sCc",
+            HTTP_OK,                        // status code
+            UpnpFileInfo_get_ContentType(finfo), // content type
             "LAST-MODIFIED: ",
-	    &finfo.last_modified,
-            X_USER_AGENT) != 0 ) {
+	    UpnpFileInfo_get_LastModified(finfo),
+            X_USER_AGENT,
+            extra_headers) != 0 ) {
             goto error_handler;
         }
 
@@ -1436,13 +1447,14 @@ process_request( IN http_message_t * req,
             // Transfer-Encoding: chunked
             if (http_MakeMessage(
                 headers, resp_major, resp_minor,
-                "R" "N" "TD" "s" "tcS" "XcCc",
-                HTTP_OK,                 // status code
-                RespInstr->ReadSendSize, // content length
-                finfo.content_type,      // content type
+                "R" "N" "TD" "s" "tcS" "Xc" "sCc",
+                HTTP_OK,                        // status code
+                RespInstr->ReadSendSize,        // content length
+                UpnpFileInfo_get_ContentType(finfo), // content type
                 "LAST-MODIFIED: ",
-		&finfo.last_modified,
-                X_USER_AGENT) != 0 ) {
+	        UpnpFileInfo_get_LastModified(finfo),
+                X_USER_AGENT,
+                extra_headers) != 0 ) {
                 goto error_handler;
             }
         } else {
@@ -1450,12 +1462,13 @@ process_request( IN http_message_t * req,
             // Transfer-Encoding: chunked
             if (http_MakeMessage(
                 headers, resp_major, resp_minor,
-                "R" "TD" "s" "tcS" "XcCc",
-                HTTP_OK,            // status code
-                finfo.content_type, // content type
+                "R" "TD" "s" "tcS" "b" "Xc" "sCc",
+                HTTP_OK,                        // status code
+                UpnpFileInfo_get_ContentType(finfo), // content type
                 "LAST-MODIFIED: ",
-		&finfo.last_modified,
-                X_USER_AGENT) != 0 ) {
+	        UpnpFileInfo_get_LastModified(finfo),
+                X_USER_AGENT,
+                extra_headers) != 0 ) {
                 goto error_handler;
             }
         }
@@ -1481,11 +1494,11 @@ process_request( IN http_message_t * req,
 
     err_code = UPNP_E_SUCCESS;
 
-  error_handler:
-    free( request_doc );
-    ixmlFreeDOMString( finfo.content_type );
-    if( err_code != UPNP_E_SUCCESS && alias_grabbed ) {
-        alias_release( alias );
+error_handler:
+    free(request_doc);
+    UpnpFileInfo_delete(finfo);
+    if (err_code != UPNP_E_SUCCESS && alias_grabbed) {
+        alias_release(alias);
     }
 
     return err_code;

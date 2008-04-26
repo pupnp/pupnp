@@ -19,6 +19,14 @@ LDADD = \
 
 upnpincludedir = $(includedir)/upnp
 upnpinclude_HEADERS = \
+	inc/ActionComplete.h \
+	inc/ActionRequest.h \
+	inc/Discovery.h \
+	inc/EventSubscribe.h \
+	inc/FileInfo.h \
+	inc/StateVarComplete.h \
+	inc/StateVarRequest.h \
+	inc/String.h \
 	inc/upnp.h \
 	inc/upnpdebug.h
 
@@ -76,6 +84,8 @@ libupnp_la_SOURCES = \
 
 # ssdp
 libupnp_la_SOURCES += \
+	src/ssdp/ssdp_ResultData.c \
+	src/ssdp/ssdp_ResultData.h \
 	src/ssdp/ssdp_device.c \
 	src/ssdp/ssdp_ctrlpt.c \
 	src/ssdp/ssdp_server.c
@@ -110,6 +120,14 @@ libupnp_la_SOURCES += \
 	src/gena/gena_callback2.c
 
 # api
+libupnp_la_SOURCES += src/api/ActionComplete.c
+libupnp_la_SOURCES += src/api/ActionRequest.c
+libupnp_la_SOURCES += src/api/Discovery.c
+libupnp_la_SOURCES += src/api/EventSubscribe.c
+libupnp_la_SOURCES += src/api/FileInfo.c
+libupnp_la_SOURCES += src/api/StateVarComplete.c
+libupnp_la_SOURCES += src/api/StateVarRequest.c
+libupnp_la_SOURCES += src/api/String.c
 libupnp_la_SOURCES += src/api/upnpapi.c
 if ENABLE_TOOLS
 libupnp_la_SOURCES += src/api/upnptools.c

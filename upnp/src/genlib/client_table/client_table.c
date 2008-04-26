@@ -30,180 +30,281 @@
 ///////////////////////////////////////////////////////////////////////////
 
 /************************************************************************
-* Purpose: This file defines the functions for clients. It defines 
-* functions for adding and removing clients to and from the client table, 
-* adding and accessing subscription and other attributes pertaining to the 
-* client  
-************************************************************************/
+ * Purpose: This file defines the functions for clients. It defines 
+ * functions for adding and removing clients to and from the client table, 
+ * adding and accessing subscription and other attributes pertaining to the 
+ * client  
+ ************************************************************************/
+
 
 #include "config.h"
+
+
 #include "client_table.h"
 
-/************************************************************************
-*	Function :	copy_client_subscription
-*
-*	Parameters :
-*		client_subscription * in ;	- source client subscription
-*		client_subscription * out ;	- destination client subscription
-*
-*	Description :	Make a copy of the client subscription data
-*
-*	Return : int ;
-*		UPNP_E_OUTOF_MEMORY - On Failure to allocate memory
-*		HTTP_SUCCESS - On Success
-*
-*	Note :
-************************************************************************/
-CLIENTONLY( int copy_client_subscription( client_subscription * in,
-                                          client_subscription * out ) {
-            int len = strlen( in->ActualSID ) + 1;
-            int len1 = strlen( in->EventURL ) + 1;
-            memcpy( out->sid, in->sid, SID_SIZE );
-            out->sid[SID_SIZE] = 0;
-            out->ActualSID = ( char * )malloc( len );
-            if( out->ActualSID == NULL )
-                return UPNP_E_OUTOF_MEMORY;
-            out->EventURL = ( char * )malloc( len1 );
-            if( out->EventURL == NULL ) {
-                free(out->ActualSID);
-                return UPNP_E_OUTOF_MEMORY;
-            }
-            memcpy( out->ActualSID, in->ActualSID, len );
-            memcpy( out->EventURL, in->EventURL, len1 );
-            //copies do not get RenewEvent Ids or next
-            out->RenewEventId = -1; out->next = NULL; return HTTP_SUCCESS;}
 
-/************************************************************************
-*	Function :	free_client_subscription
-*
-*	Parameters :
-*		client_subscription * sub ;	- Client subscription to be freed
-*
-*	Description :	Free memory allocated for client subscription data.
-*		Remove timer thread associated with this subscription event.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-            void free_client_subscription( client_subscription * sub ) {
-            upnp_timeout * event; ThreadPoolJob tempJob; if( sub ) {
-            if( sub->ActualSID )
-            free( sub->ActualSID ); if( sub->EventURL )
-            free( sub->EventURL ); if( sub->RenewEventId != -1 )    //do not remove timer event of copy
-            //invalid timer event id
-            {
-            if( TimerThreadRemove
-                ( &gTimerThread, sub->RenewEventId, &tempJob ) == 0 ) {
-            event = ( upnp_timeout * ) tempJob.arg;
-            free_upnp_timeout( event );}
-            }
+#ifdef INCLUDE_CLIENT_APIS
 
-            sub->RenewEventId = -1;}
-            }
 
-/************************************************************************
-*	Function :	freeClientSubList
-*
-*	Parameters :
-*		client_subscription * list ; Client subscription 
-*
-*	Description :	Free the client subscription table.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-            void freeClientSubList( client_subscription * list ) {
-            client_subscription * next; while( list ) {
-            free_client_subscription( list );
-            next = list->next; free( list ); list = next;}
-            }
+#include <stdlib.h> // for calloc(), free()
 
-/************************************************************************
-*	Function :	RemoveClientSubClientSID
-*
-*	Parameters :
-*		client_subscription **head ; Head of the subscription list	
-*		const Upnp_SID sid ;		 Subscription ID to be mactched
-*
-*	Description :	Remove the client subscription matching the 
-*		subscritpion id represented by the const Upnp_SID sid parameter 
-*		from the table and update the table.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-            void RemoveClientSubClientSID( client_subscription ** head,
-                                           const Upnp_SID sid ) {
-            client_subscription * finger = ( *head );
-            client_subscription * previous = NULL; while( finger ) {
-            if( !( strcmp( sid, finger->sid ) ) ) {
-            if( previous )
-            previous->next = finger->next;
-            else
-            ( *head ) = finger->next;
-            finger->next = NULL;
-            freeClientSubList( finger ); finger = NULL;}
-            else
-            {
-            previous = finger; finger = finger->next;}
-            }
-            }
 
-/************************************************************************
-*	Function :	GetClientSubClientSID
-*
-*	Parameters :
-*		client_subscription *head ; Head of the subscription list	
-*		const Upnp_SID sid ;		Subscription ID to be matched
-*
-*	Description :	Return the client subscription from the client table 
-*		that matches const Upnp_SID sid subscrition id value. 
-*
-*	Return : client_subscription * ; The matching subscription
-*
-*	Note :
-************************************************************************/
-            client_subscription *
-            GetClientSubClientSID( client_subscription * head,
-                                   const Upnp_SID sid ) {
-            client_subscription * next = head; while( next ) {
-            if( !strcmp( next->sid, sid ) )
-            break;
-            else
-            {
-            next = next->next;}
-            }
-            return next;}
+struct SClientSubscription {
+	int m_renewEventId;
+	UpnpString *m_SID;
+	UpnpString *m_actualSID;
+	UpnpString *m_eventURL;
+	struct SClientSubscription *m_next;
+};
 
-/************************************************************************
-*	Function :	GetClientSubActualSID
-*
-*	Parameters :
-*		client_subscription *head ;	Head of the subscription list		
-*		token * sid ;				Subscription ID to be matched
-*
-*	Description :	Returns the client subscription from the client 
-*		subscription table that has the matching token * sid buffer
-*		value.
-*
-*	Return : client_subscription * ; The matching subscription
-*
-*	Note :
-************************************************************************/
-            client_subscription *
-            GetClientSubActualSID( client_subscription * head,
-                                   token * sid ) {
-            client_subscription * next = head; while( next ) {
 
-            if( !memcmp( next->ActualSID, sid->buff, sid->size ) )
-            break;
-            else
-            {
-            next = next->next;}
-            }
-            return next;}
+/** Constructor */
+ClientSubscription *UpnpClientSubscription_new()
+{
+	struct SClientSubscription *p = calloc(1, sizeof (struct SClientSubscription));
+#if 0
+	p->renewEventId =  0;
+#endif
+	p->m_SID = UpnpString_new();
+	p->m_actualSID = UpnpString_new();
+	p->m_eventURL = UpnpString_new();
+	p->m_next = NULL;
 
- )
+	return (ClientSubscription *)p;
+}
+
+
+/** Destructor */
+void UpnpClientSubscription_delete(ClientSubscription *p)
+{
+	struct SClientSubscription *q = (struct SClientSubscription *)p;
+
+	q->m_renewEventId = 0;
+
+	UpnpString_delete(q->m_SID);
+	q->m_SID = NULL;
+
+	UpnpString_delete(q->m_actualSID);
+	q->m_actualSID = NULL;
+
+	UpnpString_delete(q->m_eventURL);
+	q->m_eventURL = NULL;
+
+	q->m_next = NULL;
+
+	free(p);
+}
+
+
+/** Copy Constructor */
+ClientSubscription *UpnpClientSubscription_dup(const ClientSubscription *p)
+{
+	ClientSubscription *q = UpnpClientSubscription_new();
+	
+	UpnpClientSubscription_assign(q, p);
+	
+	return q;
+}
+
+
+/** Assignment operator */
+void UpnpClientSubscription_assign(ClientSubscription *q, const ClientSubscription *p)
+{
+	if (q != p) {
+		// Do not copy RenewEventId
+		((struct SClientSubscription *)q)->m_renewEventId = -1;
+		UpnpClientSubscription_set_SID(q, UpnpClientSubscription_get_SID(p));
+		UpnpClientSubscription_set_ActualSID(q, UpnpClientSubscription_get_ActualSID(p));
+		UpnpClientSubscription_set_EventURL(q, UpnpClientSubscription_get_EventURL(p));
+		// Do not copy m_next
+		((struct SClientSubscription *)q)->m_next = NULL;
+	}
+}
+
+
+int UpnpClientSubscription_get_RenewEventId(const ClientSubscription *p)
+{
+	return ((struct SClientSubscription *)p)->m_renewEventId;
+}
+
+
+void UpnpClientSubscription_set_RenewEventId(ClientSubscription *p, int n)
+{
+	((struct SClientSubscription *)p)->m_renewEventId = n;
+}
+
+
+const UpnpString *UpnpClientSubscription_get_SID(const ClientSubscription *p)
+{
+	return ((struct SClientSubscription *)p)->m_SID;
+}
+
+
+void UpnpClientSubscription_set_SID(ClientSubscription *p, const UpnpString *s)
+{
+	UpnpString_delete(((struct SClientSubscription *)p)->m_SID);
+	((struct SClientSubscription *)p)->m_SID = UpnpString_dup(s);
+}
+
+
+void UpnpClientSubscription_strcpy_SID(ClientSubscription *p, const char *s)
+{
+	UpnpString_delete(((struct SClientSubscription *)p)->m_SID);
+	((struct SClientSubscription *)p)->m_SID = UpnpString_new();
+	UpnpString_set_String(((struct SClientSubscription *)p)->m_SID, s);
+}
+
+
+
+const UpnpString *UpnpClientSubscription_get_ActualSID(const ClientSubscription *p)
+{
+	return ((struct SClientSubscription *)p)->m_actualSID;
+}
+
+
+void UpnpClientSubscription_set_ActualSID(ClientSubscription *p, const UpnpString *s)
+{
+	UpnpString_delete(((struct SClientSubscription *)p)->m_actualSID);
+	((struct SClientSubscription *)p)->m_actualSID = UpnpString_dup(s);
+}
+
+
+void UpnpClientSubscription_strcpy_ActualSID(ClientSubscription *p, const char *s)
+{
+	UpnpString_delete(((struct SClientSubscription *)p)->m_actualSID);
+	((struct SClientSubscription *)p)->m_actualSID = UpnpString_new();
+	UpnpString_set_String(((struct SClientSubscription *)p)->m_actualSID, s);
+}
+
+
+const UpnpString *UpnpClientSubscription_get_EventURL(const ClientSubscription *p)
+{
+	return ((struct SClientSubscription *)p)->m_eventURL;
+}
+
+
+void UpnpClientSubscription_set_EventURL(ClientSubscription *p, const UpnpString *s)
+{
+	UpnpString_delete(((struct SClientSubscription *)p)->m_eventURL);
+	((struct SClientSubscription *)p)->m_eventURL = UpnpString_dup(s);
+}
+
+
+void UpnpClientSubscription_strcpy_EventURL(ClientSubscription *p, const char *s)
+{
+	UpnpString_delete(((struct SClientSubscription *)p)->m_eventURL);
+	((struct SClientSubscription *)p)->m_eventURL = UpnpString_new();
+	UpnpString_set_String(((struct SClientSubscription *)p)->m_eventURL, s);
+}
+
+
+ClientSubscription *UpnpClientSubscription_get_Next(const ClientSubscription *p)
+{
+	return (ClientSubscription *)(((struct SClientSubscription *)p)->m_next);
+}
+
+
+void UpnpClientSubscription_set_Next(ClientSubscription *p, ClientSubscription *q)
+{
+	((struct SClientSubscription *)p)->m_next = (struct SClientSubscription *)q;
+}
+
+
+void free_client_subscription(ClientSubscription *sub)
+{
+	upnp_timeout *event;
+	ThreadPoolJob tempJob;
+	if (sub) {
+		int renewEventId = UpnpClientSubscription_get_RenewEventId(sub);
+		UpnpClientSubscription_strcpy_ActualSID(sub, "");
+		UpnpClientSubscription_strcpy_EventURL(sub, "");
+		if (renewEventId != -1) {
+			// do not remove timer event of copy
+			// invalid timer event id
+			if (TimerThreadRemove(&gTimerThread, renewEventId, &tempJob) == 0) {
+				event = (upnp_timeout *)tempJob.arg;
+				free_upnp_timeout(event);
+			}
+		}
+		UpnpClientSubscription_set_RenewEventId(sub, -1);
+	}
+}
+
+
+void freeClientSubList(ClientSubscription *list)
+{
+	ClientSubscription *next;
+	while (list) {
+		free_client_subscription(list);
+		next = UpnpClientSubscription_get_Next(list);
+		UpnpClientSubscription_delete(list);
+		list = next;
+	}
+}
+
+
+void RemoveClientSubClientSID(ClientSubscription **head, const UpnpString *sid)
+{
+	ClientSubscription *finger = *head;
+	ClientSubscription *previous = NULL;
+	int found = 0;
+	while (finger) {
+		found = !strcmp(
+			UpnpString_get_String(sid),
+			UpnpString_get_String(UpnpClientSubscription_get_SID(finger)));
+		if (found) {
+			if (previous) {
+				UpnpClientSubscription_set_Next(previous,
+					UpnpClientSubscription_get_Next(finger));
+			} else {
+				*head = UpnpClientSubscription_get_Next(finger);
+			}
+			UpnpClientSubscription_set_Next(finger, NULL);
+			freeClientSubList(finger);
+			finger = NULL;
+		} else {
+			previous = finger;
+			finger = UpnpClientSubscription_get_Next(finger);
+		}
+	}
+}
+
+
+ClientSubscription *GetClientSubClientSID(ClientSubscription *head, const UpnpString *sid)
+{
+	ClientSubscription *next = head;
+	int found = 0;
+	while (next) {
+		found = !strcmp(
+			UpnpString_get_String(UpnpClientSubscription_get_SID(next)),
+			UpnpString_get_String(sid));
+		if(found) {
+			break;
+		} else {
+			next = UpnpClientSubscription_get_Next(next);
+		}
+	}
+
+	return next;
+}
+
+
+ClientSubscription *GetClientSubActualSID(ClientSubscription *head, token *sid)
+{
+	ClientSubscription *next = head;
+	while (next) {
+		if (!memcmp(
+			UpnpString_get_String(UpnpClientSubscription_get_ActualSID(next)),
+			sid->buff, sid->size)) {
+			break;
+		} else {
+			next = UpnpClientSubscription_get_Next(next);
+		}
+	}
+
+	return next;
+}
+
+
+ #endif /* INCLUDE_CLIENT_APIS */
+

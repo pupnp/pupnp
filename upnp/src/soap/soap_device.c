@@ -38,14 +38,17 @@
 
 #define QUERY_STATE_VAR_URN "urn:schemas-upnp-org:control-1-0"
 
-#include "upnpapi.h"
-#include "parsetools.h"
-#include "statcodes.h"
+
+#include "ActionRequest.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
-#include "unixutil.h"
+#include "parsetools.h"
 #include "soaplib.h"
 #include "ssdplib.h"
+#include "statcodes.h"
+#include "unixutil.h"
+#include "upnpapi.h"
+
 
 #ifdef WIN32
  #define snprintf _snprintf
@@ -569,10 +572,10 @@ check_soap_action_header( IN http_message_t * request,
 *		IN http_message_t* request :	HTTP request
 *		IN int isQuery :	flag for a querry
 *		IN IXML_Document *actionDoc :	action request document
-*		OUT char device_udn[LINE_SIZE] :	Device UDN string
-*		OUT char service_id[LINE_SIZE] :	Service ID string
+*		OUT UpnpString *device_udn :	Device UDN string
+*		OUT UpnpString *service_id :	Service ID string
 *		OUT Upnp_FunPtr *callback :	callback function of the device 
-*									application
+*						application
 *		OUT void** cookie :	cookie stored by device application 
 *							
 *	Description :	This function retrives all the information needed to 
@@ -586,12 +589,12 @@ check_soap_action_header( IN http_message_t * request,
 *	Note :
 ****************************************************************************/
 static int
-get_device_info( IN http_message_t * request,
+get_device_info( IN http_message_t *request,
                  IN int isQuery,
-                 IN IXML_Document * actionDoc,
-                 OUT char device_udn[LINE_SIZE],
-                 OUT char service_id[LINE_SIZE],
-                 OUT Upnp_FunPtr * callback,
+                 IN IXML_Document *actionDoc,
+                 OUT UpnpString *device_udn,
+                 OUT UpnpString *service_id,
+                 OUT Upnp_FunPtr *callback,
                  OUT void **cookie )
 {
     struct Handle_Info *device_info;
@@ -654,8 +657,8 @@ get_device_info( IN http_message_t * request,
         }
     }
 
-    namecopy( service_id, serv_info->serviceId );
-    namecopy( device_udn, serv_info->UDN );
+    UpnpString_set_String( device_udn, serv_info->UDN );
+    UpnpString_set_String( service_id, serv_info->serviceId );
     *callback = device_info->Callback;
     *cookie = device_info->Cookie;
 
@@ -845,10 +848,10 @@ handle_query_variable( IN SOCKINFO * info,
                        IN http_message_t * request,
                        IN IXML_Document * xml_doc )
 {
+    UpnpStateVarRequest *variable = UpnpStateVarRequest_new();
     Upnp_FunPtr soap_event_callback;
     void *cookie;
     char var_name[LINE_SIZE];
-    struct Upnp_State_Var_Request variable;
     const char *err_str;
     int err_code;
 
@@ -859,49 +862,50 @@ handle_query_variable( IN SOCKINFO * info,
         return;
     }
     // get info for event
-    if( get_device_info( request, 1, xml_doc, variable.DevUDN,
-                         variable.ServiceID,
-                         &soap_event_callback, &cookie ) != 0 ) {
+    err_code = get_device_info(
+        request, 1, xml_doc,
+        (UpnpString *)UpnpStateVarRequest_get_DevUDN(variable),
+        (UpnpString *)UpnpStateVarRequest_get_ServiceID(variable),
+        &soap_event_callback,
+        &cookie);
+    if( err_code != 0 ) {
         send_error_response( info, SOAP_INVALID_VAR,
                              Soap_Invalid_Var, request );
         return;
     }
 
-    linecopy( variable.ErrStr, "" );
-    variable.ErrCode = UPNP_E_SUCCESS;
-    namecopy( variable.StateVarName, var_name );
-    variable.CurrentVal = NULL;
-    variable.CtrlPtIPAddr = info->foreign_ip_addr;
+    UpnpStateVarRequest_set_ErrCode(variable, UPNP_E_SUCCESS);
+    UpnpStateVarRequest_strcpy_StateVarName(variable, var_name);
+    UpnpStateVarRequest_set_CtrlPtIPAddr(variable, &info->foreign_ip_addr);
 
     // send event
-    soap_event_callback( UPNP_CONTROL_GET_VAR_REQUEST, &variable, cookie );
+    soap_event_callback( UPNP_CONTROL_GET_VAR_REQUEST, variable, cookie );
 
     UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
         "Return from callback for var request\n" );
 
     // validate, and handle result
-    if( variable.CurrentVal == NULL ) {
+    if( UpnpStateVarRequest_get_CurrentVal(variable) == NULL ) {
         err_code = SOAP_ACTION_FAILED;
         err_str = Soap_Action_Failed;
-        send_error_response( info, SOAP_INVALID_VAR,
-                             Soap_Invalid_Var, request );
+        send_error_response( info, SOAP_INVALID_VAR, Soap_Invalid_Var, request );
+
         return;
     }
-    if( variable.ErrCode != UPNP_E_SUCCESS ) {
-        if( strlen( variable.ErrStr ) > 0 ) {
+    if( UpnpStateVarRequest_get_ErrCode(variable) != UPNP_E_SUCCESS ) {
+        if( UpnpString_get_Length(UpnpStateVarRequest_get_ErrStr(variable)) > 0 ) {
             err_code = SOAP_INVALID_VAR;
             err_str = Soap_Invalid_Var;
         } else {
-            err_code = variable.ErrCode;
-            err_str = variable.ErrStr;
+            err_code = UpnpStateVarRequest_get_ErrCode(variable);
+            err_str = UpnpString_get_String(UpnpStateVarRequest_get_ErrStr(variable));
         }
         send_error_response( info, err_code, err_str, request );
         return;
     }
     // send response
-    send_var_query_response( info, variable.CurrentVal, request );
-    ixmlFreeDOMString( variable.CurrentVal );
-
+    send_var_query_response( info, UpnpStateVarRequest_get_CurrentVal(variable), request );
+    UpnpStateVarRequest_delete(variable);
 }
 
 /****************************************************************************
@@ -929,14 +933,15 @@ handle_invoke_action( IN SOCKINFO * info,
                       IN IXML_Document * xml_doc )
 {
     char save_char;
-    IXML_Document *resp_node = NULL;
-    struct Upnp_Action_Request action;
+    UpnpActionRequest *action = UpnpActionRequest_new();
+    UpnpString *devUDN = UpnpString_new();
+    UpnpString *serviceID = UpnpString_new();
+    IXML_Document *actionRequestDoc = NULL;
+    IXML_Document *actionResultDoc = NULL;
     Upnp_FunPtr soap_event_callback;
     void *cookie = NULL;
     int err_code;
     const char *err_str;
-
-    action.ActionResult = NULL;
 
     // null-terminate
     save_char = action_name.buf[action_name.length];
@@ -947,59 +952,66 @@ handle_invoke_action( IN SOCKINFO * info,
     err_str = Soap_Invalid_Action;
 
     // get action node
-    if( get_action_node( xml_doc, action_name.buf, &resp_node ) == -1 ) {
+    if( get_action_node( xml_doc, action_name.buf, &actionRequestDoc ) == -1 ) {
         goto error_handler;
     }
     // get device info for action event
-    err_code = get_device_info( request, 0, xml_doc, action.DevUDN,
-                                action.ServiceID, &soap_event_callback,
-                                &cookie );
+    err_code = get_device_info(
+        request,
+	0,
+	xml_doc,
+        devUDN,
+        serviceID,
+        &soap_event_callback,
+        &cookie );
 
     if( err_code != UPNP_E_SUCCESS ) {
         goto error_handler;
     }
 
-    namecopy( action.ActionName, action_name.buf );
-    linecopy( action.ErrStr, "" );
-    action.ActionRequest = resp_node;
-    action.ActionResult = NULL;
-    action.ErrCode = UPNP_E_SUCCESS;
-    action.CtrlPtIPAddr = info->foreign_ip_addr;
+    UpnpActionRequest_set_ErrCode(action, UPNP_E_SUCCESS);
+    UpnpActionRequest_strcpy_ErrStr(action, "");
+    UpnpActionRequest_strcpy_ActionName(action, action_name.buf);
+    UpnpActionRequest_set_DevUDN(action, devUDN);
+    UpnpActionRequest_set_ServiceID(action, serviceID);
+    UpnpActionRequest_set_ActionRequest(action, actionRequestDoc);
+    UpnpActionRequest_set_CtrlPtIPAddr(action, &info->foreign_ip_addr);
 
-    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Calling Callback\n" );
+    UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
 
-    soap_event_callback( UPNP_CONTROL_ACTION_REQUEST, &action, cookie );
+    soap_event_callback(UPNP_CONTROL_ACTION_REQUEST, action, cookie);
 
-    if( action.ErrCode != UPNP_E_SUCCESS ) {
-        if( strlen( action.ErrStr ) <= 0 ) {
+    err_code = UpnpActionRequest_get_ErrCode(action);
+    if (err_code != UPNP_E_SUCCESS) {
+        err_str = UpnpString_get_String(UpnpActionRequest_get_ErrStr(action));
+        if  (strlen(err_str) <= 0) {
             err_code = SOAP_ACTION_FAILED;
             err_str = Soap_Action_Failed;
-        } else {
-            err_code = action.ErrCode;
-            err_str = action.ErrStr;
         }
         goto error_handler;
     }
     // validate, and handle action error
-    if( action.ActionResult == NULL ) {
+    actionResultDoc = UpnpActionRequest_get_ActionResult(action);
+    if (actionResultDoc == NULL) {
         err_code = SOAP_ACTION_FAILED;
         err_str = Soap_Action_Failed;
         goto error_handler;
     }
     // send response
-    send_action_response( info, action.ActionResult, request );
+    send_action_response(info, actionResultDoc, request);
 
     err_code = 0;
 
     // error handling and cleanup
-  error_handler:
-    ixmlDocument_free( action.ActionResult );
-    ixmlDocument_free( resp_node );
+error_handler:
     action_name.buf[action_name.length] = save_char;    // restore
     if( err_code != 0 ) {
         send_error_response( info, err_code, err_str, request );
     }
+
+    UpnpString_delete(serviceID);
+    UpnpString_delete(devUDN);
+    UpnpActionRequest_delete(action);
 }
 
 /****************************************************************************
