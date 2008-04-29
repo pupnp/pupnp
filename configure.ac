@@ -9,7 +9,7 @@
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.6.6], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp], [1.6.7], [mroberto@users.sourceforge.net])
 dnl ############################################################################
 dnl # *Independently* of the above libupnp package version, the libtool version
 dnl # of the 3 libraries need to be updated whenever there is a change released:
@@ -138,6 +138,14 @@ dnl # - Code has changed in threadutil
 dnl #	revision: 2 -> 3
 dnl # - Code has changed in upnp
 dnl #	revision: 4 -> 5
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:3:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.7:
+dnl # "current:revision:age"
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
 dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:3:2])
