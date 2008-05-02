@@ -83,8 +83,8 @@ void UpnpDiscovery_strcpy_Ext(UpnpDiscovery *p, const char *s);
 void UpnpDiscovery_strncpy_Ext(UpnpDiscovery *p, const char *s, int n);
 
 /** The host address of the device responding to the search. */
-struct sockaddr_in *UpnpDiscovery_get_DestAddr(const UpnpDiscovery *p);
-void UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, struct sockaddr_in *sa);
+struct sockaddr *UpnpDiscovery_get_DestAddr(const UpnpDiscovery *p);
+void UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, struct sockaddr *sa);
 
 
 #ifdef __cplusplus

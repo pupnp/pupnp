@@ -42,17 +42,21 @@ extern SOCKET gMiniServerStopSock;
 
 typedef struct MServerSockArray {
 	/* socket for listening for miniserver requests */
-	int miniServerSock;
+	SOCKET miniServerSock4;
+	SOCKET miniServerSock6;
 	/* socket for stopping miniserver */
-	int miniServerStopSock;
+	SOCKET miniServerStopSock;
 	/* socket for incoming advertisments and search requests */
-	int ssdpSock;
+	SOCKET ssdpSock4;
+	SOCKET ssdpSock6;
 
-	int stopPort;
-	int miniServerPort;
+	SOCKET stopPort;
+	SOCKET miniServerPort4;
+	SOCKET miniServerPort6;
 
 	/* socket for sending search requests and receiving search replies */
-	CLIENTONLY(int ssdpReqSock;)
+	CLIENTONLY(SOCKET ssdpReqSock4;)
+	CLIENTONLY(SOCKET ssdpReqSock6;)
 } MiniServerSockArray;
 
 
@@ -110,8 +114,10 @@ void SetGenaCallback( MiniServerCallback callback );
  * Function: StartMiniServer
  *
  * Parameters:
- *	unsigned short listen_port ; Port on which the server listens for 
- *	incoming connections
+ *	IN OUT unsigned short *listen_port4 ; Port on which the server 
+ *	  listens for incoming IPv4 connections.
+ *	IN OUT unsigned short *listen_port6 ; Port on which the server
+ *	  listens for incoming IPv6 connections.
  *
  * Description: Initialize the sockets functionality for the 
  *	Miniserver. Initialize a thread pool job to run the MiniServer
@@ -122,10 +128,11 @@ void SetGenaCallback( MiniServerCallback callback );
  *	allowed delay aborts the attempt to launch the MiniServer.
  *
  * Return: int;
- *	Actual port socket is bound to - On Success: 
- *	A negative number UPNP_E_XXX - On Error   			
+ *	On success: UPNP_E_SUCCESS
+ *	On error: UPNP_E_XXX
  ************************************************************************/
-int StartMiniServer( unsigned short listen_port );
+int StartMiniServer( IN OUT unsigned short* listen_port4, 
+                     IN OUT unsigned short* listen_port6 );
 
 /************************************************************************
  * Function: StopMiniServer

@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="libupnp"
 	ProjectGUID="{6227F51A-1498-4C4A-B213-F6FDED605125}"
+	RootNamespace="libupnp"
 	>
 	<Platforms>
 		<Platform
@@ -49,7 +50,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\pthreads\include,..\ixml\src\inc,..\ixml\inc,..\threadutil\inc,..\upnp\inc,..\upnp\src\inc,.\inc"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBUPNP_EXPORTS;PTW32_STATIC_LIB;UPNP_STATIC_LIB;UPNP_USE_MSVCPP"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBUPNP_EXPORTS;PTW32_STATIC_LIB;UPNP_STATIC_LIB;UPNP_USE_MSVCPP;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -74,7 +75,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib ..\..\pthreads\lib\pthreadvc2.lib ws2_32.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib ..\..\pthreads\lib\pthreadvc2.lib ws2_32.lib  iphlpapi.lib"
 				OutputFile=".\Release/libupnp.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -144,7 +145,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\pthreads\include;..\..\ixml\src\inc;..\..\ixml\inc;..\..\threadutil\inc;..\..\upnp\inc;..\..\upnp\src\inc;..\inc;..\msvc"
-				PreprocessorDefinitions="DEBUG;WIN32;_WINDOWS;_USRDLL;LIBUPNP_EXPORTS;UPNP_USE_MSVCPP"
+				PreprocessorDefinitions="DEBUG;WIN32;_WINDOWS;_USRDLL;LIBUPNP_EXPORTS;UPNP_USE_MSVCPP;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -170,7 +171,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib ..\..\pthreads\lib\pthreadvc2.lib ws2_32.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib ..\..\pthreads\lib\pthreadvc2.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="$(OutDir)\libupnp.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -501,6 +502,10 @@
 			</File>
 			<File
 				RelativePath="..\..\upnp\src\inc\unixutil.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\upnp\inc\upnp.h"
 				>
 			</File>
 			<File

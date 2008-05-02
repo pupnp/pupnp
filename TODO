@@ -18,6 +18,10 @@ http://sourceforge.net/tracker/?group_id=7189&atid=307189
 
 - make API clean for large files and 64 bits
 
+- Why is NUM_HANDLE defined to 200 when we can register only:
+  A) One client(1)
+  B) An IPv4 and IPv6 device (2)
+  NUM_HANDLE should be 3
 
 To Be Decided
 =============

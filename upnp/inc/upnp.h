@@ -106,13 +106,15 @@
 #endif
 #ifndef WIN32
 	#define SOCKET int
+	#define INVALID_SOCKET (SOCKET)(~0)
 #endif
 
 
 #ifndef WIN32
 	#include <netinet/in.h>
 #else
-	#include <winsock2.h>
+	#include <Ws2tcpip.h>
+	#include <iphlpapi.h>
 	#include <time.h>
 #endif
 
@@ -294,6 +296,15 @@
  */
 /*! @{ */
 #define UPNP_E_ALREADY_REGISTERED -120
+/*! @} */
+
+/** @name UPNP_E_INVALID_INTERFACE [-121]
+ *  {\tt UPNP_E_INVALID_INTERFACE} signifies that the interface provided to
+ *  {\bf UpnpInit2} is unknown or does not have a valid IPv4 or IPv6 
+ *  address configured.
+ */
+/*! @{ */
+#define UPNP_E_INVALID_INTERFACE    -121
 /*! @} */
 
 /** @name UPNP_E_NETWORK_ERROR [-200]
@@ -930,6 +941,51 @@ EXPORT_SPEC int UpnpInit(
                                     will pick an arbitrary free port. */
     );
 
+
+/*! @name Initialization and Registration */
+/*! @{ */
+/** Initializes the Linux SDK for UPnP Devices. This function must be called
+ *  before any other API function can be called.  It should be called
+ *  only once.  Subsequent calls to this API return a {\tt UPNP_E_INIT}
+ *  error code.
+ *
+ *  Optionally, the application can specify an interface name (in the
+ *  case of a multi-homed configuration) and a port number to use for
+ *  all UPnP operations.  Since a port number can be used only by one
+ *  process, multiple processes using the SDK must specify
+ *  different port numbers.
+ *
+ *  If unspecified, the SDK will use the first suitable interface and an 
+ *  arbitrary port.
+ *
+ *  This call is synchronous.
+ *
+ *  @return [int] An integer representing one of the following:
+ *    \begin{itemize}
+ *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
+ *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist 
+ *              to initialize the SDK.
+ *      \item {\tt UPNP_E_INIT}: The SDK is already initialized. 
+ *      \item {\tt UPNP_E_INIT_FAILED}: The SDK initialization 
+ *              failed for an unknown reason.
+ *      \item {\tt UPNP_E_SOCKET_BIND}: An error occurred binding a socket.
+ *      \item {\tt UPNP_E_LISTEN}: An error occurred listening to a socket.
+ *      \item {\tt UPNP_E_OUTOF_SOCKET}: An error ocurred creating a socket.
+ *      \item {\tt UPNP_E_INTERNAL_ERROR}: An internal error ocurred.
+ *      \item {\tt UPNP_E_INVALID_INTERFACE}: IfName is invalid or doees not
+ *              have a valid IPv4 or IPv6 addresss configured.
+ *    \end{itemize} */
+
+EXPORT_SPEC int UpnpInit2( 
+    IN const char *IfName,      /** The interface name to use by the UPnP SDK
+                                    operations. Examples: "eth0", "xl0",
+                                    "Local Area Connection", {\tt NULL} to
+                                    use the first suitable interface. */
+    IN unsigned short DestPort  /** The destination port number to use.  0 
+                                    will pick an arbitrary free port. */
+    );
+
+
 /** Terminates the Linux SDK for UPnP Devices. This function must be the last 
  *  API function called. It should be called only once. Subsequent calls to 
  *  this API return a {\tt UPNP_E_FINISH} error code.
@@ -949,19 +1005,39 @@ EXPORT_SPEC int UpnpFinish();
  *  returned.
  *
  *  @return [unsigned short] The port on which an internal server is 
- *                           listening for UPnP related requests. 
+ *                           listening for IPv4 UPnP related requests. 
  */
 EXPORT_SPEC unsigned short UpnpGetServerPort(void);
 
-/** If {\tt NULL} is used as the IP address in {\bf UpnpInit}, then this
+/** If '0' is used as the port number in {\bf UpnpInit}, then this
+ *  function can be used to retrieve the actual port allocated to
+ *  the SDK. If {\bf UpnpInit} has not succeeded then 0 is 
+ *  returned.
+ *
+ *  @return [unsigned short] The port on which an internal server is 
+ *                           listening for IPv6 UPnP related requests. 
+ */
+EXPORT_SPEC unsigned short UpnpGetServerPort6(void);
+
+/** If {\tt NULL} is used as the IPv4 address in {\bf UpnpInit}, then this
  *  function can be used to retrieve the actual interface address
  *  on which device is running. If {\bf UpnpInit} has not succeeded 
  *  then {\tt NULL} is returned.
  *
- *  @return [char*] The IP address on which an internal server is listening 
+ *  @return [char*] The IPv4 address on which an internal server is listening 
  *                  for UPnP related requests. 
  */
 EXPORT_SPEC char * UpnpGetServerIpAddress(void);
+
+/** If {\tt NULL} is used as the IPv6 address in {\bf UpnpInit}, then this
+ *  function can be used to retrieve the actual interface address
+ *  on which device is running. If {\bf UpnpInit} has not succeeded 
+ *  then {\tt NULL} is returned.
+ *
+ *  @return [char*] The IPv6 address on which an internal server is listening 
+ *                  for UPnP related requests. 
+ */
+EXPORT_SPEC char * UpnpGetServerIp6Address(void);
 
 /** {\bf UpnpRegisterClient} registers a control point application with the
  *  SDK.  A control point application cannot make any other API calls
@@ -1128,6 +1204,58 @@ EXPORT_SPEC int UpnpRegisterRootDevice2(
     OUT UpnpDevice_Handle* Hnd       /** Pointer to a variable to store 
                                          the new device handle. */
     );
+
+
+/** {\bf UpnpRegisterRootDevice3} registers a device application for a 
+ *  specific address family with the SDK.  A device application cannot 
+ *  make any other API calls until it registers using this function.
+ *  Device applications can also register as control points (see 
+ *  {\bf UpnpRegisterClient} to get a control point handle to perform 
+ *  control point functionality).
+ *
+ *  {\bf UpnpRegisterRootDevice} is synchronous and does not generate
+ *  any callbacks.  Callbacks can occur as soon as this function returns.
+ *
+ *  @return [int] An integer representing one of the following:
+ *    \begin{itemize}
+ *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
+ *      \item {\tt UPNP_E_FINISH}: The SDK is already terminated or 
+ *                                 is not initialized. 
+ *      \item {\tt UPNP_E_INVALID_DESC}: The description document was not 
+ *              a valid device description.
+ *      \item {\tt UPNP_E_INVALID_URL}: The URL for the description document 
+ *              is not valid.
+ *      \item {\tt UPNP_E_INVALID_PARAM}: Either {\bf Callback} or {\bf Hnd} 
+ *              is not a valid pointer or {\bf DescURL} is {\tt NULL}.
+ *      \item {\tt UPNP_E_NETWORK_ERROR}: A network error occurred.
+ *      \item {\tt UPNP_E_SOCKET_WRITE}: An error or timeout occurred writing 
+ *              to a socket.
+ *      \item {\tt UPNP_E_SOCKET_READ}: An error or timeout occurred reading 
+ *              from a socket.
+ *      \item {\tt UPNP_E_SOCKET_BIND}: An error occurred binding a socket.
+ *      \item {\tt UPNP_E_SOCKET_CONNECT}: An error occurred connecting the 
+ *              socket.
+ *      \item {\tt UPNP_E_OUTOF_SOCKET}: Too many sockets are currently 
+ *              allocated.
+ *      \item {\tt UPNP_E_OUTOF_MEMORY}: There are insufficient resources to 
+ *              register this root device.
+ *    \end{itemize} */
+
+EXPORT_SPEC int UpnpRegisterRootDevice3(
+    IN const char *DescUrl,    /** Pointer to a string containing the 
+                                   description URL for this root device 
+                                   instance. */
+    IN Upnp_FunPtr Callback,   /** Pointer to the callback function for 
+                                   receiving asynchronous events. */
+    IN const void *Cookie,     /** Pointer to user data returned with the 
+                                   callback function when invoked. */
+    OUT UpnpDevice_Handle *Hnd,/** Pointer to a variable to store the 
+                                   new device handle. */
+    IN const int  AddressFamily /** Address family of this device. Can be
+                                   AF_INET for an IPv4 device, or AF_INET6
+                                   for an IPv6 device. Defaults to AF_INET. */
+    );
+
 
 /** {\bf UpnpUnRegisterClient} unregisters a control point application, 
  *  unsubscribing all active subscriptions. After this call, the 

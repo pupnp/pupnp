@@ -1352,7 +1352,8 @@ gena_process_subscription_request( IN SOCKINFO * info,
     HandleLock();
 
     // CURRENTLY, ONLY ONE DEVICE
-    if( GetDeviceHandleInfo( &device_handle, &handle_info ) != HND_DEVICE ) {
+    if( GetDeviceHandleInfo( info->foreign_sockaddr.ss_family , 
+        &device_handle, &handle_info ) != HND_DEVICE ) {
         free( event_url_path );
         error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
         HandleUnlock();
@@ -1527,7 +1528,8 @@ gena_process_subscription_renewal_request( IN SOCKINFO * info,
     HandleLock();
 
     // CURRENTLY, ONLY SUPPORT ONE DEVICE
-    if( GetDeviceHandleInfo( &device_handle, &handle_info ) != HND_DEVICE ) {
+    if( GetDeviceHandleInfo( info->foreign_sockaddr.ss_family,
+        &device_handle, &handle_info ) != HND_DEVICE ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
         membuffer_destroy( &event_url_path );
         return;
@@ -1650,7 +1652,8 @@ gena_process_unsubscribe_request( IN SOCKINFO * info,
     HandleLock();
 
     // CURRENTLY, ONLY SUPPORT ONE DEVICE
-    if( GetDeviceHandleInfo( &device_handle, &handle_info ) != HND_DEVICE ) {
+    if( GetDeviceHandleInfo( info->foreign_sockaddr.ss_family,
+        &device_handle, &handle_info ) != HND_DEVICE ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
         membuffer_destroy( &event_url_path );
         HandleUnlock();

@@ -21,7 +21,7 @@ struct SUpnpActionRequest
 	IXML_Document *m_actionRequest;
 	IXML_Document *m_actionResult;
 	IXML_Document *m_soapHeader;
-	struct in_addr m_ctrlPtIPAddr;
+	struct sockaddr_storage m_ctrlPtIPAddr;
 };
 
 
@@ -41,7 +41,7 @@ UpnpActionRequest *UpnpActionRequest_new()
 	p->m_actionRequest = NULL;
 	p->m_actionResult = NULL;
 	p->m_soapHeader = NULL;
-	memset(&p->m_ctrlPtIPAddr, 0, sizeof (struct in_addr));
+	memset(&p->m_ctrlPtIPAddr, 0, sizeof (struct sockaddr_storage));
 #endif
 	return (UpnpActionRequest *)p;
 }
@@ -73,7 +73,7 @@ void UpnpActionRequest_delete(UpnpActionRequest *p)
 
 	UpnpActionRequest_set_SoapHeader(p, NULL);
 
-	memset(&q->m_ctrlPtIPAddr, 0, sizeof (struct in_addr));
+	memset(&q->m_ctrlPtIPAddr, 0, sizeof (struct sockaddr_storage));
 
 	free(p);
 }
@@ -224,13 +224,13 @@ void UpnpActionRequest_set_ActionResult(UpnpActionRequest *p, IXML_Document *d)
 }
 
 
-struct in_addr *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p)
+struct sockaddr_storage *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p)
 {
 	return &((struct SUpnpActionRequest *)p)->m_ctrlPtIPAddr;
 }
 
 
-void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, struct in_addr *ia)
+void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, struct sockaddr_storage *ia)
 {
 	((struct SUpnpActionRequest *)p)->m_ctrlPtIPAddr = *ia;
 }

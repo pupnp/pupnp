@@ -106,7 +106,7 @@ typedef struct TOKEN {
 //the full string representation
 typedef struct HOSTPORT {
   token text; //full host port
-  struct sockaddr_in IPv4address; //Network Byte Order  
+  struct sockaddr_storage IPaddress; //Network Byte Order  
 } hostport_type;
 
 //Represents a URI

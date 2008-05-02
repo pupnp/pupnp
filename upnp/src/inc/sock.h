@@ -48,11 +48,10 @@
 
 typedef struct 
 {
-	int socket;		// handle/descriptor to a socket
+	SOCKET socket;		// handle/descriptor to a socket
 
     // the following two fields are filled only in incoming requests;
-    struct in_addr foreign_ip_addr;
-    unsigned short foreign_ip_port;
+    struct sockaddr_storage foreign_sockaddr;
     
 } SOCKINFO;
 
@@ -65,7 +64,7 @@ typedef struct
 *
 *	Parameters :
 *		OUT SOCKINFO* info ;	Socket Information Object
-*		IN int sockfd ;			Socket Descriptor
+*		IN SOCKET sockfd ;	Socket Descriptor
 *
 *	Description :	Assign the passed in socket descriptor to socket 
 *		descriptor in the SOCKINFO structure.
@@ -76,16 +75,15 @@ typedef struct
 *		UPNP_E_SOCKET_ERROR
 *	Note :
 ************************************************************************/
-int sock_init( OUT SOCKINFO* info, IN int sockfd );
+int sock_init(OUT SOCKINFO* info, IN SOCKET sockfd);
 
 /************************************************************************
 *	Function :	sock_init_with_ip
 *
 *	Parameters :
-*		OUT SOCKINFO* info ;				Socket Information Object
-*		IN int sockfd ;						Socket Descriptor
-*		IN struct in_addr foreign_ip_addr ;	Remote IP Address
-*		IN unsigned short foreign_ip_port ;	Remote Port number
+*		OUT SOCKINFO* info ;	Socket Information Object
+*		IN SOCKET sockfd ;	Socket Descriptor
+*		IN struct sockaddr* foreign_sockaddr;	Remote socket address
 *
 *	Description :	Calls the sock_init function and assigns the passed in
 *		IP address and port to the IP address and port in the SOCKINFO
@@ -98,8 +96,10 @@ int sock_init( OUT SOCKINFO* info, IN int sockfd );
 *
 *	Note :
 ************************************************************************/
-int sock_init_with_ip( OUT SOCKINFO* info, IN int sockfd, 
-        IN struct in_addr foreign_ip_addr, IN unsigned short foreign_ip_port );
+int sock_init_with_ip(
+	OUT SOCKINFO* info,
+	IN SOCKET sockfd, 
+        IN struct sockaddr *foreign_sockaddr);
 
 /************************************************************************
 *	Function :	sock_read
@@ -162,7 +162,7 @@ int sock_write( IN SOCKINFO *info, IN char* buffer, IN size_t bufsize,
 *
 *	Note :
 ************************************************************************/
-int sock_destroy( INOUT SOCKINFO* info,int );
+int sock_destroy(INOUT SOCKINFO* info, int);
 
 #ifdef __cplusplus
 }	// #extern "C"

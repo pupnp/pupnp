@@ -50,13 +50,13 @@ extern "C" {
 *
 *	Parameters :
 *		INOUT IXML_Document *doc ;	IXML Description document
-*		IN const struct sockaddr_in* serverAddr ;	socket address object
-*					providing the IP address and port information
-*		IN const char* alias ;	string containing the alias
+*		IN const struct sockaddr *serverAddr;	socket address object
+*			providing the IP address and port information
+*		IN const char* alias ;		string containing the alias
 *		IN time_t last_modified ;	time when the XML document was 
-*					downloaded
+*			downloaded
 *		OUT char docURL[LINE_SIZE] ;	buffer to hold the URL of the 
-*					document.
+*			document.
 *
 *	Description : Configure the full URL for the description document.
 *		Create the URL document and add alias, description information.
@@ -70,10 +70,10 @@ extern "C" {
 *	Note :
 ****************************************************************************/
 int configure_urlbase( INOUT IXML_Document *doc,
-    IN const struct sockaddr_in* serverAddr,
-    IN const char* alias,
+	IN const struct sockaddr* serverAddr,
+	IN const char* alias,
 	IN time_t last_modified,
-    OUT char docURL[LINE_SIZE] );
+	OUT char docURL[LINE_SIZE]);
 
 
 #ifdef __cplusplus
@@ -81,4 +81,3 @@ int configure_urlbase( INOUT IXML_Document *doc,
 #endif
 
 #endif /* URLCONFIG_H */
-

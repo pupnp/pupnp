@@ -175,13 +175,13 @@ http_Connect( IN uri_type * destination_url,
 
     http_FixUrl( destination_url, url );
 
-    connfd = socket( AF_INET, SOCK_STREAM, 0 );
+    connfd = socket( url->hostport.IPaddress.ss_family, SOCK_STREAM, 0 );
     if( connfd == -1 ) {
         return UPNP_E_OUTOF_SOCKET;
     }
 
-    if( connect( connfd, ( struct sockaddr * )&url->hostport.IPv4address,
-                 sizeof( struct sockaddr_in ) ) == -1 ) {
+    if( connect( connfd, ( struct sockaddr * )&url->hostport.IPaddress,
+                 sizeof( url->hostport.IPaddress ) ) == -1 ) {
 #ifdef WIN32
         UpnpPrintf(UPNP_CRITICAL, HTTP, __FILE__, __LINE__,
             "connect error: %d\n", WSAGetLastError());
@@ -521,7 +521,7 @@ http_RequestAndResponse( IN uri_type * destination,
     int http_error_code;
     SOCKINFO info;
 
-    tcp_connection = socket( AF_INET, SOCK_STREAM, 0 );
+    tcp_connection = socket( destination->hostport.IPaddress.ss_family, SOCK_STREAM, 0 );
     if( tcp_connection == -1 ) {
         parser_response_init( response, req_method );
         return UPNP_E_SOCKET_ERROR;
@@ -535,7 +535,7 @@ http_RequestAndResponse( IN uri_type * destination,
     // connect
     ret_code = connect( info.socket,
                         ( struct sockaddr * )&destination->hostport.
-                        IPv4address, sizeof( struct sockaddr_in ) );
+                        IPaddress, sizeof( struct sockaddr_storage ) );
 
     if( ret_code == -1 ) {
         sock_destroy( &info, SD_BOTH );
@@ -1005,7 +1005,7 @@ http_OpenHttpPost( IN const char *url_str,
 
     handle->contentLength = contentLength;
 
-    tcp_connection = socket( AF_INET, SOCK_STREAM, 0 );
+    tcp_connection = socket( url.hostport.IPaddress.ss_family, SOCK_STREAM, 0 );
     if( tcp_connection == -1 ) {
         ret_code = UPNP_E_SOCKET_ERROR;
         goto errorHandler;
@@ -1019,8 +1019,8 @@ http_OpenHttpPost( IN const char *url_str,
     }
 
     ret_code = connect( handle->sock_info.socket,
-                        ( struct sockaddr * )&url.hostport.IPv4address,
-                        sizeof( struct sockaddr_in ) );
+                        ( struct sockaddr * )&url.hostport.IPaddress,
+                        sizeof( struct sockaddr_storage ) );
 
     if( ret_code == -1 ) {
         sock_destroy( &handle->sock_info, SD_BOTH );
@@ -1587,7 +1587,7 @@ http_OpenHttpGetProxy( IN const char *url_str,
     handle->cancel = 0;
     parser_response_init( &handle->response, HTTPMETHOD_GET );
 
-    tcp_connection = socket( AF_INET, SOCK_STREAM, 0 );
+    tcp_connection = socket( peer->hostport.IPaddress.ss_family, SOCK_STREAM, 0 );
     if( tcp_connection == -1 ) {
         ret_code = UPNP_E_SOCKET_ERROR;
         goto errorHandler;
@@ -1601,8 +1601,8 @@ http_OpenHttpGetProxy( IN const char *url_str,
     }
 
     ret_code = connect( handle->sock_info.socket,
-                        ( struct sockaddr * )&peer->hostport.IPv4address,
-                        sizeof( struct sockaddr_in ) );
+                        ( struct sockaddr * )&peer->hostport.IPaddress,
+                        sizeof( struct sockaddr_storage ) );
 
     if( ret_code == -1 ) {
         sock_destroy( &handle->sock_info, SD_BOTH );
@@ -2236,7 +2236,7 @@ http_OpenHttpGetEx( IN const char *url_str,
         handle->entity_offset = 0;
         parser_response_init( &handle->response, HTTPMETHOD_GET );
 
-        tcp_connection = socket( AF_INET, SOCK_STREAM, 0 );
+        tcp_connection = socket( url.hostport.IPaddress.ss_family, SOCK_STREAM, 0 );
         if( tcp_connection == -1 ) {
             errCode = UPNP_E_SOCKET_ERROR;
             free( handle );
@@ -2252,8 +2252,8 @@ http_OpenHttpGetEx( IN const char *url_str,
         }
 
         errCode = connect( handle->sock_info.socket,
-                           ( struct sockaddr * )&url.hostport.IPv4address,
-                           sizeof( struct sockaddr_in ) );
+                           ( struct sockaddr * )&url.hostport.IPaddress,
+                           sizeof( struct sockaddr_storage ) );
         if( errCode == -1 ) {
             sock_destroy( &handle->sock_info, SD_BOTH );
             errCode = UPNP_E_SOCKET_CONNECT;

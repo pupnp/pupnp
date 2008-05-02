@@ -78,6 +78,7 @@ typedef enum SsdpCmdType{SSDP_ERROR=-1,
 //Constant
 #define	 BUFSIZE   2500
 #define  SSDP_IP   "239.255.255.250"
+#define  SSDP_IPV6_LINKLOCAL "FF02::C"
 #define  SSDP_PORT 1900
 #define  NUM_TRY 3
 #define  NUM_COPY 1
@@ -121,7 +122,7 @@ typedef struct SsdpEventStruct
   char Os[LINE_SIZE];
   char Ext[LINE_SIZE];
   char Date[LINE_SIZE];
-  struct sockaddr_in * DestAddr;
+  struct sockaddr *DestAddr;
   void * Cookie;
 } Event;
 
@@ -134,7 +135,7 @@ typedef struct TData
    int Mx;
    void * Cookie;
    char * Data;
-   struct sockaddr_in DestAddr;
+   struct sockaddr_storage DestAddr;
    
 }ThreadData;
 
@@ -142,7 +143,7 @@ typedef struct ssdpsearchreply
 {
   int MaxAge;
   UpnpDevice_Handle handle;
-  struct sockaddr_in dest_addr;
+  struct sockaddr_storage dest_addr;
   SsdpEvent event;
   
 }SsdpSearchReply;
@@ -159,13 +160,14 @@ typedef struct ssdpsearcharg
 typedef struct 
 {
   http_parser_t parser;
-  struct sockaddr_in dest_addr;
+  struct sockaddr_storage dest_addr;
 } ssdp_thread_data;
 
 
 /* globals */
 
-CLIENTONLY(extern SOCKET gSsdpReqSocket;);
+CLIENTONLY(extern SOCKET gSsdpReqSocket4;);
+CLIENTONLY(extern SOCKET gSsdpReqSocket6;);
 
 typedef int (*ParserFun)(char *, Event *);
 
@@ -205,11 +207,11 @@ int Make_Socket_NoBlocking (int sock);
 #ifdef INCLUDE_DEVICE_APIS
 void ssdp_handle_device_request(
 	IN http_message_t* hmsg, 
-	IN struct sockaddr_in* dest_addr );
+	IN struct sockaddr* dest_addr );
 #else
 static inline void ssdp_handle_device_request(
 	IN http_message_t* hmsg, 
-	IN struct sockaddr_in* dest_addr ) {}
+	IN struct sockaddr* dest_addr ) {}
 #endif
 
 /************************************************************************
@@ -217,7 +219,7 @@ static inline void ssdp_handle_device_request(
 *
 * Parameters:
 *	IN http_message_t* hmsg: SSDP message from the device
-*	IN struct sockaddr_in* dest_addr: Address of the device
+*	IN struct sockaddr* dest_addr: Address of the device
 *	IN xboolean timeout: timeout kept by the control point while sending 
 *		search message
 *	IN void* cookie: Cookie stored by the control point application. 
@@ -234,7 +236,7 @@ static inline void ssdp_handle_device_request(
 ***************************************************************************/
 void ssdp_handle_ctrlpt_msg(
 	IN http_message_t* hmsg, 
-	IN struct sockaddr_in* dest_addr,
+	IN struct sockaddr* dest_addr,
 	IN xboolean timeout,
 	IN void* cookie );
 
@@ -347,6 +349,7 @@ int SearchByTarget(IN int Mx, IN char *St, IN void *Cookie);
 *	IN char *Udn     :
 *	IN char *Location: Location URL.
 *	IN int Duration  : Service duration in sec.
+*	IN int AddressFamily: Device address family.
 *
 * Description:
 *	This function creates the device advertisement request based on
@@ -360,7 +363,8 @@ int DeviceAdvertisement(
 	IN int RootDev,
 	IN char *Udn, 
 	IN char *Location,
-	IN int Duration);
+	IN int Duration,
+	IN int AddressFamily);
 
 
 /************************************************************************
@@ -373,6 +377,7 @@ int DeviceAdvertisement(
 *	IN char *_Server:
 *	IN char *Location: Location URL
 *	IN int Duration :Device duration in sec.
+*	IN int AddressFamily: Device address family.
 *
 * Description:
 *	This function creates a HTTP device shutdown request packet 
@@ -387,13 +392,14 @@ int DeviceShutdown(
 	IN char *Udn, 
 	IN char *_Server, 
 	IN char *Location, 
-	IN int Duration);
+	IN int Duration,
+	IN int AddressFamily);
 
 /************************************************************************
 * Function : DeviceReply
 *
 * Parameters:	
-*	IN struct sockaddr_in * DestAddr:destination IP address.
+*	IN struct sockaddr *DestAddr: destination IP address.
 *	IN char *DevType: Device type
 *	IN int RootDev: 1 means root device 0 means embedded device.
 *	IN char *Udn: Device UDN
@@ -408,17 +414,18 @@ int DeviceShutdown(
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int DeviceReply(
-	IN struct sockaddr_in * DestAddr, 
+	IN struct sockaddr *DestAddr, 
 	IN char *DevType, 
 	IN int RootDev, 
 	IN char *Udn, 
-	IN char *Location, IN int  Duration);
+	IN char *Location, 
+	IN int  Duration);
 
 /************************************************************************
 * Function : SendReply
 *
 * Parameters:	
-*	IN struct sockaddr_in * DestAddr:destination IP address.
+*	IN struct sockaddr *DestAddr: destination IP address.
 *	IN char *DevType: Device type
 *	IN int RootDev: 1 means root device 0 means embedded device.
 *	IN char * Udn: Device UDN
@@ -435,7 +442,7 @@ int DeviceReply(
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int SendReply(
-	IN struct sockaddr_in * DestAddr, 
+	IN struct sockaddr *DestAddr, 
 	IN char *DevType, 
 	IN int RootDev, 
 	IN char *Udn, 
@@ -450,7 +457,8 @@ int SendReply(
 *	IN char * Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char * Location: Location of Device description document.
-*	IN int Duration :Life time of this device.
+*	IN int Duration: Life time of this device.
+*	IN int AddressFamily: Device address family
 *
 * Description:
 *	This function creates the advertisement packet based 
@@ -463,13 +471,14 @@ int ServiceAdvertisement(
 	IN char *Udn, 
 	IN char *ServType,
 	IN char *Location,
-	IN int Duration);
+	IN int Duration,
+	IN int AddressFamily);
 
 /************************************************************************
 * Function : ServiceReply
 *
 * Parameters:	
-*	IN struct sockaddr_in *DestAddr:
+*	IN struct sockaddr *DestAddr:
 *	IN char *Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char *Server: Not used
@@ -484,7 +493,7 @@ int ServiceAdvertisement(
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int ServiceReply(
-	IN struct sockaddr_in *DestAddr,  
+	IN struct sockaddr *DestAddr,  
 	IN char *ServType, 
 	IN char *Udn, 
 	IN char *Location,
@@ -498,6 +507,7 @@ int ServiceReply(
 *	IN char *ServType: Service Type.
 *	IN char *Location: Location of Device description document.
 *	IN int Duration :Service duration in sec.
+*	IN int AddressFamily: Device address family
 *
 * Description:
 *	This function creates a HTTP service shutdown request packet 
@@ -510,7 +520,8 @@ int ServiceShutdown(
 	IN char *Udn,
 	IN char *ServType,
 	IN char *Location,
-	IN int Duration);
+	IN int Duration,
+	IN int AddressFamily);
 
 
 /************************************************************************
@@ -537,7 +548,7 @@ void *advertiseAndReplyThread(IN void * data);
 *			1 = Send Advertisement
 *	IN UpnpDevice_Handle Hnd: Device handle
 *	IN enum SsdpSearchType SearchType:Search type for sending replies
-*	IN struct sockaddr_in *DestAddr:Destination address
+*	IN struct sockaddr *DestAddr:Destination address
 *	IN char *DeviceType:Device type
 *	IN char *DeviceUDN:Device UDN
 *	IN char *ServiceType:Service type
@@ -553,10 +564,9 @@ int AdvertiseAndReply(
 	IN int AdFlag, 
 	IN UpnpDevice_Handle Hnd, 
 	IN enum SsdpSearchType SearchType, 
-	IN struct sockaddr_in *DestAddr,
+	IN struct sockaddr *DestAddr,
 	IN char *DeviceType, 
 	IN char *DeviceUDN, 
 	IN char *ServiceType, int Exp);
 
 #endif
-

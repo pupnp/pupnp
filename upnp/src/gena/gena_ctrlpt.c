@@ -325,13 +325,23 @@ static int gena_subscribe(
 			"TIMEOUT: Second-", timeout_str );
 	} else {
 		// subscribe
-		return_code = http_MakeMessage(
-			&request, 1, 1,
-			"q" "sssdsc" "sc" "sscc",
-			HTTPMETHOD_SUBSCRIBE, &dest_url,
-			"CALLBACK: <http://", LOCAL_HOST, ":", LOCAL_PORT, "/>",
-			"NT: upnp:event",
-			"TIMEOUT: Second-", timeout_str);
+		if( dest_url.hostport.IPaddress.ss_family == AF_INET6 ) {
+			return_code = http_MakeMessage(
+				&request, 1, 1,
+				"q" "sssdsc" "sc" "sscc",
+				HTTPMETHOD_SUBSCRIBE, &dest_url,
+				"CALLBACK: <http://[", gIF_IPV6, "]:", LOCAL_PORT_V6, "/>",
+				"NT: upnp:event",
+				"TIMEOUT: Second-", timeout_str );
+		} else {
+			return_code = http_MakeMessage(
+				&request, 1, 1,
+				"q" "sssdsc" "sc" "sscc",
+				HTTPMETHOD_SUBSCRIBE, &dest_url,
+				"CALLBACK: <http://", gIF_IPV4, ":", LOCAL_PORT_V4, "/>",
+				"NT: upnp:event",
+				"TIMEOUT: Second-", timeout_str);
+		}
 	}
 	if (return_code != 0) {
 		return return_code;

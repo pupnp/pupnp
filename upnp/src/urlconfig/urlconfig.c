@@ -51,7 +51,7 @@
 *	Function :	addrToString
 *
 *	Parameters :
-*		IN const struct sockaddr_in* addr ;	socket address object with 
+*		IN const struct sockaddr* addr ;	socket address object with 
 *					the IP Address and port information
 *		OUT char ipaddr_port[] ;	character array which will hold the 
 *					IP Address  in a string format.
@@ -64,11 +64,20 @@
 *	Note :
 ************************************************************************/
 static UPNP_INLINE void
-addrToString( IN const struct sockaddr_in *addr,
+addrToString( IN const struct sockaddr *addr,
               OUT char ipaddr_port[] )
 {
-    sprintf( ipaddr_port, "%s:%d", inet_ntoa( addr->sin_addr ),
-             ntohs( addr->sin_port ) );
+    char buf_ntop[64];
+
+    if( addr->sa_family == AF_INET ) {
+        struct sockaddr_in* sa4 = (struct sockaddr_in*)addr;
+        inet_ntop(AF_INET, &sa4->sin_addr, buf_ntop, sizeof(buf_ntop) );
+        sprintf( ipaddr_port, "%s:%d", buf_ntop, ntohs( sa4->sin_port ) );
+    } else if( addr->sa_family == AF_INET6 ) {
+        struct sockaddr_in6* sa6 = (struct sockaddr_in6*)addr;
+        inet_ntop(AF_INET6, &sa6->sin6_addr, buf_ntop, sizeof(buf_ntop) );
+        sprintf( ipaddr_port, "[%s]:%d", buf_ntop, ntohs( sa6->sin6_port ) );
+    }
 }
 
 /************************************************************************
@@ -344,7 +353,7 @@ config_description_doc( INOUT IXML_Document * doc,
 *
 *	Parameters :
 *		INOUT IXML_Document *doc ;	IXML Description document
-*		IN const struct sockaddr_in* serverAddr ;	socket address object
+*		IN const struct sockaddr* serverAddr ;	socket address object
 *					providing the IP address and port information
 *		IN const char* alias ;	string containing the alias
 *		IN time_t last_modified ;	time when the XML document was 
@@ -352,7 +361,7 @@ config_description_doc( INOUT IXML_Document * doc,
 *		OUT char docURL[LINE_SIZE] ;	buffer to hold the URL of the 
 *					document.
 *		INOUT IXML_Document *doc:dom document whose urlbase is to be modified
-*		IN const struct sockaddr_in* serverAddr : ip address and port of 
+*		IN const struct sockaddr* serverAddr : ip address and port of 
 *													the miniserver
 *		IN const char* alias : a name to be used for the temp; e.g.:"foo.xml"
 *		IN time_t last_modified :	time
@@ -371,7 +380,7 @@ config_description_doc( INOUT IXML_Document * doc,
 ************************************************************************/
 int
 configure_urlbase( INOUT IXML_Document * doc,
-                   IN const struct sockaddr_in *serverAddr,
+                   IN const struct sockaddr *serverAddr,
                    IN const char *alias,
                    IN time_t last_modified,
                    OUT char docURL[LINE_SIZE] )

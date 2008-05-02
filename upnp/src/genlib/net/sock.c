@@ -62,7 +62,7 @@
 *
 *	Parameters :
 *		OUT SOCKINFO* info ;	Socket Information Object
-*		IN int sockfd ;			Socket Descriptor
+*		IN SOCKET sockfd ;	Socket Descriptor
 *
 *	Description :	Assign the passed in socket descriptor to socket 
 *		descriptor in the SOCKINFO structure.
@@ -76,7 +76,7 @@
 ************************************************************************/
 int
 sock_init( OUT SOCKINFO * info,
-           IN int sockfd )
+           IN SOCKET sockfd )
 {
     assert( info );
 
@@ -91,10 +91,9 @@ sock_init( OUT SOCKINFO * info,
 *	Function :	sock_init_with_ip
 *
 *	Parameters :
-*		OUT SOCKINFO* info ;				Socket Information Object
-*		IN int sockfd ;						Socket Descriptor
-*		IN struct in_addr foreign_ip_addr ;	Remote IP Address
-*		IN unsigned short foreign_ip_port ;	Remote Port number
+*		OUT SOCKINFO* info ;		Socket Information Object
+*		IN SOCKET sockfd ;		Socket Descriptor
+*		IN struct sockaddr* foreign_sockaddr; remote socket address.
 *
 *	Description :	Calls the sock_init function and assigns the passed in
 *		IP address and port to the IP address and port in the SOCKINFO
@@ -109,9 +108,8 @@ sock_init( OUT SOCKINFO * info,
 ************************************************************************/
 int
 sock_init_with_ip( OUT SOCKINFO * info,
-                   IN int sockfd,
-                   IN struct in_addr foreign_ip_addr,
-                   IN unsigned short foreign_ip_port )
+                   IN SOCKET sockfd,
+                   IN struct sockaddr* foreign_sockaddr )
 {
     int ret;
 
@@ -120,8 +118,8 @@ sock_init_with_ip( OUT SOCKINFO * info,
         return ret;
     }
 
-    info->foreign_ip_addr = foreign_ip_addr;
-    info->foreign_ip_port = foreign_ip_port;
+    memcpy( &info->foreign_sockaddr, foreign_sockaddr, 
+        sizeof( info->foreign_sockaddr) );
 
     return UPNP_E_SUCCESS;
 }
@@ -149,9 +147,11 @@ int
 sock_destroy( INOUT SOCKINFO * info,
               int ShutdownMethod )
 {
-    shutdown( info->socket, ShutdownMethod );
-    if( UpnpCloseSocket( info->socket ) == -1 ) {
-        return UPNP_E_SOCKET_ERROR;
+    if( info->socket != INVALID_SOCKET ) {
+        shutdown( info->socket, ShutdownMethod );
+        if( UpnpCloseSocket( info->socket ) == -1 ) {
+            return UPNP_E_SOCKET_ERROR;
+        }
     }
 
     return UPNP_E_SUCCESS;
@@ -190,7 +190,7 @@ sock_read_write( IN SOCKINFO * info,
     struct timeval timeout;
     int numBytes;
     time_t start_time = time( NULL );
-    int sockfd = info->socket;
+    SOCKET sockfd = info->socket;
     long bytes_sent = 0,
       byte_left = 0,
       num_written;
@@ -202,9 +202,9 @@ sock_read_write( IN SOCKINFO * info,
     FD_ZERO( &readSet );
     FD_ZERO( &writeSet );
     if( bRead ) {
-        FD_SET( ( unsigned )sockfd, &readSet );
+        FD_SET( sockfd, &readSet );
     } else {
-        FD_SET( ( unsigned )sockfd, &writeSet );
+        FD_SET( sockfd, &writeSet );
     }
 
     timeout.tv_sec = *timeoutSecs;

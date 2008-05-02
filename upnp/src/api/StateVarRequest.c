@@ -18,7 +18,7 @@ struct SUpnpStateVarRequest
 	UpnpString *m_devUDN;
 	UpnpString *m_serviceID;
 	UpnpString *m_stateVarName;
-	struct in_addr m_ctrlPtIPAddr;
+	struct sockaddr_storage m_ctrlPtIPAddr;
 	DOMString m_currentVal;
 };
 
@@ -36,7 +36,7 @@ UpnpStateVarRequest *UpnpStateVarRequest_new()
 	p->m_serviceID = UpnpString_new();
 	p->m_stateVarName = UpnpString_new();
 #if 0
-	memset(&q->m_ctrlPtIPAddr, 0, sizeof (struct in_addr));
+	memset(&q->m_ctrlPtIPAddr, 0, sizeof (struct sockaddr_storage));
 	p->m_currentVal = NULL;
 #endif
 
@@ -64,7 +64,7 @@ void UpnpStateVarRequest_delete(UpnpStateVarRequest *p)
 	UpnpString_delete(q->m_stateVarName);
 	q->m_stateVarName = NULL;
 
-	memset(&q->m_ctrlPtIPAddr, 0, sizeof (struct in_addr));
+	memset(&q->m_ctrlPtIPAddr, 0, sizeof (struct sockaddr_storage));
 
 	ixmlFreeDOMString(q->m_currentVal);
 	q->m_currentVal = NULL;
@@ -190,13 +190,13 @@ void UpnpStateVarRequest_strcpy_StateVarName(UpnpStateVarRequest *p, const char 
 }
 
 
-struct in_addr *UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStateVarRequest *p)
+struct sockaddr_storage *UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStateVarRequest *p)
 {
 	return &((struct SUpnpStateVarRequest *)p)->m_ctrlPtIPAddr;
 }
 
 
-void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, struct in_addr *ia)
+void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, struct sockaddr_storage *ia)
 {
 	((struct SUpnpStateVarRequest *)p)->m_ctrlPtIPAddr = *ia;
 }

@@ -84,11 +84,12 @@ struct Handle_Info
                                 //URL information
     int MaxSubscriptions;
     int MaxSubscriptionTimeOut;
+    int DeviceAf;               // Address family: AF_INET or AF_INET6
 #endif
      
     // Client only
 #ifdef INCLUDE_CLIENT_APIS
-    ClientSubscription *ClientSubList; //client subscription list
+    ClientSubscription *ClientSubList; // client subscription list
     LinkedList SsdpSearchList; // active ssdp searches   
 #endif
     int   aliasInstalled;       // 0 = not installed; otherwise installed
@@ -116,13 +117,20 @@ Upnp_Handle_Type GetHandleInfo(int Hnd, struct Handle_Info **HndInfo);
 
 Upnp_Handle_Type GetClientHandleInfo(int *client_handle_out, 
                                      struct Handle_Info **HndInfo);
-Upnp_Handle_Type GetDeviceHandleInfo(int *device_handle_out, 
-                                     struct Handle_Info **HndInfo);
+Upnp_Handle_Type GetDeviceHandleInfo( const int AddressFamily,
+                                      int *device_handle_out, 
+                                      struct Handle_Info **HndInfo);
 
 
-extern char LOCAL_HOST[LINE_SIZE];
+extern char gIF_NAME[LINE_SIZE];
+extern char gIF_IPV4[22];        // INET_ADDRSTRLEN
+extern char gIF_IPV6[65];        // INET6_ADDRSTRLEN
+extern int  gIF_INDEX;
 
-extern unsigned short LOCAL_PORT;
+extern unsigned short LOCAL_PORT_V4;
+extern unsigned short LOCAL_PORT_V6;
+
+extern Upnp_SID gUpnpSdkNLSuuid;     // NLS uuid.
 
 extern TimerThread gTimerThread;
 extern ThreadPool gRecvThreadPool;
@@ -170,6 +178,14 @@ typedef enum { WEB_SERVER_DISABLED, WEB_SERVER_ENABLED } WebServerState;
 
 #define E_HTTP_SYNTAX -6
 
+#ifdef WIN32
+int WinsockInit();
+#endif
+int UpnpInitPreamble();
+int UpnpInitMutexes();
+int UpnpInitThreadPools();
+int UpnpInitStartServers(unsigned short DestPort); 
+int UpnpGetIfInfo(const char *IfName);
 void InitHandleList();
 int GetFreeHandle();
 int FreeHandle(int Handle);
@@ -177,7 +193,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam * Param);
 
 
 void AutoAdvertise(void *input); 
-int getlocalhostname(char *out);
+int getlocalhostname(char *out, const int out_len);
 
 extern WebServerState bWebServerState;
 

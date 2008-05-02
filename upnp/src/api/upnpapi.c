@@ -71,6 +71,8 @@
 #include "ssdplib.h"
 #include "soaplib.h"
 #include "ThreadPool.h"
+#include "sysdep.h"
+#include "uuid.h"
 
 
 // Needed for GENA
@@ -97,6 +99,8 @@ CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
 // Mutex to synchronize the uuid creation process
     ithread_mutex_t gUUIDMutex;
 
+    ithread_mutex_t gSDKInitMutex = PTHREAD_MUTEX_INITIALIZER;
+
     TimerThread gTimerThread;
 
     ThreadPool gSendThreadPool;
@@ -106,11 +110,21 @@ CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
 //Flag to indicate the state of web server
      WebServerState bWebServerState = WEB_SERVER_DISABLED;
 
-// static buffer to store the local host ip address or host name
-     char LOCAL_HOST[LINE_SIZE];
+// Static buffer to contain interface name. (extern'ed in upnp.h)
+     char gIF_NAME[LINE_SIZE] = { '\0' };
 
-// local port for the mini-server
-     unsigned short LOCAL_PORT;
+// Static buffer to contain interface IPv4 address. (extern'ed in upnp.h)
+     char gIF_IPV4[22]/* INET_ADDRSTRLEN*/ = { '\0' };
+
+// Static buffer to contain interface IPv6 address. (extern'ed in upnp.h)
+     char gIF_IPV6[65]/* INET6_ADDRSTRLEN*/ = { '\0' };
+
+// Contains interface index. (extern'ed in upnp.h)
+     int  gIF_INDEX = -1;
+
+// local IPv4 and IPv6 ports for the mini-server
+     unsigned short LOCAL_PORT_V4;
+     unsigned short LOCAL_PORT_V6;
 
 // UPnP device and control point handle table 
      void *HandleTable[NUM_HANDLE];
@@ -130,202 +144,169 @@ size_t g_maxContentLength = DEFAULT_SOAP_CONTENT_LENGTH; // in bytes
 //    = 0 if uninitialized, = 1 if initialized.
      int UpnpSdkInit = 0;
 
-// Global variable to denote the state of Upnp SDK device registration.
-// = 0 if unregistered, = 1 if registered.
-     int UpnpSdkDeviceRegistered = 0;
-
 // Global variable to denote the state of Upnp SDK client registration.
 // = 0 if unregistered, = 1 if registered.
      int UpnpSdkClientRegistered = 0;
+
+// Global variable to denote the state of Upnp SDK IPv4 device registration.
+// = 0 if unregistered, = 1 if registered.
+     int UpnpSdkDeviceRegisteredV4 = 0;
+
+// Global variable to denote the state of Upnp SDK IPv6 device registration.
+// = 0 if unregistered, = 1 if registered.
+     int UpnpSdkDeviceregisteredV6 = 0;
+
+// Global variable used in discovery notifications.
+     Upnp_SID gUpnpSdkNLSuuid;
+
+
+/****************************************************************************
+ * Function: UpnpInit2
+ *
+ * Parameters:		
+ *	IN const char * IfName: Name of local interface.
+ *	IN short DestPort: Local Port to listen for incoming connections.
+ *
+ * Description:
+ *	- Initializes the UPnP SDK.
+ *  - Checks IfName interface. If NULL, we find a suitable interface for 
+ *    operation.
+ *
+ * Returns:
+ *	UPNP_E_SUCCESS on success, nonzero on failure.
+ *	UPNP_E_INIT_FAILED if Initialization fails.
+ *	UPNP_E_INIT if UPnP is already initialized.
+ *	UPNP_E_INVALID_INTERFACE if interface provided is not configured with at
+ *		least one valid IP address.
+ *****************************************************************************/
+int UpnpInit2( IN const char *IfName,
+               IN unsigned short DestPort )
+{
+    int retVal;
+
+    ithread_mutex_lock( &gSDKInitMutex );
+
+    // Check if we're already initialized.
+    if( UpnpSdkInit == 1 ) {
+        ithread_mutex_unlock( &gSDKInitMutex );
+        return UPNP_E_INIT;
+    }
+
+    // Perform initialization preamble.
+    retVal = UpnpInitPreamble();
+    if( retVal != UPNP_E_SUCCESS ) {
+        ithread_mutex_unlock( &gSDKInitMutex );
+        return retVal;
+    }
+
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "UpnpInit2 with IfName=%s, DestPort=%d.\n", 
+        IfName ? IfName : "", DestPort );
+
+    // Retrieve interface information (Addresses, index, etc).
+    retVal = UpnpGetIfInfo( IfName );
+    if( retVal != UPNP_E_SUCCESS ) {
+        ithread_mutex_unlock( &gSDKInitMutex );
+        return retVal;
+    }
+
+    // Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized.
+    UpnpSdkInit = 1;
+
+    // Finish initializing the SDK.
+    retVal = UpnpInitStartServers( DestPort );
+    if( retVal != UPNP_E_SUCCESS ) {
+        UpnpSdkInit = 0;
+        ithread_mutex_unlock( &gSDKInitMutex );
+        return retVal;
+    }
+
+    ithread_mutex_unlock( &gSDKInitMutex );
+
+    return UPNP_E_SUCCESS;
+}
+
 
 /****************************************************************************
  * Function: UpnpInit
  *
  * Parameters:		
  *	IN const char * HostIP: Local IP Address
- *	IN short DestPort: Local Port to listen for incoming connections
+ *	IN short DestPort: Local Port to listen for incoming connections.
+ *
  * Description:
- *	Initializes 
- *		- Mutex objects, 
- *		- Handle Table
- *		- Thread Pool and Thread Pool Attributes
- *		- MiniServer(starts listening for incoming requests) 
- *			and WebServer (Sends request to the 
- *		        Upper Layer after HTTP Parsing)
- *		- Checks for IP Address passed as an argument. IF NULL, 
- *                gets local host name
- *		- Sets GENA and SOAP Callbacks.
- *		- Starts the timer thread.
+ *  ** DEPRECATED: Kept for backwards compatibility. **
+ *  Use UpnpInit2 for new implementations.
+ *	- Initializes the UPnP SDK.
+ *  - Checks HostIP address. If NULL, we find a suitable IP for operation.
  *
  * Returns:
  *	UPNP_E_SUCCESS on success, nonzero on failure.
  *	UPNP_E_INIT_FAILED if Initialization fails.
- *	UPNP_E_INIT if UPnP is already initialized
+ *	UPNP_E_INIT if UPnP is already initialized.
  *****************************************************************************/
 int UpnpInit( IN const char *HostIP,
               IN unsigned short DestPort )
 {
-    int retVal = 0;
-    ThreadPoolAttr attr;
-#ifdef WIN32
-	WORD wVersionRequested;
-	WSADATA wsaData;
-	int err;
-#endif
+    int retVal;
 
+    ithread_mutex_lock( &gSDKInitMutex );
+
+    // Check if we're already initialized.
     if( UpnpSdkInit == 1 ) {
-        // already initialized
+        ithread_mutex_unlock( &gSDKInitMutex );
         return UPNP_E_INIT;
     }
 
-#ifdef WIN32
-	wVersionRequested = MAKEWORD( 2, 2 );
-
-	err = WSAStartup( wVersionRequested, &wsaData );
-	if ( err != 0 ) {
-		/* Tell the user that we could not find a usable */
-		/* WinSock DLL.                                  */
-		return UPNP_E_INIT_FAILED;
-	}
-
-	/* Confirm that the WinSock DLL supports 2.2.*/
-	/* Note that if the DLL supports versions greater    */
-	/* than 2.2 in addition to 2.2, it will still return */
-	/* 2.2 in wVersion since that is the version we      */
-	/* requested.                                        */
-	 
-	if ( LOBYTE( wsaData.wVersion ) != 2 ||
-			HIBYTE( wsaData.wVersion ) != 2 ) {
-		/* Tell the user that we could not find a usable */
-		/* WinSock DLL.                                  */
-		WSACleanup( );
-		return UPNP_E_INIT_FAILED; 
-	}
-
-	/* The WinSock DLL is acceptable. Proceed. */
-#endif
-
-    membuffer_init( &gDocumentRootDir );
-
-    srand( time( NULL ) );      // needed by SSDP or other parts
-
-    if( UpnpInitLog() != UPNP_E_SUCCESS ) {
-             return UPNP_E_INIT_FAILED;
+    // Perform initialization preamble.
+    retVal = UpnpInitPreamble();
+    if( retVal != UPNP_E_SUCCESS ) {
+        ithread_mutex_unlock( &gSDKInitMutex );
+        return retVal;
     }
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Inside UpnpInit\n" );
-    // initialize mutex
-#ifdef __CYGWIN__
-        /* On Cygwin, pthread_mutex_init() fails without this memset. */
-        /* TODO: Fix Cygwin so we don't need this memset(). */
-        memset(&GlobalHndRWLock, 0, sizeof(GlobalHndRWLock));
-#endif
-    if (ithread_rwlock_init(&GlobalHndRWLock, NULL) != 0) {
-        return UPNP_E_INIT_FAILED;
-    }
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "UpnpInit with HostIP=%s, DestPort=%d.\n", 
+        HostIP ? HostIP : "", DestPort );
 
-    if (ithread_mutex_init(&gUUIDMutex, NULL) != 0) {
-        return UPNP_E_INIT_FAILED;
-    }
-    // initialize subscribe mutex
-#ifdef INCLUDE_CLIENT_APIS
-    if (ithread_mutex_init(&GlobalClientSubscribeMutex, NULL) != 0) {
-        return UPNP_E_INIT_FAILED;
-    }
-#endif
-
-    HandleLock();
+    // Verify HostIP, if provided, or find it ourselves.
     if( HostIP != NULL ) {
-        strcpy( LOCAL_HOST, HostIP );
+        strncpy( gIF_IPV4, HostIP, sizeof(gIF_IPV4) );
     } else {
-        if( getlocalhostname( LOCAL_HOST ) != UPNP_E_SUCCESS ) {
-            HandleUnlock();
+        if( getlocalhostname( gIF_IPV4, sizeof(gIF_IPV4) ) != UPNP_E_SUCCESS ) {
             return UPNP_E_INIT_FAILED;
         }
     }
 
-    if( UpnpSdkInit != 0 ) {
-        HandleUnlock();
-        return UPNP_E_INIT;
-    }
-
-    InitHandleList();
-    HandleUnlock();
-
-    TPAttrInit( &attr );
-    TPAttrSetMaxThreads( &attr, MAX_THREADS );
-    TPAttrSetMinThreads( &attr, MIN_THREADS );
-    TPAttrSetJobsPerThread( &attr, JOBS_PER_THREAD );
-    TPAttrSetIdleTime( &attr, THREAD_IDLE_TIME );
-    TPAttrSetMaxJobsTotal( &attr, MAX_JOBS_TOTAL );
-
-    if( ThreadPoolInit( &gSendThreadPool, &attr ) != UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        UpnpFinish();
-        return UPNP_E_INIT_FAILED;
-    }
-
-    if( ThreadPoolInit( &gRecvThreadPool, &attr ) != UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        UpnpFinish();
-        return UPNP_E_INIT_FAILED;
-    }
-
-    if( ThreadPoolInit( &gMiniServerThreadPool, &attr ) != UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        UpnpFinish();
-        return UPNP_E_INIT_FAILED;
-    }
-
+    // Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized.
     UpnpSdkInit = 1;
-#if EXCLUDE_SOAP == 0
-    SetSoapCallback( soap_device_callback );
-#endif
-#if EXCLUDE_GENA == 0
-    SetGenaCallback( genaCallback );
-#endif
 
-    if( ( retVal = TimerThreadInit( &gTimerThread,
-                                    &gSendThreadPool ) ) !=
-        UPNP_E_SUCCESS ) {
+    // Finish initializing the SDK.
+    retVal = UpnpInitStartServers( DestPort );
+    if( retVal != UPNP_E_SUCCESS ) {
         UpnpSdkInit = 0;
-        UpnpFinish();
+        ithread_mutex_unlock( &gSDKInitMutex );
         return retVal;
     }
-#if EXCLUDE_MINISERVER == 0
-    if( ( retVal = StartMiniServer( DestPort ) ) <= 0 ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-            "Miniserver failed to start" );
-        UpnpFinish();
-        UpnpSdkInit = 0;
-        if( retVal != -1 )
-            return retVal;
-        else                    // if miniserver is already running for unknown reasons!
-            return UPNP_E_INIT_FAILED;
-    }
-#endif
-    DestPort = retVal;
-    LOCAL_PORT = DestPort;
-
-#if EXCLUDE_WEB_SERVER == 0
-    if( ( retVal =
-          UpnpEnableWebserver( WEB_SERVER_ENABLED ) ) != UPNP_E_SUCCESS ) {
-        UpnpFinish();
-        UpnpSdkInit = 0;
-        return retVal;
-    }
-#endif
 
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Host Ip: %s Host Port: %d\n", LOCAL_HOST,
-        LOCAL_PORT );
+        "Host Ip: %s Host Port: %d\n", gIF_IPV4,
+        LOCAL_PORT_V4 );
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Exiting UpnpInit\n" );
+    ithread_mutex_unlock( &gSDKInitMutex );
 
     return UPNP_E_SUCCESS;
+}
 
-} /***************** end of UpnpInit ******************/
-
+/****************************************************************************
+ * Function: PrintThreadPoolStats
+ *
+ * Parameters:	
+ *
+ * Description:
+ *
+ * Return Values: (none)
+ *****************************************************************************/
 #ifdef DEBUG
 static void 
 PrintThreadPoolStats(
@@ -425,7 +406,9 @@ UpnpFinish()
     PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__, "MiniServer Thread Pool");
 
 #ifdef INCLUDE_DEVICE_APIS
-    if( GetDeviceHandleInfo( &device_handle, &temp ) == HND_DEVICE )
+    if( GetDeviceHandleInfo( AF_INET, &device_handle, &temp ) == HND_DEVICE )
+        UpnpUnRegisterRootDevice( device_handle );
+    if( GetDeviceHandleInfo( AF_INET6, &device_handle, &temp ) == HND_DEVICE )
         UpnpUnRegisterRootDevice( device_handle );
 #endif
 
@@ -481,7 +464,7 @@ UpnpFinish()
  * Parameters: NONE
  *
  * Description:
- *	Gives back the miniserver port.
+ *	Gives back the IPv4 listening miniserver port.
  *
  * Return Values:
  *	local port on success, zero on failure.
@@ -493,7 +476,28 @@ UpnpGetServerPort( void )
     if( UpnpSdkInit != 1 )
         return 0;
 
-    return LOCAL_PORT;
+    return LOCAL_PORT_V4;
+}
+
+/******************************************************************************
+ * Function: UpnpGetServerPort6
+ *
+ * Parameters: NONE
+ *
+ * Description:
+ *	Gives back the IPv6 listening miniserver port.
+ *
+ * Return Values:
+ *	local port on success, zero on failure.
+ *****************************************************************************/
+unsigned short
+UpnpGetServerPort6( void )
+{
+
+    if( UpnpSdkInit != 1 )
+        return 0;
+
+    return LOCAL_PORT_V6;
 }
 
 /***************************************************************************
@@ -502,10 +506,10 @@ UpnpGetServerPort( void )
  * Parameters: NONE
  *
  * Description:
- *	Gives back the local ipaddress.
+ *	Gives back the local IPv4 ipaddress.
  *
  * Return Values: char *
- *	return the IP address string on success else NULL of failure
+ *	return the IPv4 address string on success else NULL of failure
  ***************************************************************************/
 char *
 UpnpGetServerIpAddress( void )
@@ -514,7 +518,28 @@ UpnpGetServerIpAddress( void )
     if( UpnpSdkInit != 1 )
         return NULL;
 
-    return LOCAL_HOST;
+    return gIF_IPV4;
+}
+
+/***************************************************************************
+ * Function: UpnpGetServerIp6Address
+ *
+ * Parameters: NONE
+ *
+ * Description:
+ *	Gives back the local IPv6 ipaddress.
+ *
+ * Return Values: char *
+ *	return the IPv6 address string on success else NULL of failure
+ ***************************************************************************/
+char *
+UpnpGetServerIp6Address( void )
+{
+
+    if( UpnpSdkInit != 1 )
+        return NULL;
+
+    return gIF_IPV6;
 }
 
 #ifdef INCLUDE_DEVICE_APIS
@@ -619,17 +644,17 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
 
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
         "Inside UpnpRegisterRootDevice\n" );
-    
-    HandleLock();
-    if( UpnpSdkDeviceRegistered ) {
-        HandleUnlock();
-        return UPNP_E_ALREADY_REGISTERED;
-    }
 
+    HandleLock();
     if( Hnd == NULL || Fun == NULL ||
         DescUrl == NULL || strlen( DescUrl ) == 0 ) {
         HandleUnlock();
         return UPNP_E_INVALID_PARAM;
+    }
+
+    if( UpnpSdkDeviceRegisteredV4 == 1 ) {
+        HandleUnlock();
+        return UPNP_E_ALREADY_REGISTERED;
     }
 
     if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
@@ -660,6 +685,7 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
     CLIENTONLY( HInfo->ClientSubList = NULL; )
     HInfo->MaxSubscriptions = UPNP_INFINITE;
     HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+    HInfo->DeviceAf = AF_INET;
 
     if( ( retVal =
           UpnpDownloadXmlDoc( HInfo->DescURL, &( HInfo->DescDocument ) ) )
@@ -712,13 +738,15 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
             "\nUpnpRegisterRootDevice2: Empty service table\n" );
     }
 
-    UpnpSdkDeviceRegistered = 1;
+    UpnpSdkDeviceRegisteredV4 = 1;
+
     HandleUnlock();
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
         "Exiting RegisterRootDevice Successfully\n" );
 
     return UPNP_E_SUCCESS;
 }
+
 
 #endif // INCLUDE_DEVICE_APIS
 
@@ -818,13 +846,6 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
         return UPNP_E_FINISH;
     }
 
-    HandleLock();
-    if( !UpnpSdkDeviceRegistered ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    HandleUnlock();
-
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
         "Inside UpnpUnRegisterRootDevice \n" );
 #if EXCLUDE_GENA == 0
@@ -840,7 +861,7 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
     HandleUnlock();
 
 #if EXCLUDE_SSDP == 0
-    retVal = AdvertiseAndReply( -1, Hnd, 0, ( struct sockaddr_in * )NULL,
+    retVal = AdvertiseAndReply( -1, Hnd, 0, ( struct sockaddr * )NULL,
                                 ( char * )NULL, ( char * )NULL,
                                 ( char * )NULL, HInfo->MaxAge );
 #endif
@@ -863,8 +884,13 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
     }
 #endif // INTERNAL_WEB_SERVER
 
+    if( HInfo->DeviceAf == AF_INET ) {
+        UpnpSdkDeviceRegisteredV4 = 0;
+    } else if( HInfo->DeviceAf == AF_INET6 ) {
+        UpnpSdkDeviceregisteredV6 = 0;
+    }
+
     FreeHandle( Hnd );
-    UpnpSdkDeviceRegistered = 0;
     HandleUnlock();
 
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
@@ -920,24 +946,50 @@ GetNameForAlias( IN char *name,
  * Function: get_server_addr
  *
  * Parameters:	
- *	OUT struct sockaddr_in* serverAddr: pointer to server address
+ *	OUT struct sockaddr* serverAddr: pointer to server address
  *		structure 
  *
  * Description:
- *	This function fills the sockadr_in with miniserver information.
+ *	This function fills the sockadr with IPv4 miniserver information.
  *
  * Return Values: VOID
  *      
  ***************************************************************************/
 static void
-get_server_addr( OUT struct sockaddr_in *serverAddr )
+get_server_addr( OUT struct sockaddr *serverAddr )
 {
-    memset( serverAddr, 0, sizeof( struct sockaddr_in ) );
+    struct sockaddr_in* sa4 = (struct sockaddr_in*)serverAddr;
 
-    serverAddr->sin_family = AF_INET;
-    serverAddr->sin_port = htons( LOCAL_PORT );
-    //inet_aton( LOCAL_HOST, &serverAddr->sin_addr );
-    serverAddr->sin_addr.s_addr = inet_addr( LOCAL_HOST );
+    memset( serverAddr, 0, sizeof(struct sockaddr_storage) );
+
+    sa4->sin_family = AF_INET;
+    inet_pton( AF_INET, gIF_IPV4, &sa4->sin_addr );
+    sa4->sin_port = htons( LOCAL_PORT_V4 );
+}
+
+/**************************************************************************
+ * Function: get_server_addr6
+ *
+ * Parameters:	
+ *	OUT struct sockaddr* serverAddr: pointer to server address
+ *		structure 
+ *
+ * Description:
+ *	This function fills the sockadr with IPv6 miniserver information.
+ *
+ * Return Values: VOID
+ *      
+ ***************************************************************************/
+static void
+get_server_addr6( OUT struct sockaddr *serverAddr )
+{
+    struct sockaddr_in6* sa6 = (struct sockaddr_in6*)serverAddr;
+
+    memset( serverAddr, 0, sizeof(struct sockaddr_storage) );
+
+    sa6->sin6_family = AF_INET6;
+    inet_pton(AF_INET6, gIF_IPV6, &sa6->sin6_addr );
+    sa6->sin6_port = htons( LOCAL_PORT_V6 );
 }
 
 /**************************************************************************
@@ -949,8 +1001,9 @@ get_server_addr( OUT struct sockaddr_in *serverAddr )
  *	IN char* description:
  *	IN unsigned int bufferLen:
  *	IN int config_baseURL:
+ *	IN int AddressFamily:
  *	OUT IXML_Document **xmlDoc:
- *	OUT char descURL[LINE_SIZE]: 
+ *	OUT char descURL[LINE_SIZE]:
  *
  * Description:
  *	This function fills the sockadr_in with miniserver information.
@@ -963,6 +1016,7 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
                        IN char *description,
                        IN unsigned int bufferLen,
                        IN int config_baseURL,
+                       IN int AddressFamily,
                        OUT IXML_Document ** xmlDoc,
                        OUT char descURL[LINE_SIZE] )
 {
@@ -975,7 +1029,7 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
     size_t num_read;
     time_t last_modified;
     struct stat file_info;
-    struct sockaddr_in serverAddr;
+    struct sockaddr_storage serverAddr;
     int rc = UPNP_E_SUCCESS;
 
     if( description == NULL ) {
@@ -1054,10 +1108,13 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
             strcpy( aliasStr, temp_str );
         }
 
-        get_server_addr( &serverAddr );
+        if(AddressFamily == AF_INET)
+            get_server_addr( (struct sockaddr*)&serverAddr );
+        else 
+            get_server_addr6( (struct sockaddr*)&serverAddr );
 
         // config
-        retVal = configure_urlbase( *xmlDoc, &serverAddr,
+        retVal = configure_urlbase( *xmlDoc, (struct sockaddr*)&serverAddr,
                                     aliasStr, last_modified, descURL );
         if( retVal != UPNP_E_SUCCESS ) {
             ixmlDocument_free( *xmlDoc );
@@ -1088,6 +1145,7 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
  *	IN char* description:
  *	IN unsigned int bufferLen:
  *	IN int config_baseURL:
+ *	IN int AddressFamily:
  *	OUT IXML_Document **xmlDoc:
  *	OUT char *descURL: 
  *
@@ -1102,6 +1160,7 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
                        IN char *description,
                        IN unsigned int bufferLen,
                        IN int config_baseURL,
+                       IN int AddressFamily,
                        OUT IXML_Document ** xmlDoc,
                        OUT char *descURL )
 {
@@ -1184,7 +1243,7 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
     }
 
     HandleLock();
-    if( UpnpSdkDeviceRegistered ) {
+    if( UpnpSdkDeviceRegisteredV4 == 1 ) {
         HandleUnlock();
         return UPNP_E_ALREADY_REGISTERED;
     }
@@ -1206,7 +1265,8 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
 
     retVal = GetDescDocumentAndURL(
         descriptionType, description, bufferLen,
-        config_baseURL, &HInfo->DescDocument, HInfo->DescURL );
+        config_baseURL, AF_INET, 
+        &HInfo->DescDocument, HInfo->DescURL );
 
     if( retVal != UPNP_E_SUCCESS ) {
         FreeHandle( *Hnd );
@@ -1227,6 +1287,7 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
     CLIENTONLY( HInfo->ClientSubList = NULL; )
     HInfo->MaxSubscriptions = UPNP_INFINITE;
     HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+    HInfo->DeviceAf = AF_INET;
 
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "UpnpRegisterRootDevice2: Valid Description\n" );
@@ -1271,10 +1332,160 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
             "\nUpnpRegisterRootDevice2: Empty service table\n" );
     }
 
-    UpnpSdkDeviceRegistered = 1;
+    UpnpSdkDeviceRegisteredV4 = 1;
+
     HandleUnlock();
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting RegisterRootDevice2 Successfully\n" );
+
+    return UPNP_E_SUCCESS;
+}
+
+
+/****************************************************************************
+ * Function: UpnpRegisterRootDevice3
+ *
+ * Parameters:	
+ *	IN const char *DescUrl:Pointer to a string containing the 
+ *		description URL for this root device instance. 
+ *	IN Upnp_FunPtr Callback: Pointer to the callback function for 
+ *		receiving asynchronous events. 
+ *	IN const void *Cookie: Pointer to user data returned with the 
+ *		callback function when invoked.
+ *	OUT UpnpDevice_Handle *Hnd: Pointer to a variable to store the 
+ *		new device handle.
+ *  IN const int AddressFamily: Registration address family. Can be AF_INET 
+ *      or AF_INET6.
+ *
+ * Description:
+ *	This function registers a device application with
+ *	the UPnP Library.  A device application cannot make any other API
+ *	calls until it registers using this function.  
+ *
+ * Return Values:
+ *	UPNP_E_SUCCESS on success, nonzero on failure.
+ *****************************************************************************/
+int
+UpnpRegisterRootDevice3( IN const char *DescUrl,
+                         IN Upnp_FunPtr Fun,
+                         IN const void *Cookie,
+                         OUT UpnpDevice_Handle * Hnd,
+                         IN const int AddressFamily )
+{
+
+    struct Handle_Info *HInfo;
+    int retVal = 0;
+
+    if( UpnpSdkInit != 1 ) {
+        return UPNP_E_FINISH;
+    }
+
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Inside UpnpRegisterRootDevice\n" );
+    
+    HandleLock();
+    if( Hnd == NULL || Fun == NULL ||
+        DescUrl == NULL || strlen( DescUrl ) == 0 ||
+        (AddressFamily != AF_INET && AddressFamily != AF_INET6) ) {
+        HandleUnlock();
+        return UPNP_E_INVALID_PARAM;
+    }
+
+    if( ( AddressFamily == AF_INET && UpnpSdkDeviceRegisteredV4 == 1 ) ||
+        ( AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 1 ) ) {
+        HandleUnlock();
+        return UPNP_E_ALREADY_REGISTERED;
+    }
+
+    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
+        HandleUnlock();
+        return UPNP_E_OUTOF_MEMORY;
+    }
+
+    HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
+    if( HInfo == NULL ) {
+        HandleUnlock();
+        return UPNP_E_OUTOF_MEMORY;
+    }
+    HandleTable[*Hnd] = HInfo;
+
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Root device URL is %s\n", DescUrl );
+
+    HInfo->aliasInstalled = 0;
+    HInfo->HType = HND_DEVICE;
+    strcpy( HInfo->DescURL, DescUrl );
+    HInfo->Callback = Fun;
+    HInfo->Cookie = ( void * )Cookie;
+    HInfo->MaxAge = DEFAULT_MAXAGE;
+    HInfo->DeviceList = NULL;
+    HInfo->ServiceList = NULL;
+    HInfo->DescDocument = NULL;
+    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
+    CLIENTONLY( HInfo->ClientSubList = NULL; )
+    HInfo->MaxSubscriptions = UPNP_INFINITE;
+    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+    HInfo->DeviceAf = AddressFamily;
+
+    if( ( retVal =
+          UpnpDownloadXmlDoc( HInfo->DescURL, &( HInfo->DescDocument ) ) )
+        != UPNP_E_SUCCESS ) {
+        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
+        FreeHandle( *Hnd );
+        HandleUnlock();
+        return retVal;
+    }
+
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice: Valid Description\n" );
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice: DescURL : %s\n",
+        HInfo->DescURL );
+
+    HInfo->DeviceList =
+        ixmlDocument_getElementsByTagName( HInfo->DescDocument, "device" );
+    if( !HInfo->DeviceList ) {
+        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
+        ixmlDocument_free( HInfo->DescDocument );
+        FreeHandle( *Hnd );
+        HandleUnlock();
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice: No devices found for RootDevice\n" );
+        return UPNP_E_INVALID_DESC;
+    }
+
+    HInfo->ServiceList = ixmlDocument_getElementsByTagName(
+        HInfo->DescDocument, "serviceList" );
+    if( !HInfo->ServiceList ) {
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice: No services found for RootDevice\n" );
+    }
+
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice: Gena Check\n" );
+    //*******************************
+    // GENA SET UP
+    //*******************************
+    if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
+            &HInfo->ServiceTable, HInfo->DescURL ) ) {
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice: GENA Service Table \n" );
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "Here are the known services: \n" );
+        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
+    } else {
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "\nUpnpRegisterRootDevice2: Empty service table\n" );
+    }
+
+    if( AddressFamily == AF_INET )
+        UpnpSdkDeviceRegisteredV4 = 1;
+    else
+        UpnpSdkDeviceregisteredV6 = 1;
+
+    HandleUnlock();
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Exiting RegisterRootDevice Successfully\n" );
 
     return UPNP_E_SUCCESS;
 }
@@ -1476,7 +1687,7 @@ UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
         Exp = DEFAULT_MAXAGE;
     SInfo->MaxAge = Exp;
     HandleUnlock();
-    retVal = AdvertiseAndReply( 1, Hnd, 0, ( struct sockaddr_in * )NULL,
+    retVal = AdvertiseAndReply( 1, Hnd, 0, ( struct sockaddr * )NULL,
                                 ( char * )NULL, ( char * )NULL,
                                 ( char * )NULL, Exp );
 
@@ -3376,6 +3587,607 @@ UpnpDownloadXmlDoc( const char *url,
 //
 //----------------------------------------------------------------------------
 
+#ifdef WIN32
+/****************************************************************************
+ * Function: WinsockInit
+ *
+ * Parameters:	NONE
+ *
+ * Description: (Windows Only)
+ *	Initializes the Windows Winsock library.
+ *
+ * Return Values:
+ *	UPNP_E_SUCCESS on success, UPNP_E_INIT_FAILED on failure.
+ *****************************************************************************/
+int WinsockInit( void )
+{
+	WORD wVersionRequested;
+	WSADATA wsaData;
+	int err;
+
+	wVersionRequested = MAKEWORD( 2, 2 );
+
+	err = WSAStartup( wVersionRequested, &wsaData );
+	if ( err != 0 ) {
+		/* Tell the user that we could not find a usable */
+		/* WinSock DLL.                                  */
+		return UPNP_E_INIT_FAILED;
+	}
+
+	/* Confirm that the WinSock DLL supports 2.2.*/
+	/* Note that if the DLL supports versions greater    */
+	/* than 2.2 in addition to 2.2, it will still return */
+	/* 2.2 in wVersion since that is the version we      */
+	/* requested.                                        */
+	 
+	if ( LOBYTE( wsaData.wVersion ) != 2 ||
+			HIBYTE( wsaData.wVersion ) != 2 ) {
+		/* Tell the user that we could not find a usable */
+		/* WinSock DLL.                                  */
+		WSACleanup( );
+		return UPNP_E_INIT_FAILED; 
+	}
+    return UPNP_E_SUCCESS;
+}
+#endif
+
+
+/****************************************************************************
+ * Function: UpnpInitPreamble
+ *
+ * Parameters: (none)
+ *
+ * Description:
+ *   This function performs the initial steps in initializing the UPnP SDK.
+ *   - Winsock library is initialized for the process (Windows specific).
+ *   - The logging (for debug messages) is initialized.
+ *   - Mutexes, Handle table and thread pools are allocated and initialized.
+ *   - Callback functions for SOAP and GENA are set, if they're enabled.
+ *   - The SDK timer thread is initialized.
+ *
+ * Returns:
+ *	UPNP_E_SUCCESS on success
+ *****************************************************************************/
+int UpnpInitPreamble()
+{
+    uuid_upnp nls_uuid;
+    int retVal = 0;
+
+#ifdef WIN32
+    retVal = WinsockInit();
+    if( retVal != UPNP_E_SUCCESS ){
+        return retVal;
+    }
+	/* The WinSock DLL is acceptable. Proceed. */
+#endif
+
+    srand( (unsigned int)time( NULL ) );      // needed by SSDP or other parts
+
+    // Initialize debug output.
+    retVal = UpnpInitLog();
+    if( retVal != UPNP_E_SUCCESS ) {
+        // UpnpInitLog does not return a valid UPNP_E_*
+        return UPNP_E_INIT_FAILED;
+    }
+
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Inside UpnpInitPreamble\n" );
+
+   // Initialize SDK global mutexes.
+    retVal = UpnpInitMutexes();
+    if( retVal != UPNP_E_SUCCESS ) {
+        return retVal;
+    }
+
+    // Create the NLS uuid.
+    uuid_create(&nls_uuid);
+    uuid_unpack(&nls_uuid, gUpnpSdkNLSuuid);
+
+    // Init the handle list.
+    HandleLock();
+    InitHandleList();
+    HandleUnlock();
+
+    // Initialize SDK global thread pools.
+    retVal = UpnpInitThreadPools();
+    if( retVal != UPNP_E_SUCCESS ) {
+        return retVal;
+    }
+
+#if EXCLUDE_SOAP == 0
+    SetSoapCallback( soap_device_callback );
+#endif
+
+#if EXCLUDE_GENA == 0
+    SetGenaCallback( genaCallback );
+#endif
+
+    // Initialize the SDK timer thread.
+    retVal = TimerThreadInit( &gTimerThread, &gSendThreadPool );
+    if( retVal != UPNP_E_SUCCESS ) {
+        UpnpFinish();
+        return retVal;
+    }
+
+    return UPNP_E_SUCCESS;
+}
+
+
+/****************************************************************************
+ * Function: UpnpInitMutexes
+ *
+ * Parameters: (none)
+ *
+ * Description:
+ *   This function initializes the global mutexes used by the UPnP SDK.
+ *
+ * Returns:
+ *	UPNP_E_SUCCESS on success
+ *  UPNP_E_INIT_FAILED if a mutex could not be initialized.
+ *****************************************************************************/
+int UpnpInitMutexes( void )
+{
+#ifdef __CYGWIN__
+    /* On Cygwin, pthread_mutex_init() fails without this memset. */
+    /* TODO: Fix Cygwin so we don't need this memset(). */
+    memset(&GlobalHndRWLock, 0, sizeof(GlobalHndRWLock));
+#endif
+    if (ithread_rwlock_init(&GlobalHndRWLock, NULL) != 0) {
+        return UPNP_E_INIT_FAILED;
+    }
+
+    if (ithread_mutex_init(&gUUIDMutex, NULL) != 0) {
+        return UPNP_E_INIT_FAILED;
+    }
+    // initialize subscribe mutex
+#ifdef INCLUDE_CLIENT_APIS
+    if (ithread_mutex_init(&GlobalClientSubscribeMutex, NULL) != 0) {
+        return UPNP_E_INIT_FAILED;
+    }
+#endif
+    return UPNP_E_SUCCESS;
+}
+
+
+/****************************************************************************
+ * Function: UpnpInitThreadPools
+ *
+ * Parameters: (none)
+ *
+ * Description:
+ *   This function initializes the global threadm pools used by the UPnP SDK.
+ *
+ * Returns:
+ *	UPNP_E_SUCCESS on success
+ *  UPNP_E_INIT_FAILED if a mutex could not be initialized.
+ *****************************************************************************/
+int UpnpInitThreadPools( void )
+{
+    ThreadPoolAttr attr;
+
+    TPAttrInit( &attr );
+    TPAttrSetMaxThreads( &attr, MAX_THREADS );
+    TPAttrSetMinThreads( &attr, MIN_THREADS );
+    TPAttrSetJobsPerThread( &attr, JOBS_PER_THREAD );
+    TPAttrSetIdleTime( &attr, THREAD_IDLE_TIME );
+    TPAttrSetMaxJobsTotal( &attr, MAX_JOBS_TOTAL );
+
+    if( ThreadPoolInit( &gSendThreadPool, &attr ) != UPNP_E_SUCCESS ) {
+        UpnpSdkInit = 0;
+        UpnpFinish();
+        return UPNP_E_INIT_FAILED;
+    }
+
+    if( ThreadPoolInit( &gRecvThreadPool, &attr ) != UPNP_E_SUCCESS ) {
+        UpnpSdkInit = 0;
+        UpnpFinish();
+        return UPNP_E_INIT_FAILED;
+    }
+
+    if( ThreadPoolInit( &gMiniServerThreadPool, &attr ) != UPNP_E_SUCCESS ) {
+        UpnpSdkInit = 0;
+        UpnpFinish();
+        return UPNP_E_INIT_FAILED;
+    }
+    return UPNP_E_SUCCESS;
+}
+
+
+/****************************************************************************
+ * Function: UpnpInitStartServers
+ *
+ * Parameters:
+ *	IN short DestPort: Local Port to listen for incoming connections
+ *
+ * Description:
+ *  This function finishes initializing the UPnP SDK.
+ *  - The MiniServer is started, if enabled.
+ *  - The WebServer is started, if enabled.
+ *
+ * Returns:
+ *	UPNP_E_SUCCESS on success
+ *  UPNP_E_INIT_FAILED if a mutex could not be initialized.
+ *****************************************************************************/
+int UpnpInitStartServers( IN unsigned short DestPort )
+{
+    int retVal = 0;
+
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Entering UpnpInitStartServers\n" );
+
+#if EXCLUDE_MINISERVER == 0
+    LOCAL_PORT_V4 = DestPort;
+    LOCAL_PORT_V6 = DestPort;
+    retVal = StartMiniServer( &LOCAL_PORT_V4, &LOCAL_PORT_V6 );
+    if( retVal != UPNP_E_SUCCESS ) {
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "Miniserver failed to start" );
+        UpnpFinish();
+        return retVal;
+    }
+#endif
+
+#if EXCLUDE_WEB_SERVER == 0
+    membuffer_init( &gDocumentRootDir );
+    retVal = UpnpEnableWebserver( WEB_SERVER_ENABLED );
+    if( retVal != UPNP_E_SUCCESS ) {
+        UpnpFinish();
+        return retVal;
+    }
+#endif
+
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Exiting UpnpInitStartServers\n" );
+
+    return UPNP_E_SUCCESS;
+}
+
+
+/**************************************************************************
+ * Function: UpnpGetIfInfo 
+ *
+ * Parameters:
+ *  char * IfName: Interface name (can be NULL).
+ *  
+ * Description:
+ *	This function will retrieve interface information and keep it in global
+ *  variables. If NULL, we'll find the first suitable interface for 
+ *  operation.
+ *  The interface must fulfill these requirements:
+ *  - Be UP.
+ *  - Not be LOOPBACK.
+ *  - Support MULTICAST.
+ *  - Have a valid IPv4 or IPv6 address.
+ *  We'll retrieve the following information from the interface:
+ *  - gIF_NAME -> Interface name (by input or found).
+ *  - gIF_IPV4 -> IPv4 address (if any).
+ *  - gIF_IPV6 -> IPv6 address (if any).
+ *  - gIF_INDEX -> Interface index number.
+ *
+ * Return Values:
+ *  UPNP_E_SUCCESS on success
+ *      
+ ***************************************************************************/
+int UpnpGetIfInfo( const char * IfName )
+{
+#ifdef WIN32
+    // ----------------------------------------------------
+    // WIN32 implementation will use the IpHlpAPI library.
+    // ----------------------------------------------------
+    PIP_ADAPTER_ADDRESSES adapts = NULL;
+    PIP_ADAPTER_ADDRESSES adapts_item;
+    PIP_ADAPTER_UNICAST_ADDRESS uni_addr;
+    SOCKADDR* ip_addr;
+    struct in_addr v4_addr;
+    struct in6_addr v6_addr;
+    ULONG adapts_sz = 0;
+    ULONG ret;
+    int ifname_found = 0;
+    int valid_addr_found = 0;
+
+    // Get Adapters addresses required size.
+    ret = GetAdaptersAddresses( AF_UNSPEC, GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_DNS_SERVER, NULL, adapts, &adapts_sz );
+    if( ret != ERROR_BUFFER_OVERFLOW ) {
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "GetAdaptersAddresses failed to find list of adapters\n" );
+        return UPNP_E_INIT;
+    }
+
+    // Allocate enough memory.
+    adapts = (PIP_ADAPTER_ADDRESSES)malloc( adapts_sz );
+    if( adapts == NULL ) {
+        return UPNP_E_OUTOF_MEMORY;
+    }
+
+    // Do the call that will actually return the info.
+    ret = GetAdaptersAddresses( AF_UNSPEC, GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_DNS_SERVER, NULL, adapts, &adapts_sz );
+    if( ret != ERROR_SUCCESS ) {
+        free( adapts );
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "GetAdaptersAddresses failed to find list of adapters\n" );
+        return UPNP_E_INIT;
+    }
+
+    // Copy interface name, if it was provided.
+    if( IfName != NULL ) {
+        if( strlen(IfName) > sizeof(gIF_NAME) )
+            return UPNP_E_INVALID_INTERFACE;
+
+        strncpy( gIF_NAME, IfName, sizeof(gIF_NAME) );
+        ifname_found = 1;
+    }
+
+    adapts_item = adapts;
+    while( adapts_item != NULL ) {
+
+        if( adapts_item->Flags & IP_ADAPTER_NO_MULTICAST ) {
+            continue;
+        }
+
+        if( ifname_found == 0 ) {
+            // We have found a valid interface name. Keep it.
+            strncpy( gIF_NAME, adapts_item->FriendlyName, sizeof(gIF_NAME) );
+            ifname_found = 1;
+        } else {
+            if( strncmp( gIF_NAME, adapts_item->FriendlyName, sizeof(gIF_NAME) ) != 0 ) {
+                // This is not the interface we're looking for.
+                continue;
+            }
+        }
+
+        // Loop thru this adapter's unicast IP addresses.
+        uni_addr = adapts_item->FirstUnicastAddress;
+        while( uni_addr ) {
+            ip_addr = uni_addr->Address.lpSockaddr;
+            switch( ip_addr->sa_family ) {
+            case AF_INET:
+                memcpy( &v4_addr, &((struct sockaddr_in *)ip_addr)->sin_addr, sizeof(v4_addr) );
+                valid_addr_found = 1;
+                break;
+            case AF_INET6:
+                // Only keep IPv6 link-local addresses.
+                if( IN6_IS_ADDR_LINKLOCAL(&((struct sockaddr_in6 *)ip_addr)->sin6_addr) ) {
+                    memcpy( &v6_addr, &((struct sockaddr_in6 *)ip_addr)->sin6_addr, sizeof(v6_addr) );
+                    valid_addr_found = 1;
+                }
+                break;
+            default:
+                if( valid_addr_found == 0 ) {
+                    // Address is not IPv4 or IPv6 and no valid address has 
+                    // yet been found for this interface. Discard interface name.
+                    ifname_found = 0;
+                }
+                break;
+            }
+
+            // Next address.
+            uni_addr = uni_addr->Next;
+        }
+
+        if( valid_addr_found == 1 ) {
+            gIF_INDEX = adapts_item->IfIndex;
+            break;
+        }
+        
+        // Next adapter.
+        adapts_item = adapts_item->Next;
+    }
+
+    // Failed to find a valid interface, or valid address.
+    if( ifname_found == 0  || valid_addr_found == 0 ) {
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "Failed to find an adapter with valid IP addresses for use.\n" );
+        return UPNP_E_INVALID_INTERFACE;
+    }
+
+    inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
+    inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
+#elif (defined(BSD) && BSD >= 199306)
+    struct ifaddrs *ifap, *ifa;
+    struct in_addr v4_addr;
+    struct in6_addr v6_addr;
+    int ifname_found = 0;
+    int valid_addr_found = 0;
+
+    // Copy interface name, if it was provided.
+    if( IfName != NULL ) {
+        if( strlen(IfName) > sizeof(gIF_NAME) )
+            return UPNP_E_INVALID_INTERFACE;
+
+        strncpy( gIF_NAME, IfName, sizeof(gIF_NAME) );
+        ifname_found = 1;
+    }
+
+    // Get system interface addresses.
+    if( getifaddrs(&ifap) != 0 ) {
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "getifaddrs failed to find list of addresses\n" );
+        return UPNP_E_INIT;
+    }
+
+    // cycle through available interfaces and their addresses.
+    for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        // Skip LOOPBACK interfaces, DOWN interfaces and interfaces that 
+        // don't support MULTICAST.
+        if( ( ifa->ifa_flags & IFF_LOOPBACK )
+            || ( !( ifa->ifa_flags & IFF_UP ) ) 
+            || ( !( ifa->ifa_flags & IFF_MULTICAST ) ) ) {
+            continue;
+        }
+
+        if( ifname_found == 0 ) {
+            // We have found a valid interface name. Keep it.
+            strncpy( gIF_NAME, ifa->ifa_name, sizeof(gIF_NAME) );
+            ifname_found = 1;
+        } else {
+            if( strncmp( gIF_NAME, ifa->ifa_name, sizeof(gIF_NAME) ) != 0 ) {
+                // This is not the interface we're looking for.
+                continue;
+            }
+        }
+
+        // Keep interface addresses for later.
+        switch( ifa->ifa_addr->sa_family )
+        {
+        case AF_INET:
+            memcpy( &v4_addr, &((struct sockaddr_in *)(ifa->ifa_addr))->sin_addr, sizeof(v4_addr) );
+            valid_addr_found = 1;
+            break;
+        case AF_INET6:
+            // Only keep IPv6 link-local addresses.
+            if( IN6_IS_ADDR_LINKLOCAL(&((struct sockaddr_in6 *)(ifa->ifa_addr))->sin6_addr) ) {
+                memcpy( &v6_addr, &((struct sockaddr_in6 *)(ifa->ifa_addr))->sin6_addr, sizeof(v6_addr) );
+                valid_addr_found = 1;
+            }
+            break;
+        default:
+            if( valid_addr_found == 0 ) {
+                // Address is not IPv4 or IPv6 and no valid address has 
+                // yet been found for this interface. Discard interface name.
+                ifname_found = 0;
+            }
+            break;
+        }
+    }
+    freeifaddrs(ifap);
+
+    // Failed to find a valid interface, or valid address.
+    if( ifname_found == 0  || valid_addr_found == 0 ) {
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "Failed to find an adapter with valid IP addresses for use.\n" );
+        return UPNP_E_INVALID_INTERFACE;
+    }
+
+    inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
+    inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
+    gIF_INDEX = if_nametoindex(gIF_NAME);
+#else
+    char szBuffer[MAX_INTERFACES * sizeof( struct ifreq )];
+    struct ifconf ifConf;
+    struct ifreq ifReq;
+    FILE* inet6_procfd;
+    int i;
+    int LocalSock;
+    struct in6_addr v6_addr;
+    int if_idx;
+    char addr6[8][5];
+    char buf[65]; // INET6_ADDRSTRLEN
+    int ifname_found = 0;
+    int valid_addr_found = 0;
+
+    // Copy interface name, if it was provided.
+    if( IfName != NULL ) {
+        if( strlen(IfName) > sizeof(gIF_NAME) )
+            return UPNP_E_INVALID_INTERFACE;
+
+        strncpy( gIF_NAME, IfName, sizeof(gIF_NAME) );
+        ifname_found = 1;
+    }
+
+    // Create an unbound datagram socket to do the SIOCGIFADDR ioctl on. 
+    if( ( LocalSock = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP ) ) < 0 ) {
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "Can't create addrlist socket\n" );
+        return UPNP_E_INIT;
+    }
+
+    // Get the interface configuration information... 
+    ifConf.ifc_len = sizeof szBuffer;
+    ifConf.ifc_ifcu.ifcu_buf = ( caddr_t ) szBuffer;
+
+    if( ioctl( LocalSock, SIOCGIFCONF, &ifConf ) < 0 ) {
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "DiscoverInterfaces: SIOCGIFCONF returned error\n" );
+        return UPNP_E_INIT;
+    }
+
+    // Cycle through the list of interfaces looking for IP addresses. 
+    for( i = 0; i < ifConf.ifc_len ; ) {
+        struct ifreq *pifReq =
+            ( struct ifreq * )( ( caddr_t ) ifConf.ifc_req + i );
+        i += sizeof *pifReq;
+
+        // See if this is the sort of interface we want to deal with.
+        strcpy( ifReq.ifr_name, pifReq->ifr_name );
+        if( ioctl( LocalSock, SIOCGIFFLAGS, &ifReq ) < 0 ) {
+            UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+                "Can't get interface flags for %s:\n",
+                ifReq.ifr_name );
+        }
+
+        // Skip LOOPBACK interfaces, DOWN interfaces and interfaces that 
+        // don't support MULTICAST.
+        if( ( ifReq.ifr_flags & IFF_LOOPBACK )
+            || ( !( ifReq.ifr_flags & IFF_UP ) ) 
+            || ( !( ifReq.ifr_flags & IFF_MULTICAST ) ) ) {
+            continue;
+        }
+
+        if( ifname_found == 0 ) {
+            // We have found a valid interface name. Keep it.
+            strncpy( gIF_NAME, pifReq->ifr_name, sizeof(gIF_NAME) );
+            ifname_found = 1;
+        } else {
+            if( strncmp( gIF_NAME, pifReq->ifr_name, sizeof(gIF_NAME) ) != 0 ) {
+                // This is not the interface we're looking for.
+                continue;
+            }
+        }
+
+        // Check address family.
+        if( pifReq->ifr_addr.sa_family == AF_INET ) {
+            // Copy interface name, IPv4 address and interface index.
+            strncpy( gIF_NAME, pifReq->ifr_name, sizeof(gIF_NAME) );
+            inet_ntop(AF_INET, &((struct sockaddr_in*)&pifReq->ifr_addr)->sin_addr, gIF_IPV4, sizeof(gIF_IPV4));
+            gIF_INDEX = if_nametoindex(gIF_NAME);
+
+            valid_addr_found = 1;
+            break;
+        } else {
+            // Address is not IPv4
+            ifname_found = 0;
+        }
+    }
+    close( LocalSock );
+
+    // Failed to find a valid interface, or valid address.
+    if( ifname_found == 0  || valid_addr_found == 0 ) {
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "Failed to find an adapter with valid IP addresses for use.\n" );
+        return UPNP_E_INVALID_INTERFACE;
+    }
+    
+    // Try to get the IPv6 address for the same interface 
+    // from "/proc/net/if_inet6", if possible.
+    inet6_procfd = fopen( "/proc/net/if_inet6", "r" );
+    if( inet6_procfd != NULL ) {
+        while( fscanf(inet6_procfd,
+                "%4s%4s%4s%4s%4s%4s%4s%4s %02x %*02x %*02x %*02x %*20s\n",
+                addr6[0],addr6[1],addr6[2],addr6[3],
+                addr6[4],addr6[5],addr6[6],addr6[7], &if_idx) != EOF) {
+            // Get same interface as IPv4 address retrieved.
+            if( gIF_INDEX == if_idx ) {
+                snprintf(buf, sizeof(buf), "%s:%s:%s:%s:%s:%s:%s:%s",
+                    addr6[0],addr6[1],addr6[2],addr6[3],
+                    addr6[4],addr6[5],addr6[6],addr6[7]);
+                // Validate formed address and check for link-local.
+                if( inet_pton(AF_INET6, buf, &v6_addr) > 0 &&
+                    IN6_IS_ADDR_LINKLOCAL(&v6_addr) ) {
+                    // Got valid IPv6 link-local adddress.
+                    strncpy( gIF_IPV6, buf, sizeof(gIF_IPV6) );
+                    break;
+                }
+            }
+        }
+        fclose( inet6_procfd );
+    }
+#endif
+
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, 
+                "Interface name=%s, index=%d, v4=%s, v6=%s\n",
+                gIF_NAME, gIF_INDEX, gIF_IPV4, gIF_IPV6 );
+
+    return UPNP_E_SUCCESS;
+}
+
 
 /**************************************************************************
  * Function: UpnpThreadDistribution 
@@ -3560,6 +4372,7 @@ int GetFreeHandle()
  *		this function.
  *
  * Description:
+ *  NOTE: The logic around the use of this function should be revised.
  *	This function is to get client handle info
  *
  *  Return Values: HND_CLIENT, HND_INVALID
@@ -3587,38 +4400,45 @@ Upnp_Handle_Type GetClientHandleInfo(
 }
 
 /**************************************************************************
- * Function: GetDeviceHandleInfo 
+ * Function: GetDeviceHandleInfo
+ *  Retrieves the device handle and information of the first device of the
+ *  address family spcified.
  *
- * Parameters:	
- * 	IN UpnpDevice_Handle *device_handle_out:
- * 		device handle pointer (key for the client handle structure).
+ * Parameters:
+ *	IN int AddressFamily: 
+ * 	OUT UpnpDevice_Handle * device_handle_out: device handle pointer
  *	OUT struct Handle_Info **HndInfo:
  *		Device handle structure passed by this function.
  *  
  *  Description:
  *		This function is to get device handle info.
  *
- *  Return Values: HND_DEVICE, HND_INVALID
+ *  Return Values: HND_DEVICE or HND_INVALID
  *      
  ***************************************************************************/
 Upnp_Handle_Type GetDeviceHandleInfo(
+	const int AddressFamily,
 	UpnpDevice_Handle *device_handle_out,
 	struct Handle_Info **HndInfo)
 {
-	Upnp_Handle_Type ret = HND_DEVICE;
-	UpnpDevice_Handle device;
+    // Check if we've got a registered device of the address family specified.
+    if( (AddressFamily == AF_INET  && UpnpSdkDeviceRegisteredV4 == 0) ||
+        (AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 0) ) {
+        *device_handle_out = -1;
+        return HND_INVALID;
+    }
 
-	if (GetHandleInfo(1, HndInfo) == HND_DEVICE) {
-		device = 1;
-	} else if (GetHandleInfo(2, HndInfo) == HND_DEVICE) {
-		device = 2;
-	} else {
-		device = -1;
-		ret = HND_INVALID;
-	}
+    // Find it.
+    for( *device_handle_out=1; *device_handle_out < NUM_HANDLE; (*device_handle_out)++ ) {
+        if( GetHandleInfo( *device_handle_out, HndInfo ) == HND_DEVICE ) {
+            if( (*HndInfo)->DeviceAf == AddressFamily ) {
+                return HND_DEVICE;
+            }
+        }
+    }
 
-	*device_handle_out = device;
-	return ret;
+    *device_handle_out = -1;
+    return HND_INVALID;
 }
 
 /**************************************************************************
@@ -3782,6 +4602,7 @@ void printNodes( IXML_Node * tmpRoot, int depth )
  *
  * Parameters:	
  * 	OUT char *out: IP address of the interface.
+ *	IN int out_len: Length of the output buffer.
  *  
  * Description:
  *	This function is to get local IP address. It gets the ip address for 
@@ -3791,17 +4612,17 @@ void printNodes( IXML_Node * tmpRoot, int depth )
  *  Return Values: int
  *	UPNP_E_SUCCESS if successful else return appropriate error
  ***************************************************************************/
-    int getlocalhostname( OUT char *out ) {
-
+int getlocalhostname(OUT char *out, IN const int out_len)
+{
 #ifdef WIN32
- 	 struct hostent *h=NULL;
-    struct sockaddr_in LocalAddr;
+	struct hostent *h=NULL;
+	struct sockaddr_in LocalAddr;
 
- 		gethostname(out,LINE_SIZE);
+ 		gethostname(out, out_len);
  		h=gethostbyname(out);
  		if (h!=NULL){
  			memcpy(&LocalAddr.sin_addr,h->h_addr_list[0],4);
- 			strcpy( out, inet_ntoa(LocalAddr.sin_addr));
+ 			strncpy(out, inet_ntoa(LocalAddr.sin_addr), out_len);
  		}
  		return UPNP_E_SUCCESS;
 #elif (defined(BSD) && BSD >= 199306)
@@ -3830,7 +4651,7 @@ void printNodes( IXML_Node * tmpRoot, int depth )
             }
 
             strncpy( out, inet_ntoa( ((struct sockaddr_in *)(ifa->ifa_addr))->
-                sin_addr ), LINE_SIZE );
+                sin_addr ), out_len );
             out[LINE_SIZE-1] = '\0';
             UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
                 "Inside getlocalhostname : after strncpy %s\n",
@@ -3907,7 +4728,7 @@ void printNodes( IXML_Node * tmpRoot, int depth )
     }
     close( LocalSock );
 
-    strncpy( out, inet_ntoa( LocalAddr.sin_addr ), LINE_SIZE );
+    strncpy( out, inet_ntoa( LocalAddr.sin_addr ), out_len );
 
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Inside getlocalhostname : after strncpy %s\n",

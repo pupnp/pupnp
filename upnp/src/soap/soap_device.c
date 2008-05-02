@@ -592,6 +592,7 @@ static int
 get_device_info( IN http_message_t *request,
                  IN int isQuery,
                  IN IXML_Document *actionDoc,
+                 IN int AddressFamily,
                  OUT UpnpString *device_udn,
                  OUT UpnpString *service_id,
                  OUT Upnp_FunPtr *callback,
@@ -612,7 +613,8 @@ get_device_info( IN http_message_t *request,
 
     HandleLock();
 
-    if( GetDeviceHandleInfo( &device_hnd, &device_info ) != HND_DEVICE ) {
+    if( GetDeviceHandleInfo( AddressFamily, 
+        &device_hnd, &device_info ) != HND_DEVICE ) {
         goto error_handler;
     }
 
@@ -843,10 +845,10 @@ error_handler:
 *
 *	Note :
 ****************************************************************************/
-static UPNP_INLINE void
-handle_query_variable( IN SOCKINFO * info,
-                       IN http_message_t * request,
-                       IN IXML_Document * xml_doc )
+static UPNP_INLINE void handle_query_variable(
+	IN SOCKINFO *info,
+	IN http_message_t *request,
+	IN IXML_Document *xml_doc )
 {
     UpnpStateVarRequest *variable = UpnpStateVarRequest_new();
     Upnp_FunPtr soap_event_callback;
@@ -864,6 +866,7 @@ handle_query_variable( IN SOCKINFO * info,
     // get info for event
     err_code = get_device_info(
         request, 1, xml_doc,
+	info->foreign_sockaddr.ss_family,
         (UpnpString *)UpnpStateVarRequest_get_DevUDN(variable),
         (UpnpString *)UpnpStateVarRequest_get_ServiceID(variable),
         &soap_event_callback,
@@ -876,7 +879,7 @@ handle_query_variable( IN SOCKINFO * info,
 
     UpnpStateVarRequest_set_ErrCode(variable, UPNP_E_SUCCESS);
     UpnpStateVarRequest_strcpy_StateVarName(variable, var_name);
-    UpnpStateVarRequest_set_CtrlPtIPAddr(variable, &info->foreign_ip_addr);
+    UpnpStateVarRequest_set_CtrlPtIPAddr(variable, &info->foreign_sockaddr);
 
     // send event
     soap_event_callback( UPNP_CONTROL_GET_VAR_REQUEST, variable, cookie );
@@ -960,6 +963,7 @@ handle_invoke_action( IN SOCKINFO * info,
         request,
 	0,
 	xml_doc,
+	info->foreign_sockaddr.ss_family,
         devUDN,
         serviceID,
         &soap_event_callback,
@@ -975,7 +979,7 @@ handle_invoke_action( IN SOCKINFO * info,
     UpnpActionRequest_set_DevUDN(action, devUDN);
     UpnpActionRequest_set_ServiceID(action, serviceID);
     UpnpActionRequest_set_ActionRequest(action, actionRequestDoc);
-    UpnpActionRequest_set_CtrlPtIPAddr(action, &info->foreign_ip_addr);
+    UpnpActionRequest_set_CtrlPtIPAddr(action, &info->foreign_sockaddr);
 
     UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
 

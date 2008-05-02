@@ -69,8 +69,8 @@ IXML_Document *UpnpActionRequest_get_ActionResult(const UpnpActionRequest *p);
 void UpnpActionRequest_set_ActionResult(UpnpActionRequest *p, IXML_Document *d);
 
 /** IP address of the control point requesting this action */
-struct in_addr *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p);
-void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, struct in_addr *ia);
+struct sockaddr_storage *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p);
+void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, struct sockaddr_storage *ia);
 
 /** The DOM document containing the information from the SOAP header */
 IXML_Document *UpnpActionRequest_get_SoapHeader(const UpnpActionRequest *p);

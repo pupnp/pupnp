@@ -80,7 +80,7 @@ void send_search_result(IN void *data)
  * Parameters:
  *	IN http_message_t *hmsg:
  *		SSDP message from the device
- *	IN struct sockaddr_in *dest_addr:
+ *	IN struct sockaddr *dest_addr:
  *		Address of the device
  *	IN xboolean timeout:
  *		timeout kept by the control point while
@@ -100,9 +100,9 @@ void send_search_result(IN void *data)
  ***************************************************************************/
 void ssdp_handle_ctrlpt_msg(
 	IN http_message_t *hmsg,
-	IN struct sockaddr_in *dest_addr,
+	IN struct sockaddr *dest_addr,
 	IN xboolean timeout, // only in search reply
-	IN void *cookie )    // only in search reply
+	IN void *cookie)    // only in search reply
 {
     int handle;
     struct Handle_Info *ctrlpt_info = NULL;
@@ -336,50 +336,6 @@ end_ssdp_handle_ctrlpt_msg:
     UpnpDiscovery_delete(param);
 }
 
-/************************************************************************
-* Function : process_reply
-*
-* Parameters:
-*	IN char* request_buf: the response came from the device
-*	IN int buf_len: The length of the response buffer
-*	IN struct sockaddr_in* dest_addr: The address of the device
-*	IN void *cookie : cookie passed by the control point application
-*		at the time of sending search message
-*
-* Description:
-*	This function processes reply recevied from a search
-*
-* Returns: void
-*
-***************************************************************************/
-#ifndef WIN32
-#warning There are currently no uses of the function 'process_reply()' in the code.
-#warning 'process_reply()' is a candidate for removal.
-#else
-#pragma message("There are currently no uses of the function 'process_reply()' in the code.")
-#pragma message("'process_reply()' is a candidate for removal.")
-#endif
-static UPNP_INLINE void
-process_reply( IN char *request_buf,
-               IN int buf_len,
-               IN struct sockaddr_in *dest_addr,
-               IN void *cookie )
-{
-    http_parser_t parser;
-
-    parser_response_init( &parser, HTTPMETHOD_MSEARCH );
-
-    // parse
-    if( parser_append( &parser, request_buf, buf_len ) != PARSE_SUCCESS ) {
-        httpmsg_destroy( &parser.msg );
-        return;
-    }
-    // handle reply
-    ssdp_handle_ctrlpt_msg( &parser.msg, dest_addr, FALSE, cookie );
-
-    // done
-    httpmsg_destroy( &parser.msg );
-}
 
 /************************************************************************
 * Function : CreateClientRequestPacket
@@ -389,6 +345,7 @@ process_reply( IN char *request_buf,
 *	IN char *SearchTarget:Search Target
 *	IN int Mx dest_addr: Number of seconds to wait to 
 *		collect all the responses
+*	IN int AddressFamily: search address family
 *
 * Description:
 *	This function creates a HTTP search request packet 
@@ -400,13 +357,18 @@ process_reply( IN char *request_buf,
 static void
 CreateClientRequestPacket( IN char *RqstBuf,
                            IN int Mx,
-                           IN char *SearchTarget )
+                           IN char *SearchTarget,
+                           IN int AddressFamily )
 {
     char TempBuf[COMMAND_LEN];
 
     strcpy( RqstBuf, "M-SEARCH * HTTP/1.1\r\n" );
 
-    sprintf( TempBuf, "HOST: %s:%d\r\n", SSDP_IP, SSDP_PORT );
+    if (AddressFamily == AF_INET) {
+        sprintf( TempBuf, "HOST: %s:%d\r\n", SSDP_IP, SSDP_PORT );
+    } else if (AddressFamily == AF_INET6) {
+        sprintf( TempBuf, "HOST: [%s]:%d\r\n", SSDP_IPV6_LINKLOCAL, SSDP_PORT );
+    }
     strcat( RqstBuf, TempBuf );
     strcat( RqstBuf, "MAN: \"ssdp:discover\"\r\n" );
 
@@ -495,7 +457,17 @@ searchExpired( void *arg )
 *		This cokie will be returned to application in the callback.
 *
 * Description:
-*	This function creates and send the search request for a specific URL.
+*   This function implements the search request of the discovery phase.
+*   A M-SEARCH request is sent on the SSDP channel for both IPv4 and
+*   IPv6 addresses. The search target(ST) is required and must be one of
+*   the following:
+*       - "ssdp:all" : Search for all devices and services.
+*       - "ssdp:rootdevice" : Search for root devices only.
+*       - "uuid:<device-uuid>" : Search for a particular device.
+*       - "urn:schemas-upnp-org:device:<deviceType:v>"
+*       - "urn:schemas-upnp-org:service:<serviceType:v>"
+*       - "urn:<domain-name>:device:<deviceType:v>"
+*       - "urn:<domain-name>:service:<serviceType:v>"
 *
 * Returns: int
 *	1 if successful else appropriate error
@@ -506,18 +478,23 @@ SearchByTarget( IN int Mx,
                 IN void *Cookie )
 {
     char errorBuffer[ERROR_BUFFER_LEN];
-    int socklen = sizeof( struct sockaddr_in );
+    int socklen = sizeof( struct sockaddr_storage );
     int *id = NULL;
     int ret = 0;
-    char *ReqBuf;
-    struct sockaddr_in destAddr;
+    char ReqBufv4[BUFSIZE];
+    char ReqBufv6[BUFSIZE];
+    struct sockaddr_storage __ss_v4;
+    struct sockaddr_storage __ss_v6;
+    struct sockaddr_in* destAddr4 = (struct sockaddr_in*)&__ss_v4;
+    struct sockaddr_in6* destAddr6 = (struct sockaddr_in6*)&__ss_v6;
     fd_set wrSet;
     SsdpSearchArg *newArg = NULL;
     int timeTillRead = 0;
     int handle;
     struct Handle_Info *ctrlpt_info = NULL;
     enum SsdpSearchType requestType;
-    unsigned long addr = inet_addr( LOCAL_HOST );
+    unsigned long addrv4 = inet_addr( gIF_IPV4 );
+    int max_fd = 0;
 
     //ThreadData *ThData;
     ThreadPoolJob job;
@@ -527,12 +504,7 @@ SearchByTarget( IN int Mx,
         return UPNP_E_INVALID_PARAM;
     }
 
-    ReqBuf = (char *)malloc( BUFSIZE );
-    if( ReqBuf == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
-    }
-
-    UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, ">>> SSDP SEND >>>\n");
+    UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, "Inside SearchByTarget\n");
 
     timeTillRead = Mx;
 
@@ -542,21 +514,24 @@ SearchByTarget( IN int Mx,
         timeTillRead = MAX_SEARCH_TIME;
     }
 
-    CreateClientRequestPacket( ReqBuf, timeTillRead, St );
-    memset( ( char * )&destAddr, 0, sizeof( struct sockaddr_in ) );
+    CreateClientRequestPacket( ReqBufv4, timeTillRead, St, AF_INET );
+    CreateClientRequestPacket( ReqBufv6, timeTillRead, St, AF_INET6 );
 
-    destAddr.sin_family = AF_INET;
-    destAddr.sin_addr.s_addr = inet_addr( SSDP_IP );
-    destAddr.sin_port = htons( SSDP_PORT );
+    memset( &__ss_v4, 0, sizeof( __ss_v4 ) );
+    destAddr4->sin_family = AF_INET;
+    inet_pton( AF_INET, SSDP_IP, &destAddr4->sin_addr );
+    destAddr4->sin_port = htons( SSDP_PORT );
 
-    FD_ZERO( &wrSet );
-    FD_SET( gSsdpReqSocket, &wrSet );
+    memset( &__ss_v6, 0, sizeof( __ss_v6 ) );
+    destAddr6->sin6_family = AF_INET6;
+    inet_pton( AF_INET6, SSDP_IPV6_LINKLOCAL, &destAddr6->sin6_addr );
+    destAddr6->sin6_port = htons( SSDP_PORT );
+    destAddr6->sin6_scope_id = gIF_INDEX;
 
     // add search criteria to list
     HandleLock();
     if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
         HandleUnlock();
-        free( ReqBuf );
         return UPNP_E_INTERNAL_ERROR;
     }
 
@@ -578,34 +553,56 @@ SearchByTarget( IN int Mx,
     ListAddTail( &ctrlpt_info->SsdpSearchList, newArg );
     HandleUnlock();
 
-    ret = setsockopt( gSsdpReqSocket, IPPROTO_IP, IP_MULTICAST_IF,
-        (char *)&addr, sizeof (addr) );
+    FD_ZERO( &wrSet );
+    if( gSsdpReqSocket4 != INVALID_SOCKET ) {
+        setsockopt( gSsdpReqSocket4, IPPROTO_IP, IP_MULTICAST_IF,
+            (char *)&addrv4, sizeof (addrv4) );
+        FD_SET( gSsdpReqSocket4, &wrSet );
+        max_fd = max(max_fd, gSsdpReqSocket4);
+    }
+    if( gSsdpReqSocket6 != INVALID_SOCKET ) {
+        setsockopt( gSsdpReqSocket6, IPPROTO_IPV6, IPV6_MULTICAST_IF,
+            (char *)&gIF_INDEX, sizeof(gIF_INDEX) );
+        FD_SET( gSsdpReqSocket6, &wrSet );
+        max_fd = max(max_fd, gSsdpReqSocket6);
+    }
 
-    ret = select( gSsdpReqSocket + 1, NULL, &wrSet, NULL, NULL );
+    ret = select( max_fd + 1, NULL, &wrSet, NULL, NULL );
     if( ret == -1 ) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
             "SSDP_LIB: Error in select(): %s\n",
             errorBuffer );
-	shutdown( gSsdpReqSocket, SD_BOTH );
-        UpnpCloseSocket( gSsdpReqSocket );
-        free( ReqBuf );
+	    shutdown( gSsdpReqSocket4, SD_BOTH );
+        UpnpCloseSocket( gSsdpReqSocket4 );
+	    shutdown( gSsdpReqSocket6, SD_BOTH );
+        UpnpCloseSocket( gSsdpReqSocket6 );
 
         return UPNP_E_INTERNAL_ERROR;
-    } else if( FD_ISSET( gSsdpReqSocket, &wrSet ) ) {
+    } 
+    if( gSsdpReqSocket6 != INVALID_SOCKET && 
+        FD_ISSET( gSsdpReqSocket6, &wrSet ) ) {
         int NumCopy = 0;
         while( NumCopy < NUM_SSDP_COPY ) {
-            sendto( gSsdpReqSocket, ReqBuf, strlen( ReqBuf ), 0,
-                (struct sockaddr *)&destAddr, socklen );
+            sendto( gSsdpReqSocket6, ReqBufv6, strlen( ReqBufv6 ), 0,
+                (struct sockaddr *)&__ss_v6, socklen );
             NumCopy++;
             imillisleep( SSDP_PAUSE );
         }
     }
+    if( gSsdpReqSocket4 != INVALID_SOCKET && 
+        FD_ISSET( gSsdpReqSocket4, &wrSet ) ) {
+        int NumCopy = 0;
+        while( NumCopy < NUM_SSDP_COPY ) {
+            sendto( gSsdpReqSocket4, ReqBufv4, strlen( ReqBufv4 ), 0,
+                (struct sockaddr *)&__ss_v4, socklen );
+            NumCopy++;
+            imillisleep( SSDP_PAUSE );
+        }
+    } 
 
-    free( ReqBuf );
     return 1;
 }
 
 #endif // EXCLUDE_SSDP
 #endif // INCLUDE_CLIENT_APIS
-

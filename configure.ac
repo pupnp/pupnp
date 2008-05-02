@@ -149,7 +149,7 @@ dnl # "current:revision:age"
 dnl #
 dnl # - Code has changed in upnp
 dnl #	revision: 5 -> 6
-dnl # - Interface has changed in upnp
+dnl # - Interfaces have been changed, added and removed in upnp
 dnl #	current: 3 -> 4
 dnl #   revision: 6 -> 0
 dnl # - Interface has been removed in upnp

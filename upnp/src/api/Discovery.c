@@ -22,7 +22,7 @@ struct SUpnpDiscovery
 	UpnpString *m_os;
 	UpnpString *m_date;
 	UpnpString *m_ext;
-	struct sockaddr_in m_destAddr;
+	struct sockaddr m_destAddr;
 };
 
 
@@ -332,13 +332,13 @@ void UpnpDiscovery_strncpy_Ext(UpnpDiscovery *p, const char *s, int n)
 }
 
 
-struct sockaddr_in *UpnpDiscovery_get_DestAddr(const UpnpDiscovery *p)
+struct sockaddr *UpnpDiscovery_get_DestAddr(const UpnpDiscovery *p)
 {
 	return &((struct SUpnpDiscovery *)p)->m_destAddr;
 }
 
 
-void UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, struct sockaddr_in *sa)
+void UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, struct sockaddr *sa)
 {
 	((struct SUpnpDiscovery *)p)->m_destAddr = *sa;
 }
