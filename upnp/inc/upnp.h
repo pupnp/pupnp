@@ -540,13 +540,11 @@ enum UpnpOpenFileMode
 /** Returned when a control point application registers with {\bf
  *  UpnpRegisterClient}.  Client handles can only be used with 
  *  functions that operate with a client handle.  */
-
 typedef int  UpnpClient_Handle;
 
 /** Returned when a device application registers with {\bf
  *  UpnpRegisterRootDevice} or {\bf UpnpRegisterRootDevice2}.  Device handles 
  *  can only be used with functions that operate with a device handle.  */
-
 typedef int  UpnpDevice_Handle;
 
 /** @name UPnP_EventType
@@ -555,124 +553,106 @@ typedef int  UpnpDevice_Handle;
          reason for the callback.  The descriptions for each event
 	 type describe the contents of the {\bf Event} parameter.
   */
-
 enum Upnp_EventType_e {
+	/*
+	 * Control callbacks
+	 */
 
-  /*
-   * Control callbacks
-   */
+	/** Received by a device when a control point issues a control
+	 *  request.  The {\bf Event} parameter contains a pointer to a {\bf
+	 *  UpnpActionRequest} structure containing the action.  The application
+	 *  stores the results of the action in this structure. */
+	UPNP_CONTROL_ACTION_REQUEST,
 
-  /** Received by a device when a control point issues a control
-   *  request.  The {\bf Event} parameter contains a pointer to a {\bf
-   *  UpnpActionRequest} structure containing the action.  The application
-   *  stores the results of the action in this structure. */
+	/** A {\bf UpnpSendActionAsync} call completed. The {\bf Event}
+	 *  parameter contains a pointer to a {\bf UpnpActionComplete} structure
+	 *  with the results of the action.  */
+	UPNP_CONTROL_ACTION_COMPLETE,
 
-  UPNP_CONTROL_ACTION_REQUEST,
+	/** Received by a device when a query for a single service variable
+	 *  arrives.  The {\bf Event} parameter contains a pointer to a {\bf
+	 *  UpnpStateVarRequest} structure containing the name of the variable
+	 *  and value.  */
+	UPNP_CONTROL_GET_VAR_REQUEST,
 
-  /** A {\bf UpnpSendActionAsync} call completed. The {\bf Event}
-   *  parameter contains a pointer to a {\bf UpnpActionComplete} structure
-   *  with the results of the action.  */
+	/** A {\bf UpnpGetServiceVarStatus} call completed. The {\bf Event}
+	 *  parameter contains a pointer to a {\bf UpnpStateVarComplete} structure
+	 *  containing the value for the variable.  */
+	UPNP_CONTROL_GET_VAR_COMPLETE,
 
-  UPNP_CONTROL_ACTION_COMPLETE,
+	/*
+	 * Discovery callbacks
+	 */
 
-  /** Received by a device when a query for a single service variable
-   *  arrives.  The {\bf Event} parameter contains a pointer to a {\bf
-   *  UpnpStateVarRequest} structure containing the name of the variable
-   *  and value.  */
+	/** Received by a control point when a new device or service is available.  
+	 *  The {\bf Event} parameter contains a pointer to a {\bf
+	 *  UpnpDiscovery} structure with the information about the device
+	 *  or service.  */
+	UPNP_DISCOVERY_ADVERTISEMENT_ALIVE,
 
-  UPNP_CONTROL_GET_VAR_REQUEST,
+	/** Received by a control point when a device or service shuts down. The {\bf
+	 *  Event} parameter contains a pointer to a {\bf UpnpDiscovery}
+	 *  structure containing the information about the device or
+	 *  service.  */
+	UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE,
 
-  /** A {\bf UpnpGetServiceVarStatus} call completed. The {\bf Event}
-   *  parameter contains a pointer to a {\bf UpnpStateVarComplete} structure
-   *  containing the value for the variable.  */
+	/** Received by a control point when a matching device or service responds.
+	 *  The {\bf Event} parameter contains a pointer to a {\bf
+	 *  UpnpDiscovery} structure containing the information about
+	 *  the reply to the search request.  */
+	UPNP_DISCOVERY_SEARCH_RESULT,
 
-  UPNP_CONTROL_GET_VAR_COMPLETE,
+	/** Received by a control point when the search timeout expires.  The
+	 *  SDK generates no more callbacks for this search after this 
+	 *  event.  The {\bf Event} parameter is {\tt NULL}.  */
+	UPNP_DISCOVERY_SEARCH_TIMEOUT,
 
-  /*
-   * Discovery callbacks
-   */
+	/*
+	 * Eventing callbacks
+	 */
 
-  /** Received by a control point when a new device or service is available.  
-   *  The {\bf Event} parameter contains a pointer to a {\bf
-   *  UpnpDiscovery} structure with the information about the device
-   *  or service.  */
+	/** Received by a device when a subscription arrives.
+	 *  The {\bf Event} parameter contains a pointer to a {\bf
+	 *  UpnpSubscriptionRequest} structure.  At this point, the
+	 *  subscription has already been accepted.  {\bf UpnpAcceptSubscription}
+	 *  needs to be called to confirm the subscription and transmit the
+	 *  initial state table.  This can be done during this callback.  The SDK
+	 *  generates no events for a subscription unless the device 
+	 *  application calls {\bf UpnpAcceptSubscription}.
+	 */
+	UPNP_EVENT_SUBSCRIPTION_REQUEST,
 
-  UPNP_DISCOVERY_ADVERTISEMENT_ALIVE,
+	/** Received by a control point when an event arrives.  The {\bf
+	 *  Event} parameter contains a {\bf UpnpEvent} structure
+	 *  with the information about the event.  */
+	UPNP_EVENT_RECEIVED,
 
-  /** Received by a control point when a device or service shuts down. The {\bf
-   *  Event} parameter contains a pointer to a {\bf UpnpDiscovery}
-   *  structure containing the information about the device or
-   *  service.  */
+	/** A {\bf UpnpRenewSubscriptionAsync} call completed. The status of
+	 *  the renewal is in the {\bf Event} parameter as a {\bf
+	 *  Upnp_Event_Subscription} structure.  */
+	UPNP_EVENT_RENEWAL_COMPLETE,
 
-  UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE,
+	/** A {\bf UpnpSubscribeAsync} call completed. The status of the
+	 * subscription is in the {\bf Event} parameter as a {\bf
+	 * Upnp_Event_Subscription} structure.  */
+	UPNP_EVENT_SUBSCRIBE_COMPLETE,
 
-  /** Received by a control point when a matching device or service responds.
-   *  The {\bf Event} parameter contains a pointer to a {\bf
-   *  UpnpDiscovery} structure containing the information about
-   *  the reply to the search request.  */
+	/** A {\bf UpnpUnSubscribeAsync} call completed. The status of the
+	 *  subscription is in the {\bf Event} parameter as a {\bf
+	 *  EventSubscribe} structure.  */
+	UPNP_EVENT_UNSUBSCRIBE_COMPLETE,
 
-  UPNP_DISCOVERY_SEARCH_RESULT,
+	/** The auto-renewal of a client subscription failed.   
+	 *  The {\bf Event} parameter is a {\bf EventSubscribe} structure 
+	 *  with the error code set appropriately. The subscription is no longer 
+	 *  valid. */
+	UPNP_EVENT_AUTORENEWAL_FAILED,
 
-  /** Received by a control point when the search timeout expires.  The
-   *  SDK generates no more callbacks for this search after this 
-   *  event.  The {\bf Event} parameter is {\tt NULL}.  */
-
-  UPNP_DISCOVERY_SEARCH_TIMEOUT,
-
-  /*
-   * Eventing callbacks
-   */
-
-  /** Received by a device when a subscription arrives.
-   *  The {\bf Event} parameter contains a pointer to a {\bf
-   *  UpnpSubscriptionRequest} structure.  At this point, the
-   *  subscription has already been accepted.  {\bf UpnpAcceptSubscription}
-   *  needs to be called to confirm the subscription and transmit the
-   *  initial state table.  This can be done during this callback.  The SDK
-   *  generates no events for a subscription unless the device 
-   *  application calls {\bf UpnpAcceptSubscription}.
-   */
-
-  UPNP_EVENT_SUBSCRIPTION_REQUEST,
-
-  /** Received by a control point when an event arrives.  The {\bf
-   *  Event} parameter contains a {\bf UpnpEvent} structure
-   *  with the information about the event.  */
-
-  UPNP_EVENT_RECEIVED,
-
-  /** A {\bf UpnpRenewSubscriptionAsync} call completed. The status of
-   *  the renewal is in the {\bf Event} parameter as a {\bf
-   *  Upnp_Event_Subscription} structure.  */
-
-  UPNP_EVENT_RENEWAL_COMPLETE,
-
-  /** A {\bf UpnpSubscribeAsync} call completed. The status of the
-   * subscription is in the {\bf Event} parameter as a {\bf
-   * Upnp_Event_Subscription} structure.  */
-
-  UPNP_EVENT_SUBSCRIBE_COMPLETE,
-
-  /** A {\bf UpnpUnSubscribeAsync} call completed. The status of the
-   *  subscription is in the {\bf Event} parameter as a {\bf
-   *  EventSubscribe} structure.  */
-
-  UPNP_EVENT_UNSUBSCRIBE_COMPLETE,
-
-  /** The auto-renewal of a client subscription failed.   
-   *  The {\bf Event} parameter is a {\bf EventSubscribe} structure 
-   *  with the error code set appropriately. The subscription is no longer 
-   *  valid. */
-
-  UPNP_EVENT_AUTORENEWAL_FAILED,
-
-  /** A client subscription has expired. This will only occur 
-   *  if auto-renewal of subscriptions is disabled.
-   *  The {\bf Event} parameter is a {\bf EventSubscribe}
-   *  structure. The subscription is no longer valid. */
-  
-  UPNP_EVENT_SUBSCRIPTION_EXPIRED
-
+	/** A client subscription has expired. This will only occur 
+	 *  if auto-renewal of subscriptions is disabled.
+	 *  The {\bf Event} parameter is a {\bf EventSubscribe}
+	 *  structure. The subscription is no longer valid. */
+	UPNP_EVENT_SUBSCRIPTION_EXPIRED
 };
 
 typedef enum Upnp_EventType_e Upnp_EventType;
@@ -681,7 +661,6 @@ typedef enum Upnp_EventType_e Upnp_EventType;
     between a client and a device.  The SID is a string representation of
     a globally unique id (GUID) and should not be modified.
   */
-    
 typedef char Upnp_SID[44];
 
 /** @name Upnp_SType
@@ -692,21 +671,19 @@ typedef char Upnp_SID[44];
 	  can control the scope of the search from all devices
 	  to specific devices or services.
 */
-
 enum Upnp_SType_e {
-  /** Search for all devices and services on the network. */
-  UPNP_S_ALL,    
+	/** Search for all devices and services on the network. */
+	UPNP_S_ALL,    
 
-  /** Search for all root devices on the network. */
-  UPNP_S_ROOT,   
+	/** Search for all root devices on the network. */
+	UPNP_S_ROOT,   
 
-  /** Search for a particular device type or a particular device
-      instance. */
-  UPNP_S_DEVICE, 
-                       
-  /** Search for a particular service type, possibly on a particular
-   *  device type or device instance.  */
-  UPNP_S_SERVICE 
+	/** Search for a particular device type or a particular device instance. */
+	UPNP_S_DEVICE, 
+
+	/** Search for a particular service type, possibly on a particular
+	 *  device type or device instance.  */
+	UPNP_S_SERVICE 
 };
 
 typedef enum Upnp_SType_e Upnp_SType;
@@ -734,7 +711,6 @@ typedef enum Upnp_DescType_e Upnp_DescType;
 
 
 /* The type of handle returned by the web server for open requests. */
-
 typedef void *UpnpWebFileHandle;
 
 /** The {\bf UpnpVirtualDirCallbacks} structure contains the pointers to
@@ -743,97 +719,96 @@ typedef void *UpnpWebFileHandle;
  */
 struct UpnpVirtualDirCallbacks
 {
-    /** Called by the web server to query information on a file.  The callback
-     *  should return 0 on success or -1 on an error. */
-    int (*get_info) (
-        IN  const char *filename, /** The name of the file to query. */
-        OUT UpnpFileInfo *info       /** Pointer to a structure to store the 
-                                      information on the file. */
-    );
-                                  
-    /** Called by the web server to open a file.  The callback should return
-     *  a valid handle if the file can be opened.  Otherwise, it should return
-     *  {\tt NULL} to signify an error. */
-    UpnpWebFileHandle (*open)(
-        IN const char *filename,       /** The name of the file to open. */ 
-        IN enum UpnpOpenFileMode Mode  /** The mode in which to open the file. 
-                                           Valid values are {\tt UPNP_READ} or 
-                                           {\tt UPNP_WRITE}. */
-    );
+	/** Called by the web server to query information on a file.  The callback
+	 *  should return 0 on success or -1 on an error. */
+	int (*get_info) (
+		/** The name of the file to query. */
+		IN  const char *filename,
+		/** Pointer to a structure to store the information on the file. */
+		OUT UpnpFileInfo *info);
 
-  /** Called by the web server to perform a sequential read from an open
-   *  file.  The callback should copy {\bf buflen} bytes from the file into
-   *  the buffer.
-   *  @return [int] An integer representing one of the following:
-   *    \begin{itemize}
-   *      \item {\tt 0}:  The file contains no more data (EOF).
-   *      \item {\tt >0}: A successful read of the number of bytes in the 
-   *                      return code.
-   *      \item {\tt <0}: An error occurred reading the file.
-   *    \end{itemzie}
-   */
-   int (*read) (
-     IN UpnpWebFileHandle fileHnd,  /** The handle of the file to read. */
-     OUT char *buf,                 /** The buffer in which to place the 
-				        data. */
-     IN size_t buflen               /** The size of the buffer (i.e. the 
-                                        number of bytes to read). */
-     );
+	/** Called by the web server to open a file.  The callback should return
+	 *  a valid handle if the file can be opened.  Otherwise, it should return
+	 *  {\tt NULL} to signify an error. */
+	UpnpWebFileHandle (*open)(
+		/** The name of the file to open. */ 
+		IN const char *filename,
+		/** The mode in which to open the file.
+		 * Valid values are {\tt UPNP_READ} or {\tt UPNP_WRITE}. */
+		IN enum UpnpOpenFileMode Mode);
 
-  /** Called by the web server to perform a sequential write to an open
-   *  file.  The callback should write {\bf buflen} bytes into the file from
-   *  the buffer.  It should return the actual number of bytes written, 
-   *  which might be less than {\bf buflen} in the case of a write error.
-   */
-   int (*write) (
-     IN UpnpWebFileHandle fileHnd, /** The handle of the file to write. */
-     IN char *buf,                 /** The buffer with the bytes to write. */
-     IN size_t buflen              /** The number of bytes to write. */
-     );
+	/** Called by the web server to perform a sequential read from an open
+	 *  file.  The callback should copy {\bf buflen} bytes from the file into
+	 *  the buffer.
+	 *  @return [int] An integer representing one of the following:
+	 *    \begin{itemize}
+	 *      \item {\tt 0}:  The file contains no more data (EOF).
+	 *      \item {\tt >0}: A successful read of the number of bytes in the 
+	 *                      return code.
+	 *      \item {\tt <0}: An error occurred reading the file.
+	 *    \end{itemzie}
+	 */
+	int (*read) (
+		/** The handle of the file to read. */
+		IN UpnpWebFileHandle fileHnd,
+		/** The buffer in which to place the data. */
+		OUT char *buf,
+		/** The size of the buffer (i.e. the number of bytes to read). */
+		IN size_t buflen);
 
-  /** Called by the web server to move the file pointer, or offset, into
-   *  an open file.  The {\bf origin} parameter determines where to start
-   *  moving the file pointer.  A value of {\tt SEEK_CUR} moves the
-   *  file pointer relative to where it is.  The {\bf offset} parameter can
-   *  be either positive (move forward) or negative (move backward).  
-   *  {\tt SEEK_END} moves relative to the end of the file.  A positive 
-   *  {\bf offset} extends the file.  A negative {\bf offset} moves backward 
-   *  in the file.  Finally, {\tt SEEK_SET} moves to an absolute position in 
-   *  the file. In this case, {\bf offset} must be positive.  The callback 
-   *  should return 0 on a successful seek or a non-zero value on an error.
-   */
-   int (*seek) (
-     IN UpnpWebFileHandle fileHnd,  /** The handle of the file to move the 
-                                        file pointer. */
-     IN off_t offset,                /** The number of bytes to move in the 
-                                        file.  Positive values move foward and 
-                                        negative values move backward.  Note 
-                                        that this must be positive if the 
-                                        {\bf origin} is {\tt SEEK_SET}. */
-     IN int origin                  /** The position to move relative to.  It 
-                                        can be {\tt SEEK_CUR} to move relative 
-                                        to the current position, 
-					{\tt SEEK_END} to move relative to 
-					the end of the file, or {\tt 
-					SEEK_SET} to specify an absolute 
-					offset. */
-     );
+	/** Called by the web server to perform a sequential write to an open
+	 *  file.  The callback should write {\bf buflen} bytes into the file from
+	 *  the buffer.  It should return the actual number of bytes written, 
+	 *  which might be less than {\bf buflen} in the case of a write error.
+	 */
+	int (*write) (
+		/** The handle of the file to write. */
+		IN UpnpWebFileHandle fileHnd,
+		/** The buffer with the bytes to write. */
+		IN char *buf,
+		/** The number of bytes to write. */
+		IN size_t buflen);
 
-   /** Called by the web server to close a file opened via the {\bf open}
-    *  callback.  It should return 0 on success, or a non-zero value on an 
-    *  error.
-    */
-   int (*close) (
-     IN UpnpWebFileHandle fileHnd   /** The handle of the file to close. */
-     );
+	/** Called by the web server to move the file pointer, or offset, into
+	 *  an open file.  The {\bf origin} parameter determines where to start
+	 *  moving the file pointer.  A value of {\tt SEEK_CUR} moves the
+	 *  file pointer relative to where it is.  The {\bf offset} parameter can
+	 *  be either positive (move forward) or negative (move backward).  
+	 *  {\tt SEEK_END} moves relative to the end of the file.  A positive 
+	 *  {\bf offset} extends the file.  A negative {\bf offset} moves backward 
+	 *  in the file.  Finally, {\tt SEEK_SET} moves to an absolute position in 
+	 *  the file. In this case, {\bf offset} must be positive.  The callback 
+	 *  should return 0 on a successful seek or a non-zero value on an error.
+	 */
+	int (*seek) (
+		/** The handle of the file to move the file pointer. */
+		IN UpnpWebFileHandle fileHnd,
+		/** The number of bytes to move in the file.  Positive values
+		 * move foward and negative values move backward.  Note that
+		 * this must be positive if the {\bf origin} is {\tt SEEK_SET}. */
+		IN off_t offset,
+		/** The position to move relative to.  It can be {\tt SEEK_CUR}
+		 * to move relative to the current position, {\tt SEEK_END} to
+		 * move relative to the end of the file, or {\tt SEEK_SET} to
+		 * specify an absolute offset. */
+		IN int origin);
 
+	/** Called by the web server to close a file opened via the {\bf open}
+	 *  callback.  It should return 0 on success, or a non-zero value on an 
+	 *  error.
+	 */
+	int (*close) (
+		/** The handle of the file to close. */
+		IN UpnpWebFileHandle fileHnd);
 };
+
 
 typedef struct virtual_Dir_List
 {
-    struct virtual_Dir_List *next;
-    char dirName[NAME_SIZE];
+	struct virtual_Dir_List *next;
+	char dirName[NAME_SIZE];
 } virtualDirList;
+
 
 /** All callback functions share the same prototype, documented below.
  *  Note that any memory passed to the callback function
@@ -859,7 +834,6 @@ typedef struct virtual_Dir_List
  *  The return value of the callback is currently ignored.  It may be used
  *  in the future to communicate results back to the SDK.
  */
-
 typedef int (*Upnp_FunPtr)(IN Upnp_EventType EventType, IN void *Event, IN void *Cookie);
 
 /*! @} */ /* Constants, Structures, and Types */
