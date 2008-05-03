@@ -143,7 +143,7 @@ int		TvCtrlPointPrintDevice(int);
 void	TvCtrlPointAddDevice(IXML_Document *, const char *, int); 
 void    TvCtrlPointHandleGetVar(const char *, const char *, const DOMString);
 void	TvStateUpdate(char*,int, IXML_Document * , char **);
-void	TvCtrlPointHandleEvent(Upnp_SID, int, IXML_Document *); 
+void	TvCtrlPointHandleEvent(const UpnpString *, int, IXML_Document *); 
 void	TvCtrlPointHandleSubscribeUpdate(const char *, const Upnp_SID, int); 
 int		TvCtrlPointCallbackEventHandler(Upnp_EventType, void *, void *);
 void	TvCtrlPointVerifyTimeouts(int);

@@ -22,6 +22,7 @@ upnpinclude_HEADERS = \
 	inc/ActionComplete.h \
 	inc/ActionRequest.h \
 	inc/Discovery.h \
+	inc/Event.h \
 	inc/EventSubscribe.h \
 	inc/FileInfo.h \
 	inc/StateVarComplete.h \
@@ -123,6 +124,7 @@ libupnp_la_SOURCES += \
 libupnp_la_SOURCES += src/api/ActionComplete.c
 libupnp_la_SOURCES += src/api/ActionRequest.c
 libupnp_la_SOURCES += src/api/Discovery.c
+libupnp_la_SOURCES += src/api/Event.c
 libupnp_la_SOURCES += src/api/EventSubscribe.c
 libupnp_la_SOURCES += src/api/FileInfo.c
 libupnp_la_SOURCES += src/api/StateVarComplete.c

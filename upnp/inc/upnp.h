@@ -519,6 +519,7 @@
 #include "ActionComplete.h"
 #include "ActionRequest.h"
 #include "Discovery.h"
+#include "Event.h"
 #include "EventSubscribe.h"
 #include "FileInfo.h"
 #include "StateVarComplete.h"
@@ -634,7 +635,7 @@ enum Upnp_EventType_e {
   UPNP_EVENT_SUBSCRIPTION_REQUEST,
 
   /** Received by a control point when an event arrives.  The {\bf
-   *  Event} parameter contains a {\bf Upnp_Event} structure
+   *  Event} parameter contains a {\bf UpnpEvent} structure
    *  with the information about the event.  */
 
   UPNP_EVENT_RECEIVED,
@@ -733,20 +734,6 @@ enum Upnp_DescType_e {
 };
 
 typedef enum Upnp_DescType_e Upnp_DescType;
-
-
-/** Returned along with a {\bf UPNP_EVENT_RECEIVED} callback.  */
-struct Upnp_Event
-{
-  /** The subscription ID for this subscription. */
-  Upnp_SID Sid;
-
-  /** The event sequence number. */
-  int EventKey;
-
-  /** The DOM tree representing the changes generating the event. */
-  IXML_Document *ChangedVariables;
-};
 
 
 /** Returned along with a {\bf UPNP_EVENT_SUBSCRIPTION_REQUEST}

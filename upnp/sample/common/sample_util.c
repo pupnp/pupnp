@@ -548,17 +548,18 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
 
         case UPNP_EVENT_RECEIVED:
             {
-                struct Upnp_Event *e_event = (struct Upnp_Event *)Event;
+                UpnpEvent *e_event = (UpnpEvent *)Event;
                 char *xmlbuff = NULL;
-                xmlbuff = ixmlPrintNode( (IXML_Node *) e_event->ChangedVariables );
+                xmlbuff = ixmlPrintNode(
+			(IXML_Node *) UpnpEvent_get_ChangedVariables(e_event));
                 SampleUtil_Print(
                     "SID         =  %s\n"
                     "EventKey    =  %d\n"
                     "ChangedVars =  %s\n",
-                    e_event->Sid,
-                    e_event->EventKey,
-                    xmlbuff );
-                ixmlFreeDOMString( xmlbuff );
+                    UpnpString_get_String(UpnpEvent_get_SID(e_event)),
+                    UpnpEvent_get_EventKey(e_event),
+                    xmlbuff);
+                ixmlFreeDOMString(xmlbuff);
             }
             break;
 

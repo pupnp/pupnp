@@ -1747,8 +1747,7 @@ TvDeviceDecreaseBrightness( IN IXML_Document *in, OUT IXML_Document **out, OUT c
  *   Cookie -- Optional data specified during callback registration
  *
  *****************************************************************************/
-int
-TvDeviceCallbackEventHandler( Upnp_EventType EventType, void *Event, void *Cookie )
+int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Cookie)
 {
     switch ( EventType ) {
         case UPNP_EVENT_SUBSCRIPTION_REQUEST:

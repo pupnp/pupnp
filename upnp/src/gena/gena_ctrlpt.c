@@ -770,11 +770,11 @@ exit_function:
  ****************************************************************************/
 void gena_process_notification_event(IN SOCKINFO *info, IN http_message_t *event)
 {
-	struct Upnp_Event event_struct;
+	UpnpEvent *event_struct = UpnpEvent_new();
+	IXML_Document *ChangedVars = NULL;
 	int eventKey;
 	token sid;
 	ClientSubscription *subscription = NULL;
-	IXML_Document *ChangedVars;
 	struct Handle_Info *handle_info;
 	void *cookie;
 	Upnp_FunPtr callback;
@@ -788,8 +788,7 @@ void gena_process_notification_event(IN SOCKINFO *info, IN http_message_t *event
 	// get SID
 	if (httpmsg_find_hdr(event, HDR_SID, &sid_hdr) == NULL) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, event);
-
-		return;
+		goto exit_function;
 	}
 	sid.buff = sid_hdr.buf;
 	sid.size = sid_hdr.length;
@@ -798,24 +797,21 @@ void gena_process_notification_event(IN SOCKINFO *info, IN http_message_t *event
 	if (httpmsg_find_hdr(event, HDR_SEQ, &seq_hdr) == NULL ||
 	    matchstr(seq_hdr.buf, seq_hdr.length, "%d%0", &eventKey) != PARSE_OK) {
 		error_respond( info, HTTP_BAD_REQUEST, event );
-
-		return;
+		goto exit_function;
 	}
 
 	// get NT and NTS headers
 	if (httpmsg_find_hdr(event, HDR_NT, &nt_hdr) == NULL ||
 	    httpmsg_find_hdr(event, HDR_NTS, &nts_hdr) == NULL) {
 		error_respond( info, HTTP_BAD_REQUEST, event );
-
-		return;
+		goto exit_function;
 	}
 
 	// verify NT and NTS headers
 	if (memptr_cmp(&nt_hdr, "upnp:event") != 0 ||
 	    memptr_cmp(&nts_hdr, "upnp:propchange") != 0) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, event);
-
-		return;
+		goto exit_function;
 	}
 
 	// parse the content (should be XML)
@@ -823,8 +819,7 @@ void gena_process_notification_event(IN SOCKINFO *info, IN http_message_t *event
 	    event->msg.length == 0 ||
 	    ixmlParseBufferEx(event->entity.buf, &ChangedVars) != IXML_SUCCESS) {
 		error_respond(info, HTTP_BAD_REQUEST, event);
-
-		return;
+		goto exit_function;
 	}
 
 	HandleLock();
@@ -833,9 +828,7 @@ void gena_process_notification_event(IN SOCKINFO *info, IN http_message_t *event
 	if (GetClientHandleInfo(&client_handle, &handle_info) != HND_CLIENT) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, event);
 		HandleUnlock();
-		ixmlDocument_free(ChangedVars);
-
-		return;
+		goto exit_function;
 	}
 
 	// get subscription based on SID
@@ -859,9 +852,7 @@ void gena_process_notification_event(IN SOCKINFO *info, IN http_message_t *event
 				error_respond(info, HTTP_PRECONDITION_FAILED, event);
 				SubscribeUnlock();
 				HandleUnlock();
-				ixmlDocument_free(ChangedVars);
-
-				return;
+				goto exit_function;
 			}
 
 			subscription = GetClientSubActualSID(handle_info->ClientSubList, &sid);
@@ -869,18 +860,14 @@ void gena_process_notification_event(IN SOCKINFO *info, IN http_message_t *event
 				error_respond( info, HTTP_PRECONDITION_FAILED, event );
 				SubscribeUnlock();
 				HandleUnlock();
-				ixmlDocument_free( ChangedVars );
-
-				return;
+				goto exit_function;
 			}
 
 			SubscribeUnlock();
 		} else {
 			error_respond( info, HTTP_PRECONDITION_FAILED, event );
 			HandleUnlock();
-			ixmlDocument_free( ChangedVars );
-
-			return;
+			goto exit_function;
 		}
 	}
 
@@ -888,9 +875,9 @@ void gena_process_notification_event(IN SOCKINFO *info, IN http_message_t *event
 	error_respond(info, HTTP_OK, event);
 
 	// fill event struct
-	strcpy(event_struct.Sid, UpnpString_get_String(UpnpClientSubscription_get_SID(subscription)));
-	event_struct.EventKey = eventKey;
-	event_struct.ChangedVariables = ChangedVars;
+	UpnpEvent_set_EventKey(event_struct, eventKey);
+	UpnpEvent_set_ChangedVariables(event_struct, ChangedVars);
+	UpnpEvent_set_SID(event_struct, UpnpClientSubscription_get_SID(subscription));
 
 	// copy callback
 	callback = handle_info->Callback;
@@ -902,9 +889,11 @@ void gena_process_notification_event(IN SOCKINFO *info, IN http_message_t *event
 	// In future, should find a way of mainting
 	// that the handle is not unregistered in the middle of a
 	// callback
-	callback(UPNP_EVENT_RECEIVED, &event_struct, cookie);
+	callback(UPNP_EVENT_RECEIVED, event_struct, cookie);
 
+exit_function:
 	ixmlDocument_free(ChangedVars);
+	UpnpEvent_delete(event_struct);
 }
 
 #endif // INCLUDE_CLIENT_APIS

@@ -13,10 +13,8 @@ extern "C" {
 typedef struct {} UpnpActionRequest;
 
 
-#include "String.h"     // for UpnpString
-
-
 #include "ixml.h"       // for IXML_Document
+#include "String.h"     // for UpnpString
 
 
 #include <netinet/in.h> // for in_addr

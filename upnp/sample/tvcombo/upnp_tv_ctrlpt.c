@@ -937,34 +937,38 @@ TvStateUpdate( char *UDN,
  *   changes -- The DOM document representing the changes
  *
  ********************************************************************************/
-void
-TvCtrlPointHandleEvent( Upnp_SID sid,
-                        int evntkey,
-                        IXML_Document * changes )
+void TvCtrlPointHandleEvent(
+	const UpnpString *sid,
+	int evntkey,
+	IXML_Document *changes)
 {
-    struct TvDeviceNode *tmpdevnode;
-    int service;
+	struct TvDeviceNode *tmpdevnode;
+	int service;
+	const char *aux_sid = NULL;
 
-    ithread_mutex_lock( &DeviceListMutex );
+	ithread_mutex_lock(&DeviceListMutex);
 
-    tmpdevnode = GlobalDeviceList;
-    while( tmpdevnode ) {
-        for( service = 0; service < TV_SERVICE_SERVCOUNT; service++ ) {
-            if( strcmp( tmpdevnode->device.TvService[service].SID, sid ) ==
-                0 ) {
-                SampleUtil_Print( "Received Tv %s Event: %d for SID %s",
-                                  TvServiceName[service], evntkey, sid );
+	tmpdevnode = GlobalDeviceList;
+	while (tmpdevnode) {
+		for (service = 0; service < TV_SERVICE_SERVCOUNT; ++service) {
+			aux_sid = UpnpString_get_String(sid);
+			if (strcmp(tmpdevnode->device.TvService[service].SID, aux_sid) ==  0) {
+				SampleUtil_Print("Received Tv %s Event: %d for SID %s",
+					TvServiceName[service],
+					evntkey,
+					aux_sid);
+				TvStateUpdate(
+					tmpdevnode->device.UDN,
+					service,
+					changes,
+					(char **)&tmpdevnode->device.TvService[service].VariableStrVal);
+				break;
+			}
+		}
+		tmpdevnode = tmpdevnode->next;
+	}
 
-                TvStateUpdate( tmpdevnode->device.UDN, service, changes,
-                               ( char ** )&tmpdevnode->device.
-                               TvService[service].VariableStrVal );
-                break;
-            }
-        }
-        tmpdevnode = tmpdevnode->next;
-    }
-
-    ithread_mutex_unlock( &DeviceListMutex );
+	ithread_mutex_unlock(&DeviceListMutex);
 }
 
 /********************************************************************************
@@ -1148,9 +1152,11 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 
 	/* GENA Stuff */
 	case UPNP_EVENT_RECEIVED: {
-		struct Upnp_Event *e_event = ( struct Upnp_Event * )Event;
-		TvCtrlPointHandleEvent( e_event->Sid, e_event->EventKey,
-			e_event->ChangedVariables );
+		UpnpEvent *e_event = (UpnpEvent *)Event;
+		TvCtrlPointHandleEvent(
+			UpnpEvent_get_SID(e_event),
+			UpnpEvent_get_EventKey(e_event),
+			UpnpEvent_get_ChangedVariables(e_event));
 		break;
 	}
 
