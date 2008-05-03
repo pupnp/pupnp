@@ -226,7 +226,7 @@ int TvDeviceStateTableInit(char*);
  *   sr_event -- The subscription request event structure
  *
  *****************************************************************************/
-int TvDeviceHandleSubscriptionRequest(struct Upnp_Subscription_Request *);
+int TvDeviceHandleSubscriptionRequest(const UpnpSubscriptionRequest *);
 
 /******************************************************************************
  * TvDeviceHandleGetVarRequest

@@ -302,10 +302,10 @@ EXTERN_C int genaNotifyAll(
  * Function: genaNotifyAllExt
  *
  * Parameters:
- *	IN UpnpDevice_Handle device_handle: Device handle
- *	IN char *UDN: Device udn
- *	IN char *servId: Service ID
- *	IN IXML_Document *PropSet: XML document Event varible property set
+ *	IN UpnpDevice_Handle device_handle:	Device handle
+ *	IN char *UDN:				Device udn
+ *	IN char *servId:			Service ID
+ *	IN IXML_Document *PropSet:		XML document Event varible property set
  *
  * Description : This function sends a notification to all the subscribed
  *	control points
@@ -328,13 +328,13 @@ EXTERN_C int genaNotifyAllExt(
  * Function: genaInitNotify
  *
  * Parameters:
- *	IN UpnpDevice_Handle device_handle: Device handle
- *	IN char *UDN: Device udn
- *	IN char *servId: Service ID
- *	IN char **VarNames: Array of variable names
- *	IN char **VarValues: Array of variable values
- *	IN int var_count: array size
- *	IN Upnp_SID sid: subscription ID
+ *	IN UpnpDevice_Handle device_handle:	Device handle
+ *	IN char *UDN:				Device udn
+ *	IN char *servId:			Service ID
+ *	IN char **VarNames:			Array of variable names
+ *	IN char **VarValues:			Array of variable values
+ *	IN int var_count:			array size
+ *	IN Upnp_SID sid:			subscription ID
  *
  * Description: This function sends the intial state table dump to 
  *	newly subscribed control point. 
@@ -352,29 +352,30 @@ EXTERN_C int genaInitNotify(IN UpnpDevice_Handle device_handle,
 	IN char **VarNames,
 	IN char **VarValues,
 	IN int var_count,
-	IN Upnp_SID sid);
+	IN const Upnp_SID sid);
 #endif /* INCLUDE_DEVICE_APIS */
 
 
 /****************************************************************************
- *	Function :	genaInitNotifyExt
+ * Function: genaInitNotifyExt
  *
- *	Parameters :
- *		   IN UpnpDevice_Handle device_handle :	Device handle
- *		   IN char *UDN :	Device udn
- *		   IN char *servId :	Service ID
- *		   IN IXML_Document *PropSet :	Document of the state table
- *		   IN Upnp_SID sid :	subscription ID
+ * Parameters :
+ *	IN UpnpDevice_Handle device_handle:	Device handle
+ *	IN char *UDN:				Device udn
+ *	IN char *servId:			Service ID
+ *	IN IXML_Document *PropSet:		Document of the state table
+ *	IN Upnp_SID sid:			subscription ID
  *
- *	Description :	This function is similar to the genaInitNofity. The only 
+ * Description:
+ *	This function is similar to the genaInitNofity. The only 
  *	difference is that it takes the xml document for the state table and 
  *	sends the intial state table dump to newly subscribed control point. 
  *
- *	Return :	int
- *		returns GENA_E_SUCCESS if successful else returns appropriate error
+ * Return: int
+ *	returns GENA_E_SUCCESS if successful else returns appropriate error
  * 
- *	Note : No other event will be sent to this control point before the 
- *			intial state table dump.
+ * Note: No other event will be sent to this control point before the 
+ * 	intial state table dump.
  ****************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C  int genaInitNotifyExt(
@@ -382,7 +383,7 @@ EXTERN_C  int genaInitNotifyExt(
 	IN char *UDN, 
 	IN char *servId,
 	IN IXML_Document *PropSet, 
-	IN Upnp_SID sid);
+	IN const Upnp_SID sid);
 #endif /* INCLUDE_DEVICE_APIS */
 
 

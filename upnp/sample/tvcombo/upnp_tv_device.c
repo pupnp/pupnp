@@ -364,60 +364,67 @@ TvDeviceStateTableInit( IN char *DescDocURL )
  *   sr_event -- The subscription request event structure
  *
  *****************************************************************************/
-int
-TvDeviceHandleSubscriptionRequest( IN struct Upnp_Subscription_Request
-                                   *sr_event )
+int TvDeviceHandleSubscriptionRequest(IN const UpnpSubscriptionRequest *sr_event)
 {
-    unsigned int i = 0;         //,j=0;
+	unsigned int i = 0;
+	//unsigned int j = 0;
+	int cmp1 = 0;
+	int cmp2 = 0;
+	const char *l_serviceId = NULL;
+	const char *l_udn = NULL;
+	const char *l_sid = NULL;
+	// IXML_Document *PropSet = NULL;
 
-    // IXML_Document *PropSet=NULL;
+	// lock state mutex
+	ithread_mutex_lock( &TVDevMutex );
 
-    //lock state mutex
-    ithread_mutex_lock( &TVDevMutex );
+	l_serviceId = UpnpString_get_String(UpnpSubscriptionRequest_get_ServiceId(sr_event));
+	l_udn = UpnpString_get_String(UpnpSubscriptionRequest_get_UDN(sr_event));
+	l_sid = UpnpString_get_String(UpnpSubscriptionRequest_get_SID(sr_event));
+	for (i = 0; i < TV_SERVICE_SERVCOUNT; ++i) {
+		cmp1 = strcmp(l_udn, tv_service_table[i].UDN);
+		cmp2 = strcmp(l_serviceId, tv_service_table[i].ServiceId);
+		if (cmp1 == 0 && cmp2 == 0) {
+#if 0
+			PropSet = NULL;
 
-    for( i = 0; i < TV_SERVICE_SERVCOUNT; i++ ) {
-        if( ( strcmp( sr_event->UDN, tv_service_table[i].UDN ) == 0 ) &&
-            ( strcmp( sr_event->ServiceId, tv_service_table[i].ServiceId )
-              == 0 ) ) {
+			for (j = 0; j< tv_service_table[i].VariableCount; ++j) {
+				// add each variable to the property set
+				// for initial state dump
+				UpnpAddToPropertySet(
+					&PropSet, 
+					tv_service_table[i].VariableName[j],
+					tv_service_table[i].VariableStrVal[j]);
+			}
 
-            /*
-               PropSet = NULL;
+			// dump initial state 
+			UpnpAcceptSubscriptionExt(
+				device_handle,
+				l_udn, 
+				l_serviceId,
+				PropSet,
+				l_sid);
+			// free document
+			Document_free(PropSet);
+#endif
+			UpnpAcceptSubscription(
+				device_handle,
+				l_udn, 
+				l_serviceId,
+				(const char **)tv_service_table[i].
+				VariableName,
+				(const char **)tv_service_table[i].
+				VariableStrVal,
+				tv_service_table[i].VariableCount,
+				l_sid);
+		}
+	}
 
-               for (j=0; j< tv_service_table[i].VariableCount; j++)
-               {
-               //add each variable to the property set
-               //for initial state dump
-               UpnpAddToPropertySet(&PropSet, 
-               tv_service_table[i].VariableName[j],
-               tv_service_table[i].VariableStrVal[j]);
-               }
+	ithread_mutex_unlock( &TVDevMutex );
 
-               //dump initial state 
-               UpnpAcceptSubscriptionExt(device_handle, sr_event->UDN, 
-               sr_event->ServiceId,
-               PropSet,sr_event->Sid);
-               //free document
-               Document_free(PropSet);
-
-             */
-
-            UpnpAcceptSubscription( device_handle,
-                                    sr_event->UDN,
-                                    sr_event->ServiceId,
-                                    ( const char ** )tv_service_table[i].
-                                    VariableName,
-                                    ( const char ** )tv_service_table[i].
-                                    VariableStrVal,
-                                    tv_service_table[i].VariableCount,
-                                    sr_event->Sid );
-
-        }
-    }
-
-    ithread_mutex_unlock( &TVDevMutex );
-
-    return ( 1 );
+	return 1;
 }
+
 
 /******************************************************************************
  * TvDeviceHandleGetVarRequest
@@ -1749,7 +1756,7 @@ int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Co
 {
     switch ( EventType ) {
         case UPNP_EVENT_SUBSCRIPTION_REQUEST:
-            TvDeviceHandleSubscriptionRequest( (struct Upnp_Subscription_Request *)Event );
+            TvDeviceHandleSubscriptionRequest((UpnpSubscriptionRequest *)Event);
             break;
 
         case UPNP_CONTROL_GET_VAR_REQUEST:

@@ -2572,14 +2572,14 @@ UpnpNotifyExt( IN UpnpDevice_Handle Hnd,
  * Return Values: int
  *	UPNP_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
-int
-UpnpAcceptSubscription( IN UpnpDevice_Handle Hnd,
-                        IN const char *DevID_const,
-                        IN const char *ServName_const,
-                        IN const char **VarName_const,
-                        IN const char **NewVal_const,
-                        int cVariables,
-                        IN Upnp_SID SubsId )
+int UpnpAcceptSubscription(
+	IN UpnpDevice_Handle Hnd,
+	IN const char *DevID_const,
+	IN const char *ServName_const,
+	IN const char **VarName_const,
+	IN const char **NewVal_const,
+	int cVariables,
+	IN const Upnp_SID SubsId)
 {
     struct Handle_Info *SInfo = NULL;
     int retVal;

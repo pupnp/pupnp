@@ -534,15 +534,14 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
              */
         case UPNP_EVENT_SUBSCRIPTION_REQUEST:
             {
-                struct Upnp_Subscription_Request *sr_event =
-                    (struct Upnp_Subscription_Request *)Event;
+                UpnpSubscriptionRequest *sr_event = (UpnpSubscriptionRequest *)Event;
                 SampleUtil_Print(
                     "ServiceID   =  %s\n"
                     "UDN         =  %s\n"
                     "SID         =  %s\n",
-                    sr_event->ServiceId,
-                    sr_event->UDN,
-                    sr_event->Sid );
+                    UpnpString_get_String(UpnpSubscriptionRequest_get_ServiceId(sr_event)),
+                    UpnpString_get_String(UpnpSubscriptionRequest_get_UDN(sr_event)),
+                    UpnpString_get_String(UpnpSubscriptionRequest_get_SID(sr_event)));
             }
             break;
 

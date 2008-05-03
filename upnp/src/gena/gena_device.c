@@ -433,35 +433,15 @@ genaNotifyThread( IN void *input )
     HandleUnlock();
 }
 
-/****************************************************************************
-*	Function :	genaInitNotify
-*
-*	Parameters :
-*		   IN UpnpDevice_Handle device_handle :	Device handle
-*		   IN char *UDN :	Device udn
-*		   IN char *servId :	Service ID
-*		   IN char **VarNames :	Array of variable names
-*		   IN char **VarValues :	Array of variable values
-*		   IN int var_count :	array size
-*		   IN Upnp_SID sid :	subscription ID
-*
-*	Description :	This function sends the intial state table dump to 
-*		newly subscribed control point. 
-*
-*	Return :	int
-*		returns GENA_E_SUCCESS if successful else returns appropriate error
-* 
-*	Note : No other event will be sent to this control point before the 
-*			intial state table dump.
-****************************************************************************/
-int
-genaInitNotify( IN UpnpDevice_Handle device_handle,
-                IN char *UDN,
-                IN char *servId,
-                IN char **VarNames,
-                IN char **VarValues,
-                IN int var_count,
-                IN Upnp_SID sid )
+
+int genaInitNotify(
+	IN UpnpDevice_Handle device_handle,
+	IN char *UDN,
+	IN char *servId,
+	IN char **VarNames,
+	IN char **VarValues,
+	IN int var_count,
+	IN const Upnp_SID sid)
 {
     char *UDN_copy = NULL;
     char *servId_copy = NULL;
@@ -523,12 +503,12 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
         return GENA_E_BAD_SERVICE;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
         "FOUND SERVICE IN INIT NOTFY: UDN %s, ServID: %s ",
-        UDN, servId );
+        UDN, servId);
 
-    if( ( ( sub = GetSubscriptionSID( sid, service ) ) == NULL ) ||
-        ( sub->active ) ) {
+    sub = GetSubscriptionSID(sid, service);
+    if (sub == NULL || sub->active) {
         free( UDN_copy );
         free( reference_count );
         free( servId_copy );
@@ -625,32 +605,13 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
     return return_code;
 }
 
-/****************************************************************************
-*	Function :	genaInitNotifyExt
-*
-*	Parameters :
-*		   IN UpnpDevice_Handle device_handle :	Device handle
-*		   IN char *UDN :	Device udn
-*		   IN char *servId :	Service ID
-*		   IN IXML_Document *PropSet :	Document of the state table
-*		   IN Upnp_SID sid :	subscription ID
-*
-*	Description :	This function is similar to the genaInitNofity. The only 
-*	difference is that it takes the xml document for the state table and 
-*	sends the intial state table dump to newly subscribed control point. 
-*
-*	Return :	int
-*		returns GENA_E_SUCCESS if successful else returns appropriate error
-* 
-*	Note : No other event will be sent to this control point before the 
-*			intial state table dump.
-****************************************************************************/
-int
-genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
-                   IN char *UDN,
-                   IN char *servId,
-                   IN IXML_Document * PropSet,
-                   IN Upnp_SID sid )
+
+int genaInitNotifyExt(
+	IN UpnpDevice_Handle device_handle,
+	IN char *UDN,
+	IN char *servId,
+	IN IXML_Document *PropSet,
+	IN const Upnp_SID sid)
 {
     char *UDN_copy = NULL;
     char *servId_copy = NULL;
@@ -1281,196 +1242,198 @@ create_url_list( IN memptr * url_list,
 }
 
 /****************************************************************************
-*	Function :	gena_process_subscription_request
-*
-*	Parameters :
-*			IN SOCKINFO *info :	socket info of the device 
-*			IN http_message_t* request : SUBSCRIPTION request from the control
-*										point
-*
-*	Description :	This function handles a subscription request from a 
-*		ctrl point. The socket is not closed on return.
-*
-*	Return :	void
-*
-*	Note :
-****************************************************************************/
-void
-gena_process_subscription_request( IN SOCKINFO * info,
-                                   IN http_message_t * request )
+ * Function: gena_process_subscription_request
+ *
+ * Parameters:
+ *	IN SOCKINFO *info:	socket info of the device 
+ *	IN http_message_t* request: 
+ *				SUBSCRIPTION request from the control point
+ *
+ * Description: This function handles a subscription request from a 
+ * 	ctrl point. The socket is not closed on return.
+ *
+ * Return: void
+ ****************************************************************************/
+void gena_process_subscription_request(
+	IN SOCKINFO *info,
+	IN http_message_t *request)
 {
-    Upnp_SID temp_sid;
-    int return_code = 1;
-    int time_out = 1801;
-    service_info *service;
-    struct Upnp_Subscription_Request request_struct;
-    subscription *sub;
-    uuid_upnp uid;
-    struct Handle_Info *handle_info;
-    void *cookie;
-    Upnp_FunPtr callback_fun;
-    UpnpDevice_Handle device_handle;
-    memptr nt_hdr;
-    char *event_url_path = NULL;
-    memptr callback_hdr;
-    memptr timeout_hdr;
+	UpnpSubscriptionRequest *request_struct = UpnpSubscriptionRequest_new();
+	Upnp_SID temp_sid;
+	int return_code = 1;
+	int time_out = 1801;
+	service_info *service;
+	subscription *sub;
+	uuid_upnp uid;
+	struct Handle_Info *handle_info;
+	void *cookie;
+	Upnp_FunPtr callback_fun;
+	UpnpDevice_Handle device_handle;
+	memptr nt_hdr;
+	char *event_url_path = NULL;
+	memptr callback_hdr;
+	memptr timeout_hdr;
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "Subscription Request Received:\n" );
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"Subscription Request Received:\n");
 
-    if( httpmsg_find_hdr( request, HDR_NT, &nt_hdr ) == NULL ) {
-        error_respond( info, HTTP_BAD_REQUEST, request );
-        return;
-    }
+	if (httpmsg_find_hdr(request, HDR_NT, &nt_hdr) == NULL) {
+		error_respond(info, HTTP_BAD_REQUEST, request);
+		goto exit_function;
+	}
 
-    // check NT header
-    //Windows Millenium Interoperability:
-    //we accept either upnp:event, or upnp:propchange for the NT header
-    if( memptr_cmp_nocase( &nt_hdr, "upnp:event" ) != 0 ) {
-        error_respond( info, HTTP_PRECONDITION_FAILED, request );
-        return;
-    }
+	// check NT header
+	// Windows Millenium Interoperability:
+	// we accept either upnp:event, or upnp:propchange for the NT header
+	if (memptr_cmp_nocase(&nt_hdr, "upnp:event") != 0) {
+		error_respond(info, HTTP_PRECONDITION_FAILED, request);
+		goto exit_function;
+	}
 
-    // if a SID is present then the we have a bad request
-    //  "incompatible headers"
-    if( httpmsg_find_hdr( request, HDR_SID, NULL ) != NULL ) {
-        error_respond( info, HTTP_BAD_REQUEST, request );
-        return;
-    }
-    //look up service by eventURL
-    if( ( event_url_path = str_alloc( request->uri.pathquery.buff,
-                                      request->uri.pathquery.size ) ) ==
-        NULL ) {
-        error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        return;
-    }
+	// if a SID is present then the we have a bad request "incompatible headers"
+	if (httpmsg_find_hdr(request, HDR_SID, NULL) != NULL) {
+		error_respond(info, HTTP_BAD_REQUEST, request);
+		goto exit_function;
+	}
+	// look up service by eventURL
+	event_url_path = str_alloc(request->uri.pathquery.buff, request->uri.pathquery.size);
+	if (event_url_path == NULL) {
+		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		goto exit_function;
+	}
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "SubscriptionRequest for event URL path: %s\n",
-        event_url_path );
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"SubscriptionRequest for event URL path: %s\n",
+		event_url_path);
 
-    HandleLock();
+	HandleLock();
 
-    // CURRENTLY, ONLY ONE DEVICE
-    if( GetDeviceHandleInfo( info->foreign_sockaddr.ss_family , 
-        &device_handle, &handle_info ) != HND_DEVICE ) {
-        free( event_url_path );
-        error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        HandleUnlock();
-        return;
-    }
-    service = FindServiceEventURLPath( &handle_info->ServiceTable,
-                                       event_url_path );
-    free( event_url_path );
+	// CURRENTLY, ONLY ONE DEVICE
+	if (GetDeviceHandleInfo(info->foreign_sockaddr.ss_family , 
+	    &device_handle, &handle_info) != HND_DEVICE) {
+		free(event_url_path);
+		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		HandleUnlock();
+		goto exit_function;
+	}
+	service = FindServiceEventURLPath(&handle_info->ServiceTable, event_url_path);
+	free(event_url_path);
 
-    if( service == NULL || !service->active ) {
-        error_respond( info, HTTP_NOT_FOUND, request );
-        HandleUnlock();
-        return;
-    }
+	if (service == NULL || !service->active) {
+		error_respond(info, HTTP_NOT_FOUND, request);
+		HandleUnlock();
+		goto exit_function;
+	}
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "Subscription Request: Number of Subscriptions already %d\n "
-        "Max Subscriptions allowed: %d\n",
-        service->TotalSubscriptions,
-        handle_info->MaxSubscriptions );
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"Subscription Request: Number of Subscriptions already %d\n "
+		"Max Subscriptions allowed: %d\n",
+		service->TotalSubscriptions,
+		handle_info->MaxSubscriptions);
 
-    // too many subscriptions
-    if( handle_info->MaxSubscriptions != -1 &&
-        service->TotalSubscriptions >= handle_info->MaxSubscriptions ) {
-        error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        HandleUnlock();
-        return;
-    }
-    // generate new subscription
-    sub = ( subscription * ) malloc( sizeof( subscription ) );
-    if( sub == NULL ) {
-        error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        HandleUnlock();
-        return;
-    }
-    sub->eventKey = 0;
-    sub->ToSendEventKey = 0;
-    sub->active = 0;
-    sub->next = NULL;
-    sub->DeliveryURLs.size = 0;
-    sub->DeliveryURLs.URLs = NULL;
-    sub->DeliveryURLs.parsedURLs = NULL;
+	// too many subscriptions
+	if (handle_info->MaxSubscriptions != -1 &&
+	    service->TotalSubscriptions >= handle_info->MaxSubscriptions) {
+		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		HandleUnlock();
+		goto exit_function;
+	}
+	// generate new subscription
+	sub = (subscription *)malloc(sizeof (subscription));
+	if (sub == NULL) {
+		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		HandleUnlock();
+		goto exit_function;
+	}
+	sub->eventKey = 0;
+	sub->ToSendEventKey = 0;
+	sub->active = 0;
+	sub->next = NULL;
+	sub->DeliveryURLs.size = 0;
+	sub->DeliveryURLs.URLs = NULL;
+	sub->DeliveryURLs.parsedURLs = NULL;
 
-    // check for valid callbacks
-    if( httpmsg_find_hdr( request, HDR_CALLBACK, &callback_hdr ) == NULL ||
-        ( return_code = create_url_list( &callback_hdr,
-                                         &sub->DeliveryURLs ) ) == 0 ) {
-        error_respond( info, HTTP_PRECONDITION_FAILED, request );
-        freeSubscriptionList( sub );
-        HandleUnlock();
-        return;
-    }
-    if( return_code == UPNP_E_OUTOF_MEMORY ) {
-        error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        freeSubscriptionList( sub );
-        HandleUnlock();
-        return;
-    }
-    // set the timeout
-    if( httpmsg_find_hdr( request, HDR_TIMEOUT, &timeout_hdr ) != NULL ) {
-        if( matchstr( timeout_hdr.buf, timeout_hdr.length,
-                      "%iSecond-%d%0", &time_out ) == PARSE_OK ) {
-            // nothing
-        } else if( memptr_cmp_nocase( &timeout_hdr, "Second-infinite" ) ==
-                   0 ) {
-            time_out = -1;      // infinite timeout
-        } else {
-            time_out = DEFAULT_TIMEOUT; // default is > 1800 seconds
-        }
-    }
-    // replace infinite timeout with max timeout, if possible
-    if( handle_info->MaxSubscriptionTimeOut != -1 ) {
-        if( time_out == -1 ||
-            time_out > handle_info->MaxSubscriptionTimeOut ) {
-            time_out = handle_info->MaxSubscriptionTimeOut;
-        }
-    }
-    if( time_out >= 0 ) {
-        sub->expireTime = time( NULL ) + time_out;
-    } else {
-        sub->expireTime = 0;    // infinite time
-    }
+	// check for valid callbacks
+	if (httpmsg_find_hdr( request, HDR_CALLBACK, &callback_hdr) == NULL) {
+		error_respond(info, HTTP_PRECONDITION_FAILED, request);
+		freeSubscriptionList(sub);
+		HandleUnlock();
+		goto exit_function;
+	}
+	return_code = create_url_list(&callback_hdr, &sub->DeliveryURLs);
+	if (return_code == 0) {
+		error_respond(info, HTTP_PRECONDITION_FAILED, request);
+		freeSubscriptionList(sub);
+		HandleUnlock();
+		goto exit_function;
+	}
+	if (return_code == UPNP_E_OUTOF_MEMORY) {
+		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		freeSubscriptionList(sub);
+		HandleUnlock();
+		goto exit_function;
+	}
+	// set the timeout
+	if (httpmsg_find_hdr(request, HDR_TIMEOUT, &timeout_hdr) != NULL) {
+		if (matchstr(timeout_hdr.buf, timeout_hdr.length,
+		    "%iSecond-%d%0", &time_out) == PARSE_OK) {
+			// nothing
+		} else if(memptr_cmp_nocase(&timeout_hdr, "Second-infinite") == 0) {
+			// infinite timeout
+			time_out = -1;
+		} else {
+			// default is > 1800 seconds
+			time_out = DEFAULT_TIMEOUT;
+		}
+	}
+	// replace infinite timeout with max timeout, if possible
+	if (handle_info->MaxSubscriptionTimeOut != -1) {
+		if (time_out == -1 ||
+		    time_out > handle_info->MaxSubscriptionTimeOut) {
+			time_out = handle_info->MaxSubscriptionTimeOut;
+		}
+	}
+	if (time_out >= 0) {
+		sub->expireTime = time(NULL) + time_out;
+	} else {
+		// infinite time
+		sub->expireTime = 0;
+	}
 
-    //generate SID
-    uuid_create( &uid );
-    uuid_unpack( &uid, temp_sid );
-    sprintf( sub->sid, "uuid:%s", temp_sid );
+	// generate SID
+	uuid_create(&uid);
+	uuid_unpack(&uid, temp_sid);
+	sprintf(sub->sid, "uuid:%s", temp_sid);
 
-    // respond OK
-    if( respond_ok( info, time_out, sub, request ) != UPNP_E_SUCCESS ) {
-        freeSubscriptionList( sub );
-        HandleUnlock();
-        return;
-    }
-    //add to subscription list
-    sub->next = service->subscriptionList;
-    service->subscriptionList = sub;
-    service->TotalSubscriptions++;
+	// respond OK
+	if (respond_ok(info, time_out, sub, request) != UPNP_E_SUCCESS) {
+		freeSubscriptionList(sub);
+		HandleUnlock();
+		goto exit_function;
+	}
+	// add to subscription list
+	sub->next = service->subscriptionList;
+	service->subscriptionList = sub;
+	service->TotalSubscriptions++;
 
-    //finally generate callback for init table dump
-    request_struct.ServiceId = service->serviceId;
-    request_struct.UDN = service->UDN;
-    strcpy( ( char * )request_struct.Sid, sub->sid );
+	// finally generate callback for init table dump
+	UpnpSubscriptionRequest_strcpy_ServiceId(request_struct, service->serviceId);
+	UpnpSubscriptionRequest_strcpy_UDN(request_struct, service->UDN);
+	UpnpSubscriptionRequest_strcpy_SID(request_struct, sub->sid);
 
-    //copy callback
-    callback_fun = handle_info->Callback;
-    cookie = handle_info->Cookie;
+	// copy callback
+	callback_fun = handle_info->Callback;
+	cookie = handle_info->Cookie;
 
-    HandleUnlock();
+	HandleUnlock();
 
-    //make call back with request struct
-    //in the future should find a way of mainting
-    //that the handle is not unregistered in the middle of a 
-    //callback
+	// make call back with request struct
+	// in the future should find a way of mainting that the handle
+	// is not unregistered in the middle of a callback
+	callback_fun(UPNP_EVENT_SUBSCRIPTION_REQUEST, request_struct, cookie);
 
-    callback_fun( UPNP_EVENT_SUBSCRIPTION_REQUEST,
-                  &request_struct, cookie );
+exit_function:
+	UpnpSubscriptionRequest_delete(request_struct);
 }
 
 /****************************************************************************
@@ -1666,7 +1629,6 @@ gena_process_unsubscribe_request( IN SOCKINFO * info,
     // validate service
     if( service == NULL ||
         !service->active || GetSubscriptionSID( sid, service ) == NULL )
-        //CheckSubscriptionSID(sid, service) == NULL )
     {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
         HandleUnlock();

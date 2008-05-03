@@ -524,6 +524,7 @@
 #include "FileInfo.h"
 #include "StateVarComplete.h"
 #include "StateVarRequest.h"
+#include "SubscriptionRequest.h"
 
 
 enum UpnpOpenFileMode
@@ -624,7 +625,7 @@ enum Upnp_EventType_e {
 
   /** Received by a device when a subscription arrives.
    *  The {\bf Event} parameter contains a pointer to a {\bf
-   *  Upnp_Subscription_Request} structure.  At this point, the
+   *  UpnpSubscriptionRequest} structure.  At this point, the
    *  subscription has already been accepted.  {\bf UpnpAcceptSubscription}
    *  needs to be called to confirm the subscription and transmit the
    *  initial state table.  This can be done during this callback.  The SDK
@@ -690,10 +691,9 @@ typedef char Upnp_SID[44];
           {\bf UpnpSearchAsync}, the control point application
 	  can control the scope of the search from all devices
 	  to specific devices or services.
-  */
+*/
 
 enum Upnp_SType_e {
-
   /** Search for all devices and services on the network. */
   UPNP_S_ALL,    
 
@@ -707,7 +707,6 @@ enum Upnp_SType_e {
   /** Search for a particular service type, possibly on a particular
    *  device type or device instance.  */
   UPNP_S_SERVICE 
-                       
 };
 
 typedef enum Upnp_SType_e Upnp_SType;
@@ -717,9 +716,8 @@ typedef enum Upnp_SType_e Upnp_SType;
           {\bf UpnpRegisterRootDevice2}.
     @doc  These values control how {\bf UpnpRegisterRootDevice2}
           interprets the {\bf description} parameter.
-   */
+*/
 enum Upnp_DescType_e { 
-
 	/** The description is the URL to the description document. */
 	UPNPREG_URL_DESC, 
 	
@@ -730,26 +728,9 @@ enum Upnp_DescType_e {
 	/** The description is a pointer to a character array containing 
 	    the XML description document. */
 	UPNPREG_BUF_DESC 
-
 };
 
 typedef enum Upnp_DescType_e Upnp_DescType;
-
-
-/** Returned along with a {\bf UPNP_EVENT_SUBSCRIPTION_REQUEST}
- *  callback.  */
-
-struct Upnp_Subscription_Request
-{
-  /** The identifier for the service being subscribed to. */
-  char *ServiceId; 
-
-  /** Universal device name. */
-  char *UDN;       
-
-  /** The assigned subscription ID for this subscription. */
-  Upnp_SID Sid;
-};
 
 
 /* The type of handle returned by the web server for open requests. */
@@ -1660,19 +1641,20 @@ EXPORT_SPEC int UpnpSendActionExAsync(
  */
 
 EXPORT_SPEC int UpnpAcceptSubscription(
-    IN UpnpDevice_Handle Hnd, /** The handle of the device. */
-    IN const char *DevID,     /** The device ID of the subdevice of the 
-                                  service generating the event. */
-    IN const char *ServID,    /** The unique service identifier of the service 
-                                  generating the event. */
-    IN const char **VarName,  /** Pointer to an array of event variables. */
-    IN const char **NewVal,   /** Pointer to an array of values for 
-                                  the event variables. */
-    IN int cVariables,        /** The number of event variables in 
-                                  {\bf VarName}. */
-    IN Upnp_SID SubsId        /** The subscription ID of the newly 
-                                  registered control point. */
-    );
+	/** The handle of the device. */
+	IN UpnpDevice_Handle Hnd,
+	/** The device ID of the subdevice of the service generating the event. */
+	IN const char *DevID,
+	/** The unique service identifier of the service generating the event. */
+	IN const char *ServID,
+	/** Pointer to an array of event variables. */
+	IN const char **VarName,
+	/** Pointer to an array of values for the event variables. */
+	IN const char **NewVal,
+	/** The number of event variables in {\bf VarName}. */
+	IN int cVariables,
+	/** The subscription ID of the newly registered control point. */
+	IN const Upnp_SID SubsId);
 
 /** {\bf UpnpAcceptSubscriptionExt} is similar to {\bf UpnpAcceptSubscription}
  *  except that it takes a DOM document for the variables to event rather

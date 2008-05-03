@@ -116,25 +116,8 @@ RemoveSubscriptionSID( Upnp_SID sid,
 
 }
 
-/************************************************************************
-*	Function :	GetSubscriptionSID
-*
-*	Parameters :
-*		Upnp_SID sid ;	subscription ID
-*		service_info * service ;	service object providing the list of
-*						subscriptions
-*
-*	Description :	Return the subscription from the service table 
-*		that matches const Upnp_SID sid value. 
-*
-*	Return : subscription * - Pointer to the matching subscription 
-*		node;
-*
-*	Note :
-************************************************************************/
-subscription *
-GetSubscriptionSID( Upnp_SID sid,
-                    service_info * service )
+
+subscription *GetSubscriptionSID(const Upnp_SID sid, service_info *service)
 {
     subscription *next = service->subscriptionList;
     subscription *previous = NULL;
@@ -169,31 +152,15 @@ GetSubscriptionSID( Upnp_SID sid,
 
 }
 
-/************************************************************************
-*	Function :	GetNextSubscription
-*
-*	Parameters :
-*		service_info * service ; service object providing the list of
-*						subscriptions
-*		subscription *current ;	current subscription object
-*
-*	Description :	Get current and valid subscription from the service 
-*		table.
-*
-*	Return : subscription * - Pointer to the next subscription node;
-*
-*	Note :
-************************************************************************/
-subscription *
-GetNextSubscription( service_info * service,
-                     subscription * current )
+
+subscription *GetNextSubscription(service_info *service, subscription *current)
 {
     time_t current_time;
     subscription *next = NULL;
     subscription *previous = NULL;
     int notDone = 1;
 
-    //get the current_time
+    // get the current_time
     time( &current_time );
     while( ( notDone ) && ( current ) ) {
         previous = current;
@@ -218,52 +185,26 @@ GetNextSubscription( service_info * service,
     return next;
 }
 
-/************************************************************************
-*	Function :	GetFirstSubscription
-*
-*	Parameters :
-*		service_info *service ;	service object providing the list of
-*						subscriptions
-*
-*	Description :	Gets pointer to the first subscription node in the 
-*		service table.
-*
-*	Return : subscription * - pointer to the first subscription node ;
-*
-*	Note :
-************************************************************************/
-subscription *
-GetFirstSubscription( service_info * service )
-{
-    subscription temp;
-    subscription *next = NULL;
 
-    temp.next = service->subscriptionList;
-    next = GetNextSubscription( service, &temp );
-    service->subscriptionList = temp.next;
-    //  service->subscriptionList=next;
-    return next;
+subscription *GetFirstSubscription(service_info *service)
+{
+	subscription temp;
+	subscription *next = NULL;
+
+	temp.next = service->subscriptionList;
+	next = GetNextSubscription(service, &temp);
+	service->subscriptionList = temp.next;
+	// service->subscriptionList = next;
+	
+	return next;
 }
 
-/************************************************************************
-*	Function :	freeSubscription
-*
-*	Parameters :
-*		subscription * sub ;	subscription to be freed
-*
-*	Description :	Free's the memory allocated for storing the URL of 
-*		the subscription.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void
-freeSubscription( subscription * sub )
+
+void freeSubscription(subscription *sub)
 {
-    if( sub ) {
-        free_URL_list( &sub->DeliveryURLs );
-    }
+	if (sub) {
+		free_URL_list(&sub->DeliveryURLs);
+	}
 }
 
 /************************************************************************
