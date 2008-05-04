@@ -9,6 +9,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 
+/** Detailed description of this class should go here */
 typedef struct {} UpnpFileInfo;
 
 

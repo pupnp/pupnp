@@ -4215,7 +4215,7 @@ UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 	switch ( Param->FunName ) {
 #if EXCLUDE_GENA == 0
 	case SUBSCRIBE: {
-		EventSubscribe *evt = UpnpEventSubscribe_new();
+		UpnpEventSubscribe *evt = UpnpEventSubscribe_new();
 		// cast away constness
 		UpnpString *sid = (UpnpString *)UpnpEventSubscribe_get_SID(evt);
 		UpnpEventSubscribe_strcpy_PublisherUrl(evt, Param->Url);
@@ -4232,7 +4232,7 @@ UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 		break;
         }
         case UNSUBSCRIBE: {
-		EventSubscribe *evt = UpnpEventSubscribe_new();
+		UpnpEventSubscribe *evt = UpnpEventSubscribe_new();
 		UpnpEventSubscribe_strcpy_SID(evt, Param->SubsId);
 		errCode = genaUnSubscribe(
 			Param->Handle,
@@ -4246,7 +4246,7 @@ UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 		break;
         }
         case RENEW: {
-		EventSubscribe *evt = UpnpEventSubscribe_new();
+		UpnpEventSubscribe *evt = UpnpEventSubscribe_new();
 		UpnpEventSubscribe_strcpy_SID(evt, Param->SubsId);
 		errCode = genaRenewSubscription(
 			Param->Handle,

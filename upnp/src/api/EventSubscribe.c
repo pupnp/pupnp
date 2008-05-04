@@ -18,7 +18,7 @@ struct SEventSubscribe
 };
 
 
-EventSubscribe *UpnpEventSubscribe_new()
+UpnpEventSubscribe *UpnpEventSubscribe_new()
 {
 	struct SEventSubscribe *p = calloc(1, sizeof (struct SEventSubscribe));
 #if 0
@@ -28,11 +28,11 @@ EventSubscribe *UpnpEventSubscribe_new()
 	p->m_SID = UpnpString_new();
 	p->m_publisherUrl = UpnpString_new();
 
-	return (EventSubscribe *)p;
+	return (UpnpEventSubscribe *)p;
 }
 
 
-void UpnpEventSubscribe_delete(EventSubscribe *p)
+void UpnpEventSubscribe_delete(UpnpEventSubscribe *p)
 {
 	struct SEventSubscribe *q = (struct SEventSubscribe *)p;
 
@@ -50,9 +50,9 @@ void UpnpEventSubscribe_delete(EventSubscribe *p)
 }
 
 
-EventSubscribe *UpnpEventSubscribe_dup(const EventSubscribe *p)
+UpnpEventSubscribe *UpnpEventSubscribe_dup(const UpnpEventSubscribe *p)
 {
-	EventSubscribe *q = UpnpEventSubscribe_new();
+	UpnpEventSubscribe *q = UpnpEventSubscribe_new();
 	
 	UpnpEventSubscribe_assign(q, p);
 	
@@ -60,7 +60,7 @@ EventSubscribe *UpnpEventSubscribe_dup(const EventSubscribe *p)
 }
 
 
-void UpnpEventSubscribe_assign(EventSubscribe *q, const EventSubscribe *p)
+void UpnpEventSubscribe_assign(UpnpEventSubscribe *q, const UpnpEventSubscribe *p)
 {
 	if (q != p) {
 		UpnpEventSubscribe_set_ErrCode(q, UpnpEventSubscribe_get_ErrCode(p));
@@ -71,44 +71,44 @@ void UpnpEventSubscribe_assign(EventSubscribe *q, const EventSubscribe *p)
 }
 
 
-int UpnpEventSubscribe_get_ErrCode(const EventSubscribe *p)
+int UpnpEventSubscribe_get_ErrCode(const UpnpEventSubscribe *p)
 {
 	return ((struct SEventSubscribe *)p)->m_errCode;
 }
 
 
-void UpnpEventSubscribe_set_ErrCode(EventSubscribe *p, int n)
+void UpnpEventSubscribe_set_ErrCode(UpnpEventSubscribe *p, int n)
 {
 	((struct SEventSubscribe *)p)->m_errCode = n;
 }
 
 
-int UpnpEventSubscribe_get_TimeOut(const EventSubscribe *p)
+int UpnpEventSubscribe_get_TimeOut(const UpnpEventSubscribe *p)
 {
 	return ((struct SEventSubscribe *)p)->m_timeOut;
 }
 
 
-void UpnpEventSubscribe_set_TimeOut(EventSubscribe *p, int n)
+void UpnpEventSubscribe_set_TimeOut(UpnpEventSubscribe *p, int n)
 {
 	((struct SEventSubscribe *)p)->m_timeOut = n;
 }
 
 
-const UpnpString *UpnpEventSubscribe_get_SID(const EventSubscribe *p)
+const UpnpString *UpnpEventSubscribe_get_SID(const UpnpEventSubscribe *p)
 {
 	return ((struct SEventSubscribe *)p)->m_SID;
 }
 
 
-void UpnpEventSubscribe_set_SID(EventSubscribe *p, const UpnpString *s)
+void UpnpEventSubscribe_set_SID(UpnpEventSubscribe *p, const UpnpString *s)
 {
 	UpnpString_delete(((struct SEventSubscribe *)p)->m_SID);
 	((struct SEventSubscribe *)p)->m_SID = UpnpString_dup(s);
 }
 
 
-void UpnpEventSubscribe_strcpy_SID(EventSubscribe *p, const char *s)
+void UpnpEventSubscribe_strcpy_SID(UpnpEventSubscribe *p, const char *s)
 {
 	UpnpString_delete(((struct SEventSubscribe *)p)->m_SID);
 	((struct SEventSubscribe *)p)->m_SID = UpnpString_new();
@@ -116,20 +116,20 @@ void UpnpEventSubscribe_strcpy_SID(EventSubscribe *p, const char *s)
 }
 
 
-const UpnpString *UpnpEventSubscribe_get_PublisherUrl(const EventSubscribe *p)
+const UpnpString *UpnpEventSubscribe_get_PublisherUrl(const UpnpEventSubscribe *p)
 {
 	return ((struct SEventSubscribe *)p)->m_publisherUrl;
 }
 
 
-void UpnpEventSubscribe_set_PublisherUrl(EventSubscribe *p, const UpnpString *s)
+void UpnpEventSubscribe_set_PublisherUrl(UpnpEventSubscribe *p, const UpnpString *s)
 {
 	UpnpString_delete(((struct SEventSubscribe *)p)->m_publisherUrl);
 	((struct SEventSubscribe *)p)->m_publisherUrl = UpnpString_dup(s);
 }
 
 
-void UpnpEventSubscribe_strcpy_PublisherUrl(EventSubscribe *p, const char *s)
+void UpnpEventSubscribe_strcpy_PublisherUrl(UpnpEventSubscribe *p, const char *s)
 {
 	UpnpString_delete(((struct SEventSubscribe *)p)->m_publisherUrl);
 	((struct SEventSubscribe *)p)->m_publisherUrl = UpnpString_new();

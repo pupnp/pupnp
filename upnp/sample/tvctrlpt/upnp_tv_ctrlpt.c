@@ -1163,7 +1163,7 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 	case UPNP_EVENT_SUBSCRIBE_COMPLETE:
 	case UPNP_EVENT_UNSUBSCRIBE_COMPLETE:
 	case UPNP_EVENT_RENEWAL_COMPLETE: {
-		EventSubscribe *es_event = (EventSubscribe *)Event;
+		UpnpEventSubscribe *es_event = (UpnpEventSubscribe *)Event;
 		errCode = UpnpEventSubscribe_get_ErrCode(es_event);
 		if (errCode != UPNP_E_SUCCESS) {
 			SampleUtil_Print(
@@ -1181,7 +1181,7 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 
 	case UPNP_EVENT_AUTORENEWAL_FAILED:
 	case UPNP_EVENT_SUBSCRIPTION_EXPIRED: {
-		EventSubscribe *es_event = (EventSubscribe *)Event;
+		UpnpEventSubscribe *es_event = (UpnpEventSubscribe *)Event;
 		int TimeOut = default_timeout;
 		Upnp_SID newSID;
 

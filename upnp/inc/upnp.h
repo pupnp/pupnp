@@ -652,18 +652,18 @@ enum Upnp_EventType_e {
 
 	/** A {\bf UpnpUnSubscribeAsync} call completed. The status of the
 	 *  subscription is in the {\bf Event} parameter as a {\bf
-	 *  EventSubscribe} structure.  */
+	 *  UpnpEventSubscribe} structure.  */
 	UPNP_EVENT_UNSUBSCRIBE_COMPLETE,
 
 	/** The auto-renewal of a client subscription failed.   
-	 *  The {\bf Event} parameter is a {\bf EventSubscribe} structure 
+	 *  The {\bf Event} parameter is a {\bf UpnpEventSubscribe} structure 
 	 *  with the error code set appropriately. The subscription is no longer 
 	 *  valid. */
 	UPNP_EVENT_AUTORENEWAL_FAILED,
 
 	/** A client subscription has expired. This will only occur 
 	 *  if auto-renewal of subscriptions is disabled.
-	 *  The {\bf Event} parameter is a {\bf EventSubscribe}
+	 *  The {\bf Event} parameter is a {\bf UpnpEventSubscribe}
 	 *  structure. The subscription is no longer valid. */
 	UPNP_EVENT_SUBSCRIPTION_EXPIRED
 };
@@ -1676,9 +1676,9 @@ EXPORT_SPEC int UpnpRenewSubscription(
  *  to expire, generating a callback when the operation is complete.
  *
  *  Note that many of the error codes for this function are returned in
- *  the {\bf EventSubscribe} structure.  In those cases, the function
+ *  the {\bf UpnpEventSubscribe} structure.  In those cases, the function
  *  returns {\tt UPNP_E_SUCCESS} and the appropriate error code will
- *  be in the {\bf EventSubscribe.ErrCode} field in the {\bf Event}
+ *  be in the {\bf UpnpEventSubscribe.ErrCode} field in the {\bf Event}
  *  structure passed to the callback.
  *
  *  @return [int] An integer representing one of the following:
@@ -1694,30 +1694,30 @@ EXPORT_SPEC int UpnpRenewSubscription(
  *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
  *              complete this operation.
  *      \item {\tt UPNP_E_NETWORK_ERROR}: A network error occured (returned in 
- *              the {\bf EventSubscribe.ErrCode} field as part of the 
+ *              the {\bf UpnpEventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_WRITE}: An error or timeout occurred writing 
- *              to a socket (returned in the {\bf EventSubscribe.ErrCode} 
+ *              to a socket (returned in the {\bf UpnpEventSubscribe.ErrCode} 
  *              field as part of the callback).
  *      \item {\tt UPNP_E_SOCKET_READ}: An error or timeout occurred reading  
  *              from a socket (returned in the 
- *              {\bf EventSubscribe.ErrCode} field as part of the 
+ *              {\bf UpnpEventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_BIND}: An error occurred binding the socket 
- *              (returned in the {\bf EventSubscribe.ErrCode} field as 
+ *              (returned in the {\bf UpnpEventSubscribe.ErrCode} field as 
  *              part of the callback).
  *      \item {\tt UPNP_E_SOCKET_CONNECT}: An error occurred connecting to 
  *              {\bf PublisherUrl} (returned in the {\bf 
- *              EventSubscribe.ErrCode} field as part of the callback).
+ *              UpnpEventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_OUTOF_SOCKET}: An error occurred creating socket (
- *              returned in the {\bf EventSubscribe.ErrCode} field as 
+ *              returned in the {\bf UpnpEventSubscribe.ErrCode} field as 
  *              part of the callback).
  *      \item {\tt UPNP_E_BAD_RESPONSE}: An error occurred in response from 
  *              the publisher (returned in the {\bf 
- *              EventSubscribe.ErrCode} field as part of the callback).
+ *              UpnpEventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_SUBSCRIBE_UNACCEPTED}: The publisher refused 
  *              the subscription request (returned in the {\bf 
- *              EventSubscribe.ErrCode} field as part of the callback).
+ *              UpnpEventSubscribe.ErrCode} field as part of the callback).
  *    \end{itemize}
  */
 EXPORT_SPEC int UpnpRenewSubscriptionAsync(
@@ -1822,9 +1822,9 @@ EXPORT_SPEC int UpnpSubscribe(
  *  callback function when the operation is complete.
  *
  *  Note that many of the error codes for this function are returned in
- *  the {\bf EventSubscribe} structure.  In those cases, the function
+ *  the {\bf UpnpEventSubscribe} structure.  In those cases, the function
  *  returns {\tt UPNP_E_SUCCESS} and the appropriate error code will
- *  be in the {\bf EventSubscribe.ErrCode} field in the {\bf Event}
+ *  be in the {\bf UpnpEventSubscribe.ErrCode} field in the {\bf Event}
  *  structure passed to the callback.
  *
  *  @return [int] An integer representing one of the following:
@@ -1839,31 +1839,31 @@ EXPORT_SPEC int UpnpSubscribe(
  *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
  *              complete this operation.
  *      \item {\tt UPNP_E_NETWORK_ERROR}: A network error occured (returned in 
- *              the {\bf EventSubscribe.ErrCode} field as part of the 
+ *              the {\bf UpnpEventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_WRITE}: An error or timeout occurred writing 
  *              to a socket (returned in the 
- *              {\bf EventSubscribe.ErrCode} field as part of the 
+ *              {\bf UpnpEventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_READ}: An error or timeout occurred reading 
  *              from a socket (returned in the 
- *              {\bf EventSubscribe.ErrCode} field as part of the 
+ *              {\bf UpnpEventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_BIND}: An error occurred binding the socket 
- *              (returned in the {\bf EventSubscribe.ErrCode} field as 
+ *              (returned in the {\bf UpnpEventSubscribe.ErrCode} field as 
  *              part of the callback).
  *      \item {\tt UPNP_E_SOCKET_CONNECT}: An error occurred connecting to 
  *              {\bf PublisherUrl} (returned in the {\bf 
- *              EventSubscribe.ErrCode} field as part of the callback).
+ *              UpnpEventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_OUTOF_SOCKET}: An error occurred creating  the 
- *              socket (returned in the {\bf EventSubscribe.ErrCode} 
+ *              socket (returned in the {\bf UpnpEventSubscribe.ErrCode} 
  *              field as part of the callback).
  *      \item {\tt UPNP_E_BAD_RESPONSE}: An error occurred in response from 
  *              the publisher (returned in the {\bf 
- *              EventSubscribe.ErrCode} field as part of the callback).
+ *              UpnpEventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_SUBSCRIBE_UNACCEPTED}: The publisher refused 
  *              the subscription request (returned in the {\bf 
- *              EventSubscribe.ErrCode} field as part of the callback).
+ *              UpnpEventSubscribe.ErrCode} field as part of the callback).
  *    \end{itemize}
  */
 EXPORT_SPEC int UpnpSubscribeAsync(
@@ -1923,9 +1923,9 @@ EXPORT_SPEC int UpnpUnSubscribe(
  *  when the operation is complete.
  *
  *  Note that many of the error codes for this function are returned in
- *  the {\bf EventSubscribe} structure.  In those cases, the function
+ *  the {\bf UpnpEventSubscribe} structure.  In those cases, the function
  *  returns {\tt UPNP_E_SUCCESS} and the appropriate error code will
- *  be in the {\bf EventSubscribe.ErrCode} field in the {\bf Event}
+ *  be in the {\bf UpnpEventSubscribe.ErrCode} field in the {\bf Event}
  *  structure passed to the callback.
  *
  *  @return [int] An integer representing one of the following:
@@ -1939,30 +1939,30 @@ EXPORT_SPEC int UpnpUnSubscribe(
  *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
  *              complete this operation.
  *      \item {\tt UPNP_E_NETWORK_ERROR}: A network error occured (returned in 
- *              the {\bf EventSubscribe.ErrCode} field as part of the 
+ *              the {\bf UpnpEventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_WRITE}: An error or timeout occurred writing 
  *              to a socket (returned in the {\bf 
- *              EventSubscribe.ErrCode} field as part of the callback).
+ *              UpnpEventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_SOCKET_READ}: An error or timeout occurred reading 
  *              from a socket (returned in the 
- *              {\bf EventSubscribe.ErrCode} field as part of the 
+ *              {\bf UpnpEventSubscribe.ErrCode} field as part of the 
  *              callback).
  *      \item {\tt UPNP_E_SOCKET_BIND}: An error occurred binding the socket 
- *              (returned in the {\bf EventSubscribe.ErrCode} field as 
+ *              (returned in the {\bf UpnpEventSubscribe.ErrCode} field as 
  *              part of the callback).
  *      \item {\tt UPNP_E_SOCKET_CONNECT}: An error occurred connecting to 
  *              {\bf PublisherUrl} (returned in the {\bf 
- *              EventSubscribe.ErrCode} field as part of the callback).
+ *              UpnpEventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_OUTOF_SOCKET}: An error occurred creating a socket (
- *              returned in the {\bf EventSubscribe.ErrCode} field as 
+ *              returned in the {\bf UpnpEventSubscribe.ErrCode} field as 
  *              part of the callback).
  *      \item {\tt UPNP_E_BAD_RESPONSE}: An error occurred in response from 
  *              the publisher (returned in the {\bf 
- *              EventSubscribe.ErrCode} field as part of the callback).
+ *              UpnpEventSubscribe.ErrCode} field as part of the callback).
  *      \item {\tt UPNP_E_UNSUBSCRIBE_UNACCEPTED}: The publisher refused 
  *              the subscription request (returned in the {\bf 
- *              EventSubscribe.ErrCode} field as part of the callback).
+ *              UpnpEventSubscribe.ErrCode} field as part of the callback).
  *    \end{itemize} */
 EXPORT_SPEC int UpnpUnSubscribeAsync(
     IN UpnpClient_Handle Hnd, /** The handle of the subscribed control 

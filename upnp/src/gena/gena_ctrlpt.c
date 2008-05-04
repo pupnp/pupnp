@@ -66,7 +66,7 @@ static void
 GenaAutoRenewSubscription( IN void *input )
 {
 	upnp_timeout *event = (upnp_timeout *) input;
-	EventSubscribe *sub_struct = (EventSubscribe *)event->Event;
+	UpnpEventSubscribe *sub_struct = (UpnpEventSubscribe *)event->Event;
 	void *cookie;
 	Upnp_FunPtr callback_fun;
 	struct Handle_Info *handle_info;
@@ -137,7 +137,7 @@ static int ScheduleGenaAutoRenew(
 	IN int TimeOut,
 	IN ClientSubscription *sub)
 {
-	EventSubscribe *RenewEventStruct = NULL;
+	UpnpEventSubscribe *RenewEventStruct = NULL;
 	upnp_timeout *RenewEvent = NULL;
 	int return_code = GENA_SUCCESS;
 	ThreadPoolJob job;

@@ -10,7 +10,6 @@
 #include <string.h> // for strlen(), strdup()
 
 
-/** This is a private struct, it belongs only to this file. */
 struct SUpnpFileInfo
 {
 	off_t m_fileLength;

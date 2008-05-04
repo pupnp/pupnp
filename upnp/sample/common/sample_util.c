@@ -564,7 +564,7 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
 
         case UPNP_EVENT_RENEWAL_COMPLETE:
             {
-                EventSubscribe *es_event = (EventSubscribe *)Event;
+                UpnpEventSubscribe *es_event = (UpnpEventSubscribe *)Event;
                 SampleUtil_Print(
                     "SID         =  %s\n"
                     "ErrCode     =  %d\n"
@@ -578,7 +578,7 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
         case UPNP_EVENT_SUBSCRIBE_COMPLETE:
         case UPNP_EVENT_UNSUBSCRIBE_COMPLETE:
             {
-                EventSubscribe *es_event = (EventSubscribe *)Event;
+                UpnpEventSubscribe *es_event = (UpnpEventSubscribe *)Event;
                 SampleUtil_Print(
                     "SID         =  %s\n"
                     "ErrCode     =  %d\n"
@@ -594,7 +594,7 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
         case UPNP_EVENT_AUTORENEWAL_FAILED:
         case UPNP_EVENT_SUBSCRIPTION_EXPIRED:
             {
-                EventSubscribe *es_event = (EventSubscribe *)Event;
+                UpnpEventSubscribe *es_event = (UpnpEventSubscribe *)Event;
                 SampleUtil_Print(
                     "SID         =  %s\n"
                     "ErrCode     =  %d\n"
