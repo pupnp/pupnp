@@ -37,7 +37,7 @@
 #include "client_table.h"
 #include "upnp.h"
 //#include "../ssdp/ssdplib.h"
-#include "VirtualDir.h"		/* for struct UpnpVirtualDirCallbacks */
+#include "VirtualDir.h"		/* for struct VirtualDirCallbacks */
 
 
 #define MAX_INTERFACES 256
@@ -173,7 +173,7 @@ struct  UpnpNonblockParam
 
 
 extern virtualDirList *pVirtualDirList;
-extern struct UpnpVirtualDirCallbacks virtualDirCallback;
+extern struct VirtualDirCallbacks virtualDirCallback;
 
 
 typedef enum { WEB_SERVER_DISABLED, WEB_SERVER_ENABLED } WebServerState;

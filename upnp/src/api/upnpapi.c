@@ -89,7 +89,7 @@
 
 
 // This structure is for virtual directory callbacks
-struct UpnpVirtualDirCallbacks virtualDirCallback;
+struct VirtualDirCallbacks virtualDirCallback;
 
 //
 virtualDirList *pVirtualDirList;
@@ -4818,7 +4818,7 @@ UpnpSetWebServerRootDir( IN const char *rootDir )
  *	This function adds a virtual directory mapping.
  *
  *	All webserver requests containing the given directory are read using
- *	functions contained in a UpnpVirtualDirCallbacks structure registered
+ *	functions contained in a VirtualDirCallbacks structure registered
  *	via UpnpSetVirtualDirCallbacks.
  *  
  *	Note that this function is not available when the web server is not

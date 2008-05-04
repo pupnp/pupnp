@@ -2548,7 +2548,7 @@ EXPORT_SPEC int UpnpIsWebserverEnabled();
 /** {\bf UpnpAddVirtualDir} adds a virtual directory mapping.
  *
  *  All webserver requests containing the given directory are read using
- *  functions contained in a {\bf UpnpVirtualDirCallbacks} structure registered
+ *  functions contained in a {\bf VirtualDirCallbacks} structure registered
  *  via {\bf UpnpSetVirtualDirCallbacks}.
  *
  *  @return [int] An integer representing one of the following:

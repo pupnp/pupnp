@@ -4,11 +4,11 @@
 #define VIRTUALDIR_H
 
 
-/** The {\bf UpnpVirtualDirCallbacks} structure contains the pointers to
+/** The {\bf VirtualDirCallbacks} structure contains the pointers to
  *  file-related callback functions a device application can register to
  *  virtualize URLs.  
  */
-struct UpnpVirtualDirCallbacks
+struct VirtualDirCallbacks
 {
 	/** Called by the web server to query information on a file.  The callback
 	 *  should return 0 on success or -1 on an error. */
