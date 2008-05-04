@@ -163,392 +163,236 @@ int UpnpSdkDeviceregisteredV6 = 0;
 Upnp_SID gUpnpSdkNLSuuid;
 
 
-/****************************************************************************
- * Function: UpnpInit2
- *
- * Parameters:		
- *	IN const char * IfName: Name of local interface.
- *	IN short DestPort: Local Port to listen for incoming connections.
- *
- * Description:
- *	- Initializes the UPnP SDK.
- *  - Checks IfName interface. If NULL, we find a suitable interface for 
- *    operation.
- *
- * Returns:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
- *	UPNP_E_INIT_FAILED if Initialization fails.
- *	UPNP_E_INIT if UPnP is already initialized.
- *	UPNP_E_INVALID_INTERFACE if interface provided is not configured with at
- *		least one valid IP address.
- *****************************************************************************/
-int UpnpInit2( IN const char *IfName,
-               IN unsigned short DestPort )
+/******************************************************************************/
+int UpnpInit(IN const char *HostIP, IN unsigned short DestPort)
 {
-    int retVal;
+	int retVal;
 
-    ithread_mutex_lock( &gSDKInitMutex );
+	ithread_mutex_lock( &gSDKInitMutex );
 
-    // Check if we're already initialized.
-    if( UpnpSdkInit == 1 ) {
-        ithread_mutex_unlock( &gSDKInitMutex );
-        return UPNP_E_INIT;
-    }
+	// Check if we're already initialized.
+	if( UpnpSdkInit == 1 ) {
+		ithread_mutex_unlock( &gSDKInitMutex );
+		return UPNP_E_INIT;
+	}
 
-    // Perform initialization preamble.
-    retVal = UpnpInitPreamble();
-    if( retVal != UPNP_E_SUCCESS ) {
-        ithread_mutex_unlock( &gSDKInitMutex );
-        return retVal;
-    }
+	// Perform initialization preamble.
+	retVal = UpnpInitPreamble();
+	if( retVal != UPNP_E_SUCCESS ) {
+		ithread_mutex_unlock( &gSDKInitMutex );
+		return retVal;
+	}
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "UpnpInit2 with IfName=%s, DestPort=%d.\n", 
-        IfName ? IfName : "", DestPort );
+	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+		"UpnpInit with HostIP=%s, DestPort=%d.\n", 
+		HostIP ? HostIP : "", DestPort );
 
-    // Retrieve interface information (Addresses, index, etc).
-    retVal = UpnpGetIfInfo( IfName );
-    if( retVal != UPNP_E_SUCCESS ) {
-        ithread_mutex_unlock( &gSDKInitMutex );
-        return retVal;
-    }
+	// Verify HostIP, if provided, or find it ourselves.
+	if( HostIP != NULL ) {
+		strncpy( gIF_IPV4, HostIP, sizeof(gIF_IPV4) );
+	} else {
+		if( getlocalhostname( gIF_IPV4, sizeof(gIF_IPV4) ) != UPNP_E_SUCCESS ) {
+			return UPNP_E_INIT_FAILED;
+		}
+	}
 
-    // Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized.
-    UpnpSdkInit = 1;
+	// Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized.
+	UpnpSdkInit = 1;
 
-    // Finish initializing the SDK.
-    retVal = UpnpInitStartServers( DestPort );
-    if( retVal != UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        ithread_mutex_unlock( &gSDKInitMutex );
-        return retVal;
-    }
+	// Finish initializing the SDK.
+	retVal = UpnpInitStartServers( DestPort );
+	if( retVal != UPNP_E_SUCCESS ) {
+		UpnpSdkInit = 0;
+		ithread_mutex_unlock( &gSDKInitMutex );
+		return retVal;
+	}
 
-    ithread_mutex_unlock( &gSDKInitMutex );
+	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+		"Host Ip: %s Host Port: %d\n", gIF_IPV4,
+		LOCAL_PORT_V4 );
 
-    return UPNP_E_SUCCESS;
+	ithread_mutex_unlock( &gSDKInitMutex );
+
+	return UPNP_E_SUCCESS;
 }
 
 
-/****************************************************************************
- * Function: UpnpInit
- *
- * Parameters:		
- *	IN const char * HostIP: Local IP Address
- *	IN short DestPort: Local Port to listen for incoming connections.
- *
- * Description:
- *  ** DEPRECATED: Kept for backwards compatibility. **
- *  Use UpnpInit2 for new implementations.
- *	- Initializes the UPnP SDK.
- *  - Checks HostIP address. If NULL, we find a suitable IP for operation.
- *
- * Returns:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
- *	UPNP_E_INIT_FAILED if Initialization fails.
- *	UPNP_E_INIT if UPnP is already initialized.
- *****************************************************************************/
-int UpnpInit( IN const char *HostIP,
-              IN unsigned short DestPort )
+/******************************************************************************/
+int UpnpInit2(IN const char *IfName, IN unsigned short DestPort)
 {
-    int retVal;
+	int retVal;
 
-    ithread_mutex_lock( &gSDKInitMutex );
+	ithread_mutex_lock( &gSDKInitMutex );
 
-    // Check if we're already initialized.
-    if( UpnpSdkInit == 1 ) {
-        ithread_mutex_unlock( &gSDKInitMutex );
-        return UPNP_E_INIT;
-    }
+	// Check if we're already initialized.
+	if( UpnpSdkInit == 1 ) {
+		ithread_mutex_unlock( &gSDKInitMutex );
+		return UPNP_E_INIT;
+	}
 
-    // Perform initialization preamble.
-    retVal = UpnpInitPreamble();
-    if( retVal != UPNP_E_SUCCESS ) {
-        ithread_mutex_unlock( &gSDKInitMutex );
-        return retVal;
-    }
+	// Perform initialization preamble.
+	retVal = UpnpInitPreamble();
+	if( retVal != UPNP_E_SUCCESS ) {
+		ithread_mutex_unlock( &gSDKInitMutex );
+		return retVal;
+	}
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "UpnpInit with HostIP=%s, DestPort=%d.\n", 
-        HostIP ? HostIP : "", DestPort );
+	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+		"UpnpInit2 with IfName=%s, DestPort=%d.\n", 
+		IfName ? IfName : "", DestPort );
 
-    // Verify HostIP, if provided, or find it ourselves.
-    if( HostIP != NULL ) {
-        strncpy( gIF_IPV4, HostIP, sizeof(gIF_IPV4) );
-    } else {
-        if( getlocalhostname( gIF_IPV4, sizeof(gIF_IPV4) ) != UPNP_E_SUCCESS ) {
-            return UPNP_E_INIT_FAILED;
-        }
-    }
+	// Retrieve interface information (Addresses, index, etc).
+	retVal = UpnpGetIfInfo( IfName );
+	if( retVal != UPNP_E_SUCCESS ) {
+		ithread_mutex_unlock( &gSDKInitMutex );
+		return retVal;
+	}
 
-    // Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized.
-    UpnpSdkInit = 1;
+	// Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized.
+	UpnpSdkInit = 1;
 
-    // Finish initializing the SDK.
-    retVal = UpnpInitStartServers( DestPort );
-    if( retVal != UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        ithread_mutex_unlock( &gSDKInitMutex );
-        return retVal;
-    }
+	// Finish initializing the SDK.
+	retVal = UpnpInitStartServers( DestPort );
+	if( retVal != UPNP_E_SUCCESS ) {
+		UpnpSdkInit = 0;
+		ithread_mutex_unlock( &gSDKInitMutex );
+		return retVal;
+	}
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Host Ip: %s Host Port: %d\n", gIF_IPV4,
-        LOCAL_PORT_V4 );
+	ithread_mutex_unlock( &gSDKInitMutex );
 
-    ithread_mutex_unlock( &gSDKInitMutex );
-
-    return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 
-/****************************************************************************
- * Function: PrintThreadPoolStats
- *
- * Parameters:	
- *
- * Description:
- *
- * Return Values: (none)
- *****************************************************************************/
-#ifdef DEBUG
-static void 
-PrintThreadPoolStats(
-	ThreadPool *tp, 
-	const char *DbgFileName,
-	int DbgLineNo,
-	const char *msg)
-{
-	ThreadPoolStats stats;
-	ThreadPoolGetStats(tp, &stats);
-	UpnpPrintf(UPNP_INFO, API, DbgFileName, DbgLineNo, 
-		"%s\n"
-		"High Jobs pending: %d\n"
-		"Med Jobs Pending: %d\n"
-		"Low Jobs Pending: %d\n"
-		"Average wait in High Q in milliseconds: %lf\n"
-		"Average wait in Med Q in milliseconds: %lf\n"
-		"Average wait in Low Q in milliseconds: %lf\n"
-		"Max Threads Used: %d\n"
-		"Worker Threads: %d\n"
-		"Persistent Threads: %d\n"
-		"Idle Threads: %d\n"
-		"Total Threads: %d\n"
-		"Total Work Time: %lf\n"
-		"Total Idle Time: %lf\n",
-		msg,
-		stats.currentJobsHQ,
-		stats.currentJobsMQ,
-		stats.currentJobsLQ,
-		stats.avgWaitHQ,
-		stats.avgWaitMQ,
-		stats.avgWaitLQ,
-		stats.maxThreads,
-		stats.workerThreads,
-		stats.persistentThreads,
-		stats.idleThreads,
-		stats.totalThreads,
-		stats.totalWorkTime,
-		stats.totalIdleTime);
-}
-#else /* DEBUG */
-static UPNP_INLINE void 
-PrintThreadPoolStats(
-	ThreadPool *tp, 
-	const char *DbgFileName,
-	int DbgLineNo,
-	const char *msg)
-{
-}
-#endif /* DEBUG */
-
-
-/****************************************************************************
- * Function: UpnpFinish
- *
- * Parameters:	NONE
- *
- * Description:
- *	Checks for pending jobs and threads 
- *		Unregisters either the client or device 
- *		Shuts down the Timer Thread
- *		Stops the Mini Server
- *		Uninitializes the Thread Pool
- *		For Win32 cleans up Winsock Interface 
- *		Cleans up mutex objects
- *
- * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
- *****************************************************************************/
-int
-UpnpFinish()
+/******************************************************************************/
+int UpnpFinish()
 {
 #ifdef INCLUDE_DEVICE_APIS
-    UpnpDevice_Handle device_handle;
+	UpnpDevice_Handle device_handle;
 #endif
 #ifdef INCLUDE_CLIENT_APIS
-    UpnpClient_Handle client_handle;
+	UpnpClient_Handle client_handle;
 #endif
-    struct Handle_Info *temp;
+	struct Handle_Info *temp;
 
 #ifdef WIN32
-//	WSACleanup();
+	//	WSACleanup();
 #endif
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
+	if( UpnpSdkInit != 1 ) {
+		return UPNP_E_FINISH;
+	}
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit );
-    if( UpnpSdkInit == 1 ) {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpFinish : UpnpSdkInit is ONE\n" );
-    }
-    PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
-    PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
-    PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__, "MiniServer Thread Pool");
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+		"Inside UpnpFinish: UpnpSdkInit is %d\n", UpnpSdkInit);
+	if (UpnpSdkInit == 1) {
+		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+		"UpnpFinish: UpnpSdkInit is ONE\n");
+	}
+	PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
+	PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
+	PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__, "MiniServer Thread Pool");
 
 #ifdef INCLUDE_DEVICE_APIS
-    if( GetDeviceHandleInfo( AF_INET, &device_handle, &temp ) == HND_DEVICE )
-        UpnpUnRegisterRootDevice( device_handle );
-    if( GetDeviceHandleInfo( AF_INET6, &device_handle, &temp ) == HND_DEVICE )
-        UpnpUnRegisterRootDevice( device_handle );
+	if (GetDeviceHandleInfo(AF_INET, &device_handle, &temp) == HND_DEVICE ) {
+		UpnpUnRegisterRootDevice(device_handle);
+	}
+	if (GetDeviceHandleInfo(AF_INET6, &device_handle, &temp) == HND_DEVICE ) {
+		UpnpUnRegisterRootDevice(device_handle);
+	}
 #endif
 
 #ifdef INCLUDE_CLIENT_APIS
-    if( GetClientHandleInfo( &client_handle, &temp ) == HND_CLIENT )
-        UpnpUnRegisterClient( client_handle );
+	if (GetClientHandleInfo(&client_handle, &temp) == HND_CLIENT) {
+		UpnpUnRegisterClient( client_handle );
+	}
 #endif
 
-    TimerThreadShutdown( &gTimerThread );
-    StopMiniServer();
+	TimerThreadShutdown(&gTimerThread);
+	StopMiniServer();
 
 #if EXCLUDE_WEB_SERVER == 0
-    web_server_destroy();
+	web_server_destroy();
 #endif
 
-    ThreadPoolShutdown(&gMiniServerThreadPool);
-    ThreadPoolShutdown(&gRecvThreadPool);
-    ThreadPoolShutdown(&gSendThreadPool);
+	ThreadPoolShutdown(&gMiniServerThreadPool);
+	ThreadPoolShutdown(&gRecvThreadPool);
+	ThreadPoolShutdown(&gSendThreadPool);
 
-    PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
-    PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
-    PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__, "MiniServer Thread Pool");
+	PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
+	PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
+	PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__, "MiniServer Thread Pool");
 
 #ifdef INCLUDE_CLIENT_APIS
-    ithread_mutex_destroy(&GlobalClientSubscribeMutex);
+	ithread_mutex_destroy(&GlobalClientSubscribeMutex);
 #endif
-    ithread_rwlock_destroy(&GlobalHndRWLock);
-    ithread_mutex_destroy(&gUUIDMutex);
+	ithread_rwlock_destroy(&GlobalHndRWLock);
+	ithread_mutex_destroy(&gUUIDMutex);
 
-    // remove all virtual dirs
-    UpnpRemoveAllVirtualDirs();
+	// remove all virtual dirs
+	UpnpRemoveAllVirtualDirs();
 
-    // allow static linking
+	// allow static linking
 #ifdef WIN32
 #ifdef PTW32_STATIC_LIB
-    pthread_win32_thread_detach_np();
+	pthread_win32_thread_detach_np();
 #endif
 #endif
 
-    UpnpSdkInit = 0;
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Exiting UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit);
-    UpnpCloseLog();
+	UpnpSdkInit = 0;
+	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+	"Exiting UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit);
+	UpnpCloseLog();
 
-    return UPNP_E_SUCCESS;
-
+	return UPNP_E_SUCCESS;
 }
-/*************************** End of  UpnpFinish  *****************************/
 
-/******************************************************************************
- * Function: UpnpGetServerPort
- *
- * Parameters: NONE
- *
- * Description:
- *	Gives back the IPv4 listening miniserver port.
- *
- * Return Values:
- *	local port on success, zero on failure.
- *****************************************************************************/
-unsigned short
-UpnpGetServerPort( void )
+
+/******************************************************************************/
+unsigned short UpnpGetServerPort()
 {
+	if (UpnpSdkInit != 1) {
+		return 0;
+	}
 
-    if( UpnpSdkInit != 1 )
-        return 0;
-
-    return LOCAL_PORT_V4;
+	return LOCAL_PORT_V4;
 }
 
-/******************************************************************************
- * Function: UpnpGetServerPort6
- *
- * Parameters: NONE
- *
- * Description:
- *	Gives back the IPv6 listening miniserver port.
- *
- * Return Values:
- *	local port on success, zero on failure.
- *****************************************************************************/
-unsigned short
-UpnpGetServerPort6( void )
+/******************************************************************************/
+unsigned short UpnpGetServerPort6()
 {
+	if (UpnpSdkInit != 1) {
+		return 0;
+	}
 
-    if( UpnpSdkInit != 1 )
-        return 0;
-
-    return LOCAL_PORT_V6;
+	return LOCAL_PORT_V6;
 }
 
-/***************************************************************************
- * Function: UpnpGetServerIpAddress
- *
- * Parameters: NONE
- *
- * Description:
- *	Gives back the local IPv4 ipaddress.
- *
- * Return Values: char *
- *	return the IPv4 address string on success else NULL of failure
- ***************************************************************************/
-char *
-UpnpGetServerIpAddress( void )
+/*****************************************************************************/
+char *UpnpGetServerIpAddress()
 {
+	if (UpnpSdkInit != 1) {
+		return NULL;
+	}
 
-    if( UpnpSdkInit != 1 )
-        return NULL;
-
-    return gIF_IPV4;
+	return gIF_IPV4;
 }
 
-/***************************************************************************
- * Function: UpnpGetServerIp6Address
- *
- * Parameters: NONE
- *
- * Description:
- *	Gives back the local IPv6 ipaddress.
- *
- * Return Values: char *
- *	return the IPv6 address string on success else NULL of failure
- ***************************************************************************/
-char *
-UpnpGetServerIp6Address( void )
+/*****************************************************************************/
+char *UpnpGetServerIp6Address()
 {
+	if( UpnpSdkInit != 1 ) {
+		return NULL;
+	}
 
-    if( UpnpSdkInit != 1 )
-        return NULL;
-
-    return gIF_IPV6;
+	return gIF_IPV6;
 }
+
 
 #ifdef INCLUDE_DEVICE_APIS
 #if 0
 
-/****************************************************************************
+/*****************************************************************************
  * Function: UpnpAddRootDevice
  *
  * Parameters:	
@@ -1497,29 +1341,11 @@ UpnpRegisterRootDevice3( IN const char *DescUrl,
 
 #ifdef INCLUDE_CLIENT_APIS
 
-/**************************************************************************
- * Function: UpnpRegisterClient
- *
- * Parameters:	
- *	IN Upnp_FunPtr Fun:  Pointer to a function for receiving 
- *		 asynchronous events.
- *	IN const void * Cookie: Pointer to user data returned with the 
- *		callback function when invoked.
- *	OUT UpnpClient_Handle *Hnd: Pointer to a variable to store 
- *		the new control point handle.
- *
- * Description:
- *	This function registers a control point application with the
- *	UPnP Library.  A control point application cannot make any other API 
- *	calls until it registers using this function.
- *
- * Return Values: int
- *      
- ***************************************************************************/
-int
-UpnpRegisterClient( IN Upnp_FunPtr Fun,
-                    IN const void *Cookie,
-                    OUT UpnpClient_Handle * Hnd )
+/*****************************************************************************/
+int UpnpRegisterClient(
+	IN Upnp_FunPtr Fun,
+	IN const void *Cookie,
+	OUT UpnpClient_Handle *Hnd)
 {
     struct Handle_Info *HInfo;
 
@@ -1568,29 +1394,13 @@ UpnpRegisterClient( IN Upnp_FunPtr Fun,
         "Exiting UpnpRegisterClient \n" );
 
     return UPNP_E_SUCCESS;
-
-}  /****************** End of UpnpRegisterClient   *********************/
+}
 #endif // INCLUDE_CLIENT_APIS
 
 
-/****************************************************************************
- * Function: UpnpUnRegisterClient
- *
- * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point instance 
- *		to unregister
- * Description:
- *	This function unregisters a client registered with 
- *	UpnpRegisterclient or UpnpRegisterclient2. After this call, the 
- *	UpnpDevice_Handle Hnd is no longer valid. The UPnP Library generates 
- *	no more callbacks after this function returns.
- *
- * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
- *****************************************************************************/
+/*****************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
-int
-UpnpUnRegisterClient( IN UpnpClient_Handle Hnd )
+int UpnpUnRegisterClient(IN UpnpClient_Handle Hnd)
 {
     struct Handle_Info *HInfo;
     ListNode *node = NULL;
@@ -1638,7 +1448,7 @@ UpnpUnRegisterClient( IN UpnpClient_Handle Hnd )
         "Exiting UpnpUnRegisterClient \n" );
     return UPNP_E_SUCCESS;
 
-}  /****************** End of UpnpUnRegisterClient *********************/
+}
 #endif // INCLUDE_CLIENT_APIS
 
 //-----------------------------------------------------------------------------
@@ -5151,17 +4961,11 @@ UpnpFree( IN void *item )
 
 /**************************************************************************
  * Function: UpnpSetContentLength
- * OBSOLETE METHOD : use {\bf UpnpSetMaxContentLength} instead.
+ * OBSOLETE METHOD: use UpnpSetMaxContentLength() instead.
  ***************************************************************************/
-int
-UpnpSetContentLength( IN UpnpClient_Handle Hnd,
-                               /** The handle of the device instance
-                                  for which the coincoming content length needs
-                                  to be set. */
-
-                      IN int contentLength
-                               /** Permissible content length  */
-     )
+int UpnpSetContentLength(
+	IN UpnpClient_Handle Hnd,
+	IN int contentLength)
 {
     int errCode = UPNP_E_SUCCESS;
     struct Handle_Info *HInfo = NULL;

@@ -9,7 +9,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-/** Returned in a {\bf UPNP_DISCOVERY_RESULT} callback. */
+/** Returned in a \b UPNP_DISCOVERY_RESULT callback. */
 typedef struct {} UpnpDiscovery;
 
 
@@ -31,7 +31,7 @@ UpnpDiscovery *UpnpDiscovery_dup(const UpnpDiscovery *p);
 /** Assignment operator */
 void UpnpDiscovery_assign(UpnpDiscovery *q, const UpnpDiscovery *p);
 
-/** The result code of the {\bf UpnpSearchAsync} call. */
+/** The result code of the \b UpnpSearchAsync call. */
 int UpnpDiscovery_get_ErrCode(const UpnpDiscovery *p);
 void UpnpDiscovery_set_ErrCode(UpnpDiscovery *p, int n);
 

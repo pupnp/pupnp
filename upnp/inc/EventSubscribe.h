@@ -9,8 +9,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-/** Returned along with a {\bf UPNP_EVENT_SUBSCRIBE_COMPLETE} or
- * {\bf UPNP_EVENT_UNSUBSCRIBE_COMPLETE} callback.  */
+/** Returned along with a \b UPNP_EVENT_SUBSCRIBE_COMPLETE or
+ * \b UPNP_EVENT_UNSUBSCRIBE_COMPLETE callback.  */
 typedef struct {} UpnpEventSubscribe;
 
 
@@ -38,7 +38,7 @@ int UpnpEventSubscribe_get_TimeOut(const UpnpEventSubscribe *p);
 void UpnpEventSubscribe_set_TimeOut(UpnpEventSubscribe *p, int n);
 
 /** The SID for this subscription.  For subscriptions, this only
- *  contains a valid SID if the {\bf Upnp_EventSubscribe.result} field
+ *  contains a valid SID if the \b Upnp_EventSubscribe.result field
  *  contains a {\tt UPNP_E_SUCCESS} result code.  For unsubscriptions,
  *  this contains the SID from which the subscription is being
  *  unsubscribed.  */

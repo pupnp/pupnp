@@ -33,10 +33,17 @@
 #ifndef UPNP_DEBUG_H
 #define UPNP_DEBUG_H 
 
+
+/*! \file */
+
+
+#include "ThreadPool.h"
 #include "upnp.h"
 #include "upnpconfig.h"
 
+
 #include <stdio.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -270,35 +277,6 @@ static UPNP_INLINE void UpnpPrintf(
 
 
 /***************************************************************************
- * Function : UpnpDisplayBanner				
- *							
- * Parameters:							
- *	IN FILE *fd: file descriptor where the banner will be written
- *	IN char **lines: The buffer that will be written
- *	IN int size: Size of the buffer
- *	IN int starLength: This parameter provides the width of the banner
- *									
- * Description:							
- *	This functions takes the buffer and writes the buffer in the file as 
- *	per the requested banner			
- * Returns: void
- ***************************************************************************/
-#ifdef DEBUG
-void UpnpDisplayBanner(
-	FILE *fd,
-	const char **lines,
-	size_t size,
-	int starlength);
-#else
-static UPNP_INLINE void UpnpDisplayBanner(
-	FILE *fd,
-	const char **lines,
-	size_t size,
-	int starlength) {}
-#endif
-
-
-/***************************************************************************
  * Function : UpnpDisplayFileAndLine				
  *								
  * Parameters:							
@@ -323,6 +301,53 @@ static UPNP_INLINE void UpnpDisplayFileAndLine(
 	const char *DbgFileName,
 	int DbgLineNo) {}
 #endif
+
+
+/*! \brief  Writes the buffer in the file as per the requested banner
+ *
+ * \param [in] fd file descriptor where the banner will be written
+ * \param [in] lines: The buffer that will be written
+ * \param [in] size: Size of the buffer
+ * \param [in] starLength: This parameter provides the width of the banner
+ */
+#ifdef DEBUG
+void UpnpDisplayBanner(
+	FILE *fd,
+	const char **lines,
+	size_t size,
+	int starlength);
+#else
+static UPNP_INLINE void UpnpDisplayBanner(
+	FILE *fd,
+	const char **lines,
+	size_t size,
+	int starlength) {}
+#endif
+
+
+/*! \brief Prints thread pool statistics.
+ *
+ * \param [in] tp The thread pool
+ * \param [in] DbgFileName the file name that called this function, use the
+ * 	macro __FILE__.
+ * \param [in] DbgLineNo the line number that the function was called, use
+ * 	the macro __LINE__.
+ * \param [in] msg message.
+ */
+#ifdef DEBUG
+void PrintThreadPoolStats(
+	ThreadPool *tp, 
+	const char *DbgFileName,
+	int DbgLineNo,
+	const char *msg);
+#else
+static UPNP_INLINE void PrintThreadPoolStats(
+	ThreadPool *tp, 
+	const char *DbgFileName,
+	int DbgLineNo,
+	const char *msg) {}
+#endif
+
 
 /*! @} */
 

@@ -4,11 +4,15 @@
 #define STRING_H
 
 
+/** \file */
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
 
+/** Type of the string objects inside libupnp. */
 typedef struct {} UpnpString;
 
 

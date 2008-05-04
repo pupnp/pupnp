@@ -9,7 +9,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-/** Returned as part of a {\bf UPNP_CONTROL_ACTION_COMPLETE} callback.  */
+/** Returned as part of a \b UPNP_CONTROL_ACTION_COMPLETE callback.  */
 typedef struct {} UpnpActionRequest;
 
 

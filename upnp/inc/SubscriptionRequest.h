@@ -9,7 +9,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-/** Returned along with a {\bf UPNP_EVENT_SUBSCRIPTION_REQUEST} callback. */
+/** Returned along with a \b UPNP_EVENT_SUBSCRIPTION_REQUEST callback. */
 typedef struct {} UpnpSubscriptionRequest;
 
 

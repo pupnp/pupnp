@@ -339,20 +339,6 @@ void UpnpDisplayFileAndLine(
 #endif
 
 
-/***************************************************************************
- * Function : UpnpDisplayBanner	
- *
- * Parameters:			
- *	IN FILE *fd: file descriptor where the banner will be written
- *	IN char **lines: The buffer that will be written
- *	IN int size: Size of the buffer
- *	IN int starLength: This parameter provides the width of the banner
- *	
- * Description:			
- *	This functions takes the buffer and writes the buffer in the file as 
- *	per the requested banner
- * Returns: void
- ***************************************************************************/
 #ifdef DEBUG
 void UpnpDisplayBanner(
 	IN FILE * fd,
@@ -407,4 +393,46 @@ void UpnpDisplayBanner(
 	free( leftMargin );
 }
 #endif
- 
+
+
+#ifdef DEBUG
+void PrintThreadPoolStats(
+	ThreadPool *tp, 
+	const char *DbgFileName,
+	int DbgLineNo,
+	const char *msg)
+{
+	ThreadPoolStats stats;
+	ThreadPoolGetStats(tp, &stats);
+	UpnpPrintf(UPNP_INFO, API, DbgFileName, DbgLineNo, 
+		"%s\n"
+		"High Jobs pending: %d\n"
+		"Med Jobs Pending: %d\n"
+		"Low Jobs Pending: %d\n"
+		"Average wait in High Q in milliseconds: %lf\n"
+		"Average wait in Med Q in milliseconds: %lf\n"
+		"Average wait in Low Q in milliseconds: %lf\n"
+		"Max Threads Used: %d\n"
+		"Worker Threads: %d\n"
+		"Persistent Threads: %d\n"
+		"Idle Threads: %d\n"
+		"Total Threads: %d\n"
+		"Total Work Time: %lf\n"
+		"Total Idle Time: %lf\n",
+		msg,
+		stats.currentJobsHQ,
+		stats.currentJobsMQ,
+		stats.currentJobsLQ,
+		stats.avgWaitHQ,
+		stats.avgWaitMQ,
+		stats.avgWaitLQ,
+		stats.maxThreads,
+		stats.workerThreads,
+		stats.persistentThreads,
+		stats.idleThreads,
+		stats.totalThreads,
+		stats.totalWorkTime,
+		stats.totalIdleTime);
+}
+#endif
+
