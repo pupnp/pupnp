@@ -53,6 +53,8 @@
 #if (defined(BSD) && BSD >= 199306)
 	#include <time.h>
 #endif
+
+
 #include "ixml.h"
 #include "upnpconfig.h"
 
@@ -513,9 +515,20 @@
 #define INOUT
 #endif
 
+
 #include "upnpdebug.h"
 
 
+/* 
+ * Opaque data structures. The following includes are data structures that
+ * must be externally visible. Since version 1.8.0, only an opaque typedef
+ * is visible from the outside world. Any operation on these data types
+ * must be done using the appropriate interface functions.
+ *
+ * This policy has the great advantage that it is now possible to change
+ * the internal implementation of these data structures without breaking
+ * the API.
+ */
 #include "ActionComplete.h"
 #include "ActionRequest.h"
 #include "Discovery.h"
@@ -773,7 +786,6 @@ extern "C" {
  *      \item {\tt UPNP_E_OUTOF_SOCKET}: An error ocurred creating a socket.
  *      \item {\tt UPNP_E_INTERNAL_ERROR}: An internal error ocurred.
  *    \end{itemize} */
-
 EXPORT_SPEC int UpnpInit(
     IN const char *HostIP,      /** The host IP address to use, in 
                                     string format, for example "192.168.0.1", 
@@ -817,7 +829,6 @@ EXPORT_SPEC int UpnpInit(
  *      \item {\tt UPNP_E_INVALID_INTERFACE}: IfName is invalid or doees not
  *              have a valid IPv4 or IPv6 addresss configured.
  *    \end{itemize} */
-
 EXPORT_SPEC int UpnpInit2( 
     IN const char *IfName,      /** The interface name to use by the UPnP SDK
                                     operations. Examples: "eth0", "xl0",
@@ -838,7 +849,6 @@ EXPORT_SPEC int UpnpInit2(
  *      \item {\tt UPNP_E_FINISH}: The SDK is already terminated or 
  *                                 it is not initialized. 
  *    \end{itemize} */
-
 EXPORT_SPEC int UpnpFinish();
 
 /** If '0' is used as the port number in {\bf UpnpInit}, then this
@@ -899,7 +909,6 @@ EXPORT_SPEC char * UpnpGetServerIp6Address(void);
  *              register this control point.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpRegisterClient(
     IN Upnp_FunPtr Callback,   /** Pointer to a function for receiving 
                                    asynchronous events. */
@@ -943,7 +952,6 @@ EXPORT_SPEC int UpnpRegisterClient(
  *      \item {\tt UPNP_E_OUTOF_MEMORY}: There are insufficient resources to 
  *              register this root device.
  *    \end{itemize} */
-
 EXPORT_SPEC int UpnpRegisterRootDevice(
     IN const char *DescUrl,    /** Pointer to a string containing the 
                                    description URL for this root device 
@@ -1022,7 +1030,6 @@ EXPORT_SPEC int UpnpRegisterRootDevice(
  *              compiled out; the SDK cannot configure itself from the 
  *              description document.
  *    \end{itemize} */
- 
 EXPORT_SPEC int UpnpRegisterRootDevice2(
     IN Upnp_DescType descriptionType,/** The type of the description 
                                          document. */
@@ -1082,7 +1089,6 @@ EXPORT_SPEC int UpnpRegisterRootDevice2(
  *      \item {\tt UPNP_E_OUTOF_MEMORY}: There are insufficient resources to 
  *              register this root device.
  *    \end{itemize} */
-
 EXPORT_SPEC int UpnpRegisterRootDevice3(
     IN const char *DescUrl,    /** Pointer to a string containing the 
                                    description URL for this root device 
@@ -1113,7 +1119,6 @@ EXPORT_SPEC int UpnpRegisterRootDevice3(
  *      \item {\tt UPNP_E_INVALID_HANDLE}: The handle is not a valid control 
  *                   point handle.
  *    \end{itemize} */
-
 EXPORT_SPEC int UpnpUnRegisterClient(
     IN UpnpClient_Handle Hnd  /** The handle of the control point instance 
                                   to unregister. */
@@ -1136,7 +1141,6 @@ EXPORT_SPEC int UpnpUnRegisterClient(
  *              device handle.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpUnRegisterRootDevice(
    IN UpnpDevice_Handle /** The handle of the root device instance to 
                             unregister. */
@@ -1203,7 +1207,6 @@ EXPORT_SPEC int UpnpSetMaxContentLength(
  *              point handle.
  *      \item {\tt UPNP_E_INVALID_PARAM}: {\bf Target} is {\tt NULL}.
  *    \end{itemize} */
-
 EXPORT_SPEC int UpnpSearchAsync(
     IN UpnpClient_Handle Hnd, /** The handle of the client performing 
                                   the search. */
@@ -1276,7 +1279,6 @@ EXPORT_SPEC int UpnpSendAdvertisement(
  *              according to the device.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpGetServiceVarStatus(
     IN UpnpClient_Handle Hnd,     /** The handle of the control point. */
     IN const char *ActionURL,     /** The URL of the service. */
@@ -1304,7 +1306,6 @@ EXPORT_SPEC int UpnpGetServiceVarStatus(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpGetServiceVarStatusAsync(
     IN UpnpClient_Handle Hnd, /** The handle of the control point. */
     IN const char *ActionURL, /** The URL of the service. */
@@ -1339,7 +1340,6 @@ EXPORT_SPEC int UpnpGetServiceVarStatusAsync(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpSendAction(
     IN UpnpClient_Handle Hnd,     /** The handle of the control point 
                                       sending the action. */
@@ -1378,7 +1378,6 @@ EXPORT_SPEC int UpnpSendAction(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpSendActionEx(
     IN UpnpClient_Handle Hnd,    /** The handle of the control point 
                                      sending the action. */
@@ -1417,7 +1416,6 @@ EXPORT_SPEC int UpnpSendActionEx(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpSendActionAsync(
     IN UpnpClient_Handle Hnd,   /** The handle of the control point 
                                     sending the action. */
@@ -1455,7 +1453,6 @@ EXPORT_SPEC int UpnpSendActionAsync(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpSendActionExAsync(
     IN UpnpClient_Handle Hnd,   /** The handle of the control point 
                                     sending the action. */
@@ -1513,7 +1510,6 @@ EXPORT_SPEC int UpnpSendActionExAsync(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpAcceptSubscription(
 	/** The handle of the device. */
 	IN UpnpDevice_Handle Hnd,
@@ -1554,7 +1550,6 @@ EXPORT_SPEC int UpnpAcceptSubscription(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpAcceptSubscriptionExt(
     IN UpnpDevice_Handle Hnd,  /** The handle of the device. */
     IN const char *DevID,      /** The device ID of the subdevice of the 
@@ -1591,7 +1586,6 @@ EXPORT_SPEC int UpnpAcceptSubscriptionExt(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpNotify(
     IN UpnpDevice_Handle,   /** The handle to the device sending the event. */
     IN const char *DevID,   /** The device ID of the subdevice of the service 
@@ -1627,7 +1621,6 @@ EXPORT_SPEC int UpnpNotify(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpNotifyExt(
     IN UpnpDevice_Handle,       /** The handle to the device sending the 
                                     event. */
@@ -1670,7 +1663,6 @@ EXPORT_SPEC int UpnpNotifyExt(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpRenewSubscription(
     IN UpnpClient_Handle Hnd, /** The handle of the control point that 
                                   is renewing the subscription. */
@@ -1728,7 +1720,6 @@ EXPORT_SPEC int UpnpRenewSubscription(
  *              EventSubscribe.ErrCode} field as part of the callback).
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpRenewSubscriptionAsync(
     IN UpnpClient_Handle Hnd, /** The handle of the control point that 
                                   is renewing the subscription. */
@@ -1756,7 +1747,6 @@ EXPORT_SPEC int UpnpRenewSubscriptionAsync(
  *              handle.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpSetMaxSubscriptions(  
     IN UpnpDevice_Handle Hnd, /** The handle of the device for which 
 				  the maximum number of subscriptions is 
@@ -1779,7 +1769,6 @@ EXPORT_SPEC int UpnpSetMaxSubscriptions(
  *              handle.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpSetMaxSubscriptionTimeOut(  
     IN UpnpDevice_Handle Hnd,       /** The handle of the device for which 
 				        the maximum subscription time-out is 
@@ -1816,7 +1805,6 @@ EXPORT_SPEC int UpnpSetMaxSubscriptionTimeOut(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpSubscribe(
     IN UpnpClient_Handle Hnd,    /** The handle of the control point. */
     IN const char *PublisherUrl, /** The URL of the service to subscribe to. */
@@ -1878,7 +1866,6 @@ EXPORT_SPEC int UpnpSubscribe(
  *              EventSubscribe.ErrCode} field as part of the callback).
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpSubscribeAsync(
     IN UpnpClient_Handle Hnd,      /** The handle of the control point that 
                                        is subscribing. */
@@ -1923,7 +1910,6 @@ EXPORT_SPEC int UpnpSubscribeAsync(
  *              complete this operation.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpUnSubscribe(
     IN UpnpClient_Handle Hnd, /** The handle of the subscribed control 
                                   point. */
@@ -1978,7 +1964,6 @@ EXPORT_SPEC int UpnpUnSubscribe(
  *              the subscription request (returned in the {\bf 
  *              EventSubscribe.ErrCode} field as part of the callback).
  *    \end{itemize} */
-
 EXPORT_SPEC int UpnpUnSubscribeAsync(
     IN UpnpClient_Handle Hnd, /** The handle of the subscribed control 
                                   point. */
@@ -2031,7 +2016,6 @@ EXPORT_SPEC int UpnpUnSubscribeAsync(
  *              allocated.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpDownloadUrlItem(
     IN const char *url,          /** URL of an item to download. */
     OUT char **outBuf,           /** Buffer to store the downloaded item. */
@@ -2068,7 +2052,6 @@ EXPORT_SPEC int UpnpDownloadUrlItem(
  *	        remote server.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpOpenHttpGet(
 	IN const char *url,	    /** The URL of an item to get. */
 	IN OUT void **handle,       /** A pointer to store the handle for 
@@ -2115,7 +2098,6 @@ EXPORT_SPEC int UpnpOpenHttpGet(
  *	        remote server.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpOpenHttpGetProxy(
 	IN const char *url,	    /** The URL of an item to get. */
     IN const char *proxy_str,    /** The URL of the proxy. */
@@ -2164,7 +2146,6 @@ EXPORT_SPEC int UpnpOpenHttpGetProxy(
  *	        remote server.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpOpenHttpGetEx(
 	IN const char *url,         /** The URL of the item to get. */
 	IN OUT void **handle,       /** A pointer to store the handle for 
@@ -2205,7 +2186,6 @@ EXPORT_SPEC int UpnpOpenHttpGetEx(
  *        in handle value may provide additional information on the return 
  *        value.
  */
-
 EXPORT_SPEC int UpnpReadHttpGet(
 	IN void *handle,           /** The token created by the call to 
 				       {\bf UpnpOpenHttpGet}. */
@@ -2246,7 +2226,6 @@ EXPORT_SPEC int UpnpHttpGetProgress(
  *      \item {\tt UPNP_E_INVALID_PARAM}: {\bf handle} is not a valid pointer.
  *    \end{itemize}
  */  
-
 EXPORT_SPEC int UpnpCancelHttpGet(IN void *handle);
 
 /** {\bf UpnpCloseHttpGet} closes the connection and frees memory that was 
@@ -2258,7 +2237,6 @@ EXPORT_SPEC int UpnpCancelHttpGet(IN void *handle);
  *      \item {\tt UPNP_E_INVALID_PARAM}: {\bf handle} is not a valid pointer.
  *    \end{itemize}
  */  
-
 EXPORT_SPEC int UpnpCloseHttpGet(IN void *handle);
 
 
@@ -2287,7 +2265,6 @@ EXPORT_SPEC int UpnpCloseHttpGet(IN void *handle);
  *              allocated.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpOpenHttpPost(
 	IN const char *url,         /** The URL in which to send the POST 
 				        request. */
@@ -2320,7 +2297,6 @@ EXPORT_SPEC int UpnpOpenHttpPost(
  *              allocated.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpWriteHttpPost(
 	IN void *handle,          /** The handle of the connection created 
 				      by the call to {\bf UpnpOpenHttpPost}. */
@@ -2347,7 +2323,6 @@ EXPORT_SPEC int UpnpWriteHttpPost(
  *              allocated.
  *    \end{itemize}
  */
-  
 EXPORT_SPEC int UpnpCloseHttpPost(
 	IN void *handle,          /** The handle of the connection to close, 
 				      created by the call to 
@@ -2388,7 +2363,6 @@ EXPORT_SPEC int UpnpCloseHttpPost(
  *              allocated.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpDownloadXmlDoc(
     IN const char *url,          /** URL of the XML document. */
     OUT IXML_Document **xmlDoc   /** A pointer in which to store the 
@@ -2426,7 +2400,6 @@ EXPORT_SPEC int UpnpDownloadXmlDoc(
  *               directory.
  *    \end{itemize}
  */
- 
 EXPORT_SPEC int UpnpSetWebServerRootDir( 
 	/** Path of the root directory of the web server. */
 	IN const char *rootDir);
@@ -2620,5 +2593,5 @@ EXPORT_SPEC void UpnpFree(
 
 /*! @} */ /* The API */
 
-#endif
+#endif /* UPNP_H */
 
