@@ -82,58 +82,61 @@
 
 
 #ifdef INTERNAL_WEB_SERVER
-	#include "webserver.h"
 	#include "urlconfig.h"
+	#include "VirtualDir.h"
+	#include "webserver.h"
 #endif // INTERNAL_WEB_SERVER
 
+
+// This structure is for virtual directory callbacks
+struct UpnpVirtualDirCallbacks virtualDirCallback;
 
 //
 virtualDirList *pVirtualDirList;
 
 // Mutex to synchronize the subscription handling at the client side
-CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
+#ifdef INCLUDE_CLIENT_APIS
+ithread_mutex_t GlobalClientSubscribeMutex;
+#endif /* INCLUDE_CLIENT_APIS */
 
 // rwlock to synchronize handles (root device or control point handle)
-    ithread_rwlock_t GlobalHndRWLock;
+ithread_rwlock_t GlobalHndRWLock;
 
 // Mutex to synchronize the uuid creation process
-    ithread_mutex_t gUUIDMutex;
+ithread_mutex_t gUUIDMutex;
 
-    ithread_mutex_t gSDKInitMutex = PTHREAD_MUTEX_INITIALIZER;
+ithread_mutex_t gSDKInitMutex = PTHREAD_MUTEX_INITIALIZER;
 
-    TimerThread gTimerThread;
+TimerThread gTimerThread;
 
-    ThreadPool gSendThreadPool;
-    ThreadPool gRecvThreadPool;
-    ThreadPool gMiniServerThreadPool;
+ThreadPool gSendThreadPool;
+ThreadPool gRecvThreadPool;
+ThreadPool gMiniServerThreadPool;
 
-//Flag to indicate the state of web server
-     WebServerState bWebServerState = WEB_SERVER_DISABLED;
+// Flag to indicate the state of web server
+WebServerState bWebServerState = WEB_SERVER_DISABLED;
 
 // Static buffer to contain interface name. (extern'ed in upnp.h)
-     char gIF_NAME[LINE_SIZE] = { '\0' };
+char gIF_NAME[LINE_SIZE] = { '\0' };
 
 // Static buffer to contain interface IPv4 address. (extern'ed in upnp.h)
-     char gIF_IPV4[22]/* INET_ADDRSTRLEN*/ = { '\0' };
+char gIF_IPV4[22]/* INET_ADDRSTRLEN*/ = { '\0' };
 
 // Static buffer to contain interface IPv6 address. (extern'ed in upnp.h)
-     char gIF_IPV6[65]/* INET6_ADDRSTRLEN*/ = { '\0' };
+char gIF_IPV6[65]/* INET6_ADDRSTRLEN*/ = { '\0' };
 
 // Contains interface index. (extern'ed in upnp.h)
-     int  gIF_INDEX = -1;
+int  gIF_INDEX = -1;
 
 // local IPv4 and IPv6 ports for the mini-server
-     unsigned short LOCAL_PORT_V4;
-     unsigned short LOCAL_PORT_V6;
+unsigned short LOCAL_PORT_V4;
+unsigned short LOCAL_PORT_V6;
 
 // UPnP device and control point handle table 
-     void *HandleTable[NUM_HANDLE];
-
-//This structure is for virtual directory callbacks
-     struct UpnpVirtualDirCallbacks virtualDirCallback;
+void *HandleTable[NUM_HANDLE];
 
 // a local dir which serves as webserver root
-     extern membuffer gDocumentRootDir;
+extern membuffer gDocumentRootDir;
 
 // Maximum content-length that the SDK will process on an incoming packet. 
 // Content-Length exceeding this size will be not processed and error 413 
@@ -142,22 +145,22 @@ size_t g_maxContentLength = DEFAULT_SOAP_CONTENT_LENGTH; // in bytes
 
 // Global variable to denote the state of Upnp SDK 
 //    = 0 if uninitialized, = 1 if initialized.
-     int UpnpSdkInit = 0;
+int UpnpSdkInit = 0;
 
 // Global variable to denote the state of Upnp SDK client registration.
 // = 0 if unregistered, = 1 if registered.
-     int UpnpSdkClientRegistered = 0;
+int UpnpSdkClientRegistered = 0;
 
 // Global variable to denote the state of Upnp SDK IPv4 device registration.
 // = 0 if unregistered, = 1 if registered.
-     int UpnpSdkDeviceRegisteredV4 = 0;
+int UpnpSdkDeviceRegisteredV4 = 0;
 
 // Global variable to denote the state of Upnp SDK IPv6 device registration.
 // = 0 if unregistered, = 1 if registered.
-     int UpnpSdkDeviceregisteredV6 = 0;
+int UpnpSdkDeviceregisteredV6 = 0;
 
 // Global variable used in discovery notifications.
-     Upnp_SID gUpnpSdkNLSuuid;
+Upnp_SID gUpnpSdkNLSuuid;
 
 
 /****************************************************************************
@@ -5048,46 +5051,86 @@ UpnpIsWebserverEnabled()
     return ( bWebServerState == WEB_SERVER_ENABLED );
 }
 
- /**************************************************************************
- * Function: UpnpSetVirtualDirCallbacks 
- *
- * Parameters:	
- *	IN struct UpnpVirtualDirCallbacks *callbacks:a structure that 
- *		contains the callback functions.
- *	
- * Description:
- *	This function sets the callback function to be used to 
- *	access a virtual directory.
- *
- * Return Values: int
- *	UPNP_E_SUCCESS on success, or UPNP_E_INVALID_PARAM
- ***************************************************************************/
-int
-UpnpSetVirtualDirCallbacks( IN struct UpnpVirtualDirCallbacks *callbacks )
+
+int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback)
 {
-    struct UpnpVirtualDirCallbacks *pCallback;
+	int ret = UPNP_E_SUCCESS;
+	if (!callback) {
+	        ret = UPNP_E_INVALID_PARAM;
+	} else {
+		virtualDirCallback.get_info = callback;
+	}
 
-    if( UpnpSdkInit != 1 ) {
-        // SDK is not initialized
-        return UPNP_E_FINISH;
-    }
-
-    pCallback = &virtualDirCallback;
-
-    if( callbacks == NULL )
-        return UPNP_E_INVALID_PARAM;
-
-    pCallback->get_info = callbacks->get_info;
-    pCallback->open = callbacks->open;
-    pCallback->close = callbacks->close;
-    pCallback->read = callbacks->read;
-    pCallback->write = callbacks->write;
-    pCallback->seek = callbacks->seek;
-
-    return UPNP_E_SUCCESS;
+	return ret;
 }
 
- /**************************************************************************
+
+int UpnpVirtualDir_set_OpenCallback(VDCallback_Open callback)
+{
+	int ret = UPNP_E_SUCCESS;
+	if (!callback) {
+	        ret = UPNP_E_INVALID_PARAM;
+	} else {
+		virtualDirCallback.open = callback;
+	}
+
+	return ret;
+}
+
+
+int UpnpVirtualDir_set_ReadCallback(VDCallback_Read callback)
+{
+	int ret = UPNP_E_SUCCESS;
+	if (!callback) {
+	        ret = UPNP_E_INVALID_PARAM;
+	} else {
+		virtualDirCallback.read = callback;
+	}
+
+	return ret;
+}
+
+
+int UpnpVirtualDir_set_WriteCallback(VDCallback_Write callback)
+{
+	int ret = UPNP_E_SUCCESS;
+	if (!callback) {
+	        ret = UPNP_E_INVALID_PARAM;
+	} else {
+		virtualDirCallback.write = callback;
+	}
+
+	return ret;
+}
+
+
+int UpnpVirtualDir_set_SeekCallback(VDCallback_Seek callback)
+{
+	int ret = UPNP_E_SUCCESS;
+	if (!callback) {
+	        ret = UPNP_E_INVALID_PARAM;
+	} else {
+		virtualDirCallback.seek = callback;
+	}
+
+	return ret;
+}
+
+
+int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback)
+{
+	int ret = UPNP_E_SUCCESS;
+	if (!callback) {
+	        ret = UPNP_E_INVALID_PARAM;
+	} else {
+		virtualDirCallback.close = callback;
+	}
+
+	return ret;
+}
+
+
+/**************************************************************************
  * Function: UpnpFree 
  *
  * Parameters:	
@@ -5096,8 +5139,7 @@ UpnpSetVirtualDirCallbacks( IN struct UpnpVirtualDirCallbacks *callbacks )
  * Description:
  *	This function free the memory allocated by tbe UPnP library
  *
- * Return Values: VOID
- *		
+ * Return Values: void
  ***************************************************************************/
 void
 UpnpFree( IN void *item )

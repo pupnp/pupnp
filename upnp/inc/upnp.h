@@ -710,106 +710,6 @@ enum Upnp_DescType_e {
 typedef enum Upnp_DescType_e Upnp_DescType;
 
 
-/* The type of handle returned by the web server for open requests. */
-typedef void *UpnpWebFileHandle;
-
-/** The {\bf UpnpVirtualDirCallbacks} structure contains the pointers to
- *  file-related callback functions a device application can register to
- *  virtualize URLs.  
- */
-struct UpnpVirtualDirCallbacks
-{
-	/** Called by the web server to query information on a file.  The callback
-	 *  should return 0 on success or -1 on an error. */
-	int (*get_info) (
-		/** The name of the file to query. */
-		IN  const char *filename,
-		/** Pointer to a structure to store the information on the file. */
-		OUT UpnpFileInfo *info);
-
-	/** Called by the web server to open a file.  The callback should return
-	 *  a valid handle if the file can be opened.  Otherwise, it should return
-	 *  {\tt NULL} to signify an error. */
-	UpnpWebFileHandle (*open)(
-		/** The name of the file to open. */ 
-		IN const char *filename,
-		/** The mode in which to open the file.
-		 * Valid values are {\tt UPNP_READ} or {\tt UPNP_WRITE}. */
-		IN enum UpnpOpenFileMode Mode);
-
-	/** Called by the web server to perform a sequential read from an open
-	 *  file.  The callback should copy {\bf buflen} bytes from the file into
-	 *  the buffer.
-	 *  @return [int] An integer representing one of the following:
-	 *    \begin{itemize}
-	 *      \item {\tt 0}:  The file contains no more data (EOF).
-	 *      \item {\tt >0}: A successful read of the number of bytes in the 
-	 *                      return code.
-	 *      \item {\tt <0}: An error occurred reading the file.
-	 *    \end{itemzie}
-	 */
-	int (*read) (
-		/** The handle of the file to read. */
-		IN UpnpWebFileHandle fileHnd,
-		/** The buffer in which to place the data. */
-		OUT char *buf,
-		/** The size of the buffer (i.e. the number of bytes to read). */
-		IN size_t buflen);
-
-	/** Called by the web server to perform a sequential write to an open
-	 *  file.  The callback should write {\bf buflen} bytes into the file from
-	 *  the buffer.  It should return the actual number of bytes written, 
-	 *  which might be less than {\bf buflen} in the case of a write error.
-	 */
-	int (*write) (
-		/** The handle of the file to write. */
-		IN UpnpWebFileHandle fileHnd,
-		/** The buffer with the bytes to write. */
-		IN char *buf,
-		/** The number of bytes to write. */
-		IN size_t buflen);
-
-	/** Called by the web server to move the file pointer, or offset, into
-	 *  an open file.  The {\bf origin} parameter determines where to start
-	 *  moving the file pointer.  A value of {\tt SEEK_CUR} moves the
-	 *  file pointer relative to where it is.  The {\bf offset} parameter can
-	 *  be either positive (move forward) or negative (move backward).  
-	 *  {\tt SEEK_END} moves relative to the end of the file.  A positive 
-	 *  {\bf offset} extends the file.  A negative {\bf offset} moves backward 
-	 *  in the file.  Finally, {\tt SEEK_SET} moves to an absolute position in 
-	 *  the file. In this case, {\bf offset} must be positive.  The callback 
-	 *  should return 0 on a successful seek or a non-zero value on an error.
-	 */
-	int (*seek) (
-		/** The handle of the file to move the file pointer. */
-		IN UpnpWebFileHandle fileHnd,
-		/** The number of bytes to move in the file.  Positive values
-		 * move foward and negative values move backward.  Note that
-		 * this must be positive if the {\bf origin} is {\tt SEEK_SET}. */
-		IN off_t offset,
-		/** The position to move relative to.  It can be {\tt SEEK_CUR}
-		 * to move relative to the current position, {\tt SEEK_END} to
-		 * move relative to the end of the file, or {\tt SEEK_SET} to
-		 * specify an absolute offset. */
-		IN int origin);
-
-	/** Called by the web server to close a file opened via the {\bf open}
-	 *  callback.  It should return 0 on success, or a non-zero value on an 
-	 *  error.
-	 */
-	int (*close) (
-		/** The handle of the file to close. */
-		IN UpnpWebFileHandle fileHnd);
-};
-
-
-typedef struct virtual_Dir_List
-{
-	struct virtual_Dir_List *next;
-	char dirName[NAME_SIZE];
-} virtualDirList;
-
-
 /** All callback functions share the same prototype, documented below.
  *  Note that any memory passed to the callback function
  *  is valid only during the callback and should be copied if it
@@ -2528,28 +2428,125 @@ EXPORT_SPEC int UpnpDownloadXmlDoc(
  */
  
 EXPORT_SPEC int UpnpSetWebServerRootDir( 
-    IN const char* rootDir  /** Path of the root directory of the web 
-                                server. */
-    );
+	/** Path of the root directory of the web server. */
+	IN const char *rootDir);
 
-/** {\bf UpnpSetVirtualDirCallbacks} sets the callback function to be used to 
- *  access a virtual directory.  Refer to the description of
- *  {\bf UpnpVirtualDirCallbacks} for a description of the functions.
+
+/* The type of handle returned by the web server for open requests. */
+typedef void *UpnpWebFileHandle;
+
+
+typedef int (*VDCallback_GetInfo)(
+		/** The name of the file to query. */
+		IN  const char *filename,
+		/** Pointer to a structure to store the information on the file. */
+		OUT UpnpFileInfo *info);
+
+/** {\bf UpnpVirtualDir_set_GetInfoCallback} sets the get_info callback function
+ *  to be used to access a virtual directory.
  *
  *  @return [int] An integer representing one of the following:
  *    \begin{itemize}
  *       \item {\tt UPPN_E_SUCCESS}: The operation completed successfully.
- *       \item {\tt UPNP_E_INVALID_ARGUMENT}: {\bf callbacks} is not a valid 
- *               pointer.
+ *       \item {\tt UPNP_E_INVALID_ARGUMENT}: {\bf callback} is not a valid pointer.
  *    \end{itemize}
  */
+EXPORT_SPEC int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback);
 
-EXPORT_SPEC int UpnpSetVirtualDirCallbacks(
-    IN struct UpnpVirtualDirCallbacks *callbacks /** Pointer to a structure 
-                                                     containing points to the 
-                                                     virtual interface 
-                                                     functions. */
-    );
+typedef UpnpWebFileHandle (*VDCallback_Open)(
+		/** The name of the file to open. */ 
+		IN const char *filename,
+		/** The mode in which to open the file.
+		 * Valid values are {\tt UPNP_READ} or {\tt UPNP_WRITE}. */
+		IN enum UpnpOpenFileMode Mode);
+
+/** {\bf UpnpVirtualDir_set_OpenCallback} sets the open callback function
+ *  to be used to access a virtual directory.
+ *
+ *  @return [int] An integer representing one of the following:
+ *    \begin{itemize}
+ *       \item {\tt UPPN_E_SUCCESS}: The operation completed successfully.
+ *       \item {\tt UPNP_E_INVALID_ARGUMENT}: {\bf callback} is not a valid pointer.
+ *    \end{itemize}
+ */
+EXPORT_SPEC int UpnpVirtualDir_set_OpenCallback(VDCallback_Open callback);
+
+typedef int (*VDCallback_Read) (
+	/** The handle of the file to read. */
+	IN UpnpWebFileHandle fileHnd,
+	/** The buffer in which to place the data. */
+	OUT char *buf,
+	/** The size of the buffer (i.e. the number of bytes to read). */
+	IN size_t buflen);
+
+/** {\bf UpnpVirtualDir_set_ReadCallback} sets the read callback function
+ *  to be used to access a virtual directory.
+ *
+ *  @return [int] An integer representing one of the following:
+ *    \begin{itemize}
+ *       \item {\tt UPPN_E_SUCCESS}: The operation completed successfully.
+ *       \item {\tt UPNP_E_INVALID_ARGUMENT}: {\bf callback} is not a valid pointer.
+ *    \end{itemize}
+ */
+EXPORT_SPEC int UpnpVirtualDir_set_ReadCallback(VDCallback_Read callback);
+
+typedef	int (*VDCallback_Write) (
+	/** The handle of the file to write. */
+	IN UpnpWebFileHandle fileHnd,
+	/** The buffer with the bytes to write. */
+	IN char *buf,
+	/** The number of bytes to write. */
+	IN size_t buflen);
+
+/** {\bf UpnpVirtualDir_set_WriteCallback} sets the write callback function
+ *  to be used to access a virtual directory.
+ *
+ *  @return [int] An integer representing one of the following:
+ *    \begin{itemize}
+ *       \item {\tt UPPN_E_SUCCESS}: The operation completed successfully.
+ *       \item {\tt UPNP_E_INVALID_ARGUMENT}: {\bf callback} is not a valid pointer.
+ *    \end{itemize}
+ */
+EXPORT_SPEC int UpnpVirtualDir_set_WriteCallback(VDCallback_Write callback);
+
+typedef int (*VDCallback_Seek) (
+	/** The handle of the file to move the file pointer. */
+	IN UpnpWebFileHandle fileHnd,
+	/** The number of bytes to move in the file.  Positive values
+	 * move foward and negative values move backward.  Note that
+	 * this must be positive if the {\bf origin} is {\tt SEEK_SET}. */
+	IN off_t offset,
+	/** The position to move relative to.  It can be {\tt SEEK_CUR}
+	 * to move relative to the current position, {\tt SEEK_END} to
+	 * move relative to the end of the file, or {\tt SEEK_SET} to
+	 * specify an absolute offset. */
+	IN int origin);
+
+/** {\bf UpnpVirtualDir_set_SeekCallback} sets the seek callback function
+ *  to be used to access a virtual directory.
+ *
+ *  @return [int] An integer representing one of the following:
+ *    \begin{itemize}
+ *       \item {\tt UPPN_E_SUCCESS}: The operation completed successfully.
+ *       \item {\tt UPNP_E_INVALID_ARGUMENT}: {\bf callback} is not a valid pointer.
+ *    \end{itemize}
+ */
+EXPORT_SPEC int UpnpVirtualDir_set_SeekCallback(VDCallback_Seek callback);
+
+typedef int (*VDCallback_Close) (
+		/** The handle of the file to close. */
+		IN UpnpWebFileHandle fileHnd);
+
+/** {\bf UpnpVirtualDir_set_CloseCallback} sets the close callback function
+ *  to be used to access a virtual directory.
+ *
+ *  @return [int] An integer representing one of the following:
+ *    \begin{itemize}
+ *       \item {\tt UPPN_E_SUCCESS}: The operation completed successfully.
+ *       \item {\tt UPNP_E_INVALID_ARGUMENT}: {\bf callback} is not a valid pointer.
+ *    \end{itemize}
+ */
+EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback);
 
 /** {\bf UpnpEnableWebServer} enables or disables the webserver.  A value of
  *  {\tt TRUE} enables the webserver, {\tt FALSE} disables it.
@@ -2560,10 +2557,9 @@ EXPORT_SPEC int UpnpSetVirtualDirCallbacks(
  *       \item {\tt UPNP_E_INVALID_ARGUMENT}: {\bf enable} is not valid.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpEnableWebserver(
-    IN int enable /** {\tt TRUE} to enable, {\tt FALSE} to disable. */
-    );
+	/** {\tt TRUE} to enable, {\tt FALSE} to disable. */
+	IN int enable);
 
 /** {\bf UpnpIsWebServerEnabled} returns {\tt TRUE} if the webserver is
  *  enabled, or {\tt FALSE} if it is not.
@@ -2574,7 +2570,6 @@ EXPORT_SPEC int UpnpEnableWebserver(
  *       \item {\tt FALSE}: The webserver is not enabled
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpIsWebserverEnabled();
 
 /** {\bf UpnpAddVirtualDir} adds a virtual directory mapping.
@@ -2589,11 +2584,9 @@ EXPORT_SPEC int UpnpIsWebserverEnabled();
  *       \item {\tt UPNP_E_INVALID_ARGUMENT}: {\bf dirName} is not valid.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpAddVirtualDir(
-    IN const char *dirName /** The name of the new directory mapping to add. 
-							*/
-    );
+	/** The name of the new directory mapping to add. */
+	IN const char *dirName);
 
 /** {\bf UpnpRemoveVirtualDir} removes a virtual directory mapping made with
  *  {\bf UpnpAddVirtualDir}.
@@ -2604,23 +2597,20 @@ EXPORT_SPEC int UpnpAddVirtualDir(
  *       \item {\tt UPNP_E_INVALID_ARGUMENT}: {\bf dirName} is not valid.
  *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpRemoveVirtualDir(
-    IN const char *dirName /** The name of the virtual directory mapping to 
-                               remove. */
-    );
+	/** The name of the virtual directory mapping to remove. */
+	IN const char *dirName);
 
 /** {\bf UpnpRemoveAllVirtualDirs} removes all virtual directory mappings.
  *
  *  @return [void] This function does not return a value.
  *
  */
-
-EXPORT_SPEC void UpnpRemoveAllVirtualDirs( );
+EXPORT_SPEC void UpnpRemoveAllVirtualDirs();
 
 EXPORT_SPEC void UpnpFree(
-    IN void *item /* The item to free. */
-    );
+	/** The item to free. */
+	IN void *item);
 
 /*! @} */ /* Web Server API */
 

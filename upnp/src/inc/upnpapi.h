@@ -29,14 +29,16 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-// File : upnpapi.h
 
-#ifndef UPNPDK_H
-#define UPNPDK_H
+#ifndef UPNPAPI_H
+#define UPNPAPI_H
 
-#include "upnp.h"
+
 #include "client_table.h"
+#include "upnp.h"
 //#include "../ssdp/ssdplib.h"
+#include "VirtualDir.h"		/* for struct UpnpVirtualDirCallbacks */
+
 
 #define MAX_INTERFACES 256
 
@@ -197,8 +199,6 @@ int getlocalhostname(char *out, const int out_len);
 
 extern WebServerState bWebServerState;
 
-#endif
 
+#endif /* UPNPAPI_H */
 
-
-/************************ END OF upnpapi.h **********************/

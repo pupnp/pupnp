@@ -58,6 +58,7 @@
 #include "upnp.h"
 #include "upnpapi.h"
 #include "util.h"
+#include "VirtualDir.h"
 
 
 #ifndef WIN32
@@ -520,40 +521,33 @@ web_server_set_alias( IN const char *alias_name,
     return UPNP_E_OUTOF_MEMORY;
 }
 
-/************************************************************************
- * Function: web_server_init
- *
- * Parameters:
- *	none
- *
- * Description: Initilialize the different documents. Initialize the
- *	memory for root directory for web server. Call to initialize global
- *	XML document. Sets bWebServerState to WEB_SERVER_ENABLED
- *
- * Returns:
- *	0 - OK
- *	UPNP_E_OUTOF_MEMORY: note: alias_content is not freed here
- ************************************************************************/
-int
-web_server_init( void )
+
+int web_server_init()
 {
-    int ret_code;
+	int ret = 0;
+	if (bWebServerState == WEB_SERVER_DISABLED) {
+		// decode media list
+		media_list_init();
+		membuffer_init(&gDocumentRootDir);
+		glob_alias_init();
+		pVirtualDirList = NULL;
 
-    if( bWebServerState == WEB_SERVER_DISABLED ) {
-        media_list_init();    // decode media list
-        membuffer_init( &gDocumentRootDir );
-        glob_alias_init();
+		// Initialize callbacks
+		virtualDirCallback.get_info = NULL;
+		virtualDirCallback.open = NULL;
+		virtualDirCallback.read = NULL;
+		virtualDirCallback.write = NULL;
+		virtualDirCallback.seek = NULL;
+		virtualDirCallback.close = NULL;
 
-        pVirtualDirList = NULL;
+		if (ithread_mutex_init(&gWebMutex, NULL) == -1) {
+			ret = UPNP_E_OUTOF_MEMORY;
+		} else {
+			bWebServerState = WEB_SERVER_ENABLED;
+		}
+	}
 
-        ret_code = ithread_mutex_init( &gWebMutex, NULL );
-        if( ret_code == -1 ) {
-            return UPNP_E_OUTOF_MEMORY;
-        }
-        bWebServerState = WEB_SERVER_ENABLED;
-    }
-
-    return 0;
+	return ret;
 }
 
 /************************************************************************
@@ -1213,7 +1207,6 @@ process_request( IN http_message_t * req,
     int resp_minor;
     xboolean alias_grabbed;
     size_t dummy;
-    struct UpnpVirtualDirCallbacks *pVirtualDirCallback;
     const char *extra_headers;
 
     print_http_headers( req );
@@ -1285,8 +1278,7 @@ process_request( IN http_message_t * req,
     if (using_virtual_dir) {
         if (req->method != HTTPMETHOD_POST) {
             // get file info
-            pVirtualDirCallback = &virtualDirCallback;
-            if (pVirtualDirCallback->get_info(filename->buf, finfo) != 0) {
+            if (virtualDirCallback.get_info(filename->buf, finfo) != 0) {
                 err_code = HTTP_NOT_FOUND;
                 goto error_handler;
             }
@@ -1301,7 +1293,7 @@ process_request( IN http_message_t * req,
                     goto error_handler;
                 }
                 // get info
-                if( pVirtualDirCallback->get_info(filename->buf, finfo) != UPNP_E_SUCCESS ||
+                if (virtualDirCallback.get_info(filename->buf, finfo) != UPNP_E_SUCCESS ||
                     UpnpFileInfo_get_IsDirectory(finfo)) {
                     err_code = HTTP_NOT_FOUND;
                     goto error_handler;
@@ -1523,8 +1515,8 @@ error_handler:
  *	HTTP_OK
  ************************************************************************/
 int
-http_RecvPostMessage( http_parser_t * parser,
-                      IN SOCKINFO * info,
+http_RecvPostMessage( http_parser_t *parser,
+                      IN SOCKINFO *info,
                       char *filename,
                       struct SendInstruction *Instr )
 {
@@ -1541,12 +1533,10 @@ http_RecvPostMessage( http_parser_t * parser,
     int ret_code = 0;
 
     if( Instr && Instr->IsVirtualFile ) {
-
         Fp = (virtualDirCallback.open)( filename, UPNP_WRITE );
         if( Fp == NULL ) {
             return HTTP_INTERNAL_SERVER_ERROR;
         }
-
     } else {
         Fp = fopen( filename, "wb" );
         if( Fp == NULL ) {
