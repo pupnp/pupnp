@@ -390,70 +390,6 @@ char *UpnpGetServerIp6Address()
 
 
 #ifdef INCLUDE_DEVICE_APIS
-#if 0
-
-/*****************************************************************************
- * Function: UpnpAddRootDevice
- *
- * Parameters:	
- *	IN const char *DescURL: Location of the root device 
- *		description xml file
- *	IN UpnpDevice_Handle Hnd: The device handle
- *
- * Description:
- *	downloads the description file and update the service table of the
- *	device. This function has been deprecated.
- *
- * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
- *****************************************************************************/
-int
-UpnpAddRootDevice( IN const char *DescURL,
-                   IN UpnpDevice_Handle Hnd )
-{
-    int retVal = 0;
-    struct Handle_Info *HInfo;
-    IXML_Document *temp;
-
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
-
-    if( ( retVal =
-          UpnpDownloadXmlDoc( DescURL, &( temp ) ) ) != UPNP_E_SUCCESS ) {
-        return retVal;
-    }
-
-    HandleLock();
-    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
-        HandleUnlock();
-        ixmlDocument_free( temp );
-        return UPNP_E_INVALID_HANDLE;
-    }
-
-    if( addServiceTable
-        ( ( IXML_Node * ) temp, &HInfo->ServiceTable, DescURL ) ) {
-
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpAddRootDevice: GENA Service Table \n" );
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "Here are the known services: \n" );
-        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
-    } else {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "\nUpnpAddRootDevice: No Eventing Support Found \n" );
-    }
-
-    ixmlDocument_free( temp );
-    HandleUnlock();
-
-    return UPNP_E_SUCCESS;
-}
-#endif // 0
-#endif //INCLUDE_DEVICE_APIS
-
-#ifdef INCLUDE_DEVICE_APIS
-
 /****************************************************************************
  * Function: UpnpRegisterRootDevice
  *
@@ -593,78 +529,10 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
 
     return UPNP_E_SUCCESS;
 }
-
-
 #endif // INCLUDE_DEVICE_APIS
 
-#ifdef INCLUDE_DEVICE_APIS
-#if 0
-
-/****************************************************************************
- * Function: UpnpRemoveRootDevice
- *
- * Parameters:	
- *	IN const char *DescURL: Location of the root device 
- *		description xml file
- *	IN UpnpDevice_Handle Hnd: The device handle
- *
- * Description:
- *	downloads the description file and update the service table of the
- *	device. This function has been deprecated.
- *
- * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
- *****************************************************************************/
-int
-UpnpRemoveRootDevice( IN const char *DescURL,
-                      IN UpnpDevice_Handle Hnd )
-{
-    int retVal = 0;
-    struct Handle_Info *HInfo;
-
-    IXML_Document *temp;
-
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
-
-    if( ( retVal =
-          UpnpDownloadXmlDoc( DescURL, &( temp ) ) ) != UPNP_E_SUCCESS ) {
-        return retVal;
-    }
-
-    HandleLock();
-    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
-        HandleUnlock();
-        ixmlDocument_free( temp );
-        return UPNP_E_INVALID_HANDLE;
-    }
-
-    if( removeServiceTable( ( IXML_Node * ) temp, &HInfo->ServiceTable ) ) {
-
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpRemoveRootDevice: GENA Service Table \n" );
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "Here are the known services: \n" );
-        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
-    } else {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "\nUpnpRemoveRootDevice: No Services Removed\n" );
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "Here are the known services: \n" );
-        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
-    }
-
-    HandleUnlock();
-
-    ixmlDocument_free( temp );
-    return UPNP_E_SUCCESS;
-}
-#endif //0
-#endif //INCLUDE_DEVICE_APIS
 
 #ifdef INCLUDE_DEVICE_APIS
-
 /****************************************************************************
  * Function: UpnpUnRegisterRootDevice
  *
