@@ -29,32 +29,22 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
+
 #include "ixmlparser.h"
 
-/*================================================================
-*   Function: Attr_init
-*       Initializes an attribute node
-*       External function.
-*
-*=================================================================*/
-void
-ixmlAttr_init( IN IXML_Attr * attr )
+
+void ixmlAttr_init(IN IXML_Attr *attr)
 {
-    if( attr != NULL ) {
-        memset( attr, 0, sizeof( IXML_Attr ) );
-    }
+	if (attr != NULL) {
+		memset(attr, 0, sizeof (IXML_Attr));
+	}
 }
 
-/*================================================================
-*   Function: Attr_free
-*       Frees an attribute node.
-*       external function.
-*
-*=================================================================*/
-void
-ixmlAttr_free( IN IXML_Attr * attr )
+
+void ixmlAttr_free(IN IXML_Attr *attr)
 {
-    if( attr != NULL ) {
-        ixmlNode_free( ( IXML_Node * ) attr );
-    }
+	if (attr != NULL) {
+		ixmlNode_free((IXML_Node *)attr);
+	}
 }
+

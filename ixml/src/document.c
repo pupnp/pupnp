@@ -29,168 +29,125 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
+
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #include "ixmlparser.h"
 
-/*================================================================
-*   ixmlDocument_init
-*       It initialize the document structure.
-*       External function.
-*   
-*=================================================================*/
-void
-ixmlDocument_init( IN IXML_Document * doc )
+
+void ixmlDocument_init(IN IXML_Document *doc)
 {
-    memset( doc, 0, sizeof( IXML_Document ) );
+	memset(doc, 0, sizeof(IXML_Document));
 }
 
-/*================================================================
-*   ixmlDocument_free
-*       It frees the whole document tree.
-*       External function.
-*
-*=================================================================*/
-void
-ixmlDocument_free( IN IXML_Document * doc )
-{
-    if( doc != NULL ) {
-        ixmlNode_free( ( IXML_Node * ) doc );
-    }
 
+void ixmlDocument_free(IN IXML_Document *doc)
+{
+	if (doc != NULL) {
+		ixmlNode_free((IXML_Node *)doc);
+	}
 }
 
-/*================================================================
-*   ixmlDocument_setOwnerDocument
-*       
-*       When this function is called first time, nodeptr is the root
-*       of the subtree, so it is not necessay to do two steps
-*       recursion.
-*        
-*       Internal function called by ixmlDocument_importNode
-*
-*=================================================================*/
-void
-ixmlDocument_setOwnerDocument( IN IXML_Document * doc,
-                               IN IXML_Node * nodeptr )
+
+/*!
+ * When this function is called first time, nodeptr is the root of the subtree,
+ * so it is not necessay to do two steps recursion.
+ *  
+ * Internal function called by ixmlDocument_importNode
+ */
+void ixmlDocument_setOwnerDocument(
+	IN IXML_Document *doc,
+	IN IXML_Node *nodeptr)
 {
-    if( nodeptr != NULL ) {
-        nodeptr->ownerDocument = doc;
-        ixmlDocument_setOwnerDocument( doc,
-                                       ixmlNode_getFirstChild( nodeptr ) );
-        ixmlDocument_setOwnerDocument( doc,
-                                       ixmlNode_getNextSibling
-                                       ( nodeptr ) );
-    }
+	if (nodeptr != NULL) {
+		nodeptr->ownerDocument = doc;
+		ixmlDocument_setOwnerDocument(
+			doc, ixmlNode_getFirstChild(nodeptr));
+		ixmlDocument_setOwnerDocument(
+			doc, ixmlNode_getNextSibling(nodeptr));
+	}
 }
 
-/*================================================================
-*   ixmlDocument_importNode
-*       Imports a node from another document to this document. The
-*       returned node has no parent; (parentNode is null). The source
-*       node is not altered or removed from the original document;
-*       this method creates a new copy of the source node.
- 
-*       For all nodes, importing a node creates a node object owned
-*       by the importing document, with attribute values identical to
-*       the source node's nodeName and nodeType, plus the attributes
-*       related to namespaces (prefix, localName, and namespaceURI).
-*       As in the cloneNode operation on a node, the source node is
-*       not altered.
-*       
-*       External function.
-*
-*=================================================================*/
-int
-ixmlDocument_importNode( IN IXML_Document * doc,
-                         IN IXML_Node * importNode,
-                         IN BOOL deep,
-                         OUT IXML_Node ** rtNode )
+
+int ixmlDocument_importNode(
+	IN IXML_Document *doc,
+	IN IXML_Node *importNode,
+	IN BOOL deep,
+	OUT IXML_Node **rtNode)
 {
-    unsigned short nodeType;
-    IXML_Node *newNode;
+	unsigned short nodeType;
+	IXML_Node *newNode;
 
-    *rtNode = NULL;
+	*rtNode = NULL;
 
-    if( ( doc == NULL ) || ( importNode == NULL ) ) {
-        return IXML_INVALID_PARAMETER;
-    }
+	if (doc == NULL || importNode == NULL) {
+		return IXML_INVALID_PARAMETER;
+	}
 
-    nodeType = ixmlNode_getNodeType( importNode );
-    if( nodeType == eDOCUMENT_NODE ) {
-        return IXML_NOT_SUPPORTED_ERR;
-    }
+	nodeType = ixmlNode_getNodeType(importNode);
+	if (nodeType == eDOCUMENT_NODE) {
+		return IXML_NOT_SUPPORTED_ERR;
+	}
 
-    newNode = ixmlNode_cloneNode( importNode, deep );
-    if( newNode == NULL ) {
-        return IXML_FAILED;
-    }
+	newNode = ixmlNode_cloneNode(importNode, deep);
+	if (newNode == NULL) {
+		return IXML_FAILED;
+	}
 
-    ixmlDocument_setOwnerDocument( doc, newNode );
-    *rtNode = newNode;
+	ixmlDocument_setOwnerDocument(doc, newNode);
+	*rtNode = newNode;
 
-    return IXML_SUCCESS;
+	return IXML_SUCCESS;
 }
 
-/*================================================================
-*   ixmlDocument_createElementEx
-*       Creates an element of the type specified. 
-*       External function.
-*   Parameters:
-*       doc:        pointer to document
-*       tagName:    The name of the element, it is case-sensitive.
-*   Return Value:
-*       IXML_SUCCESS
-*       IXML_INVALID_PARAMETER:     if either doc or tagName is NULL
-*       IXML_INSUFFICIENT_MEMORY:   if not enough memory to finish this operations.
-*
-*=================================================================*/
-int
-ixmlDocument_createElementEx( IN IXML_Document * doc,
-                              IN const DOMString tagName,
-                              OUT IXML_Element ** rtElement )
+
+int ixmlDocument_createElementEx(
+	IN IXML_Document *doc,
+	IN const DOMString tagName,
+	OUT IXML_Element **rtElement)
 {
+	int errCode = IXML_SUCCESS;
+	IXML_Element *newElement = NULL;
 
-    int errCode = IXML_SUCCESS;
-    IXML_Element *newElement = NULL;
+	if (doc == NULL || tagName == NULL) {
+		errCode = IXML_INVALID_PARAMETER;
+		goto ErrorHandler;
+	}
 
-    if( ( doc == NULL ) || ( tagName == NULL ) ) {
-        errCode = IXML_INVALID_PARAMETER;
-        goto ErrorHandler;
-    }
+	newElement = (IXML_Element *) malloc(sizeof(IXML_Element));
+	if (newElement == NULL) {
+		errCode = IXML_INSUFFICIENT_MEMORY;
+		goto ErrorHandler;
+	}
 
-    newElement = ( IXML_Element * ) malloc( sizeof( IXML_Element ) );
-    if( newElement == NULL ) {
-        errCode = IXML_INSUFFICIENT_MEMORY;
-        goto ErrorHandler;
-    }
+	ixmlElement_init(newElement);
+	newElement->tagName = strdup(tagName);
+	if (newElement->tagName == NULL) {
+		ixmlElement_free(newElement);
+		newElement = NULL;
+		errCode = IXML_INSUFFICIENT_MEMORY;
+		goto ErrorHandler;
+	}
+	// set the node fields 
+	newElement->n.nodeType = eELEMENT_NODE;
+	newElement->n.nodeName = strdup(tagName);
+	if (newElement->n.nodeName == NULL) {
+		ixmlElement_free(newElement);
+		newElement = NULL;
+		errCode = IXML_INSUFFICIENT_MEMORY;
+		goto ErrorHandler;
+	}
 
-    ixmlElement_init( newElement );
-    newElement->tagName = strdup( tagName );
-    if( newElement->tagName == NULL ) {
-        ixmlElement_free( newElement );
-        newElement = NULL;
-        errCode = IXML_INSUFFICIENT_MEMORY;
-        goto ErrorHandler;
-    }
-    // set the node fields 
-    newElement->n.nodeType = eELEMENT_NODE;
-    newElement->n.nodeName = strdup( tagName );
-    if( newElement->n.nodeName == NULL ) {
-        ixmlElement_free( newElement );
-        newElement = NULL;
-        errCode = IXML_INSUFFICIENT_MEMORY;
-        goto ErrorHandler;
-    }
+	newElement->n.ownerDocument = doc;
 
-    newElement->n.ownerDocument = doc;
+ErrorHandler:
+	*rtElement = newElement;
 
-  ErrorHandler:
-    *rtElement = newElement;
-    return errCode;
-
+	return errCode;
 }
+
 
 /*================================================================
 *   ixmlDocument_createElement
@@ -802,3 +759,4 @@ ixmlDocument_getElementById( IN IXML_Document * doc,
 
     return rtElement;
 }
+

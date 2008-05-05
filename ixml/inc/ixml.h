@@ -296,21 +296,7 @@ EXPORT_SPEC int ixmlNode_setNodeValue(
 /*!
  * \brief Retrieves the type of a \b Node.
  *
- * The defined \b Node constants are:
- *    \li \c eATTRIBUTE_NODE 
- *    \li \c eCDATA_SECTION_NODE
- *    \li \c eCOMMENT_NODE
- *    \li \c eDOCUMENT_FRAGMENT_NODE
- *    \li \c eDOCUMENT_NODE
- *    \li \c eDOCUMENT_TYPE_NODE
- *    \li \c eELEMENT_NODE 
- *    \li \c eENTITY_NODE
- *    \li \c eENTITY_REFERENCE_NODE
- *    \li \c eNOTATION_NODE
- *    \li \c ePROCESSING_INSTRUCTION_NODE
- *    \li \c eTEXT_NODE
- *
- *  \return An integer representing the type of the \b Node.
+ *  \return An enum IXML_NODE_TYPE representing the type of the \b Node.
  */
 EXPORT_SPEC unsigned short ixmlNode_getNodeType(
 	/*! The \b Node from which to retrieve the type. */
@@ -1035,9 +1021,18 @@ EXPORT_SPEC void ixmlDocument_free(
 /*!
  * \brief Imports a \b Node from another \b Document into this \b Document.
  *
- * The new \b Node does not a have parent node: it is a clone of the original
- * \b Node with the \c ownerDocument set to \b doc.
+ * The returned new \b Node does not a have parent node (parentNode is null):
+ * it is a clone of the original \b Node with the \c ownerDocument set to
+ * \b doc. The source node is not altered or removed from the original 
+ * document.
  *
+ * For all nodes, importing a node creates a node object owned by the
+ * importing document, with attribute values identical to the source
+ * node's nodeName and nodeType, plus the attributes related to namespaces
+ * (prefix, localName, and namespaceURI).
+ *
+ * As in the cloneNode operation on a node, the source node is not altered.
+ * 
  * The \b deep parameter controls whether all the children of the \b Node are
  * imported.
  *
