@@ -821,17 +821,19 @@ EXPORT_SPEC char *UpnpGetServerIpAddress();
 EXPORT_SPEC char *UpnpGetServerIp6Address();
 
 
-/*! \b UpnpRegisterRootDevice registers a device application with
- *  the SDK.  A device application cannot make any other API
- *  calls until it registers using this function.  Device applications
- *  can also register as control points (see \b UpnpRegisterClient
- *  to get a control point handle to perform control point
- *  functionality).
+/*! \brief Registers a device application with the UPnP Library.
  *
- *  \b UpnpRegisterRootDevice is synchronous and does not generate
- *  any callbacks.  Callbacks can occur as soon as this function returns.
+ * A device application cannot make any other API calls until it registers
+ * using this function.
  *
- *  \return [int] An integer representing one of the following:
+ * Device applications can also register as control points (see 
+ * \b UpnpRegisterClient to get a control point handle to perform control
+ * point functionality).
+ *
+ * \b UpnpRegisterRootDevice is synchronous and does not generate any
+ * callbacks. Callbacks can occur as soon as this function returns.
+ *
+ *  \return An integer representing one of the following:
  *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
  *      \li \c UPNP_E_FINISH: The SDK is already terminated or is not
  *		initialized.
@@ -865,70 +867,71 @@ EXPORT_SPEC int UpnpRegisterRootDevice(
 	/*! Pointer to a variable to store the new device handle. */
 	OUT UpnpDevice_Handle *Hnd);
 
-/*! \b UpnpRegisterRootDevice2 is similar to \b UpnpRegisterRootDevice,
- *  except that it also allows the description document to be specified as a 
- *  file or a memory buffer. The description can also be configured to have the
- *  correct IP and port address.
+/*! \brief Similar to \b UpnpRegisterRootDevice, except that it also allows
+ * the description document to be specified as a file or a memory buffer.
  *
- *  NOTE: For the configuration to be functional, the internal web server
- *  MUST be present. In addition, the web server MUST be activated
- *  (using \b UpnpSetWebServerRootDir) before calling this function.
- *  The only condition where the web server can be absent is if the 
- *  description document is specified as a URL and no configuration is 
- *  required (i.e. <tt>config_baseURL = 0</tt>.)
+ * The description can also be configured to have the correct IP and port
+ * address.
  *
- *  \b UpnpRegisterRootDevice2 is synchronous and does not generate
- *  any callbacks.  Callbacks can occur as soon as this function returns.
+ * NOTE: For the configuration to be functional, the internal web server
+ * MUST be present. In addition, the web server MUST be activated
+ * (using \b UpnpSetWebServerRootDir) before calling this function.
+ * The only condition where the web server can be absent is if the 
+ * description document is specified as a URL and no configuration is 
+ * required (i.e. <tt>config_baseURL = 0</tt>.)
  *
- *  Examples of using different types of description documents:
- *  \verbatim
-    1) Description specified as a URL:
-          descriptionType == UPNPREG_URL_DESC
-          description is the URL
-          bufferLen = 0 (ignored)
-    2) Description specified as a file:
-          descriptionType == UPNPREG_FILENAME_DESC
-          description is a filename
-          bufferLen = 0 (ignored)
-    3) Description specified as a memory buffer:
-          descriptionType == UPNPREG_BUF_DESC
-          description is pointer to a memory buffer
-          bufferLen == length of memory buffer
-    \endverbatim
+ * This is synchronous and does not generate any callbacks. Callbacks can occur
+ * as soon as this function returns.
  *
- *  \return [int] An integer representing one of the following:
- *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
- *      \li \c UPNP_E_FINISH: The SDK is already terminated or 
- *                                 is not initialized.
- *      \li \c UPNP_E_INVALID_DESC: The description document is not 
- *              a valid device description.
- *      \li \c UPNP_E_INVALID_PARAM: Either \b Callback or \b Hnd 
- *              is not a valid pointer or \b DescURL is \c NULL.
- *      \li \c UPNP_E_NETWORK_ERROR: A network error occurred.
- *      \li \c UPNP_E_SOCKET_WRITE: An error or timeout occurred writing 
- *              to a socket.
- *      \li \c UPNP_E_SOCKET_READ: An error or timeout occurred reading 
- *              from a socket.
- *      \li \c UPNP_E_SOCKET_BIND: An error occurred binding a socket.
- *      \li \c UPNP_E_SOCKET_CONNECT: An error occurred connecting the 
- *              socket.
- *      \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently 
- *              allocated.
- *      \li \c UPNP_E_OUTOF_MEMORY: There are insufficient resources to 
- *              register this root device.
- *      \li \c UPNP_E_URL_TOO_BIG: Length of the URL is bigger than the 
- *              internal buffer.
- *      \li \c UPNP_E_FILE_NOT_FOUND: The description file could not 
- *              be found.
- *      \li \c UPNP_E_FILE_READ_ERROR: An error occurred reading the 
- *              description file.
- *      \li \c UPNP_E_INVALID_URL: The URL to the description document 
- *              is invalid.
- *      \li \c UPNP_E_EXT_NOT_XML: The URL to the description document 
- *              or file should have a <tt>.xml</tt> extension.
- *      \li \c UPNP_E_NO_WEB_SERVER: The internal web server has been 
- *              compiled out; the SDK cannot configure itself from the 
- *              description document.
+ * Examples of using different types of description documents:
+ * \verbatim
+   1) Description specified as a URL:
+         descriptionType == UPNPREG_URL_DESC
+         description is the URL
+         bufferLen = 0 (ignored)
+   2) Description specified as a file:
+         descriptionType == UPNPREG_FILENAME_DESC
+         description is a filename
+         bufferLen = 0 (ignored)
+   3) Description specified as a memory buffer:
+         descriptionType == UPNPREG_BUF_DESC
+         description is pointer to a memory buffer
+         bufferLen == length of memory buffer
+   \endverbatim
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_FINISH: The SDK is already terminated or 
+ *                                is not initialized.
+ *     \li \c UPNP_E_INVALID_DESC: The description document is not 
+ *             a valid device description.
+ *     \li \c UPNP_E_INVALID_PARAM: Either \b Callback or \b Hnd 
+ *             is not a valid pointer or \b DescURL is \c NULL.
+ *     \li \c UPNP_E_NETWORK_ERROR: A network error occurred.
+ *     \li \c UPNP_E_SOCKET_WRITE: An error or timeout occurred writing 
+ *             to a socket.
+ *     \li \c UPNP_E_SOCKET_READ: An error or timeout occurred reading 
+ *             from a socket.
+ *     \li \c UPNP_E_SOCKET_BIND: An error occurred binding a socket.
+ *     \li \c UPNP_E_SOCKET_CONNECT: An error occurred connecting the 
+ *             socket.
+ *     \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently 
+ *             allocated.
+ *     \li \c UPNP_E_OUTOF_MEMORY: There are insufficient resources to 
+ *             register this root device.
+ *     \li \c UPNP_E_URL_TOO_BIG: Length of the URL is bigger than the 
+ *             internal buffer.
+ *     \li \c UPNP_E_FILE_NOT_FOUND: The description file could not 
+ *             be found.
+ *     \li \c UPNP_E_FILE_READ_ERROR: An error occurred reading the 
+ *             description file.
+ *     \li \c UPNP_E_INVALID_URL: The URL to the description document 
+ *             is invalid.
+ *     \li \c UPNP_E_EXT_NOT_XML: The URL to the description document 
+ *             or file should have a <tt>.xml</tt> extension.
+ *     \li \c UPNP_E_NO_WEB_SERVER: The internal web server has been 
+ *             compiled out; the SDK cannot configure itself from the 
+ *             description document.
  */
 EXPORT_SPEC int UpnpRegisterRootDevice2(
 	/*! The type of the description document. */
@@ -951,38 +954,39 @@ EXPORT_SPEC int UpnpRegisterRootDevice2(
 	OUT UpnpDevice_Handle* Hnd);
 
 
-/*! \b UpnpRegisterRootDevice3 registers a device application for a 
- *  specific address family with the SDK.  A device application cannot 
- *  make any other API calls until it registers using this function.
- *  Device applications can also register as control points (see 
- *  \b UpnpRegisterClient to get a control point handle to perform 
- *  control point functionality).
+/*! \brief Registers a device application for a specific address family with
+ * the UPnP library.
  *
- *  \b UpnpRegisterRootDevice is synchronous and does not generate
- *  any callbacks.  Callbacks can occur as soon as this function returns.
+ * A device application cannot make any other API calls until it registers
+ * using this function. Device applications can also register as control
+ * points (see \b UpnpRegisterClient to get a control point handle to perform
+ * control point functionality).
  *
- *  \return [int] An integer representing one of the following:
- *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
- *      \li \c UPNP_E_FINISH: The SDK is already terminated or 
- *                                 is not initialized. 
- *      \li \c UPNP_E_INVALID_DESC: The description document was not 
- *              a valid device description.
- *      \li \c UPNP_E_INVALID_URL: The URL for the description document 
- *              is not valid.
- *      \li \c UPNP_E_INVALID_PARAM: Either \b Callback or \b Hnd 
- *              is not a valid pointer or \b DescURL is \c NULL.
- *      \li \c UPNP_E_NETWORK_ERROR: A network error occurred.
- *      \li \c UPNP_E_SOCKET_WRITE: An error or timeout occurred writing 
- *              to a socket.
- *      \li \c UPNP_E_SOCKET_READ: An error or timeout occurred reading 
- *              from a socket.
- *      \li \c UPNP_E_SOCKET_BIND: An error occurred binding a socket.
- *      \li \c UPNP_E_SOCKET_CONNECT: An error occurred connecting the 
- *              socket.
- *      \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently 
- *              allocated.
- *      \li \c UPNP_E_OUTOF_MEMORY: There are insufficient resources to 
- *              register this root device.
+ * This is synchronous and does not generate any callbacks. Callbacks can occur
+ * as soon as this function returns.
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_FINISH: The SDK is already terminated or 
+ *                                is not initialized. 
+ *     \li \c UPNP_E_INVALID_DESC: The description document was not 
+ *             a valid device description.
+ *     \li \c UPNP_E_INVALID_URL: The URL for the description document 
+ *             is not valid.
+ *     \li \c UPNP_E_INVALID_PARAM: Either \b Callback or \b Hnd 
+ *             is not a valid pointer or \b DescURL is \c NULL.
+ *     \li \c UPNP_E_NETWORK_ERROR: A network error occurred.
+ *     \li \c UPNP_E_SOCKET_WRITE: An error or timeout occurred writing 
+ *             to a socket.
+ *     \li \c UPNP_E_SOCKET_READ: An error or timeout occurred reading 
+ *             from a socket.
+ *     \li \c UPNP_E_SOCKET_BIND: An error occurred binding a socket.
+ *     \li \c UPNP_E_SOCKET_CONNECT: An error occurred connecting the 
+ *             socket.
+ *     \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently 
+ *             allocated.
+ *     \li \c UPNP_E_OUTOF_MEMORY: There are insufficient resources to 
+ *             register this root device.
  */
 EXPORT_SPEC int UpnpRegisterRootDevice3(
 	/*! Pointer to a string containing the description URL for this root
@@ -998,6 +1002,25 @@ EXPORT_SPEC int UpnpRegisterRootDevice3(
 	/*! Address family of this device. Can be AF_INET for an IPv4 device, or
 	 * AF_INET6 for an IPv6 device. Defaults to AF_INET. */
 	IN const int  AddressFamily);
+
+
+/*! \brief Unregisters a root device registered with \b UpnpRegisterRootDevice or
+ *  \b UpnpRegisterRootDevice2.
+ *
+ *  After this call, the \b UpnpDevice_Handle is no longer valid. For all
+ *  advertisements that have not yet expired, the SDK sends a device unavailable
+ *  message automatically.
+ *
+ *  This is a synchronous call and generates no callbacks. Once this call
+ *  returns, the SDK will no longer generate callbacks to the application.
+ *
+ *  \return An integer representing one of the following:
+ *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *      \li \c UPNP_E_INVALID_HANDLE: The handle is not a valid device handle.
+ */
+EXPORT_SPEC int UpnpUnRegisterRootDevice(
+	/*! The handle of the root device instance to unregister. */
+	IN UpnpDevice_Handle);
 
 
 /*! \brief Registers a control point application with the UPnP Library.
@@ -1044,25 +1067,6 @@ EXPORT_SPEC int UpnpRegisterClient(
 EXPORT_SPEC int UpnpUnRegisterClient(
 	/*! The handle of the control point instance to unregister. */
 	IN UpnpClient_Handle Hnd);
-
-
-/*! \brief Unregisters a root device registered with \b UpnpRegisterRootDevice or
- *  \b UpnpRegisterRootDevice2. After this call, the 
- *  \b UpnpDevice_Handle is no longer valid. For all advertisements that 
- *  have not yet expired, the SDK sends a device unavailable message 
- *  automatically.
- *
- *  \b UpnpUnRegisterRootDevice is a synchronous call and generates no
- *  callbacks.  Once this call returns, the SDK will no longer 
- *  generate callbacks to the application.
- *
- *  \return [int] An integer representing one of the following:
- *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
- *      \li \c UPNP_E_INVALID_HANDLE: The handle is not a valid device handle.
- */
-EXPORT_SPEC int UpnpUnRegisterRootDevice(
-	/*! The handle of the root device instance to unregister. */
-	IN UpnpDevice_Handle);
 
 
 /*! \deprecated Use \b UpnpSetMaxContentLength instead.

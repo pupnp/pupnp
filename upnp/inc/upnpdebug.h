@@ -50,15 +50,15 @@ extern "C" {
 #endif
 
 
-/** @name Other debugging features
-          The UPnP SDK contains other features to aid in debugging.
+/** \name Other debugging features
+ *
+ * The UPnP SDK contains other features to aid in debugging.
  */
+/*@{*/
 
-/*! @{ */
-
-/** @name Upnp_LogLevel
+/** \name Upnp_LogLevel
  *  The user has the option to select 4 different types of debugging levels,
- *  see {\tt UpnpSetLogLevel}. 
+ *  see \c UpnpSetLogLevel. 
  *  The critical level will show only those messages 
  *  which can halt the normal processing of the library, like memory 
  *  allocation errors. The remaining three levels are just for debugging 
@@ -67,12 +67,10 @@ extern "C" {
  *  Info Level displays the other important operational information 
  *  regarding the working of the library. If the user selects All, 
  *  then the library displays all the debugging information that it has.
- *  \begin{itemize}
- *    \item {\tt UPNP_CRITICAL [0]}
- *    \item {\tt UPNP_PACKET [1]}
- *    \item {\tt UPNP_INFO [2]}
- *    \item {\tt UPNP_ALL [3]}
- *  \end{itemize}
+ *    \li \c UPNP_CRITICAL [0]
+ *    \li \c UPNP_PACKET [1]
+ *    \li \c UPNP_INFO [2]
+ *    \li \c UPNP_ALL [3]
  */
 
 typedef enum Upnp_Module {
@@ -86,18 +84,18 @@ typedef enum Upnp_Module {
 	HTTP
 } Dbg_Module;
 
-/*! @{ */
+/*@{*/
 typedef enum Upnp_LogLevel_e {
 	UPNP_CRITICAL,
 	UPNP_PACKET,
 	UPNP_INFO,
 	UPNP_ALL
 } Upnp_LogLevel;
-/*! @} */
+/*@}*/
 
 
 /**
- * Default log level : see {\tt Upnp_LogLevel}
+ * Default log level : see \c Upnp_LogLevel
  */
 #define UPNP_DEFAULT_LOG_LEVEL	UPNP_ALL
 
@@ -128,7 +126,7 @@ static UPNP_INLINE int UpnpInitLog() { return UPNP_E_SUCCESS; }
  * Parameters: Upnp_LogLevel log_level
  *
  * Description:							
- *	This functions set the log level (see {\tt Upnp_LogLevel}
+ *	This functions set the log level (see \c Upnp_LogLevel)
  * Returns: void
  ***************************************************************************/
 #ifdef DEBUG
@@ -308,7 +306,7 @@ static UPNP_INLINE void UpnpDisplayFileAndLine(
  * \param [in] fd file descriptor where the banner will be written
  * \param [in] lines: The buffer that will be written
  * \param [in] size: Size of the buffer
- * \param [in] starLength: This parameter provides the width of the banner
+ * \param [in] starlength: This parameter provides the width of the banner
  */
 #ifdef DEBUG
 void UpnpDisplayBanner(
@@ -349,7 +347,7 @@ static UPNP_INLINE void PrintThreadPoolStats(
 #endif
 
 
-/*! @} */
+/*@}*/
 
 #ifdef __cplusplus
 }

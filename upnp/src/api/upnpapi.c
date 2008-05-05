@@ -163,6 +163,17 @@ int UpnpSdkDeviceregisteredV6 = 0;
 Upnp_SID gUpnpSdkNLSuuid;
 
 
+// FIXME Put this declaration in the proper header file
+static int
+GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
+                       IN char *description,
+                       IN unsigned int bufferLen,
+                       IN int config_baseURL,
+                       IN int AddressFamily,
+                       OUT IXML_Document ** xmlDoc,
+                       OUT char descURL[LINE_SIZE] );
+
+
 /******************************************************************************/
 int UpnpInit(IN const char *HostIP, IN unsigned short DestPort)
 {
@@ -368,7 +379,7 @@ unsigned short UpnpGetServerPort6()
 	return LOCAL_PORT_V6;
 }
 
-/*****************************************************************************/
+/******************************************************************************/
 char *UpnpGetServerIpAddress()
 {
 	if (UpnpSdkInit != 1) {
@@ -378,7 +389,7 @@ char *UpnpGetServerIpAddress()
 	return gIF_IPV4;
 }
 
-/*****************************************************************************/
+/******************************************************************************/
 char *UpnpGetServerIp6Address()
 {
 	if( UpnpSdkInit != 1 ) {
@@ -389,33 +400,13 @@ char *UpnpGetServerIp6Address()
 }
 
 
+/******************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
-/****************************************************************************
- * Function: UpnpRegisterRootDevice
- *
- * Parameters:	
- *	IN const char *DescUrl:Pointer to a string containing the 
- *		description URL for this root device instance. 
- *	IN Upnp_FunPtr Callback: Pointer to the callback function for 
- *		receiving asynchronous events. 
- *	IN const void *Cookie: Pointer to user data returned with the 
- *		callback function when invoked.
- *	OUT UpnpDevice_Handle *Hnd: Pointer to a variable to store the 
- *		new device handle.
- *
- * Description:
- *	This function registers a device application with
- *	the UPnP Library.  A device application cannot make any other API
- *	calls until it registers using this function.  
- *
- * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
- *****************************************************************************/
-int
-UpnpRegisterRootDevice( IN const char *DescUrl,
-                        IN Upnp_FunPtr Fun,
-                        IN const void *Cookie,
-                        OUT UpnpDevice_Handle * Hnd )
+int UpnpRegisterRootDevice(
+	IN const char *DescUrl,
+	IN Upnp_FunPtr Fun,
+	IN const void *Cookie,
+	OUT UpnpDevice_Handle * Hnd )
 {
 
     struct Handle_Info *HInfo;
@@ -533,24 +524,261 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
 
 
 #ifdef INCLUDE_DEVICE_APIS
-/****************************************************************************
- * Function: UpnpUnRegisterRootDevice
- *
- * Parameters:	
- *	IN UpnpDevice_Handle Hnd: The handle of the device instance 
- *		to unregister
- * Description:
- *	This function unregisters a root device registered with 
- *	UpnpRegisterRootDevice} or UpnpRegisterRootDevice2. After this call, the 
- *	UpnpDevice_Handle Hnd is no longer valid. For all advertisements that 
- *	have not yet expired, the UPnP library sends a device unavailable message 
- *	automatically. 
- *
- * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
- *****************************************************************************/
-int
-UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
+/******************************************************************************/
+int UpnpRegisterRootDevice2(
+	IN Upnp_DescType descriptionType,
+	IN const char *description_const,
+	IN size_t bufferLen,   // ignored unless descType == UPNPREG_BUF_DESC
+	IN int config_baseURL,
+	IN Upnp_FunPtr Fun,
+	IN const void *Cookie,
+	OUT UpnpDevice_Handle * Hnd )
+{
+    struct Handle_Info *HInfo;
+    int retVal = 0;
+    char *description = ( char * )description_const;
+    if( UpnpSdkInit != 1 ) {
+        return UPNP_E_FINISH;
+    }
+
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Inside UpnpRegisterRootDevice2\n" );
+
+    if( Hnd == NULL || Fun == NULL ) {
+        return UPNP_E_INVALID_PARAM;
+    }
+
+    HandleLock();
+    if( UpnpSdkDeviceRegisteredV4 == 1 ) {
+        HandleUnlock();
+        return UPNP_E_ALREADY_REGISTERED;
+    }
+
+    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
+        HandleUnlock();
+        return UPNP_E_OUTOF_MEMORY;
+    }
+
+    HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
+    if( HInfo == NULL ) {
+        HandleUnlock();
+        return UPNP_E_OUTOF_MEMORY;
+    }
+    HandleTable[*Hnd] = HInfo;
+
+    // prevent accidental removal of a non-existent alias
+    HInfo->aliasInstalled = 0;
+
+    retVal = GetDescDocumentAndURL(
+        descriptionType, description, bufferLen,
+        config_baseURL, AF_INET, 
+        &HInfo->DescDocument, HInfo->DescURL );
+
+    if( retVal != UPNP_E_SUCCESS ) {
+        FreeHandle( *Hnd );
+        HandleUnlock();
+        return retVal;
+    }
+
+    HInfo->aliasInstalled = ( config_baseURL != 0 );
+    HInfo->HType = HND_DEVICE;
+
+    HInfo->Callback = Fun;
+    HInfo->Cookie = ( void * )Cookie;
+    HInfo->MaxAge = DEFAULT_MAXAGE;
+    HInfo->DeviceList = NULL;
+    HInfo->ServiceList = NULL;
+
+    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
+    CLIENTONLY( HInfo->ClientSubList = NULL; )
+    HInfo->MaxSubscriptions = UPNP_INFINITE;
+    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+    HInfo->DeviceAf = AF_INET;
+
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice2: Valid Description\n" );
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice2: DescURL : %s\n",
+        HInfo->DescURL );
+
+    HInfo->DeviceList =
+        ixmlDocument_getElementsByTagName( HInfo->DescDocument, "device" );
+
+    if( !HInfo->DeviceList ) {
+        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
+        ixmlDocument_free( HInfo->DescDocument );
+        FreeHandle( *Hnd );
+        HandleUnlock();
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice2: No devices found for RootDevice\n" );
+        return UPNP_E_INVALID_DESC;
+    }
+
+    HInfo->ServiceList = ixmlDocument_getElementsByTagName(
+        HInfo->DescDocument, "serviceList" );
+    if( !HInfo->ServiceList ) {
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice2: No services found for RootDevice\n" );
+    }
+
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice2: Gena Check\n" );
+    //*******************************
+    // GENA SET UP
+    //*******************************
+    if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
+            &HInfo->ServiceTable, HInfo->DescURL ) ) {
+        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice2: GENA Service Table\n" );
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "Here are the known services: \n" );
+        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
+    } else {
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "\nUpnpRegisterRootDevice2: Empty service table\n" );
+    }
+
+    UpnpSdkDeviceRegisteredV4 = 1;
+
+    HandleUnlock();
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting RegisterRootDevice2 Successfully\n" );
+
+    return UPNP_E_SUCCESS;
+}
+#endif // INCLUDE_DEVICE_APIS
+
+
+#ifdef INCLUDE_DEVICE_APIS
+/******************************************************************************/
+int UpnpRegisterRootDevice3(
+	IN const char *DescUrl,
+	IN Upnp_FunPtr Fun,
+	IN const void *Cookie,
+	OUT UpnpDevice_Handle * Hnd,
+	IN const int AddressFamily )
+{
+    struct Handle_Info *HInfo;
+    int retVal = 0;
+
+    if( UpnpSdkInit != 1 ) {
+        return UPNP_E_FINISH;
+    }
+
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Inside UpnpRegisterRootDevice\n" );
+    
+    HandleLock();
+    if( Hnd == NULL || Fun == NULL ||
+        DescUrl == NULL || strlen( DescUrl ) == 0 ||
+        (AddressFamily != AF_INET && AddressFamily != AF_INET6) ) {
+        HandleUnlock();
+        return UPNP_E_INVALID_PARAM;
+    }
+
+    if( ( AddressFamily == AF_INET && UpnpSdkDeviceRegisteredV4 == 1 ) ||
+        ( AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 1 ) ) {
+        HandleUnlock();
+        return UPNP_E_ALREADY_REGISTERED;
+    }
+
+    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
+        HandleUnlock();
+        return UPNP_E_OUTOF_MEMORY;
+    }
+
+    HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
+    if( HInfo == NULL ) {
+        HandleUnlock();
+        return UPNP_E_OUTOF_MEMORY;
+    }
+    HandleTable[*Hnd] = HInfo;
+
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Root device URL is %s\n", DescUrl );
+
+    HInfo->aliasInstalled = 0;
+    HInfo->HType = HND_DEVICE;
+    strcpy( HInfo->DescURL, DescUrl );
+    HInfo->Callback = Fun;
+    HInfo->Cookie = ( void * )Cookie;
+    HInfo->MaxAge = DEFAULT_MAXAGE;
+    HInfo->DeviceList = NULL;
+    HInfo->ServiceList = NULL;
+    HInfo->DescDocument = NULL;
+    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
+    CLIENTONLY( HInfo->ClientSubList = NULL; )
+    HInfo->MaxSubscriptions = UPNP_INFINITE;
+    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+    HInfo->DeviceAf = AddressFamily;
+
+    if( ( retVal =
+          UpnpDownloadXmlDoc( HInfo->DescURL, &( HInfo->DescDocument ) ) )
+        != UPNP_E_SUCCESS ) {
+        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
+        FreeHandle( *Hnd );
+        HandleUnlock();
+        return retVal;
+    }
+
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice: Valid Description\n" );
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice: DescURL : %s\n",
+        HInfo->DescURL );
+
+    HInfo->DeviceList =
+        ixmlDocument_getElementsByTagName( HInfo->DescDocument, "device" );
+    if( !HInfo->DeviceList ) {
+        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
+        ixmlDocument_free( HInfo->DescDocument );
+        FreeHandle( *Hnd );
+        HandleUnlock();
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice: No devices found for RootDevice\n" );
+        return UPNP_E_INVALID_DESC;
+    }
+
+    HInfo->ServiceList = ixmlDocument_getElementsByTagName(
+        HInfo->DescDocument, "serviceList" );
+    if( !HInfo->ServiceList ) {
+        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice: No services found for RootDevice\n" );
+    }
+
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "UpnpRegisterRootDevice: Gena Check\n" );
+    //*******************************
+    // GENA SET UP
+    //*******************************
+    if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
+            &HInfo->ServiceTable, HInfo->DescURL ) ) {
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "UpnpRegisterRootDevice: GENA Service Table \n" );
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "Here are the known services: \n" );
+        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
+    } else {
+        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            "\nUpnpRegisterRootDevice2: Empty service table\n" );
+    }
+
+    if( AddressFamily == AF_INET )
+        UpnpSdkDeviceRegisteredV4 = 1;
+    else
+        UpnpSdkDeviceregisteredV6 = 1;
+
+    HandleUnlock();
+    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        "Exiting RegisterRootDevice Successfully\n" );
+
+    return UPNP_E_SUCCESS;
+}
+#endif // INCLUDE_DEVICE_APIS
+
+
+#ifdef INCLUDE_DEVICE_APIS
+int UpnpUnRegisterRootDevice(IN UpnpDevice_Handle Hnd)
 {
     int retVal = 0;
     struct Handle_Info *HInfo = NULL;
@@ -613,9 +841,121 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
 
     return retVal;
 
-}  /****************** End of UpnpUnRegisterRootDevice *********************/
+}
+#endif // INCLUDE_DEVICE_APIS
 
-#endif //INCLUDE_DEVICE_APIS
+
+/*****************************************************************************/
+#ifdef INCLUDE_CLIENT_APIS
+int UpnpRegisterClient(
+	IN Upnp_FunPtr Fun,
+	IN const void *Cookie,
+	OUT UpnpClient_Handle *Hnd)
+{
+    struct Handle_Info *HInfo;
+
+    if( UpnpSdkInit != 1 ) {
+        return UPNP_E_FINISH;
+    }
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpRegisterClient \n" );
+    if( Fun == NULL || Hnd == NULL ) {
+        return UPNP_E_INVALID_PARAM;
+    }
+
+    HandleLock();
+
+    if( UpnpSdkClientRegistered ) {
+        HandleUnlock();
+        return UPNP_E_ALREADY_REGISTERED;
+    }
+    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
+        HandleUnlock();
+        return UPNP_E_OUTOF_MEMORY;
+    }
+    HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
+    if( HInfo == NULL ) {
+        HandleUnlock();
+        return UPNP_E_OUTOF_MEMORY;
+    }
+
+    HInfo->HType = HND_CLIENT;
+    HInfo->Callback = Fun;
+    HInfo->Cookie = ( void * )Cookie;
+    HInfo->ClientSubList = NULL;
+    ListInit( &HInfo->SsdpSearchList, NULL, NULL );
+#ifdef INCLUDE_DEVICE_APIS
+    HInfo->MaxAge = 0;
+    HInfo->MaxSubscriptions = UPNP_INFINITE;
+    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+#endif
+
+    HandleTable[*Hnd] = HInfo;
+    UpnpSdkClientRegistered = 1;
+
+    HandleUnlock();
+
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpRegisterClient \n" );
+
+    return UPNP_E_SUCCESS;
+}
+#endif // INCLUDE_CLIENT_APIS
+
+
+/*****************************************************************************/
+#ifdef INCLUDE_CLIENT_APIS
+int UpnpUnRegisterClient(IN UpnpClient_Handle Hnd)
+{
+    struct Handle_Info *HInfo;
+    ListNode *node = NULL;
+    SsdpSearchArg *searchArg = NULL;
+
+    if( UpnpSdkInit != 1 ) {
+        return UPNP_E_FINISH;
+    }
+
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpUnRegisterClient \n" );
+    HandleLock();
+    if( !UpnpSdkClientRegistered ) {
+        HandleUnlock();
+        return UPNP_E_INVALID_HANDLE;
+    }
+    HandleUnlock();
+
+#if EXCLUDE_GENA == 0
+    if( genaUnregisterClient( Hnd ) != UPNP_E_SUCCESS )
+        return UPNP_E_INVALID_HANDLE;
+#endif
+    HandleLock();
+    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
+        HandleUnlock();
+        return UPNP_E_INVALID_HANDLE;
+    }
+    //clean up search list
+    node = ListHead( &HInfo->SsdpSearchList );
+    while( node != NULL ) {
+        searchArg = ( SsdpSearchArg * ) node->item;
+        if( searchArg ) {
+            free( searchArg->searchTarget );
+            free( searchArg );
+        }
+        ListDelNode( &HInfo->SsdpSearchList, node, 0 );
+        node = ListHead( &HInfo->SsdpSearchList );
+    }
+
+    ListDestroy( &HInfo->SsdpSearchList, 0 );
+    FreeHandle( Hnd );
+    UpnpSdkClientRegistered = 0;
+    HandleUnlock();
+    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpUnRegisterClient \n" );
+    return UPNP_E_SUCCESS;
+
+}
+#endif // INCLUDE_CLIENT_APIS
+
 
 // *************************************************************
 #ifdef INCLUDE_DEVICE_APIS
@@ -903,421 +1243,8 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
 }
 
 #endif // INTERNAL_WEB_SERVER
-// ********************************************************
-
-/****************************************************************************
- * Function: UpnpRegisterRootDevice2
- *
- * Parameters:	
- *	IN Upnp_DescType descriptionType: The type of description document.
- *	IN const char* description:  Treated as a URL, file name or 
- *		memory buffer depending on description type. 
- *	IN size_t bufferLen: Length of memory buffer if passing a description
- *		in a buffer, otherwize ignored.
- *	IN int config_baseURL: If nonzero, URLBase of description document is 
- *		configured and the description is served using the internal
- *		web server.
- *	IN Upnp_FunPtr Fun: Pointer to the callback function for 
- *		receiving asynchronous events. 
- *	IN const void* Cookie: Pointer to user data returned with the 
- *		callback function when invoked. 
- *	OUT UpnpDevice_Handle* Hnd: Pointer to a variable to store 
- *		the new device handle.
- *
- * Description:
- *	This function is similar to  UpnpRegisterRootDevice except that
- *	it also allows the description document to be specified as a file or 
- *	a memory buffer. The description can also be configured to have the
- *	correct IP and port address.
- *
- * Return Values:
- *      UPNP_E_SUCCESS on success, nonzero on failure.
- *****************************************************************************/
-int
-UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
-                         IN const char *description_const,
-                         IN size_t bufferLen,   // ignored unless descType == UPNPREG_BUF_DESC
-
-                         IN int config_baseURL,
-                         IN Upnp_FunPtr Fun,
-                         IN const void *Cookie,
-                         OUT UpnpDevice_Handle * Hnd )
-{
-    struct Handle_Info *HInfo;
-    int retVal = 0;
-    char *description = ( char * )description_const;
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
-
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpRegisterRootDevice2\n" );
-
-    if( Hnd == NULL || Fun == NULL ) {
-        return UPNP_E_INVALID_PARAM;
-    }
-
-    HandleLock();
-    if( UpnpSdkDeviceRegisteredV4 == 1 ) {
-        HandleUnlock();
-        return UPNP_E_ALREADY_REGISTERED;
-    }
-
-    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
-        HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
-    }
-
-    HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
-    if( HInfo == NULL ) {
-        HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
-    }
-    HandleTable[*Hnd] = HInfo;
-
-    // prevent accidental removal of a non-existent alias
-    HInfo->aliasInstalled = 0;
-
-    retVal = GetDescDocumentAndURL(
-        descriptionType, description, bufferLen,
-        config_baseURL, AF_INET, 
-        &HInfo->DescDocument, HInfo->DescURL );
-
-    if( retVal != UPNP_E_SUCCESS ) {
-        FreeHandle( *Hnd );
-        HandleUnlock();
-        return retVal;
-    }
-
-    HInfo->aliasInstalled = ( config_baseURL != 0 );
-    HInfo->HType = HND_DEVICE;
-
-    HInfo->Callback = Fun;
-    HInfo->Cookie = ( void * )Cookie;
-    HInfo->MaxAge = DEFAULT_MAXAGE;
-    HInfo->DeviceList = NULL;
-    HInfo->ServiceList = NULL;
-
-    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
-    CLIENTONLY( HInfo->ClientSubList = NULL; )
-    HInfo->MaxSubscriptions = UPNP_INFINITE;
-    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
-    HInfo->DeviceAf = AF_INET;
-
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice2: Valid Description\n" );
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice2: DescURL : %s\n",
-        HInfo->DescURL );
-
-    HInfo->DeviceList =
-        ixmlDocument_getElementsByTagName( HInfo->DescDocument, "device" );
-
-    if( !HInfo->DeviceList ) {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
-        ixmlDocument_free( HInfo->DescDocument );
-        FreeHandle( *Hnd );
-        HandleUnlock();
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice2: No devices found for RootDevice\n" );
-        return UPNP_E_INVALID_DESC;
-    }
-
-    HInfo->ServiceList = ixmlDocument_getElementsByTagName(
-        HInfo->DescDocument, "serviceList" );
-    if( !HInfo->ServiceList ) {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice2: No services found for RootDevice\n" );
-    }
-
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice2: Gena Check\n" );
-    //*******************************
-    // GENA SET UP
-    //*******************************
-    if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
-            &HInfo->ServiceTable, HInfo->DescURL ) ) {
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice2: GENA Service Table\n" );
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "Here are the known services: \n" );
-        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
-    } else {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "\nUpnpRegisterRootDevice2: Empty service table\n" );
-    }
-
-    UpnpSdkDeviceRegisteredV4 = 1;
-
-    HandleUnlock();
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting RegisterRootDevice2 Successfully\n" );
-
-    return UPNP_E_SUCCESS;
-}
-
-
-/****************************************************************************
- * Function: UpnpRegisterRootDevice3
- *
- * Parameters:	
- *	IN const char *DescUrl:Pointer to a string containing the 
- *		description URL for this root device instance. 
- *	IN Upnp_FunPtr Callback: Pointer to the callback function for 
- *		receiving asynchronous events. 
- *	IN const void *Cookie: Pointer to user data returned with the 
- *		callback function when invoked.
- *	OUT UpnpDevice_Handle *Hnd: Pointer to a variable to store the 
- *		new device handle.
- *  IN const int AddressFamily: Registration address family. Can be AF_INET 
- *      or AF_INET6.
- *
- * Description:
- *	This function registers a device application with
- *	the UPnP Library.  A device application cannot make any other API
- *	calls until it registers using this function.  
- *
- * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
- *****************************************************************************/
-int
-UpnpRegisterRootDevice3( IN const char *DescUrl,
-                         IN Upnp_FunPtr Fun,
-                         IN const void *Cookie,
-                         OUT UpnpDevice_Handle * Hnd,
-                         IN const int AddressFamily )
-{
-
-    struct Handle_Info *HInfo;
-    int retVal = 0;
-
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
-
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpRegisterRootDevice\n" );
-    
-    HandleLock();
-    if( Hnd == NULL || Fun == NULL ||
-        DescUrl == NULL || strlen( DescUrl ) == 0 ||
-        (AddressFamily != AF_INET && AddressFamily != AF_INET6) ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-
-    if( ( AddressFamily == AF_INET && UpnpSdkDeviceRegisteredV4 == 1 ) ||
-        ( AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 1 ) ) {
-        HandleUnlock();
-        return UPNP_E_ALREADY_REGISTERED;
-    }
-
-    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
-        HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
-    }
-
-    HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
-    if( HInfo == NULL ) {
-        HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
-    }
-    HandleTable[*Hnd] = HInfo;
-
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Root device URL is %s\n", DescUrl );
-
-    HInfo->aliasInstalled = 0;
-    HInfo->HType = HND_DEVICE;
-    strcpy( HInfo->DescURL, DescUrl );
-    HInfo->Callback = Fun;
-    HInfo->Cookie = ( void * )Cookie;
-    HInfo->MaxAge = DEFAULT_MAXAGE;
-    HInfo->DeviceList = NULL;
-    HInfo->ServiceList = NULL;
-    HInfo->DescDocument = NULL;
-    CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
-    CLIENTONLY( HInfo->ClientSubList = NULL; )
-    HInfo->MaxSubscriptions = UPNP_INFINITE;
-    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
-    HInfo->DeviceAf = AddressFamily;
-
-    if( ( retVal =
-          UpnpDownloadXmlDoc( HInfo->DescURL, &( HInfo->DescDocument ) ) )
-        != UPNP_E_SUCCESS ) {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
-        FreeHandle( *Hnd );
-        HandleUnlock();
-        return retVal;
-    }
-
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice: Valid Description\n" );
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice: DescURL : %s\n",
-        HInfo->DescURL );
-
-    HInfo->DeviceList =
-        ixmlDocument_getElementsByTagName( HInfo->DescDocument, "device" );
-    if( !HInfo->DeviceList ) {
-        CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
-        ixmlDocument_free( HInfo->DescDocument );
-        FreeHandle( *Hnd );
-        HandleUnlock();
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice: No devices found for RootDevice\n" );
-        return UPNP_E_INVALID_DESC;
-    }
-
-    HInfo->ServiceList = ixmlDocument_getElementsByTagName(
-        HInfo->DescDocument, "serviceList" );
-    if( !HInfo->ServiceList ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice: No services found for RootDevice\n" );
-    }
-
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice: Gena Check\n" );
-    //*******************************
-    // GENA SET UP
-    //*******************************
-    if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
-            &HInfo->ServiceTable, HInfo->DescURL ) ) {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice: GENA Service Table \n" );
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "Here are the known services: \n" );
-        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
-    } else {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "\nUpnpRegisterRootDevice2: Empty service table\n" );
-    }
-
-    if( AddressFamily == AF_INET )
-        UpnpSdkDeviceRegisteredV4 = 1;
-    else
-        UpnpSdkDeviceregisteredV6 = 1;
-
-    HandleUnlock();
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Exiting RegisterRootDevice Successfully\n" );
-
-    return UPNP_E_SUCCESS;
-}
-
 #endif // INCLUDE_DEVICE_APIS
 
-#ifdef INCLUDE_CLIENT_APIS
-
-/*****************************************************************************/
-int UpnpRegisterClient(
-	IN Upnp_FunPtr Fun,
-	IN const void *Cookie,
-	OUT UpnpClient_Handle *Hnd)
-{
-    struct Handle_Info *HInfo;
-
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpRegisterClient \n" );
-    if( Fun == NULL || Hnd == NULL ) {
-        return UPNP_E_INVALID_PARAM;
-    }
-
-    HandleLock();
-
-    if( UpnpSdkClientRegistered ) {
-        HandleUnlock();
-        return UPNP_E_ALREADY_REGISTERED;
-    }
-    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
-        HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
-    }
-    HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
-    if( HInfo == NULL ) {
-        HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
-    }
-
-    HInfo->HType = HND_CLIENT;
-    HInfo->Callback = Fun;
-    HInfo->Cookie = ( void * )Cookie;
-    HInfo->ClientSubList = NULL;
-    ListInit( &HInfo->SsdpSearchList, NULL, NULL );
-#ifdef INCLUDE_DEVICE_APIS
-    HInfo->MaxAge = 0;
-    HInfo->MaxSubscriptions = UPNP_INFINITE;
-    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
-#endif
-
-    HandleTable[*Hnd] = HInfo;
-    UpnpSdkClientRegistered = 1;
-
-    HandleUnlock();
-
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpRegisterClient \n" );
-
-    return UPNP_E_SUCCESS;
-}
-#endif // INCLUDE_CLIENT_APIS
-
-
-/*****************************************************************************/
-#ifdef INCLUDE_CLIENT_APIS
-int UpnpUnRegisterClient(IN UpnpClient_Handle Hnd)
-{
-    struct Handle_Info *HInfo;
-    ListNode *node = NULL;
-    SsdpSearchArg *searchArg = NULL;
-
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
-
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpUnRegisterClient \n" );
-    HandleLock();
-    if( !UpnpSdkClientRegistered ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    HandleUnlock();
-
-#if EXCLUDE_GENA == 0
-    if( genaUnregisterClient( Hnd ) != UPNP_E_SUCCESS )
-        return UPNP_E_INVALID_HANDLE;
-#endif
-    HandleLock();
-    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    //clean up search list
-    node = ListHead( &HInfo->SsdpSearchList );
-    while( node != NULL ) {
-        searchArg = ( SsdpSearchArg * ) node->item;
-        if( searchArg ) {
-            free( searchArg->searchTarget );
-            free( searchArg );
-        }
-        ListDelNode( &HInfo->SsdpSearchList, node, 0 );
-        node = ListHead( &HInfo->SsdpSearchList );
-    }
-
-    ListDestroy( &HInfo->SsdpSearchList, 0 );
-    FreeHandle( Hnd );
-    UpnpSdkClientRegistered = 0;
-    HandleUnlock();
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpUnRegisterClient \n" );
-    return UPNP_E_SUCCESS;
-
-}
-#endif // INCLUDE_CLIENT_APIS
 
 //-----------------------------------------------------------------------------
 //
