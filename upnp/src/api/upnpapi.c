@@ -4343,12 +4343,12 @@ int getlocalhostname(OUT char *out, IN const int out_len)
         out );
     return UPNP_E_SUCCESS;
 #endif
-    }
+}
+
 
 #ifdef INCLUDE_DEVICE_APIS
 #if EXCLUDE_SSDP == 0
-
- /**************************************************************************
+/**************************************************************************
  * Function: AutoAdvertise 
  *
  * Parameters:	
@@ -4361,23 +4361,21 @@ int getlocalhostname(OUT char *out, IN const int out_len)
  * Return Values: VOID
  *     
  ***************************************************************************/
-void
-AutoAdvertise( void *input )
+void AutoAdvertise(void *input)
 {
-    upnp_timeout *event = ( upnp_timeout * ) input;
+	upnp_timeout *event = (upnp_timeout *)input;
 
-    UpnpSendAdvertisement( event->handle, *( ( int * )event->Event ) );
-    free_upnp_timeout( event );
+	UpnpSendAdvertisement(event->handle, *((int *)event->Event));
+	free_upnp_timeout(event);
 }
-#endif //INCLUDE_DEVICE_APIS
-#endif
+#endif // EXCLUDE_SSDP == 0
+#endif // INCLUDE_DEVICE_APIS
 
-/*
- **************************** */
+
 #ifdef INTERNAL_WEB_SERVER
 
- /**************************************************************************
- * Function: UpnpSetWebServerRootDir 
+/**************************************************************************
+ * Function: UpnpSetWebServerRootDir
  *
  * Parameters:	
  *	IN const char* rootDir:Path of the root directory of the web server. 
