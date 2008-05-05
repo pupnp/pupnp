@@ -2628,10 +2628,6 @@ EXPORT_SPEC int UpnpRemoveVirtualDir(
  */
 EXPORT_SPEC void UpnpRemoveAllVirtualDirs();
 
-EXPORT_SPEC void UpnpFree(
-	/*! The item to free. */
-	IN void *item);
-
 
 /* @} Web Server API */
 

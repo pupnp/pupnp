@@ -4736,25 +4736,6 @@ int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback)
 
 
 /**************************************************************************
- * Function: UpnpFree 
- *
- * Parameters:	
- *	IN void *item:The item to free.
- *	
- * Description:
- *	This function free the memory allocated by tbe UPnP library
- *
- * Return Values: void
- ***************************************************************************/
-void
-UpnpFree( IN void *item )
-{
-    if( item )
-        free( item );
-}
-
-
-/**************************************************************************
  * Function: UpnpSetContentLength
  * OBSOLETE METHOD: use UpnpSetMaxContentLength() instead.
  ***************************************************************************/
