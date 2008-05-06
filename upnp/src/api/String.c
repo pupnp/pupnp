@@ -6,20 +6,30 @@
 #include "String.h"
 
 
-/* 
- * Due to its heavy use, this class is coded for efficiency, not for beauty.
- * Do not use this as example to other classes. Please take a look at any
- * other one.
- */
-
-
 #include <stdlib.h> // for calloc(), free()
 #include <string.h> // for strlen(), strdup()
 
 
+/*!
+ * \ingroup UpnpString
+ * 
+ * \brief Internal implementation of the class UpnpString.
+ *
+ * \internal
+ *
+ * Due to its heavy use, this class is coded for efficiency, not for beauty.
+ * Do not use this as example to other classes. Please take a look at any
+ * other one.
+ *
+ * \todo Always alloc a minimum size like 64 bytes or so and when shrinking
+ * do not perform a new memory allocation.
+ */
 struct SUpnpString
 {
+	/*! \brief Length of the string. */
 	int m_length;
+	/*! \brief Pointer to a dynamically allocated area that holds the NULL
+	 * terminated string. */
 	char *m_string;
 };
 
@@ -86,10 +96,10 @@ error_handler1:
 }
 
 
-void UpnpString_assign(UpnpString *q, const UpnpString *p)
+void UpnpString_assign(UpnpString *p, const UpnpString *q)
 {
-	if (q != p) {
-		UpnpString_set_String(q, UpnpString_get_String(p));
+	if (p != q) {
+		UpnpString_set_String(p, UpnpString_get_String(q));
 	}
 }
 
