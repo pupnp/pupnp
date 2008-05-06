@@ -13,9 +13,9 @@
  *
  * \version 1.0
  *
- * \brief Strings implementation in the UPnP library.
+ * \brief String implementation for the UPnP library.
  *
- * This class implements basic string operations in the UPnP library.
+ * This class implements string operations in the UPnP library.
  *
  * @{
  */

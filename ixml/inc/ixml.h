@@ -36,7 +36,7 @@
 /*!
  * \file
  *
- * \defgroup XMLApi The XML API
+ * \defgroup XMLAPI XML API
  *
  * @{
  */
@@ -1777,7 +1777,7 @@ EXPORT_SPEC void ixmlFreeDOMString(
 #endif
 
 
-/*@}*/ /* The XML API */
+/* @} XMLAPI XML API */
 
 
 #endif  /* IXML_H */

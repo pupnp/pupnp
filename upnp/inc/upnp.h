@@ -36,7 +36,7 @@
 /*!
  * \file
  *
- * \defgroup TheApi The UPnP API
+ * \defgroup UPnPAPI UPnP API
  * 
  * @{
  */
@@ -895,8 +895,8 @@ EXPORT_SPEC char *UpnpGetServerIp6Address();
  * \b UpnpRegisterClient to get a control point handle to perform control
  * point functionality).
  *
- * \b UpnpRegisterRootDevice is synchronous and does not generate any
- * callbacks. Callbacks can occur as soon as this function returns.
+ * This is a synchronous call and does not generate any callbacks. Callbacks
+ * can occur as soon as this function returns.
  *
  *  \return An integer representing one of the following:
  *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
@@ -933,8 +933,9 @@ EXPORT_SPEC int UpnpRegisterRootDevice(
 	OUT UpnpDevice_Handle *Hnd);
 
 /*!
- * \brief Similar to \b UpnpRegisterRootDevice, except that it also allows
- * the description document to be specified as a file or a memory buffer.
+ * \brief Registers a device application with the UPnP Library. Similar to
+ * \b UpnpRegisterRootDevice, except that it also allows the description
+ * document to be specified as a file or a memory buffer.
  *
  * The description can also be configured to have the correct IP and port
  * address.
@@ -946,8 +947,8 @@ EXPORT_SPEC int UpnpRegisterRootDevice(
  * description document is specified as a URL and no configuration is 
  * required (i.e. <tt>config_baseURL = 0</tt>.)
  *
- * This is synchronous and does not generate any callbacks. Callbacks can occur
- * as soon as this function returns.
+ * This is a synchronous call and does not generate any callbacks. Callbacks
+ * can occur as soon as this function returns.
  *
  * Examples of using different types of description documents:
  * \verbatim
@@ -2638,7 +2639,8 @@ EXPORT_SPEC void UpnpRemoveAllVirtualDirs();
 #endif /* __cplusplus */
 
 
-/* @} TheAPI The UPnP API */
+/* @} UPnPAPI UPnP API */
+
 
 #endif /* UPNP_H */
 
