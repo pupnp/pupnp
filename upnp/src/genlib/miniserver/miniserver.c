@@ -626,7 +626,7 @@ get_miniserver_sockets( MiniServerSockArray * out,
     // that we don't have an IPv4/IPv6 stack.
     listenfd4 = socket( AF_INET, SOCK_STREAM, 0 );
     listenfd6 = socket( AF_INET6, SOCK_STREAM, 0 );
-    if (listenfd4 == INVALID_SOCKET || listenfd6 == INVALID_SOCKET) {
+    if (listenfd4 == INVALID_SOCKET && listenfd6 == INVALID_SOCKET) {
         return UPNP_E_OUTOF_SOCKET;
     }
 
