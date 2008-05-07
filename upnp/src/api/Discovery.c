@@ -22,7 +22,7 @@ struct SUpnpDiscovery
 	UpnpString *m_os;
 	UpnpString *m_date;
 	UpnpString *m_ext;
-	struct sockaddr m_destAddr;
+	struct sockaddr_storage m_destAddr;
 };
 
 
@@ -42,9 +42,7 @@ UpnpDiscovery *UpnpDiscovery_new()
 	p->m_os = UpnpString_new();
 	p->m_date = UpnpString_new();
 	p->m_ext = UpnpString_new();
-#if 0
-	memset(p->m_destAddr, 0, sizeof(struct sockaddr_in));
-#endif
+	memset(&p->m_destAddr, 0, sizeof(struct sockaddr_storage));
 
 	return (UpnpDiscovery *)p;
 }
@@ -82,7 +80,7 @@ void UpnpDiscovery_delete(UpnpDiscovery *p)
 	UpnpString_delete(q->m_ext);
 	q->m_ext = NULL;
 
-	memset(&q->m_destAddr, 0, sizeof(struct sockaddr_in));
+	memset(&q->m_destAddr, 0, sizeof(struct sockaddr_storage));
 
 	free(p);
 }
@@ -334,12 +332,12 @@ void UpnpDiscovery_strncpy_Ext(UpnpDiscovery *p, const char *s, int n)
 
 struct sockaddr *UpnpDiscovery_get_DestAddr(const UpnpDiscovery *p)
 {
-	return &((struct SUpnpDiscovery *)p)->m_destAddr;
+	return (struct sockaddr *)&((struct SUpnpDiscovery *)p)->m_destAddr;
 }
 
 
 void UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, struct sockaddr *sa)
 {
-	((struct SUpnpDiscovery *)p)->m_destAddr = *sa;
+        memcpy( &((struct SUpnpDiscovery *)p)->m_destAddr, sa, sizeof(struct sockaddr_storage) );
 }
 
