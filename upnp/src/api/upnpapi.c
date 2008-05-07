@@ -464,9 +464,11 @@ int UpnpRegisterRootDevice(
 
 	retVal = UpnpDownloadXmlDoc(HInfo->DescURL, &(HInfo->DescDocument));
 	if (retVal != UPNP_E_SUCCESS) {
+		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+			"UpnpRegisterRootDevice: error downloading Document: %d\n",
+			retVal);
 		CLIENTONLY( ListDestroy(&HInfo->SsdpSearchList, 0); )
-		FreeHandle( *Hnd );
-		retVal = retVal;
+		FreeHandle(*Hnd);
 		goto exit_function;
 	}
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -846,7 +848,7 @@ int UpnpUnRegisterRootDevice(IN UpnpDevice_Handle Hnd)
         UpnpSdkDeviceregisteredV6 = 0;
     }
 
-    FreeHandle( Hnd );
+    FreeHandle(Hnd);
     HandleUnlock();
 
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
@@ -959,7 +961,7 @@ int UpnpUnRegisterClient(IN UpnpClient_Handle Hnd)
     }
 
     ListDestroy( &HInfo->SsdpSearchList, 0 );
-    FreeHandle( Hnd );
+    FreeHandle(Hnd);
     UpnpSdkClientRegistered = 0;
     HandleUnlock();
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
@@ -3144,62 +3146,64 @@ UpnpDownloadUrlItem( const char *url,
  * Return Values: int
  *	UPNP_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
-int
-UpnpDownloadXmlDoc( const char *url,
-                    IXML_Document ** xmlDoc )
+int UpnpDownloadXmlDoc(const char *url, IXML_Document **xmlDoc)
 {
-    int ret_code;
-    char *xml_buf;
-    char content_type[LINE_SIZE];
+	int ret_code;
+	char *xml_buf;
+	char content_type[LINE_SIZE];
 
-    if( url == NULL || xmlDoc == NULL ) {
-        return UPNP_E_INVALID_PARAM;
-    }
+	if (url == NULL || xmlDoc == NULL) {
+		return UPNP_E_INVALID_PARAM;
+	}
 
-    ret_code = UpnpDownloadUrlItem( url, &xml_buf, content_type );
-    if( ret_code != UPNP_E_SUCCESS ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-            "retCode: %d\n", ret_code );
-        return ret_code;
-    }
+	ret_code = UpnpDownloadUrlItem(url, &xml_buf, content_type);
+	if (ret_code != UPNP_E_SUCCESS) {
+		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+			"Error downloading document, retCode: %d\n", ret_code);
+		return ret_code;
+	}
 
-    if( strncasecmp( content_type, "text/xml", strlen( "text/xml" ) ) ) {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Not text/xml\n" );
-        // Linksys WRT54G router returns 
-        // "CONTENT-TYPE: application/octet-stream".
-        // Let's be nice to Linksys and try to parse document anyway.
-        // If the data sended is not a xml file, ixmlParseBufferEx
-        // will fail and the function will return UPNP_E_INVALID_DESC too.
+	if (strncasecmp(content_type, "text/xml", strlen("text/xml"))) {
+		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Not text/xml\n");
+		// Linksys WRT54G router returns 
+		// "CONTENT-TYPE: application/octet-stream".
+		// Let's be nice to Linksys and try to parse document anyway.
+		// If the data sended is not a xml file, ixmlParseBufferEx
+		// will fail and the function will return UPNP_E_INVALID_DESC too.
 #if 0
-        free( xml_buf );
-        return UPNP_E_INVALID_DESC;
+		free(xml_buf);
+		return UPNP_E_INVALID_DESC;
 #endif
-    }
+	}
 
-    ret_code = ixmlParseBufferEx( xml_buf, xmlDoc );
-    free( xml_buf );
-
-    if( ret_code != IXML_SUCCESS ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-            "Invalid desc\n" );
-        if( ret_code == IXML_INSUFFICIENT_MEMORY ) {
-            return UPNP_E_OUTOF_MEMORY;
-        } else {
-            return UPNP_E_INVALID_DESC;
-        }
-    } else {
+	ret_code = ixmlParseBufferEx(xml_buf, xmlDoc);
+	free(xml_buf);
+	if (ret_code != IXML_SUCCESS) {
+		if (ret_code == IXML_INSUFFICIENT_MEMORY) {
+			UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+				"Out of memory, ixml error code: %d\n",
+				ret_code);
+			return UPNP_E_OUTOF_MEMORY;
+		} else {
+			UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+				"Invalid Description, ixml error code: %d\n",
+				ret_code);
+			return UPNP_E_INVALID_DESC;
+		}
+	} else {
 #ifdef DEBUG
-        xml_buf = ixmlPrintNode( ( IXML_Node * ) * xmlDoc );
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-            "Printing the Parsed xml document \n %s\n", xml_buf );
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-            "****************** END OF Parsed XML Doc *****************\n" );
-        ixmlFreeDOMString( xml_buf );
+		xml_buf = ixmlPrintNode((IXML_Node *)*xmlDoc);
+		UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+			"Printing the Parsed xml document \n %s\n", xml_buf);
+		UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+			"****************** END OF Parsed XML Doc *****************\n");
+		ixmlFreeDOMString(xml_buf);
 #endif
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-            "Exiting UpnpDownloadXmlDoc\n" );
-        return UPNP_E_SUCCESS;
-    }
+		UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+			"Exiting UpnpDownloadXmlDoc\n");
+
+		return UPNP_E_SUCCESS;
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -4121,15 +4125,15 @@ int FreeHandle(int Upnp_Handle)
 	int ret = UPNP_E_INVALID_HANDLE;
 
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-		"FreeHandleInfo: entering, Handle is %d\n", Upnp_Handle);
+		"FreeHandle: entering, Handle is %d\n", Upnp_Handle);
 
 	if (Upnp_Handle < 1 || Upnp_Handle >= NUM_HANDLE) {
 		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
-			"FreeHandleInfo: Handle %d is out of range\n",
+			"FreeHandle: Handle %d is out of range\n",
 			Upnp_Handle);
 	} else if (HandleTable[Upnp_Handle] == NULL) {
 		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
-			"FreeHandleInfo: HandleTable[%d] is NULL\n",
+			"FreeHandle: HandleTable[%d] is NULL\n",
 			Upnp_Handle);
 	} else {
 		free( HandleTable[Upnp_Handle] );
@@ -4137,7 +4141,8 @@ int FreeHandle(int Upnp_Handle)
 		ret = UPNP_E_SUCCESS;
 	}
 
-	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "FreeHandleInfo: exiting\n");
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"FreeHandle: exiting, ret = %d.\n", ret);
 
 	return ret;
 }
