@@ -29,8 +29,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-#include <string.h>
+
+#include "ixmldebug.h"
 #include "ixmlparser.h"
+
+
+#include <string.h>
 
 #ifdef WIN32
  #define strncasecmp strnicmp
@@ -2433,77 +2437,105 @@ Parser_processAttribute( IN Parser * xmlParser,
 }
 
 /*==============================================================================*
-*
-*   Parser_getNextNode
-*       return next node 
-*   returns IXML_SUCCESS or 
-*			
-*
-*===============================================================================*/
-static int
-Parser_getNextNode( IN Parser * xmlParser,
-                    OUT IXML_Node * node,
-                    OUT BOOL * bETag )
+ *
+ *   Parser_getNextNode
+ *       return next node 
+ *   returns IXML_SUCCESS or 
+ *			
+ *
+ *===============================================================================*/
+static int Parser_getNextNode(
+	IN Parser *xmlParser,
+	OUT IXML_Node *node,
+	OUT BOOL *bETag )
 {
-    char *pCurToken = NULL;
-    char *lastElement = NULL;
+	char *pCurToken = NULL;
+	char *lastElement = NULL;
+	IXML_ERRORCODE ret = IXML_SUCCESS;
+	int line = 0;
+	int tokenLen = 0;
 
-    // endof file reached?
-    if( *( xmlParser->curPtr ) == '\0' ) {
-        *bETag = TRUE;
-        return IXML_FILE_DONE;
-    }
+	// endof file reached?
+	if (*(xmlParser->curPtr) == '\0') {
+		*bETag = TRUE;
+		line = __LINE__;
+		ret = IXML_FILE_DONE;
+		goto ExitFunction;
+	}
 
-    if( xmlParser->state == eCONTENT ) {
-        if( Parser_processContent( xmlParser, node ) != IXML_SUCCESS ) {
-            return IXML_FAILED;
-        }
-    } else {
-        Parser_skipWhiteSpaces( xmlParser );
+	if (xmlParser->state == eCONTENT) {
+		line = __LINE__;
+		ret = Parser_processContent(xmlParser, node);
+		goto ExitFunction;
+	} else {
+		Parser_skipWhiteSpaces(xmlParser);
+		tokenLen = Parser_getNextToken(xmlParser);
+		if (tokenLen == 0 &&
+		    xmlParser->pCurElement == NULL &&
+		    *(xmlParser->curPtr) == '\0') {
+			// comments after the xml doc
+			line = __LINE__;
+			ret = IXML_SUCCESS;
+			goto ExitFunction;
+		} else if ((xmlParser->tokenBuf).length == 0) {
+			line = __LINE__;
+			ret = IXML_SYNTAX_ERR;
+			goto ExitFunction;
+		}
 
-        if( ( Parser_getNextToken( xmlParser ) == 0 ) && ( xmlParser->pCurElement == NULL ) && ( *( xmlParser->curPtr ) == '\0' ) ) {   // comments after the xml doc
-            return IXML_SUCCESS;
-        } else if( ( xmlParser->tokenBuf ).length == 0 ) {
-            return IXML_SYNTAX_ERR;
-        }
+		pCurToken = (xmlParser->tokenBuf).buf;
+		if (*pCurToken == GREATERTHAN) {
+			line = __LINE__;
+			ret = IXML_SUCCESS;
+			goto ExitFunction;
+		} else if (strcmp(pCurToken, ENDTAG) == 0) {
+			//  we got </, read next element
+			line = __LINE__;
+			ret = Parser_processETag(xmlParser, node, bETag);
+			goto ExitFunction;
+		} else if (*pCurToken == LESSTHAN) {
+			line = __LINE__;
+			ret = Parser_processSTag(xmlParser, node);
+			goto ExitFunction;
+		} else if (strcmp(pCurToken, COMPLETETAG) == 0) {
+			lastElement = (xmlParser->lastElem).buf;
+			if (lastElement == NULL) {
+				line = __LINE__;
+				ret = IXML_SYNTAX_ERR;
+				goto ExitFunction;
+			}
 
-        pCurToken = ( xmlParser->tokenBuf ).buf;
-        if( *pCurToken == GREATERTHAN ) {
-            return IXML_SUCCESS;
-        } else if( strcmp( pCurToken, ENDTAG ) == 0 ) { //  we got </, read next element
-            return Parser_processETag( xmlParser, node, bETag );
-        } else if( *pCurToken == LESSTHAN ) {
-            return Parser_processSTag( xmlParser, node );
-        } else if( strcmp( pCurToken, COMPLETETAG ) == 0 ) {
-            lastElement = ( xmlParser->lastElem ).buf;
-            if( lastElement == NULL ) {
-                goto ErrorHandler;
-            }
+			node->nodeName = safe_strdup( lastElement );
+			if( node->nodeName == NULL ) {
+				line = __LINE__;
+				ret = IXML_INSUFFICIENT_MEMORY;
+				goto ExitFunction;
+			}
+			node->nodeType = eELEMENT_NODE;
+			*bETag = TRUE;
 
-            node->nodeName = safe_strdup( lastElement );
-            if( node->nodeName == NULL ) {
-                return IXML_INSUFFICIENT_MEMORY;
-            }
-            node->nodeType = eELEMENT_NODE;
-            *bETag = TRUE;
+			line = __LINE__;
+			ret = IXML_SUCCESS;
+			goto ExitFunction;
+		} else if (xmlParser->state == eATTRIBUTE && xmlParser->pCurElement != NULL) {
+			if(Parser_processAttribute( xmlParser, node ) != IXML_SUCCESS) {
+				line = __LINE__;
+				ret = IXML_SYNTAX_ERR;
+				goto ExitFunction;
+			}
+		} else {
+			line = __LINE__;
+			ret = IXML_SYNTAX_ERR;
+			goto ExitFunction;
+		}
+	}
 
-            return IXML_SUCCESS;
-        } else if( (xmlParser->state == eATTRIBUTE) && 
-                   (xmlParser->pCurElement != NULL) ) {
-            if( Parser_processAttribute( xmlParser, node ) !=
-                IXML_SUCCESS ) {
-                return IXML_SYNTAX_ERR;
-            }
-        } else {
-            return IXML_SYNTAX_ERR;
-        }
-    }
+ExitFunction:
+	if (ret != IXML_SUCCESS) {
+		IxmlPrintf("(ixml::Parser_getNextNode): Error %d, line %d\n",
+			ret, line);
+	}
 
-    return IXML_SUCCESS;
-
-  ErrorHandler:
-
-    return IXML_SYNTAX_ERR;
-
+	return ret;
 }
 

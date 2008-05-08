@@ -69,19 +69,21 @@
 		#ifdef LIBUPNP_EXPORTS
 			/* set up declspec for dll export to make functions visible to library users */
 			#define EXPORT_SPEC __declspec(dllexport)
-		#else
+		#else /* LIBUPNP_EXPORTS */
 			#define EXPORT_SPEC __declspec(dllimport)
-		#endif
-	#else
+		#endif /* LIBUPNP_EXPORTS */
+	#else /* UPNP_STATIC_LIB */
 		#define EXPORT_SPEC
-	#endif
+	#endif /* UPNP_STATIC_LIB */
+
+
 	#ifdef UPNP_USE_MSVCPP
 		/* define some things the M$ VC++ doesn't know */
 		#define UPNP_INLINE
 		typedef __int64 int64_t;
 		#define PRId64 "I64d"
 		#define PRIzu "lu"
-	#endif
+	#endif /* UPNP_USE_MSVCPP */
 	#ifdef UPNP_USE_BCBPP
 		/* define some things Borland Builder doesn't know */
 		#define UPNP_INLINE inline
@@ -89,7 +91,7 @@
 #warning The Borland C compiler is probably broken on PRId64, please someone provide a proper fix here
 		#define PRId64 "I64d"
 		#define PRIzu "zu"
-	#endif
+	#endif /* UPNP_USE_BCBPP */
 #else
 	#define EXPORT_SPEC
 	#define UPNP_INLINE inline

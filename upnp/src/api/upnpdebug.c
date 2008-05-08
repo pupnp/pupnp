@@ -30,12 +30,16 @@
 ///////////////////////////////////////////////////////////////////////////
 
 #include "config.h"
-#include "upnpdebug.h"
-#include <stdlib.h>
-#include <stdio.h>
+
+
 #include "ithread.h"
 #include "upnp.h"
+#include "upnpdebug.h"
+
+
 #include <stdarg.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 
@@ -189,27 +193,6 @@ int DebugAtThisLevel(
 #endif
 
 
-/***************************************************************************
- * Function : UpnpPrintf					
- *									
- * Parameters:			
- *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
- *		whether debug statement will go to standard output, 
- *		or any of the log files.
- *	IN Dbg_Module Module: debug will go in the name of this module
- *	IN char *DbgFileName: Name of the file from where debug statement is
- *							coming
- *	IN int DbgLineNo : Line number of the file from where debug statement 
- *				is coming
- *	IN char * FmtStr, ...: Variable number of arguments that will go 
- *				in the debug statement
- *					
- * Description:					
- *	This functions prints the debug statement either on the startdard 
- *	output or log file along with the information from where this debug 
- *	statement is coming
- * Returns: void
- ***************************************************************************/
 #ifdef DEBUG
 void UpnpPrintf(
 	IN Upnp_LogLevel DLevel,
