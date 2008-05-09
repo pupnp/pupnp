@@ -45,7 +45,7 @@ extern "C" {
 
 
 #include "service_table.h"
-#include "String.h"        // for UpnpString
+#include "UpnpString.h"
 #include "TimerThread.h"
 #include "upnp.h"
 #include "upnp_timeout.h"

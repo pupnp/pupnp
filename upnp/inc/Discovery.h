@@ -13,7 +13,7 @@ extern "C" {
 typedef struct {} UpnpDiscovery;
 
 
-#include "String.h"     /* for UpnpString */
+#include "UpnpString.h"
 
 
 #include <netinet/in.h> /* for sockaddr_in */

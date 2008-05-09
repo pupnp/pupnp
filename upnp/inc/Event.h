@@ -14,7 +14,7 @@ typedef struct {} UpnpEvent;
 
 
 #include "ixml.h"       // for IXML_Document
-#include "String.h"     // for UpnpString
+#include "UpnpString.h"
 
 
 /** Constructor */

@@ -14,7 +14,7 @@ typedef struct {} UpnpActionRequest;
 
 
 #include "ixml.h"       // for IXML_Document
-#include "String.h"     // for UpnpString
+#include "UpnpString.h"
 
 
 #include <netinet/in.h> // for in_addr

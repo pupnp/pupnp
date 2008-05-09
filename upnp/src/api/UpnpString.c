@@ -3,7 +3,7 @@
 #include "config.h"
 
 
-#include "String.h"
+#include "UpnpString.h"
 
 
 #include <stdlib.h> // for calloc(), free()

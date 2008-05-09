@@ -28,7 +28,7 @@ upnpinclude_HEADERS = \
 	inc/StateVarComplete.h \
 	inc/StateVarRequest.h \
 	inc/SubscriptionRequest.h \
-	inc/String.h \
+	inc/UpnpString.h \
 	inc/upnp.h \
 	inc/upnpdebug.h
 
@@ -132,7 +132,7 @@ libupnp_la_SOURCES += src/api/FileInfo.c
 libupnp_la_SOURCES += src/api/StateVarComplete.c
 libupnp_la_SOURCES += src/api/StateVarRequest.c
 libupnp_la_SOURCES += src/api/SubscriptionRequest.c
-libupnp_la_SOURCES += src/api/String.c
+libupnp_la_SOURCES += src/api/UpnpString.c
 libupnp_la_SOURCES += src/api/upnpapi.c
 if ENABLE_TOOLS
 libupnp_la_SOURCES += src/api/upnptools.c

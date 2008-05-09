@@ -12,7 +12,7 @@ extern "C" {
 typedef struct {} UpnpActionComplete;
 
 
-#include "String.h"     // for UpnpString
+#include "UpnpString.h"
 
 
 #include "ixml.h"       // for IXML_Document

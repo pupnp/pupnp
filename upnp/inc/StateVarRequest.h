@@ -14,7 +14,7 @@ extern "C" {
 typedef struct {} UpnpStateVarRequest;
 
 
-#include "String.h"     // for UpnpString
+#include "UpnpString.h"
 
 
 #include "ixml.h"       // for DOMString

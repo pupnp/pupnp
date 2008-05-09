@@ -45,7 +45,7 @@
 #include "miniserver.h"
 #include "service_table.h"
 #include "sock.h"
-#include "String.h"
+#include "UpnpString.h"
 #include "ThreadPool.h"
 #include "uri.h"
 #include "upnp.h"

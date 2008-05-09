@@ -13,7 +13,7 @@ extern "C" {
 typedef struct {} UpnpSubscriptionRequest;
 
 
-#include "String.h"     // for UpnpString
+#include "UpnpString.h"
 
 
 /** Constructor */

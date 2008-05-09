@@ -14,7 +14,7 @@ extern "C" {
 typedef struct {} UpnpEventSubscribe;
 
 
-#include "String.h"     // for UpnpString
+#include "UpnpString.h"
 
 
 /** Constructor */
