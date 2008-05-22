@@ -10,7 +10,7 @@ extern "C" {
 
 
 /** Detailed description of this class should go here */
-typedef struct {} UpnpFileInfo;
+typedef struct s_UpnpFileInfo UpnpFileInfo;
 
 
 #include "ixml.h"       // for DOMString

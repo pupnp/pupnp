@@ -10,7 +10,7 @@ extern "C" {
 
 
 /** Returned along with a \b UPNP_EVENT_SUBSCRIPTION_REQUEST callback. */
-typedef struct {} UpnpSubscriptionRequest;
+typedef struct s_UpnpSubscriptionRequest UpnpSubscriptionRequest;
 
 
 #include "UpnpString.h"

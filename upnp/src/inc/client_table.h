@@ -58,7 +58,7 @@ extern TimerThread gTimerThread;
 #ifdef INCLUDE_CLIENT_APIS
 
 
-typedef struct {} ClientSubscription;
+typedef struct s_ClientSubscription ClientSubscription;
 
 
 /** Constructor */

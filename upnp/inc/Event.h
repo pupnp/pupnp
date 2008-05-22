@@ -10,7 +10,7 @@ extern "C" {
 
 
 /** Returned along with a \b UPNP_EVENT_RECEIVED callback.  */
-typedef struct {} UpnpEvent;
+typedef struct s_UpnpEvent UpnpEvent;
 
 
 #include "ixml.h"       // for IXML_Document

@@ -10,7 +10,7 @@ extern "C" {
 
 
 /** Returned in a \b UPNP_DISCOVERY_RESULT callback. */
-typedef struct {} UpnpDiscovery;
+typedef struct s_UpnpDiscovery UpnpDiscovery;
 
 
 #include "UpnpString.h"

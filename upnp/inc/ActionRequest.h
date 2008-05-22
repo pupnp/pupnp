@@ -10,7 +10,7 @@ extern "C" {
 
 
 /** Returned as part of a \b UPNP_CONTROL_ACTION_COMPLETE callback.  */
-typedef struct {} UpnpActionRequest;
+typedef struct s_UpnpActionRequest UpnpActionRequest;
 
 
 #include "ixml.h"       // for IXML_Document

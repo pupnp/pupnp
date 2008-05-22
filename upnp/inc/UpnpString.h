@@ -29,7 +29,7 @@ extern "C" {
 /*!
  * \brief Type of the string objects inside libupnp.
  */
-typedef struct {} UpnpString;
+typedef struct s_UpnpString UpnpString;
 
 
 /*!

@@ -11,7 +11,7 @@ extern "C" {
 
 /** Represents the request for current value of a state variable in a service
  *  state table.  */
-typedef struct {} UpnpStateVarRequest;
+typedef struct s_UpnpStateVarRequest UpnpStateVarRequest;
 
 
 #include "UpnpString.h"

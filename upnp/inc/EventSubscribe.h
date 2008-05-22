@@ -11,7 +11,7 @@ extern "C" {
 
 /** Returned along with a \b UPNP_EVENT_SUBSCRIBE_COMPLETE or
  * \b UPNP_EVENT_UNSUBSCRIBE_COMPLETE callback.  */
-typedef struct {} UpnpEventSubscribe;
+typedef struct s_UpnpEventSubscribe UpnpEventSubscribe;
 
 
 #include "UpnpString.h"

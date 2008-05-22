@@ -9,7 +9,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-typedef struct {} UpnpActionComplete;
+typedef struct s_UpnpActionComplete UpnpActionComplete;
 
 
 #include "UpnpString.h"

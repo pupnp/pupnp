@@ -5,7 +5,7 @@
 
 
 /** Structure to contain Discovery response */
-typedef struct {} SSDPResultData;
+typedef struct s_SSDPResultData SSDPResultData;
 
 
 #include "Discovery.h" /* for UpnpDiscovery */

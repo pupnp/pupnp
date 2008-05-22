@@ -11,7 +11,7 @@ extern "C" {
 
 /** Represents the reply for the current value of a state variable in an
     asynchronous call. */
-typedef struct {} UpnpStateVarComplete;
+typedef struct s_UpnpStateVarComplete UpnpStateVarComplete;
 
 
 #include "UpnpString.h"
