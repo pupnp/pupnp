@@ -16,9 +16,11 @@ typedef struct s_UpnpActionRequest UpnpActionRequest;
 #include "ixml.h"       // for IXML_Document
 #include "UpnpString.h"
 
-
-#include <netinet/in.h> // for in_addr
-
+#ifndef WIN32
+#include <netinet/in.h> // for sockaddr_storage
+#else
+#include <ws2tcpip.h>
+#endif
 
 /** Constructor */
 UpnpActionRequest *UpnpActionRequest_new();

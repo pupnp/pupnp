@@ -15,8 +15,11 @@ typedef struct s_UpnpDiscovery UpnpDiscovery;
 
 #include "UpnpString.h"
 
-
-#include <netinet/in.h> /* for sockaddr_in */
+#ifndef WIN32
+#include <netinet/in.h> // for sockaddr_storage
+#else
+#include <ws2tcpip.h>
+#endif
 
 
 /** Constructor */

@@ -20,8 +20,11 @@ typedef struct s_UpnpStateVarRequest UpnpStateVarRequest;
 #include "ixml.h"       // for DOMString
 
 
-#include <netinet/in.h> // for in_addr
-
+#ifndef WIN32
+#include <netinet/in.h> // for sockaddr_storage
+#else
+#include <ws2tcpip.h>
+#endif
 
 /** Constructor */
 UpnpStateVarRequest *UpnpStateVarRequest_new();

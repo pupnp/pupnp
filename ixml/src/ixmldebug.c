@@ -1,7 +1,7 @@
 
-
+#ifndef WIN32
 #include "autoconfig.h"
-
+#endif
 
 #include "ixmldebug.h"
 

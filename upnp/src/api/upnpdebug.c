@@ -63,7 +63,7 @@ static const char *errFileName = "IUpnpErrFile.txt";
 static const char *infoFileName = "IUpnpInfoFile.txt";
 
 
-
+#ifdef DEBUG
 /***************************************************************************
  * Function : UpnpSetLogFileNames					
  *								
@@ -155,7 +155,7 @@ UpnpCloseLog()
     ithread_mutex_destroy( &GlobalDebugMutex );
 
 }
-
+#endif // DEBUG
 
 /***************************************************************************
  * Function : DebugAtThisLevel					
@@ -307,7 +307,11 @@ void UpnpDisplayFileAndLine(
 
 	/* Put the debug lines in the buffer */
 	sprintf(buf[0], "DEBUG - THREAD ID: 0x%lX",
+#ifndef WIN32
 		(unsigned long int)ithread_self());
+#else
+    (unsigned long int) ithread_self().p );
+#endif
 	if (DbgFileName) {
 		sprintf(buf[1],
 			"FILE: %s, LINE: %d",
