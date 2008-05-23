@@ -19,7 +19,7 @@ typedef struct s_UpnpDiscovery UpnpDiscovery;
 #ifdef WIN32
 	#include <ws2tcpip.h>
 #else
-	#include <netinet/in.h> /* for sockaddr_storage */
+	#include <netinet/in.h> /* for sockaddr, sockaddr_storage */
 #endif
 
 

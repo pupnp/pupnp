@@ -20,7 +20,7 @@ typedef struct s_UpnpActionRequest UpnpActionRequest;
 #ifdef WIN32
 	#include <ws2tcpip.h>
 #else
-	#include <netinet/in.h> /* for sockaddr_storage */
+	#include <netinet/in.h> /* for sockaddr, sockaddr_storage */
 #endif
 
 
@@ -70,13 +70,13 @@ void UpnpActionRequest_set_ActionRequest(UpnpActionRequest *p, IXML_Document *d)
 IXML_Document *UpnpActionRequest_get_ActionResult(const UpnpActionRequest *p);
 void UpnpActionRequest_set_ActionResult(UpnpActionRequest *p, IXML_Document *d);
 
-/** IP address of the control point requesting this action */
-struct sockaddr_storage *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p);
-void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, struct sockaddr_storage *ia);
-
 /** The DOM document containing the information from the SOAP header */
 IXML_Document *UpnpActionRequest_get_SoapHeader(const UpnpActionRequest *p);
 void UpnpActionRequest_set_SoapHeader(UpnpActionRequest *p, IXML_Document *d);
+
+/** IP address of the control point requesting this action */
+struct sockaddr *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p);
+void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, struct sockaddr *sa);
 
 
 #ifdef __cplusplus

@@ -21,6 +21,8 @@ struct SUpnpActionRequest
 	IXML_Document *m_actionRequest;
 	IXML_Document *m_actionResult;
 	IXML_Document *m_soapHeader;
+	/* Variables should be declared with struct sockaddr_storage,
+	 * but users must only see a struct sockaddr pointer */
 	struct sockaddr_storage m_ctrlPtIPAddr;
 };
 
@@ -224,15 +226,15 @@ void UpnpActionRequest_set_ActionResult(UpnpActionRequest *p, IXML_Document *d)
 }
 
 
-struct sockaddr_storage *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p)
+struct sockaddr *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p)
 {
-	return &((struct SUpnpActionRequest *)p)->m_ctrlPtIPAddr;
+	return (struct sockaddr *)&((struct SUpnpActionRequest *)p)->m_ctrlPtIPAddr;
 }
 
 
-void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, struct sockaddr_storage *ia)
+void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, struct sockaddr *ia)
 {
-	((struct SUpnpActionRequest *)p)->m_ctrlPtIPAddr = *ia;
+	((struct SUpnpActionRequest *)p)->m_ctrlPtIPAddr = *(struct sockaddr_storage *)ia;
 }
 
 

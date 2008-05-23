@@ -18,6 +18,8 @@ struct SUpnpStateVarRequest
 	UpnpString *m_devUDN;
 	UpnpString *m_serviceID;
 	UpnpString *m_stateVarName;
+	/* Variables should be declared with struct sockaddr_storage,
+	 * but users must only see a struct sockaddr pointer */
 	struct sockaddr_storage m_ctrlPtIPAddr;
 	DOMString m_currentVal;
 };
@@ -190,15 +192,15 @@ void UpnpStateVarRequest_strcpy_StateVarName(UpnpStateVarRequest *p, const char 
 }
 
 
-struct sockaddr_storage *UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStateVarRequest *p)
+struct sockaddr *UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStateVarRequest *p)
 {
-	return &((struct SUpnpStateVarRequest *)p)->m_ctrlPtIPAddr;
+	return (struct sockaddr *)&((struct SUpnpStateVarRequest *)p)->m_ctrlPtIPAddr;
 }
 
 
-void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, struct sockaddr_storage *ia)
+void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, struct sockaddr *sa)
 {
-	((struct SUpnpStateVarRequest *)p)->m_ctrlPtIPAddr = *ia;
+	((struct SUpnpStateVarRequest *)p)->m_ctrlPtIPAddr = *(struct sockaddr_storage *)sa;
 }
 
 

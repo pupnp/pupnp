@@ -22,6 +22,8 @@ struct SUpnpDiscovery
 	UpnpString *m_os;
 	UpnpString *m_date;
 	UpnpString *m_ext;
+	/* Variables should be declared with struct sockaddr_storage,
+	 * but users must only see a struct sockaddr pointer */
 	struct sockaddr_storage m_destAddr;
 };
 
@@ -338,6 +340,6 @@ struct sockaddr *UpnpDiscovery_get_DestAddr(const UpnpDiscovery *p)
 
 void UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, struct sockaddr *sa)
 {
-        memcpy( &((struct SUpnpDiscovery *)p)->m_destAddr, sa, sizeof(struct sockaddr_storage) );
+	((struct SUpnpDiscovery *)p)->m_destAddr = *(struct sockaddr_storage *)sa;
 }
 

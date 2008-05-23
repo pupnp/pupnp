@@ -23,7 +23,7 @@ typedef struct s_UpnpStateVarRequest UpnpStateVarRequest;
 #ifdef WIN32
 	#include <ws2tcpip.h>
 #else
-	#include <netinet/in.h> /* for sockaddr_storage */
+	#include <netinet/in.h> /* for sockaddr, sockaddr_storage */
 #endif
 
 
@@ -66,8 +66,8 @@ void UpnpStateVarRequest_set_StateVarName(UpnpStateVarRequest *p, const UpnpStri
 void UpnpStateVarRequest_strcpy_StateVarName(UpnpStateVarRequest *p, const char *s);
 
 /** IP address of sender requesting the state variable. */
-struct sockaddr_storage *UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStateVarRequest *p);
-void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, struct sockaddr_storage *ia);
+struct sockaddr *UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStateVarRequest *p);
+void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, struct sockaddr *sa);
 
 /** The current value of the variable. This needs to be allocated by 
  *  the caller.  When finished with it, the SDK frees this {\bf DOMString}. */
