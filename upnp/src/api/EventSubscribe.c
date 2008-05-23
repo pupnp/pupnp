@@ -6,7 +6,7 @@
 #include "EventSubscribe.h"
 
 
-#include <stdlib.h> // for calloc(), free()
+#include <stdlib.h> /* for calloc(), free() */
 
 
 struct SEventSubscribe

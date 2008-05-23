@@ -17,7 +17,7 @@ typedef struct s_UpnpStateVarComplete UpnpStateVarComplete;
 #include "UpnpString.h"
 
 
-#include "ixml.h"       // for DOMString
+#include "ixml.h"       /* for DOMString */
 
 
 /** Constructor */

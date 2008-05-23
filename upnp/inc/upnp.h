@@ -51,17 +51,23 @@
 #endif 
 
 
+#include "ixml.h"
+#include "upnpconfig.h"
+
+
 #include <stdio.h>
-#ifndef WIN32
-	#include <sys/param.h>
-#endif
+
+
 #if (defined(BSD) && BSD >= 199306)
 	#include <time.h>
 #endif
 
 
-#include "ixml.h"
-#include "upnpconfig.h"
+#ifdef WIN32
+	/* Do not #include <sys/param.h> */
+#else
+	#include <sys/param.h>
+#endif
 
 
 #ifdef WIN32
@@ -84,11 +90,13 @@
 		#define PRId64 "I64d"
 		#define PRIzu "lu"
 	#endif /* UPNP_USE_MSVCPP */
+
+
 	#ifdef UPNP_USE_BCBPP
 		/* define some things Borland Builder doesn't know */
 		#define UPNP_INLINE inline
 		typedef __int64 int64_t;
-#warning The Borland C compiler is probably broken on PRId64, please someone provide a proper fix here
+		#warning The Borland C compiler is probably broken on PRId64, please someone provide a proper fix here
 		#define PRId64 "I64d"
 		#define PRIzu "zu"
 	#endif /* UPNP_USE_BCBPP */
@@ -107,24 +115,27 @@
 /*#define inline*/
 
 
-#ifndef WIN32
-	#define UpnpCloseSocket close
-#else
+#ifdef WIN32
 	#define UpnpCloseSocket closesocket
 	#define fseeko fseek
+#else
+	#define UpnpCloseSocket close
 #endif
-#ifndef WIN32
+
+
+#ifdef WIN32
+#else
 	#define SOCKET int
 	#define INVALID_SOCKET (SOCKET)(~0)
 #endif
 
 
-#ifndef WIN32
-	#include <netinet/in.h>
-#else
+#ifdef WIN32
 	#include <Ws2tcpip.h>
 	#include <iphlpapi.h>
 	#include <time.h>
+#else
+	#include <netinet/in.h>
 #endif
 
 

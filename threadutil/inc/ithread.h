@@ -37,13 +37,17 @@ extern "C" {
 
 
 #include <pthread.h>
-#ifndef WIN32
+#ifdef WIN32
+	/* Do not #include <unistd.h> */
+#else
 	#include <unistd.h>
 #endif
+
 
 #ifdef __FreeBSD__
 	#define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
 #endif
+
 
 #ifdef PTHREAD_MUTEX_RECURSIVE
 	/* This system has SuS2-compliant mutex attributes.
@@ -715,10 +719,10 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *		0 on success, Nonzero on failure.
  *              See man page for sleep (man 3 sleep)
  *****************************************************************************/
-#ifndef WIN32
-#define isleep sleep
+#ifdef WIN32
+	#define isleep(x) Sleep((x)*1000)
 #else
-#define isleep(x) Sleep((x)*1000)
+	#define isleep sleep
 #endif
 
 /****************************************************************************
@@ -734,11 +738,12 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *		0 on success, Nonzero on failure.
  *              See man page for sleep (man 3 sleep)
  *****************************************************************************/
-#ifndef WIN32
-#define imillisleep(x) usleep(1000*x)
+#ifdef WIN32
+	#define imillisleep Sleep
 #else
-#define imillisleep	Sleep
+	#define imillisleep(x) usleep(1000*x)
 #endif
+
 
 #ifdef WIN32
 	#ifndef UPNP_STATIC_LIB

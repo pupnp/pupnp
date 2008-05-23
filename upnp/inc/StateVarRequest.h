@@ -17,14 +17,15 @@ typedef struct s_UpnpStateVarRequest UpnpStateVarRequest;
 #include "UpnpString.h"
 
 
-#include "ixml.h"       // for DOMString
+#include "ixml.h"       /* for DOMString */
 
 
-#ifndef WIN32
-#include <netinet/in.h> // for sockaddr_storage
+#ifdef WIN32
+	#include <ws2tcpip.h>
 #else
-#include <ws2tcpip.h>
+	#include <netinet/in.h> /* for sockaddr_storage */
 #endif
+
 
 /** Constructor */
 UpnpStateVarRequest *UpnpStateVarRequest_new();

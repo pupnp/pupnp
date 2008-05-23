@@ -6,8 +6,8 @@
 #include "Discovery.h"
 
 
-#include <stdlib.h> // for calloc(), free()
-#include <string.h> // for memset()
+#include <stdlib.h> /* for calloc(), free() */
+#include <string.h> /* for memset() */
 
 
 struct SUpnpDiscovery

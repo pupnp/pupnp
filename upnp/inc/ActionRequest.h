@@ -13,14 +13,16 @@ extern "C" {
 typedef struct s_UpnpActionRequest UpnpActionRequest;
 
 
-#include "ixml.h"       // for IXML_Document
+#include "ixml.h"       /* for IXML_Document */
 #include "UpnpString.h"
 
-#ifndef WIN32
-#include <netinet/in.h> // for sockaddr_storage
+
+#ifdef WIN32
+	#include <ws2tcpip.h>
 #else
-#include <ws2tcpip.h>
+	#include <netinet/in.h> /* for sockaddr_storage */
 #endif
+
 
 /** Constructor */
 UpnpActionRequest *UpnpActionRequest_new();

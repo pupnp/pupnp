@@ -395,12 +395,12 @@ scanner_get_str( IN scanner_t * scanner )
 *
 * Note :
 ************************************************************************/
-#ifndef WIN32
-#warning The only use of the function 'scanner_pushback()' in the code is commented out.
-#warning 'scanner_pushback()' is a candidate for removal.
+#ifdef WIN32
+	#pragma message ("The only use of the function 'scanner_pushback()' in the code is commented out.")
+	#pragma message ("'scanner_pushback()' is a candidate for removal.")
 #else
-#pragma message ("The only use of the function 'scanner_pushback()' in the code is commented out.")
-#pragma message ("'scanner_pushback()' is a candidate for removal.")
+	#warning The only use of the function 'scanner_pushback()' in the code is commented out.
+	#warning 'scanner_pushback()' is a candidate for removal.
 #endif
 static UPNP_INLINE void
 scanner_pushback( INOUT scanner_t * scanner,
@@ -970,12 +970,12 @@ read_until_crlf( INOUT scanner_t * scanner,
 *   PARSE_FAILURE
 *   PARSE_INCOMPLETE
 ************************************************************************/
-#ifndef WIN32
-#warning There are currently no uses of the function 'skip_to_end_of_header()' in the code.
-#warning 'skip_to_end_of_header()' is a candidate for removal.
+#ifdef WIN32
+	#pragma message("There are currently no uses of the function 'skip_to_end_of_header()' in the code.")
+	#pragma message("'skip_to_end_of_header()' is a candidate for removal.")
 #else
-#pragma message("There are currently no uses of the function 'skip_to_end_of_header()' in the code.")
-#pragma message("'skip_to_end_of_header()' is a candidate for removal.")
+	#warning There are currently no uses of the function 'skip_to_end_of_header()' in the code.
+	#warning 'skip_to_end_of_header()' is a candidate for removal.
 #endif
 static UPNP_INLINE int
 skip_to_end_of_header( INOUT scanner_t * scanner )

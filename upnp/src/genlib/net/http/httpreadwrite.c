@@ -35,10 +35,27 @@
 * messages
 ************************************************************************/
 
+
 #include "config.h"
+
+
+#include "httpreadwrite.h"
+
+
+#include "unixutil.h"
+#include "upnp.h"
+#include "upnpapi.h"
+#include "membuffer.h"
+#include "uri.h"
+#include "statcodes.h"
+#include "sock.h"
+#include "webserver.h"
+
 
 #include <assert.h>
 #include <stdarg.h>
+
+
 #ifndef UPNP_USE_BCBPP
 	#ifndef UPNP_USE_MSVCPP
 		#include <inttypes.h>
@@ -46,7 +63,11 @@
 	#endif
 #endif
 
-#ifndef WIN32
+
+#ifdef WIN32
+	#include <winsock2.h>
+	#include <malloc.h>
+#else
 	#include <arpa/inet.h>
 	#include <fcntl.h>
 	#include <netinet/in.h>
@@ -56,19 +77,7 @@
 	#include <sys/wait.h>
 	#include <unistd.h>
 	#include <sys/utsname.h>
-#else
-	#include <winsock2.h>
-	#include <malloc.h>
 #endif
-#include "unixutil.h"
-#include "upnp.h"
-#include "upnpapi.h"
-#include "membuffer.h"
-#include "uri.h"
-#include "statcodes.h"
-#include "httpreadwrite.h"
-#include "sock.h"
-#include "webserver.h"
 
 
 /* 

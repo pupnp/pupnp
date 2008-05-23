@@ -15,7 +15,7 @@ typedef struct s_UpnpActionComplete UpnpActionComplete;
 #include "UpnpString.h"
 
 
-#include "ixml.h"       // for IXML_Document
+#include "ixml.h"       /* for IXML_Document */
 
 
 /** Constructor */

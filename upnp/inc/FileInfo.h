@@ -13,11 +13,11 @@ extern "C" {
 typedef struct s_UpnpFileInfo UpnpFileInfo;
 
 
-#include "ixml.h"       // for DOMString
+#include "ixml.h"       /* for DOMString */
 
 
-#include <sys/types.h>  // for off_t
-#include <time.h>       // for time_t
+#include <sys/types.h>  /* for off_t */
+#include <time.h>       /* for time_t */
 
 
 /** Constructor */

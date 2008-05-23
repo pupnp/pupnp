@@ -6,8 +6,8 @@
 #include "StateVarRequest.h"
 
 
-#include <stdlib.h> // for calloc(), free()
-#include <string.h> // for memset(), strlen(), strdup()
+#include <stdlib.h> /* for calloc(), free() */
+#include <string.h> /* for memset(), strlen(), strdup() */
 
 
 struct SUpnpStateVarRequest

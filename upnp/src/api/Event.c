@@ -6,7 +6,7 @@
 #include "Event.h"
 
 
-#include <stdlib.h> // for calloc(), free()
+#include <stdlib.h> /* for calloc(), free() */
 
 
 struct SUpnpEvent

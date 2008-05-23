@@ -13,7 +13,7 @@ extern "C" {
 typedef struct s_UpnpEvent UpnpEvent;
 
 
-#include "ixml.h"       // for IXML_Document
+#include "ixml.h"       /* for IXML_Document */
 #include "UpnpString.h"
 
 

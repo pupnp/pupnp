@@ -6,8 +6,8 @@
 #include "StateVarComplete.h"
 
 
-#include <stdlib.h> // for calloc(), free()
-#include <string.h> // for strlen(), strdup()
+#include <stdlib.h> /* for calloc(), free() */
+#include <string.h> /* for strlen(), strdup() */
 
 
 struct SUpnpStateVarComplete
