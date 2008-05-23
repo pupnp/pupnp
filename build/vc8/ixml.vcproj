@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\ixml\inc;..\..\ixml\src\inc"
+				AdditionalIncludeDirectories="..\..\ixml\inc;..\..\ixml\src\inc;..\inc"
 				PreprocessorDefinitions="WIN32;DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -103,7 +103,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\ixml\inc;..\..\ixml\src\inc"
+				AdditionalIncludeDirectories="..\..\ixml\inc;..\..\ixml\src\inc;..\inc"
 				PreprocessorDefinitions="WIN32;IXML_INLINE="
 				RuntimeLibrary="0"
 				WarningLevel="3"
