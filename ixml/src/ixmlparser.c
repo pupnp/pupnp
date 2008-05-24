@@ -443,43 +443,78 @@ static int Parser_intToUTF8(IN int c, IN utf8char s)
  ******************************************************************************/
 static int Parser_UTF8ToInt(IN const char *ss, OUT int *len)
 {
+	const unsigned char *s = ( const unsigned char * )ss;
+	int c = *s;
 
-    const unsigned char *s = ( const unsigned char * )ss;
-    int c = *s;
-
-    if( c <= 127 ) {            // if c<=127, c is just the character.
-        *len = 1;
-        return c;
-    } else if( ( c & 0xE0 ) == 0xC0 && ( s[1] & 0xc0 ) == 0x80 ) {  // a sequence of 110xxxxx and 10xxxxxx?
-        *len = 2;
-        return ( ( ( c & 0x1f ) << 6 ) | ( s[1] & 0x3f ) );
-    } else if( ( c & 0xF0 ) == 0xE0 && ( s[1] & 0xc0 ) == 0x80 && ( s[2] & 0xc0 ) == 0x80 ) {   // a sequence of 1110xxxx,10xxxxxx and 10xxxxxx ?
-        *len = 3;
-        return ( ( ( c & 0xf ) << 12 ) | ( ( s[1] & 0x3f ) << 6 ) |
-                 ( s[2] & 0x3f ) );
-    } else if( ( c & 0xf8 ) == 0xf0 && ( s[1] & 0xc0 ) == 0x80 && ( s[2] & 0xc0 ) == 0x80 && ( s[3] & 0xc0 ) == 0x80 ) {    // a sequence of 11110xxx,10xxxxxx,10xxxxxx and 10xxxxxx ?
-        *len = 4;
-        return ( ( ( c & 0x7 ) << 18 ) | ( ( s[1] & 0x3f ) << 12 ) |
-                 ( ( s[2] & 0x3f ) << 6 ) | ( s[3] & 0x3f ) );
-    } else if( ( c & 0xfc ) == 0xf8 && ( s[1] & 0xc0 ) == 0x80 && ( s[2] & 0xc0 ) == 0x80 && ( s[3] & 0xc0 ) == 0x80 && ( s[4] & 0xc0 ) == 0x80 ) { // a sequence of 111110xx,10xxxxxx,10xxxxxx,10xxxxxx,10xxxxxx ?
-        *len = 5;
-        return ( ( ( c & 0x3 ) << 24 ) | ( ( s[1] & 0x3f ) << 18 ) |
-                 ( ( s[2] & 0x3f ) << 12 ) | ( ( s[3] & 0x3f ) << 6 ) |
-                 ( s[4] & 0x3f ) );
-    } else if( ( c & 0xfe ) == 0xfc && ( s[1] & 0xc0 ) == 0x80 && ( s[2] & 0xc0 ) == 0x80 && ( s[3] & 0xc0 ) == 0x80 && ( s[4] & 0xc0 ) == 0x80 && ( s[5] & 0xc0 ) == 0x80 ) {  // a sequence of 1111110x,10xxxxxx,10xxxxxx,10xxxxxx,10xxxxxx and 10xxxxxx ?
-        *len = 6;
-        return ( ( ( c & 0x1 ) << 30 ) | ( ( s[1] & 0x3f ) << 24 ) |
-                 ( ( s[2] & 0x3f ) << 18 ) | ( ( s[3] & 0x3f ) << 12 ) |
-                 ( ( s[4] & 0x3f ) << 6 ) | ( s[5] & 0x3f ) );
-    } else {                    // none of above, error
-        if (g_error_char) {
-            *len = 1;
-            return g_error_char;
-        } else {
-            *len = 0;
-            return -1;
-        }
-    }
+	if (c <= 127) {
+		/* if c<=127, c is just the character. */
+		*len = 1;
+		return c;
+	} else if ((c    & 0xE0) == 0xC0 &&
+	           (s[1] & 0xc0) == 0x80) {
+		/* a sequence of 110xxxxx and 10xxxxxx? */
+		*len = 2;
+		return	((c    & 0x1f) <<  6) |
+			 (s[1] & 0x3f);
+	} else if ((c    & 0xF0) == 0xE0 &&
+	           (s[1] & 0xc0) == 0x80 &&
+	           (s[2] & 0xc0) == 0x80) {
+		/* a sequence of 1110xxxx,10xxxxxx and 10xxxxxx ? */
+		*len = 3;
+		return	((c    & 0x0f) << 12) |
+			((s[1] & 0x3f) <<  6) |
+			 (s[2] & 0x3f);
+	} else if ((c    & 0xf8) == 0xf0 &&
+	           (s[1] & 0xc0) == 0x80 &&
+	           (s[2] & 0xc0) == 0x80 &&
+	           (s[3] & 0xc0) == 0x80) {
+		/* a sequence of 11110xxx,10xxxxxx,10xxxxxx and 10xxxxxx ? */
+		*len = 4;
+		return	((c    & 0x07) << 18) |
+			((s[1] & 0x3f) << 12) |
+			((s[2] & 0x3f) <<  6) |
+			 (s[3] & 0x3f);
+	} else if ((c    & 0xfc) == 0xf8 &&
+	           (s[1] & 0xc0) == 0x80 &&
+	           (s[2] & 0xc0) == 0x80 &&
+	           (s[3] & 0xc0) == 0x80 &&
+	           (s[4] & 0xc0) == 0x80) {
+		/* a sequence of 111110xx,10xxxxxx,10xxxxxx,10xxxxxx,10xxxxxx ? */
+		*len = 5;
+		return	((c    & 0x03) << 24) |
+			((s[1] & 0x3f) << 18) |
+			((s[2] & 0x3f) << 12) |
+			((s[3] & 0x3f) <<  6) |
+			 (s[4] & 0x3f);
+	} else if ((c    & 0xfe) == 0xfc &&
+	           (s[1] & 0xc0) == 0x80 &&
+	           (s[2] & 0xc0) == 0x80 &&
+	           (s[3] & 0xc0) == 0x80 &&
+	           (s[4] & 0xc0) == 0x80 &&
+	           (s[5] & 0xc0) == 0x80) {
+		/* a sequence of 1111110x,10xxxxxx,10xxxxxx,10xxxxxx,10xxxxxx and 10xxxxxx ? */
+		*len = 6;
+		return	((c    & 0x01) << 30) |
+			((s[1] & 0x3f) << 24) |
+			((s[2] & 0x3f) << 18) |
+			((s[3] & 0x3f) << 12) |
+			((s[4] & 0x3f) <<  6) |
+			 (s[5] & 0x3f);
+	} else {
+		/* none of above, error */
+		int ret = 0;
+		int line = __LINE__;
+		if (g_error_char) {
+			*len = 1;
+			ret = g_error_char;
+		} else {
+			*len = 0;
+			ret = -1;
+		}
+		IxmlPrintf("(%s::Parser_UTF8ToInt): Error %d, line %d\n",
+			__FILE__, ret, line);
+		return ret;
+	}
 }
 
 
@@ -1136,90 +1171,111 @@ static void Parser_skipWhiteSpaces(IN Parser *xmlParser)
  ******************************************************************************/
 static int Parser_getChar(IN const char *src, INOUT int *cLen)
 {
-    const char *pnum;
-    int sum;
-    char c;
-    int i;
+	int ret = -1;
+	int line = 0;
+	const char *pnum;
+	int sum;
+	char c;
+	int i;
 
-    if( src == NULL || cLen == NULL ) {
-        return -1;
-    }
+	if( src == NULL || cLen == NULL ) {
+		line = __LINE__;
+		ret = -1;
+		goto ExitFunction;
+	}
 
-    *cLen = 0;
+	*cLen = 0;
+	if (*src != '&') {
+		if (*src > 0 && Parser_isXmlChar(*src)) {
+			*cLen = 1;
+			ret = *src;
+			goto ExitFunction;
+		}
 
-    if( *src != '&' ) {
-        if( *src > 0 && Parser_isXmlChar( *src ) ) {
-            *cLen = 1;
-            return *src;
-        }
+		i = Parser_UTF8ToInt(src, cLen);
+		if (!Parser_isXmlChar(i)) {
+			line = __LINE__;
+			ret = g_error_char ? g_error_char : -1;
+			goto ExitFunction;
+		}
 
-        i = Parser_UTF8ToInt( src, cLen );
-        if( !Parser_isXmlChar( i ) ) {
-            return ( g_error_char ? g_error_char : -1 );
-        }
-        return i;
-    } else if( strncasecmp( src, QUOT, strlen( QUOT ) ) == 0 ) {
-        *cLen = strlen( QUOT );
-        return '"';
-    } else if( strncasecmp( src, LT, strlen( LT ) ) == 0 ) {
-        *cLen = strlen( LT );
-        return '<';
-    } else if( strncasecmp( src, GT, strlen( GT ) ) == 0 ) {
-        *cLen = strlen( GT );
-        return '>';
-    } else if( strncasecmp( src, APOS, strlen( APOS ) ) == 0 ) {
-        *cLen = strlen( APOS );
-        return '\'';
-    } else if( strncasecmp( src, AMP, strlen( AMP ) ) == 0 ) {
-        *cLen = strlen( AMP );
-        return '&';
-    } else if( strncasecmp( src, ESC_HEX, strlen( ESC_HEX ) ) == 0 ) {
-	/* Read in escape characters of type &#xnn where nn is a hexadecimal value */
-        pnum = src + strlen( ESC_HEX );
-        sum = 0;
-        while( strchr( HEX_NUMBERS, *pnum ) != 0 ) {
-            c = *pnum;
-            if( c <= '9' ) {
-                sum = sum * 16 + ( c - '0' );
-            } else if( c <= 'F' ) {
-                sum = sum * 16 + ( c - 'A' + 10 );
-            } else {
-                sum = sum * 16 + ( c - 'a' + 10 );
-            }
-
-            pnum++;
-        }
-
-        if( ( pnum == src ) || *pnum != ';' || !Parser_isXmlChar( sum ) ) {
-            goto fail_entity;
-        }
-
-        *cLen = pnum - src + 1;
-        return sum;
-
-    } else if( strncasecmp( src, ESC_DEC, strlen( ESC_DEC ) ) == 0 ) {
-        /* Read in escape characters of type &#nn where nn is a decimal value */
-        pnum = src + strlen( ESC_DEC );
-        sum = 0;
-        while( strchr( DEC_NUMBERS, *pnum ) != 0 ) {
-            sum = sum * 10 + ( *pnum - '0' );
-            pnum++;
-        }
-
-        if( ( pnum == src ) || *pnum != ';' || !Parser_isXmlChar( sum ) ) {
-            goto fail_entity;
-        }
-
-        *cLen = pnum - src + 1;
-        return sum;
-    }
+		line = __LINE__;
+		ret = i;
+		goto ExitFunction;
+	} else if (strncasecmp(src, QUOT, strlen(QUOT)) == 0) {
+		*cLen = strlen(QUOT);
+		ret = '"';
+		goto ExitFunction;
+	} else if (strncasecmp(src, LT, strlen(LT)) == 0) {
+		*cLen = strlen(LT);
+		ret = '<';
+		goto ExitFunction;
+	} else if (strncasecmp(src, GT, strlen(GT)) == 0) {
+		*cLen = strlen(GT);
+		ret = '>';
+		goto ExitFunction;
+	} else if (strncasecmp(src, APOS, strlen(APOS)) == 0) {
+		*cLen = strlen(APOS);
+		ret = '\'';
+		goto ExitFunction;
+	} else if (strncasecmp(src, AMP, strlen(AMP)) == 0) {
+		*cLen = strlen(AMP);
+		ret = '&';
+		goto ExitFunction;
+	} else if (strncasecmp(src, ESC_HEX, strlen(ESC_HEX)) == 0) {
+		/* Read in escape characters of type &#xnn where nn is a hexadecimal value */
+		pnum = src + strlen( ESC_HEX );
+		sum = 0;
+		while (strchr(HEX_NUMBERS, *pnum) != 0) {
+			c = *pnum;
+			if (c <= '9') {
+				sum = sum * 16 + ( c - '0' );
+			} else if( c <= 'F' ) {
+				sum = sum * 16 + ( c - 'A' + 10 );
+			} else {
+				sum = sum * 16 + ( c - 'a' + 10 );
+			}
+			pnum++;
+		}
+		if (pnum == src || *pnum != ';' || !Parser_isXmlChar(sum)) {
+			line = __LINE__;
+			goto fail_entity;
+		}
+		*cLen = pnum - src + 1;
+		ret = sum;
+		goto ExitFunction;
+	} else if (strncasecmp(src, ESC_DEC, strlen(ESC_DEC)) == 0) {
+		/* Read in escape characters of type &#nn where nn is a decimal value */
+		pnum = src + strlen(ESC_DEC);
+		sum = 0;
+		while (strchr(DEC_NUMBERS, *pnum) != 0) {
+			sum = sum * 10 + ( *pnum - '0' );
+			pnum++;
+		}
+		if( ( pnum == src ) || *pnum != ';' || !Parser_isXmlChar( sum ) ) {
+			line = __LINE__;
+			goto fail_entity;
+		}
+		*cLen = pnum - src + 1;
+		ret = sum;
+		goto ExitFunction;
+	}
 
 fail_entity:
-    if (g_error_char) {
-        *cLen = 1;
-        return '&';
-    }
-    return -1;
+	if (g_error_char) {
+		*cLen = 1;
+		ret = '&';
+		goto ExitFunction;
+	}
+	ret = -1;
+
+ExitFunction:
+	if (ret == -1 || (g_error_char && ret == g_error_char)) {
+		IxmlPrintf("(%s::Parser_getChar): Error %d, line %d\n",
+			__FILE__, ret, line);
+	}
+
+	return ret;
 }
 
 
@@ -1234,45 +1290,60 @@ static int Parser_copyToken(
 	IN const char *src,
 	IN int len)
 {
-    int i,
-      c,
-      cl;
-    const char *psrc,
-     *pend;
-    utf8char uch;
+	int ret = IXML_SUCCESS;
+	int line = 0;
+	int i;
+	int c;
+	int cl;
+	const char *psrc;
+	const char *pend;
+	utf8char uch;
 
-    if( !src || len <= 0 ) {
-        return IXML_FAILED;
-    }
+	if (!src || len <= 0) {
+		line = __LINE__;
+		ret = IXML_FAILED;
+		goto ExitFunction;
+	}
 
-    psrc = src;
-    pend = src + len;
+	psrc = src;
+	pend = src + len;
 
-    while( psrc < pend ) {
-        if( ( c = Parser_getChar( psrc, &cl ) ) <= 0 ) {
-            return IXML_FAILED;
-        }
+	while (psrc < pend) {
+		c = Parser_getChar(psrc, &cl);
+		if (c <= 0) {
+			line = __LINE__;
+			ret = IXML_FAILED;
+			goto ExitFunction;
+		}
 
-        if( cl == 1 ) {
-            Parser_appendTokBufChar( xmlParser, ( char )c );
-            psrc++;
-        } else {
+		if (cl == 1) {
+			Parser_appendTokBufChar(xmlParser, (char)c);
+			psrc++;
+		} else {
+			i = Parser_intToUTF8(c, uch);
+			if (i == 0) {
+				line = __LINE__;
+				ret = IXML_FAILED;
+				goto ExitFunction;
+			}
+			Parser_appendTokBufStr(xmlParser, uch);
+			psrc += cl;
+		}
+	}
 
-            i = Parser_intToUTF8( c, uch );
-            if( i == 0 ) {
-                return IXML_FAILED;
-            }
+	if (psrc > pend) {
+		line = __LINE__;
+		ret = IXML_FAILED;
+		goto ExitFunction;
+	}
 
-            Parser_appendTokBufStr( xmlParser, uch );
-            psrc += cl;
-        }
-    }
+ExitFunction:
+	if (ret != IXML_SUCCESS) {
+		IxmlPrintf("(%s::Parser_copyToken): Error %d, line %d\n",
+			__FILE__, ret, line);
+	}
 
-    if( psrc > pend ) {
-        return IXML_FAILED;
-    } else {
-        return IXML_SUCCESS;    // success
-    }
+	return ret;
 }
 
 
@@ -2053,104 +2124,117 @@ static int Parser_processContent(
 	IN Parser *xmlParser,
 	IN IXML_Node *node)
 {
-    char *pEndContent;
-    BOOL bReadContent;
-    int tokenLength;
-    char *notAllowed = "]]>";
-    char *pCurToken = NULL;
+	int ret = IXML_SUCCESS;
+	int line = 0;
+	char *pEndContent;
+	BOOL bReadContent;
+	int tokenLength;
+	char *notAllowed = "]]>";
+	char *pCurToken = NULL;
 
-    // save pointer for backup
-    xmlParser->savePtr = xmlParser->curPtr;
-    Parser_skipWhiteSpaces( xmlParser );
+	/* save pointer for backup */
+	xmlParser->savePtr = xmlParser->curPtr;
+	Parser_skipWhiteSpaces( xmlParser );
 
-    if( *( xmlParser->curPtr ) == '\0' ) {  // end of file is reached
-        return IXML_SUCCESS;
-    }
+	if (*(xmlParser->curPtr) == '\0' ) {
+		/* end of file is reached */
+		ret = IXML_SUCCESS;
+		goto ExitFunction;
+	}
 
-    pEndContent = xmlParser->curPtr;
-    if( *pEndContent == LESSTHAN ) {
-        if( strncmp( pEndContent, ( char * )CDSTART, strlen( CDSTART ) ) ==
-            0 ) {
-            if( Parser_processCDSect( &pEndContent, node ) !=
-                IXML_SUCCESS ) {
-                return IXML_SYNTAX_ERR;
-            } else {
-                xmlParser->curPtr = pEndContent;
-            }
-        } else
-            if( strncmp
-                ( pEndContent, ( char * )BEGIN_COMMENT,
-                  strlen( BEGIN_COMMENT ) ) == 0 ) {
-            if( Parser_skipComment( &pEndContent ) != IXML_SUCCESS ) {
-                return IXML_SYNTAX_ERR;
-            } else {
-                xmlParser->curPtr = pEndContent;
-            }
-        } else
-            if( strncmp
-                ( pEndContent, ( char * )BEGIN_PI,
-                  strlen( BEGIN_PI ) ) == 0 ) {
-            if( Parser_skipPI( &pEndContent ) != IXML_SUCCESS ) {
-                return IXML_SYNTAX_ERR;
-            } else {
-                xmlParser->curPtr = pEndContent;
-            }
-        } else                  // empty content
-        {
-            xmlParser->state = eELEMENT;
-        }
-    } else {
-        // backup 
-        xmlParser->curPtr = xmlParser->savePtr;
-        pEndContent = xmlParser->curPtr;
+	pEndContent = xmlParser->curPtr;
+	if (*pEndContent == LESSTHAN) {
+		if (strncmp(pEndContent, (char *)CDSTART, strlen(CDSTART)) == 0) {
+			if (Parser_processCDSect(&pEndContent, node) != IXML_SUCCESS) {
+				line = __LINE__;
+				ret = IXML_SYNTAX_ERR;
+				goto ExitFunction;
+			} else {
+				xmlParser->curPtr = pEndContent;
+			}
+		} else if(strncmp(pEndContent, (char *)BEGIN_COMMENT, strlen(BEGIN_COMMENT)) == 0) {
+			if (Parser_skipComment(&pEndContent) != IXML_SUCCESS) {
+				line = __LINE__;
+				ret = IXML_SYNTAX_ERR;
+				goto ExitFunction;
+			} else {
+				xmlParser->curPtr = pEndContent;
+			}
+		} else if(strncmp(pEndContent, (char *)BEGIN_PI, strlen(BEGIN_PI)) == 0) {
+			if (Parser_skipPI(&pEndContent) != IXML_SUCCESS) {
+				line = __LINE__;
+				ret = IXML_SYNTAX_ERR;
+				goto ExitFunction;
+			} else {
+				xmlParser->curPtr = pEndContent;
+			}
+		} else {
+			/* empty content */
+			xmlParser->state = eELEMENT;
+		}
+	} else {
+		/* backup */
+		xmlParser->curPtr = xmlParser->savePtr;
+		pEndContent = xmlParser->curPtr;
 
-        while( ( *pEndContent != LESSTHAN ) &&
-               ( strncmp
-                 ( pEndContent, ( const char * )notAllowed,
-                   strlen( notAllowed ) ) != 0 ) && *pEndContent ) {
-            pEndContent++;
-        }
+		while ((*pEndContent != LESSTHAN) &&
+		       ( strncmp(pEndContent, (const char *)notAllowed, strlen(notAllowed)) != 0) &&
+		       *pEndContent) {
+			pEndContent++;
+		}
 
-        if( *pEndContent == '\0' ) {
-            bReadContent = FALSE;
-        }
+		if (*pEndContent == '\0') {
+			bReadContent = FALSE;
+		}
 
-        if( strncmp
-            ( pEndContent, ( const char * )notAllowed,
-              strlen( notAllowed ) ) == 0 ) {
-            return IXML_SYNTAX_ERR;
-        }
+		if (strncmp(pEndContent, (const char *)notAllowed, strlen(notAllowed)) == 0) {
+			line = __LINE__;
+			ret = IXML_SYNTAX_ERR;
+			goto ExitFunction;
+		}
 
-        tokenLength = pEndContent - xmlParser->curPtr;
-        Parser_clearTokenBuf( xmlParser );
+		tokenLength = pEndContent - xmlParser->curPtr;
+		Parser_clearTokenBuf( xmlParser );
 
-        if( Parser_copyToken( xmlParser, xmlParser->curPtr, tokenLength )
-            != IXML_SUCCESS ) {
-            return IXML_SYNTAX_ERR;
-        }
+		if (Parser_copyToken(xmlParser, xmlParser->curPtr, tokenLength) != IXML_SUCCESS) {
+			line = __LINE__;
+			ret = IXML_SYNTAX_ERR;
+			goto ExitFunction;
+		}
 
-        pCurToken = ( xmlParser->tokenBuf ).buf;
-        if( pCurToken != NULL ) {
-            node->nodeValue = safe_strdup( pCurToken );
-            if( node->nodeValue == NULL ) {
-                return IXML_INSUFFICIENT_MEMORY;
-            }
-        } else {
-            return IXML_SYNTAX_ERR;
-        }
+		pCurToken = (xmlParser->tokenBuf).buf;
+		if (pCurToken != NULL) {
+			node->nodeValue = safe_strdup(pCurToken);
+			if (node->nodeValue == NULL) {
+				line = __LINE__;
+				ret = IXML_INSUFFICIENT_MEMORY;
+				goto ExitFunction;
+			}
+		} else {
+			line = __LINE__;
+			ret = IXML_SYNTAX_ERR;
+			goto ExitFunction;
+		}
 
-        node->nodeName = safe_strdup( TEXTNODENAME );
-        if( node->nodeName == NULL ) {
-            return IXML_SYNTAX_ERR;
-        }
-        node->nodeType = eTEXT_NODE;
+		node->nodeName = safe_strdup( TEXTNODENAME );
+		if (node->nodeName == NULL) {
+			line = __LINE__;
+			ret = IXML_SYNTAX_ERR;
+			goto ExitFunction;
+		}
+		node->nodeType = eTEXT_NODE;
 
-        // adjust curPtr
-        xmlParser->curPtr += tokenLength;
+		/* adjust curPtr */
+		xmlParser->curPtr += tokenLength;
+	}
 
-    }
+ExitFunction:
+	if (ret != IXML_SUCCESS) {
+		IxmlPrintf("(%s::Parser_processContent): Error %d, line %d\n",
+			__FILE__, ret, line);
+	}
 
-    return IXML_SUCCESS;
+	return ret;
 }
 
 
@@ -2164,45 +2248,67 @@ static int Parser_processContent(
 static int Parser_processETag(
 	IN Parser *xmlParser,
 	IN IXML_Node *node,
-	OUT BOOL *bETag )
+	OUT BOOL *bETag)
 {
-    char *pCurToken = NULL;
+	int ret = IXML_SUCCESS;
+	int line = 0;
+	char *pCurToken = NULL;
 
-    assert( xmlParser != NULL );
-    if( Parser_getNextToken( xmlParser ) == 0 ) {
-        return IXML_SYNTAX_ERR;
-    }
+	assert( xmlParser != NULL );
+	if( Parser_getNextToken( xmlParser ) == 0 ) {
+		line = __LINE__;
+		ret = IXML_SYNTAX_ERR;
+		goto ExitFunction;
+	}
 
-    pCurToken = ( xmlParser->tokenBuf ).buf;
-    if( pCurToken == NULL ) {
-        return IXML_SYNTAX_ERR;
-    }
-    node->nodeName = safe_strdup( pCurToken );
-    if( node->nodeName == NULL ) {
-        return IXML_INSUFFICIENT_MEMORY;
-    }
+	pCurToken = ( xmlParser->tokenBuf ).buf;
+	if( pCurToken == NULL ) {
+		line = __LINE__;
+		ret = IXML_SYNTAX_ERR;
+		goto ExitFunction;
+	}
+	node->nodeName = safe_strdup( pCurToken );
+	if( node->nodeName == NULL ) {
+		line = __LINE__;
+		ret = IXML_INSUFFICIENT_MEMORY;
+		goto ExitFunction;
+	}
 
-    node->nodeValue = NULL;
-    node->nodeType = eELEMENT_NODE;
+	node->nodeValue = NULL;
+	node->nodeType = eELEMENT_NODE;
 
-    Parser_skipWhiteSpaces( xmlParser );
+	Parser_skipWhiteSpaces( xmlParser );
 
-    // read the > 
-    if( Parser_getNextToken( xmlParser ) == 0 ) {
-        return IXML_SYNTAX_ERR;
-    }
+	/* read the >  */
+	if( Parser_getNextToken( xmlParser ) == 0 ) {
+		line = __LINE__;
+		ret = IXML_SYNTAX_ERR;
+		goto ExitFunction;
+	}
 
-    pCurToken = ( xmlParser->tokenBuf ).buf;
-    if( pCurToken == NULL ) {   // no need to free node->nodeName, it is freed by main loop
-        return IXML_SYNTAX_ERR;
-    }
+	pCurToken = ( xmlParser->tokenBuf ).buf;
+	if( pCurToken == NULL ) {
+		/* no need to free node->nodeName, it is freed by main loop */
+		line = __LINE__;
+		ret = IXML_SYNTAX_ERR;
+		goto ExitFunction;
+	}
 
-    if( strcmp( pCurToken, ">" ) != 0 ) {
-        return IXML_SYNTAX_ERR;
-    }
+	if( strcmp( pCurToken, ">" ) != 0 ) {
+		line = __LINE__;
+		ret = IXML_SYNTAX_ERR;
+		goto ExitFunction;
+	}
 
-    *bETag = TRUE;
-    return IXML_SUCCESS;
+	*bETag = TRUE;
+
+ExitFunction:
+	if (ret != IXML_SUCCESS) {
+		IxmlPrintf("(%s::Parser_processETag): Error %d, line %d\n",
+			__FILE__, ret, line);
+	}
+
+	return ret;
 }
 
 
@@ -2527,8 +2633,8 @@ static int Parser_getNextNode(
 
 ExitFunction:
 	if (ret != IXML_SUCCESS) {
-		IxmlPrintf("(ixml::Parser_getNextNode): Error %d, line %d\n",
-			ret, line);
+		IxmlPrintf("(%s::Parser_getNextNode): Error %d, line %d\n",
+			__FILE__, ret, line);
 	}
 
 	return ret;
