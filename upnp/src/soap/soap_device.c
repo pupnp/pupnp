@@ -879,7 +879,7 @@ static UPNP_INLINE void handle_query_variable(
 
     UpnpStateVarRequest_set_ErrCode(variable, UPNP_E_SUCCESS);
     UpnpStateVarRequest_strcpy_StateVarName(variable, var_name);
-    UpnpStateVarRequest_set_CtrlPtIPAddr(variable, &info->foreign_sockaddr);
+    UpnpStateVarRequest_set_CtrlPtIPAddr(variable, (struct sockaddr *)&info->foreign_sockaddr);
 
     // send event
     soap_event_callback( UPNP_CONTROL_GET_VAR_REQUEST, variable, cookie );
@@ -979,7 +979,7 @@ handle_invoke_action( IN SOCKINFO * info,
     UpnpActionRequest_set_DevUDN(action, devUDN);
     UpnpActionRequest_set_ServiceID(action, serviceID);
     UpnpActionRequest_set_ActionRequest(action, actionRequestDoc);
-    UpnpActionRequest_set_CtrlPtIPAddr(action, &info->foreign_sockaddr);
+    UpnpActionRequest_set_CtrlPtIPAddr(action, (struct sockaddr *)&info->foreign_sockaddr);
 
     UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
 
