@@ -41,7 +41,7 @@
 #include "sock.h"
 
 
-#include "unixutil.h"
+#include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
 #include "upnp.h"
 
 
@@ -51,20 +51,8 @@
 #include <string.h>
 
 
-#ifdef WIN32
-	#include <winsock2.h>
-#else
-	#include <arpa/inet.h>
-	#include <netinet/in.h>
-	#include <sys/types.h>
-	#include <sys/socket.h>
-	#include <sys/time.h>
-	#include <unistd.h>
-#endif
-
-
 #ifndef MSG_NOSIGNAL
- #define MSG_NOSIGNAL 0
+	#define MSG_NOSIGNAL 0
 #endif
 
 /************************************************************************

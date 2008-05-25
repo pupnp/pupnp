@@ -1,4 +1,4 @@
-/**************************************************************************
+/*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- **************************************************************************/
+ ******************************************************************************/
 
 
 /* Unix-specific network utilities */
@@ -37,14 +37,17 @@
 #define	GENLIB_NET_UNIXUTIL_H
 
 
-#include <sys/types.h>
-
-
 #ifdef WIN32
+	#include <winsock2.h>
 	typedef int socklen_t;
 	#define EAFNOSUPPORT 97
 #else
+	#include <arpa/inet.h>
+	#include <netinet/in.h>
 	#include <sys/socket.h>
+	#include <sys/time.h>
+	#include <sys/wait.h>
+	#include <unistd.h>
 #endif
 
 

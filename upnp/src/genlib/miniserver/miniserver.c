@@ -47,7 +47,7 @@
 #include "ssdplib.h"
 #include "statcodes.h"
 #include "ThreadPool.h"
-#include "unixutil.h"
+#include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
 #include "upnpapi.h"
 #include "util.h"
 
@@ -58,21 +58,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-
-
-#ifdef WIN32
-	#include <winsock2.h>
-
-	typedef int socklen_t;
-	#define EAFNOSUPPORT 97
-#else
-	#include <arpa/inet.h>
-	#include <netinet/in.h>
-	#include <sys/socket.h>
-	#include <sys/wait.h>
-	#include <sys/time.h>
-	#include <unistd.h>
-#endif
 
 
 #define APPLICATION_LISTENING_PORT 49152

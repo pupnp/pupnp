@@ -100,6 +100,16 @@
 		#define PRId64 "I64d"
 		#define PRIzu "zu"
 	#endif /* UPNP_USE_BCBPP */
+
+
+	#ifdef __GNUC__
+		#define UPNP_INLINE inline
+		/* Note with PRIzu that in the case of Mingw32, it's the MS C
+		 * runtime printf which ends up getting called, not the glibc
+		 * printf, so it genuinely doesn't have "zu"
+		 */
+		#define PRIzu "lu"
+	#endif
 #else
 	#define EXPORT_SPEC
 	#define UPNP_INLINE inline
