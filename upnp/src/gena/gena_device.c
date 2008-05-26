@@ -33,6 +33,11 @@
 #include "config.h"
 
 
+/*!
+ * \file
+ */
+
+
 #if EXCLUDE_GENA == 0
 #ifdef INCLUDE_DEVICE_APIS
 
@@ -82,8 +87,8 @@ int genaUnregisterDevice(
  *
  * \return UPNP_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE.
  *
- * \note XML_VERSION comment is NOT sent due to interop issues with other 
- *	UPnP vendors.
+ * \note The XML_VERSION comment is NOT sent due to interoperability issues
+ * 	with other UPnP vendors.
  */
 static int GeneratePropertySet(
 	/*! [in] Array of variable names (go in the event notify). */
@@ -95,45 +100,44 @@ static int GeneratePropertySet(
 	/*! [out] PropertySet node in the string format. */
 	OUT DOMString *out)
 {
-    char *buffer;
-    int counter = 0;
-    int size = 0;
-    int temp_counter = 0;
+	char *buffer;
+	int counter = 0;
+	int size = 0;
+	int temp_counter = 0;
 
-    //size+=strlen(XML_VERSION);  the XML_VERSION is not interopeable with 
-    //other vendors
-    size += strlen( XML_PROPERTYSET_HEADER );
-    size += strlen( "</e:propertyset>\n\n" );
+	/*size += strlen(XML_VERSION);*/
+	size += strlen(XML_PROPERTYSET_HEADER);
+	size += strlen("</e:propertyset>\n\n");
+	for (temp_counter = 0, counter = 0; counter < count; counter++) {
+		size += strlen( "<e:property>\n</e:property>\n" );
+		size += 2 * strlen(names[counter]) +
+			strlen(values[counter]) +
+			strlen("<></>\n");
+	}
 
-    for( temp_counter = 0, counter = 0; counter < count; counter++ ) {
-        size += strlen( "<e:property>\n</e:property>\n" );
-        size +=
-            ( 2 * strlen( names[counter] ) + strlen( values[counter] ) +
-              ( strlen( "<></>\n" ) ) );
+	buffer = (char *)malloc(size + 1);
+	if (buffer == NULL) {
+		return UPNP_E_OUTOF_MEMORY;
+	}
+	memset(buffer, 0, size + 1);
+	/*
+	strcpy(buffer,XML_VERSION);
+	strcat(buffer, XML_PROPERTYSET_HEADER);
+	*/
+	strcpy(buffer, XML_PROPERTYSET_HEADER);
+	for (counter = 0; counter < count; counter++) {
+		strcat(buffer, "<e:property>\n");
+		sprintf(&buffer[strlen(buffer)],
+			"<%s>%s</%s>\n</e:property>\n",
+			names[counter],
+			values[counter],
+			names[counter]);
+	}
+	strcat(buffer, "</e:propertyset>\n\n");
+	*out = ixmlCloneDOMString(buffer);
+	free(buffer);
 
-    }
-    buffer = ( char * )malloc( size + 1 );
-
-    if( buffer == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
-    }
-    memset( buffer, 0, size + 1 );
-
-    //strcpy(buffer,XML_VERSION);  the XML_VERSION is not interopeable with 
-    //other vendors
-    strcpy( buffer, XML_PROPERTYSET_HEADER );
-
-    for( counter = 0; counter < count; counter++ ) {
-        strcat( buffer, "<e:property>\n" );
-        sprintf( &buffer[strlen( buffer )],
-                 "<%s>%s</%s>\n</e:property>\n", names[counter],
-                 values[counter], names[counter] );
-    }
-    strcat( buffer, "</e:propertyset>\n\n" );
-    ( *out ) = ixmlCloneDOMString( buffer );
-    free( buffer );
-
-    return XML_SUCCESS;
+	return XML_SUCCESS;
 }
 
 
@@ -253,7 +257,7 @@ static UPNP_INLINE int notify_send_and_recv(
  * 	appropriate error code.
  */
 static int genaNotify(
-	/*! [in] Null terminated, includes all headers (including \r\n) except SID and SEQ. */
+	/*! [in] Null terminated, includes all headers (including \\r\\n) except SID and SEQ. */
 	IN char *headers,
 	/*! [in] The evented XML. */
 	IN char *propertySet,

@@ -33,6 +33,11 @@
 #include "config.h"
 
 
+/*!
+ * \file
+ */
+
+
 #if EXCLUDE_GENA == 0
 #ifdef INCLUDE_CLIENT_APIS
 

@@ -1295,13 +1295,12 @@ EXPORT_SPEC int UpnpSendAdvertisement(
  * \brief Queries the state of a state variable of a service on another device.
  *
  * \deprecated
+ * <b>The use of this function is deprecated by the UPnP Forum</b>.
  *
  * This is a synchronous call.
  *
  * A positive return value indicates a SOAP error code, whereas a negative
  * return code indicates an SDK error code.
- *
- * <b>Note that the use of this function is deprecated by the UPnP Forum</b>.
  *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
@@ -1335,8 +1334,7 @@ EXPORT_SPEC int UpnpGetServiceVarStatus(
  * when the operation is complete.
  *
  * \deprecated
- *
- * <b>Note that the use of this function is deprecated by the UPnP Forum</b>.
+ * <b>The use of this function is deprecated by the UPnP Forum</b>.
  *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.

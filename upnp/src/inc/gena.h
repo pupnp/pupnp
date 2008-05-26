@@ -66,15 +66,18 @@
 #endif /* __cplusplus */
 
 
+/*!
+ * \brief XML version comment. Not used because it is not interopeable with
+ * other UPnP vendors.
+ */
 #define XML_VERSION "<?xml version='1.0' encoding='ISO-8859-1' ?>\n"
 #define XML_PROPERTYSET_HEADER \
-		"<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n"
+	"<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n"
 
 
 #define UNABLE_MEMORY "HTTP/1.1 500 Internal Server Error\r\n\r\n"
 #define UNABLE_SERVICE_UNKNOWN "HTTP/1.1 404 Not Found\r\n\r\n"
-#define UNABLE_SERVICE_NOT_ACCEPT \
-			"HTTP/1.1 503 Service Not Available\r\n\r\n"
+#define UNABLE_SERVICE_NOT_ACCEPT "HTTP/1.1 503 Service Not Available\r\n\r\n"
 
 
 #define NOT_IMPLEMENTED "HTTP/1.1 501 Not Implemented\r\n\r\n"
@@ -114,7 +117,7 @@ extern ithread_mutex_t GlobalClientSubscribeMutex;
 
 
 /*!
- * Lock the subscription
+ * \brief Locks the subscription.
  */
 #define SubscribeLock() \
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
@@ -125,7 +128,7 @@ extern ithread_mutex_t GlobalClientSubscribeMutex;
 
 
 /*!
- * Unlock the subscription
+ * \brief Unlocks the subscription.
  */
 #define SubscribeUnlock() \
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
