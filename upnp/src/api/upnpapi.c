@@ -1,4 +1,4 @@
-/**************************************************************************
+/*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- **************************************************************************/
+ ******************************************************************************/
 
 
 #include "config.h"
@@ -2206,52 +2206,69 @@ int UpnpAcceptSubscription(
 	int cVariables,
 	IN const Upnp_SID SubsId)
 {
-    struct Handle_Info *SInfo = NULL;
-    int retVal;
-    char *DevID = ( char * )DevID_const;
-    char *ServName = ( char * )ServName_const;
-    char **VarName = ( char ** )VarName_const;
-    char **NewVal = ( char ** )NewVal_const;
+	int ret = 0;
+	int line = 0;
+	struct Handle_Info *SInfo = NULL;
+	char *DevID = (char *)DevID_const;
+	char *ServName = (char *)ServName_const;
+	char **VarName = (char **)VarName_const;
+	char **NewVal = (char **)NewVal_const;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Inside UpnpAcceptSubscription\n");
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpAcceptSubscription \n" );
+	if (UpnpSdkInit != 1) {
+		line = __LINE__;
+		ret = UPNP_E_FINISH;
+		goto ExitFunction;
+	}
 
-    HandleReadLock();
-    if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    if( DevID == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    if( ServName == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    if( SubsId == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    if( VarName == NULL || NewVal == NULL || cVariables < 0 ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
+	HandleReadLock();
 
-    HandleUnlock();
-    retVal =
-        genaInitNotify( Hnd, DevID, ServName, VarName, NewVal, cVariables,
-                        SubsId );
+	if (GetHandleInfo(Hnd, &SInfo) != HND_DEVICE) {
+		HandleUnlock();
+		line = __LINE__;
+		ret = UPNP_E_INVALID_HANDLE;
+		goto ExitFunction;
+	}
+	if (DevID == NULL) {
+		HandleUnlock();
+		line = __LINE__;
+		ret = UPNP_E_INVALID_PARAM;
+		goto ExitFunction;
+	}
+	if (ServName == NULL) {
+		HandleUnlock();
+		line = __LINE__;
+		ret = UPNP_E_INVALID_PARAM;
+		goto ExitFunction;
+	}
+	if (SubsId == NULL) {
+		HandleUnlock();
+		line = __LINE__;
+		ret = UPNP_E_INVALID_PARAM;
+		goto ExitFunction;
+	}
+	if (VarName == NULL || NewVal == NULL || cVariables < 0) {
+		HandleUnlock();
+		line = __LINE__;
+		ret = UPNP_E_INVALID_PARAM;
+		goto ExitFunction;
+	}
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpAcceptSubscription \n" );
-    return retVal;
+	HandleUnlock();
 
-}  /***************** End of UpnpAcceptSubscription *********************/
+	line = __LINE__;
+	ret = genaInitNotify(
+		Hnd, DevID, ServName, VarName, NewVal, cVariables, SubsId);
+
+ExitFunction:
+	UpnpPrintf(UPNP_ALL, API, __FILE__, line,
+		"Exiting UpnpAcceptSubscription, ret = %d\n", ret);
+
+	return ret;
+}
+
 
 /**************************************************************************
  * Function: UpnpAcceptSubscriptionExt 
@@ -2277,57 +2294,73 @@ int UpnpAcceptSubscription(
  * Return Values: int
  *	UPNP_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
-int
-UpnpAcceptSubscriptionExt( IN UpnpDevice_Handle Hnd,
-                           IN const char *DevID_const,
-                           IN const char *ServName_const,
-                           IN IXML_Document * PropSet,
-                           IN Upnp_SID SubsId )
+int UpnpAcceptSubscriptionExt(
+	IN UpnpDevice_Handle Hnd,
+	IN const char *DevID_const,
+	IN const char *ServName_const,
+	IN IXML_Document *PropSet,
+	IN Upnp_SID SubsId)
 {
-    struct Handle_Info *SInfo = NULL;
-    int retVal;
-    char *DevID = ( char * )DevID_const;
-    char *ServName = ( char * )ServName_const;
+	int ret = 0;
+	int line = 0;
+	struct Handle_Info *SInfo = NULL;
+	char *DevID = (char *)DevID_const;
+	char *ServName = (char *)ServName_const;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Inside UpnpAcceptSubscription\n");
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpAcceptSubscription \n" );
+	if (UpnpSdkInit != 1) {
+		line = __LINE__;
+		ret = UPNP_E_FINISH;
+		goto ExitFunction;
+	}
 
-    HandleReadLock();
-    if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    if( DevID == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    if( ServName == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
-    if( SubsId == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
+	HandleReadLock();
 
-    if( PropSet == NULL ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
+	if (GetHandleInfo(Hnd, &SInfo) != HND_DEVICE) {
+		HandleUnlock();
+		line = __LINE__;
+		ret = UPNP_E_INVALID_HANDLE;
+		goto ExitFunction;
+	}
+	if (DevID == NULL) {
+		HandleUnlock();
+		line = __LINE__;
+		ret = UPNP_E_INVALID_PARAM;
+		goto ExitFunction;
+	}
+	if (ServName == NULL) {
+		HandleUnlock();
+		line = __LINE__;
+		ret = UPNP_E_INVALID_PARAM;
+		goto ExitFunction;
+	}
+	if (SubsId == NULL) {
+		HandleUnlock();
+		line = __LINE__;
+		ret = UPNP_E_INVALID_PARAM;
+		goto ExitFunction;
+	}
 
-    HandleUnlock();
-    retVal = genaInitNotifyExt( Hnd, DevID, ServName, PropSet, SubsId );
+	if (PropSet == NULL) {
+		HandleUnlock();
+		line = __LINE__;
+		ret = UPNP_E_INVALID_PARAM;
+		goto ExitFunction;
+	}
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpAcceptSubscription \n" );
+	HandleUnlock();
 
-    return retVal;
+	line = __LINE__;
+	ret = genaInitNotifyExt(Hnd, DevID, ServName, PropSet, SubsId);
 
-}  /****************** End of UpnpAcceptSubscription *********************/
+ExitFunction:
+	UpnpPrintf(UPNP_ALL, API, __FILE__, line,
+		"Exiting UpnpAcceptSubscription, ret = %d.\n", ret);
+
+	return ret;
+}
 
 #endif // INCLUDE_DEVICE_APIS
 #endif // EXCLUDE_GENA == 0

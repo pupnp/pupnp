@@ -1,33 +1,33 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
 
 #include "config.h"
@@ -47,23 +47,17 @@
 #include "uuid.h"
 #include "upnpapi.h"
 
+
 extern ithread_mutex_t GlobalClientSubscribeMutex;
 
-/************************************************************************
-* Function : GenaAutoRenewSubscription
-*
-* Parameters:
-*	IN void *input: Thread data(upnp_timeout *) needed to send the renewal
-*
-* Description:
-*	This is a thread function to send the renewal just before the
-*	subscription times out.
-*
-* Returns: VOID
-*	
-***************************************************************************/
-static void
-GenaAutoRenewSubscription( IN void *input )
+
+/*!
+ * \brief This is a thread function to send the renewal just before the
+ * subscription times out.
+ */
+static void GenaAutoRenewSubscription(
+	/*! [in] Thread data(upnp_timeout *) needed to send the renewal. */
+	IN void *input)
 {
 	upnp_timeout *event = (upnp_timeout *) input;
 	UpnpEventSubscribe *sub_struct = (UpnpEventSubscribe *)event->Event;
@@ -117,24 +111,18 @@ GenaAutoRenewSubscription( IN void *input )
 }
 
 
-/************************************************************************
- * Function : ScheduleGenaAutoRenew
+/*!
+ * \brief Schedules a job to renew the subscription just before time out.
  *
- * Parameters:
- *	IN int client_handle: Handle that also contains the subscription list
- *	IN int TimeOut: The time out value of the subscription
- *	IN client_subscription * sub: Subscription being renewed
- *
- * Description:
- *	This function schedules a job to renew the subscription just before
- *	time out.
- *
- * Returns: int
- *	return GENA_E_SUCCESS if successful else returns appropriate error
- ***************************************************************************/
+ * \return GENA_E_SUCCESS if successful, otherwise returns the appropriate
+ * 	error code.
+ */
 static int ScheduleGenaAutoRenew(
+	/*! [in] Handle that also contains the subscription list. */
 	IN int client_handle,
+	/*! [in] The time out value of the subscription. */
 	IN int TimeOut,
+	/*! [in] Subscription being renewed. */
 	IN ClientSubscription *sub)
 {
 	UpnpEventSubscribe *RenewEventStruct = NULL;
@@ -190,24 +178,19 @@ static int ScheduleGenaAutoRenew(
 	return GENA_SUCCESS;
 }
 
-/************************************************************************
- * Function : gena_unsubscribe
+
+/*!
+ * \brief Sends the UNSUBCRIBE gena request and recieves the response from the
+ * 	device and returns it as a parameter.
  *
- * Parameters:
- *	IN const UpnpString *url: Event URL of the service
- *	IN const UpnpString *sid: The subcription ID.
- *	OUT http_parser_t *response: The UNSUBCRIBE response from the device
- *
- * Description:
- *	This function sends the UNSUBCRIBE gena request and recieves the 
- *	response from the device and returns it as a parameter
- *
- * Returns: int
- *	return 0 if successful else returns appropriate error
- ***************************************************************************/
+ * \returns 0 if successful, otherwise returns the appropriate error code.
+ */
 static int gena_unsubscribe(
+	/*! [in] Event URL of the service. */
 	IN const UpnpString *url,
+	/*! [in] The subcription ID. */
 	IN const UpnpString *sid,
+	/*! [out] The UNSUBCRIBE response from the device. */
 	OUT http_parser_t *response )
 {
 	int return_code;
@@ -256,27 +239,21 @@ static int gena_unsubscribe(
 	return return_code;
 }
 
-/************************************************************************
- * Function: gena_subscribe
+
+/*!
+ * \brief Subscribes or renew subscription.
  *
- * Parameters:
- *	IN const UpnpString *url: url of service to subscribe
- *	INOUT int* timeout: subscription time desired (in secs)
- *	IN const UpnpString *renewal_sid: for renewal, this contains a currently h
- *		held subscription SID. For first time
- *		subscription, this must be NULL
- *	OUT UpnpString *sid: SID returned by the subscription or renew msg
- *
- * Description:
- *	This function subscribes or renew subscription
- *
- * Returns: int
- *	return 0 if successful else returns appropriate error
- ***************************************************************************/
+ * \return 0 if successful, otherwise returns the appropriate error code.
+ */
 static int gena_subscribe(
+	/*! [in] URL of service to subscribe. */
 	IN const UpnpString *url,
+	/*! [in,out] Subscription time desired (in secs). */
 	INOUT int *timeout,
+	/*! [in] for renewal, this contains a currently held subscription SID.
+	 * For first time subscription, this must be NULL. */
 	IN const UpnpString *renewal_sid,
+	/*! [out] SID returned by the subscription or renew msg. */
 	OUT UpnpString *sid)
 {
 	int return_code;
@@ -400,21 +377,7 @@ static int gena_subscribe(
 	return UPNP_E_SUCCESS;
 }
 
-/************************************************************************
- * Function: genaUnregisterClient
- *
- * Parameters:
- *	IN UpnpClient_Handle client_handle: 
- *		Handle containing all the control point related information
- *
- * Description:
- *	This function unsubcribes all the outstanding subscriptions and cleans
- *	the subscription list. This function is called when control point 
- *	unregisters.
- *
- * Returns: int
- *	return UPNP_E_SUCCESS if successful else returns appropriate error
- ***************************************************************************/
+
 int genaUnregisterClient(IN UpnpClient_Handle client_handle)
 {
 	ClientSubscription *sub_copy = UpnpClientSubscription_new();
@@ -460,22 +423,6 @@ exit_function:
 }
 
 
-/************************************************************************
- * Function: genaUnSubscribe
- *
- * Parameters:
- *	IN UpnpClient_Handle client_handle: UPnP client handle
- *	IN const UpnpString *in_sid: The subscription ID
- *
- * Description:
- *	This function unsubscribes a SID. It first validates the SID and 
- *	client_handle,copies the subscription, sends UNSUBSCRIBE http request 
- *	to service processes request and finally removes the subscription
- *
- * Returns: int
- *	return UPNP_E_SUCCESS if service response is OK else 
- *	returns appropriate error
- ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 int genaUnSubscribe(
 	IN UpnpClient_Handle client_handle,
@@ -528,28 +475,6 @@ exit_function:
 #endif /* INCLUDE_CLIENT_APIS */
 
 
-/************************************************************************
- * Function: genaSubscribe
- *
- * Parameters:
- *	IN UpnpClient_Handle client_handle:
- *	IN const UpnpString *PublisherURL: Of the form:
- *		"http://134.134.156.80:4000/RedBulb/Event"
- *	INOUT int * TimeOut: requested Duration, if -1, then "infinite".
- *		in the OUT case: actual Duration granted 
- *		by Service, -1 for infinite
- *	OUT UpnpString *out_sid: sid of subscription, memory passed in by caller
- *
- * Description:
- *	This function subscribes to a PublisherURL ( also mentioned as EventURL
- *	some places). It sends SUBSCRIBE http request to service processes 
- *	request. Finally adds a Subscription to 
- *	the clients subscription list, if service responds with OK
- *
- * Returns: int
- *	return UPNP_E_SUCCESS if service response is OK else 
- *	returns appropriate error
- ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 int genaSubscribe(
 	IN UpnpClient_Handle client_handle,
@@ -633,26 +558,6 @@ error_handler:
 #endif /* INCLUDE_CLIENT_APIS */
 
 
-/************************************************************************
- * Function : genaRenewSubscription
- *
- * Parameters:
- *	IN UpnpClient_Handle client_handle: Client handle
- *	IN const UpnpString *in_sid: subscription ID
- *	INOUT int * TimeOut: requested Duration, if -1, then "infinite".
- *		in the OUT case: actual Duration granted 
- *		by Service, -1 for infinite
- *
- * Description:
- *	This function renews a SID. It first validates the SID and 
- *	client_handle and copies the subscription. It sends RENEW 
- *	(modified SUBSCRIBE) http request to service and processes
- *	the response.
- *
- * Returns: int
- *	return UPNP_E_SUCCESS if service response is OK else 
- *	returns appropriate error
- ***************************************************************************/
 int genaRenewSubscription(
 	IN UpnpClient_Handle client_handle,
 	IN const UpnpString *in_sid,
@@ -751,24 +656,9 @@ exit_function:
 }
 
 
-/************************************************************************
- * Function: gena_process_notification_event
- *
- * Parameters:
- *	IN SOCKINFO *info: Socket structure containing the device socket 
- *			information
- *	IN http_message_t *event: The http message contains the GENA 
- *			notification
- *
- * Description:
- *	This function processes NOTIFY events that are sent by devices. 
- *	called by genacallback()
- *
- * Returns: void
- *
- * Note : called by genacallback()
- ****************************************************************************/
-void gena_process_notification_event(IN SOCKINFO *info, IN http_message_t *event)
+void gena_process_notification_event(
+	IN SOCKINFO *info,
+	IN http_message_t *event)
 {
 	UpnpEvent *event_struct = UpnpEvent_new();
 	IXML_Document *ChangedVars = NULL;
@@ -896,6 +786,7 @@ exit_function:
 	UpnpEvent_delete(event_struct);
 }
 
-#endif // INCLUDE_CLIENT_APIS
-#endif // EXCLUDE_GENA
+
+#endif /* INCLUDE_CLIENT_APIS */
+#endif /* EXCLUDE_GENA */
 

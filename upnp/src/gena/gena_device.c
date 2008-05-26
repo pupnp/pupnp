@@ -1,107 +1,99 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
+
 
 #include "config.h"
+
+
 #if EXCLUDE_GENA == 0
 #ifdef INCLUDE_DEVICE_APIS
 
+
 #include "gena.h"
-#include "sysdep.h"
-#include "uuid.h"
-#include "upnpapi.h"
-#include "parsetools.h"
-#include "statcodes.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
+#include "parsetools.h"
 #include "ssdplib.h"
-
+#include "statcodes.h"
+#include "sysdep.h"
 #include "unixutil.h"
+#include "upnpapi.h"
+#include "uuid.h"
 
-/************************************************************************
-* Function : genaUnregisterDevice
-*																	
-* Parameters:														
-*	IN UpnpDevice_Handle device_handle: Handle of the root device
-*
-* Description:														
-*	This function cleans the service table of the device. 
-*
-* Returns: int
-*	returns UPNP_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
-****************************************************************************/
-int
-genaUnregisterDevice( IN UpnpDevice_Handle device_handle )
+
+/*!
+ * \brief Unregisters a device.
+ *
+ * \return UPNP_E_SUCCESS on success, GENA_E_BAD_HANDLE on failure.
+ */
+int genaUnregisterDevice(
+	/*! [in] Device handle. */
+	IN UpnpDevice_Handle device_handle)
 {
-    struct Handle_Info *handle_info;
+	int ret = 0;
+	struct Handle_Info *handle_info;
 
-    HandleLock();
-    if( GetHandleInfo( device_handle, &handle_info ) != HND_DEVICE ) {
+	HandleLock();
+	if (GetHandleInfo(device_handle, &handle_info) != HND_DEVICE) {
+		UpnpPrintf(UPNP_CRITICAL, GENA, __FILE__, __LINE__,
+			"genaUnregisterDevice: BAD Handle: %d\n",
+			device_handle);
+		ret = GENA_E_BAD_HANDLE;
+	} else {
+		freeServiceTable(&handle_info->ServiceTable);
+		ret = UPNP_E_SUCCESS;
+	}
+	HandleUnlock();
 
-        UpnpPrintf( UPNP_CRITICAL, GENA, __FILE__, __LINE__,
-            "genaUnregisterDevice : BAD Handle : %d\n",
-            device_handle );
-
-        HandleUnlock();
-        return GENA_E_BAD_HANDLE;
-    }
-
-    freeServiceTable( &handle_info->ServiceTable );
-    HandleUnlock();
-
-    return UPNP_E_SUCCESS;
+	return ret;
 }
 
-/************************************************************************
-* Function : GeneratePropertySet
-*																	
-* Parameters:														
-*	IN char **names : Array of variable names (go in the event notify)
-*	IN char ** values : Array of variable values (go in the event notify)
-*   IN int count : number of variables
-*   OUT DOMString *out: PropertySet node in the string format
-*
-* Description:														
-*	This function to generate XML propery Set for notifications				
-*
-* Returns: int
-*	returns UPNP_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
-*
-* Note: XML_VERSION comment is NOT sent due to interop issues with other 
-*		UPnP vendors
-****************************************************************************/
-static int
-GeneratePropertySet( IN char **names,
-                     IN char **values,
-                     IN int count,
-                     OUT DOMString * out )
+
+/*!
+ * \brief Generates XML property set for notifications.
+ *
+ * \return UPNP_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE.
+ *
+ * \note XML_VERSION comment is NOT sent due to interop issues with other 
+ *	UPnP vendors.
+ */
+static int GeneratePropertySet(
+	/*! [in] Array of variable names (go in the event notify). */
+	IN char **names,
+	/*! [in] Array of variable values (go in the event notify). */
+	IN char **values,
+	/*! [in] number of variables. */
+	IN int count,
+	/*! [out] PropertySet node in the string format. */
+	OUT DOMString *out)
 {
     char *buffer;
     int counter = 0;
@@ -140,24 +132,18 @@ GeneratePropertySet( IN char **names,
     strcat( buffer, "</e:propertyset>\n\n" );
     ( *out ) = ixmlCloneDOMString( buffer );
     free( buffer );
+
     return XML_SUCCESS;
 }
 
-/************************************************************************
-* Function : free_notify_struct
-*																	
-* Parameters:														
-*	IN notify_thread_struct * input : Notify structure
-*
-* Description:														
-*	This function frees memory used in notify_threads if the reference 
-*	count is 0 otherwise decrements the refrence count
-*
-* Returns: VOID
-*	
-****************************************************************************/
-static void
-free_notify_struct( IN notify_thread_struct * input )
+
+/*!
+ * \brief Frees memory used in notify_threads if the reference count is 0,
+ * otherwise decrements the refrence count.
+ */
+static void free_notify_struct(
+	/*! [in] Notify structure. */
+	IN notify_thread_struct *input)
 {
     ( *input->reference_count )--;
     if( ( *input->reference_count ) == 0 ) {
@@ -170,29 +156,23 @@ free_notify_struct( IN notify_thread_struct * input )
     free( input );
 }
 
-/****************************************************************************
-*	Function :	notify_send_and_recv
-*
-*	Parameters :
-*		IN uri_type* destination_url : subscription callback URL 
-*										(URL of the control point)
-*		IN membuffer* mid_msg :	Common HTTP headers 
-*		IN char* propertySet :	The evented XML 
-*		OUT http_parser_t* response : The response from the control point.
-*
-*	Description :	This function sends the notify message and returns a 
-*					reply.
-*
-*	Return : int
-*		on success: returns UPNP_E_SUCCESS; else returns a UPNP error
-*
-*	Note : called by genaNotify
-****************************************************************************/
-static UPNP_INLINE int
-notify_send_and_recv( IN uri_type * destination_url,
-                      IN membuffer * mid_msg,
-                      IN char *propertySet,
-                      OUT http_parser_t * response )
+
+/*!
+ * \brief Sends the notify message and returns a reply.
+ *
+ * \return on success returns UPNP_E_SUCCESS, otherwise returns a UPNP error.
+ *
+ * \note called by genaNotify
+ */
+static UPNP_INLINE int notify_send_and_recv(
+	/*! [in] subscription callback URL (URL of the control point). */
+	IN uri_type *destination_url,
+	/*! [in] Common HTTP headers. */
+	IN membuffer *mid_msg,
+	/*! [in] The evented XML. */
+	IN char *propertySet,
+	/*! [out] The response from the control point. */
+	OUT http_parser_t *response)
 {
     uri_type url;
     int conn_fd;
@@ -260,32 +240,25 @@ notify_send_and_recv( IN uri_type * destination_url,
     return UPNP_E_SUCCESS;
 }
 
-/****************************************************************************
-*	Function :	genaNotify
-*
-*	Parameters :
-*		IN char *headers :	(null terminated) (includes all headers 
-*							(including \r\n) except SID and SEQ)
-*		IN char *propertySet :	The evented XML 
-*		IN subscription* sub :	subscription to be Notified, 
-*								Assumes this is valid for life of function)
-*
-*	Description :	Function to Notify a particular subscription of a 
-*					particular event. In general the service should NOT be 
-*					blocked around this call. (this may cause deadlock 
-*					with a client) NOTIFY http request is sent and the 
-*					reply is processed.
-*
-*	Return :	int
-*		GENA_SUCCESS  if the event was delivered else returns appropriate 
-*		error
-*
-*	Note :
-****************************************************************************/
-int
-genaNotify( IN char *headers,
-            IN char *propertySet,
-            IN subscription * sub )
+
+/*!
+ * \brief Function to Notify a particular subscription of a particular event.
+ *
+ * In general the service should NOT be blocked around this call (this may
+ * cause deadlock with a client).
+ *
+ * NOTIFY http request is sent and the reply is processed.
+ *
+ * \return GENA_SUCCESS if the event was delivered, otherwise returns the
+ * 	appropriate error code.
+ */
+static int genaNotify(
+	/*! [in] Null terminated, includes all headers (including \r\n) except SID and SEQ. */
+	IN char *headers,
+	/*! [in] The evented XML. */
+	IN char *propertySet,
+	/*! [in] subscription to be Notified, assumes this is valid for life of function. */
+	IN subscription *sub)
 {
     int i;
     membuffer mid_msg;
@@ -338,25 +311,19 @@ genaNotify( IN char *headers,
     return return_code;
 }
 
-/****************************************************************************
-*	Function :	genaNotifyThread
-*
-*	Parameters :
-*			IN void * input : notify thread structure containing all the 
-*								headers and property set info
-*
-*	Description :	Thread job to Notify a control point. It validates the
-*		subscription and copies the subscription. Also make sure that 
-*		events are sent in order. 
-*
-*	Return : void
-*
-*	Note : calls the genaNotify to do the actual work
-****************************************************************************/
-static void
-genaNotifyThread( IN void *input )
-{
 
+/*!
+ * \brief Thread job to Notify a control point.
+ *
+ * It validates the subscription and copies the subscription. Also make sure
+ * that events are sent in order.
+ *
+ * \note calls the genaNotify to do the actual work.
+ */
+static void genaNotifyThread(
+	/*! [in] notify thread structure containing all the headers and property set info. */
+	IN void *input)
+{
     subscription *sub;
     service_info *service;
     subscription sub_copy;
@@ -443,166 +410,156 @@ int genaInitNotify(
 	IN int var_count,
 	IN const Upnp_SID sid)
 {
-    char *UDN_copy = NULL;
-    char *servId_copy = NULL;
-    char *propertySet = NULL;
-    char *headers = NULL;
-    subscription *sub = NULL;
-    service_info *service = NULL;
-    int return_code = GENA_SUCCESS;
-    int headers_size;
-    int *reference_count = NULL;
-    struct Handle_Info *handle_info;
-    ThreadPoolJob job;
+	int ret = GENA_SUCCESS;
+	int line = 0;
 
-    notify_thread_struct *thread_struct = NULL;
+	int *reference_count = NULL;
+	char *UDN_copy = NULL;
+	char *servId_copy = NULL;
+	DOMString propertySet = NULL;
+	char *headers = NULL;
+	notify_thread_struct *thread_struct = NULL;
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "GENA BEGIN INITIAL NOTIFY " );
+	subscription *sub = NULL;
+	service_info *service = NULL;
+	int headers_size;
+	struct Handle_Info *handle_info;
+	ThreadPoolJob job;
 
-    reference_count = ( int * )malloc( sizeof( int ) );
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"GENA BEGIN INITIAL NOTIFY");
 
-    if( reference_count == NULL )
-        return UPNP_E_OUTOF_MEMORY;
+	reference_count = (int *)malloc(sizeof (int));
+	if (reference_count == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
+	*reference_count = 0;
+	
+	UDN_copy = (char *)malloc(strlen(UDN) + 1);
+	if (UDN_copy == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    ( *reference_count ) = 0;
+	servId_copy = (char *)malloc(strlen(servId) + 1);
+	if( servId_copy == NULL ) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    UDN_copy = ( char * )malloc( strlen( UDN ) + 1 );
+	strcpy(UDN_copy, UDN);
+	strcpy(servId_copy, servId);
 
-    if( UDN_copy == NULL ) {
-        free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
-    }
-    servId_copy = ( char * )malloc( strlen( servId ) + 1 );
+	HandleLock();
 
-    if( servId_copy == NULL ) {
-        free( UDN_copy );
-        free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	if (GetHandleInfo(device_handle, &handle_info) != HND_DEVICE) {
+		line = __LINE__;
+		ret = GENA_E_BAD_HANDLE;
+		goto ExitFunction;
+	}
 
-    strcpy( UDN_copy, UDN );
-    strcpy( servId_copy, servId );
+	service = FindServiceId(&handle_info->ServiceTable, servId, UDN);
+	if (service == NULL) {
+		line = __LINE__;
+		ret = GENA_E_BAD_SERVICE;
+		goto ExitFunction;
+	}
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"FOUND SERVICE IN INIT NOTFY: UDN %s, ServID: %s",
+		UDN, servId);
 
-    HandleLock();
+	sub = GetSubscriptionSID(sid, service);
+	if (sub == NULL || sub->active) {
+		line = __LINE__;
+		ret = GENA_E_BAD_SID;
+		goto ExitFunction;
+	}
+	UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+		"FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s", sid);
+	sub->active = 1;
 
-    if( GetHandleInfo( device_handle, &handle_info ) != HND_DEVICE ) {
-        free( UDN_copy );
-        free( reference_count );
-        free( servId_copy );
-        HandleUnlock();
-        return GENA_E_BAD_HANDLE;
-    }
+	ret = GeneratePropertySet(VarNames, VarValues, var_count, &propertySet );
+	if (ret != XML_SUCCESS) {
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"GENERATED PROPERY SET IN INIT NOTIFY: %s",
+		propertySet);
 
-    if( ( service = FindServiceId( &handle_info->ServiceTable,
-                                   servId, UDN ) ) == NULL ) {
-        free( UDN_copy );
-        free( reference_count );
-        free( servId_copy );
-        HandleUnlock();
-        return GENA_E_BAD_SERVICE;
-    }
+	headers_size =
+		strlen("CONTENT-TYPE text/xml\r\n") +
+		strlen("CONTENT-LENGTH: \r\n") + MAX_CONTENT_LENGTH +
+		strlen("NT: upnp:event\r\n") +
+		strlen("NTS: upnp:propchange\r\n") + 1;
+	headers = (char *)malloc(headers_size);
+	if (headers == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
-        "FOUND SERVICE IN INIT NOTFY: UDN %s, ServID: %s ",
-        UDN, servId);
+	sprintf(headers,
+		"CONTENT-TYPE: text/xml\r\n"
+		"CONTENT-LENGTH: %"PRIzu"\r\n"
+		"NT: upnp:event\r\n"
+		"NTS: upnp:propchange\r\n",
+		strlen(propertySet) + 1);
 
-    sub = GetSubscriptionSID(sid, service);
-    if (sub == NULL || sub->active) {
-        free( UDN_copy );
-        free( reference_count );
-        free( servId_copy );
-        HandleUnlock();
-        return GENA_E_BAD_SID;
-    }
+	/* schedule thread for initial notification */
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s ", sid );
+	thread_struct = (notify_thread_struct *)malloc(sizeof (notify_thread_struct));
+	if (thread_struct == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+	} else {
+		*reference_count = 1;
+		thread_struct->servId = servId_copy;
+		thread_struct->UDN = UDN_copy;
+		thread_struct->headers = headers;
+		thread_struct->propertySet = propertySet;
+		strcpy(thread_struct->sid, sid);
+		thread_struct->eventKey = sub->eventKey++;
+		thread_struct->reference_count = reference_count;
+		thread_struct->device_handle = device_handle;
 
-    sub->active = 1;
+		TPJobInit(&job, (start_routine)genaNotifyThread, thread_struct);
+		TPJobSetFreeFunction(&job, (free_routine)free_notify_struct);
+		TPJobSetPriority(&job, MED_PRIORITY);
 
-    if( ( return_code = GeneratePropertySet( VarNames, VarValues,
-                                             var_count,
-                                             &propertySet ) ) !=
-        XML_SUCCESS ) {
-        free( UDN_copy );
-        free( reference_count );
-        free( servId_copy );
-        HandleUnlock();
-        return return_code;
-    }
+		ret = ThreadPoolAdd(&gSendThreadPool, &job, NULL);
+		if (ret != 0) {
+			if (ret == EOUTOFMEM) {
+				line = __LINE__;
+				ret = UPNP_E_OUTOF_MEMORY;
+			}
+		} else {
+			line = __LINE__;
+			ret = GENA_SUCCESS;
+		}
+	}
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "GENERATED PROPERY SET IN INIT NOTIFY: \n'%s'\n",
-        propertySet );
+ExitFunction:
+	if (ret != GENA_SUCCESS) {
+		free(thread_struct);
+		free(headers);
+		ixmlFreeDOMString(propertySet);
+		free(servId_copy);
+		free(UDN_copy);
+		free(reference_count);
+	}
 
-    headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
-        strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
-        strlen( "NT: upnp:event\r\n" ) +
-        strlen( "NTS: upnp:propchange\r\n" ) + 1;
+	HandleUnlock();
 
-    headers = ( char * )malloc( headers_size );
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, line,
+		"GENA END INITIAL NOTIFY, ret = %d",
+		ret);
 
-    if( headers == NULL ) {
-        ixmlFreeDOMString( propertySet );
-        free( UDN_copy );
-        free( servId_copy );
-        free( reference_count );
-        HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
-    }
-
-    sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%"PRIzu"\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
-             strlen( propertySet ) + 1 );
-
-    //schedule thread for initial notification
-
-    thread_struct =
-        ( notify_thread_struct * )
-        malloc( sizeof( notify_thread_struct ) );
-
-    if( thread_struct == NULL ) {
-        return_code = UPNP_E_OUTOF_MEMORY;
-    } else {
-        ( *reference_count ) = 1;
-        thread_struct->servId = servId_copy;
-        thread_struct->UDN = UDN_copy;
-        thread_struct->headers = headers;
-        thread_struct->propertySet = propertySet;
-        strcpy( thread_struct->sid, sid );
-        thread_struct->eventKey = sub->eventKey++;
-        thread_struct->reference_count = reference_count;
-        thread_struct->device_handle = device_handle;
-
-        TPJobInit( &job, ( start_routine ) genaNotifyThread,
-                   thread_struct );
-        TPJobSetFreeFunction( &job, ( free_routine ) free_notify_struct );
-        TPJobSetPriority( &job, MED_PRIORITY );
-
-        if( ( return_code =
-              ThreadPoolAdd( &gSendThreadPool, &job, NULL ) ) != 0 ) {
-            if( return_code == EOUTOFMEM ) {
-                return_code = UPNP_E_OUTOF_MEMORY;
-            }
-        } else {
-            return_code = GENA_SUCCESS;
-        }
-    }
-
-    if( return_code != GENA_SUCCESS ) {
-
-        free( reference_count );
-        free( UDN_copy );
-        free( servId_copy );
-        free( thread_struct );
-        ixmlFreeDOMString( propertySet );
-        free( headers );
-    }
-
-    HandleUnlock();
-
-    return return_code;
+	return ret;
 }
 
 
@@ -613,504 +570,479 @@ int genaInitNotifyExt(
 	IN IXML_Document *PropSet,
 	IN const Upnp_SID sid)
 {
-    char *UDN_copy = NULL;
-    char *servId_copy = NULL;
-    char *headers = NULL;
-    subscription *sub = NULL;
-    service_info *service = NULL;
-    int return_code = GENA_SUCCESS;
-    int headers_size;
-    int *reference_count = NULL;
-    struct Handle_Info *handle_info;
-    DOMString propertySet = NULL;
+	int ret = GENA_SUCCESS;
+	int line = 0;
 
-    ThreadPoolJob job;
+	int *reference_count = NULL;
+	char *UDN_copy = NULL;
+	char *servId_copy = NULL;
+	DOMString propertySet = NULL;
+	char *headers = NULL;
+	notify_thread_struct *thread_struct = NULL;
 
-    notify_thread_struct *thread_struct = NULL;
+	subscription *sub = NULL;
+	service_info *service = NULL;
+	int headers_size;
+	struct Handle_Info *handle_info;
+	ThreadPoolJob job;
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "GENA BEGIN INITIAL NOTIFY EXT" );
-    reference_count = ( int * )malloc( sizeof( int ) );
+	UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+		"GENA BEGIN INITIAL NOTIFY EXT");
+	
+	reference_count = (int *)malloc(sizeof (int));
+	if (reference_count == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
+	*reference_count = 0;
+	
+	UDN_copy = (char *)malloc(strlen(UDN) + 1);
+	if (UDN_copy == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    if( reference_count == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	servId_copy = (char *)malloc(strlen(servId) + 1);
+	if( servId_copy == NULL ) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    ( *reference_count ) = 0;
+	strcpy(UDN_copy, UDN);
+	strcpy(servId_copy, servId);
 
-    UDN_copy = ( char * )malloc( strlen( UDN ) + 1 );
-    if( UDN_copy == NULL ) {
-        free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	HandleLock();
 
-    servId_copy = ( char * )malloc( strlen( servId ) + 1 );
-    if( servId_copy == NULL ) {
-        free( UDN_copy );
-        free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	if (GetHandleInfo(device_handle, &handle_info) != HND_DEVICE) {
+		line = __LINE__;
+		ret = GENA_E_BAD_HANDLE;
+		goto ExitFunction;
+	}
 
-    strcpy( UDN_copy, UDN );
-    strcpy( servId_copy, servId );
+	service = FindServiceId(&handle_info->ServiceTable, servId, UDN);
+	if (service == NULL) {
+		line = __LINE__;
+		ret = GENA_E_BAD_SERVICE;
+		goto ExitFunction;
+	}
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"FOUND SERVICE IN INIT NOTFY EXT: UDN %s, ServID: %s",
+		UDN, servId);
 
-    HandleLock();
+	sub = GetSubscriptionSID(sid, service);
+	if (sub == NULL || sub->active) {
+		line = __LINE__;
+		ret = GENA_E_BAD_SID;
+		goto ExitFunction;
+	}
+	UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+		"FOUND SUBSCRIPTION IN INIT NOTIFY EXT: SID %s", sid);
+	sub->active = 1;
 
-    if( GetHandleInfo( device_handle, &handle_info ) != HND_DEVICE ) {
-        free( UDN_copy );
-        free( reference_count );
-        free( servId_copy );
-        HandleUnlock();
-        return GENA_E_BAD_HANDLE;
-    }
+	propertySet = ixmlPrintNode((IXML_Node *)PropSet);
+	if( propertySet == NULL ) {
+		line = __LINE__;
+		ret = UPNP_E_INVALID_PARAM;
+		goto ExitFunction;
+	}
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"GENERATED PROPERY SET IN INIT EXT NOTIFY: %s",
+		propertySet);
 
-    if( ( service = FindServiceId( &handle_info->ServiceTable,
-                                   servId, UDN ) ) == NULL ) {
-        free( UDN_copy );
-        free( reference_count );
-        free( servId_copy );
-        HandleUnlock();
-        return GENA_E_BAD_SERVICE;
-    }
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "FOUND SERVICE IN INIT NOTFY EXT: UDN %s, ServID: %s\n",
-        UDN, servId );
+	headers_size =
+		strlen( "CONTENT-TYPE text/xml\r\n" ) +
+		strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
+		strlen( "NT: upnp:event\r\n" ) +
+		strlen( "NTS: upnp:propchange\r\n" ) + 1;
+	headers = (char *)malloc(headers_size);
+	if (headers == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    if( ( ( sub = GetSubscriptionSID( sid, service ) ) == NULL ) ||
-        ( sub->active ) ) {
-        free( UDN_copy );
-        free( reference_count );
-        free( servId_copy );
-        HandleUnlock();
-        return GENA_E_BAD_SID;
-    }
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "FOUND SUBSCRIPTION IN INIT NOTIFY EXT: SID %s", sid );
+	sprintf(headers,
+		"CONTENT-TYPE: text/xml\r\n"
+		"CONTENT-LENGTH: %"PRIzu"\r\n"
+		"NT: upnp:event\r\n"
+		"NTS: upnp:propchange\r\n",
+		strlen(propertySet) + 1);
 
-    sub->active = 1;
+	/* schedule thread for initial notification */
 
-    propertySet = ixmlPrintNode( ( IXML_Node * ) PropSet );
-    if( propertySet == NULL ) {
-        free( UDN_copy );
-        free( reference_count );
-        free( servId_copy );
-        HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
-    }
+	thread_struct = (notify_thread_struct *)malloc(sizeof (notify_thread_struct));
+	if (thread_struct == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+	} else {
+		*reference_count = 1;
+		thread_struct->servId = servId_copy;
+		thread_struct->UDN = UDN_copy;
+		thread_struct->headers = headers;
+		thread_struct->propertySet = propertySet;
+		strcpy(thread_struct->sid, sid);
+		thread_struct->eventKey = sub->eventKey++;
+		thread_struct->reference_count = reference_count;
+		thread_struct->device_handle = device_handle;
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "GENERATED PROPERY SET IN INIT EXT NOTIFY: %s",
-        propertySet );
+		TPJobInit(&job, (start_routine)genaNotifyThread, thread_struct);
+		TPJobSetFreeFunction(&job, (free_routine)free_notify_struct);
+		TPJobSetPriority(&job, MED_PRIORITY);
 
-    headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
-        strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
-        strlen( "NT: upnp:event\r\n" ) +
-        strlen( "NTS: upnp:propchange\r\n" ) + 1;
+		ret = ThreadPoolAdd(&gSendThreadPool, &job, NULL);
+		if (ret != 0) {
+			if (ret == EOUTOFMEM) {
+				line = __LINE__;
+				ret = UPNP_E_OUTOF_MEMORY;
+			}
+		} else {
+			line = __LINE__;
+			ret = GENA_SUCCESS;
+		}
+	}
 
-    headers = ( char * )malloc( headers_size );
-    if( headers == NULL ) {
-        free( UDN_copy );
-        free( servId_copy );
-        free( reference_count );
-        ixmlFreeDOMString( propertySet );
-        HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
-    }
+ExitFunction:
+	if (ret != GENA_SUCCESS) {
+		free(thread_struct);
+		free(headers);
+		ixmlFreeDOMString(propertySet);
+		free(servId_copy);
+		free(UDN_copy);
+		free(reference_count);
+	}
 
-    sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%ld\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
-             (long) strlen( propertySet ) + 1 );
+	HandleUnlock();
 
-    //schedule thread for initial notification
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, line,
+		"GENA END INITIAL NOTIFY EXT, ret = %d",
+		ret);
 
-    thread_struct =
-        ( notify_thread_struct * )
-        malloc( sizeof( notify_thread_struct ) );
-
-    if( thread_struct == NULL ) {
-        return_code = UPNP_E_OUTOF_MEMORY;
-    } else {
-        ( *reference_count ) = 1;
-        thread_struct->servId = servId_copy;
-        thread_struct->UDN = UDN_copy;
-        thread_struct->headers = headers;
-        thread_struct->propertySet = propertySet;
-        strcpy( thread_struct->sid, sid );
-        thread_struct->eventKey = sub->eventKey++;
-        thread_struct->reference_count = reference_count;
-        thread_struct->device_handle = device_handle;
-
-        TPJobInit( &job, ( start_routine ) genaNotifyThread,
-                   thread_struct );
-        TPJobSetFreeFunction( &job, ( free_routine ) free_notify_struct );
-        TPJobSetPriority( &job, MED_PRIORITY );
-
-        if( ( return_code =
-              ThreadPoolAdd( &gSendThreadPool, &job, NULL ) ) != 0 ) {
-            if( return_code == EOUTOFMEM ) {
-                return_code = UPNP_E_OUTOF_MEMORY;
-            }
-        } else {
-            return_code = GENA_SUCCESS;
-        }
-    }
-
-    if( return_code != GENA_SUCCESS ) {
-        ixmlFreeDOMString( propertySet );
-        free( reference_count );
-        free( UDN_copy );
-        free( servId_copy );
-        free( thread_struct );
-        free( headers );
-    }
-    HandleUnlock();
-
-    return return_code;
+	return ret;
 }
 
-/****************************************************************************
-*	Function :	genaNotifyAllExt
-*
-*	Parameters :
-*			IN UpnpDevice_Handle device_handle : Device handle
-*			IN char *UDN :	Device udn
-*			IN char *servId :	Service ID
-*           IN IXML_Document *PropSet :	XML document Event varible property set
-*
-*	Description : 	This function sends a notification to all the subscribed
-*	control points
-*
-*	Return :	int
-*
-*	Note : This function is similar to the genaNotifyAll. the only difference
-*			is it takes the document instead of event variable array
-****************************************************************************/
-int
-genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
-                  IN char *UDN,
-                  IN char *servId,
-                  IN IXML_Document * PropSet )
+
+int genaNotifyAllExt(
+	IN UpnpDevice_Handle device_handle,
+	IN char *UDN,
+	IN char *servId,
+	IN IXML_Document *PropSet)
 {
-    char *headers = NULL;
-    int headers_size;
-    int return_code = GENA_SUCCESS;
-    char *UDN_copy = NULL;
-    char *servId_copy = NULL;
-    int *reference_count = NULL;
-    struct Handle_Info *handle_info;
-    DOMString propertySet = NULL;
-    ThreadPoolJob job;
-    subscription *finger = NULL;
+	int ret = GENA_SUCCESS;
+	int line = 0;
 
-    notify_thread_struct *thread_struct = NULL;
+	int *reference_count = NULL;
+	char *UDN_copy = NULL;
+	char *servId_copy = NULL;
+	DOMString propertySet = NULL;
+	char *headers = NULL;
+	notify_thread_struct *thread_struct = NULL;
 
-    service_info *service = NULL;
+	subscription *finger = NULL;
+	service_info *service = NULL;
+	int headers_size;
+	struct Handle_Info *handle_info;
+	ThreadPoolJob job;
 
-    reference_count = ( int * )malloc( sizeof( int ) );
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"GENA BEGIN NOTIFY ALL EXT");
 
-    if( reference_count == NULL )
-        return UPNP_E_OUTOF_MEMORY;
+	reference_count = (int *)malloc(sizeof (int));
+	if (reference_count == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
+	*reference_count = 0;
+	
+	UDN_copy = (char *)malloc(strlen(UDN) + 1);
+	if (UDN_copy == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    ( *reference_count = 0 );
+	servId_copy = (char *)malloc(strlen(servId) + 1);
+	if( servId_copy == NULL ) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    UDN_copy = ( char * )malloc( strlen( UDN ) + 1 );
+	strcpy(UDN_copy, UDN);
+	strcpy(servId_copy, servId);
 
-    if( UDN_copy == NULL ) {
-        free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	propertySet = ixmlPrintNode((IXML_Node *)PropSet);
+	if (propertySet == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_INVALID_PARAM;
+		goto ExitFunction;
+	}
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"GENERATED PROPERY SET IN EXT NOTIFY: %s",
+		propertySet);
 
-    servId_copy = ( char * )malloc( strlen( servId ) + 1 );
+	headers_size =
+		strlen( "CONTENT-TYPE text/xml\r\n" ) +
+		strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
+		strlen( "NT: upnp:event\r\n" ) +
+		strlen( "NTS: upnp:propchange\r\n" ) + 1;
+	headers = (char *)malloc(headers_size);
+	if (headers == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    if( servId_copy == NULL ) {
-        free( UDN_copy );
-        free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	sprintf(headers,
+		"CONTENT-TYPE: text/xml\r\n"
+		"CONTENT-LENGTH: %"PRIzu"\r\n"
+		"NT: upnp:event\r\n"
+		"NTS: upnp:propchange\r\n",
+		strlen(propertySet) + 1);
 
-    strcpy( UDN_copy, UDN );
-    strcpy( servId_copy, servId );
+	HandleLock();
 
-    propertySet = ixmlPrintNode( ( IXML_Node * ) PropSet );
-    if( propertySet == NULL ) {
-        free( UDN_copy );
-        free( servId_copy );
-        free( reference_count );
-        return UPNP_E_INVALID_PARAM;
-    }
+	if (GetHandleInfo(device_handle, &handle_info) != HND_DEVICE) {
+		line = __LINE__;
+		ret = GENA_E_BAD_HANDLE;
+	} else {
+		service = FindServiceId(&handle_info->ServiceTable, servId, UDN);
+		if (service != NULL) {
+			finger = GetFirstSubscription(service);
+			while (finger) {
+				thread_struct = (notify_thread_struct *)malloc(sizeof (notify_thread_struct));
+				if (thread_struct == NULL) {
+					line = __LINE__;
+					ret = UPNP_E_OUTOF_MEMORY;
+					break;
+				}
 
-    headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
-        strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
-        strlen( "NT: upnp:event\r\n" ) +
-        strlen( "NTS: upnp:propchange\r\n" ) + 1;
+				(*reference_count)++;
+				thread_struct->reference_count = reference_count;
+				thread_struct->UDN = UDN_copy;
+				thread_struct->servId = servId_copy;
+				thread_struct->headers = headers;
+				thread_struct->propertySet = propertySet;
+				strcpy(thread_struct->sid, finger->sid);
+				thread_struct->eventKey = finger->eventKey++;
+				thread_struct->device_handle = device_handle;
+				/* if overflow, wrap to 1 */
+				if (finger->eventKey < 0) {
+					finger->eventKey = 1;
+				}
 
-    headers = ( char * )malloc( headers_size );
-    if( headers == NULL ) {
-        free( UDN_copy );
-        free( servId_copy );
-        ixmlFreeDOMString( propertySet );
-        free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
-    }
-    //changed to add null terminator at end of content
-    //content length = (length in bytes of property set) + null char
-    sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%ld\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
-             (long) strlen( propertySet ) + 1 );
+				TPJobInit(&job, (start_routine)genaNotifyThread, thread_struct);
+				TPJobSetFreeFunction(&job, (free_routine)free_notify_struct);
+				TPJobSetPriority(&job, MED_PRIORITY);
+				ret = ThreadPoolAdd(&gSendThreadPool, &job, NULL);
+				if (ret != 0) {
+					line = __LINE__;
+					if (ret == EOUTOFMEM) {
+						line = __LINE__;
+						ret = UPNP_E_OUTOF_MEMORY;
+					}
+					break;
+				}
 
-    HandleLock();
+				finger = GetNextSubscription(service, finger);
+			}
+		} else {
+			line = __LINE__;
+			ret = GENA_E_BAD_SERVICE;
+		}
+	}
 
-    if( GetHandleInfo( device_handle, &handle_info ) != HND_DEVICE )
-        return_code = GENA_E_BAD_HANDLE;
-    else {
-        if( ( service = FindServiceId( &handle_info->ServiceTable,
-                                       servId, UDN ) ) != NULL ) {
-            finger = GetFirstSubscription( service );
+ExitFunction:
+	if (ret != GENA_SUCCESS || *reference_count == 0) {
+		free(headers);
+		ixmlFreeDOMString(propertySet);
+		free(servId_copy);
+		free(UDN_copy);
+		free(reference_count);
+	}
 
-            while( finger ) {
-                thread_struct =
-                    ( notify_thread_struct * )
-                    malloc( sizeof( notify_thread_struct ) );
-                if( thread_struct == NULL ) {
-                    break;
-                    return_code = UPNP_E_OUTOF_MEMORY;
-                }
+	HandleUnlock();
 
-                ( *reference_count )++;
-                thread_struct->reference_count = reference_count;
-                thread_struct->UDN = UDN_copy;
-                thread_struct->servId = servId_copy;
-                thread_struct->headers = headers;
-                thread_struct->propertySet = propertySet;
-                strcpy( thread_struct->sid, finger->sid );
-                thread_struct->eventKey = finger->eventKey++;
-                thread_struct->device_handle = device_handle;
-                //if overflow, wrap to 1
-                if( finger->eventKey < 0 ) {
-                    finger->eventKey = 1;
-                }
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, line,
+		"GENA END NOTIFY ALL EXT, ret = %d",
+		ret);
 
-                TPJobInit( &job, ( start_routine ) genaNotifyThread,
-                           thread_struct );
-                TPJobSetFreeFunction( &job,
-                                      ( free_routine )
-                                      free_notify_struct );
-                TPJobSetPriority( &job, MED_PRIORITY );
-                if( ( return_code = ThreadPoolAdd( &gSendThreadPool,
-                                                   &job, NULL ) ) != 0 ) {
-                    if( return_code == EOUTOFMEM ) {
-                        return_code = UPNP_E_OUTOF_MEMORY;
-                    }
-                    break;
-                }
-
-                finger = GetNextSubscription( service, finger );
-            }
-        } else
-            return_code = GENA_E_BAD_SERVICE;
-    }
-
-    if( ( *reference_count ) == 0 ) {
-        free( reference_count );
-        free( headers );
-        ixmlFreeDOMString( propertySet );
-        free( UDN_copy );
-        free( servId_copy );
-    }
-
-    HandleUnlock();
-
-    return return_code;
+	return ret;
 }
 
-/****************************************************************************
-*	Function :	genaNotifyAll
-*
-*	Parameters :
-*		IN UpnpDevice_Handle device_handle : Device handle
-*		IN char *UDN :	Device udn
-*		IN char *servId :	Service ID
-*	    IN char **VarNames : array of varible names
-*	    IN char **VarValues :	array of variable values
-*		IN int var_count	 :	number of variables
-*
-*	Description : 	This function sends a notification to all the subscribed
-*	control points
-*
-*	Return :	int
-*
-*	Note : This function is similar to the genaNotifyAllExt. The only difference
-*			is it takes event variable array instead of xml document.
-****************************************************************************/
-int
-genaNotifyAll( IN UpnpDevice_Handle device_handle,
-               IN char *UDN,
-               IN char *servId,
-               IN char **VarNames,
-               IN char **VarValues,
-               IN int var_count )
+
+int genaNotifyAll(
+	IN UpnpDevice_Handle device_handle,
+	IN char *UDN,
+	IN char *servId,
+	IN char **VarNames,
+	IN char **VarValues,
+	IN int var_count )
 {
-    char *headers = NULL;
-    char *propertySet = NULL;
-    int headers_size;
-    int return_code = GENA_SUCCESS;
-    char *UDN_copy = NULL;
-    char *servId_copy = NULL;
-    int *reference_count = NULL;
-    struct Handle_Info *handle_info;
-    ThreadPoolJob job;
+	int ret = GENA_SUCCESS;
+	int line = 0;
 
-    subscription *finger = NULL;
+	int *reference_count = NULL;
+	char *UDN_copy = NULL;
+	char *servId_copy = NULL;
+	DOMString propertySet = NULL;
+	char *headers = NULL;
+	notify_thread_struct *thread_struct = NULL;
 
-    notify_thread_struct *thread_struct = NULL;
+	subscription *finger = NULL;
+	service_info *service = NULL;
+	int headers_size;
+	struct Handle_Info *handle_info;
+	ThreadPoolJob job;
 
-    service_info *service = NULL;
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"GENA BEGIN NOTIFY ALL");
 
-    reference_count = ( int * )malloc( sizeof( int ) );
+	reference_count = (int *)malloc(sizeof (int));
+	if (reference_count == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
+	*reference_count = 0;
+	
+	UDN_copy = (char *)malloc(strlen(UDN) + 1);
+	if (UDN_copy == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    if( reference_count == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	servId_copy = (char *)malloc(strlen(servId) + 1);
+	if( servId_copy == NULL ) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    ( *reference_count = 0 );
+	strcpy(UDN_copy, UDN);
+	strcpy(servId_copy, servId);
 
-    UDN_copy = ( char * )malloc( strlen( UDN ) + 1 );
+	ret = GeneratePropertySet(VarNames, VarValues, var_count, &propertySet);
+	if (ret != XML_SUCCESS) {
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+		"GENERATED PROPERY SET IN EXT NOTIFY: %s",
+		propertySet);
 
-    if( UDN_copy == NULL ) {
-        free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	headers_size =
+		strlen( "CONTENT-TYPE text/xml\r\n" ) +
+		strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
+		strlen( "NT: upnp:event\r\n" ) +
+		strlen( "NTS: upnp:propchange\r\n" ) + 1;
+	headers = (char *)malloc(headers_size);
+	if (headers == NULL) {
+		line = __LINE__;
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 
-    servId_copy = ( char * )malloc( strlen( servId ) + 1 );
-    if( servId_copy == NULL ) {
-        free( UDN_copy );
-        free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	sprintf(headers,
+		"CONTENT-TYPE: text/xml\r\n"
+		"CONTENT-LENGTH: %"PRIzu"\r\n"
+		"NT: upnp:event\r\n"
+		"NTS: upnp:propchange\r\n",
+		strlen(propertySet) + 1);
 
-    strcpy( UDN_copy, UDN );
-    strcpy( servId_copy, servId );
+	HandleLock();
 
-    if( ( return_code = GeneratePropertySet( VarNames, VarValues,
-                                             var_count,
-                                             &propertySet ) ) !=
-        XML_SUCCESS ) {
-        free( UDN_copy );
-        free( servId_copy );
-        free( reference_count );
-        return return_code;
-    }
+	if (GetHandleInfo(device_handle, &handle_info) != HND_DEVICE) {
+		line = __LINE__;
+		ret = GENA_E_BAD_HANDLE;
+	} else {
+		service = FindServiceId(&handle_info->ServiceTable, servId, UDN);
+		if (service != NULL) {
+			finger = GetFirstSubscription(service);
+			while (finger) {
+				thread_struct = (notify_thread_struct *)malloc(sizeof (notify_thread_struct));
+				if (thread_struct == NULL) {
+					line = __LINE__;
+					ret = UPNP_E_OUTOF_MEMORY;
+					break;
+				}
 
-    headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
-        strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
-        strlen( "NT: upnp:event\r\n" ) +
-        strlen( "NTS: upnp:propchange\r\n" ) + 1;
+				(*reference_count)++;
+				thread_struct->reference_count = reference_count;
+				thread_struct->UDN = UDN_copy;
+				thread_struct->servId = servId_copy;
+				thread_struct->headers = headers;
+				thread_struct->propertySet = propertySet;
+				strcpy(thread_struct->sid, finger->sid);
+				thread_struct->eventKey = finger->eventKey++;
+				thread_struct->device_handle = device_handle;
+				/* if overflow, wrap to 1 */
+				if (finger->eventKey < 0) {
+					finger->eventKey = 1;
+				}
 
-    headers = ( char * )malloc( headers_size );
-    if( headers == NULL ) {
-        free( UDN_copy );
-        free( servId_copy );
-        ixmlFreeDOMString( propertySet );
-        free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
-    }
-    //changed to add null terminator at end of content
-    //content length = (length in bytes of property set) + null char
-    sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: %ld\r\nNT:"
-             " upnp:event\r\nNTS: upnp:propchange\r\n",
-             (long) strlen( propertySet ) + 1 );
 
-    HandleLock();
+				TPJobInit(&job, (start_routine)genaNotifyThread, thread_struct);
+				TPJobSetFreeFunction(&job, (free_routine)free_notify_struct);
+				TPJobSetPriority(&job, MED_PRIORITY);
+				ret = ThreadPoolAdd(&gSendThreadPool, &job, NULL);
+				if (ret != 0) {
+					line = __LINE__;
+					if (ret == EOUTOFMEM) {
+						line = __LINE__;
+						ret = UPNP_E_OUTOF_MEMORY;
+					}
+					break;
+				}
 
-    if( GetHandleInfo( device_handle, &handle_info ) != HND_DEVICE ) {
-        return_code = GENA_E_BAD_HANDLE;
-    } else {
-        if( ( service = FindServiceId( &handle_info->ServiceTable,
-                                       servId, UDN ) ) != NULL ) {
-            finger = GetFirstSubscription( service );
+				finger = GetNextSubscription(service, finger);
+			}
+		} else {
+			line = __LINE__;
+			ret = GENA_E_BAD_SERVICE;
+		}
+	}
 
-            while( finger ) {
-                thread_struct =
-                    ( notify_thread_struct * )
-                    malloc( sizeof( notify_thread_struct ) );
-                if( thread_struct == NULL ) {
-                    return_code = UPNP_E_OUTOF_MEMORY;
-                    break;
-                }
-                ( *reference_count )++;
-                thread_struct->reference_count = reference_count;
-                thread_struct->UDN = UDN_copy;
-                thread_struct->servId = servId_copy;
-                thread_struct->headers = headers;
-                thread_struct->propertySet = propertySet;
-                strcpy( thread_struct->sid, finger->sid );
-                thread_struct->eventKey = finger->eventKey++;
-                thread_struct->device_handle = device_handle;
-                //if overflow, wrap to 1
-                if( finger->eventKey < 0 ) {
-                    finger->eventKey = 1;
-                }
+ExitFunction:
+	if (ret != GENA_SUCCESS || *reference_count == 0) {
+		free(headers);
+		ixmlFreeDOMString(propertySet);
+		free(servId_copy);
+		free(UDN_copy);
+		free(reference_count);
+	}
 
-                TPJobInit( &job, ( start_routine ) genaNotifyThread,
-                           thread_struct );
-                TPJobSetFreeFunction( &job,
-                                      ( free_routine )
-                                      free_notify_struct );
-                TPJobSetPriority( &job, MED_PRIORITY );
+	HandleUnlock();
 
-                if( ( return_code =
-                      ThreadPoolAdd( &gSendThreadPool, &job, NULL ) )
-                    != 0 ) {
-                    if( return_code == EOUTOFMEM ) {
-                        return_code = UPNP_E_OUTOF_MEMORY;
-                        break;
-                    }
-                }
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, line,
+		"GENA END NOTIFY ALL, ret = %d",
+		ret);
 
-                finger = GetNextSubscription( service, finger );
-
-            }
-        } else {
-            return_code = GENA_E_BAD_SERVICE;
-        }
-    }
-
-    if( ( *reference_count ) == 0 ) {
-        free( reference_count );
-        free( headers );
-        ixmlFreeDOMString( propertySet );
-        free( UDN_copy );
-        free( servId_copy );
-    }
-    HandleUnlock();
-
-    return return_code;
+	return ret;
 }
 
-/****************************************************************************
-*	Function :	respond_ok
-*
-*	Parameters :
-*			IN SOCKINFO *info :	socket connection of request
-*			IN int time_out : accepted duration
-*			IN subscription *sub : accepted subscription
-*			IN http_message_t* request : http request
-*
-*	Description : Function to return OK message in the case 
-*		of a subscription request.
-*
-*	Return :	static int
-*		returns UPNP_E_SUCCESS if successful else returns appropriate error
-*	Note :
-****************************************************************************/
-static int
-respond_ok( IN SOCKINFO * info,
-            IN int time_out,
-            IN subscription * sub,
-            IN http_message_t * request )
+
+/*!
+ * \brief Returns OK message in the case of a subscription request.
+ *
+ * \return UPNP_E_SUCCESS if successful, otherwise the appropriate error code.
+ */
+static int respond_ok(
+	/*! [in] Socket connection of request. */
+	IN SOCKINFO *info,
+	/*! [in] Accepted duration. */
+	IN int time_out,
+	/*! [in] Accepted subscription. */
+	IN subscription *sub,
+	/*! [in] Http request. */
+	IN http_message_t *request)
 {
-    int major,
-      minor;
+    int major;
+    int minor;
     membuffer response;
     int return_code;
     char timeout_str[100];
@@ -1148,28 +1080,22 @@ respond_ok( IN SOCKINFO * info,
     return return_code;
 }
 
-/****************************************************************************
-*	Function :	create_url_list
-*
-*	Parameters :
-*				IN memptr* url_list :	
-*				OUT URL_list *out :	
-*
-*	Description :	Function to parse the Callback header value in 
-*		subscription requests takes in a buffer containing URLS delimited by 
-*		'<' and '>'. The entire buffer is copied into dynamic memory
-*		and stored in the URL_list. Pointers to the individual urls within 
-*		this buffer are allocated and stored in the URL_list. Only URLs with 
-*		network addresses are considered(i.e. host:port or domain name)
-*
-*	Return :	int
-*		if successful returns the number of URLs parsed 
-*		else UPNP_E_OUTOF_MEMORY
-*	Note :
-****************************************************************************/
-static int
-create_url_list( IN memptr * url_list,
-                 OUT URL_list * out )
+
+/*!
+ * \brief Function to parse the Callback header value in subscription requests.
+ *
+ * Takes in a buffer containing URLS delimited by '<' and '>'. The entire buffer
+ * is copied into dynamic memory and stored in the URL_list. Pointers to the
+ * individual urls within this buffer are allocated and stored in the URL_list.
+ * Only URLs with network addresses are considered (i.e. host:port or domain name).
+ *
+ * \return The number of URLs parsed if successful, otherwise UPNP_E_OUTOF_MEMORY.
+ */
+static int create_url_list(
+	/*! [in] . */
+	IN memptr *url_list,
+	/*! [out] . */
+	OUT URL_list *out)
 {
     int URLcount = 0;
     int i;
@@ -1241,19 +1167,7 @@ create_url_list( IN memptr * url_list,
     return URLcount;
 }
 
-/****************************************************************************
- * Function: gena_process_subscription_request
- *
- * Parameters:
- *	IN SOCKINFO *info:	socket info of the device 
- *	IN http_message_t* request: 
- *				SUBSCRIPTION request from the control point
- *
- * Description: This function handles a subscription request from a 
- * 	ctrl point. The socket is not closed on return.
- *
- * Return: void
- ****************************************************************************/
+
 void gena_process_subscription_request(
 	IN SOCKINFO *info,
 	IN http_message_t *request)
@@ -1436,24 +1350,10 @@ exit_function:
 	UpnpSubscriptionRequest_delete(request_struct);
 }
 
-/****************************************************************************
-*	Function :	gena_process_subscription_renewal_request
-*
-*	Parameters :
-*		IN SOCKINFO *info :	socket info of the device
-*		IN http_message_t* request : subscription renewal request from the 
-*									control point
-*
-*	Description :	This function handles a subscription renewal request 
-*		from a ctrl point. The connection is not destroyed on return.
-*
-*	Return :	void
-*
-*	Note :
-****************************************************************************/
-void
-gena_process_subscription_renewal_request( IN SOCKINFO * info,
-                                           IN http_message_t * request )
+
+void gena_process_subscription_renewal_request(
+	IN SOCKINFO *info,
+	IN http_message_t *request)
 {
     Upnp_SID sid;
     subscription *sub;
@@ -1562,24 +1462,10 @@ gena_process_subscription_renewal_request( IN SOCKINFO * info,
     HandleUnlock();
 }
 
-/****************************************************************************
-*	Function :	gena_process_unsubscribe_request
-*
-*	Parameters :
-*			IN SOCKINFO *info :	socket info of the device
-*			IN http_message_t* request : UNSUBSCRIBE request from the control 
-*											point
-*
-*	Description : This function Handles a subscription cancellation request 
-*		from a ctrl point. The connection is not destroyed on return.
-*
-*	Return :	void
-*
-*	Note :
-****************************************************************************/
-void
-gena_process_unsubscribe_request( IN SOCKINFO * info,
-                                  IN http_message_t * request )
+
+void gena_process_unsubscribe_request(
+	IN SOCKINFO *info,
+	IN http_message_t *request)
 {
     Upnp_SID sid;
     service_info *service;
@@ -1635,11 +1521,13 @@ gena_process_unsubscribe_request( IN SOCKINFO * info,
         return;
     }
 
-    RemoveSubscriptionSID( sid, service );
-    error_respond( info, HTTP_OK, request );    // success
+    RemoveSubscriptionSID(sid, service);
+    error_respond(info, HTTP_OK, request);    // success
 
     HandleUnlock();
 }
 
-#endif // INCLUDE_DEVICE_APIS
-#endif // EXCLUDE_GENA
+
+#endif /* INCLUDE_DEVICE_APIS */
+#endif /* EXCLUDE_GENA */
+
