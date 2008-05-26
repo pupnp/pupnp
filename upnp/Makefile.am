@@ -123,20 +123,23 @@ libupnp_la_SOURCES += \
 	src/gena/gena_callback2.c
 
 # api
-libupnp_la_SOURCES += src/api/ActionComplete.c
-libupnp_la_SOURCES += src/api/ActionRequest.c
-libupnp_la_SOURCES += src/api/Discovery.c
-libupnp_la_SOURCES += src/api/Event.c
-libupnp_la_SOURCES += src/api/EventSubscribe.c
-libupnp_la_SOURCES += src/api/FileInfo.c
-libupnp_la_SOURCES += src/api/StateVarComplete.c
-libupnp_la_SOURCES += src/api/StateVarRequest.c
-libupnp_la_SOURCES += src/api/SubscriptionRequest.c
-libupnp_la_SOURCES += src/api/UpnpString.c
-libupnp_la_SOURCES += src/api/upnpapi.c
+libupnp_la_SOURCES += \
+	src/api/ActionComplete.c \
+	src/api/ActionRequest.c \
+	src/api/Discovery.c \
+	src/api/Event.c \
+	src/api/EventSubscribe.c \
+	src/api/FileInfo.c \
+	src/api/StateVarComplete.c \
+	src/api/StateVarRequest.c \
+	src/api/SubscriptionRequest.c \
+	src/api/UpnpString.c \
+	src/api/upnpapi.c
+
 if ENABLE_TOOLS
 libupnp_la_SOURCES += src/api/upnptools.c
 endif
+
 if ENABLE_DEBUG
 libupnp_la_SOURCES += src/api/upnpdebug.c 
 endif
@@ -153,6 +156,12 @@ libupnp_la_SOURCES += \
 libupnp_la_SOURCES += src/urlconfig/urlconfig.c
 
 
+# inet_pton (needed on Win32, compiles to nothing elsewhere)
+libupnp_la_SOURCES += \
+	src/inet_pton.c \
+	src/inc/inet_pton.h
+
+
 # check / distcheck tests
 check_PROGRAMS = test_init
 TESTS = test_init
@@ -161,8 +170,6 @@ test_init_SOURCES = test/test_init.c
 
 EXTRA_DIST = \
 	LICENSE \
-	src/inc/inet_pton.h \
-	src/inet_pton.c \
 	src/win_dll.c
 
 
