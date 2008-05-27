@@ -486,6 +486,12 @@ int genaInitNotify(
 		"FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s", sid);
 	sub->active = 1;
 
+	if (var_count <= 0) {
+		line = __LINE__;
+		ret = GENA_SUCCESS;
+		goto ExitFunction;
+	}
+
 	ret = GeneratePropertySet(VarNames, VarValues, var_count, &propertySet );
 	if (ret != XML_SUCCESS) {
 		line = __LINE__;
@@ -548,7 +554,7 @@ int genaInitNotify(
 	}
 
 ExitFunction:
-	if (ret != GENA_SUCCESS) {
+	if (ret != GENA_SUCCESS || var_count <= 0) {
 		free(thread_struct);
 		free(headers);
 		ixmlFreeDOMString(propertySet);
@@ -646,6 +652,12 @@ int genaInitNotifyExt(
 		"FOUND SUBSCRIPTION IN INIT NOTIFY EXT: SID %s", sid);
 	sub->active = 1;
 
+	if (PropSet == 0) {
+		line = __LINE__;
+		ret = GENA_SUCCESS;
+		goto ExitFunction;
+	}
+
 	propertySet = ixmlPrintNode((IXML_Node *)PropSet);
 	if( propertySet == NULL ) {
 		line = __LINE__;
@@ -709,7 +721,7 @@ int genaInitNotifyExt(
 	}
 
 ExitFunction:
-	if (ret != GENA_SUCCESS) {
+	if (ret != GENA_SUCCESS || PropSet == 0) {
 		free(thread_struct);
 		free(headers);
 		ixmlFreeDOMString(propertySet);

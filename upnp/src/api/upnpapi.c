@@ -2249,12 +2249,15 @@ int UpnpAcceptSubscription(
 		ret = UPNP_E_INVALID_PARAM;
 		goto ExitFunction;
 	}
+	/* Now accepts an empty state list, so the code below is commented out */
+#if 0
 	if (VarName == NULL || NewVal == NULL || cVariables < 0) {
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto ExitFunction;
 	}
+#endif
 
 	HandleUnlock();
 
@@ -2342,13 +2345,15 @@ int UpnpAcceptSubscriptionExt(
 		ret = UPNP_E_INVALID_PARAM;
 		goto ExitFunction;
 	}
-
+	/* Now accepts an empty state list, so the code below is commented out */
+#if 0
 	if (PropSet == NULL) {
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto ExitFunction;
 	}
+#endif
 
 	HandleUnlock();
 
