@@ -2,6 +2,10 @@
 Version 1.8.0
 *******************************************************************************
 
+2008-05-31 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Charles Nepveu's suggestion of not allocating a thread for
+	MiniServer when it is not compiled.
+
 2008-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 1903069 ]
 	Subs (not services) not marked 'active'
