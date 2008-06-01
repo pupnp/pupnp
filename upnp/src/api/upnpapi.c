@@ -3248,23 +3248,12 @@ int UpnpDownloadXmlDoc(const char *url, IXML_Document **xmlDoc)
 
 //----------------------------------------------------------------------------
 //
-//                          UPNP-API  Internal function implementation
+//                UPNP-API  Internal function implementation
 //
 //----------------------------------------------------------------------------
 
 #ifdef WIN32
-/****************************************************************************
- * Function: WinsockInit
- *
- * Parameters:	NONE
- *
- * Description: (Windows Only)
- *	Initializes the Windows Winsock library.
- *
- * Return Values:
- *	UPNP_E_SUCCESS on success, UPNP_E_INIT_FAILED on failure.
- *****************************************************************************/
-int WinsockInit( void )
+int WinsockInit()
 {
 	WORD wVersionRequested;
 	WSADATA wsaData;
@@ -3297,22 +3286,6 @@ int WinsockInit( void )
 #endif
 
 
-/****************************************************************************
- * Function: UpnpInitPreamble
- *
- * Parameters: (none)
- *
- * Description:
- *   This function performs the initial steps in initializing the UPnP SDK.
- *   - Winsock library is initialized for the process (Windows specific).
- *   - The logging (for debug messages) is initialized.
- *   - Mutexes, Handle table and thread pools are allocated and initialized.
- *   - Callback functions for SOAP and GENA are set, if they're enabled.
- *   - The SDK timer thread is initialized.
- *
- * Returns:
- *	UPNP_E_SUCCESS on success
- *****************************************************************************/
 int UpnpInitPreamble()
 {
     uuid_upnp nls_uuid;
@@ -3377,19 +3350,7 @@ int UpnpInitPreamble()
 }
 
 
-/****************************************************************************
- * Function: UpnpInitMutexes
- *
- * Parameters: (none)
- *
- * Description:
- *   This function initializes the global mutexes used by the UPnP SDK.
- *
- * Returns:
- *	UPNP_E_SUCCESS on success
- *  UPNP_E_INIT_FAILED if a mutex could not be initialized.
- *****************************************************************************/
-int UpnpInitMutexes( void )
+int UpnpInitMutexes()
 {
 #ifdef __CYGWIN__
     /* On Cygwin, pthread_mutex_init() fails without this memset. */
@@ -3413,124 +3374,79 @@ int UpnpInitMutexes( void )
 }
 
 
-/****************************************************************************
- * Function: UpnpInitThreadPools
- *
- * Parameters: (none)
- *
- * Description:
- *   This function initializes the global threadm pools used by the UPnP SDK.
- *
- * Returns:
- *	UPNP_E_SUCCESS on success
- *  UPNP_E_INIT_FAILED if a mutex could not be initialized.
- *****************************************************************************/
-int UpnpInitThreadPools( void )
+int UpnpInitThreadPools()
 {
-    ThreadPoolAttr attr;
+	int ret = UPNP_E_SUCCESS;
+	ThreadPoolAttr attr;
 
-    TPAttrInit( &attr );
-    TPAttrSetMaxThreads( &attr, MAX_THREADS );
-    TPAttrSetMinThreads( &attr, MIN_THREADS );
-    TPAttrSetJobsPerThread( &attr, JOBS_PER_THREAD );
-    TPAttrSetIdleTime( &attr, THREAD_IDLE_TIME );
-    TPAttrSetMaxJobsTotal( &attr, MAX_JOBS_TOTAL );
+	TPAttrInit(&attr);
+	TPAttrSetMaxThreads(&attr, MAX_THREADS);
+	TPAttrSetMinThreads(&attr, MIN_THREADS);
+	TPAttrSetJobsPerThread(&attr, JOBS_PER_THREAD);
+	TPAttrSetIdleTime(&attr, THREAD_IDLE_TIME);
+	TPAttrSetMaxJobsTotal(&attr, MAX_JOBS_TOTAL);
 
-    if( ThreadPoolInit( &gSendThreadPool, &attr ) != UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        UpnpFinish();
-        return UPNP_E_INIT_FAILED;
-    }
+	if (ThreadPoolInit(&gSendThreadPool, &attr) != UPNP_E_SUCCESS) {
+		ret = UPNP_E_INIT_FAILED;
+		goto ExitFunction;
+	}
 
-    if( ThreadPoolInit( &gRecvThreadPool, &attr ) != UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        UpnpFinish();
-        return UPNP_E_INIT_FAILED;
-    }
+	if (ThreadPoolInit(&gRecvThreadPool, &attr) != UPNP_E_SUCCESS) {
+		ret = UPNP_E_INIT_FAILED;
+		goto ExitFunction;
+	}
 
-    if( ThreadPoolInit( &gMiniServerThreadPool, &attr ) != UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        UpnpFinish();
-        return UPNP_E_INIT_FAILED;
-    }
-    return UPNP_E_SUCCESS;
+	if (ThreadPoolInit(&gMiniServerThreadPool, &attr) != UPNP_E_SUCCESS) {
+		ret = UPNP_E_INIT_FAILED;
+		goto ExitFunction;
+	}
+
+ExitFunction:
+	if (ret != UPNP_E_SUCCESS) {
+		UpnpSdkInit = 0;
+		UpnpFinish();
+	}
+
+	return ret;
 }
 
 
-/****************************************************************************
- * Function: UpnpInitStartServers
- *
- * Parameters:
- *	IN short DestPort: Local Port to listen for incoming connections
- *
- * Description:
- *  This function finishes initializing the UPnP SDK.
- *  - The MiniServer is started, if enabled.
- *  - The WebServer is started, if enabled.
- *
- * Returns:
- *	UPNP_E_SUCCESS on success
- *  UPNP_E_INIT_FAILED if a mutex could not be initialized.
- *****************************************************************************/
-int UpnpInitStartServers( IN unsigned short DestPort )
+int UpnpInitStartServers(IN unsigned short DestPort)
 {
-    int retVal = 0;
+	int retVal = 0;
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Entering UpnpInitStartServers\n" );
+	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+		"Entering UpnpInitStartServers\n" );
 
 #if EXCLUDE_MINISERVER == 0
-    LOCAL_PORT_V4 = DestPort;
-    LOCAL_PORT_V6 = DestPort;
-    retVal = StartMiniServer( &LOCAL_PORT_V4, &LOCAL_PORT_V6 );
-    if( retVal != UPNP_E_SUCCESS ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-            "Miniserver failed to start" );
-        UpnpFinish();
-        return retVal;
-    }
+	LOCAL_PORT_V4 = DestPort;
+	LOCAL_PORT_V6 = DestPort;
+	retVal = StartMiniServer(&LOCAL_PORT_V4, &LOCAL_PORT_V6);
+	if (retVal != UPNP_E_SUCCESS) {
+		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+			"Miniserver failed to start");
+		UpnpFinish();
+		return retVal;
+	}
 #endif
 
 #if EXCLUDE_WEB_SERVER == 0
-    membuffer_init( &gDocumentRootDir );
-    retVal = UpnpEnableWebserver( WEB_SERVER_ENABLED );
-    if( retVal != UPNP_E_SUCCESS ) {
-        UpnpFinish();
-        return retVal;
-    }
+	membuffer_init(&gDocumentRootDir);
+	retVal = UpnpEnableWebserver(WEB_SERVER_ENABLED);
+	if (retVal != UPNP_E_SUCCESS) {
+		UpnpFinish();
+		return retVal;
+	}
 #endif
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Exiting UpnpInitStartServers\n" );
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+		"Exiting UpnpInitStartServers\n");
 
-    return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 
 
-/**************************************************************************
- * Function: UpnpGetIfInfo 
- *
- * Parameters:
- *  char * IfName: Interface name (can be NULL).
- *  
- * Description:
- *	This function will retrieve interface information and keep it in global
- *  variables. If NULL, we'll find the first suitable interface for 
- *  operation.
- *  The interface must fulfill these requirements:
- *  - Be UP.
- *  - Not be LOOPBACK.
- *  - Support MULTICAST.
- *  - Have a valid IPv4 or IPv6 address.
- *  We'll retrieve the following information from the interface:
- *  - gIF_NAME -> Interface name (by input or found).
- *  - gIF_IPV4 -> IPv4 address (if any).
- *  - gIF_IPV6 -> IPv6 address (if any).
- *  - gIF_INDEX -> Interface index number.
- *
- * Return Values:
- *  UPNP_E_SUCCESS on success
- *      
- ***************************************************************************/
-int UpnpGetIfInfo( const char * IfName )
+int UpnpGetIfInfo(const char *IfName)
 {
 #ifdef WIN32
     // ----------------------------------------------------
@@ -3548,7 +3464,9 @@ int UpnpGetIfInfo( const char * IfName )
     int valid_addr_found = 0;
 
     // Get Adapters addresses required size.
-    ret = GetAdaptersAddresses( AF_UNSPEC, GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_DNS_SERVER, NULL, adapts, &adapts_sz );
+    ret = GetAdaptersAddresses(AF_UNSPEC,
+        GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_DNS_SERVER,
+	NULL, adapts, &adapts_sz );
     if( ret != ERROR_BUFFER_OVERFLOW ) {
         UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
             "GetAdaptersAddresses failed to find list of adapters\n" );
@@ -3562,7 +3480,9 @@ int UpnpGetIfInfo( const char * IfName )
     }
 
     // Do the call that will actually return the info.
-    ret = GetAdaptersAddresses( AF_UNSPEC, GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_DNS_SERVER, NULL, adapts, &adapts_sz );
+    ret = GetAdaptersAddresses( AF_UNSPEC,
+	GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_DNS_SERVER,
+	NULL, adapts, &adapts_sz );
     if( ret != ERROR_SUCCESS ) {
         free( adapts );
         UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
@@ -3854,20 +3774,11 @@ int UpnpGetIfInfo( const char * IfName )
 }
 
 
-/**************************************************************************
- * Function: UpnpThreadDistribution 
- *
- * Parameters:	
- *  
- * Description:
- *	Function to schedule async functions in threadpool.
- *
- * Return Values: VOID
- *      
- ***************************************************************************/
+/*!
+ * \brief Schedule async functions in threadpool.
+ */
 #ifdef INCLUDE_CLIENT_APIS
-void
-UpnpThreadDistribution(struct UpnpNonblockParam *Param)
+void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 {
 	int errCode = 0;
 
@@ -3959,36 +3870,21 @@ UpnpThreadDistribution(struct UpnpNonblockParam *Param)
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting UpnpThreadDistribution \n" );
 
-}  /****************** End of UpnpThreadDistribution  *********************/
+}
 #endif // INCLUDE_CLIENT_APIS
 
-/**************************************************************************
- * Function: GetCallBackFn 
+
+/*!
+ * \brief Get callback function ptr from a handle.
  *
- * Parameters:	
- *  
- * Description:
- *	This function is to get callback function ptr from a handle
- *
- * Return Values: Upnp_FunPtr
- *      
- ***************************************************************************/
+ * \return Upnp_FunPtr
+ */
 Upnp_FunPtr GetCallBackFn(UpnpClient_Handle Hnd)
 {
 	return ((struct Handle_Info *)HandleTable[Hnd])->Callback;
 }
 
-/**************************************************************************
- * Function: InitHandleList 
- *
- * Parameters:
- *  
- * Description:
- *	This function is to initialize handle table
- *
- * Return Values:
- *      
- ***************************************************************************/
+
 void InitHandleList()
 {
 	int i;
@@ -3998,19 +3894,7 @@ void InitHandleList()
 	}
 }
 
-/**************************************************************************
- * Function: GetFreeHandle 
- *
- * Parameters:
- *  
- * Description:
- *	This function is to get a free handle
- *
- * Return Values:
- * 	integer greater than zero
- * 	UPNP_E_OUTOF_HANDLE
- *      
- ***************************************************************************/
+
 int GetFreeHandle()
 {
 	/* Handle 0 is not used as NULL translates to 0 when passed as a handle */
@@ -4027,23 +3911,8 @@ int GetFreeHandle()
 	}
 }
 
-/**************************************************************************
- * Function: GetClientHandleInfo 
- *
- * Parameters:	
- *	IN UpnpClient_Handle *client_handle_out: client handle pointer ( key 
- *		for the client handle structure).
- *	OUT struct Handle_Info **HndInfo: Client handle structure passed by 
- *		this function.
- *
- * Description:
- *  NOTE: The logic around the use of this function should be revised.
- *	This function is to get client handle info
- *
- *  Return Values: HND_CLIENT, HND_INVALID
- *      
- ***************************************************************************/
-//Assumes at most one client
+
+/* Assumes at most one client */
 Upnp_Handle_Type GetClientHandleInfo(
 	IN UpnpClient_Handle *client_handle_out,
 	OUT struct Handle_Info **HndInfo)
@@ -4064,63 +3933,33 @@ Upnp_Handle_Type GetClientHandleInfo(
 	return ret;
 }
 
-/**************************************************************************
- * Function: GetDeviceHandleInfo
- *  Retrieves the device handle and information of the first device of the
- *  address family spcified.
- *
- * Parameters:
- *	IN int AddressFamily: 
- * 	OUT UpnpDevice_Handle * device_handle_out: device handle pointer
- *	OUT struct Handle_Info **HndInfo:
- *		Device handle structure passed by this function.
- *  
- *  Description:
- *		This function is to get device handle info.
- *
- *  Return Values: HND_DEVICE or HND_INVALID
- *      
- ***************************************************************************/
+
 Upnp_Handle_Type GetDeviceHandleInfo(
 	const int AddressFamily,
 	UpnpDevice_Handle *device_handle_out,
 	struct Handle_Info **HndInfo)
 {
-    // Check if we've got a registered device of the address family specified.
-    if( (AddressFamily == AF_INET  && UpnpSdkDeviceRegisteredV4 == 0) ||
-        (AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 0) ) {
-        *device_handle_out = -1;
-        return HND_INVALID;
-    }
+	// Check if we've got a registered device of the address family specified.
+	if ((AddressFamily == AF_INET  && UpnpSdkDeviceRegisteredV4 == 0) ||
+	    (AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 0)) {
+		*device_handle_out = -1;
+		return HND_INVALID;
+	}
 
-    // Find it.
-    for( *device_handle_out=1; *device_handle_out < NUM_HANDLE; (*device_handle_out)++ ) {
-        if( GetHandleInfo( *device_handle_out, HndInfo ) == HND_DEVICE ) {
-            if( (*HndInfo)->DeviceAf == AddressFamily ) {
-                return HND_DEVICE;
-            }
-        }
-    }
+	// Find it.
+	for (*device_handle_out=1; *device_handle_out < NUM_HANDLE; (*device_handle_out)++) {
+		if (GetHandleInfo(*device_handle_out, HndInfo) == HND_DEVICE) {
+			if ((*HndInfo)->DeviceAf == AddressFamily) {
+				return HND_DEVICE;
+			}
+		}
+	}
 
-    *device_handle_out = -1;
-    return HND_INVALID;
+	*device_handle_out = -1;
+	return HND_INVALID;
 }
 
-/**************************************************************************
- * Function: GetDeviceHandleInfo 
- *
- * Parameters:	
- * 	IN UpnpClient_Handle * device_handle_out: handle pointer
- * 		(key for the client handle structure).
- *	OUT struct Handle_Info **HndInfo: handle structure passed by
- *		this function.
- *  
- * Description:
- *	This function is to get  handle info.
- *
- * Return Values: HND_DEVICE, UPNP_E_INVALID_HANDLE
- *      
- ***************************************************************************/
+
 Upnp_Handle_Type GetHandleInfo(
 	UpnpClient_Handle Hnd,
 	struct Handle_Info **HndInfo)
@@ -4147,19 +3986,7 @@ Upnp_Handle_Type GetHandleInfo(
 	return ret;
 }
 
-/**************************************************************************
- * Function: FreeHandle 
- *
- * Parameters:	
- * 	IN int Upnp_Handle: handle index 
- *  
- * Description:
- *	This function is to to free handle info.
- *	
- * Return Values: int
- *	UPNP_E_SUCCESS if successful
- *	UPNP_E_INVALID_HANDLE if not.
- ***************************************************************************/
+
 int FreeHandle(int Upnp_Handle)
 {
 	int ret = UPNP_E_INVALID_HANDLE;
@@ -4188,19 +4015,14 @@ int FreeHandle(int Upnp_Handle)
 }
 
 
-/**************************************************************************
- * Function: PrintHandleInfo 
- *
- * Parameters:	
- *	IN UpnpClient_Handle Hnd: handle index 
- *  
- * Description:
- *	This function is to print handle info.
+/*!
+ * \brief Print handle info.
  *	
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else return appropriate error
- ***************************************************************************/
-int PrintHandleInfo( IN UpnpClient_Handle Hnd )
+ * \return UPNP_E_SUCCESS if successful, otherwise returns appropriate error.
+ */
+int PrintHandleInfo(
+	/*! [in] Handle index. */
+	IN UpnpClient_Handle Hnd)
 {
     struct Handle_Info * HndInfo;
     if (HandleTable[Hnd] != NULL) {
@@ -4248,36 +4070,7 @@ void printNodes( IXML_Node * tmpRoot, int depth )
     }
 }
 
-   /****************** End of printNodes *********************/
 
-    //********************************************************
-    //* Name: getlocalhostname
-    //* Description:  Function to get local IP address
-    //*               Gets the ip address for the DEFAULT_INTERFACE 
-    //*               interface which is up and not a loopback
-    //*               assumes at most MAX_INTERFACES interfaces
-    //* Called by:    UpnpInit
-    //* In:           char *out
-    //* Out:          Ip address
-    //* Return codes: UPNP_E_SUCCESS
-    //* Error codes:  UPNP_E_INIT
-    //********************************************************
-
- /**************************************************************************
- * Function: getlocalhostname 
- *
- * Parameters:	
- * 	OUT char *out: IP address of the interface.
- *	IN int out_len: Length of the output buffer.
- *  
- * Description:
- *	This function is to get local IP address. It gets the ip address for 
- *	the DEFAULT_INTERFACE interface which is up and not a loopback
- *	assumes at most MAX_INTERFACES interfaces
- *
- *  Return Values: int
- *	UPNP_E_SUCCESS if successful else return appropriate error
- ***************************************************************************/
 int getlocalhostname(OUT char *out, IN const int out_len)
 {
 #ifdef WIN32
@@ -4406,19 +4199,6 @@ int getlocalhostname(OUT char *out, IN const int out_len)
 
 #ifdef INCLUDE_DEVICE_APIS
 #if EXCLUDE_SSDP == 0
-/**************************************************************************
- * Function: AutoAdvertise 
- *
- * Parameters:	
- * 	IN void *input: information provided to the thread.
- *  
- * Description:
- *	This function is a timer thread scheduled by UpnpSendAdvertisement 
- *	to the send advetisement again. 
- *
- * Return Values: VOID
- *     
- ***************************************************************************/
 void AutoAdvertise(void *input)
 {
 	upnp_timeout *event = (upnp_timeout *)input;
@@ -4432,28 +4212,23 @@ void AutoAdvertise(void *input)
 
 #ifdef INTERNAL_WEB_SERVER
 
-/**************************************************************************
- * Function: UpnpSetWebServerRootDir
+/*!
+ * \brief Sets the document root directory for the internal web server.
  *
- * Parameters:	
- *	IN const char* rootDir:Path of the root directory of the web server. 
- *  
- * Description:
- *	This function sets the document root directory for
- *	the internal web server. This directory is considered the
- *	root directory (i.e. "/") of the web server.
- *	This function also activates or deactivates the web server.
- *	To disable the web server, pass NULL for rootDir to 
- *	activate, pass a valid directory string.
- *  
- *	Note that this function is not available when the web server is not
- *	compiled into the UPnP Library.
+ * This directory is considered the root directory (i.e. "/") of the web server.
+ * This function also activates or deactivates the web server.
  *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else returns appropriate error
- ***************************************************************************/
-int
-UpnpSetWebServerRootDir( IN const char *rootDir )
+ * To disable the web server, pass NULL for rootDir, to activate pass a valid
+ * directory string.
+ *  
+ * \note This function is not available when the web server is not compiled
+ * 	into the UPnP Library.
+ *
+ * \return UPNP_E_SUCCESS if successful else returns appropriate error.
+ */
+int UpnpSetWebServerRootDir(
+	/* [in] Path of the root directory of the web server. */
+	IN const char *rootDir)
 {
     if( UpnpSdkInit == 0 )
         return UPNP_E_FINISH;
@@ -4466,34 +4241,26 @@ UpnpSetWebServerRootDir( IN const char *rootDir )
     return ( web_server_set_root_dir( rootDir ) );
 }
 #endif // INTERNAL_WEB_SERVER
-/*
- *************************** */
 
- /**************************************************************************
- * Function: UpnpAddVirtualDir 
+
+/*!
+ * \brief Adds a virtual directory mapping.
  *
- * Parameters:	
- *	IN const char *newDirName:The name of the new directory mapping to add.
+ * All webserver requests containing the given directory are read using
+ * functions contained in a VirtualDirCallbacks structure registered
+ * via UpnpSetVirtualDirCallbacks.
  *  
- * Description:
- *	This function adds a virtual directory mapping.
+ * \note This function is not available when the web server is not
+ * 	compiled into the UPnP Library.
  *
- *	All webserver requests containing the given directory are read using
- *	functions contained in a VirtualDirCallbacks structure registered
- *	via UpnpSetVirtualDirCallbacks.
- *  
- *	Note that this function is not available when the web server is not
- *	compiled into the UPnP Library.
- *
- *  Return Values: int
- *     UPNP_E_SUCCESS if successful else returns appropriate error
- ***************************************************************************/
-int
-UpnpAddVirtualDir( IN const char *newDirName )
+ * \return UPNP_E_SUCCESS if successful else returns appropriate error.
+ */
+int UpnpAddVirtualDir(
+	/* [in] The name of the new directory mapping to add. */
+	IN const char *newDirName)
 {
-
-    virtualDirList *pNewVirtualDir,
-     *pLast;
+    virtualDirList *pNewVirtualDir;
+    virtualDirList *pLast;
     virtualDirList *pCurVirtualDir;
     char dirName[NAME_SIZE];
 
@@ -4545,20 +4312,15 @@ UpnpAddVirtualDir( IN const char *newDirName )
     return UPNP_E_SUCCESS;
 }
 
- /**************************************************************************
- * Function: UpnpRemoveVirtualDir 
+
+/*!
+ * \brief Removes a virtual directory mapping.
  *
- * Parameters:	
- * 	IN const char *newDirName:The name of the directory mapping to remove.
- *  
- * Description:
- *	This function removes a virtual directory mapping.
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else returns appropriate error
- ***************************************************************************/
-int
-UpnpRemoveVirtualDir( IN const char *dirName )
+ * \return UPNP_E_SUCCESS if successful else returns appropriate error.
+ */
+int UpnpRemoveVirtualDir(
+	/* [in] The name of the directory mapping to remove. */
+	IN const char *dirName)
 {
 
     virtualDirList *pPrev;
@@ -4610,21 +4372,12 @@ UpnpRemoveVirtualDir( IN const char *dirName )
 
 }
 
- /**************************************************************************
- * Function: UpnpRemoveAllVirtualDirs 
- *
- * Parameters: VOID
- *  
- * Description:
- *	This function removes all the virtual directory mappings.
- *
- * Return Values: VOID
- *     
- ***************************************************************************/
-void
-UpnpRemoveAllVirtualDirs()
-{
 
+/*!
+ * \brief Removes all the virtual directory mappings.
+ */
+void UpnpRemoveAllVirtualDirs()
+{
     virtualDirList *pCur;
     virtualDirList *pNext;
 
@@ -4645,21 +4398,16 @@ UpnpRemoveAllVirtualDirs()
 
 }
 
- /**************************************************************************
- * Function: UpnpEnableWebserver 
+
+/*!
+ * \brief Enables or disables the webserver. A value of TRUE enables the
+ * 	webserver, FALSE disables it.
  *
- * Parameters:	
- *	IN int enable: TRUE to enable, FALSE to disable.
- *  
- * Description:
- *	This function enables or disables the webserver.  A value of
- *	TRUE enables the webserver, FALSE disables it.
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else returns appropriate error
- ***************************************************************************/
-int
-UpnpEnableWebserver( IN int enable )
+ * \return UPNP_E_SUCCESS if successful else returns appropriate error.
+ */
+int UpnpEnableWebserver(
+	/* [in] TRUE to enable, FALSE to disable. */
+	IN int enable)
 {
     int retVal;
 
@@ -4690,26 +4438,19 @@ UpnpEnableWebserver( IN int enable )
     return UPNP_E_SUCCESS;
 }
 
- /**************************************************************************
- * Function: UpnpIsWebserverEnabled 
- *
- * Parameters: VOID
- *  
- * Description:
- *	This function  checks if the webserver is enabled or disabled. 
- *
- * Return Values: int
- *	1, if webserver enabled
- *	0, if webserver disabled
- ***************************************************************************/
-int
-UpnpIsWebserverEnabled()
-{
-    if( UpnpSdkInit != 1 ) {
-        return 0;
-    }
 
-    return ( bWebServerState == WEB_SERVER_ENABLED );
+/*!
+ * \brief Checks if the webserver is enabled or disabled. 
+ *
+ * \return 1, if webserver is enabled or 0, if webserver is disabled.
+ */
+int UpnpIsWebserverEnabled()
+{
+	if (UpnpSdkInit != 1) {
+		return 0;
+	}
+
+	return bWebServerState == WEB_SERVER_ENABLED;
 }
 
 
@@ -4791,85 +4532,76 @@ int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback)
 }
 
 
-/**************************************************************************
- * Function: UpnpSetContentLength
- * OBSOLETE METHOD: use UpnpSetMaxContentLength() instead.
- ***************************************************************************/
+/*!
+ * \brief 
+ *
+ * \deprecated Use UpnpSetMaxContentLength() instead.
+ */
 int UpnpSetContentLength(
+	/* [in] . */
 	IN UpnpClient_Handle Hnd,
+	/* [in] . */
 	IN int contentLength)
 {
-    int errCode = UPNP_E_SUCCESS;
-    struct Handle_Info *HInfo = NULL;
+	int errCode = UPNP_E_SUCCESS;
+	struct Handle_Info *HInfo = NULL;
 
-    do {
-        if( UpnpSdkInit != 1 ) {
-            errCode = UPNP_E_FINISH;
-            break;
-        }
+	do {
+		if (UpnpSdkInit != 1) {
+			errCode = UPNP_E_FINISH;
+			break;
+		}
 
-        HandleLock();
+		HandleLock();
 
-        errCode = GetHandleInfo( Hnd, &HInfo );
+		errCode = GetHandleInfo(Hnd, &HInfo);
 
-        if( errCode != HND_DEVICE ) {
-            errCode = UPNP_E_INVALID_HANDLE;
-            break;
-        }
+		if (errCode != HND_DEVICE) {
+			errCode = UPNP_E_INVALID_HANDLE;
+			break;
+		}
 
-        if( contentLength > MAX_SOAP_CONTENT_LENGTH ) {
-            errCode = UPNP_E_OUTOF_BOUNDS;
-            break;
-        }
+		if (contentLength > MAX_SOAP_CONTENT_LENGTH) {
+			errCode = UPNP_E_OUTOF_BOUNDS;
+			break;
+		}
 
-        g_maxContentLength = contentLength;
+		g_maxContentLength = contentLength;
+	} while(0);
 
-    } while( 0 );
-
-    HandleUnlock();
-    return errCode;
-
+	HandleUnlock();
+	return errCode;
 }
 
 
-/**************************************************************************
- * Function: UpnpSetMaxContentLength
+/*!
+ * \brief Sets the maximum content-length that the SDK will process on an
+ * incoming SOAP requests or responses.
  *
- * Parameters:	
- *	IN int contentLength: The maximum size to be set 
- *	
- * Description:
- *	Sets the maximum content-length that the SDK will process on an 
- *	incoming SOAP requests or responses. This API allows devices that have
- *	memory constraints to exhibit consistent behaviour if the size of the 
- *	incoming SOAP message exceeds the memory that device can allocate. 
- *	The default maximum content-length is {\tt DEFAULT_SOAP_CONTENT_LENGTH}
- *	= 16K bytes.
+ * This API allows devices that have memory constraints to exhibit consistent
+ * behaviour if the size of the incoming SOAP message exceeds the memory that
+ * device can allocate.
  *
- * Return Values: int
- *	UPNP_E_SUCCESS: The operation completed successfully.
- *		
- ***************************************************************************/
-int
-UpnpSetMaxContentLength (
-                      IN size_t contentLength
-                               /** Permissible content length, in bytes  */
+ * The default maximum content-length is {\tt DEFAULT_SOAP_CONTENT_LENGTH}
+ * == 16K bytes.
+ *
+ * \return UPNP_E_SUCCESS if the operation completed successfully.
+ */
+int UpnpSetMaxContentLength(
+	/*! Permissible content length, in bytes. The maximum size to be set. */
+	IN size_t contentLength
      )
 {
-    int errCode = UPNP_E_SUCCESS;
+	int errCode = UPNP_E_SUCCESS;
 
-    do {
-        if( UpnpSdkInit != 1 ) {
-            errCode = UPNP_E_FINISH;
-            break;
-        }
+	do {
+		if (UpnpSdkInit != 1) {
+			errCode = UPNP_E_FINISH;
+			break;
+		}
+		g_maxContentLength = contentLength;
+	} while(0);
 
-        g_maxContentLength = contentLength;
-
-    } while( 0 );
-
-    return errCode;
-
+	return errCode;
 }
 
-/*********************** END OF FILE upnpapi.c :) ************************/
