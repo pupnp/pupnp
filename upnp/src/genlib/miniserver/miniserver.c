@@ -29,19 +29,18 @@
  *
  **************************************************************************/
 
-
 /************************************************************************
  * Purpose: This file implements the functionality and utility functions
  * used by the Miniserver module.
+ *
+ * The miniserver is a central point for processing all network requests.
+ * It is made of:
+ *   - The SSDP sockets for discovery.
+ *   - The HTTP listeners for description / control / eventing.
  ************************************************************************/
 
-
 #include "config.h"
-
-
 #include "miniserver.h"
-
-
 #include "httpreadwrite.h"
 #include "ithread.h"
 #include "ssdplib.h"
@@ -50,8 +49,6 @@
 #include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
 #include "upnpapi.h"
 #include "util.h"
-
-
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
@@ -131,6 +128,7 @@ SetGenaCallback( MiniServerCallback callback )
     gGenaCallback = callback;
 }
 
+#ifdef INTERNAL_WEB_SERVER
 /************************************************************************
  * Function :	dispatch_request
  *
@@ -350,6 +348,7 @@ schedule_request_job( IN int connfd,
     }
 
 }
+#endif
 
 /************************************************************************
  * Function: RunMiniServer
@@ -372,11 +371,13 @@ RunMiniServer( MiniServerSockArray *miniSock )
     struct sockaddr_storage clientAddr;
     socklen_t clientLen;
     SOCKET connectHnd;
-    SOCKET miniServSock4 = miniSock->miniServerSock4;
-    SOCKET miniServSock6 = miniSock->miniServerSock6;
     SOCKET miniServStopSock =  miniSock->miniServerStopSock;
     SOCKET ssdpSock4 = miniSock->ssdpSock4;
     SOCKET ssdpSock6 = miniSock->ssdpSock6;
+#ifdef INTERNAL_WEB_SERVER
+    SOCKET miniServSock4 = miniSock->miniServerSock4;
+    SOCKET miniServSock6 = miniSock->miniServerSock6;
+#endif
 #ifdef INCLUDE_CLIENT_APIS
     SOCKET ssdpReqSock4 = miniSock->ssdpReqSock4;
     SOCKET ssdpReqSock6 = miniSock->ssdpReqSock6;
@@ -389,10 +390,12 @@ RunMiniServer( MiniServerSockArray *miniSock )
     char requestBuf[256];
     int ret = 0;
 
+#ifdef INTERNAL_WEB_SERVER
     if( miniServSock4 != INVALID_SOCKET )
         maxMiniSock = max( maxMiniSock, miniServSock4 );
     if( miniServSock6 != INVALID_SOCKET )
         maxMiniSock = max( maxMiniSock, miniServSock6 );
+#endif
     if( ssdpSock4 != INVALID_SOCKET )
         maxMiniSock = max( maxMiniSock, ssdpSock4 );
     if( ssdpSock6 != INVALID_SOCKET )
@@ -413,10 +416,12 @@ RunMiniServer( MiniServerSockArray *miniSock )
 
         FD_SET( miniServStopSock, &expSet );
         FD_SET( miniServStopSock, &rdSet );
+#ifdef INTERNAL_WEB_SERVER
         if( miniServSock4 != INVALID_SOCKET )
             FD_SET( miniServSock4, &rdSet );
         if( miniServSock6 != INVALID_SOCKET )
             FD_SET( miniServSock6, &rdSet );
+#endif
         if( ssdpSock4 != INVALID_SOCKET )
             FD_SET( ssdpSock4, &rdSet );
         if( ssdpSock6 != INVALID_SOCKET )
@@ -437,6 +442,7 @@ RunMiniServer( MiniServerSockArray *miniSock )
 	    isleep( 1 );
             continue;
         } else {
+#ifdef INTERNAL_WEB_SERVER
             if( miniServSock6 != INVALID_SOCKET &&
                 FD_ISSET( miniServSock6, &rdSet ) ) {
                 clientLen = sizeof( clientAddr );
@@ -463,6 +469,7 @@ RunMiniServer( MiniServerSockArray *miniSock )
                 }
                 schedule_request_job( connectHnd, (struct sockaddr*)&clientAddr );
             }
+#endif
 #ifdef INCLUDE_CLIENT_APIS
             // ssdp
             if( ssdpReqSock6 != INVALID_SOCKET &&
@@ -508,10 +515,12 @@ RunMiniServer( MiniServerSockArray *miniSock )
         }
     }
 
+#ifdef INTERNAL_WEB_SERVER
     shutdown( miniServSock4, SD_BOTH );
     UpnpCloseSocket( miniServSock4 );
     shutdown( miniServSock6, SD_BOTH );
     UpnpCloseSocket( miniServSock6 );
+#endif
     shutdown( miniServStopSock, SD_BOTH );
     UpnpCloseSocket( miniServStopSock );
     shutdown( ssdpSock4, SD_BOTH );
@@ -569,6 +578,7 @@ get_port( int sockfd )
     return port;
 }
 
+#ifdef INTERNAL_WEB_SERVER
 /************************************************************************
  * Function: get_miniserver_sockets
  *
@@ -610,7 +620,6 @@ get_miniserver_sockets( MiniServerSockArray * out,
     int reuseaddr_on = 0;
     int sockError = UPNP_E_SUCCESS;
     int errCode = 0;
-    int miniServerStopSock;
     int ret = 0;
 
     // Create listen socket for IPv4/IPv6. An error here may indicate
@@ -827,33 +836,56 @@ get_miniserver_sockets( MiniServerSockArray * out,
         out->miniServerPort6 = actual_port6;
     }
 
+    out->miniServerSock4 = listenfd4;
+    out->miniServerSock6 = listenfd6;
+
+    return UPNP_E_SUCCESS;
+}
+#endif
+
+
+/************************************************************************
+ * Function: get_miniserver_stopsock
+ *
+ * Parameters:
+ *	MiniServerSockArray *out - Miniserver Socket Array
+ *
+ * Description:
+ * 	Creates the miniserver STOP socket. This socket is created and 
+ *  listened on to know when it is time to stop the Miniserver.
+ *
+ * Return: int 
+ *	UPNP_E_OUTOF_SOCKET - Failed to create a socket
+ *	UPNP_E_SOCKET_BIND - Bind() failed
+ *	UPNP_E_INTERNAL_ERROR - Port returned by the socket layer is < 0
+ *	UPNP_E_SUCCESS	- Success
+ ************************************************************************/
+int get_miniserver_stopsock( MiniServerSockArray * out )
+{
+    char errorBuffer[ERROR_BUFFER_LEN];
+    struct sockaddr_in stop_sockaddr;
+    int miniServerStopSock;
+    int ret;
+
     miniServerStopSock = socket( AF_INET, SOCK_DGRAM, 0 );
     if ( miniServerStopSock == -1 ) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
             "Error in socket(): %s\n", errorBuffer );
-        shutdown( listenfd4, SD_BOTH );
-        UpnpCloseSocket( listenfd4 );
-        shutdown( listenfd6, SD_BOTH );
-        UpnpCloseSocket( listenfd6 );
 
         return UPNP_E_OUTOF_SOCKET;
     }
 
     // bind to local socket
-    memset( &__ss_v4, 0, sizeof( __ss_v4 ) );
-    serverAddr4->sin_family = AF_INET;
-    serverAddr4->sin_addr.s_addr = inet_addr( "127.0.0.1" );
-    ret = bind( miniServerStopSock, (struct sockaddr *)&__ss_v4,
-        sizeof(__ss_v4) );
+    memset( &stop_sockaddr, 0, sizeof( stop_sockaddr ) );
+    stop_sockaddr.sin_family = AF_INET;
+    stop_sockaddr.sin_addr.s_addr = inet_addr( "127.0.0.1" );
+    ret = bind( miniServerStopSock, (struct sockaddr *)&stop_sockaddr,
+        sizeof(stop_sockaddr) );
     if ( ret == -1 ) {
         UpnpPrintf( UPNP_CRITICAL,
             MSERV, __FILE__, __LINE__,
             "Error in binding localhost!!!\n" );
-        shutdown( listenfd4, SD_BOTH );
-        UpnpCloseSocket( listenfd4 );
-        shutdown( listenfd6, SD_BOTH );
-        UpnpCloseSocket( listenfd6 );
         shutdown( miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniServerStopSock );
 
@@ -864,21 +896,16 @@ get_miniserver_sockets( MiniServerSockArray * out,
     if ( miniStopSockPort <= 0 ) {
         shutdown( miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniServerStopSock );
-        shutdown( listenfd4, SD_BOTH );
-        UpnpCloseSocket( listenfd4 );
-        shutdown( listenfd6, SD_BOTH );
-        UpnpCloseSocket( listenfd6 );
 
         return UPNP_E_INTERNAL_ERROR;
     }
 
-    out->stopPort = miniStopSockPort;
-    out->miniServerSock4 = listenfd4;
-    out->miniServerSock6 = listenfd6;
     out->miniServerStopSock = miniServerStopSock;
+    out->stopPort = miniStopSockPort;
 
     return UPNP_E_SUCCESS;
 }
+
 
 /************************************************************************
  * Function: StartMiniServer
@@ -922,18 +949,38 @@ StartMiniServer( unsigned short* listen_port4,
     }
     memset( miniSocket, 0, sizeof(*miniSocket) );
 
+#ifdef INTERNAL_WEB_SERVER
+    // V4 and V6 http listeners.
     ret_code = get_miniserver_sockets( miniSocket, *listen_port4, *listen_port6 );
     if( ret_code != UPNP_E_SUCCESS ) {
         free( miniSocket );
         return ret_code;
     }
+#endif
 
-    ret_code = get_ssdp_sockets( miniSocket );
+    // Stop socket (To end miniserver processing).
+    ret_code = get_miniserver_stopsock( miniSocket );
     if( ret_code != UPNP_E_SUCCESS ) {
+#ifdef INTERNAL_WEB_SERVER
         shutdown( miniSocket->miniServerSock4, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerSock4 );
         shutdown( miniSocket->miniServerSock6, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerSock6 );
+#endif
+        free( miniSocket );
+
+        return ret_code;
+    }
+
+    // SSDP socket for discovery / advertising.
+    ret_code = get_ssdp_sockets( miniSocket );
+    if( ret_code != UPNP_E_SUCCESS ) {
+#ifdef INTERNAL_WEB_SERVER
+        shutdown( miniSocket->miniServerSock4, SD_BOTH );
+        UpnpCloseSocket( miniSocket->miniServerSock4 );
+        shutdown( miniSocket->miniServerSock6, SD_BOTH );
+        UpnpCloseSocket( miniSocket->miniServerSock6 );
+#endif
         shutdown( miniSocket->miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerStopSock );
         free( miniSocket );
@@ -947,10 +994,12 @@ StartMiniServer( unsigned short* listen_port4,
 
     ret_code = ThreadPoolAddPersistent( &gMiniServerThreadPool, &job, NULL );
     if ( ret_code < 0 ) {
+#ifdef INTERNAL_WEB_SERVER
         shutdown( miniSocket->miniServerSock4, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerSock4 );
         shutdown( miniSocket->miniServerSock6, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerSock6 );
+#endif
         shutdown( miniSocket->miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerStopSock );
         shutdown( miniSocket->ssdpSock4, SD_BOTH );
@@ -975,10 +1024,12 @@ StartMiniServer( unsigned short* listen_port4,
 
     // taking too long to start that thread
     if ( count >= max_count ) {
+#ifdef INTERNAL_WEB_SERVER
         shutdown( miniSocket->miniServerSock4, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerSock4 );
         shutdown( miniSocket->miniServerSock6, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerSock6 );
+#endif
         shutdown( miniSocket->miniServerStopSock, SD_BOTH );
         UpnpCloseSocket( miniSocket->miniServerStopSock );
         shutdown( miniSocket->ssdpSock4, SD_BOTH );
@@ -994,8 +1045,10 @@ StartMiniServer( unsigned short* listen_port4,
 
         return UPNP_E_INTERNAL_ERROR;
     }
+#ifdef INTERNAL_WEB_SERVER
     *listen_port4 = miniSocket->miniServerPort4;
     *listen_port6 = miniSocket->miniServerPort6;
+#endif
 
     return UPNP_E_SUCCESS;
 }

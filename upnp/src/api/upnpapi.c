@@ -118,9 +118,7 @@ TimerThread gTimerThread;
 
 ThreadPool gSendThreadPool;
 ThreadPool gRecvThreadPool;
-#ifdef INTERNAL_WEB_SERVER
-	ThreadPool gMiniServerThreadPool;
-#endif
+ThreadPool gMiniServerThreadPool;
 
 // Flag to indicate the state of web server
 WebServerState bWebServerState = WEB_SERVER_DISABLED;
@@ -309,9 +307,7 @@ int UpnpFinish()
 	}
 	PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
 	PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
-#ifdef INTERNAL_WEB_SERVER
 	PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__, "MiniServer Thread Pool");
-#endif
 
 #ifdef INCLUDE_DEVICE_APIS
 	if (GetDeviceHandleInfo(AF_INET, &device_handle, &temp) == HND_DEVICE ) {
@@ -335,10 +331,8 @@ int UpnpFinish()
 	web_server_destroy();
 #endif
 
-#ifdef INTERNAL_WEB_SERVER
 	ThreadPoolShutdown(&gMiniServerThreadPool);
 	PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__, "MiniServer Thread Pool");
-#endif
 	ThreadPoolShutdown(&gRecvThreadPool);
 	PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
 	ThreadPoolShutdown(&gSendThreadPool);
@@ -3280,12 +3274,10 @@ int UpnpInitThreadPools()
 		goto ExitFunction;
 	}
 
-#ifdef INTERNAL_WEB_SERVER
 	if (ThreadPoolInit(&gMiniServerThreadPool, &attr) != UPNP_E_SUCCESS) {
 		ret = UPNP_E_INIT_FAILED;
 		goto ExitFunction;
 	}
-#endif
 
 ExitFunction:
 	if (ret != UPNP_E_SUCCESS) {
