@@ -161,11 +161,11 @@ typedef struct NOTIFY_THREAD_STRUCT {
  */
 EXTERN_C void genaCallback(
 	/*! [in] represents the parse state of the request */
-	IN http_parser_t *parser, 
+	http_parser_t *parser, 
 	/*! [in] HTTP message containing GENA request */
-	IN http_message_t* request,
+	http_message_t* request,
 	/*! [in,out] Structure containing information about the socket */
-	IN SOCKINFO *info);
+	SOCKINFO *info);
 
  
 /*!
@@ -181,16 +181,16 @@ EXTERN_C void genaCallback(
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaSubscribe(
 	/*! [in] The client handle. */
-	IN UpnpClient_Handle client_handle,
+	UpnpClient_Handle client_handle,
 	/*! [in] Of the form: "http://134.134.156.80:4000/RedBulb/Event */
-	IN const UpnpString *PublisherURL,
+	const UpnpString *PublisherURL,
 	/*! [in,out] requested Duration:
 	 * \li if -1, then "infinite".
 	 * \li in the OUT case: actual Duration granted by Service,
 	 * 	-1 for infinite. */
-	INOUT int *TimeOut,
+	int *TimeOut,
 	/*! [out] sid of subscription, memory passed in by caller. */
-	OUT UpnpString *out_sid);
+	UpnpString *out_sid);
 #endif /* INCLUDE_CLIENT_APIS */
 
 
@@ -207,9 +207,9 @@ EXTERN_C int genaSubscribe(
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaUnSubscribe(
 	/*! [in] UPnP client handle. */
-	IN UpnpClient_Handle client_handle,
+	UpnpClient_Handle client_handle,
 	/*! [in] The subscription ID. */
-	IN const UpnpString *in_sid);
+	const UpnpString *in_sid);
 #endif /* INCLUDE_CLIENT_APIS */
 
 
@@ -259,12 +259,12 @@ EXTERN_C int genaUnregisterDevice(
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaRenewSubscription(
 	/*! [in] Client handle. */
-	IN UpnpClient_Handle client_handle,
+	UpnpClient_Handle client_handle,
 	/*! [in] Subscription ID. */
-	IN const UpnpString *in_sid,
-	/*! [out] requested Duration, if -1, then "infinite". In the OUT case:
+	const UpnpString *in_sid,
+	/*! [in,out] requested Duration, if -1, then "infinite". In the OUT case:
 	 * actual Duration granted by Service, -1 for infinite. */
-	OUT int * TimeOut);
+	int *TimeOut);
 #endif /* INCLUDE_CLIENT_APIS */
 
 
@@ -310,7 +310,7 @@ EXTERN_C int genaNotifyAllExt(
 	/*! [in] Service ID. */
 	char *servId,
 	/*! [in] XML document Event varible property set. */
-	IN IXML_Document *PropSet);
+	IXML_Document *PropSet);
 #endif /* INCLUDE_DEVICE_APIS */
 
 
@@ -325,19 +325,19 @@ EXTERN_C int genaNotifyAllExt(
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaInitNotify(
 	/*! [in] Device handle. */
-	IN UpnpDevice_Handle device_handle,
+	UpnpDevice_Handle device_handle,
 	/*! [in] Device udn. */
-	IN char *UDN,
+	char *UDN,
 	/*! [in] Service ID. */
-	IN char *servId,
+	char *servId,
 	/*! [in] Array of variable names. */
-	IN char **VarNames,
+	char **VarNames,
 	/*! [in] Array of variable values. */
-	IN char **VarValues,
+	char **VarValues,
 	/*! [in] Array size. */
-	IN int var_count,
+	int var_count,
 	/*! [in] Subscription ID. */
-	IN const Upnp_SID sid);
+	const Upnp_SID sid);
 #endif /* INCLUDE_DEVICE_APIS */
 
 
@@ -354,15 +354,15 @@ EXTERN_C int genaInitNotify(
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C  int genaInitNotifyExt(
 	/*! [in] Device handle. */
-	IN UpnpDevice_Handle device_handle, 
+	UpnpDevice_Handle device_handle, 
 	/*! [in] Device udn. */
-	IN char *UDN, 
+	char *UDN, 
 	/*! [in] Service ID. */
-	IN char *servId,
+	char *servId,
 	/*! [in] Document of the state table. */
-	IN IXML_Document *PropSet, 
+	IXML_Document *PropSet, 
 	/*! [in] subscription ID. */
-	IN const Upnp_SID sid);
+	const Upnp_SID sid);
 #endif /* INCLUDE_DEVICE_APIS */
 
 
@@ -374,11 +374,11 @@ EXTERN_C  int genaInitNotifyExt(
  */
 void error_respond(
 	/*! [in] Structure containing information about the socket. */
-	IN SOCKINFO *info,
+	SOCKINFO *info,
 	/*! [in] error code that will be in the GENA response. */
-	IN int error_code,
+	int error_code,
 	/*! [in] GENA request Packet. */
-	IN http_message_t* hmsg);
+	http_message_t* hmsg);
 
 
 #endif /* GENA_H */

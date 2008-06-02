@@ -383,7 +383,7 @@ static int gena_subscribe(
 }
 
 
-int genaUnregisterClient(IN UpnpClient_Handle client_handle)
+int genaUnregisterClient(UpnpClient_Handle client_handle)
 {
 	ClientSubscription *sub_copy = UpnpClientSubscription_new();
 	int return_code = UPNP_E_SUCCESS;
@@ -430,8 +430,8 @@ exit_function:
 
 #ifdef INCLUDE_CLIENT_APIS
 int genaUnSubscribe(
-	IN UpnpClient_Handle client_handle,
-	IN const UpnpString *in_sid)
+	UpnpClient_Handle client_handle,
+	const UpnpString *in_sid)
 {
 	ClientSubscription *sub = NULL;
 	int return_code = GENA_SUCCESS;
@@ -482,10 +482,10 @@ exit_function:
 
 #ifdef INCLUDE_CLIENT_APIS
 int genaSubscribe(
-	IN UpnpClient_Handle client_handle,
-	IN const UpnpString *PublisherURL,
-	INOUT int *TimeOut,
-	OUT UpnpString *out_sid)
+	UpnpClient_Handle client_handle,
+	const UpnpString *PublisherURL,
+	int *TimeOut,
+	UpnpString *out_sid)
 {
 	int return_code = GENA_SUCCESS;
 	ClientSubscription *newSubscription = UpnpClientSubscription_new();
@@ -564,9 +564,9 @@ error_handler:
 
 
 int genaRenewSubscription(
-	IN UpnpClient_Handle client_handle,
-	IN const UpnpString *in_sid,
-	INOUT int *TimeOut)
+	UpnpClient_Handle client_handle,
+	const UpnpString *in_sid,
+	int *TimeOut)
 {
 	int return_code = GENA_SUCCESS;
 	ClientSubscription *sub = NULL;
@@ -662,8 +662,8 @@ exit_function:
 
 
 void gena_process_notification_event(
-	IN SOCKINFO *info,
-	IN http_message_t *event)
+	SOCKINFO *info,
+	http_message_t *event)
 {
 	UpnpEvent *event_struct = UpnpEvent_new();
 	IXML_Document *ChangedVars = NULL;

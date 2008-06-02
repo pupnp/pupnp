@@ -48,9 +48,9 @@
  */
 void gena_process_subscription_request(
 	/*! [in] Socket info of the device. */
-	IN SOCKINFO *info,
+	SOCKINFO *info,
 	/*! [in] Subscription request from the control point. */
-	IN http_message_t *request);
+	http_message_t *request);
 
 
 /*!
@@ -59,9 +59,9 @@ void gena_process_subscription_request(
  */
 void gena_process_subscription_renewal_request(
 	/*! [in] Socket info of the device. */
-	IN SOCKINFO *info,
+	SOCKINFO *info,
 	/*! [in] Subscription renewal request from the control point. */
-	IN http_message_t *request);
+	http_message_t *request);
 
 
 /*!
@@ -70,9 +70,9 @@ void gena_process_subscription_renewal_request(
  */
 void gena_process_unsubscribe_request(
 	/*! [in] Socket info of the device. */
-	IN SOCKINFO *info,
+	SOCKINFO *info,
 	/*! [in] UNSUBSCRIBE request from the control point. */
-	IN http_message_t *request);
+	http_message_t *request);
 
 
 #endif /* GENA_DEVICE_H */

@@ -55,9 +55,9 @@
  */
 void gena_process_notification_event(
 	/*! [in] Socket info of the device. */
-	IN SOCKINFO *info,
+	SOCKINFO *info,
 	/*! [in] The http message contains the GENA notification. */
-	IN http_message_t *event);
+	http_message_t *event);
 
 
 #endif /* GENA_CTRLPT_H */

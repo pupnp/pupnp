@@ -61,7 +61,7 @@
  */
 int genaUnregisterDevice(
 	/*! [in] Device handle. */
-	IN UpnpDevice_Handle device_handle)
+	UpnpDevice_Handle device_handle)
 {
 	int ret = 0;
 	struct Handle_Info *handle_info;
@@ -92,13 +92,13 @@ int genaUnregisterDevice(
  */
 static int GeneratePropertySet(
 	/*! [in] Array of variable names (go in the event notify). */
-	IN char **names,
+	char **names,
 	/*! [in] Array of variable values (go in the event notify). */
-	IN char **values,
+	char **values,
 	/*! [in] number of variables. */
-	IN int count,
+	int count,
 	/*! [out] PropertySet node in the string format. */
-	OUT DOMString *out)
+	DOMString *out)
 {
 	char *buffer;
 	int counter = 0;
@@ -147,7 +147,7 @@ static int GeneratePropertySet(
  */
 static void free_notify_struct(
 	/*! [in] Notify structure. */
-	IN notify_thread_struct *input)
+	notify_thread_struct *input)
 {
     ( *input->reference_count )--;
     if( ( *input->reference_count ) == 0 ) {
@@ -170,13 +170,13 @@ static void free_notify_struct(
  */
 static UPNP_INLINE int notify_send_and_recv(
 	/*! [in] subscription callback URL (URL of the control point). */
-	IN uri_type *destination_url,
+	uri_type *destination_url,
 	/*! [in] Common HTTP headers. */
-	IN membuffer *mid_msg,
+	membuffer *mid_msg,
 	/*! [in] The evented XML. */
-	IN char *propertySet,
+	char *propertySet,
 	/*! [out] The response from the control point. */
-	OUT http_parser_t *response)
+	http_parser_t *response)
 {
     uri_type url;
     int conn_fd;
@@ -258,11 +258,11 @@ static UPNP_INLINE int notify_send_and_recv(
  */
 static int genaNotify(
 	/*! [in] Null terminated, includes all headers (including \\r\\n) except SID and SEQ. */
-	IN char *headers,
+	char *headers,
 	/*! [in] The evented XML. */
-	IN char *propertySet,
+	char *propertySet,
 	/*! [in] subscription to be Notified, assumes this is valid for life of function. */
-	IN subscription *sub)
+	subscription *sub)
 {
     int i;
     membuffer mid_msg;
@@ -326,7 +326,7 @@ static int genaNotify(
  */
 static void genaNotifyThread(
 	/*! [in] notify thread structure containing all the headers and property set info. */
-	IN void *input)
+	void *input)
 {
     subscription *sub;
     service_info *service;
@@ -406,13 +406,13 @@ static void genaNotifyThread(
 
 
 int genaInitNotify(
-	IN UpnpDevice_Handle device_handle,
-	IN char *UDN,
-	IN char *servId,
-	IN char **VarNames,
-	IN char **VarValues,
-	IN int var_count,
-	IN const Upnp_SID sid)
+	UpnpDevice_Handle device_handle,
+	char *UDN,
+	char *servId,
+	char **VarNames,
+	char **VarValues,
+	int var_count,
+	const Upnp_SID sid)
 {
 	int ret = GENA_SUCCESS;
 	int line = 0;
@@ -574,11 +574,11 @@ ExitFunction:
 
 
 int genaInitNotifyExt(
-	IN UpnpDevice_Handle device_handle,
-	IN char *UDN,
-	IN char *servId,
-	IN IXML_Document *PropSet,
-	IN const Upnp_SID sid)
+	UpnpDevice_Handle device_handle,
+	char *UDN,
+	char *servId,
+	IXML_Document *PropSet,
+	const Upnp_SID sid)
 {
 	int ret = GENA_SUCCESS;
 	int line = 0;
@@ -669,10 +669,10 @@ int genaInitNotifyExt(
 		propertySet);
 
 	headers_size =
-		strlen( "CONTENT-TYPE text/xml\r\n" ) +
-		strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
-		strlen( "NT: upnp:event\r\n" ) +
-		strlen( "NTS: upnp:propchange\r\n" ) + 1;
+		strlen("CONTENT-TYPE text/xml\r\n") +
+		strlen("CONTENT-LENGTH: \r\n") + MAX_CONTENT_LENGTH +
+		strlen("NT: upnp:event\r\n") +
+		strlen("NTS: upnp:propchange\r\n") + 1;
 	headers = (char *)malloc(headers_size);
 	if (headers == NULL) {
 		line = __LINE__;
@@ -741,10 +741,10 @@ ExitFunction:
 
 
 int genaNotifyAllExt(
-	IN UpnpDevice_Handle device_handle,
-	IN char *UDN,
-	IN char *servId,
-	IN IXML_Document *PropSet)
+	UpnpDevice_Handle device_handle,
+	char *UDN,
+	char *servId,
+	IXML_Document *PropSet)
 {
 	int ret = GENA_SUCCESS;
 	int line = 0;
@@ -891,12 +891,12 @@ ExitFunction:
 
 
 int genaNotifyAll(
-	IN UpnpDevice_Handle device_handle,
-	IN char *UDN,
-	IN char *servId,
-	IN char **VarNames,
-	IN char **VarValues,
-	IN int var_count )
+	UpnpDevice_Handle device_handle,
+	char *UDN,
+	char *servId,
+	char **VarNames,
+	char **VarValues,
+	int var_count )
 {
 	int ret = GENA_SUCCESS;
 	int line = 0;
@@ -1049,13 +1049,13 @@ ExitFunction:
  */
 static int respond_ok(
 	/*! [in] Socket connection of request. */
-	IN SOCKINFO *info,
+	SOCKINFO *info,
 	/*! [in] Accepted duration. */
-	IN int time_out,
+	int time_out,
 	/*! [in] Accepted subscription. */
-	IN subscription *sub,
+	subscription *sub,
 	/*! [in] Http request. */
-	IN http_message_t *request)
+	http_message_t *request)
 {
     int major;
     int minor;
@@ -1109,9 +1109,9 @@ static int respond_ok(
  */
 static int create_url_list(
 	/*! [in] . */
-	IN memptr *url_list,
+	memptr *url_list,
 	/*! [out] . */
-	OUT URL_list *out)
+	URL_list *out)
 {
     int URLcount = 0;
     int i;
@@ -1185,8 +1185,8 @@ static int create_url_list(
 
 
 void gena_process_subscription_request(
-	IN SOCKINFO *info,
-	IN http_message_t *request)
+	SOCKINFO *info,
+	http_message_t *request)
 {
 	UpnpSubscriptionRequest *request_struct = UpnpSubscriptionRequest_new();
 	Upnp_SID temp_sid;
@@ -1368,8 +1368,8 @@ exit_function:
 
 
 void gena_process_subscription_renewal_request(
-	IN SOCKINFO *info,
-	IN http_message_t *request)
+	SOCKINFO *info,
+	http_message_t *request)
 {
     Upnp_SID sid;
     subscription *sub;
@@ -1480,8 +1480,8 @@ void gena_process_subscription_renewal_request(
 
 
 void gena_process_unsubscribe_request(
-	IN SOCKINFO *info,
-	IN http_message_t *request)
+	SOCKINFO *info,
+	http_message_t *request)
 {
     Upnp_SID sid;
     service_info *service;

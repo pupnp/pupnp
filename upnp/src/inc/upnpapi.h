@@ -352,7 +352,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam * Param);
 
 /*!
  * \brief This function is a timer thread scheduled by UpnpSendAdvertisement
- *	to the send advetisement again.
+ * to the send advetisement again.
  */
 void AutoAdvertise(
 	/*! [in] Information provided to the thread. */

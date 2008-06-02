@@ -707,7 +707,8 @@ enum Upnp_DescType_e {
 typedef enum Upnp_DescType_e Upnp_DescType;
 
 
-/*! All callback functions share the same prototype, documented below.
+/*!
+ *  All callback functions share the same prototype, documented below.
  *  Note that any memory passed to the callback function
  *  is valid only during the callback and should be copied if it
  *  needs to persist.  This callback function needs to be thread
@@ -728,10 +729,16 @@ typedef enum Upnp_DescType_e Upnp_DescType;
  *  See \b Upnp_EventType for more information on the callback values and
  *  the associated \b Event parameter.  
  *
- *  The return value of the callback is currently ignored.  It may be used
+ *  The return value of the callback is currently ignored. It may be used
  *  in the future to communicate results back to the SDK.
  */
-typedef int (*Upnp_FunPtr)(IN Upnp_EventType EventType, IN void *Event, IN void *Cookie);
+typedef int (*Upnp_FunPtr)(
+	/*! [in] .*/
+	Upnp_EventType EventType,
+	/*! [in] .*/
+	void *Event,
+	/*! [in] .*/
+	void *Cookie);
 
 /* @} Constants and Types */
 
@@ -1037,7 +1044,7 @@ EXPORT_SPEC int UpnpRegisterRootDevice2(
 	 * the description is served using the internal web server. */
 	int config_baseURL,
 	/*! [in] Pointer to the callback function for receiving asynchronous events. */
-	IN Upnp_FunPtr Fun,
+	Upnp_FunPtr Fun,
 	/*! [in] Pointer to user data returned with the callback function when
 	 * invoked. */
 	const void* Cookie,
@@ -1224,6 +1231,10 @@ EXPORT_SPEC int UpnpSetMaxContentLength(
  * matching root device, device, or service. The application specifies the
  * search type by the \b Target parameter.  
  *
+ * This function searches for the devices for the provided maximum time.
+ * It is an asynchronous function. It schedules a search job and returns. 
+ * The client is notified about the search results after search timer.
+ *
  * Note that there is no way for the SDK to distinguish which client
  * instance issued a particular search.  Therefore, the client can get
  * search callbacks that do not match the original criteria of the search.
@@ -1237,17 +1248,17 @@ EXPORT_SPEC int UpnpSetMaxContentLength(
  */
 EXPORT_SPEC int UpnpSearchAsync(
 	/*! The handle of the client performing the search. */
-	IN UpnpClient_Handle Hnd,
+	UpnpClient_Handle Hnd,
 	/*! The time, in seconds, to wait for responses. If the time is greater
 	 * than \c MAX_SEARCH_TIME then the time is set to \c MAX_SEARCH_TIME.
 	 * If the time is less than \c MIN_SEARCH_TIME then the time is set to
 	 * \c MIN_SEARCH_TIME. */ 
-	IN int Mx,
+	int Mx,
 	/*! The search target as defined in the UPnP Device Architecture v1.0
 	 * specification. */
-	IN const char *Target,
+	const char *TTarget_constarget_const,
 	/*! The user data to pass when the callback function is invoked. */
-	IN const void *Cookie); 
+	const void *Cookie_const); 
 
 /*!
  * \brief Sends out the discovery announcements for all devices and services
@@ -1266,9 +1277,9 @@ EXPORT_SPEC int UpnpSearchAsync(
  */
 EXPORT_SPEC int UpnpSendAdvertisement(
 	/*! The device handle for which to send out the announcements. */
-	IN UpnpDevice_Handle Hnd,
+	UpnpDevice_Handle Hnd,
 	/*! The expiration age, in seconds, of the announcements. */
-	IN int Exp);
+	int Exp);
 
 
 /* @} Discovery */
@@ -1316,16 +1327,16 @@ EXPORT_SPEC int UpnpSendAdvertisement(
  *             according to the device.
  */
 EXPORT_SPEC int UpnpGetServiceVarStatus(
-	/*! The handle of the control point. */
-	IN UpnpClient_Handle Hnd,
-	/*! The URL of the service. */
-	IN const char *ActionURL,
-	/*! The name of the variable to query. */
-	IN const char *VarName,
-	/*! The pointer to store the value for \b VarName. The SDK allocates
+	/*! [in] The handle of the control point. */
+	UpnpClient_Handle Hnd,
+	/*! [in] The URL of the service. */
+	const char *ActionURL,
+	/*! [in] The name of the variable to query. */
+	const char *VarName,
+	/*! [out] The pointer to store the value for \b VarName. The SDK allocates
 	 * this string and the caller needs to free it using
 	 * \b ixmlFreeDOMString. */
-	OUT DOMString *StVarVal);
+	DOMString *StVarVal);
 
 
 /*!
@@ -1346,17 +1357,17 @@ EXPORT_SPEC int UpnpGetServiceVarStatus(
  *             complete this operation.
  */
 EXPORT_SPEC int UpnpGetServiceVarStatusAsync(
-	/*! The handle of the control point. */
-	IN UpnpClient_Handle Hnd,
-	/*! The URL of the service. */
-	IN const char *ActionURL,
-	/*! The name of the variable to query. */
-	IN const char *VarName,
-	/*! Pointer to a callback function to be invoked when the operation
+	/*! [in] The handle of the control point. */
+	UpnpClient_Handle Hnd,
+	/*! [in] The URL of the service. */
+	const char *ActionURL,
+	/*! [in] The name of the variable to query. */
+	const char *VarName,
+	/*! [in] Pointer to a callback function to be invoked when the operation
 	 * is complete. */
-	IN Upnp_FunPtr Fun,
-	/*! Pointer to user data to pass to the callback function when invoked. */
-	IN const void *Cookie);
+	Upnp_FunPtr Fun,
+	/*! [in] Pointer to user data to pass to the callback function when invoked. */
+	const void *Cookie);
 
 
 /*!
@@ -1383,19 +1394,19 @@ EXPORT_SPEC int UpnpGetServiceVarStatusAsync(
  *             complete this operation.
  */
 EXPORT_SPEC int UpnpSendAction(
-	/*! The handle of the control point sending the action. */
-	IN UpnpClient_Handle Hnd,
-	/*! The action URL of the service. */
-	IN const char *ActionURL,
-	/*! The type of the service. */
-	IN const char *ServiceType,
-	/*! This parameter is ignored and must be \c NULL. */
-	IN const char *DevUDN,
-	/*! The DOM document for the action. */
-	IN IXML_Document *Action,
-	/*! The DOM document for the response to the action. The SDK allocates
+	/*! [in] The handle of the control point sending the action. */
+	UpnpClient_Handle Hnd,
+	/*! [in] The action URL of the service. */
+	const char *ActionURL,
+	/*! [in] The type of the service. */
+	const char *ServiceType,
+	/*! [in] This parameter is ignored and must be \c NULL. */
+	const char *DevUDN,
+	/*! [in] The DOM document for the action. */
+	IXML_Document *Action,
+	/*! [out] The DOM document for the response to the action. The SDK allocates
 	 * this document and the caller needs to free it. */
-	OUT IXML_Document **RespNode);
+	IXML_Document **RespNode);
 
 
 /*!
@@ -1422,22 +1433,22 @@ EXPORT_SPEC int UpnpSendAction(
  *             complete this operation.
  */
 EXPORT_SPEC int UpnpSendActionEx(
-	/*! The handle of the control point sending the action. */
-	IN UpnpClient_Handle Hnd,
-	/*! The action URL of the service. */
-	IN const char *ActionURL,
-	/*! The type of the service. */
-	IN const char *ServiceType,
-	/*! This parameter is ignored and must be \c NULL. */
-	IN const char *DevUDN,
-	/*! The DOM document for the SOAP header. This may be \c NULL if the
+	/*! [in] The handle of the control point sending the action. */
+	UpnpClient_Handle Hnd,
+	/*! [in] The action URL of the service. */
+	const char *ActionURL,
+	/*! [in] The type of the service. */
+	const char *ServiceType,
+	/*! [in] This parameter is ignored and must be \c NULL. */
+	const char *DevUDN,
+	/*! [in] The DOM document for the SOAP header. This may be \c NULL if the
 	 * header is not required. */
-	IN IXML_Document *Header,
-	/*! The DOM document for the action. */
-	IN IXML_Document *Action,
-	/*! The DOM document for the response to the action. The SDK allocates
+	IXML_Document *Header,
+	/*! [in] The DOM document for the action. */
+	IXML_Document *Action,
+	/*! [out] The DOM document for the response to the action. The SDK allocates
 	 * this document and the caller needs to free it. */
-	OUT IXML_Document **RespNode);
+	IXML_Document **RespNode);
 
 
 /*!
@@ -1462,22 +1473,22 @@ EXPORT_SPEC int UpnpSendActionEx(
  *             complete this operation.
  */
 EXPORT_SPEC int UpnpSendActionAsync(
-	/*! The handle of the control point sending the action. */
-	IN UpnpClient_Handle Hnd,
-	/*! The action URL of the service. */
-	IN const char *ActionURL,
-	/*! The type of the service. */
-	IN const char *ServiceType,
-	/*! This parameter is ignored and must be \c NULL. */
-	IN const char *DevUDN,
-	/*! The DOM document for the action to perform on this device. */
-	IN IXML_Document *Action,
-	/*! Pointer to a callback function to be invoked when the operation
+	/*! [in] The handle of the control point sending the action. */
+	UpnpClient_Handle Hnd,
+	/*! [in] The action URL of the service. */
+	const char *ActionURL,
+	/*! [in] The type of the service. */
+	const char *ServiceType,
+	/*! [in] This parameter is ignored and must be \c NULL. */
+	const char *DevUDN,
+	/*! [in] The DOM document for the action to perform on this device. */
+	IXML_Document *Action,
+	/*! [in] Pointer to a callback function to be invoked when the operation
 	 * completes. */
-	IN Upnp_FunPtr Fun,
-	/*! Pointer to user data that to be passed to the callback when
+	Upnp_FunPtr Fun,
+	/*! [in] Pointer to user data that to be passed to the callback when
 	 * invoked. */
-	IN const void *Cookie);
+	const void *Cookie);
 
 
 /*!
@@ -1502,27 +1513,29 @@ EXPORT_SPEC int UpnpSendActionAsync(
  *             complete this operation.
  */
 EXPORT_SPEC int UpnpSendActionExAsync(
-	/*! The handle of the control point sending the action. */
-	IN UpnpClient_Handle Hnd,
-	/*! The action URL of the service. */
-	IN const char *ActionURL,
-	/*! The type of the service. */
-	IN const char *ServiceType,
-	/*! This parameter is ignored and must be \c NULL. */
-	IN const char *DevUDN,
-	/*! The DOM document for the SOAP header. This may be \c NULL if the
+	/*! [in] The handle of the control point sending the action. */
+	UpnpClient_Handle Hnd,
+	/*! [in] The action URL of the service. */
+	const char *ActionURL,
+	/*! [in] The type of the service. */
+	const char *ServiceType,
+	/*! [in] This parameter is ignored and must be \c NULL. */
+	const char *DevUDN,
+	/*! [in] The DOM document for the SOAP header. This may be \c NULL if the
 	 * header is not required. */
-	IN IXML_Document *Header,
-	/*! The DOM document for the action to perform on this device. */
-	IN IXML_Document *Action,
-	/*! Pointer to a callback function to be invoked when the operation
+	IXML_Document *Header,
+	/*! [in] The DOM document for the action to perform on this device. */
+	IXML_Document *Action,
+	/*! [in] Pointer to a callback function to be invoked when the operation
 	 * completes. */
-	IN Upnp_FunPtr Fun,
-	/*! Pointer to user data that to be passed to the callback when
+	Upnp_FunPtr Fun,
+	/*! [in] Pointer to user data that to be passed to the callback when
 	 * invoked. */
-	IN const void *Cookie);
+	const void *Cookie);
+
 
 /*! @} Control */
+
 
 /******************************************************************************
  ******************************************************************************
@@ -1564,20 +1577,20 @@ EXPORT_SPEC int UpnpSendActionExAsync(
  *              complete this operation.
  */
 EXPORT_SPEC int UpnpAcceptSubscription(
-	/*! The handle of the device. */
-	IN UpnpDevice_Handle Hnd,
-	/*! The device ID of the subdevice of the service generating the event. */
-	IN const char *DevID,
-	/*! The unique service identifier of the service generating the event. */
-	IN const char *ServID,
-	/*! Pointer to an array of event variables. */
-	IN const char **VarName,
-	/*! Pointer to an array of values for the event variables. */
-	IN const char **NewVal,
-	/*! The number of event variables in \b VarName. */
-	IN int cVariables,
-	/*! The subscription ID of the newly registered control point. */
-	IN const Upnp_SID SubsId);
+	/*! [in] The handle of the device. */
+	UpnpDevice_Handle Hnd,
+	/*! [in] The device ID of the subdevice of the service generating the event. */
+	const char *DevID,
+	/*! [in] The unique service identifier of the service generating the event. */
+	const char *ServID,
+	/*! [in] Pointer to an array of event variables. */
+	const char **VarName,
+	/*! [in] Pointer to an array of values for the event variables. */
+	const char **NewVal,
+	/*! [in] The number of event variables in \b VarName. */
+	int cVariables,
+	/*! [in] The subscription ID of the newly registered control point. */
+	const Upnp_SID SubsId);
 
 
 /*!
@@ -1604,18 +1617,18 @@ EXPORT_SPEC int UpnpAcceptSubscription(
  *             complete this operation.
  */
 EXPORT_SPEC int UpnpAcceptSubscriptionExt(
-	/*! The handle of the device. */
-	IN UpnpDevice_Handle Hnd,
-	/*! The device ID of the subdevice of the service generating the event. */
-	IN const char *DevID,
-	/*! The unique service identifier of the service generating the event. */
-	IN const char *ServID,
-	/*! The DOM document for the property set. Property set documents must
+	/*! [in] The handle of the device. */
+	UpnpDevice_Handle Hnd,
+	/*! [in] The device ID of the subdevice of the service generating the event. */
+	const char *DevID,
+	/*! [in] The unique service identifier of the service generating the event. */
+	const char *ServID,
+	/*! [in] The DOM document for the property set. Property set documents must
 	 * conform to the XML schema defined in section 4.3 of the Universal
 	 * Plug and Play Device Architecture specification. */
-	IN IXML_Document *PropSet,
-	/*! The subscription ID of the newly registered control point. */
-	IN Upnp_SID SubsId);
+	IXML_Document *PropSet,
+	/*! [in] The subscription ID of the newly registered control point. */
+	Upnp_SID SubsId);
 
 
 /*!
@@ -1640,18 +1653,18 @@ EXPORT_SPEC int UpnpAcceptSubscriptionExt(
  *             complete this operation.
  */
 EXPORT_SPEC int UpnpNotify(
-	/*! The handle to the device sending the event. */
-	IN UpnpDevice_Handle,
-	/*! The device ID of the subdevice of the service generating the event. */
-	IN const char *DevID,
-	/*! The unique identifier of the service generating the event. */
-	IN const char *ServID,
-	/*! Pointer to an array of variables that have changed. */
-	IN const char **VarName,
-	/*! Pointer to an array of new values for those variables. */
-	IN const char **NewVal,
-	/*! The count of variables included in this notification. */
-	IN int cVariables);
+	/*! [in] The handle to the device sending the event. */
+	UpnpDevice_Handle,
+	/*! [in] The device ID of the subdevice of the service generating the event. */
+	const char *DevID,
+	/*! [in] The unique identifier of the service generating the event. */
+	const char *ServID,
+	/*! [in] Pointer to an array of variables that have changed. */
+	const char **VarName,
+	/*! [in] Pointer to an array of new values for those variables. */
+	const char **NewVal,
+	/*! [in] The count of variables included in this notification. */
+	int cVariables);
 
 
 /*!
@@ -1676,16 +1689,16 @@ EXPORT_SPEC int UpnpNotify(
  *             complete this operation.
  */
 EXPORT_SPEC int UpnpNotifyExt(
-	/*! The handle to the device sending the event. */
-	IN UpnpDevice_Handle,
-	/*! The device ID of the subdevice of the service generating the event. */
-	IN const char *DevID,
-	/*! The unique identifier of the service generating the event. */
-	IN const char *ServID,
-	/*! The DOM document for the property set. Property set documents must
+	/*! [in] The handle to the device sending the event. */
+	UpnpDevice_Handle,
+	/*! [in] The device ID of the subdevice of the service generating the event. */
+	const char *DevID,
+	/*! [in] The unique identifier of the service generating the event. */
+	const char *ServID,
+	/*! [in] The DOM document for the property set. Property set documents must
 	 * conform to the XML schema defined in section 4.3 of the Universal
 	 * Plug and Play Device Architecture specification. */
-	IN IXML_Document *PropSet);
+	IXML_Document *PropSet);
 
 
 /*!
@@ -1717,13 +1730,13 @@ EXPORT_SPEC int UpnpNotifyExt(
  *             complete this operation.
  */
 EXPORT_SPEC int UpnpRenewSubscription(
-	/*! The handle of the control point that is renewing the subscription. */
-	IN UpnpClient_Handle Hnd,
-	/*! Pointer to a variable containing the requested subscription time.
+	/*! [in] The handle of the control point that is renewing the subscription. */
+	UpnpClient_Handle Hnd,
+	/*! [in,out] Pointer to a variable containing the requested subscription time.
 	 * Upon return, it contains the actual renewal time. */
-	INOUT int *TimeOut,
-	/*! The ID for the subscription to renew. */
-	IN const Upnp_SID SubsId);
+	int *TimeOut,
+	/*! [in] The ID for the subscription to renew. */
+	const Upnp_SID SubsId);
 
 
 /*!
@@ -1774,18 +1787,18 @@ EXPORT_SPEC int UpnpRenewSubscription(
  *             UpnpEventSubscribe.ErrCode field as part of the callback).
  */
 EXPORT_SPEC int UpnpRenewSubscriptionAsync(
-	/*! The handle of the control point that is renewing the subscription. */
-	IN UpnpClient_Handle Hnd,
-	/*! The requested subscription time. The actual timeout value is
+	/*! [in] The handle of the control point that is renewing the subscription. */
+	UpnpClient_Handle Hnd,
+	/*! [in] The requested subscription time. The actual timeout value is
 	 * returned when the callback function is called. */
-	IN int TimeOut,
-	/*! The ID for the subscription to renew. */
-	IN Upnp_SID SubsId,
-	/*! Pointer to a callback function to be invoked when the renewal is
+	int TimeOut,
+	/*! [in] The ID for the subscription to renew. */
+	Upnp_SID SubsId,
+	/*! [in] Pointer to a callback function to be invoked when the renewal is
 	 * complete. */
-	IN Upnp_FunPtr Fun,
-	/*! Pointer to user data passed to the callback function when invoked. */
-	IN const void *Cookie);
+	Upnp_FunPtr Fun,
+	/*! [in] Pointer to user data passed to the callback function when invoked. */
+	const void *Cookie);
 
 
 /*!
@@ -1804,9 +1817,9 @@ EXPORT_SPEC int UpnpRenewSubscriptionAsync(
 EXPORT_SPEC int UpnpSetMaxSubscriptions(  
 	/*! The handle of the device for which the maximum number of
 	 * subscriptions is being set. */
-	IN UpnpDevice_Handle Hnd,
+	UpnpDevice_Handle Hnd,
 	/*! The maximum number of subscriptions to be allowed per service. */
-	IN int MaxSubscriptions);
+	int MaxSubscriptions);
 
 
 /*!
@@ -1826,9 +1839,9 @@ EXPORT_SPEC int UpnpSetMaxSubscriptions(
 EXPORT_SPEC int UpnpSetMaxSubscriptionTimeOut(  
 	/*! The handle of the device for which the maximum subscription
 	 * time-out is being set. */
-	IN UpnpDevice_Handle Hnd,
+	UpnpDevice_Handle Hnd,
 	/*! The maximum subscription time-out to be accepted. */
-	IN int MaxSubscriptionTimeOut);
+	int MaxSubscriptionTimeOut);
 
 
 /*!
@@ -1861,16 +1874,16 @@ EXPORT_SPEC int UpnpSetMaxSubscriptionTimeOut(
  *             complete this operation.
  */
 EXPORT_SPEC int UpnpSubscribe(
-	/*! The handle of the control point. */
-	IN UpnpClient_Handle Hnd,
-	/*! The URL of the service to subscribe to. */
-	IN const char *PublisherUrl,
-	/*! Pointer to a variable containing the requested subscription time.
+	/*! [in] The handle of the control point. */
+	UpnpClient_Handle Hnd,
+	/*! [in] The URL of the service to subscribe to. */
+	const char *PublisherUrl,
+	/*! [in,out]Pointer to a variable containing the requested subscription time.
 	 * Upon return, it contains the actual subscription time returned from
 	 * the service. */
-	INOUT int *TimeOut,
-	/*! Pointer to a variable to receive the subscription ID (SID). */
-	OUT Upnp_SID SubsId);
+	int *TimeOut,
+	/*! [out] Pointer to a variable to receive the subscription ID (SID). */
+	Upnp_SID SubsId);
 
 
 /*!
@@ -1923,16 +1936,16 @@ EXPORT_SPEC int UpnpSubscribe(
  */
 EXPORT_SPEC int UpnpSubscribeAsync(
 	/*! The handle of the control point that is subscribing. */
-	IN UpnpClient_Handle Hnd,
+	UpnpClient_Handle Hnd,
 	/*! The URL of the service to subscribe to. */
-	IN const char *PublisherUrl,
+	const char *PublisherUrl,
 	/*! The requested subscription time. Upon return, it contains the actual
 	 * subscription time returned from the service. */
-	IN int TimeOut,
+	int TimeOut,
 	/*! Pointer to the callback function for this subscribe request. */
-	IN Upnp_FunPtr Fun,
+	Upnp_FunPtr Fun,
 	/*! A user data value passed to the callback function when invoked. */
-	IN const void *Cookie);
+	const void *Cookie);
 
 
 /*!
@@ -1965,10 +1978,10 @@ EXPORT_SPEC int UpnpSubscribeAsync(
  *             complete this operation.
  */
 EXPORT_SPEC int UpnpUnSubscribe(
-	/*! The handle of the subscribed control point. */
-	IN UpnpClient_Handle Hnd,
-	/*! The ID returned when the control point subscribed to the service. */
-	IN const Upnp_SID SubsId);
+	/*! [in] The handle of the subscribed control point. */
+	UpnpClient_Handle Hnd,
+	/*! [in] The ID returned when the control point subscribed to the service. */
+	const Upnp_SID SubsId);
 
 
 /*!
@@ -2018,15 +2031,15 @@ EXPORT_SPEC int UpnpUnSubscribe(
  *             <b>UpnpEventSubscribe.ErrCode</b> field as part of the callback).
  */
 EXPORT_SPEC int UpnpUnSubscribeAsync(
-	/*! The handle of the subscribed control point. */
-	IN UpnpClient_Handle Hnd,
-	/*! The ID returned when the control point subscribed to the service. */
-	IN Upnp_SID SubsId,
-	/*! Pointer to a callback function to be called when the operation is
+	/*! [in] The handle of the subscribed control point. */
+	UpnpClient_Handle Hnd,
+	/*! [in] The ID returned when the control point subscribed to the service. */
+	Upnp_SID SubsId,
+	/*! [in] Pointer to a callback function to be called when the operation is
 	 * complete. */
-	IN Upnp_FunPtr Fun,
-	/*! Pointer to user data to pass to the callback function when invoked. */
-	IN const void *Cookie);
+	Upnp_FunPtr Fun,
+	/*! [in] Pointer to user data to pass to the callback function when invoked. */
+	const void *Cookie);
 
 
 /*! @} Eventing */
@@ -2470,10 +2483,10 @@ typedef void *UpnpWebFileHandle;
  * \brief Get-info callback function prototype.
  */
 typedef int (*VDCallback_GetInfo)(
-		/*! The name of the file to query. */
-		IN  const char *filename,
-		/*! Pointer to a structure to store the information on the file. */
-		OUT UpnpFileInfo *info);
+		/*! [in] The name of the file to query. */
+		const char *filename,
+		/*! [out] Pointer to a structure to store the information on the file. */
+		UpnpFileInfo *info);
 
 /*!
  * \brief Sets the get_info callback function to be used to access a virtual
@@ -2490,11 +2503,11 @@ EXPORT_SPEC int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback);
  * \brief Open callback function prototype.
  */
 typedef UpnpWebFileHandle (*VDCallback_Open)(
-		/*! The name of the file to open. */ 
-		IN const char *filename,
-		/*! The mode in which to open the file.
+		/*! [in] The name of the file to open. */ 
+		const char *filename,
+		/*! [in] The mode in which to open the file.
 		 * Valid values are \c UPNP_READ or \c UPNP_WRITE. */
-		IN enum UpnpOpenFileMode Mode);
+		enum UpnpOpenFileMode Mode);
 
 
 /*!
@@ -2512,12 +2525,12 @@ EXPORT_SPEC int UpnpVirtualDir_set_OpenCallback(VDCallback_Open callback);
  * \brief Read callback function prototype.
  */
 typedef int (*VDCallback_Read)(
-	/*! The handle of the file to read. */
-	IN UpnpWebFileHandle fileHnd,
-	/*! The buffer in which to place the data. */
-	OUT char *buf,
-	/*! The size of the buffer (i.e. the number of bytes to read). */
-	IN size_t buflen);
+	/*! [in] The handle of the file to read. */
+	UpnpWebFileHandle fileHnd,
+	/*! [out] The buffer in which to place the data. */
+	char *buf,
+	/*! [in] The size of the buffer (i.e. the number of bytes to read). */
+	size_t buflen);
 
 
 /*! 
@@ -2535,12 +2548,12 @@ EXPORT_SPEC int UpnpVirtualDir_set_ReadCallback(VDCallback_Read callback);
  * \brief Write callback function prototype.
  */
 typedef	int (*VDCallback_Write)(
-	/*! The handle of the file to write. */
-	IN UpnpWebFileHandle fileHnd,
-	/*! The buffer with the bytes to write. */
-	IN char *buf,
-	/*! The number of bytes to write. */
-	IN size_t buflen);
+	/*! [in] The handle of the file to write. */
+	UpnpWebFileHandle fileHnd,
+	/*! [in] The buffer with the bytes to write. */
+	char *buf,
+	/*! [in] The number of bytes to write. */
+	size_t buflen);
 
 
 /*!
@@ -2558,17 +2571,17 @@ EXPORT_SPEC int UpnpVirtualDir_set_WriteCallback(VDCallback_Write callback);
  * \brief Seek callback function prototype.
  */
 typedef int (*VDCallback_Seek) (
-	/*! The handle of the file to move the file pointer. */
-	IN UpnpWebFileHandle fileHnd,
-	/*! The number of bytes to move in the file.  Positive values
+	/*! [in] The handle of the file to move the file pointer. */
+	UpnpWebFileHandle fileHnd,
+	/*! [in] The number of bytes to move in the file.  Positive values
 	 * move foward and negative values move backward.  Note that
 	 * this must be positive if the \b origin is \c SEEK_SET. */
-	IN off_t offset,
-	/*! The position to move relative to.  It can be \c SEEK_CUR
+	off_t offset,
+	/*! [in] The position to move relative to.  It can be \c SEEK_CUR
 	 * to move relative to the current position, \c SEEK_END to
 	 * move relative to the end of the file, or \c SEEK_SET to
 	 * specify an absolute offset. */
-	IN int origin);
+	int origin);
 
 
 /*!
@@ -2586,8 +2599,8 @@ EXPORT_SPEC int UpnpVirtualDir_set_SeekCallback(VDCallback_Seek callback);
  * \brief Close callback function prototype.
  */
 typedef int (*VDCallback_Close)(
-		/*! The handle of the file to close. */
-		IN UpnpWebFileHandle fileHnd);
+		/*! [in] The handle of the file to close. */
+		UpnpWebFileHandle fileHnd);
 
 
 /*!
