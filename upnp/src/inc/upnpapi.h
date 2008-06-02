@@ -34,6 +34,11 @@
 #define UPNPAPI_H
 
 
+/*!
+ * \file
+ */
+
+
 #include "client_table.h"
 #include "upnp.h"
 #include "VirtualDir.h"		/* for struct VirtualDirCallbacks */
@@ -367,6 +372,16 @@ int getlocalhostname(
 	char *out,
 	/*! [in] Length of the output buffer. */
 	const int out_len);
+
+
+/*!
+ * \brief Print handle info.
+ *	
+ * \return UPNP_E_SUCCESS if successful, otherwise returns appropriate error.
+ */
+int PrintHandleInfo(
+	/*! [in] Handle index. */
+	UpnpClient_Handle Hnd);
 
 
 extern WebServerState bWebServerState;

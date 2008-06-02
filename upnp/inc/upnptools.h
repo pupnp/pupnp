@@ -29,201 +29,235 @@
  *
  ******************************************************************************/
 
-/** @name Optional Tool APIs
- *  The Linux SDK for UPnP Devices contains some additional, optional 
- *  utility APIs that can be helpful in writing applications using the 
- *  SDK. These additional APIs can be compiled out in order to save code 
- *  size in the SDK. Refer to the README for details.
- */
-
-/*! @{ */
 
 #ifndef UPNP_TOOLS_H
 #define UPNP_TOOLS_H
+
+
+/*!
+ * \file
+ *
+ * \defgroup UPnPTools Optional Tool APIs
+ *
+ * The Linux SDK for UPnP Devices contains some additional, optional 
+ * utility APIs that can be helpful in writing applications using the 
+ * SDK. These additional APIs can be compiled out in order to save code 
+ * size in the SDK. Refer to the README for details.
+ *
+ * @{
+ */
+
 
 #include "upnp.h"
 
 /* Function declarations only if tools compiled into the library */
 #if UPNP_HAVE_TOOLS
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** {\bf UpnpResolveURL} combines a base URL and a relative URL into
- *  a single absolute URL.  The memory for {\bf AbsURL} needs to be
- *  allocated by the caller and must be large enough to hold the
- *  {\bf BaseURL} and {\bf RelURL} combined.
+
+/*!
+ * \brief Converts an SDK error code into a string error message suitable for
+ * display. The memory returned from this function should NOT be freed.
  *
- *  @return [int] An integer representing one of the following:
- *    \begin{itemize}
- *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_PARAM}: {\bf RelURL} is {\tt NULL}.
- *      \item {\tt UPNP_E_INVALID_URL}: The {\bf BaseURL} / {\bf RelURL} 
+ * \return An ASCII text string representation of the error message associated
+ * 	with the error code or the string "Unknown error code"
+ */
+EXPORT_SPEC const char *UpnpGetErrorMessage(
+	/*! [in] The SDK error code to convert. */
+	int errorcode);
+
+
+/*!
+ * \brief Combines a base URL and a relative URL into a single absolute URL.
+ *
+ * The memory for \b AbsURL needs to be allocated by the caller and must
+ * be large enough to hold the \b BaseURL and \b RelURL combined.
+ *
+ * \return An integer representing one of the following:
+ *	\li <tt>UPNP_E_SUCCESS</tt>: The operation completed successfully.
+ *	\li <tt>UPNP_E_INVALID_PARAM</tt>: \b RelURL is <tt>NULL</tt>.
+ *	\li <tt>UPNP_E_INVALID_URL</tt>: The \b BaseURL / \b RelURL 
  *              combination does not form a valid URL.
- *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
+ *	\li <tt>UPNP_E_OUTOF_MEMORY</tt>: Insufficient resources exist to 
  *              complete this operation.
- *    \end{itemize}
  */
-
 EXPORT_SPEC int UpnpResolveURL(
-    IN const char * BaseURL,  /** The base URL to combine. */
-    IN const char * RelURL,   /** The relative URL to {\bf BaseURL}. */
-    OUT char * AbsURL   /** A pointer to a buffer to store the 
-                            absolute URL. */
-    );
+	/*! [in] The base URL to combine. */
+	const char *BaseURL,
+	/*! [in] The relative URL to \b BaseURL. */
+	const char *RelURL,
+	/*! [out] A pointer to a buffer to store the absolute URL. */
+	char *AbsURL);
 
-/** {\bf UpnpMakeAction} creates an action request packet based on its input 
- *  parameters (status variable name and value pair). Any number of input 
- *  parameters can be passed to this function but every input variable name 
- *  should have a matching value argument. 
- *   
- *  @return [IXML_Document*] The action node of {\bf Upnp_Document} type or 
- *                      {\tt NULL} if the operation failed.
- */
 
-EXPORT_SPEC IXML_Document* UpnpMakeAction(
-    IN const char * ActionName, /** The action name. */
-    IN const char * ServType,   /** The service type.  */
-    IN int NumArg,              /** Number of argument pairs to be passed. */ 
-    IN const char * Arg,        /** Status variable name and value pair. */
-    IN ...                   /*  Other status variable name and value pairs. */
-    );
-
-/** {\bf UpnpAddToAction} creates an action request packet based on its input 
- *  parameters (status variable name and value pair). This API is specially 
- *  suitable inside a loop to add any number input parameters into an existing
- *  action. If no action document exists in the beginning then a 
- *  {\bf Upnp_Document} variable initialized with {\tt NULL} should be passed 
- *  as a parameter.
+/*!
+ * \brief Creates an action request packet based on its input parameters
+ * (status variable name and value pair).
  *
- *  @return [int] An integer representing one of the following:
- *    \begin{itemize}
- *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_PARAM}: One or more of the parameters 
- *                                        are invalid.
- *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
- *              complete this operation.
- *    \end{itemize}
+ * Any number of input parameters can be passed to this function but every
+ * input variable name should have a matching value argument. 
+ *
+ * It is a wrapper function that calls makeAction() function to create the
+ * action request.
+ * 
+ * \return The action node of \b Upnp_Document type or <tt>NULL</tt> if the
+ * 	operation failed.
  */
+EXPORT_SPEC IXML_Document *UpnpMakeAction(
+	/*! [in] Name of the action request or response. */
+	const char *ActionName,
+	/*! [in] The service type. */
+	const char *ServType,
+	/*! [in] Number of argument pairs to be passed. */
+	int NumArg,
+	/*! [in] pointer to the first argument. */
+	const char *Arg,
+	/*! [in] Argument list. */
+	...);
 
+
+/*!
+ * \brief Ceates an action response packet based on its output parameters
+ * (status variable name and value pair).
+ *
+ * Any number of input parameters can be passed to this function but every
+ * output variable name should have a matching value argument. 
+ *   
+ * It is a wrapper function that calls makeAction() function to create the
+ * action request.
+ * 
+ * \return The action node of \b Upnp_Document type or <tt>NULL</tt> if the
+ * 	operation failed.
+ */
+EXPORT_SPEC IXML_Document *UpnpMakeActionResponse(
+	/*! [in] The action name. */
+	const char *ActionName,
+	/*! [in] The service type.. */
+	const char *ServType,
+	/*! [in] The number of argument pairs passed. */
+	int NumArg,
+	/*! [in] The status variable name and value pair. */
+	const char *Arg,
+	/*! [in] Other status variable name and value pairs. */
+	...);
+
+
+/*!
+ * \brief Adds the argument in the action request.
+ * 
+ * This API is specially suitable inside a loop to add any number input
+ * parameters into an existing action. If no action document exists in the
+ * beginning then a <b>Upnp_Document variable initialized with <tt>NULL</tt></b>
+ * should be passed as a parameter.
+ *
+ * It is a wrapper function that calls addToAction() function to add the
+ * argument in the action request.
+ * 
+ * \return An integer representing one of the following:
+ *	\li <tt>UPNP_E_SUCCESS</tt>: The operation completed successfully.
+ *	\li <tt>UPNP_E_INVALID_PARAM</tt>: One or more of the parameters are invalid.
+ *	\li <tt>UPNP_E_OUTOF_MEMORY</tt>: Insufficient resources exist to
+ *		complete this operation.
+ */
 EXPORT_SPEC int UpnpAddToAction(
-        IN OUT IXML_Document ** ActionDoc, 
-	                              /** A pointer to store the action 
-				          document node. */
-        IN const char * ActionName,   /** The action name. */
-        IN const char * ServType,     /** The service type.  */
-        IN const char * ArgName,      /** The status variable name. */
-        IN const char * ArgVal        /** The status variable value.  */
-        );
+	/*! [in,out] A pointer to store the action document node. */
+	IXML_Document **ActionDoc,
+	/*! [in] The action name. */
+	const char *ActionName,
+	/*! [in] The service type. */
+	const char *ServType,
+	/*! [in] The status variable name. */
+	const char *ArgName,
+	/*! [in] The status variable value. */
+	const char *ArgVal);
 
-/** {\bf UpnpMakeActionResponse} creates an action response packet based 
- *  on its output parameters (status variable name and value pair). Any  
- *  number of input parameters can be passed to this function but every output
- *  variable name should have a matching value argument. 
- *   
- *  @return [IXML_Document*] The action node of {\bf Upnp_Document} type or 
- *                           {\tt NULL} if the operation failed.
- */
 
-EXPORT_SPEC IXML_Document* UpnpMakeActionResponse(
-    IN const char * ActionName, /** The action name. */
-    IN const char * ServType,   /** The service type.  */
-    IN int NumArg,              /** The number of argument pairs passed. */  
-    IN const char * Arg,        /** The status variable name and value pair. */
-    IN ...                   /*  Other status variable name and value pairs. */
-    );
-
-/** {\bf UpnpAddToActionResponse} creates an action response
- *  packet based on its output parameters (status variable name
- *  and value pair). This API is especially suitable inside
- *  a loop to add any number of input parameters into an existing action 
- *  response. If no action document exists in the beginning, a 
- *  {\bf Upnp_Document} variable initialized with {\tt NULL} should be passed 
- *  as a parameter.
+/*!
+ * \brief Creates an action response packet based on its output parameters
+ * (status variable name and value pair).
  *
- *  @return [int] An integer representing one of the following:
- *    \begin{itemize}
- *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_PARAM}: One or more of the parameters 
- *                                        are invalid.
- *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
- *              complete this operation.
- *    \end{itemize}
+ * This API is especially suitable inside a loop to add any number of input
+ * parameters into an existing action response. If no action document exists
+ * in the beginning, a \b Upnp_Document variable initialized with <tt>NULL</tt>
+ * should be passed as a parameter.
+ *
+ * It is a wrapper function that calls addToAction() function to add the
+ * argument in the action request.
+ * 
+ * \return An integer representing one of the following:
+ *	\li <tt>UPNP_E_SUCCESS</tt>: The operation completed successfully.
+ *	\li <tt>UPNP_E_INVALID_PARAM</tt>: One or more of the parameters are invalid.
+ *	\li <tt>UPNP_E_OUTOF_MEMORY</tt>: Insufficient resources exist to
+ *		complete this operation.
  */
-
 EXPORT_SPEC int UpnpAddToActionResponse(
-        IN OUT IXML_Document ** ActionResponse, 
-	                                   /** Pointer to a document to 
-					       store the action document 
-					       node. */
-        IN const char * ActionName,        /** The action name. */
-        IN const char * ServType,          /** The service type.  */
-        IN const char * ArgName,           /** The status variable name. */
-        IN const char * ArgVal             /** The status variable value.  */
-        );
+	/*! [in,out] Pointer to a document to store the action document node. */
+        IXML_Document **ActionResponse, 
+	/*! [in] The action name. */
+        const char *ActionName,
+	/*! [in] The service type. */
+        const char *ServType,
+	/*! [in] The status variable name. */
+        const char *ArgName,
+	/*! [in] The status variable value. */
+        const char *ArgVal);
 
-/** {\bf UpnpAddToPropertySet} can be used when an application needs to 
- *  transfer the status of many variables at once. It can be used 
- *  (inside a loop) to add some extra status variables into an existing
- *  property set. If the application does not already have a property
- *  set document, the application should create a variable initialized 
- *  with {\tt NULL} and pass that as the first parameter.
- *  
- *  @return [int] An integer representing one of the following:
- *    \begin{itemize}
- *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_PARAM}: One or more of the parameters 
- *                                        are invalid.
- *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
- *              complete this operation.
- *    \end{itemize}
+
+/*!
+ * \brief Creates a property set message packet.
  *
+ * Any number of input parameters can be passed to this function but every
+ * input variable name should have a matching value input argument.
+ *  
+ * \return <tt>NULL</tt> on failure, or the property-set document node.
  */
+EXPORT_SPEC IXML_Document *UpnpCreatePropertySet(
+	/*! [in] The number of argument pairs passed. */
+	int NumArg,
+	/*! [in] The status variable name and value pair. */
+	const char *Arg,
+	/*! [in] Variable sized list with the rest of the parameters. */
+	...);
 
+
+/*!
+ * \brief Can be used when an application needs to transfer the status of many
+ * variables at once.
+ *
+ * It can be used (inside a loop) to add some extra status variables into an
+ * existing property set. If the application does not already have a property
+ * set document, the application should create a variable initialized with
+ * <tt>NULL</tt> and pass that as the first parameter.
+ *  
+ * \return An integer representing one of the following:
+ *	\li <tt>UPNP_E_SUCCESS</tt>: The operation completed successfully.
+ *	\li <tt>UPNP_E_INVALID_PARAM</tt>: One or more of the parameters are invalid.
+ *	\li <tt>UPNP_E_OUTOF_MEMORY</tt>: Insufficient resources exist to
+ *		complete this operation.
+ */
 EXPORT_SPEC int UpnpAddToPropertySet(
-    IN OUT IXML_Document **PropSet,    
-                                  /** A pointer to the document containing 
-				      the property set document node. */
-    IN const char * ArgName,      /** The status variable name. */  
-    IN const char * ArgVal        /** The status variable value.  */
-    );
+	/*! [in,out] A pointer to the document containing the property set document node. */
+	IXML_Document **PropSet,
+	/*! [in] The status variable name. */
+	const char *ArgName,
+	/*! [in] The status variable value. */
+	const char *ArgVal);
 
-/** {\bf UpnpCreatePropertySet} creates a property set  
- *  message packet. Any number of input parameters can be passed  
- *  to this function but every input variable name should have 
- *  a matching value input argument.
- *  
- *  @return [IXML_Document*] {\tt NULL} on failure, or the property-set 
- *                           document node.
- *
- */
-
-EXPORT_SPEC IXML_Document* UpnpCreatePropertySet(
-    IN int NumArg,        /** The number of argument pairs passed. */
-    IN const char* Arg,   /** The status variable name and value pair. */
-    IN ...
-    );
-
-/** {\bf UpnpGetErrorMessage} converts an SDK error code into a 
- *  string error message suitable for display.  The memory returned
- *  from this function should NOT be freed.
- *
- *  @return [char*] An ASCII text string representation of the error message 
- *                  associated with the error code. 
- */
-
-EXPORT_SPEC const char * UpnpGetErrorMessage(
-        int errorcode  /** The SDK error code to convert. */
-        );
-
-/*! @} */
 
 #ifdef __cplusplus
 }
 #endif
 
+
+/*! @} */
+
+
 #endif /* UPNP_HAVE_TOOLS */
+
 
 #endif /* UPNP_TOOLS_H */
 

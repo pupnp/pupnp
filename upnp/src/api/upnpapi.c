@@ -33,6 +33,11 @@
 #include "config.h"
 
 
+/*!
+ * \file
+ */
+
+
 #include <sys/stat.h>
 
 
@@ -168,17 +173,17 @@ Upnp_SID gUpnpSdkNLSuuid;
 
 
 // FIXME Put this declaration in the proper header file
-static int
-GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
-                       IN char *description,
-                       IN unsigned int bufferLen,
-                       IN int config_baseURL,
-                       IN int AddressFamily,
-                       OUT IXML_Document ** xmlDoc,
-                       OUT char descURL[LINE_SIZE] );
+static int GetDescDocumentAndURL(
+	IN Upnp_DescType descriptionType,
+	IN char *description,
+	IN unsigned int bufferLen,
+	IN int config_baseURL,
+	IN int AddressFamily,
+	OUT IXML_Document ** xmlDoc,
+	OUT char descURL[LINE_SIZE] );
 
 
-int UpnpInit(IN const char *HostIP, IN unsigned short DestPort)
+int UpnpInit(const char *HostIP, unsigned short DestPort)
 {
 	int retVal;
 
@@ -231,7 +236,7 @@ int UpnpInit(IN const char *HostIP, IN unsigned short DestPort)
 }
 
 
-int UpnpInit2(IN const char *IfName, IN unsigned short DestPort)
+int UpnpInit2(const char *IfName, unsigned short DestPort)
 {
 	int retVal;
 
@@ -406,10 +411,10 @@ char *UpnpGetServerIp6Address()
 
 #ifdef INCLUDE_DEVICE_APIS
 int UpnpRegisterRootDevice(
-	IN const char *DescUrl,
-	IN Upnp_FunPtr Fun,
-	IN const void *Cookie,
-	OUT UpnpDevice_Handle *Hnd)
+	const char *DescUrl,
+	Upnp_FunPtr Fun,
+	const void *Cookie,
+	UpnpDevice_Handle *Hnd)
 {
 	struct Handle_Info *HInfo = NULL;
 	int retVal = 0;
@@ -537,13 +542,13 @@ exit_function:
 
 #ifdef INCLUDE_DEVICE_APIS
 int UpnpRegisterRootDevice2(
-	IN Upnp_DescType descriptionType,
-	IN const char *description_const,
-	IN size_t bufferLen,   // ignored unless descType == UPNPREG_BUF_DESC
-	IN int config_baseURL,
-	IN Upnp_FunPtr Fun,
-	IN const void *Cookie,
-	OUT UpnpDevice_Handle *Hnd)
+	Upnp_DescType descriptionType,
+	const char *description_const,
+	size_t bufferLen,   // ignored unless descType == UPNPREG_BUF_DESC
+	int config_baseURL,
+	Upnp_FunPtr Fun,
+	const void *Cookie,
+	UpnpDevice_Handle *Hnd)
 {
 	struct Handle_Info *HInfo = NULL;
 	int retVal = 0;
@@ -667,11 +672,11 @@ exit_function:
 
 #ifdef INCLUDE_DEVICE_APIS
 int UpnpRegisterRootDevice3(
-	IN const char *DescUrl,
-	IN Upnp_FunPtr Fun,
-	IN const void *Cookie,
-	OUT UpnpDevice_Handle * Hnd,
-	IN const int AddressFamily )
+	const char *DescUrl,
+	Upnp_FunPtr Fun,
+	const void *Cookie,
+	UpnpDevice_Handle *Hnd,
+	const int AddressFamily)
 {
 	struct Handle_Info *HInfo;
 	int retVal = 0;
@@ -800,7 +805,7 @@ exit_function:
 
 
 #ifdef INCLUDE_DEVICE_APIS
-int UpnpUnRegisterRootDevice(IN UpnpDevice_Handle Hnd)
+int UpnpUnRegisterRootDevice(UpnpDevice_Handle Hnd)
 {
     int retVal = 0;
     struct Handle_Info *HInfo = NULL;
@@ -826,9 +831,9 @@ int UpnpUnRegisterRootDevice(IN UpnpDevice_Handle Hnd)
     HandleUnlock();
 
 #if EXCLUDE_SSDP == 0
-    retVal = AdvertiseAndReply( -1, Hnd, 0, ( struct sockaddr * )NULL,
-                                ( char * )NULL, ( char * )NULL,
-                                ( char * )NULL, HInfo->MaxAge );
+    retVal = AdvertiseAndReply(-1, Hnd, 0, (struct sockaddr *)NULL,
+                                (char *)NULL, (char *)NULL,
+                                (char *)NULL, HInfo->MaxAge);
 #endif
 
     HandleLock();
@@ -867,12 +872,11 @@ int UpnpUnRegisterRootDevice(IN UpnpDevice_Handle Hnd)
 #endif // INCLUDE_DEVICE_APIS
 
 
-/*****************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 int UpnpRegisterClient(
-	IN Upnp_FunPtr Fun,
-	IN const void *Cookie,
-	OUT UpnpClient_Handle *Hnd)
+	Upnp_FunPtr Fun,
+	const void *Cookie,
+	UpnpClient_Handle *Hnd)
 {
     struct Handle_Info *HInfo;
 
@@ -925,9 +929,8 @@ int UpnpRegisterClient(
 #endif // INCLUDE_CLIENT_APIS
 
 
-/*****************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
-int UpnpUnRegisterClient(IN UpnpClient_Handle Hnd)
+int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 {
     struct Handle_Info *HInfo;
     ListNode *node = NULL;
@@ -979,10 +982,8 @@ int UpnpUnRegisterClient(IN UpnpClient_Handle Hnd)
 #endif // INCLUDE_CLIENT_APIS
 
 
-// *************************************************************
 #ifdef INCLUDE_DEVICE_APIS
 #ifdef INTERNAL_WEB_SERVER
-
 /**************************************************************************
  * Function: GetNameForAlias
  *
@@ -2932,141 +2933,85 @@ UpnpGetServiceVarStatus( IN UpnpClient_Handle Hnd,
 
     return retVal;
 
-}  /****************** End of UpnpGetServiceVarStatus *********************/
+}
 #endif // INCLUDE_CLIENT_APIS
 #endif // EXCLUDE_SOAP
 
-//---------------------------------------------------------------------------
-//
-//                                   Client API's 
-//
-//---------------------------------------------------------------------------
 
-/**************************************************************************
- * Function: UpnpOpenHttpPost 
+/******************************************************************************
  *
- * Parameters:	
- *  
- * Description:
+ *                             Client API's 
  *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
+ *****************************************************************************/
 
-int
-UpnpOpenHttpPost( IN const char *url,
-                  IN OUT void **handle,
-                  IN const char *contentType,
-                  IN int contentLength,
-                  IN int timeout )
+
+int UpnpOpenHttpPost(
+	const char *url,
+	void **handle,
+	const char *contentType,
+	int contentLength,
+	int timeout)
 {
     return http_OpenHttpPost( url, handle, contentType, contentLength,
                               timeout );
 }
 
-/**************************************************************************
- * Function: UpnpWriteHttpPost 
- *
- * Parameters:	
- *  
- * Description:
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpWriteHttpPost( IN void *handle,
-                   IN char *buf,
-                   IN unsigned int *size,
-                   IN int timeout )
+
+int UpnpWriteHttpPost(
+	void *handle,
+	char *buf,
+	unsigned int *size,
+	int timeout)
 {
     return http_WriteHttpPost( handle, buf, size, timeout );
 }
 
-/**************************************************************************
- * Function: UpnpCloseHttpPost 
- *
- * Parameters:	
- *  
- * Description:
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpCloseHttpPost( IN void *handle,
-                   IN OUT int *httpStatus,
-                   int timeout )
+
+int UpnpCloseHttpPost(
+	void *handle,
+	int *httpStatus,
+	int timeout)
 {
     return http_CloseHttpPost( handle, httpStatus, timeout );
 }
 
-/**************************************************************************
- * Function: UpnpOpenHttpGet 
- *
- * Parameters:	
- *  
- * Description:
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpOpenHttpGet( IN const char *url_str,
-                 IN OUT void **Handle,
-                 IN OUT char **contentType,
-                 OUT int *contentLength,
-                 OUT int *httpStatus,
-                 IN int timeout )
+
+int UpnpOpenHttpGet(
+	const char *url_str,
+	void **Handle,
+	char **contentType,
+	int *contentLength,
+	int *httpStatus,
+	int timeout)
 {
     return http_OpenHttpGet( url_str, Handle, contentType, contentLength,
                              httpStatus, timeout );
 }
 
 
-
-/**************************************************************************
- * Function: UpnpOpenHttpGetProxy
- *
- * Parameters:	
- *  
- * Description:
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpOpenHttpGetProxy( IN const char *url_str,
-                 IN const char *proxy_str,
-                 IN OUT void **Handle,
-                 IN OUT char **contentType,
-                 OUT int *contentLength,
-                 OUT int *httpStatus,
-                 IN int timeout )
+int UpnpOpenHttpGetProxy(
+	const char *url_str,
+	const char *proxy_str,
+	void **Handle,
+	char **contentType,
+	int *contentLength,
+	int *httpStatus,
+	int timeout)
 {
     return http_OpenHttpGetProxy( url_str, proxy_str, Handle, contentType, contentLength,
                              httpStatus, timeout );
 }
 
-/**************************************************************************
- * Function: UpnpOpenHttpGetEx
- *
- * Parameters:	
- *  
- * Description:
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpOpenHttpGetEx( IN const char *url_str,
-                   IN OUT void **Handle,
-                   IN OUT char **contentType,
-                   OUT int *contentLength,
-                   OUT int *httpStatus,
-                   IN int lowRange,
-                   IN int highRange,
-                   IN int timeout )
+
+int UpnpOpenHttpGetEx(
+	const char *url_str,
+	void **Handle,
+	char **contentType,
+	int *contentLength,
+	int *httpStatus,
+	int lowRange,
+	int highRange,
+	int timeout)
 {
     return http_OpenHttpGetEx( url_str,
                                Handle,
@@ -3076,93 +3021,31 @@ UpnpOpenHttpGetEx( IN const char *url_str,
 }
 
 
-
-/**************************************************************************
- * Function: UpnpCancelHttpGet 
- *
- * Parameters:	
- *  
- * Description:
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpCancelHttpGet( IN void *Handle )
+int UpnpCancelHttpGet(void *Handle)
 {
-    return http_CancelHttpGet( Handle );
-}
-
-/**************************************************************************
- * Function: UpnpCloseHttpGet 
- *
- * Parameters:	
- *  
- * Description:
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpCloseHttpGet( IN void *Handle )
-{
-    return http_CloseHttpGet( Handle );
-}
-
-/**************************************************************************
- * Function: UpnpReadHttpGet 
- *
- * Parameters:	
- *  
- * Description:
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpReadHttpGet( IN void *Handle,
-                 IN OUT char *buf,
-                 IN OUT unsigned int *size,
-                 IN int timeout )
-{
-    return http_ReadHttpGet( Handle, buf, size, timeout );
+	return http_CancelHttpGet(Handle);
 }
 
 
-
-/**************************************************************************
- * Function: UpnpHttpGetProgress 
- *
- * Parameters:	
- *  
- * Description:
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful.
- *	UPNP_E_INVALID_PARAM if the provided pointers were invalid.
- ***************************************************************************/
-int
-UpnpHttpGetProgress( IN void *Handle, 
-                     OUT unsigned int *length,
-                     OUT unsigned int *total )
+int UpnpCloseHttpGet(void *Handle)
 {
-    return http_HttpGetProgress(Handle, length, total);
+	return http_CloseHttpGet(Handle);
 }
 
-/**************************************************************************
- * Function: UpnpDownloadUrlItem 
- *
- * Parameters:	
- *  
- * Description:
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpDownloadUrlItem( const char *url,
-                     char **outBuf,
-                     char *contentType )
+
+int UpnpReadHttpGet(void *Handle, char *buf, unsigned int *size, int timeout)
+{
+	return http_ReadHttpGet(Handle, buf, size, timeout);
+}
+
+
+int UpnpHttpGetProgress(void *Handle, unsigned int *length, unsigned int *total)
+{
+	return http_HttpGetProgress(Handle, length, total);
+}
+
+
+int UpnpDownloadUrlItem(const char *url, char **outBuf, char *contentType)
 {
     int ret_code;
     int dummy;
@@ -3181,16 +3064,12 @@ UpnpDownloadUrlItem( const char *url,
     return ret_code;
 }
 
-/**************************************************************************
- * Function: UpnpDownloadXmlDoc 
+
+/*!
+ * \brief UpnpDownloadXmlDoc 
  *
- * Parameters:	
- *  
- * Description:
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
+ * \return UPNP_E_SUCCESS if successful otherwise the appropriate error code.
+ */
 int UpnpDownloadXmlDoc(const char *url, IXML_Document **xmlDoc)
 {
 	int ret_code;
@@ -3418,7 +3297,7 @@ ExitFunction:
 }
 
 
-int UpnpInitStartServers(IN unsigned short DestPort)
+int UpnpInitStartServers(unsigned short DestPort)
 {
 	int retVal = 0;
 
@@ -3921,8 +3800,8 @@ int GetFreeHandle()
 
 /* Assumes at most one client */
 Upnp_Handle_Type GetClientHandleInfo(
-	IN UpnpClient_Handle *client_handle_out,
-	OUT struct Handle_Info **HndInfo)
+	UpnpClient_Handle *client_handle_out,
+	struct Handle_Info **HndInfo)
 {
 	Upnp_Handle_Type ret = HND_CLIENT;
 	UpnpClient_Handle client;
@@ -4022,14 +3901,7 @@ int FreeHandle(int Upnp_Handle)
 }
 
 
-/*!
- * \brief Print handle info.
- *	
- * \return UPNP_E_SUCCESS if successful, otherwise returns appropriate error.
- */
-int PrintHandleInfo(
-	/*! [in] Handle index. */
-	IN UpnpClient_Handle Hnd)
+int PrintHandleInfo(UpnpClient_Handle Hnd)
 {
     struct Handle_Info * HndInfo;
     if (HandleTable[Hnd] != NULL) {
@@ -4051,7 +3923,7 @@ int PrintHandleInfo(
 }
 
 
-void printNodes( IXML_Node * tmpRoot, int depth )
+void printNodes(IXML_Node *tmpRoot, int depth)
 {
     int i;
     IXML_NodeList *NodeList1;
@@ -4078,7 +3950,7 @@ void printNodes( IXML_Node * tmpRoot, int depth )
 }
 
 
-int getlocalhostname(OUT char *out, IN const int out_len)
+int getlocalhostname(char *out, const int out_len)
 {
 #ifdef WIN32
 	struct hostent *h=NULL;
@@ -4218,24 +4090,7 @@ void AutoAdvertise(void *input)
 
 
 #ifdef INTERNAL_WEB_SERVER
-
-/*!
- * \brief Sets the document root directory for the internal web server.
- *
- * This directory is considered the root directory (i.e. "/") of the web server.
- * This function also activates or deactivates the web server.
- *
- * To disable the web server, pass NULL for rootDir, to activate pass a valid
- * directory string.
- *  
- * \note This function is not available when the web server is not compiled
- * 	into the UPnP Library.
- *
- * \return UPNP_E_SUCCESS if successful else returns appropriate error.
- */
-int UpnpSetWebServerRootDir(
-	/* [in] Path of the root directory of the web server. */
-	IN const char *rootDir)
+int UpnpSetWebServerRootDir(const char *rootDir)
 {
     if( UpnpSdkInit == 0 )
         return UPNP_E_FINISH;
@@ -4245,26 +4100,12 @@ int UpnpSetWebServerRootDir(
 
     membuffer_destroy( &gDocumentRootDir );
 
-    return ( web_server_set_root_dir( rootDir ) );
+    return web_server_set_root_dir(rootDir);
 }
 #endif // INTERNAL_WEB_SERVER
 
 
-/*!
- * \brief Adds a virtual directory mapping.
- *
- * All webserver requests containing the given directory are read using
- * functions contained in a VirtualDirCallbacks structure registered
- * via UpnpSetVirtualDirCallbacks.
- *  
- * \note This function is not available when the web server is not
- * 	compiled into the UPnP Library.
- *
- * \return UPNP_E_SUCCESS if successful else returns appropriate error.
- */
-int UpnpAddVirtualDir(
-	/* [in] The name of the new directory mapping to add. */
-	IN const char *newDirName)
+int UpnpAddVirtualDir(const char *newDirName)
 {
     virtualDirList *pNewVirtualDir;
     virtualDirList *pLast;
@@ -4320,14 +4161,7 @@ int UpnpAddVirtualDir(
 }
 
 
-/*!
- * \brief Removes a virtual directory mapping.
- *
- * \return UPNP_E_SUCCESS if successful else returns appropriate error.
- */
-int UpnpRemoveVirtualDir(
-	/* [in] The name of the directory mapping to remove. */
-	IN const char *dirName)
+int UpnpRemoveVirtualDir(const char *dirName)
 {
 
     virtualDirList *pPrev;
@@ -4380,9 +4214,6 @@ int UpnpRemoveVirtualDir(
 }
 
 
-/*!
- * \brief Removes all the virtual directory mappings.
- */
 void UpnpRemoveAllVirtualDirs()
 {
     virtualDirList *pCur;
@@ -4406,15 +4237,7 @@ void UpnpRemoveAllVirtualDirs()
 }
 
 
-/*!
- * \brief Enables or disables the webserver. A value of TRUE enables the
- * 	webserver, FALSE disables it.
- *
- * \return UPNP_E_SUCCESS if successful else returns appropriate error.
- */
-int UpnpEnableWebserver(
-	/* [in] TRUE to enable, FALSE to disable. */
-	IN int enable)
+int UpnpEnableWebserver(int enable)
 {
     int retVal;
 
@@ -4539,16 +4362,9 @@ int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback)
 }
 
 
-/*!
- * \brief 
- *
- * \deprecated Use UpnpSetMaxContentLength() instead.
- */
 int UpnpSetContentLength(
-	/* [in] . */
-	IN UpnpClient_Handle Hnd,
-	/* [in] . */
-	IN int contentLength)
+	UpnpClient_Handle Hnd,
+	int contentLength)
 {
 	int errCode = UPNP_E_SUCCESS;
 	struct Handle_Info *HInfo = NULL;
@@ -4581,23 +4397,7 @@ int UpnpSetContentLength(
 }
 
 
-/*!
- * \brief Sets the maximum content-length that the SDK will process on an
- * incoming SOAP requests or responses.
- *
- * This API allows devices that have memory constraints to exhibit consistent
- * behaviour if the size of the incoming SOAP message exceeds the memory that
- * device can allocate.
- *
- * The default maximum content-length is {\tt DEFAULT_SOAP_CONTENT_LENGTH}
- * == 16K bytes.
- *
- * \return UPNP_E_SUCCESS if the operation completed successfully.
- */
-int UpnpSetMaxContentLength(
-	/*! Permissible content length, in bytes. The maximum size to be set. */
-	IN size_t contentLength
-     )
+int UpnpSetMaxContentLength(size_t contentLength)
 {
 	int errCode = UPNP_E_SUCCESS;
 
