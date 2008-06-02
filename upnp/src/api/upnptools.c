@@ -387,7 +387,7 @@ IXML_Document *UpnpCreatePropertySet(
 	}
 
 	if (NumArg < 1) {
-		return NULL;
+		return PropSet;
 	}
 
 	va_start(ArgList, Arg);

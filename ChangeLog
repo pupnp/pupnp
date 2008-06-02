@@ -2,6 +2,30 @@
 Version 1.8.0
 *******************************************************************************
 
+2008-06-02 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 1942285 ]
+	UpnpCreatePropertySet can leak memory.
+	Submitted By: Bob Ciora - bobciora
+
+	In file upnp/src/api/upnptools.c, function UpnpCreatePropertySet can leak
+	memory if no additional arguments are passed. This is because of the
+	'return' statement at (or near) line 554.
+
+	The prior call to ixmlParseBufferEx may succeed. This causes a basic ixml
+	tree to be created. The return statement at line 554 leaves this tree in
+	memory without cleaning it up.
+
+	There are two options: either add code prior to the return at 554 to clean
+	up the tree, or simply allow a NumArg parameter of 0 to be passed.
+
+	I prefer the second method -- there doesn't seem to be any need to pass
+	*any* arguments to this function.
+
+	In my local copy of upnptools.c, I have simply replaced the "return NULL"
+	in line 554 to "return PropSet".
+
+	I've attached the source file.
+
 2008-05-31 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Charles Nepveu's suggestion of not allocating a thread for
 	MiniServer when it is not compiled.
