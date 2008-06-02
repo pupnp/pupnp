@@ -48,6 +48,7 @@
 #include "uri.h"
 
 
+/*! Maximum action header buffer length. */
 #define HEADER_LENGTH 2000
 
 

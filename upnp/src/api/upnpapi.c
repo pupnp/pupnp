@@ -98,26 +98,33 @@
 /*! This structure is for virtual directory callbacks */
 struct VirtualDirCallbacks virtualDirCallback;
 
-/*! */
+/*! Pointer to the virtual directory list. */
 virtualDirList *pVirtualDirList;
 
 #ifdef INCLUDE_CLIENT_APIS
-/*! Mutex to synchronize the subscription handling at the client side */
+/*! Mutex to synchronize the subscription handling at the client side. */
 ithread_mutex_t GlobalClientSubscribeMutex;
 #endif /* INCLUDE_CLIENT_APIS */
 
-/*! rwlock to synchronize handles (root device or control point handle) */
+/*! rwlock to synchronize handles (root device or control point handle). */
 ithread_rwlock_t GlobalHndRWLock;
 
-/*! Mutex to synchronize the uuid creation process */
+/*! Mutex to synchronize the uuid creation process. */
 ithread_mutex_t gUUIDMutex;
 
+/*! Initialization mutex. */
 ithread_mutex_t gSDKInitMutex = PTHREAD_MUTEX_INITIALIZER;
 
+/*! Global timer thread. */
 TimerThread gTimerThread;
 
+/*! Send thread pool. */
 ThreadPool gSendThreadPool;
+
+/*! Receive thread pool. */
 ThreadPool gRecvThreadPool;
+
+/*! Mini server thread pool. */
 ThreadPool gMiniServerThreadPool;
 
 /*! Flag to indicate the state of web server */
@@ -135,8 +142,10 @@ char gIF_IPV6[65]/* INET6_ADDRSTRLEN*/ = { '\0' };
 /*! Contains interface index. (extern'ed in upnp.h) */
 int  gIF_INDEX = -1;
 
-/*! local IPv4 and IPv6 ports for the mini-server */
+/*! local IPv4 port for the mini-server */
 unsigned short LOCAL_PORT_V4;
+
+/*! local IPv6 port for the mini-server */
 unsigned short LOCAL_PORT_V6;
 
 /*! UPnP device and control point handle table  */
@@ -194,18 +203,18 @@ int UpnpInit(const char *HostIP, unsigned short DestPort)
 {
 	int retVal;
 
-	ithread_mutex_lock( &gSDKInitMutex );
+	ithread_mutex_lock(&gSDKInitMutex);
 
 	// Check if we're already initialized.
 	if( UpnpSdkInit == 1 ) {
-		ithread_mutex_unlock( &gSDKInitMutex );
+		ithread_mutex_unlock(&gSDKInitMutex);
 		return UPNP_E_INIT;
 	}
 
 	// Perform initialization preamble.
 	retVal = UpnpInitPreamble();
 	if( retVal != UPNP_E_SUCCESS ) {
-		ithread_mutex_unlock( &gSDKInitMutex );
+		ithread_mutex_unlock(&gSDKInitMutex);
 		return retVal;
 	}
 
