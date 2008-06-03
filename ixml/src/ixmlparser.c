@@ -2632,7 +2632,7 @@ static int Parser_getNextNode(
 	}
 
 ExitFunction:
-	if (ret != IXML_SUCCESS) {
+	if (ret != IXML_SUCCESS && ret != IXML_FILE_DONE) {
 		IxmlPrintf("(%s::Parser_getNextNode): Error %d, line %d\n",
 			__FILE__, ret, line);
 	}
