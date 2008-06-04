@@ -38,6 +38,11 @@
 #include "ixmlparser.h"
 
 
+/*!
+ * \file
+ */
+
+
 void ixmlDocument_init(IXML_Document *doc)
 {
 	memset(doc, 0, sizeof(IXML_Document));
