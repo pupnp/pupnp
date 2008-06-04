@@ -10,6 +10,11 @@
 #include <stdio.h>
 
 
+/*!
+ * \file
+ */
+
+
 #ifdef DEBUG
 void IxmlPrintf(
 	const char *FmtStr,
