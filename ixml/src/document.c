@@ -34,6 +34,7 @@
 #include <stdlib.h>
 
 
+#include "ixmldebug.h"
 #include "ixmlparser.h"
 
 
@@ -438,19 +439,23 @@ int ixmlDocument_createElementNSEx(
 {
 	IXML_Element *newElement = NULL;
 	int errCode = IXML_SUCCESS;
+	int line = 0;
 
 	if (doc == NULL || namespaceURI == NULL || qualifiedName == NULL) {
+		line = __LINE__;
 		errCode = IXML_INVALID_PARAMETER;
 		goto ErrorHandler;
 	}
 
 	errCode = ixmlDocument_createElementEx(doc, qualifiedName, &newElement);
 	if (errCode != IXML_SUCCESS) {
+		line = __LINE__;
 		goto ErrorHandler;
 	}
 	// set the namespaceURI field 
 	newElement->n.namespaceURI = strdup(namespaceURI);
 	if (newElement->n.namespaceURI == NULL) {
+		line = __LINE__;
 		ixmlElement_free(newElement);
 		newElement = NULL;
 		errCode = IXML_INSUFFICIENT_MEMORY;
@@ -459,6 +464,7 @@ int ixmlDocument_createElementNSEx(
 	// set the localName and prefix 
 	errCode = ixmlNode_setNodeName((IXML_Node *)newElement, qualifiedName);
 	if (errCode != IXML_SUCCESS) {
+		line = __LINE__;
 		ixmlElement_free(newElement);
 		newElement = NULL;
 		errCode = IXML_INSUFFICIENT_MEMORY;
@@ -469,6 +475,11 @@ int ixmlDocument_createElementNSEx(
 
 ErrorHandler:
 	*rtElement = newElement;
+	if (errCode != IXML_SUCCESS) {
+		IxmlPrintf("(%s::ixmlDocument_createElementNSEx): Error %d, line %d\n",
+			__FILE__, errCode, line);
+	}
+
 	return errCode;
 }
 
