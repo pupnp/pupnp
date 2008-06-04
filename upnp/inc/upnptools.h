@@ -37,12 +37,13 @@
 /*!
  * \file
  *
- * \defgroup UPnPTools Optional Tool APIs
+ * \defgroup UPnPTools Optional Tool API
  *
- * The Linux SDK for UPnP Devices contains some additional, optional 
- * utility APIs that can be helpful in writing applications using the 
- * SDK. These additional APIs can be compiled out in order to save code 
- * size in the SDK. Refer to the README for details.
+ * \brief Additional, optional utility API that can be helpful in writing
+ * applications.
+ *
+ * This additional API can be compiled out in order to save code size in the
+ * library. Refer to the file README for details.
  *
  * @{
  */

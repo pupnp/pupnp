@@ -1119,7 +1119,7 @@ EXPORT_SPEC int UpnpRegisterRootDevice3(
  */
 EXPORT_SPEC int UpnpUnRegisterRootDevice(
 	/*! [in] The handle of the root device instance to unregister. */
-	UpnpDevice_Handle);
+	UpnpDevice_Handle Hnd);
 
 
 /*!
@@ -1553,16 +1553,18 @@ EXPORT_SPEC int UpnpSendActionExAsync(
  */
 
 
-/*! \b UpnpAcceptSubscription accepts a subscription request and sends
- *  out the current state of the eventable variables for a service.  
- *  The device application should call this function when it receives a 
- *  \c UPNP_EVENT_SUBSCRIPTION_REQUEST callback. This function is 
- *  synchronous and generates no callbacks.
+/*!
+ * \brief Accepts a subscription request and sends out the current state of the
+ * eventable variables for a service.
  *
- *  \b UpnpAcceptSubscription can be called during the execution of 
- *  a callback function.
+ * The device application should call this function when it receives a
+ * \c UPNP_EVENT_SUBSCRIPTION_REQUEST callback.
  *
- *  \return [int] An integer representing one of the following:
+ * This function is synchronous and generates no callbacks.
+ *
+ * This function can be called during the execution of a callback function.
+ *
+ * \return An integer representing one of the following:
  *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
  *      \li \c UPNP_E_INVALID_HANDLE: The handle is not a valid device 
  *              handle.
@@ -1594,13 +1596,12 @@ EXPORT_SPEC int UpnpAcceptSubscription(
 
 
 /*!
- * \brief Similar to \b UpnpAcceptSubscription except that it takes a DOM
+ * \brief Similar to \b UpnpAcceptSubscription() except that it takes a DOM
  * document for the variables to event rather than an array of strings.
  *
  * This function is sychronous and generates no callbacks.
  *
- * \b UpnpAcceptSubscriptionExt can be called during the execution of 
- * a callback function.
+ * This function can be called during the execution of a callback function.
  *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
@@ -1637,8 +1638,8 @@ EXPORT_SPEC int UpnpAcceptSubscriptionExt(
  *
  * This function is synchronous and generates no callbacks.
  *
- * \b UpnpNotify may be called during a callback function to send out
- * a notification.
+ * This function may be called during a callback function to send out a
+ * notification.
  *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
@@ -1673,8 +1674,8 @@ EXPORT_SPEC int UpnpNotify(
  *
  * This function is synchronous and generates no callbacks.
  *
- * \b UpnpNotifyExt may be called during a callback function to send out
- * a notification.
+ * This function may be called during a callback function to send out a
+ * notification.
  *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.

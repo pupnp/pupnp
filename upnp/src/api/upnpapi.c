@@ -813,7 +813,7 @@ exit_function:
 
 	return retVal;
 }
-#endif // INCLUDE_DEVICE_APIS
+#endif /* INCLUDE_DEVICE_APIS */
 
 
 #ifdef INCLUDE_DEVICE_APIS
@@ -821,8 +821,6 @@ int UpnpUnRegisterRootDevice(UpnpDevice_Handle Hnd)
 {
     int retVal = 0;
     struct Handle_Info *HInfo = NULL;
-
-    // struct Handle_Info *info=NULL;
 
     if (UpnpSdkInit != 1) {
         return UPNP_E_FINISH;
