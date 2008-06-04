@@ -31,7 +31,6 @@ libixml_la_SOURCES	= \
 			src/inc/ixmlparser.h \
 			src/ixml.c \
 			src/ixmldebug.c \
-			src/ixmldebug.h \
 			src/ixmlparser.c \
 			src/ixmlmembuf.c \
 			src/namedNodeMap.c \
