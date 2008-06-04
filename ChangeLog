@@ -2,6 +2,46 @@
 Version 1.8.0
 *******************************************************************************
 
+2008-06-04 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 1984541 ]
+	ixmlDocumenttoString does not render the namespace tag.
+	Submitted By: Beliveau - belivo
+
+	The problem occurs when converting a xml document using
+	ixmlDocumenttoString containing a namespace tag created with
+	ixmlDocument_createElementNS. The namespace tag doesn't get rendered.
+
+	example: The following code fragment prints:
+
+	<?xml version="1.0"?>
+	<root></root>
+
+	instead of:
+	<?xml version="1.0"?>
+	<root xmlns="urn:schemas-upnp-org:device-1-0"></root>
+	
+	Code:
+
+	#include <stdlib.h>
+	#include <upnp/ixml.h>
+
+	int main()
+	{
+		IXML_Document* wDoc = ixmlDocument_createDocument();
+		IXML_Element* wRoot = ixmlDocument_createElementNS(wDoc,
+			"urn:schemas-upnp-org:device-1-0", "root");
+		ixmlNode_appendChild((IXML_Node *)wDoc,(IXML_Node *)wRoot);
+		DOMString wString = ixmlDocumenttoString(wDoc);
+		printf(wString);
+		free(wString);
+		ixmlDocument_free(wDoc);
+		
+		return 0;
+	}
+
+	The problem was in the printing routine, not in the library data
+	structure.
+
 2008-06-02 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 1942285 ]
 	UpnpCreatePropertySet can leak memory.
