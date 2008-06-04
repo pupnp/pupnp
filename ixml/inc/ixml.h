@@ -120,8 +120,7 @@ typedef int BOOL;
 /*!
  * \brief The type of the DOM node
  */
-typedef enum
-{
+typedef enum {
 	eINVALID_NODE                = 0,
 	eELEMENT_NODE                = 1,
 	eATTRIBUTE_NODE              = 2,
@@ -141,8 +140,7 @@ typedef enum
 /*!
  * \brief Error codes returned by the XML API, see the DOM spec
  */
-typedef enum 
-{
+typedef enum {
 	IXML_SUCCESS                     = 0,
 
 	IXML_INDEX_SIZE_ERR              = 1,
@@ -177,7 +175,9 @@ typedef enum
 
 typedef struct _IXML_Document *Docptr;
 
+
 typedef struct _IXML_Node     *Nodeptr;
+
 
 /*!
  * \brief Data structure common to all types of nodes.
@@ -200,44 +200,72 @@ typedef struct _IXML_Node
 	Docptr            ownerDocument;
 } IXML_Node;
 
+
+/*!
+ * \brief Data structure representing the DOM Document.
+ */
 typedef struct _IXML_Document
 {
-	IXML_Node         n;
+	IXML_Node n;
 } IXML_Document;
 
+
+/*!
+ * \brief Data structure representing a CDATA section node.
+ */
 typedef struct _IXML_CDATASection
 {
-	IXML_Node         n;
+	IXML_Node n;
 } IXML_CDATASection;
 
+
+/*!
+ * \brief Data structure representing an Element node.
+ */
 typedef struct _IXML_Element
 {
-	IXML_Node         n;
-	DOMString         tagName;
+	IXML_Node n;
+	DOMString tagName;
 } IXML_Element;
 
+
+/*!
+ * \brief Data structure representing an Attribute node.
+ */
 typedef struct _IXML_ATTR
 {
-	IXML_Node         n;
-	BOOL              specified;
-	IXML_Element      *ownerElement;
+	IXML_Node n;
+	BOOL specified;
+	IXML_Element *ownerElement;
 } IXML_Attr;
 
+
+/*!
+ * \brief Data structure representing a Text node.
+ */
 typedef struct _IXML_Text
 {
-	IXML_Node   n;
+	IXML_Node n;
 } IXML_Text;
 
+
+/*!
+ * \brief Data structure representing a list of nodes.
+ */
 typedef struct _IXML_NodeList
 {
-	IXML_Node         *nodeItem;
+	IXML_Node *nodeItem;
 	struct  _IXML_NodeList *next;
 } IXML_NodeList;
 
+
+/*!
+ * \brief Data structure representing a list of named nodes.
+ */
 typedef struct _IXML_NamedNodeMap
 {
-	IXML_Node         *nodeItem;
-struct _IXML_NamedNodeMap *next;
+	IXML_Node *nodeItem;
+	struct _IXML_NamedNodeMap *next;
 } IXML_NamedNodeMap;
 
 /* @} DOM Interfaces */
