@@ -705,7 +705,7 @@ EXPORT_SPEC void ixmlCDATASection_free(
  * \brief Initializes a \b Document node.
  */
 EXPORT_SPEC void ixmlDocument_init(
-	/*! The \b Document node to initialize.  */
+	/*! [in] The \b Document node to initialize.  */
 	IXML_Document *nodeptr);
 
 
@@ -722,14 +722,15 @@ EXPORT_SPEC void ixmlDocument_init(
  *            to complete this operation.
  */
 EXPORT_SPEC int ixmlDocument_createDocumentEx(
-	/*! Pointer to a \b Document where the new object will be stored. */
+	/*! [out] Pointer to a \b Document where the new object will be stored. */
 	IXML_Document **doc);
 
 
 /*!
  * \brief Creates a new empty \b Document node.
  *
- *  \return A pointer to the new \b Document or \c NULL on failure.
+ * \return A pointer to the new \b Document object with the nodeName set to
+ *  	"#document" or \c NULL on failure.
  */
 EXPORT_SPEC IXML_Document *ixmlDocument_createDocument();
 
@@ -753,11 +754,11 @@ EXPORT_SPEC IXML_Document *ixmlDocument_createDocument();
  *           to complete this operation.
  */
 EXPORT_SPEC int ixmlDocument_createElementEx(
-	/*! The owner \b Document of the new node. */
+	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,
-	/*! The tag name of the new \b Element node. */
+	/*! [in] The tag name of the new \b Element node. */
 	const DOMString tagName,  
-	/*! Pointer to an \b Element where the new object will be stored. */
+	/*! [out] Pointer to an \b Element where the new object will be stored. */
 	IXML_Element **rtElement);
 
 
@@ -768,19 +769,21 @@ EXPORT_SPEC int ixmlDocument_createElementEx(
  * \c localName, \c prefix, and \c namespaceURI set to \c NULL. To create an
  * \b Element with a namespace, see \b ixmlDocument_createElementNS.
  *
- *  \return A pointer to the new \b Element or \c NULL on failure.
+ *  \return A pointer to the new \b Element object with  the node name set to
+ *  tagName, and localName, prefix and namespaceURI set to \c NULL, or \c NULL
+ *  on failure.
  */
 EXPORT_SPEC IXML_Element *ixmlDocument_createElement(
-	/*! The owner \b Document of the new node. */
+	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,
-	/*! The tag name of the new \b Element node. */
+	/*! [in] The tag name of the new \b Element node (case-sensitive). */
 	const DOMString tagName);
 
 
 /*!
  * \brief Creates a new \b Text node with the given data.
  * 
- * The \b ixmlDocument_createTextNodeEx API differs from the
+ * The \b ixmlDocument_createTextNodeEx() API differs from the
  * \b ixmlDocument_createTextNode API in that it returns an error code
  * describing the reason for failure rather than just \c NULL.
  *
@@ -792,11 +795,12 @@ EXPORT_SPEC IXML_Element *ixmlDocument_createElement(
  *           to complete this operation.
  */
 EXPORT_SPEC int ixmlDocument_createTextNodeEx(
-	/*! The owner \b Document of the new node. */
+	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,
-	/*! The data to associate with the new \b Text node. */
+	/*! [in] The data to associate with the new \b Text node.
+	 * It is stored in nodeValue field.*/
 	const DOMString data,      
-	/*! A pointer to a \b Node where the new object will be stored. */
+	/*! [out] A pointer to a \b Node where the new object will be stored. */
 	IXML_Node **textNode);
 
 
@@ -806,9 +810,10 @@ EXPORT_SPEC int ixmlDocument_createTextNodeEx(
  * \return A pointer to the new \b Node or \c NULL on failure.
  */
 EXPORT_SPEC IXML_Node *ixmlDocument_createTextNode(
-	/*! The owner \b Document of the new node. */
+	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,
-	/*! The data to associate with the new \b Text node. */
+	/*! [in] The data to associate with the new \b Text node. It is stored in
+	 * the nodeValue field. */
 	const DOMString data);
 
 
@@ -827,11 +832,11 @@ EXPORT_SPEC IXML_Node *ixmlDocument_createTextNode(
  *           to complete this operation.
  */
 EXPORT_SPEC int ixmlDocument_createCDATASectionEx(
-	/*! The owner \b Document of the new node. */
+	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,
-	/*! The data to associate with the new \b CDATASection node. */
+	/*! [in] The data to associate with the new \b CDATASection node. */
 	const DOMString data,      
-	/*! A pointer to a \b Node where the new object will be stored. */ 
+	/*! [out] A pointer to a \b Node where the new object will be stored. */ 
 	IXML_CDATASection** cdNode);
 
 
@@ -841,21 +846,25 @@ EXPORT_SPEC int ixmlDocument_createCDATASectionEx(
  * \return A pointer to the new \b CDATASection or \c NULL on failure.
  */
 EXPORT_SPEC IXML_CDATASection *ixmlDocument_createCDATASection(
-	/*! The owner \b Document of the new node. */
+	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,
-	/*! The data to associate with the new \b CDATASection node. */
+	/*! [in] The data to associate with the new \b CDATASection node. */
 	const DOMString data);
 
 
 /*!
  * \brief Creates a new \b Attr node with the given name.  
  *
- * \return A pointer to the new \b Attr or \c NULL on failure.
+ * \return A pointer to the new \b Attr object with the nodeName attribute
+ * set to the given name, and the localName, prefix and namespaceURI set
+ * to NULL or \c NULL on failure.
+ *
+ * The value of the attribute is the empty string.
  */
 EXPORT_SPEC IXML_Attr *ixmlDocument_createAttribute(
-	/*! The owner \b Document of the new node. */
+	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,  
-	/*! The name of the new attribute. */
+	/*! [in] The name of the new attribute. */
 	const char *name);
 
 
@@ -874,11 +883,11 @@ EXPORT_SPEC IXML_Attr *ixmlDocument_createAttribute(
  *           to complete this operation.
  */
 EXPORT_SPEC int ixmlDocument_createAttributeEx(
-	/*! The owner \b Document of the new node. */
+	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,
-	/*! The name of the new attribute. */
+	/*! [in] The name of the new attribute. */
 	const char *name,      
-	/*! A pointer to a \b Attr where the new object will be stored. */
+	/*! [out] A pointer to a \b Attr where the new object will be stored. */
 	IXML_Attr **attrNode);
 
 
@@ -891,9 +900,9 @@ EXPORT_SPEC int ixmlDocument_createAttributeEx(
  * on an error.
  */
 EXPORT_SPEC IXML_NodeList *ixmlDocument_getElementsByTagName(
-	/*! The \b Document to search. */
+	/*! [in] The \b Document to search. */
 	IXML_Document *doc,
-	/*! The tag name to find. */
+	/*! [in] The tag name to find. The special value "*" matches all tags.*/
 	const DOMString tagName);
 
 
@@ -918,13 +927,13 @@ EXPORT_SPEC IXML_NodeList *ixmlDocument_getElementsByTagName(
  *           to complete this operation.
  */
 EXPORT_SPEC int ixmlDocument_createElementNSEx(
-	/*! The owner \b Document of the new node. */
+	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,
-	/*! The namespace URI for the new \b Element. */
+	/*! [in] The namespace URI for the new \b Element. */
 	const DOMString namespaceURI,
-	/*! The qualified name of the new \b Element. */
+	/*! [in] The qualified name of the new \b Element. */
 	const DOMString qualifiedName,
-	/*! A pointer to an \b Element where the new object will be stored. */
+	/*! [out] A pointer to an \b Element where the new object will be stored. */
 	IXML_Element **rtElement);
 
 
@@ -932,14 +941,16 @@ EXPORT_SPEC int ixmlDocument_createElementNSEx(
  * \brief Creates a new \b Element node in the given qualified name and
  * namespace URI.
  *
- * \return A pointer to the new \b Element or \c NULL on failure.
+ * \return A pointer to the new \b Element object with tagName qualifiedName,
+ * prefix and localName extraced from qualfiedName, nodeName of qualfiedName,
+ * namespaceURI of namespaceURI or \c NULL on failure.
  */
 EXPORT_SPEC IXML_Element *ixmlDocument_createElementNS(
-	/*! The owner \b Document of the new node. */
+	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,
-	/*! The namespace URI for the new \b Element. */
+	/*! [in] The namespace URI for the new \b Element. */
 	const DOMString namespaceURI,  
-	/*! The qualified name of the new \b Element. */
+	/*! [in] The qualified name of the new \b Element. */
 	const DOMString qualifiedName);
 
 
@@ -959,28 +970,30 @@ EXPORT_SPEC IXML_Element *ixmlDocument_createElementNS(
  *           to complete this operation.
  */
 EXPORT_SPEC int ixmlDocument_createAttributeNSEx(
-	/*! The owner \b Document of the new \b Attr. */
+	/*! [in] The owner \b Document of the new \b Attr. */
 	IXML_Document *doc,
-	/*! The namespace URI for the attribute. */
+	/*! [in] The namespace URI for the attribute. */
 	const DOMString namespaceURI, 
-	/*! The qualified name of the attribute. */
+	/*! [in] The qualified name of the attribute. */
 	const DOMString qualifiedName, 
-	/*! A pointer to an \b Attr where the new object will be stored. */
+	/*! [out] A pointer to an \b Attr where the new object will be stored. */
 	IXML_Attr **attrNode);
 
 
 /*!
- * \brief Creates a new \b Attr node with the given qualified name and
+ * \brief Creates a new \b Attribute node with the given qualified name and
  * namespace URI.
  *
- * \return A pointer to the new \b Attr or \c NULL on failure.
+ * \return A pointer to the new \b Attr node with the given namespaceURI and
+ * 	qualifiedName. The prefix and localname are extracted from
+ * 	the qualifiedName. The node value is empty. Or \c NULL on failure.
  */
 EXPORT_SPEC IXML_Attr *ixmlDocument_createAttributeNS(
-	/*! The owner \b Document of the new \b Attr. */
+	/*! [in] The owner \b Document of the new \b Attribute. */
 	IXML_Document *doc,
-	/*! The namespace URI for the attribute. */
+	/*! [in] The namespace URI for the attribute. */
 	const DOMString namespaceURI, 
-	/*! The qualified name of the attribute. */
+	/*! [in] The qualified name of the attribute. */
 	const DOMString qualifiedName);   
 
 
@@ -996,12 +1009,12 @@ EXPORT_SPEC IXML_Attr *ixmlDocument_createAttributeNS(
  * on an error.
  */
 EXPORT_SPEC IXML_NodeList *ixmlDocument_getElementsByTagNameNS(
-	/*! The \b Document to search. */
+	/*! [in] The \b Document to search. */
 	IXML_Document *doc,
-	/*! The namespace of the elements to find or <tt>"*"</tt> to match any
+	/*! [in] The namespace of the elements to find or <tt>"*"</tt> to match any
 	 * namespace. */
 	const DOMString namespaceURI, 
-	/*! The local name of the elements to find or <tt>"*"</tt> to match any
+	/*! [in] The local name of the elements to find or <tt>"*"</tt> to match any
 	 * local name. */
 	const DOMString localName);
 
@@ -1012,9 +1025,9 @@ EXPORT_SPEC IXML_NodeList *ixmlDocument_getElementsByTagNameNS(
  * \return A pointer to the matching \b Element or \c NULL on an error.
  */
 EXPORT_SPEC IXML_Element *ixmlDocument_getElementById(
-	/*! The owner \b Document of the \b Element. */
+	/*! [in] The owner \b Document of the \b Element. */
 	IXML_Document *doc,
-	/*! The name of the \b Element.*/
+	/*! [in] The name of the \b Element.*/
 	const DOMString tagName);
 
 
@@ -1026,7 +1039,7 @@ EXPORT_SPEC IXML_Element *ixmlDocument_getElementById(
  * explicitly cloned.
  */
 EXPORT_SPEC void ixmlDocument_free(
-	/*! The \b Document to free. */
+	/*! [in] The \b Document to free. */
 	IXML_Document *doc);
 
 
@@ -1061,14 +1074,14 @@ EXPORT_SPEC void ixmlDocument_free(
  *           \b Node to be imported could not be cloned.
  */
 EXPORT_SPEC int ixmlDocument_importNode(
-	/*! The \b Document into which to import. */
+	/*! [in] The \b Document into which to import. */
 	IXML_Document *doc,
-	/*! The \b Node to import. */
+	/*! [in] The \b Node to import. */
 	IXML_Node * importNode,  
-	/*! \c TRUE to import all children of \b importNode or \c FALSE to
+	/*! [in] \c TRUE to import all children of \b importNode or \c FALSE to
 	 * import only the root node. */
 	BOOL deep,         
-	/*! A pointer to a new \b Node owned by \b doc. */
+	/*! [out] A pointer to a new \b Node owned by \b doc. */
 	IXML_Node **rtNode);
 
 
