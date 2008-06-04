@@ -30,14 +30,14 @@
  **************************************************************************/
 
 
-#include "ixmldebug.h"
-#include "ixmlmembuf.h"
-#include "ixmlparser.h"
-
-
 /*!
  * \file
  */
+
+
+#include "ixmldebug.h"
+#include "ixmlmembuf.h"
+#include "ixmlparser.h"
 
 
 /*!

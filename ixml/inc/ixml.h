@@ -77,7 +77,11 @@
 typedef int BOOL;
 
 
-#define DOMString   char *
+/*!
+ * \brief The type of DOM strings.
+ */
+#define DOMString char *
+/*typedef char *DOMString;*/
 
 
 #ifndef TRUE
@@ -1177,11 +1181,11 @@ EXPORT_SPEC const DOMString ixmlElement_getAttribute(
  *           to complete the operation.
  */
 EXPORT_SPEC int ixmlElement_setAttribute(
-	/*! The \b Element on which to set the attribute. */
+	/*! [in] The \b Element on which to set the attribute. */
 	IXML_Element *element,
-	/*! The name of the attribute. */
+	/*! [in] The name of the attribute. */
 	const DOMString name,    
-	/*! The value of the attribute. Note that this is a non-parsed string
+	/*! [in] The value of the attribute. Note that this is a non-parsed string
 	 * and any markup must be escaped. */
 	const DOMString value);
 
@@ -1195,9 +1199,9 @@ EXPORT_SPEC int ixmlElement_setAttribute(
  *           \b name is \c NULL.
  */
 EXPORT_SPEC int ixmlElement_removeAttribute(
-	/*! The \b Element from which to remove the attribute. */
+	/*! [in] The \b Element from which to remove the attribute. */
 	IXML_Element *element,
-	/*! The name of the attribute to remove.  */
+	/*! [in] The name of the attribute to remove.  */
 	const DOMString name);              
 
 
@@ -1209,9 +1213,9 @@ EXPORT_SPEC int ixmlElement_removeAttribute(
  * \return A pointer to the attribute matching \b name or \c NULL on an error.
  */
 EXPORT_SPEC IXML_Attr *ixmlElement_getAttributeNode(
-	/*! The \b Element from which to get the attribute node.  */
+	/*! [in] The \b Element from which to get the attribute node.  */
 	IXML_Element *element,
-	/*! The name of the attribute node to find. */
+	/*! [in] The name of the attribute node to find. */
 	const DOMString name);
 
 
@@ -1265,9 +1269,9 @@ EXPORT_SPEC int ixmlElement_removeAttributeNode(
  * \return A \b NodeList of the matching \b Elements or \c NULL on an error.
  */
 EXPORT_SPEC IXML_NodeList *ixmlElement_getElementsByTagName(
-	/*! The \b Element from which to start the search. */
+	/*! [in] The \b Element from which to start the search. */
 	IXML_Element *element,
-	/*! The name of the tag for which to search. */
+	/*! [in] The name of the tag for which to search. */
 	const DOMString tagName);
 
 
@@ -1465,9 +1469,9 @@ EXPORT_SPEC unsigned long ixmlNamedNodeMap_getLength(
  * \return A \b Node or \c NULL if there is an error.
  */
 EXPORT_SPEC IXML_Node *ixmlNamedNodeMap_getNamedItem(
-	/*! The \b NamedNodeMap to search. */
+	/*! [in] The \b NamedNodeMap to search. */
 	IXML_NamedNodeMap *nnMap,
-	/*! The name of the \b Node to find. */
+	/*! [in] The name of the \b Node to find. */
 	const DOMString name);
 
 

@@ -30,17 +30,17 @@
  ******************************************************************************/
 
 
+/*!
+ * \file
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
 
 #include "ixmldebug.h"
 #include "ixmlparser.h"
-
-
-/*!
- * \file
- */
 
 
 void ixmlDocument_init(IXML_Document *doc)
@@ -211,7 +211,7 @@ IXML_Document *ixmlDocument_createDocument()
 
 int ixmlDocument_createTextNodeEx(
 	IXML_Document *doc,
-	const char *data,
+	const DOMString data,
 	IXML_Node **textNode)
 {
 	IXML_Node *returnNode;
@@ -260,7 +260,7 @@ ErrorHandler:
 
 IXML_Node *ixmlDocument_createTextNode(
 	IXML_Document *doc,
-	const char *data)
+	const DOMString data)
 {
 	IXML_Node *returnNode = NULL;
 
@@ -504,7 +504,7 @@ IXML_Element *ixmlDocument_createElementNS(
 
 IXML_NodeList *ixmlDocument_getElementsByTagName(
 	IXML_Document *doc,
-	const char *tagName)
+	const DOMString tagName)
 {
 	IXML_NodeList *returnNodeList = NULL;
 
