@@ -1628,7 +1628,7 @@ EXPORT_SPEC void ixmlNodeList_free(
  *                     of the DOM tree or \c NULL on an error.
  */
 EXPORT_SPEC DOMString ixmlPrintDocument(
-	/*! The document node to print. */
+	/*! [in] The document node to print. */
 	IXML_Document *doc);
 
 
@@ -1650,7 +1650,7 @@ EXPORT_SPEC DOMString ixmlPrintDocument(
  * \c NULL on an error.
  */
 EXPORT_SPEC DOMString ixmlPrintNode(
-	/*! The root of the \b Node tree to render to XML text. */
+	/*! [in] The root of the \b Node tree to render to XML text. */
 	IXML_Node *doc
 );
 
@@ -1674,7 +1674,7 @@ EXPORT_SPEC DOMString ixmlPrintNode(
  * \c NULL on an error.
  */
 EXPORT_SPEC DOMString ixmlDocumenttoString(
-	/*! The root of the \b Node tree to render to XML text. */
+	/*! [in] The root of the \b Node tree to render to XML text. */
 	IXML_Document *doc);
 
 
@@ -1693,7 +1693,7 @@ EXPORT_SPEC DOMString ixmlDocumenttoString(
  * \c NULL on an error.
  */
 EXPORT_SPEC DOMString ixmlNodetoString(
-	/*! The root of the \b Node tree to render to XML text. */
+	/*! [in] The root of the \b Node tree to render to XML text. */
 	IXML_Node *doc);
 
 
@@ -1701,7 +1701,7 @@ EXPORT_SPEC DOMString ixmlNodetoString(
  * \brief Makes the XML parser more tolerant to malformed text.
  */
 EXPORT_SPEC void ixmlRelaxParser(
-	/*! If \b errorChar is 0 (default), the parser is strict about XML 
+	/*! [in] If \b errorChar is 0 (default), the parser is strict about XML 
 	 * encoding : invalid UTF-8 sequences or "&" entities are rejected, and 
 	 * the parsing aborts.
 	 *
@@ -1718,7 +1718,7 @@ EXPORT_SPEC void ixmlRelaxParser(
  * \return A \b Document if the buffer correctly parses or \c NULL on an error. 
  */
 EXPORT_SPEC IXML_Document *ixmlParseBuffer(
-	/*! The buffer that contains the XML text to convert to a \b Document. */
+	/*! [in] The buffer that contains the XML text to convert to a \b Document. */
 	const char *buffer);
 
 
@@ -1737,9 +1737,9 @@ EXPORT_SPEC IXML_Document *ixmlParseBuffer(
  *           to complete this operation.
  */
 EXPORT_SPEC int ixmlParseBufferEx(
-	/*! The buffer that contains the XML text to convert to a \b Document. */
+	/*! [in] The buffer that contains the XML text to convert to a \b Document. */
 	const char *buffer,
-	/*! A point to store the \b Document if file correctly parses or \b NULL on an error. */
+	/*! [out] A point to store the \b Document if file correctly parses or \b NULL on an error. */
 	IXML_Document** doc);
 
 
@@ -1749,7 +1749,7 @@ EXPORT_SPEC int ixmlParseBufferEx(
  * \return A \b Document if the file correctly parses or \c NULL on an error.
  */
 EXPORT_SPEC IXML_Document *ixmlLoadDocument(
-	/*! The filename of the XML text to convert to a \b Document. */
+	/*! [in] The filename of the XML text to convert to a \b Document. */
 	const char* xmlFile);
 
 
@@ -1768,9 +1768,9 @@ EXPORT_SPEC IXML_Document *ixmlLoadDocument(
  *           to complete this operation.
  */
 EXPORT_SPEC int ixmlLoadDocumentEx(
-	/*! The filename of the XML text to convert to a \b Document. */
+	/*! [in] The filename of the XML text to convert to a \b Document. */
 	const char *xmlFile,
-	/*! A pointer to the \b Document if file correctly parses or \b NULL
+	/*! [out] A pointer to the \b Document if file correctly parses or \b NULL
 	 * on an error. */
 	IXML_Document **doc);
 
@@ -1782,7 +1782,7 @@ EXPORT_SPEC int ixmlLoadDocumentEx(
  * if the operation could not be completed.
  */
 EXPORT_SPEC DOMString ixmlCloneDOMString(
-	/*! The source \b DOMString to clone. */
+	/*! [in] The source \b DOMString to clone. */
 	const DOMString src);
 
 
@@ -1790,7 +1790,7 @@ EXPORT_SPEC DOMString ixmlCloneDOMString(
  * \brief Frees a \b DOMString.
  */
 EXPORT_SPEC void ixmlFreeDOMString(
-	/*! The \b DOMString to free. */
+	/*! [in] The \b DOMString to free. */
 	DOMString buf);
 
 
