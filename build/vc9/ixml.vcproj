@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="ixml"
 	ProjectGUID="{9C2C266D-35A3-465F-A297-0E21D54E5C89}"
 	RootNamespace="ixml"
@@ -20,7 +20,7 @@
 			OutputDirectory=".\out.vc9.$(ConfigurationName)\$(ProjectName)"
 			IntermediateDirectory=".\out.vc9.$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="4"
-			CharacterSet="2"
+			CharacterSet="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -40,8 +40,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\ixml\inc;..\..\ixml\src\inc"
-				PreprocessorDefinitions="DEBUG;WIN32"
+				AdditionalIncludeDirectories="..\..\ixml\inc;..\..\ixml\src\inc;..\inc"
+				PreprocessorDefinitions="DEBUG;WIN32;_USRDLL;LIBUPNP_EXPORTS;UPNP_USE_MSVCPP;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -78,10 +78,10 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="2"
+			OutputDirectory=".\out.vc9.$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory=".\out.vc9.$(ConfigurationName)\$(ProjectName)"
+			ConfigurationType="4"
+			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -103,6 +103,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="..\..\ixml\inc;..\..\ixml\src\inc;..\inc"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBUPNP_EXPORTS;PTW32_STATIC_LIB;UPNP_STATIC_LIB;UPNP_USE_MSVCPP;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -118,17 +120,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				GenerateDebugInformation="true"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -138,9 +133,6 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -169,6 +161,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ixml\src\ixml.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ixml\src\ixmldebug.c"
 				>
 			</File>
 			<File
@@ -202,6 +198,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ixml\inc\ixmldebug.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ixml\src\inc\ixmlmembuf.h"
 				>
 			</File>
@@ -209,12 +209,6 @@
 				RelativePath="..\..\ixml\src\inc\ixmlparser.h"
 				>
 			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
 		</Filter>
 	</Files>
 	<Globals>
