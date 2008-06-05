@@ -1,5 +1,15 @@
 
 
+/*!
+ * \file
+ *
+ * \brief UpnpActionComplete object implementation.
+ *
+ * \author Marcelo Roberto Jimenez
+ *
+ */
+
+
 #include "config.h"
 
 
@@ -10,11 +20,18 @@
 #include <string.h> /* for strlen(), strdup() */
 
 
+/*!
+ * \brief Internal implementation of the UpnpActionComplete object.
+ */
 struct SUpnpActionComplete
 {
+	/*! The result of the operation */
 	int m_errCode;
+	/*! The control URL for service. */
 	UpnpString *m_ctrlUrl;
+	/*! The DOM document describing the action. */
 	IXML_Document *m_actionRequest;
+	/*! The DOM document describing the result of the action */
 	IXML_Document *m_actionResult;
 };
 

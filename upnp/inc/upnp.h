@@ -43,17 +43,9 @@
  */
 
 
-#if defined MYLIB_LARGEFILE_SENSITIVE && _FILE_OFFSET_BITS+0 != 64
-	#if defined __GNUC__
-		#warning libupnp requires largefile mode - use AC_SYS_LARGEFILE
-	#else
-		#error  libupnp requires largefile mode - use AC_SYS_LARGEFILE
-	#endif
-#endif 
-
-
 #include "ixml.h"
 #include "upnpconfig.h"
+#include "UpnpGlobal.h"
 
 
 #include <stdio.h>
@@ -69,61 +61,6 @@
 #else
 	#include <sys/param.h>
 #endif
-
-
-#ifdef WIN32
-	#ifndef UPNP_STATIC_LIB
-		#ifdef LIBUPNP_EXPORTS
-			/* set up declspec for dll export to make functions visible to library users */
-			#define EXPORT_SPEC __declspec(dllexport)
-		#else /* LIBUPNP_EXPORTS */
-			#define EXPORT_SPEC __declspec(dllimport)
-		#endif /* LIBUPNP_EXPORTS */
-	#else /* UPNP_STATIC_LIB */
-		#define EXPORT_SPEC
-	#endif /* UPNP_STATIC_LIB */
-
-
-	#ifdef UPNP_USE_MSVCPP
-		/* define some things the M$ VC++ doesn't know */
-		#define UPNP_INLINE
-		typedef __int64 int64_t;
-		#define PRId64 "I64d"
-		#define PRIzu "lu"
-	#endif /* UPNP_USE_MSVCPP */
-
-
-	#ifdef UPNP_USE_BCBPP
-		/* define some things Borland Builder doesn't know */
-		#define UPNP_INLINE inline
-		typedef __int64 int64_t;
-		#warning The Borland C compiler is probably broken on PRId64, please someone provide a proper fix here
-		#define PRId64 "I64d"
-		#define PRIzu "zu"
-	#endif /* UPNP_USE_BCBPP */
-
-
-	#ifdef __GNUC__
-		#define UPNP_INLINE inline
-		/* Note with PRIzu that in the case of Mingw32, it's the MS C
-		 * runtime printf which ends up getting called, not the glibc
-		 * printf, so it genuinely doesn't have "zu"
-		 */
-		#define PRIzu "lu"
-	#endif
-#else
-	#define EXPORT_SPEC
-	#define UPNP_INLINE inline
-	/* Invented this macro so that we can live a little longer with MSVC lack of C99. */
-	#define PRIzu "zu"
-#endif
-
-/*
- * Defining this macro here gives some interesting information about unused
- * functions in the code. Of course, this should never go uncommented on a
- * release.
- */
-/*#define inline*/
 
 
 #ifdef WIN32

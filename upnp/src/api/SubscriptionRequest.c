@@ -1,5 +1,15 @@
 
 
+/*!
+ * \file
+ *
+ * \brief UpnpSubscriptionRequest object implementation.
+ *
+ * \author Marcelo Roberto Jimenez
+ *
+ */
+
+
 #include "config.h"
 
 

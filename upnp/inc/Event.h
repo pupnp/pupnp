@@ -4,6 +4,16 @@
 #define EVENT_H
 
 
+/*!
+ * \file
+ *
+ * \brief UpnpEvent object declararion.
+ *
+ * \author Marcelo Roberto Jimenez
+ *
+ */
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -14,32 +24,33 @@ typedef struct s_UpnpEvent UpnpEvent;
 
 
 #include "ixml.h"       /* for IXML_Document */
+#include "UpnpGlobal.h" /* for EXPORT_SPEC */
 #include "UpnpString.h"
 
 
 /** Constructor */
-UpnpEvent *UpnpEvent_new();
+EXPORT_SPEC UpnpEvent *UpnpEvent_new();
 
 /** Destructor */
-void UpnpEvent_delete(UpnpEvent *p);
+EXPORT_SPEC void UpnpEvent_delete(UpnpEvent *p);
 
 /** Copy Constructor */
-UpnpEvent *UpnpEvent_dup(const UpnpEvent *p);
+EXPORT_SPEC UpnpEvent *UpnpEvent_dup(const UpnpEvent *p);
 
 /** Assignment operator */
-void UpnpEvent_assign(UpnpEvent *q, const UpnpEvent *p);
+EXPORT_SPEC void UpnpEvent_assign(UpnpEvent *q, const UpnpEvent *p);
 
 /** The event sequence number. */
-int UpnpEvent_get_EventKey(const UpnpEvent *p);
-void UpnpEvent_set_EventKey(UpnpEvent *p, int n);
+EXPORT_SPEC int UpnpEvent_get_EventKey(const UpnpEvent *p);
+EXPORT_SPEC void UpnpEvent_set_EventKey(UpnpEvent *p, int n);
 
 /** The DOM tree representing the changes generating the event. */
-IXML_Document *UpnpEvent_get_ChangedVariables(const UpnpEvent *p);
-void UpnpEvent_set_ChangedVariables(UpnpEvent *p, IXML_Document *d);
+EXPORT_SPEC IXML_Document *UpnpEvent_get_ChangedVariables(const UpnpEvent *p);
+EXPORT_SPEC void UpnpEvent_set_ChangedVariables(UpnpEvent *p, IXML_Document *d);
 
 /** The subscription ID for this subscription. */
-UpnpString *UpnpEvent_get_SID(const UpnpEvent *p);
-void UpnpEvent_set_SID(UpnpEvent *p, const UpnpString *s);
+EXPORT_SPEC UpnpString *UpnpEvent_get_SID(const UpnpEvent *p);
+EXPORT_SPEC void UpnpEvent_set_SID(UpnpEvent *p, const UpnpString *s);
 
 
 #ifdef __cplusplus

@@ -30,7 +30,8 @@ upnpinclude_HEADERS = \
 	inc/SubscriptionRequest.h \
 	inc/UpnpString.h \
 	inc/upnp.h \
-	inc/upnpdebug.h
+	inc/upnpdebug.h \
+	inc/UpnpGlobal.h
 
 nodist_upnpinclude_HEADERS = inc/upnpconfig.h 
 if ENABLE_TOOLS
