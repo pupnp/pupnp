@@ -48,9 +48,9 @@
  */
 static void copy_with_escape(
 	/*! [in,out] \todo documentation. */
-	INOUT ixml_membuf *buf,
+	ixml_membuf *buf,
 	/*! [in] \todo documentation. */
-	IN const char *p)
+	const char *p)
 {
 	int i;
 	int plen;
@@ -96,9 +96,9 @@ static void copy_with_escape(
  */
 static void ixmlPrintDomTreeRecursive(
 	/*! [in] \todo documentation. */
-	IN IXML_Node *nodeptr,
+	IXML_Node *nodeptr,
 	/*! [in] \todo documentation. */
-	IN ixml_membuf *buf)
+	ixml_membuf *buf)
 {
 	const char *nodeName = NULL;
 	const char *nodeValue = NULL;
