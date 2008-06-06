@@ -40,6 +40,9 @@
 #include "ixmlparser.h"
 
 
+#include <string.h>
+
+
 /*!
  * \todo Documentation.
  */

@@ -33,6 +33,9 @@
 #include "upnp_tv_device.h"
 
 
+#include <assert.h>
+
+
 #define DEFAULT_WEB_DIR "./web"
 
 

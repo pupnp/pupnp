@@ -49,10 +49,6 @@
 #include "UpnpInet.h"
 
 
-#include <stdio.h>
-#include <sys/types.h>
-
-
 /*
  * \todo Document the exact reason of these include files and solve this
  * include mess in an include file like UpnpTime.h

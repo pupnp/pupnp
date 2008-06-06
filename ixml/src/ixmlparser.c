@@ -30,10 +30,14 @@
  ******************************************************************************/
 
 
-#include "ixmldebug.h"
 #include "ixmlparser.h"
 
 
+#include "ixmldebug.h"
+
+
+#include <assert.h>
+#include <stdio.h>
 #include <string.h>
 
 

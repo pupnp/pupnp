@@ -43,11 +43,6 @@
  */
 
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
-
-
 #ifdef WIN32
 	#ifndef UPNP_STATIC_LIB
 		#ifdef LIBUPNP_EXPORTS

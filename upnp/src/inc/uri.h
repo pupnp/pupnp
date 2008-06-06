@@ -1,4 +1,4 @@
-/**************************************************************************
+/*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- **************************************************************************/
+ ******************************************************************************/
 
 
 #ifndef GENLIB_NET_URI_H

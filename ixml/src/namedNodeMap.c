@@ -33,6 +33,10 @@
 #include "ixmlparser.h"
 
 
+#include <assert.h>
+#include <string.h>
+
+
 /*================================================================
 *   NamedNodeMap_getItemNumber
 *       return the item number of a item in NamedNodeMap.
