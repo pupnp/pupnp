@@ -14,6 +14,11 @@
  */
 
 
+#include "UpnpGlobal.h" /* for EXPORT_SPEC */
+#include "UpnpInet.h"   /* for sockaddr, sockaddr_storage */
+#include "UpnpString.h"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -21,17 +26,6 @@ extern "C" {
 
 /** Returned in a \b UPNP_DISCOVERY_RESULT callback. */
 typedef struct s_UpnpDiscovery UpnpDiscovery;
-
-
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
-#include "UpnpString.h"
-
-
-#ifdef WIN32
-	#include <ws2tcpip.h>
-#else
-	#include <netinet/in.h> /* for sockaddr, sockaddr_storage */
-#endif
 
 
 /** Constructor */

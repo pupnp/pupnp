@@ -14,6 +14,10 @@
  */
 
 
+#include "UpnpGlobal.h" /* for EXPORT_SPEC */
+#include "UpnpString.h"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -22,10 +26,6 @@ extern "C" {
 /** Returned along with a \b UPNP_EVENT_SUBSCRIBE_COMPLETE or
  * \b UPNP_EVENT_UNSUBSCRIBE_COMPLETE callback.  */
 typedef struct s_UpnpEventSubscribe UpnpEventSubscribe;
-
-
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
-#include "UpnpString.h"
 
 
 /** Constructor */

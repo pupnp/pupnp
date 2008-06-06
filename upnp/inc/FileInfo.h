@@ -14,6 +14,14 @@
  */
 
 
+#include "ixml.h"       /* for DOMString */
+#include "UpnpGlobal.h" /* for EXPORT_SPEC */
+
+
+#include <sys/types.h>  /* for off_t */
+#include <time.h>       /* for time_t */
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -21,14 +29,6 @@ extern "C" {
 
 /** Detailed description of this class should go here */
 typedef struct s_UpnpFileInfo UpnpFileInfo;
-
-
-#include "ixml.h"       /* for DOMString */
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
-
-
-#include <sys/types.h>  /* for off_t */
-#include <time.h>       /* for time_t */
 
 
 /** Constructor */

@@ -14,6 +14,11 @@
  */
 
 
+#include "ixml.h"       /* for IXML_Document */
+#include "UpnpGlobal.h" /* for EXPORT_SPEC */
+#include "UpnpString.h"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -21,11 +26,6 @@ extern "C" {
 
 /** Returned along with a \b UPNP_EVENT_RECEIVED callback.  */
 typedef struct s_UpnpEvent UpnpEvent;
-
-
-#include "ixml.h"       /* for IXML_Document */
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
-#include "UpnpString.h"
 
 
 /** Constructor */

@@ -14,6 +14,12 @@
  */
 
 
+#include "ixml.h"       /* for IXML_Document */
+#include "UpnpGlobal.h" /* for EXPORT_SPEC */
+#include "UpnpInet.h"   /* for sockaddr, sockaddr_storage */
+#include "UpnpString.h"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -21,18 +27,6 @@ extern "C" {
 
 /*! Returned as part of a \b UPNP_CONTROL_ACTION_COMPLETE callback.  */
 typedef struct s_UpnpActionRequest UpnpActionRequest;
-
-
-#include "ixml.h"       /* for IXML_Document */
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
-#include "UpnpString.h"
-
-
-#ifdef WIN32
-	#include <ws2tcpip.h>
-#else
-	#include <netinet/in.h> /* for sockaddr, sockaddr_storage */
-#endif
 
 
 /*! Constructor */

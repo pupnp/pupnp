@@ -46,13 +46,23 @@
 #include "ixml.h"
 #include "upnpconfig.h"
 #include "UpnpGlobal.h"
+#include "UpnpInet.h"
 
 
 #include <stdio.h>
+#include <sys/types.h>
 
 
-#if (defined(BSD) && BSD >= 199306)
+/*
+ * \todo Document the exact reason of these include files and solve this
+ * include mess in an include file like UpnpTime.h
+ */
+#ifdef WIN32
 	#include <time.h>
+#elif (defined(BSD) && BSD >= 199306)
+	#include <time.h>
+#else
+	/* Other systems ??? */
 #endif
 
 
@@ -64,14 +74,7 @@
 
 
 #ifdef WIN32
-	#define UpnpCloseSocket closesocket
-	#define fseeko fseek
-#else
-	#define UpnpCloseSocket close
-#endif
-
-
-#ifdef WIN32
+	#include <iphlpapi.h>
 #else
 	#define SOCKET int
 	#define INVALID_SOCKET (SOCKET)(~0)
@@ -79,15 +82,11 @@
 
 
 #ifdef WIN32
-	#include <Ws2tcpip.h>
-	#include <iphlpapi.h>
-	#include <time.h>
+	#define UpnpCloseSocket closesocket
+	#define fseeko fseek
 #else
-	#include <netinet/in.h>
+	#define UpnpCloseSocket close
 #endif
-
-
-#include <sys/types.h>
 
 
 #define NUM_HANDLE 200

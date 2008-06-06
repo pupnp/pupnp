@@ -1,42 +1,44 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * * Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * * Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * * Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
-#ifndef _http_client_h_
-#define _http_client_h_
-#ifdef __cplusplus
-#define EXTERN_C extern "C"
-#else
-#define EXTERN_C
-#endif
+
+#ifndef HTTP_CLIENT_H
+#define HTTP_CLIENT_H
+
+
 #include "genlib/closesocket/upnpclosesocket.h"
+#include "tools/config.h"
+#include "upnp.h"
+
+
 #include <fcntl.h>
 #include <string.h>
 #include <sys/types.h>
@@ -50,9 +52,11 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <sys/time.h>
-#include "tools/config.h"
-#include "upnp.h"
-//#include "upnp_debug.h"
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 
 #define HTTP_DATE_LENGTH 37 // length for HTTP DATE: 
@@ -77,9 +81,11 @@
 #define RESPONSE_TIMEOUT 30
 #define SOCKET_BUFFER_SIZE 5000
 
+
 enum hostType { HOSTNAME, IPv4address };
 enum pathType { ABS_PATH, REL_PATH, OPAQUE_PART };
 enum uriType  { ABSOLUTE, RELATIVE };
+
 
 //Buffer used to store data read from 
 //a socket during an http transfer
@@ -158,64 +164,64 @@ typedef struct HTTP_MESSAGE {
 } http_message;
 
 
-EXTERN_C int transferHTTP( char * request,  char * toSend, 
+int transferHTTP( char * request,  char * toSend, 
 			  int toSendSize, char **out,  char * Url);
 
 
-EXTERN_C int transferHTTPRaw( char * toSend, int toSendSize, 
+int transferHTTPRaw( char * toSend, int toSendSize, 
 			     char **out,  char *URL);
 
 //helper function
-EXTERN_C int transferHTTPparsedURL( char * request, 
+int transferHTTPparsedURL( char * request, 
 				    char * toSend, int toSendSize, 
 				   char **out, uri_type *URL);
 
 //assumes that char * out has enough space ( 38 characters)
 //outputs the current time in the following null terminated string:
 // "DATE: Sun, Jul 06 2000 08:53:01 GMT\r\n"
-EXTERN_C void currentTmToHttpDate(char *out);
+void currentTmToHttpDate(char *out);
 
 //returns dynamic memory or NULL on error
-EXTERN_C char * resolve_rel_url( char * base_url,  char * rel_url);
+char * resolve_rel_url( char * base_url,  char * rel_url);
 
-EXTERN_C int parse_uri(  char * in, int max, uri_type * out);
+int parse_uri(  char * in, int max, uri_type * out);
 
-EXTERN_C int token_cmp( token *in1,  token *in2);
+int token_cmp( token *in1,  token *in2);
 
-EXTERN_C int token_string_casecmp( token * in1,  char * in2);
+int token_string_casecmp( token * in1,  char * in2);
 
-EXTERN_C int token_string_cmp( token * in1,  char * in2);
+int token_string_cmp( token * in1,  char * in2);
 
-EXTERN_C int parse_http_response(  char * in, http_message * out, 
+int parse_http_response(  char * in, http_message * out, 
 				  int max_len);
 
-EXTERN_C int parse_http_request( char * in, http_message *out, 
+int parse_http_request( char * in, http_message *out, 
 				int max_len);
 
-EXTERN_C int search_for_header( http_message * in, 
+int search_for_header( http_message * in, 
 			        char * header, token *out_value);
 
 
 
-EXTERN_C int parse_hostport(  char* in, int max, hostport_type *out );
+int parse_hostport(  char* in, int max, hostport_type *out );
 
-EXTERN_C size_t write_bytes(int fd,   char * bytes, size_t n, 
+size_t write_bytes(int fd,   char * bytes, size_t n, 
 			    int timeout);
-EXTERN_C void free_http_message(http_message * message);
-EXTERN_C int copy_URL_list( URL_list *in, URL_list *out);
-EXTERN_C void free_URL_list(URL_list * list);
-EXTERN_C int parse_port(int max,   char * port, unsigned short int * out);
+void free_http_message(http_message * message);
+int copy_URL_list( URL_list *in, URL_list *out);
+void free_URL_list(URL_list * list);
+int parse_port(int max,   char * port, unsigned short int * out);
 
-EXTERN_C int parse_http_line(  char * in, int max_size);
-EXTERN_C int parse_not_LWS(  char *in, token *out, int max_size);
-EXTERN_C int parse_LWS( char * in, int max_size);
-EXTERN_C int parse_token( char * in, token * out, int max_size);
-EXTERN_C ssize_t readLine(int fd, char *out, int max, int *timeout);
-EXTERN_C int remove_dots(char * in, int size);
+int parse_http_line(  char * in, int max_size);
+int parse_not_LWS(  char *in, token *out, int max_size);
+int parse_LWS( char * in, int max_size);
+int parse_token( char * in, token * out, int max_size);
+ssize_t readLine(int fd, char *out, int max, int *timeout);
+int remove_dots(char * in, int size);
 
 
 #ifdef DEBUG
-EXTERN_C void print_http_request(
+void print_http_request(
 	http_message *message,
 	Upnp_LogLevel DLevel,
 	Dbg_Module Module,
@@ -230,8 +236,9 @@ static inline void print_http_request(
 	int DbgLineNo) {}
 #endif
 
+
 #ifdef DEBUG
-EXTERN_C void print_http_response(
+void print_http_response(
 	http_message *message,
 	Upnp_LogLevel DLevel,
 	Dbg_Module Module,
@@ -246,8 +253,9 @@ static inline void print_http_response(
 	int DbgLineNo) {}
 #endif
 
+
 #ifdef DEBUG
-EXTERN_C void print_token(
+void print_token(
 	token *in,
 	Upnp_LogLevel DLevel,
 	Dbg_Module Module,
@@ -262,8 +270,9 @@ static inline void print_token(
 	int DbgLineNo) {}
 #endif
 
+
 #ifdef DEBUG
-EXTERN_C void print_status_line(
+void print_status_line(
 	http_status *in,
 	Upnp_LogLevel DLevel,
 	Dbg_Module Module,
@@ -278,8 +287,9 @@ static inline void print_status_line(
 	int DbgLineNo) {}
 #endif
 
+
 #ifdef DEBUG
-EXTERN_C void print_request_line(
+void print_request_line(
 	http_request *in,
 	Upnp_LogLevel DLevel,
 	Dbg_Module Module,
@@ -294,8 +304,9 @@ static inline void print_request_line(
 	int DbgLineNo) {}
 #endif
 
+
 #ifdef DEBUG
-EXTERN_C void print_uri(
+void print_uri(
 	uri_type *in,
 	Upnp_LogLevel DLevel,
 	Dbg_Module Module,
@@ -310,5 +321,11 @@ static inline void print_uri(
 	int DbgLineNo) {}
 #endif
 
-#endif
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
+
+#endif /* HTTP_CLIENT_H */
 

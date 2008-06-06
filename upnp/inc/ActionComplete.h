@@ -14,6 +14,11 @@
  */
 
 
+#include "ixml.h"       /* for IXML_Document */
+#include "UpnpGlobal.h" /* for EXPORT_SPEC */
+#include "UpnpString.h"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -23,13 +28,6 @@ extern "C" {
  * \brief The type of an UpnpActionComplete object.
  */
 typedef struct s_UpnpActionComplete UpnpActionComplete;
-
-
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
-#include "UpnpString.h"
-
-
-#include "ixml.h"       /* for IXML_Document */
 
 
 /*!

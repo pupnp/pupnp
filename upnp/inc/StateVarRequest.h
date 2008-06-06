@@ -14,6 +14,12 @@
  */
 
 
+#include "ixml.h"       /* for DOMString */
+#include "UpnpGlobal.h" /* for EXPORT_SPEC */
+#include "UpnpInet.h"   /* for sockaddr, sockaddr_storage */
+#include "UpnpString.h"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -22,20 +28,6 @@ extern "C" {
 /** Represents the request for current value of a state variable in a service
  *  state table.  */
 typedef struct s_UpnpStateVarRequest UpnpStateVarRequest;
-
-
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
-#include "UpnpString.h"
-
-
-#include "ixml.h"       /* for DOMString */
-
-
-#ifdef WIN32
-	#include <ws2tcpip.h>
-#else
-	#include <netinet/in.h> /* for sockaddr, sockaddr_storage */
-#endif
 
 
 /** Constructor */

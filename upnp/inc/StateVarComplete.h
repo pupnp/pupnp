@@ -14,6 +14,11 @@
  */
 
 
+#include "ixml.h"       /* for DOMString */
+#include "UpnpGlobal.h" /* for EXPORT_SPEC */
+#include "UpnpString.h"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -22,13 +27,6 @@ extern "C" {
 /** Represents the reply for the current value of a state variable in an
     asynchronous call. */
 typedef struct s_UpnpStateVarComplete UpnpStateVarComplete;
-
-
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
-#include "UpnpString.h"
-
-
-#include "ixml.h"       /* for DOMString */
 
 
 /** Constructor */
