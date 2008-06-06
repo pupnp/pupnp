@@ -47,16 +47,16 @@
 
 
 #ifdef WIN32
-	#include <time.h>
+#else
+	#include <arpa/inet.h>  /* for inet_pton() */
+	#include <netdb.h>      /* for struct addrinfo */
+#endif
 
+
+#ifdef WIN32
 	#define strncasecmp strnicmp
 #else
-	#include <arpa/inet.h>
-	#include <sys/socket.h>
-	#include <netinet/in.h>
-	#include <unistd.h>
-	#include <netdb.h>
-	#include <sys/time.h>
+	/* Other systems have strncasecmp */
 #endif
 
 
