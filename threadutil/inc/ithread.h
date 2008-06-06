@@ -29,8 +29,14 @@
  *
  ******************************************************************************/
 
+
 #ifndef ITHREADH
 #define ITHREADH
+
+
+#include "UpnpGlobal.h" /* For EXPORT_SPEC */
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -742,22 +748,6 @@ typedef pthread_rwlock_t ithread_rwlock_t;
 	#define imillisleep Sleep
 #else
 	#define imillisleep(x) usleep(1000*x)
-#endif
-
-
-#ifdef WIN32
-	#ifndef UPNP_STATIC_LIB
-		#ifdef LIBUPNP_EXPORTS
-			/* set up declspec for dll export to make functions visible to library users */
-			#define EXPORT_SPEC __declspec(dllexport)
-		#else
-			#define EXPORT_SPEC __declspec(dllimport)
-		#endif
-	#else
-		#define EXPORT_SPEC
-	#endif
-#else
-	#define EXPORT_SPEC
 #endif
 
 

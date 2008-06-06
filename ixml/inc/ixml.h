@@ -43,31 +43,8 @@
  */
 
 
-#ifdef WIN32
-	#ifndef UPNP_STATIC_LIB
-		#ifdef LIBUPNP_EXPORTS
-			/* set up declspec for dll export to make functions visible to library users */
-			#define EXPORT_SPEC __declspec(dllexport)
-		#else /* LIBUPNP_EXPORTS */
-			#define EXPORT_SPEC __declspec(dllimport)
-		#endif /* LIBUPNP_EXPORTS */
-	#else /* UPNP_STATIC_LIB */
-		#define EXPORT_SPEC
-	#endif /* UPNP_STATIC_LIB */
+#include "UpnpGlobal.h" /* For EXPORT_SPEC */
 
-
-	#ifdef UPNP_USE_MSVCPP
-		/* define some things the M$ VC++ doesn't know */
-		#define IXML_INLINE
-	#endif /* UPNP_USE_MSVCPP */
-	#ifdef UPNP_USE_BCBPP
-		/* define some things Borland Builder doesn't know */
-		#define IXML_INLINE inline
-	#endif /* UPNP_USE_BCBPP */
-#else /* WIN32 */
-	#define EXPORT_SPEC
-	#define IXML_INLINE inline
-#endif /* WIN32 */
 
 typedef int BOOL;
 

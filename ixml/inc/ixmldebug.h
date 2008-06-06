@@ -29,7 +29,7 @@ void IxmlPrintf(
 #endif
 ;
 #else /* DEBUG */
-static IXML_INLINE void IxmlPrintf(
+static UPNP_INLINE void IxmlPrintf(
 	const char* FmtStr,
 	...) {}
 #endif /* DEBUG */
