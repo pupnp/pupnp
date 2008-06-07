@@ -1,5 +1,10 @@
 
 
+/*!
+ * \file
+ */
+
+
 #include "autoconfig.h"
 
 
@@ -10,15 +15,10 @@
 #include <stdio.h>
 
 
-/*!
- * \file
- */
-
-
 #ifdef DEBUG
 void IxmlPrintf(
 	const char *FmtStr,
-	... )
+	...)
 {
 	va_list ArgList;
 	

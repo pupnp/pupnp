@@ -30,6 +30,11 @@
  ******************************************************************************/
 
 
+/*!
+ * \file
+ */
+
+
 #include "ixmlparser.h"
 
 
@@ -48,12 +53,14 @@
 
 static char g_error_char = '\0';
 
+
 static const char LESSTHAN = '<';
 static const char GREATERTHAN = '>';
 static const char SLASH = '/';
 static const char EQUALS = '=';
 static const char QUOTE = '\"';
 static const char SINGLEQUOTE = '\'';
+
 
 static const char *WHITESPACE = "\n\t\r ";
 static const char *COMPLETETAG = "/>";
@@ -76,17 +83,17 @@ typedef struct char_info {
 	unsigned short h;
 } char_info_t;
 
+
 typedef char utf8char[8];
 
 
-/*******************************************************************************
- *	Letter table contains all characters in XML 1.0 plus ":", "_" and
- *   ideographic.
+/*!
+ * \brief The letter table contains all characters in XML 1.0 plus ":", "_" and
+ * ideographic.
  *
- *   This table contains all the characters that an element name can start with.
- *   See XML 1.0 (2nd Edition) for more details.	
- *
- ******************************************************************************/
+ * This table contains all the characters that an element name can start with.
+ * See XML 1.0 (2nd Edition) for more details.	
+ */
 static char_info_t Letter[] = {
     {0x003A, 0x003A},           // character ":"
     {0x0041, 0x005A},
@@ -141,129 +148,153 @@ static char_info_t Letter[] = {
     {0x1FBE, 0x1FBE}, {0x1FC2, 0x1FC4}, {0x1FC6, 0x1FCC}, {0x1FD0, 0x1FD3},
     {0x1FD6, 0x1FDB}, {0x1FE0, 0x1FEC}, {0x1FF2, 0x1FF4}, {0x1FF6, 0x1FFC},
     {0x2126, 0x2126}, {0x212A, 0x212B}, {0x212E, 0x212E}, {0x2180, 0x2182},
-    {0x3007, 0x3007}, {0x3021, 0x3029}, // these two are ideographic
+    {0x3007, 0x3007}, {0x3021, 0x3029}, /* these two are ideographic */
     {0x3041, 0x3094}, {0x30A1, 0x30FA}, {0x3105, 0x312C},
-    {0x4E00, 0x9FA5},           // ideographic
+    {0x4E00, 0x9FA5},           /* ideographic */
     {0xAC00, 0xD7A3}
 };
 
 
+/*!
+ * \brief The size of the letter table array.
+ */
 #define LETTERTABLESIZE (sizeof(Letter)/sizeof(Letter[0]))
 
-/*******************************************************************************
- *   NameChar table contains
- *   CombiningChar, Extender, Digit, '-', '.', less '_', ':'
- *   NameChar ::= Digit | '-' | '.' | CombiningChar | Extender
- *   See XML 1.0 2nd Edition 
+
+/*!
+ * \brief The NameChar table contains CombiningChar, Extender, Digit,
+ * '-', '.', less '_', ':'
  *
- ******************************************************************************/
+ * NameChar ::= Digit | '-' | '.' | CombiningChar | Extender
+ * See XML 1.0 2nd Edition 
+ */
 static char_info_t NameChar[] = {
-    {0x002D, 0x002D},           // character "-"
-    {0x002E, 0x002E},           // character "."
-    {0x0030, 0x0039},           // digit
-    {0x00B7, 0x00B7}, {0x02D0, 0x02D0}, {0x02D1, 0x02D1},   // extended
+    {0x002D, 0x002D},           /* character "-" */
+    {0x002E, 0x002E},           /* character "." */
+    {0x0030, 0x0039},           /* digit */
+    {0x00B7, 0x00B7}, {0x02D0, 0x02D0}, {0x02D1, 0x02D1},   /* extended */
     {0x0300, 0x0345}, {0x0360, 0x0361},
-    {0x0387, 0x0387},           // extended
+    {0x0387, 0x0387},           /* extended */
     {0x0483, 0x0486}, {0x0591, 0x05A1}, {0x05A3, 0x05B9},
     {0x05BB, 0x05BD}, {0x05BF, 0x05BF}, {0x05C1, 0x05C2}, {0x05C4, 0x05C4},
-    {0x0640, 0x0640},           // extended
+    {0x0640, 0x0640},           /* extended */
     {0x064B, 0x0652},
-    {0x0660, 0x0669},           // digit
+    {0x0660, 0x0669},           /* digit */
     {0x0670, 0x0670},
     {0x06D6, 0x06DC}, {0x06DD, 0x06DF}, {0x06E0, 0x06E4}, {0x06E7, 0x06E8},
     {0x06EA, 0x06ED},
-    {0x06F0, 0x06F9},           // digit
+    {0x06F0, 0x06F9},           /* digit */
     {0x0901, 0x0903}, {0x093C, 0x093C},
     {0x093E, 0x094C}, {0x094D, 0x094D}, {0x0951, 0x0954}, {0x0962, 0x0963},
-    {0x0966, 0x096F},           // digit
+    {0x0966, 0x096F},           /* digit */
     {0x0981, 0x0983}, {0x09BC, 0x09BC}, {0x09BE, 0x09BE},
     {0x09BF, 0x09BF}, {0x09C0, 0x09C4}, {0x09C7, 0x09C8}, {0x09CB, 0x09CD},
     {0x09D7, 0x09D7}, {0x09E2, 0x09E3},
-    {0x09E6, 0x09EF},           // digit
+    {0x09E6, 0x09EF},           /* digit */
     {0x0A02, 0x0A02},
     {0x0A3C, 0x0A3C}, {0x0A3E, 0x0A3E}, {0x0A3F, 0x0A3F}, {0x0A40, 0x0A42},
     {0x0A47, 0x0A48}, {0x0A4B, 0x0A4D},
-    {0x0A66, 0x0A6F},           // digit
+    {0x0A66, 0x0A6F},           /* digit */
     {0x0A70, 0x0A71},
     {0x0A81, 0x0A83}, {0x0ABC, 0x0ABC}, {0x0ABE, 0x0AC5}, {0x0AC7, 0x0AC9},
     {0x0ACB, 0x0ACD},
-    {0x0AE6, 0x0AEF},           // digit
+    {0x0AE6, 0x0AEF},           /* digit */
     {0x0B01, 0x0B03}, {0x0B3C, 0x0B3C},
     {0x0B3E, 0x0B43}, {0x0B47, 0x0B48}, {0x0B4B, 0x0B4D}, {0x0B56, 0x0B57},
-    {0x0B66, 0x0B6F},           // digit
+    {0x0B66, 0x0B6F},           /* digit */
     {0x0B82, 0x0B83}, {0x0BBE, 0x0BC2}, {0x0BC6, 0x0BC8},
     {0x0BCA, 0x0BCD}, {0x0BD7, 0x0BD7},
-    {0x0BE7, 0x0BEF},           // digit
+    {0x0BE7, 0x0BEF},           /* digit */
     {0x0C01, 0x0C03},
     {0x0C3E, 0x0C44}, {0x0C46, 0x0C48}, {0x0C4A, 0x0C4D}, {0x0C55, 0x0C56},
-    {0x0C66, 0x0C6F},           // digit
+    {0x0C66, 0x0C6F},           /* digit */
     {0x0C82, 0x0C83}, {0x0CBE, 0x0CC4}, {0x0CC6, 0x0CC8},
     {0x0CCA, 0x0CCD}, {0x0CD5, 0x0CD6},
-    {0x0CE6, 0x0CEF},           // digit
+    {0x0CE6, 0x0CEF},           /* digit */
     {0x0D02, 0x0D03},
     {0x0D3E, 0x0D43}, {0x0D46, 0x0D48}, {0x0D4A, 0x0D4D}, {0x0D57, 0x0D57},
-    {0x0D66, 0x0D6F},           // digit
+    {0x0D66, 0x0D6F},           /* digit */
     {0x0E31, 0x0E31}, {0x0E34, 0x0E3A},
-    {0x0E46, 0x0E46},           // extended
+    {0x0E46, 0x0E46},           /* extended */
     {0x0E47, 0x0E4E},
-    {0x0E50, 0x0E59},           // digit
+    {0x0E50, 0x0E59},           /* digit */
     {0x0EB1, 0x0EB1}, {0x0EB4, 0x0EB9},
     {0x0EBB, 0x0EBC},
-    {0x0EC6, 0x0EC6},           // extended
+    {0x0EC6, 0x0EC6},           /* extended */
     {0x0EC8, 0x0ECD},
-    {0x0ED0, 0x0ED9},           // digit
+    {0x0ED0, 0x0ED9},           /* digit */
     {0x0F18, 0x0F19},
-    {0x0F20, 0x0F29},           // digit
+    {0x0F20, 0x0F29},           /* digit */
     {0x0F35, 0x0F35}, {0x0F37, 0x0F37},
     {0x0F39, 0x0F39}, {0x0F3E, 0x0F3E}, {0x0F3F, 0x0F3F}, {0x0F71, 0x0F84},
     {0x0F86, 0x0F8B}, {0x0F90, 0x0F95}, {0x0F97, 0x0F97}, {0x0F99, 0x0FAD},
     {0x0FB1, 0x0FB7}, {0x0FB9, 0x0FB9}, {0x20D0, 0x20DC}, {0x20E1, 0x20E1},
-    {0x3005, 0x3005},           // extended
+    {0x3005, 0x3005},           /* extended */
     {0x302A, 0x302F},
-    {0x3031, 0x3035},           // extended 
-    {0x3099, 0x3099}, {0x309A, 0x309A}, // combining char
-    {0x309D, 0x309E}, {0x30FC, 0x30FE}  // extended
+    {0x3031, 0x3035},           /* extended */
+    {0x3099, 0x3099}, {0x309A, 0x309A}, /* combining char */
+    {0x309D, 0x309E}, {0x30FC, 0x30FE}  /* extended */
 };
 
 
+/*!
+ * \brief The name char table array size.
+ */
 #define NAMECHARTABLESIZE   (sizeof(NameChar)/sizeof(NameChar[0]))
 
-/* functions used in this file */
-static void Parser_free( Parser * myParser );
-static int Parser_skipDocType( char **pstr );
-static int Parser_skipProlog( Parser * xmlParser );
-static int Parser_skipMisc( Parser * xmlParser );
-static void Parser_freeElementStackItem( IXML_ElementStack * pItem );
-static void Parser_freeNsURI( IXML_NamespaceURI * pNsURI );
 
-static int Parser_getNextNode( Parser * myParser,
-                               IXML_Node * newNode,
-                               BOOL * isEnd );
-static int Parser_getNextToken( Parser * myParser );
-static int Parser_xmlNamespace( Parser * myParser,
-                                IXML_Node * newNode );
-static BOOL Parser_ElementPrefixDefined( Parser * myParser,
-                                         IXML_Node * newNode,
-                                         char **nsURI );
-static int Parser_setElementNamespace( IXML_Element * newElement,
-                                       const char *nsURI );
-static int Parser_parseDocument( IXML_Document ** retDoc,
-                                 Parser * domParser );
-static BOOL Parser_hasDefaultNamespace( Parser * xmlParser,
-                                        IXML_Node * newNode,
-                                        char **nsURI );
-static int Parser_getChar( IN const char *src,
-                           INOUT int *cLen );
+static void Parser_free(
+	Parser *myParser);
+static int Parser_skipDocType(
+	char **pstr);
+static int Parser_skipProlog(
+	Parser *xmlParser);
+static int Parser_skipMisc(
+	Parser *xmlParser);
+static void Parser_freeElementStackItem(
+	IXML_ElementStack *pItem);
+static void Parser_freeNsURI(
+	IXML_NamespaceURI *pNsURI);
+
+static int Parser_getNextNode(
+	Parser *myParser,
+	IXML_Node *newNode,
+	BOOL *isEnd);
+static int Parser_getNextToken(
+	Parser *myParser);
+static int Parser_xmlNamespace(
+	Parser *myParser,
+	IXML_Node *newNode);
+static BOOL Parser_ElementPrefixDefined(
+	Parser *myParser,
+	IXML_Node *newNode,
+	char **nsURI);
+static int Parser_setElementNamespace(
+	IXML_Element *newElement,
+	const char *nsURI);
+static int Parser_parseDocument(
+	IXML_Document **retDoc,
+	Parser *domParser);
+static BOOL Parser_hasDefaultNamespace(
+	Parser *xmlParser,
+	IXML_Node *newNode,
+	char **nsURI);
+static int Parser_getChar(
+	const char *src,
+	int *cLen);
 
 
-/*******************************************************************************
- *   safe_strdup
- *       strdup that handles NULL input.
- *   
- ******************************************************************************/
-static char *safe_strdup(const char *s) 
+/*!
+ * \brief Version of strdup() that handles NULL input.
+ *
+ * \return The same as strdup().
+ */
+static char *safe_strdup(
+	/*! [in] String to be duplicated. */
+	const char *s) 
 {
 	assert(s != NULL);
+
 	if (s == NULL) {
 		return strdup("");
 	}
@@ -271,13 +302,19 @@ static char *safe_strdup(const char *s)
 }
 
 
-/*******************************************************************************
- *   Parser_isCharInTable
- *       will determine whether character c is in the table of tbl
- *       (either Letter table or NameChar table)
- *   
- ******************************************************************************/
-static BOOL Parser_isCharInTable(IN int c, IN char_info_t * tbl, IN int sz)
+/*!
+ * \brief Will determine whether character c is in the table of tbl (either
+ * Letter table or NameChar table).
+ *
+ * \return TRUE or FALSE.
+ */
+static BOOL Parser_isCharInTable(
+	/*! [in] Character to check. */
+	int c,
+	/*! [in] Table to use. */
+	char_info_t *tbl,
+	/*! [in] Size of the table. */
+	int sz)
 {
 	int t = 0;
 	int b = sz;
@@ -298,13 +335,12 @@ static BOOL Parser_isCharInTable(IN int c, IN char_info_t * tbl, IN int sz)
 }
 
 
-/*******************************************************************************
- *	Parser_isXmlChar
- *	    see XML 1.0 (2nd Edition) 2.2.
- *       Internal to parser only
- *
- ******************************************************************************/
-static BOOL Parser_isXmlChar(IN int c)
+/*!
+ * \brief see XML 1.0 (2nd Edition) 2.2.
+ */
+static BOOL Parser_isXmlChar(
+	/*! [in] The character to check. */
+	int c)
 {
 	return
 		c == 0x9 || c == 0xA || c == 0xD ||
@@ -314,13 +350,14 @@ static BOOL Parser_isXmlChar(IN int c)
 }
 
 
-/*******************************************************************************
- *   Parser_isNameChar
- *       check whether c (int) is in LetterTable or NameCharTable
- *       Internal to parser only.
- *
- ******************************************************************************/
-static BOOL Parser_isNameChar(IN int c, IN BOOL bNameChar)
+/*!
+ * \brief Check whether c (int) is in LetterTable or NameCharTable.
+ */
+static BOOL Parser_isNameChar(
+	/*! [in] The character to check. */
+	int c,
+	/*! [in] TRUE if you also want to check in the NameChar table. */
+	BOOL bNameChar)
 {
 	if (Parser_isCharInTable(c, Letter, LETTERTABLESIZE)) {
 		return TRUE;
@@ -330,17 +367,12 @@ static BOOL Parser_isNameChar(IN int c, IN BOOL bNameChar)
 	    Parser_isCharInTable(c, NameChar, NAMECHARTABLESIZE)) {
 		return TRUE;
 	}
+
 	return FALSE;
 }
 
 
-/*******************************************************************************
- *   Parser_isValidXmlName
- *       Check to see whether name is a valid xml name.
- *       External function.
- *
- ******************************************************************************/
-BOOL Parser_isValidXmlName(IN const DOMString name)
+BOOL Parser_isValidXmlName(const DOMString name)
 {
 	const char *pstr = NULL;
 	int i = 0;
@@ -356,37 +388,29 @@ BOOL Parser_isValidXmlName(IN const DOMString name)
 				/* illegal char */
 				return FALSE;
 			}
+		}
 	}
+
+	return TRUE;
 }
 
-return TRUE;
-}
 
-
-/*******************************************************************************
- *   Parser_setErrorChar:	
- *       If 'c' is 0 (default), the parser is strict about XML encoding :
- *       invalid UTF-8 sequences or "&" entities are rejected, and the parsing 
- *       aborts.
- *       If 'c' is not 0, the parser is relaxed : invalid UTF-8 characters
- *       are replaced by this character, and invalid "&" entities are left
- *       untranslated. The parsing is then allowed to continue.
- *       External function.
- *   
- ******************************************************************************/
-void Parser_setErrorChar(IN char c)
+void Parser_setErrorChar(char c)
 {
 	g_error_char = c;
 }
 
 
-/*******************************************************************************
- *   Parser_intToUTF8:	
- *       Encoding a character to its UTF-8 character string, and return its length
- *       internal function.
- *   
- ******************************************************************************/
-static int Parser_intToUTF8(IN int c, IN utf8char s)
+/*!
+ * \brief Encodes a character to its UTF-8 character string, and return its length.
+ *
+ * \return The length of the encoded string in bytes.
+ */
+static int Parser_intToUTF8(
+	/*! [in] The character to encode. */
+	int c,
+	/*! [out] The resultant UTF-8 encoded string. */
+	utf8char s)
 {
     if( c < 0 ) {
         return 0;
@@ -396,25 +420,25 @@ static int Parser_intToUTF8(IN int c, IN utf8char s)
         s[0] = c;
         s[1] = 0;
         return 1;
-    } else if( c <= 0x07FF ) {  // 0x0080 < c <= 0x07FF
+    } else if( c <= 0x07FF ) {  /* 0x0080 < c <= 0x07FF */
         s[0] = 0xC0 | ( c >> 6 );
         s[1] = 0x80 | ( c & 0x3f );
         s[2] = 0;
         return 2;
-    } else if( c <= 0xFFFF ) {  // 0x0800 < c <= 0xFFFF
+    } else if( c <= 0xFFFF ) {  /* 0x0800 < c <= 0xFFFF */
         s[0] = 0xE0 | ( c >> 12 );
         s[1] = 0x80 | ( ( c >> 6 ) & 0x3f );
         s[2] = 0x80 | ( c & 0x3f );
         s[3] = 0;
         return 3;
-    } else if( c <= 0x1FFFFF ) {    // 0x10000 < c <= 0x1FFFFF
+    } else if( c <= 0x1FFFFF ) {    /* 0x10000 < c <= 0x1FFFFF */
         s[0] = 0xF0 | ( c >> 18 );
         s[1] = 0x80 | ( ( c >> 12 ) & 0x3f );
         s[2] = 0x80 | ( ( c >> 6 ) & 0x3f );
         s[3] = 0x80 | ( c & 0x3f );
         s[4] = 0;
         return 4;
-    } else if( c <= 0x3FFFFFF ) {   // 0x200000 < c <= 3FFFFFF
+    } else if( c <= 0x3FFFFFF ) {   /* 0x200000 < c <= 3FFFFFF */
         s[0] = 0xF8 | ( c >> 24 );
         s[1] = 0x80 | ( ( c >> 18 ) & 0x3f );
         s[2] = 0x80 | ( ( c >> 12 ) & 0x3f );
@@ -422,7 +446,7 @@ static int Parser_intToUTF8(IN int c, IN utf8char s)
         s[4] = 0x80 | ( c & 0x3f );
         s[5] = 0;
         return 5;
-    } else if( c <= 0x7FFFFFFF ) {  // 0x4000000 < c <= 7FFFFFFF
+    } else if( c <= 0x7FFFFFFF ) {  /* 0x4000000 < c <= 7FFFFFFF */
         s[0] = 0xFC | ( c >> 30 );
         s[1] = 0x80 | ( ( c >> 24 ) & 0x3f );
         s[2] = 0x80 | ( ( c >> 18 ) & 0x3f );
@@ -431,23 +455,25 @@ static int Parser_intToUTF8(IN int c, IN utf8char s)
         s[5] = 0x80 | ( c & 0x3f );
         s[6] = 0;
         return 6;
-    } else {                    // illegal
+    } else {                    /* illegal */
         return 0;
     }
 }
 
 
-/*******************************************************************************
- *   Parser_UTF8ToInt
- *       In UTF-8, characters are encoded using sequences of 1 to 6 octets.
- *       This functions will return a UTF-8 character value and its octets number.
- *       Internal to parser only.
- *       Internal to parser only
- *          
- ******************************************************************************/
-static int Parser_UTF8ToInt(IN const char *ss, OUT int *len)
+/*!
+ * \brief In UTF-8, characters are encoded using sequences of 1 to 6 octets.
+ * This functions will return a UTF-8 character value and its octets number.
+ *
+ * \return The UTF-8 character converted to an int (32 bits).
+ */
+static int Parser_UTF8ToInt(
+	/*! [in] The pointer to the character to encode. */
+	const char *ss,
+	/*! [out] The number of octets of the UTF-8 encoding of this character. */
+	int *len)
 {
-	const unsigned char *s = ( const unsigned char * )ss;
+	const unsigned char *s = (const unsigned char *)ss;
 	int c = *s;
 
 	if (c <= 127) {
@@ -522,12 +548,11 @@ static int Parser_UTF8ToInt(IN const char *ss, OUT int *len)
 }
 
 
-/*******************************************************************************
- *   Parser_init
- *       Initializes a xml parser.
- *       Internal to parser only
- *			
- ******************************************************************************/
+/*!
+ * \brief Initializes a xml parser.
+ *
+ * \return The parser object or \b NULL if there is not enough memory.
+ */
 static Parser *Parser_init()
 {
 	Parser *newParser = NULL;
@@ -545,12 +570,16 @@ static Parser *Parser_init()
 }
 
 
-/*******************************************************************************
- * Parser_isValidEndElement
- *	check if a new node->nodeName matches top of element stack.
- *	Internal to parser only.
- ******************************************************************************/
-static int Parser_isValidEndElement(IN Parser *xmlParser, IN IXML_Node *newNode)
+/*!
+ * \brief Check if a new node->nodeName matches top of element stack.
+ *
+ * \return TRUE if matches.
+ */
+static int Parser_isValidEndElement(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The node. */
+	IXML_Node *newNode)
 {
 	assert(xmlParser);
 	assert(xmlParser->pCurElement);
@@ -562,13 +591,16 @@ static int Parser_isValidEndElement(IN Parser *xmlParser, IN IXML_Node *newNode)
 }
 
 
-/*******************************************************************************
- *   Parser_pushElement
- *       push a new element onto element stack
- *       Internal to parser only.
+/*!
+ * \brief Push a new element onto element stack.
  *
- ******************************************************************************/
-static int Parser_pushElement(IN Parser *xmlParser, IN IXML_Node *newElement)
+ * \return 
+ */
+static int Parser_pushElement(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The element node to push. */
+	IXML_Node *newElement)
 {
     IXML_ElementStack *pCurElement = NULL;
     IXML_ElementStack *pNewStackElement = NULL;
@@ -622,13 +654,12 @@ static int Parser_pushElement(IN Parser *xmlParser, IN IXML_Node *newElement)
 }
 
 
-/*******************************************************************************
- *   Parser_popElement
- *       Remove element from element stack.
- *       Internal to parser only.       
- *
- ******************************************************************************/
-static void Parser_popElement(IN Parser *xmlParser)
+/*!
+ * \brief Remove element from element stack.
+ */
+static void Parser_popElement(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
 {
 	IXML_ElementStack *pCur = NULL;
 	IXML_NamespaceURI *pnsUri = NULL;
@@ -650,16 +681,18 @@ static void Parser_popElement(IN Parser *xmlParser)
 }
 
 
-/*******************************************************************************
- *   Parser_readFileOrBuffer
- *       read a xml file or buffer contents into xml parser.
- *       Internal to parser only.
- *
- ******************************************************************************/
+/*!
+ * \brief Read a xml file or buffer contents into xml parser.
+ */
 static int Parser_readFileOrBuffer(
-	IN Parser *xmlParser,
-	IN const char *xmlFileName,
-	IN BOOL file)
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The file name or the buffer to copy, according to the
+	 * parameter "file". */
+	const char *xmlFileName,
+	/*! [in] TRUE if you want to read from a file, false if xmlFileName is
+	 * the buffer to copy to the parser. */
+	BOOL file)
 {
     int fileSize = 0;
     int bytesRead = 0;
@@ -699,16 +732,19 @@ static int Parser_readFileOrBuffer(
     return IXML_SUCCESS;
 }
 
-/*******************************************************************************
- *   Parser_LoadDocument
- *       parses a xml file and return the DOM tree.
- *       Internal to parser only
- *
- ******************************************************************************/
+
+/*!
+ * \brief Parses a xml file and return the DOM tree.
+ */
 int Parser_LoadDocument(
-	OUT IXML_Document **retDoc,
-	IN const char *xmlFileName,
-	IN BOOL file )
+	/*! [out] The output document tree. */
+	IXML_Document **retDoc,
+	/*! [in] The file name or the buffer to copy, according to the
+	 * parameter "file". */
+	const char *xmlFileName,
+	/*! [in] TRUE if you want to read from a file, false if xmlFileName is
+	 * the buffer to copy to the parser. */
+	BOOL file)
 {
     int rc = IXML_SUCCESS;
     Parser *xmlParser = NULL;
@@ -731,27 +767,30 @@ int Parser_LoadDocument(
 }
 
 
-/*******************************************************************************
- *   isTopLevelElement
- *       decides whether we have top level element already.
- *       Internal to parser only.
+/*!
+ * \brief Reports whether there is a top level element in the parser.
  *
- ******************************************************************************/
-static int isTopLevelElement(IN Parser *xmlParser)
+ * \return TRUE if there is a top level element in the parser.
+ */
+static int isTopLevelElement(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
 {
-    assert( xmlParser );
-    return ( xmlParser->pCurElement == NULL );
+    assert(xmlParser);
+    return xmlParser->pCurElement == NULL;
 }
 
 
-/*******************************************************************************
- *   isDuplicateAttribute
- *       Decide whether the new attribute is the same as an
- *       existing one.
- *       Internal to parser only.
+/*!
+ * \brief Reports whether the new attribute is the same as an existing one.
  *
- ******************************************************************************/
-static int isDuplicateAttribute(IN Parser *xmlParser, IN IXML_Node *newAttrNode)
+ * \return TRUE if the new attribute is the same as an existing one.
+ */
+static int isDuplicateAttribute(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The node attribute to compare. */
+	IXML_Node *newAttrNode)
 {
     IXML_Node *elementNode = NULL;
     IXML_Node *attrNode = NULL;
@@ -769,16 +808,18 @@ static int isDuplicateAttribute(IN Parser *xmlParser, IN IXML_Node *newAttrNode)
     return FALSE;
 }
 
-/*******************************************************************************
- *   Parser_processAttributeName
- *       processes the attribute name.
- *       Internal to parser only.
+/*!
+ * \brief Processes the attribute name.
  *
- ******************************************************************************/
+ * \return IXML_SUCCESS if successful, otherwise or an error code.
+ */
 static int Parser_processAttributeName(
-	IN IXML_Document *rootDoc,
-	IN Parser *xmlParser,
-	IN IXML_Node *newNode )
+	/*! [in] The XML document. */
+	IXML_Document *rootDoc,
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode)
 {
     IXML_Attr *attr = NULL;
     int rc = IXML_SUCCESS;
@@ -787,8 +828,7 @@ static int Parser_processAttributeName(
         return IXML_SYNTAX_ERR;
     }
 
-    rc = ixmlDocument_createAttributeEx( rootDoc, newNode->nodeName,
-                                         &attr );
+    rc = ixmlDocument_createAttributeEx( rootDoc, newNode->nodeName, &attr );
     if( rc != IXML_SUCCESS ) {
         return rc;
     }
@@ -798,21 +838,23 @@ static int Parser_processAttributeName(
         return rc;
     }
 
-    rc = ixmlElement_setAttributeNode( ( IXML_Element * ) xmlParser->
-                                       currentNodePtr, attr, NULL );
+    rc = ixmlElement_setAttributeNode(
+	(IXML_Element *)xmlParser->currentNodePtr, attr, NULL );
     return rc;
 }
 
-/*******************************************************************************
- *   Parser_processElementName
- *       Processes element name 
- *       Internal to parser only.
+/*!
+ * \brief Processes element name.
  *
- ******************************************************************************/
+ * \return IXML_SUCCESS if successful, otherwise or an error code.
+ */
 static int Parser_processElementName(
-	IN IXML_Document *rootDoc,
-	IN Parser *xmlParser,
-	IN IXML_Node *newNode )
+	/*! [in] The XML document. */
+	IXML_Document *rootDoc,
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode )
 {
     IXML_Element *newElement = NULL;
     char *nsURI = NULL;
@@ -827,8 +869,7 @@ static int Parser_processElementName(
     }
 
     xmlParser->savePtr = xmlParser->curPtr;
-    rc = ixmlDocument_createElementEx( rootDoc, newNode->nodeName,
-                                       &newElement );
+    rc = ixmlDocument_createElementEx( rootDoc, newNode->nodeName, &newElement );
     if( rc != IXML_SUCCESS ) {
         return rc;
     }
@@ -873,16 +914,14 @@ static int Parser_processElementName(
     return rc;
 }
 
-/*******************************************************************************
- *   Parser_eTagVerification
- *       Verifies endof element tag is the same as the openning 
- *       element tag.
- *       Internal to parser only.
- *
- ******************************************************************************/
+/*!
+ * \brief Verifies endof element tag is the same as the openning element tag.
+ */
 static int Parser_eTagVerification(
-	IN Parser *xmlParser,
-	IN IXML_Node *newNode)
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode)
 {
     assert( newNode->nodeName );
     assert( xmlParser->currentNodePtr );
@@ -906,13 +945,7 @@ static int Parser_eTagVerification(
 }
 
 
-/*******************************************************************************
- *   Parser_freeNodeContent
- *       frees a node contents
- *       Internal to parser only.
- *
- ******************************************************************************/
-void Parser_freeNodeContent(IN IXML_Node *nodeptr)
+void Parser_freeNodeContent(IXML_Node *nodeptr)
 {
     if( nodeptr == NULL ) {
         return;
@@ -940,15 +973,16 @@ void Parser_freeNodeContent(IN IXML_Node *nodeptr)
 }
 
 
-/*******************************************************************************
- *   Parser_parseDocument
- *       Parses the xml file and returns the DOM document tree.
- *       External function.
+/*!
+ * \brief Parses the xml file and returns the DOM document tree.
  *
- ******************************************************************************/
+ * \return
+ */
 static int Parser_parseDocument(
-	OUT IXML_Document **retDoc,
-	IN Parser *xmlParser )
+	/*! [out] The XML document. */
+	IXML_Document **retDoc,
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
 {
     IXML_Document *gRootDoc = NULL;
     IXML_Node newNode;
@@ -1078,15 +1112,14 @@ ErrorHandler:
 }
 
 
-/*******************************************************************************
- *   Parser_setLastElem
- *       set the last element to be the given string.
- *       Internal to parser only.			
- *
- ******************************************************************************/
+/*!
+ * \brief Set the last element to be the given string.
+ */
 static int Parser_setLastElem(
-	IN Parser *xmlParser,
-	IN const char *s )
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The string to copy from. */
+	const char *s)
 {
     int rc;
 
@@ -1099,29 +1132,25 @@ static int Parser_setLastElem(
 }
 
 
-/*******************************************************************************
- *
- *   Parser_clearTokenBuf
- *       clear token buffer.
- *       Internal to parser only.
- *
+/*!
+ * \brief Clear token buffer.
  ******************************************************************************/
-static void Parser_clearTokenBuf(IN Parser *xmlParser)
+static void Parser_clearTokenBuf(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
 {
     ixml_membuf_destroy( &( xmlParser->tokenBuf ) );
 }
 
 
-/*******************************************************************************
- *
- *   Parser_appendTokBufStr
- *       Appends string s to token buffer
- *       Internal to parser only.
- *       
- ******************************************************************************/
+/*!
+ * \brief Appends string s to token buffer.
+ */
 static int Parser_appendTokBufStr(
-	IN Parser *xmlParser,
-	IN const char *s )
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The string to append. */
+	const char *s)
 {
     int rc = IXML_SUCCESS;
 
@@ -1133,16 +1162,14 @@ static int Parser_appendTokBufStr(
 }
 
 
-/*******************************************************************************
- *
- *   Parser_appendTokBufChar   
- *       Appends c to token buffer.
- *       Internal to parser only.
- *
- ******************************************************************************/
+/*!
+ * \brief Appends c to token buffer.
+ */
 static int Parser_appendTokBufChar(
-	IN Parser *xmlParser,
-	IN char c)
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The character to append. */
+	char c)
 {
     int rc;
 
@@ -1151,14 +1178,12 @@ static int Parser_appendTokBufChar(
 }
 
 
-/*******************************************************************************
- *
- *   Parser_skipWhiteSpaces
- *       skip white spaces 
- *       Internal to parser only			
- *
- ******************************************************************************/
-static void Parser_skipWhiteSpaces(IN Parser *xmlParser)
+/*!
+ * \brief Skip white spaces.
+ */
+static void Parser_skipWhiteSpaces(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
 {
     while( ( *( xmlParser->curPtr ) != 0 ) &&
            ( strchr( WHITESPACE, *( xmlParser->curPtr ) ) != NULL ) ) {
@@ -1167,13 +1192,14 @@ static void Parser_skipWhiteSpaces(IN Parser *xmlParser)
 }
 
 
-/*******************************************************************************
- *   Parser_getChar	
- *       returns next char value and its length			
- *       Internal to parser only
- *
- ******************************************************************************/
-static int Parser_getChar(IN const char *src, INOUT int *cLen)
+/*!
+ * \brief Returns next char value and its length.
+ */
+static int Parser_getChar(
+	/*! [in] . */
+	const char *src,
+	/*! [in,out] . */
+	int *cLen)
 {
 	int ret = -1;
 	int line = 0;
@@ -1283,16 +1309,16 @@ ExitFunction:
 }
 
 
-/*******************************************************************************
- *   Parser_copyToken	
- *       copy string in src into xml parser token buffer
- *		Internal to parser only.	
- *
- ******************************************************************************/
+/*!
+ * \brief Copy string in src into xml parser token buffer
+ */
 static int Parser_copyToken(
-	IN Parser *xmlParser,
-	IN const char *src,
-	IN int len)
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The string to copy from. */
+	const char *src,
+	/*! [in] The lenght to copy. */
+	int len)
 {
 	int ret = IXML_SUCCESS;
 	int line = 0;
@@ -1351,15 +1377,15 @@ ExitFunction:
 }
 
 
-/*******************************************************************************
- *
- *   Parser_skipString
- *       Skips all characters in the string until it finds the skip key.
- *       Then it skips the skip key and returns.
- *       Internal to parser only
- *
- ******************************************************************************/
-static int Parser_skipString(INOUT char **pstrSrc, IN const char *strSkipKey)
+/*!
+ * \brief Skips all characters in the string until it finds the skip key.
+ * Then it skips the skip key and returns.
+ */
+static int Parser_skipString(
+	/*! [in,out] The pointer to the skipped point. */
+	char **pstrSrc,
+	/*! [in] The skip key. */
+	const char *strSkipKey)
 {
     if( !( *pstrSrc ) || !strSkipKey ) {
         return IXML_FAILED;
@@ -1380,14 +1406,12 @@ static int Parser_skipString(INOUT char **pstrSrc, IN const char *strSkipKey)
 }
 
 
-/*******************************************************************************
- *
- * Function:	
- * Returns:	
- *			
- *
- ******************************************************************************/
-static int Parser_skipPI(INOUT char **pSrc)
+/*!
+ * \brief 
+ */
+static int Parser_skipPI(
+	/*! [in,out] The pointer to the skipped point. */
+	char **pSrc)
 {
     char *pEnd = NULL;
 
@@ -1415,13 +1439,12 @@ static int Parser_skipPI(INOUT char **pSrc)
 }
 
 
-/*******************************************************************************
- *   Parser_skipXMLDecl:	
- *       skips XML declarations.
- *       Internal only to parser.			
- *
- ******************************************************************************/
-static int Parser_skipXMLDecl(INOUT Parser *xmlParser)
+/*!
+ * \brief Skips XML declarations.
+ */
+static int Parser_skipXMLDecl(
+	/*! [in,out] The XML parser. */
+	Parser *xmlParser)
 {
     int rc = IXML_FAILED;
 
@@ -1436,13 +1459,12 @@ static int Parser_skipXMLDecl(INOUT Parser *xmlParser)
 }
 
 
-/*******************************************************************************
- *   Parser_skipProlog
- *       skip prolog
- *       Internal to parser only.			
- *
- ******************************************************************************/
-static int Parser_skipProlog(INOUT Parser *xmlParser)
+/*!
+ * \brief Skip prolog.
+ */
+static int Parser_skipProlog(
+	/*! [in,out] The XML parser. */
+	Parser *xmlParser)
 {
     int rc = IXML_SUCCESS;
 
@@ -1477,15 +1499,13 @@ static int Parser_skipProlog(INOUT Parser *xmlParser)
 }
 
 
-/*******************************************************************************
- *
- * Function:
- * Returns:
- *       Skips all characters in the string until it finds the skip key.
- *       Then it skips the skip key and returns.
- *
- ******************************************************************************/
-static int Parser_skipComment(INOUT char **pstrSrc)
+/*!
+ * \brief Skips all characters in the string until it finds the skip key.
+ * Then it skips the skip key and returns.
+ */
+static int Parser_skipComment(
+	/*! [in,out] The pointer to the skipped point. */
+	char **pstrSrc)
 {
     char *pStrFound = NULL;
 
@@ -1506,12 +1526,12 @@ static int Parser_skipComment(INOUT char **pstrSrc)
 }
 
 
-/*******************************************************************************
-*   Parser_skipDocType
-*       skips document type declaration
-*
-******************************************************************************/
-static int Parser_skipDocType(INOUT char **pstr)
+/*!
+ * \brief Skips document type declaration
+ */
+static int Parser_skipDocType(
+	/*! [in,out] The pointer to the skipped point. */
+	char **pstr)
 {
     char *pCur = *pstr;
     char *pNext = NULL;         // default there is no nested <
@@ -1548,14 +1568,12 @@ static int Parser_skipDocType(INOUT char **pstr)
 }
 
 
-/*******************************************************************************
- *
- *   Parser_skipMisc:	
- *       skip comment, PI and white space 
- *			
- *
- ******************************************************************************/
-static int Parser_skipMisc(IN Parser *xmlParser)
+/*!
+ * \brief Skip comment, PI and white space.
+ */
+static int Parser_skipMisc(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
 {
     int rc = IXML_SUCCESS;
     int done = FALSE;
@@ -1582,14 +1600,12 @@ static int Parser_skipMisc(IN Parser *xmlParser)
 }
 
 
-/*******************************************************************************
- *
- *   Parser_getNextToken
- *       return the length of next token in tokenBuff
- *			
- *
- ******************************************************************************/
-static int Parser_getNextToken(IN Parser *xmlParser)
+/*!
+ * \brief Return the length of next token in tokenBuff.
+ */
+static int Parser_getNextToken(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
 {
     int tokenLength = 0;
     int temp,
@@ -1653,14 +1669,14 @@ static int Parser_getNextToken(IN Parser *xmlParser)
 }
 
 
-/*******************************************************************************
- *
- *   Parser_getNameSpace	
- *       return the namespce as defined as prefix.
- *       Internal to parser only			
- *
- ******************************************************************************/
-static char *Parser_getNameSpace(IN Parser *xmlParser, IN const char *prefix)
+/*!
+ * \brief Return the namespce as defined as prefix.
+ */
+static char *Parser_getNameSpace(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The prefix. */
+	const char *prefix)
 {
     IXML_ElementStack *pCur;
     IXML_NamespaceURI *pNsUri;
@@ -1683,14 +1699,12 @@ static char *Parser_getNameSpace(IN Parser *xmlParser, IN const char *prefix)
 }
 
 
-/*******************************************************************************
- *
- *   Parser_addNamespace
- *       Add a namespace definition
- *       Internal to parser only			
- *
- ******************************************************************************/
-static int Parser_addNamespace(IN Parser *xmlParser)
+/*!
+ * \brief Add a namespace definition.
+ */
+static int Parser_addNamespace(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
 {
     IXML_Node *pNode;
     IXML_ElementStack *pCur;
@@ -1735,15 +1749,13 @@ static int Parser_addNamespace(IN Parser *xmlParser)
 }
 
 
-/*******************************************************************************
- *
- *   Parser_setNodePrefixAndLocalName
- *       set the node prefix and localName as defined by the nodeName
- *       in the form of ns:name
- *       Internal to parser only.			
- *
- ******************************************************************************/
-int Parser_setNodePrefixAndLocalName(IN IXML_Node *node)
+/*!
+ * \brief Set the node prefix and localName as defined by the nodeName in the
+ * form of ns:name.
+ */
+int Parser_setNodePrefixAndLocalName(
+	/*! [in,out] The Node to process. */
+	IXML_Node *node)
 {
     char *pStrPrefix = NULL;
     char *pLocalName;
@@ -1787,16 +1799,14 @@ int Parser_setNodePrefixAndLocalName(IN IXML_Node *node)
 }
 
 
-/*******************************************************************************
- *
- *   Parser_xmlNamespace
- *       add namespace definition. 
- *       internal to parser only.			
- *
- ******************************************************************************/
+/*!
+ * \brief Add namespace definition. 
+ */
 static int Parser_xmlNamespace(
-	IN Parser *xmlParser,
-	IN IXML_Node *newNode)
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode)
 {
     IXML_ElementStack *pCur = xmlParser->pCurElement;
     IXML_NamespaceURI *pNewNs = NULL,
@@ -1903,16 +1913,14 @@ static int Parser_xmlNamespace(
 }
 
 
-/*******************************************************************************
- *
- *   Parser_processSTag:	
- *       Processes the STag as defined by XML spec. 
- *       Internal to parser only.			
- *
- ******************************************************************************/
+/*!
+ * \brief Processes the STag as defined by XML spec. 
+ */
 static int Parser_processSTag(
-	IN Parser *xmlParser,
-	IN IXML_Node *node)
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *node)
 {
     char *pCurToken = NULL;
     int rc;
@@ -1968,17 +1976,16 @@ static int Parser_processSTag(
 }
 
 
-/*******************************************************************************
- *
- *   Parser_hasDefaultNamespace   	
- *       decide whether the current element has default namespace
- *       Internal to parser only.       			
- *
- ******************************************************************************/
+/*!
+ * \brief Decide whether the current element has default namespace
+ */
 static BOOL Parser_hasDefaultNamespace(
-	IN Parser *xmlParser,
-	IN IXML_Node *newNode,
-	IN char **nsURI )
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode,
+	/*! [in,out] The name space URI. */
+	char **nsURI )
 {
     IXML_ElementStack *pCur = xmlParser->pCurElement;
 
@@ -1995,17 +2002,16 @@ static BOOL Parser_hasDefaultNamespace(
 }
 
 
-/*******************************************************************************
- *
- *   Parser_ElementPrefixDefined
- *       decides whether element's prefix is already defined.
- *       Internal to parser only. 
- *
- ******************************************************************************/
+/*!
+ * \brief Decides whether element's prefix is already defined.
+ */
 static BOOL Parser_ElementPrefixDefined(
-	IN Parser *xmlParser,
-	IN IXML_Node *newNode,
-	IN char **nsURI )
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode,
+	/*! [in,out] The name space URI. */
+	char **nsURI )
 {
     IXML_ElementStack *pCur = xmlParser->pCurElement;
     IXML_NamespaceURI *pNsUri;
@@ -2036,18 +2042,17 @@ static BOOL Parser_ElementPrefixDefined(
 }
 
 
-/*******************************************************************************
+/*!
+ * \brief Processes CDSection as defined by XML spec.
  *
- *   Parser_processCDSect   
- *       Processes CDSection as defined by XML spec.
- *       Internal to parser only.
- *
- ******************************************************************************/
+ * \return
+ */
 static int Parser_processCDSect(
-	IN char **pSrc,
-	IN IXML_Node *node)
+	/*! [in] . */
+	char **pSrc,
+	/*! [in] The Node to process. */
+	IXML_Node *node)
 {
-
     char *pEnd;
     int tokenLength = 0;
     char *pCDataStart;
@@ -2091,16 +2096,14 @@ static int Parser_processCDSect(
 }
 
 
-/*******************************************************************************
- *
- *   Parser_setElementNamespace
- *       set element's namespace
- *       Internal to parser only.			
- *
- ******************************************************************************/
+/*!
+ * \brief Set element's namespace.
+ */
 static int Parser_setElementNamespace(
-	IN IXML_Element *newElement,
-	IN const char *nsURI)
+	/*! [in] The Element Node to process. */
+	IXML_Element *newElement,
+	/*! [in] The name space string. */
+	const char *nsURI)
 {
     if( newElement != NULL ) {
         if( newElement->n.namespaceURI != NULL ) {
@@ -2117,16 +2120,14 @@ static int Parser_setElementNamespace(
 }
 
 
-/*******************************************************************************
- *
- *   Parser_processContent
- *       processes the CONTENT as defined in XML spec.
- *       Internal to parser only			
- *
- ******************************************************************************/
+/*!
+ * \brief Processes the CONTENT as defined in XML spec.
+ */
 static int Parser_processContent(
-	IN Parser *xmlParser,
-	IN IXML_Node *node)
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *node)
 {
 	int ret = IXML_SUCCESS;
 	int line = 0;
@@ -2242,17 +2243,16 @@ ExitFunction:
 }
 
 
-/*******************************************************************************
- *
- *   Parser_processETag
- *       process ETag as defined by XML spec.
- *       Internal to parser only.			
- *
- ******************************************************************************/
+/*!
+ * \brief Process ETag as defined by XML spec.
+ */
 static int Parser_processETag(
-	IN Parser *xmlParser,
-	IN IXML_Node *node,
-	OUT BOOL *bETag)
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *node,
+	/*! [out] . */
+	BOOL *bETag)
 {
 	int ret = IXML_SUCCESS;
 	int line = 0;
@@ -2316,14 +2316,12 @@ ExitFunction:
 }
 
 
-/*******************************************************************************
- *
- *   Parser_freeElementStackItem
- *       frees one ElementStack item.
- *       Internal to parser only.			
- *
- ******************************************************************************/
-static void Parser_freeElementStackItem(IN IXML_ElementStack *pItem)
+/*!
+ * \brief Frees one ElementStack item.
+ */
+static void Parser_freeElementStackItem(
+	/*! [in] The element stack item to free. */
+	IXML_ElementStack *pItem)
 {
     assert( pItem != NULL );
     if( pItem->element != NULL ) {
@@ -2341,14 +2339,12 @@ static void Parser_freeElementStackItem(IN IXML_ElementStack *pItem)
 }
 
 
-/*******************************************************************************
- *
- *   Parser_freeNsURI
- *       frees namespaceURI item.
- *       Internal to parser only. 		
- *
- ******************************************************************************/
-static void Parser_freeNsURI(IN IXML_NamespaceURI *pNsURI)
+/*!
+ * \brief Frees namespaceURI item.
+ */
+static void Parser_freeNsURI(
+	/*! [in] The name space URI item to free. */
+	IXML_NamespaceURI *pNsURI)
 {
     assert( pNsURI != NULL );
     if( pNsURI->nsURI != NULL ) {
@@ -2360,15 +2356,12 @@ static void Parser_freeNsURI(IN IXML_NamespaceURI *pNsURI)
 }
 
 
-/*******************************************************************************
- *
- *   Parser_free
- *       frees all temporary memory allocated by xmlparser.
- *       Internal to parser only       
- *			
- *
- ******************************************************************************/
-static void Parser_free(IN Parser *xmlParser)
+/*!
+ * \brief Frees all temporary memory allocated by xmlparser.
+ */
+static void Parser_free(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
 {
     IXML_ElementStack *pElement;
     IXML_ElementStack *pNextElement;
@@ -2407,30 +2400,30 @@ static void Parser_free(IN Parser *xmlParser)
 }
 
 
-/*******************************************************************************
+/*!
+ * \brief Unimplemented function.
  *
- *   Parser_parseReference	
- *       return IXML_SUCCESS or not
- *			
- *
- ******************************************************************************/
-static int Parser_parseReference(IN char *pStr)
+ * \return IXML_SUCCESS.
+ */
+static int Parser_parseReference(
+	/*! [in] Currently unused. */
+	char *pStr)
 {
 	// place holder for future implementation
 	return IXML_SUCCESS;
 }
 
 
-/*******************************************************************************
+/*!
+ * \brief Processes attribute.
  *
- *   Parser_processAttribute	
- *       processes attribute.
- *       Internal to parser only.
- *       returns IXML_SUCCESS or failure
- *			
- *
- ******************************************************************************/
-static int Parser_processAttribute(IN Parser *xmlParser, IN IXML_Node *node)
+ * \return IXML_SUCCESS or failure code.
+ */
+static int Parser_processAttribute(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *node)
 {
     char *strEndQuote = NULL;
     int tlen = 0;
@@ -2541,18 +2534,18 @@ static int Parser_processAttribute(IN Parser *xmlParser, IN IXML_Node *node)
 }
 
 
-/*******************************************************************************
+/*!
+ * \brief Get the next node.
  *
- *   Parser_getNextNode
- *       return next node 
- *   returns IXML_SUCCESS or 
- *			
- *
- ******************************************************************************/
+ * \return IXML_SUCCESS and the next node or IXML_FILE_DONE or an error.
+ */
 static int Parser_getNextNode(
-	IN Parser *xmlParser,
-	OUT IXML_Node *node,
-	OUT BOOL *bETag)
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [out] The XML parser. */
+	IXML_Node *node,
+	/*! [out] The XML parser. */
+	BOOL *bETag)
 {
 	char *pCurToken = NULL;
 	char *lastElement = NULL;

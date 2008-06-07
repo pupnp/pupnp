@@ -9,13 +9,15 @@
 
 /*!
  * \file
+ *
+ * \brief Auxiliar routines to aid debugging.
  */
 
 
 /*!
  * \brief Prints the debug statement either on the standard output or log file
  * along with the information from where this debug statement is coming.
- **/ 
+ */ 
 #ifdef DEBUG
 void IxmlPrintf(
 	/*! [in] Printf like format specification. */

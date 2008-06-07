@@ -273,7 +273,7 @@ extern "C" {
  * \return A constant \b DOMString of the node name.
  */
 EXPORT_SPEC const DOMString ixmlNode_getNodeName(
-	/*! Pointer to the node to retrieve the name. */
+	/*! [in] Pointer to the node to retrieve the name. */
 	IXML_Node *nodeptr);
 
 
@@ -457,7 +457,7 @@ ixmlNode_getPrefix(
  *  	\c NULL.
  */
 EXPORT_SPEC const DOMString ixmlNode_getLocalName(
-	/*! The \b Node from which to retrieve the local name. */
+	/*! [in] The \b Node from which to retrieve the local name. */
 	IXML_Node *nodeptr);
 
 /*! 
@@ -1111,7 +1111,7 @@ EXPORT_SPEC int ixmlDocument_importNode(
  * \brief Initializes a \b IXML_Element node.
  */
 EXPORT_SPEC void ixmlElement_init(
-	/*! The \b Element to initialize.*/
+	/*! [in] The \b Element to initialize.*/
 	IXML_Element *element);
 
 
@@ -1121,27 +1121,29 @@ EXPORT_SPEC void ixmlElement_init(
  * \return The name of the \b Element.
  */
 EXPORT_SPEC const DOMString ixmlElement_getTagName(
-	/*! The \b Element from which to retrieve the name. */
+	/*! [in] The \b Element from which to retrieve the name. */
 	IXML_Element *element);
 
 
 /*!
  * \brief Retrieves an attribute of an \b Element by name.  
  *
- * \return The value of the attribute.
+ * \return The value of the attribute, or \b NULL if that attribute
+*       does not have a specified value.
  */
 EXPORT_SPEC const DOMString ixmlElement_getAttribute(
-	/*! The \b Element from which to retrieve the attribute. */
+	/*! [in] The \b Element from which to retrieve the attribute. */
 	IXML_Element* element,  
-	/*! The name of the attribute to retrieve. */
+	/*! [in] The name of the attribute to retrieve. */
 	const DOMString name);
 
 
 /*!
  * \brief Adds a new attribute to an \b Element.
  *
- * If an attribute with the same name already exists, the attribute value will
- * be updated with the new value in \b value.  
+ * If an attribute with the same name already exists in the element, the
+ * attribute value will be updated with the new value parameter. Otherwise,
+ * a new attribute is inserted into the element.
  *
  * \return An integer representing of the following:
  *     \li \c IXML_SUCCESS: The operation completed successfully.
@@ -1163,7 +1165,7 @@ EXPORT_SPEC int ixmlElement_setAttribute(
 
 
 /*!
- * \brief Removes an attribute by name.  
+ * \brief Removes an attribute value by name. The attribute node is not removed.
  *
  * \return An integer representing one of the following:
  *     \li \c IXML_SUCCESS: The operation completed successfully.
@@ -1182,7 +1184,8 @@ EXPORT_SPEC int ixmlElement_removeAttribute(
  * See \b ixmlElement_getAttributeNodeNS to retrieve an attribute node using
  * a qualified name or namespace URI.
  *
- * \return A pointer to the attribute matching \b name or \c NULL on an error.
+ * \return A pointer to the attribute matching \b name or \c NULL on if there
+ * 	is no such attribute.
  */
 EXPORT_SPEC IXML_Attr *ixmlElement_getAttributeNode(
 	/*! [in] The \b Element from which to get the attribute node.  */
@@ -1191,11 +1194,15 @@ EXPORT_SPEC IXML_Attr *ixmlElement_getAttributeNode(
 	const DOMString name);
 
 
-/*!Adds a new attribute node to an \b Element.  If an attribute already
- * exists with \b newAttr as a name, it will be replaced with the
- * new one and the old one will be returned in \b rtAttr.
+/*!
+ * \brief Adds a new attribute node to an \b Element.
  *
- * \return An integer representing one of the following:
+ * If an attribute already exists with \b newAttr as a name, it will be
+ * replaced with the new one and the old one will be returned in \b rtAttr.
+ *
+ * \return If successfull, the replaced attribute node is returned in rtAttr,
+ * otherwise, \b NULL is returned in this pointer. The function return value
+ * is an integer representing one of the following:
  *     \li \c IXML_SUCCESS: The operation completed successfully.
  *     \li \c IXML_INVALID_PARAMETER: Either \b element or 
  *           \b newAttr is \c NULL.
@@ -1205,11 +1212,11 @@ EXPORT_SPEC IXML_Attr *ixmlElement_getAttributeNode(
  *           an attribute of another \b Element.
  */
 EXPORT_SPEC int ixmlElement_setAttributeNode(
-	/*! The \b Element in which to add the new attribute. */
+	/*! [in] The \b Element in which to add the new attribute. */
 	IXML_Element *element,
-	/*! The new \b Attr to add. */
+	/*! [in] The new \b Attr to add. */
 	IXML_Attr* newAttr,     
-	/*! A pointer to an \b Attr where the old \b Attr will be stored.
+	/*! [out] A pointer to an \b Attr where the old \b Attr will be stored.
 	 * This will have a \c NULL if no prior node existed. */
 	IXML_Attr** rtAttr);
 
@@ -1225,11 +1232,11 @@ EXPORT_SPEC int ixmlElement_setAttributeNode(
  *           attributes of \b element.
  */
 EXPORT_SPEC int ixmlElement_removeAttributeNode(
-	/*! The \b Element from which to remove the attribute. */
+	/*! [in] The \b Element from which to remove the attribute. */
 	IXML_Element *element,
-	/*! The attribute to remove from the \b Element. */
+	/*! [in] The attribute to remove from the \b Element. */
 	IXML_Attr* oldAttr,     
-	/*! A pointer to an attribute in which to place the removed attribute. */
+	/*! [out] A pointer to an attribute in which to place the removed attribute. */
 	IXML_Attr** rtAttr);
 
 
@@ -1255,14 +1262,15 @@ EXPORT_SPEC IXML_NodeList *ixmlElement_getElementsByTagName(
 /*!
  * \brief Retrieves an attribute value using the local name and namespace URI.
  *
- * \return A \b DOMString representing the value of the matching attribute.
+ * \return A \b DOMString representing the value of the matching attribute, or
+ * \b NULL if that attribute does not have the specified value.
  */
 EXPORT_SPEC const DOMString ixmlElement_getAttributeNS(
-	/*! The \b Element from which to get the attribute value. */
+	/*! [in] The \b Element from which to get the attribute value. */
 	IXML_Element *element,
-	/*! The namespace URI of the attribute. */
+	/*! [in] The namespace URI of the attribute. */
 	const DOMString namespaceURI, 
-	/*! The local name of the attribute. */
+	/*! [in] The local name of the attribute. */
 	const DOMString localname);
 
 
@@ -1289,55 +1297,63 @@ EXPORT_SPEC const DOMString ixmlElement_getAttributeNS(
  *     \li \c IXML_FAILED: The operation could not be completed.
  */
 EXPORT_SPEC int ixmlElement_setAttributeNS(
-	/*! The \b Element on which to set the attribute. */
+	/*! [in] The \b Element on which to set the attribute. */
 	IXML_Element *element,
-	/*! The namespace URI of the new attribute. */
+	/*! [in] The namespace URI of the new attribute. */
 	const DOMString namespaceURI,   
-	/*! The qualified name of the attribute. */
+	/*! [in] The qualified name of the attribute. */
 	const DOMString qualifiedName,  
-	/*! The new value for the attribute. */
+	/*! [in] The new value for the attribute. */
 	const DOMString value);
 
 
 /*!
  * \brief Removes an attribute using the namespace URI and local name.
  *
+ * The replacing attribute has the same namespace URI and local name, as well
+ * as the original prefix.
+ * 
  * \return An integer representing one of the following:
  *     \li \c IXML_SUCCESS: The operation completed successfully.
  *     \li \c IXML_INVALID_PARAMETER: Either \b element, 
  *           \b namespaceURI, or \b localName is \c NULL.
  */
 EXPORT_SPEC int ixmlElement_removeAttributeNS(
-	/*! The \b Element from which to remove the the attribute. */
+	/*! [in] The \b Element from which to remove the the attribute. */
 	IXML_Element *element,
-	/*! The namespace URI of the attribute. */
+	/*! [in] The namespace URI of the attribute. */
 	const DOMString namespaceURI,  
-	/*! The local name of the attribute.*/
+	/*! [in] The local name of the attribute.*/
 	const DOMString localName);
 
 
 /*!
  * \brief Retrieves an \b Attr node by local name and namespace URI.
  *
- * \return A pointer to an \b Attr or \c NULL on an error.
+ * \return A pointer to an \b Attribute node  with the specified attribute
+ * 	local name and namespace URI or \c NULL if there is no such attribute.
  */
 EXPORT_SPEC IXML_Attr *ixmlElement_getAttributeNodeNS(
-	/*! The \b Element from which to get the attribute. */
+	/*! [in] The \b Element from which to get the attribute. */
 	IXML_Element *element,
-	/*! The namespace URI of the attribute. */
+	/*! [in] The namespace URI of the attribute. */
 	const DOMString namespaceURI,  
-	/*! The local name of the attribute. */
+	/*! [in] The local name of the attribute. */
 	const DOMString localName);
 
 
 /*!
- * \brief Adds a new attribute node.
+ * \brief Adds a new attribute node to the element node specified.
  *
  * If an attribute with the same local name and namespace URI already exists in
  * the \b Element, the existing attribute node is replaced with \b newAttr and
  * the old returned in \b rcAttr.
  *
- * \return An integer representing one of the following:
+ * \return The output parameter rcAttr receives the replaced attribute node if
+ * the newAttr attribute replaces an existing attribute with the same local name
+ * and namespace, otherwise rcAttr receives \b NULL.
+ *
+ * The function return value is an integer representing one of the following:
  *     \li \c IXML_SUCCESS: The operation completed successfully.
  *     \li \c IXML_INVALID_PARAMETER: Either \b element or 
  *           \b newAttr is \c NULL.
@@ -1347,27 +1363,29 @@ EXPORT_SPEC IXML_Attr *ixmlElement_getAttributeNodeNS(
  *           attribute of another \b Element.
  */
 EXPORT_SPEC int ixmlElement_setAttributeNodeNS(
-	/*! The \b Element in which to add the attribute node. */
+	/*! [in] The \b Element in which to add the attribute node. */
 	IXML_Element *element,
-	/*! The new \b Attr to add. */
+	/*! [in] The new \b Attr to add. */
 	IXML_Attr *newAttr,     
-	/*! A pointer to the replaced \b Attr, if it exists. */
+	/*! [out] A pointer to the replaced \b Attr, if it exists. */
 	IXML_Attr **rcAttr);
 
 
 /*!
  * \brief Returns a \b NodeList of all \em descendant \b Elements with a
- * given tag name, in the order in which they are encountered in the
- * pre-order traversal of the \b Element tree.
+ * given local name and namespace in the order in which they are encountered in
+ * the pre-order traversal of the \b Element tree.
  *
  * \return A \b NodeList of matching \b Elements or \c NULL on an error.
  */
 EXPORT_SPEC IXML_NodeList *ixmlElement_getElementsByTagNameNS(
-	/*! The \b Element from which to start the search. */
+	/*! [in] The \b Element from which to start the search. */
 	IXML_Element *element,
-	/*! The namespace URI of the \b Elements to find. */
+	/*! [in] The namespace URI of the \b Elements to find.  The special value
+	 * "*" matches all namespaces. */
 	const DOMString namespaceURI,
-	/*! The local name of the \b Elements to find. */
+	/*! [in] The local name of the \b Elements to find. The special value "*"
+	 * matches all local names. */
 	const DOMString localName);
 
 
@@ -1379,9 +1397,9 @@ EXPORT_SPEC IXML_NodeList *ixmlElement_getElementsByTagNameNS(
  * default value for that attribute, otherwise \c FALSE.
  */
 EXPORT_SPEC BOOL ixmlElement_hasAttribute(
-	/*! The \b Element on which to check for an attribute. */
+	/*! [in] The \b Element on which to check for an attribute. */
 	IXML_Element *element,
-	/*! The name of the attribute for which to check. */
+	/*! [in] The name of the attribute for which to check. */
 	const DOMString name);
 
 
@@ -1393,11 +1411,11 @@ EXPORT_SPEC BOOL ixmlElement_hasAttribute(
  * and local name or has a default value for that attribute, otherwise \c FALSE.
  */
 EXPORT_SPEC BOOL ixmlElement_hasAttributeNS(
-	/*! The \b Element on which to check for the attribute. */
+	/*! [in] The \b Element on which to check for the attribute. */
 	IXML_Element *element,
-	/*! The namespace URI of the attribute. */
+	/*! [in] The namespace URI of the attribute. */
 	const DOMString namespaceURI, 
-	/*! The local name of the attribute. */
+	/*! [in] The local name of the attribute. */
 	const DOMString localName);
 
 
@@ -1405,7 +1423,7 @@ EXPORT_SPEC BOOL ixmlElement_hasAttributeNS(
  * \brief Frees the given \b Element and any subtree of the \b Element.
  */
 EXPORT_SPEC void ixmlElement_free(
-	/*! The \b Element to free. */
+	/*! [in] The \b Element to free. */
 	IXML_Element *element);
 
 
@@ -1431,14 +1449,15 @@ EXPORT_SPEC void ixmlElement_free(
  * \return The number of nodes in this map.
  */
 EXPORT_SPEC unsigned long ixmlNamedNodeMap_getLength(
-	/*! The \b NamedNodeMap from which to retrieve the size. */
+	/*! [in] The \b NamedNodeMap from which to retrieve the size. */
 	IXML_NamedNodeMap *nnMap);
 
 
 /*!
  * \brief Retrieves a \b Node from the \b NamedNodeMap by name.
  *
- * \return A \b Node or \c NULL if there is an error.
+ * \return A Node with the specified nodeName, or \b NULL if it
+ * 	does not identify any node in this map.
  */
 EXPORT_SPEC IXML_Node *ixmlNamedNodeMap_getNamedItem(
 	/*! [in] The \b NamedNodeMap to search. */
@@ -1474,15 +1493,16 @@ EXPORT_SPEC IXML_Node *ixmlNamedNodeMap_removeNamedItem(
 
 
 /*!
- * \brief Retrieves a \b Node from a \b NamedNodeMap specified by a numerical
- * index.
+ * \brief Retrieves the indexth item in the map. If index is greater than or
+ * equal to the number of nodes in this map, this returns \b NULL.
  *
- * \return A pointer to the \b Node, if found, or \c NULL if it wasn't.
+ * \return The node at the indexth position in the map, or \b NULL if that is
+ * 	not a valid index.
  */
 EXPORT_SPEC IXML_Node *ixmlNamedNodeMap_item(
-	/*! The \b NamedNodeMap from which to remove the \b Node. */
+	/*! [in] The \b NamedNodeMap from which to remove the \b Node. */
 	IXML_NamedNodeMap *nnMap,
-	/*! The index into the map to remove. */
+	/*! [in] The index into the map to remove. */
 	unsigned long index);
 
 
@@ -1540,7 +1560,7 @@ EXPORT_SPEC IXML_Node *ixmlNamedNodeMap_removeNamedItemNS(
  * The \b Nodes inside the map are not freed, just the \b NamedNodeMap object.
  */
 EXPORT_SPEC void ixmlNamedNodeMap_free(
-	/*! The \b NamedNodeMap to free. */
+	/*! [in] The \b NamedNodeMap to free. */
 	IXML_NamedNodeMap *nnMap);
 
 
@@ -1567,9 +1587,9 @@ EXPORT_SPEC void ixmlNamedNodeMap_free(
  * \return A pointer to a \b Node or \c NULL if there was an error.
  */
 EXPORT_SPEC IXML_Node *ixmlNodeList_item(
-	/*! The \b NodeList from which to retrieve the \b Node. */
+	/*! [in] The \b NodeList from which to retrieve the \b Node. */
 	IXML_NodeList *nList,
-	/*! The index into the \b NodeList to retrieve. */
+	/*! [in] The index into the \b NodeList to retrieve. */
 	unsigned long index);
 
 
@@ -1579,7 +1599,7 @@ EXPORT_SPEC IXML_Node *ixmlNodeList_item(
  * \return The number of \b Nodes in the \b NodeList.
  */
 EXPORT_SPEC unsigned long ixmlNodeList_length(
-	/*! The \b NodeList for which to retrieve the number of \b Nodes. */
+	/*! [in] The \b NodeList for which to retrieve the number of \b Nodes. */
 	IXML_NodeList *nList);
 
 
@@ -1590,7 +1610,7 @@ EXPORT_SPEC unsigned long ixmlNodeList_length(
  * operation. This only frees the \b NodeList object.
  */
 EXPORT_SPEC void ixmlNodeList_free(
-	/*! The \b NodeList to free.  */
+	/*! [in] The \b NodeList to free.  */
 	IXML_NodeList *nList);
 
 

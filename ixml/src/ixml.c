@@ -44,12 +44,13 @@
 
 
 /*!
- * \todo Documentation.
+ * \brief Appends a string to a buffer, substituting some characters by escape
+ * sequences.
  */
 static void copy_with_escape(
-	/*! [in,out] \todo documentation. */
+	/*! [in,out] The input/output buffer. */
 	ixml_membuf *buf,
-	/*! [in] \todo documentation. */
+	/*! [in] The string to copy from. */
 	const char *p)
 {
 	int i;
@@ -89,6 +90,7 @@ static void copy_with_escape(
 		}
 	}
 }
+
 
 /*!
  * \brief Recursive function to print all the node in a tree.
@@ -193,6 +195,7 @@ static void ixmlPrintDomTreeRecursive(
 	}
 }
 
+
 /*!
  * \brief Print a DOM tree.
  *
@@ -262,6 +265,7 @@ static void ixmlPrintDomTree(
 		break;
 	}
 }
+
 
 /*!
  * \brief Converts a DOM tree into a text string Element, and Attribute nodes

@@ -30,6 +30,11 @@
  ******************************************************************************/
 
 
+/*!
+ * \file
+ */
+
+
 #include "ixmlparser.h"
 
 
@@ -63,28 +68,21 @@ ixmlCDATASection_init( IN IXML_CDATASection * nodeptr )
     memset( nodeptr, 0, sizeof( IXML_CDATASection ) );
 }
 
-/*================================================================
-*   ixmlCDATASection_free
-*       frees a CDATASection node.
-*       External function.
-*
-*=================================================================*/
-void
-ixmlCDATASection_free( IN IXML_CDATASection * nodeptr )
+
+void ixmlCDATASection_free(IXML_CDATASection *nodeptr)
 {
     if( nodeptr != NULL ) {
         ixmlNode_free( ( IXML_Node * ) nodeptr );
     }
 }
 
-/*================================================================
-*   ixmlNode_freeSingleNode
-*       frees a node content.
-*       Internal to parser only.
-*
-*=================================================================*/
-void
-ixmlNode_freeSingleNode( IN IXML_Node * nodeptr )
+
+/*!
+ * \brief Frees a node content.
+ */
+static void ixmlNode_freeSingleNode(
+	/*! [in] The node to free. */
+	IXML_Node *nodeptr)
 {
     IXML_Element *element = NULL;
 
@@ -119,34 +117,20 @@ ixmlNode_freeSingleNode( IN IXML_Node * nodeptr )
     }
 }
 
-/*================================================================
-*   ixmlNode_free
-*       Frees all nodes under nodeptr subtree.
-*       External function.
-*
-*=================================================================*/
-void
-ixmlNode_free( IN IXML_Node * nodeptr )
-{
-    if( nodeptr != NULL ) {
-        ixmlNode_free( nodeptr->firstChild );
-        ixmlNode_free( nodeptr->nextSibling );
-        ixmlNode_free( nodeptr->firstAttr );
 
-        ixmlNode_freeSingleNode( nodeptr );
-    }
+void ixmlNode_free(IXML_Node *nodeptr)
+{
+	if (nodeptr != NULL) {
+		ixmlNode_free(nodeptr->firstChild);
+		ixmlNode_free(nodeptr->nextSibling);
+		ixmlNode_free(nodeptr->firstAttr);
+		ixmlNode_freeSingleNode(nodeptr);
+	}
 }
 
-/*================================================================
-*   ixmlNode_getNodeName
-*       Returns the nodename(the qualified name)
-*       External function.
-*
-*=================================================================*/
-const DOMString
-ixmlNode_getNodeName( IN IXML_Node * nodeptr )
-{
 
+const DOMString ixmlNode_getNodeName(IXML_Node *nodeptr)
+{
     if( nodeptr != NULL ) {
         return ( nodeptr->nodeName );
     }
@@ -154,34 +138,24 @@ ixmlNode_getNodeName( IN IXML_Node * nodeptr )
     return NULL;
 }
 
-/*================================================================
-*   ixmlNode_getLocalName
-*       Returns the node local name
-*       External function.          		
-*
-*=================================================================*/
-const DOMString
-ixmlNode_getLocalName( IN IXML_Node * nodeptr )
+
+const DOMString ixmlNode_getLocalName(IXML_Node *nodeptr)
 {
+	if (nodeptr != NULL) {
+		return nodeptr->localName;
+	}
 
-    if( nodeptr != NULL ) {
-        return ( nodeptr->localName );
-    }
-
-    return NULL;
+	return NULL;
 }
 
-/*================================================================
-*   ixmlNode_setNamespaceURI
-*       sets the namespace URI of the node.
-*       Internal function.
-*	Return:
-*       IXML_SUCCESS or failure	
-*
-*=================================================================*/
-int
-ixmlNode_setNamespaceURI( IN IXML_Node * nodeptr,
-                          IN const char *namespaceURI )
+/*!
+ * \brief Sets the namespace URI of the node.
+ */
+static int ixmlNode_setNamespaceURI(
+	/*! [in] . */
+	IN IXML_Node *nodeptr,
+	/*! [in] . */
+	IN const char *namespaceURI)
 {
 
     if( nodeptr == NULL ) {
@@ -203,50 +177,44 @@ ixmlNode_setNamespaceURI( IN IXML_Node * nodeptr,
     return IXML_SUCCESS;
 }
 
-/*================================================================
-*   ixmlNode_setPrefix
-*       set the prefix of the node.
-*       Internal to parser only.
-*	Returns:	
-*       IXML_SUCCESS or failure.
-*
-*=================================================================*/
-int
-ixmlNode_setPrefix( IN IXML_Node * nodeptr,
-                    IN const char *prefix )
+
+/*
+ * \brief Set the prefix of the node.
+ */
+int ixmlNode_setPrefix(
+	IN IXML_Node *nodeptr,
+	IN const char *prefix)
 {
 
-    if( nodeptr == NULL ) {
+    if (nodeptr == NULL) {
         return IXML_INVALID_PARAMETER;
     }
 
-    if( nodeptr->prefix != NULL ) {
-        free( nodeptr->prefix );
+    if (nodeptr->prefix != NULL) {
+        free(nodeptr->prefix);
         nodeptr->prefix = NULL;
     }
 
-    if( prefix != NULL ) {
-        nodeptr->prefix = strdup( prefix );
-        if( nodeptr->prefix == NULL ) {
+    if (prefix != NULL) {
+        nodeptr->prefix = strdup(prefix);
+        if(nodeptr->prefix == NULL) {
             return IXML_INSUFFICIENT_MEMORY;
         }
     }
 
     return IXML_SUCCESS;
-
 }
 
-/*================================================================
-*   ixmlNode_setLocalName
-*	    set the localName of the node.
-*       Internal to parser only.
-*	Returns:	
-*       IXML_SUCCESS or failure.
-*
-*=================================================================*/
-int
-ixmlNode_setLocalName( IN IXML_Node * nodeptr,
-                       IN const char *localName )
+/*!
+ * \brief Set the localName of the node.
+ *
+ * \return IXML_SUCCESS or failure.
+ */
+static int ixmlNode_setLocalName(
+	/*! [in] The pointer to the node. */
+	IN IXML_Node *nodeptr,
+	/*! [in] The local name to set. */
+	IN const char *localName)
 {
 
     assert( nodeptr != NULL );
