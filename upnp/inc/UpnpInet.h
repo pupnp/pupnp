@@ -7,7 +7,7 @@
 /*!
  * \file
  *
- * \brief Proides a platform independent way to include TCP/IP types and functions.
+ * \brief Provides a platform independent way to include TCP/IP types and functions.
  */
 
 
