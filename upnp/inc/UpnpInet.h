@@ -4,6 +4,13 @@
 #define UPNPINET_H
 
 
+/*!
+ * \file
+ *
+ * \brief Proides a platform independent way to include TCP/IP types and functions.
+ */
+
+
 #ifdef WIN32
 	#include <Ws2tcpip.h>
 #else
