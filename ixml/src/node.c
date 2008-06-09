@@ -134,9 +134,9 @@ const DOMString ixmlNode_getLocalName(IXML_Node *nodeptr)
  */
 static int ixmlNode_setNamespaceURI(
 	/*! [in] The \b Node on which to operate. */
-	IN IXML_Node *nodeptr,
+	IXML_Node *nodeptr,
 	/*! [in] The name space string to set. */
-	IN const char *namespaceURI)
+	const char *namespaceURI)
 {
 	if (nodeptr == NULL) {
 		return IXML_INVALID_PARAMETER;
@@ -194,9 +194,9 @@ static int ixmlNode_setPrefix(
  */
 static int ixmlNode_setLocalName(
 	/*! [in] The pointer to the node. */
-	IN IXML_Node *nodeptr,
+	IXML_Node *nodeptr,
 	/*! [in] The local name to set. */
-	IN const char *localName)
+	const char *localName)
 {
 	assert(nodeptr != NULL);
 
@@ -672,7 +672,7 @@ static IXML_Node *ixmlNode_cloneTextNode(
  */
 static IXML_CDATASection *ixmlNode_cloneCDATASect(
 	/*! [in] The \b Node to clone. */
-	IN IXML_CDATASection *nodeptr)
+	IXML_CDATASection *nodeptr)
 {
 	IXML_CDATASection *newCDATA = NULL;
 	IXML_Node *newNode;
@@ -800,7 +800,7 @@ static IXML_Document *ixmlNode_cloneDoc(
  */
 static IXML_Attr *ixmlNode_cloneAttr(
 	/*! [in] The \b Node to clone. */
-	IN IXML_Attr *nodeptr)
+	IXML_Attr *nodeptr)
 {
 	IXML_Attr *newAttr;
 	IXML_Node *attrNode;
@@ -1209,13 +1209,13 @@ void ixmlNode_getElementsByTagName(
  */
 static void ixmlNode_getElementsByTagNameNSRecursive(
 	/*! [in] . */
-	IN IXML_Node *n,
+	IXML_Node *n,
 	/*! [in] . */
-	IN const char *namespaceURI,
+	const char *namespaceURI,
 	/*! [in] . */
-	IN const char *localName,
+	const char *localName,
 	/*! [out] . */
-	OUT IXML_NodeList **list)
+	IXML_NodeList **list)
 {
 	const DOMString nsURI;
 	const DOMString name;
