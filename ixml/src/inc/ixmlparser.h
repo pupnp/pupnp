@@ -30,8 +30,8 @@
  **************************************************************************/
 
 
-#ifndef _IXMLPARSER_H
-#define _IXMLPARSER_H
+#ifndef IXMLPARSER_H
+#define IXMLPARSER_H
 
 
 /*!
@@ -181,18 +181,90 @@ int ixmlNodeList_addToNodeList(
 	IXML_Node *add);
 
 
-void    ixmlNode_init(IXML_Node *IXML_Nodeptr);
-BOOL    ixmlNode_compare(IXML_Node *srcIXML_Node, IXML_Node *destIXML_Node);
-
-void    ixmlNode_getElementsByTagName(IXML_Node *n, const char *tagname, IXML_NodeList **list);
-void    ixmlNode_getElementsByTagNameNS(IXML_Node *IXML_Node, const char *namespaceURI,
-                const char *localName, IXML_NodeList **list);
-
-int     ixmlNode_setNodeProperties(IXML_Node* node, IXML_Node *src);
-int     ixmlNode_setNodeName( IXML_Node* node, const DOMString qualifiedName);
-
-void    ixmlNodeList_init(IXML_NodeList *nList);
+/*!
+ * \brief Intializes a node.
+ */
+void ixmlNode_init(
+	/*! [in] The \b Node to iniatialize. */
+	IN IXML_Node *nodeptr);
 
 
-#endif  // _IXMLPARSER_H
+/*!
+ * \brief Compare two nodes to see whether they are the same node.
+ * Parent, sibling and children node are ignored.
+ *
+ * \return
+ * 	\li TRUE, the two nodes are the same.
+ * 	\li FALSE, the two nodes are not the same.
+ */
+BOOL ixmlNode_compare(
+	/*! [in] The first \b Node. */
+	IXML_Node *srcNode,
+	/*! [in] The second \b Node. */
+ 	IXML_Node *destNode);
+
+
+/*!
+ * \brief Returns a nodeList of all descendant Elements with a given tagName,
+ * in the order in which they are encountered in a traversal of this element
+ * tree.
+ */
+void ixmlNode_getElementsByTagName(
+	/*! [in] The \b Node tree. */
+	IXML_Node *n,
+	/*! [in] The tag name to match. */
+	const char *tagname,
+	/*! [out] The output \b NodeList. */
+	IXML_NodeList **list);
+
+
+/*!
+ * \brief Returns a nodeList of all the descendant Elements with a given local
+ * name and namespace URI in the order in which they are encountered in a
+ * preorder traversal of this Elememt tree.		
+ */
+void ixmlNode_getElementsByTagNameNS(
+	/*! [in] The \b Element tree. */
+	IXML_Node *n,
+	/*! [in] The name space to match. */
+	const char *namespaceURI,
+	/*! [in] The local name to match. */
+	const char *localName,
+	/*! [out] The output \b NodeList. */
+	IXML_NodeList **list);
+
+
+/*!
+ * \brief 
+ *
+ * \return 
+ */
+int ixmlNode_setNodeName(
+	/*! [in] The \b Node. */
+	IXML_Node *node,
+	/*! [in] . */
+	const DOMString qualifiedName);
+
+
+/*!
+ * \brief 
+ *
+ * \return 
+ */
+int ixmlNode_setNodeProperties(
+	/*! [in] . */
+	IXML_Node *destNode,
+	/*! [in] . */
+	IXML_Node *src);
+
+
+/*!
+ * \brief Initializes a nodelist 
+ */
+void ixmlNodeList_init(
+	/*! [in,out] The \b NodeList to initialize. */
+	IXML_NodeList *nList);
+
+
+#endif  /* IXMLPARSER_H */
 

@@ -42,9 +42,6 @@
 #include <string.h>
 
 
-/*!
- * \brief Initializes a nodelist 
- */
 void ixmlNodeList_init(IXML_NodeList *nList)
 {
 	assert(nList != NULL);

@@ -286,7 +286,7 @@ EXPORT_SPEC const DOMString ixmlNode_getNodeName(
  *  \return A \b DOMString of the \b Node value.
  */
 EXPORT_SPEC const DOMString ixmlNode_getNodeValue(
-	/*! Pointer to the \b Node to retrieve the value. */
+	/*! [in] Pointer to the \b Node to retrieve the value. */
 	IXML_Node *nodeptr);
 
 
@@ -303,9 +303,9 @@ EXPORT_SPEC const DOMString ixmlNode_getNodeValue(
  *      	complete this operation.
  */
 EXPORT_SPEC int ixmlNode_setNodeValue(
-	/*! The \b Node to which to assign a new value. */
+	/*! [in] The \b Node to which to assign a new value. */
 	IXML_Node *nodeptr, 
-	/*! The new value of the \b Node. */
+	/*! [in] The new value of the \b Node. */
 	const char *newNodeValue);
 
 
@@ -315,7 +315,7 @@ EXPORT_SPEC int ixmlNode_setNodeValue(
  *  \return An enum IXML_NODE_TYPE representing the type of the \b Node.
  */
 EXPORT_SPEC unsigned short ixmlNode_getNodeType(
-	/*! The \b Node from which to retrieve the type. */
+	/*! [in] The \b Node from which to retrieve the type. */
 	IXML_Node *nodeptr);
 
 
@@ -326,7 +326,7 @@ EXPORT_SPEC unsigned short ixmlNode_getNodeType(
  *	parent.
  */
 EXPORT_SPEC IXML_Node *ixmlNode_getParentNode(
-	/*! The \b Node from which to retrieve the parent. */ 
+	/*! [in] The \b Node from which to retrieve the parent. */ 
 	IXML_Node *nodeptr);
 
 
@@ -339,9 +339,8 @@ EXPORT_SPEC IXML_Node *ixmlNode_getParentNode(
  *
  * \return A \b NodeList of the children of the \b Node.
  */
-EXPORT_SPEC IXML_NodeList *               
-ixmlNode_getChildNodes(
-	/*! The \b Node from which to retrieve the children. */
+EXPORT_SPEC IXML_NodeList *ixmlNode_getChildNodes(
+	/*! [in] The \b Node from which to retrieve the children. */
 	IXML_Node *nodeptr);
 
 
@@ -352,7 +351,7 @@ ixmlNode_getChildNodes(
  * not have any children.
  */
 EXPORT_SPEC IXML_Node *ixmlNode_getFirstChild(
-	/*! The \b Node from which to retrieve the first child. */ 
+	/*! [in] The \b Node from which to retrieve the first child. */ 
 	IXML_Node *nodeptr);
 
 
@@ -363,7 +362,7 @@ EXPORT_SPEC IXML_Node *ixmlNode_getFirstChild(
  * not have any children.
  */
 EXPORT_SPEC IXML_Node *ixmlNode_getLastChild(
-	/*! The \b Node from which to retrieve the last child. */
+	/*! [in] The \b Node from which to retrieve the last child. */
 	IXML_Node *nodeptr);
 
 
@@ -374,7 +373,7 @@ EXPORT_SPEC IXML_Node *ixmlNode_getLastChild(
  * \b Node exists.
  */
 EXPORT_SPEC IXML_Node *ixmlNode_getPreviousSibling(
-	/*! The \b Node for which to retrieve the previous sibling. */
+	/*! [in] The \b Node for which to retrieve the previous sibling. */
 	IXML_Node *nodeptr);
 
 
@@ -385,7 +384,7 @@ EXPORT_SPEC IXML_Node *ixmlNode_getPreviousSibling(
  *  \b Node exists.
  */
 EXPORT_SPEC IXML_Node *ixmlNode_getNextSibling(
-	/*! The \b Node from which to retrieve the next sibling. */ 
+	/*! [in] The \b Node from which to retrieve the next sibling. */ 
 	IXML_Node *nodeptr);
 
 
@@ -396,7 +395,7 @@ EXPORT_SPEC IXML_Node *ixmlNode_getNextSibling(
  *  \return A \b NamedNodeMap of the attributes or \c NULL.
  */
 EXPORT_SPEC IXML_NamedNodeMap *ixmlNode_getAttributes(
-	/*! The \b Node from which to retrieve the attributes. */ 
+	/*! [in] The \b Node from which to retrieve the attributes. */ 
 	IXML_Node *nodeptr);
 
 
@@ -411,7 +410,7 @@ EXPORT_SPEC IXML_NamedNodeMap *ixmlNode_getAttributes(
  * does not have an owner.
  */
 EXPORT_SPEC IXML_Document *ixmlNode_getOwnerDocument(
-	/*! The \b Node from which to retrieve the owner document. */
+	/*! [in] The \b Node from which to retrieve the owner document. */
 	IXML_Node *nodeptr);
 
 
@@ -425,7 +424,7 @@ EXPORT_SPEC IXML_Document *ixmlNode_getOwnerDocument(
  * \return A \b DOMString representing the URI of the namespace or \c NULL.
  */
 EXPORT_SPEC const DOMString ixmlNode_getNamespaceURI(
-	/*! The \b Node for which to retrieve the namespace. */
+	/*! [in] The \b Node for which to retrieve the namespace. */
 	IXML_Node *nodeptr);
 
 
@@ -486,11 +485,11 @@ EXPORT_SPEC const DOMString ixmlNode_getLocalName(
  *           \b nodeptr.
  */
 EXPORT_SPEC int ixmlNode_insertBefore(
-	/*! The parent of the \b Node before which to insert the new child. */
+	/*! [in] The parent of the \b Node before which to insert the new child. */
 	IXML_Node *nodeptr,   
-	/*! The \b Node to insert into the tree. */
+	/*! [in] The \b Node to insert into the tree. */
 	IXML_Node * newChild,
-	/*! The reference child where the new \b Node should be inserted.
+	/*! [in] The reference child where the new \b Node should be inserted.
 	 * The new \b Node will appear directly before the reference child. */
 	IXML_Node * refChild);
 
@@ -518,14 +517,14 @@ EXPORT_SPEC int ixmlNode_insertBefore(
  *            \b nodeptr.
  */
 EXPORT_SPEC int ixmlNode_replaceChild(
-	/*! The parent of the \b Node which contains the child to replace. */
+	/*! [in] The parent of the \b Node which contains the child to replace. */
 	IXML_Node *nodeptr,
-	/*! The child with which to replace \b oldChild. */
-	IXML_Node * newChild,        
-	/*! The child to replace with \b newChild. */
-	IXML_Node * oldChild,        
-	/*! Pointer to a \b Node to place the removed \b oldChild \b Node. */
-	IXML_Node ** returnNode);
+	/*! [in] The child with which to replace \b oldChild. */
+	IXML_Node *newChild,        
+	/*! [in] The child to replace with \b newChild. */
+	IXML_Node *oldChild,        
+	/*! [out] Pointer to a \b Node to place the removed \b oldChild \b Node. */
+	IXML_Node **returnNode);
 
 
 /*!
@@ -545,11 +544,11 @@ EXPORT_SPEC int ixmlNode_replaceChild(
  *           children of \b nodeptr.
  */
 EXPORT_SPEC int ixmlNode_removeChild(
-	/*! The parent of the child to remove. */
+	/*! [in] The parent of the child to remove. */
 	IXML_Node *nodeptr,
-	/*! The child \b Node to remove. */
+	/*! [in] The child \b Node to remove. */
 	IXML_Node *oldChild,
-	/*! Pointer to a \b Node to place the removed \b oldChild \b Node. */
+	/*! [out] Pointer to a \b Node to place the removed \b oldChild \b Node. */
 	IXML_Node **returnNode);
 
 
@@ -571,9 +570,9 @@ EXPORT_SPEC int ixmlNode_removeChild(
  *            read-only \b Node.
  */
 EXPORT_SPEC int ixmlNode_appendChild(
-	/*! The \b Node in which to append the new child. */
+	/*! [in] The \b Node in which to append the new child. */
 	IXML_Node *nodeptr,
-	/*! The new child to append. */
+	/*! [in] The new child to append. */
 	IXML_Node * newChild);
 
 
@@ -583,7 +582,7 @@ EXPORT_SPEC int ixmlNode_appendChild(
  * \return \c TRUE if the \b Node has one or more children otherwise \c FALSE.
  */
 EXPORT_SPEC BOOL ixmlNode_hasChildNodes(
-	/*! The \b Node to query for children. */
+	/*! [in] The \b Node to query for children. */
 	IXML_Node *nodeptr);
 
 
@@ -599,9 +598,9 @@ EXPORT_SPEC BOOL ixmlNode_hasChildNodes(
  * \return A clone of \b nodeptr or \c NULL.
  */
 EXPORT_SPEC IXML_Node *ixmlNode_cloneNode(
-	/*! The \b Node to clone.  */
+	/*! [in] The \b Node to clone.  */
 	IXML_Node *nodeptr,
-	/*! \c TRUE to clone the subtree also or \c FALSE to clone only
+	/*! [in] \c TRUE to clone the subtree also or \c FALSE to clone only
 	 * \b nodeptr. */
 	BOOL deep);
 
@@ -613,9 +612,8 @@ EXPORT_SPEC IXML_Node *ixmlNode_cloneNode(
  *
  * \return \c TRUE if the \b Node has attributes otherwise \c FALSE.
  */
-EXPORT_SPEC BOOL    
-ixmlNode_hasAttributes(
-	/*! The \b Node to query for attributes. */
+EXPORT_SPEC BOOL ixmlNode_hasAttributes(
+	/*! [in] The \b Node to query for attributes. */
 	IXML_Node *nodeptr);
 
 
@@ -623,7 +621,7 @@ ixmlNode_hasAttributes(
  * \brief Frees a \b Node and all \b Nodes in its subtree.
  */
 EXPORT_SPEC void ixmlNode_free(
-	/*! The \b Node to free. */
+	/*! [in] The \b Node tree to free. */
 	IXML_Node *nodeptr);
 
 /* @} Interface Node */
@@ -675,7 +673,7 @@ EXPORT_SPEC void ixmlAttr_free(
  * \brief Initializes a \b CDATASection node.
  */
 EXPORT_SPEC void ixmlCDATASection_init(
-	/*! The \b CDATASection node to initialize. */
+	/*! [in] The <b>CDATA Section Node</b> to iniatialize. */
 	IXML_CDATASection *nodeptr);
 
 
