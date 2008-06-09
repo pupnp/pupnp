@@ -42,6 +42,7 @@
 
 
 #include <stdarg.h>
+#include <stdio.h>
 
 
 #include "upnptools.h"

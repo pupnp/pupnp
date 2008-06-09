@@ -85,7 +85,7 @@ EXPORT_SPEC void UpnpActionComplete_set_ErrCode(
 /*!
  * \brief Control URL getter.
  *
- * \retrun The control URL string.
+ * \return The control URL string.
  */
 EXPORT_SPEC const UpnpString *UpnpActionComplete_get_CtrlUrl(
 	/*! [in] \b this pointer. */

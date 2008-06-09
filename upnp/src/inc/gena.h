@@ -157,7 +157,7 @@ typedef struct NOTIFY_THREAD_STRUCT {
  * \brief This is the callback function called by the miniserver to handle
  *	incoming GENA requests.
  *
- * \Return UPNP_E_SUCCESS if successful, otherwise appropriate error code.
+ * \return UPNP_E_SUCCESS if successful, otherwise appropriate error code.
  */
 EXTERN_C void genaCallback(
 	/*! [in] represents the parse state of the request */

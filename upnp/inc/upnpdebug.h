@@ -34,12 +34,14 @@
 #define UPNP_DEBUG_H 
 
 
-/*! \file */
+/*!
+ * \file
+ */
 
 
 #include "ThreadPool.h"
-#include "upnp.h"
 #include "upnpconfig.h"
+#include "UpnpGlobal.h" /* for UPNP_INLINE */
 
 
 #include <stdio.h>
@@ -72,7 +74,6 @@ extern "C" {
  *    \li \c UPNP_INFO [2]
  *    \li \c UPNP_ALL [3]
  */
-
 typedef enum Upnp_Module {
 	SSDP,
 	SOAP,
@@ -83,6 +84,7 @@ typedef enum Upnp_Module {
 	API,
 	HTTP
 } Dbg_Module;
+
 
 /*@{*/
 typedef enum Upnp_LogLevel_e {

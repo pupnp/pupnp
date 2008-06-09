@@ -1,275 +1,231 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
-#ifndef _SERVICE_TABLE
-#define _SERVICE_TABLE
+
+#ifndef SERVICE_TABLE
+#define SERVICE_TABLE
+
+
+/*!
+ * \file
+ */
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 #include "config.h"
 #include "uri.h"
 #include "ixml.h"
-
 #include "upnp.h"
+#include "upnpdebug.h"
+
+
 #include <stdio.h>
-//#include <malloc.h>
 #include <time.h>
+
 
 #define SID_SIZE  41
 
+
 #ifdef INCLUDE_DEVICE_APIS
 
+
 typedef struct SUBSCRIPTION {
-  Upnp_SID sid;
-  int eventKey;
-  int ToSendEventKey;
-  time_t expireTime;
-  int active;
-  URL_list DeliveryURLs;
-  struct SUBSCRIPTION *next;
+	Upnp_SID sid;
+	int eventKey;
+	int ToSendEventKey;
+	time_t expireTime;
+	int active;
+	URL_list DeliveryURLs;
+	struct SUBSCRIPTION *next;
 } subscription;
 
 
 typedef struct SERVICE_INFO {
-  DOMString	serviceType;
-  DOMString	serviceId;
-  char		*SCPDURL ;
-  char		*controlURL;
-  char		*eventURL;
-  DOMString	UDN;
-  int		active;
-  int		TotalSubscriptions;
-  subscription	*subscriptionList;
-  struct SERVICE_INFO	 *next;
+	DOMString	serviceType;
+	DOMString	serviceId;
+	char		*SCPDURL ;
+	char		*controlURL;
+	char		*eventURL;
+	DOMString	UDN;
+	int		active;
+	int		TotalSubscriptions;
+	subscription	*subscriptionList;
+	struct SERVICE_INFO	 *next;
 } service_info;
 
 
 typedef struct SERVICE_TABLE {
-  DOMString URLBase;
-  service_info *serviceList;
-  service_info *endServiceList;
+	DOMString URLBase;
+	service_info *serviceList;
+	service_info *endServiceList;
 } service_table;
 
 
 /* Functions for Subscriptions */
 
-/************************************************************************
-*	Function :	copy_subscription
-*
-*	Parameters :
-*		subscription *in ;	Source subscription
-*		subscription *out ;	Destination subscription
-*
-*	Description :	Makes a copy of the subscription
-*
-*	Return : int ;
-*		HTTP_SUCCESS - On Sucess
-*
-*	Note :
-************************************************************************/
-int copy_subscription(subscription *in, subscription *out);
 
-/************************************************************************
-*	Function :	RemoveSubscriptionSID
-*
-*	Parameters :
-*		Upnp_SID sid ;	subscription ID
-*		service_info * service ;	service object providing the list of
-*						subscriptions
-*
-*	Description :	Remove the subscription represented by the
-*		const Upnp_SID sid parameter from the service table and update 
-*		the service table.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void RemoveSubscriptionSID(Upnp_SID sid, service_info * service);
+/*!
+ * \brief Makes a copy of the subscription.
+ *
+ * \return HTTP_SUCCESS on Sucess.
+ */
+int copy_subscription(
+	/*! [in] Source subscription. */
+	subscription *in,
+	/*! [in] Destination subscription. */
+	subscription *out);
 
-/************************************************************************
- * Function: GetSubscriptionSID
+
+/*
+ * \brief Remove the subscription represented by the const Upnp_SID sid parameter
+ * from the service table and update the service table.
+ */
+void RemoveSubscriptionSID(
+	/*! [in] Subscription ID. */
+	Upnp_SID sid,
+	/*! [in] Service object providing the list of subscriptions. */
+	service_info *service);
+
+
+/*!
+ * \brief Return the subscription from the service table that matches
+ * const Upnp_SID sid value.
  *
- * Parameters:
- *	const Upnp_SID sid:		subscription ID
- *	const service_info *service:	service object providing the list of
- *					subscriptions
- *
- * Description :	Return the subscription from the service table 
- *	that matches const Upnp_SID sid value. 
- *
- * Return: subscription *:	Pointer to the matching subscription node;
- ************************************************************************/
-subscription *GetSubscriptionSID(const Upnp_SID sid, service_info *service); 
+ * \return Pointer to the matching subscription node.
+ */
+subscription *GetSubscriptionSID(
+	/*! [in] Subscription ID. */
+	const Upnp_SID sid,
+	/*! [in] Service object providing the list of subscriptions. */
+	service_info *service); 
   
-/************************************************************************
- * Function: GetFirstSubscription
+
+/*!
+ * \brief Gets pointer to the first subscription node in the service table.
  *
- * Parameters:
- *	service_info *service:		service object providing the list of
- *					subscriptions
+ * \return Pointer to the first subscription node.
+ */
+subscription *GetFirstSubscription(
+	/*! [in] Service object providing the list of subscriptions. */
+	service_info *service);
+
+
+/*!
+ * \brief Get current and valid subscription from the service table.
  *
- * Description: Gets pointer to the first subscription node in the 
- *	service table.
+ * \return Pointer to the next subscription node.
+ */
+subscription *GetNextSubscription(
+	/*! [in] Service object providing the list of subscriptions. */
+	service_info *service,
+	/*! [in] Current subscription object. */
+	subscription *current);
+
+
+/*!
+ * \brief Free's the memory allocated for storing the URL of the subscription.
+ */
+void freeSubscription(
+	/*! [in] Subscription object to be freed. */
+	subscription *sub);
+
+
+/*!
+ * \brief Free's memory allocated for all the subscriptions in the service table.
+ */
+void freeSubscriptionList(
+	/*! [in] Head of the subscription list. */
+	subscription * head);
+
+
+/*!
+ * \brief Traverses through the service table and returns a pointer to the
+ * service node that matches a known service id and a known UDN.
  *
- * Return: subscription *: pointer to the first subscription node
- ************************************************************************/
-subscription *GetFirstSubscription(service_info *service);
+ * \return Pointer to the matching service_info node.
+ */
+service_info *FindServiceId(
+	/*! [in] Service table. */
+	service_table *table, 
+	/*! [in] String representing the service id to be found among those
+	 * in the table. */
+	const char *serviceId,
+	/*! [in] String representing the UDN to be found among those in the
+	 * table. */
+	const char *UDN);
 
-/************************************************************************
- * Function: GetNextSubscription
+
+/*!
+ * \brief Traverses the service table and finds the node whose event URL Path
+ * matches a know value.
  *
- * Parameters:
- *	service_info *service:		service object providing the list of
- *					subscriptions
- *	subscription *current:		current subscription object
+ * \return Pointer to the service list node from the service table whose event
+ * URL matches a known event URL.
+ */
+service_info *FindServiceEventURLPath(
+	/*! [in] Service table. */
+	service_table *table,
+	/*! [in] Event URL path used to find a service from the table. */
+	char *eventURLPath);
+
+
+/*!
+ * \brief Traverses the service table and finds the node whose control URL Path
+ * matches a know value.
  *
- * Description: Get current and valid subscription from the service 
- *	table.
- *
- * Return: subscription *: pointer to the next subscription node
- ************************************************************************/	
-subscription *GetNextSubscription(service_info *service, subscription *current);
+ * \return Pointer to the service list node from the service table whose control
+ * URL Path matches a known value.
+ */
+service_info * FindServiceControlURLPath(
+	/*! [in] Service table. */
+	service_table *table,
+	/*! [in] Control URL path used to find a service from the table. */
+	const char *controlURLPath);
 
-/************************************************************************
-*	Function :	freeSubscription
-*
-*	Parameters :
-*		subscription * sub ;	subscription to be freed
-*
-*	Description :	Free's the memory allocated for storing the URL of 
-*		the subscription.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void freeSubscription(subscription *sub);
 
-/************************************************************************
-*	Function :	freeSubscriptionList
-*
-*	Parameters :
-*		subscription * head ;	head of the subscription list
-*
-*	Description :	Free's memory allocated for all the subscriptions 
-*		in the service table. 
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void freeSubscriptionList(subscription * head);
-
-/************************************************************************
-*	Function :	FindServiceId
-*
-*	Parameters :
-*		service_table *table ;	service table
-*		const char * serviceId ;string representing the service id 
-*								to be found among those in the table	
-*		const char * UDN ;		string representing the UDN 
-*								to be found among those in the table	
-*
-*	Description :	Traverses through the service table and returns a 
-*		pointer to the service node that matches a known service  id 
-*		and a known UDN
-*
-*	Return : service_info * - pointer to the matching service_info node;
-*
-*	Note :
-************************************************************************/
-service_info *FindServiceId( service_table * table, 
-			     const char * serviceId, const char * UDN);
-
-/************************************************************************
-*	Function :	FindServiceEventURLPath
-*
-*	Parameters :
-*		service_table *table ;	service table
-*		char * eventURLPath ;	event URL path used to find a service 
-*								from the table  
-*
-*	Description :	Traverses the service table and finds the node whose
-*		event URL Path matches a know value 
-*
-*	Return : service_info * - pointer to the service list node from the 
-*		service table whose event URL matches a known event URL;
-*
-*	Note :
-************************************************************************/
-service_info * FindServiceEventURLPath( service_table *table,
-					  char * eventURLPath
-					 );
-
-/************************************************************************
-*	Function :	FindServiceControlURLPath
-*
-*	Parameters :
-*		service_table * table ;	service table
-*		char * controlURLPath ;	control URL path used to find a service 
-*								from the table  
-*
-*	Description :	Traverses the service table and finds the node whose
-*		control URL Path matches a know value 
-*
-*	Return : service_info * - pointer to the service list node from the 
-*		service table whose control URL Path matches a known value;
-*
-*	Note :
-************************************************************************/
-service_info * FindServiceControlURLPath( service_table *table,
-					  const char * controlURLPath);
-
-/************************************************************************
-*	Function :	printService
-*
-*	Parameters :
-*		service_info *service ;Service whose information is to be printed
-*		Upnp_LogLevel level ; Debug level specified to the print function
-*		Dbg_Module module ;	Debug module specified to the print function
-*
-*	Description :	For debugging purposes prints information from the 
-*		service passed into the function.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
+/*!
+ * \brief For debugging purposes prints information from the service passed
+ * into the function.
+ */
 #ifdef DEBUG
 void printService(
+	/*! [in] Service whose information is to be printed. */
 	service_info *service,
+	/*! [in] Debug level specified to the print function. */
 	Upnp_LogLevel level,
+	/*! [in] Debug module specified to the print function. */
 	Dbg_Module module);
 #else
 static UPNP_INLINE void printService(
@@ -278,25 +234,18 @@ static UPNP_INLINE void printService(
 	Dbg_Module module) {}
 #endif
 
-/************************************************************************
-*	Function :	printServiceList
-*
-*	Parameters :
-*		service_info *service ;	Service whose information is to be printed
-*		Upnp_LogLevel level ;	Debug level specified to the print function
-*		Dbg_Module module ;	Debug module specified to the print function
-*
-*	Description :	For debugging purposes prints information of each 
-*		service from the service table passed into the function.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
+
+/*!
+ * \brief For debugging purposes prints information of each service from the
+ * service table passed into the function.
+ */
 #ifdef DEBUG
 void printServiceList(
+	/*! [in] Service whose information is to be printed. */
 	service_info *service,
+	/*! [in] Debug level specified to the print function. */
 	Upnp_LogLevel level,
+	/*! [in] Debug module specified to the print function. */
 	Dbg_Module module);
 #else
 static UPNP_INLINE void printServiceList(
@@ -305,26 +254,18 @@ static UPNP_INLINE void printServiceList(
 	Dbg_Module module) {}
 #endif
 
-/************************************************************************
-*	Function :	printServiceTable
-*
-*	Parameters :
-*		service_table * table ;	Service table to be printed
-*		Upnp_LogLevel level ;	Debug level specified to the print function
-*		Dbg_Module module ;	Debug module specified to the print function
-*
-*	Description :	For debugging purposes prints the URL base of the table
-*		and information of each service from the service table passed into 
-*		the function.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
+
+/*!
+ * \brief For debugging purposes prints the URL base of the table and information
+ * of each service from the service table passed into the function.
+ */
 #ifdef DEBUG
 void printServiceTable(
+	/*! [in] Service table to be printed. */
 	service_table *table,
+	/*! [in] Debug level specified to the print function. */
 	Upnp_LogLevel level,
+	/*! [in] Debug module specified to the print function. */
 	Dbg_Module module);
 #else
 static UPNP_INLINE void printServiceTable(
@@ -333,150 +274,106 @@ static UPNP_INLINE void printServiceTable(
 	Dbg_Module module) {}
 #endif
 
-/************************************************************************
-*	Function :	freeService
-*
-*	Parameters :
-*		service_info *in ;	service information that is to be freed
-*
-*	Description :	Free's memory allocated for the various components 
-*		of the service entry in the service table.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void freeService(service_info * in);
 
-/************************************************************************
-*	Function :	freeServiceList
-*
-*	Parameters :
-*		service_info * head ;	Head of the service list to be freed
-*
-*	Description :	Free's memory allocated for the various components 
-*		of each service entry in the service table.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void freeServiceList(service_info * head);
+/*!
+ * \brief Free's memory allocated for the various components of the service
+ * entry in the service table.
+ */
+void freeService(
+	/*! [in] Service information that is to be freed. */
+	service_info *in);
 
 
-/************************************************************************
-*	Function :	freeServiceTable
-*
-*	Parameters :
-*		service_table * table ;	Service table whose memory needs to be 
-*								freed
-*
-*	Description : Free's dynamic memory in table.
-*		(does not free table, only memory within the structure)
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void freeServiceTable(service_table * table);
-
-/************************************************************************
-*	Function :	removeServiceTable
-*
-*	Parameters :
-*		IXML_Node *node ;	XML node information
-*		service_table *in ;	service table from which services will be 
-*							removed
-*
-*	Description :	This function assumes that services for a particular 
-*		root device are placed linearly in the service table, and in the 
-*		order in which they are found in the description document
-*		all services for this root device are removed from the list
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int removeServiceTable(IXML_Node *node,
-				service_table *in);
+/*!
+ * \brief Free's memory allocated for the various components of each service
+ * entry in the service table.
+ */
+void freeServiceList(
+	/*! [in] Head of the service list to be freed. */
+	service_info *head);
 
 
-/************************************************************************
-*	Function :	addServiceTable
-*
-*	Parameters :
-*		IXML_Node *node ;	XML node information 
-*		service_table *in ;	service table that will be initialized with 
-*							services
-*		const char *DefaultURLBase ; Default base URL on which the URL 
-*							will be returned to the service list.
-*
-*	Description :	Add Service to the table.
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int addServiceTable(IXML_Node *node, service_table *in, const char *DefaultURLBase);
-
-/************************************************************************
-*	Function :	getServiceTable
-*
-*	Parameters :
-*		IXML_Node *node ;	XML node information
-*		service_table *out ;	output parameter which will contain the 
-*							service list and URL 
-*		const char *DefaultURLBase ; Default base URL on which the URL 
-*							will be returned.
-*
-*	Description :	Retrieve service from the table
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int getServiceTable(IXML_Node *node, service_table * out, const char * DefaultURLBase);
+/*!
+ * \brief Free's dynamic memory in table (does not free table, only memory
+ * within the structure).
+ */
+void freeServiceTable(
+	/*! [in] Service table whose internal memory needs to be freed. */
+	service_table *table);
 
 
-/*						Misc helper functions						   */
+/*!
+ * \brief This function assumes that services for a particular root device are
+ * placed linearly in the service table, and in the order in which they are
+ * found in the description document all services for this root device are
+ * removed from the list.
+ *
+ * \return An integer.
+ */
+int removeServiceTable(
+	/*! [in] XML node information. */
+	IXML_Node *node,
+	/*! [in] Service table from which services will be removed. */
+	service_table *in);
 
 
-/************************************************************************
-*	Function :	getElementValue
-*
-*	Parameters :
-*		IXML_Node *node ;	Input node which provides the list of child 
-*							nodes
-*
-*	Description :	Returns the clone of the element value
-*
-*	Return : DOMString ;
-*
-*	Note : value must be freed with DOMString_free
-************************************************************************/
-DOMString getElementValue(IXML_Node *node);
+/*!
+ * \brief Add Service to the table.
+ */
+int addServiceTable(
+	/*! [in] XML node information. */
+	IXML_Node *node,
+	/*! [in] Service table that will be initialized with services. */
+	service_table *in,
+	/*! [in] Default base URL on which the URL will be returned to the
+	 * service list. */
+	const char *DefaultURLBase);
 
-/************************************************************************
-*	Function :	getSubElement
-*
-*	Parameters :
-*		const char *element_name ;	sub element name to be searched for
-*		IXML_Node *node ;	Input node which provides the list of child 
-*							nodes
-*		IXML_Node **out ;	Ouput node to which the matched child node is
-*							returned.
-*
-*	Description :	Traverses through a list of XML nodes to find the 
-*		node with the known element name.
-*
-*	Return : int ;
-*		1 - On Success
-*		0 - On Failure
-*
-*	Note :
-************************************************************************/
-int getSubElement(const char *element_name, IXML_Node *node, 
-		  IXML_Node **out);
+
+/*!
+ * \brief Retrieve service from the table.
+ *
+ * \return An integer
+ */
+int getServiceTable(
+	/*! [in] XML node information. */
+	IXML_Node *node,
+	/*! [in] Output parameter which will contain the service list and URL. */
+	service_table *out,
+	/*! [in] Default base URL on which the URL will be returned. */
+	const char *DefaultURLBase);
+
+
+/*	Misc helper functions	*/
+
+
+/*!
+ * \brief Returns the clone of the element value.
+ *
+ * \note Value must be freed with DOMString_free.
+ *
+ * \return DOMString
+ */
+DOMString getElementValue(
+	/*! [in] Input node which provides the list of child nodes. */
+	IXML_Node *node);
+
+
+/*!
+ * \brief Traverses through a list of XML nodes to find the node with the
+ * known element name.
+ *
+ * \return
+ * 	\li 1 - On Success
+ * 	\li 0 - On Failure
+ */
+int getSubElement(
+	/*! [in] Sub element name to be searched for. */
+	const char *element_name,
+	/*! [in] Input node which provides the list of child nodes. */
+	IXML_Node *node, 
+	/*! [out] Ouput node to which the matched child node is returned. */
+	IXML_Node **out);
 
 
 #endif /* INCLUDE_DEVICE_APIS */
@@ -485,5 +382,5 @@ int getSubElement(const char *element_name, IXML_Node *node,
 }
 #endif
 
-#endif /* _SERVICE_TABLE */
+#endif /* SERVICE_TABLE */
 

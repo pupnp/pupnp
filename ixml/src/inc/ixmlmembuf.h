@@ -42,7 +42,7 @@
 #include "ixml.h"
 
 
-#include <stdlib.h>
+#include <stdlib.h> /* for size_t */
 
 
 #define MINVAL(a, b) ( (a) < (b) ? (a) : (b) )

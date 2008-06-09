@@ -34,6 +34,7 @@
 
 
 #include <stdarg.h>
+#include <stdio.h>
 
 
 #if !UPNP_HAVE_TOOLS

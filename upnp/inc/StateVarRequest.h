@@ -73,7 +73,7 @@ EXPORT_SPEC struct sockaddr *UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStat
 EXPORT_SPEC void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, struct sockaddr *sa);
 
 /** The current value of the variable. This needs to be allocated by 
- *  the caller.  When finished with it, the SDK frees this {\bf DOMString}. */
+ *  the caller.  When finished with it, the SDK frees this \b DOMString. */
 EXPORT_SPEC const DOMString UpnpStateVarRequest_get_CurrentVal(const UpnpStateVarRequest *p);
 EXPORT_SPEC void UpnpStateVarRequest_set_CurrentVal(UpnpStateVarRequest *p, const DOMString s);
 

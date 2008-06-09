@@ -39,6 +39,7 @@
 
 
 #include <assert.h>
+#include <stdlib.h> /* for free() */
 #include <string.h>
 
 

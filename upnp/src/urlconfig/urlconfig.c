@@ -33,16 +33,18 @@
 #include "config.h"
 
 
+#include "membuffer.h"
+#include "unixutil.h"
 #include "upnp.h"
+#include "upnpdebug.h"
+#include "uri.h"
+#include "urlconfig.h"
 #include "util.h"
 #include "webserver.h"
-#include "uri.h"
-#include "membuffer.h"
-#include "urlconfig.h"
-#include "unixutil.h"
 
 
 #include <assert.h>
+#include <stdio.h>
 
 
 #ifdef WIN32

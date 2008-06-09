@@ -50,7 +50,7 @@ EXPORT_SPEC void UpnpEventSubscribe_set_TimeOut(UpnpEventSubscribe *p, int n);
 
 /** The SID for this subscription.  For subscriptions, this only
  *  contains a valid SID if the \b Upnp_EventSubscribe.result field
- *  contains a {\tt UPNP_E_SUCCESS} result code.  For unsubscriptions,
+ *  contains a \b UPNP_E_SUCCESS result code.  For unsubscriptions,
  *  this contains the SID from which the subscription is being
  *  unsubscribed.  */
 EXPORT_SPEC const UpnpString *UpnpEventSubscribe_get_SID(const UpnpEventSubscribe *p);

@@ -418,9 +418,6 @@
 #endif
 
 
-#include "upnpdebug.h"
-
-
 /* 
  * Opaque data structures. The following includes are data structures that
  * must be externally visible. Since version 1.8.0, only an opaque typedef

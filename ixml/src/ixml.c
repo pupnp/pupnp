@@ -40,6 +40,7 @@
 #include "ixmlparser.h"
 
 
+#include <stdlib.h> /* for free() */
 #include <string.h>
 
 

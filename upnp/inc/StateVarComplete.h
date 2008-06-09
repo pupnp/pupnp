@@ -56,7 +56,7 @@ EXPORT_SPEC void UpnpStateVarComplete_set_StateVarName(UpnpStateVarComplete *p, 
 EXPORT_SPEC void UpnpStateVarComplete_strcpy_StateVarName(UpnpStateVarComplete *p, const char *s);
 
 /** The current value of the variable. This needs to be allocated by 
- *  the caller.  When finished with it, the SDK frees this {\bf DOMString}. */
+ *  the caller.  When finished with it, the SDK frees this \b DOMString. */
 EXPORT_SPEC const DOMString UpnpStateVarComplete_get_CurrentVal(const UpnpStateVarComplete *p);
 EXPORT_SPEC void UpnpStateVarComplete_set_CurrentVal(UpnpStateVarComplete *p, const DOMString s);
 

@@ -54,7 +54,7 @@ EXPORT_SPEC void UpnpFileInfo_set_FileLength(UpnpFileInfo *p, off_t l);
 EXPORT_SPEC const time_t *UpnpFileInfo_get_LastModified(const UpnpFileInfo *p);
 EXPORT_SPEC void UpnpFileInfo_set_LastModified(UpnpFileInfo *p, const time_t *t);
 
-/** If the file is a directory, {\bf is_directory} contains
+/** If the file is a directory, \b is_directory contains
  * a non-zero value. For a regular file, it should be 0. */
 EXPORT_SPEC int UpnpFileInfo_get_IsDirectory(const UpnpFileInfo *p);
 EXPORT_SPEC void UpnpFileInfo_set_IsDirectory(UpnpFileInfo *p, int b);
