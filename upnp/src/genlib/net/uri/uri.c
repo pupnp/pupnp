@@ -30,9 +30,11 @@
  ******************************************************************************/
 
 
-/*******************************************************************************
- * Purpose: This file contains functions for uri, url parsing utility. 
- ******************************************************************************/
+/*!
+ * \file
+ *
+ * \brief Contains functions for uri, url parsing utility.
+ */
 
 
 #ifdef __FreeBSD__
@@ -44,237 +46,169 @@
 
 
 #include "config.h"
+
+
 #include "uri.h"
+
+
 #include "upnpapi.h"
 
 
-/************************************************************************
-*	Function :	is_reserved
-*
-*	Parameters :
-*		char in ;	char to be matched for RESERVED characters 
-*
-*	Description : Returns a 1 if a char is a RESERVED char as defined in 
-*		http://www.ietf.org/rfc/rfc2396.txt RFC explaining URIs)
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int
-is_reserved( char in )
+/*!
+ * \brief Returns a 1 if a char is a RESERVED char as defined in 
+ * http://www.ietf.org/rfc/rfc2396.txt RFC explaining URIs).
+ *
+ * \return 1 if char is a RESERVED char.
+ */
+static int is_reserved(
+	/*! [in] Char to be matched for RESERVED characters. */
+	char in)
 {
-    if( strchr( RESERVED, in ) )
-        return 1;
-    else
-        return 0;
-}
-
-/************************************************************************
-*	Function :	is_mark
-*
-*	Parameters :
-*		char in ; character to be matched for MARKED characters
-*
-*	Description : Returns a 1 if a char is a MARK char as defined in 
-*		http://www.ietf.org/rfc/rfc2396.txt (RFC explaining URIs)
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int
-is_mark( char in )
-{
-    if( strchr( MARK, in ) )
-        return 1;
-    else
-        return 0;
-}
-
-/************************************************************************
-*	Function :	is_unreserved
-*
-*	Parameters :
-*		char in ;	character to be matched for UNRESERVED characters
-*
-*	Description : Returns a 1 if a char is an unreserved char as defined in 
-*		http://www.ietf.org/rfc/rfc2396.txt (RFC explaining URIs)	
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int
-is_unreserved( char in )
-{
-    if( isalnum( in ) || ( is_mark( in ) ) )
-        return 1;
-    else
-        return 0;
-}
-
-/************************************************************************
-*	Function :	is_escaped
-*
-*	Parameters :
-*		char * in ;	character to be matched for ESCAPED characters
-*
-*	Description : Returns a 1 if a char[3] sequence is escaped as defined 
-*		in http://www.ietf.org/rfc/rfc2396.txt (RFC explaining URIs)
-*               size of array is NOT checked (MUST be checked by caller)	
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int
-is_escaped( const char *in )
-{
-
-    if( ( in[0] == '%' ) && ( isxdigit( in[1] ) ) && isxdigit( in[2] ) ) {
-
-        return 1;
-    } else
-        return 0;
-}
-
-/************************************************************************
-*	Function :	replace_escaped
-*
-*	Parameters :
-*		char * in ;	string of characters
-*		int index ;	index at which to start checking the characters
-*		int *max ;	
-*
-*	Description : Replaces an escaped sequence with its unescaped version 
-*		as in http://www.ietf.org/rfc/rfc2396.txt  (RFC explaining URIs)
-*       Size of array is NOT checked (MUST be checked by caller)
-*
-*	Return : int ;
-*
-*	Note : This function modifies the string. If the sequence is an 
-*		escaped sequence it is replaced, the other characters in the 
-*		string are shifted over, and NULL characters are placed at the 
-*		end of the string.
-************************************************************************/
-int
-replace_escaped( char *in,
-                 int index,
-                 size_t *max )
-{
-    int tempInt = 0;
-    char tempChar = 0;
-    int i = 0;
-    int j = 0;
-
-    if( ( in[index] == '%' ) && ( isxdigit( in[index + 1] ) )
-        && isxdigit( in[index + 2] ) ) {
-        //Note the "%2x", makes sure that we convert a maximum of two
-        //characters.
-        if( sscanf( &in[index + 1], "%2x", &tempInt ) != 1 )
-            return 0;
-
-        tempChar = ( char )tempInt;
-
-        for( i = index + 3, j = index; j < ( *max ); i++, j++ ) {
-            in[j] = tempChar;
-            if( i < ( *max ) )
-                tempChar = in[i];
-            else
-                tempChar = 0;
-        }
-        ( *max ) -= 2;
-        return 1;
-    } else
-        return 0;
-}
-
-/************************************************************************
-*	Function :	parse_uric
-*
-*	Parameters :
-*		char *in ;	string of characters
-*		int max ;	maximum limit
-*		token *out ; token object where the string of characters is 
-*					 copied
-*
-*	Description : Parses a string of uric characters starting at in[0]
-*		as defined in http://www.ietf.org/rfc/rfc2396.txt (RFC explaining 
-*		URIs)	
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int
-parse_uric( const char *in,
-            int max,
-            token * out )
-{
-    int i = 0;
-
-    while( ( i < max )
-           && ( ( is_unreserved( in[i] ) ) || ( is_reserved( in[i] ) )
-                || ( ( i + 2 < max ) && ( is_escaped( &in[i] ) ) ) ) ) {
-        i++;
-    }
-
-    out->size = i;
-    out->buff = in;
-    return i;
+	if (strchr(RESERVED, in)) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 
-/************************************************************************
-*	Function :	copy_token
-*
-*	Parameters :
-*		const token *in ;		source token	
-*		const char * in_base ;	
-*		token * out ;			destination token
-*		char * out_base ;	
-*
-*	Description : Tokens are generally pointers into other strings
-*		this copies the offset and size from a token (in) relative to 
-*		one string (in_base) into a token (out) relative to another 
-*		string (out_base)
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-static void
-copy_token( const token * in,
-            const char *in_base,
-            token * out,
-            char *out_base )
+/*!
+ * \brief Returns a 1 if a char is a MARK char as defined in
+ * http://www.ietf.org/rfc/rfc2396.txt (RFC explaining URIs).
+ *
+ * \return 1 if char is a MARKED char.
+ */
+int is_mark(
+	/*! [in] Char to be matched for MARKED characters. */
+	char in)
 {
-    out->size = in->size;
-    out->buff = out_base + ( in->buff - in_base );
+	if (strchr(MARK, in)) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
-/************************************************************************
-*	Function :	copy_URL_list
-*
-*	Parameters :
-*		URL_list *in ;	Source URL list
-*		URL_list *out ;	Destination URL list
-*
-*	Description : Copies one URL_list into another. This includes 
-*		dynamically allocating the out->URLs field (the full string),
-*       and the structures used to hold the parsedURLs. This memory MUST 
-*		be freed by the caller through: free_URL_list(&out)
-*
-*	Return : int ;
-*		HTTP_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - On Failure to allocate memory
-*
-*	Note :
-************************************************************************/
-int
-copy_URL_list( URL_list * in,
-               URL_list * out )
+
+/*!
+ * \brief Returns a 1 if a char is an UNRESERVED char as defined in
+ * http://www.ietf.org/rfc/rfc2396.txt (RFC explaining URIs).
+ *
+ * \return 1 if char is a UNRESERVED char.
+ */
+int is_unreserved(
+	/*! [in] Char to be matched for UNRESERVED characters. */
+	char in)
+{
+	if (isalnum(in) || is_mark(in)) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+
+/*!
+ * \brief Returns a 1 if a char[3] sequence is ESCAPED as defined in
+ * http://www.ietf.org/rfc/rfc2396.txt (RFC explaining URIs).
+ *
+ * Size of array is NOT checked (MUST be checked by caller).
+ *
+ * \return 1 if char is a ESCAPED char.
+ */
+int is_escaped(
+	/*! [in] Char sequence to be matched for ESCAPED characters. */
+	const char *in)
+{
+	if (in[0] == '%' && isxdigit(in[1]) && isxdigit(in[2])) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+
+int replace_escaped(char *in, int index, size_t *max)
+{
+	int tempInt = 0;
+	char tempChar = 0;
+	int i = 0;
+	int j = 0;
+
+	if (in[index] == '%' && isxdigit(in[index + 1]) && isxdigit(in[index + 2])) {
+		/* Note the "%2x", makes sure that we convert a maximum of two
+		 * characters. */
+		if (sscanf(&in[index + 1], "%2x", &tempInt) != 1) {
+			return 0;
+		}
+
+		tempChar = ( char )tempInt;
+		for (i = index + 3, j = index; j < *max; i++, j++) {
+			in[j] = tempChar;
+			if (i < *max) {
+				tempChar = in[i];
+			} else {
+				tempChar = 0;
+			}
+		}
+		*max -= 2;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+
+/*!
+ * \brief Parses a string of uric characters starting at in[0] as defined in
+ * http://www.ietf.org/rfc/rfc2396.txt (RFC explaining URIs).
+ *
+ * \return 
+ */
+static int parse_uric(
+	/*! [in] String of characters. */
+	const char *in,
+	/*! [in] Maximum limit. */
+	int max,
+	/*! [out] Token object where the string of characters is copied. */
+	token *out)
+{
+	int i = 0;
+
+	while (i < max &&
+	       (is_unreserved(in[i]) ||
+	        is_reserved(in[i])   ||
+	        ((i + 2 < max) && is_escaped(&in[i])))) {
+		i++;
+	}
+
+	out->size = i;
+	out->buff = in;
+	return i;
+}
+
+
+/*!
+ * \brief Tokens are generally pointers into other strings. This copies the
+ * offset and size from a token (in) relative to one string (in_base) into
+ * a token (out) relative to another string (out_base).
+ */
+static void copy_token(
+	/*! [in] Source token. */
+	const token *in,
+	/*! [in] . */
+	const char *in_base,
+	/*! [out] Destination token. */
+	token *out,
+	/*! [in] . */
+	char *out_base)
+{
+	out->size = in->size;
+	out->buff = out_base + (in->buff - in_base);
+}
+
+
+int copy_URL_list(URL_list *in, URL_list *out)
 {
     int len = strlen( in->URLs ) + 1;
     int i = 0;
@@ -312,68 +246,34 @@ copy_URL_list( URL_list * in,
             sizeof(struct sockaddr_storage) );
     }
     out->size = in->size;
+
     return HTTP_SUCCESS;
-
 }
 
-/************************************************************************
-*	Function :	free_URL_list
-*
-*	Parameters :
-*		URL_list * list ;	URL List object
-*
-*	Description : Frees the memory associated with a URL_list. Frees the 
-*		dynamically allocated members of of list. Does NOT free the 
-*		pointer to the list itself ( i.e. does NOT free(list))
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void
-free_URL_list( URL_list * list )
+
+void free_URL_list(URL_list *list)
 {
-    if( list->URLs )
-        free( list->URLs );
-    if( list->parsedURLs )
-        free( list->parsedURLs );
-    list->size = 0;
+	if (list->URLs) {
+		free(list->URLs);
+	}
+	if (list->parsedURLs) {
+		free(list->parsedURLs);
+	}
+	list->size = 0;
 }
 
-/************************************************************************
-*	Function :	print_uri
-*
-*	Parameters :
-*		uri_type *in ;	URI object
-*
-*	Description : Function useful in debugging for printing a parsed uri.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
+
 #ifdef DEBUG
-void print_uri( uri_type *in )
+void print_uri(uri_type *in)
 {
-    print_token( &in->scheme );
-    print_token( &in->hostport.text );
-    print_token( &in->pathquery );
-    print_token( &in->fragment );
+	print_token(&in->scheme);
+	print_token(&in->hostport.text);
+	print_token(&in->pathquery);
+	print_token(&in->fragment);
 }
-#endif
+#endif /* DEBUG */
 
-/************************************************************************
-*	Function :	print_token
-*
-*	Parameters :
-*		token * in ;	token
-*
-*	Description : Function useful in debugging for printing a token.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
+
 #ifdef DEBUG
 void print_token(token * in)
 {
@@ -385,115 +285,47 @@ void print_token(token * in)
     putchar( '\'' );
     putchar( '\n' );
 }
-#endif
+#endif /* DEBUG */
 
-/************************************************************************
-*	Function :	token_string_casecmp
-*
-*	Parameters :
-*		token * in1 ;	Token object whose buffer is to be compared
-*		char * in2 ;	string of characters to compare with
-*
-*	Description :	Compares buffer in the token object with the buffer 
-*		in in2
-*
-*	Return : int ;
-*		< 0 string1 less than string2 
-*		0 string1 identical to string2 
-*		> 0 string1 greater than string2 
-*
-*	Note :
-************************************************************************/
-int token_string_casecmp(
-    token * in1,
-    char *in2 )
+
+int token_string_casecmp(token *in1, char *in2)
 {
-    int in2_length = strlen( in2 );
+	int in2_length = strlen(in2);
 
-    if( in1->size != in2_length )
-        return 1;
-    else
-        return strncasecmp( in1->buff, in2, in1->size );
-}
-
-/************************************************************************
-*	Function :	token_string_cmp
-*
-*	Parameters :
-*		token * in1 ;	Token object whose buffer is to be compared
-*		char * in2 ;	string of characters to compare with
-*
-*	Description : Compares a null terminated string to a token (exact)	
-*
-*	Return : int ;
-*		< 0 string1 less than string2 
-*		0 string1 identical to string2 
-*		> 0 string1 greater than string2 
-*
-*	Note :
-************************************************************************/
-int
-token_string_cmp( token * in1,
-                  char *in2 )
-{
-    int in2_length = strlen( in2 );
-
-    if( in1->size != in2_length )
-        return 1;
-    else
-        return strncmp( in1->buff, in2, in1->size );
-}
-
-/************************************************************************
-*	Function :	token_cmp
-*
-*	Parameters :
-*		token *in1 ;	First token object whose buffer is to be compared
-*		token *in2 ;	Second token object used for the comparison
-*
-*	Description : Compares two tokens	
-*
-*	Return : int ;
-*		< 0 string1 less than string2 
-*		0 string1 identical to string2 
-*		> 0 string1 greater than string2 
-*
-*	Note :
-************************************************************************/
-int
-token_cmp( token * in1,
-           token * in2 )
-{
-    if( in1->size != in2->size )
-        return 1;
-    else
-        return memcmp( in1->buff, in2->buff, in1->size );
+	if (in1->size != in2_length) {
+		return 1;
+	} else {
+		return strncasecmp(in1->buff, in2, in1->size);
+	}
 }
 
 
-/************************************************************************
-*	Function :	parse_hostport
-*
-*	Parameters :
-*		char *in ;	string of characters representing host and port
-*		int max ;	sets a maximum limit (not used).
-*		hostport_type *out ;	out parameter where the host and port
-*					are represented as an internet address
-*
-*	Description : Parses a string representing a host and port
-*		(e.g. "127.127.0.1:80" or "localhost") and fills out a 
-*		hostport_type struct with internet address and a token 
-*		representing the full host and port.  uses gethostbyname.
-*
-*	Returns: The number of characters that form up the host and port.
-*            UPNP_E_INVALID_URL on error.
-*
-*	Note :
-************************************************************************/
-int
-parse_hostport( const char *in,
-                int max,
-                hostport_type * out )
+int token_string_cmp(token * in1, char *in2)
+{
+	int in2_length = strlen(in2);
+
+	if (in1->size != in2_length) {
+		return 1;
+	} else {
+		return strncmp(in1->buff, in2, in1->size);
+	}
+}
+
+
+int token_cmp(token *in1, token *in2)
+{
+	if (in1->size != in2->size) {
+		return 1;
+	} else {
+		return memcmp(in1->buff, in2->buff, in1->size);
+	}
+}
+
+
+int parse_hostport(
+	const char *in,
+	int max,
+	hostport_type *out)
 {
     char workbuf[256];
     char* c;
@@ -636,28 +468,23 @@ parse_hostport( const char *in,
     return hostport_size;
 }
 
-/************************************************************************
-*	Function :	parse_scheme
-*
-*	Parameters :
-*		char * in ;	string of characters representing a scheme
-*		int max ;	maximum number of characters
-*		token * out ;	output parameter whose buffer is filled in with 
-*					the scheme
-*
-*	Description : parses a uri scheme starting at in[0] as defined in 
-*		http://www.ietf.org/rfc/rfc2396.txt (RFC explaining URIs)
-*		(e.g. "http:" -> scheme= "http"). 
-*		Note, string MUST include ':' within the max charcters
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int
-parse_scheme( const char *in,
-              int max,
-              token * out )
+/*!
+ * \brief parses a uri scheme starting at in[0] as defined in 
+ * http://www.ietf.org/rfc/rfc2396.txt (RFC explaining URIs).
+ *
+ * (e.g. "http:" -> scheme= "http").
+ *
+ * \note String MUST include ':' within the max charcters.
+ *
+ * \return 
+ */
+static int parse_scheme(
+	/*! [in] String of characters representing a scheme. */
+	const char *in,
+	/*! [in] Maximum number of characters. */
+	int max,
+	/*! [out] Output parameter whose buffer is filled in with the scheme. */
+	token *out)
 {
     int i = 0;
 
@@ -686,26 +513,8 @@ parse_scheme( const char *in,
 
 }
 
-/************************************************************************
-*	Function :	remove_escaped_chars
-*
-*	Parameters :
-*		INOUT char *in ;	string of characters to be modified
-*		INOUT int *size ;	size limit for the number of characters
-*
-*	Description : removes http escaped characters such as: "%20" and 
-*		replaces them with their character representation. i.e. 
-*		"hello%20foo" -> "hello foo". The input IS MODIFIED in place. 
-*		(shortened). Extra characters are replaced with NULL.
-*
-*	Return : int ;
-*		UPNP_E_SUCCESS
-*
-*	Note :
-************************************************************************/
-int
-remove_escaped_chars( INOUT char *in,
-                      INOUT size_t *size )
+
+int remove_escaped_chars(INOUT char *in, INOUT size_t *size )
 {
     int i = 0;
 
@@ -715,37 +524,8 @@ remove_escaped_chars( INOUT char *in,
     return UPNP_E_SUCCESS;
 }
 
-/************************************************************************
-*	Function :	remove_dots
-*
-*	Parameters :
-*		char *in ;	string of characters from which "dots" have to be 
-*					removed
-*		int size ;	size limit for the number of characters
-*
-*	Description : Removes ".", and ".." from a path. If a ".." can not
-*		be resolved (i.e. the .. would go past the root of the path) an 
-*		error is returned. The input IS modified in place.)
-*
-*	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - On failure to allocate memory
-*		UPNP_E_INVALID_URL - Failure to resolve URL
-*
-*	Note :
-*		Examples
-*       char path[30]="/../hello";
-*       remove_dots(path, strlen(path)) -> UPNP_E_INVALID_URL
-*       char path[30]="/./hello";
-*       remove_dots(path, strlen(path)) -> UPNP_E_SUCCESS, 
-*       in = "/hello"
-*       char path[30]="/./hello/foo/../goodbye" -> 
-*       UPNP_E_SUCCESS, in = "/hello/goodbye"
 
-************************************************************************/
-int
-remove_dots( char *in,
-             int size )
+int remove_dots(char *in, size_t size)
 {
     char *copyTo = in;
     char *copyFrom = in;
@@ -810,30 +590,8 @@ remove_dots( char *in,
     return UPNP_E_SUCCESS;
 }
 
-/************************************************************************
-*	Function :	resolve_rel_url
-*
-*	Parameters :
-*		char * base_url ;	Base URL
-*		char * rel_url ;	Relative URL
-*
-*	Description : resolves a relative url with a base url returning a NEW 
-*		(dynamically allocated with malloc) full url. If the base_url is 
-*		NULL, then a copy of the  rel_url is passed back if the rel_url 
-*		is absolute then a copy of the rel_url is passed back if neither 
-*		the base nor the rel_url are Absolute then NULL is returned.
-*		otherwise it tries and resolves the relative url with the base 
-*		as described in: http://www.ietf.org/rfc/rfc2396.txt (RFCs 
-*		explaining URIs) 
-*       : resolution of '..' is NOT implemented, but '.' is resolved 
-*
-*	Return : char * ;
-*
-*	Note :
-************************************************************************/
-char *
-resolve_rel_url( char *base_url,
-                 char *rel_url )
+
+char *resolve_rel_url(char *base_url, char *rel_url)
 {
     uri_type base;
     uri_type rel;
@@ -920,8 +678,8 @@ resolve_rel_url( char *base_url,
                             if( remove_dots( out_finger,
                                              strlen( out_finger ) ) !=
                                 UPNP_E_SUCCESS ) {
-                                free( out );
-                                //free(rel_url);
+                                free(out);
+                                /* free(rel_url); */
                                 return NULL;
                             }
                         }
@@ -929,46 +687,23 @@ resolve_rel_url( char *base_url,
                     }
                 }
             } else {
-                free( out );
-                //free(rel_url);
+                free(out);
+                /* free(rel_url); */
                 return NULL;
             }
         }
     } else {
-        free( out );
-        //free(rel_url);            
+        free(out);
+        /* free(rel_url); */          
         return NULL;
     }
 
-    //free(rel_url);
+    /* free(rel_url); */
     return out;
 }
 
-/************************************************************************
-*	Function :	parse_uri
-*
-*	Parameters :
-*		char * in ;	character string containing uri information to be 
-*					parsed
-*		int max ;	maximum limit on the number of characters
-*		uri_type * out ; out parameter which will have the parsed uri
-*					information	
-*
-*	Description : parses a uri as defined in http://www.ietf.org/rfc/
-*		rfc2396.txt (RFC explaining URIs)
-*		Handles absolute, relative, and opaque uris. Parses into the 
-*		following pieces: scheme, hostport, pathquery, fragment (path and
-*		query are treated as one token)
-*       Caller should check for the pieces they require.
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int
-parse_uri( const char *in,
-           int max,
-           uri_type * out )
+
+int parse_uri(const char *in, int max, uri_type *out)
 {
     int begin_path = 0;
     int begin_hostport = 0;
@@ -1018,34 +753,22 @@ parse_uri( const char *in,
     return HTTP_SUCCESS;
 }
 
-/************************************************************************
-*	Function :	parse_uri_and_unescape
-*
-*	Parameters :
-*		char * in ;	
-*		int max ;	
-*		uri_type * out ;	
-*
-*	Description : Same as parse_uri, except that all strings are 
-*		unescaped (%XX replaced by chars)
-*
-*	Return : int ;
-*
-*	Note: This modifies 'pathquery' and 'fragment' parts of the input
-************************************************************************/
-int
-parse_uri_and_unescape( char *in,
-                        int max,
-                        uri_type *out )
-{
-    int ret;
 
-    if( ( ret = parse_uri( in, max, out ) ) != HTTP_SUCCESS )
-        return ret;
-    if( out->pathquery.size > 0 )
-        remove_escaped_chars( (char *)out->pathquery.buff, &out->pathquery.size );
-    if( out->fragment.size > 0 )
-        remove_escaped_chars( (char *)out->fragment.buff, &out->fragment.size );
-    return HTTP_SUCCESS;
+int parse_uri_and_unescape(char *in, int max, uri_type *out)
+{
+	int ret = parse_uri(in, max, out);
+
+	if (ret != HTTP_SUCCESS) {
+		return ret;
+	}
+
+	if (out->pathquery.size > 0) {
+		remove_escaped_chars((char *)out->pathquery.buff, &out->pathquery.size);
+	}
+	if (out->fragment.size > 0) {
+		remove_escaped_chars((char *)out->fragment.buff, &out->fragment.size);
+	}
+
+	return HTTP_SUCCESS;
 }
 

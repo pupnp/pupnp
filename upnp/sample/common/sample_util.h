@@ -39,15 +39,17 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "ithread.h"
-#include "ixml.h"
+#include "ixml.h" /* for IXML_Document, IXML_Element */
+#include "upnp.h" /* for Upnp_EventType */
 #include "upnptools.h"
 
 
-// mutex to control displaying of events
+#include <stdlib.h>
+#include <string.h>
+
+
+/* mutex to control displaying of events */
 extern ithread_mutex_t display_mutex;
 
 

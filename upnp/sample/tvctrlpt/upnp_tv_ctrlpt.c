@@ -33,7 +33,10 @@
 #include "upnp_tv_ctrlpt.h"
 
 
-/*
+#include "upnp.h"
+
+
+/*!
    Mutex for protecting the global device list
    in a multi-threaded, asynchronous environment.
    All functions should lock this mutex before reading
@@ -50,7 +53,7 @@ char *TvServiceType[] = {
 };
 char *TvServiceName[] = { "Control", "Picture" };
 
-/*
+/*!
    Global arrays for storing variable names and counts for 
    TvControl and TvPicture services 
  */
@@ -61,12 +64,12 @@ char *TvVarName[TV_SERVICE_SERVCOUNT][TV_MAXVARS] = {
 char TvVarCount[TV_SERVICE_SERVCOUNT] =
     { TV_CONTROL_VARCOUNT, TV_PICTURE_VARCOUNT };
 
-/*
+/*!
    Timeout to request during subscriptions 
  */
 int default_timeout = 1801;
 
-/*
+/*!
    The first node in the global device list, or NULL if empty 
  */
 struct TvDeviceNode *GlobalDeviceList = NULL;

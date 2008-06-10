@@ -41,12 +41,15 @@
 #if EXCLUDE_DOM == 0
 
 
+#include "upnp.h"
+#include "upnptools.h"
+
+
+#include "uri.h"
+
+
 #include <stdarg.h>
 #include <stdio.h>
-
-
-#include "upnptools.h"
-#include "uri.h"
 
 
 /*! Maximum action header buffer length. */

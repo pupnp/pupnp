@@ -49,7 +49,8 @@
  */
 
 
-#include "upnp.h"
+#include "ixml.h" /* for IXML_Document */
+
 
 /* Function declarations only if tools compiled into the library */
 #if UPNP_HAVE_TOOLS

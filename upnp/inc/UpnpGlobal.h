@@ -7,8 +7,7 @@
 /*!
  * \file
  *
- * \brief The purpose of this file is to define constants that for some reason
- * might not be defined on every system.
+ * \brief Defines constants that for some reason are not defined on some systems.
  */
 
 
