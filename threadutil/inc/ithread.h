@@ -34,6 +34,11 @@
 #define ITHREADH
 
 
+/*!
+ * \file
+ */
+
+
 #include "UpnpGlobal.h" /* For EXPORT_SPEC */
 
 

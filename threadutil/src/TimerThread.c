@@ -1,68 +1,69 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
+
+
+/*!
+ * \file
+ */
+
 
 #include "TimerThread.h"
+
+
 #include <assert.h>
 
-/****************************************************************************
- * Function: FreeTimerEvent
- *
- *  Description:
- *      Deallocates a dynamically allocated TimerEvent.
- *  Parameters:
- *      TimerEvent *event - must be allocated with CreateTimerEvent
- *****************************************************************************/
-static void
-FreeTimerEvent( TimerThread * timer,
-                TimerEvent * event )
+
+/*!
+ * \brief Deallocates a dynamically allocated TimerEvent.
+ */
+static void FreeTimerEvent(
+	/*! [in] Valid timer thread pointer. */
+	TimerThread *timer,
+	/*! [in] Must be allocated with CreateTimerEvent*/
+	TimerEvent *event)
 {
+	assert(timer != NULL);
 
-    assert( timer != NULL );
-
-    FreeListFree( &timer->freeEvents, event );
+	FreeListFree(&timer->freeEvents, event);
 }
 
-/****************************************************************************
- * Function: TimerThreadWorker
+
+/*!
+ * \brief Implements timer thread.
  *
- *  Description:
- *      Implements timer thread.
- *      Waits for next event to occur and schedules
- *      associated job into threadpool.
- *      Internal Only.
- *  Parameters:
- *      void * arg -> is cast to TimerThread *
- *****************************************************************************/
-static void *
-TimerThreadWorker( void *arg )
+ * Waits for next event to occur and schedules associated job into threadpool.
+ */
+static void *TimerThreadWorker(
+	/*! [in] arg is cast to (TimerThread *). */
+	void *arg)
 {
     TimerThread *timer = ( TimerThread * ) arg;
     ListNode *head = NULL;
@@ -81,19 +82,14 @@ TimerThreadWorker( void *arg )
 
     while( 1 )
     {
-
         //mutex should always be locked at top of loop
-
         //Check for shutdown
-
         if( timer->shutdown )
         {
-
             timer->shutdown = 0;
             ithread_cond_signal( &timer->condition );
             ithread_mutex_unlock( &timer->mutex );
             return NULL;
-
         }
 
         nextEvent = NULL;
@@ -102,7 +98,6 @@ TimerThreadWorker( void *arg )
         if( timer->eventQ.size > 0 )
         {
             head = ListHead( &timer->eventQ );
-
             nextEvent = ( TimerEvent * ) head->item;
             nextEventTime = nextEvent->eventTime;
         }
@@ -110,54 +105,42 @@ TimerThreadWorker( void *arg )
         currentTime = time( NULL );
 
         //If time has elapsed, schedule job
-
         if( ( nextEvent != NULL ) && ( currentTime >= nextEventTime ) )
         {
-
             if( nextEvent->persistent ) {
-
                 ThreadPoolAddPersistent( timer->tp, &nextEvent->job,
                                          &tempId );
             } else {
-
                 ThreadPoolAdd( timer->tp, &nextEvent->job, &tempId );
             }
-
             ListDelNode( &timer->eventQ, head, 0 );
             FreeTimerEvent( timer, nextEvent );
-
             continue;
-
         }
 
         if( nextEvent != NULL ) {
             timeToWait.tv_nsec = 0;
             timeToWait.tv_sec = nextEvent->eventTime;
-
             ithread_cond_timedwait( &timer->condition, &timer->mutex,
                                     &timeToWait );
-
         } else {
             ithread_cond_wait( &timer->condition, &timer->mutex );
         }
-
     }
 }
 
-/****************************************************************************
- * Function: CalculateEventTime
+
+/*!
+ * \brief Calculates the appropriate timeout in absolute seconds
+ * since Jan 1, 1970.
  *
- *  Description:
- *      Calculates the appropriate timeout in absolute seconds since
- *      Jan 1, 1970
- *      Internal Only.
- *  Parameters:
- *      time_t *timeout - timeout
- *      
- *****************************************************************************/
-static int
-CalculateEventTime( time_t * timeout,
-                    TimeoutType type )
+ * \return 
+ */
+static int CalculateEventTime(
+	/*! [in] Timeout. */
+	time_t *timeout,
+	/*! [in] Timeout type. */
+	TimeoutType type)
 {
     time_t now;
 
@@ -175,29 +158,22 @@ CalculateEventTime( time_t * timeout,
 
 }
 
-/****************************************************************************
- * Function: CreateTimerEvent
+/*!
+ * \brief Creates a Timer Event. (Dynamically allocated).
  *
- *  Description:
- *      Creates a Timer Event. (Dynamically allocated)
- *      Internal to timer thread.
- *  Parameters:
- *      func - thread function to run.
- *      arg - argument to function.
- *      priority - priority of job.
- *      eventTime - the absoule time of the event
- *                  in seconds from Jan, 1970
- *      id - id of job
- *      
- *  Returns:
- *      TimerEvent * on success, NULL on failure.
- ****************************************************************************/
-static TimerEvent *
-CreateTimerEvent( TimerThread * timer,
-                  ThreadPoolJob * job,
-                  Duration persistent,
-                  time_t eventTime,
-                  int id )
+ * \return (TimerEvent *) on success, NULL on failure.
+ */
+static TimerEvent *CreateTimerEvent(
+	/*! [in] Valid timer thread pointer. */
+	TimerThread *timer,
+	/*! [in] . */
+	ThreadPoolJob *job,
+	/*! [in] . */
+	Duration persistent,
+	/*! [in] The absoule time of the event in seconds from Jan, 1970. */
+	time_t eventTime,
+	/*! [in] Id of job. */
+	int id)
 {
     TimerEvent *temp = NULL;
 
@@ -215,25 +191,8 @@ CreateTimerEvent( TimerThread * timer,
     return temp;
 }
 
-/************************************************************************
- * Function: TimerThreadInit
- * 
- *  Description:
- *     Initializes and starts timer thread.
- *
- *  Parameters:
- *             timer - valid timer thread pointer.
- *             tp  - valid thread pool to use. Must be
- *                   started. Must be valid for lifetime
- *                   of timer.  Timer must be shutdown
- *                   BEFORE thread pool.
- *  Return:
- *            0 on success, nonzero on failure
- *            Returns error from ThreadPoolAddPersistent if failure.
- ************************************************************************/
-int
-TimerThreadInit( TimerThread * timer,
-                 ThreadPool * tp )
+
+int TimerThreadInit(TimerThread *timer, ThreadPool *tp)
 {
 
     int rc = 0;
@@ -290,37 +249,14 @@ TimerThreadInit( TimerThread * timer,
 
 }
 
-/************************************************************************
- * Function: TimerThreadSchedule
- * 
- *  Description:
- *     Schedules an event to run at a specified time.
- *
- *  Parameters:
- *             timer - valid timer thread pointer.
- *             time_t - time of event.
- *                      either in absolute seconds,
- *                      or relative seconds in the future.
- *             timeoutType - either ABS_SEC, or REL_SEC.
- *                           if REL_SEC, then the event
- *                           will be scheduled at the
- *                           current time + REL_SEC.
- *             
- *             func - function to schedule
- *             arg - argument to function
- *             priority - priority of job.
- *             id - id of timer event. (out)
- *  Return:
- *            0 on success, nonzero on failure
- *			  EOUTOFMEM if not enough memory to schedule job
- ************************************************************************/
-int
-TimerThreadSchedule( TimerThread * timer,
-                     time_t timeout,
-                     TimeoutType type,
-                     ThreadPoolJob * job,
-                     Duration duration,
-                     int *id )
+
+int TimerThreadSchedule(
+	TimerThread *timer,
+	time_t timeout,
+	TimeoutType type,
+	ThreadPoolJob *job,
+	Duration duration,
+	int *id)
 {
 
     int rc = EOUTOFMEM;
@@ -394,28 +330,11 @@ TimerThreadSchedule( TimerThread * timer,
     return rc;
 }
 
-/************************************************************************
- * Function: TimerThreadRemove
- * 
- *  Description:
- *     Removes an event from the timer Q.
- *     Events can only be removed 
- *     before they have been placed in the
- *     thread pool.
- *
- *  Parameters:
- *             timer - valid timer thread pointer.
- *             id - id of event to remove.
- *             out - space for returned job (Can be NULL)
- *  Return:
- *            0 on success.
- *            INVALID_EVENT_ID on error.
- *
- ************************************************************************/
-int
-TimerThreadRemove( TimerThread * timer,
-                   int id,
-                   ThreadPoolJob * out )
+
+int TimerThreadRemove(
+	TimerThread *timer,
+	int id,
+	ThreadPoolJob *out)
 {
     int rc = INVALID_EVENT_ID;
     ListNode *tempNode = NULL;
@@ -450,21 +369,8 @@ TimerThreadRemove( TimerThread * timer,
     return rc;
 }
 
-/************************************************************************
- * Function: TimerThreadShutdown
- * 
- *  Description:
- *    Shutdown the timer thread
- *    Events scheduled in the future will NOT be run.
- *    Timer thread should be shutdown BEFORE it's associated
- *    thread pool.
- *  Returns:
- *    returns 0 if succesfull,
- *            nonzero otherwise.
- *            Always returns 0.
- ***********************************************************************/
-int
-TimerThreadShutdown( TimerThread * timer )
+
+int TimerThreadShutdown(TimerThread *timer)
 {
     ListNode *tempNode2 = NULL;
     ListNode *tempNode = NULL;
@@ -517,3 +423,4 @@ TimerThreadShutdown( TimerThread * timer )
 
     return 0;
 }
+

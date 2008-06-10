@@ -81,7 +81,6 @@
 	 */
 	#define EXPORT_SPEC
 
-
 	/*!
 	 * \brief Declares an inline function.
 	 *
