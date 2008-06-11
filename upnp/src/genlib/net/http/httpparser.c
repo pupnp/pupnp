@@ -2510,13 +2510,8 @@ method_to_str( IN http_method_t method )
 }
 
 
-/*!
- * \brief Print the HTTP headers.
- */
 #ifdef DEBUG
-void print_http_headers(
-	/*! [in] HTTP Message object. */
-	http_message_t *hmsg)
+void print_http_headers(http_message_t *hmsg)
 {
     ListNode *node;
     /* NNS:  dlist_node *node; */
