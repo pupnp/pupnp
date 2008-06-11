@@ -3,6 +3,11 @@ Version 1.8.0
 *******************************************************************************
 
 2008-06-11 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fixed a buffer overflow due to a bug in the calculation of the
+	CONTENT-TYPE header line size, the length was beeing calculated with
+	the wrong string, there was a missing colon.
+
+2008-06-11 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Ingo Hofmann's patch for "Content-Type in Subscription responses".
 	Adds charset="utf-8" attribute to the CONTENT-TYPE header line.
 

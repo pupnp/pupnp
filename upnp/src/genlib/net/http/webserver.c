@@ -1269,15 +1269,13 @@ process_request( IN http_message_t * req,
         }
 
     } else {
-        //
-        // try using alias
-        //
+        /* try using alias */
         if (is_valid_alias(&gAliasDoc)) {
             alias_grab(alias);
             alias_grabbed = TRUE;
             using_alias = get_alias(request_doc, alias, finfo);
             if (using_alias == TRUE) {
-                UpnpFileInfo_set_ContentType(finfo, "text/xml");
+                UpnpFileInfo_set_ContentType(finfo, "text/xml; charset=\"utf-8\"");
                 if (UpnpFileInfo_get_ContentType(finfo) == NULL) {
                     goto error_handler;
                 }

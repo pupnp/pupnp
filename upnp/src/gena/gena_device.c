@@ -30,12 +30,12 @@
  ******************************************************************************/
 
 
-#include "config.h"
-
-
 /*!
  * \file
  */
+
+
+#include "config.h"
 
 
 #if EXCLUDE_GENA == 0
@@ -149,15 +149,15 @@ static void free_notify_struct(
 	/*! [in] Notify structure. */
 	notify_thread_struct *input)
 {
-    ( *input->reference_count )--;
-    if( ( *input->reference_count ) == 0 ) {
-        free( input->headers );
-        ixmlFreeDOMString( input->propertySet );
-        free( input->servId );
-        free( input->UDN );
-        free( input->reference_count );
-    }
-    free( input );
+	(*input->reference_count)--;
+	if (*input->reference_count == 0) {
+		free(input->headers);
+		ixmlFreeDOMString(input->propertySet);
+		free(input->servId);
+		free(input->UDN);
+		free(input->reference_count);
+	}
+	free(input);
 }
 
 
@@ -405,6 +405,60 @@ static void genaNotifyThread(
 }
 
 
+/*!
+ * \brief Allocates the GENA header.
+ *
+ * \note The header must be destroyed after with a call to free(), otherwise
+ * there will be a memory leak.
+ *
+ * \return The constructed header.
+ */
+static char *AllocGenaHeaders(
+	/*! [in] The property set string. */
+	const DOMString propertySet)
+{
+	static const char *HEADER_LINE_1 =
+		"CONTENT-TYPE: text/xml; charset=\"utf-8\"\r\n";
+	static const char *HEADER_LINE_2A =
+		"CONTENT-LENGTH: ";
+	static const char *HEADER_LINE_2B =
+		"\r\n";
+	static const char *HEADER_LINE_3 =
+		"NT: upnp:event\r\n";
+	static const char *HEADER_LINE_4 =
+		"NTS: upnp:propchange\r\n";
+	char *headers = NULL;
+	int headers_size = 0;
+	int line = 0;
+
+	headers_size =
+		strlen(HEADER_LINE_1 ) +
+		strlen(HEADER_LINE_2A) + MAX_CONTENT_LENGTH +
+		strlen(HEADER_LINE_2B) +
+		strlen(HEADER_LINE_3 ) +
+		strlen(HEADER_LINE_4 ) + 1;
+	headers = (char *)malloc(headers_size);
+	if (headers == NULL) {
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	sprintf(headers, "%s%s%"PRIzu"%s%s%s",
+		HEADER_LINE_1,
+		HEADER_LINE_2A,
+		strlen(propertySet) + 1,
+		HEADER_LINE_2B,
+		HEADER_LINE_3,
+		HEADER_LINE_4);
+
+ExitFunction:
+	if (headers == NULL) {
+		UpnpPrintf(UPNP_ALL, GENA, __FILE__, line,
+			"AllocGenaHeaders(): Error UPNP_E_OUTOF_MEMORY\n");
+	}
+	return headers;
+}
+
+
 int genaInitNotify(
 	UpnpDevice_Handle device_handle,
 	char *UDN,
@@ -426,7 +480,6 @@ int genaInitNotify(
 
 	subscription *sub = NULL;
 	service_info *service = NULL;
-	int headers_size;
 	struct Handle_Info *handle_info;
 	ThreadPoolJob job;
 
@@ -492,7 +545,7 @@ int genaInitNotify(
 		goto ExitFunction;
 	}
 
-	ret = GeneratePropertySet(VarNames, VarValues, var_count, &propertySet );
+	ret = GeneratePropertySet(VarNames, VarValues, var_count, &propertySet);
 	if (ret != XML_SUCCESS) {
 		line = __LINE__;
 		goto ExitFunction;
@@ -501,24 +554,12 @@ int genaInitNotify(
 		"GENERATED PROPERTY SET IN INIT NOTIFY: %s",
 		propertySet);
 
-	headers_size =
-		strlen("CONTENT-TYPE text/xml; charset=\"utf-8\"\r\n") +
-		strlen("CONTENT-LENGTH: \r\n") + MAX_CONTENT_LENGTH +
-		strlen("NT: upnp:event\r\n") +
-		strlen("NTS: upnp:propchange\r\n") + 1;
-	headers = (char *)malloc(headers_size);
+	headers = AllocGenaHeaders(propertySet);
 	if (headers == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
-
-	sprintf(headers,
-		"CONTENT-TYPE: text/xml\r\n"
-		"CONTENT-LENGTH: %"PRIzu"\r\n"
-		"NT: upnp:event\r\n"
-		"NTS: upnp:propchange\r\n",
-		strlen(propertySet) + 1);
 
 	/* schedule thread for initial notification */
 
@@ -592,11 +633,10 @@ int genaInitNotifyExt(
 
 	subscription *sub = NULL;
 	service_info *service = NULL;
-	int headers_size;
 	struct Handle_Info *handle_info;
 	ThreadPoolJob job;
 
-	UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
 		"GENA BEGIN INITIAL NOTIFY EXT");
 	
 	reference_count = (int *)malloc(sizeof (int));
@@ -668,24 +708,12 @@ int genaInitNotifyExt(
 		"GENERATED PROPERTY SET IN INIT EXT NOTIFY: %s",
 		propertySet);
 
-	headers_size =
-		strlen("CONTENT-TYPE text/xml; charset=\"utf-8\"\r\n") +
-		strlen("CONTENT-LENGTH: \r\n") + MAX_CONTENT_LENGTH +
-		strlen("NT: upnp:event\r\n") +
-		strlen("NTS: upnp:propchange\r\n") + 1;
-	headers = (char *)malloc(headers_size);
+	headers = AllocGenaHeaders(propertySet);
 	if (headers == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
-
-	sprintf(headers,
-		"CONTENT-TYPE: text/xml\r\n"
-		"CONTENT-LENGTH: %"PRIzu"\r\n"
-		"NT: upnp:event\r\n"
-		"NTS: upnp:propchange\r\n",
-		strlen(propertySet) + 1);
 
 	/* schedule thread for initial notification */
 
@@ -758,7 +786,6 @@ int genaNotifyAllExt(
 
 	subscription *finger = NULL;
 	service_info *service = NULL;
-	int headers_size;
 	struct Handle_Info *handle_info;
 	ThreadPoolJob job;
 
@@ -800,24 +827,12 @@ int genaNotifyAllExt(
 		"GENERATED PROPERTY SET IN EXT NOTIFY: %s",
 		propertySet);
 
-	headers_size =
-		strlen("CONTENT-TYPE text/xml; charset=\"utf-8\"\r\n") +
-		strlen("CONTENT-LENGTH: \r\n") + MAX_CONTENT_LENGTH +
-		strlen("NT: upnp:event\r\n") +
-		strlen("NTS: upnp:propchange\r\n") + 1;
-	headers = (char *)malloc(headers_size);
+	headers = AllocGenaHeaders(propertySet);
 	if (headers == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
-
-	sprintf(headers,
-		"CONTENT-TYPE: text/xml\r\n"
-		"CONTENT-LENGTH: %"PRIzu"\r\n"
-		"NT: upnp:event\r\n"
-		"NTS: upnp:propchange\r\n",
-		strlen(propertySet) + 1);
 
 	HandleLock();
 
@@ -910,7 +925,6 @@ int genaNotifyAll(
 
 	subscription *finger = NULL;
 	service_info *service = NULL;
-	int headers_size;
 	struct Handle_Info *handle_info;
 	ThreadPoolJob job;
 
@@ -951,24 +965,12 @@ int genaNotifyAll(
 		"GENERATED PROPERTY SET IN EXT NOTIFY: %s",
 		propertySet);
 
-	headers_size =
-		strlen("CONTENT-TYPE text/xml; charset=\"utf-8\"\r\n") +
-		strlen("CONTENT-LENGTH: \r\n") + MAX_CONTENT_LENGTH +
-		strlen("NT: upnp:event\r\n") +
-		strlen("NTS: upnp:propchange\r\n") + 1;
-	headers = (char *)malloc(headers_size);
+	headers = AllocGenaHeaders(propertySet);
 	if (headers == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
-
-	sprintf(headers,
-		"CONTENT-TYPE: text/xml\r\n"
-		"CONTENT-LENGTH: %"PRIzu"\r\n"
-		"NT: upnp:event\r\n"
-		"NTS: upnp:propchange\r\n",
-		strlen(propertySet) + 1);
 
 	HandleLock();
 

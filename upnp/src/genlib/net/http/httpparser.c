@@ -2509,26 +2509,20 @@ method_to_str( IN http_method_t method )
     return index == -1 ? NULL : Http_Method_Table[index].name;
 }
 
-/************************************************************************
-* Function: print_http_headers
-*
-* Parameters:
-*	http_message_t* hmsg ; HTTP Message object
-*
-* Description:
-*
-* Returns:
-*	 void
-************************************************************************/
+
+/*!
+ * \brief Print the HTTP headers.
+ */
 #ifdef DEBUG
-void
-print_http_headers( http_message_t * hmsg )
+void print_http_headers(
+	/*! [in] HTTP Message object. */
+	http_message_t *hmsg)
 {
     ListNode *node;
-    // NNS:  dlist_node *node;
+    /* NNS:  dlist_node *node; */
     http_header_t *header;
 
-    // print start line
+    /* print start line */
     if( hmsg->is_request ) {
         printf( "method = %d, version = %d.%d, url = %.*s\n", 
             hmsg->method, hmsg->major_version, hmsg->minor_version,
@@ -2539,18 +2533,18 @@ print_http_headers( http_message_t * hmsg )
             (int)hmsg->status_msg.length, hmsg->status_msg.buf);
     }
 
-    // print headers
+    /* print headers */
     node = ListHead( &hmsg->headers );
-    // NNS: node = dlist_first_node( &hmsg->headers );
+    /* NNS: node = dlist_first_node( &hmsg->headers ); */
     while( node != NULL ) {
         header = ( http_header_t * ) node->item;
-        // NNS: header = (http_header_t *)node->data;
+        /* NNS: header = (http_header_t *)node->data; */
         printf( "hdr name: %.*s, value: %.*s\n", 
             (int)header->name.length, header->name.buf,
             (int)header->value.length, header->value.buf );
 
         node = ListNext( &hmsg->headers, node );
-        // NNS: node = dlist_next( &hmsg->headers, node );
+        /* NNS: node = dlist_next( &hmsg->headers, node ); */
     }
 }
 #endif
