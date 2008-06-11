@@ -2,6 +2,23 @@
 Version 1.8.0
 *******************************************************************************
 
+2008-06-11 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Ingo Hofmann's patch for "Content-Type in Subscription responses".
+	Adds charset="utf-8" attribute to the CONTENT-TYPE header line.
+
+	Hi,
+
+	I have found an inconsistency regarding the text/xml content-type
+	returned by libupnp. It looks like only subscription responses send
+	"text/xml" where all other messages contain "text/xml; charset="utf-8"".
+	Since I'm working on an DLNA device the latter behaviour is mandatory.
+	I changed the according lines in gena_device.c (see attached patch).
+	I'm not sure if it would be ok for other device to have the charset
+	field but it would help me a lot :)
+
+	Best regards,
+	Ingo
+
 2008-06-04 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 1984541 ]
 	ixmlDocumenttoString does not render the namespace tag.

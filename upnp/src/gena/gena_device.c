@@ -498,11 +498,11 @@ int genaInitNotify(
 		goto ExitFunction;
 	}
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
-		"GENERATED PROPERY SET IN INIT NOTIFY: %s",
+		"GENERATED PROPERTY SET IN INIT NOTIFY: %s",
 		propertySet);
 
 	headers_size =
-		strlen("CONTENT-TYPE text/xml\r\n") +
+		strlen("CONTENT-TYPE text/xml; charset=\"utf-8\"\r\n") +
 		strlen("CONTENT-LENGTH: \r\n") + MAX_CONTENT_LENGTH +
 		strlen("NT: upnp:event\r\n") +
 		strlen("NTS: upnp:propchange\r\n") + 1;
@@ -659,17 +659,17 @@ int genaInitNotifyExt(
 	}
 
 	propertySet = ixmlPrintNode((IXML_Node *)PropSet);
-	if( propertySet == NULL ) {
+	if (propertySet == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto ExitFunction;
 	}
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
-		"GENERATED PROPERY SET IN INIT EXT NOTIFY: %s",
+		"GENERATED PROPERTY SET IN INIT EXT NOTIFY: %s",
 		propertySet);
 
 	headers_size =
-		strlen("CONTENT-TYPE text/xml\r\n") +
+		strlen("CONTENT-TYPE text/xml; charset=\"utf-8\"\r\n") +
 		strlen("CONTENT-LENGTH: \r\n") + MAX_CONTENT_LENGTH +
 		strlen("NT: upnp:event\r\n") +
 		strlen("NTS: upnp:propchange\r\n") + 1;
@@ -797,14 +797,14 @@ int genaNotifyAllExt(
 		goto ExitFunction;
 	}
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
-		"GENERATED PROPERY SET IN EXT NOTIFY: %s",
+		"GENERATED PROPERTY SET IN EXT NOTIFY: %s",
 		propertySet);
 
 	headers_size =
-		strlen( "CONTENT-TYPE text/xml\r\n" ) +
-		strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
-		strlen( "NT: upnp:event\r\n" ) +
-		strlen( "NTS: upnp:propchange\r\n" ) + 1;
+		strlen("CONTENT-TYPE text/xml; charset=\"utf-8\"\r\n") +
+		strlen("CONTENT-LENGTH: \r\n") + MAX_CONTENT_LENGTH +
+		strlen("NT: upnp:event\r\n") +
+		strlen("NTS: upnp:propchange\r\n") + 1;
 	headers = (char *)malloc(headers_size);
 	if (headers == NULL) {
 		line = __LINE__;
@@ -948,14 +948,14 @@ int genaNotifyAll(
 		goto ExitFunction;
 	}
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
-		"GENERATED PROPERY SET IN EXT NOTIFY: %s",
+		"GENERATED PROPERTY SET IN EXT NOTIFY: %s",
 		propertySet);
 
 	headers_size =
-		strlen( "CONTENT-TYPE text/xml\r\n" ) +
-		strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
-		strlen( "NT: upnp:event\r\n" ) +
-		strlen( "NTS: upnp:propchange\r\n" ) + 1;
+		strlen("CONTENT-TYPE text/xml; charset=\"utf-8\"\r\n") +
+		strlen("CONTENT-LENGTH: \r\n") + MAX_CONTENT_LENGTH +
+		strlen("NT: upnp:event\r\n") +
+		strlen("NTS: upnp:propchange\r\n") + 1;
 	headers = (char *)malloc(headers_size);
 	if (headers == NULL) {
 		line = __LINE__;
