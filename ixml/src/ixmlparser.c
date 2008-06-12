@@ -1809,108 +1809,123 @@ static int Parser_xmlNamespace(
 	/*! [in] The Node to process. */
 	IXML_Node *newNode)
 {
-    IXML_ElementStack *pCur = xmlParser->pCurElement;
-    IXML_NamespaceURI *pNewNs = NULL,
-     *pNs = NULL,
-     *pPrevNs = NULL;
-    int rc;
+	IXML_ElementStack *pCur = xmlParser->pCurElement;
+	IXML_NamespaceURI *pNewNs = NULL;
+	IXML_NamespaceURI *pNs = NULL;
+	IXML_NamespaceURI *pPrevNs = NULL;
+	int ret = IXML_SUCCESS;
+	int line = 0;
 
-    // if the newNode contains a namespace definition
-    assert( newNode->nodeName != NULL );
+	/* if the newNode contains a namespace definition */
+	assert(newNode->nodeName != NULL);
 
-    if( strcmp( newNode->nodeName, "xmlns" ) == 0 ) // default namespace def.
-    {
-        if( pCur->namespaceUri != NULL ) {
-            free( pCur->namespaceUri );
-        }
-///here it goes to segfault on "" when not copying
-	if(newNode->nodeValue){
-         pCur->namespaceUri = safe_strdup( newNode->nodeValue );
-         if( pCur->namespaceUri == NULL ) {
-             return IXML_INSUFFICIENT_MEMORY;
-         }
-    }
+	if (strcmp(newNode->nodeName, "xmlns") == 0) {
+		/* default namespace def. */
+		if (pCur->namespaceUri != NULL) {
+			free(pCur->namespaceUri);
+		}
+		/* here it goes to segfault on "" when not copying */
+		if (newNode->nodeValue){
+		pCur->namespaceUri = safe_strdup( newNode->nodeValue );
+			if (pCur->namespaceUri == NULL) {
+				ret = IXML_INSUFFICIENT_MEMORY;
+				line = __LINE__;
+				goto ExitFunction;
+			}
+		}
+	} else if (strncmp(newNode->nodeName, "xmlns:", strlen("xmlns:")) == 0) {
+		/* namespace definition */
+		ret = Parser_setNodePrefixAndLocalName(newNode);
+		if (ret != IXML_SUCCESS) {
+			line = __LINE__;
+			goto ExitFunction;
+		}
 
-    } else if( strncmp( newNode->nodeName, "xmlns:", strlen( "xmlns:" ) ) == 0 ) {
-        // namespace definition
-        rc = Parser_setNodePrefixAndLocalName( newNode );
-        if( rc != IXML_SUCCESS ) {
-            return rc;
-        }
+		assert(newNode->localName != NULL);
 
-        assert( newNode->localName != NULL );
+		if (pCur == NULL) {
+			ret = IXML_FAILED;
+			line = __LINE__;
+			goto ExitFunction;
+		}
+		if (pCur->prefix != NULL &&
+		    strcmp(pCur->prefix, newNode->localName) == 0) {
+			pCur->namespaceUri = safe_strdup(newNode->nodeValue);
+			if (pCur->namespaceUri == NULL) {
+				ret = IXML_INSUFFICIENT_MEMORY;
+				line = __LINE__;
+				goto ExitFunction;
+			}
+		} else {
+			pPrevNs = pCur->pNsURI;
+			pNs = pPrevNs;
+			while (pNs != NULL) {
+				if (pNs->prefix != NULL &&
+				    strcmp(pNs->prefix, newNode->localName) == 0) {
+					/* replace namespace definition */
+					break;
+				} else {
+					pPrevNs = pNs;
+					pNs = pNs->nextNsURI;
+				}
+			}
+			if (pNs == NULL) {
+				/* a new definition */
+				pNewNs = (IXML_NamespaceURI *)
+					malloc(sizeof (IXML_NamespaceURI));
+				if (pNewNs == NULL) {
+					ret = IXML_INSUFFICIENT_MEMORY;
+					line = __LINE__;
+					goto ExitFunction;
+				}
+				memset(pNewNs, 0, sizeof (IXML_NamespaceURI));
+				pNewNs->prefix = safe_strdup(newNode->localName);
+				if (pNewNs->prefix == NULL) {
+					free(pNewNs);
+					ret = IXML_INSUFFICIENT_MEMORY;
+					line = __LINE__;
+					goto ExitFunction;
+				}
+				pNewNs->nsURI = safe_strdup(newNode->nodeValue);
+				if (pNewNs->nsURI == NULL) {
+					Parser_freeNsURI(pNewNs);
+					free(pNewNs);
+					ret = IXML_INSUFFICIENT_MEMORY;
+					line = __LINE__;
+					goto ExitFunction;
+				}
+				if (pCur->pNsURI == NULL) {
+					pCur->pNsURI = pNewNs;
+				} else {
+					pPrevNs->nextNsURI = pNewNs;
+				}
+			} else {
+				/* udpate the namespace */
+				if (pNs->nsURI != NULL) {
+					free(pNs->nsURI);
+				}
+				pNs->nsURI = safe_strdup(newNode->nodeValue);
+				if (pNs->nsURI == NULL) {
+					ret = IXML_INSUFFICIENT_MEMORY;
+					line = __LINE__;
+					goto ExitFunction;
+				}
+			}
+		}
+	}
+	if (xmlParser->pNeedPrefixNode != NULL) {
+		ret = Parser_addNamespace(xmlParser);
+		line = __LINE__;
+		goto ExitFunction;
+	}
 
-        if( pCur == NULL ) {
-            return IXML_FAILED;
-        }
+ExitFunction:
+	if (ret != IXML_SUCCESS && ret != IXML_FILE_DONE) {
+		IxmlPrintf("(%s::Parser_xmlNamespace): Error %d, line %d\n",
+			__FILE__, ret, line);
+	}
 
-        if( ( pCur->prefix != NULL )
-            && ( strcmp( pCur->prefix, newNode->localName ) == 0 ) ) {
-            pCur->namespaceUri = safe_strdup( newNode->nodeValue );
-            if( pCur->namespaceUri == NULL ) {
-                return IXML_INSUFFICIENT_MEMORY;
-            }
-        } else {
-            pPrevNs = pCur->pNsURI;
-            pNs = pPrevNs;
-            while( pNs != NULL ) {
-                if( ( pNs->prefix != NULL ) &&
-                    ( strcmp( pNs->prefix, newNode->localName ) == 0 ) ) {
-                    break;      // replace namespace definition
-                } else {
-                    pPrevNs = pNs;
-                    pNs = pNs->nextNsURI;
-                }
-            }
-
-            if( pNs == NULL )   // a new definition
-            {
-                pNewNs =
-                    ( IXML_NamespaceURI * )
-                    malloc( sizeof( IXML_NamespaceURI ) );
-                if( pNewNs == NULL ) {
-                    return IXML_INSUFFICIENT_MEMORY;
-                }
-                memset( pNewNs, 0, sizeof( IXML_NamespaceURI ) );
-
-                pNewNs->prefix = safe_strdup( newNode->localName );
-                if( pNewNs->prefix == NULL ) {
-                    free( pNewNs );
-                    return IXML_INSUFFICIENT_MEMORY;
-                }
-
-                pNewNs->nsURI = safe_strdup( newNode->nodeValue );
-                if( pNewNs->nsURI == NULL ) {
-                    Parser_freeNsURI( pNewNs );
-                    free( pNewNs );
-                    return IXML_INSUFFICIENT_MEMORY;
-                }
-
-                if( pCur->pNsURI == NULL ) {
-                    pCur->pNsURI = pNewNs;
-                } else {
-                    pPrevNs->nextNsURI = pNewNs;
-                }
-            } else              // udpate the namespace
-            {
-                if( pNs->nsURI != NULL ) {
-                    free( pNs->nsURI );
-                }
-
-                pNs->nsURI = safe_strdup( newNode->nodeValue );
-                if( pNs->nsURI == NULL ) {
-                    return IXML_INSUFFICIENT_MEMORY;
-                }
-            }
-        }
-    }
-
-    if( xmlParser->pNeedPrefixNode != NULL ) {
-        rc = Parser_addNamespace( xmlParser );
-        return rc;
-    } else {
-        return IXML_SUCCESS;
-    }
+	return ret;
 }
 
 
