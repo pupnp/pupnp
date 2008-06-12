@@ -5,19 +5,19 @@
 
 
 /*!
- * \file
+ * \defgroup UpnpString The UpnpString Class
  *
- * \brief UpnpString object declararion.
- *
- * This class implements string operations in the UPnP library.
+ * \brief Implements string operations in the UPnP library.
  *
  * \author Marcelo Roberto Jimenez
  *
  * \version 1.0
  *
- * \defgroup UpnpString The UpnpString Class
- *
  * @{
+ *
+ * \file
+ *
+ * \brief UpnpString object declarartion.
  */
 
 

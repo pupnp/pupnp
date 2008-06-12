@@ -1,12 +1,20 @@
 
 
 /*!
+ * \addtogroup UpnpString
+ *
+ * Due to its heavy use, this class is coded for efficiency, not for beauty.
+ * Do not use this as example to other classes. Please take a look at any
+ * other one.
+ *
+ * \todo Always alloc a minimum size like 64 bytes or so and when shrinking
+ * do not perform a new memory allocation.
+ *
+ * @{
+ *
  * \file
  *
  * \brief UpnpString object implementation.
- *
- * \author Marcelo Roberto Jimenez
- *
  */
 
 
@@ -21,18 +29,9 @@
 
 
 /*!
- * \ingroup UpnpString
- * 
  * \brief Internal implementation of the class UpnpString.
  *
  * \internal
- *
- * Due to its heavy use, this class is coded for efficiency, not for beauty.
- * Do not use this as example to other classes. Please take a look at any
- * other one.
- *
- * \todo Always alloc a minimum size like 64 bytes or so and when shrinking
- * do not perform a new memory allocation.
  */
 struct SUpnpString
 {
@@ -150,4 +149,6 @@ void UpnpString_clear(UpnpString *p)
 	// No need to realloc now, will do later when needed
 	((struct SUpnpString *)p)->m_string[0] = 0;
 }
+
+/* @} UpnpString */
 
