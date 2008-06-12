@@ -1824,14 +1824,11 @@ static int Parser_xmlNamespace(
 		if (pCur->namespaceUri != NULL) {
 			free(pCur->namespaceUri);
 		}
-		/* here it goes to segfault on "" when not copying */
-		if (newNode->nodeValue){
-		pCur->namespaceUri = safe_strdup( newNode->nodeValue );
-			if (pCur->namespaceUri == NULL) {
-				ret = IXML_INSUFFICIENT_MEMORY;
-				line = __LINE__;
-				goto ExitFunction;
-			}
+		pCur->namespaceUri = safe_strdup(newNode->nodeValue);
+		if (pCur->namespaceUri == NULL) {
+			ret = IXML_INSUFFICIENT_MEMORY;
+			line = __LINE__;
+			goto ExitFunction;
 		}
 	} else if (strncmp(newNode->nodeName, "xmlns:", strlen("xmlns:")) == 0) {
 		/* namespace definition */
