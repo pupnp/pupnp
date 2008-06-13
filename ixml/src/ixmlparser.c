@@ -2438,112 +2438,150 @@ static int Parser_processAttribute(
 	/*! [in] The Node to process. */
 	IXML_Node *node)
 {
-    char *strEndQuote = NULL;
-    int tlen = 0;
-    char *pCur = NULL;
-    char *pCurToken = NULL;
+	int ret = IXML_SUCCESS;
+	int line = 0;
+	int tlen = 0;
+	char *strEndQuote = NULL;
+	char *pCur = NULL;
+	char *pCurToken = NULL;
 
-    assert( xmlParser );
-    if( xmlParser == NULL ) {
-        return IXML_FAILED;
-    }
+	assert(xmlParser);
 
-    pCurToken = ( xmlParser->tokenBuf ).buf;
-    if( pCurToken == NULL ) {
-        return IXML_SYNTAX_ERR;
-    }
+	if (xmlParser == NULL) {
+		ret = IXML_FAILED;
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	pCurToken = xmlParser->tokenBuf.buf;
+	if (pCurToken == NULL) {
+		ret = IXML_SYNTAX_ERR;
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	if (Parser_isNameChar(Parser_UTF8ToInt(pCurToken, &tlen), FALSE) == FALSE) {
+		ret = IXML_SYNTAX_ERR;
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	/* copy in the attribute name */
+	node->nodeName = safe_strdup(pCurToken);
+	if (node->nodeName == NULL) {
+		ret = IXML_INSUFFICIENT_MEMORY;
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	/* read in the "=" sign */
+	if (Parser_getNextToken(xmlParser) == 0) {
+		ret = IXML_SYNTAX_ERR;
+		line = __LINE__;
+		goto ExitFunction;
+	}
 
-    if( Parser_isNameChar( Parser_UTF8ToInt( pCurToken, &tlen ), FALSE ) ==
-        FALSE ) {
-        return IXML_SYNTAX_ERR;
-    }
-    // copy in the attribute name
-    node->nodeName = safe_strdup( pCurToken );
-    if( node->nodeName == NULL ) {
-        return IXML_INSUFFICIENT_MEMORY;
-    }
-    // read in the "=" sign 
-    if( Parser_getNextToken( xmlParser ) == 0 ) {
-        return IXML_SYNTAX_ERR;
-    }
+	pCurToken = xmlParser->tokenBuf.buf;
+	if (*pCurToken != EQUALS) {
+		ret = IXML_SYNTAX_ERR;
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	/* read in the single quote or double quote */
+	if (Parser_getNextToken(xmlParser) == 0) {
+		ret = IXML_SYNTAX_ERR;
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	/* pCurToken is either quote or single quote */
+	pCurToken = ( xmlParser->tokenBuf ).buf;
+	if (*pCurToken != QUOTE && *pCurToken != SINGLEQUOTE) {
+		ret = IXML_SYNTAX_ERR;
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	strEndQuote = strstr(xmlParser->curPtr, pCurToken);
+	if (strEndQuote == NULL) {
+		ret = IXML_SYNTAX_ERR;
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	/* check between curPtr and strEndQuote,
+	 * whether there are illegal chars. */
+	pCur = xmlParser->curPtr;
+	while (pCur < strEndQuote) {
+		if (*pCur == '<') {
+			ret = IXML_SYNTAX_ERR;
+			line = __LINE__;
+			goto ExitFunction;
+		}
+		if (*pCur == '&') {
+			Parser_parseReference(++pCur);
+		}
+		pCur++;
+	}
+	/* clear token buffer */
+	Parser_clearTokenBuf(xmlParser);
+	if (strEndQuote != xmlParser->curPtr) {
+		ret = Parser_copyToken(
+			xmlParser,
+			xmlParser->curPtr,
+			strEndQuote - xmlParser->curPtr);
+		if(ret  != IXML_SUCCESS) {
+			ret = IXML_SYNTAX_ERR;
+			line = __LINE__;
+			goto ExitFunction;
+		}
+	}
+	/* skip the ending quote */
+	xmlParser->curPtr = strEndQuote + 1;
+	pCurToken = xmlParser->tokenBuf.buf;
+	if (pCurToken != NULL) {
+		/* attribute has value, like a="c" */
+		node->nodeValue = safe_strdup(pCurToken);
+		if (node->nodeValue == NULL) {
+			ret = IXML_INSUFFICIENT_MEMORY;
+			line = __LINE__;
+			goto ExitFunction;
+		}
+	} else {
+		/* if attribute doesn't have value, like a=""
+		 * somewhere on other places is this copied */
+		node->nodeValue = malloc(sizeof (char));
+		*(node->nodeValue) = '\0';
+	}
+	node->nodeType = eATTRIBUTE_NODE;
 
-    pCurToken = ( xmlParser->tokenBuf ).buf;
-    if( *pCurToken != EQUALS ) {
-        return IXML_SYNTAX_ERR;
-    }
-    // read in the single quote or double quote
-    if( Parser_getNextToken( xmlParser ) == 0 ) {
-        return IXML_SYNTAX_ERR;
-    }
-    // pCurToken is either quote or singlequote
-    pCurToken = ( xmlParser->tokenBuf ).buf;
-    if( ( *pCurToken != QUOTE ) && ( *pCurToken != SINGLEQUOTE ) ) {
-        return IXML_SYNTAX_ERR;
-    }
+	/* check whether this is a new namespace definition */
+	ret = Parser_xmlNamespace(xmlParser, node);
+	if (ret != IXML_SUCCESS) {
+		line = __LINE__;
+		goto ExitFunction;
+	}
+	/* read ahead to see whether we have more attributes */
+	xmlParser->savePtr = xmlParser->curPtr;
+	if (Parser_getNextToken(xmlParser) == 0) {
+		ret = IXML_SYNTAX_ERR;
+		line = __LINE__;
+		goto ExitFunction;
+	}
 
-    strEndQuote = strstr( xmlParser->curPtr, pCurToken );
-    if( strEndQuote == NULL ) {
-        return IXML_SYNTAX_ERR;
-    }
-    // check between curPtr and strEndQuote, whether there are illegal chars.
-    pCur = xmlParser->curPtr;
-    while( pCur < strEndQuote ) {
-        if( *pCur == '<' ) {
-            return IXML_SYNTAX_ERR;
-        }
+	pCurToken = xmlParser->tokenBuf.buf;
+	if (strcmp(pCurToken, "<") == 0) {
+		ret = IXML_FAILED;
+		line = __LINE__;
+		goto ExitFunction;
+	} else if(strcmp(pCurToken, ">") != 0) {
+		/* more attribute? */
+		/* backup */
+		xmlParser->curPtr = xmlParser->savePtr;
+	} else {
+		xmlParser->state = eCONTENT;
+	}
 
-        if( *pCur == '&' ) {
-            Parser_parseReference( ++pCur );
-        }
-        pCur++;
-    }
-    //clear token buffer
-    Parser_clearTokenBuf( xmlParser );
-    if( strEndQuote != xmlParser->curPtr ) {
-        if( Parser_copyToken( xmlParser, xmlParser->curPtr,
-                              strEndQuote - xmlParser->curPtr ) !=
-            IXML_SUCCESS ) {
-            return IXML_SYNTAX_ERR;
-        }
-    }
-    // skip the ending quote
-    xmlParser->curPtr = strEndQuote + 1;
+ExitFunction:
+	if (ret != IXML_SUCCESS && ret != IXML_FILE_DONE) {
+		IxmlPrintf("(%s::Parser_processAttribute): Error %d, line %d\n",
+			__FILE__, ret, line);
+	}
 
-    pCurToken = ( xmlParser->tokenBuf ).buf;
-    if( pCurToken != NULL ) {   // attribute has value, like a="c"
-        node->nodeValue = safe_strdup( pCurToken );
-        if( node->nodeValue == NULL ) {
-            return IXML_INSUFFICIENT_MEMORY;
-        }
-    }else{
-       // if attribute doesn't have value, like a=""
-        ///somewhere on other places is this copied
-       node->nodeValue = malloc(sizeof(char));
-       *(node->nodeValue) = '\0';
-    }
-    node->nodeType = eATTRIBUTE_NODE;
-
-    // check whether this is a new namespace definition
-    if( Parser_xmlNamespace( xmlParser, node ) != IXML_SUCCESS ) {
-        return IXML_FAILED;
-    }
-    // read ahead to see whether we have more attributes
-    xmlParser->savePtr = xmlParser->curPtr;
-    if( Parser_getNextToken( xmlParser ) == 0 ) {
-        return IXML_SYNTAX_ERR;
-    }
-
-    pCurToken = ( xmlParser->tokenBuf ).buf;
-    if( strcmp( pCurToken, "<" ) == 0 ) {
-        return IXML_FAILED;
-    } else if( strcmp( pCurToken, ">" ) != 0 )  // more attribute?
-    {                           // backup
-        xmlParser->curPtr = xmlParser->savePtr;
-    } else {
-        xmlParser->state = eCONTENT;
-    }
-
-    return IXML_SUCCESS;
+	return ret;
 }
 
 
@@ -2566,7 +2604,7 @@ static int Parser_getNextNode(
 	int line = 0;
 	int tokenLen = 0;
 
-	// endof file reached?
+	/* endof file reached? */
 	if (*(xmlParser->curPtr) == '\0') {
 		*bETag = TRUE;
 		line = __LINE__;
@@ -2584,7 +2622,7 @@ static int Parser_getNextNode(
 		if (tokenLen == 0 &&
 		    xmlParser->pCurElement == NULL &&
 		    *(xmlParser->curPtr) == '\0') {
-			// comments after the xml doc
+			/* comments after the xml doc */
 			line = __LINE__;
 			ret = IXML_SUCCESS;
 			goto ExitFunction;
@@ -2600,7 +2638,7 @@ static int Parser_getNextNode(
 			ret = IXML_SUCCESS;
 			goto ExitFunction;
 		} else if (strcmp(pCurToken, ENDTAG) == 0) {
-			//  we got </, read next element
+			/* we got </, read next element */
 			line = __LINE__;
 			ret = Parser_processETag(xmlParser, node, bETag);
 			goto ExitFunction;
@@ -2616,8 +2654,8 @@ static int Parser_getNextNode(
 				goto ExitFunction;
 			}
 
-			node->nodeName = safe_strdup( lastElement );
-			if( node->nodeName == NULL ) {
+			node->nodeName = safe_strdup(lastElement);
+			if (node->nodeName == NULL) {
 				line = __LINE__;
 				ret = IXML_INSUFFICIENT_MEMORY;
 				goto ExitFunction;
@@ -2629,7 +2667,7 @@ static int Parser_getNextNode(
 			ret = IXML_SUCCESS;
 			goto ExitFunction;
 		} else if (xmlParser->state == eATTRIBUTE && xmlParser->pCurElement != NULL) {
-			if(Parser_processAttribute( xmlParser, node ) != IXML_SUCCESS) {
+			if (Parser_processAttribute(xmlParser, node) != IXML_SUCCESS) {
 				line = __LINE__;
 				ret = IXML_SYNTAX_ERR;
 				goto ExitFunction;
