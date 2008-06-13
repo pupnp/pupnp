@@ -269,9 +269,10 @@ static void ixmlPrintDomTree(
 
 
 /*!
- * \brief Converts a DOM tree into a text string Element, and Attribute nodes
- * are handled differently. We don't want to print the Element and Attribute
- * nodes' sibling.
+ * \brief Converts a DOM tree into a text string.
+ *
+ * Element, and Attribute nodes are handled differently. We don't want to print
+ * the Element and Attribute nodes' sibling.
  */
 static void ixmlDomTreetoString(
 	/*! [in] \todo documentation. */
