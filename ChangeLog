@@ -2,6 +2,14 @@
 Version 1.8.0
 *******************************************************************************
 
+2008-06-13 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 1984541 ]
+	ixmlDocumenttoString does not render the namespace tag.
+	Submitted By: Beliveau - belivo
+
+	Undoing the patch that fixed this problem. In fact, there was no
+	problem and the patch was wrong.
+
 2008-06-11 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fixed a buffer overflow due to a bug in the calculation of the
 	CONTENT-TYPE header line size, the length was beeing calculated with

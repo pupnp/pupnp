@@ -105,14 +105,12 @@ static void ixmlPrintDomTreeRecursive(
 {
 	const char *nodeName = NULL;
 	const char *nodeValue = NULL;
-	const char *nodeNameSpaceURI = NULL;
 	IXML_Node *child = NULL,
 	*sibling = NULL;
 
 	if (nodeptr != NULL) {
 		nodeName = (const char *)ixmlNode_getNodeName(nodeptr);
 		nodeValue = ixmlNode_getNodeValue(nodeptr);
-		nodeNameSpaceURI = ixmlNode_getNamespaceURI(nodeptr);
 		
 		switch (ixmlNode_getNodeType(nodeptr)) {
 		case eTEXT_NODE:
@@ -152,11 +150,6 @@ static void ixmlPrintDomTreeRecursive(
 		case eELEMENT_NODE:
 			ixml_membuf_append_str(buf, "<");
 			ixml_membuf_append_str(buf, nodeName);
-			if (nodeNameSpaceURI != NULL) {
-				ixml_membuf_append_str(buf, " xmlns=\"");
-				ixml_membuf_append_str(buf, nodeNameSpaceURI);
-				ixml_membuf_append_str(buf, "\"");
-			}
 			if (nodeptr->firstAttr != NULL) {
 				ixml_membuf_append_str(buf, " ");
 				ixmlPrintDomTreeRecursive(nodeptr->firstAttr, buf);
@@ -282,7 +275,6 @@ static void ixmlDomTreetoString(
 {
 	const char *nodeName = NULL;
 	const char *nodeValue = NULL;
-	const char *nodeNameSpaceURI = NULL;
 	IXML_Node *child = NULL;
 
 	if (nodeptr == NULL || buf == NULL) {
@@ -291,7 +283,6 @@ static void ixmlDomTreetoString(
 
 	nodeName = (const char *)ixmlNode_getNodeName(nodeptr);
 	nodeValue = ixmlNode_getNodeValue(nodeptr);
-	nodeNameSpaceURI = ixmlNode_getNamespaceURI(nodeptr);
 
 	switch (ixmlNode_getNodeType(nodeptr)) {
 	case eTEXT_NODE:
@@ -311,11 +302,6 @@ static void ixmlDomTreetoString(
 	case eELEMENT_NODE:
 		ixml_membuf_append_str(buf, "<");
 		ixml_membuf_append_str(buf, nodeName);
-		if (nodeNameSpaceURI != NULL) {
-			ixml_membuf_append_str(buf, " xmlns=\"");
-			ixml_membuf_append_str(buf, nodeNameSpaceURI);
-			ixml_membuf_append_str(buf, "\"");
-		}
 		if (nodeptr->firstAttr != NULL) {
 			ixml_membuf_append_str(buf, " ");
 			ixmlPrintDomTreeRecursive(nodeptr->firstAttr, buf);
