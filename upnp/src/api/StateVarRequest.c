@@ -6,7 +6,6 @@
  * \brief UpnpStateVarRequest object implementation.
  *
  * \author Marcelo Roberto Jimenez
- *
  */
 
 
@@ -95,17 +94,17 @@ UpnpStateVarRequest *UpnpStateVarRequest_dup(const UpnpStateVarRequest *p)
 }
 
 
-void UpnpStateVarRequest_assign(UpnpStateVarRequest *q, const UpnpStateVarRequest *p)
+void UpnpStateVarRequest_assign(UpnpStateVarRequest *p, const UpnpStateVarRequest *q)
 {
-	if (q != p) {
-		UpnpStateVarRequest_set_ErrCode(q, UpnpStateVarRequest_get_ErrCode(p));
-		UpnpStateVarRequest_set_Socket(q, UpnpStateVarRequest_get_Socket(p));
-		UpnpStateVarRequest_set_ErrStr(q, UpnpStateVarRequest_get_ErrStr(p));
-		UpnpStateVarRequest_set_StateVarName(q, UpnpStateVarRequest_get_StateVarName(p));
-		UpnpStateVarRequest_set_DevUDN(q, UpnpStateVarRequest_get_DevUDN(p));
-		UpnpStateVarRequest_set_ServiceID(q, UpnpStateVarRequest_get_ServiceID(p));
-		UpnpStateVarRequest_set_CtrlPtIPAddr(q, UpnpStateVarRequest_get_CtrlPtIPAddr(p));
-		UpnpStateVarRequest_set_CurrentVal(q, UpnpStateVarRequest_get_CurrentVal(p));
+	if (p != q) {
+		UpnpStateVarRequest_set_ErrCode(p, UpnpStateVarRequest_get_ErrCode(q));
+		UpnpStateVarRequest_set_Socket(p, UpnpStateVarRequest_get_Socket(q));
+		UpnpStateVarRequest_set_ErrStr(p, UpnpStateVarRequest_get_ErrStr(q));
+		UpnpStateVarRequest_set_StateVarName(p, UpnpStateVarRequest_get_StateVarName(q));
+		UpnpStateVarRequest_set_DevUDN(p, UpnpStateVarRequest_get_DevUDN(q));
+		UpnpStateVarRequest_set_ServiceID(p, UpnpStateVarRequest_get_ServiceID(q));
+		UpnpStateVarRequest_set_CtrlPtIPAddr(p, UpnpStateVarRequest_get_CtrlPtIPAddr(q));
+		UpnpStateVarRequest_set_CurrentVal(p, UpnpStateVarRequest_get_CurrentVal(q));
 	}
 }
 

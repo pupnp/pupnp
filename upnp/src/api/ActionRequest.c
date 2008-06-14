@@ -6,7 +6,6 @@
  * \brief UpnpActionRequest object implementation.
  *
  * \author Marcelo Roberto Jimenez
- *
  */
 
 
@@ -101,19 +100,19 @@ UpnpActionRequest *UpnpActionRequest_dup(const UpnpActionRequest *p)
 }
 
 
-void UpnpActionRequest_assign(UpnpActionRequest *q, const UpnpActionRequest *p)
+void UpnpActionRequest_assign(UpnpActionRequest *p, const UpnpActionRequest *q)
 {
-	if (q != p) {
-		UpnpActionRequest_set_ErrCode(q, UpnpActionRequest_get_ErrCode(p));
-		UpnpActionRequest_set_Socket(q, UpnpActionRequest_get_Socket(p));
-		UpnpActionRequest_set_ErrStr(q, UpnpActionRequest_get_ErrStr(p));
-		UpnpActionRequest_set_ActionName(q, UpnpActionRequest_get_ActionName(p));
-		UpnpActionRequest_set_DevUDN(q, UpnpActionRequest_get_DevUDN(p));
-		UpnpActionRequest_set_ServiceID(q, UpnpActionRequest_get_ServiceID(p));
-		UpnpActionRequest_set_ActionRequest(q, UpnpActionRequest_get_ActionRequest(p));
-		UpnpActionRequest_set_ActionResult(q, UpnpActionRequest_get_ActionResult(p));
-		UpnpActionRequest_set_CtrlPtIPAddr(q, UpnpActionRequest_get_CtrlPtIPAddr(p));
-		UpnpActionRequest_set_SoapHeader(q, UpnpActionRequest_get_SoapHeader(p));
+	if (p != q) {
+		UpnpActionRequest_set_ErrCode(p, UpnpActionRequest_get_ErrCode(q));
+		UpnpActionRequest_set_Socket(p, UpnpActionRequest_get_Socket(q));
+		UpnpActionRequest_set_ErrStr(p, UpnpActionRequest_get_ErrStr(q));
+		UpnpActionRequest_set_ActionName(p, UpnpActionRequest_get_ActionName(q));
+		UpnpActionRequest_set_DevUDN(p, UpnpActionRequest_get_DevUDN(q));
+		UpnpActionRequest_set_ServiceID(p, UpnpActionRequest_get_ServiceID(q));
+		UpnpActionRequest_set_ActionRequest(p, UpnpActionRequest_get_ActionRequest(q));
+		UpnpActionRequest_set_ActionResult(p, UpnpActionRequest_get_ActionResult(q));
+		UpnpActionRequest_set_CtrlPtIPAddr(p, UpnpActionRequest_get_CtrlPtIPAddr(q));
+		UpnpActionRequest_set_SoapHeader(p, UpnpActionRequest_get_SoapHeader(q));
 	}
 }
 

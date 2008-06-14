@@ -6,7 +6,6 @@
  * \brief UpnpFileInfo object implementation.
  *
  * \author Marcelo Roberto Jimenez
- *
  */
 
 
@@ -80,15 +79,15 @@ UpnpFileInfo *UpnpFileInfo_dup(const UpnpFileInfo *p)
 }
 
 
-void UpnpFileInfo_assign(UpnpFileInfo *q, const UpnpFileInfo *p)
+void UpnpFileInfo_assign(UpnpFileInfo *p, const UpnpFileInfo *q)
 {
-	if (q != p) {
-		UpnpFileInfo_set_FileLength(q, UpnpFileInfo_get_FileLength(p));
-		UpnpFileInfo_set_LastModified(q, UpnpFileInfo_get_LastModified(p));
-		UpnpFileInfo_set_IsDirectory(q, UpnpFileInfo_get_IsDirectory(p));
-		UpnpFileInfo_set_IsReadable(q, UpnpFileInfo_get_IsReadable(p));
-		UpnpFileInfo_set_ContentType(q, UpnpFileInfo_get_ContentType(p));
-		UpnpFileInfo_set_ExtraHeaders(q, UpnpFileInfo_get_ExtraHeaders(p));
+	if (p != q) {
+		UpnpFileInfo_set_FileLength(p, UpnpFileInfo_get_FileLength(q));
+		UpnpFileInfo_set_LastModified(p, UpnpFileInfo_get_LastModified(q));
+		UpnpFileInfo_set_IsDirectory(p, UpnpFileInfo_get_IsDirectory(q));
+		UpnpFileInfo_set_IsReadable(p, UpnpFileInfo_get_IsReadable(q));
+		UpnpFileInfo_set_ContentType(p, UpnpFileInfo_get_ContentType(q));
+		UpnpFileInfo_set_ExtraHeaders(p, UpnpFileInfo_get_ExtraHeaders(q));
 	}
 }
 

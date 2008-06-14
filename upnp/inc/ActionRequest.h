@@ -10,8 +10,11 @@
  * \brief UpnpActionRequest object declaration.
  *
  * \author Marcelo Roberto Jimenez
- *
  */
+
+
+/*! Returned as part of a \b UPNP_CONTROL_ACTION_COMPLETE callback.  */
+typedef struct s_UpnpActionRequest UpnpActionRequest;
 
 
 #include "ixml.h"       /* for IXML_Document */
@@ -25,10 +28,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-/*! Returned as part of a \b UPNP_CONTROL_ACTION_COMPLETE callback.  */
-typedef struct s_UpnpActionRequest UpnpActionRequest;
-
-
 /*! Constructor */
 EXPORT_SPEC UpnpActionRequest *UpnpActionRequest_new();
 
@@ -39,7 +38,7 @@ EXPORT_SPEC void UpnpActionRequest_delete(UpnpActionRequest *p);
 EXPORT_SPEC UpnpActionRequest *UpnpActionRequest_dup(const UpnpActionRequest *p);
 
 /*! Assignment operator */
-EXPORT_SPEC void UpnpActionRequest_assign(UpnpActionRequest *q, const UpnpActionRequest *p);
+EXPORT_SPEC void UpnpActionRequest_assign(UpnpActionRequest *p, const UpnpActionRequest *q);
 
 /*! The result of the operation */
 EXPORT_SPEC int UpnpActionRequest_get_ErrCode(const UpnpActionRequest *p);

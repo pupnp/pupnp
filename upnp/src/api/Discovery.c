@@ -6,7 +6,6 @@
  * \brief UpnpDiscovery object implementation.
  *
  * \author Marcelo Roberto Jimenez
- *
  */
 
 
@@ -108,20 +107,20 @@ UpnpDiscovery *UpnpDiscovery_dup(const UpnpDiscovery *p)
 }
 
 
-void UpnpDiscovery_assign(UpnpDiscovery *q, const UpnpDiscovery *p)
+void UpnpDiscovery_assign(UpnpDiscovery *p, const UpnpDiscovery *q)
 {
-	if (q != p) {
-		UpnpDiscovery_set_ErrCode(q, UpnpDiscovery_get_ErrCode(p));
-		UpnpDiscovery_set_Expires(q, UpnpDiscovery_get_Expires(p));
-		UpnpDiscovery_set_DeviceID(q, UpnpDiscovery_get_DeviceID(p));
-		UpnpDiscovery_set_DeviceType(q, UpnpDiscovery_get_DeviceType(p));
-		UpnpDiscovery_set_ServiceType(q, UpnpDiscovery_get_ServiceType(p));
-		UpnpDiscovery_set_ServiceVer(q, UpnpDiscovery_get_ServiceVer(p));
-		UpnpDiscovery_set_Location(q, UpnpDiscovery_get_Location(p));
-		UpnpDiscovery_set_Os(q, UpnpDiscovery_get_Os(p));
-		UpnpDiscovery_set_Date(q, UpnpDiscovery_get_Date(p));
-		UpnpDiscovery_set_Ext(q, UpnpDiscovery_get_Ext(p));
-		UpnpDiscovery_set_DestAddr(q, UpnpDiscovery_get_DestAddr(p));
+	if (p != q) {
+		UpnpDiscovery_set_ErrCode(p, UpnpDiscovery_get_ErrCode(q));
+		UpnpDiscovery_set_Expires(p, UpnpDiscovery_get_Expires(q));
+		UpnpDiscovery_set_DeviceID(p, UpnpDiscovery_get_DeviceID(q));
+		UpnpDiscovery_set_DeviceType(p, UpnpDiscovery_get_DeviceType(q));
+		UpnpDiscovery_set_ServiceType(p, UpnpDiscovery_get_ServiceType(q));
+		UpnpDiscovery_set_ServiceVer(p, UpnpDiscovery_get_ServiceVer(q));
+		UpnpDiscovery_set_Location(p, UpnpDiscovery_get_Location(q));
+		UpnpDiscovery_set_Os(p, UpnpDiscovery_get_Os(q));
+		UpnpDiscovery_set_Date(p, UpnpDiscovery_get_Date(q));
+		UpnpDiscovery_set_Ext(p, UpnpDiscovery_get_Ext(q));
+		UpnpDiscovery_set_DestAddr(p, UpnpDiscovery_get_DestAddr(q));
 	}
 }
 

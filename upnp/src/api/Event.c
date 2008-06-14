@@ -6,7 +6,6 @@
  * \brief UpnpEvent object implementation.
  *
  * \author Marcelo Roberto Jimenez
- *
  */
 
 
@@ -66,12 +65,12 @@ UpnpEvent *UpnpEvent_dup(const UpnpEvent *p)
 }
 
 
-void UpnpEvent_assign(UpnpEvent *q, const UpnpEvent *p)
+void UpnpEvent_assign(UpnpEvent *p, const UpnpEvent *q)
 {
-	if (q != p) {
-		UpnpEvent_set_EventKey(q, UpnpEvent_get_EventKey(p));
-		UpnpEvent_set_ChangedVariables(q, UpnpEvent_get_ChangedVariables(p));
-		UpnpEvent_set_SID(q, UpnpEvent_get_SID(p));
+	if (p != q) {
+		UpnpEvent_set_EventKey(p, UpnpEvent_get_EventKey(q));
+		UpnpEvent_set_ChangedVariables(p, UpnpEvent_get_ChangedVariables(q));
+		UpnpEvent_set_SID(p, UpnpEvent_get_SID(q));
 	}
 }
 

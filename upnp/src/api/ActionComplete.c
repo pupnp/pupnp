@@ -6,7 +6,6 @@
  * \brief UpnpActionComplete object implementation.
  *
  * \author Marcelo Roberto Jimenez
- *
  */
 
 
@@ -80,13 +79,13 @@ UpnpActionComplete *UpnpActionComplete_dup(const UpnpActionComplete *p)
 }
 
 
-void UpnpActionComplete_assign(UpnpActionComplete *q, const UpnpActionComplete *p)
+void UpnpActionComplete_assign(UpnpActionComplete *p, const UpnpActionComplete *q)
 {
-	if (q != p) {
-		UpnpActionComplete_set_ErrCode(q, UpnpActionComplete_get_ErrCode(p));
-		UpnpActionComplete_set_CtrlUrl(q, UpnpActionComplete_get_CtrlUrl(p));
-		UpnpActionComplete_set_ActionRequest(q, UpnpActionComplete_get_ActionRequest(p));
-		UpnpActionComplete_set_ActionResult(q, UpnpActionComplete_get_ActionResult(p));
+	if (p != q) {
+		UpnpActionComplete_set_ErrCode(p, UpnpActionComplete_get_ErrCode(q));
+		UpnpActionComplete_set_CtrlUrl(p, UpnpActionComplete_get_CtrlUrl(q));
+		UpnpActionComplete_set_ActionRequest(p, UpnpActionComplete_get_ActionRequest(q));
+		UpnpActionComplete_set_ActionResult(p, UpnpActionComplete_get_ActionResult(q));
 	}
 }
 

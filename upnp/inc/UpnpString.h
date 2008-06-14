@@ -47,7 +47,7 @@ EXPORT_SPEC UpnpString *UpnpString_new();
  * \brief Destructor.
  */
 EXPORT_SPEC void UpnpString_delete(
-	/*! \em \b this pointer. */
+	/*! [in] The \em \b this pointer. */
 	UpnpString *p);
 
 
@@ -57,7 +57,7 @@ EXPORT_SPEC void UpnpString_delete(
  * \return A pointer to a new allocated copy of the original object.
  */
 EXPORT_SPEC UpnpString *UpnpString_dup(
-	/*! \em \b this pointer. */
+	/*! [in] The \em \b this pointer. */
 	const UpnpString *p);
 
 
@@ -65,9 +65,9 @@ EXPORT_SPEC UpnpString *UpnpString_dup(
  * \brief Assignment operator.
  */
 EXPORT_SPEC void UpnpString_assign(
-	/*! \em \b this pointer. */
+	/*! [in] The \em \b this pointer. */
 	UpnpString *p,
-	/*! Pointer to the right hand side object. */
+	/*! [in] The \em \b that pointer. */
 	const UpnpString *q);
 
 
@@ -77,7 +77,7 @@ EXPORT_SPEC void UpnpString_assign(
  * \return The length of the string.
  * */
 EXPORT_SPEC int UpnpString_get_Length(
-	/*! \em \b this pointer. */
+	/*! [in] The \em \b this pointer. */
 	const UpnpString *p);
 
 
@@ -87,7 +87,7 @@ EXPORT_SPEC int UpnpString_get_Length(
  * \return The pointer to char.
  */
 EXPORT_SPEC const char *UpnpString_get_String(
-	/*! \em \b this pointer. */
+	/*! [in] The \em \b this pointer. */
 	const UpnpString *p);
 
 
@@ -95,9 +95,9 @@ EXPORT_SPEC const char *UpnpString_get_String(
  * \brief Sets the string from a pointer to char.
  */
 EXPORT_SPEC void UpnpString_set_String(
-	/*! \em \b this pointer. */
+	/*! [in] The \em \b this pointer. */
 	UpnpString *p,
-	/*! (char *) to copy from. */
+	/*! [in] (char *) to copy from. */
 	const char *s);
 
 
@@ -105,9 +105,9 @@ EXPORT_SPEC void UpnpString_set_String(
  * \brief Sets the string from a pointer to char using a maximum of N chars.
  */
 EXPORT_SPEC void UpnpString_set_StringN(
-	/*! \em \b this pointer. */
+	/*! [in] The \em \b this pointer. */
 	UpnpString *p,
-	/*! (char *) to copy from. */
+	/*! [in] (char *) to copy from. */
 	const char *s,
 	/*! Maximum number of chars to copy.*/
 	int n);
@@ -117,7 +117,7 @@ EXPORT_SPEC void UpnpString_set_StringN(
  * \brief Clears the string, sets its size to zero.
  */
 EXPORT_SPEC void UpnpString_clear(
-	/*! \em \b this pointer. */
+	/*! [in] The \em \b this pointer. */
 	UpnpString *p);
 
 

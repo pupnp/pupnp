@@ -6,7 +6,6 @@
  * \brief UpnpStateVarComplete object implementation.
  *
  * \author Marcelo Roberto Jimenez
- *
  */
 
 
@@ -75,13 +74,13 @@ UpnpStateVarComplete *UpnpStateVarComplete_dup(const UpnpStateVarComplete *p)
 }
 
 
-void UpnpStateVarComplete_assign(UpnpStateVarComplete *q, const UpnpStateVarComplete *p)
+void UpnpStateVarComplete_assign(UpnpStateVarComplete *p, const UpnpStateVarComplete *q)
 {
-	if (q != p) {
-		UpnpStateVarComplete_set_ErrCode(q, UpnpStateVarComplete_get_ErrCode(p));
-		UpnpStateVarComplete_set_CtrlUrl(q, UpnpStateVarComplete_get_CtrlUrl(p));
-		UpnpStateVarComplete_set_StateVarName(q, UpnpStateVarComplete_get_StateVarName(p));
-		UpnpStateVarComplete_set_CurrentVal(q, UpnpStateVarComplete_get_CurrentVal(p));
+	if (p != q) {
+		UpnpStateVarComplete_set_ErrCode(p, UpnpStateVarComplete_get_ErrCode(q));
+		UpnpStateVarComplete_set_CtrlUrl(p, UpnpStateVarComplete_get_CtrlUrl(q));
+		UpnpStateVarComplete_set_StateVarName(p, UpnpStateVarComplete_get_StateVarName(q));
+		UpnpStateVarComplete_set_CurrentVal(p, UpnpStateVarComplete_get_CurrentVal(q));
 	}
 }
 

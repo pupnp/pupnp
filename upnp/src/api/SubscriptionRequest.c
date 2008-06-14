@@ -6,7 +6,6 @@
  * \brief UpnpSubscriptionRequest object implementation.
  *
  * \author Marcelo Roberto Jimenez
- *
  */
 
 
@@ -67,12 +66,12 @@ UpnpSubscriptionRequest *UpnpSubscriptionRequest_dup(const UpnpSubscriptionReque
 }
 
 
-void UpnpSubscriptionRequest_assign(UpnpSubscriptionRequest *q, const UpnpSubscriptionRequest *p)
+void UpnpSubscriptionRequest_assign(UpnpSubscriptionRequest *p, const UpnpSubscriptionRequest *q)
 {
-	if (q != p) {
-		UpnpSubscriptionRequest_set_ServiceId(q, UpnpSubscriptionRequest_get_ServiceId(p));
-		UpnpSubscriptionRequest_set_UDN(q, UpnpSubscriptionRequest_get_UDN(p));
-		UpnpSubscriptionRequest_set_SID(q, UpnpSubscriptionRequest_get_SID(p));
+	if (p != q) {
+		UpnpSubscriptionRequest_set_ServiceId(p, UpnpSubscriptionRequest_get_ServiceId(q));
+		UpnpSubscriptionRequest_set_UDN(p, UpnpSubscriptionRequest_get_UDN(q));
+		UpnpSubscriptionRequest_set_SID(p, UpnpSubscriptionRequest_get_SID(q));
 	}
 }
 

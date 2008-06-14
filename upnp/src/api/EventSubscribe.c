@@ -6,7 +6,6 @@
  * \brief UpnpEventSubscribe object implementation.
  *
  * \author Marcelo Roberto Jimenez
- *
  */
 
 
@@ -70,13 +69,13 @@ UpnpEventSubscribe *UpnpEventSubscribe_dup(const UpnpEventSubscribe *p)
 }
 
 
-void UpnpEventSubscribe_assign(UpnpEventSubscribe *q, const UpnpEventSubscribe *p)
+void UpnpEventSubscribe_assign(UpnpEventSubscribe *p, const UpnpEventSubscribe *q)
 {
-	if (q != p) {
-		UpnpEventSubscribe_set_ErrCode(q, UpnpEventSubscribe_get_ErrCode(p));
-		UpnpEventSubscribe_set_TimeOut(q, UpnpEventSubscribe_get_TimeOut(p));
-		UpnpEventSubscribe_set_SID(q, UpnpEventSubscribe_get_SID(p));
-		UpnpEventSubscribe_set_PublisherUrl(q, UpnpEventSubscribe_get_PublisherUrl(p));
+	if (p != q) {
+		UpnpEventSubscribe_set_ErrCode(p, UpnpEventSubscribe_get_ErrCode(q));
+		UpnpEventSubscribe_set_TimeOut(p, UpnpEventSubscribe_get_TimeOut(q));
+		UpnpEventSubscribe_set_SID(p, UpnpEventSubscribe_get_SID(q));
+		UpnpEventSubscribe_set_PublisherUrl(p, UpnpEventSubscribe_get_PublisherUrl(q));
 	}
 }
 

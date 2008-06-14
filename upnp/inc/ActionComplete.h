@@ -10,8 +10,13 @@
  * \brief UpnpActionComplete object declararion.
  *
  * \author Marcelo Roberto Jimenez
- *
  */
+
+
+/*!
+ * \brief The type of an UpnpActionComplete object.
+ */
+typedef struct s_UpnpActionComplete UpnpActionComplete;
 
 
 #include "ixml.h"       /* for IXML_Document */
@@ -22,12 +27,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
-
-/*!
- * \brief The type of an UpnpActionComplete object.
- */
-typedef struct s_UpnpActionComplete UpnpActionComplete;
 
 
 /*!
@@ -59,9 +58,9 @@ EXPORT_SPEC UpnpActionComplete *UpnpActionComplete_dup(
  */
 EXPORT_SPEC void UpnpActionComplete_assign(
 	/*! [in] \b this pointer. */
-	UpnpActionComplete *q,
+	UpnpActionComplete *p,
 	/*! [in] \b that pointer. */
-	const UpnpActionComplete *p);
+	const UpnpActionComplete *q);
 
 
 /*!
