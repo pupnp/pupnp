@@ -669,9 +669,8 @@ static int get_miniserver_sockets(
 	} else {
 		if (listenfd4 != INVALID_SOCKET) {
 			do {
-				serverAddr4->sin_port = htons(listen_port4++ );
-				sockError = bind(listenfd4, (struct sockaddr *)&__ss_v4,
-					sizeof(__ss_v4));
+				serverAddr4->sin_port = htons(listen_port4++);
+				sockError = bind(listenfd4, (struct sockaddr *)&__ss_v4, sizeof(__ss_v4));
 				if (sockError == -1) {
 #ifdef WIN32
 					errCode = WSAGetLastError();
@@ -701,9 +700,8 @@ static int get_miniserver_sockets(
 
 		if (listenfd6 != INVALID_SOCKET) {
 			do {
-				serverAddr4->sin_port = htons(listen_port6++);
-				sockError = bind(listenfd6, (struct sockaddr *)&__ss_v4,
-					sizeof(__ss_v4));
+				serverAddr6->sin6_port = htons(listen_port6++);
+				sockError = bind(listenfd6, (struct sockaddr *)&__ss_v6, sizeof(__ss_v6));
 				if (sockError == -1) {
 #ifdef WIN32
 					errCode = WSAGetLastError();
