@@ -2,6 +2,10 @@
 Version 1.8.0
 *******************************************************************************
 
+2008-06-30 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added an m4 macro to deal with finding libupnp in the users'
+	configure script.
+
 2008-06-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Nicholas Kraft's patch to fix some IPv6 copy/paste issues. He
 	reported to be getting infinite loops with the svn code.
