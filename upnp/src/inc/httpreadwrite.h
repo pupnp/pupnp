@@ -81,7 +81,7 @@ int http_FixUrl( IN uri_type* url, OUT uri_type* fixed_url );
  *	 UPNP_E_INVALID_URL
  * 	 UPNP_E_SUCCESS
  ************************************************************************/
-int http_FixStrUrl( IN char* urlstr, IN int urlstrlen, OUT uri_type* fixed_url );
+int http_FixStrUrl( IN const char* urlstr, IN int urlstrlen, OUT uri_type* fixed_url );
 
 
 /************************************************************************

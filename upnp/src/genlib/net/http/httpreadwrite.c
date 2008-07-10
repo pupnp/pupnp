@@ -1,33 +1,34 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
+
 
 /************************************************************************
 * Purpose: This file defines the functionality making use of the http 
@@ -35,10 +36,27 @@
 * messages
 ************************************************************************/
 
+
 #include "config.h"
+
+
+#include "httpreadwrite.h"
+
+
+#include "unixutil.h"
+#include "upnp.h"
+#include "upnpapi.h"
+#include "membuffer.h"
+#include "uri.h"
+#include "statcodes.h"
+#include "sock.h"
+#include "webserver.h"
+
 
 #include <assert.h>
 #include <stdarg.h>
+
+
 #ifndef UPNP_USE_BCBPP
 	#ifndef UPNP_USE_MSVCPP
 		#include <inttypes.h>
@@ -46,7 +64,11 @@
 	#endif
 #endif
 
-#ifndef WIN32
+
+#ifdef WIN32
+	#include <winsock2.h>
+	#include <malloc.h>
+#else
 	#include <arpa/inet.h>
 	#include <fcntl.h>
 	#include <netinet/in.h>
@@ -56,19 +78,7 @@
 	#include <sys/wait.h>
 	#include <unistd.h>
 	#include <sys/utsname.h>
-#else
-	#include <winsock2.h>
-	#include <malloc.h>
 #endif
-#include "unixutil.h"
-#include "upnp.h"
-#include "upnpapi.h"
-#include "membuffer.h"
-#include "uri.h"
-#include "statcodes.h"
-#include "httpreadwrite.h"
-#include "sock.h"
-#include "webserver.h"
 
 
 /* 
@@ -126,9 +136,9 @@ http_FixUrl( IN uri_type * url,
  * Function: http_FixStrUrl
  *
  * Parameters:
- *	IN char* urlstr ; 		Character string as a URL
- *	IN int urlstrlen ; 		Length of the character string
- *	OUT uri_type* fixed_url	;	Fixed and corrected URL
+ *	IN const char* urlstr;		Character string as a URL
+ *	IN int urlstrlen;		Length of the character string
+ *	OUT uri_type* fixed_url;	Fixed and corrected URL
  *
  * Description:
  *	Parses URL and then validates URL
@@ -138,7 +148,7 @@ http_FixUrl( IN uri_type * url,
  * 	 UPNP_E_SUCCESS
  ************************************************************************/
 int
-http_FixStrUrl( IN char *urlstr,
+http_FixStrUrl( IN const char *urlstr,
                 IN int urlstrlen,
                 OUT uri_type * fixed_url )
 {
@@ -195,8 +205,12 @@ http_Connect( IN uri_type * destination_url,
 }
 
 
-/************************************************************************
- * Function: http_RecvMessage
+/*!
+ * \brief Get the data on the socket and take actions based on the read data to
+ * modify the parser objects buffer.
+ *
+ * If an error is reported while parsing the data, the error code is passed in
+ * the http_errr_code parameter.
  *
  * Parameters:
  *	IN SOCKINFO *info;			Socket information object
@@ -205,81 +219,96 @@ http_Connect( IN uri_type * destination_url,
  *	IN OUT int* timeout_secs;		time out
  *	OUT int* http_error_code;		HTTP error code returned
  *
- * Description:
- *	Get the data on the socket and take actions based on the read data
- *	to modify the parser objects buffer. If an error is reported while
- *	parsing the data, the error code is passed in the http_errr_code
- *	parameter
- *
- * Returns:
- *	 UPNP_E_BAD_HTTPMSG
+ * \return
  * 	 UPNP_E_SUCCESS
- ************************************************************************/
-int
-http_RecvMessage( IN SOCKINFO * info,
-                  OUT http_parser_t * parser,
-                  IN http_method_t request_method,
-                  IN OUT int *timeout_secs,
-                  OUT int *http_error_code )
+ *	 UPNP_E_BAD_HTTPMSG
+ */
+int http_RecvMessage(
+	IN SOCKINFO *info,
+	OUT http_parser_t *parser,
+	IN http_method_t request_method,
+	IN OUT int *timeout_secs,
+	OUT int *http_error_code)
 {
-    parse_status_t status;
-    int num_read;
-    xboolean ok_on_close = FALSE;
-    char buf[2 * 1024];
+	int ret = UPNP_E_SUCCESS;
+	int line = 0;
+	parse_status_t status;
+	int num_read;
+	xboolean ok_on_close = FALSE;
+	char buf[2 * 1024];
 
-    if( request_method == HTTPMETHOD_UNKNOWN ) {
-        parser_request_init( parser );
-    } else {
-        parser_response_init( parser, request_method );
-    }
+	if (request_method == HTTPMETHOD_UNKNOWN) {
+		parser_request_init(parser);
+	} else {
+		parser_response_init(parser, request_method);
+	}
 
-    while( TRUE ) {
-        num_read = sock_read( info, buf, sizeof( buf ), timeout_secs );
-        if( num_read > 0 ) {
-            // got data
-            status = parser_append( parser, buf, num_read );
+	while (TRUE) {
+		num_read = sock_read(info, buf, sizeof buf, timeout_secs);
+		if (num_read > 0) {
+			// got data
+			status = parser_append(parser, buf, num_read);
+			if (status == PARSE_SUCCESS) {
+				UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+					"<<< (RECVD) <<<\n%s\n-----------------\n",
+					parser->msg.msg.buf );
+				print_http_headers( &parser->msg );
+				if (parser->content_length > (unsigned int)g_maxContentLength) {
+					*http_error_code = HTTP_REQ_ENTITY_TOO_LARGE;
+					line = __LINE__;
+					ret = UPNP_E_OUTOF_BOUNDS;
+					goto ExitFunction;
+				}
+				line = __LINE__;
+				ret = 0;
+				goto ExitFunction;
+			} else if (status == PARSE_FAILURE) {
+				*http_error_code = parser->http_error_code;
+				line = __LINE__;
+				ret = UPNP_E_BAD_HTTPMSG;
+				goto ExitFunction;
+			} else if (status == PARSE_INCOMPLETE_ENTITY) {
+				// read until close
+				ok_on_close = TRUE;
+			} else if (status == PARSE_CONTINUE_1) {
+				// Web post request.
+				line = __LINE__;
+				ret = PARSE_SUCCESS;
+				goto ExitFunction;
+			}
+		} else if (num_read == 0) {
+			if (ok_on_close) {
+				UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+					"<<< (RECVD) <<<\n%s\n-----------------\n",
+					parser->msg.msg.buf );
+				print_http_headers(&parser->msg);
+				line = __LINE__;
+				ret = 0;
+				goto ExitFunction;
+			} else {
+				// partial msg
+				*http_error_code = HTTP_BAD_REQUEST;    // or response
+				line = __LINE__;
+				ret = UPNP_E_BAD_HTTPMSG;
+				goto ExitFunction;
+			}
+		} else {
+			*http_error_code = parser->http_error_code;
+			line = __LINE__;
+			ret = num_read;
+			goto ExitFunction;
+		}
+	}
 
-            if( status == PARSE_SUCCESS ) {
-                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                    "<<< (RECVD) <<<\n%s\n-----------------\n",
-                    parser->msg.msg.buf );
-                    print_http_headers( &parser->msg );
+ExitFunction:
+	if (ret != UPNP_E_SUCCESS) {
+		UpnpPrintf(UPNP_ALL, HTTP, __FILE__, line,
+			"(http_RecvMessage): Error %d, http_error_code = %d.\n",
+			ret,
+			*http_error_code);
+	}
 
-                if( parser->content_length >
-                    ( unsigned int )g_maxContentLength ) {
-                    *http_error_code = HTTP_REQ_ENTITY_TOO_LARGE;
-                    return UPNP_E_OUTOF_BOUNDS;
-                }
-
-                return 0;
-            } else if( status == PARSE_FAILURE ) {
-                *http_error_code = parser->http_error_code;
-                return UPNP_E_BAD_HTTPMSG;
-            } else if( status == PARSE_INCOMPLETE_ENTITY ) {
-                // read until close
-                ok_on_close = TRUE;
-            } else if( status == PARSE_CONTINUE_1 ) //Web post request. murari
-            {
-                return PARSE_SUCCESS;
-            }
-        } else if( num_read == 0 ) {
-            if( ok_on_close ) {
-                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                    "<<< (RECVD) <<<\n%s\n-----------------\n",
-                    parser->msg.msg.buf );
-                    print_http_headers( &parser->msg );
-
-                    return 0;
-            } else {
-                // partial msg
-                *http_error_code = HTTP_BAD_REQUEST;    // or response
-                return UPNP_E_BAD_HTTPMSG;
-            }
-        } else {
-            *http_error_code = parser->http_error_code;
-            return num_read;
-        }
-    }
+	return ret;
 }
 
 
@@ -642,8 +671,9 @@ http_Download( IN const char *url_str,
         return ret_code;
     }
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-        "HTTP Buffer:\n %s\n----------END--------\n", request.buf );
+    UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "HTTP Buffer:\n%s\n" "----------END--------\n",
+        request.buf);
     // get doc msg
     ret_code =
         http_RequestAndResponse( &url, request.buf, request.length,
@@ -813,9 +843,9 @@ MakePostMessage( const char *url_str,
         return ret_code;
     }
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-        "HTTP Buffer:\n %s\n" "----------END--------\n",
-        request->buf );
+    UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "HTTP Buffer:\n%s\n" "----------END--------\n",
+        request->buf);
 
     return UPNP_E_SUCCESS;
 }
@@ -1132,9 +1162,9 @@ MakeGetMessage( const char *url_str,
         return ret_code;
     }
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-        "HTTP Buffer:\n %s\n" "----------END--------\n",
-        request->buf );
+    UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "HTTP Buffer:\n%s\n" "----------END--------\n",
+        request->buf);
 
     return UPNP_E_SUCCESS;
 }
@@ -2138,9 +2168,9 @@ MakeGetMessageEx( const char *url_str,
         }
     } while( 0 );
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-        "HTTP Buffer:\n %s\n" "----------END--------\n",
-        request->buf );
+    UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
+        "HTTP Buffer:\n%s\n" "----------END--------\n",
+        request->buf);
 
     return errCode;
 }
