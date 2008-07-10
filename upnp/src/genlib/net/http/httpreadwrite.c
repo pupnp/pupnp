@@ -205,8 +205,12 @@ http_Connect( IN uri_type * destination_url,
 }
 
 
-/************************************************************************
- * Function: http_RecvMessage
+/*!
+ * \brief Get the data on the socket and take actions based on the read data to
+ * modify the parser objects buffer.
+ *
+ * If an error is reported while parsing the data, the error code is passed in
+ * the http_errr_code parameter.
  *
  * Parameters:
  *	IN SOCKINFO *info;			Socket information object
@@ -215,81 +219,96 @@ http_Connect( IN uri_type * destination_url,
  *	IN OUT int* timeout_secs;		time out
  *	OUT int* http_error_code;		HTTP error code returned
  *
- * Description:
- *	Get the data on the socket and take actions based on the read data
- *	to modify the parser objects buffer. If an error is reported while
- *	parsing the data, the error code is passed in the http_errr_code
- *	parameter
- *
- * Returns:
- *	 UPNP_E_BAD_HTTPMSG
+ * \return
  * 	 UPNP_E_SUCCESS
- ************************************************************************/
-int
-http_RecvMessage( IN SOCKINFO * info,
-                  OUT http_parser_t * parser,
-                  IN http_method_t request_method,
-                  IN OUT int *timeout_secs,
-                  OUT int *http_error_code )
+ *	 UPNP_E_BAD_HTTPMSG
+ */
+int http_RecvMessage(
+	IN SOCKINFO *info,
+	OUT http_parser_t *parser,
+	IN http_method_t request_method,
+	IN OUT int *timeout_secs,
+	OUT int *http_error_code)
 {
-    parse_status_t status;
-    int num_read;
-    xboolean ok_on_close = FALSE;
-    char buf[2 * 1024];
+	int ret = UPNP_E_SUCCESS;
+	int line = 0;
+	parse_status_t status;
+	int num_read;
+	xboolean ok_on_close = FALSE;
+	char buf[2 * 1024];
 
-    if( request_method == HTTPMETHOD_UNKNOWN ) {
-        parser_request_init( parser );
-    } else {
-        parser_response_init( parser, request_method );
-    }
+	if (request_method == HTTPMETHOD_UNKNOWN) {
+		parser_request_init(parser);
+	} else {
+		parser_response_init(parser, request_method);
+	}
 
-    while( TRUE ) {
-        num_read = sock_read( info, buf, sizeof( buf ), timeout_secs );
-        if( num_read > 0 ) {
-            // got data
-            status = parser_append( parser, buf, num_read );
+	while (TRUE) {
+		num_read = sock_read(info, buf, sizeof buf, timeout_secs);
+		if (num_read > 0) {
+			// got data
+			status = parser_append(parser, buf, num_read);
+			if (status == PARSE_SUCCESS) {
+				UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+					"<<< (RECVD) <<<\n%s\n-----------------\n",
+					parser->msg.msg.buf );
+				print_http_headers( &parser->msg );
+				if (parser->content_length > (unsigned int)g_maxContentLength) {
+					*http_error_code = HTTP_REQ_ENTITY_TOO_LARGE;
+					line = __LINE__;
+					ret = UPNP_E_OUTOF_BOUNDS;
+					goto ExitFunction;
+				}
+				line = __LINE__;
+				ret = 0;
+				goto ExitFunction;
+			} else if (status == PARSE_FAILURE) {
+				*http_error_code = parser->http_error_code;
+				line = __LINE__;
+				ret = UPNP_E_BAD_HTTPMSG;
+				goto ExitFunction;
+			} else if (status == PARSE_INCOMPLETE_ENTITY) {
+				// read until close
+				ok_on_close = TRUE;
+			} else if (status == PARSE_CONTINUE_1) {
+				// Web post request.
+				line = __LINE__;
+				ret = PARSE_SUCCESS;
+				goto ExitFunction;
+			}
+		} else if (num_read == 0) {
+			if (ok_on_close) {
+				UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+					"<<< (RECVD) <<<\n%s\n-----------------\n",
+					parser->msg.msg.buf );
+				print_http_headers(&parser->msg);
+				line = __LINE__;
+				ret = 0;
+				goto ExitFunction;
+			} else {
+				// partial msg
+				*http_error_code = HTTP_BAD_REQUEST;    // or response
+				line = __LINE__;
+				ret = UPNP_E_BAD_HTTPMSG;
+				goto ExitFunction;
+			}
+		} else {
+			*http_error_code = parser->http_error_code;
+			line = __LINE__;
+			ret = num_read;
+			goto ExitFunction;
+		}
+	}
 
-            if( status == PARSE_SUCCESS ) {
-                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                    "<<< (RECVD) <<<\n%s\n-----------------\n",
-                    parser->msg.msg.buf );
-                    print_http_headers( &parser->msg );
+ExitFunction:
+	if (ret != UPNP_E_SUCCESS) {
+		UpnpPrintf(UPNP_ALL, HTTP, __FILE__, line,
+			"(http_RecvMessage): Error %d, http_error_code = %d.\n",
+			ret,
+			*http_error_code);
+	}
 
-                if( parser->content_length >
-                    ( unsigned int )g_maxContentLength ) {
-                    *http_error_code = HTTP_REQ_ENTITY_TOO_LARGE;
-                    return UPNP_E_OUTOF_BOUNDS;
-                }
-
-                return 0;
-            } else if( status == PARSE_FAILURE ) {
-                *http_error_code = parser->http_error_code;
-                return UPNP_E_BAD_HTTPMSG;
-            } else if( status == PARSE_INCOMPLETE_ENTITY ) {
-                // read until close
-                ok_on_close = TRUE;
-            } else if( status == PARSE_CONTINUE_1 ) //Web post request. murari
-            {
-                return PARSE_SUCCESS;
-            }
-        } else if( num_read == 0 ) {
-            if( ok_on_close ) {
-                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                    "<<< (RECVD) <<<\n%s\n-----------------\n",
-                    parser->msg.msg.buf );
-                    print_http_headers( &parser->msg );
-
-                    return 0;
-            } else {
-                // partial msg
-                *http_error_code = HTTP_BAD_REQUEST;    // or response
-                return UPNP_E_BAD_HTTPMSG;
-            }
-        } else {
-            *http_error_code = parser->http_error_code;
-            return num_read;
-        }
-    }
+	return ret;
 }
 
 
