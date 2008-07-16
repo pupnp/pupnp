@@ -133,7 +133,6 @@ int Parser_LoadDocument(IXML_Document **retDoc, const char * xmlFile, BOOL file)
 int Parser_setNodePrefixAndLocalName(IXML_Node *newIXML_NodeIXML_Attr);
 
 
-void ixmlAttr_free(IXML_Attr *attrNode);
 void ixmlAttr_init(IXML_Attr *attrNode);
 
 /*!
