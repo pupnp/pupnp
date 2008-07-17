@@ -24,7 +24,9 @@
 	/*
 	 * EXPORT_SPEC
 	 */
-	#ifndef UPNP_STATIC_LIB
+	#ifdef UPNP_STATIC_LIB
+		#define EXPORT_SPEC
+	#else /* UPNP_STATIC_LIB */
 		#ifdef LIBUPNP_EXPORTS
 			/*! set up declspec for dll export to make functions
 			 * visible to library users */
@@ -32,8 +34,6 @@
 		#else /* LIBUPNP_EXPORTS */
 			#define EXPORT_SPEC __declspec(dllimport)
 		#endif /* LIBUPNP_EXPORTS */
-	#else /* UPNP_STATIC_LIB */
-		#define EXPORT_SPEC
 	#endif /* UPNP_STATIC_LIB */
 
 
