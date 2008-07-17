@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="ixml"
 	ProjectGUID="{9C2C266D-35A3-465F-A297-0E21D54E5C89}"
 	RootNamespace="ixml"
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\ixml\inc;..\..\ixml\src\inc;..\inc"
+				AdditionalIncludeDirectories="..\..\ixml\inc;..\..\ixml\src\inc;..\inc;..\..\upnp\inc"
 				PreprocessorDefinitions="DEBUG;WIN32;_USRDLL;LIBUPNP_EXPORTS;UPNP_USE_MSVCPP;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
