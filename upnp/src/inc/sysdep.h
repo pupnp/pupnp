@@ -18,6 +18,10 @@
  */
 
 
+#ifndef SYSDEP_H
+#define SYSDEP_H
+
+
 #include "ithread.h"
 
 
@@ -42,12 +46,15 @@
    your system's clock */
 #define UUIDS_PER_TICK 1024
 
+
 /* Set the following to a call to acquire a system wide global lock
  */
 extern ithread_mutex_t gUUIDMutex;
 
+
 #define UUIDLock()      ithread_mutex_lock(&gUUIDMutex)
 #define UUIDUnlock()    ithread_mutex_unlock(&gUUIDMutex)
+
 
 typedef unsigned long   unsigned32;
 typedef unsigned short  unsigned16;
@@ -70,11 +77,14 @@ typedef unsigned64_t uuid_time_t;
 
 
 typedef struct {
-    char nodeID[6];
+	char nodeID[6];
 } uuid_node_t;
 
 
 void get_ieee_node_identifier(uuid_node_t *node);
 void get_system_time(uuid_time_t *uuid_time);
 void get_random_info(char seed[16]);
+
+
+#endif /* SYSDEP_H */
 

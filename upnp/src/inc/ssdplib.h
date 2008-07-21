@@ -36,6 +36,7 @@
 #include "httpparser.h"
 #include "httpreadwrite.h"
 #include "miniserver.h"
+#include "UpnpInet.h"
 
 
 #include <sys/types.h>
@@ -46,11 +47,9 @@
 
 
 #ifdef WIN32
-	#include <winsock2.h>
 #else
 	#include <syslog.h>
 	#include <sys/socket.h>
-	#include <netinet/in.h>
 	#include <netinet/in_systm.h>
 	#include <netinet/ip.h>
 	#include <netinet/ip_icmp.h>

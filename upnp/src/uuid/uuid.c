@@ -23,21 +23,16 @@
 #include "config.h"
 
 
-#include "sysdep.h"
 #include "uuid.h"
+
+
+#include "UpnpInet.h"
 
 
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-
-#ifdef WIN32
-	#include <winsock2.h>
-#else
-	#include <netinet/in.h>
-#endif
 
 
 /*

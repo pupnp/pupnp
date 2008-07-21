@@ -18,14 +18,16 @@
  */
 
 #include "config.h"
-#ifdef WIN32
-	#include <winsock2.h>
-#else /* WIN32 */
-	#include <unistd.h>
-#endif /* WIN32 */
+
+
+#include "sysdep.h"
+
+
+#include "UpnpInet.h"
+
+
 #include <string.h>
 #include <stdio.h>
-#include "sysdep.h"
 
 /*-----------------------------------------------------------------------------*/
 /*

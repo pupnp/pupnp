@@ -50,6 +50,7 @@
 #include "uri.h"
 #include "statcodes.h"
 #include "sock.h"
+#include "UpnpInet.h"
 #include "webserver.h"
 
 
@@ -66,12 +67,10 @@
 
 
 #ifdef WIN32
-	#include <winsock2.h>
 	#include <malloc.h>
 #else
 	#include <arpa/inet.h>
 	#include <fcntl.h>
-	#include <netinet/in.h>
 	#include <sys/types.h>
 	#include <sys/socket.h>
 	#include <sys/time.h>

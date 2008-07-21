@@ -37,6 +37,7 @@
 #include "unixutil.h"
 #include "upnp.h"
 #include "upnpdebug.h"
+#include "UpnpInet.h"
 #include "uri.h"
 #include "urlconfig.h"
 #include "util.h"
@@ -48,10 +49,8 @@
 
 
 #ifdef WIN32
-	#include <winsock2.h>
 #else
 	#include <arpa/inet.h>
-	#include <netinet/in.h>
 	#include <sys/types.h>
 	#include <sys/socket.h>
 #endif

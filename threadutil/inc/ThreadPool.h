@@ -42,6 +42,7 @@
 #include "FreeList.h"
 #include "ithread.h"
 #include "LinkedList.h"
+#include "UpnpInet.h"
 #include "UpnpGlobal.h" /* for UPNP_INLINE, EXPORT_SPEC */
 
 
@@ -50,7 +51,6 @@
 
 #ifdef WIN32
 	#include <time.h>
-	#include <winsock2.h>
 	struct timezone
 	{
 		int  tz_minuteswest; /* minutes W of Greenwich */
