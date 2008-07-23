@@ -82,11 +82,14 @@
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1
 
+/* Define to 1 if you have the <ws2tcpip.h> header file. */
+/* #undef HAVE_WS2TCPIP_H */
+
 /* Define to 1 to prevent compilation of assert() */
-#define NDEBUG 1
+/* #undef NDEBUG */
 
 /* Define to 1 to prevent some debug code */
-#define NO_DEBUG 1
+/* #undef NO_DEBUG */
 
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 /* #undef NO_MINUS_C_MINUS_O */
@@ -101,13 +104,13 @@
 #define PACKAGE_NAME "libupnp"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libupnp 1.4.7"
+#define PACKAGE_STRING "libupnp 1.8.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libupnp"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.4.7"
+#define PACKAGE_VERSION "1.8.0"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -120,7 +123,7 @@
 #define UPNP_HAVE_CLIENT 1
 
 /* see upnpconfig.h */
-/* #undef UPNP_HAVE_DEBUG */
+#define UPNP_HAVE_DEBUG 1
 
 /* see upnpconfig.h */
 #define UPNP_HAVE_DEVICE 1
@@ -131,20 +134,23 @@
 /* see upnpconfig.h */
 #define UPNP_HAVE_WEBSERVER 1
 
+/* Do not use pthread_rwlock_t */
+#define UPNP_USE_RWLOCK 1
+
 /* see upnpconfig.h */
 #define UPNP_VERSION_MAJOR 1
 
 /* see upnpconfig.h */
-#define UPNP_VERSION_MINOR 4
+#define UPNP_VERSION_MINOR 8
 
 /* see upnpconfig.h */
-#define UPNP_VERSION_PATCH 7
+#define UPNP_VERSION_PATCH 0
 
 /* see upnpconfig.h */
-#define UPNP_VERSION_STRING "1.4.7"
+#define UPNP_VERSION_STRING "1.8.0"
 
 /* Version number of package */
-#define VERSION "1.4.7"
+#define VERSION "1.8.0"
 
 /* File Offset size */
 #define _FILE_OFFSET_BITS 64
@@ -164,5 +170,5 @@
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
 
-/* Substitute for socklen_t */
+/* Type for storing the length of struct sockaddr */
 /* #undef socklen_t */
