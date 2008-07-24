@@ -6,10 +6,6 @@ Version 1.8.0
 	* Andre Sodermans (wienerschnitzel) patch for building libupnp under
 	windows systems with VC9. This one fixes a missing include.
 
-2008-06-30 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-	* Added an m4 macro to deal with finding libupnp in the users'
-	configure script.
-
 2008-06-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Nicholas Kraft's patch to fix some IPv6 copy/paste issues. He
 	reported to be getting infinite loops with the svn code.
@@ -173,6 +169,21 @@ Version 1.8.0
 *******************************************************************************
 Version 1.6.7
 *******************************************************************************
+
+2008-07-24 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 2026431 ] pupnp does not build on GNU/KfreeBSD.
+	Submitted By: Nick Leverton - leveret
+	Gnu/KFreeBSD is one of the Debian architectures, it includes a FreeBSD
+	kernel with GNU userspace (glibc etc). The Gnu/KfreeBSD developers
+	provided the attached patch to test the appropriate #define and allow pupnp
+	to build in their environment, and asked me to forward it to you.
+
+	Since the test is a simple check for defined(__GLIBC__), this would
+	presumably also help with other ports of GNU libc to non-Linux kernels.
+
+2008-06-30 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added an m4 macro to deal with finding libupnp in the users'
+	configure script.
 
 2008-04-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fix in function SetSeed() in threadutil/src/ThreadPool.c for CYGWIN
