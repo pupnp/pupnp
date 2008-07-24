@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="threadutil"
 	ProjectGUID="{1D3EEF7A-D248-48C0-B6B5-ECA229FE4B3D}"
 	RootNamespace="threadutil"
@@ -20,7 +20,7 @@
 			OutputDirectory=".\out.vc9.$(ConfigurationName)\$(ProjectName)"
 			IntermediateDirectory=".\out.vc9.$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="4"
-			CharacterSet="2"
+			CharacterSet="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,12 +41,13 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\threadutil\inc;..\..\upnp\inc;..\..\ixml\inc;..\..\pthreads\include"
-				PreprocessorDefinitions="WIN32;DEBUG"
+				PreprocessorDefinitions="DEBUG;WIN32;_USRDLL;LIBUPNP_EXPORTS;UPNP_USE_MSVCPP;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -80,10 +81,10 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory=".\out.vc9.$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory=".\out.vc9.$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="1"
-			CharacterSet="2"
+			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -105,10 +106,13 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="..\..\threadutil\inc;..\..\upnp\inc;..\..\ixml\inc;..\..\pthreads\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBUPNP_EXPORTS;PTW32_STATIC_LIB;UPNP_STATIC_LIB;UPNP_USE_MSVCPP;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

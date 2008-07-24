@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="tvcombo"
 	ProjectGUID="{6365804B-22C6-4D5E-91F3-0C052EB55B4F}"
 	RootNamespace="tvcombo"
@@ -47,6 +47,7 @@
 				RuntimeLibrary="3"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -59,8 +60,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\pthreads\lib\pthreadVC2.lib ixml.lib threadutil.lib libupnp.lib"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;;&quot;.\out.vc9.$(ConfigurationName)\ixml&quot;;&quot;.\out.vc9.$(ConfigurationName)\threadutil&quot;;&quot;.\out.vc9.$(ConfigurationName)\libupnp&quot;"
+				AdditionalDependencies="..\..\pthreads\lib\pthreadVC2.lib $(TargetDir)..\libupnp\libupnp.lib"
+				AdditionalLibraryDirectories="&quot;$(TargetDir)..\ixml&quot;;&quot;$(TargetDir)..\threadutil&quot;;&quot;$(TargetDir)..\libupnp&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -88,8 +89,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory=".\out.vc9.$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory=".\out.vc9.$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="1"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -117,6 +118,7 @@
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

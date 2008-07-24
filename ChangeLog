@@ -2,7 +2,7 @@
 Version 1.6.7
 *******************************************************************************
 
-2008-06-30 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+2008-07-24 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 2026431 ] pupnp does not build on GNU/KfreeBSD.
 	Submitted By: Nick Leverton - leveret
 	Gnu/KFreeBSD is one of the Debian architectures, it includes a FreeBSD
@@ -12,6 +12,10 @@ Version 1.6.7
 
 	Since the test is a simple check for defined(__GLIBC__), this would
 	presumably also help with other ports of GNU libc to non-Linux kernels.
+
+2008-07-16 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Andre Sodermans (wienerschnitzel) patch for building libupnp under
+	windows systems with VC9. This one fixes a missing include.
 
 2008-06-30 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added an m4 macro to deal with finding libupnp in the users'
