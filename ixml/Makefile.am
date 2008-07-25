@@ -2,7 +2,7 @@
 #
 # "Makefile.am" for "libupnp/ixml"
 #
-# (C) Copyright 2005 Rémi Turboult <r3mi@users.sourceforge.net>
+# (C) Copyright 2005 Rï¿½mi Turboult <r3mi@users.sourceforge.net>
 #
 
 SUBDIRS 		= doc
@@ -39,9 +39,8 @@ libixml_la_SOURCES	= \
 
 upnpincludedir		= $(includedir)/upnp
 upnpinclude_HEADERS	= \
-			inc/ixml.h 
+			inc/ixml.h \
 			inc/ixmldebug.h
-
 
 check_PROGRAMS          = test_document
 TESTS                   = test/test_document.sh
@@ -55,5 +54,4 @@ dist-hook:
 
 clean-local:
 	@if [ -d bin ] ; then  rm -rf bin ; fi
-
 
