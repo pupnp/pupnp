@@ -172,6 +172,7 @@ test_init_SOURCES = test/test_init.c
 
 EXTRA_DIST = \
 	LICENSE \
+	m4/libupnp.m4 \
 	src/win_dll.c
 
 
