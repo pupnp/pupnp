@@ -34,30 +34,37 @@
  * operations of the Web Server.
  ******************************************************************************/
 
+
 #include "config.h"
+
+
+#include "webserver.h"
+
+
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "ithread.h"
+#include "membuffer.h"
+#include "ssdplib.h"
+#include "statcodes.h"
+#include "strintmap.h"
+#include "unixutil.h"
+#include "upnp.h"
+#include "upnpapi.h"
+#include "util.h"
+
+
 #include <assert.h>
 #include <fcntl.h>
 #ifndef UPNP_USE_BCBPP
     #include <inttypes.h>
     #include <stdint.h>
 #endif
-#include "util.h"
-#include "strintmap.h"
-#include "membuffer.h"
-#include "httpparser.h"
-#include "httpreadwrite.h"
-#include "statcodes.h"
-#include "webserver.h"
-#include "upnp.h"
-#include "upnpapi.h"
-#include "ssdplib.h"
-
 #ifndef WIN32
     #include <unistd.h>
 #endif
 #include <sys/stat.h>
-#include "ithread.h"
-#include "unixutil.h"
+
 
 /*
    Response Types 

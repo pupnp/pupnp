@@ -55,40 +55,8 @@
 #endif
 #include "ixml.h"
 #include "upnpconfig.h"
+#include "UpnpGlobal.h"
 
-
-#ifdef WIN32
-	#ifndef UPNP_STATIC_LIB
-		#ifdef LIBUPNP_EXPORTS
-			/* set up declspec for dll export to make functions visible to library users */
-			#define EXPORT_SPEC __declspec(dllexport)
-		#else
-			#define EXPORT_SPEC __declspec(dllimport)
-		#endif
-	#else
-		#define EXPORT_SPEC
-	#endif
-	#ifdef UPNP_USE_MSVCPP
-		/* define some things the M$ VC++ doesn't know */
-		#define UPNP_INLINE
-		typedef __int64 int64_t;
-		#define PRId64 "I64d"
-		#define PRIzu "lu"
-	#endif
-	#ifdef UPNP_USE_BCBPP
-		/* define some things Borland Builder doesn't know */
-		#define UPNP_INLINE inline
-		typedef __int64 int64_t;
-#warning The Borland C compiler is probably broken on PRId64, please someone provide a proper fix here
-		#define PRId64 "I64d"
-		#define PRIzu "zu"
-	#endif
-#else
-	#define EXPORT_SPEC
-	#define UPNP_INLINE inline
-	/* Invented this macro so that we can live a little longer with MSVC lack of C99. */
-	#define PRIzu "zu"
-#endif
 
 /*
  * Defining this macro here gives some interesting information about unused

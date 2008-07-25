@@ -20,7 +20,8 @@ LDADD = \
 upnpincludedir = $(includedir)/upnp
 upnpinclude_HEADERS = \
 	inc/upnp.h \
-	inc/upnpdebug.h
+	inc/upnpdebug.h \
+	inc/UpnpGlobal.h
 
 nodist_upnpinclude_HEADERS = inc/upnpconfig.h 
 if ENABLE_TOOLS

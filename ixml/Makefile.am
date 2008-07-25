@@ -24,14 +24,23 @@ libixml_la_LDFLAGS	= -version-info $(LT_VERSION_IXML) \
 			  -export-symbols-regex '^ixml.*'
 
 libixml_la_SOURCES	= \
-			src/ixml.c src/node.c src/ixmlparser.c \
-			src/ixmlmembuf.c src/nodeList.c \
-			src/element.c src/attr.c src/document.c \
+			src/attr.c \
+			src/document.c \
+			src/element.c \
+			src/inc/ixmlmembuf.h \
+			src/inc/ixmlparser.h \
+			src/ixml.c \
+			src/ixmldebug.c \
+			src/ixmlparser.c \
+			src/ixmlmembuf.c \
 			src/namedNodeMap.c \
-			src/inc/ixmlmembuf.h src/inc/ixmlparser.h
+			src/node.c \
+			src/nodeList.c
 
 upnpincludedir		= $(includedir)/upnp
-upnpinclude_HEADERS	= inc/ixml.h 
+upnpinclude_HEADERS	= \
+			inc/ixml.h 
+			inc/ixmldebug.h
 
 
 check_PROGRAMS          = test_document
