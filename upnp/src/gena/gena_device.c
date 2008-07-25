@@ -502,7 +502,7 @@ int genaInitNotify(
 	}
 
 	servId_copy = (char *)malloc(strlen(servId) + 1);
-	if( servId_copy == NULL ) {
+	if (servId_copy == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
@@ -911,7 +911,7 @@ int genaNotifyAll(
 	char *servId,
 	char **VarNames,
 	char **VarValues,
-	int var_count )
+	int var_count)
 {
 	int ret = GENA_SUCCESS;
 	int line = 0;
@@ -1413,6 +1413,7 @@ void gena_process_subscription_renewal_request(
         &device_handle, &handle_info ) != HND_DEVICE ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
         membuffer_destroy( &event_url_path );
+        HandleUnlock();
         return;
     }
     service = FindServiceEventURLPath( &handle_info->ServiceTable,

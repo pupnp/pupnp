@@ -476,7 +476,7 @@ int genaUnSubscribe(
 exit_function:
 	UpnpClientSubscription_delete(sub_copy);
 	return return_code;
-	}
+}
 #endif /* INCLUDE_CLIENT_APIS */
 
 

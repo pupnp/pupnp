@@ -38,8 +38,9 @@ libixml_la_SOURCES	= \
 			src/nodeList.c
 
 upnpincludedir		= $(includedir)/upnp
-upnpinclude_HEADERS	= inc/ixml.h \
-			  inc/ixmldebug.h
+upnpinclude_HEADERS	= \
+			inc/ixml.h \
+			inc/ixmldebug.h
 
 check_PROGRAMS          = test_document
 TESTS                   = test/test_document.sh

@@ -30,8 +30,8 @@
  ******************************************************************************/
 
 
-#ifndef SERVICE_TABLE
-#define SERVICE_TABLE
+#ifndef SERVICE_TABLE_H
+#define SERVICE_TABLE_H
 
 
 /*!
