@@ -2355,10 +2355,13 @@ UpnpAcceptSubscription( IN UpnpDevice_Handle Hnd,
         HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
+    /* Now accepts an empty state list, so the code below is commented out */
+#if 0
     if( VarName == NULL || NewVal == NULL || cVariables < 0 ) {
         HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
+#endif
 
     HandleUnlock();
     retVal =
@@ -2431,11 +2434,13 @@ UpnpAcceptSubscriptionExt( IN UpnpDevice_Handle Hnd,
         HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
-
+	/* Now accepts an empty state list, so the code below is commented out */
+#if 0
     if( PropSet == NULL ) {
         HandleUnlock();
         return UPNP_E_INVALID_PARAM;
     }
+#endif
 
     HandleUnlock();
     retVal = genaInitNotifyExt( Hnd, DevID, ServName, PropSet, SubsId );

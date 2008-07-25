@@ -1,140 +1,136 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
-#ifndef _SERVICE_TABLE
-#define _SERVICE_TABLE
+
+#ifndef SERVICE_TABLE_H
+#define SERVICE_TABLE_H
+
+
+/*!
+ * \file
+ */
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 #include "config.h"
 #include "uri.h"
 #include "ixml.h"
-
 #include "upnp.h"
+
+
 #include <stdio.h>
-//#include <malloc.h>
 #include <time.h>
+
 
 #define SID_SIZE  41
 
+
 #ifdef INCLUDE_DEVICE_APIS
 
+
 typedef struct SUBSCRIPTION {
-  Upnp_SID sid;
-  int eventKey;
-  int ToSendEventKey;
-  time_t expireTime;
-  int active;
-  URL_list DeliveryURLs;
-  struct SUBSCRIPTION *next;
+	Upnp_SID sid;
+	int eventKey;
+	int ToSendEventKey;
+	time_t expireTime;
+	int active;
+	URL_list DeliveryURLs;
+	struct SUBSCRIPTION *next;
 } subscription;
 
 
 typedef struct SERVICE_INFO {
-  DOMString	serviceType;
-  DOMString	serviceId;
-  char		*SCPDURL ;
-  char		*controlURL;
-  char		*eventURL;
-  DOMString	UDN;
-  int		active;
-  int		TotalSubscriptions;
-  subscription	*subscriptionList;
-  struct SERVICE_INFO	 *next;
+	DOMString	serviceType;
+	DOMString	serviceId;
+	char		*SCPDURL ;
+	char		*controlURL;
+	char		*eventURL;
+	DOMString	UDN;
+	int		active;
+	int		TotalSubscriptions;
+	subscription	*subscriptionList;
+	struct SERVICE_INFO	 *next;
 } service_info;
 
 
 typedef struct SERVICE_TABLE {
-  DOMString URLBase;
-  service_info *serviceList;
-  service_info *endServiceList;
+	DOMString URLBase;
+	service_info *serviceList;
+	service_info *endServiceList;
 } service_table;
 
 
 /* Functions for Subscriptions */
 
-/************************************************************************
-*	Function :	copy_subscription
-*
-*	Parameters :
-*		subscription *in ;	Source subscription
-*		subscription *out ;	Destination subscription
-*
-*	Description :	Makes a copy of the subscription
-*
-*	Return : int ;
-*		HTTP_SUCCESS - On Sucess
-*
-*	Note :
-************************************************************************/
-int copy_subscription(subscription *in, subscription *out);
 
-/************************************************************************
-*	Function :	RemoveSubscriptionSID
-*
-*	Parameters :
-*		Upnp_SID sid ;	subscription ID
-*		service_info * service ;	service object providing the list of
-*						subscriptions
-*
-*	Description :	Remove the subscription represented by the
-*		const Upnp_SID sid parameter from the service table and update 
-*		the service table.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void RemoveSubscriptionSID(Upnp_SID sid, service_info * service);
+/*!
+ * \brief Makes a copy of the subscription.
+ *
+ * \return HTTP_SUCCESS on Sucess.
+ */
+int copy_subscription(
+	/*! [in] Source subscription. */
+	subscription *in,
+	/*! [in] Destination subscription. */
+	subscription *out);
 
-/************************************************************************
-*	Function :	GetSubscriptionSID
-*
-*	Parameters :
-*		Upnp_SID sid ;	subscription ID
-*		service_info * service ;	service object providing the list of
-*						subscriptions
-*
-*	Description :	Return the subscription from the service table 
-*		that matches const Upnp_SID sid value. 
-*
-*	Return : subscription * - Pointer to the matching subscription 
-*		node;
-*
-*	Note :
-************************************************************************/
-subscription * GetSubscriptionSID(Upnp_SID sid,service_info * service); 
+
+/*
+ * \brief Remove the subscription represented by the const Upnp_SID sid parameter
+ * from the service table and update the service table.
+ */
+void RemoveSubscriptionSID(
+	/*! [in] Subscription ID. */
+	Upnp_SID sid,
+	/*! [in] Service object providing the list of subscriptions. */
+	service_info *service);
+
+
+/*!
+ * \brief Return the subscription from the service table that matches
+ * const Upnp_SID sid value.
+ *
+ * \return Pointer to the matching subscription node.
+ */
+subscription *GetSubscriptionSID(
+	/*! [in] Subscription ID. */
+	const Upnp_SID sid,
+	/*! [in] Service object providing the list of subscriptions. */
+	service_info *service); 
   
+
 //returns a pointer to the subscription with the SID, NULL if not found
 
 subscription * CheckSubscriptionSID(Upnp_SID sid,service_info * service);

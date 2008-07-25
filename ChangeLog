@@ -21,6 +21,53 @@ Version 1.6.7
 	* Added an m4 macro to deal with finding libupnp in the users'
 	configure script.
 
+2008-06-11 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fixed a buffer overflow due to a bug in the calculation of the
+	CONTENT-TYPE header line size, the length was beeing calculated with
+	the wrong string, there was a missing colon.
+
+2008-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 1903069 ]
+	Subs (not services) not marked 'active'
+	Submitted By: Bob Ciora - bobciora
+
+	If the UpnpAcceptSubscription is not called, the subscription is not marked
+	as "active", so no state variables will ever be sent.
+
+	I have a "lazy" architecture where a service may not be ready to publish
+	any state data at the time of a subscription. Subscriptions are still
+	accepted, there's just nothing to send, so UpnpAcceptSubscription is never
+	called. As a result, the subscription is never marked as "active" via the
+	genaInitNotify functions.
+
+	A best course of action would be to modify UpnpAcceptSubscription<...>
+	functions so that they can accept *no* initial state information, but can
+	still result in the subscription being marked as active. Technically,
+	then, the "active" flag should be set here, not in the genaInitNotify<...>
+	functions.
+
+	But the UpnpAccept functions don't muck with the subscription table, and
+	it's more work than it's worth to move that code from the gena fucntions to
+	the upnpapi functions.
+
+	So--- what I've done to correct this problem is to modify both
+	UpnpAcceptSubscription<...> functions (in upnppapi.c) to accept an empty
+	state list and still call the gena layer functions. The gena layer
+	genaInitNotify<...> functions (gena_device.c) then mark the subscription as
+	"active" *before* checking for an empty state set.
+
+	In genaInitNotify, a check for "var_count <= 0" is added immediately after
+	the "subs->active = 1;" line. If this occurs, then all cleanup is
+	performed and the function returns GENA_SUCCESS (since now, an empty state
+	list is not an error). The same check is made for "PropSet == 0" in
+	genaInitNotifyExt (just after the "subs->active = 1;" line).
+
+	I've modifified my proxy layer to call UpnpAcceptSubscriptionExt even when
+	there is no state data to send. With the suggested changes to
+	gena_device.c, later state changes are sent correctly.
+
+	This has solved my problem.
+
 2008-04-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fix in function SetSeed() in threadutil/src/ThreadPool.c for CYGWIN
 	compilation. Thanks to Gary Chan.
