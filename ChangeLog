@@ -3,6 +3,9 @@ Version 1.6.7
 *******************************************************************************
 
 2008-07-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Added upnp/m4/libupnp.m4 to the distribution tarball.
+
+2008-07-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fixed a missing HandleUnlock() in upnp/src/gena/gena_device.c.
 
 2008-07-24 Marcelo Jimenez <mroberto(at)users.sourceforge.net>

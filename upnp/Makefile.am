@@ -1,7 +1,7 @@
 #
 # "Makefile.am" for "libupnp/upnp"
 #
-# Copyright (C) 2005 Rémi Turboult <r3mi@users.sourceforge.net>
+# Copyright (C) 2005 RÃ©mi Turboult <r3mi@users.sourceforge.net>
 #
 
 SUBDIRS = doc . sample
@@ -115,6 +115,7 @@ libupnp_la_SOURCES += src/api/upnpapi.c
 if ENABLE_TOOLS
 libupnp_la_SOURCES += src/api/upnptools.c
 endif
+
 if ENABLE_DEBUG
 libupnp_la_SOURCES += src/api/upnpdebug.c 
 endif
@@ -131,6 +132,12 @@ libupnp_la_SOURCES += \
 libupnp_la_SOURCES += src/urlconfig/urlconfig.c
 
 
+# inet_pton (needed on Win32, compiles to nothing elsewhere)
+libupnp_la_SOURCES += \
+	src/inet_pton.c \
+	src/inc/inet_pton.h
+
+
 # check / distcheck tests
 check_PROGRAMS = test_init
 TESTS = test_init
@@ -139,8 +146,7 @@ test_init_SOURCES = test/test_init.c
 
 EXTRA_DIST = \
 	LICENSE \
-	src/inc/inet_pton.h \
-	src/inet_pton.c \
+	m4/libupnp.m4 \
 	src/win_dll.c
 
 
