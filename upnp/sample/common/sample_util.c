@@ -1,36 +1,41 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
+
 
 #include "sample_util.h"
+
+
 #include <stdarg.h>
+#include <stdio.h>
+
 
 #if !UPNP_HAVE_TOOLS
 #	error "Need upnptools.h to compile samples ; try ./configure --enable-tools"
@@ -45,7 +50,7 @@ int initialize = 1;
 print_string gPrintFun = NULL;
 state_update gStateUpdateFun = NULL;
 
-//mutex to control displaying of events
+/*! mutex to control displaying of events */
 ithread_mutex_t display_mutex;
 
 /********************************************************************************
@@ -425,10 +430,10 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
                                   a_event->ServiceID );
                 if( a_event->ActionRequest ) {
                     xmlbuff = ixmlPrintNode( ( IXML_Node * ) a_event->ActionRequest );
-                    if( xmlbuff )
+                    if ( xmlbuff ) {
                         SampleUtil_Print( "ActRequest  =  %s\n", xmlbuff );
-                    if( xmlbuff )
                         ixmlFreeDOMString( xmlbuff );
+                    }
                     xmlbuff = NULL;
                 } else {
                     SampleUtil_Print( "ActRequest  =  (null)\n" );
@@ -436,10 +441,10 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
 
                 if( a_event->ActionResult ) {
                     xmlbuff = ixmlPrintNode( ( IXML_Node * ) a_event->ActionResult );
-                    if( xmlbuff )
+                    if ( xmlbuff ) {
                         SampleUtil_Print( "ActResult   =  %s\n", xmlbuff );
-                    if( xmlbuff )
                         ixmlFreeDOMString( xmlbuff );
+		    }
                     xmlbuff = NULL;
                 } else {
                     SampleUtil_Print( "ActResult   =  (null)\n" );
@@ -459,10 +464,10 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
                                   a_event->CtrlUrl );
                 if( a_event->ActionRequest ) {
                     xmlbuff = ixmlPrintNode( ( IXML_Node * ) a_event->ActionRequest );
-                    if( xmlbuff )
+                    if( xmlbuff ) {
                         SampleUtil_Print( "ActRequest  =  %s\n", xmlbuff );
-                    if( xmlbuff )
                         ixmlFreeDOMString( xmlbuff );
+		    }
                     xmlbuff = NULL;
                 } else {
                     SampleUtil_Print( "ActRequest  =  (null)\n" );
@@ -470,10 +475,10 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
 
                 if( a_event->ActionResult ) {
                     xmlbuff = ixmlPrintNode( ( IXML_Node * ) a_event->ActionResult );
-                    if( xmlbuff )
+                    if( xmlbuff ) {
                         SampleUtil_Print( "ActResult   =  %s\n", xmlbuff );
-                    if( xmlbuff )
                         ixmlFreeDOMString( xmlbuff );
+		    }
                     xmlbuff = NULL;
                 } else {
                     SampleUtil_Print( "ActResult   =  (null)\n" );
@@ -542,7 +547,7 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
                                   e_event->EventKey );
                 xmlbuff = ixmlPrintNode( ( IXML_Node * ) e_event->ChangedVariables );
                 SampleUtil_Print( "ChangedVars =  %s\n", xmlbuff );
-                ixmlFreeDOMString( xmlbuff );
+                ixmlFreeDOMString(xmlbuff);
                 xmlbuff = NULL;
             }
             break;
@@ -599,7 +604,7 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
         ( "======================================================================\n\n\n\n" );
 
     ithread_mutex_unlock( &display_mutex );
-    return ( 0 );
+    return 0;
 }
 
 /********************************************************************************
@@ -620,7 +625,7 @@ SampleUtil_PrintEvent( IN Upnp_EventType EventType,
  ********************************************************************************/
 int
 SampleUtil_FindAndParseService( IN IXML_Document * DescDoc,
-                                IN char *location,
+                                IN const char *location,
                                 IN char *serviceType,
                                 OUT char **serviceId,
                                 OUT char **eventURL,
@@ -632,18 +637,18 @@ SampleUtil_FindAndParseService( IN IXML_Document * DescDoc,
     int ret;
     char *tempServiceType = NULL;
     char *baseURL = NULL;
-    char *base;
+    const char *base = NULL;
     char *relcontrolURL = NULL,
      *releventURL = NULL;
     IXML_NodeList *serviceList = NULL;
     IXML_Element *service = NULL;
 
     baseURL = SampleUtil_GetFirstDocumentItem( DescDoc, "URLBase" );
-
-    if( baseURL )
+    if (baseURL) {
         base = baseURL;
-    else
+    } else {
         base = location;
+    }
 
     serviceList = SampleUtil_GetFirstServiceList( DescDoc );
     length = ixmlNodeList_length( serviceList );
@@ -753,22 +758,23 @@ uprint1( char *fmt,
  *		Same as printf()
  *
  ********************************************************************************/
-int
-SampleUtil_Print( char *fmt,
-                  ... )
+int SampleUtil_Print(char *fmt, ...)
 {
+#define MAX_BUF 1024
     va_list ap;
-    char buf[200];
+    static char buf[MAX_BUF];
     int rc;
 
-    va_start( ap, fmt );
-    rc = vsnprintf( buf, 200, fmt, ap );
-    va_end( ap );
+    /* Protect both the display and the static buffer with the mutex */
+    ithread_mutex_lock(&display_mutex);
+    va_start(ap, fmt);
+    rc = vsnprintf(buf, MAX_BUF, fmt, ap);
+    va_end(ap);
 
-    ithread_mutex_lock( &display_mutex );
-    if( gPrintFun )
-        gPrintFun( buf );
-    ithread_mutex_unlock( &display_mutex );
+    if (gPrintFun) {
+        gPrintFun(buf);
+    }
+    ithread_mutex_unlock(&display_mutex);
 
     return rc;
 }

@@ -166,7 +166,7 @@ int SampleUtil_PrintEvent(IN Upnp_EventType EventType,
  ********************************************************************************/
 int SampleUtil_FindAndParseService (
 	IN IXML_Document *DescDoc,
-	IN char* location, 
+	IN const char *location,
 	IN char *serviceType,
 	OUT char **serviceId, 
 	OUT char **eventURL,

@@ -1,39 +1,46 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
+
 
 #include "upnp_tv_device.h"
 
+
+#include <assert.h>
+
+
 #define DEFAULT_WEB_DIR "./web"
 
+
 #define DESC_URL_SIZE 200
+
 
 /*
    Device type for tv device 
@@ -180,7 +187,6 @@ SetServiceTable( IN int serviceType,
     }
 
     return SetActionTable( serviceType, out );
-
 }
 
 /******************************************************************************
@@ -251,7 +257,6 @@ SetActionTable( IN int serviceType,
     }
 
     return 0;
-
 }
 
 /******************************************************************************
@@ -374,10 +379,10 @@ TvDeviceHandleSubscriptionRequest( IN struct Upnp_Subscription_Request
 {
     unsigned int i = 0;         //,j=0;
 
-    // IXML_Document *PropSet=NULL;
+	// IXML_Document *PropSet = NULL;
 
-    //lock state mutex
-    ithread_mutex_lock( &TVDevMutex );
+	// lock state mutex
+	ithread_mutex_lock( &TVDevMutex );
 
     for( i = 0; i < TV_SERVICE_SERVCOUNT; i++ ) {
         if( ( strcmp( sr_event->UDN, tv_service_table[i].UDN ) == 0 ) &&
@@ -385,43 +390,47 @@ TvDeviceHandleSubscriptionRequest( IN struct Upnp_Subscription_Request
               == 0 ) ) {
 
             /*
-               PropSet = NULL;
+			PropSet = NULL;
 
-               for (j=0; j< tv_service_table[i].VariableCount; j++)
-               {
-               //add each variable to the property set
-               //for initial state dump
-               UpnpAddToPropertySet(&PropSet, 
-               tv_service_table[i].VariableName[j],
-               tv_service_table[i].VariableStrVal[j]);
-               }
+			for (j = 0; j< tv_service_table[i].VariableCount; ++j) {
+				// add each variable to the property set
+				// for initial state dump
+				UpnpAddToPropertySet(
+					&PropSet, 
+					tv_service_table[i].VariableName[j],
+					tv_service_table[i].VariableStrVal[j]);
+			}
 
-               //dump initial state 
-               UpnpAcceptSubscriptionExt(device_handle, sr_event->UDN, 
-               sr_event->ServiceId,
-               PropSet,sr_event->Sid);
-               //free document
-               Document_free(PropSet);
+			// dump initial state 
+			UpnpAcceptSubscriptionExt(
+				device_handle,
+				sr_event->UDN, 
+				sr_event->ServiceId,
+				PropSet,
+				sr_event->Sid);
+			// free document
+			Document_free(PropSet);
 
              */
 
-            UpnpAcceptSubscription( device_handle,
-                                    sr_event->UDN,
-                                    sr_event->ServiceId,
-                                    ( const char ** )tv_service_table[i].
-                                    VariableName,
-                                    ( const char ** )tv_service_table[i].
-                                    VariableStrVal,
-                                    tv_service_table[i].VariableCount,
-                                    sr_event->Sid );
+			UpnpAcceptSubscription( device_handle,
+				sr_event->UDN,
+				sr_event->ServiceId,
+				(const char **)tv_service_table[i].
+				VariableName,
+				(const char **)tv_service_table[i].
+				VariableStrVal,
+				tv_service_table[i].VariableCount,
+				sr_event->Sid);
 
-        }
-    }
+		}
+	}
 
-    ithread_mutex_unlock( &TVDevMutex );
+	ithread_mutex_unlock( &TVDevMutex );
 
-    return ( 1 );
+	return 1;
 }
+
 
 /******************************************************************************
  * TvDeviceHandleGetVarRequest
@@ -439,8 +448,8 @@ int
 TvDeviceHandleGetVarRequest( INOUT struct Upnp_State_Var_Request
                              *cgv_event )
 {
-    unsigned int i = 0,
-      j = 0;
+    unsigned int i = 0;
+    unsigned int j = 0;
     int getvar_succeeded = 0;
 
     cgv_event->CurrentVal = NULL;
@@ -448,12 +457,12 @@ TvDeviceHandleGetVarRequest( INOUT struct Upnp_State_Var_Request
     ithread_mutex_lock( &TVDevMutex );
 
     for( i = 0; i < TV_SERVICE_SERVCOUNT; i++ ) {
-        //check udn and service id
+        // check udn and service id
         if( ( strcmp( cgv_event->DevUDN, tv_service_table[i].UDN ) == 0 )
             &&
             ( strcmp( cgv_event->ServiceID, tv_service_table[i].ServiceId )
               == 0 ) ) {
-            //check variable name
+            // check variable name
             for( j = 0; j < tv_service_table[i].VariableCount; j++ ) {
                 if( strcmp( cgv_event->StateVarName,
                             tv_service_table[i].VariableName[j] ) == 0 ) {
@@ -498,7 +507,6 @@ TvDeviceHandleGetVarRequest( INOUT struct Upnp_State_Var_Request
 int
 TvDeviceHandleActionRequest( INOUT struct Upnp_Action_Request *ca_event )
 {
-
     /*
        Defaults if action not found 
      */
@@ -551,7 +559,7 @@ TvDeviceHandleActionRequest( INOUT struct Upnp_Action_Request *ca_event )
                                                            ActionRequest,
                                                            &ca_event->
                                                            ActionResult,
-                                                           &errorString );
+                    &errorString );
             } else {
                 errorString = "Power is Off";
                 retCode = UPNP_E_INTERNAL_ERROR;
@@ -569,7 +577,7 @@ TvDeviceHandleActionRequest( INOUT struct Upnp_Action_Request *ca_event )
         if( retCode == UPNP_E_SUCCESS ) {
             ca_event->ErrCode = UPNP_E_SUCCESS;
         } else {
-            //copy the error string 
+            // copy the error string
             strcpy( ca_event->ErrStr, errorString );
             switch ( retCode ) {
                 case UPNP_E_INVALID_PARAM:
@@ -651,7 +659,6 @@ TvDeviceSetServiceTableVar( IN unsigned int service,
     ithread_mutex_unlock( &TVDevMutex );
 
     return ( 1 );
-
 }
 
 /******************************************************************************
@@ -674,7 +681,7 @@ TvDeviceSetPower( IN int on )
 
     if( on != POWER_ON && on != POWER_OFF ) {
         SampleUtil_Print( "error: can't set power to value %d\n", on );
-        return ( 0 );
+        return 0;
     }
 
     /*
@@ -685,7 +692,7 @@ TvDeviceSetPower( IN int on )
     ret = TvDeviceSetServiceTableVar( TV_SERVICE_CONTROL, TV_CONTROL_POWER,
                                       value );
 
-    return ( ret );
+    return ret;
 }
 
 /******************************************************************************
@@ -702,9 +709,7 @@ TvDeviceSetPower( IN int on )
  *
  *****************************************************************************/
 int
-TvDevicePowerOn( IN IXML_Document * in,
-                 OUT IXML_Document ** out,
-                 OUT char **errorString )
+TvDevicePowerOn( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
     ( *out ) = NULL;
     ( *errorString ) = NULL;
@@ -724,7 +729,6 @@ TvDevicePowerOn( IN IXML_Document * in,
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
-
 }
 
 /******************************************************************************
@@ -742,7 +746,7 @@ TvDevicePowerOn( IN IXML_Document * in,
  *****************************************************************************/
 int
 TvDevicePowerOff( IN IXML_Document * in,
-                  OUT IXML_Document ** out,
+                  OUT IXML_Document **out,
                   OUT char **errorString )
 {
     ( *out ) = NULL;
@@ -781,11 +785,8 @@ TvDevicePowerOff( IN IXML_Document * in,
  *
  *****************************************************************************/
 int
-TvDeviceSetChannel( IN IXML_Document * in,
-                    OUT IXML_Document ** out,
-                    OUT char **errorString )
+TvDeviceSetChannel( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     char *value = NULL;
 
     int channel = 0;
@@ -830,7 +831,6 @@ TvDeviceSetChannel( IN IXML_Document * in,
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
-
 }
 
 /******************************************************************************
@@ -848,13 +848,10 @@ TvDeviceSetChannel( IN IXML_Document * in,
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
 int
-IncrementChannel( IN int incr,
-                  IN IXML_Document * in,
-                  OUT IXML_Document ** out,
-                  OUT char **errorString )
+IncrementChannel( IN int incr, IN IXML_Document * in, OUT IXML_Document **out, OUT char **errorString )
 {
-    int curchannel,
-      newchannel;
+    int curchannel;
+    int newchannel;
 
     char *actionName = NULL;
     char value[TV_MAX_VAL_LEN];
@@ -916,12 +913,9 @@ IncrementChannel( IN int incr,
  *
  *****************************************************************************/
 int
-TvDeviceDecreaseChannel( IN IXML_Document * in,
-                         OUT IXML_Document ** out,
-                         OUT char **errorString )
+TvDeviceDecreaseChannel( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
     return IncrementChannel( -1, in, out, errorString );
-
 }
 
 /******************************************************************************
@@ -938,12 +932,9 @@ TvDeviceDecreaseChannel( IN IXML_Document * in,
  *
  *****************************************************************************/
 int
-TvDeviceIncreaseChannel( IN IXML_Document * in,
-                         OUT IXML_Document ** out,
-                         OUT char **errorString )
+TvDeviceIncreaseChannel( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
     return IncrementChannel( 1, in, out, errorString );
-
 }
 
 /******************************************************************************
@@ -962,13 +953,9 @@ TvDeviceIncreaseChannel( IN IXML_Document * in,
  *
  *****************************************************************************/
 int
-TvDeviceSetVolume( IN IXML_Document * in,
-                   OUT IXML_Document ** out,
-                   OUT char **errorString )
+TvDeviceSetVolume( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     char *value = NULL;
-
     int volume = 0;
 
     ( *out ) = NULL;
@@ -1009,7 +996,6 @@ TvDeviceSetVolume( IN IXML_Document * in,
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
-
 }
 
 /******************************************************************************
@@ -1028,10 +1014,7 @@ TvDeviceSetVolume( IN IXML_Document * in,
  *
  *****************************************************************************/
 int
-IncrementVolume( IN int incr,
-                 IN IXML_Document * in,
-                 OUT IXML_Document ** out,
-                 OUT char **errorString )
+IncrementVolume( IN int incr, IN IXML_Document *in,OUT IXML_Document **out, OUT char **errorString )
 {
     int curvolume,
       newvolume;
@@ -1068,8 +1051,7 @@ IncrementVolume( IN int incr,
                                     TV_CONTROL_VOLUME, value ) ) {
         if( UpnpAddToActionResponse( out, actionName,
                                      TvServiceType[TV_SERVICE_CONTROL],
-                                     "Volume", value ) != UPNP_E_SUCCESS )
-        {
+                                     "Volume", value ) != UPNP_E_SUCCESS ) {
             ( *out ) = NULL;
             ( *errorString ) = "Internal Error";
             return UPNP_E_INTERNAL_ERROR;
@@ -1079,7 +1061,6 @@ IncrementVolume( IN int incr,
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
-
 }
 
 /******************************************************************************
@@ -1096,13 +1077,9 @@ IncrementVolume( IN int incr,
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
 int
-TvDeviceIncreaseVolume( IN IXML_Document * in,
-                        OUT IXML_Document ** out,
-                        OUT char **errorString )
+TvDeviceIncreaseVolume( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     return IncrementVolume( 1, in, out, errorString );
-
 }
 
 /******************************************************************************
@@ -1119,13 +1096,9 @@ TvDeviceIncreaseVolume( IN IXML_Document * in,
  *
  *****************************************************************************/
 int
-TvDeviceDecreaseVolume( IN IXML_Document * in,
-                        OUT IXML_Document ** out,
-                        OUT char **errorString )
+TvDeviceDecreaseVolume( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     return IncrementVolume( -1, in, out, errorString );
-
 }
 
 /******************************************************************************
@@ -1144,13 +1117,9 @@ TvDeviceDecreaseVolume( IN IXML_Document * in,
  *
  *****************************************************************************/
 int
-TvDeviceSetColor( IN IXML_Document * in,
-                  OUT IXML_Document ** out,
-                  OUT char **errorString )
+TvDeviceSetColor( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     char *value = NULL;
-
     int color = 0;
 
     ( *out ) = NULL;
@@ -1190,7 +1159,6 @@ TvDeviceSetColor( IN IXML_Document * in,
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
-
 }
 
 /******************************************************************************
@@ -1207,16 +1175,11 @@ TvDeviceSetColor( IN IXML_Document * in,
  *    IXML_Document **out - action result document
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
-
 int
-IncrementColor( IN int incr,
-                IN IXML_Document * in,
-                OUT IXML_Document ** out,
-                OUT char **errorString )
+IncrementColor( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-    int curcolor,
-      newcolor;
-
+    int curcolor;
+    int newcolor;
     char *actionName;
     char value[TV_MAX_VAL_LEN];
 
@@ -1274,11 +1237,8 @@ IncrementColor( IN int incr,
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
 int
-TvDeviceDecreaseColor( IN IXML_Document * in,
-                       OUT IXML_Document ** out,
-                       OUT char **errorString )
+TvDeviceDecreaseColor( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     return IncrementColor( -1, in, out, errorString );
 }
 
@@ -1295,11 +1255,8 @@ TvDeviceDecreaseColor( IN IXML_Document * in,
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
 int
-TvDeviceIncreaseColor( IN IXML_Document * in,
-                       OUT IXML_Document ** out,
-                       OUT char **errorString )
+TvDeviceIncreaseColor( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     return IncrementColor( 1, in, out, errorString );
 }
 
@@ -1319,13 +1276,9 @@ TvDeviceIncreaseColor( IN IXML_Document * in,
  *
  *****************************************************************************/
 int
-TvDeviceSetTint( IN IXML_Document * in,
-                 OUT IXML_Document ** out,
-                 OUT char **errorString )
+TvDeviceSetTint( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     char *value = NULL;
-
     int tint = -1;
 
     ( *out ) = NULL;
@@ -1384,14 +1337,10 @@ TvDeviceSetTint( IN IXML_Document * in,
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
 int
-IncrementTint( IN int incr,
-               IN IXML_Document * in,
-               OUT IXML_Document ** out,
-               OUT char **errorString )
+IncrementTint( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-    int curtint,
-      newtint;
-
+    int curtint;
+    int newtint;
     char *actionName = NULL;
     char value[TV_MAX_VAL_LEN];
 
@@ -1434,7 +1383,6 @@ IncrementTint( IN int incr,
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
-
 }
 
 /******************************************************************************
@@ -1451,11 +1399,8 @@ IncrementTint( IN int incr,
  *
  *****************************************************************************/
 int
-TvDeviceIncreaseTint( IN IXML_Document * in,
-                      OUT IXML_Document ** out,
-                      OUT char **errorString )
+TvDeviceIncreaseTint( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     return IncrementTint( 1, in, out, errorString );
 }
 
@@ -1473,11 +1418,8 @@ TvDeviceIncreaseTint( IN IXML_Document * in,
  *
  *****************************************************************************/
 int
-TvDeviceDecreaseTint( IN IXML_Document * in,
-                      OUT IXML_Document ** out,
-                      OUT char **errorString )
+TvDeviceDecreaseTint( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     return IncrementTint( -1, in, out, errorString );
 }
 
@@ -1497,11 +1439,8 @@ TvDeviceDecreaseTint( IN IXML_Document * in,
  *
  ****************************************************************************/
 int
-TvDeviceSetContrast( IN IXML_Document * in,
-                     OUT IXML_Document ** out,
-                     OUT char **errorString )
+TvDeviceSetContrast( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     char *value = NULL;
     int contrast = -1;
 
@@ -1562,14 +1501,10 @@ TvDeviceSetContrast( IN IXML_Document * in,
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
 int
-IncrementContrast( IN int incr,
-                   IN IXML_Document * in,
-                   OUT IXML_Document ** out,
-                   OUT char **errorString )
+IncrementContrast( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-    int curcontrast,
-      newcontrast;
-
+    int curcontrast;
+    int newcontrast;
     char *actionName = NULL;
     char value[TV_MAX_VAL_LEN];
 
@@ -1631,11 +1566,8 @@ IncrementContrast( IN int incr,
  *
  *****************************************************************************/
 int
-TvDeviceIncreaseContrast( IN IXML_Document * in,
-                          OUT IXML_Document ** out,
-                          OUT char **errorString )
+TvDeviceIncreaseContrast( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     return IncrementContrast( 1, in, out, errorString );
 }
 
@@ -1653,9 +1585,7 @@ TvDeviceIncreaseContrast( IN IXML_Document * in,
  *
  *****************************************************************************/
 int
-TvDeviceDecreaseContrast( IXML_Document * in,
-                          IXML_Document ** out,
-                          char **errorString )
+TvDeviceDecreaseContrast( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
     return IncrementContrast( -1, in, out, errorString );
 }
@@ -1673,11 +1603,8 @@ TvDeviceDecreaseContrast( IXML_Document * in,
  *
  *****************************************************************************/
 int
-TvDeviceSetBrightness( IN IXML_Document * in,
-                       OUT IXML_Document ** out,
-                       OUT char **errorString )
+TvDeviceSetBrightness( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-
     char *value = NULL;
     int brightness = -1;
 
@@ -1720,7 +1647,6 @@ TvDeviceSetBrightness( IN IXML_Document * in,
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
-
 }
 
 /******************************************************************************
@@ -1738,13 +1664,10 @@ TvDeviceSetBrightness( IN IXML_Document * in,
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
 int
-IncrementBrightness( IN int incr,
-                     IN IXML_Document * in,
-                     OUT IXML_Document ** out,
-                     OUT char **errorString )
+IncrementBrightness( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
-    int curbrightness,
-      newbrightness;
+    int curbrightness;
+    int newbrightness;
     char *actionName = NULL;
     char value[TV_MAX_VAL_LEN];
 
@@ -1805,9 +1728,7 @@ IncrementBrightness( IN int incr,
  *
  *****************************************************************************/
 int
-TvDeviceIncreaseBrightness( IN IXML_Document * in,
-                            OUT IXML_Document ** out,
-                            OUT char **errorString )
+TvDeviceIncreaseBrightness( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
     return IncrementBrightness( 1, in, out, errorString );
 }
@@ -1825,9 +1746,7 @@ TvDeviceIncreaseBrightness( IN IXML_Document * in,
  *
  *****************************************************************************/
 int
-TvDeviceDecreaseBrightness( IN IXML_Document * in,
-                            OUT IXML_Document ** out,
-                            OUT char **errorString )
+TvDeviceDecreaseBrightness( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
     return IncrementBrightness( -1, in, out, errorString );
 }
@@ -1851,14 +1770,9 @@ TvDeviceDecreaseBrightness( IN IXML_Document * in,
  *   Cookie -- Optional data specified during callback registration
  *
  *****************************************************************************/
-int
-TvDeviceCallbackEventHandler( Upnp_EventType EventType,
-                              void *Event,
-                              void *Cookie )
+int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Cookie)
 {
-
     switch ( EventType ) {
-
         case UPNP_EVENT_SUBSCRIPTION_REQUEST:
 
             TvDeviceHandleSubscriptionRequest( ( struct
@@ -1892,17 +1806,14 @@ TvDeviceCallbackEventHandler( Upnp_EventType EventType,
             break;
 
         default:
-            SampleUtil_Print
-                ( "Error in TvDeviceCallbackEventHandler: unknown event type %d\n",
-                  EventType );
+            SampleUtil_Print( "Error in TvDeviceCallbackEventHandler: unknown event type %d\n",
+                EventType );
     }
 
-    /*
-       Print a summary of the event received 
-     */
+    /* Print a summary of the event received */
     SampleUtil_PrintEvent( EventType, Event );
 
-    return ( 0 );
+    return 0;
 }
 
 /******************************************************************************
@@ -1921,6 +1832,7 @@ TvDeviceStop()
     UpnpFinish();
     SampleUtil_Finish();
     ithread_mutex_destroy( &TVDevMutex );
+
     return UPNP_E_SUCCESS;
 }
 
@@ -1953,7 +1865,6 @@ TvDeviceStart( char *ip_address,
                print_string pfun )
 {
     int ret = UPNP_E_SUCCESS;
-
     char desc_doc_url[DESC_URL_SIZE];
 
     ithread_mutex_init( &TVDevMutex, NULL );
@@ -1965,16 +1876,14 @@ TvDeviceStart( char *ip_address,
         "\tipaddress = %s port = %u\n",
         ip_address, port );
 
-    if( ( ret = UpnpInit( ip_address, port ) ) != UPNP_E_SUCCESS ) {
+    ret = UpnpInit( ip_address, port );
+    if( ret != UPNP_E_SUCCESS ) {
         SampleUtil_Print( "Error with UpnpInit -- %d\n", ret );
         UpnpFinish();
         return ret;
     }
 
-    if( ip_address == NULL ) {
-        ip_address = UpnpGetServerIpAddress();
-    }
-
+    ip_address = UpnpGetServerIpAddress();
     port = UpnpGetServerPort();
 
     SampleUtil_Print(
@@ -1995,12 +1904,12 @@ TvDeviceStart( char *ip_address,
 
     SampleUtil_Print( "Specifying the webserver root directory -- %s\n",
                       web_dir_path );
-    if( ( ret =
-          UpnpSetWebServerRootDir( web_dir_path ) ) != UPNP_E_SUCCESS ) {
-        SampleUtil_Print
-            ( "Error specifying webserver root directory -- %s: %d\n",
+    ret = UpnpSetWebServerRootDir( web_dir_path );
+    if( ret != UPNP_E_SUCCESS ) {
+        SampleUtil_Print( "Error specifying webserver root directory -- %s: %d\n",
               web_dir_path, ret );
         UpnpFinish();
+
         return ret;
     }
 
@@ -2009,12 +1918,12 @@ TvDeviceStart( char *ip_address,
         "\t with desc_doc_url: %s\n",
         desc_doc_url );
 
-    if( ( ret = UpnpRegisterRootDevice( desc_doc_url,
-                                        TvDeviceCallbackEventHandler,
-                                        &device_handle, &device_handle ) )
-        != UPNP_E_SUCCESS ) {
+    ret = UpnpRegisterRootDevice( desc_doc_url, TvDeviceCallbackEventHandler,
+        &device_handle, &device_handle );
+    if( ret != UPNP_E_SUCCESS ) {
         SampleUtil_Print( "Error registering the rootdevice : %d\n", ret );
         UpnpFinish();
+
         return ret;
     } else {
         SampleUtil_Print(
@@ -2022,17 +1931,17 @@ TvDeviceStart( char *ip_address,
             "Initializing State Table\n");
         TvDeviceStateTableInit( desc_doc_url );
         SampleUtil_Print("State Table Initialized\n");
-
-        if( ( ret =
-              UpnpSendAdvertisement( device_handle, default_advr_expire ) )
-            != UPNP_E_SUCCESS ) {
+        ret = UpnpSendAdvertisement( device_handle, default_advr_expire );
+        if( ret != UPNP_E_SUCCESS ) {
             SampleUtil_Print( "Error sending advertisements : %d\n", ret );
             UpnpFinish();
+
             return ret;
         }
 
         SampleUtil_Print("Advertisements Sent\n");
     }
+
     return UPNP_E_SUCCESS;
 }
 
