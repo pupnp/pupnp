@@ -4010,26 +4010,6 @@ UpnpSetVirtualDirCallbacks( IN struct UpnpVirtualDirCallbacks *callbacks )
 }
 
  /**************************************************************************
- * Function: UpnpFree 
- *
- * Parameters:	
- *	IN void *item:The item to free.
- *	
- * Description:
- *	This function free the memory allocated by tbe UPnP library
- *
- * Return Values: VOID
- *		
- ***************************************************************************/
-void
-UpnpFree( IN void *item )
-{
-    if( item )
-        free( item );
-}
-
-
-/**************************************************************************
  * Function: UpnpSetContentLength
  * OBSOLETE METHOD : use {\bf UpnpSetMaxContentLength} instead.
  ***************************************************************************/
