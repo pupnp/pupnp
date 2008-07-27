@@ -281,22 +281,6 @@ int token_cmp(
 
 
 /*!
- * \brief Parses a port (i.e. '4000') and converts it into a network ordered
- * unsigned short int.
- *
- * \return 
- */
-int parse_port(
-	/*! [in] Sets a maximum limit. */
-	int max,
-	/*! [in] Port to be parsed. */
-	const char *port,
-	/*! [out] Output parameter where the port is parsed and converted into
-	 * network format. */
-	unsigned short int *out);
-
-
-/*!
  * \brief Parses a string representing a host and port (e.g. "127.127.0.1:80"
  * or "localhost") and fills out a hostport_type struct with internet address
  * and a token representing the full host and port.
