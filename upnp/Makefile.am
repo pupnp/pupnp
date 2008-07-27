@@ -21,7 +21,8 @@ upnpincludedir = $(includedir)/upnp
 upnpinclude_HEADERS = \
 	inc/upnp.h \
 	inc/upnpdebug.h \
-	inc/UpnpGlobal.h
+	inc/UpnpGlobal.h \
+	inc/UpnpInet.h
 
 nodist_upnpinclude_HEADERS = inc/upnpconfig.h 
 if ENABLE_TOOLS
@@ -47,7 +48,6 @@ libupnp_la_SOURCES = \
 	src/inc/gena_device.h \
 	src/inc/global.h \
 	src/inc/gmtdate.h \
-	src/inc/http_client.h \
 	src/inc/httpparser.h \
 	src/inc/httpreadwrite.h \
 	src/inc/md5.h \
@@ -111,7 +111,9 @@ libupnp_la_SOURCES += \
 	src/gena/gena_callback2.c
 
 # api
-libupnp_la_SOURCES += src/api/upnpapi.c
+libupnp_la_SOURCES += \
+	src/api/upnpapi.c
+
 if ENABLE_TOOLS
 libupnp_la_SOURCES += src/api/upnptools.c
 endif

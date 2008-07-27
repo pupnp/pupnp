@@ -1736,25 +1736,7 @@ UpnpSubscribe( IN UpnpClient_Handle Hnd,
 
 #ifdef INCLUDE_CLIENT_APIS
 
-/**************************************************************************
- * Function: UpnpUnSubscribe 
- *
- *  Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point.
- *	IN Upnp_SID SubsId: The ID returned when the control point 
- *		subscribed to the service.
- *
- * Description:
- *	This function removes the subscription of  a control point from a 
- *	service previously subscribed to using UpnpSubscribe or 
- *	UpnpSubscribeAsync. This is a synchronous call.
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpUnSubscribe( IN UpnpClient_Handle Hnd,
-                 IN Upnp_SID SubsId )
+int UpnpUnSubscribe(UpnpClient_Handle Hnd, const Upnp_SID SubsId)
 {
     struct Handle_Info *SInfo = NULL;
     int RetVal;
@@ -1861,33 +1843,12 @@ UpnpUnSubscribeAsync( IN UpnpClient_Handle Hnd,
 
     return UPNP_E_SUCCESS;
 
-}  /****************** End of UpnpUnSubscribeAsync  *********************/
+}
 #endif // INCLUDE_CLIENT_APIS
 
 #ifdef INCLUDE_CLIENT_APIS
 
-/**************************************************************************
- * Function: UpnpRenewSubscription 
- *
- * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point that 
- *		is renewing the subscription.
- *	INOUT int *TimeOut: Pointer to a variable containing the 
- *		requested subscription time.  Upon return, 
- *		it contains the actual renewal time. 
- *	IN Upnp_SID SubsId: The ID for the subscription to renew. 
- *
- * Description:
- *	This function renews a subscription that is about to 
- *	expire.  This function is synchronous.
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpRenewSubscription( IN UpnpClient_Handle Hnd,
-                       INOUT int *TimeOut,
-                       IN Upnp_SID SubsId )
+int UpnpRenewSubscription(UpnpClient_Handle Hnd, int *TimeOut, const Upnp_SID SubsId)
 {
     struct Handle_Info *SInfo = NULL;
     int RetVal;
@@ -2158,40 +2119,14 @@ UpnpNotifyExt( IN UpnpDevice_Handle Hnd,
 
 #ifdef INCLUDE_DEVICE_APIS
 
-/**************************************************************************
- * Function: UpnpAcceptSubscription 
- *
- * Parameters:	
- *	IN UpnpDevice_Handle Hnd: The handle of the device. 
- *	IN const char *DevID: The device ID of the subdevice of the 
- *		service generating the event. 
- *	IN const char *ServID: The unique service identifier of the 
- *		service generating the event.
- *	IN const char **VarName: Pointer to an array of event variables.
- *	IN const char **NewVal: Pointer to an array of values for 
- *		the event variables.
- *	IN int cVariables: The number of event variables in VarName. 
- *	IN Upnp_SID SubsId: The subscription ID of the newly 
- *		registered control point. 
- *
- * Description:
- *	This function accepts a subscription request and sends
- *	out the current state of the eventable variables for a service.  
- *	The device application should call this function when it receives a 
- *	UPNP_EVENT_SUBSCRIPTION_REQUEST callback. This function is sychronous
- *	and generates no callbacks.
- *
- * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
- ***************************************************************************/
-int
-UpnpAcceptSubscription( IN UpnpDevice_Handle Hnd,
-                        IN const char *DevID_const,
-                        IN const char *ServName_const,
-                        IN const char **VarName_const,
-                        IN const char **NewVal_const,
-                        int cVariables,
-                        IN Upnp_SID SubsId )
+int UpnpAcceptSubscription(
+	UpnpDevice_Handle Hnd,
+	const char *DevID_const,
+	const char *ServName_const,
+	const char **VarName_const,
+	const char **NewVal_const,
+	int cVariables,
+	const Upnp_SID SubsId)
 {
     struct Handle_Info *SInfo = NULL;
     int retVal;

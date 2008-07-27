@@ -1,59 +1,61 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// * Redistributions of source code must retain the above copyright notice,
-// this list of conditions and the following disclaimer.
-// * Redistributions in binary form must reproduce the above copyright notice,
-// this list of conditions and the following disclaimer in the documentation
-// and/or other materials provided with the distribution.
-// * Neither name of Intel Corporation nor the names of its contributors
-// may be used to endorse or promote products derived from this software
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/**************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ **************************************************************************/
+
 
 #include "config.h"
 
+
 #ifdef INCLUDE_DEVICE_APIS
 #if EXCLUDE_SSDP == 0
+
+
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "ssdplib.h"
+#include "statcodes.h"
+#include "ThreadPool.h"
+#include "unixutil.h"
+#include "upnpapi.h"
+#include "UpnpInet.h"
+
 
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "ssdplib.h"
-#include "upnpapi.h"
-#include "ThreadPool.h"
-#include "httpparser.h"
-#include "httpreadwrite.h"
-#include "statcodes.h"
-#include "unixutil.h"
-
-#ifdef WIN32
-	#include <ws2tcpip.h>
-	#include <winsock2.h>
-#endif /* WIN32 */
 
 #define MSGTYPE_SHUTDOWN	0
 #define MSGTYPE_ADVERTISEMENT	1
 #define MSGTYPE_REPLY		2
+
 
 /************************************************************************
 * Function : advertiseAndReplyThread
@@ -88,7 +90,7 @@ advertiseAndReplyThread( IN void *data )
 * Function : ssdp_handle_device_request
 *
 * Parameters:
-*	IN http_message_t* hmsg: SSDP search request from the control point
+*	IN http_message_t *hmsg: SSDP search request from the control point
 *	IN struct sockaddr_in* dest_addr: The address info of control point
 *
 * Description:
@@ -101,7 +103,7 @@ advertiseAndReplyThread( IN void *data )
 ***************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 void
-ssdp_handle_device_request( IN http_message_t * hmsg,
+ssdp_handle_device_request( IN http_message_t *hmsg,
                             IN struct sockaddr_in *dest_addr )
 {
 #define MX_FUDGE_FACTOR 10
@@ -337,7 +339,7 @@ CreateServicePacket( IN int msg_type,
 
         // NOTE: The CACHE-CONTROL and LOCATION headers are not present in
         //  a shutdown msg, but are present here for MS WinMe interop.
-        
+
         ret_code = http_MakeMessage(
             &buf, 1, 1,
             "Q" "sssdc" "sdc" "ssc" "ssc" "ssc" "S" "Xc" "sscc",
@@ -397,7 +399,7 @@ DeviceAdvertisement( IN char *DevType,
     int ret_code;
 
     UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-        "In function SendDeviceAdvertisemenrt\n" );
+        "In function DeviceAdvertisement\n" );
 
     DestAddr.sin_family = AF_INET;
     DestAddr.sin_addr.s_addr = inet_addr( SSDP_IP );
@@ -412,7 +414,7 @@ DeviceAdvertisement( IN char *DevType,
     if( RootDev ) {
         sprintf( Mil_Usn, "%s::upnp:rootdevice", Udn );
         CreateServicePacket( MSGTYPE_ADVERTISEMENT, "upnp:rootdevice",
-                             Mil_Usn, Location, Duration, &msgs[0] );
+		Mil_Usn, Location, Duration, &msgs[0] );
     }
     // both root and sub-devices need to send these two messages
     //
@@ -550,7 +552,7 @@ DeviceReply( IN struct sockaddr_in *DestAddr,
              IN int RootDev,
              IN char *Udn,
              IN char *Location,
-             IN int Duration )
+             IN int Duration)
 {
     char *szReq[3],
       Mil_Nt[LINE_SIZE],
@@ -624,7 +626,7 @@ int
 ServiceAdvertisement( IN char *Udn,
                       IN char *ServType,
                       IN char *Location,
-                      IN int Duration )
+                      IN int Duration)
 {
     char Mil_Usn[LINE_SIZE];
     char *szReq[1];
@@ -713,7 +715,7 @@ int
 ServiceShutdown( IN char *Udn,
                  IN char *ServType,
                  IN char *Location,
-                 IN int Duration )
+                 IN int Duration)
 {
     char Mil_Usn[LINE_SIZE];
     char *szReq[1];
@@ -762,7 +764,7 @@ DeviceShutdown( IN char *DevType,
                 IN char *Udn,
                 IN char *_Server,
                 IN char *Location,
-                IN int Duration )
+                IN int Duration)
 {
     struct sockaddr_in DestAddr;
     char *msgs[3];

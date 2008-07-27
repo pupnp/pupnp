@@ -1,52 +1,65 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
-/************************************************************************
-* Purpose: This file contains functions for scanner and parser for http 
-* messages.
-************************************************************************/
+
+/*
+ * \file
+ *
+ * \brief Contains functions for scanner and parser for http messages.
+ */
+
 
 #define _GNU_SOURCE	// For strcasestr() in string.h
+
+
 #include "config.h"
-#include <assert.h>
-#include <string.h>
-#include <ctype.h>
-#include <limits.h>
-#include <stdarg.h>
+
+
 #include "strintmap.h"
 #include "httpparser.h"
 #include "statcodes.h"
 #include "unixutil.h"
+#include "upnpdebug.h"
 
-// entity positions
+
+#include <assert.h>
+#include <ctype.h>
+#include <limits.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+
+
+/* entity positions */
+
 
 #define NUM_HTTP_METHODS 9
 static str_int_entry Http_Method_Table[NUM_HTTP_METHODS] = {
@@ -122,8 +135,8 @@ str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES] = {
 * Note :
 ************************************************************************/
 static UPNP_INLINE void
-scanner_init( OUT scanner_t * scanner,
-              IN membuffer * bufptr )
+scanner_init( OUT scanner_t *scanner,
+              IN membuffer *bufptr )
 {
     scanner->cursor = 0;
     scanner->msg = bufptr;
@@ -395,12 +408,12 @@ scanner_get_str( IN scanner_t * scanner )
 *
 * Note :
 ************************************************************************/
-#ifndef WIN32
-#warning The only use of the function 'scanner_pushback()' in the code is commented out.
-#warning 'scanner_pushback()' is a candidate for removal.
+#ifdef WIN32
+	#pragma message ("The only use of the function 'scanner_pushback()' in the code is commented out.")
+	#pragma message ("'scanner_pushback()' is a candidate for removal.")
 #else
-#pragma message ("The only use of the function 'scanner_pushback()' in the code is commented out.")
-#pragma message ("'scanner_pushback()' is a candidate for removal.")
+	#warning The only use of the function 'scanner_pushback()' in the code is commented out.
+	#warning 'scanner_pushback()' is a candidate for removal.
 #endif
 static UPNP_INLINE void
 scanner_pushback( INOUT scanner_t * scanner,
@@ -970,12 +983,12 @@ read_until_crlf( INOUT scanner_t * scanner,
 *   PARSE_FAILURE
 *   PARSE_INCOMPLETE
 ************************************************************************/
-#ifndef WIN32
-#warning There are currently no uses of the function 'skip_to_end_of_header()' in the code.
-#warning 'skip_to_end_of_header()' is a candidate for removal.
+#ifdef WIN32
+	#pragma message("There are currently no uses of the function 'skip_to_end_of_header()' in the code.")
+	#pragma message("'skip_to_end_of_header()' is a candidate for removal.")
 #else
-#pragma message("There are currently no uses of the function 'skip_to_end_of_header()' in the code.")
-#pragma message("'skip_to_end_of_header()' is a candidate for removal.")
+	#warning There are currently no uses of the function 'skip_to_end_of_header()' in the code.
+	#warning 'skip_to_end_of_header()' is a candidate for removal.
 #endif
 static UPNP_INLINE int
 skip_to_end_of_header( INOUT scanner_t * scanner )
@@ -2496,26 +2509,15 @@ method_to_str( IN http_method_t method )
     return index == -1 ? NULL : Http_Method_Table[index].name;
 }
 
-/************************************************************************
-* Function: print_http_headers
-*
-* Parameters:
-*	http_message_t* hmsg ; HTTP Message object
-*
-* Description:
-*
-* Returns:
-*	 void
-************************************************************************/
+
 #ifdef DEBUG
-void
-print_http_headers( http_message_t * hmsg )
+void print_http_headers(http_message_t *hmsg)
 {
     ListNode *node;
-    // NNS:  dlist_node *node;
+    /* NNS:  dlist_node *node; */
     http_header_t *header;
 
-    // print start line
+    /* print start line */
     if( hmsg->is_request ) {
         printf( "method = %d, version = %d.%d, url = %.*s\n", 
             hmsg->method, hmsg->major_version, hmsg->minor_version,
@@ -2526,18 +2528,18 @@ print_http_headers( http_message_t * hmsg )
             (int)hmsg->status_msg.length, hmsg->status_msg.buf);
     }
 
-    // print headers
+    /* print headers */
     node = ListHead( &hmsg->headers );
-    // NNS: node = dlist_first_node( &hmsg->headers );
+    /* NNS: node = dlist_first_node( &hmsg->headers ); */
     while( node != NULL ) {
         header = ( http_header_t * ) node->item;
-        // NNS: header = (http_header_t *)node->data;
+        /* NNS: header = (http_header_t *)node->data; */
         printf( "hdr name: %.*s, value: %.*s\n", 
             (int)header->name.length, header->name.buf,
             (int)header->value.length, header->value.buf );
 
         node = ListNext( &hmsg->headers, node );
-        // NNS: node = dlist_next( &hmsg->headers, node );
+        /* NNS: node = dlist_next( &hmsg->headers, node ); */
     }
 }
 #endif
