@@ -95,7 +95,7 @@
 	 *
 	 * MSVC still does not know about this.
 	 */
-	//#define PRId64 PRId64
+	/* #define PRId64 PRId64 */
 
 	/*!
 	 * \brief Supply the PRIzu printf() macro.
