@@ -2,6 +2,10 @@
 Version 1.8.0
 *******************************************************************************
 
+2009-03-06 Oxygenic <oxygenic(at)users.sourceforge.net>
+    * parameter problem fixed in soap_request_and_response(), 2nd call to
+	http_RequestAndResponse() was wrong (thanks to Kim Kyungsan)
+
 2008-06-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Nicholas Kraft's patch to fix some IPv6 copy/paste issues. He
 	reported to be getting infinite loops with the svn code.
