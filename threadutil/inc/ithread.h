@@ -171,7 +171,9 @@ typedef pthread_condattr_t ithread_condattr_t;
  *      typedef to pthread_rwlockattr_t
  *      Internal Use Only
  ***************************************************************************/
+#if UPNP_USE_RWLOCK
 typedef pthread_rwlockattr_t ithread_rwlockattr_t;	
+#endif /* UPNP_USE_RWLOCK */
 
 
 /****************************************************************************
@@ -182,7 +184,9 @@ typedef pthread_rwlockattr_t ithread_rwlockattr_t;
  *      typedef to pthread_rwlock_t
  *      Internal Use Only
  ***************************************************************************/
+#if UPNP_USE_RWLOCK
 typedef pthread_rwlock_t ithread_rwlock_t;
+#endif /* UPNP_USE_RWLOCK */
 
 
 /****************************************************************************
@@ -443,7 +447,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *      Always returns 0.
  *      See man page for pthread_rwlockattr_init
  ***************************************************************************/
-#define ithread_rwlockattr_init pthread_rwlockattr_init
+#if UPNP_USE_RWLOCK
+	#define ithread_rwlockattr_init pthread_rwlockattr_init
+#endif /* UPNP_USE_RWLOCK */
 
 
 /****************************************************************************
@@ -459,7 +465,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *      Always returns 0.
  *      See man page for pthread_rwlockattr_destroy
  ***************************************************************************/
-#define ithread_rwlockattr_destroy pthread_rwlockattr_destroy
+#if UPNP_USE_RWLOCK
+	#define ithread_rwlockattr_destroy pthread_rwlockattr_destroy
+#endif /* UPNP_USE_RWLOCK */
   
   
 /****************************************************************************
@@ -480,7 +488,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *      Returns EINVAL if the kind is not supported.
  *      See man page for pthread_rwlockattr_setkind_np
  *****************************************************************************/
-#define ithread_rwlockatttr_setpshared pthread_rwlockatttr_setpshared
+#if UPNP_USE_RWLOCK
+	#define ithread_rwlockatttr_setpshared pthread_rwlockatttr_setpshared
+#endif /* UPNP_USE_RWLOCK */
 
 
 /****************************************************************************
@@ -501,7 +511,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *      Always returns 0.
  *      See man page for pthread_rwlockatttr_getpshared
  *****************************************************************************/
-#define ithread_rwlockatttr_getpshared pthread_rwlockatttr_getpshared
+#if UPNP_USE_RWLOCK
+	#define ithread_rwlockatttr_getpshared pthread_rwlockatttr_getpshared
+#endif /* UPNP_USE_RWLOCK */
 
   
 /****************************************************************************
@@ -519,7 +531,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *      Always returns 0.
  *      See man page for pthread_rwlock_init
  *****************************************************************************/
-#define ithread_rwlock_init pthread_rwlock_init
+#if UPNP_USE_RWLOCK
+	#define ithread_rwlock_init pthread_rwlock_init
+#endif /* UPNP_USE_RWLOCK */
 
 
 /****************************************************************************
@@ -536,7 +550,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *      Always returns 0.
  *      See man page for pthread_rwlock_rdlock
  *****************************************************************************/
-#define ithread_rwlock_rdlock pthread_rwlock_rdlock
+#if UPNP_USE_RWLOCK
+	#define ithread_rwlock_rdlock pthread_rwlock_rdlock
+#endif /* UPNP_USE_RWLOCK */
 
 
 /****************************************************************************
@@ -553,7 +569,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *      Always returns 0.
  *      See man page for pthread_rwlock_wrlock
  *****************************************************************************/
-#define ithread_rwlock_wrlock pthread_rwlock_wrlock
+#if UPNP_USE_RWLOCK
+	#define ithread_rwlock_wrlock pthread_rwlock_wrlock
+#endif /* UPNP_USE_RWLOCK */
 
 
 /****************************************************************************
@@ -571,7 +589,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *      Always returns 0.
  *      See man page for pthread_rwlock_unlock
  *****************************************************************************/
-#define ithread_rwlock_unlock pthread_rwlock_unlock
+#if UPNP_USE_RWLOCK
+	#define ithread_rwlock_unlock pthread_rwlock_unlock
+#endif /* UPNP_USE_RWLOCK */
 
 
 /****************************************************************************
@@ -590,7 +610,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *      Always returns 0.
  *      See man page for pthread_rwlock_destroy
  *****************************************************************************/
-#define ithread_rwlock_destroy pthread_rwlock_destroy
+#if UPNP_USE_RWLOCK
+	#define ithread_rwlock_destroy pthread_rwlock_destroy
+#endif /* UPNP_USE_RWLOCK */
 
 
 /****************************************************************************

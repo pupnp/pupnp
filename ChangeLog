@@ -2,6 +2,19 @@
 Version 1.8.0
 *******************************************************************************
 
+2010-09-10 Warwick Harvey <warwick.harvey(at)tieto.com>
+	Patch to take notice of UPNP_USE_RWLOCK flag
+
+	The configure.ac file included with UPnP checks for the presence of the
+	pthread_rwlock_t type, and then sets the value of the UPNP_USE_RWLOCK
+	flag appropriately.  However, this flag is not referenced at all in the
+	source code, and thus the code does not compile on systems that don't
+	have the pthread_rwlock_t type (such as Android).
+	
+	Please find attached a patch (against the current 1.6.x head) that checks
+	the value of this flag and falls back on using mutexes if read-write
+	locks are not available.
+
 2010-09-10 Jean Sigwald <jean.sigwald(at)orange-ftgroup.com>
 	I discovered a reliable denial-of-service issue on the last stable
 	release of libupnp (1.6.6) remotely triggerable by any
