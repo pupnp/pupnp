@@ -99,6 +99,33 @@ Version 1.8.0
 Version 1.6.7
 *******************************************************************************
 
+2010-03-14 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2546532 ] Missing carriage return between
+	SOAPACTION and User-Agent headers.
+
+	There is something going wrong in soap_ctrlpt.c at line 931 (based on
+	version 1.6.6 release).
+	
+	The http_Makemessage call looks as follows:
+	
+	if (http_MakeMessage(
+	&request, 1, 1,
+	"Q" "sbc" "N" "s" "s" "Ucc" "sss",
+	SOAPMETHOD_POST, path.buf, path.length,
+	"HOST: ", host.buf, host.length,
+	content_length,
+	ContentTypeHeader,
+	"SOAPACTION:
+	\"urn:schemas-upnp-org:control-1-0#QueryStateVariable\"",
+	xml_start, var_name, xml_end ) != 0 ) {
+	return UPNP_E_OUTOF_MEMORY;
+	}
+	
+	This will result in the SOAPACTION header to be immediately followed by the
+	User-Agent header, while a cr-lf should separate the two. I propose to fix
+	this by changing the second "s" to "sc" to force the addition of a cr-lf
+	after the SOAPACTION. This looks consistent to the other Makemessage calls.
+
 2008-07-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added upnp/m4/libupnp.m4 to the distribution tarball.
 

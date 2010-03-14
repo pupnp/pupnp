@@ -932,7 +932,7 @@ SoapGetServiceVarStatus( IN char *action_url,
     content_length = strlen( xml_start ) + strlen( var_name ) + strlen( xml_end );
     if (http_MakeMessage(
 	&request, 1, 1,
-	"Q" "sbc" "N" "s" "s" "Ucc" "sss",
+	"Q" "sbc" "N" "s" "sc" "Ucc" "sss",
 	SOAPMETHOD_POST, path.buf, path.length,
 	"HOST: ", host.buf, host.length,
 	content_length,
