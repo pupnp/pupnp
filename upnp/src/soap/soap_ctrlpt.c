@@ -368,8 +368,9 @@ soap_request_and_response( IN membuffer * request,
 
         // try again
         ret_code = http_RequestAndResponse( destination_url, request->buf,
+                                            request->length,
                                             HTTPMETHOD_MPOST,
-                                            request->length, UPNP_TIMEOUT,
+                                            UPNP_TIMEOUT,
                                             response );
         if( ret_code != 0 ) {
             httpmsg_destroy( &response->msg );
