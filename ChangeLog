@@ -2,10 +2,6 @@
 Version 1.8.0
 *******************************************************************************
 
-2009-03-06 Oxygenic <oxygenic(at)users.sourceforge.net>
-    * parameter problem fixed in soap_request_and_response(), 2nd call to
-	http_RequestAndResponse() was wrong (thanks to Kim Kyungsan)
-
 2008-06-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Nicholas Kraft's patch to fix some IPv6 copy/paste issues. He
 	reported to be getting infinite loops with the svn code.
@@ -125,6 +121,10 @@ Version 1.6.7
 	User-Agent header, while a cr-lf should separate the two. I propose to fix
 	this by changing the second "s" to "sc" to force the addition of a cr-lf
 	after the SOAPACTION. This looks consistent to the other Makemessage calls.
+
+2009-03-06 Oxygenic <oxygenic(at)users.sourceforge.net>
+	* parameter problem fixed in soap_request_and_response(), 2nd call to
+	http_RequestAndResponse() was wrong (thanks to Kim Kyungsan)
 
 2008-07-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added upnp/m4/libupnp.m4 to the distribution tarball.
