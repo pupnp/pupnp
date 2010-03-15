@@ -148,6 +148,14 @@ Version 1.6.7
 *******************************************************************************
 
 2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2970872 ] Update ErrorMessages for latest return
+	code list
+	Submitted By: Nick Leverton ( leveret )
+	
+	ErrorMessage[] in upnptools.c has got a bit out of sync, the attached
+	patch (generated from grep 'define UPNP_E_') should bring it up to date.
+
+2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2857611 ] Declare a few functions to have proper
 	(void) argument list.
 	Submitted By: zephyrus ( zephyrus00jp )
