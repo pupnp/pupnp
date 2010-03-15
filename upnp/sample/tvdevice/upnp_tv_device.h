@@ -623,7 +623,7 @@ int TvDeviceDecreaseBrightness(IN IXML_Document *in, OUT IXML_Document **out, OU
 
 int TvDeviceStart(char * ip_address, unsigned short port,char * desc_doc_name,
 				  char *web_dir_path, print_string pfun);
-int TvDeviceStop();
+int TvDeviceStop(void);
 
 #ifdef __cplusplus
 }

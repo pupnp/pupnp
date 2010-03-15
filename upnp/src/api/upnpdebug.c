@@ -64,7 +64,7 @@ static const char *infoFileName = "IUpnpInfoFile.txt";
 
 
 #ifdef DEBUG
-int UpnpInitLog()
+int UpnpInitLog(void)
 {
 	ithread_mutex_init(&GlobalDebugMutex, NULL);
 	if(DEBUG_TARGET == 1) {
@@ -85,7 +85,7 @@ void UpnpSetLogLevel(Upnp_LogLevel log_level)
 }
 
 
-void UpnpCloseLog()
+void UpnpCloseLog(void)
 {
 	if (DEBUG_TARGET == 1) {
 		fflush(ErrFileHnd);

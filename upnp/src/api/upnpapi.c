@@ -299,7 +299,7 @@ int UpnpInit2(const char *IfName, unsigned short DestPort)
 }
 
 
-int UpnpFinish()
+int UpnpFinish(void)
 {
 #ifdef INCLUDE_DEVICE_APIS
 	UpnpDevice_Handle device_handle;
@@ -381,7 +381,7 @@ int UpnpFinish()
 }
 
 
-unsigned short UpnpGetServerPort()
+unsigned short UpnpGetServerPort(void)
 {
 	if (UpnpSdkInit != 1) {
 		return 0;
@@ -391,7 +391,7 @@ unsigned short UpnpGetServerPort()
 }
 
 
-unsigned short UpnpGetServerPort6()
+unsigned short UpnpGetServerPort6(void)
 {
 	if (UpnpSdkInit != 1) {
 		return 0;
@@ -401,7 +401,7 @@ unsigned short UpnpGetServerPort6()
 }
 
 
-char *UpnpGetServerIpAddress()
+char *UpnpGetServerIpAddress(void)
 {
 	if (UpnpSdkInit != 1) {
 		return NULL;
@@ -411,7 +411,7 @@ char *UpnpGetServerIpAddress()
 }
 
 
-char *UpnpGetServerIp6Address()
+char *UpnpGetServerIp6Address(void)
 {
 	if( UpnpSdkInit != 1 ) {
 		return NULL;
@@ -3752,7 +3752,7 @@ int UpnpRemoveVirtualDir(const char *dirName)
 }
 
 
-void UpnpRemoveAllVirtualDirs()
+void UpnpRemoveAllVirtualDirs(void)
 {
     virtualDirList *pCur;
     virtualDirList *pNext;
@@ -3812,7 +3812,7 @@ int UpnpEnableWebserver(int enable)
  *
  * \return 1, if webserver is enabled or 0, if webserver is disabled.
  */
-int UpnpIsWebserverEnabled()
+int UpnpIsWebserverEnabled(void)
 {
 	if (UpnpSdkInit != 1) {
 		return 0;

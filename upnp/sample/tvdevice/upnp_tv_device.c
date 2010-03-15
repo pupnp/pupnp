@@ -1812,7 +1812,7 @@ int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Co
  *
  *****************************************************************************/
 int
-TvDeviceStop()
+TvDeviceStop(void)
 {
     UpnpUnRegisterRootDevice( device_handle );
     UpnpFinish();

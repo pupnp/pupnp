@@ -787,7 +787,7 @@ EXPORT_SPEC int UpnpInit2(
  *      \li \c UPNP_E_FINISH: The SDK is already terminated or 
  *                                 it is not initialized. 
  */
-EXPORT_SPEC int UpnpFinish();
+EXPORT_SPEC int UpnpFinish(void);
 
 
 /*!
@@ -801,7 +801,7 @@ EXPORT_SPEC int UpnpFinish();
  *		related requests.
  *	\li On error: 0 is returned if \b UpnpInit has not succeeded.
  */
-EXPORT_SPEC unsigned short UpnpGetServerPort();
+EXPORT_SPEC unsigned short UpnpGetServerPort(void);
 
 
 /*!
@@ -815,7 +815,7 @@ EXPORT_SPEC unsigned short UpnpGetServerPort();
  *		related requests.
  *	\li On error: 0 is returned if \b UpnpInit has not succeeded.
  */
-EXPORT_SPEC unsigned short UpnpGetServerPort6();
+EXPORT_SPEC unsigned short UpnpGetServerPort6(void);
 
 /*!
  * \brief Returns the local IPv4 listening ip address.
@@ -828,7 +828,7 @@ EXPORT_SPEC unsigned short UpnpGetServerPort6();
  * 		listening for UPnP related requests.
  * 	\li On error: \c NULL is returned if \b UpnpInit has not succeeded.
  */
-EXPORT_SPEC char *UpnpGetServerIpAddress();
+EXPORT_SPEC char *UpnpGetServerIpAddress(void);
 
 
 /*!
@@ -842,7 +842,7 @@ EXPORT_SPEC char *UpnpGetServerIpAddress();
  * 		listening for UPnP related requests.
  * 	\li On error: \c NULL is returned if \b UpnpInit has not succeeded.
  */
-EXPORT_SPEC char *UpnpGetServerIp6Address();
+EXPORT_SPEC char *UpnpGetServerIp6Address(void);
 
 
 /*!
@@ -2563,7 +2563,7 @@ EXPORT_SPEC int UpnpEnableWebserver(
  *       \li \c TRUE: The webserver is enabled.
  *       \li \c FALSE: The webserver is not enabled
  */
-EXPORT_SPEC int UpnpIsWebserverEnabled();
+EXPORT_SPEC int UpnpIsWebserverEnabled(void);
 
 
 /*!
@@ -2600,7 +2600,7 @@ EXPORT_SPEC int UpnpRemoveVirtualDir(
 /*!
  * \brief Removes all virtual directory mappings.
  */
-EXPORT_SPEC void UpnpRemoveAllVirtualDirs();
+EXPORT_SPEC void UpnpRemoveAllVirtualDirs(void);
 
 
 /* @} Web Server API */

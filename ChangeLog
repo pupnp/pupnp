@@ -147,6 +147,25 @@ Version 1.8.0
 Version 1.6.7
 *******************************************************************************
 
+2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2857611 ] Declare a few functions to have proper
+	(void) argument list.
+	Submitted By: zephyrus ( zephyrus00jp )
+	
+	In a publicly installed headers, a few functions are declared without any
+	arguments at all, a la "()".
+	When I used gcc's -Wimplict and -Wstrict-prototypes to check for the
+	mismatch of
+	function prototype declarations and their usage in my own program,
+	some headers from libupnp-1.6.6 produced warnings.
+
+	They are not strictly bugs, but pretty much annoying. This is 2009, and
+	almost all the important compilers
+	understand ISO-C.
+
+	So the offending functions are declared as "(void") to show that they have
+	no arguments at all.
+
 2010-03-14 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2546532 ] Missing carriage return between
 	SOAPACTION and User-Agent headers.
