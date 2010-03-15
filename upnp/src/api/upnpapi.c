@@ -3471,7 +3471,7 @@ int getlocalhostname(char *out, const int out_len)
 {
 	int ret = UPNP_E_SUCCESS;
 	char tempstr[16];
-	char *p = NULL;
+	const char *p = NULL;
 
 #ifdef WIN32
 	struct hostent *h = NULL;
