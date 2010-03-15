@@ -81,6 +81,7 @@ static void GenaAutoRenewSubscription(
 		eventType = UPNP_EVENT_SUBSCRIPTION_EXPIRED;
 	} else {
 		UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "GENA AUTO RENEW");
+		timeout = UpnpEventSubscribe_get_TimeOut(sub_struct);
 		errCode = genaRenewSubscription(
 			event->handle,
 			UpnpEventSubscribe_get_SID(sub_struct),
@@ -303,7 +304,7 @@ static int gena_subscribe(
 			&request, 1, 1,
 			"q" "ssc" "sscc",
 			HTTPMETHOD_SUBSCRIBE, &dest_url,
-			"SID: ", renewal_sid,
+			"SID: ", UpnpString_get_String(renewal_sid),
 			"TIMEOUT: Second-", timeout_str );
 	} else {
 		// subscribe

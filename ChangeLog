@@ -3,7 +3,17 @@ Version 1.8.0
 *******************************************************************************
 
 2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2962606 ] Autorenewal errors: invalid SID,
+	too-short renewal interval
+	Submitted By: Nick Leverton (leveret)
+	
+	Auto-renewals send an invalid SID due to a missing UpnpString_get_String
+	call. They also send a renewal interval of 0 instead of copying it from
+	the original subscription.
+
+2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2964685 ] patch for avoiding inet_ntoa (1.8.0)
+	Submitted By: Nick Leverton (leveret)
 	
 	Seems like SF's tracker won't let me add a patch to someone else's issue ?!
 	This refers to https://sourceforge.net/support/tracker.php?aid=2724578
