@@ -3,6 +3,29 @@ Version 1.8.0
 *******************************************************************************
 
 2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2964685 ] patch for avoiding inet_ntoa (1.8.0)
+	
+	Seems like SF's tracker won't let me add a patch to someone else's issue ?!
+	This refers to https://sourceforge.net/support/tracker.php?aid=2724578
+	
+	The calls to inet_ntoa are in getlocalhostname(), which is called from
+	UpnpInit when it is returning the bound IP address. 
+	UpnpInit/getlocalhostname hasn't been updated to IPv6, I presume this is
+	deliberate so that it doesn't start returning IPv6 addresses and
+	overwriting the caller's IPv4-sized allocation.
+	
+	The attached patch just updates getlocalhostname to use inet_ntop instead
+	of inet_ntoa, and also documents the fact that UpnpInit is IPv4 only whilst
+	UpnpInnit2 is both IPv4 and IPv6.
+	
+	A fuller solution might be to change UpnpInit to use some variant on
+	UpnpGetIfInfo. UpnpInit could still be left as IPv4 only if desired -
+	perhaps UpnpGetIfInfo could take an option for the desired address family.
+	getlocalhostname and its own copy of the interface scanning code would then
+	be redundant. I don't have IPv6 capability here though so I'm reluctant to
+	change the IPv6 code, as I have no way to test it.
+
+2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2724578 ] patch for avoiding memory leaks when
 	add devices
 	

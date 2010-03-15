@@ -3485,9 +3485,13 @@ int getlocalhostname(char *out, const int out_len)
 		if (p) {
 			strncpy(out, p, out_len);
 		} else {
+			UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+				"getlocalhostname: inet_ntop returned error\n" );
 			ret = UPNP_E_INIT;
 		}
 	} else {
+		UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+			"getlocalhostname: gethostbyname returned error\n" );
 		ret = UPNP_E_INIT;
 	}
 
@@ -3520,6 +3524,8 @@ int getlocalhostname(char *out, const int out_len)
 			if (p) {
 				strncpy(out, p, out_len);
 			} else {
+				UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+					"getlocalhostname: inet_ntop returned error\n" );
 				ret = UPNP_E_INIT;
 			}
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -3597,6 +3603,8 @@ int getlocalhostname(char *out, const int out_len)
 	if (p) {
 		strncpy(out, p, out_len);
 	} else {
+		UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+			"getlocalhostname: inet_ntop returned error\n" );
 		ret = UPNP_E_INIT;
 	}
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,

@@ -685,22 +685,22 @@ extern "C" {
 
 
 /*!
- * \brief Initializes the Linux SDK for UPnP Devices.
+ * \brief Initializes the Linux SDK for UPnP Devices (IPv4 only).
  *
  * \deprecated Kept for backwards compatibility. Use UpnpInit2 for new
- * implementations.
+ * implementations or where IPv6 is required.
  *
  * This function must be called before any other API function can be called.
  * It should be called only once. Subsequent calls to this API return a
  * \c UPNP_E_INIT error code.
  *
- * Optionally, the application can specify a host IP address (in the
+ * Optionally, the application can specify a host IPv4 address (in the
  * case of a multi-homed configuration) and a port number to use for
  * all UPnP operations.  Since a port number can be used only by one
  * process, multiple processes using the SDK must specify
  * different port numbers.
  *
- * If unspecified, the SDK will use the first adapter's IP address 
+ * If unspecified, the SDK will use the first IPv4-capable adapter's IP address
  * and an arbitrary port.
  *
  * This call is synchronous.
@@ -718,8 +718,8 @@ extern "C" {
  *     \li \c UPNP_E_INTERNAL_ERROR: An internal error ocurred.
  */
 EXPORT_SPEC int UpnpInit(
-	/*! The host local IP address to use, in string format, for example
-	 * "192.168.0.1", or \c NULL to use the first adapter's IP address. */
+	/*! The host local IPv4 address to use, in string format, for example
+	 * "192.168.0.1", or \c NULL to use the first IPv4 adapter's IP address. */
 	const char *HostIP,
 	/*! Local Port to listen for incoming connections
 	 * \c NULL will pick an arbitrary free port. */
@@ -727,7 +727,7 @@ EXPORT_SPEC int UpnpInit(
 
 
 /*!
- * \brief Initializes the Linux SDK for UPnP Devices.
+ * \brief Initializes the Linux SDK for UPnP Devices (IPv4 or IPv6).
  *
  * This function must be called before any other API function can be called.
  * It should be called only once. Subsequent calls to this API return a
