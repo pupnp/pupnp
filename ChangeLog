@@ -148,6 +148,9 @@ Version 1.6.7
 *******************************************************************************
 
 2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2203721 ] timeb.h check obsolete
+
+2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2970872 ] Update ErrorMessages for latest return
 	code list
 	Submitted By: Nick Leverton ( leveret )
