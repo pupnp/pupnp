@@ -3469,127 +3469,140 @@ static void printNodes(IXML_Node *tmpRoot, int depth)
 
 int getlocalhostname(char *out, const int out_len)
 {
+	int ret = UPNP_E_SUCCESS;
+	char tempstr[16];
+	char *p = NULL;
+
 #ifdef WIN32
-	struct hostent *h=NULL;
+	struct hostent *h = NULL;
 	struct sockaddr_in LocalAddr;
 
- 		gethostname(out, out_len);
- 		h=gethostbyname(out);
- 		if (h!=NULL){
- 			memcpy(&LocalAddr.sin_addr,h->h_addr_list[0],4);
- 			strncpy(out, inet_ntoa(LocalAddr.sin_addr), out_len);
- 		}
- 		return UPNP_E_SUCCESS;
+	gethostname(out, out_len);
+	h = gethostbyname(out);
+	if (h != NULL) {
+		memcpy(&LocalAddr.sin_addr, h->h_addr_list[0], 4);
+		p = inet_ntop(AF_INET, &LocalAddr.sin_addr, tempstr, 16);
+		if (p) {
+			strncpy(out, p, out_len);
+		} else {
+			ret = UPNP_E_INIT;
+		}
+	} else {
+		ret = UPNP_E_INIT;
+	}
+
 #elif (defined(BSD) && BSD >= 199306)
-    struct ifaddrs *ifap, *ifa;
+	struct ifaddrs *ifap, *ifa;
+	char tempstr[16];
 
-    if (getifaddrs(&ifap) != 0) {
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-            "DiscoverInterfaces: getifaddrs() returned error\n" );
-        return UPNP_E_INIT;
-    }
+	if (getifaddrs(&ifap) != 0) {
+		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+			"DiscoverInterfaces: getifaddrs() returned error\n");
+		return UPNP_E_INIT;
+	}
 
-    // cycle through available interfaces
-    for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next) {
-        // Skip loopback, point-to-point and down interfaces, 
-        // except don't skip down interfaces
-        // if we're trying to get a list of configurable interfaces. 
-        if( ( ifa->ifa_flags & IFF_LOOPBACK )
-            || ( !( ifa->ifa_flags & IFF_UP ) ) ) {
-            continue;
-        }
-        if( ifa->ifa_addr->sa_family == AF_INET ) {
-            // We don't want the loopback interface. 
-            if( ((struct sockaddr_in *)(ifa->ifa_addr))->sin_addr.s_addr ==
-                htonl( INADDR_LOOPBACK ) ) {
-                continue;
-            }
+	/* cycle through available interfaces */
+	for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next) {
+		/* Skip loopback, point-to-point and down interfaces, 
+		 * except don't skip down interfaces
+		 * if we're trying to get a list of configurable interfaces. */
+		if ((ifa->ifa_flags & IFF_LOOPBACK) ||
+		    (!( ifa->ifa_flags & IFF_UP))) {
+			continue;
+		}
+		if (ifa->ifa_addr->sa_family == AF_INET) {
+			/* We don't want the loopback interface. */
+			if (((struct sockaddr_in *)(ifa->ifa_addr))->sin_addr.s_addr ==
+			    htonl(INADDR_LOOPBACK)) {
+				continue;
+			}
+			p = inet_ntop(AF_INET, &LocalAddr.sin_addr, tempstr, 16);
+			if (p) {
+				strncpy(out, p, out_len);
+			} else {
+				ret = UPNP_E_INIT;
+			}
+			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+				"Inside getlocalhostname: after strncpy %s\n", out);
+			break;
+		}
+	}
+	freeifaddrs(ifap);
 
-            strncpy( out, inet_ntoa( ((struct sockaddr_in *)(ifa->ifa_addr))->
-                sin_addr ), out_len );
-            out[LINE_SIZE-1] = '\0';
-            UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                "Inside getlocalhostname : after strncpy %s\n",
-                out );
-            break;
-        }
-    }
-    freeifaddrs(ifap);
-
-    return ifa ? UPNP_E_SUCCESS : UPNP_E_INIT;
+	ret = ifa ? UPNP_E_SUCCESS : UPNP_E_INIT;
 #else
-    char szBuffer[MAX_INTERFACES * sizeof( struct ifreq )];
-    struct ifconf ifConf;
-    struct ifreq ifReq;
-    int nResult;
-    int i;
-    int LocalSock;
-    struct sockaddr_in LocalAddr;
-    int j = 0;
+	char szBuffer[MAX_INTERFACES * sizeof (struct ifreq)];
+	struct ifconf ifConf;
+	struct ifreq ifReq;
+	int nResult;
+	int i;
+	int LocalSock;
+	struct sockaddr_in LocalAddr;
+	int j = 0;
 
-    // Create an unbound datagram socket to do the SIOCGIFADDR ioctl on. 
-    if( ( LocalSock = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP ) ) < 0 ) {
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-            "Can't create addrlist socket\n" );
-        return UPNP_E_INIT;
-    }
-    // Get the interface configuration information... 
-    ifConf.ifc_len = sizeof szBuffer;
-    ifConf.ifc_ifcu.ifcu_buf = ( caddr_t ) szBuffer;
-    nResult = ioctl( LocalSock, SIOCGIFCONF, &ifConf );
+	/* Create an unbound datagram socket to do the SIOCGIFADDR ioctl on.  */
+	LocalSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (LocalSock < 0) {
+		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+			"Can't create addrlist socket\n");
+		return UPNP_E_INIT;
+	}
+	/* Get the interface configuration information... */
+	ifConf.ifc_len = sizeof szBuffer;
+	ifConf.ifc_ifcu.ifcu_buf = (caddr_t) szBuffer;
+	nResult = ioctl(LocalSock, SIOCGIFCONF, &ifConf);
+	if (nResult < 0) {
+		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+			"DiscoverInterfaces: SIOCGIFCONF returned error\n");
 
-    if( nResult < 0 ) {
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-            "DiscoverInterfaces: SIOCGIFCONF returned error\n" );
+		return UPNP_E_INIT;
+	}
 
-        return UPNP_E_INIT;
-    }
-    // Cycle through the list of interfaces looking for IP addresses. 
+	/* Cycle through the list of interfaces looking for IP addresses. */
+	for (i = 0; i < ifConf.ifc_len && j < DEFAULT_INTERFACE; ) {
+		struct ifreq *pifReq =
+			(struct ifreq *)((caddr_t)ifConf.ifc_req + i);
+		i += sizeof *pifReq;
+		/* See if this is the sort of interface we want to deal with. */
+		strcpy(ifReq.ifr_name, pifReq->ifr_name);
+		if (ioctl(LocalSock, SIOCGIFFLAGS, &ifReq) < 0) {
+			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+				"Can't get interface flags for %s:\n",
+				ifReq.ifr_name);
+		}
+		/* Skip loopback, point-to-point and down interfaces,
+		 * except don't skip down interfaces
+		 * if we're trying to get a list of configurable interfaces. */
+		if ((ifReq.ifr_flags & IFF_LOOPBACK) ||
+		    (!(ifReq.ifr_flags & IFF_UP))) {
+			continue;
+		}
+		if (pifReq->ifr_addr.sa_family == AF_INET) {
+			/* Get a pointer to the address...*/
+			memcpy(&LocalAddr, &pifReq->ifr_addr,
+				sizeof pifReq->ifr_addr);
+			/* We don't want the loopback interface. */
+			if (LocalAddr.sin_addr.s_addr ==
+			    htonl(INADDR_LOOPBACK)) {
+				continue;
+			}
+		}
+		/* increment j if we found an address which is not loopback
+		 * and is up */
+		j++;
+	}
+	close(LocalSock);
 
-    for( i = 0; ( ( i < ifConf.ifc_len ) && ( j < DEFAULT_INTERFACE ) ); ) {
-        struct ifreq *pifReq =
-            ( struct ifreq * )( ( caddr_t ) ifConf.ifc_req + i );
-        i += sizeof *pifReq;
-
-        // See if this is the sort of interface we want to deal with.
-        strcpy( ifReq.ifr_name, pifReq->ifr_name );
-        if( ioctl( LocalSock, SIOCGIFFLAGS, &ifReq ) < 0 ) {
-            UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                "Can't get interface flags for %s:\n",
-                ifReq.ifr_name );
-        }
-        // Skip loopback, point-to-point and down interfaces, 
-        // except don't skip down interfaces
-        // if we're trying to get a list of configurable interfaces. 
-        if( ( ifReq.ifr_flags & IFF_LOOPBACK )
-            || ( !( ifReq.ifr_flags & IFF_UP ) ) ) {
-            continue;
-        }
-        if( pifReq->ifr_addr.sa_family == AF_INET ) {
-            // Get a pointer to the address...
-            memcpy( &LocalAddr, &pifReq->ifr_addr,
-                    sizeof pifReq->ifr_addr );
-
-            // We don't want the loopback interface. 
-            if( LocalAddr.sin_addr.s_addr == htonl( INADDR_LOOPBACK ) ) {
-                continue;
-            }
-
-        }
-        //increment j if we found an address which is not loopback
-        //and is up
-        j++;
-
-    }
-    close( LocalSock );
-
-    strncpy( out, inet_ntoa( LocalAddr.sin_addr ), out_len );
-
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside getlocalhostname : after strncpy %s\n",
-        out );
-    return UPNP_E_SUCCESS;
+	p = inet_ntop(AF_INET, &LocalAddr.sin_addr, tempstr, 16);
+	if (p) {
+		strncpy(out, p, out_len);
+	} else {
+		ret = UPNP_E_INIT;
+	}
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Inside getlocalhostname: after strncpy %s\n", out);
 #endif
+	return ret;
 }
 
 
@@ -3602,8 +3615,8 @@ void AutoAdvertise(void *input)
 	UpnpSendAdvertisement(event->handle, *((int *)event->Event));
 	free_upnp_timeout(event);
 }
-#endif // EXCLUDE_SSDP == 0
-#endif // INCLUDE_DEVICE_APIS
+#endif /* EXCLUDE_SSDP == 0 */
+#endif /* INCLUDE_DEVICE_APIS */
 
 
 #ifdef INTERNAL_WEB_SERVER
@@ -3619,7 +3632,7 @@ int UpnpSetWebServerRootDir(const char *rootDir)
 
     return web_server_set_root_dir(rootDir);
 }
-#endif // INTERNAL_WEB_SERVER
+#endif /* INTERNAL_WEB_SERVER */
 
 
 int UpnpAddVirtualDir(const char *newDirName)
