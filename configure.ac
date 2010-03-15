@@ -351,7 +351,6 @@ AC_CHECK_HEADERS(
 	sys/ioctl.h \
 	sys/socket.h \
 	sys/time.h \
-	sys/timeb.h \
 	syslog.h \
 	unistd.h \
 	],
