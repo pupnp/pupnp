@@ -107,6 +107,11 @@ const UpnpString *UpnpActionComplete_get_CtrlUrl(const UpnpActionComplete *p)
 	return ((struct SUpnpActionComplete *)p)->m_ctrlUrl;
 }
 
+const char *UpnpActionComplete_get_CtrlUrl_cstr(const UpnpActionComplete *p)
+{
+	return UpnpString_get_String(UpnpActionComplete_get_CtrlUrl(p));
+}
+
 
 void UpnpActionComplete_set_CtrlUrl(UpnpActionComplete *p, const UpnpString *s)
 {

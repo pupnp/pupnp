@@ -49,50 +49,58 @@ EXPORT_SPEC void UpnpDiscovery_set_Expires(UpnpDiscovery *p, int n);
 
 /*! The unique device identifier. */
 EXPORT_SPEC const UpnpString *UpnpDiscovery_get_DeviceID(const UpnpDiscovery *p);
+EXPORT_SPEC const char *UpnpDiscovery_get_DeviceID_cstr(const UpnpDiscovery *p);
 EXPORT_SPEC void UpnpDiscovery_set_DeviceID(UpnpDiscovery *p, const UpnpString *s);
 EXPORT_SPEC void UpnpDiscovery_strcpy_DeviceID(UpnpDiscovery *p, const char *s);
 
 /*! The device type. */
 EXPORT_SPEC const UpnpString *UpnpDiscovery_get_DeviceType(const UpnpDiscovery *p);
+EXPORT_SPEC const char *UpnpDiscovery_get_DeviceType_cstr(const UpnpDiscovery *p);
 EXPORT_SPEC void UpnpDiscovery_set_DeviceType(UpnpDiscovery *p, const UpnpString *s);
 EXPORT_SPEC void UpnpDiscovery_strcpy_DeviceType(UpnpDiscovery *p, const char *s);
 
 /*! The ServiceType. */
 EXPORT_SPEC const UpnpString *UpnpDiscovery_get_ServiceType(const UpnpDiscovery *p);
+EXPORT_SPEC const char *UpnpDiscovery_get_ServiceType_cstr(const UpnpDiscovery *p);
 EXPORT_SPEC void UpnpDiscovery_set_ServiceType(UpnpDiscovery *p, const UpnpString *s);
 EXPORT_SPEC void UpnpDiscovery_strcpy_ServiceType(UpnpDiscovery *p, const char *s);
 
 /*! The service version. */
 EXPORT_SPEC const UpnpString *UpnpDiscovery_get_ServiceVer(const UpnpDiscovery *p);
+EXPORT_SPEC const char *UpnpDiscovery_get_ServiceVer_cstr(const UpnpDiscovery *p);
 EXPORT_SPEC void UpnpDiscovery_set_ServiceVer(UpnpDiscovery *p, const UpnpString *s);
 EXPORT_SPEC void UpnpDiscovery_strcpy_ServiceVer(UpnpDiscovery *p, const char *s);
 
 /*! The URL to the UPnP description document for the device. */
 EXPORT_SPEC const UpnpString *UpnpDiscovery_get_Location(const UpnpDiscovery *p);
+EXPORT_SPEC const char *UpnpDiscovery_get_Location_cstr(const UpnpDiscovery *p);
 EXPORT_SPEC void UpnpDiscovery_set_Location(UpnpDiscovery *p, const UpnpString *s);
 EXPORT_SPEC void UpnpDiscovery_strcpy_Location(UpnpDiscovery *p, const char *s);
 EXPORT_SPEC void UpnpDiscovery_strncpy_Location(UpnpDiscovery *p, const char *s, int n);
 
 /*! The operating system the device is running. */
 EXPORT_SPEC const UpnpString *UpnpDiscovery_get_Os(const UpnpDiscovery *p);
+EXPORT_SPEC const char *UpnpDiscovery_get_Os_cstr(const UpnpDiscovery *p);
 EXPORT_SPEC void UpnpDiscovery_set_Os(UpnpDiscovery *p, const UpnpString *s);
 EXPORT_SPEC void UpnpDiscovery_strcpy_Os(UpnpDiscovery *p, const char *s);
 EXPORT_SPEC void UpnpDiscovery_strncpy_Os(UpnpDiscovery *p, const char *s, int n);
 
 /*! Date when the response was generated. */
 EXPORT_SPEC const UpnpString *UpnpDiscovery_get_Date(const UpnpDiscovery *p);
+EXPORT_SPEC const char *UpnpDiscovery_get_Date_cstr(const UpnpDiscovery *p);
 EXPORT_SPEC void UpnpDiscovery_set_Date(UpnpDiscovery *p, const UpnpString *s);
 EXPORT_SPEC void UpnpDiscovery_strcpy_Date(UpnpDiscovery *p, const char *s);
 
 /*! Confirmation that the MAN header was understood by the device. */
 EXPORT_SPEC const UpnpString *UpnpDiscovery_get_Ext(const UpnpDiscovery *p);
+EXPORT_SPEC const char *UpnpDiscovery_get_Ext_cstr(const UpnpDiscovery *p);
 EXPORT_SPEC void UpnpDiscovery_set_Ext(UpnpDiscovery *p, const UpnpString *s);
 EXPORT_SPEC void UpnpDiscovery_strcpy_Ext(UpnpDiscovery *p, const char *s);
 EXPORT_SPEC void UpnpDiscovery_strncpy_Ext(UpnpDiscovery *p, const char *s, int n);
 
 /*! The host address of the device responding to the search. */
-EXPORT_SPEC struct sockaddr *UpnpDiscovery_get_DestAddr(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, struct sockaddr *sa);
+EXPORT_SPEC const struct sockaddr *UpnpDiscovery_get_DestAddr(const UpnpDiscovery *p);
+EXPORT_SPEC void UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, const struct sockaddr *sa);
 
 
 #ifdef __cplusplus

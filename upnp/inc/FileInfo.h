@@ -65,11 +65,13 @@ EXPORT_SPEC void UpnpFileInfo_set_IsReadable(UpnpFileInfo *p, int b);
 
 /*! The content type of the file. */
 EXPORT_SPEC const DOMString UpnpFileInfo_get_ContentType(const UpnpFileInfo *p);
+EXPORT_SPEC const char *UpnpFileInfo_get_ContentType_cstr(const UpnpFileInfo *p);
 EXPORT_SPEC void UpnpFileInfo_set_ContentType(UpnpFileInfo *p, const DOMString s);
 
 /*! Additional HTTP headers to return. Each header line should be
  *  followed by "\r\n". */
 EXPORT_SPEC const DOMString UpnpFileInfo_get_ExtraHeaders(const UpnpFileInfo *p);
+EXPORT_SPEC const char *UpnpFileInfo_get_ExtraHeaders_cstr(const UpnpFileInfo *p);
 EXPORT_SPEC void UpnpFileInfo_set_ExtraHeaders(UpnpFileInfo *p, const DOMString s);
 
 

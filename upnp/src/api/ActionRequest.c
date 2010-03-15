@@ -146,6 +146,11 @@ const UpnpString *UpnpActionRequest_get_ErrStr(const UpnpActionRequest *p)
 	return ((struct SUpnpActionRequest *)p)->m_errStr;
 }
 
+const char *UpnpActionRequest_get_ErrStr_cstr(const UpnpActionRequest *p)
+{
+	return UpnpString_get_String(UpnpActionRequest_get_ErrStr(p));
+}
+
 
 void UpnpActionRequest_set_ErrStr(UpnpActionRequest *p, const UpnpString *s)
 {
@@ -165,6 +170,11 @@ void UpnpActionRequest_strcpy_ErrStr(UpnpActionRequest *p, const char *s)
 const UpnpString *UpnpActionRequest_get_ActionName(const UpnpActionRequest *p)
 {
 	return ((struct SUpnpActionRequest *)p)->m_actionName;
+}
+
+const char *UpnpActionRequest_get_ActionName_cstr(const UpnpActionRequest *p)
+{
+	return UpnpString_get_String(UpnpActionRequest_get_ActionName(p));
 }
 
 
@@ -188,6 +198,11 @@ const UpnpString *UpnpActionRequest_get_DevUDN(const UpnpActionRequest *p)
 	return ((struct SUpnpActionRequest *)p)->m_devUDN;
 }
 
+const char *UpnpActionRequest_get_DevUDN_cstr(const UpnpActionRequest *p)
+{
+	return UpnpString_get_String(UpnpActionRequest_get_DevUDN(p));
+}
+
 
 void UpnpActionRequest_set_DevUDN(UpnpActionRequest *p, const UpnpString *s)
 {
@@ -199,6 +214,11 @@ void UpnpActionRequest_set_DevUDN(UpnpActionRequest *p, const UpnpString *s)
 const UpnpString *UpnpActionRequest_get_ServiceID(const UpnpActionRequest *p)
 {
 	return ((struct SUpnpActionRequest *)p)->m_serviceID;
+}
+
+const char *UpnpActionRequest_get_ServiceID_cstr(const UpnpActionRequest *p)
+{
+	return UpnpString_get_String(UpnpActionRequest_get_ServiceID(p));
 }
 
 
@@ -235,13 +255,13 @@ void UpnpActionRequest_set_ActionResult(UpnpActionRequest *p, IXML_Document *d)
 }
 
 
-struct sockaddr *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p)
+const struct sockaddr *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p)
 {
 	return (struct sockaddr *)&((struct SUpnpActionRequest *)p)->m_ctrlPtIPAddr;
 }
 
 
-void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, struct sockaddr *ia)
+void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, const struct sockaddr *ia)
 {
 	((struct SUpnpActionRequest *)p)->m_ctrlPtIPAddr = *(struct sockaddr_storage *)ia;
 }

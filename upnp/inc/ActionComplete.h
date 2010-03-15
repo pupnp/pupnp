@@ -90,6 +90,15 @@ EXPORT_SPEC const UpnpString *UpnpActionComplete_get_CtrlUrl(
 	/*! [in] \b this pointer. */
 	const UpnpActionComplete *p);
 
+/*!
+ * \brief Control URL getter as a C string
+ *
+ * \return The control URL string.
+ */
+EXPORT_SPEC const char *UpnpActionComplete_get_CtrlUrl_cstr(
+	/*! [in] \b this pointer. */
+	const UpnpActionComplete *p);
+
 
 /*!
  * \brief Control URL setter.

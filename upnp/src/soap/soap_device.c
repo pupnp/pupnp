@@ -912,7 +912,7 @@ static UPNP_INLINE void handle_query_variable(
             err_str = Soap_Invalid_Var;
         } else {
             err_code = UpnpStateVarRequest_get_ErrCode(variable);
-            err_str = UpnpString_get_String(UpnpStateVarRequest_get_ErrStr(variable));
+            err_str = UpnpStateVarRequest_get_ErrStr_cstr(variable);
         }
         send_error_response( info, err_code, err_str, request );
         return;
@@ -998,7 +998,7 @@ handle_invoke_action( IN SOCKINFO * info,
 
     err_code = UpnpActionRequest_get_ErrCode(action);
     if (err_code != UPNP_E_SUCCESS) {
-        err_str = UpnpString_get_String(UpnpActionRequest_get_ErrStr(action));
+        err_str = UpnpActionRequest_get_ErrStr_cstr(action);
         if  (strlen(err_str) <= 0) {
             err_code = SOAP_ACTION_FAILED;
             err_str = Soap_Action_Failed;

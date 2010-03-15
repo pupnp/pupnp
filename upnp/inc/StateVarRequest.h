@@ -51,29 +51,34 @@ EXPORT_SPEC void UpnpStateVarRequest_set_Socket(UpnpStateVarRequest *p, int n);
 
 /*! The error string in case of error */
 EXPORT_SPEC const UpnpString *UpnpStateVarRequest_get_ErrStr(const UpnpStateVarRequest *p);
+EXPORT_SPEC const char *UpnpStateVarRequest_get_ErrStr_cstr(const UpnpStateVarRequest *p);
 EXPORT_SPEC void UpnpStateVarRequest_set_ErrStr(UpnpStateVarRequest *p, const UpnpString *s);
 EXPORT_SPEC void UpnpStateVarRequest_strcpy_ErrStr(UpnpStateVarRequest *p, const char *s);
 
 /*! The unique device ID */
 EXPORT_SPEC const UpnpString *UpnpStateVarRequest_get_DevUDN(const UpnpStateVarRequest *p);
+EXPORT_SPEC const char *UpnpStateVarRequest_get_DevUDN_cstr(const UpnpStateVarRequest *p);
 EXPORT_SPEC void UpnpStateVarRequest_set_DevUDN(UpnpStateVarRequest *p, const UpnpString *s);
 
 /*! The service ID */
 EXPORT_SPEC const UpnpString *UpnpStateVarRequest_get_ServiceID(const UpnpStateVarRequest *p);
+EXPORT_SPEC const char *UpnpStateVarRequest_get_ServiceID_cstr(const UpnpStateVarRequest *p);
 EXPORT_SPEC void UpnpStateVarRequest_set_ServiceID(UpnpStateVarRequest *p, const UpnpString *s);
 
 /*! The name of the variable. */
 EXPORT_SPEC const UpnpString *UpnpStateVarRequest_get_StateVarName(const UpnpStateVarRequest *p);
+EXPORT_SPEC const char *UpnpStateVarRequest_get_StateVarName_cstr(const UpnpStateVarRequest *p);
 EXPORT_SPEC void UpnpStateVarRequest_set_StateVarName(UpnpStateVarRequest *p, const UpnpString *s);
 EXPORT_SPEC void UpnpStateVarRequest_strcpy_StateVarName(UpnpStateVarRequest *p, const char *s);
 
 /*! IP address of sender requesting the state variable. */
-EXPORT_SPEC struct sockaddr *UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStateVarRequest *p);
-EXPORT_SPEC void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, struct sockaddr *sa);
+EXPORT_SPEC const struct sockaddr *UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStateVarRequest *p);
+EXPORT_SPEC void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, const struct sockaddr *sa);
 
 /*! The current value of the variable. This needs to be allocated by 
  *  the caller.  When finished with it, the SDK frees this \b DOMString. */
 EXPORT_SPEC const DOMString UpnpStateVarRequest_get_CurrentVal(const UpnpStateVarRequest *p);
+EXPORT_SPEC const char *UpnpStateVarRequest_get_CurrentVal_cstr(const UpnpStateVarRequest *p);
 EXPORT_SPEC void UpnpStateVarRequest_set_CurrentVal(UpnpStateVarRequest *p, const DOMString s);
 
 

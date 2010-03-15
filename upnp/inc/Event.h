@@ -48,7 +48,8 @@ EXPORT_SPEC IXML_Document *UpnpEvent_get_ChangedVariables(const UpnpEvent *p);
 EXPORT_SPEC void UpnpEvent_set_ChangedVariables(UpnpEvent *p, IXML_Document *d);
 
 /*! The subscription ID for this subscription. */
-EXPORT_SPEC UpnpString *UpnpEvent_get_SID(const UpnpEvent *p);
+EXPORT_SPEC const UpnpString *UpnpEvent_get_SID(const UpnpEvent *p);
+EXPORT_SPEC const char *UpnpEvent_get_SID_cstr(const UpnpEvent *p);
 EXPORT_SPEC void UpnpEvent_set_SID(UpnpEvent *p, const UpnpString *s);
 
 

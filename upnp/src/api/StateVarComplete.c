@@ -102,6 +102,11 @@ const UpnpString *UpnpStateVarComplete_get_CtrlUrl(const UpnpStateVarComplete *p
 	return ((struct SUpnpStateVarComplete *)p)->m_ctrlUrl;
 }
 
+const char *UpnpStateVarComplete_get_CtrlUrl_cstr(const UpnpStateVarComplete *p)
+{
+	return UpnpString_get_String(UpnpStateVarComplete_get_CtrlUrl(p));
+}
+
 
 void UpnpStateVarComplete_set_CtrlUrl(UpnpStateVarComplete *p, const UpnpString *s)
 {
@@ -123,6 +128,11 @@ const UpnpString *UpnpStateVarComplete_get_StateVarName(const UpnpStateVarComple
 	return ((struct SUpnpStateVarComplete *)p)->m_stateVarName;
 }
 
+const char *UpnpStateVarComplete_get_StateVarName_cstr(const UpnpStateVarComplete *p)
+{
+	return UpnpString_get_String(UpnpStateVarComplete_get_StateVarName(p));
+}
+
 
 void UpnpStateVarComplete_set_StateVarName(UpnpStateVarComplete *p, const UpnpString *s)
 {
@@ -142,6 +152,11 @@ void UpnpStateVarComplete_strcpy_StateVarName(UpnpStateVarComplete *p, const cha
 const DOMString UpnpStateVarComplete_get_CurrentVal(const UpnpStateVarComplete *p)
 {
 	return ((struct SUpnpStateVarComplete *)p)->m_currentVal;
+}
+
+const char *UpnpStateVarComplete_get_CurrentVal_cstr(const UpnpStateVarComplete *p)
+{
+	return (const char *)UpnpStateVarComplete_get_CurrentVal(p);
 }
 
 

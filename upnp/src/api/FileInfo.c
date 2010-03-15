@@ -145,6 +145,11 @@ const DOMString UpnpFileInfo_get_ContentType(const UpnpFileInfo *p)
 	return ((struct SUpnpFileInfo *)p)->m_contentType;
 }
 
+const char *UpnpFileInfo_get_ContentType_cstr(const UpnpFileInfo *p)
+{
+	return (const char *)UpnpFileInfo_get_ContentType(p);
+}
+
 
 void UpnpFileInfo_set_ContentType(UpnpFileInfo *p, const DOMString s)
 {
@@ -156,6 +161,11 @@ void UpnpFileInfo_set_ContentType(UpnpFileInfo *p, const DOMString s)
 const DOMString UpnpFileInfo_get_ExtraHeaders(const UpnpFileInfo *p)
 {
 	return ((struct SUpnpFileInfo *)p)->m_extraHeaders;
+}
+
+const char *UpnpFileInfo_get_ExtraHeaders_cstr(const UpnpFileInfo *p)
+{
+	return (const char *)UpnpFileInfo_get_ExtraHeaders(p);
 }
 
 

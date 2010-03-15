@@ -109,6 +109,11 @@ const UpnpString *UpnpEventSubscribe_get_SID(const UpnpEventSubscribe *p)
 	return ((struct SEventSubscribe *)p)->m_SID;
 }
 
+const char *UpnpEventSubscribe_get_SID_cstr(const UpnpEventSubscribe *p)
+{
+	return UpnpString_get_String(UpnpEventSubscribe_get_SID(p));
+}
+
 
 void UpnpEventSubscribe_set_SID(UpnpEventSubscribe *p, const UpnpString *s)
 {
@@ -128,6 +133,11 @@ void UpnpEventSubscribe_strcpy_SID(UpnpEventSubscribe *p, const char *s)
 const UpnpString *UpnpEventSubscribe_get_PublisherUrl(const UpnpEventSubscribe *p)
 {
 	return ((struct SEventSubscribe *)p)->m_publisherUrl;
+}
+
+const char *UpnpEventSubscribe_get_PublisherUrl_cstr(const UpnpEventSubscribe *p)
+{
+	return UpnpString_get_String(UpnpEventSubscribe_get_PublisherUrl(p));
 }
 
 

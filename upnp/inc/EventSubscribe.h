@@ -53,12 +53,14 @@ EXPORT_SPEC void UpnpEventSubscribe_set_TimeOut(UpnpEventSubscribe *p, int n);
  *  this contains the SID from which the subscription is being
  *  unsubscribed.  */
 EXPORT_SPEC const UpnpString *UpnpEventSubscribe_get_SID(const UpnpEventSubscribe *p);
+EXPORT_SPEC const char *UpnpEventSubscribe_get_SID_cstr(const UpnpEventSubscribe *p);
 EXPORT_SPEC void UpnpEventSubscribe_set_SID(UpnpEventSubscribe *p, const UpnpString *s);
 EXPORT_SPEC void UpnpEventSubscribe_strcpy_SID(UpnpEventSubscribe *p, const char *s);
 
 
 /*! The event URL being subscribed to or removed from. */
 EXPORT_SPEC const UpnpString *UpnpEventSubscribe_get_PublisherUrl(const UpnpEventSubscribe *p);
+EXPORT_SPEC const char *UpnpEventSubscribe_get_PublisherUrl_cstr(const UpnpEventSubscribe *p);
 EXPORT_SPEC void UpnpEventSubscribe_set_PublisherUrl(UpnpEventSubscribe *p, const UpnpString *s);
 EXPORT_SPEC void UpnpEventSubscribe_strcpy_PublisherUrl(UpnpEventSubscribe *p, const char *s);
 

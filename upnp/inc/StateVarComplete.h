@@ -46,17 +46,20 @@ EXPORT_SPEC void UpnpStateVarComplete_set_ErrCode(UpnpStateVarComplete *p, int n
 
 /*! The control URL for the service. */
 EXPORT_SPEC const UpnpString *UpnpStateVarComplete_get_CtrlUrl(const UpnpStateVarComplete *p);
+EXPORT_SPEC const char *UpnpStateVarComplete_get_CtrlUrl_cstr(const UpnpStateVarComplete *p);
 EXPORT_SPEC void UpnpStateVarComplete_set_CtrlUrl(UpnpStateVarComplete *p, const UpnpString *s);
 EXPORT_SPEC void UpnpStateVarComplete_strcpy_CtrlUrl(UpnpStateVarComplete *p, const char *s);
 
 /*! The name of the variable. */
 EXPORT_SPEC const UpnpString *UpnpStateVarComplete_get_StateVarName(const UpnpStateVarComplete *p);
+EXPORT_SPEC const char *UpnpStateVarComplete_get_StateVarName_cstr(const UpnpStateVarComplete *p);
 EXPORT_SPEC void UpnpStateVarComplete_set_StateVarName(UpnpStateVarComplete *p, const UpnpString *s);
 EXPORT_SPEC void UpnpStateVarComplete_strcpy_StateVarName(UpnpStateVarComplete *p, const char *s);
 
 /*! The current value of the variable. This needs to be allocated by 
  *  the caller.  When finished with it, the SDK frees this \b DOMString. */
 EXPORT_SPEC const DOMString UpnpStateVarComplete_get_CurrentVal(const UpnpStateVarComplete *p);
+EXPORT_SPEC const char *UpnpStateVarComplete_get_CurrentVal_cstr(const UpnpStateVarComplete *p);
 EXPORT_SPEC void UpnpStateVarComplete_set_CurrentVal(UpnpStateVarComplete *p, const DOMString s);
 
 

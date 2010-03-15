@@ -154,6 +154,11 @@ const UpnpString *UpnpDiscovery_get_DeviceID(const UpnpDiscovery *p)
 	return ((struct SUpnpDiscovery *)p)->m_deviceID;
 }
 
+const char *UpnpDiscovery_get_DeviceID_cstr(const UpnpDiscovery *p)
+{
+	return UpnpString_get_String(UpnpDiscovery_get_DeviceID(p));
+}
+
 
 void UpnpDiscovery_set_DeviceID(UpnpDiscovery *p, const UpnpString *s)
 {
@@ -173,6 +178,11 @@ void UpnpDiscovery_strcpy_DeviceID(UpnpDiscovery *p, const char *s)
 const UpnpString *UpnpDiscovery_get_DeviceType(const UpnpDiscovery *p)
 {
 	return ((struct SUpnpDiscovery *)p)->m_deviceType;
+}
+
+const char *UpnpDiscovery_get_DeviceType_cstr(const UpnpDiscovery *p)
+{
+	return UpnpString_get_String(UpnpDiscovery_get_DeviceType(p));
 }
 
 
@@ -196,6 +206,11 @@ const UpnpString *UpnpDiscovery_get_ServiceType(const UpnpDiscovery *p)
 	return ((struct SUpnpDiscovery *)p)->m_serviceType;
 }
 
+const char *UpnpDiscovery_get_ServiceType_cstr(const UpnpDiscovery *p)
+{
+	return UpnpString_get_String(UpnpDiscovery_get_ServiceType(p));
+}
+
 
 void UpnpDiscovery_set_ServiceType(UpnpDiscovery *p, const UpnpString *s)
 {
@@ -217,6 +232,11 @@ const UpnpString *UpnpDiscovery_get_ServiceVer(const UpnpDiscovery *p)
 	return ((struct SUpnpDiscovery *)p)->m_serviceVer;
 }
 
+const char *UpnpDiscovery_get_ServiceVer_cstr(const UpnpDiscovery *p)
+{
+	return UpnpString_get_String(UpnpDiscovery_get_ServiceVer(p));
+}
+
 
 void UpnpDiscovery_set_ServiceVer(UpnpDiscovery *p, const UpnpString *s)
 {
@@ -236,6 +256,11 @@ void UpnpDiscovery_strcpy_ServiceVer(UpnpDiscovery *p, const char *s)
 const UpnpString *UpnpDiscovery_get_Location(const UpnpDiscovery *p)
 {
 	return ((struct SUpnpDiscovery *)p)->m_location;
+}
+
+const char *UpnpDiscovery_get_Location_cstr(const UpnpDiscovery *p)
+{
+	return UpnpString_get_String(UpnpDiscovery_get_Location(p));
 }
 
 
@@ -267,6 +292,11 @@ const UpnpString *UpnpDiscovery_get_Os(const UpnpDiscovery *p)
 	return ((struct SUpnpDiscovery *)p)->m_os;
 }
 
+const char *UpnpDiscovery_get_Os_cstr(const UpnpDiscovery *p)
+{
+	return UpnpString_get_String(UpnpDiscovery_get_Os(p));
+}
+
 
 void UpnpDiscovery_set_Os(UpnpDiscovery *p, const UpnpString *s)
 {
@@ -296,6 +326,11 @@ const UpnpString *UpnpDiscovery_get_Date(const UpnpDiscovery *p)
 	return ((struct SUpnpDiscovery *)p)->m_date;
 }
 
+const char *UpnpDiscovery_get_Date_cstr(const UpnpDiscovery *p)
+{
+	return UpnpString_get_String(UpnpDiscovery_get_Date(p));
+}
+
 
 void UpnpDiscovery_set_Date(UpnpDiscovery *p, const UpnpString *s)
 {
@@ -315,6 +350,11 @@ void UpnpDiscovery_strcpy_Date(UpnpDiscovery *p, const char *s)
 const UpnpString *UpnpDiscovery_get_Ext(const UpnpDiscovery *p)
 {
 	return ((struct SUpnpDiscovery *)p)->m_ext;
+}
+
+const char *UpnpDiscovery_get_Ext_cstr(const UpnpDiscovery *p)
+{
+	return UpnpString_get_String(UpnpDiscovery_get_Ext(p));
 }
 
 
@@ -341,13 +381,13 @@ void UpnpDiscovery_strncpy_Ext(UpnpDiscovery *p, const char *s, int n)
 }
 
 
-struct sockaddr *UpnpDiscovery_get_DestAddr(const UpnpDiscovery *p)
+const struct sockaddr *UpnpDiscovery_get_DestAddr(const UpnpDiscovery *p)
 {
 	return (struct sockaddr *)&((struct SUpnpDiscovery *)p)->m_destAddr;
 }
 
 
-void UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, struct sockaddr *sa)
+void UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, const struct sockaddr *sa)
 {
 	((struct SUpnpDiscovery *)p)->m_destAddr = *(struct sockaddr_storage *)sa;
 }

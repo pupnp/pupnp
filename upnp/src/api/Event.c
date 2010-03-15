@@ -100,9 +100,14 @@ void UpnpEvent_set_ChangedVariables(UpnpEvent *p, IXML_Document *d)
 }
 
 
-UpnpString *UpnpEvent_get_SID(const UpnpEvent *p)
+const UpnpString *UpnpEvent_get_SID(const UpnpEvent *p)
 {
 	return ((struct SUpnpEvent *)p)->m_SID;
+}
+
+const char *UpnpEvent_get_SID_cstr(const UpnpEvent *p)
+{
+	return UpnpString_get_String(UpnpEvent_get_SID(p));
 }
 
 

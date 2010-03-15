@@ -50,20 +50,24 @@ EXPORT_SPEC void UpnpActionRequest_set_Socket(UpnpActionRequest *p, int n);
 
 /*! The error string in case of error */
 EXPORT_SPEC const UpnpString *UpnpActionRequest_get_ErrStr(const UpnpActionRequest *p);
+EXPORT_SPEC const char *UpnpActionRequest_get_ErrStr_cstr(const UpnpActionRequest *p);
 EXPORT_SPEC void UpnpActionRequest_set_ErrStr(UpnpActionRequest *p, const UpnpString *s);
 EXPORT_SPEC void UpnpActionRequest_strcpy_ErrStr(UpnpActionRequest *p, const char *s);
 
 /*! The Action Name */
 EXPORT_SPEC const UpnpString *UpnpActionRequest_get_ActionName(const UpnpActionRequest *p);
+EXPORT_SPEC const char *UpnpActionRequest_get_ActionName_cstr(const UpnpActionRequest *p);
 EXPORT_SPEC void UpnpActionRequest_set_ActionName(UpnpActionRequest *p, const UpnpString *s);
 EXPORT_SPEC void UpnpActionRequest_strcpy_ActionName(UpnpActionRequest *p, const char *s);
 
 /*! The unique device ID */
 EXPORT_SPEC const UpnpString *UpnpActionRequest_get_DevUDN(const UpnpActionRequest *p);
+EXPORT_SPEC const char *UpnpActionRequest_get_DevUDN_cstr(const UpnpActionRequest *p);
 EXPORT_SPEC void UpnpActionRequest_set_DevUDN(UpnpActionRequest *p, const UpnpString *s);
 
 /*! The service ID */
 EXPORT_SPEC const UpnpString *UpnpActionRequest_get_ServiceID(const UpnpActionRequest *p);
+EXPORT_SPEC const char *UpnpActionRequest_get_ServiceID_cstr(const UpnpActionRequest *p);
 EXPORT_SPEC void UpnpActionRequest_set_ServiceID(UpnpActionRequest *p, const UpnpString *s);
 
 /*! The DOM document describing the action */
@@ -79,8 +83,8 @@ EXPORT_SPEC IXML_Document *UpnpActionRequest_get_SoapHeader(const UpnpActionRequ
 EXPORT_SPEC void UpnpActionRequest_set_SoapHeader(UpnpActionRequest *p, IXML_Document *d);
 
 /*! IP address of the control point requesting this action */
-EXPORT_SPEC struct sockaddr *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p);
-EXPORT_SPEC void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, struct sockaddr *sa);
+EXPORT_SPEC const struct sockaddr *UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p);
+EXPORT_SPEC void UpnpActionRequest_set_CtrlPtIPAddr(UpnpActionRequest *p, const struct sockaddr *sa);
 
 
 #ifdef __cplusplus

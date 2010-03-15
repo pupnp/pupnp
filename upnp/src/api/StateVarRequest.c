@@ -138,6 +138,11 @@ const UpnpString *UpnpStateVarRequest_get_ErrStr(const UpnpStateVarRequest *p)
 	return ((struct SUpnpStateVarRequest *)p)->m_errStr;
 }
 
+const char *UpnpStateVarRequest_get_ErrStr_cstr(const UpnpStateVarRequest *p)
+{
+	return UpnpString_get_String(UpnpStateVarRequest_get_ErrStr(p));
+}
+
 
 void UpnpStateVarRequest_set_ErrStr(UpnpStateVarRequest *p, const UpnpString *s)
 {
@@ -159,6 +164,11 @@ const UpnpString *UpnpStateVarRequest_get_DevUDN(const UpnpStateVarRequest *p)
 	return ((struct SUpnpStateVarRequest *)p)->m_devUDN;
 }
 
+const char *UpnpStateVarRequest_get_DevUDN_cstr(const UpnpStateVarRequest *p)
+{
+	return UpnpString_get_String(UpnpStateVarRequest_get_DevUDN(p));
+}
+
 
 void UpnpStateVarRequest_set_DevUDN(UpnpStateVarRequest *p, const UpnpString *s)
 {
@@ -172,6 +182,11 @@ const UpnpString *UpnpStateVarRequest_get_ServiceID(const UpnpStateVarRequest *p
 	return ((struct SUpnpStateVarRequest *)p)->m_serviceID;
 }
 
+const char *UpnpStateVarRequest_get_ServiceID_cstr(const UpnpStateVarRequest *p)
+{
+	return UpnpString_get_String(UpnpStateVarRequest_get_ServiceID(p));
+}
+
 
 void UpnpStateVarRequest_set_ServiceID(UpnpStateVarRequest *p, const UpnpString *s)
 {
@@ -183,6 +198,11 @@ void UpnpStateVarRequest_set_ServiceID(UpnpStateVarRequest *p, const UpnpString 
 const UpnpString *UpnpStateVarRequest_get_StateVarName(const UpnpStateVarRequest *p)
 {
 	return ((struct SUpnpStateVarRequest *)p)->m_stateVarName;
+}
+
+const char *UpnpStateVarRequest_get_StateVarName_cstr(const UpnpStateVarRequest *p)
+{
+	return UpnpString_get_String(UpnpStateVarRequest_get_StateVarName(p));
 }
 
 
@@ -201,13 +221,13 @@ void UpnpStateVarRequest_strcpy_StateVarName(UpnpStateVarRequest *p, const char 
 }
 
 
-struct sockaddr *UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStateVarRequest *p)
+const struct sockaddr *UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStateVarRequest *p)
 {
 	return (struct sockaddr *)&((struct SUpnpStateVarRequest *)p)->m_ctrlPtIPAddr;
 }
 
 
-void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, struct sockaddr *sa)
+void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, const struct sockaddr *sa)
 {
 	((struct SUpnpStateVarRequest *)p)->m_ctrlPtIPAddr = *(struct sockaddr_storage *)sa;
 }
@@ -216,6 +236,11 @@ void UpnpStateVarRequest_set_CtrlPtIPAddr(UpnpStateVarRequest *p, struct sockadd
 const DOMString UpnpStateVarRequest_get_CurrentVal(const UpnpStateVarRequest *p)
 {
 	return ((struct SUpnpStateVarRequest *)p)->m_currentVal;
+}
+
+const char *UpnpStateVarRequest_get_CurrentVal_cstr(const UpnpStateVarRequest *p)
+{
+	return (const char *)UpnpStateVarRequest_get_CurrentVal(p);
 }
 
 

@@ -81,6 +81,11 @@ const UpnpString *UpnpSubscriptionRequest_get_ServiceId(const UpnpSubscriptionRe
 	return ((struct SUpnpSubscriptionRequest *)p)->m_serviceId;
 }
 
+const char *UpnpSubscriptionRequest_get_ServiceId_cstr(const UpnpSubscriptionRequest *p)
+{
+	return UpnpString_get_String(UpnpSubscriptionRequest_get_ServiceId(p));
+}
+
 
 void UpnpSubscriptionRequest_set_ServiceId(UpnpSubscriptionRequest *p, const UpnpString *s)
 {
@@ -102,6 +107,11 @@ const UpnpString *UpnpSubscriptionRequest_get_UDN(const UpnpSubscriptionRequest 
 	return ((struct SUpnpSubscriptionRequest *)p)->m_UDN;
 }
 
+const char *UpnpSubscriptionRequest_get_UDN_cstr(const UpnpSubscriptionRequest *p)
+{
+	return UpnpString_get_String(UpnpSubscriptionRequest_get_UDN(p));
+}
+
 
 void UpnpSubscriptionRequest_set_UDN(UpnpSubscriptionRequest *p, const UpnpString *s)
 {
@@ -121,6 +131,11 @@ void UpnpSubscriptionRequest_strcpy_UDN(UpnpSubscriptionRequest *p, const char *
 const UpnpString *UpnpSubscriptionRequest_get_SID(const UpnpSubscriptionRequest *p)
 {
 	return ((struct SUpnpSubscriptionRequest *)p)->m_SID;
+}
+
+const char *UpnpSubscriptionRequest_get_SID_cstr(const UpnpSubscriptionRequest *p)
+{
+	return UpnpString_get_String(UpnpSubscriptionRequest_get_SID(p));
 }
 
 

@@ -2,6 +2,15 @@
 Version 1.8.0
 *******************************************************************************
 
+2010-03-14 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2964687 ] Add new string based accessors to upnp
+	object API
+
+	As per email to pupnp-devel, this is the patch to add the _strget_
+	accessors for string-like objects in the interface.
+	
+	Will add a further patch shortly to udpate the sample programs.
+
 2008-06-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Nicholas Kraft's patch to fix some IPv6 copy/paste issues. He
 	reported to be getting infinite loops with the svn code.
