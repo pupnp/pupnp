@@ -109,9 +109,9 @@ typedef enum Upnp_LogLevel_e {
  *	UPNP_E_SUCCESS : if success
  ***************************************************************************/
 #ifdef DEBUG
-int UpnpInitLog();
+int UpnpInitLog(void);
 #else
-static UPNP_INLINE int UpnpInitLog() { return UPNP_E_SUCCESS; }
+static UPNP_INLINE int UpnpInitLog(void) { return UPNP_E_SUCCESS; }
 #endif
 
 
@@ -141,9 +141,9 @@ static UPNP_INLINE void UpnpSetLogLevel(Upnp_LogLevel log_level) {}
  * Returns: void
  ***************************************************************************/
 #ifdef DEBUG
-void UpnpCloseLog();
+void UpnpCloseLog(void);
 #else
-static UPNP_INLINE void UpnpCloseLog() {}
+static UPNP_INLINE void UpnpCloseLog(void) {}
 #endif
 
 
