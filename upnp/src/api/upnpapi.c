@@ -201,54 +201,54 @@ static int GetDescDocumentAndURL(
 
 int UpnpInit(const char *HostIP, unsigned short DestPort)
 {
-	int retVal;
+	int retVal = UPNP_E_SUCCESS;
 
 	ithread_mutex_lock(&gSDKInitMutex);
 
-	// Check if we're already initialized.
-	if( UpnpSdkInit == 1 ) {
-		ithread_mutex_unlock(&gSDKInitMutex);
-		return UPNP_E_INIT;
+	/* Check if we're already initialized. */
+	if (UpnpSdkInit == 1) {
+		retval = UPNP_E_INIT;
+		goto exit_function;
 	}
 
-	// Perform initialization preamble.
+	/* Perform initialization preamble. */
 	retVal = UpnpInitPreamble();
-	if( retVal != UPNP_E_SUCCESS ) {
-		ithread_mutex_unlock(&gSDKInitMutex);
-		return retVal;
+	if (retVal != UPNP_E_SUCCESS) {
+		goto exit_function;
 	}
 
-	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 		"UpnpInit with HostIP=%s, DestPort=%d.\n", 
-		HostIP ? HostIP : "", DestPort );
+		HostIP ? HostIP : "", DestPort);
 
-	// Verify HostIP, if provided, or find it ourselves.
-	if( HostIP != NULL ) {
-		strncpy( gIF_IPV4, HostIP, sizeof(gIF_IPV4) );
+	/* Verify HostIP, if provided, or find it ourselves. */
+	if (HostIP != NULL) {
+		strncpy(gIF_IPV4, HostIP, sizeof(gIF_IPV4));
 	} else {
 		if( getlocalhostname( gIF_IPV4, sizeof(gIF_IPV4) ) != UPNP_E_SUCCESS ) {
-			return UPNP_E_INIT_FAILED;
+			retval = UPNP_E_INIT_FAILED;
+			goto exit_function;
 		}
 	}
 
-	// Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized.
+	/* Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized. */
 	UpnpSdkInit = 1;
 
-	// Finish initializing the SDK.
-	retVal = UpnpInitStartServers( DestPort );
-	if( retVal != UPNP_E_SUCCESS ) {
+	/* Finish initializing the SDK. */
+	retVal = UpnpInitStartServers(DestPort);
+	if (retVal != UPNP_E_SUCCESS) {
 		UpnpSdkInit = 0;
-		ithread_mutex_unlock( &gSDKInitMutex );
-		return retVal;
+		goto exit_function;
 	}
 
-	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 		"Host Ip: %s Host Port: %d\n", gIF_IPV4,
-		LOCAL_PORT_V4 );
+		LOCAL_PORT_V4);
 
-	ithread_mutex_unlock( &gSDKInitMutex );
+exit_function:
+	ithread_mutex_unlock(&gSDKInitMutex);
 
-	return UPNP_E_SUCCESS;
+	return retVal;
 }
 
 
@@ -256,44 +256,42 @@ int UpnpInit2(const char *IfName, unsigned short DestPort)
 {
 	int retVal;
 
-	ithread_mutex_lock( &gSDKInitMutex );
+	ithread_mutex_lock(&gSDKInitMutex);
 
-	// Check if we're already initialized.
-	if( UpnpSdkInit == 1 ) {
-		ithread_mutex_unlock( &gSDKInitMutex );
-		return UPNP_E_INIT;
+	/* Check if we're already initialized. */
+	if (UpnpSdkInit == 1) {
+		retVal = UPNP_E_INIT;
+		goto exit_function;
 	}
 
-	// Perform initialization preamble.
+	/* Perform initialization preamble. */
 	retVal = UpnpInitPreamble();
-	if( retVal != UPNP_E_SUCCESS ) {
-		ithread_mutex_unlock( &gSDKInitMutex );
-		return retVal;
+	if (retVal != UPNP_E_SUCCESS) {
+		goto exit_function;
 	}
 
-	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 		"UpnpInit2 with IfName=%s, DestPort=%d.\n", 
-		IfName ? IfName : "", DestPort );
+		IfName ? IfName : "", DestPort);
 
-	// Retrieve interface information (Addresses, index, etc).
+	/* Retrieve interface information (Addresses, index, etc). */
 	retVal = UpnpGetIfInfo( IfName );
-	if( retVal != UPNP_E_SUCCESS ) {
-		ithread_mutex_unlock( &gSDKInitMutex );
-		return retVal;
+	if (retVal != UPNP_E_SUCCESS) {
+		goto exit_function;
 	}
 
-	// Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized.
+	/* Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized. */
 	UpnpSdkInit = 1;
 
-	// Finish initializing the SDK.
-	retVal = UpnpInitStartServers( DestPort );
-	if( retVal != UPNP_E_SUCCESS ) {
+	/* Finish initializing the SDK. */
+	retVal = UpnpInitStartServers(DestPort);
+	if (retVal != UPNP_E_SUCCESS) {
 		UpnpSdkInit = 0;
-		ithread_mutex_unlock( &gSDKInitMutex );
-		return retVal;
+		goto exit_function;
 	}
 
-	ithread_mutex_unlock( &gSDKInitMutex );
+exit_function:
+	ithread_mutex_unlock(&gSDKInitMutex);
 
 	return UPNP_E_SUCCESS;
 }
@@ -310,7 +308,7 @@ int UpnpFinish(void)
 	struct Handle_Info *temp;
 
 #ifdef WIN32
-	//	WSACleanup();
+	/*WSACleanup();*/
 #endif
 
 	if( UpnpSdkInit != 1 ) {
@@ -549,7 +547,7 @@ exit_function:
 
 	return retVal;
 }
-#endif // INCLUDE_DEVICE_APIS
+#endif /* INCLUDE_DEVICE_APIS */
 
 
 #ifdef INCLUDE_DEVICE_APIS
@@ -679,7 +677,7 @@ exit_function:
 
 	return retVal;
 }
-#endif // INCLUDE_DEVICE_APIS
+#endif /* INCLUDE_DEVICE_APIS */
 
 
 #ifdef INCLUDE_DEVICE_APIS
@@ -879,7 +877,7 @@ int UpnpUnRegisterRootDevice(UpnpDevice_Handle Hnd)
     return retVal;
 
 }
-#endif // INCLUDE_DEVICE_APIS
+#endif /* INCLUDE_DEVICE_APIS */
 
 
 #ifdef INCLUDE_CLIENT_APIS
@@ -936,7 +934,7 @@ int UpnpRegisterClient(
 
     return UPNP_E_SUCCESS;
 }
-#endif // INCLUDE_CLIENT_APIS
+#endif /* INCLUDE_CLIENT_APIS */
 
 
 #ifdef INCLUDE_CLIENT_APIS
@@ -968,7 +966,7 @@ int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
         HandleUnlock();
         return UPNP_E_INVALID_HANDLE;
     }
-    //clean up search list
+    /* clean up search list */
     node = ListHead( &HInfo->SsdpSearchList );
     while( node != NULL ) {
         searchArg = ( SsdpSearchArg * ) node->item;
@@ -989,7 +987,7 @@ int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
     return UPNP_E_SUCCESS;
 
 }
-#endif // INCLUDE_CLIENT_APIS
+#endif /* INCLUDE_CLIENT_APIS */
 
 
 #ifdef INCLUDE_DEVICE_APIS
@@ -1350,15 +1348,13 @@ int UpnpSearchAsync(
     HandleUnlock();
     SearchByTarget( Mx, Target, ( void * )Cookie_const );
 
-    //HandleUnlock();
-
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting UpnpSearchAsync \n" );
 
     return UPNP_E_SUCCESS;
 
 }
-#endif // INCLUDE_CLIENT_APIS
+#endif /* INCLUDE_CLIENT_APIS */
 #endif
 
 
@@ -1400,7 +1396,7 @@ int UpnpSetMaxSubscriptions(
     return UPNP_E_SUCCESS;
 
 }
-#endif // INCLUDE_DEVICE_APIS
+#endif /* INCLUDE_DEVICE_APIS */
 
 
 #ifdef INCLUDE_DEVICE_APIS
@@ -1913,7 +1909,7 @@ int UpnpAcceptSubscription(
 	if (UpnpSdkInit != 1) {
 		line = __LINE__;
 		ret = UPNP_E_FINISH;
-		goto ExitFunction;
+		goto exit_function;
 	}
 
 	HandleReadLock();
@@ -1922,25 +1918,25 @@ int UpnpAcceptSubscription(
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_HANDLE;
-		goto ExitFunction;
+		goto exit_function;
 	}
 	if (DevID == NULL) {
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
-		goto ExitFunction;
+		goto exit_function;
 	}
 	if (ServName == NULL) {
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
-		goto ExitFunction;
+		goto exit_function;
 	}
 	if (SubsId == NULL) {
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
-		goto ExitFunction;
+		goto exit_function;
 	}
 	/* Now accepts an empty state list, so the code below is commented out */
 #if 0
@@ -1948,7 +1944,7 @@ int UpnpAcceptSubscription(
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
-		goto ExitFunction;
+		goto exit_function;
 	}
 #endif
 
@@ -1958,7 +1954,7 @@ int UpnpAcceptSubscription(
 	ret = genaInitNotify(
 		Hnd, DevID, ServName, VarName, NewVal, cVariables, SubsId);
 
-ExitFunction:
+exit_function:
 	UpnpPrintf(UPNP_ALL, API, __FILE__, line,
 		"Exiting UpnpAcceptSubscription, ret = %d\n", ret);
 
@@ -1985,7 +1981,7 @@ int UpnpAcceptSubscriptionExt(
 	if (UpnpSdkInit != 1) {
 		line = __LINE__;
 		ret = UPNP_E_FINISH;
-		goto ExitFunction;
+		goto exit_function;
 	}
 
 	HandleReadLock();
@@ -1994,25 +1990,25 @@ int UpnpAcceptSubscriptionExt(
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_HANDLE;
-		goto ExitFunction;
+		goto exit_function;
 	}
 	if (DevID == NULL) {
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
-		goto ExitFunction;
+		goto exit_function;
 	}
 	if (ServName == NULL) {
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
-		goto ExitFunction;
+		goto exit_function;
 	}
 	if (SubsId == NULL) {
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
-		goto ExitFunction;
+		goto exit_function;
 	}
 	/* Now accepts an empty state list, so the code below is commented out */
 #if 0
@@ -2020,7 +2016,7 @@ int UpnpAcceptSubscriptionExt(
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
-		goto ExitFunction;
+		goto exit_function;
 	}
 #endif
 
@@ -2029,7 +2025,7 @@ int UpnpAcceptSubscriptionExt(
 	line = __LINE__;
 	ret = genaInitNotifyExt(Hnd, DevID, ServName, PropSet, SubsId);
 
-ExitFunction:
+exit_function:
 	UpnpPrintf(UPNP_ALL, API, __FILE__, line,
 		"Exiting UpnpAcceptSubscription, ret = %d.\n", ret);
 
@@ -2645,11 +2641,12 @@ int UpnpDownloadXmlDoc(const char *url, IXML_Document **xmlDoc)
 }
 
 
-//----------------------------------------------------------------------------
-//
-//                UPNP-API  Internal function implementation
-//
-//----------------------------------------------------------------------------
+/*----------------------------------------------------------------------------
+ *
+ *	UPNP-API  Internal function implementation
+ *
+ *----------------------------------------------------------------------------
+ */
 
 
 #ifdef WIN32
@@ -2661,7 +2658,7 @@ int WinsockInit()
 
 	wVersionRequested = MAKEWORD( 2, 2 );
 
-	err = WSAStartup( wVersionRequested, &wsaData );
+	err = WSAStartup(wVersionRequested, &wsaData);
 	if ( err != 0 ) {
 		/* Tell the user that we could not find a usable */
 		/* WinSock DLL.                                  */
@@ -2788,20 +2785,20 @@ int UpnpInitThreadPools()
 
 	if (ThreadPoolInit(&gSendThreadPool, &attr) != UPNP_E_SUCCESS) {
 		ret = UPNP_E_INIT_FAILED;
-		goto ExitFunction;
+		goto exit_function;
 	}
 
 	if (ThreadPoolInit(&gRecvThreadPool, &attr) != UPNP_E_SUCCESS) {
 		ret = UPNP_E_INIT_FAILED;
-		goto ExitFunction;
+		goto exit_function;
 	}
 
 	if (ThreadPoolInit(&gMiniServerThreadPool, &attr) != UPNP_E_SUCCESS) {
 		ret = UPNP_E_INIT_FAILED;
-		goto ExitFunction;
+		goto exit_function;
 	}
 
-ExitFunction:
+exit_function:
 	if (ret != UPNP_E_SUCCESS) {
 		UpnpSdkInit = 0;
 		UpnpFinish();
@@ -3262,16 +3259,16 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
                 UpnpStateVarComplete_delete(Evt);
                 break;
             }
-#endif // EXCLUDE_SOAP == 0
+#endif /* EXCLUDE_SOAP == 0 */
         default:
             break;
-    } // end of switch(Param->FunName)
+    } /* end of switch(Param->FunName) */
 
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting UpnpThreadDistribution \n" );
 
 }
-#endif // INCLUDE_CLIENT_APIS
+#endif /* INCLUDE_CLIENT_APIS */
 
 
 /*!
@@ -3339,14 +3336,14 @@ Upnp_Handle_Type GetDeviceHandleInfo(
 	UpnpDevice_Handle *device_handle_out,
 	struct Handle_Info **HndInfo)
 {
-	// Check if we've got a registered device of the address family specified.
+	/* Check if we've got a registered device of the address family specified. */
 	if ((AddressFamily == AF_INET  && UpnpSdkDeviceRegisteredV4 == 0) ||
 	    (AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 0)) {
 		*device_handle_out = -1;
 		return HND_INVALID;
 	}
 
-	// Find it.
+	/* Find it. */
 	for (*device_handle_out=1; *device_handle_out < NUM_HANDLE; (*device_handle_out)++) {
 		if (GetHandleInfo(*device_handle_out, HndInfo) == HND_DEVICE) {
 			if ((*HndInfo)->DeviceAf == AddressFamily) {
@@ -3428,7 +3425,7 @@ int PrintHandleInfo(UpnpClient_Handle Hnd)
                 if(HndInfo->HType != HND_CLIENT)
                     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
                         "DescURL_%s\n", HndInfo->DescURL );
-#endif
+#endif /* INCLUDE_DEVICE_APIS */
     } else {
         return UPNP_E_INVALID_HANDLE;
     }
@@ -3798,7 +3795,7 @@ int UpnpEnableWebserver(int enable)
             bWebServerState = WEB_SERVER_DISABLED;
             SetHTTPGetCallback( NULL );
             break;
-#endif
+#endif /* INTERNAL_WEB_SERVER */
         default:
             return UPNP_E_INVALID_PARAM;
     }

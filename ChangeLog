@@ -2,6 +2,10 @@
 Version 1.8.0
 *******************************************************************************
 
+2010-03-16 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Fix for the ithread_mutex_unlock() logic in UpnpInit().
+	Thanks for Nicholas Kraft.
+
 2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2962606 ] Autorenewal errors: invalid SID,
 	too-short renewal interval
