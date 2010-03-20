@@ -15,6 +15,13 @@
 	#include <winsock2.h>
 	#include <Ws2tcpip.h>
 #else
+	#include <sys/param.h>
+	#if (defined(BSD) && BSD >= 199306) || defined (__FreeBSD_kernel__)
+		#include <ifaddrs.h>
+		/* Do not move or remove the include below for "sys/socket"!
+		 * Will break FreeBSD builds. */
+		#include <sys/socket.h>
+	#endif
 	#include <netinet/in.h>
 #endif
 

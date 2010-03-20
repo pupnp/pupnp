@@ -50,6 +50,17 @@
 #ifdef WIN32
 	/* Do not include these files */
 #else
+	#include <sys/param.h>
+	#if defined(_sun)
+		#include <fcntl.h>
+		#include <sys/sockio.h>
+	#elif defined(BSD) && BSD >= 199306
+		#include <ifaddrs.h>
+		/* Do not move or remove the include below for "sys/socket"!
+		 * Will break FreeBSD builds. */
+		#include <sys/socket.h>
+	#endif
+
 	#include <arpa/inet.h>
 	#include <net/if.h>
 	#include <netinet/in.h>
@@ -58,17 +69,7 @@
 	#include <sys/socket.h>
 	#include <sys/types.h>
 	#include <sys/utsname.h>
-
-
 	#include <unistd.h>
-
-
-	#if defined(_sun)
-		#include <sys/sockio.h>
-		#include <fcntl.h>
-	#elif defined(BSD) && BSD >= 199306
-		#include <ifaddrs.h>
-	#endif
 #endif
 
 
@@ -2961,7 +2962,7 @@ int UpnpGetIfInfo(const char *IfName)
 
     inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
     inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
-#elif (defined(BSD) && BSD >= 199306)
+#elif (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__)
     struct ifaddrs *ifap, *ifa;
     struct in_addr v4_addr;
     struct in6_addr v6_addr;
@@ -3478,7 +3479,7 @@ int getlocalhostname(char *out, const int out_len)
 	h = gethostbyname(out);
 	if (h != NULL) {
 		memcpy(&LocalAddr.sin_addr, h->h_addr_list[0], 4);
-		p = inet_ntop(AF_INET, &LocalAddr.sin_addr, tempstr, 16);
+		p = inet_ntop(AF_INET, &LocalAddr.sin_addr, tempstr, sizeof(tempstr));
 		if (p) {
 			strncpy(out, p, out_len);
 		} else {
@@ -3492,9 +3493,8 @@ int getlocalhostname(char *out, const int out_len)
 		ret = UPNP_E_INIT;
 	}
 
-#elif (defined(BSD) && BSD >= 199306)
+#elif (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__)
 	struct ifaddrs *ifap, *ifa;
-	char tempstr[16];
 
 	if (getifaddrs(&ifap) != 0) {
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -3517,12 +3517,14 @@ int getlocalhostname(char *out, const int out_len)
 			    htonl(INADDR_LOOPBACK)) {
 				continue;
 			}
-			p = inet_ntop(AF_INET, &LocalAddr.sin_addr, tempstr, 16);
+			p = inet_ntop(AF_INET,
+				&((struct sockaddr_in *)(ifa->ifa_addr))->sin_addr,
+				tempstr, sizeof(tempstr));
 			if (p) {
 				strncpy(out, p, out_len);
 			} else {
-				UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-					"getlocalhostname: inet_ntop returned error\n" );
+				UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+					"getlocalhostname: inet_ntop returned error\n");
 				ret = UPNP_E_INIT;
 			}
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -3596,7 +3598,7 @@ int getlocalhostname(char *out, const int out_len)
 	}
 	close(LocalSock);
 
-	p = inet_ntop(AF_INET, &LocalAddr.sin_addr, tempstr, 16);
+	p = inet_ntop(AF_INET, &LocalAddr.sin_addr, tempstr, sizeof(tempstr));
 	if (p) {
 		strncpy(out, p, out_len);
 	} else {

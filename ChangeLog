@@ -3,6 +3,11 @@ Version 1.8.0
 *******************************************************************************
 
 2010-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2969188 ] 1.8.0: patch for FreeBSD compilation
+	Submitted By: Nick Leverton (leveret)
+	Fix the order of header inclusion for FreeBSD.
+
+2010-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Forward port of svn revision 502:
 	SF Patch Tracker [ 2836704 ] Search for nested serviceList (not
 	stopping at the first lis

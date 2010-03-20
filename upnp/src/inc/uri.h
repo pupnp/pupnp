@@ -38,6 +38,10 @@
  * \file
  */
 
+#if !defined(WIN32)
+	#include <sys/param.h>
+#endif
+
 
 #include "UpnpGlobal.h" /* for */
 #include "UpnpInet.h"
@@ -48,6 +52,9 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(BSD)
+	#include <sys/socket.h>
+#endif
 #include <sys/types.h>
 #include <time.h>
 

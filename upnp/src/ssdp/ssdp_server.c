@@ -29,6 +29,9 @@
  *
  **************************************************************************/
 
+#if !defined(WIN32)
+	#include <sys/param.h>
+#endif
 
 #include "config.h"
 
@@ -1034,7 +1037,7 @@ int create_ssdp_sock_v4( SOCKET* ssdpSock )
     u_char ttl = 4;
     struct ip_mreq ssdpMcastAddr;
     struct sockaddr_storage __ss;
-    struct sockaddr_in* ssdpAddr4 = (struct sockaddr_in*)&__ss;
+    struct sockaddr_in *ssdpAddr4 = (struct sockaddr_in *)&__ss;
     int ret = 0;
     struct in_addr addr;
 
@@ -1061,7 +1064,7 @@ int create_ssdp_sock_v4( SOCKET* ssdpSock )
         return UPNP_E_SOCKET_ERROR;
     }
     
-#if defined(__FreeBSD__) || defined(__OSX__) || defined(__APPLE__)
+#if defined(BSD) || defined(__OSX__) || defined(__APPLE__)
     onOff = 1;
     ret = setsockopt( *ssdpSock, SOL_SOCKET, SO_REUSEPORT,
         (char *)&onOff, sizeof(onOff) );
@@ -1074,14 +1077,13 @@ int create_ssdp_sock_v4( SOCKET* ssdpSock )
 
         return UPNP_E_SOCKET_ERROR;
     }
-#endif /* __FreeBSD__ */
+#endif /* BSD */
 
     memset( &__ss, 0, sizeof( __ss ) );
     ssdpAddr4->sin_family = AF_INET;
-    //  ssdpAddr.sin_addr.s_addr = inet_addr(gIF_IPV4);
     ssdpAddr4->sin_addr.s_addr = htonl( INADDR_ANY );
     ssdpAddr4->sin_port = htons( SSDP_PORT );
-    ret = bind( *ssdpSock, (struct sockaddr *)&__ss, sizeof(__ss) );
+    ret = bind( *ssdpSock, (struct sockaddr *)ssdpAddr4, sizeof(*ssdpAddr4) );
     if ( ret == -1 ) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
@@ -1161,7 +1163,7 @@ int create_ssdp_sock_v6( SOCKET* ssdpSock )
     char errorBuffer[ERROR_BUFFER_LEN];
     struct ipv6_mreq ssdpMcastAddr;
     struct sockaddr_storage __ss;
-    struct sockaddr_in6* ssdpAddr6 = (struct sockaddr_in6*)&__ss;
+    struct sockaddr_in6 *ssdpAddr6 = (struct sockaddr_in6 *)&__ss;
     int onOff;
     int ret = 0;
 
@@ -1187,7 +1189,7 @@ int create_ssdp_sock_v6( SOCKET* ssdpSock )
         return UPNP_E_SOCKET_ERROR;
     }
     
-#if defined(__FreeBSD__) || defined(__OSX__) || defined(__APPLE__)
+#if defined(BSD) || defined(__OSX__) || defined(__APPLE__)
     onOff = 1;
     ret = setsockopt( *ssdpSock, SOL_SOCKET, SO_REUSEPORT,
         (char*)&onOff, sizeof (onOff) );
@@ -1200,15 +1202,14 @@ int create_ssdp_sock_v6( SOCKET* ssdpSock )
 
         return UPNP_E_SOCKET_ERROR;
     }
-#endif /* __FreeBSD__ */
+#endif /* BSD */
 
     memset( &__ss, 0, sizeof( __ss ) );
     ssdpAddr6->sin6_family = AF_INET6;
     ssdpAddr6->sin6_addr = in6addr_any;
-    //inet_pton( AF_INET6, gIF_IPV6, &ssdpAddr6->sin6_addr );
     ssdpAddr6->sin6_scope_id = gIF_INDEX;
     ssdpAddr6->sin6_port = htons( SSDP_PORT );
-    ret = bind( *ssdpSock, (struct sockaddr *)&__ss, sizeof(__ss) );
+    ret = bind( *ssdpSock, (struct sockaddr *)ssdpAddr6, sizeof(*ssdpAddr6) );
     if ( ret == -1 ) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,

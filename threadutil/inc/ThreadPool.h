@@ -58,7 +58,12 @@
 	};
 	int gettimeofday(struct timeval *tv, struct timezone *tz);
 #else /* WIN32 */
+	#include <sys/param.h>
 	#include <sys/time.h> /* for gettimeofday() */
+	#if defined(__OSX__) || defined(__APPLE__) || defined(__NetBSD__)
+		#include <sys/resource.h>	/* for setpriority() */
+	#endif
+
 #endif
 
 

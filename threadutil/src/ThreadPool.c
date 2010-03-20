@@ -35,6 +35,10 @@
  */
 
 
+#if ! defined(WIN32)
+	#include <sys/param.h>
+#endif
+
 #include "ThreadPool.h"
 
 
@@ -214,11 +218,11 @@ static int CmpThreadPoolJob( void *jobA, void *jobB )
  *  Parameters:
  *      ThreadPoolJob *tpj - must be allocated with CreateThreadPoolJob
  *****************************************************************************/
-static void FreeThreadPoolJob( ThreadPool *tp, ThreadPoolJob *tpj )
+static void FreeThreadPoolJob(ThreadPool *tp, ThreadPoolJob *tpj)
 {
-	assert( tp != NULL );
+	assert(tp != NULL);
 
-	FreeListFree( &tp->jobFreeList, tpj );
+	FreeListFree(&tp->jobFreeList, tpj);
 }
 
 /****************************************************************************
@@ -228,28 +232,30 @@ static void FreeThreadPoolJob( ThreadPool *tp, ThreadPoolJob *tpj )
  *      Sets the scheduling policy of the current process.
  *      Internal only.
  *  Parameters:
- *      PolocyType in
+ *      PolicyType in
  *  Returns:
  *      0 on success, nonzero on failure
  *      Returns result of GetLastError() on failure.
  *
  *****************************************************************************/
-static int SetPolicyType( PolicyType in )
+static int SetPolicyType(PolicyType in)
 {
 #ifdef __CYGWIN__
 	/* TODO not currently working... */
 	return 0;
-#elif defined(__OSX__) || defined(__APPLE__)
-	setpriority( PRIO_PROCESS, 0, 0 );
+#elif defined(__OSX__) || defined(__APPLE__) || defined(__NetBSD__)
+	setpriority(PRIO_PROCESS, 0, 0);
 	return 0;
 #elif defined(WIN32)
-	return sched_setscheduler( 0, in );
+	return sched_setscheduler(0, in);
 #elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
 	struct sched_param current;
+	int sched_result;
 
-	sched_getparam( 0, &current );
+	sched_getparam(0, &current);
 	current.sched_priority = DEFAULT_SCHED_PARAM;
-	return sched_setscheduler( 0, in, &current );
+	sched_result =  sched_setscheduler(0, in, &current);
+	return (-1 != sched_result || EPERM == errno) ? 0 : -1;
 #else
 	return 0;
 #endif
@@ -269,7 +275,7 @@ static int SetPolicyType( PolicyType in )
  *      Returns result of GerLastError on failure.
  *
  *****************************************************************************/
-static int SetPriority( ThreadPriority priority )
+static int SetPriority(ThreadPriority priority)
 {
 #if defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
 	int currentPolicy;
@@ -278,6 +284,7 @@ static int SetPriority( ThreadPriority priority )
 	int actPriority = 0;
 	int midPriority = 0;
 	struct sched_param newPriority;
+	int sched_result;
 
 	pthread_getschedparam( ithread_self(), &currentPolicy, &newPriority );
 	minPriority = sched_get_priority_min( currentPolicy );
@@ -299,7 +306,8 @@ static int SetPriority( ThreadPriority priority )
 
 	newPriority.sched_priority = actPriority;
 
-	return pthread_setschedparam(ithread_self(), currentPolicy, &newPriority );
+	sched_result = pthread_setschedparam(ithread_self(), currentPolicy, &newPriority);
+	return (0 == sched_result || EPERM == errno) ? 0 : -1;
 #else
 	return 0;
 #endif
@@ -399,7 +407,7 @@ static void SetSeed()
 	gettimeofday(&t, NULL);
 #if defined(WIN32)
  	srand( ( unsigned int )t.tv_usec + (unsigned int)ithread_get_current_thread_id().p );
-#elif defined(__FreeBSD__) || defined(__OSX__) || defined(__APPLE__)
+#elif defined(BSD) || defined(__OSX__) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
  	srand( ( unsigned int )t.tv_usec + (unsigned int)ithread_get_current_thread_id() );
 #elif defined(__linux__) || defined(__sun) || defined(__CYGWIN__) || defined(__GLIBC__)
  	srand( ( unsigned int )t.tv_usec + ithread_get_current_thread_id() );
@@ -1525,11 +1533,8 @@ void ThreadPoolPrintStats(ThreadPoolStats *stats)
 		return;
 	}
 
-#ifdef __FreeBSD__
-	printf("ThreadPoolStats at Time: %d\n", StatsTime(NULL));
-#else /* __FreeBSD__ */
-	printf("ThreadPoolStats at Time: %ld\n", StatsTime(NULL));
-#endif /* __FreeBSD__ */
+	/* some OSses time_t length may depending on platform, promote it to long for safety */
+	printf("ThreadPoolStats at Time: %ld\n", (long)StatsTime(NULL));
 	printf("High Jobs pending: %d\n", stats->currentJobsHQ);
 	printf("Med Jobs Pending: %d\n", stats->currentJobsMQ);
 	printf("Low Jobs Pending: %d\n", stats->currentJobsLQ);
