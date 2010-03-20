@@ -3,6 +3,32 @@ Version 1.8.0
 *******************************************************************************
 
 2010-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Forward port of svn revision 502:
+	SF Patch Tracker [ 2836704 ] Search for nested serviceList (not
+	stopping at the first lis
+	Submitted By: zephyrus ( zephyrus00jp )
+	
+	Internet Gateway Device description contains nested serviceList (rootdevice
+	-> servicelist, subdevice
+	and subdevice has the lower-level serviceList, etc..)
+
+	Unfrotunately, the sample code sample_util.c used by tv_device sample,
+	etc.
+	has a code that looks for only the first top-level serviceList.
+	This results in the failure to read all the services of an IGD xml
+	description.
+
+	Attached patch modifies this behavior and looks for the service by
+	visiting all the serviceList in xml document in turn.
+
+	With the modified patch (ad additional modification), I could
+	simulate an IGD device and created a modified control program for that.
+
+	Patch against 1.6.6
+
+	TIA.
+
+2010-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2973319 ] Problem in commit 499
 	Submitted By: Nick Leverton (leveret)
 	Afraid that this doesn't compile, it seems retval should be retVal in two
@@ -157,6 +183,31 @@ Version 1.8.0
 Version 1.6.7
 *******************************************************************************
 
+2010-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2836704 ] Search for nested serviceList (not
+	stopping at the first lis
+	Submitted By: zephyrus ( zephyrus00jp )
+	
+	Internet Gateway Device description contains nested serviceList (rootdevice
+	-> servicelist, subdevice
+	and subdevice has the lower-level serviceList, etc..)
+
+	Unfrotunately, the sample code sample_util.c used by tv_device sample,
+	etc.
+	has a code that looks for only the first top-level serviceList.
+	This results in the failure to read all the services of an IGD xml
+	description.
+
+	Attached patch modifies this behavior and looks for the service by
+	visiting all the serviceList in xml document in turn.
+
+	With the modified patch (ad additional modification), I could
+	simulate an IGD device and created a modified control program for that.
+
+	Patch against 1.6.6
+
+	TIA.
+	
 2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2203721 ] timeb.h check obsolete
 
