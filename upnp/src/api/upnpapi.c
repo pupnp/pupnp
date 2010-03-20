@@ -207,7 +207,7 @@ int UpnpInit(const char *HostIP, unsigned short DestPort)
 
 	/* Check if we're already initialized. */
 	if (UpnpSdkInit == 1) {
-		retval = UPNP_E_INIT;
+		retVal = UPNP_E_INIT;
 		goto exit_function;
 	}
 
@@ -226,7 +226,7 @@ int UpnpInit(const char *HostIP, unsigned short DestPort)
 		strncpy(gIF_IPV4, HostIP, sizeof(gIF_IPV4));
 	} else {
 		if( getlocalhostname( gIF_IPV4, sizeof(gIF_IPV4) ) != UPNP_E_SUCCESS ) {
-			retval = UPNP_E_INIT_FAILED;
+			retVal = UPNP_E_INIT_FAILED;
 			goto exit_function;
 		}
 	}

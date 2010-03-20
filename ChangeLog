@@ -3,6 +3,12 @@ Version 1.8.0
 *******************************************************************************
 
 2010-03-16 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2973319 ] Problem in commit 499
+	Submitted By: Nick Leverton (leveret)
+	Afraid that this doesn't compile, it seems retval should be retVal in two
+	places.
+
+2010-03-16 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fix for the ithread_mutex_unlock() logic in UpnpInit().
 	Thanks for Nicholas Kraft.
 
