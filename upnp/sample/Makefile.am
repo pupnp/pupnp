@@ -69,8 +69,9 @@ upnp_tv_combo_SOURCES = \
 if WITH_DOCUMENTATION
 examplesdir = $(docdir)/examples
 examples_DATA = \
-		$(upnp_tv_ctrlpt_SOURCES) \
-		$(upnp_tv_device_SOURCES)
+		$(sort \
+			$(upnp_tv_ctrlpt_SOURCES) \
+			$(upnp_tv_device_SOURCES))
 endif
 
 

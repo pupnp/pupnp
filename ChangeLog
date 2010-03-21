@@ -2,7 +2,23 @@
 Version 1.6.7
 *******************************************************************************
 
-2010-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2964973 ] install: will not overwrite just-created
+	...blah... with...
+	Submitted: Nick Leverton ( leveret ) - 2010-03-07 05:18
+
+	Full error:
+	/usr/bin/install: will not overwrite just-created
+	`/tmp/buildd/libupnp-1.6.6/debian/tmp/usr/share/doc/libupnp3-dev/examples/s
+	ample_util.c' with `common/sample_util.c'
+
+	This seems to be from Automake 1.11 which doesn't like having duplicate
+	files in a Makefile.am. Patch attached, kindly provided by Stefan Potyra
+	for Debian (http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=543068)
+
+	This fix will be needed for both 1.6.x and 1.8.x branches.
+
+2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Backport of svn revision 504:
 	SF Patch Tracker [ 2969188 ] 1.8.0: patch for FreeBSD compilation
 	Submitted By: Nick Leverton (leveret)
