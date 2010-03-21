@@ -43,6 +43,7 @@
 		#include <lwres/netdb.h>
 	#endif
 #endif
+#include <assert.h>
 
 
 #include "config.h"
@@ -458,13 +459,14 @@ int parse_hostport(
         ret = 1;
     }
 
-    // Check if address was converted successfully.
-    if( ret <= 0 ) {
+    /* Check if address was converted successfully. */
+    if (ret <= 0) {
         return UPNP_E_INVALID_URL;
     }
 
     out->text.size = hostport_size;
     out->text.buff = in;
+
     return hostport_size;
 }
 
