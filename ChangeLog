@@ -3,6 +3,27 @@ Version 1.6.7
 *******************************************************************************
 
 2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 2392166 ] ithread_detach not called for finished worker thread
+	Submitted: Ulrik ( ulsv_enea ) - 2008-12-05 08:24
+
+	Valgrind reports a memory leak due to that the function ithread_detach is
+	not called for finished worker threads in ThreadPool.c.
+
+	==21137== 2,176 bytes in 8 blocks are possibly lost in loss record 5 of 5
+	==21137== at 0x4C20F3F: calloc (vg_replace_malloc.c:279)
+	==21137== by 0x4010F58: _dl_allocate_tls (in /lib/ld-2.6.1.so)
+	==21137== by 0x544BA92: pthread_create@@GLIBC_2.2.5 (in
+	/lib/libpthread-2.6.1.so)
+	==21137== by 0x5F94592: CreateWorker (ThreadPool.c:639)
+	==21137== by 0x5F95079: ThreadPoolInit (ThreadPool.c:784)
+
+	I'm using libupnp 1.6.6
+
+	For more info on pthread_detach, see:
+	http://gelorakan.wordpress.com/2007/11/26/pthead_create-valgrind-memory-lea
+	k-solved/
+
+2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 2392304 ] Memory leak in SSDP AdvertiseAndReply
 	Submitted: Ulrik ( ulsv_enea ) - 2008-12-05 08:24
 

@@ -1,33 +1,33 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
 #include "upnp_tv_ctrlpt.h"
 
@@ -1320,12 +1320,12 @@ TvCtrlPointVerifyTimeouts( int incr )
  *    None
  *
  ********************************************************************************/
-void *
-TvCtrlPointTimerLoop( void *args )
+static int TvCtrlPointTimerLoopRun = 1;
+void *TvCtrlPointTimerLoop(void *args)
 {
     int incr = 30;              // how often to verify the timeouts, in seconds
 
-    while( 1 ) {
+    while (TvCtrlPointTimerLoopRun) {
         isleep( incr );
         TvCtrlPointVerifyTimeouts( incr );
     }
@@ -1348,70 +1348,72 @@ TvCtrlPointTimerLoop( void *args )
  *		TV_SUCCESS if everything went well, else TV_ERROR
  *
  ********************************************************************************/
-int
-TvCtrlPointStart( print_string printFunctionPtr,
-                  state_update updateFunctionPtr )
+int TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionPtr)
 {
-    ithread_t timer_thread;
-    int rc;
-    unsigned short port = 0;
-    char *ip_address = NULL;
+	ithread_t timer_thread;
+	int rc;
+	unsigned short port = 0;
+	char *ip_address = NULL;
 
-    SampleUtil_Initialize( printFunctionPtr );
-    SampleUtil_RegisterUpdateFunction( updateFunctionPtr );
+	SampleUtil_Initialize(printFunctionPtr);
+	SampleUtil_RegisterUpdateFunction(updateFunctionPtr);
 
-    ithread_mutex_init( &DeviceListMutex, 0 );
+	ithread_mutex_init(&DeviceListMutex, 0);
 
-    SampleUtil_Print(
-        "Initializing UPnP Sdk with\n"
-        "\tipaddress = %s port = %u\n",
-        ip_address, port );
+	SampleUtil_Print(
+		"Initializing UPnP Sdk with\n"
+		"\tipaddress = %s port = %u\n",
+		ip_address, port);
 
-    rc = UpnpInit( ip_address, port );
-    if( UPNP_E_SUCCESS != rc ) {
-        SampleUtil_Print( "WinCEStart: UpnpInit() Error: %d", rc );
-        //UpnpFinish();
-        //return TV_ERROR;
-    }
+	rc = UpnpInit(ip_address, port);
+	if (rc != UPNP_E_SUCCESS) {
+		SampleUtil_Print("WinCEStart: UpnpInit() Error: %d", rc);
+		/*
+		UpnpFinish();
+		return TV_ERROR;
+		*/
+	}
+	if (!ip_address) {
+		ip_address = UpnpGetServerIpAddress();
+	}
+	if (!port) {
+		port = UpnpGetServerPort();
+	}
 
-    if( NULL == ip_address ) {
-        ip_address = UpnpGetServerIpAddress();
-    }
-    if( 0 == port ) {
-        port = UpnpGetServerPort();
-    }
+	SampleUtil_Print(
+		"UPnP Initialized\n"
+		"\tipaddress= %s port = %u\n",
+		ip_address, port);
 
-    SampleUtil_Print(
-        "UPnP Initialized\n"
-	"\tipaddress= %s port = %u\n",
-        ip_address, port );
+	SampleUtil_Print("Registering Control Point");
+	rc = UpnpRegisterClient(TvCtrlPointCallbackEventHandler,
+		&ctrlpt_handle, &ctrlpt_handle);
+	if (rc != UPNP_E_SUCCESS) {
+		SampleUtil_Print( "Error registering CP: %d", rc );
+		UpnpFinish();
 
-    SampleUtil_Print( "Registering Control Point" );
-    rc = UpnpRegisterClient( TvCtrlPointCallbackEventHandler,
-                             &ctrlpt_handle, &ctrlpt_handle );
-    if( UPNP_E_SUCCESS != rc ) {
-        SampleUtil_Print( "Error registering CP: %d", rc );
-        UpnpFinish();
-        return TV_ERROR;
-    }
+		return TV_ERROR;
+	}
 
-    SampleUtil_Print( "Control Point Registered" );
+	SampleUtil_Print("Control Point Registered");
 
-    TvCtrlPointRefresh();
+	TvCtrlPointRefresh();
 
-    // start a timer thread
-    ithread_create( &timer_thread, NULL, TvCtrlPointTimerLoop, NULL );
+	/* start a timer thread */
+	ithread_create(&timer_thread, NULL, TvCtrlPointTimerLoop, NULL);
+	ithread_detach(timer_thread);
 
-    return TV_SUCCESS;
+	return TV_SUCCESS;
 }
 
-int
-TvCtrlPointStop( void )
+int TvCtrlPointStop(void)
 {
-    TvCtrlPointRemoveAll();
-    UpnpUnRegisterClient( ctrlpt_handle );
-    UpnpFinish();
-    SampleUtil_Finish();
+	TvCtrlPointTimerLoopRun = 0;
+	TvCtrlPointRemoveAll();
+	UpnpUnRegisterClient( ctrlpt_handle );
+	UpnpFinish();
+	SampleUtil_Finish();
 
-    return TV_SUCCESS;
+	return TV_SUCCESS;
 }
+
