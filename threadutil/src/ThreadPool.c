@@ -472,6 +472,7 @@ static void *WorkerThread( void *arg )
 	while( 1 ) {
 		ithread_mutex_lock( &tp->mutex );
 		if( job ) {
+			tp->busyThreads--;
 			FreeThreadPoolJob( tp, job );
 			job = NULL;
 		}
@@ -584,6 +585,7 @@ static void *WorkerThread( void *arg )
 			}
 		}
 
+		tp->busyThreads++;
 		ithread_mutex_unlock( &tp->mutex );
 
 		if( SetPriority( job->priority ) != 0 ) {
@@ -688,7 +690,7 @@ static int CreateWorker( ThreadPool *tp )
  *      ThreadPool* tp
  *
  *****************************************************************************/
-static void AddWorker( ThreadPool *tp )
+static void AddWorker(ThreadPool *tp)
 {
 	int jobs = 0;
 	int threads = 0;
@@ -697,8 +699,10 @@ static void AddWorker( ThreadPool *tp )
 
 	jobs = tp->highJobQ.size + tp->lowJobQ.size + tp->medJobQ.size;
 	threads = tp->totalThreads - tp->persistentThreads;
-	while( threads == 0 || (jobs / threads) >= tp->attr.jobsPerThread ) {
-		if( CreateWorker( tp ) != 0 ) {
+ 	while (threads == 0 ||
+	    (jobs / threads) >= tp->attr.jobsPerThread ||
+	    (tp->totalThreads == tp->busyThreads) ) {
+		if (CreateWorker(tp) != 0) {
 			return;
 		}
 		threads++;
@@ -804,6 +808,7 @@ int ThreadPoolInit( ThreadPool *tp, ThreadPoolAttr *attr )
 		tp->lastJobId = 0;
 		tp->shutdown = 0;
 		tp->totalThreads = 0;
+		tp->busyThreads = 0;
 		tp->persistentThreads = 0;
 		for( i = 0; i < tp->attr.minThreads; ++i ) {
 			if( ( retCode = CreateWorker( tp ) ) != 0 ) {
