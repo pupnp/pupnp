@@ -1,40 +1,40 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
 #include "ThreadPool.h"
 #include "FreeList.h"
 #include <assert.h>
 #include <stdlib.h>
-
 #include <stdio.h>
+#include <string.h>	/* for memset()*/
 
 /****************************************************************************
  * Function: DiffMillis
@@ -49,12 +49,12 @@
  *  Returns:
  *       the difference in milliseconds, time1-time2.
  *****************************************************************************/
-static unsigned long DiffMillis( struct timeval *time1, struct timeval *time2 )
+static unsigned long DiffMillis(struct timeval *time1, struct timeval *time2)
 {
 	double temp = 0;
 
-	assert( time1 != NULL );
-	assert( time2 != NULL );
+	assert(time1 != NULL);
+	assert(time2 != NULL);
 
 	temp = time1->tv_sec - time2->tv_sec;
 	/* convert to milliseconds */
@@ -77,9 +77,9 @@ static unsigned long DiffMillis( struct timeval *time1, struct timeval *time2 )
  *  Parameters:
  *      ThreadPoolStats *stats must be valid non null stats structure
  *****************************************************************************/
-static void StatsInit( ThreadPoolStats *stats )
+static void StatsInit(ThreadPoolStats *stats)
 {
-	assert( stats != NULL );
+	assert(stats != NULL);
 
 	stats->totalIdleTime = 0;
 	stats->totalJobsHQ = 0;
@@ -99,19 +99,19 @@ static void StatsInit( ThreadPoolStats *stats )
 	stats->maxThreads = 0; stats->totalThreads = 0;
 }
 
-static void StatsAccountLQ( ThreadPool *tp, unsigned long diffTime )
+static void StatsAccountLQ(ThreadPool *tp, unsigned long diffTime)
 {
 	tp->stats.totalJobsLQ++;
 	tp->stats.totalTimeLQ += diffTime;
 }
 
-static void StatsAccountMQ( ThreadPool *tp, unsigned long diffTime )
+static void StatsAccountMQ(ThreadPool *tp, unsigned long diffTime)
 {
 	tp->stats.totalJobsMQ++;
 	tp->stats.totalTimeMQ += diffTime;
 }
 
-static void StatsAccountHQ( ThreadPool *tp, unsigned long diffTime )
+static void StatsAccountHQ(ThreadPool *tp, unsigned long diffTime)
 {
 	tp->stats.totalJobsHQ++;
 	tp->stats.totalTimeHQ += diffTime;
@@ -131,36 +131,36 @@ static void StatsAccountHQ( ThreadPool *tp, unsigned long diffTime )
  *      ThreadPriority p
  *      ThreadPoolJob *job
  *****************************************************************************/
-static void CalcWaitTime( ThreadPool *tp, ThreadPriority p, ThreadPoolJob *job )
+static void CalcWaitTime(ThreadPool *tp, ThreadPriority p, ThreadPoolJob *job)
 {
 	struct timeval now;
 	unsigned long diff;
 
-	assert( tp != NULL );
-	assert( job != NULL );
+	assert(tp != NULL);
+	assert(job != NULL);
 
-	gettimeofday( &now, NULL );
-	diff = DiffMillis( &now, &job->requestTime );
-	switch ( p ) {
+	gettimeofday(&now, NULL);
+	diff = DiffMillis(&now, &job->requestTime);
+	switch (p) {
 	case LOW_PRIORITY:
-		StatsAccountLQ( tp, diff );
+		StatsAccountLQ(tp, diff);
 		break;
 	case MED_PRIORITY:
-		StatsAccountMQ( tp, diff );
+		StatsAccountMQ(tp, diff);
 		break;
 	case HIGH_PRIORITY:
-		StatsAccountHQ( tp, diff );
+		StatsAccountHQ(tp, diff);
 		break;
 	default:
-		assert( 0 );
+		assert(0);
 	}
 }
 
-static time_t StatsTime( time_t *t )
+static time_t StatsTime(time_t *t)
 {
 	struct timeval tv;
 
-	gettimeofday( &tv, NULL );
+	gettimeofday(&tv, NULL);
 	if (t) {
 		*t = tv.tv_sec;
 	}
@@ -168,12 +168,12 @@ static time_t StatsTime( time_t *t )
 	return tv.tv_sec;
 }
 #else /* STATS */
-static UPNP_INLINE void StatsInit( ThreadPoolStats *stats ) {}
-static UPNP_INLINE void StatsAccountLQ( ThreadPool *tp, unsigned long diffTime ) {}
-static UPNP_INLINE void StatsAccountMQ( ThreadPool *tp, unsigned long diffTime ) {}
-static UPNP_INLINE void StatsAccountHQ( ThreadPool *tp, unsigned long diffTime ) {}
-static UPNP_INLINE void CalcWaitTime( ThreadPool *tp, ThreadPriority p, ThreadPoolJob *job ) {}
-static UPNP_INLINE time_t StatsTime( time_t *t ) { return 0; }
+static UPNP_INLINE void StatsInit(ThreadPoolStats *stats) {}
+static UPNP_INLINE void StatsAccountLQ(ThreadPool *tp, unsigned long diffTime) {}
+static UPNP_INLINE void StatsAccountMQ(ThreadPool *tp, unsigned long diffTime) {}
+static UPNP_INLINE void StatsAccountHQ(ThreadPool *tp, unsigned long diffTime) {}
+static UPNP_INLINE void CalcWaitTime(ThreadPool *tp, ThreadPriority p, ThreadPoolJob *job) {}
+static UPNP_INLINE time_t StatsTime(time_t *t) { return 0; }
 #endif /* STATS */
 
 /****************************************************************************
@@ -185,15 +185,15 @@ static UPNP_INLINE time_t StatsTime( time_t *t ) { return 0; }
  *      void * - job A
  *      void * - job B
  *****************************************************************************/
-static int CmpThreadPoolJob( void *jobA, void *jobB )
+static int CmpThreadPoolJob(void *jobA, void *jobB)
 {
-	ThreadPoolJob *a = ( ThreadPoolJob *) jobA;
-	ThreadPoolJob *b = ( ThreadPoolJob *) jobB;
+	ThreadPoolJob *a = (ThreadPoolJob *) jobA;
+	ThreadPoolJob *b = (ThreadPoolJob *) jobB;
 
-	assert( jobA != NULL );
-	assert( jobB != NULL );
+	assert(jobA != NULL);
+	assert(jobB != NULL);
 
-	return ( a->jobId == b->jobId );
+	return a->jobId == b->jobId;
 }
 
 /****************************************************************************
@@ -204,11 +204,11 @@ static int CmpThreadPoolJob( void *jobA, void *jobB )
  *  Parameters:
  *      ThreadPoolJob *tpj - must be allocated with CreateThreadPoolJob
  *****************************************************************************/
-static void FreeThreadPoolJob( ThreadPool *tp, ThreadPoolJob *tpj )
+static void FreeThreadPoolJob(ThreadPool *tp, ThreadPoolJob *tpj)
 {
-	assert( tp != NULL );
+	assert(tp != NULL);
 
-	FreeListFree( &tp->jobFreeList, tpj );
+	FreeListFree(&tp->jobFreeList, tpj);
 }
 
 /****************************************************************************
@@ -224,22 +224,32 @@ static void FreeThreadPoolJob( ThreadPool *tp, ThreadPoolJob *tpj )
  *      Returns result of GetLastError() on failure.
  *
  *****************************************************************************/
-static int SetPolicyType( PolicyType in )
+static int SetPolicyType(PolicyType in)
 {
 #ifdef __CYGWIN__
 	/* TODO not currently working... */
 	return 0;
 #elif defined(__OSX__) || defined(__APPLE__)
-	setpriority( PRIO_PROCESS, 0, 0 );
+	setpriority(PRIO_PROCESS, 0, 0);
 	return 0;
 #elif defined(WIN32)
-	return sched_setscheduler( 0, in );
+	return sched_setscheduler(0, in);
 #elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
 	struct sched_param current;
+	int rc;
 
-	sched_getparam( 0, &current );
+	memset(&current, 0, sizeof(current)); /* purify? */
+	sched_getparam(0, &current);
 	current.sched_priority = DEFAULT_SCHED_PARAM;
-	return sched_setscheduler( 0, in, &current );
+
+	/* Solaris returns -1 if failure ..., but can return
+	 * non-zero values for 0, ..., 5 [former scheduling values.] */
+	rc = sched_setscheduler(0, in, &current);
+	if (rc == -1) {
+		return rc;
+	} else {
+		return 0;
+	}
 #else
 	return 0;
 #endif
@@ -259,7 +269,7 @@ static int SetPolicyType( PolicyType in )
  *      Returns result of GerLastError on failure.
  *
  *****************************************************************************/
-static int SetPriority( ThreadPriority priority )
+static int SetPriority(ThreadPriority priority)
 {
 #if defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
 	int currentPolicy;
@@ -269,11 +279,11 @@ static int SetPriority( ThreadPriority priority )
 	int midPriority = 0;
 	struct sched_param newPriority;
 
-	pthread_getschedparam( ithread_self(), &currentPolicy, &newPriority );
-	minPriority = sched_get_priority_min( currentPolicy );
-	maxPriority = sched_get_priority_max( currentPolicy );
-	midPriority = ( maxPriority - minPriority ) / 2;
-	switch ( priority ) {
+	pthread_getschedparam(ithread_self(), &currentPolicy, &newPriority);
+	minPriority = sched_get_priority_min(currentPolicy);
+	maxPriority = sched_get_priority_max(currentPolicy);
+	midPriority = (maxPriority - minPriority) / 2;
+	switch (priority) {
 	case LOW_PRIORITY:
 		actPriority = minPriority;
 		break;
@@ -289,7 +299,7 @@ static int SetPriority( ThreadPriority priority )
 
 	newPriority.sched_priority = actPriority;
 
-	return pthread_setschedparam(ithread_self(), currentPolicy, &newPriority );
+	return pthread_setschedparam(ithread_self(), currentPolicy, &newPriority);
 #else
 	return 0;
 #endif
@@ -307,44 +317,43 @@ static int SetPriority( ThreadPriority priority )
  *  Parameters:
  *      ThreadPool *tp
  *****************************************************************************/
-static void BumpPriority( ThreadPool *tp )
+static void BumpPriority(ThreadPool *tp)
 {
-    int done = 0;
-    struct timeval now;
-    unsigned long diffTime = 0;
-    ThreadPoolJob *tempJob = NULL;
+	int done = 0;
+	struct timeval now;
+	unsigned long diffTime = 0;
+	ThreadPoolJob *tempJob = NULL;
 
-    assert( tp != NULL );
+	assert(tp != NULL);
 
-    gettimeofday(&now, NULL);	
-
-    while( !done ) {
-        if( tp->medJobQ.size ) {
-            tempJob = ( ThreadPoolJob *) tp->medJobQ.head.next->item;
-            diffTime = DiffMillis( &now, &tempJob->requestTime );
-            if( diffTime >= ( tp->attr.starvationTime ) ) {
-                // If job has waited longer than the starvation time
-                // bump priority (add to higher priority Q)
-                StatsAccountMQ( tp, diffTime );
-                ListDelNode( &tp->medJobQ, tp->medJobQ.head.next, 0 );
-                ListAddTail( &tp->highJobQ, tempJob );
-                continue;
-            }
-        }
-        if( tp->lowJobQ.size ) {
-            tempJob = ( ThreadPoolJob *) tp->lowJobQ.head.next->item;
-            diffTime = DiffMillis( &now, &tempJob->requestTime );
-            if( diffTime >= ( tp->attr.maxIdleTime ) ) {
-                // If job has waited longer than the starvation time
-                // bump priority (add to higher priority Q)
-                StatsAccountLQ( tp, diffTime );
-                ListDelNode( &tp->lowJobQ, tp->lowJobQ.head.next, 0 );
-                ListAddTail( &tp->medJobQ, tempJob );
-                continue;
-            }
-        }
-        done = 1;
-    }
+	gettimeofday(&now, NULL);	
+	while (!done) {
+		if (tp->medJobQ.size) {
+			tempJob = (ThreadPoolJob *)tp->medJobQ.head.next->item;
+			diffTime = DiffMillis(&now, &tempJob->requestTime);
+			if (diffTime >= tp->attr.starvationTime) {
+				/* If job has waited longer than the starvation time
+				* bump priority (add to higher priority Q) */
+				StatsAccountMQ(tp, diffTime);
+				ListDelNode(&tp->medJobQ, tp->medJobQ.head.next, 0);
+				ListAddTail(&tp->highJobQ, tempJob);
+				continue;
+			}
+		}
+		if (tp->lowJobQ.size) {
+			tempJob = (ThreadPoolJob *)tp->lowJobQ.head.next->item;
+			diffTime = DiffMillis(&now, &tempJob->requestTime);
+			if (diffTime >= tp->attr.maxIdleTime) {
+				/* If job has waited longer than the starvation time
+				 * bump priority (add to higher priority Q) */
+				StatsAccountLQ(tp, diffTime);
+				ListDelNode(&tp->lowJobQ, tp->lowJobQ.head.next, 0);
+				ListAddTail(&tp->medJobQ, tempJob);
+				continue;
+			}
+		}
+		done = 1;
+	}
 }
 
 /****************************************************************************

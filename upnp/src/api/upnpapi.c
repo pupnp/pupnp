@@ -56,7 +56,7 @@
 	#include <unistd.h>
 
 
-	#if defined(_sun)
+ 	#if defined(__sun)
 		#include <sys/sockio.h>
 		#include <fcntl.h>
 	#elif defined(BSD) && BSD >= 199306
@@ -3593,6 +3593,11 @@ void printNodes( IXML_Node * tmpRoot, int depth )
     int LocalSock;
     struct sockaddr_in LocalAddr;
     int j = 0;
+
+    /* purify */
+    memset(&ifConf,  0, sizeof(ifConf));
+    memset(&ifReq,   0, sizeof(ifReq));
+    memset(szBuffer, 0, sizeof(szBuffer));
 
     // Create an unbound datagram socket to do the SIOCGIFADDR ioctl on. 
     if( ( LocalSock = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP ) ) < 0 ) {

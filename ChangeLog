@@ -2,6 +2,58 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2836704 ] Patch for Solaris10 compilation and usage.
+	Submitted By: zephyrus ( zephyrus00jp )
+	Obs by Marcelo: The issue with linking with -lsocket -lnsl -lrt is not
+	covered in this changeset beacuse I don't have solaris to test. I will
+	need some help from zephyrus in this regard. The issue will be addressed
+	in a future changeset.
+
+	Compilation for solaris
+
+	I have used gcc3.x and gcc4.x under solaris 10 for x86 / 64 bits.
+
+	A couple of Source file fixes were necessary for successful compilation
+	and runtime behavior.
+
+	threadutil/src/ThreadPool.c
+
+	POSIX
+	sched_setschduler() returns non-negative value for success.
+
+	Without the fix, UpnpInit() fails immediately.
+
+	upnpp/src/api/upnpai.c
+
+	There is a typo of a macro name "__sun" in one of the
+	CPP conditional.
+	Without the fix, the compilation aborts due to unknown constant
+	in socket ioctl call.
+
+	A few structs and an array is not properly initialized.
+	Well, I think it may be safe as is, but when I checked it
+	using purify evaluation version, it was reported that
+	uninitizlied iszBuffer may cause read of uninitialized memory.
+	So play it safe.
+
+	Configure issue.
+	This has to be more of a configure magic.
+	To link a program successfully using network, we need
+	-lsocket and -lnsl library specifications on the link line.
+	We also need -lrt for programs that use thread scheduling features.
+
+	The sample program under upnp/sample requires
+	-lsocket -lnsl -lrt
+	for successful linking.
+	I added -lsocket -lnsl -lrt to Makefile.in.
+	configure probably needs to take care of these.
+
+	I don't know much about configure, automake, etc., so
+	I am just raising a flag here.
+
+	TIA
+	
 2010-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2836704 ] Search for nested serviceList (not
 	stopping at the first lis
