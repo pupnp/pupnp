@@ -241,33 +241,28 @@ static void FreeThreadPoolJob(ThreadPool *tp, ThreadPoolJob *tpj)
  *****************************************************************************/
 static int SetPolicyType(PolicyType in)
 {
+	int retVal = 0;
 #ifdef __CYGWIN__
 	/* TODO not currently working... */
-	return 0;
+	retVal = 0;
 #elif defined(__OSX__) || defined(__APPLE__) || defined(__NetBSD__)
 	setpriority(PRIO_PROCESS, 0, 0);
-	return 0;
+	retVal = 0;
 #elif defined(WIN32)
-	return sched_setscheduler(0, in);
+	retVal = sched_setscheduler(0, in);
 #elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
 	struct sched_param current;
-	int rc;
+	int sched_result;
 
-	memset(&current, 0, sizeof(current)); /* purify? */
+	memset(&current, 0, sizeof(current));
 	sched_getparam(0, &current);
 	current.sched_priority = DEFAULT_SCHED_PARAM;
-
-	/* Solaris returns -1 if failure ..., but can return
-	 * non-zero values for 0, ..., 5 [former scheduling values.] */
-	rc = sched_setscheduler(0, in, &current);
-	if (rc == -1) {
-		return rc;
-	} else {
-		return 0;
-	}
+	sched_result = sched_setscheduler(0, in, &current);
+	retVal = (sched_result != -1 || errno == EPERM) ? 0 : errno;
 #else
-	return 0;
+	retVal = 0;
 #endif
+	return retVal;
 }
 
 /****************************************************************************
@@ -286,6 +281,7 @@ static int SetPolicyType(PolicyType in)
  *****************************************************************************/
 static int SetPriority(ThreadPriority priority)
 {
+	int retVal = 0;
 #if defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
 	int currentPolicy;
 	int minPriority = 0;
@@ -310,16 +306,19 @@ static int SetPriority(ThreadPriority priority)
 		actPriority = maxPriority;
 		break;
 	default:
-		return EINVAL;
+		retVal = EINVAL;
+		goto exit_function;
 	};
 
 	newPriority.sched_priority = actPriority;
 
 	sched_result = pthread_setschedparam(ithread_self(), currentPolicy, &newPriority);
-	return (0 == sched_result || EPERM == errno) ? 0 : -1;
+	retVal = (sched_result == 0 || errno == EPERM) ? 0 : sched_result;
 #else
-	return 0;
+	retVal = 0;
 #endif
+exit_function:
+	return retVal;
 }
 
 /****************************************************************************
