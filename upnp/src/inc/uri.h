@@ -38,6 +38,10 @@
  * \file
  */
 
+#if !defined(WIN32)
+	#include <sys/param.h>
+#endif
+
 
 #include "UpnpGlobal.h" /* for */
 #include "UpnpInet.h"
@@ -48,6 +52,9 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(BSD)
+	#include <sys/socket.h>
+#endif
 #include <sys/types.h>
 #include <time.h>
 
@@ -131,7 +138,7 @@ typedef struct HOSTPORT {
 	/*! Full host port. */
 	token text;
 	/* Network Byte Order */
-	struct sockaddr_in IPv4address;
+	struct sockaddr_storage IPaddress;
 } hostport_type;
 
 
@@ -278,22 +285,6 @@ int token_cmp(
 	token *in1,
 	/*! [in] Second token object used for the comparison. */
 	token *in2);
-
-
-/*!
- * \brief Parses a port (i.e. '4000') and converts it into a network ordered
- * unsigned short int.
- *
- * \return 
- */
-int parse_port(
-	/*! [in] Sets a maximum limit. */
-	int max,
-	/*! [in] Port to be parsed. */
-	const char *port,
-	/*! [out] Output parameter where the port is parsed and converted into
-	 * network format. */
-	unsigned short int *out);
 
 
 /*!

@@ -29,12 +29,27 @@
  *
  ******************************************************************************/
 
+
+/*!
+ * \file
+ */
+
+
+#if ! defined(WIN32)
+	#include <sys/param.h>
+#endif
+
 #include "ThreadPool.h"
+
+
 #include "FreeList.h"
+
+
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>	/* for memset()*/
+
 
 /****************************************************************************
  * Function: DiffMillis
@@ -218,7 +233,7 @@ static void FreeThreadPoolJob(ThreadPool *tp, ThreadPoolJob *tpj)
  *      Sets the scheduling policy of the current process.
  *      Internal only.
  *  Parameters:
- *      PolocyType in
+ *      PolicyType in
  *  Returns:
  *      0 on success, nonzero on failure
  *      Returns result of GetLastError() on failure.
@@ -229,7 +244,7 @@ static int SetPolicyType(PolicyType in)
 #ifdef __CYGWIN__
 	/* TODO not currently working... */
 	return 0;
-#elif defined(__OSX__) || defined(__APPLE__)
+#elif defined(__OSX__) || defined(__APPLE__) || defined(__NetBSD__)
 	setpriority(PRIO_PROCESS, 0, 0);
 	return 0;
 #elif defined(WIN32)
@@ -278,6 +293,7 @@ static int SetPriority(ThreadPriority priority)
 	int actPriority = 0;
 	int midPriority = 0;
 	struct sched_param newPriority;
+	int sched_result;
 
 	pthread_getschedparam(ithread_self(), &currentPolicy, &newPriority);
 	minPriority = sched_get_priority_min(currentPolicy);
@@ -299,7 +315,8 @@ static int SetPriority(ThreadPriority priority)
 
 	newPriority.sched_priority = actPriority;
 
-	return pthread_setschedparam(ithread_self(), currentPolicy, &newPriority);
+	sched_result = pthread_setschedparam(ithread_self(), currentPolicy, &newPriority);
+	return (0 == sched_result || EPERM == errno) ? 0 : -1;
 #else
 	return 0;
 #endif
@@ -398,7 +415,7 @@ static void SetSeed()
 	gettimeofday(&t, NULL);
 #if defined(WIN32)
  	srand( ( unsigned int )t.tv_usec + (unsigned int)ithread_get_current_thread_id().p );
-#elif defined(__FreeBSD__) || defined(__OSX__) || defined(__APPLE__)
+#elif defined(BSD) || defined(__OSX__) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
  	srand( ( unsigned int )t.tv_usec + (unsigned int)ithread_get_current_thread_id() );
 #elif defined(__linux__) || defined(__sun) || defined(__CYGWIN__) || defined(__GLIBC__)
  	srand( ( unsigned int )t.tv_usec + ithread_get_current_thread_id() );
@@ -1515,6 +1532,7 @@ int TPAttrSetMaxJobsTotal( ThreadPoolAttr *attr, int  maxJobsTotal )
 	return 0;
 }
 
+
 #ifdef STATS
 void ThreadPoolPrintStats(ThreadPoolStats *stats)
 {
@@ -1523,11 +1541,8 @@ void ThreadPoolPrintStats(ThreadPoolStats *stats)
 		return;
 	}
 
-#ifdef __FreeBSD__
-	printf("ThreadPoolStats at Time: %d\n", StatsTime(NULL));
-#else /* __FreeBSD__ */
-	printf("ThreadPoolStats at Time: %ld\n", StatsTime(NULL));
-#endif /* __FreeBSD__ */
+	/* some OSses time_t length may depending on platform, promote it to long for safety */
+	printf("ThreadPoolStats at Time: %ld\n", (long)StatsTime(NULL));
 	printf("High Jobs pending: %d\n", stats->currentJobsHQ);
 	printf("Med Jobs Pending: %d\n", stats->currentJobsMQ);
 	printf("Low Jobs Pending: %d\n", stats->currentJobsLQ);
@@ -1543,6 +1558,7 @@ void ThreadPoolPrintStats(ThreadPoolStats *stats)
 	printf("Total Time spent Idle in seconds : %f\n", stats->totalIdleTime);
 }
 #endif /* STATS */
+
 
 /****************************************************************************
  * Function: ThreadPoolGetStats
@@ -1605,6 +1621,7 @@ int ThreadPoolGetStats( ThreadPool *tp, ThreadPoolStats *stats )
 }
 
 #endif /* STATS */
+
 
 #ifdef WIN32
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)

@@ -2,6 +2,12 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Backport of svn revision 504:
+	SF Patch Tracker [ 2969188 ] 1.8.0: patch for FreeBSD compilation
+	Submitted By: Nick Leverton (leveret)
+	Fix the order of header inclusion for FreeBSD.
+
 2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2836704 ] Patch for Solaris10 compilation and usage.
 	Submitted By: zephyrus ( zephyrus00jp )
