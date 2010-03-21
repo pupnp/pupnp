@@ -401,9 +401,7 @@ TvCtrlPointProcessCommand( char *cmdline )
     return TV_SUCCESS;
 }
 
-int
-main( int argc,
-      char **argv )
+int main( int argc, char **argv )
 {
     int rc;
     ithread_t cmdloop_thread;
@@ -413,6 +411,7 @@ main( int argc,
     sigset_t sigs_to_catch;
 #endif
     int code;
+
 
     rc = TvCtrlPointStart( linux_print, NULL );
     if( rc != TV_SUCCESS ) {
@@ -436,6 +435,7 @@ main( int argc,
 #endif
 
     rc = TvCtrlPointStop();
+
     return rc;
 }
 

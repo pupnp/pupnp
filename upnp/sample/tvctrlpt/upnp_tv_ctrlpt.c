@@ -1299,12 +1299,12 @@ TvCtrlPointVerifyTimeouts( int incr )
  *    None
  *
  ********************************************************************************/
-void *
-TvCtrlPointTimerLoop( void *args )
+static int TvCtrlPointTimerLoopRun = 1;
+void *TvCtrlPointTimerLoop(void *args)
 {
     int incr = 30;              // how often to verify the timeouts, in seconds
 
-    while( 1 ) {
+    while (TvCtrlPointTimerLoopRun) {
         isleep( incr );
         TvCtrlPointVerifyTimeouts( incr );
     }
@@ -1327,66 +1327,70 @@ TvCtrlPointTimerLoop( void *args )
  *		TV_SUCCESS if everything went well, else TV_ERROR
  *
  ********************************************************************************/
-int
-TvCtrlPointStart( print_string printFunctionPtr,
-                  state_update updateFunctionPtr )
+int TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionPtr)
 {
-    ithread_t timer_thread;
-    int rc;
-    unsigned short port = 0;
-    char *ip_address = NULL;
+	ithread_t timer_thread;
+	int rc;
+	unsigned short port = 0;
+	char *ip_address = NULL;
 
-    SampleUtil_Initialize( printFunctionPtr );
-    SampleUtil_RegisterUpdateFunction( updateFunctionPtr );
+	SampleUtil_Initialize(printFunctionPtr);
+	SampleUtil_RegisterUpdateFunction(updateFunctionPtr);
 
-    ithread_mutex_init( &DeviceListMutex, 0 );
+	ithread_mutex_init(&DeviceListMutex, 0);
 
-    SampleUtil_Print(
-        "Initializing UPnP Sdk with\n"
-        "\tipaddress = %s port = %u\n",
-        ip_address, port );
+	SampleUtil_Print(
+		"Initializing UPnP Sdk with\n"
+		"\tipaddress = %s port = %u\n",
+		ip_address, port);
 
-    rc = UpnpInit( ip_address, port );
-    if( UPNP_E_SUCCESS != rc ) {
-        SampleUtil_Print( "WinCEStart: UpnpInit() Error: %d", rc );
-        UpnpFinish();
-        return TV_ERROR;
-    }
+	rc = UpnpInit(ip_address, port);
+	if (rc != UPNP_E_SUCCESS) {
+		SampleUtil_Print("WinCEStart: UpnpInit() Error: %d", rc);
+		UpnpFinish();
+		return TV_ERROR;
+	}
+	if (!ip_address) {
+		ip_address = UpnpGetServerIpAddress();
+	}
+	if (!port) {
+		port = UpnpGetServerPort();
+	}
 
-    ip_address = UpnpGetServerIpAddress();
-    port = UpnpGetServerPort();
+	SampleUtil_Print(
+		"UPnP Initialized\n"
+		"\tipaddress= %s port = %u\n",
+		ip_address, port);
 
-    SampleUtil_Print(
-        "UPnP Initialized\n"
-	"\tipaddress= %s port = %u\n",
-        ip_address, port );
+	SampleUtil_Print("Registering Control Point");
+	rc = UpnpRegisterClient(TvCtrlPointCallbackEventHandler,
+		&ctrlpt_handle, &ctrlpt_handle);
+	if (rc != UPNP_E_SUCCESS) {
+		SampleUtil_Print( "Error registering CP: %d", rc );
+		UpnpFinish();
 
-    SampleUtil_Print( "Registering Control Point" );
-    rc = UpnpRegisterClient( TvCtrlPointCallbackEventHandler,
-                             &ctrlpt_handle, &ctrlpt_handle );
-    if( UPNP_E_SUCCESS != rc ) {
-        SampleUtil_Print( "Error registering CP: %d", rc );
-        UpnpFinish();
-        return TV_ERROR;
-    }
+		return TV_ERROR;
+	}
 
-    SampleUtil_Print( "Control Point Registered" );
+	SampleUtil_Print("Control Point Registered");
 
-    TvCtrlPointRefresh();
+	TvCtrlPointRefresh();
 
-    // start a timer thread
-    ithread_create( &timer_thread, NULL, TvCtrlPointTimerLoop, NULL );
+	/* start a timer thread */
+	ithread_create(&timer_thread, NULL, TvCtrlPointTimerLoop, NULL);
+	ithread_detach(timer_thread);
 
-    return TV_SUCCESS;
+	return TV_SUCCESS;
 }
 
-int
-TvCtrlPointStop()
+int TvCtrlPointStop(void)
 {
-    TvCtrlPointRemoveAll();
-    UpnpUnRegisterClient( ctrlpt_handle );
-    UpnpFinish();
-    SampleUtil_Finish();
+	TvCtrlPointTimerLoopRun = 0;
+	TvCtrlPointRemoveAll();
+	UpnpUnRegisterClient( ctrlpt_handle );
+	UpnpFinish();
+	SampleUtil_Finish();
 
-    return TV_SUCCESS;
+	return TV_SUCCESS;
 }
+
