@@ -51,7 +51,7 @@
 	/* Do not include these files */
 #else
 	#include <sys/param.h>
-	#if defined(_sun)
+	#if defined(__sun)
 		#include <fcntl.h>
 		#include <sys/sockio.h>
 	#elif defined(BSD) && BSD >= 199306
@@ -3544,6 +3544,11 @@ int getlocalhostname(char *out, const int out_len)
 	int LocalSock;
 	struct sockaddr_in LocalAddr;
 	int j = 0;
+
+	/* purify */
+	memset(&ifConf,  0, sizeof(ifConf));
+	memset(&ifReq,   0, sizeof(ifReq));
+	memset(szBuffer, 0, sizeof(szBuffer));
 
 	/* Create an unbound datagram socket to do the SIOCGIFADDR ioctl on.  */
 	LocalSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
