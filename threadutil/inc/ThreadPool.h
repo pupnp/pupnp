@@ -265,21 +265,20 @@ typedef struct TPOOLSTATS
  */
 typedef struct THREADPOOL
 {
-	ithread_mutex_t mutex; /* mutex to protect job qs */
-	ithread_cond_t condition; /* condition variable to signal Q */
-	ithread_cond_t start_and_shutdown; /* condition variable for start 
-					and stop */
-	int lastJobId; /* ids for jobs */
-	int shutdown;  /* whether or not we are shutting down */
-	int totalThreads;      /* total number of threads */
-	int persistentThreads; /* number of persistent threads */
-	FreeList jobFreeList;  /* free list of jobs */
-	LinkedList lowJobQ;    /* low priority job Q */
-	LinkedList medJobQ;    /* med priority job Q */
-	LinkedList highJobQ;   /* high priority job Q */
-	ThreadPoolJob *persistentJob; /* persistent job */
-
-	ThreadPoolAttr attr; /* thread pool attributes */
+	ithread_mutex_t mutex;		/* mutex to protect job qs */
+	ithread_cond_t condition;	/* condition variable to signal Q */
+	ithread_cond_t start_and_shutdown; /* condition variable for start and stop */
+	int lastJobId;			/* ids for jobs */
+	int shutdown;			/* whether or not we are shutting down */
+	int totalThreads;		/* total number of threads */
+	int busyThreads;		/* number of threads that are currently executing jobs */
+	int persistentThreads;		/* number of persistent threads */
+	FreeList jobFreeList;		/* free list of jobs */
+	LinkedList lowJobQ;		/* low priority job Q */
+	LinkedList medJobQ;		/* med priority job Q */
+	LinkedList highJobQ;		/* high priority job Q */
+	ThreadPoolJob *persistentJob;	/* persistent job */
+	ThreadPoolAttr attr;		/* thread pool attributes */
 
 	/* statistics */
 	ThreadPoolStats stats;

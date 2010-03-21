@@ -194,6 +194,18 @@ Version 1.6.7
 *******************************************************************************
 
 2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* libupnp and multi-flows scenario patch
+	Submited by Carlo Parata from STMicroelectronics.
+Hi Roberto and Nektarios,
+after an analysis of the problem of libupnp with a multi-flows scenario, I
+noticed that the only cause of the freezed system is the ThreadPool
+management. There are not mutex problems. In practise, if all threads in the
+thread pool are busy executing jobs, a new worker thread should be created if
+a job is scheduled (I inspired to tombupnp library). So I solved the problem
+with a little patch in threadutil library that you can find attached in this
+e-mail. I hope to have helped you.
+
+2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2964973 ] install: will not overwrite just-created
 	...blah... with...
 	Submitted: Nick Leverton ( leveret ) - 2010-03-07 05:18
