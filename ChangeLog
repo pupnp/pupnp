@@ -3,16 +3,47 @@ Version 1.6.7
 *******************************************************************************
 
 2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Bug Tracker [ 2392304 ] Memory leak in SSDP AdvertiseAndReply
+	Submitted: Ulrik ( ulsv_enea ) - 2008-12-05 08:24
+
+	Valgrind reports a memory leak function in AdvertiseAndReply
+	(ssdp/ssdp_server.c) in libupnp 1.6.6
+
+	There are continue statements in many places in AdvertiseAndReply. In some
+	of those error handling cases the variable nodelist is not free'ed before
+	continuing to the next iteration. The next iteration will take care of
+	free'ing the nodelist from the previous iteration in most cases, but not
+	when breaking out of the for loop after the last element.
+
+	I belive this memory leak can be solved by makeing sure that the rows
+
+	ixmlNodeList_free( nodeList );
+	nodeList = NULL;
+
+	are always executed, also in the beginning of the last iteration when we
+	found out that there are not more elements.
+
+	==29110== at 0x4C21C16: malloc (vg_replace_malloc.c:149)
+	==29110== by 0x5D8DE0E: ixmlNodeList_addToNodeList (nodeList.c:106)
+	==29110== by 0x5D8B7E2: ixmlNode_getElementsByTagNameRecursive
+	(node.c:1438)
+	==29110== by 0x5D8E587: ixmlElement_getElementsByTagName
+	(element.c:491)
+	==29110== by 0x5B6C0F1: AdvertiseAndReply (ssdp_server.c:201)
+	==29110== by 0x5B7AB74: UpnpSendAdvertisement (upnpapi.c:1495)
+
+2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* libupnp and multi-flows scenario patch
 	Submited by Carlo Parata from STMicroelectronics.
-Hi Roberto and Nektarios,
-after an analysis of the problem of libupnp with a multi-flows scenario, I
-noticed that the only cause of the freezed system is the ThreadPool
-management. There are not mutex problems. In practise, if all threads in the
-thread pool are busy executing jobs, a new worker thread should be created if
-a job is scheduled (I inspired to tombupnp library). So I solved the problem
-with a little patch in threadutil library that you can find attached in this
-e-mail. I hope to have helped you.
+
+	Hi Roberto and Nektarios,
+	after an analysis of the problem of libupnp with a multi-flows scenario, I
+	noticed that the only cause of the freezed system is the ThreadPool
+	management. There are not mutex problems. In practise, if all threads in the
+	thread pool are busy executing jobs, a new worker thread should be created if
+	a job is scheduled (I inspired to tombupnp library). So I solved the problem
+	with a little patch in threadutil library that you can find attached in this
+	e-mail. I hope to have helped you.
 
 2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2964973 ] install: will not overwrite just-created
