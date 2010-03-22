@@ -29,9 +29,14 @@
  *
  ******************************************************************************/
 
+
 #include "upnp_tv_ctrlpt.h"
 
-/*
+
+#include "upnp.h"
+
+
+/*!
    Mutex for protecting the global device list
    in a multi-threaded, asynchronous environment.
    All functions should lock this mutex before reading
@@ -48,7 +53,7 @@ char *TvServiceType[] = {
 };
 char *TvServiceName[] = { "Control", "Picture" };
 
-/*
+/*!
    Global arrays for storing variable names and counts for 
    TvControl and TvPicture services 
  */
@@ -59,12 +64,12 @@ char *TvVarName[TV_SERVICE_SERVCOUNT][TV_MAXVARS] = {
 char TvVarCount[TV_SERVICE_SERVCOUNT] =
     { TV_CONTROL_VARCOUNT, TV_PICTURE_VARCOUNT };
 
-/*
+/*!
    Timeout to request during subscriptions 
  */
 int default_timeout = 1801;
 
-/*
+/*!
    The first node in the global device list, or NULL if empty 
  */
 struct TvDeviceNode *GlobalDeviceList = NULL;
@@ -139,10 +144,10 @@ TvCtrlPointDeleteNode( struct TvDeviceNode *node )
  *
  ********************************************************************************/
 int
-TvCtrlPointRemoveDevice( char *UDN )
+TvCtrlPointRemoveDevice(const char *UDN)
 {
-    struct TvDeviceNode *curdevnode,
-     *prevdevnode;
+    struct TvDeviceNode *curdevnode;
+    struct TvDeviceNode *prevdevnode;
 
     ithread_mutex_lock( &DeviceListMutex );
 
@@ -668,8 +673,8 @@ TvCtrlPointPrintDevice( int devnum )
  *
  ********************************************************************************/
 void
-TvCtrlPointAddDevice( IXML_Document * DescDoc,
-                      char *location,
+TvCtrlPointAddDevice( IXML_Document *DescDoc,
+                      const char *location,
                       int expires )
 {
     char *deviceType = NULL;
@@ -682,20 +687,19 @@ TvCtrlPointAddDevice( IXML_Document * DescDoc,
     char *eventURL[TV_SERVICE_SERVCOUNT] = { NULL, NULL };
     char *controlURL[TV_SERVICE_SERVCOUNT] = { NULL, NULL };
     Upnp_SID eventSID[TV_SERVICE_SERVCOUNT];
-    int TimeOut[TV_SERVICE_SERVCOUNT] =
-        { default_timeout, default_timeout };
+    int TimeOut[TV_SERVICE_SERVCOUNT] = {
+        default_timeout,
+        default_timeout };
     struct TvDeviceNode *deviceNode;
     struct TvDeviceNode *tmpdevnode;
     int ret = 1;
     int found = 0;
-    int service,
-      var;
+    int service;
+    int var;
 
     ithread_mutex_lock( &DeviceListMutex );
 
-    /*
-       Read key elements from description document 
-     */
+    /* Read key elements from description document */
     UDN = SampleUtil_GetFirstDocumentItem( DescDoc, "UDN" );
     deviceType = SampleUtil_GetFirstDocumentItem( DescDoc, "deviceType" );
     friendlyName =
@@ -703,9 +707,8 @@ TvCtrlPointAddDevice( IXML_Document * DescDoc,
     baseURL = SampleUtil_GetFirstDocumentItem( DescDoc, "URLBase" );
     relURL = SampleUtil_GetFirstDocumentItem( DescDoc, "presentationURL" );
 
-    ret =
-        UpnpResolveURL( ( baseURL ? baseURL : location ), relURL,
-                        presURL );
+    ret = UpnpResolveURL(
+        ( baseURL ? baseURL : location ), relURL, presURL);
 
     if( UPNP_E_SUCCESS != ret )
         SampleUtil_Print( "Error generating presURL from %s + %s", baseURL,
@@ -939,34 +942,36 @@ TvStateUpdate( char *UDN,
  *   changes -- The DOM document representing the changes
  *
  ********************************************************************************/
-void
-TvCtrlPointHandleEvent( Upnp_SID sid,
-                        int evntkey,
-                        IXML_Document * changes )
+void TvCtrlPointHandleEvent(
+	const Upnp_SID sid,
+	int evntkey,
+	IXML_Document *changes)
 {
-    struct TvDeviceNode *tmpdevnode;
-    int service;
+	struct TvDeviceNode *tmpdevnode;
+	int service;
 
-    ithread_mutex_lock( &DeviceListMutex );
+	ithread_mutex_lock(&DeviceListMutex);
 
-    tmpdevnode = GlobalDeviceList;
-    while( tmpdevnode ) {
-        for( service = 0; service < TV_SERVICE_SERVCOUNT; service++ ) {
-            if( strcmp( tmpdevnode->device.TvService[service].SID, sid ) ==
-                0 ) {
-                SampleUtil_Print( "Received Tv %s Event: %d for SID %s",
-                                  TvServiceName[service], evntkey, sid );
+	tmpdevnode = GlobalDeviceList;
+	while (tmpdevnode) {
+		for (service = 0; service < TV_SERVICE_SERVCOUNT; ++service) {
+			if (strcmp(tmpdevnode->device.TvService[service].SID, sid) == 0) {
+				SampleUtil_Print("Received Tv %s Event: %d for SID %s",
+					TvServiceName[service],
+					evntkey,
+					sid);
+				TvStateUpdate(
+					tmpdevnode->device.UDN,
+					service,
+					changes,
+					(char **)&tmpdevnode->device.TvService[service].VariableStrVal);
+				break;
+			}
+		}
+		tmpdevnode = tmpdevnode->next;
+	}
 
-                TvStateUpdate( tmpdevnode->device.UDN, service, changes,
-                               ( char ** )&tmpdevnode->device.
-                               TvService[service].VariableStrVal );
-                break;
-            }
-        }
-        tmpdevnode = tmpdevnode->next;
-    }
-
-    ithread_mutex_unlock( &DeviceListMutex );
+	ithread_mutex_unlock(&DeviceListMutex);
 }
 
 /********************************************************************************
@@ -983,10 +988,10 @@ TvCtrlPointHandleEvent( Upnp_SID sid,
  *   timeout  -- The new timeout for the subscription
  *
  ********************************************************************************/
-void
-TvCtrlPointHandleSubscribeUpdate( char *eventURL,
-                                  Upnp_SID sid,
-                                  int timeout )
+void TvCtrlPointHandleSubscribeUpdate(
+	const char *eventURL,
+	const Upnp_SID sid,
+	int timeout)
 {
     struct TvDeviceNode *tmpdevnode;
     int service;
@@ -1015,9 +1020,9 @@ TvCtrlPointHandleSubscribeUpdate( char *eventURL,
 }
 
 void
-TvCtrlPointHandleGetVar( char *controlURL,
-                         char *varName,
-                         DOMString varValue )
+TvCtrlPointHandleGetVar( const char *controlURL,
+                         const char *varName,
+                         const DOMString varValue )
 {
 
     struct TvDeviceNode *tmpdevnode;
@@ -1026,14 +1031,11 @@ TvCtrlPointHandleGetVar( char *controlURL,
     ithread_mutex_lock( &DeviceListMutex );
 
     tmpdevnode = GlobalDeviceList;
-    while( tmpdevnode ) {
-        for( service = 0; service < TV_SERVICE_SERVCOUNT; service++ ) {
-            if( strcmp
-                ( tmpdevnode->device.TvService[service].ControlURL,
-                  controlURL ) == 0 ) {
-                SampleUtil_StateUpdate( varName, varValue,
-                                        tmpdevnode->device.UDN,
-                                        GET_VAR_COMPLETE );
+    while (tmpdevnode) {
+        for (service = 0; service < TV_SERVICE_SERVCOUNT; service++) {
+            if (strcmp(tmpdevnode->device.TvService[service].ControlURL, controlURL ) == 0 ) {
+                SampleUtil_StateUpdate(
+                    varName, varValue, tmpdevnode->device.UDN, GET_VAR_COMPLETE );
                 break;
             }
         }
@@ -1057,186 +1059,152 @@ TvCtrlPointHandleGetVar( char *controlURL,
  *   Cookie -- Optional data specified during callback registration
  *
  ********************************************************************************/
-int
-TvCtrlPointCallbackEventHandler( Upnp_EventType EventType,
-                                 void *Event,
-                                 void *Cookie )
+int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Cookie)
 {
-    SampleUtil_PrintEvent( EventType, Event );
+	/*int errCode = 0;*/
 
-    switch ( EventType ) {
-            /*
-               SSDP Stuff 
-             */
-        case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
-        case UPNP_DISCOVERY_SEARCH_RESULT:
-            {
-                struct Upnp_Discovery *d_event =
-                    ( struct Upnp_Discovery * )Event;
-                IXML_Document *DescDoc = NULL;
-                int ret;
+	SampleUtil_PrintEvent(EventType, Event);
+	switch ( EventType ) {
+	/* SSDP Stuff */
+	case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
+	case UPNP_DISCOVERY_SEARCH_RESULT: {
+		struct Upnp_Discovery *d_event = (struct Upnp_Discovery *)Event;
+		IXML_Document *DescDoc = NULL;
+		int ret;
 
-                if( d_event->ErrCode != UPNP_E_SUCCESS ) {
-                    SampleUtil_Print( "Error in Discovery Callback -- %d",
-                                      d_event->ErrCode );
-                }
+		if (d_event->ErrCode != UPNP_E_SUCCESS) {
+			SampleUtil_Print(
+				"Error in Discovery Callback -- %d", d_event->ErrCode);
+		}
 
-                if( ( ret =
-                      UpnpDownloadXmlDoc( d_event->Location,
-                                          &DescDoc ) ) !=
-                    UPNP_E_SUCCESS ) {
-                    SampleUtil_Print
-                        ( "Error obtaining device description from %s -- error = %d",
-                          d_event->Location, ret );
-                } else {
-                    TvCtrlPointAddDevice( DescDoc, d_event->Location,
-                                          d_event->Expires );
-                }
+		ret = UpnpDownloadXmlDoc(d_event->Location, &DescDoc);
+		if (ret != UPNP_E_SUCCESS) {
+			SampleUtil_Print(
+				"Error obtaining device description from %s -- error = %d",
+				d_event->Location, ret );
+		} else {
+			TvCtrlPointAddDevice(
+				DescDoc, d_event->Location, d_event->Expires);
+		}
 
-                if( DescDoc )
-                    ixmlDocument_free( DescDoc );
+		if( DescDoc ) {
+			ixmlDocument_free(DescDoc);
+		}
 
-                TvCtrlPointPrintList();
-                break;
-            }
+		TvCtrlPointPrintList();
+		break;
+	}
 
-        case UPNP_DISCOVERY_SEARCH_TIMEOUT:
-            /*
-               Nothing to do here... 
-             */
-            break;
+	case UPNP_DISCOVERY_SEARCH_TIMEOUT:
+		/* Nothing to do here... */
+		break;
 
-        case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE:
-            {
-                struct Upnp_Discovery *d_event =
-                    ( struct Upnp_Discovery * )Event;
+	case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE: {
+		struct Upnp_Discovery *d_event = (struct Upnp_Discovery *)Event;
 
-                if( d_event->ErrCode != UPNP_E_SUCCESS ) {
-                    SampleUtil_Print
-                        ( "Error in Discovery ByeBye Callback -- %d",
-                          d_event->ErrCode );
-                }
+		if (d_event->ErrCode != UPNP_E_SUCCESS) {
+			SampleUtil_Print(
+				"Error in Discovery ByeBye Callback -- %d", d_event->ErrCode);
+		}
 
-                SampleUtil_Print( "Received ByeBye for Device: %s",
-                                  d_event->DeviceId );
-                TvCtrlPointRemoveDevice( d_event->DeviceId );
+		SampleUtil_Print("Received ByeBye for Device: %s", d_event->DeviceId);
+		TvCtrlPointRemoveDevice(d_event->DeviceId);
 
-                SampleUtil_Print( "After byebye:" );
-                TvCtrlPointPrintList();
+		SampleUtil_Print("After byebye:");
+		TvCtrlPointPrintList();
 
-                break;
-            }
+		break;
+	}
+	/* SOAP Stuff */
+	case UPNP_CONTROL_ACTION_COMPLETE: {
+		struct Upnp_Action_Complete *a_event = (struct Upnp_Action_Complete *)Event;
 
-            /*
-               SOAP Stuff 
-             */
-        case UPNP_CONTROL_ACTION_COMPLETE:
-            {
-                struct Upnp_Action_Complete *a_event =
-                    ( struct Upnp_Action_Complete * )Event;
+		if (a_event->ErrCode != UPNP_E_SUCCESS) {
+			SampleUtil_Print(
+				"Error in  Action Complete Callback -- %d",
+				a_event->ErrCode);
+		}
 
-                if( a_event->ErrCode != UPNP_E_SUCCESS ) {
-                    SampleUtil_Print
-                        ( "Error in  Action Complete Callback -- %d",
-                          a_event->ErrCode );
-                }
+		/* No need for any processing here, just print out results.
+		 * Service state table updates are handled by events. */
 
-                /*
-                   No need for any processing here, just print out results.  Service state
-                   table updates are handled by events. 
-                 */
+		break;
+	}
+	case UPNP_CONTROL_GET_VAR_COMPLETE: {
+		struct Upnp_State_Var_Complete *sv_event = (struct Upnp_State_Var_Complete *)Event;
 
-                break;
-            }
+		if (sv_event->ErrCode != UPNP_E_SUCCESS) {
+			SampleUtil_Print(
+				"Error in Get Var Complete Callback -- %d",
+				sv_event->ErrCode);
+		} else {
+			TvCtrlPointHandleGetVar(
+				sv_event->CtrlUrl,
+				sv_event->StateVarName,
+				sv_event->CurrentVal);
+		}
+		break;
+	}
+	/* GENA Stuff */
+	case UPNP_EVENT_RECEIVED: {
+		struct Upnp_Event *e_event = (struct Upnp_Event *)Event;
 
-        case UPNP_CONTROL_GET_VAR_COMPLETE:
-            {
-                struct Upnp_State_Var_Complete *sv_event =
-                    ( struct Upnp_State_Var_Complete * )Event;
+		TvCtrlPointHandleEvent(
+			e_event->Sid,
+			e_event->EventKey,
+			e_event->ChangedVariables);
+		break;
+	}
+	case UPNP_EVENT_SUBSCRIBE_COMPLETE:
+	case UPNP_EVENT_UNSUBSCRIBE_COMPLETE:
+	case UPNP_EVENT_RENEWAL_COMPLETE: {
+		struct Upnp_Event_Subscribe *es_event = (struct Upnp_Event_Subscribe *)Event;
 
-                if( sv_event->ErrCode != UPNP_E_SUCCESS ) {
-                    SampleUtil_Print
-                        ( "Error in Get Var Complete Callback -- %d",
-                          sv_event->ErrCode );
-                } else {
-                    TvCtrlPointHandleGetVar( sv_event->CtrlUrl,
-                                             sv_event->StateVarName,
-                                             sv_event->CurrentVal );
-                }
+		if (es_event->ErrCode != UPNP_E_SUCCESS) {
+			SampleUtil_Print(
+				"Error in Event Subscribe Callback -- %d",
+				es_event->ErrCode);
+		} else {
+			TvCtrlPointHandleSubscribeUpdate(
+				es_event->PublisherUrl,
+				es_event->Sid,
+				es_event->TimeOut);
+		}
 
-                break;
-            }
+		break;
+	}
+	case UPNP_EVENT_AUTORENEWAL_FAILED:
+	case UPNP_EVENT_SUBSCRIPTION_EXPIRED: {
+		struct Upnp_Event_Subscribe *es_event = (struct Upnp_Event_Subscribe *)Event;
+		int TimeOut = default_timeout;
+		Upnp_SID newSID;
+		int ret;
 
-            /*
-               GENA Stuff 
-             */
-        case UPNP_EVENT_RECEIVED:
-            {
-                struct Upnp_Event *e_event = ( struct Upnp_Event * )Event;
+		ret = UpnpSubscribe(
+			ctrlpt_handle,
+			es_event->PublisherUrl,
+			&TimeOut,
+			newSID);
 
-                TvCtrlPointHandleEvent( e_event->Sid, e_event->EventKey,
-                                        e_event->ChangedVariables );
-                break;
-            }
+		if (ret == UPNP_E_SUCCESS) {
+			SampleUtil_Print("Subscribed to EventURL with SID=%s", newSID);
+			TvCtrlPointHandleSubscribeUpdate(
+				es_event->PublisherUrl,
+				newSID,
+				TimeOut);
+		} else {
+			SampleUtil_Print("Error Subscribing to EventURL -- %d", ret);
+		}
+		break;
+	}
+	/* ignore these cases, since this is not a device */
+	case UPNP_EVENT_SUBSCRIPTION_REQUEST:
+	case UPNP_CONTROL_GET_VAR_REQUEST:
+	case UPNP_CONTROL_ACTION_REQUEST:
+		break;
+	}
 
-        case UPNP_EVENT_SUBSCRIBE_COMPLETE:
-        case UPNP_EVENT_UNSUBSCRIBE_COMPLETE:
-        case UPNP_EVENT_RENEWAL_COMPLETE:
-            {
-                struct Upnp_Event_Subscribe *es_event =
-                    ( struct Upnp_Event_Subscribe * )Event;
-
-                if( es_event->ErrCode != UPNP_E_SUCCESS ) {
-                    SampleUtil_Print
-                        ( "Error in Event Subscribe Callback -- %d",
-                          es_event->ErrCode );
-                } else {
-                    TvCtrlPointHandleSubscribeUpdate( es_event->
-                                                      PublisherUrl,
-                                                      es_event->Sid,
-                                                      es_event->TimeOut );
-                }
-
-                break;
-            }
-
-        case UPNP_EVENT_AUTORENEWAL_FAILED:
-        case UPNP_EVENT_SUBSCRIPTION_EXPIRED:
-            {
-                int TimeOut = default_timeout;
-                Upnp_SID newSID;
-                int ret;
-
-                struct Upnp_Event_Subscribe *es_event =
-                    ( struct Upnp_Event_Subscribe * )Event;
-
-                ret =
-                    UpnpSubscribe( ctrlpt_handle, es_event->PublisherUrl,
-                                   &TimeOut, newSID );
-
-                if( ret == UPNP_E_SUCCESS ) {
-                    SampleUtil_Print( "Subscribed to EventURL with SID=%s",
-                                      newSID );
-                    TvCtrlPointHandleSubscribeUpdate( es_event->
-                                                      PublisherUrl, newSID,
-                                                      TimeOut );
-                } else {
-                    SampleUtil_Print
-                        ( "Error Subscribing to EventURL -- %d", ret );
-                }
-                break;
-            }
-
-            /*
-               ignore these cases, since this is not a device 
-             */
-        case UPNP_EVENT_SUBSCRIPTION_REQUEST:
-        case UPNP_CONTROL_GET_VAR_REQUEST:
-        case UPNP_CONTROL_ACTION_REQUEST:
-            break;
-    }
-
-    return 0;
+	return 0;
 }
 
 /********************************************************************************

@@ -130,7 +130,8 @@ TvCtrlPointPrintLongHelp( void )
     SampleUtil_Print( "" );
     SampleUtil_Print( "This sample control point application automatically searches" );
     SampleUtil_Print( "for and subscribes to the services of television device emulator" );
-    SampleUtil_Print( "devices. While registers a tv device itself." );
+    SampleUtil_Print( "devices, described in the tvdevicedesc.xml description document." );
+    SampleUtil_Print( "It also registers itself as a tv device." );
     SampleUtil_Print( "" );
     SampleUtil_Print( "Commands:" );
     SampleUtil_Print( "  Help" );
@@ -456,7 +457,8 @@ int main( int argc, char **argv )
 {
     int rc;
     ithread_t cmdloop_thread;
-#ifndef WIN32
+#ifdef WIN32
+#else
     int sig;
     sigset_t sigs_to_catch;
 #endif
@@ -471,7 +473,9 @@ int main( int argc, char **argv )
     /* start a command loop thread */
     code = ithread_create( &cmdloop_thread, NULL, TvCtrlPointCommandLoop, NULL );
 
-#ifndef WIN32
+#ifdef WIN32
+    ithread_join(cmdloop_thread, NULL);
+#else
     /*
        Catch Ctrl-C and properly shutdown 
      */
@@ -480,12 +484,8 @@ int main( int argc, char **argv )
     sigwait( &sigs_to_catch, &sig );
 
     SampleUtil_Print( "Shutting down on signal %d...\n", sig );
-#else
-	ithread_join(cmdloop_thread, NULL);
 #endif
     TvDeviceStop();
     rc = TvCtrlPointStop();
-    
     return rc;
 }
-

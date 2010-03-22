@@ -405,7 +405,8 @@ int main( int argc, char **argv )
 {
     int rc;
     ithread_t cmdloop_thread;
-#ifndef WIN32
+#ifdef WIN32
+#else
     int sig;
     sigset_t sigs_to_catch;
 #endif
@@ -420,7 +421,9 @@ int main( int argc, char **argv )
     /* start a command loop thread */
     code = ithread_create( &cmdloop_thread, NULL, TvCtrlPointCommandLoop, NULL );
 
-#ifndef WIN32
+#ifdef WIN32
+    ithread_join(cmdloop_thread, NULL);
+#else
     /*
        Catch Ctrl-C and properly shutdown 
      */
@@ -428,9 +431,7 @@ int main( int argc, char **argv )
     sigaddset( &sigs_to_catch, SIGINT );
     sigwait( &sigs_to_catch, &sig );
 
-    SampleUtil_Print( "Shutting down on signal %d...", sig );
-#else
-	ithread_join(cmdloop_thread, NULL);
+    SampleUtil_Print( "Shutting down on signal %d...\n", sig );
 #endif
 
     rc = TvCtrlPointStop();

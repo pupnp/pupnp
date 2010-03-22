@@ -1,55 +1,65 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/**************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ **************************************************************************/
+
 
 #ifndef UPNP_TV_CTRLPT_H
 #define UPNP_TV_CTRLPT_H
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdio.h>
+
+#include "sample_util.h"
+
 
 #include "ithread.h"
-#ifndef WIN32
-#include <unistd.h>
-#endif
-#include <stdarg.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <string.h>
-
 #include "upnp.h"
 #include "upnptools.h"
-#include "sample_util.h"
+
+
+#include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+#ifdef WIN32
+	/* Do not #include <unistd.h> */
+#else
+	#include <unistd.h>
+#endif
+
 
 #define TV_SERVICE_SERVCOUNT	2
 #define TV_SERVICE_CONTROL		0
@@ -68,12 +78,12 @@ extern "C" {
 
 #define TV_MAX_VAL_LEN			5
 
-#define TV_SUCCESS				0
-#define TV_ERROR				(-1)
-#define TV_WARNING				1
+#define TV_SUCCESS			0
+#define TV_ERROR			(-1)
+#define TV_WARNING			1
 
 /* This should be the maximum VARCOUNT from above */
-#define TV_MAXVARS				TV_PICTURE_VARCOUNT
+#define TV_MAXVARS			TV_PICTURE_VARCOUNT
 
 extern char TvDeviceType[];
 extern char *TvServiceType[];
@@ -110,11 +120,11 @@ extern ithread_mutex_t DeviceListMutex;
 
 extern UpnpClient_Handle ctrlpt_handle;
 
-void	TvCtrlPointPrintHelp( void );
+void		TvCtrlPointPrintHelp(void);
 int		TvCtrlPointDeleteNode(struct TvDeviceNode*);
-int		TvCtrlPointRemoveDevice(char*);
-int		TvCtrlPointRemoveAll( void );
-int		TvCtrlPointRefresh( void );
+int		TvCtrlPointRemoveDevice(const char *);
+int		TvCtrlPointRemoveAll(void);
+int		TvCtrlPointRefresh(void);
 
 
 int		TvCtrlPointSendAction(int, int, char *, char **, char **, int);
@@ -140,11 +150,11 @@ int		TvCtrlPointGetBrightness(int);
 int		TvCtrlPointGetDevice(int, struct TvDeviceNode **);
 int		TvCtrlPointPrintList( void );
 int		TvCtrlPointPrintDevice(int);
-void	TvCtrlPointAddDevice (IXML_Document *, char *, int); 
-void    TvCtrlPointHandleGetVar(char *,char *,DOMString);
+void	TvCtrlPointAddDevice(IXML_Document *, const char *, int); 
+void    TvCtrlPointHandleGetVar(const char *, const char *, const DOMString);
 void	TvStateUpdate(char*,int, IXML_Document * , char **);
-void	TvCtrlPointHandleEvent(Upnp_SID, int, IXML_Document *); 
-void	TvCtrlPointHandleSubscribeUpdate(char *, Upnp_SID, int); 
+void	TvCtrlPointHandleEvent(const Upnp_SID, int, IXML_Document *); 
+void	TvCtrlPointHandleSubscribeUpdate(const char *, const Upnp_SID, int); 
 int		TvCtrlPointCallbackEventHandler(Upnp_EventType, void *, void *);
 void	TvCtrlPointVerifyTimeouts(int);
 void	TvCtrlPointPrintCommands( void );

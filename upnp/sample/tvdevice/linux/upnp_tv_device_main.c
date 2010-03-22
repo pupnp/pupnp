@@ -130,7 +130,8 @@ int main( IN int argc, IN char **argv )
      *web_dir_path = NULL;
     int rc;
     ithread_t cmdloop_thread;
-#ifndef WIN32
+#ifdef WIN32
+#else
     int sig;
     sigset_t sigs_to_catch;
 #endif
@@ -178,7 +179,9 @@ int main( IN int argc, IN char **argv )
     /* start a command loop thread */
     code = ithread_create( &cmdloop_thread, NULL, TvDeviceCommandLoop, NULL );
 
-#ifndef WIN32
+#ifdef WIN32
+    ithread_join(cmdloop_thread, NULL);
+#else
     /*
        Catch Ctrl-C and properly shutdown 
      */
@@ -187,8 +190,6 @@ int main( IN int argc, IN char **argv )
     sigwait( &sigs_to_catch, &sig );
 
     SampleUtil_Print( "Shutting down on signal %d...\n", sig );
-#else
-	ithread_join(cmdloop_thread, NULL);
 #endif
     rc = TvDeviceStop();
     
