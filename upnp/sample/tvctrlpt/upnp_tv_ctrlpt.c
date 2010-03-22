@@ -1079,8 +1079,7 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 				"Error in Discovery Callback -- %d", errCode);
 		}
 
-		location = UpnpString_get_String(
-		UpnpDiscovery_get_Location(d_event));
+		location = UpnpString_get_String(UpnpDiscovery_get_Location(d_event));
 		errCode = UpnpDownloadXmlDoc(location, &DescDoc);
 		if (errCode != UPNP_E_SUCCESS) {
 			SampleUtil_Print(
@@ -1111,7 +1110,7 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 
 		if (errCode != UPNP_E_SUCCESS) {
 			SampleUtil_Print(
-			"Error in Discovery ByeBye Callback -- %d", errCode);
+				"Error in Discovery ByeBye Callback -- %d", errCode);
 		}
 
 		SampleUtil_Print("Received ByeBye for Device: %s", deviceId);
@@ -1198,10 +1197,10 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 
 		if (errCode == UPNP_E_SUCCESS) {
 			SampleUtil_Print("Subscribed to EventURL with SID=%s", newSID);
-				TvCtrlPointHandleSubscribeUpdate(
-					UpnpString_get_String(UpnpEventSubscribe_get_PublisherUrl(es_event)),
-					newSID,
-					TimeOut);
+			TvCtrlPointHandleSubscribeUpdate(
+				UpnpString_get_String(UpnpEventSubscribe_get_PublisherUrl(es_event)),
+				newSID,
+				TimeOut);
 		} else {
 			SampleUtil_Print("Error Subscribing to EventURL -- %d", errCode);
 		}
@@ -1212,7 +1211,7 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 	case UPNP_EVENT_SUBSCRIPTION_REQUEST:
 	case UPNP_CONTROL_GET_VAR_REQUEST:
 	case UPNP_CONTROL_ACTION_REQUEST:
-	break;
+		break;
 	}
 
 	return 0;
