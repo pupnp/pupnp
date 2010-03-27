@@ -30,19 +30,21 @@
  ******************************************************************************/
 
 
-#ifndef ITHREADH
-#define ITHREADH
+#ifndef ITHREAD_H
+#define ITHREAD_H
 
 
 /*!
  * \file
  */
 
-#if ! defined(WIN32)
+
+#if !defined(WIN32)
 	#include <sys/param.h>
 #endif
 
-#include "UpnpGlobal.h" /* For EXPORT_SPEC */
+
+#include "UpnpGlobal.h" /* For UPNP_INLINE, EXPORT_SPEC */
 
 
 #ifdef __cplusplus
@@ -92,7 +94,8 @@ extern "C" {
  *      typedef to pthread_t.
  *      Internal Use Only.
  ***************************************************************************/
-typedef pthread_t ithread_t; 
+typedef pthread_t ithread_t;
+
   
 /****************************************************************************
  * Name: ithread_attr_t
@@ -112,7 +115,7 @@ typedef pthread_attr_t ithread_attr_t;
  *      Thread start routine 
  *      Internal Use Only.
  ***************************************************************************/
-typedef void * (*start_routine) (void *arg);
+typedef void *(*start_routine)(void *arg);
 
   
 /****************************************************************************
@@ -179,7 +182,96 @@ typedef pthread_rwlockattr_t ithread_rwlockattr_t;
  *      typedef to pthread_rwlock_t
  *      Internal Use Only
  ***************************************************************************/
-typedef pthread_rwlock_t ithread_rwlock_t;	
+typedef pthread_rwlock_t ithread_rwlock_t;
+
+
+/****************************************************************************
+ * Function: ithread_initialize_library
+ *
+ *  Description:
+ *      Initializes the library. Does nothing in all implementations, except
+ *      when statically linked for WIN32.
+ *  Parameters:
+ *      none.
+ *  Returns:
+ *      0 on success, Nonzero on failure.
+ ***************************************************************************/
+static UPNP_INLINE int ithread_initialize_library(void) {
+	int ret = 0;
+
+#if defined(WIN32) && defined(PTW32_STATIC_LIB)
+	ret = !pthread_win32_process_attach_np();
+#endif
+
+	return ret;
+}
+
+
+/****************************************************************************
+ * Function: ithread_cleanup_library
+ *
+ *  Description:
+ *      Clean up library resources. Does nothing in all implementations, except
+ *      when statically linked for WIN32.
+ *  Parameters:
+ *      none.
+ *  Returns:
+ *      0 on success, Nonzero on failure.
+ ***************************************************************************/
+static UPNP_INLINE int ithread_cleanup_library(void) {
+	int ret = 0;
+
+#if defined(WIN32) && defined(PTW32_STATIC_LIB)
+	ret = !pthread_win32_process_detach_np();
+#endif
+
+	return ret;
+}
+
+
+/****************************************************************************
+ * Function: ithread_initialize_thread
+ *
+ *  Description:
+ *      Initializes the thread. Does nothing in all implementations, except
+ *      when statically linked for WIN32.
+ *  Parameters:
+ *      none.
+ *  Returns:
+ *      0 on success, Nonzero on failure.
+ ***************************************************************************/
+static UPNP_INLINE int ithread_initialize_thread(void) {
+	int ret = 0;
+
+#if defined(WIN32) && defined(PTW32_STATIC_LIB)
+	ret = !pthread_win32_thread_attach_np();
+#endif
+
+	return ret;
+}
+
+
+/****************************************************************************
+ * Function: ithread_cleanup_thread
+ *
+ *  Description:
+ *      Clean up thread resources. Does nothing in all implementations, except
+ *      when statically linked for WIN32.
+ *  Parameters:
+ *      none.
+ *  Returns:
+ *      0 on success, Nonzero on failure.
+ ***************************************************************************/
+static UPNP_INLINE int ithread_cleanup_thread(void) {
+	int ret = 0;
+
+#if defined(WIN32) && defined(PTW32_STATIC_LIB)
+	ret = !pthread_win32_thread_detach_np();
+#endif
+
+	return ret;
+}
+
 
 /****************************************************************************
  * Function: ithread_mutexattr_init
@@ -420,8 +512,8 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *      Must be called before use.
  *      
  *  Parameters:
- *      ithread_rwlock_t * rwlock (must be valid non NULL pointer to pthread_rwlock_t)
- *      const ithread_rwlockattr_t * rwlock_attr 
+ *      ithread_rwlock_t *rwlock (must be valid non NULL pointer to pthread_rwlock_t)
+ *      const ithread_rwlockattr_t *rwlock_attr 
  *  Returns:
  *      0 on success, Nonzero on failure.
  *      Always returns 0.
@@ -436,7 +528,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *  Description:
  *      Locks rwlock for reading.
  *  Parameters:
- *      ithread_rwlock_t * rwlock (must be valid non NULL pointer to pthread_rwlock_t)
+ *      ithread_rwlock_t *rwlock (must be valid non NULL pointer to pthread_rwlock_t)
  *      rwlock must be initialized.
  *      
  *  Returns:
@@ -453,7 +545,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *  Description:
  *      Locks rwlock for writting.
  *  Parameters:
- *      ithread_rwlock_t * rwlock (must be valid non NULL pointer to pthread_rwlock_t)
+ *      ithread_rwlock_t *rwlock (must be valid non NULL pointer to pthread_rwlock_t)
  *      rwlock must be initialized.
  *      
  *  Returns:
@@ -471,7 +563,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *      Unlocks rwlock.
  *
  *  Parameters:
- *      ithread_rwlock_t * rwlock (must be valid non NULL pointer to pthread_rwlock_t)
+ *      ithread_rwlock_t *rwlock (must be valid non NULL pointer to pthread_rwlock_t)
  *      rwlock must be initialized.
  *      
  *  Returns:
@@ -491,7 +583,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *		rwlock is only destroyed when there are no longer any threads waiting on it. 
  *		rwlock cannot be destroyed if it is locked.
  *  Parameters:
- *      ithread_rwlock_t * rwlock (must be valid non NULL pointer to pthread_rwlock_t)
+ *      ithread_rwlock_t *rwlock (must be valid non NULL pointer to pthread_rwlock_t)
  *      rwlock must be initialized.
  *  Returns:
  *      0 on success. Nonzero on failure.
@@ -508,14 +600,13 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *      Initializes condition variable.
  *      Must be called before use.
  *  Parameters:
- *      ithread_cond_t * cond (must be valid non NULL pointer to pthread_cond_t)
- *      const ithread_condattr_t * cond_attr (ignored)
+ *      ithread_cond_t *cond (must be valid non NULL pointer to pthread_cond_t)
+ *      const ithread_condattr_t *cond_attr (ignored)
  *  Returns:
  *      0 on success, Nonzero on failure.
  *      See man page for pthread_cond_init
  *****************************************************************************/
 #define ithread_cond_init pthread_cond_init
-
 
 
 /****************************************************************************
@@ -525,7 +616,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *      Wakes up exactly one thread waiting on condition.
  *      Associated mutex MUST be locked by thread before entering this call.
  *  Parameters:
- *      ithread_cond_t * cond (must be valid non NULL pointer to 
+ *      ithread_cond_t *cond (must be valid non NULL pointer to 
  *      ithread_cond_t)
  *      cond must be initialized
  *  Returns:
@@ -542,7 +633,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *      Wakes up all threads waiting on condition.
  *      Associated mutex MUST be locked by thread before entering this call.
  *  Parameters:
- *      ithread_cond_t * cond (must be valid non NULL pointer to 
+ *      ithread_cond_t *cond (must be valid non NULL pointer to 
  *      ithread_cond_t)
  *      cond must be initialized
  *  Returns:
@@ -560,7 +651,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
  *      Associated mutex MUST be locked by thread before entering this call.
  *      Mutex is reacquired when call returns.
  *  Parameters:
- *      ithread_cond_t * cond (must be valid non NULL pointer to 
+ *      ithread_cond_t *cond (must be valid non NULL pointer to 
  *      ithread_cond_t)
  *      cond must be initialized
  *      ithread_mutex_t *mutex (must be valid non NULL pointer to 
@@ -576,23 +667,19 @@ typedef pthread_rwlock_t ithread_rwlock_t;
   /****************************************************************************
    * Function: pthread_cond_timedwait
    *
-   *  Description:      
-   *      Atomically releases the associated mutex and waits on the condition. 
-   *		If the condition is not signaled in the specified time 
-   *              than the 
-   *		call times out and returns.
-   *		Associated mutex MUST be locked by thread before entering 
-   *              this call.
-   *      Mutex is reacquired when call returns.
+   *	Description:      
+   *		Atomically releases the associated mutex and waits on the
+   *	condition.
+   *		If the condition is not signaled in the specified time than the
+   *	call times out and returns.
+   *		Associated mutex MUST be locked by thread before entering this call.
+   *		Mutex is reacquired when call returns.
    *  Parameters:
-   *      ithread_cond_t * cond (must be valid non NULL pointer to 
-   *      ithread_cond_t)
-   *      cond must be initialized
-   *      ithread_mutex_t *mutex (must be valid non NULL pointer to 
-   *      ithread_mutex_t)
-   *      Mutex must be locked.
-   *      const struct timespec *abstime (absolute time, measured 
-   *      from Jan 1, 1970)
+   *      ithread_cond_t *cond (must be valid non NULL pointer to ithread_cond_t)
+   *      	cond must be initialized
+   *      ithread_mutex_t *mutex (must be valid non NULL pointer to ithread_mutex_t)
+   *      	Mutex must be locked.
+   *      const struct timespec *abstime (absolute time, measured from Jan 1, 1970)
    *  Returns:
    *      0 on success. ETIMEDOUT on timeout. Nonzero on failure.
    *      See man page for pthread_cond_timedwait
@@ -608,7 +695,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
    *      Releases any resources held by the condition variable. 
    *		Condition variable can no longer be used after this call.	
    *  Parameters:
-   *      ithread_cond_t * cond (must be valid non NULL pointer to 
+   *      ithread_cond_t *cond (must be valid non NULL pointer to 
    *      ithread_cond_t)
    *      cond must be initialized.
    *  Returns:
@@ -664,6 +751,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
    ***************************************************************************/
 #define ithread_exit pthread_exit
 
+
 /****************************************************************************
    * Function: ithread_get_current_thread_id
    *
@@ -687,6 +775,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
    ***************************************************************************/
 #define ithread_self pthread_self
 
+
   /****************************************************************************
    * Function: ithread_detach
    *
@@ -699,6 +788,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
    *      See man page for pthread_detach
    ***************************************************************************/
 #define ithread_detach pthread_detach  
+
 
   /****************************************************************************
    * Function: ithread_join
@@ -719,7 +809,6 @@ typedef pthread_rwlock_t ithread_rwlock_t;
 #define ithread_join pthread_join
   
 
-
 /****************************************************************************
  * Function: isleep
  *
@@ -738,6 +827,7 @@ typedef pthread_rwlock_t ithread_rwlock_t;
 #else
 	#define isleep sleep
 #endif
+
 
 /****************************************************************************
  * Function: isleep
@@ -764,9 +854,11 @@ typedef pthread_rwlock_t ithread_rwlock_t;
 EXPORT_SPEC int pthread_mutexattr_setkind_np(pthread_mutexattr_t *attr, int kind);
 #endif
 
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ITHREADH */
+
+#endif /* ITHREAD_H */
 

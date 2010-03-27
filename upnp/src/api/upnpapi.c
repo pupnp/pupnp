@@ -204,6 +204,9 @@ int UpnpInit(const char *HostIP, unsigned short DestPort)
 {
 	int retVal = UPNP_E_SUCCESS;
 
+	/* Initializes the ithread library */
+	ithread_initialize_library();
+
 	ithread_mutex_lock(&gSDKInitMutex);
 
 	/* Check if we're already initialized. */
@@ -257,6 +260,9 @@ int UpnpInit2(const char *IfName, unsigned short DestPort)
 {
 	int retVal;
 
+	/* Initializes the ithread library */
+	ithread_initialize_library();
+
 	ithread_mutex_lock(&gSDKInitMutex);
 
 	/* Check if we're already initialized. */
@@ -308,10 +314,6 @@ int UpnpFinish(void)
 #endif
 	struct Handle_Info *temp;
 
-#ifdef WIN32
-	/*WSACleanup();*/
-#endif
-
 	if( UpnpSdkInit != 1 ) {
 		return UPNP_E_FINISH;
 	}
@@ -361,19 +363,15 @@ int UpnpFinish(void)
 	ithread_rwlock_destroy(&GlobalHndRWLock);
 	ithread_mutex_destroy(&gUUIDMutex);
 
-	// remove all virtual dirs
+	/* remove all virtual dirs */
 	UpnpRemoveAllVirtualDirs();
 
-	// allow static linking
-#ifdef WIN32
-#ifdef PTW32_STATIC_LIB
-	pthread_win32_thread_detach_np();
-#endif
-#endif
+	/* Clean-up ithread library resources */
+	ithread_cleanup_library();
 
 	UpnpSdkInit = 0;
 	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-	"Exiting UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit);
+	"Exiting UpnpFinish: UpnpSdkInit is :%d:\n", UpnpSdkInit);
 	UpnpCloseLog();
 
 	return UPNP_E_SUCCESS;
