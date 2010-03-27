@@ -4,7 +4,7 @@
 #
 # Process this file with autoconf to produce a configure script.
 #
-# (C) Copyright 2005-2007 Rémi Turboult <r3mi@users.sourceforge.net>
+# (C) Copyright 2005-2007 RÃ©mi Turboult <r3mi@users.sourceforge.net>
 #
 
 AC_PREREQ(2.60)
@@ -421,6 +421,11 @@ fi
 AC_FUNC_VPRINTF
 AC_FUNC_FSEEKO
 AC_CHECK_FUNCS(ftime,, [AC_CHECK_LIB(compat, ftime)])
+#
+# Solaris needs -lsocket -lnsl -lrt
+AC_SEARCH_LIBS([bind],           [socket])
+AC_SEARCH_LIBS([gethostbyname],  [nsl])
+AC_SEARCH_LIBS([sched_getparam], [rt])
 
 
 #

@@ -193,6 +193,11 @@ Version 1.8.0
 Version 1.6.7
 *******************************************************************************
 
+2010-03-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SF Patch Tracker [ 2836704 ] Patch for Solaris10 compilation and usage.
+	Submitted By: zephyrus ( zephyrus00jp )
+	This second part covers the issue on linking with -lsocket -lnsl -lrt.
+
 2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 2392166 ] ithread_detach not called for finished worker thread
 	Submitted: Ulrik ( ulsv_enea ) - 2008-12-05 08:24
