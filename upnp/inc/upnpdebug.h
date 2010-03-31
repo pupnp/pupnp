@@ -285,13 +285,13 @@ static UPNP_INLINE void UpnpDisplayBanner(
  */
 #ifdef DEBUG
 void PrintThreadPoolStats(
-	/* [in] The thread pool. */
+	/*! [in] The thread pool. */
 	ThreadPool *tp, 
-	/* [in] The file name that called this function, use the macro __FILE__. */
+	/*! [in] The file name that called this function, use the macro __FILE__. */
 	const char *DbgFileName,
-	/* [in] The line number that the function was called, use the macro __LINE__. */
+	/*! [in] The line number that the function was called, use the macro __LINE__. */
 	int DbgLineNo,
-	/* [in] The message. */
+	/*! [in] The message. */
 	const char *msg);
 #else
 static UPNP_INLINE void PrintThreadPoolStats(
@@ -299,6 +299,24 @@ static UPNP_INLINE void PrintThreadPoolStats(
 	const char *DbgFileName,
 	int DbgLineNo,
 	const char *msg)
+{
+}
+#endif
+
+
+/*!
+ * \brief Print the node names and values of a XML tree.
+ */
+#ifdef DEBUG
+void printNodes(
+	/*! [in] The root of the tree to print. */
+	IXML_Node *tmpRoot,
+	/*! [in] The depth to print. */
+	int depth);
+#else
+static UPNP_INLINE void printNodes(
+	IXML_Node *tmpRoot,
+	int depth)
 {
 }
 #endif

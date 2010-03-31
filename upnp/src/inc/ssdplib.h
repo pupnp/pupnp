@@ -69,7 +69,8 @@ typedef enum SsdpSearchType{
 
 
 /* Enumeration to define all different type of ssdp messages */
-typedef enum SsdpCmdType{SSDP_ERROR=-1,
+typedef enum SsdpCmdType{
+	SSDP_ERROR=-1,
 	SSDP_OK,
 	SSDP_ALIVE,
 	SSDP_BYEBYE,

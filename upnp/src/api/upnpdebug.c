@@ -33,6 +33,7 @@
 
 
 #include "ithread.h"
+#include "ixml.h"
 #include "upnp.h"
 #include "upnpdebug.h"
 
@@ -64,6 +65,8 @@ static const char *infoFileName = "IUpnpInfoFile.txt";
 
 
 #ifdef DEBUG
+
+
 int UpnpInitLog(void)
 {
 	ithread_mutex_init(&GlobalDebugMutex, NULL);
@@ -108,10 +111,8 @@ void UpnpSetLogFileNames(
         infoFileName = InfoFileName;
     }
 }
-#endif /* DEBUG */
 
 
-#ifdef DEBUG
 int DebugAtThisLevel(
 	Upnp_LogLevel DLevel,
 	Dbg_Module Module)
@@ -129,10 +130,8 @@ int DebugAtThisLevel(
 	
 	return ret;
 }
-#endif
 
 
-#ifdef DEBUG
 void UpnpPrintf(
 	Upnp_LogLevel DLevel,
 	Dbg_Module Module,
@@ -171,10 +170,8 @@ void UpnpPrintf(
 	va_end(ArgList);
 	ithread_mutex_unlock(&GlobalDebugMutex);
 }
-#endif
 
 
-#ifdef DEBUG
 FILE *GetDebugFile(Upnp_LogLevel DLevel, Dbg_Module Module)
 {
 	FILE *ret;
@@ -193,10 +190,8 @@ FILE *GetDebugFile(Upnp_LogLevel DLevel, Dbg_Module Module)
 
 	return ret;
 }
-#endif
 
 
-#ifdef DEBUG
 void UpnpDisplayFileAndLine(
 	FILE *fd,
 	const char *DbgFileName,
@@ -233,10 +228,8 @@ void UpnpDisplayFileAndLine(
 	UpnpDisplayBanner(fd, lines, NLINES, NUMBER_OF_STARS);
 	fflush(fd);
 }
-#endif
 
 
-#ifdef DEBUG
 void UpnpDisplayBanner(
 	FILE * fd,
 	const char **lines,
@@ -289,10 +282,8 @@ void UpnpDisplayBanner(
 	free(rightMargin);
 	free(leftMargin);
 }
-#endif
 
 
-#ifdef DEBUG
 void PrintThreadPoolStats(
 	ThreadPool *tp, 
 	const char *DbgFileName,
@@ -331,5 +322,34 @@ void PrintThreadPoolStats(
 		stats.totalWorkTime,
 		stats.totalIdleTime);
 }
-#endif
+
+
+void printNodes(IXML_Node *tmpRoot, int depth)
+{
+    int i;
+    IXML_NodeList *NodeList1;
+    IXML_Node *ChildNode1;
+    unsigned short NodeType;
+    const DOMString NodeValue;
+    const DOMString NodeName;
+    NodeList1 = ixmlNode_getChildNodes(tmpRoot);
+    for (i = 0; i < 100; ++i) {
+        ChildNode1 = ixmlNodeList_item(NodeList1, i);
+        if (ChildNode1 == NULL) {
+            break;
+        }
+    
+        printNodes(ChildNode1, depth+1);
+        NodeType = ixmlNode_getNodeType(ChildNode1);
+        NodeValue = ixmlNode_getNodeValue(ChildNode1);
+        NodeName = ixmlNode_getNodeName(ChildNode1);
+        UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+            "DEPTH-%2d-IXML_Node Type %d, "
+            "IXML_Node Name: %s, IXML_Node Value: %s\n",
+            depth, NodeType, NodeName, NodeValue);
+    }
+}
+
+
+#endif /* DEBUG */
 

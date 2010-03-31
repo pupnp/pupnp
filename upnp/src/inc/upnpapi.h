@@ -246,60 +246,6 @@ typedef enum {
 
 
 /*!
- * \brief (Windows Only) Initializes the Windows Winsock library.
- *
- * \return UPNP_E_SUCCESS on success, UPNP_E_INIT_FAILED on failure.
- */
-#ifdef WIN32
-int WinsockInit();
-#endif
-
-
-/*!
- * \brief Performs the initial steps in initializing the UPnP SDK.
- *
- *	\li Winsock library is initialized for the process (Windows specific).
- *	\li The logging (for debug messages) is initialized.
- *	\li Mutexes, Handle table and thread pools are allocated and initialized.
- *	\li Callback functions for SOAP and GENA are set, if they're enabled.
- *	\li The SDK timer thread is initialized.
- *
- * \return UPNP_E_SUCCESS on success.
- */
-int UpnpInitPreamble();
-
-
-/*!
- * \brief Initializes the global mutexes used by the UPnP SDK.
- *
- * \return UPNP_E_SUCCESS on success or UPNP_E_INIT_FAILED if a mutex could not
- * 	be initialized.
- */
-int UpnpInitMutexes();
-
-
-/*!
- * \brief Initializes the global threadm pools used by the UPnP SDK.
- *
- * \return UPNP_E_SUCCESS on success or UPNP_E_INIT_FAILED if a mutex could not
- * 	be initialized.
- */
-int UpnpInitThreadPools();
-
-/*!
- * \brief Finishes initializing the UPnP SDK.
- *	\li The MiniServer is started, if enabled.
- *	\li The WebServer is started, if enabled.
- * 
- * \return UPNP_E_SUCCESS on success or  UPNP_E_INIT_FAILED if a mutex could not
- * 	be initialized.
- */
-int UpnpInitStartServers(
-	/*! [in] Local Port to listen for incoming connections. */
-	unsigned short DestPort);
-
-
-/*!
  * \brief Retrieve interface information and keep it in global variables.
  * If NULL, we'll find the first suitable interface for operation.
  *

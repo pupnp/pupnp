@@ -83,7 +83,7 @@
 #include "uuid.h"
 
 
-// Needed for GENA
+/* Needed for GENA */
 #include "gena.h"
 #include "miniserver.h"
 #include "service_table.h"
@@ -93,7 +93,7 @@
 	#include "urlconfig.h"
 	#include "VirtualDir.h"
 	#include "webserver.h"
-#endif // INTERNAL_WEB_SERVER
+#endif /* INTERNAL_WEB_SERVER */
 
 
 /*! This structure is for virtual directory callbacks */
@@ -181,23 +181,240 @@ Upnp_SID gUpnpSdkNLSuuid;
 
 
 /*!
- * \brief Fills the sockadr_in with miniserver information.
+ * \brief (Windows Only) Initializes the Windows Winsock library.
+ *
+ * \return UPNP_E_SUCCESS on success, UPNP_E_INIT_FAILED on failure.
  */
-static int GetDescDocumentAndURL(
-	/* [in] pointer to server address structure. */
-	Upnp_DescType descriptionType,
-	/* [in] . */
-	char *description,
-	/* [in] . */
-	unsigned int bufferLen,
-	/* [in] . */
-	int config_baseURL,
-	/* [in] . */
-	int AddressFamily,
-	/* [out] . */
-	IXML_Document **xmlDoc,
-	/* [out] . */
-	char *descURL);
+static int WinsockInit(void)
+{
+	int retVal = UPNP_E_SUCCESS;
+#ifdef WIN32
+	WORD wVersionRequested;
+	WSADATA wsaData;
+	int err;
+
+	wVersionRequested = MAKEWORD(2, 2);
+	err = WSAStartup(wVersionRequested, &wsaData);
+	if (err != 0) {
+		/* Tell the user that we could not find a usable */
+		/* WinSock DLL.                                  */
+		retVal = UPNP_E_INIT_FAILED;
+		goto exit_function;
+	}
+	/* Confirm that the WinSock DLL supports 2.2.
+	 * Note that if the DLL supports versions greater
+	 * than 2.2 in addition to 2.2, it will still return
+	 * 2.2 in wVersion since that is the version we
+	 * requested. */
+	if (LOBYTE(wsaData.wVersion) != 2 ||
+	    HIBYTE(wsaData.wVersion) != 2) {
+		/* Tell the user that we could not find a usable
+		 * WinSock DLL. */
+		WSACleanup();
+		retVal = UPNP_E_INIT_FAILED; 
+		goto exit_function;
+	}
+	/* The WinSock DLL is acceptable. Proceed. */
+exit_function:
+#else
+#endif
+	return retVal;
+}
+
+
+/*!
+ * \brief Initializes the global mutexes used by the UPnP SDK.
+ *
+ * \return UPNP_E_SUCCESS on success or UPNP_E_INIT_FAILED if a mutex could not
+ * 	be initialized.
+ */
+static int UpnpInitMutexes(void)
+{
+#ifdef __CYGWIN__
+	/* On Cygwin, pthread_mutex_init() fails without this memset. */
+	/* TODO: Fix Cygwin so we don't need this memset(). */
+	memset(&GlobalHndRWLock, 0, sizeof(GlobalHndRWLock));
+#endif
+	if (ithread_rwlock_init(&GlobalHndRWLock, NULL) != 0) {
+		return UPNP_E_INIT_FAILED;
+	}
+
+	if (ithread_mutex_init(&gUUIDMutex, NULL) != 0) {
+		return UPNP_E_INIT_FAILED;
+	}
+	/* initialize subscribe mutex. */
+#ifdef INCLUDE_CLIENT_APIS
+	if (ithread_mutex_init(&GlobalClientSubscribeMutex, NULL) != 0) {
+		return UPNP_E_INIT_FAILED;
+	}
+#endif
+	return UPNP_E_SUCCESS;
+}
+
+
+/*!
+ * \brief Initializes the global threadm pools used by the UPnP SDK.
+ *
+ * \return UPNP_E_SUCCESS on success or UPNP_E_INIT_FAILED if a mutex could not
+ * 	be initialized.
+ */
+static int UpnpInitThreadPools(void)
+{
+	int ret = UPNP_E_SUCCESS;
+	ThreadPoolAttr attr;
+
+	TPAttrInit(&attr);
+	TPAttrSetMaxThreads(&attr, MAX_THREADS);
+	TPAttrSetMinThreads(&attr, MIN_THREADS);
+	TPAttrSetJobsPerThread(&attr, JOBS_PER_THREAD);
+	TPAttrSetIdleTime(&attr, THREAD_IDLE_TIME);
+	TPAttrSetMaxJobsTotal(&attr, MAX_JOBS_TOTAL);
+
+	if (ThreadPoolInit(&gSendThreadPool, &attr) != UPNP_E_SUCCESS) {
+		ret = UPNP_E_INIT_FAILED;
+		goto exit_function;
+	}
+
+	if (ThreadPoolInit(&gRecvThreadPool, &attr) != UPNP_E_SUCCESS) {
+		ret = UPNP_E_INIT_FAILED;
+		goto exit_function;
+	}
+
+	if (ThreadPoolInit(&gMiniServerThreadPool, &attr) != UPNP_E_SUCCESS) {
+		ret = UPNP_E_INIT_FAILED;
+		goto exit_function;
+	}
+
+exit_function:
+	if (ret != UPNP_E_SUCCESS) {
+		UpnpSdkInit = 0;
+		UpnpFinish();
+	}
+
+	return ret;
+}
+
+
+/*!
+ * \brief Performs the initial steps in initializing the UPnP SDK.
+ *
+ *	\li Winsock library is initialized for the process (Windows specific).
+ *	\li The logging (for debug messages) is initialized.
+ *	\li Mutexes, Handle table and thread pools are allocated and initialized.
+ *	\li Callback functions for SOAP and GENA are set, if they're enabled.
+ *	\li The SDK timer thread is initialized.
+ *
+ * \return UPNP_E_SUCCESS on success.
+ */
+static int UpnpInitPreamble(void)
+{
+	int retVal = UPNP_E_SUCCESS;
+	int i;
+	uuid_upnp nls_uuid;
+
+	retVal = WinsockInit();
+	if (retVal != UPNP_E_SUCCESS) {
+		return retVal;
+	}
+
+	/* needed by SSDP or other parts. */
+	srand((unsigned int)time(NULL));
+
+	/* Initialize debug output. */
+	retVal = UpnpInitLog();
+	if (retVal != UPNP_E_SUCCESS) {
+		/* UpnpInitLog does not return a valid UPNP_E_*. */
+		return UPNP_E_INIT_FAILED;
+	}
+
+	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Inside UpnpInitPreamble\n" );
+
+	/* Initialize SDK global mutexes. */
+	retVal = UpnpInitMutexes();
+	if (retVal != UPNP_E_SUCCESS) {
+		return retVal;
+	}
+
+	/* Create the NLS uuid. */
+	uuid_create(&nls_uuid);
+	uuid_unpack(&nls_uuid, gUpnpSdkNLSuuid);
+
+	/* Initializes the handle list. */
+	HandleLock();
+	for (i = 0; i < NUM_HANDLE; ++i) {
+		HandleTable[i] = NULL;
+	}
+	HandleUnlock();
+
+	/* Initialize SDK global thread pools. */
+	retVal = UpnpInitThreadPools();
+	if (retVal != UPNP_E_SUCCESS) {
+		return retVal;
+	}
+
+#if EXCLUDE_SOAP == 0
+	SetSoapCallback(soap_device_callback);
+#endif
+
+#if EXCLUDE_GENA == 0
+	SetGenaCallback(genaCallback);
+#endif
+
+	/* Initialize the SDK timer thread. */
+	retVal = TimerThreadInit( &gTimerThread, &gSendThreadPool );
+	if (retVal != UPNP_E_SUCCESS) {
+		UpnpFinish();
+
+		return retVal;
+	}
+
+	return UPNP_E_SUCCESS;
+}
+
+
+/*!
+ * \brief Finishes initializing the UPnP SDK.
+ *	\li The MiniServer is started, if enabled.
+ *	\li The WebServer is started, if enabled.
+ * 
+ * \return UPNP_E_SUCCESS on success or  UPNP_E_INIT_FAILED if a mutex could not
+ * 	be initialized.
+ */
+static int UpnpInitStartServers(
+	/*! [in] Local Port to listen for incoming connections. */
+	unsigned short DestPort)
+{
+	int retVal = 0;
+
+	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+		"Entering UpnpInitStartServers\n" );
+
+#if EXCLUDE_MINISERVER == 0
+	LOCAL_PORT_V4 = DestPort;
+	LOCAL_PORT_V6 = DestPort;
+	retVal = StartMiniServer(&LOCAL_PORT_V4, &LOCAL_PORT_V6);
+	if (retVal != UPNP_E_SUCCESS) {
+		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+			"Miniserver failed to start");
+		UpnpFinish();
+		return retVal;
+	}
+#endif
+
+#if EXCLUDE_WEB_SERVER == 0
+	membuffer_init(&gDocumentRootDir);
+	retVal = UpnpEnableWebserver(WEB_SERVER_ENABLED);
+	if (retVal != UPNP_E_SUCCESS) {
+		UpnpFinish();
+		return retVal;
+	}
+#endif
+
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+		"Exiting UpnpInitStartServers\n");
+
+	return UPNP_E_SUCCESS;
+}
 
 
 int UpnpInit(const char *HostIP, unsigned short DestPort)
@@ -314,7 +531,7 @@ int UpnpFinish(void)
 #endif
 	struct Handle_Info *temp;
 
-	if( UpnpSdkInit != 1 ) {
+	if (UpnpSdkInit != 1) {
 		return UPNP_E_FINISH;
 	}
 
@@ -339,7 +556,7 @@ int UpnpFinish(void)
 
 #ifdef INCLUDE_CLIENT_APIS
 	if (GetClientHandleInfo(&client_handle, &temp) == HND_CLIENT) {
-		UpnpUnRegisterClient( client_handle );
+		UpnpUnRegisterClient(client_handle);
 	}
 #endif
 
@@ -371,7 +588,7 @@ int UpnpFinish(void)
 
 	UpnpSdkInit = 0;
 	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-	"Exiting UpnpFinish: UpnpSdkInit is :%d:\n", UpnpSdkInit);
+		"Exiting UpnpFinish: UpnpSdkInit is :%d:\n", UpnpSdkInit);
 	UpnpCloseLog();
 
 	return UPNP_E_SUCCESS;
@@ -532,7 +749,7 @@ int UpnpRegisterRootDevice(
 		printServiceTable( &HInfo->ServiceTable, UPNP_ALL, API );
 	} else {
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-			"\nUpnpRegisterRootDevice2: Empty service table\n");
+			"\nUpnpRegisterRootDevice: Empty service table\n");
 	}
 
 	UpnpSdkDeviceRegisteredV4 = 1;
@@ -547,6 +764,26 @@ exit_function:
 	return retVal;
 }
 #endif /* INCLUDE_DEVICE_APIS */
+
+
+/*!
+ * \brief Fills the sockadr_in with miniserver information.
+ */
+static int GetDescDocumentAndURL(
+	/* [in] pointer to server address structure. */
+	Upnp_DescType descriptionType,
+	/* [in] . */
+	char *description,
+	/* [in] . */
+	unsigned int bufferLen,
+	/* [in] . */
+	int config_baseURL,
+	/* [in] . */
+	int AddressFamily,
+	/* [out] . */
+	IXML_Document **xmlDoc,
+	/* [out] . */
+	char *descURL);
 
 
 #ifdef INCLUDE_DEVICE_APIS
@@ -694,7 +931,7 @@ int UpnpRegisterRootDevice3(
 	HandleLock();
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-		"Inside UpnpRegisterRootDevice\n");
+		"Inside UpnpRegisterRootDevice3\n");
 
 	if (UpnpSdkInit != 1) {
 		retVal = UPNP_E_FINISH;
@@ -753,8 +990,8 @@ int UpnpRegisterRootDevice3(
 		goto exit_function;
 	}
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-		"UpnpRegisterRootDevice: Valid Description\n"
-		"UpnpRegisterRootDevice: DescURL : %s\n",
+		"UpnpRegisterRootDevice3: Valid Description\n"
+		"UpnpRegisterRootDevice3: DescURL : %s\n",
 		HInfo->DescURL);
 
 	HInfo->DeviceList = ixmlDocument_getElementsByTagName(
@@ -764,7 +1001,7 @@ int UpnpRegisterRootDevice3(
 		ixmlDocument_free(HInfo->DescDocument);
 		FreeHandle(*Hnd);
 		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
-			"UpnpRegisterRootDevice: No devices found for RootDevice\n");
+			"UpnpRegisterRootDevice3: No devices found for RootDevice\n");
 		retVal = UPNP_E_INVALID_DESC;
 		goto exit_function;
 	}
@@ -773,7 +1010,7 @@ int UpnpRegisterRootDevice3(
 	HInfo->DescDocument, "serviceList" );
 	if (!HInfo->ServiceList) {
 		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
-			"UpnpRegisterRootDevice: No services found for RootDevice\n");
+			"UpnpRegisterRootDevice3: No services found for RootDevice\n");
 	}
 
 	/*
@@ -787,7 +1024,7 @@ int UpnpRegisterRootDevice3(
 		HInfo->DescURL);
 	if (hasServiceTable) {
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-			"UpnpRegisterRootDevice: GENA Service Table \n"
+			"UpnpRegisterRootDevice3: GENA Service Table \n"
 			"Here are the known services: \n" );
 		printServiceTable(&HInfo->ServiceTable, UPNP_ALL, API);
 	} else {
@@ -824,7 +1061,7 @@ int UpnpUnRegisterRootDevice(UpnpDevice_Handle Hnd)
     }
 
     UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpUnRegisterRootDevice \n");
+        "Inside UpnpUnRegisterRootDevice\n");
 #if EXCLUDE_GENA == 0
     if( genaUnregisterDevice( Hnd ) != UPNP_E_SUCCESS )
         return UPNP_E_INVALID_HANDLE;
@@ -839,8 +1076,7 @@ int UpnpUnRegisterRootDevice(UpnpDevice_Handle Hnd)
 
 #if EXCLUDE_SSDP == 0
     retVal = AdvertiseAndReply(-1, Hnd, 0, (struct sockaddr *)NULL,
-                                (char *)NULL, (char *)NULL,
-                                (char *)NULL, HInfo->MaxAge);
+        (char *)NULL, (char *)NULL, (char *)NULL, HInfo->MaxAge);
 #endif
 
     HandleLock();
@@ -871,10 +1107,9 @@ int UpnpUnRegisterRootDevice(UpnpDevice_Handle Hnd)
     HandleUnlock();
 
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Exiting UpnpUnRegisterRootDevice \n" );
+        "Exiting UpnpUnRegisterRootDevice\n" );
 
     return retVal;
-
 }
 #endif /* INCLUDE_DEVICE_APIS */
 
@@ -1152,7 +1387,7 @@ static int GetDescDocumentAndURL(
 			get_server_addr6((struct sockaddr *)&serverAddr);
 		}
 
-	/* config */
+		/* config */
 		retVal = configure_urlbase(*xmlDoc, (struct sockaddr *)&serverAddr,
 			aliasStr, last_modified, descURL);
 		if (retVal != UPNP_E_SUCCESS) {
@@ -1210,11 +1445,11 @@ static int GetDescDocumentAndURL(
 #endif /* INCLUDE_DEVICE_APIS */
 
 
-//-----------------------------------------------------------------------------
-//
-//                                   SSDP interface
-//
-//-----------------------------------------------------------------------------
+/*******************************************************************************
+ *
+ *                                  SSDP interface
+ *
+ ******************************************************************************/
 
 
 #ifdef INCLUDE_DEVICE_APIS
@@ -1357,18 +1592,16 @@ int UpnpSearchAsync(
 #endif
 
 
-//-----------------------------------------------------------------------------
-//
-//                                   GENA interface 
-//
-//-----------------------------------------------------------------------------
+/*******************************************************************************
+ *
+ *                                  GENA interface
+ *
+ ******************************************************************************/
 
 
 #if EXCLUDE_GENA == 0
 #ifdef INCLUDE_DEVICE_APIS
-int UpnpSetMaxSubscriptions(
-	UpnpDevice_Handle Hnd,
-	int MaxSubscriptions )
+int UpnpSetMaxSubscriptions(UpnpDevice_Handle Hnd, int MaxSubscriptions)
 {
     struct Handle_Info *SInfo = NULL;
 
@@ -1399,9 +1632,7 @@ int UpnpSetMaxSubscriptions(
 
 
 #ifdef INCLUDE_DEVICE_APIS
-int UpnpSetMaxSubscriptionTimeOut(
-	UpnpDevice_Handle Hnd,
-	int MaxSubscriptionTimeOut)
+int UpnpSetMaxSubscriptionTimeOut(UpnpDevice_Handle Hnd, int MaxSubscriptionTimeOut)
 {
     struct Handle_Info *SInfo = NULL;
 
@@ -1439,7 +1670,7 @@ int UpnpSubscribeAsync(
 	const char *EvtUrl_const,
 	int TimeOut,
 	Upnp_FunPtr Fun,
-	const void *Cookie_const )
+	const void *Cookie_const)
 {
     struct Handle_Info *SInfo = NULL;
     struct UpnpNonblockParam *Param;
@@ -1836,7 +2067,6 @@ int UpnpNotify(
         "Exiting UpnpNotify\n");
 
     return retVal;
-
 }
 
 
@@ -1879,7 +2109,6 @@ int UpnpNotifyExt(
         "Exiting UpnpNotify \n" );
 
     return retVal;
-
 }
 #endif /* INCLUDE_DEVICE_APIS */
 
@@ -2034,11 +2263,11 @@ exit_function:
 #endif /* EXCLUDE_GENA == 0 */
 
 
-//---------------------------------------------------------------------------
-//
-//                                   SOAP interface 
-//
-//---------------------------------------------------------------------------
+/*******************************************************************************
+ *
+ *                                  SOAP interface
+ *
+ ******************************************************************************/
 
 
 #if EXCLUDE_SOAP == 0
@@ -2055,8 +2284,8 @@ int UpnpSendAction(
     int retVal = 0;
     char *ActionURL = (char *)ActionURL_const;
     char *ServiceType = (char *)ServiceType_const;
-
-    //char *DevUDN = (char *)DevUDN_const;  // udn not used?
+    /* udn not used? */
+    /*char *DevUDN = (char *)DevUDN_const;*/
 
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
@@ -2090,10 +2319,9 @@ int UpnpSendAction(
     retVal = SoapSendAction( ActionURL, ServiceType, Action, RespNodePtr );
 
     UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSendAction\n");
+	"Exiting UpnpSendAction\n");
 
     return retVal;
-
 }
 
 
@@ -2110,8 +2338,8 @@ int UpnpSendActionEx(
     int retVal = 0;
     char *ActionURL = (char *)ActionURL_const;
     char *ServiceType = (char *)ServiceType_const;
-
-    //char *DevUDN = (char *)DevUDN_const;  // udn not used?
+    /* udn not used? */
+    /*char *DevUDN = (char *)DevUDN_const;*/
 
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
@@ -2147,7 +2375,6 @@ int UpnpSendActionEx(
         "Exiting UpnpSendAction \n");
 
     return retVal;
-
 }
 
 
@@ -2160,15 +2387,15 @@ int UpnpSendActionAsync(
 	Upnp_FunPtr Fun,
 	const void *Cookie_const)
 {
+    int rc;
     ThreadPoolJob job;
     struct Handle_Info *SInfo = NULL;
     struct UpnpNonblockParam *Param;
     DOMString tmpStr;
     char *ActionURL = (char *)ActionURL_const;
     char *ServiceType = (char *)ServiceType_const;
-
-    //char *DevUDN = (char *)DevUDN_const;
-    int rc;
+    /* udn not used? */
+    /*char *DevUDN = (char *)DevUDN_const;*/
 
     if(UpnpSdkInit != 1) {
         return UPNP_E_FINISH;
@@ -2229,11 +2456,10 @@ int UpnpSendActionAsync(
     TPJobSetPriority( &job, MED_PRIORITY );
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSendActionAsync \n" );
+    UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+        "Exiting UpnpSendActionAsync \n");
 
     return UPNP_E_SUCCESS;
-
 }
 
 
@@ -2342,7 +2568,6 @@ int UpnpSendActionExAsync(
         "Exiting UpnpSendActionAsync\n");
 
     return UPNP_E_SUCCESS;
-
 }
 
 
@@ -2453,11 +2678,11 @@ int UpnpGetServiceVarStatus(
 #endif /* EXCLUDE_SOAP */
 
 
-/******************************************************************************
+/*******************************************************************************
  *
- *                             Client API's 
+ *                             Client API
  *
- *****************************************************************************/
+ ******************************************************************************/
 
 
 int UpnpOpenHttpPost(
@@ -2571,7 +2796,7 @@ int UpnpDownloadUrlItem(const char *url, char **outBuf, char *contentType)
     ret_code = http_Download( url, HTTP_DEFAULT_TIMEOUT, outBuf, &dummy,
                               contentType );
     if( ret_code > 0 ) {
-        // error reply was received
+        /* error reply was received */
         ret_code = UPNP_E_INVALID_URL;
     }
 
@@ -2598,11 +2823,11 @@ int UpnpDownloadXmlDoc(const char *url, IXML_Document **xmlDoc)
 
 	if (strncasecmp(content_type, "text/xml", strlen("text/xml"))) {
 		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Not text/xml\n");
-		// Linksys WRT54G router returns 
-		// "CONTENT-TYPE: application/octet-stream".
-		// Let's be nice to Linksys and try to parse document anyway.
-		// If the data sended is not a xml file, ixmlParseBufferEx
-		// will fail and the function will return UPNP_E_INVALID_DESC too.
+		/* Linksys WRT54G router returns
+		 * "CONTENT-TYPE: application/octet-stream".
+		 * Let's be nice to Linksys and try to parse document anyway.
+		 * If the data sended is not a xml file, ixmlParseBufferEx
+		 * will fail and the function will return UPNP_E_INVALID_DESC too. */
 #if 0
 		free(xml_buf);
 		return UPNP_E_INVALID_DESC;
@@ -2637,208 +2862,6 @@ int UpnpDownloadXmlDoc(const char *url, IXML_Document **xmlDoc)
 
 		return UPNP_E_SUCCESS;
 	}
-}
-
-
-/*----------------------------------------------------------------------------
- *
- *	UPNP-API  Internal function implementation
- *
- *----------------------------------------------------------------------------
- */
-
-
-#ifdef WIN32
-int WinsockInit()
-{
-	WORD wVersionRequested;
-	WSADATA wsaData;
-	int err;
-
-	wVersionRequested = MAKEWORD( 2, 2 );
-
-	err = WSAStartup(wVersionRequested, &wsaData);
-	if ( err != 0 ) {
-		/* Tell the user that we could not find a usable */
-		/* WinSock DLL.                                  */
-		return UPNP_E_INIT_FAILED;
-	}
-
-	/* Confirm that the WinSock DLL supports 2.2.*/
-	/* Note that if the DLL supports versions greater    */
-	/* than 2.2 in addition to 2.2, it will still return */
-	/* 2.2 in wVersion since that is the version we      */
-	/* requested.                                        */
-	 
-	if ( LOBYTE( wsaData.wVersion ) != 2 ||
-			HIBYTE( wsaData.wVersion ) != 2 ) {
-		/* Tell the user that we could not find a usable */
-		/* WinSock DLL.                                  */
-		WSACleanup( );
-		return UPNP_E_INIT_FAILED; 
-	}
-    return UPNP_E_SUCCESS;
-}
-#endif
-
-
-int UpnpInitPreamble()
-{
-    uuid_upnp nls_uuid;
-    int retVal = 0;
-
-#ifdef WIN32
-    retVal = WinsockInit();
-    if( retVal != UPNP_E_SUCCESS ){
-        return retVal;
-    }
-	/* The WinSock DLL is acceptable. Proceed. */
-#endif
-
-    srand( (unsigned int)time( NULL ) );      // needed by SSDP or other parts
-
-    // Initialize debug output.
-    retVal = UpnpInitLog();
-    if( retVal != UPNP_E_SUCCESS ) {
-        // UpnpInitLog does not return a valid UPNP_E_*
-        return UPNP_E_INIT_FAILED;
-    }
-
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Inside UpnpInitPreamble\n" );
-
-   // Initialize SDK global mutexes.
-    retVal = UpnpInitMutexes();
-    if( retVal != UPNP_E_SUCCESS ) {
-        return retVal;
-    }
-
-    // Create the NLS uuid.
-    uuid_create(&nls_uuid);
-    uuid_unpack(&nls_uuid, gUpnpSdkNLSuuid);
-
-    // Init the handle list.
-    HandleLock();
-    InitHandleList();
-    HandleUnlock();
-
-    // Initialize SDK global thread pools.
-    retVal = UpnpInitThreadPools();
-    if( retVal != UPNP_E_SUCCESS ) {
-        return retVal;
-    }
-
-#if EXCLUDE_SOAP == 0
-    SetSoapCallback( soap_device_callback );
-#endif
-
-#if EXCLUDE_GENA == 0
-    SetGenaCallback( genaCallback );
-#endif
-
-    // Initialize the SDK timer thread.
-    retVal = TimerThreadInit( &gTimerThread, &gSendThreadPool );
-    if( retVal != UPNP_E_SUCCESS ) {
-        UpnpFinish();
-        return retVal;
-    }
-
-    return UPNP_E_SUCCESS;
-}
-
-
-int UpnpInitMutexes()
-{
-#ifdef __CYGWIN__
-    /* On Cygwin, pthread_mutex_init() fails without this memset. */
-    /* TODO: Fix Cygwin so we don't need this memset(). */
-    memset(&GlobalHndRWLock, 0, sizeof(GlobalHndRWLock));
-#endif
-    if (ithread_rwlock_init(&GlobalHndRWLock, NULL) != 0) {
-        return UPNP_E_INIT_FAILED;
-    }
-
-    if (ithread_mutex_init(&gUUIDMutex, NULL) != 0) {
-        return UPNP_E_INIT_FAILED;
-    }
-    // initialize subscribe mutex
-#ifdef INCLUDE_CLIENT_APIS
-    if (ithread_mutex_init(&GlobalClientSubscribeMutex, NULL) != 0) {
-        return UPNP_E_INIT_FAILED;
-    }
-#endif
-    return UPNP_E_SUCCESS;
-}
-
-
-int UpnpInitThreadPools()
-{
-	int ret = UPNP_E_SUCCESS;
-	ThreadPoolAttr attr;
-
-	TPAttrInit(&attr);
-	TPAttrSetMaxThreads(&attr, MAX_THREADS);
-	TPAttrSetMinThreads(&attr, MIN_THREADS);
-	TPAttrSetJobsPerThread(&attr, JOBS_PER_THREAD);
-	TPAttrSetIdleTime(&attr, THREAD_IDLE_TIME);
-	TPAttrSetMaxJobsTotal(&attr, MAX_JOBS_TOTAL);
-
-	if (ThreadPoolInit(&gSendThreadPool, &attr) != UPNP_E_SUCCESS) {
-		ret = UPNP_E_INIT_FAILED;
-		goto exit_function;
-	}
-
-	if (ThreadPoolInit(&gRecvThreadPool, &attr) != UPNP_E_SUCCESS) {
-		ret = UPNP_E_INIT_FAILED;
-		goto exit_function;
-	}
-
-	if (ThreadPoolInit(&gMiniServerThreadPool, &attr) != UPNP_E_SUCCESS) {
-		ret = UPNP_E_INIT_FAILED;
-		goto exit_function;
-	}
-
-exit_function:
-	if (ret != UPNP_E_SUCCESS) {
-		UpnpSdkInit = 0;
-		UpnpFinish();
-	}
-
-	return ret;
-}
-
-
-int UpnpInitStartServers(unsigned short DestPort)
-{
-	int retVal = 0;
-
-	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-		"Entering UpnpInitStartServers\n" );
-
-#if EXCLUDE_MINISERVER == 0
-	LOCAL_PORT_V4 = DestPort;
-	LOCAL_PORT_V6 = DestPort;
-	retVal = StartMiniServer(&LOCAL_PORT_V4, &LOCAL_PORT_V6);
-	if (retVal != UPNP_E_SUCCESS) {
-		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
-			"Miniserver failed to start");
-		UpnpFinish();
-		return retVal;
-	}
-#endif
-
-#if EXCLUDE_WEB_SERVER == 0
-	membuffer_init(&gDocumentRootDir);
-	retVal = UpnpEnableWebserver(WEB_SERVER_ENABLED);
-	if (retVal != UPNP_E_SUCCESS) {
-		UpnpFinish();
-		return retVal;
-	}
-#endif
-
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-		"Exiting UpnpInitStartServers\n");
-
-	return UPNP_E_SUCCESS;
 }
 
 
@@ -3178,8 +3201,8 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 {
 	int errCode = 0;
 
-	UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-		"Inside UpnpThreadDistribution \n" );
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Inside UpnpThreadDistribution \n");
 
 	switch ( Param->FunName ) {
 #if EXCLUDE_GENA == 0
@@ -3187,20 +3210,21 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 		UpnpEventSubscribe *evt = UpnpEventSubscribe_new();
 		// cast away constness
 		UpnpString *sid = (UpnpString *)UpnpEventSubscribe_get_SID(evt);
+
 		UpnpEventSubscribe_strcpy_PublisherUrl(evt, Param->Url);
 		errCode = genaSubscribe(
 			Param->Handle,
 			UpnpEventSubscribe_get_PublisherUrl(evt),
-        	        (int *)&(Param->TimeOut),
-	                sid);
+			(int *)&Param->TimeOut,
+			sid);
 		UpnpEventSubscribe_set_ErrCode(evt, errCode);
 		UpnpEventSubscribe_set_TimeOut(evt, Param->TimeOut);
 		Param->Fun(UPNP_EVENT_SUBSCRIBE_COMPLETE, evt, Param->Cookie);
 	    	UpnpEventSubscribe_delete(evt);
 		free(Param);
 		break;
-        }
-        case UNSUBSCRIBE: {
+	}
+	case UNSUBSCRIBE: {
 		UpnpEventSubscribe *evt = UpnpEventSubscribe_new();
 		UpnpEventSubscribe_strcpy_SID(evt, Param->SubsId);
 		errCode = genaUnSubscribe(
@@ -3210,62 +3234,66 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 		UpnpEventSubscribe_strcpy_PublisherUrl(evt, "");
 		UpnpEventSubscribe_set_TimeOut(evt, 0);
 		Param->Fun(UPNP_EVENT_UNSUBSCRIBE_COMPLETE, evt, Param->Cookie);
-	    	UpnpEventSubscribe_delete(evt);
+		UpnpEventSubscribe_delete(evt);
 		free(Param);
 		break;
-        }
-        case RENEW: {
+	}
+	case RENEW: {
 		UpnpEventSubscribe *evt = UpnpEventSubscribe_new();
 		UpnpEventSubscribe_strcpy_SID(evt, Param->SubsId);
 		errCode = genaRenewSubscription(
 			Param->Handle,
 			UpnpEventSubscribe_get_SID(evt),
-			&(Param->TimeOut));
+			&Param->TimeOut);
 		UpnpEventSubscribe_set_ErrCode(evt, errCode);
 		UpnpEventSubscribe_set_TimeOut(evt, Param->TimeOut);
 		Param->Fun(UPNP_EVENT_RENEWAL_COMPLETE, evt, Param->Cookie);
-	    	UpnpEventSubscribe_delete(evt);
+		UpnpEventSubscribe_delete(evt);
 		free(Param);
 		break;
-        }
-#endif // EXCLUDE_GENA == 0
+	}
+#endif /* EXCLUDE_GENA == 0 */
 #if EXCLUDE_SOAP == 0
-        case ACTION: {
-            UpnpActionComplete *Evt = UpnpActionComplete_new();
-	    IXML_Document *actionResult = NULL;
-	    int errCode = SoapSendAction(
-                Param->Url, Param->ServiceType, Param->Act, &actionResult );
-            UpnpActionComplete_set_ErrCode(Evt, errCode);
-            UpnpActionComplete_set_ActionRequest(Evt, Param->Act);
-            UpnpActionComplete_set_ActionResult(Evt, actionResult);
-            UpnpActionComplete_strcpy_CtrlUrl(Evt, Param->Url );
-            Param->Fun( UPNP_CONTROL_ACTION_COMPLETE, Evt, Param->Cookie );
-            free(Param);
-            UpnpActionComplete_delete(Evt);
-            break;
-        }
-        case STATUS: {
-                UpnpStateVarComplete *Evt = UpnpStateVarComplete_new();
+	case ACTION: {
+		UpnpActionComplete *Evt = UpnpActionComplete_new();
+		IXML_Document *actionResult = NULL;
+		int errCode = SoapSendAction(
+			Param->Url,
+			Param->ServiceType,
+			Param->Act,
+			&actionResult);
+		UpnpActionComplete_set_ErrCode(Evt, errCode);
+		UpnpActionComplete_set_ActionRequest(Evt, Param->Act);
+		UpnpActionComplete_set_ActionResult(Evt, actionResult);
+		UpnpActionComplete_strcpy_CtrlUrl(Evt, Param->Url);
+		Param->Fun(UPNP_CONTROL_ACTION_COMPLETE, Evt, Param->Cookie);
+		free(Param);
+		UpnpActionComplete_delete(Evt);
+		break;
+	}
+	case STATUS: {
+		UpnpStateVarComplete *Evt = UpnpStateVarComplete_new();
 		DOMString currentVal = NULL;
 		int errCode = SoapGetServiceVarStatus(
-                    Param->Url, Param->VarName, &currentVal );
-                UpnpStateVarComplete_set_ErrCode(Evt, errCode);
-                UpnpStateVarComplete_strcpy_CtrlUrl(Evt, Param->Url);
-                UpnpStateVarComplete_strcpy_StateVarName(Evt, Param->VarName);
-                UpnpStateVarComplete_set_CurrentVal(Evt, currentVal);
-                Param->Fun( UPNP_CONTROL_GET_VAR_COMPLETE, Evt, Param->Cookie );
-                free( Param );
-                UpnpStateVarComplete_delete(Evt);
-                break;
-            }
+			Param->Url,
+			Param->VarName,
+			&currentVal);
+		UpnpStateVarComplete_set_ErrCode(Evt, errCode);
+		UpnpStateVarComplete_strcpy_CtrlUrl(Evt, Param->Url);
+		UpnpStateVarComplete_strcpy_StateVarName(Evt, Param->VarName);
+		UpnpStateVarComplete_set_CurrentVal(Evt, currentVal);
+		Param->Fun(UPNP_CONTROL_GET_VAR_COMPLETE, Evt, Param->Cookie);
+		free(Param);
+		UpnpStateVarComplete_delete(Evt);
+		break;
+	}
 #endif /* EXCLUDE_SOAP == 0 */
-        default:
-            break;
-    } /* end of switch(Param->FunName) */
+	default:
+		break;
+	}
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpThreadDistribution \n" );
-
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Exiting UpnpThreadDistribution\n");
 }
 #endif /* INCLUDE_CLIENT_APIS */
 
@@ -3278,16 +3306,6 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 Upnp_FunPtr GetCallBackFn(UpnpClient_Handle Hnd)
 {
 	return ((struct Handle_Info *)HandleTable[Hnd])->Callback;
-}
-
-
-void InitHandleList()
-{
-	int i;
-
-	for (i = 0; i < NUM_HANDLE; ++i) {
-		HandleTable[i] = NULL;
-	}
 }
 
 
@@ -3422,44 +3440,14 @@ int PrintHandleInfo(UpnpClient_Handle Hnd)
                 "HType_%d\n", HndInfo->HType);
 #ifdef INCLUDE_DEVICE_APIS
                 if(HndInfo->HType != HND_CLIENT)
-                    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-                        "DescURL_%s\n", HndInfo->DescURL );
+                    UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+                        "DescURL_%s\n", HndInfo->DescURL);
 #endif /* INCLUDE_DEVICE_APIS */
     } else {
         return UPNP_E_INVALID_HANDLE;
     }
 
     return UPNP_E_SUCCESS;
-}
-
-
-/*!
- * \brief Print the node names and values of a XML tree.
- */
-static void printNodes(IXML_Node *tmpRoot, int depth)
-{
-    int i;
-    IXML_NodeList *NodeList1;
-    IXML_Node *ChildNode1;
-    unsigned short NodeType;
-    const DOMString NodeValue;
-    const DOMString NodeName;
-    NodeList1 = ixmlNode_getChildNodes(tmpRoot);
-    for (i = 0; i < 100; ++i) {
-        ChildNode1 = ixmlNodeList_item(NodeList1, i);
-        if (ChildNode1 == NULL) {
-            break;
-        }
-    
-        printNodes(ChildNode1, depth+1);
-        NodeType = ixmlNode_getNodeType(ChildNode1);
-        NodeValue = ixmlNode_getNodeValue(ChildNode1);
-        NodeName = ixmlNode_getNodeName(ChildNode1);
-        UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-            "DEPTH-%2d-IXML_Node Type %d, "
-            "IXML_Node Name: %s, IXML_Node Value: %s\n",
-            depth, NodeType, NodeName, NodeValue);
-    }
 }
 
 
@@ -3703,7 +3691,6 @@ int UpnpAddVirtualDir(const char *newDirName)
 
 int UpnpRemoveVirtualDir(const char *dirName)
 {
-
     virtualDirList *pPrev;
     virtualDirList *pCur;
     int found = 0;
@@ -3750,7 +3737,6 @@ int UpnpRemoveVirtualDir(const char *dirName)
         return UPNP_E_SUCCESS;
     else
         return UPNP_E_INVALID_PARAM;
-
 }
 
 
@@ -3773,7 +3759,6 @@ void UpnpRemoveAllVirtualDirs(void)
     }
 
     pVirtualDirList = NULL;
-
 }
 
 
