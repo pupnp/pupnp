@@ -1,59 +1,64 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/**************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ **************************************************************************/
+
 
 #ifndef SSDPLIB_H
 #define SSDPLIB_H 
+
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "miniserver.h"
+#include "UpnpInet.h"
+
 
 #include <sys/types.h>
 #include <signal.h>
 #include <setjmp.h>
 #include <fcntl.h>
 #include <errno.h>
-#include "httpparser.h"
-#include "httpreadwrite.h"
-#include "miniserver.h"
-#ifndef WIN32
- #include <syslog.h>
- #include <sys/socket.h>
- #include <netinet/in.h>
- #include <netinet/in_systm.h>
- #include <netinet/ip.h>
- #include <netinet/ip_icmp.h>
- #include <sys/time.h>
- #include <arpa/inet.h>
+
+
+#ifdef WIN32
 #else
-#include <winsock2.h>
+	#include <syslog.h>
+	#include <sys/socket.h>
+	#include <netinet/in_systm.h>
+	#include <netinet/ip.h>
+	#include <netinet/ip_icmp.h>
+	#include <sys/time.h>
+	#include <arpa/inet.h>
 #endif
 
-//Enumeration to define all different types of ssdp searches
+
+/* Enumeration to define all different types of ssdp searches */
 typedef enum SsdpSearchType{
 	SSDP_SERROR=-1,
 	SSDP_ALL,SSDP_ROOTDEVICE,
@@ -63,8 +68,9 @@ typedef enum SsdpSearchType{
 } SType;
 
 
-//Enumeration to define all different type of ssdp messages
-typedef enum SsdpCmdType{SSDP_ERROR=-1,
+/* Enumeration to define all different type of ssdp messages */
+typedef enum SsdpCmdType{
+	SSDP_ERROR=-1,
 	SSDP_OK,
 	SSDP_ALIVE,
 	SSDP_BYEBYE,
@@ -75,16 +81,18 @@ typedef enum SsdpCmdType{SSDP_ERROR=-1,
 
 
 
-//Constant
+/* Constant */
 #define	 BUFSIZE   2500
 #define  SSDP_IP   "239.255.255.250"
+#define  SSDP_IPV6_LINKLOCAL "FF02::C"
 #define  SSDP_PORT 1900
 #define  NUM_TRY 3
 #define  NUM_COPY 1
 #define  THREAD_LIMIT 50
 #define  COMMAND_LEN  300
 
-#ifndef X_USER_AGENT // can be overwritten by configure CFLAGS argument
+/* can be overwritten by configure CFLAGS argument */
+#ifndef X_USER_AGENT
 /** @name X_USER_AGENT
  *  The {\tt X_USER_AGENT} constant specifies the value of the X-User-Agent:
  *  HTTP header. The value "redsonic" is needed for the DSM-320. See
@@ -94,7 +102,7 @@ typedef enum SsdpCmdType{SSDP_ERROR=-1,
  #define X_USER_AGENT "redsonic"
 #endif
 
-//Error code
+/* Error code */
 #define NO_ERROR_FOUND    0
 #define E_REQUEST_INVALID  	-3
 #define E_RES_EXPIRED		-4
@@ -105,7 +113,7 @@ typedef enum SsdpCmdType{SSDP_ERROR=-1,
 
 
 
-//Structure to store the SSDP information
+/* Structure to store the SSDP information */
 typedef struct SsdpEventStruct
 {
   enum SsdpCmdType Cmd;
@@ -121,7 +129,7 @@ typedef struct SsdpEventStruct
   char Os[LINE_SIZE];
   char Ext[LINE_SIZE];
   char Date[LINE_SIZE];
-  struct sockaddr_in * DestAddr;
+  struct sockaddr *DestAddr;
   void * Cookie;
 } Event;
 
@@ -143,7 +151,7 @@ typedef struct TData
    int Mx;
    void * Cookie;
    char * Data;
-   struct sockaddr_in DestAddr;
+   struct sockaddr_storage DestAddr;
    
 }ThreadData;
 
@@ -151,7 +159,7 @@ typedef struct ssdpsearchreply
 {
   int MaxAge;
   UpnpDevice_Handle handle;
-  struct sockaddr_in dest_addr;
+  struct sockaddr_storage dest_addr;
   SsdpEvent event;
   
 }SsdpSearchReply;
@@ -168,20 +176,17 @@ typedef struct ssdpsearcharg
 typedef struct 
 {
   http_parser_t parser;
-  struct sockaddr_in dest_addr;
+  struct sockaddr_storage dest_addr;
 } ssdp_thread_data;
 
 
 /* globals */
 
-CLIENTONLY(extern SOCKET gSsdpReqSocket;);
+CLIENTONLY(extern SOCKET gSsdpReqSocket4;);
+CLIENTONLY(extern SOCKET gSsdpReqSocket6;);
 
 typedef int (*ParserFun)(char *, Event *);
 
-
-//void InitParser();
-
-//int AnalyzeCommand(char * szCommand, Event * Evt);
 
 /************************************************************************
 * Function : Make_Socket_NoBlocking
@@ -214,11 +219,11 @@ int Make_Socket_NoBlocking (int sock);
 #ifdef INCLUDE_DEVICE_APIS
 void ssdp_handle_device_request(
 	IN http_message_t* hmsg, 
-	IN struct sockaddr_in* dest_addr );
+	IN struct sockaddr* dest_addr );
 #else
 static inline void ssdp_handle_device_request(
 	IN http_message_t* hmsg, 
-	IN struct sockaddr_in* dest_addr ) {}
+	IN struct sockaddr* dest_addr ) {}
 #endif
 
 /************************************************************************
@@ -226,7 +231,7 @@ static inline void ssdp_handle_device_request(
 *
 * Parameters:
 *	IN http_message_t* hmsg: SSDP message from the device
-*	IN struct sockaddr_in* dest_addr: Address of the device
+*	IN struct sockaddr* dest_addr: Address of the device
 *	IN xboolean timeout: timeout kept by the control point while sending 
 *		search message
 *	IN void* cookie: Cookie stored by the control point application. 
@@ -243,7 +248,7 @@ static inline void ssdp_handle_device_request(
 ***************************************************************************/
 void ssdp_handle_ctrlpt_msg(
 	IN http_message_t* hmsg, 
-	IN struct sockaddr_in* dest_addr,
+	IN struct sockaddr* dest_addr,
 	IN xboolean timeout,
 	IN void* cookie );
 
@@ -356,6 +361,7 @@ int SearchByTarget(IN int Mx, IN char *St, IN void *Cookie);
 *	IN char *Udn     :
 *	IN char *Location: Location URL.
 *	IN int Duration  : Service duration in sec.
+*	IN int AddressFamily: Device address family.
 *
 * Description:
 *	This function creates the device advertisement request based on
@@ -369,7 +375,8 @@ int DeviceAdvertisement(
 	IN int RootDev,
 	IN char *Udn, 
 	IN char *Location,
-	IN int Duration);
+	IN int Duration,
+	IN int AddressFamily);
 
 
 /************************************************************************
@@ -382,6 +389,7 @@ int DeviceAdvertisement(
 *	IN char *_Server:
 *	IN char *Location: Location URL
 *	IN int Duration :Device duration in sec.
+*	IN int AddressFamily: Device address family.
 *
 * Description:
 *	This function creates a HTTP device shutdown request packet 
@@ -396,13 +404,14 @@ int DeviceShutdown(
 	IN char *Udn, 
 	IN char *_Server, 
 	IN char *Location, 
-	IN int Duration);
+	IN int Duration,
+	IN int AddressFamily);
 
 /************************************************************************
 * Function : DeviceReply
 *
 * Parameters:	
-*	IN struct sockaddr_in * DestAddr:destination IP address.
+*	IN struct sockaddr *DestAddr: destination IP address.
 *	IN char *DevType: Device type
 *	IN int RootDev: 1 means root device 0 means embedded device.
 *	IN char *Udn: Device UDN
@@ -417,17 +426,18 @@ int DeviceShutdown(
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int DeviceReply(
-	IN struct sockaddr_in * DestAddr, 
+	IN struct sockaddr *DestAddr, 
 	IN char *DevType, 
 	IN int RootDev, 
 	IN char *Udn, 
-	IN char *Location, IN int  Duration);
+	IN char *Location, 
+	IN int  Duration);
 
 /************************************************************************
 * Function : SendReply
 *
 * Parameters:	
-*	IN struct sockaddr_in * DestAddr:destination IP address.
+*	IN struct sockaddr *DestAddr: destination IP address.
 *	IN char *DevType: Device type
 *	IN int RootDev: 1 means root device 0 means embedded device.
 *	IN char * Udn: Device UDN
@@ -444,7 +454,7 @@ int DeviceReply(
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int SendReply(
-	IN struct sockaddr_in * DestAddr, 
+	IN struct sockaddr *DestAddr, 
 	IN char *DevType, 
 	IN int RootDev, 
 	IN char *Udn, 
@@ -459,7 +469,8 @@ int SendReply(
 *	IN char * Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char * Location: Location of Device description document.
-*	IN int Duration :Life time of this device.
+*	IN int Duration: Life time of this device.
+*	IN int AddressFamily: Device address family
 *
 * Description:
 *	This function creates the advertisement packet based 
@@ -472,13 +483,14 @@ int ServiceAdvertisement(
 	IN char *Udn, 
 	IN char *ServType,
 	IN char *Location,
-	IN int Duration);
+	IN int Duration,
+	IN int AddressFamily);
 
 /************************************************************************
 * Function : ServiceReply
 *
 * Parameters:	
-*	IN struct sockaddr_in *DestAddr:
+*	IN struct sockaddr *DestAddr:
 *	IN char *Udn: Device UDN
 *	IN char *ServType: Service Type.
 *	IN char *Server: Not used
@@ -493,7 +505,7 @@ int ServiceAdvertisement(
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int ServiceReply(
-	IN struct sockaddr_in *DestAddr,  
+	IN struct sockaddr *DestAddr,  
 	IN char *ServType, 
 	IN char *Udn, 
 	IN char *Location,
@@ -507,6 +519,7 @@ int ServiceReply(
 *	IN char *ServType: Service Type.
 *	IN char *Location: Location of Device description document.
 *	IN int Duration :Service duration in sec.
+*	IN int AddressFamily: Device address family
 *
 * Description:
 *	This function creates a HTTP service shutdown request packet 
@@ -519,7 +532,8 @@ int ServiceShutdown(
 	IN char *Udn,
 	IN char *ServType,
 	IN char *Location,
-	IN int Duration);
+	IN int Duration,
+	IN int AddressFamily);
 
 
 /************************************************************************
@@ -546,7 +560,7 @@ void *advertiseAndReplyThread(IN void * data);
 *			1 = Send Advertisement
 *	IN UpnpDevice_Handle Hnd: Device handle
 *	IN enum SsdpSearchType SearchType:Search type for sending replies
-*	IN struct sockaddr_in *DestAddr:Destination address
+*	IN struct sockaddr *DestAddr:Destination address
 *	IN char *DeviceType:Device type
 *	IN char *DeviceUDN:Device UDN
 *	IN char *ServiceType:Service type
@@ -562,10 +576,10 @@ int AdvertiseAndReply(
 	IN int AdFlag, 
 	IN UpnpDevice_Handle Hnd, 
 	IN enum SsdpSearchType SearchType, 
-	IN struct sockaddr_in *DestAddr,
+	IN struct sockaddr *DestAddr,
 	IN char *DeviceType, 
 	IN char *DeviceUDN, 
 	IN char *ServiceType, int Exp);
 
-#endif
+#endif /* SSDPLIB_H */
 

@@ -1,72 +1,78 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/**************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ **************************************************************************/
+
 
 #include "config.h"
+
+
 #include "util.h"
+
+
 #ifdef INCLUDE_CLIENT_APIS
 #if EXCLUDE_SSDP == 0
 
-#include "ssdplib.h"
-#include "upnpapi.h"
-#include <stdio.h>
-#include "ThreadPool.h"
 
 #include "httpparser.h"
 #include "httpreadwrite.h"
+/*#include "ssdp_ResultData.h"*/
+#include "ssdplib.h"
 #include "statcodes.h"
-
 #include "unixutil.h"
+#include "upnpapi.h"
+#include "UpnpInet.h"
+#include "ThreadPool.h"
+
+
+#include <stdio.h>
+
 
 #ifdef WIN32
-	#include <ws2tcpip.h>
-	#include <winsock2.h>
 	#include <string.h>
 #endif /* WIN32 */
 
 
 /************************************************************************
-* Function : send_search_result
-*
-* Parameters:
-*	IN void *data: Search reply from the device
-*
-* Description:
-*	This function sends a callback to the control point application with 
-*	a SEARCH result
-*
-* Returns: void
-*
-***************************************************************************/
-void
-send_search_result( IN void *data )
+ * Function: send_search_result
+ *
+ * Parameters:
+ *	IN void *data: Search reply from the device
+ *
+ * Description:
+ *	This function sends a callback to the control point application with 
+ *	a SEARCH result
+ *
+ * Returns: void
+ *
+ ***************************************************************************/
+void send_search_result(IN void *data)
 {
     ResultData *temp = ( ResultData * ) data;
 
@@ -76,31 +82,34 @@ send_search_result( IN void *data )
 }
 
 /************************************************************************
-* Function : ssdp_handle_ctrlpt_msg
-*
-* Parameters:
-*	IN http_message_t* hmsg: SSDP message from the device
-*	IN struct sockaddr_in* dest_addr: Address of the device
-*	IN xboolean timeout: timeout kept by the control point while
-*		sending search message
-*	IN void* cookie: Cookie stored by the control point application. 
-*		This cookie will be returned to the control point
-*		in the callback 
-*
-* Description:
-*	This function handles the ssdp messages from the devices. These 
-*	messages includes the search replies, advertisement of device coming 
-*	alive and bye byes.
-*
-* Returns: void
-*
-***************************************************************************/
-void
-ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
-                        IN struct sockaddr_in *dest_addr,
-                        IN xboolean timeout,    // only in search reply
-
-                        IN void *cookie )   // only in search reply
+ * Function: ssdp_handle_ctrlpt_msg
+ *
+ * Parameters:
+ *	IN http_message_t *hmsg:
+ *		SSDP message from the device
+ *	IN struct sockaddr *dest_addr:
+ *		Address of the device
+ *	IN xboolean timeout:
+ *		timeout kept by the control point while
+ *		sending search message
+ *	IN void* cookie:
+ *		Cookie stored by the control point application. 
+ *		This cookie will be returned to the control point
+ *		in the callback 
+ *
+ * Description:
+ *	This function handles the ssdp messages from the devices. These 
+ *	messages includes the search replies, advertisement of device coming 
+ *	alive and bye byes.
+ *
+ * Returns: void
+ *
+ ***************************************************************************/
+void ssdp_handle_ctrlpt_msg(
+	IN http_message_t *hmsg,
+	IN struct sockaddr *dest_addr,
+	IN xboolean timeout, // only in search reply
+	IN void *cookie)    // only in search reply
 {
     int handle;
     struct Handle_Info *ctrlpt_info = NULL;
@@ -108,9 +117,9 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
     xboolean is_byebye;         // byebye or alive
     struct Upnp_Discovery param;
     SsdpEvent event;
-    xboolean nt_found,
-      usn_found,
-      st_found;
+    xboolean nt_found;
+    xboolean usn_found;
+    xboolean st_found;
     char save_char;
     Upnp_EventType event_type;
     Upnp_FunPtr ctrlpt_callback;
@@ -125,7 +134,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
 
     HandleReadLock();
 
-    if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
+    if ( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
         HandleUnlock();
         return;
     }
@@ -135,7 +144,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
     HandleUnlock();
 
     // search timeout
-    if( timeout ) {
+    if ( timeout ) {
         ctrlpt_callback( UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie );
         return;
     }
@@ -188,26 +197,22 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
 
     nt_found = FALSE;
 
-    if( httpmsg_find_hdr( hmsg, HDR_NT, &hdr_value ) != NULL ) {
+    if ( httpmsg_find_hdr( hmsg, HDR_NT, &hdr_value ) != NULL ) {
         save_char = hdr_value.buf[hdr_value.length];
         hdr_value.buf[hdr_value.length] = '\0';
-
         nt_found = ( ssdp_request_type( hdr_value.buf, &event ) == 0 );
-
         hdr_value.buf[hdr_value.length] = save_char;
     }
 
     usn_found = FALSE;
-    if( httpmsg_find_hdr( hmsg, HDR_USN, &hdr_value ) != NULL ) {
+    if ( httpmsg_find_hdr( hmsg, HDR_USN, &hdr_value ) != NULL ) {
         save_char = hdr_value.buf[hdr_value.length];
         hdr_value.buf[hdr_value.length] = '\0';
-
         usn_found = ( unique_service_name( hdr_value.buf, &event ) == 0 );
-
         hdr_value.buf[hdr_value.length] = save_char;
     }
 
-    if( nt_found || usn_found ) {
+    if ( nt_found || usn_found ) {
         strcpy( param.DeviceId, event.UDN );
         strcpy( param.DeviceType, event.DeviceType );
         strcpy( param.ServiceType, event.ServiceType );
@@ -216,11 +221,10 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
     // ADVERT. OR BYEBYE
     if( hmsg->is_request ) {
         // use NTS hdr to determine advert., or byebye
-        //
-        if( httpmsg_find_hdr( hmsg, HDR_NTS, &hdr_value ) == NULL ) {
+        if ( httpmsg_find_hdr( hmsg, HDR_NTS, &hdr_value ) == NULL ) {
             return;             // error; NTS header not found
         }
-        if( memptr_cmp( &hdr_value, "ssdp:alive" ) == 0 ) {
+        if ( memptr_cmp( &hdr_value, "ssdp:alive" ) == 0 ) {
             is_byebye = FALSE;
         } else if( memptr_cmp( &hdr_value, "ssdp:byebye" ) == 0 ) {
             is_byebye = TRUE;
@@ -228,7 +232,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
             return;             // bad value
         }
 
-        if( is_byebye ) {
+        if ( is_byebye ) {
             // check device byebye
             if( !nt_found || !usn_found ) {
                 return;         // bad byebye
@@ -243,7 +247,6 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
                 strlen( param.Location ) == 0 || param.Expires <= 0 ) {
                 return;         // bad advertisement
             }
-
             event_type = UPNP_DISCOVERY_ADVERTISEMENT_ALIVE;
         }
 
@@ -282,61 +285,50 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
             matched = 0;
             // check for match of ST header and search target
             switch ( searchArg->requestType ) {
-                case SSDP_ALL:
-                    {
+            case SSDP_ALL:
                         matched = 1;
                         break;
-                    }
-                case SSDP_ROOTDEVICE:
-                    {
+            case SSDP_ROOTDEVICE:
                         matched = ( event.RequestType == SSDP_ROOTDEVICE );
                         break;
-                    }
-                case SSDP_DEVICEUDN:
-                    {
+            case SSDP_DEVICEUDN:
                         matched = !( strncmp( searchArg->searchTarget,
                                               hdr_value.buf,
                                               hdr_value.length ) );
                         break;
-                    }
-                case SSDP_DEVICETYPE:
-                    {
+            case SSDP_DEVICETYPE: {
+                        int m = min( hdr_value.length,
+                                     strlen( searchArg->searchTarget ) );
+                        matched = !( strncmp( searchArg->searchTarget,
+                                              hdr_value.buf, m ) );
+                        break;
+            }
+            case SSDP_SERVICE: {
                         int m = min( hdr_value.length,
                                      strlen( searchArg->searchTarget ) );
 
                         matched = !( strncmp( searchArg->searchTarget,
                                               hdr_value.buf, m ) );
                         break;
-                    }
-                case SSDP_SERVICE:
-                    {
-                        int m = min( hdr_value.length,
-                                     strlen( searchArg->searchTarget ) );
-
-                        matched = !( strncmp( searchArg->searchTarget,
-                                              hdr_value.buf, m ) );
-                        break;
-                    }
-                default:
-                    {
+            }
+            default:
                         matched = 0;
                         break;
-                    }
             }
 
-            if( matched ) {
+            if (matched) {
                 // schedule call back
                 threadData =
                     ( ResultData * ) malloc( sizeof( ResultData ) );
-                if( threadData != NULL ) {
+                if (threadData != NULL) {
                     threadData->param = param;
                     threadData->cookie = searchArg->cookie;
                     threadData->ctrlpt_callback = ctrlpt_callback;
                     TPJobInit( &job, ( start_routine ) send_search_result,
                                threadData );
-                    TPJobSetPriority( &job, MED_PRIORITY );
+                    TPJobSetPriority(&job, MED_PRIORITY);
                     TPJobSetFreeFunction( &job, ( free_routine ) free );
-                    ThreadPoolAdd( &gRecvThreadPool, &job, NULL );
+                    ThreadPoolAdd(&gRecvThreadPool, &job, NULL);
                 }
             }
             node = ListNext( &ctrlpt_info->SsdpSearchList, node );
@@ -347,50 +339,6 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
     }
 }
 
-/************************************************************************
-* Function : process_reply
-*
-* Parameters:
-*	IN char* request_buf: the response came from the device
-*	IN int buf_len: The length of the response buffer
-*	IN struct sockaddr_in* dest_addr: The address of the device
-*	IN void *cookie : cookie passed by the control point application
-*		at the time of sending search message
-*
-* Description:
-*	This function processes reply recevied from a search
-*
-* Returns: void
-*
-***************************************************************************/
-#ifndef WIN32
-#warning There are currently no uses of the function 'process_reply()' in the code.
-#warning 'process_reply()' is a candidate for removal.
-#else
-#pragma message("There are currently no uses of the function 'process_reply()' in the code.")
-#pragma message("'process_reply()' is a candidate for removal.")
-#endif
-static UPNP_INLINE void
-process_reply( IN char *request_buf,
-               IN int buf_len,
-               IN struct sockaddr_in *dest_addr,
-               IN void *cookie )
-{
-    http_parser_t parser;
-
-    parser_response_init( &parser, HTTPMETHOD_MSEARCH );
-
-    // parse
-    if( parser_append( &parser, request_buf, buf_len ) != PARSE_SUCCESS ) {
-        httpmsg_destroy( &parser.msg );
-        return;
-    }
-    // handle reply
-    ssdp_handle_ctrlpt_msg( &parser.msg, dest_addr, FALSE, cookie );
-
-    // done
-    httpmsg_destroy( &parser.msg );
-}
 
 /************************************************************************
 * Function : CreateClientRequestPacket
@@ -400,6 +348,7 @@ process_reply( IN char *request_buf,
 *	IN char *SearchTarget:Search Target
 *	IN int Mx dest_addr: Number of seconds to wait to 
 *		collect all the responses
+*	IN int AddressFamily: search address family
 *
 * Description:
 *	This function creates a HTTP search request packet 
@@ -411,13 +360,18 @@ process_reply( IN char *request_buf,
 static void
 CreateClientRequestPacket( IN char *RqstBuf,
                            IN int Mx,
-                           IN char *SearchTarget )
+                           IN char *SearchTarget,
+                           IN int AddressFamily )
 {
     char TempBuf[COMMAND_LEN];
 
     strcpy( RqstBuf, "M-SEARCH * HTTP/1.1\r\n" );
 
-    sprintf( TempBuf, "HOST: %s:%d\r\n", SSDP_IP, SSDP_PORT );
+    if (AddressFamily == AF_INET) {
+        sprintf( TempBuf, "HOST: %s:%d\r\n", SSDP_IP, SSDP_PORT );
+    } else if (AddressFamily == AF_INET6) {
+        sprintf( TempBuf, "HOST: [%s]:%d\r\n", SSDP_IPV6_LINKLOCAL, SSDP_PORT );
+    }
     strcat( RqstBuf, TempBuf );
     strcat( RqstBuf, "MAN: \"ssdp:discover\"\r\n" );
 
@@ -431,7 +385,6 @@ CreateClientRequestPacket( IN char *RqstBuf,
         strcat( RqstBuf, TempBuf );
     }
     strcat( RqstBuf, "\r\n" );
-
 }
 
 /************************************************************************
@@ -507,7 +460,17 @@ searchExpired( void *arg )
 *		This cokie will be returned to application in the callback.
 *
 * Description:
-*	This function creates and send the search request for a specific URL.
+*   This function implements the search request of the discovery phase.
+*   A M-SEARCH request is sent on the SSDP channel for both IPv4 and
+*   IPv6 addresses. The search target(ST) is required and must be one of
+*   the following:
+*       - "ssdp:all" : Search for all devices and services.
+*       - "ssdp:rootdevice" : Search for root devices only.
+*       - "uuid:<device-uuid>" : Search for a particular device.
+*       - "urn:schemas-upnp-org:device:<deviceType:v>"
+*       - "urn:schemas-upnp-org:service:<serviceType:v>"
+*       - "urn:<domain-name>:device:<deviceType:v>"
+*       - "urn:<domain-name>:service:<serviceType:v>"
 *
 * Returns: int
 *	1 if successful else appropriate error
@@ -518,18 +481,23 @@ SearchByTarget( IN int Mx,
                 IN void *Cookie )
 {
     char errorBuffer[ERROR_BUFFER_LEN];
-    int socklen = sizeof( struct sockaddr_in );
+    int socklen = sizeof( struct sockaddr_storage );
     int *id = NULL;
     int ret = 0;
-    char *ReqBuf;
-    struct sockaddr_in destAddr;
+    char ReqBufv4[BUFSIZE];
+    char ReqBufv6[BUFSIZE];
+    struct sockaddr_storage __ss_v4;
+    struct sockaddr_storage __ss_v6;
+    struct sockaddr_in* destAddr4 = (struct sockaddr_in*)&__ss_v4;
+    struct sockaddr_in6* destAddr6 = (struct sockaddr_in6*)&__ss_v6;
     fd_set wrSet;
     SsdpSearchArg *newArg = NULL;
     int timeTillRead = 0;
     int handle;
     struct Handle_Info *ctrlpt_info = NULL;
     enum SsdpSearchType requestType;
-    unsigned long addr = inet_addr( LOCAL_HOST );
+    unsigned long addrv4 = inet_addr( gIF_IPV4 );
+    int max_fd = 0;
 
     //ThreadData *ThData;
     ThreadPoolJob job;
@@ -539,12 +507,7 @@ SearchByTarget( IN int Mx,
         return UPNP_E_INVALID_PARAM;
     }
 
-    ReqBuf = (char *)malloc( BUFSIZE );
-    if( ReqBuf == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
-    }
-
-    UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, ">>> SSDP SEND >>>\n");
+    UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, "Inside SearchByTarget\n");
 
     timeTillRead = Mx;
 
@@ -554,21 +517,24 @@ SearchByTarget( IN int Mx,
         timeTillRead = MAX_SEARCH_TIME;
     }
 
-    CreateClientRequestPacket( ReqBuf, timeTillRead, St );
-    memset( ( char * )&destAddr, 0, sizeof( struct sockaddr_in ) );
+    CreateClientRequestPacket( ReqBufv4, timeTillRead, St, AF_INET );
+    CreateClientRequestPacket( ReqBufv6, timeTillRead, St, AF_INET6 );
 
-    destAddr.sin_family = AF_INET;
-    destAddr.sin_addr.s_addr = inet_addr( SSDP_IP );
-    destAddr.sin_port = htons( SSDP_PORT );
+    memset( &__ss_v4, 0, sizeof( __ss_v4 ) );
+    destAddr4->sin_family = AF_INET;
+    inet_pton( AF_INET, SSDP_IP, &destAddr4->sin_addr );
+    destAddr4->sin_port = htons( SSDP_PORT );
 
-    FD_ZERO( &wrSet );
-    FD_SET( gSsdpReqSocket, &wrSet );
+    memset( &__ss_v6, 0, sizeof( __ss_v6 ) );
+    destAddr6->sin6_family = AF_INET6;
+    inet_pton( AF_INET6, SSDP_IPV6_LINKLOCAL, &destAddr6->sin6_addr );
+    destAddr6->sin6_port = htons( SSDP_PORT );
+    destAddr6->sin6_scope_id = gIF_INDEX;
 
     // add search criteria to list
     HandleLock();
     if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
         HandleUnlock();
-        free( ReqBuf );
         return UPNP_E_INTERNAL_ERROR;
     }
 
@@ -590,34 +556,56 @@ SearchByTarget( IN int Mx,
     ListAddTail( &ctrlpt_info->SsdpSearchList, newArg );
     HandleUnlock();
 
-    ret = setsockopt( gSsdpReqSocket, IPPROTO_IP, IP_MULTICAST_IF,
-        (char *)&addr, sizeof (addr) );
+    FD_ZERO( &wrSet );
+    if( gSsdpReqSocket4 != INVALID_SOCKET ) {
+        setsockopt( gSsdpReqSocket4, IPPROTO_IP, IP_MULTICAST_IF,
+            (char *)&addrv4, sizeof (addrv4) );
+        FD_SET( gSsdpReqSocket4, &wrSet );
+        max_fd = max(max_fd, gSsdpReqSocket4);
+    }
+    if( gSsdpReqSocket6 != INVALID_SOCKET ) {
+        setsockopt( gSsdpReqSocket6, IPPROTO_IPV6, IPV6_MULTICAST_IF,
+            (char *)&gIF_INDEX, sizeof(gIF_INDEX) );
+        FD_SET( gSsdpReqSocket6, &wrSet );
+        max_fd = max(max_fd, gSsdpReqSocket6);
+    }
 
-    ret = select( gSsdpReqSocket + 1, NULL, &wrSet, NULL, NULL );
+    ret = select( max_fd + 1, NULL, &wrSet, NULL, NULL );
     if( ret == -1 ) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
             "SSDP_LIB: Error in select(): %s\n",
             errorBuffer );
-	shutdown( gSsdpReqSocket, SD_BOTH );
-        UpnpCloseSocket( gSsdpReqSocket );
-        free( ReqBuf );
+	    shutdown( gSsdpReqSocket4, SD_BOTH );
+        UpnpCloseSocket( gSsdpReqSocket4 );
+	    shutdown( gSsdpReqSocket6, SD_BOTH );
+        UpnpCloseSocket( gSsdpReqSocket6 );
 
         return UPNP_E_INTERNAL_ERROR;
-    } else if( FD_ISSET( gSsdpReqSocket, &wrSet ) ) {
+    } 
+    if( gSsdpReqSocket6 != INVALID_SOCKET && 
+        FD_ISSET( gSsdpReqSocket6, &wrSet ) ) {
         int NumCopy = 0;
         while( NumCopy < NUM_SSDP_COPY ) {
-            sendto( gSsdpReqSocket, ReqBuf, strlen( ReqBuf ), 0,
-                (struct sockaddr *)&destAddr, socklen );
+            sendto( gSsdpReqSocket6, ReqBufv6, strlen( ReqBufv6 ), 0,
+                (struct sockaddr *)&__ss_v6, socklen );
             NumCopy++;
             imillisleep( SSDP_PAUSE );
         }
     }
+    if( gSsdpReqSocket4 != INVALID_SOCKET && 
+        FD_ISSET( gSsdpReqSocket4, &wrSet ) ) {
+        int NumCopy = 0;
+        while( NumCopy < NUM_SSDP_COPY ) {
+            sendto( gSsdpReqSocket4, ReqBufv4, strlen( ReqBufv4 ), 0,
+                (struct sockaddr *)&__ss_v4, socklen );
+            NumCopy++;
+            imillisleep( SSDP_PAUSE );
+        }
+    } 
 
-    free( ReqBuf );
     return 1;
 }
 
 #endif // EXCLUDE_SSDP
 #endif // INCLUDE_CLIENT_APIS
-

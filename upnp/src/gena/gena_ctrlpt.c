@@ -127,7 +127,7 @@ static int ScheduleGenaAutoRenew(
 	/*! [in] The time out value of the subscription. */
 	IN int TimeOut,
 	/*! [in] Subscription being renewed. */
-	IN client_subscription *sub)
+	IN ClientSubscription *sub)
 {
 	struct Upnp_Event_Subscribe *RenewEventStruct = NULL;
 	upnp_timeout *RenewEvent = NULL;
@@ -300,14 +300,24 @@ static int gena_subscribe(
 			"TIMEOUT: Second-", timeout_str );
 	} else {
 		// subscribe
+		if( dest_url.hostport.IPaddress.ss_family == AF_INET6 ) {
 			return_code = http_MakeMessage(
 				&request, 1, 1,
 				"q" "sssdsc" "sc" "sscc",
 				HTTPMETHOD_SUBSCRIBE, &dest_url,
-			"CALLBACK: <http://", LOCAL_HOST, ":", LOCAL_PORT, "/>",
+				"CALLBACK: <http://[", gIF_IPV6, "]:", LOCAL_PORT_V6, "/>",
+				"NT: upnp:event",
+				"TIMEOUT: Second-", timeout_str );
+		} else {
+			return_code = http_MakeMessage(
+				&request, 1, 1,
+				"q" "sssdsc" "sc" "sscc",
+				HTTPMETHOD_SUBSCRIBE, &dest_url,
+				"CALLBACK: <http://", gIF_IPV4, ":", LOCAL_PORT_V4, "/>",
 				"NT: upnp:event",
 				"TIMEOUT: Second-", timeout_str);
 		}
+	}
 	if (return_code != 0) {
 		return return_code;
 	}
@@ -368,7 +378,7 @@ static int gena_subscribe(
 
 int genaUnregisterClient(UpnpClient_Handle client_handle)
 {
-	client_subscription sub_copy;
+	ClientSubscription sub_copy;
 	int return_code = UPNP_E_SUCCESS;
 	struct Handle_Info *handle_info = NULL;
 	http_parser_t response;
@@ -413,10 +423,10 @@ int genaUnSubscribe(
 	UpnpClient_Handle client_handle,
 	const Upnp_SID in_sid)
 {
-	client_subscription *sub = NULL;
+	ClientSubscription *sub = NULL;
 	int return_code = GENA_SUCCESS;
 	struct Handle_Info *handle_info;
-	client_subscription sub_copy;
+	ClientSubscription sub_copy;
 	http_parser_t response;
 
 	// validate handle and sid
@@ -467,7 +477,7 @@ int genaSubscribe(
 	Upnp_SID out_sid)
 {
 	int return_code = GENA_SUCCESS;
-	client_subscription *newSubscription = NULL;
+	ClientSubscription *newSubscription = NULL;
 	uuid_upnp uid;
 	Upnp_SID temp_sid;
 	char *ActualSID = NULL;
@@ -517,7 +527,7 @@ int genaSubscribe(
 	strcpy( EventURL, PublisherURL );
 
 	// fill subscription
-	newSubscription = (client_subscription *)malloc(sizeof (client_subscription));
+	newSubscription = (ClientSubscription *)malloc(sizeof (ClientSubscription));
 	if (newSubscription == NULL) {
 		return_code = UPNP_E_OUTOF_MEMORY;
 		goto error_handler;
@@ -552,8 +562,8 @@ int genaRenewSubscription(
 	int *TimeOut)
 {
 	int return_code = GENA_SUCCESS;
-	client_subscription *sub = NULL;
-	client_subscription sub_copy;
+	ClientSubscription *sub = NULL;
+	ClientSubscription sub_copy;
 	struct Handle_Info *handle_info;
 	char *ActualSID;
 	ThreadPoolJob tempJob;
@@ -657,7 +667,7 @@ void gena_process_notification_event(
 	IXML_Document *ChangedVars = NULL;
 	int eventKey;
 	token sid;
-	client_subscription *subscription = NULL;
+	ClientSubscription *subscription = NULL;
 	struct Handle_Info *handle_info;
 	void *cookie;
 	Upnp_FunPtr callback;

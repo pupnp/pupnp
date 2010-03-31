@@ -6,12 +6,12 @@
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
  *
- * * Redistributions of source code must retain the above copyright notice, 
+ * - Redistributions of source code must retain the above copyright notice, 
  * this list of conditions and the following disclaimer. 
- * * Redistributions in binary form must reproduce the above copyright notice, 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
  * this list of conditions and the following disclaimer in the documentation 
  * and/or other materials provided with the distribution. 
- * * Neither name of Intel Corporation nor the names of its contributors 
+ * - Neither name of Intel Corporation nor the names of its contributors 
  * may be used to endorse or promote products derived from this software 
  * without specific prior written permission.
  * 
@@ -30,148 +30,92 @@
  ******************************************************************************/
 
 #include "config.h"
+
+
+#include "ithread.h"
+#include "ixml.h"
+#include "upnp.h"
 #include "upnpdebug.h"
+
+
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "ithread.h"
-#include "upnp.h"
-#include <stdarg.h>
 #include <string.h>
 
 
 
-//Mutex to synchronize all the log file opeartions in the debug mode
+/*! Mutex to synchronize all the log file opeartions in the debug mode */
 static ithread_mutex_t GlobalDebugMutex;
 
-// Global log level
+/*! Global log level */
 static Upnp_LogLevel g_log_level = UPNP_DEFAULT_LOG_LEVEL;
 
-//File handle for the error log file
+/*! File handle for the error log file */
 static FILE *ErrFileHnd = NULL;
 
-//File handle for the information log file
+/*! File handle for the information log file */
 static FILE *InfoFileHnd = NULL;
 
-//Name of the error file
+/*! Name of the error file */
 static const char *errFileName = "IUpnpErrFile.txt";
 
-//Name of the info file
+/*! Name of the info file */
 static const char *infoFileName = "IUpnpInfoFile.txt";
 
 
+#ifdef DEBUG
 
-/***************************************************************************
- * Function : UpnpSetLogFileNames					
- *								
- * Parameters:							
- *	IN const char* ErrFileName: name of the error file
- *	IN const char *InfoFileName: name of the information file
- *	IN int size: Size of the buffer
- *	IN int starLength: This parameter provides the width of the banner
- *									
- * Description:							
- *	This functions takes the buffer and writes the buffer in the file as 
- *	per the requested banner					
- * Returns: void
- ***************************************************************************/
-void
-UpnpSetLogFileNames ( IN const char *ErrFileName,
-		      IN const char *InfoFileName )
+
+int UpnpInitLog(void)
 {
-    if( ErrFileName ) {
-        errFileName = ErrFileName;
-    }
-    if( InfoFileName ) {
-        infoFileName = InfoFileName;
-    }
+	ithread_mutex_init(&GlobalDebugMutex, NULL);
+	if(DEBUG_TARGET == 1) {
+		if((ErrFileHnd = fopen( errFileName, "a")) == NULL) {
+			return -1;
+		}
+		if((InfoFileHnd = fopen( infoFileName, "a")) == NULL) {
+			return -1;
+		}
+	}
+	return UPNP_E_SUCCESS;
 }
 
 
-/***************************************************************************
- * Function : UpnpInitLog
- *
- * Parameters:	void
- *
- * Description:
- *	This functions initializes the log files
- *
- * Returns: int
- *	-1 : If fails
- *	UPNP_E_SUCCESS : if success
- ***************************************************************************/
-int
-UpnpInitLog(void)
-{
-    ithread_mutex_init( &GlobalDebugMutex, NULL );
-
-    if( DEBUG_TARGET == 1 ) {
-        if( ( ErrFileHnd = fopen( errFileName, "a" ) ) == NULL )
-            return -1;
-        if( ( InfoFileHnd = fopen( infoFileName, "a" ) ) == NULL )
-            return -1;
-    }
-    return UPNP_E_SUCCESS;
-}
-
-
-/***************************************************************************
- * Function : UpnpSetLogLevel
- *				
- * Parameters:	Upnp_LogLevel log_level
- *
- * Description:							
- *	This functions set the log level (see {\tt Upnp_LogLevel}
- * Returns: void
- ***************************************************************************/
-void 
-UpnpSetLogLevel (Upnp_LogLevel log_level)
+void UpnpSetLogLevel(Upnp_LogLevel log_level)
 {
 	g_log_level = log_level;
 }
 
 
-/***************************************************************************
- * Function : UpnpCloseLog					
- *								
- * Parameters:	void					
- *								
- * Description:						
- *	This functions closes the log files
- * Returns: void
- ***************************************************************************/
-void
-UpnpCloseLog(void)
+void UpnpCloseLog(void)
 {
-    if( DEBUG_TARGET == 1 ) {
-        fflush( ErrFileHnd );
-        fflush( InfoFileHnd );
-        fclose( ErrFileHnd );
-        fclose( InfoFileHnd );
-    }
-    ithread_mutex_destroy( &GlobalDebugMutex );
-
+	if (DEBUG_TARGET == 1) {
+		fflush(ErrFileHnd);
+		fflush(InfoFileHnd);
+		fclose(ErrFileHnd);
+		fclose(InfoFileHnd);
+	}
+	ithread_mutex_destroy(&GlobalDebugMutex);
 }
 
 
-/***************************************************************************
- * Function : DebugAtThisLevel					
- *									
- * Parameters:			
- *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
- *		whether debug statement will go to standard output, 
- *		or any of the log files.
- *	IN Dbg_Module Module: debug will go in the name of this module
- *					
- * Description:					
- *	This functions returns true if debug output should be done in this
- *	module.
- *
- * Returns: int
- ***************************************************************************/
-#ifdef DEBUG
+void UpnpSetLogFileNames(
+	const char *ErrFileName,
+	const char *InfoFileName)
+{
+    if (ErrFileName) {
+        errFileName = ErrFileName;
+    }
+    if (InfoFileName) {
+        infoFileName = InfoFileName;
+    }
+}
+
+
 int DebugAtThisLevel(
-	IN Upnp_LogLevel DLevel,
-	IN Dbg_Module Module)
+	Upnp_LogLevel DLevel,
+	Dbg_Module Module)
 {
 	int ret = DLevel <= g_log_level;
 	ret &=
@@ -186,38 +130,15 @@ int DebugAtThisLevel(
 	
 	return ret;
 }
-#endif
 
 
-/***************************************************************************
- * Function : UpnpPrintf					
- *									
- * Parameters:			
- *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
- *		whether debug statement will go to standard output, 
- *		or any of the log files.
- *	IN Dbg_Module Module: debug will go in the name of this module
- *	IN char *DbgFileName: Name of the file from where debug statement is
- *							coming
- *	IN int DbgLineNo : Line number of the file from where debug statement 
- *				is coming
- *	IN char * FmtStr, ...: Variable number of arguments that will go 
- *				in the debug statement
- *					
- * Description:					
- *	This functions prints the debug statement either on the startdard 
- *	output or log file along with the information from where this debug 
- *	statement is coming
- * Returns: void
- ***************************************************************************/
-#ifdef DEBUG
 void UpnpPrintf(
-	IN Upnp_LogLevel DLevel,
-	IN Dbg_Module Module,
-	IN const char *DbgFileName,
-	IN int DbgLineNo,
-	IN const char *FmtStr,
-	... )
+	Upnp_LogLevel DLevel,
+	Dbg_Module Module,
+	const char *DbgFileName,
+	int DbgLineNo,
+	const char *FmtStr,
+	...)
 {
 	va_list ArgList;
 	
@@ -249,27 +170,9 @@ void UpnpPrintf(
 	va_end(ArgList);
 	ithread_mutex_unlock(&GlobalDebugMutex);
 }
-#endif
 
 
-/***************************************************************************
- * Function : UpnpGetDebugFile					
- *				
- * Parameters:			
- *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
- *		whether debug statement will go to standard output, 
- *		or any of the log files.
- *	IN Dbg_Module Module: debug will go in the name of this module
- *								
- * Description:
- *	This function checks if the module is turned on for debug 
- *	and returns the file descriptor corresponding to the debug level
- * Returns: FILE *
- *	NULL : if the module is turn off for debug 
- *	else returns the right file descriptor
- ***************************************************************************/
-#ifdef DEBUG
-FILE *GetDebugFile( Upnp_LogLevel DLevel, Dbg_Module Module )
+FILE *GetDebugFile(Upnp_LogLevel DLevel, Dbg_Module Module)
 {
 	FILE *ret;
 
@@ -287,28 +190,12 @@ FILE *GetDebugFile( Upnp_LogLevel DLevel, Dbg_Module Module )
 
 	return ret;
 }
-#endif
 
 
-/***************************************************************************
- * Function : UpnpDisplayFileAndLine				
- *	
- * Parameters:	
- *	IN FILE *fd: File descriptor where line number and file name will be 
- *			written 
- *	IN char *DbgFileName: Name of the file  
- *	IN int DbgLineNo : Line number of the file
- *		
- * Description:
- *	This function writes the file name and file number from where
- *		debug statement is coming to the log file
- * Returns: void
- ***************************************************************************/
-#ifdef DEBUG
 void UpnpDisplayFileAndLine(
-	IN FILE * fd,
-	IN const char *DbgFileName,
-	IN int DbgLineNo)
+	FILE *fd,
+	const char *DbgFileName,
+	int DbgLineNo)
 {
 #define NLINES 2
 #define MAX_LINE_SIZE 512
@@ -324,7 +211,12 @@ void UpnpDisplayFileAndLine(
 
 	/* Put the debug lines in the buffer */
 	sprintf(buf[0], "DEBUG - THREAD ID: 0x%lX",
-		(unsigned long int)ithread_self());
+#ifdef WIN32
+		(unsigned long int)ithread_self().p
+#else
+		(unsigned long int)ithread_self()
+#endif
+	);
 	if (DbgFileName) {
 		sprintf(buf[1],
 			"FILE: %s, LINE: %d",
@@ -336,29 +228,13 @@ void UpnpDisplayFileAndLine(
 	UpnpDisplayBanner(fd, lines, NLINES, NUMBER_OF_STARS);
 	fflush(fd);
 }
-#endif
 
 
-/***************************************************************************
- * Function : UpnpDisplayBanner	
- *
- * Parameters:			
- *	IN FILE *fd: file descriptor where the banner will be written
- *	IN char **lines: The buffer that will be written
- *	IN int size: Size of the buffer
- *	IN int starLength: This parameter provides the width of the banner
- *	
- * Description:			
- *	This functions takes the buffer and writes the buffer in the file as 
- *	per the requested banner
- * Returns: void
- ***************************************************************************/
-#ifdef DEBUG
 void UpnpDisplayBanner(
-	IN FILE * fd,
-	IN const char **lines,
-	IN size_t size,
-	IN int starLength)
+	FILE * fd,
+	const char **lines,
+	size_t size,
+	int starLength)
 {
 	int leftMarginLength = starLength / 2 + 1;
 	int rightMarginLength = starLength / 2 + 1;
@@ -399,12 +275,81 @@ void UpnpDisplayBanner(
 		rightMargin[rightMarginLength] = 0;
 		fprintf( fd, "*%s%s%s*\n", leftMargin, line, rightMargin );
 	}
-	fprintf( fd, "%s\n\n", stars );
+	fprintf(fd, "%s\n\n", stars);
 
-	free( currentLine );
-	free( stars );
-	free( rightMargin );
-	free( leftMargin );
+	free(currentLine);
+	free(stars);
+	free(rightMargin);
+	free(leftMargin);
 }
-#endif
- 
+
+
+void PrintThreadPoolStats(
+	ThreadPool *tp, 
+	const char *DbgFileName,
+	int DbgLineNo,
+	const char *msg)
+{
+	ThreadPoolStats stats;
+	ThreadPoolGetStats(tp, &stats);
+	UpnpPrintf(UPNP_INFO, API, DbgFileName, DbgLineNo, 
+		"%s\n"
+		"High Jobs pending: %d\n"
+		"Med Jobs Pending: %d\n"
+		"Low Jobs Pending: %d\n"
+		"Average wait in High Q in milliseconds: %lf\n"
+		"Average wait in Med Q in milliseconds: %lf\n"
+		"Average wait in Low Q in milliseconds: %lf\n"
+		"Max Threads Used: %d\n"
+		"Worker Threads: %d\n"
+		"Persistent Threads: %d\n"
+		"Idle Threads: %d\n"
+		"Total Threads: %d\n"
+		"Total Work Time: %lf\n"
+		"Total Idle Time: %lf\n",
+		msg,
+		stats.currentJobsHQ,
+		stats.currentJobsMQ,
+		stats.currentJobsLQ,
+		stats.avgWaitHQ,
+		stats.avgWaitMQ,
+		stats.avgWaitLQ,
+		stats.maxThreads,
+		stats.workerThreads,
+		stats.persistentThreads,
+		stats.idleThreads,
+		stats.totalThreads,
+		stats.totalWorkTime,
+		stats.totalIdleTime);
+}
+
+
+void printNodes(IXML_Node *tmpRoot, int depth)
+{
+    int i;
+    IXML_NodeList *NodeList1;
+    IXML_Node *ChildNode1;
+    unsigned short NodeType;
+    const DOMString NodeValue;
+    const DOMString NodeName;
+    NodeList1 = ixmlNode_getChildNodes(tmpRoot);
+    for (i = 0; i < 100; ++i) {
+        ChildNode1 = ixmlNodeList_item(NodeList1, i);
+        if (ChildNode1 == NULL) {
+            break;
+        }
+    
+        printNodes(ChildNode1, depth+1);
+        NodeType = ixmlNode_getNodeType(ChildNode1);
+        NodeValue = ixmlNode_getNodeValue(ChildNode1);
+        NodeName = ixmlNode_getNodeName(ChildNode1);
+        UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+            "DEPTH-%2d-IXML_Node Type %d, "
+            "IXML_Node Name: %s, IXML_Node Value: %s\n",
+            depth, NodeType, NodeName, NodeValue);
+    }
+}
+
+
+#endif /* DEBUG */
+

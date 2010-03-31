@@ -1,57 +1,68 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
+
+
+/*!
+ * \file
+ */
+
 
 #include "config.h"
+
+
 #ifdef INCLUDE_DEVICE_APIS
 #if EXCLUDE_SOAP == 0
+
 
 #define SOAP_BODY "Body"
 #define SOAP_URN "http:/""/schemas.xmlsoap.org/soap/envelope/"
 
 #define QUERY_STATE_VAR_URN "urn:schemas-upnp-org:control-1-0"
 
-#include "upnpapi.h"
-#include "parsetools.h"
-#include "statcodes.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
-#include "unixutil.h"
+#include "parsetools.h"
 #include "soaplib.h"
 #include "ssdplib.h"
+#include "statcodes.h"
+#include "unixutil.h"
+#include "upnpapi.h"
+
 
 #ifdef WIN32
- #define snprintf _snprintf
+	#define snprintf _snprintf
 #endif
 
-// timeout duration in secs for transmission/reception
+
+/*! timeout duration in secs for transmission/reception */
 #define SOAP_TIMEOUT UPNP_TIMEOUT
 
 #define SREQ_HDR_NOT_FOUND	 -1
@@ -65,12 +76,13 @@
 
 static const char *Soap_Invalid_Action = "Invalid Action";
 
-//static const char* Soap_Invalid_Args = "Invalid Args";
+/*static const char* Soap_Invalid_Args = "Invalid Args"; */
 static const char *Soap_Action_Failed = "Action Failed";
 static const char *Soap_Invalid_Var = "Invalid Var";
 
 const char *ContentTypeHeader =
     "CONTENT-TYPE: text/xml; charset=\"utf-8\"\r\n";
+
 
 /****************************************************************************
 *	Function :	get_request_type
@@ -572,7 +584,7 @@ check_soap_action_header( IN http_message_t * request,
 *		OUT char device_udn[LINE_SIZE] :	Device UDN string
 *		OUT char service_id[LINE_SIZE] :	Service ID string
 *		OUT Upnp_FunPtr *callback :	callback function of the device 
-*									application
+*						application
 *		OUT void** cookie :	cookie stored by device application 
 *							
 *	Description :	This function retrives all the information needed to 
@@ -586,12 +598,13 @@ check_soap_action_header( IN http_message_t * request,
 *	Note :
 ****************************************************************************/
 static int
-get_device_info( IN http_message_t * request,
+get_device_info( IN http_message_t *request,
                  IN int isQuery,
-                 IN IXML_Document * actionDoc,
+                 IN IXML_Document *actionDoc,
+                 IN int AddressFamily,
                  OUT char device_udn[LINE_SIZE],
                  OUT char service_id[LINE_SIZE],
-                 OUT Upnp_FunPtr * callback,
+                 OUT Upnp_FunPtr *callback,
                  OUT void **cookie )
 {
     struct Handle_Info *device_info;
@@ -609,7 +622,8 @@ get_device_info( IN http_message_t * request,
 
     HandleLock();
 
-    if( GetDeviceHandleInfo( &device_hnd, &device_info ) != HND_DEVICE ) {
+    if( GetDeviceHandleInfo( AddressFamily, 
+        &device_hnd, &device_info ) != HND_DEVICE ) {
         goto error_handler;
     }
 
@@ -840,10 +854,10 @@ error_handler:
 *
 *	Note :
 ****************************************************************************/
-static UPNP_INLINE void
-handle_query_variable( IN SOCKINFO * info,
-                       IN http_message_t * request,
-                       IN IXML_Document * xml_doc )
+static UPNP_INLINE void handle_query_variable(
+	IN SOCKINFO *info,
+	IN http_message_t *request,
+	IN IXML_Document *xml_doc )
 {
     Upnp_FunPtr soap_event_callback;
     void *cookie;
@@ -859,9 +873,14 @@ handle_query_variable( IN SOCKINFO * info,
         return;
     }
     // get info for event
-    if( get_device_info( request, 1, xml_doc, variable.DevUDN,
-                         variable.ServiceID,
-                         &soap_event_callback, &cookie ) != 0 ) {
+    err_code = get_device_info(
+		request, 1, xml_doc,
+		info->foreign_sockaddr.ss_family,
+		variable.DevUDN,
+		variable.ServiceID,
+                &soap_event_callback,
+                &cookie);
+    if( err_code != 0 ) {
         send_error_response( info, SOAP_INVALID_VAR,
                              Soap_Invalid_Var, request );
         return;
@@ -871,7 +890,7 @@ handle_query_variable( IN SOCKINFO * info,
     variable.ErrCode = UPNP_E_SUCCESS;
     namecopy( variable.StateVarName, var_name );
     variable.CurrentVal = NULL;
-    variable.CtrlPtIPAddr = info->foreign_ip_addr;
+    variable.CtrlPtIPAddr = info->foreign_sockaddr;
 
     // send event
     soap_event_callback( UPNP_CONTROL_GET_VAR_REQUEST, &variable, cookie );
@@ -883,8 +902,8 @@ handle_query_variable( IN SOCKINFO * info,
     if( variable.CurrentVal == NULL ) {
         err_code = SOAP_ACTION_FAILED;
         err_str = Soap_Action_Failed;
-        send_error_response( info, SOAP_INVALID_VAR,
-                             Soap_Invalid_Var, request );
+        send_error_response( info, SOAP_INVALID_VAR, Soap_Invalid_Var, request );
+
         return;
     }
     if( variable.ErrCode != UPNP_E_SUCCESS ) {
@@ -951,9 +970,15 @@ handle_invoke_action( IN SOCKINFO * info,
         goto error_handler;
     }
     // get device info for action event
-    err_code = get_device_info( request, 0, xml_doc, action.DevUDN,
-                                action.ServiceID, &soap_event_callback,
-                                &cookie );
+    err_code = get_device_info(
+        request,
+	0,
+	xml_doc,
+	info->foreign_sockaddr.ss_family,
+	action.DevUDN,
+	action.ServiceID,
+	&soap_event_callback,
+        &cookie );
 
     if( err_code != UPNP_E_SUCCESS ) {
         goto error_handler;
@@ -964,10 +989,9 @@ handle_invoke_action( IN SOCKINFO * info,
     action.ActionRequest = resp_node;
     action.ActionResult = NULL;
     action.ErrCode = UPNP_E_SUCCESS;
-    action.CtrlPtIPAddr = info->foreign_ip_addr;
+    action.CtrlPtIPAddr = info->foreign_sockaddr;
 
-    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-                         "Calling Callback\n" );
+    UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
 
     soap_event_callback( UPNP_CONTROL_ACTION_REQUEST, &action, cookie );
 
@@ -993,7 +1017,7 @@ handle_invoke_action( IN SOCKINFO * info,
     err_code = 0;
 
     // error handling and cleanup
-  error_handler:
+error_handler:
     ixmlDocument_free( action.ActionResult );
     ixmlDocument_free( resp_node );
     action_name.buf[action_name.length] = save_char;    // restore

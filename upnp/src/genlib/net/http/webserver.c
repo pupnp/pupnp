@@ -1,33 +1,34 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/**************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation 
+ * All rights reserved. 
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer. 
+ * - Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * - Neither name of Intel Corporation nor the names of its contributors 
+ * may be used to endorse or promote products derived from this software 
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ **************************************************************************/
+
 
 /******************************************************************************
  * Purpose: This file defines the Web Server and has functions to carry out
@@ -52,18 +53,28 @@
 #include "upnp.h"
 #include "upnpapi.h"
 #include "util.h"
+#include "VirtualDir.h"
 
 
 #include <assert.h>
 #include <fcntl.h>
-#ifndef UPNP_USE_BCBPP
+#include <sys/stat.h>
+
+
+#ifdef UPNP_USE_BCBPP
+    /* Do not #include <inttypes.h> */
+    /* Do not #include <stdint.h> */
+#else
     #include <inttypes.h>
     #include <stdint.h>
-#endif
-#ifndef WIN32
+#endif /* !UPNP_USE_BCBPP */
+
+
+#ifdef WIN32
+    /* Do not #include <unistd.h> */
+#else
     #include <unistd.h>
 #endif
-#include <sys/stat.h>
 
 
 /*
@@ -301,8 +312,8 @@ get_content_type( IN const char *filename,
                   OUT DOMString * content_type )
 {
     const char *extension;
-    const char *type,
-     *subtype;
+    const char *type;
+    const char *subtype;
     xboolean ctype_found = FALSE;
     char *temp = NULL;
     int length = 0;
@@ -311,13 +322,13 @@ get_content_type( IN const char *filename,
 
     // get ext
     extension = strrchr( filename, '.' );
-    if( extension != NULL ) {
+    if (extension != NULL) {
         if( search_extension( extension + 1, &type, &subtype ) == 0 ) {
             ctype_found = TRUE;
         }
     }
 
-    if( !ctype_found ) {
+    if (!ctype_found) {
         // unknown content type
         type = gMediaTypes[APPLICATION_INDEX];
         subtype = "octet-stream";
@@ -325,15 +336,13 @@ get_content_type( IN const char *filename,
 
     length = strlen( type ) + strlen( "/" ) + strlen( subtype ) + 1;
     temp = ( char * )malloc( length );
-
-    if( !temp ) {
+    if (!temp) {
         return UPNP_E_OUTOF_MEMORY;
     }
-
     sprintf( temp, "%s/%s", type, subtype );
     ( *content_type ) = ixmlCloneDOMString( temp );
 
-    free( temp );
+    free(temp);
 
     if( !content_type ) {
         return UPNP_E_OUTOF_MEMORY;
@@ -521,40 +530,33 @@ web_server_set_alias( IN const char *alias_name,
     return UPNP_E_OUTOF_MEMORY;
 }
 
-/************************************************************************
- * Function: web_server_init
- *
- * Parameters:
- *	none
- *
- * Description: Initilialize the different documents. Initialize the
- *	memory for root directory for web server. Call to initialize global
- *	XML document. Sets bWebServerState to WEB_SERVER_ENABLED
- *
- * Returns:
- *	0 - OK
- *	UPNP_E_OUTOF_MEMORY: note: alias_content is not freed here
- ************************************************************************/
-int
-web_server_init( void )
+
+int web_server_init()
 {
-    int ret_code;
+	int ret = 0;
+	if (bWebServerState == WEB_SERVER_DISABLED) {
+		// decode media list
+		media_list_init();
+		membuffer_init(&gDocumentRootDir);
+		glob_alias_init();
+		pVirtualDirList = NULL;
 
-    if( bWebServerState == WEB_SERVER_DISABLED ) {
-        media_list_init();    // decode media list
-        membuffer_init( &gDocumentRootDir );
-        glob_alias_init();
+		// Initialize callbacks
+		virtualDirCallback.get_info = NULL;
+		virtualDirCallback.open = NULL;
+		virtualDirCallback.read = NULL;
+		virtualDirCallback.write = NULL;
+		virtualDirCallback.seek = NULL;
+		virtualDirCallback.close = NULL;
 
-        pVirtualDirList = NULL;
+		if (ithread_mutex_init(&gWebMutex, NULL) == -1) {
+			ret = UPNP_E_OUTOF_MEMORY;
+		} else {
+			bWebServerState = WEB_SERVER_ENABLED;
+		}
+	}
 
-        ret_code = ithread_mutex_init( &gWebMutex, NULL );
-        if( ret_code == -1 ) {
-            return UPNP_E_OUTOF_MEMORY;
-        }
-        bWebServerState = WEB_SERVER_ENABLED;
-    }
-
-    return 0;
+	return ret;
 }
 
 /************************************************************************
@@ -593,7 +595,7 @@ web_server_destroy( void )
  * Function: get_file_info
  *
  * Parameters:
- *	IN const char* filename ;     Filename having the description document
+ *	IN const char *filename;   Filename having the description document
  *	OUT struct File_Info * info ; File information object having file 
  *		attributes such as filelength, when was the file last
  *		modified, whether a file or a directory and whether the
@@ -610,45 +612,45 @@ static int
 get_file_info( IN const char *filename,
                OUT struct File_Info *info )
 {
-    int code;
-    struct stat s;
-    FILE *fp;
-    int rc = 0;
+	int code;
+	struct stat s;
+	FILE *fp;
+	int rc = 0;
 
     info->content_type = NULL;
 
-    code = stat( filename, &s );
-    if( code == -1 ) {
-        return -1;
-    }
+	code = stat(filename, &s);
+	if (code == -1) {
+		return -1;
+	}
 
-    if( S_ISDIR( s.st_mode ) ) {
+	if (S_ISDIR(s.st_mode)) {
         info->is_directory = TRUE;
-    } else if( S_ISREG( s.st_mode ) ) {
+	} else if (S_ISREG(s.st_mode)) {
         info->is_directory = FALSE;
-    } else {
-        return -1;
-    }
+	} else {
+		return -1;
+	}
 
-    // check readable
-    fp = fopen( filename, "r" );
+	// check readable
+	fp = fopen(filename, "r");
     info->is_readable = ( fp != NULL );
-    if( fp ) {
-        fclose( fp );
-    }
+	if (fp) {
+		fclose(fp);
+	}
 
     info->file_length = s.st_size;
     info->last_modified = s.st_mtime;
 
     rc = get_content_type( filename, &info->content_type );
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-        "file info: %s, length: %lld, last_mod=%s readable=%d\n",
+	UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+		"file info: %s, length: %lld, last_mod=%s readable=%d\n",
         filename, (long long)info->file_length,
         asctime( gmtime( &info->last_modified ) ),
         info->is_readable );
 
-    return rc;
+	return rc;
 }
 
 /************************************************************************
@@ -690,7 +692,7 @@ web_server_set_root_dir( IN const char *root_dir )
  * Function: get_alias
  *
  * Parameters:
- *	IN const char* request_file ; request file passed in to be compared with
+ *	IN const char *request_file;    request file passed in to be compared with
  *	OUT struct xml_alias_t* alias ; xml alias object which has a file name
  *		stored
  *   OUT struct File_Info * info	 ; File information object which will be
@@ -706,21 +708,19 @@ web_server_set_root_dir( IN const char *root_dir )
  ************************************************************************/
 static UPNP_INLINE xboolean
 get_alias( IN const char *request_file,
-           OUT struct xml_alias_t *alias,
+	OUT struct xml_alias_t *alias,
            OUT struct File_Info *info )
 {
-    int cmp;
-
-    cmp = strcmp( alias->name.buf, request_file );
-    if( cmp == 0 ) {
-        // fill up info
+	int cmp = strcmp(alias->name.buf, request_file);
+	if (cmp == 0) {
+		// fill up info
         info->file_length = alias->doc.length;
         info->is_readable = TRUE;
         info->is_directory = FALSE;
         info->last_modified = alias->last_modified;
-    }
+	}
 
-    return cmp == 0;
+	return cmp == 0;
 }
 
 /************************************************************************
@@ -1209,11 +1209,11 @@ process_request( IN http_message_t * req,
     xboolean using_virtual_dir;
     uri_type *url;
     char *temp_str;
-    int resp_major,
-      resp_minor;
+    int resp_major;
+    int resp_minor;
     xboolean alias_grabbed;
     size_t dummy;
-    struct UpnpVirtualDirCallbacks *pVirtualDirCallback;
+    const char *extra_headers = NULL;
 
     print_http_headers( req );
 
@@ -1265,15 +1265,13 @@ process_request( IN http_message_t * req,
         }
 
     } else {
-        //
-        // try using alias
-        //
-        if( is_valid_alias( &gAliasDoc ) ) {
-            alias_grab( alias );
+        /* try using alias */
+        if (is_valid_alias(&gAliasDoc)) {
+            alias_grab(alias);
             alias_grabbed = TRUE;
 
             using_alias = get_alias( request_doc, alias, &finfo );
-            if( using_alias == TRUE ) {
+            if (using_alias == TRUE) {
                 finfo.content_type = ixmlCloneDOMString( "text/xml" );
 
                 if( finfo.content_type == NULL ) {
@@ -1283,29 +1281,26 @@ process_request( IN http_message_t * req,
         }
     }
 
-    if( using_virtual_dir ) {
-        if( req->method != HTTPMETHOD_POST ) {
+    if (using_virtual_dir) {
+        if (req->method != HTTPMETHOD_POST) {
             // get file info
-            pVirtualDirCallback = &virtualDirCallback;
-            if( pVirtualDirCallback->get_info( filename->buf, &finfo ) !=
-                0 ) {
+            if (virtualDirCallback.get_info(filename->buf, &finfo) != 0) {
                 err_code = HTTP_NOT_FOUND;
                 goto error_handler;
             }
             // try index.html if req is a dir
             if( finfo.is_directory ) {
-                if( filename->buf[filename->length - 1] == '/' ) {
+                if (filename->buf[filename->length - 1] == '/') {
                     temp_str = "index.html";
                 } else {
                     temp_str = "/index.html";
                 }
-                if( membuffer_append_str( filename, temp_str ) != 0 ) {
+                if ( membuffer_append_str(filename, temp_str) != 0) {
                     goto error_handler;
                 }
                 // get info
-                if( ( pVirtualDirCallback->
-                      get_info( filename->buf, &finfo ) != UPNP_E_SUCCESS )
-                    || finfo.is_directory ) {
+                if( (virtualDirCallback.get_info(filename->buf, &finfo ) != UPNP_E_SUCCESS ) ||
+                    finfo.is_directory) {
                     err_code = HTTP_NOT_FOUND;
                     goto error_handler;
                 }
@@ -1321,7 +1316,7 @@ process_request( IN http_message_t * req,
             //  goto error_handler;
             // }
         }
-    } else if( !using_alias ) {
+    } else if (!using_alias) {
         if( gDocumentRootDir.length == 0 ) {
             goto error_handler;
         }
@@ -1392,34 +1387,40 @@ process_request( IN http_message_t * req,
         goto error_handler;
     }
 
+    /*extra_headers = UpnpFileInfo_get_ExtraHeaders(finfo);*/
+    if (!extra_headers) {
+	    extra_headers = "";
+    }
+
     if( RespInstr->IsRangeActive && RespInstr->IsChunkActive ) {
         // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "R" "T" "GKD" "s" "tcS" "XcCc",
-            HTTP_PARTIAL_CONTENT, // status code
+            "R" "T" "GKD" "s" "tcS" "Xc" "sCc",
+            HTTP_PARTIAL_CONTENT,           // status code
             finfo.content_type,   // content type
-            RespInstr,            // range info
+            RespInstr,                      // range info
             "LAST-MODIFIED: ",
 	    &finfo.last_modified,
-            X_USER_AGENT) != 0 ) {
+            X_USER_AGENT,
+            extra_headers) != 0 ) {
             goto error_handler;
         }
     } else if( RespInstr->IsRangeActive && !RespInstr->IsChunkActive ) {
-
         // Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "R" "N" "T" "GD" "s" "tcS" "XcCc",
-            HTTP_PARTIAL_CONTENT,     // status code
-            RespInstr->ReadSendSize,  // content length
+            "R" "N" "T" "GD" "s" "tcS" "Xc" "sCc",
+            HTTP_PARTIAL_CONTENT,           // status code
+            RespInstr->ReadSendSize,        // content length
             finfo.content_type,       // content type
-            RespInstr,                // range info
+            RespInstr,                      // range info
             "LAST-MODIFIED: ",
 	    &finfo.last_modified,
-            X_USER_AGENT) != 0 ) {
+            X_USER_AGENT,
+            extra_headers) != 0 ) {
             goto error_handler;
         }
 
@@ -1428,12 +1429,13 @@ process_request( IN http_message_t * req,
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "RK" "TD" "s" "tcS" "XcCc",
-            HTTP_OK,            // status code
+            "RK" "TD" "s" "tcS" "Xc" "sCc",
+            HTTP_OK,                        // status code
             finfo.content_type, // content type
             "LAST-MODIFIED: ",
 	    &finfo.last_modified,
-            X_USER_AGENT) != 0 ) {
+            X_USER_AGENT,
+            extra_headers) != 0 ) {
             goto error_handler;
         }
 
@@ -1443,13 +1445,14 @@ process_request( IN http_message_t * req,
             // Transfer-Encoding: chunked
             if (http_MakeMessage(
                 headers, resp_major, resp_minor,
-                "R" "N" "TD" "s" "tcS" "XcCc",
-                HTTP_OK,                 // status code
-                RespInstr->ReadSendSize, // content length
+                "R" "N" "TD" "s" "tcS" "Xc" "sCc",
+                HTTP_OK,                        // status code
+                RespInstr->ReadSendSize,        // content length
                 finfo.content_type,      // content type
                 "LAST-MODIFIED: ",
 		&finfo.last_modified,
-                X_USER_AGENT) != 0 ) {
+                X_USER_AGENT,
+                extra_headers) != 0 ) {
                 goto error_handler;
             }
         } else {
@@ -1457,12 +1460,13 @@ process_request( IN http_message_t * req,
             // Transfer-Encoding: chunked
             if (http_MakeMessage(
                 headers, resp_major, resp_minor,
-                "R" "TD" "s" "tcS" "XcCc",
-                HTTP_OK,            // status code
+                "R" "TD" "s" "tcS" "b" "Xc" "sCc",
+                HTTP_OK,                        // status code
                 finfo.content_type, // content type
                 "LAST-MODIFIED: ",
 		&finfo.last_modified,
-                X_USER_AGENT) != 0 ) {
+                X_USER_AGENT,
+                extra_headers) != 0 ) {
                 goto error_handler;
             }
         }
@@ -1488,11 +1492,11 @@ process_request( IN http_message_t * req,
 
     err_code = UPNP_E_SUCCESS;
 
-  error_handler:
-    free( request_doc );
+error_handler:
+    free(request_doc);
     ixmlFreeDOMString( finfo.content_type );
-    if( err_code != UPNP_E_SUCCESS && alias_grabbed ) {
-        alias_release( alias );
+    if (err_code != UPNP_E_SUCCESS && alias_grabbed) {
+        alias_release(alias);
     }
 
     return err_code;
@@ -1517,8 +1521,8 @@ process_request( IN http_message_t * req,
  *	HTTP_OK
  ************************************************************************/
 int
-http_RecvPostMessage( http_parser_t * parser,
-                      IN SOCKINFO * info,
+http_RecvPostMessage( http_parser_t *parser,
+                      IN SOCKINFO *info,
                       char *filename,
                       struct SendInstruction *Instr )
 {
@@ -1535,12 +1539,10 @@ http_RecvPostMessage( http_parser_t * parser,
     int ret_code = 0;
 
     if( Instr && Instr->IsVirtualFile ) {
-
         Fp = (virtualDirCallback.open)( filename, UPNP_WRITE );
         if( Fp == NULL ) {
             return HTTP_INTERNAL_SERVER_ERROR;
         }
-
     } else {
         Fp = fopen( filename, "wb" );
         if( Fp == NULL ) {

@@ -644,7 +644,7 @@ struct Upnp_Action_Request
   IXML_Document *ActionResult;
 
   /** IP address of the control point requesting this action. */
-  struct in_addr CtrlPtIPAddr;
+  struct sockaddr_storage CtrlPtIPAddr;
 
   /** The DOM document containing the information from the
       the SOAP header. */
@@ -691,7 +691,7 @@ struct Upnp_State_Var_Request
   char StateVarName[NAME_SIZE];
 
   /** IP address of sender requesting the state variable. */
-  struct in_addr CtrlPtIPAddr;
+  struct sockaddr_storage CtrlPtIPAddr;
 
   /** The current value of the variable. This needs to be allocated by 
    *  the caller.  When finished with it, the SDK frees this {\bf DOMString}. */
@@ -817,132 +817,29 @@ struct Upnp_Subscription_Request
 
 struct File_Info
 {
-  /** The length of the file. A length less than 0 indicates the size 
-   *  is unknown, and data will be sent until 0 bytes are returned from
-   *  a read call. */
-  off_t file_length;
+	/** The length of the file. A length less than 0 indicates the size 
+	*  is unknown, and data will be sent until 0 bytes are returned from
+	*  a read call. */
+	off_t file_length;
 
-  /** The time at which the contents of the file was modified;
-   *  The time system is always local (not GMT). */
-  time_t last_modified;
+	/** The time at which the contents of the file was modified;
+	*  The time system is always local (not GMT). */
+	time_t last_modified;
 
-  /** If the file is a directory, {\bf is_directory} contains
-   * a non-zero value. For a regular file, it should be 0. */
-  int is_directory;
+	/** If the file is a directory, {\bf is_directory} contains
+	* a non-zero value. For a regular file, it should be 0. */
+	int is_directory;
 
-  /** If the file or directory is readable, this contains 
-   * a non-zero value. If unreadable, it should be set to 0. */
-  int is_readable;
+	/** If the file or directory is readable, this contains 
+	* a non-zero value. If unreadable, it should be set to 0. */
+	int is_readable;
 
-  /** The content type of the file. This string needs to be allocated 
-   *  by the caller using {\bf ixmlCloneDOMString}.  When finished 
-   *  with it, the SDK frees the {\bf DOMString}. */
-   
-  DOMString content_type;
-
+	/** The content type of the file. This string needs to be allocated 
+	*  by the caller using {\bf ixmlCloneDOMString}.  When finished 
+	*  with it, the SDK frees the {\bf DOMString}. */
+	DOMString content_type;
 };
 
-/* The type of handle returned by the web server for open requests. */
-
-typedef void *UpnpWebFileHandle;
-
-/** The {\bf UpnpVirtualDirCallbacks} structure contains the pointers to
- *  file-related callback functions a device application can register to
- *  virtualize URLs.  
- */
-struct UpnpVirtualDirCallbacks
-{
-  /** Called by the web server to query information on a file.  The callback
-   *  should return 0 on success or -1 on an error. */
-  int (*get_info) (
-    IN  const char *filename,     /** The name of the file to query. */
-    OUT struct File_Info *info    /** Pointer to a structure to store the 
-                                      information on the file. */
-    );
-                                  
-  /** Called by the web server to open a file.  The callback should return
-   *  a valid handle if the file can be opened.  Otherwise, it should return
-   *  {\tt NULL} to signify an error. */
-  UpnpWebFileHandle (*open)(
-    IN const char *filename,       /** The name of the file to open. */ 
-    IN enum UpnpOpenFileMode Mode  /** The mode in which to open the file. 
-                                       Valid values are {\tt UPNP_READ} or 
-                                       {\tt UPNP_WRITE}. */
-    );
-
-  /** Called by the web server to perform a sequential read from an open
-   *  file.  The callback should copy {\bf buflen} bytes from the file into
-   *  the buffer.
-   *  @return [int] An integer representing one of the following:
-   *    \begin{itemize}
-   *      \item {\tt 0}:  The file contains no more data (EOF).
-   *      \item {\tt >0}: A successful read of the number of bytes in the 
-   *                      return code.
-   *      \item {\tt <0}: An error occurred reading the file.
-   *    \end{itemzie}
-   */
-   int (*read) (
-     IN UpnpWebFileHandle fileHnd,  /** The handle of the file to read. */
-     OUT char *buf,                 /** The buffer in which to place the 
-				        data. */
-     IN size_t buflen               /** The size of the buffer (i.e. the 
-                                        number of bytes to read). */
-     );
-
-  /** Called by the web server to perform a sequential write to an open
-   *  file.  The callback should write {\bf buflen} bytes into the file from
-   *  the buffer.  It should return the actual number of bytes written, 
-   *  which might be less than {\bf buflen} in the case of a write error.
-   */
-   int (*write) (
-     IN UpnpWebFileHandle fileHnd, /** The handle of the file to write. */
-     IN char *buf,                 /** The buffer with the bytes to write. */
-     IN size_t buflen              /** The number of bytes to write. */
-     );
-
-  /** Called by the web server to move the file pointer, or offset, into
-   *  an open file.  The {\bf origin} parameter determines where to start
-   *  moving the file pointer.  A value of {\tt SEEK_CUR} moves the
-   *  file pointer relative to where it is.  The {\bf offset} parameter can
-   *  be either positive (move forward) or negative (move backward).  
-   *  {\tt SEEK_END} moves relative to the end of the file.  A positive 
-   *  {\bf offset} extends the file.  A negative {\bf offset} moves backward 
-   *  in the file.  Finally, {\tt SEEK_SET} moves to an absolute position in 
-   *  the file. In this case, {\bf offset} must be positive.  The callback 
-   *  should return 0 on a successful seek or a non-zero value on an error.
-   */
-   int (*seek) (
-     IN UpnpWebFileHandle fileHnd,  /** The handle of the file to move the 
-                                        file pointer. */
-     IN off_t offset,                /** The number of bytes to move in the 
-                                        file.  Positive values move foward and 
-                                        negative values move backward.  Note 
-                                        that this must be positive if the 
-                                        {\bf origin} is {\tt SEEK_SET}. */
-     IN int origin                  /** The position to move relative to.  It 
-                                        can be {\tt SEEK_CUR} to move relative 
-                                        to the current position, 
-					{\tt SEEK_END} to move relative to 
-					the end of the file, or {\tt 
-					SEEK_SET} to specify an absolute 
-					offset. */
-     );
-
-   /** Called by the web server to close a file opened via the {\bf open}
-    *  callback.  It should return 0 on success, or a non-zero value on an 
-    *  error.
-    */
-   int (*close) (
-     IN UpnpWebFileHandle fileHnd   /** The handle of the file to close. */
-     );
-
-};
-
-typedef struct virtual_Dir_List
-{
-    struct virtual_Dir_List *next;
-    char dirName[NAME_SIZE];
-} virtualDirList;
 
 /** All callback functions share the same prototype, documented below.
  *  Note that any memory passed to the callback function
@@ -992,22 +889,22 @@ extern "C" {
 
 
 /*!
- * \brief Initializes the Linux SDK for UPnP Devices.
+ * \brief Initializes the Linux SDK for UPnP Devices (IPv4 only).
  *
  * \deprecated Kept for backwards compatibility. Use UpnpInit2 for new
- * implementations.
+ * implementations or where IPv6 is required.
  *
  * This function must be called before any other API function can be called.
  * It should be called only once. Subsequent calls to this API return a
  * \c UPNP_E_INIT error code.
  *
- * Optionally, the application can specify a host IP address (in the
+ * Optionally, the application can specify a host IPv4 address (in the
  * case of a multi-homed configuration) and a port number to use for
  * all UPnP operations.  Since a port number can be used only by one
  * process, multiple processes using the SDK must specify
  * different port numbers.
  *
- * If unspecified, the SDK will use the first adapter's IP address 
+ * If unspecified, the SDK will use the first IPv4-capable adapter's IP address
  * and an arbitrary port.
  *
  * This call is synchronous.
@@ -1025,13 +922,54 @@ extern "C" {
  *     \li \c UPNP_E_INTERNAL_ERROR: An internal error ocurred.
  */
 EXPORT_SPEC int UpnpInit(
-	/*! The host local IP address to use, in string format, for example
-	 * "192.168.0.1", or \c NULL to use the first adapter's IP address. */
+	/*! The host local IPv4 address to use, in string format, for example
+	 * "192.168.0.1", or \c NULL to use the first IPv4 adapter's IP address. */
 	const char *HostIP,
 	/*! Local Port to listen for incoming connections
 	 * \c NULL will pick an arbitrary free port. */
 	unsigned short DestPort);
 
+
+/*!
+ * \brief Initializes the Linux SDK for UPnP Devices (IPv4 or IPv6).
+ *
+ * This function must be called before any other API function can be called.
+ * It should be called only once. Subsequent calls to this API return a
+ * \c UPNP_E_INIT error code.
+ *
+ * Optionally, the application can specify an interface name (in the
+ * case of a multi-homed configuration) and a port number to use for
+ * all UPnP operations.  Since a port number can be used only by one
+ * process, multiple processes using the SDK must specify
+ * different port numbers.
+ *
+ * If unspecified, the SDK will use the first suitable interface and an 
+ * arbitrary port.
+ *
+ * This call is synchronous.
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_OUTOF_MEMORY: Insufficient resources exist 
+ *             to initialize the SDK.
+ *     \li \c UPNP_E_INIT: The SDK is already initialized. 
+ *     \li \c UPNP_E_INIT_FAILED: The SDK initialization 
+ *             failed for an unknown reason.
+ *     \li \c UPNP_E_SOCKET_BIND: An error occurred binding a socket.
+ *     \li \c UPNP_E_LISTEN: An error occurred listening to a socket.
+ *     \li \c UPNP_E_OUTOF_SOCKET: An error ocurred creating a socket.
+ *     \li \c UPNP_E_INTERNAL_ERROR: An internal error ocurred.
+ *     \li \c UPNP_E_INVALID_INTERFACE: IfName is invalid or does not
+ *             have a valid IPv4 or IPv6 addresss configured.
+ */
+EXPORT_SPEC int UpnpInit2( 
+	/*! The interface name to use by the UPnP SDK operations.
+	 * Examples: "eth0", "xl0", "Local Area Connection", \c NULL to
+	 * use the first suitable interface. */
+	const char *IfName,
+	/*!  Local Port to listen for incoming connections.
+	 * \c NULL will pick an arbitrary free port. */
+	unsigned short DestPort);
 
 
 /*!
@@ -1071,6 +1009,19 @@ EXPORT_SPEC unsigned short UpnpGetServerPort(void);
 
 
 /*!
+ * \brief Returns the internal server IPv6 UPnP listening port.
+ *
+ * If '0' is used as the port number in \b UpnpInit, then this function can be
+ * used to retrieve the actual port allocated to the SDK.
+ *
+ * \return
+ * 	\li On success: The port on which an internal server is listening for IPv6 UPnP
+ *		related requests.
+ *	\li On error: 0 is returned if \b UpnpInit has not succeeded.
+ */
+EXPORT_SPEC unsigned short UpnpGetServerPort6(void);
+
+/*!
  * \brief Returns the local IPv4 listening ip address.
  *
  * If \c NULL is used as the IPv4 address in \b UpnpInit, then this function can
@@ -1082,6 +1033,20 @@ EXPORT_SPEC unsigned short UpnpGetServerPort(void);
  * 	\li On error: \c NULL is returned if \b UpnpInit has not succeeded.
  */
 EXPORT_SPEC char *UpnpGetServerIpAddress(void);
+
+
+/*!
+ * \brief Returns the local IPv6 listening ip address.
+ *
+ * If \c NULL is used as the IPv6 address in \b UpnpInit, then this function can
+ * be used to retrieve the actual interface address on which device is running.
+ *
+ * \return
+ * 	\li On success: The IPv6 address on which an internal server is
+ * 		listening for UPnP related requests.
+ * 	\li On error: \c NULL is returned if \b UpnpInit has not succeeded.
+ */
+EXPORT_SPEC char *UpnpGetServerIp6Address(void);
 
 
 /*!
@@ -1218,6 +1183,56 @@ EXPORT_SPEC int UpnpRegisterRootDevice2(
 	const void* Cookie,
 	/*! [out] Pointer to a variable to store the new device handle. */
 	UpnpDevice_Handle* Hnd);
+
+
+/*!
+ * \brief Registers a device application for a specific address family with
+ * the UPnP library.
+ *
+ * A device application cannot make any other API calls until it registers
+ * using this function. Device applications can also register as control
+ * points (see \b UpnpRegisterClient to get a control point handle to perform
+ * control point functionality).
+ *
+ * This is synchronous and does not generate any callbacks. Callbacks can occur
+ * as soon as this function returns.
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_FINISH: The SDK is already terminated or 
+ *                                is not initialized. 
+ *     \li \c UPNP_E_INVALID_DESC: The description document was not 
+ *             a valid device description.
+ *     \li \c UPNP_E_INVALID_URL: The URL for the description document 
+ *             is not valid.
+ *     \li \c UPNP_E_INVALID_PARAM: Either \b Callback or \b Hnd 
+ *             is not a valid pointer or \b DescURL is \c NULL.
+ *     \li \c UPNP_E_NETWORK_ERROR: A network error occurred.
+ *     \li \c UPNP_E_SOCKET_WRITE: An error or timeout occurred writing 
+ *             to a socket.
+ *     \li \c UPNP_E_SOCKET_READ: An error or timeout occurred reading 
+ *             from a socket.
+ *     \li \c UPNP_E_SOCKET_BIND: An error occurred binding a socket.
+ *     \li \c UPNP_E_SOCKET_CONNECT: An error occurred connecting the 
+ *             socket.
+ *     \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently 
+ *             allocated.
+ *     \li \c UPNP_E_OUTOF_MEMORY: There are insufficient resources to 
+ *             register this root device.
+ */
+EXPORT_SPEC int UpnpRegisterRootDevice3(
+	/*! [in] Pointer to a string containing the description URL for this root
+	 * device instance. */
+	const char *DescUrl,
+	/*! [in] Pointer to the callback function for receiving asynchronous events. */
+	Upnp_FunPtr Callback,
+	/*! [in] Pointer to user data returned with the callback function when invoked. */
+	const void *Cookie,
+	/*! [out] Pointer to a variable to store the new device handle. */
+	UpnpDevice_Handle *Hnd,
+	/*! [in] Address family of this device. Can be AF_INET for an IPv4 device, or
+	 * AF_INET6 for an IPv6 device. Defaults to AF_INET. */
+	const int  AddressFamily);
 
 
 /*!
@@ -2590,6 +2605,147 @@ EXPORT_SPEC int UpnpDownloadXmlDoc(
 EXPORT_SPEC int UpnpSetWebServerRootDir( 
 	/*! [in] Path of the root directory of the web server. */
 	const char *rootDir);
+
+
+/*!
+ * \brief The type of handle returned by the web server for open requests.
+ */
+typedef void *UpnpWebFileHandle;
+
+
+/*!
+ * \brief Get-info callback function prototype.
+ */
+typedef int (*VDCallback_GetInfo)(
+		/*! [in] The name of the file to query. */
+		const char *filename,
+		/*! [out] Pointer to a structure to store the information on the file. */
+		struct File_Info *info);
+
+/*!
+ * \brief Sets the get_info callback function to be used to access a virtual
+ * directory.
+ * 
+ * \return An integer representing one of the following:
+ *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
+ */
+EXPORT_SPEC int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback);
+
+
+/*!
+ * \brief Open callback function prototype.
+ */
+typedef UpnpWebFileHandle (*VDCallback_Open)(
+		/*! [in] The name of the file to open. */ 
+		const char *filename,
+		/*! [in] The mode in which to open the file.
+		 * Valid values are \c UPNP_READ or \c UPNP_WRITE. */
+		enum UpnpOpenFileMode Mode);
+
+
+/*!
+ * \brief Sets the open callback function to be used to access a virtual
+ * directory.
+ *
+ * \return An integer representing one of the following:
+ *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
+ */
+EXPORT_SPEC int UpnpVirtualDir_set_OpenCallback(VDCallback_Open callback);
+
+
+/*!
+ * \brief Read callback function prototype.
+ */
+typedef int (*VDCallback_Read)(
+	/*! [in] The handle of the file to read. */
+	UpnpWebFileHandle fileHnd,
+	/*! [out] The buffer in which to place the data. */
+	char *buf,
+	/*! [in] The size of the buffer (i.e. the number of bytes to read). */
+	size_t buflen);
+
+
+/*! 
+ * \brief Sets the read callback function to be used to access a virtual
+ * directory.
+ *
+ *  \return An integer representing one of the following:
+ *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
+ */
+EXPORT_SPEC int UpnpVirtualDir_set_ReadCallback(VDCallback_Read callback);
+
+
+/*!
+ * \brief Write callback function prototype.
+ */
+typedef	int (*VDCallback_Write)(
+	/*! [in] The handle of the file to write. */
+	UpnpWebFileHandle fileHnd,
+	/*! [in] The buffer with the bytes to write. */
+	char *buf,
+	/*! [in] The number of bytes to write. */
+	size_t buflen);
+
+
+/*!
+ * \brief Sets the write callback function to be used to access a virtual
+ * directory.
+ *
+ * \return An integer representing one of the following:
+ *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
+ */
+EXPORT_SPEC int UpnpVirtualDir_set_WriteCallback(VDCallback_Write callback);
+
+
+/*!
+ * \brief Seek callback function prototype.
+ */
+typedef int (*VDCallback_Seek) (
+	/*! [in] The handle of the file to move the file pointer. */
+	UpnpWebFileHandle fileHnd,
+	/*! [in] The number of bytes to move in the file.  Positive values
+	 * move foward and negative values move backward.  Note that
+	 * this must be positive if the \b origin is \c SEEK_SET. */
+	off_t offset,
+	/*! [in] The position to move relative to.  It can be \c SEEK_CUR
+	 * to move relative to the current position, \c SEEK_END to
+	 * move relative to the end of the file, or \c SEEK_SET to
+	 * specify an absolute offset. */
+	int origin);
+
+
+/*!
+ * \brief Sets the seek callback function to be used to access a virtual
+ * directory.
+ *
+ *  \return An integer representing one of the following:
+ *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
+ */
+EXPORT_SPEC int UpnpVirtualDir_set_SeekCallback(VDCallback_Seek callback);
+
+
+/*!
+ * \brief Close callback function prototype.
+ */
+typedef int (*VDCallback_Close)(
+		/*! [in] The handle of the file to close. */
+		UpnpWebFileHandle fileHnd);
+
+
+/*!
+ * \brief Sets the close callback function to be used to access a virtual
+ * directory.
+ *
+ * \return An integer representing one of the following:
+ *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
+ */
+EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback);
 
 
 /*!

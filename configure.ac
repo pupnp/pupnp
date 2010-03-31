@@ -4,7 +4,7 @@
 #
 # Process this file with autoconf to produce a configure script.
 #
-# (C) Copyright 2005-2007 Rémi Turboult <r3mi@users.sourceforge.net>
+# (C) Copyright 2005-2007 RÃ©mi Turboult <r3mi@users.sourceforge.net>
 #
 
 AC_PREREQ(2.60)
@@ -147,13 +147,21 @@ dnl ############################################################################
 dnl # Release 1.6.7:
 dnl # "current:revision:age"
 dnl #
+dnl # - Code has changed in upnp
+dnl #	revision: 5 -> 6
+dnl # - Code has changed in threadutil
+dnl #	revision: 3 -> 4
+dnl # - Interfaces have been changed, added and removed in upnp
+dnl #	current: 4 -> 5
+dnl #   revision: 4 -> 0
+dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:3:2])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:0:2])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
 dnl #
 dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [4:3:2])
+AC_SUBST([LT_VERSION_THREADUTIL], [5:0:2])
 AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
@@ -333,9 +341,26 @@ AC_DEFINE([_FILE_OFFSET_BITS], [64], [File Offset size])
 
 
 #
-# Checks for header files
+# Are we targetting Win32?
+#
+AC_MSG_CHECKING([for Win32])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+#ifdef WIN32
+	#error Yup
+#endif
+],[])], [ac_cv_win32="no"], [ac_cv_win32="yes"])
+if test "$ac_cv_win32" = "yes"; then
+	AC_MSG_RESULT([yes])
+else
+	AC_MSG_RESULT([no])
+fi
+
+
+#
+# Checks for header files (which aren't needed on Win32)
 #
 AC_HEADER_STDC
+if test "$ac_cv_win32" = "no"; then
 # libupnp code doesn't use autoconf variables yet,
 # so just abort if a header file is not found.
 AC_CHECK_HEADERS(
@@ -356,13 +381,38 @@ AC_CHECK_HEADERS(
 	],
 	[],
 	[AC_MSG_ERROR([required header file missing])])
+fi
 
 
 #
 # Checks for typedefs, structures, and compiler characteristics
 #	
 AC_C_CONST
-TYPE_SOCKLEN_T
+
+# The test for socklen_t was getting it wrong when it exists but is in ws2tcpip.h,
+# so we use a new test.
+#TYPE_SOCKLEN_T
+
+AC_CHECK_HEADERS([sys/types.h sys/socket.h ws2tcpip.h])
+AC_MSG_CHECKING(for socklen_t)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
+#endif
+#ifdef HAVE_WS2TCPIP_H
+	#include <ws2tcpip.h>
+#endif
+],[ socklen_t t = 0; return t; ])
+],[ac_cv_socklen_t="yes"],[ac_cv_socklen_t="no"])
+if test "$ac_cv_socklen_t" = "yes"; then
+	AC_MSG_RESULT([yes])
+else
+	AC_MSG_RESULT([no, using int])
+	AC_DEFINE(socklen_t, int, [Type for storing the length of struct sockaddr])
+fi
 
 
 #

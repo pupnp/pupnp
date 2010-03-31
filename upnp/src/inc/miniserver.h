@@ -42,17 +42,21 @@ extern SOCKET gMiniServerStopSock;
 
 typedef struct MServerSockArray {
 	/* socket for listening for miniserver requests */
-	int miniServerSock;
+	SOCKET miniServerSock4;
+	SOCKET miniServerSock6;
 	/* socket for stopping miniserver */
-	int miniServerStopSock;
+	SOCKET miniServerStopSock;
 	/* socket for incoming advertisments and search requests */
-	int ssdpSock;
+	SOCKET ssdpSock4;
+	SOCKET ssdpSock6;
 
-	int stopPort;
-	int miniServerPort;
+	SOCKET stopPort;
+	SOCKET miniServerPort4;
+	SOCKET miniServerPort6;
 
 	/* socket for sending search requests and receiving search replies */
-	CLIENTONLY(int ssdpReqSock;)
+	CLIENTONLY(SOCKET ssdpReqSock4;)
+	CLIENTONLY(SOCKET ssdpReqSock6;)
 } MiniServerSockArray;
 
 
@@ -66,78 +70,62 @@ typedef void (*MiniServerCallback)(
 extern "C" {
 #endif
 
-/************************************************************************
- * Function: SetHTTPGetCallback
- *
- * Parameters:
- *	MiniServerCallback callback; - HTTP Callback to be invoked 
- *
- * Description:	Set HTTP Get Callback
- *
- * Return: void
- ************************************************************************/
-void SetHTTPGetCallback( MiniServerCallback callback );
 
-/************************************************************************
- * Function: SetSoapCallback
- *
- * Parameters:
- *	MiniServerCallback callback; - SOAP Callback to be invoked 
- *
- * Description: Set SOAP Callback
- *
- * Return: void
- ************************************************************************/
+/*!
+ * \brief Set HTTP Get Callback.
+ */
+void SetHTTPGetCallback(
+	/*! [in] HTTP Callback to be invoked . */
+	MiniServerCallback callback);
+
+
+/*!
+ * \brief Set SOAP Callback.
+ */
 #ifdef INCLUDE_DEVICE_APIS
-void SetSoapCallback( MiniServerCallback callback );
+void SetSoapCallback(
+	/*! [in] SOAP Callback to be invoked . */
+	MiniServerCallback callback);
 #else  /* INCLUDE_DEVICE_APIS */
-static inline void SetSoapCallback( MiniServerCallback callback ) {}
+static inline void SetSoapCallback(MiniServerCallback callback) {}
 #endif /* INCLUDE_DEVICE_APIS */
 
-/************************************************************************
- * Function: SetGenaCallback
- *
- * Parameters:
- *	MiniServerCallback callback; - GENA Callback to be invoked
- *
- * D6escription: Set GENA Callback
- *
- * Return: void
- ************************************************************************/
-void SetGenaCallback( MiniServerCallback callback );
 
-/************************************************************************
- * Function: StartMiniServer
- *
- * Parameters:
- *	unsigned short listen_port ; Port on which the server listens for 
- *	incoming connections
- *
- * Description: Initialize the sockets functionality for the 
- *	Miniserver. Initialize a thread pool job to run the MiniServer
- *	and the job to the thread pool. If listen port is 0, port is 
- *	dynamically picked
- *
- * 	Use timer mechanism to start the MiniServer, failure to meet the 
- *	allowed delay aborts the attempt to launch the MiniServer.
- *
- * Return: int;
- *	Actual port socket is bound to - On Success: 
- *	A negative number UPNP_E_XXX - On Error   			
- ************************************************************************/
-int StartMiniServer( unsigned short listen_port );
+/*!
+ * \brief Set GENA Callback.
+ */
+void SetGenaCallback(
+	/*! [in] GENA Callback to be invoked. */
+	MiniServerCallback callback);
 
-/************************************************************************
- * Function: StopMiniServer
+
+/*!
+ * \brief Initialize the sockets functionality for the Miniserver.
  *
- * Parameters:
- *	void;	
+ * Initialize a thread pool job to run the MiniServer and the job to the
+ * thread pool.
  *
- * Description: Stop and Shutdown the MiniServer and free socket resources.
+ * If listen port is 0, port is dynamically picked.
  *
- * Return : int;
- *	Always returns 0 
- ************************************************************************/
+ * Use timer mechanism to start the MiniServer, failure to meet the 
+ * allowed delay aborts the attempt to launch the MiniServer.
+ *
+ * \return
+ *	\li On success: UPNP_E_SUCCESS.
+ *	\li On error: UPNP_E_XXX.
+ */
+int StartMiniServer(
+	/*! [in,out] Port on which the server listens for incoming IPv4 connections. */
+	unsigned short *listen_port4, 
+	/*! [in,out] Port on which the server listens for incoming IPv6 connections. */
+	unsigned short *listen_port6);
+
+
+/*!
+ * \brief Stop and Shutdown the MiniServer and free socket resources.
+ *
+ * \return Always returns 0.
+ */
 int StopMiniServer();
 
 

@@ -43,8 +43,8 @@
 *	Function :	copy_client_subscription
 *
 *	Parameters :
-*		client_subscription * in ;	- source client subscription
-*		client_subscription * out ;	- destination client subscription
+*		ClientSubscription * in ;	- source client subscription
+*		ClientSubscription * out ;	- destination client subscription
 *
 *	Description :	Make a copy of the client subscription data
 *
@@ -54,8 +54,8 @@
 *
 *	Note :
 ************************************************************************/
-CLIENTONLY( int copy_client_subscription( client_subscription * in,
-                                          client_subscription * out ) {
+CLIENTONLY( int copy_client_subscription( ClientSubscription * in,
+                                          ClientSubscription * out ) {
             int len = strlen( in->ActualSID ) + 1;
             int len1 = strlen( in->EventURL ) + 1;
             memcpy( out->sid, in->sid, SID_SIZE );
@@ -77,7 +77,7 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *	Function :	free_client_subscription
 *
 *	Parameters :
-*		client_subscription * sub ;	- Client subscription to be freed
+*		ClientSubscription * sub ;	- Client subscription to be freed
 *
 *	Description :	Free memory allocated for client subscription data.
 *		Remove timer thread associated with this subscription event.
@@ -86,7 +86,7 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *
 *	Note :
 ************************************************************************/
-            void free_client_subscription( client_subscription * sub ) {
+            void free_client_subscription( ClientSubscription * sub ) {
             upnp_timeout * event; ThreadPoolJob tempJob; if( sub ) {
             if( sub->ActualSID )
             free( sub->ActualSID ); if( sub->EventURL )
@@ -106,7 +106,7 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *	Function :	freeClientSubList
 *
 *	Parameters :
-*		client_subscription * list ; Client subscription 
+*		ClientSubscription * list ; Client subscription 
 *
 *	Description :	Free the client subscription table.
 *
@@ -114,8 +114,8 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *
 *	Note :
 ************************************************************************/
-            void freeClientSubList( client_subscription * list ) {
-            client_subscription * next; while( list ) {
+            void freeClientSubList( ClientSubscription * list ) {
+            ClientSubscription * next; while( list ) {
             free_client_subscription( list );
             next = list->next; free( list ); list = next;}
             }
@@ -124,7 +124,7 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *	Function :	RemoveClientSubClientSID
 *
 *	Parameters :
-*		client_subscription **head ; Head of the subscription list	
+*		ClientSubscription **head ; Head of the subscription list	
 *		const Upnp_SID sid ;		 Subscription ID to be mactched
 *
 *	Description :	Remove the client subscription matching the 
@@ -135,10 +135,10 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *
 *	Note :
 ************************************************************************/
-            void RemoveClientSubClientSID( client_subscription ** head,
+            void RemoveClientSubClientSID( ClientSubscription ** head,
                                            const Upnp_SID sid ) {
-            client_subscription * finger = ( *head );
-            client_subscription * previous = NULL; while( finger ) {
+            ClientSubscription * finger = ( *head );
+            ClientSubscription * previous = NULL; while( finger ) {
             if( !( strcmp( sid, finger->sid ) ) ) {
             if( previous )
             previous->next = finger->next;
@@ -156,20 +156,20 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *	Function :	GetClientSubClientSID
 *
 *	Parameters :
-*		client_subscription *head ; Head of the subscription list	
+*		ClientSubscription *head ; Head of the subscription list	
 *		const Upnp_SID sid ;		Subscription ID to be matched
 *
 *	Description :	Return the client subscription from the client table 
 *		that matches const Upnp_SID sid subscrition id value. 
 *
-*	Return : client_subscription * ; The matching subscription
+*	Return : ClientSubscription * ; The matching subscription
 *
 *	Note :
 ************************************************************************/
-            client_subscription *
-            GetClientSubClientSID( client_subscription * head,
+            ClientSubscription *
+            GetClientSubClientSID( ClientSubscription * head,
                                    const Upnp_SID sid ) {
-            client_subscription * next = head; while( next ) {
+            ClientSubscription * next = head; while( next ) {
             if( !strcmp( next->sid, sid ) )
             break;
             else
@@ -182,21 +182,21 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *	Function :	GetClientSubActualSID
 *
 *	Parameters :
-*		client_subscription *head ;	Head of the subscription list		
+*		ClientSubscription *head ;	Head of the subscription list		
 *		token * sid ;				Subscription ID to be matched
 *
 *	Description :	Returns the client subscription from the client 
 *		subscription table that has the matching token * sid buffer
 *		value.
 *
-*	Return : client_subscription * ; The matching subscription
+*	Return : ClientSubscription * ; The matching subscription
 *
 *	Note :
 ************************************************************************/
-            client_subscription *
-            GetClientSubActualSID( client_subscription * head,
+            ClientSubscription *
+            GetClientSubActualSID( ClientSubscription * head,
                                    token * sid ) {
-            client_subscription * next = head; while( next ) {
+            ClientSubscription * next = head; while( next ) {
 
             if( !memcmp( next->ActualSID, sid->buff, sid->size ) )
             break;

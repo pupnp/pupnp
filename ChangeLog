@@ -3,6 +3,48 @@ Version 1.6.7
 *******************************************************************************
 
 2010-03-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	Backport of svn revision 527:
+	* Added API to ithread, created the following functions:
+	- int ithread_initialize_library(void);
+	- int ithread_cleanup_library(void);
+	- int ithread_initialize_thread(void);
+	- int ithread_cleanup_thread(void);
+	* SF Bug Tracker [ 2876374 ] Access Violation when compiling with Visual Studio 2008
+	Submitted: Stulle ( stulleamgym ) - 2009-10-10 19:05
+
+	Hi,
+
+	I am one of the devs of the MorphXT project and I use this lib in some
+	other of my projects, too. When I tried to upgrade the lib earlier for one
+	of my projects I had to realise that something did not work at first and
+	while most of the things were reasonably ease to be fixed. Now, the last
+	thing I encountered was not so easy to fix and I am uncertain if my fix is
+	any good so I'll just post it here and wait for some comments.
+
+	The problem was that I got an Access Violation when calling "UpnpInit". It
+	would call "ithread_rwlock_init(&GlobalHndRWLock, NULL)" which eventually
+	led to calling "pthread_cond_init" and I got the error notice at
+	"EnterCriticalSection (&ptw32_cond_list_lock);". It appeared that
+	"ptw32_cond_list_lock" was NULL. Now, I found two ways to fix this. Firstly
+	moving the whole block after at least one of the "ThreadPoolInit" calls
+	will fix the issue. Secondly, you could add:
+	#ifdef WIN32
+	#ifdef PTW32_STATIC_LIB
+	// to get the following working we need this... is it a good patch or
+	not... I do not know!
+	pthread_win32_process_attach_np();
+	#endif
+	#endif
+	right before "ithread_rwlock_init(&GlobalHndRWLock, NULL)".
+
+	Just so you know, I am using libupnp 1.6.6 and libpthreads 2.8.0 and both
+	are linked static into the binaries. I am currently using Visual Studio
+	2008 for development with Windows being the target OS. Any comment at your
+	end?
+
+	Regards, Stulle
+
+2010-03-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2836704 ] Patch for Solaris10 compilation and usage.
 	Submitted By: zephyrus ( zephyrus00jp )
 	This second part covers the issue on linking with -lsocket -lnsl -lrt.

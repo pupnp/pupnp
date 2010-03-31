@@ -50,18 +50,23 @@
 
 #define MAX_TIME_TOREAD  45
 
-CLIENTONLY( SOCKET gSsdpReqSocket = 0; )
+CLIENTONLY( SOCKET gSsdpReqSocket4 = INVALID_SOCKET; )
+CLIENTONLY( SOCKET gSsdpReqSocket6 = INVALID_SOCKET; )
 
 void RequestHandler();
+int create_ssdp_sock_v4( SOCKET* ssdpSock );
+int create_ssdp_sock_v6( SOCKET* ssdpSock );
+#if INCLUDE_CLIENT_APIS
+int create_ssdp_sock_reqv4( SOCKET* ssdpReqSock );
+int create_ssdp_sock_reqv6( SOCKET* ssdpReqSock );
+#endif
 Event ErrotEvt;
 
 enum Listener { Idle, Stopping, Running };
 
-unsigned short ssdpStopPort;
-
 struct SSDPSockArray {
 	// socket for incoming advertisments and search requests
-	int ssdpSock;
+	SOCKET ssdpSock;
 	// socket for sending search requests and receiving search replies
 	CLIENTONLY( int ssdpReqSock; )
 };
@@ -79,10 +84,10 @@ struct SSDPSockArray {
  *		 1 = Send Advertisement
  *	IN UpnpDevice_Handle Hnd: Device handle
  *	IN enum SsdpSearchType SearchType:Search type for sending replies
- *	IN struct sockaddr_in *DestAddr:Destination address
- *   IN char *DeviceType:Device type
+ *	IN struct sockaddr *DestAddr:Destination address
+ *	IN char *DeviceType:Device type
  *	IN char *DeviceUDN:Device UDN
- *   IN char *ServiceType:Service type
+ *	IN char *ServiceType:Service type
  *	IN int Exp:Advertisement age
  *
  * Description:
@@ -95,7 +100,7 @@ int AdvertiseAndReply(
 	IN int AdFlag,
 	IN UpnpDevice_Handle Hnd,
 	IN enum SsdpSearchType SearchType,
-	IN struct sockaddr_in *DestAddr,
+	IN struct sockaddr *DestAddr,
 	IN char *DeviceType,
 	IN char *DeviceUDN,
 	IN char *ServiceType,
@@ -213,11 +218,11 @@ int AdvertiseAndReply(
 			/* send the device advertisement */
 			if (AdFlag == 1) {
 				DeviceAdvertisement(devType, i == 0,
-					UDNstr, SInfo->DescURL, Exp);
+                    UDNstr, SInfo->DescURL, Exp, SInfo->DeviceAf );
 			} else {
 		   		/* AdFlag == -1 */
 				DeviceShutdown(devType, i == 0, UDNstr,
-					SERVER, SInfo->DescURL, Exp);
+                    SERVER, SInfo->DescURL, Exp, SInfo->DeviceAf );
 			}
 		} else {
 			switch (SearchType) {
@@ -311,11 +316,11 @@ int AdvertiseAndReply(
 			if (AdFlag) {
 				if (AdFlag == 1) {
 					ServiceAdvertisement(UDNstr, servType,
-						SInfo->DescURL, Exp);
+                                          SInfo->DescURL, Exp, SInfo->DeviceAf );
 				} else {
 					/* AdFlag == -1 */
 					ServiceShutdown(UDNstr, servType,
-						SInfo->DescURL, Exp);
+                                     SInfo->DescURL, Exp, SInfo->DeviceAf );
 				}
 			} else {
 				switch (SearchType) {
@@ -362,7 +367,7 @@ end_function:
  * Function : Make_Socket_NoBlocking
  *
  * Parameters:
- *	IN int sock: socket
+ *	IN SOCKET sock: socket
  *
  * Description:
  *	This function makes socket non-blocking.
@@ -371,7 +376,7 @@ end_function:
  *	0 if successful else -1 
  ***************************************************************************/
 int
-Make_Socket_NoBlocking( int sock )
+Make_Socket_NoBlocking( SOCKET sock )
 {
 #ifdef WIN32
      u_long val=1;
@@ -614,8 +619,11 @@ valid_ssdp_msg( IN http_message_t * hmsg )
         }
         // check HOST header
         if( ( httpmsg_find_hdr( hmsg, HDR_HOST, &hdr_value ) == NULL ) ||
-            ( memptr_cmp( &hdr_value, "239.255.255.250:1900" ) != 0 )
+            ( ( memptr_cmp( &hdr_value, "239.255.255.250:1900" ) != 0 ) &&
+              ( memptr_cmp( &hdr_value, "[FF02::C]:1900" ) != 0 ) )
              ) {
+            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                "Invalid HOST header from SSDP message\n" );
             return FALSE;
         }
     }
@@ -664,7 +672,7 @@ start_event_handler( void *Data )
         goto error_handler;
     }
     // check msg
-    if( !valid_ssdp_msg( &parser->msg ) ) {
+    if( valid_ssdp_msg( &parser->msg ) != TRUE ) {
         goto error_handler;
     }
     return 0;                   //////// done; thread will free 'data'
@@ -699,9 +707,10 @@ ssdp_event_handler_thread( void *the_data )
     // send msg to device or ctrlpt
     if( ( hmsg->method == HTTPMETHOD_NOTIFY ) ||
         ( hmsg->request_method == HTTPMETHOD_MSEARCH ) ) {
-        CLIENTONLY( ssdp_handle_ctrlpt_msg( hmsg, &data->dest_addr, FALSE, NULL );)
+        CLIENTONLY( ssdp_handle_ctrlpt_msg( hmsg, 
+            (struct sockaddr*)&data->dest_addr, FALSE, NULL );)
     } else {
-        ssdp_handle_device_request( hmsg, &data->dest_addr );
+        ssdp_handle_device_request( hmsg, (struct sockaddr*)&data->dest_addr );
     }
 
     // free data
@@ -725,19 +734,18 @@ readFromSSDPSocket( SOCKET socket )
 {
     char *requestBuf = NULL;
     char staticBuf[BUFSIZE];
-    struct sockaddr_in clientAddr;
+    struct sockaddr_storage __ss;
     ThreadPoolJob job;
     ssdp_thread_data *data = NULL;
-    socklen_t socklen = 0;
+    socklen_t socklen = sizeof( __ss );
     int byteReceived = 0;
+    char ntop_buf[64];
 
     requestBuf = staticBuf;
 
     //in case memory
     //can't be allocated, still drain the 
     //socket using a static buffer
-
-    socklen = sizeof( struct sockaddr_in );
 
     data = ( ssdp_thread_data * )
         malloc( sizeof( ssdp_thread_data ) );
@@ -746,7 +754,7 @@ readFromSSDPSocket( SOCKET socket )
         //initialize parser
 
 #ifdef INCLUDE_CLIENT_APIS
-        if( socket == gSsdpReqSocket ) {
+        if( socket == gSsdpReqSocket4 || socket == gSsdpReqSocket6 ) {
             parser_response_init( &data->parser, HTTPMETHOD_MSEARCH );
         } else {
             parser_request_init( &data->parser );
@@ -768,10 +776,18 @@ readFromSSDPSocket( SOCKET socket )
     }
     byteReceived = recvfrom( socket, requestBuf,
                              BUFSIZE - 1, 0,
-                             ( struct sockaddr * )&clientAddr, &socklen );
+                             (struct sockaddr *)&__ss, &socklen );
 
     if( byteReceived > 0 ) {
         requestBuf[byteReceived] = '\0';
+
+        if( __ss.ss_family == AF_INET )
+            inet_ntop( AF_INET, &((struct sockaddr_in*)&__ss)->sin_addr, ntop_buf, sizeof(ntop_buf) );
+        else if( __ss.ss_family == AF_INET6 )
+            inet_ntop( AF_INET6, &((struct sockaddr_in6*)&__ss)->sin6_addr, ntop_buf, sizeof(ntop_buf) );
+        else
+            strncpy( ntop_buf, "<Invalid address family>", sizeof(ntop_buf) );
+
         UpnpPrintf( UPNP_INFO, SSDP,
             __FILE__, __LINE__,
             "Start of received response ----------------------------------------------------\n"
@@ -779,7 +795,7 @@ readFromSSDPSocket( SOCKET socket )
             "End of received response ------------------------------------------------------\n"
             "From host %s\n",
             requestBuf,
-            inet_ntoa( clientAddr.sin_addr ) );
+            ntop_buf );
         UpnpPrintf( UPNP_PACKET, SSDP, __FILE__, __LINE__,
             "Start of received multicast packet --------------------------------------------\n"
             "%s\n"
@@ -790,7 +806,7 @@ readFromSSDPSocket( SOCKET socket )
             data->parser.msg.msg.length += byteReceived;
             // null-terminate
             data->parser.msg.msg.buf[byteReceived] = 0;
-            data->dest_addr = clientAddr;
+            memcpy( &data->dest_addr, &__ss, sizeof(__ss) );
             TPJobInit( &job, ( start_routine )
                        ssdp_event_handler_thread, data );
             TPJobSetFreeFunction( &job, free_ssdp_event_handler_data );
@@ -805,6 +821,7 @@ readFromSSDPSocket( SOCKET socket )
     }
 }
 
+
 /************************************************************************
  * Function : get_ssdp_sockets								
  *
@@ -812,125 +829,252 @@ readFromSSDPSocket( SOCKET socket )
  *	OUT MiniServerSockArray *out: Array of SSDP sockets
  *
  * Description:
- *	This function creates the ssdp sockets. It set their option to listen
- *	for multicast traffic.
+ *	This function creates the IPv4 and IPv6 ssdp sockets required by the
+ *  control point and device operation.
  *
  * Returns: int
  *	return UPNP_E_SUCCESS if successful else returns appropriate error
  ***************************************************************************/
-int
-get_ssdp_sockets( MiniServerSockArray * out )
+int get_ssdp_sockets( MiniServerSockArray * out )
 {
-    char errorBuffer[ERROR_BUFFER_LEN];
-    int onOff = 1;
-    u_char ttl = 4;
-    struct ip_mreq ssdpMcastAddr;
-    struct sockaddr_in ssdpAddr;
-    int option = 1;
-    int ret = 0;
-    struct in_addr addr;
-    SOCKET ssdpSock;
+    int retVal;
+
 #if INCLUDE_CLIENT_APIS
-    SOCKET ssdpReqSock;
-
-    ssdpReqSock = socket( AF_INET, SOCK_DGRAM, 0 );
-    if ( ssdpReqSock == -1 ) {
-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-        UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-            "Error in socket(): %s\n", errorBuffer );
-
-            return UPNP_E_OUTOF_SOCKET;
+    // Create the IPv4 socket for SSDP REQUESTS
+    if( strlen( gIF_IPV4 ) > 0 ) {
+        retVal = create_ssdp_sock_reqv4( &out->ssdpReqSock4 );
+        if( retVal != UPNP_E_SUCCESS ) {
+            return retVal;
+        }
+        // For use by ssdp control point.
+        gSsdpReqSocket4 = out->ssdpReqSock4;
+    } else {
+        out->ssdpReqSock4 = INVALID_SOCKET;
     }
-    ret = setsockopt( ssdpReqSock, IPPROTO_IP, IP_MULTICAST_TTL,
-        &ttl, sizeof (ttl) );
-    // just do it, regardless if fails or not.
-    Make_Socket_NoBlocking( ssdpReqSock );
-    gSsdpReqSocket = ssdpReqSock;
+
+    // Create the IPv6 socket for SSDP REQUESTS
+    if( strlen( gIF_IPV6 ) > 0 ) {
+        retVal = create_ssdp_sock_reqv6( &out->ssdpReqSock6 );
+        if( retVal != UPNP_E_SUCCESS ) {
+            CLIENTONLY( shutdown( out->ssdpReqSock4, SD_BOTH ); )
+            CLIENTONLY( UpnpCloseSocket( out->ssdpReqSock4 ); )
+            return retVal;
+        }
+        // For use by ssdp control point.
+        gSsdpReqSocket6 = out->ssdpReqSock6;
+    } else {
+        out->ssdpReqSock6 = INVALID_SOCKET;
+    }
 #endif /* INCLUDE_CLIENT_APIS */
 
-    ssdpSock = socket( AF_INET, SOCK_DGRAM, 0 );
-    if ( ssdpSock == -1 ) {
+    // Create the IPv4 socket for SSDP
+    if( strlen( gIF_IPV4 ) > 0 ) {
+        retVal = create_ssdp_sock_v4( &out->ssdpSock4 );
+        if( retVal != UPNP_E_SUCCESS ) {
+            CLIENTONLY( shutdown( out->ssdpReqSock4, SD_BOTH ); )
+            CLIENTONLY( UpnpCloseSocket( out->ssdpReqSock4 ); )
+            CLIENTONLY( shutdown( out->ssdpReqSock6, SD_BOTH ); )
+            CLIENTONLY( UpnpCloseSocket( out->ssdpReqSock6 ); )
+            return retVal;
+        }
+    } else {
+        out->ssdpSock4 = INVALID_SOCKET;
+    }
+
+    // Create the IPv6 socket for SSDP
+    if( strlen( gIF_IPV6 ) > 0 ) {
+        retVal = create_ssdp_sock_v6( &out->ssdpSock6 );
+        if( retVal != UPNP_E_SUCCESS ) {
+            shutdown( out->ssdpSock4, SD_BOTH );
+            UpnpCloseSocket( out->ssdpSock4 );
+            CLIENTONLY( shutdown( out->ssdpReqSock4, SD_BOTH ); )
+            CLIENTONLY( UpnpCloseSocket( out->ssdpReqSock4 ); )
+            CLIENTONLY( shutdown( out->ssdpReqSock6, SD_BOTH ); )
+            CLIENTONLY( UpnpCloseSocket( out->ssdpReqSock6 ); )
+            return retVal;
+        }
+    } else {
+        out->ssdpSock6 = INVALID_SOCKET;
+    }
+
+    return UPNP_E_SUCCESS;
+}
+
+
+#if INCLUDE_CLIENT_APIS
+/************************************************************************
+ * Function : create_ssdp_sock_reqv4
+ *
+ * Parameters:
+ *	IN SOCKET* ssdpReqSock: SSDP IPv4 request socket to be created
+ *
+ * Description:
+ *	This function creates the SSDP IPv4 socket to be used by the control
+ *  point.
+ *
+ * Returns:
+ *  UPNP_E_SUCCESS on successful socket creation.
+ ***************************************************************************/
+int create_ssdp_sock_reqv4( SOCKET* ssdpReqSock )
+{
+    char errorBuffer[ERROR_BUFFER_LEN];
+    u_char ttl = 4;
+
+    *ssdpReqSock = socket( AF_INET, SOCK_DGRAM, 0 );
+    if ( *ssdpReqSock == -1 ) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
             "Error in socket(): %s\n", errorBuffer );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+        return UPNP_E_OUTOF_SOCKET;
+    }
+
+    setsockopt( *ssdpReqSock, IPPROTO_IP, IP_MULTICAST_TTL,
+        &ttl, sizeof (ttl) );
+
+    // just do it, regardless if fails or not.
+    Make_Socket_NoBlocking( *ssdpReqSock );
+
+    return UPNP_E_SUCCESS;
+}
+
+
+/************************************************************************
+ * Function : create_ssdp_sock_reqv6
+ *
+ * Parameters:
+ *	IN SOCKET* ssdpReqSock: SSDP IPv6 request socket to be created
+ *
+ * Description:
+ *	This function creates the SSDP IPv6 socket to be used by the control
+ *  point.
+ *
+ * Returns: void
+ *
+ ***************************************************************************/
+int create_ssdp_sock_reqv6( SOCKET* ssdpReqSock )
+{
+    char errorBuffer[ERROR_BUFFER_LEN];
+    char hops = 1;
+
+    *ssdpReqSock = socket( AF_INET6, SOCK_DGRAM, 0 );
+    if ( *ssdpReqSock == -1 ) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+        UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+            "Error in socket(): %s\n", errorBuffer );
+        return UPNP_E_OUTOF_SOCKET;
+    }
+
+    // MUST use scoping of IPv6 addresses to control the propagation os SSDP 
+    // messages instead of relying on the Hop Limit (Equivalent to the TTL 
+    // limit in IPv4).
+    setsockopt( *ssdpReqSock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+        &hops, sizeof(hops) );
+
+    // just do it, regardless if fails or not.
+    Make_Socket_NoBlocking( *ssdpReqSock );
+
+    return UPNP_E_SUCCESS;
+}
+#endif /* INCLUDE_CLIENT_APIS */
+
+
+/************************************************************************
+ * Function : create_ssdp_sock_v4
+ *
+ * Parameters:
+ *	IN SOCKET* ssdpSock: SSDP IPv4 socket to be created
+ *
+ * Description:
+ *	This function ...
+ *
+ * Returns: void
+ *
+ ***************************************************************************/
+int create_ssdp_sock_v4( SOCKET* ssdpSock )
+{
+    char errorBuffer[ERROR_BUFFER_LEN];
+    int onOff;
+    u_char ttl = 4;
+    struct ip_mreq ssdpMcastAddr;
+    struct sockaddr_storage __ss;
+    struct sockaddr_in *ssdpAddr4 = (struct sockaddr_in *)&__ss;
+    int ret = 0;
+    struct in_addr addr;
+
+
+    *ssdpSock = socket( AF_INET, SOCK_DGRAM, 0 );
+    if ( *ssdpSock == -1 ) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+        UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+            "Error in socket(): %s\n", errorBuffer );
 
         return UPNP_E_OUTOF_SOCKET;
     }
 
     onOff = 1;
-    ret = setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEADDR,
-        (char *)&onOff, sizeof(onOff) );
+    ret = setsockopt( *ssdpSock, SOL_SOCKET, SO_REUSEADDR,
+        (char*)&onOff, sizeof(onOff) );
     if ( ret == -1) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
             "Error in setsockopt() SO_REUSEADDR: %s\n", errorBuffer );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
-        shutdown( ssdpSock, SD_BOTH );
-        UpnpCloseSocket( ssdpSock );
+        shutdown( *ssdpSock, SD_BOTH );
+        UpnpCloseSocket( *ssdpSock );
 
         return UPNP_E_SOCKET_ERROR;
     }
     
 #if defined(BSD) || defined(__OSX__) || defined(__APPLE__)
-    ret = setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEPORT,
-        (char *)&onOff, sizeof (onOff) );
+    onOff = 1;
+    ret = setsockopt( *ssdpSock, SOL_SOCKET, SO_REUSEPORT,
+        (char *)&onOff, sizeof(onOff) );
     if ( ret == -1 ) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
             "Error in setsockopt() SO_REUSEPORT: %s\n", errorBuffer );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
-        shutdown( ssdpSock, SD_BOTH );
-        UpnpCloseSocket( ssdpSock );
+        shutdown( *ssdpSock, SD_BOTH );
+        UpnpCloseSocket( *ssdpSock );
 
         return UPNP_E_SOCKET_ERROR;
     }
 #endif /* BSD */
 
-    memset( (void *)&ssdpAddr, 0, sizeof( struct sockaddr_in ) );
-    ssdpAddr.sin_family = AF_INET;
-    //  ssdpAddr.sin_addr.s_addr = inet_addr(LOCAL_HOST);
-    ssdpAddr.sin_addr.s_addr = htonl( INADDR_ANY );
-    ssdpAddr.sin_port = htons( SSDP_PORT );
-    ret = bind( ssdpSock, (struct sockaddr *)&ssdpAddr, sizeof (ssdpAddr) );
+    memset( &__ss, 0, sizeof( __ss ) );
+    ssdpAddr4->sin_family = AF_INET;
+    ssdpAddr4->sin_addr.s_addr = htonl( INADDR_ANY );
+    ssdpAddr4->sin_port = htons( SSDP_PORT );
+    ret = bind( *ssdpSock, (struct sockaddr *)ssdpAddr4, sizeof(*ssdpAddr4) );
     if ( ret == -1 ) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
             "Error in bind(), addr=0x%08X, port=%d: %s\n",
             INADDR_ANY, SSDP_PORT, errorBuffer );
-            shutdown( ssdpSock, SD_BOTH );
-        UpnpCloseSocket( ssdpSock );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+            shutdown( *ssdpSock, SD_BOTH );
+        UpnpCloseSocket( *ssdpSock );
 
         return UPNP_E_SOCKET_BIND;
     }
 
     memset( (void *)&ssdpMcastAddr, 0, sizeof (struct ip_mreq) );
-    ssdpMcastAddr.imr_interface.s_addr = inet_addr( LOCAL_HOST );
+    ssdpMcastAddr.imr_interface.s_addr = inet_addr( gIF_IPV4 );
     ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr( SSDP_IP );
-    ret = setsockopt( ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-        (char *)&ssdpMcastAddr, sizeof (struct ip_mreq) );
+    ret = setsockopt( *ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+        (char *)&ssdpMcastAddr, sizeof(struct ip_mreq) );
     if ( ret == -1 ) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
             "Error in setsockopt() IP_ADD_MEMBERSHIP (join multicast group): %s\n",
             errorBuffer );
-        shutdown( ssdpSock, SD_BOTH );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        UpnpCloseSocket( ssdpSock );
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+        shutdown( *ssdpSock, SD_BOTH );
+        UpnpCloseSocket( *ssdpSock );
 
         return UPNP_E_SOCKET_ERROR;
     }
 
     /* Set multicast interface. */
     memset( (void *)&addr, 0, sizeof (struct in_addr) );
-    addr.s_addr = inet_addr(LOCAL_HOST);
-    ret = setsockopt(ssdpSock, IPPROTO_IP, IP_MULTICAST_IF,
+    addr.s_addr = inet_addr(gIF_IPV4);
+    ret = setsockopt(*ssdpSock, IPPROTO_IP, IP_MULTICAST_IF,
         (char *)&addr, sizeof addr);
     if ( ret == -1 ) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -941,26 +1085,131 @@ get_ssdp_sockets( MiniServerSockArray * out )
     }
 
     /* result is not checked becuase it will fail in WinMe and Win9x. */
-    ret = setsockopt( ssdpSock, IPPROTO_IP,
+    ret = setsockopt( *ssdpSock, IPPROTO_IP,
         IP_MULTICAST_TTL, &ttl, sizeof (ttl) );
 
-    ret = setsockopt( ssdpSock, SOL_SOCKET, SO_BROADCAST,
-        (char *)&option, sizeof (option) );
+    onOff = 1;
+    ret = setsockopt( *ssdpSock, SOL_SOCKET, SO_BROADCAST,
+        (char*)&onOff, sizeof(onOff) );
     if( ret == -1) {
         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
             "Error in setsockopt() SO_BROADCAST (set broadcast): %s\n",
             errorBuffer );
-        shutdown( ssdpSock, SD_BOTH );
-        CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        UpnpCloseSocket( ssdpSock );
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+        shutdown( *ssdpSock, SD_BOTH );
+        UpnpCloseSocket( *ssdpSock );
 
         return UPNP_E_NETWORK_ERROR;
     }
 
-    CLIENTONLY( out->ssdpReqSock = ssdpReqSock; )
-    out->ssdpSock = ssdpSock;
+    return UPNP_E_SUCCESS;
+}
+
+
+/************************************************************************
+ * Function : create_ssdp_sock_v6
+ *
+ * Parameters:
+ *	IN SOCKET* ssdpSock: SSDP IPv6 socket to be created
+ *
+ * Description:
+ *	This function ...
+ *
+ * Returns: void
+ *
+ ***************************************************************************/
+int create_ssdp_sock_v6( SOCKET* ssdpSock )
+{
+    char errorBuffer[ERROR_BUFFER_LEN];
+    struct ipv6_mreq ssdpMcastAddr;
+    struct sockaddr_storage __ss;
+    struct sockaddr_in6 *ssdpAddr6 = (struct sockaddr_in6 *)&__ss;
+    int onOff;
+    int ret = 0;
+
+    *ssdpSock = socket( AF_INET6, SOCK_DGRAM, 0 );
+    if ( *ssdpSock == -1 ) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+        UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+            "Error in socket(): %s\n", errorBuffer );
+
+        return UPNP_E_OUTOF_SOCKET;
+    }
+
+    onOff = 1;
+    ret = setsockopt( *ssdpSock, SOL_SOCKET, SO_REUSEADDR,
+        (char*)&onOff, sizeof(onOff) );
+    if ( ret == -1) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+        UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+            "Error in setsockopt() SO_REUSEADDR: %s\n", errorBuffer );
+        shutdown( *ssdpSock, SD_BOTH );
+        UpnpCloseSocket( *ssdpSock );
+
+        return UPNP_E_SOCKET_ERROR;
+    }
+    
+#if defined(BSD) || defined(__OSX__) || defined(__APPLE__)
+    onOff = 1;
+    ret = setsockopt( *ssdpSock, SOL_SOCKET, SO_REUSEPORT,
+        (char*)&onOff, sizeof (onOff) );
+    if ( ret == -1 ) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+        UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+            "Error in setsockopt() SO_REUSEPORT: %s\n", errorBuffer );
+        shutdown( *ssdpSock, SD_BOTH );
+        UpnpCloseSocket( *ssdpSock );
+
+        return UPNP_E_SOCKET_ERROR;
+    }
+#endif /* BSD */
+
+    memset( &__ss, 0, sizeof( __ss ) );
+    ssdpAddr6->sin6_family = AF_INET6;
+    ssdpAddr6->sin6_addr = in6addr_any;
+    ssdpAddr6->sin6_scope_id = gIF_INDEX;
+    ssdpAddr6->sin6_port = htons( SSDP_PORT );
+    ret = bind( *ssdpSock, (struct sockaddr *)ssdpAddr6, sizeof(*ssdpAddr6) );
+    if ( ret == -1 ) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+        UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+            "Error in bind(), addr=0x%032lX, port=%d: %s\n",
+            0lu, SSDP_PORT, errorBuffer );
+        shutdown( *ssdpSock, SD_BOTH );
+        UpnpCloseSocket( *ssdpSock );
+
+        return UPNP_E_SOCKET_BIND;
+    }
+
+    memset( (void *)&ssdpMcastAddr, 0, sizeof(ssdpMcastAddr) );
+    ssdpMcastAddr.ipv6mr_interface = gIF_INDEX;
+    inet_pton( AF_INET6, SSDP_IPV6_LINKLOCAL, &ssdpMcastAddr.ipv6mr_multiaddr );
+    ret = setsockopt( *ssdpSock, IPPROTO_IPV6, IPV6_JOIN_GROUP,
+        (char *)&ssdpMcastAddr, sizeof(ssdpMcastAddr) );
+    if ( ret == -1 ) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+        UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+            "Error in setsockopt() IPV6_JOIN_GROUP (join multicast group): %s\n",
+            errorBuffer );
+        shutdown( *ssdpSock, SD_BOTH );
+        UpnpCloseSocket( *ssdpSock );
+
+        return UPNP_E_SOCKET_ERROR;
+    }
+
+    onOff = 1;
+    ret = setsockopt( *ssdpSock, SOL_SOCKET, SO_BROADCAST,
+        (char*)&onOff, sizeof(onOff) );
+    if( ret == -1) {
+        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+        UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+            "Error in setsockopt() SO_BROADCAST (set broadcast): %s\n",
+            errorBuffer );
+        shutdown( *ssdpSock, SD_BOTH );
+        UpnpCloseSocket( *ssdpSock );
+
+        return UPNP_E_NETWORK_ERROR;
+    }
 
     return UPNP_E_SUCCESS;
 }

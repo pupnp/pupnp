@@ -73,6 +73,7 @@ libupnp_la_SOURCES = \
 	src/inc/util.h \
 	src/inc/utilall.h \
 	src/inc/uuid.h \
+	src/inc/VirtualDir.h \
 	src/inc/webserver.h
 
 # ssdp

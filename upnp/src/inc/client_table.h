@@ -56,15 +56,15 @@ typedef struct CLIENT_SUBSCRIPTION {
   char * ActualSID;
   char * EventURL;
   int RenewEventId;
-  struct CLIENT_SUBSCRIPTION * next;
-} client_subscription;
+  struct CLIENT_SUBSCRIPTION *next;
+} ClientSubscription;
 
 /************************************************************************
 *	Function :	copy_client_subscription
 *
 *	Parameters :
-*		client_subscription * in ;	- source client subscription
-*		client_subscription * out ;	- destination client subscription
+*		ClientSubscription * in ;	- source client subscription
+*		ClientSubscription * out ;	- destination client subscription
 *
 *	Description :	Make a copy of the client subscription data
 *
@@ -74,13 +74,13 @@ typedef struct CLIENT_SUBSCRIPTION {
 *
 *	Note :
 ************************************************************************/
-int copy_client_subscription(client_subscription * in, client_subscription * out);
+int copy_client_subscription(ClientSubscription * in, ClientSubscription * out);
 
 /************************************************************************
 *	Function :	free_client_subscription
 *
 *	Parameters :
-*		client_subscription * sub ;	- Client subscription to be freed
+*		ClientSubscription * sub ;	- Client subscription to be freed
 *
 *	Description :	Free memory allocated for client subscription data.
 *		Remove timer thread associated with this subscription event.
@@ -89,14 +89,14 @@ int copy_client_subscription(client_subscription * in, client_subscription * out
 *
 *	Note :
 ************************************************************************/
-void free_client_subscription(client_subscription * sub);
+void free_client_subscription(ClientSubscription * sub);
 
 
 /************************************************************************
 *	Function :	freeClientSubList
 *
 *	Parameters :
-*		client_subscription * list ; Client subscription 
+*		ClientSubscription * list ; Client subscription 
 *
 *	Description :	Free the client subscription table.
 *
@@ -104,13 +104,13 @@ void free_client_subscription(client_subscription * sub);
 *
 *	Note :
 ************************************************************************/
-void freeClientSubList(client_subscription * list);
+void freeClientSubList(ClientSubscription * list);
 
 /************************************************************************
 *	Function :	RemoveClientSubClientSID
 *
 *	Parameters :
-*		client_subscription **head ; Head of the subscription list	
+*		ClientSubscription **head ; Head of the subscription list	
 *		const Upnp_SID sid ;		 Subscription ID to be mactched
 *
 *	Description :	Remove the client subscription matching the 
@@ -121,43 +121,42 @@ void freeClientSubList(client_subscription * list);
 *
 *	Note :
 ************************************************************************/
-void RemoveClientSubClientSID(client_subscription **head, 
+void RemoveClientSubClientSID(ClientSubscription **head, 
 				       const Upnp_SID sid);
 
 /************************************************************************
 *	Function :	GetClientSubClientSID
 *
 *	Parameters :
-*		client_subscription *head ; Head of the subscription list	
+*		ClientSubscription *head ; Head of the subscription list	
 *		const Upnp_SID sid ;		Subscription ID to be matched
 *
 *	Description :	Return the client subscription from the client table 
 *		that matches const Upnp_SID sid subscrition id value. 
 *
-*	Return : client_subscription * ; The matching subscription
+*	Return : ClientSubscription * ; The matching subscription
 *
 *	Note :
 ************************************************************************/
-client_subscription * GetClientSubClientSID(client_subscription *head
+ClientSubscription * GetClientSubClientSID(ClientSubscription *head
 						     , const Upnp_SID sid);
 
 /************************************************************************
 *	Function :	GetClientSubActualSID
 *
 *	Parameters :
-*		client_subscription *head ;	Head of the subscription list		
+*		ClientSubscription *head ;	Head of the subscription list		
 *		token * sid ;				Subscription ID to be matched
 *
 *	Description :	Returns the client subscription from the client 
 *		subscription table that has the matching token * sid buffer
 *		value.
 *
-*	Return : client_subscription * ; The matching subscription
+*	Return : ClientSubscription * ; The matching subscription
 *
 *	Note :
 ************************************************************************/
-client_subscription * GetClientSubActualSID(client_subscription *head
-						     , token * sid);
+ClientSubscription * GetClientSubActualSID(ClientSubscription *head, token * sid);
 )
 
 #ifdef __cplusplus
