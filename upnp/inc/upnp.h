@@ -418,6 +418,7 @@
 #endif
 
 
+#if UPNP_VERSION >= 10800
 /* 
  * Opaque data structures. The following includes are data structures that
  * must be externally visible. Since version 1.8.0, only an opaque typedef
@@ -437,6 +438,7 @@
 #include "StateVarComplete.h"
 #include "StateVarRequest.h"
 #include "SubscriptionRequest.h"
+#endif /* UPNP_VERSION >= 10800 */
 
 
 /*!
@@ -634,6 +636,234 @@ enum Upnp_DescType_e {
 };
 
 typedef enum Upnp_DescType_e Upnp_DescType;
+
+
+#if UPNP_VERSION < 10800
+/** Returned as part of a {\bf UPNP_CONTROL_ACTION_COMPLETE} callback.  */
+
+struct Upnp_Action_Request
+{
+  /** The result of the operation. */
+  int ErrCode;
+
+  /** The socket number of the connection to the requestor. */
+  int Socket;
+
+  /** The error string in case of error. */
+  char ErrStr[LINE_SIZE];
+
+ /** The Action Name. */
+  char ActionName[NAME_SIZE];
+
+  /** The unique device ID. */
+  char DevUDN[NAME_SIZE];
+
+  /** The service ID. */
+  char ServiceID[NAME_SIZE];
+
+  /** The DOM document describing the action. */
+  IXML_Document *ActionRequest;
+
+  /** The DOM document describing the result of the action. */
+  IXML_Document *ActionResult;
+
+  /** IP address of the control point requesting this action. */
+  struct sockaddr_storage CtrlPtIPAddr;
+
+  /** The DOM document containing the information from the
+      the SOAP header. */
+  IXML_Document *SoapHeader;
+};
+
+struct Upnp_Action_Complete
+{
+  /** The result of the operation. */
+  int ErrCode;
+
+  /** The control URL for service. */
+  char CtrlUrl[NAME_SIZE];
+
+  /** The DOM document describing the action. */
+  IXML_Document *ActionRequest;
+
+  /** The DOM document describing the result of the action. */
+  IXML_Document *ActionResult;
+
+};
+
+/** Represents the request for current value of a state variable in a service
+ *  state table.  */
+
+struct Upnp_State_Var_Request
+{
+  /** The result of the operation. */
+  int ErrCode;
+
+  /** The socket number of the connection to the requestor. */
+  int Socket;
+
+  /** The error string in case of error. */
+  char ErrStr[LINE_SIZE];
+
+  /** The unique device ID. */
+  char DevUDN[NAME_SIZE];
+
+  /** The  service ID. */
+  char ServiceID[NAME_SIZE];
+
+  /** The name of the variable. */
+  char StateVarName[NAME_SIZE];
+
+  /** IP address of sender requesting the state variable. */
+  struct sockaddr_storage CtrlPtIPAddr;
+
+  /** The current value of the variable. This needs to be allocated by 
+   *  the caller.  When finished with it, the SDK frees this {\bf DOMString}. */
+  DOMString CurrentVal;
+};
+
+/** Represents the reply for the current value of a state variable in an
+    asynchronous call. */
+
+struct Upnp_State_Var_Complete
+{
+  /** The result of the operation. */
+  int ErrCode;
+
+  /** The control URL for the service. */
+  char CtrlUrl[NAME_SIZE];
+
+  /** The name of the variable. */
+  char StateVarName[NAME_SIZE];
+
+  /** The current value of the variable or error string in case of error. */
+  DOMString CurrentVal;
+};
+
+/** Returned along with a {\bf UPNP_EVENT_RECEIVED} callback.  */
+
+struct Upnp_Event
+{
+  /** The subscription ID for this subscription. */
+  Upnp_SID Sid;
+
+  /** The event sequence number. */
+  int EventKey;
+
+  /** The DOM tree representing the changes generating the event. */
+  IXML_Document *ChangedVariables;
+
+};
+
+/*
+ * This typedef is required by Doc++ to parse the last entry of the 
+ * Upnp_Discovery structure correctly.
+ */
+
+
+/** Returned in a {\bf UPNP_DISCOVERY_RESULT} callback. */
+struct Upnp_Discovery
+{
+	/** The result code of the {\bf UpnpSearchAsync} call. */
+	int  ErrCode;                  
+				     
+	/** The expiration time of the advertisement. */
+	int  Expires;                  
+				     
+	/** The unique device identifier. */
+	char DeviceId[LINE_SIZE];      
+
+	/** The device type. */
+	char DeviceType[LINE_SIZE];    
+
+	/** The service type. */
+	char ServiceType[LINE_SIZE];
+
+	/** The service version. */
+	char ServiceVer[LINE_SIZE];    
+
+	/** The URL to the UPnP description document for the device. */
+	char Location[LINE_SIZE];      
+
+	/** The operating system the device is running. */
+	char Os[LINE_SIZE];            
+				     
+	/** Date when the response was generated. */
+	char Date[LINE_SIZE];            
+				     
+	/** Confirmation that the MAN header was understood by the device. */
+	char Ext[LINE_SIZE];           
+				     
+	/** The host address of the device responding to the search. */
+	struct sockaddr_in DestAddr; 
+};
+
+/** Returned along with a {\bf UPNP_EVENT_SUBSCRIBE_COMPLETE} or {\bf
+ * UPNP_EVENT_UNSUBSCRIBE_COMPLETE} callback.  */
+
+struct Upnp_Event_Subscribe {
+
+  /** The SID for this subscription.  For subscriptions, this only
+   *  contains a valid SID if the {\bf Upnp_EventSubscribe.result} field
+   *  contains a {\tt UPNP_E_SUCCESS} result code.  For unsubscriptions,
+   *  this contains the SID from which the subscription is being
+   *  unsubscribed.  */
+
+  Upnp_SID Sid;            
+
+  /** The result of the operation. */
+  int ErrCode;              
+
+  /** The event URL being subscribed to or removed from. */
+  char PublisherUrl[NAME_SIZE]; 
+
+  /** The actual subscription time (for subscriptions only). */
+  int TimeOut;              
+                              
+};
+  
+/** Returned along with a {\bf UPNP_EVENT_SUBSCRIPTION_REQUEST}
+ *  callback.  */
+
+struct Upnp_Subscription_Request
+{
+  /** The identifier for the service being subscribed to. */
+  char *ServiceId; 
+
+  /** Universal device name. */
+  char *UDN;       
+
+  /** The assigned subscription ID for this subscription. */
+  Upnp_SID Sid;
+
+};
+
+
+struct File_Info
+{
+	/** The length of the file. A length less than 0 indicates the size 
+	*  is unknown, and data will be sent until 0 bytes are returned from
+	*  a read call. */
+	off_t file_length;
+
+	/** The time at which the contents of the file was modified;
+	*  The time system is always local (not GMT). */
+	time_t last_modified;
+
+	/** If the file is a directory, {\bf is_directory} contains
+	* a non-zero value. For a regular file, it should be 0. */
+	int is_directory;
+
+	/** If the file or directory is readable, this contains 
+	* a non-zero value. If unreadable, it should be set to 0. */
+	int is_readable;
+
+	/** The content type of the file. This string needs to be allocated 
+	*  by the caller using {\bf ixmlCloneDOMString}.  When finished 
+	*  with it, the SDK frees the {\bf DOMString}. */
+	DOMString content_type;
+};
+#endif /* UPNP_VERSION < 10800 */
 
 
 /*!
@@ -2225,7 +2455,7 @@ EXPORT_SPEC int UpnpHttpGetProgress(
  */  
 EXPORT_SPEC int UpnpCancelHttpGet(
 	/*! [in] The handle of the connection created by the call to
-	 * \b UpnpOpenHttpPost. */
+	 * \b UpnpOpenHttpGet. */
 	void *handle);
 
 /*!
@@ -2238,7 +2468,7 @@ EXPORT_SPEC int UpnpCancelHttpGet(
  */  
 EXPORT_SPEC int UpnpCloseHttpGet(
 	/*! [in] The handle of the connection created by the call to
-	 * \b UpnpOpenHttpPost. */
+	 * \b UpnpOpenHttpGet. */
 	void *handle);
 
 
@@ -2416,7 +2646,13 @@ typedef int (*VDCallback_GetInfo)(
 		/*! [in] The name of the file to query. */
 		const char *filename,
 		/*! [out] Pointer to a structure to store the information on the file. */
-		UpnpFileInfo *info);
+#if UPNP_VERSION < 10800
+		struct File_Info *info
+#else
+		UpnpFileInfo *info
+#endif /* UPNP_VERSION < 10800 */
+		);
+
 
 /*!
  * \brief Sets the get_info callback function to be used to access a virtual
