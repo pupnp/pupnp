@@ -418,6 +418,28 @@
 #endif
 
 
+#if UPNP_VERSION >= 10800
+/* 
+ * Opaque data structures. The following includes are data structures that
+ * must be externally visible. Since version 1.8.0, only an opaque typedef
+ * is visible from the outside world. Any operation on these data types
+ * must be done using the appropriate interface functions.
+ *
+ * This policy has the great advantage that it is now possible to change
+ * the internal implementation of these data structures without breaking
+ * the API.
+ */
+#include "ActionComplete.h"
+#include "ActionRequest.h"
+#include "Discovery.h"
+#include "Event.h"
+#include "EventSubscribe.h"
+#include "FileInfo.h"
+#include "StateVarComplete.h"
+#include "StateVarRequest.h"
+#include "SubscriptionRequest.h"
+#endif /* UPNP_VERSION >= 10800 */
+
 
 /*!
  * \name Constants and Types
@@ -615,6 +637,8 @@ enum Upnp_DescType_e {
 
 typedef enum Upnp_DescType_e Upnp_DescType;
 
+
+#if UPNP_VERSION < 10800
 /** Returned as part of a {\bf UPNP_CONTROL_ACTION_COMPLETE} callback.  */
 
 struct Upnp_Action_Request
@@ -839,9 +863,11 @@ struct File_Info
 	*  with it, the SDK frees the {\bf DOMString}. */
 	DOMString content_type;
 };
+#endif /* UPNP_VERSION < 10800 */
 
 
-/** All callback functions share the same prototype, documented below.
+/*!
+ *  All callback functions share the same prototype, documented below.
  *  Note that any memory passed to the callback function
  *  is valid only during the callback and should be copied if it
  *  needs to persist.  This callback function needs to be thread
@@ -2429,7 +2455,7 @@ EXPORT_SPEC int UpnpHttpGetProgress(
  */  
 EXPORT_SPEC int UpnpCancelHttpGet(
 	/*! [in] The handle of the connection created by the call to
-	 * \b UpnpOpenHttpPost. */
+	 * \b UpnpOpenHttpGet. */
 	void *handle);
 
 /*!
@@ -2442,7 +2468,7 @@ EXPORT_SPEC int UpnpCancelHttpGet(
  */  
 EXPORT_SPEC int UpnpCloseHttpGet(
 	/*! [in] The handle of the connection created by the call to
-	 * \b UpnpOpenHttpPost. */
+	 * \b UpnpOpenHttpGet. */
 	void *handle);
 
 
@@ -2620,7 +2646,13 @@ typedef int (*VDCallback_GetInfo)(
 		/*! [in] The name of the file to query. */
 		const char *filename,
 		/*! [out] Pointer to a structure to store the information on the file. */
-		struct File_Info *info);
+#if UPNP_VERSION < 10800
+		struct File_Info *info
+#else
+		UpnpFileInfo *info
+#endif /* UPNP_VERSION < 10800 */
+		);
+
 
 /*!
  * \brief Sets the get_info callback function to be used to access a virtual
