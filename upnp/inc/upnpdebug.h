@@ -304,24 +304,6 @@ static UPNP_INLINE void PrintThreadPoolStats(
 #endif
 
 
-/*!
- * \brief Print the node names and values of a XML tree.
- */
-#ifdef DEBUG
-void printNodes(
-	/*! [in] The root of the tree to print. */
-	IXML_Node *tmpRoot,
-	/*! [in] The depth to print. */
-	int depth);
-#else
-static UPNP_INLINE void printNodes(
-	IXML_Node *tmpRoot,
-	int depth)
-{
-}
-#endif
-
-
 /*@}*/
 
 #ifdef __cplusplus

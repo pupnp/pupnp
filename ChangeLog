@@ -3,6 +3,17 @@ Version 1.8.0
 *******************************************************************************
 
 2010-03-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	SF Patch Tracker [ 2987390 ] upnp_debug vs. ixml_debug
+	Thanks for the load of updates, I'm still assimilating them ! Could I make
+	a suggestion though? The addition of printNodes(IXML_Node) to upnpdebug a
+	dds a new dependency on ixml.h for anything using upnpdebug.h. I'm making
+	quite a bit of use of upnpdebug in porting things to version 1.8.0, and I'd
+	prefer it if printNodes could be added to ixmldebug.h instead. I'm attach
+	ing a patch, what do you think ?
+
+	Nick
+
+2010-03-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Forward port of svn revision 505:
 	SF Patch Tracker [ 2836704 ] Patch for Solaris10 compilation and usage.
 	Submitted By: zephyrus ( zephyrus00jp )

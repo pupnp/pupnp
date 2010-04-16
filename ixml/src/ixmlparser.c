@@ -542,8 +542,7 @@ static int Parser_UTF8ToInt(
 			*len = 0;
 			ret = -1;
 		}
-		IxmlPrintf("(%s::Parser_UTF8ToInt): Error %d, line %d\n",
-			__FILE__, ret, line);
+		IxmlPrintf(__FILE__, line, "Parser_UTF8ToInt", "Error %d\n", ret);
 		return ret;
 	}
 }
@@ -1302,8 +1301,7 @@ fail_entity:
 
 ExitFunction:
 	if (ret == -1 || (g_error_char && ret == g_error_char)) {
-		IxmlPrintf("(%s::Parser_getChar): Error %d, line %d\n",
-			__FILE__, ret, line);
+		IxmlPrintf(__FILE__, line, "Parser_getChar", "Error %d\n", ret);
 	}
 
 	return ret;
@@ -1370,8 +1368,7 @@ static int Parser_copyToken(
 
 ExitFunction:
 	if (ret != IXML_SUCCESS) {
-		IxmlPrintf("(%s::Parser_copyToken): Error %d, line %d\n",
-			__FILE__, ret, line);
+		IxmlPrintf(__FILE__, line, "Parser_copyToken", "Error %d\n", ret);
 	}
 
 	return ret;
@@ -1918,8 +1915,7 @@ static int Parser_xmlNamespace(
 
 ExitFunction:
 	if (ret != IXML_SUCCESS && ret != IXML_FILE_DONE) {
-		IxmlPrintf("(%s::Parser_xmlNamespace): Error %d, line %d\n",
-			__FILE__, ret, line);
+		IxmlPrintf(__FILE__, line, "Parser_xmlNamespace", "Error %d\n", ret);
 	}
 
 	return ret;
@@ -2248,8 +2244,7 @@ static int Parser_processContent(
 
 ExitFunction:
 	if (ret != IXML_SUCCESS) {
-		IxmlPrintf("(%s::Parser_processContent): Error %d, line %d\n",
-			__FILE__, ret, line);
+		IxmlPrintf(__FILE__, line, "Parser_processContent", "Error %d\n", ret);
 	}
 
 	return ret;
@@ -2321,8 +2316,7 @@ static int Parser_processETag(
 
 ExitFunction:
 	if (ret != IXML_SUCCESS) {
-		IxmlPrintf("(%s::Parser_processETag): Error %d, line %d\n",
-			__FILE__, ret, line);
+		IxmlPrintf(__FILE__, line, "Parser_processETag", "Error %d\n", ret);
 	}
 
 	return ret;
@@ -2577,8 +2571,7 @@ static int Parser_processAttribute(
 
 ExitFunction:
 	if (ret != IXML_SUCCESS && ret != IXML_FILE_DONE) {
-		IxmlPrintf("(%s::Parser_processAttribute): Error %d, line %d\n",
-			__FILE__, ret, line);
+		IxmlPrintf(__FILE__, line, "Parser_processAttribute", "Error %d\n", ret);
 	}
 
 	return ret;
@@ -2681,8 +2674,7 @@ static int Parser_getNextNode(
 
 ExitFunction:
 	if (ret != IXML_SUCCESS && ret != IXML_FILE_DONE) {
-		IxmlPrintf("(%s::Parser_getNextNode): Error %d, line %d\n",
-			__FILE__, ret, line);
+		IxmlPrintf(__FILE__, line, "Parser_getNextNode", "Error %d\n", ret);
 	}
 
 	return ret;
