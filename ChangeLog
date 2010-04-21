@@ -2,6 +2,9 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-03-27 Nick Leverton <nick@leverton.org>
+	Subscription auto-renewals copy the renewal time from old subscription.
+
 2010-03-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	Backport of svn revision 527:
 	* Added API to ithread, created the following functions:

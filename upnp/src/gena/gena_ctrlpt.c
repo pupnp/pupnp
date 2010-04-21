@@ -80,6 +80,7 @@ static void GenaAutoRenewSubscription(
 		eventType = UPNP_EVENT_SUBSCRIPTION_EXPIRED;
 	} else {
 		UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "GENA AUTO RENEW");
+		timeout = sub_struct->TimeOut;
 		errCode = genaRenewSubscription(
 			event->handle,
 			sub_struct->Sid,
