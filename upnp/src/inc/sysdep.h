@@ -83,7 +83,7 @@ typedef struct {
 
 void get_ieee_node_identifier(uuid_node_t *node);
 void get_system_time(uuid_time_t *uuid_time);
-void get_random_info(char seed[16]);
+void get_random_info(unsigned char seed[16]);
 
 
 #endif /* SYSDEP_H */

@@ -18,14 +18,16 @@
  */
 
 #include "config.h"
-#ifdef WIN32
-	#include <winsock2.h>
-#else /* WIN32 */
-	#include <unistd.h>
-#endif /* WIN32 */
+
+
+#include "sysdep.h"
+
+
+#include "UpnpInet.h"
+
+
 #include <string.h>
 #include <stdio.h>
-#include "sysdep.h"
 
 /*-----------------------------------------------------------------------------*/
 /*
@@ -35,7 +37,7 @@
 void
 get_ieee_node_identifier(uuid_node_t *node)
 {
-    char seed[16];
+    unsigned char seed[16];
     static int inited = 0;
     static uuid_node_t saved_node;
 
@@ -140,7 +142,7 @@ get_system_time(uuid_time_t *uuid_time)
 
 /*-----------------------------------------------------------------------------*/
 void
-get_random_info(char seed[16])
+get_random_info(unsigned char seed[16])
 {
 	MD5_CTX c;
 	typedef struct {
@@ -159,7 +161,7 @@ get_random_info(char seed[16])
 
 	/* MD5 it */
 	MD5Init(&c);
-	MD5Update(&c, &r, sizeof r);
+	MD5Update(&c, (unsigned char *)&r, sizeof r);
 	MD5Final(seed, &c);
 };
 
