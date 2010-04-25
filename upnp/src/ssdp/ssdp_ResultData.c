@@ -35,6 +35,8 @@ void SSDPResultData_delete(SSDPResultData *p)
 {
 	struct SSSDPResultData *q = (struct SSSDPResultData *)p;
 
+	if (!q) return;
+
 	UpnpDiscovery_delete(q->m_param);
 	q->m_param = NULL;
 	
