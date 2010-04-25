@@ -3208,6 +3208,8 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 #if EXCLUDE_GENA == 0
 	case SUBSCRIBE: {
 		struct Upnp_Event_Subscribe Evt;
+		/* Cast away constness */
+		/*UpnpString *Sid = (UpnpString *)UpnpEventSubscribe_get_SID(evt);*/
 		UpnpString *Sid = UpnpString_new();
 		UpnpString *Url = UpnpString_new();
 		UpnpString_set_String(Url, Param->Url);
