@@ -53,6 +53,7 @@ libupnp_la_LDFLAGS = \
 libupnp_la_SOURCES = \
 	src/inc/config.h \
 	src/inc/client_table.h \
+	src/inc/ClientSubscription.h \
 	src/inc/gena.h \
 	src/inc/gena_ctrlpt.h \
 	src/inc/gena_device.h \
@@ -103,12 +104,13 @@ libupnp_la_SOURCES += \
 # genlib
 libupnp_la_SOURCES += \
 	src/genlib/miniserver/miniserver.c \
+	src/genlib/client_table/client_table.c \
+	src/genlib/client_table/ClientSubscription.c \
 	src/genlib/service_table/service_table.c \
 	src/genlib/util/membuffer.c \
 	src/genlib/util/strintmap.c \
 	src/genlib/util/upnp_timeout.c \
 	src/genlib/util/util.c \
-	src/genlib/client_table/client_table.c \
 	src/genlib/net/sock.c \
 	src/genlib/net/http/httpparser.c \
 	src/genlib/net/http/httpreadwrite.c \
