@@ -215,6 +215,9 @@ Version 1.6.7
 	Define PROTOTYPES to be one by default in global.h. This affects the
 	RSA MD5 code.
 
+2010-03-27 Nick Leverton <nick@leverton.org>
+	Subscription auto-renewals copy the renewal time from old subscription.
+
 2010-03-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added API to ithread, created the following functions:
 	- int ithread_initialize_library(void);
