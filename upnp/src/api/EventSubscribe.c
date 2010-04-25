@@ -45,6 +45,8 @@ void UpnpEventSubscribe_delete(UpnpEventSubscribe *p)
 {
 	struct SEventSubscribe *q = (struct SEventSubscribe *)p;
 
+	if (!q) return;
+
 	q->m_errCode = 0;
 
 	q->m_timeOut = 0;

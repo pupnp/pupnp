@@ -49,6 +49,8 @@ void UpnpStateVarComplete_delete(UpnpStateVarComplete *p)
 {
 	struct SUpnpStateVarComplete *q = (struct SUpnpStateVarComplete *)p;
 
+	if (!q) return;
+
 	q->m_errCode = 0;
 
 	UpnpString_delete(q->m_ctrlUrl);

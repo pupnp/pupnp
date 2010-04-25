@@ -51,6 +51,8 @@ void UpnpFileInfo_delete(UpnpFileInfo *p)
 {
 	struct SUpnpFileInfo *q = (struct SUpnpFileInfo *)p;
 
+	if (!q) return;
+
 	q->m_fileLength = 0;
 
 	q->m_lastModified = 0;

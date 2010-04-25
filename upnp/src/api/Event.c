@@ -44,6 +44,8 @@ void UpnpEvent_delete(UpnpEvent *p)
 {
 	struct SUpnpEvent *q = (struct SUpnpEvent *)p;
 
+	if (!q) return;
+
 	q->m_eventKey = 0;
 
 	q->m_changedVariables = NULL;

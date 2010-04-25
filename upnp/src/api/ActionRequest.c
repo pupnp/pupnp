@@ -62,6 +62,8 @@ void UpnpActionRequest_delete(UpnpActionRequest *p)
 {
 	struct SUpnpActionRequest *q = (struct SUpnpActionRequest *)p;
 
+	if (!q) return;
+
 	q->m_errCode = 0;
 
 	q->m_socket = 0;

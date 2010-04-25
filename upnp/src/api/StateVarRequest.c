@@ -59,6 +59,8 @@ void UpnpStateVarRequest_delete(UpnpStateVarRequest *p)
 {
 	struct SUpnpStateVarRequest *q = (struct SUpnpStateVarRequest *)p;
 
+	if (!q) return;
+
 	q->m_errCode = 0;
 
 	q->m_socket = 0;

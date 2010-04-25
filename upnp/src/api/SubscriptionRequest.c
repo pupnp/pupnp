@@ -43,6 +43,8 @@ void UpnpSubscriptionRequest_delete(UpnpSubscriptionRequest *p)
 {
 	struct SUpnpSubscriptionRequest *q = (struct SUpnpSubscriptionRequest *)p;
 
+	if (!q) return;
+
 	UpnpString_delete(q->m_serviceId);
 	q->m_serviceId = NULL;
 

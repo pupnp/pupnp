@@ -74,6 +74,8 @@ void UpnpString_delete(UpnpString *p)
 {
 	struct SUpnpString *q = (struct SUpnpString *)p;
 		
+	if (!q) return;
+
 	q->m_length = 0;
 
 	free(q->m_string);

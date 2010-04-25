@@ -56,6 +56,8 @@ void UpnpActionComplete_delete(UpnpActionComplete *p)
 {
 	struct SUpnpActionComplete *q = (struct SUpnpActionComplete *)p;
 
+	if (!q) return;
+
 	q->m_errCode = 0;
 
 	UpnpString_delete(q->m_ctrlUrl);

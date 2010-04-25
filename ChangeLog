@@ -3,6 +3,10 @@ Version 1.8.0
 *******************************************************************************
 
 2010-03-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	Protect the object destructors agains null pointers on deletion, which
+	should be something valid.
+
+2010-03-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	SF Patch Tracker [ 2987390 ] upnp_debug vs. ixml_debug
 	Thanks for the load of updates, I'm still assimilating them ! Could I make
 	a suggestion though? The addition of printNodes(IXML_Node) to upnpdebug a

@@ -79,6 +79,8 @@ void UpnpClientSubscription_delete(ClientSubscription *p)
 {
 	struct SClientSubscription *q = (struct SClientSubscription *)p;
 
+	if (!q) return;
+
 	q->m_renewEventId = 0;
 
 	UpnpString_delete(q->m_SID);

@@ -63,6 +63,8 @@ void UpnpDiscovery_delete(UpnpDiscovery *p)
 {
 	struct SUpnpDiscovery *q = (struct SUpnpDiscovery *)p;
 
+	if (!q) return;
+
 	q->m_errCode = 0;
 
 	q->m_expires = 0;
