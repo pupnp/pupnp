@@ -19,6 +19,7 @@ LDADD = \
 
 upnpincludedir = $(includedir)/upnp
 upnpinclude_HEADERS = \
+	inc/UpnpString.h \
 	inc/upnp.h \
 	inc/upnpdebug.h \
 	inc/UpnpGlobal.h \
@@ -113,6 +114,7 @@ libupnp_la_SOURCES += \
 
 # api
 libupnp_la_SOURCES += \
+	src/api/UpnpString.c \
 	src/api/upnpapi.c
 
 if ENABLE_TOOLS
