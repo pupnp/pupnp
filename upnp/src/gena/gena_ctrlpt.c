@@ -101,8 +101,7 @@ static void GenaAutoRenewSubscription(
 		if( GetHandleInfo( event->handle, &handle_info ) != HND_CLIENT ) {
 			HandleUnlock();
 			free_upnp_timeout(event);
-
-			return;
+			goto end_function;
 		}
 		UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "HANDLE IS VALID");
 
@@ -114,6 +113,9 @@ static void GenaAutoRenewSubscription(
 	}
 
 	free_upnp_timeout(event);
+
+end_function:
+	return;
 }
 
 
@@ -136,19 +138,22 @@ static int ScheduleGenaAutoRenew(
 	int return_code = GENA_SUCCESS;
 	ThreadPoolJob job;
 
-	if( TimeOut == UPNP_INFINITE ) {
-		return GENA_SUCCESS;
+	if (TimeOut == UPNP_INFINITE) {
+		return_code = GENA_SUCCESS;
+		goto end_function;
 	}
 
 	RenewEventStruct = UpnpEventSubscribe_new();
-	if( RenewEventStruct == NULL ) {
-		return UPNP_E_OUTOF_MEMORY;
+	if (RenewEventStruct == NULL) {
+		return_code = UPNP_E_OUTOF_MEMORY;
+		goto end_function;
 	}
 
 	RenewEvent = (upnp_timeout *) malloc(sizeof(upnp_timeout));
-	if( RenewEvent == NULL ) {
-		free( RenewEventStruct );
-		return UPNP_E_OUTOF_MEMORY;
+	if (RenewEvent == NULL) {
+		free(RenewEventStruct);
+		return_code = UPNP_E_OUTOF_MEMORY;
+		goto end_function;
 	}
 
 	// schedule expire event
@@ -175,13 +180,16 @@ static int ScheduleGenaAutoRenew(
 	if (return_code != UPNP_E_SUCCESS) {
 		free(RenewEvent);
 		free(RenewEventStruct);
-
-		return return_code;
+		goto end_function;
 	}
 
 	UpnpClientSubscription_set_RenewEventId(sub, RenewEvent->eventId);
 
-	return GENA_SUCCESS;
+	return_code = GENA_SUCCESS;
+
+end_function:
+
+	return return_code;
 }
 
 

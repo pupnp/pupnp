@@ -1798,7 +1798,7 @@ exit_function:
 
 
 #ifdef INCLUDE_CLIENT_APIS
-int UpnpUnSubscribe(UpnpClient_Handle Hnd,const Upnp_SID SubsId)
+int UpnpUnSubscribe(UpnpClient_Handle Hnd, const Upnp_SID SubsId)
 {
 	struct Handle_Info *SInfo = NULL;
 	int retVal;
@@ -3208,15 +3208,14 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 #if EXCLUDE_GENA == 0
 	case SUBSCRIBE: {
 		UpnpEventSubscribe *evt = UpnpEventSubscribe_new();
-		// cast away constness
-		UpnpString *sid = (UpnpString *)UpnpEventSubscribe_get_SID(evt);
+		const UpnpString *Sid = UpnpEventSubscribe_get_SID(evt);
 
 		UpnpEventSubscribe_strcpy_PublisherUrl(evt, Param->Url);
 		errCode = genaSubscribe(
 			Param->Handle,
 			UpnpEventSubscribe_get_PublisherUrl(evt),
 			(int *)&Param->TimeOut,
-			sid);
+			Sid);
 		UpnpEventSubscribe_set_ErrCode(evt, errCode);
 		UpnpEventSubscribe_set_TimeOut(evt, Param->TimeOut);
 		Param->Fun(UPNP_EVENT_SUBSCRIBE_COMPLETE, evt, Param->Cookie);
