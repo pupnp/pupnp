@@ -1739,7 +1739,8 @@ int UpnpSubscribe(
 {
 	int retVal;
 	struct Handle_Info *SInfo = NULL;
-	char *EvtUrl = (char *)EvtUrl_const;
+	UpnpString *EvtUrl = UpnpString_new();
+	UpnpString *SubsIdTmp = UpnpString_new();
 	
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpSubscribe\n");
 
@@ -1756,11 +1757,17 @@ int UpnpSubscribe(
 		retVal = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
+	UpnpString_set_String(EvtUrl, EvtUrl_const);
 
+	if (SubsIdTmp == NULL) {
+		retVal = UPNP_E_OUTOF_MEMORY;
+		goto exit_function;
+	}
 	if (SubsId == NULL) {
 		retVal = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
+	UpnpString_set_String(SubsIdTmp, SubsId);
 
 	if (TimeOut == NULL) {
 		retVal = UPNP_E_INVALID_PARAM;
@@ -1775,11 +1782,15 @@ int UpnpSubscribe(
 	}
 	HandleUnlock();
 
-	retVal = genaSubscribe(Hnd, EvtUrl, TimeOut, SubsId);
+	retVal = genaSubscribe(Hnd, EvtUrl, TimeOut, SubsIdTmp);
+	strcpy(SubsId, UpnpString_get_String(SubsIdTmp));
 
 exit_function:
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"Exiting UpnpSubscribe, retVal=%d\n", retVal);
+
+	UpnpString_delete(SubsIdTmp);
+	UpnpString_delete(EvtUrl);
 
 	return retVal;
 }
@@ -1791,6 +1802,7 @@ int UpnpUnSubscribe(UpnpClient_Handle Hnd, const Upnp_SID SubsId)
 {
 	struct Handle_Info *SInfo = NULL;
 	int retVal;
+	UpnpString *SubsIdTmp = UpnpString_new();
 
 	UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpUnSubscribe\n");
 
@@ -1799,10 +1811,16 @@ int UpnpUnSubscribe(UpnpClient_Handle Hnd, const Upnp_SID SubsId)
 		goto exit_function;
 	}
 
+	if (SubsIdTmp == NULL) {
+		retVal = UPNP_E_OUTOF_MEMORY;
+		goto exit_function;
+	}
 	if (SubsId == NULL) {
 		HandleUnlock();
 		return UPNP_E_INVALID_PARAM;
 	}
+	UpnpString_set_String(SubsIdTmp, SubsId);
+
 	HandleReadLock();
 	if (GetHandleInfo(Hnd, &SInfo) != HND_CLIENT) {
 		HandleUnlock();
@@ -1811,11 +1829,13 @@ int UpnpUnSubscribe(UpnpClient_Handle Hnd, const Upnp_SID SubsId)
 	}
 	HandleUnlock();
 
-	retVal = genaUnSubscribe(Hnd, SubsId);
+	retVal = genaUnSubscribe(Hnd, SubsIdTmp);
 
 exit_function:
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"Exiting UpnpUnSubscribe, retVal=%d\n", retVal);
+
+	UpnpString_delete(SubsIdTmp);
 
 	return retVal;
 }
@@ -1890,6 +1910,7 @@ int UpnpRenewSubscription(
 {
 	struct Handle_Info *SInfo = NULL;
 	int retVal;
+	UpnpString *SubsIdTmp = UpnpString_new();
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpRenewSubscription\n");
 
@@ -1897,10 +1918,15 @@ int UpnpRenewSubscription(
 		return UPNP_E_FINISH;
 	}
 
+	if (SubsIdTmp == NULL) {
+		retVal = UPNP_E_OUTOF_MEMORY;
+		goto exit_function;
+	}
 	if (SubsId == NULL) {
 		retVal = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
+	UpnpString_set_String(SubsIdTmp, SubsId);
 
 	if (TimeOut == NULL) {
 		retVal = UPNP_E_INVALID_PARAM;
@@ -1915,11 +1941,13 @@ int UpnpRenewSubscription(
 	}
 	HandleUnlock();
 
-	retVal = genaRenewSubscription(Hnd, SubsId, TimeOut);
+	retVal = genaRenewSubscription(Hnd, SubsIdTmp, TimeOut);
 
 exit_function:
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"Exiting UpnpRenewSubscription, retVal=%d\n", retVal);
+
+	UpnpString_delete(SubsIdTmp);
 
 	return retVal;
 }
@@ -3171,6 +3199,8 @@ int UpnpGetIfInfo(const char *IfName)
 #ifdef INCLUDE_CLIENT_APIS
 void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 {
+	/*int errCode = 0;*/
+
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"Inside UpnpThreadDistribution \n");
 
@@ -3178,39 +3208,50 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 #if EXCLUDE_GENA == 0
 	case SUBSCRIBE: {
 		struct Upnp_Event_Subscribe Evt;
-
+		UpnpString *Sid = UpnpString_new();
+		UpnpString *Url = UpnpString_new();
+		UpnpString_set_String(Url, Param->Url);
+		UpnpString_set_String(Sid, (char *)Evt.Sid);
 		Evt.ErrCode = genaSubscribe(
 			Param->Handle,
-			Param->Url,
+			Url,
 			(int *)&Param->TimeOut,
-			(char *)Evt.Sid);
+			Sid);
 		strcpy(Evt.PublisherUrl, Param->Url);
 		Evt.TimeOut = Param->TimeOut;
 		Param->Fun(UPNP_EVENT_SUBSCRIBE_COMPLETE, &Evt, Param->Cookie);
+		UpnpString_delete(Sid);
+		UpnpString_delete(Url);
 		free(Param);
 		break;
 	}
 	case UNSUBSCRIBE: {
 		struct Upnp_Event_Subscribe Evt;
+		UpnpString *Sid = UpnpString_new();
+		UpnpString_set_String(Sid, Param->SubsId);
 		Evt.ErrCode = genaUnSubscribe(
 			Param->Handle,
-			Param->SubsId);
-		strcpy((char *)Evt.Sid, Param->SubsId);
+			Sid);
+		strcpy((char *)Evt.Sid, UpnpString_get_String(Sid));
 		strcpy(Evt.PublisherUrl, "");
 		Evt.TimeOut = 0;
 		Param->Fun(UPNP_EVENT_UNSUBSCRIBE_COMPLETE, &Evt, Param->Cookie);
+		UpnpString_delete(Sid);
 		free(Param);
 		break;
 	}
 	case RENEW: {
 		struct Upnp_Event_Subscribe Evt;
+		UpnpString *Sid = UpnpString_new();
+		UpnpString_set_String(Sid, Param->SubsId);
 		Evt.ErrCode = genaRenewSubscription(
 			Param->Handle,
-			Param->SubsId,
+			Sid,
 			&Param->TimeOut);
 		Evt.TimeOut = Param->TimeOut;
-		strcpy((char *)Evt.Sid, Param->SubsId);
+		strcpy((char *)Evt.Sid, UpnpString_get_String(Sid));
 		Param->Fun(UPNP_EVENT_RENEWAL_COMPLETE, &Evt, Param->Cookie);
+		UpnpString_delete(Sid);
 		free(Param);
 		break;
 	}

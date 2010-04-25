@@ -53,6 +53,7 @@
 #include "sock.h"
 #include "ThreadPool.h"
 #include "upnp.h"
+#include "UpnpString.h"
 #include "uri.h"
 
 
@@ -182,14 +183,14 @@ EXTERN_C int genaSubscribe(
 	/*! [in] The client handle. */
 	UpnpClient_Handle client_handle,
 	/*! [in] Of the form: "http://134.134.156.80:4000/RedBulb/Event */
-	const char *PublisherURL,
+	const UpnpString *PublisherURL,
 	/*! [in,out] requested Duration:
 	 * \li if -1, then "infinite".
 	 * \li in the OUT case: actual Duration granted by Service,
 	 * 	-1 for infinite. */
 	int *TimeOut,
 	/*! [out] sid of subscription, memory passed in by caller. */
-	Upnp_SID out_sid);
+	UpnpString *out_sid);
 #endif /* INCLUDE_CLIENT_APIS */
 
 
@@ -208,7 +209,7 @@ EXTERN_C int genaUnSubscribe(
 	/*! [in] UPnP client handle. */
 	UpnpClient_Handle client_handle,
 	/*! [in] The subscription ID. */
-	const Upnp_SID in_sid);
+	const UpnpString *in_sid);
 #endif /* INCLUDE_CLIENT_APIS */
 
 
@@ -260,7 +261,7 @@ EXTERN_C int genaRenewSubscription(
 	/*! [in] Client handle. */
 	UpnpClient_Handle client_handle,
 	/*! [in] Subscription ID. */
-	const Upnp_SID in_sid,
+	const UpnpString *in_sid,
 	/*! [in,out] requested Duration, if -1, then "infinite". In the OUT case:
 	 * actual Duration granted by Service, -1 for infinite. */
 	int *TimeOut);
