@@ -2,6 +2,14 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-05-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	SF Bug Tracker [ 2995758 ] libupnp 1.6.6, wrong bind when reuseaddr is
+	1.
+	Submitted: viallard anthony ( homer242 )
+	When trying to use reuseaddr option in miniserver/miniserver.c, there
+	isn't a affectation of the port chosen (serverAddr.sin_port isn't
+	receive listen_port variable value).
+
 2010-04-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	Define PROTOTYPES to be one by default in global.h. This affects the
 	RSA MD5 code.
