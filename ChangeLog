@@ -2,6 +2,37 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-06-10 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	SF Bug Tracker [ 3007407 ] Service traversal issue in AdvertiseAndReply()
+	Submitted: Chuck Thomason ( cyt4 ) - 2010-05-26 15:07:39 UTC
+
+	When the UPnP server is started, one alive message is broadcast for each
+	service in each device. It appears that libupnp's implementation of the
+	alive message generation does not correctly navigate the XML description
+	document when locating the services. This can result in the wrong UDN
+	being used in the alive message sent for a service.
+
+	In my specific case (see attached XML), the root EchoSTB device contains
+	no services, but its embedded MediaServer device contains 2 services.
+	When the existing libupnp code traverses the EchoSTB device in the XML,
+	it searches the global list of serviceLists within the document instead
+	of searching for a serviceList that is its direct child node. The
+	ContentDirectory and ConnectionManager services are then announced with
+	the UDN of EchoSTB1 (the root device) instead of with the UDN of
+	MediaServer, which is actually their parent device.
+
+	I discovered this behavior using libupnp-1.6.6. I have generated a patch
+	against branch-1.6.x that corrects the XML navigation such that all
+	services are traversed from their parent device, which results in the
+	correct UDN being sent in the alive message for each service. I built
+	from branch-1.6.x without this patch, tested, and confirmed that the
+	issue still exists as I observed it in libupnp-1.6.6. I then built
+	from branch-1.6.x with this patch, tested, and confirmed that the
+	issue was resolved.
+
+	Thanks,
+	Chuck Thomason
+
 2010-05-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	SF Bug Tracker [ 2995758 ] libupnp 1.6.6, wrong bind when reuseaddr is
 	1.
@@ -16,7 +47,6 @@ Version 1.6.7
 	
 2010-03-27 Nick Leverton <nick@leverton.org>
 	Subscription auto-renewals copy the renewal time from old subscription.
-
 
 2010-03-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	Backport of svn revision 527:

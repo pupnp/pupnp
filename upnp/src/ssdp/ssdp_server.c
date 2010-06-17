@@ -96,6 +96,8 @@ struct SSDPSockArray {
  * Returns: int
  *	UPNP_E_SUCCESS if successful else appropriate error
  ***************************************************************************/
+static const char *SERVICELIST_STR = "serviceList";
+
 int AdvertiseAndReply(
 	IN int AdFlag,
 	IN UpnpDevice_Handle Hnd,
@@ -280,9 +282,22 @@ int AdvertiseAndReply(
 		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 			"Sending service Advertisement\n");
 
-		tmpNode = ixmlNodeList_item(SInfo->ServiceList, i);
-		if (!tmpNode) continue;
+		/* Correct service traversal such that each device's serviceList
+		 * is directly traversed as a child of its parent device. This
+		 * ensures that the service's alive message uses the UDN of
+		 * the parent device. */
+		tmpNode = ixmlNode_getFirstChild(tmpNode);
+		while (tmpNode) {
+			dbgStr = ixmlNode_getNodeName(tmpNode);
+			if (!strncmp(dbgStr, SERVICELIST_STR, sizeof(SERVICELIST_STR))) {
+				break;
+			}
+			tmpNode = ixmlNode_getNextSibling(tmpNode);
+		}
 		ixmlNodeList_free(nodeList);
+		if (!tmpNode) {
+			continue;
+		}
 		nodeList = ixmlElement_getElementsByTagName(
 			(IXML_Element *)tmpNode, "service");
 		if (!nodeList) {
