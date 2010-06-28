@@ -211,6 +211,31 @@ Version 1.8.0
 Version 1.6.7
 *******************************************************************************
 
+2010-06-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	SF Bug Tracker [ 3022490 ] String declaration fix for patch applied in 3007407
+	Hello,
+
+	When my patch for tracker ID 3007407 was accepted, the definition of the
+	serviceList string was changed from
+
+	#define SERVICELIST_STR "serviceList"
+
+	to
+
+	static const char *SERVICELIST_STR = "serviceList";
+
+	During internal code review of the final patch, it was pointed out that 
+	sizeof(SERVICELIST_STR) == 4 since SERVICELIST_STR is now declared as
+	a pointer instead of an array.
+
+	If you wish to use a variable instead of a define, I suggest the
+	following instead:
+
+	static const char SERVICELIST_STR[] = "serviceList";
+
+	Thanks,
+	Chuck Thomason
+
 2010-06-10 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	SF Bug Tracker [ 3007407 ] Service traversal issue in AdvertiseAndReply()
 	Submitted: Chuck Thomason ( cyt4 ) - 2010-05-26 15:07:39 UTC

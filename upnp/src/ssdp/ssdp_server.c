@@ -96,7 +96,7 @@ struct SSDPSockArray {
  * Returns: int
  *	UPNP_E_SUCCESS if successful else appropriate error
  ***************************************************************************/
-static const char *SERVICELIST_STR = "serviceList";
+static const char SERVICELIST_STR[] = "serviceList";
 
 int AdvertiseAndReply(
 	IN int AdFlag,
@@ -289,7 +289,7 @@ int AdvertiseAndReply(
 		tmpNode = ixmlNode_getFirstChild(tmpNode);
 		while (tmpNode) {
 			dbgStr = ixmlNode_getNodeName(tmpNode);
-			if (!strncmp(dbgStr, SERVICELIST_STR, sizeof(SERVICELIST_STR))) {
+			if (!strncmp(dbgStr, SERVICELIST_STR, sizeof SERVICELIST_STR)) {
 				break;
 			}
 			tmpNode = ixmlNode_getNextSibling(tmpNode);
