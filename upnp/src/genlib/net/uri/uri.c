@@ -447,13 +447,8 @@ int parse_hostport(
     else if( af == AF_INET6 ) {
         sai6->sin6_family = AF_INET6;
         sai6->sin6_port = htons(port);
-        /*
-	sai6->sin6_scope_id = gIF_INDEX;
+        sai6->sin6_scope_id = gIF_INDEX;
         ret = inet_pton(AF_INET6, srvname, &sai6->sin6_addr);
-	*/
-	/* libUPnP 1.6.x does not currently support IPV6. */
-	assert(0);
-	ret = -1;
     } else {
         // IP address was set by the hostname (getaddrinfo).
         // Override port:
