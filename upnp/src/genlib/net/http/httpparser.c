@@ -1545,7 +1545,9 @@ parser_parse_responseline( INOUT http_parser_t * parser )
 
     if( num_scanned != 3 ||
         hmsg->major_version < 0 ||
-        hmsg->minor_version < 0 || hmsg->status_code < 0 ) {
+        /* HTTP version equals to 1.0 should fail as required by the
+         * UPnP certification tool */
+        hmsg->minor_version < 1 || hmsg->status_code < 0 ) {
         // bad response line
         return PARSE_FAILURE;
     }
