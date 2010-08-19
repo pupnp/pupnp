@@ -212,6 +212,11 @@ Version 1.6.7
 *******************************************************************************
 
 2010-08-19 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* libUPnP does support IPV6 now.
+	
+	Patch submitted by Ronan Menard.
+
+2010-08-19 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* HTTP version equal to 1.0 should failed as required by the UPnP
 	certification tool. Patch submitted by Ronan Menard.
 
