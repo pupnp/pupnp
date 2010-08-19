@@ -2,6 +2,10 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-08-19 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* HTTP version equal to 1.0 should failed as required by the UPnP
+	certification tool. Patch submitted by Ronan Menard.
+
 2010-06-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	SF Bug Tracker [ 3022490 ] String declaration fix for patch applied in 3007407
 	Hello,
