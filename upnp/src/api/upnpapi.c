@@ -165,7 +165,8 @@ unsigned short LOCAL_PORT_V4;
 unsigned short LOCAL_PORT_V6;
 
 /*! UPnP device and control point handle table  */
-void *HandleTable[NUM_HANDLE];
+#define NUM_HANDLE 200
+static void *HandleTable[NUM_HANDLE];
 
 /*! a local dir which serves as webserver root */
 extern membuffer gDocumentRootDir;
