@@ -180,6 +180,9 @@ extern char gIF_NAME[LINE_SIZE];
 extern char gIF_IPV4[22];
 /*! INET6_ADDRSTRLEN. */
 extern char gIF_IPV6[65];
+
+extern char gIF_IPV6_ULA_GUA[INET6_ADDRSTRLEN];
+
 extern int  gIF_INDEX;
 
 
@@ -259,6 +262,7 @@ typedef enum {
  * \li gIF_NAME -> Interface name (by input or found).
  * \li gIF_IPV4 -> IPv4 address (if any).
  * \li gIF_IPV6 -> IPv6 address (if any).
+ * \li gIF_IPV6_ULA_GUA -> ULA or GUA IPv6 address (if any)
  * \li gIF_INDEX -> Interface index number.
  *
  * \return UPNP_E_SUCCESS on success.

@@ -96,6 +96,18 @@
 #endif /* INTERNAL_WEB_SERVER */
 
 
+#ifndef IN6_IS_ADDR_GLOBAL
+#define IN6_IS_ADDR_GLOBAL(a) \
+		(((((__const uint8_t *) (a))[0] & htonl(0xff000000)) <= htonl(0x3f000000)   \
+				&& (((__const uint8_t *) (a))[0] & htonl(0xff000000)) >= htonl(0x20000000)))
+#endif /* IS ADDR GLOBAL */
+
+#ifndef IN6_IS_ADDR_ULA
+#define IN6_IS_ADDR_ULA(a) \
+		((((__const uint32_t *) (a))[0] & htonl(0xfe000000)) \
+		== htonl (0xfc000000))
+#endif /* IS ADDR ULA */
+
 /*! This structure is for virtual directory callbacks */
 struct VirtualDirCallbacks virtualDirCallback;
 
@@ -139,6 +151,9 @@ char gIF_IPV4[22]/* INET_ADDRSTRLEN*/ = { '\0' };
 
 /*! Static buffer to contain interface IPv6 address. (extern'ed in upnp.h) */
 char gIF_IPV6[65]/* INET6_ADDRSTRLEN*/ = { '\0' };
+
+/*! Static buffer to contain interface ULA or GUA IPv6 address. (extern'ed in upnp.h) */
+char gIF_IPV6_ULA_GUA[INET6_ADDRSTRLEN] = { '\0' };
 
 /*! Contains interface index. (extern'ed in upnp.h) */
 int  gIF_INDEX = -1;
@@ -634,6 +649,14 @@ char *UpnpGetServerIp6Address(void)
 	return gIF_IPV6;
 }
 
+char *UpnpGetServerUlaGuaIp6Address(void)
+{
+	if( UpnpSdkInit != 1 ) {
+		return NULL;
+	}
+
+	return gIF_IPV6_ULA_GUA;
+}
 
 #ifdef INCLUDE_DEVICE_APIS
 int UpnpRegisterRootDevice(
@@ -947,10 +970,22 @@ int UpnpRegisterRootDevice3(
 		goto exit_function;
 	}
 
-	if ((AddressFamily == AF_INET  && UpnpSdkDeviceRegisteredV4 == 1) ||
-	    (AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 1)) {
+	/* Test for already regsitered IPV4. */
+	if (AddressFamily == AF_INET && UpnpSdkDeviceRegisteredV4 == 1) {
 		retVal = UPNP_E_ALREADY_REGISTERED;
 		goto exit_function;
+	}
+
+	/* Test for already registered IPV6. IPV6 devices might register on multiple
+	 * IPv6 addresses (link local and GUA or ULA), so we must to check the
+	 * description URL in the HandleTable. */
+	int handler_index = 0;
+	while (handler_index < NUM_HANDLE && HandleTable[handler_index] != NULL) {
+		if (strcmp(((struct Handle_Info *)HandleTable[handler_index])->DescURL, DescUrl)) {
+			retVal = UPNP_E_ALREADY_REGISTERED;
+			goto exit_function;
+		}
+		handler_index++;
 	}
 
 	*Hnd = GetFreeHandle();
@@ -3152,44 +3187,53 @@ int UpnpGetIfInfo(const char *IfName)
     }
     close( LocalSock );
 
-    // Failed to find a valid interface, or valid address.
-    if( ifname_found == 0  || valid_addr_found == 0 ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-            "Failed to find an adapter with valid IP addresses for use.\n" );
-        return UPNP_E_INVALID_INTERFACE;
-    }
-    
-    // Try to get the IPv6 address for the same interface 
-    // from "/proc/net/if_inet6", if possible.
-    inet6_procfd = fopen( "/proc/net/if_inet6", "r" );
-    if( inet6_procfd != NULL ) {
-        while( fscanf(inet6_procfd,
-                "%4s%4s%4s%4s%4s%4s%4s%4s %02x %*02x %*02x %*02x %*20s\n",
-                addr6[0],addr6[1],addr6[2],addr6[3],
-                addr6[4],addr6[5],addr6[6],addr6[7], &if_idx) != EOF) {
-            // Get same interface as IPv4 address retrieved.
-            if( gIF_INDEX == if_idx ) {
-                snprintf(buf, sizeof(buf), "%s:%s:%s:%s:%s:%s:%s:%s",
-                    addr6[0],addr6[1],addr6[2],addr6[3],
-                    addr6[4],addr6[5],addr6[6],addr6[7]);
-                // Validate formed address and check for link-local.
-                if( inet_pton(AF_INET6, buf, &v6_addr) > 0 &&
-                    IN6_IS_ADDR_LINKLOCAL(&v6_addr) ) {
-                    // Got valid IPv6 link-local adddress.
-                    strncpy( gIF_IPV6, buf, sizeof(gIF_IPV6) );
-                    break;
-                }
-            }
-        }
-        fclose( inet6_procfd );
-    }
+	// Failed to find a valid interface, or valid address.
+	if (ifname_found == 0  || valid_addr_found == 0) {
+		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+		"Failed to find an adapter with valid IP addresses for use.\n");
+
+		return UPNP_E_INVALID_INTERFACE;
+	}
+
+	// Try to get the IPv6 address for the same interface 
+	// from "/proc/net/if_inet6", if possible.
+	inet6_procfd = fopen("/proc/net/if_inet6", "r");
+	if (inet6_procfd) {
+		while (fscanf(inet6_procfd,
+			"%4s%4s%4s%4s%4s%4s%4s%4s %02x %*02x %*02x %*02x %*20s\n",
+			addr6[0],addr6[1],addr6[2],addr6[3],
+			addr6[4],addr6[5],addr6[6],addr6[7], &if_idx) != EOF) {
+			// Get same interface as IPv4 address retrieved.
+			if( gIF_INDEX == if_idx ) {
+				snprintf(buf, sizeof(buf), "%s:%s:%s:%s:%s:%s:%s:%s",
+					addr6[0],addr6[1],addr6[2],addr6[3],
+					addr6[4],addr6[5],addr6[6],addr6[7]);
+				// Validate formed address and check for link-local.
+				if (inet_pton(AF_INET6, buf, &v6_addr) > 0) {
+					if (IN6_IS_ADDR_ULA(&v6_addr)) {
+						// Got valid IPv6 ula.
+						strncpy(gIF_IPV6_ULA_GUA, buf, sizeof(gIF_IPV6_ULA_GUA));
+					} else if (IN6_IS_ADDR_GLOBAL(&v6_addr) &&
+						   strlen(gIF_IPV6_ULA_GUA) == 0) {
+						// got a GUA, should store it while no ULA is found
+						strncpy(gIF_IPV6_ULA_GUA, buf, sizeof(gIF_IPV6_ULA_GUA));
+					} else if (IN6_IS_ADDR_LINKLOCAL(&v6_addr) &&
+						   strlen(gIF_IPV6) == 0) {
+						// got a Link local IPv6 address.
+						strncpy(gIF_IPV6, buf, sizeof(gIF_IPV6));
+					}
+				}
+			}
+		}
+		fclose(inet6_procfd);
+	}
 #endif
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, 
-                "Interface name=%s, index=%d, v4=%s, v6=%s\n",
-                gIF_NAME, gIF_INDEX, gIF_IPV4, gIF_IPV6 );
+	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, 
+		"Interface name=%s, index=%d, v4=%s, v6=%s, ULA or GUA v6=%s\n",
+		gIF_NAME, gIF_INDEX, gIF_IPV4, gIF_IPV6, gIF_IPV6_ULA_GUA );
 
-    return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 
 

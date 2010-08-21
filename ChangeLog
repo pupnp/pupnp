@@ -2,6 +2,18 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* New internal buffer added to store global/ula IPV6 address.
+	* Macros to test whether an IPV6 address is global or ula.
+	* UpnpGetServerUlaGuaIp6Address(): added interface.
+	* IN6_IS_ADDR_GLOBAL, IN6_IS_ADDR_ULA: new macros.
+	* gIF_IPV6_ULA_GUA: new buffer.
+	* UpnpRegisterRootDevice3(): Change to the test of already registered
+	devices for IPV6.
+	* UpnpGetIfInfo(): gua/ula issues.
+	
+	Patch submitted by Ronan Menard.
+
 2010-08-19 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* libUPnP does support IPV6 now.
 	
