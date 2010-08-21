@@ -3,6 +3,11 @@ Version 1.6.7
 *******************************************************************************
 
 2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* InitHandleList() has never been implemented, I guess no one has ever
+	called it, so remove it.
+	* GetFreeHandle() and FreeHandle() are now static as they should.
+
+2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* New internal buffer added to store global/ula IPV6 address.
 	* Macros to test whether an IPV6 address is global or ula.
 	* UpnpGetServerUlaGuaIp6Address(): added interface.
