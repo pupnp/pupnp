@@ -327,6 +327,7 @@ static void RunMiniServer(
 	SOCKET miniServStopSock =  miniSock->miniServerStopSock;
 	SOCKET ssdpSock4 = miniSock->ssdpSock4;
 	SOCKET ssdpSock6 = miniSock->ssdpSock6;
+	SOCKET ssdpSock6UlaGua = miniSock->ssdpSock6UlaGua;
 #ifdef INTERNAL_WEB_SERVER
 	SOCKET miniServSock4 = miniSock->miniServerSock4;
 	SOCKET miniServSock6 = miniSock->miniServerSock6;
@@ -356,6 +357,9 @@ static void RunMiniServer(
 	}
 	if (ssdpSock6 != INVALID_SOCKET) {
 		maxMiniSock = max(maxMiniSock, ssdpSock6);
+	}
+	if (ssdpSock6UlaGua != INVALID_SOCKET) {
+		maxMiniSock = max(maxMiniSock, ssdpSock6UlaGua);
 	}
 #ifdef INCLUDE_CLIENT_APIS
 	if (ssdpReqSock4 != INVALID_SOCKET) {
@@ -388,6 +392,9 @@ static void RunMiniServer(
 		}
 		if(ssdpSock6 != INVALID_SOCKET) {
 			FD_SET(ssdpSock6, &rdSet);
+		}
+		if(ssdpSock6UlaGua != INVALID_SOCKET) {
+			FD_SET(ssdpSock6UlaGua, &rdSet);
 		}
 #ifdef INCLUDE_CLIENT_APIS
 		if(ssdpReqSock4 != INVALID_SOCKET) {
@@ -454,6 +461,10 @@ static void RunMiniServer(
 			    FD_ISSET(ssdpSock6, &rdSet)) {
 			readFromSSDPSocket(ssdpSock6);
 			}
+			if (ssdpSock6UlaGua != INVALID_SOCKET &&
+			    FD_ISSET(ssdpSock6UlaGua, &rdSet)) {
+				readFromSSDPSocket(ssdpSock6UlaGua);
+			}
 			if (ssdpSock4 != INVALID_SOCKET &&
 			    FD_ISSET(ssdpSock4, &rdSet)) {
 				readFromSSDPSocket(ssdpSock4);
@@ -494,6 +505,8 @@ static void RunMiniServer(
 	UpnpCloseSocket(ssdpSock4);
 	shutdown(ssdpSock6, SD_BOTH);
 	UpnpCloseSocket(ssdpSock6);
+	shutdown(ssdpSock6UlaGua, SD_BOTH);
+	UpnpCloseSocket(ssdpSock6UlaGua);
 #ifdef INCLUDE_CLIENT_APIS
 	shutdown(ssdpReqSock4, SD_BOTH);
 	UpnpCloseSocket(ssdpReqSock4);
@@ -930,6 +943,8 @@ int StartMiniServer(
 		UpnpCloseSocket(miniSocket->ssdpSock4);
 		shutdown(miniSocket->ssdpSock6, SD_BOTH);
 		UpnpCloseSocket(miniSocket->ssdpSock6);
+		shutdown(miniSocket->ssdpSock6UlaGua, SD_BOTH);
+		UpnpCloseSocket(miniSocket->ssdpSock6UlaGua);
 #ifdef INCLUDE_CLIENT_APIS
 		shutdown(miniSocket->ssdpReqSock4, SD_BOTH );
 		UpnpCloseSocket(miniSocket->ssdpReqSock4 );
@@ -959,6 +974,8 @@ int StartMiniServer(
 		UpnpCloseSocket(miniSocket->ssdpSock4);
 		shutdown(miniSocket->ssdpSock6, SD_BOTH);
 		UpnpCloseSocket(miniSocket->ssdpSock6);
+		shutdown(miniSocket->ssdpSock6UlaGua, SD_BOTH);
+		UpnpCloseSocket(miniSocket->ssdpSock6UlaGua);
 #ifdef INCLUDE_CLIENT_APIS
 		shutdown(miniSocket->ssdpReqSock4, SD_BOTH);
 		UpnpCloseSocket(miniSocket->ssdpReqSock4);
