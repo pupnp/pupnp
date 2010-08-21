@@ -212,6 +212,11 @@ Version 1.6.7
 *******************************************************************************
 
 2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* SOCKET ssdpSock6UlaGua: created variable for later use.
+	
+	Patch submitted by Ronan Menard.
+
+2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SSDP_IPV6_SITELOCAL: new macro.
 	
 	Patch submitted by Ronan Menard.
