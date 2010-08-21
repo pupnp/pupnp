@@ -658,6 +658,65 @@ char *UpnpGetServerUlaGuaIp6Address(void)
 	return gIF_IPV6_ULA_GUA;
 }
 
+
+/*!
+ * \brief Get a free handle.
+ *
+ * \return On success, an integer greater than zero or UPNP_E_OUTOF_HANDLE on
+ * 	failure.
+ */
+static int GetFreeHandle()
+{
+	/* Handle 0 is not used as NULL translates to 0 when passed as a handle */
+	int i = 1;
+
+	while (i < NUM_HANDLE && HandleTable[i] != NULL) {
+		++i;
+	}
+
+	if (i == NUM_HANDLE) {
+		return UPNP_E_OUTOF_HANDLE;
+	} else {
+		return i;
+	}
+}
+
+
+/*!
+ * \brief Free handle.
+ *
+ * \return UPNP_E_SUCCESS if successful or UPNP_E_INVALID_HANDLE if not
+ */
+static int FreeHandle(
+	/*! [in] Handle index. */
+	int Upnp_Handle)
+{
+	int ret = UPNP_E_INVALID_HANDLE;
+
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+		"FreeHandle: entering, Handle is %d\n", Upnp_Handle);
+
+	if (Upnp_Handle < 1 || Upnp_Handle >= NUM_HANDLE) {
+		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+			"FreeHandle: Handle %d is out of range\n",
+			Upnp_Handle);
+	} else if (HandleTable[Upnp_Handle] == NULL) {
+		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+			"FreeHandle: HandleTable[%d] is NULL\n",
+			Upnp_Handle);
+	} else {
+		free( HandleTable[Upnp_Handle] );
+		HandleTable[Upnp_Handle] = NULL;
+		ret = UPNP_E_SUCCESS;
+	}
+
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"FreeHandle: exiting, ret = %d.\n", ret);
+
+	return ret;
+}
+
+
 #ifdef INCLUDE_DEVICE_APIS
 int UpnpRegisterRootDevice(
 	const char *DescUrl,
@@ -3353,23 +3412,6 @@ Upnp_FunPtr GetCallBackFn(UpnpClient_Handle Hnd)
 }
 
 
-int GetFreeHandle()
-{
-	/* Handle 0 is not used as NULL translates to 0 when passed as a handle */
-	int i = 1;
-
-	while (i < NUM_HANDLE && HandleTable[i] != NULL) {
-		++i;
-	}
-
-	if (i == NUM_HANDLE) {
-		return UPNP_E_OUTOF_HANDLE;
-	} else {
-		return i;
-	}
-}
-
-
 /* Assumes at most one client */
 Upnp_Handle_Type GetClientHandleInfo(
 	UpnpClient_Handle *client_handle_out,
@@ -3440,34 +3482,6 @@ Upnp_Handle_Type GetHandleInfo(
 	}
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "GetHandleInfo: exiting\n");
-
-	return ret;
-}
-
-
-int FreeHandle(int Upnp_Handle)
-{
-	int ret = UPNP_E_INVALID_HANDLE;
-
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-		"FreeHandle: entering, Handle is %d\n", Upnp_Handle);
-
-	if (Upnp_Handle < 1 || Upnp_Handle >= NUM_HANDLE) {
-		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
-			"FreeHandle: Handle %d is out of range\n",
-			Upnp_Handle);
-	} else if (HandleTable[Upnp_Handle] == NULL) {
-		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
-			"FreeHandle: HandleTable[%d] is NULL\n",
-			Upnp_Handle);
-	} else {
-		free( HandleTable[Upnp_Handle] );
-		HandleTable[Upnp_Handle] = NULL;
-		ret = UPNP_E_SUCCESS;
-	}
-
-	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-		"FreeHandle: exiting, ret = %d.\n", ret);
 
 	return ret;
 }

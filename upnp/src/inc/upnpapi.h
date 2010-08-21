@@ -272,31 +272,6 @@ int UpnpGetIfInfo(
 	const char *IfName);
 
 
-/*!
- * \brief Initialize handle table.
- */
-void InitHandleList();
-
-
-/*!
- * \brief Get a free handle.
- *
- * \return On success, an integer greater than zero or UPNP_E_OUTOF_HANDLE on
- * 	failure.
- */
-int GetFreeHandle();
-
-
-/*!
- * \brief Free handle.
- *
- * \return UPNP_E_SUCCESS if successful or UPNP_E_INVALID_HANDLE if not
- */
-int FreeHandle(
-	/*! [in] Handle index. */
-	int Handle);
-
-
 void UpnpThreadDistribution(struct UpnpNonblockParam * Param);
 
 
