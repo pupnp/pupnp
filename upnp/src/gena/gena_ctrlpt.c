@@ -321,11 +321,15 @@ static int gena_subscribe(
 	} else {
 		// subscribe
 		if( dest_url.hostport.IPaddress.ss_family == AF_INET6 ) {
+			struct sockaddr_in6* DestAddr6 = (struct sockaddr_in6*)&dest_url.hostport.IPaddress;
 			return_code = http_MakeMessage(
 				&request, 1, 1,
 				"q" "sssdsc" "sc" "sscc",
 				HTTPMETHOD_SUBSCRIBE, &dest_url,
-				"CALLBACK: <http://[", gIF_IPV6, "]:", LOCAL_PORT_V6, "/>",
+				"CALLBACK: <http://[",
+				((IN6_IS_ADDR_LINKLOCAL(DestAddr6))||(strlen(gIF_IPV6_ULA_GUA) == 0 ))?
+						gIF_IPV6 : gIF_IPV6_ULA_GUA,
+				"]:", LOCAL_PORT_V6, "/>",
 				"NT: upnp:event",
 				"TIMEOUT: Second-", timeout_str );
 		} else {
