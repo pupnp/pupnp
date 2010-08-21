@@ -49,6 +49,7 @@ typedef struct MServerSockArray {
 	/* socket for incoming advertisments and search requests */
 	SOCKET ssdpSock4;
 	SOCKET ssdpSock6;
+	SOCKET ssdpSock6UlaGua;
 
 	SOCKET stopPort;
 	SOCKET miniServerPort4;
