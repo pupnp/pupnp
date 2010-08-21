@@ -844,6 +844,7 @@ EXPORT_SPEC char *UpnpGetServerIpAddress(void);
  */
 EXPORT_SPEC char *UpnpGetServerIp6Address(void);
 
+EXPORT_SPEC char *UpnpGetServerUlaGuaIp6Address(void);
 
 /*!
  * \brief Registers a device application with the UPnP Library.
