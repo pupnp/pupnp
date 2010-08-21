@@ -50,8 +50,6 @@
 
 #define DEV_LIMIT 200
 
-#define NUM_HANDLE 200
-
 #define DEFAULT_MX 5
 
 #define DEFAULT_MAXAGE 1800

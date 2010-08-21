@@ -85,7 +85,6 @@
 #endif
 
 
-#define NUM_HANDLE 200
 #define LINE_SIZE  180
 #define NAME_SIZE  256
 #define MNFT_NAME_SIZE  64
