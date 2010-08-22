@@ -390,6 +390,35 @@ CreateClientRequestPacket( IN char *RqstBuf,
     strcat( RqstBuf, "\r\n" );
 }
 
+
+static void CreateClientRequestPacketUlaGua(
+	IN char *RqstBuf,
+	IN int Mx,
+	IN char *SearchTarget,
+	IN int AddressFamily)
+{
+	char TempBuf[COMMAND_LEN];
+
+	strcpy(RqstBuf, "M-SEARCH * HTTP/1.1\r\n");
+	if (AddressFamily == AF_INET) {
+		sprintf(TempBuf, "HOST: %s:%d\r\n", SSDP_IP, SSDP_PORT);
+	} else if (AddressFamily == AF_INET6) {
+		sprintf(TempBuf, "HOST: [%s]:%d\r\n", SSDP_IPV6_SITELOCAL, SSDP_PORT);
+	}
+	strcat(RqstBuf, TempBuf);
+	strcat(RqstBuf, "MAN: \"ssdp:discover\"\r\n");
+	if (Mx > 0) {
+		sprintf(TempBuf, "MX: %d\r\n", Mx);
+		strcat(RqstBuf, TempBuf);
+	}
+	if (SearchTarget) {
+		sprintf(TempBuf, "ST: %s\r\n", SearchTarget);
+		strcat(RqstBuf, TempBuf);
+	}
+	strcat(RqstBuf, "\r\n");
+}
+
+
 /************************************************************************
 * Function : searchExpired
 *
@@ -478,136 +507,152 @@ searchExpired( void *arg )
 * Returns: int
 *	1 if successful else appropriate error
 ***************************************************************************/
-int
-SearchByTarget( IN int Mx,
-                IN char *St,
-                IN void *Cookie )
+int SearchByTarget(
+	IN int Mx,
+	IN char *St,
+	IN void *Cookie)
 {
-    char errorBuffer[ERROR_BUFFER_LEN];
-    int socklen = sizeof( struct sockaddr_storage );
-    int *id = NULL;
-    int ret = 0;
-    char ReqBufv4[BUFSIZE];
-    char ReqBufv6[BUFSIZE];
-    struct sockaddr_storage __ss_v4;
-    struct sockaddr_storage __ss_v6;
-    struct sockaddr_in* destAddr4 = (struct sockaddr_in*)&__ss_v4;
-    struct sockaddr_in6* destAddr6 = (struct sockaddr_in6*)&__ss_v6;
-    fd_set wrSet;
-    SsdpSearchArg *newArg = NULL;
-    int timeTillRead = 0;
-    int handle;
-    struct Handle_Info *ctrlpt_info = NULL;
-    enum SsdpSearchType requestType;
-    unsigned long addrv4 = inet_addr( gIF_IPV4 );
-    int max_fd = 0;
+	char errorBuffer[ERROR_BUFFER_LEN];
+	int socklen = sizeof( struct sockaddr_storage );
+	int *id = NULL;
+	int ret = 0;
+	char ReqBufv4[BUFSIZE];
+	char ReqBufv6[BUFSIZE];
+	char ReqBufv6UlaGua[BUFSIZE];
+	struct sockaddr_storage __ss_v4;
+	struct sockaddr_storage __ss_v6;
+	struct sockaddr_in* destAddr4 = (struct sockaddr_in*)&__ss_v4;
+	struct sockaddr_in6* destAddr6 = (struct sockaddr_in6*)&__ss_v6;
+	fd_set wrSet;
+	SsdpSearchArg *newArg = NULL;
+	int timeTillRead = 0;
+	int handle;
+	struct Handle_Info *ctrlpt_info = NULL;
+	enum SsdpSearchType requestType;
+	unsigned long addrv4 = inet_addr(gIF_IPV4);
+	int max_fd = 0;
 
-    //ThreadData *ThData;
-    ThreadPoolJob job;
+	//ThreadData *ThData;
+	ThreadPoolJob job;
 
-    requestType = ssdp_request_type1( St );
-    if( requestType == SSDP_SERROR ) {
-        return UPNP_E_INVALID_PARAM;
-    }
+	requestType = ssdp_request_type1(St);
+	if (requestType == SSDP_SERROR) {
+		return UPNP_E_INVALID_PARAM;
+	}
 
-    UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, "Inside SearchByTarget\n");
+	UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, "Inside SearchByTarget\n");
 
-    timeTillRead = Mx;
+	timeTillRead = Mx;
+	if (timeTillRead < MIN_SEARCH_TIME) {
+		timeTillRead = MIN_SEARCH_TIME;
+	} else if (timeTillRead > MAX_SEARCH_TIME) {
+		timeTillRead = MAX_SEARCH_TIME;
+	}
 
-    if( timeTillRead < MIN_SEARCH_TIME ) {
-        timeTillRead = MIN_SEARCH_TIME;
-    } else if( timeTillRead > MAX_SEARCH_TIME ) {
-        timeTillRead = MAX_SEARCH_TIME;
-    }
+	CreateClientRequestPacket(ReqBufv4, timeTillRead, St, AF_INET);
+	CreateClientRequestPacket(ReqBufv6, timeTillRead, St, AF_INET6);
+	CreateClientRequestPacketUlaGua(ReqBufv6UlaGua, timeTillRead, St, AF_INET6);
 
-    CreateClientRequestPacket( ReqBufv4, timeTillRead, St, AF_INET );
-    CreateClientRequestPacket( ReqBufv6, timeTillRead, St, AF_INET6 );
+	memset(&__ss_v4, 0, sizeof(__ss_v4));
+	destAddr4->sin_family = AF_INET;
+	inet_pton(AF_INET, SSDP_IP, &destAddr4->sin_addr);
+	destAddr4->sin_port = htons(SSDP_PORT);
 
-    memset( &__ss_v4, 0, sizeof( __ss_v4 ) );
-    destAddr4->sin_family = AF_INET;
-    inet_pton( AF_INET, SSDP_IP, &destAddr4->sin_addr );
-    destAddr4->sin_port = htons( SSDP_PORT );
+	memset(&__ss_v6, 0, sizeof(__ss_v6));
+	destAddr6->sin6_family = AF_INET6;
+	inet_pton(AF_INET6, SSDP_IPV6_SITELOCAL, &destAddr6->sin6_addr);
+	destAddr6->sin6_port = htons(SSDP_PORT);
+	destAddr6->sin6_scope_id = gIF_INDEX;
 
-    memset( &__ss_v6, 0, sizeof( __ss_v6 ) );
-    destAddr6->sin6_family = AF_INET6;
-    inet_pton( AF_INET6, SSDP_IPV6_LINKLOCAL, &destAddr6->sin6_addr );
-    destAddr6->sin6_port = htons( SSDP_PORT );
-    destAddr6->sin6_scope_id = gIF_INDEX;
+	/* add search criteria to list */
+	HandleLock();
+	if (GetClientHandleInfo(&handle, &ctrlpt_info) != HND_CLIENT) {
+		HandleUnlock();
 
-    // add search criteria to list
-    HandleLock();
-    if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
-        HandleUnlock();
-        return UPNP_E_INTERNAL_ERROR;
-    }
+		return UPNP_E_INTERNAL_ERROR;
+	}
 
-    newArg = ( SsdpSearchArg * ) malloc( sizeof( SsdpSearchArg ) );
-    newArg->searchTarget = strdup( St );
-    newArg->cookie = Cookie;
-    newArg->requestType = requestType;
+	newArg = (SsdpSearchArg *)malloc(sizeof(SsdpSearchArg));
+	newArg->searchTarget = strdup(St);
+	newArg->cookie = Cookie;
+	newArg->requestType = requestType;
 
-    id = ( int * )malloc( sizeof( int ) );
-    TPJobInit( &job, ( start_routine ) searchExpired, id );
-    TPJobSetPriority( &job, MED_PRIORITY );
-    TPJobSetFreeFunction( &job, ( free_routine ) free );
+	id = (int *)malloc(sizeof(int));
+	TPJobInit(&job, (start_routine)searchExpired, id);
+	TPJobSetPriority(&job, MED_PRIORITY);
+	TPJobSetFreeFunction(&job, (free_routine)free);
 
-    // Schedule a timeout event to remove search Arg
-    TimerThreadSchedule( &gTimerThread, timeTillRead,
-                         REL_SEC, &job, SHORT_TERM, id );
-    newArg->timeoutEventId = ( *id );
+	/* Schedule a timeout event to remove search Arg */
+	TimerThreadSchedule(&gTimerThread, timeTillRead,
+		REL_SEC, &job, SHORT_TERM, id);
+	newArg->timeoutEventId = *id;
 
-    ListAddTail( &ctrlpt_info->SsdpSearchList, newArg );
-    HandleUnlock();
+	ListAddTail(&ctrlpt_info->SsdpSearchList, newArg);
+	HandleUnlock();
+	/* End of lock */
 
-    FD_ZERO( &wrSet );
-    if( gSsdpReqSocket4 != INVALID_SOCKET ) {
-        setsockopt( gSsdpReqSocket4, IPPROTO_IP, IP_MULTICAST_IF,
-            (char *)&addrv4, sizeof (addrv4) );
-        FD_SET( gSsdpReqSocket4, &wrSet );
-        max_fd = max(max_fd, gSsdpReqSocket4);
-    }
-    if( gSsdpReqSocket6 != INVALID_SOCKET ) {
-        setsockopt( gSsdpReqSocket6, IPPROTO_IPV6, IPV6_MULTICAST_IF,
-            (char *)&gIF_INDEX, sizeof(gIF_INDEX) );
-        FD_SET( gSsdpReqSocket6, &wrSet );
-        max_fd = max(max_fd, gSsdpReqSocket6);
-    }
+	FD_ZERO(&wrSet);
+	if (gSsdpReqSocket4 != INVALID_SOCKET) {
+		setsockopt(gSsdpReqSocket4, IPPROTO_IP, IP_MULTICAST_IF,
+			(char *)&addrv4, sizeof (addrv4));
+		FD_SET(gSsdpReqSocket4, &wrSet);
+		max_fd = max(max_fd, gSsdpReqSocket4);
+	}
+	if (gSsdpReqSocket6 != INVALID_SOCKET) {
+		setsockopt(gSsdpReqSocket6, IPPROTO_IPV6, IPV6_MULTICAST_IF,
+			(char *)&gIF_INDEX, sizeof (gIF_INDEX));
+		FD_SET(gSsdpReqSocket6, &wrSet);
+		max_fd = max(max_fd, gSsdpReqSocket6);
+	}
 
-    ret = select( max_fd + 1, NULL, &wrSet, NULL, NULL );
-    if( ret == -1 ) {
-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-            "SSDP_LIB: Error in select(): %s\n",
-            errorBuffer );
-	    shutdown( gSsdpReqSocket4, SD_BOTH );
-        UpnpCloseSocket( gSsdpReqSocket4 );
-	    shutdown( gSsdpReqSocket6, SD_BOTH );
-        UpnpCloseSocket( gSsdpReqSocket6 );
+	ret = select(max_fd + 1, NULL, &wrSet, NULL, NULL);
+	if (ret == -1) {
+		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+			"SSDP_LIB: Error in select(): %s\n",
+			errorBuffer);
+		shutdown(gSsdpReqSocket4, SD_BOTH);
+		UpnpCloseSocket(gSsdpReqSocket4);
+		shutdown(gSsdpReqSocket6, SD_BOTH);
+		UpnpCloseSocket(gSsdpReqSocket6);
 
-        return UPNP_E_INTERNAL_ERROR;
-    } 
-    if( gSsdpReqSocket6 != INVALID_SOCKET && 
-        FD_ISSET( gSsdpReqSocket6, &wrSet ) ) {
-        int NumCopy = 0;
-        while( NumCopy < NUM_SSDP_COPY ) {
-            sendto( gSsdpReqSocket6, ReqBufv6, strlen( ReqBufv6 ), 0,
-                (struct sockaddr *)&__ss_v6, socklen );
-            NumCopy++;
-            imillisleep( SSDP_PAUSE );
-        }
-    }
-    if( gSsdpReqSocket4 != INVALID_SOCKET && 
-        FD_ISSET( gSsdpReqSocket4, &wrSet ) ) {
-        int NumCopy = 0;
-        while( NumCopy < NUM_SSDP_COPY ) {
-            sendto( gSsdpReqSocket4, ReqBufv4, strlen( ReqBufv4 ), 0,
-                (struct sockaddr *)&__ss_v4, socklen );
-            NumCopy++;
-            imillisleep( SSDP_PAUSE );
-        }
-    } 
+		return UPNP_E_INTERNAL_ERROR;
+	}
+	if (gSsdpReqSocket6 != INVALID_SOCKET && 
+	    FD_ISSET(gSsdpReqSocket6, &wrSet)) {
+		int NumCopy = 0;
 
-    return 1;
+		while (NumCopy < NUM_SSDP_COPY) {
+			sendto(gSsdpReqSocket6,
+				ReqBufv6UlaGua, strlen(ReqBufv6UlaGua), 0,
+				(struct sockaddr *)&__ss_v6, socklen);
+			NumCopy++;
+			imillisleep(SSDP_PAUSE);
+		}
+		NumCopy = 0;
+		inet_pton(AF_INET6, SSDP_IPV6_LINKLOCAL, &destAddr6->sin6_addr);
+		while (NumCopy < NUM_SSDP_COPY) {
+			sendto(gSsdpReqSocket6,
+				ReqBufv6, strlen(ReqBufv6), 0,
+				(struct sockaddr *)&__ss_v6, socklen);
+			NumCopy++;
+			imillisleep(SSDP_PAUSE);
+		}
+	}
+	if (gSsdpReqSocket4 != INVALID_SOCKET && 
+	    FD_ISSET(gSsdpReqSocket4, &wrSet)) {
+		int NumCopy = 0;
+
+		while (NumCopy < NUM_SSDP_COPY) {
+			sendto(gSsdpReqSocket4,
+				ReqBufv4, strlen(ReqBufv4), 0,
+				(struct sockaddr *)&__ss_v4, socklen);
+			NumCopy++;
+			imillisleep(SSDP_PAUSE);
+		}
+	} 
+
+	return 1;
 }
 
 #endif // EXCLUDE_SSDP
