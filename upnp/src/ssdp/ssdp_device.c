@@ -291,6 +291,61 @@ NewRequestHandler( IN struct sockaddr *DestAddr,
     return UPNP_E_SUCCESS;
 }
 
+/**
+ * return 1 if an inet6 @ has been found
+ */
+int extractIPv6address(char *url, char *address)
+{
+	int i = 0;
+	int j = 0;
+	int ret = 0;
+
+	while (url[i] != '[' && url[i] != '\0') {
+		i++;
+	}
+	if( url[i] == '\0') {
+		goto exit_function;
+	}
+
+	/* bracket has been found, we deal with an IPv6 address */
+	i++;
+	while (url[i] != '\0' &&  url[i] != ']' ) {
+		address[j] = url[i];
+		i++;
+		j++;
+	}
+	if (url[i] == '\0') {
+		goto exit_function;
+	}
+
+	if (url[i] == ']') {
+		address[j] = '\0';
+		ret = 1;
+	}
+
+exit_function:
+	return ret;
+}
+
+
+/**
+ * return 1 if the Url contains an ULA or GUA IPv6 address
+ * 0 otherwise
+ */
+int isUrlV6UlaGua(char *descdocUrl)
+{
+	char address[INET6_ADDRSTRLEN];
+	struct in6_addr v6_addr;
+
+	if (extractIPv6address(descdocUrl, address)) {
+		inet_pton(AF_INET6, address, &v6_addr);
+		return !IN6_IS_ADDR_LINKLOCAL(&v6_addr);
+	}
+
+	return 0;
+}
+
+
 /************************************************************************
 * Function : CreateServiceRequestPacket
 *
@@ -312,84 +367,91 @@ NewRequestHandler( IN struct sockaddr *DestAddr,
 * Returns: void
 *
 ***************************************************************************/
-void
-CreateServicePacket( IN int msg_type,
-                     IN char *nt,
-                     IN char *usn,
-                     IN char *location,
-                     IN int duration,
-                     OUT char **packet,
-                     IN int AddressFamily)
+void CreateServicePacket(
+	IN int msg_type,
+	IN char *nt,
+	IN char *usn,
+	IN char *location,
+	IN int duration,
+	OUT char **packet,
+	IN int AddressFamily)
 {
-    int ret_code;
-    char *nts;
-    membuffer buf;
+	int ret_code;
+	char *nts;
+	membuffer buf;
 
-    //Notf=0 means service shutdown, 
-    //Notf=1 means service advertisement, Notf =2 means reply   
+	/* Notf == 0 means service shutdown,
+	 * Notf == 1 means service advertisement,
+	 * Notf == 2 means reply */
+	membuffer_init(&buf);
+	buf.size_inc = 30;
+	*packet = NULL;
 
-    membuffer_init( &buf );
-    buf.size_inc = 30;
+	if (msg_type == MSGTYPE_REPLY) {
+		ret_code = http_MakeMessage(
+			&buf, 1, 1,
+			"R" "sdc" "D" "sc" "ssc" "ssc" "ssc" "S" "Xc" "ssc" "sscc",
+			HTTP_OK,
+			"CACHE-CONTROL: max-age=", duration,
+			"EXT:",
+			"LOCATION: ", location,
+			"OPT: ", "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
+			"01-NLS: ", gUpnpSdkNLSuuid,
+			X_USER_AGENT,
+			"ST: ", nt,
+			"USN: ", usn);
+		if (ret_code != 0) {
+			return;
+		}
+	} else if (msg_type == MSGTYPE_ADVERTISEMENT ||
+		   msg_type == MSGTYPE_SHUTDOWN) {
+		if (msg_type == MSGTYPE_ADVERTISEMENT) {
+			nts = "ssdp:alive";
+		} else {
+      			/* shutdown */
+			nts = "ssdp:byebye";
+		}
+		/* NOTE: The CACHE-CONTROL and LOCATION headers are not present in
+		 * a shutdown msg, but are present here for MS WinMe interop. */
+		char *host = NULL;
+		if (AddressFamily == AF_INET) {
+			host = SSDP_IP;
+		} else {
+			if (isUrlV6UlaGua(location)) {
+				host = "[" SSDP_IPV6_SITELOCAL "]";
+			} else {
+				host = "[" SSDP_IPV6_LINKLOCAL "]";
+			}
+		}
+		ret_code = http_MakeMessage(
+			&buf, 1, 1,
+			"Q" "sssdc" "sdc" "ssc" "ssc" "ssc" "ssc" "ssc" "S" "Xc" "sscc",
+			HTTPMETHOD_NOTIFY, "*", (size_t)1,
+			"HOST: ", host,
+			":", SSDP_PORT,
+			"CACHE-CONTROL: max-age=", duration,
+			"LOCATION: ", location,
+			"OPT: ", "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
+			"01-NLS: ", gUpnpSdkNLSuuid,
+			"NT: ", nt,
+			"NTS: ", nts,
+			X_USER_AGENT,
+			"USN: ", usn );
+		if (ret_code != 0) {
+			return;
+		}
+	} else {
+		/* unknown msg */
+		assert(0);
+	}
 
-    *packet = NULL;
+	/* return msg */
+	*packet = membuffer_detach(&buf);
+	membuffer_destroy(&buf);
 
-    if( msg_type == MSGTYPE_REPLY ) {
-        ret_code = http_MakeMessage(
-            &buf, 1, 1,
-            "R" "sdc" "D" "sc" "ssc" "ssc" "ssc" "S" "Xc" "ssc" "sscc",
-            HTTP_OK,
-            "CACHE-CONTROL: max-age=", duration,
-	    "EXT:",
-            "LOCATION: ", location,
-            "OPT: ", "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
-            "01-NLS: ", gUpnpSdkNLSuuid,
-            X_USER_AGENT,
-            "ST: ", nt,
-            "USN: ", usn);
-        if( ret_code != 0 ) {
-            return;
-        }
-    } else if( msg_type == MSGTYPE_ADVERTISEMENT ||
-               msg_type == MSGTYPE_SHUTDOWN ) {
-        if( msg_type == MSGTYPE_ADVERTISEMENT ) {
-            nts = "ssdp:alive";
-        } else                  // shutdown
-        {
-            nts = "ssdp:byebye";
-        }
-
-        // NOTE: The CACHE-CONTROL and LOCATION headers are not present in
-        //  a shutdown msg, but are present here for MS WinMe interop.
-
-        ret_code = http_MakeMessage(
-            &buf, 1, 1,
-            "Q" "sssdc" "sdc" "ssc" "ssc" "ssc" "ssc" "ssc" "S" "Xc" "sscc",
-            HTTPMETHOD_NOTIFY, "*", (size_t)1,
-            "HOST: ", 
-            (AddressFamily==AF_INET) ? SSDP_IP : "[" SSDP_IPV6_LINKLOCAL "]", 
-            ":", SSDP_PORT,
-            "CACHE-CONTROL: max-age=", duration,
-            "LOCATION: ", location,
-            "OPT: ", "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
-            "01-NLS: ", gUpnpSdkNLSuuid,
-            "NT: ", nt,
-            "NTS: ", nts,
-            X_USER_AGENT,
-            "USN: ", usn );
-        if( ret_code != 0 ) {
-            return;
-        }
-
-    } else {
-        assert( 0 );            // unknown msg
-    }
-
-    *packet = membuffer_detach( &buf ); // return msg
-
-    membuffer_destroy( &buf );
-
-    return;
+	return;
 }
+
 
 /************************************************************************
 * Function : DeviceAdvertisement
@@ -436,7 +498,9 @@ DeviceAdvertisement( IN char *DevType,
         DestAddr4->sin_port = htons( SSDP_PORT );
     } else if( AddressFamily == AF_INET6 ) {
         DestAddr6->sin6_family = AF_INET6;
-        inet_pton( AF_INET6, SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr );
+	inet_pton(AF_INET6,
+		(isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL : SSDP_IPV6_LINKLOCAL,
+		&DestAddr6->sin6_addr );
         DestAddr6->sin6_port = htons( SSDP_PORT );
         DestAddr6->sin6_scope_id = gIF_INDEX;
     } else {
@@ -683,7 +747,9 @@ ServiceAdvertisement( IN char *Udn,
         DestAddr4->sin_port = htons( SSDP_PORT );
     } else if( AddressFamily == AF_INET6 ) {
         DestAddr6->sin6_family = AF_INET6;
-        inet_pton( AF_INET6, SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr );
+	inet_pton(AF_INET6,
+		(isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL : SSDP_IPV6_LINKLOCAL,
+		&DestAddr6->sin6_addr );
         DestAddr6->sin6_port = htons( SSDP_PORT );
         DestAddr6->sin6_scope_id = gIF_INDEX;
     } else {
@@ -787,7 +853,9 @@ ServiceShutdown( IN char *Udn,
         DestAddr4->sin_port = htons( SSDP_PORT );
     } else if( AddressFamily == AF_INET6 ) {
         DestAddr6->sin6_family = AF_INET6;
-        inet_pton( AF_INET6, SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr );
+	inet_pton(AF_INET6,
+		(isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL : SSDP_IPV6_LINKLOCAL,
+		&DestAddr6->sin6_addr );
         DestAddr6->sin6_port = htons( SSDP_PORT );
         DestAddr6->sin6_scope_id = gIF_INDEX;
     } else {
@@ -855,7 +923,9 @@ DeviceShutdown( IN char *DevType,
         DestAddr4->sin_port = htons( SSDP_PORT );
     } else if( AddressFamily == AF_INET6 ) {
         DestAddr6->sin6_family = AF_INET6;
-        inet_pton( AF_INET6, SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr );
+	inet_pton(AF_INET6,
+		(isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL : SSDP_IPV6_LINKLOCAL,
+		&DestAddr6->sin6_addr );
         DestAddr6->sin6_port = htons( SSDP_PORT );
         DestAddr6->sin6_scope_id = gIF_INDEX;
     } else {

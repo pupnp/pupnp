@@ -3,6 +3,13 @@ Version 1.6.7
 *******************************************************************************
 
 2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* upnp/src/ssdp/ssdp_device.c: Fix for IPV6 ULA/GUA issues.
+	* upnp/src/ssdp/ssdp_ctrlpt.c: Fix for IPV6 ULA/GUA issues.
+	* upnp/src/ssdp/ssdp_server.c: Fix for IPV6 ULA/GUA issues.
+	
+	Patch submitted by Ronan Menard.
+
+2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* upnp/src/genlib/miniserver/miniserver.c: Fix for IPV6 ULA/GUA issues.
 	
 	Patch submitted by Ronan Menard.
