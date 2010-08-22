@@ -197,9 +197,9 @@ void UpnpDiscovery_set_DeviceType(UpnpDiscovery *p, const UpnpString *s)
 
 void UpnpDiscovery_strcpy_DeviceType(UpnpDiscovery *p, const char *s)
 {
-	UpnpString_delete(((struct SUpnpDiscovery *)p)->m_deviceID);
-	((struct SUpnpDiscovery *)p)->m_deviceID = UpnpString_new();
-	UpnpString_set_String(((struct SUpnpDiscovery *)p)->m_deviceID, s);
+	UpnpString_delete(((struct SUpnpDiscovery *)p)->m_deviceType);
+	((struct SUpnpDiscovery *)p)->m_deviceType = UpnpString_new();
+	UpnpString_set_String(((struct SUpnpDiscovery *)p)->m_deviceType, s);
 }
 
 

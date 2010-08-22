@@ -2,6 +2,11 @@
 Version 1.8.0
 *******************************************************************************
 
+2010-08-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* upnp/src/api/Discovery.c: Fix a serious bug and memory leak in
+	UpnpDiscovery_strcpy_DeviceType(). Thanks to David Blanchet for the
+	patch.
+
 2010-04-25 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	Separation of the ClientSubscription object.
 
