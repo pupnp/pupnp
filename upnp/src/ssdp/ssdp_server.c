@@ -243,15 +243,13 @@ int AdvertiseAndReply(
 				if (DeviceUDN && strlen(DeviceUDN) != 0) {
 					if (strcasecmp(DeviceUDN, UDNstr)) {
 						UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-							"DeviceUDN=%s and search "
-							"UDN=%s did not match\n",
+							"DeviceUDN=%s and search UDN=%s DID NOT match\n",
 							UDNstr, DeviceUDN);
 						break;
 					} else {
 						UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-							"DeviceUDN=%s and search "
-							"UDN=%s MATCH\n", UDNstr,
-							DeviceUDN);
+							"DeviceUDN=%s and search UDN=%s MATCH\n",
+							UDNstr, DeviceUDN);
 						SendReply(DestAddr, devType, 0,
 							UDNstr, SInfo->DescURL,
 							defaultExp, 0);
@@ -270,8 +268,7 @@ int AdvertiseAndReply(
 						SendReply(DestAddr, DeviceType, 0, UDNstr, SInfo->DescURL, defaultExp, 1);
 					} else {
 						UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-							"DeviceType=%s and search devType=%s"
-							" DID NOT MATCH\n",
+							"DeviceType=%s and search devType=%s DID NOT MATCH\n",
 							devType, DeviceType);
 					}
 				} else {
