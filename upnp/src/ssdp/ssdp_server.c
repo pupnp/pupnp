@@ -261,9 +261,6 @@ int AdvertiseAndReply(
 			}
 			case SSDP_DEVICETYPE: {
 				if (!strncasecmp(DeviceType, devType, strlen(DeviceType))) {
-					/* (char *) support for atoi */
-					/* TODO: Patch pending. */
-#if 0
 					if (atoi(&DeviceType[strlen(DeviceType)-1]) <= atoi(&devType[strlen(devType)-1])) {
 						/* the requested version is lower than the device version
 						 * must reply with the lower version number */
@@ -277,12 +274,6 @@ int AdvertiseAndReply(
 							" DID NOT MATCH\n",
 							devType, DeviceType);
 					}
-#else
-					UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-						"DeviceType=%s and search devType=%s MATCH\n",
-						devType, DeviceType);
-					SendReply(DestAddr, devType, 0, UDNstr, SInfo->DescURL, defaultExp, 1);
-#endif
 				} else {
 					UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 						"DeviceType=%s and search devType=%s DID NOT MATCH\n",
@@ -363,10 +354,7 @@ int AdvertiseAndReply(
 					break;
 				case SSDP_SERVICE:
 					if (ServiceType) {
-						/* TODO: Patch pending. */
-#if 0
 						if (!strncasecmp(ServiceType, servType, strlen(ServiceType) - 2)) {
-							/*ServiceReply(DestAddr, servType, UDNstr, SInfo->DescURL, defaultExp);*/
 							if (atoi(&ServiceType[strlen(ServiceType)-1]) <= atoi(&servType[strlen(servType)-1])) {
 								/* the requested version is lower than the service version
 								 * must reply with the lower version number */
@@ -379,13 +367,6 @@ int AdvertiseAndReply(
 									"ServiceType=%s and search servType=%s DID NOT MATCH\n",
 									ServiceType, servType);
 							}
-#else
-						if (!strncasecmp(ServiceType, servType, strlen(ServiceType))) {
-							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-								"ServiceType=%s and search servType=%s MATCH\n",
-								ServiceType, servType);
-							ServiceReply(DestAddr, servType, UDNstr, SInfo->DescURL, defaultExp);
-#endif
 						} else {
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								"ServiceType=%s and search servType=%s DID NOT MATCH\n",
