@@ -178,71 +178,76 @@ static UPNP_INLINE int notify_send_and_recv(
 	/*! [out] The response from the control point. */
 	http_parser_t *response)
 {
-    uri_type url;
-    int conn_fd;
-    membuffer start_msg;
-    int ret_code;
-    int err_code;
-    int timeout;
-    SOCKINFO info;
+	uri_type url;
+	int conn_fd;
+	membuffer start_msg;
+	int ret_code;
+	int err_code;
+	int timeout;
+	SOCKINFO info;
 
-    // connect
-    UpnpPrintf( UPNP_ALL, GENA, __FILE__, __LINE__,
-        "gena notify to: %.*s\n",
-        (int)destination_url->hostport.text.size,
-        destination_url->hostport.text.buff );
+	/* connect */
+	UpnpPrintf(UPNP_ALL, GENA, __FILE__, __LINE__,
+		"gena notify to: %.*s\n",
+		(int)destination_url->hostport.text.size,
+		destination_url->hostport.text.buff);
 
-    conn_fd = http_Connect( destination_url, &url );
-    if( conn_fd < 0 ) {
-        return conn_fd;         // return UPNP error
-    }
+	conn_fd = http_Connect(destination_url, &url);
+	if (conn_fd < 0) {
+		/* return UPNP error */
 
-    if( ( ret_code = sock_init( &info, conn_fd ) ) != 0 ) {
-        sock_destroy( &info, SD_BOTH );
-        return ret_code;
-    }
-    // make start line and HOST header
-    membuffer_init( &start_msg );
-    if (http_MakeMessage(
-        &start_msg, 1, 1,
-        "q" "s",
-        HTTPMETHOD_NOTIFY, &url,
-        mid_msg->buf ) != 0 ) {
-        membuffer_destroy( &start_msg );
-        sock_destroy( &info, SD_BOTH );
-        return UPNP_E_OUTOF_MEMORY;
-    }
+		return conn_fd;
+	}
 
-    timeout = HTTP_DEFAULT_TIMEOUT;
+	ret_code = sock_init(&info, conn_fd);
+	if (ret_code) {
+		sock_destroy(&info, SD_BOTH);
 
-    // send msg (note: end of notification will contain "\r\n" twice)
-    if( ( ret_code = http_SendMessage( &info, &timeout,
-                                       "bbb",
-                                       start_msg.buf, start_msg.length,
-                                       propertySet,
-                                       strlen( propertySet ),
-                                       "\r\n", strlen( "\r\n" ) ) ) !=
-        0 ) {
-        membuffer_destroy( &start_msg );
-        sock_destroy( &info, SD_BOTH );
-        return ret_code;
-    }
+		return ret_code;
+	}
+	/* make start line and HOST header */
+	membuffer_init(&start_msg);
+	if (http_MakeMessage(
+			&start_msg, 1, 1,
+			"q" "s",
+			HTTPMETHOD_NOTIFY, &url,
+			mid_msg->buf) != 0) {
+		membuffer_destroy(&start_msg);
+		sock_destroy(&info, SD_BOTH);
 
-    if( ( ret_code = http_RecvMessage( &info, response,
-                                       HTTPMETHOD_NOTIFY, &timeout,
-                                       &err_code ) ) != 0 ) {
-        membuffer_destroy( &start_msg );
-        sock_destroy( &info, SD_BOTH );
-        httpmsg_destroy( &response->msg );
-        return ret_code;
-    }
+		return UPNP_E_OUTOF_MEMORY;
+	}
 
-    sock_destroy( &info, SD_BOTH ); //should shutdown completely
-    //when closing socket
-    //  sock_destroy( &info,SD_RECEIVE);
-    membuffer_destroy( &start_msg );
+	timeout = HTTP_DEFAULT_TIMEOUT;
 
-    return UPNP_E_SUCCESS;
+	/* send msg (note: end of notification will contain "\r\n" twice) */
+	ret_code = http_SendMessage(&info, &timeout,
+		"bbb",
+		start_msg.buf, start_msg.length,
+		propertySet, strlen(propertySet),
+		"\r\n", 2);
+	if (ret_code) {
+		membuffer_destroy(&start_msg);
+		sock_destroy(&info, SD_BOTH);
+
+		return ret_code;
+	}
+
+	ret_code = http_RecvMessage(&info, response,
+		HTTPMETHOD_NOTIFY, &timeout, &err_code);
+	if (ret_code) {
+		membuffer_destroy(&start_msg);
+		sock_destroy(&info, SD_BOTH);
+		httpmsg_destroy(&response->msg);
+
+		return ret_code;
+	}
+
+	/* should shutdown completely when closing socket */
+	sock_destroy(&info, SD_BOTH);
+	membuffer_destroy(&start_msg);
+
+	return UPNP_E_SUCCESS;
 }
 
 
