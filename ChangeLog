@@ -3,6 +3,12 @@ Version 1.6.7
 *******************************************************************************
 
 2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	* Issue regarding the GENA notifications. A string termination indicator
+	was added at the end of the notification ("\r\n") in
+	notify_send_and_recv() in upnp/src/gena/gena_device.c.
+	Patch by Fabrice Fontaine.
+
+2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* The last part of Ronan Menard's patch.
 
 2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>

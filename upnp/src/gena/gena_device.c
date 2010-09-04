@@ -215,12 +215,13 @@ static UPNP_INLINE int notify_send_and_recv(
 
     timeout = HTTP_DEFAULT_TIMEOUT;
 
-    // send msg (note +1 for propertyset; null-terminator is also sent)
+    // send msg (note: end of notification will contain "\r\n" twice)
     if( ( ret_code = http_SendMessage( &info, &timeout,
-                                       "bb",
+                                       "bbb",
                                        start_msg.buf, start_msg.length,
                                        propertySet,
-                                       strlen( propertySet ) + 1 ) ) !=
+                                       strlen( propertySet ),
+                                       "\r\n", strlen( "\r\n" ) ) ) !=
         0 ) {
         membuffer_destroy( &start_msg );
         sock_destroy( &info, SD_BOTH );
