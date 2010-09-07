@@ -47,15 +47,17 @@
 
 
 #ifdef WIN32
-#else
+#else /* WIN32 */
 	#include <syslog.h>
 	#include <sys/socket.h>
-	#include <netinet/in_systm.h>
-	#include <netinet/ip.h>
-	#include <netinet/ip_icmp.h>
+	#ifndef __APPLE__
+		#include <netinet/in_systm.h>
+		#include <netinet/ip.h>
+		#include <netinet/ip_icmp.h>
+	#endif /* __APPLE__ */
 	#include <sys/time.h>
 	#include <arpa/inet.h>
-#endif
+#endif /* WIN32 */
 
 
 /* Enumeration to define all different types of ssdp searches */
