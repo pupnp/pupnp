@@ -45,9 +45,13 @@
 
 #include "UpnpGlobal.h" /* For EXPORT_SPEC */
 
-
-typedef int BOOL;
-
+/* Define BOOL. */
+#ifndef __OBJC__ 
+	typedef int BOOL;
+#else
+	/* For Objective C compilers, include objc.h which defines BOOL. */
+	#include <objc/objc.h>
+#endif
 
 /*!
  * \brief The type of DOM strings.
