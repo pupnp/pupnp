@@ -217,6 +217,12 @@ Version 1.6.7
 *******************************************************************************
 
 2010-09-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	Fix compilation error in upnp/src/gena/gena_ctrlpt.c (this is most
+	likely an error on all platforms).
+
+	Patch submitted by Chandra (inactiveneurons).
+
+2010-09-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	Fix compilation error in upnp/src/inc/ssdplib.h when compiling in OS X
 	(the netinet/* headers are not available).
 

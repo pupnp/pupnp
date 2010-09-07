@@ -316,18 +316,18 @@ static int gena_subscribe(
 			"TIMEOUT: Second-", timeout_str );
 	} else {
 		// subscribe
-		if( dest_url.hostport.IPaddress.ss_family == AF_INET6 ) {
+		if (dest_url.hostport.IPaddress.ss_family == AF_INET6) {
 			struct sockaddr_in6* DestAddr6 = (struct sockaddr_in6*)&dest_url.hostport.IPaddress;
 			return_code = http_MakeMessage(
 				&request, 1, 1,
 				"q" "sssdsc" "sc" "sscc",
 				HTTPMETHOD_SUBSCRIBE, &dest_url,
 				"CALLBACK: <http://[",
-				((IN6_IS_ADDR_LINKLOCAL(DestAddr6))||(strlen(gIF_IPV6_ULA_GUA) == 0 ))?
-						gIF_IPV6 : gIF_IPV6_ULA_GUA,
+				(IN6_IS_ADDR_LINKLOCAL(&DestAddr6->sin6_addr) || strlen(gIF_IPV6_ULA_GUA) == 0) ?
+					gIF_IPV6 : gIF_IPV6_ULA_GUA,
 				"]:", LOCAL_PORT_V6, "/>",
 				"NT: upnp:event",
-				"TIMEOUT: Second-", timeout_str );
+				"TIMEOUT: Second-", timeout_str);
 		} else {
 			return_code = http_MakeMessage(
 				&request, 1, 1,
