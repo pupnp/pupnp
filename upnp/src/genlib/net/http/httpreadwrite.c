@@ -176,31 +176,35 @@ http_FixStrUrl( IN const char *urlstr,
  *	UPNP_E_OUTOF_SOCKET
  *	UPNP_E_SOCKET_CONNECT on error
  ************************************************************************/
-int
-http_Connect( IN uri_type * destination_url,
-              OUT uri_type * url )
+int http_Connect(
+	IN uri_type *destination_url,
+	OUT uri_type *url)
 {
-    int connfd;
+	int connfd;
+	int sockaddr_len;
+	int ret_connect;
 
-    http_FixUrl( destination_url, url );
+	http_FixUrl(destination_url, url);
 
-    connfd = socket( url->hostport.IPaddress.ss_family, SOCK_STREAM, 0 );
-    if( connfd == -1 ) {
-        return UPNP_E_OUTOF_SOCKET;
-    }
-
-    if( connect( connfd, ( struct sockaddr * )&url->hostport.IPaddress,
-                 sizeof( url->hostport.IPaddress ) ) == -1 ) {
+	connfd = socket(url->hostport.IPaddress.ss_family, SOCK_STREAM, 0);
+	if (connfd == -1) {
+		return UPNP_E_OUTOF_SOCKET;
+	}
+	sockaddr_len = url->hostport.IPaddress.ss_family == AF_INET6 ?
+		sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
+	ret_connect = connect(connfd,
+		(struct sockaddr *)&url->hostport.IPaddress, sockaddr_len);
+	if (ret_connect == -1) {
 #ifdef WIN32
-        UpnpPrintf(UPNP_CRITICAL, HTTP, __FILE__, __LINE__,
-            "connect error: %d\n", WSAGetLastError());
+		UpnpPrintf(UPNP_CRITICAL, HTTP, __FILE__, __LINE__,
+			"connect error: %d\n", WSAGetLastError());
 #endif
-        shutdown( connfd, SD_BOTH );
-        UpnpCloseSocket( connfd );
-        return UPNP_E_SOCKET_CONNECT;
-    }
+		shutdown(connfd, SD_BOTH);
+		UpnpCloseSocket(connfd);
+		return UPNP_E_SOCKET_CONNECT;
+	}
 
-    return connfd;
+	return connfd;
 }
 
 
@@ -536,55 +540,57 @@ end:
  *	Error Codes returned by http_SendMessage
  *	Error Codes returned by http_RecvMessage
  ************************************************************************/
-int
-http_RequestAndResponse( IN uri_type * destination,
-                         IN const char *request,
-                         IN size_t request_length,
-                         IN http_method_t req_method,
-                         IN int timeout_secs,
-                         OUT http_parser_t * response )
+int http_RequestAndResponse(
+	IN uri_type *destination,
+	IN const char *request,
+	IN size_t request_length,
+	IN http_method_t req_method,
+	IN int timeout_secs,
+	OUT http_parser_t *response)
 {
-    int tcp_connection;
-    int ret_code;
-    int http_error_code;
-    SOCKINFO info;
+	int tcp_connection;
+	int ret_code;
+	int sockaddr_len;
+	int http_error_code;
+	SOCKINFO info;
 
-    tcp_connection = socket( destination->hostport.IPaddress.ss_family, SOCK_STREAM, 0 );
-    if( tcp_connection == -1 ) {
-        parser_response_init( response, req_method );
-        return UPNP_E_SOCKET_ERROR;
-    }
-    if( sock_init( &info, tcp_connection ) != UPNP_E_SUCCESS )
-    {
-        sock_destroy( &info, SD_BOTH );
-        parser_response_init( response, req_method );
-        return UPNP_E_SOCKET_ERROR;
-    }
-    // connect
-    ret_code = connect( info.socket,
-                        ( struct sockaddr * )&destination->hostport.
-                        IPaddress, sizeof( struct sockaddr_storage ) );
+	tcp_connection = socket(
+		destination->hostport.IPaddress.ss_family, SOCK_STREAM, 0);
+	if (tcp_connection == -1) {
+		parser_response_init(response, req_method);
+		return UPNP_E_SOCKET_ERROR;
+	}
+	if (sock_init(&info, tcp_connection) != UPNP_E_SUCCESS) {
+		parser_response_init(response, req_method);
+		ret_code = UPNP_E_SOCKET_ERROR;
+		goto end_function;
+	}
+	/* connect */
+	sockaddr_len = destination->hostport.IPaddress.ss_family == AF_INET6 ?
+		sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
+	ret_code = connect(info.socket,
+		(struct sockaddr *)&(destination->hostport.IPaddress), sockaddr_len);
+	if (ret_code == -1) {
+		parser_response_init(response, req_method);
+		ret_code = UPNP_E_SOCKET_CONNECT;
+		goto end_function;
+	}
+	/* send request */
+	ret_code = http_SendMessage(&info, &timeout_secs, "b",
+		request, request_length);
+	if (ret_code != 0) {
+		parser_response_init(response, req_method);
+		goto end_function;
+	}
+	/* recv response */
+	ret_code = http_RecvMessage(&info, response, req_method,
+		&timeout_secs, &http_error_code);
 
-    if( ret_code == -1 ) {
-        sock_destroy( &info, SD_BOTH );
-        parser_response_init( response, req_method );
-        return UPNP_E_SOCKET_CONNECT;
-    }
-    // send request
-    ret_code = http_SendMessage( &info, &timeout_secs, "b",
-                                 request, request_length );
-    if( ret_code != 0 ) {
-        sock_destroy( &info, SD_BOTH );
-        parser_response_init( response, req_method );
-        return ret_code;
-    }
-    // recv response
-    ret_code = http_RecvMessage( &info, response, req_method,
-                                 &timeout_secs, &http_error_code );
+end_function:
+	/* should shutdown completely */
+	sock_destroy(&info, SD_BOTH);
 
-    sock_destroy( &info, SD_BOTH ); //should shutdown completely
-
-    return ret_code;
+	return ret_code;
 }
 
 
@@ -1000,73 +1006,67 @@ http_CloseHttpPost( IN void *Handle,
  *	UPNP_E_SOCKET_ERROR
  *	UPNP_E_SOCKET_CONNECT
  ************************************************************************/
-int
-http_OpenHttpPost( IN const char *url_str,
-                   IN OUT void **Handle,
-                   IN const char *contentType,
-                   IN int contentLength,
-                   IN int timeout )
+int http_OpenHttpPost(
+	IN const char *url_str,
+	IN OUT void **Handle,
+	IN const char *contentType,
+	IN int contentLength,
+	IN int timeout)
 {
-    int ret_code;
-    int tcp_connection;
-    membuffer request;
-    http_post_handle_t *handle = NULL;
-    uri_type url;
+	int ret_code;
+	int sockaddr_len;
+	int tcp_connection;
+	membuffer request;
+	http_post_handle_t *handle = NULL;
+	uri_type url;
 
-    if( ( !url_str ) || ( !Handle ) || ( !contentType ) ) {
-        return UPNP_E_INVALID_PARAM;
-    }
+	if ( !url_str || !Handle || !contentType) {
+		return UPNP_E_INVALID_PARAM;
+	}
 
-    ( *Handle ) = handle;
+	*Handle = handle;
 
-    if( ( ret_code =
-          MakePostMessage( url_str, &request, &url, contentLength,
-                           contentType ) ) != UPNP_E_SUCCESS ) {
-        return ret_code;
-    }
+	ret_code = MakePostMessage(url_str, &request, &url,
+		contentLength, contentType);
+	if (ret_code != UPNP_E_SUCCESS) {
+		return ret_code;
+	}
+	handle = (http_post_handle_t *) malloc(sizeof(http_post_handle_t));
+	if (!handle) {
+		return UPNP_E_OUTOF_MEMORY;
+	}
+	handle->contentLength = contentLength;
+	tcp_connection = socket(url.hostport.IPaddress.ss_family, SOCK_STREAM, 0);
+	if (tcp_connection == -1) {
+		ret_code = UPNP_E_SOCKET_ERROR;
+		goto errorHandler;
+	}
+	if (sock_init(&handle->sock_info, tcp_connection) != UPNP_E_SUCCESS) {
+		sock_destroy( &handle->sock_info, SD_BOTH );
+		ret_code = UPNP_E_SOCKET_ERROR;
+		goto errorHandler;
+	}
+	sockaddr_len = url.hostport.IPaddress.ss_family == AF_INET6 ?
+		sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
+	ret_code = connect(handle->sock_info.socket,
+		(struct sockaddr *)&(url.hostport.IPaddress), sockaddr_len);
+	if (ret_code == -1) {
+		sock_destroy(&handle->sock_info, SD_BOTH);
+		ret_code = UPNP_E_SOCKET_CONNECT;
+		goto errorHandler;
+	}
+	/* send request */
+	ret_code = http_SendMessage(&handle->sock_info, &timeout, "b",
+		request.buf, request.length);
+	if (ret_code != 0) {
+		sock_destroy(&handle->sock_info, SD_BOTH);
+	}
 
-    handle =
-        ( http_post_handle_t * ) malloc( sizeof( http_post_handle_t ) );
+errorHandler:
+	membuffer_destroy(&request);
+	*Handle = handle;
 
-    if( handle == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
-    }
-
-    handle->contentLength = contentLength;
-
-    tcp_connection = socket( url.hostport.IPaddress.ss_family, SOCK_STREAM, 0 );
-    if( tcp_connection == -1 ) {
-        ret_code = UPNP_E_SOCKET_ERROR;
-        goto errorHandler;
-    }
-
-    if( sock_init( &handle->sock_info, tcp_connection ) != UPNP_E_SUCCESS )
-    {
-        sock_destroy( &handle->sock_info, SD_BOTH );
-        ret_code = UPNP_E_SOCKET_ERROR;
-        goto errorHandler;
-    }
-
-    ret_code = connect( handle->sock_info.socket,
-                        ( struct sockaddr * )&url.hostport.IPaddress,
-                        sizeof( struct sockaddr_storage ) );
-
-    if( ret_code == -1 ) {
-        sock_destroy( &handle->sock_info, SD_BOTH );
-        ret_code = UPNP_E_SOCKET_CONNECT;
-        goto errorHandler;
-    }
-    // send request
-    ret_code = http_SendMessage( &handle->sock_info, &timeout, "b",
-                                 request.buf, request.length );
-    if( ret_code != 0 ) {
-        sock_destroy( &handle->sock_info, SD_BOTH );
-    }
-
-  errorHandler:
-    membuffer_destroy( &request );
-    ( *Handle ) = handle;
-    return ret_code;
+	return ret_code;
 }
 
 typedef struct HTTPGETHANDLE {
@@ -1565,133 +1565,119 @@ http_OpenHttpGet( IN const char *url_str,
  *	UPNP_E_SOCKET_ERROR
  *	UPNP_E_BAD_RESPONSE
  ************************************************************************/
-int
-http_OpenHttpGetProxy( IN const char *url_str,
-                  IN const char *proxy_str,
-                  IN OUT void **Handle,
-                  IN OUT char **contentType,
-                  OUT int *contentLength,
-                  OUT int *httpStatus,
-                  IN int timeout )
+int http_OpenHttpGetProxy(
+	IN const char *url_str,
+	IN const char *proxy_str,
+	IN OUT void **Handle,
+	IN OUT char **contentType,
+	OUT int *contentLength,
+	OUT int *httpStatus,
+	IN int timeout)
 {
-    int ret_code;
-    int http_error_code;
-    memptr ctype;
-    int tcp_connection;
-    membuffer request;
-    http_get_handle_t *handle = NULL;
-    uri_type url;
-    uri_type proxy;
-    uri_type *peer;
-    parse_status_t status;
+	int ret_code;
+	int sockaddr_len;
+	int http_error_code;
+	memptr ctype;
+	int tcp_connection;
+	membuffer request;
+	http_get_handle_t *handle = NULL;
+	uri_type url;
+	uri_type proxy;
+	uri_type *peer;
+	parse_status_t status;
 
-    if( ( !url_str ) || ( !Handle ) || ( !contentType )
-        || ( !httpStatus ) ) {
-        return UPNP_E_INVALID_PARAM;
-    }
+	if (!url_str || !Handle || !contentType || !httpStatus ) {
+		return UPNP_E_INVALID_PARAM;
+	}
 
-    ( *httpStatus ) = 0;
-    ( *Handle ) = handle;
-    ( *contentType ) = NULL;
-    ( *contentLength ) = 0;
+	*httpStatus = 0;
+	*Handle = handle;
+	*contentType = NULL;
+	*contentLength = 0;
 
-    if( ( ret_code =
-          MakeGetMessage( url_str, proxy_str, &request, &url ) ) != UPNP_E_SUCCESS ) {
-        return ret_code;
-    }
-    if( proxy_str ) {
-        ret_code = http_FixStrUrl( ( char * )proxy_str, strlen( proxy_str ), &proxy );
-        peer = &proxy;
-    } else {
-        peer = &url;
-    }
+	ret_code = MakeGetMessage(url_str, proxy_str, &request, &url);
+	if (ret_code != UPNP_E_SUCCESS) {
+		return ret_code;
+	}
+	if (proxy_str) {
+		ret_code = http_FixStrUrl((char *)proxy_str, strlen(proxy_str), &proxy);
+		peer = &proxy;
+	} else {
+		peer = &url;
+	}
+	handle = (http_get_handle_t *)malloc(sizeof(http_get_handle_t));
+	if (!handle) {
+		return UPNP_E_OUTOF_MEMORY;
+	}
+	handle->entity_offset = 0;
+	handle->cancel = 0;
+	parser_response_init(&handle->response, HTTPMETHOD_GET);
+	tcp_connection = socket(peer->hostport.IPaddress.ss_family, SOCK_STREAM, 0);
+	if (tcp_connection == -1) {
+		ret_code = UPNP_E_SOCKET_ERROR;
+		goto errorHandler;
+	}
+	if (sock_init(&handle->sock_info, tcp_connection) != UPNP_E_SUCCESS) {
+		sock_destroy(&handle->sock_info, SD_BOTH);
+		ret_code = UPNP_E_SOCKET_ERROR;
+		goto errorHandler;
+	}
+	sockaddr_len = peer->hostport.IPaddress.ss_family == AF_INET6 ?
+		sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
+	ret_code = connect(handle->sock_info.socket,
+		(struct sockaddr *)&(peer->hostport.IPaddress), sockaddr_len);
+	if (ret_code == -1) {
+		sock_destroy(&handle->sock_info, SD_BOTH);
+		ret_code = UPNP_E_SOCKET_CONNECT;
+		goto errorHandler;
+	}
+	/* send request */
+	ret_code = http_SendMessage(&handle->sock_info, &timeout, "b",
+		request.buf, request.length);
+	if (ret_code) {
+		sock_destroy(&handle->sock_info, SD_BOTH);
+		goto errorHandler;
+	}
 
-    handle = ( http_get_handle_t * ) malloc( sizeof( http_get_handle_t ) );
+	status = ReadResponseLineAndHeaders(&handle->sock_info,
+		&handle->response, &timeout, &http_error_code);
+	if (status != PARSE_OK) {
+		ret_code = UPNP_E_BAD_RESPONSE;
+		goto errorHandler;
+	}
+	status = parser_get_entity_read_method(&handle->response);
+	if (status != PARSE_CONTINUE_1 && status != PARSE_SUCCESS) {
+		ret_code = UPNP_E_BAD_RESPONSE;
+		goto errorHandler;
+	}
 
-    if( handle == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	*httpStatus = handle->response.msg.status_code;
+	ret_code = UPNP_E_SUCCESS;
 
-    handle->entity_offset = 0;
-    handle->cancel = 0;
-    parser_response_init( &handle->response, HTTPMETHOD_GET );
+	if (!httpmsg_find_hdr(&handle->response.msg, HDR_CONTENT_TYPE, &ctype)) {
+		/* no content-type */
+		*contentType = NULL;
+	} else {
+		*contentType = ctype.buf;
+	}
 
-    tcp_connection = socket( peer->hostport.IPaddress.ss_family, SOCK_STREAM, 0 );
-    if( tcp_connection == -1 ) {
-        ret_code = UPNP_E_SOCKET_ERROR;
-        goto errorHandler;
-    }
+	if (handle->response.position == POS_COMPLETE) {
+		*contentLength = 0;
+	} else if (handle->response.ent_position == ENTREAD_USING_CHUNKED) {
+		*contentLength = UPNP_USING_CHUNKED;
+	} else if (handle->response.ent_position == ENTREAD_USING_CLEN) {
+		*contentLength = handle->response.content_length;
+	} else if (handle->response.ent_position == ENTREAD_UNTIL_CLOSE) {
+		*contentLength = UPNP_UNTIL_CLOSE;
+	}
 
-    if( sock_init( &handle->sock_info, tcp_connection ) != UPNP_E_SUCCESS )
-    {
-        sock_destroy( &handle->sock_info, SD_BOTH );
-        ret_code = UPNP_E_SOCKET_ERROR;
-        goto errorHandler;
-    }
-
-    ret_code = connect( handle->sock_info.socket,
-                        ( struct sockaddr * )&peer->hostport.IPaddress,
-                        sizeof( struct sockaddr_storage ) );
-
-    if( ret_code == -1 ) {
-        sock_destroy( &handle->sock_info, SD_BOTH );
-        ret_code = UPNP_E_SOCKET_CONNECT;
-        goto errorHandler;
-    }
-    // send request
-    ret_code = http_SendMessage( &handle->sock_info, &timeout, "b",
-                                 request.buf, request.length );
-    if( ret_code != 0 ) {
-        sock_destroy( &handle->sock_info, SD_BOTH );
-        goto errorHandler;
-    }
-
-    status =
-        ReadResponseLineAndHeaders( &handle->sock_info, &handle->response,
-                                    &timeout, &http_error_code );
-
-    if( status != PARSE_OK ) {
-        ret_code = UPNP_E_BAD_RESPONSE;
-        goto errorHandler;
-    }
-
-    status = parser_get_entity_read_method( &handle->response );
-
-    if( ( status != PARSE_CONTINUE_1 ) && ( status != PARSE_SUCCESS ) ) {
-        ret_code = UPNP_E_BAD_RESPONSE;
-        goto errorHandler;
-    }
-
-    ( *httpStatus ) = handle->response.msg.status_code;
-    ret_code = UPNP_E_SUCCESS;
-
-    if( httpmsg_find_hdr( &handle->response.msg, HDR_CONTENT_TYPE, &ctype )
-        == NULL ) {
-        *contentType = NULL;    // no content-type
-    } else {
-        *contentType = ctype.buf;
-    }
-
-    if( handle->response.position == POS_COMPLETE ) {
-        ( *contentLength ) = 0;
-    } else if( handle->response.ent_position == ENTREAD_USING_CHUNKED ) {
-        ( *contentLength ) = UPNP_USING_CHUNKED;
-    } else if( handle->response.ent_position == ENTREAD_USING_CLEN ) {
-        ( *contentLength ) = handle->response.content_length;
-    } else if( handle->response.ent_position == ENTREAD_UNTIL_CLOSE ) {
-        ( *contentLength ) = UPNP_UNTIL_CLOSE;
-    }
-
-  errorHandler:
-
-    ( *Handle ) = handle;
-
-    membuffer_destroy( &request );
-
-    if( ret_code != UPNP_E_SUCCESS ) {
-        httpmsg_destroy( &handle->response.msg );
-    }
-    return ret_code;
+errorHandler:
+	*Handle = handle;
+	membuffer_destroy(&request);
+	if (ret_code != UPNP_E_SUCCESS) {
+		httpmsg_destroy(&handle->response.msg);
+	}
+	return ret_code;
 }
 
 /************************************************************************
@@ -2201,149 +2187,128 @@ MakeGetMessageEx( const char *url_str,
  *	UPNP_E_SOCKET_ERROR
  *	UPNP_E_BAD_RESPONSE
  ************************************************************************/
-int
-http_OpenHttpGetEx( IN const char *url_str,
-                    IN OUT void **Handle,
-                    IN OUT char **contentType,
-                    OUT int *contentLength,
-                    OUT int *httpStatus,
-                    IN int lowRange,
-                    IN int highRange,
-                    IN int timeout )
+int http_OpenHttpGetEx(
+	IN const char *url_str,
+	IN OUT void **Handle,
+	IN OUT char **contentType,
+	OUT int *contentLength,
+	OUT int *httpStatus,
+	IN int lowRange,
+	IN int highRange,
+	IN int timeout)
 {
-    int http_error_code;
-    memptr ctype;
-    int tcp_connection;
-    membuffer request;
-    http_get_handle_t *handle = NULL;
-    uri_type url;
-    parse_status_t status;
-    int errCode = UPNP_E_SUCCESS;
+	int http_error_code;
+	memptr ctype;
+	int tcp_connection;
+	int sockaddr_len;
+	membuffer request;
+	http_get_handle_t *handle = NULL;
+	uri_type url;
+	parse_status_t status;
+	int errCode = UPNP_E_SUCCESS;
+	/* char rangeBuf[SIZE_RANGE_BUFFER]; */
+	struct SendInstruction rangeBuf;
 
-    //  char rangeBuf[SIZE_RANGE_BUFFER];
-    struct SendInstruction rangeBuf;
+	do {
+		/* Checking Input parameters */
+		if (!url_str || !Handle || !contentType || !httpStatus ) {
+			errCode = UPNP_E_INVALID_PARAM;
+			break;
+		}
 
-    do {
-        // Checking Input parameters
-        if( ( !url_str ) || ( !Handle ) ||
-            ( !contentType ) || ( !httpStatus ) ) {
-            errCode = UPNP_E_INVALID_PARAM;
-            break;
-        }
-        // Initialize output parameters
-        ( *httpStatus ) = 0;
-        ( *Handle ) = handle;
-        ( *contentType ) = NULL;
-        ( *contentLength ) = 0;
+		/* Initialize output parameters */
+		*httpStatus = 0;
+		*Handle = handle;
+		*contentType = NULL;
+		*contentLength = 0;
 
-        if( lowRange > highRange ) {
-            errCode = UPNP_E_INTERNAL_ERROR;
-            break;
-        }
+		if (lowRange > highRange) {
+			errCode = UPNP_E_INTERNAL_ERROR;
+			break;
+		}
+		memset(&rangeBuf, 0, sizeof(rangeBuf));
+		sprintf(rangeBuf.RangeHeader,
+			"Range: bytes=%d-%d\r\n", lowRange, highRange);
+		membuffer_init(&request);
+		errCode = MakeGetMessageEx(url_str, &request, &url, &rangeBuf);
+		if (errCode != UPNP_E_SUCCESS) {
+			break;
+		}
+		handle = (http_get_handle_t *)malloc(sizeof(http_get_handle_t));
+		if (!handle) {
+			errCode = UPNP_E_OUTOF_MEMORY;
+			break;
+		}
+		memset(handle, 0, sizeof(*handle));
+		handle->entity_offset = 0;
+		parser_response_init(&handle->response, HTTPMETHOD_GET);
+		tcp_connection = socket(url.hostport.IPaddress.ss_family, SOCK_STREAM, 0);
+		if (tcp_connection == -1) {
+			errCode = UPNP_E_SOCKET_ERROR;
+			free(handle);
+			break;
+		}
+		if (sock_init(&handle->sock_info, tcp_connection) != UPNP_E_SUCCESS) {
+			sock_destroy(&handle->sock_info, SD_BOTH);
+			errCode = UPNP_E_SOCKET_ERROR;
+			free(handle);
+			break;
+		}
+		sockaddr_len = url.hostport.IPaddress.ss_family == AF_INET6 ?
+			sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
+		errCode  = connect(handle->sock_info.socket,
+			(struct sockaddr *)&(url.hostport.IPaddress), sockaddr_len);
+		if (errCode == -1) {
+			sock_destroy(&handle->sock_info, SD_BOTH);
+			errCode = UPNP_E_SOCKET_CONNECT;
+			free(handle);
+			break;
+		}
+		/* send request */
+		errCode = http_SendMessage(&handle->sock_info, &timeout,
+			"b", request.buf, request.length);
+		if (errCode != UPNP_E_SUCCESS) {
+			sock_destroy(&handle->sock_info, SD_BOTH);
+			free(handle);
+			break;
+		}
+		status = ReadResponseLineAndHeaders(&handle->sock_info,
+			&handle->response, &timeout, &http_error_code);
+		if (status != PARSE_OK) {
+			errCode = UPNP_E_BAD_RESPONSE;
+			free(handle);
+			break;
+		}
+		status = parser_get_entity_read_method(&handle->response);
+		if (status != PARSE_CONTINUE_1 && status != PARSE_SUCCESS) {
+			errCode = UPNP_E_BAD_RESPONSE;
+			free(handle);
+			break;
+		}
+		*httpStatus = handle->response.msg.status_code;
+		errCode = UPNP_E_SUCCESS;
 
-        memset( &rangeBuf, 0, sizeof( rangeBuf ) );
-        sprintf( rangeBuf.RangeHeader, "Range: bytes=%d-%d\r\n",
-                 lowRange, highRange );
+		if (!httpmsg_find_hdr(&handle->response.msg, HDR_CONTENT_TYPE, &ctype)) {
+			/* no content-type */
+			*contentType = NULL;
+		} else {
+			*contentType = ctype.buf;
+		}
+		if (handle->response.position == POS_COMPLETE) {
+			*contentLength = 0;
+		} else if(handle->response.ent_position == ENTREAD_USING_CHUNKED) {
+			*contentLength = UPNP_USING_CHUNKED;
+		} else if(handle->response.ent_position == ENTREAD_USING_CLEN) {
+			*contentLength = handle->response.content_length;
+		} else if(handle->response.ent_position == ENTREAD_UNTIL_CLOSE) {
+			*contentLength = UPNP_UNTIL_CLOSE;
+		}
+		*Handle = handle;
+	} while (0);
 
-        membuffer_init( &request );
+	membuffer_destroy(&request);
 
-        if( ( errCode = MakeGetMessageEx( url_str,
-                                          &request, &url, &rangeBuf ) )
-            != UPNP_E_SUCCESS ) {
-            break;
-        }
-
-        handle =
-            ( http_get_handle_t * ) malloc( sizeof( http_get_handle_t ) );
-        if( handle == NULL ) {
-            errCode = UPNP_E_OUTOF_MEMORY;
-            break;
-        }
-
-        memset( handle, 0, sizeof( *handle ) );
-
-        handle->entity_offset = 0;
-        parser_response_init( &handle->response, HTTPMETHOD_GET );
-
-        tcp_connection = socket( url.hostport.IPaddress.ss_family, SOCK_STREAM, 0 );
-        if( tcp_connection == -1 ) {
-            errCode = UPNP_E_SOCKET_ERROR;
-            free( handle );
-            break;
-        }
-
-        if( sock_init( &handle->sock_info, tcp_connection ) !=
-            UPNP_E_SUCCESS ) {
-            sock_destroy( &handle->sock_info, SD_BOTH );
-            errCode = UPNP_E_SOCKET_ERROR;
-            free( handle );
-            break;
-        }
-
-        errCode = connect( handle->sock_info.socket,
-                           ( struct sockaddr * )&url.hostport.IPaddress,
-                           sizeof( struct sockaddr_storage ) );
-        if( errCode == -1 ) {
-            sock_destroy( &handle->sock_info, SD_BOTH );
-            errCode = UPNP_E_SOCKET_CONNECT;
-            free( handle );
-            break;
-        }
-        // send request
-        errCode = http_SendMessage( &handle->sock_info,
-                                    &timeout,
-                                    "b", request.buf, request.length );
-
-        if( errCode != UPNP_E_SUCCESS ) {
-            sock_destroy( &handle->sock_info, SD_BOTH );
-            free( handle );
-            break;
-        }
-
-        status = ReadResponseLineAndHeaders( &handle->sock_info,
-                                             &handle->response,
-                                             &timeout, &http_error_code );
-
-        if( status != PARSE_OK ) {
-            errCode = UPNP_E_BAD_RESPONSE;
-            free( handle );
-            break;
-        }
-
-        status = parser_get_entity_read_method( &handle->response );
-        if( ( status != PARSE_CONTINUE_1 ) && ( status != PARSE_SUCCESS ) ) {
-            errCode = UPNP_E_BAD_RESPONSE;
-            free( handle );
-            break;
-        }
-
-        ( *httpStatus ) = handle->response.msg.status_code;
-        errCode = UPNP_E_SUCCESS;
-
-        if( httpmsg_find_hdr( &handle->response.msg,
-                              HDR_CONTENT_TYPE, &ctype ) == NULL ) {
-            *contentType = NULL;    // no content-type
-        } else {
-            *contentType = ctype.buf;
-        }
-
-        if( handle->response.position == POS_COMPLETE ) {
-            ( *contentLength ) = 0;
-        } else if( handle->response.ent_position == ENTREAD_USING_CHUNKED ) {
-            ( *contentLength ) = UPNP_USING_CHUNKED;
-        } else if( handle->response.ent_position == ENTREAD_USING_CLEN ) {
-            ( *contentLength ) = handle->response.content_length;
-        } else if( handle->response.ent_position == ENTREAD_UNTIL_CLOSE ) {
-            ( *contentLength ) = UPNP_UNTIL_CLOSE;
-        }
-
-        ( *Handle ) = handle;
-
-    } while( 0 );
-
-    membuffer_destroy( &request );
-
-    return errCode;
+	return errCode;
 }
 
 

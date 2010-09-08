@@ -217,6 +217,17 @@ Version 1.6.7
 *******************************************************************************
 
 2010-09-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	In the latest sources, http_RequestAndResponse and other methods that
+	use connect() are broken. More specifically, connect() in these methods
+	is returning with an EINVAL. The programatic cause is that the address_len
+	argument passed to connect() is different in IPV4 vs IPV6 (as described in:
+	http://www.opengroup.org/onlinepubs/009695399/functions/connect.html).
+	The current code always uses the IPV6 size. The fix modifies each use of
+	connect() to use the correct size based on the address family being used.
+
+	Patch submitted by Chandra (inactiveneurons).
+
+2010-09-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	Fix compilation error in upnp/src/gena/gena_ctrlpt.c (this is most
 	likely an error on all platforms).
 
