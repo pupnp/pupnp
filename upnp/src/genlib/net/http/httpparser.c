@@ -1909,9 +1909,9 @@ parser_parse_entity_using_clen( INOUT http_parser_t * parser )
     assert( parser->ent_position == ENTREAD_USING_CLEN );
 
     // determine entity (i.e. body) length so far
-    //entity_length = parser->msg.msg.length - parser->entity_start_position;
     parser->msg.entity.length =
-        parser->msg.msg.length - parser->entity_start_position;
+        parser->msg.msg.length - parser->entity_start_position + 
+        parser->msg.entity_offset;
 
     if( parser->msg.entity.length < parser->content_length ) {
         // more data to be read
@@ -1919,7 +1919,8 @@ parser_parse_entity_using_clen( INOUT http_parser_t * parser )
     } else {
         if( parser->msg.entity.length > parser->content_length ) {
             // silently discard extra data
-            parser->msg.msg.buf[parser->entity_start_position +
+            parser->msg.msg.buf[parser->entity_start_position -
+                                parser->msg.entity_offset +
                                 parser->content_length] = '\0';
         }
         // save entity length
@@ -2304,6 +2305,7 @@ parser_response_init( OUT http_parser_t * parser,
     parser_init( parser );
     parser->msg.is_request = FALSE;
     parser->msg.request_method = request_method;
+    parser->msg.entity_offset = 0;
     parser->position = POS_RESPONSE_LINE;
 }
 

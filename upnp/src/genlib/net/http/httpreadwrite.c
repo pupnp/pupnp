@@ -256,7 +256,7 @@ int http_RecvMessage(
 					"<<< (RECVD) <<<\n%s\n-----------------\n",
 					parser->msg.msg.buf );
 				print_http_headers( &parser->msg );
-				if (parser->content_length > (unsigned int)g_maxContentLength) {
+				if (g_maxContentLength > 0 && parser->content_length > (unsigned int)g_maxContentLength) {
 					*http_error_code = HTTP_REQ_ENTITY_TOO_LARGE;
 					line = __LINE__;
 					ret = UPNP_E_OUTOF_BOUNDS;
@@ -1070,10 +1070,10 @@ errorHandler:
 }
 
 typedef struct HTTPGETHANDLE {
-    http_parser_t response;
-    SOCKINFO sock_info;
-    int entity_offset;
-    int cancel;
+	http_parser_t response;
+	SOCKINFO sock_info;
+	int entity_offset;
+	int cancel;
 } http_get_handle_t;
 
 /************************************************************************
@@ -1327,9 +1327,10 @@ http_ReadHttpGet( IN void *Handle,
 
     int ret_code = 0;
 
-    if( ( !handle ) || ( !size ) || ( ( ( *size ) > 0 ) && !buf )
-        || ( ( *size ) < 0 ) ) {
-        if(size) ( *size ) = 0;
+    if( !handle || !size || (*size > 0 && !buf) || *size < 0) {
+        if(size) {
+            *size = 0;
+        }
         return UPNP_E_INVALID_PARAM;
     }
     //first parse what has already been gotten
@@ -1346,11 +1347,11 @@ http_ReadHttpGet( IN void *Handle,
                && ( status != PARSE_CONTINUE_1 )
                && ( status != PARSE_INCOMPLETE ) ) {
         //error
-        ( *size ) = 0;
+        *size = 0;
         return UPNP_E_BAD_RESPONSE;
     }
     //read more if necessary entity
-    while( ( ( handle->entity_offset + ( *size ) ) >
+    while( ( ( handle->response.msg.entity_offset + *size ) >
              handle->response.msg.entity.length )
            && ( ! handle->cancel )
            && ( handle->response.position != POS_COMPLETE ) ) {
@@ -1365,7 +1366,7 @@ http_ReadHttpGet( IN void *Handle,
                 // set failure status
                 handle->response.http_error_code =
                     HTTP_INTERNAL_SERVER_ERROR;
-                ( *size ) = 0;
+                *size = 0;
                 return PARSE_FAILURE;
             }
             status = parser_parse_entity( &handle->response );
@@ -1376,7 +1377,7 @@ http_ReadHttpGet( IN void *Handle,
                        && ( status != PARSE_CONTINUE_1 )
                        && ( status != PARSE_INCOMPLETE ) ) {
                 //error
-                ( *size ) = 0;
+                *size = 0;
                 return UPNP_E_BAD_RESPONSE;
             }
         } else if( num_read == 0 ) {
@@ -1387,31 +1388,33 @@ http_ReadHttpGet( IN void *Handle,
                     handle->response.position = POS_COMPLETE;
             } else {
                 // partial msg
-                ( *size ) = 0;
+                *size = 0;
                 handle->response.http_error_code = HTTP_BAD_REQUEST;    // or response
                 return UPNP_E_BAD_HTTPMSG;
             }
         } else {
-            ( *size ) = 0;
+            *size = 0;
             return num_read;
         }
     }
 
-    if( ( handle->entity_offset + ( *size ) ) >
-        handle->response.msg.entity.length ) {
-        ( *size ) =
-            handle->response.msg.entity.length - handle->entity_offset;
+    if ((handle->response.msg.entity_offset + *size) > handle->response.msg.entity.length) {
+        *size = handle->response.msg.entity.length - handle->response.msg.entity_offset;
     }
 
-    memcpy( buf,
-            &handle->response.msg.msg.buf[handle->
-                                          response.entity_start_position +
-                                          handle->entity_offset],
-            ( *size ) );
-    handle->entity_offset += ( *size );
+    memcpy(buf,
+           &handle->response.msg.msg.buf[handle->response.entity_start_position],
+           *size);
+    if (*size > 0) {
+        membuffer_delete(&handle->response.msg.msg, 
+                         handle->response.entity_start_position,
+                         *size);
+    }
 
-    if ( handle->cancel )
+    handle->response.msg.entity_offset += *size;
+    if (handle->cancel) {
         return UPNP_E_CANCELED;
+    }
 
     return UPNP_E_SUCCESS;
 }
@@ -1498,7 +1501,6 @@ http_CloseHttpGet( IN void *Handle )
 
     sock_destroy( &handle->sock_info, SD_BOTH );    //should shutdown completely
     httpmsg_destroy( &handle->response.msg );
-    handle->entity_offset = 0;
     free( handle );
     return UPNP_E_SUCCESS;
 }
@@ -1609,7 +1611,6 @@ int http_OpenHttpGetProxy(
 	if (!handle) {
 		return UPNP_E_OUTOF_MEMORY;
 	}
-	handle->entity_offset = 0;
 	handle->cancel = 0;
 	parser_response_init(&handle->response, HTTPMETHOD_GET);
 	tcp_connection = socket(peer->hostport.IPaddress.ss_family, SOCK_STREAM, 0);
@@ -2240,7 +2241,6 @@ int http_OpenHttpGetEx(
 			break;
 		}
 		memset(handle, 0, sizeof(*handle));
-		handle->entity_offset = 0;
 		parser_response_init(&handle->response, HTTPMETHOD_GET);
 		tcp_connection = socket(url.hostport.IPaddress.ss_family, SOCK_STREAM, 0);
 		if (tcp_connection == -1) {
