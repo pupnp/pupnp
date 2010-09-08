@@ -193,7 +193,8 @@ typedef struct // http_message_t
 
 	// private fields
 	membuffer msg;		// entire raw message
-	char *urlbuf;	// storage for url string
+        char *urlbuf;	// storage for url string
+        size_t entity_offset;
 } http_message_t;
 
 typedef struct // http_parser_t

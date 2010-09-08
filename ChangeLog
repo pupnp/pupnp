@@ -3,6 +3,20 @@ Version 1.6.7
 *******************************************************************************
 
 2010-09-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+	Using UpnpReadHttpGet to download large files causes the application to
+	crash. This happens when the file being downloaded exceeds the device
+	memory - entirely possible when transferring video files.
+	The programmatic cause is that the logic implemented in the function
+	http_ReadHttpGet (which UpnpReadHttpGet calls) reads the entire file
+	into memory. The fix modifies the existing logic to discard data after
+	it's been read; there's no reason to keep it around since the caller
+	of UpnpReadHttpGet already has a copy of it.
+	
+	This issue exists in 1.6.6 as well as the latest sources.
+
+	Patch submitted by Chandra (inactiveneurons).
+
+2010-09-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	In the latest sources, http_RequestAndResponse and other methods that
 	use connect() are broken. More specifically, connect() in these methods
 	is returning with an EINVAL. The programatic cause is that the address_len
