@@ -510,7 +510,6 @@ int SearchByTarget(
 	IN void *Cookie)
 {
 	char errorBuffer[ERROR_BUFFER_LEN];
-	int socklen = sizeof( struct sockaddr_storage );
 	int *id = NULL;
 	int ret = 0;
 	char ReqBufv4[BUFSIZE];
@@ -622,16 +621,21 @@ int SearchByTarget(
 		while (NumCopy < NUM_SSDP_COPY) {
 			sendto(gSsdpReqSocket6,
 				ReqBufv6UlaGua, strlen(ReqBufv6UlaGua), 0,
-				(struct sockaddr *)&__ss_v6, socklen);
+				(struct sockaddr *)&__ss_v6,
+                               sizeof(struct sockaddr_in));
 			NumCopy++;
 			imillisleep(SSDP_PAUSE);
 		}
 		NumCopy = 0;
 		inet_pton(AF_INET6, SSDP_IPV6_LINKLOCAL, &destAddr6->sin6_addr);
 		while (NumCopy < NUM_SSDP_COPY) {
+                    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                                ">>> SSDP SEND M-SEARCH >>>\n%s\n",
+                                *ReqBufv6 );
 			sendto(gSsdpReqSocket6,
-				ReqBufv6, strlen(ReqBufv6), 0,
-				(struct sockaddr *)&__ss_v6, socklen);
+                               ReqBufv6, strlen(ReqBufv6), 0,
+                               (struct sockaddr *)&__ss_v6, 
+                               sizeof(struct sockaddr_in6));
 			NumCopy++;
 			imillisleep(SSDP_PAUSE);
 		}
@@ -639,11 +643,14 @@ int SearchByTarget(
 	if (gSsdpReqSocket4 != INVALID_SOCKET && 
 	    FD_ISSET(gSsdpReqSocket4, &wrSet)) {
 		int NumCopy = 0;
-
 		while (NumCopy < NUM_SSDP_COPY) {
+                    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                                ">>> SSDP SEND M-SEARCH >>>\n%s\n",
+                                ReqBufv4);
 			sendto(gSsdpReqSocket4,
 				ReqBufv4, strlen(ReqBufv4), 0,
-				(struct sockaddr *)&__ss_v4, socklen);
+				(struct sockaddr *)&__ss_v4, 
+                                sizeof(struct sockaddr_in));
 			NumCopy++;
 			imillisleep(SSDP_PAUSE);
 		}

@@ -229,6 +229,7 @@ NewRequestHandler( IN struct sockaddr *DestAddr,
     int ttl = 4; // a/c to UPNP Spec
     int hops = 1;
     char buf_ntop[64];
+    int ret = UPNP_E_SUCCESS;
 
     ReplySock = socket( DestAddr->sa_family, SOCK_DGRAM, 0 );
     if ( ReplySock == -1 ) {
@@ -247,6 +248,7 @@ NewRequestHandler( IN struct sockaddr *DestAddr,
             (char *)&replyAddr, sizeof (replyAddr) );
         setsockopt( ReplySock, IPPROTO_IP, IP_MULTICAST_TTL,
             (char *)&ttl, sizeof (int) );
+        socklen = sizeof(struct sockaddr_in);
     } else if( DestAddr->sa_family == AF_INET6 ) {
         inet_ntop(AF_INET6, &((struct sockaddr_in6*)DestAddr)->sin6_addr, 
             buf_ntop, sizeof(buf_ntop));
@@ -257,6 +259,8 @@ NewRequestHandler( IN struct sockaddr *DestAddr,
     } else {
         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
             "Invalid destination address specified." );
+        ret = UPNP_E_NETWORK_ERROR;
+        goto end_NewRequestHandler;
     }
 
     for( Index = 0; Index < NumPacket; Index++ ) {
@@ -280,15 +284,27 @@ NewRequestHandler( IN struct sockaddr *DestAddr,
             rc = sendto( ReplySock, *( RqPacket + Index ),
                          strlen( *( RqPacket + Index ) ),
                          0, DestAddr, socklen );
+
+            if (rc == -1) {
+                strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+                UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+                            "SSDP_LIB: New Request Handler:"
+                            "Error in socket(): %s\n", errorBuffer );
+                ret = UPNP_E_SOCKET_WRITE;
+                goto end_NewRequestHandler;
+            }
+            
             imillisleep( SSDP_PAUSE );
+
             ++NumCopy;
         }
     }
 
+end_NewRequestHandler:
     shutdown( ReplySock, SD_BOTH );
     UpnpCloseSocket( ReplySock );
 
-    return UPNP_E_SUCCESS;
+    return ret;
 }
 
 /**

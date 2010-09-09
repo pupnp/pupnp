@@ -2,6 +2,18 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-09-09 Chandra Penke <chandrapenke(at)mcntech.com>
+	Fix for regression in SSDP code to send/receive messages over UDP
+
+	Sending messages over UDP is broken in some Apple OSes
+	such as OS X and iOS. This might be broken in other OSes to but didn't
+	verify.
+
+	The fix is to modify the socket lenght argument of sendto to use the correct
+	sockaddr lenght dependng on whether the socket is IPV4 or IPV6.
+
+	Also added some error checks and debugging related to the issue
+
 2010-09-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	Using UpnpReadHttpGet to download large files causes the application to
 	crash. This happens when the file being downloaded exceeds the device
