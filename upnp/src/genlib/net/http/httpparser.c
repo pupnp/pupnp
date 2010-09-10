@@ -72,7 +72,6 @@ static str_int_entry Http_Method_Table[NUM_HTTP_METHODS] = {
     {"SUBSCRIBE", HTTPMETHOD_SUBSCRIBE},
     {"UNSUBSCRIBE", HTTPMETHOD_UNSUBSCRIBE},
     {"POST", SOAPMETHOD_POST},
-
 };
 
 #define NUM_HTTP_HEADER_NAMES 33
@@ -113,9 +112,7 @@ str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES] = {
 };
 
 /***********************************************************************/
-
 /*************                 scanner                     *************/
-
 /***********************************************************************/
 
 #define TOKCHAR_CR		0xD
@@ -134,13 +131,11 @@ str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES] = {
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE void
-scanner_init( OUT scanner_t *scanner,
-              IN membuffer *bufptr )
+static UPNP_INLINE void scanner_init(OUT scanner_t *scanner, IN membuffer *bufptr)
 {
-    scanner->cursor = 0;
-    scanner->msg = bufptr;
-    scanner->entire_msg_loaded = FALSE;
+	scanner->cursor = 0;
+	scanner->msg = bufptr;
+	scanner->entire_msg_loaded = FALSE;
 }
 
 /************************************************************************
@@ -155,10 +150,9 @@ scanner_init( OUT scanner_t *scanner,
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE xboolean
-is_separator_char( IN char c )
+static UPNP_INLINE xboolean is_separator_char(IN char c)
 {
-    return strchr( " \t()<>@,;:\\\"/[]?={}", c ) != NULL;
+    return strchr(" \t()<>@,;:\\\"/[]?={}", c) != NULL;
 }
 
 /************************************************************************
@@ -173,10 +167,9 @@ is_separator_char( IN char c )
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE xboolean
-is_identifier_char( IN char c )
+static UPNP_INLINE xboolean is_identifier_char(IN char c)
 {
-    return ( c >= 32 && c <= 126 ) && !is_separator_char( c );
+    return c >= 32 && c <= 126 && !is_separator_char(c);
 }
 
 /************************************************************************
@@ -191,10 +184,9 @@ is_identifier_char( IN char c )
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE xboolean
-is_control_char( IN char c )
+static UPNP_INLINE xboolean is_control_char(IN char c)
 {
-    return ( ( c >= 0 && c <= 31 ) || ( c == 127 ) );
+    return (c >= 0 && c <= 31) || c == 127;
 }
 
 /************************************************************************
@@ -209,8 +201,7 @@ is_control_char( IN char c )
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE xboolean
-is_qdtext_char( IN char cc )
+static UPNP_INLINE xboolean is_qdtext_char(IN char cc)
 {
     unsigned char c = ( unsigned char )cc;
 
@@ -244,10 +235,10 @@ is_qdtext_char( IN char cc )
 *
 * Note :
 ************************************************************************/
-static parse_status_t
-scanner_get_token( INOUT scanner_t * scanner,
-                   OUT memptr * token,
-                   OUT token_type_t * tok_type )
+static parse_status_t scanner_get_token(
+	INOUT scanner_t *scanner,
+	OUT memptr *token,
+	OUT token_type_t *tok_type)
 {
     char *cursor;
     char *null_terminator;      // point to null-terminator in buffer
@@ -388,57 +379,11 @@ scanner_get_token( INOUT scanner_t * scanner,
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE char *
-scanner_get_str( IN scanner_t * scanner )
+static UPNP_INLINE char *scanner_get_str(IN scanner_t * scanner)
 {
-    return scanner->msg->buf + scanner->cursor;
+	return scanner->msg->buf + scanner->cursor;
 }
 
-/************************************************************************
-* Function :	scanner_pushback
-*
-* Parameters :
-*	INOUT scanner_t* scanner ;	Scanner Object
-*	IN size_t pushback_bytes ;	Bytes to be moved back
-*
-* Description :	Move back by a certain number of bytes.				
-*	This is used to put back one or more tokens back into the input		
-*
-* Return : void ;
-*
-* Note :
-************************************************************************/
-#ifdef WIN32
-	#pragma message ("The only use of the function 'scanner_pushback()' in the code is commented out.")
-	#pragma message ("'scanner_pushback()' is a candidate for removal.")
-#else
-	#warning The only use of the function 'scanner_pushback()' in the code is commented out.
-	#warning 'scanner_pushback()' is a candidate for removal.
-#endif
-static UPNP_INLINE void
-scanner_pushback( INOUT scanner_t * scanner,
-                  IN size_t pushback_bytes )
-{
-    scanner->cursor -= pushback_bytes;
-}
-
-/***********************************************************************/
-
-/*************                end of scanner              **************/
-
-/***********************************************************************/
-
-/***********************************************************************/
-
-/*************                    parser                  **************/
-
-/***********************************************************************/
-
-/***********************************************************************/
-
-/*************                 http_message_t             **************/
-
-/***********************************************************************/
 
 /************************************************************************
 * Function :	httpmsg_compare
@@ -453,15 +398,14 @@ scanner_pushback( INOUT scanner_t * scanner,
 *
 * Note :
 ************************************************************************/
-static int
-httpmsg_compare( void *param1,
-                 void *param2 )
+static int httpmsg_compare(void *param1, void *param2)
 {
     assert( param1 != NULL );
     assert( param2 != NULL );
 
-    return ( ( http_header_t * ) param1 )->name_id ==
-        ( ( http_header_t * ) param2 )->name_id;
+    return
+	    ((http_header_t *)param1)->name_id ==
+	    ((http_header_t *)param2)->name_id;
 }
 
 /************************************************************************
@@ -476,8 +420,7 @@ httpmsg_compare( void *param1,
 *
 * Note :
 ************************************************************************/
-static void
-httpheader_free( void *msg )
+static void httpheader_free(void *msg)
 {
     http_header_t *hdr = ( http_header_t * ) msg;
 
@@ -498,8 +441,7 @@ httpheader_free( void *msg )
 *
 * Note :
 ************************************************************************/
-void
-httpmsg_init( INOUT http_message_t * msg )
+void httpmsg_init(INOUT http_message_t *msg)
 {
     msg->initialized = 1;
     msg->entity.buf = NULL;
@@ -521,8 +463,7 @@ httpmsg_init( INOUT http_message_t * msg )
 *
 * Note :
 ************************************************************************/
-void
-httpmsg_destroy( INOUT http_message_t * msg )
+void httpmsg_destroy( INOUT http_message_t * msg )
 {
     assert( msg != NULL );
 
@@ -550,9 +491,9 @@ httpmsg_destroy( INOUT http_message_t * msg )
 *
 * Note :
 ************************************************************************/
-http_header_t *
-httpmsg_find_hdr_str( IN http_message_t * msg,
-                      IN const char *header_name )
+http_header_t *httpmsg_find_hdr_str(
+	IN http_message_t *msg,
+	IN const char *header_name)
 {
     http_header_t *header;
 
@@ -587,27 +528,21 @@ httpmsg_find_hdr_str( IN http_message_t * msg,
 *
 * Note :
 ************************************************************************/
-http_header_t *
-httpmsg_find_hdr( IN http_message_t * msg,
-                  IN int header_name_id,
-                  OUT memptr * value )
+http_header_t *httpmsg_find_hdr(
+	IN http_message_t *msg,
+	IN int header_name_id,
+	OUT memptr *value)
 {
     http_header_t header;       // temp header for searching
-
     ListNode *node;
-
     http_header_t *data;
 
     header.name_id = header_name_id;
-
     node = ListFind( &msg->headers, NULL, &header );
-
     if( node == NULL ) {
         return NULL;
     }
-
     data = ( http_header_t * ) node->item;
-
     if( value != NULL ) {
         value->buf = data->value.buf;
         value->length = data->value.length;
@@ -615,12 +550,6 @@ httpmsg_find_hdr( IN http_message_t * msg,
 
     return data;
 }
-
-/***********************************************************************/
-
-/*************              http_parser_t                 **************/
-
-/***********************************************************************/
 
 /************************************************************************
 * Function :	skip_blank_lines
@@ -634,26 +563,23 @@ httpmsg_find_hdr( IN http_message_t * msg,
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE int
-skip_blank_lines( INOUT scanner_t * scanner )
+static UPNP_INLINE int skip_blank_lines(INOUT scanner_t *scanner)
 {
-    memptr token;
-    token_type_t tok_type;
-    parse_status_t status;
+	memptr token;
+	token_type_t tok_type;
+	parse_status_t status;
 
-    // skip ws, crlf
-    do {
-        status = scanner_get_token( scanner, &token, &tok_type );
-    } while( status == PARSE_OK &&
-             ( tok_type == TT_WHITESPACE || tok_type == TT_CRLF ) );
+	/* skip ws, crlf */
+	do {
+		status = scanner_get_token(scanner, &token, &tok_type);
+	} while (status == PARSE_OK &&
+		 (tok_type == TT_WHITESPACE || tok_type == TT_CRLF));
+	if (status == PARSE_OK) {
+		/* pushback a non-whitespace token */
+		scanner->cursor -= token.length;
+	}
 
-    if( status == PARSE_OK ) {
-        // pushback a non-whitespace token
-        scanner->cursor -= token.length;
-        //scanner_pushback( scanner, token.length );
-    }
-
-    return status;
+	return status;
 }
 
 /************************************************************************
@@ -671,8 +597,7 @@ skip_blank_lines( INOUT scanner_t * scanner )
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE int
-skip_lws( INOUT scanner_t * scanner )
+static UPNP_INLINE int skip_lws(INOUT scanner_t *scanner)
 {
     memptr token;
     token_type_t tok_type;
@@ -726,9 +651,9 @@ skip_lws( INOUT scanner_t * scanner )
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE parse_status_t
-match_non_ws_string( INOUT scanner_t * scanner,
-                     OUT memptr * str )
+static UPNP_INLINE parse_status_t match_non_ws_string(
+	INOUT scanner_t *scanner,
+	OUT memptr *str)
 {
     memptr token;
     token_type_t tok_type;
@@ -792,9 +717,9 @@ match_non_ws_string( INOUT scanner_t * scanner,
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE parse_status_t
-match_raw_value( INOUT scanner_t * scanner,
-                 OUT memptr * raw_value )
+static UPNP_INLINE parse_status_t match_raw_value(
+	INOUT scanner_t * scanner,
+	OUT memptr *raw_value)
 {
     memptr token;
     token_type_t tok_type;
@@ -883,10 +808,10 @@ match_raw_value( INOUT scanner_t * scanner,
 *   PARSE_FAILURE		-- bad input
 *   PARSE_INCOMPLETE
 ************************************************************************/
-static UPNP_INLINE int
-match_int( INOUT scanner_t * scanner,
-           IN int base,
-           OUT int *value )
+static UPNP_INLINE int match_int(
+	INOUT scanner_t *scanner,
+	IN int base,
+	OUT int *value)
 {
     memptr token;
     token_type_t   tok_type;
@@ -967,36 +892,6 @@ read_until_crlf( INOUT scanner_t * scanner,
         str->length = scanner->cursor - start_pos;
     }
 
-    return status;
-}
-
-/************************************************************************
-* Function: skip_to_end_of_header
-*
-* Parameters:
-*	INOUT scanner_t* scanner ; Scanner Object
-*
-* Description: Skip to end of header
-*
-* Returns:
-*   PARSE_OK
-*   PARSE_FAILURE
-*   PARSE_INCOMPLETE
-************************************************************************/
-#ifdef WIN32
-	#pragma message("There are currently no uses of the function 'skip_to_end_of_header()' in the code.")
-	#pragma message("'skip_to_end_of_header()' is a candidate for removal.")
-#else
-	#warning There are currently no uses of the function 'skip_to_end_of_header()' in the code.
-	#warning 'skip_to_end_of_header()' is a candidate for removal.
-#endif
-static UPNP_INLINE int
-skip_to_end_of_header( INOUT scanner_t * scanner )
-{
-    memptr dummy_raw_value;
-    parse_status_t status;
-
-    status = match_raw_value( scanner, &dummy_raw_value );
     return status;
 }
 
@@ -1754,140 +1649,6 @@ parser_parse_headers( INOUT http_parser_t * parser )
 
 }
 
-////////////////////////////////////////////////////////////////////////
-#ifdef HIGHLY_UNLIKELY
-// **************
-static parse_status_t
-parser_parse_headers_old( INOUT http_parser_t * parser )
-{
-    parse_status_t status;
-    memptr token;
-    memptr hdr_value;
-    token_type_t tok_type;
-    scanner_t *scanner = &parser->scanner;
-    size_t save_pos;
-    http_header_t *header;
-    int header_id;
-    int ret = 0;
-    int index;
-    http_header_t *orig_header;
-    char save_char;
-    int ret2,
-      ret3;
-
-    assert( parser->position == POS_HEADERS ||
-            parser->ent_position == ENTREAD_CHUNKY_HEADERS );
-
-    while( TRUE ) {
-        save_pos = scanner->cursor;
-
-        //
-        // check end of headers
-        //
-        status = scanner_get_token( scanner, &token, &tok_type );
-        if( status != PARSE_OK ) {
-            return status;
-        }
-
-        if( tok_type == TT_CRLF ) {
-            // end of headers
-            parser->position = POS_ENTITY;  // read entity next
-            return PARSE_OK;
-        }
-        //
-        // not end; read header
-        //
-        if( tok_type != TT_IDENTIFIER ) {
-            return PARSE_FAILURE;   // didn't see header name
-        }
-
-        status = match( scanner, " : %R%c", &hdr_value );
-        if( status != PARSE_OK ) {
-            // pushback tokens; useful only on INCOMPLETE error
-            scanner->cursor = save_pos;
-            return status;
-        }
-
-        //
-        // add header
-        //
-
-        // find header
-        index = map_str_to_int( token.buf, token.length, Http_Header_Names,
-                                NUM_HTTP_HEADER_NAMES, FALSE );
-        if( index != -1 ) {
-            header_id = Http_Header_Names[index].id;
-
-            orig_header =
-                httpmsg_find_hdr( &parser->msg, header_id, NULL );
-        } else {
-            header_id = HDR_UNKNOWN;
-
-            save_char = token.buf[token.length];
-            token.buf[token.length] = '\0';
-
-            orig_header = httpmsg_find_hdr_str( &parser->msg, token.buf );
-
-            token.buf[token.length] = save_char;    // restore
-        }
-
-        if( orig_header == NULL ) {
-            //
-            // add new header
-            //
-
-            header = ( http_header_t * ) malloc( sizeof( http_header_t ) );
-            if( header == NULL ) {
-                parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
-                return PARSE_FAILURE;
-            }
-            membuffer_init( &header->multi_hdr_buf );
-
-            header->name = token;
-            header->value = hdr_value;
-            header->name_id = header_id;
-
-            ret = dlist_append( &parser->msg.headers, header );
-            if( ret == UPNP_E_OUTOF_MEMORY ) {
-                parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
-                return PARSE_FAILURE;
-            }
-        } else if( hdr_value.length > 0 ) {
-            //
-            // append value to existing header
-            //
-
-            if( orig_header->multi_hdr_buf.buf == NULL ) {
-                // store in buffer
-                ret = membuffer_append( &orig_header->multi_hdr_buf,
-                                        orig_header->value.buf,
-                                        orig_header->value.length );
-            }
-            // append space
-            ret2 =
-                membuffer_append( &orig_header->multi_hdr_buf, ", ", 2 );
-
-            // append continuation of header value
-            ret3 = membuffer_append( &orig_header->multi_hdr_buf,
-                                     hdr_value.buf, hdr_value.length );
-
-            if( ret == UPNP_E_OUTOF_MEMORY ||
-                ret2 == UPNP_E_OUTOF_MEMORY ||
-                ret3 == UPNP_E_OUTOF_MEMORY ) {
-                // not enuf mem
-                parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
-                return PARSE_FAILURE;
-            }
-            // header value points to allocated buf
-            orig_header->value.buf = orig_header->multi_hdr_buf.buf;
-            orig_header->value.length = orig_header->multi_hdr_buf.length;
-        }
-    }                           // end while
-
-}
-#endif
-// ******************************
-
 /************************************************************************
 * Function: parser_parse_entity_using_clen
 *
@@ -2402,10 +2163,6 @@ parser_append( INOUT http_parser_t * parser,
 }
 
 /************************************************************************
-**********                   end of parser                    ***********
-************************************************************************/
-
-/************************************************************************
 * Function: raw_to_int
 *
 * Parameters:
@@ -2417,9 +2174,7 @@ parser_append( INOUT http_parser_t * parser,
 * Returns:
 *	 int
 ************************************************************************/
-int
-raw_to_int( IN memptr * raw_value,
-            IN int base )
+int raw_to_int(IN memptr *raw_value, IN int base)
 {
     long  num;
     char *end_ptr;
@@ -2456,9 +2211,7 @@ raw_to_int( IN memptr * raw_value,
 * Returns:
 *	 int - index at which the substring is found.						
 ************************************************************************/
-int
-raw_find_str( IN memptr *raw_value,
-              IN const char *str )
+int raw_find_str(IN memptr *raw_value, IN const char *str)
 {
     char c;
     char *ptr;
@@ -2501,8 +2254,7 @@ raw_find_str( IN memptr *raw_value,
 * Returns:
 *	 const char* ptr - Ptr to the HTTP Method
 ************************************************************************/
-const char *
-method_to_str( IN http_method_t method )
+const char *method_to_str(IN http_method_t method)
 {
     int index;
 
@@ -2546,5 +2298,5 @@ void print_http_headers(http_message_t *hmsg)
         /* NNS: node = dlist_next( &hmsg->headers, node ); */
     }
 }
-#endif
+#endif /* DEBUG */
 
