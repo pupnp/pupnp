@@ -177,8 +177,9 @@ typedef struct
 /* globals */
 
 CLIENTONLY(extern SOCKET gSsdpReqSocket4;);
+#ifdef UPNP_ENABLE_IPV6
 CLIENTONLY(extern SOCKET gSsdpReqSocket6;);
-
+#endif
 typedef int (*ParserFun)(char *, Event *);
 
 

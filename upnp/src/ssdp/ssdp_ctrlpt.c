@@ -597,12 +597,14 @@ int SearchByTarget(
 		FD_SET(gSsdpReqSocket4, &wrSet);
 		max_fd = max(max_fd, gSsdpReqSocket4);
 	}
+#ifdef UPNP_ENABLE_IPV6
 	if (gSsdpReqSocket6 != INVALID_SOCKET) {
 		setsockopt(gSsdpReqSocket6, IPPROTO_IPV6, IPV6_MULTICAST_IF,
 			(char *)&gIF_INDEX, sizeof (gIF_INDEX));
 		FD_SET(gSsdpReqSocket6, &wrSet);
 		max_fd = max(max_fd, gSsdpReqSocket6);
 	}
+#endif
 
 	ret = select(max_fd + 1, NULL, &wrSet, NULL, NULL);
 	if (ret == -1) {
@@ -612,11 +614,13 @@ int SearchByTarget(
 			errorBuffer);
 		shutdown(gSsdpReqSocket4, SD_BOTH);
 		UpnpCloseSocket(gSsdpReqSocket4);
+#ifdef UPNP_ENABLE_IPV6
 		shutdown(gSsdpReqSocket6, SD_BOTH);
 		UpnpCloseSocket(gSsdpReqSocket6);
-
+#endif
 		return UPNP_E_INTERNAL_ERROR;
 	}
+#ifdef UPNP_ENABLE_IPV6
 	if (gSsdpReqSocket6 != INVALID_SOCKET && 
 	    FD_ISSET(gSsdpReqSocket6, &wrSet)) {
 		int NumCopy = 0;
@@ -643,6 +647,8 @@ int SearchByTarget(
 			imillisleep(SSDP_PAUSE);
 		}
 	}
+#endif  //IPv6
+
 	if (gSsdpReqSocket4 != INVALID_SOCKET && 
 	    FD_ISSET(gSsdpReqSocket4, &wrSet)) {
 		int NumCopy = 0;

@@ -6,6 +6,9 @@
 
 #ifdef WIN32
 
+#ifdef IPV6_
+#define INET_IPV6
+#endif
 
 #include "unixutil.h"
 
