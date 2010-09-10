@@ -634,7 +634,7 @@ int SearchByTarget(
 		while (NumCopy < NUM_SSDP_COPY) {
                     UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
                                 ">>> SSDP SEND M-SEARCH >>>\n%s\n",
-                                *ReqBufv6 );
+                                ReqBufv6);
 			sendto(gSsdpReqSocket6,
                                ReqBufv6, strlen(ReqBufv6), 0,
                                (struct sockaddr *)&__ss_v6, 
