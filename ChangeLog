@@ -2,6 +2,9 @@
 Version 1.8.0
 *******************************************************************************
 
+2010-09-10 Chandra Penke <chandrapenke(at)mcntech.com>
+	Add support for conditionally enabling ipv6.
+
 2010-08-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* upnp/src/api/Discovery.c: Fix a serious bug and memory leak in
 	UpnpDiscovery_strcpy_DeviceType(). Thanks to David Blanchet for the

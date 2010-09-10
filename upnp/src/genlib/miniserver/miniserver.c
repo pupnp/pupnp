@@ -579,22 +579,21 @@ static int get_miniserver_sockets(
 {
 	char errorBuffer[ERROR_BUFFER_LEN];
 	struct sockaddr_storage __ss_v4;
-	struct sockaddr_storage __ss_v6;
 	struct sockaddr_in* serverAddr4 = (struct sockaddr_in*)&__ss_v4;
-#ifdef UPNP_ENABLE_IPV6
-	struct sockaddr_in6* serverAddr6 = (struct sockaddr_in6*)&__ss_v6;
-#endif
 	SOCKET listenfd4 = INVALID_SOCKET;
+	unsigned short actual_port4;
 #ifdef UPNP_ENABLE_IPV6
+	struct sockaddr_storage __ss_v6;
+	struct sockaddr_in6* serverAddr6 = (struct sockaddr_in6*)&__ss_v6;
 	SOCKET listenfd6 = INVALID_SOCKET;
+	unsigned short actual_port6;
 #endif
 	int ret_code;
-	unsigned short actual_port4, actual_port6;
 	int reuseaddr_on = 0;
 	int sockError = UPNP_E_SUCCESS;
 	int errCode = 0;
 
-        // 
+        //
         // Initialize all the sockets to be invalid
         //
         out->miniServerSock4 = INVALID_SOCKET;
@@ -678,8 +677,7 @@ static int get_miniserver_sockets(
 		}
 
 #ifdef UPNP_ENABLE_IPV6
-		if(listenfd6 != INVALID_SOCKET) 
-		{
+		if (listenfd6 != INVALID_SOCKET) {
 			sockError = setsockopt(listenfd6, SOL_SOCKET, SO_REUSEADDR,
 			(const char *)&reuseaddr_on, sizeof (int));
 			if (sockError == -1) {
@@ -706,8 +704,7 @@ static int get_miniserver_sockets(
 			}
 		}
 #endif  //IPv6
-	} else 
-	{
+	} else {
 		if (listenfd4 != INVALID_SOCKET) {
 			unsigned short orig_listen_port4 = listen_port4;
 			do {
