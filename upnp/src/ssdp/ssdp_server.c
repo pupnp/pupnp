@@ -51,15 +51,21 @@
 #define MAX_TIME_TOREAD  45
 
 CLIENTONLY( SOCKET gSsdpReqSocket4 = INVALID_SOCKET; )
+#ifdef UPNP_ENABLE_IPV6
 CLIENTONLY( SOCKET gSsdpReqSocket6 = INVALID_SOCKET; )
+#endif
 
 void RequestHandler();
 int create_ssdp_sock_v4( SOCKET* ssdpSock );
+#ifdef UPNP_ENABLE_IPV6
 int create_ssdp_sock_v6( SOCKET* ssdpSock );
 int create_ssdp_sock_v6_ula_gua( SOCKET* ssdpSock );
+#endif
 #if INCLUDE_CLIENT_APIS
 int create_ssdp_sock_reqv4( SOCKET* ssdpReqSock );
+#ifdef UPNP_ENABLE_IPV6
 int create_ssdp_sock_reqv6( SOCKET* ssdpReqSock );
+#endif
 #endif
 Event ErrotEvt;
 
@@ -791,11 +797,20 @@ readFromSSDPSocket( SOCKET socket )
         //initialize parser
 
 #ifdef INCLUDE_CLIENT_APIS
+#ifdef UPNP_ENABLE_IPV6
         if( socket == gSsdpReqSocket4 || socket == gSsdpReqSocket6 ) {
             parser_response_init( &data->parser, HTTPMETHOD_MSEARCH );
         } else {
             parser_request_init( &data->parser );
         }
+#else
+        if( socket == gSsdpReqSocket4 ) {
+            parser_response_init( &data->parser, HTTPMETHOD_MSEARCH );
+        } else {
+            parser_request_init( &data->parser );
+        }
+
+#endif
 #else
         parser_request_init( &data->parser );
 #endif
@@ -820,8 +835,10 @@ readFromSSDPSocket( SOCKET socket )
 
         if( __ss.ss_family == AF_INET )
             inet_ntop( AF_INET, &((struct sockaddr_in*)&__ss)->sin_addr, ntop_buf, sizeof(ntop_buf) );
+#ifdef UPNP_ENABLE_IPV6
         else if( __ss.ss_family == AF_INET6 )
             inet_ntop( AF_INET6, &((struct sockaddr_in6*)&__ss)->sin6_addr, ntop_buf, sizeof(ntop_buf) );
+#endif
         else
             strncpy( ntop_buf, "<Invalid address family>", sizeof(ntop_buf) );
 
@@ -876,6 +893,9 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 {
 	int retVal;
 
+        out->ssdpReqSock4 = INVALID_SOCKET;
+        out->ssdpReqSock6 = INVALID_SOCKET;
+
 #if INCLUDE_CLIENT_APIS
 	/* Create the IPv4 socket for SSDP REQUESTS */
 	if(strlen(gIF_IPV4) > 0) {
@@ -890,6 +910,7 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 	}
 
 	/* Create the IPv6 socket for SSDP REQUESTS */
+#ifdef UPNP_ENABLE_IPV6
 	if (strlen(gIF_IPV6) > 0) {
 		retVal = create_ssdp_sock_reqv6(&out->ssdpReqSock6);
 		if (retVal != UPNP_E_SUCCESS) {
@@ -902,6 +923,9 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 	} else {
 		out->ssdpReqSock6 = INVALID_SOCKET;
 	}
+#endif  //IPv6
+
+
 #endif /* INCLUDE_CLIENT_APIS */
 
 	/* Create the IPv4 socket for SSDP */
@@ -921,6 +945,7 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 	}
 
 	/* Create the IPv6 socket for SSDP */
+#ifdef UPNP_ENABLE_IPV6
 	if (strlen(gIF_IPV6) > 0) {
 		retVal = create_ssdp_sock_v6(&out->ssdpSock6);
 		if (retVal != UPNP_E_SUCCESS) {
@@ -956,6 +981,8 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 	} else {
 		out->ssdpSock6UlaGua = INVALID_SOCKET;
 	}
+#endif //IPv6
+
 
 	return UPNP_E_SUCCESS;
 }
@@ -1011,6 +1038,7 @@ int create_ssdp_sock_reqv4( SOCKET* ssdpReqSock )
  * Returns: void
  *
  ***************************************************************************/
+#ifdef UPNP_ENABLE_IPV6
 int create_ssdp_sock_reqv6( SOCKET* ssdpReqSock )
 {
     char errorBuffer[ERROR_BUFFER_LEN];
@@ -1035,6 +1063,8 @@ int create_ssdp_sock_reqv6( SOCKET* ssdpReqSock )
 
     return UPNP_E_SUCCESS;
 }
+#endif // IPv6
+
 #endif /* INCLUDE_CLIENT_APIS */
 
 
@@ -1178,6 +1208,7 @@ int create_ssdp_sock_v4( SOCKET* ssdpSock )
  * Returns: void
  *
  ***************************************************************************/
+#ifdef UPNP_ENABLE_IPV6
 int create_ssdp_sock_v6( SOCKET* ssdpSock )
 {
     char errorBuffer[ERROR_BUFFER_LEN];
@@ -1274,7 +1305,7 @@ int create_ssdp_sock_v6( SOCKET* ssdpSock )
     return UPNP_E_SUCCESS;
 }
 
-
+#endif // IPv6
 
 /************************************************************************
  * Function : create_ssdp_sock_v6_ula_gua
@@ -1288,6 +1319,7 @@ int create_ssdp_sock_v6( SOCKET* ssdpSock )
  * Returns: void
  *
  ***************************************************************************/
+#ifdef UPNP_ENABLE_IPV6
 int create_ssdp_sock_v6_ula_gua(SOCKET *ssdpSock)
 {
 	char errorBuffer[ERROR_BUFFER_LEN];
@@ -1385,7 +1417,7 @@ int create_ssdp_sock_v6_ula_gua(SOCKET *ssdpSock)
 
 	return UPNP_E_SUCCESS;
 }
-
+#endif   //IPv6
 
 #endif /* EXCLUDE_SSDP */
 

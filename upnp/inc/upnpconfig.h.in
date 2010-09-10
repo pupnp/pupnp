@@ -90,6 +90,9 @@
  *  (i.e. configure --enable-tools) : <upnp/upnptools.h> file is available */
 #undef UPNP_HAVE_TOOLS
 
+/** Defined to 1 if the library has been compiled with ipv6 support
+ *  (i.e. configure --enable-ipv6) */
+#undef UPNP_ENABLE_IPV6
 
 #endif /* UPNP_CONFIG_H */
 

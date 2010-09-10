@@ -256,6 +256,11 @@ if test "x$enable_tools" = xyes ; then
 	AC_DEFINE(UPNP_HAVE_TOOLS, 1, [see upnpconfig.h])
 fi
 
+RT_BOOL_ARG_ENABLE([ipv6], [no], [ipv6 support])
+if test "x$enable_ipv6" = xyes ; then
+        AC_DEFINE(UPNP_ENABLE_IPV6, 1, [see upnpconfig.h])
+fi
+
 
 RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 

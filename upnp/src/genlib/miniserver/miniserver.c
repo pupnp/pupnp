@@ -581,39 +581,58 @@ static int get_miniserver_sockets(
 	struct sockaddr_storage __ss_v4;
 	struct sockaddr_storage __ss_v6;
 	struct sockaddr_in* serverAddr4 = (struct sockaddr_in*)&__ss_v4;
+#ifdef UPNP_ENABLE_IPV6
 	struct sockaddr_in6* serverAddr6 = (struct sockaddr_in6*)&__ss_v6;
-	SOCKET listenfd4, listenfd6;
+#endif
+	SOCKET listenfd4 = INVALID_SOCKET;
+#ifdef UPNP_ENABLE_IPV6
+	SOCKET listenfd6 = INVALID_SOCKET;
+#endif
 	int ret_code;
 	unsigned short actual_port4, actual_port6;
 	int reuseaddr_on = 0;
 	int sockError = UPNP_E_SUCCESS;
 	int errCode = 0;
 
+        // 
+        // Initialize all the sockets to be invalid
+        //
+        out->miniServerSock4 = INVALID_SOCKET;
+        out->miniServerSock6 = INVALID_SOCKET;
+
 	// Create listen socket for IPv4/IPv6. An error here may indicate
 	// that we don't have an IPv4/IPv6 stack.
 	listenfd4 = socket(AF_INET, SOCK_STREAM, 0);
-	listenfd6 = socket(AF_INET6, SOCK_STREAM, 0);
-	if (listenfd4 == INVALID_SOCKET && listenfd6 == INVALID_SOCKET) {
+	if (listenfd4 == INVALID_SOCKET) {
 		return UPNP_E_OUTOF_SOCKET;
 	}
+
+#ifdef UPNP_ENABLE_IPV6
+	listenfd6 = socket(AF_INET6, SOCK_STREAM, 0);
+	if (listenfd6 == INVALID_SOCKET) {
+		return UPNP_E_OUTOF_SOCKET;
+	}
+#endif
 
 	// As per the IANA specifications for the use of ports by applications
 	// override the listen port passed in with the first available 
 	if (listen_port4 < APPLICATION_LISTENING_PORT) {
 		listen_port4 = APPLICATION_LISTENING_PORT;
 	}
+#ifdef UPNP_ENABLE_IPV6
 	if (listen_port6 < APPLICATION_LISTENING_PORT) {
 		listen_port6 = APPLICATION_LISTENING_PORT;
 	}
-
+#endif
 	memset(&__ss_v4, 0, sizeof (__ss_v4));
 	serverAddr4->sin_family = AF_INET;
 	serverAddr4->sin_addr.s_addr = htonl(INADDR_ANY);
 
+#ifdef UPNP_ENABLE_IPV6
 	memset(&__ss_v6, 0, sizeof (__ss_v6));
 	serverAddr6->sin6_family = AF_INET6;
 	serverAddr6->sin6_addr = in6addr_any;
-
+#endif
 	// Getting away with implementation of re-using address:port and instead 
 	// choosing to increment port numbers.
 	// Keeping the re-use address code as an optional behaviour that can be 
@@ -633,8 +652,10 @@ static int get_miniserver_sockets(
 			if (sockError == -1) {
 				shutdown(listenfd4, SD_BOTH);
 				UpnpCloseSocket(listenfd4);
+#ifdef UPNP_ENABLE_IPV6
 				shutdown(listenfd6, SD_BOTH);
 				UpnpCloseSocket(listenfd6);
+#endif
 				return UPNP_E_SOCKET_BIND;
 			}
 
@@ -647,14 +668,18 @@ static int get_miniserver_sockets(
 					errorBuffer);
 				shutdown(listenfd4, SD_BOTH);
 				UpnpCloseSocket(listenfd4);
+#ifdef UPNP_ENABLE_IPV6
 				shutdown(listenfd6, SD_BOTH);
 				UpnpCloseSocket(listenfd6);
+#endif
 				/* Bind failed */
 				return UPNP_E_SOCKET_BIND;
 			}
 		}
 
-		if(listenfd6 != INVALID_SOCKET) {
+#ifdef UPNP_ENABLE_IPV6
+		if(listenfd6 != INVALID_SOCKET) 
+		{
 			sockError = setsockopt(listenfd6, SOL_SOCKET, SO_REUSEADDR,
 			(const char *)&reuseaddr_on, sizeof (int));
 			if (sockError == -1) {
@@ -680,7 +705,9 @@ static int get_miniserver_sockets(
 				return UPNP_E_SOCKET_BIND;
 			}
 		}
-	} else {
+#endif  //IPv6
+	} else 
+	{
 		if (listenfd4 != INVALID_SOCKET) {
 			unsigned short orig_listen_port4 = listen_port4;
 			do {
@@ -707,12 +734,15 @@ static int get_miniserver_sockets(
 					errorBuffer);
 				shutdown(listenfd4, SD_BOTH);
 				UpnpCloseSocket(listenfd4);
+#ifdef UPNP_ENABLE_IPV6
 				shutdown(listenfd6, SD_BOTH);
 				UpnpCloseSocket(listenfd6);
+#endif
 				return UPNP_E_SOCKET_BIND;  // bind failed
 			}
 		}
 
+#ifdef UPNP_ENABLE_IPV6
 		if (listenfd6 != INVALID_SOCKET) {
 			unsigned short orig_listen_port6 = listen_port6;
 			do {
@@ -745,6 +775,7 @@ static int get_miniserver_sockets(
 				return UPNP_E_SOCKET_BIND;
 			}
 		}
+#endif
 	}
 
 	UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
@@ -759,8 +790,10 @@ static int get_miniserver_sockets(
 				errorBuffer);
 			shutdown(listenfd4, SD_BOTH);
 			UpnpCloseSocket(listenfd4);
+#ifdef UPNP_ENABLE_IPV6
 			shutdown(listenfd6, SD_BOTH);
 			UpnpCloseSocket(listenfd6);
+#endif
 			return UPNP_E_LISTEN;
 		}
 
@@ -768,14 +801,17 @@ static int get_miniserver_sockets(
 		if (actual_port4 <= 0) {
 			shutdown(listenfd4, SD_BOTH);
 			UpnpCloseSocket(listenfd4);
+#ifdef UPNP_ENABLE_IPV6
 			shutdown(listenfd6, SD_BOTH);
 			UpnpCloseSocket(listenfd6);
+#endif
 			return UPNP_E_INTERNAL_ERROR;
 		}
 
 		out->miniServerPort4 = actual_port4;
 	}
 
+#ifdef UPNP_ENABLE_IPV6
 	if (listenfd6 != INVALID_SOCKET) {
 		ret_code = listen(listenfd6, SOMAXCONN);
 		if (ret_code == -1) {
@@ -801,10 +837,11 @@ static int get_miniserver_sockets(
 
 		out->miniServerPort6 = actual_port6;
 	}
-
+#endif
 	out->miniServerSock4 = listenfd4;
+#ifdef UPNP_ENABLE_IPV6
 	out->miniServerSock6 = listenfd6;
-
+#endif
 	return UPNP_E_SUCCESS;
 }
 #endif /* INTERNAL_WEB_SERVER */
