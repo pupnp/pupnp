@@ -3,6 +3,12 @@ Version 1.8.0
 *******************************************************************************
 
 2010-09-10 Chandra Penke <chandrapenke(at)mcntech.com>
+	* SF Patch Tracker [ 2854711 ] Patch for Solaris10 compilation and usage
+	Submitted By: zephyrus ( zephyrus00jp )
+	
+	Patch for Solaris10 compilation and usage.
+
+2010-09-10 Chandra Penke <chandrapenke(at)mcntech.com>
 	Add support for conditionally enabling ipv6.
 
 2010-08-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>

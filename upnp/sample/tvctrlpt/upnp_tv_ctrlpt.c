@@ -1341,7 +1341,8 @@ int TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionP
 	SampleUtil_Print(
 		"Initializing UPnP Sdk with\n"
 		"\tipaddress = %s port = %u\n",
-		ip_address, port);
+		ip_address ? ip_address : "{NULL}",
+		port);
 
 	rc = UpnpInit(ip_address, port);
 	if (rc != UPNP_E_SUCCESS) {
@@ -1358,8 +1359,9 @@ int TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionP
 
 	SampleUtil_Print(
 		"UPnP Initialized\n"
-		"\tipaddress= %s port = %u\n",
-		ip_address, port);
+		"\tipaddress = %s port = %u\n",
+		ip_address ? ip_address : "{NULL}",
+		port);
 
 	SampleUtil_Print("Registering Control Point");
 	rc = UpnpRegisterClient(TvCtrlPointCallbackEventHandler,

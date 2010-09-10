@@ -1856,7 +1856,8 @@ TvDeviceStart( char *ip_address,
     SampleUtil_Print(
         "Initializing UPnP Sdk with\n"
         "\tipaddress = %s port = %u\n",
-        ip_address, port );
+        ip_address ? ip_address : "{NULL}",
+	port);
 
     ret = UpnpInit( ip_address, port );
     if( ret != UPNP_E_SUCCESS ) {
@@ -1870,8 +1871,9 @@ TvDeviceStart( char *ip_address,
 
     SampleUtil_Print(
         "UPnP Initialized\n"
-	"\tipaddress= %s port = %u\n",
-        ip_address, port );
+        "\tipaddress = %s port = %u\n",
+        ip_address ? ip_address : "{NULL}",
+	port);
 
     if( desc_doc_name == NULL ) {
         desc_doc_name = "tvcombodesc.xml";

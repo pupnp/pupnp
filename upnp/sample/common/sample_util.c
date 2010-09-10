@@ -43,7 +43,8 @@
 #endif
 
 
-int initialize = 1;
+static int initialize_init = 1;
+static int initialize_register = 1;
 
 /*! Function pointers to use for displaying formatted strings.
  * Set on Initialization of device. */
@@ -67,7 +68,7 @@ ithread_mutex_t display_mutex;
  ******************************************************************************/
 int SampleUtil_Initialize(print_string print_function)
 {
-	if (initialize) {
+	if (initialize_init) {
 		ithread_mutexattr_t attr;
 
 		ithread_mutexattr_init(&attr);
@@ -80,7 +81,7 @@ int SampleUtil_Initialize(print_string print_function)
 		gPrintFun = print_function;
 		ithread_mutex_unlock(&display_mutex);
 
-		initialize = 0;
+		initialize_init = 0;
 	} else {
 		SampleUtil_Print("***** SampleUtil_Initialize was called multiple times!\n");
 		abort();
@@ -99,12 +100,9 @@ int SampleUtil_Initialize(print_string print_function)
  ******************************************************************************/
 int SampleUtil_RegisterUpdateFunction(state_update update_function)
 {
-	/* Intialize only once. */
-	static int initialize = 1;
-
-	if (initialize) {
+	if (initialize_register) {
 		gStateUpdateFun = update_function;
-		initialize = 0;
+		initialize_register = 0;
 	}
 
 	return UPNP_E_SUCCESS;
@@ -123,7 +121,9 @@ int SampleUtil_Finish()
 {
 	ithread_mutex_destroy(&display_mutex);
 	gPrintFun = NULL;
-	initialize = 1;
+	gStateUpdateFun = NULL;
+	initialize_init = 1;
+	initialize_register = 1;
 
 	return UPNP_E_SUCCESS;
 }
