@@ -216,6 +216,11 @@ Version 1.8.0
 Version 1.6.7
 *******************************************************************************
 
+2010-09-10 Chandra Penke <chandrapenke(at)mcntech.com>
+	Fix for compilation in debug builds.
+
+	Ensure internal methods are declared as static since debug builds don't inline.
+
 2010-09-09 Chandra Penke <chandrapenke(at)mcntech.com>
 	Fix for regression in SSDP code to send/receive messages over UDP
 

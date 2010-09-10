@@ -308,7 +308,7 @@ search_extension( IN const char *extension,
  *	 0 - On Sucess
  *	 UPNP_E_OUTOF_MEMORY - on memory allocation failures
  ************************************************************************/
-UPNP_INLINE int
+static UPNP_INLINE int
 get_content_type(
 	IN const char *filename,
 	OUT UpnpFileInfo *fileInfo)
