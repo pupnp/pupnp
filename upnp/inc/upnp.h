@@ -1355,6 +1355,8 @@ EXPORT_SPEC int UpnpSetContentLength(
  * behaviour if the size of the incoming SOAP message exceeds the memory that
  * device can allocate.
  *
+ * If set to 0 then checking will be disabled.
+ *
  * The default maximum content-length is \c DEFAULT_SOAP_CONTENT_LENGTH 
  * = 16K bytes.
  *  
