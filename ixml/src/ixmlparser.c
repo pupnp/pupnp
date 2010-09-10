@@ -583,10 +583,13 @@ static int Parser_isValidEndElement(
 	IXML_Node *newNode)
 {
 	assert(xmlParser);
-	assert(xmlParser->pCurElement);
 	assert(xmlParser->pCurElement->element);
 	assert(newNode);
 	assert(newNode->nodeName);
+
+	if (xmlParser->pCurElement == NULL) {
+		return 0;
+	}
 
 	return strcmp(xmlParser->pCurElement->element, newNode->nodeName) == 0;
 }

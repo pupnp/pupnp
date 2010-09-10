@@ -2,6 +2,12 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-09-10 Jean Sigwald <jean.sigwald(at)orange-ftgroup.com>
+	I discovered a reliable denial-of-service issue on the last stable
+	release of libupnp (1.6.6) remotely triggerable by any
+	unauthenticated user. The issue is related with a bad parsing of
+	malformed XML.
+
 2010-09-10 Chandra Penke <chandrapenke(at)mcntech.com>
 	* SF Patch Tracker [ 2854711 ] Patch for Solaris10 compilation and usage
 	Submitted By: zephyrus ( zephyrus00jp )
