@@ -55,9 +55,11 @@ typedef struct MServerSockArray {
 	SOCKET miniServerPort4;
 	SOCKET miniServerPort6;
 
+#ifdef INCLUDE_CLIENT_APIS
 	/* socket for sending search requests and receiving search replies */
-	CLIENTONLY(SOCKET ssdpReqSock4;)
-	CLIENTONLY(SOCKET ssdpReqSock6;)
+	SOCKET ssdpReqSock4;
+	SOCKET ssdpReqSock6;
+#endif /* INCLUDE_CLIENT_APIS */
 } MiniServerSockArray;
 
 

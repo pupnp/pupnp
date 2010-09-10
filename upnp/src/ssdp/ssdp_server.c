@@ -50,10 +50,12 @@
 
 #define MAX_TIME_TOREAD  45
 
-CLIENTONLY( SOCKET gSsdpReqSocket4 = INVALID_SOCKET; )
-#ifdef UPNP_ENABLE_IPV6
-CLIENTONLY( SOCKET gSsdpReqSocket6 = INVALID_SOCKET; )
-#endif
+#ifdef INCLUDE_CLIENT_APIS
+	SOCKET gSsdpReqSocket4 = INVALID_SOCKET;
+	#ifdef UPNP_ENABLE_IPV6
+		SOCKET gSsdpReqSocket6 = INVALID_SOCKET;
+	#endif /* UPNP_ENABLE_IPV6 */
+#endif /* INCLUDE_CLIENT_APIS */
 
 void RequestHandler();
 int create_ssdp_sock_v4( SOCKET* ssdpSock );
@@ -72,10 +74,12 @@ Event ErrotEvt;
 enum Listener { Idle, Stopping, Running };
 
 struct SSDPSockArray {
-	// socket for incoming advertisments and search requests
+	/* socket for incoming advertisments and search requests */
 	SOCKET ssdpSock;
-	// socket for sending search requests and receiving search replies
-	CLIENTONLY( int ssdpReqSock; )
+#ifdef INCLUDE_CLIENT_APIS
+	/* socket for sending search requests and receiving search replies */
+	int ssdpReqSock;
+#endif /* INCLUDE_CLIENT_APIS */
 };
 
 #ifdef INCLUDE_DEVICE_APIS
@@ -738,26 +742,26 @@ start_event_handler( void *Data )
  * Returns: void
  *
  ***************************************************************************/
-static void
-ssdp_event_handler_thread( void *the_data )
+static void ssdp_event_handler_thread(void * the_data)
 {
-    ssdp_thread_data *data = ( ssdp_thread_data * ) the_data;
-    http_message_t *hmsg = &data->parser.msg;
+	ssdp_thread_data *data = (ssdp_thread_data *)the_data;
+	http_message_t *hmsg = &data->parser.msg;
 
-    if( start_event_handler( the_data ) != 0 ) {
-        return;
-    }
-    // send msg to device or ctrlpt
-    if( ( hmsg->method == HTTPMETHOD_NOTIFY ) ||
-        ( hmsg->request_method == HTTPMETHOD_MSEARCH ) ) {
-        CLIENTONLY( ssdp_handle_ctrlpt_msg( hmsg, 
-            (struct sockaddr*)&data->dest_addr, FALSE, NULL );)
-    } else {
-        ssdp_handle_device_request( hmsg, (struct sockaddr*)&data->dest_addr );
-    }
+	if (start_event_handler(the_data) != 0) {
+		return;
+	}
+	/* send msg to device or ctrlpt */
+	if (hmsg->method == HTTPMETHOD_NOTIFY ||
+	    hmsg->request_method == HTTPMETHOD_MSEARCH) {
+#ifdef INCLUDE_CLIENT_APIS
+		ssdp_handle_ctrlpt_msg(hmsg, (struct sockaddr*)&data->dest_addr, FALSE, NULL);
+#endif /* INCLUDE_CLIENT_APIS */
+	} else {
+		ssdp_handle_device_request(hmsg, (struct sockaddr*)&data->dest_addr);
+	}
 
-    // free data
-    free_ssdp_event_handler_data( data );
+	/* free data */
+	free_ssdp_event_handler_data(data);
 }
 
 /************************************************************************
