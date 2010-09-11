@@ -92,6 +92,153 @@ const int CHUNK_TAIL_SIZE = 10;
 #define CHUNK_TAIL_SIZE 10
 
 
+#ifdef UPNP_BLOCKING_CONNECT
+
+
+/************************************************************************
+ * Function : Make_Socket_NoBlocking
+ *
+ * Parameters:
+ *	IN int sock: socket
+ *
+ * Description:
+ *	This function makes socket non-blocking.
+ *
+ * Returns: int
+ *	0 if successful else -1 
+ ***************************************************************************/
+static int Make_Socket_NoBlocking(int sock)
+{
+#ifdef WIN32
+	u_long val = 1;
+	return ioctlsocket(sock, FIONBIO, &val);
+#else
+	int val;
+
+	val = fcntl(sock, F_GETFL, 0);
+	if (fcntl(sock, F_SETFL, val | O_NONBLOCK) == -1) {
+		return -1;
+	}
+#endif
+	return 0;
+}
+
+/************************************************************************
+ * Function : Make_Socket_Blocking
+ *
+ * Parameters:
+ *	IN int sock: socket
+ *
+ * Description:
+ *	This function makes socket blocking.
+ *
+ * Returns: int
+ *	0 if successful else -1 
+ ***************************************************************************/
+static int Make_Socket_Blocking(int sock)
+{
+#ifdef WIN32
+	u_long val = 0;
+	return ioctlsocket(sock, FIONBIO, &val);
+#else
+	int val;
+
+	val = fcntl(sock, F_GETFL, 0);
+	if (fcntl(sock, F_SETFL, val & ~O_NONBLOCK) == -1) {
+		return -1;
+	}
+#endif
+	return 0;
+}
+
+/* in seconds */
+#define DEFAULT_TCP_CONNECT_TIMEOUT 5
+
+/************************************************************************
+ * Function : Check_Connect_And_Wait_Connection
+ *
+ * Parameters:
+ *	IN int sock: socket
+ *  IN int connect_res: result of connect
+ *
+ * Description:
+ *	This function checks socket connection and wait if it is not connected
+ *  It should be called just after connect
+ *
+ * Returns: int
+ *	0 if successful else -1 
+ ***************************************************************************/
+static int Check_Connect_And_Wait_Connection(int sock, int connect_res)
+{
+	struct timeval tmvTimeout = {DEFAULT_TCP_CONNECT_TIMEOUT, 0};
+	int result;
+#ifdef WIN32
+	struct fd_set fdSet;
+#else
+	fd_set fdSet;
+#endif
+	FD_ZERO(&fdSet);
+	FD_SET(sock, &fdSet);
+
+	if (connect_res < 0) {
+#ifdef WIN32
+		if (WSAEWOULDBLOCK == WSAGetLastError() ) {
+#else
+		if (EINPROGRESS == errno ) {
+#endif
+			result = select(sock + 1, NULL, &fdSet, NULL, &tmvTimeout);
+			if (result < 0) {
+#ifdef WIN32
+				/* WSAGetLastError(); */
+#else
+				/* errno */
+#endif
+				return -1;
+			} else if (result == 0) {
+				/* timeout */
+				return -1;
+#ifndef WIN32
+			} else {
+				int valopt = 0;
+				socklen_t len;
+				if (getsockopt(sock, SOL_SOCKET, SO_ERROR, (void *) &valopt, &len) < 0) {
+					/* failed to read delayed error */
+					return -1;
+				} else if (valopt) {
+					/* delayed error = valopt */
+					return -1;
+				}
+#endif
+			}
+		}
+	}
+
+	return 0;
+}
+#endif /* UPNP_BLOCKING_CONNECT */
+
+static int private_connect(
+	int sockfd,
+	const struct sockaddr *serv_addr,
+	socklen_t addrlen)
+{
+#ifdef UPNP_BLOCKING_CONNECT
+	int ret = Make_Socket_NoBlocking(sockfd);
+	if (ret != - 1) {
+		ret = connect(sockfd, serv_addr, addrlen);
+		ret = Check_Connect_And_Wait_Connection(sockfd, ret);
+		if (ret != - 1) {
+			ret = Make_Socket_Blocking(sockfd);
+		}
+	}
+
+	return ret;
+#else
+	return connect(sockfd, serv_addr, addrlen);
+#endif /* UPNP_BLOCKING_CONNECT */
+}
+
+
 /************************************************************************
  * Function: http_FixUrl
  *
@@ -106,28 +253,24 @@ const int CHUNK_TAIL_SIZE = 10;
  *	 UPNP_E_INVALID_URL
  * 	 UPNP_E_SUCCESS
  ************************************************************************/
-int
-http_FixUrl( IN uri_type * url,
-             OUT uri_type * fixed_url )
+int http_FixUrl(IN uri_type *url, OUT uri_type *fixed_url)
 {
-    char *temp_path = "/";
+	char *temp_path = "/";
 
-    *fixed_url = *url;
+	*fixed_url = *url;
+	if (token_string_casecmp(&fixed_url->scheme, "http") != 0) {
+		return UPNP_E_INVALID_URL;
+	}
+	if( fixed_url->hostport.text.size == 0 ) {
+		return UPNP_E_INVALID_URL;
+	}
+	/* set pathquery to "/" if it is empty */
+	if (fixed_url->pathquery.size == 0) {
+		fixed_url->pathquery.buff = temp_path;
+		fixed_url->pathquery.size = 1;
+	}
 
-    if( token_string_casecmp( &fixed_url->scheme, "http" ) != 0 ) {
-        return UPNP_E_INVALID_URL;
-    }
-
-    if( fixed_url->hostport.text.size == 0 ) {
-        return UPNP_E_INVALID_URL;
-    }
-    // set pathquery to "/" if it is empty
-    if( fixed_url->pathquery.size == 0 ) {
-        fixed_url->pathquery.buff = temp_path;
-        fixed_url->pathquery.size = 1;
-    }
-
-    return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 
 
@@ -146,18 +289,18 @@ http_FixUrl( IN uri_type * url,
  *	 UPNP_E_INVALID_URL
  * 	 UPNP_E_SUCCESS
  ************************************************************************/
-int
-http_FixStrUrl( IN const char *urlstr,
-                IN int urlstrlen,
-                OUT uri_type * fixed_url )
+int http_FixStrUrl(
+	IN const char *urlstr,
+	IN int urlstrlen,
+	OUT uri_type * fixed_url)
 {
-    uri_type url;
+	uri_type url;
 
-    if( parse_uri( urlstr, urlstrlen, &url ) != HTTP_SUCCESS ) {
-        return UPNP_E_INVALID_URL;
-    }
+	if (parse_uri(urlstr, urlstrlen, &url) != HTTP_SUCCESS) {
+		return UPNP_E_INVALID_URL;
+	}
 
-    return http_FixUrl( &url, fixed_url );
+	return http_FixUrl(&url, fixed_url);
 }
 
 
@@ -568,7 +711,7 @@ int http_RequestAndResponse(
 	/* connect */
 	sockaddr_len = destination->hostport.IPaddress.ss_family == AF_INET6 ?
 		sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
-	ret_code = connect(info.socket,
+	ret_code = private_connect(info.socket,
 		(struct sockaddr *)&(destination->hostport.IPaddress), sockaddr_len);
 	if (ret_code == -1) {
 		parser_response_init(response, req_method);
@@ -1048,7 +1191,7 @@ int http_OpenHttpPost(
 	}
 	sockaddr_len = url.hostport.IPaddress.ss_family == AF_INET6 ?
 		sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
-	ret_code = connect(handle->sock_info.socket,
+	ret_code = private_connect(handle->sock_info.socket,
 		(struct sockaddr *)&(url.hostport.IPaddress), sockaddr_len);
 	if (ret_code == -1) {
 		sock_destroy(&handle->sock_info, SD_BOTH);
@@ -1625,7 +1768,7 @@ int http_OpenHttpGetProxy(
 	}
 	sockaddr_len = peer->hostport.IPaddress.ss_family == AF_INET6 ?
 		sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
-	ret_code = connect(handle->sock_info.socket,
+	ret_code = private_connect(handle->sock_info.socket,
 		(struct sockaddr *)&(peer->hostport.IPaddress), sockaddr_len);
 	if (ret_code == -1) {
 		sock_destroy(&handle->sock_info, SD_BOTH);
@@ -2256,7 +2399,7 @@ int http_OpenHttpGetEx(
 		}
 		sockaddr_len = url.hostport.IPaddress.ss_family == AF_INET6 ?
 			sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
-		errCode  = connect(handle->sock_info.socket,
+		errCode  = private_connect(handle->sock_info.socket,
 			(struct sockaddr *)&(url.hostport.IPaddress), sockaddr_len);
 		if (errCode == -1) {
 			sock_destroy(&handle->sock_info, SD_BOTH);
