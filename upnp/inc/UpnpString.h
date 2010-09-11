@@ -24,6 +24,9 @@
 #include "UpnpGlobal.h" /* for EXPORT_SPEC */
 
 
+#include <stdlib.h> /* for size_t */
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -76,9 +79,20 @@ EXPORT_SPEC void UpnpString_assign(
  *
  * \return The length of the string.
  * */
-EXPORT_SPEC int UpnpString_get_Length(
+EXPORT_SPEC size_t UpnpString_get_Length(
 	/*! [in] The \em \b this pointer. */
 	const UpnpString *p);
+
+
+/*!
+ * \brief Truncates the string to the specified lenght, or does nothing
+ * if the current lenght is less than or equal to the requested length.
+ * */
+EXPORT_SPEC void UpnpString_set_Length(
+	/*! [in] The \em \b this pointer. */
+	UpnpString *p,
+	/*! [in] The requested length. */
+	size_t n);
 
 
 /*!
@@ -94,7 +108,7 @@ EXPORT_SPEC const char *UpnpString_get_String(
 /*!
  * \brief Sets the string from a pointer to char.
  */
-EXPORT_SPEC void UpnpString_set_String(
+EXPORT_SPEC int UpnpString_set_String(
 	/*! [in] The \em \b this pointer. */
 	UpnpString *p,
 	/*! [in] (char *) to copy from. */
@@ -104,13 +118,13 @@ EXPORT_SPEC void UpnpString_set_String(
 /*!
  * \brief Sets the string from a pointer to char using a maximum of N chars.
  */
-EXPORT_SPEC void UpnpString_set_StringN(
+EXPORT_SPEC int UpnpString_set_StringN(
 	/*! [in] The \em \b this pointer. */
 	UpnpString *p,
 	/*! [in] (char *) to copy from. */
 	const char *s,
 	/*! Maximum number of chars to copy.*/
-	int n);
+	size_t n);
 
 
 /*!
@@ -119,6 +133,30 @@ EXPORT_SPEC void UpnpString_set_StringN(
 EXPORT_SPEC void UpnpString_clear(
 	/*! [in] The \em \b this pointer. */
 	UpnpString *p);
+
+
+/*!
+ * \brief Compares two strings for equality. Case matters.
+ *
+ * \return The result of strcmp().
+ */
+EXPORT_SPEC int UpnpString_cmp(
+	/*! [in] The \em \b the first string. */
+	UpnpString *p,
+	/*! [in] The \em \b the second string. */
+	UpnpString *q);
+
+
+/*!
+ * \brief Compares two strings for equality. Case does not matter.
+ *
+ * \return The result of strcasecmp().
+ */
+EXPORT_SPEC int UpnpString_casecmp(
+	/*! [in] The \em \b the first string. */
+	UpnpString *p,
+	/*! [in] The \em \b the second string. */
+	UpnpString *q);
 
 
 #ifdef __cplusplus
