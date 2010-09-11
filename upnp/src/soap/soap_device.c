@@ -990,7 +990,7 @@ handle_invoke_action( IN SOCKINFO * info,
     UpnpActionRequest_set_DevUDN(action, devUDN);
     UpnpActionRequest_set_ServiceID(action, serviceID);
     UpnpActionRequest_set_ActionRequest(action, actionRequestDoc);
-    UpnpActionRequest_set_CtrlPtIPAddr(action, (struct sockaddr *)&info->foreign_sockaddr);
+    UpnpActionRequest_set_CtrlPtIPAddr(action, &info->foreign_sockaddr);
 
     UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
 
