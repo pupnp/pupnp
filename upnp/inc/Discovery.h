@@ -9,103 +9,29 @@
  *
  * \brief UpnpDiscovery object declararion.
  *
+ * Returned in a \b UPNP_DISCOVERY_RESULT callback.
+ *
  * \author Marcelo Roberto Jimenez
  */
 
+#include "UpnpInet.h" /* for struct sockaddr_storage */
 
-/*! Returned in a \b UPNP_DISCOVERY_RESULT callback. */
-typedef struct s_UpnpDiscovery UpnpDiscovery;
+#define CLASS UpnpDiscovery
 
+#define EXPAND_CLASS_MEMBERS(CLASS) \
+	EXPAND_CLASS_MEMBER_INT(CLASS, ErrCode, int) \
+	EXPAND_CLASS_MEMBER_INT(CLASS, Expires, int) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, DeviceID) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, DeviceType) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, ServiceType) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, ServiceVer) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, Location) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, Os) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, Date) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, Ext) \
+	EXPAND_CLASS_MEMBER_BUFFER(CLASS, DestAddr, struct sockaddr_storage) \
 
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
-#include "UpnpInet.h"   /* for sockaddr, sockaddr_storage */
-#include "UpnpString.h"
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-
-/*! Constructor */
-EXPORT_SPEC UpnpDiscovery *UpnpDiscovery_new();
-
-/*! Destructor */
-EXPORT_SPEC void UpnpDiscovery_delete(UpnpDiscovery *p);
-
-/*! Copy Constructor */
-EXPORT_SPEC UpnpDiscovery *UpnpDiscovery_dup(const UpnpDiscovery *p);
-
-/*! Assignment operator */
-EXPORT_SPEC void UpnpDiscovery_assign(UpnpDiscovery *p, const UpnpDiscovery *q);
-
-/*! The result code of the \b UpnpSearchAsync call. */
-EXPORT_SPEC int UpnpDiscovery_get_ErrCode(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_ErrCode(UpnpDiscovery *p, int n);
-
-/*! The expiration time of the advertisement. */
-EXPORT_SPEC int UpnpDiscovery_get_Expires(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_Expires(UpnpDiscovery *p, int n);
-
-/*! The unique device identifier. */
-EXPORT_SPEC const UpnpString *UpnpDiscovery_get_DeviceID(const UpnpDiscovery *p);
-EXPORT_SPEC const char *UpnpDiscovery_get_DeviceID_cstr(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_DeviceID(UpnpDiscovery *p, const UpnpString *s);
-EXPORT_SPEC void UpnpDiscovery_strcpy_DeviceID(UpnpDiscovery *p, const char *s);
-
-/*! The device type. */
-EXPORT_SPEC const UpnpString *UpnpDiscovery_get_DeviceType(const UpnpDiscovery *p);
-EXPORT_SPEC const char *UpnpDiscovery_get_DeviceType_cstr(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_DeviceType(UpnpDiscovery *p, const UpnpString *s);
-EXPORT_SPEC void UpnpDiscovery_strcpy_DeviceType(UpnpDiscovery *p, const char *s);
-
-/*! The ServiceType. */
-EXPORT_SPEC const UpnpString *UpnpDiscovery_get_ServiceType(const UpnpDiscovery *p);
-EXPORT_SPEC const char *UpnpDiscovery_get_ServiceType_cstr(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_ServiceType(UpnpDiscovery *p, const UpnpString *s);
-EXPORT_SPEC void UpnpDiscovery_strcpy_ServiceType(UpnpDiscovery *p, const char *s);
-
-/*! The service version. */
-EXPORT_SPEC const UpnpString *UpnpDiscovery_get_ServiceVer(const UpnpDiscovery *p);
-EXPORT_SPEC const char *UpnpDiscovery_get_ServiceVer_cstr(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_ServiceVer(UpnpDiscovery *p, const UpnpString *s);
-EXPORT_SPEC void UpnpDiscovery_strcpy_ServiceVer(UpnpDiscovery *p, const char *s);
-
-/*! The URL to the UPnP description document for the device. */
-EXPORT_SPEC const UpnpString *UpnpDiscovery_get_Location(const UpnpDiscovery *p);
-EXPORT_SPEC const char *UpnpDiscovery_get_Location_cstr(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_Location(UpnpDiscovery *p, const UpnpString *s);
-EXPORT_SPEC void UpnpDiscovery_strcpy_Location(UpnpDiscovery *p, const char *s);
-EXPORT_SPEC void UpnpDiscovery_strncpy_Location(UpnpDiscovery *p, const char *s, int n);
-
-/*! The operating system the device is running. */
-EXPORT_SPEC const UpnpString *UpnpDiscovery_get_Os(const UpnpDiscovery *p);
-EXPORT_SPEC const char *UpnpDiscovery_get_Os_cstr(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_Os(UpnpDiscovery *p, const UpnpString *s);
-EXPORT_SPEC void UpnpDiscovery_strcpy_Os(UpnpDiscovery *p, const char *s);
-EXPORT_SPEC void UpnpDiscovery_strncpy_Os(UpnpDiscovery *p, const char *s, int n);
-
-/*! Date when the response was generated. */
-EXPORT_SPEC const UpnpString *UpnpDiscovery_get_Date(const UpnpDiscovery *p);
-EXPORT_SPEC const char *UpnpDiscovery_get_Date_cstr(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_Date(UpnpDiscovery *p, const UpnpString *s);
-EXPORT_SPEC void UpnpDiscovery_strcpy_Date(UpnpDiscovery *p, const char *s);
-
-/*! Confirmation that the MAN header was understood by the device. */
-EXPORT_SPEC const UpnpString *UpnpDiscovery_get_Ext(const UpnpDiscovery *p);
-EXPORT_SPEC const char *UpnpDiscovery_get_Ext_cstr(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_Ext(UpnpDiscovery *p, const UpnpString *s);
-EXPORT_SPEC void UpnpDiscovery_strcpy_Ext(UpnpDiscovery *p, const char *s);
-EXPORT_SPEC void UpnpDiscovery_strncpy_Ext(UpnpDiscovery *p, const char *s, int n);
-
-/*! The host address of the device responding to the search. */
-EXPORT_SPEC const struct sockaddr *UpnpDiscovery_get_DestAddr(const UpnpDiscovery *p);
-EXPORT_SPEC void UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, const struct sockaddr *sa);
-
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+#include "TemplateInclude.h"
 
 
 #endif /* DISCOVERY_H */

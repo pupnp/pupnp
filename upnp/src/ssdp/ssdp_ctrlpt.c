@@ -106,7 +106,7 @@ void send_search_result(IN void *data)
  ***************************************************************************/
 void ssdp_handle_ctrlpt_msg(
 	IN http_message_t *hmsg,
-	IN struct sockaddr *dest_addr,
+	IN struct sockaddr_storage *dest_addr,
 	IN xboolean timeout, // only in search reply
 	IN void *cookie)    // only in search reply
 {

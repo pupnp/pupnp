@@ -215,12 +215,12 @@ int Make_Socket_NoBlocking (int sock);
 ***************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 void ssdp_handle_device_request(
-	IN http_message_t* hmsg, 
-	IN struct sockaddr* dest_addr );
+	IN http_message_t *hmsg, 
+	IN struct sockaddr_storage *dest_addr);
 #else
 static inline void ssdp_handle_device_request(
-	IN http_message_t* hmsg, 
-	IN struct sockaddr* dest_addr ) {}
+	IN http_message_t *hmsg, 
+	IN struct sockaddr_storage *dest_addr) {}
 #endif
 
 /************************************************************************
@@ -244,10 +244,10 @@ static inline void ssdp_handle_device_request(
 *
 ***************************************************************************/
 void ssdp_handle_ctrlpt_msg(
-	IN http_message_t* hmsg, 
-	IN struct sockaddr* dest_addr,
+	IN http_message_t *hmsg, 
+	IN struct sockaddr_storage *dest_addr,
 	IN xboolean timeout,
-	IN void* cookie );
+	IN void *cookie);
 
 /************************************************************************
 * Function : unique_service_name

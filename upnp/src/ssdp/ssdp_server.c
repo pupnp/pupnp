@@ -742,7 +742,7 @@ start_event_handler( void *Data )
  * Returns: void
  *
  ***************************************************************************/
-static void ssdp_event_handler_thread(void * the_data)
+static void ssdp_event_handler_thread(void *the_data)
 {
 	ssdp_thread_data *data = (ssdp_thread_data *)the_data;
 	http_message_t *hmsg = &data->parser.msg;
@@ -754,10 +754,10 @@ static void ssdp_event_handler_thread(void * the_data)
 	if (hmsg->method == HTTPMETHOD_NOTIFY ||
 	    hmsg->request_method == HTTPMETHOD_MSEARCH) {
 #ifdef INCLUDE_CLIENT_APIS
-		ssdp_handle_ctrlpt_msg(hmsg, (struct sockaddr*)&data->dest_addr, FALSE, NULL);
+		ssdp_handle_ctrlpt_msg(hmsg, &data->dest_addr, FALSE, NULL);
 #endif /* INCLUDE_CLIENT_APIS */
 	} else {
-		ssdp_handle_device_request(hmsg, (struct sockaddr*)&data->dest_addr);
+		ssdp_handle_device_request(hmsg, &data->dest_addr);
 	}
 
 	/* free data */

@@ -91,7 +91,7 @@ advertiseAndReplyThread( IN void *data )
 *
 * Parameters:
 *	IN http_message_t *hmsg: SSDP search request from the control point
-*	IN struct sockaddr *dest_addr: The address info of control point
+*	IN struct sockaddr_storage *dest_addr: The address info of control point
 *
 * Description:
 *	This function handles the search request. It do the sanity checks of
@@ -102,9 +102,9 @@ advertiseAndReplyThread( IN void *data )
 *	1 if successful else appropriate error
 ***************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
-void
-ssdp_handle_device_request( IN http_message_t *hmsg,
-                            IN struct sockaddr *dest_addr )
+void ssdp_handle_device_request(
+	IN http_message_t *hmsg,
+	IN struct sockaddr_storage *dest_addr)
 {
 #define MX_FUDGE_FACTOR 10
 
@@ -144,7 +144,7 @@ ssdp_handle_device_request( IN http_message_t *hmsg,
 
     HandleLock();
     // device info
-    if( GetDeviceHandleInfo( dest_addr->sa_family, 
+    if( GetDeviceHandleInfo( dest_addr->ss_family, 
         &handle, &dev_info ) != HND_DEVICE ) {
         HandleUnlock();
         return;                 // no info found
