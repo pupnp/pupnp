@@ -28,6 +28,19 @@
 #include <string.h> /* for strlen(), strdup() */
 
 
+#ifdef WIN32
+	#define strcasecmp stricmp
+#else
+	/* Other systems have strncasecmp */
+#endif
+
+
+/* strndup() is a GNU extension. Other systems must fix it with elif's. */
+#ifdef __GNUC__
+extern char *strndup(__const char *__string, size_t __n);
+#endif
+
+
 /*!
  * \brief Internal implementation of the class UpnpString.
  *
@@ -115,9 +128,19 @@ void UpnpString_assign(UpnpString *p, const UpnpString *q)
 }
 
 
-int UpnpString_get_Length(const UpnpString *p)
+size_t UpnpString_get_Length(const UpnpString *p)
 {
 	return ((struct SUpnpString *)p)->m_length;
+}
+
+
+void UpnpString_set_Length(UpnpString *p, size_t n)
+{
+	if (((struct SUpnpString *)p)->m_length > n) {
+		((struct SUpnpString *)p)->m_length = n;
+		/* No need to realloc now, will do later when needed. */
+		((struct SUpnpString *)p)->m_string[n] = 0;
+	}
 }
 
 
@@ -127,29 +150,55 @@ const char *UpnpString_get_String(const UpnpString *p)
 }
 
 
-void UpnpString_set_String(UpnpString *p, const char *s)
+int UpnpString_set_String(UpnpString *p, const char *s)
 {
+	char *q = strdup(s);
+	if (!q) goto error_handler1;
 	free(((struct SUpnpString *)p)->m_string);
-	((struct SUpnpString *)p)->m_length = strlen(s);
-	((struct SUpnpString *)p)->m_string = strdup(s);
+	((struct SUpnpString *)p)->m_length = strlen(q);
+	((struct SUpnpString *)p)->m_string = q;
+
+error_handler1:
+	return q != NULL;
 }
 
 
-void UpnpString_set_StringN(UpnpString *p, const char *s, int n)
+int UpnpString_set_StringN(UpnpString *p, const char *s, size_t n)
 {
+	char *q = strndup(s, n);
+	if (!q) goto error_handler1;
 	free(((struct SUpnpString *)p)->m_string);
-	((struct SUpnpString *)p)->m_length = n;
-	((struct SUpnpString *)p)->m_string = (char *)malloc(n+1);
-	strncpy(((struct SUpnpString *)p)->m_string, s, n);
-	((struct SUpnpString *)p)->m_string[n] = 0;
+	((struct SUpnpString *)p)->m_length = strlen(q);
+	((struct SUpnpString *)p)->m_string = q;
+
+error_handler1:
+	return q != NULL;
 }
 
 
 void UpnpString_clear(UpnpString *p)
 {
 	((struct SUpnpString *)p)->m_length = 0;
-	// No need to realloc now, will do later when needed
+	/* No need to realloc now, will do later when needed. */
 	((struct SUpnpString *)p)->m_string[0] = 0;
+}
+
+
+int UpnpString_cmp(UpnpString *p, UpnpString *q)
+{
+	const char *cp = UpnpString_get_String(p);
+	const char *cq = UpnpString_get_String(q);
+
+	return strcmp(cp, cq);
+}
+
+
+int UpnpString_casecmp(UpnpString *p, UpnpString *q)
+{
+	const char *cp = UpnpString_get_String(p);
+	const char *cq = UpnpString_get_String(q);
+
+	return strcasecmp(cp, cq);
 }
 
 /* @} UpnpString */
