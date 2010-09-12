@@ -618,6 +618,7 @@ get_file_info(
 	struct stat s;
 	FILE *fp;
 	int rc = 0;
+	time_t aux_LastModified;
 
 	UpnpFileInfo_set_ContentType(info, NULL);
 
@@ -642,15 +643,16 @@ get_file_info(
 	}
 
 	UpnpFileInfo_set_FileLength(info, s.st_size);
-	UpnpFileInfo_set_LastModified(info, &s.st_mtime);
+	UpnpFileInfo_set_LastModified(info, s.st_mtime);
 
 	rc = get_content_type(filename, info);
 
+	aux_LastModified = UpnpFileInfo_get_LastModified(info);
 	UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
 		"file info: %s, length: %lld, last_mod=%s readable=%d\n",
 		filename,
 		(long long)UpnpFileInfo_get_FileLength(info),
-		asctime(gmtime(UpnpFileInfo_get_LastModified(info))),
+		asctime(gmtime(&aux_LastModified)),
 		UpnpFileInfo_get_IsReadable(info));
 
 	return rc;
@@ -717,11 +719,10 @@ get_alias(
 {
 	int cmp = strcmp(alias->name.buf, request_file);
 	if (cmp == 0) {
-		// fill up info
 		UpnpFileInfo_set_FileLength(info, alias->doc.length);
 		UpnpFileInfo_set_IsDirectory(info, FALSE);
 		UpnpFileInfo_set_IsReadable(info, TRUE);
-		UpnpFileInfo_set_LastModified(info, &alias->last_modified);
+		UpnpFileInfo_set_LastModified(info, alias->last_modified);
 	}
 
 	return cmp == 0;
