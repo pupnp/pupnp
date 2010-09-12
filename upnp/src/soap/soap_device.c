@@ -859,67 +859,67 @@ error_handler:
 static UPNP_INLINE void handle_query_variable(
 	IN SOCKINFO *info,
 	IN http_message_t *request,
-	IN IXML_Document *xml_doc )
+	IN IXML_Document *xml_doc)
 {
-    UpnpStateVarRequest *variable = UpnpStateVarRequest_new();
-    Upnp_FunPtr soap_event_callback;
-    void *cookie;
-    char var_name[LINE_SIZE];
-    const char *err_str;
-    int err_code;
+	UpnpStateVarRequest *variable = UpnpStateVarRequest_new();
+	Upnp_FunPtr soap_event_callback;
+	void *cookie;
+	char var_name[LINE_SIZE];
+	const char *err_str;
+	int err_code;
 
-    // get var name
-    if( get_var_name( xml_doc, var_name ) != 0 ) {
-        send_error_response( info, SOAP_INVALID_VAR,
-                             Soap_Invalid_Var, request );
-        return;
-    }
-    // get info for event
-    err_code = get_device_info(
-        request, 1, xml_doc,
-	info->foreign_sockaddr.ss_family,
-        (UpnpString *)UpnpStateVarRequest_get_DevUDN(variable),
-        (UpnpString *)UpnpStateVarRequest_get_ServiceID(variable),
-        &soap_event_callback,
-        &cookie);
-    if( err_code != 0 ) {
-        send_error_response( info, SOAP_INVALID_VAR,
-                             Soap_Invalid_Var, request );
-        return;
-    }
+	if (get_var_name(xml_doc, var_name) != 0) {
+		send_error_response(info, SOAP_INVALID_VAR, Soap_Invalid_Var, request);
 
-    UpnpStateVarRequest_set_ErrCode(variable, UPNP_E_SUCCESS);
-    UpnpStateVarRequest_strcpy_StateVarName(variable, var_name);
-    UpnpStateVarRequest_set_CtrlPtIPAddr(variable, (struct sockaddr *)&info->foreign_sockaddr);
+		return;
+	}
+	/* get info for event */
+	err_code = get_device_info(
+		request, 1, xml_doc,
+		info->foreign_sockaddr.ss_family,
+		(UpnpString *)UpnpStateVarRequest_get_DevUDN(variable),
+		(UpnpString *)UpnpStateVarRequest_get_ServiceID(variable),
+		&soap_event_callback,
+		&cookie);
+	if (err_code != 0) {
+		send_error_response(info, SOAP_INVALID_VAR, Soap_Invalid_Var, request);
 
-    // send event
-    soap_event_callback( UPNP_CONTROL_GET_VAR_REQUEST, variable, cookie );
+		return;
+	}
 
-    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
-        "Return from callback for var request\n" );
+	UpnpStateVarRequest_set_ErrCode(variable, UPNP_E_SUCCESS);
+	UpnpStateVarRequest_strcpy_StateVarName(variable, var_name);
+	UpnpStateVarRequest_set_CtrlPtIPAddr(variable, &info->foreign_sockaddr);
 
-    // validate, and handle result
-    if( UpnpStateVarRequest_get_CurrentVal(variable) == NULL ) {
-        err_code = SOAP_ACTION_FAILED;
-        err_str = Soap_Action_Failed;
-        send_error_response( info, SOAP_INVALID_VAR, Soap_Invalid_Var, request );
+	/* send event */
+	soap_event_callback(UPNP_CONTROL_GET_VAR_REQUEST, variable, cookie);
 
-        return;
-    }
-    if( UpnpStateVarRequest_get_ErrCode(variable) != UPNP_E_SUCCESS ) {
-        if( UpnpString_get_Length(UpnpStateVarRequest_get_ErrStr(variable)) > 0 ) {
-            err_code = SOAP_INVALID_VAR;
-            err_str = Soap_Invalid_Var;
-        } else {
-            err_code = UpnpStateVarRequest_get_ErrCode(variable);
-            err_str = UpnpStateVarRequest_get_ErrStr_cstr(variable);
-        }
-        send_error_response( info, err_code, err_str, request );
-        return;
-    }
-    // send response
-    send_var_query_response( info, UpnpStateVarRequest_get_CurrentVal(variable), request );
-    UpnpStateVarRequest_delete(variable);
+	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__,
+		"Return from callback for var request\n");
+
+	/* validate, and handle result */
+	if (UpnpStateVarRequest_get_CurrentVal(variable) == NULL) {
+		err_code = SOAP_ACTION_FAILED;
+		err_str = Soap_Action_Failed;
+		send_error_response(info, SOAP_INVALID_VAR, Soap_Invalid_Var, request);
+
+		return;
+	}
+	if (UpnpStateVarRequest_get_ErrCode(variable) != UPNP_E_SUCCESS) {
+		if (UpnpString_get_Length(UpnpStateVarRequest_get_ErrStr(variable)) > 0) {
+			err_code = SOAP_INVALID_VAR;
+			err_str = Soap_Invalid_Var;
+		} else {
+			err_code = UpnpStateVarRequest_get_ErrCode(variable);
+			err_str = UpnpStateVarRequest_get_ErrStr_cstr(variable);
+		}
+		send_error_response(info, err_code, err_str, request);
+
+		return;
+	}
+	/* send response */
+	send_var_query_response(info, UpnpStateVarRequest_get_CurrentVal(variable), request);
+	UpnpStateVarRequest_delete(variable);
 }
 
 /****************************************************************************
