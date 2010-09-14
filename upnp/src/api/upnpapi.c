@@ -1012,7 +1012,7 @@ int UpnpRegisterRootDevice3(
 	struct Handle_Info *HInfo;
 	int retVal = 0;
 	int hasServiceTable = 0;
-
+	int handler_index = 0;
 	HandleLock();
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -1041,7 +1041,7 @@ int UpnpRegisterRootDevice3(
 	/* Test for already registered IPV6. IPV6 devices might register on multiple
 	 * IPv6 addresses (link local and GUA or ULA), so we must to check the
 	 * description URL in the HandleTable. */
-	int handler_index = 0;
+
 	while (handler_index < NUM_HANDLE && HandleTable[handler_index] != NULL) {
 		if (strcmp(((struct Handle_Info *)HandleTable[handler_index])->DescURL, DescUrl)) {
 			retVal = UPNP_E_ALREADY_REGISTERED;

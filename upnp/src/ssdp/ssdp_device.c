@@ -421,6 +421,7 @@ void CreateServicePacket(
 		}
 	} else if (msg_type == MSGTYPE_ADVERTISEMENT ||
 		   msg_type == MSGTYPE_SHUTDOWN) {
+		char *host = NULL;
 		if (msg_type == MSGTYPE_ADVERTISEMENT) {
 			nts = "ssdp:alive";
 		} else {
@@ -429,7 +430,7 @@ void CreateServicePacket(
 		}
 		/* NOTE: The CACHE-CONTROL and LOCATION headers are not present in
 		 * a shutdown msg, but are present here for MS WinMe interop. */
-		char *host = NULL;
+
 		if (AddressFamily == AF_INET) {
 			host = SSDP_IP;
 		} else {
