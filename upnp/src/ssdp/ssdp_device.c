@@ -430,7 +430,6 @@ void CreateServicePacket(
 		}
 		/* NOTE: The CACHE-CONTROL and LOCATION headers are not present in
 		 * a shutdown msg, but are present here for MS WinMe interop. */
-
 		if (AddressFamily == AF_INET) {
 			host = SSDP_IP;
 		} else {

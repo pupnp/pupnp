@@ -331,13 +331,6 @@
 #endif
 
 
-
-#ifdef INCLUDE_CLIENT_APIS
-#	define CLIENTONLY(x) x
-#else 
-#	define CLIENTONLY(x)
-#endif
-
 //@}
 #endif
 
