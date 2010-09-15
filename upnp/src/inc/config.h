@@ -394,17 +394,9 @@
 #endif
 
 
-#ifdef INCLUDE_CLIENT_APIS
-#	define CLIENTONLY(x) x
-#else /* INCLUDE_CLIENT_APIS */
-#	define CLIENTONLY(x)
-#endif /* INCLUDE_CLIENT_APIS */
-
-
 /*
  * @}
  */
-
 
 #endif /* INTERNAL_CONFIG_H */
 

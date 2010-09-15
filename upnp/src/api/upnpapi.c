@@ -779,8 +779,10 @@ int UpnpRegisterRootDevice(
 	HInfo->DeviceList = NULL;
 	HInfo->ServiceList = NULL;
 	HInfo->DescDocument = NULL;
-	CLIENTONLY( ListInit(&HInfo->SsdpSearchList, NULL, NULL); )
-	CLIENTONLY( HInfo->ClientSubList = NULL; )
+#ifdef INCLUDE_CLIENT_APIS
+	ListInit(&HInfo->SsdpSearchList, NULL, NULL);
+	HInfo->ClientSubList = NULL;
+#endif /* INCLUDE_CLIENT_APIS */
 	HInfo->MaxSubscriptions = UPNP_INFINITE;
 	HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 	HInfo->DeviceAf = AF_INET;
@@ -790,7 +792,9 @@ int UpnpRegisterRootDevice(
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 			"UpnpRegisterRootDevice: error downloading Document: %d\n",
 			retVal);
-		CLIENTONLY( ListDestroy(&HInfo->SsdpSearchList, 0); )
+#ifdef INCLUDE_CLIENT_APIS
+		ListDestroy(&HInfo->SsdpSearchList, 0);
+#endif /* INCLUDE_CLIENT_APIS */
 		FreeHandle(*Hnd);
 		goto exit_function;
 	}
@@ -802,7 +806,9 @@ int UpnpRegisterRootDevice(
 	HInfo->DeviceList =
 		ixmlDocument_getElementsByTagName(HInfo->DescDocument, "device");
 	if (!HInfo->DeviceList) {
-		CLIENTONLY( ListDestroy(&HInfo->SsdpSearchList, 0); )
+#ifdef INCLUDE_CLIENT_APIS
+		ListDestroy(&HInfo->SsdpSearchList, 0);
+#endif /* INCLUDE_CLIENT_APIS */
 		ixmlDocument_free(HInfo->DescDocument);
 		FreeHandle(*Hnd);
 		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
@@ -938,8 +944,10 @@ int UpnpRegisterRootDevice2(
 	HInfo->MaxAge = DEFAULT_MAXAGE;
 	HInfo->DeviceList = NULL;
 	HInfo->ServiceList = NULL;
-	CLIENTONLY( ListInit(&HInfo->SsdpSearchList, NULL, NULL); )
-	CLIENTONLY( HInfo->ClientSubList = NULL; )
+#ifdef INCLUDE_CLIENT_APIS
+	ListInit(&HInfo->SsdpSearchList, NULL, NULL);
+	HInfo->ClientSubList = NULL;
+#endif /* INCLUDE_CLIENT_APIS */
 	HInfo->MaxSubscriptions = UPNP_INFINITE;
 	HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 	HInfo->DeviceAf = AF_INET;
@@ -952,7 +960,9 @@ int UpnpRegisterRootDevice2(
 	HInfo->DeviceList =
 		ixmlDocument_getElementsByTagName( HInfo->DescDocument, "device" );
 	if (!HInfo->DeviceList) {
-		CLIENTONLY( ListDestroy(&HInfo->SsdpSearchList, 0); )
+#ifdef INCLUDE_CLIENT_APIS
+		ListDestroy(&HInfo->SsdpSearchList, 0);
+#endif /* INCLUDE_CLIENT_APIS */
 		ixmlDocument_free(HInfo->DescDocument);
 		FreeHandle(*Hnd);
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -1013,16 +1023,15 @@ int UpnpRegisterRootDevice3(
 	int retVal = 0;
 	int hasServiceTable = 0;
 	int handler_index = 0;
+
 	HandleLock();
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"Inside UpnpRegisterRootDevice3\n");
-
 	if (UpnpSdkInit != 1) {
 		retVal = UPNP_E_FINISH;
 		goto exit_function;
 	}
-
 	if (Hnd == NULL ||
 	    Fun == NULL ||
 	    DescUrl == NULL ||
@@ -1031,17 +1040,14 @@ int UpnpRegisterRootDevice3(
 		retVal = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
-
 	/* Test for already regsitered IPV4. */
 	if (AddressFamily == AF_INET && UpnpSdkDeviceRegisteredV4 == 1) {
 		retVal = UPNP_E_ALREADY_REGISTERED;
 		goto exit_function;
 	}
-
 	/* Test for already registered IPV6. IPV6 devices might register on multiple
 	 * IPv6 addresses (link local and GUA or ULA), so we must to check the
 	 * description URL in the HandleTable. */
-
 	while (handler_index < NUM_HANDLE && HandleTable[handler_index] != NULL) {
 		if (strcmp(((struct Handle_Info *)HandleTable[handler_index])->DescURL, DescUrl)) {
 			retVal = UPNP_E_ALREADY_REGISTERED;
@@ -1049,13 +1055,11 @@ int UpnpRegisterRootDevice3(
 		}
 		handler_index++;
 	}
-
 	*Hnd = GetFreeHandle();
 	if (*Hnd == UPNP_E_OUTOF_HANDLE) {
 		retVal = UPNP_E_OUTOF_MEMORY;
 		goto exit_function;
 	}
-
 	HInfo = (struct Handle_Info *)malloc(sizeof (struct Handle_Info));
 	if (HInfo == NULL) {
 		retVal = UPNP_E_OUTOF_MEMORY;
@@ -1064,7 +1068,6 @@ int UpnpRegisterRootDevice3(
 	HandleTable[*Hnd] = HInfo;
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"Root device URL is %s\n", DescUrl);
-
 	HInfo->aliasInstalled = 0;
 	HInfo->HType = HND_DEVICE;
 	strcpy(HInfo->DescURL, DescUrl);
@@ -1074,15 +1077,18 @@ int UpnpRegisterRootDevice3(
 	HInfo->DeviceList = NULL;
 	HInfo->ServiceList = NULL;
 	HInfo->DescDocument = NULL;
-	CLIENTONLY( ListInit(&HInfo->SsdpSearchList, NULL, NULL); )
-	CLIENTONLY( HInfo->ClientSubList = NULL; )
+#ifdef INCLUDE_CLIENT_APIS
+	ListInit(&HInfo->SsdpSearchList, NULL, NULL);
+	HInfo->ClientSubList = NULL;
+#endif /* INCLUDE_CLIENT_APIS */
 	HInfo->MaxSubscriptions = UPNP_INFINITE;
 	HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 	HInfo->DeviceAf = AddressFamily;
-
 	retVal = UpnpDownloadXmlDoc(HInfo->DescURL, &(HInfo->DescDocument));
 	if (retVal != UPNP_E_SUCCESS) {
-		CLIENTONLY( ListDestroy(&HInfo->SsdpSearchList, 0); )
+#ifdef INCLUDE_CLIENT_APIS
+		ListDestroy(&HInfo->SsdpSearchList, 0);
+#endif /* INCLUDE_CLIENT_APIS */
 		FreeHandle(*Hnd);
 		goto exit_function;
 	}
@@ -1094,7 +1100,9 @@ int UpnpRegisterRootDevice3(
 	HInfo->DeviceList = ixmlDocument_getElementsByTagName(
 		HInfo->DescDocument, "device");
 	if (!HInfo->DeviceList) {
-		CLIENTONLY( ListDestroy(&HInfo->SsdpSearchList, 0); )
+#ifdef INCLUDE_CLIENT_APIS
+		ListDestroy(&HInfo->SsdpSearchList, 0);
+#endif /* INCLUDE_CLIENT_APIS */
 		ixmlDocument_free(HInfo->DescDocument);
 		FreeHandle(*Hnd);
 		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
@@ -1186,7 +1194,9 @@ int UpnpUnRegisterRootDevice(UpnpDevice_Handle Hnd)
     ixmlNodeList_free( HInfo->ServiceList );
     ixmlDocument_free( HInfo->DescDocument );
 
-    CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ); )
+#ifdef INCLUDE_CLIENT_APIS
+    ListDestroy( &HInfo->SsdpSearchList, 0 );
+#endif /* INCLUDE_CLIENT_APIS */
 
 #ifdef INTERNAL_WEB_SERVER
     if( HInfo->aliasInstalled ) {
