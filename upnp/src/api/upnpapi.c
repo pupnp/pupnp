@@ -488,7 +488,7 @@ exit_function:
 	return retVal;
 }
 
-#ifndef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
 int UpnpInit2(const char *IfName, unsigned short DestPort)
 {
 	int retVal;
@@ -533,7 +533,7 @@ int UpnpInit2(const char *IfName, unsigned short DestPort)
 exit_function:
 	ithread_mutex_unlock(&gSDKInitMutex);
 
-	return UPNP_E_SUCCESS;
+	return retVal;
 }
 #endif
 
