@@ -2,6 +2,13 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-09-16 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Broken IPv6.
+	IPv6 is currently broken in latest release of branch-1.6.x, so find a
+	patch attached that correct the issue (small fixes on define, undef and
+	retVal).
+
 2010-09-10 Warwick Harvey <warwick.harvey(at)tieto.com>
 	Patch to take notice of UPNP_USE_RWLOCK flag
 
