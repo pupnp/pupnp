@@ -28,6 +28,9 @@ upnpinclude_HEADERS = \
 	inc/StateVarComplete.h \
 	inc/StateVarRequest.h \
 	inc/SubscriptionRequest.h \
+	inc/TemplateInclude.h \
+	inc/TemplateSource.h \
+	inc/TemplateUndef.h \
 	inc/UpnpString.h \
 	inc/upnp.h \
 	inc/upnpdebug.h \

@@ -2,6 +2,11 @@
 Version 1.8.0
 *******************************************************************************
 
+2010-09-18 Chandra Penke <chandrapenke(at)mcntech.com>
+
+	This is a minor build fix. The new Template*.h files added in the latest
+	code need to be exported. Patch against the latest sources is attached.
+
 2010-08-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* upnp/src/api/Discovery.c: Fix a serious bug and memory leak in
 	UpnpDiscovery_strcpy_DeviceType(). Thanks to David Blanchet for the
