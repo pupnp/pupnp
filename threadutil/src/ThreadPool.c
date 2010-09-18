@@ -609,12 +609,16 @@ static int CreateWorker(ThreadPool *tp)
 	ithread_t temp;
 	int rc = 0;
 	int currentThreads = tp->totalThreads + 1;
+	ithread_attr_t attr;
 
 	if (tp->attr.maxThreads != INFINITE_THREADS &&
 	    currentThreads > tp->attr.maxThreads) {
 		return EMAXTHREADS;
 	}
-	rc = ithread_create(&temp, NULL, WorkerThread, tp);
+	ithread_attr_init(&attr);
+	ithread_attr_setstacksize(&attr, tp->attr.stackSize);
+	rc = ithread_create(&temp, &attr, WorkerThread, tp);
+	ithread_attr_destroy(&attr);
 	if (rc == 0) {
 		rc = ithread_detach(temp);
 		while (tp->totalThreads < currentThreads) {
@@ -1174,6 +1178,7 @@ int TPAttrInit(ThreadPoolAttr *attr)
 	attr->maxIdleTime    = DEFAULT_IDLE_TIME;
 	attr->maxThreads     = DEFAULT_MAX_THREADS;
 	attr->minThreads     = DEFAULT_MIN_THREADS;
+	attr->stackSize      = DEFAULT_STACK_SIZE;
 	attr->schedPolicy    = DEFAULT_POLICY;
 	attr->starvationTime = DEFAULT_STARVATION_TIME;
 	attr->maxJobsTotal   = DEFAULT_MAX_JOBS_TOTAL;
@@ -1297,6 +1302,28 @@ int TPAttrSetMinThreads(ThreadPoolAttr *attr, int minThreads)
 
 	return 0;
 }
+
+/****************************************************************************
+ * Function: TPAttrSetStackSize
+ *
+ *  Description:
+ *      Sets the stack size for the thread pool attributes.
+ *  Parameters:
+ *      attr - must be valid thread pool attributes.
+ *      stackSize - value to set
+ *  Returns:
+ *      Always returns 0.
+ *****************************************************************************/
+int TPAttrSetStackSize(ThreadPoolAttr *attr, size_t stackSize)
+{
+        if (!attr) {
+                return EINVAL;
+        }
+        attr->stackSize = stackSize;
+
+        return 0;
+}
+
 
 /****************************************************************************
  * Function: TPAttrSetIdleTime

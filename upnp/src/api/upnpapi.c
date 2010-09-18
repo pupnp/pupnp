@@ -282,6 +282,7 @@ static int UpnpInitThreadPools(void)
 	TPAttrInit(&attr);
 	TPAttrSetMaxThreads(&attr, MAX_THREADS);
 	TPAttrSetMinThreads(&attr, MIN_THREADS);
+	TPAttrSetStackSize(&attr, THREAD_STACK_SIZE);
 	TPAttrSetJobsPerThread(&attr, JOBS_PER_THREAD);
 	TPAttrSetIdleTime(&attr, THREAD_IDLE_TIME);
 	TPAttrSetMaxJobsTotal(&attr, MAX_JOBS_TOTAL);

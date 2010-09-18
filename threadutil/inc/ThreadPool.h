@@ -115,6 +115,10 @@ typedef enum priority {
 #define DEFAULT_MAX_THREADS 10
 
 
+/*! default stack size used by TPAttrInit */
+#define DEFAULT_STACK_SIZE 0
+
+
 /*! default jobs per thread used by TPAttrInit */
 #define DEFAULT_JOBS_PER_THREAD 10
 
@@ -181,6 +185,10 @@ typedef struct THREADPOOLATTR
 
 	/* maxThreads, ThreadPool will never have more than this number of threads */
 	int maxThreads;
+
+	/* stackSize (in bytes), this is the minimum stack size allocated for each
+	 * thread */
+	size_t stackSize;
 
 	/* maxIdleTime (in milliseconds) this is the maximum time a thread will
 	 * remain idle before dying */
@@ -520,6 +528,20 @@ int TPAttrSetMaxThreads(ThreadPoolAttr *attr, int maxThreads);
  *      Always returns 0.
  *****************************************************************************/
 int TPAttrSetMinThreads(ThreadPoolAttr *attr, int minThreads);
+
+
+/****************************************************************************
+ * Function: TPAttrSetStackSize
+ *
+ *  Description:
+ *      Sets the stack size for the thread pool attributes.
+ *  Parameters:
+ *      attr - must be valid thread pool attributes.
+ *      stackSize - value to set
+ *  Returns:
+ *      Always returns 0.
+ *****************************************************************************/
+int TPAttrSetStackSize(ThreadPoolAttr *attr, size_t stackSize);
 
 
 /****************************************************************************
