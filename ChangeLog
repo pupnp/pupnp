@@ -221,6 +221,20 @@ Version 1.8.0
 Version 1.6.7
 *******************************************************************************
 
+2010-09-18 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Customize the stack size of the threads used by pupnp through the new THREAD_STACK_SIZE variable
+
+	This patch allows a user to customize the stack size of the threads used by
+	pupnp through the new THREAD_STACK_SIZE variable. This is especially useful
+	on embedded systems with limited memory where the user can set THREAD_STACK_SIZE
+	to ITHREAD_STACK_MIN.
+
+	However, as this modification can have side effects, I set 0 as the default
+	value, so threads will continue to use the default stack size of the system
+	(which varies greatly as stated in
+	https://computing.llnl.gov/tutorials/pthreads/).
+
 2010-09-16 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
 	Broken IPv6.

@@ -85,7 +85,10 @@ extern "C" {
 
 #define ITHREAD_CANCELED PTHREAD_CANCELED
 
-  
+
+#define ITHREAD_STACK_MIN PTHREAD_STACK_MIN
+
+
 /***************************************************************************
  * Name: ithread_t
  *
@@ -726,6 +729,49 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
    ***************************************************************************/
 #define ithread_cond_destroy pthread_cond_destroy
 
+  /****************************************************************************
+   * Function: ithread_attr_init
+   *
+   *  Description:
+   *      Initialises thread attribute object.
+   *  Parameters:
+   *      ithread_attr_t *attr (must be valid non NULL pointer to
+   *      ithread_attr_t)
+   *  Returns:
+   *      0 on success. Nonzero on failure.
+   *      See man page for pthread_attr_init
+   ***************************************************************************/
+#define ithread_attr_init pthread_attr_init
+
+  /****************************************************************************
+   * Function: ithread_attr_destroy
+   *
+   *  Description:
+   *      Destroys thread attribute object.
+   *  Parameters:
+   *      ithread_attr_t *attr (must be valid non NULL pointer to
+   *      ithread_attr_t)
+   *  Returns:
+   *      0 on success. Nonzero on failure.
+   *      See man page for pthread_attr_destroy
+   ***************************************************************************/
+#define ithread_attr_destroy pthread_attr_destroy
+
+  /****************************************************************************
+   * Function: ithread_attr_setstacksize
+   *
+   *  Description:
+   *      Sets stack size of a thread attribute object.
+   *  Parameters:
+   *      ithread_attr_t *attr (must be valid non NULL pointer to
+   *      ithread_attr_t)
+   *      size_t stacksize (value of stacksize must be greater than
+   *      ITHREAD_STACK_MIN and lower than system-imposed limits
+   *  Returns:
+   *      0 on success. Nonzero on failure.
+   *      See man page for pthread_attr_setstacksize
+   ***************************************************************************/
+#define ithread_attr_setstacksize pthread_attr_setstacksize
 
   /****************************************************************************
    * Function: ithread_create
@@ -735,7 +781,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
    *      and argument.
    *  Parameters:
    *      ithread_t * thread (must be valid non NULL pointer to pthread_t)
-   *      ithread_attr_t *attr, IGNORED
+   *      ithread_attr_t *attr
    *      void * (start_routine) (void *arg) (start routine)
    *      void * arg - argument.
    *  Returns:
