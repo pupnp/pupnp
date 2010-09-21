@@ -223,6 +223,13 @@ Version 1.6.7
 
 2010-09-21 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
+	Add Content-Language iff Accept-Language
+
+	Add Content-Language header in the response if and only if there is an
+	Accept-Language header in the request.
+
+2010-09-21 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
 	Addition of WEB_SERVER_CONTENT_LANGUAGE parameter
 
 	This patch adds the WEB_SERVER_CONTENT_LANGUAGE parameter so the user can specify
