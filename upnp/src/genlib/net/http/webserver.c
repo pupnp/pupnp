@@ -1400,7 +1400,7 @@ process_request( IN http_message_t * req,
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "R" "T" "GKD" "s" "tcS" "Xc" "sCc",
+            "R" "T" "GKLD" "s" "tcS" "Xc" "sCc",
             HTTP_PARTIAL_CONTENT,           // status code
             UpnpFileInfo_get_ContentType(finfo), // content type
             RespInstr,                      // range info
@@ -1415,7 +1415,7 @@ process_request( IN http_message_t * req,
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "R" "N" "T" "GD" "s" "tcS" "Xc" "sCc",
+            "R" "N" "T" "GLD" "s" "tcS" "Xc" "sCc",
             HTTP_PARTIAL_CONTENT,           // status code
             RespInstr->ReadSendSize,        // content length
             UpnpFileInfo_get_ContentType(finfo), // content type
@@ -1432,7 +1432,7 @@ process_request( IN http_message_t * req,
         // Transfer-Encoding: chunked
         if (http_MakeMessage(
             headers, resp_major, resp_minor,
-            "RK" "TD" "s" "tcS" "Xc" "sCc",
+            "RK" "TLD" "s" "tcS" "Xc" "sCc",
             HTTP_OK,                        // status code
             UpnpFileInfo_get_ContentType(finfo), // content type
             "LAST-MODIFIED: ",
@@ -1448,7 +1448,7 @@ process_request( IN http_message_t * req,
             // Transfer-Encoding: chunked
             if (http_MakeMessage(
                 headers, resp_major, resp_minor,
-                "R" "N" "TD" "s" "tcS" "Xc" "sCc",
+                "R" "N" "TLD" "s" "tcS" "Xc" "sCc",
                 HTTP_OK,                        // status code
                 RespInstr->ReadSendSize,        // content length
                 UpnpFileInfo_get_ContentType(finfo), // content type
@@ -1463,7 +1463,7 @@ process_request( IN http_message_t * req,
             // Transfer-Encoding: chunked
             if (http_MakeMessage(
                 headers, resp_major, resp_minor,
-                "R" "TD" "s" "tcS" "b" "Xc" "sCc",
+                "R" "TLD" "s" "tcS" "b" "Xc" "sCc",
                 HTTP_OK,                        // status code
                 UpnpFileInfo_get_ContentType(finfo), // content type
                 "LAST-MODIFIED: ",
@@ -1753,7 +1753,7 @@ web_server_callback( IN http_parser_t * parser,
 
                 http_MakeMessage(
                     &headers, 1, 1,
-                    "RTDSXcCc",
+                    "RLTDSXcCc",
                     ret,
                     "text/html",
                     X_USER_AGENT );

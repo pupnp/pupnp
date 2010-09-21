@@ -221,6 +221,16 @@ Version 1.8.0
 Version 1.6.7
 *******************************************************************************
 
+2010-09-21 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Addition of WEB_SERVER_CONTENT_LANGUAGE parameter
+
+	This patch adds the WEB_SERVER_CONTENT_LANGUAGE parameter so the user can specify
+	the language used by the device during Description and Presentation steps of UPnP
+	through the HTTP CONTENT-LANGUAGE header.
+	By default, the WEB_SERVER_CONTENT_LANGUAGE is an empty string so no
+	CONTENT-LANGUAGE is added.
+
 2010-09-18 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
 	Customize the stack size of the threads used by pupnp through the new THREAD_STACK_SIZE variable
