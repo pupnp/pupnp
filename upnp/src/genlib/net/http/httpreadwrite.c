@@ -1908,7 +1908,8 @@ http_SendStatusResponse( IN SOCKINFO * info,
  *	'G':	arg = range information     // add range header
  *	'h':	arg = off_t number          // appends off_t number
  *	'K':	(no args)                   // add chunky header
- *	'L':	(no args) appends HTTP Content-Language: header if
+ *	'L':	arg = language information  // add Content-Language header if
+ *			Accept-Language header is not empty and if
  *			WEB_SERVER_CONTENT_LANGUAGE is not empty
  *	'N':	arg1 = off_t content_length // content-length header
  *	'q':    arg1 = http_method_t        // request start line and HOST header
@@ -2055,8 +2056,13 @@ http_MakeMessage( INOUT membuffer * buf,
             }
         } else if ( c == 'L' ) {
             // Add CONTENT-LANGUAGE header only if WEB_SERVER_CONTENT_LANGUAGE
-            // is not empty
-            if (strcmp( WEB_SERVER_CONTENT_LANGUAGE, "" ) && http_MakeMessage(
+            // is not empty and if Accept-Language header is not empty
+            struct SendInstruction *RespInstr;
+            RespInstr = (struct SendInstruction *)
+                va_arg( argp, struct SendInstruction *);
+            assert( RespInstr );
+            if (strcmp( RespInstr->AcceptLanguageHeader, "" ) &&
+                strcmp( WEB_SERVER_CONTENT_LANGUAGE, "" ) && http_MakeMessage(
                 buf, http_major_version, http_minor_version,
                 "ssc",
                 "CONTENT-LANGUAGE: ", WEB_SERVER_CONTENT_LANGUAGE ) != 0 ) {

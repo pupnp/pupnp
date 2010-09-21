@@ -1124,6 +1124,12 @@ CheckOtherHTTPHeaders( IN http_message_t * Req,
                         return RetCode;
                     }
                     break;
+                case HDR_ACCEPT_LANGUAGE:
+                    {
+                        memcpy( RespInstr->AcceptLanguageHeader, TmpBuf,
+                            sizeof( RespInstr->AcceptLanguageHeader ) - 1 );
+                        break;
+                    }
                 default:
                     /*
                        TODO 
@@ -1138,7 +1144,6 @@ CheckOtherHTTPHeaders( IN http_message_t * Req,
                        case HDR_CONTENT_LOCATION://return 1;
                        case HDR_ACCEPT: //return 1;
                        case HDR_ACCEPT_CHARSET://return 1;
-                       case HDR_ACCEPT_LANGUAGE://return 1;
                        case HDR_USER_AGENT: break;//return 1;
                      */
 
@@ -1402,6 +1407,7 @@ process_request( IN http_message_t * req,
             HTTP_PARTIAL_CONTENT,           // status code
             finfo.content_type,   // content type
             RespInstr,                      // range info
+            RespInstr,                      // language info
             "LAST-MODIFIED: ",
 	    &finfo.last_modified,
             X_USER_AGENT,
@@ -1418,6 +1424,7 @@ process_request( IN http_message_t * req,
             RespInstr->ReadSendSize,        // content length
             finfo.content_type,       // content type
             RespInstr,                      // range info
+            RespInstr,                      // language info
             "LAST-MODIFIED: ",
 	    &finfo.last_modified,
             X_USER_AGENT,
@@ -1433,6 +1440,7 @@ process_request( IN http_message_t * req,
             "RK" "TLD" "s" "tcS" "Xc" "sCc",
             HTTP_OK,                        // status code
             finfo.content_type, // content type
+            RespInstr,                      // language info
             "LAST-MODIFIED: ",
 	    &finfo.last_modified,
             X_USER_AGENT,
@@ -1450,6 +1458,7 @@ process_request( IN http_message_t * req,
                 HTTP_OK,                        // status code
                 RespInstr->ReadSendSize,        // content length
                 finfo.content_type,      // content type
+                RespInstr,                      // language info
                 "LAST-MODIFIED: ",
 		&finfo.last_modified,
                 X_USER_AGENT,
@@ -1464,6 +1473,7 @@ process_request( IN http_message_t * req,
                 "R" "TLD" "s" "tcS" "b" "Xc" "sCc",
                 HTTP_OK,                        // status code
                 finfo.content_type, // content type
+                RespInstr,                      // language info
                 "LAST-MODIFIED: ",
 		&finfo.last_modified,
                 X_USER_AGENT,
@@ -1697,6 +1707,8 @@ web_server_callback( IN http_parser_t * parser,
     RespInstr.IsChunkActive = 0;
     RespInstr.IsRangeActive = 0;
     RespInstr.IsTrailers = 0;
+    memset( RespInstr.AcceptLanguageHeader, 0,
+       sizeof( RespInstr.AcceptLanguageHeader ) );
     // init
     membuffer_init( &headers );
     membuffer_init( &filename );
@@ -1751,7 +1763,7 @@ web_server_callback( IN http_parser_t * parser,
 
                 http_MakeMessage(
                     &headers, 1, 1,
-                    "RLTDSXcCc",
+                    "RTLSXcCc",
                     ret,
                     "text/html",
                     X_USER_AGENT );

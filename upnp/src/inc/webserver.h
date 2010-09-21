@@ -48,6 +48,7 @@ struct SendInstruction
    int  IsRangeActive;
    int  IsTrailers;
    char RangeHeader[200];
+   char AcceptLanguageHeader[200];
    off_t RangeOffset;
    off_t ReadSendSize;  // Read from local source and send on the network.
    long RecvWriteSize; // Recv from the network and write into local file.
