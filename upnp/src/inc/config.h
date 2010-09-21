@@ -193,6 +193,20 @@
 /* @} */
 
 /*!
+ * \name WEB_SERVER_CONTENT_LANGUAGE
+ *
+ * This configuration parameter sets the value of the Content-Language
+ * header for the webserver. Thanks to this parameter, the use can advertize
+ * the language used by the device in the description (friendlyName) and
+ * presentation steps of UPnP. The default value is empty string so no
+ * Content-Language header is added.
+ *
+ * @{
+ */
+#define WEB_SERVER_CONTENT_LANGUAGE ""
+/* @} */
+
+/*!
  * \name AUTO_RENEW_TIME
  *
  * The {\tt AUTO_RENEW_TIME} is the time, in seconds, before a subscription

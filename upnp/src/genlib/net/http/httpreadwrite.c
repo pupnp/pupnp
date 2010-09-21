@@ -1908,6 +1908,8 @@ http_SendStatusResponse( IN SOCKINFO * info,
  *	'G':	arg = range information     // add range header
  *	'h':	arg = off_t number          // appends off_t number
  *	'K':	(no args)                   // add chunky header
+ *	'L':	(no args) appends HTTP Content-Language: header if
+ *			WEB_SERVER_CONTENT_LANGUAGE is not empty
  *	'N':	arg1 = off_t content_length // content-length header
  *	'q':    arg1 = http_method_t        // request start line and HOST header
  *		arg2 = (uri_type *)
@@ -2049,6 +2051,15 @@ http_MakeMessage( INOUT membuffer * buf,
                      date->tm_hour, date->tm_min, date->tm_sec, end_str );
 
             if( membuffer_append( buf, tempbuf, strlen( tempbuf ) ) != 0 ) {
+                goto error_handler;
+            }
+        } else if ( c == 'L' ) {
+            // Add CONTENT-LANGUAGE header only if WEB_SERVER_CONTENT_LANGUAGE
+            // is not empty
+            if (strcmp( WEB_SERVER_CONTENT_LANGUAGE, "" ) && http_MakeMessage(
+                buf, http_major_version, http_minor_version,
+                "ssc",
+                "CONTENT-LANGUAGE: ", WEB_SERVER_CONTENT_LANGUAGE ) != 0 ) {
                 goto error_handler;
             }
         } else if( c == 'C' ) {
