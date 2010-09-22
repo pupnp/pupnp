@@ -268,7 +268,7 @@ int AdvertiseAndReply(
 				}
 			}
 			case SSDP_DEVICETYPE: {
-				if (!strncasecmp(DeviceType, devType, strlen(DeviceType))) {
+				if (!strncasecmp(DeviceType, devType, strlen(DeviceType)-2)) {
 					if (atoi(&DeviceType[strlen(DeviceType)-1]) <= atoi(&devType[strlen(devType)-1])) {
 						/* the requested version is lower than the device version
 						 * must reply with the lower version number */

@@ -2,6 +2,15 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-09-22 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Bug fix on M-SEARCH response
+
+	Devices must respond to M-SEARCH requests for any supported version and the
+	response should specify the same version as was contained in the search target.
+	Previously, the device did not answer if the M-SEARCH request did not
+	contain the same version number than the version number of the device.
+
 2010-09-21 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
 	Add Content-Language iff Accept-Language
