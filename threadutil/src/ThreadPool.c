@@ -246,7 +246,7 @@ static int SetPolicyType(PolicyType in)
 
 	memset(&current, 0, sizeof(current));
 	sched_getparam(0, &current);
-	current.sched_priority = DEFAULT_SCHED_PARAM;
+	current.sched_priority = sched_get_priority_min(DEFAULT_POLICY);
 	sched_result = sched_setscheduler(0, in, &current);
 	retVal = (sched_result != -1 || errno == EPERM) ? 0 : errno;
 #else
