@@ -158,10 +158,6 @@ typedef int PolicyType;
 #define DEFAULT_POLICY SCHED_OTHER
 
 
-/*! Default priority */
-#define DEFAULT_SCHED_PARAM 0
-
-
 /****************************************************************************
  * Name: free_routine
  *
