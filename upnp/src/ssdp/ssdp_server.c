@@ -311,6 +311,7 @@ int AdvertiseAndReply(
 		}
 		ixmlNodeList_free(nodeList);
 		if (!tmpNode) {
+			nodeList = NULL;
 			continue;
 		}
 		nodeList = ixmlElement_getElementsByTagName(

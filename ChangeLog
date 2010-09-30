@@ -2,6 +2,31 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-09-30 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Bug fix when there is no service in embedded devices
+
+	When a device with embedded devices (like IGD) when created and one of
+	the embedded devices did not have any service, there was a Segmentation
+	Fault (see SF Tracker [ 2688125 ]).
+
+	Original SF Tracker issue follows:
+
+	SF Tracker [ 2688125 ] v1.6.6 crashes on subdevices without services
+	Submitted by: Arno Willig ( akw ) - 2009-03-15 22:45:23 BRT
+
+	I discovered a bug, which will make libupnp (1.6.6) segfault, when you
+	create a upnp description document with multiple devices which have
+	subdevices, but no own services.
+
+	The crash occurs in genlib/service_table.c in line 977:
+	end->next =
+		getServiceList( currentDevice, &next_end, URLBase );
+
+	In this case "end" seems not to be defined, so end->next crashes.
+
+	Can anyone confirm this, please?
+
 2010-09-28 Marc Essayan <marc.essayan(at)orange-ftgroup.com>
 
 	Bug fix on burst of GENA notification
@@ -43,7 +68,8 @@ Version 1.6.7
 
 2010-09-18 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
-	Customize the stack size of the threads used by pupnp through the new THREAD_STACK_SIZE variable
+	Customize the stack size of the threads used by pupnp through the new
+	THREAD_STACK_SIZE variable.
 
 	This patch allows a user to customize the stack size of the threads used by
 	pupnp through the new THREAD_STACK_SIZE variable. This is especially useful

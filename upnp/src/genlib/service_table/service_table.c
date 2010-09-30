@@ -913,8 +913,10 @@ getServiceList( IXML_Node * node,
         ( *end ) = current;
 
         return head;
-    } else
+    } else {
+        ( *end ) = NULL;
         return NULL;
+    }
 
 }
 
@@ -960,7 +962,8 @@ getAllServiceList( IXML_Node * node,
             if( head ) {
                 end->next =
                     getServiceList( currentDevice, &next_end, URLBase );
-                end = next_end;
+                if ( next_end )
+                    end = next_end;
             } else
                 head = getServiceList( currentDevice, &end, URLBase );
 
