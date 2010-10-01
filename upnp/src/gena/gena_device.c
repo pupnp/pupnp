@@ -365,6 +365,8 @@ static void genaNotifyThread(
         HandleUnlock();
         return;
     }
+
+#ifdef UPNP_ENABLE_NOTIFICATION_REORDERING
     //If the event is out of order push it back to the job queue
     if( in->eventKey != sub->ToSendEventKey ) {
 
@@ -383,6 +385,7 @@ static void genaNotifyThread(
         HandleUnlock();
         return;
     }
+#endif
 
     HandleUnlock();
 
