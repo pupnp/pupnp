@@ -2,6 +2,14 @@
 Version 1.6.7
 *******************************************************************************
 
+2010-10-01 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Adding --disable-notification-reordering option
+
+	Adding a configure flag to disable GENA notification reordering as even
+	with an imillisleep(1), this mechanism consumes too much CPU on embedded
+	devices when there is a burst of notifications.
+
 2010-09-30 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
 	Bug fix when there is no service in embedded devices

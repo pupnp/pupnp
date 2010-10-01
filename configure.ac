@@ -261,6 +261,11 @@ if test "x$enable_ipv6" = xyes ; then
         AC_DEFINE(UPNP_ENABLE_IPV6, 1, [see upnpconfig.h])
 fi
 
+RT_BOOL_ARG_ENABLE([notification_reordering], [yes], [GENA notification reordering in gena_device.c])
+if test "x$enable_notification_reordering" = xyes ; then
+        AC_DEFINE(UPNP_ENABLE_NOTIFICATION_REORDERING, 1, [see upnpconfig.h])
+fi
+
 
 RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 
