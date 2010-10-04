@@ -143,8 +143,7 @@ TvCtrlPointDeleteNode( struct TvDeviceNode *node )
  *   UDN -- The Unique Device Name for the device to remove
  *
  ********************************************************************************/
-int
-TvCtrlPointRemoveDevice(const char *UDN)
+int TvCtrlPointRemoveDevice(const char *UDN)
 {
     struct TvDeviceNode *curdevnode;
     struct TvDeviceNode *prevdevnode;
@@ -1019,10 +1018,10 @@ void TvCtrlPointHandleSubscribeUpdate(
     ithread_mutex_unlock( &DeviceListMutex );
 }
 
-void
-TvCtrlPointHandleGetVar( const char *controlURL,
-                         const char *varName,
-                         const DOMString varValue )
+void TvCtrlPointHandleGetVar(
+	const char *controlURL,
+	const char *varName,
+	const DOMString varValue)
 {
 
     struct TvDeviceNode *tmpdevnode;
@@ -1033,9 +1032,9 @@ TvCtrlPointHandleGetVar( const char *controlURL,
     tmpdevnode = GlobalDeviceList;
     while (tmpdevnode) {
         for (service = 0; service < TV_SERVICE_SERVCOUNT; service++) {
-            if (strcmp(tmpdevnode->device.TvService[service].ControlURL, controlURL ) == 0 ) {
+            if (strcmp(tmpdevnode->device.TvService[service].ControlURL, controlURL) == 0) {
                 SampleUtil_StateUpdate(
-                    varName, varValue, tmpdevnode->device.UDN, GET_VAR_COMPLETE );
+			varName, varValue, tmpdevnode->device.UDN, GET_VAR_COMPLETE);
                 break;
             }
         }
@@ -1076,29 +1075,24 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 			SampleUtil_Print(
 				"Error in Discovery Callback -- %d", d_event->ErrCode);
 		}
-
 		ret = UpnpDownloadXmlDoc(d_event->Location, &DescDoc);
 		if (ret != UPNP_E_SUCCESS) {
 			SampleUtil_Print(
 				"Error obtaining device description from %s -- error = %d",
-				d_event->Location, ret );
+				d_event->Location, ret);
 		} else {
 			TvCtrlPointAddDevice(
 				DescDoc, d_event->Location, d_event->Expires);
 		}
-
-		if( DescDoc ) {
+		if (DescDoc) {
 			ixmlDocument_free(DescDoc);
 		}
-
 		TvCtrlPointPrintList();
 		break;
 	}
-
 	case UPNP_DISCOVERY_SEARCH_TIMEOUT:
 		/* Nothing to do here... */
 		break;
-
 	case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE: {
 		struct Upnp_Discovery *d_event = (struct Upnp_Discovery *)Event;
 
@@ -1106,13 +1100,10 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 			SampleUtil_Print(
 				"Error in Discovery ByeBye Callback -- %d", d_event->ErrCode);
 		}
-
 		SampleUtil_Print("Received ByeBye for Device: %s", d_event->DeviceId);
 		TvCtrlPointRemoveDevice(d_event->DeviceId);
-
 		SampleUtil_Print("After byebye:");
 		TvCtrlPointPrintList();
-
 		break;
 	}
 	/* SOAP Stuff */
@@ -1121,13 +1112,10 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 
 		if (a_event->ErrCode != UPNP_E_SUCCESS) {
 			SampleUtil_Print(
-				"Error in  Action Complete Callback -- %d",
-				a_event->ErrCode);
+				"Error in  Action Complete Callback -- %d", a_event->ErrCode);
 		}
-
 		/* No need for any processing here, just print out results.
 		 * Service state table updates are handled by events. */
-
 		break;
 	}
 	case UPNP_CONTROL_GET_VAR_COMPLETE: {
@@ -1135,8 +1123,7 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 
 		if (sv_event->ErrCode != UPNP_E_SUCCESS) {
 			SampleUtil_Print(
-				"Error in Get Var Complete Callback -- %d",
-				sv_event->ErrCode);
+				"Error in Get Var Complete Callback -- %d", sv_event->ErrCode);
 		} else {
 			TvCtrlPointHandleGetVar(
 				sv_event->CtrlUrl,
@@ -1162,15 +1149,13 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 
 		if (es_event->ErrCode != UPNP_E_SUCCESS) {
 			SampleUtil_Print(
-				"Error in Event Subscribe Callback -- %d",
-				es_event->ErrCode);
+				"Error in Event Subscribe Callback -- %d", es_event->ErrCode);
 		} else {
 			TvCtrlPointHandleSubscribeUpdate(
 				es_event->PublisherUrl,
 				es_event->Sid,
 				es_event->TimeOut);
 		}
-
 		break;
 	}
 	case UPNP_EVENT_AUTORENEWAL_FAILED:
@@ -1185,7 +1170,6 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 			es_event->PublisherUrl,
 			&TimeOut,
 			newSID);
-
 		if (ret == UPNP_E_SUCCESS) {
 			SampleUtil_Print("Subscribed to EventURL with SID=%s", newSID);
 			TvCtrlPointHandleSubscribeUpdate(
