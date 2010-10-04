@@ -26,7 +26,6 @@ EXTRA_DIST = \
 	build/libupnp.dsp \
 	build/libupnp.dsw \
 	build/inc/autoconfig.h \
-	build/inc/config.h \
 	build/inc/upnpconfig.h \
 	build/msvc/inttypes.h \
 	build/msvc/stdint.h \
