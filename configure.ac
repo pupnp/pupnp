@@ -497,3 +497,9 @@ AC_CONFIG_FILES([
 
 AC_OUTPUT
 
+#
+# Files copied for windows compilation.
+#
+cp autoconfig.h build/inc/autoconfig.h
+cp upnp/inc/upnpconfig.h build/inc/upnpconfig.h
+
