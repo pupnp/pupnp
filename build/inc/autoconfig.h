@@ -67,9 +67,6 @@
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
 
-/* Define to 1 if you have the <sys/timeb.h> header file. */
-#define HAVE_SYS_TIMEB_H 1
-
 /* Define to 1 if you have the <sys/time.h> header file. */
 #define HAVE_SYS_TIME_H 1
 
@@ -81,6 +78,13 @@
 
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1
+
+/* Define to 1 if you have the <ws2tcpip.h> header file. */
+/* #undef HAVE_WS2TCPIP_H */
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#define LT_OBJDIR ".libs/"
 
 /* Define to 1 to prevent compilation of assert() */
 #define NDEBUG 1
@@ -101,13 +105,13 @@
 #define PACKAGE_NAME "libupnp"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libupnp 1.4.7"
+#define PACKAGE_STRING "libupnp 1.6.8"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libupnp"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.4.7"
+#define PACKAGE_VERSION "1.6.8"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -115,6 +119,12 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
+
+/* see upnpconfig.h */
+/* #undef UPNP_ENABLE_IPV6 */
+
+/* see upnpconfig.h */
+#define UPNP_ENABLE_NOTIFICATION_REORDERING 1
 
 /* see upnpconfig.h */
 #define UPNP_HAVE_CLIENT 1
@@ -131,20 +141,23 @@
 /* see upnpconfig.h */
 #define UPNP_HAVE_WEBSERVER 1
 
+/* Do not use pthread_rwlock_t */
+#define UPNP_USE_RWLOCK 1
+
 /* see upnpconfig.h */
 #define UPNP_VERSION_MAJOR 1
 
 /* see upnpconfig.h */
-#define UPNP_VERSION_MINOR 4
+#define UPNP_VERSION_MINOR 6
 
 /* see upnpconfig.h */
-#define UPNP_VERSION_PATCH 7
+#define UPNP_VERSION_PATCH 8
 
 /* see upnpconfig.h */
-#define UPNP_VERSION_STRING "1.4.7"
+#define UPNP_VERSION_STRING "1.6.8"
 
 /* Version number of package */
-#define VERSION "1.4.7"
+#define VERSION "1.6.8"
 
 /* File Offset size */
 #define _FILE_OFFSET_BITS 64
@@ -153,7 +166,7 @@
 /* #undef _LARGEFILE_SOURCE */
 
 /* Large files support */
-#define _LARGE_FILE_SOURCE 
+#define _LARGE_FILE_SOURCE /**/
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
@@ -164,5 +177,5 @@
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
 
-/* Substitute for socklen_t */
+/* Type for storing the length of struct sockaddr */
 /* #undef socklen_t */
