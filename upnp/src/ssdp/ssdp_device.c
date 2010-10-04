@@ -102,9 +102,9 @@ advertiseAndReplyThread( IN void *data )
 *	1 if successful else appropriate error
 ***************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
-void
-ssdp_handle_device_request( IN http_message_t *hmsg,
-                            IN struct sockaddr *dest_addr )
+void ssdp_handle_device_request(
+	IN http_message_t *hmsg,
+	IN struct sockaddr *dest_addr)
 {
 #define MX_FUDGE_FACTOR 10
 

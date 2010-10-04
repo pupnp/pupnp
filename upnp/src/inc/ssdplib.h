@@ -140,12 +140,12 @@ typedef void (* SsdpFunPtr)(Event *);
 
 typedef Event SsdpEvent ;
 
-//Structure to contain Discovery response
+// Structure to contain Discovery response
 typedef struct resultData
 {
-  struct Upnp_Discovery param;
-  void *cookie;
-  Upnp_FunPtr ctrlpt_callback;
+   struct Upnp_Discovery param;
+   void *cookie;
+   Upnp_FunPtr ctrlpt_callback;
 }ResultData;
 
 
@@ -224,12 +224,12 @@ int Make_Socket_NoBlocking (int sock);
 ***************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 void ssdp_handle_device_request(
-	IN http_message_t* hmsg, 
-	IN struct sockaddr* dest_addr );
+	IN http_message_t *hmsg, 
+	IN struct sockaddr *dest_addr);
 #else
 static inline void ssdp_handle_device_request(
-	IN http_message_t* hmsg, 
-	IN struct sockaddr* dest_addr ) {}
+	IN http_message_t *hmsg, 
+	IN struct sockaddr* dest_addr) {}
 #endif
 
 /************************************************************************
@@ -253,10 +253,10 @@ static inline void ssdp_handle_device_request(
 *
 ***************************************************************************/
 void ssdp_handle_ctrlpt_msg(
-	IN http_message_t* hmsg, 
-	IN struct sockaddr* dest_addr,
+	IN http_message_t *hmsg, 
+	IN struct sockaddr *dest_addr,
 	IN xboolean timeout,
-	IN void* cookie );
+	IN void *cookie);
 
 /************************************************************************
 * Function : unique_service_name

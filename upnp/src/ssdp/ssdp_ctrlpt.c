@@ -74,11 +74,10 @@
  ***************************************************************************/
 void send_search_result(IN void *data)
 {
-    ResultData *temp = ( ResultData * ) data;
+	ResultData *temp = ( ResultData * ) data;
 
-    temp->ctrlpt_callback( UPNP_DISCOVERY_SEARCH_RESULT,
-                           &temp->param, temp->cookie );
-    free( temp );
+	temp->ctrlpt_callback(UPNP_DISCOVERY_SEARCH_RESULT, &temp->param, temp->cookie);
+	free(temp);
 }
 
 /************************************************************************
@@ -127,7 +126,7 @@ void ssdp_handle_ctrlpt_msg(
     ListNode *node = NULL;
     SsdpSearchArg *searchArg = NULL;
     int matched = 0;
-    ResultData *threadData;
+    ResultData *threadData = NULL;
     ThreadPoolJob job;
 
     // we are assuming that there can be only one client supported at a time
@@ -136,7 +135,7 @@ void ssdp_handle_ctrlpt_msg(
 
     if ( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
         HandleUnlock();
-        return;
+	return;
     }
     // copy
     ctrlpt_callback = ctrlpt_info->Callback;
@@ -146,14 +145,15 @@ void ssdp_handle_ctrlpt_msg(
     // search timeout
     if ( timeout ) {
         ctrlpt_callback( UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie );
-        return;
+	return;
     }
 
     param.ErrCode = UPNP_E_SUCCESS;
 
     // MAX-AGE
-    param.Expires = -1;         // assume error
-    if( httpmsg_find_hdr( hmsg, HDR_CACHE_CONTROL, &hdr_value ) != NULL ) {
+    // assume error
+    param.Expires = -1;
+    if ( httpmsg_find_hdr( hmsg, HDR_CACHE_CONTROL, &hdr_value ) != NULL ) {
         if( matchstr( hdr_value.buf, hdr_value.length,
                       "%imax-age = %d%0", &param.Expires ) != PARSE_OK )
             return;
@@ -161,7 +161,7 @@ void ssdp_handle_ctrlpt_msg(
 
     // DATE
     param.Date[0] = '\0';
-    if( httpmsg_find_hdr( hmsg, HDR_DATE, &hdr_value ) != NULL ) {
+    if ( httpmsg_find_hdr( hmsg, HDR_DATE, &hdr_value ) != NULL ) {
         linecopylen( param.Date, hdr_value.buf, hdr_value.length );
     }
 
@@ -170,17 +170,17 @@ void ssdp_handle_ctrlpt_msg(
 
     // EXT
     param.Ext[0] = '\0';
-    if( httpmsg_find_hdr( hmsg, HDR_EXT, &hdr_value ) != NULL ) {
+    if ( httpmsg_find_hdr( hmsg, HDR_EXT, &hdr_value ) != NULL ) {
         linecopylen( param.Ext, hdr_value.buf, hdr_value.length );
     }
     // LOCATION
     param.Location[0] = '\0';
-    if( httpmsg_find_hdr( hmsg, HDR_LOCATION, &hdr_value ) != NULL ) {
+    if ( httpmsg_find_hdr( hmsg, HDR_LOCATION, &hdr_value ) != NULL ) {
         linecopylen( param.Location, hdr_value.buf, hdr_value.length );
     }
     // SERVER / USER-AGENT
     param.Os[0] = '\0';
-    if( httpmsg_find_hdr( hmsg, HDR_SERVER, &hdr_value ) != NULL ||
+    if ( httpmsg_find_hdr( hmsg, HDR_SERVER, &hdr_value ) != NULL ||
         httpmsg_find_hdr( hmsg, HDR_USER_AGENT, &hdr_value ) != NULL ) {
         linecopylen( param.Os, hdr_value.buf, hdr_value.length );
     }
@@ -327,7 +327,7 @@ void ssdp_handle_ctrlpt_msg(
                     TPJobInit( &job, ( start_routine ) send_search_result,
                                threadData );
                     TPJobSetPriority(&job, MED_PRIORITY);
-                    TPJobSetFreeFunction( &job, ( free_routine ) free );
+                    TPJobSetFreeFunction(&job, (free_routine)free);
                     ThreadPoolAdd(&gRecvThreadPool, &job, NULL);
                 }
             }
