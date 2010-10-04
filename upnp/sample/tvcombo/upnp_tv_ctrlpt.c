@@ -29,9 +29,14 @@
  *
  ******************************************************************************/
 
+
 #include "upnp_tv_ctrlpt.h"
 
-/*
+
+#include "upnp.h"
+
+
+/*!
    Mutex for protecting the global device list
    in a multi-threaded, asynchronous environment.
    All functions should lock this mutex before reading
@@ -48,7 +53,7 @@ char *TvServiceType[] = {
 };
 char *TvServiceName[] = { "Control", "Picture" };
 
-/*
+/*!
    Global arrays for storing variable names and counts for 
    TvControl and TvPicture services 
  */
@@ -59,12 +64,12 @@ char *TvVarName[TV_SERVICE_SERVCOUNT][TV_MAXVARS] = {
 char TvVarCount[TV_SERVICE_SERVCOUNT] =
     { TV_CONTROL_VARCOUNT, TV_PICTURE_VARCOUNT };
 
-/*
+/*!
    Timeout to request during subscriptions 
  */
 int default_timeout = 1801;
 
-/*
+/*!
    The first node in the global device list, or NULL if empty 
  */
 struct TvDeviceNode *GlobalDeviceList = NULL;
@@ -1071,6 +1076,7 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 			SampleUtil_Print(
 				"Error in Discovery Callback -- %d", errCode);
 		}
+
 		location = UpnpString_get_String(UpnpDiscovery_get_Location(d_event));
 		errCode = UpnpDownloadXmlDoc(location, &DescDoc);
 		if (errCode != UPNP_E_SUCCESS) {
@@ -1335,8 +1341,9 @@ int TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionP
 
 	SampleUtil_Print(
 		"UPnP Initialized\n"
-		"\tipaddress= %s port = %u\n",
-		ip_address, port);
+		"\tipaddress = %s port = %u\n",
+		ip_address ? ip_address : "{NULL}",
+		port);
 
 	SampleUtil_Print("Registering Control Point");
 	rc = UpnpRegisterClient(TvCtrlPointCallbackEventHandler,

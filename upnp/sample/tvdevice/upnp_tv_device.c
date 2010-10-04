@@ -376,20 +376,18 @@ TvDeviceStateTableInit( IN char *DescDocURL )
 int TvDeviceHandleSubscriptionRequest(IN const UpnpSubscriptionRequest *sr_event)
 {
 	unsigned int i = 0;
-	//unsigned int j = 0;
 	int cmp1 = 0;
 	int cmp2 = 0;
 	const char *l_serviceId = NULL;
 	const char *l_udn = NULL;
 	const char *l_sid = NULL;
-	// IXML_Document *PropSet = NULL;
 
 	// lock state mutex
-	ithread_mutex_lock( &TVDevMutex );
+	ithread_mutex_lock(&TVDevMutex);
 
 	l_serviceId = UpnpString_get_String(UpnpSubscriptionRequest_get_ServiceId(sr_event));
-	l_udn = UpnpString_get_String(UpnpSubscriptionRequest_get_UDN(sr_event));
-	l_sid = UpnpString_get_String(UpnpSubscriptionRequest_get_SID(sr_event));
+	l_udn = UpnpSubscriptionRequest_get_UDN_cstr(sr_event);
+	l_sid = UpnpSubscriptionRequest_get_SID_cstr(sr_event);
 	for (i = 0; i < TV_SERVICE_SERVCOUNT; ++i) {
 		cmp1 = strcmp(l_udn, tv_service_table[i].UDN);
 		cmp2 = strcmp(l_serviceId, tv_service_table[i].ServiceId);
@@ -429,7 +427,7 @@ int TvDeviceHandleSubscriptionRequest(IN const UpnpSubscriptionRequest *sr_event
 		}
 	}
 
-	ithread_mutex_unlock( &TVDevMutex );
+	ithread_mutex_unlock(&TVDevMutex);
 
 	return 1;
 }
@@ -447,53 +445,52 @@ int TvDeviceHandleSubscriptionRequest(IN const UpnpSubscriptionRequest *sr_event
  *   cgv_event -- The control get variable request event structure
  *
  *****************************************************************************/
-int
-TvDeviceHandleGetVarRequest( INOUT UpnpStateVarRequest *cgv_event )
+int TvDeviceHandleGetVarRequest(INOUT UpnpStateVarRequest *cgv_event)
 {
-    unsigned int i = 0;
-    unsigned int j = 0;
-    int getvar_succeeded = 0;
+	unsigned int i = 0;
+	unsigned int j = 0;
+	int getvar_succeeded = 0;
 
-    UpnpStateVarRequest_set_CurrentVal(cgv_event, NULL);
+	UpnpStateVarRequest_set_CurrentVal(cgv_event, NULL);
 
-    ithread_mutex_lock( &TVDevMutex );
+	ithread_mutex_lock(&TVDevMutex);
 
-    for( i = 0; i < TV_SERVICE_SERVCOUNT; i++ ) {
-        // check udn and service id
-        const char *devUDN =
-            UpnpString_get_String(UpnpStateVarRequest_get_DevUDN(cgv_event));
-        const char *serviceID =
-            UpnpString_get_String(UpnpStateVarRequest_get_ServiceID(cgv_event));
-        if( ( strcmp( devUDN,    tv_service_table[i].UDN )       == 0 ) &&
-            ( strcmp( serviceID, tv_service_table[i].ServiceId ) == 0 ) ) {
-            // check variable name
-            for( j = 0; j < tv_service_table[i].VariableCount; j++ ) {
-                const char *stateVarName =
-                    UpnpString_get_String(UpnpStateVarRequest_get_StateVarName(cgv_event));
-                if( strcmp( stateVarName, tv_service_table[i].VariableName[j] ) == 0 ) {
-                    getvar_succeeded = 1;
-                    UpnpStateVarRequest_set_CurrentVal(cgv_event,
-                        tv_service_table[i].VariableStrVal[j] );
-                    break;
-                }
-            }
-        }
-    }
+	for (i = 0; i < TV_SERVICE_SERVCOUNT; i++) {
+		// check udn and service id
+		const char *devUDN =
+			UpnpString_get_String(UpnpStateVarRequest_get_DevUDN(cgv_event));
+		const char *serviceID =
+			UpnpString_get_String(UpnpStateVarRequest_get_ServiceID(cgv_event));
+		if (strcmp(devUDN, tv_service_table[i].UDN) == 0 &&
+		    strcmp(serviceID, tv_service_table[i].ServiceId) == 0) {
+			// check variable name
+			for (j = 0; j < tv_service_table[i].VariableCount; j++) {
+				const char *stateVarName = UpnpString_get_String(
+					UpnpStateVarRequest_get_StateVarName(cgv_event));
+				if (strcmp(stateVarName,
+					   tv_service_table[i].VariableName[j]) == 0) {
+					getvar_succeeded = 1;
+					UpnpStateVarRequest_set_CurrentVal(cgv_event,
+						tv_service_table[i].VariableStrVal[j]);
+					break;
+				}
+			}
+		}
+	}
+	if (getvar_succeeded) {
+		UpnpStateVarRequest_set_ErrCode(cgv_event, UPNP_E_SUCCESS);
+	} else {
+		SampleUtil_Print(
+			"Error in UPNP_CONTROL_GET_VAR_REQUEST callback:\n" 
+			"   Unknown variable name = %s\n",
+			UpnpString_get_String(UpnpStateVarRequest_get_StateVarName(cgv_event)));
+		UpnpStateVarRequest_set_ErrCode(cgv_event, 404);
+		UpnpStateVarRequest_strcpy_ErrStr(cgv_event, "Invalid Variable");
+	}
 
-    if( getvar_succeeded ) {
-        UpnpStateVarRequest_set_ErrCode(cgv_event, UPNP_E_SUCCESS);
-    } else {
-        SampleUtil_Print(
-            "Error in UPNP_CONTROL_GET_VAR_REQUEST callback:\n" 
-            "   Unknown variable name = %s\n",
-            UpnpString_get_String(UpnpStateVarRequest_get_StateVarName(cgv_event)) );
-        UpnpStateVarRequest_set_ErrCode(cgv_event, 404);
-        UpnpStateVarRequest_strcpy_ErrStr(cgv_event, "Invalid Variable" );
-    }
+	ithread_mutex_unlock(&TVDevMutex);
 
-    ithread_mutex_unlock( &TVDevMutex );
-
-    return UpnpStateVarRequest_get_ErrCode(cgv_event) == UPNP_E_SUCCESS;
+	return UpnpStateVarRequest_get_ErrCode(cgv_event) == UPNP_E_SUCCESS;
 }
 
 /******************************************************************************
@@ -508,86 +505,81 @@ TvDeviceHandleGetVarRequest( INOUT UpnpStateVarRequest *cgv_event )
  *   ca_event -- The control action request event structure
  *
  *****************************************************************************/
-int
-TvDeviceHandleActionRequest( INOUT UpnpActionRequest *ca_event )
+int TvDeviceHandleActionRequest(INOUT UpnpActionRequest *ca_event)
 {
-    /*
-       Defaults if action not found 
-     */
-    int action_found = 0;
-    int i = 0;
-    int service = -1;
-    int retCode = 0;
-    char *errorString = NULL;
-    const char *devUDN = NULL;
-    const char *serviceID = NULL;
-    const char *actionName = NULL;
-    IXML_Document *actionResult = NULL;
+	/* Defaults if action not found. */
+	int action_found = 0;
+	int i = 0;
+	int service = -1;
+	int retCode = 0;
+	char *errorString = NULL;
+	const char *devUDN = NULL;
+	const char *serviceID = NULL;
+	const char *actionName = NULL;
+	IXML_Document *actionResult = NULL;
 
-    UpnpActionRequest_set_ErrCode(ca_event, 0);
-    UpnpActionRequest_set_ActionResult(ca_event, NULL);
+	UpnpActionRequest_set_ErrCode(ca_event, 0);
+	UpnpActionRequest_set_ActionResult(ca_event, NULL);
 
-    devUDN     = UpnpString_get_String(UpnpActionRequest_get_DevUDN(    ca_event));
-    serviceID  = UpnpString_get_String(UpnpActionRequest_get_ServiceID( ca_event));
-    actionName = UpnpString_get_String(UpnpActionRequest_get_ActionName(ca_event));
-    if( ( strcmp( devUDN,    tv_service_table[TV_SERVICE_CONTROL].UDN ) == 0 ) &&
-        ( strcmp( serviceID, tv_service_table[TV_SERVICE_CONTROL].ServiceId ) == 0 ) ) {
-        /* Request for action in the TvDevice Control Service */
-        service = TV_SERVICE_CONTROL;
-    } else if( ( strcmp( devUDN,    tv_service_table[TV_SERVICE_PICTURE].UDN ) == 0 ) &&
-               ( strcmp( serviceID, tv_service_table[TV_SERVICE_PICTURE].ServiceId ) == 0 ) ) {
-        /* Request for action in the TvDevice Picture Service */
-        service = TV_SERVICE_PICTURE;
-    }
-    /* Find and call appropriate procedure based on action name
-     * Each action name has an associated procedure stored in the
-     * service table. These are set at initialization. */
-    for( i = 0; i < TV_MAXACTIONS && tv_service_table[service].ActionNames[i] != NULL; i++ ) {
-        if( !strcmp( actionName, tv_service_table[service].ActionNames[i] ) ) {
-            if( ( !strcmp( tv_service_table[TV_SERVICE_CONTROL].VariableStrVal[TV_CONTROL_POWER], "1" ) ) ||
-                ( !strcmp( actionName, "PowerOn" ) ) ) {
-                retCode = tv_service_table[service].actions[i](
-                    UpnpActionRequest_get_ActionRequest(ca_event),
-                    &actionResult,
-                    &errorString );
-		UpnpActionRequest_set_ActionResult(ca_event, actionResult);
-            } else {
-                errorString = "Power is Off";
-                retCode = UPNP_E_INTERNAL_ERROR;
-            }
-            action_found = 1;
-            break;
-        }
-    }
+	devUDN     = UpnpString_get_String(UpnpActionRequest_get_DevUDN(    ca_event));
+	serviceID  = UpnpString_get_String(UpnpActionRequest_get_ServiceID( ca_event));
+	actionName = UpnpString_get_String(UpnpActionRequest_get_ActionName(ca_event));
+	if (strcmp(devUDN,    tv_service_table[TV_SERVICE_CONTROL].UDN) == 0 &&
+	    strcmp(serviceID, tv_service_table[TV_SERVICE_CONTROL].ServiceId) == 0) {
+		/* Request for action in the TvDevice Control Service. */
+		service = TV_SERVICE_CONTROL;
+	} else if (strcmp(devUDN,    tv_service_table[TV_SERVICE_PICTURE].UDN) == 0 &&
+		   strcmp(serviceID, tv_service_table[TV_SERVICE_PICTURE].ServiceId) == 0) {
+		/* Request for action in the TvDevice Picture Service. */
+		service = TV_SERVICE_PICTURE;
+	}
+	/* Find and call appropriate procedure based on action name.
+	 * Each action name has an associated procedure stored in the
+	 * service table. These are set at initialization. */
+	for (i = 0;
+	     i < TV_MAXACTIONS && tv_service_table[service].ActionNames[i] != NULL;
+	     i++) {
+		if (!strcmp(actionName, tv_service_table[service].ActionNames[i])) {
+			if (!strcmp(tv_service_table[TV_SERVICE_CONTROL].
+					VariableStrVal[TV_CONTROL_POWER], "1") ||
+			    !strcmp(actionName, "PowerOn")) {
+				retCode = tv_service_table[service].actions[i](
+					UpnpActionRequest_get_ActionRequest(ca_event),
+					&actionResult,
+					&errorString);
+				UpnpActionRequest_set_ActionResult(ca_event, actionResult);
+			} else {
+				errorString = "Power is Off";
+				retCode = UPNP_E_INTERNAL_ERROR;
+			}
+			action_found = 1;
+			break;
+		}
+	}
 
-    if( !action_found ) {
-        UpnpActionRequest_set_ActionResult(ca_event, NULL);
-        UpnpActionRequest_strcpy_ErrStr(ca_event, "Invalid Action" );
-        UpnpActionRequest_set_ErrCode(ca_event, 401);
-    } else {
-        if( retCode == UPNP_E_SUCCESS ) {
-        	UpnpActionRequest_set_ErrCode(ca_event, UPNP_E_SUCCESS);
-        } else {
-            // copy the error string
-            UpnpActionRequest_strcpy_ErrStr(ca_event, errorString );
-            switch ( retCode ) {
-                case UPNP_E_INVALID_PARAM:
-                    {
-                        UpnpActionRequest_set_ErrCode(ca_event, 402);
-                        break;
-                    }
-                case UPNP_E_INTERNAL_ERROR:
-                default:
-                    {
-                        UpnpActionRequest_set_ErrCode(ca_event, 501);
-                        break;
-                    }
+	if (!action_found) {
+		UpnpActionRequest_set_ActionResult(ca_event, NULL);
+		UpnpActionRequest_strcpy_ErrStr(ca_event, "Invalid Action");
+		UpnpActionRequest_set_ErrCode(ca_event, 401);
+	} else {
+		if (retCode == UPNP_E_SUCCESS) {
+			UpnpActionRequest_set_ErrCode(ca_event, UPNP_E_SUCCESS);
+		} else {
+			// copy the error string
+			UpnpActionRequest_strcpy_ErrStr(ca_event, errorString);
+			switch (retCode) {
+			case UPNP_E_INVALID_PARAM:
+				UpnpActionRequest_set_ErrCode(ca_event, 402);
+				break;
+			case UPNP_E_INTERNAL_ERROR:
+			default:
+				UpnpActionRequest_set_ErrCode(ca_event, 501);
+				break;
+			}
+		}
+	}
 
-            }
-        }
-    }
-
-    return UpnpActionRequest_get_ErrCode(ca_event);
+	return UpnpActionRequest_get_ErrCode(ca_event);
 }
 
 /******************************************************************************
@@ -1763,43 +1755,43 @@ TvDeviceDecreaseBrightness( IN IXML_Document *in, OUT IXML_Document **out, OUT c
  *****************************************************************************/
 int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Cookie)
 {
-    switch ( EventType ) {
-        case UPNP_EVENT_SUBSCRIPTION_REQUEST:
-            TvDeviceHandleSubscriptionRequest((UpnpSubscriptionRequest *)Event);
-            break;
+	switch (EventType) {
+	case UPNP_EVENT_SUBSCRIPTION_REQUEST:
+		TvDeviceHandleSubscriptionRequest((UpnpSubscriptionRequest *)Event);
+		break;
 
-        case UPNP_CONTROL_GET_VAR_REQUEST:
-            TvDeviceHandleGetVarRequest( (UpnpStateVarRequest *)Event );
-            break;
+	case UPNP_CONTROL_GET_VAR_REQUEST:
+		TvDeviceHandleGetVarRequest((UpnpStateVarRequest *)Event);
+		break;
 
-        case UPNP_CONTROL_ACTION_REQUEST:
-            TvDeviceHandleActionRequest( (UpnpActionRequest *)Event );
-            break;
+	case UPNP_CONTROL_ACTION_REQUEST:
+		TvDeviceHandleActionRequest((UpnpActionRequest *)Event);
+		break;
 
-            /*
-               ignore these cases, since this is not a control point 
-             */
-        case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
-        case UPNP_DISCOVERY_SEARCH_RESULT:
-        case UPNP_DISCOVERY_SEARCH_TIMEOUT:
-        case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE:
-        case UPNP_CONTROL_ACTION_COMPLETE:
-        case UPNP_CONTROL_GET_VAR_COMPLETE:
-        case UPNP_EVENT_RECEIVED:
-        case UPNP_EVENT_RENEWAL_COMPLETE:
-        case UPNP_EVENT_SUBSCRIBE_COMPLETE:
-        case UPNP_EVENT_UNSUBSCRIBE_COMPLETE:
-            break;
+	/*
+	ignore these cases, since this is not a control point 
+	*/
+	case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
+	case UPNP_DISCOVERY_SEARCH_RESULT:
+	case UPNP_DISCOVERY_SEARCH_TIMEOUT:
+	case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE:
+	case UPNP_CONTROL_ACTION_COMPLETE:
+	case UPNP_CONTROL_GET_VAR_COMPLETE:
+	case UPNP_EVENT_RECEIVED:
+	case UPNP_EVENT_RENEWAL_COMPLETE:
+	case UPNP_EVENT_SUBSCRIBE_COMPLETE:
+	case UPNP_EVENT_UNSUBSCRIBE_COMPLETE:
+		break;
 
-        default:
-            SampleUtil_Print( "Error in TvDeviceCallbackEventHandler: unknown event type %d\n",
-                EventType );
-    }
+	default:
+		SampleUtil_Print("Error in TvDeviceCallbackEventHandler: unknown event type %d\n",
+			EventType);
+	}
 
-    /* Print a summary of the event received */
-    SampleUtil_PrintEvent( EventType, Event );
+	/* Print a summary of the event received */
+	SampleUtil_PrintEvent(EventType, Event);
 
-    return 0;
+	return 0;
 }
 
 /******************************************************************************
@@ -1811,8 +1803,7 @@ int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Co
  * Parameters:
  *
  *****************************************************************************/
-int
-TvDeviceStop(void)
+int TvDeviceStop(void)
 {
     UpnpUnRegisterRootDevice( device_handle );
     UpnpFinish();
@@ -1860,7 +1851,8 @@ TvDeviceStart( char *ip_address,
     SampleUtil_Print(
         "Initializing UPnP Sdk with\n"
         "\tipaddress = %s port = %u\n",
-        ip_address, port );
+        ip_address ? ip_address : "{NULL}",
+	port);
 
     ret = UpnpInit( ip_address, port );
     if( ret != UPNP_E_SUCCESS ) {
@@ -1874,8 +1866,9 @@ TvDeviceStart( char *ip_address,
 
     SampleUtil_Print(
         "UPnP Initialized\n"
-	"\tipaddress= %s port = %u\n",
-        ip_address, port );
+        "\tipaddress = %s port = %u\n",
+        ip_address ? ip_address : "{NULL}",
+	port);
 
     if( desc_doc_name == NULL ) {
         desc_doc_name = "tvdevicedesc.xml";
