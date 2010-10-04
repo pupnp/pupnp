@@ -1,7 +1,7 @@
 #
 # Top-level "Makefile.am" for libupnp
 #
-# Copyright (C) 2005 Rémi Turboult <r3mi@users.sourceforge.net>
+# Copyright (C) 2005 RÃ©mi Turboult <r3mi@users.sourceforge.net>
 #
 
 ACLOCAL_AMFLAGS = -I m4
