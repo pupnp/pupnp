@@ -29,19 +29,29 @@
  *
  ******************************************************************************/
 
+
 #ifndef TIMERTHREAD_H
 #define TIMERTHREAD_H
 
+
+/*!
+ * \file
+ */
+
+
+#include "FreeList.h"
 #include "ithread.h"
 #include "LinkedList.h"
-#include "FreeList.h"
 #include "ThreadPool.h"
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 #define INVALID_EVENT_ID (-10 & 1<<29)
+
 
 /* Timeout Types */
 /* absolute means in seconds from Jan 1, 1970 */
@@ -49,140 +59,109 @@ extern "C" {
 typedef enum timeoutType {ABS_SEC,REL_SEC} TimeoutType;
 
 
-/****************************************************************************
- * Name: TimerThread
- * 
- *   Description:
- *     A timer thread similar to the one in the Upnp SDK that allows
- *     the scheduling of a job to run at a specified time in the future
- *     Because the timer thread uses the thread pool there is no 
- *     gurantee of timing, only approximate timing.
- *     Uses ThreadPool, Mutex, Condition, Thread
- *    
- * 
- *****************************************************************************/
+/*!
+ * A timer thread similar to the one in the Upnp SDK that allows
+ * the scheduling of a job to run at a specified time in the future.
+ *
+ * Because the timer thread uses the thread pool there is no 
+ * gurantee of timing, only approximate timing.
+ *
+ * Uses ThreadPool, Mutex, Condition, Thread.
+ */
 typedef struct TIMERTHREAD
 {
-  ithread_mutex_t mutex;
-  ithread_cond_t condition;
-  int lastEventId;
-  LinkedList eventQ;
-  int shutdown;
-  FreeList freeEvents;
-  ThreadPool *tp;
+	ithread_mutex_t mutex;
+	ithread_cond_t condition;
+	int lastEventId;
+	LinkedList eventQ;
+	int shutdown;
+	FreeList freeEvents;
+	ThreadPool *tp;
 } TimerThread;
 
 
-/****************************************************************************
- * Name: TimerEvent
- * 
- *   Description:
- *     
- *     Struct to contain information for a timer event.
- *     Internal to the TimerThread
- *   
- *****************************************************************************/
+/*!
+ * Struct to contain information for a timer event.
+ *
+ * Internal to the TimerThread.
+ */
 typedef struct TIMEREVENT
 {
-  ThreadPoolJob job;
-  time_t eventTime; /* absolute time for event in seconds since Jan 1, 1970 */
-  Duration persistent;  /* long term or short term job */
-  int id;
+	ThreadPoolJob job;
+	/*! [in] Absolute time for event in seconds since Jan 1, 1970. */
+	time_t eventTime;
+	/*! [in] Long term or short term job. */
+	Duration persistent;
+	int id;
 } TimerEvent;
 
 
-
-
-/************************************************************************
- * Function: TimerThreadInit
- * 
- *  Description:
- *     Initializes and starts timer thread.
+/*!
+ * \brief Initializes and starts timer thread.
  *
- *  Parameters:
- *             timer - valid timer thread pointer.
- *             tp  - valid thread pool to use. Must be
- *                   started. Must be valid for lifetime
- *                   of timer.  Timer must be shutdown
- *                   BEFORE thread pool.
- *  Return:
- *            0 on success, nonzero on failure
- *            Returns error from ThreadPoolAddPersistent on failure.
- *
- ************************************************************************/
-int TimerThreadInit(TimerThread *timer,
-		    ThreadPool *tp);
+ * \return 0 on success, nonzero on failure. Returns error from
+ * 	ThreadPoolAddPersistent on failure.
+ */
+int TimerThreadInit(
+	/*! [in] Valid timer thread pointer. */
+	TimerThread *timer,
+	/*! [in] Valid thread pool to use. Must be started. Must be valid for
+	 * lifetime of timer. Timer must be shutdown BEFORE thread pool. */
+	ThreadPool *tp);
 
 
-/************************************************************************
- * Function: TimerThreadSchedule
- * 
- *  Description:
- *     Schedules an event to run at a specified time.
+/*!
+ * \brief Schedules an event to run at a specified time.
  *
- *  Parameters:
- *             timer - valid timer thread pointer.
- *             time_t - time of event.
- *                      either in absolute seconds,
- *                      or relative seconds in the future.
- *             timeoutType - either ABS_SEC, or REL_SEC.
- *                           if REL_SEC, then the event
- *                           will be scheduled at the
- *                           current time + REL_SEC.
- *             job-> valid Thread pool job with following fields
- *             func - function to schedule
- *             arg - argument to function
- *             priority - priority of job.
- *         
- *             id - id of timer event. (out, can be null)
- *  Return:
- *            0 on success, nonzero on failure
- *            EOUTOFMEM if not enough memory to schedule job.
- *
- ************************************************************************/
-int TimerThreadSchedule(TimerThread* timer,
-			time_t time, 
-			TimeoutType type,
-			ThreadPoolJob *job,
-			Duration duration,
-			int *id);
+ * \return 0 on success, nonzero on failure, EOUTOFMEM if not enough memory
+ * 	to schedule job.
+ */
+int TimerThreadSchedule(
+	/*! [in] Valid timer thread pointer. */
+	TimerThread* timer,
+	/*! [in] time of event. Either in absolute seconds, or relative
+	 * seconds in the future. */
+	time_t time, 
+	/*! [in] either ABS_SEC, or REL_SEC. If REL_SEC, then the event
+	 * will be scheduled at the current time + REL_SEC. */
+	TimeoutType type,
+	/*! [in] Valid Thread pool job with following fields. */
+	ThreadPoolJob *job,
+	/*! [in] . */
+	Duration duration,
+	/*! [in] Id of timer event. (out, can be null). */
+	int *id);
 
-/************************************************************************
- * Function: TimerThreadRemove
- * 
- *  Description:
- *     Removes an event from the timer Q.
- *     Events can only be removed 
- *     before they have been placed in the
- *     thread pool.
- *
- *  Parameters:
- *             timer - valid timer thread pointer.
- *             id - id of event to remove.
- *             ThreadPoolJob *out - space for thread pool job.
- *  Return:
- *            0 on success, 
- *            INVALID_EVENT_ID on failure
- *			 
- ************************************************************************/
-int TimerThreadRemove(TimerThread *timer,
-			   int id,
-			   ThreadPoolJob *out);
 
-/************************************************************************
- * Function: TimerThreadShutdown
- * 
- *  Description:
- *    Shutdown the timer thread
- *    Events scheduled in the future will NOT be run.
- *    Timer thread should be shutdown BEFORE it's associated
- *    thread pool.
- *  Returns:
- *    returns 0 if succesfull,
- *            nonzero otherwise.
- *            Always returns 0.
- ***********************************************************************/   
-int TimerThreadShutdown(TimerThread *timer);
+/*!
+ * \brief Removes an event from the timer Q.
+ *
+ * Events can only be removed before they have been placed in the thread pool.
+ *
+ * \return 0 on success, INVALID_EVENT_ID on failure.
+ */
+int TimerThreadRemove(
+	/*! [in] Valid timer thread pointer. */
+	TimerThread *timer,
+	/*! [in] Id of event to remove. */
+	int id,
+	/*! [in] Space for thread pool job. */
+	ThreadPoolJob *out);
+
+
+/*!
+ * \brief Shutdown the timer thread.
+ *
+ * Events scheduled in the future will NOT be run.
+ *
+ * Timer thread should be shutdown BEFORE it's associated thread pool.
+ *
+ * \return 0 if succesfull, nonzero otherwise. Always returns 0.
+ */
+int TimerThreadShutdown(
+	/*! [in] Valid timer thread pointer. */
+	TimerThread *timer);
+
 
 #ifdef __cplusplus
 }

@@ -29,20 +29,31 @@
  *
  ******************************************************************************/
 
+
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
+
+/*!
+ * \file
+ */
+
+
 #include "FreeList.h"
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 #define EOUTOFMEM (-7 & 1<<29)
+
 
 #define FREELISTSIZE 100
 #define LIST_SUCCESS 1
 #define LIST_FAIL 0
+
 
 /****************************************************************************
  * Name: free_routine
@@ -52,6 +63,7 @@ extern "C" {
  *****************************************************************************/
 typedef void (*free_function)(void *arg);
 
+
 /****************************************************************************
  * Name: cmp_routine
  *
@@ -60,6 +72,7 @@ typedef void (*free_function)(void *arg);
  *     Returns 1 if itemA==itemB
  *****************************************************************************/
 typedef int (*cmp_routine)(void *itemA,void *itemB);
+
 
 /****************************************************************************
  * Name: ListNode
@@ -74,6 +87,7 @@ typedef struct LISTNODE
   struct LISTNODE *next;
   void *item;
 } ListNode;
+
 
 /****************************************************************************
  * Name: LinkedList
@@ -104,6 +118,7 @@ typedef struct LINKEDLIST
   cmp_routine cmp_func;    /* compare function to use */
 } LinkedList;
 
+
 /****************************************************************************
  * Function: ListInit
  *
@@ -118,6 +133,7 @@ typedef struct LINKEDLIST
  *      0 on success, EOUTOFMEM on failure.
  *****************************************************************************/
 int ListInit(LinkedList *list,cmp_routine cmp_func, free_function free_func);
+
 
 /****************************************************************************
  * Function: ListAddHead
@@ -135,6 +151,7 @@ int ListInit(LinkedList *list,cmp_routine cmp_func, free_function free_func);
  *****************************************************************************/
 ListNode *ListAddHead(LinkedList *list, void *item);
 
+
 /****************************************************************************
  * Function: ListAddTail
  *
@@ -150,6 +167,7 @@ ListNode *ListAddHead(LinkedList *list, void *item);
  *      The list has been initialized.
  *****************************************************************************/
 ListNode *ListAddTail(LinkedList *list, void *item);
+
 
 /****************************************************************************
  * Function: ListAddAfter
@@ -205,6 +223,7 @@ ListNode *ListAddBefore(LinkedList *list,void *item, ListNode *anode);
  *****************************************************************************/
 void *ListDelNode(LinkedList *list,ListNode *dnode, int freeItem);
 
+
 /****************************************************************************
  * Function: ListDestroy
  *
@@ -240,6 +259,7 @@ int ListDestroy(LinkedList *list, int freeItem);
  *****************************************************************************/
 ListNode* ListHead(LinkedList *list);
 
+
 /****************************************************************************
  * Function: ListTail
  *
@@ -255,6 +275,7 @@ ListNode* ListHead(LinkedList *list);
  *      The list has been initialized.
  *****************************************************************************/
 ListNode* ListTail(LinkedList *list);
+
 
 /****************************************************************************
  * Function: ListNext
@@ -272,6 +293,7 @@ ListNode* ListTail(LinkedList *list);
  *****************************************************************************/
 ListNode* ListNext(LinkedList *list, ListNode * node);
 
+
 /****************************************************************************
  * Function: ListPrev
  *
@@ -287,6 +309,7 @@ ListNode* ListNext(LinkedList *list, ListNode * node);
  *      The list has been initialized.
  *****************************************************************************/
 ListNode* ListPrev(LinkedList *list, ListNode * node);
+
 
 /****************************************************************************
  * Function: ListFind
@@ -306,6 +329,7 @@ ListNode* ListPrev(LinkedList *list, ListNode * node);
  *      The list has been initialized.
  *****************************************************************************/
 ListNode* ListFind(LinkedList *list, ListNode *start, void * item);
+
 
 /****************************************************************************
  * Function: ListSize
