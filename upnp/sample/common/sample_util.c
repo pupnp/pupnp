@@ -428,8 +428,9 @@ int SampleUtil_PrintEvent(IN Upnp_EventType EventType, IN void *Event)
 {
 	ithread_mutex_lock(&display_mutex);
 
-	SampleUtil_Print("======================================================================\n");
-	SampleUtil_Print("----------------------------------------------------------------------\n");
+	SampleUtil_Print(
+		"======================================================================\n"
+		"----------------------------------------------------------------------\n");
 	SampleUtil_PrintEventType(EventType);
 	switch (EventType) {
 	/* SSDP */
@@ -467,7 +468,7 @@ int SampleUtil_PrintEvent(IN Upnp_EventType EventType, IN void *Event)
 		SampleUtil_Print("ServiceID   =  %s\n", a_event->ServiceID);
 		if (a_event->ActionRequest) {
 			xmlbuff = ixmlPrintNode((IXML_Node *)a_event->ActionRequest);
-			if ( xmlbuff ) {
+			if (xmlbuff) {
 				SampleUtil_Print("ActRequest  =  %s\n", xmlbuff);
 				ixmlFreeDOMString(xmlbuff);
 			}
@@ -541,6 +542,7 @@ int SampleUtil_PrintEvent(IN Upnp_EventType EventType, IN void *Event)
 		SampleUtil_Print("CurrentVal  =  %s\n", sv_event->CurrentVal);
 		break;
 	}
+
 	/* GENA */
 	case UPNP_EVENT_SUBSCRIPTION_REQUEST: {
 		struct Upnp_Subscription_Request *sr_event =
@@ -585,7 +587,6 @@ int SampleUtil_PrintEvent(IN Upnp_EventType EventType, IN void *Event)
 		SampleUtil_Print("TimeOut     =  %d\n", es_event->TimeOut);
 		break;
 	}
-
 	case UPNP_EVENT_AUTORENEWAL_FAILED:
 	case UPNP_EVENT_SUBSCRIPTION_EXPIRED: {
 		struct Upnp_Event_Subscribe *es_event =
@@ -599,8 +600,10 @@ int SampleUtil_PrintEvent(IN Upnp_EventType EventType, IN void *Event)
 		break;
 	}
 	}
-	SampleUtil_Print("----------------------------------------------------------------------\n");
-	SampleUtil_Print("======================================================================\n");
+	SampleUtil_Print(
+		"----------------------------------------------------------------------\n"
+		"======================================================================\n"
+		"\n\n\n");
 
 	ithread_mutex_unlock(&display_mutex);
 
