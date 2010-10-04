@@ -500,6 +500,8 @@ AC_OUTPUT
 #
 # Files copied for windows compilation.
 #
+echo "configure: copying \"autoconfig.h\"          to \"build/inc/autoconfig.h\""
 cp autoconfig.h build/inc/autoconfig.h
+echo "configure: copying \"upnp/inc/upnpconfig.h\" to \"build/inc/upnpconfig.h\""
 cp upnp/inc/upnpconfig.h build/inc/upnpconfig.h
 
