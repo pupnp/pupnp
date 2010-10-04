@@ -144,6 +144,30 @@ dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:3:2])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
 dnl #
 dnl ############################################################################
+dnl # Release 1.6.7:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #	revision: 5 -> 6
+dnl # - Code has changed in threadutil
+dnl #	revision: 3 -> 4
+dnl # - Interfaces have been changed, added and removed in upnp
+dnl #	current: 4 -> 5
+dnl #   revision: 4 -> 0
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:0:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.8:
+dnl # "current:revision:age"
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:0:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
+dnl #
+dnl ############################################################################
 dnl # Release 1.8.0:
 dnl # "current:revision:age"
 dnl #
