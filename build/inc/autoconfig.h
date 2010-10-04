@@ -2,7 +2,7 @@
 /* autoconfig.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define to 1 to compile debug code */
-/* #undef DEBUG */
+#define DEBUG 1
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #define HAVE_ARPA_INET_H 1
@@ -87,10 +87,10 @@
 #define LT_OBJDIR ".libs/"
 
 /* Define to 1 to prevent compilation of assert() */
-#define NDEBUG 1
+/* #undef NDEBUG */
 
 /* Define to 1 to prevent some debug code */
-#define NO_DEBUG 1
+/* #undef NO_DEBUG */
 
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 /* #undef NO_MINUS_C_MINUS_O */
@@ -130,7 +130,7 @@
 #define UPNP_HAVE_CLIENT 1
 
 /* see upnpconfig.h */
-/* #undef UPNP_HAVE_DEBUG */
+#define UPNP_HAVE_DEBUG 1
 
 /* see upnpconfig.h */
 #define UPNP_HAVE_DEVICE 1
