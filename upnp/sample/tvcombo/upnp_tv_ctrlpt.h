@@ -1,4 +1,4 @@
-/*******************************************************************************
+/**************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
@@ -27,29 +27,40 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- ******************************************************************************/
+ **************************************************************************/
+
 
 #ifndef UPNP_TV_CTRLPT_H
 #define UPNP_TV_CTRLPT_H
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdio.h>
+
+#include "sample_util.h"
+
 
 #include "ithread.h"
-#ifndef WIN32
-#include <unistd.h>
-#endif
-#include <stdarg.h>
-#include <stdlib.h>
+#include "upnp.h"
+#include "UpnpString.h"
+#include "upnptools.h"
+
+
 #include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include "upnp.h"
-#include "upnptools.h"
-#include "sample_util.h"
+
+#ifdef WIN32
+	/* Do not #include <unistd.h> */
+#else
+	#include <unistd.h>
+#endif
+
 
 #define TV_SERVICE_SERVCOUNT	2
 #define TV_SERVICE_CONTROL		0
@@ -68,12 +79,12 @@ extern "C" {
 
 #define TV_MAX_VAL_LEN			5
 
-#define TV_SUCCESS				0
-#define TV_ERROR				(-1)
-#define TV_WARNING				1
+#define TV_SUCCESS			0
+#define TV_ERROR			(-1)
+#define TV_WARNING			1
 
 /* This should be the maximum VARCOUNT from above */
-#define TV_MAXVARS				TV_PICTURE_VARCOUNT
+#define TV_MAXVARS			TV_PICTURE_VARCOUNT
 
 extern char TvDeviceType[];
 extern char *TvServiceType[];
@@ -110,11 +121,11 @@ extern ithread_mutex_t DeviceListMutex;
 
 extern UpnpClient_Handle ctrlpt_handle;
 
-void	TvCtrlPointPrintHelp( void );
+void	TvCtrlPointPrintHelp(void);
 int		TvCtrlPointDeleteNode(struct TvDeviceNode *);
 int		TvCtrlPointRemoveDevice(const char *);
-int		TvCtrlPointRemoveAll( void );
-int		TvCtrlPointRefresh( void );
+int		TvCtrlPointRemoveAll(void);
+int		TvCtrlPointRefresh(void);
 
 
 int		TvCtrlPointSendAction(int, int, char *, char **, char **, int);
@@ -138,20 +149,20 @@ int		TvCtrlPointGetContrast(int);
 int		TvCtrlPointGetBrightness(int);
 
 int		TvCtrlPointGetDevice(int, struct TvDeviceNode **);
-int		TvCtrlPointPrintList( void );
+int		TvCtrlPointPrintList(void);
 int		TvCtrlPointPrintDevice(int);
 void	TvCtrlPointAddDevice(IXML_Document *, const char *, int); 
 void    TvCtrlPointHandleGetVar(const char *, const char *, const DOMString);
 void	TvStateUpdate(char*,int, IXML_Document * , char **);
-void	TvCtrlPointHandleEvent(const Upnp_SID, int, IXML_Document *); 
+void	TvCtrlPointHandleEvent(const char *, int, IXML_Document *); 
 void	TvCtrlPointHandleSubscribeUpdate(const char *, const Upnp_SID, int); 
 int		TvCtrlPointCallbackEventHandler(Upnp_EventType, void *, void *);
 void	TvCtrlPointVerifyTimeouts(int);
-void	TvCtrlPointPrintCommands( void );
-void*	TvCtrlPointCommandLoop( void* );
-int		TvCtrlPointStart( print_string printFunctionPtr, state_update updateFunctionPtr );
-int		TvCtrlPointStop( void );
-int		TvCtrlPointProcessCommand( char *cmdline );
+void	TvCtrlPointPrintCommands(void);
+void*	TvCtrlPointCommandLoop(void *);
+int		TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionPtr);
+int		TvCtrlPointStop(void);
+int		TvCtrlPointProcessCommand(char *cmdline);
 
 #ifdef __cplusplus
 };

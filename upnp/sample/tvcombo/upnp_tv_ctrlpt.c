@@ -937,23 +937,24 @@ TvStateUpdate( char *UDN,
  *
  ********************************************************************************/
 void TvCtrlPointHandleEvent(
-	const Upnp_SID sid,
+	const char *sid,
 	int evntkey,
 	IXML_Document *changes)
 {
 	struct TvDeviceNode *tmpdevnode;
 	int service;
+	const char *aux_sid = NULL;
 
 	ithread_mutex_lock(&DeviceListMutex);
 
 	tmpdevnode = GlobalDeviceList;
 	while (tmpdevnode) {
 		for (service = 0; service < TV_SERVICE_SERVCOUNT; ++service) {
-			if(strcmp(tmpdevnode->device.TvService[service].SID, sid) == 0) {
+			if (strcmp(tmpdevnode->device.TvService[service].SID, sid) ==  0) {
 				SampleUtil_Print("Received Tv %s Event: %d for SID %s",
 					TvServiceName[service],
 					evntkey,
-					sid );
+					aux_sid);
 				TvStateUpdate(
 					tmpdevnode->device.UDN,
 					service,

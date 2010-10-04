@@ -44,6 +44,7 @@ extern "C" {
 
 #include "ithread.h"
 #include "upnp.h"
+#include "UpnpString.h"
 #include "upnptools.h"
 
 
@@ -120,8 +121,8 @@ extern ithread_mutex_t DeviceListMutex;
 
 extern UpnpClient_Handle ctrlpt_handle;
 
-void		TvCtrlPointPrintHelp(void);
-int		TvCtrlPointDeleteNode(struct TvDeviceNode*);
+void	TvCtrlPointPrintHelp(void);
+int		TvCtrlPointDeleteNode(struct TvDeviceNode *);
 int		TvCtrlPointRemoveDevice(const char *);
 int		TvCtrlPointRemoveAll(void);
 int		TvCtrlPointRefresh(void);
@@ -148,20 +149,20 @@ int		TvCtrlPointGetContrast(int);
 int		TvCtrlPointGetBrightness(int);
 
 int		TvCtrlPointGetDevice(int, struct TvDeviceNode **);
-int		TvCtrlPointPrintList( void );
+int		TvCtrlPointPrintList(void);
 int		TvCtrlPointPrintDevice(int);
 void	TvCtrlPointAddDevice(IXML_Document *, const char *, int); 
 void    TvCtrlPointHandleGetVar(const char *, const char *, const DOMString);
 void	TvStateUpdate(char*,int, IXML_Document * , char **);
-void	TvCtrlPointHandleEvent(const Upnp_SID, int, IXML_Document *); 
+void	TvCtrlPointHandleEvent(const char *, int, IXML_Document *); 
 void	TvCtrlPointHandleSubscribeUpdate(const char *, const Upnp_SID, int); 
 int		TvCtrlPointCallbackEventHandler(Upnp_EventType, void *, void *);
 void	TvCtrlPointVerifyTimeouts(int);
-void	TvCtrlPointPrintCommands( void );
-void*	TvCtrlPointCommandLoop( void* );
-int		TvCtrlPointStart( print_string printFunctionPtr, state_update updateFunctionPtr );
-int		TvCtrlPointStop( void );
-int		TvCtrlPointProcessCommand( char *cmdline );
+void	TvCtrlPointPrintCommands(void);
+void*	TvCtrlPointCommandLoop(void *);
+int		TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionPtr);
+int		TvCtrlPointStop(void);
+int		TvCtrlPointProcessCommand(char *cmdline);
 
 #ifdef __cplusplus
 };
