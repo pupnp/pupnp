@@ -67,9 +67,6 @@
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
 
-/* Define to 1 if you have the <sys/timeb.h> header file. */
-#define HAVE_SYS_TIMEB_H 1
-
 /* Define to 1 if you have the <sys/time.h> header file. */
 #define HAVE_SYS_TIME_H 1
 
@@ -85,11 +82,15 @@
 /* Define to 1 if you have the <ws2tcpip.h> header file. */
 /* #undef HAVE_WS2TCPIP_H */
 
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#define LT_OBJDIR ".libs/"
+
 /* Define to 1 to prevent compilation of assert() */
-/* #undef NDEBUG */
+#define NDEBUG 1
 
 /* Define to 1 to prevent some debug code */
-/* #undef NO_DEBUG */
+#define NO_DEBUG 1
 
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 /* #undef NO_MINUS_C_MINUS_O */
@@ -120,10 +121,16 @@
 #define STDC_HEADERS 1
 
 /* see upnpconfig.h */
+/* #undef UPNP_ENABLE_IPV6 */
+
+/* see upnpconfig.h */
+#define UPNP_ENABLE_NOTIFICATION_REORDERING 1
+
+/* see upnpconfig.h */
 #define UPNP_HAVE_CLIENT 1
 
 /* see upnpconfig.h */
-#define UPNP_HAVE_DEBUG 1
+/* #undef UPNP_HAVE_DEBUG */
 
 /* see upnpconfig.h */
 #define UPNP_HAVE_DEVICE 1
@@ -159,7 +166,7 @@
 /* #undef _LARGEFILE_SOURCE */
 
 /* Large files support */
-#define _LARGE_FILE_SOURCE 
+#define _LARGE_FILE_SOURCE /**/
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

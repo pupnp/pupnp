@@ -2,7 +2,7 @@
 /* -*- C -*- */
 /*******************************************************************************
  *
- * Copyright (c) 2006 Rémi Turboult <r3mi@users.sourceforge.net>
+ * Copyright (c) 2006 RÃ©mi Turboult <r3mi@users.sourceforge.net>
  * All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
@@ -53,7 +53,7 @@
 
 /** The library version (numeric) e.g. 10300 means version 1.3.0 */
 #define UPNP_VERSION	\
-  ((UPNP_VERSION_MAJOR*100 + UPNP_VERSION_MINOR)*100 + UPNP_VERSION_PATCH)
+  ((UPNP_VERSION_MAJOR * 100 + UPNP_VERSION_MINOR) * 100 + UPNP_VERSION_PATCH)
 
 
 
@@ -69,7 +69,7 @@
 
 /** Defined to 1 if the library has been compiled with DEBUG enabled 
  *  (i.e. configure --enable-debug) : <upnp/upnpdebug.h> file is available */
-#define UPNP_HAVE_DEBUG 1
+/* #undef UPNP_HAVE_DEBUG */
 
 
 /** Defined to 1 if the library has been compiled with client API enabled 
@@ -91,6 +91,9 @@
  *  (i.e. configure --enable-tools) : <upnp/upnptools.h> file is available */
 #define UPNP_HAVE_TOOLS 1
 
+/** Defined to 1 if the library has been compiled with ipv6 support
+ *  (i.e. configure --enable-ipv6) */
+/* #undef UPNP_ENABLE_IPV6 */
 
 #endif /* UPNP_CONFIG_H */
 
