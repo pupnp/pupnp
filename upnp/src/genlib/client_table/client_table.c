@@ -19,7 +19,7 @@
 #include <stdlib.h> // for calloc(), free()
 
 
-void free_client_subscription(ClientSubscription *sub)
+void free_client_subscription(GenlibClientSubscription *sub)
 {
 	upnp_timeout *event;
 	ThreadPoolJob tempJob;
@@ -40,9 +40,9 @@ void free_client_subscription(ClientSubscription *sub)
 }
 
 
-void freeClientSubList(ClientSubscription *list)
+void freeClientSubList(GenlibClientSubscription *list)
 {
-	ClientSubscription *next;
+	GenlibClientSubscription *next;
 	while (list) {
 		free_client_subscription(list);
 		next = GenlibClientSubscription_get_Next(list);
@@ -52,10 +52,10 @@ void freeClientSubList(ClientSubscription *list)
 }
 
 
-void RemoveClientSubClientSID(ClientSubscription **head, const UpnpString *sid)
+void RemoveClientSubClientSID(GenlibClientSubscription **head, const UpnpString *sid)
 {
-	ClientSubscription *finger = *head;
-	ClientSubscription *previous = NULL;
+	GenlibClientSubscription *finger = *head;
+	GenlibClientSubscription *previous = NULL;
 	int found = 0;
 	while (finger) {
 		found = !strcmp(
@@ -79,9 +79,9 @@ void RemoveClientSubClientSID(ClientSubscription **head, const UpnpString *sid)
 }
 
 
-ClientSubscription *GetClientSubClientSID(ClientSubscription *head, const UpnpString *sid)
+GenlibClientSubscription *GetClientSubClientSID(GenlibClientSubscription *head, const UpnpString *sid)
 {
-	ClientSubscription *next = head;
+	GenlibClientSubscription *next = head;
 	int found = 0;
 	while (next) {
 		found = !strcmp(
@@ -98,9 +98,9 @@ ClientSubscription *GetClientSubClientSID(ClientSubscription *head, const UpnpSt
 }
 
 
-ClientSubscription *GetClientSubActualSID(ClientSubscription *head, token *sid)
+GenlibClientSubscription *GetClientSubActualSID(GenlibClientSubscription *head, token *sid)
 {
-	ClientSubscription *next = head;
+	GenlibClientSubscription *next = head;
 	while (next) {
 		if (!memcmp(
 			GenlibClientSubscription_get_ActualSID_cstr(next),

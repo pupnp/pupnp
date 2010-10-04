@@ -131,7 +131,7 @@ static int ScheduleGenaAutoRenew(
 	/*! [in] The time out value of the subscription. */
 	IN int TimeOut,
 	/*! [in] Subscription being renewed. */
-	IN ClientSubscription *sub)
+	IN GenlibClientSubscription *sub)
 {
 	UpnpEventSubscribe *RenewEventStruct = NULL;
 	upnp_timeout *RenewEvent = NULL;
@@ -398,7 +398,7 @@ static int gena_subscribe(
 
 int genaUnregisterClient(UpnpClient_Handle client_handle)
 {
-	ClientSubscription *sub_copy = GenlibClientSubscription_new();
+	GenlibClientSubscription *sub_copy = GenlibClientSubscription_new();
 	int return_code = UPNP_E_SUCCESS;
 	struct Handle_Info *handle_info = NULL;
 	http_parser_t response;
@@ -446,10 +446,10 @@ int genaUnSubscribe(
 	UpnpClient_Handle client_handle,
 	const UpnpString *in_sid)
 {
-	ClientSubscription *sub = NULL;
+	GenlibClientSubscription *sub = NULL;
 	int return_code = GENA_SUCCESS;
 	struct Handle_Info *handle_info;
-	ClientSubscription *sub_copy = GenlibClientSubscription_new();
+	GenlibClientSubscription *sub_copy = GenlibClientSubscription_new();
 	http_parser_t response;
 
 	// validate handle and sid
@@ -501,7 +501,7 @@ int genaSubscribe(
 	UpnpString *out_sid)
 {
 	int return_code = GENA_SUCCESS;
-	ClientSubscription *newSubscription = GenlibClientSubscription_new();
+	GenlibClientSubscription *newSubscription = GenlibClientSubscription_new();
 	uuid_upnp uid;
 	Upnp_SID temp_sid;
 	Upnp_SID temp_sid2;
@@ -582,8 +582,8 @@ int genaRenewSubscription(
 	int *TimeOut)
 {
 	int return_code = GENA_SUCCESS;
-	ClientSubscription *sub = NULL;
-	ClientSubscription *sub_copy = GenlibClientSubscription_new();
+	GenlibClientSubscription *sub = NULL;
+	GenlibClientSubscription *sub_copy = GenlibClientSubscription_new();
 	struct Handle_Info *handle_info;
 	UpnpString *ActualSID = UpnpString_new();
 	ThreadPoolJob tempJob;
@@ -682,7 +682,7 @@ void gena_process_notification_event(
 	IXML_Document *ChangedVars = NULL;
 	int eventKey;
 	token sid;
-	ClientSubscription *subscription = NULL;
+	GenlibClientSubscription *subscription = NULL;
 	struct Handle_Info *handle_info;
 	void *cookie;
 	Upnp_FunPtr callback;

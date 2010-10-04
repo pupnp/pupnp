@@ -40,7 +40,7 @@ extern TimerThread gTimerThread;
  */
 void free_client_subscription(
 	/*! [in] Client subscription to be freed. */
-	ClientSubscription *sub);
+	GenlibClientSubscription *sub);
 
 
 /*!
@@ -48,7 +48,7 @@ void free_client_subscription(
  */
 void freeClientSubList(
 	/*! [in] Client subscription list to be freed. */
-	ClientSubscription *list);
+	GenlibClientSubscription *list);
 
 
 /*!
@@ -58,7 +58,7 @@ void freeClientSubList(
  */
 void RemoveClientSubClientSID(
 	/*! [in] Head of the subscription list. */
-	ClientSubscription **head,
+	GenlibClientSubscription **head,
 	/*! [in] Subscription ID to be mactched. */
 	const UpnpString *sid);
 
@@ -69,9 +69,9 @@ void RemoveClientSubClientSID(
  *
  * \return The matching subscription.
  */
-ClientSubscription *GetClientSubClientSID(
+GenlibClientSubscription *GetClientSubClientSID(
 	/*! [in] Head of the subscription list. */
-	ClientSubscription *head,
+	GenlibClientSubscription *head,
 	/*! [in] Subscription ID to be mactched. */
 	const UpnpString *sid);
 
@@ -82,9 +82,9 @@ ClientSubscription *GetClientSubClientSID(
  *
  * \return The matching subscription.
  */
-ClientSubscription *GetClientSubActualSID(
+GenlibClientSubscription *GetClientSubActualSID(
 	/*! [in] Head of the subscription list. */
-	ClientSubscription *head,
+	GenlibClientSubscription *head,
 	/*! [in] Subscription ID to be mactched. */
 	token *sid);
 
