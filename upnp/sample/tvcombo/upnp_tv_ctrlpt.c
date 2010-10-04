@@ -943,7 +943,6 @@ void TvCtrlPointHandleEvent(
 {
 	struct TvDeviceNode *tmpdevnode;
 	int service;
-	const char *aux_sid = NULL;
 
 	ithread_mutex_lock(&DeviceListMutex);
 
@@ -954,7 +953,7 @@ void TvCtrlPointHandleEvent(
 				SampleUtil_Print("Received Tv %s Event: %d for SID %s",
 					TvServiceName[service],
 					evntkey,
-					aux_sid);
+					sid);
 				TvStateUpdate(
 					tmpdevnode->device.UDN,
 					service,
