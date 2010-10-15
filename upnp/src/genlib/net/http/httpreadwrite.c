@@ -68,6 +68,7 @@
 
 #ifdef WIN32
 	#include <malloc.h>
+	#define fseeko fseek
 #else
 	#include <arpa/inet.h>
 	#include <fcntl.h>

@@ -69,22 +69,6 @@
 #endif
 
 
-#ifdef WIN32
-	#include <iphlpapi.h>
-#else
-	#define SOCKET int
-	#define INVALID_SOCKET (SOCKET)(~0)
-#endif
-
-
-#ifdef WIN32
-	#define UpnpCloseSocket closesocket
-	#define fseeko fseek
-#else
-	#define UpnpCloseSocket close
-#endif
-
-
 #define LINE_SIZE  180
 #define NAME_SIZE  256
 #define MNFT_NAME_SIZE  64
