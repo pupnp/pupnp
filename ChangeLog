@@ -226,6 +226,31 @@ Version 1.6.8
 Version 1.6.7
 *******************************************************************************
 
+2010-10-15 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Fix for 100% CPU issue in select() in miniserv.c. I have also removed
+	the sleep() call, it was just a workaround.
+
+	SF Bug Tracker [ 3086852 ] 99% CPU loop in miniserver.c on a non ipv6
+	system.
+
+	Submitted by: Jin ( jin_eld ) - 2010-10-13 19:29:13 UTC
+
+	I cross compiled libupnp 1.6.7 for ARM9 using the --disable-ipv6
+	option, my system is an ipv4 only setup.
+
+	I do not know why this problem only appears when running the app in the
+	background (for instance using nohup &), but then it starts using 99%
+	CPU.
+
+	I traced the problem down to the select() call in miniserver.c in the
+	RunMiniServer() function. Select returns code 1, but errno is set to
+	"Socket operation on non-socket", I also see this when running my app
+	under strace.
+
+	I set all ...Sock6 variables to INVALID_SOCKET to make sure that they
+	do not get added to the FD_SET and the problem is gone.
+
 2010-10-01 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
 	Adding --disable-notification-reordering option
