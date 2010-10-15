@@ -122,37 +122,19 @@ sock_init_with_ip( OUT SOCKINFO * info,
     return UPNP_E_SUCCESS;
 }
 
-/************************************************************************
-*	Function :	sock_destroy
-*
-*	Parameters :
-*		INOUT SOCKINFO* info ;	Socket Information Object
-*		int ShutdownMethod ;	How to shutdown the socket. Used by  
-*								sockets's shutdown() 
-*
-*	Description :	Shutsdown the socket using the ShutdownMethod to 
-*		indicate whether sends and receives on the socket will be 
-*		dis-allowed. After shutting down the socket, closesocket is called
-*		to release system resources used by the socket calls.
-*
-*	Return : int;
-*		UPNP_E_SOCKET_ERROR on failure
-*		UPNP_E_SUCCESS on success
-*
-*	Note :
-************************************************************************/
-int
-sock_destroy( INOUT SOCKINFO * info,
-              int ShutdownMethod )
+int sock_destroy(INOUT SOCKINFO *info, int ShutdownMethod)
 {
-    if( info->socket != INVALID_SOCKET ) {
-        shutdown( info->socket, ShutdownMethod );
-        if( UpnpCloseSocket( info->socket ) == -1 ) {
-            return UPNP_E_SOCKET_ERROR;
-        }
-    }
+	int ret = UPNP_E_SUCCESS;
 
-    return UPNP_E_SUCCESS;
+	if (info->socket != -1) {
+		shutdown(info->socket, ShutdownMethod);
+		if(sock_close(info->socket) == -1) {
+			ret = UPNP_E_SOCKET_ERROR;
+		}
+		info->socket = -1;
+	}
+
+	return ret;
 }
 
 /************************************************************************

@@ -27,6 +27,7 @@
 	#endif
 	#include <netinet/in.h>
 
+	#include <unistd.h> /* for close(). Do not include in WIN32. */
 	#define SOCKET int
 	#define INVALID_SOCKET ((SOCKET)(-1))
 	#define UpnpCloseSocket close
