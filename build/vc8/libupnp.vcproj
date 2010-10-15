@@ -604,10 +604,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\upnp\src\inc\upnpclosesocket.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\upnp\inc\upnpdebug.h"
 				>
 			</File>

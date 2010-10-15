@@ -80,7 +80,6 @@ libupnp_la_SOURCES = \
 	src/inc/sysdep.h \
 	src/inc/unixutil.h \
 	src/inc/upnpapi.h \
-	src/inc/upnpclosesocket.h \
 	src/inc/upnp_timeout.h \
 	src/inc/uri.h \
 	src/inc/urlconfig.h \
