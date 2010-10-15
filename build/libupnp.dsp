@@ -5,17 +5,17 @@
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
 CFG=libupnp - Win32 Debug
-!MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
-!MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
+!MESSAGE Dies ist kein g?ltiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
+!MESSAGE verwenden Sie den Befehl "Makefile exportieren" und f?hren Sie den Befehl
 !MESSAGE 
 !MESSAGE NMAKE /f "libupnp.mak".
 !MESSAGE 
-!MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
+!MESSAGE Sie k?nnen beim Ausf?hren von NMAKE eine Konfiguration angeben
 !MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
 !MESSAGE 
 !MESSAGE NMAKE /f "libupnp.mak" CFG="libupnp - Win32 Debug"
 !MESSAGE 
-!MESSAGE Für die Konfiguration stehen zur Auswahl:
+!MESSAGE F?r die Konfiguration stehen zur Auswahl:
 !MESSAGE 
 !MESSAGE "libupnp - Win32 Release" (basierend auf  "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "libupnp - Win32 Debug" (basierend auf  "Win32 (x86) Dynamic-Link Library")
@@ -386,10 +386,6 @@ SOURCE=..\upnp\src\inc\upnp_timeout.h
 # Begin Source File
 
 SOURCE=..\upnp\src\inc\upnpapi.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\upnp\src\inc\upnpclosesocket.h
 # End Source File
 # Begin Source File
 
