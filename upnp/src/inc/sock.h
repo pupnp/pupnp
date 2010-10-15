@@ -152,25 +152,37 @@ int sock_write( IN SOCKINFO *info, IN char* buffer, IN size_t bufsize,
 		    		 INOUT int *timeoutSecs );
 
 /************************************************************************
-*	Function :	sock_destroy
-*
-*	Parameters :
-*		INOUT SOCKINFO* info ;	Socket Information Object
-*		int ShutdownMethod ;	How to shutdown the socket. Used by  
-*								sockets's shutdown() 
-*
-*	Description :	Shutsdown the socket using the ShutdownMethod to 
-*		indicate whether sends and receives on the socket will be 
-*		dis-allowed. After shutting down the socket, closesocket is called
-*		to release system resources used by the socket calls.
-*
-*	Return : int;
-*		UPNP_E_SOCKET_ERROR on failure
-*		UPNP_E_SUCCESS on success
-*
-*	Note :
-************************************************************************/
+ * Function: sock_destroy
+ *
+ * Parameters:
+ *	INOUT SOCKINFO* info ;	Socket Information Object
+ *	int ShutdownMethod ;	How to shutdown the socket. Used by
+ *				sockets's shutdown()
+ *
+ * Description: Shutsdown the socket using the ShutdownMethod to
+ *	indicate whether sends and receives on the socket will be
+ *	dis-allowed. After shutting down the socket, closesocket is called
+ *	to release system resources used by the socket calls.
+ *
+ * Return: int;
+ *	UPNP_E_SOCKET_ERROR on failure
+ *	UPNP_E_SUCCESS on success
+ *
+ * Note:
+ ************************************************************************/
 int sock_destroy(INOUT SOCKINFO* info, int);
+
+
+static inline int sock_close(int sock)
+{
+	int ret = -1;
+
+	if (sock != -1) {
+		ret = UpnpCloseSocket(sock);
+	}
+
+	return ret;
+}
 
 
 #ifdef __cplusplus
