@@ -2,7 +2,7 @@
 Version 1.6.8
 *******************************************************************************
 
-2010-10-15 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+2010-10-19 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Bug fix in select of miniserver.c
 	
@@ -12,10 +12,6 @@ Version 1.6.8
 	was beeing used in the select() call.
 
 	Thanks to Fabrice Fontaine for helping and testing with this issue.
-
-*******************************************************************************
-Version 1.6.7
-*******************************************************************************
 
 2010-10-15 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
@@ -41,6 +37,10 @@ Version 1.6.7
 
 	I set all ...Sock6 variables to INVALID_SOCKET to make sure that they
 	do not get added to the FD_SET and the problem is gone.
+
+*******************************************************************************
+Version 1.6.7
+*******************************************************************************
 
 2010-10-01 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
