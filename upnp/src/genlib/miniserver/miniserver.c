@@ -390,7 +390,7 @@ static void RunMiniServer(
 	char errorBuffer[ERROR_BUFFER_LEN];
 	fd_set expSet;
 	fd_set rdSet;
-	unsigned int maxMiniSock;
+	int maxMiniSock;
 	int ret = 0;
 	int stopSock = 0;
 

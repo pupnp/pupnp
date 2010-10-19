@@ -221,6 +221,16 @@ Version 1.8.0
 Version 1.6.8
 *******************************************************************************
 
+2010-10-15 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Bug fix in select of miniserver.c
+	
+	Fix a bug in miniserver.c, in which maxMiniSock was wrongly declared as
+	unsigned int and as a result it was beeng set to ((unsigned int)(-1)).
+	As a result, after beeing incremented, it became zero, and this value
+	was beeing used in the select() call.
+
+	Thanks to Fabrice Fontaine for helping and testing with this issue.
 
 *******************************************************************************
 Version 1.6.7
