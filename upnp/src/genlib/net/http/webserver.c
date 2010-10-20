@@ -772,15 +772,14 @@ isFileInVirtualDir( IN char *filePath )
  * Returns:
  *	int
  ************************************************************************/
-int
-ToUpperCase( char *Str )
+int ToUpperCase(char *s)
 {
-    int i;
+	while (*s) {
+		*s = toupper(*s);
+		++s;
+	}
 
-    for( i = 0; i < ( int )strlen( Str ); i++ )
-        Str[i] = toupper( Str[i] );
-    return 1;
-
+	return 1;
 }
 
 /************************************************************************
