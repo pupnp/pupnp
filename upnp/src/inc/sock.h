@@ -29,13 +29,14 @@
  *
  **************************************************************************/
 
-
 #ifndef GENLIB_NET_SOCK_H
 #define GENLIB_NET_SOCK_H
 
+/*!
+ * \file
+ */
 
 #include "util.h"
-
 
 #ifdef WIN32
 	/* Do not #include <netinet/in.h> */
@@ -43,137 +44,119 @@
 	#include <netinet/in.h>
 #endif
 
-
-/* Following variable is not defined under winsock.h */
+/* The following are not defined under winsock.h */
 #ifndef SD_RECEIVE
-#define SD_RECEIVE      0x00
-#define SD_SEND         0x01
-#define SD_BOTH         0x02
+	#define SD_RECEIVE      0x00
+	#define SD_SEND         0x01
+	#define SD_BOTH         0x02
 #endif
 
-
+/*! */
 typedef struct 
 {
-	/* handle/descriptor to a socket */
+	/*! Handle/descriptor to a socket. */
 	SOCKET socket;
-
-	/* the following two fields are filled only in incoming requests; */
+	/*! The following two fields are filled only in incoming requests. */
 	struct sockaddr_storage foreign_sockaddr;
 } SOCKINFO;
-
 
 #ifdef __cplusplus
 #extern "C" {
 #endif
 
+/*!
+ * \brief Assign the passed in socket descriptor to socket descriptor in the
+ * SOCKINFO structure.
+ *
+ * \return Integer:
+ * \li \c UPNP_E_SUCCESS	
+ * \li \c UPNP_E_OUTOF_MEMORY
+ * \li \c UPNP_E_SOCKET_ERROR
+ */
+int sock_init(
+	/*! Socket Information Object. */
+	OUT SOCKINFO *info,
+	/*! Socket Descriptor. */
+	IN SOCKET sockfd);
 
-/************************************************************************
-*	Function :	sock_init
-*
-*	Parameters :
-*		OUT SOCKINFO* info ;	Socket Information Object
-*		IN SOCKET sockfd ;	Socket Descriptor
-*
-*	Description :	Assign the passed in socket descriptor to socket 
-*		descriptor in the SOCKINFO structure.
-*
-*	Return : int;
-*		UPNP_E_SUCCESS	
-*		UPNP_E_OUTOF_MEMORY
-*		UPNP_E_SOCKET_ERROR
-*	Note :
-************************************************************************/
-int sock_init(OUT SOCKINFO* info, IN SOCKET sockfd);
-
-/************************************************************************
-*	Function :	sock_init_with_ip
-*
-*	Parameters :
-*		OUT SOCKINFO* info ;	Socket Information Object
-*		IN SOCKET sockfd ;	Socket Descriptor
-*		IN struct sockaddr* foreign_sockaddr;	Remote socket address
-*
-*	Description :	Calls the sock_init function and assigns the passed in
-*		IP address and port to the IP address and port in the SOCKINFO
-*		structure.
-*
-*	Return : int;
-*		UPNP_E_SUCCESS	
-*		UPNP_E_OUTOF_MEMORY
-*		UPNP_E_SOCKET_ERROR
-*
-*	Note :
-************************************************************************/
+/*!
+ * \brief Calls the sock_init function and assigns the passed in IP address
+ * and port to the IP address and port in the SOCKINFO structure.
+ *
+ * \return Integer:
+ * \li \c UPNP_E_SUCCESS	
+ * \li \c UPNP_E_OUTOF_MEMORY
+ * \li \c UPNP_E_SOCKET_ERROR
+ */
 int sock_init_with_ip(
+	/*! Socket Information Object. */
 	OUT SOCKINFO* info,
+	/*! Socket Descriptor. */
 	IN SOCKET sockfd, 
+	/*! Remote socket address. */
         IN struct sockaddr *foreign_sockaddr);
 
-/************************************************************************
-*	Function :	sock_read
-*
-*	Parameters :
-*		IN SOCKINFO *info ;	Socket Information Object
-*		OUT char* buffer ;	Buffer to get data to  
-*		IN size_t bufsize ;	Size of the buffer
-*	    IN int *timeoutSecs ;	timeout value
-*
-*	Description :	Reads data on socket in sockinfo
-*
-*	Return : int;
-*		numBytes - On Success, no of bytes received		
-*		UPNP_E_TIMEDOUT - Timeout
-*		UPNP_E_SOCKET_ERROR - Error on socket calls
-*
-*	Note :
-************************************************************************/
-int sock_read( IN SOCKINFO *info, OUT char* buffer, IN size_t bufsize,
-		    		 INOUT int *timeoutSecs );
-
-/************************************************************************
-*	Function :	sock_write
-*
-*	Parameters :
-*		IN SOCKINFO *info ;	Socket Information Object
-*		IN char* buffer ;	Buffer to send data from 
-*		IN size_t bufsize ;	Size of the buffer
-*	    IN int *timeoutSecs ;	timeout value
-*
-*	Description :	Writes data on the socket in sockinfo
-*
-*	Return : int;
-*		numBytes - On Success, no of bytes sent		
-*		UPNP_E_TIMEDOUT - Timeout
-*		UPNP_E_SOCKET_ERROR - Error on socket calls
-*
-*	Note :
-************************************************************************/
-int sock_write( IN SOCKINFO *info, IN char* buffer, IN size_t bufsize,
-		    		 INOUT int *timeoutSecs );
-
-/************************************************************************
- * Function: sock_destroy
+/*!
+ * \brief Reads data on socket in sockinfo.
  *
- * Parameters:
- *	INOUT SOCKINFO* info ;	Socket Information Object
- *	int ShutdownMethod ;	How to shutdown the socket. Used by
- *				sockets's shutdown()
- *
- * Description: Shutsdown the socket using the ShutdownMethod to
- *	indicate whether sends and receives on the socket will be
- *	dis-allowed. After shutting down the socket, closesocket is called
- *	to release system resources used by the socket calls.
- *
- * Return: int;
- *	UPNP_E_SOCKET_ERROR on failure
- *	UPNP_E_SUCCESS on success
- *
- * Note:
- ************************************************************************/
-int sock_destroy(INOUT SOCKINFO* info, int);
+ * \return Integer:
+ * \li \c numBytes - On Success, no of bytes received.
+ * \li \c UPNP_E_TIMEDOUT - Timeout.
+ * \li \c UPNP_E_SOCKET_ERROR - Error on socket calls.
+ */
+int sock_read(
+	/*! Socket Information Object. */
+	IN SOCKINFO *info,
+	/*! Buffer to get data to. */
+	OUT char* buffer,
+	/*! Size of the buffer. */
+	IN size_t bufsize,
+	/*! timeout value. */
+	INOUT int *timeoutSecs);
 
+/*!
+ * \brief Writes data on the socket in sockinfo.
+ *
+ * \return Integer:
+ * \li \c numBytes - On Success, no of bytes received.
+ * \li \c UPNP_E_TIMEDOUT - Timeout.
+ * \li \c UPNP_E_SOCKET_ERROR - Error on socket calls.
+ */
+int sock_write(
+	/*! Socket Information Object. */
+	IN SOCKINFO *info,
+	/*! Buffer to send data from. */
+	IN char* buffer,
+	/*! Size of the buffer. */
+	IN size_t bufsize,
+	/*! timeout value. */
+	INOUT int *timeoutSecs);
 
-static inline int sock_close(int sock)
+/*!
+ * \brief Shutsdown the socket using the ShutdownMethod to indicate whether
+ * sends and receives on the socket will be dis-allowed.
+ *
+ * After shutting down the socket, closesocket is called to release system
+ * resources used by the socket calls.
+ *
+ * \return Integer:
+ * \li \c UPNP_E_SOCKET_ERROR on failure.
+ * \li \c UPNP_E_SUCCESS on success.
+ */
+int sock_destroy(
+	/*! Socket Information Object. */
+	INOUT SOCKINFO* info,
+	/*! How to shutdown the socket. Used by sockets's shutdown(). */
+	int ShutdownMethod);
+
+/*!
+ * \brief Closes the socket if it is different from -1.
+ *
+ * \return -1 if an error occurred or if the socket is -1.
+ */
+static inline int sock_close(
+	/*! Socket descriptor. */
+	int sock)
 {
 	int ret = -1;
 
@@ -183,7 +166,6 @@ static inline int sock_close(int sock)
 
 	return ret;
 }
-
 
 #ifdef __cplusplus
 }	/* #extern "C" */
