@@ -2,6 +2,10 @@
 Version 1.6.8
 *******************************************************************************
 
+2010-10-20 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Fix a long date memory leak in webserver.c:StrStr().
+
 2010-10-19 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Bug fix in select of miniserver.c

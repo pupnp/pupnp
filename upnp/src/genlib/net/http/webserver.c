@@ -820,12 +820,12 @@ StrStr( char *S1,
     ToUpperCase( Str1 );
     ToUpperCase( Str2 );
     Ptr = strstr( Str1, Str2 );
-    if( Ptr == NULL )
-        return NULL;
-
-    Pos = Ptr - Str1;
-
-    Ret = S1 + Pos;
+    if( Ptr == NULL ) {
+        Ret = NULL;
+    } else {
+        Pos = Ptr - Str1;
+        Ret = S1 + Pos;
+    }
 
     free( Str1 );
     free( Str2 );
