@@ -29,97 +29,52 @@
  *
  **************************************************************************/
 
-
-/************************************************************************
- * Purpose: This file implements the sockets functionality 
- ************************************************************************/
-
+/*!
+ * \file
+ *
+ * \brief Implements the sockets functionality.
+ */
 
 #include "config.h"
 
-
 #include "sock.h"
 
-
-#include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
+#include "unixutil.h"		/* for socklen_t, EAFNOSUPPORT */
 #include "upnp.h"
-
 
 #include <assert.h>
 #include <errno.h>
 #include <time.h>
 #include <string.h>
 
-
 #ifndef MSG_NOSIGNAL
-	#define MSG_NOSIGNAL 0
+#define MSG_NOSIGNAL 0
 #endif
 
-/************************************************************************
-*	Function :	sock_init
-*
-*	Parameters :
-*		OUT SOCKINFO* info ;	Socket Information Object
-*		IN SOCKET sockfd ;	Socket Descriptor
-*
-*	Description :	Assign the passed in socket descriptor to socket 
-*		descriptor in the SOCKINFO structure.
-*
-*	Return : int;
-*		UPNP_E_SUCCESS	
-*		UPNP_E_OUTOF_MEMORY
-*		UPNP_E_SOCKET_ERROR
-*
-*	Note :
-************************************************************************/
-int
-sock_init( OUT SOCKINFO * info,
-           IN SOCKET sockfd )
+int sock_init(OUT SOCKINFO *info, IN SOCKET sockfd)
 {
-    assert( info );
+	assert(info);
 
-    memset( info, 0, sizeof( SOCKINFO ) );
+	memset(info, 0, sizeof(SOCKINFO));
+	info->socket = sockfd;
 
-    info->socket = sockfd;
-
-    return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 
-/************************************************************************
-*	Function :	sock_init_with_ip
-*
-*	Parameters :
-*		OUT SOCKINFO* info ;		Socket Information Object
-*		IN SOCKET sockfd ;		Socket Descriptor
-*		IN struct sockaddr* foreign_sockaddr; remote socket address.
-*
-*	Description :	Calls the sock_init function and assigns the passed in
-*		IP address and port to the IP address and port in the SOCKINFO
-*		structure.
-*
-*	Return : int;
-*		UPNP_E_SUCCESS	
-*		UPNP_E_OUTOF_MEMORY
-*		UPNP_E_SOCKET_ERROR
-*
-*	Note :
-************************************************************************/
-int
-sock_init_with_ip( OUT SOCKINFO * info,
-                   IN SOCKET sockfd,
-                   IN struct sockaddr* foreign_sockaddr )
+int sock_init_with_ip(OUT SOCKINFO *info, IN SOCKET sockfd,
+	IN struct sockaddr *foreign_sockaddr)
 {
-    int ret;
+	int ret;
 
-    ret = sock_init( info, sockfd );
-    if( ret != UPNP_E_SUCCESS ) {
-        return ret;
-    }
+	ret = sock_init(info, sockfd);
+	if (ret != UPNP_E_SUCCESS) {
+		return ret;
+	}
 
-    memcpy( &info->foreign_sockaddr, foreign_sockaddr, 
-        sizeof( info->foreign_sockaddr) );
+	memcpy(&info->foreign_sockaddr, foreign_sockaddr,
+	       sizeof(info->foreign_sockaddr));
 
-    return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 
 int sock_destroy(INOUT SOCKINFO *info, int ShutdownMethod)
@@ -128,7 +83,7 @@ int sock_destroy(INOUT SOCKINFO *info, int ShutdownMethod)
 
 	if (info->socket != -1) {
 		shutdown(info->socket, ShutdownMethod);
-		if(sock_close(info->socket) == -1) {
+		if (sock_close(info->socket) == -1) {
 			ret = UPNP_E_SOCKET_ERROR;
 		}
 		info->socket = -1;
@@ -137,178 +92,123 @@ int sock_destroy(INOUT SOCKINFO *info, int ShutdownMethod)
 	return ret;
 }
 
-/************************************************************************
-*	Function :	sock_read_write
-*
-*	Parameters :
-*		IN SOCKINFO *info ;	Socket Information Object
-*		OUT char* buffer ;	Buffer to get data to or send data from 
-*		IN size_t bufsize ;	Size of the buffer
-*	    IN int *timeoutSecs ;	timeout value
-*		IN xboolean bRead ;	Boolean value specifying read or write option
-*
-*	Description :	Receives or sends data. Also returns the time taken
-*		to receive or send data.
-*
-*	Return :int ;
-*		numBytes - On Success, no of bytes received or sent		
-*		UPNP_E_TIMEDOUT - Timeout
-*		UPNP_E_SOCKET_ERROR - Error on socket calls
-*
-*	Note :
-************************************************************************/
-static int
-sock_read_write( IN SOCKINFO * info,
-                 OUT char *buffer,
-                 IN size_t bufsize,
-                 IN int *timeoutSecs,
-                 IN xboolean bRead )
+/*!
+ * \brief Receives or sends data. Also returns the time taken to receive or
+ * send data.
+ *
+ * \return
+ *	\li \c numBytes - On Success, no of bytes received or sent or
+ *	\li \c UPNP_E_TIMEDOUT - Timeout
+ *	\li \c UPNP_E_SOCKET_ERROR - Error on socket calls
+ */
+static int sock_read_write(
+	/*! Socket Information Object. */
+	IN SOCKINFO *info,
+	/*! Buffer to get data to or send data from. */
+	OUT char *buffer,
+	/*! Size of the buffer. */
+	IN size_t bufsize,
+	/*! timeout value. */
+	IN int *timeoutSecs,
+	/*! Boolean value specifying read or write option. */
+	IN xboolean bRead)
 {
-    int retCode;
-    fd_set readSet;
-    fd_set writeSet;
-    struct timeval timeout;
-    int numBytes;
-    time_t start_time = time( NULL );
-    SOCKET sockfd = info->socket;
-    long bytes_sent = 0,
-      byte_left = 0,
-      num_written;
+	int retCode;
+	fd_set readSet;
+	fd_set writeSet;
+	struct timeval timeout;
+	int numBytes;
+	time_t start_time = time(NULL);
+	SOCKET sockfd = info->socket;
+	long bytes_sent = 0, byte_left = 0, num_written;
 
-    if( *timeoutSecs < 0 ) {
-        return UPNP_E_TIMEDOUT;
-    }
-
-    FD_ZERO( &readSet );
-    FD_ZERO( &writeSet );
-    if( bRead ) {
-        FD_SET( sockfd, &readSet );
-    } else {
-        FD_SET( sockfd, &writeSet );
-    }
-
-    timeout.tv_sec = *timeoutSecs;
-    timeout.tv_usec = 0;
-
-    while( TRUE ) {
-        if( *timeoutSecs == 0 ) {
-            retCode =
-                select( sockfd + 1, &readSet, &writeSet, NULL, NULL );
-        } else {
-            retCode =
-                select( sockfd + 1, &readSet, &writeSet, NULL, &timeout );
-        }
-
-        if( retCode == 0 ) {
-            return UPNP_E_TIMEDOUT;
-        }
-        if( retCode == -1 ) {
-            if( errno == EINTR )
-                continue;
-            return UPNP_E_SOCKET_ERROR; // error
-        } else {
-            break;              // read or write
-        }
-    }
-
+	if (*timeoutSecs < 0) {
+		return UPNP_E_TIMEDOUT;
+	}
+	FD_ZERO(&readSet);
+	FD_ZERO(&writeSet);
+	if (bRead) {
+		FD_SET(sockfd, &readSet);
+	} else {
+		FD_SET(sockfd, &writeSet);
+	}
+	timeout.tv_sec = *timeoutSecs;
+	timeout.tv_usec = 0;
+	while (TRUE) {
+		if (*timeoutSecs == 0) {
+			retCode = select(sockfd + 1, &readSet, &writeSet,
+				NULL, NULL);
+		} else {
+			retCode = select(sockfd + 1, &readSet, &writeSet,
+				NULL, &timeout);
+		}
+		if (retCode == 0) {
+			return UPNP_E_TIMEDOUT;
+		}
+		if (retCode == -1) {
+			if (errno == EINTR)
+				continue;
+			return UPNP_E_SOCKET_ERROR;
+		} else {
+			/* read or write. */
+			break;
+		}
+	}
 #ifdef SO_NOSIGPIPE
-    {
-	int old;
-	int set = 1;
-	socklen_t olen = sizeof(old);
-	getsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, &olen);
-	setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof(set));
+	{
+		int old;
+		int set = 1;
+		socklen_t olen = sizeof(old);
+		getsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, &olen);
+		setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof(set));
 #endif
-
-    if( bRead ) {
-        // read data
-        numBytes = recv( sockfd, buffer, bufsize,MSG_NOSIGNAL);
-    } else {
-        byte_left = bufsize;
-        bytes_sent = 0;
-        while( byte_left > 0 ) {
-            // write data
-            num_written =
-                send( sockfd, buffer + bytes_sent, byte_left,
-                      MSG_DONTROUTE|MSG_NOSIGNAL);
-            if( num_written == -1 ) {
+		if (bRead) {
+			/* read data. */
+			numBytes = recv(sockfd, buffer, bufsize, MSG_NOSIGNAL);
+		} else {
+			byte_left = bufsize;
+			bytes_sent = 0;
+			while (byte_left > 0) {
+				/* write data. */
+				num_written = send(sockfd,
+					buffer + bytes_sent, byte_left,
+					MSG_DONTROUTE | MSG_NOSIGNAL);
+				if (num_written == -1) {
 #ifdef SO_NOSIGPIPE
-	        setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, olen);
+					setsockopt(sockfd, SOL_SOCKET,
+						SO_NOSIGPIPE, &old, olen);
 #endif
-                return num_written;
-            }
-
-            byte_left = byte_left - num_written;
-            bytes_sent += num_written;
-        }
-
-        numBytes = bytes_sent;
-    }
-
+					return num_written;
+				}
+				byte_left = byte_left - num_written;
+				bytes_sent += num_written;
+			}
+			numBytes = bytes_sent;
+		}
 #ifdef SO_NOSIGPIPE
-	setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, olen);
-    }
+		setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, olen);
+	}
 #endif
+	if (numBytes < 0) {
+		return UPNP_E_SOCKET_ERROR;
+	}
+	/* subtract time used for reading/writing. */
+	if (*timeoutSecs != 0) {
+		*timeoutSecs -= time(NULL) - start_time;
+	}
 
-    if( numBytes < 0 ) {
-        return UPNP_E_SOCKET_ERROR;
-    }
-    // subtract time used for reading/writing
-    if( *timeoutSecs != 0 ) {
-        *timeoutSecs -= time( NULL ) - start_time;
-    }
-
-    return numBytes;
+	return numBytes;
 }
 
-/************************************************************************
-*	Function :	sock_read
-*
-*	Parameters :
-*		IN SOCKINFO *info ;	Socket Information Object
-*		OUT char* buffer ;	Buffer to get data to  
-*		IN size_t bufsize ;	Size of the buffer
-*	    IN int *timeoutSecs ;	timeout value
-*
-*	Description :	Calls sock_read_write() for reading data on the 
-*		socket
-*
-*	Return : int;
-*		Values returned by sock_read_write() 
-*
-*	Note :
-************************************************************************/
-int
-sock_read( IN SOCKINFO * info,
-           OUT char *buffer,
-           IN size_t bufsize,
-           INOUT int *timeoutSecs )
+int sock_read(IN SOCKINFO *info, OUT char *buffer, IN size_t bufsize,
+	      INOUT int *timeoutSecs)
 {
-    return sock_read_write( info, buffer, bufsize, timeoutSecs, TRUE );
+	return sock_read_write(info, buffer, bufsize, timeoutSecs, TRUE);
 }
 
-/************************************************************************
-*	Function :	sock_write
-*
-*	Parameters :
-*		IN SOCKINFO *info ;	Socket Information Object
-*		IN char* buffer ;	Buffer to send data from 
-*		IN size_t bufsize ;	Size of the buffer
-*	    IN int *timeoutSecs ;	timeout value
-*
-*	Description :	Calls sock_read_write() for writing data on the 
-*		socket
-*
-*	Return : int;
-*		sock_read_write()
-*
-*	Note :
-************************************************************************/
-int
-sock_write( IN SOCKINFO * info,
-            IN char *buffer,
-            IN size_t bufsize,
-            INOUT int *timeoutSecs )
+int sock_write(IN SOCKINFO *info, IN char *buffer, IN size_t bufsize,
+	       INOUT int *timeoutSecs)
 {
-    return sock_read_write( info, buffer, bufsize, timeoutSecs, FALSE );
+	return sock_read_write(info, buffer, bufsize, timeoutSecs, FALSE);
 }
+
