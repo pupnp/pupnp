@@ -40,6 +40,7 @@
 
 #include "webserver.h"
 
+
 #include "httpparser.h"
 #include "httpreadwrite.h"
 #include "ithread.h"
@@ -335,7 +336,6 @@ static UPNP_INLINE int get_content_type(
 	}
 	sprintf(temp, "%s/%s", type, subtype);
 	(*content_type) = ixmlCloneDOMString(temp);
-
 	free(temp);
 
 	if (!content_type) {
@@ -554,9 +554,9 @@ static int get_file_info(
 	rc = get_content_type(filename, &info->content_type);
 
 	UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
-		   "file info: %s, length: %lld, last_mod=%s readable=%d\n",
-		   filename, (long long)info->file_length,
-		   asctime(gmtime(&info->last_modified)), info->is_readable);
+		"file info: %s, length: %lld, last_mod=%s readable=%d\n",
+		filename, (long long)info->file_length,
+		asctime(gmtime(&info->last_modified)), info->is_readable);
 
 	return rc;
 }
