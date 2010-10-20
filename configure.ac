@@ -175,11 +175,20 @@ dnl # - Code has changed in threadutil
 dnl #	revision: 0 -> 1
 dnl # - Code has changed in upnp
 dnl #	revision: 0 -> 1
+dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [2:5:0])
 dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:1:2])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [4:1:0])
 dnl #
 dnl ############################################################################
+dnl # Release 1.6.9:
+dnl # "current:revision:age"
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:5:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:1:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [4:1:0])
+dnl #
+ ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [2:5:0])
 AC_SUBST([LT_VERSION_THREADUTIL], [5:1:2])
 AC_SUBST([LT_VERSION_UPNP],       [4:1:0])
