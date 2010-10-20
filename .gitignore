@@ -101,4 +101,5 @@ upnp/inc/upnpconfig.h
 upnp/sample/upnp_tv_combo
 upnp/sample/upnp_tv_ctrlpt
 upnp/sample/upnp_tv_device
+docs/doxygen
 
