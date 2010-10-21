@@ -1,7 +1,11 @@
+/*
+ * C Template objects.
+ *
+ * Copyright (C) 2010 Marcelo Roberto Jimenez <mroberto@users.sourceforge.net>
+ */
 
 #ifndef TEMPLATESOURCE_H
 #define TEMPLATESOURCE_H
-
 
 /*!
  * \file

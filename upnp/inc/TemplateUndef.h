@@ -1,3 +1,8 @@
+/*
+ * C Template objects.
+ *
+ * Copyright (C) 2010 Marcelo Roberto Jimenez <mroberto@users.sourceforge.net>
+ */
 
 /*!
  * \file
