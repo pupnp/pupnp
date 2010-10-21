@@ -64,6 +64,17 @@
 
 
 /******************************************************************************/
+#define TEMPLATE_PROTOTYPE_LIST(CLASS, MEMBER) \
+	TEMPLATE_PROTOTYPE_LIST_AUX(CLASS, MEMBER)
+#define TEMPLATE_PROTOTYPE_LIST_AUX(CLASS, MEMBER) \
+	/*! DOC_##CLASS_##MEMBER */ \
+	EXPORT_SPEC const struct list_head *CLASS##_get_##MEMBER(const CLASS *p); \
+	EXPORT_SPEC void CLASS##_add_to_list_##MEMBER(CLASS *p, struct list_head *head); \
+	EXPORT_SPEC void CLASS##_remove_from_list_##MEMBER(CLASS *p); \
+	EXPORT_SPEC void CLASS##_replace_in_list_##MEMBER(CLASS *p, struct list_head *new); \
+
+
+/******************************************************************************/
 #define TEMPLATE_PROTOTYPE_OBJECT(CLASS, MEMBER, TYPE) \
 	TEMPLATE_PROTOTYPE_OBJECT_AUX(CLASS, MEMBER, TYPE)
 #define TEMPLATE_PROTOTYPE_OBJECT_AUX(CLASS, MEMBER, TYPE) \
@@ -110,6 +121,7 @@
 
 
 #include "ixml.h"       /* for DOMString, IXML_Document */
+#include "list.h"	/* for struct list_head */
 #include "UpnpGlobal.h" /* for EXPORT_SPEC */
 #include "UpnpString.h"
 
@@ -122,6 +134,7 @@ TEMPLATE_PROTOTYPE_COMMON(CLASS)
 
 #define EXPAND_CLASS_MEMBER_INT(CLASS, MEMBER, TYPE)	TEMPLATE_PROTOTYPE_INT(CLASS, MEMBER, TYPE)
 #define EXPAND_CLASS_MEMBER_BUFFER(CLASS, MEMBER, TYPE)	TEMPLATE_PROTOTYPE_BUFFER(CLASS, MEMBER, TYPE)
+#define EXPAND_CLASS_MEMBER_LIST(CLASS, MEMBER)		TEMPLATE_PROTOTYPE_LIST(CLASS, MEMBER)
 #define EXPAND_CLASS_MEMBER_OBJECT(CLASS, MEMBER, TYPE)	TEMPLATE_PROTOTYPE_OBJECT(CLASS, MEMBER, TYPE)
 #define EXPAND_CLASS_MEMBER_STRING(CLASS, MEMBER)	TEMPLATE_PROTOTYPE_STRING(CLASS, MEMBER)
 #define EXPAND_CLASS_MEMBER_DOMSTRING(CLASS, MEMBER)	TEMPLATE_PROTOTYPE_DOMSTRING(CLASS, MEMBER)
