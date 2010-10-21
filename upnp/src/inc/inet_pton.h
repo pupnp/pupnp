@@ -40,7 +40,7 @@
  *	\li (2) takes a u_char* not an in_addr as input
  *
  */
-extern const char *inet_ntop4(const u_char src, char *dst, socklen_t size);
+extern const char *inet_ntop4(const u_char *src, char *dst, socklen_t size);
 
 
 /*!
