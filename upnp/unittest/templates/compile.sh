@@ -28,6 +28,6 @@ INCLUDES="${INCLUDES} -I${top_srcdir}/threadutil/inc" \
 INCLUDES="${INCLUDES} -I${top_srcdir}/upnp/inc" \
 INCLUDES="${INCLUDES} -I${top_srcdir}/upnp/src/inc"
 
-gcc ${INCLUDES} -E ${FILENAME}.c | grep -v ^# | indent -linux > ${FILENAME}_pp.c
-gcc ${INCLUDES} -Wall -c ${FILENAME}_pp.c
+gcc ${INCLUDES} -E ${FILENAME}.c | grep -v ^# | indent -linux > ${FILENAME}.pp.c
+gcc ${INCLUDES} -Wall -c ${FILENAME}.pp.c
 
