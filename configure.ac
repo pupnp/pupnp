@@ -514,6 +514,7 @@ AC_CONFIG_FILES([
 	upnp/Makefile
 	upnp/doc/Makefile
 	upnp/sample/Makefile
+	upnp/unittest/Makefile
 	docs/dist/Makefile
 	libupnp.pc
 	])
