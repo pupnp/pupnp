@@ -33,7 +33,7 @@
 #define GENLIB_UTIL_STRINTMAP_H
 
 #include <stdlib.h>
-#include "util.h"
+#include "upnputil.h"
 
 // Util to map from a string to an integer and vice versa
 

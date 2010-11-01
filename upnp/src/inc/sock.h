@@ -36,7 +36,7 @@
  * \file
  */
 
-#include "util.h"
+#include "upnputil.h"
 
 #ifdef WIN32
 	/* Do not #include <netinet/in.h> */

@@ -218,6 +218,19 @@ Version 1.8.0
 	FileInfo.
 
 *******************************************************************************
+Version 1.6.9
+*******************************************************************************
+
+2010-11-01 Carl Benson <carl.benson(at)windriver.com>
+
+	Fix for Android build.
+
+	I had to do some modifications myself though, because the Android
+	build system insists on having a file named "util.h" taking precedence
+	in its include path, libupnp gets confused because of the same filename
+	in upnp/src/inc/util.h
+
+*******************************************************************************
 Version 1.6.8
 *******************************************************************************
 

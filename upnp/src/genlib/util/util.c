@@ -37,7 +37,7 @@
 
 #include "config.h"
 #include "upnp.h"
-#include "util.h"
+#include "upnputil.h"
 
 
 #include <string.h>

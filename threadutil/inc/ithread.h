@@ -188,7 +188,10 @@ typedef pthread_rwlockattr_t ithread_rwlockattr_t;
  *      Internal Use Only
  ***************************************************************************/
 #if UPNP_USE_RWLOCK
-typedef pthread_rwlock_t ithread_rwlock_t;
+	typedef pthread_rwlock_t ithread_rwlock_t;
+#else
+	/* Read-write locks aren't available: use mutex instead. */
+	typedef ithread_mutex_t ithread_rwlock_t;
 #endif /* UPNP_USE_RWLOCK */
 
 
@@ -337,7 +340,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
 	#define ithread_mutexattr_setkind_np pthread_mutexattr_settype
 #else
 	#define ithread_mutexattr_setkind_np pthread_mutexattr_setkind_np
-#endif
+#endif /* UPNP_USE_RWLOCK */
 
 /****************************************************************************
  * Function: ithread_mutexattr_getkind_np
@@ -362,7 +365,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
 	#define ithread_mutexattr_getkind_np pthread_mutexattr_gettype
 #else
 	#define ithread_mutexattr_getkind_np pthread_mutexattr_getkind_np
-#endif
+#endif /* UPNP_USE_RWLOCK */
 
   
 /****************************************************************************
@@ -536,8 +539,10 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
 	#define ithread_rwlock_init pthread_rwlock_init
-#endif /* UPNP_USE_RWLOCK */
-
+#else
+	/* Read-write locks aren't available: use mutex instead. */
+	#define ithread_rwlock_init ithread_mutex_init
+#endif
 
 /****************************************************************************
  * Function: ithread_rwlock_rdlock
@@ -555,8 +560,10 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
 	#define ithread_rwlock_rdlock pthread_rwlock_rdlock
+#else
+	/* Read-write locks aren't available: use mutex instead. */
+	#define ithread_rwlock_rdlock ithread_mutex_lock
 #endif /* UPNP_USE_RWLOCK */
-
 
 /****************************************************************************
  * Function: ithread_rwlock_wrlock
@@ -574,6 +581,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
 	#define ithread_rwlock_wrlock pthread_rwlock_wrlock
+#else
+	/* Read-write locks aren't available: use mutex instead. */
+	#define ithread_rwlock_wrlock ithread_mutex_lock
 #endif /* UPNP_USE_RWLOCK */
 
 
@@ -594,6 +604,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
 	#define ithread_rwlock_unlock pthread_rwlock_unlock
+#else
+	/* Read-write locks aren't available: use mutex instead. */
+	#define ithread_rwlock_unlock ithread_mutex_unlock
 #endif /* UPNP_USE_RWLOCK */
 
 
@@ -615,6 +628,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
 	#define ithread_rwlock_destroy pthread_rwlock_destroy
+#else
+	/* Read-write locks aren't available: use mutex instead. */
+	#define ithread_rwlock_destroy ithread_mutex_destroy
 #endif /* UPNP_USE_RWLOCK */
 
 

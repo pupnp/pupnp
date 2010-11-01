@@ -42,7 +42,7 @@
 #include "LinkedList.h"
 #include "membuffer.h"
 #include "uri.h"
-#include "util.h"
+#include "upnputil.h"
 
 
 ////// private types ////////////

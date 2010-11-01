@@ -40,7 +40,7 @@
 #include "UpnpInet.h"
 #include "uri.h"
 #include "urlconfig.h"
-#include "util.h"
+#include "upnputil.h"
 #include "webserver.h"
 
 

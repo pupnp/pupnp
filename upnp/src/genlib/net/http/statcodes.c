@@ -37,7 +37,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
-#include "util.h"
+#include "upnputil.h"
 #include "statcodes.h"
 
 #ifdef WIN32

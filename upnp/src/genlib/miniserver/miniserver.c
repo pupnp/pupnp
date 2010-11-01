@@ -57,7 +57,7 @@
 #include "ThreadPool.h"
 #include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
 #include "upnpapi.h"
-#include "util.h"
+#include "upnputil.h"
 
 
 #include <assert.h>
