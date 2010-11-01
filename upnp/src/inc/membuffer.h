@@ -34,7 +34,7 @@
 
 
 #include <stdlib.h>
-#include "util.h"
+#include "upnputil.h"
 
 #define MINVAL( a, b ) ( (a) < (b) ? (a) : (b) )
 #define MAXVAL( a, b ) ( (a) > (b) ? (a) : (b) )

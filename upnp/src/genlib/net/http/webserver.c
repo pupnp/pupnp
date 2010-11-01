@@ -51,7 +51,7 @@
 #include "unixutil.h"
 #include "upnp.h"
 #include "upnpapi.h"
-#include "util.h"
+#include "upnputil.h"
 #include "VirtualDir.h"
 
 #include <assert.h>

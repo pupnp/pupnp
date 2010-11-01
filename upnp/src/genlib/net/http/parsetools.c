@@ -36,7 +36,7 @@
 
 #include "config.h"
 #include <assert.h>
-#include "util.h"
+#include "upnputil.h"
 #include "membuffer.h"
 #include "httpparser.h"
 #include "statcodes.h"

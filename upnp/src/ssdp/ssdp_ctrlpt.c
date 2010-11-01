@@ -33,7 +33,7 @@
 #include "config.h"
 
 
-#include "util.h"
+#include "upnputil.h"
 
 
 #ifdef INCLUDE_CLIENT_APIS

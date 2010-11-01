@@ -33,7 +33,7 @@
 #define GENLIB_NET_HTTP_HTTPREADWRITE_H
 
 #include "config.h"
-#include "util.h"
+#include "upnputil.h"
 #include "sock.h"
 #include "httpparser.h"
 

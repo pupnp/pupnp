@@ -32,7 +32,7 @@
 #ifndef GENLIB_NET_HTTP_PARSETOOLS_H
 #define GENLIB_NET_HTTP_PARSETOOLS_H
 
-#include "util.h"
+#include "upnputil.h"
 #include "httpparser.h"
 
 

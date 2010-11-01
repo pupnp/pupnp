@@ -109,9 +109,7 @@ struct Handle_Info
 #endif
 };
 
-
 extern ithread_rwlock_t GlobalHndRWLock;
-
 
 /*!
  * \brief Get handle information.
