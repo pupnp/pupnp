@@ -90,7 +90,6 @@ typedef enum SsdpCmdType{
 #define SSDP_IPV6_SITELOCAL "FF05::C"
 #define SSDP_PORT 1900
 #define NUM_TRY 3
-#define NUM_COPY 1
 #define THREAD_LIMIT 50
 #define COMMAND_LEN  300
 

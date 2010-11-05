@@ -223,6 +223,17 @@ Version 1.6.9
 
 2010-11-05 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
+	Removing unused NUM_COPY variable.
+
+	Previously, NUM_COPY was used in ssdp_device.c to send multiple copies 
+	of each advertisements but also multiple replies to each M-SEARCH
+	request. As sending multiple replies is not compliant with HTTPU/MU
+	spec, NUM_COPY has been set to 1 in an older patch. However, as this
+	variable is not needed and has been replaced with SSDP_COPY, it has
+	been removed.
+
+2010-11-05 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
 	Use SSDP_COPY to send multiple SSDP advertisements.
 
 	Currently, SSDP_COPY is used only to send multiple M-SEARCH requests (in
