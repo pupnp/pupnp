@@ -223,7 +223,6 @@ NewRequestHandler( IN struct sockaddr *DestAddr,
     char errorBuffer[ERROR_BUFFER_LEN];
     SOCKET ReplySock;
     int socklen = sizeof( struct sockaddr_storage );
-    int NumCopy;
     int Index;
     unsigned long replyAddr = inet_addr( gIF_IPV4 );
     int ttl = 4; // a/c to UPNP Spec
@@ -265,38 +264,20 @@ NewRequestHandler( IN struct sockaddr *DestAddr,
 
     for( Index = 0; Index < NumPacket; Index++ ) {
         int rc;
-        // The reason to keep this loop is purely historical/documentation,
-        // according to section 9.2 of HTTPU spec:
-        // 
-        // "If a multicast resource would send a response(s) to any copy of the 
-        //  request, it SHOULD send its response(s) to each copy of the request 
-        //  it receives. It MUST NOT repeat its response(s) per copy of the 
-        //  request."
-        //  
-        // http://www.upnp.org/download/draft-goland-http-udp-04.txt
-        //
-        // So, NUM_COPY has been changed from 2 to 1.
-        NumCopy = 0;
-        while( NumCopy < NUM_COPY ) {
+        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            ">>> SSDP SEND to %s >>>\n%s\n",
+            buf_ntop, *( RqPacket + Index ) );
+        rc = sendto( ReplySock, *( RqPacket + Index ),
+                     strlen( *( RqPacket + Index ) ),
+                     0, DestAddr, socklen );
+
+        if (rc == -1) {
+            strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
             UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                ">>> SSDP SEND to %s >>>\n%s\n",
-                buf_ntop, *( RqPacket + Index ) );
-            rc = sendto( ReplySock, *( RqPacket + Index ),
-                         strlen( *( RqPacket + Index ) ),
-                         0, DestAddr, socklen );
-
-            if (rc == -1) {
-                strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                            "SSDP_LIB: New Request Handler:"
-                            "Error in socket(): %s\n", errorBuffer );
-                ret = UPNP_E_SOCKET_WRITE;
-                goto end_NewRequestHandler;
-            }
-            
-            imillisleep( SSDP_PAUSE );
-
-            ++NumCopy;
+                        "SSDP_LIB: New Request Handler:"
+                        "Error in socket(): %s\n", errorBuffer );
+            ret = UPNP_E_SOCKET_WRITE;
+            goto end_NewRequestHandler;
         }
     }
 
