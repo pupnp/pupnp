@@ -221,6 +221,14 @@ Version 1.8.0
 Version 1.6.9
 *******************************************************************************
 
+2010-11-05 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Use SSDP_COPY to send multiple SSDP advertisements.
+
+	Currently, SSDP_COPY is used only to send multiple M-SEARCH requests (in
+	ssdp_ctrlpt.c). With this patch, SSDP_COPY is also used to send multiple
+	copies of each advertisements packets (in ssdp_device.c).
+
 2010-11-01 Carl Benson <carl.benson(at)windriver.com>
 
 	Fix for Android build.
