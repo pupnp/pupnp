@@ -2,6 +2,14 @@
 Version 1.6.9
 *******************************************************************************
 
+2010-11-08 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Make multiple SSDP advertisements faster.
+
+	Put the loop to send multiple copies of each SSDP advertisements in
+	ssdp_server.c instead of ssdp_device.c so we have only one call to
+	imillisleep ( SSDP_PAUSE ) to speed up advertisements.
+
 2010-11-05 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
 	Removing unused NUM_COPY variable.

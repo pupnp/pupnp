@@ -535,18 +535,13 @@ DeviceAdvertisement( IN char *DevType,
         return UPNP_E_OUTOF_MEMORY;
     }
     // send packets
-    int NumCopy = 0;
-    while( ret_code == UPNP_E_SUCCESS && NumCopy < NUM_SSDP_COPY ) {
-        if( RootDev ) {
-            // send 3 msg types
-            ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 3, &msgs[0] );
-        } else                      // sub-device
-        {
-            // send 2 msg types
-            ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 2, &msgs[1] );
-        }
-        NumCopy++;
-        imillisleep(SSDP_PAUSE);
+    if( RootDev ) {
+        // send 3 msg types
+        ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 3, &msgs[0] );
+    } else                      // sub-device
+    {
+        // send 2 msg types
+        ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 2, &msgs[1] );
     }
 
     // free msgs
@@ -769,12 +764,7 @@ ServiceAdvertisement( IN char *Udn,
         return UPNP_E_OUTOF_MEMORY;
     }
 
-    int NumCopy = 0;
-    while( RetVal == UPNP_E_SUCCESS && NumCopy < NUM_SSDP_COPY ) {
-    	RetVal = NewRequestHandler( (struct sockaddr*)&__ss, 1, szReq );
-        NumCopy++;
-        imillisleep(SSDP_PAUSE);
-    }
+    RetVal = NewRequestHandler( (struct sockaddr*)&__ss, 1, szReq );
 
     free( szReq[0] );
     return RetVal;
@@ -879,12 +869,7 @@ ServiceShutdown( IN char *Udn,
     if( szReq[0] == NULL ) {
         return UPNP_E_OUTOF_MEMORY;
     }
-    int NumCopy = 0;
-    while( RetVal == UPNP_E_SUCCESS && NumCopy < NUM_SSDP_COPY ) {
-        RetVal = NewRequestHandler( (struct sockaddr*)&__ss, 1, szReq );
-        NumCopy++;
-        imillisleep(SSDP_PAUSE);
-    }
+    RetVal = NewRequestHandler( (struct sockaddr*)&__ss, 1, szReq );
 
     free( szReq[0] );
     return RetVal;
@@ -971,18 +956,13 @@ DeviceShutdown( IN char *DevType,
         return UPNP_E_OUTOF_MEMORY;
     }
     // send packets
-    int NumCopy = 0;
-    while( ret_code == UPNP_E_SUCCESS && NumCopy < NUM_SSDP_COPY ) {
-        if( RootDev ) {
-            // send 3 msg types
-            ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 3, &msgs[0] );
-        } else                      // sub-device
-        {
-            // send 2 msg types
-            ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 2, &msgs[1] );
-        }
-        NumCopy++;
-        imillisleep(SSDP_PAUSE);
+    if( RootDev ) {
+        // send 3 msg types
+        ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 3, &msgs[0] );
+    } else                      // sub-device
+    {
+        // send 2 msg types
+        ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 2, &msgs[1] );
     }
 
     // free msgs
