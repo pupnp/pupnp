@@ -502,7 +502,7 @@ DeviceAdvertisement( IN char *DevType,
     //char Mil_Nt[LINE_SIZE]
     char Mil_Usn[LINE_SIZE];
     char *msgs[3];
-    int ret_code;
+    int ret_code = UPNP_E_SUCCESS;
 
     UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
         "In function DeviceAdvertisement\n" );
@@ -554,13 +554,18 @@ DeviceAdvertisement( IN char *DevType,
         return UPNP_E_OUTOF_MEMORY;
     }
     // send packets
-    if( RootDev ) {
-        // send 3 msg types
-        ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 3, &msgs[0] );
-    } else                      // sub-device
-    {
-        // send 2 msg types
-        ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 2, &msgs[1] );
+    int NumCopy = 0;
+    while( ret_code == UPNP_E_SUCCESS && NumCopy < NUM_SSDP_COPY ) {
+        if( RootDev ) {
+            // send 3 msg types
+            ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 3, &msgs[0] );
+        } else                      // sub-device
+        {
+            // send 2 msg types
+            ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 2, &msgs[1] );
+        }
+        NumCopy++;
+        imillisleep(SSDP_PAUSE);
     }
 
     // free msgs
@@ -751,7 +756,7 @@ ServiceAdvertisement( IN char *Udn,
 {
     char Mil_Usn[LINE_SIZE];
     char *szReq[1];
-    int RetVal;
+    int RetVal = UPNP_E_SUCCESS;
     struct sockaddr_storage __ss;
     struct sockaddr_in* DestAddr4 = (struct sockaddr_in*)&__ss;
     struct sockaddr_in6* DestAddr6 = (struct sockaddr_in6*)&__ss;
@@ -783,7 +788,12 @@ ServiceAdvertisement( IN char *Udn,
         return UPNP_E_OUTOF_MEMORY;
     }
 
-    RetVal = NewRequestHandler( (struct sockaddr*)&__ss, 1, szReq );
+    int NumCopy = 0;
+    while( RetVal == UPNP_E_SUCCESS && NumCopy < NUM_SSDP_COPY ) {
+    	RetVal = NewRequestHandler( (struct sockaddr*)&__ss, 1, szReq );
+        NumCopy++;
+        imillisleep(SSDP_PAUSE);
+    }
 
     free( szReq[0] );
     return RetVal;
@@ -860,7 +870,7 @@ ServiceShutdown( IN char *Udn,
     struct sockaddr_storage __ss;
     struct sockaddr_in* DestAddr4 = (struct sockaddr_in*)&__ss;
     struct sockaddr_in6* DestAddr6 = (struct sockaddr_in6*)&__ss;
-    int RetVal;
+    int RetVal = UPNP_E_SUCCESS;
 
     memset( &__ss, 0, sizeof(__ss) );
     if( AddressFamily == AF_INET ) {
@@ -888,7 +898,12 @@ ServiceShutdown( IN char *Udn,
     if( szReq[0] == NULL ) {
         return UPNP_E_OUTOF_MEMORY;
     }
-    RetVal = NewRequestHandler( (struct sockaddr*)&__ss, 1, szReq );
+    int NumCopy = 0;
+    while( RetVal == UPNP_E_SUCCESS && NumCopy < NUM_SSDP_COPY ) {
+        RetVal = NewRequestHandler( (struct sockaddr*)&__ss, 1, szReq );
+        NumCopy++;
+        imillisleep(SSDP_PAUSE);
+    }
 
     free( szReq[0] );
     return RetVal;
@@ -926,7 +941,7 @@ DeviceShutdown( IN char *DevType,
     struct sockaddr_in6* DestAddr6 = (struct sockaddr_in6*)&__ss;
     char *msgs[3];
     char Mil_Usn[LINE_SIZE];
-    int ret_code;
+    int ret_code = UPNP_E_SUCCESS;
 
     msgs[0] = NULL;
     msgs[1] = NULL;
@@ -975,13 +990,18 @@ DeviceShutdown( IN char *DevType,
         return UPNP_E_OUTOF_MEMORY;
     }
     // send packets
-    if( RootDev ) {
-        // send 3 msg types
-        ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 3, &msgs[0] );
-    } else                      // sub-device
-    {
-        // send 2 msg types
-        ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 2, &msgs[1] );
+    int NumCopy = 0;
+    while( ret_code == UPNP_E_SUCCESS && NumCopy < NUM_SSDP_COPY ) {
+        if( RootDev ) {
+            // send 3 msg types
+            ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 3, &msgs[0] );
+        } else                      // sub-device
+        {
+            // send 2 msg types
+            ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 2, &msgs[1] );
+        }
+        NumCopy++;
+        imillisleep(SSDP_PAUSE);
     }
 
     // free msgs
