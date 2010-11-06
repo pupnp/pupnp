@@ -82,9 +82,6 @@ int SampleUtil_Initialize(print_string print_function)
 		ithread_mutex_unlock(&display_mutex);
 
 		initialize_init = 0;
-	} else {
-		SampleUtil_Print("***** SampleUtil_Initialize was called multiple times!\n");
-		abort();
 	}
 
 	return UPNP_E_SUCCESS;

@@ -221,6 +221,14 @@ Version 1.8.0
 Version 1.6.9
 *******************************************************************************
 
+2010-10-20 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Fix for bug introduced in samples code in svn revision 502, commit
+	git:25c908c558c8e60eb386c155a6b93add447ffec0
+
+	Sample device and combo were aborting with the message:
+	"***** SampleUtil_Initialize was called multiple times!"
+
 2010-11-08 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
 	Make multiple SSDP advertisements faster.
