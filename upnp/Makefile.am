@@ -83,8 +83,7 @@ libupnp_la_SOURCES = \
 	src/inc/upnp_timeout.h \
 	src/inc/uri.h \
 	src/inc/urlconfig.h \
-	src/inc/util.h \
-	src/inc/utilall.h \
+	src/inc/upnputil.h \
 	src/inc/uuid.h \
 	src/inc/VirtualDir.h \
 	src/inc/webserver.h
