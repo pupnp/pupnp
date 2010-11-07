@@ -19,14 +19,8 @@
 /* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
 #define HAVE_FSEEKO 1
 
-/* Define to 1 if you have the `ftime' function. */
-#define HAVE_FTIME 1
-
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
-
-/* Define to 1 if you have the `compat' library (-lcompat). */
-/* #undef HAVE_LIBCOMPAT */
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1

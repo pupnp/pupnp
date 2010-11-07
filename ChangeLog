@@ -221,12 +221,24 @@ Version 1.8.0
 Version 1.6.10
 *******************************************************************************
 
+2010-11-07 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	ftime(3) in -lcompat should not be checked.
+
+	SF Bug Tracker - ID: 3104521
+	Submitted: OBATA Akio ( obache ) - 2010-11-07 07:03:44 BRST
+
+	In configure.ac
+	AC_CHECK_FUNCS(ftime,, [AC_CHECK_LIB(compat, ftime)])
+
+	But since version 1.6.3, ftime(3) is not used, so it should be
+	removed, or introduce unwanted linkage with -lcompat.
 
 *******************************************************************************
 Version 1.6.9
 *******************************************************************************
 
-2010-10-20 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+2010-11-06 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Fix for bug introduced in samples code in svn revision 502, commit
 	git:25c908c558c8e60eb386c155a6b93add447ffec0
@@ -234,7 +246,7 @@ Version 1.6.9
 	Sample device and combo were aborting with the message:
 	"***** SampleUtil_Initialize was called multiple times!"
 
-2010-11-08 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+2010-11-06 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
 	Make multiple SSDP advertisements faster.
 
