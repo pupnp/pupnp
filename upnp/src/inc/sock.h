@@ -154,7 +154,7 @@ int sock_destroy(
  *
  * \return -1 if an error occurred or if the socket is -1.
  */
-static inline int sock_close(
+static UPNP_INLINE int sock_close(
 	/*! Socket descriptor. */
 	SOCKET sock)
 {

@@ -106,7 +106,7 @@ void SetSoapCallback(
 	/*! [in] SOAP Callback to be invoked . */
 	MiniServerCallback callback);
 #else  /* INCLUDE_DEVICE_APIS */
-static inline void SetSoapCallback(MiniServerCallback callback) {}
+static UPNP_INLINE void SetSoapCallback(MiniServerCallback callback) {}
 #endif /* INCLUDE_DEVICE_APIS */
 
 
