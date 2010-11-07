@@ -240,7 +240,7 @@ get_node_value( IN IXML_Node * node )
 *		control URL
 *
 *	Return : int
-*		returns 0 on sucess; -1 on error
+*		returns 0 on success; -1 on error
 *
 *	Note :
 ****************************************************************************/

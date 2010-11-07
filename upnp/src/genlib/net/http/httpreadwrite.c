@@ -1089,7 +1089,7 @@ http_WriteHttpPost( IN void *Handle,
  *	associated memory. Frees handle associated with the HTTP POST msg.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Sucess
+ *	UPNP_E_SUCCESS		- On success
  *	UPNP_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
 int
@@ -1144,7 +1144,7 @@ http_CloseHttpPost( IN void *Handle,
  *	such handles
  *
  * Return : int;
- *	UPNP_E_SUCCESS		- On Sucess
+ *	UPNP_E_SUCCESS		- On success
  *	UPNP_E_INVALID_PARAM	- Invalid Parameter
  *	UPNP_E_OUTOF_MEMORY
  *	UPNP_E_SOCKET_ERROR
@@ -1450,7 +1450,7 @@ ReadResponseLineAndHeaders( IN SOCKINFO * info,
  *	Parses and extracts information from the new data.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Sucess
+ *	UPNP_E_SUCCESS		- On success
  *	UPNP_E_INVALID_PARAM	- Invalid Parameter
  *	UPNP_E_BAD_RESPONSE
  *	UPNP_E_BAD_HTTPMSG

@@ -95,7 +95,7 @@ int http_FixStrUrl( IN const char* urlstr, IN int urlstrlen, OUT uri_type* fixed
  *	Gets destination address from URL and then connects to the remote end
  *
  *  Returns:
- *	socket descriptor on sucess
+ *	socket descriptor on success
  *	UPNP_E_OUTOF_SOCKET
  *	UPNP_E_SOCKET_CONNECT on error
  ************************************************************************/
@@ -271,7 +271,7 @@ int http_WriteHttpPost(IN void *Handle,
  *	associated memory. Frees handle associated with the HTTP POST msg.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Sucess
+ *	UPNP_E_SUCCESS		- On success
  *	UPNP_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
 int http_CloseHttpPost(IN void *Handle, 
@@ -296,7 +296,7 @@ int http_CloseHttpPost(IN void *Handle,
  *	such handles
  *
  * Return : int;
- *	UPNP_E_SUCCESS		- On Sucess
+ *	UPNP_E_SUCCESS		- On success
  *	UPNP_E_INVALID_PARAM	- Invalid Parameter
  *	UPNP_E_OUTOF_MEMORY
  *	UPNP_E_SOCKET_ERROR
@@ -323,7 +323,7 @@ int http_OpenHttpPost(IN const char *url_str,
  *	Parses and extracts information from the new data.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Sucess
+ *	UPNP_E_SUCCESS		- On success
  *	UPNP_E_INVALID_PARAM	- Invalid Parameter
  *	UPNP_E_BAD_RESPONSE
  *	UPNP_E_BAD_HTTPMSG

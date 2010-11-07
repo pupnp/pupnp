@@ -470,7 +470,7 @@ int UpnpInit(const char *HostIP, unsigned short DestPort)
 		}
 	}
 
-	/* Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized. */
+	/* Set the UpnpSdkInit flag to 1 to indicate we're successfully initialized. */
 	UpnpSdkInit = 1;
 
 	/* Finish initializing the SDK. */
@@ -522,7 +522,7 @@ int UpnpInit2(const char *IfName, unsigned short DestPort)
 		goto exit_function;
 	}
 
-	/* Set the UpnpSdkInit flag to 1 to indicate we're sucessfully initialized. */
+	/* Set the UpnpSdkInit flag to 1 to indicate we're successfully initialized. */
 	UpnpSdkInit = 1;
 
 	/* Finish initializing the SDK. */
