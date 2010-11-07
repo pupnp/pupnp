@@ -195,8 +195,7 @@ static UPNP_INLINE int notify_send_and_recv(
 	conn_fd = http_Connect(destination_url, &url);
 	if (conn_fd < 0) {
 		/* return UPNP error */
-
-		return conn_fd;
+		return UPNP_E_SOCKET_CONNECT;
 	}
 
 	ret_code = sock_init(&info, conn_fd);
@@ -293,11 +292,9 @@ static int genaNotify(
     // send a notify to each url until one goes thru
     for( i = 0; i < sub->DeliveryURLs.size; i++ ) {
         url = &sub->DeliveryURLs.parsedURLs[i];
-
-        if( ( return_code = notify_send_and_recv( url,
-                                                  &mid_msg, propertySet,
-                                                  &response ) ) ==
-            UPNP_E_SUCCESS ) {
+        return_code = notify_send_and_recv(
+                url, &mid_msg, propertySet,&response);
+        if (return_code == UPNP_E_SUCCESS) {
             break;
         }
     }
