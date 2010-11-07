@@ -65,7 +65,7 @@ extern "C" {
 #endif
 
 
-#ifdef PTHREAD_MUTEX_RECURSIVE
+#if defined(PTHREAD_MUTEX_RECURSIVE) || defined(__DragonFly__)
 	/* This system has SuS2-compliant mutex attributes.
 	 * E.g. on Cygwin, where we don't have the old nonportable (NP) symbols
 	 */
@@ -336,7 +336,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *      Returns EINVAL if the kind is not supported.
  *      See man page for pthread_mutexattr_setkind_np
  *****************************************************************************/
-#ifdef PTHREAD_MUTEX_RECURSIVE
+#if defined(PTHREAD_MUTEX_RECURSIVE) || defined(__DragonFly__)
 	#define ithread_mutexattr_setkind_np pthread_mutexattr_settype
 #else
 	#define ithread_mutexattr_setkind_np pthread_mutexattr_setkind_np
@@ -361,7 +361,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *      Always returns 0.
  *      See man page for pthread_mutexattr_getkind_np
  *****************************************************************************/
-#ifdef PTHREAD_MUTEX_RECURSIVE
+#if defined(PTHREAD_MUTEX_RECURSIVE) || defined(__DragonFly__)
 	#define ithread_mutexattr_getkind_np pthread_mutexattr_gettype
 #else
 	#define ithread_mutexattr_getkind_np pthread_mutexattr_getkind_np
@@ -933,7 +933,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
 #endif
 
 
-#ifndef PTHREAD_MUTEX_RECURSIVE
+#if !defined(PTHREAD_MUTEX_RECURSIVE) && !defined(__DragonFly__)
 /* NK: Added for satisfying the gcc compiler */
 EXPORT_SPEC int pthread_mutexattr_setkind_np(pthread_mutexattr_t *attr, int kind);
 #endif
