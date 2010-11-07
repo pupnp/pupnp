@@ -868,8 +868,6 @@ static int GetDescDocumentAndURL(
 	/* [in] . */
 	char *description,
 	/* [in] . */
-	unsigned int bufferLen,
-	/* [in] . */
 	int config_baseURL,
 	/* [in] . */
 	int AddressFamily,
@@ -883,7 +881,7 @@ static int GetDescDocumentAndURL(
 int UpnpRegisterRootDevice2(
 	Upnp_DescType descriptionType,
 	const char *description_const,
-	size_t bufferLen,   // ignored unless descType == UPNPREG_BUF_DESC
+	size_t bufferLen,   /* ignored */
 	int config_baseURL,
 	Upnp_FunPtr Fun,
 	const void *Cookie,
@@ -931,7 +929,7 @@ int UpnpRegisterRootDevice2(
 	HInfo->aliasInstalled = 0;
 
 	retVal = GetDescDocumentAndURL(
-		descriptionType, description, bufferLen,
+		descriptionType, description,
 		config_baseURL, AF_INET, 
 		&HInfo->DescDocument, HInfo->DescURL);
 	if (retVal != UPNP_E_SUCCESS) {
@@ -1400,7 +1398,6 @@ static void get_server_addr6(
 static int GetDescDocumentAndURL(
 	Upnp_DescType descriptionType,
 	char *description,
-	unsigned int bufferLen,
 	int config_baseURL,
 	int AddressFamily,
 	IXML_Document **xmlDoc,
@@ -1522,7 +1519,6 @@ static int GetDescDocumentAndURL(
 static int GetDescDocumentAndURL(
 	Upnp_DescType descriptionType,
 	char *description,
-	unsigned int bufferLen,
 	int config_baseURL,
 	int AddressFamily,
 	IXML_Document **xmlDoc,
