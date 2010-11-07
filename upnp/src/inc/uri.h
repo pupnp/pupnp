@@ -60,6 +60,7 @@
 
 
 #ifdef WIN32
+	#include "inet_pton.h"
 #else
 	#include <arpa/inet.h>  /* for inet_pton() */
 	#include <netdb.h>      /* for struct addrinfo */
