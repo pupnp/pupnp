@@ -928,7 +928,7 @@ int StopMiniServer()
 	SOCKET sock;
 	struct sockaddr_in ssdpAddr;
 	char buf[256] = "ShutDown";
-	int bufLen = strlen(buf);
+	size_t bufLen = strlen(buf);
 
 	if(gMServState == MSERV_RUNNING) {
 		gMServState = MSERV_STOPPING;
@@ -947,8 +947,8 @@ int StopMiniServer()
 		ssdpAddr.sin_family = AF_INET;
 		ssdpAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 		ssdpAddr.sin_port = htons(miniStopSockPort);
-		sendto(sock, buf, bufLen, 0, (struct sockaddr *)&ssdpAddr,
-			socklen);
+		sendto(sock, buf, (int)bufLen, 0,
+			(struct sockaddr *)&ssdpAddr, socklen);
 		usleep(1000);
 		if (gMServState == MSERV_IDLE) {
 			break;

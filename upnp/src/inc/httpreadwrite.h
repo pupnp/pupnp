@@ -313,10 +313,10 @@ int http_OpenHttpPost(IN const char *url_str,
  * Function: http_ReadHttpGet
  *
  * Parameters:
- *	IN void *Handle;		Handle to the HTTP get object
- *	IN OUT char *buf;		Buffer to get the read and parsed data
- *	IN OUT unsigned int *size;	Size of the buffer passed
- *	IN int timeout;			time out value
+ *	IN void *Handle;	Handle to the HTTP get object
+ *	IN OUT char *buf;	Buffer to get the read and parsed data
+ *	IN OUT size_t *size;	Size of the buffer passed
+ *	IN int timeout;		time out value
  *
  * Description:
  *	Parses already existing data, then gets new data.
@@ -332,7 +332,7 @@ int http_OpenHttpPost(IN const char *url_str,
 int http_ReadHttpGet(
 	IN void *Handle,
 	IN OUT char *buf,
-	IN OUT unsigned int *size,
+	IN OUT size_t *size,
 	IN int timeout);
 
 
@@ -340,9 +340,9 @@ int http_ReadHttpGet(
  * Function: http_HttpGetProgress
  *
  * Parameters:
- *	IN void *Handle;		Handle to the HTTP get object
- *	OUT unsigned int *length;	Buffer to get the read and parsed data
- *	OUT unsigned int *total;	Size of tge buffer passed
+ *	IN void *Handle;	Handle to the HTTP get object
+ *	OUT size_t *length;	Buffer to get the read and parsed data
+ *	OUT size_t *total;	Size of tge buffer passed
  *
  * Description:
  *	Extracts information from the Handle to the HTTP get object.
@@ -353,8 +353,8 @@ int http_ReadHttpGet(
  ************************************************************************/
 int http_HttpGetProgress(
 	IN void *Handle,
-	OUT unsigned int *length,
-	OUT unsigned int *total );
+	OUT size_t *length,
+	OUT size_t *total);
 
 
 /************************************************************************

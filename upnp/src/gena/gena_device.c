@@ -102,7 +102,7 @@ static int GeneratePropertySet(
 {
 	char *buffer;
 	int counter = 0;
-	int size = 0;
+	size_t size = 0;
 	int temp_counter = 0;
 
 	/*size += strlen(XML_VERSION);*/
@@ -445,7 +445,7 @@ static char *AllocGenaHeaders(
 	static const char *HEADER_LINE_4 =
 		"NTS: upnp:propchange\r\n";
 	char *headers = NULL;
-	int headers_size = 0;
+	size_t headers_size = 0;
 	int line = 0;
 
 	headers_size =
@@ -1133,7 +1133,7 @@ static int create_url_list(
 	URL_list *out)
 {
     int URLcount = 0;
-    int i;
+    size_t i;
     int return_code = 0;
     uri_type temp;
     token urls;
