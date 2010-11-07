@@ -223,6 +223,20 @@ Version 1.6.10
 
 2010-11-07 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
+	PTHREAD_MUTEX_RECURSIVE on DragonFly is an enum.
+
+	SF Bug Tracker - ID: 3104527
+	Submitted: OBATA Akio ( obache ) - 2010-11-07 07:10:28 BRST
+
+	In threadutil/inc/ithread.h, it is expected that
+	PTHREAD_MUTEX_RECURSIVE is defined as macro. But on DragonFly BSD,
+	it is defined as enum, so not works as expected.
+
+	Attachment patch treat that DragonFly BSD always
+	have PTHREAD_MUTEX_RECURSIVE.
+
+2010-11-07 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
 	ftime(3) in -lcompat should not be checked.
 
 	SF Bug Tracker - ID: 3104521
