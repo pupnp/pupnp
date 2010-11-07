@@ -99,7 +99,7 @@ typedef struct SERVICE_TABLE {
 /*!
  * \brief Makes a copy of the subscription.
  *
- * \return HTTP_SUCCESS on Sucess.
+ * \return HTTP_SUCCESS on success.
  */
 int copy_subscription(
 	/*! [in] Source subscription. */

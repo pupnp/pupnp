@@ -17,7 +17,7 @@
  *
  * \file
  *
- * \brief UpnpString object declarartion.
+ * \brief UpnpString object declaration.
  */
 
 

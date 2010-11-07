@@ -52,7 +52,7 @@
 *	Description :	Makes a copy of the subscription
 *
 *	Return : int ;
-*		HTTP_SUCCESS - On Sucess
+*		HTTP_SUCCESS - On success
 *
 *	Note :
 ************************************************************************/
