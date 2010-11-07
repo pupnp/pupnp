@@ -95,10 +95,10 @@
 	/*! DOC_##CLASS##_##MEMBER */ \
 	EXPORT_SPEC const UpnpString *CLASS##_get_##MEMBER(const CLASS *p); \
 	EXPORT_SPEC int CLASS##_set_##MEMBER(CLASS *p, const UpnpString *s); \
-	EXPORT_SPEC int CLASS##_get_##MEMBER##_Length(const CLASS *p); \
+	EXPORT_SPEC size_t CLASS##_get_##MEMBER##_Length(const CLASS *p); \
 	EXPORT_SPEC const char *CLASS##_get_##MEMBER##_cstr(const CLASS *p); \
 	EXPORT_SPEC int CLASS##_strcpy_##MEMBER(CLASS *p, const char *s); \
-	EXPORT_SPEC int CLASS##_strncpy_##MEMBER(CLASS *p, const char *s, int n); \
+	EXPORT_SPEC int CLASS##_strncpy_##MEMBER(CLASS *p, const char *s, size_t n); \
 	EXPORT_SPEC void CLASS##_clear_##MEMBER(CLASS *p); \
 
 

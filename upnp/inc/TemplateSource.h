@@ -151,7 +151,7 @@ int CLASS##_set_##MEMBER(CLASS *p, const UpnpString *s) \
 	return UpnpString_set_String(((struct S##CLASS *)p)->m_##MEMBER, q); \
 } \
 \
-int CLASS##_get_##MEMBER##_Length(const CLASS *p) \
+size_t CLASS##_get_##MEMBER##_Length(const CLASS *p) \
 { \
 	return UpnpString_get_Length(CLASS##_get_##MEMBER(p)); \
 } \
@@ -165,7 +165,7 @@ int CLASS##_strcpy_##MEMBER(CLASS *p, const char *s) \
 	return UpnpString_set_String(((struct S##CLASS *)p)->m_##MEMBER, s); \
 } \
 \
-int CLASS##_strncpy_##MEMBER(CLASS *p, const char *s, int n) \
+int CLASS##_strncpy_##MEMBER(CLASS *p, const char *s, size_t n) \
 { \
 	return UpnpString_set_StringN(((struct S##CLASS *)p)->m_##MEMBER, s, n); \
 } \
