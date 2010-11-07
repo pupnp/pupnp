@@ -49,7 +49,7 @@ extern char *strndup(__const char *__string, size_t __n);
 struct SUpnpString
 {
 	/*! \brief Length of the string. */
-	int m_length;
+	size_t m_length;
 	/*! \brief Pointer to a dynamically allocated area that holds the NULL
 	 * terminated string. */
 	char *m_string;
