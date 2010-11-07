@@ -6,7 +6,7 @@
 /*!
  * \file
  *
- * \brief UpnpActionComplete object declarartion.
+ * \brief UpnpActionComplete object declaration.
  *
  * \author Marcelo Roberto Jimenez
  */
