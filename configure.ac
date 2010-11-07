@@ -472,7 +472,6 @@ fi
 #
 AC_FUNC_VPRINTF
 AC_FUNC_FSEEKO
-AC_CHECK_FUNCS(ftime,, [AC_CHECK_LIB(compat, ftime)])
 #
 # Solaris needs -lsocket -lnsl -lrt
 AC_SEARCH_LIBS([bind],           [socket])
