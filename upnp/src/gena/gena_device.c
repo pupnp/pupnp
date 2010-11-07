@@ -179,7 +179,7 @@ static UPNP_INLINE int notify_send_and_recv(
 	http_parser_t *response)
 {
 	uri_type url;
-	int conn_fd;
+	SOCKET conn_fd;
 	membuffer start_msg;
 	int ret_code;
 	int err_code;

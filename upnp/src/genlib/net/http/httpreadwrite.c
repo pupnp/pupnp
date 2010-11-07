@@ -108,7 +108,7 @@ const int CHUNK_TAIL_SIZE = 10;
  * Returns: int
  *	0 if successful else -1 
  ***************************************************************************/
-static int Make_Socket_NoBlocking(int sock)
+static int Make_Socket_NoBlocking(SOCKET sock)
 {
 #ifdef WIN32
 	u_long val = 1;
@@ -219,7 +219,7 @@ static int Check_Connect_And_Wait_Connection(int sock, int connect_res)
 #endif /* UPNP_BLOCKING_CONNECT */
 
 static int private_connect(
-	int sockfd,
+	SOCKET sockfd,
 	const struct sockaddr *serv_addr,
 	socklen_t addrlen)
 {
@@ -316,15 +316,15 @@ int http_FixStrUrl(
  *	Gets destination address from URL and then connects to the remote end
  *
  *  Returns:
- *	socket descriptor on sucess
+ *	socket descriptor on success
  *	UPNP_E_OUTOF_SOCKET
  *	UPNP_E_SOCKET_CONNECT on error
  ************************************************************************/
-int http_Connect(
+SOCKET http_Connect(
 	IN uri_type *destination_url,
 	OUT uri_type *url)
 {
-	int connfd;
+	SOCKET connfd;
 	int sockaddr_len;
 	int ret_connect;
 
@@ -692,7 +692,7 @@ int http_RequestAndResponse(
 	IN int timeout_secs,
 	OUT http_parser_t *response)
 {
-	int tcp_connection;
+	SOCKET tcp_connection;
 	int ret_code;
 	int sockaddr_len;
 	int http_error_code;
@@ -1159,7 +1159,7 @@ int http_OpenHttpPost(
 {
 	int ret_code;
 	int sockaddr_len;
-	int tcp_connection;
+	SOCKET tcp_connection;
 	membuffer request;
 	http_post_handle_t *handle = NULL;
 	uri_type url;
@@ -1724,7 +1724,7 @@ int http_OpenHttpGetProxy(
 	int sockaddr_len;
 	int http_error_code;
 	memptr ctype;
-	int tcp_connection;
+	SOCKET tcp_connection;
 	membuffer request;
 	http_get_handle_t *handle = NULL;
 	uri_type url;
@@ -2361,7 +2361,7 @@ int http_OpenHttpGetEx(
 {
 	int http_error_code;
 	memptr ctype;
-	int tcp_connection;
+	SOCKET tcp_connection;
 	int sockaddr_len;
 	membuffer request;
 	http_get_handle_t *handle = NULL;

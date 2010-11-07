@@ -74,7 +74,7 @@
 
 struct mserv_request_t {
 	/*! Connection handle. */
-	int connfd;
+	SOCKET connfd;
 	/*! . */
 	struct sockaddr_storage foreign_sockaddr;
 };
@@ -218,7 +218,7 @@ static void handle_request(
 	http_message_t *hmsg = NULL;
 	int timeout = HTTP_DEFAULT_TIMEOUT;
 	struct mserv_request_t *request = (struct mserv_request_t *)args;
-	int connfd = request->connfd;
+	SOCKET connfd = request->connfd;
 
 	UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
 		"miniserver %d: READING\n", connfd );
@@ -269,7 +269,7 @@ error_handler:
  */
 static UPNP_INLINE void schedule_request_job(
 	/*! [in] Socket Descriptor on which connection is accepted. */
-	int connfd,
+	SOCKET connfd,
 	/*! [in] Clients Address information. */
 	struct sockaddr *clientAddr)
 {
@@ -301,17 +301,17 @@ static UPNP_INLINE void schedule_request_job(
 }
 #endif
 
-static inline void fdset_if_valid(int sock, fd_set *set)
+static UPNP_INLINE void fdset_if_valid(SOCKET sock, fd_set *set)
 {
 	if (sock != -1) {
 		FD_SET(sock, set);
 	}
 }
 
-static void web_server_accept(int lsock, fd_set *set)
+static void web_server_accept(SOCKET lsock, fd_set *set)
 {
 #ifdef INTERNAL_WEB_SERVER
-	int asock;
+	SOCKET asock;
 	socklen_t clientLen;
 	struct sockaddr_storage clientAddr;
 	char errorBuffer[ERROR_BUFFER_LEN];
@@ -333,14 +333,14 @@ static void web_server_accept(int lsock, fd_set *set)
 #endif /* INTERNAL_WEB_SERVER */
 }
 
-static void ssdp_read(int rsock, fd_set *set)
+static void ssdp_read(SOCKET rsock, fd_set *set)
 {
 	if (rsock != -1 && FD_ISSET(rsock, set)) {
 		readFromSSDPSocket(rsock);
 	}
 }
 
-static int receive_from_stopSock(int ssock, fd_set *set)
+static int receive_from_stopSock(SOCKET ssock, fd_set *set)
 {
 	int byteReceived;
 	socklen_t clientLen;
@@ -387,9 +387,9 @@ static void RunMiniServer(
 	char errorBuffer[ERROR_BUFFER_LEN];
 	fd_set expSet;
 	fd_set rdSet;
-	int maxMiniSock;
+	SOCKET maxMiniSock;
 	int ret = 0;
-	int stopSock = 0;
+	SOCKET stopSock = 0;
 
 	maxMiniSock = 0;
 	maxMiniSock = max(maxMiniSock, miniSock->miniServerSock4);
@@ -464,7 +464,7 @@ static void RunMiniServer(
  */
 static int get_port(
 	/*! [in] Socket descriptor. */
-	int sockfd)
+	SOCKET sockfd)
 {
 	struct sockaddr_storage sockinfo;
 	socklen_t len;
@@ -779,7 +779,7 @@ static int get_miniserver_stopsock(
 {
 	char errorBuffer[ERROR_BUFFER_LEN];
 	struct sockaddr_in stop_sockaddr;
-	int miniServerStopSock = 0;
+	SOCKET miniServerStopSock = 0;
 	int ret = 0;
 
 	miniServerStopSock = socket(AF_INET, SOCK_DGRAM, 0);

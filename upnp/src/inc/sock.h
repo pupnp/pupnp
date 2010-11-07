@@ -156,7 +156,7 @@ int sock_destroy(
  */
 static inline int sock_close(
 	/*! Socket descriptor. */
-	int sock)
+	SOCKET sock)
 {
 	int ret = -1;
 
