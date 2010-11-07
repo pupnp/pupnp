@@ -61,9 +61,9 @@ typedef struct MServerSockArray {
 	/* ! . */
 	SOCKET stopPort;
 	/* ! . */
-	SOCKET miniServerPort4;
+	unsigned short miniServerPort4;
 	/* ! . */
-	SOCKET miniServerPort6;
+	unsigned short miniServerPort6;
 #ifdef INCLUDE_CLIENT_APIS
 	/*! IPv4 SSDP socket for sending search requests and receiving search
 	 * replies */
