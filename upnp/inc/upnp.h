@@ -2412,7 +2412,7 @@ EXPORT_SPEC int UpnpReadHttpGet(
 	/*! [in,out] The buffer to store the read item. */
 	char *buf,
 	/*! [in,out] The size of the buffer to be read. */
-	unsigned int *size,
+	size_t *size,
 	/*! [in] The time out value sent with the request during which a response is
 	 * expected from the server, failing which, an error is reported back to
 	 * the user. */
@@ -2431,9 +2431,9 @@ EXPORT_SPEC int UpnpHttpGetProgress(
 	/*! [in] The token created by the call to \b UpnpOpenHttpGet. */
 	void *handle,
 	/*! [out] The number of bytes received. */
-	unsigned int *length,
+	size_t *length,
 	/*! [out] The content length. */
-	unsigned int *total);
+	size_t *total);
 
 
 /*!

@@ -1440,12 +1440,12 @@ static int GetDescDocumentAndURL(
 		if (fp == NULL) {
 			return UPNP_E_FILE_NOT_FOUND;
 		}
-		membuf = (char *)malloc(fileLen + 1);
+		membuf = (char *)malloc((size_t) fileLen + 1);
 		if (membuf == NULL) {
 			fclose(fp);
 			return UPNP_E_OUTOF_MEMORY;
 		}
-		num_read = fread(membuf, 1, fileLen, fp);
+		num_read = fread(membuf, 1, (size_t) fileLen, fp);
 		if (num_read != fileLen) {
 			fclose(fp);
 			free(membuf);
@@ -2877,13 +2877,13 @@ int UpnpCloseHttpGet(void *Handle)
 }
 
 
-int UpnpReadHttpGet(void *Handle, char *buf, unsigned int *size, int timeout)
+int UpnpReadHttpGet(void *Handle, char *buf, size_t *size, int timeout)
 {
 	return http_ReadHttpGet(Handle, buf, size, timeout);
 }
 
 
-int UpnpHttpGetProgress(void *Handle, unsigned int *length, unsigned int *total)
+int UpnpHttpGetProgress(void *Handle, size_t *length, size_t *total)
 {
 	return http_HttpGetProgress(Handle, length, total);
 }

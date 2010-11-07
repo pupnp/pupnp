@@ -1440,10 +1440,10 @@ ReadResponseLineAndHeaders( IN SOCKINFO * info,
  * Function: http_ReadHttpGet
  *
  * Parameters:
- *	IN void *Handle;		Handle to the HTTP get object
- *	IN OUT char *buf;		Buffer to get the read and parsed data
- *	IN OUT unsigned int *size;	Size of the buffer passed
- *	IN int timeout;			time out value
+ *	IN void *Handle;	Handle to the HTTP get object
+ *	IN OUT char *buf;	Buffer to get the read and parsed data
+ *	IN OUT size_t *size;	Size of the buffer passed
+ *	IN int timeout;		time out value
  *
  * Description:
  *	Parses already existing data, then gets new data.
@@ -1456,11 +1456,11 @@ ReadResponseLineAndHeaders( IN SOCKINFO * info,
  *	UPNP_E_BAD_HTTPMSG
  *	UPNP_E_CANCELED
  ************************************************************************/
-int
-http_ReadHttpGet( IN void *Handle,
-                  IN OUT char *buf,
-                  IN OUT unsigned int *size,
-                  IN int timeout )
+int http_ReadHttpGet(
+	IN void *Handle,
+	IN OUT char *buf,
+	IN OUT size_t *size,
+	IN int timeout)
 {
     http_get_handle_t *handle = Handle;
 
@@ -1567,9 +1567,9 @@ http_ReadHttpGet( IN void *Handle,
  * Function: http_HttpGetProgress
  *
  * Parameters:
- *	IN void *Handle;		Handle to the HTTP get object
- *	OUT unsigned int *length;	Buffer to get the read and parsed data
- *	OUT unsigned int *total;	Size of tge buffer passed
+ *	IN void *Handle;	Handle to the HTTP get object
+ *	OUT size_t *length;	Buffer to get the read and parsed data
+ *	OUT size_t *total;	Size of tge buffer passed
  *
  * Description:
  *	Extracts information from the Handle to the HTTP get object.
@@ -1578,18 +1578,20 @@ http_ReadHttpGet( IN void *Handle,
  *	UPNP_E_SUCCESS		- On Sucess
  *	UPNP_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
-int http_HttpGetProgress( IN void *Handle, 
-                      OUT unsigned int *length,
-                      OUT unsigned int *total )
+int http_HttpGetProgress(
+	IN void *Handle, 
+	OUT size_t *length,
+	OUT size_t *total)
 {
-    http_get_handle_t *handle = Handle;
+	http_get_handle_t *handle = Handle;
 
-    if( ( !handle ) || ( !length ) || ( !total ) ) {
-        return UPNP_E_INVALID_PARAM;
-    }
-    *length = handle->response.msg.entity.length;
-    *total = handle->response.content_length;
-    return UPNP_E_SUCCESS;
+	if (!handle || !length || !total) {
+		return UPNP_E_INVALID_PARAM;
+	}
+	*length = handle->response.msg.entity.length;
+	*total = handle->response.content_length;
+
+	return UPNP_E_SUCCESS;
 }
 
 /************************************************************************
