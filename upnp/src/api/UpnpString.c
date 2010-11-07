@@ -37,7 +37,15 @@
 
 /* strndup() is a GNU extension. Other systems must fix it with elif's. */
 #ifdef __GNUC__
-extern char *strndup(__const char *__string, size_t __n);
+	extern char *strndup(__const char *__string, size_t __n);
+#elif defined(WIN32)
+	static char *strndup(const char *__string, size_t __n)
+	{
+		size_t strsize = strnlen(__string,__n);
+		char *newstr = (char *) malloc(strsize + 1);
+		strncpy(newstr,__string,__n);
+		return(newstr);
+	}
 #endif
 
 
