@@ -217,7 +217,7 @@ static UPNP_INLINE int notify_send_and_recv(
 		return UPNP_E_OUTOF_MEMORY;
 	}
 
-	timeout = HTTP_DEFAULT_TIMEOUT;
+	timeout = GENA_NOTIFICATION_SENDING_TIMEOUT;
 
 	/* send msg (note: end of notification will contain "\r\n" twice) */
 	ret_code = http_SendMessage(&info, &timeout,
@@ -231,6 +231,8 @@ static UPNP_INLINE int notify_send_and_recv(
 
 		return ret_code;
 	}
+
+	timeout = GENA_NOTIFICATION_ANSWERING_TIMEOUT;
 
 	ret_code = http_RecvMessage(&info, response,
 		HTTPMETHOD_NOTIFY, &timeout, &err_code);

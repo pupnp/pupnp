@@ -295,6 +295,50 @@
 
 
 /*!
+ * \name GENA_NOTIFICATION_SENDING_TIMEOUT
+ *
+ * The {\tt GENA_NOTIFICATION_SENDING_TIMEOUT} specifies the number of seconds
+ * to wait for sending GENA notifications to the Control Point.
+ *
+ * This timeout will be used to know how many seconds GENA notification threads
+ * will wait to write on the socket to send the notification. By putting a
+ * lower value than HTTP_DEFAULT_TIMEOUT, the thread will not wait too long and
+ * will return quickly if writing is impossible. This is very useful as some
+ * Control Points disconnect from the network without unsubscribing as a result
+ * if HTTP_DEFAULT_TIMEOUT is used, all the GENA threads will be blocked to send
+ * notifications to those disconnected Control Points until the subscription
+ * expires.
+ *
+ * @{
+ */
+#define GENA_NOTIFICATION_SENDING_TIMEOUT HTTP_DEFAULT_TIMEOUT
+/* @} */
+
+
+/*!
+ * \name GENA_NOTIFICATION_ANSWERING_TIMEOUT
+ *
+ * The {\tt GENA_NOTIFICATION_ANSWERING_TIMEOUT} specifies the number of seconds
+ * to wait for receiving the answer to a GENA notification from the Control
+ * Point.
+ *
+ * This timeout will be used to know how many seconds GENA notification threads
+ * will wait on the socket to read for an answer from the CP. By putting a
+ * lower value than HTTP_DEFAULT_TIMEOUT, the thread will not wait too long and
+ * will return quickly if there is no answer from the CP. This is very useful as
+ * some Control Points disconnect from the network without unsubscribing and if
+ * HTTP_DEFAULT_TIMEOUT is used, all the GENA threads will be blocked to wait
+ * for an answer from those disconnected Control Points until the subscription
+ * expires. However, it should be noted that UDA specifies a value of 30s for
+ * waiting the CP's answer.
+ *
+ * @{
+ */
+#define GENA_NOTIFICATION_ANSWERING_TIMEOUT HTTP_DEFAULT_TIMEOUT
+/* @} */
+
+
+/*!
  * \name Module Exclusion
  *
  * Depending on the requirements, the user can selectively discard any of 
