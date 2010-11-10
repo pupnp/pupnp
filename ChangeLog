@@ -4,6 +4,21 @@ Version 1.6.10
 
 2010-11-10 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
+	Add GENA_NOTIFICATION_xxx_TIMEOUT variable.
+
+	Currently, in notify_send_and_recv function, pupnp waits for
+	HTTP_DEFAULT_TIMEOUT seconds when trying to send a GENA notification.
+	When there is a lot of notifications with CPs which was disconnected
+	without unsusbcribing, all the pupnp threads are blocked on this
+	timeout. To correct, this issue, this patch adds a new variable,
+	GENA_NOTIFICATION_SENDING_TIMEOUT, which can be used to lower the
+	timeout so GENA threads return quickly when writing is impossible. By
+	the same mean, pupnp waits the CP's answer to the NOTIFY for
+	HTTP_DEFAULT_TIMEOUT seconds, so this patch adds a new variable,
+	GENA_NOTIFICATION_ANSWERING_TIMEOUT, to customize this value.
+
+2010-11-10 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
 	Add --disable-blocking-tcp-connections flag.
 
 	Currently, pupnp is using a blocking connect to sends GENA
