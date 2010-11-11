@@ -308,6 +308,11 @@ if test "x$enable_notification_reordering" = xyes ; then
         AC_DEFINE(UPNP_ENABLE_NOTIFICATION_REORDERING, 1, [see upnpconfig.h])
 fi
 
+RT_BOOL_ARG_ENABLE([blocking_tcp_connections], [yes], [blocking TCP connections])
+if test "x$enable_blocking_tcp_connections" = xyes ; then
+        AC_DEFINE(UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS, 1, [see upnpconfig.h])
+fi
+
 
 RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 

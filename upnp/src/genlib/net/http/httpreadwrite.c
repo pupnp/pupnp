@@ -93,7 +93,10 @@ const int CHUNK_TAIL_SIZE = 10;
 #define CHUNK_TAIL_SIZE 10
 
 
-#ifdef UPNP_BLOCKING_CONNECT
+#ifndef UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS
+
+/* in seconds */
+#define DEFAULT_TCP_CONNECT_TIMEOUT 5
 
 
 /************************************************************************
@@ -152,8 +155,6 @@ static int Make_Socket_Blocking(int sock)
 	return 0;
 }
 
-/* in seconds */
-#define DEFAULT_TCP_CONNECT_TIMEOUT 5
 
 /************************************************************************
  * Function : Check_Connect_And_Wait_Connection
@@ -201,7 +202,7 @@ static int Check_Connect_And_Wait_Connection(int sock, int connect_res)
 #ifndef WIN32
 			} else {
 				int valopt = 0;
-				socklen_t len;
+				socklen_t len = 0;
 				if (getsockopt(sock, SOL_SOCKET, SO_ERROR, (void *) &valopt, &len) < 0) {
 					/* failed to read delayed error */
 					return -1;
@@ -216,14 +217,14 @@ static int Check_Connect_And_Wait_Connection(int sock, int connect_res)
 
 	return 0;
 }
-#endif /* UPNP_BLOCKING_CONNECT */
+#endif /* UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS */
 
 static int private_connect(
 	SOCKET sockfd,
 	const struct sockaddr *serv_addr,
 	socklen_t addrlen)
 {
-#ifdef UPNP_BLOCKING_CONNECT
+#ifndef UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS
 	int ret = Make_Socket_NoBlocking(sockfd);
 	if (ret != - 1) {
 		ret = connect(sockfd, serv_addr, addrlen);
@@ -236,7 +237,7 @@ static int private_connect(
 	return ret;
 #else
 	return connect(sockfd, serv_addr, addrlen);
-#endif /* UPNP_BLOCKING_CONNECT */
+#endif /* UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS */
 }
 
 
@@ -336,7 +337,7 @@ SOCKET http_Connect(
 	}
 	sockaddr_len = url->hostport.IPaddress.ss_family == AF_INET6 ?
 		sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
-	ret_connect = connect(connfd,
+	ret_connect = private_connect(connfd,
 		(struct sockaddr *)&url->hostport.IPaddress, sockaddr_len);
 	if (ret_connect == -1) {
 #ifdef WIN32
