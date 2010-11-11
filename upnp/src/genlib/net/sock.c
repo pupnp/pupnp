@@ -122,9 +122,6 @@ static int sock_read_write(
 	SOCKET sockfd = info->socket;
 	long bytes_sent = 0, byte_left = 0, num_written;
 
-	if (*timeoutSecs < 0) {
-		return UPNP_E_TIMEDOUT;
-	}
 	FD_ZERO(&readSet);
 	FD_ZERO(&writeSet);
 	if (bRead) {
@@ -135,7 +132,7 @@ static int sock_read_write(
 	timeout.tv_sec = *timeoutSecs;
 	timeout.tv_usec = 0;
 	while (TRUE) {
-		if (*timeoutSecs == 0) {
+		if (*timeoutSecs < 0) {
 			retCode = select(sockfd + 1, &readSet, &writeSet,
 				NULL, NULL);
 		} else {

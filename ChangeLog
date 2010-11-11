@@ -2,6 +2,18 @@
 Version 1.8.0
 *******************************************************************************
 
+2010-11-10 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Support for "polling" select in sock_read_write.
+
+	Currently, in sock_read_write function, if the timeout is 0, pupnp
+	realizes a "blocking" select (with an infinite timeout). With this
+	patch, if timeout is set to 0, pupnp will realize a "polling" select
+	and returns immediately if it can not read or write on the socket. This
+	is very useful for GENA notifications when pupnp is trying to send
+	events to a disconnected Control Point. "Blocking" select can now be
+	done by putting a negative timeout value.
+
 2010-09-18 Chandra Penke <chandrapenke(at)mcntech.com>
 
 	This is a minor build fix. The new Template*.h files added in the latest

@@ -1324,7 +1324,7 @@ static int http_RecvPostMessage(
 {
 	unsigned int Data_Buf_Size = 1024;
 	char Buf[1024];
-	int Timeout = 0;
+	int Timeout = -1;
 	long Num_Write = 0;
 	FILE *Fp;
 	parse_status_t status = PARSE_OK;
@@ -1456,7 +1456,7 @@ void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
 	SOCKINFO *info)
 {
 	int ret;
-	int timeout = 0;
+	int timeout = -1;
 	enum resp_type rtype = 0;
 	membuffer headers;
 	membuffer filename;

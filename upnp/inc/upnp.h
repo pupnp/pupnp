@@ -2057,7 +2057,7 @@ EXPORT_SPEC int UpnpOpenHttpGet(
 	int *httpStatus,
 	/*! [in] The time out value sent with the request during which a response
 	 * is expected from the server, failing which, an error is reported
-	 * back to the user. */		 
+	 * back to the user. If value is negative, timeout is infinite. */
 	int timeout);
 
 
@@ -2104,7 +2104,7 @@ EXPORT_SPEC int UpnpOpenHttpGetProxy(
 	int *httpStatus,
 	/*! [in] The time out value sent with the request during which a response
 	 * is expected from the server, failing which, an error is reported
-	 * back to the user. */		 
+	 * back to the user. If value is negative, timeout is infinite. */
 	int timeout);
 
 
@@ -2155,7 +2155,7 @@ EXPORT_SPEC int UpnpOpenHttpGetEx(
 	int highRange,
 	/*! [in] A time out value sent with the request during which a response is
 	 * expected from the server, failing which, an error is reported back
-	 * to the user. */	
+	 * to the user. If value is negative, timeout is infinite. */
 	int timeout);
 
 
@@ -2185,7 +2185,7 @@ EXPORT_SPEC int UpnpReadHttpGet(
 	size_t *size,
 	/*! [in] The time out value sent with the request during which a response is
 	 * expected from the server, failing which, an error is reported back to
-	 * the user. */
+	 * the user. If value is negative, timeout is infinite. */
 	int timeout);
 
 
@@ -2268,7 +2268,8 @@ EXPORT_SPEC int UpnpOpenHttpPost(
 	/*! [in] The length of the content, in bytes, being posted. */
 	int contentLength,
 	/*! [in] The time out value sent with the request during which a response
-	 * is expected from the receiver, failing which, an error is reported. */
+	 * is expected from the receiver, failing which, an error is reported.
+	 * If value is negative, timeout is infinite. */
 	int timeout);
 
 
@@ -2294,7 +2295,8 @@ EXPORT_SPEC int UpnpWriteHttpPost(
 	/*! [in] The size, in bytes of \b buf. */
 	unsigned int *size,
 	/*! [in] A timeout value sent with the request during which a response is
-	 * expected from the server, failing which, an error is reported. */		 
+	 * expected from the server, failing which, an error is reported. If
+	 * value is negative, timeout is infinite. */
 	int timeout);
 
 
@@ -2318,7 +2320,8 @@ EXPORT_SPEC int UpnpCloseHttpPost(
 	/*! [in,out] A pointer to a buffer to store the final status of the connection. */
 	int *httpStatus,
 	/*! [in] A time out value sent with the request during which a response is
-	 * expected from the server, failing which, an error is reported. */		 
+	 * expected from the server, failing which, an error is reported. If 
+	 * value is negative, timeout is infinite. */
 	int timeout);
   
 
