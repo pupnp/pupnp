@@ -233,6 +233,18 @@ Version 1.8.0
 Version 1.6.10
 *******************************************************************************
 
+2010-11-10 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Add --disable-blocking-tcp-connections flag.
+
+	Currently, pupnp is using a blocking connect to sends GENA
+	notifications. As a result, when there is a lot of notifications with
+	CPs which were disconnected without unsusbcribing, all the pupnp
+	threads are blocked for 20s (timeout). To correct this issue, this
+	patch replace the call to connect with a call to private_connect and add
+	a compilation flag to disable blocking TCP connections, so if we are not
+	able to connect to the CP, the notification is lost.
+
 2010-11-07 Stefan Sommerfeld <zerocom(at)cs.tu-berlin.de>
 
 	Several patches for windows compatibility and fixing warnings.
