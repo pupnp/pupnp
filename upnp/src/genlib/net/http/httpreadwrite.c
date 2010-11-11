@@ -1313,30 +1313,25 @@ MakeGetMessage( const char *url_str,
     return UPNP_E_SUCCESS;
 }
 
-/************************************************************************
- * Function: ReadResponseLineAndHeaders
+/*!
+ * \brief Parses already exiting data. If not complete reads more 
+ * data on the connected socket. The read data is then parsed. The 
+ * same methid is carried out for headers.
  *
- * Parameters:
- *	IN SOCKINFO *info;		Socket information object
- *	IN OUT http_parser_t *parser;	HTTP Parser object
- *	IN OUT int *timeout_secs;	time out value
- *	IN OUT int *http_error_code;	HTTP errror code returned
- *
- * Description:
- *	Parses already exiting data. If not complete reads more 
- *	data on the connected socket. The read data is then parsed. The 
- *	same methid is carried out for headers.
- *
- * Return: int
- *	PARSE_OK - On Success
- *	PARSE_FAILURE - Failure to parse data correctly
- *	UPNP_E_BAD_HTTPMSG - Socker read() returns an error
- ************************************************************************/
-int
-ReadResponseLineAndHeaders( IN SOCKINFO * info,
-                            IN OUT http_parser_t * parser,
-                            IN OUT int *timeout_secs,
-                            IN OUT int *http_error_code )
+ * \return integer:
+ *	\li \c PARSE_OK - On Success
+ *	\li \c PARSE_FAILURE - Failure to parse data correctly
+ *	\li \c UPNP_E_BAD_HTTPMSG - Socker read() returns an error
+ */
+static int ReadResponseLineAndHeaders(
+	/*! Socket information object. */
+	IN SOCKINFO *info,
+	/*! HTTP Parser object. */
+	IN OUT http_parser_t *parser,
+	/*! Time out value. */
+	IN OUT int *timeout_secs,
+	/*! HTTP errror code returned. */
+	IN OUT int *http_error_code)
 {
     parse_status_t status;
     int num_read;
