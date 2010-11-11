@@ -1428,27 +1428,6 @@ static int http_RecvPostMessage(
 		fclose(Fp);
 	}
 
-	/*
-	   while(TotalByteReceived < Instr->RecvWriteSize &&
-	   (NumReceived = sock_read(info,Buf, Data_Buf_Size,&Timeout) ) > 0 ) 
-	   {
-	   TotalByteReceived = TotalByteReceived + NumReceived;
-	   Num_Write = virtualDirCallback.write(Fp, Buf, NumReceived);
-	   if (ferror(Fp))
-	   {
-	   virtualDirCallback.close(Fp);
-	   return HTTP_INTERNAL_SERVER_ERROR;
-	   }
-	   }
-
-	   if(TotalByteReceived < Instr->RecvWriteSize)
-	   {
-	   return HTTP_INTERNAL_SERVER_ERROR;
-	   }
-
-	   virtualDirCallback.close(Fp);
-	   }
-	 */
 	return HTTP_OK;
 }
 
