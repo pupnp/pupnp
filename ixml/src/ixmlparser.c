@@ -42,6 +42,7 @@
 
 
 #include <assert.h>
+#include <stddef.h> /* for ptrdiff_t */
 #include <stdio.h>
 #include <stdlib.h> /* for free(), malloc() */
 #include <string.h>
@@ -96,9 +97,9 @@ typedef char utf8char[8];
  * See XML 1.0 (2nd Edition) for more details.	
  */
 static char_info_t Letter[] = {
-    {0x003A, 0x003A},           // character ":"
+    {0x003A, 0x003A},           /* character ":" */
     {0x0041, 0x005A},
-    {0x005F, 0x005F},           // character "_"
+    {0x005F, 0x005F},           /* character "_" */
     {0x0061, 0x007A}, {0x00C0, 0x00D6}, {0x00D8, 0x00F6}, {0x00F8, 0x00FF},
     {0x0100, 0x0131}, {0x0134, 0x013E}, {0x0141, 0x0148}, {0x014A, 0x017E},
     {0x0180, 0x01C3}, {0x01CD, 0x01F0}, {0x01F4, 0x01F5}, {0x01FA, 0x0217},
@@ -244,221 +245,323 @@ static char_info_t NameChar[] = {
 #define NAMECHARTABLESIZE   (sizeof(NameChar)/sizeof(NameChar[0]))
 
 
-static void Parser_free(
-	Parser *myParser);
-static int Parser_skipDocType(
-	char **pstr);
-static int Parser_skipProlog(
-	Parser *xmlParser);
-static int Parser_skipMisc(
-	Parser *xmlParser);
+/*!
+ * \brief Frees one ElementStack item.
+ */
 static void Parser_freeElementStackItem(
-	IXML_ElementStack *pItem);
+	/*! [in] The element stack item to free. */
+	IXML_ElementStack *pItem)
+{
+    assert( pItem != NULL );
+    if( pItem->element != NULL ) {
+        free( pItem->element );
+        pItem->element = NULL;
+    }
+    if( pItem->namespaceUri != NULL ) {
+        free( pItem->namespaceUri );
+        pItem->namespaceUri = NULL;
+    }
+    if( pItem->prefix != NULL ) {
+        free( pItem->prefix );
+        pItem->prefix = NULL;
+    }
+}
+
+
+/*!
+ * \brief Frees namespaceURI item.
+ */
 static void Parser_freeNsURI(
-	IXML_NamespaceURI *pNsURI);
+	/*! [in] The name space URI item to free. */
+	IXML_NamespaceURI *pNsURI)
+{
+    assert( pNsURI != NULL );
+    if( pNsURI->nsURI != NULL ) {
+        free( pNsURI->nsURI );
+    }
+    if( pNsURI->prefix != NULL ) {
+        free( pNsURI->prefix );
+    }
+}
 
-static int Parser_getNextNode(
-	Parser *myParser,
-	IXML_Node *newNode,
-	BOOL *isEnd);
-static int Parser_getNextToken(
-	Parser *myParser);
-static int Parser_xmlNamespace(
-	Parser *myParser,
-	IXML_Node *newNode);
-static BOOL Parser_ElementPrefixDefined(
-	Parser *myParser,
-	IXML_Node *newNode,
-	char **nsURI);
-static int Parser_setElementNamespace(
-	IXML_Element *newElement,
-	const char *nsURI);
-static int Parser_parseDocument(
-	IXML_Document **retDoc,
-	Parser *domParser);
-static BOOL Parser_hasDefaultNamespace(
+
+/*!
+ * \brief Frees all temporary memory allocated by xmlparser.
+ */
+static void Parser_free(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
+{
+    IXML_ElementStack *pElement;
+    IXML_ElementStack *pNextElement;
+    IXML_NamespaceURI *pNsURI;
+    IXML_NamespaceURI *pNextNsURI;
+
+    if( xmlParser == NULL ) {
+        return;
+    }
+
+    if( xmlParser->dataBuffer != NULL ) {
+        free( xmlParser->dataBuffer );
+    }
+
+    ixml_membuf_destroy( &( xmlParser->tokenBuf ) );
+    ixml_membuf_destroy( &( xmlParser->lastElem ) );
+
+    pElement = xmlParser->pCurElement;
+    while( pElement != NULL ) {
+        Parser_freeElementStackItem( pElement );
+
+        pNsURI = pElement->pNsURI;
+        while( pNsURI != NULL ) {
+            pNextNsURI = pNsURI->nextNsURI;
+            Parser_freeNsURI( pNsURI );
+            free( pNsURI );
+            pNsURI = pNextNsURI;
+        }
+
+        pNextElement = pElement->nextElement;
+        free( pElement );
+        pElement = pNextElement;
+    }
+
+    free( xmlParser );
+}
+
+
+/*!
+ * \brief Skips document type declaration
+ */
+static int Parser_skipDocType(
+	/*! [in,out] The pointer to the skipped point. */
+	char **pstr)
+{
+    char *pCur = *pstr;
+    /* default there is no nested < */
+    char *pNext = NULL;
+    int num = 1;
+
+    assert( ( *pstr ) != NULL );
+    if( *pstr == NULL ) {
+        return IXML_FAILED;
+    }
+
+    while( ( pCur != NULL ) && ( num != 0 ) && ( *pCur != 0 ) ) {
+        if( *pCur == '<' ) {
+            num++;
+        } else if( *pCur == '>' ) {
+            num--;
+        } else if( *pCur == '"' ) {
+            pNext = strchr( pCur + 1, '"' );
+            if( pNext == NULL ) {
+                return IXML_SYNTAX_ERR;
+            }
+
+            pCur = pNext;
+        }
+
+        pCur++;
+    }
+
+    if( num == 0 ) {
+        *pstr = pCur;
+        return IXML_SUCCESS;
+    } else {
+        return IXML_SYNTAX_ERR;
+    }
+}
+
+
+/*!
+ * \brief Skips all characters in the string until it finds the skip key.
+ * Then it skips the skip key and returns.
+ */
+static int Parser_skipString(
+	/*! [in,out] The pointer to the skipped point. */
+	char **pstrSrc,
+	/*! [in] The skip key. */
+	const char *strSkipKey)
+{
+    if( !( *pstrSrc ) || !strSkipKey ) {
+        return IXML_FAILED;
+    }
+
+    while( ( **pstrSrc )
+           && strncmp( *pstrSrc, strSkipKey,
+                       strlen( strSkipKey ) ) != 0 ) {
+        ( *pstrSrc )++;
+    }
+
+    if( **pstrSrc == '\0' ) {
+        return IXML_SYNTAX_ERR;
+    }
+    *pstrSrc = *pstrSrc + strlen( strSkipKey );
+
+    return IXML_SUCCESS;
+}
+
+
+/*!
+ * \brief Skip white spaces.
+ */
+static void Parser_skipWhiteSpaces(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
+{
+    while( ( *( xmlParser->curPtr ) != 0 ) &&
+           ( strchr( WHITESPACE, *( xmlParser->curPtr ) ) != NULL ) ) {
+        xmlParser->curPtr++;
+    }
+}
+
+
+/*!
+ * \brief Skips XML declarations.
+ */
+static int Parser_skipXMLDecl(
+	/*! [in,out] The XML parser. */
+	Parser *xmlParser)
+{
+    int rc = IXML_FAILED;
+
+    assert( xmlParser );
+    if( xmlParser == NULL ) {
+        return rc;
+    }
+
+    rc = Parser_skipString( &( xmlParser->curPtr ), END_PI );
+    Parser_skipWhiteSpaces( xmlParser );
+    return rc;
+}
+
+
+/*!
+ * \brief Skips all characters in the string until it finds the skip key.
+ * Then it skips the skip key and returns.
+ */
+static int Parser_skipComment(
+	/*! [in,out] The pointer to the skipped point. */
+	char **pstrSrc)
+{
+    char *pStrFound = NULL;
+
+    assert( ( *pstrSrc ) != NULL );
+    if( *pstrSrc == NULL ) {
+        return IXML_FAILED;
+    }
+
+    pStrFound = strstr( *pstrSrc, END_COMMENT );
+    if( ( pStrFound != NULL ) && ( pStrFound != *pstrSrc ) &&
+        ( *( pStrFound - 1 ) != '-' ) ) {
+        *pstrSrc = pStrFound + strlen( END_COMMENT );
+    } else {
+        return IXML_SYNTAX_ERR;
+    }
+
+    return IXML_SUCCESS;
+}
+
+
+/*!
+ * \brief Skip comment, PI and white space.
+ */
+static int Parser_skipMisc(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
+{
+    int rc = IXML_SUCCESS;
+    int done = FALSE;
+
+    while( ( done == FALSE ) && ( rc == IXML_SUCCESS ) ) {
+        if( strncasecmp( xmlParser->curPtr, ( char * )BEGIN_COMMENT, strlen( BEGIN_COMMENT ) ) == 0 ) {
+            /* <!-- */
+            rc = Parser_skipComment( &( xmlParser->curPtr ) );
+
+        } else if (strncasecmp(xmlParser->curPtr, (char *)XMLDECL , strlen(XMLDECL )) == 0 ||
+                   strncasecmp(xmlParser->curPtr, (char *)XMLDECL2, strlen(XMLDECL2)) == 0) {
+            /* <?xml or <?xml? */
+            rc = IXML_SYNTAX_ERR;
+        } else if (strncasecmp(xmlParser->curPtr, (char *)BEGIN_PI, strlen(BEGIN_PI)) == 0) {
+            /* <? */
+            rc = Parser_skipString(&xmlParser->curPtr, END_PI);
+        } else {
+            done = TRUE;
+        }
+        Parser_skipWhiteSpaces(xmlParser);
+    }
+
+    return rc;
+}
+
+
+/*!
+ * \brief Skip prolog.
+ */
+static int Parser_skipProlog(
+	/*! [in,out] The XML parser. */
+	Parser *xmlParser)
+{
+    int rc = IXML_SUCCESS;
+
+    assert( xmlParser != NULL );
+    if( xmlParser == NULL ) {
+        return IXML_FAILED;
+    }
+
+    Parser_skipWhiteSpaces( xmlParser );
+
+    if( strncmp( xmlParser->curPtr, ( char * )XMLDECL, strlen( XMLDECL ) ) == 0 ) {
+        /* <?xml */
+        rc = Parser_skipXMLDecl( xmlParser );
+        if( rc != IXML_SUCCESS ) {
+            return rc;
+        }
+    }
+
+    rc = Parser_skipMisc( xmlParser );
+    if( ( rc == IXML_SUCCESS ) &&
+        strncmp( xmlParser->curPtr, ( char * )BEGIN_DOCTYPE, strlen( BEGIN_DOCTYPE ) ) == 0 ) {
+        /* <! DOCTYPE */
+        xmlParser->curPtr++;
+        rc = Parser_skipDocType( &( xmlParser->curPtr ) );
+    }
+
+    if( rc == IXML_SUCCESS ) {
+        rc = Parser_skipMisc( xmlParser );
+    }
+
+    return rc;
+}
+
+
+/*!
+ * \brief Set the last element to be the given string.
+ */
+static int Parser_setLastElem(
+	/*! [in] The XML parser. */
 	Parser *xmlParser,
-	IXML_Node *newNode,
-	char **nsURI);
-static int Parser_getChar(
-	const char *src,
-	int *cLen);
-
-
-/*!
- * \brief Version of strdup() that handles NULL input.
- *
- * \return The same as strdup().
- */
-static char *safe_strdup(
-	/*! [in] String to be duplicated. */
-	const char *s) 
+	/*! [in] The string to copy from. */
+	const char *s)
 {
-	assert(s != NULL);
+    int rc;
 
-	if (s == NULL) {
-		return strdup("");
-	}
-	return strdup(s);
-}
-
-
-/*!
- * \brief Will determine whether character c is in the table of tbl (either
- * Letter table or NameChar table).
- *
- * \return TRUE or FALSE.
- */
-static BOOL Parser_isCharInTable(
-	/*! [in] Character to check. */
-	int c,
-	/*! [in] Table to use. */
-	char_info_t *tbl,
-	/*! [in] Size of the table. */
-	int sz)
-{
-	int t = 0;
-	int b = sz;
-	int m;
-
-	while (t <= b) {
-		m = ( t + b ) / 2;
-		if (c < tbl[m].l) {
-			b = m - 1;
-		} else if (c > tbl[m].h) {
-			t = m + 1;
-		} else {
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}
-
-
-/*!
- * \brief see XML 1.0 (2nd Edition) 2.2.
- */
-static BOOL Parser_isXmlChar(
-	/*! [in] The character to check. */
-	int c)
-{
-	return
-		c == 0x9 || c == 0xA || c == 0xD ||
-		(c >= 0x20 && c <= 0xD7FF) ||
-		(c >= 0xE000 && c <= 0xFFFD) ||
-		(c >= 0x10000 && c <= 0x10FFFF);
-}
-
-
-/*!
- * \brief Check whether c (int) is in LetterTable or NameCharTable.
- */
-static BOOL Parser_isNameChar(
-	/*! [in] The character to check. */
-	int c,
-	/*! [in] TRUE if you also want to check in the NameChar table. */
-	BOOL bNameChar)
-{
-	if (Parser_isCharInTable(c, Letter, LETTERTABLESIZE)) {
-		return TRUE;
-	}
-
-	if (bNameChar &&
-	    Parser_isCharInTable(c, NameChar, NAMECHARTABLESIZE)) {
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
-
-BOOL Parser_isValidXmlName(const DOMString name)
-{
-	const char *pstr = NULL;
-	int i = 0;
-	int nameLen = 0;
-
-	assert(name != NULL);
-
-	nameLen = strlen(name);
-	pstr = name;
-	if (Parser_isNameChar(*pstr, FALSE) == TRUE) {
-		for (i = 1; i < nameLen; ++i) {
-			if (Parser_isNameChar(*(pstr + i), TRUE) == FALSE) {
-				/* illegal char */
-				return FALSE;
-			}
-		}
-	}
-
-	return TRUE;
-}
-
-
-void Parser_setErrorChar(char c)
-{
-	g_error_char = c;
-}
-
-
-/*!
- * \brief Encodes a character to its UTF-8 character string, and return its length.
- *
- * \return The length of the encoded string in bytes.
- */
-static int Parser_intToUTF8(
-	/*! [in] The character to encode. */
-	int c,
-	/*! [out] The resultant UTF-8 encoded string. */
-	utf8char s)
-{
-    if( c < 0 ) {
-        return 0;
+    if( ( xmlParser == NULL ) || ( s == NULL ) ) {
+        return IXML_FAILED;
     }
 
-    if( c <= 127 ) {
-        s[0] = c;
-        s[1] = 0;
-        return 1;
-    } else if( c <= 0x07FF ) {  /* 0x0080 < c <= 0x07FF */
-        s[0] = 0xC0 | ( c >> 6 );
-        s[1] = 0x80 | ( c & 0x3f );
-        s[2] = 0;
-        return 2;
-    } else if( c <= 0xFFFF ) {  /* 0x0800 < c <= 0xFFFF */
-        s[0] = 0xE0 | ( c >> 12 );
-        s[1] = 0x80 | ( ( c >> 6 ) & 0x3f );
-        s[2] = 0x80 | ( c & 0x3f );
-        s[3] = 0;
-        return 3;
-    } else if( c <= 0x1FFFFF ) {    /* 0x10000 < c <= 0x1FFFFF */
-        s[0] = 0xF0 | ( c >> 18 );
-        s[1] = 0x80 | ( ( c >> 12 ) & 0x3f );
-        s[2] = 0x80 | ( ( c >> 6 ) & 0x3f );
-        s[3] = 0x80 | ( c & 0x3f );
-        s[4] = 0;
-        return 4;
-    } else if( c <= 0x3FFFFFF ) {   /* 0x200000 < c <= 3FFFFFF */
-        s[0] = 0xF8 | ( c >> 24 );
-        s[1] = 0x80 | ( ( c >> 18 ) & 0x3f );
-        s[2] = 0x80 | ( ( c >> 12 ) & 0x3f );
-        s[3] = 0x80 | ( ( c >> 6 ) & 0x3f );
-        s[4] = 0x80 | ( c & 0x3f );
-        s[5] = 0;
-        return 5;
-    } else if( c <= 0x7FFFFFFF ) {  /* 0x4000000 < c <= 7FFFFFFF */
-        s[0] = 0xFC | ( c >> 30 );
-        s[1] = 0x80 | ( ( c >> 24 ) & 0x3f );
-        s[2] = 0x80 | ( ( c >> 18 ) & 0x3f );
-        s[3] = 0x80 | ( ( c >> 12 ) & 0x3f );
-        s[4] = 0x80 | ( ( c >> 6 ) & 0x3f );
-        s[5] = 0x80 | ( c & 0x3f );
-        s[6] = 0;
-        return 6;
-    } else {                    /* illegal */
-        return 0;
-    }
+    rc = ixml_membuf_assign_str( &( xmlParser->lastElem ), s );
+    return rc;
+}
+
+
+/*!
+ * \brief Clear token buffer.
+ */
+static void Parser_clearTokenBuf(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
+{
+    ixml_membuf_destroy( &( xmlParser->tokenBuf ) );
 }
 
 
@@ -472,7 +575,7 @@ static int Parser_UTF8ToInt(
 	/*! [in] The pointer to the character to encode. */
 	const char *ss,
 	/*! [out] The number of octets of the UTF-8 encoding of this character. */
-	int *len)
+	ptrdiff_t *len)
 {
 	const unsigned char *s = (const unsigned char *)ss;
 	int c = *s;
@@ -549,649 +652,72 @@ static int Parser_UTF8ToInt(
 
 
 /*!
- * \brief Initializes a xml parser.
+ * \brief Will determine whether character c is in the table of tbl (either
+ * Letter table or NameChar table).
  *
- * \return The parser object or \b NULL if there is not enough memory.
+ * \return TRUE or FALSE.
  */
-static Parser *Parser_init()
+static BOOL Parser_isCharInTable(
+	/*! [in] Character to check. */
+	int c,
+	/*! [in] Table to use. */
+	char_info_t *tbl,
+	/*! [in] Size of the table. */
+	int sz)
 {
-	Parser *newParser = NULL;
+	int t = 0;
+	int b = sz;
+	int m;
 
-	newParser = (Parser *)malloc(sizeof (Parser));
-	if (newParser == NULL) {
-		return NULL;
-	}
-
-	memset(newParser, 0, sizeof (Parser));
-	ixml_membuf_init(&(newParser->tokenBuf));
-	ixml_membuf_init(&(newParser->lastElem));
-
-	return newParser;
-}
-
-
-/*!
- * \brief Check if a new node->nodeName matches top of element stack.
- *
- * \return TRUE if matches.
- */
-static int Parser_isValidEndElement(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The node. */
-	IXML_Node *newNode)
-{
-	assert(xmlParser);
-	assert(xmlParser->pCurElement->element);
-	assert(newNode);
-	assert(newNode->nodeName);
-
-	if (xmlParser->pCurElement == NULL) {
-		return 0;
-	}
-
-	return strcmp(xmlParser->pCurElement->element, newNode->nodeName) == 0;
-}
-
-
-/*!
- * \brief Push a new element onto element stack.
- *
- * \return 
- */
-static int Parser_pushElement(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The element node to push. */
-	IXML_Node *newElement)
-{
-    IXML_ElementStack *pCurElement = NULL;
-    IXML_ElementStack *pNewStackElement = NULL;
-
-    assert( newElement );
-    if( newElement != NULL ) {
-        /* push new element */
-        pNewStackElement =
-            ( IXML_ElementStack * ) malloc( sizeof( IXML_ElementStack ) );
-        if( pNewStackElement == NULL ) {
-            return IXML_INSUFFICIENT_MEMORY;
-        }
-
-        memset( pNewStackElement, 0, sizeof( IXML_ElementStack ) );
-        /* the element member includes both prefix and name */
-
-        pNewStackElement->element = safe_strdup( newElement->nodeName );
-        if( pNewStackElement->element == NULL ) {
-            free( pNewStackElement );
-            return IXML_INSUFFICIENT_MEMORY;
-        }
-
-        if( newElement->prefix != 0 ) {
-            pNewStackElement->prefix = safe_strdup( newElement->prefix );
-            if( pNewStackElement->prefix == NULL ) {
-                Parser_freeElementStackItem( pNewStackElement );
-                free( pNewStackElement );
-                return IXML_INSUFFICIENT_MEMORY;
-            }
-        }
-
-        if( newElement->namespaceURI != 0 ) {
-            pNewStackElement->namespaceUri =
-                safe_strdup( newElement->namespaceURI );
-            if( pNewStackElement->namespaceUri == NULL ) {
-                Parser_freeElementStackItem( pNewStackElement );
-                free( pNewStackElement );
-                return IXML_INSUFFICIENT_MEMORY;
-            }
-        }
-
-        pCurElement = xmlParser->pCurElement;
-
-        /* insert the new element into the top of the stack */
-        pNewStackElement->nextElement = pCurElement;
-        xmlParser->pCurElement = pNewStackElement;
-
-    }
-
-    return IXML_SUCCESS;
-}
-
-
-/*!
- * \brief Remove element from element stack.
- */
-static void Parser_popElement(
-	/*! [in] The XML parser. */
-	Parser *xmlParser)
-{
-	IXML_ElementStack *pCur = NULL;
-	IXML_NamespaceURI *pnsUri = NULL;
-	IXML_NamespaceURI *pNextNS = NULL;
-
-	pCur = xmlParser->pCurElement;
-	if (pCur != NULL) {
-		xmlParser->pCurElement = pCur->nextElement;
-		Parser_freeElementStackItem(pCur);
-		pnsUri = pCur->pNsURI;
-		while (pnsUri != NULL) {
-			pNextNS = pnsUri->nextNsURI;
-			Parser_freeNsURI(pnsUri);
-			free(pnsUri);
-			pnsUri = pNextNS;
+	while (t <= b) {
+		m = ( t + b ) / 2;
+		if (c < tbl[m].l) {
+			b = m - 1;
+		} else if (c > tbl[m].h) {
+			t = m + 1;
+		} else {
+			return TRUE;
 		}
-		free(pCur);
 	}
+
+	return FALSE;
 }
 
 
 /*!
- * \brief Read a xml file or buffer contents into xml parser.
+ * \brief Check whether c (int) is in LetterTable or NameCharTable.
  */
-static int Parser_readFileOrBuffer(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The file name or the buffer to copy, according to the
-	 * parameter "file". */
-	const char *xmlFileName,
-	/*! [in] TRUE if you want to read from a file, false if xmlFileName is
-	 * the buffer to copy to the parser. */
-	BOOL file)
+static BOOL Parser_isNameChar(
+	/*! [in] The character to check. */
+	int c,
+	/*! [in] TRUE if you also want to check in the NameChar table. */
+	BOOL bNameChar)
 {
-    int fileSize = 0;
-    int bytesRead = 0;
-    FILE *xmlFilePtr = NULL;
+	if (Parser_isCharInTable(c, Letter, LETTERTABLESIZE)) {
+		return TRUE;
+	}
 
-    if( file ) {
-        xmlFilePtr = fopen( xmlFileName, "rb" );
-        if( xmlFilePtr == NULL ) {
-            return IXML_NO_SUCH_FILE;
-        } else {
-            fseek( xmlFilePtr, 0, SEEK_END );
-            fileSize = ftell( xmlFilePtr );
-            if( fileSize == 0 ) {
-                fclose( xmlFilePtr );
-                return IXML_SYNTAX_ERR;
-            }
+	if (bNameChar &&
+	    Parser_isCharInTable(c, NameChar, NAMECHARTABLESIZE)) {
+		return TRUE;
+	}
 
-            xmlParser->dataBuffer = ( char * )malloc( fileSize + 1 );
-            if( xmlParser->dataBuffer == NULL ) {
-                fclose( xmlFilePtr );
-                return IXML_INSUFFICIENT_MEMORY;
-            }
-
-            fseek( xmlFilePtr, 0, SEEK_SET );
-            bytesRead =
-                fread( xmlParser->dataBuffer, 1, fileSize, xmlFilePtr );
-            xmlParser->dataBuffer[bytesRead] = '\0';    // append null
-            fclose( xmlFilePtr );
-        }
-    } else {
-        xmlParser->dataBuffer = safe_strdup( xmlFileName );
-        if( xmlParser->dataBuffer == NULL ) {
-            return IXML_INSUFFICIENT_MEMORY;
-        }
-    }
-
-    return IXML_SUCCESS;
+	return FALSE;
 }
 
 
 /*!
- * \brief Parses a xml file and return the DOM tree.
+ * \brief see XML 1.0 (2nd Edition) 2.2.
  */
-int Parser_LoadDocument(
-	/*! [out] The output document tree. */
-	IXML_Document **retDoc,
-	/*! [in] The file name or the buffer to copy, according to the
-	 * parameter "file". */
-	const char *xmlFileName,
-	/*! [in] TRUE if you want to read from a file, false if xmlFileName is
-	 * the buffer to copy to the parser. */
-	BOOL file)
+static BOOL Parser_isXmlChar(
+	/*! [in] The character to check. */
+	int c)
 {
-    int rc = IXML_SUCCESS;
-    Parser *xmlParser = NULL;
-
-    xmlParser = Parser_init();
-    if( xmlParser == NULL ) {
-        return IXML_INSUFFICIENT_MEMORY;
-    }
-
-    rc = Parser_readFileOrBuffer( xmlParser, xmlFileName, file );
-    if( rc != IXML_SUCCESS ) {
-        Parser_free( xmlParser );
-        return rc;
-    }
-
-    xmlParser->curPtr = xmlParser->dataBuffer;
-    rc = Parser_parseDocument( retDoc, xmlParser );
-    return rc;
-
-}
-
-
-/*!
- * \brief Reports whether there is a top level element in the parser.
- *
- * \return TRUE if there is a top level element in the parser.
- */
-static int isTopLevelElement(
-	/*! [in] The XML parser. */
-	Parser *xmlParser)
-{
-    assert(xmlParser);
-    return xmlParser->pCurElement == NULL;
-}
-
-
-/*!
- * \brief Reports whether the new attribute is the same as an existing one.
- *
- * \return TRUE if the new attribute is the same as an existing one.
- */
-static int isDuplicateAttribute(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The node attribute to compare. */
-	IXML_Node *newAttrNode)
-{
-    IXML_Node *elementNode = NULL;
-    IXML_Node *attrNode = NULL;
-
-    elementNode = xmlParser->currentNodePtr;
-    attrNode = elementNode->firstAttr;
-    while( attrNode != NULL ) {
-        if( strcmp( attrNode->nodeName, newAttrNode->nodeName ) == 0 ) {
-            return TRUE;
-        }
-
-        attrNode = attrNode->nextSibling;
-    }
-
-    return FALSE;
-}
-
-/*!
- * \brief Processes the attribute name.
- *
- * \return IXML_SUCCESS if successful, otherwise or an error code.
- */
-static int Parser_processAttributeName(
-	/*! [in] The XML document. */
-	IXML_Document *rootDoc,
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The Node to process. */
-	IXML_Node *newNode)
-{
-    IXML_Attr *attr = NULL;
-    int rc = IXML_SUCCESS;
-
-    if( isDuplicateAttribute( xmlParser, newNode ) == TRUE ) {
-        return IXML_SYNTAX_ERR;
-    }
-
-    rc = ixmlDocument_createAttributeEx( rootDoc, newNode->nodeName, &attr );
-    if( rc != IXML_SUCCESS ) {
-        return rc;
-    }
-
-    rc = ixmlNode_setNodeProperties( ( IXML_Node * ) attr, newNode );
-    if( rc != IXML_SUCCESS ) {
-        return rc;
-    }
-
-    rc = ixmlElement_setAttributeNode(
-	(IXML_Element *)xmlParser->currentNodePtr, attr, NULL );
-    return rc;
-}
-
-/*!
- * \brief Processes element name.
- *
- * \return IXML_SUCCESS if successful, otherwise or an error code.
- */
-static int Parser_processElementName(
-	/*! [in] The XML document. */
-	IXML_Document *rootDoc,
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The Node to process. */
-	IXML_Node *newNode )
-{
-    IXML_Element *newElement = NULL;
-    char *nsURI = NULL;
-    int rc = IXML_SUCCESS;
-
-    if( xmlParser->bHasTopLevel == TRUE ) {
-        if( isTopLevelElement( xmlParser ) == TRUE ) {
-            return IXML_SYNTAX_ERR;
-        }
-    } else {
-        xmlParser->bHasTopLevel = TRUE;
-    }
-
-    xmlParser->savePtr = xmlParser->curPtr;
-    rc = ixmlDocument_createElementEx( rootDoc, newNode->nodeName, &newElement );
-    if( rc != IXML_SUCCESS ) {
-        return rc;
-    }
-
-    rc = ixmlNode_setNodeProperties( ( IXML_Node * ) newElement, newNode );
-    if( rc != IXML_SUCCESS ) {
-        ixmlElement_free( newElement );
-        return rc;
-    }
-
-    if( newNode->prefix != NULL ) { // element has namespace prefix 
-        if( Parser_ElementPrefixDefined( xmlParser, newNode, &nsURI ) !=
-            TRUE ) {
-            // read next node to see whether it includes namespace definition
-            xmlParser->pNeedPrefixNode = ( IXML_Node * ) newElement;
-        } else {                // fill in the namespace
-            Parser_setElementNamespace( newElement, nsURI );
-        }
-    } else                      // does element has default namespace
-    {
-        // the node may have default namespace definition
-        if( Parser_hasDefaultNamespace( xmlParser, newNode, &nsURI ) ==
-            TRUE ) {
-            Parser_setElementNamespace( newElement, nsURI );
-        } else if( xmlParser->state == eATTRIBUTE ) {
-            // the default namespace maybe defined later
-            xmlParser->pNeedPrefixNode = ( IXML_Node * ) newElement;
-        }
-    }
-
-    rc = ixmlNode_appendChild( xmlParser->currentNodePtr,
-                               ( IXML_Node * ) newElement );
-    if( rc != IXML_SUCCESS ) {
-        ixmlElement_free( newElement );
-        return rc;
-    }
-
-    xmlParser->currentNodePtr = ( IXML_Node * ) newElement;
-
-    // push element to stack
-    rc = Parser_pushElement( xmlParser, ( IXML_Node * ) newElement );
-    return rc;
-}
-
-/*!
- * \brief Verifies endof element tag is the same as the openning element tag.
- */
-static int Parser_eTagVerification(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The Node to process. */
-	IXML_Node *newNode)
-{
-    assert( newNode->nodeName );
-    assert( xmlParser->currentNodePtr );
-
-    if( newNode->nodeType == eELEMENT_NODE ) {
-        if( Parser_isValidEndElement( xmlParser, newNode ) == TRUE ) {
-            Parser_popElement( xmlParser );
-        } else {                // syntax error
-            return IXML_SYNTAX_ERR;
-        }
-    }
-
-    if( strcmp( newNode->nodeName, xmlParser->currentNodePtr->nodeName ) ==
-        0 ) {
-        xmlParser->currentNodePtr = xmlParser->currentNodePtr->parentNode;
-    } else {
-        return IXML_SYNTAX_ERR;
-    }
-
-    return IXML_SUCCESS;
-}
-
-
-void Parser_freeNodeContent(IXML_Node *nodeptr)
-{
-    if( nodeptr == NULL ) {
-        return;
-    }
-
-    if( nodeptr->nodeName != NULL ) {
-        free( nodeptr->nodeName );
-    }
-
-    if( nodeptr->nodeValue != NULL ) {
-        free( nodeptr->nodeValue );
-    }
-
-    if( nodeptr->namespaceURI != NULL ) {
-        free( nodeptr->namespaceURI );
-    }
-
-    if( nodeptr->prefix != NULL ) {
-        free( nodeptr->prefix );
-    }
-
-    if( nodeptr->localName != NULL ) {
-        free( nodeptr->localName );
-    }
-}
-
-
-/*!
- * \brief Parses the xml file and returns the DOM document tree.
- *
- * \return
- */
-static int Parser_parseDocument(
-	/*! [out] The XML document. */
-	IXML_Document **retDoc,
-	/*! [in] The XML parser. */
-	Parser *xmlParser)
-{
-    IXML_Document *gRootDoc = NULL;
-    IXML_Node newNode;
-    BOOL bETag = FALSE;
-    IXML_Node *tempNode = NULL;
-    int rc = IXML_SUCCESS;
-    IXML_CDATASection *cdataSecNode = NULL;
-
-    // It is important that the node gets initialized here, otherwise things
-    // can go wrong on the error handler.
-    ixmlNode_init( &newNode );
-
-    rc = ixmlDocument_createDocumentEx( &gRootDoc );
-    if( rc != IXML_SUCCESS ) {
-        goto ErrorHandler;
-    }
-
-    xmlParser->currentNodePtr = ( IXML_Node * ) gRootDoc;
-
-    rc = Parser_skipProlog( xmlParser );
-    if( rc != IXML_SUCCESS ) {
-        goto ErrorHandler;
-    }
-
-    while( bETag == FALSE ) {
-        // clear the newNode contents. Redundant on the first iteration,
-	// but nonetheless, necessary due to the possible calls to
-	// ErrorHandler above. Currently, this is just a memset to zero.
-        ixmlNode_init( &newNode );
-
-        if( Parser_getNextNode( xmlParser, &newNode, &bETag ) ==
-            IXML_SUCCESS ) {
-            if( bETag == FALSE ) {
-                switch ( newNode.nodeType ) {
-                    case eELEMENT_NODE:
-                        rc = Parser_processElementName( gRootDoc,
-                                                        xmlParser,
-                                                        &newNode );
-                        if( rc != IXML_SUCCESS ) {
-                            goto ErrorHandler;
-                        }
-                        break;
-
-                    case eTEXT_NODE:
-                        rc = ixmlDocument_createTextNodeEx( gRootDoc,
-                                                            newNode.
-                                                            nodeValue,
-                                                            &tempNode );
-                        if( rc != IXML_SUCCESS ) {
-                            goto ErrorHandler;
-                        }
-
-                        rc = ixmlNode_appendChild( xmlParser->
-                                                   currentNodePtr,
-                                                   tempNode );
-                        if( rc != IXML_SUCCESS ) {
-                            goto ErrorHandler;
-                        }
-
-                        break;
-
-                    case eCDATA_SECTION_NODE:
-                        rc = ixmlDocument_createCDATASectionEx( gRootDoc,
-                                                                newNode.
-                                                                nodeValue,
-                                                                &cdataSecNode );
-                        if( rc != IXML_SUCCESS ) {
-                            goto ErrorHandler;
-                        }
-
-                        rc = ixmlNode_appendChild( xmlParser->
-                                                   currentNodePtr,
-                                                   &( cdataSecNode->n ) );
-                        if( rc != IXML_SUCCESS ) {
-                            goto ErrorHandler;
-                        }
-                        break;
-
-                    case eATTRIBUTE_NODE:
-                        rc = Parser_processAttributeName( gRootDoc,
-                                                          xmlParser,
-                                                          &newNode );
-                        if( rc != IXML_SUCCESS ) {
-                            goto ErrorHandler;
-                        }
-                        break;
-
-                    default:
-                        break;
-                }
-            } else              // ETag==TRUE, endof element tag.  
-            {
-                rc = Parser_eTagVerification( xmlParser, &newNode );
-                if( rc != IXML_SUCCESS ) {
-                    goto ErrorHandler;
-                }
-                xmlParser->state = eCONTENT;
-            }
-
-            // reset bETag flag
-            bETag = FALSE;
-
-        } else if( bETag == TRUE ) {    // file is done
-            break;
-        } else {
-            rc = IXML_FAILED;
-            goto ErrorHandler;
-        }
-        Parser_freeNodeContent( &newNode );
-
-    }
-
-    if( xmlParser->pCurElement != NULL ) {
-        rc = IXML_SYNTAX_ERR;
-        goto ErrorHandler;
-    }
-
-    *retDoc = ( IXML_Document * ) gRootDoc;
-    Parser_free( xmlParser );
-    return rc;
-
-ErrorHandler:
-    Parser_freeNodeContent( &newNode );
-    ixmlDocument_free( gRootDoc );
-    Parser_free( xmlParser );
-    return rc;
-}
-
-
-/*!
- * \brief Set the last element to be the given string.
- */
-static int Parser_setLastElem(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The string to copy from. */
-	const char *s)
-{
-    int rc;
-
-    if( ( xmlParser == NULL ) || ( s == NULL ) ) {
-        return IXML_FAILED;
-    }
-
-    rc = ixml_membuf_assign_str( &( xmlParser->lastElem ), s );
-    return rc;
-}
-
-
-/*!
- * \brief Clear token buffer.
- ******************************************************************************/
-static void Parser_clearTokenBuf(
-	/*! [in] The XML parser. */
-	Parser *xmlParser)
-{
-    ixml_membuf_destroy( &( xmlParser->tokenBuf ) );
-}
-
-
-/*!
- * \brief Appends string s to token buffer.
- */
-static int Parser_appendTokBufStr(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The string to append. */
-	const char *s)
-{
-    int rc = IXML_SUCCESS;
-
-    if( s != NULL ) {
-        rc = ixml_membuf_append_str( &( xmlParser->tokenBuf ), s );
-    }
-
-    return rc;
-}
-
-
-/*!
- * \brief Appends c to token buffer.
- */
-static int Parser_appendTokBufChar(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The character to append. */
-	char c)
-{
-    int rc;
-
-    rc = ixml_membuf_append( &( xmlParser->tokenBuf ), &c );
-    return rc;
-}
-
-
-/*!
- * \brief Skip white spaces.
- */
-static void Parser_skipWhiteSpaces(
-	/*! [in] The XML parser. */
-	Parser *xmlParser)
-{
-    while( ( *( xmlParser->curPtr ) != 0 ) &&
-           ( strchr( WHITESPACE, *( xmlParser->curPtr ) ) != NULL ) ) {
-        xmlParser->curPtr++;
-    }
+	return
+		c == 0x9 || c == 0xA || c == 0xD ||
+		(c >= 0x20 && c <= 0xD7FF) ||
+		(c >= 0xE000 && c <= 0xFFFD) ||
+		(c >= 0x10000 && c <= 0x10FFFF);
 }
 
 
@@ -1202,7 +728,7 @@ static int Parser_getChar(
 	/*! [in] . */
 	const char *src,
 	/*! [in,out] . */
-	int *cLen)
+	ptrdiff_t *cLen)
 {
 	int ret = -1;
 	int line = 0;
@@ -1312,6 +838,106 @@ ExitFunction:
 
 
 /*!
+ * \brief Appends c to token buffer.
+ */
+static int Parser_appendTokBufChar(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The character to append. */
+	char c)
+{
+    int rc;
+
+    rc = ixml_membuf_append( &( xmlParser->tokenBuf ), &c );
+    return rc;
+}
+
+
+/*!
+ * \brief Encodes a character to its UTF-8 character string, and return its length.
+ *
+ * \return The length of the encoded string in bytes.
+ */
+static int Parser_intToUTF8(
+	/*! [in] The character to encode. */
+	int c,
+	/*! [out] The resultant UTF-8 encoded string. */
+	utf8char s)
+{
+	if (c < 0)
+		return 0;
+
+	if (c <= 127) {
+		s[0] = (char)c;
+		s[1] = (char)0;
+		return 1;
+	} else if (c <= 0x07FF) {
+		/* 0x0080 < c <= 0x07FF */
+		s[0] = (char)(0xC0 |  (c >> 6 )        );
+		s[1] = (char)(0x80 | ( c        & 0x3f));
+		s[2] = (char)0;
+		return 2;
+	} else if (c <= 0xFFFF) {
+		/* 0x0800 < c <= 0xFFFF */
+		s[0] = (char)(0xE0 |  (c >> 12)        );
+		s[1] = (char)(0x80 | ((c >> 6 ) & 0x3f));
+		s[2] = (char)(0x80 | ( c        & 0x3f));
+		s[3] = (char)0;
+		return 3;
+	} else if (c <= 0x1FFFFF) {
+		/* 0x10000 < c <= 0x1FFFFF */
+		s[0] = (char)(0xF0 |  (c >> 18)        );
+		s[1] = (char)(0x80 | ((c >> 12) & 0x3f));
+		s[2] = (char)(0x80 | ((c >> 6 ) & 0x3f));
+		s[3] = (char)(0x80 | ( c        & 0x3f));
+		s[4] = (char)0;
+		return 4;
+	} else if (c <= 0x3FFFFFF) {
+		/* 0x200000 < c <= 3FFFFFF */
+		s[0] = (char)(0xF8 |  (c >> 24)        );
+		s[1] = (char)(0x80 | ((c >> 18) & 0x3f));
+		s[2] = (char)(0x80 | ((c >> 12) & 0x3f));
+		s[3] = (char)(0x80 | ((c >> 6 ) & 0x3f));
+		s[4] = (char)(0x80 | ( c        & 0x3f));
+		s[5] = (char)0;
+		return 5;
+	} else if (c <= 0x7FFFFFFF) { 
+		/* 0x4000000 < c <= 7FFFFFFF */
+		s[0] = (char)(0xFC |  (c >> 30)        );
+		s[1] = (char)(0x80 | ((c >> 24) & 0x3f));
+		s[2] = (char)(0x80 | ((c >> 18) & 0x3f));
+		s[3] = (char)(0x80 | ((c >> 12) & 0x3f));
+		s[4] = (char)(0x80 | ((c >> 6 ) & 0x3f));
+		s[5] = (char)(0x80 | ( c        & 0x3f));
+		s[6] = (char)0;
+		return 6;
+	} else {
+		/* illegal */
+		return 0;
+	}
+}
+
+
+/*!
+ * \brief Appends string s to token buffer.
+ */
+static int Parser_appendTokBufStr(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The string to append. */
+	const char *s)
+{
+    int rc = IXML_SUCCESS;
+
+    if( s != NULL ) {
+        rc = ixml_membuf_append_str( &( xmlParser->tokenBuf ), s );
+    }
+
+    return rc;
+}
+
+
+/*!
  * \brief Copy string in src into xml parser token buffer
  */
 static int Parser_copyToken(
@@ -1320,13 +946,13 @@ static int Parser_copyToken(
 	/*! [in] The string to copy from. */
 	const char *src,
 	/*! [in] The lenght to copy. */
-	int len)
+	ptrdiff_t len)
 {
 	int ret = IXML_SUCCESS;
 	int line = 0;
 	int i;
 	int c;
-	int cl;
+	ptrdiff_t cl;
 	const char *psrc;
 	const char *pend;
 	utf8char uch;
@@ -1379,31 +1005,167 @@ ExitFunction:
 
 
 /*!
- * \brief Skips all characters in the string until it finds the skip key.
- * Then it skips the skip key and returns.
+ * \brief Return the length of next token in tokenBuff.
  */
-static int Parser_skipString(
-	/*! [in,out] The pointer to the skipped point. */
-	char **pstrSrc,
-	/*! [in] The skip key. */
-	const char *strSkipKey)
+static ptrdiff_t Parser_getNextToken(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
 {
-    if( !( *pstrSrc ) || !strSkipKey ) {
+    ptrdiff_t tokenLength = 0;
+    int temp;
+    ptrdiff_t tlen;
+    int rc;
+
+    Parser_clearTokenBuf( xmlParser );
+
+    if( *( xmlParser->curPtr ) == '\0' ) {
+        return 0;
+    }
+    /* skip XML instructions */
+    rc = Parser_skipMisc( xmlParser );
+    if( rc != IXML_SUCCESS ) {
+        return 0;
+    }
+    /* Attribute value logic must come first, since all text untokenized until
+     * end-quote */
+    if( *( xmlParser->curPtr ) == QUOTE ) {
+        tokenLength = 1;
+    } else if( *( xmlParser->curPtr ) == SINGLEQUOTE ) {
+        tokenLength = 1;
+    } else if( *( xmlParser->curPtr ) == LESSTHAN ) {
+	/* Check for start tags */
+        temp = Parser_UTF8ToInt( xmlParser->curPtr + 1, &tlen );
+        if( temp == '/' ) {
+	    /* token is '</' end tag */
+            tokenLength = 2;
+        } else if( Parser_isNameChar( temp, FALSE ) == TRUE ) {
+	    /* '<' found, so return '<' token */
+            tokenLength = 1;
+        } else {
+ 	    /* error */
+            return 0;
+        }
+    } else if( *( xmlParser->curPtr ) == EQUALS ) {
+	/* Check for '=' token, return it as a token */
+        tokenLength = 1;
+    } else if( *( xmlParser->curPtr ) == SLASH ) {
+        if( *( xmlParser->curPtr + 1 ) == GREATERTHAN ) {
+	    /* token '/>' found */
+            tokenLength = 2;
+	    /* fix */
+            xmlParser->savePtr = xmlParser->curPtr;
+        }
+    } else if( *( xmlParser->curPtr ) == GREATERTHAN ) {
+	/* > found, so return it as a token */
+        tokenLength = 1;
+    } else if( Parser_isNameChar( Parser_UTF8ToInt( xmlParser->curPtr, &tlen ), FALSE ) ) {
+	/* Check for name tokens, name found, so find out how long it is */
+        ptrdiff_t iIndex = tlen;
+
+        while( Parser_isNameChar
+               ( Parser_UTF8ToInt( xmlParser->curPtr + iIndex, &tlen ),
+                 TRUE ) ) {
+            iIndex += tlen;
+        }
+        tokenLength = iIndex;
+    } else {
+        return 0;
+    }
+
+    /* Copy the token to the return string */
+    if( Parser_copyToken( xmlParser, xmlParser->curPtr, tokenLength ) !=
+        IXML_SUCCESS ) {
+        return 0;
+    }
+
+    xmlParser->curPtr += tokenLength;
+    return tokenLength;
+}
+
+
+/*!
+ * \brief Version of strdup() that handles NULL input.
+ *
+ * \return The same as strdup().
+ */
+static char *safe_strdup(
+	/*! [in] String to be duplicated. */
+	const char *s) 
+{
+	assert(s != NULL);
+
+	if (s == NULL) {
+		return strdup("");
+	}
+	return strdup(s);
+}
+
+
+/*!
+ * \brief Processes the STag as defined by XML spec. 
+ */
+static int Parser_processSTag(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *node)
+{
+    char *pCurToken = NULL;
+    int rc;
+
+    if( Parser_getNextToken( xmlParser ) == 0 ) {
+        return IXML_SYNTAX_ERR;
+    }
+
+    pCurToken = ( xmlParser->tokenBuf ).buf;
+    if( pCurToken != NULL ) {
+        node->nodeName = safe_strdup( pCurToken );
+        if( node->nodeName == NULL ) {
+            return IXML_INSUFFICIENT_MEMORY;
+        }
+    } else {
+        return IXML_SYNTAX_ERR;
+    }
+
+    rc = Parser_setLastElem( xmlParser, node->nodeName );
+    if( rc != IXML_SUCCESS ) {
+	/* no need to free node->nodeName, main loop will free it */
         return IXML_FAILED;
     }
 
-    while( ( **pstrSrc )
-           && strncmp( *pstrSrc, strSkipKey,
-                       strlen( strSkipKey ) ) != 0 ) {
-        ( *pstrSrc )++;
+    rc = Parser_setNodePrefixAndLocalName( node );
+    if( rc != IXML_SUCCESS ) {
+	/* no need to free node->nodeName, main loop will free it */
+        return IXML_FAILED;
     }
 
-    if( **pstrSrc == '\0' ) {
+    node->nodeValue = NULL;
+    node->nodeType = eELEMENT_NODE;
+
+    xmlParser->savePtr = xmlParser->curPtr;
+    if( Parser_getNextToken( xmlParser ) == 0 ) {
+	/* no need to free node->nodeName, main loop will free it */
         return IXML_SYNTAX_ERR;
     }
-    *pstrSrc = *pstrSrc + strlen( strSkipKey );
 
-    return IXML_SUCCESS;        //success
+    pCurToken = ( xmlParser->tokenBuf ).buf;
+    /* check to see what is the next token */
+    if( strcmp( pCurToken, "/>" ) == 0 )
+    {
+	/* empty element */
+        xmlParser->state = eELEMENT;
+	/* backup to /> */
+        xmlParser->curPtr = xmlParser->savePtr;
+    } else if( strcmp( pCurToken, ">" ) == 0 )
+    {
+	/* expecting text node */
+        xmlParser->state = eCONTENT;
+    } else {
+        xmlParser->state = eATTRIBUTE;
+        xmlParser->curPtr = xmlParser->savePtr;
+    }
+
+    return IXML_SUCCESS;
 }
 
 
@@ -1441,620 +1203,6 @@ static int Parser_skipPI(
 
 
 /*!
- * \brief Skips XML declarations.
- */
-static int Parser_skipXMLDecl(
-	/*! [in,out] The XML parser. */
-	Parser *xmlParser)
-{
-    int rc = IXML_FAILED;
-
-    assert( xmlParser );
-    if( xmlParser == NULL ) {
-        return rc;
-    }
-
-    rc = Parser_skipString( &( xmlParser->curPtr ), END_PI );
-    Parser_skipWhiteSpaces( xmlParser );
-    return rc;
-}
-
-
-/*!
- * \brief Skip prolog.
- */
-static int Parser_skipProlog(
-	/*! [in,out] The XML parser. */
-	Parser *xmlParser)
-{
-    int rc = IXML_SUCCESS;
-
-    assert( xmlParser != NULL );
-    if( xmlParser == NULL ) {
-        return IXML_FAILED;
-    }
-
-    Parser_skipWhiteSpaces( xmlParser );
-
-    if( strncmp( xmlParser->curPtr, ( char * )XMLDECL, strlen( XMLDECL ) ) == 0 ) {
-        /* <?xml */
-        rc = Parser_skipXMLDecl( xmlParser );
-        if( rc != IXML_SUCCESS ) {
-            return rc;
-        }
-    }
-
-    rc = Parser_skipMisc( xmlParser );
-    if( ( rc == IXML_SUCCESS ) &&
-        strncmp( xmlParser->curPtr, ( char * )BEGIN_DOCTYPE, strlen( BEGIN_DOCTYPE ) ) == 0 ) {
-        // <! DOCTYPE
-        xmlParser->curPtr++;
-        rc = Parser_skipDocType( &( xmlParser->curPtr ) );
-    }
-
-    if( rc == IXML_SUCCESS ) {
-        rc = Parser_skipMisc( xmlParser );
-    }
-
-    return rc;
-}
-
-
-/*!
- * \brief Skips all characters in the string until it finds the skip key.
- * Then it skips the skip key and returns.
- */
-static int Parser_skipComment(
-	/*! [in,out] The pointer to the skipped point. */
-	char **pstrSrc)
-{
-    char *pStrFound = NULL;
-
-    assert( ( *pstrSrc ) != NULL );
-    if( *pstrSrc == NULL ) {
-        return IXML_FAILED;
-    }
-
-    pStrFound = strstr( *pstrSrc, END_COMMENT );
-    if( ( pStrFound != NULL ) && ( pStrFound != *pstrSrc ) &&
-        ( *( pStrFound - 1 ) != '-' ) ) {
-        *pstrSrc = pStrFound + strlen( END_COMMENT );
-    } else {
-        return IXML_SYNTAX_ERR;
-    }
-
-    return IXML_SUCCESS;
-}
-
-
-/*!
- * \brief Skips document type declaration
- */
-static int Parser_skipDocType(
-	/*! [in,out] The pointer to the skipped point. */
-	char **pstr)
-{
-    char *pCur = *pstr;
-    char *pNext = NULL;         // default there is no nested <
-    int num = 1;
-
-    assert( ( *pstr ) != NULL );
-    if( *pstr == NULL ) {
-        return IXML_FAILED;
-    }
-
-    while( ( pCur != NULL ) && ( num != 0 ) && ( *pCur != 0 ) ) {
-        if( *pCur == '<' ) {
-            num++;
-        } else if( *pCur == '>' ) {
-            num--;
-        } else if( *pCur == '"' ) {
-            pNext = strchr( pCur + 1, '"' );
-            if( pNext == NULL ) {
-                return IXML_SYNTAX_ERR;
-            }
-
-            pCur = pNext;
-        }
-
-        pCur++;
-    }
-
-    if( num == 0 ) {
-        *pstr = pCur;
-        return IXML_SUCCESS;
-    } else {
-        return IXML_SYNTAX_ERR;
-    }
-}
-
-
-/*!
- * \brief Skip comment, PI and white space.
- */
-static int Parser_skipMisc(
-	/*! [in] The XML parser. */
-	Parser *xmlParser)
-{
-    int rc = IXML_SUCCESS;
-    int done = FALSE;
-
-    while( ( done == FALSE ) && ( rc == IXML_SUCCESS ) ) {
-        if( strncasecmp( xmlParser->curPtr, ( char * )BEGIN_COMMENT, strlen( BEGIN_COMMENT ) ) == 0 ) {
-            // <!--
-            rc = Parser_skipComment( &( xmlParser->curPtr ) );
-
-        } else if( ( strncasecmp( xmlParser->curPtr, ( char * )XMLDECL, strlen( XMLDECL ) ) == 0 ) || ( strncasecmp( xmlParser->curPtr, ( char * )XMLDECL2, strlen( XMLDECL2 ) ) == 0 ) ) {
-            // <?xml or <?xml?
-            rc = IXML_SYNTAX_ERR;
-        } else if( strncasecmp( xmlParser->curPtr, ( char * )BEGIN_PI, strlen( BEGIN_PI ) ) == 0 ) {
-            // <?
-            rc = Parser_skipString( &( xmlParser->curPtr ), END_PI );
-        } else {
-            done = TRUE;
-        }
-
-        Parser_skipWhiteSpaces( xmlParser );
-    }
-
-    return rc;
-}
-
-
-/*!
- * \brief Return the length of next token in tokenBuff.
- */
-static int Parser_getNextToken(
-	/*! [in] The XML parser. */
-	Parser *xmlParser)
-{
-    int tokenLength = 0;
-    int temp,
-      tlen;
-    int rc;
-
-    Parser_clearTokenBuf( xmlParser );
-
-    if( *( xmlParser->curPtr ) == '\0' ) {
-        return 0;
-    }
-    // skip XML instructions
-    rc = Parser_skipMisc( xmlParser );
-    if( rc != IXML_SUCCESS ) {
-        return 0;
-    }
-    // Attribute value logic must come first, since all text untokenized until end-quote
-    if( *( xmlParser->curPtr ) == QUOTE ) {
-        tokenLength = 1;
-    } else if( *( xmlParser->curPtr ) == SINGLEQUOTE ) {
-        tokenLength = 1;
-    } else if( *( xmlParser->curPtr ) == LESSTHAN ) {   // Check for start tags
-        temp = Parser_UTF8ToInt( xmlParser->curPtr + 1, &tlen );
-        if( temp == '/' ) {
-            tokenLength = 2;    // token is '</' end tag
-        } else if( Parser_isNameChar( temp, FALSE ) == TRUE ) {
-            tokenLength = 1;    // '<' found, so return '<' token
-        } else {
-            return 0;           //error
-        }
-    } else if( *( xmlParser->curPtr ) == EQUALS ) { // Check for '=' token, return it as a token
-        tokenLength = 1;
-    } else if( *( xmlParser->curPtr ) == SLASH ) {
-        if( *( xmlParser->curPtr + 1 ) == GREATERTHAN ) {   // token '/>' found
-            tokenLength = 2;
-            xmlParser->savePtr = xmlParser->curPtr; // fix
-        }
-    } else if( *( xmlParser->curPtr ) == GREATERTHAN ) {    // > found, so return it as a token
-        tokenLength = 1;
-    } else if( Parser_isNameChar( Parser_UTF8ToInt( xmlParser->curPtr, &tlen ), FALSE ) ) { // Check for name tokens, name found, so find out how long it is
-        int iIndex = tlen;
-
-        while( Parser_isNameChar
-               ( Parser_UTF8ToInt( xmlParser->curPtr + iIndex, &tlen ),
-                 TRUE ) ) {
-            iIndex += tlen;
-        }
-        tokenLength = iIndex;
-    } else {
-        return 0;
-    }
-
-    // Copy the token to the return string
-    if( Parser_copyToken( xmlParser, xmlParser->curPtr, tokenLength ) !=
-        IXML_SUCCESS ) {
-        return 0;
-    }
-
-    xmlParser->curPtr += tokenLength;
-    return tokenLength;
-}
-
-
-/*!
- * \brief Return the namespce as defined as prefix.
- */
-static char *Parser_getNameSpace(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The prefix. */
-	const char *prefix)
-{
-    IXML_ElementStack *pCur;
-    IXML_NamespaceURI *pNsUri;
-
-    pCur = xmlParser->pCurElement;
-    if( strcmp( pCur->prefix, prefix ) != 0 ) {
-        pNsUri = pCur->pNsURI;
-        while( pNsUri != NULL ) {
-            if( strcmp( pNsUri->prefix, prefix ) == 0 ) {
-                return pNsUri->nsURI;
-            }
-            pNsUri = pNsUri->nextNsURI;
-        }
-    } else {
-        return pCur->namespaceUri;
-    }
-
-    return NULL;
-
-}
-
-
-/*!
- * \brief Add a namespace definition.
- */
-static int Parser_addNamespace(
-	/*! [in] The XML parser. */
-	Parser *xmlParser)
-{
-    IXML_Node *pNode;
-    IXML_ElementStack *pCur;
-    const char *namespaceUri;
-
-    pNode = xmlParser->pNeedPrefixNode;
-    pCur = xmlParser->pCurElement;
-
-    if( pNode->prefix == NULL ) {   // element does not have prefix
-        if( strcmp( pNode->nodeName, pCur->element ) != 0 ) {
-            return IXML_FAILED;
-        }
-        if( pCur->namespaceUri != NULL ) {
-            // it would be wrong that pNode->namespace != NULL.
-            assert( pNode->namespaceURI == NULL );
-
-            pNode->namespaceURI = safe_strdup( pCur->namespaceUri );
-            if( pNode->namespaceURI == NULL ) {
-                return IXML_INSUFFICIENT_MEMORY;
-            }
-        }
-
-        xmlParser->pNeedPrefixNode = NULL;
-
-    } else {
-        if( ( strcmp( pNode->nodeName, pCur->element ) != 0 ) &&
-            ( strcmp( pNode->prefix, pCur->prefix ) != 0 ) ) {
-            return IXML_FAILED;
-        }
-
-        namespaceUri = Parser_getNameSpace( xmlParser, pCur->prefix );
-        if( namespaceUri != NULL ) {
-            pNode->namespaceURI = safe_strdup( namespaceUri );
-            if( pNode->namespaceURI == NULL ) {
-                return IXML_INSUFFICIENT_MEMORY;
-            }
-
-            xmlParser->pNeedPrefixNode = NULL;
-        }
-    }
-    return IXML_SUCCESS;
-}
-
-
-/*!
- * \brief Set the node prefix and localName as defined by the nodeName in the
- * form of ns:name.
- */
-int Parser_setNodePrefixAndLocalName(
-	/*! [in,out] The Node to process. */
-	IXML_Node *node)
-{
-    char *pStrPrefix = NULL;
-    char *pLocalName;
-    int nPrefix;
-
-    assert( node != NULL );
-    if( node == NULL ) {
-        return IXML_FAILED;
-    }
-
-    pStrPrefix = strchr( node->nodeName, ':' );
-    if( pStrPrefix == NULL ) {
-        node->prefix = NULL;
-        node->localName = safe_strdup( node->nodeName );
-        if( node->localName == NULL ) {
-            return IXML_INSUFFICIENT_MEMORY;
-        }
-
-    } else {                    // fill in the local name and prefix
-
-        pLocalName = ( char * )pStrPrefix + 1;
-        nPrefix = pStrPrefix - node->nodeName;
-        node->prefix = malloc( nPrefix + 1 );
-        if( node->prefix == NULL ) {
-            return IXML_INSUFFICIENT_MEMORY;
-        }
-
-        memset( node->prefix, 0, nPrefix + 1 );
-        strncpy( node->prefix, node->nodeName, nPrefix );
-
-        node->localName = safe_strdup( pLocalName );
-        if( node->localName == NULL ) {
-            free( node->prefix );
-            node->prefix = NULL;    //no need to free really, main loop will frees it
-            //when return code is not success
-            return IXML_INSUFFICIENT_MEMORY;
-        }
-    }
-
-    return IXML_SUCCESS;
-}
-
-
-/*!
- * \brief Add namespace definition. 
- */
-static int Parser_xmlNamespace(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The Node to process. */
-	IXML_Node *newNode)
-{
-	IXML_ElementStack *pCur = xmlParser->pCurElement;
-	IXML_NamespaceURI *pNewNs = NULL;
-	IXML_NamespaceURI *pNs = NULL;
-	IXML_NamespaceURI *pPrevNs = NULL;
-	int ret = IXML_SUCCESS;
-	int line = 0;
-
-	/* if the newNode contains a namespace definition */
-	assert(newNode->nodeName != NULL);
-
-	if (strcmp(newNode->nodeName, "xmlns") == 0) {
-		/* default namespace def. */
-		if (pCur->namespaceUri != NULL) {
-			free(pCur->namespaceUri);
-		}
-		pCur->namespaceUri = safe_strdup(newNode->nodeValue);
-		if (pCur->namespaceUri == NULL) {
-			ret = IXML_INSUFFICIENT_MEMORY;
-			line = __LINE__;
-			goto ExitFunction;
-		}
-	} else if (strncmp(newNode->nodeName, "xmlns:", strlen("xmlns:")) == 0) {
-		/* namespace definition */
-		ret = Parser_setNodePrefixAndLocalName(newNode);
-		if (ret != IXML_SUCCESS) {
-			line = __LINE__;
-			goto ExitFunction;
-		}
-
-		assert(newNode->localName != NULL);
-
-		if (pCur == NULL) {
-			ret = IXML_FAILED;
-			line = __LINE__;
-			goto ExitFunction;
-		}
-		if (pCur->prefix != NULL &&
-		    strcmp(pCur->prefix, newNode->localName) == 0) {
-			pCur->namespaceUri = safe_strdup(newNode->nodeValue);
-			if (pCur->namespaceUri == NULL) {
-				ret = IXML_INSUFFICIENT_MEMORY;
-				line = __LINE__;
-				goto ExitFunction;
-			}
-		} else {
-			pPrevNs = pCur->pNsURI;
-			pNs = pPrevNs;
-			while (pNs != NULL) {
-				if (pNs->prefix != NULL &&
-				    strcmp(pNs->prefix, newNode->localName) == 0) {
-					/* replace namespace definition */
-					break;
-				} else {
-					pPrevNs = pNs;
-					pNs = pNs->nextNsURI;
-				}
-			}
-			if (pNs == NULL) {
-				/* a new definition */
-				pNewNs = (IXML_NamespaceURI *)
-					malloc(sizeof (IXML_NamespaceURI));
-				if (pNewNs == NULL) {
-					ret = IXML_INSUFFICIENT_MEMORY;
-					line = __LINE__;
-					goto ExitFunction;
-				}
-				memset(pNewNs, 0, sizeof (IXML_NamespaceURI));
-				pNewNs->prefix = safe_strdup(newNode->localName);
-				if (pNewNs->prefix == NULL) {
-					free(pNewNs);
-					ret = IXML_INSUFFICIENT_MEMORY;
-					line = __LINE__;
-					goto ExitFunction;
-				}
-				pNewNs->nsURI = safe_strdup(newNode->nodeValue);
-				if (pNewNs->nsURI == NULL) {
-					Parser_freeNsURI(pNewNs);
-					free(pNewNs);
-					ret = IXML_INSUFFICIENT_MEMORY;
-					line = __LINE__;
-					goto ExitFunction;
-				}
-				if (pCur->pNsURI == NULL) {
-					pCur->pNsURI = pNewNs;
-				} else {
-					pPrevNs->nextNsURI = pNewNs;
-				}
-			} else {
-				/* udpate the namespace */
-				if (pNs->nsURI != NULL) {
-					free(pNs->nsURI);
-				}
-				pNs->nsURI = safe_strdup(newNode->nodeValue);
-				if (pNs->nsURI == NULL) {
-					ret = IXML_INSUFFICIENT_MEMORY;
-					line = __LINE__;
-					goto ExitFunction;
-				}
-			}
-		}
-	}
-	if (xmlParser->pNeedPrefixNode != NULL) {
-		ret = Parser_addNamespace(xmlParser);
-		line = __LINE__;
-		goto ExitFunction;
-	}
-
-ExitFunction:
-	if (ret != IXML_SUCCESS && ret != IXML_FILE_DONE) {
-		IxmlPrintf(__FILE__, line, "Parser_xmlNamespace", "Error %d\n", ret);
-	}
-
-	return ret;
-}
-
-
-/*!
- * \brief Processes the STag as defined by XML spec. 
- */
-static int Parser_processSTag(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The Node to process. */
-	IXML_Node *node)
-{
-    char *pCurToken = NULL;
-    int rc;
-
-    if( Parser_getNextToken( xmlParser ) == 0 ) {
-        return IXML_SYNTAX_ERR;
-    }
-
-    pCurToken = ( xmlParser->tokenBuf ).buf;
-    if( pCurToken != NULL ) {
-        node->nodeName = safe_strdup( pCurToken );
-        if( node->nodeName == NULL ) {
-            return IXML_INSUFFICIENT_MEMORY;
-        }
-    } else {
-        return IXML_SYNTAX_ERR;
-    }
-
-    rc = Parser_setLastElem( xmlParser, node->nodeName );
-    if( rc != IXML_SUCCESS ) {  // no need to free node->nodeName, main loop will free it
-        return IXML_FAILED;
-    }
-
-    rc = Parser_setNodePrefixAndLocalName( node );
-    if( rc != IXML_SUCCESS ) {  // no need to free node->nodeName, main loop will free it
-        return IXML_FAILED;
-    }
-
-    node->nodeValue = NULL;
-    node->nodeType = eELEMENT_NODE;
-
-    xmlParser->savePtr = xmlParser->curPtr;
-    if( Parser_getNextToken( xmlParser ) == 0 ) {
-        // no need to free node->nodeName, main loop will free it
-        return IXML_SYNTAX_ERR;
-    }
-
-    pCurToken = ( xmlParser->tokenBuf ).buf;
-    // check to see what is the next token
-    if( strcmp( pCurToken, "/>" ) == 0 )    // empty element 
-    {
-        xmlParser->state = eELEMENT;
-        xmlParser->curPtr = xmlParser->savePtr; // backup to /> 
-    } else if( strcmp( pCurToken, ">" ) == 0 )  // expecting text node
-    {
-        xmlParser->state = eCONTENT;
-    } else {
-        xmlParser->state = eATTRIBUTE;
-        xmlParser->curPtr = xmlParser->savePtr;
-    }
-
-    return IXML_SUCCESS;
-}
-
-
-/*!
- * \brief Decide whether the current element has default namespace
- */
-static BOOL Parser_hasDefaultNamespace(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The Node to process. */
-	IXML_Node *newNode,
-	/*! [in,out] The name space URI. */
-	char **nsURI )
-{
-    IXML_ElementStack *pCur = xmlParser->pCurElement;
-
-    while( pCur != NULL ) {
-        if( ( pCur->prefix == NULL ) && ( pCur->namespaceUri != NULL ) ) {
-            *nsURI = pCur->namespaceUri;
-            return TRUE;
-        } else {
-            pCur = pCur->nextElement;
-        }
-    }
-
-    return FALSE;
-}
-
-
-/*!
- * \brief Decides whether element's prefix is already defined.
- */
-static BOOL Parser_ElementPrefixDefined(
-	/*! [in] The XML parser. */
-	Parser *xmlParser,
-	/*! [in] The Node to process. */
-	IXML_Node *newNode,
-	/*! [in,out] The name space URI. */
-	char **nsURI )
-{
-    IXML_ElementStack *pCur = xmlParser->pCurElement;
-    IXML_NamespaceURI *pNsUri;
-
-    while( pCur != NULL ) {
-        if( ( pCur->prefix != NULL )
-            && ( strcmp( pCur->prefix, newNode->prefix ) == 0 ) ) {
-            *nsURI = pCur->namespaceUri;
-            return TRUE;
-        } else {
-            pNsUri = pCur->pNsURI;
-
-            while( pNsUri != NULL ) {
-                if( strcmp( pNsUri->prefix, newNode->prefix ) == 0 ) {
-                    *nsURI = pNsUri->nsURI;
-                    return TRUE;
-                } else {
-                    pNsUri = pNsUri->nextNsURI;
-                }
-            }
-        }
-
-        pCur = pCur->nextElement;
-
-    }
-
-    return FALSE;
-}
-
-
-/*!
  * \brief Processes CDSection as defined by XML spec.
  *
  * \return
@@ -2066,7 +1214,7 @@ static int Parser_processCDSect(
 	IXML_Node *node)
 {
     char *pEnd;
-    int tokenLength = 0;
+    size_t tokenLength = 0;
     char *pCDataStart;
 
     if( *pSrc == NULL ) {
@@ -2084,18 +1232,18 @@ static int Parser_processCDSect(
     }
 
     if( ( pEnd - pCDataStart > 0 ) && ( *pEnd != '\0' ) ) {
-        tokenLength = pEnd - pCDataStart;
-        node->nodeValue = ( char * )malloc( tokenLength + 1 );
+        tokenLength = (size_t)(pEnd - pCDataStart);
+        node->nodeValue = (char *)malloc(tokenLength + 1);
         if( node->nodeValue == NULL ) {
             return IXML_INSUFFICIENT_MEMORY;
         }
-        strncpy( node->nodeValue, pCDataStart, tokenLength );
+        strncpy(node->nodeValue, pCDataStart, tokenLength);
         node->nodeValue[tokenLength] = '\0';
 
         node->nodeName = safe_strdup( CDATANODENAME );
         if( node->nodeName == NULL ) {
-            // no need to free node->nodeValue at all, bacause node contents
-            // will be freed by the main loop.
+            /* no need to free node->nodeValue at all, bacause node contents
+	     * will be freed by the main loop. */
             return IXML_INSUFFICIENT_MEMORY;
         }
 
@@ -2105,30 +1253,6 @@ static int Parser_processCDSect(
     } else {
         return IXML_SYNTAX_ERR;
     }
-}
-
-
-/*!
- * \brief Set element's namespace.
- */
-static int Parser_setElementNamespace(
-	/*! [in] The Element Node to process. */
-	IXML_Element *newElement,
-	/*! [in] The name space string. */
-	const char *nsURI)
-{
-    if( newElement != NULL ) {
-        if( newElement->n.namespaceURI != NULL ) {
-            return IXML_SYNTAX_ERR;
-        } else {
-            ( newElement->n ).namespaceURI = safe_strdup( nsURI );
-            if( ( newElement->n ).namespaceURI == NULL ) {
-                return IXML_INSUFFICIENT_MEMORY;
-            }
-        }
-    }
-
-    return IXML_SUCCESS;
 }
 
 
@@ -2145,8 +1269,8 @@ static int Parser_processContent(
 	int line = 0;
 	char *pEndContent;
 	BOOL bReadContent;
-	int tokenLength;
-	char *notAllowed = "]]>";
+	ptrdiff_t tokenLength;
+	const char *notAllowed = "]]>";
 	char *pCurToken = NULL;
 
 	/* save pointer for backup */
@@ -2327,90 +1451,6 @@ ExitFunction:
 
 
 /*!
- * \brief Frees one ElementStack item.
- */
-static void Parser_freeElementStackItem(
-	/*! [in] The element stack item to free. */
-	IXML_ElementStack *pItem)
-{
-    assert( pItem != NULL );
-    if( pItem->element != NULL ) {
-        free( pItem->element );
-        pItem->element = NULL;
-    }
-    if( pItem->namespaceUri != NULL ) {
-        free( pItem->namespaceUri );
-        pItem->namespaceUri = NULL;
-    }
-    if( pItem->prefix != NULL ) {
-        free( pItem->prefix );
-        pItem->prefix = NULL;
-    }
-}
-
-
-/*!
- * \brief Frees namespaceURI item.
- */
-static void Parser_freeNsURI(
-	/*! [in] The name space URI item to free. */
-	IXML_NamespaceURI *pNsURI)
-{
-    assert( pNsURI != NULL );
-    if( pNsURI->nsURI != NULL ) {
-        free( pNsURI->nsURI );
-    }
-    if( pNsURI->prefix != NULL ) {
-        free( pNsURI->prefix );
-    }
-}
-
-
-/*!
- * \brief Frees all temporary memory allocated by xmlparser.
- */
-static void Parser_free(
-	/*! [in] The XML parser. */
-	Parser *xmlParser)
-{
-    IXML_ElementStack *pElement;
-    IXML_ElementStack *pNextElement;
-    IXML_NamespaceURI *pNsURI;
-    IXML_NamespaceURI *pNextNsURI;
-
-    if( xmlParser == NULL ) {
-        return;
-    }
-
-    if( xmlParser->dataBuffer != NULL ) {
-        free( xmlParser->dataBuffer );
-    }
-
-    ixml_membuf_destroy( &( xmlParser->tokenBuf ) );
-    ixml_membuf_destroy( &( xmlParser->lastElem ) );
-
-    pElement = xmlParser->pCurElement;
-    while( pElement != NULL ) {
-        Parser_freeElementStackItem( pElement );
-
-        pNsURI = pElement->pNsURI;
-        while( pNsURI != NULL ) {
-            pNextNsURI = pNsURI->nextNsURI;
-            Parser_freeNsURI( pNsURI );
-            free( pNsURI );
-            pNsURI = pNextNsURI;
-        }
-
-        pNextElement = pElement->nextElement;
-        free( pElement );
-        pElement = pNextElement;
-    }
-
-    free( xmlParser );
-}
-
-
-/*!
  * \brief Unimplemented function.
  *
  * \return IXML_SUCCESS.
@@ -2419,8 +1459,215 @@ static int Parser_parseReference(
 	/*! [in] Currently unused. */
 	char *pStr)
 {
-	// place holder for future implementation
+	/* place holder for future implementation */
 	return IXML_SUCCESS;
+	pStr = pStr;
+}
+
+
+/*!
+ * \brief Return the namespce as defined as prefix.
+ */
+static char *Parser_getNameSpace(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The prefix. */
+	const char *prefix)
+{
+    IXML_ElementStack *pCur;
+    IXML_NamespaceURI *pNsUri;
+
+    pCur = xmlParser->pCurElement;
+    if( strcmp( pCur->prefix, prefix ) != 0 ) {
+        pNsUri = pCur->pNsURI;
+        while( pNsUri != NULL ) {
+            if( strcmp( pNsUri->prefix, prefix ) == 0 ) {
+                return pNsUri->nsURI;
+            }
+            pNsUri = pNsUri->nextNsURI;
+        }
+    } else {
+        return pCur->namespaceUri;
+    }
+
+    return NULL;
+
+}
+
+
+/*!
+ * \brief Add a namespace definition.
+ */
+static int Parser_addNamespace(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
+{
+    IXML_Node *pNode;
+    IXML_ElementStack *pCur;
+    const char *namespaceUri;
+
+    pNode = xmlParser->pNeedPrefixNode;
+    pCur = xmlParser->pCurElement;
+
+    if( pNode->prefix == NULL ) {
+	/* element does not have prefix */
+        if( strcmp( pNode->nodeName, pCur->element ) != 0 ) {
+            return IXML_FAILED;
+        }
+        if( pCur->namespaceUri != NULL ) {
+            /* it would be wrong that pNode->namespace != NULL. */
+            assert( pNode->namespaceURI == NULL );
+
+            pNode->namespaceURI = safe_strdup( pCur->namespaceUri );
+            if( pNode->namespaceURI == NULL ) {
+                return IXML_INSUFFICIENT_MEMORY;
+            }
+        }
+
+        xmlParser->pNeedPrefixNode = NULL;
+
+    } else {
+        if( ( strcmp( pNode->nodeName, pCur->element ) != 0 ) &&
+            ( strcmp( pNode->prefix, pCur->prefix ) != 0 ) ) {
+            return IXML_FAILED;
+        }
+
+        namespaceUri = Parser_getNameSpace( xmlParser, pCur->prefix );
+        if( namespaceUri != NULL ) {
+            pNode->namespaceURI = safe_strdup( namespaceUri );
+            if( pNode->namespaceURI == NULL ) {
+                return IXML_INSUFFICIENT_MEMORY;
+            }
+
+            xmlParser->pNeedPrefixNode = NULL;
+        }
+    }
+    return IXML_SUCCESS;
+}
+
+
+/*!
+ * \brief Add namespace definition. 
+ */
+static int Parser_xmlNamespace(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode)
+{
+	IXML_ElementStack *pCur = xmlParser->pCurElement;
+	IXML_NamespaceURI *pNewNs = NULL;
+	IXML_NamespaceURI *pNs = NULL;
+	IXML_NamespaceURI *pPrevNs = NULL;
+	int ret = IXML_SUCCESS;
+	int line = 0;
+
+	/* if the newNode contains a namespace definition */
+	assert(newNode->nodeName != NULL);
+
+	if (strcmp(newNode->nodeName, "xmlns") == 0) {
+		/* default namespace def. */
+		if (pCur->namespaceUri != NULL) {
+			free(pCur->namespaceUri);
+		}
+		pCur->namespaceUri = safe_strdup(newNode->nodeValue);
+		if (pCur->namespaceUri == NULL) {
+			ret = IXML_INSUFFICIENT_MEMORY;
+			line = __LINE__;
+			goto ExitFunction;
+		}
+	} else if (strncmp(newNode->nodeName, "xmlns:", strlen("xmlns:")) == 0) {
+		/* namespace definition */
+		ret = Parser_setNodePrefixAndLocalName(newNode);
+		if (ret != IXML_SUCCESS) {
+			line = __LINE__;
+			goto ExitFunction;
+		}
+
+		assert(newNode->localName != NULL);
+
+		if (pCur == NULL) {
+			ret = IXML_FAILED;
+			line = __LINE__;
+			goto ExitFunction;
+		}
+		if (pCur->prefix != NULL &&
+		    strcmp(pCur->prefix, newNode->localName) == 0) {
+			pCur->namespaceUri = safe_strdup(newNode->nodeValue);
+			if (pCur->namespaceUri == NULL) {
+				ret = IXML_INSUFFICIENT_MEMORY;
+				line = __LINE__;
+				goto ExitFunction;
+			}
+		} else {
+			pPrevNs = pCur->pNsURI;
+			pNs = pPrevNs;
+			while (pNs != NULL) {
+				if (pNs->prefix != NULL &&
+				    strcmp(pNs->prefix, newNode->localName) == 0) {
+					/* replace namespace definition */
+					break;
+				} else {
+					pPrevNs = pNs;
+					pNs = pNs->nextNsURI;
+				}
+			}
+			if (pNs == NULL) {
+				/* a new definition */
+				pNewNs = (IXML_NamespaceURI *)
+					malloc(sizeof (IXML_NamespaceURI));
+				if (pNewNs == NULL) {
+					ret = IXML_INSUFFICIENT_MEMORY;
+					line = __LINE__;
+					goto ExitFunction;
+				}
+				memset(pNewNs, 0, sizeof (IXML_NamespaceURI));
+				pNewNs->prefix = safe_strdup(newNode->localName);
+				if (pNewNs->prefix == NULL) {
+					free(pNewNs);
+					ret = IXML_INSUFFICIENT_MEMORY;
+					line = __LINE__;
+					goto ExitFunction;
+				}
+				pNewNs->nsURI = safe_strdup(newNode->nodeValue);
+				if (pNewNs->nsURI == NULL) {
+					Parser_freeNsURI(pNewNs);
+					free(pNewNs);
+					ret = IXML_INSUFFICIENT_MEMORY;
+					line = __LINE__;
+					goto ExitFunction;
+				}
+				if (pCur->pNsURI == NULL) {
+					pCur->pNsURI = pNewNs;
+				} else {
+					pPrevNs->nextNsURI = pNewNs;
+				}
+			} else {
+				/* udpate the namespace */
+				if (pNs->nsURI != NULL) {
+					free(pNs->nsURI);
+				}
+				pNs->nsURI = safe_strdup(newNode->nodeValue);
+				if (pNs->nsURI == NULL) {
+					ret = IXML_INSUFFICIENT_MEMORY;
+					line = __LINE__;
+					goto ExitFunction;
+				}
+			}
+		}
+	}
+	if (xmlParser->pNeedPrefixNode != NULL) {
+		ret = Parser_addNamespace(xmlParser);
+		line = __LINE__;
+		goto ExitFunction;
+	}
+
+ExitFunction:
+	if (ret != IXML_SUCCESS && ret != IXML_FILE_DONE) {
+		IxmlPrintf(__FILE__, line, "Parser_xmlNamespace", "Error %d\n", ret);
+	}
+
+	return ret;
 }
 
 
@@ -2437,7 +1684,7 @@ static int Parser_processAttribute(
 {
 	int ret = IXML_SUCCESS;
 	int line = 0;
-	int tlen = 0;
+	ptrdiff_t tlen = 0;
 	char *strEndQuote = NULL;
 	char *pCur = NULL;
 	char *pCurToken = NULL;
@@ -2598,7 +1845,7 @@ static int Parser_getNextNode(
 	char *lastElement = NULL;
 	IXML_ERRORCODE ret = IXML_SUCCESS;
 	int line = 0;
-	int tokenLen = 0;
+	ptrdiff_t tokenLen = 0;
 
 	/* endof file reached? */
 	if (*(xmlParser->curPtr) == '\0') {
@@ -2681,5 +1928,748 @@ ExitFunction:
 	}
 
 	return ret;
+}
+
+
+/*!
+ * \brief Decides whether element's prefix is already defined.
+ */
+static BOOL Parser_ElementPrefixDefined(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode,
+	/*! [in,out] The name space URI. */
+	char **nsURI )
+{
+    IXML_ElementStack *pCur = xmlParser->pCurElement;
+    IXML_NamespaceURI *pNsUri;
+
+    while( pCur != NULL ) {
+        if( ( pCur->prefix != NULL )
+            && ( strcmp( pCur->prefix, newNode->prefix ) == 0 ) ) {
+            *nsURI = pCur->namespaceUri;
+            return TRUE;
+        } else {
+            pNsUri = pCur->pNsURI;
+
+            while( pNsUri != NULL ) {
+                if( strcmp( pNsUri->prefix, newNode->prefix ) == 0 ) {
+                    *nsURI = pNsUri->nsURI;
+                    return TRUE;
+                } else {
+                    pNsUri = pNsUri->nextNsURI;
+                }
+            }
+        }
+
+        pCur = pCur->nextElement;
+
+    }
+
+    return FALSE;
+}
+
+
+/*!
+ * \brief Set element's namespace.
+ */
+static int Parser_setElementNamespace(
+	/*! [in] The Element Node to process. */
+	IXML_Element *newElement,
+	/*! [in] The name space string. */
+	const char *nsURI)
+{
+    if( newElement != NULL ) {
+        if( newElement->n.namespaceURI != NULL ) {
+            return IXML_SYNTAX_ERR;
+        } else {
+            ( newElement->n ).namespaceURI = safe_strdup( nsURI );
+            if( ( newElement->n ).namespaceURI == NULL ) {
+                return IXML_INSUFFICIENT_MEMORY;
+            }
+        }
+    }
+
+    return IXML_SUCCESS;
+}
+
+
+/*!
+ * \brief Reports whether the new attribute is the same as an existing one.
+ *
+ * \return TRUE if the new attribute is the same as an existing one.
+ */
+static int isDuplicateAttribute(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The node attribute to compare. */
+	IXML_Node *newAttrNode)
+{
+    IXML_Node *elementNode = NULL;
+    IXML_Node *attrNode = NULL;
+
+    elementNode = xmlParser->currentNodePtr;
+    attrNode = elementNode->firstAttr;
+    while( attrNode != NULL ) {
+        if( strcmp( attrNode->nodeName, newAttrNode->nodeName ) == 0 ) {
+            return TRUE;
+        }
+
+        attrNode = attrNode->nextSibling;
+    }
+
+    return FALSE;
+}
+
+
+/*!
+ * \brief Processes the attribute name.
+ *
+ * \return IXML_SUCCESS if successful, otherwise or an error code.
+ */
+static int Parser_processAttributeName(
+	/*! [in] The XML document. */
+	IXML_Document *rootDoc,
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode)
+{
+    IXML_Attr *attr = NULL;
+    int rc = IXML_SUCCESS;
+
+    if( isDuplicateAttribute( xmlParser, newNode ) == TRUE ) {
+        return IXML_SYNTAX_ERR;
+    }
+
+    rc = ixmlDocument_createAttributeEx( rootDoc, newNode->nodeName, &attr );
+    if( rc != IXML_SUCCESS ) {
+        return rc;
+    }
+
+    rc = ixmlNode_setNodeProperties( ( IXML_Node * ) attr, newNode );
+    if( rc != IXML_SUCCESS ) {
+        return rc;
+    }
+
+    rc = ixmlElement_setAttributeNode(
+	(IXML_Element *)xmlParser->currentNodePtr, attr, NULL );
+    return rc;
+}
+
+
+/*!
+ * \brief Push a new element onto element stack.
+ *
+ * \return 
+ */
+static int Parser_pushElement(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The element node to push. */
+	IXML_Node *newElement)
+{
+    IXML_ElementStack *pCurElement = NULL;
+    IXML_ElementStack *pNewStackElement = NULL;
+
+    assert( newElement );
+    if( newElement != NULL ) {
+        /* push new element */
+        pNewStackElement =
+            ( IXML_ElementStack * ) malloc( sizeof( IXML_ElementStack ) );
+        if( pNewStackElement == NULL ) {
+            return IXML_INSUFFICIENT_MEMORY;
+        }
+
+        memset( pNewStackElement, 0, sizeof( IXML_ElementStack ) );
+        /* the element member includes both prefix and name */
+
+        pNewStackElement->element = safe_strdup( newElement->nodeName );
+        if( pNewStackElement->element == NULL ) {
+            free( pNewStackElement );
+            return IXML_INSUFFICIENT_MEMORY;
+        }
+
+        if( newElement->prefix != 0 ) {
+            pNewStackElement->prefix = safe_strdup( newElement->prefix );
+            if( pNewStackElement->prefix == NULL ) {
+                Parser_freeElementStackItem( pNewStackElement );
+                free( pNewStackElement );
+                return IXML_INSUFFICIENT_MEMORY;
+            }
+        }
+
+        if( newElement->namespaceURI != 0 ) {
+            pNewStackElement->namespaceUri =
+                safe_strdup( newElement->namespaceURI );
+            if( pNewStackElement->namespaceUri == NULL ) {
+                Parser_freeElementStackItem( pNewStackElement );
+                free( pNewStackElement );
+                return IXML_INSUFFICIENT_MEMORY;
+            }
+        }
+
+        pCurElement = xmlParser->pCurElement;
+
+        /* insert the new element into the top of the stack */
+        pNewStackElement->nextElement = pCurElement;
+        xmlParser->pCurElement = pNewStackElement;
+
+    }
+
+    return IXML_SUCCESS;
+}
+
+
+/*!
+ * \brief Reports whether there is a top level element in the parser.
+ *
+ * \return TRUE if there is a top level element in the parser.
+ */
+static int isTopLevelElement(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
+{
+    assert(xmlParser);
+    return xmlParser->pCurElement == NULL;
+}
+
+
+/*!
+ * \brief Decide whether the current element has default namespace
+ */
+static BOOL Parser_hasDefaultNamespace(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode,
+	/*! [in,out] The name space URI. */
+	char **nsURI )
+{
+    IXML_ElementStack *pCur = xmlParser->pCurElement;
+
+    while( pCur != NULL ) {
+        if( ( pCur->prefix == NULL ) && ( pCur->namespaceUri != NULL ) ) {
+            *nsURI = pCur->namespaceUri;
+            return TRUE;
+        } else {
+            pCur = pCur->nextElement;
+        }
+    }
+
+    return FALSE;
+    newNode = newNode;
+}
+
+
+/*!
+ * \brief Processes element name.
+ *
+ * \return IXML_SUCCESS if successful, otherwise or an error code.
+ */
+static int Parser_processElementName(
+	/*! [in] The XML document. */
+	IXML_Document *rootDoc,
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode )
+{
+    IXML_Element *newElement = NULL;
+    char *nsURI = NULL;
+    int rc = IXML_SUCCESS;
+
+    if( xmlParser->bHasTopLevel == TRUE ) {
+        if( isTopLevelElement( xmlParser ) == TRUE ) {
+            return IXML_SYNTAX_ERR;
+        }
+    } else {
+        xmlParser->bHasTopLevel = TRUE;
+    }
+
+    xmlParser->savePtr = xmlParser->curPtr;
+    rc = ixmlDocument_createElementEx( rootDoc, newNode->nodeName, &newElement );
+    if( rc != IXML_SUCCESS ) {
+        return rc;
+    }
+
+    rc = ixmlNode_setNodeProperties( ( IXML_Node * ) newElement, newNode );
+    if( rc != IXML_SUCCESS ) {
+        ixmlElement_free( newElement );
+        return rc;
+    }
+
+    if (newNode->prefix) {
+	/* element has namespace prefix */
+        if (!Parser_ElementPrefixDefined(xmlParser, newNode, &nsURI)) {
+            /* read next node to see whether it includes namespace definition */
+            xmlParser->pNeedPrefixNode = (IXML_Node *)newElement;
+        } else {
+	    /* fill in the namespace */
+            Parser_setElementNamespace( newElement, nsURI );
+        }
+    } else {
+	/* does element has default namespace */
+        /* the node may have default namespace definition */
+        if (Parser_hasDefaultNamespace(xmlParser, newNode, &nsURI)) {
+            Parser_setElementNamespace(newElement, nsURI);
+        } else if (xmlParser->state == eATTRIBUTE) {
+            /* the default namespace maybe defined later */
+            xmlParser->pNeedPrefixNode = (IXML_Node *)newElement;
+        }
+    }
+
+    rc = ixmlNode_appendChild(xmlParser->currentNodePtr, (IXML_Node *)newElement);
+    if (rc != IXML_SUCCESS) {
+        ixmlElement_free(newElement);
+        return rc;
+    }
+
+    xmlParser->currentNodePtr = ( IXML_Node * ) newElement;
+
+    /* push element to stack */
+    rc = Parser_pushElement( xmlParser, ( IXML_Node * ) newElement );
+    return rc;
+}
+
+
+/*!
+ * \brief Check if a new node->nodeName matches top of element stack.
+ *
+ * \return TRUE if matches.
+ */
+static int Parser_isValidEndElement(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The node. */
+	IXML_Node *newNode)
+{
+	assert(xmlParser);
+	assert(xmlParser->pCurElement->element);
+	assert(newNode);
+	assert(newNode->nodeName);
+
+	if (xmlParser->pCurElement == NULL) {
+		return 0;
+	}
+
+	return strcmp(xmlParser->pCurElement->element, newNode->nodeName) == 0;
+}
+
+
+/*!
+ * \brief Remove element from element stack.
+ */
+static void Parser_popElement(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
+{
+	IXML_ElementStack *pCur = NULL;
+	IXML_NamespaceURI *pnsUri = NULL;
+	IXML_NamespaceURI *pNextNS = NULL;
+
+	pCur = xmlParser->pCurElement;
+	if (pCur != NULL) {
+		xmlParser->pCurElement = pCur->nextElement;
+		Parser_freeElementStackItem(pCur);
+		pnsUri = pCur->pNsURI;
+		while (pnsUri != NULL) {
+			pNextNS = pnsUri->nextNsURI;
+			Parser_freeNsURI(pnsUri);
+			free(pnsUri);
+			pnsUri = pNextNS;
+		}
+		free(pCur);
+	}
+}
+
+
+/*!
+ * \brief Verifies endof element tag is the same as the openning element tag.
+ */
+static int Parser_eTagVerification(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The Node to process. */
+	IXML_Node *newNode)
+{
+    assert( newNode->nodeName );
+    assert( xmlParser->currentNodePtr );
+
+    if( newNode->nodeType == eELEMENT_NODE ) {
+        if( Parser_isValidEndElement( xmlParser, newNode ) == TRUE ) {
+            Parser_popElement( xmlParser );
+        } else {
+	    /* syntax error */
+            return IXML_SYNTAX_ERR;
+        }
+    }
+
+    if( strcmp( newNode->nodeName, xmlParser->currentNodePtr->nodeName ) ==
+        0 ) {
+        xmlParser->currentNodePtr = xmlParser->currentNodePtr->parentNode;
+    } else {
+        return IXML_SYNTAX_ERR;
+    }
+
+    return IXML_SUCCESS;
+}
+
+
+/*!
+ * \brief Parses the xml file and returns the DOM document tree.
+ *
+ * \return
+ */
+static int Parser_parseDocument(
+	/*! [out] The XML document. */
+	IXML_Document **retDoc,
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
+{
+    IXML_Document *gRootDoc = NULL;
+    IXML_Node newNode;
+    BOOL bETag = FALSE;
+    IXML_Node *tempNode = NULL;
+    int rc = IXML_SUCCESS;
+    IXML_CDATASection *cdataSecNode = NULL;
+
+    /* It is important that the node gets initialized here, otherwise things
+     * can go wrong on the error handler. */
+    ixmlNode_init( &newNode );
+
+    rc = ixmlDocument_createDocumentEx( &gRootDoc );
+    if( rc != IXML_SUCCESS ) {
+        goto ErrorHandler;
+    }
+
+    xmlParser->currentNodePtr = ( IXML_Node * ) gRootDoc;
+
+    rc = Parser_skipProlog( xmlParser );
+    if( rc != IXML_SUCCESS ) {
+        goto ErrorHandler;
+    }
+
+    while( bETag == FALSE ) {
+        /* clear the newNode contents. Redundant on the first iteration,
+	 * but nonetheless, necessary due to the possible calls to
+	 * ErrorHandler above. Currently, this is just a memset to zero. */
+        ixmlNode_init( &newNode );
+
+        if( Parser_getNextNode( xmlParser, &newNode, &bETag ) ==
+            IXML_SUCCESS ) {
+            if( bETag == FALSE ) {
+                switch ( newNode.nodeType ) {
+                    case eELEMENT_NODE:
+                        rc = Parser_processElementName( gRootDoc,
+                                                        xmlParser,
+                                                        &newNode );
+                        if( rc != IXML_SUCCESS ) {
+                            goto ErrorHandler;
+                        }
+                        break;
+
+                    case eTEXT_NODE:
+                        rc = ixmlDocument_createTextNodeEx( gRootDoc,
+                                                            newNode.
+                                                            nodeValue,
+                                                            &tempNode );
+                        if( rc != IXML_SUCCESS ) {
+                            goto ErrorHandler;
+                        }
+
+                        rc = ixmlNode_appendChild( xmlParser->
+                                                   currentNodePtr,
+                                                   tempNode );
+                        if( rc != IXML_SUCCESS ) {
+                            goto ErrorHandler;
+                        }
+
+                        break;
+
+                    case eCDATA_SECTION_NODE:
+                        rc = ixmlDocument_createCDATASectionEx( gRootDoc,
+                                                                newNode.
+                                                                nodeValue,
+                                                                &cdataSecNode );
+                        if( rc != IXML_SUCCESS ) {
+                            goto ErrorHandler;
+                        }
+
+                        rc = ixmlNode_appendChild( xmlParser->
+                                                   currentNodePtr,
+                                                   &( cdataSecNode->n ) );
+                        if( rc != IXML_SUCCESS ) {
+                            goto ErrorHandler;
+                        }
+                        break;
+
+                    case eATTRIBUTE_NODE:
+                        rc = Parser_processAttributeName( gRootDoc,
+                                                          xmlParser,
+                                                          &newNode );
+                        if( rc != IXML_SUCCESS ) {
+                            goto ErrorHandler;
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            } else {
+                /* ETag==TRUE, endof element tag. */
+                rc = Parser_eTagVerification( xmlParser, &newNode );
+                if( rc != IXML_SUCCESS ) {
+                    goto ErrorHandler;
+                }
+                xmlParser->state = eCONTENT;
+            }
+
+            /* reset bETag flag */
+            bETag = FALSE;
+
+        } else if( bETag == TRUE ) {
+	    /* file is done */
+            break;
+        } else {
+            rc = IXML_FAILED;
+            goto ErrorHandler;
+        }
+        Parser_freeNodeContent( &newNode );
+
+    }
+
+    if( xmlParser->pCurElement != NULL ) {
+        rc = IXML_SYNTAX_ERR;
+        goto ErrorHandler;
+    }
+
+    *retDoc = ( IXML_Document * ) gRootDoc;
+    Parser_free( xmlParser );
+    return rc;
+
+ErrorHandler:
+    Parser_freeNodeContent( &newNode );
+    ixmlDocument_free( gRootDoc );
+    Parser_free( xmlParser );
+    return rc;
+}
+
+
+BOOL Parser_isValidXmlName(const DOMString name)
+{
+	const char *pstr = NULL;
+	size_t i = 0;
+	size_t nameLen = 0;
+
+	assert(name != NULL);
+
+	nameLen = strlen(name);
+	pstr = name;
+	if (Parser_isNameChar(*pstr, FALSE) == TRUE) {
+		for (i = 1; i < nameLen; ++i) {
+			if (Parser_isNameChar(*(pstr + i), TRUE) == FALSE) {
+				/* illegal char */
+				return FALSE;
+			}
+		}
+	}
+
+	return TRUE;
+}
+
+
+void Parser_setErrorChar(char c)
+{
+	g_error_char = c;
+}
+
+
+/*!
+ * \brief Initializes a xml parser.
+ *
+ * \return The parser object or \b NULL if there is not enough memory.
+ */
+static Parser *Parser_init()
+{
+	Parser *newParser = NULL;
+
+	newParser = (Parser *)malloc(sizeof (Parser));
+	if (newParser == NULL) {
+		return NULL;
+	}
+
+	memset(newParser, 0, sizeof (Parser));
+	ixml_membuf_init(&(newParser->tokenBuf));
+	ixml_membuf_init(&(newParser->lastElem));
+
+	return newParser;
+}
+
+
+/*!
+ * \brief Read a xml file or buffer contents into xml parser.
+ */
+static int Parser_readFileOrBuffer(
+	/*! [in] The XML parser. */
+	Parser *xmlParser,
+	/*! [in] The file name or the buffer to copy, according to the
+	 * parameter "file". */
+	const char *xmlFileName,
+	/*! [in] TRUE if you want to read from a file, false if xmlFileName is
+	 * the buffer to copy to the parser. */
+	BOOL file)
+{
+    long fileSize = 0;
+    size_t bytesRead = 0;
+    FILE *xmlFilePtr = NULL;
+
+    if( file ) {
+        xmlFilePtr = fopen( xmlFileName, "rb" );
+        if( xmlFilePtr == NULL ) {
+            return IXML_NO_SUCH_FILE;
+        } else {
+            fseek( xmlFilePtr, 0, SEEK_END );
+            fileSize = ftell( xmlFilePtr );
+            if( fileSize == 0 ) {
+                fclose( xmlFilePtr );
+                return IXML_SYNTAX_ERR;
+            }
+
+            xmlParser->dataBuffer = (char *)malloc((size_t)fileSize + 1);
+            if( xmlParser->dataBuffer == NULL ) {
+                fclose( xmlFilePtr );
+                return IXML_INSUFFICIENT_MEMORY;
+            }
+
+            fseek( xmlFilePtr, 0, SEEK_SET );
+            bytesRead =
+                fread(xmlParser->dataBuffer, 1, (size_t)fileSize, xmlFilePtr);
+	    /* append null */
+            xmlParser->dataBuffer[bytesRead] = '\0';
+            fclose( xmlFilePtr );
+        }
+    } else {
+        xmlParser->dataBuffer = safe_strdup( xmlFileName );
+        if( xmlParser->dataBuffer == NULL ) {
+            return IXML_INSUFFICIENT_MEMORY;
+        }
+    }
+
+    return IXML_SUCCESS;
+}
+
+
+/*!
+ * \brief Parses a xml file and return the DOM tree.
+ */
+int Parser_LoadDocument(
+	/*! [out] The output document tree. */
+	IXML_Document **retDoc,
+	/*! [in] The file name or the buffer to copy, according to the
+	 * parameter "file". */
+	const char *xmlFileName,
+	/*! [in] TRUE if you want to read from a file, false if xmlFileName is
+	 * the buffer to copy to the parser. */
+	BOOL file)
+{
+    int rc = IXML_SUCCESS;
+    Parser *xmlParser = NULL;
+
+    xmlParser = Parser_init();
+    if( xmlParser == NULL ) {
+        return IXML_INSUFFICIENT_MEMORY;
+    }
+
+    rc = Parser_readFileOrBuffer( xmlParser, xmlFileName, file );
+    if( rc != IXML_SUCCESS ) {
+        Parser_free( xmlParser );
+        return rc;
+    }
+
+    xmlParser->curPtr = xmlParser->dataBuffer;
+    rc = Parser_parseDocument( retDoc, xmlParser );
+    return rc;
+
+}
+
+
+void Parser_freeNodeContent(IXML_Node *nodeptr)
+{
+    if( nodeptr == NULL ) {
+        return;
+    }
+
+    if( nodeptr->nodeName != NULL ) {
+        free( nodeptr->nodeName );
+    }
+
+    if( nodeptr->nodeValue != NULL ) {
+        free( nodeptr->nodeValue );
+    }
+
+    if( nodeptr->namespaceURI != NULL ) {
+        free( nodeptr->namespaceURI );
+    }
+
+    if( nodeptr->prefix != NULL ) {
+        free( nodeptr->prefix );
+    }
+
+    if( nodeptr->localName != NULL ) {
+        free( nodeptr->localName );
+    }
+}
+
+
+/*!
+ * \brief Set the node prefix and localName as defined by the nodeName in the
+ * form of ns:name.
+ */
+int Parser_setNodePrefixAndLocalName(
+	/*! [in,out] The Node to process. */
+	IXML_Node *node)
+{
+    char *pStrPrefix = NULL;
+    char *pLocalName;
+    ptrdiff_t nPrefix;
+
+    assert( node != NULL );
+    if( node == NULL ) {
+        return IXML_FAILED;
+    }
+
+    pStrPrefix = strchr( node->nodeName, ':' );
+    if( pStrPrefix == NULL ) {
+        node->prefix = NULL;
+        node->localName = safe_strdup( node->nodeName );
+        if( node->localName == NULL ) {
+            return IXML_INSUFFICIENT_MEMORY;
+        }
+
+    } else {
+        /* fill in the local name and prefix */
+        pLocalName = ( char * )pStrPrefix + 1;
+        nPrefix = pStrPrefix - node->nodeName;
+        node->prefix = malloc((size_t)nPrefix + 1);
+        if (!node->prefix) {
+            return IXML_INSUFFICIENT_MEMORY;
+        }
+
+        memset(node->prefix, 0, (size_t)nPrefix + 1);
+        strncpy(node->prefix, node->nodeName, (size_t)nPrefix);
+
+        node->localName = safe_strdup( pLocalName );
+        if( node->localName == NULL ) {
+            free( node->prefix );
+	    /* no need to free really, main loop will frees it
+	     * when return code is not success */
+            node->prefix = NULL;
+            return IXML_INSUFFICIENT_MEMORY;
+        }
+    }
+
+    return IXML_SUCCESS;
 }
 

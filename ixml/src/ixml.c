@@ -54,37 +54,29 @@ static void copy_with_escape(
 	/*! [in] The string to copy from. */
 	const char *p)
 {
-	int i;
-	int plen;
+	size_t i;
+	size_t plen;
 
-	if (p == NULL) {
+	if (p == NULL)
 		return;
-	}
-
-	plen = strlen( p );
-
-	for (i = 0; i < plen; i++) {
+	plen = strlen(p);
+	for (i = 0; i < plen; ++i) {
 		switch (p[i]) {
 		case '<':
 			ixml_membuf_append_str(buf, "&lt;");
 			break;
-
 		case '>':
 			ixml_membuf_append_str(buf, "&gt;");
 			break;
-
 		case '&':
 			ixml_membuf_append_str(buf, "&amp;");
 			break;
-
 		case '\'':
 			ixml_membuf_append_str(buf, "&apos;");
 			break;
-
 		case '\"':
 			ixml_membuf_append_str(buf, "&quot;");
 			break;
-
 		default:
 			ixml_membuf_append(buf, &p[i]);
 			break;
@@ -161,11 +153,11 @@ static void ixmlPrintDomTreeRecursive(
 			} else {
 				ixml_membuf_append_str(buf, ">");
 			}
-			//  output the children
+			/* output the children */
 			ixmlPrintDomTreeRecursive(
 				ixmlNode_getFirstChild(nodeptr), buf);
 
-			// Done with children.  Output the end tag.
+			/* Done with children.  Output the end tag. */
 			ixml_membuf_append_str(buf, "</");
 			ixml_membuf_append_str(buf, nodeName);
 
@@ -242,11 +234,11 @@ static void ixmlPrintDomTree(
 			ixml_membuf_append_str(buf, ">");
 		}
 
-		// output the children
+		/* output the children */
 		ixmlPrintDomTreeRecursive(
 			ixmlNode_getFirstChild(nodeptr), buf);
 
-		// Done with children. Output the end tag.
+		/* Done with children. Output the end tag. */
 		ixml_membuf_append_str(buf, "</");
 		ixml_membuf_append_str(buf, nodeName);
 		ixml_membuf_append_str(buf, ">\r\n");
@@ -314,10 +306,10 @@ static void ixmlDomTreetoString(
 			ixml_membuf_append_str(buf, ">");
 		}
 
-		//  output the children
+		/* output the children */
 		ixmlPrintDomTreeRecursive(ixmlNode_getFirstChild(nodeptr), buf);
 
-		// Done with children.  Output the end tag.
+		/* Done with children. Output the end tag. */
 		ixml_membuf_append_str(buf, "</");
 		ixml_membuf_append_str(buf, nodeName);
 		ixml_membuf_append_str(buf, ">");

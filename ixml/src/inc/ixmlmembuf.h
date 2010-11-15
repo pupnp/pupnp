@@ -166,7 +166,7 @@ int ixml_membuf_insert(
 	size_t buf_len,
 	/*! [in] The point of insertion relative to the beggining of the
 	 * ixml_membuf internal buffer. */
-	int index);
+	size_t index);
 
 
 #endif /* IXML_MEMBUF_H */

@@ -542,11 +542,11 @@ int ixmlNode_replaceChild(
 	if (ixmlNode_allowChildren(nodeptr, newChild) == FALSE) {
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
-	// if newChild was created from a different document 
+	/* if newChild was created from a different document */
 	if (nodeptr->ownerDocument != newChild->ownerDocument) {
 		return IXML_WRONG_DOCUMENT_ERR;
 	}
-	// if refChild is not a child of nodeptr
+	/* if refChild is not a child of nodeptr */
 	if (ixmlNode_isParent(nodeptr, oldChild) != TRUE) {
 		return IXML_NOT_FOUND_ERR;
 	}
@@ -763,6 +763,10 @@ static IXML_Element *ixmlNode_cloneElement(
 /*!
  * \brief Returns a clone of a document node.
  *
+ * Currently, the IXML_Document struct is just a node, so this function
+ * just mallocs the IXML_Document, sets the node type and name. Curiously,
+ * the parameter nodeptr is not actually used.
+ *
  * \return A clone of a document node.
  */
 static IXML_Document *ixmlNode_cloneDoc(
@@ -781,7 +785,7 @@ static IXML_Document *ixmlNode_cloneDoc(
 	}
 
 	ixmlDocument_init(newDoc);
-	docNode = (IXML_Node *) newDoc;
+	docNode = (IXML_Node *)newDoc;
 
 	rc = ixmlNode_setNodeName(docNode, DOCUMENTNODENAME);
 	if (rc != IXML_SUCCESS) {
@@ -792,6 +796,7 @@ static IXML_Document *ixmlNode_cloneDoc(
 	newDoc->n.nodeType = eDOCUMENT_NODE;
 
 	return newDoc;
+	nodeptr = nodeptr;
 }
 
 /*!
