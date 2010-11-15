@@ -97,6 +97,30 @@ EXPORT_SPEC int UpnpResolveURL(
 
 
 /*!
+ * \brief Combines a base URL and a relative URL into a single absolute URL.
+ *
+ * The memory for \b AbsURL becomes owned by the caller and should be freed
+ * later.
+ *
+ * \return An integer representing one of the following:
+ *	\li <tt>UPNP_E_SUCCESS</tt>: The operation completed successfully.
+ *	\li <tt>UPNP_E_INVALID_PARAM</tt>: \b RelURL is <tt>NULL</tt>.
+ *	\li <tt>UPNP_E_INVALID_URL</tt>: The \b BaseURL / \b RelURL 
+ *              combination does not form a valid URL.
+ *	\li <tt>UPNP_E_OUTOF_MEMORY</tt>: Insufficient resources exist to 
+ *              complete this operation.
+ */
+EXPORT_SPEC int UpnpResolveURL2(
+	/*! [in] The base URL to combine. */
+	const char *BaseURL,
+	/*! [in] The relative URL to \b BaseURL. */
+	const char *RelURL,
+	/*! [out] A pointer to a pointer to a buffer to store the
+	 * absolute URL. Must be freed later by the caller. */
+	char **AbsURL);
+
+
+/*!
  * \brief Creates an action request packet based on its input parameters
  * (status variable name and value pair).
  *

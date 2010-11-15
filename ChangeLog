@@ -2,6 +2,13 @@
 Version 1.6.10
 *******************************************************************************
 
+2010-11-15 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Added the convenience function UpnpResolveURL2() to upnptools.c.
+
+	This function avoids some unecessary memory allocation.
+	The memory alloc'd by this function must be freed later by the caller.
+
 2010-11-10 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
 	Add GENA_NOTIFICATION_xxx_TIMEOUT variable.
