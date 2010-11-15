@@ -25,6 +25,8 @@ upnpinclude_HEADERS = \
 	inc/Event.h \
 	inc/EventSubscribe.h \
 	inc/FileInfo.h \
+	inc/list.h \
+	inc/poison.h \
 	inc/StateVarComplete.h \
 	inc/StateVarRequest.h \
 	inc/SubscriptionRequest.h \
