@@ -147,18 +147,36 @@ int UpnpResolveURL(
 	int ret = UPNP_E_SUCCESS;
 	char *tempRel = NULL;
 
-	if (RelURL == NULL) {
+	if (!RelURL) {
 		ret = UPNP_E_INVALID_PARAM;
 		goto ExitFunction;
 	}
-
 	tempRel = resolve_rel_url((char *)BaseURL, (char *)RelURL);
 	if (tempRel) {
 		strcpy(AbsURL, tempRel);
 		free(tempRel);
-	} else {
+	} else
 		ret = UPNP_E_INVALID_URL;
+
+ExitFunction:
+	return UPNP_E_SUCCESS;
+}
+
+
+int UpnpResolveURL2(
+	const char *BaseURL,
+	const char *RelURL,
+	char **AbsURL)
+{
+	int ret = UPNP_E_SUCCESS;
+
+	if (!RelURL) {
+		ret = UPNP_E_INVALID_PARAM;
+		goto ExitFunction;
 	}
+	*AbsURL = resolve_rel_url((char *)BaseURL, (char *)RelURL);
+	if (!*AbsURL)
+		ret = UPNP_E_INVALID_URL;
 
 ExitFunction:
 	return UPNP_E_SUCCESS;
