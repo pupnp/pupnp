@@ -88,7 +88,11 @@
 	 * inline keyword. This definition makes the use of this keyword
 	 * portable to these systems.
 	 */
-	#define UPNP_INLINE inline
+	#ifdef __STRICT_ANSI__
+		#define UPNP_INLINE __inline__
+	#else
+		#define UPNP_INLINE inline
+	#endif
 	
 	/*!
 	 * \brief Supply the PRId64 printf() macro.
