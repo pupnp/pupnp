@@ -110,7 +110,7 @@ int ixmlElement_setAttribute(
 {
 	IXML_Node *attrNode;
 	IXML_Attr *newAttrNode;
-	short errCode = IXML_SUCCESS;
+	int errCode = IXML_SUCCESS;
 
 	if (element == NULL || name == NULL || value == NULL) {
 		errCode = IXML_INVALID_PARAMETER;
@@ -208,7 +208,8 @@ IXML_Attr *ixmlElement_getAttributeNode(IXML_Element *element, const DOMString n
 
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
-		if (strcmp(attrNode->nodeName, name) == 0) { // found it
+		if (strcmp(attrNode->nodeName, name) == 0) {
+			/* found it */
 			break;
 		} else {
 			attrNode = attrNode->nextSibling;
@@ -555,8 +556,8 @@ IXML_Attr *ixmlElement_getAttributeNodeNS(
 	while (attrNode != NULL) {
 		if (strcmp(attrNode->localName, localName) == 0 &&
 		    strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
-			// found it
-		break;
+			/* found it */
+			break;
 		} else {
 			attrNode = attrNode->nextSibling;
 		}

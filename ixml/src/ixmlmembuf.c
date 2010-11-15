@@ -75,10 +75,10 @@ static int ixml_membuf_set_size(
 		diff = new_length - m->length;
 		alloc_len = MAXVAL(m->size_inc, diff) + m->capacity;
 	} else {
-		// decrease length
+		/* decrease length */
 		assert(new_length <= m->length);
 
-		// if diff is 0..m->size_inc, don't free
+		/* if diff is 0..m->size_inc, don't free */
 		if ((m->capacity - new_length) <= m->size_inc) {
 			return 0;
 		}
@@ -135,21 +135,21 @@ int ixml_membuf_assign(
 
 	assert(m != NULL);
 
-	// set value to null
+	/* set value to null */
 	if (buf == NULL) {
 		ixml_membuf_destroy(m);
 		return IXML_SUCCESS;
 	}
-	// alloc mem
+	/* alloc mem */
 	return_code = ixml_membuf_set_size(m, buf_len);
 	if (return_code != 0) {
 		return return_code;
 	}
 
-	// copy
+	/* copy */
 	memcpy(m->buf, buf, buf_len);
 
-	// null-terminate
+	/* null-terminate */
 	m->buf[buf_len] = 0;
 	m->length = buf_len;
 
@@ -187,13 +187,13 @@ int ixml_membuf_insert(
 	INOUT ixml_membuf *m,
 	IN const void *buf,
 	IN size_t buf_len,
-	int index)
+	size_t index)
 {
 	int return_code = 0;
 
 	assert(m != NULL);
 
-	if (index < 0 || index > (int)m->length) {
+	if (index > m->length) {
 		return IXML_INDEX_SIZE_ERR;
 	}
 

@@ -40,8 +40,11 @@ void IxmlPrintf(
 ;
 #else /* DEBUG */
 static UPNP_INLINE void IxmlPrintf(
-	const char* FmtStr,
-	...) {}
+	const char *FmtStr,
+	...)
+{
+	FmtStr = FmtStr;
+}
 #endif /* DEBUG */
 
 
@@ -59,6 +62,8 @@ static UPNP_INLINE void printNodes(
 	IXML_Node *tmpRoot,
 	int depth)
 {
+	tmpRoot = tmpRoot;
+	depth = depth;
 }
 #endif
 

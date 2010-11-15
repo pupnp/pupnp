@@ -139,7 +139,7 @@ int ixmlDocument_createElementEx(
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
-	// set the node fields 
+	/* set the node fields */
 	newElement->n.nodeType = eELEMENT_NODE;
 	newElement->n.nodeName = strdup(tagName);
 	if (newElement->n.nodeName == NULL) {
@@ -229,7 +229,7 @@ int ixmlDocument_createTextNodeEx(
 		rc = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
-	// initialize the node
+	/* initialize the node */
 	ixmlNode_init(returnNode);
 
 	returnNode->nodeName = strdup(TEXTNODENAME);
@@ -239,7 +239,7 @@ int ixmlDocument_createTextNodeEx(
 		rc = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
-	// add in node value
+	/* add in node value */
 	if (data != NULL) {
 		returnNode->nodeValue = strdup(data);
 		if (returnNode->nodeValue == NULL) {
@@ -295,7 +295,7 @@ int ixmlDocument_createAttributeEx(
 	ixmlAttr_init(attrNode);
 	attrNode->n.nodeType = eATTRIBUTE_NODE;
 
-	// set the node fields
+	/* set the node fields */
 	attrNode->n.nodeName = strdup(name);
 	if (attrNode->n.nodeName == NULL) {
 		ixmlAttr_free(attrNode);
@@ -343,7 +343,7 @@ int ixmlDocument_createAttributeNSEx(
 	if (errCode != IXML_SUCCESS) {
 		goto ErrorHandler;
 	}
-	// set the namespaceURI field 
+	/* set the namespaceURI field */
 	attrNode->n.namespaceURI = strdup(namespaceURI);
 	if (attrNode->n.namespaceURI == NULL) {
 		ixmlAttr_free(attrNode);
@@ -351,7 +351,7 @@ int ixmlDocument_createAttributeNSEx(
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
-	// set the localName and prefix 
+	/* set the localName and prefix */
 	errCode =
 		ixmlNode_setNodeName((IXML_Node *)attrNode, qualifiedName);
 	if (errCode != IXML_SUCCESS) {
@@ -458,7 +458,7 @@ int ixmlDocument_createElementNSEx(
 		line = __LINE__;
 		goto ErrorHandler;
 	}
-	// set the namespaceURI field 
+	/* set the namespaceURI field */
 	newElement->n.namespaceURI = strdup(namespaceURI);
 	if (newElement->n.namespaceURI == NULL) {
 		line = __LINE__;
@@ -467,7 +467,7 @@ int ixmlDocument_createElementNSEx(
 		ret = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
-	// set the localName and prefix 
+	/* set the localName and prefix */
 	ret = ixmlNode_setNodeName((IXML_Node *)newElement, qualifiedName);
 	if (ret != IXML_SUCCESS) {
 		line = __LINE__;

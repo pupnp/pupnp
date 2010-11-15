@@ -85,7 +85,7 @@ IXML_Node *ixmlNamedNodeMap_getNamedItem(
 	IXML_NamedNodeMap *nnMap,
 	const DOMString name)
 {
-	long index;
+	unsigned long index;
 
 	if (nnMap == NULL || name == NULL) {
 		return NULL;
@@ -95,7 +95,7 @@ IXML_Node *ixmlNamedNodeMap_getNamedItem(
 	if (index == IXML_INVALID_ITEM_NUMBER) {
 		return NULL;
 	} else {
-		return ixmlNamedNodeMap_item(nnMap, (unsigned long)index);
+		return ixmlNamedNodeMap_item(nnMap, index);
 	}
 }
 
@@ -165,7 +165,7 @@ int ixmlNamedNodeMap_addToNamedNodeMap(
 	}
 
 	if (*nnMap == NULL) {
-		// nodelist is empty
+		/* nodelist is empty */
 		*nnMap = (IXML_NamedNodeMap *)malloc(sizeof (IXML_NamedNodeMap));
 		if (*nnMap == NULL) {
 			return IXML_INSUFFICIENT_MEMORY;

@@ -57,11 +57,11 @@ IXML_Node *ixmlNodeList_item(
 	IXML_NodeList *next;
 	unsigned int i;
 
-	// if the list ptr is NULL
+	/* if the list ptr is NULL */
 	if (nList == NULL) {
 		return NULL;
 	}
-	// if index is more than list length
+	/* if index is more than list length */
 	if (index > ixmlNodeList_length(nList) - 1) {
 		return NULL;
 	}
@@ -93,7 +93,7 @@ int ixmlNodeList_addToNodeList(
 	}
 
 	if (*nList == NULL) {
-		// nodelist is empty
+		/* nodelist is empty */
 		*nList = (IXML_NodeList *)malloc(sizeof (IXML_NodeList));
 		if (*nList == NULL) {
 			return IXML_INSUFFICIENT_MEMORY;
