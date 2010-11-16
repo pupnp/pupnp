@@ -29,17 +29,13 @@
  *
  ******************************************************************************/
 
-
 /*!
  * \file
  */
 
-
 #include "TimerThread.h"
 
-
 #include <assert.h>
-
 
 /*!
  * \brief Deallocates a dynamically allocated TimerEvent.
@@ -55,7 +51,6 @@ static void FreeTimerEvent(
 	FreeListFree(&timer->freeEvents, event);
 }
 
-
 /*!
  * \brief Implements timer thread.
  *
@@ -67,46 +62,34 @@ static void *TimerThreadWorker(
 {
     TimerThread *timer = ( TimerThread * ) arg;
     ListNode *head = NULL;
-
     TimerEvent *nextEvent = NULL;
-
     time_t currentTime = 0;
     time_t nextEventTime = 0;
     struct timespec timeToWait;
-
     int tempId;
 
     assert( timer != NULL );
 
     ithread_mutex_lock( &timer->mutex );
-
-    while( 1 )
-    {
-        //mutex should always be locked at top of loop
-        //Check for shutdown
-        if( timer->shutdown )
-        {
+    while (1) {
+        /* mutex should always be locked at top of loop */
+	/* Check for shutdown. */
+        if (timer->shutdown) {
             timer->shutdown = 0;
             ithread_cond_signal( &timer->condition );
             ithread_mutex_unlock( &timer->mutex );
             return NULL;
         }
-
         nextEvent = NULL;
-
-        //Get the next event if possible
-        if( timer->eventQ.size > 0 )
-        {
+        /* Get the next event if possible. */
+        if (timer->eventQ.size > 0) {
             head = ListHead( &timer->eventQ );
             nextEvent = ( TimerEvent * ) head->item;
             nextEventTime = nextEvent->eventTime;
         }
-
-        currentTime = time( NULL );
-
-        //If time has elapsed, schedule job
-        if( ( nextEvent != NULL ) && ( currentTime >= nextEventTime ) )
-        {
+        currentTime = time(NULL);
+        /* If time has elapsed, schedule job. */
+        if (nextEvent && currentTime >= nextEventTime) {
             if( nextEvent->persistent ) {
                 ThreadPoolAddPersistent( timer->tp, &nextEvent->job,
                                          &tempId );
@@ -117,8 +100,7 @@ static void *TimerThreadWorker(
             FreeTimerEvent( timer, nextEvent );
             continue;
         }
-
-        if( nextEvent != NULL ) {
+        if (nextEvent) {
             timeToWait.tv_nsec = 0;
             timeToWait.tv_sec = nextEvent->eventTime;
             ithread_cond_timedwait( &timer->condition, &timer->mutex,
@@ -146,16 +128,15 @@ static int CalculateEventTime(
 
     assert( timeout != NULL );
 
-    if( type == ABS_SEC )
+    if (type == ABS_SEC)
         return 0;
-    else if( type == REL_SEC ) {
-        time( &now );
+    else /*if (type == REL_SEC) */{
+        time(&now);
         ( *timeout ) += now;
         return 0;
     }
 
     return -1;
-
 }
 
 /*!
@@ -246,9 +227,7 @@ int TimerThreadInit(TimerThread *timer, ThreadPool *tp)
     }
 
     return rc;
-
 }
-
 
 int TimerThreadSchedule(
 	TimerThread *timer,
@@ -258,7 +237,6 @@ int TimerThreadSchedule(
 	Duration duration,
 	int *id)
 {
-
     int rc = EOUTOFMEM;
     int found = 0;
     int tempId = 0;
@@ -291,35 +269,25 @@ int TimerThreadSchedule(
     }
 
     tempNode = ListHead( &timer->eventQ );
-    //add job to Q
-    //Q is ordered by eventTime
-    //with the head of the Q being the next event
-
+    /* add job to Q. Q is ordered by eventTime with the head of the Q being
+     * the next event. */
     while( tempNode != NULL ) {
         temp = ( TimerEvent * ) tempNode->item;
-        if( temp->eventTime >= timeout )
-        {
-
-            if( ListAddBefore( &timer->eventQ, newEvent, tempNode ) !=
-                NULL )
+        if( temp->eventTime >= timeout ) {
+            if (ListAddBefore( &timer->eventQ, newEvent, tempNode))
                 rc = 0;
             found = 1;
             break;
-
         }
         tempNode = ListNext( &timer->eventQ, tempNode );
     }
-
-    //add to the end of Q
-    if( !found ) {
-
+    /* add to the end of Q. */
+    if (!found) {
         if( ListAddTail( &timer->eventQ, newEvent ) != NULL )
             rc = 0;
-
     }
-    //signal change in Q
+    /* signal change in Q. */
     if( rc == 0 ) {
-
         ithread_cond_signal( &timer->condition );
     } else {
         FreeTimerEvent( timer, newEvent );
@@ -329,7 +297,6 @@ int TimerThreadSchedule(
 
     return rc;
 }
-
 
 int TimerThreadRemove(
 	TimerThread *timer,
@@ -369,7 +336,6 @@ int TimerThreadRemove(
     return rc;
 }
 
-
 int TimerThreadShutdown(TimerThread *timer)
 {
     ListNode *tempNode2 = NULL;
@@ -386,9 +352,7 @@ int TimerThreadShutdown(TimerThread *timer)
     timer->shutdown = 1;
     tempNode = ListHead( &timer->eventQ );
 
-    //Delete nodes in Q
-    //call registered free function 
-    //on argument
+    /* Delete nodes in Q. Call registered free function on argument. */
     while( tempNode != NULL ) {
         TimerEvent *temp = ( TimerEvent * ) tempNode->item;
 
@@ -406,19 +370,17 @@ int TimerThreadShutdown(TimerThread *timer)
 
     ithread_cond_broadcast( &timer->condition );
 
-    while( timer->shutdown )    //wait for timer thread to shutdown
-    {
+    while (timer->shutdown) {
+	/* wait for timer thread to shutdown. */
         ithread_cond_wait( &timer->condition, &timer->mutex );
     }
+    ithread_mutex_unlock(&timer->mutex);
 
-    ithread_mutex_unlock( &timer->mutex );
-
-    //destroy condition
-    while( ithread_cond_destroy( &timer->condition ) != 0 ) {
+    /* destroy condition. */
+    while(ithread_cond_destroy(&timer->condition) != 0) {
     }
-
-    //destroy mutex
-    while( ithread_mutex_destroy( &timer->mutex ) != 0 ) {
+    /* destroy mutex. */
+    while (ithread_mutex_destroy(&timer->mutex) != 0) {
     }
 
     return 0;

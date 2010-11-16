@@ -29,11 +29,9 @@
  *
  ******************************************************************************/
 
-
 /*!
  * \file
  */
-
 
 #if !defined(WIN32)
 	#include <sys/param.h>
@@ -41,55 +39,48 @@
 
 #include "ThreadPool.h"
 
-
 #include "FreeList.h"
-
 
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>	/* for memset()*/
 
-
-/****************************************************************************
- * Function: DiffMillis
+/*!
+ * \brief Returns the difference in milliseconds between two timeval structures.
  *
- *  Description:
- *      Returns the difference in milliseconds between two
- *      timeval structures.
- *      Internal Only.
- *  Parameters:
- *      struct timeval *time1,
- *      struct timeval *time2,
- *  Returns:
- *       the difference in milliseconds, time1-time2.
- *****************************************************************************/
-static unsigned long DiffMillis(struct timeval *time1, struct timeval *time2)
+ * \internal
+ *
+ * \return The difference in milliseconds, time1-time2.
+ */
+static long DiffMillis(
+	/*! . */
+	struct timeval *time1,
+	/*! . */
+	struct timeval *time2)
 {
 	double temp = 0;
 
-	temp = time1->tv_sec - time2->tv_sec;
+	temp = (double)(time1->tv_sec - time2->tv_sec);
 	/* convert to milliseconds */
 	temp *= 1000;
 
 	/* convert microseconds to milliseconds and add to temp */
 	/* implicit flooring of unsigned long data type */
-	temp += (time1->tv_usec - time2->tv_usec) / 1000;
+	temp += (double)((time1->tv_usec - time2->tv_usec) / 1000);
 
-	return temp;
+	return (long)temp;
 }
 
 #ifdef STATS
-/****************************************************************************
- * Function: StatsInit
+/*!
+ * \brief Initializes the statistics structure.
  *
- *  Description:
- *      Initializes the statistics structure.
- *      Internal Only.
- *  Parameters:
- *      ThreadPoolStats *stats must be valid non null stats structure
- *****************************************************************************/
-static void StatsInit(ThreadPoolStats *stats)
+ * \internal
+ */
+static void StatsInit(
+	/*! Must be valid non null stats structure. */
+	ThreadPoolStats *stats)
 {
 	stats->totalIdleTime = 0;
 	stats->totalJobsHQ = 0;
@@ -109,42 +100,70 @@ static void StatsInit(ThreadPoolStats *stats)
 	stats->maxThreads = 0; stats->totalThreads = 0;
 }
 
-static void StatsAccountLQ(ThreadPool *tp, unsigned long diffTime)
+/*!
+ * \brief 
+ *
+ * \internal
+ */
+static void StatsAccountLQ(
+	/*! . */
+	ThreadPool *tp,
+	/*! . */
+	long diffTime)
 {
 	tp->stats.totalJobsLQ++;
-	tp->stats.totalTimeLQ += diffTime;
+	tp->stats.totalTimeLQ += (double)diffTime;
 }
 
-static void StatsAccountMQ(ThreadPool *tp, unsigned long diffTime)
+/*!
+ * \brief 
+ *
+ * \internal
+ */
+static void StatsAccountMQ(
+	/*! . */
+	ThreadPool *tp,
+	/*! . */
+	long diffTime)
 {
 	tp->stats.totalJobsMQ++;
-	tp->stats.totalTimeMQ += diffTime;
+	tp->stats.totalTimeMQ += (double)diffTime;
 }
 
-static void StatsAccountHQ(ThreadPool *tp, unsigned long diffTime)
+/*!
+ * \brief 
+ *
+ * \internal
+ */
+static void StatsAccountHQ(
+	/*! . */
+	ThreadPool *tp,
+	/*! . */
+	long diffTime)
 {
 	tp->stats.totalJobsHQ++;
-	tp->stats.totalTimeHQ += diffTime;
+	tp->stats.totalTimeHQ += (double)diffTime;
 }
 
-/****************************************************************************
- * Function: CalcWaitTime
+/*!
+ * \brief Calculates the time the job has been waiting at the specified
+ * priority.
  *
- *  Description:
- *      Calculates the time the job has been waiting at the specified
- *      priority. Adds to the totalTime and totalJobs kept in the
- *      thread pool statistics structure.
- *      Internal Only.
+ * Adds to the totalTime and totalJobs kept in the thread pool statistics
+ * structure.
  *
- *  Parameters:
- *      ThreadPool *tp
- *      ThreadPriority p
- *      ThreadPoolJob *job
- *****************************************************************************/
-static void CalcWaitTime(ThreadPool *tp, ThreadPriority p, ThreadPoolJob *job)
+ * \internal
+ */
+static void CalcWaitTime(
+	/*! . */
+	ThreadPool *tp,
+	/*! . */
+	ThreadPriority p,
+	/*! . */
+	ThreadPoolJob *job)
 {
 	struct timeval now;
-	unsigned long diff;
+	long diff;
 
 	assert(tp != NULL);
 	assert(job != NULL);
@@ -166,36 +185,40 @@ static void CalcWaitTime(ThreadPool *tp, ThreadPriority p, ThreadPoolJob *job)
 	}
 }
 
-static time_t StatsTime(time_t *t)
+/*!
+ * \brief 
+ *
+ * \internal
+ */
+static time_t StatsTime(
+	/*! . */
+	time_t *t)
 {
 	struct timeval tv;
 
 	gettimeofday(&tv, NULL);
-	if (t) {
+	if (t)
 		*t = tv.tv_sec;
-	}
 
 	return tv.tv_sec;
 }
 #else /* STATS */
 static UPNP_INLINE void StatsInit(ThreadPoolStats *stats) {}
-static UPNP_INLINE void StatsAccountLQ(ThreadPool *tp, unsigned long diffTime) {}
-static UPNP_INLINE void StatsAccountMQ(ThreadPool *tp, unsigned long diffTime) {}
-static UPNP_INLINE void StatsAccountHQ(ThreadPool *tp, unsigned long diffTime) {}
+static UPNP_INLINE void StatsAccountLQ(ThreadPool *tp, long diffTime) {}
+static UPNP_INLINE void StatsAccountMQ(ThreadPool *tp, long diffTime) {}
+static UPNP_INLINE void StatsAccountHQ(ThreadPool *tp, long diffTime) {}
 static UPNP_INLINE void CalcWaitTime(ThreadPool *tp, ThreadPriority p, ThreadPoolJob *job) {}
 static UPNP_INLINE time_t StatsTime(time_t *t) { return 0; }
 #endif /* STATS */
 
-/****************************************************************************
- * Function: CmpThreadPoolJob
+/*!
+ * \brief Compares thread pool jobs.
  *
- *  Description:
- *      Compares thread pool jobs.
- *  Parameters:
- *      void * - job A
- *      void * - job B
- *****************************************************************************/
-static int CmpThreadPoolJob(void *jobA, void *jobB)
+ * \internal
+ */
+static int CmpThreadPoolJob(
+	void *jobA,
+	void *jobB)
 {
 	ThreadPoolJob *a = (ThreadPoolJob *)jobA;
 	ThreadPoolJob *b = (ThreadPoolJob *)jobB;
@@ -203,33 +226,33 @@ static int CmpThreadPoolJob(void *jobA, void *jobB)
 	return a->jobId == b->jobId;
 }
 
-/****************************************************************************
- * Function: FreeThreadPoolJob
+/*!
+ * \brief Deallocates a dynamically allocated ThreadPoolJob.
  *
- *  Description:
- *      Deallocates a dynamically allocated ThreadPoolJob.
- *  Parameters:
- *      ThreadPoolJob *tpj - must be allocated with CreateThreadPoolJob
- *****************************************************************************/
-static void FreeThreadPoolJob(ThreadPool *tp, ThreadPoolJob *tpj)
+ * \internal
+ */
+static void FreeThreadPoolJob(
+	/*! . */
+	ThreadPool *tp,
+	/*! Must be allocated with CreateThreadPoolJob. */
+	ThreadPoolJob *tpj)
 {
 	FreeListFree(&tp->jobFreeList, tpj);
 }
 
-/****************************************************************************
- * Function: SetPolicyType
+/*!
+ * \brief Sets the scheduling policy of the current process.
  *
- *  Description:
- *      Sets the scheduling policy of the current process.
- *      Internal only.
- *  Parameters:
- *      PolicyType in
- *  Returns:
- *      0 on success, nonzero on failure
- *      Returns result of GetLastError() on failure.
+ * \internal
+ * 
+ * \return
+ * 	\li \c 0 on success.
+ *      \li \c result of GetLastError() on failure.
  *
- *****************************************************************************/
-static int SetPolicyType(PolicyType in)
+ */
+static int SetPolicyType(
+	/*! . */
+	PolicyType in)
 {
 	int retVal = 0;
 #ifdef __CYGWIN__
@@ -255,21 +278,18 @@ static int SetPolicyType(PolicyType in)
 	return retVal;
 }
 
-/****************************************************************************
- * Function: SetPriority
+/*!
+ * \brief Sets the priority of the currently running thread.
  *
- *  Description:
- *      Sets the priority of the currently running thread.
- *      Internal only.
- *  Parameters:
- *      ThreadPriority priority
- *  Returns:
- *      0 on success, nonzero on failure
- *      EINVAL invalid priority
- *      Returns result of GerLastError on failure.
- *
- *****************************************************************************/
-static int SetPriority(ThreadPriority priority)
+ * \internal
+ * 
+ * \return
+ *	\li \c 0 on success.
+ *      \li \c EINVAL invalid priority or the result of GerLastError.
+ */
+static int SetPriority(
+	/*! . */
+	ThreadPriority priority)
 {
 	int retVal = 0;
 #if defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
@@ -311,23 +331,23 @@ exit_function:
 	return retVal;
 }
 
-/****************************************************************************
- * Function: BumpPriority
+/*!
+ * \brief Determines whether any jobs need to be bumped to a higher priority Q
+ * and bumps them.
  *
- *  Description:
- *      Determines whether any jobs
- *      need to be bumped to a higher priority Q and bumps them.
+ * tp->mutex must be locked.
  *
- *      tp->mutex must be locked.
- *      Internal Only.
- *  Parameters:
- *      ThreadPool *tp
- *****************************************************************************/
-static void BumpPriority(ThreadPool *tp)
+ * \internal
+ * 
+ * \return
+ */
+static void BumpPriority(
+	/*! . */
+	ThreadPool *tp)
 {
 	int done = 0;
 	struct timeval now;
-	unsigned long diffTime = 0;
+	long diffTime = 0;
 	ThreadPoolJob *tempJob = NULL;
 
 	gettimeofday(&now, NULL);	
@@ -360,18 +380,17 @@ static void BumpPriority(ThreadPool *tp)
 	}
 }
 
-/****************************************************************************
- * Function: SetRelTimeout
+/*!
+ * \brief Sets the fields of the passed in timespec to be relMillis
+ * milliseconds in the future.
  *
- *  Description:
- *      Sets the fields of the
- *      passed in timespec to be relMillis milliseconds in the future.
- *      Internal Only.
- *  Parameters:
- *      struct timespec *time
- *      int relMillis - milliseconds in the future
- *****************************************************************************/
-static void SetRelTimeout( struct timespec *time, int relMillis )
+ * \internal
+ */
+static void SetRelTimeout(
+	/*! . */
+	struct timespec *time,
+	/*! milliseconds in the future. */
+	int relMillis)
 {
 	struct timeval now;
 	int sec = relMillis / 1000;
@@ -382,17 +401,13 @@ static void SetRelTimeout( struct timespec *time, int relMillis )
 	time->tv_nsec = (now.tv_usec / 1000 + milliSeconds) * 1000000;
 }
 
-/****************************************************************************
- * Function: SetSeed
+/*!
+ * \brief Sets seed for random number generator. Each thread sets the seed
+ * random number generator.
  *
- *  Description:
- *      Sets seed for random number generator.
- *      Each thread sets the seed random number generator.
- *      Internal Only.
- *  Parameters:
- *      
- *****************************************************************************/
-static void SetSeed()
+ * \internal
+ */
+static void SetSeed(void)
 {
 	struct timeval t;
   
@@ -402,7 +417,7 @@ static void SetSeed()
 #elif defined(BSD) || defined(__OSX__) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
  	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id());
 #elif defined(__linux__) || defined(__sun) || defined(__CYGWIN__) || defined(__GLIBC__)
- 	srand((unsigned int)t.tv_usec + ithread_get_current_thread_id());
+ 	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id());
 #else
 	{
 		volatile union {
@@ -416,21 +431,18 @@ static void SetSeed()
 #endif
 }
 
-/****************************************************************************
- * Function: WorkerThread
+/*!
+ * \brief Implements a thread pool worker. Worker waits for a job to become
+ * available. Worker picks up persistent jobs first, high priority,
+ * med priority, then low priority.
  *
- *  Description:
- *      Implements a thread pool worker.
- *      Worker waits for a job to become available.
- *      Worker picks up persistent jobs first, high priority, med priority,
- *             then low priority.
- *      If worker remains idle for more than specified max, the worker
- *      is released.
- *      Internal Only.
- *  Parameters:
- *      void * arg -> is cast to ThreadPool *
- *****************************************************************************/
-static void *WorkerThread(void *arg)
+ * If worker remains idle for more than specified max, the worker is released.
+ *
+ * \internal
+ */
+static void *WorkerThread(
+	/*! arg -> is cast to (ThreadPool *). */
+	void *arg)
 {
 	time_t start = 0;
 
@@ -460,11 +472,9 @@ static void *WorkerThread(void *arg)
 			job = NULL;
 		}
 		retCode = 0;
-
 		tp->stats.idleThreads++;
-		tp->stats.totalWorkTime += ( StatsTime( NULL ) - start ); // work time
-		StatsTime( &start ); // idle time
-
+		tp->stats.totalWorkTime += (double)(StatsTime(NULL) - start);
+		StatsTime(&start);
 		if (persistent == 0) {
 			tp->stats.workerThreads--;
 		} else if (persistent == 1) {
@@ -496,7 +506,7 @@ static void *WorkerThread(void *arg)
 		}
 		tp->stats.idleThreads--;
 		/* idle time */
-		tp->stats.totalIdleTime += StatsTime(NULL) - start;
+		tp->stats.totalIdleTime += (double)(StatsTime(NULL) - start);
 		/* work time */
 		StatsTime(&start);
 		/* bump priority of starved jobs */
@@ -561,20 +571,20 @@ exit_function:
 	return NULL;
 }
 
-/****************************************************************************
- * Function: CreateThreadPoolJob
+/*!
+ * \brief Creates a Thread Pool Job. (Dynamically allocated)
  *
- *  Description:
- *      Creates a Thread Pool Job. (Dynamically allocated)
- *      Internal to thread pool.
- *  Parameters:
- *      ThreadPoolJob *job - job is copied
- *      id - id of job
+ * \internal
  *
- *  Returns:
- *      ThreadPoolJob *on success, NULL on failure.
- *****************************************************************************/
-static ThreadPoolJob *CreateThreadPoolJob(ThreadPoolJob *job, int id, ThreadPool *tp)
+ * \return ThreadPoolJob *on success, NULL on failure.
+ */
+static ThreadPoolJob *CreateThreadPoolJob(
+	/*! job is copied. */
+	ThreadPoolJob *job,
+	/*! id of job. */
+	int id,
+	/*! . */
+	ThreadPool *tp)
 {
 	ThreadPoolJob *newJob = NULL;
 
@@ -588,23 +598,20 @@ static ThreadPoolJob *CreateThreadPoolJob(ThreadPoolJob *job, int id, ThreadPool
 	return newJob;
 }
 
-/****************************************************************************
- * Function: CreateWorker
+/*!
+ * \brief Creates a worker thread, if the thread pool does not already have
+ * max threads.
  *
- *  Description:
- *      Creates a worker thread, if the thread pool
- *      does not already have max threads.
- *      Internal to thread pool.
- *  Parameters:
- *      ThreadPool *tp
+ * \internal
  *
- *  Returns:
- *      0 on success, <0 on failure
- *      EMAXTHREADS if already max threads reached
- *      EAGAIN if system can not create thread
- *
- *****************************************************************************/
-static int CreateWorker(ThreadPool *tp)
+ * \return
+ *	\li \c 0 on success, < 0 on failure.
+ *	\li \c EMAXTHREADS if already max threads reached.
+ *	\li \c EAGAIN if system can not create thread.
+ */
+static int CreateWorker(
+	/*! . */
+	ThreadPool *tp)
 {
 	ithread_t temp;
 	int rc = 0;
@@ -632,21 +639,17 @@ static int CreateWorker(ThreadPool *tp)
 	return rc;
 }
 
-/****************************************************************************
- * Function: AddWorker
+/*!
+ * \brief Determines whether or not a thread should be added based on the
+ * jobsPerThread ratio. Adds a thread if appropriate.
  *
- *  Description:
- *      Determines whether or not a thread should be added
- *      based on the jobsPerThread ratio.
- *      Adds a thread if appropriate.
- *      Internal to Thread Pool.
- *  Parameters:
- *      ThreadPool* tp
- *
- *****************************************************************************/
-static void AddWorker(ThreadPool *tp)
+ * \internal
+ */
+static void AddWorker(
+	/*! . */
+	ThreadPool *tp)
 {
-	int jobs = 0;
+	long jobs = 0;
 	int threads = 0;
 
 	jobs = tp->highJobQ.size + tp->lowJobQ.size + tp->medJobQ.size;
@@ -661,38 +664,6 @@ static void AddWorker(ThreadPool *tp)
 	}
 }
 
-/****************************************************************************
- * Function: ThreadPoolInit
- *
- *  Description:
- *      Initializes and starts ThreadPool. Must be called first.
- *      And only once for ThreadPool.
- *  Parameters:
- *      tp  - must be valid, non null, pointer to ThreadPool.
- *      minWorkerThreads - minimum number of worker threads
- *                         thread pool will never have less than this
- *                         number of threads.
- *      maxWorkerThreads - maximum number of worker threads
- *                         thread pool will never have more than this
- *                         number of threads.
- *      maxIdleTime      - maximum time that a worker thread will spend
- *                         idle. If a worker is idle longer than this
- *                         time and there are more than the min
- *                         number of workers running, than the
- *                         worker thread exits.
- *      jobsPerThread    - ratio of jobs to thread to try and maintain
- *                         if a job is scheduled and the number of jobs per
- *                         thread is greater than this number,and
- *                         if less than the maximum number of
- *                         workers are running then a new thread is
- *                         started to help out with efficiency.
- *      schedPolicy      - scheduling policy to try and set (OS dependent)
- *  Returns:
- *      0 on success, nonzero on failure.
- *      EAGAIN if not enough system resources to create minimum threads.
- *      INVALID_POLICY if schedPolicy can't be set
- *      EMAXTHREADS if minimum threads is greater than maximum threads
- *****************************************************************************/
 int ThreadPoolInit(ThreadPool *tp, ThreadPoolAttr *attr)
 {
 	int retCode = 0;
@@ -756,25 +727,6 @@ int ThreadPoolInit(ThreadPool *tp, ThreadPoolAttr *attr)
 	return retCode;
 }
 
-/****************************************************************************
- * Function: ThreadPoolAddPersistent
- *
- *  Description:
- *      Adds a long term job to the thread pool.
- *      Job will be run as soon as possible.
- *      Call will block until job is scheduled.
- *  Parameters:
- *      tp - valid thread pool pointer
- *      job-> valid ThreadPoolJob pointer with following fields
- *          func - ThreadFunction to run
- *          arg - argument to function.
- *          priority - priority of job.
- *          free_function - function to use when freeing argument
- *  Returns:
- *      0 on success, nonzero on failure
- *      EOUTOFMEM not enough memory to add job.
- *      EMAXTHREADS not enough threads to add persistent job.
- *****************************************************************************/
 int ThreadPoolAddPersistent(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
 {
 	int ret = 0;
@@ -824,29 +776,11 @@ exit_function:
 	return ret;
 }
 
-/****************************************************************************
- * Function: ThreadPoolAdd
- *
- *  Description:
- *      Adds a job to the thread pool.
- *      Job will be run as soon as possible.
- *  Parameters:
- *      tp - valid thread pool pointer
- *      func - ThreadFunction to run
- *      arg - argument to function.
- *      priority - priority of job.
- *      jobId - id of job
- *      duration - whether or not this is a persistent thread
- *      free_function - function to use when freeing argument
- *  Returns:
- *      0 on success, nonzero on failure
- *      EOUTOFMEM if not enough memory to add job.
- *****************************************************************************/
 int ThreadPoolAdd(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
 {
 	int rc = EOUTOFMEM;
 	int tempId = -1;
-	int totalJobs;
+	long totalJobs;
 	ThreadPoolJob *temp = NULL;
 
 	if (!tp || !job) {
@@ -857,7 +791,7 @@ int ThreadPoolAdd(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
 
 	totalJobs = tp->highJobQ.size + tp->lowJobQ.size + tp->medJobQ.size;
 	if (totalJobs >= tp->attr.maxJobsTotal) {
-		fprintf(stderr, "total jobs = %d, too many jobs", totalJobs);
+		fprintf(stderr, "total jobs = %ld, too many jobs", totalJobs);
 		goto exit_function;
 	}
 	if (!jobId) {
@@ -900,22 +834,6 @@ exit_function:
 	return rc;
 }
 
-/****************************************************************************
- * Function: ThreadPoolRemove
- *
- *  Description:
- *      Removes a job from the thread pool.
- *      Can only remove jobs which are not
- *      currently running.
- *  Parameters:
- *      tp - valid thread pool pointer
- *      jobId - id of job
- *      ThreadPoolJob *out - space for removed job.
- *                           Can be null if not needed.
- *
- *  Returns:
- *      0 on success. INVALID_JOB_ID on failure.
- *****************************************************************************/
 int ThreadPoolRemove(ThreadPool *tp, int jobId, ThreadPoolJob *out)
 {
 	int ret = INVALID_JOB_ID;
@@ -975,19 +893,6 @@ exit_function:
 	return ret;
 }
 
-/****************************************************************************
- * Function: ThreadPoolGetAttr
- *
- *  Description:
- *      Gets the current set of attributes
- *      associated with the thread pool.
- *  Parameters:
- *      tp - valid thread pool pointer
- *      out - non null pointer to store attributes
- *  Returns:
- *      0 on success, nonzero on failure
- *      Always returns 0.
- *****************************************************************************/
 int ThreadPoolGetAttr(ThreadPool *tp, ThreadPoolAttr *out)
 {
 	if (!tp || !out) {
@@ -1004,19 +909,6 @@ int ThreadPoolGetAttr(ThreadPool *tp, ThreadPoolAttr *out)
 	return 0;
 }
 
-/****************************************************************************
- * Function: ThreadPoolSetAttr
- *
- *  Description:
- *      Sets the attributes for the thread pool.
- *      Only affects future calculations.
- *  Parameters:
- *      tp - valid thread pool pointer
- *      attr - pointer to attributes, null sets attributes to default.
- *  Returns:
- *      0 on success, nonzero on failure
- *      Returns INVALID_POLICY if policy can not be set.
- *****************************************************************************/
 int ThreadPoolSetAttr(ThreadPool *tp, ThreadPoolAttr *attr)
 {
 	int retCode = 0;
@@ -1062,20 +954,6 @@ int ThreadPoolSetAttr(ThreadPool *tp, ThreadPoolAttr *attr)
 	return retCode;
 }
 
-/****************************************************************************
- * Function: ThreadPoolShutdown
- *
- *  Description:
- *      Shuts the thread pool down.
- *      Waits for all threads to finish.
- *      May block indefinitely if jobs do not
- *      exit.
- *  Parameters:
- *      tp - must be valid tp
- *  Returns:
- *      0 on success, nonzero on failure
- *      Always returns 0.
- *****************************************************************************/
 int ThreadPoolShutdown(ThreadPool *tp)
 {
 	ListNode *head = NULL;
@@ -1158,17 +1036,6 @@ int ThreadPoolShutdown(ThreadPool *tp)
 	return 0;
 }
 
-/****************************************************************************
- * Function: TPAttrInit
- *
- *  Description:
- *      Initializes thread pool attributes.
- *      Sets values to defaults defined in ThreadPool.h.
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
 int TPAttrInit(ThreadPoolAttr *attr)
 {
 	if (!attr) {
@@ -1186,20 +1053,6 @@ int TPAttrInit(ThreadPoolAttr *attr)
 	return 0;
 }
 
-/****************************************************************************
- * Function: TPJobInit
- *
- *  Description:
- *      Initializes thread pool job.
- *      Sets the priority to default defined in ThreadPool.h.
- *      Sets the free_routine to default defined in ThreadPool.h
- *  Parameters:
- *      ThreadPoolJob *job - must be valid thread pool attributes.
- *      start_routine func - function to run, must be valid
- *      void * arg - argument to pass to function.
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
 int TPJobInit(ThreadPoolJob *job, start_routine func, void *arg)
 {
 	if (!job || !func) {
@@ -1213,18 +1066,6 @@ int TPJobInit(ThreadPoolJob *job, start_routine func, void *arg)
 	return 0;
 }
 
-/****************************************************************************
- * Function: TPJobSetPriority
- *
- *  Description:
- *      Sets the max threads for the thread pool attributes.
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *      maxThreads - value to set
- *  Returns:
- *      Returns 0 on success nonzero on failure.
- *      Returns EINVAL if invalid priority.
- *****************************************************************************/
 int TPJobSetPriority(ThreadPoolJob *job, ThreadPriority priority)
 {
 	if (!job) {
@@ -1240,17 +1081,6 @@ int TPJobSetPriority(ThreadPoolJob *job, ThreadPriority priority)
 	}
 }
 
-/****************************************************************************
- * Function: TPJobSetFreeFunction
- *
- *  Description:
- *      Sets the max threads for the thread pool attributes.
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *      maxThreads - value to set
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
 int TPJobSetFreeFunction(ThreadPoolJob *job, free_routine func)
 {
 	if(!job) {
@@ -1261,17 +1091,6 @@ int TPJobSetFreeFunction(ThreadPoolJob *job, free_routine func)
 	return 0;
 }
 
-/****************************************************************************
- * Function: TPAttrSetMaxThreads
- *
- *  Description:
- *      Sets the max threads for the thread pool attributes.
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *      maxThreads - value to set
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
 int TPAttrSetMaxThreads(ThreadPoolAttr *attr, int maxThreads)
 {
 	if (!attr) {
@@ -1282,17 +1101,6 @@ int TPAttrSetMaxThreads(ThreadPoolAttr *attr, int maxThreads)
 	return 0;
 }
 
-/****************************************************************************
- * Function: TPAttrSetMinThreads
- *
- *  Description:
- *      Sets the min threads for the thread pool attributes.
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *      minThreads - value to set
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
 int TPAttrSetMinThreads(ThreadPoolAttr *attr, int minThreads)
 {
 	if (!attr) {
@@ -1303,17 +1111,6 @@ int TPAttrSetMinThreads(ThreadPoolAttr *attr, int minThreads)
 	return 0;
 }
 
-/****************************************************************************
- * Function: TPAttrSetStackSize
- *
- *  Description:
- *      Sets the stack size for the thread pool attributes.
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *      stackSize - value to set
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
 int TPAttrSetStackSize(ThreadPoolAttr *attr, size_t stackSize)
 {
         if (!attr) {
@@ -1324,17 +1121,6 @@ int TPAttrSetStackSize(ThreadPoolAttr *attr, size_t stackSize)
         return 0;
 }
 
-
-/****************************************************************************
- * Function: TPAttrSetIdleTime
- *
- *  Description:
- *      Sets the idle time for the thread pool attributes.
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
 int TPAttrSetIdleTime(ThreadPoolAttr *attr, int idleTime)
 {
 	if (!attr) {
@@ -1345,16 +1131,6 @@ int TPAttrSetIdleTime(ThreadPoolAttr *attr, int idleTime)
 	return 0;
 }
 
-/****************************************************************************
- * Function: TPAttrSetJobsPerThread
- *
- *  Description:
- *      Sets the max thre
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
 int TPAttrSetJobsPerThread(ThreadPoolAttr *attr, int jobsPerThread)
 {
 	if (!attr) {
@@ -1365,16 +1141,6 @@ int TPAttrSetJobsPerThread(ThreadPoolAttr *attr, int jobsPerThread)
 	return 0;
 }
 
-/****************************************************************************
- * Function: TPAttrSetStarvationTime
- *
- *  Description:
- *      Sets the starvation time for the thread pool attributes.
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
 int TPAttrSetStarvationTime(ThreadPoolAttr *attr, int starvationTime)
 {
 	if (!attr) {
@@ -1385,17 +1151,6 @@ int TPAttrSetStarvationTime(ThreadPoolAttr *attr, int starvationTime)
 	return 0;
 }
 
-/****************************************************************************
- * Function: TPAttrSetSchedPolicy
- *
- *  Description:
- *      Sets the scheduling policy for the thread pool attributes.
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *      PolicyType schedPolicy - must be a valid policy type.
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
 int TPAttrSetSchedPolicy(ThreadPoolAttr *attr, PolicyType schedPolicy)
 {
 	if (!attr) {
@@ -1406,17 +1161,6 @@ int TPAttrSetSchedPolicy(ThreadPoolAttr *attr, PolicyType schedPolicy)
 	return 0;
 }
 
-/****************************************************************************
- * Function: TPAttrSetMaxJobsTotal
- *
- *  Description:
- *      Sets the maximum number jobs that can be qeued totally.
- *  Parameters:
- *      attr - must be valid thread pool attributes.
- *      maxJobsTotal - maximum number of jobs
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
 int TPAttrSetMaxJobsTotal(ThreadPoolAttr *attr, int maxJobsTotal)
 {
 	if (!attr) {
@@ -1426,7 +1170,6 @@ int TPAttrSetMaxJobsTotal(ThreadPoolAttr *attr, int maxJobsTotal)
 
 	return 0;
 }
-
 
 #ifdef STATS
 void ThreadPoolPrintStats(ThreadPoolStats *stats)
@@ -1450,23 +1193,7 @@ void ThreadPoolPrintStats(ThreadPoolStats *stats)
 	printf("Total Time spent Working in seconds: %f\n", stats->totalWorkTime);
 	printf("Total Time spent Idle in seconds : %f\n", stats->totalIdleTime);
 }
-#endif /* STATS */
 
-
-/****************************************************************************
- * Function: ThreadPoolGetStats
- *
- *  Description:
- *      Returns various statistics about the
- *      thread pool.
- *      Only valid if STATS has been defined.
- *  Parameters:
- *      ThreadPool *tp - valid initialized threadpool
- *      ThreadPoolStats *stats - valid stats, out parameter
- *  Returns:
- *      Always returns 0.
- *****************************************************************************/
-#ifdef STATS
 int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
 {
 	if (tp == NULL || stats == NULL) {
@@ -1496,9 +1223,9 @@ int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
 	}
 	stats->totalThreads = tp->totalThreads;
 	stats->persistentThreads = tp->persistentThreads;
-	stats->currentJobsHQ = ListSize( &tp->highJobQ );
-	stats->currentJobsLQ = ListSize( &tp->lowJobQ );
-	stats->currentJobsMQ = ListSize( &tp->medJobQ );
+	stats->currentJobsHQ = (int)ListSize(&tp->highJobQ);
+	stats->currentJobsLQ = (int)ListSize(&tp->lowJobQ);
+	stats->currentJobsMQ = (int)ListSize(&tp->medJobQ);
 	/* if not shutdown then release mutex */
 	if (!tp->shutdown) {
 		ithread_mutex_unlock(&tp->mutex);
@@ -1506,47 +1233,44 @@ int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
 
 	return 0;
 }
-
 #endif /* STATS */
 
-
 #ifdef WIN32
+	#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+		#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
+	#else
+		#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
+	#endif
 
-#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-	#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
-#else
-	#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
-#endif
+	int gettimeofday(struct timeval *tv, struct timezone *tz)
+	{
+		FILETIME ft;
+		unsigned __int64 tmpres = 0;
+		static int tzflag;
 
-int gettimeofday(struct timeval *tv, struct timezone *tz)
-{
-	FILETIME ft;
-	unsigned __int64 tmpres = 0;
-	static int tzflag;
+		if (tv) {
+			GetSystemTimeAsFileTime(&ft);
 
-	if (tv) {
-		GetSystemTimeAsFileTime(&ft);
+			tmpres |= ft.dwHighDateTime;
+			tmpres <<= 32;
+			tmpres |= ft.dwLowDateTime;
 
-		tmpres |= ft.dwHighDateTime;
-		tmpres <<= 32;
-		tmpres |= ft.dwLowDateTime;
-
-		/*converting file time to unix epoch*/
-		tmpres /= 10;  /*convert into microseconds*/
-		tmpres -= DELTA_EPOCH_IN_MICROSECS; 
-		tv->tv_sec = (long)(tmpres / 1000000UL);
-		tv->tv_usec = (long)(tmpres % 1000000UL);
-	}
-	if (tz) {
-		if (!tzflag) {
-			_tzset();
-			tzflag++;
+			/*converting file time to unix epoch*/
+			tmpres /= 10;  /*convert into microseconds*/
+			tmpres -= DELTA_EPOCH_IN_MICROSECS; 
+			tv->tv_sec = (long)(tmpres / 1000000UL);
+			tv->tv_usec = (long)(tmpres % 1000000UL);
 		}
-		tz->tz_minuteswest = _timezone / 60;
-		tz->tz_dsttime = _daylight;
-	}
+		if (tz) {
+			if (!tzflag) {
+				_tzset();
+				tzflag++;
+			}
+			tz->tz_minuteswest = _timezone / 60;
+			tz->tz_dsttime = _daylight;
+		}
 
-	return 0;
-}
+		return 0;
+	}
 #endif /* WIN32 */
 

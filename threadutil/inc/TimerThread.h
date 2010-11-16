@@ -29,35 +29,31 @@
  *
  ******************************************************************************/
 
-
 #ifndef TIMERTHREAD_H
 #define TIMERTHREAD_H
-
 
 /*!
  * \file
  */
-
 
 #include "FreeList.h"
 #include "ithread.h"
 #include "LinkedList.h"
 #include "ThreadPool.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 #define INVALID_EVENT_ID (-10 & 1<<29)
 
-
-/* Timeout Types */
-/* absolute means in seconds from Jan 1, 1970 */
-/* relative means in seconds from current time */
-typedef enum timeoutType {ABS_SEC,REL_SEC} TimeoutType;
-
+/*! Timeout Types. */
+typedef enum timeoutType {
+	/*! seconds from Jan 1, 1970. */
+	ABS_SEC,
+	/*! seconds from current time. */
+	REL_SEC
+} TimeoutType;
 
 /*!
  * A timer thread similar to the one in the Upnp SDK that allows
@@ -79,7 +75,6 @@ typedef struct TIMERTHREAD
 	ThreadPool *tp;
 } TimerThread;
 
-
 /*!
  * Struct to contain information for a timer event.
  *
@@ -95,7 +90,6 @@ typedef struct TIMEREVENT
 	int id;
 } TimerEvent;
 
-
 /*!
  * \brief Initializes and starts timer thread.
  *
@@ -108,7 +102,6 @@ int TimerThreadInit(
 	/*! [in] Valid thread pool to use. Must be started. Must be valid for
 	 * lifetime of timer. Timer must be shutdown BEFORE thread pool. */
 	ThreadPool *tp);
-
 
 /*!
  * \brief Schedules an event to run at a specified time.
@@ -132,7 +125,6 @@ int TimerThreadSchedule(
 	/*! [in] Id of timer event. (out, can be null). */
 	int *id);
 
-
 /*!
  * \brief Removes an event from the timer Q.
  *
@@ -148,7 +140,6 @@ int TimerThreadRemove(
 	/*! [in] Space for thread pool job. */
 	ThreadPoolJob *out);
 
-
 /*!
  * \brief Shutdown the timer thread.
  *
@@ -161,7 +152,6 @@ int TimerThreadRemove(
 int TimerThreadShutdown(
 	/*! [in] Valid timer thread pointer. */
 	TimerThread *timer);
-
 
 #ifdef __cplusplus
 }
