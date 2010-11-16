@@ -168,4 +168,5 @@ int		TvCtrlPointProcessCommand(char *cmdline);
 };
 #endif
 
-#endif //UPNP_TV_CTRLPT_H
+#endif /*UPNP_TV_CTRLPT_H */
+

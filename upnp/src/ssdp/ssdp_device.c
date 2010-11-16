@@ -120,34 +120,38 @@ void ssdp_handle_device_request(
     int replyTime;
     int maxAge;
 
-    // check man hdr
+    /* check man hdr. */
     if( httpmsg_find_hdr( hmsg, HDR_MAN, &hdr_value ) == NULL ||
         memptr_cmp( &hdr_value, "\"ssdp:discover\"" ) != 0 ) {
-        return;                 // bad or missing hdr
+        /* bad or missing hdr. */
+        return;
     }
-    // MX header
+    /* MX header. */
     if( httpmsg_find_hdr( hmsg, HDR_MX, &hdr_value ) == NULL ||
         ( mx = raw_to_int( &hdr_value, 10 ) ) < 0 ) {
         return;
     }
-    // ST header
+    /* ST header. */
     if( httpmsg_find_hdr( hmsg, HDR_ST, &hdr_value ) == NULL ) {
         return;
     }
     save_char = hdr_value.buf[hdr_value.length];
     hdr_value.buf[hdr_value.length] = '\0';
     ret_code = ssdp_request_type( hdr_value.buf, &event );
-    hdr_value.buf[hdr_value.length] = save_char;    // restore
+    /* restore. */
+    hdr_value.buf[hdr_value.length] = save_char;
     if( ret_code == -1 ) {
-        return;                 // bad ST header
+        /* bad ST header. */
+        return;
     }
 
     HandleLock();
-    // device info
+    /* device info */
     if( GetDeviceHandleInfo( dest_addr->ss_family, 
         &handle, &dev_info ) != HND_DEVICE ) {
         HandleUnlock();
-        return;                 // no info found
+        /* no info found. */
+        return;
     }
     maxAge = dev_info->MaxAge;
     HandleUnlock();
@@ -180,11 +184,9 @@ void ssdp_handle_device_request(
     TPJobInit( &job, advertiseAndReplyThread, threadArg );
     TPJobSetFreeFunction( &job, ( free_routine ) free );
 
-    //Subtract a percentage from the mx
-    //to allow for network and processing delays
-    // (i.e. if search is for 30 seconds, 
-    //       respond withing 0 - 27 seconds)
-
+    /* Subtract a percentage from the mx to allow for network and processing
+     * delays (i.e. if search is for 30 seconds, respond
+     * within 0 - 27 seconds). */
     if( mx >= 2 ) {
         mx -= MAXVAL( 1, mx / MX_FUDGE_FACTOR );
     }
@@ -225,7 +227,8 @@ NewRequestHandler( IN struct sockaddr *DestAddr,
     int socklen = sizeof( struct sockaddr_storage );
     int Index;
     unsigned long replyAddr = inet_addr( gIF_IPV4 );
-    int ttl = 4; // a/c to UPNP Spec
+    /* a/c to UPNP Spec */
+    int ttl = 4;
     int hops = 1;
     char buf_ntop[64];
     int ret = UPNP_E_SUCCESS;
@@ -480,7 +483,7 @@ DeviceAdvertisement( IN char *DevType,
     struct sockaddr_in* DestAddr4 = (struct sockaddr_in*)&__ss;
     struct sockaddr_in6* DestAddr6 = (struct sockaddr_in6*)&__ss;
 
-    //char Mil_Nt[LINE_SIZE]
+    /* char Mil_Nt[LINE_SIZE] */
     char Mil_Usn[LINE_SIZE];
     char *msgs[3];
     int ret_code = UPNP_E_SUCCESS;
@@ -509,24 +512,20 @@ DeviceAdvertisement( IN char *DevType,
     msgs[1] = NULL;
     msgs[2] = NULL;
 
-    //If deviceis a root device , here we need to 
-    //send 3 advertisement or reply
+    /* If deviceis a root device , here we need to send 3 advertisement
+     * or reply */
     if( RootDev ) {
         sprintf( Mil_Usn, "%s::upnp:rootdevice", Udn );
         CreateServicePacket( MSGTYPE_ADVERTISEMENT, "upnp:rootdevice",
             Mil_Usn, Location, Duration, &msgs[0], AddressFamily );
     }
-    // both root and sub-devices need to send these two messages
-    //
-
+    /* both root and sub-devices need to send these two messages */
     CreateServicePacket( MSGTYPE_ADVERTISEMENT, Udn, Udn,
                          Location, Duration, &msgs[1], AddressFamily );
-
     sprintf( Mil_Usn, "%s::%s", Udn, DevType );
     CreateServicePacket( MSGTYPE_ADVERTISEMENT, DevType, Mil_Usn,
                          Location, Duration, &msgs[2], AddressFamily );
-
-    // check error
+    /* check error */
     if( ( RootDev && msgs[0] == NULL ) ||
         msgs[1] == NULL || msgs[2] == NULL ) {
         free( msgs[0] );
@@ -534,17 +533,17 @@ DeviceAdvertisement( IN char *DevType,
         free( msgs[2] );
         return UPNP_E_OUTOF_MEMORY;
     }
-    // send packets
+    /* send packets */
     if( RootDev ) {
-        // send 3 msg types
+        /* send 3 msg types */
         ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 3, &msgs[0] );
-    } else                      // sub-device
+    } else                      /* sub-device */
     {
-        // send 2 msg types
+        /* send 2 msg types */
         ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 2, &msgs[1] );
     }
 
-    // free msgs
+    /* free msgs */
     free( msgs[0] );
     free( msgs[1] );
     free( msgs[2] );
@@ -590,17 +589,17 @@ SendReply( IN struct sockaddr *DestAddr,
     msgs[1] = NULL;
 
     if( RootDev ) {
-        // one msg for root device
+        /* one msg for root device */
         num_msgs = 1;
 
         sprintf( Mil_Usn, "%s::upnp:rootdevice", Udn );
         CreateServicePacket( MSGTYPE_REPLY, "upnp:rootdevice",
             Mil_Usn, Location, Duration, &msgs[0], DestAddr->sa_family );
     } else {
-        // two msgs for embedded devices
+        /* two msgs for embedded devices */
         num_msgs = 1;
 
-        //NK: FIX for extra response when someone searches by udn
+        /*NK: FIX for extra response when someone searches by udn */
         if( !ByType ) {
             CreateServicePacket( MSGTYPE_REPLY, Udn, Udn, Location,
                 Duration, &msgs[0], DestAddr->sa_family );
@@ -611,7 +610,7 @@ SendReply( IN struct sockaddr *DestAddr,
         }
     }
 
-    // check error
+    /* check error */
     for( i = 0; i < num_msgs; i++ ) {
         if( msgs[i] == NULL ) {
             free( msgs[0] );
@@ -619,7 +618,7 @@ SendReply( IN struct sockaddr *DestAddr,
         }
     }
 
-    // send msgs
+    /* send msgs */
     ret_code = NewRequestHandler( DestAddr, num_msgs, msgs );
     for( i = 0; i < num_msgs; i++ ) {
         if( msgs[i] != NULL )
@@ -663,28 +662,23 @@ DeviceReply( IN struct sockaddr *DestAddr,
     szReq[1] = NULL;
     szReq[2] = NULL;
 
-    // create 2 or 3 msgs
-
+    /* create 2 or 3 msgs */
     if( RootDev ) {
-        // 3 replies for root device
+        /* 3 replies for root device */
         strcpy( Mil_Nt, "upnp:rootdevice" );
         sprintf( Mil_Usn, "%s::upnp:rootdevice", Udn );
         CreateServicePacket( MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
             Location, Duration, &szReq[0], DestAddr->sa_family );
     }
-
     sprintf( Mil_Nt, "%s", Udn );
     sprintf( Mil_Usn, "%s", Udn );
     CreateServicePacket( MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
         Location, Duration, &szReq[1], DestAddr->sa_family );
-
     sprintf( Mil_Nt, "%s", DevType );
     sprintf( Mil_Usn, "%s::%s", Udn, DevType );
     CreateServicePacket( MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
         Location, Duration, &szReq[2], DestAddr->sa_family );
-
-    // check error
-
+    /* check error */
     if( ( RootDev && szReq[0] == NULL ) ||
         szReq[1] == NULL || szReq[2] == NULL ) {
         free( szReq[0] );
@@ -692,14 +686,13 @@ DeviceReply( IN struct sockaddr *DestAddr,
         free( szReq[2] );
         return UPNP_E_OUTOF_MEMORY;
     }
-    // send replies
+    /* send replies */
     if( RootDev ) {
         RetVal = NewRequestHandler( DestAddr, 3, szReq );
     } else {
         RetVal = NewRequestHandler( DestAddr, 2, &szReq[1] );
     }
-
-    // free
+    /* free */
     free( szReq[0] );
     free( szReq[1] );
     free( szReq[2] );
@@ -756,8 +749,8 @@ ServiceAdvertisement( IN char *Udn,
 
     sprintf( Mil_Usn, "%s::%s", Udn, ServType );
 
-    //CreateServiceRequestPacket(1,szReq[0],Mil_Nt,Mil_Usn,
-    //Server,Location,Duration);
+    /* CreateServiceRequestPacket(1,szReq[0],Mil_Nt,Mil_Usn,
+     * Server,Location,Duration); */
     CreateServicePacket( MSGTYPE_ADVERTISEMENT, ServType, Mil_Usn,
                          Location, Duration, &szReq[0], AddressFamily );
     if( szReq[0] == NULL ) {
@@ -860,10 +853,10 @@ ServiceShutdown( IN char *Udn,
             "Invalid device address family.\n" );
     }
 
-    //sprintf(Mil_Nt,"%s",ServType);
+    /* sprintf(Mil_Nt,"%s",ServType); */
     sprintf( Mil_Usn, "%s::%s", Udn, ServType );
-    //CreateServiceRequestPacket(0,szReq[0],Mil_Nt,Mil_Usn,
-    //Server,Location,Duration);
+    /* CreateServiceRequestPacket(0,szReq[0],Mil_Nt,Mil_Usn,
+     * Server,Location,Duration); */
     CreateServicePacket( MSGTYPE_SHUTDOWN, ServType, Mil_Usn,
                          Location, Duration, &szReq[0], AddressFamily );
     if( szReq[0] == NULL ) {
@@ -929,25 +922,21 @@ DeviceShutdown( IN char *DevType,
         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
             "Invalid device address family.\n" );
     }
-
-    // root device has one extra msg
+    /* root device has one extra msg */
     if( RootDev ) {
         sprintf( Mil_Usn, "%s::upnp:rootdevice", Udn );
         CreateServicePacket( MSGTYPE_SHUTDOWN, "upnp:rootdevice",
             Mil_Usn, Location, Duration, &msgs[0], AddressFamily );
     }
-
     UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
         "In function DeviceShutdown\n" );
-    // both root and sub-devices need to send these two messages
+    /* both root and sub-devices need to send these two messages */
     CreateServicePacket( MSGTYPE_SHUTDOWN, Udn, Udn,
                          Location, Duration, &msgs[1], AddressFamily );
-
     sprintf( Mil_Usn, "%s::%s", Udn, DevType );
     CreateServicePacket( MSGTYPE_SHUTDOWN, DevType, Mil_Usn,
                          Location, Duration, &msgs[2], AddressFamily );
-
-    // check error
+    /* check error */
     if( ( RootDev && msgs[0] == NULL ) ||
         msgs[1] == NULL || msgs[2] == NULL ) {
         free( msgs[0] );
@@ -955,17 +944,16 @@ DeviceShutdown( IN char *DevType,
         free( msgs[2] );
         return UPNP_E_OUTOF_MEMORY;
     }
-    // send packets
+    /* send packets */
     if( RootDev ) {
-        // send 3 msg types
+        /* send 3 msg types */
         ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 3, &msgs[0] );
-    } else                      // sub-device
-    {
-        // send 2 msg types
+    } else {
+	/* sub-device */
+        /* send 2 msg types */
         ret_code = NewRequestHandler( (struct sockaddr*)&__ss, 2, &msgs[1] );
     }
-
-    // free msgs
+    /* free msgs */
     free( msgs[0] );
     free( msgs[1] );
     free( msgs[2] );
@@ -973,6 +961,6 @@ DeviceShutdown( IN char *DevType,
     return ret_code;
 }
 
-#endif // EXCLUDE_SSDP
-#endif // INCLUDE_DEVICE_APIS
+#endif /* EXCLUDE_SSDP */
+#endif /* INCLUDE_DEVICE_APIS */
 

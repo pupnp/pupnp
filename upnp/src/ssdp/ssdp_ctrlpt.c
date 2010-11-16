@@ -29,16 +29,12 @@
  *
  **************************************************************************/
 
-
 #include "config.h"
-
 
 #include "upnputil.h"
 
-
 #ifdef INCLUDE_CLIENT_APIS
 #if EXCLUDE_SSDP == 0
-
 
 #include "httpparser.h"
 #include "httpreadwrite.h"
@@ -50,14 +46,11 @@
 #include "UpnpInet.h"
 #include "ThreadPool.h"
 
-
 #include <stdio.h>
-
 
 #ifdef WIN32
 	#include <string.h>
 #endif /* WIN32 */
-
 
 /************************************************************************
  * Function: send_search_result
@@ -107,13 +100,16 @@ void send_search_result(IN void *data)
 void ssdp_handle_ctrlpt_msg(
 	IN http_message_t *hmsg,
 	IN struct sockaddr_storage *dest_addr,
-	IN xboolean timeout, // only in search reply
-	IN void *cookie)    // only in search reply
+	/* only in search reply */
+	IN xboolean timeout,
+	/* only in search reply */
+	IN void *cookie)
 {
     int handle;
     struct Handle_Info *ctrlpt_info = NULL;
     memptr hdr_value;
-    xboolean is_byebye;         // byebye or alive
+    /* byebye or alive */
+    xboolean is_byebye;
     UpnpDiscovery *param = UpnpDiscovery_new();
     int expires;
     int ret;
@@ -131,20 +127,18 @@ void ssdp_handle_ctrlpt_msg(
     SSDPResultData *threadData = NULL;
     ThreadPoolJob job;
 
-    // we are assuming that there can be only one client supported at a time
-
+    /* we are assuming that there can be only one client supported at a time */
     HandleReadLock();
 
     if ( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
         HandleUnlock();
 	goto end_ssdp_handle_ctrlpt_msg;
     }
-    // copy
+    /* copy */
     ctrlpt_callback = ctrlpt_info->Callback;
     ctrlpt_cookie = ctrlpt_info->Cookie;
     HandleUnlock();
-
-    // search timeout
+    /* search timeout */
     if ( timeout ) {
         ctrlpt_callback( UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie );
 	goto end_ssdp_handle_ctrlpt_msg;
@@ -152,8 +146,7 @@ void ssdp_handle_ctrlpt_msg(
 
     UpnpDiscovery_set_ErrCode(param, UPNP_E_SUCCESS);
 
-    // MAX-AGE
-    // assume error
+    /* MAX-AGE, assume error */
     expires = -1;
     UpnpDiscovery_set_Expires(param, expires);
     if ( httpmsg_find_hdr( hmsg, HDR_CACHE_CONTROL, &hdr_value ) != NULL ) {
@@ -164,28 +157,28 @@ void ssdp_handle_ctrlpt_msg(
 	}
     }
 
-    // DATE
+    /* DATE */
     if ( httpmsg_find_hdr( hmsg, HDR_DATE, &hdr_value ) != NULL ) {
         UpnpDiscovery_strcpy_Date(param, hdr_value.buf);
     }
 
-    // dest addr
+    /* dest addr */
     UpnpDiscovery_set_DestAddr(param, dest_addr);
 
-    // EXT
+    /* EXT */
     if ( httpmsg_find_hdr( hmsg, HDR_EXT, &hdr_value ) != NULL ) {
     	UpnpDiscovery_strncpy_Ext(param, hdr_value.buf, hdr_value.length);
     }
-    // LOCATION
+    /* LOCATION */
     if ( httpmsg_find_hdr( hmsg, HDR_LOCATION, &hdr_value ) != NULL ) {
         UpnpDiscovery_strncpy_Location(param, hdr_value.buf, hdr_value.length);
     }
-    // SERVER / USER-AGENT
+    /* SERVER / USER-AGENT */
     if ( httpmsg_find_hdr( hmsg, HDR_SERVER, &hdr_value ) != NULL ||
         httpmsg_find_hdr( hmsg, HDR_USER_AGENT, &hdr_value ) != NULL ) {
         UpnpDiscovery_strncpy_Os(param, hdr_value.buf, hdr_value.length);
     }
-    // clear everything
+    /* clear everything */
     event.UDN[0] = '\0';
     event.DeviceType[0] = '\0';
     event.ServiceType[0] = '\0';
@@ -213,11 +206,11 @@ void ssdp_handle_ctrlpt_msg(
         UpnpDiscovery_strcpy_ServiceType(param, event.ServiceType);
     }
 
-    // ADVERT. OR BYEBYE
+    /* ADVERT. OR BYEBYE */
     if( hmsg->is_request ) {
-        // use NTS hdr to determine advert., or byebye
+        /* use NTS hdr to determine advert., or byebye */
         if ( httpmsg_find_hdr( hmsg, HDR_NTS, &hdr_value ) == NULL ) {
-            // error; NTS header not found
+            /* error; NTS header not found */
             goto end_ssdp_handle_ctrlpt_msg;
         }
         if ( memptr_cmp( &hdr_value, "ssdp:alive" ) == 0 ) {
@@ -225,37 +218,37 @@ void ssdp_handle_ctrlpt_msg(
         } else if( memptr_cmp( &hdr_value, "ssdp:byebye" ) == 0 ) {
             is_byebye = TRUE;
         } else {
-            // bad value
+            /* bad value */
             goto end_ssdp_handle_ctrlpt_msg;
         }
 
         if ( is_byebye ) {
-            // check device byebye
+            /* check device byebye */
             if( !nt_found || !usn_found ) {
-                // bad byebye
+                /* bad byebye */
                 goto end_ssdp_handle_ctrlpt_msg;
             }
             event_type = UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE;
         } else {
-            // check advertisement      
-            // .Expires is valid if positive. This is for testing
-            //  only. Expires should be greater than 1800 (30 mins)
+            /* check advertisement.
+	     * Expires is valid if positive. This is for testing
+	     * only. Expires should be greater than 1800 (30 mins) */
             if( !nt_found ||
                 !usn_found ||
                 UpnpString_get_Length(UpnpDiscovery_get_Location(param)) == 0 ||
 		UpnpDiscovery_get_Expires(param) <= 0 ) {
-                // bad advertisement
+                /* bad advertisement */
                 goto end_ssdp_handle_ctrlpt_msg;
             }
             event_type = UPNP_DISCOVERY_ADVERTISEMENT_ALIVE;
         }
 
-        // call callback
+        /* call callback */
         ctrlpt_callback( event_type, param, ctrlpt_cookie );
     } else {
-        // reply (to a SEARCH)
-	//
-        // only checking to see if there is a valid ST header
+        /* reply (to a SEARCH) */
+	/* */
+        /* only checking to see if there is a valid ST header */
         st_found = FALSE;
         if( httpmsg_find_hdr( hmsg, HDR_ST, &hdr_value ) != NULL ) {
             save_char = hdr_value.buf[hdr_value.length];
@@ -268,10 +261,10 @@ void ssdp_handle_ctrlpt_msg(
             UpnpString_get_Length(UpnpDiscovery_get_Location(param)) == 0 ||
 	    !usn_found ||
 	    !st_found ) {
-            // bad reply
+            /* bad reply */
             goto end_ssdp_handle_ctrlpt_msg;
         }
-        // check each current search
+        /* check each current search */
         HandleLock();
         if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
             HandleUnlock();
@@ -279,14 +272,14 @@ void ssdp_handle_ctrlpt_msg(
         }
         node = ListHead( &ctrlpt_info->SsdpSearchList );
 
-        // temporary add null termination
-        //save_char = hdr_value.buf[ hdr_value.length ];
-        //hdr_value.buf[ hdr_value.length ] = '\0';
+        /* temporary add null termination */
+        /*save_char = hdr_value.buf[ hdr_value.length ]; */
+        /*hdr_value.buf[ hdr_value.length ] = '\0'; */
 
         while( node != NULL ) {
             searchArg = node->item;
             matched = 0;
-            // check for match of ST header and search target
+            /* check for match of ST header and search target */
             switch ( searchArg->requestType ) {
             case SSDP_ALL:
                         matched = 1;
@@ -320,7 +313,7 @@ void ssdp_handle_ctrlpt_msg(
             }
 
             if (matched) {
-                // schedule call back
+                /* schedule call back */
 		threadData = SSDPResultData_new();
                 if (threadData != NULL) {
                     SSDPResultData_set_Param(threadData, param);
@@ -336,7 +329,7 @@ void ssdp_handle_ctrlpt_msg(
         }
 
         HandleUnlock();
-        //ctrlpt_callback( UPNP_DISCOVERY_SEARCH_RESULT, param, cookie );
+        /*ctrlpt_callback( UPNP_DISCOVERY_SEARCH_RESULT, param, cookie ); */
     }
 end_ssdp_handle_ctrlpt_msg:
     UpnpDiscovery_delete(param);
@@ -431,15 +424,14 @@ static void CreateClientRequestPacketUlaGua(
 * Returns: void
 *
 ***************************************************************************/
-void
-searchExpired( void *arg )
+void searchExpired(void *arg)
 {
 
-    int *id = ( int * )arg;
+    int *id = (int *)arg;
     int handle = -1;
     struct Handle_Info *ctrlpt_info = NULL;
 
-    //remove search Target from list and call client back
+    /* remove search Target from list and call client back */
     ListNode *node = NULL;
     SsdpSearchArg *item;
     Upnp_FunPtr ctrlpt_callback;
@@ -448,18 +440,14 @@ searchExpired( void *arg )
 
     HandleLock();
 
-    //remove search target from search list
-
+    /* remove search target from search list */
     if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
         free( id );
         HandleUnlock();
         return;
     }
-
     ctrlpt_callback = ctrlpt_info->Callback;
-
     node = ListHead( &ctrlpt_info->SsdpSearchList );
-
     while( node != NULL ) {
         item = ( SsdpSearchArg * ) node->item;
         if( item->timeoutEventId == ( *id ) ) {
@@ -531,7 +519,7 @@ int SearchByTarget(
 	unsigned long addrv4 = inet_addr(gIF_IPV4);
 	int max_fd = 0;
 
-	//ThreadData *ThData;
+	/*ThreadData *ThData;*/
 	ThreadPoolJob job;
 
 	requestType = ssdp_request_type1(St);
@@ -647,7 +635,7 @@ int SearchByTarget(
 			imillisleep(SSDP_PAUSE);
 		}
 	}
-#endif  //IPv6
+#endif  /* IPv6 */
 
 	if (gSsdpReqSocket4 != INVALID_SOCKET && 
 	    FD_ISSET(gSsdpReqSocket4, &wrSet)) {
@@ -668,5 +656,6 @@ int SearchByTarget(
 	return 1;
 }
 
-#endif // EXCLUDE_SSDP
-#endif // INCLUDE_CLIENT_APIS
+#endif /* EXCLUDE_SSDP */
+#endif /* INCLUDE_CLIENT_APIS */
+

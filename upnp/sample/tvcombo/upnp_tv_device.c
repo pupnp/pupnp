@@ -92,31 +92,31 @@ UpnpDevice_Handle device_handle = -1;
  */
 ithread_mutex_t TVDevMutex;
 
-//Color constants
+/*Color constants */
 #define MAX_COLOR 10
 #define MIN_COLOR 1
 
-//Brightness constants
+/*Brightness constants */
 #define MAX_BRIGHTNESS 10
 #define MIN_BRIGHTNESS 1
 
-//Power constants
+/*Power constants */
 #define POWER_ON 1
 #define POWER_OFF 0
 
-//Tint constants
+/*Tint constants */
 #define MAX_TINT 10
 #define MIN_TINT 1
 
-//Volume constants
+/*Volume constants */
 #define MAX_VOLUME 10
 #define MIN_VOLUME 1
 
-//Contrast constants
+/*Contrast constants */
 #define MAX_CONTRAST 10
 #define MIN_CONTRAST 1
 
-//Channel constants
+/*Channel constants */
 #define MAX_CHANNEL 100
 #define MIN_CHANNEL 1
 
@@ -287,7 +287,7 @@ TvDeviceStateTableInit( IN char *DescDocURL )
      *ctrlurl_pict = NULL;
     char *udn = NULL;
 
-    //Download description document
+    /*Download description document */
     if( UpnpDownloadXmlDoc( DescDocURL, &DescDoc ) != UPNP_E_SUCCESS ) {
         SampleUtil_Print( "TvDeviceStateTableInit -- Error Parsing %s\n",
                           DescDocURL );
@@ -312,7 +312,7 @@ TvDeviceStateTableInit( IN char *DescDocURL )
         goto error_handler;
     }
 
-    //set control service table
+    /*set control service table */
     SetServiceTable( TV_SERVICE_CONTROL, udn, servid_ctrl,
                      TvServiceType[TV_SERVICE_CONTROL],
                      &tv_service_table[TV_SERVICE_CONTROL] );
@@ -331,14 +331,14 @@ TvDeviceStateTableInit( IN char *DescDocURL )
         ret = UPNP_E_INVALID_DESC;
         goto error_handler;
     }
-    //set picture service table
+    /*set picture service table */
     SetServiceTable( TV_SERVICE_PICTURE, udn, servid_pict,
                      TvServiceType[TV_SERVICE_PICTURE],
                      &tv_service_table[TV_SERVICE_PICTURE] );
 
   error_handler:
 
-    //clean up
+    /*clean up */
     if( udn )
         free( udn );
     if( servid_ctrl )
@@ -380,7 +380,7 @@ int TvDeviceHandleSubscriptionRequest(IN const UpnpSubscriptionRequest *sr_event
 	const char *l_udn = NULL;
 	const char *l_sid = NULL;
 
-	// lock state mutex
+	/* lock state mutex */
 	ithread_mutex_lock(&TVDevMutex);
 
 	l_serviceId = UpnpString_get_String(UpnpSubscriptionRequest_get_ServiceId(sr_event));
@@ -394,22 +394,22 @@ int TvDeviceHandleSubscriptionRequest(IN const UpnpSubscriptionRequest *sr_event
 			PropSet = NULL;
 
 			for (j = 0; j< tv_service_table[i].VariableCount; ++j) {
-				// add each variable to the property set
-				// for initial state dump
+				/* add each variable to the property set */
+				/* for initial state dump */
 				UpnpAddToPropertySet(
 					&PropSet, 
 					tv_service_table[i].VariableName[j],
 					tv_service_table[i].VariableStrVal[j]);
 			}
 
-			// dump initial state 
+			/* dump initial state  */
 			UpnpAcceptSubscriptionExt(
 				device_handle,
 				l_udn, 
 				l_serviceId,
 				PropSet,
 				l_sid);
-			// free document
+			/* free document */
 			Document_free(PropSet);
 #endif
 			UpnpAcceptSubscription(
@@ -454,14 +454,14 @@ int TvDeviceHandleGetVarRequest(INOUT UpnpStateVarRequest *cgv_event)
 	ithread_mutex_lock(&TVDevMutex);
 
 	for (i = 0; i < TV_SERVICE_SERVCOUNT; i++) {
-		// check udn and service id
+		/* check udn and service id */
 		const char *devUDN =
 			UpnpString_get_String(UpnpStateVarRequest_get_DevUDN(cgv_event));
 		const char *serviceID =
 			UpnpString_get_String(UpnpStateVarRequest_get_ServiceID(cgv_event));
 		if (strcmp(devUDN, tv_service_table[i].UDN) == 0 &&
 		    strcmp(serviceID, tv_service_table[i].ServiceId) == 0) {
-			// check variable name
+			/* check variable name */
 			for (j = 0; j < tv_service_table[i].VariableCount; j++) {
 				const char *stateVarName = UpnpString_get_String(
 					UpnpStateVarRequest_get_StateVarName(cgv_event));
@@ -563,7 +563,7 @@ int TvDeviceHandleActionRequest(INOUT UpnpActionRequest *ca_event)
 		if (retCode == UPNP_E_SUCCESS) {
 			UpnpActionRequest_set_ErrCode(ca_event, UPNP_E_SUCCESS);
 		} else {
-			// copy the error string
+			/* copy the error string */
 			UpnpActionRequest_strcpy_ErrStr(ca_event, errorString);
 			switch (retCode) {
 			case UPNP_E_INVALID_PARAM:
@@ -603,7 +603,7 @@ TvDeviceSetServiceTableVar( IN unsigned int service,
                             IN unsigned int variable,
                             IN char *value )
 {
-    //IXML_Document  *PropSet= NULL;
+    /*IXML_Document  *PropSet= NULL; */
 
     if( ( service >= TV_SERVICE_SERVCOUNT )
         || ( variable >= tv_service_table[service].VariableCount )
@@ -615,8 +615,8 @@ TvDeviceSetServiceTableVar( IN unsigned int service,
 
     strcpy( tv_service_table[service].VariableStrVal[variable], value );
 
-    /*
-       //Using utility api
+#if 0
+       /*Using utility api */
        PropSet= UpnpCreatePropertySet(1,tv_service_table[service].
        VariableName[variable], 
        tv_service_table[service].
@@ -625,9 +625,9 @@ TvDeviceSetServiceTableVar( IN unsigned int service,
        UpnpNotifyExt(device_handle, tv_service_table[service].UDN, 
        tv_service_table[service].ServiceId,PropSet);
 
-       //Free created property set
+       /*Free created property set */
        Document_free(PropSet);
-     */
+#endif
 
     UpnpNotify( device_handle,
                 tv_service_table[service].UDN,
@@ -696,7 +696,7 @@ TvDevicePowerOn( IN IXML_Document *in, OUT IXML_Document **out, OUT char **error
     ( *errorString ) = NULL;
 
     if( TvDeviceSetPower( POWER_ON ) ) {
-        //create a response
+        /*create a response */
 
         if( UpnpAddToActionResponse( out, "PowerOn",
                                      TvServiceType[TV_SERVICE_CONTROL],
@@ -733,7 +733,7 @@ TvDevicePowerOff( IN IXML_Document * in,
     ( *out ) = NULL;
     ( *errorString ) = NULL;
     if( TvDeviceSetPower( POWER_OFF ) ) {
-        //create a response
+        /*create a response */
 
         if( UpnpAddToActionResponse( out, "PowerOff",
                                      TvServiceType[TV_SERVICE_CONTROL],

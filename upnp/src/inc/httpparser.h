@@ -29,49 +29,45 @@
  *
  ******************************************************************************/
 
-
 #ifndef GENLIB_NET_HTTP_HTTPPARSER_H
 #define GENLIB_NET_HTTP_HTTPPARSER_H
-
 
 /*!
  * \file
  */
-
 
 #include "LinkedList.h"
 #include "membuffer.h"
 #include "uri.h"
 #include "upnputil.h"
 
+/* private types */
 
-////// private types ////////////
+/* scanner */
 
-
-//////////////////////
-// scanner
-///////////////////////
-// Used to represent different types of tokens in input
-typedef enum // token_type_t
+/* Used to represent different types of tokens in input. */
+typedef enum
 {
 	TT_IDENTIFIER, 
 	TT_WHITESPACE, 
 	TT_CRLF, 
-	TT_CTRL,				// needed ??
-	TT_SEPARATOR,			// ??
-	TT_QUOTEDSTRING,		// ??
+	TT_CTRL,
+	TT_SEPARATOR,
+	TT_QUOTEDSTRING,
 } token_type_t;
 
-typedef struct // scanner_t
+typedef struct
 {
-	membuffer* msg;				// raw http msg
-	size_t cursor;				// current position in buffer
-	xboolean entire_msg_loaded;	// set this to TRUE if the entire msg is loaded in
-								//   in 'msg'; else FALSE if only partial msg in 'msg'
-								//   (default is FALSE)
+	/*! raw http msg. */
+	membuffer* msg;
+	/*! current position in buffer. */
+	size_t cursor;
+	/*! set this to TRUE if the entire msg is loaded in 'msg';
+	 * else FALSE if only partial msg in 'msg' (default is FALSE). */
+	xboolean entire_msg_loaded;
 } scanner_t;
 
-typedef enum // parser_pos_t
+typedef enum
 {
 	POS_REQUEST_LINE,
 	POS_RESPONSE_LINE,
@@ -80,21 +76,17 @@ typedef enum // parser_pos_t
 	POS_COMPLETE,
 } parser_pos_t;
 
-
 #define ENTREAD_DETERMINE_READ_METHOD	1
-#define ENTREAD_USING_CLEN				2
-#define ENTREAD_USING_CHUNKED			3
-#define ENTREAD_UNTIL_CLOSE				4
-#define ENTREAD_CHUNKY_BODY				5
-#define ENTREAD_CHUNKY_HEADERS			6
+#define ENTREAD_USING_CLEN		2
+#define ENTREAD_USING_CHUNKED		3
+#define ENTREAD_UNTIL_CLOSE		4
+#define ENTREAD_CHUNKY_BODY		5
+#define ENTREAD_CHUNKY_HEADERS		6
 
+/* end of private section. */
 
-// end of private section
-//////////////////
-// ##################################################################################
-
-// method in a HTTP request
-typedef enum // http_method_t
+/* method in a HTTP request. */
+typedef enum
 {
 	HTTPMETHOD_POST, 
 	HTTPMETHOD_MPOST, 
@@ -105,116 +97,121 @@ typedef enum // http_method_t
 	HTTPMETHOD_HEAD, 
 	HTTPMETHOD_MSEARCH, 
 	HTTPMETHOD_UNKNOWN,
-    SOAPMETHOD_POST,	 //murari
+	SOAPMETHOD_POST,
 	HTTPMETHOD_SIMPLEGET
 } http_method_t;
 
-// different types of HTTP headers
-#define HDR_UNKNOWN				-1
+/* different types of HTTP headers */
+#define HDR_UNKNOWN			-1
 #define HDR_CACHE_CONTROL		1
 #define HDR_CALLBACK			2
 #define HDR_CONTENT_LENGTH		3
 #define HDR_CONTENT_TYPE		4
-#define HDR_DATE				5
-#define HDR_EXT					6
-#define HDR_HOST				7
-//#define HDR_IF_MODIFIED_SINCE	8
-//#define HDR_IF_UNMODIFIED_SINCE	9
-//#define HDR_LAST_MODIFIED		10
+#define HDR_DATE			5
+#define HDR_EXT				6
+#define HDR_HOST			7
+/*define HDR_IF_MODIFIED_SINCE		8 */
+/*define HDR_IF_UNMODIFIED_SINCE	9 */
+/*define HDR_LAST_MODIFIED		10 */
 #define HDR_LOCATION			11
-#define HDR_MAN					12
-#define HDR_MX					13
-#define HDR_NT					14
-#define HDR_NTS					15
-#define HDR_SERVER				16
-#define HDR_SEQ					17
-#define HDR_SID					18
+#define HDR_MAN				12
+#define HDR_MX				13
+#define HDR_NT				14
+#define HDR_NTS				15
+#define HDR_SERVER			16
+#define HDR_SEQ				17
+#define HDR_SID				18
 #define HDR_SOAPACTION			19
-#define HDR_ST					20
-#define HDR_TIMEOUT				21
-#define HDR_TRANSFER_ENCODING	22
-#define HDR_USN					23
+#define HDR_ST				20
+#define HDR_TIMEOUT			21
+#define HDR_TRANSFER_ENCODING		22
+#define HDR_USN				23
 #define HDR_USER_AGENT			24
 
-//Adding new header difinition//Beg_Murari
-#define HDR_ACCEPT              25
-#define HDR_ACCEPT_ENCODING     26
-#define HDR_ACCEPT_CHARSET      27
-#define HDR_ACCEPT_LANGUAGE     28
-#define HDR_ACCEPT_RANGE        29
-#define HDR_CONTENT_ENCODING    30
-#define HDR_CONTENT_LANGUAGE    31
-#define HDR_CONTENT_LOCATION    32
-#define HDR_CONTENT_RANGE       33
-#define HDR_IF_RANGE            34
-#define HDR_RANGE               35
-#define HDR_TE                  36
-//End_Murari
+/* Adding new header difinition */
+#define HDR_ACCEPT			25
+#define HDR_ACCEPT_ENCODING		26
+#define HDR_ACCEPT_CHARSET		27
+#define HDR_ACCEPT_LANGUAGE		28
+#define HDR_ACCEPT_RANGE		29
+#define HDR_CONTENT_ENCODING		30
+#define HDR_CONTENT_LANGUAGE		31
+#define HDR_CONTENT_LOCATION		32
+#define HDR_CONTENT_RANGE		33
+#define HDR_IF_RANGE			34
+#define HDR_RANGE			35
+#define HDR_TE				36
 
-// status of parsing
-typedef enum // parse_status_t
-{
-	PARSE_SUCCESS = 0,	// msg was parsed successfully
-	PARSE_INCOMPLETE,	// need more data to continue
-	PARSE_INCOMPLETE_ENTITY,	// for responses that don't have length specified
-	PARSE_FAILURE,		// parse failed; check status code for details
-	PARSE_OK,			// done partial
-	PARSE_NO_MATCH,		// token not matched
-
-	// private
+/*! status of parsing */
+typedef enum {
+	/*! msg was parsed successfully. */
+	PARSE_SUCCESS = 0,
+	/*! need more data to continue. */
+	PARSE_INCOMPLETE,
+	/*! for responses that don't have length specified. */
+	PARSE_INCOMPLETE_ENTITY,
+	/*! parse failed; check status code for details. */
+	PARSE_FAILURE,
+	/*! done partial. */
+	PARSE_OK,
+	/*! token not matched. */
+	PARSE_NO_MATCH,
+	/*! private. */
 	PARSE_CONTINUE_1
 } parse_status_t;
 
-typedef struct // http_header_t
-{
-	memptr name;		// header name as a string
-	int name_id;		// header name id (for a selective group of headers only)
-	membuffer value;	// raw-value; could be multi-lined; min-length = 0
-
-    // private
-    membuffer name_buf;
+typedef struct {
+	/*! header name as a string. */
+	memptr name;
+	/*! header name id (for a selective group of headers only). */
+	int name_id;
+	/*! raw-value; could be multi-lined; min-length = 0. */
+	membuffer value;
+	/* private. */
+	membuffer name_buf;
 } http_header_t;
 
-typedef struct // http_message_t
-{
-    int initialized;
-	// request only
+typedef struct {
+	int initialized;
+	/*! request only. */
 	http_method_t method;
+	/*! request only. */
 	uri_type uri;
-
-	// response only
+	/*! response only. */
 	http_method_t request_method;
+	/*! response only. */
 	int status_code;
+	/*! response only. */
 	membuffer status_msg;
-
-	// fields used in both request or response messages
-	xboolean is_request;	// if TRUE, msg is a request, else response
-
-	int major_version;		// http major.minor version
+	/* fields used in both request or response messages. */
+	/*! if TRUE, msg is a request, else response. */
+	xboolean is_request;
+	/* http major version. */
+	int major_version;
+	/* http minor version. */
 	int minor_version;
-
-
+	/*! . */
 	LinkedList headers;
-//NNS:	dlist headers;			// dlist<http_header_t *>
-	memptr entity;			// message body(entity)
-
-	// private fields
-	membuffer msg;		// entire raw message
-        char *urlbuf;	// storage for url string
+	/*! message body(entity). */
+	memptr entity;
+	/* private fields. */
+	/*! entire raw message. */
+	membuffer msg;
+        /*! storage for url string. */
+        char *urlbuf;
+	/*! . */
         size_t entity_offset;
 } http_message_t;
 
-typedef struct // http_parser_t
-{
+typedef struct {
 	http_message_t msg;
-	int http_error_code;	// read-only; in case of parse error, this
-							//  contains the HTTP error code (4XX or 5XX)
-
-    // read-only; this is set to true if a NOTIFY request has no content-length.
-    //  used to read valid sspd notify msg.
-    xboolean valid_ssdp_notify_hack;
-
-	// private data -- don't touch
+	/*! read-only; in case of parse error, this
+	 * contains the HTTP error code (4XX or 5XX). */
+	int http_error_code;
+	/*! read-only; this is set to true if a NOTIFY request has no
+	 * content-length. used to read valid sspd notify msg. */
+	xboolean valid_ssdp_notify_hack;
+	/* private data -- don't touch. */
 	parser_pos_t position;
 	int ent_position;
 	unsigned int content_length;
@@ -223,15 +220,9 @@ typedef struct // http_parser_t
 	scanner_t scanner;
 } http_parser_t;
 
-
-//--------------------------------------------------
-//////////////// functions /////////////////////////
-//--------------------------------------------------
-
 #ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
-
+#endif /* __cplusplus */
 
 /************************************************************************
 *	Function :	httpmsg_init
@@ -272,8 +263,7 @@ void httpmsg_destroy( INOUT http_message_t* msg );
 *		in	the linked list of messages
 *
 *	Return : http_header_t* - Pointer to a header on success;
-*			 NULL on failure														
-*
+*			 NULL on failure
 *	Note :
 ************************************************************************/
 http_header_t* httpmsg_find_hdr_str( IN http_message_t* msg,
@@ -289,8 +279,8 @@ http_header_t* httpmsg_find_hdr_str( IN http_message_t* msg,
 *
 *	Description :	Finds header from a list, with the given 'name_id'.
 *
-*	Return : http_header_t*  - Pointer to a header on success;										*
-*			 NULL on failure														
+*	Return : http_header_t*  - Pointer to a header on success;
+*		 NULL on failure
 *
 *	Note :
 ************************************************************************/
@@ -404,9 +394,9 @@ parse_status_t parser_get_entity_read_method( INOUT http_parser_t* parser );
 *																		
 * Parameters:															
 *	INOUT http_parser_t* parser ;	HTTP Parser Object					
-*	IN const char* buf	;			buffer to be appended to the parser 
-*									buffer							
-*	IN size_t buf_length ;			Size of the buffer												
+*	IN const char* buf	;	buffer to be appended to the parser
+*					buffer
+*	IN size_t buf_length ;		Size of the buffer
 *																		
 * Description: The parser function. Depending on the position of the 	
 *	parser object the actual parsing function is invoked				
@@ -422,8 +412,8 @@ parse_status_t parser_append( INOUT http_parser_t* parser,
 * Function: matchstr													
 *																		
 * Parameters:															
-*	IN char *str ;		 String to be matched														
-*	IN size_t slen ;     Length of the string														
+*	IN char *str ;		 String to be matched
+*	IN size_t slen ;     Length of the string
 *	IN const char* fmt ; Pattern format												
 *	...																	
 *																		
@@ -436,10 +426,6 @@ parse_status_t parser_append( INOUT http_parser_t* parser,
 *   PARSE_FAILURE	-- 'str' is bad input							
 ************************************************************************/
 int matchstr( IN char *str, IN size_t slen, IN const char* fmt, ... );
-
-// ====================================================
-// misc functions
-
 
 /************************************************************************
 * Function: raw_to_int													
@@ -481,10 +467,9 @@ int raw_find_str( IN memptr* raw_value, IN const char* str );
 *	nameConverts a http_method id stored in the HTTP Method				
 *																		
 * Returns:																
-*	 const char* ptr - Ptr to the HTTP Method																							*
+*	 const char* ptr - Ptr to the HTTP Method
 ************************************************************************/
 const char* method_to_str( IN http_method_t method );
-
 
 /*!
  * \brief Print the HTTP headers.
@@ -492,15 +477,18 @@ const char* method_to_str( IN http_method_t method );
 #ifdef DEBUG
 void print_http_headers(
 	/*! [in] HTTP Message object. */
-	http_message_t *hmsg );
+	http_message_t *hmsg);
 #else
-static UPNP_INLINE void print_http_headers(http_message_t *hmsg) {}
+static UPNP_INLINE void print_http_headers(http_message_t *hmsg)
+{
+	return;
+	hmsg = hmsg;
+}
 #endif
 
 #ifdef __cplusplus
 }		/* extern "C" */
 #endif	/* __cplusplus */
-
 
 #endif /* GENLIB_NET_HTTP_HTTPPARSER_H */
 

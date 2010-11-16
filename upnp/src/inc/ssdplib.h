@@ -29,7 +29,6 @@
  *
  **************************************************************************/
 
-
 #ifndef SSDPLIB_H
 #define SSDPLIB_H 
 
@@ -113,11 +112,8 @@ typedef enum SsdpCmdType{
 #define E_SOCKET 		-7
 #define RQST_TIMEOUT    20
 
-
-
-/* Structure to store the SSDP information */
-typedef struct SsdpEventStruct
-{
+/*! Structure to store the SSDP information */
+typedef struct SsdpEventStruct {
   enum SsdpCmdType Cmd;
   enum SsdpSearchType RequestType;
   int  ErrCode;
@@ -125,7 +121,8 @@ typedef struct SsdpEventStruct
   int  Mx;
   char UDN[LINE_SIZE];
   char DeviceType[LINE_SIZE];
-  char ServiceType[LINE_SIZE];  //NT or ST
+  /* NT or ST */
+  char ServiceType[LINE_SIZE];
   char Location[LINE_SIZE];
   char HostAddr[LINE_SIZE];
   char Os[LINE_SIZE];
@@ -146,7 +143,7 @@ typedef struct TData
    char * Data;
    struct sockaddr_storage DestAddr;
    
-}ThreadData;
+} ThreadData;
 
 typedef struct ssdpsearchreply
 {
@@ -155,7 +152,7 @@ typedef struct ssdpsearchreply
   struct sockaddr_storage dest_addr;
   SsdpEvent event;
   
-}SsdpSearchReply;
+} SsdpSearchReply;
 
 typedef struct ssdpsearcharg
 {

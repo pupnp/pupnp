@@ -29,90 +29,39 @@
  *
  ******************************************************************************/
 
-/************************************************************************
-* Purpose: This file contains functions for copying strings based on 
-* different options.
-************************************************************************/
-
+/*!
+ * \file
+ *
+ * Purpose: This file contains functions for copying strings based on
+ * different options.
+ */
 
 #include "config.h"
 #include "upnp.h"
 #include "upnputil.h"
 
-
 #include <string.h>
 
-
-/************************************************************************
-*	Function :	linecopy
-*
-*	Parameters :
-*		OUT char dest[LINE_SIZE] ;	output buffer
-*		IN const char* src ;	input buffer
-*
-*	Description : Copy no of bytes spcified by the LINE_SIZE constant, 
-*		from the source buffer. Null terminate the destination buffer
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void
-linecopy( OUT char dest[LINE_SIZE],
-          IN const char *src )
+void linecopy(char dest[LINE_SIZE], const char *src)
 {
-    strncpy( dest, src, LINE_SIZE - 1 );
-    dest[LINE_SIZE - 1] = '\0'; // null-terminate if len(src) >= LINE_SIZE
+	strncpy(dest, src, LINE_SIZE - 1);
+	/* null-terminate if len(src) >= LINE_SIZE. */
+	dest[LINE_SIZE - 1] = '\0';
 }
 
-/************************************************************************
-*	Function :	namecopy
-*
-*	Parameters :
-*		OUT char dest[NAME_SIZE] ;	output buffer
-*		IN const char* src ;	input buffer
-*
-*	Description : Copy no of bytes spcified by the NAME_SIZE constant, 
-*		from the source buffer. Null terminate the destination buffer
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void
-namecopy( OUT char dest[NAME_SIZE],
-          IN const char *src )
+void namecopy(char dest[NAME_SIZE], const char *src)
 {
-    strncpy( dest, src, NAME_SIZE - 1 );
-    dest[NAME_SIZE - 1] = '\0'; // null-terminate if len(src) >= NAME_SIZE
+	strncpy(dest, src, NAME_SIZE - 1);
+	/* null-terminate if len(src) >= NAME_SIZE. */
+	dest[NAME_SIZE - 1] = '\0';
 }
 
-/************************************************************************
-*	Function :	linecopylen
-*
-*	Parameters :
-*		OUT char dest[LINE_SIZE] ;	output buffer
-*		IN const char* src ;	input buffer
-*		IN size_t srclen ;	bytes to be copied.
-*
-*	Description : Determine if the srclen passed in paramter is less than 
-*		the permitted LINE_SIZE. If it is use the passed parameter, if not
-*		use the permitted LINE_SIZE as the length parameter
-*		Copy no of bytes spcified by the LINE_SIZE constant, 
-*		from the source buffer. Null terminate the destination buffer
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void
-linecopylen( OUT char dest[LINE_SIZE],
-             IN const char *src,
-             IN size_t srclen )
+void linecopylen(char dest[LINE_SIZE], const char *src, size_t srclen)
 {
-    int len;
+	int len;
 
-    len = srclen < ( LINE_SIZE - 1 ) ? srclen : ( LINE_SIZE - 1 );
-    strncpy( dest, src, len );
-    dest[len] = '\0';
+	len = srclen < (LINE_SIZE - 1) ? srclen : (LINE_SIZE - 1);
+	strncpy(dest, src, len);
+	dest[len] = '\0';
 }
+

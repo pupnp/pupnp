@@ -61,74 +61,74 @@ extern "C" {
 #endif
 
 
-//Color constants
+/*Color constants */
 #define MAX_COLOR 10
 #define MIN_COLOR 1
 
-//Brightness constants
+/*Brightness constants */
 #define MAX_BRIGHTNESS 10
 #define MIN_BRIGHTNESS 1
 
-//Power constants
+/*Power constants */
 #define POWER_ON 1
 #define POWER_OFF 0
 
-//Tint constants
+/*Tint constants */
 #define MAX_TINT 10
 #define MIN_TINT 1
 
-//Volume constants
+/*Volume constants */
 #define MAX_VOLUME 10
 #define MIN_VOLUME 1
 
-//Contrast constants
+/*Contrast constants */
 #define MAX_CONTRAST 10
 #define MIN_CONTRAST 1
 
-//Channel constants
+/*Channel constants */
 #define MAX_CHANNEL 100
 #define MIN_CHANNEL 1
 
-//Number of services.
+/*Number of services. */
 #define TV_SERVICE_SERVCOUNT  2
 
-//Index of control service
+/*Index of control service */
 #define TV_SERVICE_CONTROL    0
 
-//Index of picture service
+/*Index of picture service */
 #define TV_SERVICE_PICTURE    1
 
-//Number of control variables
+/*Number of control variables */
 #define TV_CONTROL_VARCOUNT   3
 
-//Index of power variable
+/*Index of power variable */
 #define TV_CONTROL_POWER      0
 
-//Index of channel variable
+/*Index of channel variable */
 #define TV_CONTROL_CHANNEL    1
 
-//Index of volume variable
+/*Index of volume variable */
 #define TV_CONTROL_VOLUME     2
 
-//Number of picture variables
+/*Number of picture variables */
 #define TV_PICTURE_VARCOUNT   4
 
-//Index of color variable
+/*Index of color variable */
 #define TV_PICTURE_COLOR      0
 
-//Index of tint variable
+/*Index of tint variable */
 #define TV_PICTURE_TINT       1
 
-//Index of contrast variable
+/*Index of contrast variable */
 #define TV_PICTURE_CONTRAST   2
 
-//Index of brightness variable
+/*Index of brightness variable */
 #define TV_PICTURE_BRIGHTNESS 3
 
-//Max value length
+/*Max value length */
 #define TV_MAX_VAL_LEN 5
 
-//Max actions
+/*Max actions */
 #define TV_MAXACTIONS 12
 
 /* This should be the maximum VARCOUNT from above */
@@ -177,10 +177,10 @@ struct TvService {
   unsigned int  VariableCount;
 };
 
-//Array of service structures
+/*Array of service structures */
 extern struct TvService tv_service_table[];
 
-//Device handle returned from sdk
+/*Device handle returned from sdk */
 extern UpnpDevice_Handle device_handle;
 
 
@@ -310,7 +310,7 @@ int TvDeviceCallbackEventHandler(Upnp_EventType, void*, void*);
  *****************************************************************************/
 int TvDeviceSetServiceTableVar(unsigned int, unsigned int, char*);
 
-//Control Service Actions
+/*Control Service Actions */
 
 /******************************************************************************
  * TvDevicePowerOn
@@ -436,7 +436,7 @@ int TvDeviceIncreaseVolume(IN IXML_Document *in, OUT IXML_Document **out, OUT ch
 int TvDeviceDecreaseVolume(IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString);
 
 
-//Picture Service Actions
+/*Picture Service Actions */
 
 /******************************************************************************
  * TvDeviceSetColor

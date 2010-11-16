@@ -280,7 +280,7 @@ static int genaNotify(
 
     membuffer_init( &mid_msg );
 
-    // make 'end' msg (the part that won't vary with the destination)
+    /* make 'end' msg (the part that won't vary with the destination) */
     endmsg.size_inc = 30;
     if( http_MakeMessage(
         &mid_msg, 1, 1,
@@ -291,7 +291,7 @@ static int genaNotify(
         membuffer_destroy( &mid_msg );
         return UPNP_E_OUTOF_MEMORY;
     }
-    // send a notify to each url until one goes thru
+    /* send a notify to each url until one goes thru */
     for( i = 0; i < sub->DeliveryURLs.size; i++ ) {
         url = &sub->DeliveryURLs.parsedURLs[i];
         return_code = notify_send_and_recv(
@@ -308,7 +308,7 @@ static int genaNotify(
             return_code = GENA_SUCCESS;
         } else {
             if( response.msg.status_code == HTTP_PRECONDITION_FAILED ) {
-                //Invalid SID gets removed
+                /*Invalid SID gets removed */
                 return_code = GENA_E_NOTIFY_UNACCEPTED_REMOVE_SUB;
             } else {
                 return_code = GENA_E_NOTIFY_UNACCEPTED;
@@ -345,9 +345,9 @@ static void genaNotifyThread(
      * is a lot of notifications, then multiple threads will acquire a read
      * lock and the thread which sends the notification will be blocked forever
      * on the HandleLock at the end of this function. */
-    //HandleReadLock();
+    /*HandleReadLock(); */
     HandleLock();
-    //validate context
+    /*validate context */
 
     if( GetHandleInfo( in->device_handle, &handle_info ) != HND_DEVICE ) {
         free_notify_struct( in );
@@ -366,7 +366,7 @@ static void genaNotifyThread(
     }
 
 #ifdef UPNP_ENABLE_NOTIFICATION_REORDERING
-    //If the event is out of order push it back to the job queue
+    /*If the event is out of order push it back to the job queue */
     if( in->eventKey != sub->ToSendEventKey ) {
 
         TPJobInit( &job, ( start_routine ) genaNotifyThread, input );
@@ -388,7 +388,7 @@ static void genaNotifyThread(
 
     HandleUnlock();
 
-    //send the notify
+    /*send the notify */
     return_code = genaNotify( in->headers, in->propertySet, &sub_copy );
 
     freeSubscription( &sub_copy );
@@ -400,7 +400,7 @@ static void genaNotifyThread(
         HandleUnlock();
         return;
     }
-    //validate context
+    /*validate context */
     if( ( ( service = FindServiceId( &handle_info->ServiceTable,
                                      in->servId, in->UDN ) ) == NULL )
         || ( !service->active )
@@ -412,7 +412,7 @@ static void genaNotifyThread(
 
     sub->ToSendEventKey++;
 
-    if( sub->ToSendEventKey < 0 )   //wrap to 1 for overflow
+    if( sub->ToSendEventKey < 0 )   /*wrap to 1 for overflow */
         sub->ToSendEventKey = 1;
 
     if( return_code == GENA_E_NOTIFY_UNACCEPTED_REMOVE_SUB ) {
@@ -1233,20 +1233,20 @@ void gena_process_subscription_request(
 		goto exit_function;
 	}
 
-	// check NT header
-	// Windows Millenium Interoperability:
-	// we accept either upnp:event, or upnp:propchange for the NT header
+	/* check NT header */
+	/* Windows Millenium Interoperability: */
+	/* we accept either upnp:event, or upnp:propchange for the NT header */
 	if (memptr_cmp_nocase(&nt_hdr, "upnp:event") != 0) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, request);
 		goto exit_function;
 	}
 
-	// if a SID is present then the we have a bad request "incompatible headers"
+	/* if a SID is present then the we have a bad request "incompatible headers" */
 	if (httpmsg_find_hdr(request, HDR_SID, NULL) != NULL) {
 		error_respond(info, HTTP_BAD_REQUEST, request);
 		goto exit_function;
 	}
-	// look up service by eventURL
+	/* look up service by eventURL */
 	event_url_path = str_alloc(request->uri.pathquery.buff, request->uri.pathquery.size);
 	if (event_url_path == NULL) {
 		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
@@ -1259,7 +1259,7 @@ void gena_process_subscription_request(
 
 	HandleLock();
 
-	// CURRENTLY, ONLY ONE DEVICE
+	/* CURRENTLY, ONLY ONE DEVICE */
 	if (GetDeviceHandleInfo(info->foreign_sockaddr.ss_family , 
 	    &device_handle, &handle_info) != HND_DEVICE) {
 		free(event_url_path);
@@ -1282,14 +1282,14 @@ void gena_process_subscription_request(
 		service->TotalSubscriptions,
 		handle_info->MaxSubscriptions);
 
-	// too many subscriptions
+	/* too many subscriptions */
 	if (handle_info->MaxSubscriptions != -1 &&
 	    service->TotalSubscriptions >= handle_info->MaxSubscriptions) {
 		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
 		HandleUnlock();
 		goto exit_function;
 	}
-	// generate new subscription
+	/* generate new subscription */
 	sub = (subscription *)malloc(sizeof (subscription));
 	if (sub == NULL) {
 		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
@@ -1304,7 +1304,7 @@ void gena_process_subscription_request(
 	sub->DeliveryURLs.URLs = NULL;
 	sub->DeliveryURLs.parsedURLs = NULL;
 
-	// check for valid callbacks
+	/* check for valid callbacks */
 	if (httpmsg_find_hdr( request, HDR_CALLBACK, &callback_hdr) == NULL) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, request);
 		freeSubscriptionList(sub);
@@ -1324,20 +1324,20 @@ void gena_process_subscription_request(
 		HandleUnlock();
 		goto exit_function;
 	}
-	// set the timeout
+	/* set the timeout */
 	if (httpmsg_find_hdr(request, HDR_TIMEOUT, &timeout_hdr) != NULL) {
 		if (matchstr(timeout_hdr.buf, timeout_hdr.length,
 		    "%iSecond-%d%0", &time_out) == PARSE_OK) {
-			// nothing
+			/* nothing */
 		} else if(memptr_cmp_nocase(&timeout_hdr, "Second-infinite") == 0) {
-			// infinite timeout
+			/* infinite timeout */
 			time_out = -1;
 		} else {
-			// default is > 1800 seconds
+			/* default is > 1800 seconds */
 			time_out = DEFAULT_TIMEOUT;
 		}
 	}
-	// replace infinite timeout with max timeout, if possible
+	/* replace infinite timeout with max timeout, if possible */
 	if (handle_info->MaxSubscriptionTimeOut != -1) {
 		if (time_out == -1 ||
 		    time_out > handle_info->MaxSubscriptionTimeOut) {
@@ -1347,40 +1347,40 @@ void gena_process_subscription_request(
 	if (time_out >= 0) {
 		sub->expireTime = time(NULL) + time_out;
 	} else {
-		// infinite time
+		/* infinite time */
 		sub->expireTime = 0;
 	}
 
-	// generate SID
+	/* generate SID */
 	uuid_create(&uid);
 	uuid_unpack(&uid, temp_sid);
 	sprintf(sub->sid, "uuid:%s", temp_sid);
 
-	// respond OK
+	/* respond OK */
 	if (respond_ok(info, time_out, sub, request) != UPNP_E_SUCCESS) {
 		freeSubscriptionList(sub);
 		HandleUnlock();
 		goto exit_function;
 	}
-	// add to subscription list
+	/* add to subscription list */
 	sub->next = service->subscriptionList;
 	service->subscriptionList = sub;
 	service->TotalSubscriptions++;
 
-	// finally generate callback for init table dump
+	/* finally generate callback for init table dump */
 	UpnpSubscriptionRequest_strcpy_ServiceId(request_struct, service->serviceId);
 	UpnpSubscriptionRequest_strcpy_UDN(request_struct, service->UDN);
 	UpnpSubscriptionRequest_strcpy_SID(request_struct, sub->sid);
 
-	// copy callback
+	/* copy callback */
 	callback_fun = handle_info->Callback;
 	cookie = handle_info->Cookie;
 
 	HandleUnlock();
 
-	// make call back with request struct
-	// in the future should find a way of mainting that the handle
-	// is not unregistered in the middle of a callback
+	/* make call back with request struct */
+	/* in the future should find a way of mainting that the handle */
+	/* is not unregistered in the middle of a callback */
 	callback_fun(UPNP_EVENT_SUBSCRIPTION_REQUEST, request_struct, cookie);
 
 exit_function:
@@ -1402,13 +1402,13 @@ void gena_process_subscription_renewal_request(
     membuffer event_url_path;
     memptr timeout_hdr;
 
-    // if a CALLBACK or NT header is present, then it is an error
+    /* if a CALLBACK or NT header is present, then it is an error */
     if( httpmsg_find_hdr( request, HDR_CALLBACK, NULL ) != NULL ||
         httpmsg_find_hdr( request, HDR_NT, NULL ) != NULL ) {
         error_respond( info, HTTP_BAD_REQUEST, request );
         return;
     }
-    // get SID
+    /* get SID */
     if( httpmsg_find_hdr( request, HDR_SID, &temp_hdr ) == NULL ||
         temp_hdr.length > SID_SIZE ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
@@ -1417,7 +1417,7 @@ void gena_process_subscription_renewal_request(
     memcpy( sid, temp_hdr.buf, temp_hdr.length );
     sid[temp_hdr.length] = '\0';
 
-    // lookup service by eventURL
+    /* lookup service by eventURL */
     membuffer_init( &event_url_path );
     if( membuffer_append( &event_url_path, request->uri.pathquery.buff,
                           request->uri.pathquery.size ) != 0 ) {
@@ -1427,7 +1427,7 @@ void gena_process_subscription_renewal_request(
 
     HandleLock();
 
-    // CURRENTLY, ONLY SUPPORT ONE DEVICE
+    /* CURRENTLY, ONLY SUPPORT ONE DEVICE */
     if( GetDeviceHandleInfo( info->foreign_sockaddr.ss_family,
         &device_handle, &handle_info ) != HND_DEVICE ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
@@ -1439,7 +1439,7 @@ void gena_process_subscription_renewal_request(
                                        event_url_path.buf );
     membuffer_destroy( &event_url_path );
 
-    // get subscription
+    /* get subscription */
     if( service == NULL ||
         !service->active ||
         ( ( sub = GetSubscriptionSID( sid, service ) ) == NULL ) ) {
@@ -1453,7 +1453,7 @@ void gena_process_subscription_renewal_request(
         "Max Subscriptions allowed:%d\n",
         service->TotalSubscriptions,
         handle_info->MaxSubscriptions );
-    // too many subscriptions
+    /* too many subscriptions */
     if( handle_info->MaxSubscriptions != -1 &&
             service->TotalSubscriptions > handle_info->MaxSubscriptions ) {
         error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
@@ -1461,25 +1461,25 @@ void gena_process_subscription_renewal_request(
         HandleUnlock();
         return;
     }
-    // set the timeout
+    /* set the timeout */
     if( httpmsg_find_hdr( request, HDR_TIMEOUT, &timeout_hdr ) != NULL ) {
         if( matchstr( timeout_hdr.buf, timeout_hdr.length,
                       "%iSecond-%d%0", &time_out ) == PARSE_OK ) {
 
-            //nothing
+            /*nothing */
 
         } else if( memptr_cmp_nocase( &timeout_hdr, "Second-infinite" ) ==
                    0 ) {
 
-            time_out = -1;      // inifinite timeout
+            time_out = -1;      /* inifinite timeout */
 
         } else {
-            time_out = DEFAULT_TIMEOUT; // default is > 1800 seconds
+            time_out = DEFAULT_TIMEOUT; /* default is > 1800 seconds */
 
         }
     }
 
-    // replace infinite timeout with max timeout, if possible
+    /* replace infinite timeout with max timeout, if possible */
     if( handle_info->MaxSubscriptionTimeOut != -1 ) {
         if( time_out == -1 ||
             time_out > handle_info->MaxSubscriptionTimeOut ) {
@@ -1513,13 +1513,13 @@ void gena_process_unsubscribe_request(
     memptr temp_hdr;
     membuffer event_url_path;
 
-    // if a CALLBACK or NT header is present, then it is an error
+    /* if a CALLBACK or NT header is present, then it is an error */
     if( httpmsg_find_hdr( request, HDR_CALLBACK, NULL ) != NULL ||
         httpmsg_find_hdr( request, HDR_NT, NULL ) != NULL ) {
         error_respond( info, HTTP_BAD_REQUEST, request );
         return;
     }
-    // get SID
+    /* get SID */
     if( httpmsg_find_hdr( request, HDR_SID, &temp_hdr ) == NULL ||
         temp_hdr.length > SID_SIZE ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
@@ -1528,7 +1528,7 @@ void gena_process_unsubscribe_request(
     memcpy( sid, temp_hdr.buf, temp_hdr.length );
     sid[temp_hdr.length] = '\0';
 
-    // lookup service by eventURL
+    /* lookup service by eventURL */
     membuffer_init( &event_url_path );
     if( membuffer_append( &event_url_path, request->uri.pathquery.buff,
                           request->uri.pathquery.size ) != 0 ) {
@@ -1538,7 +1538,7 @@ void gena_process_unsubscribe_request(
 
     HandleLock();
 
-    // CURRENTLY, ONLY SUPPORT ONE DEVICE
+    /* CURRENTLY, ONLY SUPPORT ONE DEVICE */
     if( GetDeviceHandleInfo( info->foreign_sockaddr.ss_family,
         &device_handle, &handle_info ) != HND_DEVICE ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
@@ -1550,7 +1550,7 @@ void gena_process_unsubscribe_request(
                                        event_url_path.buf );
     membuffer_destroy( &event_url_path );
 
-    // validate service
+    /* validate service */
     if( service == NULL ||
         !service->active || GetSubscriptionSID( sid, service ) == NULL )
     {
@@ -1560,7 +1560,7 @@ void gena_process_unsubscribe_request(
     }
 
     RemoveSubscriptionSID(sid, service);
-    error_respond(info, HTTP_OK, request);    // success
+    error_respond(info, HTTP_OK, request);    /* success */
 
     HandleUnlock();
 }

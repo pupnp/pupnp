@@ -16,7 +16,7 @@
 #ifdef INCLUDE_CLIENT_APIS
 
 
-#include <stdlib.h> // for calloc(), free()
+#include <stdlib.h> /* for calloc(), free() */
 
 
 void free_client_subscription(GenlibClientSubscription *sub)
@@ -28,8 +28,8 @@ void free_client_subscription(GenlibClientSubscription *sub)
 		GenlibClientSubscription_strcpy_ActualSID(sub, "");
 		GenlibClientSubscription_strcpy_EventURL(sub, "");
 		if (renewEventId != -1) {
-			// do not remove timer event of copy
-			// invalid timer event id
+			/* do not remove timer event of copy */
+			/* invalid timer event id */
 			if (TimerThreadRemove(&gTimerThread, renewEventId, &tempJob) == 0) {
 				event = (upnp_timeout *)tempJob.arg;
 				free_upnp_timeout(event);

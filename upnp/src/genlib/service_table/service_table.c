@@ -135,7 +135,7 @@ subscription *GetSubscriptionSID(const Upnp_SID sid, service_info *service)
         }
     }
     if( found ) {
-        //get the current_time
+        /*get the current_time */
         time( &current_time );
         if( ( found->expireTime != 0 )
             && ( found->expireTime < current_time ) ) {
@@ -161,7 +161,7 @@ subscription *GetNextSubscription(service_info *service, subscription *current)
     subscription *previous = NULL;
     int notDone = 1;
 
-    // get the current_time
+    /* get the current_time */
     time( &current_time );
     while( ( notDone ) && ( current ) ) {
         previous = current;
@@ -195,7 +195,7 @@ subscription *GetFirstSubscription(service_info *service)
 	temp.next = service->subscriptionList;
 	next = GetNextSubscription(service, &temp);
 	service->subscriptionList = temp.next;
-	// service->subscriptionList = next;
+	/* service->subscriptionList = next; */
 	
 	return next;
 }
@@ -980,9 +980,9 @@ removeServiceTable( IXML_Node * node,
                     && ( ( getSubElement( "UDN", node, &currentUDN ) )
                          && ( UDN = getElementValue( currentUDN ) ) ) ) {
                     current_service = start_search;
-                    //Services are put in the service table in the order in which they appear in the 
-                    //description document, therefore we go through the list only once to remove a particular
-                    //root device
+                    /*Services are put in the service table in the order in which they appear in the  */
+                    /*description document, therefore we go through the list only once to remove a particular */
+                    /*root device */
                     while( ( current_service )
                            && ( strcmp( current_service->UDN, UDN ) ) ) {
                         current_service = current_service->next;
@@ -1108,4 +1108,5 @@ getServiceTable( IXML_Node * node,
     return 0;
 }
 
-#endif // INCLUDE_DEVICE_APIS
+#endif /* INCLUDE_DEVICE_APIS */
+

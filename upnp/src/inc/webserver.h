@@ -130,9 +130,9 @@ void web_server_callback(
 
 
 #ifdef __cplusplus
-} // extern C
+} /* extern C */
 #endif
 
 
-#endif // GENLIB_NET_HTTP_WEBSERVER_H
+#endif /* GENLIB_NET_HTTP_WEBSERVER_H */
 

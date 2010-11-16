@@ -316,7 +316,7 @@ static UPNP_INLINE int get_content_type(
 
 	UpnpFileInfo_set_ContentType(fileInfo, NULL);
 
-	// get ext
+	/* get ext */
 	extension = strrchr(filename, '.');
 	if (extension != NULL) {
 		if (search_extension(extension + 1, &type, &subtype) == 0) {
@@ -325,7 +325,7 @@ static UPNP_INLINE int get_content_type(
 	}
 
 	if (!ctype_found) {
-		// unknown content type
+		/* unknown content type */
 		type = gMediaTypes[APPLICATION_INDEX];
 		subtype = "octet-stream";
 	}
@@ -396,7 +396,7 @@ static void alias_release(
 	struct xml_alias_t *alias)
 {
 	ithread_mutex_lock(&gWebMutex);
-	// ignore invalid alias
+	/* ignore invalid alias */
 	if (!is_valid_alias(alias)) {
 		ithread_mutex_unlock(&gWebMutex);
 		return;
@@ -420,7 +420,7 @@ int web_server_set_alias(const char *alias_name,
 
 	alias_release(&gAliasDoc);
 	if (alias_name == NULL) {
-		// don't serve aliased doc anymore
+		/* don't serve aliased doc anymore */
 		return 0;
 	}
 	assert(alias_content != NULL);
@@ -428,24 +428,24 @@ int web_server_set_alias(const char *alias_name,
 	membuffer_init(&alias.name);
 	alias.ct = NULL;
 	do {
-		// insert leading /, if missing
+		/* insert leading /, if missing */
 		if (*alias_name != '/') {
 			if (membuffer_assign_str(&alias.name, "/") != 0) {
-				break;	// error; out of mem
+				break;	/* error; out of mem */
 			}
 		}
 		ret_code = membuffer_append_str(&alias.name, alias_name);
 		if (ret_code != 0) {
-			break;	// error
+			break;	/* error */
 		}
 		if ((alias.ct = (int *)malloc(sizeof(int))) == NULL) {
-			break;	// error
+			break;	/* error */
 		}
 		*alias.ct = 1;
 		membuffer_attach(&alias.doc, (char *)alias_content,
 				 alias_content_length);
 		alias.last_modified = last_modified;
-		// save in module var
+		/* save in module var */
 		ithread_mutex_lock(&gWebMutex);
 		gAliasDoc = alias;
 		ithread_mutex_unlock(&gWebMutex);
@@ -453,8 +453,8 @@ int web_server_set_alias(const char *alias_name,
 		return 0;
 	} while (FALSE);
 
-	// error handler
-	// free temp alias
+	/* error handler */
+	/* free temp alias */
 	membuffer_destroy(&alias.name);
 	membuffer_destroy(&alias.doc);
 	free(alias.ct);
@@ -465,13 +465,13 @@ int web_server_init()
 {
 	int ret = 0;
 	if (bWebServerState == WEB_SERVER_DISABLED) {
-		// decode media list
+		/* decode media list */
 		media_list_init();
 		membuffer_init(&gDocumentRootDir);
 		glob_alias_init();
 		pVirtualDirList = NULL;
 
-		// Initialize callbacks
+		/* Initialize callbacks */
 		virtualDirCallback.get_info = NULL;
 		virtualDirCallback.open = NULL;
 		virtualDirCallback.read = NULL;
@@ -543,7 +543,7 @@ static int get_file_info(
 		return -1;
 	}
 
-	// check readable
+	/* check readable */
 	fp = fopen(filename, "r");
 	UpnpFileInfo_set_IsReadable(info, fp != NULL);
 	if (fp) {
@@ -575,9 +575,9 @@ int web_server_set_root_dir(const char *root_dir)
 	if (ret != 0) {
 		return ret;
 	}
-	// remove trailing '/', if any
+	/* remove trailing '/', if any */
 	if (gDocumentRootDir.length > 0) {
-		index = gDocumentRootDir.length - 1;	// last char
+		index = gDocumentRootDir.length - 1;	/* last char */
 		if (gDocumentRootDir.buf[index] == '/') {
 			membuffer_delete(&gDocumentRootDir, index, 1);
 		}
@@ -900,7 +900,7 @@ static int CheckOtherHTTPHeaders(
 {
 	http_header_t *header;
 	ListNode *node;
-	//NNS: dlist_node* node;
+	/*NNS: dlist_node* node; */
 	int index, RetCode = HTTP_OK;
 	char *TmpBuf;
 
@@ -910,7 +910,7 @@ static int CheckOtherHTTPHeaders(
 	node = ListHead(&Req->headers);
 	while (node != NULL) {
 		header = (http_header_t *) node->item;
-		// find header type.
+		/* find header type. */
 		index = map_str_to_int((const char *)header->name.buf,
 				header->name.length, Http_Header_Names,
 				NUM_HTTP_HEADER_NAMES, FALSE);
@@ -959,23 +959,23 @@ static int CheckOtherHTTPHeaders(
 				   header.value is the value.
 				 */
 				/*
-				   case HDR_CONTENT_TYPE: //return 1;
-				   case HDR_CONTENT_LANGUAGE://return 1;
-				   case HDR_LOCATION: //return 1;
-				   case HDR_CONTENT_LOCATION://return 1;
-				   case HDR_ACCEPT: //return 1;
-				   case HDR_ACCEPT_CHARSET://return 1;
-				   case HDR_USER_AGENT: break;//return 1;
+				   case HDR_CONTENT_TYPE: return 1;
+				   case HDR_CONTENT_LANGUAGE:return 1;
+				   case HDR_LOCATION: return 1;
+				   case HDR_CONTENT_LOCATION:return 1;
+				   case HDR_ACCEPT: return 1;
+				   case HDR_ACCEPT_CHARSET: return 1;
+				   case HDR_USER_AGENT: return 1;
 				 */
 
-				//Header check for encoding
+				/*Header check for encoding */
 				/*
-				   case HDR_ACCEPT_RANGE: //Server capability.
-				   case HDR_CONTENT_RANGE://Response.
+				   case HDR_ACCEPT_RANGE:
+				   case HDR_CONTENT_RANGE:
 				   case HDR_IF_RANGE:
 				 */
 
-				//Header check for encoding
+				/*Header check for encoding */
 				/*
 				   case HDR_ACCEPT_ENCODING:
 				   if(StrStr(TmpBuf, "identity"))
@@ -984,7 +984,7 @@ static int CheckOtherHTTPHeaders(
 				   }
 				   else return -1;
 				   case HDR_CONTENT_ENCODING:
-				   case HDR_TRANSFER_ENCODING: //Response
+				   case HDR_TRANSFER_ENCODING:
 				 */
 				break;
 			}
@@ -1040,22 +1040,22 @@ static int process_request(
 	       req->method == HTTPMETHOD_HEAD ||
 	       req->method == HTTPMETHOD_POST ||
 	       req->method == HTTPMETHOD_SIMPLEGET);
-	// init
+	/* init */
 	request_doc = NULL;
 	finfo = UpnpFileInfo_new();
 	alias_grabbed = FALSE;
-	err_code = HTTP_INTERNAL_SERVER_ERROR;	// default error
+	err_code = HTTP_INTERNAL_SERVER_ERROR;	/* default error */
 	using_virtual_dir = FALSE;
 	using_alias = FALSE;
 
 	http_CalcResponseVersion(req->major_version, req->minor_version,
 				 &resp_major, &resp_minor);
-	//
-	// remove dots
-	//
+	/* */
+	/* remove dots */
+	/* */
 	request_doc = malloc(url->pathquery.size + 1);
 	if (request_doc == NULL) {
-		goto error_handler;	// out of mem
+		goto error_handler;	/* out of mem */
 	}
 	memcpy(request_doc, url->pathquery.buff, url->pathquery.size);
 	request_doc[url->pathquery.size] = '\0';
@@ -1067,7 +1067,7 @@ static int process_request(
 		goto error_handler;
 	}
 	if (*request_doc != '/') {
-		// no slash
+		/* no slash */
 		err_code = HTTP_BAD_REQUEST;
 		goto error_handler;
 	}
@@ -1094,13 +1094,13 @@ static int process_request(
 	}
 	if (using_virtual_dir) {
 		if (req->method != HTTPMETHOD_POST) {
-			// get file info
+			/* get file info */
 			if (virtualDirCallback.
 			    get_info(filename->buf, finfo) != 0) {
 				err_code = HTTP_NOT_FOUND;
 				goto error_handler;
 			}
-			// try index.html if req is a dir
+			/* try index.html if req is a dir */
 			if (UpnpFileInfo_get_IsDirectory(finfo)) {
 				if (filename->buf[filename->length - 1] == '/') {
 					temp_str = "index.html";
@@ -1111,49 +1111,49 @@ static int process_request(
 				    0) {
 					goto error_handler;
 				}
-				// get info
+				/* get info */
 				if (virtualDirCallback.get_info(filename->buf, finfo) != UPNP_E_SUCCESS ||
 				    UpnpFileInfo_get_IsDirectory(finfo)) {
 					err_code = HTTP_NOT_FOUND;
 					goto error_handler;
 				}
 			}
-			// not readable
+			/* not readable */
 			if (!UpnpFileInfo_get_IsReadable(finfo)) {
 				err_code = HTTP_FORBIDDEN;
 				goto error_handler;
 			}
-			// finally, get content type
-			// if ( get_content_type(filename->buf, &content_type) != 0 )
-			//{
-			//  goto error_handler;
-			// }
+			/* finally, get content type */
+			/* if ( get_content_type(filename->buf, &content_type) != 0 ) */
+			/*{ */
+			/*  goto error_handler; */
+			/* } */
 		}
 	} else if (!using_alias) {
 		if (gDocumentRootDir.length == 0) {
 			goto error_handler;
 		}
-		//
-		// get file name
-		//
+		/* */
+		/* get file name */
+		/* */
 
-		// filename str
+		/* filename str */
 		if (membuffer_assign_str(filename, gDocumentRootDir.buf) != 0 ||
 		    membuffer_append_str(filename, request_doc) != 0) {
-			goto error_handler;	// out of mem
+			goto error_handler;	/* out of mem */
 		}
-		// remove trailing slashes
+		/* remove trailing slashes */
 		while (filename->length > 0 &&
 		       filename->buf[filename->length - 1] == '/') {
 			membuffer_delete(filename, filename->length - 1, 1);
 		}
 		if (req->method != HTTPMETHOD_POST) {
-			// get info on file
+			/* get info on file */
 			if (get_file_info(filename->buf, finfo) != 0) {
 				err_code = HTTP_NOT_FOUND;
 				goto error_handler;
 			}
-			// try index.html if req is a dir
+			/* try index.html if req is a dir */
 			if (UpnpFileInfo_get_IsDirectory(finfo)) {
 				if (filename->buf[filename->length - 1] == '/') {
 					temp_str = "index.html";
@@ -1164,27 +1164,27 @@ static int process_request(
 				    0) {
 					goto error_handler;
 				}
-				// get info
+				/* get info */
 				if (get_file_info(filename->buf, finfo) != 0 ||
 				    UpnpFileInfo_get_IsDirectory(finfo)) {
 					err_code = HTTP_NOT_FOUND;
 					goto error_handler;
 				}
 			}
-			// not readable
+			/* not readable */
 			if (!UpnpFileInfo_get_IsReadable(finfo)) {
 				err_code = HTTP_FORBIDDEN;
 				goto error_handler;
 			}
 		}
-		// finally, get content type
-		//      if ( get_content_type(filename->buf, &content_type) != 0 )
-		//      {
-		//          goto error_handler;
-		//      }
+		/* finally, get content type */
+		/*      if ( get_content_type(filename->buf, &content_type) != 0 ) */
+		/*      { */
+		/*          goto error_handler; */
+		/*      } */
 	}
 	RespInstr->ReadSendSize = UpnpFileInfo_get_FileLength(finfo);
-	// Check other header field.
+	/* Check other header field. */
 	err_code = CheckOtherHTTPHeaders(req, RespInstr,
 		UpnpFileInfo_get_FileLength(finfo));
 	if (err_code != HTTP_OK) {
@@ -1200,58 +1200,58 @@ static int process_request(
 		extra_headers = "";
 	}
 	if (RespInstr->IsRangeActive && RespInstr->IsChunkActive) {
-		// Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-		// Transfer-Encoding: chunked
+		/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
+		/* Transfer-Encoding: chunked */
 		if (http_MakeMessage(headers, resp_major, resp_minor,
 		    "R" "T" "GKLD" "s" "tcS" "Xc" "sCc",
-		    HTTP_PARTIAL_CONTENT,	// status code
-		    UpnpFileInfo_get_ContentType(finfo), // content type
-		    RespInstr,	// range info
-		    RespInstr,	// language info
+		    HTTP_PARTIAL_CONTENT,	/* status code */
+		    UpnpFileInfo_get_ContentType(finfo), /* content type */
+		    RespInstr,	/* range info */
+		    RespInstr,	/* language info */
 		    "LAST-MODIFIED: ",
 		    UpnpFileInfo_get_LastModified(finfo),
 		    X_USER_AGENT, extra_headers) != 0) {
 			goto error_handler;
 		}
 	} else if (RespInstr->IsRangeActive && !RespInstr->IsChunkActive) {
-		// Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-		// Transfer-Encoding: chunked
+		/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
+		/* Transfer-Encoding: chunked */
 		if (http_MakeMessage(headers, resp_major, resp_minor,
 		    "R" "N" "T" "GLD" "s" "tcS" "Xc" "sCc",
-		    HTTP_PARTIAL_CONTENT,	// status code
-		    RespInstr->ReadSendSize,	// content length
-		    UpnpFileInfo_get_ContentType(finfo), // content type
-		    RespInstr,	// range info
-		    RespInstr,	// language info
+		    HTTP_PARTIAL_CONTENT,	/* status code */
+		    RespInstr->ReadSendSize,	/* content length */
+		    UpnpFileInfo_get_ContentType(finfo), /* content type */
+		    RespInstr,	/* range info */
+		    RespInstr,	/* language info */
 		    "LAST-MODIFIED: ",
 		    UpnpFileInfo_get_LastModified(finfo),
 		    X_USER_AGENT, extra_headers) != 0) {
 			goto error_handler;
 		}
 	} else if (!RespInstr->IsRangeActive && RespInstr->IsChunkActive) {
-		// Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-		// Transfer-Encoding: chunked
+		/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
+		/* Transfer-Encoding: chunked */
 		if (http_MakeMessage(headers, resp_major, resp_minor,
 		    "RK" "TLD" "s" "tcS" "Xc" "sCc",
-		    HTTP_OK,	// status code
-		    UpnpFileInfo_get_ContentType(finfo), // content type
-		    RespInstr,	// language info
+		    HTTP_OK,	/* status code */
+		    UpnpFileInfo_get_ContentType(finfo), /* content type */
+		    RespInstr,	/* language info */
 		    "LAST-MODIFIED: ",
 		    UpnpFileInfo_get_LastModified(finfo),
 		    X_USER_AGENT, extra_headers) != 0) {
 			goto error_handler;
 		}
 	} else {
-		// !RespInstr->IsRangeActive && !RespInstr->IsChunkActive
+		/* !RespInstr->IsRangeActive && !RespInstr->IsChunkActive */
 		if (RespInstr->ReadSendSize >= 0) {
-			// Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-			// Transfer-Encoding: chunked
+			/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
+			/* Transfer-Encoding: chunked */
 			if (http_MakeMessage(headers, resp_major, resp_minor,
 			    "R" "N" "TLD" "s" "tcS" "Xc" "sCc",
-			    HTTP_OK,	// status code
-			    RespInstr->ReadSendSize,	// content length
-			    UpnpFileInfo_get_ContentType(finfo), // content type
-			    RespInstr,	// language info
+			    HTTP_OK,	/* status code */
+			    RespInstr->ReadSendSize,	/* content length */
+			    UpnpFileInfo_get_ContentType(finfo), /* content type */
+			    RespInstr,	/* language info */
 			    "LAST-MODIFIED: ",
 			    UpnpFileInfo_get_LastModified(finfo),
 			    X_USER_AGENT,
@@ -1259,13 +1259,13 @@ static int process_request(
 				goto error_handler;
 			}
 		} else {
-			// Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
-			// Transfer-Encoding: chunked
+			/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
+			/* Transfer-Encoding: chunked */
 			if (http_MakeMessage(headers, resp_major, resp_minor,
 			    "R" "TLD" "s" "tcS" "b" "Xc" "sCc",
-			    HTTP_OK,	// status code
-			    UpnpFileInfo_get_ContentType(finfo), // content type
-			    RespInstr,	// language info
+			    HTTP_OK,	/* status code */
+			    UpnpFileInfo_get_ContentType(finfo), /* content type */
+			    RespInstr,	/* language info */
 			    "LAST-MODIFIED: ",
 			    UpnpFileInfo_get_LastModified(finfo),
 			    X_USER_AGENT,
@@ -1277,16 +1277,16 @@ static int process_request(
 	if (req->method == HTTPMETHOD_HEAD) {
 		*rtype = RESP_HEADERS;
 	} else if (using_alias) {
-		// GET xml
+		/* GET xml */
 		*rtype = RESP_XMLDOC;
 	} else if (using_virtual_dir) {
 		*rtype = RESP_WEBDOC;
 	} else {
-		// GET filename
+		/* GET filename */
 		*rtype = RESP_FILEDOC;
 	}
-	// simple get http 0.9 as specified in http 1.0
-	// don't send headers
+	/* simple get http 0.9 as specified in http 1.0 */
+	/* don't send headers */
 	if (req->method == HTTPMETHOD_SIMPLEGET) {
 		membuffer_destroy(headers);
 	}
@@ -1346,37 +1346,37 @@ static int http_RecvPostMessage(
 	}
 	parser->position = POS_ENTITY;
 	do {
-		// first parse what has already been gotten
+		/* first parse what has already been gotten */
 		if (parser->position != POS_COMPLETE) {
 			status = parser_parse_entity(parser);
 		}
 		if (status == PARSE_INCOMPLETE_ENTITY) {
-			// read until close
+			/* read until close */
 			ok_on_close = TRUE;
 		} else if ((status != PARSE_SUCCESS)
 			   && (status != PARSE_CONTINUE_1)
 			   && (status != PARSE_INCOMPLETE)) {
-			// error
+			/* error */
 			fclose(Fp);
 			return HTTP_BAD_REQUEST;
 		}
-		// read more if necessary entity
+		/* read more if necessary entity */
 		while (entity_offset + Data_Buf_Size > parser->msg.entity.length &&
 		       parser->position != POS_COMPLETE) {
 			num_read = sock_read(info, Buf, sizeof(Buf), &Timeout);
 			if (num_read > 0) {
-				// append data to buffer
+				/* append data to buffer */
 				ret_code = membuffer_append(&parser->msg.msg,
 					Buf, num_read);
 				if (ret_code != 0) {
-					// set failure status
+					/* set failure status */
 					parser->http_error_code =
 					    HTTP_INTERNAL_SERVER_ERROR;
 					return HTTP_INTERNAL_SERVER_ERROR;
 				}
 				status = parser_parse_entity(parser);
 				if (status == PARSE_INCOMPLETE_ENTITY) {
-					// read until close
+					/* read until close */
 					ok_on_close = TRUE;
 				} else if ((status != PARSE_SUCCESS)
 					   && (status != PARSE_CONTINUE_1)
@@ -1391,7 +1391,7 @@ static int http_RecvPostMessage(
 					print_http_headers(&parser->msg);
 					parser->position = POS_COMPLETE;
 				} else {
-					// partial msg or response
+					/* partial msg or response */
 					parser->http_error_code = HTTP_BAD_REQUEST;
 					return HTTP_BAD_REQUEST;
 				}
@@ -1442,36 +1442,36 @@ void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
 	struct xml_alias_t xmldoc;
 	struct SendInstruction RespInstr;
 
-	//Initialize instruction header.
+	/*Initialize instruction header. */
 	RespInstr.IsVirtualFile = 0;
 	RespInstr.IsChunkActive = 0;
 	RespInstr.IsRangeActive = 0;
 	RespInstr.IsTrailers = 0;
 	memset(RespInstr.AcceptLanguageHeader, 0,
 	       sizeof(RespInstr.AcceptLanguageHeader));
-	// init
+	/* init */
 	membuffer_init(&headers);
 	membuffer_init(&filename);
 
-	//Process request should create the different kind of header depending on the
-	//the type of request.
+	/*Process request should create the different kind of header depending on the */
+	/*the type of request. */
 	ret = process_request(req, &rtype, &headers, &filename, &xmldoc,
 		&RespInstr);
 	if (ret != UPNP_E_SUCCESS) {
-		// send error code
+		/* send error code */
 		http_SendStatusResponse(info, ret, req->major_version,
 			req->minor_version);
 	} else {
-		// send response
+		/* send response */
 		switch (rtype) {
 		case RESP_FILEDOC:
-			// send file, I = further instruction to send data.
+			/* send file, I = further instruction to send data. */
 			http_SendMessage(info, &timeout, "Ibf", &RespInstr,
 					 headers.buf, headers.length,
 					 filename.buf);
 			break;
 		case RESP_XMLDOC:
-			// send xmldoc , I = further instruction to send data.
+			/* send xmldoc , I = further instruction to send data. */
 			http_SendMessage(info, &timeout,
 				"Ibb", &RespInstr,
 				headers.buf, headers.length,
@@ -1479,7 +1479,7 @@ void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
 			alias_release(&xmldoc);
 			break;
 		case RESP_WEBDOC:
-			//, I = further instruction to send data.
+			/*, I = further instruction to send data. */
 			/*
 			   http_SendVirtualDirDoc( info, &timeout, "Ibf",&RespInstr,
 			   headers.buf, headers.length,
@@ -1491,16 +1491,16 @@ void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
 				filename.buf);
 			break;
 		case RESP_HEADERS:
-			// headers only
+			/* headers only */
 			http_SendMessage(info, &timeout,
 				"b",
 				headers.buf, headers.length);
 			break;
 		case RESP_POST:
-			// headers only
+			/* headers only */
 			ret = http_RecvPostMessage(parser, info, filename.buf,
 				&RespInstr);
-			// Send response.
+			/* Send response. */
 			http_MakeMessage(&headers, 1, 1,
 				"RTLSXcCc",
 				ret, "text/html", X_USER_AGENT);
