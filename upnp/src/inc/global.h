@@ -29,10 +29,8 @@
  *
  **************************************************************************/
 
-
 #ifndef GLOBAL_H
 #define GLOBAL_H
-
 
 /* GLOBAL.H - RSAREF types and constants */
 /* PROTOTYPES should be set to one if and only if the compiler supports
@@ -41,7 +39,6 @@
   The following makes PROTOTYPES default to 1 if it has not already
   been defined with C compiler flags.
 */
-
 
 #ifndef PROTOTYPES
 	#define PROTOTYPES 1

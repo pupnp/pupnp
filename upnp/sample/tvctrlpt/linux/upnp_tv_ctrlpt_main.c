@@ -51,10 +51,10 @@ enum cmdloop_tvcmds {
    Data structure for parsing commands from the command line 
  */
 struct cmdloop_commands {
-    char *str;                  // the string 
-    int cmdnum;                 // the command
-    int numargs;                // the number of arguments
-    char *args;                 // the args
+    char *str;                  /* the string  */
+    int cmdnum;                 /* the command */
+    int numargs;                /* the number of arguments */
+    char *args;                 /* the args */
 } cmdloop_commands;
 
 /*

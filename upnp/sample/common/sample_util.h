@@ -191,7 +191,7 @@ int SampleUtil_FindAndParseService (
  ********************************************************************************/
 typedef void (*print_string)(const char *string);
 
-//global print function used by sample util
+/*global print function used by sample util */
 extern print_string gPrintFun;
 
 /********************************************************************************
@@ -212,7 +212,7 @@ typedef void (*state_update)(
 	const char *UDN,
 	eventType type);
 
-//global state update function used by smaple util
+/*global state update function used by smaple util */
 extern state_update gStateUpdateFun;
 
 /********************************************************************************

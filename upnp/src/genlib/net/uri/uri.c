@@ -228,7 +228,7 @@ int copy_URL_list(URL_list *in, URL_list *out)
     memcpy( out->URLs, in->URLs, len );
 
     for( i = 0; i < in->size; i++ ) {
-        //copy the parsed uri
+        /*copy the parsed uri */
         out->parsedURLs[i].type = in->parsedURLs[i].type;
         copy_token( &in->parsedURLs[i].scheme, in->URLs,
                     &out->parsedURLs[i].scheme, out->URLs );
@@ -343,22 +343,22 @@ int parse_hostport(
 
     memset( out, 0, sizeof(hostport_type) );
 
-    // Work on a copy of the input string.
+    /* Work on a copy of the input string. */
     strncpy( workbuf, in, sizeof(workbuf) );
 
     c = workbuf;
     if( *c == '[' ) {
-        // IPv6 addresses are enclosed in square brackets.
+        /* IPv6 addresses are enclosed in square brackets. */
         srvname = ++c;
         while( *c != '\0'  &&  *c != ']' ) {
             c++;
         }
         if( *c == '\0' ) {
-            // did not find closing bracket.
+            /* did not find closing bracket. */
             return UPNP_E_INVALID_URL;
         }
-        // NULL terminate the srvname and then increment c.
-        *c++ = '\0';    // overwrite the ']'
+        /* NULL terminate the srvname and then increment c. */
+        *c++ = '\0';    /* overwrite the ']' */
         if( *c == ':' ) {
             has_port = 1;
             c++;
@@ -366,7 +366,7 @@ int parse_hostport(
         af = AF_INET6;
     }
     else {
-        // IPv4 address -OR- host name.
+        /* IPv4 address -OR- host name. */
         srvname = c;
         while( (*c != ':') && (*c != '/') && ( (isalnum(*c)) || (*c == '.') || (*c == '-') ) ) {
             if( *c == '.' )
@@ -374,17 +374,17 @@ int parse_hostport(
             c++;
         }
         has_port = (*c == ':') ? 1 : 0;
-        // NULL terminate the srvname
+        /* NULL terminate the srvname */
         *c = '\0';
         if( has_port == 1 )
             c++;
 
         if( last_dot != NULL  &&  isdigit(*(last_dot+1)) ) {
-            // Must be an IPv4 address.
+            /* Must be an IPv4 address. */
             af = AF_INET;
         }
         else {
-            // Must be a host name.
+            /* Must be a host name. */
             struct addrinfo hints, *res, *res0;
 
             memset(&hints, 0, sizeof(hints));
@@ -396,7 +396,7 @@ int parse_hostport(
                 for (res = res0; res; res = res->ai_next) {
                     if( res->ai_family == AF_INET || 
                         res->ai_family == AF_INET6 ) {
-                        // Found a valid IPv4 or IPv6 address.
+                        /* Found a valid IPv4 or IPv6 address. */
                         memcpy( &out->IPaddress, res->ai_addr, 
                             res->ai_addrlen );
                         break;
@@ -405,40 +405,40 @@ int parse_hostport(
                 freeaddrinfo(res0);
 
                 if( res == NULL ) {
-                    // Didn't find an AF_INET or AF_INET6 address.
+                    /* Didn't find an AF_INET or AF_INET6 address. */
                     return UPNP_E_INVALID_URL;
                 }
             }
             else {
-                // getaddrinfo failed.
+                /* getaddrinfo failed. */
                 return UPNP_E_INVALID_URL;
             }
         }
     }
 
-    // Check if a port is specified.
+    /* Check if a port is specified. */
     if( has_port == 1 ) {
-        // Port is specified.
+        /* Port is specified. */
         srvport = c;
         while( *c != '\0'  &&  isdigit(*c) ) {
             c++;
         }
         port = (unsigned short int)atoi(srvport);
         if( port == 0 ) {
-            // Bad port number.
+            /* Bad port number. */
             return UPNP_E_INVALID_URL;
         }
     }
     else {
-        // Port was not specified, use default port.
+        /* Port was not specified, use default port. */
         port = 80;
     }
 
-    // The length of the host and port string can be calculated by
-    // subtracting pointers.
+    /* The length of the host and port string can be calculated by */
+    /* subtracting pointers. */
     hostport_size = (int)(c - workbuf);
 
-    // Fill in the 'out' information.
+    /* Fill in the 'out' information. */
     if( af == AF_INET ) {
         sai4->sin_family = AF_INET;
         sai4->sin_port = htons(port);
@@ -450,8 +450,8 @@ int parse_hostport(
         sai6->sin6_scope_id = gIF_INDEX;
         ret = inet_pton(AF_INET6, srvname, &sai6->sin6_addr);
     } else {
-        // IP address was set by the hostname (getaddrinfo).
-        // Override port:
+        /* IP address was set by the hostname (getaddrinfo). */
+        /* Override port: */
         if( out->IPaddress.ss_family == AF_INET )
             sai4->sin_port = htons(port);
         else
@@ -562,7 +562,7 @@ int remove_dots(char *in, size_t size)
                     copyTo = Segments[--lastSegment];
                 } else {
                     free( Segments );
-                    //TRACE("ERROR RESOLVING URL, ../ at ROOT");
+                    /*TRACE("ERROR RESOLVING URL, ../ at ROOT"); */
                     return UPNP_E_INVALID_URL;
                 }
                 continue;

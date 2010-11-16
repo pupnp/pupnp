@@ -120,15 +120,15 @@ calc_alias( IN const char *alias,
     assert( rootPath );
     assert( alias );
 
-    // add / suffix, if missing
+    /* add / suffix, if missing */
     root_len = strlen( rootPath );
     if( root_len == 0 || rootPath[root_len - 1] != '/' ) {
         temp_str = "/";
     } else {
-        temp_str = "";          // suffix already present
+        temp_str = "";          /* suffix already present */
     }
 
-    // discard / prefix, if present
+    /* discard / prefix, if present */
     if( alias[0] == '/' ) {
         aliasPtr = alias + 1;
     } else {
@@ -241,11 +241,11 @@ config_description_doc( INOUT IXML_Document * doc,
     membuffer_init( &url_str );
     membuffer_init( &root_path );
 
-    err_code = UPNP_E_OUTOF_MEMORY; // default error
+    err_code = UPNP_E_OUTOF_MEMORY; /* default error */
 
     baseList = ixmlDocument_getElementsByTagName( doc, urlBaseStr );
     if( baseList == NULL ) {
-        // urlbase not found -- create new one
+        /* urlbase not found -- create new one */
         addNew = TRUE;
         element = ixmlDocument_createElement( doc, urlBaseStr );
         if( element == NULL ) {
@@ -284,7 +284,7 @@ config_description_doc( INOUT IXML_Document * doc,
         }
 
     } else {
-        // urlbase found
+        /* urlbase found */
         urlbase_node = ixmlNodeList_item( baseList, 0 );
         assert( urlbase_node != NULL );
 
@@ -312,7 +312,7 @@ config_description_doc( INOUT IXML_Document * doc,
             membuffer_append_str( &url_str, ip_str ) != 0 ) {
             goto error_handler;
         }
-        // add leading '/' if missing from relative path
+        /* add leading '/' if missing from relative path */
         if( ( uri.pathquery.size > 0 && uri.pathquery.buff[0] != '/' ) ||
             ( uri.pathquery.size == 0 )
              ) {
@@ -328,7 +328,7 @@ config_description_doc( INOUT IXML_Document * doc,
                               uri.pathquery.size ) != 0 ) {
             goto error_handler;
         }
-        // add trailing '/' if missing
+        /* add trailing '/' if missing */
         if( url_str.buf[url_str.length - 1] != '/' ) {
             if( membuffer_append( &url_str, "/", 1 ) != 0 ) {
                 goto error_handler;
@@ -341,7 +341,7 @@ config_description_doc( INOUT IXML_Document * doc,
         }
     }
 
-    *root_path_str = membuffer_detach( &root_path );    // return path
+    *root_path_str = membuffer_detach( &root_path );    /* return path */
     err_code = UPNP_E_SUCCESS;
 
   error_handler:
@@ -400,27 +400,27 @@ configure_urlbase( INOUT IXML_Document * doc,
     int err_code;
     char ipaddr_port[LINE_SIZE];
 
-    err_code = UPNP_E_OUTOF_MEMORY; // default error
+    err_code = UPNP_E_OUTOF_MEMORY; /* default error */
 
-    // get IP address and port
+    /* get IP address and port */
     addrToString( serverAddr, ipaddr_port );
 
-    // config url-base in 'doc'
+    /* config url-base in 'doc' */
     err_code = config_description_doc( doc, ipaddr_port, &root_path );
     if( err_code != UPNP_E_SUCCESS ) {
         goto error_handler;
     }
-    // calc alias
+    /* calc alias */
     err_code = calc_alias( alias, root_path, &new_alias );
     if( err_code != UPNP_E_SUCCESS ) {
         goto error_handler;
     }
-    // calc full url for desc doc
+    /* calc full url for desc doc */
     err_code = calc_descURL( ipaddr_port, new_alias, docURL );
     if( err_code != UPNP_E_SUCCESS ) {
         goto error_handler;
     }
-    // xml doc to str
+    /* xml doc to str */
     xml_str = ixmlPrintDocument( doc );
     if( xml_str == NULL ) {
         goto error_handler;
@@ -430,7 +430,7 @@ configure_urlbase( INOUT IXML_Document * doc,
         "desc url: %s\n", docURL );
     UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
         "doc = %s\n", xml_str );
-    // store in web server
+    /* store in web server */
     err_code =
         web_server_set_alias( new_alias, xml_str, strlen( xml_str ),
                               last_modified );

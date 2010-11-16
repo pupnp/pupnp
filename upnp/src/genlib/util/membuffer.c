@@ -70,7 +70,7 @@ str_alloc( IN const char *str,
 
     s = ( char * )malloc( str_len + 1 );
     if( s == NULL ) {
-        return NULL;            // no mem
+        return NULL;            /* no mem */
     }
 
     memcpy( s, str, str_len );
@@ -111,8 +111,8 @@ memptr_cmp( IN memptr * m,
     cmp = strncmp( m->buf, s, m->length );
 
     if( cmp == 0 && m->length < strlen( s ) ) {
-        // both strings equal for 'm->length' chars
-        //  if m is shorter than s, then s is greater
+        /* both strings equal for 'm->length' chars */
+        /*  if m is shorter than s, then s is greater */
         return -1;
     }
 
@@ -147,8 +147,8 @@ memptr_cmp_nocase( IN memptr * m,
 
     cmp = strncasecmp( m->buf, s, m->length );
     if( cmp == 0 && m->length < strlen( s ) ) {
-        // both strings equal for 'm->length' chars
-        //  if m is shorter than s, then s is greater
+        /* both strings equal for 'm->length' chars */
+        /*  if m is shorter than s, then s is greater */
         return -1;
     }
 
@@ -204,20 +204,20 @@ membuffer_set_size( INOUT membuffer * m,
     size_t alloc_len;
     char *temp_buf;
 
-    if( new_length >= m->length )   // increase length
+    if( new_length >= m->length )   /* increase length */
     {
-        // need more mem?
+        /* need more mem? */
         if( new_length <= m->capacity ) {
-            return 0;           // have enough mem; done
+            return 0;           /* have enough mem; done */
         }
 
         diff = new_length - m->length;
         alloc_len = MAXVAL( m->size_inc, diff ) + m->capacity;
-    } else                      // decrease length
+    } else                      /* decrease length */
     {
         assert( new_length <= m->length );
 
-        // if diff is 0..m->size_inc, don't free
+        /* if diff is 0..m->size_inc, don't free */
         if( ( m->capacity - new_length ) <= m->size_inc ) {
             return 0;
         }
@@ -227,21 +227,21 @@ membuffer_set_size( INOUT membuffer * m,
 
     assert( alloc_len >= new_length );
 
-    temp_buf = realloc( m->buf, alloc_len + 1 );    //LEAK_FIX_MK
+    temp_buf = realloc( m->buf, alloc_len + 1 );    /*LEAK_FIX_MK */
 
-    //temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );//LEAK_FIX_MK
+    /*temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );LEAK_FIX_MK */
 
     if( temp_buf == NULL ) {
-        // try smaller size
+        /* try smaller size */
         alloc_len = new_length;
-        temp_buf = realloc( m->buf, alloc_len + 1 );    //LEAK_FIX_MK
-        //temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );//LEAK_FIX_MK
+        temp_buf = realloc( m->buf, alloc_len + 1 );    /*LEAK_FIX_MK */
+        /*temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );LEAK_FIX_MK */
 
         if( temp_buf == NULL ) {
             return UPNP_E_OUTOF_MEMORY;
         }
     }
-    // save
+    /* save */
     m->buf = temp_buf;
     m->capacity = alloc_len;
     return 0;
@@ -320,20 +320,20 @@ membuffer_assign( INOUT membuffer * m,
 
     assert( m != NULL );
 
-    // set value to null
+    /* set value to null */
     if( buf == NULL ) {
         membuffer_destroy( m );
         return 0;
     }
-    // alloc mem
+    /* alloc mem */
     return_code = membuffer_set_size( m, buf_len );
     if( return_code != 0 ) {
         return return_code;
     }
-    // copy
+    /* copy */
     if( buf_len ) {
         memcpy( m->buf, buf, buf_len );
-        m->buf[buf_len] = 0;        // null-terminate
+        m->buf[buf_len] = 0;        /* null-terminate */
     }
     m->length = buf_len;
 
@@ -446,18 +446,18 @@ membuffer_insert( INOUT membuffer * m,
     if( buf == NULL || buf_len == 0 ) {
         return 0;
     }
-    // alloc mem
+    /* alloc mem */
     return_code = membuffer_set_size( m, m->length + buf_len );
     if( return_code != 0 ) {
         return return_code;
     }
-    // insert data
+    /* insert data */
 
-    // move data to right of insertion point
+    /* move data to right of insertion point */
     memmove( m->buf + index + buf_len, m->buf + index, m->length - index );
     memcpy( m->buf + index, buf, buf_len );
     m->length += buf_len;
-    m->buf[m->length] = 0;      // null-terminate
+    m->buf[m->length] = 0;      /* null-terminate */
 
     return 0;
 }
@@ -499,22 +499,22 @@ membuffer_delete( INOUT membuffer * m,
 
     assert( index >= 0 && index < ( int )m->length );
 
-    // shrink count if it goes beyond buffer
+    /* shrink count if it goes beyond buffer */
     if( index + num_bytes > m->length ) {
         num_bytes = m->length - ( size_t ) index;
-        copy_len = 0;           // every thing at and after index purged
+        copy_len = 0;           /* every thing at and after index purged */
     } else {
-        // calc num bytes after deleted string
+        /* calc num bytes after deleted string */
         copy_len = m->length - ( index + num_bytes );
     }
 
     memmove( m->buf + index, m->buf + index + num_bytes, copy_len );
 
     new_length = m->length - num_bytes;
-    return_value = membuffer_set_size( m, new_length ); // trim buffer
-    assert( return_value == 0 );    // shrinking should always work
+    return_value = membuffer_set_size( m, new_length ); /* trim buffer */
+    assert( return_value == 0 );    /* shrinking should always work */
 
-    // don't modify until buffer is set
+    /* don't modify until buffer is set */
     m->length = new_length;
     m->buf[new_length] = 0;
 }
@@ -543,7 +543,7 @@ membuffer_detach( INOUT membuffer * m )
 
     buf = m->buf;
 
-    // free all
+    /* free all */
     membuffer_initialize( m );
 
     return buf;

@@ -79,7 +79,7 @@ TvDeviceCommandLoop( void *args )
 
         SampleUtil_Print( "\n>> " );
 
-        // Get a command line
+        /* Get a command line */
         fgets( cmdline, 100, stdin );
 
         sscanf( cmdline, "%s", cmd );
@@ -141,7 +141,7 @@ int main( IN int argc, IN char **argv )
 
     SampleUtil_Initialize( linux_print );
 
-    // Parse options
+    /* Parse options */
     for( i = 1; i < argc; i++ ) {
         if( strcmp( argv[i], "-ip" ) == 0 ) {
             ip_address = argv[++i];

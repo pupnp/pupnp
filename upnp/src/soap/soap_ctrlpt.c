@@ -1,33 +1,33 @@
-///////////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2000-2003 Intel Corporation 
-// All rights reserved. 
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met: 
-//
-// * Redistributions of source code must retain the above copyright notice, 
-// this list of conditions and the following disclaimer. 
-// * Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution. 
-// * Neither name of Intel Corporation nor the names of its contributors 
-// may be used to endorse or promote products derived from this software 
-// without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-///////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
 #include "config.h"
 #ifdef INCLUDE_CLIENT_APIS
@@ -54,9 +54,9 @@
 
 #define SOAP_ACTION_RESP	1
 #define SOAP_VAR_RESP		2
-//#define SOAP_ERROR_RESP       3
+/*#define SOAP_ERROR_RESP       3*/
 #define SOAP_ACTION_RESP_ERROR  3
-#define SOAP_VAR_RESP_ERROR   4
+#define SOAP_VAR_RESP_ERROR	4
 
 /****************************************************************************
 *	Function :	dom_cmp_name
@@ -96,7 +96,7 @@ dom_cmp_name( IN char *name,
                strcmp( nameptr.buf, name ) == 0 ) {
         ret_code = 0;
     } else {
-        ret_code = 1;           // names are not the same
+        ret_code = 1;           /* names are not the same */
     }
 
     return ret_code;
@@ -125,20 +125,20 @@ dom_find_node( IN char *node_name,
 {
     IXML_Node *node;
 
-    // invalid args
+    /* invalid args */
     if( node_name == NULL || start_node == NULL ) {
         return UPNP_E_NOT_FOUND;
     }
 
     node = ixmlNode_getFirstChild( start_node );
     while( node != NULL ) {
-        // match name
+        /* match name */
         if( dom_cmp_name( node_name, node ) == 0 ) {
             *matching_node = node;
             return UPNP_E_SUCCESS;
         }
-        // free and next node
-        node = ixmlNode_getNextSibling( node ); // next node
+        /* free and next node */
+        node = ixmlNode_getNextSibling( node ); /* next node */
     }
 
     return UPNP_E_NOT_FOUND;
@@ -193,10 +193,10 @@ dom_find_deep_node( IN char *names[],
             return UPNP_E_SUCCESS;
         }
 
-        node = match_node;      // try again
+        node = match_node;      /* try again */
     }
 
-    return UPNP_E_NOT_FOUND;    // this line not reached
+    return UPNP_E_NOT_FOUND;    /* this line not reached */
 }
 
 /****************************************************************************
@@ -253,7 +253,7 @@ get_host_and_path( IN char *ctrl_url,
     if( parse_uri( ctrl_url, strlen( ctrl_url ), url ) != HTTP_SUCCESS ) {
         return -1;
     }
-    // This is done to ensure that the buffer is kept const
+    /* This is done to ensure that the buffer is kept const */
     ((memptr *)host)->buf = (char *)url->hostport.text.buff;
     ((memptr *)host)->length = url->hostport.text.size;
 
@@ -310,15 +310,15 @@ add_man_header( INOUT membuffer * headers )
     char *man_hdr = "MAN: \"http://schemas.xmlsoap.org/soap/envelope/\"; "
         "ns=01\r\n01-";
 
-    // change POST to M-POST
+    /* change POST to M-POST */
     if( membuffer_insert( headers, "M-", 2, 0 ) != 0 ) {
         return UPNP_E_OUTOF_MEMORY;
     }
 
     soap_action_hdr = strstr( headers->buf, "SOAPACTION:" );
-    assert( soap_action_hdr != NULL );  // can't fail
+    assert( soap_action_hdr != NULL );  /* can't fail */
 
-    // insert MAN header
+    /* insert MAN header */
     if( membuffer_insert( headers, man_hdr, strlen( man_hdr ),
                           soap_action_hdr - headers->buf ) != 0 ) {
         return UPNP_E_OUTOF_MEMORY;
@@ -357,16 +357,16 @@ soap_request_and_response( IN membuffer * request,
         httpmsg_destroy( &response->msg );
         return ret_code;
     }
-    // method-not-allowed error
+    /* method-not-allowed error */
     if( response->msg.status_code == HTTP_METHOD_NOT_ALLOWED ) {
-        ret_code = add_man_header( request );   // change to M-POST msg
+        ret_code = add_man_header( request );   /* change to M-POST msg */
         if( ret_code != 0 ) {
             return ret_code;
         }
 
-        httpmsg_destroy( &response->msg );  // about to reuse response
+        httpmsg_destroy( &response->msg );  /* about to reuse response */
 
-        // try again
+        /* try again */
         ret_code = http_RequestAndResponse( destination_url, request->buf,
                                             request->length,
                                             HTTPMETHOD_MPOST,
@@ -423,9 +423,9 @@ get_response_value( IN http_message_t * hmsg,
     char *names[5];
     const DOMString nodeValue;
 
-    err_code = UPNP_E_BAD_RESPONSE; // default error
+    err_code = UPNP_E_BAD_RESPONSE; /* default error */
 
-    // only 200 and 500 status codes are relevant
+    /* only 200 and 500 status codes are relevant */
     if( ( hmsg->status_code != HTTP_OK &&
           hmsg->status_code != HTTP_INTERNAL_SERVER_ERROR ) ||
         !has_xml_content_type( hmsg ) ) {
@@ -445,9 +445,9 @@ get_response_value( IN http_message_t * hmsg,
     }
 
     if( code == SOAP_ACTION_RESP ) {
-        //
-        // try reading soap action response
-        //
+        /* */
+        /* try reading soap action response */
+        /* */
         assert( action_value != NULL );
 
         *action_value = NULL;
@@ -474,7 +474,7 @@ get_response_value( IN http_message_t * hmsg,
             done = TRUE;
         }
     } else if( code == SOAP_VAR_RESP ) {
-        // try reading var response
+        /* try reading var response */
         assert( str_value != NULL );
         *str_value = NULL;
 
@@ -496,7 +496,7 @@ get_response_value( IN http_message_t * hmsg,
     }
 
     if( !done ) {
-        // not action or var resp; read error code and description
+        /* not action or var resp; read error code and description */
         *str_value = NULL;
 
         names[0] = "Envelope";
@@ -522,7 +522,7 @@ get_response_value( IN http_message_t * hmsg,
         *upnp_error_code = atoi( temp_str );
         if( *upnp_error_code < 400 ) {
             err_code = *upnp_error_code;
-            goto error_handler; // bad SOAP error code
+            goto error_handler; /* bad SOAP error code */
         }
 
         if( code == SOAP_VAR_RESP ) {
@@ -616,27 +616,27 @@ SoapSendAction( IN char *action_url,
     size_t xml_end_len;
     size_t action_str_len;
 
-    *response_node = NULL;      // init
+    *response_node = NULL;      /* init */
 
-    err_code = UPNP_E_OUTOF_MEMORY; // default error
+    err_code = UPNP_E_OUTOF_MEMORY; /* default error */
 
     UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
         "Inside SoapSendAction():" );
-    // init
+    /* init */
     membuffer_init( &request );
     membuffer_init( &responsename );
 
-    // print action
+    /* print action */
     action_str = ixmlPrintNode( ( IXML_Node * ) action_node );
     if( action_str == NULL ) {
         goto error_handler;
     }
-    // get action name
+    /* get action name */
     if( get_action_name( action_str, &name ) != 0 ) {
         err_code = UPNP_E_INVALID_ACTION;
         goto error_handler;
     }
-    // parse url
+    /* parse url */
     if( http_FixStrUrl( action_url, strlen( action_url ), &url ) != 0 ) {
         err_code = UPNP_E_INVALID_URL;
         goto error_handler;
@@ -653,7 +653,7 @@ SoapSendAction( IN char *action_url,
     xml_end_len = strlen( xml_end );
     action_str_len = strlen( action_str );
 
-    // make request msg
+    /* make request msg */
     request.size_inc = 50;
     content_length = xml_start_len + action_str_len + xml_end_len;
     if (http_MakeMessage(
@@ -680,7 +680,7 @@ SoapSendAction( IN char *action_url,
         membuffer_append_str( &responsename, "Response" ) != 0 ) {
         goto error_handler;
     }
-    // get action node from the response
+    /* get action node from the response */
     ret_code = get_response_value( &response.msg, SOAP_ACTION_RESP,
                                    responsename.buf, &upnp_error_code,
                                    ( IXML_Node ** ) response_node,
@@ -767,32 +767,32 @@ SoapSendActionEx( IN char *action_url,
     size_t xml_end_len;
     off_t content_length;
 
-    *response_node = NULL;      // init
+    *response_node = NULL;      /* init */
 
-    err_code = UPNP_E_OUTOF_MEMORY; // default error
+    err_code = UPNP_E_OUTOF_MEMORY; /* default error */
 
     UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
         "Inside SoapSendActionEx():" );
-    // init
+    /* init */
     membuffer_init( &request );
     membuffer_init( &responsename );
 
-    // header string
+    /* header string */
     xml_header_str = ixmlPrintNode( ( IXML_Node * ) header );
     if( xml_header_str == NULL ) {
         goto error_handler;
     }
-    // print action
+    /* print action */
     action_str = ixmlPrintNode( ( IXML_Node * ) action_node );
     if( action_str == NULL ) {
         goto error_handler;
     }
-    // get action name
+    /* get action name */
     if( get_action_name( action_str, &name ) != 0 ) {
         err_code = UPNP_E_INVALID_ACTION;
         goto error_handler;
     }
-    // parse url
+    /* parse url */
     if( http_FixStrUrl( action_url, strlen( action_url ), &url ) != 0 ) {
         err_code = UPNP_E_INVALID_URL;
         goto error_handler;
@@ -814,7 +814,7 @@ SoapSendActionEx( IN char *action_url,
     xml_header_end_len = strlen( xml_header_end );
     xml_header_str_len = strlen( xml_header_str );
 
-    // make request msg
+    /* make request msg */
     request.size_inc = 50;
     content_length =
         xml_start_len +
@@ -848,7 +848,7 @@ SoapSendActionEx( IN char *action_url,
         membuffer_append_str( &responsename, "Response" ) != 0 ) {
         goto error_handler;
     }
-    // get action node from the response
+    /* get action node from the response */
     ret_code = get_response_value( &response.msg, SOAP_ACTION_RESP,
                                    responsename.buf, &upnp_error_code,
                                    ( IXML_Node ** ) response_node,
@@ -896,8 +896,8 @@ SoapGetServiceVarStatus( IN char *action_url,
                          IN char *var_name,
                          OUT char **var_value )
 {
-    const memptr host;                // value for HOST header
-    const memptr path;                // ctrl path in first line in msg
+    const memptr host;                /* value for HOST header */
+    const memptr path;                /* ctrl path in first line in msg */
     uri_type url;
     membuffer request;
     int ret_code;
@@ -919,15 +919,15 @@ SoapGetServiceVarStatus( IN char *action_url,
         "</s:Body>\r\n"
         "</s:Envelope>\r\n";
 
-    *var_value = NULL;          // return NULL in case of an error
+    *var_value = NULL;          /* return NULL in case of an error */
 
     membuffer_init( &request );
 
-    // get host hdr and url path
+    /* get host hdr and url path */
     if( get_host_and_path( action_url, &host, &path, &url ) == -1 ) {
         return UPNP_E_INVALID_URL;
     }
-    // make headers
+    /* make headers */
     request.size_inc = 50;
     content_length = strlen( xml_start ) + strlen( var_name ) + strlen( xml_end );
     if (http_MakeMessage(
@@ -941,13 +941,13 @@ SoapGetServiceVarStatus( IN char *action_url,
 	xml_start, var_name, xml_end ) != 0 ) {
         return UPNP_E_OUTOF_MEMORY;
     }
-    // send msg and get reply
+    /* send msg and get reply */
     ret_code = soap_request_and_response( &request, &url, &response );
     membuffer_destroy( &request );
     if( ret_code != UPNP_E_SUCCESS ) {
         return ret_code;
     }
-    // get variable value from the response
+    /* get variable value from the response */
     ret_code = get_response_value( &response.msg, SOAP_VAR_RESP, NULL,
                                    &upnp_error_code, NULL, var_value );
 
@@ -962,5 +962,6 @@ SoapGetServiceVarStatus( IN char *action_url,
     }
 }
 
-#endif // EXCLUDE_SOAP
-#endif // INCLUDE_CLIENT_APIS
+#endif /* EXCLUDE_SOAP */
+#endif /* INCLUDE_CLIENT_APIS */
+

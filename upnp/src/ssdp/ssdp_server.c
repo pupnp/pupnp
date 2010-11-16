@@ -595,11 +595,9 @@ ssdp_request_type1( IN char *cmd )
  * Returns: int
  *	0 on success; -1 on error
  ***************************************************************************/
-int
-ssdp_request_type( IN char *cmd,
-                   OUT SsdpEvent * Evt )
+int ssdp_request_type(IN char *cmd, OUT SsdpEvent *Evt)
 {
-    // clear event
+    /* clear event */
     memset( Evt, 0, sizeof( SsdpEvent ) );
     unique_service_name( cmd, Evt );
     Evt->ErrCode = NO_ERROR_FOUND;
@@ -624,15 +622,13 @@ ssdp_request_type( IN char *cmd,
  * Returns: VOID
  *
  ***************************************************************************/
-static void
-free_ssdp_event_handler_data( void *the_data )
+static void free_ssdp_event_handler_data(void *the_data)
 {
     ssdp_thread_data *data = ( ssdp_thread_data * ) the_data;
 
     if( data != NULL ) {
         http_message_t *hmsg = &data->parser.msg;
-
-        // free data
+        /* free data */
         httpmsg_destroy( hmsg );
         free( data );
     }
@@ -653,7 +649,7 @@ free_ssdp_event_handler_data( void *the_data )
  ***************************************************************************/
 static UPNP_INLINE xboolean valid_ssdp_msg(IN http_message_t *hmsg)
 {
-    memptr hdr_value;
+	memptr hdr_value;
 
 	/* check for valid methods - NOTIFY or M-SEARCH */
 	if (hmsg->method != HTTPMETHOD_NOTIFY &&
@@ -699,8 +695,7 @@ static UPNP_INLINE xboolean valid_ssdp_msg(IN http_message_t *hmsg)
  * Returns: int
  *	0 if successful -1 if error
  ***************************************************************************/
-static UPNP_INLINE int
-start_event_handler( void *Data )
+static UPNP_INLINE int start_event_handler(void *Data)
 {
 
     http_parser_t *parser = NULL;
@@ -716,23 +711,23 @@ start_event_handler( void *Data )
             UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
                 "SSDP recvd bad msg code = %d\n",
                 status );
-            // ignore bad msg, or not enuf mem
+            /* ignore bad msg, or not enuf mem */
             goto error_handler;
         }
-        // valid notify msg
+        /* valid notify msg */
     } else if( status != PARSE_SUCCESS ) {
         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
             "SSDP recvd bad msg code = %d\n", status );
 
         goto error_handler;
     }
-    // check msg
+    /* check msg */
     if( valid_ssdp_msg( &parser->msg ) != TRUE ) {
         goto error_handler;
     }
-    return 0;                   //////// done; thread will free 'data'
+    return 0;  /* done; thread will free 'data' */
 
-  error_handler:
+error_handler:
     free_ssdp_event_handler_data( data );
     return -1;
 }
@@ -798,16 +793,13 @@ readFromSSDPSocket( SOCKET socket )
 
     requestBuf = staticBuf;
 
-    //in case memory
-    //can't be allocated, still drain the 
-    //socket using a static buffer
-
+    /* in case memory can't be allocated, still drain the socket using a
+     * static buffer. */
     data = ( ssdp_thread_data * )
         malloc( sizeof( ssdp_thread_data ) );
 
     if( data != NULL ) {
-        //initialize parser
-
+        /* initialize parser */
 #ifdef INCLUDE_CLIENT_APIS
 #ifdef UPNP_ENABLE_IPV6
         if( socket == gSsdpReqSocket4 || socket == gSsdpReqSocket6 ) {
@@ -826,11 +818,9 @@ readFromSSDPSocket( SOCKET socket )
 #else
         parser_request_init( &data->parser );
 #endif
-
-        //set size of parser buffer
-
+        /* set size of parser buffer */
         if( membuffer_set_size( &data->parser.msg.msg, BUFSIZE ) == 0 ) {
-            //use this as the buffer for recv
+            /* use this as the buffer for recv */
             requestBuf = data->parser.msg.msg.buf;
 
         } else {
@@ -867,10 +857,10 @@ readFromSSDPSocket( SOCKET socket )
             "%s\n"
             "End of received multicast packet ----------------------------------------------\n",
             requestBuf );
-        //add thread pool job to handle request
+        /* add thread pool job to handle request */
         if( data != NULL ) {
             data->parser.msg.msg.length += byteReceived;
-            // null-terminate
+            /* null-terminate */
             data->parser.msg.msg.buf[byteReceived] = 0;
             memcpy( &data->dest_addr, &__ss, sizeof(__ss) );
             TPJobInit( &job, ( start_routine )
@@ -935,7 +925,7 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 	} else {
 		out->ssdpReqSock6 = INVALID_SOCKET;
 	}
-#endif  //IPv6
+#endif  /* IPv6 */
 
 
 #endif /* INCLUDE_CLIENT_APIS */
@@ -993,8 +983,7 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 	} else {
 		out->ssdpSock6UlaGua = INVALID_SOCKET;
 	}
-#endif //IPv6
-
+#endif /* IPv6 */
 
 	return UPNP_E_SUCCESS;
 }
@@ -1030,7 +1019,7 @@ int create_ssdp_sock_reqv4( SOCKET* ssdpReqSock )
     setsockopt( *ssdpReqSock, IPPROTO_IP, IP_MULTICAST_TTL,
         &ttl, sizeof (ttl) );
 
-    // just do it, regardless if fails or not.
+    /* just do it, regardless if fails or not. */
     Make_Socket_NoBlocking( *ssdpReqSock );
 
     return UPNP_E_SUCCESS;
@@ -1064,18 +1053,18 @@ int create_ssdp_sock_reqv6( SOCKET* ssdpReqSock )
         return UPNP_E_OUTOF_SOCKET;
     }
 
-    // MUST use scoping of IPv6 addresses to control the propagation os SSDP 
-    // messages instead of relying on the Hop Limit (Equivalent to the TTL 
-    // limit in IPv4).
+    /* MUST use scoping of IPv6 addresses to control the propagation os SSDP
+     * messages instead of relying on the Hop Limit (Equivalent to the TTL
+     * limit in IPv4). */
     setsockopt( *ssdpReqSock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
         &hops, sizeof(hops) );
 
-    // just do it, regardless if fails or not.
+    /* just do it, regardless if fails or not. */
     Make_Socket_NoBlocking( *ssdpReqSock );
 
     return UPNP_E_SUCCESS;
 }
-#endif // IPv6
+#endif /* IPv6 */
 
 #endif /* INCLUDE_CLIENT_APIS */
 
@@ -1317,7 +1306,7 @@ int create_ssdp_sock_v6( SOCKET* ssdpSock )
     return UPNP_E_SUCCESS;
 }
 
-#endif // IPv6
+#endif /* IPv6 */
 
 /************************************************************************
  * Function : create_ssdp_sock_v6_ula_gua
@@ -1429,7 +1418,7 @@ int create_ssdp_sock_v6_ula_gua(SOCKET *ssdpSock)
 
 	return UPNP_E_SUCCESS;
 }
-#endif   //IPv6
+#endif   /* IPv6 */
 
 #endif /* EXCLUDE_SSDP */
 

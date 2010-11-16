@@ -125,7 +125,7 @@ TvCtrlPointDeleteNode( struct TvDeviceNode *node )
         }
     }
 
-    //Notify New Device Added
+    /*Notify New Device Added */
     SampleUtil_StateUpdate( NULL, NULL, node->device.UDN, DEVICE_REMOVED );
     free( node );
     node = NULL;
@@ -374,7 +374,7 @@ TvCtrlPointSendAction( int service,
                       param_val[param] ) != UPNP_E_SUCCESS ) {
                     SampleUtil_Print
                         ( "ERROR: TvCtrlPointSendAction: Trying to add action param" );
-                    //return -1; // TBD - BAD! leaves mutex locked
+                    /*return -1; // TBD - BAD! leaves mutex locked */
                 }
             }
         }
@@ -716,7 +716,7 @@ TvCtrlPointAddDevice( IXML_Document *DescDoc,
     if( strcmp( deviceType, TvDeviceType ) == 0 ) {
         SampleUtil_Print( "Found Tv device" );
 
-        // Check if this device is already in the list
+        /* Check if this device is already in the list */
         tmpdevnode = GlobalDeviceList;
         while( tmpdevnode ) {
             if( strcmp( tmpdevnode->device.UDN, UDN ) == 0 ) {
@@ -727,8 +727,8 @@ TvCtrlPointAddDevice( IXML_Document *DescDoc,
         }
 
         if( found ) {
-            // The device is already there, so just update 
-            // the advertisement timeout field
+            /* The device is already there, so just update  */
+            /* the advertisement timeout field */
             tmpdevnode->device.AdvrTimeOut = expires;
         } else {
             for( service = 0; service < TV_SERVICE_SERVCOUNT; service++ ) {
@@ -794,7 +794,7 @@ TvCtrlPointAddDevice( IXML_Document *DescDoc,
 
             deviceNode->next = NULL;
 
-            // Insert the new device node in the list
+            /* Insert the new device node in the list */
             if( ( tmpdevnode = GlobalDeviceList ) ) {
 
                 while( tmpdevnode ) {
@@ -809,7 +809,7 @@ TvCtrlPointAddDevice( IXML_Document *DescDoc,
                 GlobalDeviceList = deviceNode;
             }
 
-            //Notify New Device Added
+            /*Notify New Device Added */
             SampleUtil_StateUpdate( NULL, NULL, deviceNode->device.UDN,
                                     DEVICE_ADDED );
         }
@@ -1219,7 +1219,7 @@ TvCtrlPointVerifyTimeouts( int incr )
 
     while( curdevnode ) {
         curdevnode->device.AdvrTimeOut -= incr;
-        //SampleUtil_Print("Advertisement Timeout: %d\n", curdevnode->device.AdvrTimeOut);
+        /*SampleUtil_Print("Advertisement Timeout: %d\n", curdevnode->device.AdvrTimeOut); */
 
         if( curdevnode->device.AdvrTimeOut <= 0 ) {
             /*
@@ -1275,7 +1275,7 @@ TvCtrlPointVerifyTimeouts( int incr )
 static int TvCtrlPointTimerLoopRun = 1;
 void *TvCtrlPointTimerLoop(void *args)
 {
-    int incr = 30;              // how often to verify the timeouts, in seconds
+    int incr = 30;              /* how often to verify the timeouts, in seconds */
 
     while (TvCtrlPointTimerLoopRun) {
         isleep( incr );

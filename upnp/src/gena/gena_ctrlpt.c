@@ -106,7 +106,7 @@ static void GenaAutoRenewSubscription(
 		}
 		UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "HANDLE IS VALID");
 
-		// make callback
+		/* make callback */
 		callback_fun = handle_info->Callback;
 		cookie = handle_info->Cookie;
 		HandleUnlock();
@@ -160,14 +160,14 @@ static int ScheduleGenaAutoRenew(
 		goto end_function;
 	}
 
-	// schedule expire event
+	/* schedule expire event */
 	RenewEventStruct->ErrCode = UPNP_E_SUCCESS;
 	RenewEventStruct->TimeOut = TimeOut;
 	strcpy(RenewEventStruct->Sid, UpnpString_get_String(tmpSID));
 	strncpy(RenewEventStruct->PublisherUrl,
 		UpnpString_get_String(tmpEventURL), NAME_SIZE - 1);
 
-	// RenewEvent->EventType=UPNP_EVENT_SUBSCRIPTION_EXPIRE;
+	/* RenewEvent->EventType=UPNP_EVENT_SUBSCRIPTION_EXPIRE; */
 	RenewEvent->handle = client_handle;
 	RenewEvent->Event = RenewEventStruct;
 
@@ -175,7 +175,7 @@ static int ScheduleGenaAutoRenew(
 	TPJobSetFreeFunction(&job, (free_routine)free_upnp_timeout);
 	TPJobSetPriority(&job, MED_PRIORITY);
 
-	// Schedule the job
+	/* Schedule the job */
 	return_code = TimerThreadSchedule(
 		&gTimerThread,
 		TimeOut - AUTO_RENEW_TIME,
@@ -215,7 +215,7 @@ static int gena_unsubscribe(
 	uri_type dest_url;
 	membuffer request;
 
-	// parse url
+	/* parse url */
 	return_code = http_FixStrUrl(
 		UpnpString_get_String(url),
 		UpnpString_get_Length(url),
@@ -224,7 +224,7 @@ static int gena_unsubscribe(
 		return return_code;
 	}
 
-	// make request msg
+	/* make request msg */
 	membuffer_init(&request);
 	request.size_inc = 30;
 	return_code = http_MakeMessage(
@@ -233,14 +233,14 @@ static int gena_unsubscribe(
 		HTTPMETHOD_UNSUBSCRIBE, &dest_url,
 		"SID: ", UpnpString_get_String(sid));
 
-	// Not able to make the message so destroy the existing buffer
+	/* Not able to make the message so destroy the existing buffer */
 	if (return_code != 0) {
 		membuffer_destroy(&request);
 
 		return return_code;
 	}
 
-	// send request and get reply
+	/* send request and get reply */
 	return_code = http_RequestAndResponse(
 		&dest_url, request.buf, request.length,
 		HTTPMETHOD_UNSUBSCRIBE, HTTP_DEFAULT_TIMEOUT, response);
@@ -286,7 +286,7 @@ static int gena_subscribe(
 
 	UpnpString_clear(sid);
 
-	// request timeout to string
+	/* request timeout to string */
 	if (timeout == NULL) {
 		timeout = &local_timeout;
 	}
@@ -298,7 +298,7 @@ static int gena_subscribe(
 		sprintf(timeout_str, "%d", *timeout);
 	}
 
-	// parse url
+	/* parse url */
 	return_code = http_FixStrUrl(
 		UpnpString_get_String(url),
 		UpnpString_get_Length(url),
@@ -307,11 +307,11 @@ static int gena_subscribe(
 		return return_code;
 	}
 
-	// make request msg
+	/* make request msg */
 	membuffer_init(&request);
 	request.size_inc = 30;
 	if (renewal_sid) {
-		// renew subscription
+		/* renew subscription */
 		return_code = http_MakeMessage(
 			&request, 1, 1,
 			"q" "ssc" "sscc",
@@ -319,7 +319,7 @@ static int gena_subscribe(
 			"SID: ", UpnpString_get_String(renewal_sid),
 			"TIMEOUT: Second-", timeout_str );
 	} else {
-		// subscribe
+		/* subscribe */
 		if (dest_url.hostport.IPaddress.ss_family == AF_INET6) {
 			struct sockaddr_in6* DestAddr6 = (struct sockaddr_in6*)&dest_url.hostport.IPaddress;
 			return_code = http_MakeMessage(
@@ -346,7 +346,7 @@ static int gena_subscribe(
 		return return_code;
 	}
 
-	// send request and get reply
+	/* send request and get reply */
 	return_code = http_RequestAndResponse(&dest_url, request.buf,
 		request.length,
 		HTTPMETHOD_SUBSCRIBE,
@@ -365,7 +365,7 @@ static int gena_subscribe(
 		return UPNP_E_SUBSCRIBE_UNACCEPTED;
 	}
 
-	// get SID and TIMEOUT
+	/* get SID and TIMEOUT */
 	if (httpmsg_find_hdr(&response.msg, HDR_SID, &sid_hdr) == NULL ||
 	    sid_hdr.length == 0 ||
 	    httpmsg_find_hdr( &response.msg, HDR_TIMEOUT, &timeout_hdr ) == NULL ||
@@ -375,10 +375,10 @@ static int gena_subscribe(
 		return UPNP_E_BAD_RESPONSE;
 	}
 
-	// save timeout
+	/* save timeout */
 	parse_ret = matchstr(timeout_hdr.buf, timeout_hdr.length, "%iSecond-%d%0", timeout);
 	if (parse_ret == PARSE_OK) {
-		// nothing to do
+		/* nothing to do */
 	} else if (memptr_cmp_nocase(&timeout_hdr, "Second-infinite") == 0) {
 		*timeout = -1;
 	} else {
@@ -387,7 +387,7 @@ static int gena_subscribe(
 		return UPNP_E_BAD_RESPONSE;
 	}
 
-	// save SID
+	/* save SID */
 	UpnpString_set_StringN(sid, sid_hdr.buf, sid_hdr.length);
 	if (UpnpString_get_String(sid) == NULL) {
 		httpmsg_destroy(&response.msg);
@@ -456,7 +456,7 @@ int genaUnSubscribe(
 	ClientSubscription *sub_copy = UpnpClientSubscription_new();
 	http_parser_t response;
 
-	// validate handle and sid
+	/* validate handle and sid */
 	HandleLock();
 	if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
 		HandleUnlock();
@@ -518,7 +518,7 @@ int genaSubscribe(
 	UpnpString_clear(out_sid);
 
 	HandleReadLock();
-	// validate handle
+	/* validate handle */
 	if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
 		HandleUnlock();
 
@@ -526,7 +526,7 @@ int genaSubscribe(
 	}
 	HandleUnlock();
 
-	// subscribe
+	/* subscribe */
 	SubscribeLock();
 	return_code = gena_subscribe(PublisherURL, TimeOut, NULL, ActualSID);
 	HandleLock();
@@ -542,16 +542,16 @@ int genaSubscribe(
 		goto error_handler;
 	}
 
-	// generate client SID
+	/* generate client SID */
 	uuid_create(&uid );
 	uuid_unpack(&uid, temp_sid);
 	sprintf(temp_sid2, "uuid:%s", temp_sid);
 	UpnpString_set_String(out_sid, temp_sid2);
 
-	// create event url
+	/* create event url */
 	UpnpString_assign(EventURL, PublisherURL);
 
-	// fill subscription
+	/* fill subscription */
 	if (newSubscription == NULL) {
 		return_code = UPNP_E_OUTOF_MEMORY;
 		goto error_handler;
@@ -563,7 +563,7 @@ int genaSubscribe(
 	UpnpClientSubscription_set_Next(newSubscription, handle_info->ClientSubList);
 	handle_info->ClientSubList = newSubscription;
 
-	// schedule expiration event
+	/* schedule expiration event */
 	return_code = ScheduleGenaAutoRenew(client_handle, *TimeOut, newSubscription);
 
 error_handler:
@@ -594,7 +594,7 @@ int genaRenewSubscription(
 
 	HandleLock();
 
-	// validate handle and sid
+	/* validate handle and sid */
 	if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
 		HandleUnlock();
 
@@ -610,7 +610,7 @@ int genaRenewSubscription(
 		goto exit_function;
 	}
 
-	// remove old events
+	/* remove old events */
 	if (TimerThreadRemove(
 		&gTimerThread,
 		UpnpClientSubscription_get_RenewEventId(sub),
@@ -639,17 +639,17 @@ int genaRenewSubscription(
 		goto exit_function;
 	}
 
-	// we just called GetHandleInfo, so we don't check for return value
-	//GetHandleInfo(client_handle, &handle_info);
+	/* we just called GetHandleInfo, so we don't check for return value */
+	/*GetHandleInfo(client_handle, &handle_info); */
 	if (return_code != UPNP_E_SUCCESS) {
-		// network failure (remove client sub)
+		/* network failure (remove client sub) */
 		RemoveClientSubClientSID(&handle_info->ClientSubList, in_sid);
 		free_client_subscription(sub_copy);
 		HandleUnlock();
 		goto exit_function;
 	}
 
-	// get subscription
+	/* get subscription */
 	sub = GetClientSubClientSID(handle_info->ClientSubList, in_sid);
 	if (sub == NULL) {
 		free_client_subscription(sub_copy);
@@ -658,10 +658,10 @@ int genaRenewSubscription(
 		goto exit_function;
 	}
 
-	// store actual sid
+	/* store actual sid */
 	UpnpClientSubscription_set_ActualSID(sub, ActualSID);
 
-	// start renew subscription timer
+	/* start renew subscription timer */
 	return_code = ScheduleGenaAutoRenew(client_handle, *TimeOut, sub);
 	if (return_code != GENA_SUCCESS) {
 		RemoveClientSubClientSID(
@@ -698,7 +698,7 @@ void gena_process_notification_event(
 	nts_hdr;
 	memptr seq_hdr;
 
-	// get SID
+	/* get SID */
 	if (httpmsg_find_hdr(event, HDR_SID, &sid_hdr) == NULL) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, event);
 		goto exit_function;
@@ -706,28 +706,28 @@ void gena_process_notification_event(
 	sid.buff = sid_hdr.buf;
 	sid.size = sid_hdr.length;
 
-	// get event key
+	/* get event key */
 	if (httpmsg_find_hdr(event, HDR_SEQ, &seq_hdr) == NULL ||
 	    matchstr(seq_hdr.buf, seq_hdr.length, "%d%0", &eventKey) != PARSE_OK) {
 		error_respond( info, HTTP_BAD_REQUEST, event );
 		goto exit_function;
 	}
 
-	// get NT and NTS headers
+	/* get NT and NTS headers */
 	if (httpmsg_find_hdr(event, HDR_NT, &nt_hdr) == NULL ||
 	    httpmsg_find_hdr(event, HDR_NTS, &nts_hdr) == NULL) {
 		error_respond( info, HTTP_BAD_REQUEST, event );
 		goto exit_function;
 	}
 
-	// verify NT and NTS headers
+	/* verify NT and NTS headers */
 	if (memptr_cmp(&nt_hdr, "upnp:event") != 0 ||
 	    memptr_cmp(&nts_hdr, "upnp:propchange") != 0) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, event);
 		goto exit_function;
 	}
 
-	// parse the content (should be XML)
+	/* parse the content (should be XML) */
 	if (!has_xml_content_type(event) ||
 	    event->msg.length == 0 ||
 	    ixmlParseBufferEx(event->entity.buf, &ChangedVars) != IXML_SUCCESS) {
@@ -737,28 +737,28 @@ void gena_process_notification_event(
 
 	HandleLock();
 
-	// get client info
+	/* get client info */
 	if (GetClientHandleInfo(&client_handle, &handle_info) != HND_CLIENT) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, event);
 		HandleUnlock();
 		goto exit_function;
 	}
 
-	// get subscription based on SID
+	/* get subscription based on SID */
 	subscription = GetClientSubActualSID(handle_info->ClientSubList, &sid);
 	if (subscription == NULL) {
 		if (eventKey == 0) {
-			// wait until we've finished processing a subscription 
-			//   (if we are in the middle)
-			// this is to avoid mistakenly rejecting the first event if we 
-			//   receive it before the subscription response
+			/* wait until we've finished processing a subscription  */
+			/*   (if we are in the middle) */
+			/* this is to avoid mistakenly rejecting the first event if we  */
+			/*   receive it before the subscription response */
 			HandleUnlock();
 
-			// try and get Subscription Lock 
-			//   (in case we are in the process of subscribing)
+			/* try and get Subscription Lock  */
+			/*   (in case we are in the process of subscribing) */
 			SubscribeLock();
 
-			// get HandleLock again
+			/* get HandleLock again */
 			HandleLock();
 
 			if (GetClientHandleInfo(&client_handle, &handle_info) != HND_CLIENT) {
@@ -784,25 +784,25 @@ void gena_process_notification_event(
 		}
 	}
 
-	// success
+	/* success */
 	error_respond(info, HTTP_OK, event);
 
-	// fill event struct
+	/* fill event struct */
 	tmpSID = UpnpClientSubscription_get_SID(subscription);
 	strcpy(event_struct.Sid, UpnpString_get_String(tmpSID));
 	event_struct.EventKey = eventKey;
 	event_struct.ChangedVariables = ChangedVars;
 
-	// copy callback
+	/* copy callback */
 	callback = handle_info->Callback;
 	cookie = handle_info->Cookie;
 
 	HandleUnlock();
 
-	// make callback with event struct
-	// In future, should find a way of mainting
-	// that the handle is not unregistered in the middle of a
-	// callback
+	/* make callback with event struct */
+	/* In future, should find a way of mainting */
+	/* that the handle is not unregistered in the middle of a */
+	/* callback */
 	callback(UPNP_EVENT_RECEIVED, &event_struct, cookie);
 
 exit_function:

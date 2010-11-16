@@ -314,7 +314,7 @@ static IXML_Document *makeAction(
 	}
 
 	if (NumArg > 0) {
-		//va_start(ArgList, Arg);
+		/*va_start(ArgList, Arg); */
 		ArgName = Arg;
 		for ( ; ; ) {
 			ArgValue = va_arg(ArgList, const char *);
@@ -333,7 +333,7 @@ static IXML_Document *makeAction(
 				break;
 			}
 		}
-		//va_end(ArgList);
+		/*va_end(ArgList); */
 	}
 
 	return ActionDoc;

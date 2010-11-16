@@ -66,7 +66,7 @@ struct SUpnpString
 
 UpnpString *UpnpString_new()
 {
-	// All bytes are zero, and so is the length of the string.
+	/* All bytes are zero, and so is the length of the string. */
 	struct SUpnpString *p = calloc(1, sizeof (struct SUpnpString));
 	if (p == NULL) {
 		goto error_handler1;
@@ -75,7 +75,7 @@ UpnpString *UpnpString_new()
 	p->m_length = 0;
 #endif
 
-	// This byte is zero, calloc does initialize it.
+	/* This byte is zero, calloc does initialize it. */
 	p->m_string = calloc(1, 1);
 	if (p->m_string == NULL) {
 		goto error_handler2;
@@ -83,7 +83,7 @@ UpnpString *UpnpString_new()
 
 	return (UpnpString *)p;
 
-	//free(p->m_string);
+	/*free(p->m_string); */
 error_handler2:
 	free(p);
 error_handler1:
@@ -120,7 +120,7 @@ UpnpString *UpnpString_dup(const UpnpString *p)
 
 	return (UpnpString *)q;
 
-	//free(q->m_string);
+	/*free(q->m_string); */
 error_handler2:
 	free(q);
 error_handler1:

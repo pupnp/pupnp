@@ -46,7 +46,7 @@
 #ifdef INCLUDE_CLIENT_APIS
 
 
-#include <stdlib.h> // for calloc(), free()
+#include <stdlib.h> /* for calloc(), free() */
 
 
 struct SClientSubscription {
@@ -113,12 +113,12 @@ ClientSubscription *UpnpClientSubscription_dup(const ClientSubscription *p)
 void UpnpClientSubscription_assign(ClientSubscription *q, const ClientSubscription *p)
 {
 	if (q != p) {
-		// Do not copy RenewEventId
+		/* Do not copy RenewEventId */
 		((struct SClientSubscription *)q)->m_renewEventId = -1;
 		UpnpClientSubscription_set_SID(q, UpnpClientSubscription_get_SID(p));
 		UpnpClientSubscription_set_ActualSID(q, UpnpClientSubscription_get_ActualSID(p));
 		UpnpClientSubscription_set_EventURL(q, UpnpClientSubscription_get_EventURL(p));
-		// Do not copy m_next
+		/* Do not copy m_next */
 		((struct SClientSubscription *)q)->m_next = NULL;
 	}
 }
@@ -238,8 +238,8 @@ void free_client_subscription(ClientSubscription *sub)
 		UpnpClientSubscription_strcpy_ActualSID(sub, "");
 		UpnpClientSubscription_strcpy_EventURL(sub, "");
 		if (renewEventId != -1) {
-			// do not remove timer event of copy
-			// invalid timer event id
+			/* do not remove timer event of copy */
+			/* invalid timer event id */
 			if (TimerThreadRemove(&gTimerThread, renewEventId, &tempJob) == 0) {
 				event = (upnp_timeout *)tempJob.arg;
 				free_upnp_timeout(event);

@@ -52,10 +52,10 @@ enum cmdloop_tvcmds {
    Data structure for parsing commands from the command line 
  */
 struct cmdloop_commands {
-    char *str;                  // the string 
-    int cmdnum;                 // the command
-    int numargs;                // the number of arguments
-    char *args;                 // the args
+    char *str;                  /* the string  */
+    int cmdnum;                 /* the command */
+    int numargs;                /* the number of arguments */
+    char *args;                 /* the args */
 } cmdloop_commands;
 
 /*
@@ -417,7 +417,7 @@ device_main( int argc, char **argv )
 
     SampleUtil_Initialize( linux_print );
 
-    // Parse options
+    /* Parse options */
     for( i = 1; i < argc; i++ ) {
         if( strcmp( argv[i], "-ip" ) == 0 ) {
             ip_address = argv[++i];

@@ -29,20 +29,16 @@
  *
  ******************************************************************************/
 
-
 #ifndef SERVICE_TABLE_H
 #define SERVICE_TABLE_H
-
 
 /*!
  * \file
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 #include "config.h"
 #include "uri.h"
@@ -50,16 +46,12 @@ extern "C" {
 #include "upnp.h"
 #include "upnpdebug.h"
 
-
 #include <stdio.h>
 #include <time.h>
 
-
 #define SID_SIZE  41
 
-
 #ifdef INCLUDE_DEVICE_APIS
-
 
 typedef struct SUBSCRIPTION {
 	Upnp_SID sid;
@@ -70,7 +62,6 @@ typedef struct SUBSCRIPTION {
 	URL_list DeliveryURLs;
 	struct SUBSCRIPTION *next;
 } subscription;
-
 
 typedef struct SERVICE_INFO {
 	DOMString	serviceType;
@@ -85,16 +76,13 @@ typedef struct SERVICE_INFO {
 	struct SERVICE_INFO	 *next;
 } service_info;
 
-
 typedef struct SERVICE_TABLE {
 	DOMString URLBase;
 	service_info *serviceList;
 	service_info *endServiceList;
 } service_table;
 
-
 /* Functions for Subscriptions */
-
 
 /*!
  * \brief Makes a copy of the subscription.
@@ -107,7 +95,6 @@ int copy_subscription(
 	/*! [in] Destination subscription. */
 	subscription *out);
 
-
 /*
  * \brief Remove the subscription represented by the const Upnp_SID sid parameter
  * from the service table and update the service table.
@@ -117,7 +104,6 @@ void RemoveSubscriptionSID(
 	Upnp_SID sid,
 	/*! [in] Service object providing the list of subscriptions. */
 	service_info *service);
-
 
 /*!
  * \brief Return the subscription from the service table that matches
@@ -130,7 +116,6 @@ subscription *GetSubscriptionSID(
 	const Upnp_SID sid,
 	/*! [in] Service object providing the list of subscriptions. */
 	service_info *service); 
-  
 
 /*!
  * \brief Gets pointer to the first subscription node in the service table.
@@ -140,7 +125,6 @@ subscription *GetSubscriptionSID(
 subscription *GetFirstSubscription(
 	/*! [in] Service object providing the list of subscriptions. */
 	service_info *service);
-
 
 /*!
  * \brief Get current and valid subscription from the service table.
@@ -153,7 +137,6 @@ subscription *GetNextSubscription(
 	/*! [in] Current subscription object. */
 	subscription *current);
 
-
 /*!
  * \brief Free's the memory allocated for storing the URL of the subscription.
  */
@@ -161,14 +144,12 @@ void freeSubscription(
 	/*! [in] Subscription object to be freed. */
 	subscription *sub);
 
-
 /*!
  * \brief Free's memory allocated for all the subscriptions in the service table.
  */
 void freeSubscriptionList(
 	/*! [in] Head of the subscription list. */
 	subscription * head);
-
 
 /*!
  * \brief Traverses through the service table and returns a pointer to the
@@ -186,7 +167,6 @@ service_info *FindServiceId(
 	 * table. */
 	const char *UDN);
 
-
 /*!
  * \brief Traverses the service table and finds the node whose event URL Path
  * matches a know value.
@@ -200,7 +180,6 @@ service_info *FindServiceEventURLPath(
 	/*! [in] Event URL path used to find a service from the table. */
 	char *eventURLPath);
 
-
 /*!
  * \brief Traverses the service table and finds the node whose control URL Path
  * matches a know value.
@@ -213,7 +192,6 @@ service_info * FindServiceControlURLPath(
 	service_table *table,
 	/*! [in] Control URL path used to find a service from the table. */
 	const char *controlURLPath);
-
 
 /*!
  * \brief For debugging purposes prints information from the service passed
@@ -231,9 +209,14 @@ void printService(
 static UPNP_INLINE void printService(
 	service_info *service,
 	Upnp_LogLevel level,
-	Dbg_Module module) {}
+	Dbg_Module module)
+{
+	return;
+	service = service;
+	level = level;
+	module = module;
+}
 #endif
-
 
 /*!
  * \brief For debugging purposes prints information of each service from the
@@ -251,9 +234,14 @@ void printServiceList(
 static UPNP_INLINE void printServiceList(
 	service_info *service,
 	Upnp_LogLevel level,
-	Dbg_Module module) {}
+	Dbg_Module module)
+{
+	return;
+	service = service;
+	level = level;
+	module = module;
+}
 #endif
-
 
 /*!
  * \brief For debugging purposes prints the URL base of the table and information
@@ -271,9 +259,14 @@ void printServiceTable(
 static UPNP_INLINE void printServiceTable(
 	service_table *table,
 	Upnp_LogLevel level,
-	Dbg_Module module) {}
+	Dbg_Module module)
+{
+	return;
+	table = table;
+	level = level;
+	module = module;
+}
 #endif
-
 
 /*!
  * \brief Free's memory allocated for the various components of the service
@@ -283,7 +276,6 @@ void freeService(
 	/*! [in] Service information that is to be freed. */
 	service_info *in);
 
-
 /*!
  * \brief Free's memory allocated for the various components of each service
  * entry in the service table.
@@ -292,7 +284,6 @@ void freeServiceList(
 	/*! [in] Head of the service list to be freed. */
 	service_info *head);
 
-
 /*!
  * \brief Free's dynamic memory in table (does not free table, only memory
  * within the structure).
@@ -300,7 +291,6 @@ void freeServiceList(
 void freeServiceTable(
 	/*! [in] Service table whose internal memory needs to be freed. */
 	service_table *table);
-
 
 /*!
  * \brief This function assumes that services for a particular root device are
@@ -316,7 +306,6 @@ int removeServiceTable(
 	/*! [in] Service table from which services will be removed. */
 	service_table *in);
 
-
 /*!
  * \brief Add Service to the table.
  */
@@ -328,7 +317,6 @@ int addServiceTable(
 	/*! [in] Default base URL on which the URL will be returned to the
 	 * service list. */
 	const char *DefaultURLBase);
-
 
 /*!
  * \brief Retrieve service from the table.
@@ -343,9 +331,7 @@ int getServiceTable(
 	/*! [in] Default base URL on which the URL will be returned. */
 	const char *DefaultURLBase);
 
-
 /*	Misc helper functions	*/
-
 
 /*!
  * \brief Returns the clone of the element value.
@@ -357,7 +343,6 @@ int getServiceTable(
 DOMString getElementValue(
 	/*! [in] Input node which provides the list of child nodes. */
 	IXML_Node *node);
-
 
 /*!
  * \brief Traverses through a list of XML nodes to find the node with the
@@ -374,7 +359,6 @@ int getSubElement(
 	IXML_Node *node, 
 	/*! [out] Ouput node to which the matched child node is returned. */
 	IXML_Node **out);
-
 
 #endif /* INCLUDE_DEVICE_APIS */
 

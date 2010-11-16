@@ -29,10 +29,8 @@
  *
  ******************************************************************************/
 
-
 #ifndef GENLIB_NET_URI_H
 #define GENLIB_NET_URI_H
-
 
 /*!
  * \file
@@ -42,10 +40,8 @@
 	#include <sys/param.h>
 #endif
 
-
 #include "UpnpGlobal.h" /* for */
 #include "UpnpInet.h"
-
 
 #include <ctype.h>
 #include <errno.h>
@@ -58,7 +54,6 @@
 #include <sys/types.h>
 #include <time.h>
 
-
 #ifdef WIN32
 	#include "inet_pton.h"
 #else
@@ -66,39 +61,36 @@
 	#include <netdb.h>      /* for struct addrinfo */
 #endif
 
-
 #ifdef WIN32
 	#define strncasecmp strnicmp
 #else
 	/* Other systems have strncasecmp */
 #endif
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/*! length for HTTP DATE: "DATE: Sun, 01 Jul 2000 08:15:23 GMT<cr><lf>" */
+#define HTTP_DATE_LENGTH 37
 
-#define HTTP_DATE_LENGTH 37 // length for HTTP DATE: 
-                            //"DATE: Sun, 01 Jul 2000 08:15:23 GMT<cr><lf>"
 #define SEPARATORS "()<>@,;:\\\"/[]?={} \t"
 #define MARK "-_.!~*'()"
-#define RESERVED ";/?:@&=+$,{}" //added {} for compatibility
+
+/*! added {} for compatibility */
+#define RESERVED ";/?:@&=+$,{}"
+
 #define HTTP_SUCCESS 1
-
-
 #define FALSE 0
 #define TAB 9
 #define CR 13
 #define LF 10
 #define SOCKET_BUFFER_SIZE 5000
 
-
 enum hostType {
 	HOSTNAME,
 	IPv4address
 };
-
 
 enum pathType {
 	ABS_PATH,
@@ -106,9 +98,8 @@ enum pathType {
 	OPAQUE_PART
 };
 
-
 #ifdef WIN32
-	/* there is a conflict in windows with other symbols */
+	/* there is a conflict in windows with other symbols. */
 	enum uriType  {
 		absolute,
 		relative
@@ -120,7 +111,6 @@ enum pathType {
 	};
 #endif
 
-
 /*! 
  * \brief Buffer used in parsinghttp messages, urls, etc. generally this simply
  * holds a pointer into a larger array.
@@ -129,7 +119,6 @@ typedef struct TOKEN {
 	const char *buff;
 	size_t size;
 } token;
-
 
 /*!
  * \brief Represents a host port: e.g. "127.127.0.1:80" text is a token
@@ -141,7 +130,6 @@ typedef struct HOSTPORT {
 	/* Network Byte Order */
 	struct sockaddr_storage IPaddress;
 } hostport_type;
-
 
 /*!
  * \brief Represents a URI used in parse_uri and elsewhere
@@ -155,7 +143,6 @@ typedef struct URI{
 	hostport_type hostport;
 } uri_type;
 
-
 /*!
  * \brief Represents a list of URLs as in the "callback" header of SUBSCRIBE
  * message in GENA. "char *" URLs holds dynamic memory.
@@ -168,7 +155,6 @@ typedef struct URL_LIST {
 	/*! */
 	uri_type *parsedURLs;
 } URL_list;
-
 
 /*!
  * \brief Replaces an escaped sequence with its unescaped version as in
@@ -189,7 +175,6 @@ int replace_escaped(
 	int index,
 	/*! [out] . */
 	size_t *max);
-
 
 /*!
  * \brief Copies one URL_list into another.
@@ -218,7 +203,6 @@ void free_URL_list(
 	/*! [in] URL list object. */
 	URL_list *list);
 
-
 /*!
  * \brief Function useful in debugging for printing a parsed uri.
  */
@@ -227,9 +211,12 @@ void print_uri(
 	/*! [in] URI object to print. */
 	uri_type *in);
 #else
-static UPNP_INLINE void print_uri(uri_type *in) {}
+static UPNP_INLINE void print_uri(uri_type *in)
+{
+	return;
+	in = in;
+}
 #endif
-
 
 /*!
  * \brief Function useful in debugging for printing a token.
@@ -239,9 +226,14 @@ void print_token(
 	/*! [in] Token object to print. */
 	token *in);
 #else
-static UPNP_INLINE void print_token(token * in) {}
+static UPNP_INLINE void print_token(
+	/*! [in] Token object to print. */
+	token *in)
+{
+	return;
+	in = in;
+}
 #endif
-
 
 /*!
  * \brief Compares buffer in the token object with the buffer in in2.
@@ -257,7 +249,6 @@ int token_string_casecmp(
 	/*! [in] String of characters to compare with. */
 	char *in2);
 
-
 /*!
  * \brief Compares a null terminated string to a token (exact).
  *
@@ -272,7 +263,6 @@ int token_string_cmp(
 	/*! [in] String of characters to compare with. */
 	char *in2);
 
-
 /*!
  * \brief Compares two tokens.
  *
@@ -286,7 +276,6 @@ int token_cmp(
 	token *in1,
 	/*! [in] Second token object used for the comparison. */
 	token *in2);
-
 
 /*!
  * \brief Parses a string representing a host and port (e.g. "127.127.0.1:80"
@@ -304,7 +293,6 @@ int parse_hostport(
 	 * an internet address. */
 	hostport_type *out);
 
-
 /*!
  * \brief Removes http escaped characters such as: "%20" and replaces them with
  * their character representation. i.e. "hello%20foo" -> "hello foo".
@@ -319,7 +307,6 @@ int remove_escaped_chars(
 	char *in,
 	/*! [in,out] Size limit for the number of characters. */
 	size_t *size);
-
 
 /*!
  * \brief Removes ".", and ".." from a path.
@@ -349,7 +336,6 @@ int remove_dots(
 	/*! [in] Size limit for the number of characters. */
 	size_t size);
 
-
 /*!
  * \brief resolves a relative url with a base url returning a NEW (dynamically
  * allocated with malloc) full url.
@@ -369,7 +355,6 @@ char *resolve_rel_url(
 	char *base_url,
 	/*! [in] Relative URL. */
 	char *rel_url);
-
 
 /*!
  * \brief Parses a uri as defined in http://www.ietf.org/rfc/rfc2396.txt
@@ -391,7 +376,6 @@ int parse_uri(
 	/*! [out] Output parameter which will have the parsed uri information. */
 	uri_type *out);
 
-
 /*!
  * \brief Same as parse_uri(), except that all strings are unescaped
  * (%XX replaced by chars).
@@ -408,7 +392,6 @@ int parse_uri_and_unescape(
 	/*! [out] Output parameter which will have the parsed uri information. */
 	uri_type *out);
 
-
 /*!
  * \brief 
  *
@@ -421,7 +404,6 @@ int parse_token(
 	token *out,
 	/*! [in] . */
 	int max_size);
-
 
 /* Commented #defines, functions and typdefs */
 

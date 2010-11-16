@@ -29,18 +29,14 @@
  *
  ******************************************************************************/
 
-
 /*!
  * \file
  */
 
-
 #include "config.h"
-
 
 #ifdef INCLUDE_DEVICE_APIS
 #if EXCLUDE_SOAP == 0
-
 
 #define SOAP_BODY "Body"
 #define SOAP_URN "http:/""/schemas.xmlsoap.org/soap/envelope/"
@@ -56,11 +52,9 @@
 #include "unixutil.h"
 #include "upnpapi.h"
 
-
 #ifdef WIN32
 	#define snprintf _snprintf
 #endif
-
 
 /*! timeout duration in secs for transmission/reception */
 #define SOAP_TIMEOUT UPNP_TIMEOUT
@@ -83,23 +77,16 @@ static const char *Soap_Invalid_Var = "Invalid Var";
 const char *ContentTypeHeader =
     "CONTENT-TYPE: text/xml; charset=\"utf-8\"\r\n";
 
-
-/****************************************************************************
-*	Function :	get_request_type
-*
-*	Parameters :
-*			IN http_message_t* request :	HTTP request
-*			OUT memptr* action_name :	SOAP action name
-*
-*	Description :	This function retrives the name of the SOAP action
-*
-*	Return : int
-*		0 if successful else returns appropriate error.
-*	Note :
-****************************************************************************/
-static UPNP_INLINE int
-get_request_type( IN http_message_t * request,
-                  OUT memptr * action_name )
+/*!
+ * \brief This function retrives the name of the SOAP action.
+ *
+ * \return 0 if successful else returns appropriate error.
+ */
+static UPNP_INLINE int get_request_type(
+	/*! [in] HTTP request. */
+	http_message_t *request,
+	/*! [out] SOAP action name. */
+	memptr *action_name)
 {
     memptr value;
     memptr ns_value,
@@ -109,16 +96,15 @@ get_request_type( IN http_message_t * request,
     char *s;
     membuffer soap_action_name;
 
-    // find soapaction header
-    //
+    /* find soapaction header */
     if( request->method == SOAPMETHOD_POST ) {
         if( httpmsg_find_hdr( request, HDR_SOAPACTION, &value )
             == NULL ) {
             return SREQ_HDR_NOT_FOUND;
         }
-    } else                      // M-POST
-    {
-        // get NS value from MAN header
+    } else {
+	/* M-POST */
+        /* get NS value from MAN header */
         hdr = httpmsg_find_hdr( request, HDR_MAN, &value );
         if( hdr == NULL ) {
             return SREQ_HDR_NOT_FOUND;
@@ -128,7 +114,7 @@ get_request_type( IN http_message_t * request,
                       &dummy_quote, &ns_value ) != 0 ) {
             return SREQ_BAD_HDR_FORMAT;
         }
-        // create soapaction name header
+        /* create soapaction name header */
         membuffer_init( &soap_action_name );
         if( ( membuffer_assign( &soap_action_name,
                                 ns_value.buf, ns_value.length )
@@ -151,8 +137,7 @@ get_request_type( IN http_message_t * request,
         value.length = hdr->value.length;
     }
 
-    // determine type
-    //
+    /* determine type */
     save_char = value.buf[value.length];
     value.buf[value.length] = '\0';
 
@@ -162,21 +147,22 @@ get_request_type( IN http_message_t * request,
         return SREQ_BAD_HDR_FORMAT;
     }
 
-    s++;                        // move to value
+    /* move to value */
+    s++;
 
     if( matchstr( s, value.length - ( s - value.buf ), "%s",
                   action_name ) != PARSE_OK ) {
         value.buf[value.length] = save_char;
         return SREQ_BAD_HDR_FORMAT;
     }
-    // action name or variable ?
+    /* action name or variable ? */
     if( memptr_cmp( action_name, "QueryStateVariable" ) == 0 ) {
-        // query variable
+        /* query variable */
         action_name->buf = NULL;
         action_name->length = 0;
     }
-
-    value.buf[value.length] = save_char;    // restore
+    /* restore */
+    value.buf[value.length] = save_char;
     return 0;
 }
 
@@ -206,7 +192,7 @@ send_error_response( IN SOCKINFO * info,
     int major,
       minor;
     const char *start_body =
-//		"<?xml version=\"1.0\"?>\n" required??
+/*	"<?xml version=\"1.0\"?>\n" required?? */
         "<s:Envelope "
         "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
@@ -231,14 +217,14 @@ send_error_response( IN SOCKINFO * info,
 
     sprintf( err_code_str, "%d", error_code );
 
-    // calc body len
+    /* calc body len */
     content_length = strlen( start_body ) + strlen( err_code_str ) +
         strlen( mid_body ) + strlen( err_msg ) + strlen( end_body );
 
     http_CalcResponseVersion( hmsg->major_version, hmsg->minor_version,
                               &major, &minor );
 
-    // make headers
+    /* make headers */
     membuffer_init( &headers );
     if (http_MakeMessage(
         &headers, major, minor,
@@ -251,9 +237,9 @@ send_error_response( IN SOCKINFO * info,
         start_body, err_code_str, mid_body, err_msg,
         end_body ) != 0 ) {
         membuffer_destroy( &headers );
-        return;                 // out of mem
+        return;                 /* out of mem */
     }
-    // send err msg
+    /* send err msg */
     http_SendMessage( info, &timeout_secs, "b",
                       headers.buf, headers.length );
 
@@ -304,7 +290,7 @@ send_var_query_response( IN SOCKINFO * info,
     content_length = strlen( start_body ) + strlen( var_value ) +
         strlen( end_body );
 
-    // make headers
+    /* make headers */
     membuffer_init( &response );
     
     if (http_MakeMessage(
@@ -317,10 +303,10 @@ send_var_query_response( IN SOCKINFO * info,
         X_USER_AGENT,
         start_body, var_value, end_body ) != 0 ) {
         membuffer_destroy( &response );
-        return;                 // out of mem
+        return;                 /* out of mem */
     }
     
-    // send msg
+    /* send msg */
     http_SendMessage( info, &timeout_secs, "b",
                       response.buf, response.length );
 
@@ -353,7 +339,7 @@ get_action_node( IN IXML_Document * TempDoc,
     IXML_Node *ActNode = NULL;
     DOMString ActNodeName = NULL;
     const DOMString nodeName;
-    int ret_code = -1;          // error, by default
+    int ret_code = -1;          /* error, by default */
     IXML_NodeList *nl = NULL;
 
     UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
@@ -361,7 +347,7 @@ get_action_node( IN IXML_Document * TempDoc,
 
     *RespNode = NULL;
 
-    // Got the Envelope node here
+    /* Got the Envelope node here */
     EnvpNode = ixmlNode_getFirstChild( ( IXML_Node * ) TempDoc );
     if( EnvpNode == NULL ) {
         goto error_handler;
@@ -379,12 +365,12 @@ get_action_node( IN IXML_Document * TempDoc,
     if( BodyNode == NULL ) {
         goto error_handler;
     }
-    // Got action node here
+    /* Got action node here */
     ActNode = ixmlNode_getFirstChild( BodyNode );
     if( ActNode == NULL ) {
         goto error_handler;
     }
-    //Test whether this is the action node
+    /* Test whether this is the action node */
     nodeName = ixmlNode_getNodeName( ActNode );
     if( nodeName == NULL ) {
         goto error_handler;
@@ -406,7 +392,7 @@ get_action_node( IN IXML_Document * TempDoc,
         }
     }
 
-    ret_code = 0;               // success
+    ret_code = 0; /* success */
 
   error_handler:
 
@@ -498,8 +484,7 @@ check_soap_action_header( IN http_message_t * request,
     char *temp = NULL;
     char *temp2 = NULL;
 
-    //check soap action header
-
+    /* check soap action header */
     soap_action_header = httpmsg_find_hdr( request, HDR_SOAPACTION,
                                            &header_name );
 
@@ -533,35 +518,28 @@ check_soap_action_header( IN http_message_t * request,
         return ret_code;
     }
 
-    ( *temp ) = 0;              //temp make string
+    ( *temp ) = 0;              /* temp make string */
 
-    //check to see if it is Query State Variable or
-    //Service Action
-
+    /* check to see if it is Query State Variable or
+     * Service Action */
     tempSize = strlen( urn ) + 2;
-
     ns_compare = ( char * )malloc( tempSize );
-
     if( !ns_compare ) {
         ret_code = UPNP_E_OUTOF_MEMORY;
         free( temp_header_value );
         return ret_code;
     }
-
     snprintf( ns_compare, tempSize, "\"%s", urn );
-
     if( strcmp( temp_header_value, ns_compare ) ) {
         ret_code = UPNP_E_INVALID_ACTION;
     } else {
         ret_code = UPNP_E_SUCCESS;
         temp++;
         temp2 = strchr( temp, '\"' );
-
-        if( temp2 )             //remove ending " if present
+        if( temp2 )             /* remove ending " if present */
         {
             ( *temp2 ) = 0;
         }
-
         if( *temp )
             ( *actionName ) = strdup( temp );
         if( !*actionName ) {
@@ -611,11 +589,11 @@ get_device_info( IN http_message_t *request,
     int device_hnd;
     service_info *serv_info;
     char save_char;
-    int ret_code = -1;          // error by default
+    int ret_code = -1;          /* error by default */
     const char *control_url;
     char *actionName = NULL;
 
-    // null-terminate pathquery of url
+    /* null-terminate pathquery of url */
     control_url = request->uri.pathquery.buff;
     save_char = control_url[request->uri.pathquery.size];
     ((char *)control_url)[request->uri.pathquery.size] = '\0';
@@ -641,7 +619,7 @@ get_device_info( IN http_message_t *request,
             ret_code = UPNP_E_INVALID_ACTION;
             goto error_handler;
         }
-        //check soap body
+        /* check soap body */
         ret_code =
             check_soap_body( actionDoc, QUERY_STATE_VAR_URN, actionName );
         free( actionName );
@@ -657,7 +635,7 @@ get_device_info( IN http_message_t *request,
             ret_code = UPNP_E_INVALID_SERVICE;
             goto error_handler;
         }
-        //check soap body
+        /* check soap body */
         ret_code =
             check_soap_body( actionDoc, serv_info->serviceType,
                              actionName );
@@ -675,8 +653,8 @@ get_device_info( IN http_message_t *request,
 
     ret_code = 0;
 
-  error_handler:
-    ((char *)control_url)[request->uri.pathquery.size] = save_char;   // restore
+error_handler:
+    ((char *)control_url)[request->uri.pathquery.size] = save_char;   /* restore */
     HandleUnlock();
     return ret_code;
 }
@@ -709,19 +687,18 @@ send_action_response( IN SOCKINFO * info,
     int ret_code;
     int timeout_secs = SOAP_TIMEOUT;
     static char *start_body =
-//        "<?xml version=\"1.0\"?>" required??
+	/*"<?xml version=\"1.0\"?>" required?? */
         "<s:Envelope xmlns:s=\"http://schemas.xmlsoap."
         "org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap."
         "org/soap/encoding/\"><s:Body>\n";
     static char *end_body = "</s:Body> </s:Envelope>";
 
-    // init
+    /* init */
     http_CalcResponseVersion( request->major_version,
                               request->minor_version, &major, &minor );
     membuffer_init( &headers );
-    err_code = UPNP_E_OUTOF_MEMORY; // one error only
-
-    // get xml
+    err_code = UPNP_E_OUTOF_MEMORY; /* one error only */
+    /* get xml */
     xml_response = ixmlPrintNode( ( IXML_Node * ) action_resp );
     if( xml_response == NULL ) {
         goto error_handler;
@@ -731,20 +708,18 @@ send_action_response( IN SOCKINFO * info,
         strlen( start_body ) +
         strlen( xml_response ) +
         strlen( end_body );
-
-    // make headers
+    /* make headers */
     if (http_MakeMessage(
         &headers, major, minor,
         "RNsDsSXcc",
-        HTTP_OK,   // status code
+        HTTP_OK,   /* status code */
         content_length,
         ContentTypeHeader,
         "EXT:\r\n",
         X_USER_AGENT) != 0 ) {
         goto error_handler;
     }
-
-    // send whole msg
+    /* send whole msg */
     ret_code = http_SendMessage( info, &timeout_secs, "bbbb",
                                  headers.buf, headers.length,
                                  start_body, strlen( start_body ),
@@ -763,7 +738,7 @@ error_handler:
     ixmlFreeDOMString( xml_response );
     membuffer_destroy( &headers );
     if( err_code != 0 ) {
-        // only one type of error to worry about - out of mem
+        /* only one type of error to worry about - out of mem */
         send_error_response( info, SOAP_ACTION_FAILED, "Out of memory",
                              request );
     }
@@ -796,22 +771,22 @@ get_var_name( IN IXML_Document * TempDoc,
     const DOMString Temp = NULL;
     int ret_val = -1;
 
-    // Got the Envelop node here
+    /* Got the Envelop node here */
     EnvpNode = ixmlNode_getFirstChild( ( IXML_Node * ) TempDoc );
     if( EnvpNode == NULL ) {
         goto error_handler;
     }
-    // Got Body here
+    /* Got Body here */
     BodyNode = ixmlNode_getFirstChild( EnvpNode );
     if( BodyNode == NULL ) {
         goto error_handler;
     }
-    // Got action node here
+    /* Got action node here */
     StNode = ixmlNode_getFirstChild( BodyNode );
     if( StNode == NULL ) {
         goto error_handler;
     }
-    //Test whether this is the action node
+    /* Test whether this is the action node */
     StNodeName = ixmlNode_getNodeName( StNode );
     if( StNodeName == NULL || strstr( StNodeName,
                                       "QueryStateVariable" ) == NULL ) {
@@ -831,7 +806,7 @@ get_var_name( IN IXML_Document * TempDoc,
         "Received query for variable  name %s\n",
         VarName );
 
-    ret_val = 0;            // success
+    ret_val = 0;            /* success */
 
 error_handler:
     return ret_val;
@@ -866,13 +841,13 @@ static UPNP_INLINE void handle_query_variable(
     const char *err_str;
     int err_code;
 
-    // get var name
+    /* get var name */
     if( get_var_name( xml_doc, var_name ) != 0 ) {
         send_error_response( info, SOAP_INVALID_VAR,
                              Soap_Invalid_Var, request );
         return;
     }
-    // get info for event
+    /* get info for event */
     err_code = get_device_info(
 		request, 1, xml_doc,
 		info->foreign_sockaddr.ss_family,
@@ -892,13 +867,13 @@ static UPNP_INLINE void handle_query_variable(
     variable.CurrentVal = NULL;
     variable.CtrlPtIPAddr = info->foreign_sockaddr;
 
-    // send event
+    /* send event */
     soap_event_callback( UPNP_CONTROL_GET_VAR_REQUEST, &variable, cookie );
 
     UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
         "Return from callback for var request\n" );
 
-    // validate, and handle result
+    /* validate, and handle result */
     if( variable.CurrentVal == NULL ) {
         err_code = SOAP_ACTION_FAILED;
         err_str = Soap_Action_Failed;
@@ -917,7 +892,7 @@ static UPNP_INLINE void handle_query_variable(
         send_error_response( info, err_code, err_str, request );
         return;
     }
-    // send response
+    /* send response */
     send_var_query_response( info, variable.CurrentVal, request );
     ixmlFreeDOMString( variable.CurrentVal );
 
@@ -957,19 +932,19 @@ handle_invoke_action( IN SOCKINFO * info,
 
     action.ActionResult = NULL;
 
-    // null-terminate
+    /* null-terminate */
     save_char = action_name.buf[action_name.length];
     action_name.buf[action_name.length] = '\0';
 
-    // set default error
+    /* set default error */
     err_code = SOAP_INVALID_ACTION;
     err_str = Soap_Invalid_Action;
 
-    // get action node
+    /* get action node */
     if( get_action_node( xml_doc, action_name.buf, &resp_node ) == -1 ) {
         goto error_handler;
     }
-    // get device info for action event
+    /* get device info for action event */
     err_code = get_device_info(
         request,
 	0,
@@ -1005,22 +980,22 @@ handle_invoke_action( IN SOCKINFO * info,
         }
         goto error_handler;
     }
-    // validate, and handle action error
+    /* validate, and handle action error */
     if( action.ActionResult == NULL ) {
         err_code = SOAP_ACTION_FAILED;
         err_str = Soap_Action_Failed;
         goto error_handler;
     }
-    // send response
+    /* send response */
     send_action_response( info, action.ActionResult, request );
 
     err_code = 0;
 
-    // error handling and cleanup
+    /* error handling and cleanup */
 error_handler:
     ixmlDocument_free( action.ActionResult );
     ixmlDocument_free( resp_node );
-    action_name.buf[action_name.length] = save_char;    // restore
+    action_name.buf[action_name.length] = save_char;    /* restore */
     if( err_code != 0 ) {
         send_error_response( info, err_code, err_str, request );
     }
@@ -1053,19 +1028,19 @@ soap_device_callback( IN http_parser_t * parser,
     memptr action_name;
     IXML_Document *xml_doc = NULL;
 
-    // set default error
+    /* set default error */
     err_code = SOAP_INVALID_ACTION;
     err_str = Soap_Invalid_Action;
 
-    // validate: content-type == text/xml
+    /* validate: content-type == text/xml */
     if( !has_xml_content_type( request ) ) {
         goto error_handler;
     }
-    // type of request
+    /* type of request */
     if( get_request_type( request, &action_name ) != 0 ) {
         goto error_handler;
     }
-    // parse XML
+    /* parse XML */
     err_code = ixmlParseBufferEx( request->entity.buf, &xml_doc );
     if( err_code != IXML_SUCCESS ) {
         if( err_code == IXML_INSUFFICIENT_MEMORY ) {
@@ -1079,14 +1054,14 @@ soap_device_callback( IN http_parser_t * parser,
     }
 
     if( action_name.length == 0 ) {
-        // query var
+        /* query var */
         handle_query_variable( info, request, xml_doc );
     } else {
-        // invoke action
+        /* invoke action */
         handle_invoke_action( info, request, action_name, xml_doc );
     }
 
-    err_code = 0;               // no error
+    err_code = 0;               /* no error */
 
   error_handler:
     ixmlDocument_free( xml_doc );
@@ -1095,6 +1070,7 @@ soap_device_callback( IN http_parser_t * parser,
     }
 }
 
-#endif // EXCLUDE_SOAP
+#endif /* EXCLUDE_SOAP */
 
-#endif // INCLUDE_DEVICE_APIS
+#endif /* INCLUDE_DEVICE_APIS */
+
