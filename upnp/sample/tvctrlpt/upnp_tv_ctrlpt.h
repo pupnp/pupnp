@@ -86,10 +86,10 @@ extern "C" {
 /* This should be the maximum VARCOUNT from above */
 #define TV_MAXVARS			TV_PICTURE_VARCOUNT
 
-extern char TvDeviceType[];
-extern char *TvServiceType[];
-extern char *TvServiceName[];
-extern char *TvVarName[TV_SERVICE_SERVCOUNT][TV_MAXVARS];
+extern const char TvDeviceType[];
+extern const char *TvServiceType[];
+extern const char *TvServiceName[];
+extern const char *TvVarName[TV_SERVICE_SERVCOUNT][TV_MAXVARS];
 extern char TvVarCount[];
 
 struct tv_service {
