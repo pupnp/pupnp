@@ -1481,7 +1481,7 @@ TvDeviceSetContrast( IN IXML_Document *in, OUT IXML_Document **out, OUT char **e
  *    IXML_Document **out - action result document
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
-int
+static int
 IncrementContrast( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
 {
     int curcontrast;
@@ -1532,59 +1532,20 @@ IncrementContrast( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, O
     }
 }
 
-/******************************************************************************
- * TvDeviceIncreaseContrast
- *
- * Description: 
- *
- *      Increase the contrast.
- *
- * Parameters:
- *       
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDeviceIncreaseContrast( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceIncreaseContrast(IXML_Document *in, IXML_Document **out,
+	char **errorString)
 {
-    return IncrementContrast( 1, in, out, errorString );
+    return IncrementContrast(1, in, out, errorString);
 }
 
-/******************************************************************************
- * TvDeviceDecreaseContrast
- *
- * Description: 
- *      Decrease the contrast.
- *
- * Parameters:
- *          
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDeviceDecreaseContrast( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceDecreaseContrast(IXML_Document *in, IXML_Document **out,
+	char **errorString)
 {
-    return IncrementContrast( -1, in, out, errorString );
+    return IncrementContrast(-1, in, out, errorString);
 }
 
-/******************************************************************************
- * TvDeviceSetBrightness
- *
- * Description: 
- *       Change the brightness, update the TvDevice picture service
- *       state table, and notify all subscribed control points of the
- *       updated state.
- *
- * Parameters:
- *   brightness -- The brightness value to change to.
- *
- *****************************************************************************/
-int
-TvDeviceSetBrightness( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceSetBrightness(IXML_Document *in, IXML_Document **out,
+	char **errorString)
 {
     char *value = NULL;
     int brightness = -1;
@@ -1630,22 +1591,19 @@ TvDeviceSetBrightness( IN IXML_Document *in, OUT IXML_Document **out, OUT char *
     }
 }
 
-/******************************************************************************
- * IncrementBrightness
- *
- * Description: 
- *       Increment the brightness.  Read the current brightness from the state
- *       table, add the increment, and then change the brightness.
- *
- * Parameters:
- *   incr -- The increment by which to change the brightness.
- *   
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *****************************************************************************/
-int
-IncrementBrightness( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+/*!
+ * \brief Increment the brightness. Read the current brightness from the state
+ * table, add the increment, and then change the brightness.
+ */
+static int IncrementBrightness(
+	/*! [in] The increment by which to change the brightness. */
+	IN int incr,
+	/*! [in] action request document. */
+	IN IXML_Document *in,
+	/*! [out] action result document. */
+	OUT IXML_Document **out,
+	/*! [out] errorString (in case action was unsuccessful). */
+	OUT char **errorString)
 {
     int curbrightness;
     int newbrightness;
@@ -1695,62 +1653,16 @@ IncrementBrightness( IN int incr, IN IXML_Document *in, OUT IXML_Document **out,
     }
 }
 
-/******************************************************************************
- * TvDeviceIncreaseBrightness
- *
- * Description: 
- *       Increase brightness.
- *
- * Parameters:
- *
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDeviceIncreaseBrightness( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceIncreaseBrightness(IXML_Document *in, IXML_Document **out, char **errorString)
 {
-    return IncrementBrightness( 1, in, out, errorString );
+    return IncrementBrightness(1, in, out, errorString);
 }
 
-/******************************************************************************
- * TvDeviceDecreaseBrightness
- *
- * Description: 
- *       Decrease brightnesss.
- *
- * Parameters:
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDeviceDecreaseBrightness( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceDecreaseBrightness(IXML_Document *in, IXML_Document **out, char **errorString)
 {
-    return IncrementBrightness( -1, in, out, errorString );
+    return IncrementBrightness(-1, in, out, errorString);
 }
 
-/******************************************************************************
- * TvDeviceCallbackEventHandler
- *
- * Description: 
- *       The callback handler registered with the SDK while registering
- *       root device.  Dispatches the request to the appropriate procedure
- *       based on the value of EventType. The four requests handled by the 
- *       device are: 
- *                   1) Event Subscription requests.  
- *                   2) Get Variable requests. 
- *                   3) Action requests.
- *
- * Parameters:
- *
- *   EventType -- The type of callback event
- *   Event -- Data structure containing event data
- *   Cookie -- Optional data specified during callback registration
- *
- *****************************************************************************/
 int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Cookie)
 {
 	switch (EventType) {
@@ -1792,15 +1704,6 @@ int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Co
 	return 0;
 }
 
-/******************************************************************************
- * TvDeviceStop
- *
- * Description: 
- *       Stops the device. Uninitializes the sdk. 
- *
- * Parameters:
- *
- *****************************************************************************/
 int TvDeviceStop(void)
 {
     UpnpUnRegisterRootDevice( device_handle );
@@ -1811,33 +1714,8 @@ int TvDeviceStop(void)
     return UPNP_E_SUCCESS;
 }
 
-/******************************************************************************
- * TvDeviceStart
- *
- * Description: 
- *      Initializes the UPnP Sdk, registers the device, and sends out 
- *      advertisements.  
- *
- * Parameters:
- *
- *   ip_address - ip address to initialize the sdk (may be NULL)
- *                if null, then the first non null loopback address is used.
- *   port       - port number to initialize the sdk (may be 0)
- *                if zero, then a random number is used.
- *   desc_doc_name - name of description document.
- *                   may be NULL. Default is tvdevicedesc.xml
- *   web_dir_path  - path of web directory.
- *                   may be NULL. Default is ./web (for Linux) or ../tvdevice/web
- *                   for windows.
- *   pfun          - print function to use.  
- *
- *****************************************************************************/
-int
-TvDeviceStart( char *ip_address,
-               unsigned short port,
-               char *desc_doc_name,
-               char *web_dir_path,
-               print_string pfun )
+int TvDeviceStart(char *ip_address, unsigned short port, char *desc_doc_name,
+	char *web_dir_path, print_string pfun)
 {
     int ret = UPNP_E_SUCCESS;
     char desc_doc_url[DESC_URL_SIZE];
