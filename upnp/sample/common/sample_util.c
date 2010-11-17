@@ -503,7 +503,7 @@ int SampleUtil_PrintEvent(Upnp_EventType EventType, void *Event)
 }
 
 int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
-	char *serviceType, char **serviceId, char **eventURL, char **controlURL)
+	const char *serviceType, char **serviceId, char **eventURL, char **controlURL)
 {
 	int i;
 	int length;

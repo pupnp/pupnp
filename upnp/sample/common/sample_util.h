@@ -132,7 +132,7 @@ int SampleUtil_FindAndParseService (
 	/*! [in] The location of the description document. */
 	const char *location, 
 	/*! [in] The type of service to search for. */
-	char *serviceType,
+	const char *serviceType,
 	/*! [out] The service ID. */
 	char **serviceId, 
 	/*! [out] The event URL for the service. */

@@ -29,120 +29,89 @@
  *
  ******************************************************************************/
 
-
 #include "upnp_tv_device.h"
-
 
 #include <assert.h>
 
-
 #define DEFAULT_WEB_DIR "./web"
-
 
 #define DESC_URL_SIZE 200
 
+/*! Device type for tv device. */
+extern const char TvDeviceType[];
 
-/*
-   Device type for tv device 
- */
-extern char TvDeviceType[];
+/*! Service types for tv services. */
+extern const char *TvServiceType[];
 
-/*
-   Service types for tv services
- */
-extern char *TvServiceType[];
-
-/*
-   Global arrays for storing Tv Control Service
-   variable names, values, and defaults 
- */
-char *tvc_varname[] = { "Power", "Channel", "Volume" };
+/*! Global arrays for storing Tv Control Service variable names, values,
+ * and defaults. */
+const char *tvc_varname[] = { "Power", "Channel", "Volume" };
 char tvc_varval[TV_CONTROL_VARCOUNT][TV_MAX_VAL_LEN];
-char *tvc_varval_def[] = { "1", "1", "5" };
+const char *tvc_varval_def[] = { "1", "1", "5" };
 
-/*
-   Global arrays for storing Tv Picture Service
-   variable names, values, and defaults 
- */
-char *tvp_varname[] = { "Color", "Tint", "Contrast", "Brightness" };
+/*! Global arrays for storing Tv Picture Service variable names, values,
+ * and defaults. */
+const char *tvp_varname[] = { "Color", "Tint", "Contrast", "Brightness" };
 char tvp_varval[TV_PICTURE_VARCOUNT][TV_MAX_VAL_LEN];
-char *tvp_varval_def[] = { "5", "5", "5", "5" };
+const char *tvp_varval_def[] = { "5", "5", "5", "5" };
 
-/*
-   The amount of time (in seconds) before advertisements
-   will expire 
- */
+/*! The amount of time (in seconds) before advertisements will expire. */
 int default_advr_expire = 100;
 
-/*
-   Global structure for storing the state table for this device 
- */
+/*! Global structure for storing the state table for this device. */
 struct TvService tv_service_table[2];
 
-/*
-   Device handle supplied by UPnP SDK 
- */
+/*! Device handle supplied by UPnP SDK. */
 UpnpDevice_Handle device_handle = -1;
 
-/*
-   Mutex for protecting the global state table data
-   in a multi-threaded, asynchronous environment.
-   All functions should lock this mutex before reading
-   or writing the state table data. 
- */
+/*! Mutex for protecting the global state table data
+ * in a multi-threaded, asynchronous environment.
+ * All functions should lock this mutex before reading
+ * or writing the state table data. */
 ithread_mutex_t TVDevMutex;
 
-/*Color constants */
+/*! Color constants */
 #define MAX_COLOR 10
 #define MIN_COLOR 1
 
-/*Brightness constants */
+/*! Brightness constants */
 #define MAX_BRIGHTNESS 10
 #define MIN_BRIGHTNESS 1
 
-/*Power constants */
+/*! Power constants */
 #define POWER_ON 1
 #define POWER_OFF 0
 
-/*Tint constants */
+/*! Tint constants */
 #define MAX_TINT 10
 #define MIN_TINT 1
 
-/*Volume constants */
+/*! Volume constants */
 #define MAX_VOLUME 10
 #define MIN_VOLUME 1
 
-/*Contrast constants */
+/*! Contrast constants */
 #define MAX_CONTRAST 10
 #define MIN_CONTRAST 1
 
-/*Channel constants */
+/*! Channel constants */
 #define MAX_CHANNEL 100
 #define MIN_CHANNEL 1
 
-/******************************************************************************
- * SetServiceTable
- *
- * Description: 
- *       Initializes the service table for the specified service.
- *       Note that 
- *       knowledge of the service description is
- *       assumed. 
- * Parameters:
- *   int serviceType - one of TV_SERVICE_CONTROL or, TV_SERVICE_PICTURE
- *   const char * UDN - UDN of device containing service
- *   const char * serviceId - serviceId of service
- *   const char * serviceTypeS - service type (as specified in Description
- *                                             Document) 
- *   struct TvService *out - service containing table to be set.
- *
- *****************************************************************************/
-int
-SetServiceTable( IN int serviceType,
-                 IN const char *UDN,
-                 IN const char *serviceId,
-                 IN const char *serviceTypeS,
-                 INOUT struct TvService *out )
+/*!
+ * \brief Initializes the service table for the specified service.
+ */
+static int SetServiceTable(
+	/*! [in] one of TV_SERVICE_CONTROL or, TV_SERVICE_PICTURE. */
+	IN int serviceType,
+	/*! [in] UDN of device containing service. */
+	IN const char *UDN,
+	/*! [in] serviceId of service. */
+	IN const char *serviceId,
+	/*! [in] service type (as specified in Description Document) . */
+	IN const char *serviceTypeS,
+	/*! [in,out] service containing table to be set. */
+	INOUT struct TvService *out)
 {
     unsigned int i = 0;
 
@@ -187,22 +156,7 @@ SetServiceTable( IN int serviceType,
     return SetActionTable( serviceType, out );
 }
 
-/******************************************************************************
- * SetActionTable
- *
- * Description: 
- *       Initializes the action table for the specified service.
- *       Note that 
- *       knowledge of the service description is
- *       assumed.  Action names are hardcoded.
- * Parameters:
- *   int serviceType - one of TV_SERVICE_CONTROL or, TV_SERVICE_PICTURE
- *   struct TvService *out - service containing action table to set.
- *
- *****************************************************************************/
-int
-SetActionTable( IN int serviceType,
-                INOUT struct TvService *out )
+int SetActionTable(int serviceType, struct TvService *out)
 {
     if( serviceType == TV_SERVICE_CONTROL ) {
         out->ActionNames[0] = "PowerOn";
@@ -257,25 +211,7 @@ SetActionTable( IN int serviceType,
     return 0;
 }
 
-/******************************************************************************
- * TvDeviceStateTableInit
- *
- * Description: 
- *       Initialize the device state table for 
- * 	 this TvDevice, pulling identifier info
- *       from the description Document.  Note that 
- *       knowledge of the service description is
- *       assumed.  State table variables and default
- *       values are currently hardcoded in this file
- *       rather than being read from service description
- *       documents.
- *
- * Parameters:
- *   DescDocURL -- The description document URL
- *
- *****************************************************************************/
-int
-TvDeviceStateTableInit( IN char *DescDocURL )
+int TvDeviceStateTableInit(char *DescDocURL)
 {
     IXML_Document *DescDoc = NULL;
     int ret = UPNP_E_SUCCESS;
@@ -359,19 +295,7 @@ TvDeviceStateTableInit( IN char *DescDocURL )
     return ( ret );
 }
 
-/******************************************************************************
- * TvDeviceHandleSubscriptionRequest
- *
- * Description: 
- *       Called during a subscription request callback.  If the
- *       subscription request is for this device and either its
- *       control service or picture service, then accept it.
- *
- * Parameters:
- *   sr_event -- The subscription request event structure
- *
- *****************************************************************************/
-int TvDeviceHandleSubscriptionRequest(IN struct Upnp_Subscription_Request *sr_event)
+int TvDeviceHandleSubscriptionRequest(struct Upnp_Subscription_Request *sr_event)
 {
 	unsigned int i = 0;
 	int cmp1 = 0;
@@ -430,20 +354,7 @@ int TvDeviceHandleSubscriptionRequest(IN struct Upnp_Subscription_Request *sr_ev
 	return 1;
 }
 
-
-/******************************************************************************
- * TvDeviceHandleGetVarRequest
- *
- * Description: 
- *       Called during a get variable request callback.  If the
- *       request is for this device and either its control service
- *       or picture service, then respond with the variable value.
- *
- * Parameters:
- *   cgv_event -- The control get variable request event structure
- *
- *****************************************************************************/
-int TvDeviceHandleGetVarRequest(INOUT struct Upnp_State_Var_Request *cgv_event)
+int TvDeviceHandleGetVarRequest(struct Upnp_State_Var_Request *cgv_event)
 {
 	unsigned int i = 0;
 	unsigned int j = 0;
@@ -491,26 +402,14 @@ int TvDeviceHandleGetVarRequest(INOUT struct Upnp_State_Var_Request *cgv_event)
 	return cgv_event->ErrCode == UPNP_E_SUCCESS;
 }
 
-/******************************************************************************
- * TvDeviceHandleActionRequest
- *
- * Description: 
- *       Called during an action request callback.  If the
- *       request is for this device and either its control service
- *       or picture service, then perform the action and respond.
- *
- * Parameters:
- *   ca_event -- The control action request event structure
- *
- *****************************************************************************/
-int TvDeviceHandleActionRequest(INOUT struct Upnp_Action_Request *ca_event)
+int TvDeviceHandleActionRequest(struct Upnp_Action_Request *ca_event)
 {
 	/* Defaults if action not found. */
 	int action_found = 0;
 	int i = 0;
 	int service = -1;
 	int retCode = 0;
-	char *errorString = NULL;
+	const char *errorString = NULL;
 	const char *devUDN = NULL;
 	const char *serviceID = NULL;
 	const char *actionName = NULL;
@@ -578,28 +477,8 @@ int TvDeviceHandleActionRequest(INOUT struct Upnp_Action_Request *ca_event)
 	return ca_event->ErrCode;
 }
 
-/******************************************************************************
- * TvDeviceSetServiceTableVar
- *
- * Description: 
- *       Update the TvDevice service state table, and notify all subscribed 
- *       control points of the updated state.  Note that since this function
- *       blocks on the mutex TVDevMutex, to avoid a hang this function should 
- *       not be called within any other function that currently has this mutex 
- *       locked.
- *
- * Parameters:
- *   service -- The service number (TV_SERVICE_CONTROL or TV_SERVICE_PICTURE)
- *   variable -- The variable number (TV_CONTROL_POWER, TV_CONTROL_CHANNEL,
- *                   TV_CONTROL_VOLUME, TV_PICTURE_COLOR, TV_PICTURE_TINT,
- *                   TV_PICTURE_CONTRAST, or TV_PICTURE_BRIGHTNESS)
- *   value -- The string representation of the new value
- *
- *****************************************************************************/
-int
-TvDeviceSetServiceTableVar( IN unsigned int service,
-                            IN unsigned int variable,
-                            IN char *value )
+int TvDeviceSetServiceTableVar(unsigned int service, unsigned int variable,
+	char *value)
 {
     /*IXML_Document  *PropSet= NULL; */
 
@@ -640,20 +519,14 @@ TvDeviceSetServiceTableVar( IN unsigned int service,
     return ( 1 );
 }
 
-/******************************************************************************
- * TvDeviceSetPower
- *
- * Description: 
- *       Turn the power on/off, update the TvDevice control service
- *       state table, and notify all subscribed control points of the
- *       updated state.
- *
- * Parameters:
- *   on -- If 1, turn power on.  If 0, turn power off.
- *
- *****************************************************************************/
-int
-TvDeviceSetPower( IN int on )
+/*!
+ * \brief Turn the power on/off, update the TvDevice control service
+ * state table, and notify all subscribed control points of the
+ * updated state.
+ */
+static int TvDeviceSetPower(
+	/*! [in] If 1, turn power on. If 0, turn power off. */
+	int on)
 {
     char value[TV_MAX_VAL_LEN];
     int ret = 0;
@@ -663,9 +536,7 @@ TvDeviceSetPower( IN int on )
         return 0;
     }
 
-    /*
-       Vendor-specific code to turn the power on/off goes here 
-     */
+    /* Vendor-specific code to turn the power on/off goes here. */
 
     sprintf( value, "%d", on );
     ret = TvDeviceSetServiceTableVar( TV_SERVICE_CONTROL, TV_CONTROL_POWER,
@@ -674,21 +545,7 @@ TvDeviceSetPower( IN int on )
     return ret;
 }
 
-/******************************************************************************
- * TvDevicePowerOn
- *
- * Description: 
- *       Turn the power on.
- *
- * Parameters:
- *
- *    IXML_Document * in - document of action request
- *    IXML_Document **out - action result
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDevicePowerOn( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDevicePowerOn(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
     ( *out ) = NULL;
     ( *errorString ) = NULL;
@@ -708,25 +565,10 @@ TvDevicePowerOn( IN IXML_Document *in, OUT IXML_Document **out, OUT char **error
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
+    in = in;
 }
 
-/******************************************************************************
- * TvDevicePowerOff
- *
- * Description: 
- *       Turn the power off.
- *
- * Parameters:
- *    
- *    IXML_Document * in - document of action request
- *    IXML_Document **out - action result
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDevicePowerOff( IN IXML_Document * in,
-                  OUT IXML_Document **out,
-                  OUT char **errorString )
+int TvDevicePowerOff(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
     ( *out ) = NULL;
     ( *errorString ) = NULL;
@@ -746,25 +588,10 @@ TvDevicePowerOff( IN IXML_Document * in,
 
     ( *errorString ) = "Internal Error";
     return UPNP_E_INTERNAL_ERROR;
+    in = in;
 }
 
-/******************************************************************************
- * TvDeviceSetChannel
- *
- * Description: 
- *       Change the channel, update the TvDevice control service
- *       state table, and notify all subscribed control points of the
- *       updated state.
- *
- * Parameters:
- *    
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDeviceSetChannel( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceSetChannel(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
     char *value = NULL;
 
@@ -788,9 +615,7 @@ TvDeviceSetChannel( IN IXML_Document *in, OUT IXML_Document **out, OUT char **er
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the channel goes here 
-     */
+    /* Vendor-specific code to set the channel goes here. */
 
     if( TvDeviceSetServiceTableVar( TV_SERVICE_CONTROL,
                                     TV_CONTROL_CHANNEL, value ) ) {
@@ -812,27 +637,12 @@ TvDeviceSetChannel( IN IXML_Document *in, OUT IXML_Document **out, OUT char **er
     }
 }
 
-/******************************************************************************
- * IncrementChannel
- *
- * Description: 
- *       Increment the channel.  Read the current channel from the state
- *       table, add the increment, and then change the channel.
- *
- * Parameters:
- *   incr -- The increment by which to change the channel.
- *      
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *****************************************************************************/
-int
-IncrementChannel( IN int incr, IN IXML_Document * in, OUT IXML_Document **out, OUT char **errorString )
+int IncrementChannel(int incr, IN IXML_Document *in, IXML_Document **out, const char **errorString)
 {
     int curchannel;
     int newchannel;
 
-    char *actionName = NULL;
+    const char *actionName = NULL;
     char value[TV_MAX_VAL_LEN];
 
     if( incr > 0 ) {
@@ -855,9 +665,7 @@ IncrementChannel( IN int incr, IN IXML_Document * in, OUT IXML_Document **out, O
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the channel goes here 
-     */
+    /* Vendor-specific code to set the channel goes here. */
 
     sprintf( value, "%d", newchannel );
 
@@ -876,63 +684,20 @@ IncrementChannel( IN int incr, IN IXML_Document * in, OUT IXML_Document **out, O
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
+    in = in;
 }
 
-/******************************************************************************
- * TvDeviceDecreaseChannel
- *
- * Description: 
- *       Decrease the channel.  
- *
- * Parameters:
- *   
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDeviceDecreaseChannel( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceDecreaseChannel(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
-    return IncrementChannel( -1, in, out, errorString );
+    return IncrementChannel(-1, in, out, errorString);
 }
 
-/******************************************************************************
- * TvDeviceIncreaseChannel
- *
- * Description: 
- *       Increase the channel.  
- *
- * Parameters:
- *   
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDeviceIncreaseChannel( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceIncreaseChannel(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
-    return IncrementChannel( 1, in, out, errorString );
+    return IncrementChannel(1, in, out, errorString);
 }
 
-/******************************************************************************
- * TvDeviceSetVolume
- *
- * Description: 
- *       Change the volume, update the TvDevice control service
- *       state table, and notify all subscribed control points of the
- *       updated state.
- *
- * Parameters:
- *  
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDeviceSetVolume( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceSetVolume(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
     char *value = NULL;
     int volume = 0;
@@ -977,27 +742,23 @@ TvDeviceSetVolume( IN IXML_Document *in, OUT IXML_Document **out, OUT char **err
     }
 }
 
-/******************************************************************************
- * IncrementVolume
- *
- * Description: 
- *       Increment the volume.  Read the current volume from the state
- *       table, add the increment, and then change the volume.
- *
- * Parameters:
- *   incr -- The increment by which to change the volume.
- *      
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-IncrementVolume( IN int incr, IN IXML_Document *in,OUT IXML_Document **out, OUT char **errorString )
+/*!
+ * \brief Increment the volume. Read the current volume from the state table,
+ * add the increment, and then change the volume.
+ */
+static int IncrementVolume(
+	/*! [in] The increment by which to change the volume. */
+	int incr,
+	/*! [in] Action request document. */
+	IXML_Document *in,
+	/*! [out] Action result document. */
+	IXML_Document **out,
+	/*! [out] Error string in case action was unsuccessful. */
+	const char **errorString)
 {
-    int curvolume,
-      newvolume;
-    char *actionName = NULL;
+    int curvolume;
+    int newvolume;
+    const char *actionName = NULL;
     char value[TV_MAX_VAL_LEN];
 
     if( incr > 0 ) {
@@ -1040,63 +801,20 @@ IncrementVolume( IN int incr, IN IXML_Document *in,OUT IXML_Document **out, OUT 
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
+    in = in;
 }
 
-/******************************************************************************
- * TvDeviceIncrVolume
- *
- * Description: 
- *       Increase the volume. 
- *
- * Parameters:
- *   
- *
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *****************************************************************************/
-int
-TvDeviceIncreaseVolume( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceIncreaseVolume(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
     return IncrementVolume( 1, in, out, errorString );
 }
 
-/******************************************************************************
- * TvDeviceDecreaseVolume
- *
- * Description: 
- *       Decrease the volume.
- *
- * Parameters:
- *   
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDeviceDecreaseVolume( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceDecreaseVolume(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
     return IncrementVolume( -1, in, out, errorString );
 }
 
-/******************************************************************************
- * TvDeviceSetColor
- *
- * Description: 
- *       Change the color, update the TvDevice picture service
- *       state table, and notify all subscribed control points of the
- *       updated state.
- *
- * Parameters:
- *   
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDeviceSetColor( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceSetColor(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
     char *value = NULL;
     int color = 0;
@@ -1140,26 +858,23 @@ TvDeviceSetColor( IN IXML_Document *in, OUT IXML_Document **out, OUT char **erro
     }
 }
 
-/******************************************************************************
- * IncrementColor
- *
- * Description: 
- *       Increment the color.  Read the current color from the state
- *       table, add the increment, and then change the color.
- *
- * Parameters:
- *   incr -- The increment by which to change the color.
- *   
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *****************************************************************************/
-int
-IncrementColor( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+/*!
+ * \brief Increment the color. Read the current color from the state
+ * table, add the increment, and then change the color.
+ */
+static int IncrementColor(
+	/*! [in] The increment by which to change the volume. */
+	int incr,
+	/*! [in] Action request document. */
+	IXML_Document *in,
+	/*! [out] Action result document. */
+	IXML_Document **out,
+	/*! [out] Error string in case action was unsuccessful. */
+	const char **errorString)
 {
     int curcolor;
     int newcolor;
-    char *actionName;
+    const char *actionName;
     char value[TV_MAX_VAL_LEN];
 
     if( incr > 0 ) {
@@ -1201,61 +916,20 @@ IncrementColor( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT 
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
+    in = in;
 }
 
-/******************************************************************************
- * TvDeviceDecreaseColor
- *
- * Description: 
- *       Decrease the color.  
- *
- * Parameters:
- *   
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *****************************************************************************/
-int
-TvDeviceDecreaseColor( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceDecreaseColor(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
-    return IncrementColor( -1, in, out, errorString );
+    return IncrementColor(-1, in, out, errorString);
 }
 
-/******************************************************************************
- * TvDeviceIncreaseColor
- *
- * Description: 
- *       Increase the color.
- *
- * Parameters:
- *
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *****************************************************************************/
-int
-TvDeviceIncreaseColor( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceIncreaseColor(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
-    return IncrementColor( 1, in, out, errorString );
+    return IncrementColor(1, in, out, errorString);
 }
 
-/******************************************************************************
- * TvDeviceSetTint
- *
- * Description: 
- *       Change the tint, update the TvDevice picture service
- *       state table, and notify all subscribed control points of the
- *       updated state.
- *
- * Parameters:
- *
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *
- *****************************************************************************/
-int
-TvDeviceSetTint( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int TvDeviceSetTint(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
     char *value = NULL;
     int tint = -1;
@@ -1298,7 +972,6 @@ TvDeviceSetTint( IN IXML_Document *in, OUT IXML_Document **out, OUT char **error
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
-
 }
 
 /******************************************************************************
@@ -1315,12 +988,11 @@ TvDeviceSetTint( IN IXML_Document *in, OUT IXML_Document **out, OUT char **error
  *    IXML_Document **out - action result document
  *    char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
-int
-IncrementTint( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+int IncrementTint(IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT const char **errorString)
 {
     int curtint;
     int newtint;
-    char *actionName = NULL;
+    const char *actionName = NULL;
     char value[TV_MAX_VAL_LEN];
 
     if( incr > 0 ) {
@@ -1362,6 +1034,7 @@ IncrementTint( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT c
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
+    in = in;
 }
 
 /******************************************************************************
@@ -1378,7 +1051,7 @@ IncrementTint( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT c
  *
  *****************************************************************************/
 int
-TvDeviceIncreaseTint( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+TvDeviceIncreaseTint( IN IXML_Document *in, OUT IXML_Document **out, OUT const char **errorString)
 {
     return IncrementTint( 1, in, out, errorString );
 }
@@ -1397,7 +1070,7 @@ TvDeviceIncreaseTint( IN IXML_Document *in, OUT IXML_Document **out, OUT char **
  *
  *****************************************************************************/
 int
-TvDeviceDecreaseTint( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+TvDeviceDecreaseTint( IN IXML_Document *in, OUT IXML_Document **out, OUT const char **errorString)
 {
     return IncrementTint( -1, in, out, errorString );
 }
@@ -1418,7 +1091,7 @@ TvDeviceDecreaseTint( IN IXML_Document *in, OUT IXML_Document **out, OUT char **
  *
  ****************************************************************************/
 int
-TvDeviceSetContrast( IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+TvDeviceSetContrast( IN IXML_Document *in, OUT IXML_Document **out, OUT const char **errorString)
 {
     char *value = NULL;
     int contrast = -1;
@@ -1465,26 +1138,23 @@ TvDeviceSetContrast( IN IXML_Document *in, OUT IXML_Document **out, OUT char **e
 
 }
 
-/******************************************************************************
- * IncrementContrast
- *
- * Description: 
- *       Increment the contrast.  Read the current contrast from the state
- *       table, add the increment, and then change the contrast.
- *
- * Parameters:
- *   incr -- The increment by which to change the contrast.
- *   
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
- *****************************************************************************/
-static int
-IncrementContrast( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OUT char **errorString )
+/*!
+ * \brief Increment the contrast.  Read the current contrast from the state
+ * table, add the increment, and then change the contrast.
+ */
+static int IncrementContrast(
+	/*! [in] The increment by which to change the volume. */
+	int incr,
+	/*! [in] Action request document. */
+	IXML_Document *in,
+	/*! [out] Action result document. */
+	IXML_Document **out,
+	/*! [out] Error string in case action was unsuccessful. */
+	const char **errorString)
 {
     int curcontrast;
     int newcontrast;
-    char *actionName = NULL;
+    const char *actionName = NULL;
     char value[TV_MAX_VAL_LEN];
 
     if( incr > 0 ) {
@@ -1507,9 +1177,7 @@ IncrementContrast( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, O
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the channel goes here 
-     */
+    /* Vendor-specific code to set the channel goes here. */
 
     sprintf( value, "%d", newcontrast );
 
@@ -1528,22 +1196,23 @@ IncrementContrast( IN int incr, IN IXML_Document *in, OUT IXML_Document **out, O
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
+    in = in;
 }
 
 int TvDeviceIncreaseContrast(IXML_Document *in, IXML_Document **out,
-	char **errorString)
+	const char **errorString)
 {
     return IncrementContrast(1, in, out, errorString);
 }
 
 int TvDeviceDecreaseContrast(IXML_Document *in, IXML_Document **out,
-	char **errorString)
+	const char **errorString)
 {
     return IncrementContrast(-1, in, out, errorString);
 }
 
 int TvDeviceSetBrightness(IXML_Document *in, IXML_Document **out,
-	char **errorString)
+	const char **errorString)
 {
     char *value = NULL;
     int brightness = -1;
@@ -1565,9 +1234,7 @@ int TvDeviceSetBrightness(IXML_Document *in, IXML_Document **out,
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the volume goes here 
-     */
+    /* Vendor-specific code to set the volume goes here. */
 
     if( TvDeviceSetServiceTableVar( TV_SERVICE_PICTURE,
                                     TV_PICTURE_BRIGHTNESS, value ) ) {
@@ -1595,17 +1262,17 @@ int TvDeviceSetBrightness(IXML_Document *in, IXML_Document **out,
  */
 static int IncrementBrightness(
 	/*! [in] The increment by which to change the brightness. */
-	IN int incr,
+	int incr,
 	/*! [in] action request document. */
-	IN IXML_Document *in,
+	IXML_Document *in,
 	/*! [out] action result document. */
-	OUT IXML_Document **out,
+	IXML_Document **out,
 	/*! [out] errorString (in case action was unsuccessful). */
-	OUT char **errorString)
+	const char **errorString)
 {
     int curbrightness;
     int newbrightness;
-    char *actionName = NULL;
+    const char *actionName = NULL;
     char value[TV_MAX_VAL_LEN];
 
     if( incr > 0 ) {
@@ -1628,9 +1295,7 @@ static int IncrementBrightness(
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the channel goes here 
-     */
+    /* Vendor-specific code to set the channel goes here. */
 
     sprintf( value, "%d", newbrightness );
 
@@ -1649,14 +1314,15 @@ static int IncrementBrightness(
         ( *errorString ) = "Internal Error";
         return UPNP_E_INTERNAL_ERROR;
     }
+    in = in;
 }
 
-int TvDeviceIncreaseBrightness(IXML_Document *in, IXML_Document **out, char **errorString)
+int TvDeviceIncreaseBrightness(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
     return IncrementBrightness(1, in, out, errorString);
 }
 
-int TvDeviceDecreaseBrightness(IXML_Document *in, IXML_Document **out, char **errorString)
+int TvDeviceDecreaseBrightness(IXML_Document *in, IXML_Document **out, const char **errorString)
 {
     return IncrementBrightness(-1, in, out, errorString);
 }
@@ -1667,18 +1333,13 @@ int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Co
 	case UPNP_EVENT_SUBSCRIPTION_REQUEST:
 		TvDeviceHandleSubscriptionRequest((struct Upnp_Subscription_Request *)Event);
 		break;
-
 	case UPNP_CONTROL_GET_VAR_REQUEST:
 		TvDeviceHandleGetVarRequest((struct Upnp_State_Var_Request *)Event);
 		break;
-
 	case UPNP_CONTROL_ACTION_REQUEST:
 		TvDeviceHandleActionRequest((struct Upnp_Action_Request *)Event);
 		break;
-
-	/*
-	ignore these cases, since this is not a control point 
-	*/
+	/* ignore these cases, since this is not a control point */
 	case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
 	case UPNP_DISCOVERY_SEARCH_RESULT:
 	case UPNP_DISCOVERY_SEARCH_TIMEOUT:
@@ -1690,16 +1351,15 @@ int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Co
 	case UPNP_EVENT_SUBSCRIBE_COMPLETE:
 	case UPNP_EVENT_UNSUBSCRIBE_COMPLETE:
 		break;
-
 	default:
 		SampleUtil_Print("Error in TvDeviceCallbackEventHandler: unknown event type %d\n",
 			EventType);
 	}
-
 	/* Print a summary of the event received */
 	SampleUtil_PrintEvent(EventType, Event);
 
 	return 0;
+	Cookie = Cookie;
 }
 
 int TvDeviceStop(void)
@@ -1712,8 +1372,9 @@ int TvDeviceStop(void)
     return UPNP_E_SUCCESS;
 }
 
-int TvDeviceStart(char *ip_address, unsigned short port, char *desc_doc_name,
-	char *web_dir_path, print_string pfun)
+int TvDeviceStart(char *ip_address, unsigned short port,
+	const char *desc_doc_name, const char *web_dir_path,
+	print_string pfun)
 {
     int ret = UPNP_E_SUCCESS;
     char desc_doc_url[DESC_URL_SIZE];
@@ -1744,11 +1405,11 @@ int TvDeviceStart(char *ip_address, unsigned short port, char *desc_doc_name,
         ip_address ? ip_address : "{NULL}",
 	port);
 
-    if( desc_doc_name == NULL ) {
+    if (!desc_doc_name) {
         desc_doc_name = "tvcombodesc.xml";
     }
 
-    if( web_dir_path == NULL ) {
+    if (!web_dir_path) {
         web_dir_path = DEFAULT_WEB_DIR;
     }
 

@@ -46,18 +46,19 @@ ithread_mutex_t DeviceListMutex;
 
 UpnpClient_Handle ctrlpt_handle = -1;
 
-char TvDeviceType[] = "urn:schemas-upnp-org:device:tvdevice:1";
-char *TvServiceType[] = {
+const char TvDeviceType[] = "urn:schemas-upnp-org:device:tvdevice:1";
+const char *TvServiceType[] =
+{
     "urn:schemas-upnp-org:service:tvcontrol:1",
     "urn:schemas-upnp-org:service:tvpicture:1"
 };
-char *TvServiceName[] = { "Control", "Picture" };
+const char *TvServiceName[] = { "Control", "Picture" };
 
 /*!
    Global arrays for storing variable names and counts for 
    TvControl and TvPicture services 
  */
-char *TvVarName[TV_SERVICE_SERVCOUNT][TV_MAXVARS] = {
+const char *TvVarName[TV_SERVICE_SERVCOUNT][TV_MAXVARS] = {
     {"Power", "Channel", "Volume", ""},
     {"Color", "Tint", "Contrast", "Brightness"}
 };
