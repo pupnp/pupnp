@@ -113,7 +113,7 @@ static int SetServiceTable(
 	/*! [in,out] service containing table to be set. */
 	INOUT struct TvService *out)
 {
-    unsigned int i = 0;
+    int i = 0;
 
     strcpy( out->UDN, UDN );
     strcpy( out->ServiceId, serviceId );
@@ -357,7 +357,7 @@ int TvDeviceHandleSubscriptionRequest(struct Upnp_Subscription_Request *sr_event
 int TvDeviceHandleGetVarRequest(struct Upnp_State_Var_Request *cgv_event)
 {
 	unsigned int i = 0;
-	unsigned int j = 0;
+	int j = 0;
 	int getvar_succeeded = 0;
 
 	cgv_event->CurrentVal = NULL;
@@ -477,8 +477,7 @@ int TvDeviceHandleActionRequest(struct Upnp_Action_Request *ca_event)
 	return ca_event->ErrCode;
 }
 
-int TvDeviceSetServiceTableVar(unsigned int service, unsigned int variable,
-	char *value)
+int TvDeviceSetServiceTableVar(unsigned int service, int variable, char *value)
 {
     /*IXML_Document  *PropSet= NULL; */
 
@@ -718,9 +717,7 @@ int TvDeviceSetVolume(IXML_Document *in, IXML_Document **out, const char **error
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the volume goes here 
-     */
+    /* Vendor-specific code to set the volume goes here. */
 
     if( TvDeviceSetServiceTableVar( TV_SERVICE_CONTROL,
                                     TV_CONTROL_VOLUME, value ) ) {
@@ -781,9 +778,7 @@ static int IncrementVolume(
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the channel goes here 
-     */
+    /* Vendor-specific code to set the volume goes here. */
 
     sprintf( value, "%d", newvolume );
 
@@ -834,9 +829,7 @@ int TvDeviceSetColor(IXML_Document *in, IXML_Document **out, const char **errorS
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the volume goes here 
-     */
+    /* Vendor-specific code to set the volume goes here. */
 
     if( TvDeviceSetServiceTableVar( TV_SERVICE_PICTURE,
                                     TV_PICTURE_COLOR, value ) ) {
@@ -896,9 +889,7 @@ static int IncrementColor(
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the channel goes here 
-     */
+    /* Vendor-specific code to set the volume goes here. */
 
     sprintf( value, "%d", newcolor );
 
@@ -950,9 +941,7 @@ int TvDeviceSetTint(IXML_Document *in, IXML_Document **out, const char **errorSt
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the volume goes here 
-     */
+    /* Vendor-specific code to set the volume goes here. */
 
     if( TvDeviceSetServiceTableVar( TV_SERVICE_PICTURE,
                                     TV_PICTURE_TINT, value ) ) {
@@ -1014,9 +1003,7 @@ int IncrementTint(IN int incr, IN IXML_Document *in, OUT IXML_Document **out, OU
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the channel goes here 
-     */
+    /* Vendor-specific code to set the volume goes here. */
 
     sprintf( value, "%d", newtint );
 
@@ -1113,9 +1100,7 @@ TvDeviceSetContrast( IN IXML_Document *in, OUT IXML_Document **out, OUT const ch
         return UPNP_E_INVALID_PARAM;
     }
 
-    /*
-       Vendor-specific code to set the volume goes here 
-     */
+    /* Vendor-specific code to set the volume goes here. */
 
     if( TvDeviceSetServiceTableVar( TV_SERVICE_PICTURE,
                                     TV_PICTURE_CONTRAST, value ) ) {

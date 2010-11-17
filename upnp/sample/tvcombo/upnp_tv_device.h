@@ -169,7 +169,7 @@ struct TvService {
 	/*! . */
 	upnp_action actions[TV_MAXACTIONS];
 	/*! . */
-	unsigned int  VariableCount;
+	int VariableCount;
 };
 
 /*! Array of service structures */
@@ -271,7 +271,7 @@ int TvDeviceSetServiceTableVar(
 	/*! [in] The variable number (TV_CONTROL_POWER, TV_CONTROL_CHANNEL,
 	 * TV_CONTROL_VOLUME, TV_PICTURE_COLOR, TV_PICTURE_TINT,
 	 * TV_PICTURE_CONTRAST, or TV_PICTURE_BRIGHTNESS). */
-	unsigned int variable,
+	int variable,
 	/*! [in] The string representation of the new value. */
 	char *value);
 

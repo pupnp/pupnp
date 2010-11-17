@@ -147,7 +147,14 @@ int SampleUtil_FindAndParseService (
  */
 typedef void (*print_string)(
 	/*! [in] Format. */
-	const char *string);
+	const char *string,
+	/*! [in] Arguments. */
+	...)
+#if (__GNUC__ >= 3)
+	/* This enables printf like format checking by the compiler */
+	__attribute__((format (__printf__, 1, 2)))
+#endif
+;
 
 /*! global print function used by sample util */
 extern print_string gPrintFun;

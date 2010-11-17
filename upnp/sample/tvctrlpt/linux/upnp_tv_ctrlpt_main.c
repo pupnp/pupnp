@@ -29,413 +29,363 @@
  *
  ******************************************************************************/
 
-
 #include "sample_util.h"
 #include "upnp_tv_ctrlpt.h"
 
-
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
-/*
-   Tags for valid commands issued at the command prompt 
- */
+/*! Tags for valid commands issued at the command prompt. */
 enum cmdloop_tvcmds {
-    PRTHELP = 0, PRTFULLHELP, POWON, POWOFF,
-    SETCHAN, SETVOL, SETCOL, SETTINT, SETCONT, SETBRT,
-    CTRLACTION, PICTACTION, CTRLGETVAR, PICTGETVAR,
-    PRTDEV, LSTDEV, REFRESH, EXITCMD
+	PRTHELP = 0, PRTFULLHELP, POWON, POWOFF,
+	SETCHAN, SETVOL, SETCOL, SETTINT, SETCONT, SETBRT,
+	CTRLACTION, PICTACTION, CTRLGETVAR, PICTGETVAR,
+	PRTDEV, LSTDEV, REFRESH, EXITCMD
 };
 
-/*
-   Data structure for parsing commands from the command line 
- */
+/*! Data structure for parsing commands from the command line. */
 struct cmdloop_commands {
-    char *str;                  /* the string  */
-    int cmdnum;                 /* the command */
-    int numargs;                /* the number of arguments */
-    char *args;                 /* the args */
+	/* the string  */
+	const char *str;
+	/* the command */
+	int cmdnum;
+	/* the number of arguments */
+	int numargs;
+	/* the args */
+	const char *args;
 } cmdloop_commands;
 
-/*
-   Mappings between command text names, command tag,
-   and required command arguments for command line
-   commands 
- */
+/*! Mappings between command text names, command tag,
+ * and required command arguments for command line
+ * commands */
 static struct cmdloop_commands cmdloop_cmdlist[] = {
-    {"Help", PRTHELP, 1, ""},
-    {"HelpFull", PRTFULLHELP, 1, ""},
-    {"ListDev", LSTDEV, 1, ""},
-    {"Refresh", REFRESH, 1, ""},
-    {"PrintDev", PRTDEV, 2, "<devnum>"},
-    {"PowerOn", POWON, 2, "<devnum>"},
-    {"PowerOff", POWOFF, 2, "<devnum>"},
-    {"SetChannel", SETCHAN, 3, "<devnum> <channel (int)>"},
-    {"SetVolume", SETVOL, 3, "<devnum> <volume (int)>"},
-    {"SetColor", SETCOL, 3, "<devnum> <color (int)>"},
-    {"SetTint", SETTINT, 3, "<devnum> <tint (int)>"},
-    {"SetContrast", SETCONT, 3, "<devnum> <contrast (int)>"},
-    {"SetBrightness", SETBRT, 3, "<devnum> <brightness (int)>"},
-    {"CtrlAction", CTRLACTION, 2, "<devnum> <action (string)>"},
-    {"PictAction", PICTACTION, 2, "<devnum> <action (string)>"},
-    {"CtrlGetVar", CTRLGETVAR, 2, "<devnum> <varname (string)>"},
-    {"PictGetVar", PICTGETVAR, 2, "<devnum> <varname (string)>"},
-    {"Exit", EXITCMD, 1, ""}
+	{"Help", PRTHELP, 1, ""},
+	{"HelpFull", PRTFULLHELP, 1, ""},
+	{"ListDev", LSTDEV, 1, ""},
+	{"Refresh", REFRESH, 1, ""},
+	{"PrintDev", PRTDEV, 2, "<devnum>"},
+	{"PowerOn", POWON, 2, "<devnum>"},
+	{"PowerOff", POWOFF, 2, "<devnum>"},
+	{"SetChannel", SETCHAN, 3, "<devnum> <channel (int)>"},
+	{"SetVolume", SETVOL, 3, "<devnum> <volume (int)>"},
+	{"SetColor", SETCOL, 3, "<devnum> <color (int)>"},
+	{"SetTint", SETTINT, 3, "<devnum> <tint (int)>"},
+	{"SetContrast", SETCONT, 3, "<devnum> <contrast (int)>"},
+	{"SetBrightness", SETBRT, 3, "<devnum> <brightness (int)>"},
+	{"CtrlAction", CTRLACTION, 2, "<devnum> <action (string)>"},
+	{"PictAction", PICTACTION, 2, "<devnum> <action (string)>"},
+	{"CtrlGetVar", CTRLGETVAR, 2, "<devnum> <varname (string)>"},
+	{"PictGetVar", PICTGETVAR, 2, "<devnum> <varname (string)>"},
+	{"Exit", EXITCMD, 1, ""}
 };
 
-void
-linux_print( const char *string )
+/*!
+ * \brief Prints a string to standard out.
+ */
+void linux_print(const char *format, ...)
 {
-    puts( string );
+	va_list argList;
+	va_start(argList, format);
+	vfprintf(stdout, format, argList);
+	fflush(stdout);
+	va_end(argList);
 }
 
-/********************************************************************************
- * TvCtrlPointPrintHelp
- *
- * Description: 
- *       Print help info for this application.
- ********************************************************************************/
-void
-TvCtrlPointPrintShortHelp( void )
+/*!
+ * \brief Print help info for this application.
+ */
+void TvCtrlPointPrintShortHelp(void)
 {
-    SampleUtil_Print( "Commands:" );
-    SampleUtil_Print( "  Help" );
-    SampleUtil_Print( "  HelpFull" );
-    SampleUtil_Print( "  ListDev" );
-    SampleUtil_Print( "  Refresh" );
-    SampleUtil_Print( "  PrintDev      <devnum>" );
-    SampleUtil_Print( "  PowerOn       <devnum>" );
-    SampleUtil_Print( "  PowerOff      <devnum>" );
-    SampleUtil_Print( "  SetChannel    <devnum> <channel>" );
-    SampleUtil_Print( "  SetVolume     <devnum> <volume>" );
-    SampleUtil_Print( "  SetColor      <devnum> <color>" );
-    SampleUtil_Print( "  SetTint       <devnum> <tint>" );
-    SampleUtil_Print( "  SetContrast   <devnum> <contrast>" );
-    SampleUtil_Print( "  SetBrightness <devnum> <brightness>" );
-    SampleUtil_Print( "  CtrlAction    <devnum> <action>" );
-    SampleUtil_Print( "  PictAction    <devnum> <action>" );
-    SampleUtil_Print( "  CtrlGetVar    <devnum> <varname>" );
-    SampleUtil_Print( "  PictGetVar    <devnum> <action>" );
-    SampleUtil_Print( "  Exit" );
+	SampleUtil_Print(
+		"Commands:\n"
+    		"  Help\n"
+    		"  HelpFull\n"
+    		"  ListDev\n"
+    		"  Refresh\n"
+    		"  PrintDev      <devnum>\n"
+    		"  PowerOn       <devnum>\n"
+    		"  PowerOff      <devnum>\n"
+    		"  SetChannel    <devnum> <channel>\n"
+    		"  SetVolume     <devnum> <volume>\n"
+    		"  SetColor      <devnum> <color>\n"
+    		"  SetTint       <devnum> <tint>\n"
+    		"  SetContrast   <devnum> <contrast>\n"
+    		"  SetBrightness <devnum> <brightness>\n"
+    		"  CtrlAction    <devnum> <action>\n"
+    		"  PictAction    <devnum> <action>\n"
+    		"  CtrlGetVar    <devnum> <varname>\n"
+    		"  PictGetVar    <devnum> <action>\n"
+    		"  Exit\n");
 }
 
-void
-TvCtrlPointPrintLongHelp( void )
+void TvCtrlPointPrintLongHelp(void)
 {
-    SampleUtil_Print( "" );
-    SampleUtil_Print( "******************************" );
-    SampleUtil_Print( "* TV Control Point Help Info *" );
-    SampleUtil_Print( "******************************" );
-    SampleUtil_Print( "" );
-    SampleUtil_Print( "This sample control point application automatically searches" );
-    SampleUtil_Print( "for and subscribes to the services of television device emulator" );
-    SampleUtil_Print( "devices, described in the tvdevicedesc.xml description document." );
-    SampleUtil_Print( "" );
-    SampleUtil_Print( "Commands:" );
-    SampleUtil_Print( "  Help" );
-    SampleUtil_Print( "       Print this help info." );
-    SampleUtil_Print( "  ListDev" );
-    SampleUtil_Print( "       Print the current list of TV Device Emulators that this" );
-    SampleUtil_Print( "         control point is aware of.  Each device is preceded by a" );
-    SampleUtil_Print( "         device number which corresponds to the devnum argument of" );
-    SampleUtil_Print( "         commands listed below." );
-    SampleUtil_Print( "  Refresh" );
-    SampleUtil_Print( "       Delete all of the devices from the device list and issue new" );
-    SampleUtil_Print( "         search request to rebuild the list from scratch." );
-    SampleUtil_Print( "  PrintDev       <devnum>" );
-    SampleUtil_Print( "       Print the state table for the device <devnum>." );
-    SampleUtil_Print( "         e.g., 'PrintDev 1' prints the state table for the first" );
-    SampleUtil_Print( "         device in the device list." );
-    SampleUtil_Print( "  PowerOn        <devnum>" );
-    SampleUtil_Print( "       Sends the PowerOn action to the Control Service of" );
-    SampleUtil_Print( "         device <devnum>." );
-    SampleUtil_Print( "  PowerOff       <devnum>" );
-    SampleUtil_Print( "       Sends the PowerOff action to the Control Service of" );
-    SampleUtil_Print( "         device <devnum>." );
-    SampleUtil_Print( "  SetChannel     <devnum> <channel>" );
-    SampleUtil_Print( "       Sends the SetChannel action to the Control Service of" );
-    SampleUtil_Print( "         device <devnum>, requesting the channel to be changed" );
-    SampleUtil_Print( "         to <channel>." );
-    SampleUtil_Print( "  SetVolume      <devnum> <volume>" );
-    SampleUtil_Print( "       Sends the SetVolume action to the Control Service of" );
-    SampleUtil_Print( "         device <devnum>, requesting the volume to be changed" );
-    SampleUtil_Print( "         to <volume>." );
-    SampleUtil_Print( "  SetColor       <devnum> <color>" );
-    SampleUtil_Print( "       Sends the SetColor action to the Control Service of" );
-    SampleUtil_Print( "         device <devnum>, requesting the color to be changed" );
-    SampleUtil_Print( "         to <color>." );
-    SampleUtil_Print( "  SetTint        <devnum> <tint>" );
-    SampleUtil_Print( "       Sends the SetTint action to the Control Service of" );
-    SampleUtil_Print( "         device <devnum>, requesting the tint to be changed" );
-    SampleUtil_Print( "         to <tint>." );
-    SampleUtil_Print( "  SetContrast    <devnum> <contrast>" );
-    SampleUtil_Print( "       Sends the SetContrast action to the Control Service of" );
-    SampleUtil_Print( "         device <devnum>, requesting the contrast to be changed" );
-    SampleUtil_Print( "         to <contrast>." );
-    SampleUtil_Print( "  SetBrightness  <devnum> <brightness>" );
-    SampleUtil_Print( "       Sends the SetBrightness action to the Control Service of" );
-    SampleUtil_Print( "         device <devnum>, requesting the brightness to be changed" );
-    SampleUtil_Print( "         to <brightness>." );
-    SampleUtil_Print( "  CtrlAction     <devnum> <action>" );
-    SampleUtil_Print( "       Sends an action request specified by the string <action>" );
-    SampleUtil_Print( "         to the Control Service of device <devnum>.  This command" );
-    SampleUtil_Print( "         only works for actions that have no arguments." );
-    SampleUtil_Print( "         (e.g., \"CtrlAction 1 IncreaseChannel\")" );
-    SampleUtil_Print( "  PictAction     <devnum> <action>" );
-    SampleUtil_Print( "       Sends an action request specified by the string <action>" );
-    SampleUtil_Print( "         to the Picture Service of device <devnum>.  This command" );
-    SampleUtil_Print( "         only works for actions that have no arguments." );
-    SampleUtil_Print( "         (e.g., \"PictAction 1 DecreaseContrast\")" );
-    SampleUtil_Print( "  CtrlGetVar     <devnum> <varname>" );
-    SampleUtil_Print( "       Requests the value of a variable specified by the string <varname>" );
-    SampleUtil_Print( "         from the Control Service of device <devnum>." );
-    SampleUtil_Print( "         (e.g., \"CtrlGetVar 1 Volume\")" );
-    SampleUtil_Print( "  PictGetVar     <devnum> <action>" );
-    SampleUtil_Print( "       Requests the value of a variable specified by the string <varname>" );
-    SampleUtil_Print( "         from the Picture Service of device <devnum>." );
-    SampleUtil_Print( "         (e.g., \"PictGetVar 1 Tint\")" );
-    SampleUtil_Print( "  Exit" );
-    SampleUtil_Print( "       Exits the control point application." );
+	SampleUtil_Print(
+		"\n"
+		"******************************\n"
+		"* TV Control Point Help Info *\n"
+		"******************************\n"
+		"\n"
+		"This sample control point application automatically searches\n"
+		"for and subscribes to the services of television device emulator\n"
+		"devices, described in the tvdevicedesc.xml description document.\n"
+		"It also registers itself as a tv device.\n"
+		"\n"
+		"Commands:\n"
+		"  Help\n"
+		"       Print this help info.\n"
+		"  ListDev\n"
+		"       Print the current list of TV Device Emulators that this\n"
+		"         control point is aware of.  Each device is preceded by a\n"
+		"         device number which corresponds to the devnum argument of\n"
+		"         commands listed below.\n"
+		"  Refresh\n"
+		"       Delete all of the devices from the device list and issue new\n"
+		"         search request to rebuild the list from scratch.\n"
+		"  PrintDev       <devnum>\n"
+		"       Print the state table for the device <devnum>.\n"
+		"         e.g., 'PrintDev 1' prints the state table for the first\n"
+		"         device in the device list.\n"
+		"  PowerOn        <devnum>\n"
+		"       Sends the PowerOn action to the Control Service of\n"
+		"         device <devnum>.\n"
+		"  PowerOff       <devnum>\n"
+		"       Sends the PowerOff action to the Control Service of\n"
+		"         device <devnum>.\n"
+		"  SetChannel     <devnum> <channel>\n"
+		"       Sends the SetChannel action to the Control Service of\n"
+		"         device <devnum>, requesting the channel to be changed\n"
+		"         to <channel>.\n"
+		"  SetVolume      <devnum> <volume>\n"
+		"       Sends the SetVolume action to the Control Service of\n"
+		"         device <devnum>, requesting the volume to be changed\n"
+		"         to <volume>.\n"
+		"  SetColor       <devnum> <color>\n"
+		"       Sends the SetColor action to the Control Service of\n"
+		"         device <devnum>, requesting the color to be changed\n"
+		"         to <color>.\n"
+		"  SetTint        <devnum> <tint>\n"
+		"       Sends the SetTint action to the Control Service of\n"
+		"         device <devnum>, requesting the tint to be changed\n"
+		"         to <tint>.\n"
+		"  SetContrast    <devnum> <contrast>\n"
+		"       Sends the SetContrast action to the Control Service of\n"
+		"         device <devnum>, requesting the contrast to be changed\n"
+		"         to <contrast>.\n"
+		"  SetBrightness  <devnum> <brightness>\n"
+		"       Sends the SetBrightness action to the Control Service of\n"
+		"         device <devnum>, requesting the brightness to be changed\n"
+		"         to <brightness>.\n"
+		"  CtrlAction     <devnum> <action>\n"
+		"       Sends an action request specified by the string <action>\n"
+		"         to the Control Service of device <devnum>.  This command\n"
+		"         only works for actions that have no arguments.\n"
+		"         (e.g., \"CtrlAction 1 IncreaseChannel\")\n"
+		"  PictAction     <devnum> <action>\n"
+		"       Sends an action request specified by the string <action>\n"
+		"         to the Picture Service of device <devnum>.  This command\n"
+		"         only works for actions that have no arguments.\n"
+		"         (e.g., \"PictAction 1 DecreaseContrast\")\n"
+		"  CtrlGetVar     <devnum> <varname>\n"
+		"       Requests the value of a variable specified by the string <varname>\n"
+		"         from the Control Service of device <devnum>.\n"
+		"         (e.g., \"CtrlGetVar 1 Volume\")\n"
+		"  PictGetVar     <devnum> <action>\n"
+		"       Requests the value of a variable specified by the string <varname>\n"
+		"         from the Picture Service of device <devnum>.\n"
+		"         (e.g., \"PictGetVar 1 Tint\")\n"
+		"  Exit\n"
+		"       Exits the control point application.\n");
 }
 
-/********************************************************************************
- * TvCtrlPointPrintCommands
- *
- * Description: 
- *       Print the list of valid command line commands to the user
- *
- * Parameters:
- *   None
- *
- ********************************************************************************/
-void
-TvCtrlPointPrintCommands()
+/*!
+ * \briefPrint the list of valid command line commands to the user
+ */
+void TvCtrlPointPrintCommands()
 {
-    int i;
-    int numofcmds = sizeof( cmdloop_cmdlist ) / sizeof( cmdloop_commands );
+	int i;
+	int numofcmds = (sizeof cmdloop_cmdlist) / sizeof (cmdloop_commands);
 
-    SampleUtil_Print( "Valid Commands:" );
-    for( i = 0; i < numofcmds; i++ ) {
-        SampleUtil_Print( "  %-14s %s", cmdloop_cmdlist[i].str,
-                          cmdloop_cmdlist[i].args );
-    }
-    SampleUtil_Print( "" );
+	SampleUtil_Print("Valid Commands:\n");
+	for (i = 0; i < numofcmds; ++i) {
+		SampleUtil_Print("  %-14s %s\n",
+			cmdloop_cmdlist[i].str, cmdloop_cmdlist[i].args);
+	}
+	SampleUtil_Print("\n");
 }
 
-/********************************************************************************
- * TvCtrlPointCommandLoop
- *
- * Description: 
- *       Function that receives commands from the user at the command prompt
- *       during the lifetime of the control point, and calls the appropriate
- *       functions for those commands.
- *
- * Parameters:
- *    None
- *
- ********************************************************************************/
-void *
-TvCtrlPointCommandLoop( void *args )
+/*!
+ * \brief Function that receives commands from the user at the command prompt
+ * during the lifetime of the device, and calls the appropriate
+ * functions for those commands. 
+ */
+void *TvCtrlPointCommandLoop(void *args)
 {
-    char cmdline[100];
+	char cmdline[100];
 
-    while( 1 ) {
-        SampleUtil_Print( "\n>> " );
-        fgets( cmdline, 100, stdin );
-        TvCtrlPointProcessCommand( cmdline );
-    }
+	while (1) {
+		SampleUtil_Print("\n>> ");
+		fgets(cmdline, 100, stdin);
+		TvCtrlPointProcessCommand(cmdline);
+	}
 
-    return NULL;
+	return NULL;
+	args = args;
 }
 
-int
-TvCtrlPointProcessCommand( char *cmdline )
+int TvCtrlPointProcessCommand(char *cmdline)
 {
-    char cmd[100];
-    char strarg[100];
-    int arg_val_err = -99999;
-    int arg1 = arg_val_err;
-    int arg2 = arg_val_err;
-    int cmdnum = -1;
-    int numofcmds = sizeof( cmdloop_cmdlist ) / sizeof( cmdloop_commands );
-    int cmdfound = 0;
-    int i,
-      rc;
-    int invalidargs = 0;
-    int validargs;
+	char cmd[100];
+	char strarg[100];
+	int arg_val_err = -99999;
+	int arg1 = arg_val_err;
+	int arg2 = arg_val_err;
+	int cmdnum = -1;
+	int numofcmds = (sizeof cmdloop_cmdlist) / sizeof (cmdloop_commands);
+	int cmdfound = 0;
+	int i;
+	int rc;
+	int invalidargs = 0;
+	int validargs;
 
-    validargs = sscanf( cmdline, "%s %d %d", cmd, &arg1, &arg2 );
+	validargs = sscanf(cmdline, "%s %d %d", cmd, &arg1, &arg2);
+	for (i = 0; i < numofcmds; ++i) {
+		if (strcasecmp(cmd, cmdloop_cmdlist[i].str ) == 0) {
+			cmdnum = cmdloop_cmdlist[i].cmdnum;
+			cmdfound++;
+			if (validargs != cmdloop_cmdlist[i].numargs)
+				invalidargs++;
+			break;
+		}
+	}
+	if (!cmdfound) {
+		SampleUtil_Print("Command not found; try 'Help'\n");
+		return TV_SUCCESS;
+	}
+	if (invalidargs) {
+		SampleUtil_Print("Invalid arguments; try 'Help'\n");
+		return TV_SUCCESS;
+	}
+	switch (cmdnum) {
+	case PRTHELP:
+		TvCtrlPointPrintShortHelp();
+		break;
+	case PRTFULLHELP:
+		TvCtrlPointPrintLongHelp();
+		break;
+	case POWON:
+		TvCtrlPointSendPowerOn(arg1);
+		break;
+	case POWOFF:
+		TvCtrlPointSendPowerOff(arg1);
+		break;
+	case SETCHAN:
+		TvCtrlPointSendSetChannel(arg1, arg2);
+		break;
+	case SETVOL:
+		TvCtrlPointSendSetVolume(arg1, arg2);
+		break;
+	case SETCOL:
+		TvCtrlPointSendSetColor(arg1, arg2);
+		break;
+	case SETTINT:
+		TvCtrlPointSendSetTint(arg1, arg2);
+		break;
+	case SETCONT:
+		TvCtrlPointSendSetContrast(arg1, arg2);
+		break;
+	case SETBRT:
+		TvCtrlPointSendSetBrightness(arg1, arg2);
+		break;
+	case CTRLACTION:
+		/* re-parse commandline since second arg is string. */
+		validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
+		if (validargs == 3)
+			TvCtrlPointSendAction(TV_SERVICE_CONTROL, arg1, strarg,
+				NULL, NULL, 0);
+		else
+			invalidargs++;
+		break;
+	case PICTACTION:
+		/* re-parse commandline since second arg is string. */
+		validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
+		if (validargs == 3)
+			TvCtrlPointSendAction(TV_SERVICE_PICTURE, arg1, strarg,
+				NULL, NULL, 0);
+		else
+			invalidargs++;
+		break;
+	case CTRLGETVAR:
+		/* re-parse commandline since second arg is string. */
+		validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
+		if (validargs == 3)
+			TvCtrlPointGetVar(TV_SERVICE_CONTROL, arg1, strarg);
+		else
+			invalidargs++;
+		break;
+	case PICTGETVAR:
+		/* re-parse commandline since second arg is string. */
+		validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
+		if (validargs == 3)
+			TvCtrlPointGetVar(TV_SERVICE_PICTURE, arg1, strarg);
+		else
+			invalidargs++;
+		break;
+	case PRTDEV:
+		TvCtrlPointPrintDevice(arg1);
+		break;
+	case LSTDEV:
+		TvCtrlPointPrintList();
+		break;
+	case REFRESH:
+		TvCtrlPointRefresh();
+		break;
+	case EXITCMD:
+		rc = TvCtrlPointStop();
+		exit(rc);
+		break;
+	default:
+		SampleUtil_Print("Command not implemented; see 'Help'\n");
+		break;
+	}
+	if(invalidargs)
+		SampleUtil_Print("Invalid args in command; see 'Help'\n");
 
-    for( i = 0; i < numofcmds; i++ ) {
-        if( strcasecmp( cmd, cmdloop_cmdlist[i].str ) == 0 ) {
-            cmdnum = cmdloop_cmdlist[i].cmdnum;
-            cmdfound++;
-            if( validargs != cmdloop_cmdlist[i].numargs )
-                invalidargs++;
-            break;
-        }
-    }
-
-    if( !cmdfound ) {
-        SampleUtil_Print( "Command not found; try 'Help'" );
-        return TV_SUCCESS;
-    }
-
-    if( invalidargs ) {
-        SampleUtil_Print( "Invalid arguments; try 'Help'" );
-        return TV_SUCCESS;
-    }
-
-    switch ( cmdnum ) {
-        case PRTHELP:
-            TvCtrlPointPrintShortHelp();
-            break;
-
-        case PRTFULLHELP:
-            TvCtrlPointPrintLongHelp();
-            break;
-
-        case POWON:
-            TvCtrlPointSendPowerOn( arg1 );
-            break;
-
-        case POWOFF:
-            TvCtrlPointSendPowerOff( arg1 );
-            break;
-
-        case SETCHAN:
-            TvCtrlPointSendSetChannel( arg1, arg2 );
-            break;
-
-        case SETVOL:
-            TvCtrlPointSendSetVolume( arg1, arg2 );
-            break;
-
-        case SETCOL:
-            TvCtrlPointSendSetColor( arg1, arg2 );
-            break;
-
-        case SETTINT:
-            TvCtrlPointSendSetTint( arg1, arg2 );
-            break;
-
-        case SETCONT:
-            TvCtrlPointSendSetContrast( arg1, arg2 );
-            break;
-
-        case SETBRT:
-            TvCtrlPointSendSetBrightness( arg1, arg2 );
-            break;
-
-        case CTRLACTION:
-            /*
-               re-parse commandline since second arg is string 
-             */
-            validargs = sscanf( cmdline, "%s %d %s", cmd, &arg1, strarg );
-            if( 3 == validargs )
-                TvCtrlPointSendAction( TV_SERVICE_CONTROL, arg1, strarg,
-                                       NULL, NULL, 0 );
-            else
-                invalidargs++;
-            break;
-
-        case PICTACTION:
-            /*
-               re-parse commandline since second arg is string 
-             */
-            validargs = sscanf( cmdline, "%s %d %s", cmd, &arg1, strarg );
-            if( 3 == validargs )
-                TvCtrlPointSendAction( TV_SERVICE_PICTURE, arg1, strarg,
-                                       NULL, NULL, 0 );
-            else
-                invalidargs++;
-            break;
-
-        case CTRLGETVAR:
-            /*
-               re-parse commandline since second arg is string 
-             */
-            validargs = sscanf( cmdline, "%s %d %s", cmd, &arg1, strarg );
-            if( 3 == validargs )
-                TvCtrlPointGetVar( TV_SERVICE_CONTROL, arg1, strarg );
-            else
-                invalidargs++;
-            break;
-
-        case PICTGETVAR:
-            /*
-               re-parse commandline since second arg is string 
-             */
-            validargs = sscanf( cmdline, "%s %d %s", cmd, &arg1, strarg );
-            if( 3 == validargs )
-                TvCtrlPointGetVar( TV_SERVICE_PICTURE, arg1, strarg );
-            else
-                invalidargs++;
-            break;
-
-        case PRTDEV:
-            TvCtrlPointPrintDevice( arg1 );
-            break;
-
-        case LSTDEV:
-            TvCtrlPointPrintList();
-            break;
-
-        case REFRESH:
-            TvCtrlPointRefresh();
-            break;
-
-        case EXITCMD:
-            rc = TvCtrlPointStop();
-            exit( rc );
-            break;
-
-        default:
-            SampleUtil_Print( "Command not implemented; see 'Help'" );
-            break;
-    }
-
-    if( invalidargs )
-        SampleUtil_Print( "Invalid args in command; see 'Help'" );
-
-    return TV_SUCCESS;
+	return TV_SUCCESS;
 }
 
-int main( int argc, char **argv )
+int main(int argc, char **argv)
 {
-    int rc;
-    ithread_t cmdloop_thread;
+	int rc;
+	ithread_t cmdloop_thread;
 #ifdef WIN32
 #else
-    int sig;
-    sigset_t sigs_to_catch;
+	int sig;
+	sigset_t sigs_to_catch;
 #endif
-    int code;
+	int code;
 
-
-    rc = TvCtrlPointStart( linux_print, NULL );
-    if( rc != TV_SUCCESS ) {
-        SampleUtil_Print( "Error starting UPnP TV Control Point" );
-        return rc;
-    }
-    /* start a command loop thread */
-    code = ithread_create( &cmdloop_thread, NULL, TvCtrlPointCommandLoop, NULL );
-
+	rc = TvCtrlPointStart(linux_print, NULL);
+	if (rc != TV_SUCCESS) {
+		SampleUtil_Print("Error starting UPnP TV Control Point\n");
+		return rc;
+	}
+	/* start a command loop thread */
+	code = ithread_create(&cmdloop_thread, NULL, TvCtrlPointCommandLoop, NULL);
 #ifdef WIN32
-    ithread_join(cmdloop_thread, NULL);
+	ithread_join(cmdloop_thread, NULL);
 #else
-    /*
-       Catch Ctrl-C and properly shutdown 
-     */
-    sigemptyset( &sigs_to_catch );
-    sigaddset( &sigs_to_catch, SIGINT );
-    sigwait( &sigs_to_catch, &sig );
-
-    SampleUtil_Print( "Shutting down on signal %d...\n", sig );
+	/* Catch Ctrl-C and properly shutdown */
+	sigemptyset(&sigs_to_catch);
+	sigaddset(&sigs_to_catch, SIGINT);
+	sigwait(&sigs_to_catch, &sig);
+	SampleUtil_Print("Shutting down on signal %d...\n", sig);
 #endif
+	rc = TvCtrlPointStop();
 
-    rc = TvCtrlPointStop();
-
-    return rc;
+	return rc;
+	argc = argc;
+	argv = argv;
 }
 

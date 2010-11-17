@@ -41,7 +41,7 @@ void IxmlPrintf(
 
 void printNodes(IXML_Node *tmpRoot, int depth)
 {
-    int i;
+    unsigned long i;
     IXML_NodeList *NodeList1;
     IXML_Node *ChildNode1;
     unsigned short NodeType;
