@@ -140,7 +140,7 @@ static IXML_NodeList *SampleUtil_GetNthServiceList(
 	/*! [in] . */
 	IXML_Document *doc,
 	/*! [in] . */
-	int n)
+	unsigned int n)
 {
 	IXML_NodeList *ServiceList = NULL;
 	IXML_NodeList *servlistnodelist = NULL;
@@ -553,11 +553,11 @@ int SampleUtil_PrintEvent(Upnp_EventType EventType, void *Event)
 int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 	const char *serviceType, char **serviceId, char **eventURL, char **controlURL)
 {
-	int i;
-	int length;
+	unsigned int i;
+	unsigned long length;
 	int found = 0;
 	int ret;
-	int sindex = 0;
+	unsigned int sindex = 0;
 	char *tempServiceType = NULL;
 	char *baseURL = NULL;
 	const char *base = NULL;
@@ -576,7 +576,7 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 	/* Top level */
 	for (sindex = 0;
 	     (serviceList = SampleUtil_GetNthServiceList(DescDoc , sindex)) != NULL;
-	     sindex ++) {
+	     sindex++) {
 		tempServiceType = NULL;
 		relcontrolURL = NULL;
 		releventURL = NULL;
@@ -650,9 +650,8 @@ int SampleUtil_Print(const char *fmt, ...)
 	va_start(ap, fmt);
 	rc = vsnprintf(buf, MAX_BUF, fmt, ap);
 	va_end(ap);
-
 	if (gPrintFun) {
-		gPrintFun(buf);
+		gPrintFun("%s", buf);
 	}
 
 	ithread_mutex_unlock(&display_mutex);

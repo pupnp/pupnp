@@ -34,69 +34,56 @@
 #include "upnp_tv_device.h"
 
 
+#include <stdarg.h>
 #include <stdio.h>
 
 
-/******************************************************************************
- * linux_print
- *
- * Description: 
- *       Prints a string to standard out.
- *
- * Parameters:
- *    None
- *
- *****************************************************************************/
-void
-linux_print( const char *string )
+/*!
+ * \brief Prints a string to standard out.
+ */
+void linux_print(const char *format, ...)
 {
-    printf( "%s", string );
+	va_list argList;
+	va_start(argList, format);
+	vfprintf(stdout, format, argList);
+	fflush(stdout);
+	va_end(argList);
 }
 
-/******************************************************************************
- * TvDeviceCommandLoop
- *
- * Description: 
- *       Function that receives commands from the user at the command prompt
- *       during the lifetime of the device, and calls the appropriate
- *       functions for those commands. Only one command, exit, is currently
- *       defined.
- *
- * Parameters:
- *    None
- *
- *****************************************************************************/
-void *
-TvDeviceCommandLoop( void *args )
+/*!
+ * \brief Function that receives commands from the user at the command prompt
+ * during the lifetime of the device, and calls the appropriate
+ * functions for those commands. Only one command, exit, is currently
+ * defined.
+ */
+void *TvDeviceCommandLoop(void *args)
 {
     int stoploop = 0;
     char cmdline[100];
     char cmd[100];
 
-    while( !stoploop ) {
+    while (!stoploop) {
         sprintf( cmdline, " " );
         sprintf( cmd, " " );
 
-        SampleUtil_Print( "\n>> " );
-
+        SampleUtil_Print("\n>> ");
         /* Get a command line */
-        fgets( cmdline, 100, stdin );
-
-        sscanf( cmdline, "%s", cmd );
-
-        if( strcasecmp( cmd, "exit" ) == 0 ) {
-            SampleUtil_Print( "Shutting down...\n" );
+        fgets(cmdline, 100, stdin);
+        sscanf(cmdline, "%s", cmd);
+        if( strcasecmp(cmd, "exit") == 0) {
+            SampleUtil_Print("Shutting down...\n");
             TvDeviceStop();
-            exit( 0 );
+            exit(0);
         } else {
-            SampleUtil_Print( "\n   Unknown command: %s\n\n", cmd );
-            SampleUtil_Print( "   Valid Commands:\n" );
-            SampleUtil_Print( "     Exit\n\n" );
+            SampleUtil_Print("\n   Unknown command: %s\n\n", cmd);
+            SampleUtil_Print("   Valid Commands:\n");
+            SampleUtil_Print("     Exit\n\n");
         }
 
     }
 
     return NULL;
+    args = args;
 }
 
 /******************************************************************************
@@ -121,9 +108,8 @@ TvDeviceCommandLoop( void *args )
  *                 
  *
  *****************************************************************************/
-int main( IN int argc, IN char **argv )
+int main(int argc, char **argv)
 {
-
     unsigned int portTemp = 0;
     char *ip_address = NULL,
      *desc_doc_name = NULL,
@@ -136,11 +122,10 @@ int main( IN int argc, IN char **argv )
     sigset_t sigs_to_catch;
 #endif
     int code;
-    unsigned int port = 0;
+    unsigned short port = 0;
     int i = 0;
 
-    SampleUtil_Initialize( linux_print );
-
+    SampleUtil_Initialize(linux_print);
     /* Parse options */
     for( i = 1; i < argc; i++ ) {
         if( strcmp( argv[i], "-ip" ) == 0 ) {
@@ -171,20 +156,16 @@ int main( IN int argc, IN char **argv )
             return 1;
         }
     }
-
-    port = ( unsigned short )portTemp;
-
-    TvDeviceStart( ip_address, port, desc_doc_name, web_dir_path, linux_print );
+    port = (unsigned short)portTemp;
+    TvDeviceStart(ip_address, port, desc_doc_name, web_dir_path, linux_print);
 
     /* start a command loop thread */
-    code = ithread_create( &cmdloop_thread, NULL, TvDeviceCommandLoop, NULL );
+    code = ithread_create(&cmdloop_thread, NULL, TvDeviceCommandLoop, NULL);
 
 #ifdef WIN32
     ithread_join(cmdloop_thread, NULL);
 #else
-    /*
-       Catch Ctrl-C and properly shutdown 
-     */
+    /* Catch Ctrl-C and properly shutdown */
     sigemptyset( &sigs_to_catch );
     sigaddset( &sigs_to_catch, SIGINT );
     sigwait( &sigs_to_catch, &sig );
