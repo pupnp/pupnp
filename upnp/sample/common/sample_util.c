@@ -54,18 +54,6 @@ state_update gStateUpdateFun = NULL;
 /*! mutex to control displaying of events */
 ithread_mutex_t display_mutex;
 
-/*******************************************************************************
- * SampleUtil_Initialize
- *
- * Description: 
- *     Initializes the sample util. Must be called before any sample util 
- *     functions. May be called multiple times.
- *     But the initialization is done only once.
- *
- * Parameters:
- *   print_function - print function to use in SampleUtil_Print
- *
- ******************************************************************************/
 int SampleUtil_Initialize(print_string print_function)
 {
 	if (initialize_init) {
@@ -87,14 +75,6 @@ int SampleUtil_Initialize(print_string print_function)
 	return UPNP_E_SUCCESS;
 }
 
-/*******************************************************************************
- * SampleUtil_RegisterUpdateFunction
- *
- * Description: 
- *
- * Parameters:
- *
- ******************************************************************************/
 int SampleUtil_RegisterUpdateFunction(state_update update_function)
 {
 	if (initialize_register) {
@@ -105,15 +85,6 @@ int SampleUtil_RegisterUpdateFunction(state_update update_function)
 	return UPNP_E_SUCCESS;
 }
 
-/*******************************************************************************
- * SampleUtil_Finish
- *
- * Description: 
- *     Releases Resources held by sample util.
- *
- * Parameters:
- *
- ******************************************************************************/
 int SampleUtil_Finish()
 {
 	ithread_mutex_destroy(&display_mutex);
@@ -125,21 +96,7 @@ int SampleUtil_Finish()
 	return UPNP_E_SUCCESS;
 }
 
-/*******************************************************************************
- * SampleUtil_GetElementValue
- *
- * Description: 
- *       Given a DOM node such as <Channel>11</Channel>, this routine
- *       extracts the value (e.g., 11) from the node and returns it as 
- *       a string. The string must be freed by the caller using 
- *       free.
- *
- * Parameters:
- *   node -- The DOM node from which to extract the value
- *
- ******************************************************************************/
-
-char *SampleUtil_GetElementValue(IN IXML_Element *element)
+char *SampleUtil_GetElementValue(IXML_Element *element)
 {
 	IXML_Node *child = ixmlNode_getFirstChild((IXML_Node *)element);
 	char *temp = NULL;
@@ -151,20 +108,7 @@ char *SampleUtil_GetElementValue(IN IXML_Element *element)
 	return temp;
 }
 
-/*******************************************************************************
- * SampleUtil_GetFirstServiceList
- *
- * Description: 
- *       Given a DOM node representing a UPnP Device Description Document,
- *       this routine parses the document and finds the first service list
- *       (i.e., the service list for the root device).  The service list
- *       is returned as a DOM node list.
- *
- * Parameters:
- *   node -- The DOM node from which to extract the service list
- *
- ******************************************************************************/
-IXML_NodeList *SampleUtil_GetFirstServiceList(IN IXML_Document *doc)
+IXML_NodeList *SampleUtil_GetFirstServiceList(IXML_Document *doc)
 {
 	IXML_NodeList *ServiceList = NULL;
 	IXML_NodeList *servlistnodelist = NULL;
@@ -176,7 +120,6 @@ IXML_NodeList *SampleUtil_GetFirstServiceList(IN IXML_Document *doc)
 		/* we only care about the first service list, from the root
 		 * device */
 		servlistnode = ixmlNodeList_item(servlistnodelist, 0);
-
 		/* create as list of DOM nodes */
 		ServiceList = ixmlElement_getElementsByTagName(
 			(IXML_Element *)servlistnode, "service");
@@ -192,23 +135,24 @@ IXML_NodeList *SampleUtil_GetFirstServiceList(IN IXML_Document *doc)
  * Obtain the service list 
  *    n == 0 the first
  *    n == 1 the next in the device list, etc..
- * 
  */
-IXML_NodeList *SampleUtil_GetNthServiceList(IN IXML_Document *doc , int n)
+static IXML_NodeList *SampleUtil_GetNthServiceList(
+	/*! [in] . */
+	IXML_Document *doc,
+	/*! [in] . */
+	int n)
 {
 	IXML_NodeList *ServiceList = NULL;
 	IXML_NodeList *servlistnodelist = NULL;
 	IXML_Node *servlistnode = NULL;
 
-	/*  
-	 *  ixmlDocument_getElementsByTagName()
+	/*  ixmlDocument_getElementsByTagName()
 	 *  Returns a NodeList of all Elements that match the given
 	 *  tag name in the order in which they were encountered in a preorder
 	 *  traversal of the Document tree.  
 	 *
 	 *  return (NodeList*) A pointer to a NodeList containing the 
-	 *                      matching items or NULL on an error.
-	 */
+	 *                      matching items or NULL on an error. 	 */
 	SampleUtil_Print("SampleUtil_GetNthServiceList called : n = %d\n", n);
 	servlistnodelist =
 		ixmlDocument_getElementsByTagName(doc, "serviceList");
@@ -223,8 +167,7 @@ IXML_NodeList *SampleUtil_GetNthServiceList(IN IXML_Document *doc , int n)
 		 *  numerical index.
 		 *
 		 *  return (Node*) A pointer to a Node or NULL if there was an 
-		 *                  error.
-		 */
+		 *                  error. */
 		servlistnode = ixmlNodeList_item(servlistnodelist, n);
 
 		assert(servlistnode != 0);
@@ -241,20 +184,7 @@ IXML_NodeList *SampleUtil_GetNthServiceList(IN IXML_Document *doc , int n)
 	return ServiceList;
 }
 
-/*******************************************************************************
- * SampleUtil_GetFirstDocumentItem
- *
- * Description: 
- *       Given a document node, this routine searches for the first element
- *       named by the input string item, and returns its value as a string.
- *       String must be freed by caller using free.
- * Parameters:
- *   doc -- The DOM document from which to extract the value
- *   item -- The item to search for
- *
- ******************************************************************************/
-char *SampleUtil_GetFirstDocumentItem(
-	IN IXML_Document *doc, IN const char *item)
+char *SampleUtil_GetFirstDocumentItem(IXML_Document *doc, const char *item)
 {
 	IXML_NodeList *nodeList = NULL;
 	IXML_Node *textNode = NULL;
@@ -299,20 +229,7 @@ epilogue:
 	return ret;
 }
 
-/*******************************************************************************
- * SampleUtil_GetFirstElementItem
- *
- * Description: 
- *       Given a DOM element, this routine searches for the first element
- *       named by the input string item, and returns its value as a string.
- *       The string must be freed using free.
- * Parameters:
- *   node -- The DOM element from which to extract the value
- *   item -- The item to search for
- *
- ******************************************************************************/
-char *SampleUtil_GetFirstElementItem(
-	IN IXML_Element *element, IN const char *item)
+char *SampleUtil_GetFirstElementItem(IXML_Element *element, const char *item)
 {
 	IXML_NodeList *nodeList = NULL;
 	IXML_Node *textNode = NULL;
@@ -346,17 +263,7 @@ char *SampleUtil_GetFirstElementItem(
 	return ret;
 }
 
-/*******************************************************************************
- * SampleUtil_PrintEventType
- *
- * Description: 
- *       Prints a callback event type as a string.
- *
- * Parameters:
- *   S -- The callback event
- *
- ******************************************************************************/
-void SampleUtil_PrintEventType(IN Upnp_EventType S)
+void SampleUtil_PrintEventType(Upnp_EventType S)
 {
 	switch (S) {
 	/* Discovery */
@@ -410,18 +317,7 @@ void SampleUtil_PrintEventType(IN Upnp_EventType S)
 	}
 }
 
-/*******************************************************************************
- * SampleUtil_PrintEvent
- *
- * Description: 
- *       Prints callback event structure details.
- *
- * Parameters:
- *   EventType -- The type of callback event
- *   Event -- The callback event structure
- *
- ******************************************************************************/
-int SampleUtil_PrintEvent(IN Upnp_EventType EventType, IN void *Event)
+int SampleUtil_PrintEvent(Upnp_EventType EventType, void *Event)
 {
 	ithread_mutex_lock(&display_mutex);
 
@@ -539,7 +435,6 @@ int SampleUtil_PrintEvent(IN Upnp_EventType EventType, IN void *Event)
 		SampleUtil_Print("CurrentVal  =  %s\n", sv_event->CurrentVal);
 		break;
 	}
-
 	/* GENA */
 	case UPNP_EVENT_SUBSCRIPTION_REQUEST: {
 		struct Upnp_Subscription_Request *sr_event =
@@ -607,25 +502,8 @@ int SampleUtil_PrintEvent(IN Upnp_EventType EventType, IN void *Event)
 	return 0;
 }
 
-/*******************************************************************************
- * SampleUtil_FindAndParseService
- *
- * Description: 
- *       This routine finds the first occurance of a service in a DOM representation
- *       of a description document and parses it.  
- *
- * Parameters:
- *   DescDoc -- The DOM description document
- *   location -- The location of the description document
- *   serviceSearchType -- The type of service to search for
- *   serviceId -- OUT -- The service ID
- *   eventURL -- OUT -- The event URL for the service
- *   controlURL -- OUT -- The control URL for the service
- *
- ******************************************************************************/
-int SampleUtil_FindAndParseService(
-	IN IXML_Document *DescDoc, IN const char *location, IN char *serviceType,
-	OUT char **serviceId, OUT char **eventURL, OUT char **controlURL)
+int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
+	char *serviceType, char **serviceId, char **eventURL, char **controlURL)
 {
 	int i;
 	int length;
@@ -711,20 +589,7 @@ int SampleUtil_FindAndParseService(
 	return found;
 }
 
-/*******************************************************************************
- * SampleUtil_Print
- *
- * Description: 
- *      Provides platform-specific print functionality.  This function should be
- *      called when you want to print content suitable for console output (i.e.,
- *      in a large text box or on a screen).  If your device/operating system is 
- *      not supported here, you should add a port.
- *
- * Parameters:
- *		Same as printf()
- *
- ******************************************************************************/
-int SampleUtil_Print(char *fmt, ...)
+int SampleUtil_Print(const char *fmt, ...)
 {
 #define MAX_BUF (8 * 1024)
 	va_list ap;
@@ -747,14 +612,6 @@ int SampleUtil_Print(char *fmt, ...)
 	return rc;
 }
 
-/*******************************************************************************
- * SampleUtil_StateUpdate
- *
- * Description: 
- *
- * Parameters:
- *
- ******************************************************************************/
 void SampleUtil_StateUpdate(const char *varName, const char *varValue,
 	const char *UDN, eventType type)
 {

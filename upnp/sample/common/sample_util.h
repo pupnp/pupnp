@@ -29,29 +29,27 @@
  *
  ******************************************************************************/
 
-
 #ifndef SAMPLE_UTIL_H
 #define SAMPLE_UTIL_H
 
+/*!
+ * \file
+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
 
 #include "ithread.h"
 #include "ixml.h" /* for IXML_Document, IXML_Element */
 #include "upnp.h" /* for Upnp_EventType */
 #include "upnptools.h"
 
-
 #include <stdlib.h>
 #include <string.h>
 
-
 /* mutex to control displaying of events */
 extern ithread_mutex_t display_mutex;
-
 
 typedef enum {
 	STATE_UPDATE = 0,
@@ -60,233 +58,179 @@ typedef enum {
 	GET_VAR_COMPLETE = 3
 } eventType;
 
+/*!
+ * \brief Given a DOM node such as <Channel>11</Channel>, this routine
+ * extracts the value (e.g., 11) from the node and returns it as 
+ * a string. The string must be freed by the caller using free.
+ *
+ * \return The DOM node as a string.
+ */
+char *SampleUtil_GetElementValue(
+	/*! [in] The DOM node from which to extract the value. */
+	IXML_Element *element);
 
-/********************************************************************************
- * SampleUtil_GetElementValue
+/*!
+ * \brief Given a DOM node representing a UPnP Device Description Document,
+ * this routine parses the document and finds the first service list
+ * (i.e., the service list for the root device).  The service list
+ * is returned as a DOM node list. The NodeList must be freed using
+ * NodeList_free.
  *
- * Description: 
- *       Given a DOM node such as <Channel>11</Channel>, this routine
- *       extracts the value (e.g., 11) from the node and returns it as 
- *       a string. The string must be freed by the caller using 
- *       free.
- *
- * Parameters:
- *   node -- The DOM node from which to extract the value
- *
- ********************************************************************************/
-char *SampleUtil_GetElementValue(IN IXML_Element *element);
+ * \return The service list is returned as a DOM node list.
+ */
+IXML_NodeList *SampleUtil_GetFirstServiceList(
+	/*! [in] The DOM node from which to extract the service list. */
+	IXML_Document *doc); 
 
-/********************************************************************************
- * SampleUtil_GetFirstServiceList
- *
- * Description: 
- *       Given a DOM node representing a UPnP Device Description Document,
- *       this routine parses the document and finds the first service list
- *       (i.e., the service list for the root device).  The service list
- *       is returned as a DOM node list. The NodeList must be freed using
- *       NodeList_free.
- *
- * Parameters:
- *   node -- The DOM node from which to extract the service list
- *
- ********************************************************************************/
+/*!
+ * \brief Given a document node, this routine searches for the first element
+ * named by the input string item, and returns its value as a string.
+ * String must be freed by caller using free.
+ */
+char *SampleUtil_GetFirstDocumentItem(
+	/*! [in] The DOM document from which to extract the value. */
+	IXML_Document *doc,
+	/*! [in] The item to search for. */
+	const char *item); 
 
-IXML_NodeList *SampleUtil_GetFirstServiceList(IN IXML_Document *doc); 
+/*!
+ * \brief Given a DOM element, this routine searches for the first element
+ * named by the input string item, and returns its value as a string.
+ * The string must be freed using free.
+ */
+char *SampleUtil_GetFirstElementItem(
+	/*! [in] The DOM element from which to extract the value. */
+	IXML_Element *element,
+	/*! [in] The item to search for. */
+	const char *item); 
 
+/*!
+ * \brief Prints a callback event type as a string.
+ */
+void SampleUtil_PrintEventType(
+	/*! [in] The callback event. */
+	Upnp_EventType S);
 
-/********************************************************************************
- * SampleUtil_GetFirstDocumentItem
- *
- * Description: 
- *       Given a document node, this routine searches for the first element
- *       named by the input string item, and returns its value as a string.
- *       String must be freed by caller using free.
- * Parameters:
- *   doc -- The DOM document from which to extract the value
- *   item -- The item to search for
- *
- ********************************************************************************/
-char *SampleUtil_GetFirstDocumentItem(IN IXML_Document *doc, IN const char *item); 
+/*!
+ * \brief Prints callback event structure details.
+ */
+int SampleUtil_PrintEvent(
+	/*! [in] The type of callback event. */
+	Upnp_EventType EventType, 
+	/*! [in] The callback event structure. */
+	void *Event);
 
-
-
-/********************************************************************************
- * SampleUtil_GetFirstElementItem
- *
- * Description: 
- *       Given a DOM element, this routine searches for the first element
- *       named by the input string item, and returns its value as a string.
- *       The string must be freed using free.
- * Parameters:
- *   node -- The DOM element from which to extract the value
- *   item -- The item to search for
- *
- ********************************************************************************/
-char *SampleUtil_GetFirstElementItem(IN IXML_Element *element, IN const char *item); 
-
-/********************************************************************************
- * SampleUtil_PrintEventType
- *
- * Description: 
- *       Prints a callback event type as a string.
- *
- * Parameters:
- *   S -- The callback event
- *
- ********************************************************************************/
-void SampleUtil_PrintEventType(IN Upnp_EventType S);
-
-/********************************************************************************
- * SampleUtil_PrintEvent
- *
- * Description: 
- *       Prints callback event structure details.
- *
- * Parameters:
- *   EventType -- The type of callback event
- *   Event -- The callback event structure
- *
- ********************************************************************************/
-int SampleUtil_PrintEvent(IN Upnp_EventType EventType, 
-			  IN void *Event);
-
-/********************************************************************************
- * SampleUtil_FindAndParseService
- *
- * Description: 
- *       This routine finds the first occurance of a service in a DOM representation
- *       of a description document and parses it.  Note that this function currently
- *       assumes that the eventURL and controlURL values in the service definitions
- *       are full URLs.  Relative URLs are not handled here.
- *
- * Parameters:
- *   DescDoc -- The DOM description document
- *   location -- The location of the description document
- *   serviceSearchType -- The type of service to search for
- *   serviceId -- OUT -- The service ID
- *   eventURL -- OUT -- The event URL for the service
- *   controlURL -- OUT -- The control URL for the service
- *
- ********************************************************************************/
+/*!
+ * \brief This routine finds the first occurance of a service in a DOM
+ * representation of a description document and parses it.  Note that this
+ * function currently assumes that the eventURL and controlURL values in
+ * the service definitions are full URLs.  Relative URLs are not handled here.
+ */
 int SampleUtil_FindAndParseService (
-	IN IXML_Document *DescDoc,
-	IN const char* location, 
-	IN char *serviceType,
-	OUT char **serviceId, 
-	OUT char **eventURL,
-	OUT char **controlURL);
+	/*! [in] The DOM description document. */
+	IXML_Document *DescDoc,
+	/*! [in] The location of the description document. */
+	const char *location, 
+	/*! [in] The type of service to search for. */
+	char *serviceType,
+	/*! [out] The service ID. */
+	char **serviceId, 
+	/*! [out] The event URL for the service. */
+	char **eventURL,
+	/*! [out] The control URL for the service. */
+	char **controlURL);
 
+/*!
+ * \brief Prototype for displaying strings. All printing done by the device,
+ * control point, and sample util, ultimately use this to display strings 
+ * to the user.
+ */
+typedef void (*print_string)(
+	/*! [in] Format. */
+	const char *string);
 
-/********************************************************************************
- * print_string
- *
- * Description: 
- *       Prototype for displaying strings. All printing done by the device,
- *       control point, and sample util, ultimately use this to display strings 
- *       to the user.
- *
- * Parameters:
- *   const char * string.
- *
- ********************************************************************************/
-typedef void (*print_string)(const char *string);
-
-/*global print function used by sample util */
+/*! global print function used by sample util */
 extern print_string gPrintFun;
 
-/********************************************************************************
- * state_update
- *
- * Description: 
- *     Prototype for passing back state changes
- *
- * Parameters:
- *   const char * varName
- *   const char * varValue
- *   const char * UDN
- *   int          newDevice
- ********************************************************************************/
+/*!
+ * \brief Prototype for passing back state changes.
+ */
 typedef void (*state_update)(
+	/*! [in] . */
 	const char *varName,
+	/*! [in] . */
 	const char *varValue,
+	/*! [in] . */
 	const char *UDN,
+	/*! [in] . */
 	eventType type);
 
-/*global state update function used by smaple util */
+/*! global state update function used by smaple util */
 extern state_update gStateUpdateFun;
 
-/********************************************************************************
- * SampleUtil_Initialize
- *
- * Description: 
- *     Initializes the sample util. Must be called before any sample util 
- *     functions. May be called multiple times.
- *
- * Parameters:
- *   print_function - print function to use in SampleUtil_Print
- *
- ********************************************************************************/
-int SampleUtil_Initialize(print_string print_function);
+/*!
+ * \brief Initializes the sample util. Must be called before any sample util
+ * functions. May be called multiple times.
+ */
+int SampleUtil_Initialize(
+	/*! [in] Print function to use in SampleUtil_Print. */
+	print_string print_function);
 
-/********************************************************************************
- * SampleUtil_Finish
- *
- * Description: 
- *     Releases Resources held by sample util.
- *
- * Parameters:
- *
- ********************************************************************************/
+/*!
+ * \brief Releases Resources held by sample util.
+ */
 int SampleUtil_Finish();
 
-/********************************************************************************
- * SampleUtil_Print
+/*!
+ * \brief Function emulating printf that ultimately calls the registered print
+ * function with the formatted string.
  *
- * Description: 
- *     Function emulating printf that ultimately calls the registered print 
- *     function with the formatted string.
+ * Provides platform-specific print functionality.  This function should be
+ * called when you want to print content suitable for console output (i.e.,
+ * in a large text box or on a screen).  If your device/operating system is 
+ * not supported here, you should add a port.
  *
- * Parameters:
- *   fmt - format (see printf)
- *   . . .  - variable number of args. (see printf)
- *
- ********************************************************************************/
-int SampleUtil_Print(char *fmt, ...);
+ * \return The same as printf.
+ */
+int SampleUtil_Print(
+	/*! [in] Format (see printf). */
+	const char *fmt,
+	/*! [in] Format data. */
+	...)
+#if (__GNUC__ >= 3)
+	/* This enables printf like format checking by the compiler */
+	__attribute__((format (__printf__, 1, 2)))
+#endif
+;
 
-/********************************************************************************
- * SampleUtil_RegisterUpdateFunction
- *
- * Description: 
- *
- * Parameters:
- *
- ********************************************************************************/
-int SampleUtil_RegisterUpdateFunction(state_update update_function);
+/*!
+ * \brief
+ */
+int SampleUtil_RegisterUpdateFunction(
+	/*! [in] . */
+	state_update update_function);
 
-/********************************************************************************
- * SampleUtil_StateUpdate
- *
- * Description: 
- *
- * Parameters:
- *
- ********************************************************************************/
+/*!
+ * \brief
+ */
 void SampleUtil_StateUpdate(
+	/*! [in] . */
 	const char *varName,
+	/*! [in] . */
 	const char *varValue,
+	/*! [in] . */
 	const char *UDN,
+	/*! [in] . */
 	eventType type);
 
 #ifdef __cplusplus
 };
 #endif /* __cplusplus */
 
-
 #ifdef WIN32
 	#define snprintf	_snprintf
 	#define strcasecmp	stricmp
 #endif
-
 
 #endif /* SAMPLE_UTIL_H */
 
