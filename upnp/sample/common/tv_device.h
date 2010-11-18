@@ -130,10 +130,6 @@ extern "C" {
 /*! This should be the maximum VARCOUNT from above */
 #define TV_MAXVARS TV_PICTURE_VARCOUNT
 
-extern const char TvDeviceType[];
-
-extern const char *TvServiceType[];
-
 /*!
  * \brief Prototype for all actions. For each action that a service 
  * implements, there is a corresponding function with this prototype.
@@ -529,7 +525,9 @@ int TvDeviceStart(
 	 * may be NULL. Default is ./web (for Linux) or ../tvdevice/web. */
 	const char *web_dir_path,
 	/*! [in] print function to use. */
-	print_string pfun);
+	print_string pfun,
+	/*! [in] Non-zero if called from the combo application. */
+	int combo);
 
 /*!
  * \brief Stops the device. Uninitializes the sdk.

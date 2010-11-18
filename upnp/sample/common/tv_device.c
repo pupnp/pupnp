@@ -31,17 +31,13 @@
 
 #include "tv_device.h"
 
+#include "common_data.h"
+
 #include <assert.h>
 
 #define DEFAULT_WEB_DIR "./web"
 
 #define DESC_URL_SIZE 200
-
-/*! Device type for tv device. */
-extern const char TvDeviceType[];
-
-/*! Service types for tv services. */
-extern const char *TvServiceType[];
 
 /*! Global arrays for storing Tv Control Service variable names, values,
  * and defaults. */
@@ -1359,88 +1355,83 @@ int TvDeviceStop(void)
 
 int TvDeviceStart(char *ip_address, unsigned short port,
 	const char *desc_doc_name, const char *web_dir_path,
-	print_string pfun)
+	print_string pfun, int combo)
 {
-    int ret = UPNP_E_SUCCESS;
-    char desc_doc_url[DESC_URL_SIZE];
+	int ret = UPNP_E_SUCCESS;
+	char desc_doc_url[DESC_URL_SIZE];
 
-    ithread_mutex_init( &TVDevMutex, NULL );
+	ithread_mutex_init(&TVDevMutex, NULL);
 
-    SampleUtil_Initialize( pfun );
+	SampleUtil_Initialize(pfun);
+	SampleUtil_Print(
+		"Initializing UPnP Sdk with\n"
+		"\tipaddress = %s port = %u\n",
+		ip_address ? ip_address : "{NULL}",
+		port);
+	ret = UpnpInit(ip_address, port);
+	if (ret != UPNP_E_SUCCESS) {
+		SampleUtil_Print("Error with UpnpInit -- %d\n", ret);
+		UpnpFinish();
 
-    SampleUtil_Print(
-        "Initializing UPnP Sdk with\n"
-        "\tipaddress = %s port = %u\n",
-        ip_address ? ip_address : "{NULL}",
-	port);
+		return ret;
+	}
+	ip_address = UpnpGetServerIpAddress();
+	port = UpnpGetServerPort();
+	SampleUtil_Print(
+		"UPnP Initialized\n"
+		"\tipaddress = %s port = %u\n",
+		ip_address ? ip_address : "{NULL}",
+		port);
+	if (!desc_doc_name) {
+		if (combo) {
+			desc_doc_name = "tvcombodesc.xml";
+		} else {
+			desc_doc_name = "tvdevicedesc.xml";
+		}
+	}
+	if (!web_dir_path) {
+		web_dir_path = DEFAULT_WEB_DIR;
+	}
+	snprintf(desc_doc_url, DESC_URL_SIZE, "http://%s:%d/%s", ip_address,
+		port, desc_doc_name);
+	SampleUtil_Print("Specifying the webserver root directory -- %s\n",
+		web_dir_path );
+	ret = UpnpSetWebServerRootDir(web_dir_path);
+	if (ret != UPNP_E_SUCCESS) {
+		SampleUtil_Print(
+			"Error specifying webserver root directory -- %s: %d\n",
+			web_dir_path, ret);
+		UpnpFinish();
 
-    ret = UpnpInit( ip_address, port );
-    if( ret != UPNP_E_SUCCESS ) {
-        SampleUtil_Print( "Error with UpnpInit -- %d\n", ret );
-        UpnpFinish();
-        return ret;
-    }
+		return ret;
+	}
+	SampleUtil_Print(
+		"Registering the RootDevice\n"
+		"\t with desc_doc_url: %s\n",
+		desc_doc_url);
+	ret = UpnpRegisterRootDevice(desc_doc_url, TvDeviceCallbackEventHandler,
+		&device_handle, &device_handle);
+	if (ret != UPNP_E_SUCCESS) {
+		SampleUtil_Print("Error registering the rootdevice : %d\n", ret);
+		UpnpFinish();
 
-    ip_address = UpnpGetServerIpAddress();
-    port = UpnpGetServerPort();
+		return ret;
+	} else {
+		SampleUtil_Print(
+			"RootDevice Registered\n"
+			"Initializing State Table\n");
+			TvDeviceStateTableInit(desc_doc_url);
+		SampleUtil_Print("State Table Initialized\n");
+		ret = UpnpSendAdvertisement(device_handle, default_advr_expire);
+		if (ret != UPNP_E_SUCCESS) {
+			SampleUtil_Print("Error sending advertisements : %d\n", ret);
+			UpnpFinish();
 
-    SampleUtil_Print(
-        "UPnP Initialized\n"
-        "\tipaddress = %s port = %u\n",
-        ip_address ? ip_address : "{NULL}",
-	port);
+			return ret;
+		}
+		SampleUtil_Print("Advertisements Sent\n");
+	}
 
-    if (!desc_doc_name) {
-        desc_doc_name = "tvcombodesc.xml";
-    }
-
-    if (!web_dir_path) {
-        web_dir_path = DEFAULT_WEB_DIR;
-    }
-
-    snprintf( desc_doc_url, DESC_URL_SIZE, "http://%s:%d/%s", ip_address,
-              port, desc_doc_name );
-
-    SampleUtil_Print( "Specifying the webserver root directory -- %s\n",
-                      web_dir_path );
-    ret = UpnpSetWebServerRootDir( web_dir_path );
-    if( ret != UPNP_E_SUCCESS ) {
-        SampleUtil_Print( "Error specifying webserver root directory -- %s: %d\n",
-              web_dir_path, ret );
-        UpnpFinish();
-
-        return ret;
-    }
-
-    SampleUtil_Print(
-        "Registering the RootDevice\n"
-        "\t with desc_doc_url: %s\n",
-        desc_doc_url );
-
-    ret = UpnpRegisterRootDevice( desc_doc_url, TvDeviceCallbackEventHandler,
-        &device_handle, &device_handle );
-    if( ret != UPNP_E_SUCCESS ) {
-        SampleUtil_Print( "Error registering the rootdevice : %d\n", ret );
-        UpnpFinish();
-
-        return ret;
-    } else {
-        SampleUtil_Print(
-            "RootDevice Registered\n"
-            "Initializing State Table\n");
-        TvDeviceStateTableInit( desc_doc_url );
-        SampleUtil_Print("State Table Initialized\n");
-        ret = UpnpSendAdvertisement( device_handle, default_advr_expire );
-        if( ret != UPNP_E_SUCCESS ) {
-            SampleUtil_Print( "Error sending advertisements : %d\n", ret );
-            UpnpFinish();
-
-            return ret;
-        }
-
-        SampleUtil_Print("Advertisements Sent\n");
-    }
-
-    return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 

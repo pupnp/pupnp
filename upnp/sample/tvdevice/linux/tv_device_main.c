@@ -29,14 +29,13 @@
  *
  ******************************************************************************/
 
-
+#define ALLOC_COMMON_DATA
+#include "common_data.h"
 #include "sample_util.h"
 #include "tv_device.h"
 
-
 #include <stdarg.h>
 #include <stdio.h>
-
 
 /*!
  * \brief Prints a string to standard out.
@@ -58,122 +57,112 @@ void linux_print(const char *format, ...)
  */
 void *TvDeviceCommandLoop(void *args)
 {
-    int stoploop = 0;
-    char cmdline[100];
-    char cmd[100];
+	int stoploop = 0;
+	char cmdline[100];
+	char cmd[100];
 
-    while (!stoploop) {
-        sprintf( cmdline, " " );
-        sprintf( cmd, " " );
+	while (!stoploop) {
+		sprintf(cmdline, " ");
+		sprintf(cmd, " ");
+		SampleUtil_Print("\n>> ");
+		/* Get a command line */
+		fgets(cmdline, 100, stdin);
+		sscanf(cmdline, "%s", cmd);
+		if( strcasecmp(cmd, "exit") == 0) {
+			SampleUtil_Print("Shutting down...\n");
+			TvDeviceStop();
+			exit(0);
+		} else {
+			SampleUtil_Print(
+				"\n   Unknown command: %s\n\n", cmd);
+			SampleUtil_Print(
+				"   Valid Commands:\n"
+				"     Exit\n\n");
+		}
+	}
 
-        SampleUtil_Print("\n>> ");
-        /* Get a command line */
-        fgets(cmdline, 100, stdin);
-        sscanf(cmdline, "%s", cmd);
-        if( strcasecmp(cmd, "exit") == 0) {
-            SampleUtil_Print("Shutting down...\n");
-            TvDeviceStop();
-            exit(0);
-        } else {
-            SampleUtil_Print("\n   Unknown command: %s\n\n", cmd);
-            SampleUtil_Print("   Valid Commands:\n");
-            SampleUtil_Print("     Exit\n\n");
-        }
-
-    }
-
-    return NULL;
-    args = args;
+	return NULL;
+	args = args;
 }
 
-/******************************************************************************
- * main
+/*!
+ * \brief Main entry point for tv device application.
  *
- * Description: 
- *       Main entry point for tv device application.
- *       Initializes and registers with the sdk.
- *       Initializes the state stables of the service.
- *       Starts the command loop.
+ * Initializes and registers with the sdk.
+ * Initializes the state stables of the service.
+ * Starts the command loop.
  *
- * Parameters:
- *    int argc  - count of arguments
- *    char ** argv -arguments. The application 
- *                  accepts the following optional arguments:
- *
- *                  -ip ipaddress 
- *                  -port port
- *		    -desc desc_doc_name 
- *	            -webdir web_dir_path"
- *		    -help 
- *                 
- *
- *****************************************************************************/
-int main(int argc, char **argv)
+ * Accepts the following optional arguments:
+ *	\li \c -ip ipaddress 
+ *	\li \c -port port
+ *	\li \c -desc desc_doc_name 
+ *	\li \c -webdir web_dir_path"
+ *	\li \c -help 
+ */
+int main(int argc, char *argv[])
 {
-    unsigned int portTemp = 0;
-    char *ip_address = NULL,
-     *desc_doc_name = NULL,
-     *web_dir_path = NULL;
-    int rc;
-    ithread_t cmdloop_thread;
+	unsigned int portTemp = 0;
+	char *ip_address = NULL;
+	char *desc_doc_name = NULL;
+	char *web_dir_path = NULL;
+	int rc;
+	ithread_t cmdloop_thread;
 #ifdef WIN32
 #else
-    int sig;
-    sigset_t sigs_to_catch;
+	int sig;
+	sigset_t sigs_to_catch;
 #endif
-    int code;
-    unsigned short port = 0;
-    int i = 0;
+	int code;
+	unsigned short port = 0;
+	int i = 0;
 
-    SampleUtil_Initialize(linux_print);
-    /* Parse options */
-    for( i = 1; i < argc; i++ ) {
-        if( strcmp( argv[i], "-ip" ) == 0 ) {
-            ip_address = argv[++i];
-        } else if( strcmp( argv[i], "-port" ) == 0 ) {
-            sscanf( argv[++i], "%u", &portTemp );
-        } else if( strcmp( argv[i], "-desc" ) == 0 ) {
-            desc_doc_name = argv[++i];
-        } else if( strcmp( argv[i], "-webdir" ) == 0 ) {
-            web_dir_path = argv[++i];
-        } else if( strcmp( argv[i], "-help" ) == 0 ) {
-            SampleUtil_Print( "Usage: %s -ip ipaddress -port port"
-                              " -desc desc_doc_name -webdir web_dir_path"
-                              " -help (this message)\n", argv[0] );
-            SampleUtil_Print( "\tipaddress:     IP address of the device"
-                              " (must match desc. doc)\n" );
-            SampleUtil_Print( "\t\te.g.: 192.168.0.4\n" );
-            SampleUtil_Print( "\tport:          Port number to use for "
-                              "receiving UPnP messages (must match desc. doc)\n" );
-            SampleUtil_Print( "\t\te.g.: 5431\n" );
-            SampleUtil_Print
-                ( "\tdesc_doc_name: name of device description document\n" );
-            SampleUtil_Print( "\t\te.g.: tvdevicedesc.xml\n" );
-            SampleUtil_Print
-                ( "\tweb_dir_path: Filesystem path where web files "
-                  "related to the device are stored\n" );
-            SampleUtil_Print( "\t\te.g.: /upnp/sample/tvdevice/web\n" );
-            return 1;
-        }
-    }
-    port = (unsigned short)portTemp;
-    TvDeviceStart(ip_address, port, desc_doc_name, web_dir_path, linux_print);
-
-    /* start a command loop thread */
-    code = ithread_create(&cmdloop_thread, NULL, TvDeviceCommandLoop, NULL);
-
+	SampleUtil_Initialize(linux_print);
+	/* Parse options */
+	for(i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-ip") == 0) {
+			ip_address = argv[++i];
+		} else if(strcmp(argv[i], "-port") == 0) {
+			sscanf(argv[++i], "%u", &portTemp);
+		} else if(strcmp(argv[i], "-desc") == 0) {
+			desc_doc_name = argv[++i];
+		} else if(strcmp(argv[i], "-webdir") == 0) {
+			web_dir_path = argv[++i];
+		} else if(strcmp(argv[i], "-help") == 0) {
+			SampleUtil_Print(
+				"Usage: %s -ip ipaddress -port port"
+				" -desc desc_doc_name -webdir web_dir_path"
+				" -help (this message)\n", argv[0]);
+			SampleUtil_Print(
+				"\tipaddress:     IP address of the device"
+				" (must match desc. doc)\n"
+				"\t\te.g.: 192.168.0.4\n"
+				"\tport:          Port number to use for"
+				" receiving UPnP messages (must match desc. doc)\n"
+				"\t\te.g.: 5431\n"
+				"\tdesc_doc_name: name of device description document\n"
+				"\t\te.g.: tvdevicedesc.xml\n"
+				"\tweb_dir_path: Filesystem path where web files"
+				" related to the device are stored\n"
+				"\t\te.g.: /upnp/sample/tvdevice/web\n");
+			return 1;
+		}
+	}
+	port = (unsigned short)portTemp;
+	TvDeviceStart(ip_address, port, desc_doc_name, web_dir_path,
+		linux_print, 0);
+	/* start a command loop thread */
+	code = ithread_create(&cmdloop_thread, NULL, TvDeviceCommandLoop, NULL);
 #ifdef WIN32
-    ithread_join(cmdloop_thread, NULL);
+	ithread_join(cmdloop_thread, NULL);
 #else
-    /* Catch Ctrl-C and properly shutdown */
-    sigemptyset( &sigs_to_catch );
-    sigaddset( &sigs_to_catch, SIGINT );
-    sigwait( &sigs_to_catch, &sig );
-
-    SampleUtil_Print( "Shutting down on signal %d...\n", sig );
+	/* Catch Ctrl-C and properly shutdown */
+	sigemptyset(&sigs_to_catch);
+	sigaddset(&sigs_to_catch, SIGINT);
+	sigwait(&sigs_to_catch, &sig);
+	SampleUtil_Print("Shutting down on signal %d...\n", sig);
 #endif
-    rc = TvDeviceStop();
-    
-    return rc;
+	rc = TvDeviceStop();
+
+	return rc;
 }
 

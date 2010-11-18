@@ -29,6 +29,8 @@
  *
  ******************************************************************************/
 
+#define ALLOC_COMMON_DATA
+#include "common_data.h"
 #include "sample_util.h"
 #include "tv_ctrlpt.h"
 #include "tv_device.h"
@@ -394,7 +396,7 @@ int device_main(int argc, char **argv)
         }
     }
     port = (unsigned short)portTemp;
-    return TvDeviceStart(ip_address, port, desc_doc_name, web_dir_path, linux_print);
+    return TvDeviceStart(ip_address, port, desc_doc_name, web_dir_path, linux_print, 1);
 }
 
 int main(int argc, char **argv)
@@ -409,7 +411,7 @@ int main(int argc, char **argv)
 	int code;
 
 	device_main(argc, argv);
-	rc = TvCtrlPointStart(linux_print, NULL);
+	rc = TvCtrlPointStart(linux_print, NULL, 1);
 	if (rc != TV_SUCCESS) {
 		SampleUtil_Print("Error starting UPnP TV Control Point\n");
 		return rc;
