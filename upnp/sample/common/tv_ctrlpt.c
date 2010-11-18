@@ -29,12 +29,10 @@
  *
  ******************************************************************************/
 
-
 #include "tv_ctrlpt.h"
 
-
+#include "common_data.h"
 #include "upnp.h"
-
 
 /*!
    Mutex for protecting the global device list
@@ -46,11 +44,10 @@ ithread_mutex_t DeviceListMutex;
 
 UpnpClient_Handle ctrlpt_handle = -1;
 
+/*! Device type for tv device. */
 const char TvDeviceType[] = "urn:schemas-upnp-org:device:tvdevice:1";
-const char *TvServiceType[] = {
-    "urn:schemas-upnp-org:service:tvcontrol:1",
-    "urn:schemas-upnp-org:service:tvpicture:1"
-};
+
+/*! Service names.*/
 const char *TvServiceName[] = { "Control", "Picture" };
 
 /*!
@@ -1045,8 +1042,7 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 		UpnpActionComplete *a_event = (UpnpActionComplete *)Event;
 		int errCode = UpnpActionComplete_get_ErrCode(a_event);
 		if (errCode != UPNP_E_SUCCESS) {
-			SampleUtil_Print(
-				"Error in  Action Complete Callback -- %d\n",
+			SampleUtil_Print("Error in  Action Complete Callback -- %d\n",
 				errCode);
 		}
 		/* No need for any processing here, just print out results.
@@ -1230,7 +1226,7 @@ void *TvCtrlPointTimerLoop(void *args)
  *		TV_SUCCESS if everything went well, else TV_ERROR
  *
  ********************************************************************************/
-int TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionPtr)
+int TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionPtr, int combo)
 {
 	ithread_t timer_thread;
 	int rc;
@@ -1251,10 +1247,11 @@ int TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionP
 	rc = UpnpInit(ip_address, port);
 	if (rc != UPNP_E_SUCCESS) {
 		SampleUtil_Print("WinCEStart: UpnpInit() Error: %d\n", rc);
-		/*
-		UpnpFinish();
-		return TV_ERROR;
-		*/
+		if (!combo) {
+			UpnpFinish();
+
+			return TV_ERROR;
+		}
 	}
 	if (!ip_address) {
 		ip_address = UpnpGetServerIpAddress();

@@ -42,27 +42,30 @@ endif
 
 
 tv_device_SOURCES = \
+	common/common_data.h \
 	common/sample_util.c \
 	common/sample_util.h \
-	tvdevice/tv_device.c \
-	tvdevice/tv_device.h \
+	common/tv_device.c \
+	common/tv_device.h \
 	tvdevice/linux/tv_device_main.c
 
 
 tv_ctrlpt_SOURCES = \
+	common/common_data.h \
 	common/sample_util.c \
 	common/sample_util.h \
-	tvctrlpt/tv_ctrlpt.c \
-	tvctrlpt/tv_ctrlpt.h \
+	common/tv_ctrlpt.c \
+	common/tv_ctrlpt.h \
 	tvctrlpt/linux/tv_ctrlpt_main.c
 
 tv_combo_SOURCES = \
+	common/common_data.h \
 	common/sample_util.c \
 	common/sample_util.h \
-	tvcombo/tv_ctrlpt.c \
-	tvcombo/tv_ctrlpt.h \
-	tvcombo/tv_device.c \
-	tvcombo/tv_device.h \
+	common/tv_ctrlpt.c \
+	common/tv_ctrlpt.h \
+	common/tv_device.c \
+	common/tv_device.h \
 	tvcombo/linux/tv_combo_main.c
 
 

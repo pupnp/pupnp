@@ -29,24 +29,19 @@
  *
  **************************************************************************/
 
-
 #ifndef UPNP_TV_CTRLPT_H
 #define UPNP_TV_CTRLPT_H
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 #include "sample_util.h"
-
 
 #include "ithread.h"
 #include "upnp.h"
 #include "UpnpString.h"
 #include "upnptools.h"
-
 
 #include <signal.h>
 #include <stdarg.h>
@@ -54,40 +49,36 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
-
 #ifdef WIN32
 	/* Do not #include <unistd.h> */
 #else
 	#include <unistd.h>
 #endif
 
-
 #define TV_SERVICE_SERVCOUNT	2
-#define TV_SERVICE_CONTROL		0
-#define TV_SERVICE_PICTURE		1
+#define TV_SERVICE_CONTROL	0
+#define TV_SERVICE_PICTURE	1
 
-#define TV_CONTROL_VARCOUNT		3
-#define TV_CONTROL_POWER		0
-#define TV_CONTROL_CHANNEL		1
-#define TV_CONTROL_VOLUME		2
+#define TV_CONTROL_VARCOUNT	3
+#define TV_CONTROL_POWER	0
+#define TV_CONTROL_CHANNEL	1
+#define TV_CONTROL_VOLUME	2
 
-#define TV_PICTURE_VARCOUNT		4
-#define TV_PICTURE_COLOR		0
-#define TV_PICTURE_TINT			1
-#define TV_PICTURE_CONTRAST		2
+#define TV_PICTURE_VARCOUNT	4
+#define TV_PICTURE_COLOR	0
+#define TV_PICTURE_TINT		1
+#define TV_PICTURE_CONTRAST	2
 #define TV_PICTURE_BRIGHTNESS	3
 
-#define TV_MAX_VAL_LEN			5
+#define TV_MAX_VAL_LEN		5
 
-#define TV_SUCCESS			0
-#define TV_ERROR			(-1)
-#define TV_WARNING			1
+#define TV_SUCCESS		0
+#define TV_ERROR		(-1)
+#define TV_WARNING		1
 
 /* This should be the maximum VARCOUNT from above */
-#define TV_MAXVARS			TV_PICTURE_VARCOUNT
+#define TV_MAXVARS		TV_PICTURE_VARCOUNT
 
-extern const char TvDeviceType[];
-extern const char *TvServiceType[];
 extern const char *TvServiceName[];
 extern const char *TvVarName[TV_SERVICE_SERVCOUNT][TV_MAXVARS];
 extern char TvVarCount[];
@@ -127,7 +118,6 @@ int		TvCtrlPointRemoveDevice(const char *);
 int		TvCtrlPointRemoveAll(void);
 int		TvCtrlPointRefresh(void);
 
-
 int		TvCtrlPointSendAction(int, int, const char *, const char **, char **, int);
 int		TvCtrlPointSendActionNumericArg(int devnum, int service, const char *actionName, const char *paramName, int paramValue);
 int		TvCtrlPointSendPowerOn(int devnum);
@@ -160,7 +150,7 @@ int		TvCtrlPointCallbackEventHandler(Upnp_EventType, void *, void *);
 void	TvCtrlPointVerifyTimeouts(int);
 void	TvCtrlPointPrintCommands(void);
 void*	TvCtrlPointCommandLoop(void *);
-int		TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionPtr);
+int		TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionPtr, int combo);
 int		TvCtrlPointStop(void);
 int		TvCtrlPointProcessCommand(char *cmdline);
 

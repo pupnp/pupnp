@@ -130,10 +130,6 @@ extern "C" {
 /*! This should be the maximum VARCOUNT from above */
 #define TV_MAXVARS TV_PICTURE_VARCOUNT
 
-extern const char TvDeviceType[];
-
-extern const char *TvServiceType[];
-
 /*!
  * \brief Prototype for all actions. For each action that a service 
  * implements, there is a corresponding function with this prototype.
@@ -193,7 +189,7 @@ extern ithread_mutex_t TVDevMutex;
 int SetActionTable(
 	/*! [in] one of TV_SERVICE_CONTROL or, TV_SERVICE_PICTURE. */
 	int serviceType,
-	/*! [out] service containing action table to set. */
+	/*! [in,out] service containing action table to set. */
 	struct TvService *out);
 
 /*!
@@ -225,7 +221,7 @@ int TvDeviceHandleSubscriptionRequest(
  * picture service, then respond with the variable value.
  */
 int TvDeviceHandleGetVarRequest(
-	/*! [in] The control get variable request event structure. */
+	/*! [in,out] The control get variable request event structure. */
 	UpnpStateVarRequest *cgv_event);
 
 /*!
@@ -235,7 +231,7 @@ int TvDeviceHandleGetVarRequest(
  * or picture service, then perform the action and respond.
  */
 int TvDeviceHandleActionRequest(
-	/*! [in] The control action request event structure. */
+	/*! [in,out] The control action request event structure. */
 	UpnpActionRequest *ca_event);
 
 /*!
@@ -529,7 +525,9 @@ int TvDeviceStart(
 	 * may be NULL. Default is ./web (for Linux) or ../tvdevice/web. */
 	const char *web_dir_path,
 	/*! [in] print function to use. */
-	print_string pfun);
+	print_string pfun,
+	/*! [in] Non-zero if called from the combo application. */
+	int combo);
 
 /*!
  * \brief Stops the device. Uninitializes the sdk.

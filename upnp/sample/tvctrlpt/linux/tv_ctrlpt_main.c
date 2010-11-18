@@ -29,6 +29,8 @@
  *
  ******************************************************************************/
 
+#define ALLOC_COMMON_DATA
+#include "common_data.h"
 #include "sample_util.h"
 #include "tv_ctrlpt.h"
 
@@ -366,7 +368,7 @@ int main(int argc, char **argv)
 #endif
 	int code;
 
-	rc = TvCtrlPointStart(linux_print, NULL);
+	rc = TvCtrlPointStart(linux_print, NULL, 0);
 	if (rc != TV_SUCCESS) {
 		SampleUtil_Print("Error starting UPnP TV Control Point\n");
 		return rc;
