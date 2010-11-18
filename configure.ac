@@ -147,51 +147,79 @@ dnl ############################################################################
 dnl # Release 1.6.7:
 dnl # "current:revision:age"
 dnl #
-dnl # - Code has changed in upnp
-dnl #	revision: 5 -> 6
 dnl # - Code has changed in threadutil
 dnl #	revision: 3 -> 4
-dnl # - Interfaces have been changed, added and removed in upnp
-dnl #	current: 4 -> 5
-dnl #   revision: 4 -> 0
-dnl #
-dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:0:2])
-dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
-dnl #
-dnl ############################################################################
-dnl # Release 1.6.8:
-dnl # "current:revision:age"
-dnl #
-dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:0:2])
-dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
-dnl #
-dnl ############################################################################
-dnl # Release 1.8.0:
-dnl # "current:revision:age"
-dnl #
 dnl # - Code has changed in upnp
 dnl #	revision: 5 -> 6
 dnl # - Interfaces have been changed, added and removed in upnp
 dnl #	current: 3 -> 4
 dnl #   revision: 6 -> 0
-dnl # - Interface has been removed in upnp
-dnl #   age = 0
-dnl # - Code has changed in threadutil
-dnl #	revision: 3 -> 4
-dnl # - Interfaces have been changed, added and removed in upnp
-dnl #	current: 4 -> 5
-dnl #   revision: 4 -> 0
+dnl # - Interfaces removed in upnp:
+dnl #   age: -> 0
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
 dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:0:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
+dnl #
+dnl # Obs.: 1.6.7 was released with a version error, the correct nubers should
+dnl # have been:
 dnl #AC_SUBST([LT_VERSION_UPNP],       [4:0:0])
 dnl #
 dnl ############################################################################
-AC_SUBST([LT_VERSION_IXML],       [2:4:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [5:0:2])
-AC_SUBST([LT_VERSION_UPNP],       [4:0:0])
+dnl # Release 1.6.8:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in ixml
+dnl #	revision: 4 -> 5
+dnl # - Code has changed in threadutil
+dnl #	revision: 0 -> 1
+dnl # - Code has changed in upnp
+dnl #	revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:5:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:1:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [4:1:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.9:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in threadutil
+dnl #	revision: 1 -> 2
+dnl # - Code has changed in upnp
+dnl #	revision: 1 -> 2
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:5:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:2:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [4:2:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.10:
+dnl # "current:revision:age"
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:5:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:2:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [4:2:0])
+dnl #
+dnl ############################################################################
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:5:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:2:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [4:2:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.8.0:
+dnl # "current:revision:age"
+dnl #
+dnl # - Start from a new ground.
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [6:0:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [6:0:0])
+dnl #
+dnl ############################################################################
+AC_SUBST([LT_VERSION_IXML],       [6:0:0])
+AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+AC_SUBST([LT_VERSION_UPNP],       [6:0:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
