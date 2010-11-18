@@ -31,7 +31,6 @@
 
 #include "tv_ctrlpt.h"
 
-#include "common_data.h"
 #include "upnp.h"
 
 /*!

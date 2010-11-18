@@ -30,10 +30,9 @@
  ******************************************************************************/
 
 
+#define SAMPLE_UTIL_C
 #include "sample_util.h"
 
-#define ALLOC_COMMON_DATA
-#include "common_data.h"
 #include "tv_ctrlpt.h"
 #include "tv_device.h"
 
