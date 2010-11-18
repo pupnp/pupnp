@@ -530,6 +530,22 @@ int TvDeviceStart(
 	int combo);
 
 /*!
+ * \brief Main entry point for tv device application.
+ *
+ * Initializes and registers with the sdk.
+ * Initializes the state stables of the service.
+ * Starts the command loop.
+ *
+ * Accepts the following optional arguments:
+ *	\li \c -ip ipaddress
+ *	\li \c -port port
+ *	\li \c -desc desc_doc_name
+ *	\li \c -webdir web_dir_path"
+ *	\li \c -help
+ */
+int device_main(int argc, char *argv[]);
+
+/*!
  * \brief Stops the device. Uninitializes the sdk.
  */
 int TvDeviceStop(void);

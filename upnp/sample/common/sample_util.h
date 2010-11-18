@@ -230,6 +230,16 @@ void SampleUtil_StateUpdate(
 	/*! [in] . */
 	eventType type);
 
+/*!
+ * \brief Prints a string to standard out.
+ */
+void linux_print(const char *format, ...)
+#if (__GNUC__ >= 3)
+	/* This enables printf like format checking by the compiler */
+	__attribute__((format (__printf__, 1, 2)))
+#endif
+;
+
 #ifdef __cplusplus
 };
 #endif /* __cplusplus */
