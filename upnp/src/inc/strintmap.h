@@ -39,7 +39,7 @@
 
 typedef struct /* str_int_entry */
 {
-	char *name;		/* a value in string form */
+	const char *name;	/* a value in string form */
 	int  id;		/* same value in integer form */
 } str_int_entry;
 

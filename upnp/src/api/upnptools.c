@@ -119,10 +119,9 @@ struct ErrorString ErrorMessages[] = {
 	{UPNP_E_INTERNAL_ERROR, "UPNP_E_INTERNAL_ERROR"},
 };
 
-
 const char *UpnpGetErrorMessage(int rc)
 {
-	int i;
+	size_t i;
 
 	for (i = 0; i < sizeof (ErrorMessages) / sizeof (ErrorMessages[0]); ++i) {
 		if (rc == ErrorMessages[i].rc) {
@@ -132,7 +131,6 @@ const char *UpnpGetErrorMessage(int rc)
 
 	return "Unknown error code";
 }
-
 
 /*!
  * \todo There is some unnecessary allocation and deallocation going on here

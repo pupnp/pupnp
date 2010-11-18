@@ -229,51 +229,50 @@ void UpnpDisplayFileAndLine(
 	fflush(fd);
 }
 
-
 void UpnpDisplayBanner(
 	FILE * fd,
 	const char **lines,
 	size_t size,
-	int starLength)
+	size_t starLength)
 {
-	int leftMarginLength = starLength / 2 + 1;
-	int rightMarginLength = starLength / 2 + 1;
-	int i = 0;
-	int LineSize = 0;
-	int starLengthMinus2 = starLength - 2;
+	size_t leftMarginLength = starLength / 2 + 1;
+	size_t rightMarginLength = starLength / 2 + 1;
+	size_t i = 0;
+	size_t LineSize = 0;
+	size_t starLengthMinus2 = starLength - 2;
 
-	char *leftMargin = ( char * )malloc( leftMarginLength );
-	char *rightMargin = ( char * )malloc( rightMarginLength );
-	char *stars = ( char * )malloc( starLength + 1 );
-	char *currentLine = ( char * )malloc( starLength + 1 );
+	char *leftMargin = malloc(leftMarginLength);
+	char *rightMargin = malloc(rightMarginLength);
+	char *stars = malloc(starLength + 1);
+	char *currentLine = malloc(starLength + 1);
 	const char *line = NULL;
 
-	memset( stars, '*', starLength );
+	memset(stars, '*', starLength);
 	stars[starLength] = 0;
-	memset( leftMargin, 0, leftMarginLength );
-	memset( rightMargin, 0, rightMarginLength );
-	fprintf( fd, "\n%s\n", stars );
-	for( i = 0; i < size; i++ ) {
-		LineSize = strlen( lines[i] );
+	memset(leftMargin, 0, leftMarginLength);
+	memset(rightMargin, 0, rightMarginLength);
+	fprintf(fd, "\n%s\n", stars);
+	for (i = 0; i < size; i++) {
+		LineSize = strlen(lines[i]);
 		line = lines[i];
-		while( LineSize > starLengthMinus2 ) {
-			memcpy( currentLine, line, starLengthMinus2 );
+		while (LineSize > starLengthMinus2) {
+			memcpy(currentLine, line, starLengthMinus2);
 			currentLine[starLengthMinus2] = 0;
-			fprintf( fd, "*%s*\n", currentLine );
+			fprintf(fd, "*%s*\n", currentLine);
 			LineSize -= starLengthMinus2;
 			line += starLengthMinus2;
 		}
-		leftMarginLength = (starLengthMinus2 - LineSize)/2;
-		if( LineSize % 2 == 0 ) {
+		leftMarginLength = (starLengthMinus2 - LineSize) / 2;
+		if (LineSize % 2 == 0) {
 			rightMarginLength = leftMarginLength;
 		} else {
 			rightMarginLength = leftMarginLength + 1;
 		}
-		memset( leftMargin, ' ', leftMarginLength );
-		memset( rightMargin, ' ', rightMarginLength );
+		memset(leftMargin, ' ', leftMarginLength);
+		memset(rightMargin, ' ', rightMarginLength);
 		leftMargin[leftMarginLength] = 0;
 		rightMargin[rightMarginLength] = 0;
-		fprintf( fd, "*%s%s%s*\n", leftMargin, line, rightMargin );
+		fprintf(fd, "*%s%s%s*\n", leftMargin, line, rightMargin);
 	}
 	fprintf(fd, "%s\n\n", stars);
 
@@ -282,7 +281,6 @@ void UpnpDisplayBanner(
 	free(rightMargin);
 	free(leftMargin);
 }
-
 
 void PrintThreadPoolStats(
 	ThreadPool *tp, 
