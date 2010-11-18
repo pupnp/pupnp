@@ -800,9 +800,9 @@ void TvStateUpdate(char *UDN, int Service, IXML_Document *ChangedVariables,
 	IXML_NodeList *variables;
 	IXML_Element *property;
 	IXML_Element *variable;
-	int length;
-	int length1;
-	int i;
+	long unsigned int length;
+	long unsigned int length1;
+	long unsigned int i;
 	int j;
 	char *tmpstate = NULL;
 
@@ -1126,23 +1126,10 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 	Cookie = Cookie;
 }
 
-/********************************************************************************
- * TvCtrlPointVerifyTimeouts
- *
- * Description: 
- *       Checks the advertisement  each device
- *        in the global device list.  If an advertisement expires,
- *       the device is removed from the list.  If an advertisement is about to
- *       expire, a search request is sent for that device.  
- *
- * Parameters:
- *    incr -- The increment to subtract from the timeouts each time the
- *            function is called.
- *
- ********************************************************************************/
 void TvCtrlPointVerifyTimeouts(int incr)
 {
-	struct TvDeviceNode *prevdevnode, *curdevnode;
+	struct TvDeviceNode *prevdevnode;
+	struct TvDeviceNode *curdevnode;
 	int ret;
 
 	ithread_mutex_lock(&DeviceListMutex);
@@ -1196,7 +1183,7 @@ void *TvCtrlPointTimerLoop(void *args)
 	int incr = 30;
 
 	while (TvCtrlPointTimerLoopRun) {
-		isleep(incr);
+		isleep((unsigned int)incr);
 		TvCtrlPointVerifyTimeouts(incr);
 	}
 
