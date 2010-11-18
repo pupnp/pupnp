@@ -30,8 +30,8 @@
  ******************************************************************************/
 
 #include "sample_util.h"
-#include "upnp_tv_ctrlpt.h"
-#include "upnp_tv_device.h"
+#include "tv_ctrlpt.h"
+#include "tv_device.h"
 
 #include <stdarg.h>
 #include <stdio.h>

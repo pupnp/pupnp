@@ -19,21 +19,21 @@ LDADD = \
 noinst_PROGRAMS =
 if ENABLE_SAMPLES
 if ENABLE_CLIENT
-noinst_PROGRAMS += upnp_tv_ctrlpt
-upnp_tv_ctrlpt_CPPFLAGS = \
+noinst_PROGRAMS += tv_ctrlpt
+tv_ctrlpt_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-I$(srcdir)/common/ \
 	-I$(srcdir)/tvctrlpt
 if ENABLE_DEVICE
-noinst_PROGRAMS += upnp_tv_combo
-upnp_tv_combo_CPPFLAGS = $(AM_CPPFLAGS) \
+noinst_PROGRAMS += tv_combo
+tv_combo_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(srcdir)/common/ \
 	-I$(srcdir)/tvcombo
 endif
 endif
 if ENABLE_DEVICE
-noinst_PROGRAMS += upnp_tv_device
-upnp_tv_device_CPPFLAGS = \
+noinst_PROGRAMS += tv_device
+tv_device_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-I$(srcdir)/common/ \
 	-I$(srcdir)/tvdevice
@@ -41,37 +41,37 @@ endif
 endif
 
 
-upnp_tv_device_SOURCES = \
+tv_device_SOURCES = \
 	common/sample_util.c \
 	common/sample_util.h \
-	tvdevice/upnp_tv_device.c \
-	tvdevice/upnp_tv_device.h \
-	tvdevice/linux/upnp_tv_device_main.c
+	tvdevice/tv_device.c \
+	tvdevice/tv_device.h \
+	tvdevice/linux/tv_device_main.c
 
 
-upnp_tv_ctrlpt_SOURCES = \
+tv_ctrlpt_SOURCES = \
 	common/sample_util.c \
 	common/sample_util.h \
-	tvctrlpt/upnp_tv_ctrlpt.c \
-	tvctrlpt/upnp_tv_ctrlpt.h \
-	tvctrlpt/linux/upnp_tv_ctrlpt_main.c
+	tvctrlpt/tv_ctrlpt.c \
+	tvctrlpt/tv_ctrlpt.h \
+	tvctrlpt/linux/tv_ctrlpt_main.c
 
-upnp_tv_combo_SOURCES = \
+tv_combo_SOURCES = \
 	common/sample_util.c \
 	common/sample_util.h \
-	tvcombo/upnp_tv_ctrlpt.c \
-	tvcombo/upnp_tv_ctrlpt.h \
-	tvcombo/upnp_tv_device.c \
-	tvcombo/upnp_tv_device.h \
-	tvcombo/linux/upnp_tv_combo_main.c
+	tvcombo/tv_ctrlpt.c \
+	tvcombo/tv_ctrlpt.h \
+	tvcombo/tv_device.c \
+	tvcombo/tv_device.h \
+	tvcombo/linux/tv_combo_main.c
 
 
 if WITH_DOCUMENTATION
 examplesdir = $(docdir)/examples
 examples_DATA = \
 		$(sort \
-			$(upnp_tv_ctrlpt_SOURCES) \
-			$(upnp_tv_device_SOURCES))
+			$(tv_ctrlpt_SOURCES) \
+			$(tv_device_SOURCES))
 endif
 
 

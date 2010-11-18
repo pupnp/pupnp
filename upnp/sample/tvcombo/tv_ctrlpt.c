@@ -30,7 +30,7 @@
  ******************************************************************************/
 
 
-#include "upnp_tv_ctrlpt.h"
+#include "tv_ctrlpt.h"
 
 
 #include "upnp.h"
@@ -1045,7 +1045,8 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 		UpnpActionComplete *a_event = (UpnpActionComplete *)Event;
 		int errCode = UpnpActionComplete_get_ErrCode(a_event);
 		if (errCode != UPNP_E_SUCCESS) {
-			SampleUtil_Print("Error in  Action Complete Callback -- %d\n",
+			SampleUtil_Print(
+				"Error in  Action Complete Callback -- %d\n",
 				errCode);
 		}
 		/* No need for any processing here, just print out results.
@@ -1250,8 +1251,10 @@ int TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionP
 	rc = UpnpInit(ip_address, port);
 	if (rc != UPNP_E_SUCCESS) {
 		SampleUtil_Print("WinCEStart: UpnpInit() Error: %d\n", rc);
+		/*
 		UpnpFinish();
 		return TV_ERROR;
+		*/
 	}
 	if (!ip_address) {
 		ip_address = UpnpGetServerIpAddress();

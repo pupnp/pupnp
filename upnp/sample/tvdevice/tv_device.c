@@ -29,7 +29,7 @@
  *
  ******************************************************************************/
 
-#include "upnp_tv_device.h"
+#include "tv_device.h"
 
 #include <assert.h>
 
@@ -38,10 +38,13 @@
 #define DESC_URL_SIZE 200
 
 /*! Device type for tv device. */
-extern const char TvDeviceType[];
+const char TvDeviceType[] = "urn:schemas-upnp-org:device:tvdevice:1";
 
 /*! Service types for tv services. */
-extern const char *TvServiceType[];
+const char *TvServiceType[] = {
+	"urn:schemas-upnp-org:service:tvcontrol:1",
+	"urn:schemas-upnp-org:service:tvpicture:1"
+};
 
 /*! Global arrays for storing Tv Control Service variable names, values,
  * and defaults. */
@@ -1393,7 +1396,7 @@ int TvDeviceStart(char *ip_address, unsigned short port,
 	port);
 
     if (!desc_doc_name) {
-        desc_doc_name = "tvcombodesc.xml";
+        desc_doc_name = "tvdevicedesc.xml";
     }
 
     if (!web_dir_path) {

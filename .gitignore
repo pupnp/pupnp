@@ -98,9 +98,9 @@ m4/lt~obsolete.m4
 stamp-h1
 upnp/inc/stamp-h2
 upnp/inc/upnpconfig.h
-upnp/sample/upnp_tv_combo
-upnp/sample/upnp_tv_ctrlpt
-upnp/sample/upnp_tv_device
+upnp/sample/tv_combo
+upnp/sample/tv_ctrlpt
+upnp/sample/tv_device
 upnp/unittest/unittest
 upnp/unittest/*.pp.c
 docs/doxygen
