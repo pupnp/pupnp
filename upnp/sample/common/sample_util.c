@@ -32,6 +32,10 @@
 
 #include "sample_util.h"
 
+#define ALLOC_COMMON_DATA
+#include "common_data.h"
+#include "tv_ctrlpt.h"
+#include "tv_device.h"
 
 #include <assert.h>
 #include <stdarg.h>
@@ -618,5 +622,17 @@ void SampleUtil_StateUpdate(const char *varName, const char *varValue,
 	if (gStateUpdateFun) {
 		gStateUpdateFun(varName, varValue, UDN, type);
 	}
+}
+
+/*!
+ * \brief Prints a string to standard out.
+ */
+void linux_print(const char *format, ...)
+{
+	va_list argList;
+	va_start(argList, format);
+	vfprintf(stdout, format, argList);
+	fflush(stdout);
+	va_end(argList);
 }
 

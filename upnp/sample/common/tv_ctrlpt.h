@@ -143,7 +143,23 @@ int		TvCtrlPointPrintList(void);
 int		TvCtrlPointPrintDevice(int);
 void	TvCtrlPointAddDevice(IXML_Document *, const char *, int); 
 void    TvCtrlPointHandleGetVar(const char *, const char *, const DOMString);
-void	TvStateUpdate(char*,int, IXML_Document * , char **);
+
+/*!
+ * \brief Update a Tv state table. Called when an event is received.
+ *
+ * Note: this function is NOT thread save. It must be called from another
+ * function that has locked the global device list.
+ **/
+void TvStateUpdate(
+	/*! [in] The UDN of the parent device. */
+	char *UDN,
+	/*! [in] The service state table to update. */
+	int Service,
+	/*! [out] DOM document representing the XML received with the event. */
+	IXML_Document *ChangedVariables,
+	/*! [out] pointer to the state table for the Tv  service to update. */
+	char **State);
+
 void	TvCtrlPointHandleEvent(const char *, int, IXML_Document *); 
 void	TvCtrlPointHandleSubscribeUpdate(const char *, const Upnp_SID, int); 
 int		TvCtrlPointCallbackEventHandler(Upnp_EventType, void *, void *);
@@ -153,6 +169,33 @@ void*	TvCtrlPointCommandLoop(void *);
 int		TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionPtr, int combo);
 int		TvCtrlPointStop(void);
 int		TvCtrlPointProcessCommand(char *cmdline);
+
+/*!
+ * \brief Print help info for this application.
+ */
+void TvCtrlPointPrintShortHelp(void);
+
+/*!
+ * \brief Print long help info for this application.
+ */
+void TvCtrlPointPrintLongHelp(void);
+
+/*!
+ * \briefPrint the list of valid command line commands to the user
+ */
+void TvCtrlPointPrintCommands(void);
+
+/*!
+ * \brief Function that receives commands from the user at the command prompt
+ * during the lifetime of the device, and calls the appropriate
+ * functions for those commands.
+ */
+void *TvCtrlPointCommandLoop(void *args);
+
+/*!
+ * \brief
+ */
+int TvCtrlPointProcessCommand(char *cmdline);
 
 #ifdef __cplusplus
 };
