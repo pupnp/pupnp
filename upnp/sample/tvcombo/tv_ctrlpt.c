@@ -30,7 +30,7 @@
  ******************************************************************************/
 
 
-#include "upnp_tv_ctrlpt.h"
+#include "tv_ctrlpt.h"
 
 
 #include "upnp.h"
@@ -1244,8 +1244,10 @@ int TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionP
 	rc = UpnpInit(ip_address, port);
 	if (rc != UPNP_E_SUCCESS) {
 		SampleUtil_Print("WinCEStart: UpnpInit() Error: %d\n", rc);
+		/*
 		UpnpFinish();
 		return TV_ERROR;
+		*/
 	}
 	if (!ip_address) {
 		ip_address = UpnpGetServerIpAddress();
