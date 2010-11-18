@@ -197,9 +197,15 @@ dnl ############################################################################
 dnl # Release 1.6.10:
 dnl # "current:revision:age"
 dnl #
+dnl # - Code has changed in upnp
+dnl #	revision: 2 -> 3
+dnl # - interface has changed in upnp
+dnl #   current: 4 -> 5
+dnl #   revision: 3 -> 0
+dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [2:5:0])
 dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:2:2])
-dnl #AC_SUBST([LT_VERSION_UPNP],       [4:2:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [5:0:0])
 dnl #
 dnl ############################################################################
 dnl #AC_SUBST([LT_VERSION_IXML],       [2:5:0])
