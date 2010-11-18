@@ -32,6 +32,10 @@
 #ifndef UPNP_TV_CTRLPT_H
 #define UPNP_TV_CTRLPT_H
 
+/*!
+ * \file
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -163,7 +167,20 @@ void TvStateUpdate(
 void	TvCtrlPointHandleEvent(const char *, int, IXML_Document *); 
 void	TvCtrlPointHandleSubscribeUpdate(const char *, const Upnp_SID, int); 
 int		TvCtrlPointCallbackEventHandler(Upnp_EventType, void *, void *);
-void	TvCtrlPointVerifyTimeouts(int);
+
+/*!
+ * \brief Checks the advertisement each device in the global device list.
+ *
+ * If an advertisement expires, the device is removed from the list.
+ *
+ * If an advertisement is about to expire, a search request is sent for that
+ * device.
+ */
+void TvCtrlPointVerifyTimeouts(
+	/*! [in] The increment to subtract from the timeouts each time the
+	 * function is called. */
+	int incr);
+
 void	TvCtrlPointPrintCommands(void);
 void*	TvCtrlPointCommandLoop(void *);
 int		TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionPtr, int combo);
