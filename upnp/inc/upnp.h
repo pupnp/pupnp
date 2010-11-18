@@ -1328,7 +1328,7 @@ EXPORT_SPEC int UpnpSetContentLength(
 	 * length needs to be set. */
 	UpnpClient_Handle Hnd,
 	/*! [in] Permissible content length */
-	int contentLength);
+	size_t contentLength);
 
 
 /*!

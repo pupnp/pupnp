@@ -179,7 +179,7 @@ extern char gIF_IPV6[65];
 
 extern char gIF_IPV6_ULA_GUA[INET6_ADDRSTRLEN];
 
-extern int  gIF_INDEX;
+extern unsigned gIF_INDEX;
 
 
 extern unsigned short LOCAL_PORT_V4;
@@ -292,7 +292,7 @@ int getlocalhostname(
 	/*! [out] IP address of the interface. */
 	char *out,
 	/*! [in] Length of the output buffer. */
-	const int out_len);
+	size_t out_len);
 
 
 /*!
