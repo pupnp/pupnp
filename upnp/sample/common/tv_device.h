@@ -530,6 +530,19 @@ int TvDeviceStart(
 	int combo);
 
 /*!
+ * \brief Stops the device. Uninitializes the sdk.
+ */
+int TvDeviceStop(void);
+
+/*!
+ * \brief Function that receives commands from the user at the command prompt
+ * during the lifetime of the device, and calls the appropriate
+ * functions for those commands. Only one command, exit, is currently
+ * defined.
+ */
+void *TvDeviceCommandLoop(void *args);
+
+/*!
  * \brief Main entry point for tv device application.
  *
  * Initializes and registers with the sdk.
@@ -540,15 +553,10 @@ int TvDeviceStart(
  *	\li \c -ip ipaddress
  *	\li \c -port port
  *	\li \c -desc desc_doc_name
- *	\li \c -webdir web_dir_path"
+ *	\li \c -webdir web_dir_path
  *	\li \c -help
  */
 int device_main(int argc, char *argv[]);
-
-/*!
- * \brief Stops the device. Uninitializes the sdk.
- */
-int TvDeviceStop(void);
 
 #ifdef __cplusplus
 }

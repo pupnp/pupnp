@@ -31,8 +31,6 @@
 
 #include "tv_device.h"
 
-#include "common_data.h"
-
 #include <assert.h>
 
 #define DEFAULT_WEB_DIR "./web"
@@ -1343,16 +1341,6 @@ int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Co
 	Cookie = Cookie;
 }
 
-int TvDeviceStop(void)
-{
-    UpnpUnRegisterRootDevice( device_handle );
-    UpnpFinish();
-    SampleUtil_Finish();
-    ithread_mutex_destroy( &TVDevMutex );
-
-    return UPNP_E_SUCCESS;
-}
-
 int TvDeviceStart(char *ip_address, unsigned short port,
 	const char *desc_doc_name, const char *web_dir_path,
 	print_string pfun, int combo)
@@ -1433,6 +1421,46 @@ int TvDeviceStart(char *ip_address, unsigned short port,
 	}
 
 	return UPNP_E_SUCCESS;
+}
+
+int TvDeviceStop(void)
+{
+	UpnpUnRegisterRootDevice(device_handle);
+	UpnpFinish();
+	SampleUtil_Finish();
+	ithread_mutex_destroy(&TVDevMutex);
+
+	return UPNP_E_SUCCESS;
+}
+
+void *TvDeviceCommandLoop(void *args)
+{
+	int stoploop = 0;
+	char cmdline[100];
+	char cmd[100];
+
+	while (!stoploop) {
+		sprintf(cmdline, " ");
+		sprintf(cmd, " ");
+		SampleUtil_Print("\n>> ");
+		/* Get a command line */
+		fgets(cmdline, 100, stdin);
+		sscanf(cmdline, "%s", cmd);
+		if( strcasecmp(cmd, "exit") == 0) {
+			SampleUtil_Print("Shutting down...\n");
+			TvDeviceStop();
+			exit(0);
+		} else {
+			SampleUtil_Print(
+				"\n   Unknown command: %s\n\n", cmd);
+			SampleUtil_Print(
+				"   Valid Commands:\n"
+				"     Exit\n\n");
+		}
+	}
+
+	return NULL;
+	args = args;
 }
 
 int device_main(int argc, char *argv[])

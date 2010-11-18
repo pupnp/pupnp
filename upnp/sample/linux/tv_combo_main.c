@@ -29,48 +29,12 @@
  *
  ******************************************************************************/
 
-#include "common_data.h"
 #include "sample_util.h"
+#include "tv_ctrlpt.h"
 #include "tv_device.h"
 
-#include <stdarg.h>
 #include <stdio.h>
-
-/*!
- * \brief Function that receives commands from the user at the command prompt
- * during the lifetime of the device, and calls the appropriate
- * functions for those commands. Only one command, exit, is currently
- * defined.
- */
-void *TvDeviceCommandLoop(void *args)
-{
-	int stoploop = 0;
-	char cmdline[100];
-	char cmd[100];
-
-	while (!stoploop) {
-		sprintf(cmdline, " ");
-		sprintf(cmd, " ");
-		SampleUtil_Print("\n>> ");
-		/* Get a command line */
-		fgets(cmdline, 100, stdin);
-		sscanf(cmdline, "%s", cmd);
-		if( strcasecmp(cmd, "exit") == 0) {
-			SampleUtil_Print("Shutting down...\n");
-			TvDeviceStop();
-			exit(0);
-		} else {
-			SampleUtil_Print(
-				"\n   Unknown command: %s\n\n", cmd);
-			SampleUtil_Print(
-				"   Valid Commands:\n"
-				"     Exit\n\n");
-		}
-	}
-
-	return NULL;
-	args = args;
-}
+#include <string.h>
 
 int main(int argc, char *argv[])
 {
@@ -84,8 +48,13 @@ int main(int argc, char *argv[])
 	int code;
 
 	device_main(argc, argv);
+	rc = TvCtrlPointStart(linux_print, NULL, 1);
+	if (rc != TV_SUCCESS) {
+		SampleUtil_Print("Error starting UPnP TV Control Point\n");
+		return rc;
+	}
 	/* start a command loop thread */
-	code = ithread_create(&cmdloop_thread, NULL, TvDeviceCommandLoop, NULL);
+	code = ithread_create(&cmdloop_thread, NULL, TvCtrlPointCommandLoop, NULL);
 #ifdef WIN32
 	ithread_join(cmdloop_thread, NULL);
 #else
@@ -95,7 +64,8 @@ int main(int argc, char *argv[])
 	sigwait(&sigs_to_catch, &sig);
 	SampleUtil_Print("Shutting down on signal %d...\n", sig);
 #endif
-	rc = TvDeviceStop();
+	TvDeviceStop();
+	rc = TvCtrlPointStop();
 
 	return rc;
 }

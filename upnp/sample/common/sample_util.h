@@ -48,6 +48,16 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef SAMPLE_UTIL_C
+	/*! Service types for tv services. */
+	const char *TvServiceType[] = {
+		"urn:schemas-upnp-org:service:tvcontrol:1",
+		"urn:schemas-upnp-org:service:tvpicture:1"
+	};
+#else /* SAMPLE_UTIL_C */
+	extern const char *TvServiceType[];
+#endif /* SAMPLE_UTIL_C */
+
 /* mutex to control displaying of events */
 extern ithread_mutex_t display_mutex;
 

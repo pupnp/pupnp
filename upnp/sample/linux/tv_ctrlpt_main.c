@@ -29,15 +29,14 @@
  *
  ******************************************************************************/
 
-#include "common_data.h"
 #include "sample_util.h"
 #include "tv_ctrlpt.h"
-#include "tv_device.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
 	int rc;
 	ithread_t cmdloop_thread;
@@ -48,8 +47,7 @@ int main(int argc, char *argv[])
 #endif
 	int code;
 
-	device_main(argc, argv);
-	rc = TvCtrlPointStart(linux_print, NULL, 1);
+	rc = TvCtrlPointStart(linux_print, NULL, 0);
 	if (rc != TV_SUCCESS) {
 		SampleUtil_Print("Error starting UPnP TV Control Point\n");
 		return rc;
@@ -65,9 +63,10 @@ int main(int argc, char *argv[])
 	sigwait(&sigs_to_catch, &sig);
 	SampleUtil_Print("Shutting down on signal %d...\n", sig);
 #endif
-	TvDeviceStop();
 	rc = TvCtrlPointStop();
 
 	return rc;
+	argc = argc;
+	argv = argv;
 }
 
