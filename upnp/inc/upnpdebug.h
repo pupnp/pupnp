@@ -282,7 +282,7 @@ void UpnpDisplayBanner(
 	/*! [in] Size of the buffer. */
 	size_t size,
 	/*! [in] This parameter provides the width of the banner. */
-	int starlength);
+	size_t starlength);
 #else
 static UPNP_INLINE void UpnpDisplayBanner(
 	FILE *fd,

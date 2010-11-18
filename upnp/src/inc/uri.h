@@ -372,7 +372,7 @@ int parse_uri(
 	/*! [in] Character string containing uri information to be parsed. */
 	const char *in,
 	/*! [in] Maximum limit on the number of characters. */
-	int max,
+	size_t max,
 	/*! [out] Output parameter which will have the parsed uri information. */
 	uri_type *out);
 

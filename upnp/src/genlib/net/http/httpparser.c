@@ -29,26 +29,21 @@
  *
  ******************************************************************************/
 
-
 /*
  * \file
  *
  * \brief Contains functions for scanner and parser for http messages.
  */
 
-
 #define _GNU_SOURCE	/* For strcasestr() in string.h */
 
-
 #include "config.h"
-
 
 #include "strintmap.h"
 #include "httpparser.h"
 #include "statcodes.h"
 #include "unixutil.h"
 #include "upnpdebug.h"
-
 
 #include <assert.h>
 #include <ctype.h>
@@ -57,58 +52,56 @@
 #include <stdio.h>
 #include <string.h>
 
-
 /* entity positions */
-
 
 #define NUM_HTTP_METHODS 9
 static str_int_entry Http_Method_Table[NUM_HTTP_METHODS] = {
-    {"GET", HTTPMETHOD_GET},
-    {"HEAD", HTTPMETHOD_HEAD},
-    {"M-POST", HTTPMETHOD_MPOST},
-    {"M-SEARCH", HTTPMETHOD_MSEARCH},
-    {"NOTIFY", HTTPMETHOD_NOTIFY},
-    {"POST", HTTPMETHOD_POST},
-    {"SUBSCRIBE", HTTPMETHOD_SUBSCRIBE},
-    {"UNSUBSCRIBE", HTTPMETHOD_UNSUBSCRIBE},
-    {"POST", SOAPMETHOD_POST},
+	{"GET", HTTPMETHOD_GET},
+	{"HEAD", HTTPMETHOD_HEAD},
+	{"M-POST", HTTPMETHOD_MPOST},
+	{"M-SEARCH", HTTPMETHOD_MSEARCH},
+	{"NOTIFY", HTTPMETHOD_NOTIFY},
+	{"POST", HTTPMETHOD_POST},
+	{"SUBSCRIBE", HTTPMETHOD_SUBSCRIBE},
+	{"UNSUBSCRIBE", HTTPMETHOD_UNSUBSCRIBE},
+	{"POST", SOAPMETHOD_POST},
 };
 
 #define NUM_HTTP_HEADER_NAMES 33
 str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES] = {
-    {"ACCEPT", HDR_ACCEPT},
-    {"ACCEPT-CHARSET", HDR_ACCEPT_CHARSET},
-    {"ACCEPT-ENCODING", HDR_ACCEPT_ENCODING},
-    {"ACCEPT-LANGUAGE", HDR_ACCEPT_LANGUAGE},
-    {"ACCEPT-RANGES", HDR_ACCEPT_RANGE},
-    {"CACHE-CONTROL", HDR_CACHE_CONTROL},
-    {"CALLBACK", HDR_CALLBACK},
-    {"CONTENT-ENCODING", HDR_CONTENT_ENCODING},
-    {"CONTENT-LANGUAGE", HDR_CONTENT_LANGUAGE},
-    {"CONTENT-LENGTH", HDR_CONTENT_LENGTH},
-    {"CONTENT-LOCATION", HDR_CONTENT_LOCATION},
-    {"CONTENT-RANGE", HDR_CONTENT_RANGE},
-    {"CONTENT-TYPE", HDR_CONTENT_TYPE},
-    {"DATE", HDR_DATE},
-    {"EXT", HDR_EXT},
-    {"HOST", HDR_HOST},
-    {"IF-RANGE", HDR_IF_RANGE},
-    {"LOCATION", HDR_LOCATION},
-    {"MAN", HDR_MAN},
-    {"MX", HDR_MX},
-    {"NT", HDR_NT},
-    {"NTS", HDR_NTS},
-    {"RANGE", HDR_RANGE},
-    {"SEQ", HDR_SEQ},
-    {"SERVER", HDR_SERVER},
-    {"SID", HDR_SID},
-    {"SOAPACTION", HDR_SOAPACTION},
-    {"ST", HDR_ST},
-    {"TE", HDR_TE},
-    {"TIMEOUT", HDR_TIMEOUT},
-    {"TRANSFER-ENCODING", HDR_TRANSFER_ENCODING},
-    {"USER-AGENT", HDR_USER_AGENT},
-    {"USN", HDR_USN}
+	{"ACCEPT", HDR_ACCEPT},
+	{"ACCEPT-CHARSET", HDR_ACCEPT_CHARSET},
+	{"ACCEPT-ENCODING", HDR_ACCEPT_ENCODING},
+	{"ACCEPT-LANGUAGE", HDR_ACCEPT_LANGUAGE},
+	{"ACCEPT-RANGES", HDR_ACCEPT_RANGE},
+	{"CACHE-CONTROL", HDR_CACHE_CONTROL},
+	{"CALLBACK", HDR_CALLBACK},
+	{"CONTENT-ENCODING", HDR_CONTENT_ENCODING},
+	{"CONTENT-LANGUAGE", HDR_CONTENT_LANGUAGE},
+	{"CONTENT-LENGTH", HDR_CONTENT_LENGTH},
+	{"CONTENT-LOCATION", HDR_CONTENT_LOCATION},
+	{"CONTENT-RANGE", HDR_CONTENT_RANGE},
+	{"CONTENT-TYPE", HDR_CONTENT_TYPE},
+	{"DATE", HDR_DATE},
+	{"EXT", HDR_EXT},
+	{"HOST", HDR_HOST},
+	{"IF-RANGE", HDR_IF_RANGE},
+	{"LOCATION", HDR_LOCATION},
+	{"MAN", HDR_MAN},
+	{"MX", HDR_MX},
+	{"NT", HDR_NT},
+	{"NTS", HDR_NTS},
+	{"RANGE", HDR_RANGE},
+	{"SEQ", HDR_SEQ},
+	{"SERVER", HDR_SERVER},
+	{"SID", HDR_SID},
+	{"SOAPACTION", HDR_SOAPACTION},
+	{"ST", HDR_ST},
+	{"TE", HDR_TE},
+	{"TIMEOUT", HDR_TIMEOUT},
+	{"TRANSFER-ENCODING", HDR_TRANSFER_ENCODING},
+	{"USER-AGENT", HDR_USER_AGENT},
+	{"USN", HDR_USN},
 };
 
 /***********************************************************************/

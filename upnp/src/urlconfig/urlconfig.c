@@ -106,47 +106,41 @@ addrToString( IN const struct sockaddr *addr,
 *
 *	Note : 'newAlias' should be freed using free()
 ************************************************************************/
-static UPNP_INLINE int
-calc_alias( IN const char *alias,
-            IN const char *rootPath,
-            OUT char **newAlias )
+static UPNP_INLINE int calc_alias(
+	IN const char *alias,
+	IN const char *rootPath,
+	OUT char **newAlias)
 {
-    const char *aliasPtr;
-    size_t root_len;
-    char *temp_str;
-    size_t new_alias_len;
-    char *alias_temp;
+	const char *aliasPtr;
+	size_t root_len;
+	const char *temp_str;
+	size_t new_alias_len;
+	char *alias_temp;
 
-    assert( rootPath );
-    assert( alias );
+	assert(rootPath);
+	assert(alias);
 
-    /* add / suffix, if missing */
-    root_len = strlen( rootPath );
-    if( root_len == 0 || rootPath[root_len - 1] != '/' ) {
-        temp_str = "/";
-    } else {
-        temp_str = "";          /* suffix already present */
-    }
+	/* add / suffix, if missing */
+	root_len = strlen(rootPath);
+	if (root_len == 0 || rootPath[root_len - 1] != '/')
+		temp_str = "/";
+	else
+		temp_str = "";	/* suffix already present */
+	/* discard / prefix, if present */
+	if (alias[0] == '/')
+		aliasPtr = alias + 1;
+	else 
+		aliasPtr = alias;
+	new_alias_len = root_len + strlen(temp_str) + strlen(aliasPtr);
+	alias_temp = malloc(new_alias_len + 1);
+	if (alias_temp == NULL)
+		return UPNP_E_OUTOF_MEMORY;
+	strcpy(alias_temp, rootPath);
+	strcat(alias_temp, temp_str);
+	strcat(alias_temp, aliasPtr);
 
-    /* discard / prefix, if present */
-    if( alias[0] == '/' ) {
-        aliasPtr = alias + 1;
-    } else {
-        aliasPtr = alias;
-    }
-
-    new_alias_len = root_len + strlen( temp_str ) + strlen( aliasPtr );
-    alias_temp = ( char * )malloc( new_alias_len + 1 );
-    if( alias_temp == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
-    }
-
-    strcpy( alias_temp, rootPath );
-    strcat( alias_temp, temp_str );
-    strcat( alias_temp, aliasPtr );
-
-    *newAlias = alias_temp;
-    return UPNP_E_SUCCESS;
+	*newAlias = alias_temp;
+	return UPNP_E_SUCCESS;
 }
 
 /************************************************************************
@@ -167,30 +161,27 @@ calc_alias( IN const char *alias,
 *
 *	Note :
 ************************************************************************/
-static UPNP_INLINE int
-calc_descURL( IN const char *ipPortStr,
-              IN const char *alias,
-              OUT char descURL[LINE_SIZE] )
+static UPNP_INLINE int calc_descURL(
+	IN const char *ipPortStr,
+	IN const char *alias,
+	OUT char descURL[LINE_SIZE])
 {
-    size_t len;
-    const char *http_scheme = "http://";
+	size_t len;
+	const char *http_scheme = "http://";
 
-    assert( ipPortStr != NULL && strlen( ipPortStr ) > 0 );
-    assert( alias != NULL && strlen( alias ) > 0 );
+	assert(ipPortStr != NULL && strlen(ipPortStr) > 0);
+	assert(alias != NULL && strlen(alias) > 0);
 
-    len = strlen( http_scheme ) + strlen( ipPortStr ) + strlen( alias );
+	len = strlen(http_scheme) + strlen(ipPortStr) + strlen(alias);
+	if (len > (LINE_SIZE - 1))
+		return UPNP_E_URL_TOO_BIG;
+	strcpy(descURL, http_scheme);
+	strcat(descURL, ipPortStr);
+	strcat(descURL, alias);
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+		   "desc url: %s\n", descURL);
 
-    if( len > ( LINE_SIZE - 1 ) ) {
-        return UPNP_E_URL_TOO_BIG;
-    }
-    strcpy( descURL, http_scheme );
-    strcat( descURL, ipPortStr );
-    strcat( descURL, alias );
-
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "desc url: %s\n", descURL );
-
-    return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 
 /************************************************************************
@@ -218,143 +209,126 @@ calc_descURL( IN const char *ipPortStr,
 *
 *	Note :
 ************************************************************************/
-static int
-config_description_doc( INOUT IXML_Document * doc,
-                        IN const char *ip_str,
-                        OUT char **root_path_str )
+static int config_description_doc(
+	INOUT IXML_Document *doc,
+	IN const char *ip_str,
+	OUT char **root_path_str )
 {
-    xboolean addNew = FALSE;
-    IXML_NodeList *baseList;
-    IXML_Element *element = NULL;
-    IXML_Element *newElement = NULL;
-    IXML_Node *textNode = NULL;
-    IXML_Node *rootNode = NULL;
-    IXML_Node *urlbase_node = NULL;
-    char *urlBaseStr = "URLBase";
-    const DOMString domStr = NULL;
-    uri_type uri;
-    int err_code;
-    int len;
-    membuffer url_str;
-    membuffer root_path;
+	xboolean addNew = FALSE;
+	IXML_NodeList *baseList;
+	IXML_Element *element = NULL;
+	IXML_Element *newElement = NULL;
+	IXML_Node *textNode = NULL;
+	IXML_Node *rootNode = NULL;
+	IXML_Node *urlbase_node = NULL;
+	const char *urlBaseStr = "URLBase";
+	const DOMString domStr = NULL;
+	uri_type uri;
+	int err_code;
+	int len;
+	membuffer url_str;
+	membuffer root_path;
 
-    membuffer_init( &url_str );
-    membuffer_init( &root_path );
+	membuffer_init(&url_str);
+	membuffer_init(&root_path);
+	err_code = UPNP_E_OUTOF_MEMORY;	/* default error */
+	baseList = ixmlDocument_getElementsByTagName(doc, urlBaseStr);
+	if (baseList == NULL) {
+		/* urlbase not found -- create new one */
+		addNew = TRUE;
+		element = ixmlDocument_createElement(doc, urlBaseStr);
+		if (element == NULL) {
+			goto error_handler;
+		}
+		if (membuffer_append_str(&url_str, "http://") != 0 ||
+		    membuffer_append_str(&url_str, ip_str) != 0 ||
+		    membuffer_append_str(&url_str, "/") != 0 ||
+		    membuffer_append_str(&root_path, "/") != 0) {
+			goto error_handler;
+		}
+		rootNode = ixmlNode_getFirstChild((IXML_Node *) doc);
+		if (rootNode == NULL) {
+			err_code = UPNP_E_INVALID_DESC;
+			goto error_handler;
+		}
+		err_code =
+		    ixmlNode_appendChild(rootNode, (IXML_Node *) element);
+		if (err_code != IXML_SUCCESS) {
+			goto error_handler;
+		}
+		textNode =
+		    ixmlDocument_createTextNode(doc, (char *)url_str.buf);
+		if (textNode == NULL) {
+			goto error_handler;
+		}
+		err_code =
+		    ixmlNode_appendChild((IXML_Node *) element, textNode);
+		if (err_code != IXML_SUCCESS) {
+			goto error_handler;
+		}
+	} else {
+		/* urlbase found */
+		urlbase_node = ixmlNodeList_item(baseList, 0);
+		assert(urlbase_node != NULL);
+		textNode = ixmlNode_getFirstChild(urlbase_node);
+		if (textNode == NULL) {
+			err_code = UPNP_E_INVALID_DESC;
+			goto error_handler;
+		}
+		domStr = ixmlNode_getNodeValue(textNode);
+		if (domStr == NULL) {
+			err_code = UPNP_E_INVALID_URL;
+			goto error_handler;
+		}
+		len = parse_uri(domStr, strlen(domStr), &uri);
+		if (len < 0 || uri.type != ABSOLUTE) {
+			err_code = UPNP_E_INVALID_URL;
+			goto error_handler;
+		}
+		if (membuffer_assign(&url_str, uri.scheme.buff,
+				     uri.scheme.size) != 0 ||
+		    membuffer_append_str(&url_str, "://") != 0 ||
+		    membuffer_append_str(&url_str, ip_str) != 0) {
+			goto error_handler;
+		}
+		/* add leading '/' if missing from relative path */
+		if ((uri.pathquery.size > 0 && uri.pathquery.buff[0] != '/') ||
+		    (uri.pathquery.size == 0)
+		    ) {
+			if (membuffer_append_str(&url_str, "/") != 0 ||
+			    membuffer_append_str(&root_path, "/") != 0) {
+				goto error_handler;
+			}
+		}
+		if (membuffer_append(&url_str, uri.pathquery.buff,
+				     uri.pathquery.size) != 0 ||
+		    membuffer_append(&root_path, uri.pathquery.buff,
+				     uri.pathquery.size) != 0) {
+			goto error_handler;
+		}
+		/* add trailing '/' if missing */
+		if (url_str.buf[url_str.length - 1] != '/') {
+			if (membuffer_append(&url_str, "/", 1) != 0) {
+				goto error_handler;
+			}
+		}
+		err_code = ixmlNode_setNodeValue(textNode, url_str.buf);
+		if (err_code != IXML_SUCCESS) {
+			goto error_handler;
+		}
+	}
+	*root_path_str = membuffer_detach(&root_path);	/* return path */
+	err_code = UPNP_E_SUCCESS;
 
-    err_code = UPNP_E_OUTOF_MEMORY; /* default error */
+ error_handler:
+	if (err_code != UPNP_E_SUCCESS) {
+		ixmlElement_free(newElement);
+	}
+	ixmlNodeList_free(baseList);
+	membuffer_destroy(&root_path);
+	membuffer_destroy(&url_str);
 
-    baseList = ixmlDocument_getElementsByTagName( doc, urlBaseStr );
-    if( baseList == NULL ) {
-        /* urlbase not found -- create new one */
-        addNew = TRUE;
-        element = ixmlDocument_createElement( doc, urlBaseStr );
-        if( element == NULL ) {
-            goto error_handler;
-        }
-
-        if( membuffer_append_str( &url_str, "http://" ) != 0 ||
-            membuffer_append_str( &url_str, ip_str ) != 0 ||
-            membuffer_append_str( &url_str, "/" ) != 0 ||
-            membuffer_append_str( &root_path, "/" ) != 0 ) {
-            goto error_handler;
-        }
-
-        rootNode = ixmlNode_getFirstChild( ( IXML_Node * ) doc );
-        if( rootNode == NULL ) {
-            err_code = UPNP_E_INVALID_DESC;
-            goto error_handler;
-        }
-
-        err_code =
-            ixmlNode_appendChild( rootNode, ( IXML_Node * ) element );
-        if( err_code != IXML_SUCCESS ) {
-            goto error_handler;
-        }
-
-        textNode =
-            ixmlDocument_createTextNode( doc, ( char * )url_str.buf );
-        if( textNode == NULL ) {
-            goto error_handler;
-        }
-
-        err_code =
-            ixmlNode_appendChild( ( IXML_Node * ) element, textNode );
-        if( err_code != IXML_SUCCESS ) {
-            goto error_handler;
-        }
-
-    } else {
-        /* urlbase found */
-        urlbase_node = ixmlNodeList_item( baseList, 0 );
-        assert( urlbase_node != NULL );
-
-        textNode = ixmlNode_getFirstChild( urlbase_node );
-        if( textNode == NULL ) {
-            err_code = UPNP_E_INVALID_DESC;
-            goto error_handler;
-        }
-
-        domStr = ixmlNode_getNodeValue( textNode );
-        if( domStr == NULL ) {
-            err_code = UPNP_E_INVALID_URL;
-            goto error_handler;
-        }
-
-        len = parse_uri( domStr, strlen( domStr ), &uri );
-        if( len < 0 || uri.type != ABSOLUTE ) {
-            err_code = UPNP_E_INVALID_URL;
-            goto error_handler;
-        }
-
-        if( membuffer_assign( &url_str, uri.scheme.buff,
-                              uri.scheme.size ) != 0 ||
-            membuffer_append_str( &url_str, "://" ) != 0 ||
-            membuffer_append_str( &url_str, ip_str ) != 0 ) {
-            goto error_handler;
-        }
-        /* add leading '/' if missing from relative path */
-        if( ( uri.pathquery.size > 0 && uri.pathquery.buff[0] != '/' ) ||
-            ( uri.pathquery.size == 0 )
-             ) {
-            if( membuffer_append_str( &url_str, "/" ) != 0 ||
-                membuffer_append_str( &root_path, "/" ) != 0 ) {
-                goto error_handler;
-            }
-        }
-
-        if( membuffer_append( &url_str, uri.pathquery.buff,
-                              uri.pathquery.size ) != 0 ||
-            membuffer_append( &root_path, uri.pathquery.buff,
-                              uri.pathquery.size ) != 0 ) {
-            goto error_handler;
-        }
-        /* add trailing '/' if missing */
-        if( url_str.buf[url_str.length - 1] != '/' ) {
-            if( membuffer_append( &url_str, "/", 1 ) != 0 ) {
-                goto error_handler;
-            }
-        }
-
-        err_code = ixmlNode_setNodeValue( textNode, url_str.buf );
-        if( err_code != IXML_SUCCESS ) {
-            goto error_handler;
-        }
-    }
-
-    *root_path_str = membuffer_detach( &root_path );    /* return path */
-    err_code = UPNP_E_SUCCESS;
-
-  error_handler:
-    if( err_code != UPNP_E_SUCCESS ) {
-        ixmlElement_free( newElement );
-    }
-
-    ixmlNodeList_free( baseList );
-
-    membuffer_destroy( &root_path );
-    membuffer_destroy( &url_str );
-
-    return err_code;
+	return err_code;
 }
 
 /************************************************************************

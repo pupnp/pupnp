@@ -705,7 +705,7 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 }
 
 
-int parse_uri(const char *in, int max, uri_type *out)
+int parse_uri(const char *in, size_t max, uri_type *out)
 {
     int begin_path = 0;
     int begin_hostport = 0;
