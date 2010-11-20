@@ -149,7 +149,7 @@ typedef struct URI{
  */
 typedef struct URL_LIST {
 	/*! */
-	int size;
+	size_t size;
 	/*! All the urls, delimited by <> */
 	char *URLs;
 	/*! */
@@ -169,10 +169,10 @@ typedef struct URL_LIST {
  * \return 
  */
 int replace_escaped(
-	/*! [in] String of characters. */
+	/*! [in,out] String of characters. */
 	char *in,
 	/*! [in] Index at which to start checking the characters. */
-	int index,
+	size_t index,
 	/*! [out] . */
 	size_t *max);
 
@@ -288,7 +288,7 @@ int parse_hostport(
 	/*! [in] String of characters representing host and port. */
 	const char *in,
 	/*! [in] Sets a maximum limit. */
-	int max,
+	size_t max,
 	/*! [out] Output parameter where the host and port are represented as
 	 * an internet address. */
 	hostport_type *out);
@@ -388,7 +388,7 @@ int parse_uri_and_unescape(
 	/*! [in] Character string containing uri information to be parsed. */
 	char *in,
 	/*! [in] Maximum limit on the number of characters. */
-	int max,
+	size_t max,
 	/*! [out] Output parameter which will have the parsed uri information. */
 	uri_type *out);
 

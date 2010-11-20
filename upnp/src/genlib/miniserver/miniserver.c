@@ -92,7 +92,7 @@ typedef enum {
 
 
 /*! . */
-unsigned short miniStopSockPort;
+uint16_t miniStopSockPort;
 
 
 /*!
@@ -342,7 +342,7 @@ static void ssdp_read(SOCKET rsock, fd_set *set)
 
 static int receive_from_stopSock(SOCKET ssock, fd_set *set)
 {
-	int byteReceived;
+	ssize_t byteReceived;
 	socklen_t clientLen;
 	struct sockaddr_storage clientAddr;
 	char requestBuf[256];
@@ -460,16 +460,17 @@ static void RunMiniServer(
 /*!
  * \brief Returns port to which socket, sockfd, is bound.
  *
- * \return -1 on error; check errno, otherwise > 0 means port number.
+ * \return -1 on error; check errno. 0 if successfull.
  */
 static int get_port(
 	/*! [in] Socket descriptor. */
-	SOCKET sockfd)
+	SOCKET sockfd,
+	/*! [out] The port value if successful, otherwise, untouched. */
+	uint16_t *port)
 {
 	struct sockaddr_storage sockinfo;
 	socklen_t len;
 	int code;
-	int port = 0;
 
 	len = sizeof(sockinfo);
 	code = getsockname(sockfd, (struct sockaddr *)&sockinfo, &len);
@@ -477,14 +478,14 @@ static int get_port(
 		return -1;
 	}
 	if (sockinfo.ss_family == AF_INET) {
-		port = ntohs(((struct sockaddr_in*)&sockinfo)->sin_port);
+		*port = ntohs(((struct sockaddr_in*)&sockinfo)->sin_port);
 	} else if(sockinfo.ss_family == AF_INET6) {
-		port = ntohs(((struct sockaddr_in6*)&sockinfo)->sin6_port);
+		*port = ntohs(((struct sockaddr_in6*)&sockinfo)->sin6_port);
 	}
 	UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
 		"sockfd = %d, .... port = %d\n", sockfd, port);
 
-	return port;
+	return 0;
 }
 
 
@@ -509,10 +510,10 @@ static int get_miniserver_sockets(
 	MiniServerSockArray *out,
 	/*! [in] port on which the server is listening for incoming IPv4
 	 * connections. */
-	unsigned short listen_port4,
+	uint16_t listen_port4,
 	/*! [in] port on which the server is listening for incoming IPv6
 	 * connections. */
-	unsigned short listen_port6)
+	uint16_t listen_port6)
 {
 	char errorBuffer[ERROR_BUFFER_LEN];
 	struct sockaddr_storage __ss_v4;
@@ -723,8 +724,8 @@ static int get_miniserver_sockets(
 #endif
 			return UPNP_E_LISTEN;
 		}
-		actual_port4 = get_port(listenfd4);
-		if (actual_port4 <= 0) {
+		ret_code = get_port(listenfd4, &actual_port4);
+		if (ret_code < 0) {
 			sock_close(listenfd4);
 #ifdef UPNP_ENABLE_IPV6
 			sock_close(listenfd6);
@@ -745,8 +746,8 @@ static int get_miniserver_sockets(
 			sock_close(listenfd6);
 			return UPNP_E_LISTEN;
 		}
-		actual_port6 = get_port(listenfd6);
-		if (actual_port6 <= 0) {
+		ret_code = get_port(listenfd6, &actual_port6);
+		if (ret_code <= 0) {
 			sock_close(listenfd4);
 			sock_close(listenfd6);
 			return UPNP_E_INTERNAL_ERROR;
@@ -802,8 +803,8 @@ static int get_miniserver_stopsock(
 		sock_close(miniServerStopSock);
 		return UPNP_E_SOCKET_BIND;
 	}
-	miniStopSockPort = get_port( miniServerStopSock );
-	if (miniStopSockPort <= 0) {
+	ret = get_port(miniServerStopSock, &miniStopSockPort);
+	if (ret < 0) {
 		sock_close(miniServerStopSock);
 		return UPNP_E_INTERNAL_ERROR;
 	}
@@ -821,9 +822,9 @@ static UPNP_INLINE void InitMiniServerSockArray(MiniServerSockArray *miniSocket)
 	miniSocket->ssdpSock4 = INVALID_SOCKET;
 	miniSocket->ssdpSock6 = INVALID_SOCKET;
 	miniSocket->ssdpSock6UlaGua = INVALID_SOCKET;
-	miniSocket->stopPort = -1;
-	miniSocket->miniServerPort4 = -1;
-	miniSocket->miniServerPort6 = -1;
+	miniSocket->stopPort = 0;
+	miniSocket->miniServerPort4 = 0;
+	miniSocket->miniServerPort6 = 0;
 	miniSocket->ssdpReqSock4 = INVALID_SOCKET;
 	miniSocket->ssdpReqSock6 = INVALID_SOCKET;
 }
@@ -924,7 +925,7 @@ int StartMiniServer(
 int StopMiniServer()
 {
 	char errorBuffer[ERROR_BUFFER_LEN];
-	int socklen = sizeof (struct sockaddr_in);
+	socklen_t socklen = sizeof (struct sockaddr_in);
 	SOCKET sock;
 	struct sockaddr_in ssdpAddr;
 	char buf[256] = "ShutDown";
@@ -947,7 +948,7 @@ int StopMiniServer()
 		ssdpAddr.sin_family = AF_INET;
 		ssdpAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 		ssdpAddr.sin_port = htons(miniStopSockPort);
-		sendto(sock, buf, (int)bufLen, 0,
+		sendto(sock, buf, bufLen, 0,
 			(struct sockaddr *)&ssdpAddr, socklen);
 		usleep(1000);
 		if (gMServState == MSERV_IDLE) {

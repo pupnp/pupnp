@@ -32,6 +32,10 @@
 #ifndef GENLIB_NET_HTTP_HTTPREADWRITE_H
 #define GENLIB_NET_HTTP_HTTPREADWRITE_H
 
+/*
+ * \file
+ */
+
 #include "config.h"
 #include "upnputil.h"
 #include "sock.h"
@@ -46,39 +50,33 @@
 
 int http_CancelHttpGet(IN void *Handle);
 
-/************************************************************************
- * Function: http_FixUrl
+/*!
+ * \brief Validates URL.
  *
- * Parameters:
- *	IN uri_type* url;		URL to be validated and fixed
- *	OUT uri_type* fixed_url;	URL after being fixed.
- *
- * Description:
- *	Validates URL
- *
- * Returns:
- *	 UPNP_E_INVALID_URL
- * 	 UPNP_E_SUCCESS
- ************************************************************************/
-int http_FixUrl( IN uri_type* url, OUT uri_type* fixed_url );
+ * \return
+ * 	\li \c UPNP_E_INVALID_URL
+ * 	\li \c UPNP_E_SUCCESS
+ */
+int http_FixUrl(
+	/*! [in] URL to be validated and fixed. */
+	uri_type *url,
+	/*! [out] URL after being fixed. */
+	uri_type *fixed_url);
 
-/************************************************************************
- * Function: http_FixStrUrl
+/*!
+ * \brief Parses URL and then validates URL.
  *
- * Parameters:
- *	IN char* urlstr ; 		Character string as a URL
- *	IN int urlstrlen ; 		Length of the character string
- *	OUT uri_type* fixed_url	;	Fixed and corrected URL
- *
- * Description:
- *	Parses URL and then validates URL
- *
- * Returns:
- *	 UPNP_E_INVALID_URL
- * 	 UPNP_E_SUCCESS
- ************************************************************************/
-int http_FixStrUrl( IN const char* urlstr, IN int urlstrlen, OUT uri_type* fixed_url );
-
+ * \return
+ * 	\li \c UPNP_E_INVALID_URL
+ * 	\li \c UPNP_E_SUCCESS
+ */
+int http_FixStrUrl(
+	/*! [in] Character string as a URL. */
+	const char *urlstr,
+	/*! [in] Length of the character string. */
+	size_t urlstrlen,
+	/*! [out] Fixed and corrected URL. */
+	uri_type *fixed_url);
 
 /************************************************************************
  * Function: http_Connect
