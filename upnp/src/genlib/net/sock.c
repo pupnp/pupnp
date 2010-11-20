@@ -117,7 +117,7 @@ static int sock_read_write(
 	fd_set readSet;
 	fd_set writeSet;
 	struct timeval timeout;
-	int numBytes;
+	long numBytes;
 	time_t start_time = time(NULL);
 	SOCKET sockfd = info->socket;
 	long bytes_sent = 0, byte_left = 0, num_written;
@@ -161,7 +161,7 @@ static int sock_read_write(
 #endif
 		if (bRead) {
 			/* read data. */
-			numBytes = recv(sockfd, buffer, bufsize, MSG_NOSIGNAL);
+			numBytes = (long)recv(sockfd, buffer, bufsize, MSG_NOSIGNAL);
 		} else {
 			byte_left = bufsize;
 			bytes_sent = 0;

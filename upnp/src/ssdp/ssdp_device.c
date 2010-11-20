@@ -217,78 +217,75 @@ void ssdp_handle_device_request(
 * Returns: void *
 *	1 if successful else appropriate error
 ***************************************************************************/
-static int
-NewRequestHandler( IN struct sockaddr *DestAddr,
-                   IN int NumPacket,
-                   IN char **RqPacket )
+static int NewRequestHandler(IN struct sockaddr *DestAddr, IN int NumPacket,
+	IN char **RqPacket)
 {
-    char errorBuffer[ERROR_BUFFER_LEN];
-    SOCKET ReplySock;
-    int socklen = sizeof( struct sockaddr_storage );
-    int Index;
-    unsigned long replyAddr = inet_addr( gIF_IPV4 );
-    /* a/c to UPNP Spec */
-    int ttl = 4;
-    int hops = 1;
-    char buf_ntop[64];
-    int ret = UPNP_E_SUCCESS;
+	char errorBuffer[ERROR_BUFFER_LEN];
+	SOCKET ReplySock;
+	socklen_t socklen = sizeof(struct sockaddr_storage);
+	int Index;
+	unsigned long replyAddr = inet_addr(gIF_IPV4);
+	/* a/c to UPNP Spec */
+	int ttl = 4;
+	int hops = 1;
+	char buf_ntop[64];
+	int ret = UPNP_E_SUCCESS;
 
-    ReplySock = socket( DestAddr->sa_family, SOCK_DGRAM, 0 );
-    if ( ReplySock == -1 ) {
-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-            "SSDP_LIB: New Request Handler:"
-            "Error in socket(): %s\n", errorBuffer );
+	ReplySock = socket(DestAddr->sa_family, SOCK_DGRAM, 0);
+	if (ReplySock == -1) {
+		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+			   "SSDP_LIB: New Request Handler:"
+			   "Error in socket(): %s\n", errorBuffer);
 
-        return UPNP_E_OUTOF_SOCKET;
-    }
- 
-    if( DestAddr->sa_family == AF_INET ) {
-        inet_ntop(AF_INET, &((struct sockaddr_in*)DestAddr)->sin_addr, 
-            buf_ntop, sizeof(buf_ntop));
-        setsockopt( ReplySock, IPPROTO_IP, IP_MULTICAST_IF,
-            (char *)&replyAddr, sizeof (replyAddr) );
-        setsockopt( ReplySock, IPPROTO_IP, IP_MULTICAST_TTL,
-            (char *)&ttl, sizeof (int) );
-        socklen = sizeof(struct sockaddr_in);
-    } else if( DestAddr->sa_family == AF_INET6 ) {
-        inet_ntop(AF_INET6, &((struct sockaddr_in6*)DestAddr)->sin6_addr, 
-            buf_ntop, sizeof(buf_ntop));
-        setsockopt( ReplySock, IPPROTO_IPV6, IPV6_MULTICAST_IF,
-            (char *)&gIF_INDEX, sizeof(gIF_INDEX) );
-        setsockopt( ReplySock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
-            (char *)&hops, sizeof(hops) );
-    } else {
-        UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-            "Invalid destination address specified." );
-        ret = UPNP_E_NETWORK_ERROR;
-        goto end_NewRequestHandler;
-    }
+		return UPNP_E_OUTOF_SOCKET;
+	}
 
-    for( Index = 0; Index < NumPacket; Index++ ) {
-        int rc;
-        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-            ">>> SSDP SEND to %s >>>\n%s\n",
-            buf_ntop, *( RqPacket + Index ) );
-        rc = sendto( ReplySock, *( RqPacket + Index ),
-                     strlen( *( RqPacket + Index ) ),
-                     0, DestAddr, socklen );
+	if (DestAddr->sa_family == AF_INET) {
+		inet_ntop(AF_INET, &((struct sockaddr_in *)DestAddr)->sin_addr,
+			  buf_ntop, sizeof(buf_ntop));
+		setsockopt(ReplySock, IPPROTO_IP, IP_MULTICAST_IF,
+			   (char *)&replyAddr, sizeof(replyAddr));
+		setsockopt(ReplySock, IPPROTO_IP, IP_MULTICAST_TTL,
+			   (char *)&ttl, sizeof(int));
+		socklen = sizeof(struct sockaddr_in);
+	} else if (DestAddr->sa_family == AF_INET6) {
+		inet_ntop(AF_INET6,
+			  &((struct sockaddr_in6 *)DestAddr)->sin6_addr,
+			  buf_ntop, sizeof(buf_ntop));
+		setsockopt(ReplySock, IPPROTO_IPV6, IPV6_MULTICAST_IF,
+			   (char *)&gIF_INDEX, sizeof(gIF_INDEX));
+		setsockopt(ReplySock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+			   (char *)&hops, sizeof(hops));
+	} else {
+		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+			   "Invalid destination address specified.");
+		ret = UPNP_E_NETWORK_ERROR;
+		goto end_NewRequestHandler;
+	}
 
-        if (rc == -1) {
-            strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
-                        "SSDP_LIB: New Request Handler:"
-                        "Error in socket(): %s\n", errorBuffer );
-            ret = UPNP_E_SOCKET_WRITE;
-            goto end_NewRequestHandler;
-        }
-    }
+	for (Index = 0; Index < NumPacket; Index++) {
+		ssize_t rc;
+		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+			   ">>> SSDP SEND to %s >>>\n%s\n",
+			   buf_ntop, *(RqPacket + Index));
+		rc = sendto(ReplySock, *(RqPacket + Index),
+			    strlen(*(RqPacket + Index)), 0, DestAddr, socklen);
+		if (rc == -1) {
+			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+				   "SSDP_LIB: New Request Handler:"
+				   "Error in socket(): %s\n", errorBuffer);
+			ret = UPNP_E_SOCKET_WRITE;
+			goto end_NewRequestHandler;
+		}
+	}
 
-end_NewRequestHandler:
-    shutdown( ReplySock, SD_BOTH );
-    UpnpCloseSocket( ReplySock );
+ end_NewRequestHandler:
+	shutdown(ReplySock, SD_BOTH);
+	UpnpCloseSocket(ReplySock);
 
-    return ret;
+	return ret;
 }
 
 /**
@@ -367,9 +364,9 @@ int isUrlV6UlaGua(char *descdocUrl)
 * Returns: void
 *
 ***************************************************************************/
-void CreateServicePacket(
+static void CreateServicePacket(
 	IN int msg_type,
-	IN char *nt,
+	const IN char *nt,
 	IN char *usn,
 	IN char *location,
 	IN int duration,
@@ -377,7 +374,7 @@ void CreateServicePacket(
 	IN int AddressFamily)
 {
 	int ret_code;
-	char *nts;
+	const char *nts;
 	membuffer buf;
 
 	/* Notf == 0 means service shutdown,
@@ -405,23 +402,22 @@ void CreateServicePacket(
 		}
 	} else if (msg_type == MSGTYPE_ADVERTISEMENT ||
 		   msg_type == MSGTYPE_SHUTDOWN) {
-		char *host = NULL;
-		if (msg_type == MSGTYPE_ADVERTISEMENT) {
+		const char *host = NULL;
+
+		if (msg_type == MSGTYPE_ADVERTISEMENT)
 			nts = "ssdp:alive";
-		} else {
+		else
       			/* shutdown */
 			nts = "ssdp:byebye";
-		}
 		/* NOTE: The CACHE-CONTROL and LOCATION headers are not present in
 		 * a shutdown msg, but are present here for MS WinMe interop. */
-		if (AddressFamily == AF_INET) {
+		if (AddressFamily == AF_INET)
 			host = SSDP_IP;
-		} else {
-			if (isUrlV6UlaGua(location)) {
+		else {
+			if (isUrlV6UlaGua(location))
 				host = "[" SSDP_IPV6_SITELOCAL "]";
-			} else {
+			else
 				host = "[" SSDP_IPV6_LINKLOCAL "]";
-			}
 		}
 		ret_code = http_MakeMessage(
 			&buf, 1, 1,
@@ -437,14 +433,11 @@ void CreateServicePacket(
 			"NTS: ", nts,
 			X_USER_AGENT,
 			"USN: ", usn );
-		if (ret_code != 0) {
+		if (ret_code)
 			return;
-		}
-	} else {
+	} else
 		/* unknown msg */
 		assert(0);
-	}
-
 	/* return msg */
 	*packet = membuffer_detach(&buf);
 	membuffer_destroy(&buf);
@@ -959,6 +952,7 @@ DeviceShutdown( IN char *DevType,
     free( msgs[2] );
 
     return ret_code;
+    _Server = _Server;
 }
 
 #endif /* EXCLUDE_SSDP */

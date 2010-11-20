@@ -311,33 +311,31 @@ membuffer_destroy( INOUT membuffer * m )
 *
 *	Note :
 ************************************************************************/
-int
-membuffer_assign( INOUT membuffer * m,
+int membuffer_assign( INOUT membuffer * m,
                   IN const void *buf,
                   IN size_t buf_len )
 {
-    int return_code;
+	int return_code;
 
-    assert( m != NULL );
+	assert(m != NULL);
 
-    /* set value to null */
-    if( buf == NULL ) {
-        membuffer_destroy( m );
-        return 0;
-    }
-    /* alloc mem */
-    return_code = membuffer_set_size( m, buf_len );
-    if( return_code != 0 ) {
-        return return_code;
-    }
-    /* copy */
-    if( buf_len ) {
-        memcpy( m->buf, buf, buf_len );
-        m->buf[buf_len] = 0;        /* null-terminate */
-    }
-    m->length = buf_len;
+	/* set value to null */
+	if (buf == NULL) {
+		membuffer_destroy(m);
+		return 0;
+	}
+	/* alloc mem */
+	return_code = membuffer_set_size(m, buf_len);
+	if (return_code != 0)
+		return return_code;
+	/* copy */
+	if (buf_len) {
+		memcpy(m->buf, buf, buf_len);
+		m->buf[buf_len] = 0;	/* null-terminate */
+	}
+	m->length = buf_len;
 
-    return 0;
+	return 0;
 }
 
 /************************************************************************
@@ -411,61 +409,37 @@ membuffer_append_str( INOUT membuffer * m,
     return membuffer_insert( m, c_str, strlen( c_str ), m->length );
 }
 
-/************************************************************************
-*	Function :	membuffer_insert
-*
-*	Parameters :
-*		INOUT membuffer* m ; buffer whose memory size is to be increased  
-*					and appended.
-*		IN const void* buf ; source buffer whose contents will be 
-*					copied
-*		 IN size_t buf_len ; size of the source buffer
-*		int index ;	index to determine the bounds while movinf the data
-*
-*	Description : Allocates memory for the new data to be inserted. Does
-*		memory management by moving the data from the existing memory to 
-*		the newly allocated memory and then appending the new data.
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int
-membuffer_insert( INOUT membuffer * m,
-                  IN const void *buf,
-                  IN size_t buf_len,
-                  int index )
+int membuffer_insert(membuffer *m, const void *buf, size_t buf_len, size_t index)
 {
-    int return_code;
+	int return_code;
 
-    assert( m != NULL );
+	assert(m != NULL);
 
-    if( index < 0 || index > ( int )m->length )
-        return UPNP_E_OUTOF_BOUNDS;
+	if (index > m->length)
+		return UPNP_E_OUTOF_BOUNDS;
+	if (!buf || !buf_len) {
+		return 0;
+	}
+	/* alloc mem */
+	return_code = membuffer_set_size(m, m->length + buf_len);
+	if (return_code) {
+		return return_code;
+	}
+	/* insert data */
+	/* move data to right of insertion point */
+	memmove(m->buf + index + buf_len, m->buf + index, m->length - index);
+	memcpy(m->buf + index, buf, buf_len);
+	m->length += buf_len;
+	/* null-terminate */
+	m->buf[m->length] = 0;
 
-    if( buf == NULL || buf_len == 0 ) {
-        return 0;
-    }
-    /* alloc mem */
-    return_code = membuffer_set_size( m, m->length + buf_len );
-    if( return_code != 0 ) {
-        return return_code;
-    }
-    /* insert data */
-
-    /* move data to right of insertion point */
-    memmove( m->buf + index + buf_len, m->buf + index, m->length - index );
-    memcpy( m->buf + index, buf, buf_len );
-    m->length += buf_len;
-    m->buf[m->length] = 0;      /* null-terminate */
-
-    return 0;
+	return 0;
 }
 
 void membuffer_delete(membuffer *m, size_t index, size_t num_bytes)
 {
 	int return_value;
-	int new_length;
+	size_t new_length;
 	size_t copy_len;
 
 	assert(m != NULL);

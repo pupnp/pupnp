@@ -225,7 +225,7 @@ static inline void ssdp_handle_device_request(
 * Parameters:
 *	IN http_message_t* hmsg: SSDP message from the device
 *	IN struct sockaddr* dest_addr: Address of the device
-*	IN xboolean timeout: timeout kept by the control point while sending 
+*	IN int timeout: timeout kept by the control point while sending 
 *		search message
 *	IN void* cookie: Cookie stored by the control point application. 
 *		This cookie will be returned to the control point
@@ -242,7 +242,7 @@ static inline void ssdp_handle_device_request(
 void ssdp_handle_ctrlpt_msg(
 	IN http_message_t *hmsg, 
 	IN struct sockaddr_storage *dest_addr,
-	IN xboolean timeout,
+	IN int timeout,
 	IN void *cookie);
 
 /************************************************************************

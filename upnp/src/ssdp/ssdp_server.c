@@ -120,8 +120,8 @@ int AdvertiseAndReply(
 	int Exp)
 {
 	int retVal = UPNP_E_SUCCESS;
-	int i;
-	int j;
+	long unsigned int i;
+	long unsigned int j;
 	int defaultExp = DEFAULT_MAXAGE;
 	struct Handle_Info *SInfo = NULL;
 	char UDNstr[100];
@@ -160,11 +160,11 @@ int AdvertiseAndReply(
 
 		for (i = 0;; i++) {
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-				"Entering new device list with i = %d\n\n", i);
+				"Entering new device list with i = %lu\n\n", i);
 			tmpNode = ixmlNodeList_item(SInfo->DeviceList, i);
 			if (!tmpNode) {
 				UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-					"Exiting new device list with i = %d\n\n", i);
+					"Exiting new device list with i = %lu\n\n", i);
 				break;
 			}
 			dbgStr = ixmlNode_getNodeName(tmpNode);
@@ -461,87 +461,73 @@ Make_Socket_NoBlocking( SOCKET sock )
  ***************************************************************************/
 int unique_service_name(IN char *cmd, IN SsdpEvent *Evt)
 {
-    char TempBuf[COMMAND_LEN];
-    char *TempPtr = NULL;
-    char *Ptr = NULL;
-    char *ptr1 = NULL;
-    char *ptr2 = NULL;
-    char *ptr3 = NULL;
-    int CommandFound = 0;
-    int length = 0;
+	char TempBuf[COMMAND_LEN];
+	char *TempPtr = NULL;
+	char *Ptr = NULL;
+	char *ptr1 = NULL;
+	char *ptr2 = NULL;
+	char *ptr3 = NULL;
+	int CommandFound = 0;
+	size_t n = 0;
 
-    if( ( TempPtr = strstr( cmd, "uuid:schemas" ) ) != NULL ) {
-        ptr1 = strstr( cmd, ":device" );
-        if( ptr1 != NULL ) {
-            ptr2 = strstr( ptr1 + 1, ":" );
-        } else {
-            return -1;
-        }
+	if ((TempPtr = strstr(cmd, "uuid:schemas")) != NULL) {
+		ptr1 = strstr(cmd, ":device");
+		if (ptr1 != NULL)
+			ptr2 = strstr(ptr1 + 1, ":");
+		else
+			return -1;
+		if (ptr2 != NULL)
+			ptr3 = strstr(ptr2 + 1, ":");
+		else
+			return -1;
+		if (ptr3 != NULL)
+			sprintf(Evt->UDN, "uuid:%s", ptr3 + 1);
+		else
+			return -1;
+		ptr1 = strstr(cmd, ":");
+		if (ptr1 != NULL) {
+			n = (size_t)(ptr3 - ptr1);
+			strncpy(TempBuf, ptr1, n);
+			TempBuf[n] = '\0';
+			sprintf(Evt->DeviceType, "urn%s", TempBuf);
+		} else
+			return -1;
+		return 0;
+	}
+	if ((TempPtr = strstr(cmd, "uuid")) != NULL) {
+		if ((Ptr = strstr(cmd, "::")) != NULL) {
+			n = (size_t)(Ptr - TempPtr);
+			strncpy(Evt->UDN, TempPtr, n);
+			Evt->UDN[n] = '\0';
+		} else
+			strcpy(Evt->UDN, TempPtr);
+		CommandFound = 1;
+	}
+	if (strstr(cmd, "urn:") != NULL && strstr(cmd, ":service:") != NULL) {
+		if ((TempPtr = strstr(cmd, "urn")) != NULL) {
+			strcpy(Evt->ServiceType, TempPtr);
+			CommandFound = 1;
+		}
+	}
+	if (strstr(cmd, "urn:") != NULL && strstr(cmd, ":device:") != NULL) {
+		if ((TempPtr = strstr(cmd, "urn")) != NULL) {
+			strcpy(Evt->DeviceType, TempPtr);
+			CommandFound = 1;
+		}
+	}
+	if ((TempPtr = strstr(cmd, "::upnp:rootdevice")) != NULL) {
+		/* Everything before "::upnp::rootdevice" is the UDN. */
+		if (TempPtr != cmd) {
+			n = (size_t)(TempPtr - cmd);
+			strncpy(Evt->UDN, cmd, n);
+			Evt->UDN[n] = 0;
+			CommandFound = 1;
+		}
+	}
+	if (CommandFound == 0)
+		return -1;
 
-        if( ptr2 != NULL ) {
-            ptr3 = strstr( ptr2 + 1, ":" );
-        } else {
-            return -1;
-        }
-
-        if( ptr3 != NULL ) {
-            sprintf( Evt->UDN, "uuid:%s", ptr3 + 1 );
-        } else {
-            return -1;
-        }
-
-        ptr1 = strstr( cmd, ":" );
-        if( ptr1 != NULL ) {
-            strncpy( TempBuf, ptr1, ptr3 - ptr1 );
-            TempBuf[ptr3 - ptr1] = '\0';
-            sprintf( Evt->DeviceType, "urn%s", TempBuf );
-        } else {
-            return -1;
-        }
-        return 0;
-    }
-
-    if( ( TempPtr = strstr( cmd, "uuid" ) ) != NULL ) {
-        if( ( Ptr = strstr( cmd, "::" ) ) != NULL ) {
-            strncpy( Evt->UDN, TempPtr, Ptr - TempPtr );
-            Evt->UDN[Ptr - TempPtr] = '\0';
-        } else {
-            strcpy( Evt->UDN, TempPtr );
-        }
-        CommandFound = 1;
-    }
-
-    if( strstr( cmd, "urn:" ) != NULL
-        && strstr( cmd, ":service:" ) != NULL ) {
-        if( ( TempPtr = strstr( cmd, "urn" ) ) != NULL ) {
-            strcpy( Evt->ServiceType, TempPtr );
-            CommandFound = 1;
-        }
-    }
-
-    if( strstr( cmd, "urn:" ) != NULL
-        && strstr( cmd, ":device:" ) != NULL ) {
-        if( ( TempPtr = strstr( cmd, "urn" ) ) != NULL ) {
-            strcpy( Evt->DeviceType, TempPtr );
-            CommandFound = 1;
-        }
-    }
-
-    if( ( TempPtr = strstr( cmd, "::upnp:rootdevice" ) ) != NULL ) {
-        /* Everything before "::upnp::rootdevice" is the UDN. */
-        if( TempPtr != cmd ) {
-            length = TempPtr - cmd;
-            strncpy(Evt->UDN, cmd, length);
-            Evt->UDN[length] = 0;
-            CommandFound = 1;
-        }
-    }
-   
-    if( CommandFound == 0 ) {
-        return -1;
-    }
-
-    return 0;
+	return 0;
 }
 
 /************************************************************************
@@ -779,102 +765,85 @@ static void ssdp_event_handler_thread(void *the_data)
  * Returns: void
  *
  ***************************************************************************/
-void
-readFromSSDPSocket( SOCKET socket )
+void readFromSSDPSocket(SOCKET socket)
 {
-    char *requestBuf = NULL;
-    char staticBuf[BUFSIZE];
-    struct sockaddr_storage __ss;
-    ThreadPoolJob job;
-    ssdp_thread_data *data = NULL;
-    socklen_t socklen = sizeof( __ss );
-    int byteReceived = 0;
-    char ntop_buf[64];
+	char *requestBuf = NULL;
+	char staticBuf[BUFSIZE];
+	struct sockaddr_storage __ss;
+	ThreadPoolJob job;
+	ssdp_thread_data *data = NULL;
+	socklen_t socklen = sizeof(__ss);
+	ssize_t byteReceived = 0;
+	char ntop_buf[64];
 
-    requestBuf = staticBuf;
-
-    /* in case memory can't be allocated, still drain the socket using a
-     * static buffer. */
-    data = ( ssdp_thread_data * )
-        malloc( sizeof( ssdp_thread_data ) );
-
-    if( data != NULL ) {
-        /* initialize parser */
+	requestBuf = staticBuf;
+	/* in case memory can't be allocated, still drain the socket using a
+	 * static buffer. */
+	data = malloc(sizeof(ssdp_thread_data));
+	if (data) {
+		/* initialize parser */
 #ifdef INCLUDE_CLIENT_APIS
 #ifdef UPNP_ENABLE_IPV6
-        if( socket == gSsdpReqSocket4 || socket == gSsdpReqSocket6 ) {
-            parser_response_init( &data->parser, HTTPMETHOD_MSEARCH );
-        } else {
-            parser_request_init( &data->parser );
-        }
-#else
-        if( socket == gSsdpReqSocket4 ) {
-            parser_response_init( &data->parser, HTTPMETHOD_MSEARCH );
-        } else {
-            parser_request_init( &data->parser );
-        }
-
-#endif
-#else
-        parser_request_init( &data->parser );
-#endif
-        /* set size of parser buffer */
-        if( membuffer_set_size( &data->parser.msg.msg, BUFSIZE ) == 0 ) {
-            /* use this as the buffer for recv */
-            requestBuf = data->parser.msg.msg.buf;
-
-        } else {
-            free( data );
-            data = NULL;
-        }
-    }
-    byteReceived = recvfrom( socket, requestBuf,
-                             BUFSIZE - 1, 0,
-                             (struct sockaddr *)&__ss, &socklen );
-
-    if( byteReceived > 0 ) {
-        requestBuf[byteReceived] = '\0';
-
-        if( __ss.ss_family == AF_INET )
-            inet_ntop( AF_INET, &((struct sockaddr_in*)&__ss)->sin_addr, ntop_buf, sizeof(ntop_buf) );
+		if (socket == gSsdpReqSocket4 || socket == gSsdpReqSocket6)
+			parser_response_init(&data->parser, HTTPMETHOD_MSEARCH);
+		else
+			parser_request_init(&data->parser);
+#else /* UPNP_ENABLE_IPV6 */
+		if (socket == gSsdpReqSocket4)
+			parser_response_init(&data->parser, HTTPMETHOD_MSEARCH);
+		else
+			parser_request_init(&data->parser);
+#endif /* UPNP_ENABLE_IPV6 */
+#else /* INCLUDE_CLIENT_APIS */
+		parser_request_init(&data->parser);
+#endif /* INCLUDE_CLIENT_APIS */
+		/* set size of parser buffer */
+		if (membuffer_set_size(&data->parser.msg.msg, BUFSIZE) == 0)
+			/* use this as the buffer for recv */
+			requestBuf = data->parser.msg.msg.buf;
+		else {
+			free(data);
+			data = NULL;
+		}
+	}
+	byteReceived = recvfrom(socket, requestBuf, BUFSIZE - 1, 0,
+		(struct sockaddr *)&__ss, &socklen);
+	if (byteReceived > 0) {
+		requestBuf[byteReceived] = '\0';
+		if (__ss.ss_family == AF_INET)
+			inet_ntop(AF_INET,
+				&((struct sockaddr_in *)&__ss)->sin_addr,
+				ntop_buf, sizeof(ntop_buf));
 #ifdef UPNP_ENABLE_IPV6
-        else if( __ss.ss_family == AF_INET6 )
-            inet_ntop( AF_INET6, &((struct sockaddr_in6*)&__ss)->sin6_addr, ntop_buf, sizeof(ntop_buf) );
+		else if (__ss.ss_family == AF_INET6)
+			inet_ntop(AF_INET6,
+				&((struct sockaddr_in6 *)&__ss)->sin6_addr,
+				ntop_buf, sizeof(ntop_buf));
 #endif
-        else
-            strncpy( ntop_buf, "<Invalid address family>", sizeof(ntop_buf) );
-
-        UpnpPrintf( UPNP_INFO, SSDP,
-            __FILE__, __LINE__,
-            "Start of received response ----------------------------------------------------\n"
-            "%s\n"
-            "End of received response ------------------------------------------------------\n"
-            "From host %s\n",
-            requestBuf,
-            ntop_buf );
-        UpnpPrintf( UPNP_PACKET, SSDP, __FILE__, __LINE__,
-            "Start of received multicast packet --------------------------------------------\n"
-            "%s\n"
-            "End of received multicast packet ----------------------------------------------\n",
-            requestBuf );
-        /* add thread pool job to handle request */
-        if( data != NULL ) {
-            data->parser.msg.msg.length += byteReceived;
-            /* null-terminate */
-            data->parser.msg.msg.buf[byteReceived] = 0;
-            memcpy( &data->dest_addr, &__ss, sizeof(__ss) );
-            TPJobInit( &job, ( start_routine )
-                       ssdp_event_handler_thread, data );
-            TPJobSetFreeFunction( &job, free_ssdp_event_handler_data );
-            TPJobSetPriority( &job, MED_PRIORITY );
-
-            if( ThreadPoolAdd( &gRecvThreadPool, &job, NULL ) != 0 ) {
-                free_ssdp_event_handler_data( data );
-            }
-        }
-    } else {
-        free_ssdp_event_handler_data( data );
-    }
+		else
+			strncpy(ntop_buf, "<Invalid address family>",
+				sizeof(ntop_buf));
+		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+			"Start of received response ----------------------------------------------------\n"
+			"%s\n"
+			"End of received response ------------------------------------------------------\n"
+			"From host %s\n", requestBuf, ntop_buf);
+		/* add thread pool job to handle request */
+		if (data != NULL) {
+			data->parser.msg.msg.length += (size_t)byteReceived;
+			/* null-terminate */
+			data->parser.msg.msg.buf[byteReceived] = 0;
+			memcpy(&data->dest_addr, &__ss, sizeof(__ss));
+			TPJobInit(&job, (start_routine)
+				  ssdp_event_handler_thread, data);
+			TPJobSetFreeFunction(&job,
+					     free_ssdp_event_handler_data);
+			TPJobSetPriority(&job, MED_PRIORITY);
+			if (ThreadPoolAdd(&gRecvThreadPool, &job, NULL) != 0)
+				free_ssdp_event_handler_data(data);
+		}
+	} else
+		free_ssdp_event_handler_data(data);
 }
 
 
@@ -907,10 +876,8 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 		}
 		/* For use by ssdp control point. */
 		gSsdpReqSocket4 = out->ssdpReqSock4;
-	} else {
+	} else
 		out->ssdpReqSock4 = INVALID_SOCKET;
-	}
-
 	/* Create the IPv6 socket for SSDP REQUESTS */
 #ifdef UPNP_ENABLE_IPV6
 	if (strlen(gIF_IPV6) > 0) {
@@ -922,14 +889,10 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 		}
 		/* For use by ssdp control point. */
 		gSsdpReqSocket6 = out->ssdpReqSock6;
-	} else {
+	} else
 		out->ssdpReqSock6 = INVALID_SOCKET;
-	}
 #endif  /* IPv6 */
-
-
 #endif /* INCLUDE_CLIENT_APIS */
-
 	/* Create the IPv4 socket for SSDP */
 	if (strlen(gIF_IPV4) > 0) {
 		retVal = create_ssdp_sock_v4(&out->ssdpSock4);
@@ -942,10 +905,8 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 #endif
 			return retVal;
 		}
-	} else {
+	} else
 		out->ssdpSock4 = INVALID_SOCKET;
-	}
-
 	/* Create the IPv6 socket for SSDP */
 #ifdef UPNP_ENABLE_IPV6
 	if (strlen(gIF_IPV6) > 0) {
@@ -961,10 +922,8 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 #endif
 			return retVal;
 		}
-	} else {
+	} else
 		out->ssdpSock6 = INVALID_SOCKET;
-	}
-
 	if (strlen(gIF_IPV6_ULA_GUA) > 0) {
 		retVal = create_ssdp_sock_v6_ula_gua(&out->ssdpSock6UlaGua);
 		if (retVal != UPNP_E_SUCCESS) {
@@ -980,9 +939,8 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 #endif
 			return retVal;
 		}
-	} else {
+	} else
 		out->ssdpSock6UlaGua = INVALID_SOCKET;
-	}
 #endif /* IPv6 */
 
 	return UPNP_E_SUCCESS;
@@ -1003,26 +961,24 @@ int get_ssdp_sockets(MiniServerSockArray *out)
  * Returns:
  *  UPNP_E_SUCCESS on successful socket creation.
  ***************************************************************************/
-int create_ssdp_sock_reqv4( SOCKET* ssdpReqSock )
+int create_ssdp_sock_reqv4(SOCKET *ssdpReqSock)
 {
-    char errorBuffer[ERROR_BUFFER_LEN];
-    u_char ttl = 4;
+	char errorBuffer[ERROR_BUFFER_LEN];
+	u_char ttl = 4;
 
-    *ssdpReqSock = socket( AF_INET, SOCK_DGRAM, 0 );
-    if ( *ssdpReqSock == -1 ) {
-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-        UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-            "Error in socket(): %s\n", errorBuffer );
-        return UPNP_E_OUTOF_SOCKET;
-    }
+	*ssdpReqSock = socket(AF_INET, SOCK_DGRAM, 0);
+	if (*ssdpReqSock == -1) {
+		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+			   "Error in socket(): %s\n", errorBuffer);
+		return UPNP_E_OUTOF_SOCKET;
+	}
+	setsockopt(*ssdpReqSock, IPPROTO_IP, IP_MULTICAST_TTL,
+		   &ttl, sizeof(ttl));
+	/* just do it, regardless if fails or not. */
+	Make_Socket_NoBlocking(*ssdpReqSock);
 
-    setsockopt( *ssdpReqSock, IPPROTO_IP, IP_MULTICAST_TTL,
-        &ttl, sizeof (ttl) );
-
-    /* just do it, regardless if fails or not. */
-    Make_Socket_NoBlocking( *ssdpReqSock );
-
-    return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 
 
