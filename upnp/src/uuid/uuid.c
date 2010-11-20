@@ -149,8 +149,8 @@ format_uuid_v1( uuid_upnp * uid,
     uid->time_mid = (unsigned short)((timestamp >> 32) & 0xFFFF);
     uid->time_hi_and_version = (unsigned short)((timestamp >> 48) & 0x0FFF);
     uid->time_hi_and_version |= (1 << 12);
-    uid->clock_seq_low = clock_seq & 0xFF;
-    uid->clock_seq_hi_and_reserved = ( clock_seq & 0x3F00 ) >> 8;
+    uid->clock_seq_low = (unsigned8)(clock_seq & 0xFF);
+    uid->clock_seq_hi_and_reserved = (unsigned8)( clock_seq & 0x3F00 ) >> 8;
     uid->clock_seq_hi_and_reserved |= 0x80;
     memcpy( &uid->node, &node, sizeof uid->node );
 };
@@ -287,7 +287,7 @@ true_random( void )
         inited = 1;
     };
 
-    return ( rand() );
+    return (unsigned16)( rand() );
 }
 
 /*-----------------------------------------------------------------------------*/
@@ -315,13 +315,13 @@ uuid_create_from_name( uuid_upnp * uid, /* resulting UUID */
        no matter what endian machine we're on 
      */
     net_nsid = nsid;
-    net_nsid.time_low=htonl( net_nsid.time_low );
+    net_nsid.time_low=htonl( (uint32_t)net_nsid.time_low );
     net_nsid.time_mid=htons( net_nsid.time_mid );
     net_nsid.time_hi_and_version=htons( net_nsid.time_hi_and_version );
 
     MD5Init( &c );
     MD5Update( &c, (unsigned char *)&net_nsid, sizeof(uuid_upnp) );
-    MD5Update( &c, name, namelen );
+    MD5Update( &c, name, (unsigned int)namelen );
     MD5Final( hash, &c );
 
     /*
@@ -348,7 +348,7 @@ format_uuid_v3( uuid_upnp * uid,
     /*
        convert UUID to local byte order 
      */
-    uid->time_low=ntohl( uid->time_low );
+    uid->time_low=ntohl( (uint32_t)uid->time_low );
     uid->time_mid=ntohs( uid->time_mid );
     uid->time_hi_and_version=ntohs( uid->time_hi_and_version );
 
