@@ -257,26 +257,22 @@ int membuffer_append( INOUT membuffer* m, IN const void* buf, IN size_t buf_len 
 ************************************************************************/
 int membuffer_append_str( INOUT membuffer* m, IN const char* c_str );
 
-/************************************************************************
-*	Function :	membuffer_insert
-*
-*	Parameters :
-*		INOUT membuffer* m ; buffer whose memory size is to be increased  
-*					and appended.
-*		IN const void* buf ; source buffer whose contents will be 
-*					copied
-*		 IN size_t buf_len ; size of the source buffer
-*		int index ;	index to determine the bounds while movinf the data
-*
-*	Description : Allocates memory for the new data to be inserted. Does
-*		memory management by moving the data from the existing memory to 
-*		the newly allocated memory and then appending the new data.
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int membuffer_insert( INOUT membuffer* m, IN const void* buf, IN size_t buf_len, int index );
+/*!
+ * \brief Allocates memory for the new data to be inserted. Does
+ * memory management by moving the data from the existing memory to
+ * the newly allocated memory and then appending the new data.
+ *
+ * \return 0 if successful, error code if error.
+ */
+int membuffer_insert(
+	/* [in,out] Buffer whose memory size is to be increased and appended. */
+	membuffer *m,
+	/* [in] source buffer whose contents will be copied. */
+	const void *buf,
+	/* [in] size of the source buffer. */
+	size_t buf_len,
+	/* [in] index to determine the bounds while movinf the data. */
+	size_t index);
 
 
 /*!

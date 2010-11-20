@@ -81,7 +81,7 @@ void send_search_result(IN void *data)
  *		SSDP message from the device
  *	IN struct sockaddr *dest_addr:
  *		Address of the device
- *	IN xboolean timeout:
+ *	IN int timeout:
  *		timeout kept by the control point while
  *		sending search message
  *	IN void* cookie:
@@ -101,230 +101,227 @@ void ssdp_handle_ctrlpt_msg(
 	IN http_message_t *hmsg,
 	IN struct sockaddr *dest_addr,
 	/* only in search reply */
-	IN xboolean timeout,
+	IN int timeout,
 	/* only in search reply */
 	IN void *cookie)
 {
-    int handle;
-    struct Handle_Info *ctrlpt_info = NULL;
-    memptr hdr_value;
-    /* byebye or alive */
-    xboolean is_byebye;
-    struct Upnp_Discovery param;
-    SsdpEvent event;
-    xboolean nt_found;
-    xboolean usn_found;
-    xboolean st_found;
-    char save_char;
-    Upnp_EventType event_type;
-    Upnp_FunPtr ctrlpt_callback;
-    void *ctrlpt_cookie;
-    ListNode *node = NULL;
-    SsdpSearchArg *searchArg = NULL;
-    int matched = 0;
-    ResultData *threadData = NULL;
-    ThreadPoolJob job;
+	int handle;
+	struct Handle_Info *ctrlpt_info = NULL;
+	memptr hdr_value;
+	/* byebye or alive */
+	int is_byebye;
+	struct Upnp_Discovery param;
+	SsdpEvent event;
+	int nt_found;
+	int usn_found;
+	int st_found;
+	char save_char;
+	Upnp_EventType event_type;
+	Upnp_FunPtr ctrlpt_callback;
+	void *ctrlpt_cookie;
+	ListNode *node = NULL;
+	SsdpSearchArg *searchArg = NULL;
+	int matched = 0;
+	ResultData *threadData = NULL;
+	ThreadPoolJob job;
 
-    /* we are assuming that there can be only one client supported at a time */
-    HandleReadLock();
+	/* we are assuming that there can be only one client supported at a time */
+	HandleReadLock();
 
-    if ( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
-        HandleUnlock();
-	return;
-    }
-    /* copy */
-    ctrlpt_callback = ctrlpt_info->Callback;
-    ctrlpt_cookie = ctrlpt_info->Cookie;
-    HandleUnlock();
-    /* search timeout */
-    if ( timeout ) {
-        ctrlpt_callback( UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie );
-	return;
-    }
-    param.ErrCode = UPNP_E_SUCCESS;
-    /* MAX-AGE, assume error */
-    param.Expires = -1;
-    if ( httpmsg_find_hdr( hmsg, HDR_CACHE_CONTROL, &hdr_value ) != NULL ) {
-        if( matchstr( hdr_value.buf, hdr_value.length,
-                      "%imax-age = %d%0", &param.Expires ) != PARSE_OK )
-            return;
-    }
-    /* DATE */
-    param.Date[0] = '\0';
-    if ( httpmsg_find_hdr( hmsg, HDR_DATE, &hdr_value ) != NULL ) {
-        linecopylen( param.Date, hdr_value.buf, hdr_value.length );
-    }
-    /* dest addr */
-    memcpy(&param.DestAddr, dest_addr, sizeof(struct sockaddr_in) );
-    /* EXT */
-    param.Ext[0] = '\0';
-    if ( httpmsg_find_hdr( hmsg, HDR_EXT, &hdr_value ) != NULL ) {
-        linecopylen( param.Ext, hdr_value.buf, hdr_value.length );
-    }
-    /* LOCATION */
-    param.Location[0] = '\0';
-    if ( httpmsg_find_hdr( hmsg, HDR_LOCATION, &hdr_value ) != NULL ) {
-        linecopylen( param.Location, hdr_value.buf, hdr_value.length );
-    }
-    /* SERVER / USER-AGENT */
-    param.Os[0] = '\0';
-    if ( httpmsg_find_hdr( hmsg, HDR_SERVER, &hdr_value ) != NULL ||
-        httpmsg_find_hdr( hmsg, HDR_USER_AGENT, &hdr_value ) != NULL ) {
-        linecopylen( param.Os, hdr_value.buf, hdr_value.length );
-    }
-    /* clear everything */
-    param.DeviceId[0] = '\0';
-    param.DeviceType[0] = '\0';
-    param.ServiceType[0] = '\0';
-    /* not used; version is in ServiceType */
-    param.ServiceVer[0] = '\0';
+	if (GetClientHandleInfo(&handle, &ctrlpt_info) != HND_CLIENT) {
+		HandleUnlock();
+		return;
+	}
+	/* copy */
+	ctrlpt_callback = ctrlpt_info->Callback;
+	ctrlpt_cookie = ctrlpt_info->Cookie;
+	HandleUnlock();
+	/* search timeout */
+	if (timeout) {
+		ctrlpt_callback(UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie);
+		return;
+	}
+	param.ErrCode = UPNP_E_SUCCESS;
+	/* MAX-AGE, assume error */
+	param.Expires = -1;
+	if (httpmsg_find_hdr(hmsg, HDR_CACHE_CONTROL, &hdr_value) != NULL) {
+		if (matchstr(hdr_value.buf, hdr_value.length,
+			     "%imax-age = %d%0", &param.Expires) != PARSE_OK)
+			return;
+	}
+	/* DATE */
+	param.Date[0] = '\0';
+	if (httpmsg_find_hdr(hmsg, HDR_DATE, &hdr_value) != NULL) {
+		linecopylen(param.Date, hdr_value.buf, hdr_value.length);
+	}
+	/* dest addr */
+	memcpy(&param.DestAddr, dest_addr, sizeof(struct sockaddr_in));
+	/* EXT */
+	param.Ext[0] = '\0';
+	if (httpmsg_find_hdr(hmsg, HDR_EXT, &hdr_value) != NULL) {
+		linecopylen(param.Ext, hdr_value.buf, hdr_value.length);
+	}
+	/* LOCATION */
+	param.Location[0] = '\0';
+	if (httpmsg_find_hdr(hmsg, HDR_LOCATION, &hdr_value) != NULL) {
+		linecopylen(param.Location, hdr_value.buf, hdr_value.length);
+	}
+	/* SERVER / USER-AGENT */
+	param.Os[0] = '\0';
+	if (httpmsg_find_hdr(hmsg, HDR_SERVER, &hdr_value) != NULL ||
+	    httpmsg_find_hdr(hmsg, HDR_USER_AGENT, &hdr_value) != NULL) {
+		linecopylen(param.Os, hdr_value.buf, hdr_value.length);
+	}
+	/* clear everything */
+	param.DeviceId[0] = '\0';
+	param.DeviceType[0] = '\0';
+	param.ServiceType[0] = '\0';
+	/* not used; version is in ServiceType */
+	param.ServiceVer[0] = '\0';
+	event.UDN[0] = '\0';
+	event.DeviceType[0] = '\0';
+	event.ServiceType[0] = '\0';
+	nt_found = FALSE;
+	if (httpmsg_find_hdr(hmsg, HDR_NT, &hdr_value) != NULL) {
+		save_char = hdr_value.buf[hdr_value.length];
+		hdr_value.buf[hdr_value.length] = '\0';
+		nt_found = (ssdp_request_type(hdr_value.buf, &event) == 0);
+		hdr_value.buf[hdr_value.length] = save_char;
+	}
+	usn_found = FALSE;
+	if (httpmsg_find_hdr(hmsg, HDR_USN, &hdr_value) != NULL) {
+		save_char = hdr_value.buf[hdr_value.length];
+		hdr_value.buf[hdr_value.length] = '\0';
+		usn_found = (unique_service_name(hdr_value.buf, &event) == 0);
+		hdr_value.buf[hdr_value.length] = save_char;
+	}
+	if (nt_found || usn_found) {
+		strcpy(param.DeviceId, event.UDN);
+		strcpy(param.DeviceType, event.DeviceType);
+		strcpy(param.ServiceType, event.ServiceType);
+	}
+	/* ADVERT. OR BYEBYE */
+	if (hmsg->is_request) {
+		/* use NTS hdr to determine advert., or byebye */
+		if (httpmsg_find_hdr(hmsg, HDR_NTS, &hdr_value) == NULL) {
+			return;	/* error; NTS header not found */
+		}
+		if (memptr_cmp(&hdr_value, "ssdp:alive") == 0) {
+			is_byebye = FALSE;
+		} else if (memptr_cmp(&hdr_value, "ssdp:byebye") == 0) {
+			is_byebye = TRUE;
+		} else {
+			return;	/* bad value */
+		}
+		if (is_byebye) {
+			/* check device byebye */
+			if (!nt_found || !usn_found) {
+				return;	/* bad byebye */
+			}
+			event_type = UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE;
+		} else {
+			/* check advertisement.
+			 * Expires is valid if positive. This is for testing
+			 * only. Expires should be greater than 1800 (30 mins) */
+			if (!nt_found ||
+			    !usn_found ||
+			    strlen(param.Location) == 0 || param.Expires <= 0) {
+				return;	/* bad advertisement */
+			}
+			event_type = UPNP_DISCOVERY_ADVERTISEMENT_ALIVE;
+		}
+		/* call callback */
+		ctrlpt_callback(event_type, &param, ctrlpt_cookie);
+	} else {
+		/* reply (to a SEARCH) */
+		/* only checking to see if there is a valid ST header */
+		st_found = FALSE;
+		if (httpmsg_find_hdr(hmsg, HDR_ST, &hdr_value) != NULL) {
+			save_char = hdr_value.buf[hdr_value.length];
+			hdr_value.buf[hdr_value.length] = '\0';
+			st_found =
+			    ssdp_request_type(hdr_value.buf, &event) == 0;
+			hdr_value.buf[hdr_value.length] = save_char;
+		}
+		if (hmsg->status_code != HTTP_OK ||
+		    param.Expires <= 0 ||
+		    strlen(param.Location) == 0 || !usn_found || !st_found) {
+			return;	/* bad reply */
+		}
+		/* check each current search */
+		HandleLock();
+		if (GetClientHandleInfo(&handle, &ctrlpt_info) != HND_CLIENT) {
+			HandleUnlock();
+			return;
+		}
+		node = ListHead(&ctrlpt_info->SsdpSearchList);
+		/* temporary add null termination */
+		/*save_char = hdr_value.buf[ hdr_value.length ]; */
+		/*hdr_value.buf[ hdr_value.length ] = '\0'; */
+		while (node != NULL) {
+			searchArg = node->item;
+			matched = 0;
+			/* check for match of ST header and search target */
+			switch (searchArg->requestType) {
+			case SSDP_ALL:
+				matched = 1;
+				break;
+			case SSDP_ROOTDEVICE:
+				matched =
+				    (event.RequestType == SSDP_ROOTDEVICE);
+				break;
+			case SSDP_DEVICEUDN:
+				matched = !strncmp(searchArg->searchTarget,
+						    hdr_value.buf,
+						    hdr_value.length);
+				break;
+			case SSDP_DEVICETYPE:{
+				size_t m = min(hdr_value.length,
+					       strlen(searchArg->
+						      searchTarget));
+				matched = !strncmp(searchArg->searchTarget,
+     						   hdr_value.buf, m);
+				break;
+			}
+			case SSDP_SERVICE:{
+				size_t m = min(hdr_value.length,
+					    strlen(searchArg->
+						   searchTarget));
+				matched = !strncmp(searchArg->searchTarget,
+	    					   hdr_value.buf, m);
+				break;
+			}
+			default:
+				matched = 0;
+				break;
+			}
+			if (matched) {
+				/* schedule call back */
+				threadData =
+				    (ResultData *) malloc(sizeof(ResultData));
+				if (threadData != NULL) {
+					threadData->param = param;
+					threadData->cookie = searchArg->cookie;
+					threadData->ctrlpt_callback =
+					    ctrlpt_callback;
+					TPJobInit(&job,
+						  (start_routine)
+						  send_search_result,
+						  threadData);
+					TPJobSetPriority(&job, MED_PRIORITY);
+					TPJobSetFreeFunction(&job,
+							     (free_routine)
+							     free);
+					ThreadPoolAdd(&gRecvThreadPool, &job,
+						      NULL);
+				}
+			}
+			node = ListNext(&ctrlpt_info->SsdpSearchList, node);
+		}
 
-    event.UDN[0] = '\0';
-    event.DeviceType[0] = '\0';
-    event.ServiceType[0] = '\0';
-
-    nt_found = FALSE;
-
-    if ( httpmsg_find_hdr( hmsg, HDR_NT, &hdr_value ) != NULL ) {
-        save_char = hdr_value.buf[hdr_value.length];
-        hdr_value.buf[hdr_value.length] = '\0';
-        nt_found = ( ssdp_request_type( hdr_value.buf, &event ) == 0 );
-        hdr_value.buf[hdr_value.length] = save_char;
-    }
-
-    usn_found = FALSE;
-    if ( httpmsg_find_hdr( hmsg, HDR_USN, &hdr_value ) != NULL ) {
-        save_char = hdr_value.buf[hdr_value.length];
-        hdr_value.buf[hdr_value.length] = '\0';
-        usn_found = ( unique_service_name( hdr_value.buf, &event ) == 0 );
-        hdr_value.buf[hdr_value.length] = save_char;
-    }
-
-    if ( nt_found || usn_found ) {
-        strcpy( param.DeviceId, event.UDN );
-        strcpy( param.DeviceType, event.DeviceType );
-        strcpy( param.ServiceType, event.ServiceType );
-    }
-
-    /* ADVERT. OR BYEBYE */
-    if( hmsg->is_request ) {
-        /* use NTS hdr to determine advert., or byebye */
-        if ( httpmsg_find_hdr( hmsg, HDR_NTS, &hdr_value ) == NULL ) {
-            return;             /* error; NTS header not found */
-        }
-        if ( memptr_cmp( &hdr_value, "ssdp:alive" ) == 0 ) {
-            is_byebye = FALSE;
-        } else if( memptr_cmp( &hdr_value, "ssdp:byebye" ) == 0 ) {
-            is_byebye = TRUE;
-        } else {
-            return;             /* bad value */
-        }
-
-        if ( is_byebye ) {
-            /* check device byebye */
-            if( !nt_found || !usn_found ) {
-                return;         /* bad byebye */
-            }
-            event_type = UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE;
-        } else {
-            /* check advertisement.
-	     * Expires is valid if positive. This is for testing
-	     * only. Expires should be greater than 1800 (30 mins) */
-            if( !nt_found ||
-                !usn_found ||
-                strlen( param.Location ) == 0 || param.Expires <= 0 ) {
-                return;         /* bad advertisement */
-            }
-            event_type = UPNP_DISCOVERY_ADVERTISEMENT_ALIVE;
-        }
-
-        /* call callback */
-        ctrlpt_callback( event_type, &param, ctrlpt_cookie );
-
-    } else {
-	/* reply (to a SEARCH) */
-        /* only checking to see if there is a valid ST header */
-        st_found = FALSE;
-        if( httpmsg_find_hdr( hmsg, HDR_ST, &hdr_value ) != NULL ) {
-            save_char = hdr_value.buf[hdr_value.length];
-            hdr_value.buf[hdr_value.length] = '\0';
-            st_found = ssdp_request_type( hdr_value.buf, &event ) == 0;
-            hdr_value.buf[hdr_value.length] = save_char;
-        }
-        if( hmsg->status_code != HTTP_OK ||
-            param.Expires <= 0 ||
-            strlen( param.Location ) == 0 || !usn_found || !st_found ) {
-            return;             /* bad reply */
-        }
-        /* check each current search */
-        HandleLock();
-        if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
-            HandleUnlock();
-            return;
-        }
-        node = ListHead( &ctrlpt_info->SsdpSearchList );
-
-        /* temporary add null termination */
-        /*save_char = hdr_value.buf[ hdr_value.length ]; */
-        /*hdr_value.buf[ hdr_value.length ] = '\0'; */
-
-        while( node != NULL ) {
-            searchArg = node->item;
-            matched = 0;
-            /* check for match of ST header and search target */
-            switch ( searchArg->requestType ) {
-            case SSDP_ALL:
-                        matched = 1;
-                        break;
-            case SSDP_ROOTDEVICE:
-                        matched = ( event.RequestType == SSDP_ROOTDEVICE );
-                        break;
-            case SSDP_DEVICEUDN:
-                        matched = !( strncmp( searchArg->searchTarget,
-                                              hdr_value.buf,
-                                              hdr_value.length ) );
-                        break;
-            case SSDP_DEVICETYPE: {
-                        int m = min( hdr_value.length,
-                                     strlen( searchArg->searchTarget ) );
-                        matched = !( strncmp( searchArg->searchTarget,
-                                              hdr_value.buf, m ) );
-                        break;
-            }
-            case SSDP_SERVICE: {
-                        int m = min( hdr_value.length,
-                                     strlen( searchArg->searchTarget ) );
-
-                        matched = !( strncmp( searchArg->searchTarget,
-                                              hdr_value.buf, m ) );
-                        break;
-            }
-            default:
-                        matched = 0;
-                        break;
-            }
-
-            if (matched) {
-                /* schedule call back*/
-                threadData =
-                    ( ResultData * ) malloc( sizeof( ResultData ) );
-                if (threadData != NULL) {
-                    threadData->param = param;
-                    threadData->cookie = searchArg->cookie;
-                    threadData->ctrlpt_callback = ctrlpt_callback;
-                    TPJobInit( &job, ( start_routine ) send_search_result,
-                               threadData );
-                    TPJobSetPriority(&job, MED_PRIORITY);
-                    TPJobSetFreeFunction(&job, (free_routine)free);
-                    ThreadPoolAdd(&gRecvThreadPool, &job, NULL);
-                }
-            }
-            node = ListNext( &ctrlpt_info->SsdpSearchList, node );
-        }
-
-        HandleUnlock();
-        /*ctrlpt_callback( UPNP_DISCOVERY_SEARCH_RESULT, &param, cookie );*/
-    }
+		HandleUnlock();
+		/*ctrlpt_callback( UPNP_DISCOVERY_SEARCH_RESULT, &param, cookie ); */
+	}
 }
 
 

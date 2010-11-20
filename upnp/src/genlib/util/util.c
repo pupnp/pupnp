@@ -58,7 +58,7 @@ void namecopy(char dest[NAME_SIZE], const char *src)
 
 void linecopylen(char dest[LINE_SIZE], const char *src, size_t srclen)
 {
-	int len;
+	size_t len;
 
 	len = srclen < (LINE_SIZE - 1) ? srclen : (LINE_SIZE - 1);
 	strncpy(dest, src, len);
