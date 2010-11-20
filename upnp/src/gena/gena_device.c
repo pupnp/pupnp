@@ -271,7 +271,7 @@ static int genaNotify(
 	/*! [in] subscription to be Notified, assumes this is valid for life of function. */
 	subscription *sub)
 {
-    int i;
+    size_t i;
     membuffer mid_msg;
     membuffer endmsg;
     uri_type *url;
@@ -1134,7 +1134,7 @@ static int create_url_list(
 	/*! [out] . */
 	URL_list *out)
 {
-    int URLcount = 0;
+    size_t URLcount = 0;
     size_t i;
     int return_code = 0;
     uri_type temp;
@@ -1165,12 +1165,11 @@ static int create_url_list(
     }
 
     if( URLcount > 0 ) {
-        out->URLs = ( char * )malloc( URLS->size + 1 );
-        out->parsedURLs =
-            ( uri_type * ) malloc( sizeof( uri_type ) * URLcount );
-        if( ( out->URLs == NULL ) || ( out->parsedURLs == NULL ) ) {
-            free( out->URLs );
-            free( out->parsedURLs );
+        out->URLs = malloc(URLS->size + 1);
+        out->parsedURLs = malloc(sizeof(uri_type) * URLcount);
+        if (!out->URLs || !out->parsedURLs) {
+            free(out->URLs);
+            free(out->parsedURLs);
             out->URLs = NULL;
             out->parsedURLs = NULL;
             return UPNP_E_OUTOF_MEMORY;
@@ -1201,7 +1200,7 @@ static int create_url_list(
     }
     out->size = URLcount;
 
-    return URLcount;
+    return (int)URLcount;
 }
 
 

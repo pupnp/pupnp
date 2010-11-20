@@ -32,6 +32,10 @@
 #ifndef GENLIB_UTIL_MEMBUFFER_H
 #define GENLIB_UTIL_MEMBUFFER_H
 
+/*!
+ * \file
+ */
+
 #include <stdlib.h>
 #include "upnputil.h"
 
@@ -275,25 +279,19 @@ int membuffer_append_str( INOUT membuffer* m, IN const char* c_str );
 int membuffer_insert( INOUT membuffer* m, IN const void* buf, IN size_t buf_len, int index );
 
 
-/************************************************************************
-*	Function :	membuffer_delete
-*
-*	Parameters :
-*		INOUT membuffer* m ; buffer whose memory size is to be decreased
-*					and copied to the odified location
-*		IN int index ;	index to determine bounds while moving data
-*		IN size_t num_bytes ;	number of bytes that the data needs to 
-*					shrink by
-*
-*	Description : Shrink the size of the buffer depending on the current 
-*		size of the bufer and te input parameters. Move contents from the 
-*		old buffer to the new sized buffer.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void membuffer_delete( INOUT membuffer* m, IN int index, IN size_t num_bytes );
+/*!
+ * \brief Shrink the size of the buffer depending on the current size of the
+ * bufer and te input parameters. Move contents from the old buffer to the
+ * new sized buffer.
+ */
+void membuffer_delete(
+	/* [in,out] Buffer whose memory size is to be decreased and copied
+	 * to the modified location. */
+	INOUT membuffer *m,
+	/* [in] Index to determine bounds while moving data. */
+	IN size_t index,
+	/* [in] Number of bytes that the data needs to shrink by. */
+	IN size_t num_bytes);
 
 
 /************************************************************************

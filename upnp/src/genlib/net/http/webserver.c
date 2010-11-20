@@ -310,12 +310,11 @@ static UPNP_INLINE int get_content_type(
 	const char *extension;
 	const char *type;
 	const char *subtype;
-	xboolean ctype_found = FALSE;
+	int ctype_found = FALSE;
 	char *temp = NULL;
-	int length = 0;
+	size_t length = 0;
 
 	UpnpFileInfo_set_ContentType(fileInfo, NULL);
-
 	/* get ext */
 	extension = strrchr(filename, '.');
 	if (extension != NULL) {
@@ -323,15 +322,13 @@ static UPNP_INLINE int get_content_type(
 			ctype_found = TRUE;
 		}
 	}
-
 	if (!ctype_found) {
 		/* unknown content type */
 		type = gMediaTypes[APPLICATION_INDEX];
 		subtype = "octet-stream";
 	}
-
 	length = strlen(type) + strlen("/") + strlen(subtype) + 1;
-	temp = (char *)malloc(length);
+	temp = malloc(length);
 	if (!temp) {
 		return UPNP_E_OUTOF_MEMORY;
 	}
@@ -342,7 +339,6 @@ static UPNP_INLINE int get_content_type(
 	if (!UpnpFileInfo_get_ContentType(fileInfo)) {
 		return UPNP_E_OUTOF_MEMORY;
 	}
-
 	return 0;
 }
 
@@ -365,7 +361,7 @@ static UPNP_INLINE void glob_alias_init(void)
  *
  * \return BOOLEAN.
  */
-static UPNP_INLINE xboolean is_valid_alias(
+static UPNP_INLINE int is_valid_alias(
 	/*! [in] XML alias object. */
 	const struct xml_alias_t *alias)
 {
@@ -568,7 +564,7 @@ static int get_file_info(
 
 int web_server_set_root_dir(const char *root_dir)
 {
-	int index;
+	size_t index;
 	int ret;
 
 	ret = membuffer_assign_str(&gDocumentRootDir, root_dir);
@@ -594,7 +590,7 @@ int web_server_set_root_dir(const char *root_dir)
  * \li \c TRUE - On Success
  * \li \c FALSE if request is not an alias
  */
-static UPNP_INLINE xboolean get_alias(
+static UPNP_INLINE int get_alias(
 	/*! [in] request file passed in to be compared with. */
 	const char *request_file,
 	/*! [out] xml alias object which has a file name stored. */
@@ -618,32 +614,36 @@ static UPNP_INLINE xboolean get_alias(
  * \brief Compares filePath with paths from the list of virtual directory
  * lists.
  *
- * \return BOOLEAN
+ * \return BOOLEAN.
  */
 static int isFileInVirtualDir(
 	/*! [in] Directory path to be tested for virtual directory. */
 	char *filePath)
 {
 	virtualDirList *pCurVirtualDir;
-	int webDirLen;
+	size_t webDirLen;
 
 	pCurVirtualDir = pVirtualDirList;
 	while (pCurVirtualDir != NULL) {
 		webDirLen = strlen(pCurVirtualDir->dirName);
-		if (pCurVirtualDir->dirName[webDirLen - 1] == '/') {
-			if (strncmp(pCurVirtualDir->dirName, filePath, webDirLen) == 0)
-				return TRUE;
-		} else {
-			if (strncmp(pCurVirtualDir->dirName, filePath, webDirLen) == 0 &&
-			    (filePath[webDirLen] == '/' ||
-			     filePath[webDirLen] == '\0' ||
-			     filePath[webDirLen] == '?'))
-				return TRUE;
+		if (webDirLen) {
+			if (pCurVirtualDir->dirName[webDirLen - 1] == '/') {
+				if (strncmp(pCurVirtualDir->dirName, filePath,
+						webDirLen) == 0)
+					return !0;
+			} else {
+				if (strncmp(pCurVirtualDir->dirName, filePath,
+						webDirLen) == 0 &&
+				    (filePath[webDirLen] == '/' ||
+				     filePath[webDirLen] == '\0' ||
+				     filePath[webDirLen] == '?'))
+					return !0;
+			}
 		}
 		pCurVirtualDir = pCurVirtualDir->next;
 	}
 
-	return FALSE;
+	return 0;
 }
 
 /*!
@@ -654,7 +654,7 @@ static void ToUpperCase(
 	char *s)
 {
 	while (*s) {
-		*s = toupper(*s);
+		*s = (char)toupper(*s);
 		++s;
 	}
 }
@@ -668,13 +668,12 @@ static char *StrStr(
 	/*! Input string. */
 	char *s1,
 	/*! Input sub-string. */
-	char *s2)
+	const char *s2)
 {
 	char *Str1;
 	char *Str2;
-	char *Ptr;
+	const char *Ptr;
 	char *ret = NULL;
-	int Pos;
 
 	Str1 = strdup(s1);
 	if (!Str1)
@@ -689,8 +688,7 @@ static char *StrStr(
 	if (!Ptr) {
 		ret = NULL;
 	} else {
-		Pos = Ptr - Str1;
-		ret = s1 + Pos;
+		ret = s1 + (Ptr - Str1);
 	}
 
 	free(Str2);
@@ -709,9 +707,10 @@ static char *StrTok(
 	/*! String containing the token. */
 	char **Src,
 	/*! Set of delimiter characters. */
-	char *Del)
+	const char *Del)
 {
-	char *TmpPtr, *RetPtr;
+	char *TmpPtr;
+	char *RetPtr;
 
 	if (*Src != NULL) {
 		RetPtr = *Src;
@@ -798,7 +797,8 @@ static int CreateHTTPRangeResponseHeader(
 	struct SendInstruction *Instr)
 {
 	off_t FirstByte, LastByte;
-	char *RangeInput, *Ptr;
+	char *RangeInput;
+	char *Ptr;
 
 	Instr->IsRangeActive = 1;
 	Instr->ReadSendSize = FileLength;
@@ -1024,13 +1024,13 @@ static int process_request(
 
 	char *request_doc;
 	UpnpFileInfo *finfo;
-	xboolean using_alias;
-	xboolean using_virtual_dir;
+	int using_alias;
+	int using_virtual_dir;
 	uri_type *url;
-	char *temp_str;
+	const char *temp_str;
 	int resp_major;
 	int resp_minor;
-	xboolean alias_grabbed;
+	int alias_grabbed;
 	size_t dummy;
 	const char *extra_headers = NULL;
 
@@ -1322,14 +1322,13 @@ static int http_RecvPostMessage(
 	 * is a virtual file or not. */
 	struct SendInstruction *Instr)
 {
-	unsigned int Data_Buf_Size = 1024;
+	size_t Data_Buf_Size = 1024;
 	char Buf[1024];
 	int Timeout = -1;
-	long Num_Write = 0;
 	FILE *Fp;
 	parse_status_t status = PARSE_OK;
-	xboolean ok_on_close = FALSE;
-	unsigned int entity_offset = 0;
+	int ok_on_close = FALSE;
+	size_t entity_offset = 0;
 	int num_read = 0;
 	int ret_code = 0;
 
@@ -1367,7 +1366,7 @@ static int http_RecvPostMessage(
 			if (num_read > 0) {
 				/* append data to buffer */
 				ret_code = membuffer_append(&parser->msg.msg,
-					Buf, num_read);
+					Buf, (size_t)num_read);
 				if (ret_code != 0) {
 					/* set failure status */
 					parser->http_error_code =
@@ -1408,14 +1407,14 @@ static int http_RecvPostMessage(
 		       Data_Buf_Size);
 		entity_offset += Data_Buf_Size;
 		if (Instr->IsVirtualFile) {
-			Num_Write = virtualDirCallback.write(Fp, Buf, Data_Buf_Size);
-			if (Num_Write < 0) {
+			int n = virtualDirCallback.write(Fp, Buf, Data_Buf_Size);
+			if (n < 0) {
 				virtualDirCallback.close(Fp);
 				return HTTP_INTERNAL_SERVER_ERROR;
 			}
 		} else {
-			Num_Write = fwrite(Buf, 1, Data_Buf_Size, Fp);
-			if (Num_Write < 0) {
+			size_t n = fwrite(Buf, 1, Data_Buf_Size, Fp);
+			if (n != Data_Buf_Size) {
 				fclose(Fp);
 				return HTTP_INTERNAL_SERVER_ERROR;
 			}

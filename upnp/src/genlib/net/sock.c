@@ -111,7 +111,7 @@ static int sock_read_write(
 	/*! timeout value. */
 	IN int *timeoutSecs,
 	/*! Boolean value specifying read or write option. */
-	IN xboolean bRead)
+	IN int bRead)
 {
 	int retCode;
 	fd_set readSet;

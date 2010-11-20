@@ -462,61 +462,35 @@ membuffer_insert( INOUT membuffer * m,
     return 0;
 }
 
-/************************************************************************
-*	Function :	membuffer_delete
-*
-*	Parameters :
-*		INOUT membuffer* m ; buffer whose memory size is to be decreased
-*					and copied to the odified location
-*		IN int index ;	index to determine bounds while moving data
-*		IN size_t num_bytes ;	number of bytes that the data needs to 
-*					shrink by
-*
-*	Description : Shrink the size of the buffer depending on the current 
-*		size of the bufer and te input parameters. Move contents from the 
-*		old buffer to the new sized buffer.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void
-membuffer_delete( INOUT membuffer * m,
-                  IN int index,
-                  IN size_t num_bytes )
+void membuffer_delete(membuffer *m, size_t index, size_t num_bytes)
 {
-    int return_value;
-    int new_length;
-    size_t copy_len;
+	int return_value;
+	int new_length;
+	size_t copy_len;
 
-    assert( m != NULL );
+	assert(m != NULL);
 
-    if (!m) return;
+	if (!m || !m->length)
+		return;
+	/* shrink count if it goes beyond buffer */
+	if (index + num_bytes > m->length) {
+		num_bytes = m->length - index;
+		/* every thing at and after index purged */
+		copy_len = 0;
+	} else {
+		/* calc num bytes after deleted string */
+		copy_len = m->length - (index + num_bytes);
+	}
+	memmove(m->buf + index, m->buf + index + num_bytes, copy_len);
+	new_length = m->length - num_bytes;
+	/* trim buffer */
+	return_value = membuffer_set_size(m, new_length);
+	/* shrinking should always work */
+	assert(return_value == 0);
 
-    if( m->length == 0 ) {
-        return;
-    }
-
-    assert( index >= 0 && index < ( int )m->length );
-
-    /* shrink count if it goes beyond buffer */
-    if( index + num_bytes > m->length ) {
-        num_bytes = m->length - ( size_t ) index;
-        copy_len = 0;           /* every thing at and after index purged */
-    } else {
-        /* calc num bytes after deleted string */
-        copy_len = m->length - ( index + num_bytes );
-    }
-
-    memmove( m->buf + index, m->buf + index + num_bytes, copy_len );
-
-    new_length = m->length - num_bytes;
-    return_value = membuffer_set_size( m, new_length ); /* trim buffer */
-    assert( return_value == 0 );    /* shrinking should always work */
-
-    /* don't modify until buffer is set */
-    m->length = new_length;
-    m->buf[new_length] = 0;
+	/* don't modify until buffer is set */
+	m->length = new_length;
+	m->buf[new_length] = 0;
 }
 
 /************************************************************************

@@ -59,11 +59,11 @@ typedef struct MServerSockArray {
 	/*! IPv6 SSDP Socket for incoming advertisments and search requests. */
 	SOCKET ssdpSock6UlaGua;
 	/* ! . */
-	SOCKET stopPort;
+	uint16_t stopPort;
 	/* ! . */
-	unsigned short miniServerPort4;
+	uint16_t miniServerPort4;
 	/* ! . */
-	unsigned short miniServerPort6;
+	uint16_t miniServerPort6;
 #ifdef INCLUDE_CLIENT_APIS
 	/*! IPv4 SSDP socket for sending search requests and receiving search
 	 * replies */

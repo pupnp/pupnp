@@ -6,7 +6,5 @@
 #include "sock.h"
 #include "soaplib.h"
 
-
-
-#endif // EXCLUDE_SOAP
+#endif /* EXCLUDE_SOAP */
 

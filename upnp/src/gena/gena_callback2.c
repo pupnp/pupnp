@@ -122,6 +122,8 @@ genaCallback( IN http_parser_t * parser,
             /* handle missing functions of device or ctrl pt */
             error_respond( info, HTTP_NOT_IMPLEMENTED, request );
     }
+    return;
+    parser = parser;
 }
 #endif /* EXCLUDE_GENA */
 

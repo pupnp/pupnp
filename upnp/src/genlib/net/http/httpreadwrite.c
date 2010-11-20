@@ -240,21 +240,6 @@ static int private_connect(
 #endif /* UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS */
 }
 
-
-/************************************************************************
- * Function: http_FixUrl
- *
- * Parameters:
- *	IN uri_type* url;		URL to be validated and fixed
- *	OUT uri_type* fixed_url;	URL after being fixed.
- *
- * Description:
- *	Validates URL
- *
- * Returns:
- *	 UPNP_E_INVALID_URL
- * 	 UPNP_E_SUCCESS
- ************************************************************************/
 int http_FixUrl(IN uri_type *url, OUT uri_type *fixed_url)
 {
 	char *temp_path = "/";
@@ -275,26 +260,10 @@ int http_FixUrl(IN uri_type *url, OUT uri_type *fixed_url)
 	return UPNP_E_SUCCESS;
 }
 
-
-/************************************************************************
- * Function: http_FixStrUrl
- *
- * Parameters:
- *	IN const char* urlstr;		Character string as a URL
- *	IN int urlstrlen;		Length of the character string
- *	OUT uri_type* fixed_url;	Fixed and corrected URL
- *
- * Description:
- *	Parses URL and then validates URL
- *
- * Returns:
- *	 UPNP_E_INVALID_URL
- * 	 UPNP_E_SUCCESS
- ************************************************************************/
 int http_FixStrUrl(
 	IN const char *urlstr,
-	IN int urlstrlen,
-	OUT uri_type * fixed_url)
+	IN size_t urlstrlen,
+	OUT uri_type *fixed_url)
 {
 	uri_type url;
 
@@ -304,7 +273,6 @@ int http_FixStrUrl(
 
 	return http_FixUrl(&url, fixed_url);
 }
-
 
 /************************************************************************
  * Function: http_Connect
