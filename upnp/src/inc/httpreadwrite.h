@@ -206,7 +206,7 @@ int http_RequestAndResponse(
  *	IN int timeout_secs;	time out value
  *	OUT char** document;	buffer to store the document extracted
  *				from the donloaded message.
- *	OUT int* doc_length;	length of the extracted document
+ *	OUT size_t* doc_length;	length of the extracted document
  *	OUT char* content_type;	Type of content
  *
  * Description:
@@ -221,7 +221,7 @@ int http_Download(
 	IN const char* url, 
 	IN int timeout_secs,
 	OUT char** document,
-	OUT int* doc_length,
+	OUT size_t *doc_length,
 	OUT char* content_type );
 
 
@@ -232,7 +232,7 @@ int http_Download(
  *	IN void *Handle:	Handle to the http post object
  *	IN char *buf:		Buffer to send to peer, if format used
  *				is not UPNP_USING_CHUNKED, 
- *	IN unsigned int *size:	Size of the data to be sent.
+ *	IN size_t *size:	Size of the data to be sent.
  *	IN int timeout:		time out value
  *
  * Description:
@@ -246,7 +246,7 @@ int http_Download(
  ************************************************************************/
 int http_WriteHttpPost(IN void *Handle,
 		       IN char *buf,
-		       IN unsigned int *size,
+		       IN size_t *size,
 		       IN int timeout);
 
 
@@ -350,7 +350,6 @@ int http_HttpGetProgress(
 	OUT size_t *length,
 	OUT size_t *total);
 
-
 /************************************************************************
  * Function: http_CloseHttpGet
  *
@@ -367,74 +366,61 @@ int http_HttpGetProgress(
  ************************************************************************/
 int http_CloseHttpGet(IN void *Handle);
 
-
-/************************************************************************
- * Function: http_OpenHttpGet
+/*!
+ * \brief Makes the HTTP GET message, connects to the peer,
+ * sends the HTTP GET request, gets the response and parses the response.
  *
- * Parameters:
- *	IN const char *url_str:		String as a URL
- *	IN OUT void **Handle:		Pointer to buffer to store HTTP
- *					post handle
- *	IN OUT char **contentType:	Type of content
- *	OUT int *contentLength:		length of content
- *	OUT int *httpStatus:		HTTP status returned on receiving a
- *					response message
- *	IN int timeout:			time out value
+ * If a proxy URL is defined then the connection is made there.
  *
- * Description:
- *	Makes the HTTP GET message, connects to the peer, 
- *	sends the HTTP GET request, gets the response and parses the 
- *	response.
- *
- * Return: int
- *	UPNP_E_SUCCESS		- On Success
- *	UPNP_E_INVALID_PARAM	- Invalid Paramters
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_ERROR
- *	UPNP_E_BAD_RESPONSE
- ************************************************************************/
+ * \return integer
+ * \li \c UPNP_E_SUCCESS - On Success
+ * \li \c UPNP_E_INVALID_PARAM - Invalid Paramters
+ * \li \c UPNP_E_OUTOF_MEMORY
+ * \li \c UPNP_E_SOCKET_ERROR
+ * \li \c UPNP_E_BAD_RESPONSE
+ */
 int http_OpenHttpGet(
-	IN const char *url_str,
-	IN OUT void **Handle,
-	IN OUT char **contentType,
-	OUT int *contentLength,
-	OUT int *httpStatus,
-	IN int timeout);
+	/* [in] String as a URL. */
+	const char *url_str,
+	/* [in,out] Pointer to buffer to store HTTP post handle. */
+	void **Handle,
+	/* [in,out] Type of content. */
+	char **contentType,
+	/* [out] length of content. */
+	int *contentLength,
+	/* [out] HTTP status returned on receiving a response message. */
+	int *httpStatus,
+	/* [in] time out value. */
+	int timeout);
 
-
-/************************************************************************
- * Function: http_OpenHttpGetProxy
+/*!
+ * \brief Makes the HTTP GET message, connects to the peer,
+ * sends the HTTP GET request, gets the response and parses the response.
  *
- * Parameters:
- *	IN const char *url_str;		String as a URL
- *	IN const char *proxy_str;	String as a URL
- *	IN OUT void **Handle;		Pointer to buffer to store HTTP
- *					post handle
- *	IN OUT char **contentType;	Type of content
- *	OUT int *contentLength;		length of content
- *	OUT int *httpStatus;		HTTP status returned on receiving a
- *					response message
- *	IN int timeout:			time out value
+ * If a proxy URL is defined then the connection is made there.
  *
- * Description:
- *	Makes the HTTP GET message, connects to the peer, 
- *	sends the HTTP GET request, gets the response and parses the response.
- *	If a proxy URL is defined then the connection is made there.
- *
- * Return: int
- *	UPNP_E_SUCCESS		- On Success
- *	UPNP_E_INVALID_PARAM	- Invalid Paramters
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_ERROR
- *	UPNP_E_BAD_RESPONSE
- ************************************************************************/
-int http_OpenHttpGetProxy(IN const char *url_str,
-					IN const char *proxy_str,
-					IN OUT void **Handle,
-					IN OUT char **contentType,
-					OUT int *contentLength,
-					OUT int *httpStatus,
-					IN int timeout);
+ * \return integer
+ * \li \c UPNP_E_SUCCESS - On Success
+ * \li \c UPNP_E_INVALID_PARAM - Invalid Paramters
+ * \li \c UPNP_E_OUTOF_MEMORY
+ * \li \c UPNP_E_SOCKET_ERROR
+ * \li \c UPNP_E_BAD_RESPONSE
+ */
+int http_OpenHttpGetProxy(
+	/* [in] String as a URL. */
+	const char *url_str,
+	/* [in] String as a URL. */
+	const char *proxy_str,
+	/* [in,out] Pointer to buffer to store HTTP post handle. */
+	void **Handle,
+	/* [in,out] Type of content. */
+	char **contentType,
+	/* [out] length of content. */
+	int *contentLength,
+	/* [out] HTTP status returned on receiving a response message. */
+	int *httpStatus,
+	/* [in] time out value. */
+	int timeout);
 
 
 /************************************************************************
@@ -463,61 +449,55 @@ int http_SendStatusResponse(
 	IN int request_major_version,
 	IN int request_minor_version );
 
-
-/************************************************************************
- * Function: http_MakeMessage
+/*!
+ * \brief Generate an HTTP message based on the format that is specified in
+ * the input parameters.
  *
- * Parameters:
- *	INOUT membuffer* buf;		buffer with the contents of the 
- *					message
- *	IN int http_major_version;	HTTP major version
- *	IN int http_minor_version;	HTTP minor version
- *	IN const char* fmt;		Pattern format 
- *	...;	
+\verbatim
+Format types:
+	'B':	arg = int status_code		-- appends content-length, content-type and HTML body for given code.
+	'b':	arg1 = const char *buf;
+		arg2 = size_t buf_length memory ptr
+	'C':	(no args)			-- appends a HTTP CONNECTION: close header depending on major, minor version.
+	'c':	(no args)			-- appends CRLF "\r\n"
+	'D':	(no args)			-- appends HTTP DATE: header
+	'd':	arg = int number		-- appends decimal number
+	'G':	arg = range information		-- add range header
+	'h':	arg = off_t number		-- appends off_t number
+	'K':	(no args)			-- add chunky header
+	'L':	arg = language information	-- add Content-Language header if Accept-Language header is not empty and if
+						   WEB_SERVER_CONTENT_LANGUAGE is not empty
+	'N':	arg1 = off_t content_length	-- content-length header
+	'q':	arg1 = http_method_t		-- request start line and HOST header
+		arg2 = (uri_type *)
+	'Q':	arg1 = http_method_t;		-- start line of request
+		arg2 = char* url;
+		arg3 = size_t url_length 
+	'R':	arg = int status_code		-- adds a response start line
+	'S':	(no args)			-- appends HTTP SERVER: header
+	's':	arg = const char *		-- C_string
+	'T':	arg = char * content_type;	-- format e.g: "text/html"; content-type header
+	't':	arg = time_t * gmt_time		-- appends time in RFC 1123 fmt
+	'U':	(no args)			-- appends HTTP USER-AGENT: header
+	'X':	arg = const char		-- useragent; "redsonic" HTTP X-User-Agent: useragent
+\endverbatim
  *
- * Description:
- *	Generate an HTTP message based on the format that is specified
- *	in the input parameters.
- *
- * fmt types:
- *	'B':	arg = int status_code 
- *		appends content-length, content-type and HTML body
- *		for given code
- *	'b':	arg1 = const char* buf;
- *		arg2 = size_t buf_length memory ptr
- *	'C':	(no args) appends a HTTP CONNECTION: close header 
- *			depending on major,minor version
- *	'c':	(no args) appends CRLF "\r\n"
- *	'D':	(no args) appends HTTP DATE: header
- *	'd':	arg = int number            // appends decimal number
- *	'G':	arg = range information     // add range header
- *	'h':	arg = off_t number          // appends off_t number
- *	'K':	(no args)                   // add chunky header
- *	'N':	arg1 = off_t content_length // content-length header
- *	'q':    arg1 = http_method_t        // request start line and HOST header
- *		arg2 = (uri_type *)
- *	'Q':	arg1 = http_method_t;       // start line of request
- *		arg2 = char* url; 
- *		arg3 = size_t url_length 
- *	'R':	arg = int status_code       // adds a response start line
- *	'S':	(no args) appends HTTP SERVER: header
- *	's':	arg = const char* C_string
- *	'T':	arg = char * content_type; format
- *		e.g: "text/html"; content-type header
- *	't':	arg = time_t * gmt_time     // appends time in RFC 1123 fmt
- *	'U':	(no args) appends HTTP USER-AGENT: header
- *      'X':    arg = const char useragent; "redsonic" HTTP X-User-Agent: useragent
- *
- * Return: int
- *	0 - On Success
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_INVALID_URL
- ************************************************************************/
+ * \return
+ * 	\li \c 0 - On Success
+ * 	\li \c UPNP_E_OUTOF_MEMORY
+ * 	\li \c UPNP_E_INVALID_URL
+ */
 int http_MakeMessage(
+	/* [in,out] Buffer with the contents of the message. */
 	INOUT membuffer* buf, 
+	/* [in] HTTP major version. */
 	IN int http_major_version,
+	/* [in] HTTP minor version. */
 	IN int http_minor_version,
-	IN const char* fmt, ... );
+	/* [in] Pattern format. */
+	IN const char* fmt,
+	/* [in] Format arguments. */
+	... );
 
 
 /************************************************************************

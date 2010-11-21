@@ -397,8 +397,8 @@ static void alias_release(
 		ithread_mutex_unlock(&gWebMutex);
 		return;
 	}
-	assert(alias->ct > 0);
-	*alias->ct = *alias->ct - 1;
+	assert(*alias->ct > 0);
+	*alias->ct -= 1;
 	if (*alias->ct <= 0) {
 		membuffer_destroy(&alias->doc);
 		membuffer_destroy(&alias->name);

@@ -2293,7 +2293,7 @@ EXPORT_SPEC int UpnpWriteHttpPost(
 	/*! [in] The buffer to be posted. */
 	char *buf,
 	/*! [in] The size, in bytes of \b buf. */
-	unsigned int *size,
+	size_t *size,
 	/*! [in] A timeout value sent with the request during which a response is
 	 * expected from the server, failing which, an error is reported. If
 	 * value is negative, timeout is infinite. */

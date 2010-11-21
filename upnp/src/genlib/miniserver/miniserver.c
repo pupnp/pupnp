@@ -483,7 +483,7 @@ static int get_port(
 		*port = ntohs(((struct sockaddr_in6*)&sockinfo)->sin6_port);
 	}
 	UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
-		"sockfd = %d, .... port = %d\n", sockfd, port);
+		"sockfd = %d, .... port = %u\n", sockfd, *port);
 
 	return 0;
 }

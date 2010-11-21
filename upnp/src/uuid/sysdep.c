@@ -31,21 +31,19 @@
    system dependent call to get IEEE node ID.
    This sample implementation generates a random node ID
  */
-void
-get_ieee_node_identifier(uuid_node_t *node)
+void get_ieee_node_identifier(uuid_node_t *node)
 {
-    unsigned char seed[16];
-    static int inited = 0;
-    static uuid_node_t saved_node;
+	unsigned char seed[16];
+	static int inited = 0;
+	static uuid_node_t saved_node;
 
-    if (!inited) {
-        get_random_info(seed);
-        seed[0] |= 0x80;
-        memcpy(&saved_node, seed, sizeof (uuid_node_t));
-        inited = 1;
-    };
-
-    *node = saved_node;
+	if (!inited) {
+		get_random_info(seed);
+		seed[0] |= 0x80;
+		memcpy(&saved_node, seed, sizeof(uuid_node_t));
+		inited = 1;
+	};
+	*node = saved_node;
 };
 
 /*-----------------------------------------------------------------------------*/
@@ -57,31 +55,25 @@ get_ieee_node_identifier(uuid_node_t *node)
 
 #ifdef WIN32
 
-void
-get_system_time( uuid_time_t * uuid_time )
+void get_system_time(uuid_time_t *uuid_time)
 {
-    ULARGE_INTEGER time;
+	ULARGE_INTEGER time;
 
-    GetSystemTimeAsFileTime( ( FILETIME * ) & time );
-
-    /*
-       NT keeps time in FILETIME format which is 100ns ticks since
-       Jan 1, 1601.  UUIDs use time in 100ns ticks since Oct 15, 1582.
-       The difference is 17 Days in Oct + 30 (Nov) + 31 (Dec)
-       + 18 years and 5 leap days.
-     */
-
-    time.QuadPart += ( unsigned __int64 )( 1000 * 1000 * 10 )   /* seconds */
-        * ( unsigned __int64 )( 60 * 60 * 24 )  /* days */
-        * ( unsigned __int64 )( 17 + 30 + 31 + 365 * 18 + 5 );  /* # of days */
-
-    *uuid_time = time.QuadPart;
-
+	GetSystemTimeAsFileTime((FILETIME *) & time);
+	/*
+	   NT keeps time in FILETIME format which is 100ns ticks since
+	   Jan 1, 1601.  UUIDs use time in 100ns ticks since Oct 15, 1582.
+	   The difference is 17 Days in Oct + 30 (Nov) + 31 (Dec)
+	   + 18 years and 5 leap days.
+	 */
+	time.QuadPart += (unsigned __int64)(1000 * 1000 * 10)	/* seconds */
+	    *(unsigned __int64)(60 * 60 * 24)	/* days */
+	    *(unsigned __int64)(17 + 30 + 31 + 365 * 18 + 5);	/* # of days */
+	*uuid_time = time.QuadPart;
 };
 
 /*-----------------------------------------------------------------------------*/
-void
-get_random_info(char seed[16])
+void get_random_info(char seed[16])
 {
 	MD5_CTX c;
 	typedef struct {
@@ -121,25 +113,22 @@ get_random_info(char seed[16])
 #else /* WIN32 */
 
 /*-----------------------------------------------------------------------------*/
-void
-get_system_time(uuid_time_t *uuid_time)
+void get_system_time(uuid_time_t *uuid_time)
 {
-    struct timeval tp;
+	struct timeval tp;
 
-    gettimeofday( &tp, ( struct timezone * )0 );
-
-    /*
-       Offset between UUID formatted times and Unix formatted times.
-       UUID UTC base time is October 15, 1582.
-       Unix base time is January 1, 1970.
-     */
-    *uuid_time = ( tp.tv_sec * 10000000 ) + ( tp.tv_usec * 10 ) +
-        I64( 0x01B21DD213814000 );
+	gettimeofday(&tp, (struct timezone *)0);
+	/*
+	   Offset between UUID formatted times and Unix formatted times.
+	   UUID UTC base time is October 15, 1582.
+	   Unix base time is January 1, 1970.
+	 */
+	*uuid_time = (uuid_time_t) (tp.tv_sec * 10000000 + tp.tv_usec * 10 +
+		I64(0x01B21DD213814000));
 };
 
 /*-----------------------------------------------------------------------------*/
-void
-get_random_info(unsigned char seed[16])
+void get_random_info(unsigned char seed[16])
 {
 	MD5_CTX c;
 	typedef struct {

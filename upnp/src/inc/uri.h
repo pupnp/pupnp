@@ -247,7 +247,7 @@ int token_string_casecmp(
 	/*! [in] Token object whose buffer is to be compared. */
 	token *in1,
 	/*! [in] String of characters to compare with. */
-	char *in2);
+	const char *in2);
 
 /*!
  * \brief Compares a null terminated string to a token (exact).

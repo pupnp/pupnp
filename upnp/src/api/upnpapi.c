@@ -2801,7 +2801,7 @@ int UpnpOpenHttpPost(
 int UpnpWriteHttpPost(
 	void *handle,
 	char *buf,
-	unsigned int *size,
+	size_t *size,
 	int timeout)
 {
 	return http_WriteHttpPost(handle, buf, size, timeout);
@@ -2887,21 +2887,18 @@ int UpnpHttpGetProgress(void *Handle, size_t *length, size_t *total)
 
 int UpnpDownloadUrlItem(const char *url, char **outBuf, char *contentType)
 {
-    int ret_code;
-    int dummy;
+	int ret_code;
+	size_t dummy;
 
-    if( url == NULL || outBuf == NULL || contentType == NULL ) {
-        return UPNP_E_INVALID_PARAM;
-    }
+	if (url == NULL || outBuf == NULL || contentType == NULL)
+		return UPNP_E_INVALID_PARAM;
+	ret_code = http_Download(url, HTTP_DEFAULT_TIMEOUT, outBuf, &dummy,
+				 contentType);
+	if (ret_code > 0)
+		/* error reply was received */
+		ret_code = UPNP_E_INVALID_URL;
 
-    ret_code = http_Download( url, HTTP_DEFAULT_TIMEOUT, outBuf, &dummy,
-                              contentType );
-    if( ret_code > 0 ) {
-        /* error reply was received */
-        ret_code = UPNP_E_INVALID_URL;
-    }
-
-    return ret_code;
+	return ret_code;
 }
 
 

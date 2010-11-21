@@ -157,7 +157,6 @@ int AdvertiseAndReply(
 		if (NumCopy != 0)
 			imillisleep(SSDP_PAUSE);
 		NumCopy++;
-
 		for (i = 0;; i++) {
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				"Entering new device list with i = %lu\n\n", i);
@@ -168,31 +167,29 @@ int AdvertiseAndReply(
 				break;
 			}
 			dbgStr = ixmlNode_getNodeName(tmpNode);
-
 			UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 				"Extracting device type once for %s\n", dbgStr);
 			ixmlNodeList_free(nodeList);
 			nodeList = ixmlElement_getElementsByTagName(
 				(IXML_Element *)tmpNode, "deviceType");
-			if (!nodeList) continue;
-
+			if (!nodeList)
+				continue;
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				"Extracting UDN for %s\n", dbgStr);
 			dbgStr = ixmlNode_getNodeName(tmpNode);
-
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				"Extracting device type\n");
 			tmpNode2 = ixmlNodeList_item(nodeList, 0);
-			if (!tmpNode2) continue;
-
+			if (!tmpNode2)
+				continue;
 			textNode = ixmlNode_getFirstChild(tmpNode2);
 			if (!textNode) continue;
 
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				"Extracting device type \n");
 			tmpStr = ixmlNode_getNodeValue(textNode);
-			if (!tmpStr) continue;
-
+			if (!tmpStr)
+				continue;
 			strcpy(devType, tmpStr);
 			UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
 				"Extracting device type = %s\n", devType);
@@ -201,7 +198,6 @@ int AdvertiseAndReply(
 					"TempNode is NULL\n");
 			}
 			dbgStr = ixmlNode_getNodeName(tmpNode);
-
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				"Extracting UDN for %s\n", dbgStr);
 			ixmlNodeList_free(nodeList);
@@ -226,8 +222,8 @@ int AdvertiseAndReply(
 			}
 			tmpStr = ixmlNode_getNodeValue(textNode);
 			if (!tmpStr) {
-				UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
-					"UDN not found!\n");
+				UpnpPrintf(UPNP_CRITICAL, API, __FILE__,
+					__LINE__, "UDN not found!\n");
 				continue;
 			}
 			strcpy(UDNstr, tmpStr);
@@ -237,11 +233,13 @@ int AdvertiseAndReply(
 				/* send the device advertisement */
 				if (AdFlag == 1) {
 					DeviceAdvertisement(devType, i == 0,
-                        UDNstr, SInfo->DescURL, Exp, SInfo->DeviceAf );
+						UDNstr, SInfo->DescURL, Exp,
+						SInfo->DeviceAf);
 				} else {
 		   			/* AdFlag == -1 */
 					DeviceShutdown(devType, i == 0, UDNstr,
-                        SERVER, SInfo->DescURL, Exp, SInfo->DeviceAf );
+						SERVER, SInfo->DescURL, Exp,
+						SInfo->DeviceAf);
 				}
 			} else {
 				switch (SearchType) {

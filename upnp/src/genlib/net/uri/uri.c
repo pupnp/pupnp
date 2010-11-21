@@ -271,197 +271,170 @@ void print_uri(uri_type *in)
 #ifdef DEBUG
 void print_token(token * in)
 {
-    int i = 0;
-    printf( "Token Size : %"PRIzu"\n\'", in->size );
-    for( i = 0; i < in->size; i++ ) {
-        putchar( in->buff[i] );
-    }
-    putchar( '\'' );
-    putchar( '\n' );
+	size_t i = 0;
+
+	printf("Token Size : %" PRIzu "\n\'", in->size);
+	for (i = 0; i < in->size; i++)
+		putchar(in->buff[i]);
+	putchar('\'');
+	putchar('\n');
 }
 #endif /* DEBUG */
 
 
-int token_string_casecmp(token *in1, char *in2)
+int token_string_casecmp(token *in1, const char *in2)
 {
 	size_t in2_length = strlen(in2);
-
-	if (in1->size != in2_length) {
+	if (in1->size != in2_length)
 		return 1;
-	} else {
+	else
 		return strncasecmp(in1->buff, in2, in1->size);
-	}
 }
 
 
 int token_string_cmp(token * in1, char *in2)
 {
 	size_t in2_length = strlen(in2);
-
-	if (in1->size != in2_length) {
+	if (in1->size != in2_length)
 		return 1;
-	} else {
+	else
 		return strncmp(in1->buff, in2, in1->size);
-	}
 }
-
 
 int token_cmp(token *in1, token *in2)
 {
-	if (in1->size != in2->size) {
+	if (in1->size != in2->size)
 		return 1;
-	} else {
+	else
 		return memcmp(in1->buff, in2->buff, in1->size);
-	}
 }
-
 
 int parse_hostport(
 	const char *in,
 	size_t max,
 	hostport_type *out)
 {
-    char workbuf[256];
-    char* c;
-    struct sockaddr_in* sai4 = (struct sockaddr_in*)&out->IPaddress;
-    struct sockaddr_in6* sai6 = (struct sockaddr_in6*)&out->IPaddress;
-    char *srvname = NULL;
-    char *srvport = NULL;
-    char *last_dot = NULL;
-    unsigned short int port;
-    int af = AF_UNSPEC;
-    int hostport_size;
-    int has_port = 0;
-    int ret;
+	char workbuf[256];
+	char *c;
+	struct sockaddr_in *sai4 = (struct sockaddr_in *)&out->IPaddress;
+	struct sockaddr_in6 *sai6 = (struct sockaddr_in6 *)&out->IPaddress;
+	char *srvname = NULL;
+	char *srvport = NULL;
+	char *last_dot = NULL;
+	unsigned short int port;
+	int af = AF_UNSPEC;
+	size_t hostport_size;
+	int has_port = 0;
+	int ret;
 
-    memset( out, 0, sizeof(hostport_type) );
+	memset(out, 0, sizeof(hostport_type));
+	/* Work on a copy of the input string. */
+	strncpy(workbuf, in, sizeof(workbuf));
+	c = workbuf;
+	if (*c == '[') {
+		/* IPv6 addresses are enclosed in square brackets. */
+		srvname = ++c;
+		while (*c != '\0' && *c != ']')
+			c++;
+		if (*c == '\0')
+			/* did not find closing bracket. */
+			return UPNP_E_INVALID_URL;
+		/* NULL terminate the srvname and then increment c. */
+		*c++ = '\0';	/* overwrite the ']' */
+		if (*c == ':') {
+			has_port = 1;
+			c++;
+		}
+		af = AF_INET6;
+	} else {
+		/* IPv4 address -OR- host name. */
+		srvname = c;
+		while (*c != ':' && *c != '/' &&
+		       (isalnum(*c) || *c == '.' || *c == '-')) {
+			if (*c == '.')
+				last_dot = c;
+			c++;
+		}
+		has_port = (*c == ':') ? 1 : 0;
+		/* NULL terminate the srvname */
+		*c = '\0';
+		if (has_port == 1)
+			c++;
+		if (last_dot != NULL && isdigit(*(last_dot + 1)))
+			/* Must be an IPv4 address. */
+			af = AF_INET;
+		else {
+			/* Must be a host name. */
+			struct addrinfo hints, *res, *res0;
 
-    /* Work on a copy of the input string. */
-    strncpy( workbuf, in, sizeof(workbuf) );
+			memset(&hints, 0, sizeof(hints));
+			hints.ai_family = AF_UNSPEC;
+			hints.ai_socktype = SOCK_STREAM;
 
-    c = workbuf;
-    if( *c == '[' ) {
-        /* IPv6 addresses are enclosed in square brackets. */
-        srvname = ++c;
-        while( *c != '\0'  &&  *c != ']' ) {
-            c++;
-        }
-        if( *c == '\0' ) {
-            /* did not find closing bracket. */
-            return UPNP_E_INVALID_URL;
-        }
-        /* NULL terminate the srvname and then increment c. */
-        *c++ = '\0';    /* overwrite the ']' */
-        if( *c == ':' ) {
-            has_port = 1;
-            c++;
-        }
-        af = AF_INET6;
-    }
-    else {
-        /* IPv4 address -OR- host name. */
-        srvname = c;
-        while( (*c != ':') && (*c != '/') && ( (isalnum(*c)) || (*c == '.') || (*c == '-') ) ) {
-            if( *c == '.' )
-                last_dot = c;
-            c++;
-        }
-        has_port = (*c == ':') ? 1 : 0;
-        /* NULL terminate the srvname */
-        *c = '\0';
-        if( has_port == 1 )
-            c++;
+			ret = getaddrinfo(srvname, NULL, &hints, &res0);
+			if (ret == 0) {
+				for (res = res0; res; res = res->ai_next) {
+					if (res->ai_family == AF_INET ||
+					    res->ai_family == AF_INET6) {
+						/* Found a valid IPv4 or IPv6 address. */
+						memcpy(&out->IPaddress,
+						       res->ai_addr,
+						       res->ai_addrlen);
+						break;
+					}
+				}
+				freeaddrinfo(res0);
+				if (res == NULL)
+					/* Didn't find an AF_INET or AF_INET6 address. */
+					return UPNP_E_INVALID_URL;
+			} else
+				/* getaddrinfo failed. */
+				return UPNP_E_INVALID_URL;
+		}
+	}
+	/* Check if a port is specified. */
+	if (has_port == 1) {
+		/* Port is specified. */
+		srvport = c;
+		while (*c != '\0' && isdigit(*c))
+			c++;
+		port = (unsigned short int)atoi(srvport);
+		if (port == 0)
+			/* Bad port number. */
+			return UPNP_E_INVALID_URL;
+	} else
+		/* Port was not specified, use default port. */
+		port = 80;
+	/* The length of the host and port string can be calculated by */
+	/* subtracting pointers. */
+	hostport_size = (size_t)(c - workbuf);
+	/* Fill in the 'out' information. */
+	if (af == AF_INET) {
+		sai4->sin_family = AF_INET;
+		sai4->sin_port = htons(port);
+		ret = inet_pton(AF_INET, srvname, &sai4->sin_addr);
+	} else if (af == AF_INET6) {
+		sai6->sin6_family = AF_INET6;
+		sai6->sin6_port = htons(port);
+		sai6->sin6_scope_id = gIF_INDEX;
+		ret = inet_pton(AF_INET6, srvname, &sai6->sin6_addr);
+	} else {
+		/* IP address was set by the hostname (getaddrinfo). */
+		/* Override port: */
+		if (out->IPaddress.ss_family == AF_INET)
+			sai4->sin_port = htons(port);
+		else
+			sai6->sin6_port = htons(port);
+		ret = 1;
+	}
+	/* Check if address was converted successfully. */
+	if (ret <= 0)
+		return UPNP_E_INVALID_URL;
+	out->text.size = hostport_size;
+	out->text.buff = in;
 
-        if( last_dot != NULL  &&  isdigit(*(last_dot+1)) ) {
-            /* Must be an IPv4 address. */
-            af = AF_INET;
-        }
-        else {
-            /* Must be a host name. */
-            struct addrinfo hints, *res, *res0;
-
-            memset(&hints, 0, sizeof(hints));
-            hints.ai_family = AF_UNSPEC;
-            hints.ai_socktype = SOCK_STREAM;
-
-            ret = getaddrinfo(srvname, NULL, &hints, &res0);
-            if( ret == 0 ) {
-                for (res = res0; res; res = res->ai_next) {
-                    if( res->ai_family == AF_INET || 
-                        res->ai_family == AF_INET6 ) {
-                        /* Found a valid IPv4 or IPv6 address. */
-                        memcpy( &out->IPaddress, res->ai_addr, 
-                            res->ai_addrlen );
-                        break;
-                    }
-                }
-                freeaddrinfo(res0);
-
-                if( res == NULL ) {
-                    /* Didn't find an AF_INET or AF_INET6 address. */
-                    return UPNP_E_INVALID_URL;
-                }
-            }
-            else {
-                /* getaddrinfo failed. */
-                return UPNP_E_INVALID_URL;
-            }
-        }
-    }
-
-    /* Check if a port is specified. */
-    if( has_port == 1 ) {
-        /* Port is specified. */
-        srvport = c;
-        while( *c != '\0'  &&  isdigit(*c) ) {
-            c++;
-        }
-        port = (unsigned short int)atoi(srvport);
-        if( port == 0 ) {
-            /* Bad port number. */
-            return UPNP_E_INVALID_URL;
-        }
-    }
-    else {
-        /* Port was not specified, use default port. */
-        port = 80;
-    }
-
-    /* The length of the host and port string can be calculated by */
-    /* subtracting pointers. */
-    hostport_size = (int)(c - workbuf);
-
-    /* Fill in the 'out' information. */
-    if( af == AF_INET ) {
-        sai4->sin_family = AF_INET;
-        sai4->sin_port = htons(port);
-        ret = inet_pton(AF_INET, srvname, &sai4->sin_addr);
-    }
-    else if( af == AF_INET6 ) {
-        sai6->sin6_family = AF_INET6;
-        sai6->sin6_port = htons(port);
-        sai6->sin6_scope_id = gIF_INDEX;
-        ret = inet_pton(AF_INET6, srvname, &sai6->sin6_addr);
-    } else {
-        /* IP address was set by the hostname (getaddrinfo). */
-        /* Override port: */
-        if( out->IPaddress.ss_family == AF_INET )
-            sai4->sin_port = htons(port);
-        else
-            sai6->sin6_port = htons(port);
-        ret = 1;
-    }
-
-    /* Check if address was converted successfully. */
-    if (ret <= 0) {
-        return UPNP_E_INVALID_URL;
-    }
-
-    out->text.size = hostport_size;
-    out->text.buff = in;
-
-    return hostport_size;
-    max = max;
+	return (int)hostport_size;
+	max = max;
 }
 
 /*!
