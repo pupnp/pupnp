@@ -110,7 +110,7 @@ int sock_read(
 	/*! Buffer to get data to. */
 	OUT char* buffer,
 	/*! Size of the buffer. */
-	IN size_t bufsize,
+	IN int bufsize,
 	/*! timeout value. */
 	INOUT int *timeoutSecs);
 
@@ -126,9 +126,9 @@ int sock_write(
 	/*! Socket Information Object. */
 	IN SOCKINFO *info,
 	/*! Buffer to send data from. */
-	IN char* buffer,
+	IN const char *buffer,
 	/*! Size of the buffer. */
-	IN size_t bufsize,
+	IN int bufsize,
 	/*! timeout value. */
 	INOUT int *timeoutSecs);
 

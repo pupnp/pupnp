@@ -107,7 +107,7 @@ static int sock_read_write(
 	/*! Buffer to get data to or send data from. */
 	OUT char *buffer,
 	/*! Size of the buffer. */
-	IN size_t bufsize,
+	IN int bufsize,
 	/*! timeout value. */
 	IN int *timeoutSecs,
 	/*! Boolean value specifying read or write option. */
@@ -120,39 +120,36 @@ static int sock_read_write(
 	long numBytes;
 	time_t start_time = time(NULL);
 	SOCKET sockfd = info->socket;
-	long bytes_sent = 0, byte_left = 0, num_written;
+	long bytes_sent = 0;
+	long byte_left = 0;
+	long num_written;
 
-	if (*timeoutSecs < 0) {
+	if (*timeoutSecs < 0)
 		return UPNP_E_TIMEDOUT;
-	}
 	FD_ZERO(&readSet);
 	FD_ZERO(&writeSet);
-	if (bRead) {
+	if (bRead)
 		FD_SET(sockfd, &readSet);
-	} else {
+	else
 		FD_SET(sockfd, &writeSet);
-	}
 	timeout.tv_sec = *timeoutSecs;
 	timeout.tv_usec = 0;
 	while (TRUE) {
-		if (*timeoutSecs == 0) {
+		if (*timeoutSecs == 0)
 			retCode = select(sockfd + 1, &readSet, &writeSet,
 				NULL, NULL);
-		} else {
+		else
 			retCode = select(sockfd + 1, &readSet, &writeSet,
 				NULL, &timeout);
-		}
-		if (retCode == 0) {
+		if (retCode == 0)
 			return UPNP_E_TIMEDOUT;
-		}
 		if (retCode == -1) {
 			if (errno == EINTR)
 				continue;
 			return UPNP_E_SOCKET_ERROR;
-		} else {
+		} else
 			/* read or write. */
 			break;
-		}
 	}
 #ifdef SO_NOSIGPIPE
 	{
@@ -164,21 +161,21 @@ static int sock_read_write(
 #endif
 		if (bRead) {
 			/* read data. */
-			numBytes = (long)recv(sockfd, buffer, bufsize, MSG_NOSIGNAL);
+			numBytes = (long)recv(sockfd, buffer, (size_t)bufsize, MSG_NOSIGNAL);
 		} else {
 			byte_left = bufsize;
 			bytes_sent = 0;
 			while (byte_left > 0) {
 				/* write data. */
 				num_written = send(sockfd,
-					buffer + bytes_sent, byte_left,
+					buffer + bytes_sent, (size_t)byte_left,
 					MSG_DONTROUTE | MSG_NOSIGNAL);
 				if (num_written == -1) {
 #ifdef SO_NOSIGPIPE
 					setsockopt(sockfd, SOL_SOCKET,
 						SO_NOSIGPIPE, &old, olen);
 #endif
-					return num_written;
+					return (int)num_written;
 				}
 				byte_left = byte_left - num_written;
 				bytes_sent += num_written;
@@ -189,26 +186,24 @@ static int sock_read_write(
 		setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, olen);
 	}
 #endif
-	if (numBytes < 0) {
+	if (numBytes < 0)
 		return UPNP_E_SOCKET_ERROR;
-	}
 	/* subtract time used for reading/writing. */
-	if (*timeoutSecs != 0) {
-		*timeoutSecs -= time(NULL) - start_time;
-	}
+	if (*timeoutSecs != 0)
+		*timeoutSecs -= (int)(time(NULL) - start_time);
 
-	return numBytes;
+	return (int)numBytes;
 }
 
-int sock_read(IN SOCKINFO *info, OUT char *buffer, IN size_t bufsize,
+int sock_read(IN SOCKINFO *info, OUT char *buffer, IN int bufsize,
 	      INOUT int *timeoutSecs)
 {
 	return sock_read_write(info, buffer, bufsize, timeoutSecs, TRUE);
 }
 
-int sock_write(IN SOCKINFO *info, IN char *buffer, IN size_t bufsize,
+int sock_write(IN SOCKINFO *info, IN const char *buffer, IN int bufsize,
 	       INOUT int *timeoutSecs)
 {
-	return sock_read_write(info, buffer, bufsize, timeoutSecs, FALSE);
+	return sock_read_write(info, (char *)buffer, bufsize, timeoutSecs, FALSE);
 }
 
