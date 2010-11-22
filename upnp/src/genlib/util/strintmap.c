@@ -48,7 +48,7 @@
 *					matched.
 *		IN int num_entries ; number of entries in the table that need 
 *					to be searched.
-*		IN xboolean case_sensitive ; whether the case should be case
+*		IN int case_sensitive ; whether the case should be case
 *					sensitive or not
 *
 *	Description : Match the given name with names from the entries in the 
@@ -65,7 +65,7 @@ map_str_to_int( IN const char *name,
                 IN size_t name_len,
                 IN str_int_entry * table,
                 IN int num_entries,
-                IN xboolean case_sensitive )
+                IN int case_sensitive )
 {
     int top,
       mid,

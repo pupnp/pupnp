@@ -49,7 +49,7 @@ extern "C" {
  *
  * \return boolean.
  */
-xboolean has_xml_content_type(
+int has_xml_content_type(
 	/*! HTTP Message object. */
 	IN http_message_t *hmsg);
 

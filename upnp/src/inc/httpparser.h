@@ -64,7 +64,7 @@ typedef struct
 	size_t cursor;
 	/*! set this to TRUE if the entire msg is loaded in 'msg';
 	 * else FALSE if only partial msg in 'msg' (default is FALSE). */
-	xboolean entire_msg_loaded;
+	int entire_msg_loaded;
 } scanner_t;
 
 typedef enum
@@ -185,7 +185,7 @@ typedef struct {
 	membuffer status_msg;
 	/* fields used in both request or response messages. */
 	/*! if TRUE, msg is a request, else response. */
-	xboolean is_request;
+	int is_request;
 	/* http major version. */
 	int major_version;
 	/* http minor version. */
@@ -210,7 +210,7 @@ typedef struct {
 	int http_error_code;
 	/*! read-only; this is set to true if a NOTIFY request has no
 	 * content-length. used to read valid sspd notify msg. */
-	xboolean valid_ssdp_notify_hack;
+	int valid_ssdp_notify_hack;
 	/* private data -- don't touch. */
 	parser_pos_t position;
 	int ent_position;

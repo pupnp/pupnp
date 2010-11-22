@@ -214,7 +214,7 @@ static int config_description_doc(
 	IN const char *ip_str,
 	OUT char **root_path_str )
 {
-	xboolean addNew = FALSE;
+	int addNew = FALSE;
 	IXML_NodeList *baseList;
 	IXML_Element *element = NULL;
 	IXML_Element *newElement = NULL;
