@@ -90,7 +90,7 @@ genaCallback( IN http_parser_t * parser,
               IN http_message_t * request,
               INOUT SOCKINFO * info )
 {
-    xboolean found_function = FALSE;
+    int found_function = FALSE;
 
     if( request->method == HTTPMETHOD_SUBSCRIBE ) {
 #ifdef INCLUDE_DEVICE_APIS

@@ -628,10 +628,10 @@ static void free_ssdp_event_handler_data(void *the_data)
  * Description:
  *	This function do some quick checking of the ssdp msg
  *
- * Returns: xboolean
+ * Returns: int
  *	returns TRUE if msg is valid else FALSE
  ***************************************************************************/
-static UPNP_INLINE xboolean valid_ssdp_msg(IN http_message_t *hmsg)
+static UPNP_INLINE int valid_ssdp_msg(IN http_message_t *hmsg)
 {
 	memptr hdr_value;
 

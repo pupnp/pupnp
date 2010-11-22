@@ -44,7 +44,7 @@
 #include "statcodes.h"
 #include "parsetools.h"
 
-xboolean has_xml_content_type(http_message_t *hmsg)
+int has_xml_content_type(http_message_t *hmsg)
 {
 	memptr hdr_value;
 

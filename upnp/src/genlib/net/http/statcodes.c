@@ -96,7 +96,7 @@ static const char *Http5xxStr =
     "Service Unavailable\0"
     "Gateway Timeout\0" "HTTP Version Not Supported\0";
 
-static xboolean gInitialized = FALSE;
+static int gInitialized = FALSE;
 
 /************************************************************************
 ************************* Functions *************************************
