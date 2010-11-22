@@ -128,7 +128,7 @@ int SampleUtil_PrintEvent(
 	/*! [in] The type of callback event. */
 	Upnp_EventType EventType, 
 	/*! [in] The callback event structure. */
-	void *Event);
+	const void *Event);
 
 /*!
  * \brief This routine finds the first occurance of a service in a DOM

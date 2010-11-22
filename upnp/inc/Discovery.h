@@ -1,8 +1,6 @@
 
-
 #ifndef DISCOVERY_H
 #define DISCOVERY_H
-
 
 /*!
  * \file
@@ -32,7 +30,6 @@
 	EXPAND_CLASS_MEMBER_BUFFER(CLASS, DestAddr, struct sockaddr_storage) \
 
 #include "TemplateInclude.h"
-
 
 #endif /* DISCOVERY_H */
 

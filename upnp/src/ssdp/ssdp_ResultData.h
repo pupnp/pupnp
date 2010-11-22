@@ -1,42 +1,43 @@
 
-
 #ifndef SSDP_RESULTDATA_H
 #define SSDP_RESULTDATA_H
 
+/*!
+ * \file
+ *
+ * \brief SSDPResultData object declararion.
+ *
+ * \author Marcelo Roberto Jimenez
+ */
 
-/** Structure to contain Discovery response */
-typedef struct s_SSDPResultData SSDPResultData;
+/******************************************************************************/
 
+#ifdef TEMPLATE_GENERATE_SOURCE
+#undef TEMPLATE_GENERATE_SOURCE
 
-#include "Discovery.h" /* for UpnpDiscovery */
-#include "upnp.h"      /* for Upnp_FunPtr */
+	#include "Discovery.h" /* for UpnpDiscovery */
 
+#define TEMPLATE_GENERATE_SOURCE
+#else /* TEMPLATE_GENERATE_SOURCE */
 
-/** Constructor */
-SSDPResultData *SSDPResultData_new();
+	#include "Discovery.h" /* for UpnpDiscovery */
 
-/** Destructor */
-void SSDPResultData_delete(SSDPResultData *p);
+#endif /* TEMPLATE_GENERATE_SOURCE */
 
-/** Copy Constructor */
-SSDPResultData *SSDPResultData_dup(const SSDPResultData *p);
+/******************************************************************************/
 
-/** Assignment operator */
-void SSDPResultData_assign(SSDPResultData *q, const SSDPResultData *p);
+#include "Callback.h" /* for Upnp_FunPtr */
 
-/**  */
-UpnpDiscovery *SSDPResultData_get_Param(const SSDPResultData *p);
-void SSDPResultData_set_Param(SSDPResultData *p, const UpnpDiscovery *d);
+#define CLASS SSDPResultData
 
-/**  */
-void *SSDPResultData_get_Cookie(const SSDPResultData *p);
-void SSDPResultData_set_Cookie(SSDPResultData *p, void *c);
+#define EXPAND_CLASS_MEMBERS(CLASS) \
+	EXPAND_CLASS_MEMBER_OBJECT(CLASS, Param, UpnpDiscovery) \
+	EXPAND_CLASS_MEMBER_INT(CLASS, Cookie, void *) \
+	EXPAND_CLASS_MEMBER_INT(CLASS, CtrlptCallback, Upnp_FunPtr) \
 
-/**  */
-Upnp_FunPtr SSDPResultData_get_CtrlptCallback(const SSDPResultData *p);
-void SSDPResultData_set_CtrlptCallback(SSDPResultData *p, Upnp_FunPtr f);
+#include "TemplateInclude.h"
 
-/** */
+/*! */
 void SSDPResultData_Callback(const SSDPResultData *p);
 
 #endif /* SSDP_RESULTDATA_H */

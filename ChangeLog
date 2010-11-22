@@ -2,6 +2,10 @@
 Version 1.8.0
 *******************************************************************************
 
+2010-11-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	Template object for ssdp_ResultData.
+
 2010-11-10 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
 	Support for "polling" select in sock_read_write.

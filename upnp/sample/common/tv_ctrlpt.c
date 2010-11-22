@@ -986,7 +986,7 @@ void TvCtrlPointHandleGetVar(
  *   Cookie -- Optional data specified during callback registration
  *
  ********************************************************************************/
-int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Cookie)
+int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, const void *Event, void *Cookie)
 {
 	int errCode = 0;
 
@@ -995,7 +995,7 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, void *Event, void 
 	/* SSDP Stuff */
 	case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
 	case UPNP_DISCOVERY_SEARCH_RESULT: {
-		UpnpDiscovery *d_event = (UpnpDiscovery *)Event;
+		const UpnpDiscovery *d_event = (UpnpDiscovery *)Event;
 		IXML_Document *DescDoc = NULL;
 		const char *location = NULL;
 		int errCode = UpnpDiscovery_get_ErrCode(d_event);

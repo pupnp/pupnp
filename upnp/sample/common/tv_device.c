@@ -1308,7 +1308,7 @@ int TvDeviceDecreaseBrightness(IXML_Document *in, IXML_Document **out, const cha
     return IncrementBrightness(-1, in, out, errorString);
 }
 
-int TvDeviceCallbackEventHandler(Upnp_EventType EventType, void *Event, void *Cookie)
+int TvDeviceCallbackEventHandler(Upnp_EventType EventType, const void *Event, void *Cookie)
 {
 	switch (EventType) {
 	case UPNP_EVENT_SUBSCRIPTION_REQUEST:

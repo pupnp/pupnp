@@ -249,7 +249,7 @@ int TvDeviceCallbackEventHandler(
 	/*! [in] The type of callback event. */
 	Upnp_EventType,
 	/*! [in] Data structure containing event data. */
-	void *Event,
+	const void *Event,
 	/*! [in] Optional data specified during callback registration. */
 	void *Cookie);
 

@@ -21,6 +21,7 @@ upnpincludedir = $(includedir)/upnp
 upnpinclude_HEADERS = \
 	inc/ActionComplete.h \
 	inc/ActionRequest.h \
+	inc/Callback.h \
 	inc/Discovery.h \
 	inc/Event.h \
 	inc/EventSubscribe.h \

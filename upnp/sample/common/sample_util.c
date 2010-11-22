@@ -320,7 +320,7 @@ void SampleUtil_PrintEventType(Upnp_EventType S)
 	}
 }
 
-int SampleUtil_PrintEvent(Upnp_EventType EventType, void *Event)
+int SampleUtil_PrintEvent(Upnp_EventType EventType, const void *Event)
 {
 	ithread_mutex_lock(&display_mutex);
 
