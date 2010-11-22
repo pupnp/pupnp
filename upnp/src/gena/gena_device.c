@@ -29,18 +29,14 @@
  *
  ******************************************************************************/
 
-
 /*!
  * \file
  */
 
-
 #include "config.h"
-
 
 #if EXCLUDE_GENA == 0
 #ifdef INCLUDE_DEVICE_APIS
-
 
 #include "gena.h"
 #include "httpparser.h"
@@ -52,7 +48,6 @@
 #include "unixutil.h"
 #include "upnpapi.h"
 #include "uuid.h"
-
 
 /*!
  * \brief Unregisters a device.
@@ -80,7 +75,6 @@ int genaUnregisterDevice(
 
 	return ret;
 }
-
 
 /*!
  * \brief Generates XML property set for notifications.
@@ -116,9 +110,8 @@ static int GeneratePropertySet(
 	}
 
 	buffer = (char *)malloc(size + 1);
-	if (buffer == NULL) {
+	if (buffer == NULL)
 		return UPNP_E_OUTOF_MEMORY;
-	}
 	memset(buffer, 0, size + 1);
 	/*
 	strcpy(buffer,XML_VERSION);
@@ -140,7 +133,6 @@ static int GeneratePropertySet(
 	return XML_SUCCESS;
 }
 
-
 /*!
  * \brief Frees memory used in notify_threads if the reference count is 0,
  * otherwise decrements the refrence count.
@@ -159,7 +151,6 @@ static void free_notify_struct(
 	}
 	free(input);
 }
-
 
 /*!
  * \brief Sends the notify message and returns a reply.
@@ -193,15 +184,12 @@ static UPNP_INLINE int notify_send_and_recv(
 		destination_url->hostport.text.buff);
 
 	conn_fd = http_Connect(destination_url, &url);
-	if (conn_fd < 0) {
+	if (conn_fd < 0)
 		/* return UPNP error */
 		return UPNP_E_SOCKET_CONNECT;
-	}
-
 	ret_code = sock_init(&info, conn_fd);
 	if (ret_code) {
 		sock_destroy(&info, SD_BOTH);
-
 		return ret_code;
 	}
 	/* make start line and HOST header */
@@ -213,12 +201,9 @@ static UPNP_INLINE int notify_send_and_recv(
 			mid_msg->buf) != 0) {
 		membuffer_destroy(&start_msg);
 		sock_destroy(&info, SD_BOTH);
-
 		return UPNP_E_OUTOF_MEMORY;
 	}
-
 	timeout = GENA_NOTIFICATION_SENDING_TIMEOUT;
-
 	/* send msg (note: end of notification will contain "\r\n" twice) */
 	ret_code = http_SendMessage(&info, &timeout,
 		"bbb",
@@ -228,29 +213,23 @@ static UPNP_INLINE int notify_send_and_recv(
 	if (ret_code) {
 		membuffer_destroy(&start_msg);
 		sock_destroy(&info, SD_BOTH);
-
 		return ret_code;
 	}
-
 	timeout = GENA_NOTIFICATION_ANSWERING_TIMEOUT;
-
 	ret_code = http_RecvMessage(&info, response,
 		HTTPMETHOD_NOTIFY, &timeout, &err_code);
 	if (ret_code) {
 		membuffer_destroy(&start_msg);
 		sock_destroy(&info, SD_BOTH);
 		httpmsg_destroy(&response->msg);
-
 		return ret_code;
 	}
-
 	/* should shutdown completely when closing socket */
 	sock_destroy(&info, SD_BOTH);
 	membuffer_destroy(&start_msg);
 
 	return UPNP_E_SUCCESS;
 }
-
 
 /*!
  * \brief Function to Notify a particular subscription of a particular event.
@@ -271,53 +250,47 @@ static int genaNotify(
 	/*! [in] subscription to be Notified, assumes this is valid for life of function. */
 	subscription *sub)
 {
-    size_t i;
-    membuffer mid_msg;
-    membuffer endmsg;
-    uri_type *url;
-    http_parser_t response;
-    int return_code = -1;
+	size_t i;
+	membuffer mid_msg;
+	membuffer endmsg;
+	uri_type *url;
+	http_parser_t response;
+	int return_code = -1;
 
-    membuffer_init( &mid_msg );
+	membuffer_init(&mid_msg);
+	/* make 'end' msg (the part that won't vary with the destination) */
+	endmsg.size_inc = 30;
+	if (http_MakeMessage(&mid_msg, 1, 1,
+			     "s" "ssc" "sdcc",
+			     headers,
+			     "SID: ", sub->sid,
+			     "SEQ: ", sub->ToSendEventKey) != 0) {
+		membuffer_destroy(&mid_msg);
+		return UPNP_E_OUTOF_MEMORY;
+	}
+	/* send a notify to each url until one goes thru */
+	for (i = 0; i < sub->DeliveryURLs.size; i++) {
+		url = &sub->DeliveryURLs.parsedURLs[i];
+		return_code = notify_send_and_recv(
+			url, &mid_msg, propertySet, &response);
+		if (return_code == UPNP_E_SUCCESS)
+			break;
+	}
+	membuffer_destroy(&mid_msg);
+	if (return_code == UPNP_E_SUCCESS) {
+		if (response.msg.status_code == HTTP_OK)
+			return_code = GENA_SUCCESS;
+		else {
+			if (response.msg.status_code == HTTP_PRECONDITION_FAILED)
+				/*Invalid SID gets removed */
+				return_code = GENA_E_NOTIFY_UNACCEPTED_REMOVE_SUB;
+			else
+				return_code = GENA_E_NOTIFY_UNACCEPTED;
+		}
+		httpmsg_destroy(&response.msg);
+	}
 
-    /* make 'end' msg (the part that won't vary with the destination) */
-    endmsg.size_inc = 30;
-    if( http_MakeMessage(
-        &mid_msg, 1, 1,
-        "s" "ssc" "sdcc",
-        headers,
-        "SID: ", sub->sid,
-        "SEQ: ", sub->ToSendEventKey ) != 0 ) {
-        membuffer_destroy( &mid_msg );
-        return UPNP_E_OUTOF_MEMORY;
-    }
-    /* send a notify to each url until one goes thru */
-    for( i = 0; i < sub->DeliveryURLs.size; i++ ) {
-        url = &sub->DeliveryURLs.parsedURLs[i];
-        return_code = notify_send_and_recv(
-                url, &mid_msg, propertySet,&response);
-        if (return_code == UPNP_E_SUCCESS) {
-            break;
-        }
-    }
-
-    membuffer_destroy( &mid_msg );
-
-    if( return_code == UPNP_E_SUCCESS ) {
-        if( response.msg.status_code == HTTP_OK ) {
-            return_code = GENA_SUCCESS;
-        } else {
-            if( response.msg.status_code == HTTP_PRECONDITION_FAILED ) {
-                /*Invalid SID gets removed */
-                return_code = GENA_E_NOTIFY_UNACCEPTED_REMOVE_SUB;
-            } else {
-                return_code = GENA_E_NOTIFY_UNACCEPTED;
-            }
-        }
-        httpmsg_destroy( &response.msg );
-    }
-
-    return return_code;
+	return return_code;
 }
 
 
@@ -333,94 +306,81 @@ static void genaNotifyThread(
 	/*! [in] notify thread structure containing all the headers and property set info. */
 	void *input)
 {
-    subscription *sub;
-    service_info *service;
-    subscription sub_copy;
-    notify_thread_struct *in = ( notify_thread_struct * ) input;
-    int return_code;
-    struct Handle_Info *handle_info;
-    ThreadPoolJob job;
+	subscription *sub;
+	service_info *service;
+	subscription sub_copy;
+	notify_thread_struct *in = (notify_thread_struct *) input;
+	int return_code;
+	struct Handle_Info *handle_info;
+	ThreadPoolJob job;
 
-    /* This should be a HandleLock and not a HandleReadLock otherwise if there
-     * is a lot of notifications, then multiple threads will acquire a read
-     * lock and the thread which sends the notification will be blocked forever
-     * on the HandleLock at the end of this function. */
-    /*HandleReadLock(); */
-    HandleLock();
-    /*validate context */
+	/* This should be a HandleLock and not a HandleReadLock otherwise if there
+	 * is a lot of notifications, then multiple threads will acquire a read
+	 * lock and the thread which sends the notification will be blocked forever
+	 * on the HandleLock at the end of this function. */
+	/*HandleReadLock(); */
+	HandleLock();
+	/* validate context */
 
-    if( GetHandleInfo( in->device_handle, &handle_info ) != HND_DEVICE ) {
-        free_notify_struct( in );
-        HandleUnlock();
-        return;
-    }
+	if (GetHandleInfo(in->device_handle, &handle_info) != HND_DEVICE) {
+		free_notify_struct(in);
+		HandleUnlock();
+		return;
+	}
 
-    if( ( ( service = FindServiceId( &handle_info->ServiceTable,
-                                     in->servId, in->UDN ) ) == NULL )
-        || ( !service->active )
-        || ( ( sub = GetSubscriptionSID( in->sid, service ) ) == NULL )
-        || ( ( copy_subscription( sub, &sub_copy ) != HTTP_SUCCESS ) ) ) {
-        free_notify_struct( in );
-        HandleUnlock();
-        return;
-    }
-
+	if (!(service = FindServiceId(&handle_info->ServiceTable, in->servId, in->UDN)) ||
+	    !service->active ||
+	    !(sub = GetSubscriptionSID(in->sid, service)) ||
+	    copy_subscription(sub, &sub_copy) != HTTP_SUCCESS) {
+		free_notify_struct(in);
+		HandleUnlock();
+		return;
+	}
 #ifdef UPNP_ENABLE_NOTIFICATION_REORDERING
-    /*If the event is out of order push it back to the job queue */
-    if( in->eventKey != sub->ToSendEventKey ) {
-
-        TPJobInit( &job, ( start_routine ) genaNotifyThread, input );
-        TPJobSetFreeFunction( &job, ( free_function ) free_notify_struct );
-        TPJobSetPriority( &job, MED_PRIORITY );
-
-        /* Sleep a little before creating another thread otherwise if there is
-         * a lot of notifications to send, the device will take 100% of the CPU
-         * to create threads and push them back to the job queue. */
-        imillisleep( 1 );
-
-        ThreadPoolAdd( &gSendThreadPool, &job, NULL );
-
-        freeSubscription( &sub_copy );
-        HandleUnlock();
-        return;
-    }
+	/*If the event is out of order push it back to the job queue */
+	if (in->eventKey != sub->ToSendEventKey) {
+		TPJobInit(&job, (start_routine) genaNotifyThread, input);
+		TPJobSetFreeFunction(&job, (free_function) free_notify_struct);
+		TPJobSetPriority(&job, MED_PRIORITY);
+		/* Sleep a little before creating another thread otherwise if there is
+		 * a lot of notifications to send, the device will take 100% of the CPU
+		 * to create threads and push them back to the job queue. */
+		imillisleep(1);
+		ThreadPoolAdd(&gSendThreadPool, &job, NULL);
+		freeSubscription(&sub_copy);
+		HandleUnlock();
+		return;
+	}
 #endif
 
-    HandleUnlock();
+	HandleUnlock();
 
-    /*send the notify */
-    return_code = genaNotify( in->headers, in->propertySet, &sub_copy );
+	/* send the notify */
+	return_code = genaNotify(in->headers, in->propertySet, &sub_copy);
+	freeSubscription(&sub_copy);
+	HandleLock();
+	if (GetHandleInfo(in->device_handle, &handle_info) != HND_DEVICE) {
+		free_notify_struct(in);
+		HandleUnlock();
+		return;
+	}
+	/* validate context */
+	if (!(service = FindServiceId(&handle_info->ServiceTable, in->servId, in->UDN)) ||
+	    !service->active ||
+	    !(sub = GetSubscriptionSID(in->sid, service))) {
+		free_notify_struct(in);
+		HandleUnlock();
+		return;
+	}
+	sub->ToSendEventKey++;
+	if (sub->ToSendEventKey < 0)
+		/* wrap to 1 for overflow */
+		sub->ToSendEventKey = 1;
+	if (return_code == GENA_E_NOTIFY_UNACCEPTED_REMOVE_SUB)
+		RemoveSubscriptionSID(in->sid, service);
+	free_notify_struct(in);
 
-    freeSubscription( &sub_copy );
-
-    HandleLock();
-
-    if( GetHandleInfo( in->device_handle, &handle_info ) != HND_DEVICE ) {
-        free_notify_struct( in );
-        HandleUnlock();
-        return;
-    }
-    /*validate context */
-    if( ( ( service = FindServiceId( &handle_info->ServiceTable,
-                                     in->servId, in->UDN ) ) == NULL )
-        || ( !service->active )
-        || ( ( sub = GetSubscriptionSID( in->sid, service ) ) == NULL ) ) {
-        free_notify_struct( in );
-        HandleUnlock();
-        return;
-    }
-
-    sub->ToSendEventKey++;
-
-    if( sub->ToSendEventKey < 0 )   /*wrap to 1 for overflow */
-        sub->ToSendEventKey = 1;
-
-    if( return_code == GENA_E_NOTIFY_UNACCEPTED_REMOVE_SUB ) {
-        RemoveSubscriptionSID( in->sid, service );
-    }
-
-    free_notify_struct( in );
-    HandleUnlock();
+	HandleUnlock();
 }
 
 
