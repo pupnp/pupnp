@@ -239,6 +239,14 @@ Version 1.6.10
 
 2010-11-23 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
+	Major bug fix in http_SendMessage.
+
+	Currently, http_SendMessage was not able to write to write a buffer
+	due to a bad use of file_buf instead of buf. This bug was introduced by
+	the 0197-Doxygen-reformating-compiler-warnings patch.
+
+2010-11-23 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
 	Returning the Sid in Upnp_Event_Subscribe.
 
 	Currently, Upnp_Event_Subscribe always contains an empty chain in the

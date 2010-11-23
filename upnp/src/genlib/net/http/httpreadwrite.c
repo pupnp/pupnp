@@ -589,7 +589,7 @@ int http_SendMessage(IN SOCKINFO * info, IN OUT int *TimeOut,
 			buf = va_arg(argp, char *);
 			buf_length = va_arg(argp, size_t);
 			if (buf_length > 0) {
-				nw = sock_write(info, file_buf, num_read, TimeOut);
+				nw = sock_write(info, buf, buf_length, TimeOut);
 				num_written = (size_t)nw;
 				UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
 					   ">>> (SENT) >>>\n"
