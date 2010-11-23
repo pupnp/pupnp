@@ -3318,7 +3318,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 	case SUBSCRIBE: {
 		UpnpEventSubscribe *evt = UpnpEventSubscribe_new();
 		/* Cast away constness */
-		UpnpString *Sid = (UpnpString *)UpnpEventSubscribe_get_SID(evt);
+		UpnpString *Sid = UpnpString_new();
 
 		UpnpEventSubscribe_strcpy_PublisherUrl(evt, Param->Url);
 		errCode = genaSubscribe(
@@ -3328,7 +3328,9 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 			Sid);
 		UpnpEventSubscribe_set_ErrCode(evt, errCode);
 		UpnpEventSubscribe_set_TimeOut(evt, Param->TimeOut);
+		UpnpEventSubscribe_set_SID(evt, Sid);
 		Param->Fun(UPNP_EVENT_SUBSCRIBE_COMPLETE, evt, Param->Cookie);
+ 		UpnpString_delete(Sid);
 	    	UpnpEventSubscribe_delete(evt);
 		free(Param);
 		break;
