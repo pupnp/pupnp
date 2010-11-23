@@ -479,7 +479,7 @@ Format types:
 	'T':	arg = char * content_type;	-- format e.g: "text/html"; content-type header
 	't':	arg = time_t * gmt_time		-- appends time in RFC 1123 fmt
 	'U':	(no args)			-- appends HTTP USER-AGENT: header
-	'X':	arg = const char		-- useragent; "redsonic" HTTP X-User-Agent: useragent
+	'X':	arg = const char *		-- useragent; "redsonic" HTTP X-User-Agent: useragent
 \endverbatim
  *
  * \return

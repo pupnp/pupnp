@@ -176,6 +176,7 @@ static UPNP_INLINE int notify_send_and_recv(
 	int err_code;
 	int timeout;
 	SOCKINFO info;
+	const char *CRLF = "\r\n";
 
 	/* connect */
 	UpnpPrintf(UPNP_ALL, GENA, __FILE__, __LINE__,
@@ -209,7 +210,7 @@ static UPNP_INLINE int notify_send_and_recv(
 		"bbb",
 		start_msg.buf, start_msg.length,
 		propertySet, strlen(propertySet),
-		"\r\n", 2);
+		CRLF, sizeof CRLF);
 	if (ret_code) {
 		membuffer_destroy(&start_msg);
 		sock_destroy(&info, SD_BOTH);
