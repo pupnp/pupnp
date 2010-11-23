@@ -3322,7 +3322,6 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 		UpnpString *Sid = UpnpString_new();
 		UpnpString *Url = UpnpString_new();
 		UpnpString_set_String(Url, Param->Url);
-		UpnpString_set_String(Sid, (char *)Evt.Sid);
 		Evt.ErrCode = genaSubscribe(
 			Param->Handle,
 			Url,
@@ -3330,6 +3329,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 			Sid);
 		strcpy(Evt.PublisherUrl, Param->Url);
 		Evt.TimeOut = Param->TimeOut;
+		strcpy((char *)Evt.Sid, UpnpString_get_String(Sid));
 		Param->Fun(UPNP_EVENT_SUBSCRIBE_COMPLETE, &Evt, Param->Cookie);
 		UpnpString_delete(Sid);
 		UpnpString_delete(Url);

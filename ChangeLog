@@ -2,6 +2,15 @@
 Version 1.6.10
 *******************************************************************************
 
+2010-11-23 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Returning the Sid in Upnp_Event_Subscribe.
+
+	Currently, Upnp_Event_Subscribe always contains an empty chain in the
+	Sid parameter. This patch now saves the client Subscription ID in this
+	parameter so Control Points can see and use the same SID in the
+	Upnp_Event_Subscribe and in the Upnp_Event structures.
+
 2010-11-22 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Two fixes from Juergen Lock <nox(at)jelal.kn-bremen.de>:
