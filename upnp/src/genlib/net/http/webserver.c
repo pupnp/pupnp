@@ -1463,35 +1463,31 @@ void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
 		/* send response */
 		switch (rtype) {
 		case RESP_FILEDOC:
-			/* send file, I = further instruction to send data. */
-			http_SendMessage(info, &timeout, "Ibf", &RespInstr,
+			http_SendMessage(info, &timeout, "Ibf",
+					 &RespInstr,
 					 headers.buf, headers.length,
 					 filename.buf);
 			break;
 		case RESP_XMLDOC:
-			/* send xmldoc , I = further instruction to send data. */
-			http_SendMessage(info, &timeout,
-				"Ibb", &RespInstr,
+			http_SendMessage(info, &timeout, "Ibb",
+				&RespInstr,
 				headers.buf, headers.length,
 				xmldoc.doc.buf, xmldoc.doc.length);
 			alias_release(&xmldoc);
 			break;
 		case RESP_WEBDOC:
-			/*, I = further instruction to send data. */
-			/*
-			   http_SendVirtualDirDoc( info, &timeout, "Ibf",&RespInstr,
-			   headers.buf, headers.length,
-			   filename.buf );
-			 */
-			http_SendMessage(info, &timeout,
-				"Ibf", &RespInstr,
+			/*http_SendVirtualDirDoc(info, &timeout, "Ibf",
+				&RespInstr,
+				headers.buf, headers.length,
+				filename.buf);*/
+			http_SendMessage(info, &timeout, "Ibf",
+				&RespInstr,
 				headers.buf, headers.length,
 				filename.buf);
 			break;
 		case RESP_HEADERS:
 			/* headers only */
-			http_SendMessage(info, &timeout,
-				"b",
+			http_SendMessage(info, &timeout, "b",
 				headers.buf, headers.length);
 			break;
 		case RESP_POST:
@@ -1502,10 +1498,12 @@ void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
 			http_MakeMessage(&headers, 1, 1,
 				"RTLSXcCc",
 				ret, "text/html", X_USER_AGENT);
-			http_SendMessage(info, &timeout, "b", headers.buf,
-				headers.length);
+			http_SendMessage(info, &timeout, "b",
+				headers.buf, headers.length);
 			break;
 		default:
+			UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
+				"webserver: Invalid response type received.\n");
 			assert(0);
 		}
 	}
