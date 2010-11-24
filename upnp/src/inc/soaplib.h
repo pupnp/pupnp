@@ -32,31 +32,25 @@
 #ifndef SOAPLIB_H
 #define SOAPLIB_H 
 
+/*!
+ * \file
+ */
 
 /* SOAP module API to be called in Upnp-Dk API */
 
 
-/****************************************************************************
- * Function: soap_device_callback
- *
- * Parameters:
- *	IN http_parser_t *parser: Parsed request received by the device
- *	IN http_message_t* request: HTTP request
- *	INOUT SOCKINFO *info: socket info
- *
- * Description: This is a callback called by minisever after receiving
- *	the request from the control point. This function will start
- *	processing the request. It calls handle_invoke_action to handle the
- *	SOAP action
- *
- * Return: void
- *
- * Note:
- ****************************************************************************/
+/*!
+ * \brief This is a callback called by minisever after receiving the request
+ * from the control point. This function will start processing the request.
+ * It calls handle_invoke_action to handle the SOAP action.
+ */
 void soap_device_callback(
-	IN http_parser_t *parser,
-	IN http_message_t* request,
-	INOUT SOCKINFO *info);
+	/*! [in] Parsed request received by the device. */
+	http_parser_t *parser,
+	/*! [in] HTTP request. */
+	http_message_t *request,
+	/*! [in,out] Socket info. */
+	SOCKINFO *info);
 
 
 /****************************************************************************
