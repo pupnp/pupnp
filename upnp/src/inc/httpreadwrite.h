@@ -122,37 +122,37 @@ int http_RecvMessage( IN SOCKINFO *info, OUT http_parser_t* parser,
 		OUT int* http_error_code );
 
 
-/************************************************************************
- * Function: http_SendMessage
+/*!
+ * \brief Sends a message to the destination based on the format parameter.
  *
- * Parameters:
- *	IN SOCKINFO *info ;		Socket information object
- *	IN OUT int * TimeOut ;		time out value
- *	IN const char* fmt, ...	 Pattern format to take actions upon
+ * fmt types:
+ * \li \c 'f': arg = "const char *" file name
+ * \li \c 'b': arg1 = "const char *" mem_buffer; arg2 = "size_t" buffer length.
+ * \li \c 'I': arg = "struct SendInstruction *"
  *
- * Description:
- *	Sends a message to the destination based on the
- *	IN const char* fmt parameter
- *	fmt types:
- *		'f':	arg = const char * file name
- *		'm':	arg1 = const char * mem_buffer; arg2= size_t buf_length
- *	E.g.:
- *		char *buf = "POST /xyz.cgi http/1.1\r\n\r\n";
- *		char *filename = "foo.dat";
- *		int status = http_SendMessage( tcpsock, "mf",
- *			buf, strlen(buf),	// args for memory buffer
- *			filename );		// arg for file
+ * E.g.:
+ \verbatim
+ 	char *buf = "POST /xyz.cgi http/1.1\r\n\r\n";
+ 	char *filename = "foo.dat";
+ 	int status = http_SendMessage(tcpsock, "bf",
+ 		buf, strlen(buf),	// args for memory buffer
+ 		filename);		// arg for file
+ \endverbatim
  *
- * Returns:
- *	UPNP_E_OUTOF_MEMORY
- * 	UPNP_E_FILE_READ_ERROR
- *	UPNP_E_SUCCESS
- ************************************************************************/
+ * \return
+ * \li \c UPNP_E_OUTOF_MEMORY
+ * \li \c UPNP_E_FILE_READ_ERROR
+ * \li \c UPNP_E_SUCCESS
+ */
 int http_SendMessage(
-	IN SOCKINFO *info,
-	IN OUT int* timeout_secs, 
-	IN const char* fmt, ... );
-
+	/* [in] Socket information object. */
+	SOCKINFO *info,
+	/* [in,out] Time out value. */
+	int* timeout_secs, 
+	/* [in] Pattern format to take actions upon. */
+	const char* fmt,
+	/* [in] Variable parameter list. */
+	...);
 
 /************************************************************************
  * Function: http_RequestAndResponse
