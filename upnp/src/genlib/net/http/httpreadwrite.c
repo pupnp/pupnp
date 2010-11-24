@@ -418,51 +418,22 @@ ExitFunction:
 	return ret;
 }
 
-
-/************************************************************************
- * Function: http_SendMessage
- *
- * Parameters:
- *	IN SOCKINFO *info ;		Socket information object
- *	IN OUT int * TimeOut ;		time out value
- *	IN const char* fmt, ...	 Pattern format to take actions upon
- *
- * Description:
- *	Sends a message to the destination based on the
- *	IN const char* fmt parameter
- *	fmt types:
- *		'f':	arg = const char * file name
- *		'm':	arg1 = const char * mem_buffer; arg2= size_t buf_length
- *	E.g.:
- *		char *buf = "POST /xyz.cgi http/1.1\r\n\r\n";
- *		char *filename = "foo.dat";
- *		int status = http_SendMessage( tcpsock, "mf",
- *			buf, strlen(buf),
- *			filename );
- *
- * Returns:
- *	UPNP_E_OUTOF_MEMORY
- * 	UPNP_E_FILE_READ_ERROR
- *	UPNP_E_SUCCESS
- ************************************************************************/
-int http_SendMessage(IN SOCKINFO * info, IN OUT int *TimeOut,
-	IN const char *fmt, ...)
+int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 {
 	FILE *Fp;
 	va_list argp;
 	struct SendInstruction *Instr = NULL;
-	size_t num_read;
-	size_t num_written;
-	int nr;
-	int nw;
-	int RetVal = 0;
-	char c;
 	char *buf = NULL;
-	size_t buf_length;
 	char *filename = NULL;
 	char *file_buf = NULL;
 	char *ChunkBuf = NULL;
 	char Chunk_Header[CHUNK_HEADER_SIZE];
+	char c;
+	int nw;
+	int RetVal = 0;
+	size_t buf_length;
+	size_t num_read;
+	size_t num_written;
 	size_t amount_to_be_read = 0;
 	/* 10 byte allocated for chunk header. */
 	size_t Data_Buf_Size = WEB_SERVER_BUF_SIZE;
@@ -471,9 +442,6 @@ int http_SendMessage(IN SOCKINFO * info, IN OUT int *TimeOut,
 	while ((c = *fmt++) != 0) {
 		if (c == 'I') {
 			Instr = va_arg(argp, struct SendInstruction *);
-
-			assert(Instr);
-
 			if (Instr->ReadSendSize >= 0)
 				amount_to_be_read = (size_t)Instr->ReadSendSize;
 			else
@@ -483,8 +451,10 @@ int http_SendMessage(IN SOCKINFO * info, IN OUT int *TimeOut,
 			ChunkBuf = malloc((size_t)
 				(Data_Buf_Size + CHUNK_HEADER_SIZE +
 				CHUNK_TAIL_SIZE));
-			if (!ChunkBuf)
-				return UPNP_E_OUTOF_MEMORY;
+			if (!ChunkBuf) {
+				RetVal = UPNP_E_OUTOF_MEMORY;
+				goto ExitFunction;
+			}
 			file_buf = ChunkBuf + CHUNK_HEADER_SIZE;
 		} else if (c == 'f') {
 			/* file name */
@@ -494,32 +464,33 @@ int http_SendMessage(IN SOCKINFO * info, IN OUT int *TimeOut,
 			else
 				Fp = fopen(filename, "rb");
 			if (Fp == NULL) {
-				free(ChunkBuf);
-				return UPNP_E_FILE_READ_ERROR;
+				RetVal = UPNP_E_FILE_READ_ERROR;
+				goto ExitFunction;
 			}
 			if (Instr && Instr->IsRangeActive && Instr->IsVirtualFile) {
 				if (virtualDirCallback.seek(Fp, Instr->RangeOffset,
 				    SEEK_CUR) != 0) {
-					free(ChunkBuf);
-					return UPNP_E_FILE_READ_ERROR;
+					RetVal = UPNP_E_FILE_READ_ERROR;
+					goto ExitFunction;
 				}
 			} else if (Instr && Instr->IsRangeActive) {
 				if (fseeko(Fp, Instr->RangeOffset, SEEK_CUR) != 0) {
-					free(ChunkBuf);
-					return UPNP_E_FILE_READ_ERROR;
+					RetVal = UPNP_E_FILE_READ_ERROR;
+					goto ExitFunction;
 				}
 			}
 			while (amount_to_be_read) {
 				if (Instr) {
+					int nr;
 					size_t n = amount_to_be_read >= Data_Buf_Size ?
 					    	Data_Buf_Size : amount_to_be_read;
 					if (Instr->IsVirtualFile) {
 						nr = virtualDirCallback.read(Fp, file_buf, n);
-						amount_to_be_read -= (size_t)nr;
+						num_read = (size_t)nr;
 					} else {
 						num_read = fread(file_buf, 1, n, Fp);
-						amount_to_be_read -= num_read;
 					}
+					amount_to_be_read -= num_read;
 					if (Instr->ReadSendSize < 0) {
 						/* read until close */
 						amount_to_be_read = Data_Buf_Size;
@@ -574,16 +545,14 @@ int http_SendMessage(IN SOCKINFO * info, IN OUT int *TimeOut,
 						goto Cleanup_File;
 					}
 				}
-			}	/* while */
- Cleanup_File:
-			va_end(argp);
+			} /* while */
+Cleanup_File:
 			if (Instr && Instr->IsVirtualFile) {
 				virtualDirCallback.close(Fp);
 			} else {
 				fclose(Fp);
 			}
-			free(ChunkBuf);
-			return RetVal;
+			goto ExitFunction;
 		} else if (c == 'b') {
 			/* memory buffer */
 			buf = va_arg(argp, char *);
@@ -596,16 +565,17 @@ int http_SendMessage(IN SOCKINFO * info, IN OUT int *TimeOut,
 					   "%.*s\nbuf_length=%zd, num_written=%zd\n""------------\n",
 					   (int)buf_length, buf, buf_length, num_written);
 				if (num_written != buf_length) {
-					goto end;
+					RetVal = 0;
+					goto ExitFunction;
 				}
 			}
 		}
 	}
 
- end:
+ExitFunction:
 	va_end(argp);
 	free(ChunkBuf);
-	return 0;
+	return RetVal;
 }
 
 
