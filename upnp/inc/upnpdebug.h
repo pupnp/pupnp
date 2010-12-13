@@ -31,7 +31,7 @@
  ******************************************************************************/
 
 #ifndef UPNP_DEBUG_H
-#define UPNP_DEBUG_H 
+#define UPNP_DEBUG_H
 
 /*!
  * \file
@@ -39,7 +39,7 @@
 
 #include "ThreadPool.h"
 #include "upnpconfig.h"
-#include "UpnpGlobal.h" /* for UPNP_INLINE */
+#include "UpnpGlobal.h"		/* for UPNP_INLINE */
 
 #include <stdio.h>
 
@@ -107,7 +107,6 @@ static UPNP_INLINE int UpnpInitLog(void)
 	return UPNP_E_SUCCESS;
 }
 #endif
-
 /*!
  * \brief Set the log level (see \c Upnp_LogLevel).
  */
@@ -129,7 +128,9 @@ static UPNP_INLINE void UpnpSetLogLevel(Upnp_LogLevel log_level)
 #ifdef DEBUG
 void UpnpCloseLog(void);
 #else
-static UPNP_INLINE void UpnpCloseLog(void) {}
+static UPNP_INLINE void UpnpCloseLog(void)
+{
+}
 #endif
 
 /*!
@@ -142,8 +143,7 @@ void UpnpSetLogFileNames(
 	/*! [in] Name of the information file. */
 	const char *InfoFileName);
 #else
-static UPNP_INLINE void UpnpSetLogFileNames(
-	const char *ErrFileName,
+static UPNP_INLINE void UpnpSetLogFileNames(const char *ErrFileName,
 	const char *InfoFileName)
 {
 	return;
@@ -175,7 +175,6 @@ static UPNP_INLINE FILE *UpnpGetDebugFile(Upnp_LogLevel level, Dbg_Module module
 }
 #endif
 
-
 /*!
  * \brief Returns true if debug output should be done in this module.
  *
@@ -189,9 +188,7 @@ int DebugAtThisLevel(
 	/*! [in] Debug will go in the name of this module. */
 	Dbg_Module Module);
 #else
-static UPNP_INLINE int DebugAtThisLevel(
-	Upnp_LogLevel DLevel,
-	Dbg_Module Module)
+static UPNP_INLINE int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module)
 {
 	return 0;
 	DLevel = DLevel;
@@ -199,11 +196,10 @@ static UPNP_INLINE int DebugAtThisLevel(
 }
 #endif
 
-
 /*!
  * \brief Prints the debug statement either on the standard output or log file
  * along with the information from where this debug statement is coming.
- */ 
+ */
 #ifdef DEBUG
 void UpnpPrintf(
 	/*! [in] The level of the debug logging. It will decide whether debug
@@ -212,27 +208,22 @@ void UpnpPrintf(
 	/*! [in] debug will go in the name of this module. */
 	Dbg_Module Module,
 	/*! [in] Name of the file from where debug statement is coming. */
-	const char* DbgFileName,
+	const char *DbgFileName,
 	/*! [in] Line number of the file from where debug statement is coming. */
 	int DbgLineNo,
 	/*! [in] Printf like format specification. */
-	const char* FmtStr,
-	/*! [in] Printf like Variable number of arguments that will go in the debug
-	 * statement. */
+	const char *FmtStr,
+	/*! [in] Printf like Variable number of arguments that will go in the
+	 * debug statement. */
 	...)
 #if (__GNUC__ >= 3)
-	/* This enables printf like format checking by the compiler */
-	__attribute__((format (__printf__, 5, 6)))
+	/* This enables printf like format checking by the compiler. */
+	__attribute__ ((format(__printf__, 5, 6)))
 #endif
-;
+	;
 #else /* DEBUG */
-static UPNP_INLINE void UpnpPrintf(
-	Upnp_LogLevel DLevel,
-	Dbg_Module Module,
-	const char* DbgFileName,
-	int DbgLineNo,
-	const char* FmtStr,
-	...)
+static UPNP_INLINE void UpnpPrintf(Upnp_LogLevel DLevel, Dbg_Module Module,
+	const char *DbgFileName, int DbgLineNo, const char *FmtStr, ...)
 {
 	return;
 	DLevel = DLevel;
@@ -243,24 +234,22 @@ static UPNP_INLINE void UpnpPrintf(
 }
 #endif /* DEBUG */
 
-
 /*!
  * \brief Writes the file name and file number from where debug statement is
  * coming to the log file.
  */
 #ifdef DEBUG
 void UpnpDisplayFileAndLine(
-	/*! [in] File descriptor where line number and file name will be written. */
-	FILE *fd,
+	/*! [in] File descriptor where line number and file name will be
+	 * written. */
+	FILE * fd,
 	/*! [in] Name of the file. */
 	const char *DbgFileName,
 	/*! [in] Line number of the file. */
 	int DbgLineNo);
 #else
-static UPNP_INLINE void UpnpDisplayFileAndLine(
-	FILE *fd,
-	const char *DbgFileName,
-	int DbgLineNo)
+static UPNP_INLINE void UpnpDisplayFileAndLine(FILE *fd,
+	const char *DbgFileName, int DbgLineNo)
 {
 	return;
 	fd = fd;
@@ -269,14 +258,13 @@ static UPNP_INLINE void UpnpDisplayFileAndLine(
 }
 #endif
 
-
 /*!
  * \brief Writes the buffer in the file as per the requested banner
  */
 #ifdef DEBUG
 void UpnpDisplayBanner(
 	/*! [in] file descriptor where the banner will be written. */
-	FILE *fd,
+	FILE * fd,
 	/*! [in] The buffer that will be written. */
 	const char **lines,
 	/*! [in] Size of the buffer. */
@@ -284,11 +272,8 @@ void UpnpDisplayBanner(
 	/*! [in] This parameter provides the width of the banner. */
 	size_t starlength);
 #else
-static UPNP_INLINE void UpnpDisplayBanner(
-	FILE *fd,
-	const char **lines,
-	size_t size,
-	int starlength)
+static UPNP_INLINE void UpnpDisplayBanner(FILE *fd, const char **lines,
+	size_t size, int starlength)
 {
 	return;
 	fd = fd;
@@ -298,26 +283,24 @@ static UPNP_INLINE void UpnpDisplayBanner(
 }
 #endif
 
-
 /*!
  * \brief Prints thread pool statistics.
  */
 #ifdef DEBUG
 void PrintThreadPoolStats(
 	/*! [in] The thread pool. */
-	ThreadPool *tp, 
-	/*! [in] The file name that called this function, use the macro __FILE__. */
+	ThreadPool * tp,
+	/*! [in] The file name that called this function, use the macro
+	 * __FILE__. */
 	const char *DbgFileName,
-	/*! [in] The line number that the function was called, use the macro __LINE__. */
+	/*! [in] The line number that the function was called, use the macro
+	 * __LINE__. */
 	int DbgLineNo,
 	/*! [in] The message. */
 	const char *msg);
 #else
-static UPNP_INLINE void PrintThreadPoolStats(
-	ThreadPool *tp, 
-	const char *DbgFileName,
-	int DbgLineNo,
-	const char *msg)
+static UPNP_INLINE void PrintThreadPoolStats(ThreadPool *tp,
+	const char *DbgFileName, int DbgLineNo, const char *msg)
 {
 	return;
 	tp = tp;
@@ -334,4 +317,3 @@ static UPNP_INLINE void PrintThreadPoolStats(
 #endif
 
 #endif /* UPNP_DEBUG_H */
-
