@@ -29,21 +29,21 @@
  *
  ******************************************************************************/
 
-#include "config.h"
+/*!
+ * \file
+ */
 
+#include "config.h"
 
 #include "ithread.h"
 #include "ixml.h"
 #include "upnp.h"
 #include "upnpdebug.h"
 
-
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-
 
 /*! Mutex to synchronize all the log file opeartions in the debug mode */
 static ithread_mutex_t GlobalDebugMutex;
@@ -63,30 +63,26 @@ static const char *errFileName = "IUpnpErrFile.txt";
 /*! Name of the info file */
 static const char *infoFileName = "IUpnpInfoFile.txt";
 
-
 #ifdef DEBUG
-
 
 int UpnpInitLog(void)
 {
 	ithread_mutex_init(&GlobalDebugMutex, NULL);
-	if(DEBUG_TARGET == 1) {
-		if((ErrFileHnd = fopen( errFileName, "a")) == NULL) {
+	if (DEBUG_TARGET == 1) {
+		if ((ErrFileHnd = fopen(errFileName, "a")) == NULL) {
 			return -1;
 		}
-		if((InfoFileHnd = fopen( infoFileName, "a")) == NULL) {
+		if ((InfoFileHnd = fopen(infoFileName, "a")) == NULL) {
 			return -1;
 		}
 	}
 	return UPNP_E_SUCCESS;
 }
 
-
 void UpnpSetLogLevel(Upnp_LogLevel log_level)
 {
 	g_log_level = log_level;
 }
-
 
 void UpnpCloseLog(void)
 {
@@ -99,71 +95,56 @@ void UpnpCloseLog(void)
 	ithread_mutex_destroy(&GlobalDebugMutex);
 }
 
-
-void UpnpSetLogFileNames(
-	const char *ErrFileName,
-	const char *InfoFileName)
+void UpnpSetLogFileNames(const char *ErrFileName, const char *InfoFileName)
 {
-    if (ErrFileName) {
-        errFileName = ErrFileName;
-    }
-    if (InfoFileName) {
-        infoFileName = InfoFileName;
-    }
+	if (ErrFileName) {
+		errFileName = ErrFileName;
+	}
+	if (InfoFileName) {
+		infoFileName = InfoFileName;
+	}
 }
 
-
-int DebugAtThisLevel(
-	Upnp_LogLevel DLevel,
-	Dbg_Module Module)
+int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module)
 {
 	int ret = DLevel <= g_log_level;
 	ret &=
-		DEBUG_ALL ||
-		(Module == SSDP  && DEBUG_SSDP ) ||
-		(Module == SOAP  && DEBUG_SOAP ) ||
-		(Module == GENA  && DEBUG_GENA ) ||
-		(Module == TPOOL && DEBUG_TPOOL) ||
-		(Module == MSERV && DEBUG_MSERV) ||
-		(Module == DOM   && DEBUG_DOM  ) ||
-		(Module == HTTP  && DEBUG_HTTP );
-	
+	    DEBUG_ALL ||
+	    (Module == SSDP && DEBUG_SSDP) ||
+	    (Module == SOAP && DEBUG_SOAP) ||
+	    (Module == GENA && DEBUG_GENA) ||
+	    (Module == TPOOL && DEBUG_TPOOL) ||
+	    (Module == MSERV && DEBUG_MSERV) ||
+	    (Module == DOM && DEBUG_DOM) || (Module == HTTP && DEBUG_HTTP);
+
 	return ret;
 }
 
-
-void UpnpPrintf(
-	Upnp_LogLevel DLevel,
-	Dbg_Module Module,
-	const char *DbgFileName,
-	int DbgLineNo,
-	const char *FmtStr,
-	...)
+void UpnpPrintf(Upnp_LogLevel DLevel,
+		Dbg_Module Module,
+		const char *DbgFileName, int DbgLineNo, const char *FmtStr, ...)
 {
 	va_list ArgList;
-	
-	if (!DebugAtThisLevel(DLevel, Module)) {
+
+	if (!DebugAtThisLevel(DLevel, Module))
 		return;
-	}
-	
 	ithread_mutex_lock(&GlobalDebugMutex);
 	va_start(ArgList, FmtStr);
 	if (!DEBUG_TARGET) {
-		if (DbgFileName) {
+		if (DbgFileName)
 			UpnpDisplayFileAndLine(stdout, DbgFileName, DbgLineNo);
-		}
 		vfprintf(stdout, FmtStr, ArgList);
 		fflush(stdout);
 	} else if (DLevel == 0) {
-		if (DbgFileName) {
-			UpnpDisplayFileAndLine(ErrFileHnd, DbgFileName, DbgLineNo);
-		}
+		if (DbgFileName)
+			UpnpDisplayFileAndLine(ErrFileHnd, DbgFileName,
+					       DbgLineNo);
 		vfprintf(ErrFileHnd, FmtStr, ArgList);
 		fflush(ErrFileHnd);
 	} else {
-		if (DbgFileName) {
-			UpnpDisplayFileAndLine(InfoFileHnd, DbgFileName, DbgLineNo);
-		}
+		if (DbgFileName)
+			UpnpDisplayFileAndLine(InfoFileHnd, DbgFileName,
+					       DbgLineNo);
 		vfprintf(InfoFileHnd, FmtStr, ArgList);
 		fflush(InfoFileHnd);
 	}
@@ -171,31 +152,23 @@ void UpnpPrintf(
 	ithread_mutex_unlock(&GlobalDebugMutex);
 }
 
-
 FILE *GetDebugFile(Upnp_LogLevel DLevel, Dbg_Module Module)
 {
 	FILE *ret;
 
-	if (!DebugAtThisLevel(DLevel, Module)) {
+	if (!DebugAtThisLevel(DLevel, Module))
 		ret = NULL;
-	}
-	
-	if (!DEBUG_TARGET) {
+	if (!DEBUG_TARGET)
 		ret = stdout;
-	} else if (DLevel == 0) {
+	else if (DLevel == 0)
 		ret = ErrFileHnd;
-	} else {
+	else
 		ret = InfoFileHnd;
-	}
 
 	return ret;
 }
 
-
-void UpnpDisplayFileAndLine(
-	FILE *fd,
-	const char *DbgFileName,
-	int DbgLineNo)
+void UpnpDisplayFileAndLine(FILE *fd, const char *DbgFileName, int DbgLineNo)
 {
 #define NLINES 2
 #define MAX_LINE_SIZE 512
@@ -205,10 +178,8 @@ void UpnpDisplayFileAndLine(
 	int i;
 
 	/* Initialize the pointer array */
-	for (i = 0; i < NLINES; i++) {
+	for (i = 0; i < NLINES; i++)
 		lines[i] = buf[i];
-	}
-
 	/* Put the debug lines in the buffer */
 	sprintf(buf[0], "DEBUG - THREAD ID: 0x%lX",
 #ifdef WIN32
@@ -216,24 +187,16 @@ void UpnpDisplayFileAndLine(
 #else
 		(unsigned long int)ithread_self()
 #endif
-	);
-	if (DbgFileName) {
-		sprintf(buf[1],
-			"FILE: %s, LINE: %d",
-			DbgFileName,
-			DbgLineNo);
-	}
-
+	    );
+	if (DbgFileName)
+		sprintf(buf[1], "FILE: %s, LINE: %d", DbgFileName, DbgLineNo);
 	/* Show the lines centered */
 	UpnpDisplayBanner(fd, lines, NLINES, NUMBER_OF_STARS);
 	fflush(fd);
 }
 
-void UpnpDisplayBanner(
-	FILE * fd,
-	const char **lines,
-	size_t size,
-	size_t starLength)
+void UpnpDisplayBanner(FILE * fd,
+		       const char **lines, size_t size, size_t starLength)
 {
 	size_t leftMarginLength = starLength / 2 + 1;
 	size_t rightMarginLength = starLength / 2 + 1;
@@ -263,11 +226,10 @@ void UpnpDisplayBanner(
 			line += starLengthMinus2;
 		}
 		leftMarginLength = (starLengthMinus2 - LineSize) / 2;
-		if (LineSize % 2 == 0) {
+		if (LineSize % 2 == 0)
 			rightMarginLength = leftMarginLength;
-		} else {
+		else
 			rightMarginLength = leftMarginLength + 1;
-		}
 		memset(leftMargin, ' ', leftMarginLength);
 		memset(rightMargin, ' ', rightMarginLength);
 		leftMargin[leftMarginLength] = 0;
@@ -282,15 +244,13 @@ void UpnpDisplayBanner(
 	free(leftMargin);
 }
 
-void PrintThreadPoolStats(
-	ThreadPool *tp, 
-	const char *DbgFileName,
-	int DbgLineNo,
-	const char *msg)
+void PrintThreadPoolStats(ThreadPool *tp,
+			  const char *DbgFileName,
+			  int DbgLineNo, const char *msg)
 {
 	ThreadPoolStats stats;
 	ThreadPoolGetStats(tp, &stats);
-	UpnpPrintf(UPNP_INFO, API, DbgFileName, DbgLineNo, 
+	UpnpPrintf(UPNP_INFO, API, DbgFileName, DbgLineNo,
 		"%s\n"
 		"High Jobs pending: %d\n"
 		"Med Jobs Pending: %d\n"
@@ -321,6 +281,4 @@ void PrintThreadPoolStats(
 		stats.totalIdleTime);
 }
 
-
 #endif /* DEBUG */
-
