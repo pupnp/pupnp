@@ -12,7 +12,7 @@
 #ifdef WIN32
 	#include <iphlpapi.h>
 	#include <winsock2.h>
-	#include <Ws2tcpip.h>
+	#include <ws2tcpip.h>
 
 	#define UpnpCloseSocket closesocket
 #else /* WIN32 */

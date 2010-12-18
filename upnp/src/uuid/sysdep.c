@@ -76,7 +76,7 @@ void get_system_time(uuid_time_t *uuid_time)
 	*uuid_time = time.QuadPart;
 };
 
-void get_random_info(char seed[16])
+void get_random_info(unsigned char seed[16])
 {
 	MD5_CTX c;
 	typedef struct {

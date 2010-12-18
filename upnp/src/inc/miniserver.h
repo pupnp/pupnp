@@ -1,3 +1,6 @@
+#ifndef MINISERVER_H
+#define MINISERVER_H
+
 /**************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation
@@ -29,21 +32,15 @@
  *
  **************************************************************************/
 
-#ifndef MINISERVER_H
-#define MINISERVER_H
-
-
 /*!
  * \file
  */
 
-
 #include "sock.h"
 #include "httpparser.h"
-
+#include "UpnpStdInt.h"
 
 extern SOCKET gMiniServerStopSock;
-
 
 typedef struct MServerSockArray {
 	/*! IPv4 socket for listening for miniserver requests. */
@@ -74,21 +71,18 @@ typedef struct MServerSockArray {
 #endif /* INCLUDE_CLIENT_APIS */
 } MiniServerSockArray;
 
-
 /*! . */
-typedef void (*MiniServerCallback)(
+typedef void (*MiniServerCallback) (
 	/* ! . */
-	IN http_parser_t *parser,
+	IN http_parser_t * parser,
 	/* ! . */
-	IN http_message_t* request, 
+	IN http_message_t * request,
 	/* ! . */
-	IN SOCKINFO *info);
-
+	IN SOCKINFO * info);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /*!
  * \brief Set HTTP Get Callback.
@@ -97,7 +91,6 @@ void SetHTTPGetCallback(
 	/*! [in] HTTP Callback to be invoked . */
 	MiniServerCallback callback);
 
-
 /*!
  * \brief Set SOAP Callback.
  */
@@ -105,18 +98,15 @@ void SetHTTPGetCallback(
 void SetSoapCallback(
 	/*! [in] SOAP Callback to be invoked . */
 	MiniServerCallback callback);
-#else  /* INCLUDE_DEVICE_APIS */
-static UPNP_INLINE void SetSoapCallback(MiniServerCallback callback) {}
+#else /* INCLUDE_DEVICE_APIS */
+	static UPNP_INLINE void SetSoapCallback(MiniServerCallback callback) {}
 #endif /* INCLUDE_DEVICE_APIS */
-
-
 /*!
  * \brief Set GENA Callback.
  */
 void SetGenaCallback(
 	/*! [in] GENA Callback to be invoked. */
 	MiniServerCallback callback);
-
 
 /*!
  * \brief Initialize the sockets functionality for the Miniserver.
@@ -136,11 +126,10 @@ void SetGenaCallback(
 int StartMiniServer(
 	/*! [in,out] Port on which the server listens for incoming IPv4
 	 * connections. */
-	unsigned short *listen_port4, 
+	uint16_t *listen_port4,
 	/*! [in,out] Port on which the server listens for incoming IPv6
 	 * connections. */
-	unsigned short *listen_port6);
-
+	uint16_t *listen_port6);
 
 /*!
  * \brief Stop and Shutdown the MiniServer and free socket resources.
@@ -149,11 +138,8 @@ int StartMiniServer(
  */
 int StopMiniServer();
 
-
 #ifdef __cplusplus
-}   /* extern C */
+} /* extern C */
 #endif
 
-
 #endif /* MINISERVER_H */
-

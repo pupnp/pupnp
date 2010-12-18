@@ -78,22 +78,19 @@ int http_FixStrUrl(
 	/*! [out] Fixed and corrected URL. */
 	uri_type *fixed_url);
 
-/************************************************************************
- * Function: http_Connect
+/*!
+ * \brief Gets destination address from URL and then connects to the
+ * remote end.
  *
- * Parameters:
- *	IN uri_type* destination_url;	URL containing destination information
- *	OUT uri_type *url;		Fixed and corrected URL
- *
- * Description:
- *	Gets destination address from URL and then connects to the remote end
- *
- *  Returns:
- *	socket descriptor on success
- *	UPNP_E_OUTOF_SOCKET
- *	UPNP_E_SOCKET_CONNECT on error
- ************************************************************************/
-int http_Connect( IN uri_type* destination_url, OUT uri_type *url );
+ * \return Socket descriptor on success, or on error:
+ * 	\li \c UPNP_E_OUTOF_SOCKET
+ * 	\li \c UPNP_E_SOCKET_CONNECT
+ */
+SOCKET http_Connect(
+	/*! [in] URL containing destination information. */
+	uri_type *destination_url,
+	/*! [out] Fixed and corrected URL. */
+	uri_type *url);
 
 
 /************************************************************************
