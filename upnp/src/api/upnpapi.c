@@ -29,23 +29,18 @@
  *
  ******************************************************************************/
 
-
 #include "config.h"
-
 
 /*!
  * \file
  */
 
-
 #include <sys/stat.h>
-
 
 #include <assert.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 #ifdef WIN32
 	/* Do not include these files */
@@ -69,9 +64,7 @@
 	#include <sys/socket.h>
 	#include <sys/types.h>
 	#include <sys/utsname.h>
-	#include <unistd.h>
 #endif
-
 
 #include "upnpapi.h"
 #include "httpreadwrite.h"
@@ -80,21 +73,19 @@
 #include "soaplib.h"
 #include "ThreadPool.h"
 #include "sysdep.h"
+#include "UpnpUniStd.h" /* for close() */
 #include "uuid.h"
-
 
 /* Needed for GENA */
 #include "gena.h"
 #include "miniserver.h"
 #include "service_table.h"
 
-
 #ifdef INTERNAL_WEB_SERVER
 	#include "urlconfig.h"
 	#include "VirtualDir.h"
 	#include "webserver.h"
 #endif /* INTERNAL_WEB_SERVER */
-
 
 #ifndef IN6_IS_ADDR_GLOBAL
 #define IN6_IS_ADDR_GLOBAL(a) \

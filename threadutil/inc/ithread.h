@@ -1,3 +1,6 @@
+#ifndef ITHREAD_H
+#define ITHREAD_H
+
 /*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
@@ -29,36 +32,22 @@
  *
  ******************************************************************************/
 
-
-#ifndef ITHREAD_H
-#define ITHREAD_H
-
-
 /*!
  * \file
  */
-
 
 #if !defined(WIN32)
 	#include <sys/param.h>
 #endif
 
-
 #include "UpnpGlobal.h" /* For UPNP_INLINE, EXPORT_SPEC */
-
+#include "UpnpUniStd.h" /* for close() */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 #include <pthread.h>
-#ifdef WIN32
-	/* Do not #include <unistd.h> */
-#else
-	#include <unistd.h>
-#endif
-
 
 #if defined(BSD)
 	#define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
