@@ -40,7 +40,6 @@
 
 #include "webserver.h"
 
-
 #include "httpparser.h"
 #include "httpreadwrite.h"
 #include "ithread.h"
@@ -51,26 +50,14 @@
 #include "unixutil.h"
 #include "upnp.h"
 #include "upnpapi.h"
+#include "UpnpIntTypes.h"
+#include "UpnpStdInt.h"
 #include "upnputil.h"
 #include "VirtualDir.h"
 
 #include <assert.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
-#ifdef UPNP_USE_BCBPP
-	/* Do not #include <inttypes.h> */
-	/* Do not #include <stdint.h> */
-#else
-	#include <inttypes.h>
-	#include <stdint.h>
-#endif	/* !UPNP_USE_BCBPP */
-
-#ifdef WIN32
-	/* Do not #include <unistd.h> */
-#else
-	#include <unistd.h>
-#endif
 
 /*!
  * Response Types.

@@ -48,17 +48,12 @@
 #include "statcodes.h"
 #include "sock.h"
 #include "UpnpInet.h"
+#include "UpnpIntTypes.h"
+#include "UpnpStdInt.h"
 #include "webserver.h"
 
 #include <assert.h>
 #include <stdarg.h>
-
-#ifndef UPNP_USE_BCBPP
-	#ifndef UPNP_USE_MSVCPP
-		#include <inttypes.h>
-		#include <stdint.h>
-	#endif
-#endif
 
 #ifdef WIN32
 	#include <malloc.h>
@@ -70,7 +65,6 @@
 	#include <sys/socket.h>
 	#include <sys/time.h>
 	#include <sys/wait.h>
-	#include <unistd.h>
 	#include <sys/utsname.h>
 #endif
 

@@ -1,3 +1,6 @@
+#ifndef UPNP_TV_CTRLPT_H
+#define UPNP_TV_CTRLPT_H
+
 /**************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
@@ -29,9 +32,6 @@
  *
  **************************************************************************/
 
-#ifndef UPNP_TV_CTRLPT_H
-#define UPNP_TV_CTRLPT_H
-
 /*!
  * \file
  */
@@ -46,18 +46,13 @@ extern "C" {
 #include "upnp.h"
 #include "UpnpString.h"
 #include "upnptools.h"
+#include "UpnpUniStd.h" /* for close() */
 
 #include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef WIN32
-	/* Do not #include <unistd.h> */
-#else
-	#include <unistd.h>
-#endif
 
 #define TV_SERVICE_SERVCOUNT	2
 #define TV_SERVICE_CONTROL	0

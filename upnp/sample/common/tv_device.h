@@ -1,3 +1,6 @@
+#ifndef UPNP_TV_DEVICE_H
+#define UPNP_TV_DEVICE_H
+
 /**************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
@@ -29,9 +32,6 @@
  *
  **************************************************************************/
 
-#ifndef UPNP_TV_DEVICE_H
-#define UPNP_TV_DEVICE_H
-
 /*!
  * \file
  */
@@ -47,15 +47,10 @@ extern "C" {
 
 #include "ithread.h"
 #include "upnp.h"
+#include "UpnpUniStd.h" /* for close() */
 
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef WIN32
-	/* Do not #include <unistd.h> */
-#else
-	#include <unistd.h>
-#endif
 
 /*! Color constants */
 #define MAX_COLOR 10

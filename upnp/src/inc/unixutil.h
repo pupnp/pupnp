@@ -1,3 +1,6 @@
+#ifndef GENLIB_NET_UNIXUTIL_H
+#define	GENLIB_NET_UNIXUTIL_H
+
 /*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
@@ -29,16 +32,9 @@
  *
  ******************************************************************************/
 
-
 /* Unix-specific network utilities */
 
-
-#ifndef GENLIB_NET_UNIXUTIL_H
-#define	GENLIB_NET_UNIXUTIL_H
-
-
 #include "UpnpInet.h"
-
 
 #ifdef WIN32
 	typedef int socklen_t;
@@ -48,9 +44,6 @@
 	#include <sys/socket.h>
 	#include <sys/time.h>
 	#include <sys/wait.h>
-	#include <unistd.h>
 #endif
 
-
 #endif /* GENLIB_NET_UNIXUTIL_H */
-
