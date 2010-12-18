@@ -17,6 +17,10 @@
  * this software for any purpose.
  */
 
+/*!
+ * \file
+ */
+
 #include "config.h"
 
 #include "sysdep.h"
@@ -26,10 +30,10 @@
 #include <string.h>
 #include <stdio.h>
 
-/*-----------------------------------------------------------------------------*/
-/*
-   system dependent call to get IEEE node ID.
-   This sample implementation generates a random node ID
+/*!
+ * \brief System dependent call to get IEEE node ID.
+ *
+ * This sample implementation generates a random node ID.
  */
 void get_ieee_node_identifier(uuid_node_t *node)
 {
@@ -46,11 +50,11 @@ void get_ieee_node_identifier(uuid_node_t *node)
 	*node = saved_node;
 };
 
-/*-----------------------------------------------------------------------------*/
-/*
-   system dependent call to get the current system time.
-   Returned as 100ns ticks since Oct 15, 1582, but resolution may be
-   less than 100ns.
+/*!
+ * \brief System dependent call to get the current system time.
+ *
+ * Returned as 100ns ticks since Oct 15, 1582, but resolution may be less
+ * than 100ns.
  */
 
 #ifdef WIN32
@@ -72,7 +76,6 @@ void get_system_time(uuid_time_t *uuid_time)
 	*uuid_time = time.QuadPart;
 };
 
-/*-----------------------------------------------------------------------------*/
 void get_random_info(char seed[16])
 {
 	MD5_CTX c;
@@ -89,7 +92,6 @@ void get_random_info(char seed[16])
 
 	/* Initialize memory area so that valgrind does not complain */
 	memset(&r, 0, sizeof r);
-
 	/* memory usage stats */
 	GlobalMemoryStatus( &r.m );
 	/* random system stats */
@@ -101,9 +103,7 @@ void get_random_info(char seed[16])
 	/* milliseconds since last boot */
 	r.tc = GetTickCount();
 	r.l = MAX_COMPUTERNAME_LENGTH + 1;
-
 	GetComputerName( r.hostname, &r.l );
-
 	/* MD5 it */
 	MD5Init(&c);
 	MD5Update(&c, &r, sizeof r);
@@ -112,22 +112,18 @@ void get_random_info(char seed[16])
 
 #else /* WIN32 */
 
-/*-----------------------------------------------------------------------------*/
 void get_system_time(uuid_time_t *uuid_time)
 {
 	struct timeval tp;
 
 	gettimeofday(&tp, (struct timezone *)0);
-	/*
-	   Offset between UUID formatted times and Unix formatted times.
-	   UUID UTC base time is October 15, 1582.
-	   Unix base time is January 1, 1970.
-	 */
+	/* Offset between UUID formatted times and Unix formatted times.
+	 * UUID UTC base time is October 15, 1582.
+	 * Unix base time is January 1, 1970. */
 	*uuid_time = (uuid_time_t) (tp.tv_sec * 10000000 + tp.tv_usec * 10 +
-		I64(0x01B21DD213814000));
+		0x01B21DD213814000LL);
 };
 
-/*-----------------------------------------------------------------------------*/
 void get_random_info(unsigned char seed[16])
 {
 	MD5_CTX c;
@@ -138,12 +134,12 @@ void get_random_info(unsigned char seed[16])
 	} randomness;
 	randomness r;
 
-	/* Initialize memory area so that valgrind does not complain */
+	/* Initialize memory area so that valgrind does not complain. */
 	memset(&r, 0, sizeof r);
 
-	/* Get some random stuff */
+	/* Get some random stuff. */
 	gettimeofday(&r.t, (struct timezone *)0);
-	gethostname(r.hostname, 256 );
+	gethostname(r.hostname, 256);
 
 	/* MD5 it */
 	MD5Init(&c);
@@ -152,4 +148,3 @@ void get_random_info(unsigned char seed[16])
 };
 
 #endif /* WIN32 */
-

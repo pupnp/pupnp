@@ -31,6 +31,8 @@
 #include "global.h"
 #include "md5.h"
 
+#include "UpnpStdInt.h"
+
 #include <sys/types.h>
 
 #ifdef WIN32
@@ -49,21 +51,7 @@ extern ithread_mutex_t gUUIDMutex;
 #define UUIDLock()      ithread_mutex_lock(&gUUIDMutex)
 #define UUIDUnlock()    ithread_mutex_unlock(&gUUIDMutex)
 
-typedef unsigned long unsigned32;
-typedef unsigned short unsigned16;
-typedef unsigned char unsigned8;
-typedef unsigned char byte;
-
-/*! Set this to what your compiler uses for 64 bit data type */
-#ifdef WIN32
-	#define unsigned64_t __int64
-#else
-	#define unsigned64_t unsigned long long
-#endif
-
-#define I64(C) C##LL
-
-typedef unsigned64_t uuid_time_t;
+typedef uint64_t uuid_time_t;
 
 typedef struct {
 	char nodeID[6];
