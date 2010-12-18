@@ -1,3 +1,6 @@
+#ifndef GENLIB_NET_SOCK_H
+#define GENLIB_NET_SOCK_H
+
 /**************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
@@ -28,9 +31,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **************************************************************************/
-
-#ifndef GENLIB_NET_SOCK_H
-#define GENLIB_NET_SOCK_H
 
 /*!
  * \file
@@ -171,6 +171,4 @@ static UPNP_INLINE int sock_close(
 }	/* #extern "C" */
 #endif
 
-
 #endif /* GENLIB_NET_SOCK_H */
-

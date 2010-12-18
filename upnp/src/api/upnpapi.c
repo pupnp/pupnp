@@ -72,6 +72,7 @@
 #include "soaplib.h"
 #include "ThreadPool.h"
 #include "sysdep.h"
+#include "UpnpStdInt.h"
 #include "UpnpUniStd.h" /* for close() */
 #include "uuid.h"
 

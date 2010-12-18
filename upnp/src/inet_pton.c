@@ -15,14 +15,24 @@
  * SOFTWARE.
  */
 
+/*!
+ * \file
+ */
 
 /* This file is WIN32 only */
 #ifdef WIN32
 
-
 #include "inet_pton.h"
 
-
+/*!
+ * \brief format an IPv4 address
+ *
+ * \return `dst' (as a const)
+ *
+ * \note
+ *	\li (1) uses no statics
+ *	\li (2) takes a u_char* not an in_addr as input
+ */
 static const char *inet_ntop4(const u_char *src, char *dst, socklen_t size)
 {
 	char tmp[sizeof ("255.255.255.255") + 1] = "\0";
@@ -56,8 +66,10 @@ static const char *inet_ntop4(const u_char *src, char *dst, socklen_t size)
 	return strcpy(dst, tmp);
 }
 
-
 #ifdef INET_IPV6
+/*!
+ * \brief convert IPv6 binary address into presentation (printable) format
+ */
 static const char *inet_ntop6(const u_char *src, char *dst, socklen_t size)
 {
 	/*
@@ -133,9 +145,7 @@ static const char *inet_ntop6(const u_char *src, char *dst, socklen_t size)
 		*tp++ = ':';
 	*tp++ = '\0';
 
-	/*
-	 * Check for overflow, copy, and we're done.
-	 */
+	/* Check for overflow, copy, and we're done. */
 	if ((socklen_t)(tp - tmp) size) {
 		//__set_errno (ENOSPC);
 		return (NULL);
@@ -144,7 +154,13 @@ static const char *inet_ntop6(const u_char *src, char *dst, socklen_t size)
 }
 #endif /* INET_IPV6 */
 
-
+/*!
+ * \brief like inet_aton() but without all the hexadecimal and shorthand.
+ *
+ * \return 1 if `src' is a valid dotted quad, else 0.
+ *
+ * \note does not touch `dst' unless it's returning 1.
+ */
 static int inet_pton4(const char *src,u_char *dst)
 {
 	int saw_digit, octets, ch;
@@ -154,10 +170,8 @@ static int inet_pton4(const char *src,u_char *dst)
 	octets = 0;
 	*(tp = tmp) = 0;
 	while ((ch = *src++) != '\0') {
-
 		if (ch >= '0' && ch <= '9') {
 			u_int new = *tp * 10 + (ch - '0');
-
 			if (new>255)
 				return (0);
 			*tp = new;
@@ -180,8 +194,16 @@ static int inet_pton4(const char *src,u_char *dst)
 	return 1;
 }
 
-
 #ifdef INET_IPV6
+/*!
+ * \brief convert presentation level address to network order binary form.
+ *
+ * \return 1 if `src' is a valid [RFC1884 2.2] address, else 0.
+ *
+ * \note
+ *	\li (1) does not touch `dst' unless it's returning 1.
+ *	\li (2) :: in a full address is silently ignored.
+ */
 static int inet_pton6(const char *src, u_char *dst)
 {
 	static const char xdigits[] = "0123456789abcdef";
@@ -245,10 +267,8 @@ static int inet_pton6(const char *src, u_char *dst)
 		*tp++ = (u_char) val & 0xff;
 	}
 	if (colonp != NULL) {
-		/*
-		 * Since some memmove()'s erroneously fail to handle
-		 * overlapping regions, we'll do the shift by hand.
-		 */
+		/* Since some memmove()'s erroneously fail to handle
+		 * overlapping regions, we'll do the shift by hand. */
 		const int n = tp - colonp;
 		int i;
 
@@ -268,14 +288,14 @@ static int inet_pton6(const char *src, u_char *dst)
 #endif /* INET_IPV6 */
 
 
-const char *inet_ntop(int af,const void *src,char *dst,socklen_t size)
+const char *inet_ntop(int af, const void *src, char *dst,socklen_t size)
 {
 	switch (af) {
 	case AF_INET:
-		return (inet_ntop4(src, dst, size));
+		return inet_ntop4(src, dst, size);
 #ifdef INET_IPV6
 	case AF_INET6:
-		return (inet_ntop6(src, dst, size));
+		return inet_ntop6(src, dst, size);
 #endif
 	default:
 		/*__set_errno(EAFNOSUPPORT);*/
@@ -284,15 +304,14 @@ const char *inet_ntop(int af,const void *src,char *dst,socklen_t size)
 	/* NOTREACHED */
 }
 
-
-int inet_pton(int af,const char *src,void *dst)
+int inet_pton(int af, const char *src, void *dst)
 {
 	switch (af) {
 	case AF_INET:
-		return (inet_pton4(src, dst));
+		return inet_pton4(src, dst);
 #ifdef INET_IPV6
 	case AF_INET6:
-		return (inet_pton6(src, dst));
+		return inet_pton6(src, dst);
 #endif
 	default:
 		/*__set_errno(EAFNOSUPPORT);*/
@@ -301,6 +320,4 @@ int inet_pton(int af,const char *src,void *dst)
 	/* NOTREACHED */
 }
 
-
 #endif /* WIN32 */
-

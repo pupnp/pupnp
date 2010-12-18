@@ -29,9 +29,7 @@
  *
  **************************************************************************/
 
-
 #include "config.h"
-
 
 /*!
  * \file
@@ -46,9 +44,7 @@
  *
  */
 
-
 #include "miniserver.h"
-
 
 #include "httpreadwrite.h"
 #include "ithread.h"
@@ -59,7 +55,6 @@
 #include "upnpapi.h"
 #include "upnputil.h"
 
-
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
@@ -67,10 +62,8 @@
 #include <string.h>
 #include <sys/types.h>
 
-
 /*! . */
 #define APPLICATION_LISTENING_PORT 49152
-
 
 struct mserv_request_t {
 	/*! Connection handle. */
@@ -78,7 +71,6 @@ struct mserv_request_t {
 	/*! . */
 	struct sockaddr_storage foreign_sockaddr;
 };
-
 
 /*! . */
 typedef enum {
@@ -90,10 +82,8 @@ typedef enum {
 	MSERV_STOPPING
 } MiniServerState;
 
-
 /*! . */
 uint16_t miniStopSockPort;
-
 
 /*!
  * module vars
@@ -103,12 +93,10 @@ static MiniServerCallback gSoapCallback = NULL;
 static MiniServerCallback gGenaCallback = NULL;
 static MiniServerState gMServState = MSERV_IDLE;
 
-
 void SetHTTPGetCallback(MiniServerCallback callback)
 {
 	gGetCallback = callback;
 }
-
 
 #ifdef INCLUDE_DEVICE_APIS
 void SetSoapCallback(MiniServerCallback callback)
@@ -121,7 +109,6 @@ void SetGenaCallback(MiniServerCallback callback)
 {
 	gGenaCallback = callback;
 }
-
 
 #ifdef INTERNAL_WEB_SERVER
 /*!
@@ -169,7 +156,6 @@ static int dispatch_request(
 	return 0;
 }
 
-
 /*!
  * \brief Send Error Message.
  */
@@ -186,7 +172,6 @@ static UPNP_INLINE void handle_error(
 	http_SendStatusResponse(info, http_error_code, major, minor);
 }
 
-
 /*!
  * \brief Free memory assigned for handling request and unitialize socket
  * functionality.
@@ -200,7 +185,6 @@ static void free_handle_request_arg(
 	sock_close(request->connfd);
 	free(request);
 }
-
 
 /*!
  * \brief Receive the request and dispatch it for handling.
@@ -261,7 +245,6 @@ error_handler:
 	UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
 		"miniserver %d: COMPLETE\n", connfd);
 }
-
 
 /*!
  * \brief Initilize the thread pool to handle a request, sets priority for the
@@ -456,7 +439,6 @@ static void RunMiniServer(
 	return;
 }
 
-
 /*!
  * \brief Returns port to which socket, sockfd, is bound.
  *
@@ -488,7 +470,6 @@ static int get_port(
 	return 0;
 }
 
-
 #ifdef INTERNAL_WEB_SERVER
 /*!
  * \brief Creates a STREAM socket, binds to INADDR_ANY and listens for
@@ -519,12 +500,12 @@ static int get_miniserver_sockets(
 	struct sockaddr_storage __ss_v4;
 	struct sockaddr_in* serverAddr4 = (struct sockaddr_in*)&__ss_v4;
 	SOCKET listenfd4;
-	unsigned short actual_port4;
+	uint16_t actual_port4;
 #ifdef UPNP_ENABLE_IPV6
 	struct sockaddr_storage __ss_v6;
 	struct sockaddr_in6* serverAddr6 = (struct sockaddr_in6*)&__ss_v6;
 	SOCKET listenfd6;
-	unsigned short actual_port6;
+	uint16_t actual_port6;
 #endif
 	int ret_code;
 	int reuseaddr_on = 0;
@@ -635,7 +616,7 @@ static int get_miniserver_sockets(
 #endif  /* IPv6 */
 	} else {
 		if (listenfd4 != INVALID_SOCKET) {
-			unsigned short orig_listen_port4 = listen_port4;
+			uint16_t orig_listen_port4 = listen_port4;
 			do {
 				serverAddr4->sin_port = htons(listen_port4++);
 				sockError = bind(listenfd4,
@@ -673,7 +654,7 @@ static int get_miniserver_sockets(
 		}
 #ifdef UPNP_ENABLE_IPV6
 		if (listenfd6 != INVALID_SOCKET) {
-			unsigned short orig_listen_port6 = listen_port6;
+			uint16_t orig_listen_port6 = listen_port6;
 			do {
 				serverAddr6->sin6_port = htons(listen_port6++);
 				sockError = bind(listenfd6,
@@ -763,7 +744,6 @@ static int get_miniserver_sockets(
 }
 #endif /* INTERNAL_WEB_SERVER */
 
-
 /*!
  * \brief Creates the miniserver STOP socket. This socket is created and 
  *  listened on to know when it is time to stop the Miniserver.
@@ -832,10 +812,10 @@ static UPNP_INLINE void InitMiniServerSockArray(MiniServerSockArray *miniSocket)
 int StartMiniServer(
 	/*! [in,out] Port on which the server listens for incoming IPv4
 	 * connections. */
-	unsigned short *listen_port4, 
+	uint16_t *listen_port4, 
 	/*! [in,out] Port on which the server listens for incoming IPv6
 	 * connections. */
-	unsigned short *listen_port6)
+	uint16_t *listen_port6)
 {
 	int ret_code;
 	int count;
@@ -921,7 +901,6 @@ int StartMiniServer(
 	return UPNP_E_SUCCESS;
 }
 
-
 int StopMiniServer()
 {
 	char errorBuffer[ERROR_BUFFER_LEN];
@@ -960,4 +939,3 @@ int StopMiniServer()
 
 	return 0;
 }
-

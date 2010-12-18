@@ -202,7 +202,7 @@ typedef int (*ParserFun)(char *, Event *);
 * Returns: int
 *	0 if successful else -1 
 ***************************************************************************/
-int Make_Socket_NoBlocking (int sock);
+int Make_Socket_NoBlocking (SOCKET sock);
 
 /************************************************************************
 * Function : ssdp_handle_device_request
