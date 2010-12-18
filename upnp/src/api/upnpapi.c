@@ -63,7 +63,6 @@
 	#include <sys/param.h>
 	#include <sys/socket.h>
 	#include <sys/types.h>
-	#include <sys/utsname.h>
 #endif
 
 #include "upnpapi.h"
