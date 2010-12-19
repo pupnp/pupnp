@@ -427,9 +427,8 @@ static void searchExpired(
 	}
 	HandleUnlock();
 
-	if (found) {
+	if (found)
 		ctrlpt_callback(UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie);
-	}
 
 	free(id);
 }
@@ -459,24 +458,18 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 	ThreadPoolJob job;
 
 	requestType = ssdp_request_type1(St);
-	if (requestType == SSDP_SERROR) {
+	if (requestType == SSDP_SERROR)
 		return UPNP_E_INVALID_PARAM;
-	}
-
 	UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 		   "Inside SearchByTarget\n");
-
 	timeTillRead = Mx;
-	if (timeTillRead < MIN_SEARCH_TIME) {
+	if (timeTillRead < MIN_SEARCH_TIME)
 		timeTillRead = MIN_SEARCH_TIME;
-	} else if (timeTillRead > MAX_SEARCH_TIME) {
+	else if (timeTillRead > MAX_SEARCH_TIME)
 		timeTillRead = MAX_SEARCH_TIME;
-	}
-
 	CreateClientRequestPacket(ReqBufv4, timeTillRead, St, AF_INET);
 	CreateClientRequestPacket(ReqBufv6, timeTillRead, St, AF_INET6);
-	CreateClientRequestPacketUlaGua(ReqBufv6UlaGua, timeTillRead, St,
-					AF_INET6);
+	CreateClientRequestPacketUlaGua(ReqBufv6UlaGua, timeTillRead, St, AF_INET6);
 
 	memset(&__ss_v4, 0, sizeof(__ss_v4));
 	destAddr4->sin_family = AF_INET;
@@ -493,25 +486,20 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 	HandleLock();
 	if (GetClientHandleInfo(&handle, &ctrlpt_info) != HND_CLIENT) {
 		HandleUnlock();
-
 		return UPNP_E_INTERNAL_ERROR;
 	}
-
 	newArg = (SsdpSearchArg *) malloc(sizeof(SsdpSearchArg));
 	newArg->searchTarget = strdup(St);
 	newArg->cookie = Cookie;
 	newArg->requestType = requestType;
-
 	id = (int *)malloc(sizeof(int));
 	TPJobInit(&job, (start_routine) searchExpired, id);
 	TPJobSetPriority(&job, MED_PRIORITY);
 	TPJobSetFreeFunction(&job, (free_routine) free);
-
 	/* Schedule a timeout event to remove search Arg */
 	TimerThreadSchedule(&gTimerThread, timeTillRead,
 			    REL_SEC, &job, SHORT_TERM, id);
 	newArg->timeoutEventId = *id;
-
 	ListAddTail(&ctrlpt_info->SsdpSearchList, newArg);
 	HandleUnlock();
 	/* End of lock */
@@ -531,7 +519,6 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 		max_fd = max(max_fd, gSsdpReqSocket6);
 	}
 #endif
-
 	ret = select(max_fd + 1, NULL, &wrSet, NULL, NULL);
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -572,8 +559,7 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 			imillisleep(SSDP_PAUSE);
 		}
 	}
-#endif				/* IPv6 */
-
+#endif /* IPv6 */
 	if (gSsdpReqSocket4 != INVALID_SOCKET &&
 	    FD_ISSET(gSsdpReqSocket4, &wrSet)) {
 		int NumCopy = 0;
