@@ -33,11 +33,11 @@
  ******************************************************************************/
 
 /*!
- * \file
- *
  * \defgroup UPnPAPI UPnP API
  * 
  * @{
+ *
+ * \file
  */
 
 #include "ixml.h"
@@ -381,19 +381,6 @@
 
 /* @} ErrorCodes */
 
-#ifndef OUT
-#define OUT
-#endif
-
-#ifndef IN
-#define IN
-#endif
-
-#ifndef INOUT
-#define INOUT
-#endif
-
-
 #if UPNP_VERSION >= 10800
 /* 
  * Opaque data structures. The following includes are data structures that
@@ -612,7 +599,6 @@ enum Upnp_DescType_e {
 
 typedef enum Upnp_DescType_e Upnp_DescType;
 
-
 #if UPNP_VERSION < 10800
 /** Returned as part of a {\bf UPNP_CONTROL_ACTION_COMPLETE} callback.  */
 
@@ -813,7 +799,6 @@ struct Upnp_Subscription_Request
 
 };
 
-
 struct File_Info
 {
 	/** The length of the file. A length less than 0 indicates the size 
@@ -839,7 +824,6 @@ struct File_Info
 	DOMString content_type;
 };
 #endif /* UPNP_VERSION < 10800 */
-
 
 /*!
  *  All callback functions share the same prototype, documented below.
@@ -876,18 +860,15 @@ typedef int (*Upnp_FunPtr)(
 
 /* @} Constants and Types */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
 
 /*!
  * \name Initialization and Registration
  *
  * @{
  */
-
 
 /*!
  * \brief Initializes the Linux SDK for UPnP Devices (IPv4 only).
@@ -929,7 +910,6 @@ EXPORT_SPEC int UpnpInit(
 	/*! Local Port to listen for incoming connections
 	 * \c NULL will pick an arbitrary free port. */
 	unsigned short DestPort);
-
 
 /*!
  * \brief Initializes the Linux SDK for UPnP Devices (IPv4 or IPv6).
@@ -974,7 +954,6 @@ EXPORT_SPEC int UpnpInit2(
 	unsigned short DestPort);
 #endif
 
-
 /*!
  * \brief Terminates the Linux SDK for UPnP Devices.
  *
@@ -996,7 +975,6 @@ EXPORT_SPEC int UpnpInit2(
  */
 EXPORT_SPEC int UpnpFinish(void);
 
-
 /*!
  * \brief Returns the internal server IPv4 UPnP listening port.
  *
@@ -1009,7 +987,6 @@ EXPORT_SPEC int UpnpFinish(void);
  *	\li On error: 0 is returned if \b UpnpInit has not succeeded.
  */
 EXPORT_SPEC unsigned short UpnpGetServerPort(void);
-
 
 /*!
  * \brief Returns the internal server IPv6 UPnP listening port.
@@ -1037,7 +1014,6 @@ EXPORT_SPEC unsigned short UpnpGetServerPort6(void);
  * 	\li On error: \c NULL is returned if \b UpnpInit has not succeeded.
  */
 EXPORT_SPEC char *UpnpGetServerIpAddress(void);
-
 
 /*!
  * \brief Returns the local IPv6 listening ip address.
@@ -1190,7 +1166,6 @@ EXPORT_SPEC int UpnpRegisterRootDevice2(
 	/*! [out] Pointer to a variable to store the new device handle. */
 	UpnpDevice_Handle* Hnd);
 
-
 /*!
  * \brief Registers a device application for a specific address family with
  * the UPnP library.
@@ -1240,7 +1215,6 @@ EXPORT_SPEC int UpnpRegisterRootDevice3(
 	 * AF_INET6 for an IPv6 device. Defaults to AF_INET. */
 	const int  AddressFamily);
 
-
 /*!
  * \brief Unregisters a root device registered with \b UpnpRegisterRootDevice or
  * \b UpnpRegisterRootDevice2.
@@ -1259,7 +1233,6 @@ EXPORT_SPEC int UpnpRegisterRootDevice3(
 EXPORT_SPEC int UpnpUnRegisterRootDevice(
 	/*! [in] The handle of the root device instance to unregister. */
 	UpnpDevice_Handle Hnd);
-
 
 /*!
  * \brief Registers a control point application with the UPnP Library.
@@ -1287,7 +1260,6 @@ EXPORT_SPEC int UpnpRegisterClient(
 	/*! [out] Pointer to a variable to store the new control point handle. */
 	UpnpClient_Handle *Hnd);
 
-
 /*!
  * \brief Unregisters a control point application, unsubscribing all active
  * subscriptions.
@@ -1308,7 +1280,6 @@ EXPORT_SPEC int UpnpUnRegisterClient(
 	/*! [in] The handle of the control point instance to unregister. */
 	UpnpClient_Handle Hnd);
 
-
 /*!
  * \deprecated Use \b UpnpSetMaxContentLength instead.
  *
@@ -1321,7 +1292,6 @@ EXPORT_SPEC int UpnpSetContentLength(
 	UpnpClient_Handle Hnd,
 	/*! [in] Permissible content length */
 	size_t contentLength);
-
 
 /*!
  * \brief Sets the maximum content-length that the SDK will process on an
@@ -1344,9 +1314,7 @@ EXPORT_SPEC int UpnpSetMaxContentLength(
 	 * in bytes. */
 	size_t contentLength);
 
-
 /* @} Initialization and Registration */
-
 
 /******************************************************************************
  ******************************************************************************
@@ -1356,13 +1324,11 @@ EXPORT_SPEC int UpnpSetMaxContentLength(
  ******************************************************************************
  ******************************************************************************/
 
-
 /*!
  * \name Discovery
  *
  * @{
  */
-
 
 /*!
  * \brief Searches for devices matching the given search target.
@@ -1422,9 +1388,7 @@ EXPORT_SPEC int UpnpSendAdvertisement(
 	/*! The expiration age, in seconds, of the announcements. */
 	int Exp);
 
-
 /* @} Discovery */
-
 
 /******************************************************************************
  ******************************************************************************
@@ -1434,13 +1398,11 @@ EXPORT_SPEC int UpnpSendAdvertisement(
  ******************************************************************************
  ******************************************************************************/
 
-
 /*!
  * \name Control
  *
  * @{
  */
-
 
 /*!
  * \brief Queries the state of a state variable of a service on another device.
@@ -1479,7 +1441,6 @@ EXPORT_SPEC int UpnpGetServiceVarStatus(
 	 * \b ixmlFreeDOMString. */
 	DOMString *StVarVal);
 
-
 /*!
  * \brief Queries the state of a variable of a service, generating a callback
  * when the operation is complete.
@@ -1509,7 +1470,6 @@ EXPORT_SPEC int UpnpGetServiceVarStatusAsync(
 	Upnp_FunPtr Fun,
 	/*! [in] Pointer to user data to pass to the callback function when invoked. */
 	const void *Cookie);
-
 
 /*!
  * \brief Sends a message to change a state variable in a service.
@@ -1548,7 +1508,6 @@ EXPORT_SPEC int UpnpSendAction(
 	/*! [out] The DOM document for the response to the action. The SDK allocates
 	 * this document and the caller needs to free it. */
 	IXML_Document **RespNode);
-
 
 /*!
  * \brief Sends a message to change a state variable in a service.
@@ -1591,7 +1550,6 @@ EXPORT_SPEC int UpnpSendActionEx(
 	 * this document and the caller needs to free it. */
 	IXML_Document **RespNode);
 
-
 /*!
  * \brief Sends a message to change a state variable in a service, generating a
  * callback when the operation is complete.
@@ -1630,7 +1588,6 @@ EXPORT_SPEC int UpnpSendActionAsync(
 	/*! [in] Pointer to user data that to be passed to the callback when
 	 * invoked. */
 	const void *Cookie);
-
 
 /*!
  * \brief Sends a message to change a state variable in a service, generating a
@@ -1674,9 +1631,7 @@ EXPORT_SPEC int UpnpSendActionExAsync(
 	 * invoked. */
 	const void *Cookie);
 
-
 /*! @} Control */
-
 
 /******************************************************************************
  ******************************************************************************
@@ -1686,13 +1641,11 @@ EXPORT_SPEC int UpnpSendActionExAsync(
  ******************************************************************************
  ******************************************************************************/
 
-
 /*!
  * \name Eventing
  *
  * @{
  */
-
 
 /*!
  * \brief Accepts a subscription request and sends out the current state of the
@@ -1735,7 +1688,6 @@ EXPORT_SPEC int UpnpAcceptSubscription(
 	/*! [in] The subscription ID of the newly registered control point. */
 	const Upnp_SID SubsId);
 
-
 /*!
  * \brief Similar to \b UpnpAcceptSubscription() except that it takes a DOM
  * document for the variables to event rather than an array of strings.
@@ -1772,7 +1724,6 @@ EXPORT_SPEC int UpnpAcceptSubscriptionExt(
 	/*! [in] The subscription ID of the newly registered control point. */
 	Upnp_SID SubsId);
 
-
 /*!
  * \brief Sends out an event change notification to all control points
  * subscribed to a particular service.
@@ -1808,7 +1759,6 @@ EXPORT_SPEC int UpnpNotify(
 	/*! [in] The count of variables included in this notification. */
 	int cVariables);
 
-
 /*!
  * \brief Similar to \b UpnpNotify except that it takes a DOM document for the
  * event rather than an array of strings.
@@ -1841,7 +1791,6 @@ EXPORT_SPEC int UpnpNotifyExt(
 	 * conform to the XML schema defined in section 4.3 of the Universal
 	 * Plug and Play Device Architecture specification. */
 	IXML_Document *PropSet);
-
 
 /*!
  * \brief Renews a subscription that is about to expire.
@@ -1879,7 +1828,6 @@ EXPORT_SPEC int UpnpRenewSubscription(
 	int *TimeOut,
 	/*! [in] The ID for the subscription to renew. */
 	const Upnp_SID SubsId);
-
 
 /*!
  * \brief Renews a subscription that is about to expire, generating a callback
@@ -1942,7 +1890,6 @@ EXPORT_SPEC int UpnpRenewSubscriptionAsync(
 	/*! [in] Pointer to user data passed to the callback function when invoked. */
 	const void *Cookie);
 
-
 /*!
  * \brief Sets the maximum number of subscriptions accepted per service.
  *
@@ -1962,7 +1909,6 @@ EXPORT_SPEC int UpnpSetMaxSubscriptions(
 	UpnpDevice_Handle Hnd,
 	/*! The maximum number of subscriptions to be allowed per service. */
 	int MaxSubscriptions);
-
 
 /*!
  * \brief Sets the maximum time-out accepted for a subscription request or
@@ -1984,7 +1930,6 @@ EXPORT_SPEC int UpnpSetMaxSubscriptionTimeOut(
 	UpnpDevice_Handle Hnd,
 	/*! The maximum subscription time-out to be accepted. */
 	int MaxSubscriptionTimeOut);
-
 
 /*!
  * \brief Registers a control point to receive event notifications from another
@@ -2026,7 +1971,6 @@ EXPORT_SPEC int UpnpSubscribe(
 	int *TimeOut,
 	/*! [out] Pointer to a variable to receive the subscription ID (SID). */
 	Upnp_SID SubsId);
-
 
 /*!
  * \brief Performs the same operation as \b UpnpSubscribe, but returns
@@ -2089,7 +2033,6 @@ EXPORT_SPEC int UpnpSubscribeAsync(
 	/*! A user data value passed to the callback function when invoked. */
 	const void *Cookie);
 
-
 /*!
  * \brief Removes the subscription of a control point from a service previously
  * subscribed to using \b UpnpSubscribe or \b UpnpSubscribeAsync.
@@ -2124,7 +2067,6 @@ EXPORT_SPEC int UpnpUnSubscribe(
 	UpnpClient_Handle Hnd,
 	/*! [in] The ID returned when the control point subscribed to the service. */
 	const Upnp_SID SubsId);
-
 
 /*!
  * \brief Removes a subscription of a control point from a service previously
@@ -2183,9 +2125,7 @@ EXPORT_SPEC int UpnpUnSubscribeAsync(
 	/*! [in] Pointer to user data to pass to the callback function when invoked. */
 	const void *Cookie);
 
-
 /*! @} Eventing */
-
 
 
 /******************************************************************************
@@ -2237,7 +2177,6 @@ EXPORT_SPEC int UpnpDownloadUrlItem(
 	 * \c LINE_SIZE bytes in size. */
 	char *contentType);
 
-
 /*!
  * \brief Gets a file specified in a URL.
  *
@@ -2281,7 +2220,6 @@ EXPORT_SPEC int UpnpOpenHttpGet(
 	 * is expected from the server, failing which, an error is reported
 	 * back to the user. */		 
 	int timeout);
-
 
 /*!
  * \brief Gets a file specified in a URL through the specified proxy.
@@ -2328,7 +2266,6 @@ EXPORT_SPEC int UpnpOpenHttpGetProxy(
 	 * is expected from the server, failing which, an error is reported
 	 * back to the user. */		 
 	int timeout);
-
 
 /*!
  * \brief Gets specified number of bytes from a file specified in the URL.
@@ -2380,7 +2317,6 @@ EXPORT_SPEC int UpnpOpenHttpGetEx(
 	 * to the user. */	
 	int timeout);
 
-
 /*!
  * \brief Gets specified number of bytes from a file specified in a URL. 
  *
@@ -2410,7 +2346,6 @@ EXPORT_SPEC int UpnpReadHttpGet(
 	 * the user. */
 	int timeout);
 
-
 /*!
  * \brief Retrieve progress information of a http-get transfer. 
  *
@@ -2426,7 +2361,6 @@ EXPORT_SPEC int UpnpHttpGetProgress(
 	size_t *length,
 	/*! [out] The content length. */
 	size_t *total);
-
 
 /*!
  * \brief Set the cancel flag of the \b handle parameter. 
@@ -2452,7 +2386,6 @@ EXPORT_SPEC int UpnpCloseHttpGet(
 	/*! [in] The handle of the connection created by the call to
 	 * \b UpnpOpenHttpGet. */
 	void *handle);
-
 
 /*!
  * \brief Makes an HTTP POST request message, opens a connection to the server
@@ -2493,7 +2426,6 @@ EXPORT_SPEC int UpnpOpenHttpPost(
 	 * is expected from the receiver, failing which, an error is reported. */
 	int timeout);
 
-
 /*!
  * \brief Sends a request to a server to copy the contents of a buffer to the
  * URI specified in the \b UpnpOpenHttpPost call.
@@ -2519,7 +2451,6 @@ EXPORT_SPEC int UpnpWriteHttpPost(
 	 * expected from the server, failing which, an error is reported. */		 
 	int timeout);
 
-
 /*!
  * \brief Sends and receives any pending data, closes the connection with the
  * server, and frees memory allocated during the \b UpnpOpenHttpPost call.
@@ -2542,7 +2473,6 @@ EXPORT_SPEC int UpnpCloseHttpPost(
 	/*! [in] A time out value sent with the request during which a response is
 	 * expected from the server, failing which, an error is reported. */		 
 	int timeout);
-  
 
 /*!
  * \brief Downloads an XML document specified in a URL.
@@ -2576,7 +2506,6 @@ EXPORT_SPEC int UpnpDownloadXmlDoc(
 	const char *url,
 	/*! [out] A pointer in which to store the XML document. */
 	IXML_Document **xmlDoc);
-
 
 /*! @} Control Point HTTP API */
 
@@ -2614,12 +2543,10 @@ EXPORT_SPEC int UpnpSetWebServerRootDir(
 	/*! [in] Path of the root directory of the web server. */
 	const char *rootDir);
 
-
 /*!
  * \brief The type of handle returned by the web server for open requests.
  */
 typedef void *UpnpWebFileHandle;
-
 
 /*!
  * \brief Get-info callback function prototype.
@@ -2635,7 +2562,6 @@ typedef int (*VDCallback_GetInfo)(
 #endif /* UPNP_VERSION < 10800 */
 		);
 
-
 /*!
  * \brief Sets the get_info callback function to be used to access a virtual
  * directory.
@@ -2645,7 +2571,6 @@ typedef int (*VDCallback_GetInfo)(
  *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
  */
 EXPORT_SPEC int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback);
-
 
 /*!
  * \brief Open callback function prototype.
@@ -2657,7 +2582,6 @@ typedef UpnpWebFileHandle (*VDCallback_Open)(
 		 * Valid values are \c UPNP_READ or \c UPNP_WRITE. */
 		enum UpnpOpenFileMode Mode);
 
-
 /*!
  * \brief Sets the open callback function to be used to access a virtual
  * directory.
@@ -2667,7 +2591,6 @@ typedef UpnpWebFileHandle (*VDCallback_Open)(
  *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
  */
 EXPORT_SPEC int UpnpVirtualDir_set_OpenCallback(VDCallback_Open callback);
-
 
 /*!
  * \brief Read callback function prototype.
@@ -2680,7 +2603,6 @@ typedef int (*VDCallback_Read)(
 	/*! [in] The size of the buffer (i.e. the number of bytes to read). */
 	size_t buflen);
 
-
 /*! 
  * \brief Sets the read callback function to be used to access a virtual
  * directory.
@@ -2690,7 +2612,6 @@ typedef int (*VDCallback_Read)(
  *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
  */
 EXPORT_SPEC int UpnpVirtualDir_set_ReadCallback(VDCallback_Read callback);
-
 
 /*!
  * \brief Write callback function prototype.
@@ -2703,7 +2624,6 @@ typedef	int (*VDCallback_Write)(
 	/*! [in] The number of bytes to write. */
 	size_t buflen);
 
-
 /*!
  * \brief Sets the write callback function to be used to access a virtual
  * directory.
@@ -2713,7 +2633,6 @@ typedef	int (*VDCallback_Write)(
  *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
  */
 EXPORT_SPEC int UpnpVirtualDir_set_WriteCallback(VDCallback_Write callback);
-
 
 /*!
  * \brief Seek callback function prototype.
@@ -2731,7 +2650,6 @@ typedef int (*VDCallback_Seek) (
 	 * specify an absolute offset. */
 	int origin);
 
-
 /*!
  * \brief Sets the seek callback function to be used to access a virtual
  * directory.
@@ -2742,14 +2660,12 @@ typedef int (*VDCallback_Seek) (
  */
 EXPORT_SPEC int UpnpVirtualDir_set_SeekCallback(VDCallback_Seek callback);
 
-
 /*!
  * \brief Close callback function prototype.
  */
 typedef int (*VDCallback_Close)(
 		/*! [in] The handle of the file to close. */
 		UpnpWebFileHandle fileHnd);
-
 
 /*!
  * \brief Sets the close callback function to be used to access a virtual
@@ -2760,7 +2676,6 @@ typedef int (*VDCallback_Close)(
  *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
  */
 EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback);
-
 
 /*!
  * \brief Enables or disables the webserver.
@@ -2773,7 +2688,6 @@ EXPORT_SPEC int UpnpEnableWebserver(
 	/*! [in] \c TRUE to enable, \c FALSE to disable. */
 	int enable);
 
-
 /*!
  * \brief Returns \c TRUE if the webserver is enabled, or \c FALSE if it is not.
  *
@@ -2782,7 +2696,6 @@ EXPORT_SPEC int UpnpEnableWebserver(
  *       \li \c FALSE: The webserver is not enabled
  */
 EXPORT_SPEC int UpnpIsWebserverEnabled(void);
-
 
 /*!
  * \brief Adds a virtual directory mapping.
@@ -2802,7 +2715,6 @@ EXPORT_SPEC int UpnpAddVirtualDir(
 	/*! [in] The name of the new directory mapping to add. */
 	const char *dirName);
 
-
 /*!
  * \brief Removes a virtual directory mapping made with \b UpnpAddVirtualDir.
  *
@@ -2814,24 +2726,17 @@ EXPORT_SPEC int UpnpRemoveVirtualDir(
 	/*! [in] The name of the virtual directory mapping to remove. */
 	const char *dirName);
 
-
 /*!
  * \brief Removes all virtual directory mappings.
  */
 EXPORT_SPEC void UpnpRemoveAllVirtualDirs(void);
 
-
 /* @} Web Server API */
-
-
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-
 /* @} UPnPAPI UPnP API */
 
-
 #endif /* UPNP_H */
-

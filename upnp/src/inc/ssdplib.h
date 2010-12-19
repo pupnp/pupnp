@@ -53,7 +53,6 @@
 #ifdef WIN32
 #else /* WIN32 */
 	#include <syslog.h>
-	#include <sys/socket.h>
 	#ifndef __APPLE__
 		#include <netinet/in_systm.h>
 		#include <netinet/ip.h>

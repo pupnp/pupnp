@@ -48,16 +48,12 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
-#if defined(BSD)
-	#include <sys/socket.h>
-#endif
 #include <sys/types.h>
 #include <time.h>
 
 #ifdef WIN32
 	#include "inet_pton.h"
 #else
-	#include <arpa/inet.h>  /* for inet_pton() */
 	#include <netdb.h>      /* for struct addrinfo */
 #endif
 

@@ -30,6 +30,10 @@
  **************************************************************************/
 
 /*!
+ * \addtogroup Sock
+ * 
+ * @{
+ * 
  * \file
  *
  * \brief Implements the sockets functionality.
@@ -52,7 +56,7 @@
 #define MSG_NOSIGNAL 0
 #endif
 
-int sock_init(OUT SOCKINFO *info, IN SOCKET sockfd)
+int sock_init(SOCKINFO *info, SOCKET sockfd)
 {
 	assert(info);
 
@@ -62,8 +66,8 @@ int sock_init(OUT SOCKINFO *info, IN SOCKET sockfd)
 	return UPNP_E_SUCCESS;
 }
 
-int sock_init_with_ip(OUT SOCKINFO *info, IN SOCKET sockfd,
-	IN struct sockaddr *foreign_sockaddr)
+int sock_init_with_ip(SOCKINFO *info, SOCKET sockfd,
+	struct sockaddr *foreign_sockaddr)
 {
 	int ret;
 
@@ -78,7 +82,7 @@ int sock_init_with_ip(OUT SOCKINFO *info, IN SOCKET sockfd,
 	return UPNP_E_SUCCESS;
 }
 
-int sock_destroy(INOUT SOCKINFO *info, int ShutdownMethod)
+int sock_destroy(SOCKINFO *info, int ShutdownMethod)
 {
 	int ret = UPNP_E_SUCCESS;
 
@@ -103,16 +107,16 @@ int sock_destroy(INOUT SOCKINFO *info, int ShutdownMethod)
  *	\li \c UPNP_E_SOCKET_ERROR - Error on socket calls
  */
 static int sock_read_write(
-	/*! Socket Information Object. */
-	IN SOCKINFO *info,
-	/*! Buffer to get data to or send data from. */
-	OUT char *buffer,
-	/*! Size of the buffer. */
-	IN int bufsize,
-	/*! timeout value. */
-	IN int *timeoutSecs,
-	/*! Boolean value specifying read or write option. */
-	IN int bRead)
+	/*! [in] Socket Information Object. */
+	SOCKINFO *info,
+	/*! [out] Buffer to get data to or send data from. */
+	char *buffer,
+	/*! [in] Size of the buffer. */
+	int bufsize,
+	/*! [in] timeout value. */
+	int *timeoutSecs,
+	/*! [in] Boolean value specifying read or write option. */
+	int bRead)
 {
 	int retCode;
 	fd_set readSet;
@@ -196,15 +200,14 @@ static int sock_read_write(
 	return (int)numBytes;
 }
 
-int sock_read(IN SOCKINFO *info, OUT char *buffer, IN int bufsize,
-	      INOUT int *timeoutSecs)
+int sock_read(SOCKINFO *info, char *buffer, int bufsize, int *timeoutSecs)
 {
 	return sock_read_write(info, buffer, bufsize, timeoutSecs, TRUE);
 }
 
-int sock_write(IN SOCKINFO *info, IN const char *buffer, IN int bufsize,
-	       INOUT int *timeoutSecs)
+int sock_write(SOCKINFO *info, const char *buffer, int bufsize, int *timeoutSecs)
 {
+	/* Consciently removing constness. */
 	return sock_read_write(info, (char *)buffer, bufsize, timeoutSecs, FALSE);
 }
 
@@ -240,3 +243,5 @@ int sock_make_no_blocking(SOCKET sock)
 #endif /* WIN32 */
 	return 0;
 }
+
+/* @} Sock */

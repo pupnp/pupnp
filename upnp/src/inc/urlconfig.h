@@ -36,16 +36,7 @@
 
 #include "UpnpInet.h"
 
-
-#ifdef WIN32
-#else
-	#include <arpa/inet.h>
-	#include <sys/socket.h>
-#endif
-
-
 /* functions available only if the web server is included */
-
 
 #ifdef __cplusplus
 extern "C" {

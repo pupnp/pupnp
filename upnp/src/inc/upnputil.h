@@ -1,3 +1,6 @@
+#ifndef UTIL_H
+#define UTIL_H
+
 /*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation
@@ -28,9 +31,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
-
-#ifndef UTIL_H
-#define UTIL_H
 
 /*!
  * \file
