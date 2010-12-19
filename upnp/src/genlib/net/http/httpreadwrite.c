@@ -60,7 +60,6 @@
 	#define fseeko fseek
 #else
 	#include <arpa/inet.h>
-	#include <fcntl.h>
 	#include <sys/types.h>
 	#include <sys/socket.h>
 	#include <sys/time.h>
@@ -84,78 +83,17 @@ const int CHUNK_TAIL_SIZE = 10;
 /* in seconds */
 #define DEFAULT_TCP_CONNECT_TIMEOUT 5
 
-/************************************************************************
- * Function : Make_Socket_NoBlocking
+/*!
+ * \brief Checks socket connection and wait if it is not connected.
+ * It should be called just after connect.
  *
- * Parameters:
- *	IN int sock: socket
- *
- * Description:
- *	This function makes socket non-blocking.
- *
- * Returns: int
- *	0 if successful else -1 
- ***************************************************************************/
-static int Make_Socket_NoBlocking(SOCKET sock)
-{
-#ifdef WIN32
-	u_long val = 1;
-	return ioctlsocket(sock, FIONBIO, &val);
-#else
-	int val;
-
-	val = fcntl(sock, F_GETFL, 0);
-	if (fcntl(sock, F_SETFL, val | O_NONBLOCK) == -1) {
-		return -1;
-	}
-#endif
-	return 0;
-}
-
-/************************************************************************
- * Function : Make_Socket_Blocking
- *
- * Parameters:
- *	IN int sock: socket
- *
- * Description:
- *	This function makes socket blocking.
- *
- * Returns: int
- *	0 if successful else -1 
- ***************************************************************************/
-static int Make_Socket_Blocking(int sock)
-{
-#ifdef WIN32
-	u_long val = 0;
-	return ioctlsocket(sock, FIONBIO, &val);
-#else
-	int val;
-
-	val = fcntl(sock, F_GETFL, 0);
-	if (fcntl(sock, F_SETFL, val & ~O_NONBLOCK) == -1) {
-		return -1;
-	}
-#endif
-	return 0;
-}
-
-
-/************************************************************************
- * Function : Check_Connect_And_Wait_Connection
- *
- * Parameters:
- *	IN int sock: socket
- *  IN int connect_res: result of connect
- *
- * Description:
- *	This function checks socket connection and wait if it is not connected
- *  It should be called just after connect
- *
- * Returns: int
- *	0 if successful else -1 
- ***************************************************************************/
-static int Check_Connect_And_Wait_Connection(int sock, int connect_res)
+ * \return 0 if successful, else -1.
+ */
+static int Check_Connect_And_Wait_Connection(
+	/*! [in] socket. */
+	SOCKET sock,
+	/*! [in] result of connect. */
+	int connect_res)
 {
 	struct timeval tmvTimeout = {DEFAULT_TCP_CONNECT_TIMEOUT, 0};
 	int result;
@@ -210,12 +148,12 @@ static int private_connect(
 	socklen_t addrlen)
 {
 #ifndef UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS
-	int ret = Make_Socket_NoBlocking(sockfd);
+	int ret = sock_make_no_blocking(sockfd);
 	if (ret != - 1) {
 		ret = connect(sockfd, serv_addr, addrlen);
 		ret = Check_Connect_And_Wait_Connection(sockfd, ret);
 		if (ret != - 1) {
-			ret = Make_Socket_Blocking(sockfd);
+			ret = sock_make_blocking(sockfd);
 		}
 	}
 

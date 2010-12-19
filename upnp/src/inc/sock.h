@@ -34,6 +34,10 @@
 
 /*!
  * \file
+ *
+ * \defgroup Sock Network Socket Library
+ *
+ * @{
  */
 
 #include "upnputil.h"
@@ -63,6 +67,23 @@ typedef struct
 #ifdef __cplusplus
 #extern "C" {
 #endif
+
+/*!
+ * \brief Closes the socket if it is different from -1.
+ *
+ * \return -1 if an error occurred or if the socket is -1.
+ */
+static UPNP_INLINE int sock_close(
+	/*! Socket descriptor. */
+	SOCKET sock)
+{
+	int ret = -1;
+
+	if (sock != -1)
+		ret = UpnpCloseSocket(sock);
+
+	return ret;
+}
 
 /*!
  * \brief Assign the passed in socket descriptor to socket descriptor in the
@@ -95,6 +116,23 @@ int sock_init_with_ip(
 	IN SOCKET sockfd, 
 	/*! Remote socket address. */
         IN struct sockaddr *foreign_sockaddr);
+
+/*!
+ * \brief Shutsdown the socket using the ShutdownMethod to indicate whether
+ * sends and receives on the socket will be dis-allowed.
+ *
+ * After shutting down the socket, closesocket is called to release system
+ * resources used by the socket calls.
+ *
+ * \return Integer:
+ * \li \c UPNP_E_SOCKET_ERROR on failure.
+ * \li \c UPNP_E_SUCCESS on success.
+ */
+int sock_destroy(
+	/*! Socket Information Object. */
+	INOUT SOCKINFO* info,
+	/*! How to shutdown the socket. Used by sockets's shutdown(). */
+	int ShutdownMethod);
 
 /*!
  * \brief Reads data on socket in sockinfo.
@@ -133,42 +171,27 @@ int sock_write(
 	INOUT int *timeoutSecs);
 
 /*!
- * \brief Shutsdown the socket using the ShutdownMethod to indicate whether
- * sends and receives on the socket will be dis-allowed.
- *
- * After shutting down the socket, closesocket is called to release system
- * resources used by the socket calls.
- *
- * \return Integer:
- * \li \c UPNP_E_SOCKET_ERROR on failure.
- * \li \c UPNP_E_SUCCESS on success.
+ * \brief Make socket blocking.
+ * 
+ * \return 0 if successful, -1 otherwise.
  */
-int sock_destroy(
-	/*! Socket Information Object. */
-	INOUT SOCKINFO* info,
-	/*! How to shutdown the socket. Used by sockets's shutdown(). */
-	int ShutdownMethod);
+int sock_make_blocking(
+	/* [in] socket. */
+	SOCKET sock);
 
 /*!
- * \brief Closes the socket if it is different from -1.
- *
- * \return -1 if an error occurred or if the socket is -1.
+ * \brief Make socket non-blocking.
+ * 
+ * \return 0 if successful, -1 otherwise.
  */
-static UPNP_INLINE int sock_close(
-	/*! Socket descriptor. */
-	SOCKET sock)
-{
-	int ret = -1;
-
-	if (sock != -1) {
-		ret = UpnpCloseSocket(sock);
-	}
-
-	return ret;
-}
+int sock_make_no_blocking(
+	/* [in] socket. */
+	SOCKET sock);
 
 #ifdef __cplusplus
 }	/* #extern "C" */
 #endif
+
+/* @} Sock Network Socket Library */
 
 #endif /* GENLIB_NET_SOCK_H */
