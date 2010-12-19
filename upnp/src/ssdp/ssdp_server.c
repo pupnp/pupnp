@@ -615,12 +615,12 @@ static void ssdp_event_handler_thread(
 	    hmsg->request_method == HTTPMETHOD_MSEARCH) {
 #ifdef INCLUDE_CLIENT_APIS
 		ssdp_handle_ctrlpt_msg(hmsg,
-				       (struct sockaddr *)&data->dest_addr,
+				       &data->dest_addr,
 				       FALSE, NULL);
 #endif /* INCLUDE_CLIENT_APIS */
 	} else {
 		ssdp_handle_device_request(hmsg,
-					   (struct sockaddr *)&data->dest_addr);
+					   &data->dest_addr);
 	}
 
 	/* free data */

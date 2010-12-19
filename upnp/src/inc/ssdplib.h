@@ -284,7 +284,7 @@ void ssdp_handle_ctrlpt_msg(
 	/* [in] SSDP message from the device. */
 	http_message_t *hmsg, 
 	/* [in] Address of the device. */
-	struct sockaddr *dest_addr,
+	struct sockaddr_storage *dest_addr,
 	/* [in] timeout kept by the control point while sending search message.
 	 * Only in search reply. */
 	int timeout,
@@ -347,13 +347,13 @@ void ssdp_handle_device_request(
 	/* [in] . */
 	http_message_t *hmsg, 
 	/* [in] . */
-	struct sockaddr *dest_addr);
+	struct sockaddr_storage *dest_addr);
 #else /* INCLUDE_DEVICE_APIS */
 static inline void ssdp_handle_device_request(
 	/* [in] . */
 	http_message_t *hmsg, 
 	/* [in] . */
-	struct sockaddr* dest_addr) {}
+	struct sockaddr_storage *dest_addr) {}
 #endif /* INCLUDE_DEVICE_APIS */
 
 /*!

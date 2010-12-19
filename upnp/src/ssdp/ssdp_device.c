@@ -74,7 +74,7 @@ void *advertiseAndReplyThread(void *data)
 }
 
 #ifdef INCLUDE_DEVICE_APIS
-void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr *dest_addr)
+void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *dest_addr)
 {
 #define MX_FUDGE_FACTOR 10
 	int handle;
@@ -112,7 +112,7 @@ void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr *dest_addr
 
 	HandleLock();
 	/* device info. */
-	if (GetDeviceHandleInfo(dest_addr->sa_family,
+	if (GetDeviceHandleInfo(dest_addr->ss_family,
 				&handle, &dev_info) != HND_DEVICE) {
 		HandleUnlock();
 		/* no info found. */

@@ -75,7 +75,7 @@ static void send_search_result(
 	free(temp);
 }
 
-void ssdp_handle_ctrlpt_msg(http_message_t *hmsg, struct sockaddr *dest_addr,
+void ssdp_handle_ctrlpt_msg(http_message_t *hmsg, struct sockaddr_storage *dest_addr,
 			    int timeout, void *cookie)
 {
 	int handle;
