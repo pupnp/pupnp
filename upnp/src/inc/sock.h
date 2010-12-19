@@ -33,20 +33,15 @@
  **************************************************************************/
 
 /*!
- * \file
- *
  * \defgroup Sock Network Socket Library
  *
  * @{
+ *
+ * \file
  */
 
-#include "upnputil.h"
-
-#ifdef WIN32
-	/* Do not #include <netinet/in.h> */
-#else
-	#include <netinet/in.h>
-#endif
+#include "UpnpInet.h"		/* for SOCKET, netinet/in */
+#include "UpnpGlobal.h"		/* for UPNP_INLINE */
 
 /* The following are not defined under winsock.h */
 #ifndef SD_RECEIVE
@@ -95,10 +90,10 @@ static UPNP_INLINE int sock_close(
  * \li \c UPNP_E_SOCKET_ERROR
  */
 int sock_init(
-	/*! Socket Information Object. */
-	OUT SOCKINFO *info,
-	/*! Socket Descriptor. */
-	IN SOCKET sockfd);
+	/*! [out] Socket Information Object. */
+	SOCKINFO *info,
+	/*! [in] Socket Descriptor. */
+	SOCKET sockfd);
 
 /*!
  * \brief Calls the sock_init function and assigns the passed in IP address
@@ -110,12 +105,12 @@ int sock_init(
  * \li \c UPNP_E_SOCKET_ERROR
  */
 int sock_init_with_ip(
-	/*! Socket Information Object. */
-	OUT SOCKINFO* info,
-	/*! Socket Descriptor. */
-	IN SOCKET sockfd, 
-	/*! Remote socket address. */
-        IN struct sockaddr *foreign_sockaddr);
+	/*! [out] Socket Information Object. */
+	SOCKINFO* info,
+	/*! [in] Socket Descriptor. */
+	SOCKET sockfd, 
+	/*! [in] Remote socket address. */
+        struct sockaddr *foreign_sockaddr);
 
 /*!
  * \brief Shutsdown the socket using the ShutdownMethod to indicate whether
@@ -129,9 +124,9 @@ int sock_init_with_ip(
  * \li \c UPNP_E_SUCCESS on success.
  */
 int sock_destroy(
-	/*! Socket Information Object. */
-	INOUT SOCKINFO* info,
-	/*! How to shutdown the socket. Used by sockets's shutdown(). */
+	/*! [in,out] Socket Information Object. */
+	SOCKINFO* info,
+	/*! [in] How to shutdown the socket. Used by sockets's shutdown(). */
 	int ShutdownMethod);
 
 /*!
@@ -143,14 +138,14 @@ int sock_destroy(
  * \li \c UPNP_E_SOCKET_ERROR - Error on socket calls.
  */
 int sock_read(
-	/*! Socket Information Object. */
-	IN SOCKINFO *info,
-	/*! Buffer to get data to. */
-	OUT char* buffer,
-	/*! Size of the buffer. */
-	IN int bufsize,
-	/*! timeout value. */
-	INOUT int *timeoutSecs);
+	/*! [in] Socket Information Object. */
+	SOCKINFO *info,
+	/*! [out] Buffer to get data to. */
+	char* buffer,
+	/*! [in] Size of the buffer. */
+	int bufsize,
+	/*! [in,out] timeout value. */
+	int *timeoutSecs);
 
 /*!
  * \brief Writes data on the socket in sockinfo.
@@ -161,14 +156,14 @@ int sock_read(
  * \li \c UPNP_E_SOCKET_ERROR - Error on socket calls.
  */
 int sock_write(
-	/*! Socket Information Object. */
-	IN SOCKINFO *info,
-	/*! Buffer to send data from. */
-	IN const char *buffer,
-	/*! Size of the buffer. */
-	IN int bufsize,
-	/*! timeout value. */
-	INOUT int *timeoutSecs);
+	/*! [in] Socket Information Object. */
+	SOCKINFO *info,
+	/*! [in] Buffer to send data from. */
+	const char *buffer,
+	/*! [in] Size of the buffer. */
+	int bufsize,
+	/*! [in,out] timeout value. */
+	int *timeoutSecs);
 
 /*!
  * \brief Make socket blocking.

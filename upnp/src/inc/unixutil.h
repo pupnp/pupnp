@@ -40,8 +40,6 @@
 	typedef int socklen_t;
 	#define EAFNOSUPPORT 97
 #else
-	#include <arpa/inet.h>
-	#include <sys/socket.h>
 	#include <sys/time.h>
 	#include <sys/wait.h>
 #endif

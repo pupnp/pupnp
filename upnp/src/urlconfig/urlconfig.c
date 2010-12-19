@@ -29,9 +29,11 @@
  *
  **************************************************************************/
 
+/*!
+ * \file
+ */
 
 #include "config.h"
-
 
 #include "membuffer.h"
 #include "unixutil.h"
@@ -43,18 +45,13 @@
 #include "upnputil.h"
 #include "webserver.h"
 
-
 #include <assert.h>
 #include <stdio.h>
 
-
 #ifdef WIN32
 #else
-	#include <arpa/inet.h>
 	#include <sys/types.h>
-	#include <sys/socket.h>
 #endif
-
 
 /************************************************************************
 *	Function :	addrToString

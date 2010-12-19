@@ -29,49 +29,24 @@
  *
  ******************************************************************************/
 
-#include "config.h"
-
 /*!
+ * \addtogroup UPnPAPI
+ * 
+ * @{
+ * 
  * \file
  */
 
-#include <sys/stat.h>
-
-#include <assert.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <string.h>
-
-#ifdef WIN32
-	/* Do not include these files */
-#else
-	#include <sys/param.h>
-	#if defined(__sun)
-		#include <fcntl.h>
-		#include <sys/sockio.h>
-	#elif defined(BSD) && BSD >= 199306
-		#include <ifaddrs.h>
-		/* Do not move or remove the include below for "sys/socket"!
-		 * Will break FreeBSD builds. */
-		#include <sys/socket.h>
-	#endif
-
-	#include <arpa/inet.h>
-	#include <net/if.h>
-	#include <netinet/in.h>
-	#include <sys/ioctl.h>
-	#include <sys/param.h>
-	#include <sys/socket.h>
-	#include <sys/types.h>
-#endif
+#include "config.h"
 
 #include "upnpapi.h"
+
 #include "httpreadwrite.h"
 #include "membuffer.h"
 #include "ssdplib.h"
 #include "soaplib.h"
-#include "ThreadPool.h"
 #include "sysdep.h"
+#include "ThreadPool.h"
 #include "UpnpStdInt.h"
 #include "UpnpUniStd.h" /* for close() */
 #include "uuid.h"
@@ -86,6 +61,21 @@
 	#include "VirtualDir.h"
 	#include "webserver.h"
 #endif /* INTERNAL_WEB_SERVER */
+
+#include <sys/stat.h>
+
+#include <assert.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+
+#ifdef WIN32
+	/* Do not include these files */
+#else
+	#include <sys/ioctl.h>
+	#include <sys/param.h>
+	#include <sys/types.h>
+#endif
 
 #ifndef IN6_IS_ADDR_GLOBAL
 #define IN6_IS_ADDR_GLOBAL(a) \
@@ -3984,3 +3974,4 @@ int UpnpSetMaxContentLength(size_t contentLength)
 	return errCode;
 }
 
+/* @} UPnPAPI */
