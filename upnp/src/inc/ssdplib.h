@@ -136,14 +136,6 @@ typedef void (* SsdpFunPtr)(Event *);
 
 typedef Event SsdpEvent ;
 
-/*! Structure to contain Discovery response. */
-typedef struct resultData
-{
-	struct Upnp_Discovery param;
-	void *cookie;
-	Upnp_FunPtr ctrlpt_callback;
-} ResultData;
-
 typedef struct TData
 {
 	int Mx;

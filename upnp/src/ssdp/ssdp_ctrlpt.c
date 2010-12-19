@@ -46,7 +46,7 @@
 
 #include "httpparser.h"
 #include "httpreadwrite.h"
-/*#include "ssdp_ResultData.h"*/
+#include "ssdp_ResultData.h"
 #include "ssdplib.h"
 #include "statcodes.h"
 #include "unixutil.h"

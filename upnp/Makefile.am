@@ -80,6 +80,7 @@ libupnp_la_SOURCES = \
 
 # ssdp
 libupnp_la_SOURCES += \
+        src/ssdp/ssdp_ResultData.h \
 	src/ssdp/ssdp_device.c \
 	src/ssdp/ssdp_ctrlpt.c \
 	src/ssdp/ssdp_server.c
