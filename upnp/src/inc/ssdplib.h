@@ -33,6 +33,10 @@
  **************************************************************************/
 
 /*!
+ * \defgroup SSDPlib SSDP Library
+ *
+ * @{
+ *
  * \file
  */
 
@@ -44,7 +48,6 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <setjmp.h>
-#include <fcntl.h>
 #include <errno.h>
 
 #ifdef WIN32
@@ -176,48 +179,33 @@ typedef struct
 typedef int (*ParserFun)(char *, Event *);
 
 /*!
- * \brief Make ssdp socket non-blocking.
- * 
- * \return 0 if successful, -1 otherwise.
+ * \name SSDP Server Functions
+ *
+ * @{
  */
-int Make_Socket_NoBlocking(
-	/* [in] socket. */
-	SOCKET sock);
 
 /*!
- * \brief Handles the search request. It does the sanity checks of the
- * request and then schedules a thread to send a random time reply
- * (random within maximum time given by the control point to reply).
+ * \brief Sends SSDP advertisements, replies and shutdown messages.
+ *
+ * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
-#ifdef INCLUDE_DEVICE_APIS
-void ssdp_handle_device_request(
-	/* [in] . */
-	http_message_t *hmsg, 
-	/* [in] . */
-	struct sockaddr_storage *dest_addr);
-#else
-static inline void ssdp_handle_device_request(
-	/* [in] . */
-	http_message_t *hmsg, 
-	/* [in] . */
-	struct sockaddr_storage *dest_addr) {}
-#endif
-
-/*!
- * \brief This function handles the ssdp messages from the devices. These
- * messages includes the search replies, advertisement of device coming alive
- * and bye byes.
- */
-void ssdp_handle_ctrlpt_msg(
-	/* [in] SSDP message from the device. */
-	http_message_t *hmsg, 
-	/* [in] Address of the device. */
-	struct sockaddr_storage *dest_addr,
-	/* [in] timeout kept by the control point while sending search message. */
-	int timeout,
-	/* [in] Cookie stored by the control point application. This cookie will
-	 * be returned to the control point in the callback. */
-	void *cookie);
+int AdvertiseAndReply(
+	/* [in] -1 = Send shutdown, 0 = send reply, 1 = Send Advertisement. */
+	int AdFlag, 
+	/* [in] Device handle. */
+	UpnpDevice_Handle Hnd, 
+	/* [in] Search type for sending replies. */
+	enum SsdpSearchType SearchType, 
+	/* [in] Destination address. */
+	struct sockaddr *DestAddr,
+	/* [in] Device type. */
+	char *DeviceType, 
+	/* [in] Device UDN. */
+	char *DeviceUDN, 
+	/* [in] Service type. */
+	char *ServiceType,
+	/* [in] Advertisement age. */
+	int Exp);
 
 /*!
  * \brief Fills the fields of the event structure like DeviceType, Device UDN
@@ -233,24 +221,6 @@ int unique_service_name(
 	SsdpEvent *Evt);
 
 /*!
- * \brief Creates the ssdp sockets. It set their option to listen for
- * multicast traffic.
- *
- * \return UPNP_E_SUCCESS if successful else returns appropriate error.
- */
-int get_ssdp_sockets(
-	/* [out] Array of SSDP sockets. */
-	MiniServerSockArray *out);
-
-/*!
- * \brief This function reads the data from the ssdp socket.
- */
-void readFromSSDPSocket(
-	/* [in] SSDP socket. */
-	SOCKET socket);
-
-
-/*!
  * \brief This function figures out the type of the SSDP search in the in the
  * request.
  *
@@ -260,7 +230,6 @@ void readFromSSDPSocket(
 enum SsdpSearchType ssdp_request_type1(
 	/* [in] command came in the ssdp request. */
 	char *cmd);
-
 
 /*!
  * \brief Starts filling the SSDP event structure based upon the
@@ -275,7 +244,62 @@ int ssdp_request_type(
 	SsdpEvent *Evt);
 
 /*!
+ * \brief This function reads the data from the ssdp socket.
+ */
+void readFromSSDPSocket(
+	/* [in] SSDP socket. */
+	SOCKET socket);
+
+/*!
+ * \brief Creates the IPv4 and IPv6 ssdp sockets required by the
+ *  control point and device operation.
+ *
+ * \return UPNP_E_SUCCESS if successful else returns appropriate error.
+ */
+int get_ssdp_sockets(
+	/* [out] Array of SSDP sockets. */
+	MiniServerSockArray *out);
+
+/* @} SSDP Server Functions */
+
+/*!
+ * \name SSDP Control Point Functions
+ *
+ * @{
+ */
+
+/*!
+ * \brief This function handles the ssdp messages from the devices. These
+ * messages includes the search replies, advertisement of device coming alive
+ * and bye byes.
+ */
+void ssdp_handle_ctrlpt_msg(
+	/* [in] SSDP message from the device. */
+	http_message_t *hmsg, 
+	/* [in] Address of the device. */
+	struct sockaddr_storage *dest_addr,
+	/* [in] timeout kept by the control point while sending search message.
+	 * Only in search reply. */
+	int timeout,
+	/* [in] Cookie stored by the control point application. This cookie will
+	 * be returned to the control point in the callback.
+	 * Only in search reply. */
+	void *cookie);
+
+/*!
  * \brief Creates and send the search request for a specific URL.
+ *
+ * This function implements the search request of the discovery phase.
+ * A M-SEARCH request is sent on the SSDP channel for both IPv4 and
+ * IPv6 addresses. The search target(ST) is required and must be one of
+ * the following:
+ *     \li "ssdp:all" : Search for all devices and services.
+ *     \li "ssdp:rootdevice" : Search for root devices only.
+ *     \li "uuid:<device-uuid>" : Search for a particular device.
+ *     \li "urn:schemas-upnp-org:device:<deviceType:v>"
+ *     \li "urn:schemas-upnp-org:service:<serviceType:v>"
+ *     \li "urn:<domain-name>:device:<deviceType:v>"
+ *     \li "urn:<domain-name>:service:<serviceType:v>"
  *
  * \return 1 if successful else appropriate error.
  */
@@ -287,6 +311,43 @@ int SearchByTarget(
 	/* [in] Cookie provided by control point application. This cokie will
 	 * be returned to application in the callback. */
 	void *Cookie);
+
+/* @} SSDP Control Point Functions */
+
+/*!
+ * \name SSDP Device Functions
+ *
+ * @{
+ */
+
+/*!
+ * \brief Wrapper function to reply the search request coming from the
+ * control point.
+ *
+ * \return always return NULL
+ */
+void *advertiseAndReplyThread(
+	/* [in] Structure containing the search request. */
+	void *data);
+
+/*!
+ * \brief Handles the search request. It does the sanity checks of the
+ * request and then schedules a thread to send a random time reply
+ * (random within maximum time given by the control point to reply).
+ */
+#ifdef INCLUDE_DEVICE_APIS
+void ssdp_handle_device_request(
+	/* [in] . */
+	http_message_t *hmsg, 
+	/* [in] . */
+	struct sockaddr_storage *dest_addr);
+#else /* INCLUDE_DEVICE_APIS */
+static inline void ssdp_handle_device_request(
+	/* [in] . */
+	http_message_t *hmsg, 
+	/* [in] . */
+	struct sockaddr_storage *dest_addr) {}
+#endif /* INCLUDE_DEVICE_APIS */
 
 /*!
  * \brief Creates the device advertisement request based on the input
@@ -309,48 +370,6 @@ int DeviceAdvertisement(
 	int AddressFamily);
 
 /*!
- * \brief Creates a HTTP device shutdown request packet and send it to the
- * multicast channel through RequestHandler.
- *
- * \return UPNP_E_SUCCESS if successful else appropriate error.
- */
-int DeviceShutdown(
-	/* [in] Device Type. */
-	char *DevType, 
-	/* [in] 1 means root device. */
-	int RootDev,
-	/* [in] Device UDN. */
-	char *Udn, 
-	/* [in] . */
-	char *_Server, 
-	/* [in] Location URL. */
-	char *Location, 
-	/* [in] Device duration in sec. */
-	int Duration,
-	/* [in] Device address family. */
-	int AddressFamily);
-
-/*!
- * \brief Creates the reply packet based on the input parameter, and send it
- * to the client address given in its input parameter DestAddr.
- *
- * \return UPNP_E_SUCCESS if successful else appropriate error.
- */
-int DeviceReply(
-	/* [in] destination IP address. */
-	struct sockaddr *DestAddr, 
-	/* [in] Device type. */
-	char *DevType, 
-	/* [in] 1 means root device 0 means embedded device. */
-	int RootDev, 
-	/* [in] Device UDN. */
-	char *Udn, 
-	/* [in] Location of Device description document. */
-	char *Location, 
-	/* [in] Life time of this device. */
-	int Duration);
-
-/*!
  * \brief Creates the reply packet based on the input parameter, and send it
  * to the client addesss given in its input parameter DestAddr.
  *
@@ -371,6 +390,26 @@ int SendReply(
 	int Duration, 
 	/* [in] . */
 	int ByType );
+
+/*!
+ * \brief Creates the reply packet based on the input parameter, and send it
+ * to the client address given in its input parameter DestAddr.
+ *
+ * \return UPNP_E_SUCCESS if successful else appropriate error.
+ */
+int DeviceReply(
+	/* [in] destination IP address. */
+	struct sockaddr *DestAddr, 
+	/* [in] Device type. */
+	char *DevType, 
+	/* [in] 1 means root device 0 means embedded device. */
+	int RootDev, 
+	/* [in] Device UDN. */
+	char *Udn, 
+	/* [in] Location of Device description document. */
+	char *Location, 
+	/* [in] Life time of this device. */
+	int Duration);
 
 /*!
  * \brief Creates the advertisement packet based on the input parameter,
@@ -427,36 +466,29 @@ int ServiceShutdown(
 	int AddressFamily);
 
 /*!
- * \brief Wrapper function to reply the search request coming from the
- * control point.
- *
- * \return always return NULL
- */
-void *advertiseAndReplyThread(
-	/* [in] Structure containing the search request. */
-	void *data);
-
-/*!
- * \brief Sends SSDP advertisements, replies and shutdown messages.
+ * \brief Creates a HTTP device shutdown request packet and send it to the
+ * multicast channel through RequestHandler.
  *
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
-int AdvertiseAndReply(
-	/* [in] -1 = Send shutdown, 0 = send reply, 1 = Send Advertisement. */
-	int AdFlag, 
-	/* [in] Device handle. */
-	UpnpDevice_Handle Hnd, 
-	/* [in] Search type for sending replies. */
-	enum SsdpSearchType SearchType, 
-	/* [in] Destination address. */
-	struct sockaddr *DestAddr,
-	/* [in] Device type. */
-	char *DeviceType, 
+int DeviceShutdown(
+	/* [in] Device Type. */
+	char *DevType, 
+	/* [in] 1 means root device. */
+	int RootDev,
 	/* [in] Device UDN. */
-	char *DeviceUDN, 
-	/* [in] Service type. */
-	char *ServiceType,
-	/* [in] Advertisement age. */
-	int Exp);
+	char *Udn, 
+	/* [in] . */
+	char *_Server, 
+	/* [in] Location URL. */
+	char *Location, 
+	/* [in] Device duration in sec. */
+	int Duration,
+	/* [in] Device address family. */
+	int AddressFamily);
+
+/* @} SSDP Device Functions */
+
+/* @} SSDPlib SSDP Library */
 
 #endif /* SSDPLIB_H */

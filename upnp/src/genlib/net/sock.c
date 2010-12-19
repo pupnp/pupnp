@@ -39,11 +39,12 @@
 
 #include "sock.h"
 
-#include "unixutil.h"		/* for socklen_t, EAFNOSUPPORT */
+#include "unixutil.h"	/* for socklen_t, EAFNOSUPPORT */
 #include "upnp.h"
 
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>	/* for F_GETFL, F_SETFL, O_NONBLOCK */
 #include <time.h>
 #include <string.h>
 
@@ -205,3 +206,35 @@ int sock_write(IN SOCKINFO *info, IN const char *buffer, IN int bufsize,
 	return sock_read_write(info, (char *)buffer, bufsize, timeoutSecs, FALSE);
 }
 
+int sock_make_blocking(SOCKET sock)
+{
+#ifdef WIN32
+	u_long val = 0;
+	return ioctlsocket(sock, FIONBIO, &val);
+#else
+	int val;
+
+	val = fcntl(sock, F_GETFL, 0);
+	if (fcntl(sock, F_SETFL, val & ~O_NONBLOCK) == -1) {
+		return -1;
+	}
+#endif
+	return 0;
+}
+
+
+int sock_make_no_blocking(SOCKET sock)
+{
+#ifdef WIN32
+	u_long val = 1;
+	return ioctlsocket(sock, FIONBIO, &val);
+#else /* WIN32 */
+	int val;
+
+	val = fcntl(sock, F_GETFL, 0);
+	if (fcntl(sock, F_SETFL, val | O_NONBLOCK) == -1) {
+		return -1;
+	}
+#endif /* WIN32 */
+	return 0;
+}

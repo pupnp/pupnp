@@ -1,3 +1,6 @@
+#ifndef UPNP_H
+#define UPNP_H
+
 /*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
@@ -29,11 +32,6 @@
  *
  ******************************************************************************/
 
-
-#ifndef UPNP_H
-#define UPNP_H
-
-
 /*!
  * \file
  *
@@ -42,12 +40,10 @@
  * @{
  */
 
-
 #include "ixml.h"
 #include "upnpconfig.h"
 #include "UpnpGlobal.h"
 #include "UpnpInet.h"
-
 
 /*
  * \todo Document the exact reason of these include files and solve this
@@ -61,13 +57,11 @@
 	/* Other systems ??? */
 #endif
 
-
 #ifdef WIN32
 	/* Do not #include <sys/param.h> */
 #else
 	#include <sys/param.h>
 #endif
-
 
 #define LINE_SIZE  180
 #define NAME_SIZE  256
@@ -78,7 +72,6 @@
 #define UPNP_INFINITE		-1
 #define UPNP_USING_CHUNKED	-3
 #define UPNP_UNTIL_CLOSE	-4
-
 
 /*!
  * \name Error codes 
@@ -420,7 +413,6 @@
 #include "StateVarComplete.h"
 #include "StateVarRequest.h"
 #include "SubscriptionRequest.h"
-
 
 /*!
  * \name Constants and Types
