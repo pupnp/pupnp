@@ -328,7 +328,7 @@ void ssdp_handle_device_request(
 	/* [in] . */
 	struct sockaddr_storage *dest_addr);
 #else /* INCLUDE_DEVICE_APIS */
-static inline void ssdp_handle_device_request(
+static UPNP_INLINE void ssdp_handle_device_request(
 	/* [in] . */
 	http_message_t *hmsg, 
 	/* [in] . */
