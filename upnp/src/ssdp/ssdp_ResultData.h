@@ -2,6 +2,10 @@
 #define SSDP_RESULTDATA_H
 
 /*!
+ * \addtogroup SSDPlib
+ *
+ * @{
+ * 
  * \file
  *
  * \brief SSDPResultData object declararion.
@@ -16,5 +20,7 @@ typedef struct resultData
 	void *cookie;
 	Upnp_FunPtr ctrlpt_callback;
 } ResultData;
+
+/* @} SSDPlib */
 
 #endif /* SSDP_RESULTDATA_H */

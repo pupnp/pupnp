@@ -68,8 +68,6 @@
 
 void RequestHandler();
 
-Event ErrotEvt;
-
 enum Listener {
 	Idle,
 	Stopping,

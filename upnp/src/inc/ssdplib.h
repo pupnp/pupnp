@@ -59,28 +59,18 @@
 		#include <netinet/ip_icmp.h>
 	#endif /* __APPLE__ */
 	#include <sys/time.h>
-	#include <arpa/inet.h>
 #endif /* WIN32 */
 
 /*! Enumeration to define all different types of ssdp searches */
-typedef enum SsdpSearchType{
-	SSDP_SERROR=-1,
-	SSDP_ALL,SSDP_ROOTDEVICE,
+typedef enum SsdpSearchType {
+	/*! Unknown search command. */
+	SSDP_SERROR = -1,
+	SSDP_ALL,
+	SSDP_ROOTDEVICE,
 	SSDP_DEVICEUDN,
 	SSDP_DEVICETYPE,
 	SSDP_SERVICE
 } SType;
-
-/*! Enumeration to define all different type of ssdp messages */
-typedef enum SsdpCmdType{
-	SSDP_ERROR=-1,
-	SSDP_OK,
-	SSDP_ALIVE,
-	SSDP_BYEBYE,
-	SSDP_SEARCH,
-	SSDP_NOTIFY,
-	SSDP_TIMEOUT
-} Cmd;
 
 #define BUFSIZE   2500
 #define SSDP_IP   "239.255.255.250"
@@ -114,7 +104,6 @@ typedef enum SsdpCmdType{
 
 /*! Structure to store the SSDP information */
 typedef struct SsdpEventStruct {
-	enum SsdpCmdType Cmd;
 	enum SsdpSearchType RequestType;
 	int  ErrCode;
 	int  MaxAge;
@@ -130,11 +119,9 @@ typedef struct SsdpEventStruct {
 	char Date[LINE_SIZE];
 	struct sockaddr *DestAddr;
 	void * Cookie;
-} Event;
+} SsdpEvent;
 
-typedef void (* SsdpFunPtr)(Event *);
-
-typedef Event SsdpEvent ;
+typedef void (* SsdpFunPtr)(SsdpEvent *);
 
 typedef struct TData
 {
@@ -175,7 +162,7 @@ typedef struct
 		extern SOCKET gSsdpReqSocket6;
 	#endif /* UPNP_ENABLE_IPV6 */
 #endif /* INCLUDE_CLIENT_APIS */
-typedef int (*ParserFun)(char *, Event *);
+typedef int (*ParserFun)(char *, SsdpEvent *);
 
 /*!
  * \name SSDP Server Functions

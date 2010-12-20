@@ -122,9 +122,6 @@ void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *d
 	HandleUnlock();
 
 	UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
-		   "ssdp_handle_device_request with Cmd %d SEARCH\n",
-		   event.Cmd);
-	UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
 		   "MAX-AGE     =  %d\n", maxAge);
 	UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
 		   "MX     =  %d\n", event.Mx);
