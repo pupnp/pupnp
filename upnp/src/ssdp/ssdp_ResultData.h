@@ -3,6 +3,10 @@
 #define SSDP_RESULTDATA_H
 
 /*!
+ * \addtogroup SSDPlib
+ *
+ * @{
+ * 
  * \file
  *
  * \brief SSDPResultData object declararion.
@@ -39,6 +43,8 @@
 
 /*! */
 void SSDPResultData_Callback(const SSDPResultData *p);
+
+/* @} SSDPlib */
 
 #endif /* SSDP_RESULTDATA_H */
 
