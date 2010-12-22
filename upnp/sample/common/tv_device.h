@@ -33,6 +33,14 @@
  **************************************************************************/
 
 /*!
+ * \addtogroup UpnpSamples
+ *
+ * @{
+ *
+ * \name Device Sample API
+ *
+ * @{
+ *
  * \file
  */
 
@@ -47,7 +55,6 @@ extern "C" {
 
 #include "ithread.h"
 #include "upnp.h"
-#include "UpnpUniStd.h" /* for close() */
 
 #include <stdlib.h>
 #include <string.h>
@@ -557,5 +564,8 @@ int device_main(int argc, char *argv[]);
 }
 #endif
 
-#endif
+/*! @} Control Point Sample API */
 
+/*! @} UpnpSamples */
+
+#endif /* UPNP_TV_DEVICE_H */

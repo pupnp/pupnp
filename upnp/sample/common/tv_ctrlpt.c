@@ -29,6 +29,18 @@
  *
  ******************************************************************************/
 
+/*!
+ * \addtogroup UpnpSamples
+ *
+ * @{
+ *
+ * \name Control Point Sample Module
+ *
+ * @{
+ *
+ * \file
+ */
+
 #include "tv_ctrlpt.h"
 
 #include "upnp.h"
@@ -1568,3 +1580,6 @@ int TvCtrlPointProcessCommand(char *cmdline)
 	return TV_SUCCESS;
 }
 
+/*! @} Control Point Sample Module */
+
+/*! @} UpnpSamples */

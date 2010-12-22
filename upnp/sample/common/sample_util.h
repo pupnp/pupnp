@@ -1,3 +1,6 @@
+#ifndef SAMPLE_UTIL_H
+#define SAMPLE_UTIL_H
+
 /*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
@@ -29,10 +32,11 @@
  *
  ******************************************************************************/
 
-#ifndef SAMPLE_UTIL_H
-#define SAMPLE_UTIL_H
-
 /*!
+ * \defgroup UpnpSamples Sample Code
+ *
+ * @{
+ *
  * \file
  */
 
@@ -258,6 +262,8 @@ void linux_print(const char *format, ...)
 	#define snprintf	_snprintf
 	#define strcasecmp	stricmp
 #endif
+
+/*! @} UpnpSamples */
 
 #endif /* SAMPLE_UTIL_H */
 

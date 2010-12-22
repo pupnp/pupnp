@@ -29,6 +29,13 @@
  *
  ******************************************************************************/
 
+/*!
+ * \addtogroup UpnpSamples
+ *
+ * @{
+ *
+ * \file
+ */
 
 #define SAMPLE_UTIL_C
 #include "sample_util.h"
@@ -618,3 +625,5 @@ void linux_print(const char *format, ...)
 	fflush(stdout);
 	va_end(argList);
 }
+
+/*! @} UpnpSamples */
