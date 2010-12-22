@@ -57,12 +57,6 @@
 	/* Other systems ??? */
 #endif
 
-#ifdef WIN32
-	/* Do not #include <sys/param.h> */
-#else
-	#include <sys/param.h>
-#endif
-
 #define LINE_SIZE  180
 #define NAME_SIZE  256
 #define MNFT_NAME_SIZE  64
