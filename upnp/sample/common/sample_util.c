@@ -536,7 +536,7 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 			service = (IXML_Element *)ixmlNodeList_item(serviceList, i);
 			tempServiceType = SampleUtil_GetFirstElementItem(
 				(IXML_Element *)service, "serviceType");
-			if (strcmp(tempServiceType, serviceType) == 0) {
+			if (tempServiceType && strcmp(tempServiceType, serviceType) == 0) {
 				SampleUtil_Print("Found service: %s\n", serviceType);
 				*serviceId = SampleUtil_GetFirstElementItem(service, "serviceId");
 				SampleUtil_Print("serviceId: %s\n", *serviceId);
