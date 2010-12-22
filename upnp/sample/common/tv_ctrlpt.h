@@ -33,6 +33,14 @@
  **************************************************************************/
 
 /*!
+ * \addtogroup UpnpSamples
+ *
+ * @{
+ *
+ * \name Contro Point Sample API
+ *
+ * @{
+ *
  * \file
  */
 
@@ -42,17 +50,13 @@ extern "C" {
 
 #include "sample_util.h"
 
-#include "ithread.h"
 #include "upnp.h"
 #include "UpnpString.h"
 #include "upnptools.h"
-#include "UpnpUniStd.h" /* for close() */
 
 #include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define TV_SERVICE_SERVCOUNT	2
 #define TV_SERVICE_CONTROL	0
@@ -213,5 +217,9 @@ int TvCtrlPointProcessCommand(char *cmdline);
 };
 #endif
 
-#endif /* UPNP_TV_CTRLPT_H */
 
+/*! @} Device Sample */
+
+/*! @} UpnpSamples */
+
+#endif /* UPNP_TV_CTRLPT_H */
