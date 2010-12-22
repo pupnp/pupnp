@@ -42,7 +42,7 @@
 
 
 #if !UPNP_HAVE_TOOLS
-#	error "Need upnptools.h to compile samples ; try ./configure --enable-tools"
+#	error "Need upnptools.h to compile samples; try ./configure --enable-tools"
 #endif
 
 
@@ -104,9 +104,8 @@ char *SampleUtil_GetElementValue(IXML_Element *element)
 	IXML_Node *child = ixmlNode_getFirstChild((IXML_Node *)element);
 	char *temp = NULL;
 
-	if (child != 0 && ixmlNode_getNodeType(child) == eTEXT_NODE) {
+	if (child != 0 && ixmlNode_getNodeType(child) == eTEXT_NODE)
 		temp = strdup(ixmlNode_getNodeValue(child));
-	}
 
 	return temp;
 }
@@ -127,9 +126,8 @@ IXML_NodeList *SampleUtil_GetFirstServiceList(IXML_Document *doc)
 		ServiceList = ixmlElement_getElementsByTagName(
 			(IXML_Element *)servlistnode, "service");
 	}
-	if (servlistnodelist) {
+	if (servlistnodelist)
 		ixmlNodeList_free(servlistnodelist);
-	}
 
 	return ServiceList;
 }
@@ -179,10 +177,8 @@ static IXML_NodeList *SampleUtil_GetNthServiceList(
 		ServiceList = ixmlElement_getElementsByTagName(
 			(IXML_Element *)servlistnode, "service");
 	}
-
-	if (servlistnodelist) {
+	if (servlistnodelist)
 		ixmlNodeList_free(servlistnodelist);
-	}
 
 	return ServiceList;
 }
@@ -200,34 +196,33 @@ char *SampleUtil_GetFirstDocumentItem(IXML_Document *doc, const char *item)
 		if (tmpNode) {
 			textNode = ixmlNode_getFirstChild(tmpNode);
 			if (!textNode) {
-				SampleUtil_Print("sample_util.c: (bug) "
-					"ixmlNode_getFirstChild(tmpNode) "
-					"returned NULL\n"); 
+				SampleUtil_Print("%s(%d): (BUG) ixmlNode_getFirstChild(tmpNode) returned NULL\n",
+					__FILE__, __LINE__); 
 				ret = strdup("");
 				goto epilogue;
 			}
 			if (!ixmlNode_getNodeValue(textNode)) {
-				SampleUtil_Print("ixmlNode_getNodeValue "
-					"returned NULL\n"); 
+				SampleUtil_Print("%s(%d): ixmlNode_getNodeValue returned NULL\n",
+					__FILE__, __LINE__); 
 				ret = strdup("");
 				goto epilogue;
 			} else {
 				ret = strdup(ixmlNode_getNodeValue(textNode));
 			}
 		} else {
-			SampleUtil_Print("ixmlNode_getFirstChild(tmpNode) "
-				"returned NULL\n");
+			SampleUtil_Print("%s(%d): ixmlNode_getFirstChild(tmpNode) returned NULL\n",
+				__FILE__, __LINE__);
 			goto epilogue;
 		}
 	} else {
-		SampleUtil_Print("Error finding %s in XML Node\n", item);
+		SampleUtil_Print("%s(%d): Error finding %s in XML Node\n",
+			__FILE__, __LINE__, item);
 		goto epilogue;
 	}
 
 epilogue:
-	if (nodeList) {
+	if (nodeList)
 		ixmlNodeList_free(nodeList);
-	}
 
 	return ret;
 }
@@ -241,24 +236,23 @@ char *SampleUtil_GetFirstElementItem(IXML_Element *element, const char *item)
 
 	nodeList = ixmlElement_getElementsByTagName(element, (char *)item);
 	if (nodeList == NULL) {
-		SampleUtil_Print( "Error finding %s in XML Node\n", item);
-
+		SampleUtil_Print("%s(%d): Error finding %s in XML Node\n",
+			__FILE__, __LINE__, item);
 		return NULL;
 	}
 	tmpNode = ixmlNodeList_item(nodeList, 0);
 	if (tmpNode) {
-		SampleUtil_Print("Error finding %s value in XML Node\n", item);
+		SampleUtil_Print("%s(%d): Error finding %s value in XML Node\n",
+			__FILE__, __LINE__, item);
 		ixmlNodeList_free(nodeList);
-
 		return NULL;
 	}
 	textNode = ixmlNode_getFirstChild(tmpNode);
 	ret = strdup(ixmlNode_getNodeValue(textNode));
 	if (!ret) {
-		SampleUtil_Print("Error allocating memory for %s in XML Node\n",
-			item);
+		SampleUtil_Print("%s(%d): Error allocating memory for %s in XML Node\n",
+			__FILE__, __LINE__, item);
 		ixmlNodeList_free(nodeList);
-
 		return NULL;
 	}
 	ixmlNodeList_free(nodeList);
@@ -522,11 +516,10 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 	IXML_Element *service = NULL;
 
 	baseURL = SampleUtil_GetFirstDocumentItem(DescDoc, "URLBase");
-	if (baseURL) {
+	if (baseURL)
 		base = baseURL;
-	} else {
+	else
 		base = location;
-	}
 
 	/* Top level */
 	for (sindex = 0;
@@ -541,34 +534,27 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 		length = ixmlNodeList_length(serviceList);
 		for (i = 0; i < length; i++) {
 			service = (IXML_Element *)ixmlNodeList_item(serviceList, i);
-			tempServiceType =
-				SampleUtil_GetFirstElementItem(
-					(IXML_Element *)service, "serviceType");
+			tempServiceType = SampleUtil_GetFirstElementItem(
+				(IXML_Element *)service, "serviceType");
 			if (strcmp(tempServiceType, serviceType) == 0) {
 				SampleUtil_Print("Found service: %s\n", serviceType);
-				*serviceId =
-					SampleUtil_GetFirstElementItem(service, "serviceId");
+				*serviceId = SampleUtil_GetFirstElementItem(service, "serviceId");
 				SampleUtil_Print("serviceId: %s\n", *serviceId);
-				relcontrolURL =
-					SampleUtil_GetFirstElementItem(service, "controlURL");
-				releventURL =
-					SampleUtil_GetFirstElementItem(service, "eventSubURL");
-				*controlURL =
-					malloc(strlen(base) + strlen(relcontrolURL)+1);
+				relcontrolURL = SampleUtil_GetFirstElementItem(service, "controlURL");
+				releventURL = SampleUtil_GetFirstElementItem(service, "eventSubURL");
+				*controlURL = malloc(strlen(base) + strlen(relcontrolURL)+1);
 				if (*controlURL) {
 					ret = UpnpResolveURL(base, relcontrolURL, *controlURL);
-					if (ret != UPNP_E_SUCCESS) {
+					if (ret != UPNP_E_SUCCESS)
 						SampleUtil_Print("Error generating controlURL from %s + %s\n",
 							base, relcontrolURL);
-					}
 				}
 				*eventURL = malloc(strlen(base) + strlen(releventURL)+1);
 				if (*eventURL) {
 					ret = UpnpResolveURL(base, releventURL, *eventURL);
-					if (ret != UPNP_E_SUCCESS) {
+					if (ret != UPNP_E_SUCCESS)
 						SampleUtil_Print("Error generating eventURL from %s + %s\n",
 							base, releventURL);
-					}
 				}
 				free(relcontrolURL);
 				free(releventURL);
@@ -582,9 +568,8 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 		}
 		free(tempServiceType);
 		tempServiceType = NULL;
-		if (serviceList) {
+		if (serviceList)
 			ixmlNodeList_free(serviceList);
-		}
 		serviceList = NULL;
 	}
 	free(baseURL);
@@ -605,9 +590,8 @@ int SampleUtil_Print(const char *fmt, ...)
 	va_start(ap, fmt);
 	rc = vsnprintf(buf, MAX_BUF, fmt, ap);
 	va_end(ap);
-	if (gPrintFun) {
+	if (gPrintFun)
 		gPrintFun("%s", buf);
-	}
 
 	ithread_mutex_unlock(&display_mutex);
 
@@ -618,9 +602,8 @@ void SampleUtil_StateUpdate(const char *varName, const char *varValue,
 	const char *UDN, eventType type)
 {
 	/* TBD: Add mutex here? */
-	if (gStateUpdateFun) {
+	if (gStateUpdateFun)
 		gStateUpdateFun(varName, varValue, UDN, type);
-	}
 }
 
 /*!
@@ -629,9 +612,9 @@ void SampleUtil_StateUpdate(const char *varName, const char *varValue,
 void linux_print(const char *format, ...)
 {
 	va_list argList;
+
 	va_start(argList, format);
 	vfprintf(stdout, format, argList);
 	fflush(stdout);
 	va_end(argList);
 }
-
