@@ -394,10 +394,11 @@ freebsd*)
 *)
 	echo "Using non-specific system compiler settings"
 	if test x"$enable_debug" = xyes; then
-		# AC_PROG_CC already sets CFLAGS to "-g -O2" by default
+		# AC_PROG_CC already sets CFLAGS to "-g -O2" by default,
+		# but only if CFLAGS was not previously set.
 		#:
 		# Use -O0 in debug so that variables do not get optimized out
-		AX_CFLAGS_GCC_OPTION([-O0])
+		AX_CFLAGS_GCC_OPTION([-O0, -g])
 	else
 		# add optimise for size
 		AX_CFLAGS_GCC_OPTION([-Os])
