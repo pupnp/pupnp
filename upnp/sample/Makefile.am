@@ -14,7 +14,6 @@ LDADD = \
 	$(top_builddir)/threadutil/libthreadutil.la \
 	$(top_builddir)/ixml/libixml.la
 
-
 # samples
 noinst_PROGRAMS =
 if ENABLE_SAMPLES
@@ -40,14 +39,12 @@ tv_device_CPPFLAGS = \
 endif
 endif
 
-
 tv_device_SOURCES = \
 	common/sample_util.c \
 	common/sample_util.h \
 	common/tv_device.c \
 	common/tv_device.h \
 	linux/tv_device_main.c
-
 
 tv_ctrlpt_SOURCES = \
 	common/sample_util.c \
@@ -65,7 +62,6 @@ tv_combo_SOURCES = \
 	common/tv_device.h \
 	linux/tv_combo_main.c
 
-
 if WITH_DOCUMENTATION
 examplesdir = $(docdir)/examples
 examples_DATA = \
@@ -73,7 +69,6 @@ examples_DATA = \
 			$(tv_ctrlpt_SOURCES) \
 			$(tv_device_SOURCES))
 endif
-
 
 EXTRA_DIST = \
 	web/tvcombodesc.xml \
