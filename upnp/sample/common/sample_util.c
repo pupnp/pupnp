@@ -208,24 +208,18 @@ char *SampleUtil_GetFirstDocumentItem(IXML_Document *doc, const char *item)
 				ret = strdup("");
 				goto epilogue;
 			}
-			if (!ixmlNode_getNodeValue(textNode)) {
+			ret = ixmlNode_getNodeValue(textNode);
+			if (!ret) {
 				SampleUtil_Print("%s(%d): ixmlNode_getNodeValue returned NULL\n",
 					__FILE__, __LINE__); 
 				ret = strdup("");
-				goto epilogue;
-			} else {
-				ret = strdup(ixmlNode_getNodeValue(textNode));
 			}
-		} else {
+		} else
 			SampleUtil_Print("%s(%d): ixmlNode_getFirstChild(tmpNode) returned NULL\n",
 				__FILE__, __LINE__);
-			goto epilogue;
-		}
-	} else {
+	} else
 		SampleUtil_Print("%s(%d): Error finding %s in XML Node\n",
 			__FILE__, __LINE__, item);
-		goto epilogue;
-	}
 
 epilogue:
 	if (nodeList)
