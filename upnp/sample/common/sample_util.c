@@ -38,20 +38,15 @@
  */
 
 #define SAMPLE_UTIL_C
+
 #include "sample_util.h"
 
-#include "tv_ctrlpt.h"
-#include "tv_device.h"
-
-#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 
-
 #if !UPNP_HAVE_TOOLS
-#	error "Need upnptools.h to compile samples; try ./configure --enable-tools"
+#	error "Need upnptools.h to compile samples ; try ./configure --enable-tools"
 #endif
-
 
 static int initialize_init = 1;
 static int initialize_register = 1;
@@ -73,12 +68,11 @@ int SampleUtil_Initialize(print_string print_function)
 		ithread_mutexattr_setkind_np(&attr, ITHREAD_MUTEX_RECURSIVE_NP);
 		ithread_mutex_init(&display_mutex, &attr);
 		ithread_mutexattr_destroy(&attr);
-
 		/* To shut up valgrind mutex warning. */
 		ithread_mutex_lock(&display_mutex);
 		gPrintFun = print_function;
 		ithread_mutex_unlock(&display_mutex);
-
+		/* Finished initializing. */
 		initialize_init = 0;
 	}
 
@@ -124,7 +118,7 @@ IXML_NodeList *SampleUtil_GetFirstServiceList(IXML_Document *doc)
 	IXML_Node *servlistnode = NULL;
 
 	servlistnodelist =
-		ixmlDocument_getElementsByTagName( doc, "serviceList" );
+		ixmlDocument_getElementsByTagName(doc, "serviceList");
 	if (servlistnodelist && ixmlNodeList_length(servlistnodelist)) {
 		/* we only care about the first service list, from the root
 		 * device */
@@ -139,6 +133,9 @@ IXML_NodeList *SampleUtil_GetFirstServiceList(IXML_Document *doc)
 	return ServiceList;
 }
 
+#define OLD_FIND_SERVICE_CODE
+#ifdef OLD_FIND_SERVICE_CODE
+#else
 /*
  * Obtain the service list 
  *    n == 0 the first
@@ -177,18 +174,20 @@ static IXML_NodeList *SampleUtil_GetNthServiceList(
 		 *  return (Node*) A pointer to a Node or NULL if there was an 
 		 *                  error. */
 		servlistnode = ixmlNodeList_item(servlistnodelist, n);
-
-		assert(servlistnode != 0);
-
-		/* create as list of DOM nodes */
-		ServiceList = ixmlElement_getElementsByTagName(
-			(IXML_Element *)servlistnode, "service");
+		if (!servlistnode) {
+			/* create as list of DOM nodes */
+			ServiceList = ixmlElement_getElementsByTagName(
+				(IXML_Element *)servlistnode, "service");
+		} else
+			SampleUtil_Print("%s(%d): ixmlNodeList_item(nodeList, n) returned NULL\n",
+				__FILE__, __LINE__);
 	}
 	if (servlistnodelist)
 		ixmlNodeList_free(servlistnodelist);
 
 	return ServiceList;
 }
+#endif
 
 char *SampleUtil_GetFirstDocumentItem(IXML_Document *doc, const char *item)
 {
@@ -208,14 +207,14 @@ char *SampleUtil_GetFirstDocumentItem(IXML_Document *doc, const char *item)
 				ret = strdup("");
 				goto epilogue;
 			}
-			ret = ixmlNode_getNodeValue(textNode);
+			ret = strdup(ixmlNode_getNodeValue(textNode));
 			if (!ret) {
 				SampleUtil_Print("%s(%d): ixmlNode_getNodeValue returned NULL\n",
 					__FILE__, __LINE__); 
 				ret = strdup("");
 			}
 		} else
-			SampleUtil_Print("%s(%d): ixmlNode_getFirstChild(tmpNode) returned NULL\n",
+			SampleUtil_Print("%s(%d): ixmlNodeList_item(nodeList, 0) returned NULL\n",
 				__FILE__, __LINE__);
 	} else
 		SampleUtil_Print("%s(%d): Error finding %s in XML Node\n",
@@ -242,7 +241,7 @@ char *SampleUtil_GetFirstElementItem(IXML_Element *element, const char *item)
 		return NULL;
 	}
 	tmpNode = ixmlNodeList_item(nodeList, 0);
-	if (tmpNode) {
+	if (!tmpNode) {
 		SampleUtil_Print("%s(%d): Error finding %s value in XML Node\n",
 			__FILE__, __LINE__, item);
 		ixmlNodeList_free(nodeList);
@@ -507,7 +506,10 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 	unsigned long length;
 	int found = 0;
 	int ret;
+#ifdef OLD_FIND_SERVICE_CODE
+#else /* OLD_FIND_SERVICE_CODE */
 	unsigned int sindex = 0;
+#endif /* OLD_FIND_SERVICE_CODE */
 	char *tempServiceType = NULL;
 	char *baseURL = NULL;
 	const char *base = NULL;
@@ -521,8 +523,9 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 		base = baseURL;
 	else
 		base = location;
-
-	/* Top level */
+#ifdef OLD_FIND_SERVICE_CODE
+	serviceList = SampleUtil_GetFirstServiceList(DescDoc);
+#else /* OLD_FIND_SERVICE_CODE */
 	for (sindex = 0;
 	     (serviceList = SampleUtil_GetNthServiceList(DescDoc , sindex)) != NULL;
 	     sindex++) {
@@ -530,8 +533,7 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 		relcontrolURL = NULL;
 		releventURL = NULL;
 		service = NULL;
-
-		/* serviceList = SampleUtil_GetFirstServiceList( DescDoc ); */
+#endif /* OLD_FIND_SERVICE_CODE */
 		length = ixmlNodeList_length(serviceList);
 		for (i = 0; i < length; i++) {
 			service = (IXML_Element *)ixmlNodeList_item(serviceList, i);
@@ -543,14 +545,14 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 				SampleUtil_Print("serviceId: %s\n", *serviceId);
 				relcontrolURL = SampleUtil_GetFirstElementItem(service, "controlURL");
 				releventURL = SampleUtil_GetFirstElementItem(service, "eventSubURL");
-				*controlURL = malloc(strlen(base) + strlen(relcontrolURL)+1);
+				*controlURL = malloc(strlen(base) + strlen(relcontrolURL) + 1);
 				if (*controlURL) {
 					ret = UpnpResolveURL(base, relcontrolURL, *controlURL);
 					if (ret != UPNP_E_SUCCESS)
 						SampleUtil_Print("Error generating controlURL from %s + %s\n",
 							base, relcontrolURL);
 				}
-				*eventURL = malloc(strlen(base) + strlen(releventURL)+1);
+				*eventURL = malloc(strlen(base) + strlen(releventURL) + 1);
 				if (*eventURL) {
 					ret = UpnpResolveURL(base, releventURL, *eventURL);
 					if (ret != UPNP_E_SUCCESS)
@@ -572,7 +574,10 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 		if (serviceList)
 			ixmlNodeList_free(serviceList);
 		serviceList = NULL;
+#ifdef OLD_FIND_SERVICE_CODE
+#else /* OLD_FIND_SERVICE_CODE */
 	}
+#endif /* OLD_FIND_SERVICE_CODE */
 	free(baseURL);
 
 	return found;
