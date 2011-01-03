@@ -1569,7 +1569,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 	const char *temp_str;
 	uri_type url;
 	uri_type *uri_ptr;
-	int error_code = UPNP_E_OUTOF_MEMORY;
+	int error_code = 0;
 	va_list argp;
 	char tempbuf[200];
 	const char *weekday_str = "Sun\0Mon\0Tue\0Wed\0Thu\0Fri\0Sat";
@@ -1758,12 +1758,16 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			assert(0);
 		}
 	}
+	goto ExitFunction;
 
-	return 0;
-
- error_handler:
-	va_end(argp);
+error_handler:
+	/* Default is out of memory error. */
+	if (!error_code)
+		error_code = UPNP_E_OUTOF_MEMORY;
 	membuffer_destroy(buf);
+
+ExitFunction:
+	va_end(argp);
 	return error_code;
 }
 
