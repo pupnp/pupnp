@@ -1633,14 +1633,14 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 				start_str = "DATE: ";
 				end_str = "\r\n";
 				curr_time = time(NULL);
-				date = gmtime(&curr_time);
+				loc_time = &curr_time;
 			} else {
 				/* date value only */
 				start_str = end_str = "";
 				loc_time = (time_t *)va_arg(argp, time_t *);
-				assert(loc_time);
-				date = gmtime(loc_time);
 			}
+			assert(loc_time);
+			date = gmtime(loc_time);
 			sprintf(tempbuf,
 				"%s%s, %02d %s %d %02d:%02d:%02d GMT%s",
 				start_str, &weekday_str[date->tm_wday * 4],
