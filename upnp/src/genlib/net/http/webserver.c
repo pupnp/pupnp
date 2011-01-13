@@ -1188,6 +1188,21 @@ static int process_request(
 	if (!extra_headers) {
 		extra_headers = "";
 	}
+
+	/* Check if chunked encoding should be used. */
+	if (using_virtual_dir && UpnpFileInfo_get_FileLength(finfo) == UPNP_USING_CHUNKED) {
+		/* Chunked encoding is only supported by HTTP 1.1 clients */
+		if (resp_major == 1 && resp_minor == 1) {
+			RespInstr->IsChunkActive = 1;
+		} else {
+			/* The virtual callback indicates that we should use
+			 * chunked encoding however the client doesn't support
+			 * it. Return with an internal server error. */
+			err_code = HTTP_NOT_ACCEPTABLE;
+			goto error_handler;
+		}
+	}
+
 	aux_LastModified = UpnpFileInfo_get_LastModified(finfo);
 	if (RespInstr->IsRangeActive && RespInstr->IsChunkActive) {
 		/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
