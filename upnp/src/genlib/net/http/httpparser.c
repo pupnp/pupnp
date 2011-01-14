@@ -1569,7 +1569,7 @@ parser_parse_entity_using_clen( INOUT http_parser_t * parser )
     /* determine entity (i.e. body) length so far */
     parser->msg.entity.length =
         parser->msg.msg.length - parser->entity_start_position + 
-        parser->msg.entity_offset;
+        parser->msg.amount_discarded;
 
     if( parser->msg.entity.length < parser->content_length ) {
         /* more data to be read */
@@ -1577,16 +1577,16 @@ parser_parse_entity_using_clen( INOUT http_parser_t * parser )
     } else {
         if( parser->msg.entity.length > parser->content_length ) {
             /* silently discard extra data */
-            parser->msg.msg.buf[parser->entity_start_position -
-                                parser->msg.entity_offset +
-                                parser->content_length] = '\0';
+            parser->msg.msg.buf[parser->entity_start_position +
+                                parser->content_length -
+                                parser->msg.amount_discarded] = '\0';
         }
         /* save entity length */
         parser->msg.entity.length = parser->content_length;
 
         /* save entity start ptr; (the very last thing to do) */
         parser->msg.entity.buf = parser->msg.msg.buf +
-            parser->entity_start_position;
+                                 parser->entity_start_position;
 
         /* done reading entity */
         parser->position = POS_COMPLETE;
@@ -1719,7 +1719,7 @@ parser_parse_chunky_entity( INOUT http_parser_t * parser )
     if( parser->chunk_size == 0 ) {
         /* done reading entity; determine length of entity */
         parser->msg.entity.length = parser->scanner.cursor -
-            parser->entity_start_position;
+            parser->entity_start_position + parser->msg.amount_discarded;
 
         /* read entity headers */
         parser->ent_position = ENTREAD_CHUNKY_HEADERS;
@@ -1753,7 +1753,8 @@ parser_parse_entity_until_close( INOUT http_parser_t * parser )
     cursor = parser->msg.msg.length;
 
     /* update entity length */
-    parser->msg.entity.length = cursor - parser->entity_start_position;
+    parser->msg.entity.length = cursor - parser->entity_start_position +
+                                parser->msg.amount_discarded;
 
     /* update pointer */
     parser->msg.entity.buf =
@@ -1958,7 +1959,7 @@ parser_response_init( OUT http_parser_t * parser,
     parser_init( parser );
     parser->msg.is_request = FALSE;
     parser->msg.request_method = request_method;
-    parser->msg.entity_offset = 0;
+    parser->msg.amount_discarded = 0;
     parser->position = POS_RESPONSE_LINE;
 }
 
