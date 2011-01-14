@@ -244,6 +244,17 @@ Version 1.6.11
 
 2011-01-14 Chandra Penke <chandrapenke(at)mcntech.com>
 
+	Fixes transfer encoding in the HTTP client API, which is currently
+	broken. The break was due to a regression caused by another
+	fix (tracker 3056713), which fixed an out of memory crash when
+	downloading large files. The previous fix changed the
+	http_ReadHttpGet() implementation so that data already read by the
+	user was discarded. However, it only worked for transfers where
+	the content length was specified. This fix extends the previous
+	implementation to cover chunked transfer encoding.
+
+2011-01-14 Chandra Penke <chandrapenke(at)mcntech.com>
+
 	Minor change in membuffer.c to include "membuffer.h" without looking
 	in the standard header path. This allows pupnp to build in xcode.
 

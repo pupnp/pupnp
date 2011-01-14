@@ -1242,8 +1242,8 @@ int http_ReadHttpGet(
 		return UPNP_E_BAD_RESPONSE;
 	}
 	/* read more if necessary entity */
-	while (handle->response.msg.entity_offset + *size >
-		handle->response.msg.entity.length &&
+	while (handle->response.msg.amount_discarded + *size >
+	       handle->response.msg.entity.length &&
 	       !handle->cancel &&
 	       handle->response.position != POS_COMPLETE) {
 		num_read = sock_read(&handle->sock_info, tempbuf,
@@ -1287,19 +1287,24 @@ int http_ReadHttpGet(
 			return num_read;
 		}
 	}
-	if (handle->response.msg.entity_offset + *size >
-	    handle->response.msg.entity.length)
-		*size = handle->response.msg.entity.length -
-		    handle->response.msg.entity_offset;
-	memcpy(buf, &handle->response.msg.msg.buf[handle->response.entity_start_position],
-		*size);
-	/* FIXME: testing size AFTER memcopy? Weird... */
-	if (*size > 0)
-		membuffer_delete(&handle->response.msg.msg,
-			handle->response.entity_start_position, *size);
-	handle->response.msg.entity_offset += *size;
 	if (handle->cancel) {
 		return UPNP_E_CANCELED;
+	}
+	/* truncate size to fall within available data */
+	if (handle->response.msg.amount_discarded + *size >
+	    handle->response.msg.entity.length)
+		*size = handle->response.msg.entity.length -
+			handle->response.msg.amount_discarded;
+	/* copy data to user buffer. delete copied data */
+	if (*size > 0) {
+		memcpy(buf, &handle->response.msg.msg.buf[handle->response.entity_start_position],
+			*size);
+		membuffer_delete(&handle->response.msg.msg,
+			handle->response.entity_start_position, *size);
+		/* update scanner position. needed for chunked transfers */
+		handle->response.scanner.cursor -= *size;
+		/* update amount discarded */
+		handle->response.msg.amount_discarded += *size;
 	}
 
 	return UPNP_E_SUCCESS;

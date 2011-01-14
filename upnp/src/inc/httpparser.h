@@ -183,6 +183,10 @@ typedef struct {
 	int status_code;
 	/*! response only. */
 	membuffer status_msg;
+       /*! response only. the amount of data that's been read by the user, that's no
+        *  longer in the raw message buffer.
+        */
+       size_t amount_discarded;
 	/* fields used in both request or response messages. */
 	/*! if TRUE, msg is a request, else response. */
 	int is_request;
@@ -199,8 +203,6 @@ typedef struct {
 	membuffer msg;
         /*! storage for url string. */
         char *urlbuf;
-	/*! . */
-        size_t entity_offset;
 } http_message_t;
 
 typedef struct {
@@ -216,6 +218,8 @@ typedef struct {
 	int ent_position;
 	unsigned int content_length;
 	int chunk_size;
+       /*! offset in the the raw message buffer, which contains the message body.
+        *  preceding this are the headers of the messsage. */
 	size_t entity_start_position;
 	scanner_t scanner;
 } http_parser_t;
