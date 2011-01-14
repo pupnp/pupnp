@@ -38,7 +38,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include <membuffer.h>
+#include "membuffer.h"
 #include "upnp.h"
 #include "unixutil.h"
 

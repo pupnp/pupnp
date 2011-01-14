@@ -237,6 +237,11 @@ Version 1.8.0
 Version 1.6.11
 *******************************************************************************
 
+2011-01-14 Chandra Penke <chandrapenke(at)mcntech.com>
+
+	Minor change in membuffer.c to include "membuffer.h" without looking
+	in the standard header path. This allows pupnp to build in xcode.
+
 2010-12-18 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	SF Tracker: Patches
