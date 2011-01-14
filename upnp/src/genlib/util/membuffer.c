@@ -29,10 +29,12 @@
  *
  ******************************************************************************/
 
-/************************************************************************
-* Purpose: This file contains functions that operate on memory and 
-*	buffers, allocation, re-allocation, and modification of the memory 
-************************************************************************/
+/*
+ * \file
+ *
+ * \brief This file contains functions that operate on memory and buffers,
+ * allocation, re-allocation, and modification of the memory
+ */
 
 #include "config.h"
 #include <assert.h>
@@ -42,278 +44,129 @@
 #include "upnp.h"
 #include "unixutil.h"
 
-/************************************************************************
-*								 string									*
-************************************************************************/
-
-/************************************************************************
-*	Function :	str_alloc
-*
-*	Parameters :
-*		IN const char* str ;	input string object
-*		IN size_t str_len ;		input string length
-*
-*	Description :	Allocate memory and copy information from the input 
-*		string to the newly allocated memory.
-*
-*	Return : char* ;
-*		Pointer to the newly allocated memory.
-*		NULL if memory cannot be allocated.
-*
-*	Note :
-************************************************************************/
-char *
-str_alloc( IN const char *str,
-           IN size_t str_len )
+char *str_alloc(const char *str, size_t str_len)
 {
-    char *s;
+	char *s;
 
-    s = ( char * )malloc( str_len + 1 );
-    if( s == NULL ) {
-        return NULL;            /* no mem */
-    }
+	s = (char *)malloc(str_len + 1);
+	if (s == NULL) {
+		return NULL;	/* no mem */
+	}
 
-    memcpy( s, str, str_len );
-    s[str_len] = '\0';
+	memcpy(s, str, str_len);
+	s[str_len] = '\0';
 
-    return s;
+	return s;
 }
 
-/************************************************************************
-*								memptr									*
-************************************************************************/
-
-/************************************************************************
-*	Function :	memptr_cmp
-*
-*	Parameters :
-*		IN memptr* m ;	input memory object
-*		IN const char* s ;	constatnt string for the memory object to be 
-*					compared with
-*
-*	Description : Compares characters of strings passed for number of 
-*		bytes. If equal for the number of bytes, the length of the bytes 
-*		determines which buffer is shorter.
-*
-*	Return : int ;
-*		< 0 string1 substring less than string2 substring 
-*		0 string1 substring identical to string2 substring 
-*		> 0 string1 substring greater than string2 substring 
-*
-*	Note :
-************************************************************************/
-int
-memptr_cmp( IN memptr * m,
-            IN const char *s )
+int memptr_cmp(memptr * m, const char *s)
 {
-    int cmp;
+	int cmp;
 
-    cmp = strncmp( m->buf, s, m->length );
+	cmp = strncmp(m->buf, s, m->length);
 
-    if( cmp == 0 && m->length < strlen( s ) ) {
-        /* both strings equal for 'm->length' chars */
-        /*  if m is shorter than s, then s is greater */
-        return -1;
-    }
+	if (cmp == 0 && m->length < strlen(s)) {
+		/* both strings equal for 'm->length' chars */
+		/*  if m is shorter than s, then s is greater */
+		return -1;
+	}
 
-    return cmp;
+	return cmp;
 }
 
-/************************************************************************
-*	Function :	memptr_cmp_nocase
-*
-*	Parameters :
-*		IN memptr* m ;	input memory object
-*		IN const char* s ;	constatnt string for the memory object to be 
-*					compared with
-*
-*	Description : Compares characters of 2 strings irrespective of the 
-*		case for a specific count of bytes  If the character comparison 
-*		is the same the length of the 2 srings determines the shorter 
-*		of the 2 strings.
-*
-*	Return : int ;
-*		< 0 string1 substring less than string2 substring 
-*		0 string1 substring identical to string2 substring 
-*		> 0 string1 substring greater than string2 substring 
-*  
-*	Note :
-************************************************************************/
-int
-memptr_cmp_nocase( IN memptr * m,
-                   IN const char *s )
+int memptr_cmp_nocase(memptr * m, const char *s)
 {
-    int cmp;
+	int cmp;
 
-    cmp = strncasecmp( m->buf, s, m->length );
-    if( cmp == 0 && m->length < strlen( s ) ) {
-        /* both strings equal for 'm->length' chars */
-        /*  if m is shorter than s, then s is greater */
-        return -1;
-    }
+	cmp = strncasecmp(m->buf, s, m->length);
+	if (cmp == 0 && m->length < strlen(s)) {
+		/* both strings equal for 'm->length' chars */
+		/*  if m is shorter than s, then s is greater */
+		return -1;
+	}
 
-    return cmp;
+	return cmp;
 }
 
-/************************************************************************
-*							 membuffer									*
-************************************************************************/
-
-/************************************************************************
-*	Function :	membuffer_initialize
-*
-*	Parameters :
-*		INOUT membuffer* m ;	buffer to be initialized
-*
-*	Description :	Initialize the buffer
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-static UPNP_INLINE void
-membuffer_initialize( INOUT membuffer * m )
+/*!
+ * \brief Initialize the buffer.
+ */
+static UPNP_INLINE void membuffer_initialize(
+	/*! [in,out] Buffer to be initialized. */
+	membuffer *m)
 {
-    m->buf = NULL;
-    m->length = 0;
-    m->capacity = 0;
+	m->buf = NULL;
+	m->length = 0;
+	m->capacity = 0;
 }
 
-/************************************************************************
-*	Function :	membuffer_set_size
-*
-*	Parameters :
-*		INOUT membuffer* m ;	buffer whose size is to be modified
-*		IN size_t new_length ;	new size to which the buffer will be 
-*					modified
-*
-*	Description : Increases or decreases buffer cap so that at least
-*	   'new_length' bytes can be stored
-*
-*	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - On failure to allocate memory.
-*
-*	Note :
-************************************************************************/
-int
-membuffer_set_size( INOUT membuffer * m,
-                    IN size_t new_length )
+int membuffer_set_size(membuffer *m, size_t new_length)
 {
-    size_t diff;
-    size_t alloc_len;
-    char *temp_buf;
+	size_t diff;
+	size_t alloc_len;
+	char *temp_buf;
 
-    if( new_length >= m->length )   /* increase length */
-    {
-        /* need more mem? */
-        if( new_length <= m->capacity ) {
-            return 0;           /* have enough mem; done */
-        }
+	if (new_length >= m->length) {	/* increase length */
+		/* need more mem? */
+		if (new_length <= m->capacity) {
+			return 0;	/* have enough mem; done */
+		}
 
-        diff = new_length - m->length;
-        alloc_len = MAXVAL( m->size_inc, diff ) + m->capacity;
-    } else                      /* decrease length */
-    {
-        assert( new_length <= m->length );
+		diff = new_length - m->length;
+		alloc_len = MAXVAL(m->size_inc, diff) + m->capacity;
+	} else {		/* decrease length */
 
-        /* if diff is 0..m->size_inc, don't free */
-        if( ( m->capacity - new_length ) <= m->size_inc ) {
-            return 0;
-        }
+		assert(new_length <= m->length);
 
-        alloc_len = new_length + m->size_inc;
-    }
+		/* if diff is 0..m->size_inc, don't free */
+		if ((m->capacity - new_length) <= m->size_inc) {
+			return 0;
+		}
 
-    assert( alloc_len >= new_length );
+		alloc_len = new_length + m->size_inc;
+	}
 
-    temp_buf = realloc( m->buf, alloc_len + 1 );    /*LEAK_FIX_MK */
+	assert(alloc_len >= new_length);
 
-    /*temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );LEAK_FIX_MK */
+	temp_buf = realloc(m->buf, alloc_len + 1);	/*LEAK_FIX_MK */
 
-    if( temp_buf == NULL ) {
-        /* try smaller size */
-        alloc_len = new_length;
-        temp_buf = realloc( m->buf, alloc_len + 1 );    /*LEAK_FIX_MK */
-        /*temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );LEAK_FIX_MK */
+	/*temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );LEAK_FIX_MK */
 
-        if( temp_buf == NULL ) {
-            return UPNP_E_OUTOF_MEMORY;
-        }
-    }
-    /* save */
-    m->buf = temp_buf;
-    m->capacity = alloc_len;
-    return 0;
+	if (temp_buf == NULL) {
+		/* try smaller size */
+		alloc_len = new_length;
+		temp_buf = realloc(m->buf, alloc_len + 1);	/*LEAK_FIX_MK */
+		/*temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );LEAK_FIX_MK */
+
+		if (temp_buf == NULL) {
+			return UPNP_E_OUTOF_MEMORY;
+		}
+	}
+	/* save */
+	m->buf = temp_buf;
+	m->capacity = alloc_len;
+	return 0;
 }
 
-/************************************************************************
-*	Function :	membuffer_init
-*
-*	Parameters :
-*		INOUT membuffer* m ; buffer	to be initialized
-*
-*	Description : Wrapper to membuffer_initialize().
-*		Set the size of the buffer to MEMBUF_DEF_SIZE_INC
-*		Initializes m->buf to NULL, length=0
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void
-membuffer_init( INOUT membuffer * m )
+void membuffer_init(membuffer *m)
 {
-    assert( m != NULL );
+	assert(m != NULL);
 
-    m->size_inc = MEMBUF_DEF_SIZE_INC;
-    membuffer_initialize( m );
+	m->size_inc = MEMBUF_DEF_SIZE_INC;
+	membuffer_initialize(m);
 }
 
-/************************************************************************
-*	Function :	membuffer_destroy
-*
-*	Parameters :
-*		INOUT membuffer* m ;	buffer to be destroyed
-*
-*	Description : Free's memory allocated for membuffer* m.
-*
-*	Return : void ;
-*
-*	Note :
-************************************************************************/
-void
-membuffer_destroy( INOUT membuffer * m )
+void membuffer_destroy(membuffer *m)
 {
-    if( m == NULL ) {
-        return;
-    }
+	if (m == NULL) {
+		return;
+	}
 
-    free( m->buf );
-    membuffer_init( m );
+	free(m->buf);
+	membuffer_init(m);
 }
 
-/************************************************************************
-*	Function :	membuffer_assign
-*
-*	Parameters :
-*		INOUT membuffer* m ; buffer whose memory is to be allocated and 
-*					assigned.
-*		IN const void* buf ; source buffer whose contents will be copied
-*		IN size_t buf_len ;	 length of the source buffer
-*
-*	Description : Allocate memory to membuffer* m and copy the contents 
-*		of the in parameter IN const void* buf.
-*
-*	Return : int ;
-*	 UPNP_E_SUCCESS
-*	 UPNP_E_OUTOF_MEMORY
-*
-*	Note :
-************************************************************************/
-int membuffer_assign( INOUT membuffer * m,
-                  IN const void *buf,
-                  IN size_t buf_len )
+int membuffer_assign(membuffer *m, const void *buf, size_t buf_len)
 {
 	int return_code;
 
@@ -338,78 +191,25 @@ int membuffer_assign( INOUT membuffer * m,
 	return 0;
 }
 
-/************************************************************************
-*	Function :	membuffer_assign_str
-*
-*	Parameters :
-*		INOUT membuffer* m ;	buffer to be allocated and assigned
-*		IN const char* c_str ;	source buffer whose contents will be 
-*					copied
-*
-*	Description : Wrapper function for membuffer_assign()
-*
-*	Return : int ;
-*	 UPNP_E_SUCCESS
-*	 UPNP_E_OUTOF_MEMORY
-*
-*	Note :
-************************************************************************/
-int
-membuffer_assign_str( INOUT membuffer * m,
-                      IN const char *c_str )
+int membuffer_assign_str(membuffer *m, const char *c_str)
 {
-    return membuffer_assign( m, c_str, strlen( c_str ) );
+	return membuffer_assign(m, c_str, strlen(c_str));
 }
 
-/************************************************************************
-*	Function :	membuffer_append
-*
-*	Parameters :
-*		INOUT membuffer* m ; buffer whose memory is to be appended.
-*		IN const void* buf ; source buffer whose contents will be 
-*					copied
-*		IN size_t buf_len ;	length of the source buffer
-*
-*	Description : Invokes function to appends data from a constant buffer 
-*		to the buffer 
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int
-membuffer_append( INOUT membuffer * m,
-                  IN const void *buf,
-                  IN size_t buf_len )
+int membuffer_append(membuffer *m, const void *buf, size_t buf_len)
 {
-    assert( m != NULL );
+	assert(m != NULL);
 
-    return membuffer_insert( m, buf, buf_len, m->length );
+	return membuffer_insert(m, buf, buf_len, m->length);
 }
 
-/************************************************************************
-*	Function :	membuffer_append_str
-*
-*	Parameters :
-*		INOUT membuffer* m ;	buffer whose memory is to be appended.
-*		IN const char* c_str ;	source buffer whose contents will be 
-*					copied
-*
-*	Description : Invokes function to appends data from a constant string 
-*		to the buffer 	
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int
-membuffer_append_str( INOUT membuffer * m,
-                      IN const char *c_str )
+int membuffer_append_str(membuffer *m, const char *c_str)
 {
-    return membuffer_insert( m, c_str, strlen( c_str ), m->length );
+	return membuffer_insert(m, c_str, strlen(c_str), m->length);
 }
 
-int membuffer_insert(membuffer *m, const void *buf, size_t buf_len, size_t index)
+int membuffer_insert(membuffer * m, const void *buf, size_t buf_len,
+		     size_t index)
 {
 	int return_code;
 
@@ -436,7 +236,7 @@ int membuffer_insert(membuffer *m, const void *buf, size_t buf_len, size_t index
 	return 0;
 }
 
-void membuffer_delete(membuffer *m, size_t index, size_t num_bytes)
+void membuffer_delete(membuffer * m, size_t index, size_t num_bytes)
 {
 	int return_value;
 	size_t new_length;
@@ -467,62 +267,26 @@ void membuffer_delete(membuffer *m, size_t index, size_t num_bytes)
 	m->buf[new_length] = 0;
 }
 
-/************************************************************************
-*	Function :	membuffer_detach
-*
-*	Parameters :
-*		INOUT membuffer* m ; buffer to be returned and updated.	
-*
-*	Description : Detaches current buffer and returns it. The caller
-*		must free the returned buffer using free().
-*		After this call, length becomes 0.
-*
-*	Return : char* ;
-*		a pointer to the current buffer
-*
-*	Note :
-************************************************************************/
-char *
-membuffer_detach( INOUT membuffer * m )
+char *membuffer_detach(membuffer *m)
 {
-    char *buf;
+	char *buf;
 
-    assert( m != NULL );
+	assert(m != NULL);
 
-    buf = m->buf;
+	buf = m->buf;
 
-    /* free all */
-    membuffer_initialize( m );
+	/* free all */
+	membuffer_initialize(m);
 
-    return buf;
+	return buf;
 }
 
-/************************************************************************
-*	Function :	membuffer_attach
-*
-*	Parameters :
-*		INOUT membuffer* m ;	buffer to be updated
-*		IN char* new_buf ;	 source buffer which will be assigned to the 
-*					buffer to be updated
-*		IN size_t buf_len ;	length of the source buffer 
-*
-*	Description : Free existing memory in membuffer and assign the new 
-*		buffer in its place.
-*
-*	Return : void ;
-*
-*	Note : 'new_buf' must be allocted using malloc or realloc so
-*		that it can be freed using free()
-************************************************************************/
-void
-membuffer_attach( INOUT membuffer * m,
-                  IN char *new_buf,
-                  IN size_t buf_len )
+void membuffer_attach(membuffer *m, char *new_buf, size_t buf_len)
 {
-    assert( m != NULL );
+	assert(m != NULL);
 
-    membuffer_destroy( m );
-    m->buf = new_buf;
-    m->length = buf_len;
-    m->capacity = buf_len;
+	membuffer_destroy(m);
+	m->buf = new_buf;
+	m->length = buf_len;
+	m->capacity = buf_len;
 }
