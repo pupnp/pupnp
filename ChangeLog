@@ -239,6 +239,11 @@ Version 1.6.11
 
 2011-01-14 Chandra Penke <chandrapenke(at)mcntech.com>
 
+	- Null termination of strndup() implementation on systems missing it.
+	- Implementation of strnlen() on systems missing it.
+
+2011-01-14 Chandra Penke <chandrapenke(at)mcntech.com>
+
 	Minor change in membuffer.c to include "membuffer.h" without looking
 	in the standard header path. This allows pupnp to build in xcode.
 
