@@ -2,6 +2,13 @@
 Version 1.8.0
 *******************************************************************************
 
+2010-01-16 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	Fix for UpnpFileInfo_get_LastModified() in http_MakeMessage().
+
+	UpnpFileInfo_get_LastModified() returns time_t, and http_MakeMessage()
+	takes a "time_t *". Thanks to Chandra Penke for pointing the bug.
+
 2010-11-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
 	Template object for ssdp_ResultData.

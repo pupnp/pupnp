@@ -1012,6 +1012,7 @@ static int process_request(
 
 	char *request_doc;
 	UpnpFileInfo *finfo;
+	time_t aux_LastModified;
 	int using_alias;
 	int using_virtual_dir;
 	uri_type *url;
@@ -1187,6 +1188,7 @@ static int process_request(
 	if (!extra_headers) {
 		extra_headers = "";
 	}
+	aux_LastModified = UpnpFileInfo_get_LastModified(finfo);
 	if (RespInstr->IsRangeActive && RespInstr->IsChunkActive) {
 		/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
 		/* Transfer-Encoding: chunked */
@@ -1197,7 +1199,7 @@ static int process_request(
 		    RespInstr,	/* range info */
 		    RespInstr,	/* language info */
 		    "LAST-MODIFIED: ",
-		    UpnpFileInfo_get_LastModified(finfo),
+		    &aux_LastModified,
 		    X_USER_AGENT, extra_headers) != 0) {
 			goto error_handler;
 		}
@@ -1212,7 +1214,7 @@ static int process_request(
 		    RespInstr,	/* range info */
 		    RespInstr,	/* language info */
 		    "LAST-MODIFIED: ",
-		    UpnpFileInfo_get_LastModified(finfo),
+		    &aux_LastModified,
 		    X_USER_AGENT, extra_headers) != 0) {
 			goto error_handler;
 		}
@@ -1225,7 +1227,7 @@ static int process_request(
 		    UpnpFileInfo_get_ContentType(finfo), /* content type */
 		    RespInstr,	/* language info */
 		    "LAST-MODIFIED: ",
-		    UpnpFileInfo_get_LastModified(finfo),
+		    &aux_LastModified,
 		    X_USER_AGENT, extra_headers) != 0) {
 			goto error_handler;
 		}
@@ -1241,7 +1243,7 @@ static int process_request(
 			    UpnpFileInfo_get_ContentType(finfo), /* content type */
 			    RespInstr,	/* language info */
 			    "LAST-MODIFIED: ",
-			    UpnpFileInfo_get_LastModified(finfo),
+			    &aux_LastModified,
 			    X_USER_AGENT,
 			    extra_headers) != 0) {
 				goto error_handler;
@@ -1255,7 +1257,7 @@ static int process_request(
 			    UpnpFileInfo_get_ContentType(finfo), /* content type */
 			    RespInstr,	/* language info */
 			    "LAST-MODIFIED: ",
-			    UpnpFileInfo_get_LastModified(finfo),
+			    &aux_LastModified,
 			    X_USER_AGENT,
 			    extra_headers) != 0) {
 				goto error_handler;
