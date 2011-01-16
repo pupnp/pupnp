@@ -28,20 +28,21 @@
 	/* Other systems have strncasecmp */
 #endif
 
-/* strndup() is a GNU extension. Other systems must fix it with elif's. */
-#if defined(__GNUC__) && !defined(__APPLE__)
-	extern char *strndup(__const char *__string, size_t __n);
-#endif /* defined(__GNUC__) && !defined(__APPLE__) */
-
-#if defined(__GNUC__) && defined(__APPLE__)
+/* strnlen() is a GNU extension. */
+#if HAVE_STRNLEN
+	extern size_t strnlen(const char *s, size_t maxlen);
+#else /* HAVE_STRNLEN */
 	static size_t strnlen(const char *s, size_t n)
 	{
 		const char *p = (const char *)memchr(s, 0, n);
 		return p ? p - s : n;
 	}
-#endif /* defined(__GNUC__) && defined(__APPLE__) */
+#endif /* HAVE_STRNLEN */
 
-#if (defined(__GNUC__) && defined(__APPLE__)) || defined(WIN32)
+/* strndup() is a GNU extension. */
+#if HAVE_STRNDUP && !defined(WIN32)
+	extern char *strndup(__const char *__string, size_t __n);
+#else /* HAVE_STRNDUP && !defined(WIN32) */
 	static char *strndup(const char *__string, size_t __n)
 	{
 		size_t strsize = strnlen(__string, __n);
@@ -52,7 +53,7 @@
 
 		return newstr;
 	}
-#endif /* (defined(__GNUC__) && defined(__APPLE__)) || defined(WIN32) */
+#endif /* HAVE_STRNDUP && !defined(WIN32) */
 
 /*!
  * \brief Internal implementation of the class UpnpString.

@@ -49,6 +49,12 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
+/* Defines if strndup is available on your system */
+#define HAVE_STRNDUP 1
+
+/* Defines if strnlen is available on your system */
+#define HAVE_STRNLEN 1
+
 /* Define to 1 if you have the <syslog.h> header file. */
 #define HAVE_SYSLOG_H 1
 
