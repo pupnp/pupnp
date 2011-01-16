@@ -2,6 +2,10 @@
 Version 1.6.11
 *******************************************************************************
 
+2011-01-16 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Use config.h to test for the availability of strndup() and strnlen().
+
 2011-01-14 Chandra Penke <chandrapenke(at)mcntech.com>
 
 	- Null termination of strndup() implementation on systems missing it.

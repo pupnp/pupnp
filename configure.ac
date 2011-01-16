@@ -497,6 +497,10 @@ fi
 #
 AC_FUNC_VPRINTF
 AC_FUNC_FSEEKO
+AC_CHECK_FUNC(strnlen,
+	AC_DEFINE(HAVE_STRNLEN, 1, [Defines if strnlen is available on your system]))
+AC_CHECK_FUNC(strndup,
+	AC_DEFINE(HAVE_STRNDUP, 1, [Defines if strndup is available on your system]))
 #
 # Solaris needs -lsocket -lnsl -lrt
 AC_SEARCH_LIBS([bind],           [socket])
