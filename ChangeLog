@@ -4,6 +4,11 @@ Version 1.8.0
 
 2011-01-17 Chandra Penke <chandrapenke(at)mcntech.com>
 
+	Include upnpconfig.h in FileInfo.h to automatically include large
+	file macros
+
+2011-01-17 Chandra Penke <chandrapenke(at)mcntech.com>
+
 	Fix for warnings Apple systems related to macros defined in list.h.
 
 	In list.h, in apple systems, undefine the macros prior to defining them.

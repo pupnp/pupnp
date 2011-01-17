@@ -13,6 +13,8 @@
  * \author Marcelo Roberto Jimenez
  */
 
+#include "upnpconfig.h"
+
 #include <sys/types.h>  /* for off_t */
 #include <time.h>       /* for time_t */
 
