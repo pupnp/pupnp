@@ -2,6 +2,12 @@
 Version 1.8.0
 *******************************************************************************
 
+2010-09-18 Chandra Penke <chandrapenke(at)mcntech.com>
+
+	Fix for warnings Apple systems related to macros defined in list.h.
+
+	In list.h, in apple systems, undefine the macros prior to defining them.
+
 2010-01-16 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
 	Fix for UpnpFileInfo_get_LastModified() in http_MakeMessage().

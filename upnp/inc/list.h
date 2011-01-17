@@ -9,6 +9,14 @@
 #endif
 #include "poison.h"
 
+#ifdef __APPLE__
+/* Apple systems define these macros in system headers, so we undef
+ * them prior to inclusion of this file */
+#undef LIST_HEAD
+#undef LIST_HEAD_INIT
+#undef INIT_LIST_HEAD
+#endif
+
 /*
  * Simple doubly linked list implementation.
  *
