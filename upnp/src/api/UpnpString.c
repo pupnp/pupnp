@@ -48,7 +48,7 @@
 		size_t strsize = strnlen(__string, __n);
 		char *newstr = (char *)malloc(strsize + 1);
 
-		strncpy(newstr, __string, newstr);
+		strncpy(newstr, __string, strsize);
 		newstr[strsize] = 0;
 
 		return newstr;
