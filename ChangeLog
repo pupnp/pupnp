@@ -4,6 +4,65 @@ Version 1.6.11
 
 2011-01-16 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
+	Define _FILE_OFFSET_BITS, _LARGEFILE_SOURCE and _LARGE_FILE_SOURCE in
+	upnpconfig.h.
+
+	Make these definitions available to programs using the library.
+	Thanks to Chandra Penke for pointing the problem.
+
+	Summary: Problem with large file support in pupnp build - ID: 3158969
+	Submitted: Chandra ( inactiveneurons ) - 2011-01-15 16:17:02 BRST
+	Details:
+	First off, I apologize in advance for the length of this comment, it's
+	the only way I could describe the problem accurately.
+
+	Secondly, a brief thanks (again). The company I'm working for has been
+	using pupnp for a massively cross-platform project which involves iphone,
+	osx, windows, linux x86, arm, and mips hosts. It's amazing how well it
+	works, so kudos to the maintainers!
+
+	We came across a problem when compiling with the following tool-chain:
+	http://www.codesourcery.com/sgpp/lite/mips/portal/release824. The
+	problem is the following:
+
+	In configure.ac the following lines exist to enable large file support:
+
+	AC_DEFINE([_LARGE_FILE_SOURCE], [], [Large files support])
+	AC_DEFINE([_FILE_OFFSET_BITS], [64], [File Offset size])
+
+	Which in turn result in the following #defines in autoconfig.h:
+
+	#define _LARGE_FILE_SOURCE /**/
+	#define _FILE_OFFSET_BITS 64
+
+	However, this file is not exported as part of the upnp build. Therefore,
+	while the entire library gets built with large file support, it's
+	possible that dependent libraries which only rely on the include files
+	may not use large file support.
+
+	In the particular case of the above tool-chain, the 'off_t' type is 8
+	bytes when large file support is enabled, but only 4 bytes when it's
+	not. As a result part our stack built on top of pupnp, which did not
+	have large file support (because it did not use the above autoconf
+	directives), was relying on 'a off_t' that was 4 bytes.
+
+	This caused, among many things, for the UpnpFileInfo struct to break.
+	Since the struct is completely invisible outside of pupnp (because of
+	some template macro magic), pupnp thought that 'FileLength' field was
+	8 bytes, but the header setter/getter methods being used by dependent
+	libraries thought that it was 4, which caused some erratic behavior
+	when going through pupnp's webserver and HTTP client API.
+
+	We put in a temporary work around by adding the following preprocessor
+	flags: -D_LARGE_FILE_SOURCE, -D_FILE_OFFSET_BITS=64 as part of our
+	build process. However, it's a hack, and I was wondering if I'm missing
+	something and there's a better way to approach this.
+
+	Thanks,
+	Chandra
+
+2011-01-16 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
 	Use config.h to test for the availability of strndup() and strnlen().
 
 2011-01-14 Chandra Penke <chandrapenke(at)mcntech.com>

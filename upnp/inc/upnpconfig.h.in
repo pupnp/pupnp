@@ -57,8 +57,21 @@
 
 
 /***************************************************************************
+ * Large file support
+ ***************************************************************************/
+
+/** File Offset size */
+#undef _FILE_OFFSET_BITS
+
+/** Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
+#undef _LARGEFILE_SOURCE
+
+/** Large files support */
+#undef _LARGE_FILE_SOURCE
+
+/***************************************************************************
  * Library optional features
- ***************************************************************************/ 
+ ***************************************************************************/
 
 /*
  * The following defines can be tested in order to know which 
