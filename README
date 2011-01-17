@@ -227,17 +227,18 @@ To build the samples (note: this is the default behaviour):
 % ./configure --enable-samples
 % make
 
-will build the sample device "$(LIBUPNP)/upnp/upnp_tv_device" and
-sample control point "$(LIBUPNP)/upnp/upnp_tv_ctrlpt". 
+will build the sample device "$(LIBUPNP)/upnp/tv_device" and
+sample control point "$(LIBUPNP)/upnp/tv_ctrlpt". 
 Note : the sample device won't be built if --disable-device has been 
 configured, and the sample control point won't be build if --disable-client 
 has been configured.
 
-To run the sample device, you need the "$(LIBUPNP)/upnp/sample/tvdevice/web" 
-sub-directory. Example :
+To run the sample device, you need to create a tvdevice directory and move
+the web directory there, giving: "$(LIBUPNP)/upnp/sample/tvdevice/web".
+To run the sample invoke from the command line as follows:
 
 % cd $(LIBUPNP)/upnp/sample/tvdevice
-% ../../upnp_tv_device
+% ../tv_device
 
 
 
