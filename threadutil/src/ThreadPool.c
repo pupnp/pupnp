@@ -97,7 +97,8 @@ static void StatsInit(
 	stats->workerThreads = 0;
 	stats->idleThreads = 0;
 	stats->persistentThreads = 0;
-	stats->maxThreads = 0; stats->totalThreads = 0;
+	stats->maxThreads = 0;
+	stats->totalThreads = 0;
 }
 
 /*!
@@ -459,6 +460,7 @@ static void *WorkerThread(
 	/* Increment total thread count */
 	ithread_mutex_lock(&tp->mutex);
 	tp->totalThreads++;
+	tp->pendingWorkerThreadStart = 0;
 	ithread_cond_broadcast(&tp->start_and_shutdown);
 	ithread_mutex_unlock(&tp->mutex);
 
@@ -602,6 +604,9 @@ static ThreadPoolJob *CreateThreadPoolJob(
  * \brief Creates a worker thread, if the thread pool does not already have
  * max threads.
  *
+ * \remark The ThreadPool object mutex must be locked prior to calling this
+ * function.
+ *
  * \internal
  *
  * \return
@@ -610,16 +615,20 @@ static ThreadPoolJob *CreateThreadPoolJob(
  *	\li \c EAGAIN if system can not create thread.
  */
 static int CreateWorker(
-	/*! . */
+	/*! A pointer to the ThreadPool object. */
 	ThreadPool *tp)
 {
 	ithread_t temp;
 	int rc = 0;
-	int currentThreads = tp->totalThreads + 1;
 	ithread_attr_t attr;
 
+	/* if a new worker is the process of starting, wait until it fully starts */
+	while (tp->pendingWorkerThreadStart) {
+		ithread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
+	}
+
 	if (tp->attr.maxThreads != INFINITE_THREADS &&
-	    currentThreads > tp->attr.maxThreads) {
+	    tp->totalThreads + 1 > tp->attr.maxThreads) {
 		return EMAXTHREADS;
 	}
 	ithread_attr_init(&attr);
@@ -628,7 +637,9 @@ static int CreateWorker(
 	ithread_attr_destroy(&attr);
 	if (rc == 0) {
 		rc = ithread_detach(temp);
-		while (tp->totalThreads < currentThreads) {
+		tp->pendingWorkerThreadStart = 1;
+		/* wait until the new worker thread starts */
+		while (tp->pendingWorkerThreadStart) {
 			ithread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
 		}
 	}
@@ -643,10 +654,13 @@ static int CreateWorker(
  * \brief Determines whether or not a thread should be added based on the
  * jobsPerThread ratio. Adds a thread if appropriate.
  *
+ * \remark The ThreadPool object mutex must be locked prior to calling this
+ * function.
+ *
  * \internal
  */
 static void AddWorker(
-	/*! . */
+	/*! A pointer to the ThreadPool object. */
 	ThreadPool *tp)
 {
 	long jobs = 0;
@@ -709,6 +723,7 @@ int ThreadPoolInit(ThreadPool *tp, ThreadPoolAttr *attr)
 		tp->totalThreads = 0;
 		tp->busyThreads = 0;
 		tp->persistentThreads = 0;
+		tp->pendingWorkerThreadStart = 0;
 		for (i = 0; i < tp->attr.minThreads; ++i) {
 			retCode = CreateWorker(tp);
 			if (retCode) {

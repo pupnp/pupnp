@@ -255,6 +255,79 @@ Version 1.8.0
 Version 1.6.11
 *******************************************************************************
 
+2011-01-20 Chandra Penke <chandrapenke(at)mcntech.com>
+	Fix for Race condition can hang miniserver thread.
+
+	Add 'requiredThreads' field to the ThreadPool structure, to avoid
+	a race condition when waiting for a new thread to be created. The
+	race condition occurs when a thread is destroyed while the master
+	thread is waiting for a new thread to be created.
+
+	Thanks to Chuck Thomason for pointing the problem.
+
+	Summary: Race condition can hang miniserver thread - ID: 3158591
+
+	Details:
+	Hello,
+
+	I have found a race condition in the thread pool handling of
+	libupnp-1.6.6 that periodically results in the miniserver thread
+	getting blocked infinitely.
+
+	In my setup, I have the miniserver thread pool configured with 1
+	job per thread, 2 threads minimum, and 50 threads maximum.
+
+	Just before the lockup occurs, the miniserver thread pool contains
+	2 threads: one worker thread hanging around from a previous HTTP
+	request job (let's call that thread "old_worker") and the
+	miniserver thread itself.
+
+	A new HTTP request comes in. Accordingly, the miniserver enters
+	schedule_request_job() and then ThreadPoolAdd(). In
+	ThreadPoolAdd(), the job gets added to the medium-priority queue,
+	and AddWorker() is called. In AddWorker(), jobs = 1 and threads =
+	1, so CreateWorker gets called.
+
+	When we enter CreateWorker(), tp->totalThreads is 2, so
+	currentThreads is 3. The function creates a new thread and then
+	blocks on tp->start_and_shutdown. The miniserver thread expects
+	the newly created thread to increment tp->totalThreads and then
+	signal the condition variable to wake up the miniserver thread and
+	let it proceed.
+
+	The newly created thread starts in the WorkerThread() function. It
+	increments tp->totalThreads to 3, does a broadcast on the
+	start_and_shutdown condition, and starts running its job. However,
+	before the miniserver thread wakes up, "old_worker" times out. It
+	sees that there are no jobs in any queue and that the total number
+	of threads (3) is more than the minimum (2). As a result, it
+	reduces tp->totalThreads to 2 and dies.
+
+	Now the miniserver thread finally wakes up. It checks
+	tp->totalThreads and sees that its value is 2, so it blocks on
+	tp->start_and_shutdown again. It has now "missed" seeing
+	tp->totalThreads get incremented to 3 and will never be unblocked
+	again.
+
+	When this issue does occur for a server device, the miniserver
+	port remains open, but becomes unresponsive since the miniserver
+	thread is stuck. SSDP alive messages keep getting sent out, as
+	they are handled by a separate thread. Reproducing the issue is
+	difficult due to the timing coincidence involved, but in my
+	environment I am presently seeing it at least once a day. I
+	figured out the sequence described above through addition of my
+	own debug logs.
+
+	The relevant code involved in this bug has not changed
+	substantially in libupnp-1.6.10, though I am planning to test
+	against 1.6.10 as well in the near future.
+
+	Do you have any input for an elegant fix for this issue?
+
+	Thanks,
+
+	Chuck Thomason
+
 2011-01-16 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Define _FILE_OFFSET_BITS, _LARGEFILE_SOURCE and _LARGE_FILE_SOURCE in
