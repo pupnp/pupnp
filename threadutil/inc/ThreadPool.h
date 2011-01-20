@@ -222,6 +222,8 @@ typedef struct THREADPOOL
 	int shutdown;
 	/*! total number of threads */
 	int totalThreads;
+	/*! flag that's set when waiting for a new worker thread to start */
+	int pendingWorkerThreadStart;
 	/*! number of threads that are currently executing jobs */
 	int busyThreads;
 	/*! number of persistent threads */
