@@ -255,7 +255,13 @@ Version 1.8.0
 Version 1.6.11
 *******************************************************************************
 
+2011-01-30 Chandra Penke <chandrapenke(at)mcntech.com>
+
+	Fix for compilation warnings of unused variables in upnpdebug.c in
+	release builds.
+
 2011-01-20 Chandra Penke <chandrapenke(at)mcntech.com>
+
 	Fix for Race condition can hang miniserver thread.
 
 	Add 'requiredThreads' field to the ThreadPool structure, to avoid
