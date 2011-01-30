@@ -305,11 +305,9 @@ static UPNP_INLINE int get_content_type(
 	UpnpFileInfo_set_ContentType(fileInfo, NULL);
 	/* get ext */
 	extension = strrchr(filename, '.');
-	if (extension != NULL) {
-		if (search_extension(extension + 1, &type, &subtype) == 0) {
+	if (extension != NULL)
+		if (search_extension(extension + 1, &type, &subtype) == 0)
 			ctype_found = TRUE;
-		}
-	}
 	if (!ctype_found) {
 		/* unknown content type */
 		type = gMediaTypes[APPLICATION_INDEX];
@@ -317,16 +315,14 @@ static UPNP_INLINE int get_content_type(
 	}
 	length = strlen(type) + strlen("/") + strlen(subtype) + 1;
 	temp = malloc(length);
-	if (!temp) {
+	if (!temp)
 		return UPNP_E_OUTOF_MEMORY;
-	}
 	sprintf(temp, "%s/%s", type, subtype);
 	UpnpFileInfo_set_ContentType(fileInfo, temp);
 	free(temp);
-
-	if (!UpnpFileInfo_get_ContentType(fileInfo)) {
+	if (!UpnpFileInfo_get_ContentType(fileInfo))
 		return UPNP_E_OUTOF_MEMORY;
-	}
+
 	return 0;
 }
 
@@ -413,18 +409,14 @@ int web_server_set_alias(const char *alias_name,
 	alias.ct = NULL;
 	do {
 		/* insert leading /, if missing */
-		if (*alias_name != '/') {
-			if (membuffer_assign_str(&alias.name, "/") != 0) {
+		if (*alias_name != '/')
+			if (membuffer_assign_str(&alias.name, "/") != 0)
 				break;	/* error; out of mem */
-			}
-		}
 		ret_code = membuffer_append_str(&alias.name, alias_name);
-		if (ret_code != 0) {
+		if (ret_code != 0)
 			break;	/* error */
-		}
-		if ((alias.ct = (int *)malloc(sizeof(int))) == NULL) {
+		if ((alias.ct = (int *)malloc(sizeof(int))) == NULL)
 			break;	/* error */
-		}
 		*alias.ct = 1;
 		membuffer_attach(&alias.doc, (char *)alias_content,
 				 alias_content_length);
@@ -436,18 +428,19 @@ int web_server_set_alias(const char *alias_name,
 
 		return 0;
 	} while (FALSE);
-
 	/* error handler */
 	/* free temp alias */
 	membuffer_destroy(&alias.name);
 	membuffer_destroy(&alias.doc);
 	free(alias.ct);
+
 	return UPNP_E_OUTOF_MEMORY;
 }
 
 int web_server_init()
 {
 	int ret = 0;
+
 	if (bWebServerState == WEB_SERVER_DISABLED) {
 		/* decode media list */
 		media_list_init();
@@ -463,11 +456,10 @@ int web_server_init()
 		virtualDirCallback.seek = NULL;
 		virtualDirCallback.close = NULL;
 
-		if (ithread_mutex_init(&gWebMutex, NULL) == -1) {
+		if (ithread_mutex_init(&gWebMutex, NULL) == -1)
 			ret = UPNP_E_OUTOF_MEMORY;
-		} else {
+		else
 			bWebServerState = WEB_SERVER_ENABLED;
-		}
 	}
 
 	return ret;
@@ -513,34 +505,25 @@ static int get_file_info(
 	time_t aux_LastModified;
 
 	UpnpFileInfo_set_ContentType(info, NULL);
-
 	code = stat(filename, &s);
-	if (code == -1) {
+	if (code == -1)
 		return -1;
-	}
-
-	if (S_ISDIR(s.st_mode)) {
+	if (S_ISDIR(s.st_mode))
 		UpnpFileInfo_set_IsDirectory(info, TRUE);
-	} else if (S_ISREG(s.st_mode)) {
+	else if (S_ISREG(s.st_mode))
 		UpnpFileInfo_set_IsDirectory(info, FALSE);
-	} else {
+	else
 		return -1;
-	}
-
 	/* check readable */
 	fp = fopen(filename, "r");
 	UpnpFileInfo_set_IsReadable(info, fp != NULL);
-	if (fp) {
+	if (fp)
 		fclose(fp);
-	}
-
 	UpnpFileInfo_set_FileLength(info, s.st_size);
 	UpnpFileInfo_set_LastModified(info, s.st_mtime);
-
 	rc = get_content_type(filename, info);
-
 	aux_LastModified = UpnpFileInfo_get_LastModified(info);
-	UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
 		"file info: %s, length: %lld, last_mod=%s readable=%d\n",
 		filename,
 		(long long)UpnpFileInfo_get_FileLength(info),
@@ -556,15 +539,13 @@ int web_server_set_root_dir(const char *root_dir)
 	int ret;
 
 	ret = membuffer_assign_str(&gDocumentRootDir, root_dir);
-	if (ret != 0) {
+	if (ret != 0)
 		return ret;
-	}
 	/* remove trailing '/', if any */
 	if (gDocumentRootDir.length > 0) {
 		index = gDocumentRootDir.length - 1;	/* last char */
-		if (gDocumentRootDir.buf[index] == '/') {
+		if (gDocumentRootDir.buf[index] == '/')
 			membuffer_delete(&gDocumentRootDir, index, 1);
-		}
 	}
 
 	return 0;
@@ -667,17 +648,15 @@ static char *StrStr(
 	if (!Str1)
 		goto error1;
 	Str2 = strdup(s2);
-	if (!Str2) {
+	if (!Str2)
 		goto error2;
-	}
 	ToUpperCase(Str1);
 	ToUpperCase(Str2);
 	Ptr = strstr(Str1, Str2);
-	if (!Ptr) {
+	if (!Ptr)
 		ret = NULL;
-	} else {
+	else
 		ret = s1 + (Ptr - Str1);
-	}
 
 	free(Str2);
 error2:
@@ -735,13 +714,11 @@ static int GetNextRange(
 	int64_t L = -1;
 	int Is_Suffix_byte_Range = 1;
 
-	if (*SrcRangeStr == NULL) {
+	if (*SrcRangeStr == NULL)
 		return -1;
-	}
 	Tok = StrTok(SrcRangeStr, ",");
-	if ((Ptr = strstr(Tok, "-")) == NULL) {
+	if ((Ptr = strstr(Tok, "-")) == NULL)
 		return -1;
-	}
 	*Ptr = ' ';
 	sscanf(Tok, "%" SCNd64 "%" SCNd64, &F, &L);
 	if (F == -1 || L == -1) {
@@ -979,8 +956,8 @@ static int CheckOtherHTTPHeaders(
 		}
 		node = ListNext(&Req->headers, node);
 	}
-
 	free(TmpBuf);
+
 	return RetCode;
 }
 
@@ -1339,21 +1316,18 @@ static int http_RecvPostMessage(
 
 	if (Instr && Instr->IsVirtualFile) {
 		Fp = (virtualDirCallback.open) (filename, UPNP_WRITE);
-		if (Fp == NULL) {
+		if (Fp == NULL)
 			return HTTP_INTERNAL_SERVER_ERROR;
-		}
 	} else {
 		Fp = fopen(filename, "wb");
-		if (Fp == NULL) {
+		if (Fp == NULL)
 			return HTTP_UNAUTHORIZED;
-		}
 	}
 	parser->position = POS_ENTITY;
 	do {
 		/* first parse what has already been gotten */
-		if (parser->position != POS_COMPLETE) {
+		if (parser->position != POS_COMPLETE)
 			status = parser_parse_entity(parser);
-		}
 		if (status == PARSE_INCOMPLETE_ENTITY) {
 			/* read until close */
 			ok_on_close = TRUE;

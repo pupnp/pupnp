@@ -520,7 +520,6 @@ exit_function:
 }
 #endif
 
-
 int UpnpFinish(void)
 {
 #ifdef INCLUDE_DEVICE_APIS
@@ -531,75 +530,64 @@ int UpnpFinish(void)
 #endif
 	struct Handle_Info *temp;
 
-	if (UpnpSdkInit != 1) {
+	if (UpnpSdkInit != 1)
 		return UPNP_E_FINISH;
-	}
-
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-		"Inside UpnpFinish: UpnpSdkInit is %d\n", UpnpSdkInit);
-	if (UpnpSdkInit == 1) {
+		   "Inside UpnpFinish: UpnpSdkInit is %d\n", UpnpSdkInit);
+	if (UpnpSdkInit == 1)
 		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-		"UpnpFinish: UpnpSdkInit is ONE\n");
-	}
-	PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
-	PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
-	PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__, "MiniServer Thread Pool");
-
+			"UpnpFinish: UpnpSdkInit is ONE\n");
+	PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__,
+		"Send Thread Pool");
+	PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__,
+		"Recv Thread Pool");
+	PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__,
+		"MiniServer Thread Pool");
 #ifdef INCLUDE_DEVICE_APIS
-	if (GetDeviceHandleInfo(AF_INET, &device_handle, &temp) == HND_DEVICE ) {
+	if (GetDeviceHandleInfo(AF_INET, &device_handle, &temp) == HND_DEVICE)
 		UpnpUnRegisterRootDevice(device_handle);
-	}
-	if (GetDeviceHandleInfo(AF_INET6, &device_handle, &temp) == HND_DEVICE ) {
+	if (GetDeviceHandleInfo(AF_INET6, &device_handle, &temp) == HND_DEVICE)
 		UpnpUnRegisterRootDevice(device_handle);
-	}
 #endif
-
 #ifdef INCLUDE_CLIENT_APIS
-	if (GetClientHandleInfo(&client_handle, &temp) == HND_CLIENT) {
+	if (GetClientHandleInfo(&client_handle, &temp) == HND_CLIENT)
 		UpnpUnRegisterClient(client_handle);
-	}
 #endif
-
 	TimerThreadShutdown(&gTimerThread);
 	StopMiniServer();
-
 #if EXCLUDE_WEB_SERVER == 0
 	web_server_destroy();
 #endif
-
 	ThreadPoolShutdown(&gMiniServerThreadPool);
-	PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__, "MiniServer Thread Pool");
+	PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__,
+		"MiniServer Thread Pool");
 	ThreadPoolShutdown(&gRecvThreadPool);
-	PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
+	PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__,
+		"Send Thread Pool");
 	ThreadPoolShutdown(&gSendThreadPool);
-	PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
-
+	PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__,
+		"Recv Thread Pool");
 #ifdef INCLUDE_CLIENT_APIS
 	ithread_mutex_destroy(&GlobalClientSubscribeMutex);
 #endif
 	ithread_rwlock_destroy(&GlobalHndRWLock);
 	ithread_mutex_destroy(&gUUIDMutex);
-
 	/* remove all virtual dirs */
 	UpnpRemoveAllVirtualDirs();
-
 	/* Clean-up ithread library resources */
 	ithread_cleanup_library();
-
 	UpnpSdkInit = 0;
-	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 		"Exiting UpnpFinish: UpnpSdkInit is :%d:\n", UpnpSdkInit);
 	UpnpCloseLog();
 
 	return UPNP_E_SUCCESS;
 }
 
-
 unsigned short UpnpGetServerPort(void)
 {
-	if (UpnpSdkInit != 1) {
+	if (UpnpSdkInit != 1)
 		return 0;
-	}
 
 	return LOCAL_PORT_V4;
 }
@@ -607,43 +595,36 @@ unsigned short UpnpGetServerPort(void)
 #ifdef UPNP_ENABLE_IPV6
 unsigned short UpnpGetServerPort6(void)
 {
-	if (UpnpSdkInit != 1) {
+	if (UpnpSdkInit != 1)
 		return 0;
-	}
 
 	return LOCAL_PORT_V6;
 }
 #endif
 
-
 char *UpnpGetServerIpAddress(void)
 {
-	if (UpnpSdkInit != 1) {
+	if (UpnpSdkInit != 1)
 		return NULL;
-	}
 
 	return gIF_IPV4;
 }
 
-
 char *UpnpGetServerIp6Address(void)
 {
-	if( UpnpSdkInit != 1 ) {
+	if (UpnpSdkInit != 1)
 		return NULL;
-	}
 
 	return gIF_IPV6;
 }
 
 char *UpnpGetServerUlaGuaIp6Address(void)
 {
-	if( UpnpSdkInit != 1 ) {
+	if (UpnpSdkInit != 1)
 		return NULL;
-	}
 
 	return gIF_IPV6_ULA_GUA;
 }
-
 
 /*!
  * \brief Get a free handle.
@@ -656,17 +637,13 @@ static int GetFreeHandle()
 	/* Handle 0 is not used as NULL translates to 0 when passed as a handle */
 	int i = 1;
 
-	while (i < NUM_HANDLE && HandleTable[i] != NULL) {
+	while (i < NUM_HANDLE && HandleTable[i] != NULL)
 		++i;
-	}
-
-	if (i == NUM_HANDLE) {
+	if (i == NUM_HANDLE)
 		return UPNP_E_OUTOF_HANDLE;
-	} else {
+	else
 		return i;
-	}
 }
-
 
 /*!
  * \brief Free handle.
@@ -681,7 +658,6 @@ static int FreeHandle(
 
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 		"FreeHandle: entering, Handle is %d\n", Upnp_Handle);
-
 	if (Upnp_Handle < 1 || Upnp_Handle >= NUM_HANDLE) {
 		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
 			"FreeHandle: Handle %d is out of range\n",
@@ -695,13 +671,11 @@ static int FreeHandle(
 		HandleTable[Upnp_Handle] = NULL;
 		ret = UPNP_E_SUCCESS;
 	}
-
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"FreeHandle: exiting, ret = %d.\n", ret);
 
 	return ret;
 }
-
 
 #ifdef INCLUDE_DEVICE_APIS
 int UpnpRegisterRootDevice(
@@ -1140,178 +1114,158 @@ exit_function:
 #ifdef INCLUDE_DEVICE_APIS
 int UpnpUnRegisterRootDevice(UpnpDevice_Handle Hnd)
 {
-    int retVal = 0;
-    struct Handle_Info *HInfo = NULL;
+	int retVal = 0;
+	struct Handle_Info *HInfo = NULL;
 
-    if (UpnpSdkInit != 1) {
-        return UPNP_E_FINISH;
-    }
-
-    UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpUnRegisterRootDevice\n");
+	if (UpnpSdkInit != 1)
+		return UPNP_E_FINISH;
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+		   "Inside UpnpUnRegisterRootDevice\n");
 #if EXCLUDE_GENA == 0
-    if( genaUnregisterDevice( Hnd ) != UPNP_E_SUCCESS )
-        return UPNP_E_INVALID_HANDLE;
+	if (genaUnregisterDevice(Hnd) != UPNP_E_SUCCESS)
+		return UPNP_E_INVALID_HANDLE;
 #endif
 
-    HandleLock();
-    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    HandleUnlock();
+	HandleLock();
+	if (GetHandleInfo(Hnd, &HInfo) == UPNP_E_INVALID_HANDLE) {
+		HandleUnlock();
+		return UPNP_E_INVALID_HANDLE;
+	}
+	HandleUnlock();
 
 #if EXCLUDE_SSDP == 0
-    retVal = AdvertiseAndReply(-1, Hnd, 0, (struct sockaddr *)NULL,
-        (char *)NULL, (char *)NULL, (char *)NULL, HInfo->MaxAge);
+	retVal = AdvertiseAndReply(-1, Hnd, 0, (struct sockaddr *)NULL,
+		(char *)NULL, (char *)NULL, (char *)NULL,
+		HInfo->MaxAge);
 #endif
 
-    HandleLock();
-    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    /*info = (struct Handle_Info *) HandleTable[Hnd]; */
-    ixmlNodeList_free( HInfo->DeviceList );
-    ixmlNodeList_free( HInfo->ServiceList );
-    ixmlDocument_free( HInfo->DescDocument );
-
+	HandleLock();
+	if (GetHandleInfo(Hnd, &HInfo) == UPNP_E_INVALID_HANDLE) {
+		HandleUnlock();
+		return UPNP_E_INVALID_HANDLE;
+	}
+	ixmlNodeList_free(HInfo->DeviceList);
+	ixmlNodeList_free(HInfo->ServiceList);
+	ixmlDocument_free(HInfo->DescDocument);
 #ifdef INCLUDE_CLIENT_APIS
-    ListDestroy( &HInfo->SsdpSearchList, 0 );
+	ListDestroy(&HInfo->SsdpSearchList, 0);
 #endif /* INCLUDE_CLIENT_APIS */
-
 #ifdef INTERNAL_WEB_SERVER
-    if( HInfo->aliasInstalled ) {
-        web_server_set_alias( NULL, NULL, 0, 0 );
-    }
+	if (HInfo->aliasInstalled)
+		web_server_set_alias(NULL, NULL, 0, 0);
 #endif /* INTERNAL_WEB_SERVER */
+	if (HInfo->DeviceAf == AF_INET)
+		UpnpSdkDeviceRegisteredV4 = 0;
+	else if (HInfo->DeviceAf == AF_INET6)
+		UpnpSdkDeviceregisteredV6 = 0;
+	FreeHandle(Hnd);
+	HandleUnlock();
 
-    if( HInfo->DeviceAf == AF_INET ) {
-        UpnpSdkDeviceRegisteredV4 = 0;
-    } else if( HInfo->DeviceAf == AF_INET6 ) {
-        UpnpSdkDeviceregisteredV6 = 0;
-    }
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+		   "Exiting UpnpUnRegisterRootDevice\n");
 
-    FreeHandle(Hnd);
-    HandleUnlock();
-
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Exiting UpnpUnRegisterRootDevice\n" );
-
-    return retVal;
+	return retVal;
 }
 #endif /* INCLUDE_DEVICE_APIS */
 
-
 #ifdef INCLUDE_CLIENT_APIS
-int UpnpRegisterClient(
-	Upnp_FunPtr Fun,
-	const void *Cookie,
+int UpnpRegisterClient(Upnp_FunPtr Fun, const void *Cookie,
 	UpnpClient_Handle *Hnd)
 {
-    struct Handle_Info *HInfo;
+	struct Handle_Info *HInfo;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpRegisterClient \n" );
-    if( Fun == NULL || Hnd == NULL ) {
-        return UPNP_E_INVALID_PARAM;
-    }
+	if (UpnpSdkInit != 1)
+		return UPNP_E_FINISH;
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		   "Inside UpnpRegisterClient \n");
+	if (Fun == NULL || Hnd == NULL)
+		return UPNP_E_INVALID_PARAM;
 
-    HandleLock();
-
-    if( UpnpSdkClientRegistered ) {
-        HandleUnlock();
-        return UPNP_E_ALREADY_REGISTERED;
-    }
-    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
-        HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
-    }
-    HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
-    if( HInfo == NULL ) {
-        HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
-    }
-
-    HInfo->HType = HND_CLIENT;
-    HInfo->Callback = Fun;
-    HInfo->Cookie = ( void * )Cookie;
-    HInfo->ClientSubList = NULL;
-    ListInit( &HInfo->SsdpSearchList, NULL, NULL );
+	HandleLock();
+	if (UpnpSdkClientRegistered) {
+		HandleUnlock();
+		return UPNP_E_ALREADY_REGISTERED;
+	}
+	if ((*Hnd = GetFreeHandle()) == UPNP_E_OUTOF_HANDLE) {
+		HandleUnlock();
+		return UPNP_E_OUTOF_MEMORY;
+	}
+	HInfo = (struct Handle_Info *)malloc(sizeof(struct Handle_Info));
+	if (HInfo == NULL) {
+		HandleUnlock();
+		return UPNP_E_OUTOF_MEMORY;
+	}
+	HInfo->HType = HND_CLIENT;
+	HInfo->Callback = Fun;
+	HInfo->Cookie = (void *)Cookie;
+	HInfo->ClientSubList = NULL;
+	ListInit(&HInfo->SsdpSearchList, NULL, NULL);
 #ifdef INCLUDE_DEVICE_APIS
-    HInfo->MaxAge = 0;
-    HInfo->MaxSubscriptions = UPNP_INFINITE;
-    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+	HInfo->MaxAge = 0;
+	HInfo->MaxSubscriptions = UPNP_INFINITE;
+	HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 #endif
+	HandleTable[*Hnd] = HInfo;
+	UpnpSdkClientRegistered = 1;
+	HandleUnlock();
 
-    HandleTable[*Hnd] = HInfo;
-    UpnpSdkClientRegistered = 1;
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		   "Exiting UpnpRegisterClient \n");
 
-    HandleUnlock();
-
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpRegisterClient \n" );
-
-    return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 #endif /* INCLUDE_CLIENT_APIS */
-
 
 #ifdef INCLUDE_CLIENT_APIS
 int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 {
-    struct Handle_Info *HInfo;
-    ListNode *node = NULL;
-    SsdpSearchArg *searchArg = NULL;
+	struct Handle_Info *HInfo;
+	ListNode *node = NULL;
+	SsdpSearchArg *searchArg = NULL;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
-    }
+	if (UpnpSdkInit != 1)
+		return UPNP_E_FINISH;
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		   "Inside UpnpUnRegisterClient \n");
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpUnRegisterClient \n" );
-    HandleLock();
-    if( !UpnpSdkClientRegistered ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    HandleUnlock();
+	HandleLock();
+	if (!UpnpSdkClientRegistered) {
+		HandleUnlock();
+		return UPNP_E_INVALID_HANDLE;
+	}
+	HandleUnlock();
 
 #if EXCLUDE_GENA == 0
-    if( genaUnregisterClient( Hnd ) != UPNP_E_SUCCESS )
-        return UPNP_E_INVALID_HANDLE;
+	if (genaUnregisterClient(Hnd) != UPNP_E_SUCCESS)
+		return UPNP_E_INVALID_HANDLE;
 #endif
-    HandleLock();
-    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
-        HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
-    }
-    /* clean up search list */
-    node = ListHead( &HInfo->SsdpSearchList );
-    while( node != NULL ) {
-        searchArg = ( SsdpSearchArg * ) node->item;
-        if( searchArg ) {
-            free( searchArg->searchTarget );
-            free( searchArg );
-        }
-        ListDelNode( &HInfo->SsdpSearchList, node, 0 );
-        node = ListHead( &HInfo->SsdpSearchList );
-    }
+	HandleLock();
+	if (GetHandleInfo(Hnd, &HInfo) == UPNP_E_INVALID_HANDLE) {
+		HandleUnlock();
+		return UPNP_E_INVALID_HANDLE;
+	}
+	/* clean up search list */
+	node = ListHead(&HInfo->SsdpSearchList);
+	while (node != NULL) {
+		searchArg = (SsdpSearchArg *) node->item;
+		if (searchArg) {
+			free(searchArg->searchTarget);
+			free(searchArg);
+		}
+		ListDelNode(&HInfo->SsdpSearchList, node, 0);
+		node = ListHead(&HInfo->SsdpSearchList);
+	}
+	ListDestroy(&HInfo->SsdpSearchList, 0);
+	FreeHandle(Hnd);
+	UpnpSdkClientRegistered = 0;
+	HandleUnlock();
 
-    ListDestroy( &HInfo->SsdpSearchList, 0 );
-    FreeHandle(Hnd);
-    UpnpSdkClientRegistered = 0;
-    HandleUnlock();
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpUnRegisterClient \n" );
-    return UPNP_E_SUCCESS;
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		   "Exiting UpnpUnRegisterClient \n");
 
+	return UPNP_E_SUCCESS;
 }
 #endif /* INCLUDE_CLIENT_APIS */
-
 
 #ifdef INCLUDE_DEVICE_APIS
 #ifdef INTERNAL_WEB_SERVER
