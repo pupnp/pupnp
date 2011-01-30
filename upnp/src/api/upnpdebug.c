@@ -45,6 +45,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef DEBUG
+
 /*! Mutex to synchronize all the log file opeartions in the debug mode */
 static ithread_mutex_t GlobalDebugMutex;
 
@@ -62,8 +64,6 @@ static const char *errFileName = "IUpnpErrFile.txt";
 
 /*! Name of the info file */
 static const char *infoFileName = "IUpnpInfoFile.txt";
-
-#ifdef DEBUG
 
 int UpnpInitLog(void)
 {
