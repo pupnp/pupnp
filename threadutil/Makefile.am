@@ -1,8 +1,7 @@
-# $Id: Makefile.am,v 1.2 2006/02/27 21:38:56 r3mi Exp $
 #
 # "Makefile.am" for "libupnp/threadutil"
 #
-# (C) Copyright 2005 Rémi Turboult <r3mi@users.sourceforge.net>
+# (C) Copyright 2005 Remi Turboult <r3mi@users.sourceforge.net>
 #
 
 AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc
@@ -19,12 +18,16 @@ lib_LTLIBRARIES		= libthreadutil.la
 libthreadutil_la_LDFLAGS = -version-info $(LT_VERSION_THREADUTIL)
 
 libthreadutil_la_SOURCES = \
-			src/FreeList.c src/LinkedList.c \
-			src/ThreadPool.c src/TimerThread.c
+			inc/FreeList.h \
+			src/FreeList.c \
+			inc/LinkedList.h \
+			src/LinkedList.c \
+			inc/ThreadPool.h \
+			src/ThreadPool.c \
+			inc/TimerThread.h \
+			src/TimerThread.c
 
 upnpincludedir		= $(includedir)/upnp
 upnpinclude_HEADERS	= \
-			inc/FreeList.h inc/LinkedList.h \
-			inc/ThreadPool.h inc/TimerThread.h \
 			inc/ithread.h
 
