@@ -255,6 +255,15 @@ Version 1.8.0
 Version 1.6.11
 *******************************************************************************
 
+2011-02-11 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Fix for incorrectly exported include files.
+
+	The files FreeList.h, LinkedList.h, ThreadPool.h and TimerThread.h
+	from the threautil library were being installed in the include
+	directory of the library, incorrectly exposing internal data structure
+	of the library.
+
 2011-01-30 Chandra Penke <chandrapenke(at)mcntech.com>
 
 	Fix for compilation warnings of unused variables in upnpdebug.c in
