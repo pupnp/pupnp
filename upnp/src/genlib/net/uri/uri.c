@@ -312,6 +312,7 @@ int token_cmp(token *in1, token *in2)
 int parse_hostport(
 	const char *in,
 	size_t max,
+	int defaultPort,
 	hostport_type *out)
 {
 	char workbuf[256];
@@ -402,9 +403,10 @@ int parse_hostport(
 		if (port == 0)
 			/* Bad port number. */
 			return UPNP_E_INVALID_URL;
-	} else
+	} else {
 		/* Port was not specified, use default port. */
-		port = 80;
+		port = defaultPort;
+	}
 	/* The length of the host and port string can be calculated by */
 	/* subtracting pointers. */
 	hostport_size = (size_t)(c - workbuf);
@@ -673,6 +675,7 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 	int begin_path = 0;
 	size_t begin_hostport = 0;
 	size_t begin_fragment = 0;
+	int defaultPort = 80;
 
 	begin_hostport = parse_scheme(in, max, &out->scheme);
 	if (begin_hostport) {
@@ -687,9 +690,13 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 	    in[begin_hostport] == '/' &&
 	    in[begin_hostport + 1] == '/') {
 		begin_hostport += 2;
+		if (token_string_casecmp(&out->scheme, "https") == 0) {
+			defaultPort = 443;
+		}
 		begin_path = parse_hostport(&in[begin_hostport],
-			max - begin_hostport,
-			&out->hostport);
+					    max - begin_hostport,
+					    defaultPort,
+					    &out->hostport);
 		if (begin_path >= 0) {
 			begin_path += (int)begin_hostport;
 		} else

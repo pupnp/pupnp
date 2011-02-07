@@ -216,9 +216,18 @@ int http_FixUrl(IN uri_type *url, OUT uri_type *fixed_url)
 	const char *temp_path = "/";
 
 	*fixed_url = *url;
-	if (token_string_casecmp(&fixed_url->scheme, "http") != 0) {
+#ifdef UPNP_ENABLE_OPEN_SSL
+	if (token_string_casecmp(&fixed_url->scheme, "http") != 0 &&
+	    token_string_casecmp(&fixed_url->scheme, "https") != 0)
+	{
 		return UPNP_E_INVALID_URL;
 	}
+#else
+	if (token_string_casecmp(&fixed_url->scheme, "http") != 0)
+	{
+		return UPNP_E_INVALID_URL;
+	}
+#endif
 	if( fixed_url->hostport.text.size == 0 ) {
 		return UPNP_E_INVALID_URL;
 	}
@@ -1072,6 +1081,16 @@ int http_OpenHttpConnection(const char *url_str, void **Handle, int timeout)
 		ret_code = UPNP_E_SOCKET_CONNECT;
 		goto errorHandler;
 	}
+#ifdef UPNP_ENABLE_OPEN_SSL
+	/* For HTTPS connections start the TLS/SSL handshake. */
+	if (token_string_casecmp(&url.scheme, "https") == 0) {
+		ret_code = sock_ssl_connect(&handle->sock_info);
+		if (ret_code != UPNP_E_SUCCESS) {
+			sock_destroy(&handle->sock_info, SD_BOTH);
+			goto errorHandler;
+		}
+	}
+#endif
 errorHandler:
 	*Handle = handle;
 	return ret_code;

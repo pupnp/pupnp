@@ -4,6 +4,18 @@ Version 1.8.0
 
 2011-02-07 Chandra Penke <chandrapenke(at)mcntech.com>
 
+	Add HTTPS support using OpenSSL. HTTPS support is optional and can
+	be enabled by passing the --enable-open-ssl argument to the
+	configure script.
+
+	The following methods are introduced to the public API:
+	UpnpInitOpenSslContext
+
+	When enabled, HTTPS can be used by using "https://" instead of
+	"http://" when passing URLs to the HTTP Client API.
+
+2011-02-07 Chandra Penke <chandrapenke(at)mcntech.com>
+
 	Refactor HTTP Client API to be more generic.
 
 	The following features are added:

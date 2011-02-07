@@ -57,6 +57,10 @@
 	/* Other systems ??? */
 #endif
 
+#ifdef UPNP_ENABLE_OPEN_SSL
+#include <openssl/ssl.h>
+#endif
+
 #define LINE_SIZE  180
 #define NAME_SIZE  256
 #define MNFT_NAME_SIZE  64
@@ -576,6 +580,29 @@ EXPORT_SPEC int UpnpInit2(
 	/*!  Local Port to listen for incoming connections.
 	 * \c NULL will pick an arbitrary free port. */
 	unsigned short DestPort);
+#endif
+
+/*!
+ * \brief Initializes the OpenSSL library, and the OpenSSL context for use
+ * with pupnp
+ *
+ * \note This method is only enabled if pupnp is compiled with open-ssl support.
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_INIT: The SDK is already initialized.
+ *     \li \c UPNP_E_INIT_FAILED: The SDK initialization
+ *             failed for an unknown reason.
+ */
+#ifdef UPNP_ENABLE_OPEN_SSL
+EXPORT_SPEC int UpnpInitSslContext(
+	/*! If set to 1 initializes the OpenSSL library. Otherwise the application
+	 *  is responsible for initializing it. If set to 1, then OpenSSL is intialized
+	 *  with all error strings, and all ciphers loaded. */
+	int initOpenSslLib,
+	/*! The SSL_METHOD to use to create the context. See OpenSSL docs
+	 * for more info */
+	const SSL_METHOD *sslMethod);
 #endif
 
 /*!

@@ -77,6 +77,10 @@
 	#include <sys/types.h>
 #endif
 
+#ifdef UPNP_ENABLE_OPEN_SSL
+#include <openssl/ssl.h>
+#endif
+
 #ifndef IN6_IS_ADDR_GLOBAL
 #define IN6_IS_ADDR_GLOBAL(a) \
 		(((((__const uint8_t *) (a))[0] & htonl(0xff000000)) <= htonl(0x3f000000)   \
@@ -177,6 +181,12 @@ int UpnpSdkDeviceregisteredV6 = 0;
 /*! Global variable used in discovery notifications. */
 Upnp_SID gUpnpSdkNLSuuid;
 
+/*! Global variable used as to store the OpenSSL context object
+ * to be used for all SSL/TLS connections
+ */
+#ifdef UPNP_ENABLE_OPEN_SSL
+SSL_CTX *gSslCtx = NULL;
+#endif
 
 /*!
  * \brief (Windows Only) Initializes the Windows Winsock library.
@@ -520,6 +530,24 @@ exit_function:
 }
 #endif
 
+#ifdef UPNP_ENABLE_OPEN_SSL
+int UpnpInitSslContext(int initOpenSslLib, const SSL_METHOD *sslMethod)
+{
+	if (gSslCtx)
+		return UPNP_E_INIT;
+	if (initOpenSslLib) {
+		SSL_load_error_strings();
+		SSL_library_init();
+		OpenSSL_add_all_algorithms();
+	}
+	gSslCtx = SSL_CTX_new(sslMethod);
+	if (!gSslCtx) {
+		return UPNP_E_INIT_FAILED;
+	}
+	return UPNP_E_SUCCESS;
+}
+#endif
+
 int UpnpFinish(void)
 {
 #ifdef INCLUDE_DEVICE_APIS
@@ -529,7 +557,12 @@ int UpnpFinish(void)
 	UpnpClient_Handle client_handle;
 #endif
 	struct Handle_Info *temp;
-
+#ifdef UPNP_ENABLE_OPEN_SSL
+    if (gSslCtx) {
+        SSL_CTX_free(gSslCtx);
+        gSslCtx = NULL;
+    }
+#endif
 	if (UpnpSdkInit != 1)
 		return UPNP_E_FINISH;
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
