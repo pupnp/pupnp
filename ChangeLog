@@ -2,6 +2,14 @@
 Version 1.6.11
 *******************************************************************************
 
+2011-02-07 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Major bug fix in IPv6 code.
+
+	Major bug fix in miniserver.c for IPv6, bug was introduced when
+	changing implementation of get_port in November 20th 2010 ("gena:fix
+	several compiler warnings" commit).
+
 2011-02-11 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Fix for incorrectly exported include files.

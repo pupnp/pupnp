@@ -728,7 +728,7 @@ static int get_miniserver_sockets(
 			return UPNP_E_LISTEN;
 		}
 		ret_code = get_port(listenfd6, &actual_port6);
-		if (ret_code <= 0) {
+		if (ret_code < 0) {
 			sock_close(listenfd4);
 			sock_close(listenfd6);
 			return UPNP_E_INTERNAL_ERROR;
