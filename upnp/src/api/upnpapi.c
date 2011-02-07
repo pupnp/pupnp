@@ -2728,8 +2728,12 @@ int UpnpOpenHttpPost(
 	int contentLength,
 	int timeout)
 {
-	return http_OpenHttpPost(
-		url, handle, contentType, contentLength, timeout);
+	int status = http_OpenHttpConnection(url, handle, timeout);
+	if (status == UPNP_E_SUCCESS) {
+		return http_MakeHttpRequest(HTTPMETHOD_POST, url, handle, NULL, contentType,
+					    contentLength, timeout);
+	}
+	return status;
 }
 
 
@@ -2739,7 +2743,7 @@ int UpnpWriteHttpPost(
 	size_t *size,
 	int timeout)
 {
-	return http_WriteHttpPost(handle, buf, size, timeout);
+	return http_WriteHttpRequest(handle, buf, size, timeout);
 }
 
 
@@ -2748,35 +2752,56 @@ int UpnpCloseHttpPost(
 	int *httpStatus,
 	int timeout)
 {
-	return http_CloseHttpPost(handle, httpStatus, timeout);
-}
+	int status = http_EndHttpRequest(handle, timeout);
+	if (status == UPNP_E_SUCCESS) {
+		status = http_GetHttpResponse(handle, NULL, NULL, NULL, httpStatus, timeout);
+	}
+	status = http_CloseHttpConnection(handle);
+	return status;}
 
 
 int UpnpOpenHttpGet(
-	const char *url_str,
-	void **Handle,
+	const char *url,
+	void **handle,
 	char **contentType,
 	int *contentLength,
 	int *httpStatus,
 	int timeout)
 {
-	return http_OpenHttpGet(
-		url_str, Handle, contentType, contentLength, httpStatus, timeout);
+	int status = UpnpOpenHttpConnection(url, handle, timeout);
+	if (status == UPNP_E_SUCCESS) {
+		status = UpnpMakeHttpRequest(HTTPMETHOD_GET, url, *handle, NULL, NULL, 0, timeout);
+	}
+	if (status == UPNP_E_SUCCESS) {
+		status = UpnpEndHttpRequest(*handle, timeout);
+	}
+	if (status == UPNP_E_SUCCESS) {
+		status = UpnpGetHttpResponse(*handle, NULL, contentType, contentLength, httpStatus, timeout);
+	}
+	return status;
 }
 
 
 int UpnpOpenHttpGetProxy(
-	const char *url_str,
+	const char *url,
 	const char *proxy_str,
-	void **Handle,
+	void **handle,
 	char **contentType,
 	int *contentLength,
 	int *httpStatus,
 	int timeout)
 {
-	return http_OpenHttpGetProxy(
-		url_str, proxy_str, Handle, contentType, contentLength,
-		httpStatus, timeout);
+	int status = UpnpOpenHttpConnection(proxy_str, handle, timeout);
+	if (status == UPNP_E_SUCCESS) {
+		status = UpnpMakeHttpRequest(HTTPMETHOD_GET, url, *handle, NULL, NULL, 0, timeout);
+	}
+	if (status == UPNP_E_SUCCESS) {
+		status = UpnpEndHttpRequest(*handle, timeout);
+	}
+	if (status == UPNP_E_SUCCESS) {
+		status = UpnpGetHttpResponse(*handle, NULL, contentType, contentLength, httpStatus, timeout);
+	}
+	return status;
 }
 
 
@@ -2804,19 +2829,70 @@ int UpnpCancelHttpGet(void *Handle)
 
 int UpnpCloseHttpGet(void *Handle)
 {
-	return http_CloseHttpGet(Handle);
+	return UpnpCloseHttpConnection(Handle);
 }
 
 
 int UpnpReadHttpGet(void *Handle, char *buf, size_t *size, int timeout)
 {
-	return http_ReadHttpGet(Handle, buf, size, timeout);
+	return http_ReadHttpResponse(Handle, buf, size, timeout);
 }
 
 
 int UpnpHttpGetProgress(void *Handle, size_t *length, size_t *total)
 {
 	return http_HttpGetProgress(Handle, length, total);
+}
+
+
+int UpnpOpenHttpConnection(const char *url,
+			   void **handle, int timeout)
+{
+	return http_OpenHttpConnection(url, handle, timeout);
+}
+
+
+int UpnpMakeHttpRequest(Upnp_HttpMethod method, const char *url,
+			void *handle, UpnpString *headers,
+			const char *contentType, int contentLength,
+			int timeout)
+{
+	return http_MakeHttpRequest(method, url, handle, headers, contentType,
+				    contentLength, timeout);
+}
+
+int UpnpWriteHttpRequest(void *handle, char *buf,
+			 size_t *size, int timeout)
+{
+	return http_WriteHttpRequest(handle, buf, size, timeout);
+}
+
+
+int UpnpEndHttpRequest(void *handle, int timeout)
+{
+	return http_EndHttpRequest(handle, timeout);
+}
+
+
+int UpnpGetHttpResponse(void *handle, UpnpString *headers,
+			char **contentType, int *contentLength, int *httpStatus,
+			int timeout)
+{
+	return http_GetHttpResponse(handle, headers, contentType, contentLength,
+				    httpStatus, timeout);
+}
+
+
+int UpnpReadHttpResponse(void *handle, char *buf,
+			 size_t *size, int timeout)
+{
+	return http_ReadHttpResponse(handle, buf, size, timeout);
+}
+
+
+int UpnpCloseHttpConnection(void *handle)
+{
+	return http_CloseHttpConnection(handle);
 }
 
 

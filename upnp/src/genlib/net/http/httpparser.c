@@ -54,8 +54,9 @@
 
 /* entity positions */
 
-#define NUM_HTTP_METHODS 9
+#define NUM_HTTP_METHODS 11
 static str_int_entry Http_Method_Table[NUM_HTTP_METHODS] = {
+	{"DELETE", HTTPMETHOD_DELETE},
 	{"GET", HTTPMETHOD_GET},
 	{"HEAD", HTTPMETHOD_HEAD},
 	{"M-POST", HTTPMETHOD_MPOST},
@@ -65,6 +66,7 @@ static str_int_entry Http_Method_Table[NUM_HTTP_METHODS] = {
 	{"SUBSCRIBE", HTTPMETHOD_SUBSCRIBE},
 	{"UNSUBSCRIBE", HTTPMETHOD_UNSUBSCRIBE},
 	{"POST", SOAPMETHOD_POST},
+	{"PUT", HTTPMETHOD_PUT}
 };
 
 #define NUM_HTTP_HEADER_NAMES 33
@@ -1450,7 +1452,8 @@ parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
 		if (tok_type == TT_CRLF) {
 			/* end of headers */
 			if ((parser->msg.is_request)
-			    && (parser->msg.method == HTTPMETHOD_POST)) {
+			    && (parser->msg.method == HTTPMETHOD_POST ||
+                    parser->msg.method == HTTPMETHOD_PUT)) {
 				parser->position = POS_COMPLETE;	/*post entity parsing */
 				/*is handled separately  */
 				return PARSE_SUCCESS;

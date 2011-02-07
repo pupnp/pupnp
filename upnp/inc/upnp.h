@@ -1767,6 +1767,19 @@ EXPORT_SPEC int UpnpUnSubscribeAsync(
  */
 
 /*!
+ * \brief Different HTTP methods.
+ */
+enum Upnp_HttpMethod_e {
+    UPNP_HTTPMETHOD_PUT = 0,
+    UPNP_HTTPMETHOD_DELETE = 1,
+    UPNP_HTTPMETHOD_GET = 2,
+    UPNP_HTTPMETHOD_HEAD = 3,
+    UPNP_HTTPMETHOD_POST = 4
+};
+
+typedef enum Upnp_HttpMethod_e Upnp_HttpMethod;
+
+/*!
  * \brief Downloads a file specified in a URL.
  *
  * The SDK allocates the memory for \b outBuf and the application is
@@ -1807,10 +1820,12 @@ EXPORT_SPEC int UpnpDownloadUrlItem(
  * The SDK allocates the memory for \b handle and \b contentType, the
  * application is responsible for freeing this memory.
  *
+ * \note Memory for \b contentType is freed when freeing the memory
+ *       for handle.
+ *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
  *     \li \c UPNP_E_INVALID_PARAM: Either \b url, \b handle,  
- *             \b contentType, \b contentLength or \b httpStatus 
  *     	is not a valid pointer.
  *     \li \c UPNP_E_INVALID_URL: The \b url is not a valid 
  *             URL.
@@ -1851,10 +1866,12 @@ EXPORT_SPEC int UpnpOpenHttpGet(
  * The SDK allocates the memory for \b handle and \b contentType, the
  * application is responsible for freeing this memory.
  *
+ * \note Memory for \b contentType is freed when freeing the memory
+ *       for handle.
+ *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
  *     \li \c UPNP_E_INVALID_PARAM: Either \b url, \b handle,  
- *             \b contentType, \b contentLength or \b httpStatus 
  *     	is not a valid pointer.
  *     \li \c UPNP_E_INVALID_URL: The \b url is not a valid 
  *             URL.
@@ -2016,7 +2033,7 @@ EXPORT_SPEC int UpnpCloseHttpGet(
  * and sends the POST request to the server if the connection to the server
  * succeeds.
  *
- * The SDK allocates the memory for \b handle and \b contentType, the
+ * The SDK allocates the memory for \b handle, the
  * application is responsible for freeing this memory.
  *
  *  \return An integer representing one of the following:
@@ -2042,7 +2059,7 @@ EXPORT_SPEC int UpnpOpenHttpPost(
 	/*! [in,out] A pointer in which to store the handle for this connection. This
 	 * handle is required for futher operations over this connection. */
 	void **handle,
-	/*! [in] A buffer to store the media type of content being sent. */
+	/*! [in] A buffer to store the media type of content being sent. Can be NULL. */
 	const char *contentType,
 	/*! [in] The length of the content, in bytes, being posted. */
 	int contentLength,
@@ -2100,6 +2117,234 @@ EXPORT_SPEC int UpnpCloseHttpPost(
 	 * expected from the server, failing which, an error is reported. If 
 	 * value is negative, timeout is infinite. */
 	int timeout);
+
+/*!
+ * \brief Opens a connection to the server.
+ *
+ * The SDK allocates the memory for \b handle, the
+ * application is responsible for freeing this memory.
+ *
+ *  \return An integer representing one of the following:
+ *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *      \li \c UPNP_E_INVALID_PARAM: Either \b url, or \b handle
+ *              is not a valid pointer.
+ *      \li \c UPNP_E_INVALID_URL: The \b url is not a valid
+ *              URL.
+ *      \li \c UPNP_E_OUTOF_MEMORY: Insufficient resources exist to
+ *              download this file.
+ *      \li \c UPNP_E_SOCKET_ERROR: Error occured allocating a socket and
+ *		resources or an error occurred binding a socket.
+ *      \li \c UPNP_E_SOCKET_WRITE: An error or timeout occurred writing
+ *              to a socket.
+ *      \li \c UPNP_E_SOCKET_CONNECT: An error occurred connecting a
+ *              socket.
+ *      \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
+ *              allocated.
+ */
+EXPORT_SPEC int UpnpOpenHttpConnection(
+	/*! [in] The URL which contains the host, and the scheme to make the connection. */
+	const char *url,
+	/*! [in,out] A pointer in which to store the handle for this connection. This
+	 * handle is required for futher operations over this connection. */
+	void **handle,
+	/*! [in] The time out value sent with the request during which a response
+	 * is expected from the receiver, failing which, an error is reported.
+	 * If value is negative, timeout is infinite. */
+	int timeout);
+
+/*!
+ * \brief Makes a HTTP request using a connection previously created by
+ * \b UpnpOpenHttpConnection.
+ *
+ * \note Trying to make another request while a request is already being processed
+ * results in undefined behavior. It's up to the user to end a previous
+ * request by calling \b UpnpEndHttpRequest.
+ *
+ *  \return An integer representing one of the following:
+ *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *      \li \c UPNP_E_INVALID_PARAM: Either \b url, \b handle
+ *              or \b contentType is not a valid pointer.
+ *      \li \c UPNP_E_INVALID_URL: The \b url is not a valid
+ *              URL.
+ *      \li \c UPNP_E_OUTOF_MEMORY: Insufficient resources exist to
+ *              download this file.
+ *      \li \c UPNP_E_SOCKET_ERROR: Error occured allocating a socket and
+ *		resources or an error occurred binding a socket.
+ *      \li \c UPNP_E_SOCKET_WRITE: An error or timeout occurred writing
+ *              to a socket.
+ *      \li \c UPNP_E_SOCKET_CONNECT: An error occurred connecting a
+ *              socket.
+ *      \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
+ *              allocated.
+ */
+EXPORT_SPEC int UpnpMakeHttpRequest(
+    /* ![in] The method to use to make the request. */
+    Upnp_HttpMethod method,
+	/*! [in] The URL to use to make the request. The URL should use the same
+     *  scheme used to create the connection, but the host can be different
+     *  if the request is being proxied. */
+	const char *url,
+	/*! [in] The handle to the connection. */
+	void *handle,
+	/*! [in] Headers to be used for the request. Each header should be terminated by a CRLF as specified
+     *  in the HTTP specification. If NULL then the default headers will be used. */
+	UpnpString *headers,
+	/*! [in] The media type of content being sent. Can be NULL. */
+	const char *contentType,
+	/*! [in] The length of the content being sent, in bytes. Set to \b UPNP_USING_CHUNKED to use
+     *  chunked encoding, or \b UPNP_UNTIL_CLOSE to avoid specifying the content length to the server.
+     *  In this case the request is considered unfinished until the connection is closed. */
+	int contentLength,
+	/*! [in] The time out value sent with the request during which a response
+	 * is expected from the receiver, failing which, an error is reported.
+	 * If value is negative, timeout is infinite. */
+	int timeout);
+
+/*!
+ * \brief Writes the content of a HTTP request initiated by a \b UpnpMakeHttpRequest call.
+ * The end of the content should be indicated by a call to \b UpnpEndHttpRequest
+ *
+ *  \return An integer representing one of the following:
+ *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *      \li \c UPNP_E_INVALID_PARAM: Either \b handle, \b buf
+ *              or \b size is not a valid pointer.
+ *      \li \c UPNP_E_SOCKET_WRITE: An error or timeout occurred writing
+ *              to a socket.
+ *      \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
+ *              allocated.
+ */
+EXPORT_SPEC int UpnpWriteHttpRequest(
+	/*! [in] The handle of the connection created by the call to
+	 * \b UpnpOpenHttpConnection. */
+	void *handle,
+	/*! [in] The buffer containing date to be written. */
+	char *buf,
+	/*! [in] The size, in bytes of \b buf. */
+	size_t *size,
+	/*! [in] A timeout value sent with the request during which a response is
+	 * expected from the server, failing which, an error is reported. If
+	 * value is negative, timeout is infinite. */
+	int timeout);
+
+/*!
+ * \brief Indicates the end of a HTTP request previously made by
+ * \b UpnpMakeHttpRequest.
+ *
+ *  \return An integer representing one of the following:
+ *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *      \li \c UPNP_E_INVALID_PARAM: \b handle is not a valid pointer.
+ *      \li \c UPNP_E_OUTOF_MEMORY: Insufficient resources exist to
+ *              download this file.
+ *      \li \c UPNP_E_SOCKET_ERROR: Error occured allocating a socket and
+ *		resources or an error occurred binding a socket.
+ *      \li \c UPNP_E_SOCKET_WRITE: An error or timeout occurred writing
+ *              to a socket.
+ *      \li \c UPNP_E_SOCKET_CONNECT: An error occurred connecting a
+ *              socket.
+ *      \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
+ *              allocated.
+ */
+EXPORT_SPEC int UpnpEndHttpRequest(
+	/*! [in] The handle to the connection. */
+	void *handle,
+	/*! [in] The time out value sent with the request during which a response
+	 * is expected from the receiver, failing which, an error is reported.
+	 * If value is negative, timeout is infinite. */
+	int timeout);
+
+/*!
+ * \brief Gets the response from the server using a connection previously created
+ * by \b UpnpOpenHttpConnection
+ *
+ * \note Memory for \b contentType is only valid until the next call to the HTTP API
+ * for the same connection.
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_INVALID_PARAM: Either \b handle,
+ *     	is not a valid pointer.
+ *     \li \c UPNP_E_INVALID_URL: The \b url is not a valid
+ *             URL.
+ *     \li \c UPNP_E_OUTOF_MEMORY: Insufficient resources exist to
+ *             download this file.
+ *     \li \c UPNP_E_NETWORK_ERROR: A network error occurred.
+ *     \li \c UPNP_E_SOCKET_WRITE: An error or timeout occurred writing
+ *             to a socket.
+ *     \li \c UPNP_E_SOCKET_READ: An error or timeout occurred reading
+ *             from a socket.
+ *     \li \c UPNP_E_SOCKET_BIND: An error occurred binding a socket.
+ *     \li \c UPNP_E_SOCKET_CONNECT: An error occurred connecting a
+ *             socket.
+ *     \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
+ *             allocated.
+ *     \li \c UPNP_E_BAD_RESPONSE: A bad response was received from the
+ *             remote server.
+ */
+EXPORT_SPEC int UpnpGetHttpResponse(
+	/*! [in] The handle of the connection created by the call to
+	 * \b UpnpOpenHttpConnection. */
+	void *handle,
+	/*! [in] Headers sent by the server for the response. If NULL then the
+     * headers are not copied. */
+	UpnpString *headers,
+	/*! [out] A buffer to store the media type of the item. */
+	char **contentType,
+	/*! [out] A pointer to store the length of the item. */
+	int *contentLength,
+	/*! [out] The status returned on receiving a response message. */
+	int *httpStatus,
+	/*! [in] The time out value sent with the request during which a response
+	 * is expected from the server, failing which, an error is reported
+	 * back to the user. If value is negative, timeout is infinite. */
+	int timeout);
+
+/*!
+ * \brief Reads the content of a response using a connection previously created
+ * by \b UpnpOpenHttpConnection.
+ *
+ *  \return An integer representing one of the following:
+ *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *      \li \c UPNP_E_INVALID_PARAM: Either \b handle, \b buf
+ *              or \b size is not a valid pointer.
+ *	    \li \c UPNP_E_BAD_RESPONSE: A bad response was received from the
+ *	            remote server.
+ *      \li \c UPNP_E_BAD_HTTPMSG: Either the request or response was in
+ *              the incorrect format.
+ *      \li \c UPNP_E_CANCELED: another thread called UpnpCancelHttpGet.
+ *
+ *  Note: In case of return values, the status code parameter of the passed
+ *        in handle value may provide additional information on the return
+ *        value.
+ */
+EXPORT_SPEC int UpnpReadHttpResponse(
+	/*! [in] The handle of the connection created by the call to
+	 * \b UpnpOpenHttpConnection. */
+	void *handle,
+	/*! [in,out] The buffer to store the read item. */
+	char *buf,
+	/*! [in,out] The size of the buffer to be read. */
+	size_t *size,
+	/*! [in] The time out value sent with the request during which a response is
+	 * expected from the server, failing which, an error is reported back to
+	 * the user. If value is negative, timeout is infinite. */
+	int timeout);
+
+/*!
+ * \brief Closes the connection created with \b UpnpOpenHttpConnection
+ * and frees any memory associated with the connection.
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_INVALID_PARAM: \b handle, or is not a valid pointer.
+ *     \li \c UPNP_E_SOCKET_READ: An error or timeout occurred reading
+ *             from a socket.
+ *     \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
+ *             allocated.
+ */
+EXPORT_SPEC int UpnpCloseHttpConnection(
+	/*! [in] The handle of the connection to close, created by the call to
+	 * \b UpnpOpenHttpPost. */
+	void *handle);
 
 /*!
  * \brief Downloads an XML document specified in a URL.
