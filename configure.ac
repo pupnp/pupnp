@@ -227,8 +227,8 @@ dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [7:0:0])
 dnl #
 dnl ############################################################################
-AC_SUBST([LT_VERSION_IXML],       [6:0:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+AC_SUBST([LT_VERSION_IXML],       [7:0:0])
+AC_SUBST([LT_VERSION_THREADUTIL], [7:0:0])
 AC_SUBST([LT_VERSION_UPNP],       [7:0:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
