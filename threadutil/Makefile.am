@@ -28,6 +28,11 @@ libthreadutil_la_SOURCES = \
 			src/TimerThread.c
 
 upnpincludedir		= $(includedir)/upnp
+
 upnpinclude_HEADERS	= \
-			inc/ithread.h
+			inc/ithread.h \
+			inc/FreeList.h \
+			inc/LinkedList.h \
+			inc/ThreadPool.h \
+			inc/TimerThread.h
 
