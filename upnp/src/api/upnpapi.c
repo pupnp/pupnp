@@ -520,6 +520,66 @@ exit_function:
 }
 #endif
 
+#ifdef DEBUG
+/*!
+ * \brief Prints thread pool statistics.
+ */
+void PrintThreadPoolStats(
+	/*! [in] The thread pool. */
+	ThreadPool *tp,
+	/*! [in] The file name that called this function, use the macro
+	 * __FILE__. */
+	const char *DbgFileName,
+	/*! [in] The line number that the function was called, use the macro
+	 * __LINE__. */
+	int DbgLineNo,
+	/*! [in] The message. */
+	const char *msg)
+{
+	ThreadPoolStats stats;
+	ThreadPoolGetStats(tp, &stats);
+	UpnpPrintf(UPNP_INFO, API, DbgFileName, DbgLineNo,
+		"%s\n"
+		"High Jobs pending: %d\n"
+		"Med Jobs Pending: %d\n"
+		"Low Jobs Pending: %d\n"
+		"Average wait in High Q in milliseconds: %lf\n"
+		"Average wait in Med Q in milliseconds: %lf\n"
+		"Average wait in Low Q in milliseconds: %lf\n"
+		"Max Threads Used: %d\n"
+		"Worker Threads: %d\n"
+		"Persistent Threads: %d\n"
+		"Idle Threads: %d\n"
+		"Total Threads: %d\n"
+		"Total Work Time: %lf\n"
+		"Total Idle Time: %lf\n",
+		msg,
+		stats.currentJobsHQ,
+		stats.currentJobsMQ,
+		stats.currentJobsLQ,
+		stats.avgWaitHQ,
+		stats.avgWaitMQ,
+		stats.avgWaitLQ,
+		stats.maxThreads,
+		stats.workerThreads,
+		stats.persistentThreads,
+		stats.idleThreads,
+		stats.totalThreads,
+		stats.totalWorkTime,
+		stats.totalIdleTime);
+}
+#else
+static UPNP_INLINE void PrintThreadPoolStats(ThreadPool *tp,
+	const char *DbgFileName, int DbgLineNo, const char *msg)
+{
+	return;
+	tp = tp;
+	DbgFileName = DbgFileName;
+	DbgLineNo = DbgLineNo;
+	msg = msg;
+}
+#endif /* DEBUG */
+
 int UpnpFinish(void)
 {
 #ifdef INCLUDE_DEVICE_APIS
