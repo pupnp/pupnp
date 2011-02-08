@@ -224,21 +224,24 @@ dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
 dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:4:2])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [6:0:0])
 dnl #
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:3:2])
-dnl #AC_SUBST([LT_VERSION_UPNP],       [5:0:0])
-dnl #
 dnl ############################################################################
 dnl # Release 1.6.12:
 dnl # "current:revision:age"
 dnl #
+dnl # - interface added in threadutil
+dnl #   current: 5 -> 6
+dnl #   revision: 4 - > 0
+dnl #   age: 2 -> 3
+dnl # - interfaces removed in threadutil
+dnl #   age: 3 -> 0
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:4:2])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [6:0:0])
 dnl #
- ############################################################################
+dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [2:6:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [5:4:2])
+AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
 AC_SUBST([LT_VERSION_UPNP],       [6:0:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
