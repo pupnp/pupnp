@@ -252,6 +252,19 @@ Version 1.8.0
 	FileInfo.
 
 *******************************************************************************
+Version 1.6.12
+*******************************************************************************
+
+2011-02-08 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Undo the "incorrectly exported include files".
+	
+	Legacy applications like linux-igd and igd2-for-linux are using those
+	API to create a thread pool for managing their GENA events.
+
+	Leave it to be reworked in 1.8.x.
+
+*******************************************************************************
 Version 1.6.11
 *******************************************************************************
 
