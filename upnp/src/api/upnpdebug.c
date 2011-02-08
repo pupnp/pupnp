@@ -244,41 +244,4 @@ void UpnpDisplayBanner(FILE * fd,
 	free(leftMargin);
 }
 
-void PrintThreadPoolStats(ThreadPool *tp,
-			  const char *DbgFileName,
-			  int DbgLineNo, const char *msg)
-{
-	ThreadPoolStats stats;
-	ThreadPoolGetStats(tp, &stats);
-	UpnpPrintf(UPNP_INFO, API, DbgFileName, DbgLineNo,
-		"%s\n"
-		"High Jobs pending: %d\n"
-		"Med Jobs Pending: %d\n"
-		"Low Jobs Pending: %d\n"
-		"Average wait in High Q in milliseconds: %lf\n"
-		"Average wait in Med Q in milliseconds: %lf\n"
-		"Average wait in Low Q in milliseconds: %lf\n"
-		"Max Threads Used: %d\n"
-		"Worker Threads: %d\n"
-		"Persistent Threads: %d\n"
-		"Idle Threads: %d\n"
-		"Total Threads: %d\n"
-		"Total Work Time: %lf\n"
-		"Total Idle Time: %lf\n",
-		msg,
-		stats.currentJobsHQ,
-		stats.currentJobsMQ,
-		stats.currentJobsLQ,
-		stats.avgWaitHQ,
-		stats.avgWaitMQ,
-		stats.avgWaitLQ,
-		stats.maxThreads,
-		stats.workerThreads,
-		stats.persistentThreads,
-		stats.idleThreads,
-		stats.totalThreads,
-		stats.totalWorkTime,
-		stats.totalIdleTime);
-}
-
 #endif /* DEBUG */

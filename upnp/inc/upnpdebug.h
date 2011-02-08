@@ -283,33 +283,6 @@ static UPNP_INLINE void UpnpDisplayBanner(FILE *fd, const char **lines,
 }
 #endif
 
-/*!
- * \brief Prints thread pool statistics.
- */
-#ifdef DEBUG
-void PrintThreadPoolStats(
-	/*! [in] The thread pool. */
-	ThreadPool * tp,
-	/*! [in] The file name that called this function, use the macro
-	 * __FILE__. */
-	const char *DbgFileName,
-	/*! [in] The line number that the function was called, use the macro
-	 * __LINE__. */
-	int DbgLineNo,
-	/*! [in] The message. */
-	const char *msg);
-#else
-static UPNP_INLINE void PrintThreadPoolStats(ThreadPool *tp,
-	const char *DbgFileName, int DbgLineNo, const char *msg)
-{
-	return;
-	tp = tp;
-	DbgFileName = DbgFileName;
-	DbgLineNo = DbgLineNo;
-	msg = msg;
-}
-#endif
-
 /*@}*/
 
 #ifdef __cplusplus
