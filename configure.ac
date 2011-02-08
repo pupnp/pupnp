@@ -9,7 +9,7 @@
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.6.12], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp], [1.6.13], [mroberto@users.sourceforge.net])
 dnl ############################################################################
 dnl # *Independently* of the above libupnp package version, the libtool version
 dnl # of the 3 libraries need to be updated whenever there is a change released:
@@ -234,6 +234,15 @@ dnl #   revision: 4 - > 0
 dnl #   age: 2 -> 3
 dnl # - interfaces removed in threadutil
 dnl #   age: 3 -> 0
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [6:0:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.13:
+dnl # "current:revision:age"
+dnl #
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
 dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
