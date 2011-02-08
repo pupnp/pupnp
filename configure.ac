@@ -208,9 +208,13 @@ dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:2:2])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [5:0:0])
 dnl #
 dnl ############################################################################
-dnl #AC_SUBST([LT_VERSION_IXML],       [2:5:0])
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:2:2])
-dnl #AC_SUBST([LT_VERSION_UPNP],       [4:2:0])
+dnl # Release 1.6.11:
+dnl # "current:revision:age"
+dnl #
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:3:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [5:0:0])
 dnl #
 dnl ############################################################################
 dnl # Release 1.8.0:
@@ -220,12 +224,12 @@ dnl # - Start from a new ground.
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [6:0:0])
 dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
-dnl #AC_SUBST([LT_VERSION_UPNP],       [6:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [7:0:0])
 dnl #
 dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [6:0:0])
 AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
-AC_SUBST([LT_VERSION_UPNP],       [6:0:0])
+AC_SUBST([LT_VERSION_UPNP],       [7:0:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
