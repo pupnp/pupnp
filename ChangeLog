@@ -2,6 +2,8 @@
 Version 1.6.13
 *******************************************************************************
 
+2011-03-08 Iain Denniston <iain.denniston(at)gmail.com>
+	Fix for uuid_unpack incorrect shift precedence.
 
 *******************************************************************************
 Version 1.6.12
