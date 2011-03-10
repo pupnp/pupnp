@@ -109,7 +109,7 @@ void format_uuid_v1(uuid_upnp * uid,
 	uid->time_hi_and_version = (uint16_t)((timestamp >> 48) & 0x0FFF);
 	uid->time_hi_and_version |= (1 << 12);
 	uid->clock_seq_low = (uint8_t) (clock_seq & 0xFF);
-	uid->clock_seq_hi_and_reserved = (uint8_t) (clock_seq & 0x3F00) >> 8;
+	uid->clock_seq_hi_and_reserved = (uint8_t) ((clock_seq & 0x3F00) >> 8);
 	uid->clock_seq_hi_and_reserved |= 0x80;
 	memcpy(&uid->node, &node, sizeof uid->node);
 };
