@@ -34,14 +34,18 @@
 	/*
 	 * UPNP_INLINE
 	 * PRId64
+	 * PRIzd
 	 * PRIzu
+	 * PRIzx
 	 */
 	#ifdef UPNP_USE_MSVCPP
 		/* define some things the M$ VC++ doesn't know */
 		#define UPNP_INLINE
 		typedef __int64 int64_t;
 		#define PRId64 "I64d"
+		#define PRIzd "ld"
 		#define PRIzu "lu"
+		#define PRIzx "lx"
 	#endif /* UPNP_USE_MSVCPP */
 
 	#ifdef UPNP_USE_BCBPP
@@ -51,7 +55,9 @@
 		#warning The Borland C compiler is probably broken on PRId64,
 		#warning please someone provide a proper fix here
 		#define PRId64 "I64d"
+		#define PRIzd "zd"
 		#define PRIzu "zu"
+		#define PRIzx "zx"
 	#endif /* UPNP_USE_BCBPP */
 
 	#ifdef __GNUC__
@@ -60,7 +66,9 @@
 		 * runtime printf which ends up getting called, not the glibc
 		 * printf, so it genuinely doesn't have "zu"
 		 */
+		#define PRIzd "ld"
 		#define PRIzu "lu"
+		#define PRIzx "lx"
 	#endif /* __GNUC__ */
 #else
 	/*! 
@@ -93,13 +101,15 @@
 	/* #define PRId64 PRId64 */
 
 	/*!
-	 * \brief Supply the PRIzu printf() macro.
+	 * \brief Supply the PRIz* printf() macros.
 	 *
-	 * This macro was invented so that we can live a little longer with
+	 * These macros were invented so that we can live a little longer with
 	 * MSVC lack of C99. "z" is the correct printf() size specifier for
 	 * the size_t type.
 	 */
+	#define PRIzd "zd"
 	#define PRIzu "zu"
+	#define PRIzx "zx"
 #endif
 
 /*
