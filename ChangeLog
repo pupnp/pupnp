@@ -255,6 +255,11 @@ Version 1.8.0
 Version 1.6.13
 *******************************************************************************
 
+2011-03-08 Iain Denniston <iain.denniston(at)gmail.com>
+	Partial fix for UpnpGetIfInfo with MSVC - convert wchar string to
+	char string (full fix requires a lot of work - potentially impacting
+	all supported platforms)
+
 2011-03-11 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Created the macros PRIzd and PRIzx to deal with MSVC lack of C99.
