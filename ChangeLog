@@ -255,10 +255,17 @@ Version 1.8.0
 Version 1.6.13
 *******************************************************************************
 
+2011-03-11 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Created the macros PRIzd and PRIzx to deal with MSVC lack of C99.
+	Thanks to Iain Denniston for pointing it out.
+
 2011-03-08 Iain Denniston <iain.denniston(at)gmail.com>
+
 	Fixes for headers when compiled under C++
 
 2011-03-08 Iain Denniston <iain.denniston(at)gmail.com>
+
 	Fix for uuid_unpack incorrect shift precedence.
 
 *******************************************************************************

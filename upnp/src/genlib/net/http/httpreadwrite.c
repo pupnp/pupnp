@@ -446,7 +446,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 					/* Copy CRLF at the end of the chunk */
 					memcpy(file_buf + num_read, "\r\n", 2);
 					/* Hex length for the chunk size. */
-					sprintf(Chunk_Header, "%zx", num_read);
+					sprintf(Chunk_Header, "%" PRIzx, num_read);
 					/*itoa(num_read,Chunk_Header,16);  */
 					strcat(Chunk_Header, "\r\n");
 					/* Copy the chunk size header  */
@@ -850,7 +850,7 @@ int http_WriteHttpPost( IN void *Handle,
 			if (!tempbuf)
 				return UPNP_E_OUTOF_MEMORY;
 			/* begin chunk */
-			sprintf(tempbuf, "%zx\r\n", *size);
+			sprintf(tempbuf, "%" PRIzx "\r\n", *size);
 			tempSize = strlen(tempbuf);
 			memcpy(tempbuf + tempSize, buf, *size);
 			memcpy(tempbuf + tempSize + *size, "\r\n", 2);
