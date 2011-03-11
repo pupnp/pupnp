@@ -256,6 +256,9 @@ Version 1.6.13
 *******************************************************************************
 
 2011-03-08 Iain Denniston <iain.denniston(at)gmail.com>
+	Fix for memory leak.
+
+2011-03-08 Iain Denniston <iain.denniston(at)gmail.com>
 	Fix and Update of MSVC9 solution and project files - now compile in all
 	modes. Added x64 and static library targets.
 

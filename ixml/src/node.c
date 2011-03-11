@@ -588,6 +588,8 @@ int ixmlNode_removeChild(
 	oldChild->parentNode = NULL;
 	if (returnNode != NULL) {
 		*returnNode = oldChild;
+	} else {
+		ixmlNode_free(oldChild);
 	}
 
 	return IXML_SUCCESS;

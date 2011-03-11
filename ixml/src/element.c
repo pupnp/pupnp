@@ -272,6 +272,8 @@ int ixmlElement_setAttributeNode(
 		}
 		if (rtAttr != NULL) {
 			*rtAttr = (IXML_Attr *)attrNode;
+		} else {
+			ixmlAttr_free((IXML_Attr *)attrNode);
 		}
 	} else {
 		/* Add this attribute */
