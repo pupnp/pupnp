@@ -60,7 +60,7 @@ typedef struct
 } SOCKINFO;
 
 #ifdef __cplusplus
-#extern "C" {
+extern "C" {
 #endif
 
 /*!
