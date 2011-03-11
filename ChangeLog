@@ -256,6 +256,10 @@ Version 1.6.13
 *******************************************************************************
 
 2011-03-08 Iain Denniston <iain.denniston(at)gmail.com>
+	Fix and Update of MSVC9 solution and project files - now compile in all
+	modes. Added x64 and static library targets.
+
+2011-03-08 Iain Denniston <iain.denniston(at)gmail.com>
 	Partial fix for UpnpGetIfInfo with MSVC - convert wchar string to
 	char string (full fix requires a lot of work - potentially impacting
 	all supported platforms)
