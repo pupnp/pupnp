@@ -45,7 +45,7 @@
 #define HTTP_DEFAULT_TIMEOUT	30
 
 #ifdef __cplusplus
-#extern "C" {
+extern "C" {
 #endif
 
 int http_CancelHttpGet(IN void *Handle);
