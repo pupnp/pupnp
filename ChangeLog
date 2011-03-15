@@ -257,6 +257,14 @@ Version 1.6.13
 
 2011-03-15 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
+	Putting ssdpReqSocks under compilation flag.
+
+	Putting all access to ssdpReqSock4 and ssdpReqSock6 under
+	INCLUDE_CLIENT_APIS compilation flag to be able to compile when
+	client part of library is disable.
+
+2011-03-15 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
 	New UpnpRegisterRootDevice4 for legacy CPs.
 
 	Add a new UpnpRegisterRootDevice4 which allow user to specify a
