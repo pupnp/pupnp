@@ -255,6 +255,16 @@ Version 1.8.0
 Version 1.6.13
 *******************************************************************************
 
+2011-03-15 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	New UpnpRegisterRootDevice4 for legacy CPs.
+
+	Add a new UpnpRegisterRootDevice4 which allow user to specify a
+	description URL to be returned for legacy CPs (for example, CPs
+	searching for a v1 when the device is v2). Most of those CPs does not
+	work if they found a v2 in the XML description, so this new function is
+	only used to solve interoperability issues.
+
 2011-03-08 Iain Denniston <iain.denniston(at)gmail.com>
 	Fix for memory leak.
 

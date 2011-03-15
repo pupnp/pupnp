@@ -128,8 +128,9 @@
 #define UPNP_E_BUFFER_TOO_SMALL		-106
 
 /*!
- * \brief The description document passed to \b UpnpRegisterRootDevice or
- * \b UpnpRegisterRootDevice2 is invalid.
+ * \brief The description document passed to \b UpnpRegisterRootDevice,
+ * \b UpnpRegisterRootDevice2 \b UpnpRegisterRootDevice3 or
+ * \b UpnpRegisterRootDevice4 is invalid.
  */
 #define UPNP_E_INVALID_DESC		-107
 
@@ -418,7 +419,8 @@ typedef int  UpnpClient_Handle;
 
 /*!
  * \brief Returned when a device application registers with
- * \b UpnpRegisterRootDevice or \b UpnpRegisterRootDevice2.
+ * \b UpnpRegisterRootDevice, \b UpnpRegisterRootDevice2,
+ * \b UpnpRegisterRootDevice3 or \b UpnpRegisterRootDevice4.
  *
  * Device handles can only be used with functions that operate with a device
  * handle.
@@ -840,8 +842,62 @@ EXPORT_SPEC int UpnpRegisterRootDevice3(
 	const int  AddressFamily);
 
 /*!
- * \brief Unregisters a root device registered with \b UpnpRegisterRootDevice or
- * \b UpnpRegisterRootDevice2.
+ * \brief Registers a device application for a specific address family with
+ * the UPnP library. This function can also be used to specify a dedicated
+ * description URL to be returned for legacy CPs.
+ *
+ * A device application cannot make any other API calls until it registers
+ * using this function. Device applications can also register as control
+ * points (see \b UpnpRegisterClient to get a control point handle to perform
+ * control point functionality).
+ *
+ * This is synchronous and does not generate any callbacks. Callbacks can occur
+ * as soon as this function returns.
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_FINISH: The SDK is already terminated or
+ *                                is not initialized.
+ *     \li \c UPNP_E_INVALID_DESC: The description document was not
+ *             a valid device description.
+ *     \li \c UPNP_E_INVALID_URL: The URL for the description document
+ *             is not valid.
+ *     \li \c UPNP_E_INVALID_PARAM: Either \b Callback or \b Hnd
+ *             is not a valid pointer or \b DescURL is \c NULL.
+ *     \li \c UPNP_E_NETWORK_ERROR: A network error occurred.
+ *     \li \c UPNP_E_SOCKET_WRITE: An error or timeout occurred writing
+ *             to a socket.
+ *     \li \c UPNP_E_SOCKET_READ: An error or timeout occurred reading
+ *             from a socket.
+ *     \li \c UPNP_E_SOCKET_BIND: An error occurred binding a socket.
+ *     \li \c UPNP_E_SOCKET_CONNECT: An error occurred connecting the
+ *             socket.
+ *     \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
+ *             allocated.
+ *     \li \c UPNP_E_OUTOF_MEMORY: There are insufficient resources to
+ *             register this root device.
+ */
+EXPORT_SPEC int UpnpRegisterRootDevice4(
+	/*! [in] Pointer to a string containing the description URL for this root
+	 * device instance. */
+	const char *DescUrl,
+	/*! [in] Pointer to the callback function for receiving asynchronous events. */
+	Upnp_FunPtr Callback,
+	/*! [in] Pointer to user data returned with the callback function when invoked. */
+	const void *Cookie,
+	/*! [out] Pointer to a variable to store the new device handle. */
+	UpnpDevice_Handle *Hnd,
+	/*! [in] Address family of this device. Can be AF_INET for an IPv4 device, or
+	 * AF_INET6 for an IPv6 device. Defaults to AF_INET. */
+	const int  AddressFamily,
+	/*! [in] Pointer to a string containing the description URL to be returned for
+	 * legacy CPs for this root device instance. */
+	const char *LowerDescUrl);
+
+/*!
+ * \brief Unregisters a root device registered with \b UpnpRegisterRootDevice,
+ * \b UpnpRegisterRootDevice2, \b UpnpRegisterRootDevice3 or
+ * \b UpnpRegisterRootDevice4.
  *
  * After this call, the \b UpnpDevice_Handle is no longer valid. For all
  * advertisements that have not yet expired, the SDK sends a device unavailable
