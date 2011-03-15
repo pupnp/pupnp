@@ -80,6 +80,9 @@ struct Handle_Info
 #ifdef INCLUDE_DEVICE_APIS
 	/*! URL for the use of SSDP. */
 	char  DescURL[LINE_SIZE];
+	/*! URL for the use of SSDP when answering to legacy CPs (CP searching
+	 * for a v1 when the device is v2). */
+	char  LowerDescURL[LINE_SIZE];
 	/*! XML file path for device description. */
 	char  DescXML[LINE_SIZE];
 	/* Advertisement timeout */

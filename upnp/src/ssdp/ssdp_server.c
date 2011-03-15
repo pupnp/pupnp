@@ -245,10 +245,18 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 				}
 				case SSDP_DEVICETYPE: {
 					if (!strncasecmp(DeviceType, devType, strlen(DeviceType) - 2)) {
-						if (atoi(&DeviceType[strlen(DeviceType)
-								     - 1]) <= atoi(&devType[strlen(devType) - 1])) {
+						if (atoi(strrchr(DeviceType, ':') + 1)
+						    < atoi(&devType[strlen(devType) - 1])) {
 							/* the requested version is lower than the device version
-							 * must reply with the lower version number */
+							 * must reply with the lower version number and the lower
+							 * description URL */
+							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+								   "DeviceType=%s and search devType=%s MATCH\n",
+								   devType, DeviceType);
+							SendReply(DestAddr, DeviceType, 0, UDNstr, SInfo->LowerDescURL,
+								  defaultExp, 1);
+						} else if (atoi(strrchr(DeviceType, ':') + 1)
+							   == atoi(&devType[strlen(devType) - 1])) {
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								   "DeviceType=%s and search devType=%s MATCH\n",
 								   devType, DeviceType);
@@ -347,10 +355,18 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 					case SSDP_SERVICE:
 						if (ServiceType) {
 							if (!strncasecmp(ServiceType, servType, strlen(ServiceType) - 2)) {
-								if (atoi(&ServiceType[strlen(ServiceType) - 1]) <=
+								if (atoi(strrchr(ServiceType, ':') + 1) <
 								    atoi(&servType[strlen(servType) - 1])) {
 									/* the requested version is lower than the service version
-									 * must reply with the lower version number */
+									 * must reply with the lower version number and the lower
+									 * description URL */
+									UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+										   "ServiceType=%s and search servType=%s MATCH\n",
+										   ServiceType, servType);
+									SendReply(DestAddr, ServiceType, 0, UDNstr, SInfo->LowerDescURL,
+										  defaultExp, 1);
+								} else if (atoi(strrchr (ServiceType, ':') + 1) ==
+									   atoi(&servType[strlen(servType) - 1])) {
 									UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 										   "ServiceType=%s and search servType=%s MATCH\n",
 										   ServiceType, servType);

@@ -365,10 +365,13 @@ static int check_soap_body(
 			if (actionNode) {
 				ns = ixmlNode_getNamespaceURI(actionNode);
 				name = ixmlNode_getLocalName(actionNode);
+				/* Don't check version number, to accept a
+				 * request comming on a v1 service when
+				 * publishing a v2 service */
 				if (name &&
 				    ns &&
 				    !strcmp(actionName, name) &&
-				    !strcmp(urn, ns))
+				    !strncmp(urn, ns, strlen (urn) - 2))
 					ret_code = UPNP_E_SUCCESS;
 			}
 		}
@@ -439,7 +442,9 @@ static int check_soap_action_header(
 		return ret_code;
 	}
 	snprintf(ns_compare, tempSize, "\"%s", urn);
-	if (strcmp(temp_header_value, ns_compare))
+	/* Don't check version number, to accept a request comming on a v1
+	 * service  when publishing a v2 service */
+	if (strncmp(temp_header_value, ns_compare, strlen(ns_compare) - 2))
 		ret_code = UPNP_E_INVALID_ACTION;
 	else {
 		ret_code = UPNP_E_SUCCESS;

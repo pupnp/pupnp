@@ -790,6 +790,10 @@ int UpnpRegisterRootDevice(
 	HInfo->aliasInstalled = 0;
 	HInfo->HType = HND_DEVICE;
 	strcpy(HInfo->DescURL, DescUrl);
+	strcpy(HInfo->LowerDescURL, DescUrl);
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Following Root Device URL will be used when answering to legacy CPs %s\n",
+		HInfo->LowerDescURL);
 	HInfo->Callback = Fun;
 	HInfo->Cookie = (void *)Cookie;
 	HInfo->MaxAge = DEFAULT_MAXAGE;
@@ -952,6 +956,10 @@ int UpnpRegisterRootDevice2(
 		goto exit_function;
 	}
 
+	strcpy(HInfo->LowerDescURL, HInfo->DescURL);
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Following Root Device URL will be used when answering to legacy CPs %s\n",
+		HInfo->LowerDescURL);
 	HInfo->aliasInstalled = config_baseURL != 0;
 	HInfo->HType = HND_DEVICE;
 	HInfo->Callback = Fun;
@@ -1035,6 +1043,23 @@ int UpnpRegisterRootDevice3(
 	UpnpDevice_Handle *Hnd,
 	const int AddressFamily)
 {
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Inside UpnpRegisterRootDevice3\n");
+	return UpnpRegisterRootDevice4(DescUrl, Fun, Cookie, Hnd,
+		AddressFamily, NULL);
+}
+#endif /* INCLUDE_DEVICE_APIS */
+
+
+#ifdef INCLUDE_DEVICE_APIS
+int UpnpRegisterRootDevice4(
+	const char *DescUrl,
+	Upnp_FunPtr Fun,
+	const void *Cookie,
+	UpnpDevice_Handle *Hnd,
+	const int AddressFamily,
+	const char *LowerDescUrl)
+{
 	struct Handle_Info *HInfo;
 	int retVal = 0;
 	int hasServiceTable = 0;
@@ -1043,7 +1068,7 @@ int UpnpRegisterRootDevice3(
 	HandleLock();
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-		"Inside UpnpRegisterRootDevice3\n");
+		"Inside UpnpRegisterRootDevice4\n");
 	if (UpnpSdkInit != 1) {
 		retVal = UPNP_E_FINISH;
 		goto exit_function;
@@ -1087,6 +1112,13 @@ int UpnpRegisterRootDevice3(
 	HInfo->aliasInstalled = 0;
 	HInfo->HType = HND_DEVICE;
 	strcpy(HInfo->DescURL, DescUrl);
+	if (LowerDescUrl == NULL)
+		strcpy(HInfo->LowerDescURL, DescUrl);
+	else
+		strcpy(HInfo->LowerDescURL, LowerDescUrl);
+	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+		"Following Root Device URL will be used when answering to legacy CPs %s\n",
+		HInfo->LowerDescURL);
 	HInfo->Callback = Fun;
 	HInfo->Cookie = (void *)Cookie;
 	HInfo->MaxAge = DEFAULT_MAXAGE;
@@ -1109,8 +1141,8 @@ int UpnpRegisterRootDevice3(
 		goto exit_function;
 	}
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-		"UpnpRegisterRootDevice3: Valid Description\n"
-		"UpnpRegisterRootDevice3: DescURL : %s\n",
+		"UpnpRegisterRootDevice4: Valid Description\n"
+		"UpnpRegisterRootDevice4: DescURL : %s\n",
 		HInfo->DescURL);
 
 	HInfo->DeviceList = ixmlDocument_getElementsByTagName(
@@ -1122,7 +1154,7 @@ int UpnpRegisterRootDevice3(
 		ixmlDocument_free(HInfo->DescDocument);
 		FreeHandle(*Hnd);
 		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
-			"UpnpRegisterRootDevice3: No devices found for RootDevice\n");
+			"UpnpRegisterRootDevice4: No devices found for RootDevice\n");
 		retVal = UPNP_E_INVALID_DESC;
 		goto exit_function;
 	}
@@ -1131,26 +1163,26 @@ int UpnpRegisterRootDevice3(
 	HInfo->DescDocument, "serviceList" );
 	if (!HInfo->ServiceList) {
 		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
-			"UpnpRegisterRootDevice3: No services found for RootDevice\n");
+			"UpnpRegisterRootDevice4: No services found for RootDevice\n");
 	}
 
 	/*
 	 * GENA SET UP
 	 */
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-		"UpnpRegisterRootDevice3: Gena Check\n" );
+		"UpnpRegisterRootDevice4: Gena Check\n" );
 	hasServiceTable = getServiceTable(
 		(IXML_Node *)HInfo->DescDocument,
 		&HInfo->ServiceTable,
 		HInfo->DescURL);
 	if (hasServiceTable) {
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-			"UpnpRegisterRootDevice3: GENA Service Table \n"
+			"UpnpRegisterRootDevice4: GENA Service Table \n"
 			"Here are the known services: \n" );
 		printServiceTable(&HInfo->ServiceTable, UPNP_ALL, API);
 	} else {
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-			"\nUpnpRegisterRootDevice3: Empty service table\n");
+			"\nUpnpRegisterRootDevice4: Empty service table\n");
 	}
 
 	if (AddressFamily == AF_INET) {
@@ -1163,7 +1195,7 @@ int UpnpRegisterRootDevice3(
 
 exit_function:
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
-		"Exiting RegisterRootDevice3, return value == %d\n", retVal);
+		"Exiting RegisterRootDevice4, return value == %d\n", retVal);
 	HandleUnlock();
 
 	return retVal;
