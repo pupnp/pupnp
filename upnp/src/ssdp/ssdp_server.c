@@ -833,7 +833,7 @@ static int create_ssdp_sock_v4(
 	return UPNP_E_SUCCESS;
 }
 
-#if INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
 /*!
  * \brief Creates the SSDP IPv4 socket to be used by the control point.
  *
@@ -1099,9 +1099,9 @@ int get_ssdp_sockets(MiniServerSockArray * out)
 {
 	int retVal;
 
+#ifdef INCLUDE_CLIENT_APIS
 	out->ssdpReqSock4 = INVALID_SOCKET;
 	out->ssdpReqSock6 = INVALID_SOCKET;
-#if INCLUDE_CLIENT_APIS
 	/* Create the IPv4 socket for SSDP REQUESTS */
 	if (strlen(gIF_IPV4) > 0) {
 		retVal = create_ssdp_sock_reqv4(&out->ssdpReqSock4);
