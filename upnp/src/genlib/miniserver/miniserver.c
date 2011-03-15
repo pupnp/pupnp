@@ -745,6 +745,10 @@ static int get_miniserver_sockets(
 	out->miniServerSock4 = listenfd4;
 #ifdef UPNP_ENABLE_IPV6
 	out->miniServerSock6 = listenfd6;
+#else
+	/* Silence compiler warning message:
+	 * warning: unused parameter ‘listen_port6’ */
+	listen_port6 = 0;
 #endif
 	return UPNP_E_SUCCESS;
 }
