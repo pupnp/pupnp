@@ -86,12 +86,12 @@ int sock_destroy(SOCKINFO *info, int ShutdownMethod)
 {
 	int ret = UPNP_E_SUCCESS;
 
-	if (info->socket != -1) {
+	if (info->socket != INVALID_SOCKET) {
 		shutdown(info->socket, ShutdownMethod);
 		if (sock_close(info->socket) == -1) {
 			ret = UPNP_E_SOCKET_ERROR;
 		}
-		info->socket = -1;
+		info->socket = INVALID_SOCKET;
 	}
 
 	return ret;

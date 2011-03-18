@@ -441,7 +441,7 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 	struct Handle_Info *ctrlpt_info = NULL;
 	enum SsdpSearchType requestType;
 	unsigned long addrv4 = inet_addr(gIF_IPV4);
-	int max_fd = 0;
+	SOCKET max_fd = 0;
 
 	/*ThreadData *ThData; */
 	ThreadPoolJob job;

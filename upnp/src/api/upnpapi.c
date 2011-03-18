@@ -3242,7 +3242,7 @@ int UpnpGetIfInfo(const char *IfName)
 		ifname_found = 1;
 	}
 	/* Create an unbound datagram socket to do the SIOCGIFADDR ioctl on.  */
-	if ((LocalSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+	if ((LocalSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET) {
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 			   "Can't create addrlist socket\n");
 		return UPNP_E_INIT;
@@ -3660,7 +3660,7 @@ int getlocalhostname(char *out, size_t out_len)
 
 	/* Create an unbound datagram socket to do the SIOCGIFADDR ioctl on.  */
 	LocalSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (LocalSock < 0) {
+	if (LocalSock == INVALID_SOCKET) {
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 			"Can't create addrlist socket\n");
 		return UPNP_E_INIT;

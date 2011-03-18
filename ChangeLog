@@ -2,6 +2,10 @@
 Version 1.6.14
 *******************************************************************************
 
+2011-03-08 Iain Denniston <iain.denniston(at)gmail.com>
+
+	Several fixes to correctly use SOCKET (and related) types instead of
+	non-portable variations.
 
 *******************************************************************************
 Version 1.6.13
