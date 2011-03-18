@@ -379,7 +379,7 @@ get_response_value( IN http_message_t * hmsg,
 	char *node_str = NULL;
 	const char *temp_str = NULL;
 	DOMString error_node_str = NULL;
-	int err_code = UPNP_E_BAD_RESPONSE; /* default error */ ;
+	int err_code = UPNP_E_BAD_RESPONSE; /* default error */
 	int done = FALSE;
 	const char *names[5];
 	const DOMString nodeValue;

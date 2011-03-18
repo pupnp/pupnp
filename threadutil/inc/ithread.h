@@ -922,7 +922,8 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
 #endif
 
 
-#if !defined(PTHREAD_MUTEX_RECURSIVE) && !defined(__DragonFly__)
+#if !defined(PTHREAD_MUTEX_RECURSIVE) && !defined(__DragonFly__) && !defined(UPNP_USE_MSVCPP)
+/* !defined(UPNP_USE_MSVCPP) should probably also have pthreads version check - but it's not clear if that is possible */
 /* NK: Added for satisfying the gcc compiler */
 EXPORT_SPEC int pthread_mutexattr_setkind_np(pthread_mutexattr_t *attr, int kind);
 #endif

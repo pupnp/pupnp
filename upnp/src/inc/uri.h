@@ -52,7 +52,10 @@
 #include <time.h>
 
 #ifdef WIN32
-	#include "inet_pton.h"
+	#ifndef UPNP_USE_MSVCPP
+		/* VC Winsocks2 includes these functions */
+		#include "inet_pton.h"
+	#endif
 #else
 	#include <netdb.h>      /* for struct addrinfo */
 #endif

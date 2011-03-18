@@ -15,8 +15,11 @@
 
 #ifdef WIN32
 	#include <stdarg.h>
-	#include <windef.h>
-	#include <winbase.h>
+	#ifndef UPNP_USE_MSVCPP
+		/* Removed: not required (and cause compilation issues) */
+		#include <winbase.h>
+		#include <windef.h>
+	#endif
 	#include <winsock2.h>
 	#include <iphlpapi.h>
 	#include <ws2tcpip.h>

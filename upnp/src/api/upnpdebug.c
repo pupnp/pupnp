@@ -118,6 +118,7 @@ int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module)
 	    (Module == DOM && DEBUG_DOM) || (Module == HTTP && DEBUG_HTTP);
 
 	return ret;
+	Module = Module; /* VC complains about this being unreferenced */
 }
 
 void UpnpPrintf(Upnp_LogLevel DLevel,

@@ -51,6 +51,9 @@
  */
 #ifdef WIN32
 	#include <time.h>
+	#ifdef UPNP_USE_MSVCPP
+		#include <sys/types.h>	/* needed for off_t */
+	#endif
 #elif (defined(BSD) && BSD >= 199306)
 	#include <time.h>
 #else
