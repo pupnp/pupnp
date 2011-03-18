@@ -181,7 +181,7 @@ static int NewRequestHandler(
 	int ret = UPNP_E_SUCCESS;
 
 	ReplySock = socket(DestAddr->sa_family, SOCK_DGRAM, 0);
-	if (ReplySock == -1) {
+	if (ReplySock == INVALID_SOCKET) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 			   "SSDP_LIB: New Request Handler:"

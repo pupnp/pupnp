@@ -74,7 +74,7 @@ static UPNP_INLINE int sock_close(
 {
 	int ret = -1;
 
-	if (sock != -1)
+	if (sock != INVALID_SOCKET)
 		ret = UpnpCloseSocket(sock);
 
 	return ret;

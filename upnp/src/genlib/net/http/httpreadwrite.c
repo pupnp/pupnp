@@ -222,8 +222,8 @@ SOCKET http_Connect(
 	http_FixUrl(destination_url, url);
 
 	connfd = socket(url->hostport.IPaddress.ss_family, SOCK_STREAM, 0);
-	if (connfd == -1) {
-		return UPNP_E_OUTOF_SOCKET;
+	if (connfd == INVALID_SOCKET) {
+		return (SOCKET)(UPNP_E_OUTOF_SOCKET);
 	}
 	sockaddr_len = (socklen_t)(url->hostport.IPaddress.ss_family == AF_INET6 ?
 		sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in));
@@ -236,7 +236,7 @@ SOCKET http_Connect(
 #endif
 		shutdown(connfd, SD_BOTH);
 		UpnpCloseSocket(connfd);
-		return UPNP_E_SOCKET_CONNECT;
+		return (SOCKET)(UPNP_E_SOCKET_CONNECT);
 	}
 
 	return connfd;
@@ -548,7 +548,7 @@ int http_RequestAndResponse(
 
 	tcp_connection = socket(
 		destination->hostport.IPaddress.ss_family, SOCK_STREAM, 0);
-	if (tcp_connection == -1) {
+	if (tcp_connection == INVALID_SOCKET) {
 		parser_response_init(response, req_method);
 		return UPNP_E_SOCKET_ERROR;
 	}
@@ -969,7 +969,7 @@ int http_OpenHttpPost(
 	handle->contentLength = contentLength;
 	tcp_connection = socket(url.hostport.IPaddress.ss_family,
 		SOCK_STREAM, 0);
-	if (tcp_connection == -1) {
+	if (tcp_connection == INVALID_SOCKET) {
 		ret_code = UPNP_E_SOCKET_ERROR;
 		goto errorHandler;
 	}
@@ -1446,7 +1446,7 @@ int http_OpenHttpGetProxy(const char *url_str, const char *proxy_str,
 	parser_response_init(&handle->response, HTTPMETHOD_GET);
 	tcp_connection =
 	    socket(peer->hostport.IPaddress.ss_family, SOCK_STREAM, 0);
-	if (tcp_connection == -1) {
+	if (tcp_connection == INVALID_SOCKET) {
 		ret_code = UPNP_E_SOCKET_ERROR;
 		goto errorHandler;
 	}
@@ -1965,7 +1965,7 @@ int http_OpenHttpGetEx(
 		memset(handle, 0, sizeof(*handle));
 		parser_response_init(&handle->response, HTTPMETHOD_GET);
 		tcp_connection = socket(url.hostport.IPaddress.ss_family, SOCK_STREAM, 0);
-		if (tcp_connection == -1) {
+		if (tcp_connection == INVALID_SOCKET) {
 			errCode = UPNP_E_SOCKET_ERROR;
 			free(handle);
 			break;

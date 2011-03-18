@@ -736,7 +736,7 @@ static int create_ssdp_sock_v4(
 	struct in_addr addr;
 
 	*ssdpSock = socket(AF_INET, SOCK_DGRAM, 0);
-	if (*ssdpSock == -1) {
+	if (*ssdpSock == INVALID_SOCKET) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in socket(): %s\n", errorBuffer);
@@ -847,7 +847,7 @@ static int create_ssdp_sock_reqv4(
 	u_char ttl = 4;
 
 	*ssdpReqSock = socket(AF_INET, SOCK_DGRAM, 0);
-	if (*ssdpReqSock == -1) {
+	if (*ssdpReqSock == INVALID_SOCKET) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in socket(): %s\n", errorBuffer);
@@ -877,7 +877,7 @@ static int create_ssdp_sock_v6(
 	int ret = 0;
 
 	*ssdpSock = socket(AF_INET6, SOCK_DGRAM, 0);
-	if (*ssdpSock == -1) {
+	if (*ssdpSock == INVALID_SOCKET) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in socket(): %s\n", errorBuffer);
@@ -978,7 +978,7 @@ static int create_ssdp_sock_v6_ula_gua(
 	int ret = 0;
 
 	*ssdpSock = socket(AF_INET6, SOCK_DGRAM, 0);
-	if (*ssdpSock == -1) {
+	if (*ssdpSock == INVALID_SOCKET) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in socket(): %s\n", errorBuffer);
@@ -1076,7 +1076,7 @@ static int create_ssdp_sock_reqv6(
 	char hops = 1;
 
 	*ssdpReqSock = socket(AF_INET6, SOCK_DGRAM, 0);
-	if (*ssdpReqSock == -1) {
+	if (*ssdpReqSock == INVALID_SOCKET) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in socket(): %s\n", errorBuffer);
