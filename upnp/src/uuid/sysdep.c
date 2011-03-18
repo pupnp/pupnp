@@ -106,7 +106,7 @@ void get_random_info(unsigned char seed[16])
 	GetComputerName( r.hostname, &r.l );
 	/* MD5 it */
 	MD5Init(&c);
-	MD5Update(&c, &r, sizeof r);
+	MD5Update(&c, (unsigned char *)(&r), sizeof r);
 	MD5Final(seed, &c);
 };
 

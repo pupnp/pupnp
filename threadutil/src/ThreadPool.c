@@ -292,8 +292,8 @@ static int SetPriority(
 	/*! . */
 	ThreadPriority priority)
 {
-	int retVal = 0;
 #if defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
+	int retVal = 0;
 	int currentPolicy;
 	int minPriority = 0;
 	int maxPriority = 0;
@@ -325,11 +325,12 @@ static int SetPriority(
 
 	sched_result = pthread_setschedparam(ithread_self(), currentPolicy, &newPriority);
 	retVal = (sched_result == 0 || errno == EPERM) ? 0 : sched_result;
-#else
-	retVal = 0;
-#endif
 exit_function:
 	return retVal;
+#else
+	return 0;
+	priority = priority;
+#endif
 }
 
 /*!

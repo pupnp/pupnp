@@ -255,6 +255,11 @@ Version 1.8.0
 Version 1.6.14
 *******************************************************************************
 
+2011-03-18 Iain Denniston <iain.denniston(at)gmail.com>
+
+	Fixes for compilation under Windows (specifically MSVC). Also added
+	MSVC supported "_inline", and fixed some WIN32 specific warnings.
+
 2011-03-08 Iain Denniston <iain.denniston(at)gmail.com>
 
 	Several fixes to correctly use SOCKET (and related) types instead of
