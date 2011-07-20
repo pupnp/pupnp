@@ -255,6 +255,13 @@ Version 1.8.0
 Version 1.6.14
 *******************************************************************************
 
+2011-07-20 Marc Essayan <marc.essayan(at)orange-ftgroup.com>
+
+	Bug Fix on M-SEARCH.
+
+	Do not answer to M-SEARCH using HTTP version 1.0 as specified by the
+	UPnP Device Architecture.
+
 2011-03-18 Iain Denniston <iain.denniston(at)gmail.com>
 
 	Fixes for compilation under Windows (specifically MSVC). Also added
