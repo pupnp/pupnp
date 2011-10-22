@@ -284,11 +284,18 @@ dnl ############################################################################
 dnl # Release 1.6.16:
 dnl # "current:revision:age"
 dnl #
-dnl # - 
+dnl # - Code has changed in ixml
+dnl #	revision: 6 -> 7
+dnl # - Code has changed in upnp
+dnl #	revision: 1 -> 2
+dnl # - interface changed/added/removed in upnp
+dnl #   current++(9); revision = 0
+dnl # - interface added in upnp
+dnl #   age++(3)
 dnl #
-dnl #AC_SUBST([LT_VERSION_IXML],       [::])
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [::])
-dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:7:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [9:0:3])
 dnl #
 dnl ############################################################################
 dnl # Release 1.8.0:
