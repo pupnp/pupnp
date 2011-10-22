@@ -4,6 +4,24 @@ Version 1.6.16
 
 2012-03-05 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
+	SF Bug Tracker id 2989399 - UpnpSetVirtualDirCallbacks API removal in 1.6.x
+
+	Submitted: Nick Leverton ( leveret ) - 2010-04-19 07:44:10 PDT
+
+	Details: The recent codebase merge has removed a significant API call
+	which is used by several pupnp devices such as mediatomb and gmediaserver.
+	UpnpSetVirtualDirCallbacks() has been replaced by individual routines to
+	set each callback. Essentially this means that 1.6.7 will in fact be a majo
+	bump and 1.6.6 devices can no longer link against it. Could we have the call
+	reinstated please, perhaps as a wrapper around the individual calls ? As
+	it is, all distros will have to patch their 1.6.x apps, rebuild and re-link them.
+
+	The other removed API calls and external variables don't seem to be used
+	by any of the apps I have copies of, but UpnpSetVirtualDirCallbacks is
+	important for maintaining compatibility within 1.6.x.
+
+2012-03-05 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
 	SF Bug Tracker id 3325246 - Memory Leak in XML Parser
 
 	Submitted: Terry Farnham ( tfarnham ) - 2011-06-23 09:45:54 PDT
