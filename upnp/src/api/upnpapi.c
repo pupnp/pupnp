@@ -79,8 +79,8 @@
 
 #ifndef IN6_IS_ADDR_GLOBAL
 #define IN6_IS_ADDR_GLOBAL(a) \
-		(((((__const uint8_t *) (a))[0] & htonl(0xff000000)) <= htonl(0x3f000000)   \
-				&& (((__const uint8_t *) (a))[0] & htonl(0xff000000)) >= htonl(0x20000000)))
+		((((__const uint32_t *) (a))[0] & htonl(0x70000000)) \
+		== htonl (0x20000000))
 #endif /* IS ADDR GLOBAL */
 
 #ifndef IN6_IS_ADDR_ULA

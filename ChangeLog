@@ -255,6 +255,13 @@ Version 1.8.0
 Version 1.6.14
 *******************************************************************************
 
+2011-10-24 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Bug fix in IN6_IS_ADDR_GLOBAL.
+
+	Changing IN6_IS_ADDR_GLOBAL to accept all IPv6 addresses which have a
+	2000::/3 prefix.
+
 2011-07-20 Marc Essayan <marc.essayan(at)orange-ftgroup.com>
 
 	Bug Fix on M-SEARCH.
