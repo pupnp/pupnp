@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (C) 2011 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -1206,13 +1207,21 @@ exit_function:
 #ifdef INCLUDE_DEVICE_APIS
 int UpnpUnRegisterRootDevice(UpnpDevice_Handle Hnd)
 {
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+		   "Inside UpnpUnRegisterRootDevice\n");
+	return UpnpUnRegisterRootDeviceLowPower(Hnd, -1, -1, -1);
+}
+
+int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd, int PowerState,
+	int SleepPeriod, int RegistrationState)
+{
 	int retVal = 0;
 	struct Handle_Info *HInfo = NULL;
 
 	if (UpnpSdkInit != 1)
 		return UPNP_E_FINISH;
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-		   "Inside UpnpUnRegisterRootDevice\n");
+		   "Inside UpnpUnRegisterRootDeviceLowPower\n");
 #if EXCLUDE_GENA == 0
 	if (genaUnregisterDevice(Hnd) != UPNP_E_SUCCESS)
 		return UPNP_E_INVALID_HANDLE;
@@ -1223,6 +1232,11 @@ int UpnpUnRegisterRootDevice(UpnpDevice_Handle Hnd)
 		HandleUnlock();
 		return UPNP_E_INVALID_HANDLE;
 	}
+	HInfo->PowerState = PowerState;
+	if( SleepPeriod < 0 )
+		SleepPeriod = -1;
+	HInfo->SleepPeriod = SleepPeriod;
+	HInfo->RegistrationState = RegistrationState;
 	HandleUnlock();
 
 #if EXCLUDE_SSDP == 0
@@ -1254,7 +1268,7 @@ int UpnpUnRegisterRootDevice(UpnpDevice_Handle Hnd)
 	HandleUnlock();
 
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-		   "Exiting UpnpUnRegisterRootDevice\n");
+		   "Exiting UpnpUnRegisterRootDeviceLowPower\n");
 
 	return retVal;
 }
@@ -1584,6 +1598,14 @@ static int GetDescDocumentAndURL(
 #if EXCLUDE_SSDP == 0
 int UpnpSendAdvertisement(UpnpDevice_Handle Hnd, int Exp)
 {
+    UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+        "Inside UpnpSendAdvertisement \n");
+    return UpnpSendAdvertisementLowPower (Hnd, Exp, -1, -1, -1);
+}
+
+int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd, int Exp,
+    int PowerState, int SleepPeriod, int RegistrationState)
+{
     struct Handle_Info *SInfo = NULL;
     int retVal = 0,
      *ptrMx;
@@ -1595,7 +1617,7 @@ int UpnpSendAdvertisement(UpnpDevice_Handle Hnd, int Exp)
     }
 
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSendAdvertisement \n" );
+        "Inside UpnpSendAdvertisementLowPower \n" );
 
     HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
@@ -1605,6 +1627,11 @@ int UpnpSendAdvertisement(UpnpDevice_Handle Hnd, int Exp)
     if( Exp < 1 )
         Exp = DEFAULT_MAXAGE;
     SInfo->MaxAge = Exp;
+    SInfo->PowerState = PowerState;
+    if( SleepPeriod < 0 )
+        SleepPeriod = -1;
+    SInfo->SleepPeriod = SleepPeriod;
+    SInfo->RegistrationState = RegistrationState;
     HandleUnlock();
     retVal = AdvertiseAndReply( 1, Hnd, 0, ( struct sockaddr * )NULL,
                                 ( char * )NULL, ( char * )NULL,
@@ -1665,7 +1692,7 @@ int UpnpSendAdvertisement(UpnpDevice_Handle Hnd, int Exp)
 
     HandleUnlock();
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSendAdvertisement \n" );
+        "Exiting UpnpSendAdvertisementLowPower \n" );
 
     return retVal;
 

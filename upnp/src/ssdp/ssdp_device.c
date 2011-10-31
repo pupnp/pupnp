@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation
  * All rights reserved.
+ * Copyright (C) 2011 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -313,7 +314,13 @@ static void CreateServicePacket(
 	/*! [out] Output buffer filled with HTTP statement. */
 	char **packet,
 	/*! [in] Address family of the HTTP request. */
-	int AddressFamily)
+	int AddressFamily,
+	/*! [in] PowerState as defined by UPnP Low Power. */
+	int PowerState,
+	/*! [in] SleepPeriod as defined by UPnP Low Power. */
+	int SleepPeriod,
+	/*! [in] RegistrationState as defined by UPnP Low Power. */
+	int RegistrationState)
 {
 	int ret_code;
 	const char *nts;
@@ -326,7 +333,23 @@ static void CreateServicePacket(
 	buf.size_inc = 30;
 	*packet = NULL;
 	if (msg_type == MSGTYPE_REPLY) {
-		ret_code = http_MakeMessage(&buf, 1, 1,
+		if (PowerState > 0) {
+			ret_code = http_MakeMessage(&buf, 1, 1,
+					    "R" "sdc" "D" "sc" "ssc" "ssc" "ssc"
+					    "S" "Xc" "ssc" "ssc"
+					    "sdc" "sdc" "sdcc", HTTP_OK,
+					    "CACHE-CONTROL: max-age=", duration,
+					    "EXT:", "LOCATION: ", location,
+					    "OPT: ",
+					    "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
+					    "01-NLS: ", gUpnpSdkNLSuuid,
+					    X_USER_AGENT, "ST: ", nt, "USN: ",
+					    usn, "Powerstate: ", PowerState,
+					    "SleepPeriod: ", SleepPeriod,
+					    "RegistrationState: ",
+					    RegistrationState);
+		} else {
+			ret_code = http_MakeMessage(&buf, 1, 1,
 					    "R" "sdc" "D" "sc" "ssc" "ssc" "ssc"
 					    "S" "Xc" "ssc" "sscc", HTTP_OK,
 					    "CACHE-CONTROL: max-age=", duration,
@@ -336,6 +359,7 @@ static void CreateServicePacket(
 					    "01-NLS: ", gUpnpSdkNLSuuid,
 					    X_USER_AGENT, "ST: ", nt, "USN: ",
 					    usn);
+		}
 		if (ret_code != 0) {
 			return;
 		}
@@ -358,7 +382,24 @@ static void CreateServicePacket(
 			else
 				host = "[" SSDP_IPV6_LINKLOCAL "]";
 		}
-		ret_code = http_MakeMessage(&buf, 1, 1,
+		if (PowerState > 0) {
+			ret_code = http_MakeMessage(&buf, 1, 1,
+					    "Q" "sssdc" "sdc" "ssc" "ssc" "ssc"
+					    "ssc" "ssc" "S" "Xc" "ssc"
+					    "sdc" "sdc" "sdcc",
+					    HTTPMETHOD_NOTIFY, "*", (size_t) 1,
+					    "HOST: ", host, ":", SSDP_PORT,
+					    "CACHE-CONTROL: max-age=", duration,
+					    "LOCATION: ", location, "OPT: ",
+					    "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
+					    "01-NLS: ", gUpnpSdkNLSuuid, "NT: ",
+					    nt, "NTS: ", nts, X_USER_AGENT,
+					    "USN: ", usn, "Powerstate: ",
+					    PowerState, "SleepPeriod: ",
+					    SleepPeriod, "RegistrationState: ",
+					    RegistrationState);
+		} else {
+			ret_code = http_MakeMessage(&buf, 1, 1,
 					    "Q" "sssdc" "sdc" "ssc" "ssc" "ssc"
 					    "ssc" "ssc" "S" "Xc" "sscc",
 					    HTTPMETHOD_NOTIFY, "*", (size_t) 1,
@@ -369,6 +410,7 @@ static void CreateServicePacket(
 					    "01-NLS: ", gUpnpSdkNLSuuid, "NT: ",
 					    nt, "NTS: ", nts, X_USER_AGENT,
 					    "USN: ", usn);
+		}
 		if (ret_code)
 			return;
 	} else
@@ -382,7 +424,8 @@ static void CreateServicePacket(
 }
 
 int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
-			int Duration, int AddressFamily)
+			int Duration, int AddressFamily, int PowerState,
+			int SleepPeriod, int RegistrationState)
 {
 	struct sockaddr_storage __ss;
 	struct sockaddr_in *DestAddr4 = (struct sockaddr_in *)&__ss;
@@ -419,14 +462,17 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 		sprintf(Mil_Usn, "%s::upnp:rootdevice", Udn);
 		CreateServicePacket(MSGTYPE_ADVERTISEMENT, "upnp:rootdevice",
 				    Mil_Usn, Location, Duration, &msgs[0],
-				    AddressFamily);
+				    AddressFamily, PowerState, SleepPeriod,
+				    RegistrationState);
 	}
 	/* both root and sub-devices need to send these two messages */
 	CreateServicePacket(MSGTYPE_ADVERTISEMENT, Udn, Udn,
-			    Location, Duration, &msgs[1], AddressFamily);
+			    Location, Duration, &msgs[1], AddressFamily,
+			    PowerState, SleepPeriod, RegistrationState);
 	sprintf(Mil_Usn, "%s::%s", Udn, DevType);
 	CreateServicePacket(MSGTYPE_ADVERTISEMENT, DevType, Mil_Usn,
-			    Location, Duration, &msgs[2], AddressFamily);
+			    Location, Duration, &msgs[2], AddressFamily,
+			    PowerState, SleepPeriod, RegistrationState);
 	/* check error */
 	if ((RootDev && msgs[0] == NULL) || msgs[1] == NULL || msgs[2] == NULL) {
 		free(msgs[0]);
@@ -454,7 +500,8 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 }
 
 int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
-	      char *Udn, char *Location, int Duration, int ByType)
+	      char *Udn, char *Location, int Duration, int ByType,
+	      int PowerState, int SleepPeriod, int RegistrationState)
 {
 	int ret_code;
 	char *msgs[2];
@@ -471,7 +518,8 @@ int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 		sprintf(Mil_Usn, "%s::upnp:rootdevice", Udn);
 		CreateServicePacket(MSGTYPE_REPLY, "upnp:rootdevice",
 				    Mil_Usn, Location, Duration, &msgs[0],
-				    DestAddr->sa_family);
+				    DestAddr->sa_family, PowerState,
+				    SleepPeriod, RegistrationState);
 	} else {
 		/* two msgs for embedded devices */
 		num_msgs = 1;
@@ -480,12 +528,14 @@ int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 		if (!ByType) {
 			CreateServicePacket(MSGTYPE_REPLY, Udn, Udn, Location,
 					    Duration, &msgs[0],
-					    DestAddr->sa_family);
+					    DestAddr->sa_family, PowerState,
+					    SleepPeriod, RegistrationState);
 		} else {
 			sprintf(Mil_Usn, "%s::%s", Udn, DevType);
 			CreateServicePacket(MSGTYPE_REPLY, DevType, Mil_Usn,
 					    Location, Duration, &msgs[0],
-					    DestAddr->sa_family);
+					    DestAddr->sa_family, PowerState,
+					    SleepPeriod, RegistrationState);
 		}
 	}
 	/* check error */
@@ -506,7 +556,8 @@ int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 }
 
 int DeviceReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
-		char *Udn, char *Location, int Duration)
+		char *Udn, char *Location, int Duration, int PowerState,
+		int SleepPeriod, int RegistrationState)
 {
 	char *szReq[3], Mil_Nt[LINE_SIZE], Mil_Usn[LINE_SIZE];
 	int RetVal;
@@ -521,16 +572,19 @@ int DeviceReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 		sprintf(Mil_Usn, "%s::upnp:rootdevice", Udn);
 		CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
 				    Location, Duration, &szReq[0],
-				    DestAddr->sa_family);
+				    DestAddr->sa_family, PowerState,
+				    SleepPeriod, RegistrationState);
 	}
 	sprintf(Mil_Nt, "%s", Udn);
 	sprintf(Mil_Usn, "%s", Udn);
 	CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
-			    Location, Duration, &szReq[1], DestAddr->sa_family);
+			    Location, Duration, &szReq[1], DestAddr->sa_family,
+			    PowerState, SleepPeriod, RegistrationState);
 	sprintf(Mil_Nt, "%s", DevType);
 	sprintf(Mil_Usn, "%s::%s", Udn, DevType);
 	CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
-			    Location, Duration, &szReq[2], DestAddr->sa_family);
+			    Location, Duration, &szReq[2], DestAddr->sa_family,
+			    PowerState, SleepPeriod, RegistrationState);
 	/* check error */
 	if ((RootDev && szReq[0] == NULL) ||
 	    szReq[1] == NULL || szReq[2] == NULL) {
@@ -554,7 +608,8 @@ int DeviceReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 }
 
 int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
-			 int Duration, int AddressFamily)
+			 int Duration, int AddressFamily, int PowerState,
+			 int SleepPeriod, int RegistrationState)
 {
 	char Mil_Usn[LINE_SIZE];
 	char *szReq[1];
@@ -583,7 +638,8 @@ int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
 	/* CreateServiceRequestPacket(1,szReq[0],Mil_Nt,Mil_Usn,
 	 * Server,Location,Duration); */
 	CreateServicePacket(MSGTYPE_ADVERTISEMENT, ServType, Mil_Usn,
-			    Location, Duration, &szReq[0], AddressFamily);
+			    Location, Duration, &szReq[0], AddressFamily,
+			    PowerState, SleepPeriod, RegistrationState);
 	if (szReq[0] == NULL) {
 		return UPNP_E_OUTOF_MEMORY;
 	}
@@ -594,7 +650,8 @@ int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
 }
 
 int ServiceReply(struct sockaddr *DestAddr, char *ServType, char *Udn,
-		 char *Location, int Duration)
+		 char *Location, int Duration, int PowerState, int SleepPeriod,
+		 int RegistrationState)
 {
 	char Mil_Usn[LINE_SIZE];
 	char *szReq[1];
@@ -603,7 +660,8 @@ int ServiceReply(struct sockaddr *DestAddr, char *ServType, char *Udn,
 	szReq[0] = NULL;
 	sprintf(Mil_Usn, "%s::%s", Udn, ServType);
 	CreateServicePacket(MSGTYPE_REPLY, ServType, Mil_Usn,
-			    Location, Duration, &szReq[0], DestAddr->sa_family);
+			    Location, Duration, &szReq[0], DestAddr->sa_family,
+			    PowerState, SleepPeriod, RegistrationState);
 	if (szReq[0] == NULL)
 		return UPNP_E_OUTOF_MEMORY;
 	RetVal = NewRequestHandler(DestAddr, 1, szReq);
@@ -613,7 +671,8 @@ int ServiceReply(struct sockaddr *DestAddr, char *ServType, char *Udn,
 }
 
 int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
-		    int AddressFamily)
+		    int AddressFamily, int PowerState, int SleepPeriod,
+		    int RegistrationState)
 {
 	char Mil_Usn[LINE_SIZE];
 	char *szReq[1];
@@ -643,7 +702,8 @@ int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
 	/* CreateServiceRequestPacket(0,szReq[0],Mil_Nt,Mil_Usn,
 	 * Server,Location,Duration); */
 	CreateServicePacket(MSGTYPE_SHUTDOWN, ServType, Mil_Usn,
-			    Location, Duration, &szReq[0], AddressFamily);
+			    Location, Duration, &szReq[0], AddressFamily,
+			    PowerState, SleepPeriod, RegistrationState);
 	if (szReq[0] == NULL)
 		return UPNP_E_OUTOF_MEMORY;
 	RetVal = NewRequestHandler((struct sockaddr *)&__ss, 1, szReq);
@@ -653,7 +713,8 @@ int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
 }
 
 int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
-		   char *Location, int Duration, int AddressFamily)
+		   char *Location, int Duration, int AddressFamily,
+		   int PowerState, int SleepPeriod, int RegistrationState)
 {
 	struct sockaddr_storage __ss;
 	struct sockaddr_in *DestAddr4 = (struct sockaddr_in *)&__ss;
@@ -686,16 +747,19 @@ int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
 		sprintf(Mil_Usn, "%s::upnp:rootdevice", Udn);
 		CreateServicePacket(MSGTYPE_SHUTDOWN, "upnp:rootdevice",
 				    Mil_Usn, Location, Duration, &msgs[0],
-				    AddressFamily);
+				    AddressFamily, PowerState, SleepPeriod,
+				    RegistrationState);
 	}
 	UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 		   "In function DeviceShutdown\n");
 	/* both root and sub-devices need to send these two messages */
 	CreateServicePacket(MSGTYPE_SHUTDOWN, Udn, Udn,
-			    Location, Duration, &msgs[1], AddressFamily);
+			    Location, Duration, &msgs[1], AddressFamily,
+			    PowerState, SleepPeriod, RegistrationState);
 	sprintf(Mil_Usn, "%s::%s", Udn, DevType);
 	CreateServicePacket(MSGTYPE_SHUTDOWN, DevType, Mil_Usn,
-			    Location, Duration, &msgs[2], AddressFamily);
+			    Location, Duration, &msgs[2], AddressFamily,
+			    PowerState, SleepPeriod, RegistrationState);
 	/* check error */
 	if ((RootDev && msgs[0] == NULL) || msgs[1] == NULL || msgs[2] == NULL) {
 		free(msgs[0]);
