@@ -5,6 +5,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (C) 2011 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -1288,6 +1289,35 @@ EXPORT_SPEC int UpnpUnRegisterRootDevice(
 	UpnpDevice_Handle Hnd);
 
 /*!
+ * \brief Unregisters a root device registered with \b UpnpRegisterRootDevice,
+ * \b UpnpRegisterRootDevice2, \b UpnpRegisterRootDevice3 or
+ * \b UpnpRegisterRootDevice4.
+ *
+ * After this call, the \b UpnpDevice_Handle is no longer valid. For all
+ * advertisements that have not yet expired, the SDK sends a device unavailable
+ * message automatically.
+ *
+ * This is a synchronous call and generates no callbacks. Once this call
+ * returns, the SDK will no longer generate callbacks to the application.
+ *
+ * This function allow a device to specify the SSDP extensions defined by UPnP
+ * Low Power.
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_INVALID_HANDLE: The handle is not a valid device handle.
+ */
+EXPORT_SPEC int UpnpUnRegisterRootDeviceLowPower(
+        /*! [in] The handle of the root device instance to unregister. */
+        UpnpDevice_Handle Hnd,
+        /*! PowerState as defined by UPnP Low Power. */
+        int PowerState,
+        /*! SleepPeriod as defined by UPnP Low Power. */
+        int SleepPeriod,
+        /*! RegistrationState as defined by UPnP Low Power. */
+        int RegistrationState);
+
+/*!
  * \brief Registers a control point application with the UPnP Library.
  *
  * A control point application cannot make any other API calls until it
@@ -1440,6 +1470,36 @@ EXPORT_SPEC int UpnpSendAdvertisement(
 	UpnpDevice_Handle Hnd,
 	/*! The expiration age, in seconds, of the announcements. */
 	int Exp);
+
+/*!
+ * \brief Sends out the discovery announcements for all devices and services
+ * for a device.
+ *
+ * Each announcement is made with the same expiration time.
+ *
+ * This is a synchronous call.
+ *
+ * This function allow a device to specify the SSDP extensions defined by UPnP
+ * Low Power.
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_INVALID_HANDLE: The handle is not a valid
+ *             device handle.
+ *     \li \c UPNP_E_OUTOF_MEMORY: There are insufficient resources to
+ *             send future advertisements.
+ */
+EXPORT_SPEC int UpnpSendAdvertisementLowPower(
+        /*! The device handle for which to send out the announcements. */
+        UpnpDevice_Handle Hnd,
+        /*! The expiration age, in seconds, of the announcements. */
+        int Exp,
+        /*! PowerState as defined by UPnP Low Power. */
+        int PowerState,
+        /*! SleepPeriod as defined by UPnP Low Power. */
+        int SleepPeriod,
+        /*! RegistrationState as defined by UPnP Low Power. */
+        int RegistrationState);
 
 /* @} Discovery */
 

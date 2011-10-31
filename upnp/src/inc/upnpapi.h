@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (C) 2011 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -87,6 +88,12 @@ struct Handle_Info
 	char  DescXML[LINE_SIZE];
 	/* Advertisement timeout */
 	int MaxAge;
+	/* Power State as defined by UPnP Low Power. */
+	int PowerState;
+	/* Sleep Period as defined by UPnP Low Power. */
+	int SleepPeriod;
+	/* Registration State as defined by UPnP Low Power. */
+	int RegistrationState;
 	/*! Description parsed in terms of DOM document. */
 	IXML_Document *DescDocument;
 	/*! List of devices in the description document. */

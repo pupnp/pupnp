@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (C) 2011 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -205,26 +206,37 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 					DeviceAdvertisement(devType, i == 0,
 							    UDNstr,
 							    SInfo->DescURL, Exp,
-							    SInfo->DeviceAf);
+							    SInfo->DeviceAf,
+							    SInfo->PowerState,
+	                                                    SInfo->SleepPeriod,
+	                                                    SInfo->RegistrationState);
 				} else {
 					/* AdFlag == -1 */
 					DeviceShutdown(devType, i == 0, UDNstr,
 						       SERVER, SInfo->DescURL,
-						       Exp, SInfo->DeviceAf);
+						       Exp, SInfo->DeviceAf,
+						       SInfo->PowerState,
+						       SInfo->SleepPeriod,
+						       SInfo->RegistrationState);
 				}
 			} else {
 				switch (SearchType) {
 				case SSDP_ALL:
 					DeviceReply(DestAddr, devType, i == 0,
 						    UDNstr, SInfo->DescURL,
-						    defaultExp);
+						    defaultExp, SInfo->PowerState,
+						    SInfo->SleepPeriod,
+						    SInfo->RegistrationState);
 					break;
 				case SSDP_ROOTDEVICE:
 					if (i == 0) {
 						SendReply(DestAddr, devType, 1,
 							  UDNstr,
 							  SInfo->DescURL,
-							  defaultExp, 0);
+							  defaultExp, 0,
+							  SInfo->PowerState,
+							  SInfo->SleepPeriod,
+							  SInfo->RegistrationState);
 					}
 					break;
 				case SSDP_DEVICEUDN: {
@@ -238,7 +250,10 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								"DeviceUDN=%s and search UDN=%s MATCH\n",
 								UDNstr, DeviceUDN);
-							SendReply(DestAddr, devType, 0, UDNstr, SInfo->DescURL, defaultExp, 0);
+							SendReply(DestAddr, devType, 0, UDNstr, SInfo->DescURL, defaultExp, 0,
+								SInfo->PowerState,
+								SInfo->SleepPeriod,
+								SInfo->RegistrationState);
 							break;
 						}
 					}
@@ -254,14 +269,20 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 								   "DeviceType=%s and search devType=%s MATCH\n",
 								   devType, DeviceType);
 							SendReply(DestAddr, DeviceType, 0, UDNstr, SInfo->LowerDescURL,
-								  defaultExp, 1);
+								  defaultExp, 1,
+								  SInfo->PowerState,
+								  SInfo->SleepPeriod,
+								  SInfo->RegistrationState);
 						} else if (atoi(strrchr(DeviceType, ':') + 1)
 							   == atoi(&devType[strlen(devType) - 1])) {
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								   "DeviceType=%s and search devType=%s MATCH\n",
 								   devType, DeviceType);
 							SendReply(DestAddr, DeviceType, 0, UDNstr, SInfo->DescURL,
-								  defaultExp, 1);
+								  defaultExp, 1,
+								  SInfo->PowerState,
+								  SInfo->SleepPeriod,
+								  SInfo->RegistrationState);
 						} else {
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								   "DeviceType=%s and search devType=%s DID NOT MATCH\n",
@@ -337,12 +358,18 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 					if (AdFlag == 1) {
 						ServiceAdvertisement(UDNstr,
 							servType, SInfo->DescURL,
-							Exp, SInfo->DeviceAf);
+							Exp, SInfo->DeviceAf,
+							SInfo->PowerState,
+							SInfo->SleepPeriod,
+							SInfo->RegistrationState);
 					} else {
 						/* AdFlag == -1 */
 						ServiceShutdown(UDNstr,
 							servType, SInfo->DescURL,
-							Exp, SInfo->DeviceAf);
+							Exp, SInfo->DeviceAf,
+							SInfo->PowerState,
+							SInfo->SleepPeriod,
+							SInfo->RegistrationState);
 					}
 				} else {
 					switch (SearchType) {
@@ -350,7 +377,10 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 						ServiceReply(DestAddr, servType,
 							     UDNstr,
 							     SInfo->DescURL,
-							     defaultExp);
+							     defaultExp,
+							     SInfo->PowerState,
+							     SInfo->SleepPeriod,
+							     SInfo->RegistrationState);
 						break;
 					case SSDP_SERVICE:
 						if (ServiceType) {
@@ -364,14 +394,20 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 										   "ServiceType=%s and search servType=%s MATCH\n",
 										   ServiceType, servType);
 									SendReply(DestAddr, ServiceType, 0, UDNstr, SInfo->LowerDescURL,
-										  defaultExp, 1);
+										  defaultExp, 1,
+										  SInfo->PowerState,
+										  SInfo->SleepPeriod,
+										  SInfo->RegistrationState);
 								} else if (atoi(strrchr (ServiceType, ':') + 1) ==
 									   atoi(&servType[strlen(servType) - 1])) {
 									UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 										   "ServiceType=%s and search servType=%s MATCH\n",
 										   ServiceType, servType);
 									SendReply(DestAddr, ServiceType, 0, UDNstr, SInfo->DescURL,
-										  defaultExp, 1);
+										  defaultExp, 1,
+										  SInfo->PowerState,
+										  SInfo->SleepPeriod,
+										  SInfo->RegistrationState);
 								} else {
 									UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 									   "ServiceType=%s and search servType=%s DID NOT MATCH\n",

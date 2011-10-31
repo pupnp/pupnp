@@ -5,6 +5,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (C) 2011 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -353,7 +354,13 @@ int DeviceAdvertisement(
 	/* [in] Service duration in sec. */
 	int Duration,
 	/* [in] Device address family. */
-	int AddressFamily);
+	int AddressFamily,
+	/* [in] PowerState as defined by UPnP Low Power. */
+	int PowerState,
+	/* [in] SleepPeriod as defined by UPnP Low Power. */
+	int SleepPeriod,
+	/* [in] RegistrationState as defined by UPnP Low Power. */
+	int RegistrationState);
 
 /*!
  * \brief Creates the reply packet based on the input parameter, and send it
@@ -375,7 +382,13 @@ int SendReply(
 	/* [in] Life time of this device. */
 	int Duration, 
 	/* [in] . */
-	int ByType );
+	int ByType,
+	/* [in] PowerState as defined by UPnP Low Power. */
+	int PowerState,
+	/* [in] SleepPeriod as defined by UPnP Low Power. */
+	int SleepPeriod,
+	/* [in] RegistrationState as defined by UPnP Low Power. */
+	int RegistrationState);
 
 /*!
  * \brief Creates the reply packet based on the input parameter, and send it
@@ -395,7 +408,13 @@ int DeviceReply(
 	/* [in] Location of Device description document. */
 	char *Location, 
 	/* [in] Life time of this device. */
-	int Duration);
+	int Duration,
+	/* [in] PowerState as defined by UPnP Low Power. */
+	int PowerState,
+	/* [in] SleepPeriod as defined by UPnP Low Power. */
+	int SleepPeriod,
+	/* [in] RegistrationState as defined by UPnP Low Power. */
+	int RegistrationState);
 
 /*!
  * \brief Creates the advertisement packet based on the input parameter,
@@ -413,7 +432,13 @@ int ServiceAdvertisement(
 	/* [in] Life time of this device. */
 	int Duration,
 	/* [in] Device address family. */
-	int AddressFamily);
+	int AddressFamily,
+	/* [in] PowerState as defined by UPnP Low Power. */
+	int PowerState,
+	/* [in] SleepPeriod as defined by UPnP Low Power. */
+	int SleepPeriod,
+	/* [in] RegistrationState as defined by UPnP Low Power. */
+	int RegistrationState);
 
 /*!
  * \brief Creates the advertisement packet based on the input parameter,
@@ -431,7 +456,13 @@ int ServiceReply(
 	/* [in] Location of Device description document. */
 	char *Location,
 	/* [in] Life time of this device. */
-	int Duration);
+	int Duration,
+	/* [in] PowerState as defined by UPnP Low Power. */
+	int PowerState,
+	/* [in] SleepPeriod as defined by UPnP Low Power. */
+	int SleepPeriod,
+	/* [in] RegistrationState as defined by UPnP Low Power. */
+	int RegistrationState);
 
 /*!
  * \brief Creates a HTTP service shutdown request packet and sends it to the
@@ -449,7 +480,13 @@ int ServiceShutdown(
 	/* [in] Service duration in sec. */
 	int Duration,
 	/* [in] Device address family. */
-	int AddressFamily);
+	int AddressFamily,
+	/* [in] PowerState as defined by UPnP Low Power. */
+	int PowerState,
+	/* [in] SleepPeriod as defined by UPnP Low Power. */
+	int SleepPeriod,
+	/* [in] RegistrationState as defined by UPnP Low Power. */
+	int RegistrationState);
 
 /*!
  * \brief Creates a HTTP device shutdown request packet and send it to the
@@ -471,7 +508,13 @@ int DeviceShutdown(
 	/* [in] Device duration in sec. */
 	int Duration,
 	/* [in] Device address family. */
-	int AddressFamily);
+	int AddressFamily,
+	/* [in] PowerState as defined by UPnP Low Power. */
+	int PowerState,
+	/* [in] SleepPeriod as defined by UPnP Low Power. */
+	int SleepPeriod,
+	/* [in] RegistrationState as defined by UPnP Low Power. */
+	int RegistrationState);
 
 /* @} SSDP Device Functions */
 
