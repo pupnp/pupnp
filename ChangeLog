@@ -255,6 +255,13 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-01-04 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Bug fix for IPv4-mapped IPv6 addresses.
+
+	Setting IPv6 sockets with IPV6_V6ONLY flag to avoid getting IP packets
+	with IPv4-mapped IPv6 addresses on IPv6 sockets.
+
 
 *******************************************************************************
 Version 1.6.15
@@ -268,12 +275,12 @@ Version 1.6.15
 	site-scope address (FF05::C) instead of only sending M-SEARCH on
 	link-scope (FF02::C).
 
-2012-01-04 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+2012-01-11 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
-	Bug fix for IPv4-mapped IPv6 addresses.
+	Retrieve IPv6 addresses in Upnp_Discovery.
 
-	Setting IPv6 sockets with IPV6_V6ONLY flag to avoid getting IP packets
-	with IPv4-mapped IPv6 addresses on IPv6 sockets.
+	Changing sockaddr_in into sockaddr_storage in Upnp_Discovery to be able
+	to retrieve IPv6 addresses of devices in Control Points using pupnp.
 
 2012-01-09 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
