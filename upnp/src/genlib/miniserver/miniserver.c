@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation
  * All rights reserved.
+ * Copyright (C) 2012 France Telecom All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -512,6 +513,7 @@ static int get_miniserver_sockets(
 	struct sockaddr_in6* serverAddr6 = (struct sockaddr_in6*)&__ss_v6;
 	SOCKET listenfd6;
 	uint16_t actual_port6;
+	int onOff;
 #endif
 	int ret_code;
 	int reuseaddr_on = 0;
@@ -527,7 +529,16 @@ static int get_miniserver_sockets(
 #ifdef UPNP_ENABLE_IPV6
 	listenfd6 = socket(AF_INET6, SOCK_STREAM, 0);
 	if (listenfd6 == INVALID_SOCKET) {
+		sock_close(listenfd4);
 		return UPNP_E_OUTOF_SOCKET;
+	}
+	onOff = 1;
+	sockError = setsockopt(listenfd6, IPPROTO_IPV6, IPV6_V6ONLY,
+			 (char *)&onOff, sizeof(onOff));
+	if (sockError == SOCKET_ERROR) {
+		sock_close(listenfd4);
+		sock_close(listenfd6);
+		return UPNP_E_SOCKET_BIND;
 	}
 #endif
 	/* As per the IANA specifications for the use of ports by applications

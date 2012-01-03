@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
- * Copyright (C) 2011 France Telecom All rights reserved. 
+ * Copyright (C) 2011-2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -948,6 +948,19 @@ static int create_ssdp_sock_v6(
 		return UPNP_E_SOCKET_ERROR;
 	}
 #endif /* BSD, __OSX__, __APPLE__ */
+	onOff = 1;
+	ret = setsockopt(*ssdpSock, IPPROTO_IPV6, IPV6_V6ONLY,
+			 (char *)&onOff, sizeof(onOff));
+	if (ret == -1) {
+		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+			   "Error in setsockopt() IPV6_V6ONLY: %s\n",
+			   errorBuffer);
+		shutdown(*ssdpSock, SD_BOTH);
+		UpnpCloseSocket(*ssdpSock);
+
+		return UPNP_E_SOCKET_ERROR;
+	}
 	memset(&__ss, 0, sizeof(__ss));
 	ssdpAddr6->sin6_family = AF_INET6;
 	ssdpAddr6->sin6_addr = in6addr_any;
@@ -1049,6 +1062,19 @@ static int create_ssdp_sock_v6_ula_gua(
 		return UPNP_E_SOCKET_ERROR;
 	}
 #endif /* BSD, __OSX__, __APPLE__ */
+	onOff = 1;
+	ret = setsockopt(*ssdpSock, IPPROTO_IPV6, IPV6_V6ONLY,
+			(char *)&onOff, sizeof(onOff));
+	if (ret == -1) {
+		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+			   "Error in setsockopt() IPV6_V6ONLY: %s\n",
+			   errorBuffer);
+		shutdown(*ssdpSock, SD_BOTH);
+		UpnpCloseSocket(*ssdpSock);
+
+		return UPNP_E_SOCKET_ERROR;
+	}
 	memset(&__ss, 0, sizeof(__ss));
 	ssdpAddr6->sin6_family = AF_INET6;
 	ssdpAddr6->sin6_addr = in6addr_any;
