@@ -2,6 +2,19 @@
 Version 1.6.15
 *******************************************************************************
 
+2012-01-09 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	SF Bug tracker, ID: 3469344
+	Submitted: dimmman ( dimmman ) - 2012-01-04 01:44:29 PST
+	Details: Looking at the code (v1.6.14, upnptools.c) for UpnpResolveURL
+	and UpnpResolveURL2 it shows that the ExitFunction: always returns
+	UPNP_E_SUCCESS.
+
+	I'm farily sure it's a simple mistake that should have been "return ret;"
+	in both cases.
+
+	Br,
+	Jonny
 
 *******************************************************************************
 Version 1.6.14
