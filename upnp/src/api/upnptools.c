@@ -157,7 +157,7 @@ int UpnpResolveURL(
 		ret = UPNP_E_INVALID_URL;
 
 ExitFunction:
-	return UPNP_E_SUCCESS;
+	return ret;
 }
 
 
@@ -177,7 +177,7 @@ int UpnpResolveURL2(
 		ret = UPNP_E_INVALID_URL;
 
 ExitFunction:
-	return UPNP_E_SUCCESS;
+	return ret;
 }
 
 
