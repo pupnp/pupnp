@@ -2,6 +2,13 @@
 Version 1.6.15
 *******************************************************************************
 
+2012-01-11 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Retrieve IPv6 addresses in Upnp_Discovery.
+
+	Changing sockaddr_in into sockaddr_storage in Upnp_Discovery to be able
+	to retrieve IPv6 addresses of devices in Control Points using pupnp.
+
 2012-01-04 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Bug fix for IPv4-mapped IPv6 addresses.

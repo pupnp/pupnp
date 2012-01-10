@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (C) 2012 France Telecom All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -128,7 +129,7 @@ void ssdp_handle_ctrlpt_msg(http_message_t *hmsg, struct sockaddr_storage *dest_
 		linecopylen(param.Date, hdr_value.buf, hdr_value.length);
 	}
 	/* dest addr */
-	memcpy(&param.DestAddr, dest_addr, sizeof(struct sockaddr_in));
+	memcpy(&param.DestAddr, dest_addr, sizeof(struct sockaddr_storage));
 	/* EXT */
 	param.Ext[0] = '\0';
 	if (httpmsg_find_hdr(hmsg, HDR_EXT, &hdr_value) != NULL) {
