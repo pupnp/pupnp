@@ -528,10 +528,13 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 		int NumCopy = 0;
 
 		while (NumCopy < NUM_SSDP_COPY) {
+			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+				   ">>> SSDP SEND M-SEARCH >>>\n%s\n",
+				   ReqBufv6UlaGua);
 			sendto(gSsdpReqSocket6,
 			       ReqBufv6UlaGua, strlen(ReqBufv6UlaGua), 0,
 			       (struct sockaddr *)&__ss_v6,
-			       sizeof(struct sockaddr_in));
+			       sizeof(struct sockaddr_in6));
 			NumCopy++;
 			imillisleep(SSDP_PAUSE);
 		}

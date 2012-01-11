@@ -4,6 +4,14 @@ Version 1.6.15
 
 2012-01-11 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Bug fix on M-SEARCH for IPv6 CPs.
+
+	Small bug fix on IPv6 Control Point: now CP will also send M-SEARCH on
+	site-scope address (FF05::C) instead of only sending M-SEARCH on
+	link-scope (FF02::C).
+
+2012-01-11 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Retrieve IPv6 addresses in Upnp_Discovery.
 
 	Changing sockaddr_in into sockaddr_storage in Upnp_Discovery to be able
