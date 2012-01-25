@@ -273,6 +273,17 @@ dnl ############################################################################
 dnl # Release 1.6.15:
 dnl # "current:revision:age"
 dnl #
+dnl # - Code has changed in upnp
+dnl #	revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [8:1:2])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.16:
+dnl # "current:revision:age"
+dnl #
 dnl # - 
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [::])
