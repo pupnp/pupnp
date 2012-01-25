@@ -105,7 +105,7 @@
 #define PACKAGE_NAME "libupnp"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libupnp 1.6.15"
+#define PACKAGE_STRING "libupnp 1.6.16"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libupnp"
@@ -114,7 +114,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.6.15"
+#define PACKAGE_VERSION "1.6.16"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -157,13 +157,13 @@
 #define UPNP_VERSION_MINOR 6
 
 /* see upnpconfig.h */
-#define UPNP_VERSION_PATCH 15
+#define UPNP_VERSION_PATCH 16
 
 /* see upnpconfig.h */
-#define UPNP_VERSION_STRING "1.6.15"
+#define UPNP_VERSION_STRING "1.6.16"
 
 /* Version number of package */
-#define VERSION "1.6.15"
+#define VERSION "1.6.16"
 
 /* File Offset size */
 #define _FILE_OFFSET_BITS 64
