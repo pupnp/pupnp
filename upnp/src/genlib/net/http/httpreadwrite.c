@@ -641,11 +641,13 @@ int http_Download( IN const char *url_str,
 		return UPNP_E_INVALID_URL;
 	hoststr += 2;
 	temp = strchr(hoststr, '/');
-	if (temp == NULL)
-		return UPNP_E_INVALID_URL;
-	*temp = '\0';
-	hostlen = strlen(hoststr);
-	*temp = '/';
+	if (temp) {
+		*temp = '\0';
+		hostlen = strlen(hoststr);
+		*temp = '/';
+	} else {
+		hostlen = strlen(hoststr);
+	}
 	UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
 		   "HOSTNAME : %s Length : %" PRIzu "\n", hoststr, hostlen);
 	ret_code = http_MakeMessage(&request, 1, 1,

@@ -255,6 +255,12 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-02-07 Edwin Stearns <edwin(at)vtilt.com>
+
+	Attached is a patch that resolved an issue I found with a server that
+	gave its device description URI without a trailing slash (e.g.
+	`http://127.0.0.1:5555`).
+
 2012-01-04 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Bug fix for IPv4-mapped IPv6 addresses.
