@@ -516,9 +516,9 @@ int genaSubscribe(
 	HandleReadLock();
 	/* validate handle */
 	if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
-		HandleUnlock();
-
-		return GENA_E_BAD_HANDLE;
+		return_code = GENA_E_BAD_HANDLE;
+		SubscribeLock();
+		goto error_handler;
 	}
 	HandleUnlock();
 
