@@ -1309,12 +1309,12 @@ parser_parse_requestline( INOUT http_parser_t * parser )
     num_scanned = sscanf( version_str.buf, "%d . %d",
                           &hmsg->major_version, &hmsg->minor_version );
     version_str.buf[version_str.length] = save_char;    /* restore */
-    if( num_scanned != 2 ||
+    if (num_scanned != 2 ||
         /* HTTP version equals to 1.0 should fail for MSEARCH as required by the
          * UPnP certification tool */
-        hmsg->major_version < 0 || (    ( hmsg->major_version == 1 )
-                                     && ( hmsg->minor_version < 1 )
-                                     && ( Http_Method_Table[index].id == HTTPMETHOD_MSEARCH ) ) ) {
+        hmsg->major_version < 0 ||
+	( hmsg->major_version == 1 && hmsg->minor_version < 1 &&
+	  Http_Method_Table[index].id == HTTPMETHOD_MSEARCH )) {
         parser->http_error_code = HTTP_HTTP_VERSION_NOT_SUPPORTED;
         /* error; bad http version */
         return PARSE_FAILURE;
