@@ -1378,10 +1378,9 @@ parse_status_t parser_parse_responseline(INOUT http_parser_t *parser)
 			     &hmsg->major_version, &hmsg->minor_version,
 			     &hmsg->status_code);
 	line.buf[line.length] = save_char;	/* restore */
-	if (num_scanned != 3 || hmsg->major_version < 0 ||
-	    /* HTTP version equals to 1.0 should fail as required by the
-	     * UPnP certification tool */
-	    hmsg->minor_version < 1 || hmsg->status_code < 0)
+	if (num_scanned != 3 ||
+	    hmsg->major_version < 0 || hmsg->minor_version < 0 ||
+	    hmsg->status_code < 0)
 		/* bad response line */
 		return PARSE_FAILURE;
 	/* point to status msg */
