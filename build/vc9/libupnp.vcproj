@@ -765,14 +765,6 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\..\upnp\src\api\ActionComplete.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\src\api\ActionRequest.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ixml\src\attr.c"
 				>
 			</File>
@@ -781,31 +773,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\upnp\src\genlib\client_table\ClientSubscription.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\src\api\Discovery.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ixml\src\document.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ixml\src\element.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\src\api\Event.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\src\api\EventSubscribe.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\src\api\FileInfo.c"
 				>
 			</File>
 			<File
@@ -905,10 +877,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\upnp\src\ssdp\ssdp_ResultData.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\upnp\src\ssdp\ssdp_server.c"
 				>
 			</File>
@@ -917,19 +885,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\upnp\src\api\StateVarComplete.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\src\api\StateVarRequest.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\upnp\src\genlib\util\strintmap.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\src\api\SubscriptionRequest.c"
 				>
 			</File>
 			<File
@@ -994,14 +950,6 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\..\upnp\inc\ActionComplete.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\inc\ActionRequest.h"
-				>
-			</File>
-			<File
 				RelativePath="..\inc\autoconfig.h"
 				>
 			</File>
@@ -1015,22 +963,6 @@
 			</File>
 			<File
 				RelativePath="..\..\upnp\src\inc\config.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\inc\Discovery.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\inc\Event.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\inc\EventSubscribe.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\inc\FileInfo.h"
 				>
 			</File>
 			<File
@@ -1114,14 +1046,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\upnp\inc\StateVarComplete.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\inc\StateVarRequest.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\upnp\src\inc\statuscodes.h"
 				>
 			</File>
@@ -1131,10 +1055,6 @@
 			</File>
 			<File
 				RelativePath="..\..\upnp\src\inc\strintmap.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\upnp\inc\SubscriptionRequest.h"
 				>
 			</File>
 			<File
