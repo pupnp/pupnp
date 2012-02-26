@@ -40,8 +40,12 @@
  * \file
  */
 
+#include "upnpconfig.h"
 #include "UpnpInet.h"		/* for SOCKET, netinet/in */
 #include "UpnpGlobal.h"		/* for UPNP_INLINE */
+#ifdef UPNP_ENABLE_OPEN_SSL
+#include <openssl/ssl.h>
+#endif
 
 /* The following are not defined under winsock.h */
 #ifndef SD_RECEIVE
@@ -57,6 +61,9 @@ typedef struct
 	SOCKET socket;
 	/*! The following two fields are filled only in incoming requests. */
 	struct sockaddr_storage foreign_sockaddr;
+#ifdef UPNP_ENABLE_OPEN_SSL
+	SSL *ssl;
+#endif
 } SOCKINFO;
 
 #ifdef __cplusplus
@@ -111,6 +118,20 @@ int sock_init_with_ip(
 	SOCKET sockfd, 
 	/*! [in] Remote socket address. */
         struct sockaddr *foreign_sockaddr);
+
+/*!
+ * \brief Associates an SSL object with the socket and begins
+ * the client-side SSL/TLS handshake.
+ *
+ * \return Integer:
+ * \li \c UPNP_E_SUCCESS
+ * \li \c UPNP_E_SOCKET_ERROR
+ */
+#ifdef UPNP_ENABLE_OPEN_SSL
+int sock_ssl_connect(
+	/*! [out] Socket Information Object. */
+	SOCKINFO* info);
+#endif
 
 /*!
  * \brief Shutsdown the socket using the ShutdownMethod to indicate whether

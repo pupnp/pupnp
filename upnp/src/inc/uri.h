@@ -288,6 +288,8 @@ int parse_hostport(
 	const char *in,
 	/*! [in] Sets a maximum limit. */
 	size_t max,
+    /*! [in] The default port if the port is not specified. */
+    int defaultPort,
 	/*! [out] Output parameter where the host and port are represented as
 	 * an internet address. */
 	hostport_type *out);

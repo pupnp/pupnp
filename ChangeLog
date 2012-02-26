@@ -2,6 +2,50 @@
 Version 1.8.0
 *******************************************************************************
 
+2011-02-07 Chandra Penke <chandrapenke(at)mcntech.com>
+
+	Add HTTPS support using OpenSSL. HTTPS support is optional and can
+	be enabled by passing the --enable-open-ssl argument to the
+	configure script.
+
+	The following methods are introduced to the public API:
+	UpnpInitOpenSslContext
+
+	When enabled, HTTPS can be used by using "https://" instead of
+	"http://" when passing URLs to the HTTP Client API.
+
+2011-02-07 Chandra Penke <chandrapenke(at)mcntech.com>
+
+	Refactor HTTP Client API to be more generic.
+
+	The following features are added:
+
+	- Support for persistent HTTP connections (reusing HTTP
+	  connections). Tthis is still a work in progress and relies on
+	  applications to interpret the 'Connection' header
+	  appropriately.
+
+	- Support for specifying request headers when making
+	  requests. Useful for interacting with web services that require
+	  custom headers.
+
+	- Support for retrieving response headers (this is a API only
+	  change, some more work needs to be done to implement the actual
+	  functionality. Specifically copy_msg_headers in httpreadwrite.c
+	  needs to be implemented)
+
+	- Common API for all HTTP methods.
+
+	- Support for PUT, and DELETE methods.
+
+	The following methods are introduced to the public HTTP Client API
+
+	UpnpOpenHttpConnection, UpnpCloseHttpConnection, UpnpMakeHttpRequest,
+	UpnpWriteHttpRequest, UpnpEndHttpRequest, UpnpGetHttpResponse,
+	UpnpReadHttpResponse.
+
+	Removed a lot of duplicate code in httpreadwrite.c
+
 2011-01-17 Chandra Penke <chandrapenke(at)mcntech.com>
 
 	Include upnpconfig.h in FileInfo.h to automatically include large

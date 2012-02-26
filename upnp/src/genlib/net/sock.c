@@ -52,8 +52,17 @@
 #include <time.h>
 #include <string.h>
 
+#ifdef UPNP_ENABLE_OPEN_SSL
+#include <openssl/ssl.h>
+#endif
+
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0
+#endif
+
+#ifdef UPNP_ENABLE_OPEN_SSL
+/* OpenSSL context defined in upnpapi.c */
+extern SSL_CTX *gSslCtx;
 #endif
 
 int sock_init(SOCKINFO *info, SOCKET sockfd)
@@ -82,11 +91,37 @@ int sock_init_with_ip(SOCKINFO *info, SOCKET sockfd,
 	return UPNP_E_SUCCESS;
 }
 
+#ifdef UPNP_ENABLE_OPEN_SSL
+int sock_ssl_connect(SOCKINFO *info)
+{
+	int status = 0;
+	info->ssl = SSL_new(gSslCtx);
+	if (!info->ssl) {
+		return UPNP_E_SOCKET_ERROR;
+	}
+	status = SSL_set_fd(info->ssl, info->socket);
+	if (status == 1) {
+		status = SSL_connect(info->ssl);
+	}
+	if (status == 1) {
+		return UPNP_E_SUCCESS;
+	}
+	return UPNP_E_SOCKET_ERROR;
+}
+#endif
+
 int sock_destroy(SOCKINFO *info, int ShutdownMethod)
 {
 	int ret = UPNP_E_SUCCESS;
 
 	if (info->socket != INVALID_SOCKET) {
+#ifdef UPNP_ENABLE_OPEN_SSL
+        if (info->ssl) {
+            SSL_shutdown(info->ssl);
+            SSL_free(info->ssl);
+            info->ssl = NULL;
+        }
+#endif
 		shutdown(info->socket, ShutdownMethod);
 		if (sock_close(info->socket) == -1) {
 			ret = UPNP_E_SOCKET_ERROR;
@@ -163,16 +198,36 @@ static int sock_read_write(
 		setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof(set));
 #endif
 		if (bRead) {
+#ifdef UPNP_ENABLE_OPEN_SSL
+            if (info->ssl) {
+                numBytes = (long)SSL_read(info->ssl,
+                                          buffer, (size_t)bufsize);
+            }
+            else {
+#endif
 			/* read data. */
 			numBytes = (long)recv(sockfd, buffer, (size_t)bufsize, MSG_NOSIGNAL);
+#ifdef UPNP_ENABLE_OPEN_SSL
+            }
+#endif
 		} else {
 			byte_left = bufsize;
 			bytes_sent = 0;
 			while (byte_left > 0) {
+#ifdef UPNP_ENABLE_OPEN_SSL
+                if (info->ssl) {
+                    num_written = SSL_write(info->ssl,
+                                            buffer + bytes_sent, (size_t)byte_left);
+                }
+                else {
+#endif
 				/* write data. */
 				num_written = send(sockfd,
 					buffer + bytes_sent, (size_t)byte_left,
 					MSG_DONTROUTE | MSG_NOSIGNAL);
+#ifdef UPNP_ENABLE_OPEN_SSL
+                }
+#endif
 				if (num_written == -1) {
 #ifdef SO_NOSIGPIPE
 					setsockopt(sockfd, SOL_SOCKET,
