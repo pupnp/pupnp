@@ -563,11 +563,9 @@ int genaSubscribe(
 	return_code = ScheduleGenaAutoRenew(client_handle, *TimeOut, newSubscription);
 
 error_handler:
-	if (return_code != UPNP_E_SUCCESS) {
-		UpnpString_delete(ActualSID);
-		UpnpString_delete(EventURL);
-		GenlibClientSubscription_delete(newSubscription);
-	}
+	UpnpString_delete(ActualSID);
+	UpnpString_delete(EventURL);
+	GenlibClientSubscription_delete(newSubscription);
 	HandleUnlock();
 	SubscribeUnlock();
 
