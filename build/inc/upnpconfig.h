@@ -108,5 +108,9 @@
  *  (i.e. configure --enable-ipv6) */
 /* #undef UPNP_ENABLE_IPV6 */
 
+/** Defined to 1 if the library has been compiled with OpenSSL support
+ *  (i.e. configure --enable-open_ssl) */
+/* #undef UPNP_ENABLE_OPEN_SSL */
+
 #endif /* UPNP_CONFIG_H */
 

@@ -133,6 +133,9 @@
 #define UPNP_ENABLE_NOTIFICATION_REORDERING 1
 
 /* see upnpconfig.h */
+/* #undef UPNP_ENABLE_OPEN_SSL */
+
+/* see upnpconfig.h */
 #define UPNP_HAVE_CLIENT 1
 
 /* see upnpconfig.h */
