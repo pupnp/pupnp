@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -1305,6 +1306,16 @@ parser_parse_requestline( INOUT http_parser_t * parser )
         HTTP_SUCCESS ) {
         return PARSE_FAILURE;
     }
+
+    index =
+        map_str_to_int( method_str.buf, method_str.length,
+                        Http_Method_Table, NUM_HTTP_METHODS, TRUE );
+    if( index < 0 ) {
+        /* error; method not found */
+        parser->http_error_code = HTTP_NOT_IMPLEMENTED;
+        return PARSE_FAILURE;
+    }
+
     /* scan version */
     save_char = version_str.buf[version_str.length];
     version_str.buf[version_str.length] = '\0'; /* null-terminate */
@@ -1319,15 +1330,6 @@ parser_parse_requestline( INOUT http_parser_t * parser )
 	  Http_Method_Table[index].id == HTTPMETHOD_MSEARCH )) {
         parser->http_error_code = HTTP_HTTP_VERSION_NOT_SUPPORTED;
         /* error; bad http version */
-        return PARSE_FAILURE;
-    }
-
-    index =
-        map_str_to_int( method_str.buf, method_str.length,
-                        Http_Method_Table, NUM_HTTP_METHODS, TRUE );
-    if( index < 0 ) {
-        /* error; method not found */
-        parser->http_error_code = HTTP_NOT_IMPLEMENTED;
         return PARSE_FAILURE;
     }
 
