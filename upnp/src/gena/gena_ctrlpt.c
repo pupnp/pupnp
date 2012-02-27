@@ -565,7 +565,8 @@ int genaSubscribe(
 error_handler:
 	UpnpString_delete(ActualSID);
 	UpnpString_delete(EventURL);
-	GenlibClientSubscription_delete(newSubscription);
+	if (return_code != UPNP_E_SUCCESS)
+		GenlibClientSubscription_delete(newSubscription);
 	HandleUnlock();
 	SubscribeUnlock();
 

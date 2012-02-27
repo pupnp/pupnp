@@ -299,6 +299,18 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-02-24 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	SF Bug Tracker id 3489999 - UpnpString leaks in genaSubscribe()
+
+	Submitted: Yoichi NAKAYAMA ( yoichi ) - 2012-02-21 07:06:35 PST
+
+	In genaSubscribe() (defined in upnp/src/gena/gena_ctrlpt.c),
+	ActualSID and EventURL will not be freed if ScheduleGenaAutoRenew
+	returns UPNP_E_SUCCESS.
+
+	This fixes the an issue introduced by the previous fix.
+
 2012-02-23 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	SF Bug Tracker id 3489999 - UpnpString leaks in genaSubscribe()
