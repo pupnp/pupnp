@@ -2,6 +2,15 @@
 Version 1.6.16
 *******************************************************************************
 
+2012-02-27 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	SF Bug Tracker id 3494865 - Use of non-initialized variable in parser_parse_requestline
+
+	Submitted: Marcelo Roberto Jimenez ( mroberto ) - 2012-02-26 16:50:23 PST
+
+	src/genlib/net/http/httpparser.c: In function ‘parser_parse_requestline’:
+	src/genlib/net/http/httpparser.c:1319:28: warning: ‘index’ may be used uninitialized in this function
+
 2012-02-24 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	SF Bug Tracker id 3489999 - UpnpString leaks in genaSubscribe()
