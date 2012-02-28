@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -143,6 +144,7 @@ int ixmlDocument_createElementEx(
 	newElement->n.nodeType = eELEMENT_NODE;
 	newElement->n.nodeName = strdup(tagName);
 	if (newElement->n.nodeName == NULL) {
+		free(newElement->tagName);
 		ixmlElement_free(newElement);
 		newElement = NULL;
 		errCode = IXML_INSUFFICIENT_MEMORY;

@@ -299,6 +299,16 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-02-28 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	SF Bug Tracker id 3495280 - Memory leak in ixmlDocument_createElementEx
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-02-28 04:01:02 PST
+
+	There is a memory leak in ixmlDocument_createElementEx:
+	newElement->tagName is not freed if
+	newElement->n.nodeName = strdup(tagName); returns NULL.
+
 2012-02-27 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	SF Bug Tracker id 3494865 - Use of non-initialized variable in parser_parse_requestline
