@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -322,7 +323,6 @@ static UPNP_INLINE int get_action_node(
 			goto error_handler;
 		ret_code = ixmlParseBufferEx(ActNodeName, RespNode);
 		if (ret_code != IXML_SUCCESS) {
-			ixmlFreeDOMString(ActNodeName);
 			ret_code = -1;
 			goto error_handler;
 		}
