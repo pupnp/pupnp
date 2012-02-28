@@ -301,6 +301,15 @@ Version 1.6.16
 
 2012-02-28 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3495286 - Double free in get_action_node
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-02-28 04:27:54 PST
+
+	ixmlFreeDOMString(ActNodeName); is called twice if
+	ixmlParseBufferEx(ActNodeName, RespNode); does not return IXML_SUCCESS.
+
+2012-02-28 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3495280 - Memory leak in ixmlDocument_createElementEx
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-02-28 04:01:02 PST
