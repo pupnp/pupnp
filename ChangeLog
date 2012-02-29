@@ -299,6 +299,16 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-02-29 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	SF Bug Tracker id 3495616 - Memory leak in ixmlElement_setAttributeNS
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-02-29 02:09:43 PST
+
+	newAttrNode is not freed if newAttr->n.nodeValue = strdup(value); returns
+	NULL or if ixmlElement_setAttributeNodeNS(element, newAttr, NULL) does
+	not return IXML_SUCCESS.
+
 2012-02-28 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	SF Bug Tracker id 3495286 - Double free in get_action_node
