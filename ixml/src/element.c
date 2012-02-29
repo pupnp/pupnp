@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -492,15 +493,18 @@ int ixmlElement_setAttributeNS(
 			qualifiedName,
 			&newAttr);
 		if (rc != IXML_SUCCESS) {
+			Parser_freeNodeContent(&newAttrNode);
 			return rc;
 		}
 		newAttr->n.nodeValue = strdup(value);
 		if (newAttr->n.nodeValue == NULL) {
 			ixmlAttr_free(newAttr);
+			Parser_freeNodeContent(&newAttrNode);
 			return IXML_INSUFFICIENT_MEMORY;
 		}
 		if (ixmlElement_setAttributeNodeNS(element, newAttr, NULL) != IXML_SUCCESS) {
 			ixmlAttr_free(newAttr);
+			Parser_freeNodeContent(&newAttrNode);
 			return IXML_FAILED;
 		}
 	}
