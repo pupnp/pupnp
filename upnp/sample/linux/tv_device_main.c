@@ -46,7 +46,11 @@ int main(int argc, char *argv[])
 #endif
 	int code;
 
-	device_main(argc, argv);
+	rc = device_main(argc, argv);
+	if (rc != UPNP_E_SUCCESS) {
+		return rc;
+	}
+
 	/* start a command loop thread */
 	code = ithread_create(&cmdloop_thread, NULL, TvDeviceCommandLoop, NULL);
 #ifdef WIN32

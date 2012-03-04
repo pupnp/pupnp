@@ -4,6 +4,15 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Submitted: Yoichi NAKAYAMA ( yoichi ) - 2012-03-03 20:35:08 PST 
+
+	SF Bug Tracker id 3496702 - TvDeviceStop is called even if Start failed
+
+	In sample tvdevice, error of device_main() is not handled, and
+	TvDeviceStop() cause crash.
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3496942 - Memory leak in config_description_doc
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 01:55:54 PST
