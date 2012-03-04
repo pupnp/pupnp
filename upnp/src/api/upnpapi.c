@@ -884,6 +884,7 @@ int UpnpRegisterRootDevice(
 	 */
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"UpnpRegisterRootDevice: Gena Check\n");
+	memset(&HInfo->ServiceTable, 0, sizeof(HInfo->ServiceTable));
 	hasServiceTable = getServiceTable(
 		(IXML_Node *)HInfo->DescDocument,
 		&HInfo->ServiceTable,

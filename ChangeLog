@@ -301,9 +301,19 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
-	Submitted: Yoichi NAKAYAMA ( yoichi ) - 2012-03-03 20:35:08 PST 
+	SF Bug Tracker id 3496703 - Handle_Info::ServiceList may have undefined value
+
+	Submitted: Yoichi NAKAYAMA ( yoichi ) - 2012-03-03 20:49:25 PST
+
+	In UpnpRegisterRootDevice(), HInfo->ServiceTable is not initialized and
+	getServiceTable() may leave it intact. It will cause crash on
+	freeServiceTable() called from UpnpUnRegisterRootDevice().
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	SF Bug Tracker id 3496702 - TvDeviceStop is called even if Start failed
+
+	Submitted: Yoichi NAKAYAMA ( yoichi ) - 2012-03-03 20:35:08 PST
 
 	In sample tvdevice, error of device_main() is not handled, and
 	TvDeviceStop() cause crash.
