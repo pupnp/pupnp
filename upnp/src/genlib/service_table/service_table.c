@@ -914,7 +914,6 @@ removeServiceTable( IXML_Node * node,
     IXML_Node *currentUDN = NULL;
     DOMString UDN = NULL;
     IXML_NodeList *deviceList = NULL;
-    IXML_Node *currentDevice = NULL;
     service_info *current_service = NULL;
     service_info *start_search = NULL;
     service_info *prev_service = NULL;
@@ -930,7 +929,6 @@ removeServiceTable( IXML_Node * node,
         if( deviceList != NULL ) {
             NumOfDevices = ixmlNodeList_length( deviceList );
             for( i = 0; i < NumOfDevices; i++ ) {
-                currentDevice = ixmlNodeList_item( deviceList, i );
                 if( ( start_search )
                     && ( ( getSubElement( "UDN", node, &currentUDN ) )
                          && ( UDN = getElementValue( currentUDN ) ) ) ) {
