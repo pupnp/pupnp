@@ -4,6 +4,16 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3497159 - Bug fix in Parser_readFileOrBuffer
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 14:20:58 PST
+
+	fileSize = ftell( xmlFilePtr ); can return a negative value, in this
+	 case the function should exit (at the moment, the function exits only
+	if ftell returns 0).
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3497140 - Bug fix in http_get_code_text
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 13:07:03 PST
