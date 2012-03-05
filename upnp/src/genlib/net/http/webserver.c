@@ -1315,7 +1315,7 @@ static int http_RecvPostMessage(
 	int ok_on_close = FALSE;
 	size_t entity_offset = 0;
 	int num_read = 0;
-	int ret_code = 0;
+	int ret_code = HTTP_OK;
 
 	if (Instr && Instr->IsVirtualFile) {
 		Fp = (virtualDirCallback.open) (filename, UPNP_WRITE);
@@ -1338,8 +1338,8 @@ static int http_RecvPostMessage(
 			   && (status != PARSE_CONTINUE_1)
 			   && (status != PARSE_INCOMPLETE)) {
 			/* error */
-			fclose(Fp);
-			return HTTP_BAD_REQUEST;
+			ret_code = HTTP_BAD_REQUEST;
+			goto ExitFunction;
 		}
 		/* read more if necessary entity */
 		while (entity_offset + Data_Buf_Size > parser->msg.entity.length &&
@@ -1347,13 +1347,13 @@ static int http_RecvPostMessage(
 			num_read = sock_read(info, Buf, sizeof(Buf), &Timeout);
 			if (num_read > 0) {
 				/* append data to buffer */
-				ret_code = membuffer_append(&parser->msg.msg,
-					Buf, (size_t)num_read);
-				if (ret_code != 0) {
+				if (membuffer_append(&parser->msg.msg,
+					Buf, (size_t)num_read) != 0) {
 					/* set failure status */
 					parser->http_error_code =
 					    HTTP_INTERNAL_SERVER_ERROR;
-					return HTTP_INTERNAL_SERVER_ERROR;
+					ret_code = HTTP_INTERNAL_SERVER_ERROR;
+					goto ExitFunction;
 				}
 				status = parser_parse_entity(parser);
 				if (status == PARSE_INCOMPLETE_ENTITY) {
@@ -1362,7 +1362,8 @@ static int http_RecvPostMessage(
 				} else if ((status != PARSE_SUCCESS)
 					   && (status != PARSE_CONTINUE_1)
 					   && (status != PARSE_INCOMPLETE)) {
-					return HTTP_BAD_REQUEST;
+					ret_code = HTTP_BAD_REQUEST;
+					goto ExitFunction;
 				}
 			} else if (num_read == 0) {
 				if (ok_on_close) {
@@ -1374,10 +1375,12 @@ static int http_RecvPostMessage(
 				} else {
 					/* partial msg or response */
 					parser->http_error_code = HTTP_BAD_REQUEST;
-					return HTTP_BAD_REQUEST;
+					ret_code = HTTP_BAD_REQUEST;
+					goto ExitFunction;
 				}
 			} else {
-				return num_read;
+				ret_code = num_read;
+				goto ExitFunction;
 			}
 		}
 		if ((entity_offset + Data_Buf_Size) > parser->msg.entity.length) {
@@ -1391,25 +1394,26 @@ static int http_RecvPostMessage(
 		if (Instr->IsVirtualFile) {
 			int n = virtualDirCallback.write(Fp, Buf, Data_Buf_Size);
 			if (n < 0) {
-				virtualDirCallback.close(Fp);
-				return HTTP_INTERNAL_SERVER_ERROR;
+				ret_code = HTTP_INTERNAL_SERVER_ERROR;
+				goto ExitFunction;
 			}
 		} else {
 			size_t n = fwrite(Buf, 1, Data_Buf_Size, Fp);
 			if (n != Data_Buf_Size) {
-				fclose(Fp);
-				return HTTP_INTERNAL_SERVER_ERROR;
+				ret_code = HTTP_INTERNAL_SERVER_ERROR;
+				goto ExitFunction;
 			}
 		}
 	} while (parser->position != POS_COMPLETE ||
 		 entity_offset != parser->msg.entity.length);
-	if (Instr->IsVirtualFile) {
+ExitFunction:
+	if (Instr && Instr->IsVirtualFile) {
 		virtualDirCallback.close(Fp);
 	} else {
 		fclose(Fp);
 	}
 
-	return HTTP_OK;
+	return ret_code;
 }
 
 void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
