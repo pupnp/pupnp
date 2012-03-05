@@ -329,7 +329,7 @@ int parse_hostport(
 	int ret;
 
 	memset(out, 0, sizeof(hostport_type));
-	memset(workbuf, 0, sizeof(workbuf);
+	memset(workbuf, 0, sizeof(workbuf));
 	/* Work on a copy of the input string. */
 	strncpy(workbuf, in, sizeof(workbuf) - 1);
 	c = workbuf;
