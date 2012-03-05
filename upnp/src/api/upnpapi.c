@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
- * Copyright (C) 2011 France Telecom All rights reserved. 
+ * Copyright (C) 2011-2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -3390,6 +3390,7 @@ int UpnpGetIfInfo(const char *IfName)
 	if (ioctl(LocalSock, SIOCGIFCONF, &ifConf) < 0) {
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 			   "DiscoverInterfaces: SIOCGIFCONF returned error\n");
+		close(LocalSock);
 		return UPNP_E_INIT;
 	}
 	/* Cycle through the list of interfaces looking for IP addresses.  */
@@ -3810,7 +3811,7 @@ int getlocalhostname(char *out, size_t out_len)
 	if (nResult < 0) {
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 			"DiscoverInterfaces: SIOCGIFCONF returned error\n");
-
+		close(LocalSock);
 		return UPNP_E_INIT;
 	}
 

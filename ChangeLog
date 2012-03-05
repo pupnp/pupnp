@@ -301,6 +301,15 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3496934 - Memory leaks in getlocalhostname and UpnpGetIfInfo
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 01:25:42 PST
+
+	LocalSock is not closed if ioctl(LocalSock, SIOCGIFCONF, &ifConf);
+	returns an error.
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3496933 - Out-of-bounds access in CheckOtherHTTPHeaders
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 01:15:34 PST
