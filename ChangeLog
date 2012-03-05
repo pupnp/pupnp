@@ -4,6 +4,14 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3497027 - Buffer not null terminated in parse_hostport
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 06:28:38 PST
+
+	workbuf might be not null terminated.
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3497009 - Resource leak in http_SendMessage
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 05:51:44 PST
