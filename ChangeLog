@@ -4,6 +4,13 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	HInfo->ServiceTable initialization in UpnpRegisterRootDevice2 and UpnpRegisterRootDevice4
+
+	Initialize also HInfo->ServiceTable in UpnpRegisterRootDevice2 and
+	UpnpRegisterRootDevice4 functions
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3496703 - Handle_Info::ServiceList may have undefined value
 
 	Submitted: Yoichi NAKAYAMA ( yoichi ) - 2012-03-03 20:49:25 PST
