@@ -1612,6 +1612,8 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd, int Exp,
     upnp_timeout *adEvent;
     ThreadPoolJob job;
 
+    memset(&job, 0, sizeof(job));
+
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
     }
@@ -1832,6 +1834,8 @@ int UpnpSubscribeAsync(
     char *EvtUrl = ( char * )EvtUrl_const;
     ThreadPoolJob job;
 
+    memset(&job, 0, sizeof(job));
+
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
     }
@@ -2009,6 +2013,8 @@ int UpnpUnSubscribeAsync(
 	struct Handle_Info *SInfo = NULL;
 	struct UpnpNonblockParam *Param;
 
+	memset(&job, 0, sizeof(job));
+
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpUnSubscribeAsync\n");
 
 	if (UpnpSdkInit != 1) {
@@ -2120,6 +2126,8 @@ int UpnpRenewSubscriptionAsync(
     ThreadPoolJob job;
     struct Handle_Info *SInfo = NULL;
     struct UpnpNonblockParam *Param;
+
+    memset(&job, 0, sizeof(job));
 
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
@@ -2552,6 +2560,8 @@ int UpnpSendActionAsync(
     /* udn not used? */
     /*char *DevUDN = (char *)DevUDN_const;*/
 
+    memset(&job, 0, sizeof(job));
+
     if(UpnpSdkInit != 1) {
         return UPNP_E_FINISH;
     }
@@ -2636,6 +2646,8 @@ int UpnpSendActionExAsync(
     char *ServiceType = ( char * )ServiceType_const;
     ThreadPoolJob job;
     int retVal = 0;
+
+    memset(&job, 0, sizeof(job));
 
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
@@ -2738,6 +2750,8 @@ int UpnpGetServiceVarStatusAsync(
     struct UpnpNonblockParam *Param;
     char *ActionURL = (char *)ActionURL_const;
     char *VarName = (char *)VarName_const;
+
+    memset(&job, 0, sizeof(job));
 
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
@@ -3611,6 +3625,8 @@ int getlocalhostname(char *out, size_t out_len)
 	struct hostent *h = NULL;
 	struct sockaddr_in LocalAddr;
 
+	memset(&LocalAddr, 0, sizeof(LocalAddr));
+
 	gethostname(out, out_len);
 	h = gethostbyname(out);
 	if (h != NULL) {
@@ -3685,6 +3701,7 @@ int getlocalhostname(char *out, size_t out_len)
 	memset(&ifConf,  0, sizeof(ifConf));
 	memset(&ifReq,   0, sizeof(ifReq));
 	memset(szBuffer, 0, sizeof(szBuffer));
+	memset(&LocalAddr, 0, sizeof(LocalAddr));
 
 	/* Create an unbound datagram socket to do the SIOCGIFADDR ioctl on.  */
 	LocalSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);

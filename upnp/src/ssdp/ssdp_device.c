@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation
  * All rights reserved.
- * Copyright (C) 2011 France Telecom All rights reserved. 
+ * Copyright (C) 2011-2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -89,6 +89,8 @@ void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *d
 	ThreadPoolJob job;
 	int replyTime;
 	int maxAge;
+
+	memset(&job, 0, sizeof(job));
 
 	/* check man hdr. */
 	if (httpmsg_find_hdr(hmsg, HDR_MAN, &hdr_value) == NULL ||
