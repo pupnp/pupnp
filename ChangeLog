@@ -301,6 +301,27 @@ Version 1.6.16
 
 2012-03-05 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
+	SF Bug Tracker id 3325246 - Memory Leak in XML Parser
+
+	Submitted: Terry Farnham ( tfarnham ) - 2011-06-23 09:45:54 PDT
+
+	Details: The following bit of xml results in a memory leak from the xml
+	parser:
+
+	const char *xmlbuffer="<?xml version=\"1.0\" encoding=\"utf-8\"?>
+	<root xmlns=\"urn:schemas-upnp-org:device-1-0\" xmlns:dlna=\"urn:schemas-dlna-org:device-1-0\">
+	<dlna:X_DLNADOC xmlns:dlna=\"urn:schemas-dlna-org:device-1-0\">DMS-1.50</dlna:X_DLNADOC></root>";
+
+	When I execute the following code:
+
+	IXML_Document *doc = ixmlParseBuffer(xmlbuffer);
+	ixmlDocument_free(doc);
+
+	It results in a memory leak in ixmlparser.c line 2107 where it calls
+	safe_strdup( newElement->namespaceURI ); It's difficult to figure out why.
+
+2012-03-05 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
 	SF Bug Tracker id 3417134 - Crash seen in UpnpFinish
 
 	Submitted: Sunil ( sunilangadi ) - 2011-10-02 08:28:47 PDT
