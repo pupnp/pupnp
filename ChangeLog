@@ -4,6 +4,14 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3497009 - Resource leak in http_SendMessage
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 05:51:44 PST
+
+	Fp is not closed if fseeko(Fp, Instr->RangeOffset, SEEK_CUR) does not return 0.
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	HInfo->ServiceTable initialization in UpnpRegisterRootDevice2 and UpnpRegisterRootDevice4
 
 	Initialize also HInfo->ServiceTable in UpnpRegisterRootDevice2 and
