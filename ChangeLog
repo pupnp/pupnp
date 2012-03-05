@@ -299,6 +299,15 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	SF Bug Tracker id 3496581 - Memory leak in getServiceList
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-03 08:43:23 PST
+
+	serviceNodeList is not freed if
+	current->next = malloc(sizeof(service_info)); returns NULL.
+
 2012-02-29 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	SF Bug Tracker id 3495616 - Memory leak in ixmlElement_setAttributeNS
