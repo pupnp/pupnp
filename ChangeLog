@@ -299,6 +299,27 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-03-05 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	SF Bug Tracker id 3417134 - Crash seen in UpnpFinish
+
+	Submitted: Sunil ( sunilangadi ) - 2011-10-02 08:28:47 PDT
+
+	Details: I observed crash in the below mentioned log statement in
+	function upnpfinish(file: upnpapi.c).
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Exiting UpnpFinish:
+		UpnpSdkInit is :%d:\n", UpnpSdkInit);
+
+	In particular it was crashing in ithread_self in
+	UpnpDisplayFileAndLine(file upnpdebug.c) on WIN32.
+
+	Moving the call ithread_cleanup_library() below the upnp printf call
+	mentioned above in function upnpfinish fixed the crash but I couldn't get
+	to the root of the problem.
+
+	The problem was observed on WIN32.
+
+
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	SF Bug Tracker id 3497034 - Buffer not null terminated in UpnpGetIfInfo
