@@ -636,12 +636,12 @@ int UpnpFinish(void)
 	ithread_mutex_destroy(&gUUIDMutex);
 	/* remove all virtual dirs */
 	UpnpRemoveAllVirtualDirs();
-	/* Clean-up ithread library resources */
-	ithread_cleanup_library();
 	UpnpSdkInit = 0;
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 		"Exiting UpnpFinish: UpnpSdkInit is :%d:\n", UpnpSdkInit);
 	UpnpCloseLog();
+	/* Clean-up ithread library resources */
+	ithread_cleanup_library();
 
 	return UPNP_E_SUCCESS;
 }
