@@ -4,6 +4,16 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3497033 - Buffer not null terminated in UpnpInit
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 06:42:18 PST
+
+	gIF_IPV4, gIF_IPV6 and gIF_IPV6_ULA_GUA might be not null terminated.
+	Moreover, gIF_IPV4 should be 16 characters (INET_ADDRSTRLEN) and not 22
+	and gIF_IPV6 should be 46 characters (INET6_ADDRSTRLEN) and not 65.
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Bug fix of lastest commit (parse_hostport)
 
 	Missing parenthesis in memset.
