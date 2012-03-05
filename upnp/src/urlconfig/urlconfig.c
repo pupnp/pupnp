@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -211,10 +212,8 @@ static int config_description_doc(
 	IN const char *ip_str,
 	OUT char **root_path_str )
 {
-	int addNew = FALSE;
 	IXML_NodeList *baseList;
 	IXML_Element *element = NULL;
-	IXML_Element *newElement = NULL;
 	IXML_Node *textNode = NULL;
 	IXML_Node *rootNode = NULL;
 	IXML_Node *urlbase_node = NULL;
@@ -232,7 +231,6 @@ static int config_description_doc(
 	baseList = ixmlDocument_getElementsByTagName(doc, urlBaseStr);
 	if (baseList == NULL) {
 		/* urlbase not found -- create new one */
-		addNew = TRUE;
 		element = ixmlDocument_createElement(doc, urlBaseStr);
 		if (element == NULL) {
 			goto error_handler;
@@ -319,7 +317,7 @@ static int config_description_doc(
 
  error_handler:
 	if (err_code != UPNP_E_SUCCESS) {
-		ixmlElement_free(newElement);
+		ixmlElement_free(element);
 	}
 	ixmlNodeList_free(baseList);
 	membuffer_destroy(&root_path);
