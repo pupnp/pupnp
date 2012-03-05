@@ -4,6 +4,15 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3497140 - Bug fix in http_get_code_text
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 13:07:03 PST
+
+	Replace if( statusCode < 100 && statusCode >= 600 ) which can't be true
+	by if( statusCode < 100 || statusCode >= 600 ).
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3497126 - Resource leak in http_RecvPostMessage
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 12:33:59 PST
