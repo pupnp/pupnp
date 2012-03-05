@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -908,8 +909,13 @@ static int CheckOtherHTTPHeaders(
 				}
 				break;
 			case HDR_ACCEPT_LANGUAGE:
-				memcpy(RespInstr->AcceptLanguageHeader, TmpBuf,
-				       sizeof(RespInstr->AcceptLanguageHeader) - 1);
+				if (sizeof(TmpBuf) > sizeof(RespInstr->AcceptLanguageHeader)) {
+					memcpy(RespInstr->AcceptLanguageHeader, TmpBuf,
+						sizeof(RespInstr->AcceptLanguageHeader) - 1);
+				} else {
+					memcpy(RespInstr->AcceptLanguageHeader, TmpBuf,
+						sizeof(TmpBuf) - 1);
+				}
 				break;
 			default:
 				/*

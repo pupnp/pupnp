@@ -4,6 +4,15 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3496933 - Out-of-bounds access in CheckOtherHTTPHeaders
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 01:15:34 PST
+
+	An out-of-bands access is raised because size of
+	RespInst->AcceptLanguageHeader is 200 and TmpBuf size is 180.
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Remove unused currentDevice variable in removeServiceTable
 
 	currentDevice is not used in this function.
