@@ -134,10 +134,10 @@ WebServerState bWebServerState = WEB_SERVER_DISABLED;
 char gIF_NAME[LINE_SIZE] = { '\0' };
 
 /*! Static buffer to contain interface IPv4 address. (extern'ed in upnp.h) */
-char gIF_IPV4[22]/* INET_ADDRSTRLEN*/ = { '\0' };
+char gIF_IPV4[INET_ADDRSTRLEN] = { '\0' };
 
 /*! Static buffer to contain interface IPv6 address. (extern'ed in upnp.h) */
-char gIF_IPV6[65]/* INET6_ADDRSTRLEN*/ = { '\0' };
+char gIF_IPV6[INET6_ADDRSTRLEN] = { '\0' };
 
 /*! Static buffer to contain interface ULA or GUA IPv6 address. (extern'ed in upnp.h) */
 char gIF_IPV6_ULA_GUA[INET6_ADDRSTRLEN] = { '\0' };
@@ -453,10 +453,11 @@ int UpnpInit(const char *HostIP, unsigned short DestPort)
 		HostIP ? HostIP : "", DestPort);
 
 	/* Verify HostIP, if provided, or find it ourselves. */
+	memset(gIF_IPV4, 0, sizeof(gIF_IPV4));
 	if (HostIP != NULL) {
-		strncpy(gIF_IPV4, HostIP, sizeof(gIF_IPV4));
+		strncpy(gIF_IPV4, HostIP, sizeof(gIF_IPV4) - 1);
 	} else {
-		if( getlocalhostname( gIF_IPV4, sizeof(gIF_IPV4) ) != UPNP_E_SUCCESS ) {
+		if( getlocalhostname( gIF_IPV4, sizeof(gIF_IPV4) - 1 ) != UPNP_E_SUCCESS ) {
 			retVal = UPNP_E_INIT_FAILED;
 			goto exit_function;
 		}
@@ -3483,22 +3484,28 @@ int UpnpGetIfInfo(const char *IfName)
 				if (inet_pton(AF_INET6, buf, &v6_addr) > 0) {
 					if (IN6_IS_ADDR_ULA(&v6_addr)) {
 						/* Got valid IPv6 ula. */
+						memset(gIF_IPV6_ULA_GUA, 0,
+							sizeof(gIF_IPV6_ULA_GUA));
 						strncpy(gIF_IPV6_ULA_GUA, buf,
 							sizeof
-							(gIF_IPV6_ULA_GUA));
+							(gIF_IPV6_ULA_GUA) - 1);
 					} else if (IN6_IS_ADDR_GLOBAL(&v6_addr)
 						   && strlen(gIF_IPV6_ULA_GUA)
 						   == 0) {
 						/* got a GUA, should store it while no ULA is found */
+						memset(gIF_IPV6_ULA_GUA, 0,
+                                                        sizeof(gIF_IPV6_ULA_GUA));
 						strncpy(gIF_IPV6_ULA_GUA, buf,
 							sizeof
-							(gIF_IPV6_ULA_GUA));
+							(gIF_IPV6_ULA_GUA) - 1);
 					} else
 					    if (IN6_IS_ADDR_LINKLOCAL(&v6_addr)
 						&& strlen(gIF_IPV6) == 0) {
 						/* got a Link local IPv6 address. */
+						memset(gIF_IPV6, 0,
+                                                        sizeof(gIF_IPV6));
 						strncpy(gIF_IPV6, buf,
-							sizeof(gIF_IPV6));
+							sizeof(gIF_IPV6) - 1);
 					}
 				}
 			}
