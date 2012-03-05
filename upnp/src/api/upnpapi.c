@@ -3083,7 +3083,8 @@ int UpnpGetIfInfo(const char *IfName)
 		if (strlen(IfName) > sizeof(gIF_NAME))
 			return UPNP_E_INVALID_INTERFACE;
 
-		strncpy(gIF_NAME, IfName, sizeof(gIF_NAME));
+		memset(gIF_NAME, 0, sizeof(gIF_NAME));
+		strncpy(gIF_NAME, IfName, sizeof(gIF_NAME) - 1);
 		ifname_found = 1;
 	}
 	adapts_item = adapts;
@@ -3104,8 +3105,9 @@ int UpnpGetIfInfo(const char *IfName)
 			wcstombs(gIF_NAME, adapts_item->FriendlyName,
 				sizeof(gIF_NAME));
 #else
+			memset(gIF_NAME, 0, sizeof(gIF_NAME));
 			strncpy(gIF_NAME, adapts_item->FriendlyName,
-				sizeof(gIF_NAME));
+				sizeof(gIF_NAME) - 1);
 #endif
 			ifname_found = 1;
 		} else {
@@ -3196,7 +3198,8 @@ int UpnpGetIfInfo(const char *IfName)
 		if (strlen(IfName) > sizeof(gIF_NAME))
 			return UPNP_E_INVALID_INTERFACE;
 
-		strncpy(gIF_NAME, IfName, sizeof(gIF_NAME));
+		memset(gIF_NAME, 0, sizeof(gIF_NAME));
+		strncpy(gIF_NAME, IfName, sizeof(gIF_NAME) - 1);
 		ifname_found = 1;
 	}
 	/* Get system interface addresses. */
@@ -3216,7 +3219,8 @@ int UpnpGetIfInfo(const char *IfName)
 		}
 		if (ifname_found == 0) {
 			/* We have found a valid interface name. Keep it. */
-			strncpy(gIF_NAME, ifa->ifa_name, sizeof(gIF_NAME));
+			memset(gIF_NAME, 0, sizeof(gIF_NAME));
+			strncpy(gIF_NAME, ifa->ifa_name, sizeof(gIF_NAME) - 1);
 			ifname_found = 1;
 		} else {
 			if (strncmp(gIF_NAME, ifa->ifa_name, sizeof(gIF_NAME))
@@ -3283,7 +3287,8 @@ int UpnpGetIfInfo(const char *IfName)
 		if (strlen(IfName) > sizeof(gIF_NAME))
 			return UPNP_E_INVALID_INTERFACE;
 
-		strncpy(gIF_NAME, IfName, sizeof(gIF_NAME));
+		memset(gIF_NAME, 0, sizeof(gIF_NAME));
+		strncpy(gIF_NAME, IfName, sizeof(gIF_NAME) - 1);
 		ifname_found = 1;
 	}
 	/* Create an unbound datagram socket to do the SIOCGIFADDR ioctl on.  */
@@ -3323,7 +3328,8 @@ int UpnpGetIfInfo(const char *IfName)
 		}
 		if (ifname_found == 0) {
 			/* We have found a valid interface name. Keep it. */
-			strncpy(gIF_NAME, pifReq->ifr_name, sizeof(gIF_NAME));
+			memset(gIF_NAME, 0, sizeof(gIF_NAME));
+			strncpy(gIF_NAME, pifReq->ifr_name, sizeof(gIF_NAME) - 1);
 			ifname_found = 1;
 		} else {
 			if (strncmp
@@ -3336,7 +3342,8 @@ int UpnpGetIfInfo(const char *IfName)
 		/* Check address family. */
 		if (pifReq->ifr_addr.sa_family == AF_INET) {
 			/* Copy interface name, IPv4 address and interface index. */
-			strncpy(gIF_NAME, pifReq->ifr_name, sizeof(gIF_NAME));
+			memset(gIF_NAME, 0, sizeof(gIF_NAME));
+			strncpy(gIF_NAME, pifReq->ifr_name, sizeof(gIF_NAME) - 1);
 			inet_ntop(AF_INET,
 				  &((struct sockaddr_in *)&pifReq->ifr_addr)->
 				  sin_addr, gIF_IPV4, sizeof(gIF_IPV4));

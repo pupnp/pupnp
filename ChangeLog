@@ -4,6 +4,14 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3497034 - Buffer not null terminated in UpnpGetIfInfo
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 06:43:52 PST
+
+	gIF_NAME might be not null terminated.
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3497033 - Buffer not null terminated in UpnpInit
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 06:42:18 PST
