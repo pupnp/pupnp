@@ -361,6 +361,15 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3497126 - Resource leak in http_RecvPostMessage
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 12:33:59 PST
+
+	Fp is not closed when an error is raised on membuffer_append or
+	sock_read.
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3497034 - Buffer not null terminated in UpnpGetIfInfo
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 06:43:52 PST
