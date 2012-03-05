@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -315,6 +316,8 @@ static void genaNotifyThread(
 	struct Handle_Info *handle_info;
 	ThreadPoolJob job;
 
+	memset(&job, 0, sizeof(job));
+
 	/* This should be a HandleLock and not a HandleReadLock otherwise if there
 	 * is a lot of notifications, then multiple threads will acquire a read
 	 * lock and the thread which sends the notification will be blocked forever
@@ -462,6 +465,8 @@ int genaInitNotify(
 	service_info *service = NULL;
 	struct Handle_Info *handle_info;
 	ThreadPoolJob job;
+
+	memset(&job, 0, sizeof(job));
 
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
 		"GENA BEGIN INITIAL NOTIFY");
@@ -616,6 +621,8 @@ int genaInitNotifyExt(
 	struct Handle_Info *handle_info;
 	ThreadPoolJob job;
 
+	memset(&job, 0, sizeof(job));
+
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
 		"GENA BEGIN INITIAL NOTIFY EXT");
 	
@@ -769,6 +776,8 @@ int genaNotifyAllExt(
 	struct Handle_Info *handle_info;
 	ThreadPoolJob job;
 
+	memset(&job, 0, sizeof(job));
+
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
 		"GENA BEGIN NOTIFY ALL EXT");
 
@@ -907,6 +916,8 @@ int genaNotifyAll(
 	service_info *service = NULL;
 	struct Handle_Info *handle_info;
 	ThreadPoolJob job;
+
+	memset(&job, 0, sizeof(job));
 
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
 		"GENA BEGIN NOTIFY ALL");

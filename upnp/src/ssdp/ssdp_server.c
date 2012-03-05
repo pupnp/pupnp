@@ -688,6 +688,8 @@ void readFromSSDPSocket(SOCKET socket)
 	ssize_t byteReceived = 0;
 	char ntop_buf[64];
 
+	memset(&job, 0, sizeof(job));
+
 	requestBuf = staticBuf;
 	/* in case memory can't be allocated, still drain the socket using a
 	 * static buffer. */

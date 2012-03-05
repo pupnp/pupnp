@@ -1013,6 +1013,7 @@ static int process_request(
 	       req->method == HTTPMETHOD_POST ||
 	       req->method == HTTPMETHOD_SIMPLEGET);
 	/* init */
+	memset(&finfo, 0, sizeof(finfo));
 	request_doc = NULL;
 	finfo = UpnpFileInfo_new();
 	alias_grabbed = FALSE;

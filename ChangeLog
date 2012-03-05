@@ -301,6 +301,18 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3496938 - Missing structures initialisation in some functions
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 01:31:16 PST
+
+	Memsetting to 0 some of the structures: finfo in process_request,
+	job in readFromSSDPSocket, request in http_OpenHttpGetEx, job in
+	genaNotifyThread, job in genaNotifyAllExt, job in genaNotifyAll,
+	job in genaInitNotifyExt, job in genaInitNotify, LocalAddr in
+	getlocalhostname.
+
+2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3496934 - Memory leaks in getlocalhostname and UpnpGetIfInfo
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 01:25:42 PST

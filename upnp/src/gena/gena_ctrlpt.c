@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -137,6 +138,8 @@ static int ScheduleGenaAutoRenew(
 	upnp_timeout *RenewEvent = NULL;
 	int return_code = GENA_SUCCESS;
 	ThreadPoolJob job;
+
+	memset(&job, 0, sizeof(job));
 
 	if (TimeOut == UPNP_INFINITE) {
 		return_code = GENA_SUCCESS;

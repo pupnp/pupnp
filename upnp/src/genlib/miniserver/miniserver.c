@@ -260,6 +260,8 @@ static UPNP_INLINE void schedule_request_job(
 	struct mserv_request_t *request;
 	ThreadPoolJob job;
 
+	memset(&job, 0, sizeof(job));
+
 	request = (struct mserv_request_t *)malloc(
 		sizeof (struct mserv_request_t));
 	if (request == NULL) {
@@ -845,6 +847,8 @@ int StartMiniServer(
 	int max_count = 10000;
 	MiniServerSockArray *miniSocket;
 	ThreadPoolJob job;
+
+	memset(&job, 0, sizeof(job));
 
 	if (gMServState != MSERV_IDLE) {
 		/* miniserver running. */

@@ -99,6 +99,8 @@ void ssdp_handle_ctrlpt_msg(http_message_t *hmsg, struct sockaddr_storage *dest_
 	SSDPResultData *threadData = NULL;
 	ThreadPoolJob job;
 
+	memset(&job, 0, sizeof(job));
+
 	/* we are assuming that there can be only one client supported at a time */
 	HandleReadLock();
 
@@ -456,6 +458,8 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 
 	/*ThreadData *ThData; */
 	ThreadPoolJob job;
+
+	memset(&job, 0, sizeof(job));
 
 	requestType = ssdp_request_type1(St);
 	if (requestType == SSDP_SERROR)
