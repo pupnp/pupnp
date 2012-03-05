@@ -462,12 +462,12 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 				if (virtualDirCallback.seek(Fp, Instr->RangeOffset,
 				    SEEK_CUR) != 0) {
 					RetVal = UPNP_E_FILE_READ_ERROR;
-					goto ExitFunction;
+					goto Cleanup_File;
 				}
 			} else if (Instr && Instr->IsRangeActive) {
 				if (fseeko(Fp, Instr->RangeOffset, SEEK_CUR) != 0) {
 					RetVal = UPNP_E_FILE_READ_ERROR;
-					goto ExitFunction;
+					goto Cleanup_File;
 				}
 			}
 			while (amount_to_be_read) {
