@@ -158,6 +158,7 @@ static int ScheduleGenaAutoRenew(
 		return_code = UPNP_E_OUTOF_MEMORY;
 		goto end_function;
 	}
+	memset(RenewEvent, 0, sizeof(upnp_timeout));
 
 	/* schedule expire event */
 	UpnpEventSubscribe_set_ErrCode(RenewEventStruct, UPNP_E_SUCCESS);

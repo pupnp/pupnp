@@ -558,7 +558,9 @@ int genaInitNotify(
 		thread_struct->UDN = UDN_copy;
 		thread_struct->headers = headers;
 		thread_struct->propertySet = propertySet;
-		strcpy(thread_struct->sid, sid);
+		memset(thread_struct->sid, 0, sizeof(thread_struct->sid));
+		strncpy(thread_struct->sid, sid,
+			sizeof(thread_struct->sid) - 1);
 		thread_struct->eventKey = sub->eventKey++;
 		thread_struct->reference_count = reference_count;
 		thread_struct->device_handle = device_handle;
@@ -714,7 +716,9 @@ int genaInitNotifyExt(
 		thread_struct->UDN = UDN_copy;
 		thread_struct->headers = headers;
 		thread_struct->propertySet = propertySet;
-		strcpy(thread_struct->sid, sid);
+		memset(thread_struct->sid, 0, sizeof(thread_struct->sid));
+		strncpy(thread_struct->sid, sid,
+			sizeof(thread_struct->sid) - 1);
 		thread_struct->eventKey = sub->eventKey++;
 		thread_struct->reference_count = reference_count;
 		thread_struct->device_handle = device_handle;
@@ -846,7 +850,10 @@ int genaNotifyAllExt(
 				thread_struct->servId = servId_copy;
 				thread_struct->headers = headers;
 				thread_struct->propertySet = propertySet;
-				strcpy(thread_struct->sid, finger->sid);
+				memset(thread_struct->sid, 0,
+					sizeof(thread_struct->sid));
+				strncpy(thread_struct->sid, finger->sid,
+					sizeof(thread_struct->sid) - 1);
 				thread_struct->eventKey = finger->eventKey++;
 				thread_struct->device_handle = device_handle;
 				/* if overflow, wrap to 1 */
@@ -986,7 +993,10 @@ int genaNotifyAll(
 				thread_struct->servId = servId_copy;
 				thread_struct->headers = headers;
 				thread_struct->propertySet = propertySet;
-				strcpy(thread_struct->sid, finger->sid);
+				memset(thread_struct->sid, 0,
+					sizeof(thread_struct->sid));
+				strncpy(thread_struct->sid, finger->sid,
+					sizeof(thread_struct->sid) - 1);
 				thread_struct->eventKey = finger->eventKey++;
 				thread_struct->device_handle = device_handle;
 				/* if overflow, wrap to 1 */
