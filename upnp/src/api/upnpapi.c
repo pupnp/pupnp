@@ -636,12 +636,12 @@ int UpnpFinish(void)
 	ithread_mutex_destroy(&gUUIDMutex);
 	/* remove all virtual dirs */
 	UpnpRemoveAllVirtualDirs();
-	/* Clean-up ithread library resources */
-	ithread_cleanup_library();
 	UpnpSdkInit = 0;
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 		"Exiting UpnpFinish: UpnpSdkInit is :%d:\n", UpnpSdkInit);
 	UpnpCloseLog();
+	/* Clean-up ithread library resources */
+	ithread_cleanup_library();
 
 	return UPNP_E_SUCCESS;
 }
@@ -3989,6 +3989,27 @@ int UpnpIsWebserverEnabled(void)
 	return bWebServerState == WEB_SERVER_ENABLED;
 }
 
+int UpnpSetVirtualDirCallbacks(struct UpnpVirtualDirCallbacks *callbacks)
+{
+	int ret = 0;
+
+	if( UpnpSdkInit != 1 ) {
+		/* SDK is not initialized */
+		return UPNP_E_FINISH;
+	}
+
+	if( callbacks == NULL )
+		return UPNP_E_INVALID_PARAM;
+
+	ret = UpnpVirtualDir_set_GetInfoCallback(callbacks->get_info) == UPNP_E_SUCCESS
+	   && UpnpVirtualDir_set_OpenCallback(callbacks->open) == UPNP_E_SUCCESS
+	   && UpnpVirtualDir_set_ReadCallback(callbacks->read) == UPNP_E_SUCCESS
+	   && UpnpVirtualDir_set_WriteCallback(callbacks->write) == UPNP_E_SUCCESS
+	   && UpnpVirtualDir_set_SeekCallback(callbacks->seek) == UPNP_E_SUCCESS
+	   && UpnpVirtualDir_set_CloseCallback(callbacks->close) == UPNP_E_SUCCESS;
+
+	return ret ? UPNP_E_SUCCESS : UPNP_E_INVALID_PARAM;
+}
 
 int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback)
 {

@@ -1594,6 +1594,9 @@ static int Parser_xmlNamespace(
 		}
 		if (pCur->prefix != NULL &&
 		    strcmp(pCur->prefix, newNode->localName) == 0) {
+			if (pCur->namespaceUri != NULL) {
+				free(pCur->namespaceUri);
+			}
 			pCur->namespaceUri = safe_strdup(newNode->nodeValue);
 			if (pCur->namespaceUri == NULL) {
 				ret = IXML_INSUFFICIENT_MEMORY;

@@ -2791,6 +2791,21 @@ typedef int (*VDCallback_Close)(
 EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback);
 
 /*!
+ * \brief The {\bf UpnpVirtualDirCallbacks} structure contains the pointers to
+ *  file-related callback functions a device application can register to
+ *  virtualize URLs.
+ */
+struct UpnpVirtualDirCallbacks
+{
+	VDCallback_GetInfo get_info;
+	VDCallback_Open open;
+	VDCallback_Read read;
+	VDCallback_Write write;
+	VDCallback_Seek seek;
+	VDCallback_Close close;
+};
+
+/*!
  * \brief Enables or disables the webserver.
  *
  * \return An integer representing one of the following:
@@ -2809,6 +2824,17 @@ EXPORT_SPEC int UpnpEnableWebserver(
  *       \li \c FALSE: The webserver is not enabled
  */
 EXPORT_SPEC int UpnpIsWebserverEnabled(void);
+
+/*!
+ *  \brief Sets the callback functions to be used to access a virtual directory.
+ *
+ *  \return An integer representing one of the following:
+ *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *       \li \c UPNP_E_INVALID_PARAM: one of the callbacks is not valid.
+ */
+EXPORT_SPEC int UpnpSetVirtualDirCallbacks(
+	/*! [in] A structure that contains the callback functions. */
+	struct UpnpVirtualDirCallbacks *callbacks );
 
 /*!
  * \brief Adds a virtual directory mapping.

@@ -2,6 +2,66 @@
 Version 1.6.16
 *******************************************************************************
 
+2012-03-05 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	SF Bug Tracker id 2989399 - UpnpSetVirtualDirCallbacks API removal in 1.6.x
+
+	Submitted: Nick Leverton ( leveret ) - 2010-04-19 07:44:10 PDT
+
+	Details: The recent codebase merge has removed a significant API call
+	which is used by several pupnp devices such as mediatomb and gmediaserver.
+	UpnpSetVirtualDirCallbacks() has been replaced by individual routines to
+	set each callback. Essentially this means that 1.6.7 will in fact be a majo
+	bump and 1.6.6 devices can no longer link against it. Could we have the call
+	reinstated please, perhaps as a wrapper around the individual calls ? As
+	it is, all distros will have to patch their 1.6.x apps, rebuild and re-link them.
+
+	The other removed API calls and external variables don't seem to be used
+	by any of the apps I have copies of, but UpnpSetVirtualDirCallbacks is
+	important for maintaining compatibility within 1.6.x.
+
+2012-03-05 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	SF Bug Tracker id 3325246 - Memory Leak in XML Parser
+
+	Submitted: Terry Farnham ( tfarnham ) - 2011-06-23 09:45:54 PDT
+
+	Details: The following bit of xml results in a memory leak from the xml
+	parser:
+
+	const char *xmlbuffer="<?xml version=\"1.0\" encoding=\"utf-8\"?>
+	<root xmlns=\"urn:schemas-upnp-org:device-1-0\" xmlns:dlna=\"urn:schemas-dlna-org:device-1-0\">
+	<dlna:X_DLNADOC xmlns:dlna=\"urn:schemas-dlna-org:device-1-0\">DMS-1.50</dlna:X_DLNADOC></root>";
+
+	When I execute the following code:
+
+	IXML_Document *doc = ixmlParseBuffer(xmlbuffer);
+	ixmlDocument_free(doc);
+
+	It results in a memory leak in ixmlparser.c line 2107 where it calls
+	safe_strdup( newElement->namespaceURI ); It's difficult to figure out why.
+
+2012-03-05 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	SF Bug Tracker id 3417134 - Crash seen in UpnpFinish
+
+	Submitted: Sunil ( sunilangadi ) - 2011-10-02 08:28:47 PDT
+
+	Details: I observed crash in the below mentioned log statement in
+	function upnpfinish(file: upnpapi.c).
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Exiting UpnpFinish:
+		UpnpSdkInit is :%d:\n", UpnpSdkInit);
+
+	In particular it was crashing in ithread_self in
+	UpnpDisplayFileAndLine(file upnpdebug.c) on WIN32.
+
+	Moving the call ithread_cleanup_library() below the upnp printf call
+	mentioned above in function upnpfinish fixed the crash but I couldn't get
+	to the root of the problem.
+
+	The problem was observed on WIN32.
+
+
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	SF Bug Tracker id 3497159 - Bug fix in Parser_readFileOrBuffer
