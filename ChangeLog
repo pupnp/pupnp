@@ -301,6 +301,14 @@ Version 1.6.16
 
 2012-03-06 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Removing two unused variables in ssdp_server.c
+
+	Removing first TempPtr allocation in unique_service_name as well as one
+	of the dbgStr allocation in AdvertizeAndReply as those values were not
+	used.
+
+2012-03-06 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3497714 - Buffer overflows
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-06 07:36:08 PST

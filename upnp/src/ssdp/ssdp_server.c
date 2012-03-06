@@ -152,7 +152,6 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 				continue;
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				   "Extracting UDN for %s\n", dbgStr);
-			dbgStr = ixmlNode_getNodeName(tmpNode);
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				   "Extracting device type\n");
 			tmpNode2 = ixmlNodeList_item(nodeList, 0);
@@ -458,7 +457,7 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 	int CommandFound = 0;
 	size_t n = 0;
 
-	if ((TempPtr = strstr(cmd, "uuid:schemas")) != NULL) {
+	if (strstr(cmd, "uuid:schemas") != NULL) {
 		ptr1 = strstr(cmd, ":device");
 		if (ptr1 != NULL)
 			ptr2 = strstr(ptr1 + 1, ":");
