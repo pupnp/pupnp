@@ -558,7 +558,9 @@ int genaInitNotify(
 		thread_struct->UDN = UDN_copy;
 		thread_struct->headers = headers;
 		thread_struct->propertySet = propertySet;
-		strcpy(thread_struct->sid, sid);
+		memset(thread_struct->sid, 0, sizeof(thread_struct->sid));
+		strncpy(thread_struct->sid, sid,
+			sizeof(thread_struct->sid) - 1);
 		thread_struct->eventKey = sub->eventKey++;
 		thread_struct->reference_count = reference_count;
 		thread_struct->device_handle = device_handle;
@@ -714,7 +716,9 @@ int genaInitNotifyExt(
 		thread_struct->UDN = UDN_copy;
 		thread_struct->headers = headers;
 		thread_struct->propertySet = propertySet;
-		strcpy(thread_struct->sid, sid);
+		memset(thread_struct->sid, 0, sizeof(thread_struct->sid));
+		strncpy(thread_struct->sid, sid,
+			sizeof(thread_struct->sid) - 1);
 		thread_struct->eventKey = sub->eventKey++;
 		thread_struct->reference_count = reference_count;
 		thread_struct->device_handle = device_handle;
@@ -846,7 +850,10 @@ int genaNotifyAllExt(
 				thread_struct->servId = servId_copy;
 				thread_struct->headers = headers;
 				thread_struct->propertySet = propertySet;
-				strcpy(thread_struct->sid, finger->sid);
+				memset(thread_struct->sid, 0,
+					sizeof(thread_struct->sid));
+				strncpy(thread_struct->sid, finger->sid,
+					sizeof(thread_struct->sid) - 1);
 				thread_struct->eventKey = finger->eventKey++;
 				thread_struct->device_handle = device_handle;
 				/* if overflow, wrap to 1 */
@@ -986,7 +993,10 @@ int genaNotifyAll(
 				thread_struct->servId = servId_copy;
 				thread_struct->headers = headers;
 				thread_struct->propertySet = propertySet;
-				strcpy(thread_struct->sid, finger->sid);
+				memset(thread_struct->sid, 0,
+					sizeof(thread_struct->sid));
+				strncpy(thread_struct->sid, finger->sid,
+					sizeof(thread_struct->sid) - 1);
 				thread_struct->eventKey = finger->eventKey++;
 				thread_struct->device_handle = device_handle;
 				/* if overflow, wrap to 1 */
@@ -1196,6 +1206,8 @@ void gena_process_subscription_request(
 	memptr callback_hdr;
 	memptr timeout_hdr;
 
+	memset(&request_struct, 0, sizeof(request_struct));
+
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
 		"Subscription Request Received:\n");
 
@@ -1341,7 +1353,8 @@ void gena_process_subscription_request(
 	/* finally generate callback for init table dump */
 	request_struct.ServiceId = service->serviceId;
 	request_struct.UDN = service->UDN;
-	strcpy((char *)request_struct.Sid, sub->sid);
+	strncpy((char *)request_struct.Sid, sub->sid,
+		sizeof(request_struct.Sid) - 1);
 
 	/* copy callback */
 	callback_fun = handle_info->Callback;

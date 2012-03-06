@@ -784,6 +784,7 @@ int UpnpRegisterRootDevice(
 		retVal = UPNP_E_OUTOF_MEMORY;
 		goto exit_function;
 	}
+	memset(HInfo, 0, sizeof(struct Handle_Info));
 	HandleTable[*Hnd] = HInfo;
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -791,8 +792,8 @@ int UpnpRegisterRootDevice(
 
 	HInfo->aliasInstalled = 0;
 	HInfo->HType = HND_DEVICE;
-	strcpy(HInfo->DescURL, DescUrl);
-	strcpy(HInfo->LowerDescURL, DescUrl);
+	strncpy(HInfo->DescURL, DescUrl, sizeof(HInfo->DescURL) - 1);
+	strncpy(HInfo->LowerDescURL, DescUrl, sizeof(HInfo->LowerDescURL) - 1);
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"Following Root Device URL will be used when answering to legacy CPs %s\n",
 		HInfo->LowerDescURL);
@@ -945,6 +946,7 @@ int UpnpRegisterRootDevice2(
 		retVal = UPNP_E_OUTOF_MEMORY;
 		goto exit_function;
 	}
+	memset(HInfo, 0, sizeof(struct Handle_Info));
 	HandleTable[*Hnd] = HInfo;
 
 	/* prevent accidental removal of a non-existent alias */
@@ -959,7 +961,8 @@ int UpnpRegisterRootDevice2(
 		goto exit_function;
 	}
 
-	strcpy(HInfo->LowerDescURL, HInfo->DescURL);
+	strncpy(HInfo->LowerDescURL, HInfo->DescURL,
+		sizeof(HInfo->LowerDescURL) - 1);
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"Following Root Device URL will be used when answering to legacy CPs %s\n",
 		HInfo->LowerDescURL);
@@ -1110,16 +1113,19 @@ int UpnpRegisterRootDevice4(
 		retVal = UPNP_E_OUTOF_MEMORY;
 		goto exit_function;
 	}
+	memset(HInfo, 0, sizeof(struct Handle_Info));
 	HandleTable[*Hnd] = HInfo;
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"Root device URL is %s\n", DescUrl);
 	HInfo->aliasInstalled = 0;
 	HInfo->HType = HND_DEVICE;
-	strcpy(HInfo->DescURL, DescUrl);
+	strncpy(HInfo->DescURL, DescUrl, sizeof(HInfo->DescURL) - 1);
 	if (LowerDescUrl == NULL)
-		strcpy(HInfo->LowerDescURL, DescUrl);
+		strncpy(HInfo->LowerDescURL, DescUrl,
+			sizeof(HInfo->LowerDescURL) - 1);
 	else
-		strcpy(HInfo->LowerDescURL, LowerDescUrl);
+		strncpy(HInfo->LowerDescURL, LowerDescUrl,
+			sizeof(HInfo->LowerDescURL) - 1);
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"Following Root Device URL will be used when answering to legacy CPs %s\n",
 		HInfo->LowerDescURL);
@@ -1871,10 +1877,11 @@ int UpnpSubscribeAsync(
     if( Param == NULL ) {
         return UPNP_E_OUTOF_MEMORY;
     }
+    memset( Param, 0, sizeof( struct UpnpNonblockParam ) );
 
     Param->FunName = SUBSCRIBE;
     Param->Handle = Hnd;
-    strcpy( Param->Url, EvtUrl );
+    strncpy( Param->Url, EvtUrl, sizeof( Param->Url ) - 1 );
     Param->TimeOut = TimeOut;
     Param->Fun = Fun;
     Param->Cookie = (void *)Cookie_const;
@@ -2048,10 +2055,11 @@ int UpnpUnSubscribeAsync(
 		retVal = UPNP_E_OUTOF_MEMORY;
 		goto exit_function;
 	}
+	memset( Param, 0, sizeof( struct UpnpNonblockParam ) );
 
 	Param->FunName = UNSUBSCRIBE;
 	Param->Handle = Hnd;
-	strcpy( Param->SubsId, SubsId );
+	strncpy( Param->SubsId, SubsId, sizeof( Param->SubsId ) - 1 );
 	Param->Fun = Fun;
 	Param->Cookie = (void *)Cookie_const;
 	TPJobInit( &job, ( start_routine ) UpnpThreadDistribution, Param );
@@ -2164,10 +2172,11 @@ int UpnpRenewSubscriptionAsync(
     if( Param == NULL ) {
         return UPNP_E_OUTOF_MEMORY;
     }
+    memset(Param, 0, sizeof( struct UpnpNonblockParam ) );
 
     Param->FunName = RENEW;
     Param->Handle = Hnd;
-    strcpy( Param->SubsId, SubsId );
+    strncpy( Param->SubsId, SubsId, sizeof( Param->SubsId ) - 1 );
     Param->Fun = Fun;
     Param->Cookie = ( void * )Cookie_const;
     Param->TimeOut = TimeOut;
@@ -2599,11 +2608,13 @@ int UpnpSendActionAsync(
     if( Param == NULL ) {
         return UPNP_E_OUTOF_MEMORY;
     }
+    memset( Param, 0, sizeof( struct UpnpNonblockParam ) );
 
     Param->FunName = ACTION;
     Param->Handle = Hnd;
-    strcpy( Param->Url, ActionURL );
-    strcpy( Param->ServiceType, ServiceType );
+    strncpy( Param->Url, ActionURL, sizeof ( Param->Url ) - 1 );
+    strncpy( Param->ServiceType, ServiceType,
+	sizeof ( Param->ServiceType ) - 1 );
 
     rc = ixmlParseBufferEx( tmpStr, &( Param->Act ) );
     if( rc != IXML_SUCCESS ) {
@@ -2694,11 +2705,13 @@ int UpnpSendActionExAsync(
     if( Param == NULL ) {
         return UPNP_E_OUTOF_MEMORY;
     }
+    memset( Param, 0, sizeof( struct UpnpNonblockParam ) );
 
     Param->FunName = ACTION;
     Param->Handle = Hnd;
-    strcpy( Param->Url, ActionURL );
-    strcpy( Param->ServiceType, ServiceType );
+    strncpy( Param->Url, ActionURL, sizeof( Param->Url ) - 1 );
+    strncpy( Param->ServiceType, ServiceType,
+	sizeof ( Param->ServiceType ) - 1 );
     retVal = ixmlParseBufferEx( headerStr, &( Param->Header ) );
     if( retVal != IXML_SUCCESS ) {
         ixmlFreeDOMString( tmpStr );
@@ -2783,11 +2796,12 @@ int UpnpGetServiceVarStatusAsync(
     if( Param == NULL ) {
         return UPNP_E_OUTOF_MEMORY;
     }
+    memset( Param, 0, sizeof( struct UpnpNonblockParam ) ); 
 
     Param->FunName = STATUS;
     Param->Handle = Hnd;
-    strcpy( Param->Url, ActionURL );
-    strcpy( Param->VarName, VarName );
+    strncpy( Param->Url, ActionURL, sizeof( Param->Url ) - 1);
+    strncpy( Param->VarName, VarName, sizeof( Param->VarName ) - 1 );
     Param->Fun = Fun;
     Param->Cookie = ( void * )Cookie_const;
 
@@ -3434,6 +3448,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 #if EXCLUDE_GENA == 0
 	case SUBSCRIBE: {
 		struct Upnp_Event_Subscribe Evt;
+		memset(&Evt, 0, sizeof(Evt));
 		/* Cast away constness */
 		/*UpnpString *Sid = (UpnpString *)UpnpEventSubscribe_get_SID(evt);*/
 		UpnpString *Sid = UpnpString_new();
@@ -3444,9 +3459,11 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 			Url,
 			(int *)&Param->TimeOut,
 			Sid);
-		strcpy(Evt.PublisherUrl, Param->Url);
+		strncpy(Evt.PublisherUrl, Param->Url,
+			sizeof(Evt.PublisherUrl) - 1);
 		Evt.TimeOut = Param->TimeOut;
-		strcpy((char *)Evt.Sid, UpnpString_get_String(Sid));
+		strncpy((char *)Evt.Sid, UpnpString_get_String(Sid),
+			sizeof((char *)Evt.Sid) - 1);
 		Param->Fun(UPNP_EVENT_SUBSCRIBE_COMPLETE, &Evt, Param->Cookie);
 		UpnpString_delete(Sid);
 		UpnpString_delete(Url);
@@ -3455,13 +3472,15 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 	}
 	case UNSUBSCRIBE: {
 		struct Upnp_Event_Subscribe Evt;
+		memset(&Evt, 0, sizeof(Evt));
 		UpnpString *Sid = UpnpString_new();
 		UpnpString_set_String(Sid, Param->SubsId);
 		Evt.ErrCode = genaUnSubscribe(
 			Param->Handle,
 			Sid);
-		strcpy((char *)Evt.Sid, UpnpString_get_String(Sid));
-		strcpy(Evt.PublisherUrl, "");
+		strncpy((char *)Evt.Sid, UpnpString_get_String(Sid),
+			sizeof((char *)Evt.Sid) - 1);
+		strncpy(Evt.PublisherUrl, "", sizeof(Evt.PublisherUrl) - 1);
 		Evt.TimeOut = 0;
 		Param->Fun(UPNP_EVENT_UNSUBSCRIBE_COMPLETE, &Evt, Param->Cookie);
 		UpnpString_delete(Sid);
@@ -3470,6 +3489,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 	}
 	case RENEW: {
 		struct Upnp_Event_Subscribe Evt;
+		memset(&Evt, 0, sizeof(Evt));
 		UpnpString *Sid = UpnpString_new();
 		UpnpString_set_String(Sid, Param->SubsId);
 		Evt.ErrCode = genaRenewSubscription(
@@ -3477,7 +3497,8 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 			Sid,
 			&Param->TimeOut);
 		Evt.TimeOut = Param->TimeOut;
-		strcpy((char *)Evt.Sid, UpnpString_get_String(Sid));
+		strncpy((char *)Evt.Sid, UpnpString_get_String(Sid),
+			sizeof((char *)Evt.Sid) - 1);
 		Param->Fun(UPNP_EVENT_RENEWAL_COMPLETE, &Evt, Param->Cookie);
 		UpnpString_delete(Sid);
 		free(Param);
@@ -3487,13 +3508,14 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 #if EXCLUDE_SOAP == 0
 	case ACTION: {
 		struct Upnp_Action_Complete Evt;
+		memset(&Evt, 0, sizeof(Evt));
 		Evt.ActionResult = NULL;
 		Evt.ErrCode = SoapSendAction(
 			Param->Url,
 			Param->ServiceType,
 			Param->Act, &Evt.ActionResult);
 		Evt.ActionRequest = Param->Act;
-		strcpy(Evt.CtrlUrl, Param->Url);
+		strncpy(Evt.CtrlUrl, Param->Url, sizeof(Evt.CtrlUrl) - 1);
 		Param->Fun(UPNP_CONTROL_ACTION_COMPLETE, &Evt, Param->Cookie);
 		ixmlDocument_free(Evt.ActionRequest);
 		ixmlDocument_free(Evt.ActionResult);
@@ -3502,12 +3524,14 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 	}
 	case STATUS: {
 		struct Upnp_State_Var_Complete Evt;
+		memset(&Evt, 0, sizeof(Evt));
 		Evt.ErrCode = SoapGetServiceVarStatus(
 			Param->Url,
 			Param->VarName,
 			&Evt.CurrentVal);
-		strcpy(Evt.StateVarName, Param->VarName);
-		strcpy(Evt.CtrlUrl, Param->Url);
+		strncpy(Evt.StateVarName, Param->VarName,
+			sizeof(Evt.StateVarName) - 1);
+		strncpy(Evt.CtrlUrl, Param->Url, sizeof(Evt.CtrlUrl) - 1);
 		Param->Fun(UPNP_CONTROL_GET_VAR_COMPLETE, &Evt, Param->Cookie);
 		free(Evt.CurrentVal);
 		free(Param);

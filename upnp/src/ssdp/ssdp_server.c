@@ -110,6 +110,10 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 	const DOMString dbgStr;
 	int NumCopy = 0;
 
+	memset(UDNstr, 0, sizeof(UDNstr));
+	memset(devType, 0, sizeof(devType));
+	memset(servType, 0, sizeof(servType));
+
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		   "Inside AdvertiseAndReply with AdFlag = %d\n", AdFlag);
 
@@ -162,7 +166,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 			tmpStr = ixmlNode_getNodeValue(textNode);
 			if (!tmpStr)
 				continue;
-			strcpy(devType, tmpStr);
+			strncpy(devType, tmpStr, sizeof(devType) - 1);
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				   "Extracting device type = %s\n", devType);
 			if (!tmpNode) {
@@ -197,7 +201,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 					   __LINE__, "UDN not found!\n");
 				continue;
 			}
-			strcpy(UDNstr, tmpStr);
+			strncpy(UDNstr, tmpStr, sizeof(UDNstr) - 1);
 			UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 				   "Sending UDNStr = %s \n", UDNstr);
 			if (AdFlag) {
@@ -351,7 +355,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 				tmpStr = ixmlNode_getNodeValue(textNode);
 				if (!tmpStr)
 					continue;
-				strcpy(servType, tmpStr);
+				strncpy(servType, tmpStr, sizeof(servType) - 1);
 				UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 					   "ServiceType = %s\n", servType);
 				if (AdFlag) {
@@ -483,19 +487,25 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 			n = (size_t) (Ptr - TempPtr);
 			strncpy(Evt->UDN, TempPtr, n);
 			Evt->UDN[n] = '\0';
-		} else
-			strcpy(Evt->UDN, TempPtr);
+		} else {
+			memset(Evt->UDN, 0, sizeof(Evt->UDN));
+			strncpy(Evt->UDN, TempPtr, sizeof(Evt->UDN) - 1);
+		}
 		CommandFound = 1;
 	}
 	if (strstr(cmd, "urn:") != NULL && strstr(cmd, ":service:") != NULL) {
 		if ((TempPtr = strstr(cmd, "urn")) != NULL) {
-			strcpy(Evt->ServiceType, TempPtr);
+			memset(Evt->ServiceType, 0, sizeof(Evt->ServiceType));
+			strncpy(Evt->ServiceType, TempPtr,
+				sizeof(Evt->ServiceType) - 1);
 			CommandFound = 1;
 		}
 	}
 	if (strstr(cmd, "urn:") != NULL && strstr(cmd, ":device:") != NULL) {
 		if ((TempPtr = strstr(cmd, "urn")) != NULL) {
-			strcpy(Evt->DeviceType, TempPtr);
+			memset(Evt->DeviceType, 0, sizeof(Evt->DeviceType));
+			strncpy(Evt->DeviceType, TempPtr,
+				sizeof(Evt->DeviceType) - 1);
 			CommandFound = 1;
 		}
 	}

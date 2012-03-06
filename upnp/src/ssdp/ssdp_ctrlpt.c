@@ -149,9 +149,9 @@ void ssdp_handle_ctrlpt_msg(http_message_t *hmsg, struct sockaddr_storage *dest_
 		linecopylen(param.Os, hdr_value.buf, hdr_value.length);
 	}
 	/* clear everything */
-	param.DeviceId[0] = '\0';
-	param.DeviceType[0] = '\0';
-	param.ServiceType[0] = '\0';
+	memset(param.DeviceId, 0, sizeof(param.DeviceId));
+	memset(param.DeviceType, 0, sizeof(param.DeviceType));
+	memset(param.ServiceType, 0, sizeof(param.ServiceType));
 	/* not used; version is in ServiceType */
 	param.ServiceVer[0] = '\0';
 	event.UDN[0] = '\0';
@@ -172,9 +172,11 @@ void ssdp_handle_ctrlpt_msg(http_message_t *hmsg, struct sockaddr_storage *dest_
 		hdr_value.buf[hdr_value.length] = save_char;
 	}
 	if (nt_found || usn_found) {
-		strcpy(param.DeviceId, event.UDN);
-		strcpy(param.DeviceType, event.DeviceType);
-		strcpy(param.ServiceType, event.ServiceType);
+		strncpy(param.DeviceId, event.UDN, sizeof(param.DeviceId) - 1);
+		strncpy(param.DeviceType, event.DeviceType,
+			sizeof(param.DeviceType) - 1);
+		strncpy(param.ServiceType, event.ServiceType,
+			sizeof(param.ServiceType) - 1);
 	}
 	/* ADVERT. OR BYEBYE */
 	if (hmsg->is_request) {
