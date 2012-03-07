@@ -566,31 +566,23 @@ int ixmlNode_removeChild(
 	IXML_Node *oldChild,
 	IXML_Node **returnNode)
 {
-	if (nodeptr == NULL || oldChild == NULL) {
+	if (!nodeptr || !oldChild)
 		return IXML_INVALID_PARAMETER;
-	}
-
-	if (ixmlNode_isParent(nodeptr, oldChild) == FALSE ) {
+	if (!ixmlNode_isParent(nodeptr, oldChild))
 		return IXML_NOT_FOUND_ERR;
-	}
-
-	if (oldChild->prevSibling != NULL) {
+	if (oldChild->prevSibling)
 		oldChild->prevSibling->nextSibling = oldChild->nextSibling;
-	}
-	if (nodeptr->firstChild == oldChild) {
+	if (nodeptr->firstChild == oldChild)
 		nodeptr->firstChild = oldChild->nextSibling;
-	}
-	if (oldChild->nextSibling != NULL) {
+	if (oldChild->nextSibling)
 		oldChild->nextSibling->prevSibling = oldChild->prevSibling;
-	}
 	oldChild->nextSibling = NULL;
 	oldChild->prevSibling = NULL;
 	oldChild->parentNode = NULL;
-	if (returnNode != NULL) {
+	if (returnNode)
 		*returnNode = oldChild;
-	} else {
+	else
 		ixmlNode_free(oldChild);
-	}
 
 	return IXML_SUCCESS;
 }
