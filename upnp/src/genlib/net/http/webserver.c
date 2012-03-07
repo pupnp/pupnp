@@ -502,6 +502,7 @@ static int get_file_info(
 	FILE *fp;
 	int rc = 0;
 
+	ixmlFreeDOMString(info->content_type);	
 	info->content_type = NULL;
 	code = stat(filename, &s);
 	if (code == -1)
