@@ -299,6 +299,13 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-03-07 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Fixing an error in d6db7c555d0f11856ce5e3e479b16a4cf4689107 commit
+
+	Evt.Sid should not be cast into char* when calling sizeof otherwise
+	size will be 4.
+
 2012-03-06 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Removing two unused variables in ssdp_server.c
