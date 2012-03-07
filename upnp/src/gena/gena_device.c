@@ -211,7 +211,7 @@ static UPNP_INLINE int notify_send_and_recv(
 		"bbb",
 		start_msg.buf, start_msg.length,
 		propertySet, strlen(propertySet),
-		CRLF, sizeof CRLF);
+		CRLF, strlen(CRLF));
 	if (ret_code) {
 		membuffer_destroy(&start_msg);
 		sock_destroy(&info, SD_BOTH);
