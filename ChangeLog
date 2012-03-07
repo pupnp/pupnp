@@ -301,6 +301,15 @@ Version 1.6.16
 
 2012-03-07 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
+	SF Bug Tracker id 3497714 - Buffer overflows
+
+	Fix compile error on WIN32.
+
+	Local variables must be declared first.
+	Remove outdated comment.
+
+2012-03-07 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
 	Avoid access violation in assertion.
 
 	xmlParser->pCurElement was dereferenced before null check.
