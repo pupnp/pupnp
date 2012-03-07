@@ -2,6 +2,13 @@
 Version 1.6.16
 *******************************************************************************
 
+2012-03-07 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Avoid access violation in assertion.
+
+	xmlParser->pCurElement was dereferenced before null check.
+	Affects debug build only.
+
 2012-03-07 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Remove SIZEOF_MISTACH error in notify_send_and_recv
