@@ -4,6 +4,16 @@ Version 1.6.16
 
 2012-03-07 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3498436 - Memory leak in Parser_processAttributeName
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-07 02:30:57 PST
+
+	attr is not freed if ixmlNode_setNodeProperties or
+	ixmlNode_setAttributeNode return an error in
+	Parser_processAttributeName.
+
+2012-03-07 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Fixing an error in d6db7c555d0f11856ce5e3e479b16a4cf4689107 commit
 
 	Evt.Sid should not be cast into char* when calling sizeof otherwise

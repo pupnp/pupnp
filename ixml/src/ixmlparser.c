@@ -2054,11 +2054,15 @@ static int Parser_processAttributeName(
 
     rc = ixmlNode_setNodeProperties( ( IXML_Node * ) attr, newNode );
     if( rc != IXML_SUCCESS ) {
+        ixmlAttr_free( attr );
         return rc;
     }
 
     rc = ixmlElement_setAttributeNode(
 	(IXML_Element *)xmlParser->currentNodePtr, attr, NULL );
+    if( rc != IXML_SUCCESS ) {
+        ixmlAttr_free( attr );
+    }
     return rc;
 }
 
