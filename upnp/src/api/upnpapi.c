@@ -3463,7 +3463,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 			sizeof(Evt.PublisherUrl) - 1);
 		Evt.TimeOut = Param->TimeOut;
 		strncpy((char *)Evt.Sid, UpnpString_get_String(Sid),
-			sizeof((char *)Evt.Sid) - 1);
+			sizeof(Evt.Sid) - 1);
 		Param->Fun(UPNP_EVENT_SUBSCRIBE_COMPLETE, &Evt, Param->Cookie);
 		UpnpString_delete(Sid);
 		UpnpString_delete(Url);
@@ -3479,7 +3479,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 			Param->Handle,
 			Sid);
 		strncpy((char *)Evt.Sid, UpnpString_get_String(Sid),
-			sizeof((char *)Evt.Sid) - 1);
+			sizeof(Evt.Sid) - 1);
 		strncpy(Evt.PublisherUrl, "", sizeof(Evt.PublisherUrl) - 1);
 		Evt.TimeOut = 0;
 		Param->Fun(UPNP_EVENT_UNSUBSCRIBE_COMPLETE, &Evt, Param->Cookie);
@@ -3498,7 +3498,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 			&Param->TimeOut);
 		Evt.TimeOut = Param->TimeOut;
 		strncpy((char *)Evt.Sid, UpnpString_get_String(Sid),
-			sizeof((char *)Evt.Sid) - 1);
+			sizeof(Evt.Sid) - 1);
 		Param->Fun(UPNP_EVENT_RENEWAL_COMPLETE, &Evt, Param->Cookie);
 		UpnpString_delete(Sid);
 		free(Param);
