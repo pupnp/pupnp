@@ -954,6 +954,8 @@ removeServiceTable( IXML_Node * node,
                         freeService( current_service );
                         current_service = start_search;
                     }
+                    ixmlFreeDOMString( UDN );
+                    UDN = NULL;
                 }
             }
 

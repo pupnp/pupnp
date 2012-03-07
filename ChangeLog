@@ -4,6 +4,14 @@ Version 1.6.16
 
 2012-03-07 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3498439 - Memory leak in removeServiceTable
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-07 02:35:46 PST
+
+	UDN is not freed.
+
+2012-03-07 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3498436 - Memory leak in Parser_processAttributeName
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-07 02:30:57 PST
