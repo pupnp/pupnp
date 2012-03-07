@@ -738,7 +738,7 @@ EXPORT_SPEC int ixmlDocument_createDocumentEx(
  * \return A pointer to the new \b Document object with the nodeName set to
  *  	"#document" or \c NULL on failure.
  */
-EXPORT_SPEC IXML_Document *ixmlDocument_createDocument();
+EXPORT_SPEC IXML_Document *ixmlDocument_createDocument(void);
 
 
 /*!
