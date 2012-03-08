@@ -320,6 +320,16 @@ Version 1.6.16
 
 2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	SF Bug Tracker id 3496993 - Write after free in ixmlNode_insertBefore
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 04:54:40 PST
+
+	If ixmlNode_isParent(nodeptr, newChild) returns TRUE,
+	ixmlNode_removeChild(nodeptr, newChild, NULL) will free newChild before
+	the modifications of newChild->nextSibling and newChild->prevSibling.
+
+2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Remove most of strcpy, sprintf and strcat
 
 	Replace strcpy, sprintf and strcat by strncpy, snprintf and strncat to

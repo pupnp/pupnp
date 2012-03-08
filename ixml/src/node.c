@@ -500,7 +500,7 @@ int ixmlNode_insertBefore(
 
 	if (refChild != NULL) {
 		if (ixmlNode_isParent(nodeptr, newChild) == TRUE) {
-			ixmlNode_removeChild(nodeptr, newChild, NULL);
+			ixmlNode_removeChild(nodeptr, newChild, &newChild);
 			newChild->nextSibling = NULL;
 			newChild->prevSibling = NULL;
 		}
@@ -611,7 +611,7 @@ int ixmlNode_appendChild(IXML_Node *nodeptr, IXML_Node *newChild)
 	}
 
 	if (ixmlNode_isParent(nodeptr, newChild) == TRUE ) {
-		ixmlNode_removeChild(nodeptr, newChild, NULL);
+		ixmlNode_removeChild(nodeptr, newChild, &newChild);
 	}
 	/* set the parent node pointer */
 	newChild->parentNode = nodeptr;
