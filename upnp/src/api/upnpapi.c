@@ -2024,8 +2024,8 @@ int UpnpUnSubscribe(UpnpClient_Handle Hnd, const Upnp_SID SubsId)
 		goto exit_function;
 	}
 	if (SubsId == NULL) {
-		HandleUnlock();
-		return UPNP_E_INVALID_PARAM;
+		retVal = UPNP_E_INVALID_PARAM;
+		goto exit_function;
 	}
 	UpnpString_set_String(SubsIdTmp, SubsId);
 
@@ -2108,7 +2108,7 @@ int UpnpUnSubscribeAsync(
 exit_function:
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Exiting UpnpUnSubscribeAsync\n");
 
-	return UPNP_E_SUCCESS;
+	return retVal;
 }
 #endif /* INCLUDE_CLIENT_APIS */
 
@@ -2126,7 +2126,8 @@ int UpnpRenewSubscription(
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpRenewSubscription\n");
 
 	if (UpnpSdkInit != 1) {
-		return UPNP_E_FINISH;
+		retVal = UPNP_E_FINISH;
+		goto exit_function;
 	}
 
 	if (SubsIdTmp == NULL) {
@@ -2752,6 +2753,7 @@ int UpnpSendActionExAsync(
 	sizeof ( Param->ServiceType ) - 1 );
     retVal = ixmlParseBufferEx( headerStr, &( Param->Header ) );
     if( retVal != IXML_SUCCESS ) {
+        free( Param );
         ixmlFreeDOMString( tmpStr );
         ixmlFreeDOMString( headerStr );
         if( retVal == IXML_INSUFFICIENT_MEMORY ) {
@@ -2763,6 +2765,7 @@ int UpnpSendActionExAsync(
 
     retVal = ixmlParseBufferEx( tmpStr, &( Param->Act ) );
     if( retVal != IXML_SUCCESS ) {
+        free( Param );
         ixmlFreeDOMString( tmpStr );
         ixmlFreeDOMString( headerStr );
         ixmlDocument_free( Param->Header );
