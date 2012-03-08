@@ -4,6 +4,15 @@ Version 1.6.16
 
 2012-03-08 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
+	SF Bug Tracker id 3499878 - UpnpUnSubscribeAsync(): ‘retVal’ may be used uninitialized
+
+	Submitted: Marcelo Roberto Jimenez ( mroberto ) - 2012-03-08 12:38:57 PST
+
+	src/api/upnpapi.c: In function ‘UpnpUnSubscribeAsync’:
+	src/api/upnpapi.c:2060:6: warning: ‘retVal’ may be used uninitialized in this function
+
+2012-03-08 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
 	SF Bug Tracker id 3175217 - Crash bug in Parser_addNamespace()
 
 	Submitted: Terry Farnham ( tfarnham ) - 2011-02-07 09:25:25 PST

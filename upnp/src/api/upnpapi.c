@@ -2024,7 +2024,7 @@ int UpnpUnSubscribeAsync(
 	Upnp_FunPtr Fun,
 	const void *Cookie_const)
 {
-	int retVal;
+	int retVal = UPNP_E_SUCCESS;
 	ThreadPoolJob job;
 	struct Handle_Info *SInfo = NULL;
 	struct UpnpNonblockParam *Param;
