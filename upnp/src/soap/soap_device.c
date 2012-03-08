@@ -693,24 +693,21 @@ static UPNP_INLINE void handle_query_variable(
 	void *cookie;
 	char var_name[LINE_SIZE];
 	const char *err_str;
-	int err_code;
+	int err_code = 0;
 
-	if (get_var_name(xml_doc, var_name) != 0) {
-		send_error_response(info, SOAP_INVALID_VAR,
-				    Soap_Invalid_Var, request);
-		return;
-	}
+	/* set default error */
+	err_code = SOAP_INVALID_VAR;
+	err_str = Soap_Invalid_Var;
+
+	if (get_var_name(xml_doc, var_name) != 0)
+		goto error_handler;
 	/* get info for event */
-	err_code = get_device_info(request, 1, xml_doc,
+	if (get_device_info(request, 1, xml_doc,
 		info->foreign_sockaddr.ss_family,
 		(UpnpString *)UpnpStateVarRequest_get_DevUDN(variable),
 		(UpnpString *)UpnpStateVarRequest_get_ServiceID(variable),
-		&soap_event_callback, &cookie);
-	if (err_code != 0) {
-		send_error_response(info, SOAP_INVALID_VAR,
-				    Soap_Invalid_Var, request);
-		return;
-	}
+		&soap_event_callback, &cookie) != 0)
+		goto error_handler;
 	UpnpStateVarRequest_set_ErrCode(variable, UPNP_E_SUCCESS);
 	UpnpStateVarRequest_strcpy_StateVarName(variable, var_name);
 	UpnpStateVarRequest_set_CtrlPtIPAddr(variable, &info->foreign_sockaddr);
@@ -719,28 +716,23 @@ static UPNP_INLINE void handle_query_variable(
 	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__,
 		"Return from callback for var request\n");
 	/* validate, and handle result */
-	if (UpnpStateVarRequest_get_CurrentVal(variable) == NULL) {
-		err_code = SOAP_ACTION_FAILED;
-		err_str = Soap_Action_Failed;
-		send_error_response(info, SOAP_INVALID_VAR, Soap_Invalid_Var,
-				    request);
-		return;
-	}
+	if (UpnpStateVarRequest_get_CurrentVal(variable) == NULL)
+		goto error_handler;
 	if (UpnpStateVarRequest_get_ErrCode(variable) != UPNP_E_SUCCESS) {
 		if (UpnpString_get_Length(UpnpStateVarRequest_get_ErrStr(variable)) > 0) {
-			err_code = SOAP_INVALID_VAR;
-			err_str = Soap_Invalid_Var;
-		} else {
 			err_code = UpnpStateVarRequest_get_ErrCode(variable);
 			err_str = UpnpStateVarRequest_get_ErrStr_cstr(variable);
 		}
-		send_error_response(info, err_code, err_str, request);
-
-		return;
+		goto error_handler;
 	}
 	/* send response */
 	send_var_query_response(info, UpnpStateVarRequest_get_CurrentVal(variable), request);
+
+        /* error handling and cleanup */
+error_handler:
 	UpnpStateVarRequest_delete(variable);
+	if (err_code != 0)
+		send_error_response(info, err_code, err_str, request);
 }
 
 /*!

@@ -2,6 +2,12 @@
 Version 1.8.0
 *******************************************************************************
 
+2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
+	Memory leak fix in handle_query_variable
+
+	variable was never freed.
+
 2011-02-07 Chandra Penke <chandrapenke(at)mcntech.com>
 
 	Add HTTPS support using OpenSSL. HTTPS support is optional and can
