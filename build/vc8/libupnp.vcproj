@@ -50,7 +50,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\pthreads\include;..\..\ixml\src\inc;..\..\ixml\inc;..\..\threadutil\inc;..\..\upnp\inc;..\..\upnp\src\inc;..\inc;..\msvc"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBUPNP_EXPORTS;PTW32_STATIC_LIB;UPNP_STATIC_LIB;UPNP_USE_MSVCPP;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBUPNP_EXPORTS;PTW32_STATIC_LIB;UPNP_USE_MSVCPP;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -80,8 +80,8 @@
 				OutputFile="$(OutDir)\libupnp.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release/libupnp.pdb"
-				ImportLibrary=".\Release/libupnp.lib"
+				ProgramDatabaseFile="$(OutDir)\libupnp.pdb"
+				ImportLibrary="$(OutDir)\libupnp.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -96,7 +96,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release/libupnp.bsc"
+				OutputFile="$(OutDir)\libupnp.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
