@@ -2,6 +2,17 @@
 Version 1.6.16
 *******************************************************************************
 
+2012-03-08 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	SF Bug Tracker id 3175217 - Crash bug in Parser_addNamespace()
+
+	Submitted: Terry Farnham ( tfarnham ) - 2011-02-07 09:25:25 PST
+
+	Details: The strcmp(pNode->prefix,pCur->prefix) crashes on pCur->prefix
+	being NULL. This occurs on invalidly formatted xml where a node uses an
+	undefined namespace. I would expect to receive IXML_FAILED in this
+	situation.
+
 2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Removing access to NULL pointers in node.c and element.c
