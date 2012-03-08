@@ -487,7 +487,7 @@ int ixmlElement_setAttributeNS(
 			Parser_freeNodeContent(&newAttrNode);
 			return IXML_INSUFFICIENT_MEMORY;
 		}
-		if (ixmlElement_setAttributeNodeNS(element, newAttr, NULL) != IXML_SUCCESS) {
+		if (ixmlElement_setAttributeNodeNS(element, newAttr, &newAttr) != IXML_SUCCESS) {
 			ixmlAttr_free(newAttr);
 			Parser_freeNodeContent(&newAttrNode);
 			return IXML_FAILED;

@@ -320,6 +320,14 @@ Version 1.6.16
 
 2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Removing access to NULL pointers in node.c and element.c
+
+	Check that newNode is not NULL ixmlNode_cloneNodeTree and pass newAttr
+	as the return node in the ixmlElement_setAttributeNodeNS call of
+	ixmlElement_setAttributeNS.
+
+2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Memory leaks correction in upnpapi.c
 
 	Fix memory leaks in UpnpUnSubscribe, SendActionExAsync and

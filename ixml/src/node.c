@@ -1040,7 +1040,8 @@ static IXML_Node *ixmlNode_cloneNodeTree(
 	}
 
 	/* by spec, the duplicate node has no parent */
-	newNode->parentNode = NULL;
+	if (newNode != NULL)
+		newNode->parentNode = NULL;
 
 	return newNode;
 }
