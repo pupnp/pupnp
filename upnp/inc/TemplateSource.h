@@ -245,6 +245,8 @@ CLASS *CLASS##_new() \
 { \
 	struct S##CLASS *p = calloc(1, sizeof (struct S##CLASS)); \
 \
+	if (!p) return NULL; \
+\
 	EXPAND_CLASS_MEMBERS(CLASS) \
 \
 	return (CLASS *)p; \
@@ -287,6 +289,8 @@ TEMPLATE_DEFINITION_DESTRUCTOR(CLASS)
 CLASS *CLASS##_dup(const CLASS *q) \
 { \
 	CLASS *p = CLASS##_new(); \
+\
+	if (!p) return NULL; \
 \
 	CLASS##_assign(p, q); \
 \

@@ -699,14 +699,15 @@ static UPNP_INLINE void handle_query_variable(
 	err_code = SOAP_INVALID_VAR;
 	err_str = Soap_Invalid_Var;
 
-	if (get_var_name(xml_doc, var_name) != 0)
+	if (variable == NULL || get_var_name(xml_doc, var_name) != 0)
 		goto error_handler;
 	/* get info for event */
-	if (get_device_info(request, 1, xml_doc,
+	err_code = get_device_info(request, 1, xml_doc,
 		info->foreign_sockaddr.ss_family,
 		(UpnpString *)UpnpStateVarRequest_get_DevUDN(variable),
 		(UpnpString *)UpnpStateVarRequest_get_ServiceID(variable),
-		&soap_event_callback, &cookie) != 0)
+		&soap_event_callback, &cookie);
+	if (err_code != UPNP_E_SUCCESS)
 		goto error_handler;
 	UpnpStateVarRequest_set_ErrCode(variable, UPNP_E_SUCCESS);
 	UpnpStateVarRequest_strcpy_StateVarName(variable, var_name);

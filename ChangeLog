@@ -4,6 +4,13 @@ Version 1.8.0
 
 2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
+	Check for NULL pointer in TemplateSource.h
+
+	calloc can return NULL so check for NULL pointer in CLASS##_new and
+	CLASS##_dup.
+
+2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
 	Replace strcpy with strncpy in get_hoststr
 
 	Replace strcpy with strncpy to avoid buffer overflow.
