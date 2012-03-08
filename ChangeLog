@@ -4,6 +4,13 @@ Version 1.6.16
 
 2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Memory leaks correction in upnpapi.c
+	
+	Fix memory leaks in UpnpUnSubscribe, SendActionExAsync and
+	RenewSubscription.
+
+2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3496993 - Write after free in ixmlNode_insertBefore
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 04:54:40 PST
