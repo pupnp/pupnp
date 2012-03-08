@@ -1503,47 +1503,38 @@ static int Parser_addNamespace(
 	/*! [in] The XML parser. */
 	Parser *xmlParser)
 {
-    IXML_Node *pNode;
-    IXML_ElementStack *pCur;
-    const char *namespaceUri;
+	IXML_Node *pNode;
+	IXML_ElementStack *pCur;
+	const char *namespaceUri;
 
-    pNode = xmlParser->pNeedPrefixNode;
-    pCur = xmlParser->pCurElement;
+	pNode = xmlParser->pNeedPrefixNode;
+	pCur = xmlParser->pCurElement;
+	if (!pNode->prefix) {
+		/* element does not have prefix */
+		if (strcmp(pNode->nodeName, pCur->element) != 0)
+			return IXML_FAILED;
+		if (pCur->namespaceUri) {
+			/* it would be wrong that pNode->namespace != NULL. */
+			assert(pNode->namespaceURI == NULL);
+			pNode->namespaceURI = safe_strdup(pCur->namespaceUri);
+			if (!pNode->namespaceURI)
+				return IXML_INSUFFICIENT_MEMORY;
+		}
+		xmlParser->pNeedPrefixNode = NULL;
+	} else {
+		if ((strcmp(pNode->nodeName, pCur->element) != 0) &&
+		    (strcmp(pNode->prefix, pCur->prefix) != 0))
+			return IXML_FAILED;
+		namespaceUri = Parser_getNameSpace(xmlParser, pCur->prefix);
+		if (namespaceUri) {
+			pNode->namespaceURI = safe_strdup(namespaceUri);
+			if (!pNode->namespaceURI)
+				return IXML_INSUFFICIENT_MEMORY;
+			xmlParser->pNeedPrefixNode = NULL;
+		}
+	}
 
-    if( pNode->prefix == NULL ) {
-	/* element does not have prefix */
-        if( strcmp( pNode->nodeName, pCur->element ) != 0 ) {
-            return IXML_FAILED;
-        }
-        if( pCur->namespaceUri != NULL ) {
-            /* it would be wrong that pNode->namespace != NULL. */
-            assert( pNode->namespaceURI == NULL );
-
-            pNode->namespaceURI = safe_strdup( pCur->namespaceUri );
-            if( pNode->namespaceURI == NULL ) {
-                return IXML_INSUFFICIENT_MEMORY;
-            }
-        }
-
-        xmlParser->pNeedPrefixNode = NULL;
-
-    } else {
-        if( ( strcmp( pNode->nodeName, pCur->element ) != 0 ) &&
-            ( strcmp( pNode->prefix, pCur->prefix ) != 0 ) ) {
-            return IXML_FAILED;
-        }
-
-        namespaceUri = Parser_getNameSpace( xmlParser, pCur->prefix );
-        if( namespaceUri != NULL ) {
-            pNode->namespaceURI = safe_strdup( namespaceUri );
-            if( pNode->namespaceURI == NULL ) {
-                return IXML_INSUFFICIENT_MEMORY;
-            }
-
-            xmlParser->pNeedPrefixNode = NULL;
-        }
-    }
-    return IXML_SUCCESS;
+	return IXML_SUCCESS;
 }
 
 
