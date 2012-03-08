@@ -430,6 +430,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 	/* 10 byte allocated for chunk header. */
 	size_t Data_Buf_Size = WEB_SERVER_BUF_SIZE;
 
+	memset(Chunk_Header, 0, sizeof(Chunk_Header));
 	va_start(argp, fmt);
 	while ((c = *fmt++) != 0) {
 		if (c == 'I') {
@@ -507,9 +508,13 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 					/* Copy CRLF at the end of the chunk */
 					memcpy(file_buf + num_read, "\r\n", 2);
 					/* Hex length for the chunk size. */
-					sprintf(Chunk_Header, "%" PRIzx, num_read);
+					memset(Chunk_Header, 0,
+						sizeof(Chunk_Header));
+					snprintf(Chunk_Header,
+						sizeof(Chunk_Header) - strlen ("\r\n") - 1,
+						"%" PRIzx, num_read);
 					/*itoa(num_read,Chunk_Header,16);  */
-					strcat(Chunk_Header, "\r\n");
+					strncat(Chunk_Header, "\r\n", strlen ("\r\n"));
 					/* Copy the chunk size header  */
 					memcpy(file_buf - strlen(Chunk_Header),
 					       Chunk_Header,
@@ -696,7 +701,8 @@ int http_Download( IN const char *url_str,
 		return ret_code;
 	/* make msg */
 	membuffer_init(&request);
-	strcpy(urlPath, url_str);
+	memset(urlPath, 0, strlen(url_str) + 1);
+	strncpy(urlPath, url_str, strlen(url_str));
 	hoststr = strstr(urlPath, "//");
 	if (hoststr == NULL)
 		return UPNP_E_INVALID_URL;
@@ -1434,6 +1440,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 	const char *month_str = "Jan\0Feb\0Mar\0Apr\0May\0Jun\0"
 	    "Jul\0Aug\0Sep\0Oct\0Nov\0Dec";
 
+	memset(tempbuf, 0, sizeof(tempbuf));
 	va_start(argp, fmt);
 	while ((c = *fmt++) != 0) {
 		if (c == 's') {
@@ -1475,13 +1482,14 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 		} else if (c == 'd') {
 			/* integer */
 			num = (size_t)va_arg(argp, int);
-			sprintf(tempbuf, "%" PRIzu, num);
+			snprintf(tempbuf, sizeof(tempbuf) - 1, "%" PRIzu, num);
 			if (membuffer_append(buf, tempbuf, strlen(tempbuf)))
 				goto error_handler;
 		} else if (c == 'h') {
 			/* off_t */
 			bignum = (off_t) va_arg(argp, off_t);
-			sprintf(tempbuf, "%" PRId64, (int64_t) bignum);
+			snprintf(tempbuf, sizeof(tempbuf) - 1, "%" PRId64,
+				(int64_t) bignum);
 			if (membuffer_append(buf, tempbuf, strlen(tempbuf)))
 				goto error_handler;
 		} else if (c == 't' || c == 'D') {
@@ -1499,7 +1507,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			}
 			assert(loc_time);
 			date = gmtime(loc_time);
-			sprintf(tempbuf,
+			snprintf(tempbuf, sizeof(tempbuf) - 1,
 				"%s%s, %02d %s %d %02d:%02d:%02d GMT%s",
 				start_str, &weekday_str[date->tm_wday * 4],
 				date->tm_mday, &month_str[date->tm_mon * 4],
@@ -1556,7 +1564,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			/*   e.g.: 'HTTP/1.1 200 OK' code */
 			status_code = (int)va_arg(argp, int);
 			assert(status_code > 0);
-			sprintf(tempbuf, "HTTP/%d.%d %d ",
+			snprintf(tempbuf, sizeof(tempbuf) - 1, "HTTP/%d.%d %d ",
 				http_major_version, http_minor_version,
 				status_code);
 			/* str */
@@ -1567,7 +1575,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 		} else if (c == 'B') {
 			/* body of a simple reply */
 			status_code = (int)va_arg(argp, int);
-			sprintf(tempbuf, "%s%d %s%s",
+			snprintf(tempbuf, sizeof(tempbuf) - 1, "%s%d %s%s",
 				"<html><body><h1>",
 				status_code, http_get_code_text(status_code),
 				"</h1></body></html>");
@@ -1702,7 +1710,7 @@ int MakeGetMessageEx( const char *url_str,
 			break;
 		}
 		memset(urlPath, 0, strlen(url_str) + 1);
-		strcpy(urlPath, url_str);
+		strncpy(urlPath, url_str, strlen(url_str));
 		hoststr = strstr(urlPath, "//");
 		if (hoststr == NULL) {
 			errCode = UPNP_E_INVALID_URL;
@@ -1806,7 +1814,8 @@ int http_OpenHttpGetEx(
 			break;
 		}
 		memset(&rangeBuf, 0, sizeof(rangeBuf));
-		sprintf(rangeBuf.RangeHeader,
+		snprintf(rangeBuf.RangeHeader,
+			sizeof(rangeBuf.RangeHeader) - 1,
 			"Range: bytes=%d-%d\r\n", lowRange, highRange);
 		membuffer_init(&request);
 		errCode = MakeGetMessageEx(url_str, &request, &url, &rangeBuf);

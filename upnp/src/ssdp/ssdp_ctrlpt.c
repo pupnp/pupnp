@@ -327,24 +327,27 @@ static void CreateClientRequestPacket(
 {
 	char TempBuf[COMMAND_LEN];
 
+	memset(TempBuf, 0, sizeof(TempBuf));
 	strcpy(RqstBuf, "M-SEARCH * HTTP/1.1\r\n");
 
 	if (AddressFamily == AF_INET) {
-		sprintf(TempBuf, "HOST: %s:%d\r\n", SSDP_IP, SSDP_PORT);
+		snprintf(TempBuf, sizeof(TempBuf) - 1, "HOST: %s:%d\r\n",
+			SSDP_IP, SSDP_PORT);
 	} else if (AddressFamily == AF_INET6) {
-		sprintf(TempBuf, "HOST: [%s]:%d\r\n", SSDP_IPV6_LINKLOCAL,
-			SSDP_PORT);
+		snprintf(TempBuf, sizeof(TempBuf) - 1, "HOST: [%s]:%d\r\n",
+			SSDP_IPV6_LINKLOCAL, SSDP_PORT);
 	}
 	strcat(RqstBuf, TempBuf);
 	strcat(RqstBuf, "MAN: \"ssdp:discover\"\r\n");
 
 	if (Mx > 0) {
-		sprintf(TempBuf, "MX: %d\r\n", Mx);
+		snprintf(TempBuf, sizeof(TempBuf) - 1, "MX: %d\r\n", Mx);
 		strcat(RqstBuf, TempBuf);
 	}
 
 	if (SearchTarget != NULL) {
-		sprintf(TempBuf, "ST: %s\r\n", SearchTarget);
+		snprintf(TempBuf, sizeof(TempBuf) - 1, "ST: %s\r\n",
+			SearchTarget);
 		strcat(RqstBuf, TempBuf);
 	}
 	strcat(RqstBuf, "\r\n");
@@ -365,21 +368,24 @@ static void CreateClientRequestPacketUlaGua(
 {
 	char TempBuf[COMMAND_LEN];
 
+	memset(TempBuf, 0, sizeof(TempBuf));
 	strcpy(RqstBuf, "M-SEARCH * HTTP/1.1\r\n");
 	if (AddressFamily == AF_INET) {
-		sprintf(TempBuf, "HOST: %s:%d\r\n", SSDP_IP, SSDP_PORT);
+		snprintf(TempBuf, sizeof(TempBuf) - 1, "HOST: %s:%d\r\n",
+			SSDP_IP, SSDP_PORT);
 	} else if (AddressFamily == AF_INET6) {
-		sprintf(TempBuf, "HOST: [%s]:%d\r\n", SSDP_IPV6_SITELOCAL,
-			SSDP_PORT);
+		snprintf(TempBuf, sizeof(TempBuf) - 1, "HOST: [%s]:%d\r\n",
+			SSDP_IPV6_SITELOCAL, SSDP_PORT);
 	}
 	strcat(RqstBuf, TempBuf);
 	strcat(RqstBuf, "MAN: \"ssdp:discover\"\r\n");
 	if (Mx > 0) {
-		sprintf(TempBuf, "MX: %d\r\n", Mx);
+		snprintf(TempBuf, sizeof(TempBuf) - 1, "MX: %d\r\n", Mx);
 		strcat(RqstBuf, TempBuf);
 	}
 	if (SearchTarget) {
-		sprintf(TempBuf, "ST: %s\r\n", SearchTarget);
+		snprintf(TempBuf, sizeof(TempBuf) - 1, "ST: %s\r\n",
+			SearchTarget);
 		strcat(RqstBuf, TempBuf);
 	}
 	strcat(RqstBuf, "\r\n");

@@ -493,8 +493,10 @@ int genaInitNotify(
 		goto ExitFunction;
 	}
 
-	strcpy(UDN_copy, UDN);
-	strcpy(servId_copy, servId);
+	memset(UDN_copy, 0, strlen(UDN) + 1);
+	strncpy(UDN_copy, UDN, strlen(UDN));
+	memset(servId_copy, 0, strlen(servId) + 1);
+	strncpy(servId_copy, servId, strlen(servId));
 
 	HandleLock();
 
@@ -650,8 +652,10 @@ int genaInitNotifyExt(
 		goto ExitFunction;
 	}
 
-	strcpy(UDN_copy, UDN);
-	strcpy(servId_copy, servId);
+	memset(UDN_copy, 0, strlen(UDN) + 1);
+	strncpy(UDN_copy, UDN, strlen(UDN));
+	memset(servId_copy, 0, strlen(servId) + 1);
+	strncpy(servId_copy, servId, strlen(servId));
 
 	HandleLock();
 
@@ -807,8 +811,10 @@ int genaNotifyAllExt(
 		goto ExitFunction;
 	}
 
-	strcpy(UDN_copy, UDN);
-	strcpy(servId_copy, servId);
+	memset(UDN_copy, 0, strlen(UDN) + 1);
+	strncpy(UDN_copy, UDN, strlen(UDN));
+	memset(servId_copy, 0, strlen(servId) + 1);
+	strncpy(servId_copy, servId, strlen(servId));
 
 	propertySet = ixmlPrintNode((IXML_Node *)PropSet);
 	if (propertySet == NULL) {
@@ -951,8 +957,10 @@ int genaNotifyAll(
 		goto ExitFunction;
 	}
 
-	strcpy(UDN_copy, UDN);
-	strcpy(servId_copy, servId);
+	memset(UDN_copy, 0, strlen(UDN) + 1);
+	strncpy(UDN_copy, UDN, strlen(UDN));
+	memset(servId_copy, 0, strlen(servId) + 1);
+	strncpy(servId_copy, servId, strlen(servId));
 
 	ret = GeneratePropertySet(VarNames, VarValues, var_count, &propertySet);
 	if (ret != XML_SUCCESS) {
@@ -1067,13 +1075,16 @@ static int respond_ok(
     char timeout_str[100];
     int upnp_timeout = UPNP_TIMEOUT;
 
+    memset( timeout_str, 0, sizeof( timeout_str ) );
     http_CalcResponseVersion( request->major_version,
                               request->minor_version, &major, &minor );
 
     if( time_out >= 0 ) {
-        sprintf( timeout_str, "TIMEOUT: Second-%d", time_out );
+        snprintf( timeout_str, sizeof ( timeout_str ) - 1,
+		"TIMEOUT: Second-%d", time_out );
     } else {
-        strcpy( timeout_str, "TIMEOUT: Second-infinite" );
+        strncpy( timeout_str, "TIMEOUT: Second-infinite",
+		sizeof ( timeout_str ) - 1 );
     }
 
     membuffer_init( &response );
@@ -1335,7 +1346,8 @@ void gena_process_subscription_request(
 	/* generate SID */
 	uuid_create(&uid);
 	uuid_unpack(&uid, temp_sid);
-	sprintf(sub->sid, "uuid:%s", temp_sid);
+	memset(sub->sid, 0, sizeof(sub->sid));
+	snprintf(sub->sid, sizeof(sub->sid) - 1, "uuid:%s", temp_sid);
 
 	/* respond OK */
 	if (respond_ok(info, time_out, sub, request) != UPNP_E_SUCCESS) {

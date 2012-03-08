@@ -1500,6 +1500,7 @@ static int GetDescDocumentAndURL(
 	struct sockaddr_storage serverAddr;
 	int rc = UPNP_E_SUCCESS;
 
+	memset(aliasStr, 0, sizeof(aliasStr));
 	if (description == NULL)
 		return UPNP_E_INVALID_PARAM;
 	/* non-URL description must have configuration specified */
@@ -1551,7 +1552,8 @@ static int GetDescDocumentAndURL(
 	/* Determine alias */
 	if (config_baseURL) {
 		if (descriptionType == UPNPREG_BUF_DESC) {
-			strcpy(aliasStr, "description.xml");
+			strncpy(aliasStr, "description.xml",
+				sizeof(aliasStr) - 1);
 		} else {
 			/* URL or filename */
 			retVal = GetNameForAlias(description, &temp_str);
@@ -1564,7 +1566,7 @@ static int GetDescDocumentAndURL(
 				free(temp_str);
 				return UPNP_E_URL_TOO_BIG;
 			}
-			strcpy(aliasStr, temp_str);
+			strncpy(aliasStr, temp_str, sizeof(aliasStr) - 1);
 		}
 		if (AddressFamily == AF_INET) {
 			get_server_addr((struct sockaddr *)&serverAddr);
@@ -1586,7 +1588,8 @@ static int GetDescDocumentAndURL(
 			ixmlDocument_free(*xmlDoc);
 			return UPNP_E_URL_TOO_BIG;
 		}
-		strcpy(descURL, description);
+		strncpy(descURL, description, strlen(description));
+		descURL[strlen(description)] = '\0';
 	}
 
 	assert(*xmlDoc != NULL);
@@ -1617,7 +1620,8 @@ static int GetDescDocumentAndURL(
 	if (strlen(description) > (LINE_SIZE - 1)) {
 		return UPNP_E_URL_TOO_BIG;
 	}
-	strcpy(descURL, description);
+	strncpy(descURL, description, strlen(description));
+	descURL[strlen(description)] = '\0';
 
 	retVal = UpnpDownloadXmlDoc(description, xmlDoc);
 	if (retVal != UPNP_E_SUCCESS) {
@@ -1986,7 +1990,8 @@ int UpnpSubscribe(
 	HandleUnlock();
 
 	retVal = genaSubscribe(Hnd, EvtUrl, TimeOut, SubsIdTmp);
-	strcpy(SubsId, UpnpString_get_String(SubsIdTmp));
+	memset(SubsId, 0, sizeof(Upnp_SID));
+	strncpy(SubsId, UpnpString_get_String(SubsIdTmp), sizeof(Upnp_SID) - 1);
 
 exit_function:
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -3436,7 +3441,9 @@ int UpnpGetIfInfo(const char *IfName)
 		    (struct ifreq *)((caddr_t) ifConf.ifc_req + i);
 		i += sizeof *pifReq;
 		/* See if this is the sort of interface we want to deal with. */
-		strcpy(ifReq.ifr_name, pifReq->ifr_name);
+		memset(ifReq.ifr_name, 0, sizeof(ifReq.ifr_name));
+		strncpy(ifReq.ifr_name, pifReq->ifr_name,
+			sizeof(ifReq.ifr_name) - 1);
 		if (ioctl(LocalSock, SIOCGIFFLAGS, &ifReq) < 0) {
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				   "Can't get interface flags for %s:\n",
@@ -3868,7 +3875,9 @@ int getlocalhostname(char *out, size_t out_len)
 			(struct ifreq *)((caddr_t)ifConf.ifc_req + i);
 		i += sizeof *pifReq;
 		/* See if this is the sort of interface we want to deal with. */
-		strcpy(ifReq.ifr_name, pifReq->ifr_name);
+		memset(ifReq.ifr_name, 0, sizeof(ifReq.ifr_name));
+		strncpy(ifReq.ifr_name, pifReq->ifr_name,
+			sizeof(ifReq.ifr_name) - 1);
 		if (ioctl(LocalSock, SIOCGIFFLAGS, &ifReq) < 0) {
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				"Can't get interface flags for %s:\n",
@@ -3948,6 +3957,7 @@ int UpnpAddVirtualDir(const char *newDirName)
     virtualDirList *pCurVirtualDir;
     char dirName[NAME_SIZE];
 
+    memset( dirName, 0, sizeof( dirName ) );
     if( UpnpSdkInit != 1 ) {
         /* SDK is not initialized */
         return UPNP_E_FINISH;
@@ -3959,9 +3969,9 @@ int UpnpAddVirtualDir(const char *newDirName)
 
     if( *newDirName != '/' ) {
         dirName[0] = '/';
-        strcpy( dirName + 1, newDirName );
+        strncpy( dirName + 1, newDirName, sizeof( dirName ) - 1 );
     } else {
-        strcpy( dirName, newDirName );
+        strncpy( dirName, newDirName, sizeof( dirName ) - 1 );
     }
 
     pCurVirtualDir = pVirtualDirList;
@@ -3980,7 +3990,9 @@ int UpnpAddVirtualDir(const char *newDirName)
         return UPNP_E_OUTOF_MEMORY;
     }
     pNewVirtualDir->next = NULL;
-    strcpy( pNewVirtualDir->dirName, dirName );
+    memset( pNewVirtualDir->dirName, 0, sizeof( pNewVirtualDir->dirName ) );
+    strncpy( pNewVirtualDir->dirName, dirName,
+	sizeof( pNewVirtualDir->dirName ) - 1);
     *( pNewVirtualDir->dirName + strlen( dirName ) ) = 0;
 
     if( pVirtualDirList == NULL ) { /* first virtual dir */

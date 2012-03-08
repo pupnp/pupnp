@@ -467,8 +467,11 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 			ptr3 = strstr(ptr2 + 1, ":");
 		else
 			return -1;
-		if (ptr3 != NULL)
-			sprintf(Evt->UDN, "uuid:%s", ptr3 + 1);
+		if (ptr3 != NULL) {
+			memset(Evt->UDN, 0, sizeof(Evt->UDN));
+			snprintf(Evt->UDN, sizeof(Evt->UDN) - 1,
+				"uuid:%s", ptr3 + 1);
+		}
 		else
 			return -1;
 		ptr1 = strstr(cmd, ":");
@@ -476,7 +479,9 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 			n = (size_t) (ptr3 - ptr1);
 			strncpy(TempBuf, ptr1, n);
 			TempBuf[n] = '\0';
-			sprintf(Evt->DeviceType, "urn%s", TempBuf);
+			memset(Evt->DeviceType, 0, sizeof(Evt->DeviceType));
+			snprintf(Evt->DeviceType, sizeof(Evt->DeviceType) - 1,
+				"urn%s", TempBuf);
 		} else
 			return -1;
 		return 0;

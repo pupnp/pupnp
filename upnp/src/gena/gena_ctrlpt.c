@@ -284,6 +284,7 @@ static int gena_subscribe(
 	uri_type dest_url;
 	http_parser_t response;
 
+	memset(timeout_str, 0, sizeof(timeout_str));
 	UpnpString_clear(sid);
 
 	/* request timeout to string */
@@ -291,11 +292,12 @@ static int gena_subscribe(
 		timeout = &local_timeout;
 	}
 	if (*timeout < 0) {
-		strcpy(timeout_str, "infinite");
+		strncpy(timeout_str, "infinite", sizeof(timeout_str) - 1);
 	} else if(*timeout < CP_MINIMUM_SUBSCRIPTION_TIME) {
-		sprintf(timeout_str, "%d", CP_MINIMUM_SUBSCRIPTION_TIME);
+		snprintf(timeout_str, sizeof(timeout_str) - 1,
+			"%d", CP_MINIMUM_SUBSCRIPTION_TIME);
 	} else {
-		sprintf(timeout_str, "%d", *timeout);
+		snprintf(timeout_str, sizeof(timeout_str) - 1, "%d", *timeout);
 	}
 
 	/* parse url */
@@ -513,6 +515,9 @@ int genaSubscribe(
 	UpnpString *EventURL = UpnpString_new();
 	struct Handle_Info *handle_info;
 
+	memset(temp_sid, 0, sizeof(temp_sid));
+	memset(temp_sid2, 0, sizeof(temp_sid2));
+
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "GENA SUBSCRIBE BEGIN");
 
 	UpnpString_clear(out_sid);
@@ -545,7 +550,7 @@ int genaSubscribe(
 	/* generate client SID */
 	uuid_create(&uid );
 	uuid_unpack(&uid, temp_sid);
-	sprintf(temp_sid2, "uuid:%s", temp_sid);
+	snprintf(temp_sid2, sizeof(temp_sid2) - 1, "uuid:%s", temp_sid);
 	UpnpString_set_String(out_sid, temp_sid2);
 
 	/* create event url */

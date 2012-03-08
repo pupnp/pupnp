@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -589,12 +590,13 @@ char *resolve_rel_url(char *base_url, char *rel_url)
     if( out == NULL ) {
         return NULL;
     }
+    memset( out, 0, strlen( base_url ) + strlen( rel_url ) + 2 );
 
     if( ( parse_uri( rel_url, strlen( rel_url ), &rel ) ) == HTTP_SUCCESS ) {
 
         if( rel.type == ABSOLUTE ) {
 
-            strcpy( out, rel_url );
+            strncpy( out, rel_url, strlen ( rel_url ) );
         } else {
 
             if( ( parse_uri( base_url, strlen( base_url ), &base ) ==
@@ -602,7 +604,7 @@ char *resolve_rel_url(char *base_url, char *rel_url)
                 && ( base.type == ABSOLUTE ) ) {
 
                 if( strlen( rel_url ) == 0 ) {
-                    strcpy( out, base_url );
+                    strncpy( out, base_url, strlen ( base_url ) );
                 } else {
                     memcpy( out, base.scheme.buff, base.scheme.size );
                     out_finger += base.scheme.size;
@@ -610,7 +612,7 @@ char *resolve_rel_url(char *base_url, char *rel_url)
                     out_finger++;
 
                     if( rel.hostport.text.size > 0 ) {
-                        sprintf( out_finger, "%s", rel_url );
+                        snprintf( out_finger, strlen( rel_url ), "%s", rel_url );
                     } else {
                         if( base.hostport.text.size > 0 ) {
                             memcpy( out_finger, "//", 2 );
@@ -621,7 +623,7 @@ char *resolve_rel_url(char *base_url, char *rel_url)
                         }
 
                         if( rel.path_type == ABS_PATH ) {
-                            strcpy( out_finger, rel_url );
+                            strncpy( out_finger, rel_url, strlen ( rel_url ) );
 
                         } else {
 
@@ -642,7 +644,7 @@ char *resolve_rel_url(char *base_url, char *rel_url)
                                 finger++;
 
                             }
-                            strcpy( last_slash, rel_url );
+                            strncpy( last_slash, rel_url, strlen ( rel_url ) );
                             if( remove_dots( out_finger,
                                              strlen( out_finger ) ) !=
                                 UPNP_E_SUCCESS ) {

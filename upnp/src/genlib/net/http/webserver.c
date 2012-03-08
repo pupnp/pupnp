@@ -318,6 +318,7 @@ static UPNP_INLINE int get_content_type(
 	temp = malloc(length);
 	if (!temp)
 		return UPNP_E_OUTOF_MEMORY;
+	memset(temp, 0, length);
 	sprintf(temp, "%s/%s", type, subtype);
 	UpnpFileInfo_set_ContentType(fileInfo, temp);
 	free(temp);
@@ -773,7 +774,8 @@ static int CreateHTTPRangeResponseHeader(
 	RangeInput = malloc(strlen(ByteRangeSpecifier) + 1);
 	if (!RangeInput)
 		return UPNP_E_OUTOF_MEMORY;
-	strcpy(RangeInput, ByteRangeSpecifier);
+	memset(RangeInput, 0, strlen(ByteRangeSpecifier) + 1);
+	strncpy(RangeInput, ByteRangeSpecifier, strlen(ByteRangeSpecifier));
 	/* CONTENT-RANGE: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
 	if (StrStr(RangeInput, "bytes") == NULL ||
 	    (Ptr = StrStr(RangeInput, "=")) == NULL) {
@@ -792,13 +794,15 @@ static int CreateHTTPRangeResponseHeader(
 			free(RangeInput);
 			return HTTP_REQUEST_RANGE_NOT_SATISFIABLE;
 		}
+		memset(Instr->RangeHeader, 0, sizeof(Instr->RangeHeader));
 		if (FirstByte >= 0 && LastByte >= 0 && LastByte >= FirstByte) {
 			if (LastByte >= FileLength)
 				LastByte = FileLength - 1;
 			Instr->RangeOffset = FirstByte;
 			Instr->ReadSendSize = LastByte - FirstByte + 1;
 			/* Data between two range. */
-			sprintf(Instr->RangeHeader,
+			snprintf(Instr->RangeHeader,
+				sizeof(Instr->RangeHeader) - 1,
 				"CONTENT-RANGE: bytes %" PRId64
 				"-%" PRId64 "/%" PRId64 "\r\n",
 				(int64_t)FirstByte,
@@ -808,7 +812,10 @@ static int CreateHTTPRangeResponseHeader(
 			   && FirstByte < FileLength) {
 			Instr->RangeOffset = FirstByte;
 			Instr->ReadSendSize = FileLength - FirstByte;
-			sprintf(Instr->RangeHeader,
+			memset(Instr->RangeHeader, 0,
+				sizeof(Instr->RangeHeader));
+			snprintf(Instr->RangeHeader,
+				sizeof(Instr->RangeHeader) - 1,
 				"CONTENT-RANGE: bytes %" PRId64
 				"-%" PRId64 "/%" PRId64 "\r\n",
 				(int64_t)FirstByte,
@@ -818,7 +825,8 @@ static int CreateHTTPRangeResponseHeader(
 			if (LastByte >= FileLength) {
 				Instr->RangeOffset = 0;
 				Instr->ReadSendSize = FileLength;
-				sprintf(Instr->RangeHeader,
+				snprintf(Instr->RangeHeader,
+					sizeof(Instr->RangeHeader) - 1,
 					"CONTENT-RANGE: bytes 0-%" PRId64
 					"/%" PRId64 "\r\n",
 					(int64_t)(FileLength - 1),
@@ -826,7 +834,8 @@ static int CreateHTTPRangeResponseHeader(
 			} else {
 				Instr->RangeOffset = FileLength - LastByte;
 				Instr->ReadSendSize = LastByte;
-				sprintf(Instr->RangeHeader,
+				snprintf(Instr->RangeHeader,
+					sizeof(Instr->RangeHeader) - 1,
 					"CONTENT-RANGE: bytes %" PRId64
 					"-%" PRId64 "/%" PRId64 "\r\n",
 					(int64_t)(FileLength - LastByte + 1),
