@@ -169,7 +169,8 @@ static int get_hoststr(const char* url_str,
 {
 	char *urlPath = alloca(strlen(url_str) + 1);
 	char *temp;
-	strcpy(urlPath, url_str);
+	memset(urlPath, 0, strlen(url_str) + 1);
+	strncpy(urlPath, url_str, strlen(url_str));
 	*hoststr = strstr(urlPath, "//");
 	if (*hoststr == NULL)
 		return UPNP_E_INVALID_URL;

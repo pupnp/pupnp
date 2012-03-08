@@ -4,6 +4,12 @@ Version 1.8.0
 
 2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
+	Replace strcpy with strncpy in get_hoststr
+
+	Replace strcpy with strncpy to avoid buffer overflow.
+
+2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
+
 	Memory leak fix in handle_query_variable
 
 	variable was never freed.
