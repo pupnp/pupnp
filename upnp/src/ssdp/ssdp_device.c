@@ -440,6 +440,7 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 	UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 		   "In function DeviceAdvertisement\n");
 	memset(&__ss, 0, sizeof(__ss));
+	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	if (AddressFamily == AF_INET) {
 		DestAddr4->sin_family = AF_INET;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
@@ -461,7 +462,8 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 	/* If deviceis a root device , here we need to send 3 advertisement
 	 * or reply */
 	if (RootDev) {
-		sprintf(Mil_Usn, "%s::upnp:rootdevice", Udn);
+		snprintf(Mil_Usn, sizeof(Mil_Usn) - 1,
+			"%s::upnp:rootdevice", Udn);
 		CreateServicePacket(MSGTYPE_ADVERTISEMENT, "upnp:rootdevice",
 				    Mil_Usn, Location, Duration, &msgs[0],
 				    AddressFamily, PowerState, SleepPeriod,
@@ -471,7 +473,7 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 	CreateServicePacket(MSGTYPE_ADVERTISEMENT, Udn, Udn,
 			    Location, Duration, &msgs[1], AddressFamily,
 			    PowerState, SleepPeriod, RegistrationState);
-	sprintf(Mil_Usn, "%s::%s", Udn, DevType);
+	snprintf(Mil_Usn, sizeof(Mil_Usn) - 1, "%s::%s", Udn, DevType);
 	CreateServicePacket(MSGTYPE_ADVERTISEMENT, DevType, Mil_Usn,
 			    Location, Duration, &msgs[2], AddressFamily,
 			    PowerState, SleepPeriod, RegistrationState);
@@ -513,11 +515,13 @@ int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 
 	msgs[0] = NULL;
 	msgs[1] = NULL;
+	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	if (RootDev) {
 		/* one msg for root device */
 		num_msgs = 1;
 
-		sprintf(Mil_Usn, "%s::upnp:rootdevice", Udn);
+		snprintf(Mil_Usn, sizeof(Mil_Usn) - 1, "%s::upnp:rootdevice",
+			Udn);
 		CreateServicePacket(MSGTYPE_REPLY, "upnp:rootdevice",
 				    Mil_Usn, Location, Duration, &msgs[0],
 				    DestAddr->sa_family, PowerState,
@@ -533,7 +537,8 @@ int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 					    DestAddr->sa_family, PowerState,
 					    SleepPeriod, RegistrationState);
 		} else {
-			sprintf(Mil_Usn, "%s::%s", Udn, DevType);
+			snprintf(Mil_Usn, sizeof(Mil_Usn) - 1, "%s::%s", Udn,
+				DevType);
 			CreateServicePacket(MSGTYPE_REPLY, DevType, Mil_Usn,
 					    Location, Duration, &msgs[0],
 					    DestAddr->sa_family, PowerState,
@@ -567,23 +572,26 @@ int DeviceReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 	szReq[0] = NULL;
 	szReq[1] = NULL;
 	szReq[2] = NULL;
+	memset(Mil_Nt, 0, sizeof(Mil_Nt));
+	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	/* create 2 or 3 msgs */
 	if (RootDev) {
 		/* 3 replies for root device */
-		strcpy(Mil_Nt, "upnp:rootdevice");
-		sprintf(Mil_Usn, "%s::upnp:rootdevice", Udn);
+		strncpy(Mil_Nt, "upnp:rootdevice", sizeof(Mil_Nt) - 1);
+		snprintf(Mil_Usn, sizeof(Mil_Usn) - 1, "%s::upnp:rootdevice",
+			Udn);
 		CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
 				    Location, Duration, &szReq[0],
 				    DestAddr->sa_family, PowerState,
 				    SleepPeriod, RegistrationState);
 	}
-	sprintf(Mil_Nt, "%s", Udn);
-	sprintf(Mil_Usn, "%s", Udn);
+	snprintf(Mil_Nt, sizeof(Mil_Nt) - 1, "%s", Udn);
+	snprintf(Mil_Usn, sizeof(Mil_Usn) - 1, "%s", Udn);
 	CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
 			    Location, Duration, &szReq[1], DestAddr->sa_family,
 			    PowerState, SleepPeriod, RegistrationState);
-	sprintf(Mil_Nt, "%s", DevType);
-	sprintf(Mil_Usn, "%s::%s", Udn, DevType);
+	snprintf(Mil_Nt, sizeof(Mil_Nt) - 1, "%s", DevType);
+	snprintf(Mil_Usn, sizeof(Mil_Usn) - 1, "%s::%s", Udn, DevType);
 	CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
 			    Location, Duration, &szReq[2], DestAddr->sa_family,
 			    PowerState, SleepPeriod, RegistrationState);
@@ -621,6 +629,7 @@ int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
 	struct sockaddr_in6 *DestAddr6 = (struct sockaddr_in6 *)&__ss;
 
 	memset(&__ss, 0, sizeof(__ss));
+	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	if (AddressFamily == AF_INET) {
 		DestAddr4->sin_family = AF_INET;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
@@ -636,7 +645,7 @@ int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Invalid device address family.\n");
 	}
-	sprintf(Mil_Usn, "%s::%s", Udn, ServType);
+	snprintf(Mil_Usn, sizeof(Mil_Usn) - 1,"%s::%s", Udn, ServType);
 	/* CreateServiceRequestPacket(1,szReq[0],Mil_Nt,Mil_Usn,
 	 * Server,Location,Duration); */
 	CreateServicePacket(MSGTYPE_ADVERTISEMENT, ServType, Mil_Usn,
@@ -659,8 +668,9 @@ int ServiceReply(struct sockaddr *DestAddr, char *ServType, char *Udn,
 	char *szReq[1];
 	int RetVal;
 
+	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	szReq[0] = NULL;
-	sprintf(Mil_Usn, "%s::%s", Udn, ServType);
+	snprintf(Mil_Usn, sizeof(Mil_Usn) - 1, "%s::%s", Udn, ServType);
 	CreateServicePacket(MSGTYPE_REPLY, ServType, Mil_Usn,
 			    Location, Duration, &szReq[0], DestAddr->sa_family,
 			    PowerState, SleepPeriod, RegistrationState);
@@ -684,6 +694,7 @@ int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
 	int RetVal = UPNP_E_SUCCESS;
 
 	memset(&__ss, 0, sizeof(__ss));
+	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	if (AddressFamily == AF_INET) {
 		DestAddr4->sin_family = AF_INET;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
@@ -700,7 +711,7 @@ int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
 			   "Invalid device address family.\n");
 	}
 	/* sprintf(Mil_Nt,"%s",ServType); */
-	sprintf(Mil_Usn, "%s::%s", Udn, ServType);
+	snprintf(Mil_Usn, sizeof(Mil_Usn) - 1, "%s::%s", Udn, ServType);
 	/* CreateServiceRequestPacket(0,szReq[0],Mil_Nt,Mil_Usn,
 	 * Server,Location,Duration); */
 	CreateServicePacket(MSGTYPE_SHUTDOWN, ServType, Mil_Usn,
@@ -729,6 +740,7 @@ int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
 	msgs[1] = NULL;
 	msgs[2] = NULL;
 	memset(&__ss, 0, sizeof(__ss));
+	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	if (AddressFamily == AF_INET) {
 		DestAddr4->sin_family = AF_INET;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
@@ -746,7 +758,8 @@ int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
 	}
 	/* root device has one extra msg */
 	if (RootDev) {
-		sprintf(Mil_Usn, "%s::upnp:rootdevice", Udn);
+		snprintf(Mil_Usn, sizeof(Mil_Usn) - 1, "%s::upnp:rootdevice",
+			Udn);
 		CreateServicePacket(MSGTYPE_SHUTDOWN, "upnp:rootdevice",
 				    Mil_Usn, Location, Duration, &msgs[0],
 				    AddressFamily, PowerState, SleepPeriod,
@@ -758,7 +771,7 @@ int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
 	CreateServicePacket(MSGTYPE_SHUTDOWN, Udn, Udn,
 			    Location, Duration, &msgs[1], AddressFamily,
 			    PowerState, SleepPeriod, RegistrationState);
-	sprintf(Mil_Usn, "%s::%s", Udn, DevType);
+	snprintf(Mil_Usn, sizeof(Mil_Usn) - 1, "%s::%s", Udn, DevType);
 	CreateServicePacket(MSGTYPE_SHUTDOWN, DevType, Mil_Usn,
 			    Location, Duration, &msgs[2], AddressFamily,
 			    PowerState, SleepPeriod, RegistrationState);

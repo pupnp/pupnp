@@ -2,6 +2,13 @@
 Version 1.6.16
 *******************************************************************************
 
+2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Remove most of strcpy, sprintf and strcat
+
+	Replace strcpy, sprintf and strcat by strncpy, snprintf and strncat to
+	avoid buffer overflows.
+
 2012-03-07 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	SF Bug Tracker id 3497714 - Buffer overflows

@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved.  
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -218,13 +219,14 @@ static int addToAction(
 		if (ActBuff == NULL) {
 			return UPNP_E_OUTOF_MEMORY;
 		}
+		memset(ActBuff, 0, HEADER_LENGTH);
 
 		if (response) {
-			sprintf(ActBuff,
+			snprintf(ActBuff, HEADER_LENGTH - 1,
 				"<u:%sResponse xmlns:u=\"%s\">\r\n</u:%sResponse>",
 				ActionName, ServType, ActionName);
 		} else {
-			sprintf(ActBuff,
+			snprintf(ActBuff, HEADER_LENGTH - 1,
 				"<u:%s xmlns:u=\"%s\">\r\n</u:%s>",
 				ActionName, ServType, ActionName);
 		}
@@ -291,13 +293,14 @@ static IXML_Document *makeAction(
 	if (ActBuff == NULL) {
 		return NULL;
 	}
+	memset(ActBuff, 0, HEADER_LENGTH);
 
 	if (response) {
-		sprintf(ActBuff,
+		snprintf(ActBuff, HEADER_LENGTH - 1,
 			"<u:%sResponse xmlns:u=\"%s\">\r\n</u:%sResponse>",
 			ActionName, ServType, ActionName);
 	} else {
-		sprintf(ActBuff,
+		snprintf(ActBuff, HEADER_LENGTH - 1,
 			"<u:%s xmlns:u=\"%s\">\r\n</u:%s>",
 			ActionName, ServType, ActionName);
 	}
