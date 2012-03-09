@@ -616,8 +616,10 @@ int UpnpFinish(void)
 		UpnpUnRegisterClient(client_handle);
 #endif
 	TimerThreadShutdown(&gTimerThread);
-#if EXCLUDE_WEB_SERVER == 0
+#if EXCLUDE_MINISERVER == 0
 	StopMiniServer();
+#endif
+#if EXCLUDE_WEB_SERVER == 0
 	web_server_destroy();
 #endif
 	ThreadPoolShutdown(&gMiniServerThreadPool);
@@ -3982,7 +3984,7 @@ void UpnpRemoveAllVirtualDirs(void)
 
 int UpnpEnableWebserver(int enable)
 {
-    int retVal;
+    int retVal = UPNP_E_SUCCESS;
 
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
@@ -4005,10 +4007,10 @@ int UpnpEnableWebserver(int enable)
             break;
 #endif /* INTERNAL_WEB_SERVER */
         default:
-            return UPNP_E_INVALID_PARAM;
+            retVal = UPNP_E_INVALID_PARAM;
     }
 
-    return UPNP_E_SUCCESS;
+    return retVal;
 }
 
 

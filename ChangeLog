@@ -4,6 +4,12 @@ Version 1.6.16
 
 2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Optimisation of --disable-webserver
+
+	Do not compile webserver.c if --disable-webserver is used.
+
+2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Improve threadutil
 
 	Remove "dereference NULL return" errors and implicit conversions to
