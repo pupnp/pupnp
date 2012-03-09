@@ -59,6 +59,7 @@
 #ifdef WIN32
 	#include <malloc.h>
 	#define fseeko fseek
+	#define snprintf _snprintf
 #else
 	#include <arpa/inet.h>
 	#include <sys/types.h>
@@ -511,7 +512,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 					memset(Chunk_Header, 0,
 						sizeof(Chunk_Header));
 					snprintf(Chunk_Header,
-						sizeof(Chunk_Header) - strlen ("\r\n") - 1,
+						sizeof(Chunk_Header) - strlen ("\r\n"),
 						"%" PRIzx, num_read);
 					/*itoa(num_read,Chunk_Header,16);  */
 					strncat(Chunk_Header, "\r\n", strlen ("\r\n"));
@@ -1439,6 +1440,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 	const char *weekday_str = "Sun\0Mon\0Tue\0Wed\0Thu\0Fri\0Sat";
 	const char *month_str = "Jan\0Feb\0Mar\0Apr\0May\0Jun\0"
 	    "Jul\0Aug\0Sep\0Oct\0Nov\0Dec";
+	int rc = 0;
 
 	memset(tempbuf, 0, sizeof(tempbuf));
 	va_start(argp, fmt);
@@ -1482,15 +1484,17 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 		} else if (c == 'd') {
 			/* integer */
 			num = (size_t)va_arg(argp, int);
-			snprintf(tempbuf, sizeof(tempbuf) - 1, "%" PRIzu, num);
-			if (membuffer_append(buf, tempbuf, strlen(tempbuf)))
+			rc = snprintf(tempbuf, sizeof(tempbuf), "%" PRIzu, num);
+			if (rc < 0 || (unsigned int) rc >= sizeof(tempbuf) ||
+				membuffer_append(buf, tempbuf, strlen(tempbuf)))
 				goto error_handler;
 		} else if (c == 'h') {
 			/* off_t */
 			bignum = (off_t) va_arg(argp, off_t);
-			snprintf(tempbuf, sizeof(tempbuf) - 1, "%" PRId64,
+			rc = snprintf(tempbuf, sizeof(tempbuf), "%" PRId64,
 				(int64_t) bignum);
-			if (membuffer_append(buf, tempbuf, strlen(tempbuf)))
+			if (rc < 0 || (unsigned int) rc >= sizeof(tempbuf) ||
+				membuffer_append(buf, tempbuf, strlen(tempbuf)))
 				goto error_handler;
 		} else if (c == 't' || c == 'D') {
 			/* date */
@@ -1507,13 +1511,14 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			}
 			assert(loc_time);
 			date = gmtime(loc_time);
-			snprintf(tempbuf, sizeof(tempbuf) - 1,
+			rc = snprintf(tempbuf, sizeof(tempbuf),
 				"%s%s, %02d %s %d %02d:%02d:%02d GMT%s",
 				start_str, &weekday_str[date->tm_wday * 4],
 				date->tm_mday, &month_str[date->tm_mon * 4],
 				date->tm_year + 1900, date->tm_hour,
 				date->tm_min, date->tm_sec, end_str);
-			if (membuffer_append(buf, tempbuf, strlen(tempbuf)))
+			if (rc < 0 || (unsigned int) rc >= sizeof(tempbuf) ||
+				membuffer_append(buf, tempbuf, strlen(tempbuf)))
 				goto error_handler;
 		} else if (c == 'L') {
 			/* Add CONTENT-LANGUAGE header only if WEB_SERVER_CONTENT_LANGUAGE */
@@ -1564,21 +1569,24 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			/*   e.g.: 'HTTP/1.1 200 OK' code */
 			status_code = (int)va_arg(argp, int);
 			assert(status_code > 0);
-			snprintf(tempbuf, sizeof(tempbuf) - 1, "HTTP/%d.%d %d ",
+			rc = snprintf(tempbuf, sizeof(tempbuf), "HTTP/%d.%d %d ",
 				http_major_version, http_minor_version,
 				status_code);
 			/* str */
 			status_msg = http_get_code_text(status_code);
-			if (http_MakeMessage(buf, http_major_version, http_minor_version,
+			if (rc < 0 || (unsigned int) rc >= sizeof(tempbuf) ||
+				http_MakeMessage(buf, http_major_version, http_minor_version,
 					     "ssc", tempbuf, status_msg) != 0)
 				goto error_handler;
 		} else if (c == 'B') {
 			/* body of a simple reply */
 			status_code = (int)va_arg(argp, int);
-			snprintf(tempbuf, sizeof(tempbuf) - 1, "%s%d %s%s",
+			rc = snprintf(tempbuf, sizeof(tempbuf), "%s%d %s%s",
 				"<html><body><h1>",
 				status_code, http_get_code_text(status_code),
 				"</h1></body></html>");
+			if (rc < 0 || (unsigned int) rc >= sizeof(tempbuf))
+				goto error_handler;
 			bignum = (off_t)strlen(tempbuf);
 			if (http_MakeMessage(buf, http_major_version, http_minor_version,
 					     "NTcs", bignum,	/* content-length */
@@ -1795,6 +1803,7 @@ int http_OpenHttpGetEx(
 	int errCode = UPNP_E_SUCCESS;
 	/* char rangeBuf[SIZE_RANGE_BUFFER]; */
 	struct SendInstruction rangeBuf;
+	int rc = 0;
 
 	membuffer_init(&request);
 
@@ -1814,9 +1823,10 @@ int http_OpenHttpGetEx(
 			break;
 		}
 		memset(&rangeBuf, 0, sizeof(rangeBuf));
-		snprintf(rangeBuf.RangeHeader,
-			sizeof(rangeBuf.RangeHeader) - 1,
+		rc = snprintf(rangeBuf.RangeHeader, sizeof(rangeBuf.RangeHeader),
 			"Range: bytes=%d-%d\r\n", lowRange, highRange);
+		if (rc < 0 || (unsigned int) rc >= sizeof(rangeBuf.RangeHeader))
+			break;
 		membuffer_init(&request);
 		errCode = MakeGetMessageEx(url_str, &request, &url, &rangeBuf);
 		if (errCode != UPNP_E_SUCCESS)

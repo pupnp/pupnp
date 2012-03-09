@@ -44,6 +44,9 @@
 		#include <lwres/netdb.h>
 	#endif
 #endif
+#ifdef WIN32
+	#define snprintf _snprintf
+#endif
 #include <assert.h>
 
 
@@ -612,7 +615,8 @@ char *resolve_rel_url(char *base_url, char *rel_url)
                     out_finger++;
 
                     if( rel.hostport.text.size > 0 ) {
-                        snprintf( out_finger, strlen( rel_url ), "%s", rel_url );
+                        snprintf( out_finger, strlen( rel_url ) + 1, "%s",
+                                  rel_url );
                     } else {
                         if( base.hostport.text.size > 0 ) {
                             memcpy( out_finger, "//", 2 );

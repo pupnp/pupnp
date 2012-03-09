@@ -50,6 +50,10 @@
 #include "upnpapi.h"
 #include "uuid.h"
 
+#ifdef WIN32
+	#define snprintf _snprintf
+#endif
+
 /*!
  * \brief Unregisters a device.
  *
@@ -413,6 +417,7 @@ static char *AllocGenaHeaders(
 	char *headers = NULL;
 	size_t headers_size = 0;
 	int line = 0;
+	int rc = 0;
 
 	headers_size =
 		strlen(HEADER_LINE_1 ) +
@@ -425,7 +430,8 @@ static char *AllocGenaHeaders(
 		line = __LINE__;
 		goto ExitFunction;
 	}
-	sprintf(headers, "%s%s%"PRIzu"%s%s%s",
+	memset(headers, 0, headers_size);
+	rc = snprintf(headers, headers_size, "%s%s%"PRIzu"%s%s%s",
 		HEADER_LINE_1,
 		HEADER_LINE_2A,
 		strlen(propertySet) + 1,
@@ -434,7 +440,7 @@ static char *AllocGenaHeaders(
 		HEADER_LINE_4);
 
 ExitFunction:
-	if (headers == NULL) {
+	if (headers == NULL || rc < 0 || (unsigned int) rc >= headers_size) {
 		UpnpPrintf(UPNP_ALL, GENA, __FILE__, line,
 			"AllocGenaHeaders(): Error UPNP_E_OUTOF_MEMORY\n");
 	}
@@ -1074,17 +1080,22 @@ static int respond_ok(
     int return_code;
     char timeout_str[100];
     int upnp_timeout = UPNP_TIMEOUT;
+    int rc = 0;
 
     memset( timeout_str, 0, sizeof( timeout_str ) );
     http_CalcResponseVersion( request->major_version,
                               request->minor_version, &major, &minor );
 
     if( time_out >= 0 ) {
-        snprintf( timeout_str, sizeof ( timeout_str ) - 1,
-		"TIMEOUT: Second-%d", time_out );
+        rc = snprintf( timeout_str, sizeof ( timeout_str ),
+                       "TIMEOUT: Second-%d", time_out );
     } else {
         strncpy( timeout_str, "TIMEOUT: Second-infinite",
-		sizeof ( timeout_str ) - 1 );
+                 sizeof ( timeout_str ) - 1);
+    }
+    if (rc < 0 || (unsigned int) rc >= sizeof ( timeout_str ) ) {
+        error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request ); 
+        return UPNP_E_OUTOF_MEMORY;
     }
 
     membuffer_init( &response );
@@ -1216,6 +1227,7 @@ void gena_process_subscription_request(
 	char *event_url_path = NULL;
 	memptr callback_hdr;
 	memptr timeout_hdr;
+	int rc = 0;
 
 	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
 		"Subscription Request Received:\n");
@@ -1347,10 +1359,12 @@ void gena_process_subscription_request(
 	uuid_create(&uid);
 	uuid_unpack(&uid, temp_sid);
 	memset(sub->sid, 0, sizeof(sub->sid));
-	snprintf(sub->sid, sizeof(sub->sid) - 1, "uuid:%s", temp_sid);
+	rc = snprintf(sub->sid, sizeof(sub->sid), "uuid:%s", temp_sid);
 
 	/* respond OK */
-	if (respond_ok(info, time_out, sub, request) != UPNP_E_SUCCESS) {
+	if (rc < 0 || (unsigned int) rc >= sizeof(sub->sid) ||
+		(respond_ok(info, time_out,
+		sub, request) != UPNP_E_SUCCESS)) {
 		freeSubscriptionList(sub);
 		HandleUnlock();
 		goto exit_function;

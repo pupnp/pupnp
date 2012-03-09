@@ -195,7 +195,7 @@ static void send_error_response(
 	membuffer headers;
 
 	memset(err_code_str, 0, sizeof(err_code_str));
-	snprintf(err_code_str, sizeof(err_code_str) - 1, "%d", error_code);
+	snprintf(err_code_str, sizeof(err_code_str), "%d", error_code);
 	/* calc body len */
 	content_length = (off_t) (strlen(start_body) + strlen(err_code_str) +
 				  strlen(mid_body) + strlen(err_msg) +

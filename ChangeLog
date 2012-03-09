@@ -318,6 +318,23 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	SF Bug Tracker id 3499781 - msvc doesn't have snprintf
+
+	Submitted: Yoichi NAKAYAMA ( yoichi ) - 2012-03-08 10:18:39 PST
+
+	97a17ff5add73c97844e2fa74456bab4df0800f1 commit breaks build on
+	windows/msvc since there is no snprintf.
+
+	Note:
+	* Some existing sources use _snprintf when WIN32 is defined, but its
+	behavior is a bit different from C99 snprintf.
+	* snprintf does terminate the buffer, so the commit (use buffer size
+	minus 1 as argument) changes the behavior at the boundary.
+	* Truncation might be better than crash in some cases. But it may
+	result in not good.
+
 2012-03-08 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	SF Bug Tracker id 3499878 - UpnpUnSubscribeAsync(): ‘retVal’ may be used uninitialized

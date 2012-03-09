@@ -58,6 +58,7 @@
 
 #ifdef WIN32
 #include <string.h>
+#define snprintf _snprintf
 #endif /* WIN32 */
 
 /*!
@@ -331,23 +332,22 @@ static void CreateClientRequestPacket(
 	strcpy(RqstBuf, "M-SEARCH * HTTP/1.1\r\n");
 
 	if (AddressFamily == AF_INET) {
-		snprintf(TempBuf, sizeof(TempBuf) - 1, "HOST: %s:%d\r\n",
-			SSDP_IP, SSDP_PORT);
+		snprintf(TempBuf, sizeof(TempBuf), "HOST: %s:%d\r\n", SSDP_IP,
+			SSDP_PORT);
 	} else if (AddressFamily == AF_INET6) {
-		snprintf(TempBuf, sizeof(TempBuf) - 1, "HOST: [%s]:%d\r\n",
+		snprintf(TempBuf, sizeof(TempBuf), "HOST: [%s]:%d\r\n",
 			SSDP_IPV6_LINKLOCAL, SSDP_PORT);
 	}
 	strcat(RqstBuf, TempBuf);
 	strcat(RqstBuf, "MAN: \"ssdp:discover\"\r\n");
 
 	if (Mx > 0) {
-		snprintf(TempBuf, sizeof(TempBuf) - 1, "MX: %d\r\n", Mx);
+		snprintf(TempBuf, sizeof(TempBuf), "MX: %d\r\n", Mx);
 		strcat(RqstBuf, TempBuf);
 	}
 
 	if (SearchTarget != NULL) {
-		snprintf(TempBuf, sizeof(TempBuf) - 1, "ST: %s\r\n",
-			SearchTarget);
+		snprintf(TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
 		strcat(RqstBuf, TempBuf);
 	}
 	strcat(RqstBuf, "\r\n");
@@ -371,21 +371,20 @@ static void CreateClientRequestPacketUlaGua(
 	memset(TempBuf, 0, sizeof(TempBuf));
 	strcpy(RqstBuf, "M-SEARCH * HTTP/1.1\r\n");
 	if (AddressFamily == AF_INET) {
-		snprintf(TempBuf, sizeof(TempBuf) - 1, "HOST: %s:%d\r\n",
-			SSDP_IP, SSDP_PORT);
+		snprintf(TempBuf, sizeof(TempBuf), "HOST: %s:%d\r\n", SSDP_IP,
+			SSDP_PORT);
 	} else if (AddressFamily == AF_INET6) {
-		snprintf(TempBuf, sizeof(TempBuf) - 1, "HOST: [%s]:%d\r\n",
+		snprintf(TempBuf, sizeof(TempBuf), "HOST: [%s]:%d\r\n",
 			SSDP_IPV6_SITELOCAL, SSDP_PORT);
 	}
 	strcat(RqstBuf, TempBuf);
 	strcat(RqstBuf, "MAN: \"ssdp:discover\"\r\n");
 	if (Mx > 0) {
-		snprintf(TempBuf, sizeof(TempBuf) - 1, "MX: %d\r\n", Mx);
+		snprintf(TempBuf, sizeof(TempBuf), "MX: %d\r\n", Mx);
 		strcat(RqstBuf, TempBuf);
 	}
 	if (SearchTarget) {
-		snprintf(TempBuf, sizeof(TempBuf) - 1, "ST: %s\r\n",
-			SearchTarget);
+		snprintf(TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
 		strcat(RqstBuf, TempBuf);
 	}
 	strcat(RqstBuf, "\r\n");

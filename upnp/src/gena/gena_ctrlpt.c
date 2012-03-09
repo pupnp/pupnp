@@ -53,6 +53,9 @@
 #include "uuid.h"
 #include "upnpapi.h"
 
+#ifdef WIN32
+	#define snprintf _snprintf
+#endif
 
 extern ithread_mutex_t GlobalClientSubscribeMutex;
 
@@ -283,6 +286,7 @@ static int gena_subscribe(
 	membuffer request;
 	uri_type dest_url;
 	http_parser_t response;
+	int rc = 0;
 
 	memset(timeout_str, 0, sizeof(timeout_str));
 	UpnpString_clear(sid);
@@ -294,11 +298,13 @@ static int gena_subscribe(
 	if (*timeout < 0) {
 		strncpy(timeout_str, "infinite", sizeof(timeout_str) - 1);
 	} else if(*timeout < CP_MINIMUM_SUBSCRIPTION_TIME) {
-		snprintf(timeout_str, sizeof(timeout_str) - 1,
+		rc = snprintf(timeout_str, sizeof(timeout_str),
 			"%d", CP_MINIMUM_SUBSCRIPTION_TIME);
 	} else {
-		snprintf(timeout_str, sizeof(timeout_str) - 1, "%d", *timeout);
+		rc = snprintf(timeout_str, sizeof(timeout_str), "%d", *timeout);
 	}
+	if (rc < 0 || (unsigned int) rc >= sizeof(timeout_str))
+		return UPNP_E_OUTOF_MEMORY;
 
 	/* parse url */
 	return_code = http_FixStrUrl(
@@ -514,6 +520,7 @@ int genaSubscribe(
 	UpnpString *ActualSID = UpnpString_new();
 	UpnpString *EventURL = UpnpString_new();
 	struct Handle_Info *handle_info;
+	int rc = 0;
 
 	memset(temp_sid, 0, sizeof(temp_sid));
 	memset(temp_sid2, 0, sizeof(temp_sid2));
@@ -550,7 +557,11 @@ int genaSubscribe(
 	/* generate client SID */
 	uuid_create(&uid );
 	uuid_unpack(&uid, temp_sid);
-	snprintf(temp_sid2, sizeof(temp_sid2) - 1, "uuid:%s", temp_sid);
+	rc = snprintf(temp_sid2, sizeof(temp_sid2), "uuid:%s", temp_sid);
+	if (rc < 0 || (unsigned int) rc >= sizeof(temp_sid2)) {
+		return_code = UPNP_E_OUTOF_MEMORY;
+		goto error_handler;
+	}
 	UpnpString_set_String(out_sid, temp_sid2);
 
 	/* create event url */

@@ -135,6 +135,7 @@ static UPNP_INLINE int calc_alias(
 		return UPNP_E_OUTOF_MEMORY;
 	memset(alias_temp, 0, new_alias_len + 1);
 	strncpy(alias_temp, rootPath, root_len);
+	alias_temp[root_len] = '\0';
 	strncat(alias_temp, temp_str, strlen(temp_str));
 	strncat(alias_temp, aliasPtr, strlen(aliasPtr));
 
@@ -175,6 +176,7 @@ static UPNP_INLINE int calc_descURL(
 	if (len > (LINE_SIZE - 1))
 		return UPNP_E_URL_TOO_BIG;
 	strncpy(descURL, http_scheme, strlen(http_scheme));
+	descURL[strlen(http_scheme)] = '\0';
 	strncat(descURL, ipPortStr, strlen(ipPortStr));
 	strncat(descURL, alias, strlen(alias));
 	descURL[len] = '\0';
