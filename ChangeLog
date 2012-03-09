@@ -4,6 +4,15 @@ Version 1.6.16
 
 2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	More compilaton optimisation
+
+	Do not compile most of service_table.c and client_table.c if
+	--disable-gena is used.
+	Do not compile urlconfig.c if --disable-webserver is used.
+	Adding new UPNP_HAVE_xxx variables in upnpconfig.h and upnpconfig.h.in.
+
+2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Optimisation of --disable-webserver
 
 	Do not compile webserver.c if --disable-webserver is used.

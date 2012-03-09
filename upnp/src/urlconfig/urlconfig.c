@@ -54,6 +54,9 @@
 	#include <sys/types.h>
 #endif
 
+#ifdef INCLUDE_DEVICE_APIS
+#ifdef INTERNAL_WEB_SERVER
+
 /************************************************************************
 *	Function :	addrToString
 *
@@ -417,3 +420,5 @@ error_handler:
     }
     return err_code;
 }
+#endif /* INCLUDE_DEVICE_APIS */
+#endif /* INTERNAL_WEB_SERVER */ 

@@ -850,6 +850,7 @@ int UpnpRegisterRootDevice(
 			"UpnpRegisterRootDevice: No services found for RootDevice\n");
 	}
 
+#if EXCLUDE_GENA == 0
 	/*
 	 * GENA SET UP
 	 */
@@ -869,6 +870,7 @@ int UpnpRegisterRootDevice(
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 			"\nUpnpRegisterRootDevice: Empty service table\n");
 	}
+#endif /* EXCLUDE_GENA */
 
 	UpnpSdkDeviceRegisteredV4 = 1;
 
@@ -1009,6 +1011,7 @@ int UpnpRegisterRootDevice2(
 			"UpnpRegisterRootDevice2: No services found for RootDevice\n");
 	}
 
+#if EXCLUDE_GENA == 0
 	/*
 	 * GENA SET UP
 	 */
@@ -1028,6 +1031,7 @@ int UpnpRegisterRootDevice2(
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 			"\nUpnpRegisterRootDevice2: Empty service table\n");
 	}
+#endif /* EXCLUDE_GENA */
 
 	UpnpSdkDeviceRegisteredV4 = 1;
 
@@ -1178,6 +1182,7 @@ int UpnpRegisterRootDevice4(
 			"UpnpRegisterRootDevice4: No services found for RootDevice\n");
 	}
 
+#if EXCLUDE_GENA == 0
 	/*
 	 * GENA SET UP
 	 */
@@ -1197,6 +1202,7 @@ int UpnpRegisterRootDevice4(
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 			"\nUpnpRegisterRootDevice4: Empty service table\n");
 	}
+#endif /* EXCLUDE_GENA */
 
 	if (AddressFamily == AF_INET) {
 		UpnpSdkDeviceRegisteredV4 = 1;

@@ -43,6 +43,7 @@
 
 #ifdef INCLUDE_DEVICE_APIS
 
+#if EXCLUDE_GENA == 0
 /************************************************************************
 *	Function :	copy_subscription
 *
@@ -322,6 +323,7 @@ FindServiceEventURLPath( service_table * table,
 
     return NULL;
 }
+#endif /* EXCLUDE_GENA */
 
 /************************************************************************
 *	Function :	FindServiceControlURLPath
@@ -339,6 +341,7 @@ FindServiceEventURLPath( service_table * table,
 *
 *	Note :
 ************************************************************************/
+#if EXCLUDE_SOAP == 0
 service_info *
 FindServiceControlURLPath( service_table * table,
                            const char *controlURLPath )
@@ -370,6 +373,7 @@ FindServiceControlURLPath( service_table * table,
     return NULL;
 
 }
+#endif /* EXCLUDE_SOAP */
 
 /************************************************************************
 *	Function :	printService
@@ -515,6 +519,7 @@ void printServiceTable(
     printServiceList( table->serviceList, level, module );}
 #endif
 
+#if EXCLUDE_GENA == 0
 /************************************************************************
 *	Function :	freeService
 *
@@ -1062,6 +1067,7 @@ getServiceTable( IXML_Node * node,
 
     return 0;
 }
+#endif /* EXCLUDE_GENA */
 
 #endif /* INCLUDE_DEVICE_APIS */
 
