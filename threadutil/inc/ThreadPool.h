@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -98,7 +99,7 @@ typedef enum priority {
 #define DEFAULT_MAX_THREADS 10
 
 /*! default stack size used by TPAttrInit */
-#define DEFAULT_STACK_SIZE 0
+#define DEFAULT_STACK_SIZE 0u
 
 /*! default jobs per thread used by TPAttrInit */
 #define DEFAULT_JOBS_PER_THREAD 10
@@ -165,7 +166,7 @@ typedef struct THREADPOOLJOB
 	void *arg;
 	free_routine free_func;
 	struct timeval requestTime;
-	int priority;
+	ThreadPriority priority;
 	int jobId;
 } ThreadPoolJob;
 
