@@ -318,13 +318,20 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
-2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Adding configure options
+
+	Adding --disable-ssdp, --disable-soap, --disable-gena options to
+	configure script.
+
+2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Bug fix of last commit
 
 	_snprintf was wrongly defined in ssdp_server.c
 
-2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	SF Bug Tracker id 3499781 - msvc doesn't have snprintf
 

@@ -435,11 +435,34 @@
 #endif
 
 
-/* configure --enable-webserver --enable-device */
+/* configure --enable-webserver */
 #if UPNP_HAVE_WEBSERVER
 #	define INTERNAL_WEB_SERVER	1
 #endif
 
+/* configure --enable-ssdp */
+#undef EXCLUDE_SSDP
+#if UPNP_HAVE_SSDP
+#       define EXCLUDE_SSSDP 0
+#else
+#       define EXCLUDE_SSSDP 1
+#endif
+
+/* configure --enable-soap */
+#undef EXCLUDE_SOAP
+#if UPNP_HAVE_SOAP
+#	define EXCLUDE_SOAP 0
+#else
+#	define EXCLUDE_SOAP 1
+#endif
+
+/* configure --enable-gena */
+#undef EXCLUDE_GENA
+#if UPNP_HAVE_GENA
+#       define EXCLUDE_GENA 0
+#else
+#       define EXCLUDE_GENA 1
+#endif
 
 #undef  EXCLUDE_WEB_SERVER
 #undef  EXCLUDE_MINISERVER

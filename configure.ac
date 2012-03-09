@@ -398,6 +398,20 @@ if test "x$enable_webserver" = xyes ; then
 	AC_DEFINE(UPNP_HAVE_WEBSERVER, 1, [see upnpconfig.h])
 fi
 
+RT_BOOL_ARG_ENABLE([ssdp], [yes], [SSDP part])
+if test "x$enable_ssdp" = xyes ; then
+        AC_DEFINE(UPNP_HAVE_SSDP, 1, [see upnpconfig.h])
+fi
+
+RT_BOOL_ARG_ENABLE([soap], [yes], [SOAP part])
+if test "x$enable_soap" = xyes ; then
+        AC_DEFINE(UPNP_HAVE_SOAP, 1, [see upnpconfig.h])
+fi
+
+RT_BOOL_ARG_ENABLE([gena], [yes], [GENA part])
+if test "x$enable_gena" = xyes ; then
+        AC_DEFINE(UPNP_HAVE_GENA, 1, [see upnpconfig.h])
+fi
 
 RT_BOOL_ARG_ENABLE([tools], [yes], [helper APIs in upnptools.h])
 if test "x$enable_tools" = xyes ; then
