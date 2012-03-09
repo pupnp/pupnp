@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -59,15 +60,15 @@ static long DiffMillis(
 	/*! . */
 	struct timeval *time2)
 {
-	double temp = 0;
+	double temp = 0.0;
 
-	temp = (double)(time1->tv_sec - time2->tv_sec);
+	temp = (double)time1->tv_sec - (double)time2->tv_sec;
 	/* convert to milliseconds */
-	temp *= 1000;
+	temp *= 1000.0;
 
 	/* convert microseconds to milliseconds and add to temp */
 	/* implicit flooring of unsigned long data type */
-	temp += (double)((time1->tv_usec - time2->tv_usec) / 1000);
+	temp += ((double)time1->tv_usec - (double)time2->tv_usec) / 1000.0;
 
 	return (long)temp;
 }
@@ -476,7 +477,7 @@ static void *WorkerThread(
 		}
 		retCode = 0;
 		tp->stats.idleThreads++;
-		tp->stats.totalWorkTime += (double)(StatsTime(NULL) - start);
+		tp->stats.totalWorkTime += (double)StatsTime(NULL) - (double)start;
 		StatsTime(&start);
 		if (persistent == 0) {
 			tp->stats.workerThreads--;
@@ -509,7 +510,7 @@ static void *WorkerThread(
 		}
 		tp->stats.idleThreads--;
 		/* idle time */
-		tp->stats.totalIdleTime += (double)(StatsTime(NULL) - start);
+		tp->stats.totalIdleTime += (double)StatsTime(NULL) - (double)start;
 		/* work time */
 		StatsTime(&start);
 		/* bump priority of starved jobs */
@@ -531,16 +532,28 @@ static void *WorkerThread(
 				/* Pick the highest priority job */
 				if (tp->highJobQ.size > 0) {
 					head = ListHead(&tp->highJobQ);
+					if (head == NULL) {
+						tp->stats.workerThreads--;
+						goto exit_function;
+					}
 					job = (ThreadPoolJob *) head->item;
 					CalcWaitTime(tp, HIGH_PRIORITY, job);
 					ListDelNode(&tp->highJobQ, head, 0);
 				} else if (tp->medJobQ.size > 0) {
 					head = ListHead(&tp->medJobQ);
+					if (head == NULL) {
+						tp->stats.workerThreads--;
+						goto exit_function;
+					}
 					job = (ThreadPoolJob *) head->item;
 					CalcWaitTime(tp, MED_PRIORITY, job);
 					ListDelNode(&tp->medJobQ, head, 0);
 				} else if (tp->lowJobQ.size > 0) {
 					head = ListHead(&tp->lowJobQ);
+					if (head == NULL) {
+						tp->stats.workerThreads--;
+						goto exit_function;
+					}
 					job = (ThreadPoolJob *) head->item;
 					CalcWaitTime(tp, LOW_PRIORITY, job);
 					ListDelNode(&tp->lowJobQ, head, 0);
@@ -961,6 +974,10 @@ int ThreadPoolShutdown(ThreadPool *tp)
 	/* clean up high priority jobs */
 	while (tp->highJobQ.size) {
 		head = ListHead(&tp->highJobQ);
+		if (head == NULL) {
+			ithread_mutex_unlock(&tp->mutex);
+			return EINVAL;
+		}
 		temp = (ThreadPoolJob *)head->item;
 		if (temp->free_func)
 			temp->free_func(temp->arg);
@@ -971,6 +988,10 @@ int ThreadPoolShutdown(ThreadPool *tp)
 	/* clean up med priority jobs */
 	while (tp->medJobQ.size) {
 		head = ListHead(&tp->medJobQ);
+		if (head == NULL) {
+			ithread_mutex_unlock(&tp->mutex);
+			return EINVAL;
+		}
 		temp = (ThreadPoolJob *)head->item;
 		if (temp->free_func)
 			temp->free_func(temp->arg);
@@ -981,6 +1002,10 @@ int ThreadPoolShutdown(ThreadPool *tp)
 	/* clean up low priority jobs */
 	while (tp->lowJobQ.size) {
 		head = ListHead(&tp->lowJobQ);
+		if (head == NULL) {
+			ithread_mutex_unlock(&tp->mutex);
+			return EINVAL;
+		}
 		temp = (ThreadPoolJob *)head->item;
 		if (temp->free_func)
 			temp->free_func(temp->arg);
@@ -1047,9 +1072,9 @@ int TPJobSetPriority(ThreadPoolJob *job, ThreadPriority priority)
 {
 	if (!job)
 		return EINVAL;
-	if (priority == LOW_PRIORITY ||
-	    priority == MED_PRIORITY ||
-	    priority == HIGH_PRIORITY) {
+	if (priority == (ThreadPriority)LOW_PRIORITY ||
+	    priority == (ThreadPriority)MED_PRIORITY ||
+	    priority == (ThreadPriority)HIGH_PRIORITY) {
 		job->priority = priority;
 		return 0;
 	} else {
@@ -1170,17 +1195,17 @@ int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
 
 	*stats = tp->stats;
 	if (stats->totalJobsHQ > 0)
-		stats->avgWaitHQ = stats->totalTimeHQ / stats->totalJobsHQ;
+		stats->avgWaitHQ = stats->totalTimeHQ / (double)stats->totalJobsHQ;
 	else
 		stats->avgWaitHQ = 0;
 	if (stats->totalJobsMQ > 0)
-		stats->avgWaitMQ = stats->totalTimeMQ / stats->totalJobsMQ;
+		stats->avgWaitMQ = stats->totalTimeMQ / (double)stats->totalJobsMQ;
 	else
-		stats->avgWaitMQ = 0;
+		stats->avgWaitMQ = 0.0;
 	if (stats->totalJobsLQ > 0)
-		stats->avgWaitLQ = stats->totalTimeLQ / stats->totalJobsLQ;
+		stats->avgWaitLQ = stats->totalTimeLQ / (double)stats->totalJobsLQ;
 	else
-		stats->avgWaitLQ = 0;
+		stats->avgWaitLQ = 0.0;
 	stats->totalThreads = tp->totalThreads;
 	stats->persistentThreads = tp->persistentThreads;
 	stats->currentJobsHQ = (int)ListSize(&tp->highJobQ);

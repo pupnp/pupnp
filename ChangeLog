@@ -4,6 +4,13 @@ Version 1.6.16
 
 2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Improve threadutil
+
+	Remove "dereference NULL return" errors and implicit conversions to
+	double or enum types.
+
+2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Optimisation of --disable-webserver
 
 	Do not compile miniserver.c if --disable-webserver is used.
