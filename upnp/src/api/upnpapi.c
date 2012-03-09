@@ -616,8 +616,8 @@ int UpnpFinish(void)
 		UpnpUnRegisterClient(client_handle);
 #endif
 	TimerThreadShutdown(&gTimerThread);
-	StopMiniServer();
 #if EXCLUDE_WEB_SERVER == 0
+	StopMiniServer();
 	web_server_destroy();
 #endif
 	ThreadPoolShutdown(&gMiniServerThreadPool);

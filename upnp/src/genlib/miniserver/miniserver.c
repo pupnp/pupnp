@@ -32,6 +32,8 @@
 
 #include "config.h"
 
+#if EXCLUDE_MINISERVER == 0
+
 /*!
  * \file
  *
@@ -970,3 +972,4 @@ int StopMiniServer()
 
 	return 0;
 }
+#endif /* EXCLUDE_MINISERVER */
