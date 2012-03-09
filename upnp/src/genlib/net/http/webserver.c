@@ -39,6 +39,8 @@
 
 #include "config.h"
 
+#if EXCLUDE_WEB_SERVER == 0
+
 #include "webserver.h"
 
 
@@ -1534,4 +1536,5 @@ void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
 	membuffer_destroy(&headers);
 	membuffer_destroy(&filename);
 }
+#endif /* EXCLUDE_WEB_SERVER */
 
