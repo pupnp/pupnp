@@ -320,6 +320,12 @@ Version 1.6.16
 
 2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Optimisation of --disable-webserver
+
+	Do not compile miniserver.c if --disable-webserver is used.
+
+2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Adding configure options
 
 	Adding --disable-ssdp, --disable-soap, --disable-gena options to
