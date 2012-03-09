@@ -100,6 +100,21 @@
 #define UPNP_HAVE_WEBSERVER 1
 
 
+/** Defined to 1 if the library has been compiled with the SSDP part enabled
+ *  (i.e. configure --enable-ssdp) */
+#define UPNP_HAVE_SSDP 1
+
+
+/** Defined to 1 if the library has been compiled with the SOAP part enabled
+ *  (i.e. configure --enable-soap) */
+#define UPNP_HAVE_SOAP 1
+
+
+/** Defined to 1 if the library has been compiled with the GENA part enabled
+ *  (i.e. configure --enable-gena) */
+#define UPNP_HAVE_GENA 1
+
+
 /** Defined to 1 if the library has been compiled with helper API
  *  (i.e. configure --enable-tools) : <upnp/upnptools.h> file is available */
 #define UPNP_HAVE_TOOLS 1
