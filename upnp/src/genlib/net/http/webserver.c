@@ -60,6 +60,10 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
+#ifdef WIN32
+	 #define snprintf _snprintf
+#endif
+
 /*!
  * Response Types.
  */
@@ -300,6 +304,7 @@ static UPNP_INLINE int get_content_type(
 	int ctype_found = FALSE;
 	char *temp = NULL;
 	size_t length = 0;
+	int rc = 0;
 
 	(*content_type) = NULL;
 	/* get ext */
@@ -317,7 +322,11 @@ static UPNP_INLINE int get_content_type(
 	if (!temp)
 		return UPNP_E_OUTOF_MEMORY;
 	memset(temp, 0, length);
-	sprintf(temp, "%s/%s", type, subtype);
+	rc = snprintf(temp, length, "%s/%s", type, subtype);
+	if (rc < 0 || (unsigned int) rc >= length) {
+		free(temp);
+		return UPNP_E_OUTOF_MEMORY;
+	}
 	(*content_type) = ixmlCloneDOMString(temp);
 	free(temp);
 	if (!content_type)
@@ -762,6 +771,7 @@ static int CreateHTTPRangeResponseHeader(
 	off_t FirstByte, LastByte;
 	char *RangeInput;
 	char *Ptr;
+	int rc = 0;
 
 	Instr->IsRangeActive = 1;
 	Instr->ReadSendSize = FileLength;
@@ -797,32 +807,40 @@ static int CreateHTTPRangeResponseHeader(
 			Instr->RangeOffset = FirstByte;
 			Instr->ReadSendSize = LastByte - FirstByte + 1;
 			/* Data between two range. */
-			snprintf(Instr->RangeHeader,
-				sizeof(Instr->RangeHeader) - 1,
+			rc = snprintf(Instr->RangeHeader,
+				sizeof(Instr->RangeHeader),
 				"CONTENT-RANGE: bytes %" PRId64
 				"-%" PRId64 "/%" PRId64 "\r\n",
 				(int64_t)FirstByte,
 				(int64_t)LastByte,
 				(int64_t)FileLength);
+			if (rc < 0 || (unsigned int) rc >= sizeof(Instr->RangeHeader)) {
+				free(RangeInput);
+				return UPNP_E_OUTOF_MEMORY;
+			}
 		} else if (FirstByte >= 0 && LastByte == -1
 			   && FirstByte < FileLength) {
 			Instr->RangeOffset = FirstByte;
 			Instr->ReadSendSize = FileLength - FirstByte;
 			memset(Instr->RangeHeader, 0,
 				sizeof(Instr->RangeHeader));
-			snprintf(Instr->RangeHeader,
-				sizeof(Instr->RangeHeader) - 1,
+			rc = snprintf(Instr->RangeHeader,
+				sizeof(Instr->RangeHeader),
 				"CONTENT-RANGE: bytes %" PRId64
 				"-%" PRId64 "/%" PRId64 "\r\n",
 				(int64_t)FirstByte,
 				(int64_t)(FileLength - 1),
 				(int64_t)FileLength);
+			if (rc < 0 || (unsigned int) rc >= sizeof(Instr->RangeHeader)) {
+				free(RangeInput);
+				return UPNP_E_OUTOF_MEMORY;
+			}
 		} else if (FirstByte == -1 && LastByte > 0) {
 			if (LastByte >= FileLength) {
 				Instr->RangeOffset = 0;
 				Instr->ReadSendSize = FileLength;
-				snprintf(Instr->RangeHeader,
-					sizeof(Instr->RangeHeader) - 1,
+				rc = snprintf(Instr->RangeHeader,
+					sizeof(Instr->RangeHeader),
 					"CONTENT-RANGE: bytes 0-%" PRId64
 					"/%" PRId64 "\r\n",
 					(int64_t)(FileLength - 1),
@@ -830,13 +848,17 @@ static int CreateHTTPRangeResponseHeader(
 			} else {
 				Instr->RangeOffset = FileLength - LastByte;
 				Instr->ReadSendSize = LastByte;
-				snprintf(Instr->RangeHeader,
-					sizeof(Instr->RangeHeader) - 1,
+				rc = snprintf(Instr->RangeHeader,
+					sizeof(Instr->RangeHeader),
 					"CONTENT-RANGE: bytes %" PRId64
 					"-%" PRId64 "/%" PRId64 "\r\n",
 					(int64_t)(FileLength - LastByte + 1),
 					(int64_t)FileLength,
 					(int64_t)FileLength);
+			}
+			if (rc < 0 || (unsigned int) rc >= sizeof(Instr->RangeHeader)) {
+				free(RangeInput);
+				return UPNP_E_OUTOF_MEMORY;
 			}
 		} else {
 			free(RangeInput);

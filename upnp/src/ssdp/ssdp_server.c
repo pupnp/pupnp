@@ -40,6 +40,7 @@
 
 #ifndef WIN32
 	#include <sys/param.h>
+	#define snprintf _snprintf
 #endif /* WIN32 */
 
 #include "config.h"
@@ -456,6 +457,7 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 	char *ptr3 = NULL;
 	int CommandFound = 0;
 	size_t n = 0;
+	int rc = 0;
 
 	if (strstr(cmd, "uuid:schemas") != NULL) {
 		ptr1 = strstr(cmd, ":device");
@@ -469,8 +471,10 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 			return -1;
 		if (ptr3 != NULL) {
 			memset(Evt->UDN, 0, sizeof(Evt->UDN));
-			snprintf(Evt->UDN, sizeof(Evt->UDN) - 1,
-				"uuid:%s", ptr3 + 1);
+			rc = snprintf(Evt->UDN, sizeof(Evt->UDN), "uuid:%s",
+				ptr3 + 1);
+			if (rc < 0 || (unsigned int) rc >= sizeof(Evt->UDN))
+				return -1;
 		}
 		else
 			return -1;
@@ -480,8 +484,10 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 			strncpy(TempBuf, ptr1, n);
 			TempBuf[n] = '\0';
 			memset(Evt->DeviceType, 0, sizeof(Evt->DeviceType));
-			snprintf(Evt->DeviceType, sizeof(Evt->DeviceType) - 1,
+			rc = snprintf(Evt->DeviceType, sizeof(Evt->DeviceType),
 				"urn%s", TempBuf);
+			if (rc < 0 || (unsigned int) rc >= sizeof(Evt->DeviceType))
+				return -1;
 		} else
 			return -1;
 		return 0;
