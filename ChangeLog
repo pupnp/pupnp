@@ -320,6 +320,12 @@ Version 1.6.16
 
 2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Bug fix of last commit
+
+	_snprintf was wrongly defined in ssdp_server.c
+
+2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3499781 - msvc doesn't have snprintf
 
 	Submitted: Yoichi NAKAYAMA ( yoichi ) - 2012-03-08 10:18:39 PST
