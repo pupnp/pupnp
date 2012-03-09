@@ -79,17 +79,21 @@ libupnp_la_SOURCES = \
 	src/inc/webserver.h
 
 # ssdp
+if ENABLE_SSDP
 libupnp_la_SOURCES += \
         src/ssdp/ssdp_ResultData.h \
 	src/ssdp/ssdp_device.c \
 	src/ssdp/ssdp_ctrlpt.c \
 	src/ssdp/ssdp_server.c
+endif
 
 # soap
+if ENABLE_SOAP
 libupnp_la_SOURCES += \
 	src/soap/soap_device.c \
 	src/soap/soap_ctrlpt.c \
 	src/soap/soap_common.c
+endif
 
 # genlib
 libupnp_la_SOURCES += \
@@ -109,10 +113,12 @@ libupnp_la_SOURCES += \
 	src/genlib/net/uri/uri.c
 
 # gena
+if ENABLE_GENA
 libupnp_la_SOURCES += \
 	src/gena/gena_device.c \
 	src/gena/gena_ctrlpt.c \
 	src/gena/gena_callback2.c
+endif
 
 # api
 libupnp_la_SOURCES += \
