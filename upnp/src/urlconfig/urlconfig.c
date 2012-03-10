@@ -83,16 +83,18 @@ addrToString( IN const struct sockaddr *addr,
               IN size_t ipaddr_port_size )
 {
     char buf_ntop[INET6_ADDRSTRLEN];
-    int rc;
+    int rc = 0;
 
     if( addr->sa_family == AF_INET ) {
         struct sockaddr_in* sa4 = (struct sockaddr_in*)addr;
         inet_ntop(AF_INET, &sa4->sin_addr, buf_ntop, sizeof(buf_ntop) );
-        rc = snprintf( ipaddr_port, ipaddr_port_size, "%s:%d", buf_ntop, ntohs( sa4->sin_port ) );
+        rc = snprintf( ipaddr_port, ipaddr_port_size, "%s:%d", buf_ntop,
+            (int)ntohs( sa4->sin_port ) );
     } else if( addr->sa_family == AF_INET6 ) {
         struct sockaddr_in6* sa6 = (struct sockaddr_in6*)addr;
         inet_ntop(AF_INET6, &sa6->sin6_addr, buf_ntop, sizeof(buf_ntop) );
-        rc = snprintf( ipaddr_port, ipaddr_port_size, "[%s]:%d", buf_ntop, ntohs( sa6->sin6_port ) );
+        rc = snprintf( ipaddr_port, ipaddr_port_size, "[%s]:%d", buf_ntop,
+            (int)ntohs( sa6->sin6_port ) );
     }
 	if (rc < 0 || (unsigned int) rc >= ipaddr_port_size)
 		return UPNP_E_BUFFER_TOO_SMALL;
@@ -142,10 +144,10 @@ static UPNP_INLINE int calc_alias(
 	else 
 		aliasPtr = alias;
 	new_alias_len = root_len + strlen(temp_str) + strlen(aliasPtr);
-	alias_temp = malloc(new_alias_len + 1);
+	alias_temp = malloc(new_alias_len + (size_t)1);
 	if (alias_temp == NULL)
 		return UPNP_E_OUTOF_MEMORY;
-	memset(alias_temp, 0, new_alias_len + 1);
+	memset(alias_temp, 0, new_alias_len + (size_t)1);
 	strncpy(alias_temp, rootPath, root_len);
 	alias_temp[root_len] = '\0';
 	strncat(alias_temp, temp_str, strlen(temp_str));
@@ -185,7 +187,7 @@ static UPNP_INLINE int calc_descURL(
 	assert(alias != NULL && strlen(alias) > 0);
 
 	len = strlen(http_scheme) + strlen(ipPortStr) + strlen(alias);
-	if (len > (LINE_SIZE - 1))
+	if (len > ((size_t)LINE_SIZE - (size_t)1))
 		return UPNP_E_URL_TOO_BIG;
 	strncpy(descURL, http_scheme, strlen(http_scheme));
 	descURL[strlen(http_scheme)] = '\0';
@@ -279,7 +281,7 @@ static int config_description_doc(
 		}
 	} else {
 		/* urlbase found */
-		urlbase_node = ixmlNodeList_item(baseList, 0);
+		urlbase_node = ixmlNodeList_item(baseList, 0lu);
 		assert(urlbase_node != NULL);
 		textNode = ixmlNode_getFirstChild(urlbase_node);
 		if (textNode == NULL) {
@@ -319,7 +321,7 @@ static int config_description_doc(
 		}
 		/* add trailing '/' if missing */
 		if (url_str.buf[url_str.length - 1] != '/') {
-			if (membuffer_append(&url_str, "/", 1) != 0) {
+			if (membuffer_append(&url_str, "/", (size_t)1) != 0) {
 				goto error_handler;
 			}
 		}

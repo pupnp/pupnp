@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -49,7 +50,7 @@ extern "C" {
 #include <stdio.h>
 #include <time.h>
 
-#define SID_SIZE  41
+#define SID_SIZE  (size_t)41
 
 #ifdef INCLUDE_DEVICE_APIS
 

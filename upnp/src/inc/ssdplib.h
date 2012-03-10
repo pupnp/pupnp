@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
- * Copyright (C) 2011 France Telecom All rights reserved. 
+ * Copyright (C) 2011-2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -73,7 +73,7 @@ typedef enum SsdpSearchType {
 	SSDP_SERVICE
 } SType;
 
-#define BUFSIZE   2500
+#define BUFSIZE   (size_t)2500
 #define SSDP_IP   "239.255.255.250"
 #define SSDP_IPV6_LINKLOCAL "FF02::C"
 #define SSDP_IPV6_SITELOCAL "FF05::C"

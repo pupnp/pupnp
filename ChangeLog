@@ -4,6 +4,13 @@ Version 1.6.16
 
 2012-03-10 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Remove some of the implicit cast in upnp part
+
+	Remove some of the "implicit integer or enum conversions" as well as
+	some access to NULL reference in upnp part.
+
+2012-03-10 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Remove lock in ThreadPoolInit
 
 	If ThreadPoolInit returned EAGAIN, tp->lock was not freed. 

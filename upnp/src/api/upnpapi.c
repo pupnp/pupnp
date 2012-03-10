@@ -384,7 +384,9 @@ static int UpnpInitStartServers(
 	/*! [in] Local Port to listen for incoming connections. */
 	unsigned short DestPort)
 {
+#if EXCLUDE_MINISERVER == 0 || EXCLUDE_WEB_SERVER == 0
 	int retVal = 0;
+#endif
 
 	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
 		"Entering UpnpInitStartServers\n" );
@@ -1258,9 +1260,9 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd, int PowerState,
 	HandleUnlock();
 
 #if EXCLUDE_SSDP == 0
-	retVal = AdvertiseAndReply(-1, Hnd, 0, (struct sockaddr *)NULL,
-		(char *)NULL, (char *)NULL, (char *)NULL,
-		HInfo->MaxAge);
+	retVal = AdvertiseAndReply(-1, Hnd, (enum SsdpSearchType)0,
+		(struct sockaddr *)NULL, (char *)NULL, (char *)NULL,
+		(char *)NULL, HInfo->MaxAge);
 #endif
 
 	HandleLock();
@@ -1657,9 +1659,9 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd, int Exp,
     SInfo->SleepPeriod = SleepPeriod;
     SInfo->RegistrationState = RegistrationState;
     HandleUnlock();
-    retVal = AdvertiseAndReply( 1, Hnd, 0, ( struct sockaddr * )NULL,
-                                ( char * )NULL, ( char * )NULL,
-                                ( char * )NULL, Exp );
+    retVal = AdvertiseAndReply( 1, Hnd, ( enum SsdpSearchType )0,
+                                ( struct sockaddr * )NULL, ( char * )NULL,
+                                ( char * )NULL, ( char * )NULL, Exp );
 
     if( retVal != UPNP_E_SUCCESS )
         return retVal;
@@ -3601,13 +3603,13 @@ Upnp_Handle_Type GetClientHandleInfo(
 
 
 Upnp_Handle_Type GetDeviceHandleInfo(
-	const int AddressFamily,
+	const unsigned short AddressFamily,
 	UpnpDevice_Handle *device_handle_out,
 	struct Handle_Info **HndInfo)
 {
 	/* Check if we've got a registered device of the address family specified. */
-	if ((AddressFamily == AF_INET  && UpnpSdkDeviceRegisteredV4 == 0) ||
-	    (AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 0)) {
+	if ((AddressFamily == (unsigned short)AF_INET  && UpnpSdkDeviceRegisteredV4 == 0) ||
+	    (AddressFamily == (unsigned short)AF_INET6 && UpnpSdkDeviceregisteredV6 == 0)) {
 		*device_handle_out = -1;
 		return HND_INVALID;
 	}
@@ -3630,7 +3632,7 @@ Upnp_Handle_Type GetHandleInfo(
 	UpnpClient_Handle Hnd,
 	struct Handle_Info **HndInfo)
 {
-	Upnp_Handle_Type ret = UPNP_E_INVALID_HANDLE;
+	Upnp_Handle_Type ret = HND_INVALID;
 
 	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
 		"GetHandleInfo: entering, Handle is %d\n", Hnd);

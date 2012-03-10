@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -429,7 +430,7 @@ parse_status_t parser_append( INOUT http_parser_t* parser,
 *   PARSE_NO_MATCH -- failure to match pattern 'fmt'					
 *   PARSE_FAILURE	-- 'str' is bad input							
 ************************************************************************/
-int matchstr( IN char *str, IN size_t slen, IN const char* fmt, ... );
+parse_status_t matchstr( IN char *str, IN size_t slen, IN const char* fmt, ... );
 
 /************************************************************************
 * Function: raw_to_int													
