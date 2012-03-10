@@ -50,6 +50,7 @@
 #include <stdio.h>
 
 #ifdef WIN32
+	#define snprintf _snprintf
 #else
 	#include <sys/types.h>
 #endif
@@ -63,31 +64,39 @@
 *	Parameters :
 *		IN const struct sockaddr* addr ;	socket address object with 
 *					the IP Address and port information
-*		OUT char ipaddr_port[] ;	character array which will hold the 
+*		OUT char ipaddr_port ;	character array which will hold the 
 *					IP Address  in a string format.
+*		IN size_t ipaddr_port_size ;	ipaddr_port buffer size
 *
 *	Description : Converts an Internet address to a string and stores it 
 *		a buffer.
 *
-*	Return : void ;
+*	Return : int ;
+*		UPNP_E_SUCCESS - On Success.
+*		UPNP_E_BUFFER_TOO_SMALL - Given buffer doesn't have enough size.
 *
 *	Note :
 ************************************************************************/
-static UPNP_INLINE void
+static UPNP_INLINE int
 addrToString( IN const struct sockaddr *addr,
-              OUT char ipaddr_port[] )
+              OUT char *ipaddr_port,
+              IN size_t ipaddr_port_size )
 {
     char buf_ntop[INET6_ADDRSTRLEN];
+    int rc;
 
     if( addr->sa_family == AF_INET ) {
         struct sockaddr_in* sa4 = (struct sockaddr_in*)addr;
         inet_ntop(AF_INET, &sa4->sin_addr, buf_ntop, sizeof(buf_ntop) );
-        sprintf( ipaddr_port, "%s:%d", buf_ntop, ntohs( sa4->sin_port ) );
+        rc = snprintf( ipaddr_port, ipaddr_port_size, "%s:%d", buf_ntop, ntohs( sa4->sin_port ) );
     } else if( addr->sa_family == AF_INET6 ) {
         struct sockaddr_in6* sa6 = (struct sockaddr_in6*)addr;
         inet_ntop(AF_INET6, &sa6->sin6_addr, buf_ntop, sizeof(buf_ntop) );
-        sprintf( ipaddr_port, "[%s]:%d", buf_ntop, ntohs( sa6->sin6_port ) );
+        rc = snprintf( ipaddr_port, ipaddr_port_size, "[%s]:%d", buf_ntop, ntohs( sa6->sin6_port ) );
     }
+	if (rc < 0 || (unsigned int) rc >= ipaddr_port_size)
+		return UPNP_E_BUFFER_TOO_SMALL;
+	return UPNP_E_SUCCESS;
 }
 
 /************************************************************************
@@ -376,10 +385,11 @@ configure_urlbase( INOUT IXML_Document * doc,
     int err_code;
     char ipaddr_port[LINE_SIZE];
 
-    err_code = UPNP_E_OUTOF_MEMORY; /* default error */
-
     /* get IP address and port */
-    addrToString( serverAddr, ipaddr_port );
+    err_code = addrToString( serverAddr, ipaddr_port, sizeof(ipaddr_port) );
+    if ( err_code != UPNP_E_SUCCESS ) {
+        goto error_handler;
+    }
 
     /* config url-base in 'doc' */
     err_code = config_description_doc( doc, ipaddr_port, &root_path );
