@@ -506,15 +506,19 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 				}
 				/* Create chunk for the current buffer. */
 				if (Instr && Instr->IsChunkActive) {
+					int rc;
 					/* Copy CRLF at the end of the chunk */
 					memcpy(file_buf + num_read, "\r\n", 2);
 					/* Hex length for the chunk size. */
 					memset(Chunk_Header, 0,
 						sizeof(Chunk_Header));
-					snprintf(Chunk_Header,
+					rc = snprintf(Chunk_Header,
 						sizeof(Chunk_Header) - strlen ("\r\n"),
 						"%" PRIzx, num_read);
-					/*itoa(num_read,Chunk_Header,16);  */
+					if (rc < 0 || (unsigned int) rc >= sizeof(Chunk_Header) - strlen ("\r\n")) {
+						RetVal = UPNP_E_INTERNAL_ERROR;
+						goto Cleanup_File;
+					}
 					strncat(Chunk_Header, "\r\n", strlen ("\r\n"));
 					/* Copy the chunk size header  */
 					memcpy(file_buf - strlen(Chunk_Header),
