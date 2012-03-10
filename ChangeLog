@@ -322,13 +322,15 @@ Version 1.6.16
 
 	Further measures against buffer overflows.
 
-	Pass output buffer size to CreateClientRequestPacket(UlaGua)
-	from SearchByTarget and detect overflow.
-	Handle SearchByTarget error in UpnpSearchAsync.
-	Treat large argument as error in UpnpAddVirtualDir.
-	Do not clear buffer before snprintf.
-	Clarify the last argument of GetDescDocumentAndURL has size LINE_SIZE.
-	For inet_ntop, use buffer with size INET6_ADDRSTRLEN or INET_ADDRSTRLEN.
+	* Pass output buffer size to CreateClientRequestPacket(UlaGua)
+	  from SearchByTarget and detect overflow.
+	* Handle SearchByTarget error in UpnpSearchAsync.
+	* Pass output buffer size to addrToString and detect overflow.
+	* Handle addrToString error in configure_urlbase. 
+	* Treat large argument as error in UpnpAddVirtualDir.
+	* Do not clear buffer before snprintf.
+	* Clarify the last argument of GetDescDocumentAndURL has size LINE_SIZE.
+	* For inet_ntop, use buffer with size INET6_ADDRSTRLEN or INET_ADDRSTRLEN.
 
 2012-03-10 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
