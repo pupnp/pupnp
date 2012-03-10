@@ -901,7 +901,7 @@ static int GetDescDocumentAndURL(
 	/* [out] . */
 	IXML_Document **xmlDoc,
 	/* [out] . */
-	char *descURL);
+	char descURL[LINE_SIZE]);
 
 
 #ifdef INCLUDE_DEVICE_APIS
@@ -1461,7 +1461,7 @@ static int GetDescDocumentAndURL(
 	int config_baseURL,
 	int AddressFamily,
 	IXML_Document **xmlDoc,
-	char *descURL)
+	char descURL[LINE_SIZE])
 {
 	int retVal = 0;
 	char *membuf = NULL;
@@ -1559,12 +1559,12 @@ static int GetDescDocumentAndURL(
 		}
 	} else {
 		/* Manual */
-		if (strlen(description) > (LINE_SIZE - 1)) {
+		if (strlen(description) > LINE_SIZE - 1) {
 			ixmlDocument_free(*xmlDoc);
 			return UPNP_E_URL_TOO_BIG;
 		}
-		strncpy(descURL, description, strlen(description));
-		descURL[strlen(description)] = '\0';
+		strncpy(descURL, description, LINE_SIZE - 1);
+		descURL[LINE_SIZE - 1] = '\0';
 	}
 
 	assert(*xmlDoc != NULL);
@@ -1580,7 +1580,7 @@ static int GetDescDocumentAndURL(
 	int config_baseURL,
 	int AddressFamily,
 	IXML_Document **xmlDoc,
-	char *descURL)
+	char descURL[LINE_SIZE])
 {
 	int retVal = 0;
 
@@ -1592,11 +1592,11 @@ static int GetDescDocumentAndURL(
 		return UPNP_E_INVALID_PARAM;
 	}
 
-	if (strlen(description) > (LINE_SIZE - 1)) {
+	if (strlen(description) > LINE_SIZE - 1) {
 		return UPNP_E_URL_TOO_BIG;
 	}
-	strncpy(descURL, description, strlen(description));
-	descURL[strlen(description)] = '\0';
+	strncpy(descURL, description, LINE_SIZE - 1);
+	descURL[LINE_SIZE - 1] = '\0';
 
 	retVal = UpnpDownloadXmlDoc(description, xmlDoc);
 	if (retVal != UPNP_E_SUCCESS) {
