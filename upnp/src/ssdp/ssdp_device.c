@@ -380,7 +380,7 @@ static void CreateServicePacket(
 			nts = "ssdp:byebye";
 		/* NOTE: The CACHE-CONTROL and LOCATION headers are not present in
 		 * a shutdown msg, but are present here for MS WinMe interop. */
-		if (AddressFamily == AF_INET)
+		if (AddressFamily == (unsigned short)AF_INET)
 			host = SSDP_IP;
 		else {
 			if (isUrlV6UlaGua(location))
@@ -430,7 +430,7 @@ static void CreateServicePacket(
 }
 
 int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
-			int Duration, int AddressFamily, int PowerState,
+			int Duration, unsigned short AddressFamily, int PowerState,
 			int SleepPeriod, int RegistrationState)
 {
 	struct sockaddr_storage __ss;
@@ -445,12 +445,11 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 	UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 		   "In function DeviceAdvertisement\n");
 	memset(&__ss, 0, sizeof(__ss));
-	memset(Mil_Usn, 0, sizeof(Mil_Usn));
-	if (AddressFamily == AF_INET) {
+	if (AddressFamily == (unsigned short)AF_INET) {
 		DestAddr4->sin_family = (unsigned short)AF_INET;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == AF_INET6) {
+	} else if (AddressFamily == (unsigned short)AF_INET6) {
 		DestAddr6->sin6_family = (unsigned short)AF_INET6;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
@@ -524,7 +523,6 @@ int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 
 	msgs[0] = NULL;
 	msgs[1] = NULL;
-	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	if (RootDev) {
 		/* one msg for root device */
 		num_msgs = 1;
@@ -587,11 +585,10 @@ int DeviceReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 	szReq[0] = NULL;
 	szReq[1] = NULL;
 	szReq[2] = NULL;
-	memset(Mil_Nt, 0, sizeof(Mil_Nt));
-	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	/* create 2 or 3 msgs */
 	if (RootDev) {
 		/* 3 replies for root device */
+		memset(Mil_Nt, 0, sizeof(Mil_Nt));
 		strncpy(Mil_Nt, "upnp:rootdevice", sizeof(Mil_Nt) - 1);
 		rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice", Udn);
 		if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
@@ -641,8 +638,8 @@ error_handler:
 }
 
 int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
-			 int Duration, int AddressFamily, int PowerState,
-			 int SleepPeriod, int RegistrationState)
+			 int Duration, unsigned short AddressFamily,
+			 int PowerState, int SleepPeriod, int RegistrationState)
 {
 	char Mil_Usn[LINE_SIZE];
 	char *szReq[1];
@@ -653,14 +650,13 @@ int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
 	int rc = 0;
 
 	memset(&__ss, 0, sizeof(__ss));
-	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	szReq[0] = NULL;
-	if (AddressFamily == AF_INET) {
-		DestAddr4->sin_family = (unsigned short)AF_INET;
+	if (AddressFamily == (unsigned short)AF_INET) {
+		DestAddr4->sin_family = AddressFamily;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == AF_INET6) {
-		DestAddr6->sin6_family = (unsigned short)AF_INET6;
+	} else if (AddressFamily == (unsigned short)AF_INET6) {
+		DestAddr6->sin6_family = AddressFamily;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
@@ -698,7 +694,6 @@ int ServiceReply(struct sockaddr *DestAddr, char *ServType, char *Udn,
 	int RetVal = UPNP_E_OUTOF_MEMORY;
 	int rc = 0;
 
-	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	szReq[0] = NULL;
 	rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn, ServType);
 	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
@@ -717,8 +712,8 @@ error_handler:
 }
 
 int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
-		    int AddressFamily, int PowerState, int SleepPeriod,
-		    int RegistrationState)
+		    unsigned short AddressFamily, int PowerState,
+		    int SleepPeriod, int RegistrationState)
 {
 	char Mil_Usn[LINE_SIZE];
 	char *szReq[1];
@@ -729,14 +724,13 @@ int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
 	int rc = 0;
 
 	memset(&__ss, 0, sizeof(__ss));
-	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	szReq[0] = NULL;
-	if (AddressFamily == AF_INET) {
-		DestAddr4->sin_family = AF_INET;
+	if (AddressFamily == (unsigned short)AF_INET) {
+		DestAddr4->sin_family = AddressFamily;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == AF_INET6) {
-		DestAddr6->sin6_family = AF_INET6;
+	} else if (AddressFamily == (unsigned short)AF_INET6) {
+		DestAddr6->sin6_family = AddressFamily;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
@@ -766,7 +760,7 @@ error_handler:
 }
 
 int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
-		   char *Location, int Duration, int AddressFamily,
+		   char *Location, int Duration, unsigned short AddressFamily,
 		   int PowerState, int SleepPeriod, int RegistrationState)
 {
 	struct sockaddr_storage __ss;
@@ -781,13 +775,12 @@ int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
 	msgs[1] = NULL;
 	msgs[2] = NULL;
 	memset(&__ss, 0, sizeof(__ss));
-	memset(Mil_Usn, 0, sizeof(Mil_Usn));
-	if (AddressFamily == AF_INET) {
-		DestAddr4->sin_family = (unsigned short)AF_INET;
+	if (AddressFamily == (unsigned short)AF_INET) {
+		DestAddr4->sin_family = AddressFamily;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == AF_INET6) {
-		DestAddr6->sin6_family = (unsigned short)AF_INET6;
+	} else if (AddressFamily == (unsigned short)AF_INET6) {
+		DestAddr6->sin6_family = AddressFamily;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);

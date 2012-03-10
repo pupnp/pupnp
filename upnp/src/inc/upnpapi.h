@@ -107,7 +107,7 @@ struct Handle_Info
 	/*! . */
 	int MaxSubscriptionTimeOut;
 	/*! Address family: AF_INET or AF_INET6. */
-	int DeviceAf;
+	unsigned short DeviceAf;
 #endif
 
 	/* Client only */
