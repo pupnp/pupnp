@@ -50,6 +50,8 @@
 	{
 		size_t strsize = strnlen(__string, __n);
 		char *newstr = (char *)malloc(strsize + 1);
+		if (newstr == NULL)
+			return NULL;
 
 		strncpy(newstr, __string, strsize);
 		newstr[strsize] = 0;
