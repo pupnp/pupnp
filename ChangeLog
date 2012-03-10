@@ -4,6 +4,10 @@ Version 1.6.16
 
 2012-03-10 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
+	Exclude IPv6 stuff in SearchByTarget when UPNP_ENABLE_IPV6 is not defined.
+
+2012-03-10 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
 	Further measures against buffer overflows.
 
 	* Pass output buffer size to CreateClientRequestPacket(UlaGua)

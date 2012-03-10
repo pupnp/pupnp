@@ -493,12 +493,18 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 	int *id = NULL;
 	int ret = 0;
 	char ReqBufv4[BUFSIZE];
+#ifdef UPNP_ENABLE_IPV6
 	char ReqBufv6[BUFSIZE];
 	char ReqBufv6UlaGua[BUFSIZE];
+#endif
 	struct sockaddr_storage __ss_v4;
+#ifdef UPNP_ENABLE_IPV6
 	struct sockaddr_storage __ss_v6;
+#endif
 	struct sockaddr_in *destAddr4 = (struct sockaddr_in *)&__ss_v4;
+#ifdef UPNP_ENABLE_IPV6
 	struct sockaddr_in6 *destAddr6 = (struct sockaddr_in6 *)&__ss_v6;
+#endif
 	fd_set wrSet;
 	SsdpSearchArg *newArg = NULL;
 	int timeTillRead = 0;
@@ -527,23 +533,27 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 	retVal = CreateClientRequestPacket(ReqBufv4, sizeof(ReqBufv4), timeTillRead, St, AF_INET);
 	if (retVal != UPNP_E_SUCCESS)
 		return retVal;
+#ifdef UPNP_ENABLE_IPV6
 	retVal = CreateClientRequestPacket(ReqBufv6, sizeof(ReqBufv6), timeTillRead, St, AF_INET6);
 	if (retVal != UPNP_E_SUCCESS)
 		return retVal;
 	retVal = CreateClientRequestPacketUlaGua(ReqBufv6UlaGua, sizeof(ReqBufv6UlaGua), timeTillRead, St, AF_INET6);
 	if (retVal != UPNP_E_SUCCESS)
 		return retVal;
+#endif
 
 	memset(&__ss_v4, 0, sizeof(__ss_v4));
 	destAddr4->sin_family = AF_INET;
 	inet_pton(AF_INET, SSDP_IP, &destAddr4->sin_addr);
 	destAddr4->sin_port = htons(SSDP_PORT);
 
+#ifdef UPNP_ENABLE_IPV6
 	memset(&__ss_v6, 0, sizeof(__ss_v6));
 	destAddr6->sin6_family = AF_INET6;
 	inet_pton(AF_INET6, SSDP_IPV6_SITELOCAL, &destAddr6->sin6_addr);
 	destAddr6->sin6_port = htons(SSDP_PORT);
 	destAddr6->sin6_scope_id = gIF_INDEX;
+#endif
 
 	/* add search criteria to list */
 	HandleLock();
