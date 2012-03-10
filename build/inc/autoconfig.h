@@ -145,6 +145,15 @@
 #define UPNP_HAVE_DEVICE 1
 
 /* see upnpconfig.h */
+#define UPNP_HAVE_GENA 1
+
+/* see upnpconfig.h */
+#define UPNP_HAVE_SOAP 1
+
+/* see upnpconfig.h */
+#define UPNP_HAVE_SSDP 1
+
+/* see upnpconfig.h */
 #define UPNP_HAVE_TOOLS 1
 
 /* see upnpconfig.h */
