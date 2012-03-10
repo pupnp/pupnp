@@ -902,7 +902,7 @@ typedef struct HTTPCONNECTIONHANDLE {
  *	\li \c PARSE_FAILURE - Failure to parse data correctly
  *	\li \c UPNP_E_BAD_HTTPMSG - Socker read() returns an error
  */
-static int ReadResponseLineAndHeaders(
+static parse_status_t ReadResponseLineAndHeaders(
 	/*! Socket information object. */
 	IN SOCKINFO *info,
 	/*! HTTP Parser object. */
@@ -1220,12 +1220,13 @@ int http_GetHttpResponse(void *Handle, UpnpString *headers,
 	status = ReadResponseLineAndHeaders(&handle->sock_info,
 					    &handle->response, &timeout,
 					    &http_error_code);
-	if (status != PARSE_OK) {
+	if (status != (parse_status_t)PARSE_OK) {
 		ret_code = UPNP_E_BAD_RESPONSE;
 		goto errorHandler;
 	}
 	status = parser_get_entity_read_method(&handle->response);
-	if (status != PARSE_CONTINUE_1 && status != PARSE_SUCCESS) {
+	if (status != (parse_status_t)PARSE_CONTINUE_1 &&
+		status != (parse_status_t)PARSE_SUCCESS) {
 		ret_code = UPNP_E_BAD_RESPONSE;
 		goto errorHandler;
 	}
@@ -1515,6 +1516,8 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			}
 			assert(loc_time);
 			date = gmtime(loc_time);
+			if (date == NULL)
+				goto error_handler;
 			rc = snprintf(tempbuf, sizeof(tempbuf),
 				"%s%s, %02d %s %d %02d:%02d:%02d GMT%s",
 				start_str, &weekday_str[date->tm_wday * 4],
@@ -1875,13 +1878,14 @@ int http_OpenHttpGetEx(
 		}
 		status = ReadResponseLineAndHeaders(&handle->sock_info,
 			&handle->response, &timeout, &http_error_code);
-		if (status != PARSE_OK) {
+		if (status != (parse_status_t)PARSE_OK) {
 			errCode = UPNP_E_BAD_RESPONSE;
 			free(handle);
 			break;
 		}
 		status = parser_get_entity_read_method(&handle->response);
-		if (status != PARSE_CONTINUE_1 && status != PARSE_SUCCESS) {
+		if (status != (parse_status_t)PARSE_CONTINUE_1 &&
+			status != (parse_status_t)PARSE_SUCCESS) {
 			errCode = UPNP_E_BAD_RESPONSE;
 			free(handle);
 			break;

@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -48,7 +49,7 @@ char *str_alloc(const char *str, size_t str_len)
 {
 	char *s;
 
-	s = (char *)malloc(str_len + 1);
+	s = (char *)malloc(str_len + (size_t)1);
 	if (s == NULL) {
 		return NULL;	/* no mem */
 	}
@@ -96,8 +97,8 @@ static UPNP_INLINE void membuffer_initialize(
 	membuffer *m)
 {
 	m->buf = NULL;
-	m->length = 0;
-	m->capacity = 0;
+	m->length = (size_t)0;
+	m->capacity = (size_t)0;
 }
 
 int membuffer_set_size(membuffer *m, size_t new_length)
@@ -128,14 +129,14 @@ int membuffer_set_size(membuffer *m, size_t new_length)
 
 	assert(alloc_len >= new_length);
 
-	temp_buf = realloc(m->buf, alloc_len + 1);	/*LEAK_FIX_MK */
+	temp_buf = realloc(m->buf, alloc_len + (size_t)1);	/*LEAK_FIX_MK */
 
 	/*temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );LEAK_FIX_MK */
 
 	if (temp_buf == NULL) {
 		/* try smaller size */
 		alloc_len = new_length;
-		temp_buf = realloc(m->buf, alloc_len + 1);	/*LEAK_FIX_MK */
+		temp_buf = realloc(m->buf, alloc_len + (size_t)1);	/*LEAK_FIX_MK */
 		/*temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );LEAK_FIX_MK */
 
 		if (temp_buf == NULL) {
@@ -250,7 +251,7 @@ void membuffer_delete(membuffer * m, size_t index, size_t num_bytes)
 	if (index + num_bytes > m->length) {
 		num_bytes = m->length - index;
 		/* every thing at and after index purged */
-		copy_len = 0;
+		copy_len = (size_t)0;
 	} else {
 		/* calc num bytes after deleted string */
 		copy_len = m->length - (index + num_bytes);
@@ -261,6 +262,8 @@ void membuffer_delete(membuffer * m, size_t index, size_t num_bytes)
 	return_value = membuffer_set_size(m, new_length);
 	/* shrinking should always work */
 	assert(return_value == 0);
+	if (return_value != 0)
+		return;
 
 	/* don't modify until buffer is set */
 	m->length = new_length;

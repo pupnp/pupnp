@@ -187,7 +187,7 @@ static int NewRequestHandler(
 	char buf_ntop[INET6_ADDRSTRLEN];
 	int ret = UPNP_E_SUCCESS;
 
-	ReplySock = socket(DestAddr->sa_family, SOCK_DGRAM, 0);
+	ReplySock = socket((int)DestAddr->sa_family, SOCK_DGRAM, 0);
 	if (ReplySock == INVALID_SOCKET) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
@@ -320,7 +320,7 @@ static void CreateServicePacket(
 	/*! [out] Output buffer filled with HTTP statement. */
 	char **packet,
 	/*! [in] Address family of the HTTP request. */
-	int AddressFamily,
+	unsigned short AddressFamily,
 	/*! [in] PowerState as defined by UPnP Low Power. */
 	int PowerState,
 	/*! [in] SleepPeriod as defined by UPnP Low Power. */
@@ -336,7 +336,7 @@ static void CreateServicePacket(
 	 * Notf == 1 means service advertisement,
 	 * Notf == 2 means reply */
 	membuffer_init(&buf);
-	buf.size_inc = 30;
+	buf.size_inc = (size_t)30;
 	*packet = NULL;
 	if (msg_type == MSGTYPE_REPLY) {
 		if (PowerState > 0) {
@@ -447,11 +447,11 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 	memset(&__ss, 0, sizeof(__ss));
 	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	if (AddressFamily == AF_INET) {
-		DestAddr4->sin_family = AF_INET;
+		DestAddr4->sin_family = (unsigned short)AF_INET;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
 	} else if (AddressFamily == AF_INET6) {
-		DestAddr6->sin6_family = AF_INET6;
+		DestAddr6->sin6_family = (unsigned short)AF_INET6;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
@@ -656,11 +656,11 @@ int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
 	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	szReq[0] = NULL;
 	if (AddressFamily == AF_INET) {
-		DestAddr4->sin_family = AF_INET;
+		DestAddr4->sin_family = (unsigned short)AF_INET;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
 	} else if (AddressFamily == AF_INET6) {
-		DestAddr6->sin6_family = AF_INET6;
+		DestAddr6->sin6_family = (unsigned short)AF_INET6;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
@@ -783,11 +783,11 @@ int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
 	memset(&__ss, 0, sizeof(__ss));
 	memset(Mil_Usn, 0, sizeof(Mil_Usn));
 	if (AddressFamily == AF_INET) {
-		DestAddr4->sin_family = AF_INET;
+		DestAddr4->sin_family = (unsigned short)AF_INET;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
 	} else if (AddressFamily == AF_INET6) {
-		DestAddr6->sin6_family = AF_INET6;
+		DestAddr6->sin6_family = (unsigned short)AF_INET6;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);

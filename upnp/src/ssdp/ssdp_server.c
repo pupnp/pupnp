@@ -346,7 +346,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 						   "ServiceType not found \n");
 					continue;
 				}
-				tmpNode2 = ixmlNodeList_item(tmpNodeList, 0);
+				tmpNode2 = ixmlNodeList_item(tmpNodeList, 0lu);
 				if (!tmpNode2)
 					continue;
 				textNode = ixmlNode_getFirstChild(tmpNode2);
@@ -404,7 +404,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 										  SInfo->SleepPeriod,
 										  SInfo->RegistrationState);
 								} else if (atoi(strrchr (ServiceType, ':') + 1) ==
-									   atoi(&servType[strlen(servType) - 1])) {
+									   atoi(&servType[strlen(servType) - (size_t)1])) {
 									UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 										   "ServiceType=%s and search servType=%s MATCH\n",
 										   ServiceType, servType);
@@ -457,7 +457,7 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 	char *ptr2 = NULL;
 	char *ptr3 = NULL;
 	int CommandFound = 0;
-	size_t n = 0;
+	size_t n = (size_t)0;
 	int rc = 0;
 
 	if (strstr(cmd, "uuid:schemas") != NULL) {
@@ -480,7 +480,7 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 			return -1;
 		ptr1 = strstr(cmd, ":");
 		if (ptr1 != NULL) {
-			n = (size_t) (ptr3 - ptr1);
+			n = (size_t)ptr3 - (size_t)ptr1;
 			strncpy(TempBuf, ptr1, n);
 			TempBuf[n] = '\0';
 			rc = snprintf(Evt->DeviceType, sizeof(Evt->DeviceType),
@@ -493,7 +493,7 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 	}
 	if ((TempPtr = strstr(cmd, "uuid")) != NULL) {
 		if ((Ptr = strstr(cmd, "::")) != NULL) {
-			n = (size_t) (Ptr - TempPtr);
+			n = (size_t)Ptr - (size_t)TempPtr;
 			strncpy(Evt->UDN, TempPtr, n);
 			Evt->UDN[n] = '\0';
 		} else {
@@ -521,7 +521,7 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 	if ((TempPtr = strstr(cmd, "::upnp:rootdevice")) != NULL) {
 		/* Everything before "::upnp::rootdevice" is the UDN. */
 		if (TempPtr != cmd) {
-			n = (size_t) (TempPtr - cmd);
+			n = (size_t)TempPtr - (size_t)cmd;
 			strncpy(Evt->UDN, cmd, n);
 			Evt->UDN[n] = 0;
 			CommandFound = 1;
@@ -595,14 +595,14 @@ static UPNP_INLINE int valid_ssdp_msg(
 	memptr hdr_value;
 
 	/* check for valid methods - NOTIFY or M-SEARCH */
-	if (hmsg->method != HTTPMETHOD_NOTIFY &&
-	    hmsg->method != HTTPMETHOD_MSEARCH &&
-	    hmsg->request_method != HTTPMETHOD_MSEARCH) {
+	if (hmsg->method != (http_method_t)HTTPMETHOD_NOTIFY &&
+	    hmsg->method != (http_method_t)HTTPMETHOD_MSEARCH &&
+	    hmsg->request_method != (http_method_t)HTTPMETHOD_MSEARCH) {
 		return FALSE;
 	}
-	if (hmsg->request_method != HTTPMETHOD_MSEARCH) {
+	if (hmsg->request_method != (http_method_t)HTTPMETHOD_MSEARCH) {
 		/* check PATH == "*" */
-		if (hmsg->uri.type != RELATIVE ||
+		if (hmsg->uri.type != (enum uriType)RELATIVE ||
 		    strncmp("*", hmsg->uri.pathquery.buff,
 			    hmsg->uri.pathquery.size) != 0) {
 			return FALSE;
@@ -642,8 +642,8 @@ static UPNP_INLINE int start_event_handler(
 
 	parser = &data->parser;
 	status = parser_parse(parser);
-	if (status == PARSE_FAILURE) {
-		if (parser->msg.method != HTTPMETHOD_NOTIFY ||
+	if (status == (parse_status_t)PARSE_FAILURE) {
+		if (parser->msg.method != (http_method_t)HTTPMETHOD_NOTIFY ||
 		    !parser->valid_ssdp_notify_hack) {
 			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 				   "SSDP recvd bad msg code = %d\n", status);
@@ -651,7 +651,7 @@ static UPNP_INLINE int start_event_handler(
 			goto error_handler;
 		}
 		/* valid notify msg */
-	} else if (status != PARSE_SUCCESS) {
+	} else if (status != (parse_status_t)PARSE_SUCCESS) {
 		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 			   "SSDP recvd bad msg code = %d\n", status);
 
@@ -683,8 +683,8 @@ static void ssdp_event_handler_thread(
 	if (start_event_handler(the_data) != 0)
 		return;
 	/* send msg to device or ctrlpt */
-	if (hmsg->method == HTTPMETHOD_NOTIFY ||
-	    hmsg->request_method == HTTPMETHOD_MSEARCH) {
+	if (hmsg->method == (http_method_t)HTTPMETHOD_NOTIFY ||
+	    hmsg->request_method == (http_method_t)HTTPMETHOD_MSEARCH) {
 #ifdef INCLUDE_CLIENT_APIS
 		ssdp_handle_ctrlpt_msg(hmsg,
 				       &data->dest_addr,
@@ -739,7 +739,7 @@ void readFromSSDPSocket(SOCKET socket)
 			data = NULL;
 		}
 	}
-	byteReceived = recvfrom(socket, requestBuf, BUFSIZE - 1, 0,
+	byteReceived = recvfrom(socket, requestBuf, BUFSIZE - (size_t)1, 0,
 				(struct sockaddr *)&__ss, &socklen);
 	if (byteReceived > 0) {
 		requestBuf[byteReceived] = '\0';
@@ -790,7 +790,7 @@ static int create_ssdp_sock_v4(
 {
 	char errorBuffer[ERROR_BUFFER_LEN];
 	int onOff;
-	u_char ttl = 4;
+	u_char ttl = (u_char)4;
 	struct ip_mreq ssdpMcastAddr;
 	struct sockaddr_storage __ss;
 	struct sockaddr_in *ssdpAddr4 = (struct sockaddr_in *)&__ss;
@@ -834,7 +834,7 @@ static int create_ssdp_sock_v4(
 	}
 #endif /* BSD, __OSX__, __APPLE__ */
 	memset(&__ss, 0, sizeof(__ss));
-	ssdpAddr4->sin_family = AF_INET;
+	ssdpAddr4->sin_family = (unsigned short)AF_INET;
 	ssdpAddr4->sin_addr.s_addr = htonl(INADDR_ANY);
 	ssdpAddr4->sin_port = htons(SSDP_PORT);
 	ret = bind(*ssdpSock, (struct sockaddr *)ssdpAddr4, sizeof(*ssdpAddr4));
@@ -1215,7 +1215,7 @@ int get_ssdp_sockets(MiniServerSockArray * out)
 #endif /* IPv6 */
 #endif /* INCLUDE_CLIENT_APIS */
 	/* Create the IPv4 socket for SSDP */
-	if (strlen(gIF_IPV4) > 0) {
+	if (strlen(gIF_IPV4) > (size_t)0) {
 		retVal = create_ssdp_sock_v4(&out->ssdpSock4);
 		if (retVal != UPNP_E_SUCCESS) {
 #ifdef INCLUDE_CLIENT_APIS
@@ -1230,7 +1230,7 @@ int get_ssdp_sockets(MiniServerSockArray * out)
 		out->ssdpSock4 = INVALID_SOCKET;
 	/* Create the IPv6 socket for SSDP */
 #ifdef UPNP_ENABLE_IPV6
-	if (strlen(gIF_IPV6) > 0) {
+	if (strlen(gIF_IPV6) > (size_t)0) {
 		retVal = create_ssdp_sock_v6(&out->ssdpSock6);
 		if (retVal != UPNP_E_SUCCESS) {
 			shutdown(out->ssdpSock4, SD_BOTH);
@@ -1245,7 +1245,7 @@ int get_ssdp_sockets(MiniServerSockArray * out)
 		}
 	} else
 		out->ssdpSock6 = INVALID_SOCKET;
-	if (strlen(gIF_IPV6_ULA_GUA) > 0) {
+	if (strlen(gIF_IPV6_ULA_GUA) > (size_t)0) {
 		retVal = create_ssdp_sock_v6_ula_gua(&out->ssdpSock6UlaGua);
 		if (retVal != UPNP_E_SUCCESS) {
 			shutdown(out->ssdpSock4, SD_BOTH);

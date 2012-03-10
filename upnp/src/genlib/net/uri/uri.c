@@ -139,14 +139,14 @@ int replace_escaped(char *in, size_t index, size_t *max)
 	size_t i = 0;
 	size_t j = 0;
 
-	if (in[index] == '%' && isxdigit(in[index + 1]) && isxdigit(in[index + 2])) {
+	if (in[index] == '%' && isxdigit(in[index + (size_t)1]) && isxdigit(in[index + (size_t)2])) {
 		/* Note the "%2x", makes sure that we convert a maximum of two
 		 * characters. */
-		if (sscanf(&in[index + 1], "%2x", &tempInt) != 1) {
+		if (sscanf(&in[index + (size_t)1], "%2x", &tempInt) != 1) {
 			return 0;
 		}
 		tempChar = (char)tempInt;
-		for (i = index + 3, j = index; j < *max; i++, j++) {
+		for (i = index + (size_t)3, j = index; j < *max; i++, j++) {
 			in[j] = tempChar;
 			if (i < *max) {
 				tempChar = in[i];
@@ -154,7 +154,7 @@ int replace_escaped(char *in, size_t index, size_t *max)
 				tempChar = 0;
 			}
 		}
-		*max -= 2;
+		*max -= (size_t)2;
 		return 1;
 	} else {
 		return 0;
@@ -176,12 +176,12 @@ static size_t parse_uric(
 	/*! [out] Token object where the string of characters is copied. */
 	token *out)
 {
-	size_t i = 0;
+	size_t i = (size_t)0;
 
 	while (i < max &&
 	       (is_unreserved(in[i]) ||
 	        is_reserved(in[i])   ||
-	        ((i + 2 < max) && is_escaped(&in[i])))) {
+	        ((i + (size_t)2 < max) && is_escaped(&in[i])))) {
 		i++;
 	}
 
@@ -414,14 +414,14 @@ int parse_hostport(
 	}
 	/* The length of the host and port string can be calculated by */
 	/* subtracting pointers. */
-	hostport_size = (size_t)(c - workbuf);
+	hostport_size = (size_t)c - (size_t)workbuf;
 	/* Fill in the 'out' information. */
 	if (af == AF_INET) {
-		sai4->sin_family = AF_INET;
+		sai4->sin_family = (unsigned short)AF_INET;
 		sai4->sin_port = htons(port);
 		ret = inet_pton(AF_INET, srvname, &sai4->sin_addr);
 	} else if (af == AF_INET6) {
-		sai6->sin6_family = AF_INET6;
+		sai6->sin6_family = (unsigned short)AF_INET6;
 		sai6->sin6_port = htons(port);
 		sai6->sin6_scope_id = gIF_INDEX;
 		ret = inet_pton(AF_INET6, srvname, &sai6->sin6_addr);
@@ -462,19 +462,19 @@ static size_t parse_scheme(
 	/*! [out] Output parameter whose buffer is filled in with the scheme. */
 	token *out)
 {
-    size_t i = 0;
+    size_t i = (size_t)0;
 
-    out->size = 0;
+    out->size = (size_t)0;
     out->buff = NULL;
 
-    if( ( max == 0 ) || ( !isalpha( in[0] ) ) )
-        return 0;
+    if( ( max == (size_t)0 ) || ( !isalpha( in[0] ) ) )
+        return (size_t)0;
 
     i++;
     while( ( i < max ) && ( in[i] != ':' ) ) {
         if( !( isalnum( in[i] ) || ( in[i] == '+' ) || ( in[i] == '-' )
                || ( in[i] == '.' ) ) )
-            return 0;
+            return (size_t)0;
         i++;
     }
     if( i < max ) {
@@ -483,15 +483,15 @@ static size_t parse_scheme(
         return i;
     }
 
-    return 0;
+    return (size_t)0;
 }
 
 
 int remove_escaped_chars(INOUT char *in, INOUT size_t *size)
 {
-	size_t i = 0;
+	size_t i = (size_t)0;
 
-	for (i = 0; i < *size; i++) {
+	for (i = (size_t)0; i < *size; i++) {
 		replace_escaped(in, i, size);
 	}
 
@@ -570,7 +570,7 @@ char *resolve_rel_url(char *base_url, char *rel_url)
     uri_type base;
     uri_type rel;
 
-    size_t i = 0;
+    size_t i = (size_t)0;
     char *finger = NULL;
 
     char *last_slash = NULL;
@@ -579,7 +579,7 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 
     if( base_url && rel_url ) {
         out =
-            ( char * )malloc( strlen( base_url ) + strlen( rel_url ) + 2 );
+            ( char * )malloc( strlen( base_url ) + strlen( rel_url ) + (size_t)2 );
     } else {
         if( rel_url )
             return strdup( rel_url );
@@ -590,36 +590,36 @@ char *resolve_rel_url(char *base_url, char *rel_url)
     if( out == NULL ) {
         return NULL;
     }
-    memset( out, 0, strlen( base_url ) + strlen( rel_url ) + 2 );
+    memset( out, 0, strlen( base_url ) + strlen( rel_url ) + (size_t)2 );
 
     if( ( parse_uri( rel_url, strlen( rel_url ), &rel ) ) == HTTP_SUCCESS ) {
 
-        if( rel.type == ABSOLUTE ) {
+        if( rel.type == ( enum uriType) ABSOLUTE ) {
 
             strncpy( out, rel_url, strlen ( rel_url ) );
         } else {
 
             if( ( parse_uri( base_url, strlen( base_url ), &base ) ==
                   HTTP_SUCCESS )
-                && ( base.type == ABSOLUTE ) ) {
+                && ( base.type == ( enum uriType ) ABSOLUTE ) ) {
 
-                if( strlen( rel_url ) == 0 ) {
+                if( strlen( rel_url ) == (size_t)0 ) {
                     strncpy( out, base_url, strlen ( base_url ) );
                 } else {
                     char *out_finger = out;
-                    assert( base.scheme.size + 1 /* ':' */ <= strlen ( base_url ) );
+                    assert( base.scheme.size + (size_t)1 /* ':' */ <= strlen ( base_url ) );
                     memcpy( out, base.scheme.buff, base.scheme.size );
                     out_finger += base.scheme.size;
                     ( *out_finger ) = ':';
                     out_finger++;
 
-                    if( rel.hostport.text.size > 0 ) {
-                        snprintf( out_finger, strlen( rel_url ) + 1, "%s",
-                                  rel_url );
+                    if( rel.hostport.text.size > (size_t)0 ) {
+                        snprintf( out_finger, strlen( rel_url ) + (size_t)1,
+                                  "%s", rel_url );
                     } else {
-                        if( base.hostport.text.size > 0 ) {
-                            assert( base.scheme.size + 1
-                                + base.hostport.text.size + 2 /* "//" */ <= strlen ( base_url ) );
+                        if( base.hostport.text.size > (size_t)0 ) {
+                            assert( base.scheme.size + (size_t)1
+                                + base.hostport.text.size + (size_t)2 /* "//" */ <= strlen ( base_url ) );
                             memcpy( out_finger, "//", 2 );
                             out_finger += 2;
                             memcpy( out_finger, base.hostport.text.buff,
@@ -627,22 +627,22 @@ char *resolve_rel_url(char *base_url, char *rel_url)
                             out_finger += base.hostport.text.size;
                         }
 
-                        if( rel.path_type == ABS_PATH ) {
+                        if( rel.path_type == ( enum pathType ) ABS_PATH ) {
                             strncpy( out_finger, rel_url, strlen ( rel_url ) );
 
                         } else {
                             char temp_path = '/';
 
-                            if( base.pathquery.size == 0 ) {
-                                base.pathquery.size = 1;
+                            if( base.pathquery.size == (size_t)0 ) {
+                                base.pathquery.size = (size_t)1;
                                 base.pathquery.buff = &temp_path;
                             }
 
-                            assert( base.scheme.size + 1 + base.hostport.text.size + 2
-                                + base.pathquery.size <= strlen ( base_url ) + 1 /* temp_path */);
+                            assert( base.scheme.size + (size_t)1 + base.hostport.text.size + (size_t)2
+                                + base.pathquery.size <= strlen ( base_url ) + (size_t)1 /* temp_path */);
                             finger = out_finger;
                             last_slash = finger;
-                            i = 0;
+                            i = (size_t)0;
                             while( ( i < base.pathquery.size ) &&
                                    ( base.pathquery.buff[i] != '?' ) ) {
                                 ( *finger ) = base.pathquery.buff[i];
@@ -684,8 +684,8 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 int parse_uri(const char *in, size_t max, uri_type *out)
 {
 	int begin_path = 0;
-	size_t begin_hostport = 0;
-	size_t begin_fragment = 0;
+	size_t begin_hostport = (size_t)0;
+	size_t begin_fragment = (size_t)0;
 	int defaultPort = 80;
 
 	begin_hostport = parse_scheme(in, max, &out->scheme);
@@ -697,10 +697,10 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 		out->type = RELATIVE;
 		out->path_type = REL_PATH;
 	}
-	if (begin_hostport + 1 < max &&
+	if (begin_hostport + (size_t)1 < max &&
 	    in[begin_hostport] == '/' &&
-	    in[begin_hostport + 1] == '/') {
-		begin_hostport += 2;
+	    in[begin_hostport + (size_t)1] == '/') {
+		begin_hostport += (size_t)2;
 		if (token_string_casecmp(&out->scheme, "https") == 0) {
 			defaultPort = 443;
 		}
@@ -728,7 +728,7 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 			   &out->fragment);
 	} else {
 		out->fragment.buff = NULL;
-		out->fragment.size = 0;
+		out->fragment.size = (size_t)0;
 	}
 
 	return HTTP_SUCCESS;
@@ -742,10 +742,10 @@ int parse_uri_and_unescape(char *in, size_t max, uri_type *out)
 		return ret;
 	}
 
-	if (out->pathquery.size > 0) {
+	if (out->pathquery.size > (size_t)0) {
 		remove_escaped_chars((char *)out->pathquery.buff, &out->pathquery.size);
 	}
-	if (out->fragment.size > 0) {
+	if (out->fragment.size > (size_t)0) {
 		remove_escaped_chars((char *)out->fragment.buff, &out->fragment.size);
 	}
 

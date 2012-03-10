@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation
  * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -62,7 +63,7 @@ typedef struct {
 	/*! used to increase size; MUST be > 0; (read/write). */
 	size_t size_inc;
 	/*! default value of size_inc. */
-#define MEMBUF_DEF_SIZE_INC 5
+#define MEMBUF_DEF_SIZE_INC (size_t)5
 } membuffer;
 
 #ifdef __cplusplus

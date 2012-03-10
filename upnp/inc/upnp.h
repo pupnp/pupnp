@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
- * Copyright (C) 2011 France Telecom All rights reserved. 
+ * Copyright (C) 2011-2012 France Telecom All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -65,8 +65,8 @@
 #include <openssl/ssl.h>
 #endif
 
-#define LINE_SIZE  180
-#define NAME_SIZE  256
+#define LINE_SIZE  (size_t)180
+#define NAME_SIZE  (size_t)256
 #define MNFT_NAME_SIZE  64
 #define MODL_NAME_SIZE  32
 #define SERL_NUMR_SIZE  64

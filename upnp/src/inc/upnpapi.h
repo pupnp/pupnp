@@ -174,7 +174,7 @@ Upnp_Handle_Type GetClientHandleInfo(
  */
 Upnp_Handle_Type GetDeviceHandleInfo(
 	/*! [in] Address family. */
-	const int AddressFamily,
+	const unsigned short AddressFamily,
 	/*! [out] Device handle pointer. */
 	int *device_handle_out, 
 	/*! [out] Device handle structure passed by this function. */

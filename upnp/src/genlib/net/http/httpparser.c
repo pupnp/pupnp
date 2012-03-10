@@ -522,11 +522,11 @@ http_header_t *httpmsg_find_hdr(
 *
 * Description :	skips blank lines at the start of a msg.
 *
-* Return : int ;
+* Return : parse_status_t ;
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE int skip_blank_lines(INOUT scanner_t *scanner)
+static UPNP_INLINE parse_status_t skip_blank_lines(INOUT scanner_t *scanner)
 {
 	memptr token;
 	token_type_t tok_type;
@@ -535,9 +535,9 @@ static UPNP_INLINE int skip_blank_lines(INOUT scanner_t *scanner)
 	/* skip ws, crlf */
 	do {
 		status = scanner_get_token(scanner, &token, &tok_type);
-	} while (status == PARSE_OK &&
+	} while (status == (parse_status_t)PARSE_OK &&
 		 (tok_type == TT_WHITESPACE || tok_type == TT_CRLF));
-	if (status == PARSE_OK) {
+	if (status == (parse_status_t)PARSE_OK) {
 		/* pushback a non-whitespace token */
 		scanner->cursor -= token.length;
 	}
@@ -560,7 +560,7 @@ static UPNP_INLINE int skip_blank_lines(INOUT scanner_t *scanner)
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE int skip_lws(INOUT scanner_t *scanner)
+static UPNP_INLINE parse_status_t skip_lws(INOUT scanner_t *scanner)
 {
     memptr token;
     token_type_t tok_type;
@@ -574,13 +574,14 @@ static UPNP_INLINE int skip_lws(INOUT scanner_t *scanner)
 
         /* get CRLF or WS */
         status = scanner_get_token( scanner, &token, &tok_type );
-        if( status == PARSE_OK ) {
+        if( status == ( parse_status_t ) PARSE_OK ) {
             if( tok_type == TT_CRLF ) {
                 /* get WS */
                 status = scanner_get_token( scanner, &token, &tok_type );
             }
 
-            if( status == PARSE_OK && tok_type == TT_WHITESPACE ) {
+            if( status == ( parse_status_t ) PARSE_OK &&
+		tok_type == TT_WHITESPACE ) {
                 matched = TRUE;
             } else {
                 /* did not match LWS; pushback token(s) */
@@ -590,7 +591,8 @@ static UPNP_INLINE int skip_lws(INOUT scanner_t *scanner)
     } while( matched );
 
     /* if entire msg is loaded, ignore an 'incomplete' warning */
-    if( status == PARSE_INCOMPLETE && scanner->entire_msg_loaded ) {
+    if( status == ( parse_status_t ) PARSE_INCOMPLETE &&
+	scanner->entire_msg_loaded ) {
         status = PARSE_OK;
     }
 
@@ -631,7 +633,7 @@ static UPNP_INLINE parse_status_t match_non_ws_string(
 
     while( !done ) {
         status = scanner_get_token( scanner, &token, &tok_type );
-        if( status == PARSE_OK &&
+        if( status == ( parse_status_t ) PARSE_OK &&
             tok_type != TT_WHITESPACE && tok_type != TT_CRLF ) {
             /* append non-ws token */
             str->length += token.length;
@@ -640,13 +642,13 @@ static UPNP_INLINE parse_status_t match_non_ws_string(
         }
     }
 
-    if( status == PARSE_OK ) {
+    if( status == ( parse_status_t ) PARSE_OK ) {
         /* last token was WS; push it back in */
         scanner->cursor -= token.length;
     }
     /* tolerate 'incomplete' msg */
-    if( status == PARSE_OK ||
-        ( status == PARSE_INCOMPLETE && scanner->entire_msg_loaded )
+    if( status == ( parse_status_t ) PARSE_OK ||
+        ( status == ( parse_status_t ) PARSE_INCOMPLETE && scanner->entire_msg_loaded )
          ) {
         if( str->length == 0 ) {
             /* no strings found */
@@ -701,7 +703,7 @@ static UPNP_INLINE parse_status_t match_raw_value(
 
     while( !done ) {
         status = scanner_get_token( scanner, &token, &tok_type );
-        if( status == PARSE_OK ) {
+        if( status == ( parse_status_t ) PARSE_OK ) {
             if( !saw_crlf ) {
                 if( tok_type == TT_CRLF ) {
                     /* CRLF could end value */
@@ -733,7 +735,7 @@ static UPNP_INLINE parse_status_t match_raw_value(
         }
     }
 
-    if( status == PARSE_OK ) {
+    if( status == ( parse_status_t ) PARSE_OK ) {
         /* trim whitespace on right side of value */
         while( raw_value->length > 0 ) {
             /* get last char */
@@ -771,7 +773,7 @@ static UPNP_INLINE parse_status_t match_raw_value(
 *   PARSE_FAILURE		-- bad input
 *   PARSE_INCOMPLETE
 ************************************************************************/
-static UPNP_INLINE int match_int(
+static UPNP_INLINE parse_status_t match_int(
 	INOUT scanner_t *scanner,
 	IN int base,
 	OUT int *value)
@@ -785,7 +787,7 @@ static UPNP_INLINE int match_int(
 
 	save_pos = scanner->cursor;
 	status = scanner_get_token(scanner, &token, &tok_type);
-	if (status == PARSE_OK) {
+	if (status == (parse_status_t)PARSE_OK) {
 		if (tok_type == TT_IDENTIFIER) {
 			errno = 0;
 			num = strtol(token.buf, &end_ptr, base);
@@ -801,7 +803,7 @@ static UPNP_INLINE int match_int(
 			status = PARSE_NO_MATCH;
 		}
 	}
-	if (status != PARSE_OK) {
+	if (status != (parse_status_t)PARSE_OK) {
 		/* restore scanner position for bad values */
 		scanner->cursor = save_pos;
 	}
@@ -825,7 +827,7 @@ static UPNP_INLINE int match_int(
 *   PARSE_FAILURE
 *   PARSE_INCOMPLETE
 ************************************************************************/
-static UPNP_INLINE int
+static UPNP_INLINE parse_status_t 
 read_until_crlf( INOUT scanner_t * scanner,
                  OUT memptr * str )
 {
@@ -840,9 +842,9 @@ read_until_crlf( INOUT scanner_t * scanner,
     /* read until we hit a crlf */
     do {
         status = scanner_get_token( scanner, &token, &tok_type );
-    } while( status == PARSE_OK && tok_type != TT_CRLF );
+    } while( status == ( parse_status_t ) PARSE_OK && tok_type != TT_CRLF );
 
-    if( status == PARSE_OK ) {
+    if( status == ( parse_status_t ) PARSE_OK ) {
         /* pushback crlf in stream */
         scanner->cursor -= token.length;
 
@@ -947,7 +949,7 @@ match_char( INOUT scanner_t * scanner,
 *
 * Note :
 ************************************************************************/
-static int vfmatch(
+static parse_status_t vfmatch(
 	INOUT scanner_t *scanner,
 	IN const char *fmt,
 	va_list argp)
@@ -988,7 +990,8 @@ static int vfmatch(
                     assert( str_ptr != NULL );
                     status = scanner_get_token( scanner, str_ptr,
                                                 &tok_type );
-                    if( status == PARSE_OK && tok_type != TT_IDENTIFIER ) {
+                    if( status == ( parse_status_t ) PARSE_OK &&
+			tok_type != TT_IDENTIFIER ) {
                         /* not an identifier */
                         status = PARSE_NO_MATCH;
                     }
@@ -996,7 +999,8 @@ static int vfmatch(
                 case 'c':      /* crlf */
                     status = scanner_get_token( scanner,
                                                 &token, &tok_type );
-                    if( status == PARSE_OK && tok_type != TT_CRLF ) {
+                    if( status == ( parse_status_t ) PARSE_OK &&
+			tok_type != TT_CRLF ) {
                         /* not CRLF token */
                         status = PARSE_NO_MATCH;
                     }
@@ -1046,7 +1050,8 @@ static int vfmatch(
                     str_ptr = ( memptr * ) va_arg( argp, memptr * );
                     status =
                         scanner_get_token( scanner, str_ptr, &tok_type );
-                    if( status == PARSE_OK && tok_type != TT_QUOTEDSTRING ) {
+                    if( status == ( parse_status_t ) PARSE_OK &&
+			tok_type != TT_QUOTEDSTRING ) {
                         status = PARSE_NO_MATCH;    /* not a quoted string */
                     }
                     break;
@@ -1054,7 +1059,8 @@ static int vfmatch(
 	      	    /* optional whitespace */
                     status = scanner_get_token( scanner,
                                                 &token, &tok_type );
-                    if( status == PARSE_OK && tok_type != TT_WHITESPACE ) {
+                    if( status == ( parse_status_t ) PARSE_OK &&
+			tok_type != TT_WHITESPACE ) {
                         /* restore non-whitespace token */
                         scanner->cursor -= token.length;
                     }
@@ -1124,7 +1130,7 @@ static int vfmatch(
 *   PARSE_NO_MATCH
 *   PARSE_INCOMPLETE
 ************************************************************************/
-static int match(
+static parse_status_t match(
 	INOUT scanner_t *scanner,
 	IN const char *fmt,
 	...)
@@ -1156,13 +1162,13 @@ static int match(
 *   PARSE_NO_MATCH -- failure to match pattern 'fmt'
 *   PARSE_FAILURE	-- 'str' is bad input
 ************************************************************************/
-int
+parse_status_t
 matchstr( IN char *str,
           IN size_t slen,
           IN const char *fmt,
           ... )
 {
-    int ret_code;
+    parse_status_t ret_code;
     char save_char;
     scanner_t scanner;
     membuffer buf;
@@ -1245,7 +1251,7 @@ parser_parse_requestline( INOUT http_parser_t * parser )
     assert( parser->position == POS_REQUEST_LINE );
 
     status = skip_blank_lines( &parser->scanner );
-    if( status != PARSE_OK ) {
+    if( status != ( parse_status_t ) PARSE_OK ) {
         return status;
     }
     /*simple get http 0.9 as described in http 1.0 spec */
@@ -1253,7 +1259,7 @@ parser_parse_requestline( INOUT http_parser_t * parser )
     status =
         match( &parser->scanner, "%s\t%S%w%c", &method_str, &url_str );
 
-    if( status == PARSE_OK ) {
+    if( status == ( parse_status_t ) PARSE_OK ) {
 
         index =
             map_str_to_int( method_str.buf, method_str.length,
@@ -1292,7 +1298,7 @@ parser_parse_requestline( INOUT http_parser_t * parser )
     status = match( &parser->scanner,
                     "%s\t%S\t%ihttp%w/%w%L%c", &method_str, &url_str,
                     &version_str );
-    if( status != PARSE_OK ) {
+    if( status != ( parse_status_t ) PARSE_OK ) {
         return status;
     }
     /* store url */
@@ -1333,7 +1339,7 @@ parser_parse_requestline( INOUT http_parser_t * parser )
         return PARSE_FAILURE;
     }
 
-    hmsg->method = Http_Method_Table[index].id;
+    hmsg->method = ( http_method_t ) Http_Method_Table[index].id;
     parser->position = POS_HEADERS; /* move to headers */
 
     return PARSE_OK;
@@ -1366,14 +1372,14 @@ parse_status_t parser_parse_responseline(INOUT http_parser_t *parser)
 	assert(parser->position == POS_RESPONSE_LINE);
 
 	status = skip_blank_lines(&parser->scanner);
-	if (status != PARSE_OK)
+	if (status != ( parse_status_t) PARSE_OK)
 		return status;
 	/* response line */
 	/*status = match( &parser->scanner, "%ihttp%w/%w%d\t.\t%d\t%d\t%L%c", */
 	/*  &hmsg->major_version, &hmsg->minor_version, */
 	/*  &hmsg->status_code, &hmsg->status_msg ); */
 	status = match(&parser->scanner, "%ihttp%w/%w%L%c", &line);
-	if (status != PARSE_OK)
+	if (status != ( parse_status_t ) PARSE_OK)
 		return status;
 	save_char = line.buf[line.length];
 	line.buf[line.length] = '\0';	/* null-terminate */
