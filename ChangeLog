@@ -322,6 +322,7 @@ Version 1.6.16
 
 	Further measures against buffer overflows.
 
+	Treat large argument as error in UpnpAddVirtualDir.
 	Do not clear buffer before snprintf.
 
 2012-03-10 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
