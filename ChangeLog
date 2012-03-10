@@ -324,6 +324,7 @@ Version 1.6.16
 
 	Treat large argument as error in UpnpAddVirtualDir.
 	Do not clear buffer before snprintf.
+	Clarify the last argument of GetDescDocumentAndURL has size LINE_SIZE.
 	For inet_ntop, use buffer with size INET6_ADDRSTRLEN or INET_ADDRSTRLEN.
 
 2012-03-10 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
