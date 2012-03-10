@@ -222,7 +222,7 @@ typedef struct {
 	parser_pos_t position;
 	int ent_position;
 	unsigned int content_length;
-	int chunk_size;
+	size_t chunk_size;
        /*! offset in the the raw message buffer, which contains the message body.
         *  preceding this are the headers of the messsage. */
 	size_t entity_start_position;

@@ -126,7 +126,7 @@
  *
  * @{
  */
-#define THREAD_STACK_SIZE 0
+#define THREAD_STACK_SIZE (size_t)0
 /* @} */
 
 
