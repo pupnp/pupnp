@@ -4,6 +4,13 @@ Version 1.6.16
 
 2012-03-10 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
+	Handle allocation error in strndup to avoid access violation.
+
+	Return NULL before calling strncpy.
+	Platforms with HAVE_STRNDUP are not affected.
+
+2012-03-10 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
 	Synchronize autoconfig.h with upnpconfig.h.
 
 	It fixes WIN32 build where configure is not invoked. 
