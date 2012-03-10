@@ -552,7 +552,10 @@ int ssdp_request_type(char *cmd, SsdpEvent *Evt)
 {
 	/* clear event */
 	memset(Evt, 0, sizeof(SsdpEvent));
-	unique_service_name(cmd, Evt);
+	if (unique_service_name(cmd, Evt) != 0) {
+		Evt->ErrCode = E_HTTP_SYNTEX;
+		return -1;
+	}
 	Evt->ErrCode = NO_ERROR_FOUND;
 	if ((Evt->RequestType = ssdp_request_type1(cmd)) == SSDP_SERROR) {
 		Evt->ErrCode = E_HTTP_SYNTEX;
