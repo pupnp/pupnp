@@ -11,6 +11,7 @@ Version 1.6.16
 	* Handle SearchByTarget error in UpnpSearchAsync.
 	* Pass output buffer size to addrToString and detect overflow.
 	* Handle addrToString error in configure_urlbase. 
+	* Handle overflow in http_SendMessage.
 	* Treat large argument as error in UpnpAddVirtualDir.
 	* Do not clear buffer before snprintf.
 	* Clarify the last argument of GetDescDocumentAndURL has size LINE_SIZE.
