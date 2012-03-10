@@ -222,7 +222,6 @@ static int addToAction(
 		if (ActBuff == NULL) {
 			return UPNP_E_OUTOF_MEMORY;
 		}
-		memset(ActBuff, 0, HEADER_LENGTH);
 
 		if (response) {
 			rc = snprintf(ActBuff, HEADER_LENGTH,
@@ -301,7 +300,6 @@ static IXML_Document *makeAction(
 	if (ActBuff == NULL) {
 		return NULL;
 	}
-	memset(ActBuff, 0, HEADER_LENGTH);
 
 	if (response) {
 		rc = snprintf(ActBuff, HEADER_LENGTH,

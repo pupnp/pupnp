@@ -430,7 +430,6 @@ static char *AllocGenaHeaders(
 		line = __LINE__;
 		goto ExitFunction;
 	}
-	memset(headers, 0, headers_size);
 	rc = snprintf(headers, headers_size, "%s%s%"PRIzu"%s%s%s",
 		HEADER_LINE_1,
 		HEADER_LINE_2A,
@@ -1082,7 +1081,6 @@ static int respond_ok(
     int upnp_timeout = UPNP_TIMEOUT;
     int rc = 0;
 
-    memset( timeout_str, 0, sizeof( timeout_str ) );
     http_CalcResponseVersion( request->major_version,
                               request->minor_version, &major, &minor );
 
@@ -1090,6 +1088,7 @@ static int respond_ok(
         rc = snprintf( timeout_str, sizeof ( timeout_str ),
                        "TIMEOUT: Second-%d", time_out );
     } else {
+        memset( timeout_str, 0, sizeof( timeout_str ) );
         strncpy( timeout_str, "TIMEOUT: Second-infinite",
                  sizeof ( timeout_str ) - 1);
     }
@@ -1360,7 +1359,6 @@ void gena_process_subscription_request(
 	/* generate SID */
 	uuid_create(&uid);
 	uuid_unpack(&uid, temp_sid);
-	memset(sub->sid, 0, sizeof(sub->sid));
 	rc = snprintf(sub->sid, sizeof(sub->sid), "uuid:%s", temp_sid);
 
 	/* respond OK */

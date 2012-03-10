@@ -294,7 +294,6 @@ static int gena_subscribe(
 	http_parser_t response;
 	int rc = 0;
 
-	memset(timeout_str, 0, sizeof(timeout_str));
 	UpnpString_clear(sid);
 
 	/* request timeout to string */
@@ -302,6 +301,7 @@ static int gena_subscribe(
 		timeout = &local_timeout;
 	}
 	if (*timeout < 0) {
+		memset(timeout_str, 0, sizeof(timeout_str));
 		strncpy(timeout_str, "infinite", sizeof(timeout_str) - 1);
 	} else if(*timeout < CP_MINIMUM_SUBSCRIPTION_TIME) {
 		rc = snprintf(timeout_str, sizeof(timeout_str),

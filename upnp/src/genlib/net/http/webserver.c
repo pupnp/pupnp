@@ -323,7 +323,6 @@ static UPNP_INLINE int get_content_type(
 	temp = malloc(length);
 	if (!temp)
 		return UPNP_E_OUTOF_MEMORY;
-	memset(temp, 0, length);
 	rc = snprintf(temp, length, "%s/%s", type, subtype);
 	if (rc < 0 || (unsigned int) rc >= length) {
 		free(temp);
@@ -802,7 +801,6 @@ static int CreateHTTPRangeResponseHeader(
 			free(RangeInput);
 			return HTTP_REQUEST_RANGE_NOT_SATISFIABLE;
 		}
-		memset(Instr->RangeHeader, 0, sizeof(Instr->RangeHeader));
 		if (FirstByte >= 0 && LastByte >= 0 && LastByte >= FirstByte) {
 			if (LastByte >= FileLength)
 				LastByte = FileLength - 1;
@@ -824,8 +822,6 @@ static int CreateHTTPRangeResponseHeader(
 			   && FirstByte < FileLength) {
 			Instr->RangeOffset = FirstByte;
 			Instr->ReadSendSize = FileLength - FirstByte;
-			memset(Instr->RangeHeader, 0,
-				sizeof(Instr->RangeHeader));
 			rc = snprintf(Instr->RangeHeader,
 				sizeof(Instr->RangeHeader),
 				"CONTENT-RANGE: bytes %" PRId64
