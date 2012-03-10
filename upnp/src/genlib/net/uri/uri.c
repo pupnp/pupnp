@@ -567,7 +567,6 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 {
     uri_type base;
     uri_type rel;
-    char temp_path = '/';
 
     size_t i = 0;
     char *finger = NULL;
@@ -575,12 +574,10 @@ char *resolve_rel_url(char *base_url, char *rel_url)
     char *last_slash = NULL;
 
     char *out = NULL;
-    char *out_finger = NULL;
 
     if( base_url && rel_url ) {
         out =
             ( char * )malloc( strlen( base_url ) + strlen( rel_url ) + 2 );
-        out_finger = out;
     } else {
         if( rel_url )
             return strdup( rel_url );
@@ -607,6 +604,8 @@ char *resolve_rel_url(char *base_url, char *rel_url)
                 if( strlen( rel_url ) == 0 ) {
                     strncpy( out, base_url, strlen ( base_url ) );
                 } else {
+                    char *out_finger = out;
+                    assert( base.scheme.size + 1 /* ':' */ <= strlen ( base_url ) );
                     memcpy( out, base.scheme.buff, base.scheme.size );
                     out_finger += base.scheme.size;
                     ( *out_finger ) = ':';
@@ -617,6 +616,8 @@ char *resolve_rel_url(char *base_url, char *rel_url)
                                   rel_url );
                     } else {
                         if( base.hostport.text.size > 0 ) {
+                            assert( base.scheme.size + 1
+                                + base.hostport.text.size + 2 /* "//" */ <= strlen ( base_url ) );
                             memcpy( out_finger, "//", 2 );
                             out_finger += 2;
                             memcpy( out_finger, base.hostport.text.buff,
@@ -628,12 +629,15 @@ char *resolve_rel_url(char *base_url, char *rel_url)
                             strncpy( out_finger, rel_url, strlen ( rel_url ) );
 
                         } else {
+                            char temp_path = '/';
 
                             if( base.pathquery.size == 0 ) {
                                 base.pathquery.size = 1;
                                 base.pathquery.buff = &temp_path;
                             }
 
+                            assert( base.scheme.size + 1 + base.hostport.text.size + 2
+                                + base.pathquery.size <= strlen ( base_url ) + 1 /* temp_path */);
                             finger = out_finger;
                             last_slash = finger;
                             i = 0;
