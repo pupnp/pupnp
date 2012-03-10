@@ -4,6 +4,12 @@ Version 1.6.16
 
 2012-03-10 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Remove lock in ThreadPoolInit
+
+	If ThreadPoolInit returned EAGAIN, tp->lock was not freed. 
+
+2012-03-10 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Improve ixml
 
 	Remove "implicit integer conversions" and

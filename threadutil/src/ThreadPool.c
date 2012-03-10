@@ -707,6 +707,10 @@ int ThreadPoolInit(ThreadPool *tp, ThreadPoolAttr *attr)
 	retCode += ithread_cond_init(&tp->condition, NULL);
 	retCode += ithread_cond_init(&tp->start_and_shutdown, NULL);
 	if (retCode) {
+		ithread_mutex_unlock(&tp->mutex);
+		ithread_mutex_destroy(&tp->mutex);
+		ithread_cond_destroy(&tp->condition);
+		ithread_cond_destroy(&tp->start_and_shutdown);
 		return EAGAIN;
 	}
 	if (attr) {
