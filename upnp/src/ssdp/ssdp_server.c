@@ -705,7 +705,7 @@ void readFromSSDPSocket(SOCKET socket)
 	ssdp_thread_data *data = NULL;
 	socklen_t socklen = sizeof(__ss);
 	ssize_t byteReceived = 0;
-	char ntop_buf[64];
+	char ntop_buf[INET6_ADDRSTRLEN];
 
 	memset(&job, 0, sizeof(job));
 

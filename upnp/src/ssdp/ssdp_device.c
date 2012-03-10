@@ -184,7 +184,7 @@ static int NewRequestHandler(
 	/* a/c to UPNP Spec */
 	int ttl = 4;
 	int hops = 1;
-	char buf_ntop[64];
+	char buf_ntop[INET6_ADDRSTRLEN];
 	int ret = UPNP_E_SUCCESS;
 
 	ReplySock = socket(DestAddr->sa_family, SOCK_DGRAM, 0);
