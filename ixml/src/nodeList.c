@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -62,12 +63,12 @@ IXML_Node *ixmlNodeList_item(
 		return NULL;
 	}
 	/* if index is more than list length */
-	if (index > ixmlNodeList_length(nList) - 1) {
+	if (index > ixmlNodeList_length(nList) - 1lu) {
 		return NULL;
 	}
 
 	next = nList;
-	for (i = 0; i < index && next != NULL; ++i) {
+	for (i = 0u; i < index && next != NULL; ++i) {
 		next = next->next;
 	}
 
@@ -127,7 +128,7 @@ int ixmlNodeList_addToNodeList(
 unsigned long ixmlNodeList_length(IXML_NodeList *nList)
 {
 	IXML_NodeList *list;
-	unsigned long length = 0;
+	unsigned long length = 0lu;
 
 	list = nList;
 	while (list != NULL) {
