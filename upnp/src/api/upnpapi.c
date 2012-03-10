@@ -3877,9 +3877,13 @@ int UpnpAddVirtualDir(const char *newDirName)
     }
 
     if( *newDirName != '/' ) {
+        if (strlen(newDirName) > sizeof(dirName) - 2)
+            return UPNP_E_INVALID_PARAM;
         dirName[0] = '/';
         strncpy( dirName + 1, newDirName, sizeof( dirName ) - 2 );
     } else {
+        if (strlen(newDirName) > sizeof(dirName) - 1)
+            return UPNP_E_INVALID_PARAM;
         strncpy( dirName, newDirName, sizeof( dirName ) - 1 );
     }
 
