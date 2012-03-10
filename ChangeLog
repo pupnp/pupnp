@@ -2,6 +2,12 @@
 Version 1.6.16
 *******************************************************************************
 
+2012-03-10 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Synchronize autoconfig.h with upnpconfig.h.
+
+	It fixes WIN32 build where configure is not invoked. 
+
 2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	More compilaton optimisation
