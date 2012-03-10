@@ -334,7 +334,7 @@ static int receive_from_stopSock(SOCKET ssock, fd_set *set)
 	socklen_t clientLen;
 	struct sockaddr_storage clientAddr;
 	char requestBuf[256];
-	char buf_ntop[64];
+	char buf_ntop[INET6_ADDRSTRLEN];
 
 	if (FD_ISSET(ssock, set)) {
 		clientLen = sizeof(clientAddr);

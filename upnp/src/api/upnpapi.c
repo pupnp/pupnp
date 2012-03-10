@@ -3417,7 +3417,7 @@ int UpnpGetIfInfo(const char *IfName)
 	struct in6_addr v6_addr;
 	unsigned if_idx;
 	char addr6[8][5];
-	char buf[65];		/* INET6_ADDRSTRLEN */
+	char buf[INET6_ADDRSTRLEN];
 	int ifname_found = 0;
 	int valid_addr_found = 0;
 
@@ -3777,7 +3777,7 @@ int PrintHandleInfo(UpnpClient_Handle Hnd)
 int getlocalhostname(char *out, size_t out_len)
 {
 	int ret = UPNP_E_SUCCESS;
-	char tempstr[16];
+	char tempstr[INET_ADDRSTRLEN];
 	const char *p = NULL;
 
 #ifdef WIN32

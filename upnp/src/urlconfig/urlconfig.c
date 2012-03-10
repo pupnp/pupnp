@@ -77,7 +77,7 @@ static UPNP_INLINE void
 addrToString( IN const struct sockaddr *addr,
               OUT char ipaddr_port[] )
 {
-    char buf_ntop[64];
+    char buf_ntop[INET6_ADDRSTRLEN];
 
     if( addr->sa_family == AF_INET ) {
         struct sockaddr_in* sa4 = (struct sockaddr_in*)addr;
