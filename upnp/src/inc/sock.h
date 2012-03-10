@@ -5,6 +5,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -164,7 +165,7 @@ int sock_read(
 	/*! [out] Buffer to get data to. */
 	char* buffer,
 	/*! [in] Size of the buffer. */
-	int bufsize,
+	size_t bufsize,
 	/*! [in,out] timeout value. */
 	int *timeoutSecs);
 
@@ -182,7 +183,7 @@ int sock_write(
 	/*! [in] Buffer to send data from. */
 	const char *buffer,
 	/*! [in] Size of the buffer. */
-	int bufsize,
+	size_t bufsize,
 	/*! [in,out] timeout value. */
 	int *timeoutSecs);
 

@@ -318,6 +318,13 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-03-11 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Remove more implicit casts in upnp part
+
+	Remove more "implicit integer or enum conversions" as well as memset
+	before snprintf.
+
 2012-03-11 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	Avoid out of range access in CheckOtherHTTPHeaders.

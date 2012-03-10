@@ -1313,9 +1313,9 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd, int PowerState,
 	if (HInfo->aliasInstalled)
 		web_server_set_alias(NULL, NULL, 0, 0);
 #endif /* INTERNAL_WEB_SERVER */
-	if (HInfo->DeviceAf == AF_INET)
+	if (HInfo->DeviceAf == (unsigned short)AF_INET)
 		UpnpSdkDeviceRegisteredV4 = 0;
-	else if (HInfo->DeviceAf == AF_INET6)
+	else if (HInfo->DeviceAf == (unsigned short)AF_INET6)
 		UpnpSdkDeviceregisteredV6 = 0;
 	FreeHandle(Hnd);
 	HandleUnlock();

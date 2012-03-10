@@ -69,7 +69,7 @@ static int is_reserved(
 	/*! [in] Char to be matched for RESERVED characters. */
 	char in)
 {
-	if (strchr(RESERVED, in)) {
+	if (strchr(RESERVED, (int)in)) {
 		return 1;
 	} else {
 		return 0;
@@ -87,7 +87,7 @@ int is_mark(
 	/*! [in] Char to be matched for MARKED characters. */
 	char in)
 {
-	if (strchr(MARK, in)) {
+	if (strchr(MARK, (int)in)) {
 		return 1;
 	} else {
 		return 0;
@@ -213,12 +213,12 @@ static void copy_token(
 
 int copy_URL_list(URL_list *in, URL_list *out)
 {
-    size_t len = strlen(in->URLs) + 1;
-    size_t i = 0;
+    size_t len = strlen(in->URLs) + (size_t)1;
+    size_t i = (size_t)0;
 
     out->URLs = NULL;
     out->parsedURLs = NULL;
-    out->size = 0;
+    out->size = (size_t)0;
 
     out->URLs = malloc(len);
     out->parsedURLs = malloc(sizeof(uri_type) * in->size);
@@ -226,7 +226,7 @@ int copy_URL_list(URL_list *in, URL_list *out)
     if ( !out->URLs || !out->parsedURLs)
         return UPNP_E_OUTOF_MEMORY;
     memcpy(out->URLs, in->URLs, len);
-    for( i = 0; i < in->size; i++ ) {
+    for( i = (size_t)0; i < in->size; i++ ) {
         /*copy the parsed uri */
         out->parsedURLs[i].type = in->parsedURLs[i].type;
         copy_token( &in->parsedURLs[i].scheme, in->URLs,
@@ -257,7 +257,7 @@ void free_URL_list(URL_list *list)
 	if (list->parsedURLs) {
 		free(list->parsedURLs);
 	}
-	list->size = 0;
+	list->size = (size_t)0;
 }
 
 
@@ -316,7 +316,7 @@ int token_cmp(token *in1, token *in2)
 int parse_hostport(
 	const char *in,
 	size_t max,
-	int defaultPort,
+	unsigned short int defaultPort,
 	hostport_type *out)
 {
 	char workbuf[256];
@@ -327,7 +327,7 @@ int parse_hostport(
 	char *srvport = NULL;
 	char *last_dot = NULL;
 	unsigned short int port;
-	int af = AF_UNSPEC;
+	unsigned short af = AF_UNSPEC;
 	size_t hostport_size;
 	int has_port = 0;
 	int ret;
@@ -408,27 +408,26 @@ int parse_hostport(
 		if (port == 0)
 			/* Bad port number. */
 			return UPNP_E_INVALID_URL;
-	} else {
+	} else
 		/* Port was not specified, use default port. */
 		port = defaultPort;
-	}
 	/* The length of the host and port string can be calculated by */
 	/* subtracting pointers. */
 	hostport_size = (size_t)c - (size_t)workbuf;
 	/* Fill in the 'out' information. */
-	if (af == AF_INET) {
-		sai4->sin_family = (unsigned short)AF_INET;
+	if (af == (unsigned short)AF_INET) {
+		sai4->sin_family = af;
 		sai4->sin_port = htons(port);
 		ret = inet_pton(AF_INET, srvname, &sai4->sin_addr);
-	} else if (af == AF_INET6) {
-		sai6->sin6_family = (unsigned short)AF_INET6;
+	} else if (af == (unsigned short)AF_INET6) {
+		sai6->sin6_family = af;
 		sai6->sin6_port = htons(port);
 		sai6->sin6_scope_id = gIF_INDEX;
 		ret = inet_pton(AF_INET6, srvname, &sai6->sin6_addr);
 	} else {
 		/* IP address was set by the hostname (getaddrinfo). */
 		/* Override port: */
-		if (out->IPaddress.ss_family == AF_INET)
+		if (out->IPaddress.ss_family == (unsigned short)AF_INET)
 			sai4->sin_port = htons(port);
 		else
 			sai6->sin6_port = htons(port);
@@ -686,7 +685,7 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 	int begin_path = 0;
 	size_t begin_hostport = (size_t)0;
 	size_t begin_fragment = (size_t)0;
-	int defaultPort = 80;
+	unsigned short int defaultPort = 80;
 
 	begin_hostport = parse_scheme(in, max, &out->scheme);
 	if (begin_hostport) {
@@ -705,9 +704,9 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 			defaultPort = 443;
 		}
 		begin_path = parse_hostport(&in[begin_hostport],
-					    max - begin_hostport,
-					    defaultPort,
-					    &out->hostport);
+			max - begin_hostport,
+			defaultPort,
+			&out->hostport);
 		if (begin_path >= 0) {
 			begin_path += (int)begin_hostport;
 		} else

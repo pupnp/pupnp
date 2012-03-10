@@ -76,8 +76,8 @@
 const int CHUNK_HEADER_SIZE = 10;
 const int CHUNK_TAIL_SIZE = 10;
 */
-#define CHUNK_HEADER_SIZE 10
-#define CHUNK_TAIL_SIZE 10
+#define CHUNK_HEADER_SIZE (size_t)10
+#define CHUNK_TAIL_SIZE (size_t)10
 
 #ifndef UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS
 
@@ -337,7 +337,7 @@ int http_RecvMessage(
 	int ok_on_close = FALSE;
 	char buf[2 * 1024];
 
-	if (request_method == HTTPMETHOD_UNKNOWN) {
+	if (request_method == (http_method_t)HTTPMETHOD_UNKNOWN) {
 		parser_request_init(parser);
 	} else {
 		parser_response_init(parser, request_method);
@@ -348,12 +348,13 @@ int http_RecvMessage(
 		if (num_read > 0) {
 			/* got data */
 			status = parser_append(parser, buf, (size_t)num_read);
-			if (status == PARSE_SUCCESS) {
+			switch (status) {
+			case PARSE_SUCCESS:
 				UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
 					"<<< (RECVD) <<<\n%s\n-----------------\n",
 					parser->msg.msg.buf );
 				print_http_headers( &parser->msg );
-				if (g_maxContentLength > 0 && parser->content_length > (unsigned int)g_maxContentLength) {
+				if (g_maxContentLength > (size_t)0 && parser->content_length > (unsigned int)g_maxContentLength) {
 					*http_error_code = HTTP_REQ_ENTITY_TOO_LARGE;
 					line = __LINE__;
 					ret = UPNP_E_OUTOF_BOUNDS;
@@ -362,19 +363,21 @@ int http_RecvMessage(
 				line = __LINE__;
 				ret = 0;
 				goto ExitFunction;
-			} else if (status == PARSE_FAILURE) {
+			case PARSE_FAILURE:
 				*http_error_code = parser->http_error_code;
 				line = __LINE__;
 				ret = UPNP_E_BAD_HTTPMSG;
 				goto ExitFunction;
-			} else if (status == PARSE_INCOMPLETE_ENTITY) {
+			case PARSE_INCOMPLETE_ENTITY:
 				/* read until close */
 				ok_on_close = TRUE;
-			} else if (status == PARSE_CONTINUE_1) {
+			case PARSE_CONTINUE_1:
 				/* Web post request. */
 				line = __LINE__;
 				ret = PARSE_SUCCESS;
 				goto ExitFunction;
+			default:
+				break;
 			}
 		} else if (num_read == 0) {
 			if (ok_on_close) {
@@ -427,7 +430,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 	size_t buf_length;
 	size_t num_read;
 	size_t num_written;
-	size_t amount_to_be_read = 0;
+	size_t amount_to_be_read = (size_t)0;
 	/* 10 byte allocated for chunk header. */
 	size_t Data_Buf_Size = WEB_SERVER_BUF_SIZE;
 
@@ -482,7 +485,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 						nr = virtualDirCallback.read(Fp, file_buf, n);
 						num_read = (size_t)nr;
 					} else {
-						num_read = fread(file_buf, 1, n, Fp);
+						num_read = fread(file_buf, (size_t)1, n, Fp);
 					}
 					amount_to_be_read -= num_read;
 					if (Instr->ReadSendSize < 0) {
@@ -490,9 +493,9 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 						amount_to_be_read = Data_Buf_Size;
 					}
 				} else {
-					num_read = fread(file_buf, 1, Data_Buf_Size, Fp);
+					num_read = fread(file_buf, (size_t)1, Data_Buf_Size, Fp);
 				}
-				if (num_read == 0) {
+				if (num_read == (size_t)0) {
 					/* EOF so no more to send. */
 					if (Instr && Instr->IsChunkActive) {
 						const char *str = "0\r\n\r\n";
@@ -529,10 +532,10 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 					/*printf("Sending %s\n",file_buf-strlen(Chunk_Header)); */
 					nw = sock_write(info,
 						file_buf - strlen(Chunk_Header),
-						num_read + strlen(Chunk_Header) + 2,
+						num_read + strlen(Chunk_Header) + (size_t)2,
 						TimeOut);
 					num_written = (size_t)nw;
-					if (nw <= 0 || num_written != num_read + strlen(Chunk_Header) + 2)
+					if (nw <= 0 || num_written != num_read + strlen(Chunk_Header) + (size_t)2)
 						/* Send error nothing we can do. */
 						goto Cleanup_File;
 				} else {
@@ -559,7 +562,7 @@ Cleanup_File:
 			/* memory buffer */
 			buf = va_arg(argp, char *);
 			buf_length = va_arg(argp, size_t);
-			if (buf_length > 0) {
+			if (buf_length > (size_t)0) {
 				nw = sock_write(info, buf, buf_length, TimeOut);
 				num_written = (size_t)nw;
 				UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
@@ -619,7 +622,7 @@ int http_RequestAndResponse(
 	SOCKINFO info;
 
 	tcp_connection = socket(
-		destination->hostport.IPaddress.ss_family, SOCK_STREAM, 0);
+		(int)destination->hostport.IPaddress.ss_family, SOCK_STREAM, 0);
 	if (tcp_connection == INVALID_SOCKET) {
 		parser_response_init(response, req_method);
 		return UPNP_E_SOCKET_ERROR;
@@ -1225,8 +1228,11 @@ int http_GetHttpResponse(void *Handle, UpnpString *headers,
 		goto errorHandler;
 	}
 	status = parser_get_entity_read_method(&handle->response);
-	if (status != (parse_status_t)PARSE_CONTINUE_1 &&
-		status != (parse_status_t)PARSE_SUCCESS) {
+	switch (status) {
+	case PARSE_CONTINUE_1:
+	case PARSE_SUCCESS:
+		break;
+	default:
 		ret_code = UPNP_E_BAD_RESPONSE;
 		goto errorHandler;
 	}
@@ -1242,7 +1248,7 @@ int http_GetHttpResponse(void *Handle, UpnpString *headers,
 			*contentType = ctype.buf;
 	}
 	if (contentLength) {
-		if (handle->response.position == POS_COMPLETE)
+		if (handle->response.position == (parser_pos_t)POS_COMPLETE)
 			*contentLength = 0;
 		else if (handle->response.ent_position == ENTREAD_USING_CHUNKED)
 			*contentLength = UPNP_USING_CHUNKED;
@@ -1404,7 +1410,7 @@ int http_SendStatusResponse(IN SOCKINFO *info, IN int http_status_code,
 	http_CalcResponseVersion(request_major_version, request_minor_version,
 				 &response_major, &response_minor);
 	membuffer_init(&membuf);
-	membuf.size_inc = 70;
+	membuf.size_inc = (size_t)70;
 	/* response start line */
 	ret = http_MakeMessage(&membuf, response_major, response_minor, "RSCB",
 			       http_status_code, http_status_code);

@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -147,7 +148,7 @@ static int sock_read_write(
 	/*! [out] Buffer to get data to or send data from. */
 	char *buffer,
 	/*! [in] Size of the buffer. */
-	int bufsize,
+	size_t bufsize,
 	/*! [in] timeout value. */
 	int *timeoutSecs,
 	/*! [in] Boolean value specifying read or write option. */
@@ -164,6 +165,8 @@ static int sock_read_write(
 	long byte_left = 0;
 	long num_written;
 
+	if (*timeoutSecs < 0)
+		return UPNP_E_TIMEDOUT;
 	FD_ZERO(&readSet);
 	FD_ZERO(&writeSet);
 	if (bRead)
@@ -173,7 +176,7 @@ static int sock_read_write(
 	timeout.tv_sec = *timeoutSecs;
 	timeout.tv_usec = 0;
 	while (TRUE) {
-		if (*timeoutSecs < 0)
+		if (*timeoutSecs == 0)
 			retCode = select(sockfd + 1, &readSet, &writeSet,
 				NULL, NULL);
 		else
@@ -206,7 +209,7 @@ static int sock_read_write(
             else {
 #endif
 			/* read data. */
-			numBytes = (long)recv(sockfd, buffer, (size_t)bufsize, MSG_NOSIGNAL);
+			numBytes = (long)recv(sockfd, buffer, bufsize, MSG_NOSIGNAL);
 #ifdef UPNP_ENABLE_OPEN_SSL
             }
 #endif
@@ -253,12 +256,12 @@ static int sock_read_write(
 	return (int)numBytes;
 }
 
-int sock_read(SOCKINFO *info, char *buffer, int bufsize, int *timeoutSecs)
+int sock_read(SOCKINFO *info, char *buffer, size_t bufsize, int *timeoutSecs)
 {
 	return sock_read_write(info, buffer, bufsize, timeoutSecs, TRUE);
 }
 
-int sock_write(SOCKINFO *info, const char *buffer, int bufsize, int *timeoutSecs)
+int sock_write(SOCKINFO *info, const char *buffer, size_t bufsize, int *timeoutSecs)
 {
 	/* Consciently removing constness. */
 	return sock_read_write(info, (char *)buffer, bufsize, timeoutSecs, FALSE);
