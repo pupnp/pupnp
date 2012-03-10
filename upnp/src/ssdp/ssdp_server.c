@@ -753,9 +753,11 @@ void readFromSSDPSocket(SOCKET socket)
 				  &((struct sockaddr_in6 *)&__ss)->sin6_addr,
 				  ntop_buf, sizeof(ntop_buf));
 #endif /* UPNP_ENABLE_IPV6 */
-		else
+		else {
+			memset(ntop_buf, 0, sizeof(ntop_buf));
 			strncpy(ntop_buf, "<Invalid address family>",
-				sizeof(ntop_buf));
+				sizeof(ntop_buf) - 1);
+		}
 		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 			   "Start of received response ----------------------------------------------------\n"
 			   "%s\n"
