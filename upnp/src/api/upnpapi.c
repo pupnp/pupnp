@@ -1770,6 +1770,7 @@ int UpnpSearchAsync(
 {
     struct Handle_Info *SInfo = NULL;
     char *Target = ( char * )Target_const;
+    int retVal;
 
     if( UpnpSdkInit != 1 ) {
         return UPNP_E_FINISH;
@@ -1792,7 +1793,9 @@ int UpnpSearchAsync(
     }
 
     HandleUnlock();
-    SearchByTarget( Mx, Target, ( void * )Cookie_const );
+    retVal = SearchByTarget( Mx, Target, ( void * )Cookie_const );
+    if (retVal != 1)
+        return retVal;
 
     UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting UpnpSearchAsync \n" );

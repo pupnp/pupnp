@@ -322,6 +322,9 @@ Version 1.6.16
 
 	Further measures against buffer overflows.
 
+	Pass output buffer size to CreateClientRequestPacket(UlaGua)
+	from SearchByTarget and detect overflow.
+	Handle SearchByTarget error in UpnpSearchAsync.
 	Treat large argument as error in UpnpAddVirtualDir.
 	Do not clear buffer before snprintf.
 	Clarify the last argument of GetDescDocumentAndURL has size LINE_SIZE.

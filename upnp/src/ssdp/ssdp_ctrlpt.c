@@ -316,9 +316,11 @@ end_ssdp_handle_ctrlpt_msg:
  * \brief Creates a HTTP search request packet depending on the input
  * parameter.
  */
-static void CreateClientRequestPacket(
-	/*! [in] Output string in HTTP format. */
-	IN char *RqstBuf,
+static int CreateClientRequestPacket(
+	/*! [in,out] Output string in HTTP format. */
+	INOUT char *RqstBuf,
+	/*! [in] RqstBuf size. */
+	IN size_t RqstBufSize,
 	/*! [in] Search Target. */
 	IN int Mx,
 	/*! [in] Number of seconds to wait to collect all the responses. */
@@ -326,39 +328,66 @@ static void CreateClientRequestPacket(
 	/*! [in] search address family. */
 	IN int AddressFamily)
 {
+	int rc;
 	char TempBuf[COMMAND_LEN];
+	const char *command = "M-SEARCH * HTTP/1.1\r\n";
+	const char *man = "MAN: \"ssdp:discover\"\r\n";
 
 	memset(TempBuf, 0, sizeof(TempBuf));
-	strcpy(RqstBuf, "M-SEARCH * HTTP/1.1\r\n");
+	if (RqstBufSize <= strlen(command))
+		return UPNP_E_INTERNAL_ERROR;
+	strcpy(RqstBuf, command);
 
 	if (AddressFamily == AF_INET) {
-		snprintf(TempBuf, sizeof(TempBuf), "HOST: %s:%d\r\n", SSDP_IP,
+		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: %s:%d\r\n", SSDP_IP,
 			SSDP_PORT);
 	} else if (AddressFamily == AF_INET6) {
-		snprintf(TempBuf, sizeof(TempBuf), "HOST: [%s]:%d\r\n",
+		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: [%s]:%d\r\n",
 			SSDP_IPV6_LINKLOCAL, SSDP_PORT);
 	}
+	if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+		return UPNP_E_INTERNAL_ERROR;
+
+	if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+		return UPNP_E_BUFFER_TOO_SMALL;
 	strcat(RqstBuf, TempBuf);
-	strcat(RqstBuf, "MAN: \"ssdp:discover\"\r\n");
+
+	if (RqstBufSize <= strlen(RqstBuf) + strlen(man))
+		return UPNP_E_BUFFER_TOO_SMALL;
+	strcat(RqstBuf, man);
 
 	if (Mx > 0) {
-		snprintf(TempBuf, sizeof(TempBuf), "MX: %d\r\n", Mx);
+		rc = snprintf(TempBuf, sizeof(TempBuf), "MX: %d\r\n", Mx);
+		if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+			return UPNP_E_INTERNAL_ERROR;
+		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+			return UPNP_E_BUFFER_TOO_SMALL;
 		strcat(RqstBuf, TempBuf);
 	}
 
 	if (SearchTarget != NULL) {
-		snprintf(TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
+		rc = snprintf(TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
+		if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+			return UPNP_E_INTERNAL_ERROR;
+		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+			return UPNP_E_BUFFER_TOO_SMALL;
 		strcat(RqstBuf, TempBuf);
 	}
+	if (RqstBufSize <= strlen(RqstBuf) + strlen("\r\n"))
+		return UPNP_E_BUFFER_TOO_SMALL;
 	strcat(RqstBuf, "\r\n");
+
+	return UPNP_E_SUCCESS;
 }
 
 /*!
  * \brief
  */
-static void CreateClientRequestPacketUlaGua(
-	/*! [in] . */
+static int CreateClientRequestPacketUlaGua(
+	/*! [in,out] . */
 	char *RqstBuf,
+	/*! [in] . */
+	size_t RqstBufSize,
 	/*! [in] . */
 	int Mx,
 	/*! [in] . */
@@ -366,28 +395,54 @@ static void CreateClientRequestPacketUlaGua(
 	/*! [in] . */
 	int AddressFamily)
 {
+	int rc;
 	char TempBuf[COMMAND_LEN];
+	const char *command = "M-SEARCH * HTTP/1.1\r\n";
+	const char *man = "MAN: \"ssdp:discover\"\r\n";
 
 	memset(TempBuf, 0, sizeof(TempBuf));
-	strcpy(RqstBuf, "M-SEARCH * HTTP/1.1\r\n");
+	if (RqstBufSize <= strlen(command))
+		return UPNP_E_INTERNAL_ERROR;
+	strcpy(RqstBuf, command);
 	if (AddressFamily == AF_INET) {
-		snprintf(TempBuf, sizeof(TempBuf), "HOST: %s:%d\r\n", SSDP_IP,
+		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: %s:%d\r\n", SSDP_IP,
 			SSDP_PORT);
 	} else if (AddressFamily == AF_INET6) {
-		snprintf(TempBuf, sizeof(TempBuf), "HOST: [%s]:%d\r\n",
+		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: [%s]:%d\r\n",
 			SSDP_IPV6_SITELOCAL, SSDP_PORT);
 	}
+	if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+		return UPNP_E_INTERNAL_ERROR;
+
+	if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+		return UPNP_E_BUFFER_TOO_SMALL;
 	strcat(RqstBuf, TempBuf);
-	strcat(RqstBuf, "MAN: \"ssdp:discover\"\r\n");
+
+	if (RqstBufSize <= strlen(RqstBuf) + strlen(man))
+		return UPNP_E_BUFFER_TOO_SMALL;
+	strcat(RqstBuf, man);
+
 	if (Mx > 0) {
-		snprintf(TempBuf, sizeof(TempBuf), "MX: %d\r\n", Mx);
+		rc = snprintf(TempBuf, sizeof(TempBuf), "MX: %d\r\n", Mx);
+		if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+			return UPNP_E_INTERNAL_ERROR;
+		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+			return UPNP_E_BUFFER_TOO_SMALL;
 		strcat(RqstBuf, TempBuf);
 	}
 	if (SearchTarget) {
-		snprintf(TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
+		rc = snprintf(TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
+		if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+			return UPNP_E_INTERNAL_ERROR;
+		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+			return UPNP_E_BUFFER_TOO_SMALL;
 		strcat(RqstBuf, TempBuf);
 	}
+	if (RqstBufSize <= strlen(RqstBuf) + strlen("\r\n"))
+		return UPNP_E_BUFFER_TOO_SMALL;
 	strcat(RqstBuf, "\r\n");
+
+	return UPNP_E_SUCCESS;
 }
 
 /*!
@@ -460,6 +515,7 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 	enum SsdpSearchType requestType;
 	unsigned long addrv4 = inet_addr(gIF_IPV4);
 	SOCKET max_fd = 0;
+	int retVal;
 
 	/*ThreadData *ThData; */
 	ThreadPoolJob job;
@@ -476,9 +532,15 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 		timeTillRead = MIN_SEARCH_TIME;
 	else if (timeTillRead > MAX_SEARCH_TIME)
 		timeTillRead = MAX_SEARCH_TIME;
-	CreateClientRequestPacket(ReqBufv4, timeTillRead, St, AF_INET);
-	CreateClientRequestPacket(ReqBufv6, timeTillRead, St, AF_INET6);
-	CreateClientRequestPacketUlaGua(ReqBufv6UlaGua, timeTillRead, St, AF_INET6);
+	retVal = CreateClientRequestPacket(ReqBufv4, sizeof(ReqBufv4), timeTillRead, St, AF_INET);
+	if (retVal != UPNP_E_SUCCESS)
+		return retVal;
+	retVal = CreateClientRequestPacket(ReqBufv6, sizeof(ReqBufv6), timeTillRead, St, AF_INET6);
+	if (retVal != UPNP_E_SUCCESS)
+		return retVal;
+	retVal = CreateClientRequestPacketUlaGua(ReqBufv6UlaGua, sizeof(ReqBufv6UlaGua), timeTillRead, St, AF_INET6);
+	if (retVal != UPNP_E_SUCCESS)
+		return retVal;
 
 	memset(&__ss_v4, 0, sizeof(__ss_v4));
 	destAddr4->sin_family = AF_INET;
