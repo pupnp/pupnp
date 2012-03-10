@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -48,6 +49,12 @@ void ixmlNode_init(IXML_Node *nodeptr)
 	assert(nodeptr != NULL);
 
 	memset(nodeptr, 0, sizeof (IXML_Node));
+	nodeptr->parentNode = NULL;
+	nodeptr->firstChild = NULL;
+	nodeptr->prevSibling = NULL;
+	nodeptr->nextSibling = NULL;
+	nodeptr->firstAttr = NULL;
+	nodeptr->ownerDocument = NULL;
 }
 
 
@@ -90,7 +97,7 @@ static void ixmlNode_freeSingleNode(
 		if (nodeptr->localName != NULL) {
 			free(nodeptr->localName);
 		}
-		if (nodeptr->nodeType == eELEMENT_NODE) {
+		if (nodeptr->nodeType == (IXML_NODE_TYPE)eELEMENT_NODE) {
 			element = (IXML_Element *)nodeptr;
 			free(element->tagName);
 		}
@@ -280,7 +287,7 @@ unsigned short ixmlNode_getNodeType(IXML_Node *nodeptr)
 	if (nodeptr != NULL) {
 		return nodeptr->nodeType;
 	} else {
-		return eINVALID_NODE;
+		return (unsigned short)eINVALID_NODE;
 	}
 }
 
@@ -397,7 +404,8 @@ static BOOL ixmlNode_isParent(
 
 	assert(nodeptr != NULL && toFind != NULL);
 
-	found = toFind->parentNode == nodeptr;
+	if (nodeptr != NULL && toFind != NULL)
+		found = toFind->parentNode == nodeptr;
 
 	return found;
 }
@@ -425,14 +433,14 @@ static BOOL ixmlNode_allowChildren(
 		break;
 
 	case eELEMENT_NODE:
-		if (newChild->nodeType == eATTRIBUTE_NODE ||
-		    newChild->nodeType == eDOCUMENT_NODE) {
+		if (newChild->nodeType == (IXML_NODE_TYPE)eATTRIBUTE_NODE ||
+		    newChild->nodeType == (IXML_NODE_TYPE)eDOCUMENT_NODE) {
 			return FALSE;
 		}
 	break;
 
 	case eDOCUMENT_NODE:
-		if (newChild->nodeType != eELEMENT_NODE) {
+		if (newChild->nodeType != (IXML_NODE_TYPE)eELEMENT_NODE) {
 			return FALSE;
 		}
 
@@ -915,6 +923,8 @@ static IXML_Node *ixmlNode_cloneNodeTreeRecursive(
 		switch (nodeptr->nodeType) {
 		case eELEMENT_NODE:
 			newElement = ixmlNode_cloneElement((IXML_Element *)nodeptr);
+			if (newElement == NULL)
+				return NULL;
 			newElement->n.firstAttr = ixmlNode_cloneNodeTreeRecursive(
 				nodeptr->firstAttr, deep);
 			if (deep) {
@@ -935,6 +945,8 @@ static IXML_Node *ixmlNode_cloneNodeTreeRecursive(
 
 		case eATTRIBUTE_NODE:
 			newAttr = ixmlNode_cloneAttr((IXML_Attr *)nodeptr);
+			if (newAttr == NULL)
+				return NULL;
 			nextSib = ixmlNode_cloneNodeTreeRecursive(nodeptr->nextSibling, deep);
 			newAttr->n.nextSibling = nextSib;
 			if (nextSib != NULL) {
@@ -954,6 +966,8 @@ static IXML_Node *ixmlNode_cloneNodeTreeRecursive(
 
 		case eDOCUMENT_NODE:
 			newDoc = ixmlNode_cloneDoc((IXML_Document *)nodeptr);
+			if (newDoc == NULL)
+				return NULL;
 			newNode = (IXML_Node *)newDoc;
 			if (deep) {
 				newNode->firstChild = ixmlNode_cloneNodeTreeRecursive(
@@ -1000,6 +1014,8 @@ static IXML_Node *ixmlNode_cloneNodeTree(
 	switch (nodeptr->nodeType) {
 	case eELEMENT_NODE:
 		newElement = ixmlNode_cloneElement((IXML_Element *)nodeptr);
+		if (newElement == NULL)
+			return NULL;
 		newElement->n.firstAttr = ixmlNode_cloneNodeTreeRecursive(nodeptr->firstAttr, deep);
 		if (deep) {
 			newElement->n.firstChild = ixmlNode_cloneNodeTreeRecursive(
@@ -1112,7 +1128,7 @@ IXML_NamedNodeMap *ixmlNode_getAttributes(IXML_Node *nodeptr)
 		return NULL;
 	}
 
-	if(nodeptr->nodeType == eELEMENT_NODE) {
+	if(nodeptr->nodeType == (IXML_NODE_TYPE)eELEMENT_NODE) {
 		returnNamedNodeMap = (IXML_NamedNodeMap *)malloc(sizeof(IXML_NamedNodeMap));
 		if(returnNamedNodeMap == NULL) {
 			return NULL;
@@ -1150,7 +1166,8 @@ BOOL ixmlNode_hasChildNodes(IXML_Node *nodeptr)
 BOOL ixmlNode_hasAttributes(IXML_Node *nodeptr)
 {
 	if (nodeptr != NULL) {
-		if (nodeptr->nodeType == eELEMENT_NODE && nodeptr->firstAttr != NULL) {
+		if (nodeptr->nodeType == (IXML_NODE_TYPE)eELEMENT_NODE &&
+			nodeptr->firstAttr != NULL) {
 			return TRUE;
 		}
 	}

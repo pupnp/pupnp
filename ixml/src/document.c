@@ -185,7 +185,7 @@ int ixmlDocument_createDocumentEx(IXML_Document **rtDoc)
 
 	ixmlDocument_init(doc);
 
-	doc->n.nodeName = strdup(DOCUMENTNODENAME);
+	doc->n.nodeName = strdup((const char*)DOCUMENTNODENAME);
 	if (doc->n.nodeName == NULL) {
 		ixmlDocument_free(doc);
 		doc = NULL;
@@ -234,7 +234,7 @@ int ixmlDocument_createTextNodeEx(
 	/* initialize the node */
 	ixmlNode_init(returnNode);
 
-	returnNode->nodeName = strdup(TEXTNODENAME);
+	returnNode->nodeName = strdup((const char*)TEXTNODENAME);
 	if (returnNode->nodeName == NULL) {
 		ixmlNode_free(returnNode);
 		returnNode = NULL;
@@ -320,7 +320,8 @@ IXML_Attr *ixmlDocument_createAttribute(
 {
 	IXML_Attr *attrNode = NULL;
 
-	ixmlDocument_createAttributeEx(doc, name, &attrNode);
+	if(ixmlDocument_createAttributeEx(doc, name, &attrNode) != IXML_SUCCESS)
+		return NULL;
 
 	return attrNode;
 }
@@ -403,7 +404,7 @@ int ixmlDocument_createCDATASectionEx(
 
 	ixmlCDATASection_init(cDSectionNode);
 	cDSectionNode->n.nodeType = eCDATA_SECTION_NODE;
-	cDSectionNode->n.nodeName = strdup(CDATANODENAME);
+	cDSectionNode->n.nodeName = strdup((const char*)CDATANODENAME);
 	if (cDSectionNode->n.nodeName == NULL) {
 		ixmlCDATASection_free(cDSectionNode);
 		cDSectionNode = NULL;

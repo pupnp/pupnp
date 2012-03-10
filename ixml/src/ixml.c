@@ -60,7 +60,7 @@ static void copy_with_escape(
 	if (p == NULL)
 		return;
 	plen = strlen(p);
-	for (i = 0; i < plen; ++i) {
+	for (i = (size_t)0; i < plen; ++i) {
 		switch (p[i]) {
 		case '<':
 			ixml_membuf_append_str(buf, "&lt;");
@@ -175,7 +175,7 @@ static void ixmlPrintDomTreeRecursive(
 		default:
 			IxmlPrintf(__FILE__, __LINE__, "ixmlPrintDomTreeRecursive",
 				"Warning, unknown node type %d\n",
-				ixmlNode_getNodeType(nodeptr));
+				(int)ixmlNode_getNodeType(nodeptr));
 			break;
 		}
 	}
@@ -247,7 +247,7 @@ static void ixmlPrintDomTree(
 	default:
 		IxmlPrintf(__FILE__, __LINE__, "ixmlPrintDomTree",
 			"Warning, unknown node type %d\n",
-			ixmlNode_getNodeType(nodeptr));
+			(int)ixmlNode_getNodeType(nodeptr));
 		break;
 	}
 }
@@ -318,7 +318,7 @@ static void ixmlDomTreetoString(
 	default:
 		IxmlPrintf(__FILE__, __LINE__, "ixmlPrintDomTreeRecursive",
 			"Warning, unknown node type %d\n",
-			ixmlNode_getNodeType(nodeptr));
+			(int)ixmlNode_getNodeType(nodeptr));
 		break;
 	}
 }

@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -87,11 +88,11 @@ static int ixml_membuf_set_size(
 
 	assert(alloc_len >= new_length);
 
-	temp_buf = realloc(m->buf, alloc_len + 1);
+	temp_buf = realloc(m->buf, alloc_len + (size_t)1);
 	if (temp_buf == NULL) {
 		/* try smaller size */
 		alloc_len = new_length;
-		temp_buf = realloc(m->buf, alloc_len + 1);
+		temp_buf = realloc(m->buf, alloc_len + (size_t)1);
 		if (temp_buf == NULL) {
 			return IXML_INSUFFICIENT_MEMORY;
 		}
@@ -110,8 +111,8 @@ void ixml_membuf_init(ixml_membuf *m)
 
 	m->size_inc = MEMBUF_DEF_SIZE_INC;
 	m->buf = NULL;
-	m->length = 0;
-	m->capacity = 0;
+	m->length = (size_t)0;
+	m->capacity = (size_t)0;
 }
 
 
@@ -171,7 +172,7 @@ int ixml_membuf_append(
 {
 	assert(m != NULL);
 
-	return ixml_membuf_insert(m, buf, 1, m->length);
+	return ixml_membuf_insert(m, buf, (size_t)1, m->length);
 }
 
 
@@ -197,7 +198,7 @@ int ixml_membuf_insert(
 		return IXML_INDEX_SIZE_ERR;
 	}
 
-	if (buf == NULL || buf_len == 0) {
+	if (buf == NULL || buf_len == (size_t)0) {
 		return 0;
 	}
 	/* alloc mem */

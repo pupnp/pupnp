@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -53,11 +54,11 @@ static unsigned long ixmlNamedNodeMap_getItemNumber(
 	IN const char *name)
 {
 	IXML_Node *tempNode;
-	unsigned long returnItemNo = 0;
+	unsigned long returnItemNo = 0lu;
 
 	assert(nnMap != NULL && name != NULL);
 	if (nnMap == NULL || name == NULL) {
-		return IXML_INVALID_ITEM_NUMBER;
+		return (unsigned long)IXML_INVALID_ITEM_NUMBER;
 	}
 
 	tempNode = nnMap->nodeItem;
@@ -69,7 +70,7 @@ static unsigned long ixmlNamedNodeMap_getItemNumber(
 		returnItemNo++;
 	}
 
-	return IXML_INVALID_ITEM_NUMBER;
+	return (unsigned long)IXML_INVALID_ITEM_NUMBER;
 }
 
 
@@ -92,7 +93,7 @@ IXML_Node *ixmlNamedNodeMap_getNamedItem(
 	}
 
 	index = ixmlNamedNodeMap_getItemNumber(nnMap, name);
-	if (index == IXML_INVALID_ITEM_NUMBER) {
+	if (index == (unsigned long)IXML_INVALID_ITEM_NUMBER) {
 		return NULL;
 	} else {
 		return ixmlNamedNodeMap_item(nnMap, index);
@@ -111,12 +112,12 @@ IXML_Node *ixmlNamedNodeMap_item(
 		return NULL;
 	}
 
-	if (index > ixmlNamedNodeMap_getLength(nnMap) - 1) {
+	if (index > ixmlNamedNodeMap_getLength(nnMap) - 1lu) {
 		return NULL;
 	}
 
 	tempNode = nnMap->nodeItem;
-	for (i = 0; i < index && tempNode != NULL; ++i) {
+	for (i = 0u; i < index && tempNode != NULL; ++i) {
 		tempNode = tempNode->nextSibling;
 	}
 
@@ -131,7 +132,7 @@ unsigned long ixmlNamedNodeMap_getLength(IXML_NamedNodeMap *nnMap)
 
 	if (nnMap != NULL) {
 		tempNode = nnMap->nodeItem;
-		for (length = 0; tempNode != NULL; ++length) {
+		for (length = 0lu; tempNode != NULL; ++length) {
 			tempNode = tempNode->nextSibling;
 		}
 	}

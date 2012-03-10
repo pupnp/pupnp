@@ -431,7 +431,7 @@ int ixmlElement_setAttributeNS(
 
 	/* see DOM 2 spec page 59 */
 	if ((newAttrNode.prefix != NULL && namespaceURI == NULL) ||
-	    (strcmp(newAttrNode.prefix, "xml") == 0 &&
+	    (newAttrNode.prefix != NULL && strcmp(newAttrNode.prefix, "xml") == 0 &&
 	     strcmp(namespaceURI, "http://www.w3.org/XML/1998/namespace") != 0) ||
 	    (strcmp(qualifiedName, "xmlns") == 0 &&
 	     strcmp(namespaceURI, "http://www.w3.org/2000/xmlns/") != 0)) {
