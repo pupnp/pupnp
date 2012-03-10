@@ -320,6 +320,12 @@ Version 1.6.16
 
 2012-03-10 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
+	Further measures against buffer overflows.
+
+	Do not clear buffer before snprintf.
+
+2012-03-10 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
 	Handle allocation error in strndup to avoid access violation.
 
 	Return NULL before calling strncpy.

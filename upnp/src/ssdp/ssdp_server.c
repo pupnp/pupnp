@@ -471,7 +471,6 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 		else
 			return -1;
 		if (ptr3 != NULL) {
-			memset(Evt->UDN, 0, sizeof(Evt->UDN));
 			rc = snprintf(Evt->UDN, sizeof(Evt->UDN), "uuid:%s",
 				ptr3 + 1);
 			if (rc < 0 || (unsigned int) rc >= sizeof(Evt->UDN))
@@ -484,7 +483,6 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 			n = (size_t) (ptr3 - ptr1);
 			strncpy(TempBuf, ptr1, n);
 			TempBuf[n] = '\0';
-			memset(Evt->DeviceType, 0, sizeof(Evt->DeviceType));
 			rc = snprintf(Evt->DeviceType, sizeof(Evt->DeviceType),
 				"urn%s", TempBuf);
 			if (rc < 0 || (unsigned int) rc >= sizeof(Evt->DeviceType))
