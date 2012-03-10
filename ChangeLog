@@ -331,6 +331,7 @@ Version 1.6.16
 	* Respect unique_service_name error in ssdp_request_type
 	  so as not to touch non-terminated buffer under Evt.
 	* Treat large argument as error in UpnpAddVirtualDir.
+	* Use strncpy with the standard way in readFromSSDPSocket.
 	* Do not clear buffer before snprintf.
 	* Clarify the last argument of GetDescDocumentAndURL has size LINE_SIZE.
 	* For inet_ntop, use buffer with size INET6_ADDRSTRLEN or INET_ADDRSTRLEN.
