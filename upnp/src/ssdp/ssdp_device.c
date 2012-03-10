@@ -604,7 +604,7 @@ int DeviceReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 	rc = snprintf(Mil_Nt, sizeof(Mil_Nt), "%s", Udn);
 	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Nt))
 		goto error_handler;
-	snprintf(Mil_Usn, sizeof(Mil_Usn), "%s", Udn);
+	rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s", Udn);
 	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
 		goto error_handler;
 	CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
