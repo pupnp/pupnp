@@ -3878,7 +3878,7 @@ int UpnpAddVirtualDir(const char *newDirName)
 
     if( *newDirName != '/' ) {
         dirName[0] = '/';
-        strncpy( dirName + 1, newDirName, sizeof( dirName ) - 1 );
+        strncpy( dirName + 1, newDirName, sizeof( dirName ) - 2 );
     } else {
         strncpy( dirName, newDirName, sizeof( dirName ) - 1 );
     }
