@@ -442,7 +442,7 @@ int UpnpInit(const char *HostIP, unsigned short DestPort)
 
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 		"UpnpInit with HostIP=%s, DestPort=%d.\n", 
-		HostIP ? HostIP : "", DestPort);
+		HostIP ? HostIP : "", (int)DestPort);
 
 	/* Verify HostIP, if provided, or find it ourselves. */
 	memset(gIF_IPV4, 0, sizeof(gIF_IPV4));
@@ -467,7 +467,7 @@ int UpnpInit(const char *HostIP, unsigned short DestPort)
 
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 		"Host Ip: %s Host Port: %d\n", gIF_IPV4,
-		LOCAL_PORT_V4);
+		(int)LOCAL_PORT_V4);
 
 exit_function:
 	ithread_mutex_unlock(&gSDKInitMutex);
@@ -653,7 +653,7 @@ int UpnpFinish(void)
 unsigned short UpnpGetServerPort(void)
 {
 	if (UpnpSdkInit != 1)
-		return 0;
+		return 0u;
 
 	return LOCAL_PORT_V4;
 }
@@ -662,7 +662,7 @@ unsigned short UpnpGetServerPort(void)
 unsigned short UpnpGetServerPort6(void)
 {
 	if (UpnpSdkInit != 1)
-		return 0;
+		return 0u;
 
 	return LOCAL_PORT_V6;
 }
@@ -767,7 +767,7 @@ int UpnpRegisterRootDevice(
 	if (Hnd == NULL ||
 	    Fun == NULL ||
 	    DescUrl == NULL ||
-	    strlen(DescUrl) == 0) {
+	    strlen(DescUrl) == (size_t)0) {
 		retVal = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
@@ -1091,7 +1091,7 @@ int UpnpRegisterRootDevice4(
 	if (Hnd == NULL ||
 	    Fun == NULL ||
 	    DescUrl == NULL ||
-	    strlen(DescUrl) == 0 ||
+	    strlen(DescUrl) == (size_t)0 ||
 	    (AddressFamily != AF_INET && AddressFamily != AF_INET6)) {
 		retVal = UPNP_E_INVALID_PARAM;
 		goto exit_function;
@@ -1481,15 +1481,16 @@ static int GetDescDocumentAndURL(
 	if (description == NULL)
 		return UPNP_E_INVALID_PARAM;
 	/* non-URL description must have configuration specified */
-	if (descriptionType != UPNPREG_URL_DESC && !config_baseURL)
+	if (descriptionType != (enum Upnp_DescType_e)UPNPREG_URL_DESC &&
+		!config_baseURL)
 		return UPNP_E_INVALID_PARAM;
 	/* Get XML doc and last modified time */
-	if (descriptionType == UPNPREG_URL_DESC) {
+	if (descriptionType == (enum Upnp_DescType_e)UPNPREG_URL_DESC) {
 		retVal = UpnpDownloadXmlDoc(description, xmlDoc);
 		if (retVal != UPNP_E_SUCCESS)
 			return retVal;
 		last_modified = time(NULL);
-	} else if (descriptionType == UPNPREG_FILENAME_DESC) {
+	} else if (descriptionType == (enum Upnp_DescType_e)UPNPREG_FILENAME_DESC) {
 		retVal = stat(description, &file_info);
 		if (retVal == -1)
 			return UPNP_E_FILE_NOT_FOUND;
@@ -1498,12 +1499,12 @@ static int GetDescDocumentAndURL(
 		fp = fopen(description, "rb");
 		if (fp == NULL)
 			return UPNP_E_FILE_NOT_FOUND;
-		membuf = (char *)malloc(fileLen + 1);
+		membuf = (char *)malloc(fileLen + (size_t)1);
 		if (membuf == NULL) {
 			fclose(fp);
 			return UPNP_E_OUTOF_MEMORY;
 		}
-		num_read = fread(membuf, 1, fileLen, fp);
+		num_read = fread(membuf, (size_t)1, fileLen, fp);
 		if (num_read != fileLen) {
 			fclose(fp);
 			free(membuf);
@@ -1513,14 +1514,15 @@ static int GetDescDocumentAndURL(
 		fclose(fp);
 		rc = ixmlParseBufferEx(membuf, xmlDoc);
 		free(membuf);
-	} else if (descriptionType == UPNPREG_BUF_DESC) {
+	} else if (descriptionType == (enum Upnp_DescType_e)UPNPREG_BUF_DESC) {
 		last_modified = time(NULL);
 		rc = ixmlParseBufferEx(description, xmlDoc);
 	} else {
 		return UPNP_E_INVALID_PARAM;
 	}
 
-	if (rc != IXML_SUCCESS && descriptionType != UPNPREG_URL_DESC) {
+	if (rc != IXML_SUCCESS &&
+		descriptionType != (enum Upnp_DescType_e)UPNPREG_URL_DESC) {
 		if (rc == IXML_INSUFFICIENT_MEMORY)
 			return UPNP_E_OUTOF_MEMORY;
 		else
@@ -1528,7 +1530,7 @@ static int GetDescDocumentAndURL(
 	}
 	/* Determine alias */
 	if (config_baseURL) {
-		if (descriptionType == UPNPREG_BUF_DESC) {
+		if (descriptionType == (enum Upnp_DescType_e)UPNPREG_BUF_DESC) {
 			strncpy(aliasStr, "description.xml",
 				sizeof(aliasStr) - 1);
 		} else {
@@ -1586,7 +1588,8 @@ static int GetDescDocumentAndURL(
 {
 	int retVal = 0;
 
-	if (descriptionType != UPNPREG_URL_DESC || config_baseURL) {
+	if (descriptionType != (enum Upnp_DescType_e)UPNPREG_URL_DESC ||
+		config_baseURL) {
 		return UPNP_E_NO_WEB_SERVER;
 	}
 
@@ -1594,7 +1597,7 @@ static int GetDescDocumentAndURL(
 		return UPNP_E_INVALID_PARAM;
 	}
 
-	if (strlen(description) > LINE_SIZE - 1) {
+	if (strlen(description) > LINE_SIZE - (size_t)1) {
 		return UPNP_E_URL_TOO_BIG;
 	}
 	strncpy(descURL, description, LINE_SIZE - 1);
@@ -3333,7 +3336,7 @@ int UpnpGetIfInfo(const char *IfName)
 		return UPNP_E_INIT;
 	}
 	/* Get the interface configuration information...  */
-	ifConf.ifc_len = sizeof szBuffer;
+	ifConf.ifc_len = (int)sizeof szBuffer;
 	ifConf.ifc_ifcu.ifcu_buf = (caddr_t) szBuffer;
 
 	if (ioctl(LocalSock, SIOCGIFCONF, &ifConf) < 0) {
@@ -3343,7 +3346,7 @@ int UpnpGetIfInfo(const char *IfName)
 		return UPNP_E_INIT;
 	}
 	/* Cycle through the list of interfaces looking for IP addresses.  */
-	for (i = 0; i < (size_t)ifConf.ifc_len;) {
+	for (i = (size_t)0; i < (size_t)ifConf.ifc_len;) {
 		struct ifreq *pifReq =
 		    (struct ifreq *)((caddr_t) ifConf.ifc_req + i);
 		i += sizeof *pifReq;
@@ -3426,7 +3429,7 @@ int UpnpGetIfInfo(const char *IfName)
 							(gIF_IPV6_ULA_GUA) - 1);
 					} else if (IN6_IS_ADDR_GLOBAL(&v6_addr)
 						   && strlen(gIF_IPV6_ULA_GUA)
-						   == 0) {
+						   == (size_t)0) {
 						/* got a GUA, should store it while no ULA is found */
 						memset(gIF_IPV6_ULA_GUA, 0,
                                                         sizeof(gIF_IPV6_ULA_GUA));
@@ -3435,7 +3438,7 @@ int UpnpGetIfInfo(const char *IfName)
 							(gIF_IPV6_ULA_GUA) - 1);
 					} else
 					    if (IN6_IS_ADDR_LINKLOCAL(&v6_addr)
-						&& strlen(gIF_IPV6) == 0) {
+						&& strlen(gIF_IPV6) == (size_t)0) {
 						/* got a Link local IPv6 address. */
 						memset(gIF_IPV6, 0,
                                                         sizeof(gIF_IPV6));
@@ -3773,7 +3776,7 @@ int getlocalhostname(char *out, size_t out_len)
 		return UPNP_E_INIT;
 	}
 	/* Get the interface configuration information... */
-	ifConf.ifc_len = sizeof szBuffer;
+	ifConf.ifc_len = (int)sizeof szBuffer;
 	ifConf.ifc_ifcu.ifcu_buf = (caddr_t) szBuffer;
 	nResult = ioctl(LocalSock, SIOCGIFCONF, &ifConf);
 	if (nResult < 0) {
@@ -3784,7 +3787,7 @@ int getlocalhostname(char *out, size_t out_len)
 	}
 
 	/* Cycle through the list of interfaces looking for IP addresses. */
-	for (i = 0; i < (long unsigned int)ifConf.ifc_len && j < DEFAULT_INTERFACE; ) {
+	for (i = 0lu; i < (long unsigned int)ifConf.ifc_len && j < DEFAULT_INTERFACE; ) {
 		struct ifreq *pifReq =
 			(struct ifreq *)((caddr_t)ifConf.ifc_req + i);
 		i += sizeof *pifReq;
@@ -3877,7 +3880,7 @@ int UpnpAddVirtualDir(const char *newDirName)
         return UPNP_E_FINISH;
     }
 
-    if( ( newDirName == NULL ) || ( strlen( newDirName ) == 0 ) ) {
+    if( ( newDirName == NULL ) || ( strlen( newDirName ) == ( size_t ) 0 ) ) {
         return UPNP_E_INVALID_PARAM;
     }
 
@@ -4040,7 +4043,7 @@ int UpnpIsWebserverEnabled(void)
 		return 0;
 	}
 
-	return bWebServerState == WEB_SERVER_ENABLED;
+	return bWebServerState == (WebServerState)WEB_SERVER_ENABLED;
 }
 
 int UpnpSetVirtualDirCallbacks(struct UpnpVirtualDirCallbacks *callbacks)

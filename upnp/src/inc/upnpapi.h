@@ -56,7 +56,7 @@
 #define DEFAULT_MAXAGE 1800
 
 #define DEFAULT_SOAP_CONTENT_LENGTH 16000
-#define MAX_SOAP_CONTENT_LENGTH 32000
+#define MAX_SOAP_CONTENT_LENGTH (size_t)32000
 
 extern size_t g_maxContentLength;
 
