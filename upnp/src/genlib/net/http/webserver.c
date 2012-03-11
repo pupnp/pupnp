@@ -894,8 +894,9 @@ static int CheckOtherHTTPHeaders(
 	/*NNS: dlist_node* node; */
 	int index, RetCode = HTTP_OK;
 	char *TmpBuf;
+	size_t TmpBufSize = LINE_SIZE;
 
-	TmpBuf = (char *)malloc(LINE_SIZE);
+	TmpBuf = (char *)malloc(TmpBufSize);
 	if (!TmpBuf)
 		return UPNP_E_OUTOF_MEMORY;
 	node = ListHead(&Req->headers);
@@ -905,9 +906,10 @@ static int CheckOtherHTTPHeaders(
 		index = map_str_to_int((const char *)header->name.buf,
 				header->name.length, Http_Header_Names,
 				NUM_HTTP_HEADER_NAMES, FALSE);
-		if (header->value.length >= LINE_SIZE) {
+		if (header->value.length >= TmpBufSize) {
 			free(TmpBuf);
-			TmpBuf = (char *)malloc(header->value.length + 1);
+			TmpBufSize = header->value.length + 1;
+			TmpBuf = (char *)malloc(TmpBufSize);
 			if (!TmpBuf)
 				return UPNP_E_OUTOF_MEMORY;
 		}
@@ -939,12 +941,13 @@ static int CheckOtherHTTPHeaders(
 				}
 				break;
 			case HDR_ACCEPT_LANGUAGE:
-				if (sizeof(TmpBuf) > sizeof(RespInstr->AcceptLanguageHeader)) {
-					memcpy(RespInstr->AcceptLanguageHeader, TmpBuf,
-						sizeof(RespInstr->AcceptLanguageHeader) - 1);
+				if (header->value.length + 1 > sizeof(RespInstr->AcceptLanguageHeader)) {
+					size_t length = sizeof(RespInstr->AcceptLanguageHeader) - 1;
+					memcpy(RespInstr->AcceptLanguageHeader, TmpBuf, length);
+					RespInstr->AcceptLanguageHeader[length] = '\0';
 				} else {
 					memcpy(RespInstr->AcceptLanguageHeader, TmpBuf,
-						sizeof(TmpBuf) - 1);
+						header->value.length + 1);
 				}
 				break;
 			default:
