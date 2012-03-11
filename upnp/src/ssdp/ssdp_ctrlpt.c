@@ -412,6 +412,8 @@ static int CreateClientRequestPacketUlaGua(
 	} else if (AddressFamily == AF_INET6) {
 		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: [%s]:%d\r\n",
 			SSDP_IPV6_SITELOCAL, SSDP_PORT);
+	} else {
+		return UPNP_E_INVALID_ARGUMENT;
 	}
 	if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
 		return UPNP_E_INTERNAL_ERROR;
