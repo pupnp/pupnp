@@ -318,6 +318,16 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-03-11 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Avoid out of range access in CheckOtherHTTPHeaders.
+
+	There was a problem in HDR_ACCEPT_LANGUAGE case.
+	It may read from TmpBuf larger amount than allocated,
+	since condition was always true.
+	Terminate RespInstr->AcceptLanguageHeader correctly.
+	Skip allocation if there is already sufficient buffer.
+
 2012-03-10 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Remove some of the implicit cast in upnp part
