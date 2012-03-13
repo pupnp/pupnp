@@ -127,8 +127,8 @@ static int sock_read_write(
 	time_t start_time = time(NULL);
 	SOCKET sockfd = info->socket;
 	long bytes_sent = 0;
-	long byte_left = 0;
-	long num_written;
+	size_t byte_left = 0;
+	ssize_t num_written;
 
 	if (*timeoutSecs < 0)
 		return UPNP_E_TIMEDOUT;
@@ -171,10 +171,10 @@ static int sock_read_write(
 		} else {
 			byte_left = bufsize;
 			bytes_sent = 0;
-			while (byte_left > 0) {
+			while (byte_left != 0) {
 				/* write data. */
 				num_written = send(sockfd,
-					buffer + bytes_sent, (size_t)byte_left,
+					buffer + bytes_sent, byte_left,
 					MSG_DONTROUTE | MSG_NOSIGNAL);
 				if (num_written == -1) {
 #ifdef SO_NOSIGPIPE
@@ -183,7 +183,7 @@ static int sock_read_write(
 #endif
 					return (int)num_written;
 				}
-				byte_left = byte_left - num_written;
+				byte_left -= (size_t)num_written;
 				bytes_sent += num_written;
 			}
 			numBytes = bytes_sent;
