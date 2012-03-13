@@ -320,7 +320,7 @@ static void CreateServicePacket(
 	/*! [out] Output buffer filled with HTTP statement. */
 	char **packet,
 	/*! [in] Address family of the HTTP request. */
-	unsigned short AddressFamily,
+	int AddressFamily,
 	/*! [in] PowerState as defined by UPnP Low Power. */
 	int PowerState,
 	/*! [in] SleepPeriod as defined by UPnP Low Power. */
@@ -380,7 +380,7 @@ static void CreateServicePacket(
 			nts = "ssdp:byebye";
 		/* NOTE: The CACHE-CONTROL and LOCATION headers are not present in
 		 * a shutdown msg, but are present here for MS WinMe interop. */
-		if (AddressFamily == (unsigned short)AF_INET)
+		if (AddressFamily == AF_INET)
 			host = SSDP_IP;
 		else {
 			if (isUrlV6UlaGua(location))
@@ -430,7 +430,7 @@ static void CreateServicePacket(
 }
 
 int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
-			int Duration, unsigned short AddressFamily, int PowerState,
+			int Duration, int AddressFamily, int PowerState,
 			int SleepPeriod, int RegistrationState)
 {
 	struct sockaddr_storage __ss;
@@ -445,11 +445,11 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 	UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 		   "In function DeviceAdvertisement\n");
 	memset(&__ss, 0, sizeof(__ss));
-	if (AddressFamily == (unsigned short)AF_INET) {
+	if (AddressFamily == AF_INET) {
 		DestAddr4->sin_family = (unsigned short)AF_INET;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == (unsigned short)AF_INET6) {
+	} else if (AddressFamily == AF_INET6) {
 		DestAddr6->sin6_family = (unsigned short)AF_INET6;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
@@ -638,7 +638,7 @@ error_handler:
 }
 
 int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
-			 int Duration, unsigned short AddressFamily,
+			 int Duration, int AddressFamily,
 			 int PowerState, int SleepPeriod, int RegistrationState)
 {
 	char Mil_Usn[LINE_SIZE];
@@ -651,12 +651,12 @@ int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
 
 	memset(&__ss, 0, sizeof(__ss));
 	szReq[0] = NULL;
-	if (AddressFamily == (unsigned short)AF_INET) {
-		DestAddr4->sin_family = AddressFamily;
+	if (AddressFamily == AF_INET) {
+		DestAddr4->sin_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == (unsigned short)AF_INET6) {
-		DestAddr6->sin6_family = AddressFamily;
+	} else if (AddressFamily == AF_INET6) {
+		DestAddr6->sin6_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
@@ -712,7 +712,7 @@ error_handler:
 }
 
 int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
-		    unsigned short AddressFamily, int PowerState,
+		    int AddressFamily, int PowerState,
 		    int SleepPeriod, int RegistrationState)
 {
 	char Mil_Usn[LINE_SIZE];
@@ -725,12 +725,12 @@ int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
 
 	memset(&__ss, 0, sizeof(__ss));
 	szReq[0] = NULL;
-	if (AddressFamily == (unsigned short)AF_INET) {
-		DestAddr4->sin_family = AddressFamily;
+	if (AddressFamily == AF_INET) {
+		DestAddr4->sin_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == (unsigned short)AF_INET6) {
-		DestAddr6->sin6_family = AddressFamily;
+	} else if (AddressFamily == AF_INET6) {
+		DestAddr6->sin6_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
@@ -760,7 +760,7 @@ error_handler:
 }
 
 int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
-		   char *Location, int Duration, unsigned short AddressFamily,
+		   char *Location, int Duration, int AddressFamily,
 		   int PowerState, int SleepPeriod, int RegistrationState)
 {
 	struct sockaddr_storage __ss;
@@ -775,12 +775,12 @@ int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
 	msgs[1] = NULL;
 	msgs[2] = NULL;
 	memset(&__ss, 0, sizeof(__ss));
-	if (AddressFamily == (unsigned short)AF_INET) {
-		DestAddr4->sin_family = AddressFamily;
+	if (AddressFamily == AF_INET) {
+		DestAddr4->sin_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == (unsigned short)AF_INET6) {
-		DestAddr6->sin6_family = AddressFamily;
+	} else if (AddressFamily == AF_INET6) {
+		DestAddr6->sin6_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);

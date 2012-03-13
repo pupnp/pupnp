@@ -2,6 +2,12 @@
 Version 1.6.16
 *******************************************************************************
 
+2012-03-13 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Address family is an int
+
+	Reference: "man 2 socket".
+
 2012-03-11 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Remove more implicit casts in upnp part

@@ -1213,7 +1213,7 @@ EXPORT_SPEC int UpnpRegisterRootDevice3(
 	UpnpDevice_Handle *Hnd,
 	/*! [in] Address family of this device. Can be AF_INET for an IPv4 device, or
 	 * AF_INET6 for an IPv6 device. Defaults to AF_INET. */
-	const int  AddressFamily);
+	int  AddressFamily);
 
 /*!
  * \brief Registers a device application for a specific address family with
@@ -1263,7 +1263,7 @@ EXPORT_SPEC int UpnpRegisterRootDevice4(
 	UpnpDevice_Handle *Hnd,
 	/*! [in] Address family of this device. Can be AF_INET for an IPv4 device, or
 	 * AF_INET6 for an IPv6 device. Defaults to AF_INET. */
-	const int  AddressFamily,
+	int  AddressFamily,
 	/*! [in] Pointer to a string containing the description URL to be returned for
 	 * legacy CPs for this root device instance. */
 	const char *LowerDescUrl);
