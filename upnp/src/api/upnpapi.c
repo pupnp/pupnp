@@ -1089,7 +1089,7 @@ int UpnpRegisterRootDevice3(
 	Upnp_FunPtr Fun,
 	const void *Cookie,
 	UpnpDevice_Handle *Hnd,
-	const int AddressFamily)
+	int AddressFamily)
 {
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 		"Inside UpnpRegisterRootDevice3\n");
@@ -1105,7 +1105,7 @@ int UpnpRegisterRootDevice4(
 	Upnp_FunPtr Fun,
 	const void *Cookie,
 	UpnpDevice_Handle *Hnd,
-	const int AddressFamily,
+	int AddressFamily,
 	const char *LowerDescUrl)
 {
 	struct Handle_Info *HInfo;
@@ -1239,11 +1239,10 @@ int UpnpRegisterRootDevice4(
 	}
 #endif /* EXCLUDE_GENA */
 
-	if (AddressFamily == AF_INET) {
+	if (AddressFamily == AF_INET)
 		UpnpSdkDeviceRegisteredV4 = 1;
-	} else {
+	else
 		UpnpSdkDeviceregisteredV6 = 1;
-	}
 
 	retVal = UPNP_E_SUCCESS;
 
@@ -3708,13 +3707,13 @@ Upnp_Handle_Type GetClientHandleInfo(
 
 
 Upnp_Handle_Type GetDeviceHandleInfo(
-	const unsigned short AddressFamily,
+	int AddressFamily,
 	UpnpDevice_Handle *device_handle_out,
 	struct Handle_Info **HndInfo)
 {
 	/* Check if we've got a registered device of the address family specified. */
-	if ((AddressFamily == (unsigned short)AF_INET  && UpnpSdkDeviceRegisteredV4 == 0) ||
-	    (AddressFamily == (unsigned short)AF_INET6 && UpnpSdkDeviceregisteredV6 == 0)) {
+	if ((AddressFamily == AF_INET  && UpnpSdkDeviceRegisteredV4 == 0) ||
+	    (AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 0)) {
 		*device_handle_out = -1;
 		return HND_INVALID;
 	}

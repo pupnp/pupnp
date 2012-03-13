@@ -354,7 +354,7 @@ int DeviceAdvertisement(
 	/* [in] Service duration in sec. */
 	int Duration,
 	/* [in] Device address family. */
-	unsigned short AddressFamily,
+	int AddressFamily,
 	/* [in] PowerState as defined by UPnP Low Power. */
 	int PowerState,
 	/* [in] SleepPeriod as defined by UPnP Low Power. */
@@ -432,7 +432,7 @@ int ServiceAdvertisement(
 	/* [in] Life time of this device. */
 	int Duration,
 	/* [in] Device address family. */
-	unsigned short AddressFamily,
+	int AddressFamily,
 	/* [in] PowerState as defined by UPnP Low Power. */
 	int PowerState,
 	/* [in] SleepPeriod as defined by UPnP Low Power. */
@@ -480,7 +480,7 @@ int ServiceShutdown(
 	/* [in] Service duration in sec. */
 	int Duration,
 	/* [in] Device address family. */
-	unsigned short AddressFamily,
+	int AddressFamily,
 	/* [in] PowerState as defined by UPnP Low Power. */
 	int PowerState,
 	/* [in] SleepPeriod as defined by UPnP Low Power. */
@@ -508,7 +508,7 @@ int DeviceShutdown(
 	/* [in] Device duration in sec. */
 	int Duration,
 	/* [in] Device address family. */
-	unsigned short AddressFamily,
+	int AddressFamily,
 	/* [in] PowerState as defined by UPnP Low Power. */
 	int PowerState,
 	/* [in] SleepPeriod as defined by UPnP Low Power. */

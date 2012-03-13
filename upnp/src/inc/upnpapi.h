@@ -107,7 +107,7 @@ struct Handle_Info
 	/*! . */
 	int MaxSubscriptionTimeOut;
 	/*! Address family: AF_INET or AF_INET6. */
-	unsigned short DeviceAf;
+	int DeviceAf;
 #endif
 
 	/* Client only */
@@ -174,7 +174,7 @@ Upnp_Handle_Type GetClientHandleInfo(
  */
 Upnp_Handle_Type GetDeviceHandleInfo(
 	/*! [in] Address family. */
-	const unsigned short AddressFamily,
+	int AddressFamily,
 	/*! [out] Device handle pointer. */
 	int *device_handle_out, 
 	/*! [out] Device handle structure passed by this function. */
