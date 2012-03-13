@@ -1517,9 +1517,9 @@ static int Parser_addNamespace(
 		}
 		xmlParser->pNeedPrefixNode = NULL;
 	} else {
-		if (pCur->prefix &&
-		    (strcmp(pNode->nodeName, pCur->element) != 0) &&
-		    (strcmp(pNode->prefix, pCur->prefix) != 0))
+		if (!pCur->prefix ||
+		    ((strcmp(pNode->nodeName, pCur->element) != 0) &&
+		     (strcmp(pNode->prefix, pCur->prefix) != 0)))
 			return IXML_FAILED;
 		namespaceUri = Parser_getNameSpace(xmlParser, pCur->prefix);
 		if (namespaceUri) {
