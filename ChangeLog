@@ -4,6 +4,16 @@ Version 1.6.16
 
 2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Use switch instead of if with enums in upnpapi.c
+
+	Replace if statements with switch when using HND_DEVICE and HND_CLIENT
+	enum constants.
+	Correct also UpnpUnRegisterRootDeviceLowPower and UpnpUnRegisterClient
+	as those functions were wrongly awaiting an UPNP_E_INVALID_HANDLE
+	instead of HND_INVALID from GetHandleInfo.
+
+2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Improve ssdp part
 
 	Do not compile CreateClientRequestPacketUlaGua if IPv6 is disable.
