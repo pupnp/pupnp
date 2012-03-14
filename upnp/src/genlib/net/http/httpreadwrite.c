@@ -312,6 +312,7 @@ int http_RecvMessage(
 			case PARSE_INCOMPLETE_ENTITY:
 				/* read until close */
 				ok_on_close = TRUE;
+				break;
 			case PARSE_CONTINUE_1:
 				/* Web post request. */
 				line = __LINE__;
