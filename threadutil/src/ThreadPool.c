@@ -831,13 +831,16 @@ int ThreadPoolAdd(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
 	temp = CreateThreadPoolJob(job, tp->lastJobId, tp);
 	if (!temp)
 		goto exit_function;
-	if (job->priority == HIGH_PRIORITY) {
+	switch (job->priority) {
+	case HIGH_PRIORITY:
 		if (ListAddTail(&tp->highJobQ, temp))
 			rc = 0;
-	} else if (job->priority == MED_PRIORITY) {
+		break;
+	case MED_PRIORITY:
 		if (ListAddTail(&tp->medJobQ, temp))
 			rc = 0;
-	} else {
+		break;
+	default:
 		if (ListAddTail(&tp->lowJobQ, temp))
 			rc = 0;
 	}
@@ -1076,12 +1079,13 @@ int TPJobSetPriority(ThreadPoolJob *job, ThreadPriority priority)
 {
 	if (!job)
 		return EINVAL;
-	if (priority == (ThreadPriority)LOW_PRIORITY ||
-	    priority == (ThreadPriority)MED_PRIORITY ||
-	    priority == (ThreadPriority)HIGH_PRIORITY) {
+	switch (priority) {
+	case LOW_PRIORITY:
+	case MED_PRIORITY:
+	case HIGH_PRIORITY:
 		job->priority = priority;
 		return 0;
-	} else {
+	default:
 		return EINVAL;
 	}
 }

@@ -320,6 +320,12 @@ Version 1.6.16
 
 2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Use switch insted of if with enums in threadutil
+
+	Replace if statements with switch when using enums in threadutil.
+
+2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Fix missing break in http_RecvMessage
 
 	There was a missing break in PARSE_INCOMPLETE_ENTITY due to commit
