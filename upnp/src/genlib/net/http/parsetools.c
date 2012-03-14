@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation
  * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -51,9 +52,13 @@ int has_xml_content_type(http_message_t *hmsg)
 	assert(hmsg);
 
 	/* find 'content-type' header which must have text/xml */
-	if (httpmsg_find_hdr(hmsg, HDR_CONTENT_TYPE, &hdr_value) &&
-	    matchstr(hdr_value.buf, hdr_value.length, "%itext%w/%wxml" ) == PARSE_OK) {
-		return TRUE;
+	if (httpmsg_find_hdr(hmsg, HDR_CONTENT_TYPE, &hdr_value)) {
+		switch (matchstr(hdr_value.buf, hdr_value.length, "%itext%w/%wxml" )) {
+		case PARSE_OK:
+			return TRUE;
+		default:
+			break;
+		}
 	}
 	return FALSE;
 }

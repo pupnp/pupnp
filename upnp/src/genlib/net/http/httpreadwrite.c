@@ -513,7 +513,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 				if (Instr && Instr->IsChunkActive) {
 					int rc;
 					/* Copy CRLF at the end of the chunk */
-					memcpy(file_buf + num_read, "\r\n", 2);
+					memcpy(file_buf + num_read, "\r\n", (size_t)2);
 					/* Hex length for the chunk size. */
 					memset(Chunk_Header, 0,
 						sizeof(Chunk_Header));
@@ -784,6 +784,10 @@ int http_Download( IN const char *url_str,
 		/* shrink can't fail */
 		assert(msg_length > *doc_length);
 		assert(*document != NULL);
+		if (msg_length <= *doc_length || *document == NULL)
+			UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
+				"msg_length(%d) <= *doc_length(%d) or document"
+				" is NULL", msg_length, *doc_length);
 	}
 	if (response.msg.status_code == HTTP_OK) {
 		ret_code = 0;	/* success */
@@ -907,7 +911,7 @@ typedef struct HTTPCONNECTIONHANDLE {
  *	\li \c PARSE_FAILURE - Failure to parse data correctly
  *	\li \c UPNP_E_BAD_HTTPMSG - Socker read() returns an error
  */
-static parse_status_t ReadResponseLineAndHeaders(
+static int ReadResponseLineAndHeaders(
 	/*! Socket information object. */
 	IN SOCKINFO *info,
 	/*! HTTP Parser object. */
@@ -1896,9 +1900,8 @@ int http_OpenHttpGetEx(
 			free(handle);
 			break;
 		}
-		status = ReadResponseLineAndHeaders(&handle->sock_info,
-			&handle->response, &timeout, &http_error_code);
-		if (status != (parse_status_t)PARSE_OK) {
+		if (ReadResponseLineAndHeaders(&handle->sock_info,
+			&handle->response, &timeout, &http_error_code) != (int)PARSE_OK) {
 			errCode = UPNP_E_BAD_RESPONSE;
 			free(handle);
 			break;

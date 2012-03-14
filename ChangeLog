@@ -318,6 +318,21 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-03-15 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Improve upnp/genlib/net
+
+	Change ret_code from int to parse_status_t in match.
+	Set back return code of ReadResponseLineAndHeaders from parse_status_t
+	to int as this function can return UPNP_E_BAD_HTTPMSG. As a result, do
+	not cast the result of this function into parse_status_t in
+	http_OpenHttpGetProxy and http_OpenHttpGetEx.
+	Use switch with PARSE_OK in parsetools.c.
+	Add missing explicit casts of integer constants in uri.c and
+	httpreadwrite.c.
+	Use switch, int and sa_family_t with AF_INET in uri.c.
+	Print an error in http_Download if realloc failed.
+
 2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Use switch instead of if with enums in upnpapi.c
