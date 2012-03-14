@@ -318,6 +318,13 @@ Version 1.8.0
 Version 1.6.16
 *******************************************************************************
 
+2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Fix missing break in http_RecvMessage
+
+	There was a missing break in PARSE_INCOMPLETE_ENTITY due to commit
+	2eb3e069badd5c8676738c3ead37f9551fd8448e.
+
 2012-03-14 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	Fix parse failure observed with tvdevice sample.
