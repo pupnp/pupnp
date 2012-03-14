@@ -25,6 +25,13 @@
 	#include <ws2tcpip.h>
 
 	#define UpnpCloseSocket closesocket
+
+	#if(_WIN32_WINNT < 0x0600)
+		typedef short sa_family_t;
+	#else
+		typedef ADDRESS_FAMILY sa_family_t;
+	#endif
+
 #else /* WIN32 */
 	#include <sys/param.h>
 	#if defined(__sun)
