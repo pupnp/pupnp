@@ -338,13 +338,16 @@ static int CreateClientRequestPacket(
 		return UPNP_E_INTERNAL_ERROR;
 	strcpy(RqstBuf, command);
 
-	if (AddressFamily == AF_INET) {
+	switch (AddressFamily) {
+	case AF_INET:
 		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: %s:%d\r\n", SSDP_IP,
 			SSDP_PORT);
-	} else if (AddressFamily == AF_INET6) {
+		break;
+	case AF_INET6:
 		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: [%s]:%d\r\n",
 			SSDP_IPV6_LINKLOCAL, SSDP_PORT);
-	} else {
+		break;
+	default:
 		return UPNP_E_INVALID_ARGUMENT;
 	}
 	if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
@@ -385,6 +388,7 @@ static int CreateClientRequestPacket(
 /*!
  * \brief
  */
+#ifdef UPNP_ENABLE_IPV6
 static int CreateClientRequestPacketUlaGua(
 	/*! [in,out] . */
 	char *RqstBuf,
@@ -406,13 +410,16 @@ static int CreateClientRequestPacketUlaGua(
 	if (RqstBufSize <= strlen(command))
 		return UPNP_E_INTERNAL_ERROR;
 	strcpy(RqstBuf, command);
-	if (AddressFamily == AF_INET) {
+	switch (AddressFamily) {
+	case AF_INET:
 		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: %s:%d\r\n", SSDP_IP,
 			SSDP_PORT);
-	} else if (AddressFamily == AF_INET6) {
+		break;
+	case AF_INET6:
 		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: [%s]:%d\r\n",
 			SSDP_IPV6_SITELOCAL, SSDP_PORT);
-	} else {
+		break;
+	default:
 		return UPNP_E_INVALID_ARGUMENT;
 	}
 	if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
@@ -448,6 +455,7 @@ static int CreateClientRequestPacketUlaGua(
 
 	return UPNP_E_SUCCESS;
 }
+#endif /* UPNP_ENABLE_IPV6 */
 
 /*!
  * \brief
@@ -555,13 +563,13 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 #endif
 
 	memset(&__ss_v4, 0, sizeof(__ss_v4));
-	destAddr4->sin_family = AF_INET;
+	destAddr4->sin_family = (sa_family_t)AF_INET;
 	inet_pton(AF_INET, SSDP_IP, &destAddr4->sin_addr);
 	destAddr4->sin_port = htons(SSDP_PORT);
 
 #ifdef UPNP_ENABLE_IPV6
 	memset(&__ss_v6, 0, sizeof(__ss_v6));
-	destAddr6->sin6_family = AF_INET6;
+	destAddr6->sin6_family = (sa_family_t)AF_INET6;
 	inet_pton(AF_INET6, SSDP_IPV6_SITELOCAL, &destAddr6->sin6_addr);
 	destAddr6->sin6_port = htons(SSDP_PORT);
 	destAddr6->sin6_scope_id = gIF_INDEX;
