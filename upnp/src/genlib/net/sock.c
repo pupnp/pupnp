@@ -46,6 +46,7 @@
 
 #include "unixutil.h"	/* for socklen_t, EAFNOSUPPORT */
 #include "upnp.h"
+#include "UpnpStdInt.h" /* for ssize_t */
 
 #include <assert.h>
 #include <errno.h>

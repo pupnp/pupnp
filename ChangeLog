@@ -320,6 +320,13 @@ Version 1.6.16
 
 2012-03-14 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
+	Fix compile error on Windows.
+
+	Include UpnpStdInt.h for ssize_t.
+	Define sa_family_t in UpnpInet.h.
+
+2012-03-14 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
 	Avoid ambiguous change of SsdpEvent in unique_service_name.
 
 	Handle overflow before changing SsdpEvent.
