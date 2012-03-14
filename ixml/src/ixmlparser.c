@@ -1846,11 +1846,12 @@ static int Parser_getNextNode(
 		goto ExitFunction;
 	}
 
-	if (xmlParser->state == (PARSER_STATE)eCONTENT) {
+	switch (xmlParser->state) {
+	case eCONTENT:
 		line = __LINE__;
 		ret = Parser_processContent(xmlParser, node);
 		goto ExitFunction;
-	} else {
+	default:
 		Parser_skipWhiteSpaces(xmlParser);
 		tokenLen = Parser_getNextToken(xmlParser);
 		if (tokenLen == 0 &&
@@ -2209,9 +2210,15 @@ static int Parser_processElementName(
         /* the node may have default namespace definition */
         if (Parser_hasDefaultNamespace(xmlParser, newNode, &nsURI)) {
             Parser_setElementNamespace(newElement, nsURI);
-        } else if (xmlParser->state == (PARSER_STATE)eATTRIBUTE) {
-            /* the default namespace maybe defined later */
-            xmlParser->pNeedPrefixNode = (IXML_Node *)newElement;
+        } else {
+            switch (xmlParser->state) {
+            case eATTRIBUTE:
+                /* the default namespace maybe defined later */
+                xmlParser->pNeedPrefixNode = (IXML_Node *)newElement;
+                break;
+            default:
+                break;
+            }
         }
     }
 
@@ -2292,13 +2299,17 @@ static int Parser_eTagVerification(
     assert( newNode->nodeName );
     assert( xmlParser->currentNodePtr );
 
-    if( newNode->nodeType == (IXML_NODE_TYPE)eELEMENT_NODE ) {
+    switch( newNode->nodeType ) {
+    case eELEMENT_NODE:
         if( Parser_isValidEndElement( xmlParser, newNode ) == TRUE ) {
             Parser_popElement( xmlParser );
         } else {
 	    /* syntax error */
             return IXML_SYNTAX_ERR;
         }
+        break;
+    default:
+       break;
     }
 
     if( strcmp( newNode->nodeName, xmlParser->currentNodePtr->nodeName ) ==
@@ -2496,12 +2507,6 @@ static Parser *Parser_init()
 	}
 
 	memset(newParser, 0, sizeof (Parser));
-	newParser->dataBuffer = NULL;
-	newParser->curPtr = NULL;
-	newParser->savePtr = NULL;
-	newParser->pNeedPrefixNode = NULL;
-	newParser->pCurElement = NULL;
-	newParser->currentNodePtr = NULL;
 	ixml_membuf_init(&(newParser->tokenBuf));
 	ixml_membuf_init(&(newParser->lastElem));
 
