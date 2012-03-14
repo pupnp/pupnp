@@ -4,6 +4,13 @@ Version 1.6.16
 
 2012-03-14 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
+	Avoid ambiguous change of SsdpEvent in unique_service_name.
+
+	Handle overflow before changing SsdpEvent.
+	Because the behavior of "snprintf" is platform dependent in such case.
+
+2012-03-14 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
 	SF Bug Tracker id 3502958 - The commit 5944960e prevents a pupnp client (amule) from receiving replies from an IGD device.
 
 	Previous change broke the feature. The error of unique_service_name
