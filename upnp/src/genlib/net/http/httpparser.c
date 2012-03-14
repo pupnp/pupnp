@@ -249,7 +249,7 @@ static parse_status_t scanner_get_token(
 			/* possibly more valid chars */
 			return PARSE_INCOMPLETE;
 		/* calc token length */
-		token->length = (size_t)cursor - (size_t)token->buf;
+		token->length = (size_t)(cursor - token->buf);
 	} else if (c == ' ' || c == '\t') {
 		token->buf = cursor++;
 		token_type = TT_WHITESPACE;
@@ -258,7 +258,7 @@ static parse_status_t scanner_get_token(
 		if (!scanner->entire_msg_loaded && cursor == null_terminator)
 			/* possibly more chars */
 			return PARSE_INCOMPLETE;
-		token->length = (size_t)cursor - (size_t)token->buf;
+		token->length = (size_t)(cursor - token->buf);
 	} else if (c == TOKCHAR_CR) {
 		/* scan CRLF */
 		token->buf = cursor++;
@@ -304,7 +304,7 @@ static parse_status_t scanner_get_token(
 				return PARSE_FAILURE;
 		}
 		if (got_end_quote)
-			token->length = (size_t)cursor - (size_t)token->buf;
+			token->length = (size_t)(cursor - token->buf);
 		else {	/* incomplete */
 
 			assert(cursor == null_terminator);
@@ -1414,7 +1414,7 @@ parse_status_t parser_parse_responseline(INOUT http_parser_t *parser)
 	while (*p == ' ' || *p == '\t')
 		p++;
 	/* now, p is at start of status msg */
-	n = line.length - (size_t)p - (size_t)line.buf;
+	n = line.length - (size_t)(p - line.buf);
 	if (membuffer_assign(&hmsg->status_msg, p, n) != 0) {
 		/* out of mem */
 		parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;

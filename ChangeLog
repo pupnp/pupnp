@@ -4,6 +4,15 @@ Version 1.6.16
 
 2012-03-14 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
+	Fix parse failure observed with tvdevice sample.
+
+	Commit c40d2bc0c9b60c43b641ac4669c7b8bbcd6134c5 has a problem
+	at removing the parentheses in parser_parse_responseline.
+	Difference of pointers was used with intention, don't cast
+	them separately.
+
+2012-03-14 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
 	Fix compile error on Windows.
 
 	Include UpnpStdInt.h for ssize_t.
