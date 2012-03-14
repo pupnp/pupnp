@@ -2,6 +2,14 @@
 Version 1.6.16
 *******************************************************************************
 
+2012-03-14 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	SF Bug Tracker id 3502958 - The commit 5944960e prevents a pupnp client (amule) from receiving replies from an IGD device.
+
+	Previous change broke the feature. The error of unique_service_name
+	in ssdp_request_type should be ignored.
+	This reverts commit 5944960e172a797a9fcc196291f4046cafa7f6ec.
+
 2012-03-13 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Address family is an int
