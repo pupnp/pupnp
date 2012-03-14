@@ -133,9 +133,10 @@ static int CalculateEventTime(
 
     assert( timeout != NULL );
 
-    if (type == (TimeoutType)ABS_SEC)
+    switch (type) {
+    case ABS_SEC:
         return 0;
-    else /*if (type == REL_SEC) */{
+    default: /* REL_SEC) */
         time(&now);
         ( *timeout ) += now;
         return 0;
