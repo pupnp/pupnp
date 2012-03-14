@@ -136,8 +136,8 @@ int replace_escaped(char *in, size_t index, size_t *max)
 {
 	int tempInt = 0;
 	char tempChar = 0;
-	size_t i = 0;
-	size_t j = 0;
+	size_t i = (size_t)0;
+	size_t j = (size_t)0;
 
 	if (in[index] == '%' && isxdigit(in[index + (size_t)1]) && isxdigit(in[index + (size_t)2])) {
 		/* Note the "%2x", makes sure that we convert a maximum of two
@@ -326,7 +326,7 @@ int parse_hostport(
 	char *srvport = NULL;
 	char *last_dot = NULL;
 	unsigned short int port;
-	unsigned short af = AF_UNSPEC;
+	int af = AF_UNSPEC;
 	size_t hostport_size;
 	int has_port = 0;
 	int ret;
@@ -378,13 +378,17 @@ int parse_hostport(
 
 			ret = getaddrinfo(srvname, NULL, &hints, &res0);
 			if (ret == 0) {
-				for (res = res0; res; res = res->ai_next) {
-					if (res->ai_family == AF_INET ||
-					    res->ai_family == AF_INET6) {
+				for (res = res0; res && !ret; res = res->ai_next) {
+					switch (res->ai_family) {
+					case AF_INET:
+					case AF_INET6:
 						/* Found a valid IPv4 or IPv6 address. */
 						memcpy(&out->IPaddress,
 						       res->ai_addr,
 						       res->ai_addrlen);
+						ret=1;
+						break;
+					default:
 						break;
 					}
 				}
@@ -414,19 +418,22 @@ int parse_hostport(
 	/* subtracting pointers. */
 	hostport_size = (size_t)c - (size_t)workbuf;
 	/* Fill in the 'out' information. */
-	if (af == (unsigned short)AF_INET) {
-		sai4->sin_family = af;
+	switch (af) {
+	case AF_INET:
+		sai4->sin_family = (sa_family_t)af;
 		sai4->sin_port = htons(port);
 		ret = inet_pton(AF_INET, srvname, &sai4->sin_addr);
-	} else if (af == (unsigned short)AF_INET6) {
-		sai6->sin6_family = af;
+		break;
+	case AF_INET6:
+		sai6->sin6_family = (sa_family_t)af;
 		sai6->sin6_port = htons(port);
 		sai6->sin6_scope_id = gIF_INDEX;
 		ret = inet_pton(AF_INET6, srvname, &sai6->sin6_addr);
-	} else {
+		break;
+	default:
 		/* IP address was set by the hostname (getaddrinfo). */
 		/* Override port: */
-		if (out->IPaddress.ss_family == (unsigned short)AF_INET)
+		if (out->IPaddress.ss_family == (sa_family_t)AF_INET)
 			sai4->sin_port = htons(port);
 		else
 			sai6->sin6_port = htons(port);
@@ -618,7 +625,7 @@ char *resolve_rel_url(char *base_url, char *rel_url)
                         if( base.hostport.text.size > (size_t)0 ) {
                             assert( base.scheme.size + (size_t)1
                                 + base.hostport.text.size + (size_t)2 /* "//" */ <= strlen ( base_url ) );
-                            memcpy( out_finger, "//", 2 );
+                            memcpy( out_finger, "//", (size_t)2 );
                             out_finger += 2;
                             memcpy( out_finger, base.hostport.text.buff,
                                     base.hostport.text.size );

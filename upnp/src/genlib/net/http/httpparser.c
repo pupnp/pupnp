@@ -1138,7 +1138,7 @@ static parse_status_t match(
 	IN const char *fmt,
 	...)
 {
-	int ret_code;
+	parse_status_t ret_code;
 	va_list args;
 
 	va_start(args, fmt);
