@@ -41,7 +41,6 @@ void ixmlAttr_init(IN IXML_Attr *attr)
 {
 	if (attr != NULL) {
 		memset(attr, 0, sizeof (IXML_Attr));
-		attr->ownerElement = NULL;
 	}
 }
 

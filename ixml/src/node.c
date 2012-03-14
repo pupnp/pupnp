@@ -49,12 +49,6 @@ void ixmlNode_init(IXML_Node *nodeptr)
 	assert(nodeptr != NULL);
 
 	memset(nodeptr, 0, sizeof (IXML_Node));
-	nodeptr->parentNode = NULL;
-	nodeptr->firstChild = NULL;
-	nodeptr->prevSibling = NULL;
-	nodeptr->nextSibling = NULL;
-	nodeptr->firstAttr = NULL;
-	nodeptr->ownerDocument = NULL;
 }
 
 
@@ -97,9 +91,13 @@ static void ixmlNode_freeSingleNode(
 		if (nodeptr->localName != NULL) {
 			free(nodeptr->localName);
 		}
-		if (nodeptr->nodeType == (IXML_NODE_TYPE)eELEMENT_NODE) {
+		switch (nodeptr->nodeType ) {
+		case eELEMENT_NODE:
 			element = (IXML_Element *)nodeptr;
 			free(element->tagName);
+			break;
+		default:
+			break;
 		}
 		free(nodeptr);
 	}
@@ -433,15 +431,21 @@ static BOOL ixmlNode_allowChildren(
 		break;
 
 	case eELEMENT_NODE:
-		if (newChild->nodeType == (IXML_NODE_TYPE)eATTRIBUTE_NODE ||
-		    newChild->nodeType == (IXML_NODE_TYPE)eDOCUMENT_NODE) {
+		switch (newChild->nodeType) {
+		case eATTRIBUTE_NODE:
+		case eDOCUMENT_NODE:
 			return FALSE;
+		default:
+			break;
 		}
 	break;
 
 	case eDOCUMENT_NODE:
-		if (newChild->nodeType != (IXML_NODE_TYPE)eELEMENT_NODE) {
+		switch (newChild->nodeType) {
+		case eELEMENT_NODE:
 			return FALSE;
+		default:
+			break;
 		}
 
 	default:
@@ -1128,7 +1132,8 @@ IXML_NamedNodeMap *ixmlNode_getAttributes(IXML_Node *nodeptr)
 		return NULL;
 	}
 
-	if(nodeptr->nodeType == (IXML_NODE_TYPE)eELEMENT_NODE) {
+	switch(nodeptr->nodeType) {
+	case eELEMENT_NODE:
 		returnNamedNodeMap = (IXML_NamedNodeMap *)malloc(sizeof(IXML_NamedNodeMap));
 		if(returnNamedNodeMap == NULL) {
 			return NULL;
@@ -1146,7 +1151,7 @@ IXML_NamedNodeMap *ixmlNode_getAttributes(IXML_Node *nodeptr)
 			tempNode = tempNode->nextSibling;
 		}
 		return returnNamedNodeMap;
-	} else {
+	default:
 		/* if not an ELEMENT_NODE */
 		return NULL;
 	}
@@ -1166,9 +1171,13 @@ BOOL ixmlNode_hasChildNodes(IXML_Node *nodeptr)
 BOOL ixmlNode_hasAttributes(IXML_Node *nodeptr)
 {
 	if (nodeptr != NULL) {
-		if (nodeptr->nodeType == (IXML_NODE_TYPE)eELEMENT_NODE &&
-			nodeptr->firstAttr != NULL) {
-			return TRUE;
+		switch (nodeptr->nodeType) {
+		case eELEMENT_NODE:
+			if (nodeptr->firstAttr != NULL)
+				return TRUE;
+			break;
+		default:
+			break;
 		}
 	}
 

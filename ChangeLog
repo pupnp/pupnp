@@ -4,6 +4,15 @@ Version 1.6.16
 
 2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Use switch insted of if with enums in ixml
+
+	Replace if statements with switch when using enums in ixml.
+	Remove uneeded initialization in ixmlAttr_init, Parser_init and
+	ixmlNode_init which was added by wrongly added in commit
+	06660b6383c438e4e2c9ca9854077cecc4da9e5d.
+
+2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Use switch insted of if with enums in threadutil
 
 	Replace if statements with switch when using enums in threadutil.
