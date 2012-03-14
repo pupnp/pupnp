@@ -197,7 +197,8 @@ static int NewRequestHandler(
 		return UPNP_E_OUTOF_SOCKET;
 	}
 
-	if (DestAddr->sa_family == AF_INET) {
+	switch (DestAddr->sa_family) {
+	case AF_INET:
 		inet_ntop(AF_INET, &((struct sockaddr_in *)DestAddr)->sin_addr,
 			  buf_ntop, sizeof(buf_ntop));
 		setsockopt(ReplySock, IPPROTO_IP, IP_MULTICAST_IF,
@@ -205,7 +206,8 @@ static int NewRequestHandler(
 		setsockopt(ReplySock, IPPROTO_IP, IP_MULTICAST_TTL,
 			   (char *)&ttl, sizeof(int));
 		socklen = sizeof(struct sockaddr_in);
-	} else if (DestAddr->sa_family == AF_INET6) {
+		break;
+	case AF_INET6:
 		inet_ntop(AF_INET6,
 			  &((struct sockaddr_in6 *)DestAddr)->sin6_addr,
 			  buf_ntop, sizeof(buf_ntop));
@@ -213,7 +215,8 @@ static int NewRequestHandler(
 			   (char *)&gIF_INDEX, sizeof(gIF_INDEX));
 		setsockopt(ReplySock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
 			   (char *)&hops, sizeof(hops));
-	} else {
+		break;
+	default:
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Invalid destination address specified.");
 		ret = UPNP_E_NETWORK_ERROR;
@@ -380,9 +383,11 @@ static void CreateServicePacket(
 			nts = "ssdp:byebye";
 		/* NOTE: The CACHE-CONTROL and LOCATION headers are not present in
 		 * a shutdown msg, but are present here for MS WinMe interop. */
-		if (AddressFamily == AF_INET)
+		switch (AddressFamily) {
+		case AF_INET:
 			host = SSDP_IP;
-		else {
+			break;
+		default:
 			if (isUrlV6UlaGua(location))
 				host = "[" SSDP_IPV6_SITELOCAL "]";
 			else
@@ -445,18 +450,21 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 	UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 		   "In function DeviceAdvertisement\n");
 	memset(&__ss, 0, sizeof(__ss));
-	if (AddressFamily == AF_INET) {
-		DestAddr4->sin_family = (unsigned short)AF_INET;
+	switch (AddressFamily) {
+	case AF_INET:
+		DestAddr4->sin_family = (sa_family_t)AF_INET;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == AF_INET6) {
-		DestAddr6->sin6_family = (unsigned short)AF_INET6;
+		break;
+	case AF_INET6:
+		DestAddr6->sin6_family = (sa_family_t)AF_INET6;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
 		DestAddr6->sin6_port = htons(SSDP_PORT);
 		DestAddr6->sin6_scope_id = gIF_INDEX;
-	} else {
+		break;
+	default:
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Invalid device address family.\n");
 	}
@@ -533,7 +541,7 @@ int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 			goto error_handler;
 		CreateServicePacket(MSGTYPE_REPLY, "upnp:rootdevice",
 				    Mil_Usn, Location, Duration, &msgs[0],
-				    DestAddr->sa_family, PowerState,
+				    (int)DestAddr->sa_family, PowerState,
 				    SleepPeriod, RegistrationState);
 	} else {
 		/* two msgs for embedded devices */
@@ -543,7 +551,7 @@ int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 		if (!ByType) {
 			CreateServicePacket(MSGTYPE_REPLY, Udn, Udn, Location,
 					    Duration, &msgs[0],
-					    DestAddr->sa_family, PowerState,
+					    (int)DestAddr->sa_family, PowerState,
 					    SleepPeriod, RegistrationState);
 		} else {
 			rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn,
@@ -552,7 +560,7 @@ int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 				goto error_handler;
 			CreateServicePacket(MSGTYPE_REPLY, DevType, Mil_Usn,
 					    Location, Duration, &msgs[0],
-					    DestAddr->sa_family, PowerState,
+					    (int)DestAddr->sa_family, PowerState,
 					    SleepPeriod, RegistrationState);
 		}
 	}
@@ -595,7 +603,7 @@ int DeviceReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 			goto error_handler;
 		CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
 				    Location, Duration, &szReq[0],
-				    DestAddr->sa_family, PowerState,
+				    (int)DestAddr->sa_family, PowerState,
 				    SleepPeriod, RegistrationState);
 	}
 	rc = snprintf(Mil_Nt, sizeof(Mil_Nt), "%s", Udn);
@@ -605,7 +613,7 @@ int DeviceReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
 		goto error_handler;
 	CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
-			    Location, Duration, &szReq[1], DestAddr->sa_family,
+			    Location, Duration, &szReq[1], (int)DestAddr->sa_family,
 			    PowerState, SleepPeriod, RegistrationState);
 	rc = snprintf(Mil_Nt, sizeof(Mil_Nt), "%s", DevType);
 	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Nt))
@@ -614,7 +622,7 @@ int DeviceReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
 		goto error_handler;
 	CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
-			    Location, Duration, &szReq[2], DestAddr->sa_family,
+			    Location, Duration, &szReq[2], (int)DestAddr->sa_family,
 			    PowerState, SleepPeriod, RegistrationState);
 	/* check error */
 	if ((RootDev && szReq[0] == NULL) ||
@@ -651,18 +659,21 @@ int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
 
 	memset(&__ss, 0, sizeof(__ss));
 	szReq[0] = NULL;
-	if (AddressFamily == AF_INET) {
+	switch (AddressFamily) {
+	case AF_INET:
 		DestAddr4->sin_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == AF_INET6) {
+		break;
+	case AF_INET6:
 		DestAddr6->sin6_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
 		DestAddr6->sin6_port = htons(SSDP_PORT);
 		DestAddr6->sin6_scope_id = gIF_INDEX;
-	} else {
+		break;
+	default:
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Invalid device address family.\n");
 	}
@@ -699,7 +710,7 @@ int ServiceReply(struct sockaddr *DestAddr, char *ServType, char *Udn,
 	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
 		goto error_handler;
 	CreateServicePacket(MSGTYPE_REPLY, ServType, Mil_Usn,
-			    Location, Duration, &szReq[0], DestAddr->sa_family,
+			    Location, Duration, &szReq[0], (int)DestAddr->sa_family,
 			    PowerState, SleepPeriod, RegistrationState);
 	if (szReq[0] == NULL)
 		goto error_handler;
@@ -725,18 +736,21 @@ int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
 
 	memset(&__ss, 0, sizeof(__ss));
 	szReq[0] = NULL;
-	if (AddressFamily == AF_INET) {
+	switch (AddressFamily) {
+	case AF_INET:
 		DestAddr4->sin_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == AF_INET6) {
+		break;
+	case AF_INET6:
 		DestAddr6->sin6_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
 		DestAddr6->sin6_port = htons(SSDP_PORT);
 		DestAddr6->sin6_scope_id = gIF_INDEX;
-	} else {
+		break;
+	default:
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Invalid device address family.\n");
 	}
@@ -775,18 +789,21 @@ int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
 	msgs[1] = NULL;
 	msgs[2] = NULL;
 	memset(&__ss, 0, sizeof(__ss));
-	if (AddressFamily == AF_INET) {
+	switch (AddressFamily) {
+	case AF_INET:
 		DestAddr4->sin_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET, SSDP_IP, &DestAddr4->sin_addr);
 		DestAddr4->sin_port = htons(SSDP_PORT);
-	} else if (AddressFamily == AF_INET6) {
+		break;
+	case AF_INET6:
 		DestAddr6->sin6_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET6,
 			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
 			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
 		DestAddr6->sin6_port = htons(SSDP_PORT);
 		DestAddr6->sin6_scope_id = gIF_INDEX;
-	} else {
+		break;
+	default:
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Invalid device address family.\n");
 	}

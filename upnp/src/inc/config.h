@@ -179,7 +179,7 @@
  *
  * @{
  */
-#define SSDP_PAUSE  100
+#define SSDP_PAUSE  100u
 /* @} */
 
 /*!

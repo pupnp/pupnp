@@ -133,7 +133,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 		if (NumCopy != 0)
 			imillisleep(SSDP_PAUSE);
 		NumCopy++;
-		for (i = 0;; i++) {
+		for (i = 0lu;; i++) {
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				   "Entering new device list with i = %lu\n\n",
 				   i);
@@ -156,7 +156,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 				   "Extracting UDN for %s\n", dbgStr);
 			UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 				   "Extracting device type\n");
-			tmpNode2 = ixmlNodeList_item(nodeList, 0);
+			tmpNode2 = ixmlNodeList_item(nodeList, 0lu);
 			if (!tmpNode2)
 				continue;
 			textNode = ixmlNode_getFirstChild(tmpNode2);
@@ -184,7 +184,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 					   __LINE__, "UDN not found!\n");
 				continue;
 			}
-			tmpNode2 = ixmlNodeList_item(nodeList, 0);
+			tmpNode2 = ixmlNodeList_item(nodeList, 0lu);
 			if (!tmpNode2) {
 				UpnpPrintf(UPNP_CRITICAL, API, __FILE__,
 					   __LINE__, "UDN not found!\n");
@@ -208,7 +208,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 			if (AdFlag) {
 				/* send the device advertisement */
 				if (AdFlag == 1) {
-					DeviceAdvertisement(devType, i == 0,
+					DeviceAdvertisement(devType, i == 0lu,
 							    UDNstr,
 							    SInfo->DescURL, Exp,
 							    SInfo->DeviceAf,
@@ -217,7 +217,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 	                                                    SInfo->RegistrationState);
 				} else {
 					/* AdFlag == -1 */
-					DeviceShutdown(devType, i == 0, UDNstr,
+					DeviceShutdown(devType, i == 0lu, UDNstr,
 						       SERVER, SInfo->DescURL,
 						       Exp, SInfo->DeviceAf,
 						       SInfo->PowerState,
@@ -227,14 +227,14 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 			} else {
 				switch (SearchType) {
 				case SSDP_ALL:
-					DeviceReply(DestAddr, devType, i == 0,
+					DeviceReply(DestAddr, devType, i == 0lu,
 						    UDNstr, SInfo->DescURL,
 						    defaultExp, SInfo->PowerState,
 						    SInfo->SleepPeriod,
 						    SInfo->RegistrationState);
 					break;
 				case SSDP_ROOTDEVICE:
-					if (i == 0) {
+					if (i == 0lu) {
 						SendReply(DestAddr, devType, 1,
 							  UDNstr,
 							  SInfo->DescURL,
@@ -245,7 +245,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 					}
 					break;
 				case SSDP_DEVICEUDN: {
-					if (DeviceUDN && strlen(DeviceUDN) != 0) {
+					if (DeviceUDN && strlen(DeviceUDN) != (size_t)0) {
 						if (strcasecmp(DeviceUDN, UDNstr)) {
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								"DeviceUDN=%s and search UDN=%s DID NOT match\n",
@@ -264,9 +264,9 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 					}
 				}
 				case SSDP_DEVICETYPE: {
-					if (!strncasecmp(DeviceType, devType, strlen(DeviceType) - 2)) {
+					if (!strncasecmp(DeviceType, devType, strlen(DeviceType) - (size_t)2)) {
 						if (atoi(strrchr(DeviceType, ':') + 1)
-						    < atoi(&devType[strlen(devType) - 1])) {
+						    < atoi(&devType[strlen(devType) - (size_t)1])) {
 							/* the requested version is lower than the device version
 							 * must reply with the lower version number and the lower
 							 * description URL */
@@ -279,7 +279,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 								  SInfo->SleepPeriod,
 								  SInfo->RegistrationState);
 						} else if (atoi(strrchr(DeviceType, ':') + 1)
-							   == atoi(&devType[strlen(devType) - 1])) {
+							   == atoi(&devType[strlen(devType) - (size_t)1])) {
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								   "DeviceType=%s and search devType=%s MATCH\n",
 								   devType, DeviceType);
@@ -333,7 +333,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 					   "Service not found 3\n");
 				continue;
 			}
-			for (j = 0;; j++) {
+			for (j = 0lu;; j++) {
 				tmpNode = ixmlNodeList_item(nodeList, j);
 				if (!tmpNode) {
 					break;
@@ -389,9 +389,9 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 						break;
 					case SSDP_SERVICE:
 						if (ServiceType) {
-							if (!strncasecmp(ServiceType, servType, strlen(ServiceType) - 2)) {
+							if (!strncasecmp(ServiceType, servType, strlen(ServiceType) - (size_t)2)) {
 								if (atoi(strrchr(ServiceType, ':') + 1) <
-								    atoi(&servType[strlen(servType) - 1])) {
+								    atoi(&servType[strlen(servType) - (size_t)1])) {
 									/* the requested version is lower than the service version
 									 * must reply with the lower version number and the lower
 									 * description URL */
@@ -739,17 +739,20 @@ void readFromSSDPSocket(SOCKET socket)
 				(struct sockaddr *)&__ss, &socklen);
 	if (byteReceived > 0) {
 		requestBuf[byteReceived] = '\0';
-		if (__ss.ss_family == AF_INET)
+		switch (__ss.ss_family) {
+		case AF_INET:
 			inet_ntop(AF_INET,
 				  &((struct sockaddr_in *)&__ss)->sin_addr,
 				  ntop_buf, sizeof(ntop_buf));
+			break;
 #ifdef UPNP_ENABLE_IPV6
-		else if (__ss.ss_family == AF_INET6)
+		case AF_INET6:
 			inet_ntop(AF_INET6,
 				  &((struct sockaddr_in6 *)&__ss)->sin6_addr,
 				  ntop_buf, sizeof(ntop_buf));
+			break;
 #endif /* UPNP_ENABLE_IPV6 */
-		else {
+		default:
 			memset(ntop_buf, 0, sizeof(ntop_buf));
 			strncpy(ntop_buf, "<Invalid address family>",
 				sizeof(ntop_buf) - 1);
@@ -830,7 +833,7 @@ static int create_ssdp_sock_v4(
 	}
 #endif /* BSD, __OSX__, __APPLE__ */
 	memset(&__ss, 0, sizeof(__ss));
-	ssdpAddr4->sin_family = (unsigned short)AF_INET;
+	ssdpAddr4->sin_family = (sa_family_t)AF_INET;
 	ssdpAddr4->sin_addr.s_addr = htonl(INADDR_ANY);
 	ssdpAddr4->sin_port = htons(SSDP_PORT);
 	ret = bind(*ssdpSock, (struct sockaddr *)ssdpAddr4, sizeof(*ssdpAddr4));
@@ -984,7 +987,7 @@ static int create_ssdp_sock_v6(
 		return UPNP_E_SOCKET_ERROR;
 	}
 	memset(&__ss, 0, sizeof(__ss));
-	ssdpAddr6->sin6_family = AF_INET6;
+	ssdpAddr6->sin6_family = (sa_family_t)AF_INET6;
 	ssdpAddr6->sin6_addr = in6addr_any;
 	ssdpAddr6->sin6_scope_id = gIF_INDEX;
 	ssdpAddr6->sin6_port = htons(SSDP_PORT);
@@ -1098,7 +1101,7 @@ static int create_ssdp_sock_v6_ula_gua(
 		return UPNP_E_SOCKET_ERROR;
 	}
 	memset(&__ss, 0, sizeof(__ss));
-	ssdpAddr6->sin6_family = AF_INET6;
+	ssdpAddr6->sin6_family = (sa_family_t)AF_INET6;
 	ssdpAddr6->sin6_addr = in6addr_any;
 	ssdpAddr6->sin6_scope_id = gIF_INDEX;
 	ssdpAddr6->sin6_port = htons(SSDP_PORT);
@@ -1187,7 +1190,7 @@ int get_ssdp_sockets(MiniServerSockArray * out)
 	out->ssdpReqSock4 = INVALID_SOCKET;
 	out->ssdpReqSock6 = INVALID_SOCKET;
 	/* Create the IPv4 socket for SSDP REQUESTS */
-	if (strlen(gIF_IPV4) > 0) {
+	if (strlen(gIF_IPV4) > (size_t)0) {
 		retVal = create_ssdp_sock_reqv4(&out->ssdpReqSock4);
 		if (retVal != UPNP_E_SUCCESS)
 			return retVal;
@@ -1197,7 +1200,7 @@ int get_ssdp_sockets(MiniServerSockArray * out)
 		out->ssdpReqSock4 = INVALID_SOCKET;
 	/* Create the IPv6 socket for SSDP REQUESTS */
 #ifdef UPNP_ENABLE_IPV6
-	if (strlen(gIF_IPV6) > 0) {
+	if (strlen(gIF_IPV6) > (size_t)0) {
 		retVal = create_ssdp_sock_reqv6(&out->ssdpReqSock6);
 		if (retVal != UPNP_E_SUCCESS) {
 			shutdown(out->ssdpReqSock4, SD_BOTH);

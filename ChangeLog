@@ -4,6 +4,21 @@ Version 1.6.16
 
 2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Improve ssdp part
+
+	Do not compile CreateClientRequestPacketUlaGua if IPv6 is disable.
+	Cast DestAddr->sa_family from sa_family_t into int when calling
+	CreateServicePacket as this function has been set back to accept int in
+	a692e591defe6ed9a617b9b4a083964a01f7bbab.
+	Use switch instead of if with AF_INET and AF_INET6.
+	Add missing casts from AF_INET and AF_INET6 into sa_family_t when using
+	them to set sin_family and sin6_family.
+	Add missing explicit casts into size_t or lu when using	integer
+	constants with strlen or unsigned long indexes.
+	Set SSDP_PAUSE to be unsigned as it is used with usleep.
+
+2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Use switch insted of if with enums in ixml
 
 	Replace if statements with switch when using enums in ixml.
