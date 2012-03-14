@@ -388,7 +388,7 @@ static int parse_hostport(
 
 			ret = getaddrinfo(srvname, NULL, &hints, &res0);
 			if (ret == 0) {
-				for (res = res0; res && !ret; res = res->ai_next) {
+				for (res = res0; res; res = res->ai_next) {
 					switch (res->ai_family) {
 					case AF_INET:
 					case AF_INET6:
@@ -396,12 +396,10 @@ static int parse_hostport(
 						memcpy(&out->IPaddress,
 						       res->ai_addr,
 						       res->ai_addrlen);
-						ret=1;
-						break;
-					default:
-						break;
+						goto found;
 					}
 				}
+found:
 				freeaddrinfo(res0);
 				if (res == NULL)
 					/* Didn't find an AF_INET or AF_INET6 address. */
