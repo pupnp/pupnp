@@ -179,10 +179,10 @@ int UpnpSdkDeviceRegisteredV4 = 0;
  * == 0 if unregistered, == 1 if registered. */
 int UpnpSdkDeviceregisteredV6 = 0;
 
-#ifdef HAVE_UPNP_OPTSSDP
+#ifdef UPNP_HAVE_OPTSSDP
 /*! Global variable used in discovery notifications. */
 Upnp_SID gUpnpSdkNLSuuid;
-#endif /* HAVE_UPNP_OPTSSDP */
+#endif /* UPNP_HAVE_OPTSSDP */
 
 /*! Global variable used as to store the OpenSSL context object
  * to be used for all SSL/TLS connections
