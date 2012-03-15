@@ -48,6 +48,9 @@
 #include "upnp.h"
 #include "UpnpStdInt.h" /* for ssize_t */
 
+#include "upnpdebug.h"
+#include "upnputil.h"
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>	/* for F_GETFL, F_SETFL, O_NONBLOCK */
@@ -115,16 +118,21 @@ int sock_ssl_connect(SOCKINFO *info)
 int sock_destroy(SOCKINFO *info, int ShutdownMethod)
 {
 	int ret = UPNP_E_SUCCESS;
+	char errorBuffer[ERROR_BUFFER_LEN];
 
 	if (info->socket != INVALID_SOCKET) {
 #ifdef UPNP_ENABLE_OPEN_SSL
-        if (info->ssl) {
-            SSL_shutdown(info->ssl);
-            SSL_free(info->ssl);
-            info->ssl = NULL;
-        }
+		if (info->ssl) {
+			SSL_shutdown(info->ssl);
+			SSL_free(info->ssl);
+			info->ssl = NULL;
+		}
 #endif
-		shutdown(info->socket, ShutdownMethod);
+		if (shutdown(info->socket, ShutdownMethod) == -1) {
+			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
+				   "Error in shutdown: %s\n", errorBuffer);
+		}
 		if (sock_close(info->socket) == -1) {
 			ret = UPNP_E_SOCKET_ERROR;
 		}
@@ -163,7 +171,7 @@ static int sock_read_write(
 	time_t start_time = time(NULL);
 	SOCKET sockfd = info->socket;
 	long bytes_sent = 0;
-	size_t byte_left = 0;
+	size_t byte_left = (size_t)0;
 	ssize_t num_written;
 
 	if (*timeoutSecs < 0)
@@ -217,7 +225,7 @@ static int sock_read_write(
 		} else {
 			byte_left = bufsize;
 			bytes_sent = 0;
-			while (byte_left != 0) {
+			while (byte_left != (size_t)0) {
 #ifdef UPNP_ENABLE_OPEN_SSL
                 if (info->ssl) {
                     num_written = SSL_write(info->ssl,

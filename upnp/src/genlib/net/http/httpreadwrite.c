@@ -280,6 +280,7 @@ SOCKET http_Connect(
 	SOCKET connfd;
 	socklen_t sockaddr_len;
 	int ret_connect;
+	char errorBuffer[ERROR_BUFFER_LEN];
 
 	http_FixUrl(destination_url, url);
 
@@ -297,7 +298,11 @@ SOCKET http_Connect(
 		UpnpPrintf(UPNP_CRITICAL, HTTP, __FILE__, __LINE__,
 			"connect error: %d\n", WSAGetLastError());
 #endif
-		shutdown(connfd, SD_BOTH);
+		if (shutdown(connfd, SD_BOTH) == -1) {
+			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
+				   "Error in shutdown: %s\n", errorBuffer);
+		}
 		UpnpCloseSocket(connfd);
 		return (SOCKET)(UPNP_E_SOCKET_CONNECT);
 	}
@@ -1501,7 +1506,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			/* mem buffer */
 			s = (char *)va_arg(argp, char *);
 			UpnpPrintf(UPNP_ALL, HTTP, __FILE__, __LINE__,
-				"Adding a char Buffer starting with: %c\n", s[0]);
+				"Adding a char Buffer starting with: %c\n", (int)s[0]);
 			assert(s);
 			length = (size_t) va_arg(argp, size_t);
 			if (membuffer_append(buf, s, length))

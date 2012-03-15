@@ -83,18 +83,18 @@ static void StatsInit(
 	/*! Must be valid non null stats structure. */
 	ThreadPoolStats *stats)
 {
-	stats->totalIdleTime = 0;
+	stats->totalIdleTime = 0.0;
 	stats->totalJobsHQ = 0;
 	stats->totalJobsLQ = 0;
 	stats->totalJobsMQ = 0;
-	stats->totalTimeHQ = 0;
-	stats->totalTimeMQ = 0;
-	stats->totalTimeLQ = 0;
-	stats->totalWorkTime = 0;
-	stats->totalIdleTime = 0;
-	stats->avgWaitHQ = 0;
-	stats->avgWaitMQ = 0;
-	stats->avgWaitLQ = 0;
+	stats->totalTimeHQ = 0.0;
+	stats->totalTimeMQ = 0.0;
+	stats->totalTimeLQ = 0.0;
+	stats->totalWorkTime = 0.0;
+	stats->totalIdleTime = 0.0;
+	stats->avgWaitHQ = 0.0;
+	stats->avgWaitMQ = 0.0;
+	stats->avgWaitLQ = 0.0;
 	stats->workerThreads = 0;
 	stats->idleThreads = 0;
 	stats->persistentThreads = 0;
@@ -1205,7 +1205,7 @@ int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
 	if (stats->totalJobsHQ > 0)
 		stats->avgWaitHQ = stats->totalTimeHQ / (double)stats->totalJobsHQ;
 	else
-		stats->avgWaitHQ = 0;
+		stats->avgWaitHQ = 0.0;
 	if (stats->totalJobsMQ > 0)
 		stats->avgWaitMQ = stats->totalTimeMQ / (double)stats->totalJobsMQ;
 	else

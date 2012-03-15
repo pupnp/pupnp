@@ -315,7 +315,7 @@ int token_cmp(token *in1, token *in2)
 
 int parse_hostport(
 	const char *in,
-	size_t max,
+	/*size_t max,*/
 	unsigned short int defaultPort,
 	hostport_type *out)
 {
@@ -447,7 +447,7 @@ int parse_hostport(
 	out->text.buff = in;
 
 	return (int)hostport_size;
-	max = max;
+	//max=max;
 }
 
 /*!
@@ -711,7 +711,7 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 			defaultPort = 443;
 		}
 		begin_path = parse_hostport(&in[begin_hostport],
-			max - begin_hostport,
+			/*max - begin_hostport,*/
 			defaultPort,
 			&out->hostport);
 		if (begin_path >= 0) {

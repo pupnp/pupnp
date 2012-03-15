@@ -119,8 +119,11 @@ void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *d
 
 	HandleLock();
 	/* device info. */
-	if (GetDeviceHandleInfo(dest_addr->ss_family,
-				&handle, &dev_info) != HND_DEVICE) {
+	switch (GetDeviceHandleInfo((int)dest_addr->ss_family,
+				&handle, &dev_info)) {
+	case HND_DEVICE:
+		break;
+	default:
 		HandleUnlock();
 		/* no info found. */
 		return;
@@ -241,7 +244,12 @@ static int NewRequestHandler(
 	}
 
  end_NewRequestHandler:
-	shutdown(ReplySock, SD_BOTH);
+	ret = shutdown(ReplySock, SD_BOTH);
+	if (ret == -1) {
+		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+			   "Error in shutdown: %s\n", errorBuffer);
+	}
 	UpnpCloseSocket(ReplySock);
 
 	return ret;
@@ -823,7 +831,7 @@ error_handler:
 	return RetVal;
 }
 
-int DeviceShutdown(char *DevType, int RootDev, char *Udn, char *_Server,
+int DeviceShutdown(char *DevType, int RootDev, char *Udn, /*char *_Server,*/
 		   char *Location, int Duration, int AddressFamily,
 		   int PowerState, int SleepPeriod, int RegistrationState)
 {
@@ -903,7 +911,7 @@ error_handler:
 	free(msgs[2]);
 
 	return ret_code;
-	_Server = _Server;
+	//_Server = _Server;
 }
 #endif /* EXCLUDE_SSDP */
 #endif /* INCLUDE_DEVICE_APIS */
