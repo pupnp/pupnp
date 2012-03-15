@@ -393,6 +393,12 @@ if test "x$enable_ssdp" = xyes ; then
         AC_DEFINE(UPNP_HAVE_SSDP, 1, [see upnpconfig.h])
 fi
 
+RT_BOOL_ARG_ENABLE([optssdp], [yes], [optionnal SSDP headers support)])
+if test "x$enable_optssdp" = xyes ; then
+        AC_DEFINE(UPNP_HAVE_OPTSSDP, 1, [see upnpconfig.h])
+	enable_uuid=yes
+fi
+
 RT_BOOL_ARG_ENABLE([soap], [yes], [SOAP part])
 if test "x$enable_soap" = xyes ; then
         AC_DEFINE(UPNP_HAVE_SOAP, 1, [see upnpconfig.h])
@@ -401,7 +407,10 @@ fi
 RT_BOOL_ARG_ENABLE([gena], [yes], [GENA part])
 if test "x$enable_gena" = xyes ; then
         AC_DEFINE(UPNP_HAVE_GENA, 1, [see upnpconfig.h])
+	enable_uuid=yes
 fi
+
+AM_CONDITIONAL(ENABLE_UUID, test x"$enable_uuid" = xyes)
 
 RT_BOOL_ARG_ENABLE([tools], [yes], [helper APIs in upnptools.h])
 if test "x$enable_tools" = xyes ; then

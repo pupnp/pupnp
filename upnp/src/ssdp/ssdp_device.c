@@ -343,6 +343,7 @@ static void CreateServicePacket(
 	*packet = NULL;
 	if (msg_type == MSGTYPE_REPLY) {
 		if (PowerState > 0) {
+#ifdef UPNP_HAVE_OPTSSDP
 			ret_code = http_MakeMessage(&buf, 1, 1,
 					    "R" "sdc" "D" "sc" "ssc" "ssc" "ssc"
 					    "S" "Xc" "ssc" "ssc"
@@ -357,7 +358,21 @@ static void CreateServicePacket(
 					    "SleepPeriod: ", SleepPeriod,
 					    "RegistrationState: ",
 					    RegistrationState);
+#else
+                        ret_code = http_MakeMessage(&buf, 1, 1,
+					    "R" "sdc" "D" "sc" "ssc"
+					    "S" "ssc" "ssc"
+					    "sdc" "sdc" "sdcc", HTTP_OK,
+					    "CACHE-CONTROL: max-age=", duration,
+					    "EXT:", "LOCATION: ", location,
+					    "ST: ", nt, "USN: ",
+					    usn, "Powerstate: ", PowerState,
+					    "SleepPeriod: ", SleepPeriod,
+					    "RegistrationState: ",
+					    RegistrationState);
+#endif /* UPNP_HAVE_OPTSSDP */
 		} else {
+#ifdef UPNP_HAVE_OPTSSDP
 			ret_code = http_MakeMessage(&buf, 1, 1,
 					    "R" "sdc" "D" "sc" "ssc" "ssc" "ssc"
 					    "S" "Xc" "ssc" "sscc", HTTP_OK,
@@ -368,6 +383,14 @@ static void CreateServicePacket(
 					    "01-NLS: ", gUpnpSdkNLSuuid,
 					    X_USER_AGENT, "ST: ", nt, "USN: ",
 					    usn);
+#else
+			ret_code = http_MakeMessage(&buf, 1, 1,
+					    "R" "sdc" "D" "sc" "ssc"
+					    "S" "ssc" "sscc", HTTP_OK,
+					    "CACHE-CONTROL: max-age=", duration,
+					    "EXT:", "LOCATION: ", location,
+					    "ST: ", nt, "USN: ", usn);
+#endif /* UPNP_HAVE_OPTSSDP */
 		}
 		if (ret_code != 0) {
 			return;
@@ -394,6 +417,7 @@ static void CreateServicePacket(
 				host = "[" SSDP_IPV6_LINKLOCAL "]";
 		}
 		if (PowerState > 0) {
+#ifdef UPNP_HAVE_OPTSSDP
 			ret_code = http_MakeMessage(&buf, 1, 1,
 					    "Q" "sssdc" "sdc" "ssc" "ssc" "ssc"
 					    "ssc" "ssc" "S" "Xc" "ssc"
@@ -409,7 +433,23 @@ static void CreateServicePacket(
 					    PowerState, "SleepPeriod: ",
 					    SleepPeriod, "RegistrationState: ",
 					    RegistrationState);
+#else
+			ret_code = http_MakeMessage(&buf, 1, 1,
+					    "Q" "sssdc" "sdc" "ssc"
+					    "ssc" "ssc" "S" "ssc"
+					    "sdc" "sdc" "sdcc",
+					    HTTPMETHOD_NOTIFY, "*", (size_t) 1,
+					    "HOST: ", host, ":", SSDP_PORT,
+					    "CACHE-CONTROL: max-age=", duration,
+					    "LOCATION: ", location, "NT: ", nt,
+					    "NTS: ", nts,
+					    "USN: ", usn, "Powerstate: ",
+					    PowerState, "SleepPeriod: ",
+					    SleepPeriod, "RegistrationState: ",
+					    RegistrationState);
+#endif /* UPNP_HAVE_OPTSSDP */
 		} else {
+#ifdef UPNP_HAVE_OPTSSDP 
 			ret_code = http_MakeMessage(&buf, 1, 1,
 					    "Q" "sssdc" "sdc" "ssc" "ssc" "ssc"
 					    "ssc" "ssc" "S" "Xc" "sscc",
@@ -421,6 +461,16 @@ static void CreateServicePacket(
 					    "01-NLS: ", gUpnpSdkNLSuuid, "NT: ",
 					    nt, "NTS: ", nts, X_USER_AGENT,
 					    "USN: ", usn);
+#else
+			ret_code = http_MakeMessage(&buf, 1, 1,
+					    "Q" "sssdc" "sdc" "ssc"
+					    "ssc" "ssc" "S" "sscc",
+					    HTTPMETHOD_NOTIFY, "*", (size_t) 1,
+					    "HOST: ", host, ":", SSDP_PORT,
+					    "CACHE-CONTROL: max-age=", duration,
+					    "LOCATION: ", location, "NT: ", nt,
+					    "NTS: ", nts, "USN: ", usn);
+#endif /* UPNP_HAVE_OPTSSDP */
 		}
 		if (ret_code)
 			return;

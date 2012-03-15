@@ -4,6 +4,15 @@ Version 1.6.16
 
 2012-03-15 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Add --disable-optssdp option
+
+	Modify configure.ac to add --disable-optssdp option. This option will
+	remove OPT, 01-NLS and X_USER_AGENT headers from SSDP messages as those
+	headers are optional. If --disable-gena and disable-optssdp are both
+	used, uuid part will not be compiled anymore.
+
+2012-03-15 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Bug fix in ixmlNode_allowChildren
 
 	Commit d48d73720bd325062c4d3b9ce85f3944be4f562d added a bug in
