@@ -786,8 +786,9 @@ int http_Download( IN const char *url_str,
 		assert(*document != NULL);
 		if (msg_length <= *doc_length || *document == NULL)
 			UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
-				"msg_length(%d) <= *doc_length(%d) or document"
-				" is NULL", msg_length, *doc_length);
+				"msg_length(%" PRIzu ") <= *doc_length(%"
+				PRIzu ") or document is NULL",
+				msg_length, *doc_length);
 	}
 	if (response.msg.status_code == HTTP_OK) {
 		ret_code = 0;	/* success */
