@@ -108,7 +108,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 	IXML_Node *tmpNode2 = NULL;
 	IXML_Node *textNode = NULL;
 	const DOMString tmpStr;
-	char SERVER[200];
+	//char SERVER[200];
 	const DOMString dbgStr;
 	int NumCopy = 0;
 
@@ -127,7 +127,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 	}
 	defaultExp = SInfo->MaxAge;
 	/* get server info */
-	get_sdk_info(SERVER);
+	//get_sdk_info(SERVER);
 	/* parse the device list and send advertisements/replies */
 	while (NumCopy == 0 || (AdFlag && NumCopy < NUM_SSDP_COPY)) {
 		if (NumCopy != 0)
@@ -218,7 +218,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 				} else {
 					/* AdFlag == -1 */
 					DeviceShutdown(devType, i == 0lu, UDNstr,
-						       SERVER, SInfo->DescURL,
+						       /*SERVER,*/ SInfo->DescURL,
 						       Exp, SInfo->DeviceAf,
 						       SInfo->PowerState,
 						       SInfo->SleepPeriod,
@@ -812,10 +812,8 @@ static int create_ssdp_sock_v4(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() SO_REUSEADDR: %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_ERROR;
+		ret = UPNP_E_SOCKET_ERROR;
+		goto error_handler;
 	}
 #if defined(BSD) || defined(__OSX__) || defined(__APPLE__)
 	onOff = 1;
@@ -826,10 +824,8 @@ static int create_ssdp_sock_v4(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() SO_REUSEPORT: %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_ERROR;
+		ret = UPNP_E_SOCKET_ERROR;
+		goto error_handler;
 	}
 #endif /* BSD, __OSX__, __APPLE__ */
 	memset(&__ss, 0, sizeof(__ss));
@@ -842,10 +838,8 @@ static int create_ssdp_sock_v4(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in bind(), addr=0x%08X, port=%d: %s\n",
 			   INADDR_ANY, SSDP_PORT, errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_BIND;
+		ret = UPNP_E_SOCKET_BIND;
+		goto error_handler;
 	}
 	memset((void *)&ssdpMcastAddr, 0, sizeof(struct ip_mreq));
 	ssdpMcastAddr.imr_interface.s_addr = inet_addr(gIF_IPV4);
@@ -857,10 +851,8 @@ static int create_ssdp_sock_v4(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() IP_ADD_MEMBERSHIP (join multicast group): %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_ERROR;
+		ret = UPNP_E_SOCKET_ERROR;
+		goto error_handler;
 	}
 	/* Set multicast interface. */
 	memset((void *)&addr, 0, sizeof(struct in_addr));
@@ -885,13 +877,22 @@ static int create_ssdp_sock_v4(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() SO_BROADCAST (set broadcast): %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
+		ret = UPNP_E_NETWORK_ERROR;
+		goto error_handler;
+	}
+	ret = UPNP_E_SUCCESS;
 
-		return UPNP_E_NETWORK_ERROR;
+error_handler:
+	if (ret != UPNP_E_SUCCESS) {
+		if (shutdown(*ssdpSock, SD_BOTH) == -1) {
+			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+				   "Error in shutdown: %s\n", errorBuffer);
+                }
+                UpnpCloseSocket(*ssdpSock);
 	}
 
-	return UPNP_E_SUCCESS;
+	return ret;
 }
 
 #ifdef INCLUDE_CLIENT_APIS
@@ -953,10 +954,8 @@ static int create_ssdp_sock_v6(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() SO_REUSEADDR: %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_ERROR;
+		ret = UPNP_E_SOCKET_ERROR;
+		goto error_handler;
 	}
 #if defined(BSD) || defined(__OSX__) || defined(__APPLE__)
 	onOff = 1;
@@ -967,10 +966,8 @@ static int create_ssdp_sock_v6(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() SO_REUSEPORT: %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_ERROR;
+		ret = UPNP_E_SOCKET_ERROR;
+		goto error_handler;
 	}
 #endif /* BSD, __OSX__, __APPLE__ */
 	onOff = 1;
@@ -981,10 +978,8 @@ static int create_ssdp_sock_v6(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() IPV6_V6ONLY: %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_ERROR;
+		ret = UPNP_E_SOCKET_ERROR;
+		goto error_handler;
 	}
 	memset(&__ss, 0, sizeof(__ss));
 	ssdpAddr6->sin6_family = (sa_family_t)AF_INET6;
@@ -997,10 +992,8 @@ static int create_ssdp_sock_v6(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in bind(), addr=0x%032lX, port=%d: %s\n",
 			   0lu, SSDP_PORT, errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_BIND;
+		ret = UPNP_E_SOCKET_BIND;
+		goto error_handler;
 	}
 	memset((void *)&ssdpMcastAddr, 0, sizeof(ssdpMcastAddr));
 	ssdpMcastAddr.ipv6mr_interface = gIF_INDEX;
@@ -1013,10 +1006,8 @@ static int create_ssdp_sock_v6(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() IPV6_JOIN_GROUP (join multicast group): %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_ERROR;
+		ret = UPNP_E_SOCKET_ERROR;
+		goto error_handler;
 	}
 	onOff = 1;
 	ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_BROADCAST,
@@ -1026,13 +1017,22 @@ static int create_ssdp_sock_v6(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() SO_BROADCAST (set broadcast): %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
+		ret = UPNP_E_NETWORK_ERROR;
+		goto error_handler;
+	}
+	ret = UPNP_E_SUCCESS;
 
-		return UPNP_E_NETWORK_ERROR;
+error_handler:
+	if (ret != UPNP_E_SUCCESS) {
+		if (shutdown(*ssdpSock, SD_BOTH) == -1) {
+			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+				   "Error in shutdown: %s\n", errorBuffer);
+		}
+		UpnpCloseSocket(*ssdpSock);
 	}
 
-	return UPNP_E_SUCCESS;
+	return ret;
 }
 #endif /* IPv6 */
 
@@ -1067,10 +1067,8 @@ static int create_ssdp_sock_v6_ula_gua(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() SO_REUSEADDR: %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_ERROR;
+		ret = UPNP_E_SOCKET_ERROR;
+		goto error_handler;
 	}
 #if defined(BSD) || defined(__OSX__) || defined(__APPLE__)
 	onOff = 1;
@@ -1081,10 +1079,8 @@ static int create_ssdp_sock_v6_ula_gua(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() SO_REUSEPORT: %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_ERROR;
+		ret = UPNP_E_SOCKET_ERROR;
+		goto error_handler;
 	}
 #endif /* BSD, __OSX__, __APPLE__ */
 	onOff = 1;
@@ -1095,10 +1091,8 @@ static int create_ssdp_sock_v6_ula_gua(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() IPV6_V6ONLY: %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_ERROR;
+		ret = UPNP_E_SOCKET_ERROR;
+		goto error_handler;
 	}
 	memset(&__ss, 0, sizeof(__ss));
 	ssdpAddr6->sin6_family = (sa_family_t)AF_INET6;
@@ -1111,10 +1105,8 @@ static int create_ssdp_sock_v6_ula_gua(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in bind(), addr=0x%032lX, port=%d: %s\n",
 			   0lu, SSDP_PORT, errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_BIND;
+		ret = UPNP_E_SOCKET_BIND;
+		goto error_handler;
 	}
 	memset((void *)&ssdpMcastAddr, 0, sizeof(ssdpMcastAddr));
 	ssdpMcastAddr.ipv6mr_interface = gIF_INDEX;
@@ -1128,10 +1120,8 @@ static int create_ssdp_sock_v6_ula_gua(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() IPV6_JOIN_GROUP (join multicast group): %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
-
-		return UPNP_E_SOCKET_ERROR;
+		ret = UPNP_E_SOCKET_ERROR;
+		goto error_handler;
 	}
 	onOff = 1;
 	ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_BROADCAST,
@@ -1141,13 +1131,22 @@ static int create_ssdp_sock_v6_ula_gua(
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Error in setsockopt() SO_BROADCAST (set broadcast): %s\n",
 			   errorBuffer);
-		shutdown(*ssdpSock, SD_BOTH);
-		UpnpCloseSocket(*ssdpSock);
+		ret = UPNP_E_NETWORK_ERROR;
+		goto error_handler;
+	}
+	ret = UPNP_E_SUCCESS;
 
-		return UPNP_E_NETWORK_ERROR;
+error_handler:
+	if (ret != UPNP_E_SUCCESS) {
+		if (shutdown(*ssdpSock, SD_BOTH) == -1) {
+			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+				   "Error in shutdown: %s\n", errorBuffer);
+		}
+		UpnpCloseSocket(*ssdpSock);
 	}
 
-	return UPNP_E_SUCCESS;
+	return ret;
 }
 #endif /* IPv6 */
 

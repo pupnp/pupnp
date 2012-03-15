@@ -1096,7 +1096,7 @@ static char *safe_strdup(
 	assert(s != NULL);
 
 	if (s == NULL) {
-		return strdup("");
+		return strdup((const char*)"");
 	}
 	return strdup(s);
 }
@@ -1215,7 +1215,7 @@ static int Parser_processCDSect(
 	IXML_Node *node)
 {
     char *pEnd;
-    size_t tokenLength = 0;
+    size_t tokenLength = (size_t)0;
     char *pCDataStart;
 
     if( *pSrc == NULL ) {
@@ -1451,6 +1451,7 @@ ExitFunction:
  *
  * \return IXML_SUCCESS.
  */
+#if 0
 static int Parser_parseReference(
 	/*! [in] Currently unused. */
 	char *pStr)
@@ -1459,6 +1460,7 @@ static int Parser_parseReference(
 	return IXML_SUCCESS;
 	pStr = pStr;
 }
+#endif
 
 
 /*!
@@ -1746,9 +1748,9 @@ static int Parser_processAttribute(
 			line = __LINE__;
 			goto ExitFunction;
 		}
-		if (*pCur == '&') {
+		/*if (*pCur == '&') {
 			Parser_parseReference(++pCur);
-		}
+		}*/
 		pCur++;
 	}
 	/* clear token buffer */
@@ -1861,7 +1863,7 @@ static int Parser_getNextNode(
 			line = __LINE__;
 			ret = IXML_SUCCESS;
 			goto ExitFunction;
-		} else if ((xmlParser->tokenBuf).length == 0) {
+		} else if ((xmlParser->tokenBuf).length == (size_t)0) {
 			line = __LINE__;
 			ret = IXML_SYNTAX_ERR;
 			goto ExitFunction;
@@ -1901,8 +1903,16 @@ static int Parser_getNextNode(
 			line = __LINE__;
 			ret = IXML_SUCCESS;
 			goto ExitFunction;
-		} else if (xmlParser->state == eATTRIBUTE && xmlParser->pCurElement != NULL) {
-			if (Parser_processAttribute(xmlParser, node) != IXML_SUCCESS) {
+		} else if (xmlParser->pCurElement != NULL) {
+			switch (xmlParser->state) {
+			case eATTRIBUTE:
+				if (Parser_processAttribute(xmlParser, node) != IXML_SUCCESS) {
+					line = __LINE__;
+					ret = IXML_SYNTAX_ERR;
+					goto ExitFunction;
+				}
+				break;
+			default:
 				line = __LINE__;
 				ret = IXML_SYNTAX_ERR;
 				goto ExitFunction;
@@ -2139,7 +2149,7 @@ static BOOL Parser_hasDefaultNamespace(
 	/*! [in] The XML parser. */
 	Parser *xmlParser,
 	/*! [in] The Node to process. */
-	IXML_Node *newNode,
+	/*IXML_Node *newNode,*/
 	/*! [in,out] The name space URI. */
 	char **nsURI )
 {
@@ -2155,7 +2165,7 @@ static BOOL Parser_hasDefaultNamespace(
     }
 
     return FALSE;
-    newNode = newNode;
+    //newNode = newNode;
 }
 
 
@@ -2208,7 +2218,7 @@ static int Parser_processElementName(
     } else {
 	/* does element has default namespace */
         /* the node may have default namespace definition */
-        if (Parser_hasDefaultNamespace(xmlParser, newNode, &nsURI)) {
+        if (Parser_hasDefaultNamespace(xmlParser, /*newNode,*/ &nsURI)) {
             Parser_setElementNamespace(newElement, nsURI);
         } else {
             switch (xmlParser->state) {
@@ -2528,7 +2538,7 @@ static int Parser_readFileOrBuffer(
 	BOOL file)
 {
     long fileSize = 0;
-    size_t bytesRead = 0;
+    size_t bytesRead = (size_t)0;
     FILE *xmlFilePtr = NULL;
 
     if( file ) {
@@ -2543,7 +2553,7 @@ static int Parser_readFileOrBuffer(
                 return IXML_SYNTAX_ERR;
             }
 
-            xmlParser->dataBuffer = (char *)malloc((size_t)fileSize + 1);
+            xmlParser->dataBuffer = (char *)malloc((size_t)fileSize + (size_t)1);
             if( xmlParser->dataBuffer == NULL ) {
                 fclose( xmlFilePtr );
                 return IXML_INSUFFICIENT_MEMORY;

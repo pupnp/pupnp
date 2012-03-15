@@ -776,13 +776,13 @@ static IXML_Element *ixmlNode_cloneElement(
  */
 static IXML_Document *ixmlNode_cloneDoc(
 	/*! [in] The \b Node to clone. */
-	IXML_Document *nodeptr)
+	/*IXML_Document *nodeptr*/)
 {
 	IXML_Document *newDoc;
 	IXML_Node *docNode;
 	int rc;
 
-	assert(nodeptr != NULL);
+	//assert(nodeptr != NULL);
 
 	newDoc = (IXML_Document *)malloc(sizeof (IXML_Document));
 	if (newDoc == NULL) {
@@ -801,7 +801,7 @@ static IXML_Document *ixmlNode_cloneDoc(
 	newDoc->n.nodeType = eDOCUMENT_NODE;
 
 	return newDoc;
-	nodeptr = nodeptr;
+	//nodeptr = nodeptr;
 }
 
 /*!
@@ -968,7 +968,7 @@ static IXML_Node *ixmlNode_cloneNodeTreeRecursive(
 			break;
 
 		case eDOCUMENT_NODE:
-			newDoc = ixmlNode_cloneDoc((IXML_Document *)nodeptr);
+			newDoc = ixmlNode_cloneDoc(/*(IXML_Document *)nodeptr*/);
 			if (newDoc == NULL)
 				return NULL;
 			newNode = (IXML_Node *)newDoc;

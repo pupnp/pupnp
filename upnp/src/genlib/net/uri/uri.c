@@ -315,7 +315,7 @@ int token_cmp(token *in1, token *in2)
 
 int parse_hostport(
 	const char *in,
-	size_t max,
+	/*size_t max,*/
 	hostport_type *out)
 {
 	char workbuf[256];
@@ -446,7 +446,7 @@ int parse_hostport(
 	out->text.buff = in;
 
 	return (int)hostport_size;
-	max = max;
+	//max=max;
 }
 
 /*!
@@ -706,7 +706,7 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 	    in[begin_hostport + (size_t)1] == '/') {
 		begin_hostport += (size_t)2;
 		begin_path = parse_hostport(&in[begin_hostport],
-			max - begin_hostport,
+			/*max - begin_hostport,*/
 			&out->hostport);
 		if (begin_path >= 0) {
 			begin_path += (int)begin_hostport;

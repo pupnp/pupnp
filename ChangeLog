@@ -2,6 +2,17 @@
 Version 1.6.16
 *******************************************************************************
 
+2012-03-16 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Add more explicit casts and remove dead code
+
+	Comment unused SERVER from DeviceShutdown.
+	Comment unused max from parse_hostport.
+	Comment unused nodeptr from ixmlNode_cloneDoc.
+	Comment unused newNode from Parser_hasDefaultNamespace.
+	Comment unused Parser_parseReference function
+	Check return code of shutdown and display an error if needed.
+
 2012-03-15 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Fix previous commit

@@ -287,7 +287,7 @@ int parse_hostport(
 	/*! [in] String of characters representing host and port. */
 	const char *in,
 	/*! [in] Sets a maximum limit. */
-	size_t max,
+	/*size_t max,*/
 	/*! [out] Output parameter where the host and port are represented as
 	 * an internet address. */
 	hostport_type *out);

@@ -128,7 +128,7 @@ IXML_Node *ixmlNamedNodeMap_item(
 unsigned long ixmlNamedNodeMap_getLength(IXML_NamedNodeMap *nnMap)
 {
 	IXML_Node *tempNode;
-	unsigned long length = 0;
+	unsigned long length = 0lu;
 
 	if (nnMap != NULL) {
 		tempNode = nnMap->nodeItem;
