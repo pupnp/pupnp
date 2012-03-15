@@ -428,7 +428,6 @@ static BOOL ixmlNode_allowChildren(
 	case eTEXT_NODE:
 	case eCDATA_SECTION_NODE:
 		return FALSE;
-		break;
 
 	case eELEMENT_NODE:
 		switch (newChild->nodeType) {
@@ -443,9 +442,9 @@ static BOOL ixmlNode_allowChildren(
 	case eDOCUMENT_NODE:
 		switch (newChild->nodeType) {
 		case eELEMENT_NODE:
-			return FALSE;
-		default:
 			break;
+		default:
+			return FALSE;
 		}
 
 	default:
