@@ -162,10 +162,12 @@ endif
 
 
 # uuid
+if ENABLE_UUID
 libupnp_la_SOURCES += \
 	src/uuid/md5.c \
 	src/uuid/sysdep.c \
 	src/uuid/uuid.c
+endif
 
 
 # urlconfig

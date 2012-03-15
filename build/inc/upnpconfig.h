@@ -105,6 +105,11 @@
 #define UPNP_HAVE_SSDP 1
 
 
+/** Defined to 1 if the library has been compiled with optional SSDP headers
+ *  support (i.e. configure --enable-optssdp) */
+#define UPNP_HAVE_OPTSSDP 1
+
+
 /** Defined to 1 if the library has been compiled with the SOAP part enabled
  *  (i.e. configure --enable-soap) */
 #define UPNP_HAVE_SOAP 1

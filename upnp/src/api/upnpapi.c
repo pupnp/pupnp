@@ -179,8 +179,10 @@ int UpnpSdkDeviceRegisteredV4 = 0;
  * == 0 if unregistered, == 1 if registered. */
 int UpnpSdkDeviceregisteredV6 = 0;
 
+#ifdef HAVE_UPNP_OPTSSDP
 /*! Global variable used in discovery notifications. */
 Upnp_SID gUpnpSdkNLSuuid;
+#endif /* HAVE_UPNP_OPTSSDP */
 
 /*! Global variable used as to store the OpenSSL context object
  * to be used for all SSL/TLS connections
@@ -320,7 +322,9 @@ static int UpnpInitPreamble(void)
 {
 	int retVal = UPNP_E_SUCCESS;
 	int i;
+#ifdef UPNP_HAVE_OPTSSDP
 	uuid_upnp nls_uuid;
+#endif /* UPNP_HAVE_OPTSSDP */
 
 	retVal = WinsockInit();
 	if (retVal != UPNP_E_SUCCESS) {
@@ -345,9 +349,11 @@ static int UpnpInitPreamble(void)
 		return retVal;
 	}
 
+#ifdef UPNP_HAVE_OPTSSDP
 	/* Create the NLS uuid. */
 	uuid_create(&nls_uuid);
 	uuid_unpack(&nls_uuid, gUpnpSdkNLSuuid);
+#endif /* UPNP_HAVE_OPTSSDP */
 
 	/* Initializes the handle list. */
 	HandleLock();
