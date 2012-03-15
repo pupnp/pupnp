@@ -4,6 +4,12 @@ Version 1.6.16
 
 2012-03-15 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Fix previous commit
+
+	Replace HAVE_UPNP_OPTSSDP by UPNP_HAVE_OPTSSDP in upnpapi.c.
+
+2012-03-15 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Add --disable-optssdp option
 
 	Modify configure.ac to add --disable-optssdp option. This option will
