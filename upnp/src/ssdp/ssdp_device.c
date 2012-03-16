@@ -831,7 +831,7 @@ error_handler:
 	return RetVal;
 }
 
-int DeviceShutdown(char *DevType, int RootDev, char *Udn, /*char *_Server,*/
+int DeviceShutdown(char *DevType, int RootDev, char *Udn,
 		   char *Location, int Duration, int AddressFamily,
 		   int PowerState, int SleepPeriod, int RegistrationState)
 {
@@ -911,7 +911,6 @@ error_handler:
 	free(msgs[2]);
 
 	return ret_code;
-	//_Server = _Server;
 }
 #endif /* EXCLUDE_SSDP */
 #endif /* INCLUDE_DEVICE_APIS */

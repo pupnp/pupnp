@@ -313,9 +313,18 @@ int token_cmp(token *in1, token *in2)
 		return memcmp(in1->buff, in2->buff, in1->size);
 }
 
-int parse_hostport(
+/*!
+ * \brief Parses a string representing a host and port (e.g. "127.127.0.1:80"
+ * or "localhost") and fills out a hostport_type struct with internet address
+ * and a token representing the full host and port.
+ *
+ * Uses gethostbyname.
+ */
+static int parse_hostport(
+	/*! [in] String of characters representing host and port. */
 	const char *in,
-	/*size_t max,*/
+	/*! [out] Output parameter where the host and port are represented as
+	 * an internet address. */
 	unsigned short int defaultPort,
 	hostport_type *out)
 {
@@ -447,7 +456,6 @@ int parse_hostport(
 	out->text.buff = in;
 
 	return (int)hostport_size;
-	//max=max;
 }
 
 /*!
@@ -711,7 +719,6 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 			defaultPort = 443;
 		}
 		begin_path = parse_hostport(&in[begin_hostport],
-			/*max - begin_hostport,*/
 			defaultPort,
 			&out->hostport);
 		if (begin_path >= 0) {

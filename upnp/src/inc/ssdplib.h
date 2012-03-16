@@ -501,8 +501,6 @@ int DeviceShutdown(
 	int RootDev,
 	/* [in] Device UDN. */
 	char *Udn, 
-	/* [in] . */
-	/*char *_Server,*/
 	/* [in] Location URL. */
 	char *Location, 
 	/* [in] Device duration in sec. */

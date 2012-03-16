@@ -2148,8 +2148,6 @@ static int isTopLevelElement(
 static BOOL Parser_hasDefaultNamespace(
 	/*! [in] The XML parser. */
 	Parser *xmlParser,
-	/*! [in] The Node to process. */
-	/*IXML_Node *newNode,*/
 	/*! [in,out] The name space URI. */
 	char **nsURI )
 {
@@ -2165,7 +2163,6 @@ static BOOL Parser_hasDefaultNamespace(
     }
 
     return FALSE;
-    //newNode = newNode;
 }
 
 
@@ -2218,7 +2215,7 @@ static int Parser_processElementName(
     } else {
 	/* does element has default namespace */
         /* the node may have default namespace definition */
-        if (Parser_hasDefaultNamespace(xmlParser, /*newNode,*/ &nsURI)) {
+        if (Parser_hasDefaultNamespace(xmlParser, &nsURI)) {
             Parser_setElementNamespace(newElement, nsURI);
         } else {
             switch (xmlParser->state) {
