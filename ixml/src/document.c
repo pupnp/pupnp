@@ -165,8 +165,14 @@ IXML_Element *ixmlDocument_createElement(
 	const DOMString tagName)
 {
 	IXML_Element *newElement = NULL;
+	int ret = IXML_SUCCESS;
 
-	ixmlDocument_createElementEx(doc, tagName, &newElement);
+	ret = ixmlDocument_createElementEx(doc, tagName, &newElement);
+	if (ret != IXML_SUCCESS) {
+                IxmlPrintf(__FILE__, __LINE__, "ixmlDocument_createElement",
+			"Error %d\n", ret);
+		return NULL;
+        }
 	return newElement;
 }
 

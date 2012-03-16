@@ -320,6 +320,15 @@ Version 1.6.16
 
 2012-03-16 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Check return code in ixml
+
+	Check return code of ixmlDocument_CreateElementEx in
+	ixmlDocument_CreateElement.
+	Check return code of ixmlNode_setNodeName and ixmlNode_setNodeValue in
+	ixmlNode_cloneCDATASect and ixmlNode_cloneTextNode.
+
+2012-03-16 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	Add more explicit casts and remove dead code
 
 	Comment unused SERVER from DeviceShutdown.
