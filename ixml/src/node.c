@@ -655,6 +655,7 @@ static IXML_Node *ixmlNode_cloneTextNode(
 	IXML_Node *nodeptr)
 {
 	IXML_Node *newNode = NULL;
+	int rc;
 
 	assert(nodeptr != NULL);
 
@@ -663,8 +664,16 @@ static IXML_Node *ixmlNode_cloneTextNode(
 		return NULL;
 	} else {
 		ixmlNode_init(newNode);
-		ixmlNode_setNodeName(newNode, nodeptr->nodeName);
-		ixmlNode_setNodeValue(newNode, nodeptr->nodeValue);
+		rc = ixmlNode_setNodeName(newNode, nodeptr->nodeName);
+		if (rc != IXML_SUCCESS) {
+			ixmlNode_free(newNode);
+			return NULL;
+		}
+		rc = ixmlNode_setNodeValue(newNode, nodeptr->nodeValue);
+		if (rc != IXML_SUCCESS) {
+			ixmlNode_free(newNode);
+			return NULL;
+		}
 		newNode->nodeType = eTEXT_NODE;
 	}
 
@@ -683,15 +692,24 @@ static IXML_CDATASection *ixmlNode_cloneCDATASect(
 	IXML_CDATASection *newCDATA = NULL;
 	IXML_Node *newNode;
 	IXML_Node *srcNode;
+	int rc;
 
 	assert(nodeptr != NULL);
 	newCDATA = (IXML_CDATASection *)malloc(sizeof (IXML_CDATASection));
 	if (newCDATA != NULL) {
 		newNode = (IXML_Node *)newCDATA;
-		ixmlNode_init(newNode);
+		ixmlCDATASection_init(newCDATA);
 		srcNode = (IXML_Node *)nodeptr;
-		ixmlNode_setNodeName(newNode, srcNode->nodeName);
-		ixmlNode_setNodeValue(newNode, srcNode->nodeValue);
+		rc = ixmlNode_setNodeName(newNode, srcNode->nodeName);
+		if (rc != IXML_SUCCESS) {
+			ixmlCDATASection_free(newCDATA);
+			return NULL;
+		}
+		rc = ixmlNode_setNodeValue(newNode, srcNode->nodeValue);
+		if (rc != IXML_SUCCESS) {
+			ixmlCDATASection_free(newCDATA);
+			return NULL;
+		}
 		newNode->nodeType = eCDATA_SECTION_NODE;
 	}
 
