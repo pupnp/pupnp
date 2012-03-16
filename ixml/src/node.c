@@ -766,42 +766,32 @@ static IXML_Element *ixmlNode_cloneElement(
 
 
 /*!
- * \brief Returns a clone of a document node.
+ * \brief Returns a new document node.
  *
  * Currently, the IXML_Document struct is just a node, so this function
- * just mallocs the IXML_Document, sets the node type and name. Curiously,
- * the parameter nodeptr is not actually used.
+ * just mallocs the IXML_Document, sets the node type and name.
  *
- * \return A clone of a document node.
+ * \return A new document node.
  */
-static IXML_Document *ixmlNode_cloneDoc(
-	/*! [in] The \b Node to clone. */
-	/*IXML_Document *nodeptr*/)
+static IXML_Document *ixmlNode_newDoc(void)
 {
 	IXML_Document *newDoc;
 	IXML_Node *docNode;
 	int rc;
 
-	//assert(nodeptr != NULL);
-
 	newDoc = (IXML_Document *)malloc(sizeof (IXML_Document));
-	if (newDoc == NULL) {
+	if (!newDoc)
 		return NULL;
-	}
-
 	ixmlDocument_init(newDoc);
 	docNode = (IXML_Node *)newDoc;
-
 	rc = ixmlNode_setNodeName(docNode, DOCUMENTNODENAME);
 	if (rc != IXML_SUCCESS) {
 		ixmlDocument_free(newDoc);
 		return NULL;
 	}
-
 	newDoc->n.nodeType = eDOCUMENT_NODE;
 
 	return newDoc;
-	//nodeptr = nodeptr;
 }
 
 /*!
@@ -968,7 +958,7 @@ static IXML_Node *ixmlNode_cloneNodeTreeRecursive(
 			break;
 
 		case eDOCUMENT_NODE:
-			newDoc = ixmlNode_cloneDoc(/*(IXML_Document *)nodeptr*/);
+			newDoc = ixmlNode_newDoc();
 			if (newDoc == NULL)
 				return NULL;
 			newNode = (IXML_Node *)newDoc;

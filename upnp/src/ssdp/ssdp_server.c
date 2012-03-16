@@ -108,7 +108,6 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 	IXML_Node *tmpNode2 = NULL;
 	IXML_Node *textNode = NULL;
 	const DOMString tmpStr;
-	//char SERVER[200];
 	const DOMString dbgStr;
 	int NumCopy = 0;
 
@@ -126,8 +125,6 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 		goto end_function;
 	}
 	defaultExp = SInfo->MaxAge;
-	/* get server info */
-	//get_sdk_info(SERVER);
 	/* parse the device list and send advertisements/replies */
 	while (NumCopy == 0 || (AdFlag && NumCopy < NUM_SSDP_COPY)) {
 		if (NumCopy != 0)
@@ -218,7 +215,7 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 				} else {
 					/* AdFlag == -1 */
 					DeviceShutdown(devType, i == 0lu, UDNstr,
-						       /*SERVER,*/ SInfo->DescURL,
+						       SInfo->DescURL,
 						       Exp, SInfo->DeviceAf,
 						       SInfo->PowerState,
 						       SInfo->SleepPeriod,
