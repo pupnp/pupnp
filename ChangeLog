@@ -2,6 +2,13 @@
 Version 1.6.16
 *******************************************************************************
 
+2012-03-18 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Add infoSize parameter to get_sdk_info
+
+	Add infoSize parameter to get_sdk_info function to replace sprintf call
+	by a snprintf call.
+
 2012-03-16 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Check return code in ixml
