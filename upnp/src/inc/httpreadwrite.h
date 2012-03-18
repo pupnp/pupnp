@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation
  * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -616,6 +617,7 @@ int http_OpenHttpGetEx(IN const char *url_str,
  *
  * Parameters:
  *	OUT char *info;	buffer to store the operating system information
+ *	IN size_t infoSize; size of buffer
  *
  * Description:
  *	Returns the server information for the operating system
@@ -623,7 +625,7 @@ int http_OpenHttpGetEx(IN const char *url_str,
  * Return:
  *	UPNP_INLINE void
  ************************************************************************/
-void get_sdk_info( OUT char *info );
+void get_sdk_info( OUT char *info, IN size_t infoSize );
 
 #ifdef __cplusplus
 }	/* #extern "C" */

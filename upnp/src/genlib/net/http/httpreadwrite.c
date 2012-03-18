@@ -1588,7 +1588,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 		} else if (c == 'S' || c == 'U') {
 			/* SERVER or USER-AGENT header */
 			temp_str = (c == 'S') ? "SERVER: " : "USER-AGENT: ";
-			get_sdk_info(tempbuf);
+			get_sdk_info(tempbuf, sizeof(tempbuf));
 			if (http_MakeMessage(buf, http_major_version, http_minor_version,
 					     "ss", temp_str, tempbuf) != 0)
 				goto error_handler;
@@ -1949,6 +1949,7 @@ int http_OpenHttpGetEx(
  *
  * Parameters:
  *	OUT char *info;	buffer to store the operating system information
+ *	IN size_t infoSize; size of buffer
  *
  * Description:
  *	Returns the server information for the operating system
@@ -1957,14 +1958,14 @@ int http_OpenHttpGetEx(
  *	UPNP_INLINE void
  ************************************************************************/
 /* 'info' should have a size of at least 100 bytes */
-void get_sdk_info(OUT char *info)
+void get_sdk_info(OUT char *info, IN size_t infoSize)
 {
 #ifdef WIN32
 	OSVERSIONINFO versioninfo;
 	versioninfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
 	if (GetVersionEx(&versioninfo) != 0)
-		sprintf(info,
+		snprintf(info, infoSize,
 			"%d.%d.%d %d/%s, UPnP/1.0, Portable SDK for UPnP devices/"
 			PACKAGE_VERSION "\r\n", versioninfo.dwMajorVersion,
 			versioninfo.dwMinorVersion, versioninfo.dwBuildNumber,
@@ -1978,7 +1979,7 @@ void get_sdk_info(OUT char *info)
 	ret_code = uname(&sys_info);
 	if (ret_code == -1)
 		*info = '\0';
-	sprintf(info,
+	snprintf(info, infoSize,
 		"%s/%s, UPnP/1.0, Portable SDK for UPnP devices/"
 		PACKAGE_VERSION "\r\n", sys_info.sysname, sys_info.release);
 #endif
