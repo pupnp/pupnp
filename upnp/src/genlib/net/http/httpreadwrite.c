@@ -875,13 +875,13 @@ int http_WriteHttpPost( IN void *Handle,
 	}
 	if (handle->contentLength == UPNP_USING_CHUNKED) {
 		if (*size) {
-			size_t tempSize = (size_t)0;
-			tempbuf = malloc(*size +
-				CHUNK_HEADER_SIZE + CHUNK_TAIL_SIZE);
+			size_t tempSize = *size +
+				CHUNK_HEADER_SIZE + CHUNK_TAIL_SIZE;
+			tempbuf = malloc(tempSize);
 			if (!tempbuf)
 				return UPNP_E_OUTOF_MEMORY;
 			/* begin chunk */
-			sprintf(tempbuf, "%" PRIzx "\r\n", *size);
+			snprintf(tempbuf, tempSize, "%" PRIzx "\r\n", *size);
 			tempSize = strlen(tempbuf);
 			memcpy(tempbuf + tempSize, buf, *size);
 			memcpy(tempbuf + tempSize + *size, "\r\n", (size_t)2);
