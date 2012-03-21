@@ -286,6 +286,8 @@ dnl # "current:revision:age"
 dnl #
 dnl # - Code has changed in ixml
 dnl #	revision: 6 -> 7
+dnl # - Code has changed in threadutil
+dnl #   revision: 0 -> 1
 dnl # - Code has changed in upnp
 dnl #	revision: 1 -> 2
 dnl # - interface changed/added/removed in upnp
@@ -294,12 +296,12 @@ dnl # - interface added in upnp
 dnl #   age++(3)
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [2:7:0])
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:1:0])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [9:0:3])
 dnl #
 dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [2:7:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+AC_SUBST([LT_VERSION_THREADUTIL], [6:1:0])
 AC_SUBST([LT_VERSION_UPNP],       [9:0:3])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
