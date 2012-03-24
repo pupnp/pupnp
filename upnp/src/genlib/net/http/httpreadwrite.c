@@ -383,7 +383,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 
 	memset(Chunk_Header, 0, sizeof(Chunk_Header));
 	va_start(argp, fmt);
-	while ((c = *fmt++) != 0) {
+	while ((c = *fmt++)) {
 		if (c == 'I') {
 			Instr = va_arg(argp, struct SendInstruction *);
 			if (Instr->ReadSendSize >= 0)
@@ -1636,7 +1636,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 
 	memset(tempbuf, 0, sizeof(tempbuf));
 	va_start(argp, fmt);
-	while ((c = *fmt++) != 0) {
+	while ((c = *fmt++)) {
 		if (c == 's') {
 			/* C string */
 			s = (char *)va_arg(argp, char *);
