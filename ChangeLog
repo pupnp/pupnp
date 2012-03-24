@@ -2,6 +2,14 @@
 Version 1.6.17
 *******************************************************************************
 
+2012-03-24 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	SF Bug Tracker id 3510693 - build fail with --disable-device
+
+	GetDeviceHandleInfo just fail without using undefined member DeviceAf
+	if UPNP_HAVE_DEVICE is not defined.
+	Move ContentTypeHeader definition to soap_common.c, since it is
+	also used in soap_ctrlpt.c.
 
 *******************************************************************************
 Version 1.6.16

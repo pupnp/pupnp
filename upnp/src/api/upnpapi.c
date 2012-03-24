@@ -3729,6 +3729,7 @@ Upnp_Handle_Type GetDeviceHandleInfo(
 	UpnpDevice_Handle *device_handle_out,
 	struct Handle_Info **HndInfo)
 {
+#ifdef UPNP_HAVE_DEVICE
 	/* Check if we've got a registered device of the address family specified. */
 	if ((AddressFamily == AF_INET  && UpnpSdkDeviceRegisteredV4 == 0) ||
 	    (AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 0)) {
@@ -3748,6 +3749,7 @@ Upnp_Handle_Type GetDeviceHandleInfo(
 			break;
 		}
 	}
+#endif /* UPNP_HAVE_DEVICE */
 
 	*device_handle_out = -1;
 	return HND_INVALID;
