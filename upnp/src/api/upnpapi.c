@@ -84,14 +84,14 @@
 
 #ifndef IN6_IS_ADDR_GLOBAL
 #define IN6_IS_ADDR_GLOBAL(a) \
-		((((__const uint32_t *) (a))[0] & htonl(0x70000000)) \
-		== htonl (0x20000000))
+		((((__const uint32_t *) (a))[0] & htonl((uint32_t)0x70000000)) \
+		== htonl ((uint32_t)0x20000000))
 #endif /* IS ADDR GLOBAL */
 
 #ifndef IN6_IS_ADDR_ULA
 #define IN6_IS_ADDR_ULA(a) \
-		((((__const uint32_t *) (a))[0] & htonl(0xfe000000)) \
-		== htonl (0xfc000000))
+		((((__const uint32_t *) (a))[0] & htonl((uint32_t)0xfe000000)) \
+		== htonl ((uint32_t)0xfc000000))
 #endif /* IS ADDR ULA */
 
 /*! This structure is for virtual directory callbacks */

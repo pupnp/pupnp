@@ -332,6 +332,15 @@ Version 1.8.0
 Version 1.6.17
 *******************************************************************************
 
+2012-03-24 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Remove implicit casts
+
+	Cast parameters of htonl in uint32_t in IN6_IS_ADDR_GLOBAL and
+	IN6_IS_ADDR_ULA definitions.
+	Remove comparison with 0 in while statement of vfmatch,
+	http_SendMessage and http_MakeMessage.
+
 2012-03-24 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	SF Bug Tracker id 3510693 - build fail with --disable-device

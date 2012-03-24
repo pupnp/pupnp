@@ -979,7 +979,7 @@ static parse_status_t vfmatch(
     save_pos = scanner->cursor;
 
     status = PARSE_OK;
-    while( ( ( c = *fmt_ptr++ ) != 0 ) &&
+    while( ( c = *fmt_ptr++ ) &&
 	 ( status == ( parse_status_t ) PARSE_OK ) ) {
         if( c == '%' ) {
             c = *fmt_ptr++;
