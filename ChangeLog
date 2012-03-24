@@ -2,6 +2,20 @@
 Version 1.8.0
 *******************************************************************************
 
+2012-03-24 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	SF Bug Tracker id 3510595 - UpnpDownloadXmlDoc : can't get the file
+
+	Submitted: Marco Virgulti ( mvirg83 ) - 2012-03-23 10:08:08 PDT
+
+	There is a problem, perhaps, during downloading a document by
+	UpnpDownloadXmlDoc. During debugging i've found that in an not exported
+	api (unfortunately i forgot the code line...) where it is setted a
+	local variable "int timeout" to -1 then passed directly to another
+	function for sending data through tcp socket. I patched this setting it
+	to 0 (there is an IF section that exits if timeout < 0). It is normal
+	behavior or it is a bug?
+
 2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
 
 	Check for NULL pointer in TemplateSource.h

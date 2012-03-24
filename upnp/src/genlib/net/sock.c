@@ -174,8 +174,6 @@ static int sock_read_write(
 	size_t byte_left = (size_t)0;
 	ssize_t num_written;
 
-	if (*timeoutSecs < 0)
-		return UPNP_E_TIMEDOUT;
 	FD_ZERO(&readSet);
 	FD_ZERO(&writeSet);
 	if (bRead)
@@ -185,7 +183,7 @@ static int sock_read_write(
 	timeout.tv_sec = *timeoutSecs;
 	timeout.tv_usec = 0;
 	while (TRUE) {
-		if (*timeoutSecs == 0)
+		if (*timeoutSecs < 0)
 			retCode = select(sockfd + 1, &readSet, &writeSet,
 				NULL, NULL);
 		else
