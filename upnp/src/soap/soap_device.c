@@ -74,9 +74,6 @@ static const char *Soap_Invalid_Action = "Invalid Action";
 static const char *Soap_Action_Failed = "Action Failed";
 static const char *Soap_Invalid_Var = "Invalid Var";
 
-const char *ContentTypeHeader =
-    "CONTENT-TYPE: text/xml; charset=\"utf-8\"\r\n";
-
 /*!
  * \brief This function retrives the name of the SOAP action.
  *
