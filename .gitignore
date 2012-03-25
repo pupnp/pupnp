@@ -103,3 +103,7 @@ upnp/sample/tv_ctrlpt
 upnp/sample/tv_device
 docs/doxygen
 
+
+/build/vc10/out.vc9.Win32/Debug
+/build/vc10/out.vc10.Win32
+/build/vc10/out.vc10.x64
