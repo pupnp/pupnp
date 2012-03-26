@@ -444,9 +444,9 @@
 /* configure --enable-ssdp */
 #undef EXCLUDE_SSDP
 #if UPNP_HAVE_SSDP
-#       define EXCLUDE_SSSDP 0
+#       define EXCLUDE_SSDP 0
 #else
-#       define EXCLUDE_SSSDP 1
+#       define EXCLUDE_SSDP 1
 #endif
 
 /* configure --enable-soap */
