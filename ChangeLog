@@ -2,6 +2,16 @@
 Version 1.6.17
 *******************************************************************************
 
+2012-03-26 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	SF Bug Tracker id 3511149 - --disable-ssdp has no effect
+
+	Submitted: Yoichi NAKAYAMA ( yoichi ) - 2012-03-25 18:14:34 PDT
+
+	There are typos in upnp/src/inc/config.h "EXCLUDE_SSSDP" (shold be
+	EXCLUDE_SSDP), therefore EXCLUDE_SSDP is always 0, and --disable-ssdp
+	has no effect.
+
 2012-03-24 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Remove implicit casts
