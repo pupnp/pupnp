@@ -105,8 +105,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\lib\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\tmp\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\lib\$(ProjectName)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\tmp\$(ProjectName)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\lib\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\tmp\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\lib\</OutDir>
@@ -163,6 +163,9 @@
     <Lib>
       <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib;$(OutDir)..\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
+    <BuildLog>
+      <Path>$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>

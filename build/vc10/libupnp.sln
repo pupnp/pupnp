@@ -13,6 +13,25 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tvdevice", "tvdevice.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tvcombo", "tvcombo.vcxproj", "{6365804B-22C6-4D5E-91F3-0C052EB55B4F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{55AF07A8-18AA-45B8-A231-5082F1C6FC08}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\AUTHORS = ..\..\AUTHORS
+		..\..\bootstrap = ..\..\bootstrap
+		..\..\ChangeLog = ..\..\ChangeLog
+		..\..\configure.ac = ..\..\configure.ac
+		..\..\COPYING = ..\..\COPYING
+		..\..\Doxyfile = ..\..\Doxyfile
+		..\..\INSTALL = ..\..\INSTALL
+		..\..\libupnp.pc.in = ..\..\libupnp.pc.in
+		..\..\libupnp.spec = ..\..\libupnp.spec
+		..\..\LICENSE = ..\..\LICENSE
+		..\..\Makefile.am = ..\..\Makefile.am
+		..\..\NEWS = ..\..\NEWS
+		..\..\README = ..\..\README
+		..\..\THANKS = ..\..\THANKS
+		..\..\TODO = ..\..\TODO
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Lib|Win32 = Debug Lib|Win32

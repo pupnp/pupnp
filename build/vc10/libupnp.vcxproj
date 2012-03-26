@@ -113,26 +113,26 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\bin\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\tmp\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\tmp\$(ProjectName)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\bin\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\tmp\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\tmp\$(ProjectName)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\bin\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\tmp\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\tmp\$(ProjectName)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\bin\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\tmp\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\tmp\$(ProjectName)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug Lib|Win32'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\lib\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug Lib|Win32'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\tmp\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug Lib|x64'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\lib\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug Lib|x64'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\tmp\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release Lib|Win32'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\lib\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Lib|Win32'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\tmp\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release Lib|x64'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\lib\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Lib|x64'">$(SolutionDir)\out.vc9.$(Platform)\$(Configuration)\tmp\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug Lib|Win32'">$(SolutionDir)\out.vc10.$(Platform)\$(Configuration)\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug Lib|Win32'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\tmp\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug Lib|x64'">$(SolutionDir)\out.vc10.$(Platform)\$(Configuration)\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug Lib|x64'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\tmp\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release Lib|Win32'">$(SolutionDir)\out.vc10.$(Platform)\$(Configuration)\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Lib|Win32'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\tmp\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release Lib|x64'">$(SolutionDir)\out.vc10.$(Platform)\$(Configuration)\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Lib|x64'">$(SolutionDir)out.vc10.$(Platform)\$(Configuration)\tmp\$(ProjectName)\</IntDir>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug Lib|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug Lib|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug Lib|Win32'" />
@@ -198,7 +198,7 @@
       <AdditionalDependencies>pthreadvc2.lib;ws2_32.lib;iphlpapi.lib;ixml.lib;threadutil.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib;$(OutDir)..\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib\ixml;$(OutDir)..\lib\threadutil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -256,7 +256,7 @@
       <AdditionalDependencies>pthreadvc2.lib;ws2_32.lib;iphlpapi.lib;ixml.lib;threadutil.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib;$(OutDir)..\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib\ixml;$(OutDir)..\lib\threadutil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -311,7 +311,7 @@
       <AdditionalDependencies>pthreadvc2.lib;ws2_32.lib;iphlpapi.lib;ixml.lib;threadutil.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib;$(OutDir)..\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib\ixml;$(OutDir)..\lib\threadutil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -325,6 +325,15 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>$(OutDir)libupnp.bsc</OutputFile>
     </Bscmake>
+    <BuildLog>
+      <Path>$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <PostBuildEvent>
+      <Command>copy "$(SolutionDir)..\..\pthreads\lib\pthread*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Add pthreadVC2.dll to output</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
@@ -363,7 +372,7 @@
       <AdditionalDependencies>pthreadvc2.lib;ws2_32.lib;iphlpapi.lib;ixml.lib;threadutil.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib;$(OutDir)..\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib\ixml;$(OutDir)..\lib\threadutil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -412,7 +421,7 @@
       <Culture>0x0407</Culture>
     </ResourceCompile>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib;$(OutDir)..\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib\ixml;$(OutDir)..\lib\threadutil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -453,7 +462,7 @@
       <Culture>0x0407</Culture>
     </ResourceCompile>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib;$(OutDir)..\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib\ixml;$(OutDir)..\lib\threadutil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -497,7 +506,7 @@
       <Culture>0x0407</Culture>
     </ResourceCompile>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib;$(OutDir)..\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib\ixml;$(OutDir)..\lib\threadutil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -541,7 +550,7 @@
       <Culture>0x0407</Culture>
     </ResourceCompile>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib;$(OutDir)..\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\pthreads\;..\..\pthreads\lib;$(OutDir)..\lib\ixml;$(OutDir)..\lib\threadutil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
