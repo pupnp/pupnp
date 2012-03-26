@@ -368,9 +368,11 @@ static int UpnpInitPreamble(void)
 		return retVal;
 	}
 
+#ifdef INCLUDE_DEVICE_APIS
 #if EXCLUDE_SOAP == 0
 	SetSoapCallback(soap_device_callback);
 #endif
+#endif /* INCLUDE_DEVICE_APIS */
 
 #if EXCLUDE_GENA == 0
 	SetGenaCallback(genaCallback);
@@ -3831,7 +3833,7 @@ Upnp_Handle_Type GetDeviceHandleInfo(
 	UpnpDevice_Handle *device_handle_out,
 	struct Handle_Info **HndInfo)
 {
-#ifdef UPNP_HAVE_DEVICE
+#ifdef INCLUDE_DEVICE_APIS
 	/* Check if we've got a registered device of the address family specified. */
 	if ((AddressFamily == AF_INET  && UpnpSdkDeviceRegisteredV4 == 0) ||
 	    (AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 0)) {
@@ -3851,7 +3853,7 @@ Upnp_Handle_Type GetDeviceHandleInfo(
 			break;
 		}
 	}
-#endif /* UPNP_HAVE_DEVICE */
+#endif /* INCLUDE_DEVICE_APIS */
 
 	*device_handle_out = -1;
 	return HND_INVALID;
