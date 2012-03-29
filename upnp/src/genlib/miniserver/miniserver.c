@@ -91,10 +91,11 @@ uint16_t miniStopSockPort;
 /*!
  * module vars
  */
+static MiniServerState gMServState = MSERV_IDLE;
+#ifdef INTERNAL_WEB_SERVER
 static MiniServerCallback gGetCallback = NULL;
 static MiniServerCallback gSoapCallback = NULL;
 static MiniServerCallback gGenaCallback = NULL;
-static MiniServerState gMServState = MSERV_IDLE;
 
 void SetHTTPGetCallback(MiniServerCallback callback)
 {
@@ -113,7 +114,6 @@ void SetGenaCallback(MiniServerCallback callback)
 	gGenaCallback = callback;
 }
 
-#ifdef INTERNAL_WEB_SERVER
 /*!
  * \brief Based on the type pf message, appropriate callback is issued.
  *
@@ -340,7 +340,7 @@ static int receive_from_stopSock(SOCKET ssock, fd_set *set)
 		clientLen = sizeof(clientAddr);
 		memset((char *)&clientAddr, 0, sizeof(clientAddr));
 		byteReceived = recvfrom(ssock, requestBuf,
-			25, 0, (struct sockaddr *)&clientAddr, &clientLen);
+			(size_t)25, 0, (struct sockaddr *)&clientAddr, &clientLen);
 		if (byteReceived > 0) {
 			requestBuf[byteReceived] = '\0';
 			inet_ntop(AF_INET,
@@ -476,7 +476,7 @@ static int get_port(
 		*port = ntohs(((struct sockaddr_in6*)&sockinfo)->sin6_port);
 	}
 	UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
-		"sockfd = %d, .... port = %u\n", sockfd, *port);
+		"sockfd = %d, .... port = %d\n", sockfd, (int)*port);
 
 	return 0;
 }
@@ -511,12 +511,12 @@ static int get_miniserver_sockets(
 	struct sockaddr_storage __ss_v4;
 	struct sockaddr_in* serverAddr4 = (struct sockaddr_in*)&__ss_v4;
 	SOCKET listenfd4;
-	uint16_t actual_port4;
+	uint16_t actual_port4 = 0u;
 #ifdef UPNP_ENABLE_IPV6
 	struct sockaddr_storage __ss_v6;
 	struct sockaddr_in6* serverAddr6 = (struct sockaddr_in6*)&__ss_v6;
 	SOCKET listenfd6;
-	uint16_t actual_port6;
+	uint16_t actual_port6 = 0u;
 	int onOff;
 #endif
 	int ret_code;
@@ -548,19 +548,19 @@ static int get_miniserver_sockets(
 	/* As per the IANA specifications for the use of ports by applications
 	 * override the listen port passed in with the first available. */
 	if (listen_port4 < APPLICATION_LISTENING_PORT) {
-		listen_port4 = APPLICATION_LISTENING_PORT;
+		listen_port4 = (uint16_t)APPLICATION_LISTENING_PORT;
 	}
 #ifdef UPNP_ENABLE_IPV6
 	if (listen_port6 < APPLICATION_LISTENING_PORT) {
-		listen_port6 = APPLICATION_LISTENING_PORT;
+		listen_port6 = (uint16_t)APPLICATION_LISTENING_PORT;
 	}
 #endif
 	memset(&__ss_v4, 0, sizeof (__ss_v4));
-	serverAddr4->sin_family = AF_INET;
+	serverAddr4->sin_family = (sa_family_t)AF_INET;
 	serverAddr4->sin_addr.s_addr = htonl(INADDR_ANY);
 #ifdef UPNP_ENABLE_IPV6
 	memset(&__ss_v6, 0, sizeof (__ss_v6));
-	serverAddr6->sin6_family = AF_INET6;
+	serverAddr6->sin6_family = (sa_family_t)AF_INET6;
 	serverAddr6->sin6_addr = in6addr_any;
 #endif
 	/* Getting away with implementation of re-using address:port and
@@ -763,7 +763,7 @@ static int get_miniserver_sockets(
 #else
 	/* Silence compiler warning message:
 	 * warning: unused parameter ‘listen_port6’ */
-	listen_port6 = 0;
+	listen_port6 = 0u;
 #endif
 	return UPNP_E_SUCCESS;
 }
@@ -797,7 +797,7 @@ static int get_miniserver_stopsock(
 	}
 	/* Bind to local socket. */
 	memset(&stop_sockaddr, 0, sizeof (stop_sockaddr));
-	stop_sockaddr.sin_family = AF_INET;
+	stop_sockaddr.sin_family = (sa_family_t)AF_INET;
 	stop_sockaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	ret = bind(miniServerStopSock, (struct sockaddr *)&stop_sockaddr,
 		sizeof(stop_sockaddr));
@@ -827,9 +827,9 @@ static UPNP_INLINE void InitMiniServerSockArray(MiniServerSockArray *miniSocket)
 	miniSocket->ssdpSock4 = INVALID_SOCKET;
 	miniSocket->ssdpSock6 = INVALID_SOCKET;
 	miniSocket->ssdpSock6UlaGua = INVALID_SOCKET;
-	miniSocket->stopPort = 0;
-	miniSocket->miniServerPort4 = 0;
-	miniSocket->miniServerPort6 = 0;
+	miniSocket->stopPort = 0u;
+	miniSocket->miniServerPort4 = 0u;
+	miniSocket->miniServerPort6 = 0u;
 #ifdef INCLUDE_CLIENT_APIS
 	miniSocket->ssdpReqSock4 = INVALID_SOCKET;
 	miniSocket->ssdpReqSock6 = INVALID_SOCKET;
@@ -852,7 +852,10 @@ int StartMiniServer(
 
 	memset(&job, 0, sizeof(job));
 
-	if (gMServState != MSERV_IDLE) {
+	switch (gMServState) {
+	case MSERV_IDLE:
+		break;
+	default:
 		/* miniserver running. */
 		return UPNP_E_INTERNAL_ERROR;
 	}
@@ -907,9 +910,9 @@ int StartMiniServer(
 	}
 	/* Wait for miniserver to start. */
 	count = 0;
-	while (gMServState != MSERV_RUNNING && count < max_count) {
+	while (gMServState != (MiniServerState)MSERV_RUNNING && count < max_count) {
 		/* 0.05s */
-		usleep(50 * 1000);
+		usleep(50u * 1000u);
 		count++;
 	}
 	if (count >= max_count) {
@@ -943,9 +946,11 @@ int StopMiniServer()
 	char buf[256] = "ShutDown";
 	size_t bufLen = strlen(buf);
 
-	if(gMServState == MSERV_RUNNING) {
+	switch(gMServState) {
+	case MSERV_RUNNING:
 		gMServState = MSERV_STOPPING;
-	} else {
+		break;
+	default:
 		return 0;
 	}
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -956,17 +961,17 @@ int StopMiniServer()
 			errorBuffer);
 		return 0;
 	}
-	while(gMServState != MSERV_IDLE) {
-		ssdpAddr.sin_family = AF_INET;
+	while(gMServState != (MiniServerState)MSERV_IDLE) {
+		ssdpAddr.sin_family = (sa_family_t)AF_INET;
 		ssdpAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 		ssdpAddr.sin_port = htons(miniStopSockPort);
 		sendto(sock, buf, bufLen, 0,
 			(struct sockaddr *)&ssdpAddr, socklen);
-		usleep(1000);
-		if (gMServState == MSERV_IDLE) {
+		usleep(1000u);
+		if (gMServState == (MiniServerState)MSERV_IDLE) {
 			break;
 		}
-		isleep(1);
+		isleep(1u);
 	}
 	sock_close(sock);
 
