@@ -332,6 +332,17 @@ Version 1.8.0
 Version 1.6.17
 *******************************************************************************
 
+2012-03-29 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	SF Bug Tracker id 3512833 - Miniserver is wrongly disabled
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-29 07:36:34 PDT
+
+	Miniserver is disabled if ECXLUDE_GENA, EXCLUDE_SOAP and
+	EXCLUDE_WEBSERVER are set.
+	However, SSDP needs the Miniserver to answer to M-SEARCH requests.
+	So, MiniServer should not be disabled if EXCLUDE_SSDP is not also set.
+
 2012-03-26 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	SF Bug Tracker id 3510693 - build fail with --disable-device
