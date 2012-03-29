@@ -334,6 +334,12 @@ Version 1.6.17
 
 2012-03-29 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
+	Removing implicit casts in miniserver.c
+
+	Removing implicit integer or enum casts in miniserver.c.
+
+2012-03-29 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
 	SF Bug Tracker id 3512833 - Miniserver is wrongly disabled
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-29 07:36:34 PDT
