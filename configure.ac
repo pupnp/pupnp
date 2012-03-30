@@ -444,6 +444,11 @@ if test "x$enable_ipv6" = xyes ; then
         AC_DEFINE(UPNP_ENABLE_IPV6, 1, [see upnpconfig.h])
 fi
 
+RT_BOOL_ARG_ENABLE([unspecified_server], [no], [unspecified SERVER header])
+if test "x$enable_unspecified_server" = xyes ; then
+        AC_DEFINE(UPNP_ENABLE_UNSPECIFIED_SERVER, 1, [see upnpconfig.h])
+fi
+
 RT_BOOL_ARG_ENABLE([open_ssl], [no], [open-ssl support])
 if test "x$enable_open_ssl" = xyes ; then
         AC_DEFINE(UPNP_ENABLE_OPEN_SSL, 1, [see upnpconfig.h])

@@ -136,6 +136,9 @@
 /* #undef UPNP_ENABLE_OPEN_SSL */
 
 /* see upnpconfig.h */
+/* #undef UPNP_ENABLE_UNSPECIFIED_SERVER */
+
+/* see upnpconfig.h */
 #define UPNP_HAVE_CLIENT 1
 
 /* see upnpconfig.h */

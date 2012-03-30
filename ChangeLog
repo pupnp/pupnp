@@ -332,6 +332,14 @@ Version 1.8.0
 Version 1.6.17
 *******************************************************************************
 
+2012-03-30 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Add --enable-unspecified_server
+
+	Add --enable-unspecified_server configure option to set to "Unspecified"
+	the OS name, OS version, product name and product version normally
+	contained in the SERVER header as this could be used by an attacker.
+
 2012-03-29 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Removing implicit casts in miniserver.c
