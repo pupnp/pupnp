@@ -2118,6 +2118,9 @@ int http_OpenHttpGetEx(
 /* 'info' should have a size of at least 100 bytes */
 void get_sdk_info(OUT char *info, IN size_t infoSize)
 {
+#ifdef UPNP_ENABLE_UNSPECIFIED_SERVER
+	snprintf(info, infoSize, "Unspecified, UPnP/1.0, Unspecified\r\n");
+#else /* UPNP_ENABLE_UNSPECIFIED_SERVER */
 #ifdef WIN32
 	OSVERSIONINFO versioninfo;
 	versioninfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -2141,5 +2144,6 @@ void get_sdk_info(OUT char *info, IN size_t infoSize)
 		"%s/%s, UPnP/1.0, Portable SDK for UPnP devices/"
 		PACKAGE_VERSION "\r\n", sys_info.sysname, sys_info.release);
 #endif
+#endif /* UPNP_ENABLE_UNSPECIFIED_SERVER */
 }
 

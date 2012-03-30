@@ -434,6 +434,11 @@ if test "x$enable_ipv6" = xyes ; then
         AC_DEFINE(UPNP_ENABLE_IPV6, 1, [see upnpconfig.h])
 fi
 
+RT_BOOL_ARG_ENABLE([unspecified_server], [no], [unspecified SERVER header])
+if test "x$enable_unspecified_server" = xyes ; then
+        AC_DEFINE(UPNP_ENABLE_UNSPECIFIED_SERVER, 1, [see upnpconfig.h])
+fi
+
 RT_BOOL_ARG_ENABLE([notification_reordering], [yes], [GENA notification reordering in gena_device.c])
 if test "x$enable_notification_reordering" = xyes ; then
         AC_DEFINE(UPNP_ENABLE_NOTIFICATION_REORDERING, 1, [see upnpconfig.h])
