@@ -130,10 +130,10 @@
 /* #undef UPNP_ENABLE_IPV6 */
 
 /* see upnpconfig.h */
-/* #undef UPNP_ENABLE_UNSPECIFIED_SERVER */
+#define UPNP_ENABLE_NOTIFICATION_REORDERING 1
 
 /* see upnpconfig.h */
-#define UPNP_ENABLE_NOTIFICATION_REORDERING 1
+/* #undef UPNP_ENABLE_UNSPECIFIED_SERVER */
 
 /* see upnpconfig.h */
 #define UPNP_HAVE_CLIENT 1
