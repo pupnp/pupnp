@@ -2,6 +2,15 @@
 Version 1.6.17
 *******************************************************************************
 
+2012-04-02 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	SF Bug Tracker id 3514145 - Memory leak fix in threadutil
+
+	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-04-02 06:49:20 PDT
+
+	Put thread in a detached state when calling ithread_create otherwise in
+	some circumstances, thread can end before the call to ithread_detach.
+
 2012-03-30 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Add --enable-unspecified_server
