@@ -5,6 +5,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation 
  * All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met: 
@@ -76,7 +77,8 @@ extern "C" {
 
 
 #define ITHREAD_STACK_MIN PTHREAD_STACK_MIN
-
+#define ITHREAD_CREATE_DETACHED PTHREAD_CREATE_DETACHED
+#define ITHREAD_CREATE_JOINABLE PTHREAD_CREATE_JOINABLE
 
 /***************************************************************************
  * Name: ithread_t
@@ -777,6 +779,22 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
    *      See man page for pthread_attr_setstacksize
    ***************************************************************************/
 #define ithread_attr_setstacksize pthread_attr_setstacksize
+
+  /****************************************************************************
+   * Function: ithread_attr_setdetachstate
+   *
+   *  Description:
+   *      Sets detach state of a thread attribute object.
+   *  Parameters:
+   *      ithread_attr_t *attr (must be valid non NULL pointer to
+   *      ithread_attr_t)
+   *      int detachstate (value of detachstate must be ITHREAD_CREATE_DETACHED
+   *      or ITHREAD_CREATE_JOINABLE)
+   *  Returns:
+   *      0 on success. Nonzero on failure.
+   *      See man page for pthread_attr_setdetachstate
+   ***************************************************************************/
+#define ithread_attr_setdetachstate pthread_attr_setdetachstate
 
   /****************************************************************************
    * Function: ithread_create
