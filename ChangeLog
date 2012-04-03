@@ -332,6 +332,12 @@ Version 1.8.0
 Version 1.6.18
 *******************************************************************************
 
+2012-04-03 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
+
+	Compilation optimisation
+
+	Do not compile the code related to the webserver in http_SendMessage
+	when --disable-webserver is set
 
 *******************************************************************************
 Version 1.6.17
