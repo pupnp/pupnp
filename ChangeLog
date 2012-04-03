@@ -405,7 +405,7 @@ Version 1.6.16
 2012-03-08 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Memory leaks correction in upnpapi.c
-	
+
 	Fix memory leaks in UpnpUnSubscribe, SendActionExAsync and
 	RenewSubscription.
 
