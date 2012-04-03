@@ -363,27 +363,32 @@ ExitFunction:
 
 int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 {
+#if EXCLUDE_WEB_SERVER == 0
 	FILE *Fp;
-	va_list argp;
 	struct SendInstruction *Instr = NULL;
-	char *buf = NULL;
 	char *filename = NULL;
 	char *file_buf = NULL;
 	char *ChunkBuf = NULL;
+	/* 10 byte allocated for chunk header. */
 	char Chunk_Header[CHUNK_HEADER_SIZE];
+	size_t num_read;
+	size_t amount_to_be_read = (size_t)0;
+	size_t Data_Buf_Size = WEB_SERVER_BUF_SIZE;
+#endif /* EXCLUDE_WEB_SERVER */
+	va_list argp;
+	char *buf = NULL;
 	char c;
 	int nw;
 	int RetVal = 0;
 	size_t buf_length;
-	size_t num_read;
 	size_t num_written;
-	size_t amount_to_be_read = (size_t)0;
-	/* 10 byte allocated for chunk header. */
-	size_t Data_Buf_Size = WEB_SERVER_BUF_SIZE;
 
+#if EXCLUDE_WEB_SERVER == 0
 	memset(Chunk_Header, 0, sizeof(Chunk_Header));
+#endif /* EXCLUDE_WEB_SERVER */
 	va_start(argp, fmt);
 	while ((c = *fmt++)) {
+#if EXCLUDE_WEB_SERVER == 0
 		if (c == 'I') {
 			Instr = va_arg(argp, struct SendInstruction *);
 			if (Instr->ReadSendSize >= 0)
@@ -505,7 +510,9 @@ Cleanup_File:
 				fclose(Fp);
 			}
 			goto ExitFunction;
-		} else if (c == 'b') {
+		} else
+#endif /* EXCLUDE_WEB_SERVER */
+		if (c == 'b') {
 			/* memory buffer */
 			buf = va_arg(argp, char *);
 			buf_length = va_arg(argp, size_t);
@@ -527,7 +534,9 @@ Cleanup_File:
 
 ExitFunction:
 	va_end(argp);
+#if EXCLUDE_WEB_SERVER == 0
 	free(ChunkBuf);
+#endif /* EXCLUDE_WEB_SERVER */
 	return RetVal;
 }
 
