@@ -303,6 +303,19 @@ dnl ############################################################################
 dnl # Release 1.6.17:
 dnl # "current:revision:age"
 dnl #
+dnl # - Code has changed in threadutil
+dnl #   revision: 1 -> 2
+dnl # - Code has changed in upnp
+dnl #   revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:7:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:2:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [9:1:3])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.18:
+dnl # "current:revision:age"
+dnl #
 dnl # -
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [::])

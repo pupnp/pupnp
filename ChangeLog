@@ -329,6 +329,11 @@ Version 1.8.0
 	FileInfo.
 
 *******************************************************************************
+Version 1.6.18
+*******************************************************************************
+
+
+*******************************************************************************
 Version 1.6.17
 *******************************************************************************
 
@@ -1080,6 +1085,20 @@ Version 1.6.16
 	returns UPNP_E_SUCCESS.
 
 	This fixes the an issue introduced by the previous fix.
+
+2012-02-23 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	SF Bug Tracker id 3489990 - some files are missing in tarball
+
+	Submitted: Yoichi NAKAYAMA ( yoichi ) - 2012-02-21 06:52:57 PST
+
+	Released tarball (e.g. libupnp-1.6.15.tar.bz2) does not contain
+	some files under upnp/{inc,src} used by the project files for
+	windows (build/vc8/libupnp. vcproj and build/vc9/libupnp.vcproj).
+
+	This breaks build on Windows from tarball released after following changes
+	http://pupnp.git.sourceforge.net/git/gitweb.cgi?p=pupnp/pupnp;a=commitdiff;h=0eba550da039be01211b56fea0d02d03f0a12343
+	http://pupnp.git.sourceforge.net/git/gitweb.cgi?p=pupnp/pupnp;a=commitdiff;h=7a796b264ec7d5de5876fd6a2001c2d329709e02
 
 2012-02-23 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
