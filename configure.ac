@@ -303,16 +303,19 @@ dnl ############################################################################
 dnl # Release 1.6.17:
 dnl # "current:revision:age"
 dnl #
-dnl # -
+dnl # - Code has changed in threadutil
+dnl #   revision: 1 -> 2
+dnl # - Code has changed in upnp
+dnl #   revision: 0 -> 1
 dnl #
-dnl #AC_SUBST([LT_VERSION_IXML],       [::])
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [::])
-dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:7:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:2:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [9:1:3])
 dnl #
 dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [2:7:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [6:1:0])
-AC_SUBST([LT_VERSION_UPNP],       [9:0:3])
+AC_SUBST([LT_VERSION_THREADUTIL], [6:2:0])
+AC_SUBST([LT_VERSION_UPNP],       [9:1:3])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
