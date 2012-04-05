@@ -332,6 +332,15 @@ Version 1.8.0
 Version 1.6.18
 *******************************************************************************
 
+2012-03-26 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Fix type of local variable stopSock in RunMiniServer()
+
+	The variable is declared as SOCKET, but it is used to
+	store return value of int receive_from_stopSock(...).
+	The type was changed in the commit
+	4b47e6a51d9c7049a862695b68de75699e023551 by mistake.
+
 2012-04-03 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	Compilation optimisation
