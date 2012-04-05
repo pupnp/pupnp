@@ -377,7 +377,7 @@ static void RunMiniServer(
 	fd_set rdSet;
 	SOCKET maxMiniSock;
 	int ret = 0;
-	SOCKET stopSock = 0;
+	int stopSock = 0;
 
 	maxMiniSock = 0;
 	maxMiniSock = max(maxMiniSock, miniSock->miniServerSock4);
