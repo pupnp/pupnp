@@ -332,7 +332,17 @@ Version 1.8.0
 Version 1.6.18
 *******************************************************************************
 
-2012-03-26 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+2012-04-05 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	SF Bug Tracker id 3507819 - Use of thread-unsafe gmtime() in httpreadwrite.c
+
+	Submitted: zephyrus ( zephyrus00jp ) - 2012-03-18 06:31:00 PDT
+
+	Define http_gmtime_r and web_server_asctime_r and use it.
+	Those prefix are added since pthread for Win32 already
+	has macro gmtime_r and asctime_r.
+
+2012-04-05 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	Fix type of local variable stopSock in RunMiniServer()
 
