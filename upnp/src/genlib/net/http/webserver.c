@@ -132,6 +132,20 @@ static const char *gMediaTypes[] = {
 #define NUM_MEDIA_TYPES       69
 #define NUM_HTTP_HEADER_NAMES 33
 
+#define ASCTIME_R_BUFFER_SIZE 26
+#ifdef WIN32
+static char *web_server_asctime_r(const struct tm *tm, char *buf)
+{
+	if (tm == NULL || buf == NULL)
+		return NULL;
+
+	asctime_s(buf, ASCTIME_R_BUFFER_SIZE, tm);
+	return buf;
+}
+#else
+#define web_server_asctime_r asctime_r
+#endif
+
 /* sorted by file extension; must have 'NUM_MEDIA_TYPES' extensions */
 static const char *gEncodedMediaTypes =
 	"aif\0" AUDIO_STR "aiff\0"
@@ -512,6 +526,8 @@ static int get_file_info(
 	struct stat s;
 	FILE *fp;
 	int rc = 0;
+	struct tm date;
+	char buffer[ASCTIME_R_BUFFER_SIZE];
 
 	ixmlFreeDOMString(info->content_type);	
 	info->content_type = NULL;
@@ -535,7 +551,8 @@ static int get_file_info(
 	UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
 		"file info: %s, length: %lld, last_mod=%s readable=%d\n",
 		filename, (long long)info->file_length,
-		asctime(gmtime(&info->last_modified)), info->is_readable);
+		web_server_asctime_r(http_gmtime_r(&info->last_modified, &date), buffer),
+		info->is_readable);
 
 	return rc;
 }

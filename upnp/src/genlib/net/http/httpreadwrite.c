@@ -164,6 +164,18 @@ static int private_connect(
 #endif /* UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS */
 }
 
+#ifdef WIN32
+struct tm *http_gmtime_r(const time_t *clock, struct tm *result)
+{
+	if (clock == NULL || *clock < 0 || result == NULL)
+		return NULL;
+
+	/* gmtime in VC runtime is thread safe. */
+	*result = *gmtime(clock);
+	return result;
+}
+#endif
+
 int http_FixUrl(IN uri_type *url, OUT uri_type *fixed_url)
 {
 	const char *temp_path = "/";
@@ -1624,6 +1636,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 	size_t length;
 	time_t *loc_time;
 	time_t curr_time;
+	struct tm date_storage;
 	struct tm *date;
 	const char *start_str;
 	const char *end_str;
@@ -1711,7 +1724,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 				loc_time = (time_t *)va_arg(argp, time_t *);
 			}
 			assert(loc_time);
-			date = gmtime(loc_time);
+			date = http_gmtime_r(loc_time, &date_storage);
 			if (date == NULL)
 				goto error_handler;
 			rc = snprintf(tempbuf, sizeof(tempbuf),
