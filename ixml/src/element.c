@@ -455,11 +455,14 @@ int ixmlElement_setAttributeNS(
 			free(attrNode->prefix);
 		}
 		/* replace it with the new prefix */
-		attrNode->prefix = strdup( newAttrNode.prefix );
-		if (attrNode->prefix == NULL) {
-			Parser_freeNodeContent(&newAttrNode);
-			return IXML_INSUFFICIENT_MEMORY;
-		}
+		if (newAttrNode.prefix != NULL) {
+			attrNode->prefix = strdup( newAttrNode.prefix );
+			if (attrNode->prefix == NULL) {
+				Parser_freeNodeContent(&newAttrNode);
+				return IXML_INSUFFICIENT_MEMORY;
+			}
+		} else
+			attrNode->prefix = newAttrNode.prefix;
 
 		if (attrNode->nodeValue != NULL) {
 			free(attrNode->nodeValue);
