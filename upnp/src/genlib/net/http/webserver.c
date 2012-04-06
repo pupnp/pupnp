@@ -1443,7 +1443,7 @@ static int http_RecvPostMessage(
 		       &parser->msg.msg.buf[parser->entity_start_position + entity_offset],
 		       Data_Buf_Size);
 		entity_offset += Data_Buf_Size;
-		if (Instr->IsVirtualFile) {
+		if (Instr && Instr->IsVirtualFile) {
 			int n = virtualDirCallback.write(Fp, Buf, Data_Buf_Size);
 			if (n < 0) {
 				ret_code = HTTP_INTERNAL_SERVER_ERROR;

@@ -332,6 +332,16 @@ Version 1.8.0
 Version 1.6.18
 *******************************************************************************
 
+2012-04-06 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Remove possibility of access violation.
+
+	1. Test Instr before dereference it in http_RecvPostMessage.
+	(Though it never becomes NULL because NULL is not passed to
+	the static method)
+	2. Avoid strdup(NULL) in ixmlElement_setAttributeNS.
+	Those are detected by llvm scan-build.
+
 2012-04-05 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	SF Bug Tracker id 3507819 - Use of thread-unsafe gmtime() in httpreadwrite.c
