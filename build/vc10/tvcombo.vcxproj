@@ -180,10 +180,11 @@
       <Path>$(IntDir)$(MSBuildProjectName).log</Path>
     </BuildLog>
     <PostBuildEvent>
-      <Command>mkdir "$(OutDir)web"
+      <Command>copy "$(SolutionDir)..\..\pthreads\lib\pthread*.dll" "$(OutDir)"
+mkdir "$(OutDir)web"
 xcopy "$(SolutionDir)..\..\upnp\sample\web" "$(OutDir)web" /S /E /Y
 </Command>
-      <Message>Copy sample web folder to output dir</Message>
+      <Message>Copy sample web folder and pthreadVC2.dll to output dir</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -238,10 +239,11 @@ xcopy "$(SolutionDir)..\..\upnp\sample\web" "$(OutDir)web" /S /E /Y
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir "$(OutDir)web"
+      <Command>copy "$(SolutionDir)..\..\pthreads\lib\pthread*.dll" "$(OutDir)"
+mkdir "$(OutDir)web"
 xcopy "$(SolutionDir)..\..\upnp\sample\web" "$(OutDir)web" /S /E /Y
 </Command>
-      <Message>Copy sample web folder to output dir</Message>
+      <Message>Copy sample web folder and pthreadVC2.dll to output dir</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -296,10 +298,11 @@ xcopy "$(SolutionDir)..\..\upnp\sample\web" "$(OutDir)web" /S /E /Y
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir "$(OutDir)web"
+      <Command>copy "$(SolutionDir)..\..\pthreads\lib\pthread*.dll" "$(OutDir)"
+mkdir "$(OutDir)web"
 xcopy "$(SolutionDir)..\..\upnp\sample\web" "$(OutDir)web" /S /E /Y
 </Command>
-      <Message>Copy sample web folder to output dir</Message>
+      <Message>Copy sample web folder and pthreadVC2.dll to output dir</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Lib|x64'">
@@ -354,10 +357,11 @@ xcopy "$(SolutionDir)..\..\upnp\sample\web" "$(OutDir)web" /S /E /Y
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir "$(OutDir)web"
+      <Command>copy "$(SolutionDir)..\..\pthreads\lib\pthread*.dll" "$(OutDir)"
+mkdir "$(OutDir)web"
 xcopy "$(SolutionDir)..\..\upnp\sample\web" "$(OutDir)web" /S /E /Y
 </Command>
-      <Message>Copy sample web folder to output dir</Message>
+      <Message>Copy sample web folder and pthreadVC2.dll to output dir</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|x64'">
