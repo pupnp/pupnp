@@ -38,6 +38,7 @@
  */
 
 #include "upnp.h"
+#include <errno.h>
 
 /* usually used to specify direction of parameters in functions */
 #ifndef IN
@@ -122,7 +123,9 @@ void linecopylen(
 		#ifndef S_ISDIR
 			#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 		#endif
-		#define EADDRINUSE		WSAEADDRINUSE
+		#ifndef EADDRINUSE		/* VS2010 has this defined */
+			#define EADDRINUSE		WSAEADDRINUSE
+		#endif
 		#define strcasecmp		stricmp
 		#define strncasecmp		strnicmp
 		#define sleep(a)		Sleep((a)*1000)
