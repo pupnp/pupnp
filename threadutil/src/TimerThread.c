@@ -107,7 +107,7 @@ static void *TimerThreadWorker(
         }
         if (nextEvent) {
             timeToWait.tv_nsec = 0;
-            timeToWait.tv_sec = nextEvent->eventTime;
+            timeToWait.tv_sec = (long)nextEvent->eventTime;
             ithread_cond_timedwait( &timer->condition, &timer->mutex,
                                     &timeToWait );
         } else {
