@@ -35,10 +35,13 @@
 /* Unix-specific network utilities */
 
 #include "UpnpInet.h"
+#include <errno.h>
 
 #ifdef WIN32
 	typedef int socklen_t;
-	#define EAFNOSUPPORT 97
+	#ifndef EAFNOSUPPORT	/* VS2010 has this defined */
+		#define EAFNOSUPPORT 97
+	#endif
 #else
 	#include <sys/time.h>
 	#include <sys/wait.h>
