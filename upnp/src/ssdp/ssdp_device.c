@@ -210,6 +210,7 @@ static int NewRequestHandler(
 			   (char *)&ttl, sizeof(int));
 		socklen = sizeof(struct sockaddr_in);
 		break;
+#ifdef INET_IPV6
 	case AF_INET6:
 		inet_ntop(AF_INET6,
 			  &((struct sockaddr_in6 *)DestAddr)->sin6_addr,
@@ -219,6 +220,7 @@ static int NewRequestHandler(
 		setsockopt(ReplySock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
 			   (char *)&hops, sizeof(hops));
 		break;
+#endif
 	default:
 		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
 			   "Invalid destination address specified.");
