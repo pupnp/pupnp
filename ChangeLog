@@ -2,6 +2,15 @@
 Version 1.6.18
 *******************************************************************************
 
+2012-04-11 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Avoid access violation after parser_parse_chunky_headers call.
+
+	In parser_parse_chunky_headers, parser->msg.msg.buf can be changed
+	by membuffer_delete call. Therefore if we save the pointer to
+	parser->msg.entity.buf before calling membuffer_delete, it will
+	induce access to released memory.
+
 2012-04-06 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	Remove possibility of access violation.
