@@ -35,6 +35,7 @@
 /* Unix-specific network utilities */
 
 #include "UpnpInet.h"
+#include <errno.h>
 
 #ifdef WIN32
 	#include <errno.h>
