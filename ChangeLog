@@ -332,6 +332,15 @@ Version 1.8.0
 Version 1.6.18
 *******************************************************************************
 
+2012-04-17 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Create intermediate directory per project on vc9.
+
+	Sample applications share sample_util.c and collisions of
+	object file can occur in parallel build. Modify project files to
+	split intermediate directories against it.
+	Apply similar changes also to library projects, like vc10 projects.
+
 2012-04-11 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	Avoid access violation after parser_parse_chunky_headers call.
