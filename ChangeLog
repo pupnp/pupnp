@@ -2,6 +2,13 @@
 Version 1.6.18
 *******************************************************************************
 
+2012-04-20 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Avoid dereference of null pointer in ixmlNode_setNodeProperties.
+
+	The problem can occur if one of the arguments is NULL.
+	Test argument and fix assertion.
+
 2012-04-17 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	Create intermediate directory per project on vc9.
