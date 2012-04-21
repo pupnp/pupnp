@@ -2,6 +2,16 @@
 Version 1.6.18
 *******************************************************************************
 
+2012-04-21 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Fix problems detected as dead assignment warning by clang scan-build.
+
+	Wrong assignment by shutdown result hides the real error code
+	of NewRequestHandler() in ssdp_device.c.
+	Fix return code description of NewRequestHandler().
+	Handle return code from ithread_create in sample applications.
+	Remove unused assignments.
+
 2012-04-20 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	Avoid dereference of null pointer in ixmlNode_setNodeProperties.

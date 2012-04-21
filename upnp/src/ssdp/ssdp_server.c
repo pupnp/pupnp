@@ -864,8 +864,8 @@ static int create_ssdp_sock_v4(
 		/* This is probably not a critical error, so let's continue. */
 	}
 	/* result is not checked becuase it will fail in WinMe and Win9x. */
-	ret = setsockopt(*ssdpSock, IPPROTO_IP,
-			 IP_MULTICAST_TTL, &ttl, sizeof(ttl));
+	setsockopt(*ssdpSock, IPPROTO_IP,
+		IP_MULTICAST_TTL, &ttl, sizeof(ttl));
 	onOff = 1;
 	ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_BROADCAST,
 			 (char *)&onOff, sizeof(onOff));

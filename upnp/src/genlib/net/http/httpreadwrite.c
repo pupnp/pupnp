@@ -1206,7 +1206,6 @@ static int ReadResponseLineAndHeaders(
 			return num_read;
 		}
 	}
-	done = 0;
 	status = parser_parse_headers(parser);
 	if ((status == (parse_status_t)PARSE_OK) &&
 		(parser->position == (parser_pos_t)POS_ENTITY))

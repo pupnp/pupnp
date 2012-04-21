@@ -239,7 +239,6 @@ void ssdp_handle_ctrlpt_msg(http_message_t *hmsg, struct sockaddr_storage *dest_
 		/*hdr_value.buf[ hdr_value.length ] = '\0'; */
 		while (node != NULL) {
 			searchArg = node->item;
-			matched = 0;
 			/* check for match of ST header and search target */
 			switch (searchArg->requestType) {
 			case SSDP_ALL:

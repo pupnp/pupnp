@@ -926,7 +926,6 @@ removeServiceTable( IXML_Node * node,
     long unsigned int i = 0lu;
 
     if( getSubElement( "root", node, &root ) ) {
-        current_service = in->serviceList;
         start_search = in->serviceList;
         deviceList =
             ixmlElement_getElementsByTagName( ( IXML_Element * ) root,

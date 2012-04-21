@@ -723,8 +723,6 @@ static UPNP_INLINE void handle_query_variable(
 		   "Return from callback for var request\n");
 	/* validate, and handle result */
 	if (variable.CurrentVal == NULL) {
-		err_code = SOAP_ACTION_FAILED;
-		err_str = Soap_Action_Failed;
 		send_error_response(info, SOAP_INVALID_VAR, Soap_Invalid_Var,
 				    request);
 		return;
