@@ -334,6 +334,13 @@ Version 1.6.18
 
 2012-04-21 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
+	Fix condition for allocation failure in get_content_type().
+
+	At the end of get_content_type() in webserver.c, it should check
+	return value of ixmlCloneDOMString().
+
+2012-04-21 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
 	Fix problems detected as dead assignment warning by clang scan-build.
 
 	Wrong assignment by shutdown result hides the real error code
