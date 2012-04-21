@@ -102,12 +102,11 @@ static int GeneratePropertySet(
 	char *buffer;
 	int counter = 0;
 	size_t size = 0;
-	int temp_counter = 0;
 
 	/*size += strlen(XML_VERSION);*/
 	size += strlen(XML_PROPERTYSET_HEADER);
 	size += strlen("</e:propertyset>\n\n");
-	for (temp_counter = 0, counter = 0; counter < count; counter++) {
+	for (counter = 0; counter < count; counter++) {
 		size += strlen( "<e:property>\n</e:property>\n" );
 		size += 2 * strlen(names[counter]) +
 			strlen(values[counter]) +
