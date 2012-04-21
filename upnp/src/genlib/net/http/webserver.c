@@ -344,7 +344,7 @@ static UPNP_INLINE int get_content_type(
 	}
 	(*content_type) = ixmlCloneDOMString(temp);
 	free(temp);
-	if (!content_type)
+	if (!(*content_type))
 		return UPNP_E_OUTOF_MEMORY;
 
 	return 0;
