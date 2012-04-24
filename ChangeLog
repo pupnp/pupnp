@@ -2,6 +2,13 @@
 Version 1.6.18
 *******************************************************************************
 
+2012-04-24 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Disable SetGenaCallback call if device is disabled.
+
+	If device is disabled, SetGenaCallback definition is disabled,
+	but its call remains. A link error will occur in Win32.
+
 2012-04-21 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	Fix condition for allocation failure in get_content_type().
