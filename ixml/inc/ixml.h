@@ -158,6 +158,13 @@ typedef struct _IXML_Document *Docptr;
 
 typedef struct _IXML_Node     *Nodeptr;
 
+#ifdef SCRIPTSUPPORT
+/*!
+ * \brief Signature for GC support method, called before a node is freed.
+ */
+typedef void (*IXML_BeforeFreeNode_t) (Nodeptr obj);
+#endif
+
 
 /*!
  * \brief Data structure common to all types of nodes.
@@ -178,6 +185,9 @@ typedef struct _IXML_Node
 	Nodeptr           nextSibling;
 	Nodeptr           firstAttr;
 	Docptr            ownerDocument;
+#ifdef SCRIPTSUPPORT
+	void*             ctag;			// custom tag
+#endif
 } IXML_Node;
 
 
@@ -625,9 +635,29 @@ EXPORT_SPEC BOOL ixmlNode_hasAttributes(
  * \brief Frees a \b Node and all \b Nodes in its subtree.
  */
 EXPORT_SPEC void ixmlNode_free(
-	/*! [in] The \b Node tree to free. */
+	/*! [in] The \b Node tree to free. Before it is freed, the handler
+	 * set by \b ixmlSetBeforeFree will be called, the order will be
+	 * top-down.
+	 */
 	IXML_Node *nodeptr);
 
+#ifdef SCRIPTSUPPORT
+/*!
+ * \brief Sets the custom tag for the node.
+ */
+EXPORT_SPEC void ixmlNode_setCTag(
+	/*! [in] The \b Node to which to attach the tag. */
+	IXML_Node *nodeptr,
+	/*! [in] The \b tag to attach. */
+	void *ctag);
+
+/*!
+ * \brief Gets the custom tag for the node.
+ */
+EXPORT_SPEC void* ixmlNode_getCTag(
+	/*! [in] The \b Node from which to get the tag. */
+	IXML_Node *nodeptr);
+#endif
 /* @} Interface Node */
 
 
@@ -1737,6 +1767,18 @@ EXPORT_SPEC void ixmlRelaxParser(
 	 */
 	char errorChar);
 
+#ifdef SCRIPTSUPPORT
+/*!
+ * \brief Sets the handler to call before a node is freed.
+ */
+EXPORT_SPEC void ixmlSetBeforeFree(
+	/*! [in] If \b hndlr is set to a function, it will be called before any
+	 * node is freed, with the node as its parameter. This allows scripting
+	 * languages to do their garbage collection, without maintaining their
+	 * own tree structure.
+	 */
+	IXML_BeforeFreeNode_t hndlr);
+#endif
 
 /*!
  * \brief Parses an XML text buffer converting it into an IXML DOM representation.

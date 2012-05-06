@@ -120,6 +120,25 @@ void Parser_setErrorChar(
 	/*! [in] The character to become the error character. */
 	char c);
 
+#ifdef SCRIPTSUPPORT
+/*!
+ * \brief Sets the handler to call before a node is freed.
+ *
+ * If \b hndlr is set to a function, it will be called before any
+ * node is freed, with the node as its parameter. This allows scripting
+ * languages to do their garbage collection, without maintaining their
+ * own tree structure.
+ */
+void Parser_setBeforeFree(
+	/*! [in] The handler callback to call before each node to be freed. */
+	IXML_BeforeFreeNode_t hndlr);
+
+/*!
+ * \brief Gets the handler to call before a node is freed.
+ */
+IXML_BeforeFreeNode_t Parser_getBeforeFree();
+#endif
+
 
 /*!
  * \brief Fees a node contents.
