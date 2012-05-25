@@ -332,6 +332,11 @@ Version 1.8.0
 Version 1.6.18
 *******************************************************************************
 
+2012-05-25 Anoop Mohan <anoop.anoop(at)gmail.com>
+
+	This patch fixes a bug in non blocking connect call where the sock
+	option length for SO_ERROR was passed as 0 instead of sizeof(int).
+
 2012-04-24 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	Disable SetGenaCallback call if device is disabled.
