@@ -126,7 +126,7 @@ static int Check_Connect_And_Wait_Connection(
 #ifndef WIN32
 			} else {
 				int valopt = 0;
-				socklen_t len = 0;
+				socklen_t len = sizeof(valopt);
 				if (getsockopt(sock, SOL_SOCKET, SO_ERROR, (void *) &valopt, &len) < 0) {
 					/* failed to read delayed error */
 					return -1;
