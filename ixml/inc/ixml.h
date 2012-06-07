@@ -273,6 +273,8 @@ extern "C" {
  * The \b Node interface forms the primary datatype for all other DOM 
  * objects. Every other interface is derived from this interface, inheriting 
  * its functionality. For more information, refer to DOM2-Core page 34.
+ * (Note: within the IXML library the NamedNodeMap and NodeList interfaces are
+ * the only interfaces that are not DOM objects and hence do not inherit from Node)
  *
  * @{
  */
@@ -324,7 +326,8 @@ EXPORT_SPEC int ixmlNode_setNodeValue(
 
 
 /*!
- * \brief Retrieves the type of a \b Node.
+ * \brief Retrieves the type of a \b Node. Note that not all possible 
+ * return values are actually implemented.
  *
  *  \return An enum IXML_NODE_TYPE representing the type of the \b Node.
  */
@@ -901,7 +904,7 @@ EXPORT_SPEC IXML_Attr *ixmlDocument_createAttribute(
 	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,  
 	/*! [in] The name of the new attribute. */
-	const char *name);
+	const DOMString name);
 
 
 /*!
@@ -922,7 +925,7 @@ EXPORT_SPEC int ixmlDocument_createAttributeEx(
 	/*! [in] The owner \b Document of the new node. */
 	IXML_Document *doc,
 	/*! [in] The name of the new attribute. */
-	const char *name,      
+	const DOMString name,      
 	/*! [out] A pointer to a \b Attr where the new object will be stored. */
 	IXML_Attr **attrNode);
 
