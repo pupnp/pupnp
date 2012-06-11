@@ -21,7 +21,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\lib\"
-			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\"
+			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\$(ProjectName)\"
 			ConfigurationType="4"
 			CharacterSet="0"
 			EnableManagedIncrementalBuild="1"
@@ -88,7 +88,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\lib\"
-			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\"
+			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\$(ProjectName)\"
 			ConfigurationType="4"
 			CharacterSet="0"
 			EnableManagedIncrementalBuild="1"
@@ -156,7 +156,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\lib\"
-			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\"
+			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\$(ProjectName)\"
 			ConfigurationType="4"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -226,7 +226,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\lib\"
-			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\"
+			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\$(ProjectName)\"
 			ConfigurationType="4"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -297,7 +297,7 @@
 		<Configuration
 			Name="Debug Lib|Win32"
 			OutputDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\lib\"
-			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\"
+			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\$(ProjectName)\"
 			ConfigurationType="4"
 			CharacterSet="0"
 			EnableManagedIncrementalBuild="1"
@@ -364,7 +364,7 @@
 		<Configuration
 			Name="Debug Lib|x64"
 			OutputDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\lib\"
-			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\"
+			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\$(ProjectName)\"
 			ConfigurationType="4"
 			CharacterSet="0"
 			EnableManagedIncrementalBuild="1"
@@ -432,7 +432,7 @@
 		<Configuration
 			Name="Release Lib|Win32"
 			OutputDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\lib\"
-			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\"
+			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\$(ProjectName)\"
 			ConfigurationType="4"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -502,7 +502,7 @@
 		<Configuration
 			Name="Release Lib|x64"
 			OutputDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\lib\"
-			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\"
+			IntermediateDirectory="$(SolutionDir)\out.vc9.$(PlatformName)\$(ConfigurationName)\tmp\$(ProjectName)\"
 			ConfigurationType="4"
 			CharacterSet="0"
 			WholeProgramOptimization="1"

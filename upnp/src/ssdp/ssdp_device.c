@@ -169,7 +169,7 @@ void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *d
  * \brief Works as a request handler which passes the HTTP request string
  * to multicast channel.
  *
- * \return 1 if successful else appropriate error.
+ * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
 static int NewRequestHandler(
 	/*! [in] Ip address, to send the reply. */
@@ -246,8 +246,7 @@ static int NewRequestHandler(
 	}
 
  end_NewRequestHandler:
-	ret = shutdown(ReplySock, SD_BOTH);
-	if (ret == -1) {
+	if (shutdown(ReplySock, SD_BOTH) == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 			   "Error in shutdown: %s\n", errorBuffer);

@@ -332,6 +332,51 @@ Version 1.8.0
 Version 1.6.18
 *******************************************************************************
 
+2012-05-25 Anoop Mohan <anoop.anoop(at)gmail.com>
+
+	This patch fixes a bug in non blocking connect call where the sock
+	option length for SO_ERROR was passed as 0 instead of sizeof(int).
+
+2012-04-24 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Disable SetGenaCallback call if device is disabled.
+
+	If device is disabled, SetGenaCallback definition is disabled,
+	but its call remains. A link error will occur in Win32.
+
+2012-04-21 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Fix condition for allocation failure in get_content_type().
+
+	At the end of get_content_type() in webserver.c, it should check
+	return value of ixmlCloneDOMString().
+
+2012-04-21 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Fix problems detected as dead assignment warning by clang scan-build.
+
+	Wrong assignment by shutdown result hides the real error code
+	of NewRequestHandler() in ssdp_device.c.
+	Fix return code description of NewRequestHandler().
+	Handle return code from ithread_create in sample applications.
+	Remove unused assignments.
+
+2012-04-20 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Avoid dereference of null pointer in ixmlNode_setNodeProperties.
+
+	The problem can occur if one of the arguments is NULL.
+	Test argument and fix assertion.
+
+2012-04-17 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Create intermediate directory per project on vc9.
+
+	Sample applications share sample_util.c and collisions of
+	object file can occur in parallel build. Modify project files to
+	split intermediate directories against it.
+	Apply similar changes also to library projects, like vc10 projects.
+
 2012-04-11 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	Avoid access violation after parser_parse_chunky_headers call.

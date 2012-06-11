@@ -55,6 +55,9 @@ int main(int argc, char *argv[])
 	}
 	/* start a command loop thread */
 	code = ithread_create(&cmdloop_thread, NULL, TvCtrlPointCommandLoop, NULL);
+	if (code !=  0) {
+		return UPNP_E_INTERNAL_ERROR;
+	}
 #ifdef WIN32
 	ithread_join(cmdloop_thread, NULL);
 #else

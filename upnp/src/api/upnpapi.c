@@ -374,9 +374,11 @@ static int UpnpInitPreamble(void)
 #endif
 #endif /* INCLUDE_DEVICE_APIS */
 
+#ifdef INTERNAL_WEB_SERVER
 #if EXCLUDE_GENA == 0
 	SetGenaCallback(genaCallback);
 #endif
+#endif /* INTERNAL_WEB_SERVER */
 
 	/* Initialize the SDK timer thread. */
 	retVal = TimerThreadInit( &gTimerThread, &gSendThreadPool );

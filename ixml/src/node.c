@@ -1343,7 +1343,10 @@ int ixmlNode_setNodeProperties(
 {
 	int rc;
 
-	assert(destNode != NULL || src != NULL);
+	assert(destNode != NULL && src != NULL);
+	if(destNode == NULL || src == NULL) {
+		return IXML_INVALID_PARAMETER;
+	}
 
 	rc = ixmlNode_setNodeValue(destNode, src->nodeValue);
 	if(rc != IXML_SUCCESS) {
