@@ -2,6 +2,13 @@
 Version 1.6.18
 *******************************************************************************
 
+2012-06-19 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	Fix memory leak and access violation in UpnpSendAction(Ex)Async.
+
+	Free buffers after malloc or ixmlPrintNode failure.
+	Free Param->Header before destructing Param.
+
 2012-05-25 Anoop Mohan <anoop.anoop(at)gmail.com>
 
 	This patch fixes a bug in non blocking connect call where the sock

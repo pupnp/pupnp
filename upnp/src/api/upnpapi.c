@@ -2736,6 +2736,7 @@ int UpnpSendActionAsync(
         malloc( sizeof( struct UpnpNonblockParam ) );
 
     if( Param == NULL ) {
+        ixmlFreeDOMString( tmpStr );
         return UPNP_E_OUTOF_MEMORY;
     }
     memset( Param, 0, sizeof( struct UpnpNonblockParam ) );
@@ -2829,6 +2830,7 @@ int UpnpSendActionExAsync(
 
     tmpStr = ixmlPrintNode( ( IXML_Node * ) Act );
     if( tmpStr == NULL ) {
+        ixmlFreeDOMString( headerStr );
         return UPNP_E_INVALID_ACTION;
     }
 
@@ -2836,6 +2838,8 @@ int UpnpSendActionExAsync(
         ( struct UpnpNonblockParam * )
         malloc( sizeof( struct UpnpNonblockParam ) );
     if( Param == NULL ) {
+        ixmlFreeDOMString( tmpStr );
+        ixmlFreeDOMString( headerStr );
         return UPNP_E_OUTOF_MEMORY;
     }
     memset( Param, 0, sizeof( struct UpnpNonblockParam ) );
@@ -2859,10 +2863,10 @@ int UpnpSendActionExAsync(
 
     retVal = ixmlParseBufferEx( tmpStr, &( Param->Act ) );
     if( retVal != IXML_SUCCESS ) {
+        ixmlDocument_free( Param->Header );
         free( Param );
         ixmlFreeDOMString( tmpStr );
         ixmlFreeDOMString( headerStr );
-        ixmlDocument_free( Param->Header );
         if( retVal == IXML_INSUFFICIENT_MEMORY ) {
             return UPNP_E_OUTOF_MEMORY;
         } else {
