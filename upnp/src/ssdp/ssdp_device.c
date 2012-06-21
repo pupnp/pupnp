@@ -186,7 +186,9 @@ static int NewRequestHandler(
 	unsigned long replyAddr = inet_addr(gIF_IPV4);
 	/* a/c to UPNP Spec */
 	int ttl = 4;
+#ifdef INET_IPV6
 	int hops = 1;
+#endif
 	char buf_ntop[INET6_ADDRSTRLEN];
 	int ret = UPNP_E_SUCCESS;
 
