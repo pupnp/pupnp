@@ -491,8 +491,6 @@ int web_server_init()
 
 void web_server_destroy(void)
 {
-	int ret;
-
 	if (bWebServerState == WEB_SERVER_ENABLED) {
 		membuffer_destroy(&gDocumentRootDir);
 		alias_release(&gAliasDoc);
@@ -501,8 +499,7 @@ void web_server_destroy(void)
 		memset(&gAliasDoc, 0, sizeof(struct xml_alias_t));
 		ithread_mutex_unlock(&gWebMutex);
 
-		ret = ithread_mutex_destroy(&gWebMutex);
-		assert(ret == 0);
+		ithread_mutex_destroy(&gWebMutex);
 		bWebServerState = WEB_SERVER_DISABLED;
 	}
 }
