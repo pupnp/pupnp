@@ -257,14 +257,11 @@ static int genaNotify(
 {
 	size_t i;
 	membuffer mid_msg;
-	membuffer endmsg;
 	uri_type *url;
 	http_parser_t response;
 	int return_code = -1;
 
 	membuffer_init(&mid_msg);
-	/* make 'end' msg (the part that won't vary with the destination) */
-	endmsg.size_inc = 30;
 	if (http_MakeMessage(&mid_msg, 1, 1,
 			     "s" "ssc" "sdcc",
 			     headers,
