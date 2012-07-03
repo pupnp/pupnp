@@ -17,6 +17,7 @@ sections:
 6.  Product Release Notes
 7.  New Features
 8.  Support and Contact Information
+9.  IXML support for scriptinglanguages
 
 
 1) Release Contents
@@ -342,4 +343,54 @@ us know.
 
 * Other brands, names, and trademarks are the property of their respective 
 owners.
+
+
+9.  IXML support for scriptinglanguages
+-------------------------------------------
+The treestructure of XML documents created by IXML is hard to maintain when
+creating a binding for a scripting language. Even when many elements may 
+never be used on the script side, it requires copying the entire tree 
+structure once you start accessing elements several levels deep.
+Hence scriptsupport was added. To enable it compile while SCRIPTSUPPORT has
+been defined. This allows control using only a list instead of a tree-like
+structure, and only nodes actually accessed need to be created instead of
+all the nodes in the tree.
+
+Here's how its supposed to work;
+* The scriptsupport allows you to add a callback when a node is freed on 
+  the C side, so appropriate action can be taken on the script side, see
+  function ixmlSetBeforeFree().
+* Instead of recreating the tree structure, an intermediate object should
+  be created only for the nodes actually accessed. The object should be
+  containing a pointer to the node and a 'valid flag' which is initially 
+  set to TRUE (the valid flag, can simply be the pointer to the node being 
+  NULL or not). Before creating the intermediate object, the custom tag 
+  'ctag' can be used to check whether one was already created.
+* the node object gets an extra 'void* ctag' field, a custom tag to make a
+  cross reference to the script side intermediate object. It can be set
+  using ixmlNode_setCTag(), and read using ixmlNode_getCTag(). Whenever
+  a new intermediate object is created, the ctag of the coirresponding
+  node should be set to point to this intermediate object.
+* The tree structure traversal is done on the C side (looking up parents, 
+  children and siblings)
+* Every intermediate object created should be kept in a list (preferably a 
+  key-value list, where the key is the pointer to the node and the value is 
+  the pointer to the intermediate object)
+* when the callback is called, the node should be looked up in the list, 
+  the flag set to false, the pointer to the C-side node be cleared and on
+  the C-side the ctag should be cleared.
+* whenever the intermediate object is accessed and its flag is set to False, 
+  an error should be thrown that the XML document has been closed.
+
+Freeing resources can be done in 2 ways, C side by simply calling the free 
+node methods, or script side by the garbage collector of the scriptengine. 
+Scriptside steps;
+* if the valid flag is set to False (XML document is closed), then the 
+  intermediate object can be destroyed, no further action
+* if the node has a parent, then the intermediate object can be destroyed 
+  after the ctag on the corresponding node has been cleared. Nothing needs
+  to be freed on the C-side.
+* if the node has no parent, then the node must be freed on the C side by 
+  calling the corresponding free node methods. This will result in a chain 
+  of callbacks closing the node and all underlying nodes.
 
