@@ -17,9 +17,6 @@
     <ClCompile Include="..\..\upnp\src\api\ActionRequest.c">
       <Filter>sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\attr.c">
-      <Filter>sources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\upnp\src\genlib\client_table\client_table.c">
       <Filter>sources</Filter>
     </ClCompile>
@@ -29,12 +26,6 @@
     <ClCompile Include="..\..\upnp\src\api\Discovery.c">
       <Filter>sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\document.c">
-      <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ixml\src\element.c">
-      <Filter>sources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\upnp\src\api\Event.c">
       <Filter>sources</Filter>
     </ClCompile>
@@ -42,9 +33,6 @@
       <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\upnp\src\api\FileInfo.c">
-      <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\threadutil\src\FreeList.c">
       <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\upnp\src\gena\gena_callback2.c">
@@ -62,18 +50,6 @@
     <ClCompile Include="..\..\upnp\src\genlib\net\http\httpreadwrite.c">
       <Filter>sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\ixml.c">
-      <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ixml\src\ixmlmembuf.c">
-      <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ixml\src\ixmlparser.c">
-      <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\threadutil\src\LinkedList.c">
-      <Filter>sources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\upnp\src\uuid\md5.c">
       <Filter>sources</Filter>
     </ClCompile>
@@ -81,15 +57,6 @@
       <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\upnp\src\genlib\miniserver\miniserver.c">
-      <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ixml\src\namedNodeMap.c">
-      <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ixml\src\node.c">
-      <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ixml\src\nodeList.c">
       <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\upnp\src\genlib\net\http\parsetools.c">
@@ -138,12 +105,6 @@
       <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\upnp\src\uuid\sysdep.c">
-      <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\threadutil\src\ThreadPool.c">
-      <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\threadutil\src\TimerThread.c">
       <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\upnp\src\genlib\util\upnp_timeout.c">
