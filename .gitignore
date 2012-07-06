@@ -111,3 +111,5 @@ docs/doxygen
 /build/vc10/out.vc10.x64
 /pthreads
 /build/vc10/ipch
+/build/vc10/IUpnpErrFile.txt
+/build/vc10/IUpnpInfoFile.txt
