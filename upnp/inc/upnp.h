@@ -1492,7 +1492,7 @@ EXPORT_SPEC int UpnpAcceptSubscriptionExt(
 	 * Plug and Play Device Architecture specification. */
 	IXML_Document *PropSet,
 	/*! [in] The subscription ID of the newly registered control point. */
-	Upnp_SID SubsId);
+	const Upnp_SID SubsId);
 
 /*!
  * \brief Sends out an event change notification to all control points

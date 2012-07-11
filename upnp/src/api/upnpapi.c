@@ -2522,7 +2522,7 @@ int UpnpAcceptSubscriptionExt(
 	const char *DevID_const,
 	const char *ServName_const,
 	IXML_Document *PropSet,
-	Upnp_SID SubsId)
+	const Upnp_SID SubsId)
 {
 	int ret = 0;
 	int line = 0;
