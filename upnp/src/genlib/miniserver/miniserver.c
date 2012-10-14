@@ -502,10 +502,14 @@ static int get_miniserver_sockets(
 	MiniServerSockArray *out,
 	/*! [in] port on which the server is listening for incoming IPv4
 	 * connections. */
-	uint16_t listen_port4,
+	uint16_t listen_port4
+#ifdef UPNP_ENABLE_IPV6
+	,
 	/*! [in] port on which the server is listening for incoming IPv6
 	 * connections. */
-	uint16_t listen_port6)
+	uint16_t listen_port6
+#endif
+	)
 {
 	char errorBuffer[ERROR_BUFFER_LEN];
 	struct sockaddr_storage __ss_v4;
@@ -760,10 +764,6 @@ static int get_miniserver_sockets(
 	out->miniServerSock4 = listenfd4;
 #ifdef UPNP_ENABLE_IPV6
 	out->miniServerSock6 = listenfd6;
-#else
-	/* Silence compiler warning message:
-	 * warning: unused parameter ‘listen_port6’ */
-	listen_port6 = 0u;
 #endif
 	return UPNP_E_SUCCESS;
 }
@@ -868,7 +868,11 @@ int StartMiniServer(
 #ifdef INTERNAL_WEB_SERVER
 	/* V4 and V6 http listeners. */
 	ret_code = get_miniserver_sockets(
-		miniSocket, *listen_port4, *listen_port6);
+		miniSocket, *listen_port4
+#ifdef UPNP_ENABLE_IPV6
+		, *listen_port6
+#endif
+		);
 	if (ret_code != UPNP_E_SUCCESS) {
 		free(miniSocket);
 		return ret_code;
