@@ -107,6 +107,10 @@ static void ixmlNode_freeSingleNode(
 void ixmlNode_free(IXML_Node *nodeptr)
 {
 	if (nodeptr != NULL) {
+#ifdef SCRIPTSUPPORT
+		IXML_BeforeFreeNode_t hndlr = Parser_getBeforeFree();
+		if (hndlr != NULL) hndlr(nodeptr);
+#endif
 		ixmlNode_free(nodeptr->firstChild);
 		ixmlNode_free(nodeptr->nextSibling);
 		ixmlNode_free(nodeptr->firstAttr);
@@ -1380,3 +1384,17 @@ ErrorHandler:
 	return IXML_INSUFFICIENT_MEMORY;
 }
 
+#ifdef SCRIPTSUPPORT
+void ixmlNode_setCTag(IXML_Node *nodeptr, void *ctag)
+{
+	if (nodeptr != NULL) nodeptr->ctag = ctag;
+}
+
+void* ixmlNode_getCTag(IXML_Node *nodeptr)
+{
+	if (nodeptr != NULL)
+		return nodeptr->ctag;
+	else
+		return NULL;
+}
+#endif

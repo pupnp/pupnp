@@ -281,7 +281,7 @@ IXML_Node *ixmlDocument_createTextNode(
 
 int ixmlDocument_createAttributeEx(
 	IXML_Document *doc,
-	const char *name,
+	const DOMString name,
 	IXML_Attr **rtAttr)
 {
 	IXML_Attr *attrNode = NULL;
@@ -322,7 +322,7 @@ ErrorHandler:
 
 IXML_Attr *ixmlDocument_createAttribute(
 	IXML_Document *doc,
-	const char *name)
+	const DOMString name)
 {
 	IXML_Attr *attrNode = NULL;
 

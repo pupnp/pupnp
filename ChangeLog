@@ -2,6 +2,23 @@
 Version 1.8.0
 *******************************************************************************
 
+2012-07-11 Thijs Schreijer <thijs(at)thijsschreijer.nl>
+
+	Changed param to const UpnpAcceptSubscriptionExt() for consistency
+
+2012-06-07 Thijs Schreijer <thijs(at)thijsschreijer.nl>
+
+	updated ixmlDocument_createAttributeEx() and ixmlDocument_createAttribute()
+	to use parameter DOMString instead of char * (same but now consistent)
+
+2012-05-06 Thijs Schreijer <thijs(at)thijsschreijer.nl>
+
+	Added script support (directive SCRIPTSUPPORT) for better support of
+	garbage collected script languages. The node element gets a custom tag
+	through ixmlNode_setCTag() and ixmlNode_getCTag(). And a callback upon
+	releasing the node resources can be set using ixmlSetBeforeFree()
+	See updated readme for usage.
+
 2012-03-24 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
 	SF Bug Tracker id 3510595 - UpnpDownloadXmlDoc : can't get the file
