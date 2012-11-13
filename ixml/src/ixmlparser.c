@@ -55,6 +55,9 @@
 
 
 static char g_error_char = '\0';
+#ifdef SCRIPTSUPPORT
+static IXML_BeforeFreeNode_t Before_Free_callback;
+#endif
 
 
 static const char LESSTHAN = '<';
@@ -2498,6 +2501,17 @@ void Parser_setErrorChar(char c)
 	g_error_char = c;
 }
 
+#ifdef SCRIPTSUPPORT
+void Parser_setBeforeFree(IXML_BeforeFreeNode_t hndlr)
+{
+	Before_Free_callback = hndlr;
+}
+
+IXML_BeforeFreeNode_t Parser_getBeforeFree()
+{
+	return Before_Free_callback;
+}
+#endif
 
 /*!
  * \brief Initializes a xml parser.
