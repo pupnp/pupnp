@@ -467,16 +467,16 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 		else
 			return -1;
 		if (ptr3 != NULL) {
-			if (strlen("uuid:") + strlen(ptr3 + 1) >= sizeof(Evt->UDN))
+			if (strlen("uuid:") + strlen(ptr3 + 1) >= sizeof Evt->UDN)
 				return -1;
-			snprintf(Evt->UDN, sizeof(Evt->UDN), "uuid:%s",
-				ptr3 + 1);
+			snprintf(Evt->UDN, sizeof Evt->UDN, "uuid:%s", ptr3 + 1);
 		}
 		else
 			return -1;
 		ptr1 = strstr(cmd, ":");
 		if (ptr1 != NULL) {
 			n = (size_t)ptr3 - (size_t)ptr1;
+			n = n >= sizeof TempBuf ? sizeof TempBuf - 1 : n;
 			strncpy(TempBuf, ptr1, n);
 			TempBuf[n] = '\0';
 			if (strlen("urn") + strlen(TempBuf) >= sizeof(Evt->DeviceType))
@@ -490,27 +490,28 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 	if ((TempPtr = strstr(cmd, "uuid")) != NULL) {
 		if ((Ptr = strstr(cmd, "::")) != NULL) {
 			n = (size_t)Ptr - (size_t)TempPtr;
+			n = n >= sizeof Evt->UDN ? sizeof Evt->UDN - 1 : n;
 			strncpy(Evt->UDN, TempPtr, n);
 			Evt->UDN[n] = '\0';
 		} else {
 			memset(Evt->UDN, 0, sizeof(Evt->UDN));
-			strncpy(Evt->UDN, TempPtr, sizeof(Evt->UDN) - 1);
+			strncpy(Evt->UDN, TempPtr, sizeof Evt->UDN - 1);
 		}
 		CommandFound = 1;
 	}
 	if (strstr(cmd, "urn:") != NULL && strstr(cmd, ":service:") != NULL) {
 		if ((TempPtr = strstr(cmd, "urn")) != NULL) {
-			memset(Evt->ServiceType, 0, sizeof(Evt->ServiceType));
+			memset(Evt->ServiceType, 0, sizeof Evt->ServiceType);
 			strncpy(Evt->ServiceType, TempPtr,
-				sizeof(Evt->ServiceType) - 1);
+				sizeof Evt->ServiceType - 1);
 			CommandFound = 1;
 		}
 	}
 	if (strstr(cmd, "urn:") != NULL && strstr(cmd, ":device:") != NULL) {
 		if ((TempPtr = strstr(cmd, "urn")) != NULL) {
-			memset(Evt->DeviceType, 0, sizeof(Evt->DeviceType));
+			memset(Evt->DeviceType, 0, sizeof Evt->DeviceType);
 			strncpy(Evt->DeviceType, TempPtr,
-				sizeof(Evt->DeviceType) - 1);
+				sizeof Evt->DeviceType - 1);
 			CommandFound = 1;
 		}
 	}
@@ -518,6 +519,7 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
 		/* Everything before "::upnp::rootdevice" is the UDN. */
 		if (TempPtr != cmd) {
 			n = (size_t)TempPtr - (size_t)cmd;
+			n = n >= sizeof Evt->UDN ? sizeof Evt->UDN - 1 : n;
 			strncpy(Evt->UDN, cmd, n);
 			Evt->UDN[n] = 0;
 			CommandFound = 1;

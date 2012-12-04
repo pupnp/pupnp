@@ -349,6 +349,26 @@ Version 1.8.0
 Version 1.6.18
 *******************************************************************************
 
+2012-12-06 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Security fix for CERT issue VU#922681
+
+	This patch addresses three possible buffer overflows in function
+	unique_service_name(). The three issues have the folowing CVE numbers:
+
+	CVE-2012-5958 Issue #2: Stack buffer overflow of Tempbuf
+	CVE-2012-5959 Issue #4: Stack buffer overflow of Event->UDN
+	CVE-2012-5960 Issue #8: Stack buffer overflow of Event->UDN
+
+	Notice that the following issues have already been dealt by previous
+	work:
+
+	CVE-2012-5961 Issue #1: Stack buffer overflow of Evt->UDN
+	CVE-2012-5962 Issue #3: Stack buffer overflow of Evt->DeviceType
+	CVE-2012-5963 Issue #5: Stack buffer overflow of Event->UDN
+	CVE-2012-5964 Issue #6: Stack buffer overflow of Event->DeviceType
+	CVE-2012-5965 Issue #7: Stack buffer overflow of Event->DeviceType
+
 2012-06-19 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	Fix memory leak and access violation in UpnpSendAction(Ex)Async.
