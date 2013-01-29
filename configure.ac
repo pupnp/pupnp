@@ -316,16 +316,21 @@ dnl ############################################################################
 dnl # Release 1.6.18:
 dnl # "current:revision:age"
 dnl #
-dnl # -
+dnl # - Code has changed in ixml
+dnl #   revision: 7 -> 8
+dnl # - Code has changed in threadutil
+dnl #   revision: 2 -> 3
+dnl # - Code has changed in upnp
+dnl #   revision: 1 -> 2
 dnl #
-dnl #AC_SUBST([LT_VERSION_IXML],       [::])
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [::])
-dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:8:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:3:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [9:2:3])
 dnl #
 dnl ############################################################################
-AC_SUBST([LT_VERSION_IXML],       [2:7:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [6:2:0])
-AC_SUBST([LT_VERSION_UPNP],       [9:1:3])
+AC_SUBST([LT_VERSION_IXML],       [2:8:0])
+AC_SUBST([LT_VERSION_THREADUTIL], [6:3:0])
+AC_SUBST([LT_VERSION_UPNP],       [9:2:3])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
