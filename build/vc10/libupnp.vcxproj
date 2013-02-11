@@ -174,7 +174,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>..\inc;..\msvc;..\..\upnp\inc;..\..\upnp\src\inc;..\..\ixml\inc;..\..\ixml\src\inc;..\..\threadutil\inc;..\..\pthreads;..\..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBUPNP_EXPORTS;UPNP_USE_MSVCPP;_CRT_NONSTDC_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL;_SCL_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_WARNINGS;_AFX_SECURE_NO_DEPRECATE;_SECURE_ATL;_ATL_NO_COM_SUPPORT;_ATL_SECURE_NO_WARNINGS;_ATL_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SCRIPTSUPPORT;WIN32;NDEBUG;RELEASE;_WINDOWS;_USRDLL;LIBUPNP_EXPORTS;UPNP_USE_MSVCPP;_CRT_NONSTDC_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL;_SCL_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_WARNINGS;_AFX_SECURE_NO_DEPRECATE;_SECURE_ATL;_ATL_NO_COM_SUPPORT;_ATL_SECURE_NO_WARNINGS;_ATL_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -292,7 +292,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\inc;..\msvc;..\..\upnp\inc;..\..\upnp\src\inc;..\..\ixml\inc;..\..\ixml\src\inc;..\..\threadutil\inc;..\..\pthreads;..\..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DEBUG;WIN32;_USRDLL;LIBUPNP_EXPORTS;UPNP_USE_MSVCPP;SCRIPTSUPPORT;_CRT_NONSTDC_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL;_SCL_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_WARNINGS;_AFX_SECURE_NO_DEPRECATE;_SECURE_ATL;_ATL_NO_COM_SUPPORT;_ATL_SECURE_NO_WARNINGS;_ATL_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SCRIPTSUPPORT;DEBUG;WIN32;_WINDOWS;_USRDLL;LIBUPNP_EXPORTS;UPNP_USE_MSVCPP;_CRT_NONSTDC_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL;_SCL_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_WARNINGS;_AFX_SECURE_NO_DEPRECATE;_SECURE_ATL;_ATL_NO_COM_SUPPORT;_ATL_SECURE_NO_WARNINGS;_ATL_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -404,7 +404,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\inc;..\msvc;..\..\upnp\inc;..\..\upnp\src\inc;..\..\ixml\inc;..\..\ixml\src\inc;..\..\threadutil\inc;..\..\pthreads;..\..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;PTW32_STATIC_LIB;UPNP_STATIC_LIB;UPNP_USE_MSVCPP;_CRT_NONSTDC_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL;_SCL_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_WARNINGS;_AFX_SECURE_NO_DEPRECATE;_SECURE_ATL;_ATL_NO_COM_SUPPORT;_ATL_SECURE_NO_WARNINGS;_ATL_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SCRIPTSUPPORT;WIN32;DEBUG;_WINDOWS;PTW32_STATIC_LIB;UPNP_STATIC_LIB;UPNP_USE_MSVCPP;_CRT_NONSTDC_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL;_SCL_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_WARNINGS;_AFX_SECURE_NO_DEPRECATE;_SECURE_ATL;_ATL_NO_COM_SUPPORT;_ATL_SECURE_NO_WARNINGS;_ATL_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -493,7 +493,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>..\inc;..\msvc;..\..\upnp\inc;..\..\upnp\src\inc;..\..\ixml\inc;..\..\ixml\src\inc;..\..\threadutil\inc;..\..\pthreads;..\..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;RELEASE;_WINDOWS;PTW32_STATIC_LIB;UPNP_STATIC_LIB;UPNP_USE_MSVCPP;_CRT_NONSTDC_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL;_SCL_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_WARNINGS;_AFX_SECURE_NO_DEPRECATE;_SECURE_ATL;_ATL_NO_COM_SUPPORT;_ATL_SECURE_NO_WARNINGS;_ATL_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SCRIPTSUPPORT;WIN32;NDEBUG;RELEASE;_WINDOWS;PTW32_STATIC_LIB;UPNP_STATIC_LIB;UPNP_USE_MSVCPP;_CRT_NONSTDC_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL;_SCL_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_WARNINGS;_AFX_SECURE_NO_DEPRECATE;_SECURE_ATL;_ATL_NO_COM_SUPPORT;_ATL_SECURE_NO_WARNINGS;_ATL_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
