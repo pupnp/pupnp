@@ -477,6 +477,11 @@ if test "x$enable_blocking_tcp_connections" = xyes ; then
         AC_DEFINE(UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS, 1, [see upnpconfig.h])
 fi
 
+RT_BOOL_ARG_ENABLE([scriptsupport], [no], [script support for IXML document tree, see ixml.h])
+if test "x$enable_scriptsupport" = xyes ; then
+        AC_DEFINE(SCRIPTSUPPORT, 1, [see upnpconfig.h])
+fi
+
 
 RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 
