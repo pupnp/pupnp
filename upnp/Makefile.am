@@ -168,7 +168,10 @@ libupnp_la_SOURCES += \
 	src/uuid/sysdep.c \
 	src/uuid/uuid.c
 upnpinclude_HEADERS += \
-	src/inc/uuid.h
+	src/inc/uuid.h \
+	src/inc/md5.h \
+	src/inc/global.h \
+	src/inc/sysdep.h
 endif
 
 
