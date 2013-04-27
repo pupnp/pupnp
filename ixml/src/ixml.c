@@ -417,7 +417,7 @@ void ixmlRelaxParser(char errorChar)
 	Parser_setErrorChar(errorChar);
 }
 
-#ifdef SCRIPTSUPPORT
+#ifdef IXML_HAVE_SCRIPTSUPPORT
 void ixmlSetBeforeFree(IXML_BeforeFreeNode_t hndlr)
 {
 	Parser_setBeforeFree(hndlr);

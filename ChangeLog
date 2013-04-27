@@ -2,6 +2,14 @@
 Version 1.8.0
 *******************************************************************************
 
+2013-04-27 Thijs Schreijer <thijs(at)thijsschreijer.nl>
+
+	Renamed SCRIPTSUPPORT to IXML_HAVE_SCRIPTSUPPORT for consistency. Also
+        updated autoconfig and automake files, so it also works on non-windows.
+        Option is enabled by default, because it adds an element to the node
+        structure. Not using an available field is better than accidentally
+        using an unavailable field.
+
 2012-07-11 Thijs Schreijer <thijs(at)thijsschreijer.nl>
 
 	Changed param to const UpnpAcceptSubscriptionExt() for consistency
