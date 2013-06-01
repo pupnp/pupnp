@@ -186,7 +186,7 @@ typedef struct _IXML_Node
 	Nodeptr           firstAttr;
 	Docptr            ownerDocument;
 #ifdef IXML_HAVE_SCRIPTSUPPORT
-	void*             ctag;			// custom tag
+	void*             ctag;			/* custom tag */
 #endif
 } IXML_Node;
 
