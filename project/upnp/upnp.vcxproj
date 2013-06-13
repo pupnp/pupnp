@@ -103,6 +103,12 @@
       <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference />
+    <PreBuildEvent>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -117,6 +123,12 @@
       <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference />
+    <PreBuildEvent>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -135,6 +147,12 @@
       <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference />
+    <PreBuildEvent>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -153,6 +171,12 @@
       <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference />
+    <PreBuildEvent>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\ixml\ixml.vcxproj">

@@ -102,6 +102,12 @@
     </Link>
     <Lib />
     <Lib />
+    <PostBuildEvent>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -116,6 +122,12 @@
     </Link>
     <Lib />
     <Lib />
+    <PostBuildEvent>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -134,6 +146,12 @@
     </Link>
     <Lib />
     <Lib />
+    <PostBuildEvent>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -152,6 +170,12 @@
     </Link>
     <Lib />
     <Lib />
+    <PostBuildEvent>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\threadutil\inc\FreeList.h" />
