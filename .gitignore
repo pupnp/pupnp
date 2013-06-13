@@ -117,6 +117,7 @@ docs/doxygen
 
 # Tempory Files
 *.log
+*File.txt
 
 # old cvs files
 *.cvsignore

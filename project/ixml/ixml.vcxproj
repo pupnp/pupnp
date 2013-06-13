@@ -101,10 +101,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
+IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -119,10 +121,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
+IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,10 +145,12 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
+IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -163,10 +169,12 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"</Command>
+      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /SQ "$(SolutionDir)..\include\$(ProjectName)"</Command>
+      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
+IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

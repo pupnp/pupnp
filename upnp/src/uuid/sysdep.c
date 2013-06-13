@@ -103,7 +103,7 @@ void get_random_info(unsigned char seed[16])
 	/* milliseconds since last boot */
 	r.tc = GetTickCount();
 	r.l = MAX_COMPUTERNAME_LENGTH + 1;
-	GetComputerName( r.hostname, &r.l );
+	GetComputerNameA( r.hostname, &r.l ); // use non-unicode version
 	/* MD5 it */
 	MD5Init(&c);
 	MD5Update(&c, (unsigned char *)(&r), sizeof r);
