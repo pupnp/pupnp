@@ -316,9 +316,9 @@ static UPNP_INLINE int get_content_type(
 	/*! [out] . */
 	OUT UpnpFileInfo *fileInfo)
 {
-	const char *extension;
-	const char *type;
-	const char *subtype;
+	const char *extension = NULL;
+	const char *type = NULL;
+	const char *subtype = NULL;
 	int ctype_found = FALSE;
 	char *temp = NULL;
 	size_t length = 0;

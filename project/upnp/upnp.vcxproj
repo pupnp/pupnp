@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A37D36AB-6E70-4F55-A9AC-B3D5166E3919}</ProjectGuid>
+    <RootNamespace>libupnp</RootNamespace>
+    <ProjectName>upnp</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ProjectReference />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ProjectReference />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ProjectReference />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ProjectReference />
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ixml\ixml.vcxproj">
+      <Project>{8316d07e-6da7-409b-b064-6d9fe099a79b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\threadutil\threadutil.vcxproj">
+      <Project>{a43ca2a8-3864-4282-8c86-efefae0e0e4d}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\upnp\inc\ActionComplete.h" />
+    <ClInclude Include="..\..\upnp\inc\ActionRequest.h" />
+    <ClInclude Include="..\..\upnp\inc\Callback.h" />
+    <ClInclude Include="..\..\upnp\inc\Discovery.h" />
+    <ClInclude Include="..\..\upnp\inc\Event.h" />
+    <ClInclude Include="..\..\upnp\inc\EventSubscribe.h" />
+    <ClInclude Include="..\..\upnp\inc\FileInfo.h" />
+    <ClInclude Include="..\..\upnp\inc\list.h" />
+    <ClInclude Include="..\..\upnp\inc\poison.h" />
+    <ClInclude Include="..\..\upnp\inc\StateVarComplete.h" />
+    <ClInclude Include="..\..\upnp\inc\StateVarRequest.h" />
+    <ClInclude Include="..\..\upnp\inc\SubscriptionRequest.h" />
+    <ClInclude Include="..\..\upnp\inc\TemplateInclude.h" />
+    <ClInclude Include="..\..\upnp\inc\TemplateSource.h" />
+    <ClInclude Include="..\..\upnp\inc\TemplateUndef.h" />
+    <ClInclude Include="..\..\upnp\inc\upnp.h" />
+    <ClInclude Include="..\..\upnp\inc\upnpdebug.h" />
+    <ClInclude Include="..\..\upnp\inc\UpnpGlobal.h" />
+    <ClInclude Include="..\..\upnp\inc\UpnpInet.h" />
+    <ClInclude Include="..\..\upnp\inc\UpnpIntTypes.h" />
+    <ClInclude Include="..\..\upnp\inc\UpnpStdInt.h" />
+    <ClInclude Include="..\..\upnp\inc\UpnpString.h" />
+    <ClInclude Include="..\..\upnp\inc\upnptools.h" />
+    <ClInclude Include="..\..\upnp\inc\UpnpUniStd.h" />
+    <ClInclude Include="..\..\upnp\src\inc\ClientSubscription.h" />
+    <ClInclude Include="..\..\upnp\src\inc\client_table.h" />
+    <ClInclude Include="..\..\upnp\src\inc\config.h" />
+    <ClInclude Include="..\..\upnp\src\inc\gena.h" />
+    <ClInclude Include="..\..\upnp\src\inc\gena_ctrlpt.h" />
+    <ClInclude Include="..\..\upnp\src\inc\gena_device.h" />
+    <ClInclude Include="..\..\upnp\src\inc\global.h" />
+    <ClInclude Include="..\..\upnp\src\inc\gmtdate.h" />
+    <ClInclude Include="..\..\upnp\src\inc\httpparser.h" />
+    <ClInclude Include="..\..\upnp\src\inc\httpreadwrite.h" />
+    <ClInclude Include="..\..\upnp\src\inc\inet_pton.h" />
+    <ClInclude Include="..\..\upnp\src\inc\md5.h" />
+    <ClInclude Include="..\..\upnp\src\inc\membuffer.h" />
+    <ClInclude Include="..\..\upnp\src\inc\miniserver.h" />
+    <ClInclude Include="..\..\upnp\src\inc\netall.h" />
+    <ClInclude Include="..\..\upnp\src\inc\parsetools.h" />
+    <ClInclude Include="..\..\upnp\src\inc\server.h" />
+    <ClInclude Include="..\..\upnp\src\inc\service_table.h" />
+    <ClInclude Include="..\..\upnp\src\inc\soaplib.h" />
+    <ClInclude Include="..\..\upnp\src\inc\sock.h" />
+    <ClInclude Include="..\..\upnp\src\inc\ssdplib.h" />
+    <ClInclude Include="..\..\upnp\src\inc\statcodes.h" />
+    <ClInclude Include="..\..\upnp\src\inc\statuscodes.h" />
+    <ClInclude Include="..\..\upnp\src\inc\strintmap.h" />
+    <ClInclude Include="..\..\upnp\src\inc\sysdep.h" />
+    <ClInclude Include="..\..\upnp\src\inc\unixutil.h" />
+    <ClInclude Include="..\..\upnp\src\inc\upnpapi.h" />
+    <ClInclude Include="..\..\upnp\src\inc\upnputil.h" />
+    <ClInclude Include="..\..\upnp\src\inc\upnp_timeout.h" />
+    <ClInclude Include="..\..\upnp\src\inc\uri.h" />
+    <ClInclude Include="..\..\upnp\src\inc\urlconfig.h" />
+    <ClInclude Include="..\..\upnp\src\inc\uuid.h" />
+    <ClInclude Include="..\..\upnp\src\inc\VirtualDir.h" />
+    <ClInclude Include="..\..\upnp\src\inc\webserver.h" />
+    <ClInclude Include="..\..\upnp\src\ssdp\ssdp_ResultData.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\upnp\src\api\ActionComplete.c" />
+    <ClCompile Include="..\..\upnp\src\api\ActionRequest.c" />
+    <ClCompile Include="..\..\upnp\src\api\Discovery.c" />
+    <ClCompile Include="..\..\upnp\src\api\Event.c" />
+    <ClCompile Include="..\..\upnp\src\api\EventSubscribe.c" />
+    <ClCompile Include="..\..\upnp\src\api\FileInfo.c" />
+    <ClCompile Include="..\..\upnp\src\api\StateVarComplete.c" />
+    <ClCompile Include="..\..\upnp\src\api\StateVarRequest.c" />
+    <ClCompile Include="..\..\upnp\src\api\SubscriptionRequest.c" />
+    <ClCompile Include="..\..\upnp\src\api\upnpapi.c" />
+    <ClCompile Include="..\..\upnp\src\api\upnpdebug.c" />
+    <ClCompile Include="..\..\upnp\src\api\UpnpString.c" />
+    <ClCompile Include="..\..\upnp\src\api\upnptools.c" />
+    <ClCompile Include="..\..\upnp\src\gena\gena_callback2.c" />
+    <ClCompile Include="..\..\upnp\src\gena\gena_ctrlpt.c" />
+    <ClCompile Include="..\..\upnp\src\gena\gena_device.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\client_table\ClientSubscription.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\client_table\client_table.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\miniserver\miniserver.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\net\http\httpparser.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\net\http\httpreadwrite.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\net\http\parsetools.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\net\http\statcodes.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\net\http\webserver.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\net\sock.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\net\uri\uri.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\service_table\service_table.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\util\membuffer.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\util\strintmap.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\util\upnp_timeout.c" />
+    <ClCompile Include="..\..\upnp\src\genlib\util\util.c" />
+    <ClCompile Include="..\..\upnp\src\inet_pton.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\upnp\src\soap\soap_common.c" />
+    <ClCompile Include="..\..\upnp\src\soap\soap_ctrlpt.c" />
+    <ClCompile Include="..\..\upnp\src\soap\soap_device.c" />
+    <ClCompile Include="..\..\upnp\src\ssdp\ssdp_ctrlpt.c" />
+    <ClCompile Include="..\..\upnp\src\ssdp\ssdp_device.c" />
+    <ClCompile Include="..\..\upnp\src\ssdp\ssdp_ResultData.c" />
+    <ClCompile Include="..\..\upnp\src\ssdp\ssdp_server.c" />
+    <ClCompile Include="..\..\upnp\src\urlconfig\urlconfig.c" />
+    <ClCompile Include="..\..\upnp\src\uuid\md5.c" />
+    <ClCompile Include="..\..\upnp\src\uuid\sysdep.c" />
+    <ClCompile Include="..\..\upnp\src\uuid\uuid.c" />
+    <ClCompile Include="..\..\upnp\src\win_dll.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
