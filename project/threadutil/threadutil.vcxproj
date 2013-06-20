@@ -122,49 +122,49 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)..\$(ProjectName)\inc;$(SolutionDir)..\$(ProjectName)\src\inc;$(SolutionDir)..\upnp\inc;$(SolutionDir)..\ixml\inc;$(SolutionDir)..\threadutil\inc;$(SolutionDir)..\build\inc;$(SolutionDir)..\build\msvc;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -173,7 +173,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -181,8 +181,8 @@
     <Lib />
     <Lib />
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
@@ -195,7 +195,7 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;LIBUPNP_EXPORTS;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -203,8 +203,8 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
     <Lib />
     <Lib />
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
@@ -217,7 +217,7 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -225,8 +225,8 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
     <Lib />
     <Lib />
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
@@ -239,7 +239,7 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;LIBUPNP_EXPORTS;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -247,8 +247,8 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
     <Lib />
     <Lib />
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
@@ -263,7 +263,7 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -273,8 +273,8 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
     <Lib />
     <Lib />
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
@@ -289,7 +289,7 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;LIBUPNP_EXPORTS;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -299,8 +299,8 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
     <Lib />
     <Lib />
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
@@ -315,7 +315,7 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -325,8 +325,8 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
     <Lib />
     <Lib />
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
@@ -341,7 +341,7 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;LIBUPNP_EXPORTS;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\pthreads\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -351,8 +351,8 @@ IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\
     <Lib />
     <Lib />
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(SolutionDir)..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(SolutionDir)..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
+XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
