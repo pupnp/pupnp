@@ -38,7 +38,7 @@
 
 #include "membuffer.h"
 #include "unixutil.h"
-#include "upnp.h"
+#include "upnp/upnp.h"
 #include "upnpdebug.h"
 #include "UpnpInet.h"
 #include "uri.h"

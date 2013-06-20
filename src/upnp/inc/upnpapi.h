@@ -41,7 +41,7 @@
 
 
 #include "client_table.h"
-#include "upnp.h"
+#include "upnp/upnp.h"
 #include "VirtualDir.h"		/* for struct VirtualDirCallbacks */
 
 

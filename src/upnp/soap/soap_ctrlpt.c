@@ -48,7 +48,7 @@
 #include "upnpapi.h"
 #include "soaplib.h"
 #include "uri.h"
-#include "upnp.h"
+#include "upnp/upnp.h"
 
 #include "unixutil.h"
 

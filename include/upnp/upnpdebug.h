@@ -37,7 +37,7 @@
  * \file
  */
 
-#include "ThreadPool.h"
+#include "threadutil/ThreadPool.h"
 #include "upnpconfig.h"
 #include "UpnpGlobal.h"		/* for UPNP_INLINE */
 

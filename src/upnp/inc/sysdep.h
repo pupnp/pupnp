@@ -24,7 +24,7 @@
  * \file
  */
 
-#include "ithread.h"
+#include "threadutil/ithread.h"
 
 /* change to point to where MD5 .h's live */
 /* get MD5 sample implementation from RFC 1321 */

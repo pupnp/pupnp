@@ -49,7 +49,7 @@
  */
 
 
-#include "ixml.h" /* for IXML_Document */
+#include "ixml/ixml.h" /* for IXML_Document */
 #include "upnpconfig.h"	/* for UPNP_HAVE_TOOLS */
 
 

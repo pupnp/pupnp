@@ -17,7 +17,7 @@
 
 #include "config.h"
 
-#include "UpnpString.h"
+#include "upnp/UpnpString.h"
 
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */

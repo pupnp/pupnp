@@ -42,10 +42,33 @@
 		/* define some things the M$ VC++ doesn't know */
 		#define UPNP_INLINE _inline
 		typedef __int64 int64_t;
-		#define PRId64 "I64d"
-		#define PRIzd "ld"
-		#define PRIzu "lu"
-		#define PRIzx "lx"
+		#ifndef PRIzd
+			#define PRIzd "ld"
+		#endif
+		#ifndef PRIzu
+			#define PRIzu "lu"
+		#endif
+		#ifndef PRIzx
+			#define PRIzx "lx"
+		#endif
+		#ifndef PRIx64
+			#define PRIx64 "llx"
+		#endif
+		#ifndef SCNx64
+			#define SCNx64 "llx"
+		#endif
+		#ifndef PRId64
+			#define PRId64 "lld"
+		#endif
+		#ifndef SCNd64
+			#define SCNd64 "lld"
+		#endif
+		#ifndef PRIu64
+			#define PRIu64 "llu"
+		#endif
+		#ifndef PRIxPTR
+			#define PRIxPTR  PRIx64
+		#endif
 	#endif /* UPNP_USE_MSVCPP */
 
 	#ifdef UPNP_USE_BCBPP

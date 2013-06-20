@@ -37,7 +37,7 @@
  * \file
  */
 
-#include "upnp.h"
+#include "upnp/upnp.h"
 #include <errno.h>
 
 /* usually used to specify direction of parameters in functions */

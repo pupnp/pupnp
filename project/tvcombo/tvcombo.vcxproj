@@ -122,50 +122,50 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -173,7 +173,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;$(ProjectDir)..\..\upnp\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;$(ProjectDir)..\..\src\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -186,7 +186,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;$(ProjectDir)..\..\upnp\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;$(ProjectDir)..\..\src\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -199,7 +199,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;$(ProjectDir)..\..\upnp\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;$(ProjectDir)..\..\src\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -212,7 +212,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;$(ProjectDir)..\..\upnp\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;$(ProjectDir)..\..\src\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -227,7 +227,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;$(ProjectDir)..\..\upnp\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;$(ProjectDir)..\..\src\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -244,7 +244,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;$(ProjectDir)..\..\upnp\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;$(ProjectDir)..\..\src\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -261,7 +261,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;$(ProjectDir)..\..\upnp\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;$(ProjectDir)..\..\src\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -278,7 +278,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;$(ProjectDir)..\..\upnp\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;$(ProjectDir)..\..\src\sample\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -288,20 +288,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\upnp\sample\common\sample_util.h" />
-    <ClInclude Include="..\..\upnp\sample\common\tv_ctrlpt.h" />
-    <ClInclude Include="..\..\upnp\sample\common\tv_device.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\upnp\sample\common\sample_util.c" />
-    <ClCompile Include="..\..\upnp\sample\common\tv_ctrlpt.c" />
-    <ClCompile Include="..\..\upnp\sample\common\tv_device.c" />
-    <ClCompile Include="..\..\upnp\sample\linux\tv_combo_main.c" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\threadutil\threadutil.vcxproj">
+      <Project>{a43ca2a8-3864-4282-8c86-efefae0e0e4d}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\upnp\upnp.vcxproj">
       <Project>{a37d36ab-6e70-4f55-a9ac-b3d5166e3919}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\sample\common\sample_util.h" />
+    <ClInclude Include="..\..\src\sample\common\tv_ctrlpt.h" />
+    <ClInclude Include="..\..\src\sample\common\tv_device.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\sample\common\sample_util.c" />
+    <ClCompile Include="..\..\src\sample\common\tv_ctrlpt.c" />
+    <ClCompile Include="..\..\src\sample\common\tv_device.c" />
+    <ClCompile Include="..\..\src\sample\linux\tv_combo_main.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

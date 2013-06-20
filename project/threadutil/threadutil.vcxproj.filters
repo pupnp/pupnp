@@ -15,33 +15,33 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\threadutil\inc\FreeList.h">
+    <ClInclude Include="..\..\include\threadutil\FreeList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\threadutil\inc\ithread.h">
+    <ClInclude Include="..\..\include\threadutil\ithread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\threadutil\inc\LinkedList.h">
+    <ClInclude Include="..\..\include\threadutil\LinkedList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\threadutil\inc\ThreadPool.h">
+    <ClInclude Include="..\..\include\threadutil\ThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\threadutil\inc\TimerThread.h">
+    <ClInclude Include="..\..\include\threadutil\TimerThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\threadutil\src\FreeList.c">
+    <ClCompile Include="..\..\src\threadutil\FreeList.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\threadutil\src\LinkedList.c">
+    <ClCompile Include="..\..\src\threadutil\LinkedList.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\threadutil\src\ThreadPool.c">
+    <ClCompile Include="..\..\src\threadutil\ThreadPool.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\threadutil\src\TimerThread.c">
+    <ClCompile Include="..\..\src\threadutil\TimerThread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

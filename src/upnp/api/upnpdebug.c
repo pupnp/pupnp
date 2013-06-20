@@ -35,9 +35,9 @@
 
 #include "config.h"
 
-#include "ithread.h"
-#include "ixml.h"
-#include "upnp.h"
+#include "threadutil/ithread.h"
+#include "ixml/ixml.h"
+#include "upnp/upnp.h"
 #include "upnpdebug.h"
 
 #include <stdarg.h>

@@ -44,10 +44,10 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#include "ithread.h"
-#include "ixml.h" /* for IXML_Document, IXML_Element */
-#include "upnp.h" /* for Upnp_EventType */
-#include "upnptools.h"
+#include "threadutil/ithread.h"
+#include "ixml/ixml.h" /* for IXML_Document, IXML_Element */
+#include "upnp/upnp.h" /* for Upnp_EventType */
+#include "upnp/upnptools.h"
 
 #include <stdlib.h>
 #include <string.h>

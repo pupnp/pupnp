@@ -4,7 +4,7 @@
 #define IXMLDEBUG_H
 
 
-#include "UpnpGlobal.h"
+#include "upnp/UpnpGlobal.h"
 #include "ixml.h"
 
 

@@ -43,8 +43,8 @@ extern "C" {
 
 #include "config.h"
 #include "uri.h"
-#include "ixml.h"
-#include "upnp.h"
+#include "ixml/ixml.h"
+#include "upnp/upnp.h"
 #include "upnpdebug.h"
 
 #include <stdio.h>

@@ -42,8 +42,8 @@
 #if EXCLUDE_DOM == 0
 
 
-#include "upnp.h"
-#include "upnptools.h"
+#include "upnp/upnp.h"
+#include "upnp/upnptools.h"
 
 
 #include "uri.h"

@@ -41,8 +41,8 @@
 	#include <sys/param.h>
 #endif
 
-#include "UpnpGlobal.h" /* For UPNP_INLINE, EXPORT_SPEC */
-#include "UpnpUniStd.h" /* for close() */
+#include "upnp/UpnpGlobal.h" /* For UPNP_INLINE, EXPORT_SPEC */
+#include "upnp/UpnpUniStd.h" /* for close() */
 
 #ifdef __cplusplus
 extern "C" {

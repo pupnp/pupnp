@@ -123,50 +123,50 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
     <OutDir>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\include\$(ProjectName);$(SolutionDir)..\pthreads\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\$(PlatformName)\$(Configuration)\;$(SolutionDir)..\pthreads\lib\$(PlatformTarget)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -174,7 +174,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -182,12 +182,12 @@
     </Link>
     <ProjectReference />
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
-IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">
@@ -196,7 +196,7 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;LIBUPNP_EXPORTS;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -204,12 +204,12 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
     </Link>
     <ProjectReference />
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
-IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -218,7 +218,7 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -226,12 +226,12 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
     </Link>
     <ProjectReference />
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
-IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
@@ -240,7 +240,7 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;LIBUPNP_EXPORTS;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -248,12 +248,12 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
     </Link>
     <ProjectReference />
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
-IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -264,7 +264,7 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -274,12 +274,12 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
     </Link>
     <ProjectReference />
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
-IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'">
@@ -290,7 +290,7 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;LIBUPNP_EXPORTS;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -300,12 +300,12 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
     </Link>
     <ProjectReference />
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
-IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -316,7 +316,7 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;UPNP_STATIC_LIB;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -326,12 +326,12 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
     </Link>
     <ProjectReference />
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
-IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
@@ -342,7 +342,7 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;UPNP_USE_MSVCPP;WIN32_LEAN_AND_MEAN;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_AFX_SECURE_NO_DEPRECATE;_UNICODE;UNICODE;LIBUPNP_EXPORTS;_RELEASE;RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\$(ProjectName)\inc;$(ProjectDir)..\..\$(ProjectName)\src\inc;$(ProjectDir)..\..\upnp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\$(ProjectName)\inc;$(ProjectDir)..\..\src\build\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -352,12 +352,12 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
     </Link>
     <ProjectReference />
     <PreBuildEvent>
-      <Command>IF EXIST "$(SolutionDir)..\include\$(ProjectName)" RMDIR /S /Q "$(SolutionDir)..\include\$(ProjectName)"
-IF EXIST "$(SolutionDir)..\include\build" RMDIR /S /Q "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY /QSYI "$(ProjectDir)..\..\$(ProjectName)\inc" "$(SolutionDir)..\include\$(ProjectName)"
-XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -369,120 +369,124 @@ XCOPY /QSYI "$(ProjectDir)..\..\build\inc" "$(SolutionDir)..\include\build"</Com
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\upnp\inc\ActionComplete.h" />
-    <ClInclude Include="..\..\upnp\inc\ActionRequest.h" />
-    <ClInclude Include="..\..\upnp\inc\Callback.h" />
-    <ClInclude Include="..\..\upnp\inc\Discovery.h" />
-    <ClInclude Include="..\..\upnp\inc\Event.h" />
-    <ClInclude Include="..\..\upnp\inc\EventSubscribe.h" />
-    <ClInclude Include="..\..\upnp\inc\FileInfo.h" />
-    <ClInclude Include="..\..\upnp\inc\list.h" />
-    <ClInclude Include="..\..\upnp\inc\poison.h" />
-    <ClInclude Include="..\..\upnp\inc\StateVarComplete.h" />
-    <ClInclude Include="..\..\upnp\inc\StateVarRequest.h" />
-    <ClInclude Include="..\..\upnp\inc\SubscriptionRequest.h" />
-    <ClInclude Include="..\..\upnp\inc\TemplateInclude.h" />
-    <ClInclude Include="..\..\upnp\inc\TemplateSource.h" />
-    <ClInclude Include="..\..\upnp\inc\TemplateUndef.h" />
-    <ClInclude Include="..\..\upnp\inc\upnp.h" />
-    <ClInclude Include="..\..\upnp\inc\upnpdebug.h" />
-    <ClInclude Include="..\..\upnp\inc\UpnpGlobal.h" />
-    <ClInclude Include="..\..\upnp\inc\UpnpInet.h" />
-    <ClInclude Include="..\..\upnp\inc\UpnpIntTypes.h" />
-    <ClInclude Include="..\..\upnp\inc\UpnpStdInt.h" />
-    <ClInclude Include="..\..\upnp\inc\UpnpString.h" />
-    <ClInclude Include="..\..\upnp\inc\upnptools.h" />
-    <ClInclude Include="..\..\upnp\inc\UpnpUniStd.h" />
-    <ClInclude Include="..\..\upnp\src\inc\ClientSubscription.h" />
-    <ClInclude Include="..\..\upnp\src\inc\client_table.h" />
-    <ClInclude Include="..\..\upnp\src\inc\config.h" />
-    <ClInclude Include="..\..\upnp\src\inc\gena.h" />
-    <ClInclude Include="..\..\upnp\src\inc\gena_ctrlpt.h" />
-    <ClInclude Include="..\..\upnp\src\inc\gena_device.h" />
-    <ClInclude Include="..\..\upnp\src\inc\global.h" />
-    <ClInclude Include="..\..\upnp\src\inc\gmtdate.h" />
-    <ClInclude Include="..\..\upnp\src\inc\httpparser.h" />
-    <ClInclude Include="..\..\upnp\src\inc\httpreadwrite.h" />
-    <ClInclude Include="..\..\upnp\src\inc\inet_pton.h" />
-    <ClInclude Include="..\..\upnp\src\inc\md5.h" />
-    <ClInclude Include="..\..\upnp\src\inc\membuffer.h" />
-    <ClInclude Include="..\..\upnp\src\inc\miniserver.h" />
-    <ClInclude Include="..\..\upnp\src\inc\netall.h" />
-    <ClInclude Include="..\..\upnp\src\inc\parsetools.h" />
-    <ClInclude Include="..\..\upnp\src\inc\server.h" />
-    <ClInclude Include="..\..\upnp\src\inc\service_table.h" />
-    <ClInclude Include="..\..\upnp\src\inc\soaplib.h" />
-    <ClInclude Include="..\..\upnp\src\inc\sock.h" />
-    <ClInclude Include="..\..\upnp\src\inc\ssdplib.h" />
-    <ClInclude Include="..\..\upnp\src\inc\statcodes.h" />
-    <ClInclude Include="..\..\upnp\src\inc\statuscodes.h" />
-    <ClInclude Include="..\..\upnp\src\inc\strintmap.h" />
-    <ClInclude Include="..\..\upnp\src\inc\sysdep.h" />
-    <ClInclude Include="..\..\upnp\src\inc\unixutil.h" />
-    <ClInclude Include="..\..\upnp\src\inc\upnpapi.h" />
-    <ClInclude Include="..\..\upnp\src\inc\upnputil.h" />
-    <ClInclude Include="..\..\upnp\src\inc\upnp_timeout.h" />
-    <ClInclude Include="..\..\upnp\src\inc\uri.h" />
-    <ClInclude Include="..\..\upnp\src\inc\urlconfig.h" />
-    <ClInclude Include="..\..\upnp\src\inc\uuid.h" />
-    <ClInclude Include="..\..\upnp\src\inc\VirtualDir.h" />
-    <ClInclude Include="..\..\upnp\src\inc\webserver.h" />
-    <ClInclude Include="..\..\upnp\src\ssdp\ssdp_ResultData.h" />
+    <ClInclude Include="..\..\include\upnp\ActionComplete.h" />
+    <ClInclude Include="..\..\include\upnp\ActionRequest.h" />
+    <ClInclude Include="..\..\include\upnp\Callback.h" />
+    <ClInclude Include="..\..\include\upnp\Discovery.h" />
+    <ClInclude Include="..\..\include\upnp\Event.h" />
+    <ClInclude Include="..\..\include\upnp\EventSubscribe.h" />
+    <ClInclude Include="..\..\include\upnp\FileInfo.h" />
+    <ClInclude Include="..\..\include\upnp\list.h" />
+    <ClInclude Include="..\..\include\upnp\poison.h" />
+    <ClInclude Include="..\..\include\upnp\StateVarComplete.h" />
+    <ClInclude Include="..\..\include\upnp\StateVarRequest.h" />
+    <ClInclude Include="..\..\include\upnp\SubscriptionRequest.h" />
+    <ClInclude Include="..\..\include\upnp\TemplateInclude.h" />
+    <ClInclude Include="..\..\include\upnp\TemplateSource.h" />
+    <ClInclude Include="..\..\include\upnp\TemplateUndef.h" />
+    <ClInclude Include="..\..\include\upnp\upnp.h" />
+    <ClInclude Include="..\..\include\upnp\upnpdebug.h" />
+    <ClInclude Include="..\..\include\upnp\UpnpGlobal.h" />
+    <ClInclude Include="..\..\include\upnp\UpnpInet.h" />
+    <ClInclude Include="..\..\include\upnp\UpnpIntTypes.h" />
+    <ClInclude Include="..\..\include\upnp\UpnpStdInt.h" />
+    <ClInclude Include="..\..\include\upnp\UpnpString.h" />
+    <ClInclude Include="..\..\include\upnp\upnptools.h" />
+    <ClInclude Include="..\..\include\upnp\UpnpUniStd.h" />
+    <ClInclude Include="..\..\src\upnp\inc\ClientSubscription.h" />
+    <ClInclude Include="..\..\src\upnp\inc\client_table.h" />
+    <ClInclude Include="..\..\src\upnp\inc\config.h" />
+    <ClInclude Include="..\..\src\upnp\inc\gena.h" />
+    <ClInclude Include="..\..\src\upnp\inc\gena_ctrlpt.h" />
+    <ClInclude Include="..\..\src\upnp\inc\gena_device.h" />
+    <ClInclude Include="..\..\src\upnp\inc\global.h" />
+    <ClInclude Include="..\..\src\upnp\inc\gmtdate.h" />
+    <ClInclude Include="..\..\src\upnp\inc\httpparser.h" />
+    <ClInclude Include="..\..\src\upnp\inc\httpreadwrite.h" />
+    <ClInclude Include="..\..\src\upnp\inc\inet_pton.h" />
+    <ClInclude Include="..\..\src\upnp\inc\md5.h" />
+    <ClInclude Include="..\..\src\upnp\inc\membuffer.h" />
+    <ClInclude Include="..\..\src\upnp\inc\miniserver.h" />
+    <ClInclude Include="..\..\src\upnp\inc\netall.h" />
+    <ClInclude Include="..\..\src\upnp\inc\parsetools.h" />
+    <ClInclude Include="..\..\src\upnp\inc\server.h" />
+    <ClInclude Include="..\..\src\upnp\inc\service_table.h" />
+    <ClInclude Include="..\..\src\upnp\inc\soaplib.h" />
+    <ClInclude Include="..\..\src\upnp\inc\sock.h" />
+    <ClInclude Include="..\..\src\upnp\inc\ssdplib.h" />
+    <ClInclude Include="..\..\src\upnp\inc\statcodes.h" />
+    <ClInclude Include="..\..\src\upnp\inc\statuscodes.h" />
+    <ClInclude Include="..\..\src\upnp\inc\strintmap.h" />
+    <ClInclude Include="..\..\src\upnp\inc\sysdep.h" />
+    <ClInclude Include="..\..\src\upnp\inc\unixutil.h" />
+    <ClInclude Include="..\..\src\upnp\inc\upnpapi.h" />
+    <ClInclude Include="..\..\src\upnp\inc\upnputil.h" />
+    <ClInclude Include="..\..\src\upnp\inc\upnp_timeout.h" />
+    <ClInclude Include="..\..\src\upnp\inc\uri.h" />
+    <ClInclude Include="..\..\src\upnp\inc\urlconfig.h" />
+    <ClInclude Include="..\..\src\upnp\inc\uuid.h" />
+    <ClInclude Include="..\..\src\upnp\inc\VirtualDir.h" />
+    <ClInclude Include="..\..\src\upnp\inc\webserver.h" />
+    <ClInclude Include="..\..\src\upnp\ssdp\ssdp_ResultData.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\upnp\src\api\ActionComplete.c" />
-    <ClCompile Include="..\..\upnp\src\api\ActionRequest.c" />
-    <ClCompile Include="..\..\upnp\src\api\Discovery.c" />
-    <ClCompile Include="..\..\upnp\src\api\Event.c" />
-    <ClCompile Include="..\..\upnp\src\api\EventSubscribe.c" />
-    <ClCompile Include="..\..\upnp\src\api\FileInfo.c" />
-    <ClCompile Include="..\..\upnp\src\api\StateVarComplete.c" />
-    <ClCompile Include="..\..\upnp\src\api\StateVarRequest.c" />
-    <ClCompile Include="..\..\upnp\src\api\SubscriptionRequest.c" />
-    <ClCompile Include="..\..\upnp\src\api\upnpapi.c" />
-    <ClCompile Include="..\..\upnp\src\api\upnpdebug.c" />
-    <ClCompile Include="..\..\upnp\src\api\UpnpString.c" />
-    <ClCompile Include="..\..\upnp\src\api\upnptools.c" />
-    <ClCompile Include="..\..\upnp\src\gena\gena_callback2.c" />
-    <ClCompile Include="..\..\upnp\src\gena\gena_ctrlpt.c" />
-    <ClCompile Include="..\..\upnp\src\gena\gena_device.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\client_table\ClientSubscription.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\client_table\client_table.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\miniserver\miniserver.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\net\http\httpparser.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\net\http\httpreadwrite.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\net\http\parsetools.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\net\http\statcodes.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\net\http\webserver.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\net\sock.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\net\uri\uri.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\service_table\service_table.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\util\membuffer.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\util\strintmap.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\util\upnp_timeout.c" />
-    <ClCompile Include="..\..\upnp\src\genlib\util\util.c" />
-    <ClCompile Include="..\..\upnp\src\inet_pton.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    <None Include="..\..\include\upnp\LICENSE" />
+    <None Include="..\..\include\upnp\upnpconfig.h.in" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\upnp\api\ActionComplete.c" />
+    <ClCompile Include="..\..\src\upnp\api\ActionRequest.c" />
+    <ClCompile Include="..\..\src\upnp\api\Discovery.c" />
+    <ClCompile Include="..\..\src\upnp\api\Event.c" />
+    <ClCompile Include="..\..\src\upnp\api\EventSubscribe.c" />
+    <ClCompile Include="..\..\src\upnp\api\FileInfo.c" />
+    <ClCompile Include="..\..\src\upnp\api\StateVarComplete.c" />
+    <ClCompile Include="..\..\src\upnp\api\StateVarRequest.c" />
+    <ClCompile Include="..\..\src\upnp\api\SubscriptionRequest.c" />
+    <ClCompile Include="..\..\src\upnp\api\upnpapi.c" />
+    <ClCompile Include="..\..\src\upnp\api\upnpdebug.c" />
+    <ClCompile Include="..\..\src\upnp\api\UpnpString.c" />
+    <ClCompile Include="..\..\src\upnp\api\upnptools.c" />
+    <ClCompile Include="..\..\src\upnp\gena\gena_callback2.c" />
+    <ClCompile Include="..\..\src\upnp\gena\gena_ctrlpt.c" />
+    <ClCompile Include="..\..\src\upnp\gena\gena_device.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\client_table\ClientSubscription.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\client_table\client_table.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\miniserver\miniserver.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\net\http\httpparser.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\net\http\httpreadwrite.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\net\http\parsetools.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\net\http\statcodes.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\net\http\webserver.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\net\sock.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\net\uri\uri.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\service_table\service_table.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\util\membuffer.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\util\strintmap.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\util\upnp_timeout.c" />
+    <ClCompile Include="..\..\src\upnp\genlib\util\util.c" />
+    <ClCompile Include="..\..\src\upnp\inet_pton.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release DLL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\upnp\src\soap\soap_common.c" />
-    <ClCompile Include="..\..\upnp\src\soap\soap_ctrlpt.c" />
-    <ClCompile Include="..\..\upnp\src\soap\soap_device.c" />
-    <ClCompile Include="..\..\upnp\src\ssdp\ssdp_ctrlpt.c" />
-    <ClCompile Include="..\..\upnp\src\ssdp\ssdp_device.c" />
-    <ClCompile Include="..\..\upnp\src\ssdp\ssdp_ResultData.c" />
-    <ClCompile Include="..\..\upnp\src\ssdp\ssdp_server.c" />
-    <ClCompile Include="..\..\upnp\src\urlconfig\urlconfig.c" />
-    <ClCompile Include="..\..\upnp\src\uuid\md5.c" />
-    <ClCompile Include="..\..\upnp\src\uuid\sysdep.c" />
-    <ClCompile Include="..\..\upnp\src\uuid\uuid.c" />
-    <ClCompile Include="..\..\upnp\src\win_dll.c" />
+    <ClCompile Include="..\..\src\upnp\soap\soap_common.c" />
+    <ClCompile Include="..\..\src\upnp\soap\soap_ctrlpt.c" />
+    <ClCompile Include="..\..\src\upnp\soap\soap_device.c" />
+    <ClCompile Include="..\..\src\upnp\ssdp\ssdp_ctrlpt.c" />
+    <ClCompile Include="..\..\src\upnp\ssdp\ssdp_device.c" />
+    <ClCompile Include="..\..\src\upnp\ssdp\ssdp_ResultData.c" />
+    <ClCompile Include="..\..\src\upnp\ssdp\ssdp_server.c" />
+    <ClCompile Include="..\..\src\upnp\urlconfig\urlconfig.c" />
+    <ClCompile Include="..\..\src\upnp\uuid\md5.c" />
+    <ClCompile Include="..\..\src\upnp\uuid\sysdep.c" />
+    <ClCompile Include="..\..\src\upnp\uuid\uuid.c" />
+    <ClCompile Include="..\..\src\upnp\win_dll.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

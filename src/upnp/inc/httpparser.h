@@ -37,7 +37,7 @@
  * \file
  */
 
-#include "LinkedList.h"
+#include "threadutil/LinkedList.h"
 #include "membuffer.h"
 #include "uri.h"
 #include "upnputil.h"

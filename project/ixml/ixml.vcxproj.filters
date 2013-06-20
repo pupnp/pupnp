@@ -14,52 +14,52 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Header Files\inc">
-      <UniqueIdentifier>{b5f272ef-65d2-4808-98d2-8fa736390d6a}</UniqueIdentifier>
+      <UniqueIdentifier>{5e6e6c1f-bc94-4895-a182-5c4b830a9a7a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\ixml\inc\ixml.h">
+    <ClInclude Include="..\..\include\ixml\ixml.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ixml\inc\ixmldebug.h">
+    <ClInclude Include="..\..\include\ixml\ixmldebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ixml\src\inc\ixmlmembuf.h">
+    <ClInclude Include="..\..\src\ixml\inc\ixmlmembuf.h">
       <Filter>Header Files\inc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ixml\src\inc\ixmlparser.h">
+    <ClInclude Include="..\..\src\ixml\inc\ixmlparser.h">
       <Filter>Header Files\inc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ixml\src\attr.c">
+    <ClCompile Include="..\..\src\ixml\attr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\document.c">
+    <ClCompile Include="..\..\src\ixml\document.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\element.c">
+    <ClCompile Include="..\..\src\ixml\element.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\ixml.c">
+    <ClCompile Include="..\..\src\ixml\ixml.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\ixmldebug.c">
+    <ClCompile Include="..\..\src\ixml\ixmldebug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\ixmlmembuf.c">
+    <ClCompile Include="..\..\src\ixml\ixmlmembuf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\ixmlparser.c">
+    <ClCompile Include="..\..\src\ixml\ixmlparser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\namedNodeMap.c">
+    <ClCompile Include="..\..\src\ixml\namedNodeMap.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\node.c">
+    <ClCompile Include="..\..\src\ixml\node.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ixml\src\nodeList.c">
+    <ClCompile Include="..\..\src\ixml\nodeList.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

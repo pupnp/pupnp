@@ -41,7 +41,7 @@
  * \file
  */
 
-#include "ixml.h"
+#include "ixml/ixml.h"
 #include "upnpconfig.h"
 #include "UpnpGlobal.h"
 #include "UpnpInet.h"

@@ -42,7 +42,7 @@
 #include "httpreadwrite.h"
 
 #include "unixutil.h"
-#include "upnp.h"
+#include "upnp/upnp.h"
 #include "upnpapi.h"
 #include "membuffer.h"
 #include "uri.h"

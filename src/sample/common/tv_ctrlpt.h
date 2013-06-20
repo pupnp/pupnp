@@ -50,9 +50,9 @@ extern "C" {
 
 #include "sample_util.h"
 
-#include "upnp.h"
-#include "UpnpString.h"
-#include "upnptools.h"
+#include "upnp/upnp.h"
+#include "upnp/UpnpString.h"
+#include "upnp/upnptools.h"
 
 #include <signal.h>
 #include <stdarg.h>

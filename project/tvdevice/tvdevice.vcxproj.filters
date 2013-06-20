@@ -15,21 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\upnp\sample\common\sample_util.c">
+    <ClCompile Include="..\..\src\sample\common\sample_util.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\upnp\sample\common\tv_device.c">
+    <ClCompile Include="..\..\src\sample\common\tv_device.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\upnp\sample\linux\tv_device_main.c">
+    <ClCompile Include="..\..\src\sample\linux\tv_device_main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\upnp\sample\common\sample_util.h">
+    <ClInclude Include="..\..\src\sample\common\sample_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\upnp\sample\common\tv_device.h">
+    <ClInclude Include="..\..\src\sample\common\tv_device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -15,11 +15,11 @@ extern "C" {
 
 #include "ClientSubscription.h"
 #include "service_table.h"
-#include "upnp.h"
-#include "UpnpString.h"
+#include "upnp/upnp.h"
+#include "upnp/UpnpString.h"
 #include "upnp_timeout.h"
 #include "uri.h"
-#include "TimerThread.h"
+#include "threadutil/TimerThread.h"
 
 
 #include <stdio.h>

@@ -53,8 +53,8 @@ extern "C" {
 
 #include "sample_util.h"
 
-#include "ithread.h"
-#include "upnp.h"
+#include "threadutil/ithread.h"
+#include "upnp/upnp.h"
 
 #include <stdlib.h>
 #include <string.h>

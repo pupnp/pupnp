@@ -40,8 +40,8 @@
 #include "FreeList.h"
 #include "ithread.h"
 #include "LinkedList.h"
-#include "UpnpInet.h"
-#include "UpnpGlobal.h" /* for UPNP_INLINE, EXPORT_SPEC */
+#include "upnp/UpnpInet.h"
+#include "upnp/UpnpGlobal.h" /* for UPNP_INLINE, EXPORT_SPEC */
 
 #include <errno.h>
 

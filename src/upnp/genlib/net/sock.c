@@ -45,7 +45,7 @@
 #include "sock.h"
 
 #include "unixutil.h"	/* for socklen_t, EAFNOSUPPORT */
-#include "upnp.h"
+#include "upnp/upnp.h"
 #include "UpnpStdInt.h" /* for ssize_t */
 
 #include "upnpdebug.h"

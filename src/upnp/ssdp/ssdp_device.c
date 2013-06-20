@@ -47,7 +47,7 @@
 #include "httpreadwrite.h"
 #include "ssdplib.h"
 #include "statcodes.h"
-#include "ThreadPool.h"
+#include "threadutil/ThreadPool.h"
 #include "unixutil.h"
 #include "upnpapi.h"
 #include "UpnpInet.h"

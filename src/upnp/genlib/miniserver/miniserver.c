@@ -50,10 +50,10 @@
 #include "miniserver.h"
 
 #include "httpreadwrite.h"
-#include "ithread.h"
+#include "threadutil/ithread.h"
 #include "ssdplib.h"
 #include "statcodes.h"
-#include "ThreadPool.h"
+#include "threadutil/ThreadPool.h"
 #include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
 #include "upnpapi.h"
 #include "upnputil.h"

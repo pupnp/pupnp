@@ -47,7 +47,7 @@
 #include "ssdplib.h"
 #include "soaplib.h"
 #include "sysdep.h"
-#include "ThreadPool.h"
+#include "threadutil/ThreadPool.h"
 #include "UpnpStdInt.h"
 #include "UpnpUniStd.h" /* for close() */
 #include "uuid.h"

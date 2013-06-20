@@ -43,7 +43,7 @@
 
 #include "tv_ctrlpt.h"
 
-#include "upnp.h"
+#include "upnp/upnp.h"
 
 /*!
  * Mutex for protecting the global device list in a multi-threaded,

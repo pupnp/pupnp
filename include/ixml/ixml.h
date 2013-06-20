@@ -43,7 +43,7 @@
  */
 
 
-#include "UpnpGlobal.h" /* For EXPORT_SPEC */
+#include "upnp/UpnpGlobal.h" /* For EXPORT_SPEC */
 
 /* Define BOOL. */
 #ifndef __OBJC__ 
