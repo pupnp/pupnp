@@ -595,7 +595,7 @@ static UPNP_INLINE int get_alias(
 {
 	int cmp = strcmp(alias->name.buf, request_file);
 	if (cmp == 0) {
-		UpnpFileInfo_set_FileLength(info, (off_t)alias->doc.length);
+		UpnpFileInfo_set_FileLength(info, (ptrdiff_t)alias->doc.length);
 		UpnpFileInfo_set_IsDirectory(info, FALSE);
 		UpnpFileInfo_set_IsReadable(info, TRUE);
 		UpnpFileInfo_set_LastModified(info, alias->last_modified);
@@ -728,9 +728,9 @@ static int GetNextRange(
 	/*! string containing the token / range. */
 	char **SrcRangeStr,
 	/*! gets the first byte of the token. */
-	off_t *FirstByte,
+	ptrdiff_t *FirstByte,
 	/*! gets the last byte of the token. */
-	off_t *LastByte)
+	ptrdiff_t *LastByte)
 {
 	char *Ptr;
 	char *Tok;
@@ -757,13 +757,13 @@ static int GetNextRange(
 			}
 		}
 		if (Is_Suffix_byte_Range) {
-			*FirstByte = (off_t) L;
-			*LastByte = (off_t) F;
+			*FirstByte = (ptrdiff_t) L;
+			*LastByte = (ptrdiff_t) F;
 			return 1;
 		}
 	}
-	*FirstByte = (off_t) F;
-	*LastByte = (off_t) L;
+	*FirstByte = (ptrdiff_t) F;
+	*LastByte = (ptrdiff_t) L;
 
 	return 1;
 }
@@ -782,11 +782,11 @@ static int CreateHTTPRangeResponseHeader(
 	/*! String containing the range. */
 	char *ByteRangeSpecifier,
 	/*! Length of the file. */
-	off_t FileLength,
+	ptrdiff_t FileLength,
 	/*! [out] SendInstruction object where the range operations will be stored. */
 	struct SendInstruction *Instr)
 {
-	off_t FirstByte, LastByte;
+	ptrdiff_t FirstByte, LastByte;
 	char *RangeInput;
 	char *Ptr;
 	int rc = 0;
@@ -904,7 +904,7 @@ static int CheckOtherHTTPHeaders(
 	/*! [out] Send Instruction object to data for the response. */
 	struct SendInstruction *RespInstr,
 	/*! Size of the file containing the request document. */
-	off_t FileSize)
+	ptrdiff_t FileSize)
 {
 	http_header_t *header;
 	ListNode *node;

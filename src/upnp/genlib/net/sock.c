@@ -170,7 +170,7 @@ static int sock_read_write(
 	long numBytes;
 	time_t start_time = time(NULL);
 	SOCKET sockfd = info->socket;
-	long bytes_sent = 0;
+	size_t bytes_sent = 0;
 	size_t byte_left = (size_t)0;
 	ssize_t num_written;
 

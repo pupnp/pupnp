@@ -532,7 +532,7 @@ SoapSendAction( IN char *action_url,
     char *upnp_error_str;
     int got_response = FALSE;
 
-    off_t content_length;
+    ptrdiff_t content_length;
     const char *xml_start =
         "<s:Envelope "
         "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -584,7 +584,7 @@ SoapSendAction( IN char *action_url,
 
     /* make request msg */
     request.size_inc = 50;
-    content_length = (off_t)(xml_start_len + action_str_len + xml_end_len);
+    content_length = (ptrdiff_t)(xml_start_len + action_str_len + xml_end_len);
     if (http_MakeMessage(
        	&request, 1, 1,
         "q" "N" "s" "sssbsc" "Uc" "b" "b" "b",
@@ -693,7 +693,7 @@ int SoapSendActionEx(
     size_t xml_body_start_len;
     size_t action_str_len;
     size_t xml_end_len;
-    off_t content_length;
+    ptrdiff_t content_length;
 
     *response_node = NULL;      /* init */
 
@@ -744,7 +744,7 @@ int SoapSendActionEx(
 
     /* make request msg */
     request.size_inc = 50;
-    content_length = (off_t)(xml_start_len + xml_header_start_len +
+    content_length = (ptrdiff_t)(xml_start_len + xml_header_start_len +
 	xml_header_str_len + xml_header_end_len +
         xml_body_start_len + action_str_len + xml_end_len);
     if (http_MakeMessage(
@@ -830,7 +830,7 @@ SoapGetServiceVarStatus( IN char *action_url,
     int ret_code;
     http_parser_t response;
     int upnp_error_code;
-    off_t content_length;
+    ptrdiff_t content_length;
     const char *xml_start =
         "<s:Envelope "
         "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -852,7 +852,7 @@ SoapGetServiceVarStatus( IN char *action_url,
     }
     /* make headers */
     request.size_inc = 50;
-    content_length = (off_t)(strlen(xml_start) + strlen(var_name) +
+    content_length = (ptrdiff_t)(strlen(xml_start) + strlen(var_name) +
 	strlen(xml_end));
     if (http_MakeMessage(
 	&request, 1, 1,

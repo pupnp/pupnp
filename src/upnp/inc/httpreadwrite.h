@@ -525,11 +525,11 @@ Format types:
 	'D':	(no args)			-- appends HTTP DATE: header
 	'd':	arg = int number		-- appends decimal number
 	'G':	arg = range information		-- add range header
-	'h':	arg = off_t number		-- appends off_t number
+	'h':	arg = ptrdiff_t number		-- appends ptrdiff_t number
 	'K':	(no args)			-- add chunky header
 	'L':	arg = language information	-- add Content-Language header if Accept-Language header is not empty and if
 						   WEB_SERVER_CONTENT_LANGUAGE is not empty
-	'N':	arg1 = off_t content_length	-- content-length header
+	'N':	arg1 = ptrdiff_t content_length	-- content-length header
 	'q':	arg1 = http_method_t		-- request start line and HOST header
 		arg2 = (uri_type *)
 	'Q':	arg1 = http_method_t;		-- start line of request

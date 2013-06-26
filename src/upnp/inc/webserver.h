@@ -49,9 +49,9 @@ struct SendInstruction
 	int IsTrailers;
 	char RangeHeader[200];
 	char AcceptLanguageHeader[200];
-	off_t RangeOffset;
+	ptrdiff_t RangeOffset;
 	/*! Read from local source and send on the network. */
-	off_t ReadSendSize;
+	ptrdiff_t ReadSendSize;
 	/*! Recv from the network and write into local file. */
 	long RecvWriteSize;
 	/* Later few more member could be added depending

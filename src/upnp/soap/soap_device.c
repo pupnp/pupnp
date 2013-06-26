@@ -162,7 +162,7 @@ static void send_error_response(
 	/*! [in] HTTP request. */
 	IN http_message_t *hmsg)
 {
-	off_t content_length;
+	ptrdiff_t content_length;
 	int timeout_secs = SOAP_TIMEOUT;
 	int major;
 	int minor;
@@ -194,7 +194,7 @@ static void send_error_response(
 	memset(err_code_str, 0, sizeof(err_code_str));
 	snprintf(err_code_str, sizeof(err_code_str), "%d", error_code);
 	/* calc body len */
-	content_length = (off_t) (strlen(start_body) + strlen(err_code_str) +
+	content_length = (ptrdiff_t) (strlen(start_body) + strlen(err_code_str) +
 				  strlen(mid_body) + strlen(err_msg) +
 				  strlen(end_body));
 	http_CalcResponseVersion(hmsg->major_version, hmsg->minor_version,
@@ -231,7 +231,7 @@ static UPNP_INLINE void send_var_query_response(
 	/*! [in] HTTP request. */
 	http_message_t *hmsg)
 {
-	off_t content_length;
+	ptrdiff_t content_length;
 	int timeout_secs = SOAP_TIMEOUT;
 	int major;
 	int minor;
@@ -249,7 +249,7 @@ static UPNP_INLINE void send_var_query_response(
 
 	http_CalcResponseVersion(hmsg->major_version, hmsg->minor_version,
 				 &major, &minor);
-	content_length = (off_t) (strlen(start_body) + strlen(var_value) +
+	content_length = (ptrdiff_t) (strlen(start_body) + strlen(var_value) +
 				  strlen(end_body));
 	/* make headers */
 	membuffer_init(&response);
@@ -570,7 +570,7 @@ static UPNP_INLINE void send_action_response(
 	membuffer headers;
 	int major, minor;
 	int err_code;
-	off_t content_length;
+	ptrdiff_t content_length;
 	int ret_code;
 	int timeout_secs = SOAP_TIMEOUT;
 	static const char *start_body =
@@ -589,7 +589,7 @@ static UPNP_INLINE void send_action_response(
 	xml_response = ixmlPrintNode((IXML_Node *) action_resp);
 	if (!xml_response)
 		goto error_handler;
-	content_length = (off_t)(strlen(start_body) + strlen(xml_response) +
+	content_length = (ptrdiff_t)(strlen(start_body) + strlen(xml_response) +
 		strlen(end_body));
 	/* make headers */
 	if (http_MakeMessage(&headers, major, minor,

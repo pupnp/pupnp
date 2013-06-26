@@ -34,7 +34,7 @@
 #define INTERNAL_CONFIG_H 
 
 
-#include "autoconfig.h"
+#include "build/autoconfig.h"
 
 
 /*!

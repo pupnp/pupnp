@@ -13,15 +13,15 @@
  * \author Marcelo Roberto Jimenez
  */
 
-#include "upnpconfig.h"
+#include "build/upnpconfig.h"
 
-#include <sys/types.h>  /* for off_t */
+#include <sys/types.h>  /* for ptrdiff_t */
 #include <time.h>       /* for time_t */
 
 #define CLASS UpnpFileInfo
 
 #define EXPAND_CLASS_MEMBERS(CLASS) \
-	EXPAND_CLASS_MEMBER_INT(CLASS, FileLength, off_t) \
+	EXPAND_CLASS_MEMBER_INT(CLASS, FileLength, ptrdiff_t) \
 	EXPAND_CLASS_MEMBER_INT(CLASS, LastModified, time_t) \
 	EXPAND_CLASS_MEMBER_INT(CLASS, IsDirectory, int) \
 	EXPAND_CLASS_MEMBER_INT(CLASS, IsReadable, int) \

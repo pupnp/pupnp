@@ -5,7 +5,7 @@
  */
 
 
-#include "autoconfig.h"
+#include "build/autoconfig.h"
 
 
 #include "ixmldebug.h"

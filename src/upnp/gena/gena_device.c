@@ -1099,7 +1099,7 @@ static int respond_ok(
         &response, major, minor,
         "R" "D" "S" "N" "Xc" "ssc" "scc",
         HTTP_OK,
-        (off_t)0,
+        (ptrdiff_t)0,
         X_USER_AGENT,
         "SID: ", sub->sid,
         timeout_str ) != 0 ) {

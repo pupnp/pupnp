@@ -898,7 +898,7 @@ int MakeGenericMessage(http_method_t method,
 	if (ret_code == 0) {
 		if (contentLength >= 0)
 			ret_code = http_MakeMessage(request, 1, 1, "Nc",
-						    (off_t) contentLength);
+						    (ptrdiff_t) contentLength);
 		else if (contentLength == UPNP_USING_CHUNKED)
 			ret_code = http_MakeMessage(request, 1, 1, "Kc");
 		else if (contentLength == UPNP_UNTIL_CLOSE)
@@ -1473,7 +1473,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 	char c;
 	char *s = NULL;
 	size_t num;
-	off_t bignum;
+	ptrdiff_t bignum;
 	size_t length;
 	time_t *loc_time;
 	time_t curr_time;
@@ -1544,8 +1544,8 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 				membuffer_append(buf, tempbuf, strlen(tempbuf)))
 				goto error_handler;
 		} else if (c == 'h') {
-			/* off_t */
-			bignum = (off_t) va_arg(argp, off_t);
+			/* ptrdiff_t */
+			bignum = (ptrdiff_t) va_arg(argp, ptrdiff_t);
 			rc = snprintf(tempbuf, sizeof(tempbuf), "%" PRId64,
 				(int64_t) bignum);
 			if (rc < 0 || (unsigned int) rc >= sizeof(tempbuf) ||
@@ -1601,7 +1601,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			}
 		} else if (c == 'N') {
 			/* content-length header */
-			bignum = (off_t) va_arg(argp, off_t);
+			bignum = (ptrdiff_t) va_arg(argp, ptrdiff_t);
 			assert(bignum >= 0);
 			if (http_MakeMessage(buf, http_major_version, http_minor_version,
 					     "shc", "CONTENT-LENGTH: ", bignum) != 0)
@@ -1644,7 +1644,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 				"</h1></body></html>");
 			if (rc < 0 || (unsigned int) rc >= sizeof(tempbuf))
 				goto error_handler;
-			bignum = (off_t)strlen(tempbuf);
+			bignum = (ptrdiff_t)strlen(tempbuf);
 			if (http_MakeMessage(buf, http_major_version, http_minor_version,
 					     "NTcs", bignum,	/* content-length */
 					     "text/html",	/* content-type */

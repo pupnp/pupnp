@@ -42,7 +42,7 @@
  */
 
 #include "ixml/ixml.h"
-#include "upnpconfig.h"
+#include "build/upnpconfig.h"
 #include "UpnpGlobal.h"
 #include "UpnpInet.h"
 
@@ -53,7 +53,7 @@
 #ifdef WIN32
 	#include <time.h>
 	#ifdef UPNP_USE_MSVCPP
-		#include <sys/types.h>	/* needed for off_t */
+		#include <sys/types.h>	/* needed for ptrdiff_t */
 	#endif
 #elif (defined(BSD) && BSD >= 199306)
 	#include <time.h>
@@ -2656,7 +2656,7 @@ typedef int (*VDCallback_Seek) (
 	/*! [in] The number of bytes to move in the file.  Positive values
 	 * move foward and negative values move backward.  Note that
 	 * this must be positive if the \b origin is \c SEEK_SET. */
-	off_t offset,
+	ptrdiff_t offset,
 	/*! [in] The position to move relative to.  It can be \c SEEK_CUR
 	 * to move relative to the current position, \c SEEK_END to
 	 * move relative to the end of the file, or \c SEEK_SET to
