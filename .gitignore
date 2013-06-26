@@ -114,3 +114,25 @@ docs/doxygen
 /build/vc10/IUpnpErrFile.txt
 /build/vc10/IUpnpInfoFile.txt
 /build/vc10/*.opensdf
+
+# Tempory Files
+*.log
+*File.txt
+
+# old cvs files
+*.cvsignore
+
+# visual studio noise
+*.user
+*.sdf
+*ipch/
+*.userprefs
+*.opensdf
+*.sdf
+*.v11.suo
+
+# targets
+build/
+lib/
+obj/
+bin/
