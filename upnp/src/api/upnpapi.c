@@ -4085,16 +4085,17 @@ int UpnpRemoveVirtualDir(const char *dirName)
         return UPNP_E_INVALID_PARAM;
     }
     /* Handle the special case where the directory that we are */
-    /* removing is the first and only one in the list. */
-    if( ( pVirtualDirList->next == NULL ) &&
-        ( strcmp( pVirtualDirList->dirName, dirName ) == 0 ) ) {
-        free( pVirtualDirList );
-        pVirtualDirList = NULL;
+    /* removing is the first in the list. */
+    if (strcmp( pVirtualDirList->dirName, dirName ) == 0)
+    {
+        pPrev = pVirtualDirList;
+        pVirtualDirList = pVirtualDirList->next;
+        free( pPrev );
         return UPNP_E_SUCCESS;
     }
 
-    pCur = pVirtualDirList;
-    pPrev = pCur;
+    pCur = pVirtualDirList->next;
+    pPrev = pVirtualDirList;
 
     while( pCur != NULL ) {
         if( strcmp( pCur->dirName, dirName ) == 0 ) {

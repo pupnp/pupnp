@@ -2,6 +2,13 @@
 Version 1.6.19
 *******************************************************************************
 
+2013-07-30 Zheng Peng <darkelf2010(at)users.sf.net>
+
+	SF ticket #116 UpnpRemoveVirtualDir wrong linked list operation
+
+	What if pVirtualDirList has two nodes and what we want to delete is the
+	first one. Patch attached.
+
 2013-07-30 Sebastian Brandt <s.brandt(at)aixtrusion.de>
 
 	Dear libupnp-devels,
