@@ -55,7 +55,7 @@
 
 
 static char g_error_char = '\0';
-#ifdef SCRIPTSUPPORT
+#ifdef IXML_HAVE_SCRIPTSUPPORT
 static IXML_BeforeFreeNode_t Before_Free_callback;
 #endif
 
@@ -2501,7 +2501,7 @@ void Parser_setErrorChar(char c)
 	g_error_char = c;
 }
 
-#ifdef SCRIPTSUPPORT
+#ifdef IXML_HAVE_SCRIPTSUPPORT
 void Parser_setBeforeFree(IXML_BeforeFreeNode_t hndlr)
 {
 	Before_Free_callback = hndlr;

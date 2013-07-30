@@ -120,7 +120,7 @@ void Parser_setErrorChar(
 	/*! [in] The character to become the error character. */
 	char c);
 
-#ifdef SCRIPTSUPPORT
+#ifdef IXML_HAVE_SCRIPTSUPPORT
 /*!
  * \brief Sets the handler to call before a node is freed.
  *

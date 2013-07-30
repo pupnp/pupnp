@@ -158,7 +158,7 @@ typedef struct _IXML_Document *Docptr;
 
 typedef struct _IXML_Node     *Nodeptr;
 
-#ifdef SCRIPTSUPPORT
+#ifdef IXML_HAVE_SCRIPTSUPPORT
 /*!
  * \brief Signature for GC support method, called before a node is freed.
  */
@@ -185,8 +185,8 @@ typedef struct _IXML_Node
 	Nodeptr           nextSibling;
 	Nodeptr           firstAttr;
 	Docptr            ownerDocument;
-#ifdef SCRIPTSUPPORT
-	void*             ctag;			// custom tag
+#ifdef IXML_HAVE_SCRIPTSUPPORT
+	void*             ctag;			/* custom tag */
 #endif
 } IXML_Node;
 
@@ -644,7 +644,7 @@ EXPORT_SPEC void ixmlNode_free(
 	 */
 	IXML_Node *nodeptr);
 
-#ifdef SCRIPTSUPPORT
+#ifdef IXML_HAVE_SCRIPTSUPPORT
 /*!
  * \brief Sets the custom tag for the node.
  */
@@ -1770,7 +1770,7 @@ EXPORT_SPEC void ixmlRelaxParser(
 	 */
 	char errorChar);
 
-#ifdef SCRIPTSUPPORT
+#ifdef IXML_HAVE_SCRIPTSUPPORT
 /*!
  * \brief Sets the handler to call before a node is freed.
  */

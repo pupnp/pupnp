@@ -351,8 +351,9 @@ The treestructure of XML documents created by IXML is hard to maintain when
 creating a binding for a scripting language. Even when many elements may 
 never be used on the script side, it requires copying the entire tree 
 structure once you start accessing elements several levels deep.
-Hence scriptsupport was added. To enable it compile while SCRIPTSUPPORT has
-been defined. This allows control using only a list instead of a tree-like
+Hence scriptsupport was added. To enable it compile while 
+IXML_HAVE_SCRIPTSUPPORT has been defined (enabled by default). 
+This allows control using only a list instead of a tree-like
 structure, and only nodes actually accessed need to be created instead of
 all the nodes in the tree.
 

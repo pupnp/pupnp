@@ -113,3 +113,4 @@ docs/doxygen
 /build/vc10/ipch
 /build/vc10/IUpnpErrFile.txt
 /build/vc10/IUpnpInfoFile.txt
+/build/vc10/*.opensdf

@@ -18,6 +18,10 @@ else
     AM_CPPFLAGS		+= -DNDEBUG
 endif
 
+if ENABLE_SCRIPTSUPPORT
+    AM_CPPFLAGS		+= -DIXML_HAVE_SCRIPTSUPPORT
+endif
+
 lib_LTLIBRARIES		= libixml.la
 
 libixml_la_LDFLAGS	= -version-info $(LT_VERSION_IXML) \
