@@ -2,6 +2,34 @@
 Version 1.6.19
 *******************************************************************************
 
+2013-07-30 Sebastian Brandt <s.brandt(at)aixtrusion.de>
+
+	Dear libupnp-devels,
+	when POST'ing to the simple web server in libupnp, the application crashes.
+	This is caused by a missing "..." argument in webserver.c:1533.
+	Seems it has been there for a long time ... 1.6.9 and 1.6.18 have it.
+
+	webserver.c:1533 calls http_MakeMessage
+	/* Send response. */
+	http_MakeMessage(&headers, 1, 1,
+		 "RTLSXcCc",
+		 ret, "text/html", X_USER_AGENT);
+	The format parameter RTLSXcCc needs four arguments -
+	R - response code - ret,
+	T- content type - text/html,
+	L - struct SendInstruction * - NOT PRESENT
+	X - user agent - X_USER_AGENT
+
+	This results in a crash.
+
+	Changing to
+	http_MakeMessage(&headers, 1, 1,
+		 "RTLSXcCc",
+		 ret, "text/html", &RespInstr, X_USER_AGENT);
+	solves the situation.
+
+	Yours,
+	Sebastian Brandt
 
 *******************************************************************************
 Version 1.6.18
