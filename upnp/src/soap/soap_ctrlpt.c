@@ -455,7 +455,7 @@ get_response_value( IN http_message_t * hmsg,
 		if (!temp_str)
 			goto error_handler;
 		*upnp_error_code = atoi(temp_str);
-		if (*upnp_error_code < 400) {
+		if (*upnp_error_code > 400) {
 			err_code = *upnp_error_code;
 			goto error_handler;	/* bad SOAP error code */
 		}
