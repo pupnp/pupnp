@@ -1533,7 +1533,7 @@ void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
 			/* Send response. */
 			http_MakeMessage(&headers, 1, 1,
 				"RTLSXcCc",
-				ret, "text/html", X_USER_AGENT);
+				ret, "text/html", &RespInstr, X_USER_AGENT);
 			http_SendMessage(info, &timeout, "b",
 				headers.buf, headers.length);
 			break;
