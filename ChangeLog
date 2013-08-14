@@ -357,6 +357,12 @@ Version 1.8.0
 Version 1.6.19
 *******************************************************************************
 
+2013-08-13 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Enforce RFC 2616 and accept "0" after a backslash for quoted-strings.
+
+	Reported by Peng <howtofly(at)gmail.com>
+
 2013-08-13 Peng <howtofly(at)gmail.com>
 
 	Patch to make scanner_get_token more robust (avoid over-reading).
