@@ -141,9 +141,9 @@ static UPNP_INLINE void scanner_init(OUT scanner_t *scanner, IN membuffer *bufpt
 * Description :	Finds the separator character.
 *
 ************************************************************************/
-static UPNP_INLINE int is_separator_char(IN char c)
+static UPNP_INLINE int is_separator_char(IN int c)
 {
-    return strchr(" \t()<>@,;:\\\"/[]?={}", (int)c) != NULL;
+	return strchr(" \t()<>@,;:\\\"/[]?={}", c) != 0;
 }
 
 /************************************************************************
@@ -155,7 +155,7 @@ static UPNP_INLINE int is_separator_char(IN char c)
 * Description :	Calls the function to indentify separator character 
 *
 ************************************************************************/
-static UPNP_INLINE int is_identifier_char(IN char c)
+static UPNP_INLINE int is_identifier_char(IN int c)
 {
     return c >= 32 && c <= 126 && !is_separator_char(c);
 }
@@ -169,7 +169,7 @@ static UPNP_INLINE int is_identifier_char(IN char c)
 * Description :	Determines if the passed value is a control character
 *
 ************************************************************************/
-static UPNP_INLINE int is_control_char(IN char c)
+static UPNP_INLINE int is_control_char(IN int c)
 {
     return (c >= 0 && c <= 31) || c == 127;
 }
@@ -183,20 +183,16 @@ static UPNP_INLINE int is_control_char(IN char c)
 * Description :	Checks to see if the passed in value is CR/LF
 *
 ************************************************************************/
-static UPNP_INLINE int is_qdtext_char(IN char cc)
+static UPNP_INLINE int is_qdtext_char(IN int c)
 {
-    unsigned char c = ( unsigned char )cc;
+	/* we don't check for this; it's checked in get_token() */
+	assert( c != '"' );
 
-    /* we don't check for this; it's checked in get_token() */
-    assert( c != '"' );
-
-    if( ( c >= 32 && c != 127 ) ||
-        ( c == TOKCHAR_CR || c == TOKCHAR_LF || c == '\t' )
-         ) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+	return
+		(c >= 32 && c != 127) ||
+		c == TOKCHAR_CR ||
+		c == TOKCHAR_LF ||
+		c == '\t';
 }
 
 /************************************************************************
@@ -224,7 +220,7 @@ static parse_status_t scanner_get_token(
 {
 	char *cursor;
 	char *null_terminator;	/* point to null-terminator in buffer */
-	char c;
+	int c;
 	token_type_t token_type;
 	int got_end_quote;
 
@@ -292,8 +288,7 @@ static parse_status_t scanner_get_token(
 			} else if (c == '\\') {
 				if (cursor < null_terminator) {
 					c = *cursor++;
-					/*if ( !(c > 0 && c <= 127) ) */
-					if (c == 0)
+					if (c < 0 || c > 127)
 						return PARSE_FAILURE;
 				}
 				/* else, while loop handles incomplete buf */
