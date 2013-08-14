@@ -243,7 +243,7 @@ static parse_status_t scanner_get_token(
 		/* scan identifier */
 		token->buf = cursor++;
 		token_type = TT_IDENTIFIER;
-		while (is_identifier_char(*cursor))
+		while (cursor < null_terminator && is_identifier_char(*cursor))
 			cursor++;
 		if (!scanner->entire_msg_loaded && cursor == null_terminator)
 			/* possibly more valid chars */
@@ -253,7 +253,7 @@ static parse_status_t scanner_get_token(
 	} else if (c == ' ' || c == '\t') {
 		token->buf = cursor++;
 		token_type = TT_WHITESPACE;
-		while (*cursor == ' ' || *cursor == '\t')
+		while (cursor < null_terminator && (*cursor == ' ' || *cursor == '\t'))
 			cursor++;
 		if (!scanner->entire_msg_loaded && cursor == null_terminator)
 			/* possibly more chars */

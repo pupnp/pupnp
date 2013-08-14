@@ -2,16 +2,9 @@
 Version 1.6.19
 *******************************************************************************
 
-2013-07-30 Robert Buckley <rbuckley(at)users.sf.net>
+2013-08-13 Peng <howtofly(at)gmail.com>
 
-	SF ticket #53 Action Error Response not returned
-
-	In soap_ctrlpt.c, in function get_response_value:
-
-	upnp_error_code is checked to see if it is less than 400 because that
-	would indicate a SOAP error code.
-
-	However it should be checked to see if it is greater than 400.
+	Patch to make scanner_get_token more robust (avoid over-reading).
 
 2013-07-30 Zheng Peng <darkelf2010(at)users.sf.net>
 
