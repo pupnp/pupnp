@@ -2,6 +2,29 @@
 Version 1.6.19
 *******************************************************************************
 
+2013-08-13 Peng <howtofly(at)gmail.com>
+
+	Patch to fix behaviou when char is signed
+
+	it seems to me that there is still something wrong:
+
+	1)  the new is_qdtext_char() is incorrect.
+	There is a trap if char is implemented as signed char.
+	Suppose that c is '\xFF', it will be -1 when converted to an int.
+	By definition, c should be qdtext:
+	qdtext = <any TEXT except <">>
+	TEXT = <any OCTET except CTLs, but including LWS>
+	OCTET = <any 8-bit sequence of data>
+
+	2) the character after '\\' could be either part of a quoted-pair
+	(together with '\\'), or a normal qdtext, since '\\' itself can
+	be treated as a qdtext. This is equivalent to saying that the
+	character after '\\' in a quoted string could be ANY octet.
+
+	A patch based on the above two observations is attached.
+
+	Peng
+
 2013-08-13 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Enforce RFC 2616 and accept "0" after a backslash for quoted-strings.

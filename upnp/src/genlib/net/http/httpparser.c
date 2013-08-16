@@ -190,6 +190,7 @@ static UPNP_INLINE int is_qdtext_char(IN int c)
 
 	return
 		(c >= 32 && c != 127) ||
+		c < 0 ||
 		c == TOKCHAR_CR ||
 		c == TOKCHAR_LF ||
 		c == '\t';
@@ -288,8 +289,7 @@ static parse_status_t scanner_get_token(
 			} else if (c == '\\') {
 				if (cursor < null_terminator) {
 					c = *cursor++;
-					if (c < 0 || c > 127)
-						return PARSE_FAILURE;
+					/* the char after '\\' could be ANY octet */
 				}
 				/* else, while loop handles incomplete buf */
 			} else if (is_qdtext_char(c)) {
