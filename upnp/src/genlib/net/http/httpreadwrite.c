@@ -322,6 +322,7 @@ int http_RecvMessage(
 				ret = 0;
 				goto ExitFunction;
 			case PARSE_FAILURE:
+			case PARSE_NO_MATCH:
 				*http_error_code = parser->http_error_code;
 				line = __LINE__;
 				ret = UPNP_E_BAD_HTTPMSG;

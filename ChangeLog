@@ -4,6 +4,17 @@ Version 1.6.19
 
 2013-09-02 Peng <howtofly(at)gmail.com>
 
+	Suppose the UPnP device is listening on 192.168.1.102:49152. Use the following to send
+	garbage bytes to the device:
+	while true; do echo "\""; done | netcat 192.168.1.102 49152
+
+	The device just keeps receiving these bytes and its memory usage keeps growing.
+	Malicious client may exploit it to exhaust the device's memory.
+
+	The attached patch eliminates this possibility.
+
+2013-09-02 Peng <howtofly(at)gmail.com>
+
 	1) restore the scanner's original cursor position in case of
 	   insufficient input;
 	2) free the memories allocated for a new header in case of a failure.
