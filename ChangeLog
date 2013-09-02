@@ -357,6 +357,12 @@ Version 1.8.0
 Version 1.6.19
 *******************************************************************************
 
+2013-09-02 Peng <howtofly(at)gmail.com>
+
+	1) restore the scanner's original cursor position in case of
+	   insufficient input;
+	2) free the memories allocated for a new header in case of a failure.
+
 2013-08-13 Peng <howtofly(at)gmail.com>
 
 	Patch to fix behaviou when char is signed
