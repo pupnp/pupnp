@@ -1457,6 +1457,8 @@ parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
 		/* check end of headers */
 		status = scanner_get_token(scanner, &token, &tok_type);
 		if (status != (parse_status_t)PARSE_OK) {
+			/* pushback tokens; useful only on INCOMPLETE error */
+			scanner->cursor = save_pos;
 			return status;
 		}
 		switch (tok_type) {
@@ -1524,6 +1526,8 @@ parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
 			if (membuffer_assign(&header->name_buf, token.buf, token.length) ||
 			    membuffer_assign(&header->value, hdr_value.buf, hdr_value.length)) {
 				/* not enough mem */
+				membuffer_destroy(&header->value);
+				membuffer_destroy(&header->name_buf);
 				free(header);
 				parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
 				return PARSE_FAILURE;
@@ -1531,15 +1535,13 @@ parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
 			header->name.buf = header->name_buf.buf;
 			header->name.length = header->name_buf.length;
 			header->name_id = header_id;
-			ListAddTail(&parser->msg.headers, header);
-			/*NNS:          ret = dlist_append( &parser->msg.headers, header ); */
-/** TODO: remove that? Yes as ret is not set anymore
-			if (ret == UPNP_E_OUTOF_MEMORY) {
-				parser->http_error_code =
-				    HTTP_INTERNAL_SERVER_ERROR;
+			if (!ListAddTail(&parser->msg.headers, header)) {
+				membuffer_destroy(&header->value);
+				membuffer_destroy(&header->name_buf);
+				free(header);
+				parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
 				return PARSE_FAILURE;
 			}
-end of remove that? */
 		} else if (hdr_value.length > (size_t)0) {
 			/* append value to existing header */
 			/* append space */
