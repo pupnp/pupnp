@@ -1590,7 +1590,6 @@ static int GetDescDocumentAndURL(
 			}
 			if (strlen(temp_str) > (LINE_SIZE - 1)) {
 				ixmlDocument_free(*xmlDoc);
-				free(temp_str);
 				return UPNP_E_URL_TOO_BIG;
 			}
 			strncpy(aliasStr, temp_str, sizeof(aliasStr) - 1);
