@@ -267,6 +267,7 @@ static int config_description_doc(
 		err_code =
 		    ixmlNode_appendChild(rootNode, (IXML_Node *) element);
 		if (err_code != IXML_SUCCESS) {
+			err_code = UPNP_E_INVALID_DESC;
 			goto error_handler;
 		}
 		textNode =
@@ -277,6 +278,7 @@ static int config_description_doc(
 		err_code =
 		    ixmlNode_appendChild((IXML_Node *) element, textNode);
 		if (err_code != IXML_SUCCESS) {
+			err_code = UPNP_E_INTERNAL_ERROR;
 			goto error_handler;
 		}
 	} else {
@@ -327,6 +329,7 @@ static int config_description_doc(
 		}
 		err_code = ixmlNode_setNodeValue(textNode, url_str.buf);
 		if (err_code != IXML_SUCCESS) {
+			err_code = UPNP_E_OUTOF_MEMORY;
 			goto error_handler;
 		}
 	}
