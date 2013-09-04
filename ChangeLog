@@ -4,6 +4,12 @@ Version 1.6.19
 
 2013-09-03 Peng <howtofly(at)gmail.com>
 
+	Fix return value of config_description_doc.
+
+	UPNP_E_XXX should not be used instead of IXML_XXX
+
+2013-09-03 Peng <howtofly(at)gmail.com>
+
 	Remove faulty free in GetDescDocumentAndURL.
 
 	temp_str, which points to part of description, should not be freed.
