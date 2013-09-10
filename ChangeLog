@@ -357,6 +357,17 @@ Version 1.8.0
 Version 1.6.19
 *******************************************************************************
 
+2013-09-10 zexian chen <chenzexian88(at)gmail.com>
+
+	Hi,
+
+	I had found some bugs about memory leak on libupnp-1.6.18. 
+
+	It may lead to memory leak  when calling ThreadPoolAdd() or
+	ThreadPoolAddPersistent() which does not return 0. 
+
+	See the attachment for patch.
+
 2013-09-03 Peng <howtofly(at)gmail.com>
 
 	Fix return value of config_description_doc.

@@ -295,9 +295,10 @@ void ssdp_handle_ctrlpt_msg(http_message_t *hmsg, struct sockaddr_storage *dest_
 					TPJobSetPriority(&job, MED_PRIORITY);
 					TPJobSetFreeFunction(&job,
 							     (free_routine)
-							     SSDPResultData_delete);
-					ThreadPoolAdd(&gRecvThreadPool, &job,
-						      NULL);
+							     free);
+					if (ThreadPoolAdd(&gRecvThreadPool, &job, NULL) != 0) {
+						SSDPResultData_delete(threadData);
+					}
 				}
 			}
 			node = ListNext(&ctrlpt_info->SsdpSearchList, node);
