@@ -291,8 +291,9 @@ void ssdp_handle_ctrlpt_msg(http_message_t *hmsg, struct sockaddr_storage *dest_
 					TPJobSetFreeFunction(&job,
 							     (free_routine)
 							     free);
-					ThreadPoolAdd(&gRecvThreadPool, &job,
-						      NULL);
+					if (ThreadPoolAdd(&gRecvThreadPool, &job, NULL) != 0) {
+						free(threadData);
+					}
 				}
 			}
 			node = ListNext(&ctrlpt_info->SsdpSearchList, node);

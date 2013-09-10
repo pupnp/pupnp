@@ -910,6 +910,7 @@ int StartMiniServer(
 		sock_close(miniSocket->ssdpReqSock4);
 		sock_close(miniSocket->ssdpReqSock6);
 #endif /* INCLUDE_CLIENT_APIS */
+		free(miniSocket);
 		return UPNP_E_OUTOF_MEMORY;
 	}
 	/* Wait for miniserver to start. */

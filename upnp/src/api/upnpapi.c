@@ -1980,7 +1980,9 @@ int UpnpSubscribeAsync(
     TPJobInit(&job, (start_routine)UpnpThreadDistribution, Param);
     TPJobSetFreeFunction(&job, (free_routine)free);
     TPJobSetPriority(&job, MED_PRIORITY);
-    ThreadPoolAdd(&gSendThreadPool, &job, NULL);
+    if (ThreadPoolAdd(&gSendThreadPool, &job, NULL) != 0) {
+	free(Param);
+    }
 
     UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting UpnpSubscribeAsync\n");
@@ -2166,7 +2168,9 @@ int UpnpUnSubscribeAsync(
 	TPJobInit( &job, ( start_routine ) UpnpThreadDistribution, Param );
 	TPJobSetFreeFunction( &job, ( free_routine ) free );
 	TPJobSetPriority( &job, MED_PRIORITY );
-	ThreadPoolAdd( &gSendThreadPool, &job, NULL );
+	if (ThreadPoolAdd( &gSendThreadPool, &job, NULL ) != 0) {
+		free(Param);
+	}
 
 exit_function:
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Exiting UpnpUnSubscribeAsync\n");
@@ -2292,7 +2296,9 @@ int UpnpRenewSubscriptionAsync(
     TPJobInit( &job, ( start_routine ) UpnpThreadDistribution, Param );
     TPJobSetFreeFunction( &job, ( free_routine ) free );
     TPJobSetPriority( &job, MED_PRIORITY );
-    ThreadPoolAdd( &gSendThreadPool, &job, NULL );
+    if (ThreadPoolAdd( &gSendThreadPool, &job, NULL ) != 0) {
+	free(Param);
+    }
 
     UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting UpnpRenewSubscriptionAsync\n");
@@ -2764,7 +2770,9 @@ int UpnpSendActionAsync(
     TPJobSetFreeFunction( &job, ( free_routine ) free );
 
     TPJobSetPriority( &job, MED_PRIORITY );
-    ThreadPoolAdd( &gSendThreadPool, &job, NULL );
+    if (ThreadPoolAdd( &gSendThreadPool, &job, NULL ) != 0) {
+	free(Param);
+    }
 
     UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting UpnpSendActionAsync \n");
@@ -2884,7 +2892,9 @@ int UpnpSendActionExAsync(
     TPJobSetFreeFunction( &job, ( free_routine ) free );
 
     TPJobSetPriority( &job, MED_PRIORITY );
-    ThreadPoolAdd( &gSendThreadPool, &job, NULL );
+    if (ThreadPoolAdd( &gSendThreadPool, &job, NULL ) != 0) {
+	free(Param);
+    }
 
     UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting UpnpSendActionAsync\n");
@@ -2951,7 +2961,9 @@ int UpnpGetServiceVarStatusAsync(
 
     TPJobSetPriority( &job, MED_PRIORITY );
 
-    ThreadPoolAdd( &gSendThreadPool, &job, NULL );
+    if (ThreadPoolAdd( &gSendThreadPool, &job, NULL ) != 0) {
+	free(Param);
+    }
 
     UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
         "Exiting UpnpGetServiceVarStatusAsync\n");

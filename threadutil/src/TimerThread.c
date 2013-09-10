@@ -96,10 +96,17 @@ static void *TimerThreadWorker(
         /* If time has elapsed, schedule job. */
         if (nextEvent && currentTime >= nextEventTime) {
             if( nextEvent->persistent ) {
-                ThreadPoolAddPersistent( timer->tp, &nextEvent->job,
-                                         &tempId );
+                if (ThreadPoolAddPersistent( timer->tp, &nextEvent->job, &tempId ) != 0) {
+			if (nextEvent->job.arg != NULL && nextEvent->job.free_func != NULL) {
+				nextEvent->job.free_func(nextEvent->job.arg);
+			}
+		}
             } else {
-                ThreadPoolAdd( timer->tp, &nextEvent->job, &tempId );
+                if (ThreadPoolAdd( timer->tp, &nextEvent->job, &tempId ) != 0) {
+			if (nextEvent->job.arg != NULL && nextEvent->job.free_func != NULL) {
+				nextEvent->job.free_func(nextEvent->job.arg);
+			}
+		}
             }
             ListDelNode( &timer->eventQ, head, 0 );
             FreeTimerEvent( timer, nextEvent );
