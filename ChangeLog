@@ -2,6 +2,16 @@
 Version 1.6.19
 *******************************************************************************
 
+2013-10-17 Peng <howtofly(at)gmail.com>
+
+	Fix return value of process_request and related subroutines
+	1) Only HTTP_XXX should be return
+	2) Make default return value work for process_request
+
+2013-10-15 Peng <howtofly(at)gmail.com>
+
+	Fix Content-Range generation bug
+
 2013-09-10 zexian chen <chenzexian88(at)gmail.com>
 
 	Hi,

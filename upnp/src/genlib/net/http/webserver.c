@@ -771,7 +771,7 @@ static int GetNextRange(
  *
  * \return
  * \li \c HTTP_BAD_REQUEST
- * \li \c UPNP_E_OUTOF_MEMORY
+ * \li \c HTTP_INTERNAL_SERVER_ERROR
  * \li \c HTTP_REQUEST_RANGE_NOT_SATISFIABLE
  * \li \c HTTP_OK
  */
@@ -794,7 +794,7 @@ static int CreateHTTPRangeResponseHeader(
 		return HTTP_BAD_REQUEST;
 	RangeInput = malloc(strlen(ByteRangeSpecifier) + 1);
 	if (!RangeInput)
-		return UPNP_E_OUTOF_MEMORY;
+		return HTTP_INTERNAL_SERVER_ERROR;
 	memset(RangeInput, 0, strlen(ByteRangeSpecifier) + 1);
 	strncpy(RangeInput, ByteRangeSpecifier, strlen(ByteRangeSpecifier));
 	/* CONTENT-RANGE: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
@@ -830,7 +830,7 @@ static int CreateHTTPRangeResponseHeader(
 				(int64_t)FileLength);
 			if (rc < 0 || (unsigned int) rc >= sizeof(Instr->RangeHeader)) {
 				free(RangeInput);
-				return UPNP_E_OUTOF_MEMORY;
+				return HTTP_INTERNAL_SERVER_ERROR;
 			}
 		} else if (FirstByte >= 0 && LastByte == -1
 			   && FirstByte < FileLength) {
@@ -845,7 +845,7 @@ static int CreateHTTPRangeResponseHeader(
 				(int64_t)FileLength);
 			if (rc < 0 || (unsigned int) rc >= sizeof(Instr->RangeHeader)) {
 				free(RangeInput);
-				return UPNP_E_OUTOF_MEMORY;
+				return HTTP_INTERNAL_SERVER_ERROR;
 			}
 		} else if (FirstByte == -1 && LastByte > 0) {
 			if (LastByte >= FileLength) {
@@ -870,7 +870,7 @@ static int CreateHTTPRangeResponseHeader(
 			}
 			if (rc < 0 || (unsigned int) rc >= sizeof(Instr->RangeHeader)) {
 				free(RangeInput);
-				return UPNP_E_OUTOF_MEMORY;
+				return HTTP_INTERNAL_SERVER_ERROR;
 			}
 		} else {
 			free(RangeInput);
@@ -891,7 +891,7 @@ static int CreateHTTPRangeResponseHeader(
  *
  * \return
  * \li \c HTTP_BAD_REQUEST
- * \li \c UPNP_E_OUTOF_MEMORY
+ * \li \c HTTP_INTERNAL_SERVER_ERROR
  * \li \c HTTP_REQUEST_RANGE_NOT_SATISFIABLE
  * \li \c HTTP_OK
  */
@@ -912,7 +912,7 @@ static int CheckOtherHTTPHeaders(
 
 	TmpBuf = (char *)malloc(TmpBufSize);
 	if (!TmpBuf)
-		return UPNP_E_OUTOF_MEMORY;
+		return HTTP_INTERNAL_SERVER_ERROR;
 	node = ListHead(&Req->headers);
 	while (node != NULL) {
 		header = (http_header_t *) node->item;
@@ -925,7 +925,7 @@ static int CheckOtherHTTPHeaders(
 			TmpBufSize = header->value.length + 1;
 			TmpBuf = (char *)malloc(TmpBufSize);
 			if (!TmpBuf)
-				return UPNP_E_OUTOF_MEMORY;
+				return HTTP_INTERNAL_SERVER_ERROR;
 		}
 		memcpy(TmpBuf, header->value.buf, header->value.length);
 		TmpBuf[header->value.length] = '\0';
@@ -1014,8 +1014,11 @@ static int CheckOtherHTTPHeaders(
  *
  * \return
  * \li \c HTTP_BAD_REQUEST
- * \li \c UPNP_E_OUTOF_MEMORY
+ * \li \c HTTP_INTERNAL_SERVER_ERROR
  * \li \c HTTP_REQUEST_RANGE_NOT_SATISFIABLE
+ * \li \c HTTP_FORBIDDEN
+ * \li \c HTTP_NOT_FOUND
+ * \li \c HTTP_NOT_ACCEPTABLE
  * \li \c HTTP_OK
  */
 static int process_request(
@@ -1202,14 +1205,15 @@ static int process_request(
 	}
 	RespInstr->ReadSendSize = finfo.file_length;
 	/* Check other header field. */
-	if ((err_code =
+	if ((code =
 	     CheckOtherHTTPHeaders(req, RespInstr,
 				   finfo.file_length)) != HTTP_OK) {
+		err_code = code;
 		goto error_handler;
 	}
 	if (req->method == HTTPMETHOD_POST) {
 		*rtype = RESP_POST;
-		err_code = UPNP_E_SUCCESS;
+		err_code = HTTP_OK;
 		goto error_handler;
 	}
 	/*extra_headers = UpnpFileInfo_get_ExtraHeaders(finfo); */
@@ -1247,7 +1251,6 @@ static int process_request(
 		}
 	} else if (RespInstr->IsRangeActive && !RespInstr->IsChunkActive) {
 		/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
-		/* Transfer-Encoding: chunked */
 		if (http_MakeMessage(headers, resp_major, resp_minor,
 		    "R" "N" "T" "GLD" "s" "tcS" "Xc" "sCc",
 		    HTTP_PARTIAL_CONTENT,	/* status code */
@@ -1261,7 +1264,6 @@ static int process_request(
 			goto error_handler;
 		}
 	} else if (!RespInstr->IsRangeActive && RespInstr->IsChunkActive) {
-		/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
 		/* Transfer-Encoding: chunked */
 		if (http_MakeMessage(headers, resp_major, resp_minor,
 		    "RK" "TLD" "s" "tcS" "Xc" "sCc",
@@ -1276,8 +1278,6 @@ static int process_request(
 	} else {
 		/* !RespInstr->IsRangeActive && !RespInstr->IsChunkActive */
 		if (RespInstr->ReadSendSize >= 0) {
-			/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
-			/* Transfer-Encoding: chunked */
 			if (http_MakeMessage(headers, resp_major, resp_minor,
 			    "R" "N" "TLD" "s" "tcS" "Xc" "sCc",
 			    HTTP_OK,	/* status code */
@@ -1291,8 +1291,6 @@ static int process_request(
 				goto error_handler;
 			}
 		} else {
-			/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
-			/* Transfer-Encoding: chunked */
 			if (http_MakeMessage(headers, resp_major, resp_minor,
 			    "R" "TLD" "s" "tcS" "Xc" "sCc",
 			    HTTP_OK,	/* status code */
@@ -1322,12 +1320,12 @@ static int process_request(
 	if (req->method == HTTPMETHOD_SIMPLEGET) {
 		membuffer_destroy(headers);
 	}
-	err_code = UPNP_E_SUCCESS;
+	err_code = HTTP_OK;
 
  error_handler:
 	free(request_doc);
 	ixmlFreeDOMString(finfo.content_type);
-	if (err_code != UPNP_E_SUCCESS && alias_grabbed) {
+	if (err_code != HTTP_OK && alias_grabbed) {
 		alias_release(alias);
 	}
 
@@ -1489,7 +1487,7 @@ void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
 	/*the type of request. */
 	ret = process_request(req, &rtype, &headers, &filename, &xmldoc,
 		&RespInstr);
-	if (ret != UPNP_E_SUCCESS) {
+	if (ret != HTTP_OK) {
 		/* send error code */
 		http_SendStatusResponse(info, ret, req->major_version,
 			req->minor_version);
