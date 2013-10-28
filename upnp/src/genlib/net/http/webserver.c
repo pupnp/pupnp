@@ -156,6 +156,7 @@ static const char *gEncodedMediaTypes =
 	"au\0" AUDIO_STR "basic\0"
 	"avi\0" VIDEO_STR "msvideo\0"
 	"bmp\0" IMAGE_STR "bmp\0"
+	"css\0" TEXT_STR "css\0"
 	"dcr\0" APPLICATION_STR "x-director\0"
 	"dib\0" IMAGE_STR "bmp\0"
 	"dir\0" APPLICATION_STR "x-director\0"
