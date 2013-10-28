@@ -50,7 +50,7 @@ extern "C" {
 
 #include <pthread.h>
 
-#if defined(BSD)
+#if defined(BSD) && !defined(__GNU__)
 	#define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
 #endif
 

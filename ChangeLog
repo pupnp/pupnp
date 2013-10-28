@@ -357,6 +357,10 @@ Version 1.8.0
 Version 1.6.19
 *******************************************************************************
 
+2013-10-28 Pino Toscano <pinotree(at)users.sourceforge.net>
+
+	Fix compilation on GNU/Hurd
+
 2013-10-28 Peng <howtofly(at)gmail.com>
 
 	Fix return value of http_RecvPostMessage and update httpparser.c's comments
