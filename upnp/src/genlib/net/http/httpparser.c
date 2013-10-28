@@ -140,7 +140,7 @@ static UPNP_INLINE void scanner_init(OUT scanner_t *scanner, IN membuffer *bufpt
 * Parameters :
 *	IN char c ;	character to be tested against used separator values
 *
-* Description :	Finds the separator character.
+* Description :	Determines if the passed value is a separator
 *
 ************************************************************************/
 static UPNP_INLINE int is_separator_char(IN int c)
@@ -154,7 +154,7 @@ static UPNP_INLINE int is_separator_char(IN int c)
 * Parameters :
 *	IN char c ;	character to be tested for separator values
 *
-* Description :	Calls the function to indentify separator character 
+* Description :	Determines if the passed value is permissible in token
 *
 ************************************************************************/
 static UPNP_INLINE int is_identifier_char(IN int c)
@@ -182,7 +182,7 @@ static UPNP_INLINE int is_control_char(IN int c)
 * Parameters :
 *	IN char cc ; character to be tested for CR/LF
 *
-* Description :	Checks to see if the passed in value is CR/LF
+* Description :	Determines if the passed value is permissible in qdtext
 *
 ************************************************************************/
 static UPNP_INLINE int is_qdtext_char(IN int c)
@@ -518,8 +518,9 @@ http_header_t *httpmsg_find_hdr(
 * Description :	skips blank lines at the start of a msg.
 *
 * Return : parse_status_t ;
-*
-* Note :
+*	PARSE_OK
+*	PARSE_INCOMPLETE		-- not enuf chars to get a token
+*	PARSE_FAILURE			-- bad msg format
 ************************************************************************/
 static UPNP_INLINE parse_status_t skip_blank_lines(INOUT scanner_t *scanner)
 {
@@ -1129,6 +1130,7 @@ static parse_status_t vfmatch(
 *   PARSE_OK
 *   PARSE_NO_MATCH
 *   PARSE_INCOMPLETE
+*   PARSE_FAILURE		- bad input
 ************************************************************************/
 static parse_status_t match(
 	INOUT scanner_t *scanner,
@@ -1161,6 +1163,7 @@ static parse_status_t match(
 *   PARSE_OK
 *   PARSE_NO_MATCH -- failure to match pattern 'fmt'
 *   PARSE_FAILURE	-- 'str' is bad input
+*   PARSE_INCOMPLETE
 ************************************************************************/
 parse_status_t
 matchstr( IN char *str,
@@ -1235,6 +1238,8 @@ parser_init( OUT http_parser_t * parser )
 *	PARSE_OK
 *	PARSE_SUCCESS
 *	PARSE_FAILURE
+*	PARSE_INCOMPLETE
+*	PARSE_NO_MATCH
 ************************************************************************/
 static parse_status_t
 parser_parse_requestline( INOUT http_parser_t * parser )
@@ -1351,12 +1356,13 @@ parser_parse_requestline( INOUT http_parser_t * parser )
 * Parameters:
 *	INOUT http_parser_t* parser	; HTTP Parser object
 *
-* Description: Get HTTP Method, URL location and version information.
+* Description: Get HTTP version information, status code and status msg.
 *
 * Returns:
 *	PARSE_OK
-*	PARSE_SUCCESS
 *	PARSE_FAILURE
+*	PARSE_INCOMPLETE
+*	PARSE_NO_MATCH
 ************************************************************************/
 parse_status_t parser_parse_responseline(INOUT http_parser_t *parser)
 {
@@ -1428,12 +1434,14 @@ parse_status_t parser_parse_responseline(INOUT http_parser_t *parser)
 * Parameters:
 *	INOUT http_parser_t* parser	; HTTP Parser object
 *
-* Description: Get HTTP Method, URL location and version information.
+* Description: Read HTTP header fields.
 *
 * Returns:
 *	PARSE_OK
 *	PARSE_SUCCESS
 *	PARSE_FAILURE
+*	PARSE_INCOMPLETE
+*	PARSE_NO_MATCH
 ************************************************************************/
 parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
 {
@@ -1574,7 +1582,6 @@ parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
 *
 * Returns:
 *	 PARSE_INCOMPLETE
-*	 PARSE_FAILURE -- entity length > content-length value
 *	 PARSE_SUCCESS
 ************************************************************************/
 static UPNP_INLINE parse_status_t
@@ -1621,9 +1628,10 @@ parser_parse_entity_using_clen( INOUT http_parser_t * parser )
 * Description: Read data in the chunks
 *
 * Returns:
+*	 PARSE_CONTINUE_1
 *	 PARSE_INCOMPLETE
-*	 PARSE_FAILURE -- entity length > content-length value
-*	 PARSE_SUCCESS
+*	 PARSE_FAILURE
+*	 PARSE_NO_MATCH
 ************************************************************************/
 static UPNP_INLINE parse_status_t parser_parse_chunky_body(
 	INOUT http_parser_t *parser)
@@ -1665,8 +1673,9 @@ static UPNP_INLINE parse_status_t parser_parse_chunky_body(
 * Description: Read headers at the end of the chunked entity
 *
 * Returns:
+*	 PARSE_NO_MATCH
 *	 PARSE_INCOMPLETE
-*	 PARSE_FAILURE -- entity length > content-length value
+*	 PARSE_FAILURE
 *	 PARSE_SUCCESS
 ************************************************************************/
 static UPNP_INLINE parse_status_t
@@ -1701,12 +1710,12 @@ parser_parse_chunky_headers( INOUT http_parser_t * parser )
 * Parameters:
 *	INOUT http_parser_t* parser	- HTTP Parser Object
 *
-* Description: Read headers at the end of the chunked entity
+* Description: Read entity using chunked transfer encoding
 *
 * Returns:
 *	 PARSE_INCOMPLETE
-*	 PARSE_FAILURE -- entity length > content-length value
-*	 PARSE_SUCCESS
+*	 PARSE_FAILURE
+*	 PARSE_NO_MATCH
 *	 PARSE_CONTINUE_1
 ************************************************************************/
 static UPNP_INLINE parse_status_t
@@ -1755,7 +1764,7 @@ parser_parse_chunky_entity( INOUT http_parser_t * parser )
 * Parameters:
 *	INOUT http_parser_t* parser	; HTTP Parser object
 *
-* Description: Read headers at the end of the chunked entity
+* Description: Keep reading entity until the connection is closed.
 *
 * Returns:
 *	 PARSE_INCOMPLETE_ENTITY
@@ -1792,9 +1801,9 @@ parser_parse_entity_until_close( INOUT http_parser_t * parser )
 * Description: Determines method to read entity
 *
 * Returns:
-*	 PARSE_OK
+*	 PARSE_CONTINUE_1
 * 	 PARSE_FAILURE
-*	 PARSE_COMPLETE	-- no more reading to do
+*	 PARSE_SUCCESS	-- no more reading to do
 ************************************************************************/
 UPNP_INLINE parse_status_t
 parser_get_entity_read_method( INOUT http_parser_t * parser )
@@ -1890,17 +1899,19 @@ parser_get_entity_read_method( INOUT http_parser_t * parser )
 * Parameters:
 *	INOUT http_parser_t* parser	; HTTP Parser object
 *
-* Description: Determines method to read entity
+* Description: Read HTTP entity body
 *
 * Returns:
-*	 PARSE_OK
 * 	 PARSE_FAILURE
-*	 PARSE_COMPLETE	-- no more reading to do
+* 	 PARSE_NO_MATCH
+* 	 PARSE_INCOMPLETE
+* 	 PARSE_INCOMPLETE_ENTITY
+*	 PARSE_SUCCESS	-- no more reading to do
 ************************************************************************/
 UPNP_INLINE parse_status_t
 parser_parse_entity( INOUT http_parser_t * parser )
 {
-    parse_status_t status = PARSE_OK;
+    parse_status_t status;
 
     assert( parser->position == POS_ENTITY );
 
@@ -1931,6 +1942,7 @@ parser_parse_entity( INOUT http_parser_t * parser )
                 break;
 
             default:
+		status = PARSE_FAILURE;
                 assert( 0 );
         }
 
@@ -1991,7 +2003,11 @@ parser_response_init( OUT http_parser_t * parser,
 *	parser object the actual parsing function is invoked
 *
 * Returns:
-*	 void
+*	PARSE_SUCCESS
+*	PARSE_FAILURE
+*	PARSE_INCOMPLETE
+*	PARSE_INCOMPLETE_ENTITY
+*	PARSE_NO_MATCH
 ************************************************************************/
 parse_status_t
 parser_parse( INOUT http_parser_t * parser )
@@ -2046,11 +2062,14 @@ parser_parse( INOUT http_parser_t * parser )
 *					buffer
 *	IN size_t buf_length ;		Size of the buffer
 *
-* Description: The parser function. Depending on the position of the
-*	parser object the actual parsing function is invoked
+* Description: Append date to HTTP parser, and do the parsing.
 *
 * Returns:
-*	 void
+*	PARSE_SUCCESS
+*	PARSE_FAILURE
+*	PARSE_INCOMPLETE
+*	PARSE_INCOMPLETE_ENTITY
+*	PARSE_NO_MATCH
 ************************************************************************/
 parse_status_t
 parser_append( INOUT http_parser_t * parser,
