@@ -1338,7 +1338,8 @@ static int process_request(
  * \return
  * \li \c HTTP_INTERNAL_SERVER_ERROR
  * \li \c HTTP_UNAUTHORIZED
- * \li \c HTTP_REQUEST_RANGE_NOT_SATISFIABLE
+ * \li \c HTTP_BAD_REQUEST
+ * \li \c HTTP_SERVICE_UNAVAILABLE
  * \li \c HTTP_OK
  */
 static int http_RecvPostMessage(
@@ -1424,7 +1425,7 @@ static int http_RecvPostMessage(
 					goto ExitFunction;
 				}
 			} else {
-				ret_code = num_read;
+				ret_code = HTTP_SERVICE_UNAVAILABLE;
 				goto ExitFunction;
 			}
 		}

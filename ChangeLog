@@ -2,6 +2,10 @@
 Version 1.6.19
 *******************************************************************************
 
+2013-10-28 Peng <howtofly(at)gmail.com>
+
+	Fix return value of http_RecvPostMessage and update httpparser.c's comments
+
 2013-10-17 Peng <howtofly(at)gmail.com>
 
 	Fix return value of process_request and related subroutines
