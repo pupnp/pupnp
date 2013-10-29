@@ -741,6 +741,10 @@ void TvCtrlPointAddDevice(
 			deviceNode->device.AdvrTimeOut = expires;
 			for (service = 0; service < TV_SERVICE_SERVCOUNT;
 			     service++) {
+				if (serviceId[service] == NULL) {
+					/* not found */
+					continue;
+				}
 				strcpy(deviceNode->device.TvService[service].
 				       ServiceId, serviceId[service]);
 				strcpy(deviceNode->device.TvService[service].

@@ -357,6 +357,47 @@ Version 1.8.0
 Version 1.6.19
 *******************************************************************************
 
+2012-06-19 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
+
+	SF Bug Tracker #118, Creator: T.Iwamoto
+	tv_ctrlpt crashes after detecting a later version of tvcontrol service
+
+	From:  gon3456@users.sf.net
+	Steps to reproduce:
+	1. Extracts and build libupnp-1.6.18
+	$ tar -xjf /path/to/archive/libupnp-1.6.18.tar.bz2
+	$ cd libupnp-1.6.18
+	$ ./configure
+	$ make
+	2. Applies the attached patch and remake.
+	$ patch -p1 < /path/to/patch/libupnp-1.6.18.patch
+	$ make
+	3. Run tv_device.
+	$ cd upnp/sample
+	$ ./tv_device
+	4. Run tv_ctrlpt; the tv_ctrlpt crashes soon.
+	$ ./tv_ctrlpt
+	Segmentation fault (core dumped)
+	This is an issue report about the sample program of control point.
+	The tv_ctrlpt crashes after detecting a tvdevice that contains tvcontrol:2 or higher version of tvcontrol service.
+	tv_ctrlpt should detect correctly such devices due to forward compatibility of control points with device.
+	For more information about the compatibility, please refer the following document:
+	DLNA Architectures and Protocols Part 1 2011 December - 7.3.2.1.3 (GUN:GZJXU)
+	The attached patch changes the sample programs as below:
+	- device: changes version of tvcontrol service from 1 to 2. This change may occur in the future.
+	- cp: nothing changed: cp knows version 1 of tvcontrol service only.
+	I know many vendors implements their control points based on the tv_ctrlpt, so I hope to fix this issue ASAP.
+
+	==
+
+	From: Yoichi NAKAYAMA
+	SEGV is caused by strcpy with NULL argument.
+	Attached patch will avoid SEGV in strcpy, but there may be other inconsistencies.
+
+	> I know many vendors implements their control points based on the tv_ctrlpt,
+
+	I don't think so. I think tv_ctrlpt is just a sample to be used with tv_device.
+
 2013-10-28 Pino Toscano <pinotree(at)users.sourceforge.net>
 
 	Fix compilation on GNU/Hurd
