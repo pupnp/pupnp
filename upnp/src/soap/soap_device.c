@@ -415,7 +415,6 @@ static int check_soap_action_header(
 	temp_header_value = malloc(soap_action_header->value.length + 1);
 	if (!temp_header_value) {
 		ret_code = UPNP_E_OUTOF_MEMORY;
-		free(temp_header_value);
 		return ret_code;
 	}
 	strncpy(temp_header_value, soap_action_header->value.buf,
@@ -728,7 +727,7 @@ static UPNP_INLINE void handle_query_variable(
 		return;
 	}
 	if (variable.ErrCode != UPNP_E_SUCCESS) {
-		if (strlen(variable.ErrStr) > 0) {
+		if (strlen(variable.ErrStr) == 0) {
 			err_code = SOAP_INVALID_VAR;
 			err_str = Soap_Invalid_Var;
 		} else {
@@ -736,6 +735,7 @@ static UPNP_INLINE void handle_query_variable(
 			err_str = variable.ErrStr;
 		}
 		send_error_response(info, err_code, err_str, request);
+		ixmlFreeDOMString(variable.CurrentVal);
 		return;
 	}
 	/* send response */
