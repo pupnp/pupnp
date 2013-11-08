@@ -301,15 +301,16 @@ FindServiceEventURLPath( service_table * table,
 
     if( ( table )
         &&
-        ( parse_uri
-          ( eventURLPath, strlen( eventURLPath ), &parsed_url_in ) ) ) {
+        ( parse_uri( eventURLPath,
+                     strlen( eventURLPath ),
+                     &parsed_url_in ) == HTTP_SUCCESS ) ) {
 
         finger = table->serviceList;
         while( finger ) {
             if( finger->eventURL )
                 if( ( parse_uri
                       ( finger->eventURL, strlen( finger->eventURL ),
-                        &parsed_url ) ) ) {
+                        &parsed_url ) == HTTP_SUCCESS ) ) {
 
                     if( !token_cmp
                         ( &parsed_url.pathquery,
@@ -354,13 +355,13 @@ FindServiceControlURLPath( service_table * table,
         &&
         ( parse_uri
           ( controlURLPath, strlen( controlURLPath ),
-            &parsed_url_in ) ) ) {
+            &parsed_url_in ) == HTTP_SUCCESS ) ) {
         finger = table->serviceList;
         while( finger ) {
             if( finger->controlURL )
                 if( ( parse_uri
                       ( finger->controlURL, strlen( finger->controlURL ),
-                        &parsed_url ) ) ) {
+                        &parsed_url ) == HTTP_SUCCESS) ) {
                     if( !token_cmp
                         ( &parsed_url.pathquery,
                           &parsed_url_in.pathquery ) )

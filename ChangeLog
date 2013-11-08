@@ -357,6 +357,10 @@ Version 1.8.0
 Version 1.6.19
 *******************************************************************************
 
+2013-11-08 Peng <howtofly(at)gmail.com>
+
+	Fix return value check of parse_uri.
+
 2012-06-19 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
 	SF Bug Tracker #118, Creator: T.Iwamoto
