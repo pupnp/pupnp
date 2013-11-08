@@ -359,6 +359,14 @@ Version 1.6.19
 
 2013-11-08 Peng <howtofly(at)gmail.com>
 
+	Fix several minor bugs in soap_device.c
+
+	1) remove redundant free
+	2) avoid user-provided ErrStr being overwritten by the default one
+	3) eliminated memory leak possiblity in handle_query_variable
+
+2013-11-08 Peng <howtofly(at)gmail.com>
+
 	Fix return value check of parse_uri.
 
 2012-06-19 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>

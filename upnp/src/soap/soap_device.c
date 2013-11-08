@@ -416,7 +416,6 @@ static int check_soap_action_header(
 	temp_header_value = malloc(soap_action_header->value.length + 1);
 	if (!temp_header_value) {
 		ret_code = UPNP_E_OUTOF_MEMORY;
-		free(temp_header_value);
 		return ret_code;
 	}
 	strncpy(temp_header_value, soap_action_header->value.buf,
