@@ -200,10 +200,6 @@ typedef pthread_rwlockattr_t ithread_rwlockattr_t;
 static UPNP_INLINE int ithread_initialize_library(void) {
 	int ret = 0;
 
-#if defined(WIN32) && defined(PTW32_STATIC_LIB)
-	ret = !pthread_win32_process_attach_np();
-#endif
-
 	return ret;
 }
 
@@ -221,10 +217,6 @@ static UPNP_INLINE int ithread_initialize_library(void) {
  ***************************************************************************/
 static UPNP_INLINE int ithread_cleanup_library(void) {
 	int ret = 0;
-
-#if defined(WIN32) && defined(PTW32_STATIC_LIB)
-	ret = !pthread_win32_process_detach_np();
-#endif
 
 	return ret;
 }

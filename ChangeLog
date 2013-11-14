@@ -357,6 +357,42 @@ Version 1.8.0
 Version 1.6.19
 *******************************************************************************
 
+2013-11-14 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	SF Bug Tracker #119, Creator: Klaus Fischer
+	Access violation due to changed usage of pthreads-win32
+
+	Dear libupnp developers,
+
+	I have experienced a crash (access violation) when using libupnp on
+	Windows. The crash is actually located in pthreads-win32 and happens
+	when repeatedly de-/initializing libupnp on Win32 in the same process
+	and both libupnp and pthreads-win32 are compiled as static libraries.
+
+	So I'm doing this:
+	- UpnpInit()
+	- UpnpFinish()
+	- UpnpInit() <- Crash
+
+	I am already in touch with Ross Johnson on the pthreads-win32 mailing
+	list regarding this issue:
+
+	http://sourceware.org/ml/pthreads-win32/2013/msg00020.html
+
+	He told me the problem is that the functions
+	pthread_win32_process_attach/detach_np() should no longer be called
+	directly, but are invoked automatically now since version 2.9.0 of
+	pthreads-win32, which has been released approx. 1.5 years ago. Please
+	refer to above link for in-depth information.
+
+	So for proper using of latest pthreads-win32 library, those function
+	calls should vanish inside libupnp. Could you consider adapting libupnp
+	in that way? I would really like to use both libraries out-of-the-box
+	without local modifications, and this issue prevents that.
+
+	Best regards,
+	Klaus
+
 2013-11-08 Peng <howtofly(at)gmail.com>
 
 	Fix several minor bugs in soap_device.c
