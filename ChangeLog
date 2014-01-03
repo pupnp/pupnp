@@ -2,6 +2,13 @@
 Version 1.6.20
 *******************************************************************************
 
+2014-01-03 Peng <howtofly(at)gmail.com>
+
+	rewrite soap_device.c
+
+	1) separate HTTP handling from SOAP handling
+	2) remove repeated validity check, each check is performed exactly once
+	3) fix HTTP status code per UPnP spec, SOAP spec and RFC 2774
 
 *******************************************************************************
 Version 1.6.19

@@ -88,14 +88,19 @@ static const char *Http4xxStr =
     "Unsupported Media Type\0"
     "Requested Range Not Satisfiable\0" "Expectation Failed\0";
 
-#define NUM_5XX_CODES   6
+#define NUM_5XX_CODES   11
 static const char *Http5xxCodes[NUM_5XX_CODES];
 static const char *Http5xxStr =
     "Internal Server Error\0"
     "Not Implemented\0"
     "Bad Gateway\0"
     "Service Unavailable\0"
-    "Gateway Timeout\0" "HTTP Version Not Supported\0";
+    "Gateway Timeout\0"
+    "HTTP Version Not Supported\0"
+    "Variant Also Negotiates\0"
+    "Insufficient Storage\0"
+    "Loop Detected\0"
+    "\0" "Not Extended\0";
 
 static int gInitialized = FALSE;
 

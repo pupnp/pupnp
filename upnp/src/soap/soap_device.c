@@ -48,6 +48,9 @@
 #include "unixutil.h"
 #include "upnpapi.h"
 
+#include <assert.h>
+#include <string.h>
+
 #ifdef WIN32
 	#define snprintf _snprintf
 #endif
@@ -57,12 +60,15 @@
 
 #define SREQ_HDR_NOT_FOUND	 -1
 #define SREQ_BAD_HDR_FORMAT	 -2
+#define SREQ_NOT_EXTENDED	 -3
 
 #define SOAP_INVALID_ACTION 401
 #define SOAP_INVALID_ARGS	402
 #define SOAP_OUT_OF_SYNC	403
 #define SOAP_INVALID_VAR	404
 #define SOAP_ACTION_FAILED	501
+#define SOAP_MEMORY_OUT		603
+
 
 static const char *SOAP_BODY = "Body";
 static const char *SOAP_URN = "http:/""/schemas.xmlsoap.org/soap/envelope/";
@@ -72,81 +78,17 @@ static const char *Soap_Invalid_Action = "Invalid Action";
 /*static const char* Soap_Invalid_Args = "Invalid Args"; */
 static const char *Soap_Action_Failed = "Action Failed";
 static const char *Soap_Invalid_Var = "Invalid Var";
+static const char *Soap_Memory_out = "Out of Memory";
 
-/*!
- * \brief This function retrives the name of the SOAP action.
- *
- * \return 0 if successful else returns appropriate error.
- */
-static UPNP_INLINE int get_request_type(
-	/*! [in] HTTP request. */
-	http_message_t *request,
-	/*! [out] SOAP action name. */
-	memptr *action_name)
-{
-	memptr value;
-	memptr ns_value, dummy_quote;
-	http_header_t *hdr;
-	char save_char;
-	char *s;
-	membuffer soap_action_name;
-	size_t n;
+typedef struct soap_devserv_t {
+	char dev_udn[NAME_SIZE];
+	char service_type[NAME_SIZE];
+	char service_id[NAME_SIZE];
+	memptr action_name;
+	Upnp_FunPtr callback;
+	void *cookie;
+}soap_devserv_t;
 
-	/* find soapaction header */
-	if (request->method == SOAPMETHOD_POST) {
-		if (!httpmsg_find_hdr(request, HDR_SOAPACTION, &value))
-			return SREQ_HDR_NOT_FOUND;
-	} else {
-		/* M-POST */
-		/* get NS value from MAN header */
-		hdr = httpmsg_find_hdr(request, HDR_MAN, &value);
-		if (hdr == NULL)
-			return SREQ_HDR_NOT_FOUND;
-		if (matchstr(value.buf, value.length, "%q%i ; ns = %s",
-			     &dummy_quote, &ns_value) != 0)
-			return SREQ_BAD_HDR_FORMAT;
-		/* create soapaction name header */
-		membuffer_init(&soap_action_name);
-		if (membuffer_assign(&soap_action_name,
-			ns_value.buf, ns_value.length) == UPNP_E_OUTOF_MEMORY ||
-		    membuffer_append_str(&soap_action_name,
-			"-SOAPACTION") == UPNP_E_OUTOF_MEMORY) {
-			membuffer_destroy(&soap_action_name);
-			return UPNP_E_OUTOF_MEMORY;
-		}
-		hdr = httpmsg_find_hdr_str(request, soap_action_name.buf);
-		membuffer_destroy(&soap_action_name);
-		if (!hdr)
-			return SREQ_HDR_NOT_FOUND;
-		value.buf = hdr->value.buf;
-		value.length = hdr->value.length;
-	}
-	/* determine type */
-	save_char = value.buf[value.length];
-	value.buf[value.length] = '\0';
-	s = strchr(value.buf, '#');
-	if (s == NULL) {
-		value.buf[value.length] = save_char;
-		return SREQ_BAD_HDR_FORMAT;
-	}
-	/* move to value */
-	s++;
-	n = value.length - (size_t)(s - value.buf);
-	if (matchstr(s, n, "%s", action_name) != PARSE_OK) {
-		value.buf[value.length] = save_char;
-		return SREQ_BAD_HDR_FORMAT;
-	}
-	/* action name or variable ? */
-	if (memptr_cmp(action_name, "QueryStateVariable") == 0) {
-		/* query variable */
-		action_name->buf = NULL;
-		action_name->length = 0;
-	}
-	/* restore */
-	value.buf[value.length] = save_char;
-
-	return 0;
-}
 
 /*!
  * \brief Sends SOAP error response.
@@ -270,288 +212,6 @@ static UPNP_INLINE void send_var_query_response(
 	membuffer_destroy(&response);
 }
 
-/*!
- * \brief Separates the action node from the root DOM node.
- *
- * \return 0 if successful, or -1 if fails.
- */
-static UPNP_INLINE int get_action_node(
-	/*! [in] The root DOM node. */
-	IXML_Document *TempDoc,
-	/*! [in] IXML_Node name to be searched. */
-	char *NodeName,
-	/*! [out] Response/Output node. */
-	IXML_Document **RespNode)
-{
-	IXML_Node *EnvpNode = NULL;
-	IXML_Node *BodyNode = NULL;
-	IXML_Node *ActNode = NULL;
-	DOMString ActNodeName = NULL;
-	const DOMString nodeName;
-	int ret_code = -1;	/* error, by default */
-	IXML_NodeList *nl = NULL;
-
-	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__,
-		   "get_action_node(): node name =%s\n ", NodeName);
-	*RespNode = NULL;
-	/* Got the Envelope node here */
-	EnvpNode = ixmlNode_getFirstChild((IXML_Node *) TempDoc);
-	if (!EnvpNode)
-		goto error_handler;
-	nl = ixmlElement_getElementsByTagNameNS((IXML_Element *)EnvpNode,
-						"*", "Body");
-	if (!nl)
-		goto error_handler;
-	BodyNode = ixmlNodeList_item(nl, 0);
-	if (!BodyNode)
-		goto error_handler;
-	/* Got action node here */
-	ActNode = ixmlNode_getFirstChild(BodyNode);
-	if (!ActNode)
-		goto error_handler;
-	/* Test whether this is the action node */
-	nodeName = ixmlNode_getNodeName(ActNode);
-	if (!nodeName)
-		goto error_handler;
-	if (!strstr(nodeName, NodeName))
-		goto error_handler;
-	else {
-		ActNodeName = ixmlPrintNode(ActNode);
-		if (!ActNodeName)
-			goto error_handler;
-		ret_code = ixmlParseBufferEx(ActNodeName, RespNode);
-		if (ret_code != IXML_SUCCESS) {
-			ret_code = -1;
-			goto error_handler;
-		}
-	}
-	/* success */
-	ret_code = 0;
-
-error_handler:
-	ixmlFreeDOMString(ActNodeName);
-	if (nl)
-		ixmlNodeList_free(nl);
-	return ret_code;
-}
-
-/*!
- * \brief Checks the soap body xml came in the SOAP request.
- *
- * \return UPNP_E_SUCCESS if successful else returns appropriate error.
- */
-static int check_soap_body(
-	/* [in] soap body xml document. */
-	IN IXML_Document *doc,
-	/* [in] URN. */
-	IN const char *urn,
-	/* [in] Name of the requested action. */
-	IN const char *actionName)
-{
-	IXML_NodeList *nl = NULL;
-	IXML_Node *bodyNode = NULL;
-	IXML_Node *actionNode = NULL;
-	const DOMString ns = NULL;
-	const DOMString name = NULL;
-	int ret_code = UPNP_E_INVALID_ACTION;
-
-	nl = ixmlDocument_getElementsByTagNameNS(doc, SOAP_URN, SOAP_BODY);
-	if (nl) {
-		bodyNode = ixmlNodeList_item(nl, 0);
-		if (bodyNode) {
-			actionNode = ixmlNode_getFirstChild(bodyNode);
-			if (actionNode) {
-				ns = ixmlNode_getNamespaceURI(actionNode);
-				name = ixmlNode_getLocalName(actionNode);
-				/* Don't check version number, to accept a
-				 * request comming on a v1 service when
-				 * publishing a v2 service */
-				if (name &&
-				    ns &&
-				    !strcmp(actionName, name) &&
-				    !strncmp(urn, ns, strlen (urn) - 2))
-					ret_code = UPNP_E_SUCCESS;
-			}
-		}
-		ixmlNodeList_free(nl);
-	}
-	return ret_code;
-}
-
-/*!
- * \brief Checks the HTTP header of the SOAP request coming from the
- * control point.
- *
- * \return UPNP_E_SUCCESS if successful else returns appropriate error.
- */
-static int check_soap_action_header(
-	/*! [in] HTTP request. */
-	http_message_t * request,
-	/*! [in] URN. */
-	const char *urn,
-	/*! [out] Name of the SOAP action. */
-	char **actionName)
-{
-	memptr header_name;
-	http_header_t *soap_action_header = NULL;
-	char *ns_compare = NULL;
-	size_t tempSize = 0;
-	int ret_code = UPNP_E_SUCCESS;
-	char *temp_header_value = NULL;
-	char *temp = NULL;
-	char *temp2 = NULL;
-
-	/* check soap action header */
-	soap_action_header = httpmsg_find_hdr(request, HDR_SOAPACTION,
-					      &header_name);
-	if (!soap_action_header) {
-		ret_code = UPNP_E_INVALID_ACTION;
-		return ret_code;
-	}
-	if (soap_action_header->value.length <= 0) {
-		ret_code = UPNP_E_INVALID_ACTION;
-		return ret_code;
-	}
-	temp_header_value = malloc(soap_action_header->value.length + 1);
-	if (!temp_header_value) {
-		ret_code = UPNP_E_OUTOF_MEMORY;
-		return ret_code;
-	}
-	strncpy(temp_header_value, soap_action_header->value.buf,
-		soap_action_header->value.length);
-	temp_header_value[soap_action_header->value.length] = 0;
-	temp = strchr(temp_header_value, '#');
-	if (!temp) {
-		free(temp_header_value);
-		ret_code = UPNP_E_INVALID_ACTION;
-		return ret_code;
-	}
-
-	(*temp) = 0;		/* temp make string */
-
-	/* check to see if it is Query State Variable or
-	 * Service Action */
-	tempSize = strlen(urn) + 2;
-	ns_compare = malloc(tempSize);
-	if (!ns_compare) {
-		ret_code = UPNP_E_OUTOF_MEMORY;
-		free(temp_header_value);
-		return ret_code;
-	}
-	snprintf(ns_compare, tempSize, "\"%s", urn);
-	/* Don't check version number, to accept a request comming on a v1
-	 * service  when publishing a v2 service */
-	if (strncmp(temp_header_value, ns_compare, strlen(ns_compare) - 2))
-		ret_code = UPNP_E_INVALID_ACTION;
-	else {
-		ret_code = UPNP_E_SUCCESS;
-		temp++;
-		temp2 = strchr(temp, '\"');
-		/* remove ending " if present */
-		if (temp2)
-			(*temp2) = 0;
-		if (*temp)
-			(*actionName) = strdup(temp);
-		if (!*actionName)
-			ret_code = UPNP_E_OUTOF_MEMORY;
-	}
-
-	free(temp_header_value);
-	free(ns_compare);
-	return ret_code;
-}
-
-/*!
- * \brief Retrives all the information needed to process the incoming SOAP
- * request. It finds the device and service info and also the callback
- * function to hand-over the request to the device application.
- *
- * \return UPNP_E_SUCCESS if successful else returns appropriate error.
- */
-static int get_device_info(
-	/*! [in] HTTP request. */
-	http_message_t *request,
-	/*! [in] flag for a querry. */
-	int isQuery,
-	/*! [in] Action request document. */
-	IXML_Document *actionDoc,
-	/*! [in] . */
-	int AddressFamily,
-	/*! [out] Device UDN string. */
-	OUT char device_udn[LINE_SIZE],
-	/*! [out] Service ID string. */
-	char service_id[LINE_SIZE],
-	/*! [out] callback function of the device application. */
-	Upnp_FunPtr *callback,
-	/*! [out] cookie stored by device application. */
-	void **cookie)
-{
-	struct Handle_Info *device_info;
-	int device_hnd;
-	service_info *serv_info;
-	char save_char;
-	/* error by default */
-	int ret_code = -1;
-	const char *control_url;
-	char *actionName = NULL;
-
-	/* null-terminate pathquery of url */
-	control_url = request->uri.pathquery.buff;
-	save_char = control_url[request->uri.pathquery.size];
-	((char *)control_url)[request->uri.pathquery.size] = '\0';
-
-	HandleLock();
-
-	if (GetDeviceHandleInfo(AddressFamily, &device_hnd,
-				&device_info) != HND_DEVICE)
-		goto error_handler;
-	serv_info = FindServiceControlURLPath(
-		&device_info->ServiceTable, control_url);
-	if (!serv_info)
-		goto error_handler;
-	if (isQuery) {
-		ret_code = check_soap_action_header(request,
-			QUERY_STATE_VAR_URN, &actionName);
-		if (ret_code != UPNP_E_SUCCESS &&
-		    ret_code != UPNP_E_OUTOF_MEMORY) {
-			ret_code = UPNP_E_INVALID_ACTION;
-			goto error_handler;
-		}
-		/* check soap body */
-		ret_code = check_soap_body(actionDoc, QUERY_STATE_VAR_URN,
-			actionName);
-		free(actionName);
-		if (ret_code != UPNP_E_SUCCESS)
-			goto error_handler;
-	} else {
-		ret_code = check_soap_action_header(request,
-			serv_info->serviceType, &actionName);
-		if (ret_code != UPNP_E_SUCCESS &&
-		    ret_code != UPNP_E_OUTOF_MEMORY) {
-			ret_code = UPNP_E_INVALID_SERVICE;
-			goto error_handler;
-		}
-		/* check soap body */
-		ret_code = check_soap_body(actionDoc, serv_info->serviceType,
-			actionName);
-		free(actionName);
-		if (ret_code != UPNP_E_SUCCESS) {
-			ret_code = UPNP_E_INVALID_SERVICE;
-			goto error_handler;
-		}
-	}
-	namecopy(service_id, serv_info->serviceId);
-	namecopy(device_udn, serv_info->UDN);
-	*callback = device_info->Callback;
-	*cookie = device_info->Cookie;
-	ret_code = 0;
-
- error_handler:
-	/* restore */
-	((char *)control_url)[request->uri.pathquery.size] = save_char;
-	HandleUnlock();
-	return ret_code;
-}
 
 /*!
  * \brief Sends the SOAP action response.
@@ -622,102 +282,38 @@ error_handler:
 	}
 }
 
-/*!
- * \brief Finds the name of the state variable asked in the SOAP request.
- *
- * \return 0 if successful else returns -1.
- */
-static UPNP_INLINE int get_var_name(
-	/*! [in] Document containing variable request. */
-	IXML_Document *TempDoc,
-	/*! [out] Name of the state varible. */
-	char *VarName)
-{
-	IXML_Node *EnvpNode = NULL;
-	IXML_Node *BodyNode = NULL;
-	IXML_Node *StNode = NULL;
-	IXML_Node *VarNameNode = NULL;
-	IXML_Node *VarNode = NULL;
-	const DOMString StNodeName = NULL;
-	const DOMString Temp = NULL;
-	int ret_val = -1;
-
-	/* Got the Envelop node here */
-	EnvpNode = ixmlNode_getFirstChild((IXML_Node *) TempDoc);
-	if (EnvpNode == NULL)
-		goto error_handler;
-	/* Got Body here */
-	BodyNode = ixmlNode_getFirstChild(EnvpNode);
-	if (BodyNode == NULL)
-		goto error_handler;
-	/* Got action node here */
-	StNode = ixmlNode_getFirstChild(BodyNode);
-	if (StNode == NULL)
-		goto error_handler;
-	/* Test whether this is the action node */
-	StNodeName = ixmlNode_getNodeName(StNode);
-	if (StNodeName == NULL ||
-	    strstr(StNodeName, "QueryStateVariable") == NULL)
-		goto error_handler;
-	VarNameNode = ixmlNode_getFirstChild(StNode);
-	if (VarNameNode == NULL)
-		goto error_handler;
-	VarNode = ixmlNode_getFirstChild(VarNameNode);
-	Temp = ixmlNode_getNodeValue(VarNode);
-	linecopy(VarName, Temp);
-	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__,
-		   "Received query for variable  name %s\n", VarName);
-
-	/* success */
-	ret_val = 0;
-
-error_handler:
-	return ret_val;
-}
 
 /*!
  * \brief Handles the SOAP requests to querry the state variables.
  * This functionality has been deprecated in the UPnP V1.0 architecture.
  */
 static UPNP_INLINE void handle_query_variable(
-	/*! [in] Socket info. */
-	SOCKINFO *info,
-	/*! [in] HTTP request. */
-	http_message_t *request,
-	/*! [in] Document containing the variable request SOAP message. */
-	IXML_Document *xml_doc)
+		/*! [in] Socket info. */
+		SOCKINFO *info,
+		/*! [in] HTTP Request. */
+		http_message_t *request,
+		/*! [in] SOAP device/service information. */
+		soap_devserv_t *soap_info,
+		/*! [in] Node containing variable name. */
+		IXML_Node *req_node)
 {
-	Upnp_FunPtr soap_event_callback;
-	void *cookie;
-	char var_name[LINE_SIZE];
 	struct Upnp_State_Var_Request variable;
 	const char *err_str;
 	int err_code;
+	const DOMString var_name;
 
-	/* get var name */
-	if (get_var_name(xml_doc, var_name) != 0) {
-		send_error_response(info, SOAP_INVALID_VAR,
-				    Soap_Invalid_Var, request);
-		return;
-	}
-	/* get info for event */
-	err_code = get_device_info(request, 1, xml_doc,
-				   info->foreign_sockaddr.ss_family,
-				   variable.DevUDN,
-				   variable.ServiceID,
-				   &soap_event_callback, &cookie);
-	if (err_code != 0) {
-		send_error_response(info, SOAP_INVALID_VAR,
-				    Soap_Invalid_Var, request);
-		return;
-	}
-	linecopy(variable.ErrStr, "");
 	variable.ErrCode = UPNP_E_SUCCESS;
+	linecopy(variable.ErrStr, "");
+	namecopy(variable.DevUDN, soap_info->dev_udn);
+	namecopy(variable.ServiceID, soap_info->service_id);
+	var_name = ixmlNode_getNodeValue(req_node);
 	namecopy(variable.StateVarName, var_name);
-	variable.CurrentVal = NULL;
 	variable.CtrlPtIPAddr = info->foreign_sockaddr;
+	variable.CurrentVal = NULL;
+
 	/* send event */
-	soap_event_callback(UPNP_CONTROL_GET_VAR_REQUEST, &variable, cookie);
+	soap_info->callback(UPNP_CONTROL_GET_VAR_REQUEST, &variable,
+			soap_info->cookie);
 	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__,
 		   "Return from callback for var request\n");
 	/* validate, and handle result */
@@ -744,56 +340,59 @@ static UPNP_INLINE void handle_query_variable(
 }
 
 /*!
- * \brief Handles the SOAP action request. It checks the integrity of the SOAP
- * action request and gives the call back to the device application.
+ * \brief Handles the SOAP action request.
  */
 static void handle_invoke_action(
-	/*! [in] Socket info. */
-	IN SOCKINFO *info,
-	/*! [in] HTTP Request. */
-	IN http_message_t *request,
-	/*! [in] Name of the SOAP Action. */
-	IN memptr action_name,
-	/*! [in] Document containing the SOAP action request. */
-	IN IXML_Document *xml_doc)
+		/*! [in] Socket info. */
+		SOCKINFO *info,
+		/*! [in] HTTP Request. */
+		http_message_t *request,
+		/*! [in] SOAP device/service information. */
+		soap_devserv_t *soap_info,
+		/*! [in] Node containing the SOAP action request. */
+		IXML_Node *req_node)
 {
 	char save_char;
-	IXML_Document *resp_node = NULL;
+	IXML_Document *req_doc = NULL;
 	struct Upnp_Action_Request action;
-	Upnp_FunPtr soap_event_callback;
-	void *cookie = NULL;
 	int err_code;
 	const char *err_str;
-
+	memptr action_name;
 	action.ActionResult = NULL;
+	DOMString act_node = NULL;
+
 	/* null-terminate */
+	action_name = soap_info->action_name;
 	save_char = action_name.buf[action_name.length];
 	action_name.buf[action_name.length] = '\0';
-	/* set default error */
-	err_code = SOAP_INVALID_ACTION;
-	err_str = Soap_Invalid_Action;
 	/* get action node */
-	if (get_action_node(xml_doc, action_name.buf, &resp_node) == -1)
+	act_node = ixmlPrintNode(req_node);
+	if (!act_node) {
+		err_code = SOAP_MEMORY_OUT;
+		err_str = Soap_Memory_out;
 		goto error_handler;
-	/* get device info for action event */
-	err_code = get_device_info(request,
-				   0,
-				   xml_doc,
-				   info->foreign_sockaddr.ss_family,
-				   action.DevUDN,
-				   action.ServiceID,
-				   &soap_event_callback, &cookie);
-
-	if (err_code != UPNP_E_SUCCESS)
+	}
+	err_code = ixmlParseBufferEx(act_node, &req_doc);
+	if (err_code != IXML_SUCCESS) {
+		if (IXML_INSUFFICIENT_MEMORY == err_code) {
+			err_code = SOAP_MEMORY_OUT;
+			err_str = Soap_Memory_out;
+		} else {
+			err_code = SOAP_INVALID_ACTION;
+			err_str = Soap_Invalid_Action;
+		}
 		goto error_handler;
-	namecopy(action.ActionName, action_name.buf);
-	linecopy(action.ErrStr, "");
-	action.ActionRequest = resp_node;
-	action.ActionResult = NULL;
+	}
 	action.ErrCode = UPNP_E_SUCCESS;
+	linecopy(action.ErrStr, "");
+	namecopy(action.ActionName, action_name.buf);
+	namecopy(action.DevUDN, soap_info->dev_udn);
+	namecopy(action.ServiceID, soap_info->service_id);
+	action.ActionRequest = req_doc;
+	action.ActionResult = NULL;
 	action.CtrlPtIPAddr = info->foreign_sockaddr;
 	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
-	soap_event_callback(UPNP_CONTROL_ACTION_REQUEST, &action, cookie);
+	soap_info->callback(UPNP_CONTROL_ACTION_REQUEST, &action, soap_info->cookie);
 	if (action.ErrCode != UPNP_E_SUCCESS) {
 		if (strlen(action.ErrStr) <= 0) {
 			err_code = SOAP_ACTION_FAILED;
@@ -817,7 +416,8 @@ static void handle_invoke_action(
 	/* error handling and cleanup */
 error_handler:
 	ixmlDocument_free(action.ActionResult);
-	ixmlDocument_free(resp_node);
+	ixmlDocument_free(req_doc);
+	ixmlFreeDOMString(act_node);
 	/* restore */
 	action_name.buf[action_name.length] = save_char;
 	if (err_code != 0)
@@ -825,9 +425,270 @@ error_handler:
 }
 
 /*!
+ * \brief Retrieve SOAP device/service information associated
+ * with request-URI, which includes the callback function to hand-over
+ * the request to the device application.
+ *
+ * \return 0 if OK, -1 on error.
+ */
+static int get_dev_service(
+		/*! [in] HTTP request. */
+		http_message_t *request,
+		/*! [in] Address family: AF_INET or AF_INET6. */
+		int AddressFamily,
+		/*! [out] SOAP device/service information. */
+		soap_devserv_t *soap_info)
+{
+	struct Handle_Info *device_info;
+	int device_hnd;
+	service_info *serv_info;
+	char save_char;
+	/* error by default */
+	int ret_code = -1;
+	const char *control_url;
+
+	/* null-terminate pathquery of url */
+	control_url = request->uri.pathquery.buff;
+	save_char = control_url[request->uri.pathquery.size];
+	((char *)control_url)[request->uri.pathquery.size] = '\0';
+
+	HandleReadLock();
+
+	if (GetDeviceHandleInfo(AddressFamily, &device_hnd,
+				&device_info) != HND_DEVICE)
+		goto error_handler;
+	serv_info = FindServiceControlURLPath(
+		&device_info->ServiceTable, control_url);
+	if (!serv_info)
+		goto error_handler;
+
+	namecopy(soap_info->dev_udn, serv_info->UDN);
+	namecopy(soap_info->service_type, serv_info->serviceType);
+	namecopy(soap_info->service_id, serv_info->serviceId);
+	soap_info->callback = device_info->Callback;
+	soap_info->cookie = device_info->Cookie;
+	ret_code = 0;
+
+ error_handler:
+	/* restore */
+	((char *)control_url)[request->uri.pathquery.size] = save_char;
+	HandleUnlock();
+	return ret_code;
+}
+
+/*!
+ * \brief Get the SOAPACTION header value for M-POST request.
+ *
+ * \return UPNP_E_SUCCESS if OK, error number on failure.
+ */
+static int get_mpost_acton_hdrval(
+		/*! [in] HTTP request. */
+		http_message_t *request,
+		/*! [out] Buffer to get the header value */
+		memptr *val)
+{
+	http_header_t *hdr;
+	memptr ns_value, dummy_quote, value;
+	membuffer soap_action_name;
+
+	assert(HTTPMETHOD_MPOST == request->method);
+	hdr = httpmsg_find_hdr(request, HDR_MAN, &value);
+	if (NULL == hdr)
+		return SREQ_NOT_EXTENDED;
+	if (matchstr(value.buf, value.length, "%q%i ; ns = %s",
+		     &dummy_quote, &ns_value) != PARSE_OK)
+		return SREQ_NOT_EXTENDED;
+	/* create soapaction name header */
+	membuffer_init(&soap_action_name);
+	if (membuffer_assign(&soap_action_name,
+		ns_value.buf, ns_value.length) == UPNP_E_OUTOF_MEMORY ||
+	    membuffer_append_str(&soap_action_name,
+		"-SOAPACTION") == UPNP_E_OUTOF_MEMORY) {
+		membuffer_destroy(&soap_action_name);
+		return UPNP_E_OUTOF_MEMORY;
+	}
+	hdr = httpmsg_find_hdr_str(request, soap_action_name.buf);
+	membuffer_destroy(&soap_action_name);
+	if (NULL == hdr)
+		return SREQ_HDR_NOT_FOUND;
+	val->buf = hdr->value.buf;
+	val->length = hdr->value.length;
+	return UPNP_E_SUCCESS;
+}
+
+/*!
+ * \brief Check the header validity, and get the action name
+ * and the version of the service that the CP wants to use.
+ *
+ * \return UPNP_E_SUCCESS if OK, error number on failure.
+ */
+static int check_soapaction_hdr(
+		/*! [in] HTTP request. */
+		http_message_t *request,
+		/*! [in, out] SOAP device/service information. */
+		soap_devserv_t *soap_info)
+{
+	memptr value;
+	char save_char;
+	char *hash_pos = NULL;
+	char *col_pos1, *col_pos2, *serv_type;
+	int ret_code;
+
+	/* find SOAPACTION header */
+	if (SOAPMETHOD_POST == request->method) {
+		if (!httpmsg_find_hdr(request, HDR_SOAPACTION, &value))
+			return SREQ_HDR_NOT_FOUND;
+	} else {
+		ret_code = get_mpost_acton_hdrval(request, &value);
+		if (ret_code != UPNP_E_SUCCESS) {
+			return ret_code;
+		}
+	}
+
+	/* error by default */
+	ret_code = SREQ_BAD_HDR_FORMAT;
+	/* get action name*/
+	save_char = value.buf[value.length];
+	value.buf[value.length] = '\0';
+	hash_pos = strchr(value.buf, '#');
+	if (NULL == hash_pos) {
+		goto error_handler;
+	}
+	*hash_pos = '\0';
+	if (matchstr(hash_pos+1,
+			value.length - (size_t)(hash_pos+1 - value.buf),
+			"%s", &soap_info->action_name) != PARSE_OK) {
+		goto error_handler;
+	}
+
+	/* check service type */
+	if (value.buf[0] != '\"') {
+		goto error_handler;
+	}
+	serv_type = &value.buf[1];
+	col_pos1 = strrchr(serv_type, ':');
+	if (NULL == col_pos1) {
+		goto error_handler;
+	}
+	col_pos2 = strrchr(soap_info->service_type, ':');
+	/* XXX: this should be checked when service list is generated */
+	assert(col_pos2 != NULL);
+	if (col_pos2-soap_info->service_type == col_pos1-serv_type &&
+		strncmp(soap_info->service_type, serv_type, col_pos1-serv_type) == 0) {
+		/* for action invocation, update the version information */
+		namecopy(soap_info->service_type, serv_type);
+	} else if (strcmp(serv_type, QUERY_STATE_VAR_URN) == 0 &&
+			memptr_cmp(&soap_info->action_name, "QueryStateVariable") == 0) {
+		/* query variable */
+		soap_info->action_name.buf = NULL;
+		soap_info->action_name.length = 0;
+	} else {
+		goto error_handler;
+	}
+	ret_code = UPNP_E_SUCCESS;
+
+error_handler:
+	if (hash_pos != NULL) {
+		*hash_pos = '#';
+	}
+	value.buf[value.length] = save_char;
+	return ret_code;
+}
+
+
+/*!
+ * \brief Check validity of the SOAP request per UPnP specification.
+ *
+ * \return 0 if OK, -1 on failure.
+ */
+static int check_soap_request(
+		/*! [in] SOAP device/service information. */
+		soap_devserv_t *soap_info,
+		/*! [in] Document containing the SOAP action request. */
+		IN IXML_Document *xml_doc,
+		/*! [out] Node containing the SOAP action request/variable name. */
+		IXML_Node **req_node)
+{
+	IXML_Node *envp_node = NULL;
+	IXML_Node *body_node = NULL;
+	IXML_Node *action_node = NULL;
+	const DOMString local_name = NULL;
+	const DOMString ns_uri = NULL;
+	int ret_val = -1;
+
+	/* Got the Envelop node here */
+	envp_node = ixmlNode_getFirstChild((IXML_Node *) xml_doc);
+	if (NULL == envp_node) {
+		goto error_handler;
+	}
+	ns_uri = ixmlNode_getNamespaceURI(envp_node);
+	if (NULL == ns_uri || strcmp(ns_uri, SOAP_URN) != 0) {
+		goto error_handler;
+	}
+	/* Got Body here */
+	body_node = ixmlNode_getFirstChild(envp_node);
+	if (NULL == body_node) {
+		goto error_handler;
+	}
+	local_name = ixmlNode_getLocalName(body_node);
+	if (NULL == local_name || strcmp(local_name, SOAP_BODY) != 0) {
+		goto error_handler;
+	}
+	/* Got action node here */
+	action_node = ixmlNode_getFirstChild(body_node);
+	if (NULL == action_node) {
+		goto error_handler;
+	}
+	/* check local name and namespace of action node */
+	ns_uri = ixmlNode_getNamespaceURI(action_node);
+	if (NULL == ns_uri) {
+		goto error_handler;
+	}
+	local_name = ixmlNode_getLocalName(action_node);
+	if (NULL == local_name) {
+		goto error_handler;
+	}
+	if (NULL == soap_info->action_name.buf) {
+		IXML_Node *varname_node = NULL;
+		IXML_Node *nametxt_node = NULL;
+		if (strcmp(ns_uri, QUERY_STATE_VAR_URN) != 0 ||
+			strcmp(local_name, "QueryStateVariable") != 0) {
+			goto error_handler;
+		}
+		varname_node = ixmlNode_getFirstChild(action_node);
+		if(NULL == varname_node) {
+			goto error_handler;
+		}
+		local_name = ixmlNode_getLocalName(varname_node);
+		if (strcmp(local_name, "varName") != 0) {
+			goto error_handler;
+		}
+		nametxt_node = ixmlNode_getFirstChild(varname_node);
+		if (NULL == nametxt_node ||
+			ixmlNode_getNodeType(nametxt_node) != eTEXT_NODE) {
+			goto error_handler;
+		}
+		*req_node = nametxt_node;
+	} else {
+		/* check service type against SOAPACTION header */
+		if (strcmp(soap_info->service_type, ns_uri) != 0 ||
+			memptr_cmp(&soap_info->action_name, local_name) != 0) {
+			goto error_handler;
+		}
+		*req_node = action_node;
+	}
+	/* success */
+	ret_val = 0;
+
+error_handler:
+	return ret_val;
+}
+
+
+/*!
  * \brief This is a callback called by minisever after receiving the request
- * from the control point. This function will start processing the request.
- * It calls handle_invoke_action to handle the SOAP action.
+ * from the control point. After HTTP processing, it calls handle_soap_request
+ * to start SOAP processing.
  */
 void soap_device_callback(
 	/*! [in] Parsed request received by the device. */
@@ -838,43 +699,74 @@ void soap_device_callback(
 	SOCKINFO *info)
 {
 	int err_code;
-	const char *err_str;
-	memptr action_name;
 	IXML_Document *xml_doc = NULL;
+	soap_devserv_t *soap_info = NULL;
+	IXML_Node *req_node = NULL;
 
-	/* set default error */
-	err_code = SOAP_INVALID_ACTION;
-	err_str = Soap_Invalid_Action;
-
+	/* get device/service identified by the request-URI */
+	soap_info = malloc(sizeof(soap_devserv_t));
+	if (NULL == soap_info) {
+		err_code = HTTP_INTERNAL_SERVER_ERROR;
+		goto error_handler;
+	}
+	if (get_dev_service(request,
+			info->foreign_sockaddr.ss_family, soap_info) < 0) {
+		err_code = HTTP_NOT_FOUND;
+		goto error_handler;
+	}
 	/* validate: content-type == text/xml */
-	if (!has_xml_content_type(request))
+	if (!has_xml_content_type(request)) {
+		err_code = HTTP_UNSUPPORTED_MEDIA_TYPE;
 		goto error_handler;
-	/* type of request */
-	if (get_request_type(request, &action_name) != 0)
+	}
+	/* check SOAPACTION HTTP header */
+	err_code = check_soapaction_hdr(request, soap_info);
+	if (err_code != UPNP_E_SUCCESS) {
+		switch (err_code) {
+		case SREQ_NOT_EXTENDED:
+			err_code = HTTP_NOT_EXTENDED;
+			break;
+		case UPNP_E_OUTOF_MEMORY:
+			err_code = HTTP_INTERNAL_SERVER_ERROR;
+			break;
+		default:
+			err_code = HTTP_BAD_REQUEST;
+			break;
+		}
 		goto error_handler;
+	}
 	/* parse XML */
 	err_code = ixmlParseBufferEx(request->entity.buf, &xml_doc);
 	if (err_code != IXML_SUCCESS) {
-		if (err_code == IXML_INSUFFICIENT_MEMORY)
-			err_code = UPNP_E_OUTOF_MEMORY;
+		if (IXML_INSUFFICIENT_MEMORY == err_code)
+			err_code = HTTP_INTERNAL_SERVER_ERROR;
 		else
-			err_code = SOAP_ACTION_FAILED;
-		err_str = "XML error";
+			err_code = HTTP_BAD_REQUEST;
 		goto error_handler;
 	}
-	if (action_name.length == 0)
+	/* check SOAP body */
+	if (check_soap_request(soap_info, xml_doc, &req_node) < 0)
+	{
+		err_code = HTTP_BAD_REQUEST;
+		goto error_handler;
+	}
+	/* process SOAP request */
+	if (NULL == soap_info->action_name.buf)
 		/* query var */
-		handle_query_variable(info, request, xml_doc);
+		handle_query_variable(info, request, soap_info, req_node);
 	else
 		/* invoke action */
-		handle_invoke_action(info, request, action_name, xml_doc);
-	/* no error */
-	err_code = 0;
+		handle_invoke_action(info, request, soap_info, req_node);
 
- error_handler:
+	err_code = HTTP_OK;
+
+error_handler:
 	ixmlDocument_free(xml_doc);
-	if (err_code != 0)
-		send_error_response(info, err_code, err_str, request);
+	free(soap_info);
+	if (err_code != HTTP_OK) {
+		http_SendStatusResponse(info, err_code, request->major_version,
+				request->minor_version);
+	}
 	return;
 	parser = parser;
 }
