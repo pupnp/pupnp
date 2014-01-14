@@ -79,6 +79,10 @@
 #define HTTP_SERVICE_UNAVAILABLE            503
 #define HTTP_GATEWAY_TIMEOUT                504
 #define HTTP_HTTP_VERSION_NOT_SUPPORTED     505
+#define HTTP_VARIANT_ALSO_NEGOTIATES        506
+#define HTTP_INSUFFICIENT_STORAGE           507
+#define HTTP_LOOP_DETECTED                  508
+#define HTTP_NOT_EXTENDED                   510
 
 /* HTTP lib error codes */
 
