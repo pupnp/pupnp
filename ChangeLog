@@ -2,6 +2,11 @@
 Version 1.8.0
 *******************************************************************************
 
+2014-01-15 Peng <howtofly(at)gmail.com>
+
+	Fix memory leaks.
+
+
 2013-04-27 Thijs Schreijer <thijs(at)thijsschreijer.nl>
 
 	Renamed SCRIPTSUPPORT to IXML_HAVE_SCRIPTSUPPORT for consistency. Also

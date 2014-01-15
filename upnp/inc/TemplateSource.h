@@ -41,7 +41,7 @@
 #define TEMPLATE_CONSTRUCTOR_LIST(MEMBER, TYPE)		INIT_LIST_HEAD(&p->m_##MEMBER);
 #define TEMPLATE_CONSTRUCTOR_OBJECT(MEMBER, TYPE)	p->m_##MEMBER = TYPE##_new();
 #define TEMPLATE_CONSTRUCTOR_STRING(MEMBER)		p->m_##MEMBER = UpnpString_new();
-#define TEMPLATE_CONSTRUCTOR_DOMSTRING(MEMBER)		/* p->m_##MEMBER = NULL; */
+#define TEMPLATE_CONSTRUCTOR_DOMSTRING(MEMBER)		 p->m_##MEMBER = NULL;
 
 /******************************************************************************/
 #define TEMPLATE_DESTRUCTOR_INT(MEMBER, TYPE)		p->m_##MEMBER = 0;
@@ -49,7 +49,7 @@
 #define TEMPLATE_DESTRUCTOR_LIST(MEMBER)		list_del(&p->m_##MEMBER);
 #define TEMPLATE_DESTRUCTOR_OBJECT(MEMBER, TYPE)	TYPE##_delete(p->m_##MEMBER); p->m_##MEMBER = NULL;
 #define TEMPLATE_DESTRUCTOR_STRING(MEMBER)		UpnpString_delete(p->m_##MEMBER); p->m_##MEMBER = NULL;
-#define TEMPLATE_DESTRUCTOR_DOMSTRING(MEMBER)		p->m_##MEMBER = NULL;
+#define TEMPLATE_DESTRUCTOR_DOMSTRING(MEMBER)		ixmlFreeDOMString(p->m_##MEMBER); p->m_##MEMBER = NULL;
 
 /******************************************************************************/
 #define TEMPLATE_ASSIGNMENT(CLASS, MEMBER)	ok = ok && CLASS##_set_##MEMBER(p, CLASS##_get_##MEMBER(q));
