@@ -181,9 +181,10 @@ libupnp_la_SOURCES += \
 
 
 # check / distcheck tests
-check_PROGRAMS = test_init
-TESTS = test_init
+check_PROGRAMS = test_init test_url
+TESTS = test_init test_url
 test_init_SOURCES = test/test_init.c
+test_url_SOURCES = test/test_url.c
 
 
 EXTRA_DIST = \
