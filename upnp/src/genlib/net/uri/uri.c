@@ -510,68 +510,81 @@ int remove_escaped_chars(INOUT char *in, INOUT size_t *size)
 }
 
 
-int remove_dots(char *in, size_t size)
+static UPNP_INLINE int is_end_path(char c) {
+    switch (c) {
+	case '?':
+	case '#':
+	case '\0':
+	    return 1;
+    }
+    return 0;
+}
+
+
+/* This function directly implements the "Remove Dot Segments"
+ * algorithm described in RFC 3986 section 5.2.4. */
+int remove_dots(char *buf, size_t size)
 {
-    char *copyTo = in;
-    char *copyFrom = in;
-    char *max = in + size;
-    char **Segments = NULL;
-    int lastSegment = -1;
+    char *in = buf;
+    char *out = buf;
+    char *max = buf + size;
 
-    Segments = malloc( sizeof( char * ) * size );
+    while (!is_end_path(in[0])) {
+	assert (buf <= out);
+	assert (out <= in);
+	assert (in < max);
 
-    if( Segments == NULL )
-        return UPNP_E_OUTOF_MEMORY;
-
-    Segments[0] = NULL;
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "REMOVE_DOTS: before: %s\n", in );
-    while( ( copyFrom < max ) && ( *copyFrom != '?' )
-           && ( *copyFrom != '#' ) ) {
-
-        if( ( ( *copyFrom ) == '.' )
-            && ( ( copyFrom == in ) || ( *( copyFrom - 1 ) == '/' ) ) ) {
-            if( ( copyFrom + 1 == max )
-                || ( *( copyFrom + 1 ) == '/' ) ) {
-
-                copyFrom += 2;
-                continue;
-            } else if( ( *( copyFrom + 1 ) == '.' )
-                       && ( ( copyFrom + 2 == max )
-                            || ( *( copyFrom + 2 ) == '/' ) ) ) {
-                copyFrom += 3;
-
-                if( lastSegment > 0 ) {
-                    copyTo = Segments[--lastSegment];
-                } else {
-                    free( Segments );
-                    /*TRACE("ERROR RESOLVING URL, ../ at ROOT"); */
-                    return UPNP_E_INVALID_URL;
-                }
-                continue;
+        /* case 2.A: */
+        if (strncmp(in, "./", 2) == 0) {
+            in += 2;
+        } else if (strncmp(in, "../", 3) == 0) {
+            in += 3;
+        /* case 2.B: */
+        } else if (strncmp(in, "/./", 3) == 0) {
+            in += 2;
+        } else if (strncmp(in, "/.", 2) == 0 && is_end_path(in[2])) {
+            in += 1;
+	    in[0] = '/';
+        /* case 2.C: */
+        } else if (strncmp(in, "/../", 4) == 0 || (strncmp(in, "/..", 3) == 0 && is_end_path(in[3]))) {
+            /* Make the next character in the input buffer a '/': */
+            if (is_end_path(in[3])) { /* terminating "/.." case */
+                in += 2;
+                in[0] = '/';
+            } else { /* "/../" prefix case */
+                in += 3;
             }
+            /* Trim the last component from the output buffer, or empty it. */
+            while (buf < out)
+		if (*--out == '/')
+		    break;
+#ifdef DEBUG
+	    if (out < in)
+		out[0] = '\0';
+#endif
+        /* case 2.D: */
+        } else if (strncmp(in, ".", 1) == 0 && is_end_path(in[1])) {
+            in += 1;
+	} else if (strncmp(in, "..", 2) == 0 && is_end_path(in[2])) {
+            in += 2;
+        /* case 2.E */
+        } else {
+            /* move initial '/' character (if any) */
+            if (in[0] == '/')
+		*out++ = *in++;
+	    /* move first segment up to, but not including, the next '/' character */
+	    while (in < max && in[0] != '/' && !is_end_path(in[0]))
+		*out++ = *in++;
+#ifdef DEBUG
+	    if (out < in)
+		out[0] = '\0';
+#endif
         }
-
-        if( ( *copyFrom ) == '/' ) {
-
-            lastSegment++;
-            Segments[lastSegment] = copyTo + 1;
-        }
-        ( *copyTo ) = ( *copyFrom );
-        copyTo++;
-        copyFrom++;
     }
-    if( copyFrom < max ) {
-        while( copyFrom < max ) {
-            ( *copyTo ) = ( *copyFrom );
-            copyTo++;
-            copyFrom++;
-        }
-    }
-    ( *copyTo ) = 0;
-    free( Segments );
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "REMOVE_DOTS: after: %s\n", in );
+    while (in < max)
+	*out++ = *in++;
+    if (out < max)
+	out[0] = '\0';
     return UPNP_E_SUCCESS;
 }
 
