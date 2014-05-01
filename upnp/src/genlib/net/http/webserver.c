@@ -792,11 +792,9 @@ static int CreateHTTPRangeResponseHeader(
 	Instr->ReadSendSize = FileLength;
 	if (!ByteRangeSpecifier)
 		return HTTP_BAD_REQUEST;
-	RangeInput = malloc(strlen(ByteRangeSpecifier) + 1);
+	RangeInput = strdup(ByteRangeSpecifier);
 	if (!RangeInput)
 		return HTTP_INTERNAL_SERVER_ERROR;
-	memset(RangeInput, 0, strlen(ByteRangeSpecifier) + 1);
-	strncpy(RangeInput, ByteRangeSpecifier, strlen(ByteRangeSpecifier));
 	/* CONTENT-RANGE: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
 	if (StrStr(RangeInput, "bytes") == NULL ||
 	    (Ptr = StrStr(RangeInput, "=")) == NULL) {
