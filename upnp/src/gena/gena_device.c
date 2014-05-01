@@ -480,24 +480,19 @@ int genaInitNotify(
 	}
 	*reference_count = 0;
 	
-	UDN_copy = (char *)malloc(strlen(UDN) + 1);
+	UDN_copy = strdup(UDN);
 	if (UDN_copy == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
 
-	servId_copy = (char *)malloc(strlen(servId) + 1);
+	servId_copy = strdup(servId);
 	if (servId_copy == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
-
-	memset(UDN_copy, 0, strlen(UDN) + 1);
-	strncpy(UDN_copy, UDN, strlen(UDN));
-	memset(servId_copy, 0, strlen(servId) + 1);
-	strncpy(servId_copy, servId, strlen(servId));
 
 	HandleLock();
 
@@ -639,24 +634,19 @@ int genaInitNotifyExt(
 	}
 	*reference_count = 0;
 	
-	UDN_copy = (char *)malloc(strlen(UDN) + 1);
+	UDN_copy = strdup(UDN);
 	if (UDN_copy == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
 
-	servId_copy = (char *)malloc(strlen(servId) + 1);
+	servId_copy = strdup(servId);
 	if( servId_copy == NULL ) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
-
-	memset(UDN_copy, 0, strlen(UDN) + 1);
-	strncpy(UDN_copy, UDN, strlen(UDN));
-	memset(servId_copy, 0, strlen(servId) + 1);
-	strncpy(servId_copy, servId, strlen(servId));
 
 	HandleLock();
 
@@ -798,24 +788,19 @@ int genaNotifyAllExt(
 	}
 	*reference_count = 0;
 	
-	UDN_copy = (char *)malloc(strlen(UDN) + 1);
+	UDN_copy = strdup(UDN);
 	if (UDN_copy == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
 
-	servId_copy = (char *)malloc(strlen(servId) + 1);
+	servId_copy = strdup(servId);
 	if( servId_copy == NULL ) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
-
-	memset(UDN_copy, 0, strlen(UDN) + 1);
-	strncpy(UDN_copy, UDN, strlen(UDN));
-	memset(servId_copy, 0, strlen(servId) + 1);
-	strncpy(servId_copy, servId, strlen(servId));
 
 	propertySet = ixmlPrintNode((IXML_Node *)PropSet);
 	if (propertySet == NULL) {
@@ -944,24 +929,19 @@ int genaNotifyAll(
 	}
 	*reference_count = 0;
 	
-	UDN_copy = (char *)malloc(strlen(UDN) + 1);
+	UDN_copy = strdup(UDN);
 	if (UDN_copy == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
 
-	servId_copy = (char *)malloc(strlen(servId) + 1);
+	servId_copy = strdup(servId);
 	if( servId_copy == NULL ) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
-
-	memset(UDN_copy, 0, strlen(UDN) + 1);
-	strncpy(UDN_copy, UDN, strlen(UDN));
-	memset(servId_copy, 0, strlen(servId) + 1);
-	strncpy(servId_copy, servId, strlen(servId));
 
 	ret = GeneratePropertySet(VarNames, VarValues, var_count, &propertySet);
 	if (ret != XML_SUCCESS) {
