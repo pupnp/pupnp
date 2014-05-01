@@ -143,15 +143,12 @@ static UPNP_INLINE int calc_alias(
 		aliasPtr = alias + 1;
 	else 
 		aliasPtr = alias;
-	new_alias_len = root_len + strlen(temp_str) + strlen(aliasPtr);
-	alias_temp = malloc(new_alias_len + (size_t)1);
+	new_alias_len = root_len + strlen(temp_str) + strlen(aliasPtr) + (size_t)1;
+	alias_temp = malloc(new_alias_len);
 	if (alias_temp == NULL)
 		return UPNP_E_OUTOF_MEMORY;
-	memset(alias_temp, 0, new_alias_len + (size_t)1);
-	strncpy(alias_temp, rootPath, root_len);
-	alias_temp[root_len] = '\0';
-	strncat(alias_temp, temp_str, strlen(temp_str));
-	strncat(alias_temp, aliasPtr, strlen(aliasPtr));
+	memset(alias_temp, 0, new_alias_len);
+	snprintf(alias_temp, new_alias_len, "%s%s%s", rootPath, temp_str, aliasPtr);
 
 	*newAlias = alias_temp;
 	return UPNP_E_SUCCESS;
@@ -186,14 +183,10 @@ static UPNP_INLINE int calc_descURL(
 	assert(ipPortStr != NULL && strlen(ipPortStr) > 0);
 	assert(alias != NULL && strlen(alias) > 0);
 
-	len = strlen(http_scheme) + strlen(ipPortStr) + strlen(alias);
-	if (len > ((size_t)LINE_SIZE - (size_t)1))
+	len = strlen(http_scheme) + strlen(ipPortStr) + strlen(alias) + (size_t)1;
+	if (len > (size_t)LINE_SIZE)
 		return UPNP_E_URL_TOO_BIG;
-	strncpy(descURL, http_scheme, strlen(http_scheme));
-	descURL[strlen(http_scheme)] = '\0';
-	strncat(descURL, ipPortStr, strlen(ipPortStr));
-	strncat(descURL, alias, strlen(alias));
-	descURL[len] = '\0';
+	snprintf(descURL, len, "%s%s%s", http_scheme, ipPortStr, alias);
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 		   "desc url: %s\n", descURL);
 
