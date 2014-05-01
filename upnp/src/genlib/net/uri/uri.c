@@ -580,115 +580,113 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 {
     uri_type base;
     uri_type rel;
+    int rv;
 
-    size_t i = (size_t)0;
-    char *finger = NULL;
-
-    char *last_slash = NULL;
-
-    char *out = NULL;
-
-    if( base_url && rel_url ) {
-        out =
-            ( char * )malloc( strlen( base_url ) + strlen( rel_url ) + (size_t)2 );
-    } else {
-        if( rel_url )
-            return strdup( rel_url );
-        else
+    if (!base_url) {
+        if (!rel_url)
             return NULL;
+        return strdup(rel_url);
     }
 
-    if( out == NULL ) {
+    size_t len_rel = strlen(rel_url);
+    if (parse_uri(rel_url, len_rel, &rel) != HTTP_SUCCESS)
         return NULL;
+    if (rel.type == (enum uriType)ABSOLUTE)
+        return strdup(rel_url);
+
+    size_t len_base = strlen(base_url);
+    if ((parse_uri(base_url, len_base, &base) != HTTP_SUCCESS)
+            || (base.type != (enum uriType)ABSOLUTE))
+        return NULL;
+    if (len_rel == (size_t)0)
+        return strdup(base_url);
+
+    size_t len = len_base + len_rel + (size_t)2;
+    char *out = (char *)malloc(len);
+    if (out == NULL)
+        return NULL;
+    memset(out, 0, len);
+    char *out_finger = out;
+
+    /* scheme */
+    rv = snprintf(out_finger, len, "%.*s:", (int)base.scheme.size, base.scheme.buff);
+    if (rv < 0 || rv >= len)
+        goto error;
+    out_finger += rv;
+    len -= rv;
+
+    /* authority */
+    if (rel.hostport.text.size > (size_t)0) {
+        rv = snprintf(out_finger, len, "%s", rel_url);
+        if (rv < 0 || rv >= len)
+            goto error;
+        return out;
     }
-    memset( out, 0, strlen( base_url ) + strlen( rel_url ) + (size_t)2 );
+    if (base.hostport.text.size > (size_t)0) {
+	rv = snprintf(out_finger, len, "//%.*s", (int)base.hostport.text.size, base.hostport.text.buff);
+	if (rv < 0 || rv >= len)
+	    goto error;
+	out_finger += rv;
+	len -= rv;
+    }
 
-    if( ( parse_uri( rel_url, strlen( rel_url ), &rel ) ) == HTTP_SUCCESS ) {
-
-        if( rel.type == ( enum uriType) ABSOLUTE ) {
-
-            strncpy( out, rel_url, strlen ( rel_url ) );
-        } else {
-
-            if( ( parse_uri( base_url, strlen( base_url ), &base ) ==
-                  HTTP_SUCCESS )
-                && ( base.type == ( enum uriType ) ABSOLUTE ) ) {
-
-                if( strlen( rel_url ) == (size_t)0 ) {
-                    strncpy( out, base_url, strlen ( base_url ) );
-                } else {
-                    char *out_finger = out;
-                    assert( base.scheme.size + (size_t)1 /* ':' */ <= strlen ( base_url ) );
-                    memcpy( out, base.scheme.buff, base.scheme.size );
-                    out_finger += base.scheme.size;
-                    ( *out_finger ) = ':';
-                    out_finger++;
-
-                    if( rel.hostport.text.size > (size_t)0 ) {
-                        snprintf( out_finger, strlen( rel_url ) + (size_t)1,
-                                  "%s", rel_url );
-                    } else {
-                        if( base.hostport.text.size > (size_t)0 ) {
-                            assert( base.scheme.size + (size_t)1
-                                + base.hostport.text.size + (size_t)2 /* "//" */ <= strlen ( base_url ) );
-                            memcpy( out_finger, "//", (size_t)2 );
-                            out_finger += 2;
-                            memcpy( out_finger, base.hostport.text.buff,
-                                    base.hostport.text.size );
-                            out_finger += base.hostport.text.size;
-                        }
-
-                        if( rel.path_type == ( enum pathType ) ABS_PATH ) {
-                            strncpy( out_finger, rel_url, strlen ( rel_url ) );
-
-                        } else {
-                            char temp_path = '/';
-
-                            if( base.pathquery.size == (size_t)0 ) {
-                                base.pathquery.size = (size_t)1;
-                                base.pathquery.buff = &temp_path;
-                            }
-
-                            assert( base.scheme.size + (size_t)1 + base.hostport.text.size + (size_t)2
-                                + base.pathquery.size <= strlen ( base_url ) + (size_t)1 /* temp_path */);
-                            finger = out_finger;
-                            last_slash = finger;
-                            i = (size_t)0;
-                            while( ( i < base.pathquery.size ) &&
-                                   ( base.pathquery.buff[i] != '?' ) ) {
-                                ( *finger ) = base.pathquery.buff[i];
-                                if( base.pathquery.buff[i] == '/' )
-                                    last_slash = finger + 1;
-                                i++;
-                                finger++;
-
-                            }
-                            strncpy( last_slash, rel_url, strlen ( rel_url ) );
-                            if( remove_dots( out_finger,
-                                             strlen( out_finger ) ) !=
-                                UPNP_E_SUCCESS ) {
-                                free(out);
-                                /* free(rel_url); */
-                                return NULL;
-                            }
-                        }
-
-                    }
-                }
-            } else {
-                free(out);
-                /* free(rel_url); */
-                return NULL;
-            }
-        }
+    /* path */
+    char *path = out_finger;
+    if (rel.path_type == (enum pathType)ABS_PATH) {
+	rv = snprintf(out_finger, len, "%s", rel_url);
+    } else if (base.pathquery.size == (size_t)0) {
+	rv = snprintf(out_finger, len, "/%s", rel_url);
     } else {
-        free(out);
-        /* free(rel_url); */          
-        return NULL;
-    }
+	if (rel.pathquery.size == (size_t)0) {
+	    rv = snprintf(out_finger, len, "%.*s", (int)base.pathquery.size, base.pathquery.buff);
+	} else {
+	    if (len < base.pathquery.size)
+		goto error;
+	    size_t i = (size_t)0, prefix = (size_t)1;
+	    while (i < base.pathquery.size) {
+		out_finger[i] = base.pathquery.buff[i];
+		switch (base.pathquery.buff[i++]) {
+		    case '/':
+			prefix = i;
+			/* fall-through */
+		    default:
+			continue;
+		    case '?': /* query */
+			if (rel.pathquery.buff[0] == '?')
+			    prefix = --i;
+		}
+		break;
+	    }
+	    out_finger += prefix;
+	    len -= prefix;
+	    rv = snprintf(out_finger, len, "%.*s", (int)rel.pathquery.size, rel.pathquery.buff);
+	}
+	if (rv < 0 || rv >= len)
+	    goto error;
+	out_finger += rv;
+	len -= rv;
 
-    /* free(rel_url); */
+	/* fragment */
+	if (rel.fragment.size > (size_t)0)
+	    rv = snprintf(out_finger, len, "#%.*s", (int)rel.fragment.size, rel.fragment.buff);
+	else if (base.fragment.size > (size_t)0)
+	    rv = snprintf(out_finger, len, "#%.*s", (int)base.fragment.size, base.fragment.buff);
+	else
+	    rv = 0;
+    }
+    if (rv < 0 || rv >= len)
+	goto error;
+    out_finger += rv;
+    len -= rv;
+
+    if (remove_dots(path, out_finger - path) != UPNP_E_SUCCESS)
+	goto error;
+
     return out;
+
+error:
+    free(out);
+    return NULL;
 }
 
 
