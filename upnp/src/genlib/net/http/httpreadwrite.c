@@ -481,13 +481,12 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 					memset(Chunk_Header, 0,
 						sizeof(Chunk_Header));
 					rc = snprintf(Chunk_Header,
-						sizeof(Chunk_Header) - strlen ("\r\n"),
-						"%" PRIzx, num_read);
-					if (rc < 0 || (unsigned int) rc >= sizeof(Chunk_Header) - strlen ("\r\n")) {
+						sizeof(Chunk_Header),
+						"%" PRIzx "\r\n", num_read);
+					if (rc < 0 || (unsigned int) rc >= sizeof(Chunk_Header)) {
 						RetVal = UPNP_E_INTERNAL_ERROR;
 						goto Cleanup_File;
 					}
-					strncat(Chunk_Header, "\r\n", strlen ("\r\n"));
 					/* Copy the chunk size header  */
 					memcpy(file_buf - strlen(Chunk_Header),
 					       Chunk_Header,
