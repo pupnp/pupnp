@@ -129,7 +129,7 @@ static const char *gMediaTypes[] = {
 #define TEXT_INDEX        5
 
 /* general */
-#define NUM_MEDIA_TYPES       69
+#define NUM_MEDIA_TYPES       70
 #define NUM_HTTP_HEADER_NAMES 33
 
 #define ASCTIME_R_BUFFER_SIZE 26
