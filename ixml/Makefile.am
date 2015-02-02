@@ -7,7 +7,8 @@
 
 SUBDIRS 		= doc
 
-AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc
+AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc \
+                          -I$(top_srcdir)/upnp/inc
 AM_CFLAGS		= 
 
 LDADD			= libixml.la

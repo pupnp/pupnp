@@ -362,6 +362,13 @@ Version 1.8.0
 Version 1.6.20
 *******************************************************************************
 
+2015-02-01 Jean-Francois Dockes <medoc@users.sf.net>
+
+        Out-of-tree builds seem to be currently broken, because ixml and
+        threadutil files need an include path to include UpnpGlobal.h, and
+        configure tries to copy files into a directory which it does not create.
+        The patch fixes both issues.
+
 2014-01-03 Peng <howtofly(at)gmail.com>
 
 	rewrite soap_device.c
