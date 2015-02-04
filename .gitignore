@@ -73,6 +73,14 @@ GRTAGS
 GSYMS
 GTAGS
 
+# QT-Creator files
+Makefile.am.user
+pupnp.config
+pupnp.creator
+pupnp.creator.user
+pupnp.files
+pupnp.includes
+
 *.orig
 *~
 \#*#
