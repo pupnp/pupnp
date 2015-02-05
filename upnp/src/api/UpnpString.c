@@ -43,9 +43,7 @@
 #endif /* WIN32 */
 
 /* strndup() is a GNU extension. */
-#if HAVE_STRNDUP && !defined(WIN32)
-	extern char *strndup(__const char *__string, size_t __n);
-#else /* HAVE_STRNDUP && !defined(WIN32) */
+#if !HAVE_STRNDUP || defined(WIN32)
 	static char *strndup(const char *__string, size_t __n)
 	{
 		size_t strsize = strnlen(__string, __n);

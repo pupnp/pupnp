@@ -2,6 +2,45 @@
 Version 1.6.20
 *******************************************************************************
 
+2015-02-04 Shaun Marko <semarko@users.sf.net>
+
+        Bug tracker #124 Build fails with --enable-debug
+
+        Build environment
+        Fedora 21
+        X86-64
+        * gcc 4.9.2
+
+        How to repeat
+        $ ./configure --enable debug
+        $ make
+        libtool: compile: gcc -DHAVE_CONFIG_H -I. -I.. -I../upnp/inc -I./inc -I../threadutil/inc
+        -I../ixml/inc -I./src/inc -pthread -g -O2 -Wall -MT src/api/libupnp_la-UpnpString.lo
+        -MD -MP -MF src/api/.deps/libupnp_la-UpnpString.Tpo -c src/api/UpnpString.c
+        -fPIC -DPIC -o src/api .libs/libupnp_la-UpnpString.o src/api/UpnpString.c:47:16:
+        error: expected identifier or '(' before 'extension'
+        extern char *strndup(const char *string, size_t __n);
+        ^
+        Makefile:1016: recipe for target 'src/api/libupnp_la-UpnpString.lo' failed
+
+        Reason for failure
+        Build enables -O2 optimization flags which causes the inclusion of a
+        macro implementation of strndup from include/bits/string2.h.
+
+        Workarounds
+        Disable optimization when configuring or making:
+        $ configure CFLAGS='-g -pthread -O0' --enable-debug
+        $ make
+        or
+        $ configure --enable-debug
+        $ make CFLAGS='-g -pthread -O0' Define NO_STRING_INLINES
+        $ export CFLAGS="-DNO_STRING_INLINES -O2"
+        $ ./configure --enagble-debug
+        $ make
+
+        Fix
+        * Don't declare strndup in src/api/UpnpString.c if it exists
+
 2015-02-01 Jean-Francois Dockes <medoc@users.sf.net>
 
         Out-of-tree builds seem to be currently broken, because ixml and
