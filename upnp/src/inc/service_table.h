@@ -61,8 +61,15 @@ typedef struct SUBSCRIPTION {
 	time_t expireTime;
 	int active;
 	URL_list DeliveryURLs;
+	/* List of queued events for this subscription. Only one event job
+	   at a time goes into the thread pool. The first element in the
+	   list is a copy of the active job. Others are activated on job
+	   completion. */
+	LinkedList outgoing;
 	struct SUBSCRIPTION *next;
 } subscription;
+
+extern void freeSubscriptionQueuedEvents(subscription *sub);
 
 typedef struct SERVICE_INFO {
 	DOMString	serviceType;
