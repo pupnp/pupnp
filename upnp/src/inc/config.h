@@ -142,6 +142,18 @@
 #define MAX_JOBS_TOTAL 100
 /* @} */
 
+/*! \name MAX_SUBSCRIPTION_QUEUED_EVENTS
+ *
+ *  The {\tt MAX_SUBSCRIPTION_QUEUED_EVENTS} determines the maximum number of
+ *  events which can be queued for a given subscription before events begin
+ *  to be discarded. This limits the amount of memory used for a
+ *  non-responding subscribed entity.
+ *
+ * @{
+ */
+#define MAX_SUBSCRIPTION_QUEUED_EVENTS 5
+/* @} */
+
 
 /*!
  * \name DEFAULT_SOAP_CONTENT_LENGTH

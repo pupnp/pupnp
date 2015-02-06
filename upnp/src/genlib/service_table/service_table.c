@@ -74,6 +74,7 @@ copy_subscription( subscription * in,
           copy_URL_list( &in->DeliveryURLs, &out->DeliveryURLs ) )
         != HTTP_SUCCESS )
         return return_code;
+    ListInit(&out->outgoing, 0, 0);
     out->next = NULL;
     return HTTP_SUCCESS;
 }
@@ -207,6 +208,7 @@ void freeSubscription(subscription *sub)
 {
 	if (sub) {
 		free_URL_list(&sub->DeliveryURLs);
+		freeSubscriptionQueuedEvents(sub);
 	}
 }
 
