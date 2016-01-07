@@ -362,6 +362,18 @@ Version 1.8.0
 Version 1.6.20
 *******************************************************************************
 
+2016-01-07 Nick Leverton <nick(at)leverton.org>
+
+	SF Bug Tracker #130, Creator: Klaus Fischer
+	Miniserver uses INADDR_ANY instead of HostIP
+	https://sourceforge.net/p/pupnp/bugs/127/
+
+	The internal miniserver.c uses INADDR_ANY instead of the HostIP/IfName
+	provided when initializing libupnp. But, this HostIP/IfName gets used
+	for the UDP socket when multicasting SSDP messages.  Because of this,
+	miniserver may end up sending from different IP address than ssdpserver.
+	This patch causes miniserver to use the already known interface address.
+
 2016-01-07 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	SF pupnp:discussion list

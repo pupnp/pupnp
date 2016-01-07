@@ -561,7 +561,7 @@ static int get_miniserver_sockets(
 #endif
 	memset(&__ss_v4, 0, sizeof (__ss_v4));
 	serverAddr4->sin_family = (sa_family_t)AF_INET;
-	serverAddr4->sin_addr.s_addr = htonl(INADDR_ANY);
+	serverAddr4->sin_addr.s_addr = inet_addr(gIF_IPV4);
 #ifdef UPNP_ENABLE_IPV6
 	memset(&__ss_v6, 0, sizeof (__ss_v6));
 	serverAddr6->sin6_family = (sa_family_t)AF_INET6;
