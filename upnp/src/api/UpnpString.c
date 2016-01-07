@@ -31,15 +31,13 @@
 #ifndef UPNP_USE_MSVCPP
 	/* VC has strnlen which is already included but with (potentially) different linkage */
 	/* strnlen() is a GNU extension. */
-	#if HAVE_STRNLEN
-		extern size_t strnlen(const char *s, size_t maxlen);
-	#else /* HAVE_STRNLEN */
+	#if !HAVE_STRNLEN
 		static size_t strnlen(const char *s, size_t n)
 		{
 			const char *p = (const char *)memchr(s, 0, n);
 			return p ? p - s : n;
 		}
-	#endif /* HAVE_STRNLEN */
+	#endif /* !HAVE_STRNLEN */
 #endif /* WIN32 */
 
 /* strndup() is a GNU extension. */
