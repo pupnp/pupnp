@@ -4,7 +4,8 @@
 # (C) Copyright 2005 Remi Turboult <r3mi@users.sourceforge.net>
 #
 
-AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc
+AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc \
+                          -I$(top_srcdir)/upnp/inc
 
 if ENABLE_DEBUG
     AM_CPPFLAGS		+= -DDEBUG -DSTATS
