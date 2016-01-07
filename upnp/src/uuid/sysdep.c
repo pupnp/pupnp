@@ -120,8 +120,10 @@ void get_system_time(uuid_time_t *uuid_time)
 	/* Offset between UUID formatted times and Unix formatted times.
 	 * UUID UTC base time is October 15, 1582.
 	 * Unix base time is January 1, 1970. */
-	*uuid_time = (uuid_time_t) (tp.tv_sec * 10000000 + tp.tv_usec * 10 +
-		0x01B21DD213814000LL);
+	*uuid_time =
+		(uuid_time_t)tp.tv_sec * 10000000 +
+		(uuid_time_t)tp.tv_usec * 10 +
+		0x01B21DD213814000LL;
 };
 
 void get_random_info(unsigned char seed[16])
