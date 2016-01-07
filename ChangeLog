@@ -2,6 +2,13 @@
 Version 1.6.20
 *******************************************************************************
 
+2016-01-07 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	SF Bug Tracker #130, Creator: Shaddy Baddah
+	infinite loop in UpnpGetIfInfo() under WIN32
+
+	Original code makes no sense. This patch should fix it.
+
 2014-01-03 Peng <howtofly(at)gmail.com>
 
 	rewrite soap_device.c

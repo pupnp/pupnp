@@ -3260,6 +3260,7 @@ int UpnpGetIfInfo(const char *IfName)
 	adapts_item = adapts;
 	while (adapts_item != NULL) {
 		if (adapts_item->Flags & IP_ADAPTER_NO_MULTICAST) {
+			adapts_item = adapts_item->Next;
 			continue;
 		}
 		if (ifname_found == 0) {
