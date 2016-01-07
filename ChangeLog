@@ -364,6 +364,19 @@ Version 1.6.20
 
 2016-01-07 Nick Leverton <nick(at)leverton.org>
 
+	SF Bug Tracker #128, Creator: Nick Leverton
+	redefining strndup causes "error: expected identifier or '(' before '__extension__'"
+
+	Fix redefinition of strnlen and strndup
+	These are available when HAVE_STRNDUP and HAVE_STRNLEN are defined, but
+	libupnp provides an extern prototype anyway.  Recent versions of glibc
+	define this prototype differently, causing the following compile error:
+
+	src/api/UpnpString.c:47:15: error: expected identifier or '(' before  '__extension__'
+		extern char *strndup(__const char *__string, size_t __n);
+
+2016-01-07 Nick Leverton <nick(at)leverton.org>
+
 	SF Bug Tracker #129, Creator: Nick Leverton
 	shutdown() on UDP sockets logs ENOTCONN message.
 	https://sourceforge.net/p/pupnp/bugs/129/
