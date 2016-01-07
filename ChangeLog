@@ -362,6 +362,10 @@ Version 1.8.0
 Version 1.6.20
 *******************************************************************************
 
+2016-01-07 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+	Fix for a reported integer overflow
+
 2016-01-07 Jean-Francois Dockes <medoc(at)users.sf.net>
 2016-01-07 Nick Leverton <nick(at)leverton.org>
 	SF Patches #60, Creator: Jean-Francois Dockes
