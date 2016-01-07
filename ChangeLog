@@ -2,6 +2,23 @@
 Version 1.6.20
 *******************************************************************************
 
+2016-01-07 Jean-Francois Dockes <medoc(at)users.sf.net>
+2016-01-07 Nick Leverton <nick(at)leverton.org>
+	SF Patches #60, Creator: Jean-Francois Dockes
+
+	When libupnp is configured with --enable-ipv6 but ipv6 is not available
+	on the system (for example because the ipv6 code is not loaded in a Linux
+	kernel as is the case by default on Raspbian), the ipv6 socket creation
+	call will fail in miniserver.c and the library init will fail, even if
+	the ipv4 initialisation would have succeeded.
+
+	Let a library configured with --enable-ipv6 initialize in ipv4-only
+	mode if ipv6 is not available instead of failing. This can happen
+	if no ipv6 code is configured or loaded in the kernel.
+
+	Don't fail if IPv6 is unavailable.
+	We might be an IPv6 enabled distro build running on an IPv4-only custom kernel.
+
 2016-01-07 Nick Leverton <nick(at)leverton.org>
 
 	SF Bug Tracker #128, Creator: Nick Leverton

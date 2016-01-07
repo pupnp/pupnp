@@ -521,7 +521,6 @@ static int get_miniserver_sockets(
 	struct sockaddr_in6* serverAddr6 = (struct sockaddr_in6*)&__ss_v6;
 	SOCKET listenfd6;
 	uint16_t actual_port6 = 0u;
-	int onOff;
 #endif
 	int ret_code;
 	int reuseaddr_on = 0;
@@ -532,23 +531,41 @@ static int get_miniserver_sockets(
 	 * that we don't have an IPv4/IPv6 stack. */
 	listenfd4 = socket(AF_INET, SOCK_STREAM, 0);
 	if (listenfd4 == INVALID_SOCKET) {
-		return UPNP_E_OUTOF_SOCKET;
+		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+		UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
+			"get_miniserver_sockets: IPv4 socket not available: %s\n",
+			errorBuffer);
 	}
 #ifdef UPNP_ENABLE_IPV6
 	listenfd6 = socket(AF_INET6, SOCK_STREAM, 0);
 	if (listenfd6 == INVALID_SOCKET) {
-		sock_close(listenfd4);
-		return UPNP_E_OUTOF_SOCKET;
-	}
-	onOff = 1;
-	sockError = setsockopt(listenfd6, IPPROTO_IPV6, IPV6_V6ONLY,
-			 (char *)&onOff, sizeof(onOff));
-	if (sockError == SOCKET_ERROR) {
-		sock_close(listenfd4);
-		sock_close(listenfd6);
-		return UPNP_E_SOCKET_BIND;
+		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+		UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
+			"get_miniserver_sockets: IPv6 socket not available: %s\n",
+			errorBuffer);
+	} else {
+		int onOff = 1;
+		sockError = setsockopt(listenfd6, IPPROTO_IPV6, IPV6_V6ONLY,
+							   (char *)&onOff, sizeof(onOff));
+		if (sockError == SOCKET_ERROR) {
+			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
+				"get_miniserver_sockets: unable to set IPv6 socket protocol: %s\n",
+				errorBuffer);
+			sock_close(listenfd6);
+			listenfd6 = INVALID_SOCKET;
+		}
 	}
 #endif
+	if (listenfd4 == INVALID_SOCKET
+#ifdef UPNP_ENABLE_IPV6
+	    && listenfd6 == INVALID_SOCKET
+#endif
+	) {
+		UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
+			"get_miniserver_sockets: no protocols available\n");
+		return UPNP_E_OUTOF_SOCKET;
+	}
 	/* As per the IANA specifications for the use of ports by applications
 	 * override the listen port passed in with the first available. */
 	if (listen_port4 < APPLICATION_LISTENING_PORT) {
