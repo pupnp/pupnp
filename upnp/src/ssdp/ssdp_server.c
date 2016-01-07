@@ -883,11 +883,6 @@ static int create_ssdp_sock_v4(
 
 error_handler:
 	if (ret != UPNP_E_SUCCESS) {
-		if (shutdown(*ssdpSock, SD_BOTH) == -1) {
-			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-				   "Error in shutdown: %s\n", errorBuffer);
-                }
                 UpnpCloseSocket(*ssdpSock);
 	}
 
@@ -1023,11 +1018,6 @@ static int create_ssdp_sock_v6(
 
 error_handler:
 	if (ret != UPNP_E_SUCCESS) {
-		if (shutdown(*ssdpSock, SD_BOTH) == -1) {
-			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-				   "Error in shutdown: %s\n", errorBuffer);
-		}
 		UpnpCloseSocket(*ssdpSock);
 	}
 
@@ -1137,11 +1127,6 @@ static int create_ssdp_sock_v6_ula_gua(
 
 error_handler:
 	if (ret != UPNP_E_SUCCESS) {
-		if (shutdown(*ssdpSock, SD_BOTH) == -1) {
-			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-				   "Error in shutdown: %s\n", errorBuffer);
-		}
 		UpnpCloseSocket(*ssdpSock);
 	}
 
@@ -1201,7 +1186,6 @@ int get_ssdp_sockets(MiniServerSockArray * out)
 	if (strlen(gIF_IPV6) > (size_t)0) {
 		retVal = create_ssdp_sock_reqv6(&out->ssdpReqSock6);
 		if (retVal != UPNP_E_SUCCESS) {
-			shutdown(out->ssdpReqSock4, SD_BOTH);
 			UpnpCloseSocket(out->ssdpReqSock4);
 			return retVal;
 		}
@@ -1216,9 +1200,7 @@ int get_ssdp_sockets(MiniServerSockArray * out)
 		retVal = create_ssdp_sock_v4(&out->ssdpSock4);
 		if (retVal != UPNP_E_SUCCESS) {
 #ifdef INCLUDE_CLIENT_APIS
-			shutdown(out->ssdpReqSock4, SD_BOTH);
 			UpnpCloseSocket(out->ssdpReqSock4);
-			shutdown(out->ssdpReqSock6, SD_BOTH);
 			UpnpCloseSocket(out->ssdpReqSock6);
 #endif /* INCLUDE_CLIENT_APIS */
 			return retVal;
@@ -1230,12 +1212,9 @@ int get_ssdp_sockets(MiniServerSockArray * out)
 	if (strlen(gIF_IPV6) > (size_t)0) {
 		retVal = create_ssdp_sock_v6(&out->ssdpSock6);
 		if (retVal != UPNP_E_SUCCESS) {
-			shutdown(out->ssdpSock4, SD_BOTH);
 			UpnpCloseSocket(out->ssdpSock4);
 #ifdef INCLUDE_CLIENT_APIS
-			shutdown(out->ssdpReqSock4, SD_BOTH);
 			UpnpCloseSocket(out->ssdpReqSock4);
-			shutdown(out->ssdpReqSock6, SD_BOTH);
 			UpnpCloseSocket(out->ssdpReqSock6);
 #endif /* INCLUDE_CLIENT_APIS */
 			return retVal;
@@ -1245,14 +1224,10 @@ int get_ssdp_sockets(MiniServerSockArray * out)
 	if (strlen(gIF_IPV6_ULA_GUA) > (size_t)0) {
 		retVal = create_ssdp_sock_v6_ula_gua(&out->ssdpSock6UlaGua);
 		if (retVal != UPNP_E_SUCCESS) {
-			shutdown(out->ssdpSock4, SD_BOTH);
 			UpnpCloseSocket(out->ssdpSock4);
-			shutdown(out->ssdpSock6, SD_BOTH);
 			UpnpCloseSocket(out->ssdpSock6);
 #ifdef INCLUDE_CLIENT_APIS
-			shutdown(out->ssdpReqSock4, SD_BOTH);
 			UpnpCloseSocket(out->ssdpReqSock4);
-			shutdown(out->ssdpReqSock6, SD_BOTH);
 			UpnpCloseSocket(out->ssdpReqSock6);
 #endif /* INCLUDE_CLIENT_APIS */
 			return retVal;

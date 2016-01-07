@@ -609,10 +609,8 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 			   "SSDP_LIB: Error in select(): %s\n", errorBuffer);
-		shutdown(gSsdpReqSocket4, SD_BOTH);
 		UpnpCloseSocket(gSsdpReqSocket4);
 #ifdef UPNP_ENABLE_IPV6
-		shutdown(gSsdpReqSocket6, SD_BOTH);
 		UpnpCloseSocket(gSsdpReqSocket6);
 #endif
 		return UPNP_E_INTERNAL_ERROR;

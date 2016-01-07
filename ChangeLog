@@ -4,7 +4,20 @@ Version 1.6.20
 
 2016-01-07 Nick Leverton <nick(at)leverton.org>
 
-	SF Bug Tracker #130, Creator: Klaus Fischer
+	SF Bug Tracker #129, Creator: Nick Leverton
+	shutdown() on UDP sockets logs ENOTCONN message.
+	https://sourceforge.net/p/pupnp/bugs/129/
+
+	Fix ENOTCONN "Error in shutdown: Transport endpoint is not connected"
+
+	When logging is enabled, ssdpserver logs bursts of
+	"Error in shutdown: Transport endpoint is not connected"
+	This is because shutdown() is not supported for UDP sockets and under
+	recent UNIX specifications it returns ENOTCONN if used.
+	
+2016-01-07 Nick Leverton <nick(at)leverton.org>
+
+	SF Bug Tracker #127, Creator: Klaus Fischer
 	Miniserver uses INADDR_ANY instead of HostIP
 	https://sourceforge.net/p/pupnp/bugs/127/
 
