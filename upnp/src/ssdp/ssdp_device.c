@@ -248,11 +248,6 @@ static int NewRequestHandler(
 	}
 
  end_NewRequestHandler:
-	if (shutdown(ReplySock, SD_BOTH) == -1) {
-		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-			   "Error in shutdown: %s\n", errorBuffer);
-	}
 	UpnpCloseSocket(ReplySock);
 
 	return ret;
