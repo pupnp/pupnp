@@ -364,6 +364,15 @@ Version 1.6.20
 
 2016-01-07 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
+	SF pupnp:discussion list
+	libupnp double free bug
+	https://sourceforge.net/p/pupnp/discussion/569832/thread/28243030/
+
+	There is no reason to keep the counter on a dynamically allocated
+	buffer, this patch removes this and fixes the double free bug.
+
+2016-01-07 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
 	SF Bug Tracker #130, Creator: Shaddy Baddah
 	infinite loop in UpnpGetIfInfo() under WIN32
 
