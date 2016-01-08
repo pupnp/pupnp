@@ -95,7 +95,7 @@ struct xml_alias_t {
 	/*! . */
 	time_t last_modified;
 	/*! . */
-	int ct;
+	int *ct;
 };
 
 static const char *gMediaTypes[] = {
@@ -361,7 +361,7 @@ static UPNP_INLINE void glob_alias_init(void)
 
 	membuffer_init(&alias->doc);
 	membuffer_init(&alias->name);
-	alias->ct = 0;
+	alias->ct = NULL;
 	alias->last_modified = 0;
 }
 
@@ -388,7 +388,7 @@ static void alias_grab(
 	ithread_mutex_lock(&gWebMutex);
 	assert(is_valid_alias(&gAliasDoc));
 	memcpy(alias, &gAliasDoc, sizeof(struct xml_alias_t));
-	alias->ct = alias->ct + 1;
+	*alias->ct = *alias->ct + 1;
 	ithread_mutex_unlock(&gWebMutex);
 }
 
@@ -406,11 +406,12 @@ static void alias_release(
 		ithread_mutex_unlock(&gWebMutex);
 		return;
 	}
-	assert(alias->ct > 0);
-	alias->ct--;
-	if (alias->ct <= 0) {
+	assert(*alias->ct > 0);
+	*alias->ct -= 1;
+	if (*alias->ct <= 0) {
 		membuffer_destroy(&alias->doc);
 		membuffer_destroy(&alias->name);
+		free(alias->ct);
 	}
 	ithread_mutex_unlock(&gWebMutex);
 }
@@ -430,7 +431,7 @@ int web_server_set_alias(const char *alias_name,
 	assert(alias_content != NULL);
 	membuffer_init(&alias.doc);
 	membuffer_init(&alias.name);
-	alias.ct = 0;
+	alias.ct = NULL;
 	do {
 		/* insert leading /, if missing */
 		if (*alias_name != '/')
@@ -439,7 +440,9 @@ int web_server_set_alias(const char *alias_name,
 		ret_code = membuffer_append_str(&alias.name, alias_name);
 		if (ret_code != 0)
 			break;	/* error */
-		alias.ct = 1;
+		if ((alias.ct = (int *)malloc(sizeof(int))) == NULL)
+			break;	/* error */
+		*alias.ct = 1;
 		membuffer_attach(&alias.doc, (char *)alias_content,
 				 alias_content_length);
 		alias.last_modified = last_modified;
@@ -454,6 +457,7 @@ int web_server_set_alias(const char *alias_name,
 	/* free temp alias */
 	membuffer_destroy(&alias.name);
 	membuffer_destroy(&alias.doc);
+	free(alias.ct);
 
 	return UPNP_E_OUTOF_MEMORY;
 }
