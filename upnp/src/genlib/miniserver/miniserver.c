@@ -578,11 +578,11 @@ static int get_miniserver_sockets(
 #endif
 	memset(&__ss_v4, 0, sizeof (__ss_v4));
 	serverAddr4->sin_family = (sa_family_t)AF_INET;
-	serverAddr4->sin_addr.s_addr = inet_addr(gIF_IPV4);
+	inet_pton(AF_INET, gIF_IPV4, &serverAddr4->sin_addr);
 #ifdef UPNP_ENABLE_IPV6
 	memset(&__ss_v6, 0, sizeof (__ss_v6));
 	serverAddr6->sin6_family = (sa_family_t)AF_INET6;
-	serverAddr6->sin6_addr = in6addr_any;
+	inet_pton(AF_INET6, gIF_IPV6, &serverAddr6->sin6_addr);
 #endif
 	/* Getting away with implementation of re-using address:port and
 	 * instead choosing to increment port numbers.
