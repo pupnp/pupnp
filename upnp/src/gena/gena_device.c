@@ -429,7 +429,7 @@ static char *AllocGenaHeaders(
 	rc = snprintf(headers, headers_size, "%s%s%"PRIzu"%s%s%s",
 		HEADER_LINE_1,
 		HEADER_LINE_2A,
-		strlen(propertySet) + 1,
+		strlen(propertySet) + 2,
 		HEADER_LINE_2B,
 		HEADER_LINE_3,
 		HEADER_LINE_4);
