@@ -362,6 +362,45 @@ Version 1.8.0
 Version 1.6.20
 *******************************************************************************
 
+2016-02-22 Jean-Francois Dockes <medoc(at)users.sf.net>
+
+	SF Bugs #131, Creator: Jean-Francois Dockes
+
+	I know it sounds crazy that nobody ever saw this, but the CONTENT-LENGTH
+	value in GENA NOTIFY messages is too small by one.
+
+	It appears that most current control points don't notice the extra
+	character (an LF, which is validly there but not included in
+	Content-Length), probably because their protocol handler is reasonably
+	lenient, and because the missing body LF does not prevent parsing the
+	XML. But there is a least one anal CP (Linn Kazoo) which barfs, because
+	it reads all data until connection close and the size mismatch triggers
+	a bug.
+
+	"Proof":
+	In gena_device.c:217 (notify_send_and_recv())
+
+	ret_code = http_SendMessage(&info, &timeout,
+	    "bbb",
+	    start_msg.buf, start_msg.length,
+	    propertySet, strlen(propertySet),
+	    CRLF, strlen(CRLF));
+
+	start_msg has all the headers, including the empty line.
+	Content-length should be strlen(propertySet) + strlen(CRLF) (2)
+	In gena_device.c:433 (AllocGenaHeaders())
+
+	rc = snprintf(headers, headers_size, "%s%s%"PRIzu"%s%s%s",
+	    HEADER_LINE_1,
+	    HEADER_LINE_2A,
+	    strlen(propertySet) + 1,
+	    HEADER_LINE_2B,
+	    HEADER_LINE_3,
+	    HEADER_LINE_4);
+
+	HEADER_LINE_2A is "CONTENT-LENGTH: ". 
+	The following value should be strlen(propertySet) + 2
+
 2016-01-07 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Fix for a reported integer overflow
