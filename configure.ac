@@ -501,6 +501,15 @@ if test "x$enable_blocking_tcp_connections" = xyes ; then
         AC_DEFINE(UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS, 1, [see upnpconfig.h])
 fi
 
+RT_BOOL_ARG_ENABLE([scriptsupport], [yes], [script support for IXML document tree, see ixml.h])
+if test "x$enable_scriptsupport" = xyes ; then
+        AC_DEFINE(IXML_HAVE_SCRIPTSUPPORT, 1, [see upnpconfig.h])
+fi
+
+RT_BOOL_ARG_ENABLE([postwrite], [no], [write to the filesystem on otherwise unhandled POST requests])
+if test "x$enable_postwrite" = xyes ; then
+        AC_DEFINE(UPNP_ENABLE_POST_WRITE, 1, [see upnpconfig.h])
+fi
 
 RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 
