@@ -482,6 +482,10 @@ if test "x$enable_scriptsupport" = xyes ; then
         AC_DEFINE(IXML_HAVE_SCRIPTSUPPORT, 1, [see upnpconfig.h])
 fi
 
+RT_BOOL_ARG_ENABLE([postwrite], [no], [write to the filesystem on otherwise unhandled POST requests])
+if test "x$enable_postwrite" = xyes ; then
+        AC_DEFINE(UPNP_ENABLE_POST_WRITE, 1, [see upnpconfig.h])
+fi
 
 RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 
