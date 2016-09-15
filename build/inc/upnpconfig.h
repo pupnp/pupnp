@@ -136,5 +136,10 @@
  *  (i.e. configure --enable-open_ssl) */
 /* #undef UPNP_ENABLE_OPEN_SSL */
 
+/** Defined to 1 if the library has been compiled to support filesystem writes on POST
+ *  (i.e. configure --enable-postwrite) */
+/* #undef UPNP_ENABLE_POST_WRITE */
+
+
 #endif /* UPNP_CONFIG_H */
 

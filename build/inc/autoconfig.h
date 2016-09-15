@@ -139,6 +139,9 @@
 /* #undef UPNP_ENABLE_OPEN_SSL */
 
 /* see upnpconfig.h */
+/* #undef UPNP_ENABLE_POST_WRITE */
+
+/* see upnpconfig.h */
 /* #undef UPNP_ENABLE_UNSPECIFIED_SERVER */
 
 /* see upnpconfig.h */
