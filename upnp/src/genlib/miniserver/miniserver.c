@@ -583,6 +583,7 @@ static int get_miniserver_sockets(
 	memset(&__ss_v6, 0, sizeof (__ss_v6));
 	serverAddr6->sin6_family = (sa_family_t)AF_INET6;
 	inet_pton(AF_INET6, gIF_IPV6, &serverAddr6->sin6_addr);
+	serverAddr6->sin6_scope_id = gIF_INDEX;
 #endif
 	/* Getting away with implementation of re-using address:port and
 	 * instead choosing to increment port numbers.
