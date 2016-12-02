@@ -623,24 +623,24 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 
     /* scheme */
     rv = snprintf(out_finger, len, "%.*s:", (int)base.scheme.size, base.scheme.buff);
-    if (rv < 0 || rv >= len)
+    if (rv < 0 || rv >= (int)len)
         goto error;
     out_finger += rv;
-    len -= rv;
+    len -= (size_t)rv;
 
     /* authority */
     if (rel.hostport.text.size > (size_t)0) {
         rv = snprintf(out_finger, len, "%s", rel_url);
-        if (rv < 0 || rv >= len)
+        if (rv < 0 || rv >= (int)len)
             goto error;
         return out;
     }
     if (base.hostport.text.size > (size_t)0) {
 	rv = snprintf(out_finger, len, "//%.*s", (int)base.hostport.text.size, base.hostport.text.buff);
-	if (rv < 0 || rv >= len)
+	if (rv < 0 || rv >= (int)len)
 	    goto error;
 	out_finger += rv;
-	len -= rv;
+	len -= (size_t)rv;
     }
 
     /* path */
@@ -674,10 +674,10 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 	    len -= prefix;
 	    rv = snprintf(out_finger, len, "%.*s", (int)rel.pathquery.size, rel.pathquery.buff);
 	}
-	if (rv < 0 || rv >= len)
+	if (rv < 0 || rv >= (int)len)
 	    goto error;
 	out_finger += rv;
-	len -= rv;
+	len -= (size_t)rv;
 
 	/* fragment */
 	if (rel.fragment.size > (size_t)0)
@@ -687,12 +687,12 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 	else
 	    rv = 0;
     }
-    if (rv < 0 || rv >= len)
+    if (rv < 0 || rv >= (int)len)
 	goto error;
     out_finger += rv;
-    len -= rv;
+    len -= (size_t)rv;
 
-    if (remove_dots(path, out_finger - path) != UPNP_E_SUCCESS)
+    if (remove_dots(path, (size_t)(out_finger - path)) != UPNP_E_SUCCESS)
 	goto error;
 
     return out;

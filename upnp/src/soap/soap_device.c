@@ -532,6 +532,7 @@ static int check_soapaction_hdr(
 	char save_char;
 	char *hash_pos = NULL;
 	char *col_pos1, *col_pos2, *serv_type;
+	size_t cp1_diff;
 	int ret_code;
 
 	/* find SOAPACTION header */
@@ -573,8 +574,9 @@ static int check_soapaction_hdr(
 	col_pos2 = strrchr(soap_info->service_type, ':');
 	/* XXX: this should be checked when service list is generated */
 	assert(col_pos2 != NULL);
-	if (col_pos2-soap_info->service_type == col_pos1-serv_type &&
-		strncmp(soap_info->service_type, serv_type, col_pos1-serv_type) == 0) {
+	cp1_diff = (size_t)(col_pos1 - serv_type);
+	if (col_pos2 - soap_info->service_type == col_pos1 - serv_type &&
+		strncmp(soap_info->service_type, serv_type, cp1_diff) == 0) {
 		/* for action invocation, update the version information */
 		namecopy(soap_info->service_type, serv_type);
 	} else if (strcmp(serv_type, QUERY_STATE_VAR_URN) == 0 &&
