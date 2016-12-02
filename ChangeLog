@@ -2,6 +2,18 @@
 Version 1.6.21
 *******************************************************************************
 
+2016-11-30 Uwe Kleine-König <uwe(at)kleine-koenig.org>
+
+	miniserver: fix binding to ipv6 link-local addresses
+
+	Linux requires to have sin6_scope_id hold the interface id when binding to
+	link-local addresses. This is already in use in other parts of upnp, so
+	portability shouldn't be in the way here. Without this bind(2) fails with
+	errno=EINVAL (although ipv6(7) from manpages 4.08 specifies ENODEV in this
+	case).
+
+	Fixes: https://bugs.debian.org/813249
+
 2016-09-15 Mathew Garret <(at)mjg59 (twitter)>
 
 	SF Bug Tracker #132 CVE-2016-6255: write files via POST
