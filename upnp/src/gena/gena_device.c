@@ -1113,7 +1113,7 @@ static int create_url_list(
 	/*! [out] . */
 	URL_list *out)
 {
-    size_t URLcount = 0;
+    size_t URLcount = 0, URLcount2 = 0;
     size_t i;
     int return_code = 0;
     uri_type temp;
@@ -1155,16 +1155,23 @@ static int create_url_list(
         }
         memcpy( out->URLs, URLS->buff, URLS->size );
         out->URLs[URLS->size] = 0;
-        URLcount = 0;
         for( i = 0; i < URLS->size; i++ ) {
             if( ( URLS->buff[i] == '<' ) && ( i + 1 < URLS->size ) ) {
                 if( ( ( return_code =
                         parse_uri( &out->URLs[i + 1], URLS->size - i + 1,
-                                   &out->parsedURLs[URLcount] ) ) ==
+                                   &out->parsedURLs[URLcount2] ) ) ==
                       HTTP_SUCCESS )
-                    && ( out->parsedURLs[URLcount].hostport.text.size !=
+                    && ( out->parsedURLs[URLcount2].hostport.text.size !=
                          0 ) ) {
-                    URLcount++;
+                    URLcount2++;
+                    if (URLcount2 >= URLcount)
+                        /*
+                         * break early here in case there is a bogus URL that
+                         * was skipped above. This prevents to access
+                         * out->parsedURLs[URLcount] which is beyond the
+                         * allocation.
+                         */
+                        break;
                 } else {
                     if( return_code == UPNP_E_OUTOF_MEMORY ) {
                         free( out->URLs );
