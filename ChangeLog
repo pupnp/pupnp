@@ -2,6 +2,20 @@
 Version 1.6.21
 *******************************************************************************
 
+2016-12-08 Uwe Kleine-König <uwe(at)kleine-koenig.org>
+
+	Fix out-of-bound access in create_url_list() (CVE-2016-8863)
+
+	If there is an invalid URL in URLS->buf after a valid one, uri_parse is
+	called with out pointing after the allocated memory. As uri_parse writes
+	to *out before returning an error the loop in create_url_list must be
+	stopped early to prevent an out-of-bound access
+
+	Bug: https://sourceforge.net/p/pupnp/bugs/133/
+	Bug-CVE: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-8863
+	Bug-Debian: https://bugs.debian.org/842093
+	Bug-Redhat: https://bugzilla.redhat.com/show_bug.cgi?id=1388771
+
 2016-11-30 Uwe Kleine-König <uwe(at)kleine-koenig.org>
 
 	miniserver: fix binding to ipv6 link-local addresses
