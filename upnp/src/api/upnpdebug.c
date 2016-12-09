@@ -70,10 +70,12 @@ int UpnpInitLog(void)
 	ithread_mutex_init(&GlobalDebugMutex, NULL);
 	if (DEBUG_TARGET == 1) {
 		if ((ErrFileHnd = fopen(errFileName, "a")) == NULL) {
-			return -1;
+			fprintf(stderr, "Failed to open errFileName (%s): %s\n", errFileName, strerror(errno));
+			ErrFileHnd = stderr;
 		}
 		if ((InfoFileHnd = fopen(infoFileName, "a")) == NULL) {
-			return -1;
+			fprintf(stderr, "Failed to open infoFileName (%s): %s\n", infoFileName, strerror(errno));
+			InfoFileHnd = stdout;
 		}
 	}
 	return UPNP_E_SUCCESS;
