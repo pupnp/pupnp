@@ -362,6 +362,11 @@ Version 1.8.0
 Version 1.6.21
 *******************************************************************************
 
+2016-12-16 Gabriel Burca <gburca(at)github>
+
+	If the error or info log files can not be created, use stderr and
+	stdout instead.
+
 2016-12-08 Uwe Kleine-König <uwe(at)kleine-koenig.org>
 
 	Fix out-of-bound access in create_url_list() (CVE-2016-8863)
