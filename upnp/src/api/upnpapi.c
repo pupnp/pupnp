@@ -1705,6 +1705,8 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd, int Exp,
     }
     if( Exp < 1 )
         Exp = DEFAULT_MAXAGE;
+    if( Exp <= AUTO_ADVERTISEMENT_TIME * 2 )
+        Exp = ( AUTO_ADVERTISEMENT_TIME + 1 ) * 2;
     SInfo->MaxAge = Exp;
     SInfo->PowerState = PowerState;
     if( SleepPeriod < 0 )
