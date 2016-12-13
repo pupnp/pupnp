@@ -1125,7 +1125,11 @@ EXPORT_SPEC int UpnpSearchAsync(
 EXPORT_SPEC int UpnpSendAdvertisement(
 	/*! The device handle for which to send out the announcements. */
 	UpnpDevice_Handle Hnd,
-	/*! The expiration age, in seconds, of the announcements. */
+	/*! The expiration age, in seconds, of the announcements. If the
+	 * expiration age is less than 1 then the expiration age is set to
+	 * \c DEFAULT_MAXAGE. If the expiration age is less than or equal to
+	 * \c AUTO_ADVERTISEMENT_TIME * 2 then the expiration age is set to
+	 * ( \c AUTO_ADVERTISEMENT_TIME + 1 ) * 2. */
 	int Exp);
 
 /*!
@@ -1149,7 +1153,11 @@ EXPORT_SPEC int UpnpSendAdvertisement(
 EXPORT_SPEC int UpnpSendAdvertisementLowPower(
         /*! The device handle for which to send out the announcements. */
         UpnpDevice_Handle Hnd,
-        /*! The expiration age, in seconds, of the announcements. */
+        /*! The expiration age, in seconds, of the announcements. If the
+         * expiration age is less than 1 then the expiration age is set to
+         * \c DEFAULT_MAXAGE. If the expiration age is less than or equal to 
+         * \c AUTO_ADVERTISEMENT_TIME * 2 then the expiration age is set to
+         * ( \c AUTO_ADVERTISEMENT_TIME + 1 ) * 2. */
         int Exp,
         /*! PowerState as defined by UPnP Low Power. */
         int PowerState,
