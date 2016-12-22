@@ -85,8 +85,9 @@ integrated mini web server for serving UPnP related documents.
 ## 3. Package Contents
 ---
 
-The SDK for UPnP Devices contains the following: 
+The SDK for UPnP Devices contains the following:
 
+Path/File | Description
 ----------------|-------------------------------------------------------------
 README    	| This file.  Contains the installation and build instructions.
 LICENSE   	| The licensing terms the SDK is distributed under.
@@ -275,7 +276,7 @@ To remove all the targets, object files, and built documentation:
 ```
 
 
-###CROSS COMPILATION
+### CROSS COMPILATION
 
 To cross compile the SDK, a special "configure" directive is all that is
 required:
@@ -289,7 +290,7 @@ required:
 This will invoke the "arm-linux-gcc" cross compiler to build the library.
 
 
-###SAMPLES
+### SAMPLES
 
 The SDK contains two samples: a TV device application and a control point
 that talks with the TV device.  They are found in the $(LIBUPNP)/upnp/sample 
@@ -319,7 +320,7 @@ To run the sample invoke from the command line as follows:
 ```
 
 
-###SOLARIS BUILD
+### SOLARIS BUILD
 
 The building process for the Solaris operating system is similar to the one
 described above. Only the call to ./configure has to be done using an
@@ -340,7 +341,7 @@ where <cputype> has to be replaced by the appropriate CPU tuning flag (e.g.
 can be called as described above.
 
 
-###WINDOWS BUILD
+### WINDOWS BUILD
 
 In order to build libupnp under Windows the pthreads-w32 package is required.
 You can download a self-extracting ZIP file from the following location:
@@ -381,7 +382,7 @@ The top-level makefile for the UPnP SDK contains rules to install the
 necessary components.  To install the SDK, as root:
 
 ```
-make install
+% make install
 ```
 
 ### Uninstall
@@ -390,12 +391,11 @@ Likewise, the top-level makefile contains an uninstall rule, reversing
 the steps in the install:
 
 ```
-make uninstall
+% make uninstall
 ```
 
 
 ## 7. Product Release Notes
----
 
 The SDK for UPnP Devices v1.2.1a has these known issues:
 
@@ -408,13 +408,11 @@ The SDK for UPnP Devices v1.2.1a has these known issues:
   libpthreads that has been resolved in the 2.1.94 version.
 
 ## 8. New Features
----
 
 See NEWS file.
 
 
 ## 9. Support and Contact Information
----
 
 Intel is not providing support for the SDK for UPnP Devices. Mailing lists
 and discussion boards can be found at http://www.libupnp.org/.
@@ -428,7 +426,7 @@ owners.
 
 
 ## 10. IXML support for scriptinglanguages
----
+
 The treestructure of XML documents created by IXML is hard to maintain when
 creating a binding for a scripting language. Even when many elements may 
 never be used on the script side, it requires copying the entire tree 
