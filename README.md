@@ -1,4 +1,4 @@
-Portable SDK for UPnP* Devices (libupnp)
+#Portable SDK for UPnP\* Devices (libupnp)
 
 Copyright (c) 2000-2003 Intel Corporation - All Rights Reserved.
 Copyright (c) 2005-2006 Rémi Turboult <r3mi@users.sourceforge.net>
@@ -9,18 +9,71 @@ See LICENSE for details.
 This file contains information about the above product in the following 
 sections: 
 
-1.  Release Contents
-2.  Package Contents
-3.  System Requirements
-4.  Build Instructions
-5.  Install/Uninstall Instructions
-6.  Product Release Notes
-7.  New Features
-8.  Support and Contact Information
+1. Release List
+2. Release Contents
+3. Package Contents
+4. System Requirements
+5. Build Instructions
+6. Install/Uninstall Instructions
+7. Product Release Notes
+8. New Features
+9. Support and Contact Information
+10. IXML support for scriptinglanguages
 
 
-1) Release Contents
--------------------------------------------
+## 1. Release List
+---
+
+Release Number | Date | History
+---------------|------|--------
+0.9.0  | 2000-08-01 | [UPnP SDK for Linux][UPnP SDK for Linux]
+0.9.1  | 2000-08-17 | [UPnP SDK for Linux][UPnP SDK for Linux]
+1.0.0  | 2000-08-31 | [UPnP SDK for Linux][UPnP SDK for Linux]
+1.0.1  | 2000-10-13 | [UPnP SDK for Linux][UPnP SDK for Linux]
+1.0.2  | 2001-02-07 | [UPnP SDK for Linux][UPnP SDK for Linux]
+1.0.3  | 2001-06-12 | [UPnP SDK for Linux][UPnP SDK for Linux]
+1.0.4  | 2001-08-15 | [UPnP SDK for Linux][UPnP SDK for Linux]
+1.2.1  | 2003-02-13 | [UPnP SDK for Linux][UPnP SDK for Linux]
+1.2.1a | 2003-11-08 | [UPnP SDK for Linux][UPnP SDK for Linux]
+1.3.0  | 2006-03-04 | [UPnP SDK for Linux][UPnP SDK for Linux]
+1.3.1  | 2006-03-05 | [UPnP SDK for Linux][UPnP SDK for Linux]
+1.4.0  | 2006-06-12 | [Portable UPnP SDK][Portable UPnP SDK]
+1.4.1  | 2006-08-11 | [Portable UPnP SDK][Portable UPnP SDK]
+1.4.2  | 2007-02-16 | [Portable UPnP SDK][Portable UPnP SDK]
+1.4.3  | 2007-03-06 | [Portable UPnP SDK][Portable UPnP SDK]
+1.4.4  | 2007-04-17 | [Portable UPnP SDK][Portable UPnP SDK]
+1.4.5  | 2007-04-28 | [Portable UPnP SDK][Portable UPnP SDK]
+1.4.6  | 2007-04-30 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.0  | 2007-06-23 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.1  | 2007-11-08 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.2  | 2007-12-10 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.3  | 2007-12-26 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.4  | 2008-01-26 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.5  | 2008-02-02 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.6  | 2008-04-25 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.7  | 2010-10-04 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.8  | 2010-10-21 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.9  | 2010-11-07 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.10 | 2011-01-30 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.11 | 2011-02-07 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.12 | 2011-02-08 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.13 | 2011-03-17 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.14 | 2011-11-17 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.15 | 2012-01-25 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.16 | 2012-03-21 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.17 | 2012-04-03 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.18 | 2013-01-29 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.19 | 2013-11-15 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.20 | 2016-07-07 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.21 | 2016-12-21 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.22 | 2017-??-?? | 
+1.8.0  | 2017-??-?? | 
+
+[UPnP SDK for Linux]: https://sourceforge.net/projects/upnp/
+[Portable UPnP SDK]: https://sourceforge.net/projects/pupnp/
+
+## 2. Release Contents
+---
 
 The Portable SDK for UPnP Devices is an SDK for development of UPnP device 
 and control point applications.  It consists of the core UPnP 
@@ -29,31 +82,28 @@ supporting the Document Object Model (DOM) Level 2 API and an optional,
 integrated mini web server for serving UPnP related documents.
 
 
-2) Package Contents
--------------------------------------------
+## 3. Package Contents
+---
 
 The SDK for UPnP Devices contains the following: 
 
-README    	This file.  Contains the installation and build instructions.
-LICENSE   	The licensing terms the SDK is distributed under.
-NEWS		Changes and new features.
-ixml\doc	The files for generating the XML parser documentation from
-		the source code.
-ixml\inc	The public include files required to use the XML parser.
-ixml\src	The source code to the XML parser library.
-threadutil\inc	The public include files required to the threading 
-		utility library.
-threadutil\src	The source code to the threading utility library.
-upnp\doc	The files for generating the SDK documentation from the
-		source code.
-upnp\inc	The public include files required to use the SDK.
-upnp\src      	The source files comprising the SDK, libupnp.so.
-upnp\sample	A sample device and control point application, illustrating the
-          	usage of the SDK.
+----------------|-------------------------------------------------------------
+README    	| This file.  Contains the installation and build instructions.
+LICENSE   	| The licensing terms the SDK is distributed under.
+NEWS		| Changes and new features.
+ixml\doc	| The files for generating the XML parser documentation from the source code.
+ixml\inc	| The public include files required to use the XML parser.
+ixml\src	| The source code to the XML parser library.
+threadutil\inc	| The public include files required to the threading utility library.
+threadutil\src	| The source code to the threading utility library.
+upnp\doc	| The files for generating the SDK documentation from the source code.
+upnp\inc	| The public include files required to use the SDK.
+upnp\src      	| The source files comprising the SDK, libupnp.so.
+upnp\sample	| A sample device and control point application, illustrating the usage of the SDK.
 
 
-3) System Requirements
--------------------------------------------
+## 4. System Requirements
+---
 
 The SDK for UPnP Devices is designed to compile and run under several
 operating systems.  It does, however, have dependencies on some
@@ -85,34 +135,39 @@ ps2pdf      The final step to making the PDF is converting the PostStript
 For the UPnP library to function correctly, networking must be configured
 properly for multicasting.  To do this:
 
-route add -net 239.0.0.0 netmask 255.0.0.0 eth0
+```
+% route add -net 239.0.0.0 netmask 255.0.0.0 eth0
+```
 
 where 'eth0' is the network adapter that the UPnP library will use.  Without
 this addition, device advertisements and control point searches will not
 function.
 
 
+## 5. Build Instructions
+---
 
-4) Build Instructions
--------------------------------------------
-
-CORE LIBRARIES
+###CORE LIBRARIES
 
 The in the examples below, replace $(LIBUPNP) with "libupnp-x.y.z",
 with x, y, and z corresponding to the version of the library that you have.
 
 All pieces of the SDK are configured and built from the $(LIBUPNP) directory. 
 
+```
 % cd $(LIBUPNP)
 % ./configure
 % make
+```
 
 will build a version of the binaries without debug support, and with default 
 options enabled (see below for options available at configure time).
 
+```
 % cd $(LIBUPNP)
 % ./configure CFLAGS="-DSPARC_SOLARIS -mtune=<cputype> -mcpu=<cputype>"
 % make
+```
 
 will build a Sparc Solaris version of the binaries without debug support
 and with default options enabled (see below for options available at
@@ -124,14 +179,17 @@ To build the documentation, assuming all the necessary tools are installed
 
 To generate the HTML documentation:
 
+```
 % cd $(LIBUPNP)
 % make html
+```
 
 To generate the PDF file:
 
+```
 % cd $(LIBUPNP)
 % make pdf
-
+```
 
 A few options are available at configure time. Use "./configure --help"
 to display a complete list of options. Note that these options 
@@ -139,34 +197,40 @@ may be combined in any order.
 After installation, the file <upnp/upnpconfig.h> will provide a summary
 of the optional features that have been included in the library.
 
-
+```
 % cd $(LIBUPNP)
 % ./configure --enable-debug
 % make 
+```
 
 will build a debug version with symbols support.
 
 To build the library with the optional, integrated mini web server (note
 that this is the default):
 
+```
 % cd $(LIBUPNP)
 % ./configure --enable-webserver
 % make 
+```
 
 To build without:
 
+```
 % cd $(LIBUPNP)
 % ./configure --disable-webserver
 % make 
-
+```
 
 The SDK also contains some additional helper APIs, declared in
 inc/tools/upnptools.h.  If these additional tools are not required, they can
 be compiled out:
 
+```
 % cd $(LIBUPNP)
 % ./configure --disable-tools
 % make 
+```
 
 By default, the tools are included in the library.
 
@@ -174,15 +238,19 @@ To further remove code that is not required, the library can be build with or
 with out the control point (client) or device specific code.  To remove this
 code:
 
+```
 % cd $(LIBUPNP)
 % ./configure --disable-client
 % make 
+```
 
 to remove client only code or:
 
+```
 % cd $(LIBUPNP)
 % ./configure --disable-device
 % make 
+```
 
 to remove device only code.
 
@@ -192,30 +260,36 @@ integrated web server is automatically removed when configuring with
 
 To build the library without large-file support (enabled by default) :
 
+```
 % cd $(LIBUPNP)
 % ./configure --disable-largefile
 % make 
+```
 
 
 To remove all the targets, object files, and built documentation:
 
+```
 % cd $(LIBUPNP)
 % make clean
+```
 
 
-CROSS COMPILATION
+###CROSS COMPILATION
 
 To cross compile the SDK, a special "configure" directive is all that is
 required:
 
+```
 % cd $(LIBUPNP)
 % ./configure --host=arm-linux
 % make
+```
 
 This will invoke the "arm-linux-gcc" cross compiler to build the library.
 
 
-SAMPLES
+###SAMPLES
 
 The SDK contains two samples: a TV device application and a control point
 that talks with the TV device.  They are found in the $(LIBUPNP)/upnp/sample 
@@ -223,9 +297,11 @@ directory.
 
 To build the samples (note: this is the default behaviour):
 
+```
 % cd $(LIBUPNP)
 % ./configure --enable-samples
 % make
+```
 
 will build the sample device "$(LIBUPNP)/upnp/tv_device" and
 sample control point "$(LIBUPNP)/upnp/tv_ctrlpt". 
@@ -237,30 +313,34 @@ To run the sample device, you need to create a tvdevice directory and move
 the web directory there, giving: "$(LIBUPNP)/upnp/sample/tvdevice/web".
 To run the sample invoke from the command line as follows:
 
+```
 % cd $(LIBUPNP)/upnp/sample/tvdevice
 % ../tv_device
+```
 
 
-
-SOLARIS BUILD
+###SOLARIS BUILD
 
 The building process for the Solaris operating system is similar to the one
 described above. Only the call to ./configure has to be done using an
 additional parameter:
 
-./configure CFLAGS="-mcpu=<cputype> -mtune=<cputype> -DSPARC_SOLARIS"
+```
+% ./configure CFLAGS="-mcpu=<cputype> -mtune=<cputype> -DSPARC_SOLARIS"
+```
 
 where <cputype> has to be replaced by the appropriate CPU tuning flag (e.g.
 "supersparc"). Afterwards
 
-make
-make install
+```
+% make
+% make install
+```
 
 can be called as described above.
 
 
-
-WINDOWS BUILD
+###WINDOWS BUILD
 
 In order to build libupnp under Windows the pthreads-w32 package is required.
 You can download a self-extracting ZIP file from the following location:
@@ -292,46 +372,49 @@ UPNP_STATIC_LIB - for creating a statically linkable UPnP-library
 PTW32_STATIC_LIB - for using the static pthreads32 library
 
 
-5) Install/Uninstall Instructions
--------------------------------------------
+## 6. Install/Uninstall Instructions
+---
 
-Install
+### Install
 
 The top-level makefile for the UPnP SDK contains rules to install the 
 necessary components.  To install the SDK, as root:
 
+```
 make install
+```
 
-Uninstall
+### Uninstall
 
 Likewise, the top-level makefile contains an uninstall rule, reversing 
 the steps in the install:
 
+```
 make uninstall
+```
 
 
-6) Product Release Notes
--------------------------------------------
+## 7. Product Release Notes
+---
 
 The SDK for UPnP Devices v1.2.1a has these known issues:
 
-- The UPnP library may not work with older versions of gcc and libstdc++, 
+* The UPnP library may not work with older versions of gcc and libstdc++,
   causing a segmentation fault when the library loads.  It is recommended
   that gcc version 2.9 or later be used in building library.
-- The UPnP library does not work the glibc 2.1.92-14 that ships with
+* The UPnP library does not work the glibc 2.1.92-14 that ships with
   Red Hat 7.0.  For the library to function, you must updated the glibc
   and glibc-devel packages to 2.1.94-3 or later.  There is some issue with
   libpthreads that has been resolved in the 2.1.94 version.
 
-
-7) New Features
--------------------------------------------
+## 8. New Features
+---
 
 See NEWS file.
 
 
-8) Support and Contact Information
--------------------------------------------
+## 9. Support and Contact Information
+---
 
 Intel is not providing support for the SDK for UPnP Devices. Mailing lists
 and discussion boards can be found at http://www.libupnp.org/.
@@ -340,6 +423,57 @@ If you find this SDK useful, please send an email to upnp@intel.com and let
 us know.
 
 
-* Other brands, names, and trademarks are the property of their respective 
+\* Other brands, names, and trademarks are the property of their respective 
 owners.
+
+
+## 10. IXML support for scriptinglanguages
+---
+The treestructure of XML documents created by IXML is hard to maintain when
+creating a binding for a scripting language. Even when many elements may 
+never be used on the script side, it requires copying the entire tree 
+structure once you start accessing elements several levels deep.
+Hence scriptsupport was added. To enable it compile while 
+IXML_HAVE_SCRIPTSUPPORT has been defined (enabled by default). 
+This allows control using only a list instead of a tree-like
+structure, and only nodes actually accessed need to be created instead of
+all the nodes in the tree.
+
+Here's how its supposed to work;
+* The scriptsupport allows you to add a callback when a node is freed on 
+  the C side, so appropriate action can be taken on the script side, see
+  function ixmlSetBeforeFree().
+* Instead of recreating the tree structure, an intermediate object should
+  be created only for the nodes actually accessed. The object should be
+  containing a pointer to the node and a 'valid flag' which is initially 
+  set to TRUE (the valid flag, can simply be the pointer to the node being 
+  NULL or not). Before creating the intermediate object, the custom tag 
+  'ctag' can be used to check whether one was already created.
+* the node object gets an extra 'void\* ctag' field, a custom tag to make a
+  cross reference to the script side intermediate object. It can be set
+  using ixmlNode_setCTag(), and read using ixmlNode_getCTag(). Whenever
+  a new intermediate object is created, the ctag of the coirresponding
+  node should be set to point to this intermediate object.
+* The tree structure traversal is done on the C side (looking up parents, 
+  children and siblings)
+* Every intermediate object created should be kept in a list (preferably a 
+  key-value list, where the key is the pointer to the node and the value is 
+  the pointer to the intermediate object)
+* when the callback is called, the node should be looked up in the list, 
+  the flag set to false, the pointer to the C-side node be cleared and on
+  the C-side the ctag should be cleared.
+* whenever the intermediate object is accessed and its flag is set to False, 
+  an error should be thrown that the XML document has been closed.
+
+Freeing resources can be done in 2 ways, C side by simply calling the free 
+node methods, or script side by the garbage collector of the scriptengine. 
+Scriptside steps;
+* if the valid flag is set to False (XML document is closed), then the 
+  intermediate object can be destroyed, no further action
+* if the node has a parent, then the intermediate object can be destroyed 
+  after the ctag on the corresponding node has been cleared. Nothing needs
+  to be freed on the C-side.
+* if the node has no parent, then the node must be freed on the C side by 
+  calling the corresponding free node methods. This will result in a chain 
+  of callbacks closing the node and all underlying nodes.
 
