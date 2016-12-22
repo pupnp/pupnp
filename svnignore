@@ -10,5 +10,5 @@ autoconfig.h*
 autom4te.cache
 config*
 libtool
-libupnp.pc
+libupnp*.pc
 stamp-h*

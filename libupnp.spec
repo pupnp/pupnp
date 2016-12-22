@@ -1,6 +1,6 @@
 Version: 1.8.0
 Summary: Universal Plug and Play (UPnP) SDK
-Name: libupnp
+Name: libupnp-1.8
 Release: 1%{?dist}
 License: BSD
 Group: System Environment/Libraries
@@ -17,11 +17,11 @@ and bridges on Linux.
 
 %package devel
 Group: Development/Libraries
-Summary: Include files needed for development with libupnp
-Requires: libupnp = %{version}-%{release}
+Summary: Include files needed for development with %{name}
+Requires: %{name} = %{version}-%{release}
 
 %description devel
-The libupnp-devel package contains the files necessary for development with
+The %{name}-devel package contains the files necessary for development with
 the UPnP SDK libraries.
 
 %prep
@@ -48,7 +48,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{__mv} %{buildroot}%{docdir}/html \
 	%{buildroot}%{docdeveldir}/
 
-%{__rm} %{buildroot}%{_libdir}/{libixml.la,libthreadutil.la,libupnp.la}
+%{__rm} %{buildroot}%{_libdir}/{libixml-1.8.la,libthreadutil-1.8.la,libupnp-1.8.la}
 
 %post -p /sbin/ldconfig
 
@@ -57,21 +57,21 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %doc %{docdir}
-%{_libdir}/libixml.so.*
-%{_libdir}/libthreadutil.so.*
-%{_libdir}/libupnp.so.*
+%{_libdir}/libixml-1.8.so.*
+%{_libdir}/libthreadutil-1.8.so.*
+%{_libdir}/libupnp-1.8.so.*
 
 %files devel
 %defattr(0644,root,root,0755)
 %doc %{docdeveldir}
-%{_includedir}/upnp/
-%{_libdir}/libixml.so
-%{_libdir}/libthreadutil.so
-%{_libdir}/libupnp.so
-%{_libdir}/libixml.a
-%{_libdir}/libthreadutil.a
-%{_libdir}/libupnp.a
-%{_libdir}/pkgconfig/libupnp.pc
+%{_includedir}/upnp-1.8/
+%{_libdir}/libixml-1.8.so
+%{_libdir}/libthreadutil-1.8.so
+%{_libdir}/libupnp-1.8.so
+%{_libdir}/libixml-1.8.a
+%{_libdir}/libthreadutil-1.8.a
+%{_libdir}/libupnp-1.8.a
+%{_libdir}/pkgconfig/libupnp-1.8.pc
 
 %clean
 rm -rf %{buildroot}

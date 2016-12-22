@@ -11,9 +11,9 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/upnp/src/inc
 
 LDADD = \
-	$(top_builddir)/upnp/libupnp.la \
-	$(top_builddir)/threadutil/libthreadutil.la \
-	$(top_builddir)/ixml/libixml.la
+	$(top_builddir)/upnp/libupnp-1.8.la \
+	$(top_builddir)/threadutil/libthreadutil-1.8.la \
+	$(top_builddir)/ixml/libixml-1.8.la
 
 #unittest
 noinst_PROGRAMS = unittest

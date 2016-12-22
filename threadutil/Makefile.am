@@ -14,11 +14,11 @@ else
 endif
 
 
-lib_LTLIBRARIES		= libthreadutil.la
+lib_LTLIBRARIES		= libthreadutil-1.8.la
 
-libthreadutil_la_LDFLAGS = -version-info $(LT_VERSION_THREADUTIL)
+libthreadutil_1_8_la_LDFLAGS = -version-info $(LT_VERSION_THREADUTIL)
 
-libthreadutil_la_SOURCES = \
+libthreadutil_1_8_la_SOURCES = \
 			inc/FreeList.h \
 			src/FreeList.c \
 			inc/LinkedList.h \
@@ -28,7 +28,7 @@ libthreadutil_la_SOURCES = \
 			inc/TimerThread.h \
 			src/TimerThread.c
 
-upnpincludedir		= $(includedir)/upnp
+upnpincludedir		= $(includedir)/upnp-1.8
 upnpinclude_HEADERS	= \
 			inc/ithread.h
 
