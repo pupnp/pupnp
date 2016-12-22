@@ -1,13 +1,14 @@
 #Portable SDK for UPnP\* Devices (libupnp)
 
 Copyright (c) 2000-2003 Intel Corporation - All Rights Reserved.
+
 Copyright (c) 2005-2006 Rémi Turboult <r3mi@users.sourceforge.net>
+
 Copyright (c) 2006 Michel Pfeiffer and others <virtual_worlds@gmx.de>
 
 See LICENSE for details.
 
-This file contains information about the above product in the following 
-sections: 
+## Table of Contents
 
 1. Release List
 2. Release Contents
@@ -111,24 +112,16 @@ libpthread  The header and library are installed as part of the glibc-devel
             package (or equivalent).
 
 Additionally, the documentation for the SDK can be auto-generated from 
-the UPNP.H header file using DOC++, a documentation system for C, C++, 
+the upnp.h header file using DOC++, a documentation system for C, C++, 
 IDL, and Java\*.  DOC++ generates the documentation in HTML or TeX format.
 Using some additional tools, the TeX output can be converted into a
 PDF file.  To generate the documentation these tools are required:
 
-DOC++     | The homepage for DOC++ is http://docpp.sourceforge.net/.
-            The current version as of this release of the SDK is
-            version 3.4.9.  DOC++ is the only requirement for generating
-            the HTML documentation.
+DOC++     | The homepage for DOC\+\+ is http://docpp.sourceforge.net/. The current version as of this release of the SDK is version 3.4.9. DOC\+\+ is the only requirement for generating the HTML documentation.
 ----------|--------------------------------------------------------------
-LaTeX/TeX | To generate the PDF documentation, LaTeX and TeX tools are
-            necessary.  The tetex and tetex-latex packages provide these
-            tools.
-dvips     | dvips converts the DVI file produced by LaTeX into a PostScript\*
-            file.  The tetex-dvips package provides this tool.
-ps2pdf    | The final step to making the PDF is converting the PostStript
-            into Portable Document Format.  The ghostscript package provides
-            this tool.
+LaTeX/TeX | To generate the PDF documentation, LaTeX and TeX tools are necessary. The tetex and tetex-latex packages provide these tools.
+dvips     | dvips converts the DVI file produced by LaTeX into a PostScript\* file. The tetex-dvips package provides this tool.
+ps2pdf    | The final step to making the PDF is converting the PostStript\* into Portable Document Format.  The ghostscript package provides this tool.
 
 For the UPnP library to function correctly, networking must be configured
 properly for multicasting.  To do this:
