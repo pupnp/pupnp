@@ -19,7 +19,7 @@ See LICENSE for details.
 7. Product Release Notes
 8. New Features
 9. Support and Contact Information
-10. IXML support for scriptinglanguages
+10. IXML support for scripting languages
 
 
 ## 1. Release List
