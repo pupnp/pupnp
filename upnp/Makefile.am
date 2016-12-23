@@ -181,10 +181,10 @@ libupnp_1_8_la_SOURCES += \
 
 
 # check / distcheck tests
-check_PROGRAMS = test_init test_url
-TESTS = test_init test_url
-test_init_SOURCES = test/test_init.c
-test_url_SOURCES = test/test_url.c
+check_PROGRAMS = test_init-1.8 test_url-1.8
+TESTS = test_init-1.8 test_url-1.8
+test_init_1_8_SOURCES = test/test_init.c
+test_url_1_8_SOURCES = test/test_url.c
 
 
 EXTRA_DIST = \

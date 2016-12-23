@@ -47,10 +47,10 @@ upnpinclude_HEADERS	= \
 			inc/ixml.h \
 			inc/ixmldebug.h
 
-check_PROGRAMS          = test_document
+check_PROGRAMS          = test_document-1.8
 TESTS                   = test/test_document.sh
 
-test_document_SOURCES 	= test/test_document.c
+test_document_1_8_SOURCES 	= test/test_document.c
 
 EXTRA_DIST		= test/test_document.sh test/testdata
 

@@ -18,42 +18,42 @@ LDADD = \
 noinst_PROGRAMS =
 if ENABLE_SAMPLES
 if ENABLE_CLIENT
-noinst_PROGRAMS += tv_ctrlpt
-tv_ctrlpt_CPPFLAGS = \
+noinst_PROGRAMS += tv_ctrlpt-1.8
+tv_ctrlpt_1_8_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-I$(srcdir)/common/ \
 	-I$(srcdir)/tvctrlpt
 if ENABLE_DEVICE
-noinst_PROGRAMS += tv_combo
-tv_combo_CPPFLAGS = $(AM_CPPFLAGS) \
+noinst_PROGRAMS += tv_combo-1.8
+tv_combo_1_8_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(srcdir)/common/ \
 	-I$(srcdir)/tvcombo
 endif
 endif
 if ENABLE_DEVICE
-noinst_PROGRAMS += tv_device
-tv_device_CPPFLAGS = \
+noinst_PROGRAMS += tv_device-1.8
+tv_device_1_8_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-I$(srcdir)/common/ \
 	-I$(srcdir)/tvdevice
 endif
 endif
 
-tv_device_SOURCES = \
+tv_device_1_8_SOURCES = \
 	common/sample_util.c \
 	common/sample_util.h \
 	common/tv_device.c \
 	common/tv_device.h \
 	linux/tv_device_main.c
 
-tv_ctrlpt_SOURCES = \
+tv_ctrlpt_1_8_SOURCES = \
 	common/sample_util.c \
 	common/sample_util.h \
 	common/tv_ctrlpt.c \
 	common/tv_ctrlpt.h \
 	linux/tv_ctrlpt_main.c
 
-tv_combo_SOURCES = \
+tv_combo_1_8_SOURCES = \
 	common/sample_util.c \
 	common/sample_util.h \
 	common/tv_ctrlpt.c \
@@ -65,8 +65,8 @@ tv_combo_SOURCES = \
 if WITH_DOCUMENTATION
 examplesdir = $(docdir)/examples
 examples_DATA = \
-	$(tv_ctrlpt_SOURCES) \
-	$(tv_device_SOURCES)
+	$(tv_ctrlpt_1_8_SOURCES) \
+	$(tv_device_1_8_SOURCES)
 endif
 
 EXTRA_DIST = \
