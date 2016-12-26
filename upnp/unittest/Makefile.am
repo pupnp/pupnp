@@ -16,12 +16,12 @@ LDADD = \
 	$(top_builddir)/ixml/libixml-1.8.la
 
 #unittest
-noinst_PROGRAMS = unittest
+noinst_PROGRAMS = unittest-1.8
 
-unittest_CPPFLAGS = \
+unittest_1_8_CPPFLAGS = \
 	$(AM_CPPFLAGS)
 
-unittest_SOURCES = \
+unittest_1_8_SOURCES = \
 	main.c \
 	templates/FirstObject.c \
 	templates/FirstObject.h \
