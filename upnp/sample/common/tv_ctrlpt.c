@@ -1461,7 +1461,9 @@ void *TvCtrlPointCommandLoop(void *args)
 
 	while (1) {
 		SampleUtil_Print("\n>> ");
-		fgets(cmdline, 100, stdin);
+		char *s = fgets(cmdline, 100, stdin);
+		if (!s)
+			break;
 		TvCtrlPointProcessCommand(cmdline);
 	}
 
