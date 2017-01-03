@@ -1397,7 +1397,9 @@ void *TvDeviceCommandLoop(void *args)
 		sprintf(cmd, " ");
 		SampleUtil_Print("\n>> ");
 		/* Get a command line */
-		fgets(cmdline, 100, stdin);
+		char *s = fgets(cmdline, 100, stdin);
+		if (!s)
+			break;
 		sscanf(cmdline, "%s", cmd);
 		if (strcasecmp(cmd, "exit") == 0) {
 			SampleUtil_Print("Shutting down...\n");
