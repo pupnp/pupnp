@@ -2,11 +2,6 @@
 Version 1.8.1
 *******************************************************************************
 
-2016-12-16 Peter Pramberger <peterpramb(at)users.sf.net>
-
-	ixml/test/test_document.c is missing the string.h include, therefore
-	the compiler complains about an implicit declaration.
-
 
 *******************************************************************************
 Version 1.8.0
@@ -15,7 +10,6 @@ Version 1.8.0
 2014-01-15 Peng <howtofly(at)gmail.com>
 
 	Fix memory leaks.
-
 
 2013-04-27 Thijs Schreijer <thijs(at)thijsschreijer.nl>
 
@@ -367,6 +361,15 @@ Version 1.8.0
 2008-02-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Rewrote Peter Hartley's patch to include a new extra header field in
 	FileInfo.
+
+*******************************************************************************
+Version 1.6.22
+*******************************************************************************
+
+2016-12-16 Peter Pramberger <peterpramb(at)users.sf.net>
+
+	ixml/test/test_document.c is missing the string.h include, therefore
+	the compiler complains about an implicit declaration.
 
 *******************************************************************************
 Version 1.6.21
