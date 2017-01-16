@@ -2,6 +2,10 @@
 Version 1.8.1
 *******************************************************************************
 
+2016-12-16 Peter Pramberger <peterpramb(at)users.sf.net>
+
+	ixml/test/test_document.c is missing the string.h include, therefore
+	the compiler complains about an implicit declaration.
 
 
 *******************************************************************************
