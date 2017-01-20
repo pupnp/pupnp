@@ -32,8 +32,8 @@ result(const struct test *test)
 }
 
 /* The URLs must be resolvale! */
-static const char ABS_URL1[] = "http://www.libupnp.org/path1/";
-static const char ABS_URL2[] = "http://www.libupnp.org/path1/path1";
+static const char ABS_URL1[] = "http://pupnp.sourceforge.net/path1/";
+static const char ABS_URL2[] = "http://pupnp.sourceforge.net/path1/path1";
 static const char ABS_URL3[] = "http://localhost/path1/";
 static const char ABS_URL4[] = "http://127.0.0.1/path1/";
 static const char ABS_URL5[] = "http://127.0.0.1:6544/path1/";
@@ -47,30 +47,32 @@ static const char REL_URL5[] = "?query1";
 static const char REL_URL6[] = "#frag1";
 
 static const char ABS_RFC[] = "http://localhost/b/c/d;p?q";
-// s,\<a\>,localhost,
-// s,//g\>,//127.0.0.1,
+/*
+s,\<a\>,localhost,
+s,//g\>,//127.0.0.1,
+*/
 
 static const struct test RFC3986[] = {
-	// Errors
+	/* Errors */
 	TEST(NULL,     NULL,  NULL, UPNP_E_INVALID_PARAM),
 	TEST(ABS_URL1, NULL,  NULL, UPNP_E_INVALID_PARAM),
 	TEST("foo",    "bar", NULL, UPNP_E_INVALID_URL),
-	// Custom
+	/* Custom */
 	TEST(NULL,     ABS_URL1, ABS_URL1),
 	TEST(ABS_URL1, ABS_URL2, ABS_URL2),
 	TEST(ABS_URL1, "",       ABS_URL1),
 	TEST(ABS_URL1, REL_URL1, "http://localhost/path2"),
 	TEST(ABS_URL2, REL_URL1, "http://localhost/path2"),
-	TEST(ABS_URL1, REL_URL2, "http://www.libupnp.org/path3"),
-	TEST(ABS_URL2, REL_URL2, "http://www.libupnp.org/path3"),
-	TEST(ABS_URL1, REL_URL3, "http://www.libupnp.org/path1/path4"),
-	TEST(ABS_URL2, REL_URL3, "http://www.libupnp.org/path1/path4"),
-	TEST(ABS_URL1, REL_URL4, "http://www.libupnp.org/path5"),
-	TEST(ABS_URL2, REL_URL4, "http://www.libupnp.org/path5"),
-	TEST(ABS_URL1, REL_URL6, "http://www.libupnp.org/path1/#frag1"),
-	TEST(ABS_URL2, REL_URL6, "http://www.libupnp.org/path1/path1#frag1"),
+	TEST(ABS_URL1, REL_URL2, "http://pupnp.sourceforge.net/path3"),
+	TEST(ABS_URL2, REL_URL2, "http://pupnp.sourceforge.net/path3"),
+	TEST(ABS_URL1, REL_URL3, "http://pupnp.sourceforge.net/path1/path4"),
+	TEST(ABS_URL2, REL_URL3, "http://pupnp.sourceforge.net/path1/path4"),
+	TEST(ABS_URL1, REL_URL4, "http://pupnp.sourceforge.net/path5"),
+	TEST(ABS_URL2, REL_URL4, "http://pupnp.sourceforge.net/path5"),
+	TEST(ABS_URL1, REL_URL6, "http://pupnp.sourceforge.net/path1/#frag1"),
+	TEST(ABS_URL2, REL_URL6, "http://pupnp.sourceforge.net/path1/path1#frag1"),
 	TEST("http://127.0.0.1:6544/getDeviceDesc", "CDS_Event", "http://127.0.0.1:6544/CDS_Event"),
-	// <http://tools.ietf.org/html/rfc3986#section-5.4.1> Normal Examples
+	/* <http://tools.ietf.org/html/rfc3986#section-5.4.1> Normal Examples */
 	TEST(ABS_RFC, "g:h",         "g:h"),
 	TEST(ABS_RFC, "g",           "http://localhost/b/c/g"),
 	TEST(ABS_RFC, "./g",         "http://localhost/b/c/g"),
@@ -94,7 +96,7 @@ static const struct test RFC3986[] = {
 	TEST(ABS_RFC, "../..",       "http://localhost/"),
 	TEST(ABS_RFC, "../../",      "http://localhost/"),
 	TEST(ABS_RFC, "../../g",     "http://localhost/g"),
-	// <http://tools.ietf.org/html/rfc3986#section-5.4.2> Abnormal Examples
+	/* <http://tools.ietf.org/html/rfc3986#section-5.4.2> Abnormal Examples */
 	TEST(ABS_RFC, "../../../g",    "http://localhost/g"),
 	TEST(ABS_RFC, "../../../../g", "http://localhost/g"),
 	TEST(ABS_RFC, "/./g",          "http://localhost/g"),
@@ -128,4 +130,6 @@ main (int argc, char* argv[])
 	exit (ret ? EXIT_FAILURE : EXIT_SUCCESS);
 }
 
-// gcc -o url-test -g url-test.c -I ixml/inc -I threadutil/inc -I upnp/inc upnp/.libs/libupnp.a -L ixml/.libs -lixml -L threadutil/.libs -lthreadutil -lpthread
+/*
+ gcc -o url-test -g url-test.c -I ixml/inc -I threadutil/inc -I upnp/inc upnp/.libs/libupnp.a -L ixml/.libs -lixml -L threadutil/.libs -lthreadutil -lpthread
+ */
