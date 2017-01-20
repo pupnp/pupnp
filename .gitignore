@@ -107,9 +107,14 @@ stamp-h1
 upnp/inc/stamp-h2
 upnp/inc/upnpconfig.h
 upnp/sample/tv_combo
+upnp/sample/tv_combo-1.8
 upnp/sample/tv_ctrlpt
+upnp/sample/tv_ctrlpt-1.8
 upnp/sample/tv_device
+upnp/sample/tv_device-1.8
+upnp/test/test_url
 upnp/unittest/unittest
+upnp/unittest/unittest-1.8
 upnp/unittest/*.pp.c
 docs/doxygen
 
