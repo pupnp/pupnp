@@ -181,7 +181,7 @@
 #define UPNP_VERSION_MINOR 8
 
 /* see upnpconfig.h */
-#define UPNP_VERSION_PATCH 0
+#define UPNP_VERSION_PATCH 1
 
 /* see upnpconfig.h */
 #define UPNP_VERSION_STRING "1.8.1"
