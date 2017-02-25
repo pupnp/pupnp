@@ -10,7 +10,7 @@ AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc \
 if ENABLE_DEBUG
     AM_CPPFLAGS		+= -DDEBUG -DSTATS
 else
-    AM_CPPFLAGS		+= -DNO_DEBUG -DNDEBUG
+    AM_CPPFLAGS		+= -DNDEBUG
 endif
 
 

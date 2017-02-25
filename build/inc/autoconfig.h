@@ -92,9 +92,6 @@
 /* Define to 1 to prevent compilation of assert() */
 #define NDEBUG 1
 
-/* Define to 1 to prevent some debug code */
-#define NO_DEBUG 1
-
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 /* #undef NO_MINUS_C_MINUS_O */
 
