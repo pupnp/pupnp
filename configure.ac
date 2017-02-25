@@ -402,7 +402,6 @@ if test "x$enable_debug" = xyes ; then
 	AC_DEFINE(UPNP_HAVE_DEBUG, 1, [see upnpconfig.h])
 	AC_DEFINE(DEBUG, 1, [Define to 1 to compile debug code])
 else
-	AC_DEFINE(NO_DEBUG, 1, [Define to 1 to prevent some debug code])
 	AC_DEFINE(NDEBUG, 1, [Define to 1 to prevent compilation of assert()])
 fi
 
