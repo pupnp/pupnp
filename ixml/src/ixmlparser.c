@@ -35,6 +35,7 @@
  * \file
  */
 
+#include "autoconfig.h"
 
 #include "ixmlparser.h"
 
