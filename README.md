@@ -93,8 +93,6 @@ NEWS		| Changes and new features.
 ixml\doc	| The files for generating the XML parser documentation from the source code.
 ixml\inc	| The public include files required to use the XML parser.
 ixml\src	| The source code to the XML parser library.
-threadutil\inc	| The public include files required to the threading utility library.
-threadutil\src	| The source code to the threading utility library.
 upnp\doc	| The files for generating the SDK documentation from the source code.
 upnp\inc	| The public include files required to use the SDK.
 upnp\src      	| The source files comprising the SDK, libupnp.so.

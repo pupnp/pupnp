@@ -10,7 +10,6 @@ DISTCHECK_CONFIGURE_FLAGS = --enable-debug --enable-samples
 
 SUBDIRS = \
 	ixml \
-	threadutil \
 	upnp \
 	docs/dist
 

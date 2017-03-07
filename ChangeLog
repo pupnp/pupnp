@@ -2,6 +2,14 @@
 Version 1.8.1
 *******************************************************************************
 
+2017-03-07 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
+
+	Move threadutil source code to libupnp
+
+	With this patch, threadutil library is removed as the only public
+	header that has been kept in 1.8.x is ithread.h which is mainly a
+	wrapper to pthread with inline functions.
+	threadutil source code will now be a part of libupnp library.
 
 *******************************************************************************
 Version 1.8.0

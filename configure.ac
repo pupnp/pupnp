@@ -339,12 +339,10 @@ dnl #
 dnl # - 
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [::])
-dnl #AC_SUBST([LT_VERSION_THREADUTIL], [::])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
 dnl #
 dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [10:0:0])
-AC_SUBST([LT_VERSION_THREADUTIL], [10:0:0])
 AC_SUBST([LT_VERSION_UPNP],       [10:0:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
@@ -715,7 +713,6 @@ AC_CONFIG_FILES([
 	Makefile
 	ixml/Makefile
 	ixml/doc/Makefile
-	threadutil/Makefile
 	upnp/Makefile
 	upnp/doc/Makefile
 	upnp/sample/Makefile

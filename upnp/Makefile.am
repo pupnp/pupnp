@@ -8,12 +8,10 @@ SUBDIRS = doc . sample unittest
 
 AM_CPPFLAGS = \
 	-I$(srcdir)/inc \
-	-I$(top_srcdir)/threadutil/inc \
 	-I$(top_srcdir)/ixml/inc
 
 LDADD = \
 	libupnp-1.8.la \
-	$(top_builddir)/threadutil/libthreadutil-1.8.la \
 	$(top_builddir)/ixml/libixml-1.8.la
 
 
@@ -56,7 +54,6 @@ libupnp_1_8_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/src/inc
 libupnp_1_8_la_LDFLAGS = \
 	-version-info $(LT_VERSION_UPNP) \
 	-export-symbols-regex '^Upnp.*' \
-	$(top_builddir)/threadutil/libthreadutil-1.8.la \
 	$(top_builddir)/ixml/libixml-1.8.la
 
 libupnp_1_8_la_SOURCES = \
@@ -93,6 +90,21 @@ libupnp_1_8_la_SOURCES = \
 	src/inc/uuid.h \
 	src/inc/VirtualDir.h \
 	src/inc/webserver.h
+
+# threadutil
+upnpinclude_HEADERS += \
+	inc/ithread.h
+
+libupnp_1_8_la_CPPFLAGS += -I$(srcdir)/src/threadutil
+libupnp_1_8_la_SOURCES += \
+	src/threadutil/FreeList.h \
+	src/threadutil/FreeList.c \
+	src/threadutil/LinkedList.h \
+	src/threadutil/LinkedList.c \
+	src/threadutil/ThreadPool.h \
+	src/threadutil/ThreadPool.c \
+	src/threadutil/TimerThread.h \
+	src/threadutil/TimerThread.c
 
 # ssdp
 if ENABLE_SSDP
@@ -158,6 +170,9 @@ endif
 
 if ENABLE_DEBUG
 libupnp_1_8_la_SOURCES += src/api/upnpdebug.c 
+AM_CPPFLAGS         += -DDEBUG -DSTATS
+else
+AM_CPPFLAGS         += -DNDEBUG
 endif
 
 

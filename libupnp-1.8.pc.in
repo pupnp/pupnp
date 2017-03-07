@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: libupnp-1.8
 Description: Linux SDK for UPnP Devices
 Version: @VERSION@
-Libs: @PTHREAD_CFLAGS@ @PTHREAD_LIBS@ -L${libdir} -lupnp-1.8 -lthreadutil-1.8 -lixml-1.8
+Libs: @PTHREAD_CFLAGS@ @PTHREAD_LIBS@ -L${libdir} -lupnp-1.8 -lixml-1.8
 Cflags: @PTHREAD_CFLAGS@ -I${includedir}/upnp-1.8
 
