@@ -24,7 +24,6 @@ top_srcdir=../../..
 INCLUDES=
 INCLUDES="${INCLUDES} -I${top_srcdir}"
 INCLUDES="${INCLUDES} -I${top_srcdir}/ixml/inc"
-INCLUDES="${INCLUDES} -I${top_srcdir}/threadutil/inc" \
 INCLUDES="${INCLUDES} -I${top_srcdir}/upnp/inc" \
 INCLUDES="${INCLUDES} -I${top_srcdir}/upnp/src/inc"
 

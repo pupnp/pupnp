@@ -6,13 +6,11 @@
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/upnp/inc \
-	-I$(top_srcdir)/threadutil/inc \
 	-I$(top_srcdir)/ixml/inc \
 	-I$(top_srcdir)/upnp/src/inc
 
 LDADD = \
 	$(top_builddir)/upnp/libupnp-1.8.la \
-	$(top_builddir)/threadutil/libthreadutil-1.8.la \
 	$(top_builddir)/ixml/libixml-1.8.la
 
 #unittest
