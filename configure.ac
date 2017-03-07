@@ -494,6 +494,11 @@ if test "x$enable_postwrite" = xyes ; then
         AC_DEFINE(UPNP_ENABLE_POST_WRITE, 1, [see upnpconfig.h])
 fi
 
+RT_BOOL_ARG_ENABLE([reuseaddr], [no], [bind the miniserver socket with reuseaddr to allow clean restarts])
+if test "x$enable_reuseaddr" = xyes ; then
+        AC_DEFINE(UPNP_MINISERVER_REUSEADDR, 1, [see upnpconfig.h])
+fi
+
 RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 
 
