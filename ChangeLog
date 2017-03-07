@@ -4,6 +4,10 @@ Version 1.8.1
 
 2017-03-07 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
 
+	Enable IPv6 by default
+
+2017-03-07 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
+
 	Move threadutil source code to libupnp
 
 	With this patch, threadutil library is removed as the only public
