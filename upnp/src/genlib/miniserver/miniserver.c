@@ -523,7 +523,12 @@ static int get_miniserver_sockets(
 	uint16_t actual_port6 = 0u;
 #endif
 	int ret_code;
+#ifdef UPNP_MINISERVER_REUSEADDR
+	int reuseaddr_on = 1;
+#else
 	int reuseaddr_on = 0;
+#endif
+
 	int sockError = UPNP_E_SUCCESS;
 	int errCode = 0;
 
