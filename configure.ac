@@ -659,6 +659,7 @@ fi
 # Checks for typedefs, structures, and compiler characteristics
 #	
 AC_C_CONST
+AC_C_BIGENDIAN
 
 # The test for socklen_t was getting it wrong when it exists but is in ws2tcpip.h,
 # so we use a new test.
