@@ -2,6 +2,28 @@
 Version 1.8.1
 *******************************************************************************
 
+2017-07-07 James Cowgill <james410(at)cowgill.org.uk>
+
+	Replace MD5 impmplementation with public-domain version
+
+	Currently the RSA MD5 implementation is used. Unfortunately the license
+	has some potential issues:
+	* The license does not explicitly allow distributing derivative works.
+	This was the original argument used in
+	[Debian #459516](https://bugs.debian.org/459516).
+	* The license contains an advertising clause similar to the BSD 4-clause
+	license. This is incompatible with the GPL and if it were enforced,
+	would require RSA to be mentioned by pretty much everyone who uses pupnp.
+
+	The simple solution is to replace it with a public domain
+	implementation. I've taken OpenBSDs implementation and tweaked it
+	slightly for use by pupnp by:
+	- Adjusting the includes.
+	- Removing the __bounded__ attributes which are specific to OpenBSD.
+	- Using the standard integer types from stdint.h.
+	- Using memset instead of explicit_bzero.
+
+
 2017-03-07 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
 
 	Enable IPv6 by default
