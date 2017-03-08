@@ -614,9 +614,9 @@ static int get_miniserver_sockets(
 				return UPNP_E_SOCKET_BIND;
 			}
 			serverAddr4->sin_port = htons(listen_port4);
-			sockError = bind(listenfd4,
-				(struct sockaddr *)&__ss_v4,
-				sizeof (__ss_v4));
+                        sockError = bind(listenfd4,
+                                (struct sockaddr *)serverAddr4,
+                                sizeof(*serverAddr4));
 			if (sockError == SOCKET_ERROR) {
 				strerror_r(errno, errorBuffer,
 					ERROR_BUFFER_LEN);
@@ -644,9 +644,9 @@ static int get_miniserver_sockets(
 				return UPNP_E_SOCKET_BIND;
 			}
 			serverAddr6->sin6_port = htons(listen_port6);
-			sockError = bind(listenfd6,
-				(struct sockaddr *)&__ss_v6,
-				sizeof (__ss_v6));
+                        sockError = bind(listenfd6,
+                                (struct sockaddr *)serverAddr6,
+                                sizeof(*serverAddr6));
 			if (sockError == SOCKET_ERROR) {
 				strerror_r(errno, errorBuffer,
 					ERROR_BUFFER_LEN);

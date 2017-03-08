@@ -55,6 +55,8 @@ modules.builtin
 include/config
 include/linux/version.h
 include/generated
+build/inc/autoconfig.h
+build/inc/upnpconfig.h
 
 # stgit generated dirs
 patches-*
