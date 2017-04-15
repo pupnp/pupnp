@@ -1,4 +1,4 @@
-#Portable SDK for UPnP\* Devices (libupnp)
+# Portable SDK for UPnP\* Devices (libupnp)
 
 Copyright (c) 2000-2003 Intel Corporation - All Rights Reserved.
 
@@ -135,12 +135,14 @@ function.
 
 ## 5. Build Instructions
 
-###CORE LIBRARIES
+### CORE LIBRARIES
 
-The in the examples below, replace $(LIBUPNP) with "libupnp-x.y.z",
+The in the examples below, replace `$(LIBUPNP)` with "libupnp-x.y.z",
 with x, y, and z corresponding to the version of the library that you have.
 
-All pieces of the SDK are configured and built from the $(LIBUPNP) directory. 
+All pieces of the SDK are configured and built from the `$(LIBUPNP)` directory. 
+
+Note: On a git checkout, you need to run `./bootstrap` to generate the configure script.
 
 ```
 % cd $(LIBUPNP)
