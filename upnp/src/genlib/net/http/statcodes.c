@@ -41,7 +41,7 @@
 #include "upnputil.h"
 #include "statcodes.h"
 
-#ifdef WIN32
+#ifdef _WIN32
  #include "unixutil.h"
 #endif
 

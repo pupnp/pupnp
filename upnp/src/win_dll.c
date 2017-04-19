@@ -1,7 +1,7 @@
 // upnpLib.cpp : Defines the entry point for the DLL application.
 //
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include <windows.h>
 BOOL APIENTRY DllMain( HANDLE hModule, 

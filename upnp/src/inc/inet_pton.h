@@ -1,7 +1,7 @@
 #ifndef INET_PTON
 #define INET_PTON
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #ifdef IPV6_
 #define INET_IPV6
@@ -45,6 +45,6 @@ extern const char *inet_ntop(int af, const void *src, char *dst,
  */
 extern int inet_pton(int af, const char *src, void *dst);
 
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #endif /* INET_PTON */

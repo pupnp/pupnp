@@ -64,7 +64,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 	 #define snprintf _snprintf
 #endif
 
@@ -135,7 +135,7 @@ static const char *gMediaTypes[] = {
 #define NUM_HTTP_HEADER_NAMES 33
 
 #define ASCTIME_R_BUFFER_SIZE 26
-#ifdef WIN32
+#ifdef _WIN32
 static char *web_server_asctime_r(const struct tm *tm, char *buf)
 {
 	if (tm == NULL || buf == NULL)

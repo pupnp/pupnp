@@ -116,7 +116,7 @@ void linecopylen(
 /* C specific */
 /* VC needs these in C++ mode too (do other compilers?) */
 #if !defined(__cplusplus) || defined(UPNP_USE_MSVCPP)
-	#ifdef WIN32
+	#ifdef _WIN32
 		#ifndef S_ISREG
 			#define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
 		#endif
@@ -134,7 +134,7 @@ void linecopylen(
 	#else
 		#define max(a, b)   (((a)>(b))? (a):(b))
 		#define min(a, b)   (((a)<(b))? (a):(b))
-	#endif /* WIN32 */
+	#endif /* _WIN32 */
 #endif /* !defined(__cplusplus) || defined(UPNP_USE_MSVCPP) */
 
 #endif /* UTIL_H */

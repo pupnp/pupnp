@@ -185,7 +185,7 @@ void UpnpDisplayFileAndLine(FILE *fd, const char *DbgFileName, int DbgLineNo)
 		lines[i] = buf[i];
 	/* Put the debug lines in the buffer */
 	sprintf(buf[0], "DEBUG - THREAD ID: 0x%lX",
-#ifdef WIN32
+#ifdef _WIN32
 		(unsigned long int)ithread_self().p
 #else
 		(unsigned long int)ithread_self()

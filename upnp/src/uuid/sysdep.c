@@ -57,7 +57,7 @@ void get_ieee_node_identifier(uuid_node_t *node)
  * than 100ns.
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 
 void get_system_time(uuid_time_t *uuid_time)
 {
@@ -110,7 +110,7 @@ void get_random_info(unsigned char seed[16])
 	MD5Final(seed, &c);
 };
 
-#else /* WIN32 */
+#else /* _WIN32 */
 
 void get_system_time(uuid_time_t *uuid_time)
 {
@@ -149,4 +149,4 @@ void get_random_info(unsigned char seed[16])
 	MD5Final(seed, &c);
 };
 
-#endif /* WIN32 */
+#endif /* _WIN32 */

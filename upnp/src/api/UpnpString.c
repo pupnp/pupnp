@@ -22,7 +22,7 @@
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
 
-#ifdef WIN32
+#ifdef _WIN32
 	#define strcasecmp stricmp
 #else
 	/* Other systems have strncasecmp */
@@ -38,10 +38,10 @@
 			return p ? p - s : n;
 		}
 	#endif /* !HAVE_STRNLEN */
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 /* strndup() is a GNU extension. */
-#if !HAVE_STRNDUP || defined(WIN32)
+#if !HAVE_STRNDUP || defined(_WIN32)
 	static char *strndup(const char *__string, size_t __n)
 	{
 		size_t strsize = strnlen(__string, __n);
@@ -54,7 +54,7 @@
 
 		return newstr;
 	}
-#endif /* HAVE_STRNDUP && !defined(WIN32) */
+#endif /* HAVE_STRNDUP && !defined(_WIN32) */
 
 /*!
  * \brief Internal implementation of the class UpnpString.
