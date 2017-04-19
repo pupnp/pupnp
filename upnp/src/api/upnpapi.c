@@ -3369,7 +3369,8 @@ int UpnpGetIfInfo(const char *IfName)
 		ifname_found = 1;
 	}
 	for (adapts_item = adapts; adapts_item != NULL; adapts_item = adapts_item->Next) {
-		if (adapts_item->Flags & IP_ADAPTER_NO_MULTICAST) {
+		if (adapts_item->Flags & IP_ADAPTER_NO_MULTICAST ||
+			adapts_item->OperStatus != IfOperStatusUp) {
 			continue;
 		}
 		if (ifname_found == 0) {
