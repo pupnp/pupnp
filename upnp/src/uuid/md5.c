@@ -22,21 +22,27 @@
 
 #include <string.h>
 
-#define PUT_64BIT_LE(cp, value) do {					\
-	(cp)[7] = (value) >> 56;					\
-	(cp)[6] = (value) >> 48;					\
-	(cp)[5] = (value) >> 40;					\
-	(cp)[4] = (value) >> 32;					\
-	(cp)[3] = (value) >> 24;					\
-	(cp)[2] = (value) >> 16;					\
-	(cp)[1] = (value) >> 8;						\
-	(cp)[0] = (value); } while (0)
+#define PUT_BIT_LE(i, cp, value) do {			\
+	(cp)[i] = (uint8_t)(((value) >> 8 * i) & 0xFF);	\
+} while (0)
 
-#define PUT_32BIT_LE(cp, value) do {					\
-	(cp)[3] = (value) >> 24;					\
-	(cp)[2] = (value) >> 16;					\
-	(cp)[1] = (value) >> 8;						\
-	(cp)[0] = (value); } while (0)
+#define PUT_64BIT_LE(cp, value) do {	\
+	PUT_BIT_LE(7, cp, value);	\
+	PUT_BIT_LE(6, cp, value);	\
+	PUT_BIT_LE(5, cp, value);	\
+	PUT_BIT_LE(4, cp, value);	\
+	PUT_BIT_LE(3, cp, value);	\
+	PUT_BIT_LE(2, cp, value);	\
+	PUT_BIT_LE(1, cp, value);	\
+	PUT_BIT_LE(0, cp, value);	\
+} while (0)
+
+#define PUT_32BIT_LE(cp, value) do {	\
+	PUT_BIT_LE(3, cp, value);	\
+	PUT_BIT_LE(2, cp, value);	\
+	PUT_BIT_LE(1, cp, value);	\
+	PUT_BIT_LE(0, cp, value);	\
+} while (0)
 
 static uint8_t PADDING[MD5_BLOCK_LENGTH] = {
 	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
