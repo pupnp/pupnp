@@ -2,6 +2,10 @@
 Version 1.6.22
 *******************************************************************************
 
+2017-04-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	Fix some compiler warning messages on md5.c
+
 2017-07-07 James Cowgill <james410(at)cowgill.org.uk>
 
 	Replace MD5 impmplementation with public-domain version
