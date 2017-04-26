@@ -83,41 +83,33 @@
  *  (i.e. configure --enable-debug) : <upnp/upnpdebug.h> file is available */
 #undef UPNP_HAVE_DEBUG
 
-
 /** Defined to 1 if the library has been compiled with client API enabled 
  *  (i.e. configure --enable-client) */
 #undef UPNP_HAVE_CLIENT
-
 
 /** Defined to 1 if the library has been compiled with device API enabled 
  *  (i.e. configure --enable-device) */
 #undef UPNP_HAVE_DEVICE
 
-
 /** Defined to 1 if the library has been compiled with integrated web server
  *  (i.e. configure --enable-webserver --enable-device) */
 #undef UPNP_HAVE_WEBSERVER
-
 
 /** Defined to 1 if the library has been compiled with the SSDP part enabled
  *  (i.e. configure --enable-ssdp) */
 #undef UPNP_HAVE_SSDP
 
-
 /** Defined to 1 if the library has been compiled with optional SSDP headers
  *  support (i.e. configure --enable-optssdp) */
 #undef UPNP_HAVE_OPTSSDP
-
 
 /** Defined to 1 if the library has been compiled with the SOAP part enabled
  *  (i.e. configure --enable-soap) */
 #undef UPNP_HAVE_SOAP
 
-
 /** Defined to 1 if the library has been compiled with the GENA part enabled
  *  (i.e. configure --enable-gena) */
 #undef UPNP_HAVE_GENA
-
 
 /** Defined to 1 if the library has been compiled with helper API
  *  (i.e. configure --enable-tools) : <upnp/upnptools.h> file is available */
@@ -139,6 +131,8 @@
  *  (i.e. configure --enable-postwrite) */
 #undef UPNP_ENABLE_POST_WRITE
 
+/** Defined to 1 if the library has been compiled bind the miniserver socket with SO_REUSEADDR
+ *  (i.e. configure --enable_reuseaddr) */
+#undef UPNP_MINISERVER_REUSEADDR
 
 #endif /* UPNP_CONFIG_H */
-
