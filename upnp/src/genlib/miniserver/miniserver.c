@@ -671,7 +671,7 @@ static int get_miniserver_sockets(
 					(struct sockaddr *)serverAddr4,
 					sizeof(*serverAddr4));
 				if (sockError == SOCKET_ERROR) {
-#ifdef WIN32
+#ifdef _WIN32
 					errCode = WSAGetLastError();
 #else
 					errCode = errno;
@@ -709,7 +709,7 @@ static int get_miniserver_sockets(
 					(struct sockaddr *)serverAddr6,
 					sizeof(*serverAddr6));
 				if (sockError == SOCKET_ERROR) {
-#ifdef WIN32
+#ifdef _WIN32
 					errCode = WSAGetLastError();
 #else
 					errCode = errno; 

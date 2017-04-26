@@ -36,7 +36,7 @@
  * \file
  */
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 	#include <sys/param.h>
 #endif
 
@@ -51,7 +51,7 @@
 #include <sys/types.h>
 #include <time.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 	#ifndef UPNP_USE_MSVCPP
 		/* VC Winsocks2 includes these functions */
 		#include "inet_pton.h"
@@ -60,7 +60,7 @@
 	#include <netdb.h>      /* for struct addrinfo */
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 	#define strncasecmp strnicmp
 #else
 	/* Other systems have strncasecmp */
@@ -97,7 +97,7 @@ enum pathType {
 	OPAQUE_PART
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 	/* there is a conflict in windows with other symbols. */
 	enum uriType  {
 		absolute,

@@ -49,7 +49,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 	#define snprintf _snprintf
 #else
 	#include <sys/types.h>

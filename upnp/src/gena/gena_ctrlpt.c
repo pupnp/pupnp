@@ -53,7 +53,7 @@
 #include "uuid.h"
 #include "upnpapi.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 	#define snprintf _snprintf
 #endif
 

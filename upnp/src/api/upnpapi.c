@@ -3368,10 +3368,9 @@ int UpnpGetIfInfo(const char *IfName)
 		strncpy(gIF_NAME, IfName, sizeof(gIF_NAME) - 1);
 		ifname_found = 1;
 	}
-	adapts_item = adapts;
-	while (adapts_item != NULL) {
-		if (adapts_item->Flags & IP_ADAPTER_NO_MULTICAST) {
-			adapts_item = adapts_item->Next;
+	for (adapts_item = adapts; adapts_item != NULL; adapts_item = adapts_item->Next) {
+		if (adapts_item->Flags & IP_ADAPTER_NO_MULTICAST ||
+			adapts_item->OperStatus != IfOperStatusUp) {
 			continue;
 		}
 		if (ifname_found == 0) {
@@ -3457,8 +3456,6 @@ int UpnpGetIfInfo(const char *IfName)
 			gIF_INDEX = adapts_item->IfIndex;
 			break;
 		}
-		/* Next adapter. */
-		adapts_item = adapts_item->Next;
 	}
 	/* Failed to find a valid interface, or valid address. */
 	if (ifname_found == 0 || valid_addr_found == 0) {

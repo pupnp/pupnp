@@ -51,8 +51,8 @@
 #include <setjmp.h>
 #include <errno.h>
 
-#ifdef WIN32
-#else /* WIN32 */
+#ifdef _WIN32
+#else /* _WIN32 */
 	#include <syslog.h>
 	#ifndef __APPLE__
 		#include <netinet/in_systm.h>
@@ -60,7 +60,7 @@
 		#include <netinet/ip_icmp.h>
 	#endif /* __APPLE__ */
 	#include <sys/time.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 /*! Enumeration to define all different types of ssdp searches */
 typedef enum SsdpSearchType {

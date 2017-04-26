@@ -56,7 +56,7 @@
 #include <assert.h>
 #include <stdarg.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 	#include <malloc.h>
 	#define fseeko fseek
 	#define snprintf _snprintf
@@ -98,7 +98,7 @@ static int Check_Connect_And_Wait_Connection(
 {
 	struct timeval tmvTimeout = {DEFAULT_TCP_CONNECT_TIMEOUT, 0};
 	int result;
-#ifdef WIN32
+#ifdef _WIN32
 	struct fd_set fdSet;
 #else
 	fd_set fdSet;
@@ -107,14 +107,14 @@ static int Check_Connect_And_Wait_Connection(
 	FD_SET(sock, &fdSet);
 
 	if (connect_res < 0) {
-#ifdef WIN32
+#ifdef _WIN32
 		if (WSAEWOULDBLOCK == WSAGetLastError() ) {
 #else
 		if (EINPROGRESS == errno ) {
 #endif
 			result = select(sock + 1, NULL, &fdSet, NULL, &tmvTimeout);
 			if (result < 0) {
-#ifdef WIN32
+#ifdef _WIN32
 				/* WSAGetLastError(); */
 #else
 				/* errno */
@@ -123,7 +123,7 @@ static int Check_Connect_And_Wait_Connection(
 			} else if (result == 0) {
 				/* timeout */
 				return -1;
-#ifndef WIN32
+#ifndef _WIN32
 			} else {
 				int valopt = 0;
 				socklen_t len = sizeof(valopt);
@@ -164,7 +164,7 @@ static int private_connect(
 #endif /* UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS */
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 struct tm *http_gmtime_r(const time_t *clock, struct tm *result)
 {
 	if (clock == NULL || *clock < 0 || result == NULL)
@@ -306,7 +306,7 @@ SOCKET http_Connect(
 	ret_connect = private_connect(connfd,
 		(struct sockaddr *)&url->hostport.IPaddress, sockaddr_len);
 	if (ret_connect == -1) {
-#ifdef WIN32
+#ifdef _WIN32
 		UpnpPrintf(UPNP_CRITICAL, HTTP, __FILE__, __LINE__,
 			"connect error: %d\n", WSAGetLastError());
 #endif
@@ -1984,7 +1984,7 @@ void get_sdk_info(OUT char *info, IN size_t infoSize)
 #ifdef UPNP_ENABLE_UNSPECIFIED_SERVER
 	snprintf(info, infoSize, "Unspecified, UPnP/1.0, Unspecified\r\n");
 #else /* UPNP_ENABLE_UNSPECIFIED_SERVER */
-#ifdef WIN32
+#ifdef _WIN32
 	OSVERSIONINFO versioninfo;
 	versioninfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 

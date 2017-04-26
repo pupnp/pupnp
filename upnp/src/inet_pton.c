@@ -19,8 +19,8 @@
  * \file
  */
 
-/* This file is WIN32 only */
-#ifdef WIN32
+/* This file is _WIN32 only */
+#ifdef _WIN32
 
 #include "inet_pton.h"
 
@@ -320,4 +320,4 @@ int inet_pton(int af, const char *src, void *dst)
 	/* NOTREACHED */
 }
 
-#endif /* WIN32 */
+#endif /* _WIN32 */

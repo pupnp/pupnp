@@ -50,7 +50,7 @@
  * \todo Document the exact reason of these include files and solve this
  * include mess in an include file like UpnpTime.h
  */
-#ifdef WIN32
+#ifdef _WIN32
 	#include <time.h>
 	#ifdef UPNP_USE_MSVCPP
 		#include <sys/types.h>	/* needed for off_t */
