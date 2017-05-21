@@ -23,7 +23,7 @@ EXTRA_DIST = \
 	build/inc/autoconfig.h \
 	build/inc/upnpconfig.h \
 	build/msvc/inttypes.h \
-	build/msvc/stdint.h \
+	build/msvc/stdint.h
 
 
 # This variable must have 'exec' in its name, in order to be installed 
