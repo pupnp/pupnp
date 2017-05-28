@@ -374,6 +374,16 @@ dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:4:0])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [9:6:3])
 dnl #
 dnl ############################################################################
+dnl # Release 1.6.23:
+dnl # "current:revision:age"
+dnl #
+dnl # -
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [::])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [::])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
+dnl #
+dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [2:8:0])
 AC_SUBST([LT_VERSION_THREADUTIL], [6:4:0])
 AC_SUBST([LT_VERSION_UPNP],       [9:6:3])
