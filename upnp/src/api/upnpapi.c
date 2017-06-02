@@ -143,7 +143,7 @@ char gIF_IPV6[INET6_ADDRSTRLEN] = { '\0' };
 char gIF_IPV6_ULA_GUA[INET6_ADDRSTRLEN] = { '\0' };
 
 /*! Contains interface index. (extern'ed in upnp.h) */
-unsigned gIF_INDEX = (unsigned)-1;
+unsigned gIF_INDEX = 0;
 
 /*! local IPv4 port for the mini-server */
 unsigned short LOCAL_PORT_V4;
