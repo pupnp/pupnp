@@ -60,10 +60,10 @@ static FILE *ErrFileHnd = NULL;
 static FILE *InfoFileHnd = NULL;
 
 /*! Name of the error file */
-static const char *errFileName = "IUpnpErrFile.txt";
+static const char *errFileName = "libupnp_err.log";
 
 /*! Name of the info file */
-static const char *infoFileName = "IUpnpInfoFile.txt";
+static const char *infoFileName = "libupnp_info.log";
 
 int UpnpInitLog(void)
 {
@@ -132,8 +132,9 @@ void UpnpPrintf(Upnp_LogLevel DLevel,
 	if (!DebugAtThisLevel(DLevel, Module))
 		return;
 	ithread_mutex_lock(&GlobalDebugMutex);
+
 	va_start(ArgList, FmtStr);
-	if (!DEBUG_TARGET) {
+	if (DEBUG_TARGET) {
 		if (DbgFileName)
 			UpnpDisplayFileAndLine(stdout, DbgFileName, DbgLineNo);
 		vfprintf(stdout, FmtStr, ArgList);
@@ -161,7 +162,7 @@ FILE *GetDebugFile(Upnp_LogLevel DLevel, Dbg_Module Module)
 
 	if (!DebugAtThisLevel(DLevel, Module))
 		ret = NULL;
-	if (!DEBUG_TARGET)
+	if (DEBUG_TARGET)
 		ret = stdout;
 	else if (DLevel == 0)
 		ret = ErrFileHnd;
@@ -173,78 +174,20 @@ FILE *GetDebugFile(Upnp_LogLevel DLevel, Dbg_Module Module)
 
 void UpnpDisplayFileAndLine(FILE *fd, const char *DbgFileName, int DbgLineNo)
 {
-#define NLINES 2
-#define MAX_LINE_SIZE 512
-#define NUMBER_OF_STARS 80
-	const char *lines[NLINES];
-	char buf[NLINES][MAX_LINE_SIZE];
-	int i;
+	char timebuf[26];
+	time_t now = time(NULL);
+	struct tm *timeinfo;
+	timeinfo = localtime(&now);
+	strftime(timebuf, 26, "%Y-%m-%d %H:%M:%S", timeinfo);
 
-	/* Initialize the pointer array */
-	for (i = 0; i < NLINES; i++)
-		lines[i] = buf[i];
-	/* Put the debug lines in the buffer */
-	sprintf(buf[0], "DEBUG - THREAD ID: 0x%lX",
+	fprintf(fd, "%s UPNP: Thread:0x%lX [%s:%d]: ", timebuf,
 #ifdef _WIN32
 		(unsigned long int)ithread_self().p
 #else
 		(unsigned long int)ithread_self()
 #endif
-	    );
-	if (DbgFileName)
-		sprintf(buf[1], "FILE: %s, LINE: %d", DbgFileName, DbgLineNo);
-	/* Show the lines centered */
-	UpnpDisplayBanner(fd, lines, NLINES, NUMBER_OF_STARS);
+	, DbgFileName, DbgLineNo);
 	fflush(fd);
-}
-
-void UpnpDisplayBanner(FILE * fd,
-		       const char **lines, size_t size, size_t starLength)
-{
-	size_t leftMarginLength = starLength / 2 + 1;
-	size_t rightMarginLength = starLength / 2 + 1;
-	size_t i = 0;
-	size_t LineSize = 0;
-	size_t starLengthMinus2 = starLength - 2;
-
-	char *leftMargin = malloc(leftMarginLength);
-	char *rightMargin = malloc(rightMarginLength);
-	char *stars = malloc(starLength + 1);
-	char *currentLine = malloc(starLength + 1);
-	const char *line = NULL;
-
-	memset(stars, '*', starLength);
-	stars[starLength] = 0;
-	memset(leftMargin, 0, leftMarginLength);
-	memset(rightMargin, 0, rightMarginLength);
-	fprintf(fd, "\n%s\n", stars);
-	for (i = 0; i < size; i++) {
-		LineSize = strlen(lines[i]);
-		line = lines[i];
-		while (LineSize > starLengthMinus2) {
-			memcpy(currentLine, line, starLengthMinus2);
-			currentLine[starLengthMinus2] = 0;
-			fprintf(fd, "*%s*\n", currentLine);
-			LineSize -= starLengthMinus2;
-			line += starLengthMinus2;
-		}
-		leftMarginLength = (starLengthMinus2 - LineSize) / 2;
-		if (LineSize % 2 == 0)
-			rightMarginLength = leftMarginLength;
-		else
-			rightMarginLength = leftMarginLength + 1;
-		memset(leftMargin, ' ', leftMarginLength);
-		memset(rightMargin, ' ', rightMarginLength);
-		leftMargin[leftMarginLength] = 0;
-		rightMargin[rightMarginLength] = 0;
-		fprintf(fd, "*%s%s%s*\n", leftMargin, line, rightMargin);
-	}
-	fprintf(fd, "%s\n\n", stars);
-
-	free(currentLine);
-	free(stars);
-	free(rightMargin);
-	free(leftMargin);
 }
 
 #endif /* DEBUG */
