@@ -70,7 +70,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 	/* Do not include these files */
 #else
 	#include <sys/ioctl.h>
@@ -199,7 +199,7 @@ SSL_CTX *gSslCtx = NULL;
 static int WinsockInit(void)
 {
 	int retVal = UPNP_E_SUCCESS;
-#ifdef WIN32
+#ifdef _WIN32
 	WORD wVersionRequested;
 	WSADATA wsaData;
 	int err;
@@ -3318,7 +3318,7 @@ int UpnpDownloadXmlDoc(const char *url, IXML_Document **xmlDoc)
 
 int UpnpGetIfInfo(const char *IfName)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	/* ---------------------------------------------------- */
 	/* WIN32 implementation will use the IpHlpAPI library. */
 	/* ---------------------------------------------------- */
@@ -3936,7 +3936,7 @@ int getlocalhostname(char *out, size_t out_len)
 	char tempstr[INET_ADDRSTRLEN];
 	const char *p = NULL;
 
-#ifdef WIN32
+#ifdef _WIN32
 	struct hostent *h = NULL;
 	struct sockaddr_in LocalAddr;
 

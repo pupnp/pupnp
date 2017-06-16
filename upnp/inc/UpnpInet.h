@@ -13,7 +13,7 @@
 
 #include "UpnpUniStd.h" /* for close() */
 
-#ifdef WIN32
+#ifdef _WIN32
 	#include <stdarg.h>
 	#include <winsock2.h>
 	#include <iphlpapi.h>
@@ -27,7 +27,7 @@
 		typedef ADDRESS_FAMILY sa_family_t;
 	#endif
 
-#else /* WIN32 */
+#else /* _WIN32 */
 	#include <sys/param.h>
 	#if defined(__sun)
 		#include <fcntl.h>
@@ -55,7 +55,7 @@
 
 	/*! Alias to close() to make code more WIN32 tolerant. */
 	#define UpnpCloseSocket close
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 /* @} Sock */
 

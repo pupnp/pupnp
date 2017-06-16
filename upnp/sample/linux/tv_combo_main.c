@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 {
 	int rc;
 	ithread_t cmdloop_thread;
-#ifdef WIN32
+#ifdef _WIN32
 #else
 	int sig;
 	sigset_t sigs_to_catch;
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	if (code !=  0) {
 		return UPNP_E_INTERNAL_ERROR;
 	}
-#ifdef WIN32
+#ifdef _WIN32
 	ithread_join(cmdloop_thread, NULL);
 #else
 	/* Catch Ctrl-C and properly shutdown */

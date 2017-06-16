@@ -2,6 +2,12 @@
 Version 1.8.2
 *******************************************************************************
 
+2015-04-30  Hugo Beauzée-Luyssen <chouquette(at)users.sourceforge.net>
+
+	When building using a strict mode (-std=c++11 instead of -std=gnu++11,
+	for instance), the WIN32 macro isn't defined. The attached patch fixes
+	it by using _WIN32 instead.
+
 2015-02-06 Jean-Francois Dockes <jf@dockes.org>
 
 	Queue events on their subscription object instead of adding them to the

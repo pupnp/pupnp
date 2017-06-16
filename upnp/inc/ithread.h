@@ -37,7 +37,7 @@
  * \file
  */
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 	#include <sys/param.h>
 #endif
 
@@ -236,7 +236,7 @@ static UPNP_INLINE int ithread_cleanup_library(void) {
 static UPNP_INLINE int ithread_initialize_thread(void) {
 	int ret = 0;
 
-#if defined(WIN32) && defined(PTW32_STATIC_LIB)
+#if defined(_WIN32) && defined(PTW32_STATIC_LIB)
 	ret = !pthread_win32_thread_attach_np();
 #endif
 
@@ -258,7 +258,7 @@ static UPNP_INLINE int ithread_initialize_thread(void) {
 static UPNP_INLINE int ithread_cleanup_thread(void) {
 	int ret = 0;
 
-#if defined(WIN32) && defined(PTW32_STATIC_LIB)
+#if defined(_WIN32) && defined(PTW32_STATIC_LIB)
 	ret = !pthread_win32_thread_detach_np();
 #endif
 
@@ -905,7 +905,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *		0 on success, Nonzero on failure.
  *              See man page for sleep (man 3 sleep)
  *****************************************************************************/
-#ifdef WIN32
+#ifdef _WIN32
 	#define isleep(x) Sleep((x)*1000)
 #else
 	#define isleep sleep
@@ -925,7 +925,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
  *		0 on success, Nonzero on failure.
  *              See man page for sleep (man 3 sleep)
  *****************************************************************************/
-#ifdef WIN32
+#ifdef _WIN32
 	#define imillisleep Sleep
 #else
 	#define imillisleep(x) usleep(1000*x)

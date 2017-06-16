@@ -258,7 +258,7 @@ void linux_print(const char *format, ...)
 };
 #endif /* __cplusplus */
 
-#ifdef WIN32
+#ifdef _WIN32
 	#define snprintf	_snprintf
 	#define strcasecmp	stricmp
 #endif

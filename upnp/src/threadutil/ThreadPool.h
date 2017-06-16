@@ -45,7 +45,7 @@
 
 #include <errno.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 	#include <time.h>
 	struct timezone
 	{
@@ -53,7 +53,7 @@
 		int  tz_dsttime;     /* type of dst correction */
 	};
 	int gettimeofday(struct timeval *tv, struct timezone *tz);
-#else /* WIN32 */
+#else /* _WIN32 */
 	#include <sys/param.h>
 	#include <sys/time.h> /* for gettimeofday() */
 	#if defined(__OSX__) || defined(__APPLE__) || defined(__NetBSD__)

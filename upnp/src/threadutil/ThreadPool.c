@@ -34,7 +34,7 @@
  * \file
  */
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 	#include <sys/param.h>
 #endif
 
@@ -263,7 +263,7 @@ static int SetPolicyType(
 #elif defined(__OSX__) || defined(__APPLE__) || defined(__NetBSD__)
 	setpriority(PRIO_PROCESS, 0, 0);
 	retVal = 0;
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	retVal = sched_setscheduler(0, in);
 #elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
 	struct sched_param current;
@@ -415,7 +415,7 @@ static void SetSeed(void)
 	struct timeval t;
   
 	gettimeofday(&t, NULL);
-#if defined(WIN32)
+#if defined(_WIN32)
 	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id().p);
 #elif defined(BSD) || defined(__OSX__) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
 	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id());
@@ -1233,7 +1233,7 @@ int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
 }
 #endif /* STATS */
 
-#ifdef WIN32
+#ifdef _WIN32
 	#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
 		#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
 	#else
@@ -1270,4 +1270,4 @@ int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
 
 		return 0;
 	}
-#endif /* WIN32 */
+#endif /* _WIN32 */
