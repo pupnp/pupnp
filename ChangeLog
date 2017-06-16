@@ -2,6 +2,24 @@
 Version 1.8.2
 *******************************************************************************
 
+2015-02-06 Jean-Francois Dockes <jf@dockes.org>
+
+	Queue events on their subscription object instead of adding them to the
+	thread pool immediately. 
+
+	Events destined for a non-responding control point would flood the
+	thread pool and prevent correct dispatching to other clients, sometimes
+	to the point of disabling the device. Events are now queued without
+	allocating thread resources and properly discarded when a client is not
+	accepting them.
+
+2015-02-03 Jean-Francois Dockes <jf@dockes.org>
+
+	genaInitNotify()/genaInitNotifyExt() and
+	genaNotifyAll()/genaNotifyAllExt() are relatively complicated methods
+	which only differ by the format of an input parameter. This update
+	extracts the common code for easier maintenance, esp. relating to the
+	queueing modifications to follow.
 
 
 *******************************************************************************
