@@ -483,6 +483,8 @@ const char* method_to_str( IN http_method_t method );
 /*!
  * \brief Print the HTTP headers.
  */
+
+
 #ifdef DEBUG
 void print_http_headers(
 	/*! [in] HTTP Message object. */

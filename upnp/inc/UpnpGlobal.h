@@ -50,14 +50,20 @@
 
 	#ifdef UPNP_USE_BCBPP
 		/* define some things Borland Builder doesn't know */
+/* inconsistency between the httpparser.h and the .c file definition.
+   Header is missing UPNP_INLINE prefix, so compiler is confused ...
+   better remove it
 		#define UPNP_INLINE inline
+ */
+		#define UPNP_INLINE
 		typedef __int64 int64_t;
 		#warning The Borland C compiler is probably broken on PRId64,
 		#warning please someone provide a proper fix here
-		#define PRId64 "I64d"
-		#define PRIzd "zd"
-		#define PRIzu "zu"
-		#define PRIzx "zx"
+		#define PRId64 "Ld"
+		#define PRIzd "ld"
+		#define PRIzu "lu"
+		#define PRIzx "lx"
+		#define SCNd64 "Ld"
 	#endif /* UPNP_USE_BCBPP */
 
 	#ifdef __GNUC__

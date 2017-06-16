@@ -29,15 +29,19 @@
 #endif
 
 #ifndef UPNP_USE_MSVCPP
-	/* VC has strnlen which is already included but with (potentially) different linkage */
-	/* strnlen() is a GNU extension. */
-	#if !HAVE_STRNLEN
-		static size_t strnlen(const char *s, size_t n)
-		{
-			const char *p = (const char *)memchr(s, 0, n);
-			return p ? p - s : n;
-		}
-	#endif /* !HAVE_STRNLEN */
+	#ifdef UPNP_USE_BCBPP
+		static size_t strnlen(const char *s, size_t n) { return strnlen_s(s, n); }
+	#else
+		/* VC has strnlen which is already included but with (potentially) different linkage */
+		/* strnlen() is a GNU extension. */
+		#if !HAVE_STRNLEN
+			static size_t strnlen(const char *s, size_t n)
+			{
+				const char *p = (const char *)memchr(s, 0, n);
+				return p ? p - s : n;
+			}
+		#endif /* !HAVE_STRNLEN */
+	#endif /* UPNP_USE_BCBPP */
 #endif /* _WIN32 */
 
 /* strndup() is a GNU extension. */

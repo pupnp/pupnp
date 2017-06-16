@@ -1,10 +1,10 @@
 #ifndef UPNPSTDINT_H
 #define UPNPSTDINT_H
 
-#if !defined(UPNP_USE_BCBPP)
-
 /* Sized integer types. */
 #include <stdint.h>
+
+#if !defined(UPNP_USE_BCBPP)
 
 #ifdef UPNP_USE_MSVCPP
 	/* no ssize_t defined for VC */

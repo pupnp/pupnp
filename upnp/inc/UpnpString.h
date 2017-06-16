@@ -43,7 +43,7 @@ typedef struct s_UpnpString UpnpString;
  *
  * \return A pointer to a new allocated object.
  */
-EXPORT_SPEC UpnpString *UpnpString_new();
+EXPORT_SPEC UpnpString *UpnpString_new(void);
 
 
 /*!

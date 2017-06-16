@@ -2198,14 +2198,15 @@ const char *method_to_str(IN http_method_t method)
 #ifdef DEBUG
 void print_http_headers(http_message_t *hmsg)
 {
-    ListNode *node;
-    /* NNS:  dlist_node *node; */
-    http_header_t *header;
+
+	ListNode *node;
+	/* NNS:  dlist_node *node; */
+	http_header_t *header;
 
     /* print start line */
     if( hmsg->is_request ) {
-        printf( "method = %d, version = %d.%d, url = %.*s\n", 
-            hmsg->method, hmsg->major_version, hmsg->minor_version,
+        printf( "method = %d, version = %d.%d, url = %.*s\n",
+			hmsg->method, hmsg->major_version, hmsg->minor_version,
             (int)hmsg->uri.pathquery.size, hmsg->uri.pathquery.buff);
     } else {
         printf( "resp status = %d, version = %d.%d, status msg = %.*s\n",

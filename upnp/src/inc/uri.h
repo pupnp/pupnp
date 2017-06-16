@@ -52,7 +52,7 @@
 #include <time.h>
 
 #ifdef _WIN32
-	#ifndef UPNP_USE_MSVCPP
+	#if !defined(UPNP_USE_MSVCPP) && !defined(UPNP_USE_BCBPP)
 		/* VC Winsocks2 includes these functions */
 		#include "inet_pton.h"
 	#endif
