@@ -152,7 +152,6 @@ unsigned short LOCAL_PORT_V4;
 unsigned short LOCAL_PORT_V6;
 
 /*! UPnP device and control point handle table  */
-#define NUM_HANDLE 200
 static void *HandleTable[NUM_HANDLE];
 
 /*! a local dir which serves as webserver root */
@@ -168,7 +167,7 @@ size_t g_maxContentLength = DEFAULT_SOAP_CONTENT_LENGTH;
 int UpnpSdkInit = 0;
 
 /*! Global variable to denote the state of Upnp SDK client registration.
- * == 0 if unregistered, == 1 if registered. */
+ * == 0 if unregistered, >= 1 if registered - registered clients count. */
 int UpnpSdkClientRegistered = 0;
 
 /*! Global variable to denote the state of Upnp SDK IPv4 device registration.
@@ -667,12 +666,8 @@ int UpnpFinish(void)
 	}
 #endif
 #ifdef INCLUDE_CLIENT_APIS
-	switch (GetClientHandleInfo(&client_handle, &temp)) {
-	case HND_CLIENT:
+	while (HND_CLIENT == GetClientHandleInfo(&client_handle, &temp)) {
 		UpnpUnRegisterClient(client_handle);
-		break;
-	default:
-		break;
 	}
 #endif
 	TimerThreadShutdown(&gTimerThread);
@@ -1386,7 +1381,7 @@ int UpnpRegisterClient(Upnp_FunPtr Fun, const void *Cookie,
 		return UPNP_E_INVALID_PARAM;
 
 	HandleLock();
-	if (UpnpSdkClientRegistered) {
+	if ((NUM_HANDLE - 1) <= (UpnpSdkClientRegistered + UpnpSdkDeviceRegisteredV4 + UpnpSdkDeviceregisteredV6)) {
 		HandleUnlock();
 		return UPNP_E_ALREADY_REGISTERED;
 	}
@@ -1410,7 +1405,7 @@ int UpnpRegisterClient(Upnp_FunPtr Fun, const void *Cookie,
 	HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 #endif
 	HandleTable[*Hnd] = HInfo;
-	UpnpSdkClientRegistered = 1;
+	UpnpSdkClientRegistered += 1;
 	HandleUnlock();
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -1464,7 +1459,7 @@ int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 	}
 	ListDestroy(&HInfo->SsdpSearchList, 0);
 	FreeHandle(Hnd);
-	UpnpSdkClientRegistered = 0;
+	UpnpSdkClientRegistered -= 1;
 	HandleUnlock();
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -1856,7 +1851,7 @@ int UpnpSearchAsync(
     }
 
     HandleUnlock();
-    retVal = SearchByTarget( Mx, Target, ( void * )Cookie_const );
+    retVal = SearchByTarget( Hnd, Mx, Target, ( void * )Cookie_const );
     if (retVal != 1)
         return retVal;
 
@@ -3822,26 +3817,21 @@ Upnp_Handle_Type GetClientHandleInfo(
 	UpnpClient_Handle *client_handle_out,
 	struct Handle_Info **HndInfo)
 {
-	Upnp_Handle_Type ret = HND_CLIENT;
 	UpnpClient_Handle client;
 
-	switch (GetHandleInfo(1, HndInfo)) {
-	case HND_CLIENT:
-		client = 1;
-		break;
-	default:
-		switch (GetHandleInfo(2, HndInfo)) {
+	for (client = 1; client < NUM_HANDLE; client++) {
+		switch (GetHandleInfo(client, HndInfo)) {
 		case HND_CLIENT:
-			client = 2;
+			*client_handle_out = client;
+			return HND_CLIENT;
 			break;
 		default:
-			client = -1;
-			ret = HND_INVALID;
+			break;
 		}
 	}
 
-	*client_handle_out = client;
-	return ret;
+	*client_handle_out = -1;
+	return HND_INVALID;
 }
 
 

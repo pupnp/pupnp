@@ -706,6 +706,8 @@ void gena_process_notification_event(
 	void *cookie;
 	Upnp_FunPtr callback;
 	UpnpClient_Handle client_handle;
+	UpnpClient_Handle client_handle_start;
+	int err_ret = HTTP_PRECONDITION_FAILED;
 
 	memptr sid_hdr;
 	memptr nt_hdr,
@@ -752,10 +754,21 @@ void gena_process_notification_event(
 	HandleLock();
 
 	/* get client info */
-	if (GetClientHandleInfo(&client_handle, &handle_info) != HND_CLIENT) {
+	if (GetClientHandleInfo(&client_handle_start, &handle_info) != HND_CLIENT) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, event);
 		HandleUnlock();
 		goto exit_function;
+	}
+
+	HandleUnlock();
+
+	for (client_handle = client_handle_start; client_handle < NUM_HANDLE; client_handle++) {
+	HandleLock();
+
+	/* get client info */
+	if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
+		HandleUnlock();
+		continue;
 	}
 
 	/* get subscription based on SID */
@@ -775,31 +788,28 @@ void gena_process_notification_event(
 			/* get HandleLock again */
 			HandleLock();
 
-			if (GetClientHandleInfo(&client_handle, &handle_info) != HND_CLIENT) {
-				error_respond(info, HTTP_PRECONDITION_FAILED, event);
+			if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
 				SubscribeUnlock();
 				HandleUnlock();
-				goto exit_function;
+				continue;
 			}
 
 			subscription = GetClientSubActualSID(handle_info->ClientSubList, &sid);
 			if (subscription == NULL) {
-				error_respond( info, HTTP_PRECONDITION_FAILED, event );
 				SubscribeUnlock();
 				HandleUnlock();
-				goto exit_function;
+				continue;
 			}
 
 			SubscribeUnlock();
 		} else {
-			error_respond( info, HTTP_PRECONDITION_FAILED, event );
 			HandleUnlock();
-			goto exit_function;
+			continue;
 		}
 	}
 
 	/* success */
-	error_respond(info, HTTP_OK, event);
+	err_ret = HTTP_OK;
 
 	/* fill event struct */
 	UpnpEvent_set_EventKey(event_struct, eventKey);
@@ -817,6 +827,9 @@ void gena_process_notification_event(
 	/* that the handle is not unregistered in the middle of a */
 	/* callback */
 	callback(UPNP_EVENT_RECEIVED, event_struct, cookie);
+	}
+
+	error_respond( info, err_ret, event );
 
 exit_function:
 	ixmlDocument_free(ChangedVars);

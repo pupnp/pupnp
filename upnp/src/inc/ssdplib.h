@@ -148,8 +148,13 @@ typedef struct ssdpsearcharg
 	enum SsdpSearchType requestType;
 } SsdpSearchArg;
 
+typedef struct ssdpsearchexparg
+{
+	int handle;
+	int timeoutEventId;
+} SsdpSearchExpArg;
 
-typedef struct 
+typedef struct
 {
 	http_parser_t parser;
 	struct sockaddr_storage dest_addr;
@@ -291,6 +296,8 @@ void ssdp_handle_ctrlpt_msg(
  * \return 1 if successful else appropriate error.
  */
 int SearchByTarget(
+	/* [in] The handle of the client performing the search. */
+	int Hnd,
 	/* [in] Number of seconds to wait, to collect all the responses. */
 	int Mx,
 	/* [in] Search target. */

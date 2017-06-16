@@ -2,13 +2,17 @@
 Version 1.8.2
 *******************************************************************************
 
-2014-11-14  Philippe <philippe44ca(at)users.sourceforge.net>
+2013-10-28 Vladimir Fedoseev <va-dos(at)users.sourceforge.net>
+
+	Attached patch allows to register multiple clients from single app.
+
+2014-11-14 Philippe <philippe44ca(at)users.sourceforge.net>
 
 	Hi - I recently compiled libupnp on C++ Builder XE7 and had to do a few
 	changes to make it work. In thase this helps, I've generated a small
 	patch file.
 
-2015-04-30  Hugo Beauzée-Luyssen <chouquette(at)users.sourceforge.net>
+2015-04-30 Hugo Beauzée-Luyssen <chouquette(at)users.sourceforge.net>
 
 	When building using a strict mode (-std=c++11 instead of -std=gnu++11,
 	for instance), the WIN32 macro isn't defined. The attached patch fixes

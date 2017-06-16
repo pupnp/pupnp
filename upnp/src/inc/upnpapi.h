@@ -58,6 +58,8 @@
 #define DEFAULT_SOAP_CONTENT_LENGTH 16000
 #define MAX_SOAP_CONTENT_LENGTH (size_t)32000
 
+#define NUM_HANDLE 200
+
 extern size_t g_maxContentLength;
 
 /* 30-second timeout */
