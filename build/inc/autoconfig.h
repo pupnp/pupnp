@@ -1,6 +1,9 @@
 /* autoconfig.h.  Generated from autoconfig.h.in by configure.  */
 /* autoconfig.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define if building universal (internal helper macro) */
+/* #undef AC_APPLE_UNIVERSAL_BUILD */
+
 /* Define to 1 to compile debug code */
 /* #undef DEBUG */
 
@@ -130,9 +133,6 @@
 /* #undef UPNP_ENABLE_IPV6 */
 
 /* see upnpconfig.h */
-#define UPNP_ENABLE_NOTIFICATION_REORDERING 1
-
-/* see upnpconfig.h */
 /* #undef UPNP_ENABLE_POST_WRITE */
 
 /* see upnpconfig.h */
@@ -165,6 +165,9 @@
 /* see upnpconfig.h */
 #define UPNP_HAVE_WEBSERVER 1
 
+/* see upnpconfig.h */
+/* #undef UPNP_MINISERVER_REUSEADDR */
+
 /* Do not use pthread_rwlock_t */
 #define UPNP_USE_RWLOCK 1
 
@@ -182,6 +185,18 @@
 
 /* Version number of package */
 #define VERSION "1.6.23"
+
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+/* #  undef WORDS_BIGENDIAN */
+# endif
+#endif
 
 /* File Offset size */
 #define _FILE_OFFSET_BITS 64
