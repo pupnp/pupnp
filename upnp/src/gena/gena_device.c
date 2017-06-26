@@ -574,7 +574,7 @@ static int genaInitNotifyCommon(
 		memset(thread_struct->sid, 0, sizeof(thread_struct->sid));
 		strncpy(thread_struct->sid, sid,
 			sizeof(thread_struct->sid) - 1);
-		thread_struct->eventKey = sub->eventKey++;
+		thread_struct->ctime = time(0);
 		thread_struct->reference_count = reference_count;
 		thread_struct->device_handle = device_handle;
 
@@ -705,6 +705,40 @@ ExitFunction:
 	return ret;
 }
 
+// This gets called before queuing a new event.
+// - The list size can never go over MAX_SUBSCRIPTION_QUEUED_EVENTS so we
+//   discard the oldest non-active event if it is already at the max
+// - We also discard any non-active event older than MAX_SUBSCRIPTION_EVENT_AGE.
+// non-active: any but the head of queue, which is already copied to
+// the thread pool
+static void maybeDiscardEvents(LinkedList *listp)
+{
+	time_t now = time(0L);
+
+	while (ListSize(listp) > 1) {
+		ListNode *node = ListHead(listp);
+		/* The first candidate is the second event: first non-active */
+		if (node == 0 || (node = node->next) == 0) {
+			/* Major inconsistency, really, should abort here. */
+			fprintf(stderr, "gena_device: maybeDiscardEvents: "
+					"list is inconsistent\n");
+			break;
+		}
+
+		notify_thread_struct *ntsp =
+			(notify_thread_struct *)(((ThreadPoolJob *)node->item)->arg);
+		if (ListSize(listp) > g_UpnpSdkEQMaxLen ||
+			now - ntsp->ctime > g_UpnpSdkEQMaxAge) {
+			free_notify_struct(ntsp);
+			free(node->item);
+			ListDelNode(listp, node, 0);
+		} else {
+			// If the list is smaller than the max and the oldest
+			// task is young enough, stop pruning
+			break;
+		}
+	}
+}
 
 /* We take ownership of propertySet and will free it */
 static int genaNotifyAllCommon(
@@ -789,29 +823,10 @@ static int genaNotifyAllCommon(
 					sizeof(thread_struct->sid));
 				strncpy(thread_struct->sid, finger->sid,
 					sizeof(thread_struct->sid) - 1);
-				thread_struct->eventKey = finger->eventKey++;
+				thread_struct->ctime = time(0);
 				thread_struct->device_handle = device_handle;
-				/* if overflow, wrap to 1 */
-				if (finger->eventKey < 0) {
-					finger->eventKey = 1;
-				}
 
-				if (ListSize(&finger->outgoing) >=
-					MAX_SUBSCRIPTION_QUEUED_EVENTS) {
-					/* We discard the second event: first non-active */
-					ListNode *node = ListHead(&finger->outgoing);
-					if (node)
-						node = node->next;
-					if (node) {
-						/* We delete the node ourselves because we also need
-						   to do the right thing about the thread struct */
-						job = (ThreadPoolJob *)node->item;
-						free_notify_struct((notify_thread_struct *)job->arg);
-						free(node->item);
-						ListDelNode(&finger->outgoing, node, 0);
-					}
-				}
-
+				maybeDiscardEvents(&finger->outgoing);
 				job = (ThreadPoolJob *)malloc(sizeof(ThreadPoolJob));
 				if (job == NULL) {
 					line = __LINE__;
@@ -1192,7 +1207,6 @@ void gena_process_subscription_request(
 		HandleUnlock();
 		goto exit_function;
 	}
-	sub->eventKey = 0;
 	sub->ToSendEventKey = 0;
 	sub->active = 0;
 	sub->next = NULL;

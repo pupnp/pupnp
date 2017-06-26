@@ -162,6 +162,22 @@ extern membuffer gDocumentRootDir;
  * error 413 (HTTP Error Code) will be returned to the remote end point. */
 size_t g_maxContentLength = DEFAULT_SOAP_CONTENT_LENGTH;
 
+/*! Global variable to determines the maximum number of
+ *  events which can be queued for a given subscription before events begin
+ *  to be discarded. This limits the amount of memory used for a
+ *  non-responding subscribed entity. */
+int g_UpnpSdkEQMaxLen = MAX_SUBSCRIPTION_QUEUED_EVENTS;
+
+/*! Global variable to determine the maximum number of
+ *  seconds which an event can spend on a subscription queue (waiting for the
+ *  event at the head of the queue to be communicated). This parameter will
+ *  have no effect in most situations with the default (low) value of
+ *  MAX_SUBSCRIPTION_QUEUED_EVENTS. However, if MAX_SUBSCRIPTION_QUEUED_EVENTS
+ *  is set to a high value, the AGE parameter will allow pruning the queue in
+ *  good conformance with the UPnP Device Architecture standard, at the
+ *  price of higher potential memory use. */
+int g_UpnpSdkEQMaxAge = MAX_SUBSCRIPTION_EVENT_AGE;
+
 /*! Global variable to denote the state of Upnp SDK == 0 if uninitialized,
  * == 1 if initialized. */
 int UpnpSdkInit = 0;
@@ -4409,6 +4425,13 @@ int UpnpSetMaxContentLength(size_t contentLength)
 	} while(0);
 
 	return errCode;
+}
+
+int UpnpSetEventQueueLimits(int maxLen, int maxAge)
+{
+	g_UpnpSdkEQMaxLen = maxLen;
+	g_UpnpSdkEQMaxAge = maxAge;
+	return UPNP_E_SUCCESS;
 }
 
 /* @} UPnPAPI */

@@ -151,7 +151,24 @@
  *
  * @{
  */
-#define MAX_SUBSCRIPTION_QUEUED_EVENTS 5
+#define MAX_SUBSCRIPTION_QUEUED_EVENTS 10
+/* @} */
+
+
+/*! \name MAX_SUBSCRIPTION_EVENT_AGE
+ *
+ *  The {\tt MAX_SUBSCRIPTION__EVENT_AGE} determines the maximum number of
+ *  seconds which an event can spend on a subscription queue (waiting for the
+ *  event at the head of the queue to be communicated). This parameter will
+ *  have no effect in most situations with the default (low) value of
+ *  MAX_SUBSCRIPTION_QUEUED_EVENTS. However, if MAX_SUBSCRIPTION_QUEUED_EVENTS
+ *  is set to a high value, the AGE parameter will allow pruning the queue in
+ *  good conformance with the UPnP Device Architecture standard, at the
+ *  price of higher potential memory use.
+ *
+ * @{
+ */
+#define MAX_SUBSCRIPTION_EVENT_AGE 30
 /* @} */
 
 
