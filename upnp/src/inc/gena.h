@@ -147,7 +147,7 @@ typedef struct NOTIFY_THREAD_STRUCT {
 	char *servId;
 	char *UDN;
 	Upnp_SID sid;
-	int eventKey;
+	time_t ctime;
 	int *reference_count;
 	UpnpDevice_Handle device_handle;
 } notify_thread_struct;

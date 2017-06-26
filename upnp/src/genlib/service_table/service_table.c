@@ -66,7 +66,6 @@ copy_subscription( subscription * in,
 
     memcpy( out->sid, in->sid, SID_SIZE );
     out->sid[SID_SIZE] = 0;
-    out->eventKey = in->eventKey;
     out->ToSendEventKey = in->ToSendEventKey;
     out->expireTime = in->expireTime;
     out->active = in->active;
