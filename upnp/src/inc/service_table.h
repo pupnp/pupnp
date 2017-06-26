@@ -56,7 +56,6 @@ extern "C" {
 
 typedef struct SUBSCRIPTION {
 	Upnp_SID sid;
-	int eventKey;
 	int ToSendEventKey;
 	time_t expireTime;
 	int active;

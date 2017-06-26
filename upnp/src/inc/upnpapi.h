@@ -59,6 +59,8 @@
 #define MAX_SOAP_CONTENT_LENGTH (size_t)32000
 
 extern size_t g_maxContentLength;
+extern int g_UpnpSdkEQMaxLen;
+extern int g_UpnpSdkEQMaxAge;
 
 /* 30-second timeout */
 #define UPNP_TIMEOUT	30
