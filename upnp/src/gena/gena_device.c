@@ -705,12 +705,14 @@ ExitFunction:
 	return ret;
 }
 
-// This gets called before queuing a new event.
-// - The list size can never go over MAX_SUBSCRIPTION_QUEUED_EVENTS so we
-//   discard the oldest non-active event if it is already at the max
-// - We also discard any non-active event older than MAX_SUBSCRIPTION_EVENT_AGE.
-// non-active: any but the head of queue, which is already copied to
-// the thread pool
+/*
+ * This gets called before queuing a new event.
+ * - The list size can never go over MAX_SUBSCRIPTION_QUEUED_EVENTS so we
+ *   discard the oldest non-active event if it is already at the max
+ * - We also discard any non-active event older than MAX_SUBSCRIPTION_EVENT_AGE.
+ * non-active: any but the head of queue, which is already copied to
+ * the thread pool
+ */
 static void maybeDiscardEvents(LinkedList *listp)
 {
 	time_t now = time(0L);
@@ -733,8 +735,8 @@ static void maybeDiscardEvents(LinkedList *listp)
 			free(node->item);
 			ListDelNode(listp, node, 0);
 		} else {
-			// If the list is smaller than the max and the oldest
-			// task is young enough, stop pruning
+			/* If the list is smaller than the max and the oldest
+			 * task is young enough, stop pruning */
 			break;
 		}
 	}

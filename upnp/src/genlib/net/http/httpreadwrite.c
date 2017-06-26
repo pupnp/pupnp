@@ -1606,7 +1606,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			if (http_MakeMessage(buf, http_major_version, http_minor_version,
 					     "shc", "CONTENT-LENGTH: ", bignum) != 0)
 				goto error_handler;
-			// Add accept ranges
+			/* Add accept ranges */
 			if (http_MakeMessage(buf, http_major_version, http_minor_version,
 								 "sc", "Accept-Ranges: bytes") != 0)
 				goto error_handler;
