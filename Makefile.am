@@ -16,10 +16,13 @@ SUBDIRS = \
 
 
 EXTRA_DIST = \
+	.gitignore \
 	Doxyfile \
 	libupnp.pc.in \
 	LICENSE \
 	THANKS \
+	README.md \
+	bootstrap \
 	libupnp.spec \
 	build/libupnp.bpf \
 	build/libupnp.bpr \
