@@ -2,6 +2,16 @@
 Version 1.6.23
 *******************************************************************************
 
+2015-02-06 Philippe <philippe44ca@users.sf.net>
+
+	extra headers
+
+	Allow extra headers to be sent to client in the File_Info struct by
+	adding extra_headers, an array of struct Extra_Headers.
+
+	It contains "name" and "value" and the callee can populate a DOMString
+	"resp" to add a header as well in the reponse
+
 2015-02-06 Jean-Francois Dockes <jf@dockes.org>
 
 	Queue events on their subscription object instead of adding them to the
