@@ -777,6 +777,16 @@ struct Upnp_Subscription_Request
 
 };
 
+struct Extra_Headers
+{
+	/** The length of the file. A length less than 0 indicates the size
+	*  is unknown, and data will be sent until 0 bytes are returned from
+	*  a read call. */
+	char *name;
+	char *value;
+	DOMString resp;
+};
+
 struct File_Info
 {
 	/** The length of the file. A length less than 0 indicates the size 
@@ -800,6 +810,11 @@ struct File_Info
 	*  by the caller using {\bf ixmlCloneDOMString}.  When finished 
 	*  with it, the SDK frees the {\bf DOMString}. */
 	DOMString content_type;
+
+	/** Headers to be modified / added. A modified response must be allocated
+	* by the caller using {\bf ixmlCloneDOMString}.  When finished with it,
+	* the SDK frees all of them. */
+	struct Extra_Headers *extra_headers;
 };
 
 /*!
