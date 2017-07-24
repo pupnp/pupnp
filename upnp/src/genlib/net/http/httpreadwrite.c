@@ -1658,6 +1658,20 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 	memset(tempbuf, 0, sizeof(tempbuf));
 	va_start(argp, fmt);
 	while ((c = *fmt++)) {
+		if (c == 'E') {
+			struct Extra_Headers *extras;
+			/* array of extra headers */
+			extras = (struct Extra_Headers *) va_arg(argp, struct Extra_Headers *);
+			while (extras->name) {
+				if (extras->resp) {
+					if (membuffer_append(buf, extras->resp, strlen(extras->resp)))
+						goto error_handler;
+					if (membuffer_append(buf, "\r\n", (size_t)2))
+						goto error_handler;
+				}
+				extras++;
+			}
+		}
 		if (c == 's') {
 			/* C string */
 			s = (char *)va_arg(argp, char *);
