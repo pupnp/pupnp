@@ -1311,9 +1311,9 @@ int TvDeviceStart(char *ip_address, unsigned short port,
 	SampleUtil_Print("Initializing UPnP Sdk with\n"
 			 "\tipaddress = %s port = %u\n",
 			 ip_address ? ip_address : "{NULL}", port);
-	ret = UpnpInit(ip_address, port);
+	ret = UpnpInit2(ip_address, port);
 	if (ret != UPNP_E_SUCCESS) {
-		SampleUtil_Print("Error with UpnpInit -- %d\n", ret);
+		SampleUtil_Print("Error with UpnpInit2 -- %d\n", ret);
 		UpnpFinish();
 
 		return ret;
