@@ -41,6 +41,8 @@
 
 #include "httpreadwrite.h"
 
+#include "ExtraHeaders.h"
+#include "FileInfo.h"
 #include "unixutil.h"
 #include "upnp.h"
 #include "upnpapi.h"
@@ -1501,17 +1503,21 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 	va_start(argp, fmt);
 	while ((c = *fmt++)) {
 		if (c == 'E') {
-			struct Extra_Headers *extras;
-			/* array of extra headers */
-			extras = (struct Extra_Headers *) va_arg(argp, struct Extra_Headers *);
-			while (extras->name) {
-				if (extras->resp) {
-					if (membuffer_append(buf, extras->resp, strlen(extras->resp)))
+			/* list of extra headers */
+			struct list_head *pos;
+			struct list_head *head;
+			ExtraHeaders *extra;
+			const DOMString resp;
+			head = (struct list_head *)va_arg(argp, struct list_head *);
+			list_for_each(pos, head) {
+				extra = (ExtraHeaders *)pos;
+				resp = ExtraHeaders_get_resp(extra);
+				if (resp) {
+					if (membuffer_append(buf, resp, strlen(resp)))
 						goto error_handler;
 					if (membuffer_append(buf, "\r\n", (size_t)2))
 						goto error_handler;
 				}
-				extras++;
 			}
 		}
 		if (c == 's') {
