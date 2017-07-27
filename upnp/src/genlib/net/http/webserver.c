@@ -1012,6 +1012,81 @@ static int CheckOtherHTTPHeaders(
 }
 
 /*!
+ * \brief Build an array of unrecognized headers.
+ *
+ * \return nothing
+ */
+#define MAX_EXTRA_HEADERS 128
+static int ExtraHTTPHeaders(
+	/*! [in] HTTP Request message. */
+	http_message_t *Req,
+	struct Extra_Headers **ExtraHeaders)
+{
+	http_header_t *header;
+	ListNode *node;
+	int index, nb_extra = 0;
+	struct Extra_Headers *extra_headers;
+
+	node = ListHead(&Req->headers);
+	extra_headers = *ExtraHeaders =
+		(struct Extra_Headers*) malloc(MAX_EXTRA_HEADERS * sizeof(struct Extra_Headers));
+	if (!extra_headers) {
+		return HTTP_INTERNAL_SERVER_ERROR;
+	}
+	while (node != NULL) {
+		header = (http_header_t *) node->item;
+		/* find header type. */
+		index = map_str_to_int((const char *)header->name.buf,
+				header->name.length, Http_Header_Names,
+				NUM_HTTP_HEADER_NAMES, FALSE);
+		if (index < 0) {
+			extra_headers->name = (char *)malloc(header->name.length + 1);
+			extra_headers->value = (char *)malloc(header->value.length + 1);
+			if (!extra_headers->name || !extra_headers->value) {
+				/* cleanup will be made by caller */
+				return HTTP_INTERNAL_SERVER_ERROR;
+			}
+			memcpy(extra_headers->name, header->name.buf, header->name.length);
+			memcpy(extra_headers->value, header->value.buf, header->value.length);
+			extra_headers->name[header->name.length] = '\0';
+			extra_headers->value[header->value.length] = '\0';
+			extra_headers->resp = NULL;
+
+			extra_headers++;
+			nb_extra++;
+
+			if (nb_extra == MAX_EXTRA_HEADERS - 1) {
+				break;
+			}
+		}
+		node = ListNext(&Req->headers, node);
+	}
+	extra_headers->name = extra_headers->value = extra_headers->resp = NULL;
+	return HTTP_OK;
+}
+
+static void FreeExtraHTTPHeaders(
+	/*! [in] extra HTTP headers to free. */
+	struct Extra_Headers *ExtraHeaders)
+{
+	struct Extra_Headers *extra_headers = ExtraHeaders;
+
+	if (!ExtraHeaders) {
+		return;
+	}
+
+	while (extra_headers->name) {
+		free(extra_headers->name);
+		if (extra_headers->value) free(extra_headers->value);
+		if (extra_headers->resp) ixmlFreeDOMString(extra_headers->resp);
+		extra_headers++;
+	}
+
+	free(ExtraHeaders);
+}
+
+
+/*!
  * \brief Processes the request and returns the result in the output parameters.
  *
  * \return
@@ -1051,7 +1126,7 @@ static int process_request(
 	int resp_minor;
 	int alias_grabbed;
 	size_t dummy;
-	const char *extra_headers = NULL;
+	struct Extra_Headers *extra_headers = NULL;
 
 	print_http_headers(req);
 	url = &req->uri;
@@ -1240,7 +1315,7 @@ static int process_request(
 		/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
 		/* Transfer-Encoding: chunked */
 		if (http_MakeMessage(headers, resp_major, resp_minor,
-		    "R" "T" "GKLD" "s" "tcS" "Xc" "sCc",
+		    "R" "T" "GKLD" "s" "tcS" "Xc" "ECc",
 		    HTTP_PARTIAL_CONTENT,	/* status code */
 		    UpnpFileInfo_get_ContentType(finfo), /* content type */
 		    RespInstr,	/* range info */
@@ -1267,7 +1342,7 @@ static int process_request(
 	} else if (!RespInstr->IsRangeActive && RespInstr->IsChunkActive) {
 		/* Transfer-Encoding: chunked */
 		if (http_MakeMessage(headers, resp_major, resp_minor,
-		    "RK" "TLD" "s" "tcS" "Xc" "sCc",
+		    "RK" "TLD" "s" "tcS" "Xc" "ECc",
 		    HTTP_OK,	/* status code */
 		    UpnpFileInfo_get_ContentType(finfo), /* content type */
 		    RespInstr,	/* language info */
@@ -1280,7 +1355,7 @@ static int process_request(
 		/* !RespInstr->IsRangeActive && !RespInstr->IsChunkActive */
 		if (RespInstr->ReadSendSize >= 0) {
 			if (http_MakeMessage(headers, resp_major, resp_minor,
-			    "R" "N" "TLD" "s" "tcS" "Xc" "sCc",
+			    "R" "N" "TLD" "s" "tcS" "Xc" "ECc",
 			    HTTP_OK,	/* status code */
 			    RespInstr->ReadSendSize,	/* content length */
 			    UpnpFileInfo_get_ContentType(finfo), /* content type */
@@ -1293,7 +1368,7 @@ static int process_request(
 			}
 		} else {
 			if (http_MakeMessage(headers, resp_major, resp_minor,
-			    "R" "TLD" "s" "tcS" "Xc" "sCc",
+			    "R" "TLD" "s" "tcS" "Xc" "ECc",
 			    HTTP_OK,	/* status code */
 			    UpnpFileInfo_get_ContentType(finfo), /* content type */
 			    RespInstr,	/* language info */
@@ -1325,6 +1400,7 @@ static int process_request(
 
  error_handler:
 	free(request_doc);
+	FreeExtraHTTPHeaders(extra_headers);
 	UpnpFileInfo_delete(finfo);
 	if (err_code != HTTP_OK && alias_grabbed) {
 		alias_release(alias);
