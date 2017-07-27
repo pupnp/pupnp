@@ -44,6 +44,7 @@
 #include "webserver.h"
 
 
+#include "ExtraHeaders.h"
 #include "FileInfo.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
@@ -1019,80 +1020,61 @@ static int CheckOtherHTTPHeaders(
 	return RetCode;
 }
 
+static void FreeExtraHTTPHeaders(
+	/*! [in] extra HTTP headers to free. */
+	struct list_head *extraHeadersList)
+{
+	struct list_head *pos;
+	struct list_head *tmp;
+	ExtraHeaders *extra;
+
+	list_for_each_safe(pos, tmp, extraHeadersList) {
+		extra = (ExtraHeaders *)pos;
+		ExtraHeaders_delete(extra);
+	}
+}
+
 /*!
  * \brief Build an array of unrecognized headers.
  *
  * \return nothing
  */
-#define MAX_EXTRA_HEADERS 128
 static int ExtraHTTPHeaders(
 	/*! [in] HTTP Request message. */
 	http_message_t *Req,
-	struct Extra_Headers **ExtraHeaders)
+	struct list_head *extraHeadersList)
 {
 	http_header_t *header;
 	ListNode *node;
-	int index, nb_extra = 0;
-	struct Extra_Headers *extra_headers;
+	int index;
+	ExtraHeaders *extraHeader;
+	struct list_head *extraHeaderNode;
 
 	node = ListHead(&Req->headers);
-	extra_headers = *ExtraHeaders =
-		(struct Extra_Headers*) malloc(MAX_EXTRA_HEADERS * sizeof(struct Extra_Headers));
-	if (!extra_headers) {
-		return HTTP_INTERNAL_SERVER_ERROR;
-	}
 	while (node != NULL) {
-		header = (http_header_t *) node->item;
+		header = (http_header_t *)node->item;
 		/* find header type. */
 		index = map_str_to_int((const char *)header->name.buf,
 				header->name.length, Http_Header_Names,
 				NUM_HTTP_HEADER_NAMES, FALSE);
 		if (index < 0) {
-			extra_headers->name = (char *)malloc(header->name.length + 1);
-			extra_headers->value = (char *)malloc(header->value.length + 1);
-			if (!extra_headers->name || !extra_headers->value) {
-				/* cleanup will be made by caller */
+			extraHeader = ExtraHeaders_new();
+			if (!extraHeader) {
+				FreeExtraHTTPHeaders(extraHeadersList);
 				return HTTP_INTERNAL_SERVER_ERROR;
 			}
-			memcpy(extra_headers->name, header->name.buf, header->name.length);
-			memcpy(extra_headers->value, header->value.buf, header->value.length);
-			extra_headers->name[header->name.length] = '\0';
-			extra_headers->value[header->value.length] = '\0';
-			extra_headers->resp = NULL;
-
-			extra_headers++;
-			nb_extra++;
-
-			if (nb_extra == MAX_EXTRA_HEADERS - 1) {
-				break;
-			}
+			/* TODO: Check that cast that removes const. */
+			/*extraHeaderNode = (struct list_head *)ExtraHeaders_get_node(extraHeader);*/
+			extraHeaderNode = ExtraHeaders_get_node(extraHeader);
+			list_add(extraHeaderNode, extraHeadersList);
+			ExtraHeaders_strncpy_name(extraHeader, header->name.buf, header->name.length);
+			ExtraHeaders_strncpy_value(extraHeader, header->value.buf, header->value.length);
 		}
 		node = ListNext(&Req->headers, node);
 	}
-	extra_headers->name = extra_headers->value = extra_headers->resp = NULL;
+
 	return HTTP_OK;
 }
-
-static void FreeExtraHTTPHeaders(
-	/*! [in] extra HTTP headers to free. */
-	struct Extra_Headers *ExtraHeaders)
-{
-	struct Extra_Headers *extra_headers = ExtraHeaders;
-
-	if (!ExtraHeaders) {
-		return;
-	}
-
-	while (extra_headers->name) {
-		free(extra_headers->name);
-		if (extra_headers->value) free(extra_headers->value);
-		if (extra_headers->resp) ixmlFreeDOMString(extra_headers->resp);
-		extra_headers++;
-	}
-
-	free(ExtraHeaders);
-}
-
 
 /*!
  * \brief Processes the request and returns the result in the output parameters.
@@ -1134,7 +1116,7 @@ static int process_request(
 	int resp_minor;
 	int alias_grabbed;
 	size_t dummy;
-	struct Extra_Headers *extra_headers = NULL;
+	struct list_head *extra_headers = NULL;
 
 	print_http_headers(req);
 	url = &req->uri;
@@ -1299,10 +1281,9 @@ static int process_request(
 		err_code = HTTP_OK;
 		goto error_handler;
 	}
-	extra_headers = UpnpFileInfo_get_ExtraHeaders(finfo);
-	if (!extra_headers) {
-		extra_headers = "";
-	}
+	/* TODO: Check that cast that removes const. */
+	/*extra_headers = (struct list_head *)UpnpFileInfo_get_ExtraHeadersList(finfo);*/
+	extra_headers = UpnpFileInfo_get_ExtraHeadersList(finfo);
 
 	/* Check if chunked encoding should be used. */
 	if (using_virtual_dir && UpnpFileInfo_get_FileLength(finfo) == UPNP_USING_CHUNKED) {

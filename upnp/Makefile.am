@@ -140,6 +140,7 @@ libupnp_la_SOURCES += \
 	src/genlib/net/http/statcodes.c \
 	src/genlib/net/http/webserver.c \
 	src/genlib/net/http/parsetools.c \
+	src/genlib/net/http/ExtraHeaders.c \
 	src/genlib/net/uri/uri.c
 
 # gena

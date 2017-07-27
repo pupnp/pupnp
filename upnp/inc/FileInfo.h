@@ -1,7 +1,5 @@
-
 #ifndef FILEINFO_H
 #define FILEINFO_H
-
 
 /*!
  * \file
@@ -30,10 +28,9 @@
 	EXPAND_CLASS_MEMBER_INT(CLASS, IsDirectory, int) \
 	EXPAND_CLASS_MEMBER_INT(CLASS, IsReadable, int) \
 	EXPAND_CLASS_MEMBER_DOMSTRING(CLASS, ContentType) \
-	EXPAND_CLASS_MEMBER_DOMSTRING(CLASS, ExtraHeaders) \
+	EXPAND_CLASS_MEMBER_LIST(CLASS, ExtraHeadersList) \
 
 #include "TemplateInclude.h"
-
 
 #endif /* FILEINFO_H */
 
