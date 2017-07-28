@@ -3478,8 +3478,8 @@ int UpnpGetIfInfo(const char *IfName)
 	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
 #elif (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__)
 	struct ifaddrs *ifap, *ifa;
-	struct in_addr v4_addr;
-	struct in6_addr v6_addr;
+	struct in_addr v4_addr = { 0 };
+	struct in6_addr v6_addr = { 0 };
 	int ifname_found = 0;
 	int valid_addr_found = 0;
 

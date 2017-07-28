@@ -1229,9 +1229,9 @@ int TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionP
 			 "\tipaddress = %s port = %u\n",
 			 ip_address ? ip_address : "{NULL}", port);
 
-	rc = UpnpInit(ip_address, port);
+	rc = UpnpInit2(ip_address, port);
 	if (rc != UPNP_E_SUCCESS) {
-		SampleUtil_Print("WinCEStart: UpnpInit() Error: %d\n", rc);
+		SampleUtil_Print("WinCEStart: UpnpInit2() Error: %d\n", rc);
 		if (!combo) {
 			UpnpFinish();
 

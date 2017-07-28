@@ -2,6 +2,17 @@
 Version 1.8.2
 *******************************************************************************
 
+2017-07-24 Michael Osipov
+
+	Initialize in_addr and in6_addr to avoid garbage output if never written
+
+	If any of the address families isn't available in UpnpGetIfInfo(),
+	especially IPv6, always init both structs with zero to avoid garbage
+	output with inet_ntop() to gIF_IPV4 and gIF_IPV6.
+
+	See v00d00/gerbera#112 (https://github.com/v00d00/gerbera/issues/112)
+	for consequences: bind for IPv6 will fail.
+
 2013-10-28 Vladimir Fedoseev <va-dos(at)users.sourceforge.net>
 
 	Attached patch allows to register multiple clients from single app.
