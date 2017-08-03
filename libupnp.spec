@@ -48,7 +48,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{__mv} %{buildroot}%{docdir}/html \
 	%{buildroot}%{docdeveldir}/
 
-%{__rm} %{buildroot}%{_libdir}/{libixml-1.8.la,libupnp-1.8.la}
+%{__rm} %{buildroot}%{_libdir}/{libixml.la,libupnp.la}
 
 %post -p /sbin/ldconfig
 
@@ -57,18 +57,18 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %doc %{docdir}
-%{_libdir}/libixml-1.8.so.*
-%{_libdir}/libupnp-1.8.so.*
+%{_libdir}/libixml.so.*
+%{_libdir}/libupnp.so.*
 
 %files devel
 %defattr(0644,root,root,0755)
 %doc %{docdeveldir}
-%{_includedir}/upnp-1.8/
-%{_libdir}/libixml-1.8.so
-%{_libdir}/libupnp-1.8.so
-%{_libdir}/libixml-1.8.a
-%{_libdir}/libupnp-1.8.a
-%{_libdir}/pkgconfig/libupnp-1.8.pc
+%{_includedir}/upnp/
+%{_libdir}/libixml.so
+%{_libdir}/libupnp.so
+%{_libdir}/libixml.a
+%{_libdir}/libupnp.a
+%{_libdir}/pkgconfig/libupnp.pc
 
 %clean
 rm -rf %{buildroot}

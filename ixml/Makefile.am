@@ -11,7 +11,7 @@ AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc \
                           -I$(top_srcdir)/upnp/inc
 AM_CFLAGS		= 
 
-LDADD			= libixml-1.8.la
+LDADD			= libixml.la
 
 if ENABLE_DEBUG
     AM_CPPFLAGS		+= -DDEBUG
@@ -23,12 +23,12 @@ if ENABLE_SCRIPTSUPPORT
     AM_CPPFLAGS		+= -DIXML_HAVE_SCRIPTSUPPORT
 endif
 
-lib_LTLIBRARIES		= libixml-1.8.la
+lib_LTLIBRARIES		= libixml.la
 
-libixml_1_8_la_LDFLAGS	= -version-info $(LT_VERSION_IXML) \
+libixml_la_LDFLAGS	= -version-info $(LT_VERSION_IXML) \
 			  -export-symbols-regex '^ixml.*'
 
-libixml_1_8_la_SOURCES	= \
+libixml_la_SOURCES	= \
 			src/attr.c \
 			src/document.c \
 			src/element.c \
@@ -42,15 +42,15 @@ libixml_1_8_la_SOURCES	= \
 			src/node.c \
 			src/nodeList.c
 
-upnpincludedir		= $(includedir)/upnp-1.8
+upnpincludedir		= $(includedir)/upnp
 upnpinclude_HEADERS	= \
 			inc/ixml.h \
 			inc/ixmldebug.h
 
-check_PROGRAMS          = test_document-1.8
+check_PROGRAMS          = test_document
 TESTS                   = test/test_document.sh
 
-test_document_1_8_SOURCES 	= test/test_document.c
+test_document_SOURCES 	= test/test_document.c
 
 EXTRA_DIST		= test/test_document.sh test/testdata
 

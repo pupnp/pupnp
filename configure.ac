@@ -735,7 +735,7 @@ AC_CONFIG_FILES([
 	upnp/sample/Makefile
 	upnp/unittest/Makefile
 	docs/dist/Makefile
-	libupnp-1.8.pc
+	libupnp.pc
 	])
 
 

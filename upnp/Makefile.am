@@ -11,11 +11,11 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/ixml/inc
 
 LDADD = \
-	libupnp-1.8.la \
-	$(top_builddir)/ixml/libixml-1.8.la
+	libupnp.la \
+	$(top_builddir)/ixml/libixml.la
 
 
-upnpincludedir = $(includedir)/upnp-1.8
+upnpincludedir = $(includedir)/upnp
 upnpinclude_HEADERS = \
 	inc/ActionComplete.h \
 	inc/ActionRequest.h \
@@ -47,16 +47,16 @@ upnpinclude_HEADERS += inc/upnptools.h
 endif
 
 
-lib_LTLIBRARIES = libupnp-1.8.la
+lib_LTLIBRARIES = libupnp.la
 
-libupnp_1_8_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/src/inc 
+libupnp_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/src/inc 
 
-libupnp_1_8_la_LDFLAGS = \
+libupnp_la_LDFLAGS = \
 	-version-info $(LT_VERSION_UPNP) \
 	-export-symbols-regex '^Upnp.*' \
-	$(top_builddir)/ixml/libixml-1.8.la
+	$(top_builddir)/ixml/libixml.la
 
-libupnp_1_8_la_SOURCES = \
+libupnp_la_SOURCES = \
 	src/inc/config.h \
 	src/inc/client_table.h \
 	src/inc/ClientSubscription.h \
@@ -95,8 +95,8 @@ libupnp_1_8_la_SOURCES = \
 upnpinclude_HEADERS += \
 	inc/ithread.h
 
-libupnp_1_8_la_CPPFLAGS += -I$(srcdir)/src/threadutil
-libupnp_1_8_la_SOURCES += \
+libupnp_la_CPPFLAGS += -I$(srcdir)/src/threadutil
+libupnp_la_SOURCES += \
 	src/threadutil/FreeList.h \
 	src/threadutil/FreeList.c \
 	src/threadutil/LinkedList.h \
@@ -108,7 +108,7 @@ libupnp_1_8_la_SOURCES += \
 
 # ssdp
 if ENABLE_SSDP
-libupnp_1_8_la_SOURCES += \
+libupnp_la_SOURCES += \
 	src/ssdp/ssdp_ResultData.c \
 	src/ssdp/ssdp_ResultData.h \
 	src/ssdp/ssdp_device.c \
@@ -118,14 +118,14 @@ endif
 
 # soap
 if ENABLE_SOAP
-libupnp_1_8_la_SOURCES += \
+libupnp_la_SOURCES += \
 	src/soap/soap_device.c \
 	src/soap/soap_ctrlpt.c \
 	src/soap/soap_common.c
 endif
 
 # genlib
-libupnp_1_8_la_SOURCES += \
+libupnp_la_SOURCES += \
 	src/genlib/miniserver/miniserver.c \
 	src/genlib/client_table/client_table.c \
 	src/genlib/client_table/ClientSubscription.c \
@@ -144,14 +144,14 @@ libupnp_1_8_la_SOURCES += \
 
 # gena
 if ENABLE_GENA
-libupnp_1_8_la_SOURCES += \
+libupnp_la_SOURCES += \
 	src/gena/gena_device.c \
 	src/gena/gena_ctrlpt.c \
 	src/gena/gena_callback2.c
 endif
 
 # api
-libupnp_1_8_la_SOURCES += \
+libupnp_la_SOURCES += \
 	src/api/ActionComplete.c \
 	src/api/ActionRequest.c \
 	src/api/Discovery.c \
@@ -165,11 +165,11 @@ libupnp_1_8_la_SOURCES += \
 	src/api/upnpapi.c
 
 if ENABLE_TOOLS
-libupnp_1_8_la_SOURCES += src/api/upnptools.c
+libupnp_la_SOURCES += src/api/upnptools.c
 endif
 
 if ENABLE_DEBUG
-libupnp_1_8_la_SOURCES += src/api/upnpdebug.c 
+libupnp_la_SOURCES += src/api/upnpdebug.c 
 AM_CPPFLAGS         += -DDEBUG -DSTATS
 else
 AM_CPPFLAGS         += -DNDEBUG
@@ -178,7 +178,7 @@ endif
 
 # uuid
 if ENABLE_UUID
-libupnp_1_8_la_SOURCES += \
+libupnp_la_SOURCES += \
 	src/uuid/md5.c \
 	src/uuid/sysdep.c \
 	src/uuid/uuid.c
@@ -186,20 +186,20 @@ endif
 
 
 # urlconfig
-libupnp_1_8_la_SOURCES += src/urlconfig/urlconfig.c
+libupnp_la_SOURCES += src/urlconfig/urlconfig.c
 
 
 # inet_pton (needed on Win32, compiles to nothing elsewhere)
-libupnp_1_8_la_SOURCES += \
+libupnp_la_SOURCES += \
 	src/inet_pton.c \
 	src/inc/inet_pton.h
 
 
 # check / distcheck tests
-check_PROGRAMS = test_init-1.8 test_url-1.8
-TESTS = test_init-1.8 test_url-1.8
-test_init_1_8_SOURCES = test/test_init.c
-test_url_1_8_SOURCES = test/test_url.c
+check_PROGRAMS = test_init test_url
+TESTS = test_init test_url
+test_init_SOURCES = test/test_init.c
+test_url_SOURCES = test/test_url.c
 
 
 EXTRA_DIST = \
