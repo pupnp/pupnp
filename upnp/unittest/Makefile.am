@@ -10,16 +10,16 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/upnp/src/inc
 
 LDADD = \
-	$(top_builddir)/upnp/libupnp-1.8.la \
-	$(top_builddir)/ixml/libixml-1.8.la
+	$(top_builddir)/upnp/libupnp.la \
+	$(top_builddir)/ixml/libixml.la
 
 #unittest
-noinst_PROGRAMS = unittest-1.8
+noinst_PROGRAMS = unittest
 
-unittest_1_8_CPPFLAGS = \
+unittest_CPPFLAGS = \
 	$(AM_CPPFLAGS)
 
-unittest_1_8_SOURCES = \
+unittest_SOURCES = \
 	main.c \
 	templates/FirstObject.c \
 	templates/FirstObject.h \
