@@ -749,11 +749,11 @@ char *UpnpGetServerIp6Address(void)
 {
 #ifdef UPNP_ENABLE_IPV6
 	if (UpnpSdkInit != 1)
-		return 0;
+		return NULL;
 
 	return gIF_IPV6;
 #else
-	return 0;
+	return NULL;
 #endif
 }
 
@@ -765,7 +765,7 @@ char *UpnpGetServerUlaGuaIp6Address(void)
 
 	return gIF_IPV6_ULA_GUA;
 #else
-	return 0;
+	return NULL;
 #endif
 }
 
