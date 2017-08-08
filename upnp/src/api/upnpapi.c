@@ -3331,7 +3331,7 @@ int UpnpGetIfInfo(const char *IfName)
 {
 #ifdef _WIN32
 	/* ---------------------------------------------------- */
-	/* WIN32 implementation will use the IpHlpAPI library. */
+	/* WIN32 implementation will use the IpHlpAPI library.  */
 	/* ---------------------------------------------------- */
 	PIP_ADAPTER_ADDRESSES adapts = NULL;
 	PIP_ADAPTER_ADDRESSES adapts_item;
@@ -3396,11 +3396,11 @@ int UpnpGetIfInfo(const char *IfName)
 			 */
 			wcstombs(gIF_NAME, adapts_item->FriendlyName,
 				sizeof(gIF_NAME));
-#else
+#else /* UPNP_USE_MSVCPP */
 			memset(gIF_NAME, 0, sizeof(gIF_NAME));
 			strncpy(gIF_NAME, adapts_item->FriendlyName,
 				sizeof(gIF_NAME) - 1);
-#endif
+#endif /* UPNP_USE_MSVCPP */
 			ifname_found = 1;
 		} else {
 #ifdef UPNP_USE_MSVCPP
@@ -3420,14 +3420,14 @@ int UpnpGetIfInfo(const char *IfName)
 				/* This is not the interface we're looking for. */
 				continue;
 			}
-#else
+#else /* UPNP_USE_MSVCPP */
 			if (strncmp
 			    (gIF_NAME, adapts_item->FriendlyName,
 			     sizeof(gIF_NAME)) != 0) {
 				/* This is not the interface we're looking for. */
 				continue;
 			}
-#endif
+#endif /* UPNP_USE_MSVCPP */
 		}
 		/* Loop thru this adapter's unicast IP addresses. */
 		uni_addr = adapts_item->FirstUnicastAddress;
@@ -3476,7 +3476,7 @@ int UpnpGetIfInfo(const char *IfName)
 	}
 	inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
 	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
-#elif (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__)
+#elif (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__) /* _WIN32 */
 	struct ifaddrs *ifap, *ifa;
 	struct in_addr v4_addr = { 0 };
 	struct in6_addr v6_addr = { 0 };
@@ -3558,7 +3558,7 @@ int UpnpGetIfInfo(const char *IfName)
 	inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
 	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
 	gIF_INDEX = if_nametoindex(gIF_NAME);
-#else
+#else /* (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__) */ /* _WIN32 */
 	char szBuffer[MAX_INTERFACES * sizeof(struct ifreq)];
 	struct ifconf ifConf;
 	struct ifreq ifReq;
@@ -3624,9 +3624,8 @@ int UpnpGetIfInfo(const char *IfName)
 			strncpy(gIF_NAME, pifReq->ifr_name, sizeof(gIF_NAME) - 1);
 			ifname_found = 1;
 		} else {
-			if (strncmp
-			    (gIF_NAME, pifReq->ifr_name,
-			     sizeof(gIF_NAME)) != 0) {
+			if (strncmp(gIF_NAME, pifReq->ifr_name,
+				sizeof(gIF_NAME)) != 0) {
 				/* This is not the interface we're looking for. */
 				continue;
 			}
@@ -3702,7 +3701,7 @@ int UpnpGetIfInfo(const char *IfName)
 		}
 		fclose(inet6_procfd);
 	}
-#endif
+#endif /* (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__) */ /* _WIN32 */
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 		   "Interface name=%s, index=%d, v4=%s, v6=%s, ULA or GUA v6=%s\n",
 		   gIF_NAME, gIF_INDEX, gIF_IPV4, gIF_IPV6, gIF_IPV6_ULA_GUA);
