@@ -510,7 +510,6 @@ exit_function:
 	return retVal;
 }
 
-#ifdef UPNP_ENABLE_IPV6
 int UpnpInit2(const char *IfName, unsigned short DestPort)
 {
 	int retVal;
@@ -557,7 +556,6 @@ exit_function:
 
 	return retVal;
 }
-#endif
 
 #ifdef UPNP_ENABLE_OPEN_SSL
 int UpnpInitSslContext(int initOpenSslLib, const SSL_METHOD *sslMethod)
@@ -727,15 +725,17 @@ unsigned short UpnpGetServerPort(void)
 	return LOCAL_PORT_V4;
 }
 
-#ifdef UPNP_ENABLE_IPV6
 unsigned short UpnpGetServerPort6(void)
 {
+#ifdef UPNP_ENABLE_IPV6
 	if (UpnpSdkInit != 1)
 		return 0u;
 
 	return LOCAL_PORT_V6;
-}
+#else
+	return 0u;
 #endif
+}
 
 char *UpnpGetServerIpAddress(void)
 {
@@ -747,18 +747,26 @@ char *UpnpGetServerIpAddress(void)
 
 char *UpnpGetServerIp6Address(void)
 {
+#ifdef UPNP_ENABLE_IPV6
 	if (UpnpSdkInit != 1)
-		return NULL;
+		return 0;
 
 	return gIF_IPV6;
+#else
+	return 0;
+#endif
 }
 
 char *UpnpGetServerUlaGuaIp6Address(void)
 {
+#ifdef UPNP_ENABLE_IPV6
 	if (UpnpSdkInit != 1)
 		return NULL;
 
 	return gIF_IPV6_ULA_GUA;
+#else
+	return 0;
+#endif
 }
 
 /*!

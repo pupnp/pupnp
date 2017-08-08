@@ -577,7 +577,6 @@ EXPORT_SPEC int UpnpInit(
  *     \li \c UPNP_E_INVALID_INTERFACE: IfName is invalid or does not
  *             have a valid IPv4 or IPv6 addresss configured.
  */
-#ifdef UPNP_ENABLE_IPV6
 EXPORT_SPEC int UpnpInit2( 
 	/*! The interface name to use by the UPnP SDK operations.
 	 * Examples: "eth0", "xl0", "Local Area Connection", \c NULL to
@@ -586,7 +585,6 @@ EXPORT_SPEC int UpnpInit2(
 	/*!  Local Port to listen for incoming connections.
 	 * \c NULL will pick an arbitrary free port. */
 	unsigned short DestPort);
-#endif
 
 /*!
  * \brief Initializes the OpenSSL library, and the OpenSSL context for use
@@ -656,9 +654,7 @@ EXPORT_SPEC unsigned short UpnpGetServerPort(void);
  *		related requests.
  *	\li On error: 0 is returned if \b UpnpInit has not succeeded.
  */
-#ifdef UPNP_ENABLE_IPV6
 EXPORT_SPEC unsigned short UpnpGetServerPort6(void);
-#endif
 /*!
  * \brief Returns the local IPv4 listening ip address.
  *
@@ -683,11 +679,9 @@ EXPORT_SPEC char *UpnpGetServerIpAddress(void);
  * 		listening for UPnP related requests.
  * 	\li On error: \c NULL is returned if \b UpnpInit has not succeeded.
  */
-#ifdef UPNP_ENABLE_IPV6
 EXPORT_SPEC char *UpnpGetServerIp6Address(void);
 
 EXPORT_SPEC char *UpnpGetServerUlaGuaIp6Address(void);
-#endif
 /*!
  * \brief Registers a device application with the UPnP Library.
  *
