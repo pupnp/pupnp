@@ -429,8 +429,6 @@ if test "x$ac_cv_sys_largefile_sensitive" = "xyes"; then
 	AC_DEFINE([UPNP_LARGEFILE_SENSITIVE], 1, [whether the system defaults to 32bit off_t but can do 64bit when requested])
 fi
 
-AC_REVISION([$Revision: 1.11 $])
-
 upnpmaj=`echo "$PACKAGE_VERSION" | sed 's/\..*//' `
 upnpmin=[`echo "$PACKAGE_VERSION" | sed 's/^[^.]\.// ; s/[^0-9].*$//' `]
 upnppatch=[`echo "$PACKAGE_VERSION" | sed 's/^[^.]\.[^.]\.// ; s/[^0-9].*$//' `]
