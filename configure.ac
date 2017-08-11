@@ -665,10 +665,6 @@ fi
 AC_C_CONST
 AC_C_BIGENDIAN
 
-# The test for socklen_t was getting it wrong when it exists but is in ws2tcpip.h,
-# so we use a new test.
-#TYPE_SOCKLEN_T
-
 AC_CHECK_HEADERS([sys/types.h sys/socket.h ws2tcpip.h])
 AC_MSG_CHECKING(for socklen_t)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
