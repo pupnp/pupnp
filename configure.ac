@@ -424,8 +424,6 @@ AC_CANONICAL_HOST
 AC_CONFIG_HEADERS([autoconfig.h upnp/inc/upnpconfig.h])
 #AC_SYS_LARGEFILE_SENSITIVE
 
-AC_REVISION([$Revision: 1.11 $])
-
 upnpmaj=`echo "$PACKAGE_VERSION" | sed 's/\..*//' `
 upnpmin=[`echo "$PACKAGE_VERSION" | sed 's/^[^.]\.// ; s/[^0-9].*$//' `]
 upnppatch=[`echo "$PACKAGE_VERSION" | sed 's/^[^.]\.[^.]\.// ; s/[^0-9].*$//' `]
