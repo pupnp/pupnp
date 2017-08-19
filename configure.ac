@@ -461,7 +461,7 @@ if test "x$enable_ssdp" = xyes ; then
         AC_DEFINE(UPNP_HAVE_SSDP, 1, [see upnpconfig.h])
 fi
 
-RT_BOOL_ARG_ENABLE([optssdp], [yes], [optionnal SSDP headers support)])
+RT_BOOL_ARG_ENABLE([optssdp], [yes], [optional SSDP headers support)])
 if test "x$enable_optssdp" = xyes ; then
         AC_DEFINE(UPNP_HAVE_OPTSSDP, 1, [see upnpconfig.h])
 	enable_uuid=yes
