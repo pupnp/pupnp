@@ -41,7 +41,7 @@
  * \file
  */
 
-#include "upnpconfig.h"
+#include "autoconfig.h"
 #include "UpnpInet.h"		/* for SOCKET, netinet/in */
 #include "UpnpGlobal.h"		/* for UPNP_INLINE */
 #ifdef UPNP_ENABLE_OPEN_SSL
