@@ -54,20 +54,11 @@
 #define UPNP_VERSION	\
   ((UPNP_VERSION_MAJOR * 100 + UPNP_VERSION_MINOR) * 100 + UPNP_VERSION_PATCH)
 
-
-
 /***************************************************************************
  * Large file support
  ***************************************************************************/
 
-/** File Offset size */
-#undef _FILE_OFFSET_BITS
-
-/** Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
-#undef _LARGEFILE_SOURCE
-
-/** Large files support */
-#undef _LARGE_FILE_SOURCE
+#undef UPNP_LARGEFILE_SENSITIVE
 
 /***************************************************************************
  * Library optional features

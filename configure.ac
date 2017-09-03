@@ -405,7 +405,11 @@ AC_CANONICAL_HOST
 #    installed libraries.
 #
 AC_CONFIG_HEADERS([autoconfig.h upnp/inc/upnpconfig.h])
-#AC_SYS_LARGEFILE_SENSITIVE
+AX_SYS_LARGEFILE_SENSITIVE
+
+if test "x$ac_cv_sys_largefile_sensitive" = "xyes"; then
+	AC_DEFINE([UPNP_LARGEFILE_SENSITIVE], 1, [whether the system defaults to 32bit off_t but can do 64bit when requested])
+fi
 
 AC_REVISION([$Revision: 1.11 $])
 
@@ -596,13 +600,7 @@ AX_CFLAGS_WARN_ALL
 echo "-------------------------------------------------------------------------------"
 
 
-#
-# Lot's of stuff to ensure large file support
-#
 AC_TYPE_SIZE_T
-AC_TYPE_OFF_T
-AC_DEFINE([_LARGE_FILE_SOURCE], [], [Large files support])
-AC_DEFINE([_FILE_OFFSET_BITS], [64], [File Offset size])
 
 
 #
