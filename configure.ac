@@ -405,7 +405,11 @@ AC_CANONICAL_HOST
 #    installed libraries.
 #
 AC_CONFIG_HEADERS([autoconfig.h upnp/inc/upnpconfig.h])
-#AC_SYS_LARGEFILE_SENSITIVE
+AX_SYS_LARGEFILE_SENSITIVE
+
+if test "x$ac_cv_sys_largefile_sensitive" = "xyes"; then
+	AC_DEFINE([UPNP_LARGEFILE_SENSITIVE], 1, [whether the system defaults to 32bit off_t but can do 64bit when requested])
+fi
 
 AC_REVISION([$Revision: 1.11 $])
 
@@ -461,7 +465,7 @@ if test "x$enable_ssdp" = xyes ; then
         AC_DEFINE(UPNP_HAVE_SSDP, 1, [see upnpconfig.h])
 fi
 
-RT_BOOL_ARG_ENABLE([optssdp], [yes], [optionnal SSDP headers support)])
+RT_BOOL_ARG_ENABLE([optssdp], [yes], [optional SSDP headers support)])
 if test "x$enable_optssdp" = xyes ; then
         AC_DEFINE(UPNP_HAVE_OPTSSDP, 1, [see upnpconfig.h])
 	enable_uuid=yes
@@ -596,13 +600,7 @@ AX_CFLAGS_WARN_ALL
 echo "-------------------------------------------------------------------------------"
 
 
-#
-# Lot's of stuff to ensure large file support
-#
 AC_TYPE_SIZE_T
-AC_TYPE_OFF_T
-AC_DEFINE([_LARGE_FILE_SOURCE], [], [Large files support])
-AC_DEFINE([_FILE_OFFSET_BITS], [64], [File Offset size])
 
 
 #
@@ -748,15 +746,4 @@ AC_CONFIG_FILES([
 	libupnp.pc
 	])
 
-
 AC_OUTPUT
-
-#
-# Files copied for windows compilation.
-#
-echo "configure: copying \"autoconfig.h\"          to \"build/inc/autoconfig.h\""
-test -d build/inc || mkdir -p build/inc
-cp autoconfig.h build/inc/autoconfig.h
-echo "configure: copying \"upnp/inc/upnpconfig.h\" to \"build/inc/upnpconfig.h\""
-cp upnp/inc/upnpconfig.h build/inc/upnpconfig.h
-
