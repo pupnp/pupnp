@@ -613,7 +613,9 @@ static UPNP_INLINE int get_alias(
  */
 static int isFileInVirtualDir(
 	/*! [in] Directory path to be tested for virtual directory. */
-	char *filePath)
+	char *filePath,
+	/*! [out] The cookie registered with this virtual directory, if matched. */
+	const void **cookie)
 {
 	virtualDirList *pCurVirtualDir;
 	size_t webDirLen;
@@ -624,15 +626,21 @@ static int isFileInVirtualDir(
 		if (webDirLen) {
 			if (pCurVirtualDir->dirName[webDirLen - 1] == '/') {
 				if (strncmp(pCurVirtualDir->dirName, filePath,
-						webDirLen) == 0)
+						webDirLen) == 0) {
+					if (cookie != NULL)
+						*cookie = pCurVirtualDir->cookie;
 					return !0;
+				}
 			} else {
 				if (strncmp(pCurVirtualDir->dirName, filePath,
 						webDirLen) == 0 &&
 				    (filePath[webDirLen] == '/' ||
 				     filePath[webDirLen] == '\0' ||
-				     filePath[webDirLen] == '?'))
+				     filePath[webDirLen] == '?')) {
+					if (cookie != NULL)
+						*cookie = pCurVirtualDir->cookie;
 					return !0;
+				}
 			}
 		}
 		pCurVirtualDir = pCurVirtualDir->next;
@@ -1091,7 +1099,7 @@ static int process_request(
 		err_code = HTTP_BAD_REQUEST;
 		goto error_handler;
 	}
-	if (isFileInVirtualDir(request_doc)) {
+	if (isFileInVirtualDir(request_doc, &RespInstr->Cookie)) {
 		using_virtual_dir = TRUE;
 		RespInstr->IsVirtualFile = 1;
 		if (membuffer_assign_str(filename, request_doc) != 0) {
@@ -1116,7 +1124,7 @@ static int process_request(
 		if (req->method != HTTPMETHOD_POST) {
 			/* get file info */
 			if (virtualDirCallback.
-			    get_info(filename->buf, finfo) != 0) {
+			    get_info(filename->buf, finfo, RespInstr->Cookie) != 0) {
 				err_code = HTTP_NOT_FOUND;
 				goto error_handler;
 			}
@@ -1132,7 +1140,7 @@ static int process_request(
 					goto error_handler;
 				}
 				/* get info */
-				if (virtualDirCallback.get_info(filename->buf, finfo) != UPNP_E_SUCCESS ||
+				if (virtualDirCallback.get_info(filename->buf, finfo, RespInstr->Cookie) != UPNP_E_SUCCESS ||
 				    UpnpFileInfo_get_IsDirectory(finfo)) {
 					err_code = HTTP_NOT_FOUND;
 					goto error_handler;
@@ -1365,7 +1373,7 @@ static int http_RecvPostMessage(
 	int ret_code = HTTP_OK;
 
 	if (Instr && Instr->IsVirtualFile) {
-		Fp = (virtualDirCallback.open) (filename, UPNP_WRITE);
+		Fp = (virtualDirCallback.open) (filename, UPNP_WRITE, Instr->Cookie);
 		if (Fp == NULL)
 			return HTTP_INTERNAL_SERVER_ERROR;
 	} else {
@@ -1443,7 +1451,7 @@ static int http_RecvPostMessage(
 		       Data_Buf_Size);
 		entity_offset += Data_Buf_Size;
 		if (Instr && Instr->IsVirtualFile) {
-			int n = virtualDirCallback.write(Fp, Buf, Data_Buf_Size);
+			int n = virtualDirCallback.write(Fp, Buf, Data_Buf_Size, Instr->Cookie);
 			if (n < 0) {
 				ret_code = HTTP_INTERNAL_SERVER_ERROR;
 				goto ExitFunction;
@@ -1459,7 +1467,7 @@ static int http_RecvPostMessage(
 		 entity_offset != parser->msg.entity.length);
 ExitFunction:
 	if (Instr && Instr->IsVirtualFile) {
-		virtualDirCallback.close(Fp);
+		virtualDirCallback.close(Fp, Instr->Cookie);
 	} else {
 		fclose(Fp);
 	}

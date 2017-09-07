@@ -1099,7 +1099,7 @@ EXPORT_SPEC int UpnpSearchAsync(
 	 * specification. */
 	const char *TTarget_constarget_const,
 	/*! The user data to pass when the callback function is invoked. */
-	const void *Cookie_const); 
+	const void *Cookie_const);
 
 /*!
  * \brief Sends out the discovery announcements for all devices and services
@@ -2575,7 +2575,9 @@ typedef int (*VDCallback_GetInfo)(
 		/*! [in] The name of the file to query. */
 		const char *filename,
 		/*! [out] Pointer to a structure to store the information on the file. */
-		UpnpFileInfo *info);
+		UpnpFileInfo *info,
+		/*! [in] The cookie associated with this VirtualDir */
+		const void *cookie);
 
 /*!
  * \brief Sets the get_info callback function to be used to access a virtual
@@ -2595,7 +2597,9 @@ typedef UpnpWebFileHandle (*VDCallback_Open)(
 		const char *filename,
 		/*! [in] The mode in which to open the file.
 		 * Valid values are \c UPNP_READ or \c UPNP_WRITE. */
-		enum UpnpOpenFileMode Mode);
+		enum UpnpOpenFileMode Mode,
+		/*! [in] The cookie associated with this VirtualDir */
+		const void *cookie);
 
 /*!
  * \brief Sets the open callback function to be used to access a virtual
@@ -2616,7 +2620,9 @@ typedef int (*VDCallback_Read)(
 	/*! [out] The buffer in which to place the data. */
 	char *buf,
 	/*! [in] The size of the buffer (i.e. the number of bytes to read). */
-	size_t buflen);
+	size_t buflen,
+	/*! [in] The cookie associated with this VirtualDir */
+	const void *cookie);
 
 /*! 
  * \brief Sets the read callback function to be used to access a virtual
@@ -2637,7 +2643,9 @@ typedef	int (*VDCallback_Write)(
 	/*! [in] The buffer with the bytes to write. */
 	char *buf,
 	/*! [in] The number of bytes to write. */
-	size_t buflen);
+	size_t buflen,
+	/*! [in] The cookie associated with this VirtualDir */
+	const void *cookie);
 
 /*!
  * \brief Sets the write callback function to be used to access a virtual
@@ -2663,7 +2671,9 @@ typedef int (*VDCallback_Seek) (
 	 * to move relative to the current position, \c SEEK_END to
 	 * move relative to the end of the file, or \c SEEK_SET to
 	 * specify an absolute offset. */
-	int origin);
+	int origin,
+	/*! [in] The cookie associated with this VirtualDir */
+	const void *cookie);
 
 /*!
  * \brief Sets the seek callback function to be used to access a virtual
@@ -2680,7 +2690,9 @@ EXPORT_SPEC int UpnpVirtualDir_set_SeekCallback(VDCallback_Seek callback);
  */
 typedef int (*VDCallback_Close)(
 		/*! [in] The handle of the file to close. */
-		UpnpWebFileHandle fileHnd);
+		UpnpWebFileHandle fileHnd,
+		/*! [in] The cookie associated with this VirtualDir */
+		const void *cookie);
 
 /*!
  * \brief Sets the close callback function to be used to access a virtual
@@ -2728,7 +2740,11 @@ EXPORT_SPEC int UpnpIsWebserverEnabled(void);
  */
 EXPORT_SPEC int UpnpAddVirtualDir(
 	/*! [in] The name of the new directory mapping to add. */
-	const char *dirName);
+	const char *dirName,
+	/*! [in] The cookie to associated with this virtual directory */
+	const void *cookie,
+	/*! [out] The cookie previously associated, if mapping is already present */
+	const void **oldcookie);
 
 /*!
  * \brief Removes a virtual directory mapping made with \b UpnpAddVirtualDir.

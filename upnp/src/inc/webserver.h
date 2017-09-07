@@ -54,6 +54,8 @@ struct SendInstruction
 	off_t ReadSendSize;
 	/*! Recv from the network and write into local file. */
 	long RecvWriteSize;
+	/*! Cookie associated with the virtualDir. */
+	const void *Cookie;
 	/* Later few more member could be added depending
 	 * on the requirement.*/
 };

@@ -4130,7 +4130,7 @@ int UpnpSetWebServerRootDir(const char *rootDir)
 #endif /* INTERNAL_WEB_SERVER */
 
 
-int UpnpAddVirtualDir(const char *newDirName)
+int UpnpAddVirtualDir(const char *newDirName, const void *cookie, const void **oldcookie)
 {
     virtualDirList *pNewVirtualDir;
     virtualDirList *pLast;
@@ -4162,6 +4162,9 @@ int UpnpAddVirtualDir(const char *newDirName)
     while( pCurVirtualDir != NULL ) {
 	/* already has this entry */
 	if( strcmp( pCurVirtualDir->dirName, dirName ) == 0 ) {
+            if (oldcookie != NULL)
+                *oldcookie = pCurVirtualDir->cookie;
+            pCurVirtualDir->cookie = cookie;
 	    return UPNP_E_SUCCESS;
 	}
 
@@ -4174,6 +4177,9 @@ int UpnpAddVirtualDir(const char *newDirName)
 	return UPNP_E_OUTOF_MEMORY;
     }
     pNewVirtualDir->next = NULL;
+    if (oldcookie != NULL)
+        *oldcookie = NULL;
+    pNewVirtualDir->cookie = cookie;
     memset( pNewVirtualDir->dirName, 0, sizeof( pNewVirtualDir->dirName ) );
     strncpy( pNewVirtualDir->dirName, dirName,
 	sizeof( pNewVirtualDir->dirName ) - 1);
