@@ -556,7 +556,7 @@ int genaSubscribe(
 
 	/* generate client SID */
 	uuid_create(&uid );
-	uuid_unpack(&uid, temp_sid);
+	upnp_uuid_unpack(&uid, temp_sid);
 	rc = snprintf(temp_sid2, sizeof(temp_sid2), "uuid:%s", temp_sid);
 	if (rc < 0 || (unsigned int) rc >= sizeof(temp_sid2)) {
 		return_code = UPNP_E_OUTOF_MEMORY;

@@ -1270,7 +1270,7 @@ void gena_process_subscription_request(
 
 	/* generate SID */
 	uuid_create(&uid);
-	uuid_unpack(&uid, temp_sid);
+	upnp_uuid_unpack(&uid, temp_sid);
 	rc = snprintf(sub->sid, sizeof(sub->sid), "uuid:%s", temp_sid);
 
 	/* respond OK */

@@ -367,7 +367,7 @@ static int UpnpInitPreamble(void)
 #ifdef UPNP_HAVE_OPTSSDP
 	/* Create the NLS uuid. */
 	uuid_create(&nls_uuid);
-	uuid_unpack(&nls_uuid, gUpnpSdkNLSuuid);
+	upnp_uuid_unpack(&nls_uuid, gUpnpSdkNLSuuid);
 #endif /* UPNP_HAVE_OPTSSDP */
 
 	/* Initializes the handle list. */

@@ -48,7 +48,7 @@ int uuid_create(
 /*!
  * \brief Out will be xxxx-xx-xx-xx-xxxxxx format.
  */
-void uuid_unpack(
+void upnp_uuid_unpack(
 	/*! . */
 	uuid_upnp * u,
 	/*! . */

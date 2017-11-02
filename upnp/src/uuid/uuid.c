@@ -82,7 +82,7 @@ int uuid_create(uuid_upnp * uid)
 	return 1;
 };
 
-void uuid_unpack(uuid_upnp * u, char *out)
+void upnp_uuid_unpack(uuid_upnp * u, char *out)
 {
 	sprintf(out,
 		"%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x",
