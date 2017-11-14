@@ -362,14 +362,19 @@ dnl ############################################################################
 dnl # Release 1.8.3:
 dnl # "current:revision:age"
 dnl #
-dnl # - 
+dnl # - Code has changed in upnp
+dnl #   revision: 1 -> 2
+dnl # - interfaces changed/added/removed:
+dnl #   current: 11 -> 12, revision 2 -> 0
+dnl # - interfaces added:
+dnl #   age: 1 -> 2
 dnl #
-dnl #AC_SUBST([LT_VERSION_IXML],       [::])
-dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
+dnl #AC_SUBST([LT_VERSION_IXML],       [10:1:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [12:0:2])
 dnl #
 dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [10:1:0])
-AC_SUBST([LT_VERSION_UPNP],       [11:1:1])
+AC_SUBST([LT_VERSION_UPNP],       [12:0:2])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
