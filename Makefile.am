@@ -20,8 +20,6 @@ EXTRA_DIST = \
 	LICENSE \
 	THANKS \
 	libupnp.spec \
-	build/inc/autoconfig.h \
-	build/inc/upnpconfig.h \
 	build/msvc/inttypes.h \
 	build/msvc/stdint.h
 
