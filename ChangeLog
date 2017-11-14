@@ -2,6 +2,56 @@
 Version 1.8.3
 *******************************************************************************
 
+2017-09-07 Dave Overton <david(at)insomniavisions.com>
+
+	Add userdata/cookie to virtualDir callbacks
+
+	As with the main Device APIs (UpnpRegisterRootDevice etc), it is useful
+	to have a userdata/cookie pointer returned with each callback.
+
+	This patch allows one cookie per registered path which enables a variety
+	of functionality in client apps.
+
+2017-09-03 Uwe Kleine-König <uwe@kleine-koenig.org>
+
+	Fix large file system support
+
+	libupnp uses large file support (if available). If a program linking to
+	libupnp does not however it creates mismatches in callframes. See
+	Issue #51 for the results.
+
+	This simplifies LFS support by using AC_SYS_LARGEFILE_SENSITIVE instead of
+	manually defining _LARGE_FILE_SOURCE and _FILE_OFFSET_BITS (which is
+	useless on architectures where the size of off_t is fixed).
+
+	Furthermore additional logic is introduced to catch a library user without
+	64 bit wide off_t on such a platform.
+
+	upnp.h also makes use of off_t, but as this file includes FileInfo.h, the
+	latter is the single right place for this check.
+
+	This fixes #52 which is a generalized variant of #51.
+
+2017-08-19 Uwe Kleine-König <uwe@kleine-koenig.org>
+
+	configure.ac: Drop copying of include files
+
+	The comment suggests this is for windows compilation. It should be easily
+	possible to add the source directory as an include path to the windows
+	compiler, too, so drop this. (Otherwise this should better be done using
+	AC_CONFIG_COMMANDS.)
+
+2017-09-03 Uwe Kleine-König <uwe@kleine-koenig.org>
+
+	Let source code use autoconfig.h not the public upnpconfig.h
+
+	The former is the one supposed to be used for internal code. upnpconfig.h is only
+	for public stuff.
+
+2017-08-19 Uwe Kleine-König <uwe@kleine-koenig.org>
+
+	configure.ac: Fix typo s/optionnal/optional/
+
 2017-08-08 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
 	Fix broken samples when configured with --disable-ipv6.
