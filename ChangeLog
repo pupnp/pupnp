@@ -2,6 +2,29 @@
 Version 1.8.4
 *******************************************************************************
 
+2017-11-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	GitHub #57 - 1.8.3 broke ABI without changing SONAME
+	Opened by jcowgill
+
+	This change in 1.8.3 broke the ABI and therefore the SONAME should have
+	been changed (ie: age reset to 0):
+
+	EXPORT_SPEC int UpnpAddVirtualDir(
+	        /*! [in] The name of the new directory mapping to add. */
+	-       const char *dirName);
+	+       const char *dirName,
+	+       /*! [in] The cookie to associated with this virtual directory */
+	+       const void *cookie,
+	+       /*! [out] The cookie previously associated, if mapping is already present */
+	+       const void **oldcookie);
+
+	If only the cookie argument was added, you could probably get away with
+	this because all that would happen is that a garbage value is passed
+	around without being used. With the addition of oldcookie, any old
+	programs will not initialise this value and will probably segfault when
+	libupnp tries to write to it.
+
 *******************************************************************************
 Version 1.8.3
 *******************************************************************************
