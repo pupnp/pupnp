@@ -46,6 +46,7 @@ extern "C" {
 #include "ixml.h"
 #include "upnp.h"
 #include "upnpdebug.h"
+#include "LinkedList.h"
 
 #include <stdio.h>
 #include <time.h>
