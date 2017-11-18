@@ -17,6 +17,8 @@
 #undef INIT_LIST_HEAD
 #endif
 
+#include "UpnpGlobal.h" /* For UPNP_INLINE */
+
 /*
  * Simple doubly linked list implementation.
  *
