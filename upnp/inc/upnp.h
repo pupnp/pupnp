@@ -614,6 +614,17 @@ struct Upnp_Action_Request
   IXML_Document *SoapHeader;
 };
 
+/* compat code for libupnp-1.8 */
+typedef struct Upnp_Action_Request UpnpActionRequest;
+#define UpnpActionRequest_get_ErrCode(x) ((x)->ErrCode)
+#define UpnpActionRequest_get_Socket(x) ((x)->Socket)
+#define UpnpActionRequest_get_ErrStr_cstr(x) ((x)->ErrStr)
+#define UpnpActionRequest_get_ActionName_cstr(x) ((x)->ActionName)
+#define UpnpActionRequest_get_DevUDN_cstr(x) ((x)->DevUDN)
+#define UpnpActionRequest_get_ServiceID_cstr(x) ((x)->ServiceID)
+#define UpnpActionRequest_get_ActionRequest(x) ((x)->ActionRequest)
+#define UpnpActionRequest_get_ActionResult(x) ((x)->ActionResult)
+
 struct Upnp_Action_Complete
 {
   /** The result of the operation. */
@@ -629,6 +640,13 @@ struct Upnp_Action_Complete
   IXML_Document *ActionResult;
 
 };
+
+/* compat code for libupnp-1.8 */
+typedef struct Upnp_Action_Complete UpnpActionComplete;
+#define UpnpActionComplete_get_ErrCode(x) ((x)->ErrCode)
+#define UpnpActionComplete_get_CtrlUrl_cstr(x) ((x)->CtrlUrl)
+#define UpnpActionComplete_get_ActionRequest(x) ((x)->ActionRequest)
+#define UpnpActionComplete_get_ActionResult(x) ((x)->ActionResult)
 
 /** Represents the request for current value of a state variable in a service
  *  state table.  */
@@ -661,6 +679,15 @@ struct Upnp_State_Var_Request
   DOMString CurrentVal;
 };
 
+/* compat code for libupnp-1.8 */
+typedef struct Upnp_Action_Complete UpnpActionComplete;
+#define UpnpStateVarRequest_get_ErrCode(x) ((x)->ErrCode)
+#define UpnpStateVarRequest_get_Socket(x) ((x)->Socket)
+#define UpnpStateVarRequest_get_ErrStr_cstr(x) ((x)->ErrStr)
+#define UpnpStateVarRequest_get_DevUDN_cstr(x) ((x)->DevUDN)
+#define UpnpStateVarRequest_get_ServiceID_cstr(x) ((x)->ServiceID)
+#define UpnpStateVarRequest_get_StateVarName_cstr(x) ((x)->StateVarName)
+
 /** Represents the reply for the current value of a state variable in an
     asynchronous call. */
 
@@ -679,6 +706,12 @@ struct Upnp_State_Var_Complete
   DOMString CurrentVal;
 };
 
+/* compat code for libupnp-1.8 */
+typedef struct Upnp_State_Var_Complete UpnpStateVarComplee;
+#define UpnpStateVarComplete_get_ErrCode(x) ((x)->ErrCode)
+#define UpnpStateVarComplete_get_CtrlUrl_cstr(x) ((x)->CtrlUrl)
+#define UpnpStateVarComplete_get_StateVarName_cstr(x) ((x)->StateVarName)
+
 /** Returned along with a {\bf UPNP_EVENT_RECEIVED} callback.  */
 
 struct Upnp_Event
@@ -693,6 +726,12 @@ struct Upnp_Event
   IXML_Document *ChangedVariables;
 
 };
+
+/* compat code for libupnp-1.8 */
+typedef struct Upnp_Event UpnpEvent;
+#define UpnpEvent_get_SID_cstr(x) ((x)->Sid)
+#define UpnpEvent_get_EventKey(x) ((x)->EventKey)
+#define UpnpEvent_get_ChangedVariables(x) ((x)->ChangedVariables)
 
 /*
  * This typedef is required by Doc++ to parse the last entry of the 
@@ -737,6 +776,14 @@ struct Upnp_Discovery
 	struct sockaddr_storage DestAddr;
 };
 
+/* compat code for libupnp-1.8 */
+typedef struct Upnp_Discovery UpnpDiscovery;
+#define UpnpDiscovery_get_DeviceID_cstr(x) ((x)->DeviceId)
+#define UpnpDiscovery_get_DeviceType_cstr(x) ((x)->DeviceType)
+#define UpnpDiscovery_get_Location_cstr(x) ((x)->Location)
+#define UpnpDiscovery_get_ServiceType_cstr(x) ((x)->ServiceType)
+#define UpnpDiscovery_get_Expires(x) ((x)->Expires)
+
 /** Returned along with a {\bf UPNP_EVENT_SUBSCRIBE_COMPLETE} or {\bf
  * UPNP_EVENT_UNSUBSCRIBE_COMPLETE} callback.  */
 
@@ -760,6 +807,13 @@ struct Upnp_Event_Subscribe {
   int TimeOut;              
                               
 };
+
+/* compat code for libupnp-1.8 */
+typedef struct Upnp_Event_Subscribe UpnpEventSubscribe;
+#define UpnpEventSubscribe_get_SID_cstr(x) ((x)->Sid)
+#define UpnpEventSubscribe_get_ErrCode(x) ((x)->ErrCode)
+#define UpnpEventSubscribe_get_PublisherUrl_cstr(x) ((x)->PublisherUrl)
+#define UpnpEventSubscribe_get_TimeOut(x) ((x)->TimeOut)
   
 /** Returned along with a {\bf UPNP_EVENT_SUBSCRIPTION_REQUEST}
  *  callback.  */
@@ -774,8 +828,13 @@ struct Upnp_Subscription_Request
 
   /** The assigned subscription ID for this subscription. */
   Upnp_SID Sid;
-
 };
+
+/* compat code for libupnp-1.8 */
+typedef struct Upnp_Subscription_Request UpnpSubscriptionRequest;
+#define UpnpSubscriptionRequest_get_ServiceId_cstr(x) ((x)->ServiceId)
+#define UpnpSubscriptionRequest_get_UDN_cstr(x) ((x)->UDN)
+#define UpnpSubscriptionRequest_get_SID_cstr(x) ((x)->Sid)
 
 struct Extra_Headers
 {
@@ -816,6 +875,13 @@ struct File_Info
 	* the SDK frees all of them. */
 	struct Extra_Headers *extra_headers;
 };
+
+/* compat code for libupnp-1.8 */
+typedef struct File_Info UpnpFileInfo;
+#define UpnpFileInfo_get_FileLength(x) ((x)->file_length)
+#define UpnpFileInfo_get_LastModified(x) ((x)->last_modified)
+#define UpnpFileInfo_get_IsDirectory(x) ((x)->is_directory)
+#define UpnpFileInfo_get_IsReadable(x) ((x)->is_readable)
 
 /*!
  *  All callback functions share the same prototype, documented below.
