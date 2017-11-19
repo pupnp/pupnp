@@ -1,8 +1,6 @@
 
 
 EXTRA_DIST = \
-    ./UPnP_Programming_Guide.pdf \
-    ./IXML_Programming_Guide.pdf \
     ./html/upnp/icon1.gif \
     ./html/upnp/icon2.gif \
     ./html/upnp/toc.html \
