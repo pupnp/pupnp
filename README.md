@@ -66,8 +66,13 @@ Release Number | Date | History
 1.6.19 | 2013-11-15 | [Portable UPnP SDK][Portable UPnP SDK]
 1.6.20 | 2016-07-07 | [Portable UPnP SDK][Portable UPnP SDK]
 1.6.21 | 2016-12-21 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.22 | 2017-??-?? | 
-1.8.0  | 2017-??-?? | 
+1.6.22 | 2017-05-30 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.23 | 2017-11-19 | [Portable UPnP SDK][Portable UPnP SDK]
+1.6.24 | 2017-11-19 | [Portable UPnP SDK][Portable UPnP SDK]
+1.8.0  | 2017-01-04 | [Portable UPnP SDK][Portable UPnP SDK]
+1.8.1  | 2017-05-24 | [Portable UPnP SDK][Portable UPnP SDK]
+1.8.2  | 2017-11-12 | [Portable UPnP SDK][Portable UPnP SDK]
+1.8.3  | 2017-11-12 | [Portable UPnP SDK][Portable UPnP SDK]
 
 [UPnP SDK for Linux]: https://sourceforge.net/projects/upnp/
 [Portable UPnP SDK]: https://sourceforge.net/projects/pupnp/
