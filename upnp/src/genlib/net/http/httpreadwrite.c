@@ -1662,14 +1662,16 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			struct Extra_Headers *extras;
 			/* array of extra headers */
 			extras = (struct Extra_Headers *) va_arg(argp, struct Extra_Headers *);
-			while (extras->name) {
-				if (extras->resp) {
-					if (membuffer_append(buf, extras->resp, strlen(extras->resp)))
-						goto error_handler;
-					if (membuffer_append(buf, "\r\n", (size_t)2))
-						goto error_handler;
+			if (extras) {
+				while (extras->name) {
+					if (extras->resp) {
+						if (membuffer_append(buf, extras->resp, strlen(extras->resp)))
+							goto error_handler;
+						if (membuffer_append(buf, "\r\n", (size_t)2))
+							goto error_handler;
+					}
+					extras++;
 				}
-				extras++;
 			}
 		}
 		if (c == 's') {
