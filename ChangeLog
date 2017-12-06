@@ -2,6 +2,19 @@
 Version 1.6.25
 *******************************************************************************
 
+2017-12-05 Jörg Krause <joerg.krause@embedded.rocks>
+
+	Fix segmentation fault in http_MakeMessage
+
+	When upmpdcli is linked with libupnp 1.6.24 it fails with an
+	segmentation fault, but linked with libupnp 1.6.22 worked just fine.
+
+	git bisect shows that commit 9c2e8ec is the bad one as the variable
+	`extras` is not properly checked before attempting to used it as a
+	pointer.
+
+	Asure `extras` is not Null before using it.
+
 *******************************************************************************
 Version 1.6.24
 *******************************************************************************
