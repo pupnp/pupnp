@@ -1673,8 +1673,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 					extras++;
 				}
 			}
-		}
-		if (c == 's') {
+		} else if (c == 's') {
 			/* C string */
 			s = (char *)va_arg(argp, char *);
 			assert(s);
