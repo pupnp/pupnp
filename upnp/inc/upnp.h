@@ -680,7 +680,7 @@ struct Upnp_State_Var_Request
 };
 
 /* compat code for libupnp-1.8 */
-typedef struct Upnp_Action_Complete UpnpActionComplete;
+typedef struct Upnp_State_Var_Request UpnpStateVarRequest;
 #define UpnpStateVarRequest_get_ErrCode(x) ((x)->ErrCode)
 #define UpnpStateVarRequest_get_Socket(x) ((x)->Socket)
 #define UpnpStateVarRequest_get_ErrStr_cstr(x) ((x)->ErrStr)
@@ -707,7 +707,7 @@ struct Upnp_State_Var_Complete
 };
 
 /* compat code for libupnp-1.8 */
-typedef struct Upnp_State_Var_Complete UpnpStateVarComplee;
+typedef struct Upnp_State_Var_Complete UpnpStateVarComplete;
 #define UpnpStateVarComplete_get_ErrCode(x) ((x)->ErrCode)
 #define UpnpStateVarComplete_get_CtrlUrl_cstr(x) ((x)->CtrlUrl)
 #define UpnpStateVarComplete_get_StateVarName_cstr(x) ((x)->StateVarName)
@@ -778,6 +778,8 @@ struct Upnp_Discovery
 
 /* compat code for libupnp-1.8 */
 typedef struct Upnp_Discovery UpnpDiscovery;
+#define UpnpDiscovery_get_ErrCode(x) ((x)->ErrCode)
+#define UpnpDiscovery_get_Expires(x) ((x)->Expires)
 #define UpnpDiscovery_get_DeviceID_cstr(x) ((x)->DeviceId)
 #define UpnpDiscovery_get_DeviceType_cstr(x) ((x)->DeviceType)
 #define UpnpDiscovery_get_Location_cstr(x) ((x)->Location)
