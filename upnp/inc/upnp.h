@@ -782,9 +782,12 @@ typedef struct Upnp_Discovery UpnpDiscovery;
 #define UpnpDiscovery_get_Expires(x) ((x)->Expires)
 #define UpnpDiscovery_get_DeviceID_cstr(x) ((x)->DeviceId)
 #define UpnpDiscovery_get_DeviceType_cstr(x) ((x)->DeviceType)
-#define UpnpDiscovery_get_Location_cstr(x) ((x)->Location)
 #define UpnpDiscovery_get_ServiceType_cstr(x) ((x)->ServiceType)
-#define UpnpDiscovery_get_Expires(x) ((x)->Expires)
+#define UpnpDiscovery_get_ServiceVer_cstr(x) ((x)->ServiceVer)
+#define UpnpDiscovery_get_Location_cstr(x) ((x)->Location)
+#define UpnpDiscovery_get_Os_cstr(x) ((x)->Os)
+#define UpnpDiscovery_get_Date_cstr(x) ((x)->Date)
+#define UpnpDiscovery_get_Ext_cstr(x) ((x)->Ext)
 
 /** Returned along with a {\bf UPNP_EVENT_SUBSCRIBE_COMPLETE} or {\bf
  * UPNP_EVENT_UNSUBSCRIBE_COMPLETE} callback.  */
