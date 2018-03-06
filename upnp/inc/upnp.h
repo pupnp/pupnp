@@ -998,7 +998,7 @@ EXPORT_SPEC int UpnpRegisterClient(
  * \brief Unregisters a control point application, unsubscribing all active
  * subscriptions.
  *
- * This function unregisters a client registered with UpnpRegisterclient or
+ * This function unregisters a client registered with UpnpRegisterClient or
  * UpnpRegisterclient2. After this call, the \b UpnpClient_Handle is no longer
  * valid. The UPnP Library generates no more callbacks after this function
  * returns.
