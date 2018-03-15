@@ -255,8 +255,6 @@ EXTRA_DIST = \
 if WITH_DOCUMENTATION
     docsdir = @docdir@
     nobase_docs_DATA = \
-        ./UPnP_Programming_Guide.pdf \
-        ./IXML_Programming_Guide.pdf \
         ./html/upnp/icon1.gif \
         ./html/upnp/icon2.gif \
         ./html/upnp/toc.html \
