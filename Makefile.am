@@ -64,6 +64,6 @@ endif
 
 CLEANFILES = IUpnpErrFile.txt IUpnpInfoFile.txt
 
+# Ensure that the working copy is clean
 dist-hook:
-	# Ensure that the working copy is clean
 	test ! -d $(top_srcdir)/.git || cd $(top_srcdir) && git diff-index --quiet HEAD
