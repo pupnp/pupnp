@@ -62,13 +62,6 @@ tv_combo_SOURCES = \
 	common/tv_device.h \
 	linux/tv_combo_main.c
 
-if WITH_DOCUMENTATION
-examplesdir = $(docdir)/examples
-examples_DATA = \
-	$(tv_ctrlpt_SOURCES) \
-	$(tv_device_SOURCES)
-endif
-
 EXTRA_DIST = \
 	web/tvcombodesc.xml \
 	web/tvcontrolSCPD.xml \
