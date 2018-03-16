@@ -11,16 +11,12 @@ DISTCHECK_CONFIGURE_FLAGS = --enable-debug --enable-samples
 SUBDIRS = \
 	ixml \
 	threadutil \
-	upnp \
-	docs/dist
-
+	upnp
 
 EXTRA_DIST = \
 	.gitignore \
 	Doxyfile \
 	libupnp.pc.in \
-	LICENSE \
-	THANKS \
 	README.md \
 	bootstrap \
 	libupnp.spec \
@@ -56,13 +52,7 @@ pkgconfigexec_DATA = libupnp.pc
 
 $(pkgconfigexec_DATA): config.status
 
-
-if WITH_DOCUMENTATION
-	doc_DATA = LICENSE README NEWS TODO THANKS
-endif
-
-
-CLEANFILES = IUpnpErrFile.txt IUpnpInfoFile.txt
+CLEANFILES = IUpnpErrFile.txt IUpnpInfoFile.txt build/inc/autoconfig.h build/inc/upnpconfig.h
 
 # Ensure that the working copy is clean
 dist-hook:
