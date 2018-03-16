@@ -568,39 +568,6 @@ fi
 
 RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 
-
-#
-# doc installation
-# autoconf >= 2.60 already defines ${docdir}, but we will not use its 
-# default value, which is ${datarootdir}/doc/${PACKAGE_TARNAME}.
-# That would give us ${datarootdir}/doc/libupnp, and we want the package
-# version on that.
-#
-docdir="${datadir}/doc/${PACKAGE_NAME}-${PACKAGE_VERSION}"
-AC_MSG_CHECKING([for documentation directory])
-AC_ARG_WITH(
-	[documentation], 
-	AS_HELP_STRING(
-		[--with-documentation=directory_name],
-		[where documentation is installed 
-		 @<:@[DATADIR/doc/]AC_PACKAGE_NAME[-]AC_PACKAGE_VERSION@:>@])
-AS_HELP_STRING(
-		[--without-documentation],
-		[do not install the documentation]),
-	[],
-	[with_documentation=no])
-
-#
-# If something has been entered after an equal sign, assume it is the directory
-#
-if test x"$with_documentation" != xyes -a x"$with_documentation" != xno; then
-	docdir="$with_documentation"
-fi
-AM_CONDITIONAL(WITH_DOCUMENTATION, test x"$with_documentation" != xno)
-AC_SUBST(docdir)
-AC_MSG_RESULT($docdir)
-
-
 #
 # Checks for programs
 #
@@ -786,10 +753,8 @@ AC_CONFIG_FILES([
 	upnp/Makefile
 	upnp/doc/Makefile
 	upnp/sample/Makefile
-	docs/dist/Makefile
 	libupnp.pc
 	])
-
 
 AC_OUTPUT
 
