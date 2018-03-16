@@ -17,8 +17,6 @@ EXTRA_DIST = \
 	.gitignore \
 	Doxyfile \
 	libupnp.pc.in \
-	LICENSE \
-	THANKS \
 	README.md \
 	bootstrap \
 	libupnp.spec \
@@ -53,9 +51,6 @@ pkgconfigexec_DATA = libupnp.pc
 
 
 $(pkgconfigexec_DATA): config.status
-
-doc_DATA = LICENSE README NEWS TODO THANKS
-
 
 CLEANFILES = IUpnpErrFile.txt IUpnpInfoFile.txt
 
