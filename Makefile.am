@@ -10,9 +10,7 @@ DISTCHECK_CONFIGURE_FLAGS = --enable-debug --enable-samples
 
 SUBDIRS = \
 	ixml \
-	upnp \
-	docs/dist
-
+	upnp
 
 EXTRA_DIST = \
 	Doxyfile \
@@ -32,11 +30,6 @@ pkgconfigexec_DATA = libupnp.pc
 
 $(pkgconfigexec_DATA): config.status
 
-
-if WITH_DOCUMENTATION
-	doc_DATA = LICENSE README NEWS TODO THANKS
-endif
-
+doc_DATA = LICENSE README NEWS TODO THANKS
 
 CLEANFILES = IUpnpErrFile.txt IUpnpInfoFile.txt
-

@@ -41,12 +41,6 @@ make install DESTDIR=$RPM_BUILD_ROOT
 #mv examples dir and pdf file to the doc devel dir
 %{__mv} %{buildroot}%{docdir}/examples \
 	%{buildroot}%{docdeveldir}/
-%{__mv} %{buildroot}%{docdir}/UPnP_Programming_Guide.pdf \
-	%{buildroot}%{docdeveldir}/
-%{__mv} %{buildroot}%{docdir}/IXML_Programming_Guide.pdf \
-	%{buildroot}%{docdeveldir}/
-%{__mv} %{buildroot}%{docdir}/html \
-	%{buildroot}%{docdeveldir}/
 
 %{__rm} %{buildroot}%{_libdir}/{libixml.la,libupnp.la}
 
