@@ -40,6 +40,7 @@
 #include "upnp.h"
 #include "upnpdebug.h"
 
+#include <errno.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
