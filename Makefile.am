@@ -27,4 +27,4 @@ pkgconfigexec_DATA = libupnp.pc
 
 $(pkgconfigexec_DATA): config.status
 
-CLEANFILES = IUpnpErrFile.txt IUpnpInfoFile.txt
+CLEANFILES = IUpnpErrFile.txt IUpnpInfoFile.txt build/inc/autoconfig.h build/inc/upnpconfig.h
