@@ -15,8 +15,6 @@ SUBDIRS = \
 EXTRA_DIST = \
 	Doxyfile \
 	libupnp.pc.in \
-	LICENSE \
-	THANKS \
 	libupnp.spec \
 	build/msvc/inttypes.h \
 	build/msvc/stdint.h
@@ -27,9 +25,6 @@ EXTRA_DIST = \
 pkgconfigexecdir = $(libdir)/pkgconfig
 pkgconfigexec_DATA = libupnp.pc
 
-
 $(pkgconfigexec_DATA): config.status
-
-doc_DATA = LICENSE README NEWS TODO THANKS
 
 CLEANFILES = IUpnpErrFile.txt IUpnpInfoFile.txt

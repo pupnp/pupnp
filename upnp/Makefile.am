@@ -203,12 +203,9 @@ test_url_SOURCES = test/test_url.c
 
 
 EXTRA_DIST = \
-	LICENSE \
 	m4/libupnp.m4 \
 	src/win_dll.c
-
 
 CLEANFILES = \
 	IUpnpErrFile.txt \
 	IUpnpInfoFile.txt
-
