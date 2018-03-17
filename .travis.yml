@@ -1,0 +1,7 @@
+language: c
+compiler: gcc
+dist: trusty
+script:
+  - ./bootstrap
+  - ./configure
+  - make distcheck
