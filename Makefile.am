@@ -10,15 +10,11 @@ DISTCHECK_CONFIGURE_FLAGS = --enable-debug --enable-samples
 
 SUBDIRS = \
 	ixml \
-	upnp \
-	docs/dist
-
+	upnp
 
 EXTRA_DIST = \
 	Doxyfile \
 	libupnp.pc.in \
-	LICENSE \
-	THANKS \
 	libupnp.spec \
 	build/msvc/inttypes.h \
 	build/msvc/stdint.h
@@ -29,14 +25,6 @@ EXTRA_DIST = \
 pkgconfigexecdir = $(libdir)/pkgconfig
 pkgconfigexec_DATA = libupnp.pc
 
-
 $(pkgconfigexec_DATA): config.status
 
-
-if WITH_DOCUMENTATION
-	doc_DATA = LICENSE README NEWS TODO THANKS
-endif
-
-
-CLEANFILES = IUpnpErrFile.txt IUpnpInfoFile.txt
-
+CLEANFILES = build/inc/autoconfig.h build/inc/upnpconfig.h
