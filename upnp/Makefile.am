@@ -206,6 +206,4 @@ EXTRA_DIST = \
 	m4/libupnp.m4 \
 	src/win_dll.c
 
-CLEANFILES = \
-	IUpnpErrFile.txt \
-	IUpnpInfoFile.txt
+CLEANFILES = libupnp_err.log libupnp_info.log
