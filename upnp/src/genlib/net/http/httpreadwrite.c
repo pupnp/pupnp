@@ -1455,7 +1455,7 @@ int http_SendStatusResponse(IN SOCKINFO *info, IN int http_status_code,
 	membuffer_init(&membuf);
 	membuf.size_inc = (size_t)70;
 	/* response start line */
-	ret = http_MakeMessage(&membuf, response_major, response_minor, "RSCB",
+	ret = http_MakeMessage(&membuf, response_major, response_minor, "RSCBcc",
 			       http_status_code, http_status_code);
 	if (ret == 0) {
 		timeout = HTTP_DEFAULT_TIMEOUT;
@@ -1596,9 +1596,12 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			    (http_major_version == 1 && http_minor_version == 1)
 			    ) {
 				/* connection header */
-				if (membuffer_append_str(buf, "CONNECTION: close\r\n"))
+				if (membuffer_append_str(buf, "CONNECTION: close"))
 					goto error_handler;
 			}
+			/* append \r\n in all cases, e.g. HTTP/1.0 */
+			if (membuffer_append_str(buf, "\r\n"))
+				goto error_handler;
 		} else if (c == 'N') {
 			/* content-length header */
 			bignum = (off_t) va_arg(argp, off_t);
