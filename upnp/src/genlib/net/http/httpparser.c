@@ -1,31 +1,31 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -205,16 +205,16 @@ static UPNP_INLINE int is_qdtext_char(IN int c)
 *
 * Parameters :
 *	INOUT scanner_t* scanner ;	Scanner Object
-*	OUT memptr* token ;			Token 
+*	OUT memptr* token ;			Token
 *	OUT token_type_t* tok_type ; Type of token
 *
-* Description :	reads next token from the input stream				
+* Description :	reads next token from the input stream
 *	note: 0 and is used as a marker, and will not be valid in a quote
 *
 * Return : parse_status_t ;
 *	PARSE_OK
-*	PARSE_INCOMPLETE		-- not enuf chars to get a token			
-*	PARSE_FAILURE			-- bad msg format							
+*	PARSE_INCOMPLETE		-- not enuf chars to get a token
+*	PARSE_FAILURE			-- bad msg format
 *
 * Note :
 ************************************************************************/
@@ -349,8 +349,8 @@ static UPNP_INLINE char *scanner_get_str(IN scanner_t * scanner)
 * Function :	httpmsg_compare
 *
 * Parameters :
-*	void* param1 ;	
-*	void* param2 ;	
+*	void* param1 ;
+*	void* param2 ;
 *
 * Description :	Compares name id in the http headers.
 *
@@ -372,7 +372,7 @@ static int httpmsg_compare(void *param1, void *param2)
 * Function :	httpheader_free
 *
 * Parameters :
-*	void *msg ;	
+*	void *msg ;
 *
 * Description :	Free memory allocated for the http header
 *
@@ -428,11 +428,11 @@ void httpmsg_destroy( INOUT http_message_t * msg )
     assert( msg != NULL );
 
     if( msg->initialized == 1 ) {
-        ListDestroy( &msg->headers, 1 );
-        membuffer_destroy( &msg->msg );
-        membuffer_destroy( &msg->status_msg );
-        free( msg->urlbuf );
-        msg->initialized = 0;
+	ListDestroy( &msg->headers, 1 );
+	membuffer_destroy( &msg->msg );
+	membuffer_destroy( &msg->status_msg );
+	free( msg->urlbuf );
+	msg->initialized = 0;
     }
 }
 
@@ -462,13 +462,13 @@ http_header_t *httpmsg_find_hdr_str(
     node = ListHead( &msg->headers );
     while( node != NULL ) {
 
-        header = ( http_header_t * ) node->item;
+	header = ( http_header_t * ) node->item;
 
-        if( memptr_cmp_nocase( &header->name, header_name ) == 0 ) {
-            return header;
-        }
+	if( memptr_cmp_nocase( &header->name, header_name ) == 0 ) {
+	    return header;
+	}
 
-        node = ListNext( &msg->headers, node );
+	node = ListNext( &msg->headers, node );
     }
     return NULL;
 }
@@ -500,12 +500,12 @@ http_header_t *httpmsg_find_hdr(
     header.name_id = header_name_id;
     node = ListFind( &msg->headers, NULL, &header );
     if( node == NULL ) {
-        return NULL;
+	return NULL;
     }
     data = ( http_header_t * ) node->item;
     if( value != NULL ) {
-        value->buf = data->value.buf;
-        value->length = data->value.length;
+	value->buf = data->value.buf;
+	value->length = data->value.length;
     }
 
     return data;
@@ -568,31 +568,31 @@ static UPNP_INLINE parse_status_t skip_lws(INOUT scanner_t *scanner)
     int matched;
 
     do {
-        save_pos = scanner->cursor;
-        matched = FALSE;
+	save_pos = scanner->cursor;
+	matched = FALSE;
 
-        /* get CRLF or WS */
-        status = scanner_get_token( scanner, &token, &tok_type );
-        if( status == ( parse_status_t ) PARSE_OK ) {
-            if( tok_type == ( token_type_t ) TT_CRLF ) {
-                /* get WS */
-                status = scanner_get_token( scanner, &token, &tok_type );
-            }
+	/* get CRLF or WS */
+	status = scanner_get_token( scanner, &token, &tok_type );
+	if( status == ( parse_status_t ) PARSE_OK ) {
+	    if( tok_type == ( token_type_t ) TT_CRLF ) {
+		/* get WS */
+		status = scanner_get_token( scanner, &token, &tok_type );
+	    }
 
-            if( status == ( parse_status_t ) PARSE_OK &&
+	    if( status == ( parse_status_t ) PARSE_OK &&
 		tok_type == ( token_type_t ) TT_WHITESPACE ) {
-                matched = TRUE;
-            } else {
-                /* did not match LWS; pushback token(s) */
-                scanner->cursor = save_pos;
-            }
-        }
+		matched = TRUE;
+	    } else {
+		/* did not match LWS; pushback token(s) */
+		scanner->cursor = save_pos;
+	    }
+	}
     } while( matched );
 
     /* if entire msg is loaded, ignore an 'incomplete' warning */
     if( status == ( parse_status_t ) PARSE_INCOMPLETE &&
 	scanner->entire_msg_loaded ) {
-        status = PARSE_OK;
+	status = PARSE_OK;
     }
 
     return status;
@@ -631,36 +631,36 @@ static UPNP_INLINE parse_status_t match_non_ws_string(
     str->buf = scanner_get_str( scanner );  /* point to next char in input */
 
     while( !done ) {
-        status = scanner_get_token( scanner, &token, &tok_type );
-        if( status == ( parse_status_t ) PARSE_OK &&
-            tok_type != ( token_type_t ) TT_WHITESPACE &&
-            tok_type != ( token_type_t ) TT_CRLF ) {
-            /* append non-ws token */
-            str->length += token.length;
-        } else {
-            done = TRUE;
-        }
+	status = scanner_get_token( scanner, &token, &tok_type );
+	if( status == ( parse_status_t ) PARSE_OK &&
+	    tok_type != ( token_type_t ) TT_WHITESPACE &&
+	    tok_type != ( token_type_t ) TT_CRLF ) {
+	    /* append non-ws token */
+	    str->length += token.length;
+	} else {
+	    done = TRUE;
+	}
     }
 
     if( status == ( parse_status_t ) PARSE_OK ) {
-        /* last token was WS; push it back in */
-        scanner->cursor -= token.length;
+	/* last token was WS; push it back in */
+	scanner->cursor -= token.length;
     }
     /* tolerate 'incomplete' msg */
     if( status == ( parse_status_t ) PARSE_OK ||
-        ( status == ( parse_status_t ) PARSE_INCOMPLETE &&
-        scanner->entire_msg_loaded )
-         ) {
-        if( str->length == ( size_t ) 0 ) {
-            /* no strings found */
-            return PARSE_NO_MATCH;
-        } else {
-            return PARSE_OK;
-        }
+	( status == ( parse_status_t ) PARSE_INCOMPLETE &&
+	scanner->entire_msg_loaded )
+	 ) {
+	if( str->length == ( size_t ) 0 ) {
+	    /* no strings found */
+	    return PARSE_NO_MATCH;
+	} else {
+	    return PARSE_OK;
+	}
     } else {
-        /* error -- pushback tokens */
-        scanner->cursor = save_cursor;
-        return status;
+	/* error -- pushback tokens */
+	scanner->cursor = save_cursor;
+	return status;
     }
 }
 
@@ -669,10 +669,10 @@ static UPNP_INLINE parse_status_t match_non_ws_string(
 *
 * Parameters :
 *	INOUT scanner_t* scanner ;	Scanner Object
-*	OUT memptr* raw_value ;		Buffer to get the scanner buffer 
+*	OUT memptr* raw_value ;		Buffer to get the scanner buffer
 *					contents
 *
-* Description :	Matches a raw value in a the input; value's length 
+* Description :	Matches a raw value in a the input; value's length
 *	can	be 0 or more. Whitespace after value is trimmed. On success,
 *	scanner points the CRLF that ended the value
 *
@@ -703,60 +703,60 @@ static UPNP_INLINE parse_status_t match_raw_value(
     raw_value->length = ( size_t ) 0;
 
     while( !done ) {
-        status = scanner_get_token( scanner, &token, &tok_type );
-        if( status == ( parse_status_t ) PARSE_OK ) {
-            if( !saw_crlf ) {
-                if( tok_type == ( token_type_t ) TT_CRLF ) {
-                    /* CRLF could end value */
-                    saw_crlf = TRUE;
+	status = scanner_get_token( scanner, &token, &tok_type );
+	if( status == ( parse_status_t ) PARSE_OK ) {
+	    if( !saw_crlf ) {
+		if( tok_type == ( token_type_t ) TT_CRLF ) {
+		    /* CRLF could end value */
+		    saw_crlf = TRUE;
 
-                    /* save input position at start of CRLF */
-                    pos_at_crlf = scanner->cursor - token.length;
-                }
-                /* keep appending value */
-                raw_value->length += token.length;
-            } else              /* already seen CRLF */
-            {
-                if( tok_type == ( token_type_t ) TT_WHITESPACE ) {
-                    /* start again; forget CRLF */
-                    saw_crlf = FALSE;
-                    raw_value->length += token.length;
-                } else {
-                    /* non-ws means value ended just before CRLF */
-                    done = TRUE;
+		    /* save input position at start of CRLF */
+		    pos_at_crlf = scanner->cursor - token.length;
+		}
+		/* keep appending value */
+		raw_value->length += token.length;
+	    } else              /* already seen CRLF */
+	    {
+		if( tok_type == ( token_type_t ) TT_WHITESPACE ) {
+		    /* start again; forget CRLF */
+		    saw_crlf = FALSE;
+		    raw_value->length += token.length;
+		} else {
+		    /* non-ws means value ended just before CRLF */
+		    done = TRUE;
 
-                    /* point to the crlf which ended the value */
-                    scanner->cursor = pos_at_crlf;
-                }
-            }
-        } else {
-            /* some kind of error; restore scanner position */
-            scanner->cursor = save_pos;
-            done = TRUE;
-        }
+		    /* point to the crlf which ended the value */
+		    scanner->cursor = pos_at_crlf;
+		}
+	    }
+	} else {
+	    /* some kind of error; restore scanner position */
+	    scanner->cursor = save_pos;
+	    done = TRUE;
+	}
     }
 
     if( status == ( parse_status_t ) PARSE_OK ) {
-        /* trim whitespace on right side of value */
-        while( raw_value->length > ( size_t ) 0 ) {
-            /* get last char */
-            c = raw_value->buf[raw_value->length - ( size_t ) 1];
+	/* trim whitespace on right side of value */
+	while( raw_value->length > ( size_t ) 0 ) {
+	    /* get last char */
+	    c = raw_value->buf[raw_value->length - ( size_t ) 1];
 
-            if( c != ' ' && c != '\t' &&
-                c != TOKCHAR_CR && c != TOKCHAR_LF ) {
-                /* done; no more whitespace */
-                break;
-            }
-            /* remove whitespace */
-            raw_value->length--;
-        }
+	    if( c != ' ' && c != '\t' &&
+		c != TOKCHAR_CR && c != TOKCHAR_LF ) {
+		/* done; no more whitespace */
+		break;
+	    }
+	    /* remove whitespace */
+	    raw_value->length--;
+	}
     }
 
     return status;
 }
 
 /************************************************************************
-* Function: match_int													
+* Function: match_int
 *
 * Parameters:
 *	INOUT scanner_t* scanner ;  Scanner Object
@@ -765,7 +765,7 @@ static UPNP_INLINE parse_status_t match_raw_value(
 *	OUT int* value ;	Number stored here
 *
 * Description: Matches an unsigned integer value in the input. The
-*	integer is returned in 'value'. Except for PARSE_OK result, the	
+*	integer is returned in 'value'. Except for PARSE_OK result, the
 *	scanner's cursor is moved back to its original position on error.
 *
 * Returns:
@@ -819,18 +819,18 @@ static UPNP_INLINE parse_status_t match_int(
 *	INOUT scanner_t* scanner ;Scanner Object
 *	OUT memptr* str ;	Buffer to copy scanner buffer contents to
 *
-* Description: Reads data until end of line; the crlf at the end of		
-*	line is not consumed. On error, scanner is not restored. On			
-*	success, 'str' points to a string that runs until eol				
+* Description: Reads data until end of line; the crlf at the end of
+*	line is not consumed. On error, scanner is not restored. On
+*	success, 'str' points to a string that runs until eol
 *
 * Returns:
 *   PARSE_OK
 *   PARSE_FAILURE
 *   PARSE_INCOMPLETE
 ************************************************************************/
-static UPNP_INLINE parse_status_t 
+static UPNP_INLINE parse_status_t
 read_until_crlf( INOUT scanner_t * scanner,
-                 OUT memptr * str )
+		 OUT memptr * str )
 {
     memptr token;
     token_type_t tok_type;
@@ -842,16 +842,16 @@ read_until_crlf( INOUT scanner_t * scanner,
 
     /* read until we hit a crlf */
     do {
-        status = scanner_get_token( scanner, &token, &tok_type );
+	status = scanner_get_token( scanner, &token, &tok_type );
     } while( status == ( parse_status_t ) PARSE_OK &&
 	tok_type != ( token_type_t ) TT_CRLF );
 
     if( status == ( parse_status_t ) PARSE_OK ) {
-        /* pushback crlf in stream */
-        scanner->cursor -= token.length;
+	/* pushback crlf in stream */
+	scanner->cursor -= token.length;
 
-        /* str should include all strings except crlf at the end */
-        str->length = scanner->cursor - start_pos;
+	/* str should include all strings except crlf at the end */
+	str->length = scanner->cursor - start_pos;
     }
 
     return status;
@@ -876,22 +876,22 @@ read_until_crlf( INOUT scanner_t * scanner,
 ************************************************************************/
 static UPNP_INLINE parse_status_t
 match_char( INOUT scanner_t * scanner,
-            IN char c,
-            IN int case_sensitive )
+	    IN char c,
+	    IN int case_sensitive )
 {
     char scan_char;
 
     if( scanner->cursor >= scanner->msg->length ) {
-        return PARSE_INCOMPLETE;
+	return PARSE_INCOMPLETE;
     }
     /* read next char from scanner */
     scan_char = scanner->msg->buf[scanner->cursor++];
 
     if( case_sensitive ) {
-        return c == scan_char ? PARSE_OK : PARSE_NO_MATCH;
+	return c == scan_char ? PARSE_OK : PARSE_NO_MATCH;
     } else {
-        return tolower( c ) == tolower( scan_char ) ?
-            PARSE_OK : PARSE_NO_MATCH;
+	return tolower( c ) == tolower( scan_char ) ?
+	    PARSE_OK : PARSE_NO_MATCH;
     }
 }
 
@@ -917,9 +917,9 @@ match_char( INOUT scanner_t * scanner,
  *   %c     matches CRLF
  *   %i     ignore case in literal matching
  *   %n     case-sensitive matching in literals
- *   %w     optional whitespace; (similar to '\t', 
+ *   %w     optional whitespace; (similar to '\t',
  *                  except whitespace is optional)
- *   %0     (zero) match null-terminator char '\0' 
+ *   %0     (zero) match null-terminator char '\0'
  *              (can only be used as last char in fmt)
  *              use only in matchstr(), not match()
  *   other chars match literally
@@ -935,12 +935,12 @@ match_char( INOUT scanner_t * scanner,
 * Function : vfmatch
 *
 * Parameters :
-* 	INOUT scanner_t* scanner ;	Scanner Object	
-* 	IN const char* fmt ;		Pattern Format 
+* 	INOUT scanner_t* scanner ;	Scanner Object
+* 	IN const char* fmt ;		Pattern Format
 * 	va_list argp ;			List of variable arguments
 *
-* Description : Extracts variable parameters depending on the passed 
-* 	in format parameter. Parses data also based on the passed in 
+* Description : Extracts variable parameters depending on the passed
+* 	in format parameter. Parses data also based on the passed in
 * 	format parameter.
 *
 * Return : int ;
@@ -979,139 +979,139 @@ static parse_status_t vfmatch(
     status = PARSE_OK;
     while( ( c = *fmt_ptr++ ) &&
 	 ( status == ( parse_status_t ) PARSE_OK ) ) {
-        if( c == '%' ) {
-            c = *fmt_ptr++;
-            switch ( c ) {
-                case 'R':      /* raw value */
-                    str_ptr = va_arg( argp, memptr * );
-                    assert( str_ptr != NULL );
-                    status = match_raw_value( scanner, str_ptr );
-                    break;
-                case 's':      /* simple identifier */
-                    str_ptr = va_arg( argp, memptr * );
-                    assert( str_ptr != NULL );
-                    status = scanner_get_token( scanner, str_ptr,
-                                                &tok_type );
-                    if( status == ( parse_status_t ) PARSE_OK &&
+	if( c == '%' ) {
+	    c = *fmt_ptr++;
+	    switch ( c ) {
+		case 'R':      /* raw value */
+		    str_ptr = va_arg( argp, memptr * );
+		    assert( str_ptr != NULL );
+		    status = match_raw_value( scanner, str_ptr );
+		    break;
+		case 's':      /* simple identifier */
+		    str_ptr = va_arg( argp, memptr * );
+		    assert( str_ptr != NULL );
+		    status = scanner_get_token( scanner, str_ptr,
+						&tok_type );
+		    if( status == ( parse_status_t ) PARSE_OK &&
 			tok_type != ( token_type_t ) TT_IDENTIFIER ) {
-                        /* not an identifier */
-                        status = PARSE_NO_MATCH;
-                    }
-                    break;
-                case 'c':      /* crlf */
-                    status = scanner_get_token( scanner,
-                                                &token, &tok_type );
-                    if( status == ( parse_status_t ) PARSE_OK &&
+			/* not an identifier */
+			status = PARSE_NO_MATCH;
+		    }
+		    break;
+		case 'c':      /* crlf */
+		    status = scanner_get_token( scanner,
+						&token, &tok_type );
+		    if( status == ( parse_status_t ) PARSE_OK &&
 			tok_type != ( token_type_t ) TT_CRLF ) {
-                        /* not CRLF token */
-                        status = PARSE_NO_MATCH;
-                    }
-                    break;
-                case 'd':      /* integer */
-                case 'x':      /* hex number */
-                    int_ptr = va_arg(argp, int *);
-                    assert(int_ptr != NULL);
-                    base = c == 'd' ? 10 : 16;
-                    status = match_int(scanner, base, int_ptr);
-                    break;
-                case 'S':      /* non-whitespace string */
-                case 'U':      /* uri */
-                    if( c == 'S' ) {
-                        str_ptr = va_arg( argp, memptr * );
-                    } else {
-                        str_ptr = &temp_str;
-                    }
-                    assert( str_ptr != NULL );
-                    status = match_non_ws_string( scanner, str_ptr );
-                    if( c == 'U' && status == ( parse_status_t ) PARSE_OK ) {
-                        uri_ptr = va_arg( argp, uri_type * );
-                        assert( uri_ptr != NULL );
-                        stat = parse_uri( str_ptr->buf, str_ptr->length,
-                                          uri_ptr );
-                        if( stat != HTTP_SUCCESS ) {
-                            status = PARSE_NO_MATCH;
-                        }
-                    }
-                    break;
-                case 'L':      /* string till eol */
-                    str_ptr = va_arg( argp, memptr * );
-                    assert( str_ptr != NULL );
-                    status = read_until_crlf( scanner, str_ptr );
-                    break;
-                case ' ':      /* match space */
-                case '%':      /* match percentage symbol */
-                    status = match_char( scanner, c, case_sensitive );
-                    break;
-                case 'n':      /* case-sensitive match */
-                    case_sensitive = TRUE;
-                    break;
-                case 'i':      /* ignore case */
-                    case_sensitive = FALSE;
-                    break;
-                case 'q':      /* quoted string */
-                    str_ptr = ( memptr * ) va_arg( argp, memptr * );
-                    status =
-                        scanner_get_token( scanner, str_ptr, &tok_type );
-                    if( status == ( parse_status_t ) PARSE_OK &&
+			/* not CRLF token */
+			status = PARSE_NO_MATCH;
+		    }
+		    break;
+		case 'd':      /* integer */
+		case 'x':      /* hex number */
+		    int_ptr = va_arg(argp, int *);
+		    assert(int_ptr != NULL);
+		    base = c == 'd' ? 10 : 16;
+		    status = match_int(scanner, base, int_ptr);
+		    break;
+		case 'S':      /* non-whitespace string */
+		case 'U':      /* uri */
+		    if( c == 'S' ) {
+			str_ptr = va_arg( argp, memptr * );
+		    } else {
+			str_ptr = &temp_str;
+		    }
+		    assert( str_ptr != NULL );
+		    status = match_non_ws_string( scanner, str_ptr );
+		    if( c == 'U' && status == ( parse_status_t ) PARSE_OK ) {
+			uri_ptr = va_arg( argp, uri_type * );
+			assert( uri_ptr != NULL );
+			stat = parse_uri( str_ptr->buf, str_ptr->length,
+					  uri_ptr );
+			if( stat != HTTP_SUCCESS ) {
+			    status = PARSE_NO_MATCH;
+			}
+		    }
+		    break;
+		case 'L':      /* string till eol */
+		    str_ptr = va_arg( argp, memptr * );
+		    assert( str_ptr != NULL );
+		    status = read_until_crlf( scanner, str_ptr );
+		    break;
+		case ' ':      /* match space */
+		case '%':      /* match percentage symbol */
+		    status = match_char( scanner, c, case_sensitive );
+		    break;
+		case 'n':      /* case-sensitive match */
+		    case_sensitive = TRUE;
+		    break;
+		case 'i':      /* ignore case */
+		    case_sensitive = FALSE;
+		    break;
+		case 'q':      /* quoted string */
+		    str_ptr = ( memptr * ) va_arg( argp, memptr * );
+		    status =
+			scanner_get_token( scanner, str_ptr, &tok_type );
+		    if( status == ( parse_status_t ) PARSE_OK &&
 			tok_type != ( token_type_t ) TT_QUOTEDSTRING ) {
-                        status = PARSE_NO_MATCH;    /* not a quoted string */
-                    }
-                    break;
-                case 'w':
-	      	    /* optional whitespace */
-                    status = scanner_get_token( scanner,
-                                                &token, &tok_type );
-                    if( status == ( parse_status_t ) PARSE_OK &&
+			status = PARSE_NO_MATCH;    /* not a quoted string */
+		    }
+		    break;
+		case 'w':
+		    /* optional whitespace */
+		    status = scanner_get_token( scanner,
+						&token, &tok_type );
+		    if( status == ( parse_status_t ) PARSE_OK &&
 			tok_type != ( token_type_t ) TT_WHITESPACE ) {
-                        /* restore non-whitespace token */
-                        scanner->cursor -= token.length;
-                    }
-                    break;
-                case 'P':
-	      	    /* current pos of scanner */
-                    int_ptr = va_arg( argp, int * );
-                    assert( int_ptr != NULL );
-                    *int_ptr = (int)scanner->cursor;
-                    break;
-                    /* valid only in matchstr() */
-                case '0':
+			/* restore non-whitespace token */
+			scanner->cursor -= token.length;
+		    }
+		    break;
+		case 'P':
+		    /* current pos of scanner */
+		    int_ptr = va_arg( argp, int * );
+		    assert( int_ptr != NULL );
+		    *int_ptr = (int)scanner->cursor;
+		    break;
+		    /* valid only in matchstr() */
+		case '0':
 		    /* end of msg? */
-                    /* check that we are 1 beyond last char */
-                    if( scanner->cursor == scanner->msg->length &&
-                        scanner->msg->buf[scanner->cursor] == '\0' ) {
-                        status = PARSE_OK;
-                    } else {
-                        status = PARSE_NO_MATCH;
-                    }
-                    break;
-                default:
+		    /* check that we are 1 beyond last char */
+		    if( scanner->cursor == scanner->msg->length &&
+			scanner->msg->buf[scanner->cursor] == '\0' ) {
+			status = PARSE_OK;
+		    } else {
+			status = PARSE_NO_MATCH;
+		    }
+		    break;
+		default:
 		    /* unknown option */
-                    assert( 0 );
-            }
-        } else {
-            switch ( c ) {
-                case ' ':      /* LWS* */
-                    status = skip_lws( scanner );
-                    break;
-                case '\t':     /* Whitespace */
-                    status = scanner_get_token( scanner,
-                                                &token, &tok_type );
-                    if( status == ( parse_status_t ) PARSE_OK &&
+		    assert( 0 );
+	    }
+	} else {
+	    switch ( c ) {
+		case ' ':      /* LWS* */
+		    status = skip_lws( scanner );
+		    break;
+		case '\t':     /* Whitespace */
+		    status = scanner_get_token( scanner,
+						&token, &tok_type );
+		    if( status == ( parse_status_t ) PARSE_OK &&
 			tok_type != (token_type_t) TT_WHITESPACE ) {
-                        /* not whitespace token */
-                        status = PARSE_NO_MATCH;
-                    }
-                    break;
-                default:       /* match characters */
-                    {
-                        status = match_char( scanner, c, case_sensitive );
-                    }
-            }
-        }
+			/* not whitespace token */
+			status = PARSE_NO_MATCH;
+		    }
+		    break;
+		default:       /* match characters */
+		    {
+			status = match_char( scanner, c, case_sensitive );
+		    }
+	    }
+	}
     }
     if( status != ( parse_status_t ) PARSE_OK ) {
-        /* on error, restore original scanner pos */
-        scanner->cursor = save_pos;
+	/* on error, restore original scanner pos */
+	scanner->cursor = save_pos;
     }
 
     return status;
@@ -1169,9 +1169,9 @@ static parse_status_t match(
 ************************************************************************/
 parse_status_t
 matchstr( IN char *str,
-          IN size_t slen,
-          IN const char *fmt,
-          ... )
+	  IN size_t slen,
+	  IN const char *fmt,
+	  ... )
 {
     parse_status_t ret_code;
     char save_char;
@@ -1259,91 +1259,91 @@ parser_parse_requestline( INOUT http_parser_t * parser )
 
     status = skip_blank_lines( &parser->scanner );
     if( status != ( parse_status_t ) PARSE_OK ) {
-        return status;
+	return status;
     }
     /*simple get http 0.9 as described in http 1.0 spec */
 
     status =
-        match( &parser->scanner, "%s\t%S%w%c", &method_str, &url_str );
+	match( &parser->scanner, "%s\t%S%w%c", &method_str, &url_str );
 
     if( status == ( parse_status_t ) PARSE_OK ) {
 
-        index =
-            map_str_to_int( method_str.buf, method_str.length,
-                            Http_Method_Table, NUM_HTTP_METHODS, TRUE );
+	index =
+	    map_str_to_int( method_str.buf, method_str.length,
+			    Http_Method_Table, NUM_HTTP_METHODS, TRUE );
 
-        if( index < 0 ) {
-            /* error; method not found */
-            parser->http_error_code = HTTP_NOT_IMPLEMENTED;
-            return PARSE_FAILURE;
-        }
+	if( index < 0 ) {
+	    /* error; method not found */
+	    parser->http_error_code = HTTP_NOT_IMPLEMENTED;
+	    return PARSE_FAILURE;
+	}
 
-        if( Http_Method_Table[index].id != HTTPMETHOD_GET ) {
-            parser->http_error_code = HTTP_BAD_REQUEST;
-            return PARSE_FAILURE;
-        }
+	if( Http_Method_Table[index].id != HTTPMETHOD_GET ) {
+	    parser->http_error_code = HTTP_BAD_REQUEST;
+	    return PARSE_FAILURE;
+	}
 
-        hmsg->method = HTTPMETHOD_SIMPLEGET;
+	hmsg->method = HTTPMETHOD_SIMPLEGET;
 
-        /* store url */
-        hmsg->urlbuf = str_alloc( url_str.buf, url_str.length );
-        if( hmsg->urlbuf == NULL ) {
-            /* out of mem */
-            parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
-            return PARSE_FAILURE;
-        }
-        if( parse_uri( hmsg->urlbuf, url_str.length, &hmsg->uri ) !=
-            HTTP_SUCCESS ) {
-            return PARSE_FAILURE;
-        }
+	/* store url */
+	hmsg->urlbuf = str_alloc( url_str.buf, url_str.length );
+	if( hmsg->urlbuf == NULL ) {
+	    /* out of mem */
+	    parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
+	    return PARSE_FAILURE;
+	}
+	if( parse_uri( hmsg->urlbuf, url_str.length, &hmsg->uri ) !=
+	    HTTP_SUCCESS ) {
+	    return PARSE_FAILURE;
+	}
 
-        parser->position = POS_COMPLETE;    /* move to headers */
+	parser->position = POS_COMPLETE;    /* move to headers */
 
-        return PARSE_SUCCESS;
+	return PARSE_SUCCESS;
     }
 
     status = match( &parser->scanner,
-                    "%s\t%S\t%ihttp%w/%w%L%c", &method_str, &url_str,
-                    &version_str );
+		    "%s\t%S\t%ihttp%w/%w%L%c", &method_str, &url_str,
+		    &version_str );
     if( status != ( parse_status_t ) PARSE_OK ) {
-        return status;
+	return status;
     }
     /* store url */
     hmsg->urlbuf = str_alloc( url_str.buf, url_str.length );
     if( hmsg->urlbuf == NULL ) {
-        /* out of mem */
-        parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
-        return PARSE_FAILURE;
+	/* out of mem */
+	parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
+	return PARSE_FAILURE;
     }
     if( parse_uri( hmsg->urlbuf, url_str.length, &hmsg->uri ) !=
-        HTTP_SUCCESS ) {
-        return PARSE_FAILURE;
+	HTTP_SUCCESS ) {
+	return PARSE_FAILURE;
     }
 
     index =
-        map_str_to_int( method_str.buf, method_str.length,
-                        Http_Method_Table, NUM_HTTP_METHODS, TRUE );
+	map_str_to_int( method_str.buf, method_str.length,
+			Http_Method_Table, NUM_HTTP_METHODS, TRUE );
     if( index < 0 ) {
-        /* error; method not found */
-        parser->http_error_code = HTTP_NOT_IMPLEMENTED;
-        return PARSE_FAILURE;
+	/* error; method not found */
+	parser->http_error_code = HTTP_NOT_IMPLEMENTED;
+	return PARSE_FAILURE;
     }
 
     /* scan version */
     save_char = version_str.buf[version_str.length];
     version_str.buf[version_str.length] = '\0'; /* null-terminate */
     num_scanned = sscanf( version_str.buf, "%d . %d",
-                          &hmsg->major_version, &hmsg->minor_version );
+			  &hmsg->major_version, &hmsg->minor_version );
     version_str.buf[version_str.length] = save_char;    /* restore */
     if (num_scanned != 2 ||
-        /* HTTP version equals to 1.0 should fail for MSEARCH as required by the
-         * UPnP certification tool */
-        hmsg->major_version < 0 ||
+	/* HTTP version equals to 1.0 should fail for MSEARCH as required by the
+	 * UPnP certification tool */
+	hmsg->major_version < 0 ||
 	( hmsg->major_version == 1 && hmsg->minor_version < 1 &&
 	  Http_Method_Table[index].id == HTTPMETHOD_MSEARCH )) {
-        parser->http_error_code = HTTP_HTTP_VERSION_NOT_SUPPORTED;
-        /* error; bad http version */
-        return PARSE_FAILURE;
+	parser->http_error_code = HTTP_HTTP_VERSION_NOT_SUPPORTED;
+	/* error; bad http version */
+	return PARSE_FAILURE;
     }
 
     hmsg->method = ( http_method_t ) Http_Method_Table[index].id;
@@ -1460,6 +1460,7 @@ parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
 	http_header_t *orig_header;
 	char save_char;
 	int ret2;
+	static char zero = 0;
 
 	assert(parser->position == (parser_pos_t)POS_HEADERS ||
 	       parser->ent_position == ENTREAD_CHUNKY_HEADERS);
@@ -1530,8 +1531,7 @@ parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
 			membuffer_init(&header->value);
 			/* value can be 0 length */
 			if (hdr_value.length == (size_t)0) {
-				/* FIXME: Is this a bug? buf is not const. */
-				hdr_value.buf = "\0";
+				hdr_value.buf = &zero;
 				hdr_value.length = (size_t)1;
 			}
 			/* save in header in buffers */
@@ -1595,29 +1595,29 @@ parser_parse_entity_using_clen( INOUT http_parser_t * parser )
 
     /* determine entity (i.e. body) length so far */
     parser->msg.entity.length =
-        parser->msg.msg.length - parser->entity_start_position + 
-        parser->msg.amount_discarded;
+	parser->msg.msg.length - parser->entity_start_position +
+	parser->msg.amount_discarded;
 
     if( parser->msg.entity.length < parser->content_length ) {
-        /* more data to be read */
-        return PARSE_INCOMPLETE;
+	/* more data to be read */
+	return PARSE_INCOMPLETE;
     } else {
-        if( parser->msg.entity.length > parser->content_length ) {
-            /* silently discard extra data */
-            parser->msg.msg.buf[parser->entity_start_position +
-                                parser->content_length -
-                                parser->msg.amount_discarded] = '\0';
-        }
-        /* save entity length */
-        parser->msg.entity.length = parser->content_length;
+	if( parser->msg.entity.length > parser->content_length ) {
+	    /* silently discard extra data */
+	    parser->msg.msg.buf[parser->entity_start_position +
+				parser->content_length -
+				parser->msg.amount_discarded] = '\0';
+	}
+	/* save entity length */
+	parser->msg.entity.length = parser->content_length;
 
-        /* save entity start ptr; (the very last thing to do) */
-        parser->msg.entity.buf = parser->msg.msg.buf +
-                                 parser->entity_start_position;
+	/* save entity start ptr; (the very last thing to do) */
+	parser->msg.entity.buf = parser->msg.msg.buf +
+				 parser->entity_start_position;
 
-        /* done reading entity */
-        parser->position = POS_COMPLETE;
-        return PARSE_SUCCESS;
+	/* done reading entity */
+	parser->position = POS_COMPLETE;
+	return PARSE_SUCCESS;
     }
 }
 
@@ -1689,20 +1689,20 @@ parser_parse_chunky_headers( INOUT http_parser_t * parser )
     save_pos = parser->scanner.cursor;
     status = parser_parse_headers( parser );
     if( status == ( parse_status_t ) PARSE_OK ) {
-        /* finally, done with the whole msg */
-        parser->position = POS_COMPLETE;
+	/* finally, done with the whole msg */
+	parser->position = POS_COMPLETE;
 
-        membuffer_delete( &parser->msg.msg, save_pos,
-                          ( parser->scanner.cursor - save_pos ) );
-        parser->scanner.cursor = save_pos;
+	membuffer_delete( &parser->msg.msg, save_pos,
+			  ( parser->scanner.cursor - save_pos ) );
+	parser->scanner.cursor = save_pos;
 
-        /* save entity start ptr as the very last thing to do */
-        parser->msg.entity.buf = parser->msg.msg.buf +
-            parser->entity_start_position;
+	/* save entity start ptr as the very last thing to do */
+	parser->msg.entity.buf = parser->msg.msg.buf +
+	    parser->entity_start_position;
 
-        return PARSE_SUCCESS;
+	return PARSE_SUCCESS;
     } else {
-        return status;
+	return status;
     }
 }
 
@@ -1735,26 +1735,26 @@ parser_parse_chunky_entity( INOUT http_parser_t * parser )
     /* get size of chunk, discard extension, discard CRLF */
     status = match( scanner, "%x%L%c", &parser->chunk_size, &dummy );
     if( status != ( parse_status_t ) PARSE_OK ) {
-        scanner->cursor = save_pos;
-        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-            "CHUNK COULD NOT BE PARSED\n" );
-        return status;
+	scanner->cursor = save_pos;
+	UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+	    "CHUNK COULD NOT BE PARSED\n" );
+	return status;
     }
     /* remove chunk info just matched; just retain data */
     membuffer_delete( &parser->msg.msg, save_pos,
-                      ( scanner->cursor - save_pos ) );
+		      ( scanner->cursor - save_pos ) );
     scanner->cursor = save_pos; /* adjust scanner too */
 
     if( parser->chunk_size == (size_t)0 ) {
-        /* done reading entity; determine length of entity */
-        parser->msg.entity.length = parser->scanner.cursor -
-            parser->entity_start_position + parser->msg.amount_discarded;
+	/* done reading entity; determine length of entity */
+	parser->msg.entity.length = parser->scanner.cursor -
+	    parser->entity_start_position + parser->msg.amount_discarded;
 
-        /* read entity headers */
-        parser->ent_position = ENTREAD_CHUNKY_HEADERS;
+	/* read entity headers */
+	parser->ent_position = ENTREAD_CHUNKY_HEADERS;
     } else {
-        /* read chunk body */
-        parser->ent_position = ENTREAD_CHUNKY_BODY;
+	/* read chunk body */
+	parser->ent_position = ENTREAD_CHUNKY_BODY;
     }
 
     return PARSE_CONTINUE_1;    /* continue to reading body */
@@ -1783,11 +1783,11 @@ parser_parse_entity_until_close( INOUT http_parser_t * parser )
 
     /* update entity length */
     parser->msg.entity.length = cursor - parser->entity_start_position +
-                                parser->msg.amount_discarded;
+				parser->msg.amount_discarded;
 
     /* update pointer */
     parser->msg.entity.buf =
-        parser->msg.msg.buf + parser->entity_start_position;
+	parser->msg.msg.buf + parser->entity_start_position;
 
     parser->scanner.cursor = cursor;
 
@@ -1828,67 +1828,67 @@ parser_get_entity_read_method( INOUT http_parser_t * parser )
     /* * no body for 1xx, 204, 304 and HEAD, GET, */
     /*      SUBSCRIBE, UNSUBSCRIBE */
     if( hmsg->is_request ) {
-        switch ( hmsg->method ) {
-            case HTTPMETHOD_HEAD:
-            case HTTPMETHOD_GET:
-                /*case HTTPMETHOD_POST: */
-            case HTTPMETHOD_SUBSCRIBE:
-            case HTTPMETHOD_UNSUBSCRIBE:
-            case HTTPMETHOD_MSEARCH:
-                /* no body; mark as done */
-                parser->position = POS_COMPLETE;
-                return PARSE_SUCCESS;
-                break;
+	switch ( hmsg->method ) {
+	    case HTTPMETHOD_HEAD:
+	    case HTTPMETHOD_GET:
+		/*case HTTPMETHOD_POST: */
+	    case HTTPMETHOD_SUBSCRIBE:
+	    case HTTPMETHOD_UNSUBSCRIBE:
+	    case HTTPMETHOD_MSEARCH:
+		/* no body; mark as done */
+		parser->position = POS_COMPLETE;
+		return PARSE_SUCCESS;
+		break;
 
-            default:
-                ;               /* do nothing */
-        }
+	    default:
+		;               /* do nothing */
+	}
     } else                      /* response */
     {
-        response_code = hmsg->status_code;
+	response_code = hmsg->status_code;
 
-        if( response_code == 204 ||
-            response_code == 304 ||
-            ( response_code >= 100 && response_code <= 199 ) ||
-            hmsg->request_method == ( http_method_t ) HTTPMETHOD_HEAD ||
-            hmsg->request_method == ( http_method_t ) HTTPMETHOD_MSEARCH ||
-            hmsg->request_method == ( http_method_t ) HTTPMETHOD_SUBSCRIBE ||
-            hmsg->request_method == ( http_method_t ) HTTPMETHOD_UNSUBSCRIBE ||
-            hmsg->request_method == ( http_method_t ) HTTPMETHOD_NOTIFY ) {
-            parser->position = POS_COMPLETE;
-            return PARSE_SUCCESS;
-        }
+	if( response_code == 204 ||
+	    response_code == 304 ||
+	    ( response_code >= 100 && response_code <= 199 ) ||
+	    hmsg->request_method == ( http_method_t ) HTTPMETHOD_HEAD ||
+	    hmsg->request_method == ( http_method_t ) HTTPMETHOD_MSEARCH ||
+	    hmsg->request_method == ( http_method_t ) HTTPMETHOD_SUBSCRIBE ||
+	    hmsg->request_method == ( http_method_t ) HTTPMETHOD_UNSUBSCRIBE ||
+	    hmsg->request_method == ( http_method_t ) HTTPMETHOD_NOTIFY ) {
+	    parser->position = POS_COMPLETE;
+	    return PARSE_SUCCESS;
+	}
     }
 
     /* * transfer-encoding -- used to indicate chunked data */
     if( httpmsg_find_hdr( hmsg, HDR_TRANSFER_ENCODING, &hdr_value ) ) {
-        if( raw_find_str( &hdr_value, "chunked" ) >= 0 ) {
-            /* read method to use chunked transfer encoding */
-            parser->ent_position = ENTREAD_USING_CHUNKED;
-            UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
-                "Found Chunked Encoding ....\n" );
+	if( raw_find_str( &hdr_value, "chunked" ) >= 0 ) {
+	    /* read method to use chunked transfer encoding */
+	    parser->ent_position = ENTREAD_USING_CHUNKED;
+	    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+		"Found Chunked Encoding ....\n" );
 
-            return PARSE_CONTINUE_1;
-        }
+	    return PARSE_CONTINUE_1;
+	}
     }
     /* * use content length */
     if( httpmsg_find_hdr( hmsg, HDR_CONTENT_LENGTH, &hdr_value ) ) {
-        parser->content_length = (unsigned int)raw_to_int(&hdr_value, 10);
-        parser->ent_position = ENTREAD_USING_CLEN;
-        return PARSE_CONTINUE_1;
+	parser->content_length = (unsigned int)raw_to_int(&hdr_value, 10);
+	parser->ent_position = ENTREAD_USING_CLEN;
+	return PARSE_CONTINUE_1;
     }
     /* * multi-part/byteranges not supported (yet) */
 
     /* * read until connection is closed */
     if( hmsg->is_request ) {
-        /* set hack flag for NOTIFY methods; if set to true this is */
-        /*  a valid SSDP notify msg */
-        if( hmsg->method == ( http_method_t ) HTTPMETHOD_NOTIFY ) {
-            parser->valid_ssdp_notify_hack = TRUE;
-        }
+	/* set hack flag for NOTIFY methods; if set to true this is */
+	/*  a valid SSDP notify msg */
+	if( hmsg->method == ( http_method_t ) HTTPMETHOD_NOTIFY ) {
+	    parser->valid_ssdp_notify_hack = TRUE;
+	}
 
-        parser->http_error_code = HTTP_LENGTH_REQUIRED;
-        return PARSE_FAILURE;
+	parser->http_error_code = HTTP_LENGTH_REQUIRED;
+	return PARSE_FAILURE;
     }
 
     parser->ent_position = ENTREAD_UNTIL_CLOSE;
@@ -1918,35 +1918,35 @@ parser_parse_entity( INOUT http_parser_t * parser )
     assert( parser->position == POS_ENTITY );
 
     do {
-        switch ( parser->ent_position ) {
-            case ENTREAD_USING_CLEN:
-                status = parser_parse_entity_using_clen( parser );
-                break;
+	switch ( parser->ent_position ) {
+	    case ENTREAD_USING_CLEN:
+		status = parser_parse_entity_using_clen( parser );
+		break;
 
-            case ENTREAD_USING_CHUNKED:
-                status = parser_parse_chunky_entity( parser );
-                break;
+	    case ENTREAD_USING_CHUNKED:
+		status = parser_parse_chunky_entity( parser );
+		break;
 
-            case ENTREAD_CHUNKY_BODY:
-                status = parser_parse_chunky_body( parser );
-                break;
+	    case ENTREAD_CHUNKY_BODY:
+		status = parser_parse_chunky_body( parser );
+		break;
 
-            case ENTREAD_CHUNKY_HEADERS:
-                status = parser_parse_chunky_headers( parser );
-                break;
+	    case ENTREAD_CHUNKY_HEADERS:
+		status = parser_parse_chunky_headers( parser );
+		break;
 
-            case ENTREAD_UNTIL_CLOSE:
-                status = parser_parse_entity_until_close( parser );
-                break;
+	    case ENTREAD_UNTIL_CLOSE:
+		status = parser_parse_entity_until_close( parser );
+		break;
 
-            case ENTREAD_DETERMINE_READ_METHOD:
-                status = parser_get_entity_read_method( parser );
-                break;
+	    case ENTREAD_DETERMINE_READ_METHOD:
+		status = parser_get_entity_read_method( parser );
+		break;
 
-            default:
+	    default:
 		status = PARSE_FAILURE;
-                assert( 0 );
-        }
+		assert( 0 );
+	}
 
     } while( status == ( parse_status_t ) PARSE_CONTINUE_1 );
 
@@ -1986,7 +1986,7 @@ parser_request_init( OUT http_parser_t * parser )
 ************************************************************************/
 void
 parser_response_init( OUT http_parser_t * parser,
-                      IN http_method_t request_method )
+		      IN http_method_t request_method )
 {
     parser_init( parser );
     parser->msg.is_request = FALSE;
@@ -2021,33 +2021,33 @@ parser_parse( INOUT http_parser_t * parser )
     assert( parser != NULL );
 
     do {
-        switch ( parser->position ) {
-            case POS_ENTITY:
-                status = parser_parse_entity( parser );
+	switch ( parser->position ) {
+	    case POS_ENTITY:
+		status = parser_parse_entity( parser );
 
-                break;
+		break;
 
-            case POS_HEADERS:
-                status = parser_parse_headers( parser );
+	    case POS_HEADERS:
+		status = parser_parse_headers( parser );
 
-                break;
+		break;
 
-            case POS_REQUEST_LINE:
-                status = parser_parse_requestline( parser );
+	    case POS_REQUEST_LINE:
+		status = parser_parse_requestline( parser );
 
-                break;
+		break;
 
-            case POS_RESPONSE_LINE:
-                status = parser_parse_responseline( parser );
+	    case POS_RESPONSE_LINE:
+		status = parser_parse_responseline( parser );
 
-                break;
+		break;
 
-            default:
-                {
-                    status = PARSE_FAILURE;
-                    assert( 0 );
-                }
-        }
+	    default:
+		{
+		    status = PARSE_FAILURE;
+		    assert( 0 );
+		}
+	}
 
     } while( status == ( parse_status_t ) PARSE_OK );
 
@@ -2075,8 +2075,8 @@ parser_parse( INOUT http_parser_t * parser )
 ************************************************************************/
 parse_status_t
 parser_append( INOUT http_parser_t * parser,
-               IN const char *buf,
-               IN size_t buf_length )
+	       IN const char *buf,
+	       IN size_t buf_length )
 {
     int ret_code;
 
@@ -2086,9 +2086,9 @@ parser_append( INOUT http_parser_t * parser,
     /* append data to buffer */
     ret_code = membuffer_append( &parser->msg.msg, buf, buf_length );
     if( ret_code != 0 ) {
-        /* set failure status */
-        parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
-        return PARSE_FAILURE;
+	/* set failure status */
+	parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
+	return PARSE_FAILURE;
     }
 
     return parser_parse( parser );
@@ -2138,7 +2138,7 @@ int raw_to_int(IN memptr *raw_value, IN int base)
 * Side effects: raw_value is transformed to lowercase.
 *
 * Returns:
-*	 int - index at which the substring is found.						
+*	 int - index at which the substring is found.
 ************************************************************************/
 int raw_find_str(IN memptr *raw_value, IN const char *str)
 {
@@ -2151,7 +2151,7 @@ int raw_find_str(IN memptr *raw_value, IN const char *str)
 
     /* Make it lowercase */
     for (i = 0; raw_value->buf[i]; ++i) {
-        raw_value->buf[i] = (char)tolower(raw_value->buf[i]);
+	raw_value->buf[i] = (char)tolower(raw_value->buf[i]);
     }
 
     /* null-terminate */
@@ -2164,7 +2164,7 @@ int raw_find_str(IN memptr *raw_value, IN const char *str)
     raw_value->buf[raw_value->length] = c;
 
     if( ptr == 0 ) {
-        return -1;
+	return -1;
     }
 
     /* return index */
@@ -2175,7 +2175,7 @@ int raw_find_str(IN memptr *raw_value, IN const char *str)
 * Function: method_to_str
 *
 * Parameters:
-* IN http_method_t method ; HTTP method	
+* IN http_method_t method ; HTTP method
 *
 * Description: A wrapper function that maps a method id to a method
 *	nameConverts a http_method id stored in the HTTP Method
@@ -2205,27 +2205,27 @@ void print_http_headers(http_message_t *hmsg)
 
     /* print start line */
     if( hmsg->is_request ) {
-        printf( "method = %d, version = %d.%d, url = %.*s\n",
+	printf( "method = %d, version = %d.%d, url = %.*s\n",
 			hmsg->method, hmsg->major_version, hmsg->minor_version,
-            (int)hmsg->uri.pathquery.size, hmsg->uri.pathquery.buff);
+	    (int)hmsg->uri.pathquery.size, hmsg->uri.pathquery.buff);
     } else {
-        printf( "resp status = %d, version = %d.%d, status msg = %.*s\n",
-            hmsg->status_code, hmsg->major_version, hmsg->minor_version,
-            (int)hmsg->status_msg.length, hmsg->status_msg.buf);
+	printf( "resp status = %d, version = %d.%d, status msg = %.*s\n",
+	    hmsg->status_code, hmsg->major_version, hmsg->minor_version,
+	    (int)hmsg->status_msg.length, hmsg->status_msg.buf);
     }
 
     /* print headers */
     node = ListHead( &hmsg->headers );
     /* NNS: node = dlist_first_node( &hmsg->headers ); */
     while( node != NULL ) {
-        header = ( http_header_t * ) node->item;
-        /* NNS: header = (http_header_t *)node->data; */
-        printf( "hdr name: %.*s, value: %.*s\n", 
-            (int)header->name.length, header->name.buf,
-            (int)header->value.length, header->value.buf );
+	header = ( http_header_t * ) node->item;
+	/* NNS: header = (http_header_t *)node->data; */
+	printf( "hdr name: %.*s, value: %.*s\n",
+	    (int)header->name.length, header->name.buf,
+	    (int)header->value.length, header->value.buf );
 
-        node = ListNext( &hmsg->headers, node );
-        /* NNS: node = dlist_next( &hmsg->headers, node ); */
+	node = ListNext( &hmsg->headers, node );
+	/* NNS: node = dlist_next( &hmsg->headers, node ); */
     }
 }
 #endif /* DEBUG */
