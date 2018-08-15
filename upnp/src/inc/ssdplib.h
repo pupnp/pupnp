@@ -1,34 +1,34 @@
 #ifndef SSDPLIB_H
-#define SSDPLIB_H 
+#define SSDPLIB_H
 
 /**************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (C) 2011-2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (C) 2011-2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **************************************************************************/
@@ -183,17 +183,17 @@ typedef int (*ParserFun)(char *, SsdpEvent *);
  */
 int AdvertiseAndReply(
 	/* [in] -1 = Send shutdown, 0 = send reply, 1 = Send Advertisement. */
-	int AdFlag, 
+	int AdFlag,
 	/* [in] Device handle. */
-	UpnpDevice_Handle Hnd, 
+	UpnpDevice_Handle Hnd,
 	/* [in] Search type for sending replies. */
-	enum SsdpSearchType SearchType, 
+	enum SsdpSearchType SearchType,
 	/* [in] Destination address. */
 	struct sockaddr *DestAddr,
 	/* [in] Device type. */
-	char *DeviceType, 
+	char *DeviceType,
 	/* [in] Device UDN. */
-	char *DeviceUDN, 
+	char *DeviceUDN,
 	/* [in] Service type. */
 	char *ServiceType,
 	/* [in] Advertisement age. */
@@ -267,7 +267,7 @@ int get_ssdp_sockets(
  */
 void ssdp_handle_ctrlpt_msg(
 	/* [in] SSDP message from the device. */
-	http_message_t *hmsg, 
+	http_message_t *hmsg,
 	/* [in] Address of the device. */
 	struct sockaddr_storage *dest_addr,
 	/* [in] timeout kept by the control point while sending search message.
@@ -317,10 +317,8 @@ int SearchByTarget(
 /*!
  * \brief Wrapper function to reply the search request coming from the
  * control point.
- *
- * \return always return NULL
  */
-void *advertiseAndReplyThread(
+void advertiseAndReplyThread(
 	/* [in] Structure containing the search request. */
 	void *data);
 
@@ -332,13 +330,13 @@ void *advertiseAndReplyThread(
 #ifdef INCLUDE_DEVICE_APIS
 void ssdp_handle_device_request(
 	/* [in] . */
-	http_message_t *hmsg, 
+	http_message_t *hmsg,
 	/* [in] . */
 	struct sockaddr_storage *dest_addr);
 #else /* INCLUDE_DEVICE_APIS */
 static UPNP_INLINE void ssdp_handle_device_request(
 	/* [in] . */
-	http_message_t *hmsg, 
+	http_message_t *hmsg,
 	/* [in] . */
 	struct sockaddr_storage *dest_addr) {}
 #endif /* INCLUDE_DEVICE_APIS */
@@ -355,7 +353,7 @@ int DeviceAdvertisement(
 	/* [in] flag to indicate if the device is root device. */
 	int RootDev,
 	/* [in] UDN. */
-	char *Udn, 
+	char *Udn,
 	/* [in] Location URL. */
 	char *Location,
 	/* [in] Service duration in sec. */
@@ -377,17 +375,17 @@ int DeviceAdvertisement(
  */
 int SendReply(
 	/* [in] destination IP address. */
-	struct sockaddr *DestAddr, 
+	struct sockaddr *DestAddr,
 	/* [in] Device type. */
-	char *DevType, 
+	char *DevType,
 	/* [in] 1 means root device 0 means embedded device. */
-	int RootDev, 
+	int RootDev,
 	/* [in] Device UDN. */
-	char *Udn, 
+	char *Udn,
 	/* [in] Location of Device description document. */
-	char *Location, 
+	char *Location,
 	/* [in] Life time of this device. */
-	int Duration, 
+	int Duration,
 	/* [in] . */
 	int ByType,
 	/* [in] PowerState as defined by UPnP Low Power. */
@@ -405,15 +403,15 @@ int SendReply(
  */
 int DeviceReply(
 	/* [in] destination IP address. */
-	struct sockaddr *DestAddr, 
+	struct sockaddr *DestAddr,
 	/* [in] Device type. */
-	char *DevType, 
+	char *DevType,
 	/* [in] 1 means root device 0 means embedded device. */
-	int RootDev, 
+	int RootDev,
 	/* [in] Device UDN. */
-	char *Udn, 
+	char *Udn,
 	/* [in] Location of Device description document. */
-	char *Location, 
+	char *Location,
 	/* [in] Life time of this device. */
 	int Duration,
 	/* [in] PowerState as defined by UPnP Low Power. */
@@ -431,7 +429,7 @@ int DeviceReply(
  */
 int ServiceAdvertisement(
 	/* [in] Device UDN. */
-	char *Udn, 
+	char *Udn,
 	/* [in] Service Type. */
 	char *ServType,
 	/* [in] Location of Device description document. */
@@ -455,11 +453,11 @@ int ServiceAdvertisement(
  */
 int ServiceReply(
 	/* [in] . */
-	struct sockaddr *DestAddr,  
+	struct sockaddr *DestAddr,
 	/* [in] Service Type. */
-	char *ServType, 
+	char *ServType,
 	/* [in] Device UDN. */
-	char *Udn, 
+	char *Udn,
 	/* [in] Location of Device description document. */
 	char *Location,
 	/* [in] Life time of this device. */
@@ -503,13 +501,13 @@ int ServiceShutdown(
  */
 int DeviceShutdown(
 	/* [in] Device Type. */
-	char *DevType, 
+	char *DevType,
 	/* [in] 1 means root device. */
 	int RootDev,
 	/* [in] Device UDN. */
-	char *Udn, 
+	char *Udn,
 	/* [in] Location URL. */
-	char *Location, 
+	char *Location,
 	/* [in] Device duration in sec. */
 	int Duration,
 	/* [in] Device address family. */

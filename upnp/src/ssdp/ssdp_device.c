@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation
  * All rights reserved.
- * Copyright (C) 2011-2012 France Telecom All rights reserved. 
+ * Copyright (C) 2011-2012 France Telecom All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,7 +34,7 @@
  * \addtogroup SSDPlib
  *
  * @{
- * 
+ *
  * \file
  */
 
@@ -64,7 +64,7 @@
 #define MSGTYPE_ADVERTISEMENT	1
 #define MSGTYPE_REPLY		2
 
-void *advertiseAndReplyThread(void *data)
+void advertiseAndReplyThread(void *data)
 {
 	SsdpSearchReply *arg = (SsdpSearchReply *) data;
 
@@ -74,8 +74,6 @@ void *advertiseAndReplyThread(void *data)
 			  arg->event.DeviceType,
 			  arg->event.UDN, arg->event.ServiceType, arg->MaxAge);
 	free(arg);
-
-	return NULL;
 }
 
 #ifdef INCLUDE_DEVICE_APIS
@@ -365,7 +363,7 @@ static void CreateServicePacket(
 					    "RegistrationState: ",
 					    RegistrationState);
 #else
-                        ret_code = http_MakeMessage(&buf, 1, 1,
+			ret_code = http_MakeMessage(&buf, 1, 1,
 					    "R" "sdc" "D" "sc" "ssc"
 					    "S" "ssc" "ssc"
 					    "sdc" "sdc" "sdcc", HTTP_OK,
@@ -455,7 +453,7 @@ static void CreateServicePacket(
 					    RegistrationState);
 #endif /* UPNP_HAVE_OPTSSDP */
 		} else {
-#ifdef UPNP_HAVE_OPTSSDP 
+#ifdef UPNP_HAVE_OPTSSDP
 			ret_code = http_MakeMessage(&buf, 1, 1,
 					    "Q" "sssdc" "sdc" "ssc" "ssc" "ssc"
 					    "ssc" "ssc" "S" "Xc" "sscc",
