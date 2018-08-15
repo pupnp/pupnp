@@ -247,7 +247,6 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								"DeviceUDN=%s and search UDN=%s DID NOT match\n",
 								UDNstr, DeviceUDN);
-							break;
 						} else {
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								"DeviceUDN=%s and search UDN=%s MATCH\n",
@@ -256,9 +255,9 @@ int AdvertiseAndReply(int AdFlag, UpnpDevice_Handle Hnd,
 								SInfo->PowerState,
 								SInfo->SleepPeriod,
 								SInfo->RegistrationState);
-							break;
 						}
 					}
+					break;
 				}
 				case SSDP_DEVICETYPE: {
 					if (!strncasecmp(DeviceType, devType, strlen(DeviceType) - (size_t)2)) {
