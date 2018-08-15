@@ -75,8 +75,10 @@ static void send_search_result(
 	SSDPResultData_delete(temp);
 }
 
-void ssdp_handle_ctrlpt_msg(http_message_t *hmsg, struct sockaddr_storage *dest_addr,
-			    int timeout, void *cookie)
+void ssdp_handle_ctrlpt_msg(
+	http_message_t *hmsg,
+	struct sockaddr_storage *dest_addr,
+	int timeout)
 {
 	int handle;
 	int handle_start;

@@ -272,11 +272,7 @@ void ssdp_handle_ctrlpt_msg(
 	struct sockaddr_storage *dest_addr,
 	/* [in] timeout kept by the control point while sending search message.
 	 * Only in search reply. */
-	int timeout,
-	/* [in] Cookie stored by the control point application. This cookie will
-	 * be returned to the control point in the callback.
-	 * Only in search reply. */
-	void *cookie);
+	int timeout);
 
 /*!
  * \brief Creates and send the search request for a specific URL.
