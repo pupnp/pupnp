@@ -234,7 +234,7 @@ void ssdp_handle_ctrlpt_msg(http_message_t *hmsg, struct sockaddr_storage *dest_
 			ctrlpt_cookie = ctrlpt_info->Cookie;
 			HandleUnlock();
 
-			ctrlpt_callback(event_type, &param, ctrlpt_cookie);
+			ctrlpt_callback(event_type, param, ctrlpt_cookie);
 		}
 	} else {
 		/* reply (to a SEARCH) */
