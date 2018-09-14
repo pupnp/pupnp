@@ -79,17 +79,17 @@ static UPNP_INLINE void INIT_LIST_HEAD(struct list_head *list)
 }
 
 #ifdef CONFIG_DEBUG_LIST
-extern bool __list_add_valid(struct list_head *new,
+extern bool __list_add_valid(struct list_head *newent,
 			      struct list_head *prev,
 			      struct list_head *next);
 extern bool __list_del_entry_valid(struct list_head *entry);
 #else
-static UPNP_INLINE bool __list_add_valid(struct list_head *new,
+static UPNP_INLINE bool __list_add_valid(struct list_head *newent,
 				struct list_head *prev,
 				struct list_head *next)
 {
 	return true;
-	new++; prev++; next++; /* against compiler warnings */
+	newent++; prev++; next++; /* against compiler warnings */
 }
 static UPNP_INLINE bool __list_del_entry_valid(struct list_head *entry)
 {
@@ -104,44 +104,44 @@ static UPNP_INLINE bool __list_del_entry_valid(struct list_head *entry)
  * This is only for internal list manipulation where we know
  * the prev/next entries already!
  */
-static UPNP_INLINE void __list_add(struct list_head *new,
+static UPNP_INLINE void __list_add(struct list_head *newent,
 			      struct list_head *prev,
 			      struct list_head *next)
 {
-	if (!__list_add_valid(new, prev, next))
+	if (!__list_add_valid(newent, prev, next))
 		return;
 
-	next->prev = new;
-	new->next = next;
-	new->prev = prev;
-	WRITE_ONCE(prev->next, new);
+	next->prev = newent;
+	newent->next = next;
+	newent->prev = prev;
+	WRITE_ONCE(prev->next, newent);
 }
 
 /**
  * list_add - add a new entry
- * @new: new entry to be added
+ * @newent: new entry to be added
  * @head: list head to add it after
  *
  * Insert a new entry after the specified head.
  * This is good for implementing stacks.
  */
-static UPNP_INLINE void list_add(struct list_head *new, struct list_head *head)
+static UPNP_INLINE void list_add(struct list_head *newent, struct list_head *head)
 {
-	__list_add(new, head, head->next);
+	__list_add(newent, head, head->next);
 }
 
 
 /**
  * list_add_tail - add a new entry
- * @new: new entry to be added
+ * @newent: new entry to be added
  * @head: list head to add it before
  *
  * Insert a new entry before the specified head.
  * This is useful for implementing queues.
  */
-static UPNP_INLINE void list_add_tail(struct list_head *new, struct list_head *head)
+static UPNP_INLINE void list_add_tail(struct list_head *newent, struct list_head *head)
 {
-	__list_add(new, head->prev, head);
+	__list_add(newent, head->prev, head);
 }
 
 /*
@@ -174,30 +174,30 @@ static UPNP_INLINE void __list_del_entry(struct list_head *entry)
 static UPNP_INLINE void list_del(struct list_head *entry)
 {
 	__list_del_entry(entry);
-	entry->next = LIST_POISON1;
-	entry->prev = LIST_POISON2;
+	entry->next = (struct list_head*)LIST_POISON1;
+	entry->prev =  (struct list_head*)LIST_POISON2;
 }
 
 /**
  * list_replace - replace old entry by new one
  * @old : the element to be replaced
- * @new : the new element to insert
+ * @newent : the new element to insert
  *
  * If @old was empty, it will be overwritten.
  */
 static UPNP_INLINE void list_replace(struct list_head *old,
-				struct list_head *new)
+				struct list_head *newent)
 {
-	new->next = old->next;
-	new->next->prev = new;
-	new->prev = old->prev;
-	new->prev->next = new;
+	newent->next = old->next;
+	newent->next->prev = newent;
+	newent->prev = old->prev;
+	newent->prev->next = newent;
 }
 
 static UPNP_INLINE void list_replace_init(struct list_head *old,
-					struct list_head *new)
+					struct list_head *newent)
 {
-	list_replace(old, new);
+	list_replace(old, newent);
 	INIT_LIST_HEAD(old);
 }
 
@@ -705,8 +705,8 @@ static UPNP_INLINE void __hlist_del(struct hlist_node *n)
 static UPNP_INLINE void hlist_del(struct hlist_node *n)
 {
 	__hlist_del(n);
-	n->next = LIST_POISON1;
-	n->pprev = LIST_POISON2;
+	n->next =  (struct hlist_node*)LIST_POISON1;
+	n->pprev =  (struct hlist_node**)LIST_POISON2;
 }
 
 static UPNP_INLINE void hlist_del_init(struct hlist_node *n)
@@ -774,11 +774,11 @@ hlist_is_singular_node(struct hlist_node *n, struct hlist_head *h)
  * reference of the first entry if it exists.
  */
 static UPNP_INLINE void hlist_move_list(struct hlist_head *old,
-				   struct hlist_head *new)
+				   struct hlist_head *newent)
 {
-	new->first = old->first;
-	if (new->first)
-		new->first->pprev = &new->first;
+	newent->first = old->first;
+	if (newent->first)
+		newent->first->pprev = &newent->first;
 	old->first = NULL;
 }
 
