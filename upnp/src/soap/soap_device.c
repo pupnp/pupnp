@@ -462,11 +462,9 @@ static int get_dev_service(
 
 	HandleReadLock();
 
-	if (GetDeviceHandleInfo(AddressFamily, &device_hnd,
-				&device_info) != HND_DEVICE)
+	if (GetDeviceHandleInfoForPath(control_url, AddressFamily, &device_hnd,
+								   &device_info, &serv_info) != HND_DEVICE)
 		goto error_handler;
-	serv_info = FindServiceControlURLPath(
-		&device_info->ServiceTable, control_url);
 	if (!serv_info)
 		goto error_handler;
 

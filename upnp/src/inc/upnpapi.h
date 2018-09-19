@@ -172,17 +172,41 @@ Upnp_Handle_Type GetClientHandleInfo(
 	struct Handle_Info **HndInfo);
 /*!
  * \brief Retrieves the device handle and information of the first device of
- * 	the address family spcified.
+ * 	the address family specified. The search begins at the 'start' index, which should
+ *  be 0 for the first call, then the last successful value returned. This allows 
+ *  listing all entries for the address family.
  *
  * \return HND_DEVICE or HND_INVALID
  */
 Upnp_Handle_Type GetDeviceHandleInfo(
+	/*! [in] place to start the search (i.e. last value returned). */
+	UpnpDevice_Handle start, 
 	/*! [in] Address family. */
 	int AddressFamily,
 	/*! [out] Device handle pointer. */
 	int *device_handle_out, 
 	/*! [out] Device handle structure passed by this function. */
 	struct Handle_Info **HndInfo);
+
+/*!
+ * \brief Retrieves the device handle and information of the first device of
+ * 	the address family specified, with a service having a controlURL or
+ * 	eventSubURL matching the path.
+ *
+ * \return HND_DEVICE or HND_INVALID
+ */
+Upnp_Handle_Type GetDeviceHandleInfoForPath(
+	/*! The Uri path. */
+	const char *path, 
+	/*! [in] Address family. */
+	int AddressFamily,
+	/*! [out] Device handle pointer. */
+	int *device_handle_out, 
+	/*! [out] Device handle structure passed by this function. */
+	struct Handle_Info **HndInfo,
+	/*! [out] Service info for found path. */
+	service_info **serv_info
+	);
 
 
 extern char gIF_NAME[LINE_SIZE];

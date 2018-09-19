@@ -80,7 +80,7 @@ void advertiseAndReplyThread(void *data)
 void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *dest_addr)
 {
 #define MX_FUDGE_FACTOR 10
-	int handle;
+	int handle, start;
 	struct Handle_Info *dev_info = NULL;
 	memptr hdr_value;
 	int mx;
@@ -115,51 +115,55 @@ void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *d
 		/* bad ST header. */
 		return;
 
-	HandleLock();
-	/* device info. */
-	switch (GetDeviceHandleInfo((int)dest_addr->ss_family,
-				&handle, &dev_info)) {
-	case HND_DEVICE:
-		break;
-	default:
+	start = 0;
+	for (;;) {
+		HandleLock();
+		/* device info. */
+		switch (GetDeviceHandleInfo(start, (int)dest_addr->ss_family,
+									&handle, &dev_info)) {
+		case HND_DEVICE:
+			break;
+		default:
+			HandleUnlock();
+			/* no info found. */
+			return;
+		}
+		maxAge = dev_info->MaxAge;
 		HandleUnlock();
-		/* no info found. */
-		return;
+
+		UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
+				   "MAX-AGE     =  %d\n", maxAge);
+		UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
+				   "MX     =  %d\n", event.Mx);
+		UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
+				   "DeviceType   =  %s\n", event.DeviceType);
+		UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
+				   "DeviceUuid   =  %s\n", event.UDN);
+		UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
+				   "ServiceType =  %s\n", event.ServiceType);
+		threadArg = (SsdpSearchReply *)malloc(sizeof(SsdpSearchReply));
+		if (threadArg == NULL)
+			return;
+		threadArg->handle = handle;
+		memcpy(&threadArg->dest_addr, dest_addr, sizeof(threadArg->dest_addr));
+		threadArg->event = event;
+		threadArg->MaxAge = maxAge;
+
+		TPJobInit(&job, advertiseAndReplyThread, threadArg);
+		TPJobSetFreeFunction(&job, (free_routine) free);
+
+		/* Subtract a percentage from the mx to allow for network and processing
+		 * delays (i.e. if search is for 30 seconds, respond
+		 * within 0 - 27 seconds). */
+		if (mx >= 2)
+			mx -= MAXVAL(1, mx / MX_FUDGE_FACTOR);
+		if (mx < 1)
+			mx = 1;
+		replyTime = rand() % mx;
+		TimerThreadSchedule(&gTimerThread, replyTime, REL_SEC, &job,
+							SHORT_TERM, NULL);
+		start = handle;
 	}
-	maxAge = dev_info->MaxAge;
-	HandleUnlock();
-
-	UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
-		   "MAX-AGE     =  %d\n", maxAge);
-	UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
-		   "MX     =  %d\n", event.Mx);
-	UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
-		   "DeviceType   =  %s\n", event.DeviceType);
-	UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
-		   "DeviceUuid   =  %s\n", event.UDN);
-	UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
-		   "ServiceType =  %s\n", event.ServiceType);
-	threadArg = (SsdpSearchReply *)malloc(sizeof(SsdpSearchReply));
-	if (threadArg == NULL)
-		return;
-	threadArg->handle = handle;
-	memcpy(&threadArg->dest_addr, dest_addr, sizeof(threadArg->dest_addr));
-	threadArg->event = event;
-	threadArg->MaxAge = maxAge;
-
-	TPJobInit(&job, advertiseAndReplyThread, threadArg);
-	TPJobSetFreeFunction(&job, (free_routine) free);
-
-	/* Subtract a percentage from the mx to allow for network and processing
-	 * delays (i.e. if search is for 30 seconds, respond
-	 * within 0 - 27 seconds). */
-	if (mx >= 2)
-		mx -= MAXVAL(1, mx / MX_FUDGE_FACTOR);
-	if (mx < 1)
-		mx = 1;
-	replyTime = rand() % mx;
-	TimerThreadSchedule(&gTimerThread, replyTime, REL_SEC, &job,
-			    SHORT_TERM, NULL);
 }
 #endif
 

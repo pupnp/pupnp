@@ -664,19 +664,11 @@ int UpnpFinish(void)
 	PrintThreadPoolStats(&gMiniServerThreadPool, __FILE__, __LINE__,
 		"MiniServer Thread Pool");
 #ifdef INCLUDE_DEVICE_APIS
-	switch (GetDeviceHandleInfo(AF_INET, &device_handle, &temp)) {
-	case HND_DEVICE:
+	while (GetDeviceHandleInfo(0, AF_INET, &device_handle, &temp) ==  HND_DEVICE) {
 		UpnpUnRegisterRootDevice(device_handle);
-		break;
-	default:
-		break;
 	}
-	switch (GetDeviceHandleInfo(AF_INET6, &device_handle, &temp)) {
-	case HND_DEVICE:
+	while (GetDeviceHandleInfo(0, AF_INET6, &device_handle, &temp) == HND_DEVICE) {
 		UpnpUnRegisterRootDevice(device_handle);
-		break;
-	default:
-		break;
 	}
 #endif
 #ifdef INCLUDE_CLIENT_APIS
@@ -851,11 +843,6 @@ int UpnpRegisterRootDevice(
 		goto exit_function;
 	}
 
-	if (UpnpSdkDeviceRegisteredV4 == 1) {
-		retVal = UPNP_E_ALREADY_REGISTERED;
-		goto exit_function;
-	}
-
 	*Hnd = GetFreeHandle();
 	if (*Hnd == UPNP_E_OUTOF_HANDLE) {
 		retVal = UPNP_E_OUTOF_MEMORY;
@@ -1017,11 +1004,6 @@ int UpnpRegisterRootDevice2(
 		goto exit_function;
 	}
 
-	if (UpnpSdkDeviceRegisteredV4 == 1) {
-		retVal = UPNP_E_ALREADY_REGISTERED;
-		goto exit_function;
-	}
-
 	*Hnd = GetFreeHandle();
 	if (*Hnd == UPNP_E_OUTOF_HANDLE) {
 		retVal = UPNP_E_OUTOF_MEMORY;
@@ -1161,7 +1143,6 @@ int UpnpRegisterRootDevice4(
 #if EXCLUDE_GENA == 0
 	int hasServiceTable = 0;
 #endif /* EXCLUDE_GENA */
-	int handler_index = 0;
 
 	HandleLock();
 
@@ -1178,21 +1159,6 @@ int UpnpRegisterRootDevice4(
 	    (AddressFamily != AF_INET && AddressFamily != AF_INET6)) {
 		retVal = UPNP_E_INVALID_PARAM;
 		goto exit_function;
-	}
-	/* Test for already regsitered IPV4. */
-	if (AddressFamily == AF_INET && UpnpSdkDeviceRegisteredV4 == 1) {
-		retVal = UPNP_E_ALREADY_REGISTERED;
-		goto exit_function;
-	}
-	/* Test for already registered IPV6. IPV6 devices might register on multiple
-	 * IPv6 addresses (link local and GUA or ULA), so we must to check the
-	 * description URL in the HandleTable. */
-	while (handler_index < NUM_HANDLE && HandleTable[handler_index] != NULL) {
-		if (strcmp(((struct Handle_Info *)HandleTable[handler_index])->DescURL, DescUrl)) {
-			retVal = UPNP_E_ALREADY_REGISTERED;
-			goto exit_function;
-		}
-		handler_index++;
 	}
 	*Hnd = GetFreeHandle();
 	if (*Hnd == UPNP_E_OUTOF_HANDLE) {
@@ -3859,6 +3825,7 @@ Upnp_Handle_Type GetClientHandleInfo(
 
 
 Upnp_Handle_Type GetDeviceHandleInfo(
+	UpnpDevice_Handle start, 
 	int AddressFamily,
 	UpnpDevice_Handle *device_handle_out,
 	struct Handle_Info **HndInfo)
@@ -3870,13 +3837,53 @@ Upnp_Handle_Type GetDeviceHandleInfo(
 		*device_handle_out = -1;
 		return HND_INVALID;
 	}
+	if (start < 0 || start >= NUM_HANDLE-1) {
+		*device_handle_out = -1;
+		return HND_INVALID;
+	}
+	++start;
+	/* Find it. */
+	for (*device_handle_out=start; *device_handle_out < NUM_HANDLE; (*device_handle_out)++) {
+		switch (GetHandleInfo(*device_handle_out, HndInfo)) {
+		case HND_DEVICE:
+			if ((*HndInfo)->DeviceAf == AddressFamily) {
+				return HND_DEVICE;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+#endif /* INCLUDE_DEVICE_APIS */
 
+	*device_handle_out = -1;
+	return HND_INVALID;
+}
+
+Upnp_Handle_Type GetDeviceHandleInfoForPath(
+	const char *path,
+	int AddressFamily,
+	UpnpDevice_Handle *device_handle_out,
+	struct Handle_Info **HndInfo,
+	service_info **serv_info
+	)
+{
+#ifdef INCLUDE_DEVICE_APIS
+	/* Check if we've got a registered device of the address family specified. */
+	if ((AddressFamily == AF_INET  && UpnpSdkDeviceRegisteredV4 == 0) ||
+	    (AddressFamily == AF_INET6 && UpnpSdkDeviceregisteredV6 == 0)) {
+		*device_handle_out = -1;
+		return HND_INVALID;
+	}
 	/* Find it. */
 	for (*device_handle_out=1; *device_handle_out < NUM_HANDLE; (*device_handle_out)++) {
 		switch (GetHandleInfo(*device_handle_out, HndInfo)) {
 		case HND_DEVICE:
 			if ((*HndInfo)->DeviceAf == AddressFamily) {
-				return HND_DEVICE;
+				if ((*serv_info = FindServiceControlURLPath(&(*HndInfo)->ServiceTable, path)) || 
+					(*serv_info = FindServiceEventURLPath(&(*HndInfo)->ServiceTable, path))) {
+					return HND_DEVICE;
+				}
 			}
 			break;
 		default:

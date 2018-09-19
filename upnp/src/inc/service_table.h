@@ -186,7 +186,7 @@ service_info *FindServiceEventURLPath(
 	/*! [in] Service table. */
 	service_table *table,
 	/*! [in] Event URL path used to find a service from the table. */
-	char *eventURLPath);
+	const char *eventURLPath);
 
 /*!
  * \brief Traverses the service table and finds the node whose control URL Path

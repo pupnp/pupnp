@@ -294,7 +294,7 @@ FindServiceId( service_table * table,
 ************************************************************************/
 service_info *
 FindServiceEventURLPath( service_table * table,
-                         char *eventURLPath )
+                         const char *eventURLPath )
 {
     service_info *finger = NULL;
     uri_type parsed_url;

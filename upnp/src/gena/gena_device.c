@@ -1172,15 +1172,13 @@ void gena_process_subscription_request(
 
 	HandleLock();
 
-	/* CURRENTLY, ONLY ONE DEVICE */
-	if (GetDeviceHandleInfo(info->foreign_sockaddr.ss_family , 
-	    &device_handle, &handle_info) != HND_DEVICE) {
+	if (GetDeviceHandleInfoForPath(event_url_path, info->foreign_sockaddr.ss_family,
+								   &device_handle, &handle_info, &service) != HND_DEVICE) {
 		free(event_url_path);
 		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
 		HandleUnlock();
 		goto exit_function;
 	}
-	service = FindServiceEventURLPath(&handle_info->ServiceTable, event_url_path);
 	free(event_url_path);
 
 	if (service == NULL || !service->active) {
@@ -1346,16 +1344,13 @@ void gena_process_subscription_renewal_request(
 
     HandleLock();
 
-    /* CURRENTLY, ONLY SUPPORT ONE DEVICE */
-    if( GetDeviceHandleInfo( info->foreign_sockaddr.ss_family,
-        &device_handle, &handle_info ) != HND_DEVICE ) {
+    if (GetDeviceHandleInfoForPath(event_url_path.buf, info->foreign_sockaddr.ss_family,
+								   &device_handle, &handle_info, &service) != HND_DEVICE ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
         membuffer_destroy( &event_url_path );
         HandleUnlock();
         return;
     }
-    service = FindServiceEventURLPath( &handle_info->ServiceTable,
-                                       event_url_path.buf );
     membuffer_destroy( &event_url_path );
 
     /* get subscription */
@@ -1457,16 +1452,13 @@ void gena_process_unsubscribe_request(
 
     HandleLock();
 
-    /* CURRENTLY, ONLY SUPPORT ONE DEVICE */
-    if( GetDeviceHandleInfo( info->foreign_sockaddr.ss_family,
-        &device_handle, &handle_info ) != HND_DEVICE ) {
+    if( GetDeviceHandleInfoForPath(event_url_path.buf, info->foreign_sockaddr.ss_family,
+								   &device_handle, &handle_info, &service) != HND_DEVICE ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
         membuffer_destroy( &event_url_path );
         HandleUnlock();
         return;
     }
-    service = FindServiceEventURLPath( &handle_info->ServiceTable,
-                                       event_url_path.buf );
     membuffer_destroy( &event_url_path );
 
     /* validate service */
