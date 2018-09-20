@@ -445,7 +445,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 	/* 10 byte allocated for chunk header. */
 	char Chunk_Header[CHUNK_HEADER_SIZE];
 	size_t num_read;
-	size_t amount_to_be_read = (size_t)0;
+	off_t amount_to_be_read = 0;
 	size_t Data_Buf_Size = WEB_SERVER_BUF_SIZE;
 #endif /* EXCLUDE_WEB_SERVER */
 	va_list argp;
@@ -465,7 +465,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 		if (c == 'I') {
 			Instr = va_arg(argp, struct SendInstruction *);
 			if (Instr->ReadSendSize >= 0)
-				amount_to_be_read = (size_t)Instr->ReadSendSize;
+				amount_to_be_read = Instr->ReadSendSize;
 			else
 				amount_to_be_read = Data_Buf_Size;
 			if (amount_to_be_read < WEB_SERVER_BUF_SIZE)
@@ -505,7 +505,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 				if (Instr) {
 					int nr;
 					size_t n = amount_to_be_read >= Data_Buf_Size ?
-					    	Data_Buf_Size : amount_to_be_read;
+						Data_Buf_Size : (size_t)amount_to_be_read;
 					if (Instr->IsVirtualFile) {
 						nr = virtualDirCallback.read(Fp, file_buf, n, Instr->Cookie);
 						num_read = (size_t)nr;
