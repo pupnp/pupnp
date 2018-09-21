@@ -720,7 +720,8 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 		out->type = RELATIVE;
 		out->path_type = REL_PATH;
 	}
-	if (begin_hostport + (size_t)1 < max &&
+	if (out->scheme.size > 0 &&
+            begin_hostport + (size_t)1 < max &&
 	    in[begin_hostport] == '/' &&
 	    in[begin_hostport + (size_t)1] == '/') {
 		begin_hostport += (size_t)2;
