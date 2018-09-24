@@ -467,9 +467,9 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 			if (Instr->ReadSendSize >= 0)
 				amount_to_be_read = Instr->ReadSendSize;
 			else
-				amount_to_be_read = Data_Buf_Size;
-			if (amount_to_be_read < WEB_SERVER_BUF_SIZE)
-				Data_Buf_Size = amount_to_be_read;
+				amount_to_be_read = (off_t)Data_Buf_Size;
+			if (amount_to_be_read < (off_t)WEB_SERVER_BUF_SIZE)
+			    	Data_Buf_Size = (size_t)amount_to_be_read;
 			ChunkBuf = malloc((size_t)
 				(Data_Buf_Size + CHUNK_HEADER_SIZE +
 				CHUNK_TAIL_SIZE));
@@ -504,7 +504,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 			while (amount_to_be_read) {
 				if (Instr) {
 					int nr;
-					size_t n = amount_to_be_read >= Data_Buf_Size ?
+					size_t n = amount_to_be_read >= (off_t)Data_Buf_Size ?
 						Data_Buf_Size : (size_t)amount_to_be_read;
 					if (Instr->IsVirtualFile) {
 						nr = virtualDirCallback.read(Fp, file_buf, n, Instr->Cookie);
@@ -512,10 +512,10 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 					} else {
 						num_read = fread(file_buf, (size_t)1, n, Fp);
 					}
-					amount_to_be_read -= num_read;
+					amount_to_be_read -= (off_t)num_read;
 					if (Instr->ReadSendSize < 0) {
 						/* read until close */
-						amount_to_be_read = Data_Buf_Size;
+						amount_to_be_read = (off_t)Data_Buf_Size;
 					}
 				} else {
 					num_read = fread(file_buf, (size_t)1, Data_Buf_Size, Fp);
