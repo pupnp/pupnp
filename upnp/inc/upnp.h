@@ -617,13 +617,17 @@ struct Upnp_Action_Request
 /* compat code for libupnp-1.8 */
 typedef struct Upnp_Action_Request UpnpActionRequest;
 #define UpnpActionRequest_get_ErrCode(x) ((x)->ErrCode)
+#define UpnpActionRequest_set_ErrCode(x, v) ((x)->ErrCode = (v))
 #define UpnpActionRequest_get_Socket(x) ((x)->Socket)
 #define UpnpActionRequest_get_ErrStr_cstr(x) ((x)->ErrStr)
+#define UpnpActionRequest_set_ErrStr(x, v) (strncpy((x)->ErrStr, UpnpString_get_String((v)), LINE_SIZE))
 #define UpnpActionRequest_get_ActionName_cstr(x) ((x)->ActionName)
 #define UpnpActionRequest_get_DevUDN_cstr(x) ((x)->DevUDN)
 #define UpnpActionRequest_get_ServiceID_cstr(x) ((x)->ServiceID)
 #define UpnpActionRequest_get_ActionRequest(x) ((x)->ActionRequest)
+#define UpnpActionRequest_set_ActionRequest(x, v) ((x)->ActionRequest = (v))
 #define UpnpActionRequest_get_ActionResult(x) ((x)->ActionResult)
+#define UpnpActionRequest_set_ActionResult(x, v) ((x)->ActionResult = (v))
 
 struct Upnp_Action_Complete
 {
@@ -682,11 +686,14 @@ struct Upnp_State_Var_Request
 /* compat code for libupnp-1.8 */
 typedef struct Upnp_State_Var_Request UpnpStateVarRequest;
 #define UpnpStateVarRequest_get_ErrCode(x) ((x)->ErrCode)
+#define UpnpStateVarRequest_set_ErrCode(x, v) ((x)->ErrCode = (v))
 #define UpnpStateVarRequest_get_Socket(x) ((x)->Socket)
 #define UpnpStateVarRequest_get_ErrStr_cstr(x) ((x)->ErrStr)
 #define UpnpStateVarRequest_get_DevUDN_cstr(x) ((x)->DevUDN)
 #define UpnpStateVarRequest_get_ServiceID_cstr(x) ((x)->ServiceID)
 #define UpnpStateVarRequest_get_StateVarName_cstr(x) ((x)->StateVarName)
+#define UpnpStateVarRequest_get_CurrentVal(x) ((x)->CurrentVal)
+#define UpnpStateVarRequest_set_CurrentVal(x, v) ((x)->CurrentVal = (v))
 
 /** Represents the reply for the current value of a state variable in an
     asynchronous call. */
@@ -884,9 +891,15 @@ struct File_Info
 /* compat code for libupnp-1.8 */
 typedef struct File_Info UpnpFileInfo;
 #define UpnpFileInfo_get_FileLength(x) ((x)->file_length)
+#define UpnpFileInfo_set_FileLength(x, v) ((x)->file_length = (v))
 #define UpnpFileInfo_get_LastModified(x) ((x)->last_modified)
+#define UpnpFileInfo_set_LastModified(x, v) ((x)->last_modified = (v))
 #define UpnpFileInfo_get_IsDirectory(x) ((x)->is_directory)
+#define UpnpFileInfo_set_IsDirectory(x, v) ((x)->is_directory = (v))
 #define UpnpFileInfo_get_IsReadable(x) ((x)->is_readable)
+#define UpnpFileInfo_set_IsReadable(x, v) ((x)->is_readable = (v))
+#define UpnpFileInfo_get_ContentType(x) ((x)->content_type)
+#define UpnpFileInfo_set_ContentType(x, v) ((x)->content_type = (v))
 
 /*!
  *  All callback functions share the same prototype, documented below.
