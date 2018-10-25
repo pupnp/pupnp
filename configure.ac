@@ -376,11 +376,12 @@ dnl ############################################################################
 dnl # Release 1.8.4:
 dnl # "current:revision:age"
 dnl #
+dnl # - Code has changed in upnp
+dnl #   revision: 0 -> 1
 dnl # - interfaces changed/added/removed:
-dnl #   current: 12 -> 13, revision 0 -> 0
+dnl #   current: 12 -> 13, revision 1 -> 0
 dnl # - interfaces removed:
 dnl #   age: 2 -> 0
-dnl # -
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [::])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
