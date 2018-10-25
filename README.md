@@ -73,6 +73,7 @@ Release Number | Date | History
 1.8.1  | 2017-05-24 | [Portable UPnP SDK][Portable UPnP SDK]
 1.8.2  | 2017-11-12 | [Portable UPnP SDK][Portable UPnP SDK]
 1.8.3  | 2017-11-12 | [Portable UPnP SDK][Portable UPnP SDK]
+1.8.4  | 2018-10-25 | [Portable UPnP SDK][Portable UPnP SDK]
 
 [UPnP SDK for Linux]: https://sourceforge.net/projects/upnp/
 [Portable UPnP SDK]: https://sourceforge.net/projects/pupnp/
