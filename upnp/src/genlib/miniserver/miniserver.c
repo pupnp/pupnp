@@ -613,25 +613,6 @@ static int get_miniserver_sockets(
 #endif
 				return UPNP_E_SOCKET_BIND;
 			}
-			serverAddr4->sin_port = htons(listen_port4);
-                        sockError = bind(listenfd4,
-                                (struct sockaddr *)serverAddr4,
-                                sizeof(*serverAddr4));
-			if (sockError == SOCKET_ERROR) {
-				strerror_r(errno, errorBuffer,
-					ERROR_BUFFER_LEN);
-				UpnpPrintf(UPNP_INFO, MSERV,
-					__FILE__, __LINE__,
-					"get_miniserver_sockets: "
-					"Error in IPv4 bind(): %s\n", 
-					errorBuffer);
-				sock_close(listenfd4);
-#ifdef UPNP_ENABLE_IPV6
-				sock_close(listenfd6);
-#endif
-				/* Bind failed */
-				return UPNP_E_SOCKET_BIND;
-			}
 		}
 #ifdef UPNP_ENABLE_IPV6
 		if (listenfd6 != INVALID_SOCKET) {
@@ -643,101 +624,85 @@ static int get_miniserver_sockets(
 				sock_close(listenfd6);
 				return UPNP_E_SOCKET_BIND;
 			}
-			serverAddr6->sin6_port = htons(listen_port6);
-                        sockError = bind(listenfd6,
-                                (struct sockaddr *)serverAddr6,
-                                sizeof(*serverAddr6));
-			if (sockError == SOCKET_ERROR) {
-				strerror_r(errno, errorBuffer,
-					ERROR_BUFFER_LEN);
-				UpnpPrintf(UPNP_INFO, MSERV,
-					__FILE__, __LINE__,
-					"get_miniserver_sockets: "
-					"Error in IPv6 bind(): %s\n", 
-					errorBuffer);
-				sock_close(listenfd4);
-				sock_close(listenfd6);
-				/* Bind failed */
-				return UPNP_E_SOCKET_BIND;
-			}
 		}
 #endif  /* IPv6 */
-	} else {
-		if (listenfd4 != INVALID_SOCKET) {
-			uint16_t orig_listen_port4 = listen_port4;
-			do {
-				serverAddr4->sin_port = htons(listen_port4++);
-				sockError = bind(listenfd4,
-					(struct sockaddr *)serverAddr4,
-					sizeof(*serverAddr4));
-				if (sockError == SOCKET_ERROR) {
-#ifdef _WIN32
-					errCode = WSAGetLastError();
-#else
-					errCode = errno;
-#endif
-					if (errno == EADDRINUSE) {
-						errCode = 1;
-					}
-				} else {
-					errCode = 0;
-				}
-			} while (errCode != 0 &&
-				 listen_port4 >= orig_listen_port4);
-			if (sockError == SOCKET_ERROR) {
-				strerror_r(errno, errorBuffer,
-					ERROR_BUFFER_LEN);
-				UpnpPrintf(UPNP_INFO, MSERV,
-					__FILE__, __LINE__,
-					"get_miniserver_sockets: "
-					"Error in IPv4 bind(): %s\n",
-					errorBuffer);
-				sock_close(listenfd4);
-#ifdef UPNP_ENABLE_IPV6
-				sock_close(listenfd6);
-#endif
-				/* Bind failied. */
-				return UPNP_E_SOCKET_BIND;
-			}
-		}
-#ifdef UPNP_ENABLE_IPV6
-		if (listenfd6 != INVALID_SOCKET) {
-			uint16_t orig_listen_port6 = listen_port6;
-			do {
-				serverAddr6->sin6_port = htons(listen_port6++);
-				sockError = bind(listenfd6,
-					(struct sockaddr *)serverAddr6,
-					sizeof(*serverAddr6));
-				if (sockError == SOCKET_ERROR) {
-#ifdef _WIN32
-					errCode = WSAGetLastError();
-#else
-					errCode = errno; 
-#endif
-					if (errno == EADDRINUSE) {
-						errCode = 1;
-					}
-				} else {
-					errCode = 0;
-				}
-			} while (errCode != 0 &&
-				 listen_port6 >= orig_listen_port6);
-			if (sockError == SOCKET_ERROR) {
-				strerror_r(errno, errorBuffer,
-					ERROR_BUFFER_LEN);
-				UpnpPrintf(UPNP_INFO, MSERV,
-					__FILE__, __LINE__,
-					"get_miniserver_sockets: "
-					"Error in IPv6 bind(): %s\n",
-					errorBuffer);
-				sock_close(listenfd4);
-				sock_close(listenfd6);
-				/* Bind failied. */
-				return UPNP_E_SOCKET_BIND;
-			}
-		}
-#endif
 	}
+	
+	if (listenfd4 != INVALID_SOCKET) {
+		uint16_t orig_listen_port4 = listen_port4;
+		do {
+			serverAddr4->sin_port = htons(listen_port4++);
+			sockError = bind(listenfd4,
+					 (struct sockaddr *)serverAddr4,
+					 sizeof(*serverAddr4));
+			if (sockError == SOCKET_ERROR) {
+#ifdef _WIN32
+				errCode = WSAGetLastError();
+#else
+				errCode = errno;
+#endif
+				if (errno == EADDRINUSE) {
+					errCode = 1;
+				}
+			} else {
+				errCode = 0;
+			}
+		} while (errCode != 0 &&
+			 listen_port4 >= orig_listen_port4);
+		if (sockError == SOCKET_ERROR) {
+			strerror_r(errno, errorBuffer,
+				   ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, MSERV,
+				   __FILE__, __LINE__,
+				   "get_miniserver_sockets: "
+				   "Error in IPv4 bind(): %s\n",
+				   errorBuffer);
+			sock_close(listenfd4);
+#ifdef UPNP_ENABLE_IPV6
+			sock_close(listenfd6);
+#endif
+			/* Bind failied. */
+			return UPNP_E_SOCKET_BIND;
+		}
+	}
+#ifdef UPNP_ENABLE_IPV6
+	if (listenfd6 != INVALID_SOCKET) {
+		uint16_t orig_listen_port6 = listen_port6;
+		do {
+			serverAddr6->sin6_port = htons(listen_port6++);
+			sockError = bind(listenfd6,
+					 (struct sockaddr *)serverAddr6,
+					 sizeof(*serverAddr6));
+			if (sockError == SOCKET_ERROR) {
+#ifdef _WIN32
+				errCode = WSAGetLastError();
+#else
+				errCode = errno; 
+#endif
+				if (errno == EADDRINUSE) {
+					errCode = 1;
+				}
+			} else {
+				errCode = 0;
+			}
+		} while (errCode != 0 &&
+			 listen_port6 >= orig_listen_port6);
+		if (sockError == SOCKET_ERROR) {
+			strerror_r(errno, errorBuffer,
+				   ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, MSERV,
+				   __FILE__, __LINE__,
+				   "get_miniserver_sockets: "
+				   "Error in IPv6 bind(): %s\n",
+				   errorBuffer);
+			sock_close(listenfd4);
+			sock_close(listenfd6);
+			/* Bind failied. */
+			return UPNP_E_SOCKET_BIND;
+		}
+	}
+#endif
+
 	UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
 		"get_miniserver_sockets: bind successful\n");
 	if (listenfd4 != INVALID_SOCKET) {
