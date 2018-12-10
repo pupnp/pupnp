@@ -111,9 +111,9 @@ void CLASS##_remove_from_list_##MEMBER(CLASS *p) \
 	list_del_init(&((struct S##CLASS *)p)->m_##MEMBER); \
 } \
 \
-void CLASS##_replace_in_list_##MEMBER(CLASS *p, struct list_head *new) \
+void CLASS##_replace_in_list_##MEMBER(CLASS *p, struct list_head *rep) \
 { \
-	list_replace_init(&((struct S##CLASS *)p)->m_##MEMBER, new); \
+	list_replace_init(&((struct S##CLASS *)p)->m_##MEMBER, rep); \
 } \
 
 
@@ -208,7 +208,7 @@ const char *CLASS##_get_##MEMBER##_cstr(const CLASS *p) \
 
 #include "config.h"
 
-#include <stdlib.h> /* for calloc(), free() */	
+#include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
 
 /******************************************************************************/

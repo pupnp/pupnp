@@ -76,7 +76,7 @@
 	EXPORT_SPEC const struct list_head *CLASS##_get_##MEMBER(const CLASS *p); \
 	EXPORT_SPEC void CLASS##_add_to_list_##MEMBER(CLASS *p, struct list_head *head); \
 	EXPORT_SPEC void CLASS##_remove_from_list_##MEMBER(CLASS *p); \
-	EXPORT_SPEC void CLASS##_replace_in_list_##MEMBER(CLASS *p, struct list_head *new); \
+	EXPORT_SPEC void CLASS##_replace_in_list_##MEMBER(CLASS *p, struct list_head *rep); \
 
 
 /******************************************************************************/

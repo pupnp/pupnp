@@ -1,31 +1,31 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -70,7 +70,7 @@
 	#include <sys/utsname.h>
 #endif
 
-/* 
+/*
  * Please, do not change these to const int while MSVC cannot understand
  * const int in array dimensions.
  */
@@ -179,8 +179,8 @@ struct tm *http_gmtime_r(const time_t *clock, struct tm *result)
 #endif
 
 static int get_hoststr(const char* url_str,
-                       char **hoststr,
-                       size_t *hostlen)
+		       char **hoststr,
+		       size_t *hostlen)
 {
 	char *urlPath = alloca(strlen(url_str) + 1);
 	char *temp;
@@ -200,7 +200,7 @@ static int get_hoststr(const char* url_str,
 }
 
 static void copy_msg_headers(IN LinkedList *msgHeaders,
-                             OUT UpnpString *headers)
+			     OUT UpnpString *headers)
 {
 	return;
 /* TODO: */
@@ -471,7 +471,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 			else
 				amount_to_be_read = (off_t)Data_Buf_Size;
 			if (amount_to_be_read < (off_t)WEB_SERVER_BUF_SIZE)
-			    	Data_Buf_Size = (size_t)amount_to_be_read;
+				Data_Buf_Size = (size_t)amount_to_be_read;
 			ChunkBuf = malloc((size_t)
 				(Data_Buf_Size + CHUNK_HEADER_SIZE +
 				CHUNK_TAIL_SIZE));
@@ -704,7 +704,7 @@ end_function:
  *	OUT char* content_type;	Type of content
  *
  * Description:
- *	Download the document message and extract the document 
+ *	Download the document message and extract the document
  *	from the message.
  *
  * Return: int
@@ -712,10 +712,10 @@ end_function:
  *	UPNP_E_INVALID_URL
  ************************************************************************/
 int http_Download( IN const char *url_str,
-               IN int timeout_secs,
-               OUT char **document,
-               OUT size_t *doc_length,
-               OUT char *content_type )
+	       IN int timeout_secs,
+	       OUT char **document,
+	       OUT size_t *doc_length,
+	       OUT char *content_type )
 {
 	int ret_code;
 	uri_type url;
@@ -931,8 +931,8 @@ typedef struct HTTPCONNECTIONHANDLE {
 
 
 /*!
- * \brief Parses already exiting data. If not complete reads more 
- * data on the connected socket. The read data is then parsed. The 
+ * \brief Parses already exiting data. If not complete reads more
+ * data on the connected socket. The read data is then parsed. The
  * same methid is carried out for headers.
  *
  * \return integer:
@@ -1429,7 +1429,7 @@ int http_CloseHttpConnection(void *Handle)
  *
  * Parameters:
  *	IN SOCKINFO *info;		Socket information object
- *	IN int http_status_code;	error code returned while making 
+ *	IN int http_status_code;	error code returned while making
  *					or sending the response message
  *	IN int request_major_version;	request major version
  *	IN int request_minor_version;	request minor version
@@ -1509,18 +1509,19 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			ExtraHeaders *extra;
 			const DOMString resp;
 			head = (struct list_head *)va_arg(argp, struct list_head *);
-			list_for_each(pos, head) {
-				extra = (ExtraHeaders *)pos;
-				resp = ExtraHeaders_get_resp(extra);
-				if (resp) {
-					if (membuffer_append(buf, resp, strlen(resp)))
-						goto error_handler;
-					if (membuffer_append(buf, "\r\n", (size_t)2))
-						goto error_handler;
+			if (head) {
+				list_for_each(pos, head) {
+					extra = (ExtraHeaders *)pos;
+					resp = ExtraHeaders_get_resp(extra);
+					if (resp) {
+						if (membuffer_append(buf, resp, strlen(resp)))
+							goto error_handler;
+						if (membuffer_append(buf, "\r\n", (size_t)2))
+							goto error_handler;
+					}
 				}
 			}
-		}
-		if (c == 's') {
+		} else if (c == 's') {
 			/* C string */
 			s = (char *)va_arg(argp, char *);
 			assert(s);
@@ -1745,9 +1746,9 @@ ExitFunction:
  * Return: void
  ************************************************************************/
 void http_CalcResponseVersion( IN int request_major_vers,
-                          IN int request_minor_vers,
-                          OUT int *response_major_vers,
-                          OUT int *response_minor_vers)
+			  IN int request_minor_vers,
+			  OUT int *response_major_vers,
+			  OUT int *response_minor_vers)
 {
 	if ((request_major_vers > 1) ||
 	    (request_major_vers == 1 && request_minor_vers >= 1)) {
@@ -1777,9 +1778,9 @@ void http_CalcResponseVersion( IN int request_major_vers,
 *	UPNP_E_SUCCESS
 ************************************************************************/
 int MakeGetMessageEx( const char *url_str,
-                  membuffer * request,
-                  uri_type * url,
-                  struct SendInstruction *pRangeSpecifier)
+		  membuffer * request,
+		  uri_type * url,
+		  struct SendInstruction *pRangeSpecifier)
 {
 	int errCode = UPNP_E_SUCCESS;
 	char *urlPath = NULL;
@@ -1855,8 +1856,8 @@ int MakeGetMessageEx( const char *url_str,
  *	IN int timeout;			time out value
  *
  * Description:
- *	Makes the HTTP GET message, connects to the peer, 
- *	sends the HTTP GET request, gets the response and parses the 
+ *	Makes the HTTP GET message, connects to the peer,
+ *	sends the HTTP GET request, gets the response and parses the
  *	response.
  *
  * Return: int
