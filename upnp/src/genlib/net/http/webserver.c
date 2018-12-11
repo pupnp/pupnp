@@ -1116,7 +1116,8 @@ static int process_request(
 	int resp_minor;
 	int alias_grabbed;
 	size_t dummy;
-	struct list_head *extra_headers = NULL;
+	LIST_HEAD(extra_headers_store);
+	struct list_head *extra_headers = &extra_headers_store;
 
 	print_http_headers(req);
 	url = &req->uri;
