@@ -44,6 +44,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#include "config_sample.h"
 #include "ithread.h"
 #include "ixml.h" /* for IXML_Document, IXML_Element */
 #include "upnp.h" /* for Upnp_EventType */
