@@ -3903,14 +3903,14 @@ Upnp_Handle_Type GetHandleInfo(
 {
 	Upnp_Handle_Type ret = HND_INVALID;
 
-	UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+	UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
 		"GetHandleInfo: entering, Handle is %d\n", Hnd);
 
 	if (Hnd < 1 || Hnd >= NUM_HANDLE) {
-		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
+		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 			"GetHandleInfo: Handle out of range\n");
 	} else if (HandleTable[Hnd] == NULL) {
-		UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
+		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
 			"GetHandleInfo: HandleTable[%d] is NULL\n",
 			Hnd);
 	} else if (HandleTable[Hnd] != NULL) {

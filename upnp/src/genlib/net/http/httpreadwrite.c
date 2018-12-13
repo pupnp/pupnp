@@ -555,7 +555,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 					       strlen(Chunk_Header));
 					/* on the top of the buffer. */
 					/*file_buf[num_read+strlen(Chunk_Header)] = NULL; */
-					/*printf("Sending %s\n",file_buf-strlen(Chunk_Header)); */
+					/*upnpprintf("Sending %s\n",file_buf-strlen(Chunk_Header));*/
 					nw = sock_write(info,
 						file_buf - strlen(Chunk_Header),
 						num_read + strlen(Chunk_Header) + (size_t)2,
