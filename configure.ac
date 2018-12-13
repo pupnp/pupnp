@@ -432,7 +432,7 @@ AC_CANONICAL_HOST
 #    libraries : it contains information on the configuration of the
 #    installed libraries.
 #
-AC_CONFIG_HEADERS([autoconfig.h upnp/inc/upnpconfig.h])
+AC_CONFIG_HEADERS([autoconfig.h upnp/inc/upnpconfig.h upnp/sample/common/config_sample.h])
 AX_SYS_LARGEFILE_SENSITIVE
 
 if test "x$ac_cv_sys_largefile_sensitive" = "xyes"; then
