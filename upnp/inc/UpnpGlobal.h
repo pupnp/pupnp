@@ -7,7 +7,7 @@
  * \brief Defines constants that for some reason are not defined on some systems.
  */
 
-#if defined MYLIB_LARGEFILE_SENSITIVE && _FILE_OFFSET_BITS+0 != 64
+#if defined UPNP_LARGEFILE_SENSITIVE && _FILE_OFFSET_BITS+0 != 64
 	#if defined __GNUC__
 		#warning libupnp requires largefile mode - use AC_SYS_LARGEFILE
 	#else
