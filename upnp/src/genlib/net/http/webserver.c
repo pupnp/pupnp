@@ -1026,11 +1026,11 @@ static void FreeExtraHTTPHeaders(
 {
 	struct list_head *pos;
 	struct list_head *tmp;
-	ExtraHeaders *extra;
+	UpnpExtraHeaders *extra;
 
 	list_for_each_safe(pos, tmp, extraHeadersList) {
-		extra = (ExtraHeaders *)pos;
-		ExtraHeaders_delete(extra);
+		extra = (UpnpExtraHeaders *)pos;
+		UpnpExtraHeaders_delete(extra);
 	}
 }
 
@@ -1047,7 +1047,7 @@ static int ExtraHTTPHeaders(
 	http_header_t *header;
 	ListNode *node;
 	int index;
-	ExtraHeaders *extraHeader;
+	UpnpExtraHeaders *extraHeader;
 	struct list_head *extraHeaderNode;
 
 	node = ListHead(&Req->headers);
@@ -1058,17 +1058,17 @@ static int ExtraHTTPHeaders(
 				header->name.length, Http_Header_Names,
 				NUM_HTTP_HEADER_NAMES, FALSE);
 		if (index < 0) {
-			extraHeader = ExtraHeaders_new();
+			extraHeader = UpnpExtraHeaders_new();
 			if (!extraHeader) {
 				FreeExtraHTTPHeaders(extraHeadersList);
 				return HTTP_INTERNAL_SERVER_ERROR;
 			}
 			/* TODO: Check that cast that removes const. */
 			/*extraHeaderNode = (struct list_head *)ExtraHeaders_get_node(extraHeader);*/
-			extraHeaderNode = ExtraHeaders_get_node(extraHeader);
+			extraHeaderNode = UpnpExtraHeaders_get_node(extraHeader);
 			list_add(extraHeaderNode, extraHeadersList);
-			ExtraHeaders_strncpy_name(extraHeader, header->name.buf, header->name.length);
-			ExtraHeaders_strncpy_value(extraHeader, header->value.buf, header->value.length);
+			UpnpExtraHeaders_strncpy_name(extraHeader, header->name.buf, header->name.length);
+			UpnpExtraHeaders_strncpy_value(extraHeader, header->value.buf, header->value.length);
 		}
 		node = ListNext(&Req->headers, node);
 	}
@@ -1184,6 +1184,7 @@ static int process_request(
 				err_code = code;
 				goto error_handler;
 			}
+
 			/* get file info */
 			if (virtualDirCallback.
 			    get_info(filename->buf, finfo, RespInstr->Cookie) != 0) {
@@ -1197,8 +1198,7 @@ static int process_request(
 				} else {
 					temp_str = "/index.html";
 				}
-				if (membuffer_append_str(filename, temp_str) !=
-				    0) {
+				if (membuffer_append_str(filename, temp_str) != 0) {
 					goto error_handler;
 				}
 				/* get info */

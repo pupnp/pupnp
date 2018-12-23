@@ -5,12 +5,12 @@
 /*!
  * \file
  *
- * \brief ExtraHeaders object declararion.
+ * \brief UpnpExtraHeaders object declararion.
  *
  * \author Marcelo Roberto Jimenez
  */
 
-#define CLASS ExtraHeaders
+#define CLASS UpnpExtraHeaders
 
 #define EXPAND_CLASS_MEMBERS(CLASS) \
 	EXPAND_CLASS_MEMBER_LIST(CLASS, node) \
