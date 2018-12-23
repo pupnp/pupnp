@@ -1022,7 +1022,7 @@ static int CheckOtherHTTPHeaders(
 
 static void FreeExtraHTTPHeaders(
 	/*! [in] extra HTTP headers to free. */
-	struct list_head *extraHeadersList)
+	const struct list_head *extraHeadersList)
 {
 	struct list_head *pos;
 	struct list_head *tmp;
@@ -1042,7 +1042,7 @@ static void FreeExtraHTTPHeaders(
 static int ExtraHTTPHeaders(
 	/*! [in] HTTP Request message. */
 	http_message_t *Req,
-	struct list_head *extraHeadersList)
+	const struct list_head *extraHeadersList)
 {
 	http_header_t *header;
 	ListNode *node;
@@ -1116,8 +1116,6 @@ static int process_request(
 	int resp_minor;
 	int alias_grabbed;
 	size_t dummy;
-	LIST_HEAD(extra_headers_store);
-	struct list_head *extra_headers = &extra_headers_store;
 
 	print_http_headers(req);
 	url = &req->uri;
@@ -1180,7 +1178,7 @@ static int process_request(
 	}
 	if (using_virtual_dir) {
 		if (req->method != HTTPMETHOD_POST) {
-			if ((code = ExtraHTTPHeaders(req, extra_headers)) != HTTP_OK) {
+			if ((code = ExtraHTTPHeaders(req, UpnpFileInfo_get_ExtraHeadersList(finfo))) != HTTP_OK) {
 				err_code = code;
 				goto error_handler;
 			}
@@ -1313,13 +1311,14 @@ static int process_request(
 		    RespInstr,	/* language info */
 		    "LAST-MODIFIED: ",
 		    &aux_LastModified,
-		    X_USER_AGENT, extra_headers) != 0) {
+		    X_USER_AGENT,
+		    UpnpFileInfo_get_ExtraHeadersList(finfo)) != 0) {
 			goto error_handler;
 		}
 	} else if (RespInstr->IsRangeActive && !RespInstr->IsChunkActive) {
 		/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
 		if (http_MakeMessage(headers, resp_major, resp_minor,
-		    "R" "N" "T" "GLD" "s" "tcS" "Xc" "sCc",
+		    "R" "N" "T" "GLD" "s" "tcS" "EXc" "sCc",
 		    HTTP_PARTIAL_CONTENT,	/* status code */
 		    RespInstr->ReadSendSize,	/* content length */
 		    UpnpFileInfo_get_ContentType(finfo), /* content type */
@@ -1327,7 +1326,8 @@ static int process_request(
 		    RespInstr,	/* language info */
 		    "LAST-MODIFIED: ",
 		    &aux_LastModified,
-		    X_USER_AGENT, extra_headers) != 0) {
+		    X_USER_AGENT,
+		    UpnpFileInfo_get_ExtraHeadersList(finfo)) != 0) {
 			goto error_handler;
 		}
 	} else if (!RespInstr->IsRangeActive && RespInstr->IsChunkActive) {
@@ -1339,7 +1339,8 @@ static int process_request(
 		    RespInstr,	/* language info */
 		    "LAST-MODIFIED: ",
 		    &aux_LastModified,
-		    X_USER_AGENT, extra_headers) != 0) {
+		    X_USER_AGENT,
+		    UpnpFileInfo_get_ExtraHeadersList(finfo)) != 0) {
 			goto error_handler;
 		}
 	} else {
@@ -1354,7 +1355,7 @@ static int process_request(
 			    "LAST-MODIFIED: ",
 			    &aux_LastModified,
 			    X_USER_AGENT,
-			    extra_headers) != 0) {
+			    UpnpFileInfo_get_ExtraHeadersList(finfo)) != 0) {
 				goto error_handler;
 			}
 		} else {
@@ -1366,7 +1367,7 @@ static int process_request(
 			    "LAST-MODIFIED: ",
 			    &aux_LastModified,
 			    X_USER_AGENT,
-			    extra_headers) != 0) {
+			    UpnpFileInfo_get_ExtraHeadersList(finfo)) != 0) {
 				goto error_handler;
 			}
 		}
@@ -1391,7 +1392,7 @@ static int process_request(
 
  error_handler:
 	free(request_doc);
-	FreeExtraHTTPHeaders(extra_headers);
+	FreeExtraHTTPHeaders(UpnpFileInfo_get_ExtraHeadersList(finfo));
 	UpnpFileInfo_delete(finfo);
 	if (err_code != HTTP_OK && alias_grabbed) {
 		alias_release(alias);
