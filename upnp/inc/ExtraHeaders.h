@@ -5,18 +5,18 @@
 /*!
  * \file
  *
- * \brief ExtraHeaders object declararion.
+ * \brief UpnpExtraHeaders object declararion.
  *
  * \author Marcelo Roberto Jimenez
  */
 
-#define CLASS ExtraHeaders
+#define CLASS UpnpExtraHeaders
 
 #define EXPAND_CLASS_MEMBERS(CLASS) \
 	EXPAND_CLASS_MEMBER_LIST(CLASS, node) \
 	EXPAND_CLASS_MEMBER_STRING(CLASS, name) \
-        EXPAND_CLASS_MEMBER_STRING(CLASS, value) \
-        EXPAND_CLASS_MEMBER_DOMSTRING(CLASS, resp) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, value) \
+	EXPAND_CLASS_MEMBER_DOMSTRING(CLASS, resp) \
 
 #include "TemplateInclude.h"
 

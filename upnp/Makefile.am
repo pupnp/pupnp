@@ -23,6 +23,7 @@ upnpinclude_HEADERS = \
 	inc/Discovery.h \
 	inc/Event.h \
 	inc/EventSubscribe.h \
+	inc/ExtraHeaders.h \
 	inc/FileInfo.h \
 	inc/list.h \
 	inc/poison.h \
@@ -141,7 +142,6 @@ libupnp_la_SOURCES += \
 	src/genlib/net/http/statcodes.c \
 	src/genlib/net/http/webserver.c \
 	src/genlib/net/http/parsetools.c \
-	src/genlib/net/http/ExtraHeaders.c \
 	src/genlib/net/uri/uri.c
 
 # gena
@@ -159,6 +159,7 @@ libupnp_la_SOURCES += \
 	src/api/Discovery.c \
 	src/api/Event.c \
 	src/api/EventSubscribe.c \
+	src/api/ExtraHeaders.c \
 	src/api/FileInfo.c \
 	src/api/StateVarComplete.c \
 	src/api/StateVarRequest.c \

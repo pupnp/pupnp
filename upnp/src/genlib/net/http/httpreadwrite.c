@@ -1506,13 +1506,13 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			/* list of extra headers */
 			struct list_head *pos;
 			struct list_head *head;
-			ExtraHeaders *extra;
+			UpnpExtraHeaders *extra;
 			const DOMString resp;
 			head = (struct list_head *)va_arg(argp, struct list_head *);
 			if (head) {
 				list_for_each(pos, head) {
-					extra = (ExtraHeaders *)pos;
-					resp = ExtraHeaders_get_resp(extra);
+					extra = (UpnpExtraHeaders *)pos;
+					resp = UpnpExtraHeaders_get_resp(extra);
 					if (resp) {
 						if (membuffer_append(buf, resp, strlen(resp)))
 							goto error_handler;
