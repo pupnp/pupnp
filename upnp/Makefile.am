@@ -61,7 +61,6 @@ libupnp_la_SOURCES = \
 	src/inc/config.h \
 	src/inc/client_table.h \
 	src/inc/ClientSubscription.h \
-	src/inc/ExtraHeaders.h \
 	src/inc/gena.h \
 	src/inc/gena_ctrlpt.h \
 	src/inc/gena_device.h \
