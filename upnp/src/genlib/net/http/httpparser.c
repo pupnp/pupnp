@@ -2198,35 +2198,37 @@ const char *method_to_str(IN http_method_t method)
 #ifdef DEBUG
 void print_http_headers(http_message_t *hmsg)
 {
-
 	ListNode *node;
-	/* NNS:  dlist_node *node; */
+	/* NNS:	 dlist_node *node; */
 	http_header_t *header;
 
-    /* print start line */
-    if( hmsg->is_request ) {
-	printf( "method = %d, version = %d.%d, url = %.*s\n",
-			hmsg->method, hmsg->major_version, hmsg->minor_version,
-	    (int)hmsg->uri.pathquery.size, hmsg->uri.pathquery.buff);
-    } else {
-	printf( "resp status = %d, version = %d.%d, status msg = %.*s\n",
-	    hmsg->status_code, hmsg->major_version, hmsg->minor_version,
-	    (int)hmsg->status_msg.length, hmsg->status_msg.buf);
-    }
+	/* print start line */
+	if( hmsg->is_request ) {
+		UpnpPrintf(UPNP_ALL, HTTP, __FILE__, __LINE__,
+				   "method = %d, version = %d.%d, url = %.*s\n",
+				   hmsg->method, hmsg->major_version, hmsg->minor_version,
+				   (int)hmsg->uri.pathquery.size, hmsg->uri.pathquery.buff);
+	} else {
+		UpnpPrintf(UPNP_ALL, HTTP, __FILE__, __LINE__,
+				   "resp status = %d, version = %d.%d, status msg = %.*s\n",
+				   hmsg->status_code, hmsg->major_version, hmsg->minor_version,
+				   (int)hmsg->status_msg.length, hmsg->status_msg.buf);
+	}
 
-    /* print headers */
-    node = ListHead( &hmsg->headers );
-    /* NNS: node = dlist_first_node( &hmsg->headers ); */
-    while( node != NULL ) {
-	header = ( http_header_t * ) node->item;
-	/* NNS: header = (http_header_t *)node->data; */
-	printf( "hdr name: %.*s, value: %.*s\n",
-	    (int)header->name.length, header->name.buf,
-	    (int)header->value.length, header->value.buf );
+	/* print headers */
+	node = ListHead( &hmsg->headers );
+	/* NNS: node = dlist_first_node( &hmsg->headers ); */
+	while( node != NULL ) {
+		header = ( http_header_t * ) node->item;
+		/* NNS: header = (http_header_t *)node->data; */
+		UpnpPrintf(UPNP_ALL, HTTP, __FILE__, __LINE__,
+				   "hdr name: %.*s, value: %.*s\n",
+				   (int)header->name.length, header->name.buf,
+				   (int)header->value.length, header->value.buf );
 
-	node = ListNext( &hmsg->headers, node );
-	/* NNS: node = dlist_next( &hmsg->headers, node ); */
-    }
+		node = ListNext( &hmsg->headers, node );
+		/* NNS: node = dlist_next( &hmsg->headers, node ); */
+	}
 }
 #endif /* DEBUG */
 

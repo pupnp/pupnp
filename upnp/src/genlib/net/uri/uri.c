@@ -261,7 +261,8 @@ void free_URL_list(URL_list *list)
 }
 
 
-#ifdef DEBUG
+/* This should use upnpdebug. Failing that, disable by default */
+#ifdef DEBUG_URI
 void print_uri(uri_type *in)
 {
 	print_token(&in->scheme);
@@ -269,15 +270,12 @@ void print_uri(uri_type *in)
 	print_token(&in->pathquery);
 	print_token(&in->fragment);
 }
-#endif /* DEBUG */
 
-
-#ifdef DEBUG
 void print_token(token * in)
 {
 	size_t i = 0;
 
-	printf("Token Size : %" PRIzu "\n\'", in->size);
+	fprintf(stderr, "Token Size : %" PRIzu "\n\'", in->size);
 	for (i = 0; i < in->size; i++)
 		putchar(in->buff[i]);
 	putchar('\'');

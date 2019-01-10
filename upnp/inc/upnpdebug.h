@@ -58,13 +58,12 @@ extern "C" {
  *  The critical level will show only those messages 
  *  which can halt the normal processing of the library, like memory 
  *  allocation errors. The remaining three levels are just for debugging 
- *  purposes.  Packet level will display all the incoming and outgoing 
- *  packets that are flowing between the control point and the device. 
+ *  purposes. Error will show recoverable errors.
  *  Info Level displays the other important operational information 
  *  regarding the working of the library. If the user selects All, 
  *  then the library displays all the debugging information that it has.
  *    \li \c UPNP_CRITICAL [0]
- *    \li \c UPNP_PACKET [1]
+ *    \li \c UPNP_ERROR [1]
  *    \li \c UPNP_INFO [2]
  *    \li \c UPNP_ALL [3]
  */
@@ -82,11 +81,18 @@ typedef enum Upnp_Module {
 /*@{*/
 typedef enum Upnp_LogLevel_e {
 	UPNP_CRITICAL,
-	UPNP_PACKET,
+	UPNP_ERROR,
 	UPNP_INFO,
 	UPNP_ALL
 } Upnp_LogLevel;
 /*@}*/
+
+/* UPNP_PACKET probably resulted from a confusion between module and
+   level and was only used by a few messages in ssdp_device.c (they
+   have been moved to INFO). Kept for compatibility, don't use for new
+   messages.
+*/
+#define UPNP_PACKET UPNP_ERROR
 
 /*!
  * Default log level : see \c Upnp_LogLevel
@@ -133,21 +139,23 @@ static UPNP_INLINE void UpnpCloseLog(void)
 #endif
 
 /*!
- * \brief Set the name for error and information files, respectively.
+ * \brief Set the name for the log file. There used to be 2 separate files. The
+ * second parameter has been kept for compatibility but is ignored.
+ * Use a NULL file name for logging to stderr.
  */
 #ifdef DEBUG
 void UpnpSetLogFileNames(
-	/*! [in] Name of the error file. */
-	const char *ErrFileName,
-	/*! [in] Name of the information file. */
-	const char *InfoFileName);
+	/*! [in] Name of the log file. */
+	const char *fileName,
+	/*! [in] Ignored. */
+	const char *Ignored);
 #else
 static UPNP_INLINE void UpnpSetLogFileNames(const char *ErrFileName,
-	const char *InfoFileName)
+	const char *ignored)
 {
 	return;
 	ErrFileName = ErrFileName;
-	InfoFileName = InfoFileName;
+	ignored = ignored;
 }
 #endif
 
@@ -155,8 +163,8 @@ static UPNP_INLINE void UpnpSetLogFileNames(const char *ErrFileName,
  * \brief Check if the module is turned on for debug and returns the file
  * descriptor corresponding to the debug level
  *
- * \return NULL if the module is turn off for debug otheriwse returns the
- *	right file descriptor.
+ * \return NULL if the module is turn off for debug otherwise returns the
+ *	right FILE pointer.
  */
 #ifdef DEBUG
 FILE *UpnpGetDebugFile(
@@ -171,27 +179,6 @@ static UPNP_INLINE FILE *UpnpGetDebugFile(Upnp_LogLevel level, Dbg_Module module
 	return NULL;
 	level = level;
 	module = module;
-}
-#endif
-
-/*!
- * \brief Returns true if debug output should be done in this module.
- *
- * \return Nonzero value if true, zero if false.
- */
-#ifdef DEBUG
-int DebugAtThisLevel(
-	/*! [in] The level of the debug logging. It will decide whether debug
-	 * statement will go to standard output, or any of the log files. */
-	Upnp_LogLevel DLevel,
-	/*! [in] Debug will go in the name of this module. */
-	Dbg_Module Module);
-#else
-static UPNP_INLINE int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module)
-{
-	return 0;
-	DLevel = DLevel;
-	Module = Module;
 }
 #endif
 
@@ -233,56 +220,6 @@ static UPNP_INLINE void UpnpPrintf(Upnp_LogLevel DLevel, Dbg_Module Module,
 }
 #endif /* DEBUG */
 
-/*!
- * \brief Writes the file name and file number from where debug statement is
- * coming to the log file.
- */
-#ifdef DEBUG
-void UpnpDisplayFileAndLine(
-	/*! [in] File descriptor where line number and file name will be
-	 * written. */
-	FILE * fd,
-	/*! [in] Name of the file. */
-	const char *DbgFileName,
-	/*! [in] Line number of the file. */
-	int DbgLineNo);
-#else
-static UPNP_INLINE void UpnpDisplayFileAndLine(FILE *fd,
-	const char *DbgFileName, int DbgLineNo)
-{
-	return;
-	fd = fd;
-	DbgFileName = DbgFileName;
-	DbgLineNo = DbgLineNo;
-}
-#endif
-
-/*!
- * \brief Writes the buffer in the file as per the requested banner
- */
-#ifdef DEBUG
-void UpnpDisplayBanner(
-	/*! [in] file descriptor where the banner will be written. */
-	FILE * fd,
-	/*! [in] The buffer that will be written. */
-	const char **lines,
-	/*! [in] Size of the buffer. */
-	size_t size,
-	/*! [in] This parameter provides the width of the banner. */
-	size_t starlength);
-#else
-static UPNP_INLINE void UpnpDisplayBanner(FILE *fd, const char **lines,
-	size_t size, int starlength)
-{
-	return;
-	fd = fd;
-	lines = lines;
-	size = size;
-	starlength = starlength;
-}
-#endif
-
-/*@}*/
 
 #ifdef __cplusplus
 }
