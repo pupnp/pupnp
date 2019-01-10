@@ -1182,20 +1182,20 @@ void ThreadPoolPrintStats(ThreadPoolStats *stats)
 	if (!stats)
 		return;
 	/* some OSses time_t length may depending on platform, promote it to long for safety */
-	printf("ThreadPoolStats at Time: %ld\n", (long)StatsTime(NULL));
-	printf("High Jobs pending: %d\n", stats->currentJobsHQ);
-	printf("Med Jobs Pending: %d\n", stats->currentJobsMQ);
-	printf("Low Jobs Pending: %d\n", stats->currentJobsLQ);
-	printf("Average Wait in High Priority Q in milliseconds: %f\n", stats->avgWaitHQ);
-	printf("Average Wait in Med Priority Q in milliseconds: %f\n", stats->avgWaitMQ);
-	printf("Averate Wait in Low Priority Q in milliseconds: %f\n", stats->avgWaitLQ);
-	printf("Max Threads Active: %d\n", stats->maxThreads);
-	printf("Current Worker Threads: %d\n", stats->workerThreads);
-	printf("Current Persistent Threads: %d\n", stats->persistentThreads);
-	printf("Current Idle Threads: %d\n", stats->idleThreads);
-	printf("Total Threads : %d\n", stats->totalThreads);
-	printf("Total Time spent Working in seconds: %f\n", stats->totalWorkTime);
-	printf("Total Time spent Idle in seconds : %f\n", stats->totalIdleTime);
+	fprintf(stderr,"ThreadPoolStats at Time: %ld\n", (long)StatsTime(NULL));
+	fprintf(stderr,"High Jobs pending: %d\n", stats->currentJobsHQ);
+	fprintf(stderr,"Med Jobs Pending: %d\n", stats->currentJobsMQ);
+	fprintf(stderr,"Low Jobs Pending: %d\n", stats->currentJobsLQ);
+	fprintf(stderr,"Average Wait in High Priority Q in milliseconds: %f\n", stats->avgWaitHQ);
+	fprintf(stderr,"Average Wait in Med Priority Q in milliseconds: %f\n", stats->avgWaitMQ);
+	fprintf(stderr,"Averate Wait in Low Priority Q in milliseconds: %f\n", stats->avgWaitLQ);
+	fprintf(stderr,"Max Threads Active: %d\n", stats->maxThreads);
+	fprintf(stderr,"Current Worker Threads: %d\n", stats->workerThreads);
+	fprintf(stderr,"Current Persistent Threads: %d\n", stats->persistentThreads);
+	fprintf(stderr,"Current Idle Threads: %d\n", stats->idleThreads);
+	fprintf(stderr,"Total Threads : %d\n", stats->totalThreads);
+	fprintf(stderr,"Total Time spent Working in seconds: %f\n", stats->totalWorkTime);
+	fprintf(stderr,"Total Time spent Idle in seconds : %f\n", stats->totalIdleTime);
 }
 
 int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
