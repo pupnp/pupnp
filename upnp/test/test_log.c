@@ -38,6 +38,8 @@
 int main (int argc, char* argv[])
 {
 #if UPNP_HAVE_DEBUG
+	int i;
+
 	/* Try a few random calls (let's crash it...) */
 	UpnpCloseLog();
 	UpnpCloseLog();
@@ -68,7 +70,7 @@ int main (int argc, char* argv[])
 	UpnpSetLogFileNames(NULL, NULL);
 	UpnpInitLog();
 	UpnpPrintf(UPNP_CRITICAL,API,__FILE__,__LINE__,"I'm back !\n");
-	for (int i = 0; i < 10000; i++) {
+	for (i = 0; i < 10000; i++) {
 		UpnpInitLog();
 		UpnpCloseLog();
 	}
