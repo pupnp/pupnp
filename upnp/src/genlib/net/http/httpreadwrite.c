@@ -484,7 +484,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 			/* file name */
 			filename = va_arg(argp, char *);
 			if (Instr && Instr->IsVirtualFile)
-				Fp = (virtualDirCallback.open)(filename, UPNP_READ, Instr->Cookie);
+				Fp = (virtualDirCallback.open)(filename, UPNP_READ, Instr->Cookie, Instr->RequestCookie);
 			else
 				Fp = fopen(filename, "rb");
 			if (Fp == NULL) {
@@ -493,7 +493,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 			}
 			if (Instr && Instr->IsRangeActive && Instr->IsVirtualFile) {
 				if (virtualDirCallback.seek(Fp, Instr->RangeOffset,
-				    SEEK_CUR, Instr->Cookie) != 0) {
+					SEEK_CUR, Instr->Cookie, Instr->RequestCookie) != 0) {
 					RetVal = UPNP_E_FILE_READ_ERROR;
 					goto Cleanup_File;
 				}
@@ -509,7 +509,8 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 					size_t n = amount_to_be_read >= (off_t)Data_Buf_Size ?
 						Data_Buf_Size : (size_t)amount_to_be_read;
 					if (Instr->IsVirtualFile) {
-						nr = virtualDirCallback.read(Fp, file_buf, n, Instr->Cookie);
+						nr = virtualDirCallback.read(Fp, file_buf, n,
+							Instr->Cookie, Instr->RequestCookie);
 						num_read = (size_t)nr;
 					} else {
 						num_read = fread(file_buf, (size_t)1, n, Fp);
@@ -579,7 +580,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 			} /* while */
 Cleanup_File:
 			if (Instr && Instr->IsVirtualFile) {
-				virtualDirCallback.close(Fp, Instr->Cookie);
+				virtualDirCallback.close(Fp, Instr->Cookie, Instr->RequestCookie);
 			} else {
 				fclose(Fp);
 			}
