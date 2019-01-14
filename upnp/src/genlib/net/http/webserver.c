@@ -1185,7 +1185,7 @@ static int process_request(
 
 			/* get file info */
 			if (virtualDirCallback.
-			    get_info(filename->buf, finfo, RespInstr->Cookie) != 0) {
+			    get_info(filename->buf, finfo, RespInstr->Cookie, &RespInstr->RequestCookie) != 0) {
 				err_code = HTTP_NOT_FOUND;
 				goto error_handler;
 			}
@@ -1200,7 +1200,7 @@ static int process_request(
 					goto error_handler;
 				}
 				/* get info */
-				if (virtualDirCallback.get_info(filename->buf, finfo, RespInstr->Cookie) != UPNP_E_SUCCESS ||
+				if (virtualDirCallback.get_info(filename->buf, finfo, RespInstr->Cookie, &RespInstr->RequestCookie) != UPNP_E_SUCCESS ||
 				    UpnpFileInfo_get_IsDirectory(finfo)) {
 					err_code = HTTP_NOT_FOUND;
 					goto error_handler;
@@ -1433,7 +1433,7 @@ static int http_RecvPostMessage(
 	int ret_code = HTTP_OK;
 
 	if (Instr && Instr->IsVirtualFile) {
-		Fp = (virtualDirCallback.open) (filename, UPNP_WRITE, Instr->Cookie);
+		Fp = (virtualDirCallback.open) (filename, UPNP_WRITE, Instr->Cookie, Instr->RequestCookie);
 		if (Fp == NULL)
 			return HTTP_INTERNAL_SERVER_ERROR;
 	} else {
@@ -1511,7 +1511,8 @@ static int http_RecvPostMessage(
 		       Data_Buf_Size);
 		entity_offset += Data_Buf_Size;
 		if (Instr && Instr->IsVirtualFile) {
-			int n = virtualDirCallback.write(Fp, Buf, Data_Buf_Size, Instr->Cookie);
+			int n = virtualDirCallback.write(Fp, Buf, Data_Buf_Size,
+					Instr->Cookie, Instr->RequestCookie);
 			if (n < 0) {
 				ret_code = HTTP_INTERNAL_SERVER_ERROR;
 				goto ExitFunction;
@@ -1527,7 +1528,7 @@ static int http_RecvPostMessage(
 		 entity_offset != parser->msg.entity.length);
 ExitFunction:
 	if (Instr && Instr->IsVirtualFile) {
-		virtualDirCallback.close(Fp, Instr->Cookie);
+		virtualDirCallback.close(Fp, Instr->Cookie, Instr->RequestCookie);
 	} else {
 		fclose(Fp);
 	}

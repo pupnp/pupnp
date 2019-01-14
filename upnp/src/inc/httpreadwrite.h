@@ -152,7 +152,7 @@ int http_SendMessage(
 	/* [in] Socket information object. */
 	SOCKINFO *info,
 	/* [in,out] Time out value. */
-	int* timeout_secs, 
+	int* timeout_secs,
 	/* [in] Pattern format to take actions upon. */
 	const char* fmt,
 	/* [in] Variable parameter list. */

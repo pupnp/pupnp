@@ -2571,12 +2571,14 @@ typedef void *UpnpWebFileHandle;
  * \brief Get-info callback function prototype.
  */
 typedef int (*VDCallback_GetInfo)(
-		/*! [in] The name of the file to query. */
-		const char *filename,
-		/*! [out] Pointer to a structure to store the information on the file. */
-		UpnpFileInfo *info,
-		/*! [in] The cookie associated with this VirtualDir */
-		const void *cookie);
+    /*! [in] The name of the file to query. */
+    const char *filename,
+    /*! [out] Pointer to a structure to store the information on the file. */
+    UpnpFileInfo *info,
+    /*! [in] The cookie associated with this VirtualDir */
+    const void *cookie,
+    /*! [out] The cookie associated with this request */
+    const void **request_cookie);
 
 /*!
  * \brief Sets the get_info callback function to be used to access a virtual
@@ -2592,13 +2594,15 @@ EXPORT_SPEC int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback);
  * \brief Open callback function prototype.
  */
 typedef UpnpWebFileHandle (*VDCallback_Open)(
-		/*! [in] The name of the file to open. */ 
-		const char *filename,
-		/*! [in] The mode in which to open the file.
-		 * Valid values are \c UPNP_READ or \c UPNP_WRITE. */
-		enum UpnpOpenFileMode Mode,
-		/*! [in] The cookie associated with this VirtualDir */
-		const void *cookie);
+    /*! [in] The name of the file to open. */
+    const char *filename,
+    /*! [in] The mode in which to open the file.
+     * Valid values are \c UPNP_READ or \c UPNP_WRITE. */
+    enum UpnpOpenFileMode Mode,
+    /*! [in] The cookie associated with this VirtualDir */
+    const void *cookie,
+    /*! [in] The cookie associated with this request */
+    const void *request_cookie);
 
 /*!
  * \brief Sets the open callback function to be used to access a virtual
@@ -2614,14 +2618,16 @@ EXPORT_SPEC int UpnpVirtualDir_set_OpenCallback(VDCallback_Open callback);
  * \brief Read callback function prototype.
  */
 typedef int (*VDCallback_Read)(
-	/*! [in] The handle of the file to read. */
-	UpnpWebFileHandle fileHnd,
-	/*! [out] The buffer in which to place the data. */
-	char *buf,
-	/*! [in] The size of the buffer (i.e. the number of bytes to read). */
-	size_t buflen,
-	/*! [in] The cookie associated with this VirtualDir */
-	const void *cookie);
+    /*! [in] The handle of the file to read. */
+    UpnpWebFileHandle fileHnd,
+    /*! [out] The buffer in which to place the data. */
+    char *buf,
+    /*! [in] The size of the buffer (i.e. the number of bytes to read). */
+    size_t buflen,
+    /*! [in] The cookie associated with this VirtualDir */
+    const void *cookie,
+    /*! [in] The cookie associated with this request */
+    const void *request_cookie);
 
 /*! 
  * \brief Sets the read callback function to be used to access a virtual
@@ -2637,14 +2643,16 @@ EXPORT_SPEC int UpnpVirtualDir_set_ReadCallback(VDCallback_Read callback);
  * \brief Write callback function prototype.
  */
 typedef	int (*VDCallback_Write)(
-	/*! [in] The handle of the file to write. */
-	UpnpWebFileHandle fileHnd,
-	/*! [in] The buffer with the bytes to write. */
-	char *buf,
-	/*! [in] The number of bytes to write. */
-	size_t buflen,
-	/*! [in] The cookie associated with this VirtualDir */
-	const void *cookie);
+    /*! [in] The handle of the file to write. */
+    UpnpWebFileHandle fileHnd,
+    /*! [in] The buffer with the bytes to write. */
+    char *buf,
+    /*! [in] The number of bytes to write. */
+    size_t buflen,
+    /*! [in] The cookie associated with this VirtualDir */
+    const void *cookie,
+    /*! [in] The cookie associated with this request */
+    const void *request_cookie);
 
 /*!
  * \brief Sets the write callback function to be used to access a virtual
@@ -2660,19 +2668,21 @@ EXPORT_SPEC int UpnpVirtualDir_set_WriteCallback(VDCallback_Write callback);
  * \brief Seek callback function prototype.
  */
 typedef int (*VDCallback_Seek) (
-	/*! [in] The handle of the file to move the file pointer. */
-	UpnpWebFileHandle fileHnd,
-	/*! [in] The number of bytes to move in the file.  Positive values
-	 * move foward and negative values move backward.  Note that
-	 * this must be positive if the \b origin is \c SEEK_SET. */
-	off_t offset,
-	/*! [in] The position to move relative to.  It can be \c SEEK_CUR
-	 * to move relative to the current position, \c SEEK_END to
-	 * move relative to the end of the file, or \c SEEK_SET to
-	 * specify an absolute offset. */
-	int origin,
-	/*! [in] The cookie associated with this VirtualDir */
-	const void *cookie);
+    /*! [in] The handle of the file to move the file pointer. */
+    UpnpWebFileHandle fileHnd,
+    /*! [in] The number of bytes to move in the file.  Positive values
+     * move foward and negative values move backward.  Note that
+     * this must be positive if the \b origin is \c SEEK_SET. */
+    off_t offset,
+    /*! [in] The position to move relative to.  It can be \c SEEK_CUR
+     * to move relative to the current position, \c SEEK_END to
+     * move relative to the end of the file, or \c SEEK_SET to
+     * specify an absolute offset. */
+    int origin,
+    /*! [in] The cookie associated with this VirtualDir */
+    const void *cookie,
+    /*! [in] The cookie associated with this request */
+    const void *request_cookie);
 
 /*!
  * \brief Sets the seek callback function to be used to access a virtual
@@ -2688,10 +2698,12 @@ EXPORT_SPEC int UpnpVirtualDir_set_SeekCallback(VDCallback_Seek callback);
  * \brief Close callback function prototype.
  */
 typedef int (*VDCallback_Close)(
-		/*! [in] The handle of the file to close. */
-		UpnpWebFileHandle fileHnd,
-		/*! [in] The cookie associated with this VirtualDir */
-		const void *cookie);
+    /*! [in] The handle of the file to close. */
+    UpnpWebFileHandle fileHnd,
+    /*! [in] The cookie associated with this VirtualDir */
+    const void *cookie,
+    /*! [in] The cookie associated with this request */
+    const void *request_cookie);
 
 /*!
  * \brief Sets the close callback function to be used to access a virtual
