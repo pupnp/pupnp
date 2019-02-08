@@ -722,6 +722,11 @@ AC_COMPILE_IFELSE(
 			AC_MSG_ERROR([pthread_rwlock_t not available])])])
 echo "-------------------------------------------------------------------------------"
 
+if test "x$enable_open_ssl" = xyes ; then
+	PKG_CHECK_MODULES(OPENSSL, libssl,
+		[LIBS="$LIBS $OPENSSL_LIBS" CFLAGS="$CFLAGS $OPENSSL_CFLAGS"],
+		[AC_MSG_ERROR([openssl not found])])
+fi
 
 AC_CONFIG_FILES([
 	Makefile
