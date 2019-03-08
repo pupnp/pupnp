@@ -6,6 +6,7 @@ includedir=@includedir@
 Name: libupnp
 Description: Linux SDK for UPnP Devices
 Version: @VERSION@
-Libs: @PTHREAD_CFLAGS@ @PTHREAD_LIBS@ -L${libdir} -lupnp -lixml @OPENSSL_LIBS@
+Libs: @PTHREAD_CFLAGS@ @PTHREAD_LIBS@ -L${libdir} -lupnp -lixml
+Libs.private: @OPENSSL_LIBS@
 Cflags: @PTHREAD_CFLAGS@ -I${includedir}/upnp
 
