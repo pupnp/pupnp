@@ -3533,11 +3533,11 @@ int UpnpGetIfInfo(const char *IfName)
 	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
 	gIF_INDEX = if_nametoindex(gIF_NAME);
 #else /* (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__) */ /* _WIN32 */
-	char szBuffer[MAX_INTERFACES * sizeof(struct ifreq)];
+	struct ifreq ifArray[MAX_INTERFACES];
 	struct ifconf ifConf;
 	struct ifreq ifReq;
 	FILE *inet6_procfd;
-	size_t i;
+	int i;
 	int LocalSock;
 	struct in6_addr v6_addr;
 	unsigned if_idx;
@@ -3562,8 +3562,8 @@ int UpnpGetIfInfo(const char *IfName)
 		return UPNP_E_INIT;
 	}
 	/* Get the interface configuration information...  */
-	ifConf.ifc_len = (int)sizeof szBuffer;
-	ifConf.ifc_ifcu.ifcu_buf = (caddr_t) szBuffer;
+	ifConf.ifc_len = (int) sizeof ifArray;
+	ifConf.ifc_ifcu.ifcu_buf = (char *)ifArray;
 
 	if (ioctl(LocalSock, SIOCGIFCONF, &ifConf) < 0) {
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -3571,11 +3571,15 @@ int UpnpGetIfInfo(const char *IfName)
 		close(LocalSock);
 		return UPNP_E_INIT;
 	}
+	if (ifConf.ifc_len == sizeof ifArray) {
+		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+			   "DiscoverInterfaces: ifConf.ifc_len == sizeof ifArray, "
+			   "an overflow might have occurred, "
+			   "operation should be retried with a bigger buffer.\n");
+	}
 	/* Cycle through the list of interfaces looking for IP addresses.  */
-	for (i = (size_t)0; i < (size_t)ifConf.ifc_len;) {
-		struct ifreq *pifReq =
-		    (struct ifreq *)((caddr_t) ifConf.ifc_req + i);
-		i += sizeof *pifReq;
+	for (i = 0; i < ifConf.ifc_len; i += (int)(sizeof (struct ifreq))) {
+		struct ifreq *pifReq = (struct ifreq *)(ifConf.ifc_buf + i);
 		/* See if this is the sort of interface we want to deal with. */
 		memset(ifReq.ifr_name, 0, sizeof(ifReq.ifr_name));
 		strncpy(ifReq.ifr_name, pifReq->ifr_name,
@@ -4023,20 +4027,20 @@ int getlocalhostname(char *out, size_t out_len)
 
 	ret = ifa ? UPNP_E_SUCCESS : UPNP_E_INIT;
 #else
-	char szBuffer[MAX_INTERFACES * sizeof (struct ifreq)];
+	struct ifreq ifArray[MAX_INTERFACES];
 	struct ifconf ifConf;
 	struct ifreq ifReq;
 	int nResult;
-	long unsigned int i;
+	int i;
 	int LocalSock;
 	struct sockaddr_in LocalAddr;
 	int j = 0;
 
 	/* purify */
-	memset(&ifConf,  0, sizeof(ifConf));
-	memset(&ifReq,   0, sizeof(ifReq));
-	memset(szBuffer, 0, sizeof(szBuffer));
-	memset(&LocalAddr, 0, sizeof(LocalAddr));
+	memset(&ifConf,  0, sizeof ifConf);
+	memset(&ifReq,   0, sizeof ifReq);
+	memset(ifArray, 0, sizeof ifArray);
+	memset(&LocalAddr, 0, sizeof LocalAddr);
 
 	/* Create an unbound datagram socket to do the SIOCGIFADDR ioctl on.  */
 	LocalSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -4046,8 +4050,8 @@ int getlocalhostname(char *out, size_t out_len)
 		return UPNP_E_INIT;
 	}
 	/* Get the interface configuration information... */
-	ifConf.ifc_len = (int)sizeof szBuffer;
-	ifConf.ifc_ifcu.ifcu_buf = (caddr_t) szBuffer;
+	ifConf.ifc_len = (int)sizeof ifArray;
+	ifConf.ifc_ifcu.ifcu_buf = (char *)ifArray;
 	nResult = ioctl(LocalSock, SIOCGIFCONF, &ifConf);
 	if (nResult < 0) {
 		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
@@ -4055,12 +4059,16 @@ int getlocalhostname(char *out, size_t out_len)
 		close(LocalSock);
 		return UPNP_E_INIT;
 	}
+	if (ifConf.ifc_len == sizeof ifArray) {
+		UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+			   "DiscoverInterfaces: ifConf.ifc_len == sizeof ifArray, "
+			   "an overflow might have occurred, "
+			   "operation should be retried with a bigger buffer.\n");
+	}
 
 	/* Cycle through the list of interfaces looking for IP addresses. */
-	for (i = 0lu; i < (long unsigned int)ifConf.ifc_len && j < DEFAULT_INTERFACE; ) {
-		struct ifreq *pifReq =
-			(struct ifreq *)((caddr_t)ifConf.ifc_req + i);
-		i += sizeof *pifReq;
+	for (i = 0; i < ifConf.ifc_len && j < DEFAULT_INTERFACE; i += (int)(sizeof (struct ifreq))) {
+		struct ifreq *pifReq = (struct ifreq *)(ifConf.ifc_buf + i);
 		/* See if this is the sort of interface we want to deal with. */
 		memset(ifReq.ifr_name, 0, sizeof(ifReq.ifr_name));
 		strncpy(ifReq.ifr_name, pifReq->ifr_name,
