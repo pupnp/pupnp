@@ -7,6 +7,9 @@ Version 1.10.0
 	Proper allocation for an array of structs and a check for an unlikely
 	overflow when calling the SIOCGIFCONF ioctl().
 
+	It still bugs me the stack requirements of getlocalhostname() and
+	UpnpGetIfInfo().
+
 *******************************************************************************
 Version 1.8.5
 *******************************************************************************
