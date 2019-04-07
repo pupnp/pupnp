@@ -671,7 +671,7 @@ static BOOL Parser_isCharInTable(
 	int sz)
 {
 	int t = 0;
-	int b = sz;
+	int b = sz - 1;
 	int m;
 
 	while (t <= b) {
