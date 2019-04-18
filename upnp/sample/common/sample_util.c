@@ -194,6 +194,7 @@ char *SampleUtil_GetFirstDocumentItem(IXML_Document *doc, const char *item)
 	IXML_NodeList *nodeList = NULL;
 	IXML_Node *textNode = NULL;
 	IXML_Node *tmpNode = NULL;
+	char *nodeValue = NULL;
 	char *ret = NULL;
 
 	nodeList = ixmlDocument_getElementsByTagName(doc, (char *)item);
@@ -207,9 +208,16 @@ char *SampleUtil_GetFirstDocumentItem(IXML_Document *doc, const char *item)
 				ret = strdup("");
 				goto epilogue;
 			}
-			ret = strdup(ixmlNode_getNodeValue(textNode));
-			if (!ret) {
+			nodeValue = ixmlNode_getNodeValue(textNode);
+			if (!nodeValue) {
 				SampleUtil_Print("%s(%d): ixmlNode_getNodeValue returned NULL\n",
+					__FILE__, __LINE__); 
+				ret = strdup("");
+				goto epilogue;
+			}
+			ret = strdup(nodeValue);
+			if (!ret) {
+				SampleUtil_Print("%s(%d): Error allocating memory for XML Node value\n",
 					__FILE__, __LINE__); 
 				ret = strdup("");
 			}
