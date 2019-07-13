@@ -197,7 +197,7 @@ dnl ############################################################################
 dnl # Release 1.6.10:
 dnl # "current:revision:age"
 dnl #
-dnl # - Code has changed in ixml 
+dnl # - Code has changed in ixml
 dnl #	revision: 5 -> 6
 dnl # - Code has changed in threadutil
 dnl #	revision: 2 -> 3
@@ -390,14 +390,30 @@ dnl ############################################################################
 dnl # Release 1.8.5:
 dnl # "current:revision:age"
 dnl #
+dnl # - Code has changed in ixml
+dnl #   revision: 1 -> 2
+dnl # - Code has changed in upnp
+dnl #   revision: 0 -> 1
+dnl # - interfaces changed/added/removed:
+dnl #   current: 13 -> 14, revision 1 -> 0
+dnl # - interfaces added:
+dnl #   age: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [10:2:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [14:0:1])
+dnl #
+dnl ############################################################################
+dnl # Release 1.8.6:
+dnl # "current:revision:age"
+dnl #
 dnl # -
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [::])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
 dnl #
 dnl ############################################################################
-AC_SUBST([LT_VERSION_IXML],       [10:1:0])
-AC_SUBST([LT_VERSION_UPNP],       [13:0:0])
+AC_SUBST([LT_VERSION_IXML],       [10:2:0])
+AC_SUBST([LT_VERSION_UPNP],       [14:0:1])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
@@ -425,10 +441,10 @@ AC_CANONICAL_HOST
 # There are 3 configuration files :
 # 1) "./autoconfig.h" is auto-generated and used only internally during build
 #    (usually named "config.h" but conflicts with the file below)
-# 2) "./upnp/src/inc/config.h" is static and contains some compile-time 
-#    parameters. This file was previously in "./upnp/inc" but is no longer 
+# 2) "./upnp/src/inc/config.h" is static and contains some compile-time
+#    parameters. This file was previously in "./upnp/inc" but is no longer
 #    installed (contains internal definitions only).
-# 3) "./upnp/inc/upnpconfig.h" is auto-generated and installed with the 
+# 3) "./upnp/inc/upnpconfig.h" is auto-generated and installed with the
 #    libraries : it contains information on the configuration of the
 #    installed libraries.
 #
@@ -476,9 +492,9 @@ if test "x$enable_device" = xyes ; then
 fi
 
 
-if test "x$enable_device" = xno ; then 
+if test "x$enable_device" = xno ; then
 	enable_webserver=no
-else 
+else
 	RT_BOOL_ARG_ENABLE([webserver], [yes], [integrated web server])
 fi
 AM_CONDITIONAL(ENABLE_WEBSERVER, test x"$enable_webserver" = xyes)
@@ -488,23 +504,23 @@ fi
 
 RT_BOOL_ARG_ENABLE([ssdp], [yes], [SSDP part])
 if test "x$enable_ssdp" = xyes ; then
-        AC_DEFINE(UPNP_HAVE_SSDP, 1, [see upnpconfig.h])
+	AC_DEFINE(UPNP_HAVE_SSDP, 1, [see upnpconfig.h])
 fi
 
 RT_BOOL_ARG_ENABLE([optssdp], [yes], [optional SSDP headers support)])
 if test "x$enable_optssdp" = xyes ; then
-        AC_DEFINE(UPNP_HAVE_OPTSSDP, 1, [see upnpconfig.h])
+	AC_DEFINE(UPNP_HAVE_OPTSSDP, 1, [see upnpconfig.h])
 	enable_uuid=yes
 fi
 
 RT_BOOL_ARG_ENABLE([soap], [yes], [SOAP part])
 if test "x$enable_soap" = xyes ; then
-        AC_DEFINE(UPNP_HAVE_SOAP, 1, [see upnpconfig.h])
+	AC_DEFINE(UPNP_HAVE_SOAP, 1, [see upnpconfig.h])
 fi
 
 RT_BOOL_ARG_ENABLE([gena], [yes], [GENA part])
 if test "x$enable_gena" = xyes ; then
-        AC_DEFINE(UPNP_HAVE_GENA, 1, [see upnpconfig.h])
+	AC_DEFINE(UPNP_HAVE_GENA, 1, [see upnpconfig.h])
 	enable_uuid=yes
 fi
 
@@ -517,37 +533,37 @@ fi
 
 RT_BOOL_ARG_ENABLE([ipv6], [yes], [ipv6 support])
 if test "x$enable_ipv6" = xyes ; then
-        AC_DEFINE(UPNP_ENABLE_IPV6, 1, [see upnpconfig.h])
+	AC_DEFINE(UPNP_ENABLE_IPV6, 1, [see upnpconfig.h])
 fi
 
 RT_BOOL_ARG_ENABLE([unspecified_server], [no], [unspecified SERVER header])
 if test "x$enable_unspecified_server" = xyes ; then
-        AC_DEFINE(UPNP_ENABLE_UNSPECIFIED_SERVER, 1, [see upnpconfig.h])
+	AC_DEFINE(UPNP_ENABLE_UNSPECIFIED_SERVER, 1, [see upnpconfig.h])
 fi
 
 RT_BOOL_ARG_ENABLE([open_ssl], [no], [open-ssl support])
 if test "x$enable_open_ssl" = xyes ; then
-        AC_DEFINE(UPNP_ENABLE_OPEN_SSL, 1, [see upnpconfig.h])
+	AC_DEFINE(UPNP_ENABLE_OPEN_SSL, 1, [see upnpconfig.h])
 fi
 
 RT_BOOL_ARG_ENABLE([blocking_tcp_connections], [yes], [blocking TCP connections])
 if test "x$enable_blocking_tcp_connections" = xyes ; then
-        AC_DEFINE(UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS, 1, [see upnpconfig.h])
+	AC_DEFINE(UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS, 1, [see upnpconfig.h])
 fi
 
 RT_BOOL_ARG_ENABLE([scriptsupport], [yes], [script support for IXML document tree, see ixml.h])
 if test "x$enable_scriptsupport" = xyes ; then
-        AC_DEFINE(IXML_HAVE_SCRIPTSUPPORT, 1, [see upnpconfig.h])
+	AC_DEFINE(IXML_HAVE_SCRIPTSUPPORT, 1, [see upnpconfig.h])
 fi
 
 RT_BOOL_ARG_ENABLE([postwrite], [no], [write to the filesystem on otherwise unhandled POST requests])
 if test "x$enable_postwrite" = xyes ; then
-        AC_DEFINE(UPNP_ENABLE_POST_WRITE, 1, [see upnpconfig.h])
+	AC_DEFINE(UPNP_ENABLE_POST_WRITE, 1, [see upnpconfig.h])
 fi
 
 RT_BOOL_ARG_ENABLE([reuseaddr], [no], [bind the miniserver socket with reuseaddr to allow clean restarts])
 if test "x$enable_reuseaddr" = xyes ; then
-        AC_DEFINE(UPNP_MINISERVER_REUSEADDR, 1, [see upnpconfig.h])
+	AC_DEFINE(UPNP_MINISERVER_REUSEADDR, 1, [see upnpconfig.h])
 fi
 
 RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
@@ -642,7 +658,7 @@ fi
 
 #
 # Checks for typedefs, structures, and compiler characteristics
-#	
+#
 AC_C_CONST
 AC_C_BIGENDIAN
 
