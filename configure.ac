@@ -9,7 +9,7 @@
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.8.5], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp], [1.10.0], [mroberto@users.sourceforge.net])
 dnl ############################################################################
 dnl # *Independently* of the above libupnp package version, the libtool version
 dnl # of the 3 libraries need to be updated whenever there is a change released:
@@ -390,14 +390,47 @@ dnl ############################################################################
 dnl # Release 1.8.5:
 dnl # "current:revision:age"
 dnl #
+dnl # - Code has changed in ixml
+dnl #   revision: 1 -> 2
+dnl # - Code has changed in upnp
+dnl #   revision: 0 -> 1
+dnl # - interfaces changed/added/removed:
+dnl #   current: 13 -> 14, revision 1 -> 0
+dnl # - interfaces added:
+dnl #   age: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [10:2:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [14:0:1])
+dnl #
+dnl ############################################################################
+dnl # Release 1.8.6:
+dnl # "current:revision:age"
+dnl #
 dnl # -
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [::])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
 dnl #
 dnl ############################################################################
-AC_SUBST([LT_VERSION_IXML],       [10:1:0])
-AC_SUBST([LT_VERSION_UPNP],       [13:0:0])
+dnl # Release 1.10.0:
+dnl # "current:revision:age"
+dnl #
+dnl # - First release of 1.10
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [11:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [15:0:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.10.1:
+dnl # "current:revision:age"
+dnl #
+dnl # -
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [::])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
+dnl #
+AC_SUBST([LT_VERSION_IXML],       [11:0:0])
+AC_SUBST([LT_VERSION_UPNP],       [15:0:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
