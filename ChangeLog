@@ -1,6 +1,23 @@
 *******************************************************************************
+Version 1.10.0
+*******************************************************************************
+
+2019-04-03 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	Proper allocation for an array of structs and a check for an unlikely
+	overflow when calling the SIOCGIFCONF ioctl().
+
+	It still bugs me the stack requirements of getlocalhostname() and
+	UpnpGetIfInfo().
+
+*******************************************************************************
 Version 1.8.5
 *******************************************************************************
+
+2019-07-18 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	Fixed a wrong ifdef in ssdp_device.c that was causing problems with
+	ipv6. Thanks to BraneDev @ Github
 
 *******************************************************************************
 Version 1.8.4

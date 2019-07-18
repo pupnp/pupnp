@@ -131,15 +131,15 @@ void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *d
 		maxAge = dev_info->MaxAge;
 		HandleUnlock();
 
-		UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
+		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 				   "MAX-AGE     =  %d\n", maxAge);
-		UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
+		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 				   "MX     =  %d\n", event.Mx);
-		UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
+		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 				   "DeviceType   =  %s\n", event.DeviceType);
-		UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
+		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 				   "DeviceUuid   =  %s\n", event.UDN);
-		UpnpPrintf(UPNP_PACKET, API, __FILE__, __LINE__,
+		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 				   "ServiceType =  %s\n", event.ServiceType);
 		threadArg = (SsdpSearchReply *)malloc(sizeof(SsdpSearchReply));
 		if (threadArg == NULL)
@@ -188,7 +188,7 @@ static int NewRequestHandler(
 	unsigned long replyAddr = inet_addr(gIF_IPV4);
 	/* a/c to UPNP Spec */
 	int ttl = 4;
-#ifdef INET_IPV6
+#ifdef UPNP_ENABLE_IPV6
 	int hops = 1;
 #endif
 	char buf_ntop[INET6_ADDRSTRLEN];
@@ -214,7 +214,7 @@ static int NewRequestHandler(
 			   (char *)&ttl, sizeof(int));
 		socklen = sizeof(struct sockaddr_in);
 		break;
-#ifdef INET_IPV6
+#ifdef UPNP_ENABLE_IPV6
 	case AF_INET6:
 		inet_ntop(AF_INET6,
 			  &((struct sockaddr_in6 *)DestAddr)->sin6_addr,
