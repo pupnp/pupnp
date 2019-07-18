@@ -31,6 +31,8 @@ modules.builtin
 *.patch
 *.gcno
 *.sha1
+*.pro
+*.pro.user
 
 #
 # Top-level generic files
