@@ -188,7 +188,7 @@ static int NewRequestHandler(
 	unsigned long replyAddr = inet_addr(gIF_IPV4);
 	/* a/c to UPNP Spec */
 	int ttl = 4;
-#ifdef INET_IPV6
+#ifdef UPNP_ENABLE_IPV6
 	int hops = 1;
 #endif
 	char buf_ntop[INET6_ADDRSTRLEN];
@@ -214,7 +214,7 @@ static int NewRequestHandler(
 			   (char *)&ttl, sizeof(int));
 		socklen = sizeof(struct sockaddr_in);
 		break;
-#ifdef INET_IPV6
+#ifdef UPNP_ENABLE_IPV6
 	case AF_INET6:
 		inet_ntop(AF_INET6,
 			  &((struct sockaddr_in6 *)DestAddr)->sin6_addr,

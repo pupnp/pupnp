@@ -14,6 +14,11 @@ Version 1.10.0
 Version 1.8.5
 *******************************************************************************
 
+2019-07-18 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	Fixed a wrong ifdef in ssdp_device.c that was causing problems with
+	ipv6. Thanks to BraneDev @ Github
+
 *******************************************************************************
 Version 1.8.4
 *******************************************************************************
