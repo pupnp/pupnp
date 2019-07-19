@@ -2,6 +2,10 @@
 Version 1.10.0
 *******************************************************************************
 
+2019-07-19 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	Fix sed command for upnppatch in configure.ac
+
 2019-04-03 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
 	Proper allocation for an array of structs and a check for an unlikely

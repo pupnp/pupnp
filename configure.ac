@@ -474,7 +474,7 @@ fi
 
 upnpmaj=`echo "$PACKAGE_VERSION" | sed 's/\..*//' `
 upnpmin=[`echo "$PACKAGE_VERSION" | sed 's/^[^.]\.// ; s/[^0-9].*$//' `]
-upnppatch=[`echo "$PACKAGE_VERSION" | sed 's/^[^.]\.[^.]\.// ; s/[^0-9].*$//' `]
+upnppatch=[`echo "$PACKAGE_VERSION" | sed 's/^[^\.]*\.[^.]*\.//' `]
 AC_DEFINE_UNQUOTED([UPNP_VERSION_STRING], "$PACKAGE_VERSION", [see upnpconfig.h])
 AC_DEFINE_UNQUOTED([UPNP_VERSION_MAJOR], $upnpmaj, [see upnpconfig.h])
 AC_DEFINE_UNQUOTED([UPNP_VERSION_MINOR], $upnpmin, [see upnpconfig.h])
