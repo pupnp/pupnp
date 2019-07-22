@@ -18,7 +18,7 @@ dnl # where:
 dnl # 	- library code modified:		revision++
 dnl # 	- interfaces changed/added/removed:	current++ and revision=0
 dnl # 	- interfaces added: 			age++
-dnl # 	- interfaces removed:			age=0
+dnl # 	- interfaces removed or changed:	age=0
 dnl # *please update only once, before a formal release, not for each change*
 dnl #
 dnl ############################################################################
@@ -436,7 +436,7 @@ dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
 dnl # 	- interfaces changed/added/removed:	current++ and revision=0
 dnl # 	- interfaces added: 			age++
-dnl # 	- interfaces removed:			age=0
+dnl # 	- interfaces removed or changed:	age=0
 dnl # *please update only once, before a formal release, not for each change*
 dnl ############################################################################
 
