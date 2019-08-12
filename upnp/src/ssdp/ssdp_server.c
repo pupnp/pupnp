@@ -913,6 +913,7 @@ static int create_ssdp_sock_reqv4(
 
 	return UPNP_E_SUCCESS;
 }
+#endif /* INCLUDE_CLIENT_APIS */
 
 #ifdef UPNP_ENABLE_IPV6
 /*!
@@ -1131,6 +1132,7 @@ error_handler:
 }
 #endif /* IPv6 */
 
+#ifdef INCLUDE_CLIENT_APIS
 /*!
  * \brief Creates the SSDP IPv6 socket to be used by the control point.
  */
