@@ -648,7 +648,7 @@ void TvCtrlPointAddDevice(
 {
 	char *deviceType = NULL;
 	char *friendlyName = NULL;
-	char presURL[200];
+	char *presURL = NULL;
 	char *baseURL = NULL;
 	char *relURL = NULL;
 	char *UDN = NULL;
@@ -676,7 +676,7 @@ void TvCtrlPointAddDevice(
 	baseURL = SampleUtil_GetFirstDocumentItem(DescDoc, "URLBase");
 	relURL = SampleUtil_GetFirstDocumentItem(DescDoc, "presentationURL");
 
-	ret = UpnpResolveURL((baseURL ? baseURL : location), relURL, presURL);
+	ret = UpnpResolveURL2((baseURL ? baseURL : location), relURL, &presURL);
 
 	if (UPNP_E_SUCCESS != ret)
 		SampleUtil_Print("Error generating presURL from %s + %s\n",
@@ -798,6 +798,8 @@ void TvCtrlPointAddDevice(
 		free(baseURL);
 	if (relURL)
 		free(relURL);
+	if (presURL)
+		free(presURL);
 	for (service = 0; service < TV_SERVICE_SERVCOUNT; service++) {
 		if (serviceId[service])
 			free(serviceId[service]);
