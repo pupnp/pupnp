@@ -601,20 +601,14 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc, const char *location,
 				SampleUtil_Print("serviceId: %s\n", *serviceId);
 				relcontrolURL = SampleUtil_GetFirstElementItem(service, "controlURL");
 				releventURL = SampleUtil_GetFirstElementItem(service, "eventSubURL");
-				*controlURL = malloc(strlen(base) + strlen(relcontrolURL) + 1);
-				if (*controlURL) {
-					ret = UpnpResolveURL(base, relcontrolURL, *controlURL);
-					if (ret != UPNP_E_SUCCESS)
-						SampleUtil_Print("Error generating controlURL from %s + %s\n",
-							base, relcontrolURL);
-				}
-				*eventURL = malloc(strlen(base) + strlen(releventURL) + 1);
-				if (*eventURL) {
-					ret = UpnpResolveURL(base, releventURL, *eventURL);
-					if (ret != UPNP_E_SUCCESS)
-						SampleUtil_Print("Error generating eventURL from %s + %s\n",
-							base, releventURL);
-				}
+				ret = UpnpResolveURL2(base, relcontrolURL, controlURL);
+				if (ret != UPNP_E_SUCCESS)
+					SampleUtil_Print("Error generating controlURL from %s + %s\n",
+							 base, relcontrolURL);
+				ret = UpnpResolveURL2(base, releventURL, eventURL);
+				if (ret != UPNP_E_SUCCESS)
+					SampleUtil_Print("Error generating eventURL from %s + %s\n",
+							 base, releventURL);
 				free(relcontrolURL);
 				free(releventURL);
 				relcontrolURL = NULL;
