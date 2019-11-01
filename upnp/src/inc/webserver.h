@@ -56,8 +56,8 @@ struct SendInstruction
 	long RecvWriteSize;
 	/*! Cookie associated with the virtualDir. */
 	const void *Cookie;
-    /*! Cookie associated with the request. */
-    const void *RequestCookie;
+	/*! Cookie associated with the request. */
+	const void *RequestCookie;
 	/* Later few more member could be added depending
 	 * on the requirement.*/
 };

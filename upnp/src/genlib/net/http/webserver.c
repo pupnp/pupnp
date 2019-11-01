@@ -1547,14 +1547,8 @@ void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
 	struct xml_alias_t xmldoc;
 	struct SendInstruction RespInstr;
 
-	/*Initialize instruction header. */
-	RespInstr.IsVirtualFile = 0;
-	RespInstr.IsChunkActive = 0;
-	RespInstr.IsRangeActive = 0;
-	RespInstr.IsTrailers = 0;
-	memset(RespInstr.AcceptLanguageHeader, 0,
-	       sizeof(RespInstr.AcceptLanguageHeader));
 	/* init */
+	memset(&RespInstr, 0, sizeof(RespInstr));
 	membuffer_init(&headers);
 	membuffer_init(&filename);
 
