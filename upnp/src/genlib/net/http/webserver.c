@@ -1318,7 +1318,7 @@ static int process_request(
 	} else if (RespInstr->IsRangeActive && !RespInstr->IsChunkActive) {
 		/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
 		if (http_MakeMessage(headers, resp_major, resp_minor,
-		    "R" "N" "T" "GLD" "s" "tcS" "EXc" "sCc",
+		    "R" "N" "T" "GLD" "s" "tcS" "Xc" "ECc",
 		    HTTP_PARTIAL_CONTENT,	/* status code */
 		    RespInstr->ReadSendSize,	/* content length */
 		    UpnpFileInfo_get_ContentType(finfo), /* content type */
