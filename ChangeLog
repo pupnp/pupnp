@@ -2,6 +2,11 @@
 Version 1.10.1
 *******************************************************************************
 
+2019-11-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	Forward port of Karlchen's github #122
+	Fix format string for ExtraHeaders
+
 *******************************************************************************
 Version 1.10.0
 *******************************************************************************
@@ -17,6 +22,14 @@ Version 1.10.0
 
 	It still bugs me the stack requirements of getlocalhostname() and
 	UpnpGetIfInfo().
+
+*******************************************************************************
+Version 1.8.6
+*******************************************************************************
+
+2019-11-20 KarlStraussberger (Karlchen@github)
+
+	Fix format string for ExtraHeaders #122
 
 *******************************************************************************
 Version 1.8.5
