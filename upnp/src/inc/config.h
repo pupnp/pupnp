@@ -401,20 +401,6 @@
 #endif
 /* @} */
 
-    
-/*!
- * \name DEBUG_TARGET
- *
- * The user has the option to redirect the library output debug messages 
- * to either the screen or to a log file.  All the output messages with 
- * debug level 0 will go to {\tt upnp.err} and messages with debug level 
- * greater than zero will be redirected to {\tt upnp.out}.
- *
- * @{
- */
-#define DEBUG_TARGET		1   
-/* @} */
-
 
 /*!
  * \name Other debugging features
