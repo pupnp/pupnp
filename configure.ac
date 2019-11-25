@@ -732,7 +732,7 @@ AC_SEARCH_LIBS([sched_getparam], [rt])
 # Checks for POSIX Threads
 #
 echo "--------------------------- pthread stuff -------------------------------------"
-ACX_PTHREAD(
+AX_PTHREAD(
 	[],
 	[AC_MSG_ERROR([POSIX threads are required to build this program])])
 #
