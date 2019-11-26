@@ -31,12 +31,12 @@ struct upnp_list_head {
 	struct upnp_list_head *next, *prev;
 };
 
-struct hlist_head {
-        struct hlist_node *first;
+struct upnp_hlist_head {
+        struct upnp_hlist_node *first;
 };
 
-struct hlist_node {
-        struct hlist_node *next, **pprev;
+struct upnp_hlist_node {
+        struct upnp_hlist_node *next, **pprev;
 };
 
 #define UPNP_LIST_HEAD_INIT(name) { &(name), &(name) }
@@ -639,42 +639,42 @@ static UPNP_INLINE void list_splice_tail_init(struct upnp_list_head *list,
  */
 
 #define HLIST_HEAD_INIT { .first = NULL }
-#define HLIST_HEAD(name) struct hlist_head name = {  .first = NULL }
+#define HLIST_HEAD(name) struct upnp_hlist_head name = {  .first = NULL }
 #define INIT_HLIST_HEAD(ptr) ((ptr)->first = NULL)
-static UPNP_INLINE void INIT_HLIST_NODE(struct hlist_node *h)
+static UPNP_INLINE void INIT_HLIST_NODE(struct upnp_hlist_node *h)
 {
 	h->next = NULL;
 	h->pprev = NULL;
 }
 
-static UPNP_INLINE int hlist_unhashed(const struct hlist_node *h)
+static UPNP_INLINE int hlist_unhashed(const struct upnp_hlist_node *h)
 {
 	return !h->pprev;
 }
 
-static UPNP_INLINE int hlist_empty(const struct hlist_head *h)
+static UPNP_INLINE int hlist_empty(const struct upnp_hlist_head *h)
 {
 	return !h->first;
 }
 
-static UPNP_INLINE void __hlist_del(struct hlist_node *n)
+static UPNP_INLINE void __hlist_del(struct upnp_hlist_node *n)
 {
-	struct hlist_node *next = n->next;
-	struct hlist_node **pprev = n->pprev;
+	struct upnp_hlist_node *next = n->next;
+	struct upnp_hlist_node **pprev = n->pprev;
 
 	*pprev = next;
 	if (next)
 		next->pprev = pprev;
 }
 
-static UPNP_INLINE void hlist_del(struct hlist_node *n)
+static UPNP_INLINE void hlist_del(struct upnp_hlist_node *n)
 {
 	__hlist_del(n);
-	n->next =  (struct hlist_node*)LIST_POISON1;
-	n->pprev =  (struct hlist_node**)LIST_POISON2;
+	n->next =  (struct upnp_hlist_node*)LIST_POISON1;
+	n->pprev =  (struct upnp_hlist_node**)LIST_POISON2;
 }
 
-static UPNP_INLINE void hlist_del_init(struct hlist_node *n)
+static UPNP_INLINE void hlist_del_init(struct upnp_hlist_node *n)
 {
 	if (!hlist_unhashed(n)) {
 		__hlist_del(n);
@@ -682,9 +682,9 @@ static UPNP_INLINE void hlist_del_init(struct hlist_node *n)
 	}
 }
 
-static UPNP_INLINE void hlist_add_head(struct hlist_node *n, struct hlist_head *h)
+static UPNP_INLINE void hlist_add_head(struct upnp_hlist_node *n, struct upnp_hlist_head *h)
 {
-	struct hlist_node *first = h->first;
+	struct upnp_hlist_node *first = h->first;
 	n->next = first;
 	if (first)
 		first->pprev = &n->next;
@@ -693,8 +693,8 @@ static UPNP_INLINE void hlist_add_head(struct hlist_node *n, struct hlist_head *
 }
 
 /* next must be != NULL */
-static UPNP_INLINE void hlist_add_before(struct hlist_node *n,
-					struct hlist_node *next)
+static UPNP_INLINE void hlist_add_before(struct upnp_hlist_node *n,
+					struct upnp_hlist_node *next)
 {
 	n->pprev = next->pprev;
 	n->next = next;
@@ -702,8 +702,8 @@ static UPNP_INLINE void hlist_add_before(struct hlist_node *n,
 	*(n->pprev) = n;
 }
 
-static UPNP_INLINE void hlist_add_behind(struct hlist_node *n,
-				    struct hlist_node *prev)
+static UPNP_INLINE void hlist_add_behind(struct upnp_hlist_node *n,
+				    struct upnp_hlist_node *prev)
 {
 	n->next = prev->next;
 	prev->next = n;
@@ -714,12 +714,12 @@ static UPNP_INLINE void hlist_add_behind(struct hlist_node *n,
 }
 
 /* after that we'll appear to be on some hlist and hlist_del will work */
-static UPNP_INLINE void hlist_add_fake(struct hlist_node *n)
+static UPNP_INLINE void hlist_add_fake(struct upnp_hlist_node *n)
 {
 	n->pprev = &n->next;
 }
 
-static UPNP_INLINE int hlist_fake(struct hlist_node *h)
+static UPNP_INLINE int hlist_fake(struct upnp_hlist_node *h)
 {
 	return h->pprev == &h->next;
 }
@@ -729,7 +729,7 @@ static UPNP_INLINE int hlist_fake(struct hlist_node *h)
  * accessing head:
  */
 static UPNP_INLINE int
-hlist_is_singular_node(struct hlist_node *n, struct hlist_head *h)
+hlist_is_singular_node(struct upnp_hlist_node *n, struct upnp_hlist_head *h)
 {
 	return !n->next && n->pprev == &h->first;
 }
@@ -738,8 +738,8 @@ hlist_is_singular_node(struct hlist_node *n, struct hlist_head *h)
  * Move a list from one list head to another. Fixup the pprev
  * reference of the first entry if it exists.
  */
-static UPNP_INLINE void hlist_move_list(struct hlist_head *old,
-				   struct hlist_head *newent)
+static UPNP_INLINE void hlist_move_list(struct upnp_hlist_head *old,
+				   struct upnp_hlist_head *newent)
 {
 	newent->first = old->first;
 	if (newent->first)
@@ -765,7 +765,7 @@ static UPNP_INLINE void hlist_move_list(struct hlist_head *old,
  * hlist_for_each_entry	- iterate over list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the upnp_hlist_node within the struct.
  */
 #define hlist_for_each_entry(pos, head, member)				\
 	for (pos = hlist_entry_safe((head)->first, typeof(*(pos)), member);\
@@ -775,7 +775,7 @@ static UPNP_INLINE void hlist_move_list(struct hlist_head *old,
 /**
  * hlist_for_each_entry_continue - iterate over a hlist continuing after current point
  * @pos:	the type * to use as a loop cursor.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the upnp_hlist_node within the struct.
  */
 #define hlist_for_each_entry_continue(pos, member)			\
 	for (pos = hlist_entry_safe((pos)->member.next, typeof(*(pos)), member);\
@@ -785,7 +785,7 @@ static UPNP_INLINE void hlist_move_list(struct hlist_head *old,
 /**
  * hlist_for_each_entry_from - iterate over a hlist continuing from current point
  * @pos:	the type * to use as a loop cursor.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the upnp_hlist_node within the struct.
  */
 #define hlist_for_each_entry_from(pos, member)				\
 	for (; pos;							\
@@ -794,9 +794,9 @@ static UPNP_INLINE void hlist_move_list(struct hlist_head *old,
 /**
  * hlist_for_each_entry_safe - iterate over list of given type safe against removal of list entry
  * @pos:	the type * to use as a loop cursor.
- * @n:		another &struct hlist_node to use as temporary storage
+ * @n:		another &struct upnp_hlist_node to use as temporary storage
  * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the upnp_hlist_node within the struct.
  */
 #define hlist_for_each_entry_safe(pos, n, head, member) 		\
 	for (pos = hlist_entry_safe((head)->first, typeof(*pos), member);\
