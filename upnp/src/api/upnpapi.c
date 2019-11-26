@@ -3360,9 +3360,8 @@ int UpnpGetIfInfo(const char *IfName)
 		}
 		if (ifname_found == 0) {
 			/* We have found a valid interface name. Keep it. */
-#ifdef UPNP_USE_MSVCPP
 			/*
-			 * Partial fix for VC - friendly name is wchar string,
+			 * Partial fix for Windows: Friendly name is wchar string,
 			 * but currently gIF_NAME is char string. For now try
 			 * to convert it, which will work with many (but not
 			 * all) adapters. A full fix would require a lot of
@@ -3370,16 +3369,10 @@ int UpnpGetIfInfo(const char *IfName)
 			 */
 			wcstombs(gIF_NAME, adapts_item->FriendlyName,
 				sizeof(gIF_NAME));
-#else /* UPNP_USE_MSVCPP */
-			memset(gIF_NAME, 0, sizeof(gIF_NAME));
-			strncpy(gIF_NAME, adapts_item->FriendlyName,
-				sizeof(gIF_NAME) - 1);
-#endif /* UPNP_USE_MSVCPP */
 			ifname_found = 1;
 		} else {
-#ifdef UPNP_USE_MSVCPP
 			/*
-			 * Partial fix for VC - friendly name is wchar string,
+			 * Partial fix for Windows: Friendly name is wchar string,
 			 * but currently gIF_NAME is char string. For now try
 			 * to convert it, which will work with many (but not
 			 * all) adapters. A full fix would require a lot of
@@ -3394,14 +3387,6 @@ int UpnpGetIfInfo(const char *IfName)
 				/* This is not the interface we're looking for. */
 				continue;
 			}
-#else /* UPNP_USE_MSVCPP */
-			if (strncmp
-			    (gIF_NAME, adapts_item->FriendlyName,
-			     sizeof(gIF_NAME)) != 0) {
-				/* This is not the interface we're looking for. */
-				continue;
-			}
-#endif /* UPNP_USE_MSVCPP */
 		}
 		/* Loop thru this adapter's unicast IP addresses. */
 		uni_addr = adapts_item->FirstUnicastAddress;
