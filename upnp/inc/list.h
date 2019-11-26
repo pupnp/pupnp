@@ -15,12 +15,6 @@
 
 #include "UpnpGlobal.h" /* For UPNP_INLINE */
 
-#undef READ_ONCE
-#define READ_ONCE(x) x
-
-#undef WRITE_ONCE
-#define WRITE_ONCE(x,y) x = y
-
 /**
  * upnp_container_of - cast a member of a structure out to the containing structure
  * @ptr:        the pointer to the member.
@@ -61,7 +55,7 @@ struct hlist_node {
 
 static UPNP_INLINE void INIT_LIST_HEAD(struct list_head *list)
 {
-	WRITE_ONCE(list->next, list);
+	list->next = list;
 	list->prev = list;
 }
 
@@ -101,7 +95,7 @@ static UPNP_INLINE void __list_add(struct list_head *newent,
 	next->prev = newent;
 	newent->next = next;
 	newent->prev = prev;
-	WRITE_ONCE(prev->next, newent);
+	prev->next = newent;
 }
 
 /**
@@ -141,7 +135,7 @@ static UPNP_INLINE void list_add_tail(struct list_head *newent, struct list_head
 static UPNP_INLINE void __list_del(struct list_head * prev, struct list_head * next)
 {
 	next->prev = prev;
-	WRITE_ONCE(prev->next, next);
+	prev->next = next;
 }
 
 /**
@@ -238,7 +232,7 @@ static UPNP_INLINE int list_is_last(const struct list_head *list,
  */
 static UPNP_INLINE int list_empty(const struct list_head *head)
 {
-	return READ_ONCE(head->next) == head;
+	return head->next == head;
 }
 
 /**
@@ -437,7 +431,7 @@ static UPNP_INLINE void list_splice_tail_init(struct list_head *list,
  */
 #define list_first_entry_or_null(ptr, type, member) ({ \
 	struct list_head *head__ = (ptr); \
-	struct list_head *pos__ = READ_ONCE(head__->next); \
+	struct list_head *pos__ = head__->next; \
 	pos__ != head__ ? list_entry(pos__, type, member) : NULL; \
 })
 
@@ -678,7 +672,7 @@ static UPNP_INLINE int hlist_unhashed(const struct hlist_node *h)
 
 static UPNP_INLINE int hlist_empty(const struct hlist_head *h)
 {
-	return !READ_ONCE(h->first);
+	return !h->first;
 }
 
 static UPNP_INLINE void __hlist_del(struct hlist_node *n)
@@ -686,7 +680,7 @@ static UPNP_INLINE void __hlist_del(struct hlist_node *n)
 	struct hlist_node *next = n->next;
 	struct hlist_node **pprev = n->pprev;
 
-	WRITE_ONCE(*pprev, next);
+	*pprev = next;
 	if (next)
 		next->pprev = pprev;
 }
@@ -712,7 +706,7 @@ static UPNP_INLINE void hlist_add_head(struct hlist_node *n, struct hlist_head *
 	n->next = first;
 	if (first)
 		first->pprev = &n->next;
-	WRITE_ONCE(h->first, n);
+	h->first = n;
 	n->pprev = &h->first;
 }
 
@@ -723,14 +717,14 @@ static UPNP_INLINE void hlist_add_before(struct hlist_node *n,
 	n->pprev = next->pprev;
 	n->next = next;
 	next->pprev = &n->next;
-	WRITE_ONCE(*(n->pprev), n);
+	*(n->pprev) = n;
 }
 
 static UPNP_INLINE void hlist_add_behind(struct hlist_node *n,
 				    struct hlist_node *prev)
 {
 	n->next = prev->next;
-	WRITE_ONCE(prev->next, n);
+	prev->next = n;
 	n->pprev = &prev->next;
 
 	if (n->next)
