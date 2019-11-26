@@ -4,15 +4,6 @@
 #include <stddef.h> /* for offsetof */
 
 #include "poison.h"
-
-#ifdef __APPLE__
-/* Apple systems define these macros in system headers, so we undef
- * them prior to inclusion of this file */
-#undef LIST_HEAD
-#undef LIST_HEAD_INIT
-#undef INIT_LIST_HEAD
-#endif
-
 #include "UpnpGlobal.h" /* For UPNP_INLINE */
 
 /**
@@ -48,12 +39,12 @@ struct hlist_node {
         struct hlist_node *next, **pprev;
 };
 
-#define LIST_HEAD_INIT(name) { &(name), &(name) }
+#define UPNP_LIST_HEAD_INIT(name) { &(name), &(name) }
 
-#define LIST_HEAD(name) \
-	struct list_head name = LIST_HEAD_INIT(name)
+#define UPNP_LIST_HEAD(name) \
+	struct list_head name = UPNP_LIST_HEAD_INIT(name)
 
-static UPNP_INLINE void INIT_LIST_HEAD(struct list_head *list)
+static UPNP_INLINE void UPNP_INIT_LIST_HEAD(struct list_head *list)
 {
 	list->next = list;
 	list->prev = list;
@@ -172,7 +163,7 @@ static UPNP_INLINE void list_replace_init(struct list_head *old,
 					struct list_head *newent)
 {
 	list_replace(old, newent);
-	INIT_LIST_HEAD(old);
+	UPNP_INIT_LIST_HEAD(old);
 }
 
 /**
@@ -182,7 +173,7 @@ static UPNP_INLINE void list_replace_init(struct list_head *old,
 static UPNP_INLINE void list_del_init(struct list_head *entry)
 {
 	__list_del_entry(entry);
-	INIT_LIST_HEAD(entry);
+	UPNP_INIT_LIST_HEAD(entry);
 }
 
 /**
@@ -305,7 +296,7 @@ static UPNP_INLINE void list_cut_position(struct list_head *list,
 		(head->next != entry && head != entry))
 		return;
 	if (entry == head)
-		INIT_LIST_HEAD(list);
+		UPNP_INIT_LIST_HEAD(list);
 	else
 		__list_cut_position(list, head, entry);
 }
@@ -360,7 +351,7 @@ static UPNP_INLINE void list_splice_init(struct list_head *list,
 {
 	if (!list_empty(list)) {
 		__list_splice(list, head, head->next);
-		INIT_LIST_HEAD(list);
+		UPNP_INIT_LIST_HEAD(list);
 	}
 }
 
@@ -377,7 +368,7 @@ static UPNP_INLINE void list_splice_tail_init(struct list_head *list,
 {
 	if (!list_empty(list)) {
 		__list_splice(list, head->prev, head);
-		INIT_LIST_HEAD(list);
+		UPNP_INIT_LIST_HEAD(list);
 	}
 }
 
