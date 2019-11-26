@@ -392,8 +392,6 @@ static UPNP_INLINE void list_splice_tail_init(struct list_head *list,
 #define list_first_entry(ptr, type, member) \
 	list_entry((ptr)->next, type, member)
 
-#define prefetch(x) 0
-
 /**
  * list_last_entry - get the last element from a list
  * @ptr:	the list head to take the element from.
