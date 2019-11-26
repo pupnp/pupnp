@@ -638,9 +638,9 @@ static UPNP_INLINE void list_splice_tail_init(struct upnp_list_head *list,
  * You lose the ability to access the tail in O(1).
  */
 
-#define HLIST_HEAD_INIT { .first = NULL }
-#define HLIST_HEAD(name) struct upnp_hlist_head name = {  .first = NULL }
-#define INIT_HLIST_HEAD(ptr) ((ptr)->first = NULL)
+#define UPNP_HLIST_HEAD_INIT { .first = NULL }
+#define UPNP_HLIST_HEAD(name) struct upnp_hlist_head name = {  .first = NULL }
+#define UPNP_INIT_HLIST_HEAD(ptr) ((ptr)->first = NULL)
 static UPNP_INLINE void INIT_HLIST_NODE(struct upnp_hlist_node *h)
 {
 	h->next = NULL;
