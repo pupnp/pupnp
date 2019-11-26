@@ -50,14 +50,14 @@ static UPNP_INLINE void UPNP_INIT_LIST_HEAD(struct upnp_list_head *list)
 	list->prev = list;
 }
 
-static UPNP_INLINE int __list_add_valid(struct upnp_list_head *newent,
+static UPNP_INLINE int __upnp_list_add_valid(struct upnp_list_head *newent,
 				struct upnp_list_head *prev,
 				struct upnp_list_head *next)
 {
 	return 1;
 	newent++; prev++; next++; /* against compiler warnings */
 }
-static UPNP_INLINE int __list_del_entry_valid(struct upnp_list_head *entry)
+static UPNP_INLINE int __upnp_list_del_entry_valid(struct upnp_list_head *entry)
 {
 	return 1;
 	entry++; /* against compiler warnings */
@@ -69,11 +69,11 @@ static UPNP_INLINE int __list_del_entry_valid(struct upnp_list_head *entry)
  * This is only for internal list manipulation where we know
  * the prev/next entries already!
  */
-static UPNP_INLINE void __list_add(struct upnp_list_head *newent,
+static UPNP_INLINE void __upnp_list_add(struct upnp_list_head *newent,
 			      struct upnp_list_head *prev,
 			      struct upnp_list_head *next)
 {
-	if (!__list_add_valid(newent, prev, next))
+	if (!__upnp_list_add_valid(newent, prev, next))
 		return;
 
 	next->prev = newent;
@@ -92,7 +92,7 @@ static UPNP_INLINE void __list_add(struct upnp_list_head *newent,
  */
 static UPNP_INLINE void list_add(struct upnp_list_head *newent, struct upnp_list_head *head)
 {
-	__list_add(newent, head, head->next);
+	__upnp_list_add(newent, head, head->next);
 }
 
 
@@ -106,7 +106,7 @@ static UPNP_INLINE void list_add(struct upnp_list_head *newent, struct upnp_list
  */
 static UPNP_INLINE void list_add_tail(struct upnp_list_head *newent, struct upnp_list_head *head)
 {
-	__list_add(newent, head->prev, head);
+	__upnp_list_add(newent, head->prev, head);
 }
 
 /*
@@ -116,7 +116,7 @@ static UPNP_INLINE void list_add_tail(struct upnp_list_head *newent, struct upnp
  * This is only for internal list manipulation where we know
  * the prev/next entries already!
  */
-static UPNP_INLINE void __list_del(struct upnp_list_head * prev, struct upnp_list_head * next)
+static UPNP_INLINE void __upnp_list_del(struct upnp_list_head * prev, struct upnp_list_head * next)
 {
 	next->prev = prev;
 	prev->next = next;
@@ -128,17 +128,17 @@ static UPNP_INLINE void __list_del(struct upnp_list_head * prev, struct upnp_lis
  * Note: list_empty() on entry does not return 1 after this, the entry is
  * in an undefined state.
  */
-static UPNP_INLINE void __list_del_entry(struct upnp_list_head *entry)
+static UPNP_INLINE void __upnp_list_del_entry(struct upnp_list_head *entry)
 {
-	if (!__list_del_entry_valid(entry))
+	if (!__upnp_list_del_entry_valid(entry))
 		return;
 
-	__list_del(entry->prev, entry->next);
+	__upnp_list_del(entry->prev, entry->next);
 }
 
 static UPNP_INLINE void list_del(struct upnp_list_head *entry)
 {
-	__list_del_entry(entry);
+	__upnp_list_del_entry(entry);
 	entry->next = (struct upnp_list_head*)LIST_POISON1;
 	entry->prev =  (struct upnp_list_head*)LIST_POISON2;
 }
@@ -172,7 +172,7 @@ static UPNP_INLINE void list_replace_init(struct upnp_list_head *old,
  */
 static UPNP_INLINE void list_del_init(struct upnp_list_head *entry)
 {
-	__list_del_entry(entry);
+	__upnp_list_del_entry(entry);
 	UPNP_INIT_LIST_HEAD(entry);
 }
 
@@ -183,7 +183,7 @@ static UPNP_INLINE void list_del_init(struct upnp_list_head *entry)
  */
 static UPNP_INLINE void list_move(struct upnp_list_head *list, struct upnp_list_head *head)
 {
-	__list_del_entry(list);
+	__upnp_list_del_entry(list);
 	list_add(list, head);
 }
 
@@ -195,7 +195,7 @@ static UPNP_INLINE void list_move(struct upnp_list_head *list, struct upnp_list_
 static UPNP_INLINE void list_move_tail(struct upnp_list_head *list,
 				  struct upnp_list_head *head)
 {
-	__list_del_entry(list);
+	__upnp_list_del_entry(list);
 	list_add_tail(list, head);
 }
 
@@ -261,7 +261,7 @@ static UPNP_INLINE int list_is_singular(const struct upnp_list_head *head)
 	return !list_empty(head) && (head->next == head->prev);
 }
 
-static UPNP_INLINE void __list_cut_position(struct upnp_list_head *list,
+static UPNP_INLINE void __upnp_list_cut_position(struct upnp_list_head *list,
 		struct upnp_list_head *head, struct upnp_list_head *entry)
 {
 	struct upnp_list_head *new_first = entry->next;
@@ -298,10 +298,10 @@ static UPNP_INLINE void list_cut_position(struct upnp_list_head *list,
 	if (entry == head)
 		UPNP_INIT_LIST_HEAD(list);
 	else
-		__list_cut_position(list, head, entry);
+		__upnp_list_cut_position(list, head, entry);
 }
 
-static UPNP_INLINE void __list_splice(const struct upnp_list_head *list,
+static UPNP_INLINE void __upnp_list_splice(const struct upnp_list_head *list,
 				 struct upnp_list_head *prev,
 				 struct upnp_list_head *next)
 {
@@ -324,7 +324,7 @@ static UPNP_INLINE void list_splice(const struct upnp_list_head *list,
 				struct upnp_list_head *head)
 {
 	if (!list_empty(list))
-		__list_splice(list, head, head->next);
+		__upnp_list_splice(list, head, head->next);
 }
 
 /**
@@ -336,7 +336,7 @@ static UPNP_INLINE void list_splice_tail(struct upnp_list_head *list,
 				struct upnp_list_head *head)
 {
 	if (!list_empty(list))
-		__list_splice(list, head->prev, head);
+		__upnp_list_splice(list, head->prev, head);
 }
 
 /**
@@ -350,7 +350,7 @@ static UPNP_INLINE void list_splice_init(struct upnp_list_head *list,
 				    struct upnp_list_head *head)
 {
 	if (!list_empty(list)) {
-		__list_splice(list, head, head->next);
+		__upnp_list_splice(list, head, head->next);
 		UPNP_INIT_LIST_HEAD(list);
 	}
 }
@@ -367,7 +367,7 @@ static UPNP_INLINE void list_splice_tail_init(struct upnp_list_head *list,
 					 struct upnp_list_head *head)
 {
 	if (!list_empty(list)) {
-		__list_splice(list, head->prev, head);
+		__upnp_list_splice(list, head->prev, head);
 		UPNP_INIT_LIST_HEAD(list);
 	}
 }
