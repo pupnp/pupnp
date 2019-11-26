@@ -22,13 +22,13 @@
 #define WRITE_ONCE(x,y) x = y
 
 /**
- * container_of - cast a member of a structure out to the containing structure
+ * upnp_container_of - cast a member of a structure out to the containing structure
  * @ptr:        the pointer to the member.
  * @type:       the type of the container struct this is embedded in.
  * @member:     the name of the member within the struct.
  *
  */
-#define container_of(ptr, type, member) ({                      \
+#define upnp_container_of(ptr, type, member) ({                 \
         const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
         (type *)( (char *)__mptr - offsetof(type,member) );})
 
@@ -401,7 +401,7 @@ static UPNP_INLINE void list_splice_tail_init(struct list_head *list,
  * @member:	the name of the list_head within the struct.
  */
 #define list_entry(ptr, type, member) \
-	container_of(ptr, type, member)
+	upnp_container_of(ptr, type, member)
 
 /**
  * list_first_entry - get the first element from a list
@@ -771,7 +771,7 @@ static UPNP_INLINE void hlist_move_list(struct hlist_head *old,
 	old->first = NULL;
 }
 
-#define hlist_entry(ptr, type, member) container_of(ptr,type,member)
+#define hlist_entry(ptr, type, member) upnp_container_of(ptr,type,member)
 
 #define hlist_for_each(pos, head) \
 	for (pos = (head)->first; pos ; pos = pos->next)
