@@ -59,12 +59,6 @@ static UPNP_INLINE void INIT_LIST_HEAD(struct list_head *list)
 	list->prev = list;
 }
 
-#ifdef CONFIG_DEBUG_LIST
-extern int __list_add_valid(struct list_head *newent,
-			      struct list_head *prev,
-			      struct list_head *next);
-extern int __list_del_entry_valid(struct list_head *entry);
-#else
 static UPNP_INLINE int __list_add_valid(struct list_head *newent,
 				struct list_head *prev,
 				struct list_head *next)
@@ -77,7 +71,6 @@ static UPNP_INLINE int __list_del_entry_valid(struct list_head *entry)
 	return 1;
 	entry++; /* against compiler warnings */
 }
-#endif
 
 /*
  * Insert a new entry between two known consecutive entries.
