@@ -1,6 +1,8 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
 
+#include <stddef.h> /* for offsetof */
+
 #include "poison.h"
 
 #ifdef __APPLE__
@@ -18,9 +20,6 @@
 
 #undef WRITE_ONCE
 #define WRITE_ONCE(x,y) x = y
-
-#undef offsetof
-#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 
 /**
  * container_of - cast a member of a structure out to the containing structure
