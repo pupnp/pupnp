@@ -13,9 +13,6 @@
 
 #include "UpnpGlobal.h" /* For UPNP_INLINE */
 
-#define bool int
-#define true !0
-
 #undef READ_ONCE
 #define READ_ONCE(x) x
 
@@ -70,21 +67,21 @@ static UPNP_INLINE void INIT_LIST_HEAD(struct list_head *list)
 }
 
 #ifdef CONFIG_DEBUG_LIST
-extern bool __list_add_valid(struct list_head *newent,
+extern int __list_add_valid(struct list_head *newent,
 			      struct list_head *prev,
 			      struct list_head *next);
-extern bool __list_del_entry_valid(struct list_head *entry);
+extern int __list_del_entry_valid(struct list_head *entry);
 #else
-static UPNP_INLINE bool __list_add_valid(struct list_head *newent,
+static UPNP_INLINE int __list_add_valid(struct list_head *newent,
 				struct list_head *prev,
 				struct list_head *next)
 {
-	return true;
+	return 1;
 	newent++; prev++; next++; /* against compiler warnings */
 }
-static UPNP_INLINE bool __list_del_entry_valid(struct list_head *entry)
+static UPNP_INLINE int __list_del_entry_valid(struct list_head *entry)
 {
-	return true;
+	return 1;
 	entry++; /* against compiler warnings */
 }
 #endif
@@ -151,7 +148,7 @@ static UPNP_INLINE void __list_del(struct list_head * prev, struct list_head * n
 /**
  * list_del - deletes entry from list.
  * @entry: the element to delete from the list.
- * Note: list_empty() on entry does not return true after this, the entry is
+ * Note: list_empty() on entry does not return 1 after this, the entry is
  * in an undefined state.
  */
 static UPNP_INLINE void __list_del_entry(struct list_head *entry)
@@ -747,7 +744,7 @@ static UPNP_INLINE void hlist_add_fake(struct hlist_node *n)
 	n->pprev = &n->next;
 }
 
-static UPNP_INLINE bool hlist_fake(struct hlist_node *h)
+static UPNP_INLINE int hlist_fake(struct hlist_node *h)
 {
 	return h->pprev == &h->next;
 }
@@ -756,7 +753,7 @@ static UPNP_INLINE bool hlist_fake(struct hlist_node *h)
  * Check whether the node is the only node of the head without
  * accessing head:
  */
-static UPNP_INLINE bool
+static UPNP_INLINE int
 hlist_is_singular_node(struct hlist_node *n, struct hlist_head *h)
 {
 	return !n->next && n->pprev == &h->first;
@@ -831,6 +828,4 @@ static UPNP_INLINE void hlist_move_list(struct hlist_head *old,
 	     pos && ({ n = pos->member.next; 1; });			\
 	     pos = hlist_entry_safe(n, typeof(*pos), member))
 
-#undef bool
-#undef true
 #endif
