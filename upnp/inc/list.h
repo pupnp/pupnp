@@ -657,7 +657,7 @@ static UPNP_INLINE int hlist_empty(const struct upnp_hlist_head *h)
 	return !h->first;
 }
 
-static UPNP_INLINE void __hlist_del(struct upnp_hlist_node *n)
+static UPNP_INLINE void __upnp_hlist_del(struct upnp_hlist_node *n)
 {
 	struct upnp_hlist_node *next = n->next;
 	struct upnp_hlist_node **pprev = n->pprev;
@@ -669,7 +669,7 @@ static UPNP_INLINE void __hlist_del(struct upnp_hlist_node *n)
 
 static UPNP_INLINE void hlist_del(struct upnp_hlist_node *n)
 {
-	__hlist_del(n);
+	__upnp_hlist_del(n);
 	n->next =  (struct upnp_hlist_node*)LIST_POISON1;
 	n->pprev =  (struct upnp_hlist_node**)LIST_POISON2;
 }
@@ -677,7 +677,7 @@ static UPNP_INLINE void hlist_del(struct upnp_hlist_node *n)
 static UPNP_INLINE void hlist_del_init(struct upnp_hlist_node *n)
 {
 	if (!hlist_unhashed(n)) {
-		__hlist_del(n);
+		__upnp_hlist_del(n);
 		INIT_HLIST_NODE(n);
 	}
 }
