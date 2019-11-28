@@ -1511,7 +1511,7 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 			const DOMString resp;
 			head = (struct upnp_list_head *)va_arg(argp, struct upnp_list_head *);
 			if (head) {
-				list_for_each(pos, head) {
+				upnp_list_for_each(pos, head) {
 					extra = (UpnpExtraHeaders *)pos;
 					resp = UpnpExtraHeaders_get_resp(extra);
 					if (resp) {
