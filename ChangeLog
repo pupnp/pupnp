@@ -2,6 +2,28 @@
 Version 1.10.2
 *******************************************************************************
 
+2019-11-20 ePirat Marvin Scholz <epirat07(at)gmail.com>
+
+	Github issues:
+
+	#123: Check for -lpthread too
+	- Updates pthread m4 check from upstream
+
+	#124: config.h: Remove DEBUG_TARGET
+	- The DEBUG_TARGET is no longer used, it was previously used in
+	upnpdebug.c to disable logging to a file, which now is done
+	by just not calling UpnpSetLogFileNames.
+
+	#125: Fix interface filtering for Windows
+	- The mentioned fix is not only needed for MSVC, but when
+	cross-compiling for Windows with mingw-w64 too.
+
+	#126: Do not redeclare timezone struct if already defined in Mingw
+	
+	#127: Use rand_s in get_random_info on Windows
+
+	#128: Overhaul list.h to fix various issues
+
 *******************************************************************************
 Version 1.10.1
 *******************************************************************************
