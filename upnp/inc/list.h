@@ -1,5 +1,5 @@
-#ifndef _LINUX_LIST_H
-#define _LINUX_LIST_H
+#ifndef _UPNP_LIST_H
+#define _UPNP_LIST_H
 
 #include <stddef.h> /* for offsetof */
 
