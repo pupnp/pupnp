@@ -1066,7 +1066,7 @@ static int ExtraHTTPHeaders(
 			/* TODO: Check that cast that removes const. */
 			/*extraHeaderNode = (struct upnp_list_head *)ExtraHeaders_get_node(extraHeader);*/
 			extraHeaderNode = UpnpExtraHeaders_get_node(extraHeader);
-			list_add(extraHeaderNode, extraHeadersList);
+			upnp_list_add(extraHeaderNode, extraHeadersList);
 			UpnpExtraHeaders_strncpy_name(extraHeader, header->name.buf, header->name.length);
 			UpnpExtraHeaders_strncpy_value(extraHeader, header->value.buf, header->value.length);
 		}

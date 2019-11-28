@@ -46,7 +46,7 @@
 /******************************************************************************/
 #define TEMPLATE_DESTRUCTOR_INT(MEMBER, TYPE)		p->m_##MEMBER = 0;
 #define TEMPLATE_DESTRUCTOR_BUFFER(MEMBER, TYPE)	memset(&p->m_##MEMBER, 0, sizeof (TYPE));
-#define TEMPLATE_DESTRUCTOR_LIST(MEMBER)		list_del(&p->m_##MEMBER);
+#define TEMPLATE_DESTRUCTOR_LIST(MEMBER)		upnp_list_del(&p->m_##MEMBER);
 #define TEMPLATE_DESTRUCTOR_OBJECT(MEMBER, TYPE)	TYPE##_delete(p->m_##MEMBER); p->m_##MEMBER = NULL;
 #define TEMPLATE_DESTRUCTOR_STRING(MEMBER)		UpnpString_delete(p->m_##MEMBER); p->m_##MEMBER = NULL;
 #define TEMPLATE_DESTRUCTOR_DOMSTRING(MEMBER)		ixmlFreeDOMString(p->m_##MEMBER); p->m_##MEMBER = NULL;
@@ -103,17 +103,17 @@ const struct upnp_list_head *CLASS##_get_##MEMBER(const CLASS *p) \
 \
 void CLASS##_add_to_list_##MEMBER(CLASS *p, struct upnp_list_head *head) \
 { \
-	list_add(&((struct S##CLASS *)p)->m_##MEMBER, head); \
+	upnp_list_add(&((struct S##CLASS *)p)->m_##MEMBER, head); \
 } \
 \
 void CLASS##_remove_from_list_##MEMBER(CLASS *p) \
 { \
-	list_del_init(&((struct S##CLASS *)p)->m_##MEMBER); \
+	upnp_list_del_init(&((struct S##CLASS *)p)->m_##MEMBER); \
 } \
 \
 void CLASS##_replace_in_list_##MEMBER(CLASS *p, struct upnp_list_head *rep) \
 { \
-	list_replace_init(&((struct S##CLASS *)p)->m_##MEMBER, rep); \
+	upnp_list_replace_init(&((struct S##CLASS *)p)->m_##MEMBER, rep); \
 } \
 
 
