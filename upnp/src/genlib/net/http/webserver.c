@@ -1022,10 +1022,10 @@ static int CheckOtherHTTPHeaders(
 
 static void FreeExtraHTTPHeaders(
 	/*! [in] extra HTTP headers to free. */
-	const struct list_head *extraHeadersList)
+	const struct upnp_list_head *extraHeadersList)
 {
-	struct list_head *pos;
-	struct list_head *tmp;
+	struct upnp_list_head *pos;
+	struct upnp_list_head *tmp;
 	UpnpExtraHeaders *extra;
 
 	list_for_each_safe(pos, tmp, extraHeadersList) {
@@ -1042,13 +1042,13 @@ static void FreeExtraHTTPHeaders(
 static int ExtraHTTPHeaders(
 	/*! [in] HTTP Request message. */
 	http_message_t *Req,
-	const struct list_head *extraHeadersList)
+	const struct upnp_list_head *extraHeadersList)
 {
 	http_header_t *header;
 	ListNode *node;
 	int index;
 	UpnpExtraHeaders *extraHeader;
-	struct list_head *extraHeaderNode;
+	struct upnp_list_head *extraHeaderNode;
 
 	node = ListHead(&Req->headers);
 	while (node != NULL) {
@@ -1064,9 +1064,9 @@ static int ExtraHTTPHeaders(
 				return HTTP_INTERNAL_SERVER_ERROR;
 			}
 			/* TODO: Check that cast that removes const. */
-			/*extraHeaderNode = (struct list_head *)ExtraHeaders_get_node(extraHeader);*/
+			/*extraHeaderNode = (struct upnp_list_head *)ExtraHeaders_get_node(extraHeader);*/
 			extraHeaderNode = UpnpExtraHeaders_get_node(extraHeader);
-			list_add(extraHeaderNode, extraHeadersList);
+			upnp_list_add(extraHeaderNode, extraHeadersList);
 			UpnpExtraHeaders_strncpy_name(extraHeader, header->name.buf, header->name.length);
 			UpnpExtraHeaders_strncpy_value(extraHeader, header->value.buf, header->value.length);
 		}
