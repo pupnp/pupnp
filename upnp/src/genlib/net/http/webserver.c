@@ -1028,7 +1028,7 @@ static void FreeExtraHTTPHeaders(
 	struct upnp_list_head *tmp;
 	UpnpExtraHeaders *extra;
 
-	list_for_each_safe(pos, tmp, extraHeadersList) {
+	upnp_list_for_each_safe(pos, tmp, extraHeadersList) {
 		extra = (UpnpExtraHeaders *)pos;
 		UpnpExtraHeaders_delete(extra);
 	}
