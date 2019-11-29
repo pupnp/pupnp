@@ -25,6 +25,7 @@ See LICENSE for details.
 
 Release Number | Date | History
 ---------------|------|--------
+1.12.0 | 2019-11-29 | [Portable UPnP SDK][Portable UPnP SDK]
 1.10.1 | 2019-11-20 | [Portable UPnP SDK][Portable UPnP SDK]
 1.10.0 | 2019-11-01 | [Portable UPnP SDK][Portable UPnP SDK]
 1.8.6  | 2019-11-20 | [Portable UPnP SDK][Portable UPnP SDK]
