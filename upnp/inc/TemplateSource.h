@@ -29,7 +29,7 @@
 /******************************************************************************/
 #define TEMPLATE_DEFINITION_INT(MEMBER, TYPE)		TYPE m_##MEMBER;
 #define TEMPLATE_DEFINITION_BUFFER(MEMBER, TYPE)	TYPE m_##MEMBER;
-#define TEMPLATE_DEFINITION_LIST(MEMBER)		struct upnp_list_head m_##MEMBER;
+#define TEMPLATE_DEFINITION_LIST(MEMBER)		    UpnpListHead m_##MEMBER;
 #define TEMPLATE_DEFINITION_OBJECT(MEMBER, TYPE)	TYPE *m_##MEMBER;
 #define TEMPLATE_DEFINITION_STRING(MEMBER)		UpnpString *m_##MEMBER;
 #define TEMPLATE_DEFINITION_DOMSTRING(MEMBER)		DOMString m_##MEMBER;
@@ -38,7 +38,7 @@
 #define TEMPLATE_CONSTRUCTOR_INT(MEMBER, TYPE)		/* p->m_##MEMBER = 0; */
 #define TEMPLATE_CONSTRUCTOR_BUFFER(MEMBER, TYPE)	\
 	/* memset(&p->m_##MEMBER, 0, sizeof (TYPE)); */
-#define TEMPLATE_CONSTRUCTOR_LIST(MEMBER, TYPE)		UPNP_INIT_LIST_HEAD(&p->m_##MEMBER);
+#define TEMPLATE_CONSTRUCTOR_LIST(MEMBER, TYPE)		UpnpListInit(&p->m_##MEMBER);
 #define TEMPLATE_CONSTRUCTOR_OBJECT(MEMBER, TYPE)	p->m_##MEMBER = TYPE##_new();
 #define TEMPLATE_CONSTRUCTOR_STRING(MEMBER)		p->m_##MEMBER = UpnpString_new();
 #define TEMPLATE_CONSTRUCTOR_DOMSTRING(MEMBER)		 p->m_##MEMBER = NULL;
@@ -46,7 +46,7 @@
 /******************************************************************************/
 #define TEMPLATE_DESTRUCTOR_INT(MEMBER, TYPE)		p->m_##MEMBER = 0;
 #define TEMPLATE_DESTRUCTOR_BUFFER(MEMBER, TYPE)	memset(&p->m_##MEMBER, 0, sizeof (TYPE));
-#define TEMPLATE_DESTRUCTOR_LIST(MEMBER)		upnp_list_del(&p->m_##MEMBER);
+#define TEMPLATE_DESTRUCTOR_LIST(MEMBER)		UpnpListInit(&p->m_##MEMBER);
 #define TEMPLATE_DESTRUCTOR_OBJECT(MEMBER, TYPE)	TYPE##_delete(p->m_##MEMBER); p->m_##MEMBER = NULL;
 #define TEMPLATE_DESTRUCTOR_STRING(MEMBER)		UpnpString_delete(p->m_##MEMBER); p->m_##MEMBER = NULL;
 #define TEMPLATE_DESTRUCTOR_DOMSTRING(MEMBER)		ixmlFreeDOMString(p->m_##MEMBER); p->m_##MEMBER = NULL;
@@ -96,24 +96,15 @@ void CLASS##_clear_##MEMBER(CLASS *p) \
 #define TEMPLATE_METHODS_LIST(CLASS, MEMBER) \
 	TEMPLATE_METHODS_LIST_AUX(CLASS, MEMBER)
 #define TEMPLATE_METHODS_LIST_AUX(CLASS, MEMBER) \
-const struct upnp_list_head *CLASS##_get_##MEMBER(const CLASS *p) \
+const UpnpListHead *CLASS##_get_##MEMBER(const CLASS *p) \
 { \
-	return (struct upnp_list_head *)&((struct S##CLASS *)p)->m_##MEMBER; \
+	return (UpnpListHead *)&((struct S##CLASS *)p)->m_##MEMBER;	\
 } \
 \
-void CLASS##_add_to_list_##MEMBER(CLASS *p, struct upnp_list_head *head) \
+void CLASS##_add_to_list_##MEMBER(CLASS *p, struct UpnpListHead *head) \
 { \
-	upnp_list_add(&((struct S##CLASS *)p)->m_##MEMBER, head); \
-} \
-\
-void CLASS##_remove_from_list_##MEMBER(CLASS *p) \
-{ \
-	upnp_list_del_init(&((struct S##CLASS *)p)->m_##MEMBER); \
-} \
-\
-void CLASS##_replace_in_list_##MEMBER(CLASS *p, struct upnp_list_head *rep) \
-{ \
-	upnp_list_replace_init(&((struct S##CLASS *)p)->m_##MEMBER, rep); \
+	UpnpListHead *list = &((struct S##CLASS *)p)->m_##MEMBER; \
+	UpnpListInsert(list, UpnpListEnd(list), head);			\
 } \
 
 

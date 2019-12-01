@@ -1,6 +1,3 @@
-#ifndef _UPNP_LIST_H_
-#define _UPNP_LIST_H_
-
 /*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation 
@@ -33,41 +30,42 @@
  *
  ******************************************************************************/
 
-/** Trivial list management interface, patterned on std::list. It aims more at
- * being familiar than at being minimal. The implementation does not perform
- * any allocation or deallocation. 
- */
+#include "list.h"
 
+void UpnpListInit(UpnpListHead *list)
+{
+	list->next = list;
+	list->prev = list;
+}
 
-/** list anchor structure. This should be the *first* entry in list
- *  member objects, except if you want to do member offset arithmetic
- *  instead of simple casts (look up "containerof"). The list code itself 
- *  does not care. */
-typedef struct UpnpListHead {
-	struct UpnpListHead *next, *prev;
-} UpnpListHead;
+UpnpListIter UpnpListBegin(UpnpListHead *list)
+{
+	return list->next;
+}
 
-/** List iterator. Not strictly necessary, but clarifies the interface. */
-typedef UpnpListHead *UpnpListIter;
+UpnpListIter UpnpListEnd(UpnpListHead *list)
+{
+	return list;
+}
 
-/** Initialize empty list */
-extern void UpnpListInit(UpnpListHead *list);
+UpnpListIter UpnpListNext(UpnpListHead *list, UpnpListIter pos)
+{
+	return pos->next;
+}
 
-/** Return iterator pointing to the first list element, or
- *  UpnpListEnd(list) if the list is empty */
-extern UpnpListIter UpnpListBegin(UpnpListHead *list);
+UpnpListIter UpnpListInsert(UpnpListHead *list, UpnpListIter pos,
+							UpnpListHead *elt)
+{
+	elt->prev = pos->prev;
+	elt->next = pos;
+	pos->prev->next = elt;
+	pos->prev = elt;
+	return elt;
+}
 
-/** Return end of list sentinel iterator (not an element) */
-extern UpnpListIter UpnpListEnd(UpnpListHead *list);
-
-/** Return iterator pointing to element after pos, or end() */
-extern UpnpListIter UpnpListNext(UpnpListHead *list, UpnpListIter pos);
-
-/** Insert element before pos, returns iterator pointing to inserted element. */
-extern UpnpListIter UpnpListInsert(UpnpListHead *list, UpnpListIter pos,
-                                       UpnpListHead *elt);
-
-/** Erase element at pos, return next one, or end()*/
-extern UpnpListIter UpnpListErase(UpnpListHead *list, UpnpListIter pos);
-
-#endif /* _UPNPLISTH_ */
+UpnpListIter UpnpListErase(UpnpListHead *list, UpnpListIter pos)
+{
+	pos->prev->next = pos->next;
+	pos->next->prev = pos->prev;
+	return pos->next;
+}
