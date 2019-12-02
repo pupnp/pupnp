@@ -1505,13 +1505,14 @@ int http_MakeMessage(membuffer *buf, int http_major_version,
 	while ((c = *fmt++)) {
 		if (c == 'E') {
 			/* list of extra headers */
-			struct upnp_list_head *pos;
-			struct upnp_list_head *head;
+			UpnpListIter pos;
+			UpnpListHead *head;
 			UpnpExtraHeaders *extra;
 			const DOMString resp;
-			head = (struct upnp_list_head *)va_arg(argp, struct upnp_list_head *);
+			head = (UpnpListHead *)va_arg(argp, UpnpListHead *);
 			if (head) {
-				upnp_list_for_each(pos, head) {
+				for (pos = UpnpListBegin(head); pos != UpnpListEnd(head);
+					 pos = UpnpListNext(head, pos)) {
 					extra = (UpnpExtraHeaders *)pos;
 					resp = UpnpExtraHeaders_get_resp(extra);
 					if (resp) {

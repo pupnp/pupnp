@@ -73,10 +73,8 @@
 	TEMPLATE_PROTOTYPE_LIST_AUX(CLASS, MEMBER)
 #define TEMPLATE_PROTOTYPE_LIST_AUX(CLASS, MEMBER) \
 	/*! DOC_##CLASS_##MEMBER */ \
-	EXPORT_SPEC const struct upnp_list_head *CLASS##_get_##MEMBER(const CLASS *p); \
-	EXPORT_SPEC void CLASS##_add_to_list_##MEMBER(CLASS *p, struct upnp_list_head *head); \
-	EXPORT_SPEC void CLASS##_remove_from_list_##MEMBER(CLASS *p); \
-	EXPORT_SPEC void CLASS##_replace_in_list_##MEMBER(CLASS *p, struct upnp_list_head *rep); \
+	EXPORT_SPEC const UpnpListHead *CLASS##_get_##MEMBER(const CLASS *p); \
+	EXPORT_SPEC void CLASS##_add_to_list_##MEMBER(CLASS *p, UpnpListHead *head); \
 
 
 /******************************************************************************/
@@ -126,7 +124,7 @@
 
 
 #include "ixml.h"       /* for DOMString, IXML_Document */
-#include "list.h"	/* for struct upnp_list_head */
+#include "list.h"	
 #include "UpnpGlobal.h" /* for EXPORT_SPEC */
 #include "UpnpString.h"
 

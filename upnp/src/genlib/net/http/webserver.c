@@ -1022,14 +1022,15 @@ static int CheckOtherHTTPHeaders(
 
 static void FreeExtraHTTPHeaders(
 	/*! [in] extra HTTP headers to free. */
-	const struct upnp_list_head *extraHeadersList)
+	UpnpListHead *extraHeadersList)
 {
-	struct upnp_list_head *pos;
-	struct upnp_list_head *tmp;
+	UpnpListIter pos;
 	UpnpExtraHeaders *extra;
 
-	upnp_list_for_each_safe(pos, tmp, extraHeadersList) {
-		extra = (UpnpExtraHeaders *)pos;
+	for (pos = UpnpListBegin(extraHeadersList);
+		 pos != UpnpListEnd(extraHeadersList); ) {
+		extra = (UpnpExtraHeaders*)pos;
+		pos = UpnpListErase(extraHeadersList, pos);
 		UpnpExtraHeaders_delete(extra);
 	}
 }
@@ -1042,13 +1043,13 @@ static void FreeExtraHTTPHeaders(
 static int ExtraHTTPHeaders(
 	/*! [in] HTTP Request message. */
 	http_message_t *Req,
-	const struct upnp_list_head *extraHeadersList)
+	UpnpListHead *extraHeadersList)
 {
 	http_header_t *header;
 	ListNode *node;
 	int index;
 	UpnpExtraHeaders *extraHeader;
-	struct upnp_list_head *extraHeaderNode;
+	UpnpListHead *extraHeaderNode;
 
 	node = ListHead(&Req->headers);
 	while (node != NULL) {
@@ -1063,10 +1064,10 @@ static int ExtraHTTPHeaders(
 				FreeExtraHTTPHeaders(extraHeadersList);
 				return HTTP_INTERNAL_SERVER_ERROR;
 			}
-			/* TODO: Check that cast that removes const. */
-			/*extraHeaderNode = (struct upnp_list_head *)ExtraHeaders_get_node(extraHeader);*/
-			extraHeaderNode = UpnpExtraHeaders_get_node(extraHeader);
-			upnp_list_add(extraHeaderNode, extraHeadersList);
+			extraHeaderNode = (UpnpListHead *)
+				UpnpExtraHeaders_get_node(extraHeader);
+			UpnpListInsert(extraHeadersList, UpnpListEnd(extraHeadersList),
+						   extraHeaderNode);
 			UpnpExtraHeaders_strncpy_name(extraHeader, header->name.buf, header->name.length);
 			UpnpExtraHeaders_strncpy_value(extraHeader, header->value.buf, header->value.length);
 		}
@@ -1178,7 +1179,9 @@ static int process_request(
 	}
 	if (using_virtual_dir) {
 		if (req->method != HTTPMETHOD_POST) {
-			if ((code = ExtraHTTPHeaders(req, UpnpFileInfo_get_ExtraHeadersList(finfo))) != HTTP_OK) {
+			if ((code = ExtraHTTPHeaders(
+					 req, (UpnpListHead*)
+					 UpnpFileInfo_get_ExtraHeadersList(finfo))) != HTTP_OK) {
 				err_code = code;
 				goto error_handler;
 			}
@@ -1392,7 +1395,8 @@ static int process_request(
 
  error_handler:
 	free(request_doc);
-	FreeExtraHTTPHeaders(UpnpFileInfo_get_ExtraHeadersList(finfo));
+	FreeExtraHTTPHeaders(
+		(UpnpListHead*)UpnpFileInfo_get_ExtraHeadersList(finfo));
 	UpnpFileInfo_delete(finfo);
 	if (err_code != HTTP_OK && alias_grabbed) {
 		alias_release(alias);

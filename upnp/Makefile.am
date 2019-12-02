@@ -26,7 +26,6 @@ upnpinclude_HEADERS = \
 	inc/ExtraHeaders.h \
 	inc/FileInfo.h \
 	inc/list.h \
-	inc/poison.h \
 	inc/StateVarComplete.h \
 	inc/StateVarRequest.h \
 	inc/SubscriptionRequest.h \
@@ -135,6 +134,7 @@ libupnp_la_SOURCES += \
 	src/genlib/util/strintmap.c \
 	src/genlib/util/upnp_timeout.c \
 	src/genlib/util/util.c \
+	src/genlib/util/list.c \
 	src/genlib/net/sock.c \
 	src/genlib/net/http/httpparser.c \
 	src/genlib/net/http/httpreadwrite.c \
