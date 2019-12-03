@@ -38,8 +38,9 @@
  * any allocation or deallocation. 
  */
 
+#include "UpnpGlobal.h"
 
-/** list anchor structure. This should be the *first* entry in list
+/** List anchor structure. This should be the *first* entry in list
  *  member objects, except if you want to do member offset arithmetic
  *  instead of simple casts (look up "containerof"). The list code itself 
  *  does not care. */
@@ -51,23 +52,23 @@ typedef struct UpnpListHead {
 typedef UpnpListHead *UpnpListIter;
 
 /** Initialize empty list */
-extern void UpnpListInit(UpnpListHead *list);
+EXPORT_SPEC void UpnpListInit(UpnpListHead *list);
 
 /** Return iterator pointing to the first list element, or
  *  UpnpListEnd(list) if the list is empty */
-extern UpnpListIter UpnpListBegin(UpnpListHead *list);
+EXPORT_SPEC UpnpListIter UpnpListBegin(UpnpListHead *list);
 
 /** Return end of list sentinel iterator (not an element) */
-extern UpnpListIter UpnpListEnd(UpnpListHead *list);
+EXPORT_SPEC UpnpListIter UpnpListEnd(UpnpListHead *list);
 
 /** Return iterator pointing to element after pos, or end() */
-extern UpnpListIter UpnpListNext(UpnpListHead *list, UpnpListIter pos);
+EXPORT_SPEC UpnpListIter UpnpListNext(UpnpListHead *list, UpnpListIter pos);
 
 /** Insert element before pos, returns iterator pointing to inserted element. */
-extern UpnpListIter UpnpListInsert(UpnpListHead *list, UpnpListIter pos,
-                                       UpnpListHead *elt);
+EXPORT_SPEC UpnpListIter UpnpListInsert(UpnpListHead *list, UpnpListIter pos,
+                                        UpnpListHead *elt);
 
 /** Erase element at pos, return next one, or end()*/
-extern UpnpListIter UpnpListErase(UpnpListHead *list, UpnpListIter pos);
+EXPORT_SPEC UpnpListIter UpnpListErase(UpnpListHead *list, UpnpListIter pos);
 
 #endif /* _UPNPLISTH_ */
