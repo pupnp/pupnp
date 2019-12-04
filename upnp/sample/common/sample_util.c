@@ -195,7 +195,7 @@ char *SampleUtil_GetFirstDocumentItem(IXML_Document *doc, const char *item)
 	IXML_NodeList *nodeList = NULL;
 	IXML_Node *textNode = NULL;
 	IXML_Node *tmpNode = NULL;
-	char *nodeValue = NULL;
+	const char *nodeValue = NULL;
 	char *ret = NULL;
 
 	nodeList = ixmlDocument_getElementsByTagName(doc, (char *)item);
