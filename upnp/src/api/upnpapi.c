@@ -3057,7 +3057,7 @@ int UpnpOpenHttpPost(
 {
 	int status = http_OpenHttpConnection(url, handle, timeout);
 	if (status == UPNP_E_SUCCESS) {
-		return http_MakeHttpRequest(HTTPMETHOD_POST, url, handle, NULL, contentType,
+		return http_MakeHttpRequest(UPNP_HTTPMETHOD_POST, url, handle, NULL, contentType,
 					    contentLength, timeout);
 	}
 	return status;
@@ -3097,7 +3097,7 @@ int UpnpOpenHttpGet(
 {
 	int status = UpnpOpenHttpConnection(url, handle, timeout);
 	if (status == UPNP_E_SUCCESS) {
-		status = UpnpMakeHttpRequest(HTTPMETHOD_GET, url, *handle, NULL, NULL, 0, timeout);
+		status = UpnpMakeHttpRequest(UPNP_HTTPMETHOD_GET, url, *handle, NULL, NULL, 0, timeout);
 	}
 	if (status == UPNP_E_SUCCESS) {
 		status = UpnpEndHttpRequest(*handle, timeout);
@@ -3120,7 +3120,7 @@ int UpnpOpenHttpGetProxy(
 {
 	int status = UpnpOpenHttpConnection(proxy_str, handle, timeout);
 	if (status == UPNP_E_SUCCESS) {
-		status = UpnpMakeHttpRequest(HTTPMETHOD_GET, url, *handle, NULL, NULL, 0, timeout);
+		status = UpnpMakeHttpRequest(UPNP_HTTPMETHOD_GET, url, *handle, NULL, NULL, 0, timeout);
 	}
 	if (status == UPNP_E_SUCCESS) {
 		status = UpnpEndHttpRequest(*handle, timeout);
