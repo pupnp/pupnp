@@ -530,6 +530,8 @@ static int TvDeviceSetPower(
 int TvDevicePowerOn(IXML_Document * in,IXML_Document **out,
 	const char **errorString)
 {
+	(void)in;
+
 	(*out) = NULL;
 	(*errorString) = NULL;
 
@@ -547,12 +549,13 @@ int TvDevicePowerOn(IXML_Document * in,IXML_Document **out,
 		(*errorString) = "Internal Error";
 		return UPNP_E_INTERNAL_ERROR;
 	}
-	in = in;
 }
 
 int TvDevicePowerOff(IXML_Document *in, IXML_Document **out,
 	const char **errorString)
 {
+	(void)in;
+
 	(*out) = NULL;
 	(*errorString) = NULL;
 	if (TvDeviceSetPower(POWER_OFF)) {
@@ -569,7 +572,6 @@ int TvDevicePowerOff(IXML_Document *in, IXML_Document **out,
 	}
 	(*errorString) = "Internal Error";
 	return UPNP_E_INTERNAL_ERROR;
-	in = in;
 }
 
 int TvDeviceSetChannel(IXML_Document * in, IXML_Document ** out,
@@ -616,6 +618,7 @@ int TvDeviceSetChannel(IXML_Document * in, IXML_Document ** out,
 int IncrementChannel(int incr, IN IXML_Document * in, IXML_Document ** out,
 		     const char **errorString)
 {
+	(void)in;
 	int curchannel;
 	int newchannel;
 	const char *actionName = NULL;
@@ -658,7 +661,6 @@ int IncrementChannel(int incr, IN IXML_Document * in, IXML_Document ** out,
 		(*errorString) = "Internal Error";
 		return UPNP_E_INTERNAL_ERROR;
 	}
-	in = in;
 }
 
 int TvDeviceDecreaseChannel(IXML_Document * in, IXML_Document ** out,
@@ -726,6 +728,7 @@ static int IncrementVolume(
 	/*! [out] Error string in case action was unsuccessful. */
 	const char **errorString)
 {
+	(void)in;
 	int curvolume;
 	int newvolume;
 	const char *actionName = NULL;
@@ -767,7 +770,6 @@ static int IncrementVolume(
 		(*errorString) = "Internal Error";
 		return UPNP_E_INTERNAL_ERROR;
 	}
-	in = in;
 }
 
 int TvDeviceIncreaseVolume(IXML_Document * in, IXML_Document ** out,
@@ -835,6 +837,7 @@ static int IncrementColor(
 	/*! [out] Error string in case action was unsuccessful. */
 	const char **errorString)
 {
+	(void)in;
 	int curcolor;
 	int newcolor;
 	const char *actionName;
@@ -874,7 +877,6 @@ static int IncrementColor(
 		(*errorString) = "Internal Error";
 		return UPNP_E_INTERNAL_ERROR;
 	}
-	in = in;
 }
 
 int TvDeviceDecreaseColor(IXML_Document * in, IXML_Document ** out,
@@ -945,6 +947,7 @@ int TvDeviceSetTint(IXML_Document * in, IXML_Document ** out,
 int IncrementTint(IN int incr, IN IXML_Document *in, OUT IXML_Document **out,
 		  OUT const char **errorString)
 {
+	(void)in;
 	int curtint;
 	int newtint;
 	const char *actionName = NULL;
@@ -984,7 +987,6 @@ int IncrementTint(IN int incr, IN IXML_Document *in, OUT IXML_Document **out,
 		(*errorString) = "Internal Error";
 		return UPNP_E_INTERNAL_ERROR;
 	}
-	in = in;
 }
 
 /******************************************************************************
@@ -1096,6 +1098,7 @@ static int IncrementContrast(
 	/*! [out] Error string in case action was unsuccessful. */
 	const char **errorString)
 {
+	(void)in;
 	int curcontrast;
 	int newcontrast;
 	const char *actionName = NULL;
@@ -1137,7 +1140,6 @@ static int IncrementContrast(
 		(*errorString) = "Internal Error";
 		return UPNP_E_INTERNAL_ERROR;
 	}
-	in = in;
 }
 
 int TvDeviceIncreaseContrast(IXML_Document * in, IXML_Document ** out,
@@ -1206,6 +1208,7 @@ static int IncrementBrightness(
 	/*! [out] errorString (in case action was unsuccessful). */
 	const char **errorString)
 {
+	(void)in;
 	int curbrightness;
 	int newbrightness;
 	const char *actionName = NULL;
@@ -1247,7 +1250,6 @@ static int IncrementBrightness(
 		(*errorString) = "Internal Error";
 		return UPNP_E_INTERNAL_ERROR;
 	}
-	in = in;
 }
 
 int TvDeviceIncreaseBrightness(IXML_Document * in, IXML_Document ** out,
@@ -1264,6 +1266,7 @@ int TvDeviceDecreaseBrightness(IXML_Document * in, IXML_Document ** out,
 
 int TvDeviceCallbackEventHandler(Upnp_EventType EventType, const void *Event, void *Cookie)
 {
+	(void)Cookie;
 	switch (EventType) {
 	case UPNP_EVENT_SUBSCRIPTION_REQUEST:
 		TvDeviceHandleSubscriptionRequest((UpnpSubscriptionRequest *)Event);
@@ -1295,7 +1298,6 @@ int TvDeviceCallbackEventHandler(Upnp_EventType EventType, const void *Event, vo
 	SampleUtil_PrintEvent(EventType, Event);
 
 	return 0;
-	Cookie = Cookie;
 }
 
 int TvDeviceStart(char *ip_address, unsigned short port,
@@ -1387,6 +1389,7 @@ int TvDeviceStop(void)
 
 void *TvDeviceCommandLoop(void *args)
 {
+	(void)args;
 	int stoploop = 0;
 	char cmdline[100];
 	char cmd[100];
@@ -1412,7 +1415,6 @@ void *TvDeviceCommandLoop(void *args)
 	}
 
 	return NULL;
-	args = args;
 }
 
 int device_main(int argc, char *argv[])
