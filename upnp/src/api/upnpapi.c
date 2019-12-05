@@ -624,15 +624,7 @@ void PrintThreadPoolStats(
 		stats.totalIdleTime);
 }
 #else
-static UPNP_INLINE void PrintThreadPoolStats(ThreadPool *tp,
-	const char *DbgFileName, int DbgLineNo, const char *msg)
-{
-	return;
-	tp = tp;
-	DbgFileName = DbgFileName;
-	DbgLineNo = DbgLineNo;
-	msg = msg;
-}
+#define PrintThreadPoolStats(tp, DbgFileName, DbgLineNo, msg) do {} while (0)
 #endif /* DEBUG */
 
 int UpnpFinish(void)
