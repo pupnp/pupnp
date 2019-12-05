@@ -200,10 +200,10 @@ static int get_hoststr(const char *url_str, char **hoststr, size_t *hostlen)
 	return UPNP_E_SUCCESS;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 static void copy_msg_headers(LinkedList *msgHeaders, UpnpString *headers)
 {
+	(void)msgHeaders;
+	(void)headers;
 	return;
 /* TODO: */
 #if 0
@@ -229,7 +229,6 @@ static void copy_msg_headers(LinkedList *msgHeaders, UpnpString *headers)
 	}
 #endif
 }
-#pragma GCC diagnostic pop
 
 int http_FixUrl(uri_type *url, uri_type *fixed_url)
 {

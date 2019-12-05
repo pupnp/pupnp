@@ -48,16 +48,16 @@ UpnpListIter UpnpListEnd(UpnpListHead *list)
 	return list;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 UpnpListIter UpnpListNext(UpnpListHead *list, UpnpListIter pos)
 {
+	(void)list;
 	return pos->next;
 }
 
 UpnpListIter UpnpListInsert(UpnpListHead *list, UpnpListIter pos,
 							UpnpListHead *elt)
 {
+	(void)list;
 	elt->prev = pos->prev;
 	elt->next = pos;
 	pos->prev->next = elt;
@@ -67,8 +67,8 @@ UpnpListIter UpnpListInsert(UpnpListHead *list, UpnpListIter pos,
 
 UpnpListIter UpnpListErase(UpnpListHead *list, UpnpListIter pos)
 {
+	(void)list;
 	pos->prev->next = pos->next;
 	pos->next->prev = pos->prev;
 	return pos->next;
 }
-#pragma GCC diagnostic pop

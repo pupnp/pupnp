@@ -207,11 +207,7 @@ void print_uri(
 	/*! [in] URI object to print. */
 	uri_type *in);
 #else
-static UPNP_INLINE void print_uri(uri_type *in)
-{
-	return;
-	in = in;
-}
+#define print_uri(in) do {} while (0)
 #endif
 
 /*!
@@ -222,13 +218,7 @@ void print_token(
 	/*! [in] Token object to print. */
 	token *in);
 #else
-static UPNP_INLINE void print_token(
-	/*! [in] Token object to print. */
-	token *in)
-{
-	return;
-	in = in;
-}
+#define print_token(in) do {} while (0)
 #endif
 
 /*!
