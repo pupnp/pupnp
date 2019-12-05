@@ -3438,7 +3438,7 @@ int UpnpGetIfInfo(const char *IfName)
 #elif (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__) /* _WIN32 */
 	struct ifaddrs *ifap, *ifa;
 	struct in_addr v4_addr = { 0 };
-	struct in6_addr v6_addr = { 0 };
+	struct in6_addr v6_addr = IN6ADDR_ANY_INIT;
 	int ifname_found = 0;
 	int valid_addr_found = 0;
 
