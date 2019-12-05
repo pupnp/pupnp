@@ -464,6 +464,7 @@ AC_CONFIG_SRCDIR([upnp/inc/upnp.h])
 
 
 AM_INIT_AUTOMAKE([1.8 -Wall foreign subdir-objects dist-bzip2])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 
 #
