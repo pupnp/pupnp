@@ -123,6 +123,8 @@ void UpnpCloseLog(void)
 
 void UpnpSetLogFileNames(const char *newFileName, const char *ignored)
 {
+	(void)ignored;
+
 	if (fileName) {
 		free(fileName);
 		fileName = NULL;
@@ -132,11 +134,12 @@ void UpnpSetLogFileNames(const char *newFileName, const char *ignored)
 	}
 	setlogwascalled = 1;
 	return;
-	ignored = ignored;
 }
 
 static int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module)
 {
+	(void)Module;
+
 	return (DLevel <= g_log_level) &&
 		(DEBUG_ALL ||
 		 (Module == SSDP && DEBUG_SSDP) ||
@@ -145,8 +148,6 @@ static int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module)
 		 (Module == TPOOL && DEBUG_TPOOL) ||
 		 (Module == MSERV && DEBUG_MSERV) ||
 		 (Module == DOM && DEBUG_DOM) || (Module == HTTP && DEBUG_HTTP));
-
-	Module = Module; /* VC complains about this being unreferenced */
 }
 
 static void UpnpDisplayFileAndLine(

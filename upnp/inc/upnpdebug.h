@@ -122,8 +122,8 @@ void UpnpSetLogLevel(
 #else
 static UPNP_INLINE void UpnpSetLogLevel(Upnp_LogLevel log_level)
 {
+	(void)log_level;
 	return;
-	log_level = log_level;
 }
 #endif
 
@@ -153,9 +153,9 @@ void UpnpSetLogFileNames(
 static UPNP_INLINE void UpnpSetLogFileNames(const char *ErrFileName,
 	const char *ignored)
 {
+	(void)ErrFileName;
+	(void)ignored;
 	return;
-	ErrFileName = ErrFileName;
-	ignored = ignored;
 }
 #endif
 
@@ -176,9 +176,9 @@ FILE *UpnpGetDebugFile(
 #else
 static UPNP_INLINE FILE *UpnpGetDebugFile(Upnp_LogLevel level, Dbg_Module module)
 {
+	(void)level;
+	(void)module;
 	return NULL;
-	level = level;
-	module = module;
 }
 #endif
 
@@ -211,12 +211,12 @@ void UpnpPrintf(
 static UPNP_INLINE void UpnpPrintf(Upnp_LogLevel DLevel, Dbg_Module Module,
 	const char *DbgFileName, int DbgLineNo, const char *FmtStr, ...)
 {
+	(void)DLevel;
+	(void)Module;
+	(void)DbgFileName;
+	(void)DbgLineNo;
+	(void)FmtStr;
 	return;
-	DLevel = DLevel;
-	Module = Module;
-	DbgFileName = DbgFileName;
-	DbgLineNo = DbgLineNo;
-	FmtStr = FmtStr;
 }
 #endif /* DEBUG */
 

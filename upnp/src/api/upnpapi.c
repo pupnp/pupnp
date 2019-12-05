@@ -982,6 +982,7 @@ int UpnpRegisterRootDevice2(
 	const void *Cookie,
 	UpnpDevice_Handle *Hnd)
 {
+	(void)bufferLen;
 	struct Handle_Info *HInfo = NULL;
 	int retVal = 0;
 #if EXCLUDE_GENA == 0
@@ -1108,7 +1109,6 @@ exit_function:
 	HandleUnlock();
 
 	return retVal;
-	bufferLen = bufferLen;
 }
 #endif /* INCLUDE_DEVICE_APIS */
 

@@ -90,6 +90,7 @@ genaCallback( IN http_parser_t * parser,
               IN http_message_t * request,
               INOUT SOCKINFO * info )
 {
+    (void)parser;
     int found_function = FALSE;
 
     if( request->method == HTTPMETHOD_SUBSCRIBE ) {
@@ -123,7 +124,6 @@ genaCallback( IN http_parser_t * parser,
             error_respond( info, HTTP_NOT_IMPLEMENTED, request );
     }
     return;
-    parser = parser;
 }
 #endif /* EXCLUDE_GENA */
 
