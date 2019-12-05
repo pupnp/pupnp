@@ -56,9 +56,9 @@
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 void
-error_respond( IN SOCKINFO * info,
-               IN int error_code,
-               IN http_message_t * hmsg )
+error_respond( SOCKINFO * info,
+               int error_code,
+               http_message_t * hmsg )
 {
     int major,
       minor;
@@ -86,9 +86,9 @@ error_respond( IN SOCKINFO * info,
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 void
-genaCallback( IN http_parser_t * parser,
-              IN http_message_t * request,
-              INOUT SOCKINFO * info )
+genaCallback( http_parser_t * parser,
+              http_message_t * request,
+              SOCKINFO * info )
 {
     int found_function = FALSE;
 

@@ -96,13 +96,13 @@ typedef struct soap_devserv_t {
  */
 static void send_error_response(
 	/*! [in] Socket info. */
-	IN SOCKINFO *info,
+	SOCKINFO *info,
 	/*! [in] Error code. */
-	IN int error_code,
+	int error_code,
 	/*! [in] Error message. */
-	IN const char *err_msg,
+	const char *err_msg,
 	/*! [in] HTTP request. */
-	IN http_message_t *hmsg)
+	http_message_t *hmsg)
 {
 	off_t content_length;
 	int timeout_secs = SOAP_TIMEOUT;
@@ -613,7 +613,7 @@ static int check_soap_request(
 		/*! [in] SOAP device/service information. */
 		soap_devserv_t *soap_info,
 		/*! [in] Document containing the SOAP action request. */
-		IN IXML_Document *xml_doc,
+		IXML_Document *xml_doc,
 		/*! [out] Node containing the SOAP action request/variable name. */
 		IXML_Node **req_node)
 {

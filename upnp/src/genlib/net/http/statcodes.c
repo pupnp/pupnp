@@ -125,9 +125,9 @@ static int gInitialized = FALSE;
 *	 void																
 ************************************************************************/
 static UPNP_INLINE void
-init_table( IN const char *encoded_str,
-            OUT const char *table[],
-            IN int tbl_size )
+init_table( const char *encoded_str,
+            const char *table[],
+            int tbl_size )
 {
     int i;
     const char *s = encoded_str;

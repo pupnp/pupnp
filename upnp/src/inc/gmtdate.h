@@ -45,8 +45,8 @@ extern "C" {
 //   charsRead - num chars that match the month
 //   fullNameMatch - full name match(1) or 3-letter match(0)
 //
-int ParseMonth( IN const char* monthStr,
-    OUT int* charsRead, OUT int* fullNameMatch );
+int ParseMonth( const char* monthStr,
+    int* charsRead, int* fullNameMatch );
 
 // input: dayOfWeek:  3-letter or full day of week ("mon" etc)
 // returns dayOfWeek=0..6 or -1 on failure
@@ -54,8 +54,8 @@ int ParseMonth( IN const char* monthStr,
 //   charsRead - num chars that match the month
 //   fullNameMatch - full name match(1) or 3-letter match(0)
 //
-int ParseDayOfWeek( IN const char* dayOfWeek,
-    OUT int* charsRead, OUT int* fullNameMatch );
+int ParseDayOfWeek( const char* dayOfWeek,
+    int* charsRead, int* fullNameMatch );
 
 // converts date to string format: RFC 1123 format:
 // Sun, 06 Nov 1994 08:49:37 GMT
@@ -77,18 +77,18 @@ int ParseTime( const char* s, int* hour, int* minute, int* second );
 //   str - contains date/time in string format
 //   dateTime - date and time obtained from 'str'
 // returns: 0 on success, -1 on error
-int ParseRFC850DateTime( IN const char* str,
-    OUT struct tm* dateTime, OUT int* numCharsParsed );
+int ParseRFC850DateTime( const char* str,
+    struct tm* dateTime, int* numCharsParsed );
 
-int ParseRFC1123DateTime( IN const char* str,
-    OUT struct tm* dateTime, OUT int* numCharsParsed );
+int ParseRFC1123DateTime( const char* str,
+    struct tm* dateTime, int* numCharsParsed );
 
-int ParseAsctimeFmt( IN const char* str,
-    OUT struct tm* dateTime, OUT int* numCharsParsed );
+int ParseAsctimeFmt( const char* str,
+    struct tm* dateTime, int* numCharsParsed );
 
 // parses any of these formats: 1123, 850 or asctime()  
-int ParseDateTime( IN const char* str,
-    OUT struct tm* dateTime, OUT int* numCharsParsed );
+int ParseDateTime( const char* str,
+    struct tm* dateTime, int* numCharsParsed );
 
 #ifdef __cplusplus
 }   /* extern C */

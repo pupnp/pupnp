@@ -36,23 +36,23 @@
 
 #include <genlib/net/http/parseutil.h>
 
-int http_ServerCallback( IN HttpMessage& request, IN int sockfd );
+int http_ServerCallback( /* IN */ HttpMessage& request, /* IN */ int sockfd );
 
 // adds 'entity' to the alias list; the entity is referred using
 //
-// aliasRelURL: relative url for given entity
-// entity: entity to be served
-// actualAlias: [possibly] modified version of aliasResURL to resolve conflicts
+// [in]  aliasRelURL: relative url for given entity
+// [in]  entity: entity to be served
+// [out] actualAlias: [possibly] modified version of aliasResURL to resolve conflicts
 // returns:
 //   0 : success
 //   HTTP_E_OUT_OF_MEMORY
-int http_AddAlias( IN const char* aliasRelURL, IN HttpEntity* entity,
-    OUT xstring& actualAlias );
+int http_AddAlias( const char* aliasRelURL, HttpEntity* entity,
+    xstring& actualAlias );
 
 extern "C" {
 #endif /* __cplusplus */
 
-void http_OldServerCallback( IN const char* msg, int sockfd );
+void http_OldServerCallback( /* IN */ const char* msg, int sockfd );
 
 void http_SetRootDir( const char* httpRootDir );
 
@@ -60,7 +60,7 @@ void http_SetRootDir( const char* httpRootDir );
 // returns:
 //  0: success -- alias removed
 // -1: alias not found
-int http_RemoveAlias( IN const char* alias );
+int http_RemoveAlias( /* IN */ const char* alias );
 
 #ifdef __cplusplus
 }   /* extern C */

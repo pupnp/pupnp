@@ -78,9 +78,9 @@
 *	Note :
 ************************************************************************/
 static UPNP_INLINE int
-addrToString( IN const struct sockaddr *addr,
-              OUT char *ipaddr_port,
-              IN size_t ipaddr_port_size )
+addrToString( const struct sockaddr *addr,
+              char *ipaddr_port,
+              size_t ipaddr_port_size )
 {
     char buf_ntop[INET6_ADDRSTRLEN];
     int rc = 0;
@@ -119,9 +119,9 @@ addrToString( IN const struct sockaddr *addr,
 *	Note : 'newAlias' should be freed using free()
 ************************************************************************/
 static UPNP_INLINE int calc_alias(
-	IN const char *alias,
-	IN const char *rootPath,
-	OUT char **newAlias)
+	const char *alias,
+	const char *rootPath,
+	char **newAlias)
 {
 	const char *aliasPtr;
 	size_t root_len;
@@ -173,9 +173,9 @@ static UPNP_INLINE int calc_alias(
 *	Note :
 ************************************************************************/
 static UPNP_INLINE int calc_descURL(
-	IN const char *ipPortStr,
-	IN const char *alias,
-	OUT char descURL[LINE_SIZE])
+	const char *ipPortStr,
+	const char *alias,
+	char descURL[LINE_SIZE])
 {
 	size_t len;
 	const char *http_scheme = "http://";
@@ -219,9 +219,9 @@ static UPNP_INLINE int calc_descURL(
 *	Note :
 ************************************************************************/
 static int config_description_doc(
-	INOUT IXML_Document *doc,
-	IN const char *ip_str,
-	OUT char **root_path_str )
+	IXML_Document *doc,
+	const char *ip_str,
+	char **root_path_str )
 {
 	IXML_NodeList *baseList;
 	IXML_Element *element = NULL;
@@ -371,11 +371,11 @@ static int config_description_doc(
 *	Note :
 ************************************************************************/
 int
-configure_urlbase( INOUT IXML_Document * doc,
-                   IN const struct sockaddr *serverAddr,
-                   IN const char *alias,
-                   IN time_t last_modified,
-                   OUT char docURL[LINE_SIZE] )
+configure_urlbase( IXML_Document * doc,
+                   const struct sockaddr *serverAddr,
+                   const char *alias,
+                   time_t last_modified,
+                   char docURL[LINE_SIZE] )
 {
     char *root_path = NULL;
     char *new_alias = NULL;

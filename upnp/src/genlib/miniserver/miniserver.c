@@ -121,7 +121,7 @@ void SetGenaCallback(MiniServerCallback callback)
  */
 static int dispatch_request(
 	/*! [in] Socket Information object. */
-	IN SOCKINFO *info,
+	SOCKINFO *info,
 	/*! [in] HTTP parser object. */
 	http_parser_t *hparser)
 {

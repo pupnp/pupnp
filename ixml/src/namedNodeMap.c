@@ -49,9 +49,9 @@
  */
 static unsigned long ixmlNamedNodeMap_getItemNumber(
 	/*! [in] The named node map to process. */
-	IN IXML_NamedNodeMap *nnMap,
+	IXML_NamedNodeMap *nnMap,
 	/*! [in] The name of the item to find. */
-	IN const char *name)
+	const char *name)
 {
 	IXML_Node *tempNode;
 	unsigned long returnItemNo = 0lu;
@@ -102,8 +102,8 @@ IXML_Node *ixmlNamedNodeMap_getNamedItem(
 
 
 IXML_Node *ixmlNamedNodeMap_item(
-	IN IXML_NamedNodeMap *nnMap,
-	IN unsigned long index )
+	/* IN */ IXML_NamedNodeMap *nnMap,
+	/* IN */ unsigned long index )
 {
 	IXML_Node *tempNode;
 	unsigned int i;
