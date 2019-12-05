@@ -69,6 +69,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #ifdef _WIN32
 	/* Do not include these files */
@@ -4280,7 +4281,7 @@ int UpnpEnableWebserver(int enable)
 
     switch ( enable ) {
 #ifdef INTERNAL_WEB_SERVER
-	case TRUE:
+	case true:
 	    if( ( retVal = web_server_init() ) != UPNP_E_SUCCESS ) {
 		return retVal;
 	    }
@@ -4288,7 +4289,7 @@ int UpnpEnableWebserver(int enable)
 	    SetHTTPGetCallback( web_server_callback );
 	    break;
 
-	case FALSE:
+	case false:
 	    web_server_destroy();
 	    bWebServerState = WEB_SERVER_DISABLED;
 	    SetHTTPGetCallback( NULL );

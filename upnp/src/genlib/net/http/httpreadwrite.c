@@ -57,6 +57,7 @@
 
 #include <assert.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 #ifdef _WIN32
 #include <malloc.h>
@@ -357,7 +358,7 @@ int http_RecvMessage(IN SOCKINFO *info,
 	int line = 0;
 	parse_status_t status;
 	int num_read;
-	int ok_on_close = FALSE;
+	bool ok_on_close = false;
 	char buf[2 * 1024];
 
 	if (request_method == (http_method_t)HTTPMETHOD_UNKNOWN) {
@@ -366,7 +367,7 @@ int http_RecvMessage(IN SOCKINFO *info,
 		parser_response_init(parser, request_method);
 	}
 
-	while (TRUE) {
+	while (true) {
 		num_read = sock_read(info, buf, sizeof buf, timeout_secs);
 		if (num_read > 0) {
 			/* got data */
@@ -402,7 +403,7 @@ int http_RecvMessage(IN SOCKINFO *info,
 				goto ExitFunction;
 			case PARSE_INCOMPLETE_ENTITY:
 				/* read until close */
-				ok_on_close = TRUE;
+				ok_on_close = true;
 				break;
 			case PARSE_CONTINUE_1:
 				/* Web post request. */
@@ -1463,7 +1464,7 @@ int http_ReadHttpResponse(void *Handle, char *buf, size_t *size, int timeout)
 	http_connection_handle_t *handle = Handle;
 	parse_status_t status;
 	int num_read;
-	int ok_on_close = FALSE;
+	bool ok_on_close = false;
 	char tempbuf[2 * 1024];
 	int ret_code = 0;
 
@@ -1479,7 +1480,7 @@ int http_ReadHttpResponse(void *Handle, char *buf, size_t *size, int timeout)
 		status = PARSE_SUCCESS;
 	if (status == PARSE_INCOMPLETE_ENTITY)
 		/* read until close */
-		ok_on_close = TRUE;
+		ok_on_close = true;
 	else if ((status != PARSE_SUCCESS) && (status != PARSE_CONTINUE_1) &&
 		 (status != PARSE_INCOMPLETE)) {
 		/*error */
@@ -1507,7 +1508,7 @@ int http_ReadHttpResponse(void *Handle, char *buf, size_t *size, int timeout)
 			status = parser_parse_entity(&handle->response);
 			if (status == PARSE_INCOMPLETE_ENTITY) {
 				/* read until close */
-				ok_on_close = TRUE;
+				ok_on_close = true;
 			} else if ((status != PARSE_SUCCESS) &&
 				   (status != PARSE_CONTINUE_1) &&
 				   (status != PARSE_INCOMPLETE)) {

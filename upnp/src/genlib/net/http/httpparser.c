@@ -133,7 +133,7 @@ static UPNP_INLINE void scanner_init(OUT scanner_t *scanner, IN membuffer *bufpt
 {
 	scanner->cursor = (size_t)0;
 	scanner->msg = bufptr;
-	scanner->entire_msg_loaded = FALSE;
+	scanner->entire_msg_loaded = false;
 }
 
 /************************************************************************
@@ -227,7 +227,7 @@ static parse_status_t scanner_get_token(
 	char *null_terminator;	/* point to null-terminator in buffer */
 	int c;
 	token_type_t token_type;
-	int got_end_quote;
+	bool got_end_quote;
 
 	assert(scanner);
 	assert(token);
@@ -284,11 +284,11 @@ static parse_status_t scanner_get_token(
 		/* quoted text */
 		token->buf = cursor++;
 		token_type = TT_QUOTEDSTRING;
-		got_end_quote = FALSE;
+		got_end_quote = false;
 		while (cursor < null_terminator) {
 			c = *cursor++;
 			if (c == '"') {
-				got_end_quote = TRUE;
+				got_end_quote = true;
 				break;
 			} else if (c == '\\') {
 				if (cursor < null_terminator) {
@@ -565,11 +565,11 @@ static UPNP_INLINE parse_status_t skip_lws(INOUT scanner_t *scanner)
     token_type_t tok_type;
     parse_status_t status;
     size_t save_pos;
-    int matched;
+    bool matched;
 
     do {
 	save_pos = scanner->cursor;
-	matched = FALSE;
+	matched = false;
 
 	/* get CRLF or WS */
 	status = scanner_get_token( scanner, &token, &tok_type );
@@ -581,7 +581,7 @@ static UPNP_INLINE parse_status_t skip_lws(INOUT scanner_t *scanner)
 
 	    if( status == ( parse_status_t ) PARSE_OK &&
 		tok_type == ( token_type_t ) TT_WHITESPACE ) {
-		matched = TRUE;
+		matched = true;
 	    } else {
 		/* did not match LWS; pushback token(s) */
 		scanner->cursor = save_pos;
@@ -622,7 +622,7 @@ static UPNP_INLINE parse_status_t match_non_ws_string(
     memptr token;
     token_type_t tok_type;
     parse_status_t status;
-    int done = FALSE;
+    bool done = false;
     size_t save_cursor;
 
     save_cursor = scanner->cursor;
@@ -638,7 +638,7 @@ static UPNP_INLINE parse_status_t match_non_ws_string(
 	    /* append non-ws token */
 	    str->length += token.length;
 	} else {
-	    done = TRUE;
+	    done = true;
 	}
     }
 
@@ -690,8 +690,8 @@ static UPNP_INLINE parse_status_t match_raw_value(
     memptr token;
     token_type_t tok_type;
     parse_status_t status;
-    int done = FALSE;
-    int saw_crlf = FALSE;
+    bool done = false;
+    bool saw_crlf = false;
     size_t pos_at_crlf = ( size_t ) 0;
     size_t save_pos;
     char c;
@@ -708,7 +708,7 @@ static UPNP_INLINE parse_status_t match_raw_value(
 	    if( !saw_crlf ) {
 		if( tok_type == ( token_type_t ) TT_CRLF ) {
 		    /* CRLF could end value */
-		    saw_crlf = TRUE;
+		    saw_crlf = true;
 
 		    /* save input position at start of CRLF */
 		    pos_at_crlf = scanner->cursor - token.length;
@@ -719,11 +719,11 @@ static UPNP_INLINE parse_status_t match_raw_value(
 	    {
 		if( tok_type == ( token_type_t ) TT_WHITESPACE ) {
 		    /* start again; forget CRLF */
-		    saw_crlf = FALSE;
+		    saw_crlf = false;
 		    raw_value->length += token.length;
 		} else {
 		    /* non-ws means value ended just before CRLF */
-		    done = TRUE;
+		    done = true;
 
 		    /* point to the crlf which ended the value */
 		    scanner->cursor = pos_at_crlf;
@@ -732,7 +732,7 @@ static UPNP_INLINE parse_status_t match_raw_value(
 	} else {
 	    /* some kind of error; restore scanner position */
 	    scanner->cursor = save_pos;
-	    done = TRUE;
+	    done = true;
 	}
     }
 
@@ -965,7 +965,7 @@ static parse_status_t vfmatch(
     uri_type *uri_ptr;
     size_t save_pos;
     int stat;
-    int case_sensitive = TRUE;
+    bool case_sensitive = true;
     memptr token;
     token_type_t tok_type;
     int base;
@@ -1043,10 +1043,10 @@ static parse_status_t vfmatch(
 		    status = match_char( scanner, c, case_sensitive );
 		    break;
 		case 'n':      /* case-sensitive match */
-		    case_sensitive = TRUE;
+		    case_sensitive = true;
 		    break;
 		case 'i':      /* ignore case */
-		    case_sensitive = FALSE;
+		    case_sensitive = false;
 		    break;
 		case 'q':      /* quoted string */
 		    str_ptr = ( memptr * ) va_arg( argp, memptr * );
@@ -1190,7 +1190,7 @@ matchstr( IN char *str,
     membuffer_attach( &buf, str, slen );
 
     scanner_init( &scanner, &buf );
-    scanner.entire_msg_loaded = TRUE;
+    scanner.entire_msg_loaded = true;
 
     va_start( arg_list, fmt );
     ret_code = vfmatch( &scanner, fmt, arg_list );
@@ -1222,7 +1222,7 @@ parser_init( OUT http_parser_t * parser )
 
     parser->http_error_code = HTTP_BAD_REQUEST; /* err msg by default */
     parser->ent_position = ENTREAD_DETERMINE_READ_METHOD;
-    parser->valid_ssdp_notify_hack = FALSE;
+    parser->valid_ssdp_notify_hack = false;
 
     httpmsg_init( &parser->msg );
     scanner_init( &parser->scanner, &parser->msg.msg );
@@ -1270,7 +1270,7 @@ parser_parse_requestline( INOUT http_parser_t * parser )
 
 	index =
 	    map_str_to_int( method_str.buf, method_str.length,
-			    Http_Method_Table, NUM_HTTP_METHODS, TRUE );
+			    Http_Method_Table, NUM_HTTP_METHODS, true );
 
 	if( index < 0 ) {
 	    /* error; method not found */
@@ -1322,7 +1322,7 @@ parser_parse_requestline( INOUT http_parser_t * parser )
 
     index =
 	map_str_to_int( method_str.buf, method_str.length,
-			Http_Method_Table, NUM_HTTP_METHODS, TRUE );
+			Http_Method_Table, NUM_HTTP_METHODS, true );
     if( index < 0 ) {
 	/* error; method not found */
 	parser->http_error_code = HTTP_NOT_IMPLEMENTED;
@@ -1465,7 +1465,7 @@ parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
 	assert(parser->position == (parser_pos_t)POS_HEADERS ||
 	       parser->ent_position == ENTREAD_CHUNKY_HEADERS);
 
-	while (TRUE) {
+	while (true) {
 		save_pos = scanner->cursor;
 		/* check end of headers */
 		status = scanner_get_token(scanner, &token, &tok_type);
@@ -1501,7 +1501,7 @@ parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
 		/* find header */
 		index =
 		    map_str_to_int(token.buf, token.length, Http_Header_Names,
-				   NUM_HTTP_HEADER_NAMES, FALSE);
+				   NUM_HTTP_HEADER_NAMES, false);
 		if (index != -1) {
 			/*Check if it is a soap header */
 			if (Http_Header_Names[index].id == HDR_SOAPACTION) {
@@ -1884,7 +1884,7 @@ parser_get_entity_read_method( INOUT http_parser_t * parser )
 	/* set hack flag for NOTIFY methods; if set to true this is */
 	/*  a valid SSDP notify msg */
 	if( hmsg->method == ( http_method_t ) HTTPMETHOD_NOTIFY ) {
-	    parser->valid_ssdp_notify_hack = TRUE;
+	    parser->valid_ssdp_notify_hack = true;
 	}
 
 	parser->http_error_code = HTTP_LENGTH_REQUIRED;
@@ -1968,7 +1968,7 @@ void
 parser_request_init( OUT http_parser_t * parser )
 {
     parser_init( parser );
-    parser->msg.is_request = TRUE;
+    parser->msg.is_request = true;
     parser->position = POS_REQUEST_LINE;
 }
 
@@ -1989,7 +1989,7 @@ parser_response_init( OUT http_parser_t * parser,
 		      IN http_method_t request_method )
 {
     parser_init( parser );
-    parser->msg.is_request = FALSE;
+    parser->msg.is_request = false;
     parser->msg.request_method = request_method;
     parser->msg.amount_discarded = (size_t)0;
     parser->position = POS_RESPONSE_LINE;

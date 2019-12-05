@@ -56,6 +56,7 @@
 #include <fcntl.h>	/* for F_GETFL, F_SETFL, O_NONBLOCK */
 #include <time.h>
 #include <string.h>
+#include <stdbool.h>
 
 #ifdef UPNP_ENABLE_OPEN_SSL
 #include <openssl/ssl.h>
@@ -161,7 +162,7 @@ static int sock_read_write(
 	/*! [in] timeout value. */
 	int *timeoutSecs,
 	/*! [in] Boolean value specifying read or write option. */
-	int bRead)
+	bool bRead)
 {
 	int retCode;
 	fd_set readSet;
@@ -182,7 +183,7 @@ static int sock_read_write(
 		FD_SET(sockfd, &writeSet);
 	timeout.tv_sec = *timeoutSecs;
 	timeout.tv_usec = 0;
-	while (TRUE) {
+	while (true) {
 		if (*timeoutSecs < 0)
 			retCode = select(sockfd + 1, &readSet, &writeSet,
 				NULL, NULL);
@@ -265,13 +266,13 @@ static int sock_read_write(
 
 int sock_read(SOCKINFO *info, char *buffer, size_t bufsize, int *timeoutSecs)
 {
-	return sock_read_write(info, buffer, bufsize, timeoutSecs, TRUE);
+	return sock_read_write(info, buffer, bufsize, timeoutSecs, true);
 }
 
 int sock_write(SOCKINFO *info, const char *buffer, size_t bufsize, int *timeoutSecs)
 {
 	/* Consciently removing constness. */
-	return sock_read_write(info, (char *)buffer, bufsize, timeoutSecs, FALSE);
+	return sock_read_write(info, (char *)buffer, bufsize, timeoutSecs, false);
 }
 
 int sock_make_blocking(SOCKET sock)

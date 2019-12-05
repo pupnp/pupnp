@@ -36,6 +36,7 @@
 /*!
  * \file
  */
+#include <stdbool.h>
 
 #include "LinkedList.h"
 #include "membuffer.h"
@@ -63,9 +64,9 @@ typedef struct
 	membuffer* msg;
 	/*! current position in buffer. */
 	size_t cursor;
-	/*! set this to TRUE if the entire msg is loaded in 'msg';
-	 * else FALSE if only partial msg in 'msg' (default is FALSE). */
-	int entire_msg_loaded;
+	/*! set this to true if the entire msg is loaded in 'msg';
+	 * else false if only partial msg in 'msg' (default is false). */
+	bool entire_msg_loaded;
 } scanner_t;
 
 typedef enum
@@ -193,8 +194,8 @@ typedef struct {
         */
        size_t amount_discarded;
 	/* fields used in both request or response messages. */
-	/*! if TRUE, msg is a request, else response. */
-	int is_request;
+	/*! if true, msg is a request, else response. */
+	bool is_request;
 	/* http major version. */
 	int major_version;
 	/* http minor version. */

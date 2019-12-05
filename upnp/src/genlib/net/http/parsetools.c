@@ -45,7 +45,7 @@
 #include "statcodes.h"
 #include "parsetools.h"
 
-int has_xml_content_type(http_message_t *hmsg)
+bool has_xml_content_type(http_message_t *hmsg)
 {
 	memptr hdr_value;
 
@@ -55,11 +55,11 @@ int has_xml_content_type(http_message_t *hmsg)
 	if (httpmsg_find_hdr(hmsg, HDR_CONTENT_TYPE, &hdr_value)) {
 		switch (matchstr(hdr_value.buf, hdr_value.length, "%itext%w/%wxml" )) {
 		case PARSE_OK:
-			return TRUE;
+			return true;
 		default:
 			break;
 		}
 	}
-	return FALSE;
+	return false;
 }
 

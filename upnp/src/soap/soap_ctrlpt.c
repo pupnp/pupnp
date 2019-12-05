@@ -38,6 +38,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 #include "miniserver.h"
 #include "membuffer.h"
@@ -380,7 +381,7 @@ get_response_value( IN http_message_t * hmsg,
 	const char *temp_str = NULL;
 	DOMString error_node_str = NULL;
 	int err_code = UPNP_E_BAD_RESPONSE; /* default error */
-	int done = FALSE;
+	bool done = false;
 	const char *names[5];
 	const DOMString nodeValue;
 
@@ -416,7 +417,7 @@ get_response_value( IN http_message_t * hmsg,
 				goto error_handler;
 			}
 			err_code = SOAP_ACTION_RESP;
-			done = TRUE;
+			done = true;
 		}
 	} else if (code == SOAP_VAR_RESP) {
 		/* try reading var response */
@@ -434,7 +435,7 @@ get_response_value( IN http_message_t * hmsg,
 				goto error_handler;
 			*str_value = ixmlCloneDOMString(nodeValue);
 			err_code = SOAP_VAR_RESP;
-			done = TRUE;
+			done = true;
 		}
 	}
 	if (!done) {
@@ -530,7 +531,7 @@ SoapSendAction( IN char *action_url,
     uri_type url;
     int upnp_error_code;
     char *upnp_error_str;
-    int got_response = FALSE;
+    bool got_response = false;
 
     off_t content_length;
     const char *xml_start =
@@ -599,7 +600,7 @@ SoapSendAction( IN char *action_url,
     }
 
     ret_code = soap_request_and_response( &request, &url, &response );
-    got_response = TRUE;
+    got_response = true;
     if( ret_code != UPNP_E_SUCCESS ) {
         err_code = ret_code;
         goto error_handler;
@@ -672,7 +673,7 @@ int SoapSendActionEx(
     uri_type url;
     int upnp_error_code;
     char *upnp_error_str;
-    int got_response = FALSE;
+    bool got_response = false;
     const char *xml_start =
         "<s:Envelope "
         "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -765,7 +766,7 @@ int SoapSendActionEx(
     }
 
     ret_code = soap_request_and_response( &request, &url, &response );
-    got_response = TRUE;
+    got_response = true;
     if( ret_code != UPNP_E_SUCCESS ) {
         err_code = ret_code;
         goto error_handler;

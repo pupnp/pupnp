@@ -321,7 +321,7 @@ static UPNP_INLINE int get_content_type(
 	const char *extension;
 	const char *type;
 	const char *subtype;
-	int ctype_found = FALSE;
+	bool ctype_found = false;
 	char *temp = NULL;
 	size_t length = 0;
 	int rc = 0;
@@ -331,7 +331,7 @@ static UPNP_INLINE int get_content_type(
 	extension = strrchr(filename, '.');
 	if (extension != NULL)
 		if (search_extension(extension + 1, &type, &subtype) == 0)
-			ctype_found = TRUE;
+			ctype_found = true;
 	if (!ctype_found) {
 		/* unknown content type */
 		type = gMediaTypes[APPLICATION_INDEX];
@@ -371,9 +371,9 @@ static UPNP_INLINE void glob_alias_init(void)
 /*!
  * \brief Check for the validity of the XML object buffer.
  *
- * \return BOOLEAN.
+ * \return bool.
  */
-static UPNP_INLINE int is_valid_alias(
+static UPNP_INLINE bool is_valid_alias(
 	/*! [in] XML alias object. */
 	const struct xml_alias_t *alias)
 {
@@ -455,7 +455,7 @@ int web_server_set_alias(const char *alias_name,
 		ithread_mutex_unlock(&gWebMutex);
 
 		return 0;
-	} while (FALSE);
+	} while (false);
 	/* error handler */
 	/* free temp alias */
 	membuffer_destroy(&alias.name);
@@ -536,9 +536,9 @@ static int get_file_info(
 	if (code == -1)
 		return -1;
 	if (S_ISDIR(s.st_mode))
-		UpnpFileInfo_set_IsDirectory(info, TRUE);
+		UpnpFileInfo_set_IsDirectory(info, true);
 	else if (S_ISREG(s.st_mode))
-		UpnpFileInfo_set_IsDirectory(info, FALSE);
+		UpnpFileInfo_set_IsDirectory(info, false);
 	else
 		return -1;
 	/* check readable */
@@ -583,10 +583,10 @@ int web_server_set_root_dir(const char *root_dir)
  * passed in as the input parameter. If equal extract file information.
  *
  * \return
- * \li \c TRUE - On Success
- * \li \c FALSE if request is not an alias
+ * \li \c true - On Success
+ * \li \c false if request is not an alias
  */
-static UPNP_INLINE int get_alias(
+static UPNP_INLINE bool get_alias(
 	/*! [in] request file passed in to be compared with. */
 	const char *request_file,
 	/*! [out] xml alias object which has a file name stored. */
@@ -598,8 +598,8 @@ static UPNP_INLINE int get_alias(
 	int cmp = strcmp(alias->name.buf, request_file);
 	if (cmp == 0) {
 		UpnpFileInfo_set_FileLength(info, (off_t)alias->doc.length);
-		UpnpFileInfo_set_IsDirectory(info, FALSE);
-		UpnpFileInfo_set_IsReadable(info, TRUE);
+		UpnpFileInfo_set_IsDirectory(info, false);
+		UpnpFileInfo_set_IsReadable(info, true);
 		UpnpFileInfo_set_LastModified(info, alias->last_modified);
 	}
 
@@ -610,9 +610,9 @@ static UPNP_INLINE int get_alias(
  * \brief Compares filePath with paths from the list of virtual directory
  * lists.
  *
- * \return BOOLEAN.
+ * \return bool.
  */
-static int isFileInVirtualDir(
+static bool isFileInVirtualDir(
 	/*! [in] Directory path to be tested for virtual directory. */
 	char *filePath,
 	/*! [out] The cookie registered with this virtual directory, if matched. */
@@ -630,7 +630,7 @@ static int isFileInVirtualDir(
 						webDirLen) == 0) {
 					if (cookie != NULL)
 						*cookie = pCurVirtualDir->cookie;
-					return !0;
+					return true;
 				}
 			} else {
 				if (strncmp(pCurVirtualDir->dirName, filePath,
@@ -640,14 +640,14 @@ static int isFileInVirtualDir(
 				     filePath[webDirLen] == '?')) {
 					if (cookie != NULL)
 						*cookie = pCurVirtualDir->cookie;
-					return !0;
+					return true;
 				}
 			}
 		}
 		pCurVirtualDir = pCurVirtualDir->next;
 	}
 
-	return 0;
+	return false;
 }
 
 /*!
@@ -930,7 +930,7 @@ static int CheckOtherHTTPHeaders(
 		/* find header type. */
 		index = map_str_to_int((const char *)header->name.buf,
 				header->name.length, Http_Header_Names,
-				NUM_HTTP_HEADER_NAMES, FALSE);
+				NUM_HTTP_HEADER_NAMES, false);
 		if (header->value.length >= TmpBufSize) {
 			free(TmpBuf);
 			TmpBufSize = header->value.length + 1;
@@ -1057,7 +1057,7 @@ static int ExtraHTTPHeaders(
 		/* find header type. */
 		index = map_str_to_int((const char *)header->name.buf,
 				header->name.length, Http_Header_Names,
-				NUM_HTTP_HEADER_NAMES, FALSE);
+				NUM_HTTP_HEADER_NAMES, false);
 		if (index < 0) {
 			extraHeader = UpnpExtraHeaders_new();
 			if (!extraHeader) {
@@ -1109,13 +1109,13 @@ static int process_request(
 	char *request_doc;
 	UpnpFileInfo *finfo;
 	time_t aux_LastModified;
-	int using_alias;
-	int using_virtual_dir;
+	bool using_alias;
+	bool using_virtual_dir;
 	uri_type *url;
 	const char *temp_str;
 	int resp_major;
 	int resp_minor;
-	int alias_grabbed;
+	bool alias_grabbed;
 	size_t dummy;
 
 	print_http_headers(req);
@@ -1128,10 +1128,10 @@ static int process_request(
 	memset(&finfo, 0, sizeof(finfo));
 	request_doc = NULL;
 	finfo = UpnpFileInfo_new();
-	alias_grabbed = FALSE;
+	alias_grabbed = false;
 	err_code = HTTP_INTERNAL_SERVER_ERROR;	/* default error */
-	using_virtual_dir = FALSE;
-	using_alias = FALSE;
+	using_virtual_dir = false;
+	using_alias = false;
 
 	http_CalcResponseVersion(req->major_version, req->minor_version,
 				 &resp_major, &resp_minor);
@@ -1157,7 +1157,7 @@ static int process_request(
 		goto error_handler;
 	}
 	if (isFileInVirtualDir(request_doc, &RespInstr->Cookie)) {
-		using_virtual_dir = TRUE;
+		using_virtual_dir = true;
 		RespInstr->IsVirtualFile = 1;
 		if (membuffer_assign_str(filename, request_doc) != 0) {
 			goto error_handler;
@@ -1166,9 +1166,9 @@ static int process_request(
 		/* try using alias */
 		if (is_valid_alias(&gAliasDoc)) {
 			alias_grab(alias);
-			alias_grabbed = TRUE;
+			alias_grabbed = true;
 			using_alias = get_alias(request_doc, alias, finfo);
-			if (using_alias == TRUE) {
+			if (using_alias == true) {
 				UpnpFileInfo_set_ContentType(finfo,
 					"text/xml; charset=\"utf-8\"");
 				if (UpnpFileInfo_get_ContentType(finfo) == NULL) {
@@ -1431,7 +1431,7 @@ static int http_RecvPostMessage(
 	int Timeout = -1;
 	FILE *Fp;
 	parse_status_t status = PARSE_OK;
-	int ok_on_close = FALSE;
+	bool ok_on_close = false;
 	size_t entity_offset = 0;
 	int num_read = 0;
 	int ret_code = HTTP_OK;
@@ -1456,7 +1456,7 @@ static int http_RecvPostMessage(
 			status = parser_parse_entity(parser);
 		if (status == PARSE_INCOMPLETE_ENTITY) {
 			/* read until close */
-			ok_on_close = TRUE;
+			ok_on_close = true;
 		} else if ((status != PARSE_SUCCESS)
 			   && (status != PARSE_CONTINUE_1)
 			   && (status != PARSE_INCOMPLETE)) {
@@ -1481,7 +1481,7 @@ static int http_RecvPostMessage(
 				status = parser_parse_entity(parser);
 				if (status == PARSE_INCOMPLETE_ENTITY) {
 					/* read until close */
-					ok_on_close = TRUE;
+					ok_on_close = true;
 				} else if ((status != PARSE_SUCCESS)
 					   && (status != PARSE_CONTINUE_1)
 					   && (status != PARSE_INCOMPLETE)) {

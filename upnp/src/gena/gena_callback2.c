@@ -90,11 +90,11 @@ genaCallback( IN http_parser_t * parser,
               IN http_message_t * request,
               INOUT SOCKINFO * info )
 {
-    int found_function = FALSE;
+    bool found_function = false;
 
     if( request->method == HTTPMETHOD_SUBSCRIBE ) {
 #ifdef INCLUDE_DEVICE_APIS
-        found_function = TRUE;
+        found_function = true;
         if( httpmsg_find_hdr( request, HDR_NT, NULL ) == NULL ) {
             /* renew subscription */
             gena_process_subscription_renewal_request
@@ -106,13 +106,13 @@ genaCallback( IN http_parser_t * parser,
         UpnpPrintf( UPNP_ALL, GENA, __FILE__, __LINE__,
             "got subscription request\n" );
     } else if( request->method == HTTPMETHOD_UNSUBSCRIBE ) {
-        found_function = TRUE;
+        found_function = true;
         /* unsubscribe */
         gena_process_unsubscribe_request( info, request );
 #endif
     } else if( request->method == HTTPMETHOD_NOTIFY ) {
 #ifdef INCLUDE_CLIENT_APIS
-        found_function = TRUE;
+        found_function = true;
         /* notify */
         gena_process_notification_event( info, request );
 #endif
