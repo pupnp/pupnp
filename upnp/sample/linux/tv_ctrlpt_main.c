@@ -38,6 +38,8 @@
 
 int main(int argc, char **argv)
 {
+	(void)argc;
+	(void)argv;
 	int rc;
 	ithread_t cmdloop_thread;
 #ifdef _WIN32
@@ -69,7 +71,5 @@ int main(int argc, char **argv)
 	rc = TvCtrlPointStop();
 
 	return rc;
-	argc = argc;
-	argv = argv;
 }
 
