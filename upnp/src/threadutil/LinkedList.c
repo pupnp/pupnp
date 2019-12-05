@@ -32,9 +32,8 @@
 
 #include "LinkedList.h"
 
-#ifdef _WIN32
-	/* Do not #include <sys/param.h> */
-#else
+#ifndef _WIN32
+	/* Do not #include <sys/param.h> on Windows */
 	#include <sys/param.h>
 #endif
 
