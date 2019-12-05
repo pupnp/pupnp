@@ -73,12 +73,12 @@ typedef struct MServerSockArray {
 
 /*! . */
 typedef void (*MiniServerCallback) (
-	/* ! . */
-	IN http_parser_t * parser,
-	/* ! . */
-	IN http_message_t * request,
-	/* ! . */
-	IN SOCKINFO * info);
+	/* ! [in] . */
+	http_parser_t * parser,
+	/* ! [in] . */
+	http_message_t * request,
+	/* ! [in] . */
+	SOCKINFO * info);
 
 #ifdef __cplusplus
 extern "C" {

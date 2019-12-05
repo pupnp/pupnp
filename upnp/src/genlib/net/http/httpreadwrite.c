@@ -200,7 +200,7 @@ static int get_hoststr(const char *url_str, char **hoststr, size_t *hostlen)
 	return UPNP_E_SUCCESS;
 }
 
-static void copy_msg_headers(IN LinkedList *msgHeaders, OUT UpnpString *headers)
+static void copy_msg_headers(LinkedList *msgHeaders, UpnpString *headers)
 {
 	(void)msgHeaders;
 	(void)headers;
@@ -230,7 +230,7 @@ static void copy_msg_headers(IN LinkedList *msgHeaders, OUT UpnpString *headers)
 #endif
 }
 
-int http_FixUrl(IN uri_type *url, OUT uri_type *fixed_url)
+int http_FixUrl(uri_type *url, uri_type *fixed_url)
 {
 	const char *temp_path = "/";
 
@@ -258,7 +258,7 @@ int http_FixUrl(IN uri_type *url, OUT uri_type *fixed_url)
 }
 
 int http_FixStrUrl(
-	IN const char *urlstr, IN size_t urlstrlen, OUT uri_type *fixed_url)
+	const char *urlstr, size_t urlstrlen, uri_type *fixed_url)
 {
 	uri_type url;
 
@@ -284,7 +284,7 @@ int http_FixStrUrl(
  *	UPNP_E_OUTOF_SOCKET
  *	UPNP_E_SOCKET_CONNECT on error
  ************************************************************************/
-SOCKET http_Connect(IN uri_type *destination_url, OUT uri_type *url)
+SOCKET http_Connect(uri_type *destination_url, uri_type *url)
 {
 	SOCKET connfd;
 	socklen_t sockaddr_len;
@@ -346,11 +346,11 @@ SOCKET http_Connect(IN uri_type *destination_url, OUT uri_type *url)
  * 	 UPNP_E_SUCCESS
  *	 UPNP_E_BAD_HTTPMSG
  */
-int http_RecvMessage(IN SOCKINFO *info,
-	OUT http_parser_t *parser,
-	IN http_method_t request_method,
-	IN OUT int *timeout_secs,
-	OUT int *http_error_code)
+int http_RecvMessage(SOCKINFO *info,
+	http_parser_t *parser,
+	http_method_t request_method,
+	int *timeout_secs,
+	int *http_error_code)
 {
 	int ret = UPNP_E_SUCCESS;
 	int line = 0;
@@ -710,12 +710,12 @@ ExitFunction:
  *	Error Codes returned by http_SendMessage
  *	Error Codes returned by http_RecvMessage
  ************************************************************************/
-int http_RequestAndResponse(IN uri_type *destination,
-	IN const char *request,
-	IN size_t request_length,
-	IN http_method_t req_method,
-	IN int timeout_secs,
-	OUT http_parser_t *response)
+int http_RequestAndResponse(uri_type *destination,
+	const char *request,
+	size_t request_length,
+	http_method_t req_method,
+	int timeout_secs,
+	http_parser_t *response)
 {
 	SOCKET tcp_connection;
 	int ret_code;
@@ -783,11 +783,11 @@ end_function:
  *	UPNP_E_SUCCESS
  *	UPNP_E_INVALID_URL
  ************************************************************************/
-int http_Download(IN const char *url_str,
-	IN int timeout_secs,
-	OUT char **document,
-	OUT size_t *doc_length,
-	OUT char *content_type)
+int http_Download(const char *url_str,
+	int timeout_secs,
+	char **document,
+	size_t *doc_length,
+	char *content_type)
 {
 	int ret_code;
 	uri_type url;
@@ -1074,13 +1074,13 @@ typedef struct HTTPCONNECTIONHANDLE
  */
 static int ReadResponseLineAndHeaders(
 	/*! Socket information object. */
-	IN SOCKINFO *info,
+	SOCKINFO *info,
 	/*! HTTP Parser object. */
-	IN OUT http_parser_t *parser,
+	http_parser_t *parser,
 	/*! Time out value. */
-	IN OUT int *timeout_secs,
+	int *timeout_secs,
 	/*! HTTP errror code returned. */
-	IN OUT int *http_error_code)
+	int *http_error_code)
 {
 	parse_status_t status;
 	int num_read;
@@ -1193,7 +1193,7 @@ static int ReadResponseLineAndHeaders(
  *	UPNP_E_SUCCESS		- On Sucess
  *	UPNP_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
-int http_HttpGetProgress(IN void *Handle, OUT size_t *length, OUT size_t *total)
+int http_HttpGetProgress(void *Handle, size_t *length, size_t *total)
 {
 	http_connection_handle_t *handle = Handle;
 
@@ -1219,7 +1219,7 @@ int http_HttpGetProgress(IN void *Handle, OUT size_t *length, OUT size_t *total)
  *	UPNP_E_SUCCESS		- On Success
  *	UPNP_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
-int http_CancelHttpGet(IN void *Handle)
+int http_CancelHttpGet(void *Handle)
 {
 	http_connection_handle_t *handle = Handle;
 
@@ -1593,10 +1593,10 @@ int http_CloseHttpConnection(void *Handle)
  *	UPNP_E_SOCKET_WRITE
  *	UPNP_E_TIMEDOUT
  ************************************************************************/
-int http_SendStatusResponse(IN SOCKINFO *info,
-	IN int http_status_code,
-	IN int request_major_version,
-	IN int request_minor_version)
+int http_SendStatusResponse(SOCKINFO *info,
+	int http_status_code,
+	int request_major_version,
+	int request_minor_version)
 {
 	int response_major, response_minor;
 	membuffer membuf;
@@ -1973,10 +1973,10 @@ ExitFunction:
  *
  * Return: void
  ************************************************************************/
-void http_CalcResponseVersion(IN int request_major_vers,
-	IN int request_minor_vers,
-	OUT int *response_major_vers,
-	OUT int *response_minor_vers)
+void http_CalcResponseVersion(int request_major_vers,
+	int request_minor_vers,
+	int *response_major_vers,
+	int *response_minor_vers)
 {
 	if ((request_major_vers > 1) ||
 		(request_major_vers == 1 && request_minor_vers >= 1)) {
@@ -2119,14 +2119,14 @@ int MakeGetMessageEx(const char *url_str,
  *	UPNP_E_SOCKET_ERROR
  *	UPNP_E_BAD_RESPONSE
  ************************************************************************/
-int http_OpenHttpGetEx(IN const char *url_str,
-	IN OUT void **Handle,
-	IN OUT char **contentType,
-	OUT int *contentLength,
-	OUT int *httpStatus,
-	IN int lowRange,
-	IN int highRange,
-	IN int timeout)
+int http_OpenHttpGetEx(const char *url_str,
+	void **Handle,
+	char **contentType,
+	int *contentLength,
+	int *httpStatus,
+	int lowRange,
+	int highRange,
+	int timeout)
 {
 	int http_error_code;
 	memptr ctype;
@@ -2269,7 +2269,7 @@ int http_OpenHttpGetEx(IN const char *url_str,
  *	UPNP_INLINE void
  ************************************************************************/
 /* 'info' should have a size of at least 100 bytes */
-void get_sdk_info(OUT char *info, IN size_t infoSize)
+void get_sdk_info(char *info, size_t infoSize)
 {
 #ifdef UPNP_ENABLE_UNSPECIFIED_SERVER
 	snprintf(info, infoSize, "Unspecified, UPnP/1.0, Unspecified\r\n");

@@ -66,7 +66,7 @@ extern ithread_mutex_t GlobalClientSubscribeMutex;
  */
 static void GenaAutoRenewSubscription(
 	/*! [in] Thread data(upnp_timeout *) needed to send the renewal. */
-	IN void *input)
+	void *input)
 {
 	upnp_timeout *event = (upnp_timeout *) input;
 	UpnpEventSubscribe *sub_struct = (UpnpEventSubscribe *)event->Event;
@@ -131,11 +131,11 @@ end_function:
  */
 static int ScheduleGenaAutoRenew(
 	/*! [in] Handle that also contains the subscription list. */
-	IN int client_handle,
+	int client_handle,
 	/*! [in] The time out value of the subscription. */
-	IN int TimeOut,
+	int TimeOut,
 	/*! [in] Subscription being renewed. */
-	IN GenlibClientSubscription *sub)
+	GenlibClientSubscription *sub)
 {
 	UpnpEventSubscribe *RenewEventStruct = NULL;
 	upnp_timeout *RenewEvent = NULL;
@@ -208,11 +208,11 @@ end_function:
  */
 static int gena_unsubscribe(
 	/*! [in] Event URL of the service. */
-	IN const UpnpString *url,
+	const UpnpString *url,
 	/*! [in] The subcription ID. */
-	IN const UpnpString *sid,
+	const UpnpString *sid,
 	/*! [out] The UNSUBCRIBE response from the device. */
-	OUT http_parser_t *response )
+	http_parser_t *response )
 {
 	int return_code;
 	uri_type dest_url;
@@ -268,14 +268,14 @@ static int gena_unsubscribe(
  */
 static int gena_subscribe(
 	/*! [in] URL of service to subscribe. */
-	IN const UpnpString *url,
+	const UpnpString *url,
 	/*! [in,out] Subscription time desired (in secs). */
-	INOUT int *timeout,
+	int *timeout,
 	/*! [in] for renewal, this contains a currently held subscription SID.
 	 * For first time subscription, this must be NULL. */
-	IN const UpnpString *renewal_sid,
+	const UpnpString *renewal_sid,
 	/*! [out] SID returned by the subscription or renew msg. */
-	OUT UpnpString *sid)
+	UpnpString *sid)
 {
 	int return_code;
 	int parse_ret = 0;

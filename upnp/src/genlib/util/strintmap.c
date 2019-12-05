@@ -61,11 +61,11 @@
 *	Note :
 ************************************************************************/
 int
-map_str_to_int( IN const char *name,
-                IN size_t name_len,
-                IN str_int_entry * table,
-                IN int num_entries,
-                IN int case_sensitive )
+map_str_to_int( const char *name,
+                size_t name_len,
+                str_int_entry * table,
+                int num_entries,
+                int case_sensitive )
 {
     int top,
       mid,
@@ -120,9 +120,9 @@ map_str_to_int( IN const char *name,
 *	Note :
 ************************************************************************/
 int
-map_int_to_str( IN int id,
-                IN str_int_entry * table,
-                IN int num_entries )
+map_int_to_str( int id,
+                str_int_entry * table,
+                int num_entries )
 {
     int i;
 

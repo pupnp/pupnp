@@ -57,9 +57,9 @@
  */
 static int ixml_membuf_set_size(
 	/*! [in,out] The memory buffer. */
-	INOUT ixml_membuf *m,
+	ixml_membuf *m,
 	/*! [in] The new lenght. */
-	IN size_t new_length)
+	size_t new_length)
 {
 	size_t diff;
 	size_t alloc_len;
@@ -167,8 +167,10 @@ int ixml_membuf_assign_str(
 
 
 int ixml_membuf_append(
-	INOUT ixml_membuf *m,
-	IN const void *buf)
+	/*! [in,out] The memory buffer */
+	ixml_membuf *m,
+	/*! [in] The buffer to append */
+	const void *buf)
 {
 	assert(m != NULL);
 
@@ -177,17 +179,23 @@ int ixml_membuf_append(
 
 
 int ixml_membuf_append_str(
-	INOUT ixml_membuf *m,
-	IN const char *c_str)
+	/*! [in,out] The memory buffer */
+	ixml_membuf *m,
+	/*! [in] The characters to append (null-terminated) */
+	const char *c_str)
 {
 	return ixml_membuf_insert(m, c_str, strlen(c_str), m->length);
 }
 
 
 int ixml_membuf_insert(
-	INOUT ixml_membuf *m,
-	IN const void *buf,
-	IN size_t buf_len,
+	/*! [in,out] The memory buffer */
+	ixml_membuf *m,
+	/*! [in] The buffer to insert */
+	const void *buf,
+	/*! [in] The length of the buffer */
+	size_t buf_len,
+	/*! [in] Position where to insert the buffer */
 	size_t index)
 {
 	int return_code = 0;

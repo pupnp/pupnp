@@ -628,8 +628,6 @@
     <ClInclude Include="..\..\upnp\src\inc\gena.h" />
     <ClInclude Include="..\..\upnp\src\inc\gena_ctrlpt.h" />
     <ClInclude Include="..\..\upnp\src\inc\gena_device.h" />
-    <ClInclude Include="..\..\upnp\src\inc\global.h" />
-    <ClInclude Include="..\..\upnp\src\inc\gmtdate.h" />
     <ClInclude Include="..\..\upnp\src\inc\httpparser.h" />
     <ClInclude Include="..\..\upnp\src\inc\httpreadwrite.h" />
     <ClInclude Include="..\msvc\inttypes.h" />
@@ -638,7 +636,6 @@
     <ClInclude Include="..\..\upnp\src\inc\miniserver.h" />
     <ClInclude Include="..\..\upnp\src\inc\netall.h" />
     <ClInclude Include="..\..\upnp\src\inc\parsetools.h" />
-    <ClInclude Include="..\..\upnp\src\inc\server.h" />
     <ClInclude Include="..\..\upnp\src\inc\service_table.h" />
     <ClInclude Include="..\..\upnp\src\inc\soaplib.h" />
     <ClInclude Include="..\..\upnp\src\inc\sock.h" />

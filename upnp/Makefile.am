@@ -63,8 +63,6 @@ libupnp_la_SOURCES = \
 	src/inc/gena.h \
 	src/inc/gena_ctrlpt.h \
 	src/inc/gena_device.h \
-	src/inc/global.h \
-	src/inc/gmtdate.h \
 	src/inc/httpparser.h \
 	src/inc/httpreadwrite.h \
 	src/inc/md5.h \
@@ -72,7 +70,6 @@ libupnp_la_SOURCES = \
 	src/inc/miniserver.h \
 	src/inc/netall.h \
 	src/inc/parsetools.h \
-	src/inc/server.h \
 	src/inc/service_table.h \
 	src/inc/soaplib.h \
 	src/inc/sock.h \
