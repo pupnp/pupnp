@@ -102,7 +102,7 @@ static const char *Http5xxStr =
     "Loop Detected\0"
     "\0" "Not Extended\0";
 
-static int gInitialized = FALSE;
+static int gInitialized = 0;
 
 /************************************************************************
 ************************* Functions *************************************
@@ -159,7 +159,7 @@ init_tables( void )
     init_table( Http4xxStr, Http4xxCodes, NUM_4XX_CODES );
     init_table( Http5xxStr, Http5xxCodes, NUM_5XX_CODES );
 
-    gInitialized = TRUE;        /* mark only after complete */
+    gInitialized = 1;        /* mark only after complete */
 }
 
 /************************************************************************

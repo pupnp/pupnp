@@ -80,7 +80,6 @@ extern "C" {
 #define RESERVED ";/?:@&=+$,{}"
 
 #define HTTP_SUCCESS 1
-#define FALSE 0
 #define SOCKET_BUFFER_SIZE 5000
 
 enum hostType {

@@ -415,7 +415,7 @@ int genaUnregisterClient(UpnpClient_Handle client_handle)
 	struct Handle_Info *handle_info = NULL;
 	http_parser_t response;
 
-	while (TRUE) {
+	while (1) {
 		HandleLock();
 
 		if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {

@@ -44,14 +44,6 @@
 #define EVENT_TIMEDOUT -2
 #define EVENT_TERMINATE	-3
 
-/*! boolean type in C. */
-#ifndef TRUE
-	#define TRUE 1
-#endif
-#ifndef FALSE
-	#define FALSE 0
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif

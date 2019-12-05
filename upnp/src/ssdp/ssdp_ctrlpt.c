@@ -168,14 +168,14 @@ void ssdp_handle_ctrlpt_msg(
 	event.UDN[0] = '\0';
 	event.DeviceType[0] = '\0';
 	event.ServiceType[0] = '\0';
-	nt_found = FALSE;
+	nt_found = 0;
 	if (httpmsg_find_hdr(hmsg, HDR_NT, &hdr_value) != NULL) {
 		save_char = hdr_value.buf[hdr_value.length];
 		hdr_value.buf[hdr_value.length] = '\0';
 		nt_found = (ssdp_request_type(hdr_value.buf, &event) == 0);
 		hdr_value.buf[hdr_value.length] = save_char;
 	}
-	usn_found = FALSE;
+	usn_found = 0;
 	if (httpmsg_find_hdr(hmsg, HDR_USN, &hdr_value) != NULL) {
 		save_char = hdr_value.buf[hdr_value.length];
 		hdr_value.buf[hdr_value.length] = '\0';
@@ -195,9 +195,9 @@ void ssdp_handle_ctrlpt_msg(
 			goto end_ssdp_handle_ctrlpt_msg;
 		}
 		if (memptr_cmp(&hdr_value, "ssdp:alive") == 0) {
-			is_byebye = FALSE;
+			is_byebye = 0;
 		} else if (memptr_cmp(&hdr_value, "ssdp:byebye") == 0) {
-			is_byebye = TRUE;
+			is_byebye = 1;
 		} else {
 			/* bad value */
 			goto end_ssdp_handle_ctrlpt_msg;
@@ -241,7 +241,7 @@ void ssdp_handle_ctrlpt_msg(
 	} else {
 		/* reply (to a SEARCH) */
 		/* only checking to see if there is a valid ST header */
-		st_found = FALSE;
+		st_found = 0;
 		if (httpmsg_find_hdr(hmsg, HDR_ST, &hdr_value) != NULL) {
 			save_char = hdr_value.buf[hdr_value.length];
 			hdr_value.buf[hdr_value.length] = '\0';
