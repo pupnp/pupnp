@@ -28,7 +28,6 @@
 
 /* change to point to where MD5 .h's live */
 /* get MD5 sample implementation from RFC 1321 */
-#include "global.h"
 #include "md5.h"
 
 #include "UpnpStdInt.h"
