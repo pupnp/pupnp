@@ -184,9 +184,6 @@
     <ClInclude Include="..\..\upnp\src\inc\global.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\upnp\src\inc\gmtdate.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\upnp\src\inc\httpparser.h">
       <Filter>headers</Filter>
     </ClInclude>
