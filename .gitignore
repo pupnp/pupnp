@@ -136,6 +136,9 @@ upnp/test_init.trs
 upnp/test_url
 upnp/test_url.log
 upnp/test_url.trs
+upnp/test_list
+upnp/test_list.log
+upnp/test_list.trs
 
 /build/vc10/out.vc9.Win32/Debug
 /build/vc10/out.vc10.Win32
