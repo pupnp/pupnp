@@ -81,9 +81,6 @@ extern "C" {
 
 #define HTTP_SUCCESS 1
 #define FALSE 0
-#define TAB 9
-#define CR 13
-#define LF 10
 #define SOCKET_BUFFER_SIZE 5000
 
 enum hostType {
