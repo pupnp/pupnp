@@ -628,7 +628,6 @@
     <ClInclude Include="..\..\upnp\src\inc\gena.h" />
     <ClInclude Include="..\..\upnp\src\inc\gena_ctrlpt.h" />
     <ClInclude Include="..\..\upnp\src\inc\gena_device.h" />
-    <ClInclude Include="..\..\upnp\src\inc\global.h" />
     <ClInclude Include="..\..\upnp\src\inc\httpparser.h" />
     <ClInclude Include="..\..\upnp\src\inc\httpreadwrite.h" />
     <ClInclude Include="..\msvc\inttypes.h" />
