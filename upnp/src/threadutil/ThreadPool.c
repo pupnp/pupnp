@@ -260,7 +260,7 @@ static int SetPolicyType(
 #ifdef __CYGWIN__
 	/* TODO not currently working... */
 	retVal = 0;
-#elif defined(__OSX__) || defined(__APPLE__) || defined(__NetBSD__)
+#elif defined(__APPLE__) || defined(__NetBSD__)
 	setpriority(PRIO_PROCESS, 0, 0);
 	retVal = 0;
 #elif defined(_WIN32)
@@ -417,7 +417,7 @@ static void SetSeed(void)
 	gettimeofday(&t, NULL);
 #if defined(_WIN32)
 	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id().p);
-#elif defined(BSD) || defined(__OSX__) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
+#elif defined(BSD) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
 	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id());
 #elif defined(__linux__) || defined(__sun) || defined(__CYGWIN__) || defined(__GLIBC__)
 	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id());

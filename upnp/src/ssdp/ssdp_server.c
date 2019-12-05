@@ -811,7 +811,7 @@ static int create_ssdp_sock_v4(
 		ret = UPNP_E_SOCKET_ERROR;
 		goto error_handler;
 	}
-#if (defined(BSD) && !defined(__GNU__)) || defined(__OSX__) || defined(__APPLE__)
+#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
 	onOff = 1;
 	ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_REUSEPORT,
 			 (char *)&onOff, sizeof(onOff));
@@ -823,7 +823,7 @@ static int create_ssdp_sock_v4(
 		ret = UPNP_E_SOCKET_ERROR;
 		goto error_handler;
 	}
-#endif /* BSD, __OSX__, __APPLE__ */
+#endif /* BSD, __APPLE__ */
 	memset(&__ss, 0, sizeof(__ss));
 	ssdpAddr4->sin_family = (sa_family_t)AF_INET;
 	ssdpAddr4->sin_addr.s_addr = htonl(INADDR_ANY);
@@ -949,7 +949,7 @@ static int create_ssdp_sock_v6(
 		ret = UPNP_E_SOCKET_ERROR;
 		goto error_handler;
 	}
-#if (defined(BSD) && !defined(__GNU__)) || defined(__OSX__) || defined(__APPLE__)
+#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
 	onOff = 1;
 	ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_REUSEPORT,
 			 (char *)&onOff, sizeof(onOff));
@@ -961,7 +961,7 @@ static int create_ssdp_sock_v6(
 		ret = UPNP_E_SOCKET_ERROR;
 		goto error_handler;
 	}
-#endif /* BSD, __OSX__, __APPLE__ */
+#endif /* BSD, __APPLE__ */
 	onOff = 1;
 	ret = setsockopt(*ssdpSock, IPPROTO_IPV6, IPV6_V6ONLY,
 			 (char *)&onOff, sizeof(onOff));
@@ -1057,7 +1057,7 @@ static int create_ssdp_sock_v6_ula_gua(
 		ret = UPNP_E_SOCKET_ERROR;
 		goto error_handler;
 	}
-#if (defined(BSD) && !defined(__GNU__)) || defined(__OSX__) || defined(__APPLE__)
+#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
 	onOff = 1;
 	ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_REUSEPORT,
 			 (char *)&onOff, sizeof(onOff));
@@ -1069,7 +1069,7 @@ static int create_ssdp_sock_v6_ula_gua(
 		ret = UPNP_E_SOCKET_ERROR;
 		goto error_handler;
 	}
-#endif /* BSD, __OSX__, __APPLE__ */
+#endif /* BSD, __APPLE__ */
 	onOff = 1;
 	ret = setsockopt(*ssdpSock, IPPROTO_IPV6, IPV6_V6ONLY,
 			(char *)&onOff, sizeof(onOff));
