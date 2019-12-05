@@ -1233,6 +1233,7 @@ int http_CancelHttpGet(IN void *Handle)
 
 int http_OpenHttpConnection(const char *url_str, void **Handle, int timeout)
 {
+	(void)timeout; // Unused parameter
 	int ret_code;
 	size_t sockaddr_len;
 	SOCKET tcp_connection;
@@ -1288,8 +1289,6 @@ int http_OpenHttpConnection(const char *url_str, void **Handle, int timeout)
 errorHandler:
 	*Handle = handle;
 	return ret_code;
-	/* Unused parameter */
-	timeout = timeout;
 }
 
 int http_MakeHttpRequest(Upnp_HttpMethod method,
@@ -1312,7 +1311,7 @@ int http_MakeHttpRequest(Upnp_HttpMethod method,
 	}
 	handle->requestStarted = 1;
 	handle->cancel = 0;
-	ret_code = MakeGenericMessage(method,
+	ret_code = MakeGenericMessage((http_method_t)method,
 		url_str,
 		&request,
 		&url,
@@ -1326,7 +1325,7 @@ int http_MakeHttpRequest(Upnp_HttpMethod method,
 		&handle->sock_info, &timeout, "b", request.buf, request.length);
 	membuffer_destroy(&request);
 	httpmsg_destroy(&handle->response.msg);
-	parser_response_init(&handle->response, method);
+	parser_response_init(&handle->response, (http_method_t)method);
 	return ret_code;
 }
 

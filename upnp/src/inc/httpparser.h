@@ -91,11 +91,11 @@ typedef enum
  * those of Upnp_HttpMethod enum defined in upnp.h */
 typedef enum
 {
-	HTTPMETHOD_PUT = 0,
-	HTTPMETHOD_DELETE = 1,
-	HTTPMETHOD_GET = 2,
-	HTTPMETHOD_HEAD = 3,
-	HTTPMETHOD_POST = 4,
+	HTTPMETHOD_PUT = UPNP_HTTPMETHOD_PUT,
+	HTTPMETHOD_DELETE = UPNP_HTTPMETHOD_DELETE,
+	HTTPMETHOD_GET = UPNP_HTTPMETHOD_GET,
+	HTTPMETHOD_HEAD = UPNP_HTTPMETHOD_HEAD,
+	HTTPMETHOD_POST = UPNP_HTTPMETHOD_POST,
 	HTTPMETHOD_MPOST, 
 	HTTPMETHOD_SUBSCRIBE, 
 	HTTPMETHOD_UNSUBSCRIBE, 
@@ -490,11 +490,7 @@ void print_http_headers(
 	/*! [in] HTTP Message object. */
 	http_message_t *hmsg);
 #else
-static UPNP_INLINE void print_http_headers(http_message_t *hmsg)
-{
-	return;
-	hmsg = hmsg;
-}
+#define print_http_headers(hmsg) do {} while (0)
 #endif
 
 #ifdef __cplusplus

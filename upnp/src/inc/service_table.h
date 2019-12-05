@@ -214,16 +214,7 @@ void printService(
 	/*! [in] Debug module specified to the print function. */
 	Dbg_Module module);
 #else
-static UPNP_INLINE void printService(
-	service_info *service,
-	Upnp_LogLevel level,
-	Dbg_Module module)
-{
-	return;
-	service = service;
-	level = level;
-	module = module;
-}
+#define printService(service, level, module) do {} while (0)
 #endif
 
 /*!
@@ -239,16 +230,7 @@ void printServiceList(
 	/*! [in] Debug module specified to the print function. */
 	Dbg_Module module);
 #else
-static UPNP_INLINE void printServiceList(
-	service_info *service,
-	Upnp_LogLevel level,
-	Dbg_Module module)
-{
-	return;
-	service = service;
-	level = level;
-	module = module;
-}
+#define printServiceList(service, level, module) do {} while (0)
 #endif
 
 /*!
@@ -264,16 +246,7 @@ void printServiceTable(
 	/*! [in] Debug module specified to the print function. */
 	Dbg_Module module);
 #else
-static UPNP_INLINE void printServiceTable(
-	service_table *table,
-	Upnp_LogLevel level,
-	Dbg_Module module)
-{
-	return;
-	table = table;
-	level = level;
-	module = module;
-}
+#define printServiceTable(table, level, module) do {} while (0)
 #endif
 
 /*!

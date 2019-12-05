@@ -813,6 +813,7 @@ void TvCtrlPointAddDevice(
 void TvStateUpdate(char *UDN, int Service, IXML_Document *ChangedVariables,
 		   char **State)
 {
+	(void)UDN;
 	IXML_NodeList *properties;
 	IXML_NodeList *variables;
 	IXML_Element *property;
@@ -865,7 +866,6 @@ void TvStateUpdate(char *UDN, int Service, IXML_Document *ChangedVariables,
 		ixmlNodeList_free(properties);
 	}
 	return;
-	UDN = UDN;
 }
 
 /********************************************************************************
@@ -932,6 +932,7 @@ void TvCtrlPointHandleSubscribeUpdate(
 	const Upnp_SID sid,
 	int timeout)
 {
+	(void)timeout;
 	struct TvDeviceNode *tmpdevnode;
 	int service;
 
@@ -958,7 +959,6 @@ void TvCtrlPointHandleSubscribeUpdate(
 	ithread_mutex_unlock(&DeviceListMutex);
 
 	return;
-	timeout = timeout;
 }
 
 void TvCtrlPointHandleGetVar(
@@ -1006,6 +1006,7 @@ void TvCtrlPointHandleGetVar(
  ********************************************************************************/
 int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, const void *Event, void *Cookie)
 {
+	(void)Cookie;
 	int errCode = 0;
 
 	SampleUtil_PrintEvent(EventType, Event);
@@ -1140,7 +1141,6 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType EventType, const void *Event,
 	}
 
 	return 0;
-	Cookie = Cookie;
 }
 
 void TvCtrlPointVerifyTimeouts(int incr)
@@ -1196,6 +1196,8 @@ void TvCtrlPointVerifyTimeouts(int incr)
 static int TvCtrlPointTimerLoopRun = 1;
 void *TvCtrlPointTimerLoop(void *args)
 {
+	(void)args;
+
 	/* how often to verify the timeouts, in seconds */
 	int incr = 30;
 
@@ -1205,7 +1207,6 @@ void *TvCtrlPointTimerLoop(void *args)
 	}
 
 	return NULL;
-	args = args;
 }
 
 /*!
@@ -1459,6 +1460,7 @@ void TvCtrlPointPrintCommands(void)
 
 void *TvCtrlPointCommandLoop(void *args)
 {
+	(void)args;
 	char cmdline[100];
 
 	while (1) {
@@ -1470,7 +1472,6 @@ void *TvCtrlPointCommandLoop(void *args)
 	}
 
 	return NULL;
-	args = args;
 }
 
 int TvCtrlPointProcessCommand(char *cmdline)

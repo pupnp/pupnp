@@ -706,6 +706,7 @@ void soap_device_callback(
 	/*! [in,out] Socket info. */
 	SOCKINFO *info)
 {
+	(void)parser;
 	int err_code;
 	IXML_Document *xml_doc = NULL;
 	soap_devserv_t *soap_info = NULL;
@@ -776,7 +777,6 @@ error_handler:
 				request->minor_version);
 	}
 	return;
-	parser = parser;
 }
 
 #endif /* EXCLUDE_SOAP */
