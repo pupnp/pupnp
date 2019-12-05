@@ -4271,7 +4271,7 @@ void UpnpRemoveAllVirtualDirs(void)
 }
 
 
-int UpnpEnableWebserver(int enable)
+int UpnpEnableWebserver(bool enable)
 {
     int retVal = UPNP_E_SUCCESS;
 
@@ -4308,7 +4308,7 @@ int UpnpEnableWebserver(int enable)
  *
  * \return 1, if webserver is enabled or 0, if webserver is disabled.
  */
-int UpnpIsWebserverEnabled(void)
+bool UpnpIsWebserverEnabled(void)
 {
 	if (UpnpSdkInit != 1) {
 		return 0;

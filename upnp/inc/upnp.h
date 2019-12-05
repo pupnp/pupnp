@@ -46,6 +46,7 @@
 #include "UpnpGlobal.h"
 #include "UpnpInet.h"
 
+#include <stdbool.h>
 /*
  * \todo Document the exact reason of these include files and solve this
  * include mess in an include file like UpnpTime.h
@@ -2723,17 +2724,17 @@ EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback);
  *       \li \c UPNP_E_INVALID_ARGUMENT: \b enable is not valid.
  */
 EXPORT_SPEC int UpnpEnableWebserver(
-	/*! [in] \c TRUE to enable, \c FALSE to disable. */
-	int enable);
+	/*! [in] \c true to enable, \c false to disable. */
+	bool enable);
 
 /*!
- * \brief Returns \c TRUE if the webserver is enabled, or \c FALSE if it is not.
+ * \brief Returns \c true if the webserver is enabled, or \c false if it is not.
  *
  *  \return An integer representing one of the following:
- *       \li \c TRUE: The webserver is enabled.
- *       \li \c FALSE: The webserver is not enabled
+ *       \li \c true: The webserver is enabled.
+ *       \li \c false: The webserver is not enabled
  */
-EXPORT_SPEC int UpnpIsWebserverEnabled(void);
+EXPORT_SPEC bool UpnpIsWebserverEnabled(void);
 
 /*!
  * \brief Adds a virtual directory mapping.
