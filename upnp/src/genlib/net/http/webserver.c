@@ -316,7 +316,7 @@ static UPNP_INLINE int get_content_type(
 	/*! [in] . */
 	const char *filename,
 	/*! [out] . */
-	OUT UpnpFileInfo *fileInfo)
+	UpnpFileInfo *fileInfo)
 {
 	const char *extension;
 	const char *type;
@@ -521,7 +521,7 @@ static int get_file_info(
 	/*! [out] File information object having file attributes such as filelength,
 	 * when was the file last modified, whether a file or a directory and
 	 * whether the file or directory is readable. */
-	OUT UpnpFileInfo *info)
+	UpnpFileInfo *info)
 {
 	int code;
 	struct stat s;
@@ -1540,7 +1540,7 @@ ExitFunction:
 	return ret_code;
 }
 
-void web_server_callback(http_parser_t *parser, INOUT http_message_t *req,
+void web_server_callback(http_parser_t *parser, /* INOUT */ http_message_t *req,
 	SOCKINFO *info)
 {
 	int ret;

@@ -615,7 +615,7 @@ int TvDeviceSetChannel(IXML_Document * in, IXML_Document ** out,
 	}
 }
 
-int IncrementChannel(int incr, IN IXML_Document * in, IXML_Document ** out,
+int IncrementChannel(int incr, IXML_Document * in, IXML_Document ** out,
 		     const char **errorString)
 {
 	(void)in;
@@ -940,12 +940,12 @@ int TvDeviceSetTint(IXML_Document * in, IXML_Document ** out,
  * Parameters:
  *   incr -- The increment by which to change the tint.
  *   
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
+ *    [in] IXML_Document * in -  action request document
+ *    [out] IXML_Document **out - action result document
+ *    [out] char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
-int IncrementTint(IN int incr, IN IXML_Document *in, OUT IXML_Document **out,
-		  OUT const char **errorString)
+int IncrementTint(int incr, IXML_Document *in, IXML_Document **out,
+		  const char **errorString)
 {
 	(void)in;
 	int curtint;
@@ -997,13 +997,13 @@ int IncrementTint(IN int incr, IN IXML_Document *in, OUT IXML_Document **out,
  *
  * Parameters:
  *   
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
+ *    [in]  IXML_Document * in -  action request document
+ *    [out] IXML_Document **out - action result document
+ *    [out] char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceIncreaseTint(IN IXML_Document *in, OUT IXML_Document **out,
-	OUT const char **errorString)
+int TvDeviceIncreaseTint(IXML_Document *in, IXML_Document **out,
+	const char **errorString)
 {
 	return IncrementTint(1, in, out, errorString);
 }
@@ -1016,13 +1016,13 @@ int TvDeviceIncreaseTint(IN IXML_Document *in, OUT IXML_Document **out,
  *
  * Parameters:
  *  
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
+ *    [in]  IXML_Document * in -  action request document
+ *    [out] IXML_Document **out - action result document
+ *    [out] char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceDecreaseTint(IN IXML_Document *in, OUT IXML_Document **out,
-	OUT const char **errorString)
+int TvDeviceDecreaseTint(IXML_Document *in, IXML_Document **out,
+	const char **errorString)
 {
 	return IncrementTint(-1, in, out, errorString);
 }
@@ -1037,13 +1037,13 @@ int TvDeviceDecreaseTint(IN IXML_Document *in, OUT IXML_Document **out,
  *
  * Parameters:
  *   
- *    IXML_Document * in -  action request document
- *    IXML_Document **out - action result document
- *    char **errorString - errorString (in case action was unsuccessful)
+ *    [in]  IXML_Document * in -  action request document
+ *    [out] IXML_Document **out - action result document
+ *    [out] char **errorString - errorString (in case action was unsuccessful)
  *
  ****************************************************************************/
-int TvDeviceSetContrast(IN IXML_Document *in, OUT IXML_Document **out,
-	OUT const char **errorString)
+int TvDeviceSetContrast(IXML_Document *in, IXML_Document **out,
+	const char **errorString)
 {
 	char *value = NULL;
 	int contrast = -1;

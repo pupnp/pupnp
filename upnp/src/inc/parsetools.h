@@ -50,8 +50,8 @@ extern "C" {
  * \return boolean.
  */
 int has_xml_content_type(
-	/*! HTTP Message object. */
-	IN http_message_t *hmsg);
+	/*! [in] HTTP Message object. */
+	http_message_t *hmsg);
 
 #ifdef __cplusplus
 } /* extern C */

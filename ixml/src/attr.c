@@ -37,7 +37,7 @@
 #include <string.h>
 
 
-void ixmlAttr_init(IN IXML_Attr *attr)
+void ixmlAttr_init(IXML_Attr *attr)
 {
 	if (attr != NULL) {
 		memset(attr, 0, sizeof (IXML_Attr));
@@ -45,7 +45,7 @@ void ixmlAttr_init(IN IXML_Attr *attr)
 }
 
 
-void ixmlAttr_free(IN IXML_Attr *attr)
+void ixmlAttr_free(IXML_Attr *attr)
 {
 	if (attr != NULL) {
 		ixmlNode_free((IXML_Node *)attr);

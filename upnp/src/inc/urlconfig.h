@@ -65,11 +65,11 @@ extern "C" {
  * 	UPNP_E_SUCCESS - On Success
  * 	UPNP_E_OUTOF_MEMORY - Default Error
  ****************************************************************************/
-int configure_urlbase( INOUT IXML_Document *doc,
-	IN const struct sockaddr* serverAddr,
-	IN const char* alias,
-	IN time_t last_modified,
-	OUT char docURL[LINE_SIZE]);
+int configure_urlbase( IXML_Document *doc,
+	const struct sockaddr* serverAddr,
+	const char* alias,
+	time_t last_modified,
+	char docURL[LINE_SIZE]);
 
 
 #ifdef __cplusplus

@@ -129,7 +129,7 @@ str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES] = {
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE void scanner_init(OUT scanner_t *scanner, IN membuffer *bufptr)
+static UPNP_INLINE void scanner_init(scanner_t *scanner, membuffer *bufptr)
 {
 	scanner->cursor = (size_t)0;
 	scanner->msg = bufptr;
@@ -145,7 +145,7 @@ static UPNP_INLINE void scanner_init(OUT scanner_t *scanner, IN membuffer *bufpt
 * Description :	Determines if the passed value is a separator
 *
 ************************************************************************/
-static UPNP_INLINE int is_separator_char(IN int c)
+static UPNP_INLINE int is_separator_char(int c)
 {
 	return strchr(" \t()<>@,;:\\\"/[]?={}", c) != 0;
 }
@@ -159,7 +159,7 @@ static UPNP_INLINE int is_separator_char(IN int c)
 * Description :	Determines if the passed value is permissible in token
 *
 ************************************************************************/
-static UPNP_INLINE int is_identifier_char(IN int c)
+static UPNP_INLINE int is_identifier_char(int c)
 {
     return c >= 32 && c <= 126 && !is_separator_char(c);
 }
@@ -173,7 +173,7 @@ static UPNP_INLINE int is_identifier_char(IN int c)
 * Description :	Determines if the passed value is a control character
 *
 ************************************************************************/
-static UPNP_INLINE int is_control_char(IN int c)
+static UPNP_INLINE int is_control_char(int c)
 {
     return (c >= 0 && c <= 31) || c == 127;
 }
@@ -187,7 +187,7 @@ static UPNP_INLINE int is_control_char(IN int c)
 * Description :	Determines if the passed value is permissible in qdtext
 *
 ************************************************************************/
-static UPNP_INLINE int is_qdtext_char(IN int c)
+static UPNP_INLINE int is_qdtext_char(int c)
 {
 	/* we don't check for this; it's checked in get_token() */
 	assert( c != '"' );
@@ -219,9 +219,9 @@ static UPNP_INLINE int is_qdtext_char(IN int c)
 * Note :
 ************************************************************************/
 static parse_status_t scanner_get_token(
-	INOUT scanner_t *scanner,
-	OUT memptr *token,
-	OUT token_type_t *tok_type)
+	scanner_t *scanner,
+	memptr *token,
+	token_type_t *tok_type)
 {
 	char *cursor;
 	char *null_terminator;	/* point to null-terminator in buffer */
@@ -339,7 +339,7 @@ static parse_status_t scanner_get_token(
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE char *scanner_get_str(IN scanner_t * scanner)
+static UPNP_INLINE char *scanner_get_str(scanner_t * scanner)
 {
 	return scanner->msg->buf + scanner->cursor;
 }
@@ -401,7 +401,7 @@ static void httpheader_free(void *msg)
 *
 * Note :
 ************************************************************************/
-void httpmsg_init(INOUT http_message_t *msg)
+void httpmsg_init(http_message_t *msg)
 {
     msg->initialized = 1;
     msg->entity.buf = NULL;
@@ -423,7 +423,7 @@ void httpmsg_init(INOUT http_message_t *msg)
 *
 * Note :
 ************************************************************************/
-void httpmsg_destroy( INOUT http_message_t * msg )
+void httpmsg_destroy( http_message_t * msg )
 {
     assert( msg != NULL );
 
@@ -452,8 +452,8 @@ void httpmsg_destroy( INOUT http_message_t * msg )
 * Note :
 ************************************************************************/
 http_header_t *httpmsg_find_hdr_str(
-	IN http_message_t *msg,
-	IN const char *header_name)
+	http_message_t *msg,
+	const char *header_name)
 {
     http_header_t *header;
 
@@ -489,9 +489,9 @@ http_header_t *httpmsg_find_hdr_str(
 * Note :
 ************************************************************************/
 http_header_t *httpmsg_find_hdr(
-	IN http_message_t *msg,
-	IN int header_name_id,
-	OUT memptr *value)
+	http_message_t *msg,
+	int header_name_id,
+	memptr *value)
 {
     http_header_t header;       /* temp header for searching */
     ListNode *node;
@@ -524,7 +524,7 @@ http_header_t *httpmsg_find_hdr(
 *	PARSE_INCOMPLETE		-- not enuf chars to get a token
 *	PARSE_FAILURE			-- bad msg format
 ************************************************************************/
-static UPNP_INLINE parse_status_t skip_blank_lines(INOUT scanner_t *scanner)
+static UPNP_INLINE parse_status_t skip_blank_lines(scanner_t *scanner)
 {
 	memptr token;
 	token_type_t tok_type;
@@ -559,7 +559,7 @@ static UPNP_INLINE parse_status_t skip_blank_lines(INOUT scanner_t *scanner)
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE parse_status_t skip_lws(INOUT scanner_t *scanner)
+static UPNP_INLINE parse_status_t skip_lws(scanner_t *scanner)
 {
     memptr token;
     token_type_t tok_type;
@@ -616,8 +616,8 @@ static UPNP_INLINE parse_status_t skip_lws(INOUT scanner_t *scanner)
 * Note :
 ************************************************************************/
 static UPNP_INLINE parse_status_t match_non_ws_string(
-	INOUT scanner_t *scanner,
-	OUT memptr *str)
+	scanner_t *scanner,
+	memptr *str)
 {
     memptr token;
     token_type_t tok_type;
@@ -684,8 +684,8 @@ static UPNP_INLINE parse_status_t match_non_ws_string(
 * Note :
 ************************************************************************/
 static UPNP_INLINE parse_status_t match_raw_value(
-	INOUT scanner_t * scanner,
-	OUT memptr *raw_value)
+	scanner_t * scanner,
+	memptr *raw_value)
 {
     memptr token;
     token_type_t tok_type;
@@ -775,9 +775,9 @@ static UPNP_INLINE parse_status_t match_raw_value(
 *   PARSE_INCOMPLETE
 ************************************************************************/
 static UPNP_INLINE parse_status_t match_int(
-	INOUT scanner_t *scanner,
-	IN int base,
-	OUT int *value)
+	scanner_t *scanner,
+	int base,
+	int *value)
 {
 	memptr token;
 	token_type_t tok_type;
@@ -829,8 +829,8 @@ static UPNP_INLINE parse_status_t match_int(
 *   PARSE_INCOMPLETE
 ************************************************************************/
 static UPNP_INLINE parse_status_t
-read_until_crlf( INOUT scanner_t * scanner,
-		 OUT memptr * str )
+read_until_crlf( scanner_t * scanner,
+		 memptr * str )
 {
     memptr token;
     token_type_t tok_type;
@@ -875,9 +875,9 @@ read_until_crlf( INOUT scanner_t * scanner,
 *   PARSE_INCOMPLETE
 ************************************************************************/
 static UPNP_INLINE parse_status_t
-match_char( INOUT scanner_t * scanner,
-	    IN char c,
-	    IN int case_sensitive )
+match_char( scanner_t * scanner,
+	    char c,
+	    int case_sensitive )
 {
     char scan_char;
 
@@ -952,8 +952,8 @@ match_char( INOUT scanner_t * scanner,
 * Note :
 ************************************************************************/
 static parse_status_t vfmatch(
-	INOUT scanner_t *scanner,
-	IN const char *fmt,
+	scanner_t *scanner,
+	const char *fmt,
 	va_list argp)
 {
     char c;
@@ -1135,8 +1135,8 @@ static parse_status_t vfmatch(
 *   PARSE_FAILURE		- bad input
 ************************************************************************/
 static parse_status_t match(
-	INOUT scanner_t *scanner,
-	IN const char *fmt,
+	scanner_t *scanner,
+	const char *fmt,
 	...)
 {
 	parse_status_t ret_code;
@@ -1168,9 +1168,9 @@ static parse_status_t match(
 *   PARSE_INCOMPLETE
 ************************************************************************/
 parse_status_t
-matchstr( IN char *str,
-	  IN size_t slen,
-	  IN const char *fmt,
+matchstr( char *str,
+	  size_t slen,
+	  const char *fmt,
 	  ... )
 {
     parse_status_t ret_code;
@@ -1216,7 +1216,7 @@ matchstr( IN char *str,
 *	void
 ************************************************************************/
 static UPNP_INLINE void
-parser_init( OUT http_parser_t * parser )
+parser_init( http_parser_t * parser )
 {
     memset( parser, 0, sizeof( http_parser_t ) );
 
@@ -1244,7 +1244,7 @@ parser_init( OUT http_parser_t * parser )
 *	PARSE_NO_MATCH
 ************************************************************************/
 static parse_status_t
-parser_parse_requestline( INOUT http_parser_t * parser )
+parser_parse_requestline( http_parser_t * parser )
 {
     parse_status_t status;
     http_message_t *hmsg = &parser->msg;
@@ -1366,7 +1366,7 @@ parser_parse_requestline( INOUT http_parser_t * parser )
 *	PARSE_INCOMPLETE
 *	PARSE_NO_MATCH
 ************************************************************************/
-parse_status_t parser_parse_responseline(INOUT http_parser_t *parser)
+parse_status_t parser_parse_responseline(http_parser_t *parser)
 {
 	parse_status_t status;
 	http_message_t *hmsg = &parser->msg;
@@ -1445,7 +1445,7 @@ parse_status_t parser_parse_responseline(INOUT http_parser_t *parser)
 *	PARSE_INCOMPLETE
 *	PARSE_NO_MATCH
 ************************************************************************/
-parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
+parse_status_t parser_parse_headers(http_parser_t *parser)
 {
 	parse_status_t status;
 	memptr token;
@@ -1587,7 +1587,7 @@ parse_status_t parser_parse_headers(INOUT http_parser_t *parser)
 *	 PARSE_SUCCESS
 ************************************************************************/
 static UPNP_INLINE parse_status_t
-parser_parse_entity_using_clen( INOUT http_parser_t * parser )
+parser_parse_entity_using_clen( http_parser_t * parser )
 {
     /*int entity_length; */
 
@@ -1636,7 +1636,7 @@ parser_parse_entity_using_clen( INOUT http_parser_t * parser )
 *	 PARSE_NO_MATCH
 ************************************************************************/
 static UPNP_INLINE parse_status_t parser_parse_chunky_body(
-	INOUT http_parser_t *parser)
+	http_parser_t *parser)
 {
 	parse_status_t status;
 	size_t save_pos;
@@ -1681,7 +1681,7 @@ static UPNP_INLINE parse_status_t parser_parse_chunky_body(
 *	 PARSE_SUCCESS
 ************************************************************************/
 static UPNP_INLINE parse_status_t
-parser_parse_chunky_headers( INOUT http_parser_t * parser )
+parser_parse_chunky_headers( http_parser_t * parser )
 {
     parse_status_t status;
     size_t save_pos;
@@ -1721,7 +1721,7 @@ parser_parse_chunky_headers( INOUT http_parser_t * parser )
 *	 PARSE_CONTINUE_1
 ************************************************************************/
 static UPNP_INLINE parse_status_t
-parser_parse_chunky_entity( INOUT http_parser_t * parser )
+parser_parse_chunky_entity( http_parser_t * parser )
 {
     scanner_t *scanner = &parser->scanner;
     parse_status_t status;
@@ -1772,7 +1772,7 @@ parser_parse_chunky_entity( INOUT http_parser_t * parser )
 *	 PARSE_INCOMPLETE_ENTITY
 ************************************************************************/
 static UPNP_INLINE parse_status_t
-parser_parse_entity_until_close( INOUT http_parser_t * parser )
+parser_parse_entity_until_close( http_parser_t * parser )
 {
     size_t cursor;
 
@@ -1808,7 +1808,7 @@ parser_parse_entity_until_close( INOUT http_parser_t * parser )
 *	 PARSE_SUCCESS	-- no more reading to do
 ************************************************************************/
 UPNP_INLINE parse_status_t
-parser_get_entity_read_method( INOUT http_parser_t * parser )
+parser_get_entity_read_method( http_parser_t * parser )
 {
     http_message_t *hmsg = &parser->msg;
     int response_code;
@@ -1911,7 +1911,7 @@ parser_get_entity_read_method( INOUT http_parser_t * parser )
 *	 PARSE_SUCCESS	-- no more reading to do
 ************************************************************************/
 UPNP_INLINE parse_status_t
-parser_parse_entity( INOUT http_parser_t * parser )
+parser_parse_entity( http_parser_t * parser )
 {
     parse_status_t status;
 
@@ -1965,7 +1965,7 @@ parser_parse_entity( INOUT http_parser_t * parser )
 *	 void
 ************************************************************************/
 void
-parser_request_init( OUT http_parser_t * parser )
+parser_request_init( http_parser_t * parser )
 {
     parser_init( parser );
     parser->msg.is_request = TRUE;
@@ -1985,8 +1985,8 @@ parser_request_init( OUT http_parser_t * parser )
 *	 void
 ************************************************************************/
 void
-parser_response_init( OUT http_parser_t * parser,
-		      IN http_method_t request_method )
+parser_response_init( http_parser_t * parser,
+		      http_method_t request_method )
 {
     parser_init( parser );
     parser->msg.is_request = FALSE;
@@ -2012,7 +2012,7 @@ parser_response_init( OUT http_parser_t * parser,
 *	PARSE_NO_MATCH
 ************************************************************************/
 parse_status_t
-parser_parse( INOUT http_parser_t * parser )
+parser_parse( http_parser_t * parser )
 {
     parse_status_t status;
 
@@ -2074,9 +2074,9 @@ parser_parse( INOUT http_parser_t * parser )
 *	PARSE_NO_MATCH
 ************************************************************************/
 parse_status_t
-parser_append( INOUT http_parser_t * parser,
-	       IN const char *buf,
-	       IN size_t buf_length )
+parser_append( http_parser_t * parser,
+	       const char *buf,
+	       size_t buf_length )
 {
     int ret_code;
 
@@ -2106,7 +2106,7 @@ parser_append( INOUT http_parser_t * parser,
 * Returns:
 *	 int
 ************************************************************************/
-int raw_to_int(IN memptr *raw_value, IN int base)
+int raw_to_int(memptr *raw_value, int base)
 {
 	long num;
 	char *end_ptr;
@@ -2140,7 +2140,7 @@ int raw_to_int(IN memptr *raw_value, IN int base)
 * Returns:
 *	 int - index at which the substring is found.
 ************************************************************************/
-int raw_find_str(IN memptr *raw_value, IN const char *str)
+int raw_find_str(memptr *raw_value, const char *str)
 {
     char c;
     char *ptr;
@@ -2183,7 +2183,7 @@ int raw_find_str(IN memptr *raw_value, IN const char *str)
 * Returns:
 *	 const char* ptr - Ptr to the HTTP Method
 ************************************************************************/
-const char *method_to_str(IN http_method_t method)
+const char *method_to_str(http_method_t method)
 {
     int index;
 

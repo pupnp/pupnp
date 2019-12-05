@@ -245,7 +245,7 @@ extern "C" {
 *
 *	Note :
 ************************************************************************/
-void httpmsg_init( INOUT http_message_t* msg );
+void httpmsg_init( http_message_t* msg );
 
 /************************************************************************
 *	Function :	httpmsg_destroy
@@ -259,7 +259,7 @@ void httpmsg_init( INOUT http_message_t* msg );
 *
 *	Note :
 ************************************************************************/
-void httpmsg_destroy( INOUT http_message_t* msg );
+void httpmsg_destroy( http_message_t* msg );
 
 /************************************************************************
 *	Function :	httpmsg_find_hdr_str
@@ -275,8 +275,8 @@ void httpmsg_destroy( INOUT http_message_t* msg );
 *			 NULL on failure
 *	Note :
 ************************************************************************/
-http_header_t* httpmsg_find_hdr_str( IN http_message_t* msg,
-			IN const char* header_name );
+http_header_t* httpmsg_find_hdr_str( http_message_t* msg,
+			const char* header_name );
 
 /************************************************************************
 *	Function :	httpmsg_find_hdr
@@ -293,8 +293,8 @@ http_header_t* httpmsg_find_hdr_str( IN http_message_t* msg,
 *
 *	Note :
 ************************************************************************/
-http_header_t* httpmsg_find_hdr( IN http_message_t* msg, 
-			IN int header_name_id, OUT memptr* value );
+http_header_t* httpmsg_find_hdr( http_message_t* msg, 
+			int header_name_id, memptr* value );
 
 /************************************************************************
 * Function: parser_request_init											
@@ -307,7 +307,7 @@ http_header_t* httpmsg_find_hdr( IN http_message_t* msg,
 * Returns:																
 *	 void																
 ************************************************************************/
-void parser_request_init( OUT http_parser_t* parser );
+void parser_request_init( http_parser_t* parser );
 
 /************************************************************************
 * Function: parser_response_init										
@@ -321,8 +321,8 @@ void parser_request_init( OUT http_parser_t* parser );
 * Returns:																
 *	 void																
 ************************************************************************/
-void parser_response_init( OUT http_parser_t* parser, 
-			   IN http_method_t request_method );
+void parser_response_init( http_parser_t* parser, 
+			   http_method_t request_method );
 
 /************************************************************************
 * Function: parser_parse												
@@ -336,7 +336,7 @@ void parser_response_init( OUT http_parser_t* parser,
 * Returns:																
 *	 void																
 ************************************************************************/
-parse_status_t parser_parse(INOUT http_parser_t * parser);
+parse_status_t parser_parse(http_parser_t * parser);
 
 /************************************************************************
 * Function: parser_parse_responseline									
@@ -351,7 +351,7 @@ parse_status_t parser_parse(INOUT http_parser_t * parser);
 *	PARSE_SUCCESS														
 *	PARSE_FAILURE														
 ************************************************************************/
-parse_status_t parser_parse_responseline(INOUT http_parser_t *parser);
+parse_status_t parser_parse_responseline(http_parser_t *parser);
 
 /************************************************************************
 * Function: parser_parse_headers									
@@ -366,7 +366,7 @@ parse_status_t parser_parse_responseline(INOUT http_parser_t *parser);
 *	PARSE_SUCCESS														
 *	PARSE_FAILURE														
 ************************************************************************/
-parse_status_t parser_parse_headers(INOUT http_parser_t *parser);
+parse_status_t parser_parse_headers(http_parser_t *parser);
 
 /************************************************************************
 * Function: parser_parse_entity											
@@ -381,7 +381,7 @@ parse_status_t parser_parse_headers(INOUT http_parser_t *parser);
 * 	 PARSE_FAILURE														
 *	 PARSE_COMPLETE	-- no more reading to do							
 ************************************************************************/
-parse_status_t parser_parse_entity(INOUT http_parser_t *parser);
+parse_status_t parser_parse_entity(http_parser_t *parser);
 
 /************************************************************************
 * Function: parser_get_entity_read_method								
@@ -396,7 +396,7 @@ parse_status_t parser_parse_entity(INOUT http_parser_t *parser);
 * 	 PARSE_FAILURE														
 *	 PARSE_COMPLETE	-- no more reading to do							
 ************************************************************************/
-parse_status_t parser_get_entity_read_method( INOUT http_parser_t* parser );
+parse_status_t parser_get_entity_read_method( http_parser_t* parser );
 
 /************************************************************************
 * Function: parser_append												
@@ -413,9 +413,9 @@ parse_status_t parser_get_entity_read_method( INOUT http_parser_t* parser );
 * Returns:																
 *	 void																
 ************************************************************************/
-parse_status_t parser_append( INOUT http_parser_t* parser, 
-				 IN const char* buf,
-				 IN size_t buf_length );
+parse_status_t parser_append( http_parser_t* parser, 
+				 const char* buf,
+				 size_t buf_length );
 
 /************************************************************************
 * Function: matchstr													
@@ -434,7 +434,7 @@ parse_status_t parser_append( INOUT http_parser_t* parser,
 *   PARSE_NO_MATCH -- failure to match pattern 'fmt'					
 *   PARSE_FAILURE	-- 'str' is bad input							
 ************************************************************************/
-parse_status_t matchstr( IN char *str, IN size_t slen, IN const char* fmt, ... );
+parse_status_t matchstr( char *str, size_t slen, const char* fmt, ... );
 
 /************************************************************************
 * Function: raw_to_int													
@@ -448,7 +448,7 @@ parse_status_t matchstr( IN char *str, IN size_t slen, IN const char* fmt, ... )
 * Returns:																
 *	 int																
 ************************************************************************/
-int raw_to_int( IN memptr* raw_value, int base );
+int raw_to_int( memptr* raw_value, int base );
 
 /************************************************************************
 * Function: raw_find_str
@@ -464,7 +464,7 @@ int raw_to_int( IN memptr* raw_value, int base );
 * Returns:
 *	 int - index at which the substring is found.						
 ************************************************************************/
-int raw_find_str( IN memptr* raw_value, IN const char* str );
+int raw_find_str( memptr* raw_value, const char* str );
 
 /************************************************************************
 * Function: method_to_str												
@@ -478,7 +478,7 @@ int raw_find_str( IN memptr* raw_value, IN const char* str );
 * Returns:																
 *	 const char* ptr - Ptr to the HTTP Method
 ************************************************************************/
-const char* method_to_str( IN http_method_t method );
+const char* method_to_str( http_method_t method );
 
 /*!
  * \brief Print the HTTP headers.

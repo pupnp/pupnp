@@ -372,9 +372,9 @@ IXML_NodeList *ixmlElement_getElementsByTagName(
 
 
 const DOMString ixmlElement_getAttributeNS(
-	IN IXML_Element *element,
-	IN const DOMString namespaceURI,
-	IN const DOMString localName)
+	/* IN */ IXML_Element *element,
+	/* IN */ const DOMString namespaceURI,
+	/* IN */ const DOMString localName)
 {
 	IXML_Node *attrNode;
 
@@ -562,9 +562,9 @@ IXML_Attr *ixmlElement_getAttributeNodeNS(
 
 
 int ixmlElement_setAttributeNodeNS(
-	IN IXML_Element *element,
-	IN IXML_Attr *newAttr,
-	OUT IXML_Attr **rtAttr)
+	/* IN */ IXML_Element *element,
+	/* IN */ IXML_Attr *newAttr,
+	/* OUT */ IXML_Attr **rtAttr)
 {
 	IXML_Node *attrNode = NULL;
 	IXML_Node *node = NULL;

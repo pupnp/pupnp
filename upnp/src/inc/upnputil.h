@@ -40,20 +40,6 @@
 #include "upnp.h"
 #include <errno.h>
 
-/* usually used to specify direction of parameters in functions */
-#ifndef IN
-	#define IN
-#endif
-
-#ifndef OUT
-	#define OUT
-#endif
-
-#ifndef INOUT
-	#define INOUT
-#endif
-
-
 #define GEMD_OUT_OF_MEMORY -1
 #define EVENT_TIMEDOUT -2
 #define EVENT_TERMINATE	-3
