@@ -84,7 +84,7 @@ static void ixmlDocument_setOwnerDocument(
 int ixmlDocument_importNode(
 	IXML_Document *doc,
 	IXML_Node *importNode,
-	BOOL deep,
+	int deep,
 	IXML_Node **rtNode)
 {
 	unsigned short nodeType;
