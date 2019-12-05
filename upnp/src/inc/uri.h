@@ -80,7 +80,6 @@ extern "C" {
 #define RESERVED ";/?:@&=+$,{}"
 
 #define HTTP_SUCCESS 1
-#define FALSE 0
 #define TAB 9
 #define CR 13
 #define LF 10
