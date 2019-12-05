@@ -118,7 +118,7 @@ int ixmlElement_setAttribute(
 		goto ErrorHandler;
 	}
 
-	if (Parser_isValidXmlName(name) == FALSE) {
+	if (Parser_isValidXmlName(name) == false) {
 		errCode = IXML_INVALID_CHARACTER_ERR;
 		goto ErrorHandler;
 	}
@@ -307,7 +307,7 @@ static IXML_Node *ixmlElement_findAttributeNode(
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
 		/* parentNode, prevSib, nextSib and ownerDocument doesn't matter */
-		if (ixmlNode_compare(attrNode, oldAttrNode) == TRUE) {
+		if (ixmlNode_compare(attrNode, oldAttrNode) == true) {
 			/* Found it */
 			break;
 		} else {
@@ -413,7 +413,7 @@ int ixmlElement_setAttributeNS(
 		return IXML_INVALID_PARAMETER;
 	}
 
-	if (Parser_isValidXmlName(qualifiedName) == FALSE) {
+	if (Parser_isValidXmlName(qualifiedName) == false) {
 		return IXML_INVALID_CHARACTER_ERR;
 	}
 
@@ -655,30 +655,30 @@ IXML_NodeList *ixmlElement_getElementsByTagNameNS(
 }
 
 
-BOOL ixmlElement_hasAttribute(
+bool ixmlElement_hasAttribute(
 	IXML_Element *element,
 	const DOMString name)
 {
 	IXML_Node *attrNode = NULL;
 
 	if (element == NULL || name == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
 		if (strcmp(attrNode->nodeName, name) == 0) {
-			return TRUE;
+			return true;
 		} else {
 			attrNode = attrNode->nextSibling;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 
-BOOL ixmlElement_hasAttributeNS(
+bool ixmlElement_hasAttributeNS(
 	IXML_Element * element,
 	const DOMString namespaceURI,
 	const DOMString localName )
@@ -686,20 +686,20 @@ BOOL ixmlElement_hasAttributeNS(
 	IXML_Node *attrNode = NULL;
 
 	if (element == NULL || namespaceURI == NULL || localName == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
 		if (strcmp(attrNode->localName, localName) == 0 &&
 		    strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
-			return TRUE;
+			return true;
 		} else {
 			attrNode = attrNode->nextSibling;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 

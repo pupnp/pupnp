@@ -365,23 +365,23 @@ IXML_Document *ixmlNode_getOwnerDocument(IXML_Node *nodeptr)
 /*!
  * \brief Check if ancestorNode is ancestor of toFind.
  *
- * \return TRUE or FALSE.
+ * \return true or false.
  */
-static BOOL ixmlNode_isAncestor(
+static bool ixmlNode_isAncestor(
 	/*! [in] The candidate to ancestor \b Node. */
 	IXML_Node *ancestorNode,
 	/*! [in] The \b Node to check for an ancestor. */
 	IXML_Node *toFind)
 {
-	BOOL found = FALSE;
+	bool found = false;
 
 	if (ancestorNode != NULL && toFind != NULL) {
 		if (toFind->parentNode == ancestorNode) {
-			return TRUE;
+			return true;
 		} else {
 			found = ixmlNode_isAncestor(
 				ancestorNode->firstChild, toFind);
-			if (found == FALSE) {
+			if (found == false) {
 				found = ixmlNode_isAncestor(
 					ancestorNode->nextSibling, toFind);
 			}
@@ -394,15 +394,15 @@ static BOOL ixmlNode_isAncestor(
 /*!
  * \brief Check whether toFind is a children of nodeptr.
  *
- * \return TRUE or FALSE.
+ * \return true or false.
  */
-static BOOL ixmlNode_isParent(
+static bool ixmlNode_isParent(
 	/*! [in] The candidate to parent \b Node. */
 	IXML_Node *nodeptr,
 	/*! [in] The \b Node to check for his parent. */
 	IXML_Node *toFind)
 {
-	BOOL found = FALSE;
+	bool found = false;
 
 	assert(nodeptr != NULL && toFind != NULL);
 
@@ -416,10 +416,10 @@ static BOOL ixmlNode_isParent(
  * \brief Check to see whether nodeptr allows children of type newChild.    
  *
  * \return
- * 	\li TRUE, if nodeptr can have newChild as children.
- * 	\li FALSE, if nodeptr cannot have newChild as children.
+ * 	\li true, if nodeptr can have newChild as children.
+ * 	\li false, if nodeptr cannot have newChild as children.
  */
-static BOOL ixmlNode_allowChildren(
+static bool ixmlNode_allowChildren(
 	/*! [in] The \b Node to check. */
 	IXML_Node *nodeptr,
 	/*! [in] The child \b Node to check. */
@@ -431,13 +431,13 @@ static BOOL ixmlNode_allowChildren(
 	case eATTRIBUTE_NODE:
 	case eTEXT_NODE:
 	case eCDATA_SECTION_NODE:
-		return FALSE;
+		return false;
 
 	case eELEMENT_NODE:
 		switch (newChild->nodeType) {
 		case eATTRIBUTE_NODE:
 		case eDOCUMENT_NODE:
-			return FALSE;
+			return false;
 		default:
 			break;
 		}
@@ -448,14 +448,14 @@ static BOOL ixmlNode_allowChildren(
 		case eELEMENT_NODE:
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 
 	default:
 		break;
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -464,10 +464,10 @@ static BOOL ixmlNode_allowChildren(
  * Parent, sibling and children node are ignored.
  *
  * \return
- * 	\li TRUE, the two nodes are the same.
- * 	\li FALSE, the two nodes are not the same.
+ * 	\li true, the two nodes are the same.
+ * 	\li false, the two nodes are not the same.
  */
-BOOL ixmlNode_compare(
+bool ixmlNode_compare(
 	/*! [in] The first \b Node. */
 	IXML_Node *srcNode,
 	/*! [in] The second \b Node. */
@@ -497,11 +497,11 @@ int ixmlNode_insertBefore(
 		return IXML_INVALID_PARAMETER;
 	}
 	/* whether nodeptr allow children of the type of newChild */
-	if (ixmlNode_allowChildren(nodeptr, newChild) == FALSE) {
+	if (ixmlNode_allowChildren(nodeptr, newChild) == false) {
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
 	/* or if newChild is one of nodeptr's ancestors */
-	if (ixmlNode_isAncestor(newChild, nodeptr) == TRUE) {
+	if (ixmlNode_isAncestor(newChild, nodeptr) == true) {
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
 	/* if newChild was created from a different document */
@@ -509,12 +509,12 @@ int ixmlNode_insertBefore(
 		return IXML_WRONG_DOCUMENT_ERR;
 	}
 	/* if refChild is not a child of nodeptr */
-	if (ixmlNode_isParent(nodeptr, refChild) == FALSE) {
+	if (ixmlNode_isParent(nodeptr, refChild) == false) {
 		return IXML_NOT_FOUND_ERR;
 	}
 
 	if (refChild != NULL) {
-		if (ixmlNode_isParent(nodeptr, newChild) == TRUE) {
+		if (ixmlNode_isParent(nodeptr, newChild) == true) {
 			ixmlNode_removeChild(nodeptr, newChild, &newChild);
 			newChild->nextSibling = NULL;
 			newChild->prevSibling = NULL;
@@ -550,11 +550,11 @@ int ixmlNode_replaceChild(
 	}
 	/* if nodetype of nodeptr does not allow children of the type of newChild
 	 * needs to add later or if newChild is one of nodeptr's ancestors */
-	if (ixmlNode_isAncestor(newChild, nodeptr) == TRUE) {
+	if (ixmlNode_isAncestor(newChild, nodeptr) == true) {
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
 
-	if (ixmlNode_allowChildren(nodeptr, newChild) == FALSE) {
+	if (ixmlNode_allowChildren(nodeptr, newChild) == false) {
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
 	/* if newChild was created from a different document */
@@ -562,7 +562,7 @@ int ixmlNode_replaceChild(
 		return IXML_WRONG_DOCUMENT_ERR;
 	}
 	/* if refChild is not a child of nodeptr */
-	if (ixmlNode_isParent(nodeptr, oldChild) != TRUE) {
+	if (ixmlNode_isParent(nodeptr, oldChild) != true) {
 		return IXML_NOT_FOUND_ERR;
 	}
 
@@ -617,15 +617,15 @@ int ixmlNode_appendChild(IXML_Node *nodeptr, IXML_Node *newChild)
 		return IXML_WRONG_DOCUMENT_ERR;
 	}
 	/* if newChild is an ancestor of nodeptr */
-	if (ixmlNode_isAncestor(newChild, nodeptr) == TRUE) {
+	if (ixmlNode_isAncestor(newChild, nodeptr) == true) {
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
 	/* if nodeptr does not allow to have newChild as children */
-	if (ixmlNode_allowChildren(nodeptr, newChild) == FALSE) {
+	if (ixmlNode_allowChildren(nodeptr, newChild) == false) {
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
 
-	if (ixmlNode_isParent(nodeptr, newChild) == TRUE ) {
+	if (ixmlNode_isParent(nodeptr, newChild) == true ) {
 		ixmlNode_removeChild(nodeptr, newChild, &newChild);
 	}
 	/* set the parent node pointer */
@@ -878,9 +878,9 @@ static IXML_Attr *ixmlNode_cloneAttr(
 }
 
 /*!
- * \brief Return a clone of attribute node, with specified field set to TRUE.
+ * \brief Return a clone of attribute node, with specified field set to true.
  *
- * \return A clone of attribute node, with specified field set to TRUE.
+ * \return A clone of attribute node, with specified field set to true.
  */
 static IXML_Attr *ixmlNode_cloneAttrDirect(
 	/*! [in] The \b Node to clone. */
@@ -892,7 +892,7 @@ static IXML_Attr *ixmlNode_cloneAttrDirect(
 
 	newAttr = ixmlNode_cloneAttr(nodeptr);
 	if (newAttr != NULL) {
-		newAttr->specified = TRUE;
+		newAttr->specified = true;
 	}
 
 	return newAttr;
@@ -924,8 +924,8 @@ static void ixmlNode_setSiblingNodesParent(
 static IXML_Node *ixmlNode_cloneNodeTreeRecursive(
 	/*! [in] Node tree to clone. */
 	IXML_Node *nodeptr,
-	/*! [in] TRUE if you want to clone the tree. */
-	BOOL deep)
+	/*! [in] true if you want to clone the tree. */
+	bool deep)
 {
 	IXML_Node *newNode = NULL;
 	IXML_Element *newElement = NULL;
@@ -1017,8 +1017,8 @@ static IXML_Node *ixmlNode_cloneNodeTreeRecursive(
 static IXML_Node *ixmlNode_cloneNodeTree(
 	/*! [in] Node tree to clone. */
 	IXML_Node *nodeptr,
-	/*! [in] TRUE if you want to clone the tree. */
-	BOOL deep)
+	/*! [in] true if you want to clone the tree. */
+	bool deep)
 {
 	IXML_Node *newNode = NULL;
 	IXML_Element *newElement;
@@ -1079,7 +1079,7 @@ static IXML_Node *ixmlNode_cloneNodeTree(
 
 
 
-IXML_Node *ixmlNode_cloneNode(IXML_Node *nodeptr, BOOL deep)
+IXML_Node *ixmlNode_cloneNode(IXML_Node *nodeptr, bool deep)
 {
 	IXML_Node *newNode;
 	IXML_Attr *newAttrNode;
@@ -1169,30 +1169,30 @@ IXML_NamedNodeMap *ixmlNode_getAttributes(IXML_Node *nodeptr)
 }
 
 
-BOOL ixmlNode_hasChildNodes(IXML_Node *nodeptr)
+bool ixmlNode_hasChildNodes(IXML_Node *nodeptr)
 {
 	if (nodeptr == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	return nodeptr->firstChild != NULL;
 }
 
 
-BOOL ixmlNode_hasAttributes(IXML_Node *nodeptr)
+bool ixmlNode_hasAttributes(IXML_Node *nodeptr)
 {
 	if (nodeptr != NULL) {
 		switch (nodeptr->nodeType) {
 		case eELEMENT_NODE:
 			if (nodeptr->firstAttr != NULL)
-				return TRUE;
+				return true;
 			break;
 		default:
 			break;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 
