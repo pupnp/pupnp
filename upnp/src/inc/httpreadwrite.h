@@ -55,7 +55,7 @@ struct tm *http_gmtime_r(const time_t *clock, struct tm *result);
 #define http_gmtime_r gmtime_r
 #endif
 
-int http_CancelHttpGet(IN void *Handle);
+int http_CancelHttpGet(/* IN */ void *Handle);
 
 /*!
  * \brief Validates URL.
@@ -120,10 +120,10 @@ SOCKET http_Connect(
  *	 UPNP_E_BAD_HTTPMSG
  * 	 UPNP_E_SUCCESS
  ************************************************************************/
-int http_RecvMessage( IN SOCKINFO *info, OUT http_parser_t* parser,
-		IN http_method_t request_method, 
-		IN OUT int* timeout_secs,
-		OUT int* http_error_code );
+int http_RecvMessage( SOCKINFO *info, http_parser_t* parser,
+		http_method_t request_method, 
+		int* timeout_secs,
+		int* http_error_code );
 
 
 /*!
@@ -181,12 +181,12 @@ int http_SendMessage(
  *	Error Codes returned by http_RecvMessage
  ************************************************************************/
 int http_RequestAndResponse(
-	IN uri_type* destination,
-	IN const char* request,
-	IN size_t request_length,
-	IN http_method_t req_method,
-	IN int timeout_secs, 
-	OUT http_parser_t* response );
+	uri_type* destination,
+	const char* request,
+	size_t request_length,
+	http_method_t req_method,
+	int timeout_secs, 
+	http_parser_t* response );
 
 
 /************************************************************************
@@ -222,11 +222,11 @@ int http_RequestAndResponse(
  *	UPNP_E_INVALID_URL
  ************************************************************************/
 int http_Download(
-	IN const char* url, 
-	IN int timeout_secs,
-	OUT char** document,
-	OUT size_t *doc_length,
-	OUT char* content_type );
+	const char* url, 
+	int timeout_secs,
+	char** document,
+	size_t *doc_length,
+	char* content_type );
 
 
 /************************************************************************
@@ -245,9 +245,9 @@ int http_Download(
  *	UPNP_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
 int http_HttpGetProgress(
-	IN void *Handle,
-	OUT size_t *length,
-	OUT size_t *total);
+	void *Handle,
+	size_t *length,
+	size_t *total);
 
 
 /*!
@@ -506,10 +506,10 @@ EXPORT_SPEC int http_CloseHttpConnection(
  *	UPNP_E_TIMEDOUT
  ************************************************************************/
 int http_SendStatusResponse(
-	IN SOCKINFO *info,
-	IN int http_status_code,
-	IN int request_major_version,
-	IN int request_minor_version );
+	SOCKINFO *info,
+	int http_status_code,
+	int request_major_version,
+	int request_minor_version );
 
 /*!
  * \brief Generate an HTTP message based on the format that is specified in
@@ -551,13 +551,13 @@ Format types:
  */
 int http_MakeMessage(
 	/* [in,out] Buffer with the contents of the message. */
-	INOUT membuffer* buf, 
+	membuffer* buf, 
 	/* [in] HTTP major version. */
-	IN int http_major_version,
+	int http_major_version,
 	/* [in] HTTP minor version. */
-	IN int http_minor_version,
+	int http_minor_version,
 	/* [in] Pattern format. */
-	IN const char* fmt,
+	const char* fmt,
 	/* [in] Format arguments. */
 	... );
 
@@ -577,10 +577,10 @@ int http_MakeMessage(
  * Return: void
  ************************************************************************/
 void http_CalcResponseVersion( 
-	IN int request_major_vers,
-	IN int request_minor_vers,
-	OUT int* response_major_vers,
-	OUT int* response_minor_vers );
+	int request_major_vers,
+	int request_minor_vers,
+	int* response_major_vers,
+	int* response_minor_vers );
 
 
 /************************************************************************
@@ -608,14 +608,14 @@ void http_CalcResponseVersion(
  *	UPNP_E_SOCKET_ERROR
  *	UPNP_E_BAD_RESPONSE
  ************************************************************************/
-int http_OpenHttpGetEx(IN const char *url_str,
-		     IN OUT void **Handle,
-		     IN OUT char **contentType,
-		     OUT int *contentLength,
-		     OUT int *httpStatus,
-			 IN int lowRange,
-			 IN int highRange,
-		     IN int timeout);
+int http_OpenHttpGetEx(const char *url_str,
+		     void **Handle,
+		     char **contentType,
+		     int *contentLength,
+		     int *httpStatus,
+			 int lowRange,
+			 int highRange,
+		     int timeout);
 
 
 /************************************************************************
@@ -631,7 +631,7 @@ int http_OpenHttpGetEx(IN const char *url_str,
  * Return:
  *	UPNP_INLINE void
  ************************************************************************/
-void get_sdk_info( OUT char *info, IN size_t infoSize );
+void get_sdk_info( char *info, size_t infoSize );
 
 #ifdef __cplusplus
 }	/* #extern "C" */

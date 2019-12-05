@@ -67,7 +67,7 @@
  */
 static void send_search_result(
 	/* [in] Search reply from the device. */
-	IN void *data)
+	void *data)
 {
 	SSDPResultData *temp = (SSDPResultData *)data;
 
@@ -354,15 +354,15 @@ end_ssdp_handle_ctrlpt_msg:
  */
 static int CreateClientRequestPacket(
 	/*! [in,out] Output string in HTTP format. */
-	INOUT char *RqstBuf,
+	char *RqstBuf,
 	/*! [in] RqstBuf size. */
-	IN size_t RqstBufSize,
+	size_t RqstBufSize,
 	/*! [in] Search Target. */
-	IN int Mx,
+	int Mx,
 	/*! [in] Number of seconds to wait to collect all the responses. */
-	IN char *SearchTarget,
+	char *SearchTarget,
 	/*! [in] search address family. */
-	IN int AddressFamily)
+	int AddressFamily)
 {
 	int rc;
 	char TempBuf[COMMAND_LEN];

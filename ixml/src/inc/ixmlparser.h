@@ -204,7 +204,7 @@ int ixmlNodeList_addToNodeList(
  */
 void ixmlNode_init(
 	/*! [in] The \b Node to iniatialize. */
-	IN IXML_Node *nodeptr);
+	IXML_Node *nodeptr);
 
 
 /*!

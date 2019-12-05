@@ -183,7 +183,7 @@ static int dom_find_deep_node(
 *	Note :The given node must have a text node as its first child
 ****************************************************************************/
 static const DOMString
-get_node_value( IN IXML_Node * node )
+get_node_value( IXML_Node * node )
 {
     IXML_Node *text_node = NULL;
     const DOMString text_value = NULL;
@@ -215,10 +215,10 @@ get_node_value( IN IXML_Node * node )
 *	Note :
 ****************************************************************************/
 static UPNP_INLINE int
-get_host_and_path( IN char *ctrl_url,
-                   OUT const memptr *host,
-                   OUT const memptr *path,
-                   OUT uri_type * url )
+get_host_and_path( char *ctrl_url,
+                   const memptr *host,
+                   const memptr *path,
+                   uri_type * url )
 {
     if( parse_uri( ctrl_url, strlen( ctrl_url ), url ) != HTTP_SUCCESS ) {
         return -1;
@@ -248,8 +248,8 @@ get_host_and_path( IN char *ctrl_url,
 *	Note :
 ****************************************************************************/
 static UPNP_INLINE int
-get_action_name( IN char *action,
-                 OUT memptr * name )
+get_action_name( char *action,
+                 memptr * name )
 {
     memptr dummy;
     int ret_code;
@@ -304,9 +304,9 @@ static UPNP_INLINE int add_man_header(
 *	Note :
 ****************************************************************************/
 static int
-soap_request_and_response( IN membuffer * request,
-                           IN uri_type * destination_url,
-                           OUT http_parser_t * response )
+soap_request_and_response( membuffer * request,
+                           uri_type * destination_url,
+                           http_parser_t * response )
 {
     int ret_code;
 
@@ -365,12 +365,12 @@ soap_request_and_response( IN membuffer * request,
 *	Note :
 ****************************************************************************/
 static int
-get_response_value( IN http_message_t * hmsg,
-                    IN int code,
-                    IN char *name,
-                    OUT int *upnp_error_code,
-                    OUT IXML_Node ** action_value,
-                    OUT DOMString * str_value )
+get_response_value( http_message_t * hmsg,
+                    int code,
+                    char *name,
+                    int *upnp_error_code,
+                    IXML_Node ** action_value,
+                    DOMString * str_value )
 {
 	IXML_Node *node = NULL;
 	IXML_Node *root_node = NULL;
@@ -515,10 +515,10 @@ get_response_value( IN http_message_t * hmsg,
 *	Note :
 ****************************************************************************/
 int
-SoapSendAction( IN char *action_url,
-                IN char *service_type,
-                IN IXML_Document * action_node,
-                OUT IXML_Document ** response_node )
+SoapSendAction( char *action_url,
+                char *service_type,
+                IXML_Document * action_node,
+                IXML_Document ** response_node )
 {
     char *action_str = NULL;
     memptr name;
@@ -655,11 +655,11 @@ error_handler:
 *	Note :
 ****************************************************************************/
 int SoapSendActionEx(
-	IN char *action_url,
-	IN char *service_type,
-	IN IXML_Document * header,
-	IN IXML_Document * action_node,
-	OUT IXML_Document ** response_node )
+	char *action_url,
+	char *service_type,
+	IXML_Document * header,
+	IXML_Document * action_node,
+	IXML_Document ** response_node )
 {
     char *xml_header_str = NULL;
     char *action_str = NULL;
@@ -819,9 +819,9 @@ int SoapSendActionEx(
 *	Note :
 ****************************************************************************/
 int
-SoapGetServiceVarStatus( IN char *action_url,
-                         IN char *var_name,
-                         OUT char **var_value )
+SoapGetServiceVarStatus( char *action_url,
+                         char *var_name,
+                         char **var_value )
 {
     const memptr host;                /* value for HOST header */
     const memptr path;                /* ctrl path in first line in msg */

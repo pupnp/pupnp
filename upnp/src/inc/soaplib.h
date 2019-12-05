@@ -71,10 +71,10 @@ void soap_device_callback(
  * Note:
  ****************************************************************************/
 int SoapSendAction(
-	IN char* action_url,
-	IN char *service_type,
-	IN IXML_Document *action_node,
-	OUT IXML_Document **response_node);
+	char* action_url,
+	char *service_type,
+	IXML_Document *action_node,
+	IXML_Document **response_node);
 
 /****************************************************************************
  * Function: SoapSendActionEx
@@ -97,11 +97,11 @@ int SoapSendAction(
  * Note:
  ****************************************************************************/
 int SoapSendActionEx(
-	IN char * ActionURL,
-	IN char *ServiceType,
-	IN IXML_Document *Header,
-	IN IXML_Document *ActNode,
-	OUT IXML_Document **RespNode);
+	char * ActionURL,
+	char *ServiceType,
+	IXML_Document *Header,
+	IXML_Document *ActNode,
+	IXML_Document **RespNode);
 
 /****************************************************************************
  * Function: SoapGetServiceVarStatus
@@ -119,9 +119,9 @@ int SoapSendActionEx(
  * Note:
  ****************************************************************************/
 int SoapGetServiceVarStatus(
-	IN char * ActionURL,
-	IN DOMString VarName,
-	OUT DOMString *StVar);
+	char * ActionURL,
+	DOMString VarName,
+	DOMString *StVar);
 
 extern const char* ContentTypeHeader;
 
