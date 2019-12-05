@@ -490,11 +490,7 @@ void print_http_headers(
 	/*! [in] HTTP Message object. */
 	http_message_t *hmsg);
 #else
-static UPNP_INLINE void print_http_headers(http_message_t *hmsg)
-{
-	return;
-	hmsg = hmsg;
-}
+#define print_http_headers(hmsg) do {} while (0)
 #endif
 
 #ifdef __cplusplus
