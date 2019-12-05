@@ -1232,7 +1232,7 @@ int http_CancelHttpGet(void *Handle)
 
 int http_OpenHttpConnection(const char *url_str, void **Handle, int timeout)
 {
-	(void)timeout; // Unused parameter
+	(void)timeout; /* Unused parameter */
 	int ret_code;
 	size_t sockaddr_len;
 	SOCKET tcp_connection;

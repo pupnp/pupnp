@@ -4,12 +4,13 @@
 #endif
 
 #include <assert.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "list.h"
 
-struct list_test_item {
+struct list_test_item
+{
 	UpnpListHead list;
 	int index;
 };
@@ -25,12 +26,12 @@ struct list_test_item *list_test_item__new(int i)
 
 int main(void)
 {
+	int i;
 	UpnpListHead list;
 	UpnpListInit(&list);
 
 	/* Fill list with items */
-	for (int i = 0; i < 10; i++)
-	{
+	for (i = 0; i < 10; i++) {
 		struct list_test_item *item = list_test_item__new(i);
 
 		UpnpListInsert(&list, UpnpListEnd(&list), &item->list);
@@ -41,9 +42,12 @@ int main(void)
 		int i = 0;
 		UpnpListIter list_iter = UpnpListBegin(&list);
 		while (list_iter != UpnpListEnd(&list)) {
-			struct list_test_item *item = (struct list_test_item *)list_iter;
+			struct list_test_item *item =
+				(struct list_test_item *)list_iter;
 
-			printf("List item index: %i, expected: %i\n", item->index, i);
+			printf("List item index: %i, expected: %i\n",
+				item->index,
+				i);
 			assert(item->index == i);
 
 			i++;
@@ -59,9 +63,12 @@ int main(void)
 		int i = 0;
 		UpnpListIter list_iter = UpnpListBegin(&list);
 		while (list_iter != UpnpListEnd(&list)) {
-			struct list_test_item *item = (struct list_test_item *)list_iter;
+			struct list_test_item *item =
+				(struct list_test_item *)list_iter;
 
-			printf("List item index: %i, expected: %i\n", item->index, i);
+			printf("List item index: %i, expected: %i\n",
+				item->index,
+				i);
 			assert(item->index == i);
 
 			i++;
@@ -79,4 +86,3 @@ int main(void)
 
 	return 0;
 }
-
