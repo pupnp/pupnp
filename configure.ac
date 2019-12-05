@@ -651,8 +651,8 @@ AC_TYPE_SIZE_T
 #
 AC_MSG_CHECKING([for Win32])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
-#ifdef WIN32
-	#error Yup
+#ifdef _WIN32
+	This is an error!
 #endif
 ],[])], [ac_cv_win32="no"], [ac_cv_win32="yes"])
 if test "$ac_cv_win32" = "yes"; then
