@@ -205,9 +205,6 @@
     <ClInclude Include="..\..\upnp\src\inc\parsetools.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\upnp\src\inc\server.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\upnp\src\inc\service_table.h">
       <Filter>headers</Filter>
     </ClInclude>

@@ -636,7 +636,6 @@
     <ClInclude Include="..\..\upnp\src\inc\miniserver.h" />
     <ClInclude Include="..\..\upnp\src\inc\netall.h" />
     <ClInclude Include="..\..\upnp\src\inc\parsetools.h" />
-    <ClInclude Include="..\..\upnp\src\inc\server.h" />
     <ClInclude Include="..\..\upnp\src\inc\service_table.h" />
     <ClInclude Include="..\..\upnp\src\inc\soaplib.h" />
     <ClInclude Include="..\..\upnp\src\inc\sock.h" />
