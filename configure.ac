@@ -641,6 +641,7 @@ freebsd*)
 esac
 
 AX_CFLAGS_WARN_ALL
+AX_CFLAGS_GCC_OPTION([-Wextra -Wpedantic])
 echo "-------------------------------------------------------------------------------"
 
 
