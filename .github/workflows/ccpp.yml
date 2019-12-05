@@ -22,3 +22,22 @@ jobs:
       run: make
     - name: make distcheck
       run: make distcheck
+
+  build_asan:
+    name: Sanitizer build (ubuntu-16.04)
+    runs-on: ubuntu-16.04
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: bootstrap and configure
+      run: |
+        ./bootstrap
+        ./configure --enable-debug \
+          CFLAGS="-fsanitize=address,leak" \
+          LDFLAGS="-fsanitize=address,leak"
+    - name: make
+      run: make
+    - name: make check (upnp)
+      run: cd upnp && make check || (cat test-suite.log && exit 1)
+    - name: make check (ixml)
+      run: cd ixml && make check || (cat test-suite.log && exit 1)
