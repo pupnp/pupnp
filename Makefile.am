@@ -13,7 +13,7 @@ SUBDIRS = \
 	upnp
 
 EXTRA_DIST = \
-	Doxyfile \
+	docs/Doxyfile \
 	libupnp.pc.in \
 	libupnp.spec \
 	build/msvc/inttypes.h \
