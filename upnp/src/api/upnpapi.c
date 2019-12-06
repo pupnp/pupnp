@@ -4722,9 +4722,11 @@ int UpnpEnableWebserver(int enable)
 		bWebServerState = WEB_SERVER_DISABLED;
 		SetHTTPGetCallback(NULL);
 	}
-#endif /* INTERNAL_WEB_SERVER */
 
 	return UPNP_E_SUCCESS;
+#else /* Internal web server disabled */
+	return UPNP_E_NO_WEB_SERVER;
+#endif /* INTERNAL_WEB_SERVER */
 }
 
 /*!

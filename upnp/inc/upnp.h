@@ -2774,6 +2774,8 @@ EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback);
  *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
  *       \li \c UPNP_E_OUTOF_MEMORY: The web server could not be started due to
  *		an out-of-memory condition.
+ *		 \li \c UPNP_E_NO_WEB_SERVER: The internal web server has been compiled
+ *		out so it can't be enabled or disabled.
  */
 EXPORT_SPEC int UpnpEnableWebserver(
 	/*! [in] \c 1 to enable, \c 0 to disable. */
