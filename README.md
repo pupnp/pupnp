@@ -1,9 +1,13 @@
 # Portable SDK for UPnP\* Devices (libupnp)
 
-![](https://github.com/mrjimenez/pupnp/workflows/ccpp.yml/badge.svg)
-![](https://github.com/mrjimenez/pupnp/workflows/ccpp.yml/badge.svg?branch=branch-1.10.x)
-![](https://github.com/mrjimenez/pupnp/workflows/ccpp.yml/badge.svg?branch=branch-1.8.x)
-![](https://github.com/mrjimenez/pupnp/workflows/ccpp.yml/badge.svg?branch=branch-1.6.x)
+![master](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg)
+
+<!---
+![1.10.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.10.x)
+![1.8.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.8.x)
+![1.6.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.6.x)
+![1.4.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.4.x)
+-->
 
 Copyright (c) 2000-2003 Intel Corporation - All Rights Reserved.
 
