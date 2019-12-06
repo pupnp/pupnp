@@ -4,25 +4,51 @@ Version 1.12.0
 
 2019-11-20 ePirat Marvin Scholz <epirat07(at)gmail.com>
 
-	Github issues:
+        GitHub PRs:
+        #150: Remove unused files
+        #149: UpnpEnableWebserver: Error correctly when web server compiled-out
+        #148: CI: Remove .travis.yml
+        #147: Remove TRUE/FALSE defines and BOOL typedef
+        #146: CI: Add address sanitizer and leak sanitizer enabled test run
+        #145: Add list test
+        #144: Add -Wextra and -Wpedantic to get more warnings
+        #143: More warning fixes
+        #142: Doxygen changes
+        #141: Remove unused headers
+        #140: Remove IN, OUT and INOUT defines
+        #139: Remove unused defines in uri.h
+        #138: Use stdbool.h instead of BOOL typedef and defines
+        #137: Various compiler warning fixes
+        #136: configure.ac: Fix Windows detection
+        #135: configure.ac: Enable silent rules
+        #134: LinkedList: Simplify _WIN32 check
+        #133: Remove checks of __OSX__ define
+        #132: Add Github Actions based CI
 
-	#123: Check for -lpthread too
-	- Updates pthread m4 check from upstream
+2019-12-03 Jean-Francois Dockes <jf(at)dockes.org>
 
+        Github PR #130: Add forgotten Windows dll export qualifiers
+
+2019-12-01 Jean-Francois Dockes <jf(at)dockes.org>
+
+        Github PR #129: Remove and replace the list.h file
+
+2019-11-20 ePirat Marvin Scholz <epirat07(at)gmail.com>
+
+	Github PRs:
+
+	#128: Overhaul list.h to fix various issues
+	#127: Use rand_s in get_random_info on Windows
+	#126: Do not redeclare timezone struct if already defined in Mingw
+	#125: Fix interface filtering for Windows
+	- The mentioned fix is not only needed for MSVC, but when
+	cross-compiling for Windows with mingw-w64 too.
 	#124: config.h: Remove DEBUG_TARGET
 	- The DEBUG_TARGET is no longer used, it was previously used in
 	upnpdebug.c to disable logging to a file, which now is done
 	by just not calling UpnpSetLogFileNames.
-
-	#125: Fix interface filtering for Windows
-	- The mentioned fix is not only needed for MSVC, but when
-	cross-compiling for Windows with mingw-w64 too.
-
-	#126: Do not redeclare timezone struct if already defined in Mingw
-	
-	#127: Use rand_s in get_random_info on Windows
-
-	#128: Overhaul list.h to fix various issues
+	#123: Check for -lpthread too
+	- Updates pthread m4 check from upstream
 
 *******************************************************************************
 Version 1.10.1
