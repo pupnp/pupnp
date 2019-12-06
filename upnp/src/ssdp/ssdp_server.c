@@ -579,7 +579,7 @@ static void free_ssdp_event_handler_data(
 /*!
  * \brief Does some quick checking of the ssdp msg.
  *
- * \return TRUE if msg is valid, else FALSE.
+ * \return 1 if msg is valid, else 0.
  */
 static UPNP_INLINE int valid_ssdp_msg(
 	/*! [in] ssdp_thread_data structure. This structure contains SSDP
@@ -592,14 +592,14 @@ static UPNP_INLINE int valid_ssdp_msg(
 	if (hmsg->method != (http_method_t)HTTPMETHOD_NOTIFY &&
 	    hmsg->method != (http_method_t)HTTPMETHOD_MSEARCH &&
 	    hmsg->request_method != (http_method_t)HTTPMETHOD_MSEARCH) {
-		return FALSE;
+		return 0;
 	}
 	if (hmsg->request_method != (http_method_t)HTTPMETHOD_MSEARCH) {
 		/* check PATH == "*" */
 		if (hmsg->uri.type != (enum uriType)RELATIVE ||
 		    strncmp("*", hmsg->uri.pathquery.buff,
 			    hmsg->uri.pathquery.size) != 0) {
-			return FALSE;
+			return 0;
 		}
 		/* check HOST header */
 		if (httpmsg_find_hdr(hmsg, HDR_HOST, &hdr_value) == NULL ||
@@ -611,12 +611,12 @@ static UPNP_INLINE int valid_ssdp_msg(
 			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
 				   "Invalid HOST header from SSDP message\n");
 
-			return FALSE;
+			return 0;
 		}
 	}
 
 	/* passed quick check */
-	return TRUE;
+	return 1;
 }
 
 /*!
@@ -652,7 +652,7 @@ static UPNP_INLINE int start_event_handler(
 		goto error_handler;
 	}
 	/* check msg */
-	if (valid_ssdp_msg(&parser->msg) != TRUE) {
+	if (valid_ssdp_msg(&parser->msg) != 1) {
 		goto error_handler;
 	}
 	/* done; thread will free 'data' */
@@ -680,7 +680,7 @@ static void ssdp_event_handler_thread(
 	if (hmsg->method == (http_method_t)HTTPMETHOD_NOTIFY ||
 	    hmsg->request_method == (http_method_t)HTTPMETHOD_MSEARCH) {
 #ifdef INCLUDE_CLIENT_APIS
-		ssdp_handle_ctrlpt_msg(hmsg, &data->dest_addr, FALSE);
+		ssdp_handle_ctrlpt_msg(hmsg, &data->dest_addr, 0);
 #endif /* INCLUDE_CLIENT_APIS */
 	} else {
 		ssdp_handle_device_request(hmsg,

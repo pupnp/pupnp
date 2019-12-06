@@ -182,7 +182,7 @@ static int sock_read_write(
 		FD_SET(sockfd, &writeSet);
 	timeout.tv_sec = *timeoutSecs;
 	timeout.tv_usec = 0;
-	while (TRUE) {
+	while (1) {
 		if (*timeoutSecs < 0)
 			retCode = select(sockfd + 1, &readSet, &writeSet,
 				NULL, NULL);
@@ -265,13 +265,13 @@ static int sock_read_write(
 
 int sock_read(SOCKINFO *info, char *buffer, size_t bufsize, int *timeoutSecs)
 {
-	return sock_read_write(info, buffer, bufsize, timeoutSecs, TRUE);
+	return sock_read_write(info, buffer, bufsize, timeoutSecs, 1);
 }
 
 int sock_write(SOCKINFO *info, const char *buffer, size_t bufsize, int *timeoutSecs)
 {
 	/* Consciently removing constness. */
-	return sock_read_write(info, (char *)buffer, bufsize, timeoutSecs, FALSE);
+	return sock_read_write(info, (char *)buffer, bufsize, timeoutSecs, 0);
 }
 
 int sock_make_blocking(SOCKET sock)

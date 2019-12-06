@@ -45,28 +45,11 @@
 
 #include "UpnpGlobal.h" /* For EXPORT_SPEC */
 
-/* Define BOOL. */
-#ifndef __OBJC__ 
-	typedef int BOOL;
-#else
-	/* For Objective C compilers, include objc.h which defines BOOL. */
-	#include <objc/objc.h>
-#endif
-
 /*!
  * \brief The type of DOM strings.
  */
 #define DOMString char *
 /*typedef char *DOMString;*/
-
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
 
 
 /*!
@@ -165,7 +148,7 @@ typedef struct _IXML_Node
 	DOMString         namespaceURI;
 	DOMString         prefix;
 	DOMString         localName;
-	BOOL              readOnly;
+	int              readOnly;
                           
 	Nodeptr           parentNode;
 	Nodeptr           firstChild;
@@ -213,7 +196,7 @@ typedef struct _IXML_Element
 typedef struct _IXML_ATTR
 {
 	IXML_Node n;
-	BOOL specified;
+	int specified;
 	IXML_Element *ownerElement;
 } IXML_Attr;
 
@@ -584,9 +567,9 @@ EXPORT_SPEC int ixmlNode_appendChild(
 /*!
  * \brief Queries whether or not a \b Node has children.
  *
- * \return \c TRUE if the \b Node has one or more children otherwise \c FALSE.
+ * \return \c 1 if the \b Node has one or more children otherwise \c 0.
  */
-EXPORT_SPEC BOOL ixmlNode_hasChildNodes(
+EXPORT_SPEC int ixmlNode_hasChildNodes(
 	/*! [in] The \b Node to query for children. */
 	IXML_Node *nodeptr);
 
@@ -605,9 +588,9 @@ EXPORT_SPEC BOOL ixmlNode_hasChildNodes(
 EXPORT_SPEC IXML_Node *ixmlNode_cloneNode(
 	/*! [in] The \b Node to clone.  */
 	IXML_Node *nodeptr,
-	/*! [in] \c TRUE to clone the subtree also or \c FALSE to clone only
+	/*! [in] \c 1 to clone the subtree also or \c 0 to clone only
 	 * \b nodeptr. */
-	BOOL deep);
+	int deep);
 
 
 /*!
@@ -615,9 +598,9 @@ EXPORT_SPEC IXML_Node *ixmlNode_cloneNode(
  *
  * Note that only \b Element nodes have attributes.
  *
- * \return \c TRUE if the \b Node has attributes otherwise \c FALSE.
+ * \return \c 1 if the \b Node has attributes otherwise \c 0.
  */
-EXPORT_SPEC BOOL ixmlNode_hasAttributes(
+EXPORT_SPEC int ixmlNode_hasAttributes(
 	/*! [in] The \b Node to query for attributes. */
 	IXML_Node *nodeptr);
 
@@ -1105,9 +1088,9 @@ EXPORT_SPEC int ixmlDocument_importNode(
 	IXML_Document *doc,
 	/*! [in] The \b Node to import. */
 	IXML_Node * importNode,  
-	/*! [in] \c TRUE to import all children of \b importNode or \c FALSE to
+	/*! [in] \c 1 to import all children of \b importNode or \c 0 to
 	 * import only the root node. */
-	BOOL deep,         
+	int deep,         
 	/*! [out] A pointer to a new \b Node owned by \b doc. */
 	IXML_Node **rtNode);
 
@@ -1416,10 +1399,10 @@ EXPORT_SPEC IXML_NodeList *ixmlElement_getElementsByTagNameNS(
  * \brief Queries whether the \b Element has an attribute with the given name
  * or a default value.
  *
- * \return \c TRUE if the \b Element has an attribute with this name or has a
- * default value for that attribute, otherwise \c FALSE.
+ * \return \c 1 if the \b Element has an attribute with this name or has a
+ * default value for that attribute, otherwise \c 0.
  */
-EXPORT_SPEC BOOL ixmlElement_hasAttribute(
+EXPORT_SPEC int ixmlElement_hasAttribute(
 	/*! [in] The \b Element on which to check for an attribute. */
 	IXML_Element *element,
 	/*! [in] The name of the attribute for which to check. */
@@ -1430,10 +1413,10 @@ EXPORT_SPEC BOOL ixmlElement_hasAttribute(
  * \brief Queries whether the \b Element has an attribute with the given
  * local name and namespace URI or has a default value for that attribute.
  *
- * \return \c TRUE if the \b Element has an attribute with the given namespace
- * and local name or has a default value for that attribute, otherwise \c FALSE.
+ * \return \c 1 if the \b Element has an attribute with the given namespace
+ * and local name or has a default value for that attribute, otherwise \c 0.
  */
-EXPORT_SPEC BOOL ixmlElement_hasAttributeNS(
+EXPORT_SPEC int ixmlElement_hasAttributeNS(
 	/*! [in] The \b Element on which to check for the attribute. */
 	IXML_Element *element,
 	/*! [in] The namespace URI of the attribute. */

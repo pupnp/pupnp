@@ -55,11 +55,11 @@ int has_xml_content_type(http_message_t *hmsg)
 	if (httpmsg_find_hdr(hmsg, HDR_CONTENT_TYPE, &hdr_value)) {
 		switch (matchstr(hdr_value.buf, hdr_value.length, "%itext%w/%wxml" )) {
 		case PARSE_OK:
-			return TRUE;
+			return 1;
 		default:
 			break;
 		}
 	}
-	return FALSE;
+	return 0;
 }
 

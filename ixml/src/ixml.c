@@ -330,7 +330,7 @@ int ixmlLoadDocumentEx(const char *xmlFile, IXML_Document **doc)
 		return IXML_INVALID_PARAMETER;
 	}
 
-	return Parser_LoadDocument(doc, xmlFile, TRUE);
+	return Parser_LoadDocument(doc, xmlFile, 1);
 }
 
 
@@ -435,7 +435,7 @@ int ixmlParseBufferEx(const char *buffer, IXML_Document **retDoc)
 		return IXML_INVALID_PARAMETER;
 	}
 
-	return Parser_LoadDocument(retDoc, buffer, FALSE);
+	return Parser_LoadDocument(retDoc, buffer, 0);
 }
 
 

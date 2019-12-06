@@ -93,14 +93,14 @@ typedef struct _Parser
 	IXML_ElementStack *pCurElement;
 	IXML_Node *currentNodePtr;
 	PARSER_STATE state;
-	BOOL bHasTopLevel;
+	int bHasTopLevel;
 } Parser;
 
 
 /*!
  * \brief Check to see whether name is a valid xml name.
  */
-BOOL Parser_isValidXmlName(
+int Parser_isValidXmlName(
 	/*! [in] The string to be checked. */
 	const DOMString name);
 
@@ -147,7 +147,7 @@ void Parser_freeNodeContent(
 	/*! [in] The Node to process. */
 	IXML_Node *IXML_Nodeptr);
 
-int Parser_LoadDocument(IXML_Document **retDoc, const char * xmlFile, BOOL file);
+int Parser_LoadDocument(IXML_Document **retDoc, const char * xmlFile, int file);
 
 int Parser_setNodePrefixAndLocalName(IXML_Node *newIXML_NodeIXML_Attr);
 
@@ -212,10 +212,10 @@ void ixmlNode_init(
  * Parent, sibling and children node are ignored.
  *
  * \return
- * 	\li TRUE, the two nodes are the same.
- * 	\li FALSE, the two nodes are not the same.
+ * 	\li 1, the two nodes are the same.
+ * 	\li 0, the two nodes are not the same.
  */
-BOOL ixmlNode_compare(
+int ixmlNode_compare(
 	/*! [in] The first \b Node. */
 	IXML_Node *srcNode,
 	/*! [in] The second \b Node. */

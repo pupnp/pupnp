@@ -475,9 +475,9 @@ static int Parser_skipMisc(
 	Parser *xmlParser)
 {
     int rc = IXML_SUCCESS;
-    int done = FALSE;
+    int done = 0;
 
-    while( ( done == FALSE ) && ( rc == IXML_SUCCESS ) ) {
+    while( ( done == 0 ) && ( rc == IXML_SUCCESS ) ) {
         if( strncasecmp( xmlParser->curPtr, ( char * )BEGIN_COMMENT, strlen( BEGIN_COMMENT ) ) == 0 ) {
             /* <!-- */
             rc = Parser_skipComment( &( xmlParser->curPtr ) );
@@ -490,7 +490,7 @@ static int Parser_skipMisc(
             /* <? */
             rc = Parser_skipString(&xmlParser->curPtr, END_PI);
         } else {
-            done = TRUE;
+            done = 1;
         }
         Parser_skipWhiteSpaces(xmlParser);
     }
@@ -660,9 +660,9 @@ static int Parser_UTF8ToInt(
  * \brief Will determine whether character c is in the table of tbl (either
  * Letter table or NameChar table).
  *
- * \return TRUE or FALSE.
+ * \return 1 or 0.
  */
-static BOOL Parser_isCharInTable(
+static int Parser_isCharInTable(
 	/*! [in] Character to check. */
 	int c,
 	/*! [in] Table to use. */
@@ -681,40 +681,40 @@ static BOOL Parser_isCharInTable(
 		} else if (c > tbl[m].h) {
 			t = m + 1;
 		} else {
-			return TRUE;
+			return 1;
 		}
 	}
 
-	return FALSE;
+	return 0;
 }
 
 
 /*!
  * \brief Check whether c (int) is in LetterTable or NameCharTable.
  */
-static BOOL Parser_isNameChar(
+static int Parser_isNameChar(
 	/*! [in] The character to check. */
 	int c,
-	/*! [in] TRUE if you also want to check in the NameChar table. */
-	BOOL bNameChar)
+	/*! [in] 1 if you also want to check in the NameChar table. */
+	int bNameChar)
 {
 	if (Parser_isCharInTable(c, Letter, (int)LETTERTABLESIZE)) {
-		return TRUE;
+		return 1;
 	}
 
 	if (bNameChar &&
 	    Parser_isCharInTable(c, NameChar, (int)NAMECHARTABLESIZE)) {
-		return TRUE;
+		return 1;
 	}
 
-	return FALSE;
+	return 0;
 }
 
 
 /*!
  * \brief see XML 1.0 (2nd Edition) 2.2.
  */
-static BOOL Parser_isXmlChar(
+static int Parser_isXmlChar(
 	/*! [in] The character to check. */
 	int c)
 {
@@ -1043,7 +1043,7 @@ static ptrdiff_t Parser_getNextToken(
         if( temp == '/' ) {
 	    /* token is '</' end tag */
             tokenLength = 2;
-        } else if( Parser_isNameChar( temp, FALSE ) == TRUE ) {
+        } else if( Parser_isNameChar( temp, 0 ) ) {
 	    /* '<' found, so return '<' token */
             tokenLength = 1;
         } else {
@@ -1063,13 +1063,13 @@ static ptrdiff_t Parser_getNextToken(
     } else if( *( xmlParser->curPtr ) == GREATERTHAN ) {
 	/* > found, so return it as a token */
         tokenLength = 1;
-    } else if( Parser_isNameChar( Parser_UTF8ToInt( xmlParser->curPtr, &tlen ), FALSE ) ) {
+    } else if( Parser_isNameChar( Parser_UTF8ToInt( xmlParser->curPtr, &tlen ), 0 ) ) {
 	/* Check for name tokens, name found, so find out how long it is */
         ptrdiff_t iIndex = tlen;
 
         while( Parser_isNameChar
                ( Parser_UTF8ToInt( xmlParser->curPtr + iIndex, &tlen ),
-                 TRUE ) ) {
+                 1 ) ) {
             iIndex += tlen;
         }
         tokenLength = iIndex;
@@ -1228,7 +1228,7 @@ static int Parser_processCDSect(
 
     pCDataStart = *pSrc + strlen( CDSTART );
     pEnd = pCDataStart;
-    while( ( Parser_isXmlChar( (int)*pEnd ) == TRUE ) && ( *pEnd != '\0' ) ) {
+    while( ( Parser_isXmlChar( (int)*pEnd ) ) && ( *pEnd != '\0' ) ) {
         if( strncmp( pEnd, CDEND, strlen( CDEND ) ) == 0 ) {
             break;
         } else {
@@ -1387,7 +1387,7 @@ static int Parser_processETag(
 	/*! [in] The Node to process. */
 	IXML_Node *node,
 	/*! [out] . */
-	BOOL *bETag)
+	int *bETag)
 {
 	int ret = IXML_SUCCESS;
 	int line = 0;
@@ -1439,7 +1439,7 @@ static int Parser_processETag(
 		goto ExitFunction;
 	}
 
-	*bETag = TRUE;
+	*bETag = 1;
 
 ExitFunction:
 	if (ret != IXML_SUCCESS) {
@@ -1699,7 +1699,7 @@ static int Parser_processAttribute(
 		line = __LINE__;
 		goto ExitFunction;
 	}
-	if (Parser_isNameChar(Parser_UTF8ToInt(pCurToken, &tlen), FALSE) == FALSE) {
+	if (Parser_isNameChar(Parser_UTF8ToInt(pCurToken, &tlen), 0) == 0) {
 		ret = IXML_SYNTAX_ERR;
 		line = __LINE__;
 		goto ExitFunction;
@@ -1836,7 +1836,7 @@ static int Parser_getNextNode(
 	/*! [out] The XML parser. */
 	IXML_Node *node,
 	/*! [out] The XML parser. */
-	BOOL *bETag)
+	int *bETag)
 {
 	char *pCurToken = NULL;
 	char *lastElement = NULL;
@@ -1846,7 +1846,7 @@ static int Parser_getNextNode(
 
 	/* endof file reached? */
 	if (*(xmlParser->curPtr) == '\0') {
-		*bETag = TRUE;
+		*bETag = 1;
 		line = __LINE__;
 		ret = IXML_FILE_DONE;
 		goto ExitFunction;
@@ -1902,7 +1902,7 @@ static int Parser_getNextNode(
 				goto ExitFunction;
 			}
 			node->nodeType = eELEMENT_NODE;
-			*bETag = TRUE;
+			*bETag = 1;
 
 			line = __LINE__;
 			ret = IXML_SUCCESS;
@@ -1940,7 +1940,7 @@ ExitFunction:
 /*!
  * \brief Decides whether element's prefix is already defined.
  */
-static BOOL Parser_ElementPrefixDefined(
+static int Parser_ElementPrefixDefined(
 	/*! [in] The XML parser. */
 	Parser *xmlParser,
 	/*! [in] The Node to process. */
@@ -1955,14 +1955,14 @@ static BOOL Parser_ElementPrefixDefined(
         if( ( pCur->prefix != NULL )
             && ( strcmp( pCur->prefix, newNode->prefix ) == 0 ) ) {
             *nsURI = pCur->namespaceUri;
-            return TRUE;
+            return 1;
         } else {
             pNsUri = pCur->pNsURI;
 
             while( pNsUri != NULL ) {
                 if( strcmp( pNsUri->prefix, newNode->prefix ) == 0 ) {
                     *nsURI = pNsUri->nsURI;
-                    return TRUE;
+                    return 1;
                 } else {
                     pNsUri = pNsUri->nextNsURI;
                 }
@@ -1973,7 +1973,7 @@ static BOOL Parser_ElementPrefixDefined(
 
     }
 
-    return FALSE;
+    return 0;
 }
 
 
@@ -2004,7 +2004,7 @@ static int Parser_setElementNamespace(
 /*!
  * \brief Reports whether the new attribute is the same as an existing one.
  *
- * \return TRUE if the new attribute is the same as an existing one.
+ * \return 1 if the new attribute is the same as an existing one.
  */
 static int isDuplicateAttribute(
 	/*! [in] The XML parser. */
@@ -2019,13 +2019,13 @@ static int isDuplicateAttribute(
     attrNode = elementNode->firstAttr;
     while( attrNode != NULL ) {
         if( strcmp( attrNode->nodeName, newAttrNode->nodeName ) == 0 ) {
-            return TRUE;
+            return 1;
         }
 
         attrNode = attrNode->nextSibling;
     }
 
-    return FALSE;
+    return 0;
 }
 
 
@@ -2045,7 +2045,7 @@ static int Parser_processAttributeName(
     IXML_Attr *attr = NULL;
     int rc = IXML_SUCCESS;
 
-    if( isDuplicateAttribute( xmlParser, newNode ) == TRUE ) {
+    if( isDuplicateAttribute( xmlParser, newNode ) ) {
         return IXML_SYNTAX_ERR;
     }
 
@@ -2135,7 +2135,7 @@ static int Parser_pushElement(
 /*!
  * \brief Reports whether there is a top level element in the parser.
  *
- * \return TRUE if there is a top level element in the parser.
+ * \return 1 if there is a top level element in the parser.
  */
 static int isTopLevelElement(
 	/*! [in] The XML parser. */
@@ -2149,7 +2149,7 @@ static int isTopLevelElement(
 /*!
  * \brief Decide whether the current element has default namespace
  */
-static BOOL Parser_hasDefaultNamespace(
+static int Parser_hasDefaultNamespace(
 	/*! [in] The XML parser. */
 	Parser *xmlParser,
 	/*! [in,out] The name space URI. */
@@ -2160,13 +2160,13 @@ static BOOL Parser_hasDefaultNamespace(
     while( pCur != NULL ) {
         if( ( pCur->prefix == NULL ) && ( pCur->namespaceUri != NULL ) ) {
             *nsURI = pCur->namespaceUri;
-            return TRUE;
+            return 1;
         } else {
             pCur = pCur->nextElement;
         }
     }
 
-    return FALSE;
+    return 0;
 }
 
 
@@ -2187,12 +2187,12 @@ static int Parser_processElementName(
     char *nsURI = NULL;
     int rc = IXML_SUCCESS;
 
-    if( xmlParser->bHasTopLevel == TRUE ) {
-        if( isTopLevelElement( xmlParser ) == TRUE ) {
+    if( xmlParser->bHasTopLevel ) {
+        if( isTopLevelElement( xmlParser ) ) {
             return IXML_SYNTAX_ERR;
         }
     } else {
-        xmlParser->bHasTopLevel = TRUE;
+        xmlParser->bHasTopLevel = 1;
     }
 
     xmlParser->savePtr = xmlParser->curPtr;
@@ -2250,7 +2250,7 @@ static int Parser_processElementName(
 /*!
  * \brief Check if a new node->nodeName matches top of element stack.
  *
- * \return TRUE if matches.
+ * \return 1 if matches.
  */
 static int Parser_isValidEndElement(
 	/*! [in] The XML parser. */
@@ -2312,7 +2312,7 @@ static int Parser_eTagVerification(
 
     switch( newNode->nodeType ) {
     case eELEMENT_NODE:
-        if( Parser_isValidEndElement( xmlParser, newNode ) == TRUE ) {
+        if( Parser_isValidEndElement( xmlParser, newNode ) ) {
             Parser_popElement( xmlParser );
         } else {
 	    /* syntax error */
@@ -2347,7 +2347,7 @@ static int Parser_parseDocument(
 {
     IXML_Document *gRootDoc = NULL;
     IXML_Node newNode;
-    BOOL bETag = FALSE;
+    int bETag = 0;
     IXML_Node *tempNode = NULL;
     int rc = IXML_SUCCESS;
     IXML_CDATASection *cdataSecNode = NULL;
@@ -2368,7 +2368,7 @@ static int Parser_parseDocument(
         goto ErrorHandler;
     }
 
-    while( bETag == FALSE ) {
+    while( bETag == 0 ) {
         /* clear the newNode contents. Redundant on the first iteration,
 	 * but nonetheless, necessary due to the possible calls to
 	 * ErrorHandler above. Currently, this is just a memset to zero. */
@@ -2376,7 +2376,7 @@ static int Parser_parseDocument(
 
         if( Parser_getNextNode( xmlParser, &newNode, &bETag ) ==
             IXML_SUCCESS ) {
-            if( bETag == FALSE ) {
+            if( bETag == 0 ) {
                 switch ( newNode.nodeType ) {
                     case eELEMENT_NODE:
                         rc = Parser_processElementName( gRootDoc,
@@ -2435,7 +2435,7 @@ static int Parser_parseDocument(
                         break;
                 }
             } else {
-                /* ETag==TRUE, endof element tag. */
+                /* ETag==1, endof element tag. */
                 rc = Parser_eTagVerification( xmlParser, &newNode );
                 if( rc != IXML_SUCCESS ) {
                     goto ErrorHandler;
@@ -2444,9 +2444,9 @@ static int Parser_parseDocument(
             }
 
             /* reset bETag flag */
-            bETag = FALSE;
+            bETag = 0;
 
-        } else if( bETag == TRUE ) {
+        } else if( bETag ) {
 	    /* file is done */
             break;
         } else {
@@ -2474,7 +2474,7 @@ ErrorHandler:
 }
 
 
-BOOL Parser_isValidXmlName(const DOMString name)
+int Parser_isValidXmlName(const DOMString name)
 {
 	const char *pstr = NULL;
 	size_t i = (size_t)0;
@@ -2484,16 +2484,16 @@ BOOL Parser_isValidXmlName(const DOMString name)
 
 	nameLen = strlen(name);
 	pstr = name;
-	if (Parser_isNameChar((int)*pstr, FALSE) == TRUE) {
+	if (Parser_isNameChar((int)*pstr, 0)) {
 		for (i = (size_t)1; i < nameLen; ++i) {
-			if (Parser_isNameChar((int)*(pstr + i), TRUE) == FALSE) {
+			if (Parser_isNameChar((int)*(pstr + i), 1) == 0) {
 				/* illegal char */
-				return FALSE;
+				return 0;
 			}
 		}
 	}
 
-	return TRUE;
+	return 1;
 }
 
 
@@ -2545,9 +2545,9 @@ static int Parser_readFileOrBuffer(
 	/*! [in] The file name or the buffer to copy, according to the
 	 * parameter "file". */
 	const char *xmlFileName,
-	/*! [in] TRUE if you want to read from a file, false if xmlFileName is
+	/*! [in] 1 if you want to read from a file, 0 if xmlFileName is
 	 * the buffer to copy to the parser. */
-	BOOL file)
+	int file)
 {
     long fileSize = 0;
     size_t bytesRead = (size_t)0;
@@ -2598,9 +2598,9 @@ int Parser_LoadDocument(
 	/*! [in] The file name or the buffer to copy, according to the
 	 * parameter "file". */
 	const char *xmlFileName,
-	/*! [in] TRUE if you want to read from a file, false if xmlFileName is
+	/*! [in] 1 if you want to read from a file, 0 if xmlFileName is
 	 * the buffer to copy to the parser. */
-	BOOL file)
+	int file)
 {
     int rc = IXML_SUCCESS;
     Parser *xmlParser = NULL;

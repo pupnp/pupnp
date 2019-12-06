@@ -63,8 +63,8 @@ typedef struct
 	membuffer* msg;
 	/*! current position in buffer. */
 	size_t cursor;
-	/*! set this to TRUE if the entire msg is loaded in 'msg';
-	 * else FALSE if only partial msg in 'msg' (default is FALSE). */
+	/*! set this to 1 if the entire msg is loaded in 'msg';
+	 * else 0 if only partial msg in 'msg' (default is 0). */
 	int entire_msg_loaded;
 } scanner_t;
 
@@ -193,7 +193,7 @@ typedef struct {
         */
        size_t amount_discarded;
 	/* fields used in both request or response messages. */
-	/*! if TRUE, msg is a request, else response. */
+	/*! if 1, msg is a request, else response. */
 	int is_request;
 	/* http major version. */
 	int major_version;
@@ -215,7 +215,7 @@ typedef struct {
 	/*! read-only; in case of parse error, this
 	 * contains the HTTP error code (4XX or 5XX). */
 	int http_error_code;
-	/*! read-only; this is set to true if a NOTIFY request has no
+	/*! read-only; this is set to 1 if a NOTIFY request has no
 	 * content-length. used to read valid sspd notify msg. */
 	int valid_ssdp_notify_hack;
 	/* private data -- don't touch. */
