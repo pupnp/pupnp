@@ -501,7 +501,7 @@ int ixmlNode_insertBefore(
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
 	/* or if newChild is one of nodeptr's ancestors */
-	if (ixmlNode_isAncestor(newChild, nodeptr) == 1) {
+	if (ixmlNode_isAncestor(newChild, nodeptr)) {
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
 	/* if newChild was created from a different document */
@@ -514,7 +514,7 @@ int ixmlNode_insertBefore(
 	}
 
 	if (refChild != NULL) {
-		if (ixmlNode_isParent(nodeptr, newChild) == 1) {
+		if (ixmlNode_isParent(nodeptr, newChild)) {
 			ixmlNode_removeChild(nodeptr, newChild, &newChild);
 			newChild->nextSibling = NULL;
 			newChild->prevSibling = NULL;
@@ -550,7 +550,7 @@ int ixmlNode_replaceChild(
 	}
 	/* if nodetype of nodeptr does not allow children of the type of newChild
 	 * needs to add later or if newChild is one of nodeptr's ancestors */
-	if (ixmlNode_isAncestor(newChild, nodeptr) == 1) {
+	if (ixmlNode_isAncestor(newChild, nodeptr)) {
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
 
@@ -617,7 +617,7 @@ int ixmlNode_appendChild(IXML_Node *nodeptr, IXML_Node *newChild)
 		return IXML_WRONG_DOCUMENT_ERR;
 	}
 	/* if newChild is an ancestor of nodeptr */
-	if (ixmlNode_isAncestor(newChild, nodeptr) == 1) {
+	if (ixmlNode_isAncestor(newChild, nodeptr)) {
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
 	/* if nodeptr does not allow to have newChild as children */
@@ -625,7 +625,7 @@ int ixmlNode_appendChild(IXML_Node *nodeptr, IXML_Node *newChild)
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
 
-	if (ixmlNode_isParent(nodeptr, newChild) == 1 ) {
+	if (ixmlNode_isParent(nodeptr, newChild)) {
 		ixmlNode_removeChild(nodeptr, newChild, &newChild);
 	}
 	/* set the parent node pointer */

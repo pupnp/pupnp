@@ -1043,7 +1043,7 @@ static ptrdiff_t Parser_getNextToken(
         if( temp == '/' ) {
 	    /* token is '</' end tag */
             tokenLength = 2;
-        } else if( Parser_isNameChar( temp, 0 ) == 1 ) {
+        } else if( Parser_isNameChar( temp, 0 ) ) {
 	    /* '<' found, so return '<' token */
             tokenLength = 1;
         } else {
@@ -1228,7 +1228,7 @@ static int Parser_processCDSect(
 
     pCDataStart = *pSrc + strlen( CDSTART );
     pEnd = pCDataStart;
-    while( ( Parser_isXmlChar( (int)*pEnd ) == 1 ) && ( *pEnd != '\0' ) ) {
+    while( ( Parser_isXmlChar( (int)*pEnd ) ) && ( *pEnd != '\0' ) ) {
         if( strncmp( pEnd, CDEND, strlen( CDEND ) ) == 0 ) {
             break;
         } else {
@@ -2045,7 +2045,7 @@ static int Parser_processAttributeName(
     IXML_Attr *attr = NULL;
     int rc = IXML_SUCCESS;
 
-    if( isDuplicateAttribute( xmlParser, newNode ) == 1 ) {
+    if( isDuplicateAttribute( xmlParser, newNode ) ) {
         return IXML_SYNTAX_ERR;
     }
 
@@ -2187,8 +2187,8 @@ static int Parser_processElementName(
     char *nsURI = NULL;
     int rc = IXML_SUCCESS;
 
-    if( xmlParser->bHasTopLevel == 1 ) {
-        if( isTopLevelElement( xmlParser ) == 1 ) {
+    if( xmlParser->bHasTopLevel ) {
+        if( isTopLevelElement( xmlParser ) ) {
             return IXML_SYNTAX_ERR;
         }
     } else {
@@ -2312,7 +2312,7 @@ static int Parser_eTagVerification(
 
     switch( newNode->nodeType ) {
     case eELEMENT_NODE:
-        if( Parser_isValidEndElement( xmlParser, newNode ) == 1 ) {
+        if( Parser_isValidEndElement( xmlParser, newNode ) ) {
             Parser_popElement( xmlParser );
         } else {
 	    /* syntax error */
@@ -2446,7 +2446,7 @@ static int Parser_parseDocument(
             /* reset bETag flag */
             bETag = 0;
 
-        } else if( bETag == 1 ) {
+        } else if( bETag ) {
 	    /* file is done */
             break;
         } else {
@@ -2484,7 +2484,7 @@ int Parser_isValidXmlName(const DOMString name)
 
 	nameLen = strlen(name);
 	pstr = name;
-	if (Parser_isNameChar((int)*pstr, 0) == 1) {
+	if (Parser_isNameChar((int)*pstr, 0)) {
 		for (i = (size_t)1; i < nameLen; ++i) {
 			if (Parser_isNameChar((int)*(pstr + i), 1) == 0) {
 				/* illegal char */
