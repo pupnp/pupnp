@@ -471,7 +471,7 @@ int web_server_set_alias(const char *alias_name,
 
 int web_server_init()
 {
-	int ret = 0;
+	int ret = UPNP_E_SUCCESS;
 
 	if (bWebServerState == WEB_SERVER_DISABLED) {
 		/* decode media list */

@@ -2772,7 +2772,8 @@ EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback);
  *
  * \return An integer representing one of the following:
  *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
- *       \li \c UPNP_E_INVALID_ARGUMENT: \b enable is not valid.
+ *       \li \c UPNP_E_OUTOF_MEMORY: The web server could not be started due to
+ *		an out-of-memory condition.
  */
 EXPORT_SPEC int UpnpEnableWebserver(
 	/*! [in] \c 1 to enable, \c 0 to disable. */

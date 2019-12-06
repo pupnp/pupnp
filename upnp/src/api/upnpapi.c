@@ -4706,33 +4706,25 @@ void UpnpRemoveAllVirtualDirs(void)
 
 int UpnpEnableWebserver(int enable)
 {
-	int retVal = UPNP_E_SUCCESS;
-
 	if (UpnpSdkInit != 1) {
 		return UPNP_E_FINISH;
 	}
-
-	switch (enable) {
 #ifdef INTERNAL_WEB_SERVER
-	case 1:
-		if ((retVal = web_server_init()) != UPNP_E_SUCCESS) {
+	if (enable) {
+		int retVal = web_server_init();
+		if (retVal != UPNP_E_SUCCESS) {
 			return retVal;
 		}
 		bWebServerState = WEB_SERVER_ENABLED;
 		SetHTTPGetCallback(web_server_callback);
-		break;
-
-	case 0:
+	} else {
 		web_server_destroy();
 		bWebServerState = WEB_SERVER_DISABLED;
 		SetHTTPGetCallback(NULL);
-		break;
-#endif /* INTERNAL_WEB_SERVER */
-	default:
-		retVal = UPNP_E_INVALID_PARAM;
 	}
+#endif /* INTERNAL_WEB_SERVER */
 
-	return retVal;
+	return UPNP_E_SUCCESS;
 }
 
 /*!
