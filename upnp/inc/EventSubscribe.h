@@ -2,7 +2,6 @@
 #ifndef EVENTSUBSCRIBE_H
 #define EVENTSUBSCRIBE_H
 
-
 /*!
  * \file
  *
@@ -20,10 +19,8 @@
 	EXPAND_CLASS_MEMBER_INT(CLASS, ErrCode, int) \
 	EXPAND_CLASS_MEMBER_INT(CLASS, TimeOut, int) \
 	EXPAND_CLASS_MEMBER_STRING(CLASS, SID) \
-	EXPAND_CLASS_MEMBER_STRING(CLASS, PublisherUrl) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, PublisherUrl)
 
 #include "TemplateInclude.h"
 
-
 #endif /* EVENTSUBSCRIBE_H */
-
