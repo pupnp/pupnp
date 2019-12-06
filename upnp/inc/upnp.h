@@ -2723,15 +2723,15 @@ EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback);
  *       \li \c UPNP_E_INVALID_ARGUMENT: \b enable is not valid.
  */
 EXPORT_SPEC int UpnpEnableWebserver(
-	/*! [in] \c TRUE to enable, \c FALSE to disable. */
+	/*! [in] \c 1 to enable, \c 0 to disable. */
 	int enable);
 
 /*!
- * \brief Returns \c TRUE if the webserver is enabled, or \c FALSE if it is not.
+ * \brief Returns \c 1 if the webserver is enabled, or \c 0 if it is not.
  *
  *  \return An integer representing one of the following:
- *       \li \c TRUE: The webserver is enabled.
- *       \li \c FALSE: The webserver is not enabled
+ *       \li \c 1: The webserver is enabled.
+ *       \li \c 0: The webserver is not enabled
  */
 EXPORT_SPEC int UpnpIsWebserverEnabled(void);
 
