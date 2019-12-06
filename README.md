@@ -1,5 +1,10 @@
 # Portable SDK for UPnP\* Devices (libupnp)
 
+![](https://github.com/mrjimenez/pupnp/workflows/ccpp.yml/badge.svg)
+![](https://github.com/mrjimenez/pupnp/workflows/ccpp.yml/badge.svg?branch=branch-1.10.x)
+![](https://github.com/mrjimenez/pupnp/workflows/ccpp.yml/badge.svg?branch=branch-1.8.x)
+![](https://github.com/mrjimenez/pupnp/workflows/ccpp.yml/badge.svg?branch=branch-1.6.x)
+
 Copyright (c) 2000-2003 Intel Corporation - All Rights Reserved.
 
 Copyright (c) 2005-2006 Rémi Turboult <r3mi@users.sourceforge.net>
