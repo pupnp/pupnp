@@ -12,7 +12,7 @@ dnl $2 = default value, shall be m4 constant, either [yes] or [no]
 dnl $3 = help string (default value is appended) e.g. [compile debugging code]
 dnl
 dnl @version $Id: rt_bool_arg_enable.m4,v 1.2 2006/02/18 14:35:09 r3mi Exp $
-dnl @author Rémi Turboult <r3mi@users.sourceforge.net>
+dnl @author Rï¿½mi Turboult <r3mi@users.sourceforge.net>
 dnl @license GPLWithACException
 dnl
 dnl This file is free software, distributed under the terms of the GNU
@@ -41,7 +41,7 @@ AC_DEFUN([RT_BOOL_ARG_ENABLE],[
 		               )])
 	test "x$enable_[$1]" != [x]m4_if([$2],[yes],[no],[yes]) dnl
 		&& enable_[]Name=[$2]
-	AC_MSG_RESULT($enable_[]Name)dnl
+	AC_MSG_RESULT($enable_[]Name)
 	AM_CONDITIONAL([ENABLE_]NAME, test x"$enable_[]Name" = xyes)
 	dnl
 	m4_popdef([NAME])dnl
