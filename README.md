@@ -347,7 +347,7 @@ The SDK for UPnP Devices v1.2.1a has these known issues:
 
 ## 8. New Features
 
-See NEWS file.
+See [ChangeLog file](https://github.com/pupnp/pupnp/blob/master/ChangeLog).
 
 ## 9. Support and Contact Information
 
