@@ -1,31 +1,31 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -37,26 +37,26 @@
 #include "config.h"
 
 #if EXCLUDE_GENA == 0
-#ifdef INCLUDE_DEVICE_APIS
+	#ifdef INCLUDE_DEVICE_APIS
 
-#include <assert.h>
+		#include <assert.h>
 
-#include "gena.h"
-#include "httpparser.h"
-#include "httpreadwrite.h"
-#include "parsetools.h"
-#include "ssdplib.h"
-#include "statcodes.h"
-#include "sysdep.h"
-#include "unixutil.h"
-#include "upnpapi.h"
-#include "uuid.h"
+		#include "gena.h"
+		#include "httpparser.h"
+		#include "httpreadwrite.h"
+		#include "parsetools.h"
+		#include "ssdplib.h"
+		#include "statcodes.h"
+		#include "sysdep.h"
+		#include "unixutil.h"
+		#include "upnpapi.h"
+		#include "uuid.h"
 
-#ifdef _WIN32
-	#define snprintf _snprintf
-#endif
+		#ifdef _WIN32
+			#define snprintf _snprintf
+		#endif
 
-#define STALE_JOBID (INVALID_JOB_ID -1)
+		#define STALE_JOBID (INVALID_JOB_ID - 1)
 
 /*!
  * \brief Unregisters a device.
@@ -72,7 +72,10 @@ int genaUnregisterDevice(
 
 	HandleLock();
 	if (GetHandleInfo(device_handle, &handle_info) != HND_DEVICE) {
-		UpnpPrintf(UPNP_CRITICAL, GENA, __FILE__, __LINE__,
+		UpnpPrintf(UPNP_CRITICAL,
+			GENA,
+			__FILE__,
+			__LINE__,
 			"genaUnregisterDevice: BAD Handle: %d\n",
 			device_handle);
 		ret = GENA_E_BAD_HANDLE;
@@ -111,9 +114,8 @@ static int GeneratePropertySet(
 	size += strlen(XML_PROPERTYSET_HEADER);
 	size += strlen("</e:propertyset>\n\n");
 	for (counter = 0; counter < count; counter++) {
-		size += strlen( "<e:property>\n</e:property>\n" );
-		size += 2 * strlen(names[counter]) +
-			strlen(values[counter]) +
+		size += strlen("<e:property>\n</e:property>\n");
+		size += 2 * strlen(names[counter]) + strlen(values[counter]) +
 			strlen("<></>\n");
 	}
 
@@ -187,7 +189,10 @@ static UPNP_INLINE int notify_send_and_recv(
 	const char *CRLF = "\r\n";
 
 	/* connect */
-	UpnpPrintf(UPNP_ALL, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_ALL,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"gena notify to: %.*s\n",
 		(int)destination_url->hostport.text.size,
 		destination_url->hostport.text.buff);
@@ -203,30 +208,37 @@ static UPNP_INLINE int notify_send_and_recv(
 	}
 	/* make start line and HOST header */
 	membuffer_init(&start_msg);
-	if (http_MakeMessage(
-			&start_msg, 1, 1,
-			"q" "s",
-			HTTPMETHOD_NOTIFY, &url,
-			mid_msg->buf) != 0) {
+	if (http_MakeMessage(&start_msg,
+		    1,
+		    1,
+		    "q"
+		    "s",
+		    HTTPMETHOD_NOTIFY,
+		    &url,
+		    mid_msg->buf) != 0) {
 		membuffer_destroy(&start_msg);
 		sock_destroy(&info, SD_BOTH);
 		return UPNP_E_OUTOF_MEMORY;
 	}
 	timeout = GENA_NOTIFICATION_SENDING_TIMEOUT;
 	/* send msg (note: end of notification will contain "\r\n" twice) */
-	ret_code = http_SendMessage(&info, &timeout,
+	ret_code = http_SendMessage(&info,
+		&timeout,
 		"bbb",
-		start_msg.buf, start_msg.length,
-		propertySet, strlen(propertySet),
-		CRLF, strlen(CRLF));
+		start_msg.buf,
+		start_msg.length,
+		propertySet,
+		strlen(propertySet),
+		CRLF,
+		strlen(CRLF));
 	if (ret_code) {
 		membuffer_destroy(&start_msg);
 		sock_destroy(&info, SD_BOTH);
 		return ret_code;
 	}
 	timeout = GENA_NOTIFICATION_ANSWERING_TIMEOUT;
-	ret_code = http_RecvMessage(&info, response,
-		HTTPMETHOD_NOTIFY, &timeout, &err_code);
+	ret_code = http_RecvMessage(
+		&info, response, HTTPMETHOD_NOTIFY, &timeout, &err_code);
 	if (ret_code) {
 		membuffer_destroy(&start_msg);
 		sock_destroy(&info, SD_BOTH);
@@ -252,11 +264,13 @@ static UPNP_INLINE int notify_send_and_recv(
  * 	appropriate error code.
  */
 static int genaNotify(
-	/*! [in] Null terminated, includes all headers (including \\r\\n) except SID and SEQ. */
+	/*! [in] Null terminated, includes all headers (including \\r\\n) except
+	   SID and SEQ. */
 	char *headers,
 	/*! [in] The evented XML. */
 	char *propertySet,
-	/*! [in] subscription to be Notified, assumes this is valid for life of function. */
+	/*! [in] subscription to be Notified, assumes this is valid for life of
+	   function. */
 	subscription *sub)
 {
 	size_t i;
@@ -266,11 +280,17 @@ static int genaNotify(
 	int return_code = -1;
 
 	membuffer_init(&mid_msg);
-	if (http_MakeMessage(&mid_msg, 1, 1,
-			     "s" "ssc" "sdcc",
-			     headers,
-			     "SID: ", sub->sid,
-			     "SEQ: ", sub->ToSendEventKey) != 0) {
+	if (http_MakeMessage(&mid_msg,
+		    1,
+		    1,
+		    "s"
+		    "ssc"
+		    "sdcc",
+		    headers,
+		    "SID: ",
+		    sub->sid,
+		    "SEQ: ",
+		    sub->ToSendEventKey) != 0) {
 		membuffer_destroy(&mid_msg);
 		return UPNP_E_OUTOF_MEMORY;
 	}
@@ -287,9 +307,11 @@ static int genaNotify(
 		if (response.msg.status_code == HTTP_OK)
 			return_code = GENA_SUCCESS;
 		else {
-			if (response.msg.status_code == HTTP_PRECONDITION_FAILED)
+			if (response.msg.status_code ==
+				HTTP_PRECONDITION_FAILED)
 				/*Invalid SID gets removed */
-				return_code = GENA_E_NOTIFY_UNACCEPTED_REMOVE_SUB;
+				return_code =
+					GENA_E_NOTIFY_UNACCEPTED_REMOVE_SUB;
 			else
 				return_code = GENA_E_NOTIFY_UNACCEPTED;
 		}
@@ -298,7 +320,6 @@ static int genaNotify(
 
 	return return_code;
 }
-
 
 /*!
  * \brief Thread job to Notify a control point.
@@ -309,20 +330,21 @@ static int genaNotify(
  * \note calls the genaNotify to do the actual work.
  */
 static void genaNotifyThread(
-	/*! [in] notify thread structure containing all the headers and property set info. */
+	/*! [in] notify thread structure containing all the headers and property
+	   set info. */
 	void *input)
 {
 	subscription *sub;
 	service_info *service;
 	subscription sub_copy;
-	notify_thread_struct *in = (notify_thread_struct *) input;
+	notify_thread_struct *in = (notify_thread_struct *)input;
 	int return_code;
 	struct Handle_Info *handle_info;
 
-	/* This should be a HandleLock and not a HandleReadLock otherwise if there
-	 * is a lot of notifications, then multiple threads will acquire a read
-	 * lock and the thread which sends the notification will be blocked forever
-	 * on the HandleLock at the end of this function. */
+	/* This should be a HandleLock and not a HandleReadLock otherwise if
+	 * there is a lot of notifications, then multiple threads will acquire a
+	 * read lock and the thread which sends the notification will be blocked
+	 * forever on the HandleLock at the end of this function. */
 	/*HandleReadLock(); */
 	HandleLock();
 	/* validate context */
@@ -333,10 +355,11 @@ static void genaNotifyThread(
 		return;
 	}
 
-	if (!(service = FindServiceId(&handle_info->ServiceTable, in->servId, in->UDN)) ||
-	    !service->active ||
-	    !(sub = GetSubscriptionSID(in->sid, service)) ||
-	    copy_subscription(sub, &sub_copy) != HTTP_SUCCESS) {
+	if (!(service = FindServiceId(
+		      &handle_info->ServiceTable, in->servId, in->UDN)) ||
+		!service->active ||
+		!(sub = GetSubscriptionSID(in->sid, service)) ||
+		copy_subscription(sub, &sub_copy) != HTTP_SUCCESS) {
 		free_notify_struct(in);
 		HandleUnlock();
 		return;
@@ -354,9 +377,10 @@ static void genaNotifyThread(
 		return;
 	}
 	/* validate context */
-	if (!(service = FindServiceId(&handle_info->ServiceTable, in->servId, in->UDN)) ||
-	    !service->active ||
-	    !(sub = GetSubscriptionSID(in->sid, service))) {
+	if (!(service = FindServiceId(
+		      &handle_info->ServiceTable, in->servId, in->UDN)) ||
+		!service->active ||
+		!(sub = GetSubscriptionSID(in->sid, service))) {
 		free_notify_struct(in);
 		HandleUnlock();
 		return;
@@ -374,7 +398,7 @@ static void genaNotifyThread(
 		if (ListSize(&sub->outgoing) > 0) {
 			ThreadPoolJob *job;
 			ListNode *node = ListHead(&sub->outgoing);
-			job = (ThreadPoolJob*)node->item;
+			job = (ThreadPoolJob *)node->item;
 			/* The new head of queue should not have already been
 			   added to the pool, else something is very wrong */
 			assert(job->jobId != STALE_JOBID);
@@ -391,7 +415,6 @@ static void genaNotifyThread(
 	HandleUnlock();
 }
 
-
 /*!
  * \brief Allocates the GENA header.
  *
@@ -406,31 +429,26 @@ static char *AllocGenaHeaders(
 {
 	static const char *HEADER_LINE_1 =
 		"CONTENT-TYPE: text/xml; charset=\"utf-8\"\r\n";
-	static const char *HEADER_LINE_2A =
-		"CONTENT-LENGTH: ";
-	static const char *HEADER_LINE_2B =
-		"\r\n";
-	static const char *HEADER_LINE_3 =
-		"NT: upnp:event\r\n";
-	static const char *HEADER_LINE_4 =
-		"NTS: upnp:propchange\r\n";
+	static const char *HEADER_LINE_2A = "CONTENT-LENGTH: ";
+	static const char *HEADER_LINE_2B = "\r\n";
+	static const char *HEADER_LINE_3 = "NT: upnp:event\r\n";
+	static const char *HEADER_LINE_4 = "NTS: upnp:propchange\r\n";
 	char *headers = NULL;
 	size_t headers_size = 0;
 	int line = 0;
 	int rc = 0;
 
-	headers_size =
-		strlen(HEADER_LINE_1 ) +
-		strlen(HEADER_LINE_2A) + MAX_CONTENT_LENGTH +
-		strlen(HEADER_LINE_2B) +
-		strlen(HEADER_LINE_3 ) +
-		strlen(HEADER_LINE_4 ) + 1;
+	headers_size = strlen(HEADER_LINE_1) + strlen(HEADER_LINE_2A) +
+		       MAX_CONTENT_LENGTH + strlen(HEADER_LINE_2B) +
+		       strlen(HEADER_LINE_3) + strlen(HEADER_LINE_4) + 1;
 	headers = (char *)malloc(headers_size);
 	if (headers == NULL) {
 		line = __LINE__;
 		goto ExitFunction;
 	}
-	rc = snprintf(headers, headers_size, "%s%s%"PRIzu"%s%s%s",
+	rc = snprintf(headers,
+		headers_size,
+		"%s%s%" PRIzu "%s%s%s",
 		HEADER_LINE_1,
 		HEADER_LINE_2A,
 		strlen(propertySet) + 2,
@@ -439,8 +457,11 @@ static char *AllocGenaHeaders(
 		HEADER_LINE_4);
 
 ExitFunction:
-	if (headers == NULL || rc < 0 || (unsigned int) rc >= headers_size) {
-		UpnpPrintf(UPNP_ALL, GENA, __FILE__, line,
+	if (headers == NULL || rc < 0 || (unsigned int)rc >= headers_size) {
+		UpnpPrintf(UPNP_ALL,
+			GENA,
+			__FILE__,
+			line,
 			"AllocGenaHeaders(): Error UPNP_E_OUTOF_MEMORY\n");
 	}
 	return headers;
@@ -460,7 +481,8 @@ void freeSubscriptionQueuedEvents(subscription *sub)
 			if (first) {
 				first = 0;
 			} else {
-				free_notify_struct((notify_thread_struct *)job->arg);
+				free_notify_struct(
+					(notify_thread_struct *)job->arg);
 			}
 			free(node->item);
 			ListDelNode(&sub->outgoing, node, 0);
@@ -470,8 +492,7 @@ void freeSubscriptionQueuedEvents(subscription *sub)
 }
 
 /* We take ownership of propertySet and will free it */
-static int genaInitNotifyCommon(
-	UpnpDevice_Handle device_handle,
+static int genaInitNotifyCommon(UpnpDevice_Handle device_handle,
 	char *UDN,
 	char *servId,
 	DOMString propertySet,
@@ -491,7 +512,10 @@ static int genaInitNotifyCommon(
 	struct Handle_Info *handle_info;
 	ThreadPoolJob *job = NULL;
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"GENA BEGIN INITIAL NOTIFY COMMON");
 
 	job = (ThreadPoolJob *)malloc(sizeof(ThreadPoolJob));
@@ -502,14 +526,14 @@ static int genaInitNotifyCommon(
 	}
 	memset(job, 0, sizeof(ThreadPoolJob));
 
-	reference_count = (int *)malloc(sizeof (int));
+	reference_count = (int *)malloc(sizeof(int));
 	if (reference_count == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
 	*reference_count = 0;
-	
+
 	UDN_copy = strdup(UDN);
 	if (UDN_copy == NULL) {
 		line = __LINE__;
@@ -538,9 +562,13 @@ static int genaInitNotifyCommon(
 		ret = GENA_E_BAD_SERVICE;
 		goto ExitFunction;
 	}
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"FOUND SERVICE IN INIT NOTFY: UDN %s, ServID: %s",
-		UDN, servId);
+		UDN,
+		servId);
 
 	sub = GetSubscriptionSID(sid, service);
 	if (sub == NULL || sub->active) {
@@ -548,8 +576,12 @@ static int genaInitNotifyCommon(
 		ret = GENA_E_BAD_SID;
 		goto ExitFunction;
 	}
-	UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-		"FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s", sid);
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
+		"FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s",
+		sid);
 	sub->active = 1;
 
 	headers = AllocGenaHeaders(propertySet);
@@ -561,7 +593,8 @@ static int genaInitNotifyCommon(
 
 	/* schedule thread for initial notification */
 
-	thread_struct = (notify_thread_struct *)malloc(sizeof (notify_thread_struct));
+	thread_struct =
+		(notify_thread_struct *)malloc(sizeof(notify_thread_struct));
 	if (thread_struct == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
@@ -572,7 +605,8 @@ static int genaInitNotifyCommon(
 		thread_struct->headers = headers;
 		thread_struct->propertySet = propertySet;
 		memset(thread_struct->sid, 0, sizeof(thread_struct->sid));
-		strncpy(thread_struct->sid, sid,
+		strncpy(thread_struct->sid,
+			sid,
 			sizeof(thread_struct->sid) - 1);
 		thread_struct->ctime = time(0);
 		thread_struct->reference_count = reference_count;
@@ -591,7 +625,8 @@ static int genaInitNotifyCommon(
 		} else {
 			ListNode *node = ListAddTail(&sub->outgoing, job);
 			if (node != NULL) {
-				((ThreadPoolJob *)node->item)->jobId = STALE_JOBID;
+				((ThreadPoolJob *)node->item)->jobId =
+					STALE_JOBID;
 				line = __LINE__;
 				ret = GENA_SUCCESS;
 			} else {
@@ -614,15 +649,17 @@ ExitFunction:
 
 	HandleUnlock();
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, line,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		line,
 		"GENA END INITIAL NOTIFY COMMON, ret = %d",
 		ret);
 
 	return ret;
 }
 
-int genaInitNotify(
-	UpnpDevice_Handle device_handle,
+int genaInitNotify(UpnpDevice_Handle device_handle,
 	char *UDN,
 	char *servId,
 	char **VarNames,
@@ -634,7 +671,10 @@ int genaInitNotify(
 	int line = 0;
 	DOMString propertySet = NULL;
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"GENA BEGIN INITIAL NOTIFY");
 
 	if (var_count <= 0) {
@@ -648,23 +688,29 @@ int genaInitNotify(
 		line = __LINE__;
 		goto ExitFunction;
 	}
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"GENERATED PROPERTY SET IN INIT NOTIFY: %s",
 		propertySet);
 
-	ret = genaInitNotifyCommon(device_handle, UDN, servId, propertySet, sid);
+	ret = genaInitNotifyCommon(
+		device_handle, UDN, servId, propertySet, sid);
 
 ExitFunction:
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, line,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		line,
 		"GENA END INITIAL NOTIFY, ret = %d",
 		ret);
 
 	return ret;
 }
 
-int genaInitNotifyExt(
-	UpnpDevice_Handle device_handle,
+int genaInitNotifyExt(UpnpDevice_Handle device_handle,
 	char *UDN,
 	char *servId,
 	IXML_Document *PropSet,
@@ -675,7 +721,10 @@ int genaInitNotifyExt(
 
 	DOMString propertySet = NULL;
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"GENA BEGIN INITIAL NOTIFY EXT");
 
 	if (PropSet == 0) {
@@ -690,15 +739,22 @@ int genaInitNotifyExt(
 		ret = UPNP_E_INVALID_PARAM;
 		goto ExitFunction;
 	}
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"GENERATED PROPERTY SET IN INIT EXT NOTIFY: %s",
 		propertySet);
 
-	ret = genaInitNotifyCommon(device_handle, UDN, servId, propertySet, sid);
+	ret = genaInitNotifyCommon(
+		device_handle, UDN, servId, propertySet, sid);
 
 ExitFunction:
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, line,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		line,
 		"GENA END INITIAL NOTIFY EXT, ret = %d",
 		ret);
 
@@ -722,13 +778,15 @@ static void maybeDiscardEvents(LinkedList *listp)
 		/* The first candidate is the second event: first non-active */
 		if (node == 0 || (node = node->next) == 0) {
 			/* Major inconsistency, really, should abort here. */
-			fprintf(stderr, "gena_device: maybeDiscardEvents: "
-					"list is inconsistent\n");
+			fprintf(stderr,
+				"gena_device: maybeDiscardEvents: "
+				"list is inconsistent\n");
 			break;
 		}
 
 		notify_thread_struct *ntsp =
-			(notify_thread_struct *)(((ThreadPoolJob *)node->item)->arg);
+			(notify_thread_struct *)(((ThreadPoolJob *)node->item)
+							 ->arg);
 		if (ListSize(listp) > g_UpnpSdkEQMaxLen ||
 			now - ntsp->ctime > g_UpnpSdkEQMaxAge) {
 			free_notify_struct(ntsp);
@@ -743,8 +801,7 @@ static void maybeDiscardEvents(LinkedList *listp)
 }
 
 /* We take ownership of propertySet and will free it */
-static int genaNotifyAllCommon(
-	UpnpDevice_Handle device_handle,
+static int genaNotifyAllCommon(UpnpDevice_Handle device_handle,
 	char *UDN,
 	char *servId,
 	DOMString propertySet)
@@ -762,18 +819,21 @@ static int genaNotifyAllCommon(
 	service_info *service = NULL;
 	struct Handle_Info *handle_info;
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"GENA BEGIN NOTIFY ALL COMMON");
 
 	/* Keep this allocation first */
-	reference_count = (int *)malloc(sizeof (int));
+	reference_count = (int *)malloc(sizeof(int));
 	if (reference_count == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
 	}
 	*reference_count = 0;
-	
+
 	UDN_copy = strdup(UDN);
 	if (UDN_copy == NULL) {
 		line = __LINE__;
@@ -782,7 +842,7 @@ static int genaNotifyAllCommon(
 	}
 
 	servId_copy = strdup(servId);
-	if( servId_copy == NULL ) {
+	if (servId_copy == NULL) {
 		line = __LINE__;
 		ret = UPNP_E_OUTOF_MEMORY;
 		goto ExitFunction;
@@ -801,14 +861,16 @@ static int genaNotifyAllCommon(
 		line = __LINE__;
 		ret = GENA_E_BAD_HANDLE;
 	} else {
-		service = FindServiceId(&handle_info->ServiceTable, servId, UDN);
+		service =
+			FindServiceId(&handle_info->ServiceTable, servId, UDN);
 		if (service != NULL) {
 			finger = GetFirstSubscription(service);
 			while (finger) {
 				ThreadPoolJob *job = NULL;
 				ListNode *node;
 
-				thread_struct = (notify_thread_struct *)malloc(sizeof (notify_thread_struct));
+				thread_struct = (notify_thread_struct *)malloc(
+					sizeof(notify_thread_struct));
 				if (thread_struct == NULL) {
 					line = __LINE__;
 					ret = UPNP_E_OUTOF_MEMORY;
@@ -816,35 +878,44 @@ static int genaNotifyAllCommon(
 				}
 
 				(*reference_count)++;
-				thread_struct->reference_count = reference_count;
+				thread_struct->reference_count =
+					reference_count;
 				thread_struct->UDN = UDN_copy;
 				thread_struct->servId = servId_copy;
 				thread_struct->headers = headers;
 				thread_struct->propertySet = propertySet;
-				memset(thread_struct->sid, 0,
+				memset(thread_struct->sid,
+					0,
 					sizeof(thread_struct->sid));
-				strncpy(thread_struct->sid, finger->sid,
+				strncpy(thread_struct->sid,
+					finger->sid,
 					sizeof(thread_struct->sid) - 1);
 				thread_struct->ctime = time(0);
 				thread_struct->device_handle = device_handle;
 
 				maybeDiscardEvents(&finger->outgoing);
-				job = (ThreadPoolJob *)malloc(sizeof(ThreadPoolJob));
+				job = (ThreadPoolJob *)malloc(
+					sizeof(ThreadPoolJob));
 				if (job == NULL) {
 					line = __LINE__;
 					ret = UPNP_E_OUTOF_MEMORY;
 					break;
 				}
 				memset(job, 0, sizeof(ThreadPoolJob));
-				TPJobInit(job, (start_routine)genaNotifyThread, thread_struct);
-				TPJobSetFreeFunction(job, (free_routine)free_notify_struct);
+				TPJobInit(job,
+					(start_routine)genaNotifyThread,
+					thread_struct);
+				TPJobSetFreeFunction(
+					job, (free_routine)free_notify_struct);
 				TPJobSetPriority(job, MED_PRIORITY);
 				node = ListAddTail(&finger->outgoing, job);
 
-				/* If there is only one element on the list (which we just
+				/* If there is only one element on the list
+				   (which we just
 				   added), need to kickstart the threadpool */
 				if (ListSize(&finger->outgoing) == 1) {
-					ret = ThreadPoolAdd(&gSendThreadPool, job, NULL);
+					ret = ThreadPoolAdd(
+						&gSendThreadPool, job, NULL);
 					if (ret != 0) {
 						line = __LINE__;
 						if (ret == EOUTOFMEM) {
@@ -854,7 +925,8 @@ static int genaNotifyAllCommon(
 						break;
 					}
 					if (node) {
-						((ThreadPoolJob *)(node->item))->jobId = STALE_JOBID;
+						((ThreadPoolJob *)(node->item))
+							->jobId = STALE_JOBID;
 					}
 				}
 				finger = GetNextSubscription(service, finger);
@@ -880,16 +952,17 @@ ExitFunction:
 
 	HandleUnlock();
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, line,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		line,
 		"GENA END NOTIFY ALL COMMON, ret = %d",
 		ret);
 
 	return ret;
 }
 
-
-int genaNotifyAllExt(
-	UpnpDevice_Handle device_handle,
+int genaNotifyAllExt(UpnpDevice_Handle device_handle,
 	char *UDN,
 	char *servId,
 	IXML_Document *PropSet)
@@ -899,7 +972,10 @@ int genaNotifyAllExt(
 
 	DOMString propertySet = NULL;
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"GENA BEGIN NOTIFY ALL EXT");
 
 	propertySet = ixmlPrintNode((IXML_Node *)PropSet);
@@ -908,7 +984,10 @@ int genaNotifyAllExt(
 		ret = UPNP_E_INVALID_PARAM;
 		goto ExitFunction;
 	}
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"GENERATED PROPERTY SET IN EXT NOTIFY: %s",
 		propertySet);
 
@@ -916,16 +995,17 @@ int genaNotifyAllExt(
 
 ExitFunction:
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, line,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		line,
 		"GENA END NOTIFY ALL EXT, ret = %d",
 		ret);
 
 	return ret;
 }
 
-
-int genaNotifyAll(
-	UpnpDevice_Handle device_handle,
+int genaNotifyAll(UpnpDevice_Handle device_handle,
 	char *UDN,
 	char *servId,
 	char **VarNames,
@@ -937,15 +1017,18 @@ int genaNotifyAll(
 
 	DOMString propertySet = NULL;
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
-		"GENA BEGIN NOTIFY ALL");
+	UpnpPrintf(
+		UPNP_INFO, GENA, __FILE__, __LINE__, "GENA BEGIN NOTIFY ALL");
 
 	ret = GeneratePropertySet(VarNames, VarValues, var_count, &propertySet);
 	if (ret != XML_SUCCESS) {
 		line = __LINE__;
 		goto ExitFunction;
 	}
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"GENERATED PROPERTY SET IN EXT NOTIFY: %s",
 		propertySet);
 
@@ -953,13 +1036,15 @@ int genaNotifyAll(
 
 ExitFunction:
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, line,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		line,
 		"GENA END NOTIFY ALL, ret = %d",
 		ret);
 
 	return ret;
 }
-
 
 /*!
  * \brief Returns OK message in the case of a subscription request.
@@ -976,53 +1061,63 @@ static int respond_ok(
 	/*! [in] Http request. */
 	http_message_t *request)
 {
-    int major;
-    int minor;
-    membuffer response;
-    int return_code;
-    char timeout_str[100];
-    int upnp_timeout = UPNP_TIMEOUT;
-    int rc = 0;
+	int major;
+	int minor;
+	membuffer response;
+	int return_code;
+	char timeout_str[100];
+	int upnp_timeout = UPNP_TIMEOUT;
+	int rc = 0;
 
-    http_CalcResponseVersion( request->major_version,
-                              request->minor_version, &major, &minor );
+	http_CalcResponseVersion(
+		request->major_version, request->minor_version, &major, &minor);
 
-    if( time_out >= 0 ) {
-        rc = snprintf( timeout_str, sizeof ( timeout_str ),
-                       "TIMEOUT: Second-%d", time_out );
-    } else {
-        memset( timeout_str, 0, sizeof( timeout_str ) );
-        strncpy( timeout_str, "TIMEOUT: Second-infinite",
-                 sizeof ( timeout_str ) - 1);
-    }
-    if (rc < 0 || (unsigned int) rc >= sizeof ( timeout_str ) ) {
-        error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request ); 
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	if (time_out >= 0) {
+		rc = snprintf(timeout_str,
+			sizeof(timeout_str),
+			"TIMEOUT: Second-%d",
+			time_out);
+	} else {
+		memset(timeout_str, 0, sizeof(timeout_str));
+		strncpy(timeout_str,
+			"TIMEOUT: Second-infinite",
+			sizeof(timeout_str) - 1);
+	}
+	if (rc < 0 || (unsigned int)rc >= sizeof(timeout_str)) {
+		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		return UPNP_E_OUTOF_MEMORY;
+	}
 
-    membuffer_init( &response );
-    response.size_inc = 30;
-    if( http_MakeMessage(
-        &response, major, minor,
-        "R" "D" "S" "N" "Xc" "ssc" "scc",
-        HTTP_OK,
-        (off_t)0,
-        X_USER_AGENT,
-        "SID: ", sub->sid,
-        timeout_str ) != 0 ) {
-        membuffer_destroy( &response );
-        error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        return UPNP_E_OUTOF_MEMORY;
-    }
+	membuffer_init(&response);
+	response.size_inc = 30;
+	if (http_MakeMessage(&response,
+		    major,
+		    minor,
+		    "R"
+		    "D"
+		    "S"
+		    "N"
+		    "Xc"
+		    "ssc"
+		    "scc",
+		    HTTP_OK,
+		    (off_t)0,
+		    X_USER_AGENT,
+		    "SID: ",
+		    sub->sid,
+		    timeout_str) != 0) {
+		membuffer_destroy(&response);
+		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		return UPNP_E_OUTOF_MEMORY;
+	}
 
-    return_code = http_SendMessage( info, &upnp_timeout, "b",
-                                    response.buf, response.length );
+	return_code = http_SendMessage(
+		info, &upnp_timeout, "b", response.buf, response.length);
 
-    membuffer_destroy( &response );
+	membuffer_destroy(&response);
 
-    return return_code;
+	return return_code;
 }
-
 
 /*!
  * \brief Function to parse the Callback header value in subscription requests.
@@ -1030,9 +1125,11 @@ static int respond_ok(
  * Takes in a buffer containing URLS delimited by '<' and '>'. The entire buffer
  * is copied into dynamic memory and stored in the URL_list. Pointers to the
  * individual urls within this buffer are allocated and stored in the URL_list.
- * Only URLs with network addresses are considered (i.e. host:port or domain name).
+ * Only URLs with network addresses are considered (i.e. host:port or domain
+ * name).
  *
- * \return The number of URLs parsed if successful, otherwise UPNP_E_OUTOF_MEMORY.
+ * \return The number of URLs parsed if successful, otherwise
+ * UPNP_E_OUTOF_MEMORY.
  */
 static int create_url_list(
 	/*! [in] . */
@@ -1040,86 +1137,88 @@ static int create_url_list(
 	/*! [out] . */
 	URL_list *out)
 {
-    size_t URLcount = 0, URLcount2 = 0;
-    size_t i;
-    int return_code = 0;
-    uri_type temp;
-    token urls;
-    token *URLS;
+	size_t URLcount = 0, URLcount2 = 0;
+	size_t i;
+	int return_code = 0;
+	uri_type temp;
+	token urls;
+	token *URLS;
 
-    urls.buff = url_list->buf;
-    urls.size = url_list->length;
-    URLS = &urls;
+	urls.buff = url_list->buf;
+	urls.size = url_list->length;
+	URLS = &urls;
 
-    out->size = 0;
-    out->URLs = NULL;
-    out->parsedURLs = NULL;
+	out->size = 0;
+	out->URLs = NULL;
+	out->parsedURLs = NULL;
 
-    for( i = 0; i < URLS->size; i++ ) {
-        if( ( URLS->buff[i] == '<' ) && ( i + 1 < URLS->size ) ) {
-            if( ( ( return_code = parse_uri( &URLS->buff[i + 1],
-                                             URLS->size - i + 1,
-                                             &temp ) ) == HTTP_SUCCESS )
-                && ( temp.hostport.text.size != 0 ) ) {
-                URLcount++;
-            } else {
-                if( return_code == UPNP_E_OUTOF_MEMORY ) {
-                    return return_code;
-                }
-            }
-        }
-    }
+	for (i = 0; i < URLS->size; i++) {
+		if ((URLS->buff[i] == '<') && (i + 1 < URLS->size)) {
+			if (((return_code = parse_uri(&URLS->buff[i + 1],
+				      URLS->size - i + 1,
+				      &temp)) == HTTP_SUCCESS) &&
+				(temp.hostport.text.size != 0)) {
+				URLcount++;
+			} else {
+				if (return_code == UPNP_E_OUTOF_MEMORY) {
+					return return_code;
+				}
+			}
+		}
+	}
 
-    if( URLcount > 0 ) {
-        out->URLs = malloc(URLS->size + 1);
-        out->parsedURLs = malloc(sizeof(uri_type) * URLcount);
-        if (!out->URLs || !out->parsedURLs) {
-            free(out->URLs);
-            free(out->parsedURLs);
-            out->URLs = NULL;
-            out->parsedURLs = NULL;
-            return UPNP_E_OUTOF_MEMORY;
-        }
-        memcpy( out->URLs, URLS->buff, URLS->size );
-        out->URLs[URLS->size] = 0;
-        for( i = 0; i < URLS->size; i++ ) {
-            if( ( URLS->buff[i] == '<' ) && ( i + 1 < URLS->size ) ) {
-                if( ( ( return_code =
-                        parse_uri( &out->URLs[i + 1], URLS->size - i + 1,
-                                   &out->parsedURLs[URLcount2] ) ) ==
-                      HTTP_SUCCESS )
-                    && ( out->parsedURLs[URLcount2].hostport.text.size !=
-                         0 ) ) {
-                    URLcount2++;
-                    if (URLcount2 >= URLcount)
-                        /*
-                         * break early here in case there is a bogus URL that
-                         * was skipped above. This prevents to access
-                         * out->parsedURLs[URLcount] which is beyond the
-                         * allocation.
-                         */
-                        break;
-                } else {
-                    if( return_code == UPNP_E_OUTOF_MEMORY ) {
-                        free( out->URLs );
-                        free( out->parsedURLs );
-                        out->URLs = NULL;
-                        out->parsedURLs = NULL;
-                        return return_code;
-                    }
-                }
-            }
-        }
-    }
-    out->size = URLcount;
+	if (URLcount > 0) {
+		out->URLs = malloc(URLS->size + 1);
+		out->parsedURLs = malloc(sizeof(uri_type) * URLcount);
+		if (!out->URLs || !out->parsedURLs) {
+			free(out->URLs);
+			free(out->parsedURLs);
+			out->URLs = NULL;
+			out->parsedURLs = NULL;
+			return UPNP_E_OUTOF_MEMORY;
+		}
+		memcpy(out->URLs, URLS->buff, URLS->size);
+		out->URLs[URLS->size] = 0;
+		for (i = 0; i < URLS->size; i++) {
+			if ((URLS->buff[i] == '<') && (i + 1 < URLS->size)) {
+				if (((return_code = parse_uri(&out->URLs[i + 1],
+					      URLS->size - i + 1,
+					      &out->parsedURLs[URLcount2])) ==
+					    HTTP_SUCCESS) &&
+					(out->parsedURLs[URLcount2]
+							.hostport.text.size !=
+						0)) {
+					URLcount2++;
+					if (URLcount2 >= URLcount)
+						/*
+						 * break early here in case
+						 * there is a bogus URL that was
+						 * skipped above. This prevents
+						 * to access
+						 * out->parsedURLs[URLcount]
+						 * which is beyond the
+						 * allocation.
+						 */
+						break;
+				} else {
+					if (return_code ==
+						UPNP_E_OUTOF_MEMORY) {
+						free(out->URLs);
+						free(out->parsedURLs);
+						out->URLs = NULL;
+						out->parsedURLs = NULL;
+						return return_code;
+					}
+				}
+			}
+		}
+	}
+	out->size = URLcount;
 
-    return (int)URLcount;
+	return (int)URLcount;
 }
 
-
-void gena_process_subscription_request(
-	SOCKINFO *info,
-	http_message_t *request)
+void gena_process_subscription_request(SOCKINFO *info, http_message_t *request)
 {
 	UpnpSubscriptionRequest *request_struct = UpnpSubscriptionRequest_new();
 	Upnp_SID temp_sid;
@@ -1138,7 +1237,10 @@ void gena_process_subscription_request(
 	memptr timeout_hdr;
 	int rc = 0;
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"Subscription Request Received:\n");
 
 	if (httpmsg_find_hdr(request, HDR_NT, &nt_hdr) == NULL) {
@@ -1154,26 +1256,34 @@ void gena_process_subscription_request(
 		goto exit_function;
 	}
 
-	/* if a SID is present then the we have a bad request "incompatible headers" */
+	/* if a SID is present then the we have a bad request "incompatible
+	 * headers" */
 	if (httpmsg_find_hdr(request, HDR_SID, NULL) != NULL) {
 		error_respond(info, HTTP_BAD_REQUEST, request);
 		goto exit_function;
 	}
 	/* look up service by eventURL */
-	event_url_path = str_alloc(request->uri.pathquery.buff, request->uri.pathquery.size);
+	event_url_path = str_alloc(
+		request->uri.pathquery.buff, request->uri.pathquery.size);
 	if (event_url_path == NULL) {
 		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
 		goto exit_function;
 	}
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"SubscriptionRequest for event URL path: %s\n",
 		event_url_path);
 
 	HandleLock();
 
-	if (GetDeviceHandleInfoForPath(event_url_path, info->foreign_sockaddr.ss_family,
-								   &device_handle, &handle_info, &service) != HND_DEVICE) {
+	if (GetDeviceHandleInfoForPath(event_url_path,
+		    info->foreign_sockaddr.ss_family,
+		    &device_handle,
+		    &handle_info,
+		    &service) != HND_DEVICE) {
 		free(event_url_path);
 		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
 		HandleUnlock();
@@ -1187,7 +1297,10 @@ void gena_process_subscription_request(
 		goto exit_function;
 	}
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
 		"Subscription Request: Number of Subscriptions already %d\n "
 		"Max Subscriptions allowed: %d\n",
 		service->TotalSubscriptions,
@@ -1195,13 +1308,13 @@ void gena_process_subscription_request(
 
 	/* too many subscriptions */
 	if (handle_info->MaxSubscriptions != -1 &&
-	    service->TotalSubscriptions >= handle_info->MaxSubscriptions) {
+		service->TotalSubscriptions >= handle_info->MaxSubscriptions) {
 		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
 		HandleUnlock();
 		goto exit_function;
 	}
 	/* generate new subscription */
-	sub = (subscription *)malloc(sizeof (subscription));
+	sub = (subscription *)malloc(sizeof(subscription));
 	if (sub == NULL) {
 		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
 		HandleUnlock();
@@ -1220,7 +1333,7 @@ void gena_process_subscription_request(
 	}
 
 	/* check for valid callbacks */
-	if (httpmsg_find_hdr( request, HDR_CALLBACK, &callback_hdr) == NULL) {
+	if (httpmsg_find_hdr(request, HDR_CALLBACK, &callback_hdr) == NULL) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, request);
 		freeSubscriptionList(sub);
 		HandleUnlock();
@@ -1241,10 +1354,13 @@ void gena_process_subscription_request(
 	}
 	/* set the timeout */
 	if (httpmsg_find_hdr(request, HDR_TIMEOUT, &timeout_hdr) != NULL) {
-		if (matchstr(timeout_hdr.buf, timeout_hdr.length,
-		    "%iSecond-%d%0", &time_out) == PARSE_OK) {
+		if (matchstr(timeout_hdr.buf,
+			    timeout_hdr.length,
+			    "%iSecond-%d%0",
+			    &time_out) == PARSE_OK) {
 			/* nothing */
-		} else if(memptr_cmp_nocase(&timeout_hdr, "Second-infinite") == 0) {
+		} else if (memptr_cmp_nocase(&timeout_hdr, "Second-infinite") ==
+			   0) {
 			/* infinite timeout */
 			time_out = -1;
 		} else {
@@ -1255,7 +1371,7 @@ void gena_process_subscription_request(
 	/* replace infinite timeout with max timeout, if possible */
 	if (handle_info->MaxSubscriptionTimeOut != -1) {
 		if (time_out == -1 ||
-		    time_out > handle_info->MaxSubscriptionTimeOut) {
+			time_out > handle_info->MaxSubscriptionTimeOut) {
 			time_out = handle_info->MaxSubscriptionTimeOut;
 		}
 	}
@@ -1272,9 +1388,8 @@ void gena_process_subscription_request(
 	rc = snprintf(sub->sid, sizeof(sub->sid), "uuid:%s", temp_sid);
 
 	/* respond OK */
-	if (rc < 0 || (unsigned int) rc >= sizeof(sub->sid) ||
-		(respond_ok(info, time_out,
-		sub, request) != UPNP_E_SUCCESS)) {
+	if (rc < 0 || (unsigned int)rc >= sizeof(sub->sid) ||
+		(respond_ok(info, time_out, sub, request) != UPNP_E_SUCCESS)) {
 		freeSubscriptionList(sub);
 		HandleUnlock();
 		goto exit_function;
@@ -1285,7 +1400,8 @@ void gena_process_subscription_request(
 	service->TotalSubscriptions++;
 
 	/* finally generate callback for init table dump */
-	UpnpSubscriptionRequest_strcpy_ServiceId(request_struct, service->serviceId);
+	UpnpSubscriptionRequest_strcpy_ServiceId(
+		request_struct, service->serviceId);
 	UpnpSubscriptionRequest_strcpy_UDN(request_struct, service->UDN);
 	UpnpSubscriptionRequest_strcpy_SID(request_struct, sub->sid);
 
@@ -1304,179 +1420,183 @@ exit_function:
 	UpnpSubscriptionRequest_delete(request_struct);
 }
 
-
 void gena_process_subscription_renewal_request(
-	SOCKINFO *info,
-	http_message_t *request)
+	SOCKINFO *info, http_message_t *request)
 {
-    Upnp_SID sid;
-    subscription *sub;
-    int time_out = 1801;
-    service_info *service;
-    struct Handle_Info *handle_info;
-    UpnpDevice_Handle device_handle;
-    memptr temp_hdr;
-    membuffer event_url_path;
-    memptr timeout_hdr;
+	Upnp_SID sid;
+	subscription *sub;
+	int time_out = 1801;
+	service_info *service;
+	struct Handle_Info *handle_info;
+	UpnpDevice_Handle device_handle;
+	memptr temp_hdr;
+	membuffer event_url_path;
+	memptr timeout_hdr;
 
-    /* if a CALLBACK or NT header is present, then it is an error */
-    if( httpmsg_find_hdr( request, HDR_CALLBACK, NULL ) != NULL ||
-        httpmsg_find_hdr( request, HDR_NT, NULL ) != NULL ) {
-        error_respond( info, HTTP_BAD_REQUEST, request );
-        return;
-    }
-    /* get SID */
-    if( httpmsg_find_hdr( request, HDR_SID, &temp_hdr ) == NULL ||
-        temp_hdr.length > SID_SIZE ) {
-        error_respond( info, HTTP_PRECONDITION_FAILED, request );
-        return;
-    }
-    memcpy( sid, temp_hdr.buf, temp_hdr.length );
-    sid[temp_hdr.length] = '\0';
+	/* if a CALLBACK or NT header is present, then it is an error */
+	if (httpmsg_find_hdr(request, HDR_CALLBACK, NULL) != NULL ||
+		httpmsg_find_hdr(request, HDR_NT, NULL) != NULL) {
+		error_respond(info, HTTP_BAD_REQUEST, request);
+		return;
+	}
+	/* get SID */
+	if (httpmsg_find_hdr(request, HDR_SID, &temp_hdr) == NULL ||
+		temp_hdr.length > SID_SIZE) {
+		error_respond(info, HTTP_PRECONDITION_FAILED, request);
+		return;
+	}
+	memcpy(sid, temp_hdr.buf, temp_hdr.length);
+	sid[temp_hdr.length] = '\0';
 
-    /* lookup service by eventURL */
-    membuffer_init( &event_url_path );
-    if( membuffer_append( &event_url_path, request->uri.pathquery.buff,
-                          request->uri.pathquery.size ) != 0 ) {
-        error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        return;
-    }
+	/* lookup service by eventURL */
+	membuffer_init(&event_url_path);
+	if (membuffer_append(&event_url_path,
+		    request->uri.pathquery.buff,
+		    request->uri.pathquery.size) != 0) {
+		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		return;
+	}
 
-    HandleLock();
+	HandleLock();
 
-    if (GetDeviceHandleInfoForPath(event_url_path.buf, info->foreign_sockaddr.ss_family,
-								   &device_handle, &handle_info, &service) != HND_DEVICE ) {
-        error_respond( info, HTTP_PRECONDITION_FAILED, request );
-        membuffer_destroy( &event_url_path );
-        HandleUnlock();
-        return;
-    }
-    membuffer_destroy( &event_url_path );
+	if (GetDeviceHandleInfoForPath(event_url_path.buf,
+		    info->foreign_sockaddr.ss_family,
+		    &device_handle,
+		    &handle_info,
+		    &service) != HND_DEVICE) {
+		error_respond(info, HTTP_PRECONDITION_FAILED, request);
+		membuffer_destroy(&event_url_path);
+		HandleUnlock();
+		return;
+	}
+	membuffer_destroy(&event_url_path);
 
-    /* get subscription */
-    if( service == NULL ||
-        !service->active ||
-        ( ( sub = GetSubscriptionSID( sid, service ) ) == NULL ) ) {
-        error_respond( info, HTTP_PRECONDITION_FAILED, request );
-        HandleUnlock();
-        return;
-    }
+	/* get subscription */
+	if (service == NULL || !service->active ||
+		((sub = GetSubscriptionSID(sid, service)) == NULL)) {
+		error_respond(info, HTTP_PRECONDITION_FAILED, request);
+		HandleUnlock();
+		return;
+	}
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
-        "Renew request: Number of subscriptions already: %d\n "
-        "Max Subscriptions allowed:%d\n",
-        service->TotalSubscriptions,
-        handle_info->MaxSubscriptions );
-    /* too many subscriptions */
-    if( handle_info->MaxSubscriptions != -1 &&
-            service->TotalSubscriptions > handle_info->MaxSubscriptions ) {
-        error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        RemoveSubscriptionSID( sub->sid, service );
-        HandleUnlock();
-        return;
-    }
-    /* set the timeout */
-    if( httpmsg_find_hdr( request, HDR_TIMEOUT, &timeout_hdr ) != NULL ) {
-        if( matchstr( timeout_hdr.buf, timeout_hdr.length,
-                      "%iSecond-%d%0", &time_out ) == PARSE_OK ) {
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
+		"Renew request: Number of subscriptions already: %d\n "
+		"Max Subscriptions allowed:%d\n",
+		service->TotalSubscriptions,
+		handle_info->MaxSubscriptions);
+	/* too many subscriptions */
+	if (handle_info->MaxSubscriptions != -1 &&
+		service->TotalSubscriptions > handle_info->MaxSubscriptions) {
+		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		RemoveSubscriptionSID(sub->sid, service);
+		HandleUnlock();
+		return;
+	}
+	/* set the timeout */
+	if (httpmsg_find_hdr(request, HDR_TIMEOUT, &timeout_hdr) != NULL) {
+		if (matchstr(timeout_hdr.buf,
+			    timeout_hdr.length,
+			    "%iSecond-%d%0",
+			    &time_out) == PARSE_OK) {
 
-            /*nothing */
+			/*nothing */
 
-        } else if( memptr_cmp_nocase( &timeout_hdr, "Second-infinite" ) ==
-                   0 ) {
+		} else if (memptr_cmp_nocase(&timeout_hdr, "Second-infinite") ==
+			   0) {
 
-            time_out = -1;      /* inifinite timeout */
+			time_out = -1; /* inifinite timeout */
 
-        } else {
-            time_out = DEFAULT_TIMEOUT; /* default is > 1800 seconds */
+		} else {
+			time_out =
+				DEFAULT_TIMEOUT; /* default is > 1800 seconds */
+		}
+	}
 
-        }
-    }
+	/* replace infinite timeout with max timeout, if possible */
+	if (handle_info->MaxSubscriptionTimeOut != -1) {
+		if (time_out == -1 ||
+			time_out > handle_info->MaxSubscriptionTimeOut) {
+			time_out = handle_info->MaxSubscriptionTimeOut;
+		}
+	}
 
-    /* replace infinite timeout with max timeout, if possible */
-    if( handle_info->MaxSubscriptionTimeOut != -1 ) {
-        if( time_out == -1 ||
-            time_out > handle_info->MaxSubscriptionTimeOut ) {
-            time_out = handle_info->MaxSubscriptionTimeOut;
-        }
-    }
+	if (time_out == -1) {
+		sub->expireTime = 0;
+	} else {
+		sub->expireTime = time(NULL) + time_out;
+	}
 
-    if( time_out == -1 ) {
-        sub->expireTime = 0;
-    } else {
-        sub->expireTime = time( NULL ) + time_out;
-    }
+	if (respond_ok(info, time_out, sub, request) != UPNP_E_SUCCESS) {
+		RemoveSubscriptionSID(sub->sid, service);
+	}
 
-    if( respond_ok( info, time_out, sub, request ) != UPNP_E_SUCCESS ) {
-        RemoveSubscriptionSID( sub->sid, service );
-    }
-
-    HandleUnlock();
+	HandleUnlock();
 }
 
-
-void gena_process_unsubscribe_request(
-	SOCKINFO *info,
-	http_message_t *request)
+void gena_process_unsubscribe_request(SOCKINFO *info, http_message_t *request)
 {
-    Upnp_SID sid;
-    service_info *service;
-    struct Handle_Info *handle_info;
-    UpnpDevice_Handle device_handle;
+	Upnp_SID sid;
+	service_info *service;
+	struct Handle_Info *handle_info;
+	UpnpDevice_Handle device_handle;
 
-    memptr temp_hdr;
-    membuffer event_url_path;
+	memptr temp_hdr;
+	membuffer event_url_path;
 
-    /* if a CALLBACK or NT header is present, then it is an error */
-    if( httpmsg_find_hdr( request, HDR_CALLBACK, NULL ) != NULL ||
-        httpmsg_find_hdr( request, HDR_NT, NULL ) != NULL ) {
-        error_respond( info, HTTP_BAD_REQUEST, request );
-        return;
-    }
-    /* get SID */
-    if( httpmsg_find_hdr( request, HDR_SID, &temp_hdr ) == NULL ||
-        temp_hdr.length > SID_SIZE ) {
-        error_respond( info, HTTP_PRECONDITION_FAILED, request );
-        return;
-    }
-    memcpy( sid, temp_hdr.buf, temp_hdr.length );
-    sid[temp_hdr.length] = '\0';
+	/* if a CALLBACK or NT header is present, then it is an error */
+	if (httpmsg_find_hdr(request, HDR_CALLBACK, NULL) != NULL ||
+		httpmsg_find_hdr(request, HDR_NT, NULL) != NULL) {
+		error_respond(info, HTTP_BAD_REQUEST, request);
+		return;
+	}
+	/* get SID */
+	if (httpmsg_find_hdr(request, HDR_SID, &temp_hdr) == NULL ||
+		temp_hdr.length > SID_SIZE) {
+		error_respond(info, HTTP_PRECONDITION_FAILED, request);
+		return;
+	}
+	memcpy(sid, temp_hdr.buf, temp_hdr.length);
+	sid[temp_hdr.length] = '\0';
 
-    /* lookup service by eventURL */
-    membuffer_init( &event_url_path );
-    if( membuffer_append( &event_url_path, request->uri.pathquery.buff,
-                          request->uri.pathquery.size ) != 0 ) {
-        error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        return;
-    }
+	/* lookup service by eventURL */
+	membuffer_init(&event_url_path);
+	if (membuffer_append(&event_url_path,
+		    request->uri.pathquery.buff,
+		    request->uri.pathquery.size) != 0) {
+		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		return;
+	}
 
-    HandleLock();
+	HandleLock();
 
-    if( GetDeviceHandleInfoForPath(event_url_path.buf, info->foreign_sockaddr.ss_family,
-								   &device_handle, &handle_info, &service) != HND_DEVICE ) {
-        error_respond( info, HTTP_PRECONDITION_FAILED, request );
-        membuffer_destroy( &event_url_path );
-        HandleUnlock();
-        return;
-    }
-    membuffer_destroy( &event_url_path );
+	if (GetDeviceHandleInfoForPath(event_url_path.buf,
+		    info->foreign_sockaddr.ss_family,
+		    &device_handle,
+		    &handle_info,
+		    &service) != HND_DEVICE) {
+		error_respond(info, HTTP_PRECONDITION_FAILED, request);
+		membuffer_destroy(&event_url_path);
+		HandleUnlock();
+		return;
+	}
+	membuffer_destroy(&event_url_path);
 
-    /* validate service */
-    if( service == NULL ||
-        !service->active || GetSubscriptionSID( sid, service ) == NULL )
-    {
-        error_respond( info, HTTP_PRECONDITION_FAILED, request );
-        HandleUnlock();
-        return;
-    }
+	/* validate service */
+	if (service == NULL || !service->active ||
+		GetSubscriptionSID(sid, service) == NULL) {
+		error_respond(info, HTTP_PRECONDITION_FAILED, request);
+		HandleUnlock();
+		return;
+	}
 
-    RemoveSubscriptionSID(sid, service);
-    error_respond(info, HTTP_OK, request);    /* success */
+	RemoveSubscriptionSID(sid, service);
+	error_respond(info, HTTP_OK, request); /* success */
 
-    HandleUnlock();
+	HandleUnlock();
 }
 
-
-#endif /* INCLUDE_DEVICE_APIS */
-#endif /* EXCLUDE_GENA */
-
+	#endif /* INCLUDE_DEVICE_APIS */
+#endif         /* EXCLUDE_GENA */

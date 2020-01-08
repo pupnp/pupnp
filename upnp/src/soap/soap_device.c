@@ -1,31 +1,31 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -37,42 +37,42 @@
 #include "config.h"
 
 #ifdef INCLUDE_DEVICE_APIS
-#if EXCLUDE_SOAP == 0
+	#if EXCLUDE_SOAP == 0
 
-#include "ActionRequest.h"
-#include "httpparser.h"
-#include "httpreadwrite.h"
-#include "parsetools.h"
-#include "soaplib.h"
-#include "ssdplib.h"
-#include "statcodes.h"
-#include "unixutil.h"
-#include "upnpapi.h"
+		#include "ActionRequest.h"
+		#include "httpparser.h"
+		#include "httpreadwrite.h"
+		#include "parsetools.h"
+		#include "soaplib.h"
+		#include "ssdplib.h"
+		#include "statcodes.h"
+		#include "unixutil.h"
+		#include "upnpapi.h"
 
-#include <assert.h>
-#include <string.h>
+		#include <assert.h>
+		#include <string.h>
 
-#ifdef _WIN32
-	#define snprintf _snprintf
-#endif
+		#ifdef _WIN32
+			#define snprintf _snprintf
+		#endif
 
-/*! timeout duration in secs for transmission/reception */
-#define SOAP_TIMEOUT UPNP_TIMEOUT
+		/*! timeout duration in secs for transmission/reception */
+		#define SOAP_TIMEOUT UPNP_TIMEOUT
 
-#define SREQ_HDR_NOT_FOUND	 -1
-#define SREQ_BAD_HDR_FORMAT	 -2
-#define SREQ_NOT_EXTENDED	 -3
+		#define SREQ_HDR_NOT_FOUND -1
+		#define SREQ_BAD_HDR_FORMAT -2
+		#define SREQ_NOT_EXTENDED -3
 
-#define SOAP_INVALID_ACTION 401
-#define SOAP_INVALID_ARGS	402
-#define SOAP_OUT_OF_SYNC	403
-#define SOAP_INVALID_VAR	404
-#define SOAP_ACTION_FAILED	501
-#define SOAP_MEMORY_OUT		603
-
+		#define SOAP_INVALID_ACTION 401
+		#define SOAP_INVALID_ARGS 402
+		#define SOAP_OUT_OF_SYNC 403
+		#define SOAP_INVALID_VAR 404
+		#define SOAP_ACTION_FAILED 501
+		#define SOAP_MEMORY_OUT 603
 
 static const char *SOAP_BODY = "Body";
-static const char *SOAP_URN = "http:/""/schemas.xmlsoap.org/soap/envelope/";
+static const char *SOAP_URN = "http:/"
+			      "/schemas.xmlsoap.org/soap/envelope/";
 static const char *QUERY_STATE_VAR_URN = "urn:schemas-upnp-org:control-1-0";
 
 static const char *Soap_Invalid_Action = "Invalid Action";
@@ -81,15 +81,15 @@ static const char *Soap_Action_Failed = "Action Failed";
 static const char *Soap_Invalid_Var = "Invalid Var";
 static const char *Soap_Memory_out = "Out of Memory";
 
-typedef struct soap_devserv_t {
+typedef struct soap_devserv_t
+{
 	char dev_udn[NAME_SIZE];
 	char service_type[NAME_SIZE];
 	char service_id[NAME_SIZE];
 	memptr action_name;
 	Upnp_FunPtr callback;
 	void *cookie;
-}soap_devserv_t;
-
+} soap_devserv_t;
 
 /*!
  * \brief Sends SOAP error response.
@@ -109,10 +109,11 @@ static void send_error_response(
 	int major;
 	int minor;
 	const char *start_body =
-/*		"<?xml version=\"1.0\"?>\n" required?? */
+		/*		"<?xml version=\"1.0\"?>\n" required?? */
 		"<s:Envelope "
 		"xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-		"s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+		"s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/"
+		"\">\n"
 		"<s:Body>\n"
 		"<s:Fault>\n"
 		"<faultcode>s:Client</faultcode>\n"
@@ -120,45 +121,48 @@ static void send_error_response(
 		"<detail>\n"
 		"<UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\">\n"
 		"<errorCode>";
-	const char *mid_body =
-		"</errorCode>\n"
-		"<errorDescription>";
-	const char *end_body =
-		"</errorDescription>\n"
-		"</UPnPError>\n"
-		"</detail>\n"
-		"</s:Fault>\n"
-		"</s:Body>\n"
-		"</s:Envelope>\n";
+	const char *mid_body = "</errorCode>\n"
+			       "<errorDescription>";
+	const char *end_body = "</errorDescription>\n"
+			       "</UPnPError>\n"
+			       "</detail>\n"
+			       "</s:Fault>\n"
+			       "</s:Body>\n"
+			       "</s:Envelope>\n";
 	char err_code_str[30];
 	membuffer headers;
 
 	memset(err_code_str, 0, sizeof(err_code_str));
 	snprintf(err_code_str, sizeof(err_code_str), "%d", error_code);
 	/* calc body len */
-	content_length = (off_t) (strlen(start_body) + strlen(err_code_str) +
-				  strlen(mid_body) + strlen(err_msg) +
-				  strlen(end_body));
-	http_CalcResponseVersion(hmsg->major_version, hmsg->minor_version,
-				 &major, &minor);
+	content_length =
+		(off_t)(strlen(start_body) + strlen(err_code_str) +
+			strlen(mid_body) + strlen(err_msg) + strlen(end_body));
+	http_CalcResponseVersion(
+		hmsg->major_version, hmsg->minor_version, &major, &minor);
 	/* make headers */
 	membuffer_init(&headers);
-	if (http_MakeMessage(&headers, major, minor,
-			"RNsDsSXcc" "sssss",
-			500,
-			content_length,
-			ContentTypeHeader,
-			"EXT:\r\n",
-			X_USER_AGENT,
-			start_body, err_code_str, mid_body, err_msg,
-			end_body) != 0) {
+	if (http_MakeMessage(&headers,
+		    major,
+		    minor,
+		    "RNsDsSXcc"
+		    "sssss",
+		    500,
+		    content_length,
+		    ContentTypeHeader,
+		    "EXT:\r\n",
+		    X_USER_AGENT,
+		    start_body,
+		    err_code_str,
+		    mid_body,
+		    err_msg,
+		    end_body) != 0) {
 		membuffer_destroy(&headers);
 		/* out of mem */
 		return;
 	}
 	/* send err msg */
-	http_SendMessage(info, &timeout_secs, "b",
-		headers.buf, headers.length);
+	http_SendMessage(info, &timeout_secs, "b", headers.buf, headers.length);
 	membuffer_destroy(&headers);
 }
 
@@ -180,39 +184,46 @@ static UPNP_INLINE void send_var_query_response(
 	const char *start_body =
 		"<s:Envelope "
 		"xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-		"s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+		"s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/"
+		"\">\n"
 		"<s:Body>\n"
 		"<u:QueryStateVariableResponse "
-		"xmlns:u=\"urn:schemas-upnp-org:control-1-0\">\n" "<return>";
-	const char *end_body =
-		"</return>\n"
-		"</u:QueryStateVariableResponse>\n" "</s:Body>\n" "</s:Envelope>\n";
+		"xmlns:u=\"urn:schemas-upnp-org:control-1-0\">\n"
+		"<return>";
+	const char *end_body = "</return>\n"
+			       "</u:QueryStateVariableResponse>\n"
+			       "</s:Body>\n"
+			       "</s:Envelope>\n";
 	membuffer response;
 
-	http_CalcResponseVersion(hmsg->major_version, hmsg->minor_version,
-				 &major, &minor);
-	content_length = (off_t) (strlen(start_body) + strlen(var_value) +
-				  strlen(end_body));
+	http_CalcResponseVersion(
+		hmsg->major_version, hmsg->minor_version, &major, &minor);
+	content_length = (off_t)(
+		strlen(start_body) + strlen(var_value) + strlen(end_body));
 	/* make headers */
 	membuffer_init(&response);
-	if (http_MakeMessage(&response, major, minor,
-			"RNsDsSXcc" "sss",
-			HTTP_OK,
-			content_length,
-			ContentTypeHeader,
-			"EXT:\r\n",
-			X_USER_AGENT,
-			start_body, var_value, end_body) != 0) {
+	if (http_MakeMessage(&response,
+		    major,
+		    minor,
+		    "RNsDsSXcc"
+		    "sss",
+		    HTTP_OK,
+		    content_length,
+		    ContentTypeHeader,
+		    "EXT:\r\n",
+		    X_USER_AGENT,
+		    start_body,
+		    var_value,
+		    end_body) != 0) {
 		membuffer_destroy(&response);
 		/* out of mem */
 		return;
 	}
 	/* send msg */
-	http_SendMessage(info, &timeout_secs, "b",
-		response.buf, response.length);
+	http_SendMessage(
+		info, &timeout_secs, "b", response.buf, response.length);
 	membuffer_destroy(&response);
 }
-
 
 /*!
  * \brief Sends the SOAP action response.
@@ -240,36 +251,47 @@ static UPNP_INLINE void send_action_response(
 	static const char *end_body = "</s:Body> </s:Envelope>";
 
 	/* init */
-	http_CalcResponseVersion(request->major_version, request->minor_version,
-		&major, &minor);
+	http_CalcResponseVersion(
+		request->major_version, request->minor_version, &major, &minor);
 	membuffer_init(&headers);
-	err_code = UPNP_E_OUTOF_MEMORY;	/* one error only */
+	err_code = UPNP_E_OUTOF_MEMORY; /* one error only */
 	/* get xml */
-	xml_response = ixmlPrintNode((IXML_Node *) action_resp);
+	xml_response = ixmlPrintNode((IXML_Node *)action_resp);
 	if (!xml_response)
 		goto error_handler;
-	content_length = (off_t)(strlen(start_body) + strlen(xml_response) +
-		strlen(end_body));
+	content_length = (off_t)(
+		strlen(start_body) + strlen(xml_response) + strlen(end_body));
 	/* make headers */
-	if (http_MakeMessage(&headers, major, minor,
-			"RNsDsSXcc",
-			HTTP_OK,	/* status code */
-			content_length,
-			ContentTypeHeader,
-			"EXT:\r\n", X_USER_AGENT) != 0) {
+	if (http_MakeMessage(&headers,
+		    major,
+		    minor,
+		    "RNsDsSXcc",
+		    HTTP_OK, /* status code */
+		    content_length,
+		    ContentTypeHeader,
+		    "EXT:\r\n",
+		    X_USER_AGENT) != 0) {
 		goto error_handler;
 	}
 	/* send whole msg */
-	ret_code = http_SendMessage(
-		info, &timeout_secs, "bbbb",
-		headers.buf, headers.length,
-		start_body, strlen(start_body),
-		xml_response, strlen(xml_response),
-		end_body, strlen(end_body));
+	ret_code = http_SendMessage(info,
+		&timeout_secs,
+		"bbbb",
+		headers.buf,
+		headers.length,
+		start_body,
+		strlen(start_body),
+		xml_response,
+		strlen(xml_response),
+		end_body,
+		strlen(end_body));
 	if (ret_code != 0) {
-		UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__,
-			   "Failed to send response: err code = %d\n",
-			   ret_code);
+		UpnpPrintf(UPNP_INFO,
+			SOAP,
+			__FILE__,
+			__LINE__,
+			"Failed to send response: err code = %d\n",
+			ret_code);
 	}
 	err_code = 0;
 
@@ -278,25 +300,24 @@ error_handler:
 	membuffer_destroy(&headers);
 	if (err_code != 0) {
 		/* only one type of error to worry about - out of mem */
-		send_error_response(info, SOAP_ACTION_FAILED, "Out of memory",
-			request);
+		send_error_response(
+			info, SOAP_ACTION_FAILED, "Out of memory", request);
 	}
 }
-
 
 /*!
  * \brief Handles the SOAP requests to querry the state variables.
  * This functionality has been deprecated in the UPnP V1.0 architecture.
  */
 static UPNP_INLINE void handle_query_variable(
-		/*! [in] Socket info. */
-		SOCKINFO *info,
-		/*! [in] HTTP Request. */
-		http_message_t *request,
-		/*! [in] SOAP device/service information. */
-		soap_devserv_t *soap_info,
-		/*! [in] Node containing variable name. */
-		IXML_Node *req_node)
+	/*! [in] Socket info. */
+	SOCKINFO *info,
+	/*! [in] HTTP Request. */
+	http_message_t *request,
+	/*! [in] SOAP device/service information. */
+	soap_devserv_t *soap_info,
+	/*! [in] Node containing variable name. */
+	IXML_Node *req_node)
 {
 	UpnpStateVarRequest *variable = UpnpStateVarRequest_new();
 	const char *err_str;
@@ -321,22 +342,27 @@ static UPNP_INLINE void handle_query_variable(
 	UpnpStateVarRequest_set_CtrlPtIPAddr(variable, &info->foreign_sockaddr);
 
 	/* send event */
-	soap_info->callback(UPNP_CONTROL_GET_VAR_REQUEST, variable,
-			soap_info->cookie);
-	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__,
+	soap_info->callback(
+		UPNP_CONTROL_GET_VAR_REQUEST, variable, soap_info->cookie);
+	UpnpPrintf(UPNP_INFO,
+		SOAP,
+		__FILE__,
+		__LINE__,
 		"Return from callback for var request\n");
 	/* validate, and handle result */
 	if (UpnpStateVarRequest_get_CurrentVal(variable) == NULL)
 		goto error_handler;
 	if (UpnpStateVarRequest_get_ErrCode(variable) != UPNP_E_SUCCESS) {
-		if (UpnpString_get_Length(UpnpStateVarRequest_get_ErrStr(variable)) > 0) {
+		if (UpnpString_get_Length(
+			    UpnpStateVarRequest_get_ErrStr(variable)) > 0) {
 			err_code = UpnpStateVarRequest_get_ErrCode(variable);
 			err_str = UpnpStateVarRequest_get_ErrStr_cstr(variable);
 		}
 		goto error_handler;
 	}
 	/* send response */
-	send_var_query_response(info, UpnpStateVarRequest_get_CurrentVal(variable), request);
+	send_var_query_response(
+		info, UpnpStateVarRequest_get_CurrentVal(variable), request);
 	err_code = 0;
 
 	/* error handling and cleanup */
@@ -350,14 +376,14 @@ error_handler:
  * \brief Handles the SOAP action request.
  */
 static void handle_invoke_action(
-		/*! [in] Socket info. */
-		SOCKINFO *info,
-		/*! [in] HTTP Request. */
-		http_message_t *request,
-		/*! [in] SOAP device/service information. */
-		soap_devserv_t *soap_info,
-		/*! [in] Node containing the SOAP action request. */
-		IXML_Node *req_node)
+	/*! [in] Socket info. */
+	SOCKINFO *info,
+	/*! [in] HTTP Request. */
+	http_message_t *request,
+	/*! [in] SOAP device/service information. */
+	soap_devserv_t *soap_info,
+	/*! [in] Node containing the SOAP action request. */
+	IXML_Node *req_node)
 {
 	char save_char;
 	UpnpActionRequest *action = UpnpActionRequest_new();
@@ -399,7 +425,8 @@ static void handle_invoke_action(
 	UpnpActionRequest_set_CtrlPtIPAddr(action, &info->foreign_sockaddr);
 
 	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
-	soap_info->callback(UPNP_CONTROL_ACTION_REQUEST, action, soap_info->cookie);
+	soap_info->callback(
+		UPNP_CONTROL_ACTION_REQUEST, action, soap_info->cookie);
 	err_code = UpnpActionRequest_get_ErrCode(action);
 	if (err_code != UPNP_E_SUCCESS) {
 		err_str = UpnpActionRequest_get_ErrStr_cstr(action);
@@ -440,12 +467,12 @@ error_handler:
  * \return 0 if OK, -1 on error.
  */
 static int get_dev_service(
-		/*! [in] HTTP request. */
-		http_message_t *request,
-		/*! [in] Address family: AF_INET or AF_INET6. */
-		int AddressFamily,
-		/*! [out] SOAP device/service information. */
-		soap_devserv_t *soap_info)
+	/*! [in] HTTP request. */
+	http_message_t *request,
+	/*! [in] Address family: AF_INET or AF_INET6. */
+	int AddressFamily,
+	/*! [out] SOAP device/service information. */
+	soap_devserv_t *soap_info)
 {
 	struct Handle_Info *device_info;
 	int device_hnd;
@@ -462,8 +489,11 @@ static int get_dev_service(
 
 	HandleReadLock();
 
-	if (GetDeviceHandleInfoForPath(control_url, AddressFamily, &device_hnd,
-								   &device_info, &serv_info) != HND_DEVICE)
+	if (GetDeviceHandleInfoForPath(control_url,
+		    AddressFamily,
+		    &device_hnd,
+		    &device_info,
+		    &serv_info) != HND_DEVICE)
 		goto error_handler;
 	if (!serv_info)
 		goto error_handler;
@@ -475,7 +505,7 @@ static int get_dev_service(
 	soap_info->cookie = device_info->Cookie;
 	ret_code = 0;
 
- error_handler:
+error_handler:
 	/* restore */
 	((char *)control_url)[request->uri.pathquery.size] = save_char;
 	HandleUnlock();
@@ -488,10 +518,10 @@ static int get_dev_service(
  * \return UPNP_E_SUCCESS if OK, error number on failure.
  */
 static int get_mpost_acton_hdrval(
-		/*! [in] HTTP request. */
-		http_message_t *request,
-		/*! [out] Buffer to get the header value */
-		memptr *val)
+	/*! [in] HTTP request. */
+	http_message_t *request,
+	/*! [out] Buffer to get the header value */
+	memptr *val)
 {
 	http_header_t *hdr;
 	memptr ns_value, dummy_quote, value;
@@ -501,15 +531,19 @@ static int get_mpost_acton_hdrval(
 	hdr = httpmsg_find_hdr(request, HDR_MAN, &value);
 	if (NULL == hdr)
 		return SREQ_NOT_EXTENDED;
-	if (matchstr(value.buf, value.length, "%q%i ; ns = %s",
-		     &dummy_quote, &ns_value) != PARSE_OK)
+	if (matchstr(value.buf,
+		    value.length,
+		    "%q%i ; ns = %s",
+		    &dummy_quote,
+		    &ns_value) != PARSE_OK)
 		return SREQ_NOT_EXTENDED;
 	/* create soapaction name header */
 	membuffer_init(&soap_action_name);
 	if (membuffer_assign(&soap_action_name,
-		ns_value.buf, ns_value.length) == UPNP_E_OUTOF_MEMORY ||
-	    membuffer_append_str(&soap_action_name,
-		"-SOAPACTION") == UPNP_E_OUTOF_MEMORY) {
+		    ns_value.buf,
+		    ns_value.length) == UPNP_E_OUTOF_MEMORY ||
+		membuffer_append_str(&soap_action_name, "-SOAPACTION") ==
+			UPNP_E_OUTOF_MEMORY) {
 		membuffer_destroy(&soap_action_name);
 		return UPNP_E_OUTOF_MEMORY;
 	}
@@ -529,10 +563,10 @@ static int get_mpost_acton_hdrval(
  * \return UPNP_E_SUCCESS if OK, error number on failure.
  */
 static int check_soapaction_hdr(
-		/*! [in] HTTP request. */
-		http_message_t *request,
-		/*! [in, out] SOAP device/service information. */
-		soap_devserv_t *soap_info)
+	/*! [in] HTTP request. */
+	http_message_t *request,
+	/*! [in, out] SOAP device/service information. */
+	soap_devserv_t *soap_info)
 {
 	memptr value;
 	char save_char;
@@ -562,9 +596,10 @@ static int check_soapaction_hdr(
 		goto error_handler;
 	}
 	*hash_pos = '\0';
-	if (matchstr(hash_pos+1,
-			value.length - (size_t)(hash_pos+1 - value.buf),
-			"%s", &soap_info->action_name) != PARSE_OK) {
+	if (matchstr(hash_pos + 1,
+		    value.length - (size_t)(hash_pos + 1 - value.buf),
+		    "%s",
+		    &soap_info->action_name) != PARSE_OK) {
 		goto error_handler;
 	}
 
@@ -586,7 +621,8 @@ static int check_soapaction_hdr(
 		/* for action invocation, update the version information */
 		namecopy(soap_info->service_type, serv_type);
 	} else if (strcmp(serv_type, QUERY_STATE_VAR_URN) == 0 &&
-			memptr_cmp(&soap_info->action_name, "QueryStateVariable") == 0) {
+		   memptr_cmp(&soap_info->action_name, "QueryStateVariable") ==
+			   0) {
 		/* query variable */
 		soap_info->action_name.buf = NULL;
 		soap_info->action_name.length = 0;
@@ -603,19 +639,18 @@ error_handler:
 	return ret_code;
 }
 
-
 /*!
  * \brief Check validity of the SOAP request per UPnP specification.
  *
  * \return 0 if OK, -1 on failure.
  */
 static int check_soap_request(
-		/*! [in] SOAP device/service information. */
-		soap_devserv_t *soap_info,
-		/*! [in] Document containing the SOAP action request. */
-		IXML_Document *xml_doc,
-		/*! [out] Node containing the SOAP action request/variable name. */
-		IXML_Node **req_node)
+	/*! [in] SOAP device/service information. */
+	soap_devserv_t *soap_info,
+	/*! [in] Document containing the SOAP action request. */
+	IXML_Document *xml_doc,
+	/*! [out] Node containing the SOAP action request/variable name. */
+	IXML_Node **req_node)
 {
 	IXML_Node *envp_node = NULL;
 	IXML_Node *body_node = NULL;
@@ -625,7 +660,7 @@ static int check_soap_request(
 	int ret_val = -1;
 
 	/* Got the Envelop node here */
-	envp_node = ixmlNode_getFirstChild((IXML_Node *) xml_doc);
+	envp_node = ixmlNode_getFirstChild((IXML_Node *)xml_doc);
 	if (NULL == envp_node) {
 		goto error_handler;
 	}
@@ -664,7 +699,7 @@ static int check_soap_request(
 			goto error_handler;
 		}
 		varname_node = ixmlNode_getFirstChild(action_node);
-		if(NULL == varname_node) {
+		if (NULL == varname_node) {
 			goto error_handler;
 		}
 		local_name = ixmlNode_getLocalName(varname_node);
@@ -692,7 +727,6 @@ error_handler:
 	return ret_val;
 }
 
-
 /*!
  * \brief This is a callback called by minisever after receiving the request
  * from the control point. After HTTP processing, it calls handle_soap_request
@@ -718,8 +752,8 @@ void soap_device_callback(
 		err_code = HTTP_INTERNAL_SERVER_ERROR;
 		goto error_handler;
 	}
-	if (get_dev_service(request,
-			info->foreign_sockaddr.ss_family, soap_info) < 0) {
+	if (get_dev_service(
+		    request, info->foreign_sockaddr.ss_family, soap_info) < 0) {
 		err_code = HTTP_NOT_FOUND;
 		goto error_handler;
 	}
@@ -754,8 +788,7 @@ void soap_device_callback(
 		goto error_handler;
 	}
 	/* check SOAP body */
-	if (check_soap_request(soap_info, xml_doc, &req_node) < 0)
-	{
+	if (check_soap_request(soap_info, xml_doc, &req_node) < 0) {
 		err_code = HTTP_BAD_REQUEST;
 		goto error_handler;
 	}
@@ -773,13 +806,14 @@ error_handler:
 	ixmlDocument_free(xml_doc);
 	free(soap_info);
 	if (err_code != HTTP_OK) {
-		http_SendStatusResponse(info, err_code, request->major_version,
-				request->minor_version);
+		http_SendStatusResponse(info,
+			err_code,
+			request->major_version,
+			request->minor_version);
 	}
 	return;
 }
 
-#endif /* EXCLUDE_SOAP */
+	#endif /* EXCLUDE_SOAP */
 
 #endif /* INCLUDE_DEVICE_APIS */
-

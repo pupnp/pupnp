@@ -31,99 +31,95 @@
 
 #include "config.h"
 #if EXCLUDE_GENA == 0
-#include "gena.h"
-#include "gena_device.h"
-#include "gena_ctrlpt.h"
+	#include "gena.h"
+	#include "gena_ctrlpt.h"
+	#include "gena_device.h"
 
-#include "httpparser.h"
-#include "httpreadwrite.h"
-#include "statcodes.h"
-#include "unixutil.h"
+	#include "httpparser.h"
+	#include "httpreadwrite.h"
+	#include "statcodes.h"
+	#include "unixutil.h"
 
 /************************************************************************
-* Function : error_respond									
-*																	
-* Parameters:														
-*	IN SOCKINFO *info: Structure containing information about the socket
-*	IN int error_code: error code that will be in the GENA response
-*	IN http_message_t* hmsg: GENA request Packet 
-*
-* Description:														
-*	This function send an error message to the control point in the case
-*	incorrect GENA requests.
-*
-* Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
-***************************************************************************/
-void
-error_respond( SOCKINFO * info,
-               int error_code,
-               http_message_t * hmsg )
+ * Function : error_respond
+ *
+ * Parameters:
+ *	IN SOCKINFO *info: Structure containing information about the socket
+ *	IN int error_code: error code that will be in the GENA response
+ *	IN http_message_t* hmsg: GENA request Packet
+ *
+ * Description:
+ *	This function send an error message to the control point in the case
+ *	incorrect GENA requests.
+ *
+ * Returns: int
+ *	UPNP_E_SUCCESS if successful else appropriate error
+ ***************************************************************************/
+void error_respond(SOCKINFO *info, int error_code, http_message_t *hmsg)
 {
-    int major,
-      minor;
+	int major, minor;
 
-    /* retrieve the minor and major version from the GENA request */
-    http_CalcResponseVersion( hmsg->major_version,
-                              hmsg->minor_version, &major, &minor );
+	/* retrieve the minor and major version from the GENA request */
+	http_CalcResponseVersion(
+		hmsg->major_version, hmsg->minor_version, &major, &minor);
 
-    http_SendStatusResponse( info, error_code, major, minor );
+	http_SendStatusResponse(info, error_code, major, minor);
 }
 
 /************************************************************************
-* Function : genaCallback									
-*																	
-* Parameters:														
-*	IN http_parser_t *parser: represents the parse state of the request
-*	IN http_message_t* request: HTTP message containing GENA request
-*	INOUT SOCKINFO *info: Structure containing information about the socket
-*
-* Description:														
-*	This is the callback function called by the miniserver to handle 
-*	incoming GENA requests. 
-*
-* Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
-***************************************************************************/
-void
-genaCallback( http_parser_t * parser,
-              http_message_t * request,
-              SOCKINFO * info )
+ * Function : genaCallback
+ *
+ * Parameters:
+ *	IN http_parser_t *parser: represents the parse state of the request
+ *	IN http_message_t* request: HTTP message containing GENA request
+ *	INOUT SOCKINFO *info: Structure containing information about the socket
+ *
+ * Description:
+ *	This is the callback function called by the miniserver to handle
+ *	incoming GENA requests.
+ *
+ * Returns: int
+ *	UPNP_E_SUCCESS if successful else appropriate error
+ ***************************************************************************/
+void genaCallback(
+	http_parser_t *parser, http_message_t *request, SOCKINFO *info)
 {
-    (void)parser;
-    int found_function = 0;
+	(void)parser;
+	int found_function = 0;
 
-    if( request->method == HTTPMETHOD_SUBSCRIBE ) {
-#ifdef INCLUDE_DEVICE_APIS
-        found_function = 1;
-        if( httpmsg_find_hdr( request, HDR_NT, NULL ) == NULL ) {
-            /* renew subscription */
-            gena_process_subscription_renewal_request
-            ( info, request );
-	} else {
-            /* subscribe */
-            gena_process_subscription_request( info, request );
+	if (request->method == HTTPMETHOD_SUBSCRIBE) {
+	#ifdef INCLUDE_DEVICE_APIS
+		found_function = 1;
+		if (httpmsg_find_hdr(request, HDR_NT, NULL) == NULL) {
+			/* renew subscription */
+			gena_process_subscription_renewal_request(
+				info, request);
+		} else {
+			/* subscribe */
+			gena_process_subscription_request(info, request);
+		}
+		UpnpPrintf(UPNP_ALL,
+			GENA,
+			__FILE__,
+			__LINE__,
+			"got subscription request\n");
+	} else if (request->method == HTTPMETHOD_UNSUBSCRIBE) {
+		found_function = 1;
+		/* unsubscribe */
+		gena_process_unsubscribe_request(info, request);
+	#endif
+	} else if (request->method == HTTPMETHOD_NOTIFY) {
+	#ifdef INCLUDE_CLIENT_APIS
+		found_function = 1;
+		/* notify */
+		gena_process_notification_event(info, request);
+	#endif
 	}
-        UpnpPrintf( UPNP_ALL, GENA, __FILE__, __LINE__,
-            "got subscription request\n" );
-    } else if( request->method == HTTPMETHOD_UNSUBSCRIBE ) {
-        found_function = 1;
-        /* unsubscribe */
-        gena_process_unsubscribe_request( info, request );
-#endif
-    } else if( request->method == HTTPMETHOD_NOTIFY ) {
-#ifdef INCLUDE_CLIENT_APIS
-        found_function = 1;
-        /* notify */
-        gena_process_notification_event( info, request );
-#endif
-    }
 
-    if( !found_function ) {
-            /* handle missing functions of device or ctrl pt */
-            error_respond( info, HTTP_NOT_IMPLEMENTED, request );
-    }
-    return;
+	if (!found_function) {
+		/* handle missing functions of device or ctrl pt */
+		error_respond(info, HTTP_NOT_IMPLEMENTED, request);
+	}
+	return;
 }
 #endif /* EXCLUDE_GENA */
-

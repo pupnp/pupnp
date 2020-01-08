@@ -4724,7 +4724,7 @@ int UpnpEnableWebserver(int enable)
 	}
 
 	return UPNP_E_SUCCESS;
-#else /* Internal web server disabled */
+#else  /* Internal web server disabled */
 	return UPNP_E_NO_WEB_SERVER;
 #endif /* INTERNAL_WEB_SERVER */
 }

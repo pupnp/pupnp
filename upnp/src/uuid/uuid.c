@@ -30,19 +30,20 @@
 #include "UpnpInet.h"
 #include "UpnpStdInt.h"
 
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 /* various forward declarations. */
-static int read_state(uint16_t *clockseq,
-		      uuid_time_t *timestamp, uuid_node_t * node);
-static void write_state(uint16_t clockseq,
-			uuid_time_t timestamp, uuid_node_t node);
+static int read_state(
+	uint16_t *clockseq, uuid_time_t *timestamp, uuid_node_t *node);
+static void write_state(
+	uint16_t clockseq, uuid_time_t timestamp, uuid_node_t node);
 static void format_uuid_v1(uuid_upnp *uid,
-			   uint16_t clockseq,
-			   uuid_time_t timestamp, uuid_node_t node);
+	uint16_t clockseq,
+	uuid_time_t timestamp,
+	uuid_node_t node);
 static void format_uuid_v3(uuid_upnp *uid, unsigned char hash[16]);
 static void get_current_time(uuid_time_t *timestamp);
 static uint16_t true_random(void);
@@ -50,7 +51,7 @@ static uint16_t true_random(void);
 /*!
  * \brief Generator of a UUID.
  */
-int uuid_create(uuid_upnp * uid)
+int uuid_create(uuid_upnp *uid)
 {
 	uuid_time_t timestamp;
 	uuid_time_t last_time;
@@ -82,7 +83,7 @@ int uuid_create(uuid_upnp * uid)
 	return 1;
 };
 
-void upnp_uuid_unpack(uuid_upnp * u, char *out)
+void upnp_uuid_unpack(uuid_upnp *u, char *out)
 {
 	sprintf(out,
 		"%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x",
@@ -92,15 +93,20 @@ void upnp_uuid_unpack(uuid_upnp * u, char *out)
 		u->clock_seq_hi_and_reserved,
 		u->clock_seq_low,
 		u->node[0],
-		u->node[1], u->node[2], u->node[3], u->node[4], u->node[5]);
+		u->node[1],
+		u->node[2],
+		u->node[3],
+		u->node[4],
+		u->node[5]);
 };
 
 /*!
  * \brief Make a UUID from the timestamp, clockseq, and node ID.
  */
-void format_uuid_v1(uuid_upnp * uid,
-		    uint16_t clock_seq,
-		    uuid_time_t timestamp, uuid_node_t node)
+void format_uuid_v1(uuid_upnp *uid,
+	uint16_t clock_seq,
+	uuid_time_t timestamp,
+	uuid_node_t node)
 {
 	/* Construct a version 1 uuid with the information we've gathered
 	 * plus a few constants. */
@@ -108,14 +114,15 @@ void format_uuid_v1(uuid_upnp * uid,
 	uid->time_mid = (uint16_t)((timestamp >> 32) & 0xFFFF);
 	uid->time_hi_and_version = (uint16_t)((timestamp >> 48) & 0x0FFF);
 	uid->time_hi_and_version |= (1 << 12);
-	uid->clock_seq_low = (uint8_t) (clock_seq & 0xFF);
-	uid->clock_seq_hi_and_reserved = (uint8_t) ((clock_seq & 0x3F00) >> 8);
+	uid->clock_seq_low = (uint8_t)(clock_seq & 0xFF);
+	uid->clock_seq_hi_and_reserved = (uint8_t)((clock_seq & 0x3F00) >> 8);
 	uid->clock_seq_hi_and_reserved |= 0x80;
 	memcpy(&uid->node, &node, sizeof uid->node);
 };
 
 /*! Data type for UUID generator persistent state. */
-typedef struct {
+typedef struct
+{
 	/*! Saved timestamp. */
 	uuid_time_t ts;
 	/*! Saved node ID. */
@@ -130,8 +137,7 @@ static int stateInited = 0;
 /*!
  * \brief Read UUID generator state from non-volatile store.
  */
-int read_state(uint16_t *clockseq,
-	       uuid_time_t *timestamp, uuid_node_t *node)
+int read_state(uint16_t *clockseq, uuid_time_t *timestamp, uuid_node_t *node)
 {
 	if (!stateInited)
 		return 0;
@@ -183,7 +189,8 @@ void get_current_time(uuid_time_t *timestamp)
 		get_system_time(&time_now);
 		/* if clock reading changed since last UUID generated... */
 		if (time_last != time_now) {
-			/* reset count of uuids gen'd with this clock reading. */
+			/* reset count of uuids gen'd with this clock reading.
+			 */
 			uuids_this_tick = 0;
 			break;
 		};
@@ -215,7 +222,7 @@ static uint16_t true_random(void)
 		inited = 1;
 	};
 
-	return (uint16_t) (rand());
+	return (uint16_t)(rand());
 }
 
 /*!
@@ -225,7 +232,7 @@ void uuid_create_from_name(
 	/*! resulting UUID. */
 	uuid_upnp *uid,
 	/*! UUID to serve as context, so identical names from different name
-	* spaces generate different UUIDs. */
+	 * spaces generate different UUIDs. */
 	uuid_upnp nsid,
 	/*! The name from which to generate a UUID. */
 	void *name,
@@ -234,10 +241,10 @@ void uuid_create_from_name(
 {
 	MD5_CTX c;
 	unsigned char hash[16];
-	uuid_upnp net_nsid;	/* context UUID in network byte order */
+	uuid_upnp net_nsid; /* context UUID in network byte order */
 
-	/* put name space ID in network byte order so it hashes the same no matter
-	 * what endian machine we're on. */
+	/* put name space ID in network byte order so it hashes the same no
+	 * matter what endian machine we're on. */
 	net_nsid = nsid;
 	net_nsid.time_low = htonl(net_nsid.time_low);
 	net_nsid.time_mid = htons(net_nsid.time_mid);
@@ -269,7 +276,9 @@ void format_uuid_v3(uuid_upnp *uid, unsigned char hash[16])
 	uid->clock_seq_hi_and_reserved |= 0x80;
 };
 
-#define CHECK(f1, f2) if (f1 != f2) return f1 < f2 ? -1 : 1;
+#define CHECK(f1, f2) \
+	if (f1 != f2) \
+		return f1 < f2 ? -1 : 1;
 
 /*!
  * \brief Compare two UUID's "lexically" and return.
@@ -289,7 +298,7 @@ int uuid_compare(uuid_upnp *u1, uuid_upnp *u2)
 	CHECK(u1->time_hi_and_version, u2->time_hi_and_version);
 	CHECK(u1->clock_seq_hi_and_reserved, u2->clock_seq_hi_and_reserved);
 	CHECK(u1->clock_seq_low, u2->clock_seq_low)
-	    for (i = 0; i < 6; i++) {
+	for (i = 0; i < 6; i++) {
 		if (u1->node[i] < u2->node[i])
 			return -1;
 		if (u1->node[i] > u2->node[i])
