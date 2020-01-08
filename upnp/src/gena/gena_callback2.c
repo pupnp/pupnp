@@ -84,8 +84,8 @@ void error_respond(SOCKINFO *info, int error_code, http_message_t *hmsg)
 void genaCallback(
 	http_parser_t *parser, http_message_t *request, SOCKINFO *info)
 {
-	(void)parser;
 	int found_function = 0;
+	(void)parser;
 
 	if (request->method == HTTPMETHOD_SUBSCRIBE) {
 	#ifdef INCLUDE_DEVICE_APIS

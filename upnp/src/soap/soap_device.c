@@ -740,11 +740,11 @@ void soap_device_callback(
 	/*! [in,out] Socket info. */
 	SOCKINFO *info)
 {
-	(void)parser;
 	int err_code;
 	IXML_Document *xml_doc = NULL;
 	soap_devserv_t *soap_info = NULL;
 	IXML_Node *req_node = NULL;
+	(void)parser;
 
 	/* get device/service identified by the request-URI */
 	soap_info = malloc(sizeof(soap_devserv_t));

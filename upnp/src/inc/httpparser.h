@@ -54,7 +54,7 @@ typedef enum
 	TT_CRLF,
 	TT_CTRL,
 	TT_SEPARATOR,
-	TT_QUOTEDSTRING,
+	TT_QUOTEDSTRING
 } token_type_t;
 
 typedef struct
@@ -74,7 +74,7 @@ typedef enum
 	POS_RESPONSE_LINE,
 	POS_HEADERS,
 	POS_ENTITY,
-	POS_COMPLETE,
+	POS_COMPLETE
 } parser_pos_t;
 
 #define ENTREAD_DETERMINE_READ_METHOD 1

@@ -658,11 +658,11 @@ int IncrementChannel(int incr,
 	IXML_Document **out,
 	const char **errorString)
 {
-	(void)in;
 	int curchannel;
 	int newchannel;
 	const char *actionName = NULL;
 	char value[TV_MAX_VAL_LEN];
+	(void)in;
 
 	if (incr > 0) {
 		actionName = "IncreaseChannel";
@@ -769,11 +769,11 @@ static int IncrementVolume(
 	/*! [out] Error string in case action was unsuccessful. */
 	const char **errorString)
 {
-	(void)in;
 	int curvolume;
 	int newvolume;
 	const char *actionName = NULL;
 	char value[TV_MAX_VAL_LEN];
+	(void)in;
 
 	if (incr > 0) {
 		actionName = "IncreaseVolume";
@@ -879,11 +879,11 @@ static int IncrementColor(
 	/*! [out] Error string in case action was unsuccessful. */
 	const char **errorString)
 {
-	(void)in;
 	int curcolor;
 	int newcolor;
 	const char *actionName;
 	char value[TV_MAX_VAL_LEN];
+	(void)in;
 
 	if (incr > 0) {
 		actionName = "IncreaseColor";
@@ -993,11 +993,11 @@ int IncrementTint(int incr,
 	IXML_Document **out,
 	const char **errorString)
 {
-	(void)in;
 	int curtint;
 	int newtint;
 	const char *actionName = NULL;
 	char value[TV_MAX_VAL_LEN];
+	(void)in;
 
 	if (incr > 0) {
 		actionName = "IncreaseTint";
@@ -1145,11 +1145,11 @@ static int IncrementContrast(
 	/*! [out] Error string in case action was unsuccessful. */
 	const char **errorString)
 {
-	(void)in;
 	int curcontrast;
 	int newcontrast;
 	const char *actionName = NULL;
 	char value[TV_MAX_VAL_LEN];
+	(void)in;
 
 	if (incr > 0) {
 		actionName = "IncreaseContrast";
@@ -1256,11 +1256,11 @@ static int IncrementBrightness(
 	/*! [out] errorString (in case action was unsuccessful). */
 	const char **errorString)
 {
-	(void)in;
 	int curbrightness;
 	int newbrightness;
 	const char *actionName = NULL;
 	char value[TV_MAX_VAL_LEN];
+	(void)in;
 
 	if (incr > 0) {
 		actionName = "IncreaseBrightness";
@@ -1452,17 +1452,18 @@ int TvDeviceStop(void)
 
 void *TvDeviceCommandLoop(void *args)
 {
-	(void)args;
 	int stoploop = 0;
 	char cmdline[100];
 	char cmd[100];
+	char *s;
+	(void)args;
 
 	while (!stoploop) {
 		sprintf(cmdline, " ");
 		sprintf(cmd, " ");
 		SampleUtil_Print("\n>> ");
 		/* Get a command line */
-		char *s = fgets(cmdline, 100, stdin);
+		s = fgets(cmdline, 100, stdin);
 		if (!s)
 			break;
 		sscanf(cmdline, "%s", cmd);

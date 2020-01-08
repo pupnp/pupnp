@@ -52,14 +52,14 @@ void get_ieee_node_identifier(uuid_node_t *node)
 		inited = 1;
 	};
 	*node = saved_node;
-};
+}
 
-	/*!
-	 * \brief System dependent call to get the current system time.
-	 *
-	 * Returned as 100ns ticks since Oct 15, 1582, but resolution may be
-	 * less than 100ns.
-	 */
+/*!
+ * \brief System dependent call to get the current system time.
+ *
+ * Returned as 100ns ticks since Oct 15, 1582, but resolution may be
+ * less than 100ns.
+ */
 
 #ifdef _WIN32
 
@@ -102,8 +102,8 @@ void get_system_time(uuid_time_t *uuid_time)
 	 * UUID UTC base time is October 15, 1582.
 	 * Unix base time is January 1, 1970. */
 	*uuid_time = (uuid_time_t)tp.tv_sec * 10000000 +
-		     (uuid_time_t)tp.tv_usec * 10 + 0x01B21DD213814000LL;
-};
+		     (uuid_time_t)tp.tv_usec * 10 + 0x01B21DD213814000L;
+}
 
 void get_random_info(unsigned char seed[16])
 {
@@ -127,6 +127,6 @@ void get_random_info(unsigned char seed[16])
 	MD5Init(&c);
 	MD5Update(&c, (unsigned char *)&r, sizeof r);
 	MD5Final(seed, &c);
-};
+}
 
 #endif /* _WIN32 */

@@ -134,7 +134,9 @@ int replace_escaped(char *in, size_t index, size_t *max)
 		isxdigit(in[index + (size_t)2])) {
 		/* Note the "%2x", makes sure that we convert a maximum of two
 		 * characters. */
-		if (sscanf(&in[index + (size_t)1], "%2x", &tempInt) != 1) {
+		if (sscanf(&in[index + (size_t)1],
+			    "%2x",
+			    (unsigned int *)&tempInt) != 1) {
 			return 0;
 		}
 		tempChar = (char)tempInt;
@@ -586,6 +588,14 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 	uri_type base;
 	uri_type rel;
 	int rv;
+	size_t len_rel;
+	size_t len_base;
+	size_t len;
+	char *out;
+	char *out_finger;
+	char *path;
+	size_t i;
+	size_t prefix;
 
 	if (!base_url) {
 		if (!rel_url)
@@ -593,25 +603,25 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 		return strdup(rel_url);
 	}
 
-	size_t len_rel = strlen(rel_url);
+	len_rel = strlen(rel_url);
 	if (parse_uri(rel_url, len_rel, &rel) != HTTP_SUCCESS)
 		return NULL;
 	if (rel.type == (enum uriType)ABSOLUTE)
 		return strdup(rel_url);
 
-	size_t len_base = strlen(base_url);
+	len_base = strlen(base_url);
 	if ((parse_uri(base_url, len_base, &base) != HTTP_SUCCESS) ||
 		(base.type != (enum uriType)ABSOLUTE))
 		return NULL;
 	if (len_rel == (size_t)0)
 		return strdup(base_url);
 
-	size_t len = len_base + len_rel + (size_t)2;
-	char *out = (char *)malloc(len);
+	len = len_base + len_rel + (size_t)2;
+	out = (char *)malloc(len);
 	if (out == NULL)
 		return NULL;
 	memset(out, 0, len);
-	char *out_finger = out;
+	out_finger = out;
 
 	/* scheme */
 	rv = snprintf(out_finger,
@@ -644,7 +654,7 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 	}
 
 	/* path */
-	char *path = out_finger;
+	path = out_finger;
 	if (rel.path_type == (enum pathType)ABS_PATH) {
 		rv = snprintf(out_finger, len, "%s", rel_url);
 	} else if (base.pathquery.size == (size_t)0) {
@@ -659,7 +669,8 @@ char *resolve_rel_url(char *base_url, char *rel_url)
 		} else {
 			if (len < base.pathquery.size)
 				goto error;
-			size_t i = (size_t)0, prefix = (size_t)1;
+			i = 0;
+			prefix = 1;
 			while (i < base.pathquery.size) {
 				out_finger[i] = base.pathquery.buff[i];
 				switch (base.pathquery.buff[i++]) {

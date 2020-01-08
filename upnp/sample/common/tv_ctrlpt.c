@@ -663,7 +663,7 @@ void TvCtrlPointAddDevice(
 	char *eventURL[TV_SERVICE_SERVCOUNT] = {NULL, NULL};
 	char *controlURL[TV_SERVICE_SERVCOUNT] = {NULL, NULL};
 	Upnp_SID eventSID[TV_SERVICE_SERVCOUNT];
-	int TimeOut[TV_SERVICE_SERVCOUNT] = {default_timeout, default_timeout};
+	int TimeOut[TV_SERVICE_SERVCOUNT];
 	struct TvDeviceNode *deviceNode;
 	struct TvDeviceNode *tmpdevnode;
 	int ret = 1;
@@ -671,6 +671,8 @@ void TvCtrlPointAddDevice(
 	int service;
 	int var;
 
+	TimeOut[0] = default_timeout;
+	TimeOut[1] = default_timeout;
 	ithread_mutex_lock(&DeviceListMutex);
 
 	/* Read key elements from description document */
@@ -828,7 +830,6 @@ void TvCtrlPointAddDevice(
 void TvStateUpdate(
 	char *UDN, int Service, IXML_Document *ChangedVariables, char **State)
 {
-	(void)UDN;
 	IXML_NodeList *properties;
 	IXML_NodeList *variables;
 	IXML_Element *property;
@@ -838,6 +839,7 @@ void TvStateUpdate(
 	long unsigned int i;
 	int j;
 	char *tmpstate = NULL;
+	(void)UDN;
 
 	SampleUtil_Print("Tv State Update (service %d):\n", Service);
 	/* Find all of the e:property tags in the document */
@@ -955,9 +957,9 @@ void TvCtrlPointHandleEvent(
 void TvCtrlPointHandleSubscribeUpdate(
 	const char *eventURL, const Upnp_SID sid, int timeout)
 {
-	(void)timeout;
 	struct TvDeviceNode *tmpdevnode;
 	int service;
+	(void)timeout;
 
 	ithread_mutex_lock(&DeviceListMutex);
 
@@ -1031,8 +1033,8 @@ void TvCtrlPointHandleGetVar(
 int TvCtrlPointCallbackEventHandler(
 	Upnp_EventType EventType, const void *Event, void *Cookie)
 {
-	(void)Cookie;
 	int errCode = 0;
+	(void)Cookie;
 
 	SampleUtil_PrintEvent(EventType, Event);
 	switch (EventType) {
@@ -1244,10 +1246,9 @@ void TvCtrlPointVerifyTimeouts(int incr)
 static int TvCtrlPointTimerLoopRun = 1;
 void *TvCtrlPointTimerLoop(void *args)
 {
-	(void)args;
-
 	/* how often to verify the timeouts, in seconds */
 	int incr = 30;
+	(void)args;
 
 	while (TvCtrlPointTimerLoopRun) {
 		isleep((unsigned int)incr);
@@ -1532,12 +1533,13 @@ void TvCtrlPointPrintCommands(void)
 
 void *TvCtrlPointCommandLoop(void *args)
 {
-	(void)args;
 	char cmdline[100];
+	char *s;
+	(void)args;
 
 	while (1) {
 		SampleUtil_Print("\n>> ");
-		char *s = fgets(cmdline, 100, stdin);
+		s = fgets(cmdline, 100, stdin);
 		if (!s)
 			break;
 		TvCtrlPointProcessCommand(cmdline);

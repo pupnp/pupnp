@@ -1069,13 +1069,13 @@ int UpnpRegisterRootDevice2(Upnp_DescType descriptionType,
 	const void *Cookie,
 	UpnpDevice_Handle *Hnd)
 {
-	(void)bufferLen;
 	struct Handle_Info *HInfo = NULL;
 	int retVal = 0;
 	#if EXCLUDE_GENA == 0
 	int hasServiceTable = 0;
 	#endif /* EXCLUDE_GENA */
 	char *description = (char *)description_const;
+	(void)bufferLen;
 
 	HandleLock();
 

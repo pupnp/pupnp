@@ -81,7 +81,7 @@ int uuid_create(uuid_upnp *uid)
 	UUIDUnlock();
 
 	return 1;
-};
+}
 
 void upnp_uuid_unpack(uuid_upnp *u, char *out)
 {
@@ -98,7 +98,7 @@ void upnp_uuid_unpack(uuid_upnp *u, char *out)
 		u->node[3],
 		u->node[4],
 		u->node[5]);
-};
+}
 
 /*!
  * \brief Make a UUID from the timestamp, clockseq, and node ID.
@@ -118,7 +118,7 @@ void format_uuid_v1(uuid_upnp *uid,
 	uid->clock_seq_hi_and_reserved = (uint8_t)((clock_seq & 0x3F00) >> 8);
 	uid->clock_seq_hi_and_reserved |= 0x80;
 	memcpy(&uid->node, &node, sizeof uid->node);
-};
+}
 
 /*! Data type for UUID generator persistent state. */
 typedef struct
@@ -146,7 +146,7 @@ int read_state(uint16_t *clockseq, uuid_time_t *timestamp, uuid_node_t *node)
 	*node = st.node;
 
 	return 1;
-};
+}
 
 /*!
  * \brief Save UUID generator state back to non-volatile storage.
@@ -167,7 +167,7 @@ void write_state(uint16_t clockseq, uuid_time_t timestamp, uuid_node_t node)
 		/* schedule next save for 10 seconds from now. */
 		next_save = timestamp + (10 * 10 * 1000 * 1000);
 	};
-};
+}
 
 /*!
  * \brief Get time as 60 bit 100ns ticks since whenever.
@@ -203,7 +203,7 @@ void get_current_time(uuid_time_t *timestamp)
 	/* add the count of uuids to low order bits of the clock reading. */
 	*timestamp = time_now + uuids_this_tick;
 	time_last = *timestamp;
-};
+}
 
 /*!
  * \brief generate a crypto-quality random number.
@@ -255,7 +255,7 @@ void uuid_create_from_name(
 	MD5Final(hash, &c);
 	/* the hash is in network byte order at this point. */
 	format_uuid_v3(uid, hash);
-};
+}
 
 /*!
  * \brief Make a UUID from a (pseudo)random 128 bit number.
@@ -274,7 +274,7 @@ void format_uuid_v3(uuid_upnp *uid, unsigned char hash[16])
 	uid->time_hi_and_version |= (3 << 12);
 	uid->clock_seq_hi_and_reserved &= 0x3F;
 	uid->clock_seq_hi_and_reserved |= 0x80;
-};
+}
 
 #define CHECK(f1, f2) \
 	if (f1 != f2) \
@@ -306,4 +306,4 @@ int uuid_compare(uuid_upnp *u1, uuid_upnp *u2)
 	}
 
 	return 0;
-};
+}

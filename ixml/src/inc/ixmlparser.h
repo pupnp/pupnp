@@ -68,7 +68,7 @@ typedef enum
 {
 	eELEMENT,
 	eATTRIBUTE,
-	eCONTENT,
+	eCONTENT
 } PARSER_STATE;
 
 typedef struct _Parser

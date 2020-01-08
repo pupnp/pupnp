@@ -772,6 +772,7 @@ ExitFunction:
 static void maybeDiscardEvents(LinkedList *listp)
 {
 	time_t now = time(0L);
+	notify_thread_struct *ntsp;
 
 	while (ListSize(listp) > 1) {
 		ListNode *node = ListHead(listp);
@@ -784,9 +785,8 @@ static void maybeDiscardEvents(LinkedList *listp)
 			break;
 		}
 
-		notify_thread_struct *ntsp =
-			(notify_thread_struct *)(((ThreadPoolJob *)node->item)
-							 ->arg);
+		ntsp = (notify_thread_struct *)(((ThreadPoolJob *)node->item)
+							->arg);
 		if (ListSize(listp) > g_UpnpSdkEQMaxLen ||
 			now - ntsp->ctime > g_UpnpSdkEQMaxAge) {
 			free_notify_struct(ntsp);

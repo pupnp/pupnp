@@ -1231,12 +1231,12 @@ int http_CancelHttpGet(void *Handle)
 
 int http_OpenHttpConnection(const char *url_str, void **Handle, int timeout)
 {
-	(void)timeout; /* Unused parameter */
 	int ret_code;
 	size_t sockaddr_len;
 	SOCKET tcp_connection;
 	http_connection_handle_t *handle = NULL;
 	uri_type url;
+	(void)timeout; /* Unused parameter */
 	if (!url_str || !Handle)
 		return UPNP_E_INVALID_PARAM;
 	*Handle = handle;
