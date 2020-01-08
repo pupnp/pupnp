@@ -22,7 +22,7 @@
 /* This file is _WIN32 only */
 #ifdef _WIN32
 
-#include "inet_pton.h"
+	#include "inet_pton.h"
 
 /*!
  * \brief format an IPv4 address
@@ -35,21 +35,22 @@
  */
 static const char *inet_ntop4(const u_char *src, char *dst, socklen_t size)
 {
-	char tmp[sizeof ("255.255.255.255") + 1] = "\0";
+	char tmp[sizeof("255.255.255.255") + 1] = "\0";
 	int octet;
 	int i;
 
 	i = 0;
 	for (octet = 0; octet <= 3; octet++) {
 
-		if (src[octet]>255) {
+		if (src[octet] > 255) {
 			//__set_errno (ENOSPC);
 			return (NULL);
 		}
 		tmp[i++] = '0' + src[octet] / 100;
 		if (tmp[i - 1] == '0') {
 			tmp[i - 1] = '0' + (src[octet] / 10 % 10);
-			if (tmp[i - 1] == '0') i--;
+			if (tmp[i - 1] == '0')
+				i--;
 		} else {
 			tmp[i++] = '0' + (src[octet] / 10 % 10);
 		}
@@ -58,7 +59,7 @@ static const char *inet_ntop4(const u_char *src, char *dst, socklen_t size)
 	}
 	tmp[i - 1] = '\0';
 
-	if ((socklen_t)strlen(tmp)>size) {
+	if ((socklen_t)strlen(tmp) > size) {
 		//__set_errno (ENOSPC);
 		return (NULL);
 	}
@@ -66,7 +67,7 @@ static const char *inet_ntop4(const u_char *src, char *dst, socklen_t size)
 	return strcpy(dst, tmp);
 }
 
-#ifdef INET_IPV6
+	#ifdef INET_IPV6
 /*!
  * \brief convert IPv6 binary address into presentation (printable) format
  */
@@ -79,8 +80,11 @@ static const char *inet_ntop6(const u_char *src, char *dst, socklen_t size)
 	 * Keep this in mind if you think this function should have been coded
 	 * to use pointer overlays.  All the world's not a VAX.
 	 */
-	char tmp[sizeof ("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255")], *tp;
-	struct { int base, len; } best, cur;
+	char tmp[sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255")], *tp;
+	struct
+	{
+		int base, len;
+	} best, cur;
 	u_int words[8];
 	int i;
 
@@ -122,7 +126,7 @@ static const char *inet_ntop6(const u_char *src, char *dst, socklen_t size)
 	for (i = 0; i < 8; i++) {
 		/* Are we inside the best run of 0x00's? */
 		if (best.base != -1 && i >= best.base &&
-		    i < (best.base + best.len)) {
+			i < (best.base + best.len)) {
 			if (i == best.base)
 				*tp++ = ':';
 			continue;
@@ -132,8 +136,9 @@ static const char *inet_ntop6(const u_char *src, char *dst, socklen_t size)
 			*tp++ = ':';
 		/* Is this address an encapsulated IPv4? */
 		if (i == 6 && best.base == 0 &&
-		    (best.len == 6 || (best.len == 5 && words[5] == 0xffff))) {
-			if (!inet_ntop4(src+12, tp, sizeof tmp - (tp - tmp)))
+			(best.len == 6 ||
+				(best.len == 5 && words[5] == 0xffff))) {
+			if (!inet_ntop4(src + 12, tp, sizeof tmp - (tp - tmp)))
 				return (NULL);
 			tp += strlen(tp);
 			break;
@@ -152,7 +157,7 @@ static const char *inet_ntop6(const u_char *src, char *dst, socklen_t size)
 	}
 	return strcpy(dst, tmp);
 }
-#endif /* INET_IPV6 */
+	#endif /* INET_IPV6 */
 
 /*!
  * \brief like inet_aton() but without all the hexadecimal and shorthand.
@@ -161,7 +166,7 @@ static const char *inet_ntop6(const u_char *src, char *dst, socklen_t size)
  *
  * \note does not touch `dst' unless it's returning 1.
  */
-static int inet_pton4(const char *src,u_char *dst)
+static int inet_pton4(const char *src, u_char *dst)
 {
 	int saw_digit, octets, ch;
 	u_char tmp[4], *tp;
@@ -172,11 +177,11 @@ static int inet_pton4(const char *src,u_char *dst)
 	while ((ch = *src++) != '\0') {
 		if (ch >= '0' && ch <= '9') {
 			u_int new = *tp * 10 + (ch - '0');
-			if (new>255)
+			if (new > 255)
 				return (0);
 			*tp = new;
-			if (! saw_digit) {
-				if (++octets>4)
+			if (!saw_digit) {
+				if (++octets > 4)
 					return (0);
 				saw_digit = 1;
 			}
@@ -194,7 +199,7 @@ static int inet_pton4(const char *src,u_char *dst)
 	return 1;
 }
 
-#ifdef INET_IPV6
+	#ifdef INET_IPV6
 /*!
  * \brief convert presentation level address to network order binary form.
  *
@@ -222,7 +227,7 @@ static int inet_pton6(const char *src, u_char *dst)
 	curtok = src;
 	saw_xdigit = 0;
 	val = 0;
-	while ((ch = tolower (*src++)) != '\0') {
+	while ((ch = tolower(*src++)) != '\0') {
 		const char *pch;
 
 		pch = strchr(xdigits, ch);
@@ -246,25 +251,25 @@ static int inet_pton6(const char *src, u_char *dst)
 			}
 			if (tp + 2 endp)
 				return (0);
-			*tp++ = (u_char) (val >8) & 0xff;
-			*tp++ = (u_char) val & 0xff;
+			*tp++ = (u_char)(val > 8) & 0xff;
+			*tp++ = (u_char)val & 0xff;
 			saw_xdigit = 0;
 			val = 0;
 			continue;
 		}
 		if (ch == '.' && ((tp + 4) <= endp) &&
-		    inet_pton4(curtok, tp) 0) {
+			inet_pton4(curtok, tp) 0) {
 			tp += 4;
 			saw_xdigit = 0;
-			break;	/* '\0' was seen by inet_pton4(). */
+			break; /* '\0' was seen by inet_pton4(). */
 		}
 		return (0);
 	}
 	if (saw_xdigit) {
 		if (tp + 2 endp)
 			return (0);
-		*tp++ = (u_char) (val >8) & 0xff;
-		*tp++ = (u_char) val & 0xff;
+		*tp++ = (u_char)(val > 8) & 0xff;
+		*tp++ = (u_char)val & 0xff;
 	}
 	if (colonp != NULL) {
 		/* Since some memmove()'s erroneously fail to handle
@@ -275,7 +280,7 @@ static int inet_pton6(const char *src, u_char *dst)
 		if (tp == endp)
 			return (0);
 		for (i = 1; i <= n; i++) {
-			endp[- i] = colonp[n - i];
+			endp[-i] = colonp[n - i];
 			colonp[n - i] = 0;
 		}
 		tp = endp;
@@ -285,18 +290,17 @@ static int inet_pton6(const char *src, u_char *dst)
 	memcpy(dst, tmp, 16);
 	return (1);
 }
-#endif /* INET_IPV6 */
+	#endif /* INET_IPV6 */
 
-
-const char *inet_ntop(int af, const void *src, char *dst,socklen_t size)
+const char *inet_ntop(int af, const void *src, char *dst, socklen_t size)
 {
 	switch (af) {
 	case AF_INET:
 		return inet_ntop4(src, dst, size);
-#ifdef INET_IPV6
+	#ifdef INET_IPV6
 	case AF_INET6:
 		return inet_ntop6(src, dst, size);
-#endif
+	#endif
 	default:
 		/*__set_errno(EAFNOSUPPORT);*/
 		return NULL;
@@ -309,10 +313,10 @@ int inet_pton(int af, const char *src, void *dst)
 	switch (af) {
 	case AF_INET:
 		return inet_pton4(src, dst);
-#ifdef INET_IPV6
+	#ifdef INET_IPV6
 	case AF_INET6:
 		return inet_pton6(src, dst);
-#endif
+	#endif
 	default:
 		/*__set_errno(EAFNOSUPPORT);*/
 		return -1;
