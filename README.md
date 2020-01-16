@@ -139,16 +139,29 @@ where 'eth0' is the network adapter that the UPnP library will use.  Without thi
 
 ## 5. Build Instructions
 
+### Pre-requisites
+
+Some packages/tools are required to build the library. Here's a minimal 'inspirational example'
+that builds the library using a Docker Ubuntu image.
+
+```bash
+% docker run -it --rm ubuntu /bin/bash
+
+% apt update \
+  && apt install -y build-essential autoconf libtool pkg-config git shtool \
+  && git clone http://github.com/pupnp/pupnp.git \
+  && cd pupnp \
+  && ./bootstrap
+
+% ./configure
+% make
+```
+
 ### CORE LIBRARIES
-
-The in the examples below, replace `$(LIBUPNP)` with "libupnp-x.y.z", with x, y, and z corresponding to the version of the library that you have.
-
-All pieces of the SDK are configured and built from the `$(LIBUPNP)` directory.
 
 Note: On a git checkout, you need to run `./bootstrap` to generate the configure script.
 
 ```bash
-% cd $(LIBUPNP)
 % ./configure
 % make
 ```
@@ -156,7 +169,6 @@ Note: On a git checkout, you need to run `./bootstrap` to generate the configure
 will build a version of the binaries without debug support, and with default options enabled (see below for options available at configure time).
 
 ```bash
-% cd $(LIBUPNP)
 % ./configure CFLAGS="-DSPARC_SOLARIS -mtune=<cputype> -mcpu=<cputype>"
 % make
 ```
@@ -168,21 +180,18 @@ To build the documentation, assuming all the necessary tools are installed (see 
 To generate the HTML documentation:
 
 ```bash
-% cd $(LIBUPNP)
 % make html
 ```
 
 To generate the PDF file:
 
 ```bash
-% cd $(LIBUPNP)
 % make pdf
 ```
 
 A few options are available at configure time. Use "./configure --help" to display a complete list of options. Note that these options may be combined in any order. After installation, the file \<upnp/upnpconfig.h\> will provide a summary of the optional features that have been included in the library.
 
 ```bash
-% cd $(LIBUPNP)
 % ./configure --enable-debug
 % make
 ```
@@ -192,7 +201,6 @@ will build a debug version with symbols support.
 To build the library with the optional, integrated mini web server (note that this is the default):
 
 ```bash
-% cd $(LIBUPNP)
 % ./configure --enable-webserver
 % make
 ```
@@ -200,7 +208,6 @@ To build the library with the optional, integrated mini web server (note that th
 To build without:
 
 ```bash
-% cd $(LIBUPNP)
 % ./configure --disable-webserver
 % make
 ```
@@ -208,7 +215,6 @@ To build without:
 The SDK also contains some additional helper APIs, declared in inc/tools/upnptools.h.  If these additional tools are not required, they can be compiled out:
 
 ```bash
-% cd $(LIBUPNP)
 % ./configure --disable-tools
 % make
 ```
@@ -218,7 +224,6 @@ By default, the tools are included in the library.
 To further remove code that is not required, the library can be build with or with out the control point (client) or device specific code.  To remove this code:
 
 ```bash
-% cd $(LIBUPNP)
 % ./configure --disable-client
 % make
 ```
@@ -226,7 +231,6 @@ To further remove code that is not required, the library can be build with or wi
 to remove client only code or:
 
 ```bash
-% cd $(LIBUPNP)
 % ./configure --disable-device
 % make
 ```
@@ -238,7 +242,6 @@ By default, both client and device code is included in the library. The integrat
 To build the library without large-file support (enabled by default):
 
 ```bash
-% cd $(LIBUPNP)
 % ./configure --disable-largefile
 % make
 ```
@@ -246,7 +249,6 @@ To build the library without large-file support (enabled by default):
 To remove all the targets, object files, and built documentation:
 
 ```bash
-% cd $(LIBUPNP)
 % make clean
 ```
 
@@ -255,7 +257,6 @@ To remove all the targets, object files, and built documentation:
 To cross compile the SDK, a special "configure" directive is all that is required:
 
 ```bash
-% cd $(LIBUPNP)
 % ./configure --host=arm-linux
 % make
 ```
@@ -269,7 +270,6 @@ The SDK contains two samples: a TV device application and a control point that t
 To build the samples (note: this is the default behaviour):
 
 ```bash
-% cd $(LIBUPNP)
 % ./configure --enable-samples
 % make
 ```
@@ -279,7 +279,7 @@ will build the sample device "$(LIBUPNP)/upnp/tv_device" and sample control poin
 To run the sample device, you need to create a tvdevice directory and move the web directory there, giving: "$(LIBUPNP)/upnp/sample/tvdevice/web". To run the sample invoke from the command line as follows:
 
 ```bash
-% cd $(LIBUPNP)/upnp/sample/tvdevice
+% cd ./upnp/sample/tvdevice
 % ../tv_device
 ```
 
