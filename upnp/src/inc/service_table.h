@@ -1,31 +1,31 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -41,21 +41,22 @@
 extern "C" {
 #endif
 
+#include "LinkedList.h"
 #include "config.h"
-#include "uri.h"
 #include "ixml.h"
 #include "upnp.h"
 #include "upnpdebug.h"
-#include "LinkedList.h"
+#include "uri.h"
 
 #include <stdio.h>
 #include <time.h>
 
-#define SID_SIZE  (size_t)41
+#define SID_SIZE (size_t)41
 
 #ifdef INCLUDE_DEVICE_APIS
 
-typedef struct SUBSCRIPTION {
+typedef struct SUBSCRIPTION
+{
 	Upnp_SID sid;
 	int ToSendEventKey;
 	time_t expireTime;
@@ -71,20 +72,22 @@ typedef struct SUBSCRIPTION {
 
 extern void freeSubscriptionQueuedEvents(subscription *sub);
 
-typedef struct SERVICE_INFO {
-	DOMString	serviceType;
-	DOMString	serviceId;
-	char		*SCPDURL ;
-	char		*controlURL;
-	char		*eventURL;
-	DOMString	UDN;
-	int		active;
-	int		TotalSubscriptions;
-	subscription	*subscriptionList;
-	struct SERVICE_INFO	 *next;
+typedef struct SERVICE_INFO
+{
+	DOMString serviceType;
+	DOMString serviceId;
+	char *SCPDURL;
+	char *controlURL;
+	char *eventURL;
+	DOMString UDN;
+	int active;
+	int TotalSubscriptions;
+	subscription *subscriptionList;
+	struct SERVICE_INFO *next;
 } service_info;
 
-typedef struct SERVICE_TABLE {
+typedef struct SERVICE_TABLE
+{
 	DOMString URLBase;
 	service_info *serviceList;
 	service_info *endServiceList;
@@ -104,8 +107,8 @@ int copy_subscription(
 	subscription *out);
 
 /*
- * \brief Remove the subscription represented by the const Upnp_SID sid parameter
- * from the service table and update the service table.
+ * \brief Remove the subscription represented by the const Upnp_SID sid
+ * parameter from the service table and update the service table.
  */
 void RemoveSubscriptionSID(
 	/*! [in] Subscription ID. */
@@ -123,7 +126,7 @@ subscription *GetSubscriptionSID(
 	/*! [in] Subscription ID. */
 	const Upnp_SID sid,
 	/*! [in] Service object providing the list of subscriptions. */
-	service_info *service); 
+	service_info *service);
 
 /*!
  * \brief Gets pointer to the first subscription node in the service table.
@@ -153,11 +156,12 @@ void freeSubscription(
 	subscription *sub);
 
 /*!
- * \brief Free's memory allocated for all the subscriptions in the service table.
+ * \brief Free's memory allocated for all the subscriptions in the service
+ * table.
  */
 void freeSubscriptionList(
 	/*! [in] Head of the subscription list. */
-	subscription * head);
+	subscription *head);
 
 /*!
  * \brief Traverses through the service table and returns a pointer to the
@@ -167,7 +171,7 @@ void freeSubscriptionList(
  */
 service_info *FindServiceId(
 	/*! [in] Service table. */
-	service_table *table, 
+	service_table *table,
 	/*! [in] String representing the service id to be found among those
 	 * in the table. */
 	const char *serviceId,
@@ -195,17 +199,17 @@ service_info *FindServiceEventURLPath(
  * \return Pointer to the service list node from the service table whose control
  * URL Path matches a known value.
  */
-service_info * FindServiceControlURLPath(
+service_info *FindServiceControlURLPath(
 	/*! [in] Service table. */
 	service_table *table,
 	/*! [in] Control URL path used to find a service from the table. */
 	const char *controlURLPath);
 
-/*!
- * \brief For debugging purposes prints information from the service passed
- * into the function.
- */
-#ifdef DEBUG
+	/*!
+	 * \brief For debugging purposes prints information from the service
+	 * passed into the function.
+	 */
+	#ifdef DEBUG
 void printService(
 	/*! [in] Service whose information is to be printed. */
 	service_info *service,
@@ -213,15 +217,17 @@ void printService(
 	Upnp_LogLevel level,
 	/*! [in] Debug module specified to the print function. */
 	Dbg_Module module);
-#else
-#define printService(service, level, module) do {} while (0)
-#endif
+	#else
+		#define printService(service, level, module) \
+			do { \
+			} while (0)
+	#endif
 
-/*!
- * \brief For debugging purposes prints information of each service from the
- * service table passed into the function.
- */
-#ifdef DEBUG
+	/*!
+	 * \brief For debugging purposes prints information of each service from
+	 * the service table passed into the function.
+	 */
+	#ifdef DEBUG
 void printServiceList(
 	/*! [in] Service whose information is to be printed. */
 	service_info *service,
@@ -229,15 +235,18 @@ void printServiceList(
 	Upnp_LogLevel level,
 	/*! [in] Debug module specified to the print function. */
 	Dbg_Module module);
-#else
-#define printServiceList(service, level, module) do {} while (0)
-#endif
+	#else
+		#define printServiceList(service, level, module) \
+			do { \
+			} while (0)
+	#endif
 
-/*!
- * \brief For debugging purposes prints the URL base of the table and information
- * of each service from the service table passed into the function.
- */
-#ifdef DEBUG
+	/*!
+	 * \brief For debugging purposes prints the URL base of the table and
+	 * information of each service from the service table passed into the
+	 * function.
+	 */
+	#ifdef DEBUG
 void printServiceTable(
 	/*! [in] Service table to be printed. */
 	service_table *table,
@@ -245,9 +254,11 @@ void printServiceTable(
 	Upnp_LogLevel level,
 	/*! [in] Debug module specified to the print function. */
 	Dbg_Module module);
-#else
-#define printServiceTable(table, level, module) do {} while (0)
-#endif
+	#else
+		#define printServiceTable(table, level, module) \
+			do { \
+			} while (0)
+	#endif
 
 /*!
  * \brief Free's memory allocated for the various components of the service
@@ -307,7 +318,8 @@ int addServiceTable(
 int getServiceTable(
 	/*! [in] XML node information. */
 	IXML_Node *node,
-	/*! [in] Output parameter which will contain the service list and URL. */
+	/*! [in] Output parameter which will contain the service list and URL.
+	 */
 	service_table *out,
 	/*! [in] Default base URL on which the URL will be returned. */
 	const char *DefaultURLBase);
@@ -337,7 +349,7 @@ int getSubElement(
 	/*! [in] Sub element name to be searched for. */
 	const char *element_name,
 	/*! [in] Input node which provides the list of child nodes. */
-	IXML_Node *node, 
+	IXML_Node *node,
 	/*! [out] Ouput node to which the matched child node is returned. */
 	IXML_Node **out);
 
@@ -348,4 +360,3 @@ int getSubElement(
 #endif
 
 #endif /* SERVICE_TABLE */
-
