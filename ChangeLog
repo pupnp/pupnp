@@ -2,6 +2,24 @@
 Version 1.12.0
 *******************************************************************************
 
+2020-01-22 Stephen Bash <scbash(at)github>
+
+    Reduce spurious HTTP 416 errors due to ill-defined bytes header
+    
+    I (re)discovered this behavior trying to use the Gerbera media server
+    with Chromecast (built in to my Vizio P55-F1 TV).  Chromecast specifies
+    "bytes:0-" with no end range, which caused pupnp to return
+    RANGE_NOT_SATISFIABLE.  Jin, the author of MediaTomb, of which Gerbera
+    is a continuation, fixed this in 2007 in MediaTomb's fork of pupnp, see
+    gerbera@ccd7994d45 "made sure that range requests specified as
+    "bytes=0-" do not trigger...", but never passed the fix upstream.  When
+    restarted as Gerbera, pupnp was removed from the local tree in favor of
+    using the upstream version, and the patch was lost which lead to me
+    rediscovering it recently.
+    
+    This is Jin's original patch applied to pupnp 1.8.  This teaches punp to
+    ignore the bytes header if it matches "0-" and return HTTP_OK.
+
 2020-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
 	GitHub issue #157
