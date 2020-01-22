@@ -818,8 +818,14 @@ static int CreateHTTPRangeResponseHeader(
 	/* Jump = */
 	Ptr = Ptr + 1;
 	if (FileLength < 0) {
+		int ret = HTTP_REQUEST_RANGE_NOT_SATISFIABLE;
+		if ((*Ptr == '0') && (*(Ptr+1) == '-') && (*(Ptr+2) == '\0'))
+		{
+			Instr->IsRangeActive = 0;
+			ret = HTTP_OK;
+		}
 		free(RangeInput);
-		return HTTP_REQUEST_RANGE_NOT_SATISFIABLE;
+		return ret;
 	}
 	if (GetNextRange(&Ptr, &FirstByte, &LastByte) != -1) {
 		if (FileLength < FirstByte) {
