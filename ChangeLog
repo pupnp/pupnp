@@ -2,6 +2,20 @@
 Version 1.12.0
 *******************************************************************************
 
+2020-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
+
+	GitHub issue #157
+
+	When building v1.8.6 (on GNU/Linux) with --disable-device, pupnp doesn't build:
+	/bin/bash ../libtool  --tag=CC   --mode=compile gcc -DHAVE_CONFIG_H -I. -I.. -I../upnp/inc  -I./inc -I../ixml/inc  -DNDEBUG -I./src/inc -I./src/threadutil -I/foo/contrib/x86_64-linux-gnu/include -fPIC  -pthread  -I/foo/contrib/x86_64-linux-gnu/include -DNDEBUG=1 -O3  -DUPNP_STATIC_LIB -Os -Wall -c -o src/genlib/util/libupnp_la-util.lo `test -f 'src/genlib/util/util.c' || echo './'`src/genlib/util/util.c
+	In file included from src/genlib/miniserver/miniserver.c:58:0:
+	./src/inc/upnpapi.h:208:2: error: unknown type name 'service_info'
+  	service_info **serv_info
+  	^~~~~~~~~~~~
+
+	This patch fixes compilation for the --disable-device case.
+	
+
 2019-11-20 ePirat Marvin Scholz <epirat07(at)gmail.com>
 
         GitHub PRs:

@@ -53,8 +53,6 @@ extern "C" {
 
 #define SID_SIZE (size_t)41
 
-#ifdef INCLUDE_DEVICE_APIS
-
 typedef struct SUBSCRIPTION
 {
 	Upnp_SID sid;
@@ -70,8 +68,6 @@ typedef struct SUBSCRIPTION
 	struct SUBSCRIPTION *next;
 } subscription;
 
-extern void freeSubscriptionQueuedEvents(subscription *sub);
-
 typedef struct SERVICE_INFO
 {
 	DOMString serviceType;
@@ -85,6 +81,10 @@ typedef struct SERVICE_INFO
 	subscription *subscriptionList;
 	struct SERVICE_INFO *next;
 } service_info;
+
+#ifdef INCLUDE_DEVICE_APIS
+
+extern void freeSubscriptionQueuedEvents(subscription *sub);
 
 typedef struct SERVICE_TABLE
 {
