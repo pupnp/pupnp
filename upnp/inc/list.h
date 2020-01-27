@@ -40,6 +40,10 @@
 
 #include "UpnpGlobal.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /** List anchor structure. This should be the *first* entry in list
  *  member objects, except if you want to do member offset arithmetic
  *  instead of simple casts (look up "containerof"). The list code itself 
@@ -70,5 +74,9 @@ EXPORT_SPEC UpnpListIter UpnpListInsert(UpnpListHead *list, UpnpListIter pos,
 
 /** Erase element at pos, return next one, or end()*/
 EXPORT_SPEC UpnpListIter UpnpListErase(UpnpListHead *list, UpnpListIter pos);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* _UPNPLISTH_ */
