@@ -12,6 +12,7 @@
  */
 
 #include "upnpconfig.h"
+#include "UpnpInet.h" /* for struct sockaddr_storage */
 
 #include <sys/types.h>  /* for off_t */
 #include <time.h>       /* for time_t */
@@ -29,6 +30,7 @@
 	EXPAND_CLASS_MEMBER_INT(CLASS, IsReadable, int) \
 	EXPAND_CLASS_MEMBER_DOMSTRING(CLASS, ContentType) \
 	EXPAND_CLASS_MEMBER_LIST(CLASS, ExtraHeadersList) \
+	EXPAND_CLASS_MEMBER_BUFFER(CLASS, CtrlPtIPAddr, struct sockaddr_storage) \
 
 #include "TemplateInclude.h"
 
