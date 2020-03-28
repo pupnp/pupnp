@@ -1132,6 +1132,8 @@ static int ExtraHTTPHeaders(
  * \li \c HTTP_OK
  */
 static int process_request(
+	/*! [in] Socket info. */
+	SOCKINFO *info,
 	/*! [in] HTTP Request message. */
 	http_message_t *req,
 	/*! [out] Tpye of response. */
@@ -1231,6 +1233,8 @@ static int process_request(
 				err_code = code;
 				goto error_handler;
 			}
+
+			UpnpFileInfo_set_CtrlPtIPAddr(finfo, &info->foreign_sockaddr);
 
 			/* get file info */
 			if (virtualDirCallback.get_info(filename->buf,
@@ -1681,7 +1685,7 @@ void web_server_callback(
 	 * on the */
 	/*the type of request. */
 	ret = process_request(
-		req, &rtype, &headers, &filename, &xmldoc, &RespInstr);
+		info, req, &rtype, &headers, &filename, &xmldoc, &RespInstr);
 	if (ret != HTTP_OK) {
 		/* send error code */
 		http_SendStatusResponse(
