@@ -28,6 +28,7 @@
 	EXPAND_CLASS_MEMBER_INT(CLASS, ActionResult, IXML_Document *) \
 	EXPAND_CLASS_MEMBER_INT(CLASS, SoapHeader, IXML_Document *) \
 	EXPAND_CLASS_MEMBER_BUFFER(CLASS, CtrlPtIPAddr, struct sockaddr_storage) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, Os) \
 
 #include "TemplateInclude.h"
 

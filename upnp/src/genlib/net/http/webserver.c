@@ -1161,6 +1161,7 @@ static int process_request(
 	int resp_minor;
 	int alias_grabbed;
 	size_t dummy;
+	memptr hdr_value;
 
 	print_http_headers(req);
 	url = &req->uri;
@@ -1235,6 +1236,10 @@ static int process_request(
 			}
 
 			UpnpFileInfo_set_CtrlPtIPAddr(finfo, &info->foreign_sockaddr);
+
+			if (httpmsg_find_hdr(req, HDR_USER_AGENT, &hdr_value) != NULL) {
+				UpnpFileInfo_strncpy_Os(finfo, hdr_value.buf, hdr_value.length);
+			}
 
 			/* get file info */
 			if (virtualDirCallback.get_info(filename->buf,

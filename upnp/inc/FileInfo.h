@@ -31,6 +31,7 @@
 	EXPAND_CLASS_MEMBER_DOMSTRING(CLASS, ContentType) \
 	EXPAND_CLASS_MEMBER_LIST(CLASS, ExtraHeadersList) \
 	EXPAND_CLASS_MEMBER_BUFFER(CLASS, CtrlPtIPAddr, struct sockaddr_storage) \
+	EXPAND_CLASS_MEMBER_STRING(CLASS, Os) \
 
 #include "TemplateInclude.h"
 
