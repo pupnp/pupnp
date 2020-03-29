@@ -393,6 +393,7 @@ static void handle_invoke_action(
 	const char *err_str;
 	memptr action_name;
 	DOMString act_node = NULL;
+	memptr hdr_value;
 
 	/* null-terminate */
 	action_name = soap_info->action_name;
@@ -423,6 +424,10 @@ static void handle_invoke_action(
 	UpnpActionRequest_set_ActionRequest(action, actionRequestDoc);
 	UpnpActionRequest_set_ActionResult(action, NULL);
 	UpnpActionRequest_set_CtrlPtIPAddr(action, &info->foreign_sockaddr);
+
+	if (httpmsg_find_hdr(request, HDR_USER_AGENT, &hdr_value) != NULL) {
+		UpnpActionRequest_strncpy_Os(action, hdr_value.buf, hdr_value.length);
+	}
 
 	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
 	soap_info->callback(
