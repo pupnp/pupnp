@@ -566,12 +566,16 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 	int timeTillRead = 0;
 	struct Handle_Info *ctrlpt_info = NULL;
 	enum SsdpSearchType requestType;
-	unsigned long addrv4 = inet_addr(gIF_IPV4);
+	struct in_addr addrv4;
 	SOCKET max_fd = 0;
 	int retVal;
 
 	/*ThreadData *ThData; */
 	ThreadPoolJob job;
+
+	if (!inet_aton(gIF_IPV4, &addrv4)) {
+		return UPNP_E_INVALID_PARAM;
+	}
 
 	memset(&job, 0, sizeof(job));
 

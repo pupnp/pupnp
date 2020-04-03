@@ -185,7 +185,7 @@ static int NewRequestHandler(
 	SOCKET ReplySock;
 	socklen_t socklen = sizeof(struct sockaddr_storage);
 	int Index;
-	unsigned long replyAddr = inet_addr(gIF_IPV4);
+	struct in_addr replyAddr;
 	/* a/c to UPNP Spec */
 	int ttl = 4;
 #ifdef UPNP_ENABLE_IPV6
@@ -193,6 +193,10 @@ static int NewRequestHandler(
 #endif
 	char buf_ntop[INET6_ADDRSTRLEN];
 	int ret = UPNP_E_SUCCESS;
+
+	if (!inet_aton(gIF_IPV4, &replyAddr)) {
+		return UPNP_E_INVALID_PARAM;
+	}
 
 	ReplySock = socket((int)DestAddr->sa_family, SOCK_DGRAM, 0);
 	if (ReplySock == INVALID_SOCKET) {
