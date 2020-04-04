@@ -1,4 +1,38 @@
 *******************************************************************************
+Version 1.12.1
+*******************************************************************************
+
+2020-04-03 Rene Nielsen <rene.nielsen(at)microchip.com>
+
+	setsockopt(IP_MULTICAST_IF) fails on 64-bit CPUs
+
+2020-04-03 Rosen Penev <rosenp(at)gmail.com>
+
+	GitHub PR #164
+
+	Do not use usleep when using newer POSIX C source.
+    
+    	usleep is deprecated and is optionally unavailable with uClibc-ng.
+
+2020-03-29 pamapa <pamapa(at)github>
+
+	GitHub PR #162
+
+	Add Os/UserAgent information to UpnpActionRequest and UpnpFileInfo
+
+2020-03-28 pamapa <pamapa(at)github>
+
+	GitHub PR #161
+
+	Add CtrlPtIPAddr to UpnpFileInfo class
+
+2020-01-27 Ian Whyman <v00d00(at)github>
+
+	GitHub PR #160
+
+	List: Add extern C for C++ users
+
+*******************************************************************************
 Version 1.12.0
 *******************************************************************************
 
