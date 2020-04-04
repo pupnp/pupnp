@@ -928,7 +928,15 @@ static UPNP_INLINE int ithread_cleanup_thread(void) {
 #ifdef _WIN32
 	#define imillisleep Sleep
 #else
-	#define imillisleep(x) usleep(1000*x)
+#if _POSIX_C_SOURCE < 200809L
+	#define imillisleep(x) usleep(1000 * x)
+#else
+	#define imillisleep(x) \
+		do { \
+			const struct timespec req = {0, x * 1000 * 1000}; \
+			nanosleep(&req, NULL); \
+		} while(0)
+#endif
 #endif
 
 
