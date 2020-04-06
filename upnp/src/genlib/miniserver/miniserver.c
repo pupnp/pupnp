@@ -905,7 +905,7 @@ int StartMiniServer(
 	count = 0;
 	while (gMServState != (MiniServerState)MSERV_RUNNING && count < max_count) {
 		/* 0.05s */
-		usleep(50u * 1000u);
+		imillisleep(50);
 		count++;
 	}
 	if (count >= max_count) {
@@ -960,7 +960,7 @@ int StopMiniServer()
 		ssdpAddr.sin_port = htons(miniStopSockPort);
 		sendto(sock, buf, bufLen, 0,
 			(struct sockaddr *)&ssdpAddr, socklen);
-		usleep(1000u);
+		imillisleep(1);
 		if (gMServState == (MiniServerState)MSERV_IDLE) {
 			break;
 		}
