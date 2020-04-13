@@ -120,7 +120,7 @@ IF (device)
 ENDIF (device)
 
 INCLUDE (CMakeDependentOption)
-CMAKE_DEPENDENT_OPTION (webserver "integrated web server" NOT device ON)
+CMAKE_DEPENDENT_OPTION (webserver "integrated web server" ON NOT device OFF)
 SET (UPNP_HAVE_WEBSERVER ${webserver}) #see upnpconfig.h
 
 OPTION (ssdp "SSDP part" ON)
