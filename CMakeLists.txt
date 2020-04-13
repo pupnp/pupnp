@@ -358,3 +358,36 @@ ADD_SUBDIRECTORY (ixml)
 ADD_SUBDIRECTORY (upnp)
 
 ENABLE_TESTING()
+
+FILE (GLOB XML_FILES
+	${CMAKE_CURRENT_SOURCE_DIR}/ixml/test/testdata/*.xml
+)
+
+ADD_CUSTOM_TARGET (check
+	COMMAND ${CMAKE_CTEST_COMMAND}
+	DEPENDS ixml_test
+		test_init
+		test_list
+		test_log
+		test_url
+)
+
+ADD_TEST (NAME IXML_TEST
+	COMMAND ixml_test ${XML_FILES}
+)
+
+ADD_TEST (NAME UPNP_INIT
+	COMMAND test_init
+)
+
+ADD_TEST (NAME UPNP_LIST
+	COMMAND test_list
+)
+
+ADD_TEST (NAME UPNP_LOG
+	COMMAND test_log
+)
+
+ADD_TEST (NAME UPNP_URL
+	COMMAND test_url
+)

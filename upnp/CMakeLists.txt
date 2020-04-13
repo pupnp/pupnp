@@ -4,6 +4,8 @@
 # # Copyright (C) 2005 Rémi Turboult <r3mi@users.sourceforge.net>
 # #
 
+ADD_SUBDIRECTORY (test)
+
 ADD_LIBRARY (upnp_objects OBJECT
 	src/api/ActionComplete.c
 	src/api/ActionRequest.c
@@ -219,16 +221,6 @@ SET_TARGET_PROPERTIES(upnp_static PROPERTIES
 # libupnp_la_SOURCES += \
 # 	src/inet_pton.c \
 # 	src/inc/inet_pton.h
-# 
-# 
-# # check / distcheck tests
-# check_PROGRAMS = test_init test_url test_log test_list
-# TESTS = test_init test_url test_log test_list
-# test_init_SOURCES = test/test_init.c
-# test_url_SOURCES = test/test_url.c
-# test_log_SOURCES = test/test_log.c
-# test_list_SOURCES = test/test_list.c
-# 
 # 
 # EXTRA_DIST = \
 # 	m4/libupnp.m4 \
