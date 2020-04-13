@@ -51,7 +51,7 @@ TARGET_INCLUDE_DIRECTORIES (upnp_objects
 )
 
 TARGET_LINK_LIBRARIES (upnp_objects
-	ixml_objects
+	PUBLIC ixml_objects
 )
 
 IF (debug)
