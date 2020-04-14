@@ -6,6 +6,10 @@
 
 ADD_SUBDIRECTORY (test)
 
+IF (samples)
+	ADD_SUBDIRECTORY (sample)
+ENDIF (samples)
+
 ADD_LIBRARY (upnp_objects OBJECT
 	src/api/ActionComplete.c
 	src/api/ActionRequest.c
@@ -127,6 +131,7 @@ SET_TARGET_PROPERTIES(upnp_shared PROPERTIES
 TARGET_LINK_LIBRARIES (upnp_shared
 	INTERFACE ixml_shared
 	INTERFACE upnp_objects
+	INTERFACE Threads::Threads
 )
 
 IF (UPNP_ENABLE_OPEN_SSL)
