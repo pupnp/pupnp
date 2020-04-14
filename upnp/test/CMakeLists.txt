@@ -12,12 +12,6 @@ ADD_EXECUTABLE (test_init
 	test_init.c
 )
 
-TARGET_INCLUDE_DIRECTORIES (test_init
-	PRIVATE ${UPNP_BINARY_DIR}/upnp/inc/
-	PRIVATE ${UPNP_SOURCE_DIR}/ixml/inc/
-	PRIVATE ${UPNP_SOURCE_DIR}/upnp/inc/
-)
-
 TARGET_LINK_LIBRARIES (test_init
 	upnp_shared
 )
@@ -25,10 +19,6 @@ TARGET_LINK_LIBRARIES (test_init
 ADD_EXECUTABLE (test_list
 	EXCLUDE_FROM_ALL
 	test_list.c
-)
-
-TARGET_INCLUDE_DIRECTORIES (test_list
-	PRIVATE ${UPNP_SOURCE_DIR}/upnp/inc/
 )
 
 TARGET_LINK_LIBRARIES (test_list
@@ -40,12 +30,6 @@ ADD_EXECUTABLE (test_log
 	test_log.c
 )
 
-TARGET_INCLUDE_DIRECTORIES (test_log
-	PRIVATE ${UPNP_BINARY_DIR}/upnp/inc/
-	PRIVATE ${UPNP_SOURCE_DIR}/ixml/inc/
-	PRIVATE ${UPNP_SOURCE_DIR}/upnp/inc/
-)
-
 TARGET_LINK_LIBRARIES (test_log
 	upnp_shared
 )
@@ -53,12 +37,6 @@ TARGET_LINK_LIBRARIES (test_log
 ADD_EXECUTABLE (test_url
 	EXCLUDE_FROM_ALL
 	test_url.c
-)
-
-TARGET_INCLUDE_DIRECTORIES (test_url
-	PRIVATE ${UPNP_BINARY_DIR}/upnp/inc/
-	PRIVATE ${UPNP_SOURCE_DIR}/ixml/inc/
-	PRIVATE ${UPNP_SOURCE_DIR}/upnp/inc/
 )
 
 TARGET_LINK_LIBRARIES (test_url
