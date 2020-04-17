@@ -370,6 +370,7 @@ ADD_CUSTOM_TARGET (check
 		test_list
 		test_log
 		test_url
+		unittest
 )
 
 ADD_TEST (NAME IXML_TEST
@@ -390,4 +391,8 @@ ADD_TEST (NAME UPNP_LOG
 
 ADD_TEST (NAME UPNP_URL
 	COMMAND test_url
+)
+
+ADD_TEST (NAME UNITTEST
+	COMMAND unittest
 )
