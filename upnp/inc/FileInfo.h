@@ -17,7 +17,7 @@
 #include <sys/types.h>  /* for off_t */
 #include <time.h>       /* for time_t */
 
-#if defined UPNP_LARGEFILE_SENSITIVE && _FILE_OFFSET_BITS+0 != 64
+#if defined UPNP_LARGEFILE_SENSITIVE && _FILE_OFFSET_BITS+0 != 64 && !defined _WIN32
 #error libupnp uses large file support, so users must do that, too
 #endif
 

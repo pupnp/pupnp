@@ -24,6 +24,8 @@
 
 	#include "inet_pton.h"
 
+#if (NTDDI_VERSION < NTDDI_VISTA)
+
 /*!
  * \brief format an IPv4 address
  *
@@ -323,5 +325,7 @@ int inet_pton(int af, const char *src, void *dst)
 	}
 	/* NOTREACHED */
 }
+
+#endif /* NTDDI_VERSION < NTDDI_VISTA */
 
 #endif /* _WIN32 */

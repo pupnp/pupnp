@@ -57,7 +57,9 @@
 #include <string.h>
 
 #ifdef _WIN32
-	#define snprintf _snprintf
+	#if defined(_MSC_VER) && _MSC_VER < 1900
+		#define snprintf _snprintf
+	#endif
 #endif
 
 #define MSGTYPE_SHUTDOWN	0
@@ -194,7 +196,7 @@ static int NewRequestHandler(
 	char buf_ntop[INET6_ADDRSTRLEN];
 	int ret = UPNP_E_SUCCESS;
 
-	if (!inet_aton(gIF_IPV4, &replyAddr)) {
+	if (!inet_pton(AF_INET, gIF_IPV4, &replyAddr)) {
 		return UPNP_E_INVALID_PARAM;
 	}
 

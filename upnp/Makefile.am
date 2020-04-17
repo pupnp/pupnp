@@ -56,6 +56,11 @@ libupnp_la_LDFLAGS = \
 	-export-symbols-regex '^Upnp.*' \
 	$(top_builddir)/ixml/libixml.la
 
+if WIN32
+libupnp_la_LDFLAGS += \
+	-no-undefined
+endif
+
 libupnp_la_SOURCES = \
 	src/inc/config.h \
 	src/inc/client_table.h \

@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#if (NTDDI_VERSION < NTDDI_VISTA)
+
 /*!
  * \file
  *
@@ -44,6 +46,8 @@ extern const char *inet_ntop(int af, const void *src, char *dst,
  *	\li -1 if some other error occurred (`dst' is untouched in this case, too)
  */
 extern int inet_pton(int af, const char *src, void *dst);
+
+#endif /* NTDDI_VERSION < NTDDI_VISTA */
 
 #endif /* _WIN32 */
 

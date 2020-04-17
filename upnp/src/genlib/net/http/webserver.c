@@ -65,7 +65,9 @@
 	#include <sys/stat.h>
 
 	#ifdef _WIN32
-		#define snprintf _snprintf
+		#if defined(_MSC_VER) && _MSC_VER < 1900
+			#define snprintf _snprintf
+		#endif
 	#endif
 
 /*!

@@ -58,7 +58,9 @@
 
 #ifdef _WIN32
 #include <string.h>
+#if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
+#endif
 #endif /* _WIN32 */
 
 /*!
@@ -573,7 +575,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 	/*ThreadData *ThData; */
 	ThreadPoolJob job;
 
-	if (!inet_aton(gIF_IPV4, &addrv4)) {
+	if (!inet_pton(AF_INET, gIF_IPV4, &addrv4)) {
 		return UPNP_E_INVALID_PARAM;
 	}
 

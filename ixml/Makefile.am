@@ -28,6 +28,10 @@ lib_LTLIBRARIES		= libixml.la
 libixml_la_LDFLAGS	= -version-info $(LT_VERSION_IXML) \
 			  -export-symbols-regex '^ixml.*'
 
+if WIN32
+libixml_la_LDFLAGS += -no-undefined
+endif
+
 libixml_la_SOURCES	= \
 			src/attr.c \
 			src/document.c \
