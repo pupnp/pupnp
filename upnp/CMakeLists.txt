@@ -115,23 +115,63 @@ IF (uuid)
 	)
 ENDIF (uuid)
 
-SET_PROPERTY (TARGET upnp_objects
-	PROPERTY POSITION_INDEPENDENT_CODE 1
+SET_TARGET_PROPERTIES (upnp_objects PROPERTIES
+	POSITION_INDEPENDENT_CODE 1
 )
 
 ADD_LIBRARY (upnp_shared SHARED
 	$<TARGET_OBJECTS:upnp_objects>
 )
 
-SET_TARGET_PROPERTIES(upnp_shared PROPERTIES
+ADD_LIBRARY (UPNP::SHARED ALIAS upnp_shared)
+
+LIST (APPEND UPNP_HEADERS
+	inc/ActionComplete.h
+	inc/ActionRequest.h
+	inc/Callback.h
+	inc/Discovery.h
+	inc/Event.h
+	inc/EventSubscribe.h
+	inc/ExtraHeaders.h
+	inc/FileInfo.h
+	inc/ithread.h
+	inc/list.h
+	inc/StateVarComplete.h
+	inc/StateVarRequest.h
+	inc/SubscriptionRequest.h
+	inc/TemplateInclude.h
+	inc/TemplateSource.h
+	inc/TemplateUndef.h
+	inc/UpnpString.h
+	inc/upnp.h
+	inc/upnpdebug.h
+	inc/UpnpGlobal.h
+	inc/UpnpInet.h
+	inc/UpnpIntTypes.h
+	inc/UpnpStdInt.h
+	inc/UpnpUniStd.h
+)
+
+IF (ENABLE_TOOLS)
+	LIST (APPEND UPNP_HEADERS
+		inc/upnptools.h
+	)
+ENDIF (ENABLE_TOOLS)
+
+SET_TARGET_PROPERTIES (upnp_shared PROPERTIES
 	OUTPUT_NAME upnp
+	EXPORT_NAME UPNP::SHARED
 	VERSION ${UPNP_VERSION}
 	SOVERSION ${UPNP_VERSION_MAJOR}
+	PUBLIC_HEADER "${UPNP_HEADERS}"
+)
+
+TARGET_INCLUDE_DIRECTORIES (upnp_shared
+	INTERFACE $<BUILD_INTERFACE:$<TARGET_PROPERTY:upnp_objects,INTERFACE_INCLUDE_DIRECTORIES>>
 )
 
 TARGET_LINK_LIBRARIES (upnp_shared
 	INTERFACE ixml_shared
-	INTERFACE upnp_objects
 	INTERFACE Threads::Threads
 )
 
@@ -141,110 +181,42 @@ IF (UPNP_ENABLE_OPEN_SSL)
 	)
 ENDIF (UPNP_ENABLE_OPEN_SSL)
 
+INSTALL (TARGETS upnp_shared
+	EXPORT UPNP-Export
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
+)
+
 ADD_LIBRARY (upnp_static STATIC
 	$<TARGET_OBJECTS:upnp_objects>
 )
 
 SET_TARGET_PROPERTIES(upnp_static PROPERTIES
 	OUTPUT_NAME upnp
+	EXPORT_NAME UPNP::STATIC
+)
+
+TARGET_INCLUDE_DIRECTORIES (upnp_static
+	INTERFACE $<BUILD_INTERFACE:$<TARGET_PROPERTY:upnp_objects,INTERFACE_INCLUDE_DIRECTORIES>>
 )
 
 TARGET_LINK_LIBRARIES (upnp_static
 	INTERFACE ixml_static
-	INTERFACE upnp_objects
 )
-
 
 IF (UPNP_ENABLE_OPEN_SSL)
 	TARGET_LINK_LIBRARIES (upnp_static
 		PRIVATE OpenSSL::SSL
 	)
 ENDIF (UPNP_ENABLE_OPEN_SSL)
-# 
-# 
-# SUBDIRS = doc . sample unittest
-# 
-# upnpincludedir = $(includedir)/upnp
-# upnpinclude_HEADERS = \
-# 	inc/ActionComplete.h \
-# 	inc/ActionRequest.h \
-# 	inc/Callback.h \
-# 	inc/Discovery.h \
-# 	inc/Event.h \
-# 	inc/EventSubscribe.h \
-# 	inc/ExtraHeaders.h \
-# 	inc/FileInfo.h \
-# 	inc/list.h \
-# 	inc/StateVarComplete.h \
-# 	inc/StateVarRequest.h \
-# 	inc/SubscriptionRequest.h \
-# 	inc/TemplateInclude.h \
-# 	inc/TemplateSource.h \
-# 	inc/TemplateUndef.h \
-# 	inc/UpnpString.h \
-# 	inc/upnp.h \
-# 	inc/upnpdebug.h \
-# 	inc/UpnpGlobal.h \
-# 	inc/UpnpInet.h \
-# 	inc/UpnpIntTypes.h \
-# 	inc/UpnpStdInt.h \
-# 	inc/UpnpUniStd.h
-# 
-# nodist_upnpinclude_HEADERS = inc/upnpconfig.h 
-# if ENABLE_TOOLS
-# upnpinclude_HEADERS += inc/upnptools.h 
-# endif
 
-# libupnp_la_SOURCES = \
-# 	src/inc/config.h \
-# 	src/inc/client_table.h \
-# 	src/inc/ClientSubscription.h \
-# 	src/inc/gena.h \
-# 	src/inc/gena_ctrlpt.h \
-# 	src/inc/gena_device.h \
-# 	src/inc/httpparser.h \
-# 	src/inc/httpreadwrite.h \
-# 	src/inc/md5.h \
-# 	src/inc/membuffer.h \
-# 	src/inc/miniserver.h \
-# 	src/inc/netall.h \
-# 	src/inc/parsetools.h \
-# 	src/inc/service_table.h \
-# 	src/inc/soaplib.h \
-# 	src/inc/sock.h \
-# 	src/inc/statcodes.h \
-# 	src/inc/statuscodes.h \
-# 	src/inc/strintmap.h \
-# 	src/inc/ssdplib.h \
-# 	src/inc/sysdep.h \
-# 	src/inc/unixutil.h \
-# 	src/inc/upnpapi.h \
-# 	src/inc/upnp_timeout.h \
-# 	src/inc/uri.h \
-# 	src/inc/urlconfig.h \
-# 	src/inc/upnputil.h \
-# 	src/inc/uuid.h \
-# 	src/inc/VirtualDir.h \
-# 	src/inc/webserver.h
-# 
-# # threadutil
-# upnpinclude_HEADERS += \
-# 	inc/ithread.h
-# 
-# libupnp_la_SOURCES += \
-# 	src/threadutil/FreeList.h \
-# 	src/threadutil/LinkedList.h \
-# 	src/threadutil/ThreadPool.h \
-# 	src/threadutil/TimerThread.h \
+INSTALL (TARGETS upnp_static
+	EXPORT UPNP-Export
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
+)
 
-# # ssdp
-# if ENABLE_SSDP
-# libupnp_la_SOURCES += \
-# 	src/ssdp/ssdp_ResultData.h \
-# endif
-# 
-# 
-# 
 # # inet_pton (needed on Win32, compiles to nothing elsewhere)
 # libupnp_la_SOURCES += \
 # 	src/inet_pton.c \

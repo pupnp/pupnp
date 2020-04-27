@@ -38,10 +38,24 @@ ADD_LIBRARY (ixml_shared SHARED
 	$<TARGET_OBJECTS:ixml_objects>
 )
 
+LIST (APPEND IXML_HEADERS
+	inc/ixml.h
+	inc/ixmldebug.h
+)
+
 SET_TARGET_PROPERTIES(ixml_shared PROPERTIES
 	OUTPUT_NAME ixml
+	EXPORT_NAME IXML::SHARED
 	VERSION ${IXML_VERSION}
 	SOVERSION ${IXML_VERSION_MAJOR}
+	PUBLIC_HEADER "${IXML_HEADERS}"
+)
+
+INSTALL (TARGETS ixml_shared
+	EXPORT UPNP-Export
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
 )
 
 ADD_LIBRARY (ixml_static STATIC
@@ -50,23 +64,11 @@ ADD_LIBRARY (ixml_static STATIC
 
 SET_TARGET_PROPERTIES(ixml_static PROPERTIES
 	OUTPUT_NAME ixml
+	EXPORT_NAME IXML::STATIC
 )
 
-#upnpinclude_HEADERS	= \
-#			inc/ixml.h \
-#			inc/ixmldebug.h
-#
-#check_PROGRAMS          = test_document
-#TESTS                   = test/test_document.sh
-#
-#test_document_SOURCES 	= test/test_document.c
-#
-#EXTRA_DIST		= test/test_document.sh test/testdata
-#
-#dist-hook:
-#	rm -rf `find $(distdir)/test/testdata/ -type f \! -name '*ml' -print`
-#
-#clean-local:
-#	@if [ -d bin ] ; then  rm -rf bin ; fi
-
-
+INSTALL (TARGETS ixml_static
+	EXPORT UPNP-Export
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
+)
