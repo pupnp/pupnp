@@ -38,6 +38,8 @@ ADD_LIBRARY (ixml_shared SHARED
 	$<TARGET_OBJECTS:ixml_objects>
 )
 
+ADD_LIBRARY (IXML::SHARED ALIAS ixml_shared)
+
 LIST (APPEND IXML_HEADERS
 	inc/ixml.h
 	inc/ixmldebug.h
@@ -62,6 +64,7 @@ ADD_LIBRARY (ixml_static STATIC
 	$<TARGET_OBJECTS:ixml_objects>
 )
 
+ADD_LIBRARY (IXML::STATIC ALIAS ixml_static)
 SET_TARGET_PROPERTIES(ixml_static PROPERTIES
 	OUTPUT_NAME ixml
 	EXPORT_NAME IXML::STATIC
