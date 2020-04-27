@@ -330,6 +330,7 @@ ENDIF (Solaris)
 #
 # Checks for POSIX Threads
 #
+SET (THREADS_PREFER_PTHREAD_FLAG TRUE)
 INCLUDE (FindThreads)
 
 #
