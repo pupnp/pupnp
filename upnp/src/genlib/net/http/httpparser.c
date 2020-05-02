@@ -1285,6 +1285,11 @@ parser_parse_requestline( http_parser_t * parser )
 
 	hmsg->method = HTTPMETHOD_SIMPLEGET;
 
+	/* remove excessive leading slashes, keep one slash */
+	while ( url_str.length >= 2 && url_str.buf[0] == '/' && url_str.buf[1] == '/' ) {
+		url_str.buf++;
+		url_str.length--;
+	}
 	/* store url */
 	hmsg->urlbuf = str_alloc( url_str.buf, url_str.length );
 	if( hmsg->urlbuf == NULL ) {
@@ -1307,6 +1312,11 @@ parser_parse_requestline( http_parser_t * parser )
 		    &version_str );
     if( status != ( parse_status_t ) PARSE_OK ) {
 	return status;
+    }
+    /* remove excessive leading slashes, keep one slash */
+    while ( url_str.length >= 2 && url_str.buf[0] == '/' && url_str.buf[1] == '/' ) {
+		url_str.buf++;
+		url_str.length--;
     }
     /* store url */
     hmsg->urlbuf = str_alloc( url_str.buf, url_str.length );
