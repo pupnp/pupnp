@@ -41,7 +41,9 @@
 #ifndef _WIN32
 	#include <sys/param.h>
 #else
-	#define snprintf _snprintf
+	#if defined(_MSC_VER) && _MSC_VER < 1900
+		#define snprintf _snprintf
+	#endif
 #endif /* _WIN32 */
 
 #include "config.h"

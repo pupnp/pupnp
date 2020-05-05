@@ -61,7 +61,9 @@
 #ifdef _WIN32
 	#include <malloc.h>
 	#define fseeko fseek
-	#define snprintf _snprintf
+	#if defined(_MSC_VER) && _MSC_VER < 1900
+		#define snprintf _snprintf
+	#endif
 #else
 	#include <arpa/inet.h>
 	#include <sys/time.h>

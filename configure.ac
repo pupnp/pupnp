@@ -683,6 +683,8 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+AM_CONDITIONAL(WIN32, test x"$ac_cv_win32" = xyes)
+
 
 #
 # Checks for header files (which aren't needed on Win32)
