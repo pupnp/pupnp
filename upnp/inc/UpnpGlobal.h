@@ -19,17 +19,21 @@
 	/*
 	 * EXPORT_SPEC
 	 */
-	#ifdef UPNP_STATIC_LIB
+	#if defined _MSC_VER || defined __BORLANDC__
+		#ifdef UPNP_STATIC_LIB
+			#define EXPORT_SPEC
+		#else /* UPNP_STATIC_LIB */
+			#ifdef LIBUPNP_EXPORTS
+				/*! set up declspec for dll export to make functions
+				 * visible to library users */
+				#define EXPORT_SPEC __declspec(dllexport)
+			#else /* LIBUPNP_EXPORTS */
+				#define EXPORT_SPEC __declspec(dllimport)
+			#endif /* LIBUPNP_EXPORTS */
+		#endif /* UPNP_STATIC_LIB */
+	#else /* _MSC_VER || __BORLANDC__ */
 		#define EXPORT_SPEC
-	#else /* UPNP_STATIC_LIB */
-		#ifdef LIBUPNP_EXPORTS
-			/*! set up declspec for dll export to make functions
-			 * visible to library users */
-			#define EXPORT_SPEC __declspec(dllexport)
-		#else /* LIBUPNP_EXPORTS */
-			#define EXPORT_SPEC __declspec(dllimport)
-		#endif /* LIBUPNP_EXPORTS */
-	#endif /* UPNP_STATIC_LIB */
+	#endif /* _MSC_VER || __BORLANDC__ */
 
 	/*
 	 * UPNP_INLINE
