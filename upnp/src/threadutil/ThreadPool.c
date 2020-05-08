@@ -263,7 +263,7 @@ static int SetPolicyType(
 #elif defined(__APPLE__) || defined(__NetBSD__)
 	setpriority(PRIO_PROCESS, 0, 0);
 	retVal = 0;
-#elif defined(_WIN32)
+#elif defined(__PTW32_DLLPORT)
 	retVal = sched_setscheduler(0, in);
 #elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
 	struct sched_param current;
@@ -415,7 +415,7 @@ static void SetSeed(void)
 	struct timeval t;
   
 	gettimeofday(&t, NULL);
-#if defined(_WIN32)
+#if defined(__PTW32_DLLPORT)
 	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id().p);
 #elif defined(BSD) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
 	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id());
@@ -429,7 +429,7 @@ static void SetSeed(void)
 		} idu;
 
 		idu.tid = ithread_get_current_thread_id();
-		srand((unsigned int)t.millitm + idu.i);
+		srand((unsigned int)t.tv_usec + idu.i);
 	}
 #endif
 }

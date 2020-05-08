@@ -58,7 +58,9 @@ libupnp_la_LDFLAGS = \
 
 if WIN32
 libupnp_la_LDFLAGS += \
-	-no-undefined
+	-no-undefined \
+	-liphlpapi \
+	-lws2_32
 endif
 
 libupnp_la_SOURCES = \
