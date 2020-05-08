@@ -560,9 +560,9 @@ static int get_file_info(
 		HTTP,
 		__FILE__,
 		__LINE__,
-		"file info: %s, length: %lld, last_mod=%s readable=%d\n",
+	        "file info: %s, length: %" PRId64 ", last_mod=%s readable=%d\n",
 		filename,
-		(long long)UpnpFileInfo_get_FileLength(info),
+	        (int64_t)UpnpFileInfo_get_FileLength(info),
 		web_server_asctime_r(
 			http_gmtime_r(&aux_LastModified, &date), buffer),
 		UpnpFileInfo_get_IsReadable(info));
