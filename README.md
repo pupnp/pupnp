@@ -122,11 +122,11 @@ Dependency  | Description
 ------------|-------------------------------------------------------------
 libpthread  | The header and library are installed as part of the glibc-devel package (or equivalent).
 
-Additionally, the documentation for the SDK can be auto-generated from the upnp.h header file using DOC++, a documentation system for C, C++, IDL, and Java\*.  DOC++ generates the documentation in HTML or TeX format. Using some additional tools, the TeX output can be converted into a PDF file. To generate the documentation these tools are required:
+Additionally, the documentation for the SDK can be auto-generated from the upnp.h header file using Doxygen, a documentation system for C, C++, IDL, and Java\*.  Doxygen generates the documentation in HTML or TeX format. Using some additional tools, the TeX output can be converted into a PDF file. To generate the documentation these tools are required:
 
 Package   | Description
 ----------|--------------------------------------------------------------
-DOC++   | The homepage for DOC++ is <http://docpp.sourceforge.net>. The current version as of this release of the SDK is version 3.4.9. DOC++ is the only requirement for generating the HTML documentation.
+Doxygen   | The homepage for Doxygen is <https://www.doxygen.nl/index.html>. The current version as of this release of the SDK is version 3.4.9. Doxygen is the only requirement for generating the HTML documentation.
 LaTeX/TeX | To generate the PDF documentation, LaTeX and TeX tools are necessary. The tetex and tetex-latex packages provide these tools.
 dvips     | dvips converts the DVI file produced by LaTeX into a PostScript\* file. The tetex-dvips package provides this tool.
 ps2pdf    | The final step to making the PDF is converting the PostStript\* into Portable Document Format. The ghostscript package provides this tool.
