@@ -55,8 +55,10 @@
 #include "uri.h"
 #include "webserver.h"
 
+#include <alloca.h>
 #include <assert.h>
 #include <stdarg.h>
+#include <string.h>
 
 #ifdef _WIN32
 	#include <malloc.h>
