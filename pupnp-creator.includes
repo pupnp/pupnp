@@ -1,5 +1,4 @@
 ./
-build/msvc
 ixml/inc
 ixml/src/inc
 upnp/inc
