@@ -33,6 +33,7 @@ modules.builtin
 *.sha1
 *.pro
 *.pro.user
+*.creator.user
 
 #
 # Top-level generic files
