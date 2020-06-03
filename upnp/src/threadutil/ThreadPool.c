@@ -822,7 +822,7 @@ int ThreadPoolAdd(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
 
 	totalJobs = tp->highJobQ.size + tp->lowJobQ.size + tp->medJobQ.size;
 	if (totalJobs >= tp->attr.maxJobsTotal) {
-		fprintf(stderr, "total jobs = %ld, too many jobs", totalJobs);
+		fprintf(stderr, "libupnp ThreadPoolAdd too many jobs: %ld\n", totalJobs);
 		goto exit_function;
 	}
 	if (!jobId)
