@@ -66,9 +66,10 @@ int copy_subscription(subscription *in, subscription *out)
 	out->ToSendEventKey = in->ToSendEventKey;
 	out->expireTime = in->expireTime;
 	out->active = in->active;
-	if ((return_code = copy_URL_list(
-		     &in->DeliveryURLs, &out->DeliveryURLs)) != HTTP_SUCCESS)
+	return_code = copy_URL_list(&in->DeliveryURLs, &out->DeliveryURLs);
+	if (return_code != HTTP_SUCCESS) {
 		return return_code;
+	}
 	ListInit(&out->outgoing, 0, 0);
 	out->next = NULL;
 	return HTTP_SUCCESS;
@@ -96,11 +97,12 @@ void RemoveSubscriptionSID(Upnp_SID sid, service_info *service)
 	subscription *previous = NULL;
 
 	while (finger) {
-		if (!(strcmp(sid, finger->sid))) {
-			if (previous)
+		if (!strcmp(sid, finger->sid)) {
+			if (previous) {
 				previous->next = finger->next;
-			else
+			} else {
 				service->subscriptionList = finger->next;
+			}
 			finger->next = NULL;
 			freeSubscriptionList(finger);
 			finger = NULL;
@@ -117,10 +119,9 @@ subscription *GetSubscriptionSID(const Upnp_SID sid, service_info *service)
 	subscription *next = service->subscriptionList;
 	subscription *previous = NULL;
 	subscription *found = NULL;
-
 	time_t current_time;
 
-	while ((next) && (found == NULL)) {
+	while (next && !found) {
 		if (!strcmp(next->sid, sid))
 			found = next;
 		else {
@@ -129,14 +130,14 @@ subscription *GetSubscriptionSID(const Upnp_SID sid, service_info *service)
 		}
 	}
 	if (found) {
-		/*get the current_time */
+		/* get the current_time */
 		time(&current_time);
-		if ((found->expireTime != 0) &&
-			(found->expireTime < current_time)) {
-			if (previous)
+		if (found->expireTime && found->expireTime < current_time) {
+			if (previous) {
 				previous->next = found->next;
-			else
+			} else {
 				service->subscriptionList = found->next;
+			}
 			found->next = NULL;
 			freeSubscriptionList(found);
 			found = NULL;
@@ -155,15 +156,15 @@ subscription *GetNextSubscription(service_info *service, subscription *current)
 
 	/* get the current_time */
 	time(&current_time);
-	while ((notDone) && (current)) {
+	while (notDone && current) {
 		previous = current;
 		current = current->next;
 
-		if (current == NULL) {
+		if (!current) {
 			notDone = 0;
 			next = current;
-		} else if ((current->expireTime != 0) &&
-			   (current->expireTime < current_time)) {
+		} else if (current->expireTime &&
+			   current->expireTime < current_time) {
 			previous->next = current->next;
 			current->next = NULL;
 			freeSubscriptionList(current);
@@ -247,8 +248,8 @@ service_info *FindServiceId(
 	if (table) {
 		finger = table->serviceList;
 		while (finger) {
-			if ((!strcmp(serviceId, finger->serviceId)) &&
-				(!strcmp(UDN, finger->UDN))) {
+			if (!strcmp(serviceId, finger->serviceId) &&
+				!strcmp(UDN, finger->UDN)) {
 				return finger;
 			}
 			finger = finger->next;
@@ -281,21 +282,21 @@ service_info *FindServiceEventURLPath(
 	uri_type parsed_url;
 	uri_type parsed_url_in;
 
-	if ((table) && (parse_uri(eventURLPath,
-				strlen(eventURLPath),
-				&parsed_url_in) == HTTP_SUCCESS)) {
-
+	if (table &&
+		parse_uri(eventURLPath, strlen(eventURLPath), &parsed_url_in) ==
+			HTTP_SUCCESS) {
 		finger = table->serviceList;
 		while (finger) {
-			if (finger->eventURL)
-				if ((parse_uri(finger->eventURL,
-					     strlen(finger->eventURL),
-					     &parsed_url) == HTTP_SUCCESS)) {
-
+			if (finger->eventURL) {
+				if (parse_uri(finger->eventURL,
+					    strlen(finger->eventURL),
+					    &parsed_url) == HTTP_SUCCESS) {
 					if (!token_cmp(&parsed_url.pathquery,
-						    &parsed_url_in.pathquery))
+						    &parsed_url_in.pathquery)) {
 						return finger;
+					}
 				}
+			}
 			finger = finger->next;
 		}
 	}
@@ -326,19 +327,21 @@ service_info *FindServiceControlURLPath(
 	uri_type parsed_url;
 	uri_type parsed_url_in;
 
-	if ((table) && (parse_uri(controlURLPath,
-				strlen(controlURLPath),
-				&parsed_url_in) == HTTP_SUCCESS)) {
+	if (table && parse_uri(controlURLPath,
+			     strlen(controlURLPath),
+			     &parsed_url_in) == HTTP_SUCCESS) {
 		finger = table->serviceList;
 		while (finger) {
-			if (finger->controlURL)
-				if ((parse_uri(finger->controlURL,
-					     strlen(finger->controlURL),
-					     &parsed_url) == HTTP_SUCCESS)) {
+			if (finger->controlURL) {
+				if (parse_uri(finger->controlURL,
+					    strlen(finger->controlURL),
+					    &parsed_url) == HTTP_SUCCESS) {
 					if (!token_cmp(&parsed_url.pathquery,
-						    &parsed_url_in.pathquery))
+						    &parsed_url_in.pathquery)) {
 						return finger;
+					}
 				}
+			}
 			finger = finger->next;
 		}
 	}
@@ -664,8 +667,9 @@ DOMString getElementValue(IXML_Node *node)
 	IXML_Node *child = (IXML_Node *)ixmlNode_getFirstChild(node);
 	const DOMString temp = NULL;
 
-	if ((child != 0) && (ixmlNode_getNodeType(child) == eTEXT_NODE)) {
+	if (child && ixmlNode_getNodeType(child) == eTEXT_NODE) {
 		temp = ixmlNode_getNodeValue(child);
+
 		return ixmlCloneDOMString(temp);
 	} else {
 		return NULL;
@@ -690,19 +694,14 @@ DOMString getElementValue(IXML_Node *node)
  ******************************************************************************/
 int getSubElement(const char *element_name, IXML_Node *node, IXML_Node **out)
 {
-
 	const DOMString NodeName = NULL;
 	int found = 0;
-
 	IXML_Node *child = (IXML_Node *)ixmlNode_getFirstChild(node);
 
 	(*out) = NULL;
-
-	while ((child != NULL) && (!found)) {
-
+	while (child && !found) {
 		switch (ixmlNode_getNodeType(child)) {
 		case eELEMENT_NODE:
-
 			NodeName = ixmlNode_getNodeName(child);
 			if (!strcmp(NodeName, element_name)) {
 				(*out) = child;
@@ -710,11 +709,9 @@ int getSubElement(const char *element_name, IXML_Node *node, IXML_Node **out)
 				return found;
 			}
 			break;
-
 		default:
 			break;
 		}
-
 		child = (IXML_Node *)ixmlNode_getNextSibling(child);
 	}
 
@@ -758,7 +755,7 @@ service_info *getServiceList(IXML_Node *node, service_info **end, char *URLBase)
 		getSubElement("serviceList", node, &serviceList)) {
 		serviceNodeList = ixmlElement_getElementsByTagName(
 			(IXML_Element *)serviceList, "service");
-		if (serviceNodeList != NULL) {
+		if (serviceNodeList) {
 			NumOfServices = ixmlNodeList_length(serviceNodeList);
 			for (i = 0lu; i < NumOfServices; i++) {
 				current_service =
@@ -903,7 +900,6 @@ service_info *getAllServiceList(
 	long unsigned int i = 0lu;
 
 	(*out_end) = NULL;
-
 	deviceList = ixmlElement_getElementsByTagName(
 		(IXML_Element *)node, "device");
 	if (deviceList) {
@@ -915,9 +911,10 @@ service_info *getAllServiceList(
 					currentDevice, &next_end, URLBase);
 				if (next_end)
 					end = next_end;
-			} else
+			} else {
 				head = getServiceList(
 					currentDevice, &end, URLBase);
+			}
 		}
 		ixmlNodeList_free(deviceList);
 	}
@@ -956,7 +953,7 @@ int removeServiceTable(IXML_Node *node, service_table *in)
 		start_search = in->serviceList;
 		deviceList = ixmlElement_getElementsByTagName(
 			(IXML_Element *)root, "device");
-		if (deviceList != NULL) {
+		if (deviceList) {
 			NumOfDevices = ixmlNodeList_length(deviceList);
 			for (i = 0lu; i < NumOfDevices; i++) {
 				if ((start_search) &&
@@ -965,13 +962,11 @@ int removeServiceTable(IXML_Node *node, service_table *in)
 						(UDN = getElementValue(
 							 currentUDN)))) {
 					current_service = start_search;
-					/*Services are put in the service table
-					 * in the order in
-					 * which they appear in the  */
-					/*description document, therefore we go
-					 * through the list
-					 * only once to remove a particular */
-					/*root device */
+					/* Services are put in the service table
+					 * in the order in which they appear in
+					 * the description document, therefore
+					 * we go through the list only once to
+					 * remove a particular root device */
 					while ((current_service) &&
 						(strcmp(current_service->UDN,
 							UDN))) {
@@ -1033,14 +1028,12 @@ int addServiceTable(
 {
 	IXML_Node *root = NULL;
 	IXML_Node *URLBase = NULL;
-
 	service_info *tempEnd = NULL;
 
 	if (in->URLBase) {
 		free(in->URLBase);
 		in->URLBase = NULL;
 	}
-
 	if (getSubElement("root", node, &root)) {
 		if (getSubElement("URLBase", root, &URLBase)) {
 			in->URLBase = getElementValue(URLBase);
@@ -1052,7 +1045,6 @@ int addServiceTable(
 				in->URLBase = ixmlCloneDOMString("");
 			}
 		}
-
 		if ((in->endServiceList->next = getAllServiceList(
 			     root, in->URLBase, &tempEnd))) {
 			in->endServiceList = tempEnd;
@@ -1096,9 +1088,9 @@ int getServiceTable(
 				out->URLBase = ixmlCloneDOMString("");
 			}
 		}
-
-		if ((out->serviceList = getAllServiceList(
-			     root, out->URLBase, &out->endServiceList))) {
+		out->serviceList = getAllServiceList(
+			root, out->URLBase, &out->endServiceList);
+		if (out->serviceList) {
 			return 1;
 		}
 	}
