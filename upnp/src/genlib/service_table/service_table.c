@@ -282,9 +282,11 @@ service_info *FindServiceEventURLPath(
 	uri_type parsed_url;
 	uri_type parsed_url_in;
 
-	if (table &&
-		parse_uri(eventURLPath, strlen(eventURLPath), &parsed_url_in) ==
-			HTTP_SUCCESS) {
+	if (!table || !eventURLPath) {
+		return NULL;
+	}
+	if (parse_uri(eventURLPath, strlen(eventURLPath), &parsed_url_in) ==
+		HTTP_SUCCESS) {
 		finger = table->serviceList;
 		while (finger) {
 			if (finger->eventURL) {
@@ -327,9 +329,11 @@ service_info *FindServiceControlURLPath(
 	uri_type parsed_url;
 	uri_type parsed_url_in;
 
-	if (table && parse_uri(controlURLPath,
-			     strlen(controlURLPath),
-			     &parsed_url_in) == HTTP_SUCCESS) {
+	if (!table || !controlURLPath) {
+		return NULL;
+	}
+	if (parse_uri(controlURLPath, strlen(controlURLPath), &parsed_url_in) ==
+		HTTP_SUCCESS) {
 		finger = table->serviceList;
 		while (finger) {
 			if (finger->controlURL) {
