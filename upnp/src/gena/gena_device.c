@@ -1220,6 +1220,68 @@ static int create_url_list(
 	return (int)URLcount;
 }
 
+/*!
+ * \brief Validate that the URLs passed by the user are on the same network
+ * segment than the device.
+ *
+ * Note: This is a fix for CallStanger a.k.a. CVE-2020-12695
+ *
+ * \return 0 if all URLs are on the same segment or -1 otherwise.
+ */
+int gena_validate_delivery_urls(
+	/*! [in] . */
+	SOCKINFO *info,
+	/*! [in] . */
+	URL_list *url_list)
+{
+	size_t i = 0;
+	struct in_addr genaAddr4;
+	struct in_addr genaNetmask;
+	struct sockaddr_in *deliveryAddr4 = NULL;
+	char deliveryAddrString[INET6_ADDRSTRLEN];
+
+	if (info == NULL || url_list == NULL) {
+		return 0;
+	}
+
+	switch (info->foreign_sockaddr.ss_family) {
+	case AF_INET:
+		if (!inet_pton(AF_INET, gIF_IPV4, &genaAddr4)) {
+			return -1;
+		}
+
+		if (!inet_pton(AF_INET, gIF_IPV4_NETMASK, &genaNetmask)) {
+			return -1;
+		}
+
+		for (i = 0; i < url_list->size; i++) {
+			deliveryAddr4 = (struct sockaddr_in *)
+				&url_list->parsedURLs[i].hostport.IPaddress;
+			if ((deliveryAddr4->sin_addr.s_addr & genaNetmask.s_addr)
+				!= (genaAddr4.s_addr & genaNetmask.s_addr)) {
+				inet_ntop(AF_INET, &deliveryAddr4->sin_addr,
+					deliveryAddrString, sizeof(deliveryAddrString));
+				UpnpPrintf(UPNP_CRITICAL,
+					GENA,
+					__FILE__,
+					__LINE__,
+					"DeliveryURL %s is invalid.\n"
+					"It is not in the expected network segment (IPv4: %s, netmask: %s)\n",
+					deliveryAddrString,
+					gIF_IPV4,
+					gIF_IPV4_NETMASK
+					);
+			      return -1;
+			}
+		}
+		break;
+	case AF_INET6:
+		// TODO
+		break;
+	}
+	return 0;
+}
+
 void gena_process_subscription_request(SOCKINFO *info, http_message_t *request)
 {
 	UpnpSubscriptionRequest *request_struct = UpnpSubscriptionRequest_new();
@@ -1350,6 +1412,13 @@ void gena_process_subscription_request(SOCKINFO *info, http_message_t *request)
 	}
 	if (return_code == UPNP_E_OUTOF_MEMORY) {
 		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		freeSubscriptionList(sub);
+		HandleUnlock();
+		goto exit_function;
+	}
+	return_code = gena_validate_delivery_urls(info, &sub->DeliveryURLs);
+	if (return_code != 0) {
+		error_respond(info, HTTP_PRECONDITION_FAILED, request);
 		freeSubscriptionList(sub);
 		HandleUnlock();
 		goto exit_function;

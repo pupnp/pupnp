@@ -137,6 +137,9 @@ char gIF_NAME[LINE_SIZE] = {'\0'};
 /*! Static buffer to contain interface IPv4 address. (extern'ed in upnp.h) */
 char gIF_IPV4[INET_ADDRSTRLEN] = {'\0'};
 
+/*! Static buffer to contain interface IPv4 netmask. (extern'ed in upnp.h) */
+char gIF_IPV4_NETMASK[INET_ADDRSTRLEN] = {'\0'};
+
 /*! Static buffer to contain interface IPv6 address. (extern'ed in upnp.h) */
 char gIF_IPV6[INET6_ADDRSTRLEN] = {'\0'};
 
@@ -3932,8 +3935,8 @@ int UpnpGetIfInfo(const char *IfName)
 		}
 		/* Check address family. */
 		if (pifReq->ifr_addr.sa_family == AF_INET) {
-			/* Copy interface name, IPv4 address and interface
-			 * index. */
+			/* Copy interface name, IPv4 address, IPv4 netmask and
+			 * interface index. */
 			memset(gIF_NAME, 0, sizeof(gIF_NAME));
 			strncpy(gIF_NAME,
 				pifReq->ifr_name,
@@ -3943,6 +3946,19 @@ int UpnpGetIfInfo(const char *IfName)
 					 ->sin_addr,
 				gIF_IPV4,
 				sizeof(gIF_IPV4));
+			if (ioctl(LocalSock, SIOCGIFNETMASK, &ifReq) < 0) {
+				UpnpPrintf(UPNP_ALL,
+					API,
+					__FILE__,
+					__LINE__,
+					"Can't get interface netmask for %s:\n",
+					ifReq.ifr_name);
+			}
+			inet_ntop(AF_INET,
+				&((struct sockaddr_in *)&ifReq.ifr_netmask)
+					 ->sin_addr,
+				gIF_IPV4_NETMASK,
+				sizeof(gIF_IPV4_NETMASK));
 			gIF_INDEX = if_nametoindex(gIF_NAME);
 			valid_addr_found = 1;
 			break;
