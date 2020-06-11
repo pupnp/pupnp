@@ -47,8 +47,6 @@
 
 #define MAX_INTERFACES 256
 
-#define DEFAULT_INTERFACE 1
-
 #define DEV_LIMIT 200
 
 #define DEFAULT_MX 5
@@ -315,21 +313,6 @@ void UpnpThreadDistribution(struct UpnpNonblockParam * Param);
 void AutoAdvertise(
 	/*! [in] Information provided to the thread. */
 	void *input); 
-
-
-/*!
- * \brief Get local IP address.
- *
- * Gets the ip address for the DEFAULT_INTERFACE interface which is up and not
- * a loopback. Assumes at most MAX_INTERFACES interfaces
- *
- * \return UPNP_E_SUCCESS  if successful or UPNP_E_INIT.
- */
-int getlocalhostname(
-	/*! [out] IP address of the interface. */
-	char *out,
-	/*! [in] Length of the output buffer. */
-	size_t out_len);
 
 
 /*!
