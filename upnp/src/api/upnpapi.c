@@ -140,11 +140,12 @@ char gIF_IPV4[INET_ADDRSTRLEN] = {'\0'};
 /*! Static buffer to contain interface IPv4 netmask. (extern'ed in upnp.h) */
 char gIF_IPV4_NETMASK[INET_ADDRSTRLEN] = {'\0'};
 
-/*! Static buffer to contain interface IPv6 address. (extern'ed in upnp.h) */
+/*! Static buffer to contain interface IPv6 link-local address (LLA).
+ * (extern'ed in upnp.h) */
 char gIF_IPV6[INET6_ADDRSTRLEN] = {'\0'};
 
-/*! Static buffer to contain interface ULA or GUA IPv6 address. (extern'ed in
- * upnp.h) */
+/*! Static buffer to contain interface IPv6 unique-local or globally-unique
+ * address (ULA or GUA). (extern'ed in upnp.h) */
 char gIF_IPV6_ULA_GUA[INET6_ADDRSTRLEN] = {'\0'};
 
 /*! Contains interface index. (extern'ed in upnp.h) */
@@ -153,8 +154,11 @@ unsigned gIF_INDEX = (unsigned)-1;
 /*! local IPv4 port for the mini-server */
 unsigned short LOCAL_PORT_V4;
 
-/*! local IPv6 port for the mini-server */
+/*! IPv6 LLA port for the mini-server */
 unsigned short LOCAL_PORT_V6;
+
+/*! IPv6 ULA or GUA port for the mini-server */
+unsigned short LOCAL_PORT_V6_ULA_GUA;
 
 /*! UPnP device and control point handle table  */
 static void *HandleTable[NUM_HANDLE];
@@ -438,7 +442,8 @@ static int UpnpInitStartServers(
 #if EXCLUDE_MINISERVER == 0
 	LOCAL_PORT_V4 = DestPort;
 	LOCAL_PORT_V6 = DestPort;
-	retVal = StartMiniServer(&LOCAL_PORT_V4, &LOCAL_PORT_V6);
+	LOCAL_PORT_V6_ULA_GUA = DestPort;
+	retVal = StartMiniServer(&LOCAL_PORT_V4, &LOCAL_PORT_V6, &LOCAL_PORT_V6_ULA_GUA);
 	if (retVal != UPNP_E_SUCCESS) {
 		UpnpPrintf(UPNP_CRITICAL,
 			API,
@@ -701,6 +706,18 @@ unsigned short UpnpGetServerPort6(void)
 		return 0u;
 
 	return LOCAL_PORT_V6;
+#else
+	return 0u;
+#endif
+}
+
+unsigned short UpnpGetServerUlaGuaPort6(void)
+{
+#ifdef UPNP_ENABLE_IPV6
+	if (UpnpSdkInit != 1)
+		return 0u;
+
+	return LOCAL_PORT_V6_ULA_GUA;
 #else
 	return 0u;
 #endif

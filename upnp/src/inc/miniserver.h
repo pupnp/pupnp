@@ -45,15 +45,17 @@ extern SOCKET gMiniServerStopSock;
 typedef struct MServerSockArray {
 	/*! IPv4 socket for listening for miniserver requests. */
 	SOCKET miniServerSock4;
-	/*! IPv6 Socket for listening for miniserver requests. */
+	/*! IPv6 LLA Socket for listening for miniserver requests. */
 	SOCKET miniServerSock6;
+	/*! IPv6 ULA or GUA Socket for listening for miniserver requests. */
+	SOCKET miniServerSock6UlaGua;
 	/*! Socket for stopping miniserver */
 	SOCKET miniServerStopSock;
 	/*! IPv4 SSDP Socket for incoming advertisments and search requests. */
 	SOCKET ssdpSock4;
-	/*! IPv6 SSDP Socket for incoming advertisments and search requests. */
+	/*! IPv6 LLA SSDP Socket for incoming advertisments and search requests. */
 	SOCKET ssdpSock6;
-	/*! IPv6 SSDP Socket for incoming advertisments and search requests. */
+	/*! IPv6 ULA or GUA SSDP Socket for incoming advertisments and search requests. */
 	SOCKET ssdpSock6UlaGua;
 	/* ! . */
 	uint16_t stopPort;
@@ -61,6 +63,8 @@ typedef struct MServerSockArray {
 	uint16_t miniServerPort4;
 	/* ! . */
 	uint16_t miniServerPort6;
+	/* ! . */
+	uint16_t miniServerPort6UlaGua;
 #ifdef INCLUDE_CLIENT_APIS
 	/*! IPv4 SSDP socket for sending search requests and receiving search
 	 * replies */
@@ -128,8 +132,11 @@ int StartMiniServer(
 	 * connections. */
 	uint16_t *listen_port4,
 	/*! [in,out] Port on which the server listens for incoming IPv6
-	 * connections. */
-	uint16_t *listen_port6);
+	 * LLA connections. */
+	uint16_t *listen_port6,
+	/*! [in,out] Port on which the server listens for incoming
+	 * IPv6 ULA or GUA connections. */
+	uint16_t *listen_port6UlaGua);
 
 /*!
  * \brief Stop and Shutdown the MiniServer and free socket resources.
