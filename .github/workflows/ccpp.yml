@@ -21,9 +21,7 @@ jobs:
     - name: make
       run: make
     - name: make distcheck
-      run: make distcheck
-    - name: print the logs
-      run: cat upnp/test-suite.log
+      run: make VERBOSE=1 distcheck
 
   build_asan:
     name: Sanitizer build (ubuntu-16.04)
