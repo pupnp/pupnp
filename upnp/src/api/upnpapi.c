@@ -3679,6 +3679,7 @@ int UpnpGetIfInfo(const char *IfName)
 	defined(__FreeBSD_kernel__) /* _WIN32 */
 	struct ifaddrs *ifap, *ifa;
 	struct in_addr v4_addr = {0};
+	struct in_addr v4_netmask = {0};
 	struct in6_addr v6_addr = IN6ADDR_ANY_INIT;
 	int ifname_found = 0;
 	int valid_addr_found = 0;
@@ -3732,6 +3733,10 @@ int UpnpGetIfInfo(const char *IfName)
 				&((struct sockaddr_in *)(ifa->ifa_addr))
 					 ->sin_addr,
 				sizeof(v4_addr));
+			memcpy(&v4_netmask,
+				&((struct sockaddr_in *)(ifa->ifa_netmask))
+					 ->sin_addr,
+				sizeof(v4_netmask));
 			valid_addr_found = 1;
 			break;
 		case AF_INET6:
@@ -3770,6 +3775,7 @@ int UpnpGetIfInfo(const char *IfName)
 		return UPNP_E_INVALID_INTERFACE;
 	}
 	inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
+	inet_ntop(AF_INET, &v4_netmask, gIF_IPV4_NETMASK, sizeof(gIF_IPV4_NETMASK));
 	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
 	gIF_INDEX = if_nametoindex(gIF_NAME);
 #else /* (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__) */ /* _WIN32 */
