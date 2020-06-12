@@ -132,6 +132,10 @@ extern "C" {
 /*! This should be the maximum VARCOUNT from above */
 #define TV_MAXVARS TV_PICTURE_VARCOUNT
 
+#define IP_MODE_IPV4 1
+#define IP_MODE_IPV6_LLA 2
+#define IP_MODE_IPV6_ULA_GUA 3
+
 /*!
  * \brief Prototype for all actions. For each action that a service 
  * implements, there is a corresponding function with this prototype.
@@ -514,9 +518,9 @@ int TvDeviceDecreaseBrightness(
  * advertisements.
  */
 int TvDeviceStart(
-	/*! [in] ip address to initialize the sdk (may be NULL)
-	 * if null, then the first non null loopback address is used. */
-	char *ip_address,
+	/*! [in] interface to initialize the sdk (may be NULL)
+	 * if null, then the first non null interface is used. */
+	char *interface,
 	/*! [in] port number to initialize the sdk (may be 0)
 	 * if zero, then a random number is used. */
 	unsigned short port,
@@ -526,6 +530,9 @@ int TvDeviceStart(
 	/*! [in] path of web directory.
 	 * may be NULL. Default is ./web (for Linux) or ../tvdevice/web. */
 	const char *web_dir_path,
+	/*! [in] IP mode: IP_MODE_IPV4, IP_MODE_IPV6_LLA or
+	 * IP_MODE_IPV6_ULA_GUA. Default is IP_MODE_IPV4. */
+	int ip_mode,
 	/*! [in] print function to use. */
 	print_string pfun,
 	/*! [in] Non-zero if called from the combo application. */

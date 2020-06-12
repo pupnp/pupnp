@@ -382,6 +382,7 @@ static void RunMiniServer(
 	maxMiniSock = 0;
 	maxMiniSock = max(maxMiniSock, miniSock->miniServerSock4);
 	maxMiniSock = max(maxMiniSock, miniSock->miniServerSock6);
+	maxMiniSock = max(maxMiniSock, miniSock->miniServerSock6UlaGua);
 	maxMiniSock = max(maxMiniSock, miniSock->miniServerStopSock);
 	maxMiniSock = max(maxMiniSock, miniSock->ssdpSock4);
 	maxMiniSock = max(maxMiniSock, miniSock->ssdpSock6);
@@ -401,6 +402,7 @@ static void RunMiniServer(
 		FD_SET(miniSock->miniServerStopSock, &rdSet);
 		fdset_if_valid(miniSock->miniServerSock4, &rdSet);
 		fdset_if_valid(miniSock->miniServerSock6, &rdSet);
+		fdset_if_valid(miniSock->miniServerSock6UlaGua, &rdSet);
 		fdset_if_valid(miniSock->ssdpSock4, &rdSet);
 		fdset_if_valid(miniSock->ssdpSock6, &rdSet);
 		fdset_if_valid(miniSock->ssdpSock6UlaGua, &rdSet);
@@ -435,6 +437,7 @@ static void RunMiniServer(
 	/* Close all sockets. */
 	sock_close(miniSock->miniServerSock4);
 	sock_close(miniSock->miniServerSock6);
+	sock_close(miniSock->miniServerSock6UlaGua);
 	sock_close(miniSock->miniServerStopSock);
 	sock_close(miniSock->ssdpSock4);
 	sock_close(miniSock->ssdpSock6);
@@ -506,8 +509,12 @@ static int get_miniserver_sockets(
 #ifdef UPNP_ENABLE_IPV6
 	,
 	/*! [in] port on which the server is listening for incoming IPv6
-	 * connections. */
+	 * ULA connections. */
 	uint16_t listen_port6
+	,
+	/*! [in] port on which the server is listening for incoming
+	 * IPv6 ULA or GUA connections. */
+	uint16_t listen_port6UlaGua
 #endif
 	)
 {
@@ -521,6 +528,11 @@ static int get_miniserver_sockets(
 	struct sockaddr_in6* serverAddr6 = (struct sockaddr_in6*)&__ss_v6;
 	SOCKET listenfd6;
 	uint16_t actual_port6 = 0u;
+
+	struct sockaddr_storage __ss_v6UlaGua;
+	struct sockaddr_in6* serverAddr6UlaGua = (struct sockaddr_in6*)&__ss_v6UlaGua;
+	SOCKET listenfd6UlaGua;
+	uint16_t actual_port6UlaGua = 0u;
 #endif
 	int ret_code;
 #ifdef UPNP_MINISERVER_REUSEADDR
@@ -561,10 +573,31 @@ static int get_miniserver_sockets(
 			listenfd6 = INVALID_SOCKET;
 		}
 	}
+	
+	listenfd6UlaGua = socket(AF_INET6, SOCK_STREAM, 0);
+	if (listenfd6UlaGua == INVALID_SOCKET) {
+		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+		UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
+			"get_miniserver_sockets: IPv6 socket not available: %s\n",
+			errorBuffer);
+	} else {
+		int onOff = 1;
+		sockError = setsockopt(listenfd6UlaGua, IPPROTO_IPV6, IPV6_V6ONLY,
+							   (char *)&onOff, sizeof(onOff));
+		if (sockError == SOCKET_ERROR) {
+			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
+				"get_miniserver_sockets: unable to set IPv6 socket protocol: %s\n",
+				errorBuffer);
+			sock_close(listenfd6UlaGua);
+			listenfd6UlaGua = INVALID_SOCKET;
+		}
+	}
 #endif
 	if (listenfd4 == INVALID_SOCKET
 #ifdef UPNP_ENABLE_IPV6
 	    && listenfd6 == INVALID_SOCKET
+	    && listenfd6UlaGua == INVALID_SOCKET
 #endif
 	) {
 		UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
@@ -580,6 +613,9 @@ static int get_miniserver_sockets(
 	if (listen_port6 < APPLICATION_LISTENING_PORT) {
 		listen_port6 = (uint16_t)APPLICATION_LISTENING_PORT;
 	}
+	if (listen_port6UlaGua < APPLICATION_LISTENING_PORT) {
+		listen_port6UlaGua = (uint16_t)APPLICATION_LISTENING_PORT;
+	}
 #endif
 	memset(&__ss_v4, 0, sizeof (__ss_v4));
 	serverAddr4->sin_family = (sa_family_t)AF_INET;
@@ -589,6 +625,10 @@ static int get_miniserver_sockets(
 	serverAddr6->sin6_family = (sa_family_t)AF_INET6;
 	inet_pton(AF_INET6, gIF_IPV6, &serverAddr6->sin6_addr);
 	serverAddr6->sin6_scope_id = gIF_INDEX;
+	
+	memset(&__ss_v6UlaGua, 0, sizeof (__ss_v6UlaGua));
+	serverAddr6UlaGua->sin6_family = (sa_family_t)AF_INET6;
+	inet_pton(AF_INET6, gIF_IPV6_ULA_GUA, &serverAddr6UlaGua->sin6_addr);
 #endif
 	/* Getting away with implementation of re-using address:port and
 	 * instead choosing to increment port numbers.
@@ -610,6 +650,7 @@ static int get_miniserver_sockets(
 				sock_close(listenfd4);
 #ifdef UPNP_ENABLE_IPV6
 				sock_close(listenfd6);
+				sock_close(listenfd6UlaGua);
 #endif
 				return UPNP_E_SOCKET_BIND;
 			}
@@ -622,6 +663,18 @@ static int get_miniserver_sockets(
 			if (sockError == SOCKET_ERROR) {
 				sock_close(listenfd4);
 				sock_close(listenfd6);
+				sock_close(listenfd6UlaGua);
+				return UPNP_E_SOCKET_BIND;
+			}
+		}
+		if (listenfd6UlaGua != INVALID_SOCKET) {
+			sockError = setsockopt(listenfd6UlaGua, SOL_SOCKET,
+				SO_REUSEADDR,
+			(const char *)&reuseaddr_on, sizeof (int));
+			if (sockError == SOCKET_ERROR) {
+				sock_close(listenfd4);
+				sock_close(listenfd6);
+				sock_close(listenfd6UlaGua);
 				return UPNP_E_SOCKET_BIND;
 			}
 		}
@@ -660,6 +713,7 @@ static int get_miniserver_sockets(
 			sock_close(listenfd4);
 #ifdef UPNP_ENABLE_IPV6
 			sock_close(listenfd6);
+			sock_close(listenfd6UlaGua);
 #endif
 			/* Bind failied. */
 			return UPNP_E_SOCKET_BIND;
@@ -701,6 +755,42 @@ static int get_miniserver_sockets(
 			return UPNP_E_SOCKET_BIND;
 		}
 	}
+	if (listenfd6UlaGua != INVALID_SOCKET) {
+		uint16_t orig_listen_port6UlaGua = listen_port6UlaGua;
+		do {
+			serverAddr6UlaGua->sin6_port = htons(listen_port6UlaGua++);
+			sockError = bind(listenfd6UlaGua,
+					 (struct sockaddr *)serverAddr6UlaGua,
+					 sizeof(*serverAddr6UlaGua));
+			if (sockError == SOCKET_ERROR) {
+#ifdef _WIN32
+				errCode = WSAGetLastError();
+#else
+				errCode = errno; 
+#endif
+				if (errno == EADDRINUSE) {
+					errCode = 1;
+				}
+			} else {
+				errCode = 0;
+			}
+		} while (errCode != 0 &&
+			 listen_port6UlaGua >= orig_listen_port6UlaGua);
+		if (sockError == SOCKET_ERROR) {
+			strerror_r(errno, errorBuffer,
+				   ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, MSERV,
+				   __FILE__, __LINE__,
+				   "get_miniserver_sockets: "
+				   "Error in IPv6 bind(): %s\n",
+				   errorBuffer);
+			sock_close(listenfd4);
+			sock_close(listenfd6);
+			sock_close(listenfd6UlaGua);
+			/* Bind failied. */
+			return UPNP_E_SOCKET_BIND;
+		}
+	}
 #endif
 
 	UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
@@ -715,6 +805,7 @@ static int get_miniserver_sockets(
 			sock_close(listenfd4);
 #ifdef UPNP_ENABLE_IPV6
 			sock_close(listenfd6);
+			sock_close(listenfd6UlaGua);
 #endif
 			return UPNP_E_LISTEN;
 		}
@@ -723,6 +814,7 @@ static int get_miniserver_sockets(
 			sock_close(listenfd4);
 #ifdef UPNP_ENABLE_IPV6
 			sock_close(listenfd6);
+			sock_close(listenfd6UlaGua);
 #endif
 			return UPNP_E_INTERNAL_ERROR;
 		}
@@ -748,10 +840,32 @@ static int get_miniserver_sockets(
 		}
 		out->miniServerPort6 = actual_port6;
 	}
+	if (listenfd6UlaGua != INVALID_SOCKET) {
+		ret_code = listen(listenfd6UlaGua, SOMAXCONN);
+		if (ret_code == SOCKET_ERROR) {
+			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
+				"mserv start: Error in IPv6 listen(): %s\n",
+				errorBuffer);
+			sock_close(listenfd4);
+			sock_close(listenfd6);
+			sock_close(listenfd6UlaGua);
+			return UPNP_E_LISTEN;
+		}
+		ret_code = get_port(listenfd6UlaGua, &actual_port6UlaGua);
+		if (ret_code < 0) {
+			sock_close(listenfd4);
+			sock_close(listenfd6);
+			sock_close(listenfd6UlaGua);
+			return UPNP_E_INTERNAL_ERROR;
+		}
+		out->miniServerPort6UlaGua = actual_port6UlaGua;
+	}
 #endif
 	out->miniServerSock4 = listenfd4;
 #ifdef UPNP_ENABLE_IPV6
 	out->miniServerSock6 = listenfd6;
+	out->miniServerSock6 = listenfd6UlaGua;
 #endif
 	return UPNP_E_SUCCESS;
 }
@@ -811,6 +925,7 @@ static UPNP_INLINE void InitMiniServerSockArray(MiniServerSockArray *miniSocket)
 {
 	miniSocket->miniServerSock4 = INVALID_SOCKET;
 	miniSocket->miniServerSock6 = INVALID_SOCKET;
+	miniSocket->miniServerSock6UlaGua = INVALID_SOCKET;
 	miniSocket->miniServerStopSock = INVALID_SOCKET;
 	miniSocket->ssdpSock4 = INVALID_SOCKET;
 	miniSocket->ssdpSock6 = INVALID_SOCKET;
@@ -818,6 +933,7 @@ static UPNP_INLINE void InitMiniServerSockArray(MiniServerSockArray *miniSocket)
 	miniSocket->stopPort = 0u;
 	miniSocket->miniServerPort4 = 0u;
 	miniSocket->miniServerPort6 = 0u;
+	miniSocket->miniServerPort6UlaGua = 0u;
 #ifdef INCLUDE_CLIENT_APIS
 	miniSocket->ssdpReqSock4 = INVALID_SOCKET;
 	miniSocket->ssdpReqSock6 = INVALID_SOCKET;
@@ -829,8 +945,11 @@ int StartMiniServer(
 	 * connections. */
 	uint16_t *listen_port4, 
 	/*! [in,out] Port on which the server listens for incoming IPv6
-	 * connections. */
-	uint16_t *listen_port6)
+	 * LLA connections. */
+	uint16_t *listen_port6,
+	/*! [in,out] Port on which the server listens for incoming
+	 * IPv6 ULA or GUA connections. */
+	uint16_t *listen_port6UlaGua)
 {
 	int ret_code;
 	int count;
@@ -859,6 +978,7 @@ int StartMiniServer(
 		miniSocket, *listen_port4
 #ifdef UPNP_ENABLE_IPV6
 		, *listen_port6
+		, *listen_port6UlaGua
 #endif
 		);
 	if (ret_code != UPNP_E_SUCCESS) {
@@ -871,6 +991,7 @@ int StartMiniServer(
 	if (ret_code != UPNP_E_SUCCESS) {
 		sock_close(miniSocket->miniServerSock4);
 		sock_close(miniSocket->miniServerSock6);
+		sock_close(miniSocket->miniServerSock6UlaGua);
 		free(miniSocket);
 		return ret_code;
 	}
@@ -879,6 +1000,7 @@ int StartMiniServer(
 	if (ret_code != UPNP_E_SUCCESS) {
 		sock_close(miniSocket->miniServerSock4);
 		sock_close(miniSocket->miniServerSock6);
+		sock_close(miniSocket->miniServerSock6UlaGua);
 		sock_close(miniSocket->miniServerStopSock);
 		free(miniSocket);
 		return ret_code;
@@ -890,6 +1012,7 @@ int StartMiniServer(
 	if (ret_code < 0) {
 		sock_close(miniSocket->miniServerSock4);
 		sock_close(miniSocket->miniServerSock6);
+		sock_close(miniSocket->miniServerSock6UlaGua);
 		sock_close(miniSocket->miniServerStopSock);
 		sock_close(miniSocket->ssdpSock4);
 		sock_close(miniSocket->ssdpSock6);
@@ -912,6 +1035,7 @@ int StartMiniServer(
 		/* Took it too long to start that thread. */
 		sock_close(miniSocket->miniServerSock4);
 		sock_close(miniSocket->miniServerSock6);
+		sock_close(miniSocket->miniServerSock6UlaGua);
 		sock_close(miniSocket->miniServerStopSock);
 		sock_close(miniSocket->ssdpSock4);
 		sock_close(miniSocket->ssdpSock6);
@@ -925,6 +1049,7 @@ int StartMiniServer(
 #ifdef INTERNAL_WEB_SERVER
 	*listen_port4 = miniSocket->miniServerPort4;
 	*listen_port6 = miniSocket->miniServerPort6;
+	*listen_port6UlaGua = miniSocket->miniServerPort6UlaGua;
 #endif
 
 	return UPNP_E_SUCCESS;

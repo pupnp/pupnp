@@ -610,22 +610,35 @@ EXPORT_SPEC int UpnpFinish(void);
 EXPORT_SPEC unsigned short UpnpGetServerPort(void);
 
 /*!
- * \brief Returns the internal server IPv6 UPnP listening port.
+ * \brief Returns the internal server IPv6 link-local (LLA) UPnP listening port.
  *
  * If '0' is used as the port number in \b UpnpInit2, then this function can be
  * used to retrieve the actual port allocated to the SDK.
  *
  * \return
  * 	\li On success: The port on which an internal server is listening for
- *		IPv6 UPnP related requests.
+ *		IPv6 link-local (LLA) UPnP related requests.
  * 	\li On error: 0 is returned if \b UpnpInit2 has not succeeded.
  */
 EXPORT_SPEC unsigned short UpnpGetServerPort6(void);
 
 /*!
+ * \brief Returns the internal server IPv6 ULA or GUA UPnP listening port.
+ *
+ * If '0' is used as the port number in \b UpnpInit2, then this function can be
+ * used to retrieve the actual port allocated to the SDK.
+ *
+ * \return
+ * 	\li On success: The port on which an internal server is listening for
+ *		IPv6 ULA or GUA UPnP related requests.
+ * 	\li On error: 0 is returned if \b UpnpInit2 has not succeeded.
+ */
+EXPORT_SPEC unsigned short UpnpGetServerUlaGuaPort6(void);
+
+/*!
  * \brief Returns the local IPv4 listening ip address.
  *
- * If \c NULL is used as the IPv4 address in \b UpnpInit2, then this function can
+ * If \c NULL is used as the interface in \b UpnpInit2, then this function can
  * be used to retrieve the actual interface address on which device is running.
  *
  * \return
@@ -636,18 +649,30 @@ EXPORT_SPEC unsigned short UpnpGetServerPort6(void);
 EXPORT_SPEC char *UpnpGetServerIpAddress(void);
 
 /*!
- * \brief Returns the local IPv6 listening ip address.
+ * \brief Returns the IPv6 link-local listening ip address.
  *
- * If \c NULL is used as the IPv6 address in \b UpnpInit2, then this function can
+ * If \c NULL is used as the interface in \b UpnpInit2, then this function can
  * be used to retrieve the actual interface address on which device is running.
  *
  * \return
- * 	\li On success: The IPv6 address on which an internal server is
- * 		listening for UPnP related requests.
+ * 	\li On success: The IPv6 link-local address (LLA) on which an internal
+ * 		server is listening for UPnP related requests.
  * 	\li On error: \c NULL is returned if \b UpnpInit2 has not succeeded.
  */
 EXPORT_SPEC char *UpnpGetServerIp6Address(void);
 
+/*!
+ * \brief Returns the IPv6 unique-local or globally-unique listening ip address.
+ *
+ * If \c NULL is used as the interface in \b UpnpInit2, then this function can
+ * be used to retrieve the actual interface address on which device is running.
+ *
+ * \return
+ * 	\li On success: The IPv6 unique-local or globally-unique address
+ * 		(ULA or GUA) on which an internal server is listening for UPnP
+ *		related requests.
+ * 	\li On error: \c NULL is returned if \b UpnpInit2 has not succeeded.
+ */
 EXPORT_SPEC char *UpnpGetServerUlaGuaIp6Address(void);
 /*!
  * \brief Registers a device application with the UPnP Library.
