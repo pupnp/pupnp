@@ -1350,32 +1350,53 @@ int TvDeviceCallbackEventHandler(
 	return 0;
 }
 
-int TvDeviceStart(char *ip_address,
+int TvDeviceStart(char *interface,
 	unsigned short port,
 	const char *desc_doc_name,
 	const char *web_dir_path,
+	int ip_mode,
 	print_string pfun,
 	int combo)
 {
 	int ret = UPNP_E_SUCCESS;
 	char desc_doc_url[DESC_URL_SIZE];
+	char* ip_address = NULL;
+	int address_family = AF_INET;
 
 	ithread_mutex_init(&TVDevMutex, NULL);
 
 	SampleUtil_Initialize(pfun);
 	SampleUtil_Print("Initializing UPnP Sdk with\n"
-			 "\tipaddress = %s port = %u\n",
-		ip_address ? ip_address : "{NULL}",
+			 "\tinterface = %s port = %u\n",
+		interface ? interface : "{NULL}",
 		port);
-	ret = UpnpInit2(ip_address, port);
+	ret = UpnpInit2(interface, port);
 	if (ret != UPNP_E_SUCCESS) {
 		SampleUtil_Print("Error with UpnpInit2 -- %d\n", ret);
 		UpnpFinish();
 
 		return ret;
 	}
-	ip_address = UpnpGetServerIpAddress();
-	port = UpnpGetServerPort();
+	switch (ip_mode) {
+	case IP_MODE_IPV4:
+		ip_address = UpnpGetServerIpAddress();
+		port = UpnpGetServerPort();
+		address_family = AF_INET;
+		break;
+	case IP_MODE_IPV6_LLA:
+		ip_address = UpnpGetServerIp6Address();
+		port = UpnpGetServerPort6();
+		address_family = AF_INET6;
+		break;
+	case IP_MODE_IPV6_ULA_GUA:
+		ip_address = UpnpGetServerUlaGuaIp6Address();
+		port = UpnpGetServerUlaGuaPort6();
+		address_family = AF_INET6;
+		break;
+	default:
+		SampleUtil_Print("Invalid ip_mode : %d\n", ip_mode);
+		return UPNP_E_INTERNAL_ERROR;
+	}
 	SampleUtil_Print("UPnP Initialized\n"
 			 "\tipaddress = %s port = %u\n",
 		ip_address ? ip_address : "{NULL}",
@@ -1390,12 +1411,26 @@ int TvDeviceStart(char *ip_address,
 	if (!web_dir_path) {
 		web_dir_path = DEFAULT_WEB_DIR;
 	}
-	snprintf(desc_doc_url,
+	switch (address_family) {
+	case AF_INET:
+		snprintf(desc_doc_url,
 		DESC_URL_SIZE,
 		"http://%s:%d/%s",
 		ip_address,
 		port,
 		desc_doc_name);
+		break;
+	case AF_INET6:
+		snprintf(desc_doc_url,
+		DESC_URL_SIZE,
+		"http://[%s]:%d/%s",
+		ip_address,
+		port,
+		desc_doc_name);
+		break;
+	default:
+		return UPNP_E_INTERNAL_ERROR;
+	}
 	SampleUtil_Print("Specifying the webserver root directory -- %s\n",
 		web_dir_path);
 	ret = UpnpSetWebServerRootDir(web_dir_path);
@@ -1411,10 +1446,11 @@ int TvDeviceStart(char *ip_address,
 	SampleUtil_Print("Registering the RootDevice\n"
 			 "\t with desc_doc_url: %s\n",
 		desc_doc_url);
-	ret = UpnpRegisterRootDevice(desc_doc_url,
+	ret = UpnpRegisterRootDevice3(desc_doc_url,
 		TvDeviceCallbackEventHandler,
 		&device_handle,
-		&device_handle);
+		&device_handle,
+		address_family);
 	if (ret != UPNP_E_SUCCESS) {
 		SampleUtil_Print(
 			"Error registering the rootdevice : %d\n", ret);
@@ -1484,33 +1520,36 @@ void *TvDeviceCommandLoop(void *args)
 int device_main(int argc, char *argv[])
 {
 	unsigned int portTemp = 0;
-	char *ip_address = NULL;
+	char *interface = NULL;
 	char *desc_doc_name = NULL;
 	char *web_dir_path = NULL;
 	unsigned short port = 0;
+	int ip_mode = IP_MODE_IPV4;
 	int i = 0;
 
 	SampleUtil_Initialize(linux_print);
 	/* Parse options */
 	for (i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-ip") == 0) {
-			ip_address = argv[++i];
+		if (strcmp(argv[i], "-i") == 0) {
+			interface = argv[++i];
 		} else if (strcmp(argv[i], "-port") == 0) {
 			sscanf(argv[++i], "%u", &portTemp);
 		} else if (strcmp(argv[i], "-desc") == 0) {
 			desc_doc_name = argv[++i];
 		} else if (strcmp(argv[i], "-webdir") == 0) {
 			web_dir_path = argv[++i];
+		} else if (strcmp(argv[i], "-m") == 0) {
+			sscanf(argv[++i], "%d", &ip_mode);
 		} else if (strcmp(argv[i], "-help") == 0) {
 			SampleUtil_Print(
-				"Usage: %s -ip ipaddress -port port"
+				"Usage: %s -i interface -port port"
 				" -desc desc_doc_name -webdir web_dir_path"
-				" -help (this message)\n",
+				" -m ip_mode -help (this message)\n",
 				argv[0]);
 			SampleUtil_Print(
-				"\tipaddress:     IP address of the device"
+				"\tinterface:     interface address of the device"
 				" (must match desc. doc)\n"
-				"\t\te.g.: 192.168.0.4\n"
+				"\t\te.g.: eth0\n"
 				"\tport:          Port number to use for"
 				" receiving UPnP messages (must match desc. "
 				"doc)\n"
@@ -1518,16 +1557,18 @@ int device_main(int argc, char *argv[])
 				"\tdesc_doc_name: name of device description "
 				"document\n"
 				"\t\te.g.: tvdevicedesc.xml\n"
-				"\tweb_dir_path: Filesystem path where web "
+				"\tweb_dir_path:  Filesystem path where web "
 				"files"
 				" related to the device are stored\n"
-				"\t\te.g.: /upnp/sample/tvdevice/web\n");
+				"\t\te.g.: /upnp/sample/tvdevice/web\n"
+				"\tip_mode:       set to 1 for IPv4 (default), "
+				"2 for IPv6 LLA and 3 for IPv6 ULA or GUA\n");
 			return 1;
 		}
 	}
 	port = (unsigned short)portTemp;
 	return TvDeviceStart(
-		ip_address, port, desc_doc_name, web_dir_path, linux_print, 0);
+		interface, port, desc_doc_name, web_dir_path, ip_mode, linux_print, 0);
 }
 
 /*! @} Device Sample Module */
