@@ -8,6 +8,8 @@ bootstrap
 build/msvc/inttypes.h
 build/msvc/stdint.h
 configure.ac
+docs/api_changes/v1_10.md
+docs/Doxyfile
 docs/Makefile.am
 ixml/Makefile.am
 ixml/inc/ixml.h
