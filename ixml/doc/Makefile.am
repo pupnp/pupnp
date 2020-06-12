@@ -2,7 +2,7 @@
 #
 # "Makefile.am" for "libunp/ixml/doc" 
 #
-# (C) Copyright 2005 Rémi Turboult <r3mi@users.sourceforge.net>
+# (C) Copyright 2005 RÃ©mi Turboult <r3mi@users.sourceforge.net>
 #
 ##########################################################################
 #
