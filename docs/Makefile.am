@@ -4,6 +4,8 @@
 # Copyright (C) 2020 Marcelo Roberto Jimenez
 #
 
+EXTRA_DIST = api_changes
+
 docs:
 	doxygen
 
