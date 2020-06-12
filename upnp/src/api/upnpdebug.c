@@ -64,7 +64,7 @@ static int initwascalled;
 /* Name of the output file. We keep a copy */
 static char *fileName;
 
-/* This is called from UpnpInit(). So the user must call setLogFileName() 
+/* This is called from UpnpInit2(). So the user must call setLogFileName() 
  * before. This can be called again, for example to rotate the log
  * file, and we try to avoid multiple calls to the mutex init, with a
  * risk of race, probably not a problem, and not worth fixing. */
@@ -108,7 +108,7 @@ void UpnpSetLogLevel(Upnp_LogLevel log_level)
 void UpnpCloseLog(void)
 {
 	/* Calling lock() assumes that someone called UpnpInitLog(), but
-	 * this is reasonable as it is called from UpnpInit(). We risk a
+	 * this is reasonable as it is called from UpnpInit2(). We risk a
 	 * crash if we do this without a lock.*/
 	ithread_mutex_lock(&GlobalDebugMutex);
 

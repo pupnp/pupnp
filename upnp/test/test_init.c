@@ -106,7 +106,7 @@ main (int argc, char* argv[])
 	 */
 	printf ("\n");
 	printf ("Initializing UPnP ... \n");
-	rc = UpnpInit (NULL, 0);
+	rc = UpnpInit2 (NULL, 0);
 	if ( UPNP_E_SUCCESS == rc ) {
 		const char* ip_address = UpnpGetServerIpAddress();
 		unsigned short port    = UpnpGetServerPort();
@@ -114,7 +114,7 @@ main (int argc, char* argv[])
 		printf ("UPnP Initialized OK ip=%s, port=%d\n", 
 			(ip_address ? ip_address : "UNKNOWN"), port);
 	} else {
-		printf ("** ERROR UpnpInit(): %d", rc);
+		printf ("** ERROR UpnpInit2(): %d", rc);
 #if UPNP_HAVE_TOOLS
 		printf (" %s", UpnpGetErrorMessage (rc));
 #endif

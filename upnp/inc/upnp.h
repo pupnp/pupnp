@@ -183,15 +183,15 @@
 #define UPNP_E_INVALID_ACTION -115
 
 /*!
- * \brief \b UpnpInit has not been called, or \b UpnpFinish has already been
+ * \brief \b UpnpInit2 has not been called, or \b UpnpFinish has already been
  * called.
  *
- * None of the API functions operate until \b UpnpInit successfully completes.
+ * None of the API functions operate until \b UpnpInit2 successfully completes.
  */
 #define UPNP_E_FINISH -116
 
 /*!
- * \brief \b UpnpInit cannot complete.
+ * \brief \b UpnpInit2 cannot complete.
  *
  * The typical reason is failure to allocate sufficient resources.
  */
@@ -292,7 +292,7 @@
  * \brief The SDK had a problem setting the socket to listen for incoming
  * connections.
  *
- * This error only happens during initialization (i.e. \b UpnpInit).
+ * This error only happens during initialization (i.e. \b UpnpInit2).
  */
 #define UPNP_E_LISTEN -206
 
@@ -511,48 +511,6 @@ extern "C" {
  */
 
 /*!
- * \brief Initializes the Linux SDK for UPnP Devices (IPv4 only).
- *
- * \deprecated Kept for backwards compatibility. Use UpnpInit2 for new
- * implementations or where IPv6 is required.
- *
- * This function must be called before any other API function can be called.
- * It should be called only once. Subsequent calls to this API return a
- * \c UPNP_E_INIT error code.
- *
- * Optionally, the application can specify a host IPv4 address (in the
- * case of a multi-homed configuration) and a port number to use for
- * all UPnP operations.  Since a port number can be used only by one
- * process, multiple processes using the SDK must specify
- * different port numbers.
- *
- * If unspecified, the SDK will use the first IPv4-capable adapter's IP address
- * and an arbitrary port.
- *
- * This call is synchronous.
- *
- * \return An integer representing one of the following:
- *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
- *     \li \c UPNP_E_OUTOF_MEMORY: Insufficient resources exist
- *             to initialize the SDK.
- *     \li \c UPNP_E_INIT: The SDK is already initialized.
- *     \li \c UPNP_E_INIT_FAILED: The SDK initialization
- *             failed for an unknown reason.
- *     \li \c UPNP_E_SOCKET_BIND: An error occurred binding a socket.
- *     \li \c UPNP_E_LISTEN: An error occurred listening to a socket.
- *     \li \c UPNP_E_OUTOF_SOCKET: An error ocurred creating a socket.
- *     \li \c UPNP_E_INTERNAL_ERROR: An internal error ocurred.
- */
-EXPORT_SPEC int UpnpInit(
-	/*! The host local IPv4 address to use, in string format, for example
-	 * "192.168.0.1", or \c NULL to use the first IPv4 adapter's IP address.
-	 */
-	const char *HostIP,
-	/*! Local Port to listen for incoming connections
-	 * \c NULL will pick an arbitrary free port. */
-	unsigned short DestPort);
-
-/*!
  * \brief Initializes the Linux SDK for UPnP Devices (IPv4 or IPv6).
  *
  * This function must be called before any other API function can be called.
@@ -641,52 +599,52 @@ EXPORT_SPEC int UpnpFinish(void);
 /*!
  * \brief Returns the internal server IPv4 UPnP listening port.
  *
- * If '0' is used as the port number in \b UpnpInit, then this function can be
+ * If '0' is used as the port number in \b UpnpInit2, then this function can be
  * used to retrieve the actual port allocated to the SDK.
  *
  * \return
  * 	\li On success: The port on which an internal server is listening for
  *		IPv4 UPnP related requests.
- *	\li On error: 0 is returned if \b UpnpInit has not succeeded.
+ *	\li On error: 0 is returned if \b UpnpInit2 has not succeeded.
  */
 EXPORT_SPEC unsigned short UpnpGetServerPort(void);
 
 /*!
  * \brief Returns the internal server IPv6 UPnP listening port.
  *
- * If '0' is used as the port number in \b UpnpInit, then this function can be
+ * If '0' is used as the port number in \b UpnpInit2, then this function can be
  * used to retrieve the actual port allocated to the SDK.
  *
  * \return
  * 	\li On success: The port on which an internal server is listening for
  *		IPv6 UPnP related requests.
- * 	\li On error: 0 is returned if \b UpnpInit has not succeeded.
+ * 	\li On error: 0 is returned if \b UpnpInit2 has not succeeded.
  */
 EXPORT_SPEC unsigned short UpnpGetServerPort6(void);
 
 /*!
  * \brief Returns the local IPv4 listening ip address.
  *
- * If \c NULL is used as the IPv4 address in \b UpnpInit, then this function can
+ * If \c NULL is used as the IPv4 address in \b UpnpInit2, then this function can
  * be used to retrieve the actual interface address on which device is running.
  *
  * \return
  * 	\li On success: The IPv4 address on which an internal server is
  * 		listening for UPnP related requests.
- * 	\li On error: \c NULL is returned if \b UpnpInit has not succeeded.
+ * 	\li On error: \c NULL is returned if \b UpnpInit2 has not succeeded.
  */
 EXPORT_SPEC char *UpnpGetServerIpAddress(void);
 
 /*!
  * \brief Returns the local IPv6 listening ip address.
  *
- * If \c NULL is used as the IPv6 address in \b UpnpInit, then this function can
+ * If \c NULL is used as the IPv6 address in \b UpnpInit2, then this function can
  * be used to retrieve the actual interface address on which device is running.
  *
  * \return
  * 	\li On success: The IPv6 address on which an internal server is
  * 		listening for UPnP related requests.
- * 	\li On error: \c NULL is returned if \b UpnpInit has not succeeded.
+ * 	\li On error: \c NULL is returned if \b UpnpInit2 has not succeeded.
  */
 EXPORT_SPEC char *UpnpGetServerIp6Address(void);
 
