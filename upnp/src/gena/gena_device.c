@@ -1238,6 +1238,11 @@ int gena_validate_delivery_urls(
 	struct in_addr genaAddr4;
 	struct in_addr genaNetmask;
 	struct sockaddr_in *deliveryAddr4 = NULL;
+	struct in6_addr genaAddr6Lla;
+	struct in6_addr genaAddr6UlaGua;
+	struct in6_addr *genaAddr6 = NULL;
+	unsigned int if_prefix;
+	struct sockaddr_in6 *deliveryAddr6 = NULL;
 	char deliveryAddrString[INET6_ADDRSTRLEN];
 
 	if (info == NULL || url_list == NULL) {
@@ -1276,7 +1281,42 @@ int gena_validate_delivery_urls(
 		}
 		break;
 	case AF_INET6:
-		// TODO
+		if (!inet_pton(AF_INET6, gIF_IPV6, &genaAddr6Lla)) {
+			return -1;
+		}
+
+		if (!inet_pton(AF_INET6, gIF_IPV6_ULA_GUA, &genaAddr6UlaGua)) {
+			return -1;
+		}
+
+		for (i = 0; i < url_list->size; i++) {
+			deliveryAddr6 = (struct sockaddr_in6 *)
+				&url_list->parsedURLs[i].hostport.IPaddress;
+			if (IN6_IS_ADDR_LINKLOCAL(deliveryAddr6)) {
+				genaAddr6 = &genaAddr6Lla;
+				if_prefix = gIF_IPV6_PREFIX_LENGTH;
+			} else {
+				genaAddr6 = &genaAddr6UlaGua;
+				if_prefix = gIF_IPV6_ULA_GUA_PREFIX_LENGTH;
+			}
+			/* We assume that IPv6 prefix is a multiple of 8 */
+			if (memcmp(deliveryAddr6->sin6_addr.s6_addr,
+				genaAddr6->s6_addr, if_prefix / 8)) {
+				inet_ntop(AF_INET6, &deliveryAddr6->sin6_addr,
+					deliveryAddrString, sizeof(deliveryAddrString));
+				UpnpPrintf(UPNP_CRITICAL,
+					GENA,
+					__FILE__,
+					__LINE__,
+					"DeliveryURL %s is invalid.\n"
+					"It is not in the expected network segment (IPv6: %s, prefix: %d)\n",
+					deliveryAddrString,
+					IN6_IS_ADDR_LINKLOCAL(deliveryAddr6)?gIF_IPV6:gIF_IPV6_ULA_GUA,
+					if_prefix
+					);
+			      return -1;
+			}
+		}
 		break;
 	}
 	return 0;
