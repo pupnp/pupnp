@@ -1,6 +1,77 @@
 *******************************************************************************
-Version 1.12.2
+Version 1.14.0
 *******************************************************************************
+
+2020-06-11 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
+
+        upnpapic.c: retrieve gIF_IPV4_NETMASK with BSD
+	GitHub #183
+
+        BSD is using getifaddrs, update the code to retrieve the IPv4 netmask
+	(used in the CallStranger fix)
+
+        Signed-off-by: Fabrice Fontaine fontaine.fabrice@gmail.com
+
+2020-06-09 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
+
+        Drop UpnpInit
+	GitHub #182
+
+        This function is deprecated since a long time moreover it is vulnerable
+	to CallStranger a.k.a. CVE-2020-12695 and can't be fixed without
+	breaking the API as HostIP only allows the user to pass an IP address
+	and not a netmask.
+
+        If we want to discover the netmask from the HostIP provided in UPnPInit,
+	we'll have to loop through all the available interfaces to find the
+	interface with the given IP address to finally retrieve the netmask.
+	This is a lot of work/modification for a deprecated function. Moreover,
+	in the end UPnPInit will be like a "deprecated" (i.e. IPv4-only) version
+	of UPnPInit2.
+
+        So it is time to remove this deprecated function.
+
+        As a result, also remove getlocalhostname and DEFAULT_INTERFACE which
+	are not needed anymore and replace UpnpInit by UpnpInit2 in comments.
+
+        Signed-off-by: Fabrice Fontaine fontaine.fabrice@gmail.com
+
+2020-06-09 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
+
+        Partial fix for CallStranger on IPv4
+	GitHub #181
+
+        This is a partial fix for CallStranger a.k.a. CVE-2020-12695
+
+        Check that DeliveryURLs are in the expected network segment as requested
+	by the new UPnP UDA:
+	https://openconnectivity.org/upnp-specs/UPnP-arch-DeviceArchitecture-v2.0-20200417.pdf.
+
+        Here is an extract of the new requirement:
+
+        The subscription request containing a delivery URL not on the same
+	network segment as the fully qualified event subscription URL shall not
+	be accepted. For private networks this means that the delivery URL
+	provided will adhere to the following IP ranges:
+
+        . 10.0.0.0 - 10.255.255.255 (10/8 prefix)
+	. 172.16.0.0 - 172.31.255.255 (172.16/12 prefix)
+	. 192.168.0.0 - 192.168.255.255 (192.168/16 prefix)
+
+        In the context of pupnp, this means that the IPv4 netmask is now
+	retrieved when using UPnPInit2. Then, each DeliveryURL is checked
+	against the device's IPv4 address and netmask. If one of them are not
+	compliant, the whole subscription is rejected.
+
+        This first commit should be enhanced / updated to:
+
+        . remove UPnPInit (it is deprecated for a long time) or update it so
+	. the user can also pass the netmask
+	. fix IPv6
+	. fix Windows code
+	. retrieve the netmask in the BSD code of UPnPInit2
+
+        Signed-off-by: Fabrice Fontaine fontaine.fabrice@gmail.com
 
 2020-06-04 Patrik Lantz pjlantz(at)github
 
