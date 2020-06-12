@@ -330,13 +330,11 @@ exit_function:
 /*!
  * \brief Performs the initial steps in initializing the UPnP SDK.
  *
- *	\li Winsock library is initialized for the process (Windows specific).
- *	\li The logging (for debug messages) is initialized.
- *	\li Mutexes, Handle table and thread pools are allocated and
- *		initialized.
- *	\li Callback functions for SOAP and GENA are set, if they're
- *		enabled.
- *	\li The SDK timer thread is initialized.
+ * \li Winsock library is initialized for the process (Windows specific).
+ * \li The logging (for debug messages) is initialized.
+ * \li Mutexes, Handle table and thread pools are allocated and initialized.
+ * \li Callback functions for SOAP and GENA are set, if they're enabled.
+ * \li The SDK timer thread is initialized.
  *
  * \return UPNP_E_SUCCESS on success.
  */
@@ -443,7 +441,8 @@ static int UpnpInitStartServers(
 	LOCAL_PORT_V4 = DestPort;
 	LOCAL_PORT_V6 = DestPort;
 	LOCAL_PORT_V6_ULA_GUA = DestPort;
-	retVal = StartMiniServer(&LOCAL_PORT_V4, &LOCAL_PORT_V6, &LOCAL_PORT_V6_ULA_GUA);
+	retVal = StartMiniServer(
+		&LOCAL_PORT_V4, &LOCAL_PORT_V6, &LOCAL_PORT_V6_ULA_GUA);
 	if (retVal != UPNP_E_SUCCESS) {
 		UpnpPrintf(UPNP_CRITICAL,
 			API,
@@ -3792,7 +3791,10 @@ int UpnpGetIfInfo(const char *IfName)
 		return UPNP_E_INVALID_INTERFACE;
 	}
 	inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
-	inet_ntop(AF_INET, &v4_netmask, gIF_IPV4_NETMASK, sizeof(gIF_IPV4_NETMASK));
+	inet_ntop(AF_INET,
+		&v4_netmask,
+		gIF_IPV4_NETMASK,
+		sizeof(gIF_IPV4_NETMASK));
 	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
 	gIF_INDEX = if_nametoindex(gIF_NAME);
 #else /* (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__) */ /* _WIN32 */
@@ -4308,7 +4310,6 @@ int PrintHandleInfo(UpnpClient_Handle Hnd)
 
 	return UPNP_E_SUCCESS;
 }
-
 
 #ifdef INCLUDE_DEVICE_APIS
 	#if EXCLUDE_SSDP == 0
