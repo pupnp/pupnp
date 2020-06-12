@@ -144,9 +144,15 @@ char gIF_IPV4_NETMASK[INET_ADDRSTRLEN] = {'\0'};
  * (extern'ed in upnp.h) */
 char gIF_IPV6[INET6_ADDRSTRLEN] = {'\0'};
 
+/*! IPv6 LLA prefix length. (extern'ed in upnp.h) */
+unsigned gIF_IPV6_PREFIX_LENGTH = 0;
+
 /*! Static buffer to contain interface IPv6 unique-local or globally-unique
  * address (ULA or GUA). (extern'ed in upnp.h) */
 char gIF_IPV6_ULA_GUA[INET6_ADDRSTRLEN] = {'\0'};
+
+/*! IPv6 ULA or GUA prefix length. (extern'ed in upnp.h) */
+unsigned gIF_IPV6_ULA_GUA_PREFIX_LENGTH = 0;
 
 /*! Contains interface index. (extern'ed in upnp.h) */
 unsigned gIF_INDEX = (unsigned)-1;
@@ -3804,6 +3810,7 @@ int UpnpGetIfInfo(const char *IfName)
 	int LocalSock;
 	struct in6_addr v6_addr;
 	unsigned if_idx;
+	unsigned if_prefix;
 	char addr6[8][5];
 	char buf[INET6_ADDRSTRLEN];
 	int ifname_found = 0;
@@ -3941,7 +3948,7 @@ int UpnpGetIfInfo(const char *IfName)
 	inet6_procfd = fopen("/proc/net/if_inet6", "r");
 	if (inet6_procfd) {
 		while (fscanf(inet6_procfd,
-			       "%4s%4s%4s%4s%4s%4s%4s%4s %02x %*02x %*02x "
+			       "%4s%4s%4s%4s%4s%4s%4s%4s %02x %02x %*02x "
 			       "%*02x %*20s\n",
 			       addr6[0],
 			       addr6[1],
@@ -3951,7 +3958,8 @@ int UpnpGetIfInfo(const char *IfName)
 			       addr6[5],
 			       addr6[6],
 			       addr6[7],
-			       &if_idx) != EOF) {
+			       &if_idx,
+			       &if_prefix) != EOF) {
 			/* Get same interface as IPv4 address retrieved. */
 			if (gIF_INDEX == if_idx) {
 				snprintf(buf,
@@ -3977,6 +3985,7 @@ int UpnpGetIfInfo(const char *IfName)
 							buf,
 							sizeof(gIF_IPV6_ULA_GUA) -
 								1);
+						gIF_IPV6_ULA_GUA_PREFIX_LENGTH = if_prefix;
 					} else if (IN6_IS_ADDR_GLOBAL(
 							   &v6_addr) &&
 						   strlen(gIF_IPV6_ULA_GUA) ==
@@ -3990,6 +3999,7 @@ int UpnpGetIfInfo(const char *IfName)
 							buf,
 							sizeof(gIF_IPV6_ULA_GUA) -
 								1);
+						gIF_IPV6_ULA_GUA_PREFIX_LENGTH = if_prefix;
 					} else if (IN6_IS_ADDR_LINKLOCAL(
 							   &v6_addr) &&
 						   strlen(gIF_IPV6) ==
@@ -4002,6 +4012,7 @@ int UpnpGetIfInfo(const char *IfName)
 						strncpy(gIF_IPV6,
 							buf,
 							sizeof(gIF_IPV6) - 1);
+						gIF_IPV6_PREFIX_LENGTH = if_prefix;
 					}
 				}
 			}
