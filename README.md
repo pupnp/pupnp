@@ -143,7 +143,7 @@ where 'eth0' is the network adapter that the UPnP library will use.  Without thi
 
 ## 5. Build Instructions
 
-### Pre-requisites
+### 5.1 - Pre-requisites
 
 Some packages/tools are required to build the library. Here's a minimal 'inspirational example'
 that builds the library using a Docker Ubuntu image.
@@ -161,7 +161,7 @@ that builds the library using a Docker Ubuntu image.
 % make
 ```
 
-### CORE LIBRARIES
+### 5.2 - Core Libraries
 
 Note: On a git checkout, you need to run `./bootstrap` to generate the configure script.
 
@@ -256,7 +256,7 @@ To remove all the targets, object files, and built documentation:
 % make clean
 ```
 
-### CROSS COMPILATION
+### 5.3 - Cross Compilation
 
 To cross compile the SDK, a special "configure" directive is all that is required:
 
@@ -267,7 +267,7 @@ To cross compile the SDK, a special "configure" directive is all that is require
 
 This will invoke the "arm-linux-gcc" cross compiler to build the library.
 
-### SAMPLES
+### 5.4 - Samples
 
 The SDK contains two samples: a TV device application and a control point that talks with the TV device.  They are found in the $(LIBUPNP)/upnp/sample directory.  
 
@@ -287,7 +287,7 @@ To run the sample device, you need to create a tvdevice directory and move the w
 % ../tv_device
 ```
 
-### SOLARIS BUILD
+### 5.5 - Solaris Build
 
 The building process for the Solaris operating system is similar to the one described above. Only the call to ./configure has to be done using an additional parameter:
 
@@ -304,7 +304,7 @@ where \<cputype\> has to be replaced by the appropriate CPU tuning flag (e.g. "s
 
 can be called as described above.
 
-### WINDOWS BUILD
+### 5.6 - Windows Build
 
 In order to build libupnp under Windows the pthreads-w32 package is required. You can download a self-extracting ZIP file from the following location:
 
@@ -326,7 +326,7 @@ PTW32_STATIC_LIB - for using the static pthreads32 library
 
 ## 6. Install/Uninstall Instructions
 
-### Install
+### 6.1 - Install
 
 The top-level makefile for the UPnP SDK contains rules to install the necessary components.  To install the SDK, as root:
 
@@ -334,7 +334,7 @@ The top-level makefile for the UPnP SDK contains rules to install the necessary 
 % make install
 ```
 
-### Uninstall
+### 6.2 - Uninstall
 
 Likewise, the top-level makefile contains an uninstall rule, reversing the steps in the install:
 
