@@ -211,8 +211,10 @@ extern char gIF_NAME[LINE_SIZE];
 extern char gIF_IPV4[INET_ADDRSTRLEN];
 extern char gIF_IPV4_NETMASK[INET_ADDRSTRLEN];
 extern char gIF_IPV6[INET6_ADDRSTRLEN];
+extern unsigned gIF_IPV6_PREFIX_LENGTH;
 
 extern char gIF_IPV6_ULA_GUA[INET6_ADDRSTRLEN];
+extern unsigned gIF_IPV6_ULA_GUA_PREFIX_LENGTH;
 
 extern unsigned gIF_INDEX;
 
