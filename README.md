@@ -3,6 +3,7 @@
 branch|status
 ------|------
 Master| ![master](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg)
+branch-1.12.x | ![1.10.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.12.x)
 branch-1.10.x | ![1.10.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.10.x)
 branch-1.8.x | ![1.8.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.8.x)
 branch-1.6.x | ![1.6.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.6.x)
@@ -33,6 +34,7 @@ See LICENSE for details.
 
 Release Number | Date | History
 ---------------|------|--------
+1.14.0 | 2020-06-xx | [Portable UPnP SDK][Portable UPnP SDK]
 1.12.1 | 2020-04-07 | [Portable UPnP SDK][Portable UPnP SDK]
 1.12.0 | 2020-01-22 | [Portable UPnP SDK][Portable UPnP SDK]
 1.10.1 | 2019-11-20 | [Portable UPnP SDK][Portable UPnP SDK]
