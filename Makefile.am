@@ -10,7 +10,8 @@ DISTCHECK_CONFIGURE_FLAGS = --enable-debug --enable-samples
 
 SUBDIRS = \
 	ixml \
-	upnp
+	upnp \
+	docs
 
 EXTRA_DIST = \
 	docs/Doxyfile \

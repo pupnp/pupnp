@@ -809,10 +809,9 @@ fi
 
 AC_CONFIG_FILES([
 	Makefile
+	docs/Makefile
 	ixml/Makefile
-	ixml/doc/Makefile
 	upnp/Makefile
-	upnp/doc/Makefile
 	upnp/sample/Makefile
 	upnp/unittest/Makefile
 	libupnp.pc

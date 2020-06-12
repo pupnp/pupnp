@@ -4,7 +4,7 @@
 # Copyright (C) 2005 Rémi Turboult <r3mi@users.sourceforge.net>
 #
 
-SUBDIRS = doc . sample unittest
+SUBDIRS = . sample unittest
 
 AM_CPPFLAGS = \
 	-I$(srcdir)/inc \

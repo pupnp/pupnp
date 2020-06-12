@@ -5,8 +5,6 @@
 # (C) Copyright 2005 Rémi Turboult <r3mi@users.sourceforge.net>
 #
 
-SUBDIRS 		= doc
-
 AM_CPPFLAGS		= -I$(srcdir)/inc -I$(srcdir)/src/inc \
                           -I$(top_srcdir)/upnp/inc
 AM_CFLAGS		= 

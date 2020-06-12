@@ -8,12 +8,8 @@ bootstrap
 build/msvc/inttypes.h
 build/msvc/stdint.h
 configure.ac
+docs/Makefile.am
 ixml/Makefile.am
-ixml/doc/Makefile.am
-ixml/doc/docxx.sty
-ixml/doc/intro.dxx
-ixml/doc/ixml.dxx
-ixml/doc/license.dxx
 ixml/inc/ixml.h
 ixml/inc/ixmldebug.h
 ixml/src/attr.c
@@ -73,12 +69,6 @@ m4/ax_pthread.m4
 m4/ax_sys_largefile_sensitive.m4
 m4/rt_bool_arg_enable.m4
 upnp/Makefile.am
-upnp/doc/Makefile.am
-upnp/doc/callback.dxx
-upnp/doc/docxx.sty
-upnp/doc/intro.dxx
-upnp/doc/license.dxx
-upnp/doc/upnpsdk.dxx
 upnp/inc/ActionComplete.h
 upnp/inc/ActionRequest.h
 upnp/inc/Callback.h
