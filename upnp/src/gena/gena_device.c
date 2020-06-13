@@ -1292,7 +1292,7 @@ int gena_validate_delivery_urls(
 		for (i = 0; i < url_list->size; i++) {
 			deliveryAddr6 = (struct sockaddr_in6 *)
 				&url_list->parsedURLs[i].hostport.IPaddress;
-			if (IN6_IS_ADDR_LINKLOCAL(deliveryAddr6)) {
+			if (IN6_IS_ADDR_LINKLOCAL(&deliveryAddr6->sin6_addr)) {
 				genaAddr6 = &genaAddr6Lla;
 				if_prefix = gIF_IPV6_PREFIX_LENGTH;
 			} else {
@@ -1311,7 +1311,7 @@ int gena_validate_delivery_urls(
 					"DeliveryURL %s is invalid.\n"
 					"It is not in the expected network segment (IPv6: %s, prefix: %d)\n",
 					deliveryAddrString,
-					IN6_IS_ADDR_LINKLOCAL(deliveryAddr6)?gIF_IPV6:gIF_IPV6_ULA_GUA,
+					IN6_IS_ADDR_LINKLOCAL(&deliveryAddr6->sin6_addr)?gIF_IPV6:gIF_IPV6_ULA_GUA,
 					if_prefix
 					);
 			      return -1;
