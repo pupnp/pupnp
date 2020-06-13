@@ -423,6 +423,7 @@ static void RunMiniServer(
 		} else {
 			web_server_accept(miniSock->miniServerSock4, &rdSet);
 			web_server_accept(miniSock->miniServerSock6, &rdSet);
+			web_server_accept(miniSock->miniServerSock6UlaGua, &rdSet);
 #ifdef INCLUDE_CLIENT_APIS
 			ssdp_read(miniSock->ssdpReqSock4, &rdSet);
 			ssdp_read(miniSock->ssdpReqSock6, &rdSet);
@@ -865,7 +866,7 @@ static int get_miniserver_sockets(
 	out->miniServerSock4 = listenfd4;
 #ifdef UPNP_ENABLE_IPV6
 	out->miniServerSock6 = listenfd6;
-	out->miniServerSock6 = listenfd6UlaGua;
+	out->miniServerSock6UlaGua = listenfd6UlaGua;
 #endif
 	return UPNP_E_SUCCESS;
 }
