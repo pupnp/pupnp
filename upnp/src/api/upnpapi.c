@@ -3676,9 +3676,12 @@ int UpnpGetIfInfo(const char *IfName)
 					&((struct sockaddr_in *)ip_addr)
 						 ->sin_addr,
 					sizeof(v4_addr));
+				/* TODO: Retrieve IPv4 netmask */
 				valid_addr_found = 1;
 				break;
 			case AF_INET6:
+				/* TODO: Retrieve IPv6 ULA or GUA address and
+				 * its prefix */
 				/* Only keep IPv6 link-local addresses. */
 				if (IN6_IS_ADDR_LINKLOCAL(
 					    &((struct sockaddr_in6 *)ip_addr)
@@ -3688,6 +3691,7 @@ int UpnpGetIfInfo(const char *IfName)
 								ip_addr)
 							 ->sin6_addr,
 						sizeof(v6_addr));
+					/* TODO: Retrieve IPv6 LLA prefix */
 					valid_addr_found = 1;
 				}
 				break;
