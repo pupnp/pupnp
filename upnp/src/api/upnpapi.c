@@ -454,7 +454,7 @@ static int UpnpInitStartServers(
 			API,
 			__FILE__,
 			__LINE__,
-			"Miniserver failed to start");
+			"Miniserver failed to start\n");
 		UpnpFinish();
 		return retVal;
 	}
