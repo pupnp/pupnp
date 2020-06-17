@@ -41,8 +41,8 @@
 
 #include "httpreadwrite.h"
 
-#include "ExtraHeaders.h"
-#include "FileInfo.h"
+#include "UpnpExtraHeaders.h"
+#include "UpnpFileInfo.h"
 #include "UpnpInet.h"
 #include "UpnpIntTypes.h"
 #include "UpnpStdInt.h"

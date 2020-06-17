@@ -1,66 +1,61 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
 
-
 #include "config.h"
-
 
 /*!
  * \file
  */
 
-
 #if EXCLUDE_GENA == 0
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 
+		#include "UpnpEventSubscribe.h"
+		#include "gena.h"
+		#include "httpparser.h"
+		#include "httpreadwrite.h"
+		#include "parsetools.h"
+		#include "statcodes.h"
+		#include "sysdep.h"
+		#include "upnpapi.h"
+		#include "uuid.h"
 
-#include "EventSubscribe.h"
-#include "gena.h"
-#include "httpparser.h"
-#include "httpreadwrite.h"
-#include "parsetools.h"
-#include "statcodes.h"
-#include "sysdep.h"
-#include "uuid.h"
-#include "upnpapi.h"
-
-#ifdef _WIN32
-	#if defined(_MSC_VER) && _MSC_VER < 1900
-		#define snprintf _snprintf
-	#endif
-#endif
+		#ifdef _WIN32
+			#if defined(_MSC_VER) && _MSC_VER < 1900
+				#define snprintf _snprintf
+			#endif
+		#endif
 
 extern ithread_mutex_t GlobalClientSubscribeMutex;
-
 
 /*!
  * \brief This is a thread function to send the renewal just before the
@@ -70,7 +65,7 @@ static void GenaAutoRenewSubscription(
 	/*! [in] Thread data(upnp_timeout *) needed to send the renewal. */
 	void *input)
 {
-	upnp_timeout *event = (upnp_timeout *) input;
+	upnp_timeout *event = (upnp_timeout *)input;
 	UpnpEventSubscribe *sub_struct = (UpnpEventSubscribe *)event->Event;
 	void *cookie;
 	Upnp_FunPtr callback_fun;
@@ -81,22 +76,25 @@ static void GenaAutoRenewSubscription(
 	int errCode = 0;
 
 	if (AUTO_RENEW_TIME == 0) {
-		UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__, "GENA SUB EXPIRED");
+		UpnpPrintf(UPNP_INFO,
+			GENA,
+			__FILE__,
+			__LINE__,
+			"GENA SUB EXPIRED");
 		UpnpEventSubscribe_set_ErrCode(sub_struct, UPNP_E_SUCCESS);
 		send_callback = 1;
 		eventType = UPNP_EVENT_SUBSCRIPTION_EXPIRED;
 	} else {
-		UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "GENA AUTO RENEW");
+		UpnpPrintf(
+			UPNP_INFO, GENA, __FILE__, __LINE__, "GENA AUTO RENEW");
 		timeout = UpnpEventSubscribe_get_TimeOut(sub_struct);
-		errCode = genaRenewSubscription(
-			event->handle,
+		errCode = genaRenewSubscription(event->handle,
 			UpnpEventSubscribe_get_SID(sub_struct),
 			&timeout);
 		UpnpEventSubscribe_set_ErrCode(sub_struct, errCode);
 		UpnpEventSubscribe_set_TimeOut(sub_struct, timeout);
-		if (errCode != UPNP_E_SUCCESS &&
-		    errCode != GENA_E_BAD_SID &&
-		    errCode != GENA_E_BAD_HANDLE) {
+		if (errCode != UPNP_E_SUCCESS && errCode != GENA_E_BAD_SID &&
+			errCode != GENA_E_BAD_HANDLE) {
 			send_callback = 1;
 			eventType = UPNP_EVENT_AUTORENEWAL_FAILED;
 		}
@@ -104,12 +102,13 @@ static void GenaAutoRenewSubscription(
 
 	if (send_callback) {
 		HandleReadLock();
-		if( GetHandleInfo( event->handle, &handle_info ) != HND_CLIENT ) {
+		if (GetHandleInfo(event->handle, &handle_info) != HND_CLIENT) {
 			HandleUnlock();
 			free_upnp_timeout(event);
 			goto end_function;
 		}
-		UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "HANDLE IS VALID");
+		UpnpPrintf(
+			UPNP_INFO, GENA, __FILE__, __LINE__, "HANDLE IS VALID");
 
 		/* make callback */
 		callback_fun = handle_info->Callback;
@@ -123,7 +122,6 @@ static void GenaAutoRenewSubscription(
 end_function:
 	return;
 }
-
 
 /*!
  * \brief Schedules a job to renew the subscription just before time out.
@@ -157,7 +155,7 @@ static int ScheduleGenaAutoRenew(
 		goto end_function;
 	}
 
-	RenewEvent = (upnp_timeout *) malloc(sizeof(upnp_timeout));
+	RenewEvent = (upnp_timeout *)malloc(sizeof(upnp_timeout));
 	if (RenewEvent == NULL) {
 		free(RenewEventStruct);
 		return_code = UPNP_E_OUTOF_MEMORY;
@@ -168,23 +166,25 @@ static int ScheduleGenaAutoRenew(
 	/* schedule expire event */
 	UpnpEventSubscribe_set_ErrCode(RenewEventStruct, UPNP_E_SUCCESS);
 	UpnpEventSubscribe_set_TimeOut(RenewEventStruct, TimeOut);
-	UpnpEventSubscribe_set_SID(RenewEventStruct, GenlibClientSubscription_get_SID(sub));
-	UpnpEventSubscribe_set_PublisherUrl(RenewEventStruct, GenlibClientSubscription_get_EventURL(sub));
+	UpnpEventSubscribe_set_SID(
+		RenewEventStruct, GenlibClientSubscription_get_SID(sub));
+	UpnpEventSubscribe_set_PublisherUrl(
+		RenewEventStruct, GenlibClientSubscription_get_EventURL(sub));
 
 	/* RenewEvent->EventType=UPNP_EVENT_SUBSCRIPTION_EXPIRE; */
 	RenewEvent->handle = client_handle;
 	RenewEvent->Event = RenewEventStruct;
 
-	TPJobInit(&job, (start_routine) GenaAutoRenewSubscription, RenewEvent);
+	TPJobInit(&job, (start_routine)GenaAutoRenewSubscription, RenewEvent);
 	TPJobSetFreeFunction(&job, (free_routine)free_upnp_timeout);
 	TPJobSetPriority(&job, MED_PRIORITY);
 
 	/* Schedule the job */
-	return_code = TimerThreadSchedule(
-		&gTimerThread,
+	return_code = TimerThreadSchedule(&gTimerThread,
 		TimeOut - AUTO_RENEW_TIME,
 		REL_SEC,
-		&job, SHORT_TERM,
+		&job,
+		SHORT_TERM,
 		&(RenewEvent->eventId));
 	if (return_code != UPNP_E_SUCCESS) {
 		free(RenewEvent);
@@ -201,7 +201,6 @@ end_function:
 	return return_code;
 }
 
-
 /*!
  * \brief Sends the UNSUBCRIBE gena request and recieves the response from the
  * 	device and returns it as a parameter.
@@ -214,15 +213,14 @@ static int gena_unsubscribe(
 	/*! [in] The subcription ID. */
 	const UpnpString *sid,
 	/*! [out] The UNSUBCRIBE response from the device. */
-	http_parser_t *response )
+	http_parser_t *response)
 {
 	int return_code;
 	uri_type dest_url;
 	membuffer request;
 
 	/* parse url */
-	return_code = http_FixStrUrl(
-		UpnpString_get_String(url),
+	return_code = http_FixStrUrl(UpnpString_get_String(url),
 		UpnpString_get_Length(url),
 		&dest_url);
 	if (return_code != 0) {
@@ -232,11 +230,16 @@ static int gena_unsubscribe(
 	/* make request msg */
 	membuffer_init(&request);
 	request.size_inc = 30;
-	return_code = http_MakeMessage(
-		&request, 1, 1,
-		"q" "ssc" "Uc",
-		HTTPMETHOD_UNSUBSCRIBE, &dest_url,
-		"SID: ", UpnpString_get_String(sid));
+	return_code = http_MakeMessage(&request,
+		1,
+		1,
+		"q"
+		"ssc"
+		"Uc",
+		HTTPMETHOD_UNSUBSCRIBE,
+		&dest_url,
+		"SID: ",
+		UpnpString_get_String(sid));
 
 	/* Not able to make the message so destroy the existing buffer */
 	if (return_code != 0) {
@@ -246,9 +249,12 @@ static int gena_unsubscribe(
 	}
 
 	/* send request and get reply */
-	return_code = http_RequestAndResponse(
-		&dest_url, request.buf, request.length,
-		HTTPMETHOD_UNSUBSCRIBE, HTTP_DEFAULT_TIMEOUT, response);
+	return_code = http_RequestAndResponse(&dest_url,
+		request.buf,
+		request.length,
+		HTTPMETHOD_UNSUBSCRIBE,
+		HTTP_DEFAULT_TIMEOUT,
+		response);
 	membuffer_destroy(&request);
 	if (return_code != 0) {
 		httpmsg_destroy(&response->msg);
@@ -261,7 +267,6 @@ static int gena_unsubscribe(
 
 	return return_code;
 }
-
 
 /*!
  * \brief Subscribes or renew subscription.
@@ -299,18 +304,19 @@ static int gena_subscribe(
 	if (*timeout < 0) {
 		memset(timeout_str, 0, sizeof(timeout_str));
 		strncpy(timeout_str, "infinite", sizeof(timeout_str) - 1);
-	} else if(*timeout < CP_MINIMUM_SUBSCRIPTION_TIME) {
-		rc = snprintf(timeout_str, sizeof(timeout_str),
-			"%d", CP_MINIMUM_SUBSCRIPTION_TIME);
+	} else if (*timeout < CP_MINIMUM_SUBSCRIPTION_TIME) {
+		rc = snprintf(timeout_str,
+			sizeof(timeout_str),
+			"%d",
+			CP_MINIMUM_SUBSCRIPTION_TIME);
 	} else {
 		rc = snprintf(timeout_str, sizeof(timeout_str), "%d", *timeout);
 	}
-	if (rc < 0 || (unsigned int) rc >= sizeof(timeout_str))
+	if (rc < 0 || (unsigned int)rc >= sizeof(timeout_str))
 		return UPNP_E_OUTOF_MEMORY;
 
 	/* parse url */
-	return_code = http_FixStrUrl(
-		UpnpString_get_String(url),
+	return_code = http_FixStrUrl(UpnpString_get_String(url),
 		UpnpString_get_Length(url),
 		&dest_url);
 	if (return_code != 0) {
@@ -322,34 +328,62 @@ static int gena_subscribe(
 	request.size_inc = 30;
 	if (renewal_sid) {
 		/* renew subscription */
-		return_code = http_MakeMessage(
-			&request, 1, 1,
-			"q" "ssc" "sscc",
-			HTTPMETHOD_SUBSCRIBE, &dest_url,
-			"SID: ", UpnpString_get_String(renewal_sid),
-			"TIMEOUT: Second-", timeout_str );
+		return_code = http_MakeMessage(&request,
+			1,
+			1,
+			"q"
+			"ssc"
+			"sscc",
+			HTTPMETHOD_SUBSCRIBE,
+			&dest_url,
+			"SID: ",
+			UpnpString_get_String(renewal_sid),
+			"TIMEOUT: Second-",
+			timeout_str);
 	} else {
 		/* subscribe */
 		if (dest_url.hostport.IPaddress.ss_family == AF_INET6) {
-			struct sockaddr_in6* DestAddr6 = (struct sockaddr_in6*)&dest_url.hostport.IPaddress;
-			return_code = http_MakeMessage(
-				&request, 1, 1,
-				"q" "sssdsc" "sc" "sscc",
-				HTTPMETHOD_SUBSCRIBE, &dest_url,
+			struct sockaddr_in6 *DestAddr6 =
+				(struct sockaddr_in6 *)&dest_url.hostport
+					.IPaddress;
+			return_code = http_MakeMessage(&request,
+				1,
+				1,
+				"q"
+				"sssdsc"
+				"sc"
+				"sscc",
+				HTTPMETHOD_SUBSCRIBE,
+				&dest_url,
 				"CALLBACK: <http://[",
-				(IN6_IS_ADDR_LINKLOCAL(&DestAddr6->sin6_addr) || strlen(gIF_IPV6_ULA_GUA) == 0) ?
-					gIF_IPV6 : gIF_IPV6_ULA_GUA,
-				"]:", LOCAL_PORT_V6, "/>",
+				(IN6_IS_ADDR_LINKLOCAL(&DestAddr6->sin6_addr) ||
+					strlen(gIF_IPV6_ULA_GUA) == 0)
+					? gIF_IPV6
+					: gIF_IPV6_ULA_GUA,
+				"]:",
+				LOCAL_PORT_V6,
+				"/>",
 				"NT: upnp:event",
-				"TIMEOUT: Second-", timeout_str);
+				"TIMEOUT: Second-",
+				timeout_str);
 		} else {
-			return_code = http_MakeMessage(
-				&request, 1, 1,
-				"q" "sssdsc" "sc" "sscc",
-				HTTPMETHOD_SUBSCRIBE, &dest_url,
-				"CALLBACK: <http://", gIF_IPV4, ":", LOCAL_PORT_V4, "/>",
+			return_code = http_MakeMessage(&request,
+				1,
+				1,
+				"q"
+				"sssdsc"
+				"sc"
+				"sscc",
+				HTTPMETHOD_SUBSCRIBE,
+				&dest_url,
+				"CALLBACK: <http://",
+				gIF_IPV4,
+				":",
+				LOCAL_PORT_V4,
+				"/>",
 				"NT: upnp:event",
-				"TIMEOUT: Second-", timeout_str);
+				"TIMEOUT: Second-",
+				timeout_str);
 		}
 	}
 	if (return_code != 0) {
@@ -357,7 +391,8 @@ static int gena_subscribe(
 	}
 
 	/* send request and get reply */
-	return_code = http_RequestAndResponse(&dest_url, request.buf,
+	return_code = http_RequestAndResponse(&dest_url,
+		request.buf,
 		request.length,
 		HTTPMETHOD_SUBSCRIBE,
 		HTTP_DEFAULT_TIMEOUT,
@@ -377,22 +412,24 @@ static int gena_subscribe(
 
 	/* get SID and TIMEOUT */
 	if (httpmsg_find_hdr(&response.msg, HDR_SID, &sid_hdr) == NULL ||
-	    sid_hdr.length == 0 ||
-	    httpmsg_find_hdr( &response.msg, HDR_TIMEOUT, &timeout_hdr ) == NULL ||
-	    timeout_hdr.length == 0 ) {
-		httpmsg_destroy( &response.msg );
+		sid_hdr.length == 0 ||
+		httpmsg_find_hdr(&response.msg, HDR_TIMEOUT, &timeout_hdr) ==
+			NULL ||
+		timeout_hdr.length == 0) {
+		httpmsg_destroy(&response.msg);
 
 		return UPNP_E_BAD_RESPONSE;
 	}
 
 	/* save timeout */
-	parse_ret = matchstr(timeout_hdr.buf, timeout_hdr.length, "%iSecond-%d%0", timeout);
+	parse_ret = matchstr(
+		timeout_hdr.buf, timeout_hdr.length, "%iSecond-%d%0", timeout);
 	if (parse_ret == PARSE_OK) {
 		/* nothing to do */
 	} else if (memptr_cmp_nocase(&timeout_hdr, "Second-infinite") == 0) {
 		*timeout = -1;
 	} else {
-		httpmsg_destroy( &response.msg );
+		httpmsg_destroy(&response.msg);
 
 		return UPNP_E_BAD_RESPONSE;
 	}
@@ -408,7 +445,6 @@ static int gena_subscribe(
 
 	return UPNP_E_SUCCESS;
 }
-
 
 int genaUnregisterClient(UpnpClient_Handle client_handle)
 {
@@ -429,9 +465,9 @@ int genaUnregisterClient(UpnpClient_Handle client_handle)
 			return_code = UPNP_E_SUCCESS;
 			break;
 		}
-		GenlibClientSubscription_assign(sub_copy, handle_info->ClientSubList);
-		RemoveClientSubClientSID(
-			&handle_info->ClientSubList,
+		GenlibClientSubscription_assign(
+			sub_copy, handle_info->ClientSubList);
+		RemoveClientSubClientSID(&handle_info->ClientSubList,
 			GenlibClientSubscription_get_SID(sub_copy));
 
 		HandleUnlock();
@@ -454,11 +490,8 @@ exit_function:
 	return return_code;
 }
 
-
-#ifdef INCLUDE_CLIENT_APIS
-int genaUnSubscribe(
-	UpnpClient_Handle client_handle,
-	const UpnpString *in_sid)
+		#ifdef INCLUDE_CLIENT_APIS
+int genaUnSubscribe(UpnpClient_Handle client_handle, const UpnpString *in_sid)
 {
 	GenlibClientSubscription *sub = NULL;
 	int return_code = GENA_SUCCESS;
@@ -504,18 +537,17 @@ exit_function:
 	GenlibClientSubscription_delete(sub_copy);
 	return return_code;
 }
-#endif /* INCLUDE_CLIENT_APIS */
+		#endif /* INCLUDE_CLIENT_APIS */
 
-
-#ifdef INCLUDE_CLIENT_APIS
-int genaSubscribe(
-	UpnpClient_Handle client_handle,
+		#ifdef INCLUDE_CLIENT_APIS
+int genaSubscribe(UpnpClient_Handle client_handle,
 	const UpnpString *PublisherURL,
 	int *TimeOut,
 	UpnpString *out_sid)
 {
 	int return_code = GENA_SUCCESS;
-	GenlibClientSubscription *newSubscription = GenlibClientSubscription_new();
+	GenlibClientSubscription *newSubscription =
+		GenlibClientSubscription_new();
 	uuid_upnp uid;
 	Upnp_SID temp_sid;
 	Upnp_SID temp_sid2;
@@ -545,22 +577,26 @@ int genaSubscribe(
 	return_code = gena_subscribe(PublisherURL, TimeOut, NULL, ActualSID);
 	HandleLock();
 	if (return_code != UPNP_E_SUCCESS) {
-		UpnpPrintf( UPNP_CRITICAL, GENA, __FILE__, __LINE__,
-			"SUBSCRIBE FAILED in transfer error code: %d returned\n",
-			return_code );
+		UpnpPrintf(UPNP_CRITICAL,
+			GENA,
+			__FILE__,
+			__LINE__,
+			"SUBSCRIBE FAILED in transfer error code: %d "
+			"returned\n",
+			return_code);
 		goto error_handler;
 	}
 
-	if(GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
+	if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
 		return_code = GENA_E_BAD_HANDLE;
 		goto error_handler;
 	}
 
 	/* generate client SID */
-	uuid_create(&uid );
+	uuid_create(&uid);
 	upnp_uuid_unpack(&uid, temp_sid);
 	rc = snprintf(temp_sid2, sizeof(temp_sid2), "uuid:%s", temp_sid);
-	if (rc < 0 || (unsigned int) rc >= sizeof(temp_sid2)) {
+	if (rc < 0 || (unsigned int)rc >= sizeof(temp_sid2)) {
 		return_code = UPNP_E_OUTOF_MEMORY;
 		goto error_handler;
 	}
@@ -578,11 +614,13 @@ int genaSubscribe(
 	GenlibClientSubscription_set_SID(newSubscription, out_sid);
 	GenlibClientSubscription_set_ActualSID(newSubscription, ActualSID);
 	GenlibClientSubscription_set_EventURL(newSubscription, EventURL);
-	GenlibClientSubscription_set_Next(newSubscription, handle_info->ClientSubList);
+	GenlibClientSubscription_set_Next(
+		newSubscription, handle_info->ClientSubList);
 	handle_info->ClientSubList = newSubscription;
 
 	/* schedule expiration event */
-	return_code = ScheduleGenaAutoRenew(client_handle, *TimeOut, newSubscription);
+	return_code =
+		ScheduleGenaAutoRenew(client_handle, *TimeOut, newSubscription);
 
 error_handler:
 	UpnpString_delete(ActualSID);
@@ -594,13 +632,10 @@ error_handler:
 
 	return return_code;
 }
-#endif /* INCLUDE_CLIENT_APIS */
-
+		#endif /* INCLUDE_CLIENT_APIS */
 
 int genaRenewSubscription(
-	UpnpClient_Handle client_handle,
-	const UpnpString *in_sid,
-	int *TimeOut)
+	UpnpClient_Handle client_handle, const UpnpString *in_sid, int *TimeOut)
 {
 	int return_code = GENA_SUCCESS;
 	GenlibClientSubscription *sub = NULL;
@@ -628,25 +663,28 @@ int genaRenewSubscription(
 	}
 
 	/* remove old events */
-	if (TimerThreadRemove(
-		&gTimerThread,
-		GenlibClientSubscription_get_RenewEventId(sub),
-		&tempJob) == 0 ) {
+	if (TimerThreadRemove(&gTimerThread,
+		    GenlibClientSubscription_get_RenewEventId(sub),
+		    &tempJob) == 0) {
 		free_upnp_timeout((upnp_timeout *)tempJob.arg);
 	}
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "REMOVED AUTO RENEW  EVENT");
+	UpnpPrintf(UPNP_INFO,
+		GENA,
+		__FILE__,
+		__LINE__,
+		"REMOVED AUTO RENEW  EVENT");
 
 	GenlibClientSubscription_set_RenewEventId(sub, -1);
 	GenlibClientSubscription_assign(sub_copy, sub);
 
 	HandleUnlock();
 
-	return_code = gena_subscribe(
-		GenlibClientSubscription_get_EventURL(sub_copy),
-		TimeOut,
-		GenlibClientSubscription_get_ActualSID(sub_copy),
-		ActualSID);
+	return_code =
+		gena_subscribe(GenlibClientSubscription_get_EventURL(sub_copy),
+			TimeOut,
+			GenlibClientSubscription_get_ActualSID(sub_copy),
+			ActualSID);
 
 	HandleLock();
 
@@ -681,8 +719,7 @@ int genaRenewSubscription(
 	/* start renew subscription timer */
 	return_code = ScheduleGenaAutoRenew(client_handle, *TimeOut, sub);
 	if (return_code != GENA_SUCCESS) {
-		RemoveClientSubClientSID(
-			&handle_info->ClientSubList,
+		RemoveClientSubClientSID(&handle_info->ClientSubList,
 			GenlibClientSubscription_get_SID(sub));
 	}
 	free_client_subscription(sub_copy);
@@ -694,10 +731,7 @@ exit_function:
 	return return_code;
 }
 
-
-void gena_process_notification_event(
-	SOCKINFO *info,
-	http_message_t *event)
+void gena_process_notification_event(SOCKINFO *info, http_message_t *event)
 {
 	UpnpEvent *event_struct = UpnpEvent_new();
 	IXML_Document *ChangedVars = NULL;
@@ -712,8 +746,7 @@ void gena_process_notification_event(
 	int err_ret = HTTP_PRECONDITION_FAILED;
 
 	memptr sid_hdr;
-	memptr nt_hdr,
-	nts_hdr;
+	memptr nt_hdr, nts_hdr;
 	memptr seq_hdr;
 
 	/* get SID */
@@ -726,29 +759,30 @@ void gena_process_notification_event(
 
 	/* get event key */
 	if (httpmsg_find_hdr(event, HDR_SEQ, &seq_hdr) == NULL ||
-	    matchstr(seq_hdr.buf, seq_hdr.length, "%d%0", &eventKey) != PARSE_OK) {
-		error_respond( info, HTTP_BAD_REQUEST, event );
+		matchstr(seq_hdr.buf, seq_hdr.length, "%d%0", &eventKey) !=
+			PARSE_OK) {
+		error_respond(info, HTTP_BAD_REQUEST, event);
 		goto exit_function;
 	}
 
 	/* get NT and NTS headers */
 	if (httpmsg_find_hdr(event, HDR_NT, &nt_hdr) == NULL ||
-	    httpmsg_find_hdr(event, HDR_NTS, &nts_hdr) == NULL) {
-		error_respond( info, HTTP_BAD_REQUEST, event );
+		httpmsg_find_hdr(event, HDR_NTS, &nts_hdr) == NULL) {
+		error_respond(info, HTTP_BAD_REQUEST, event);
 		goto exit_function;
 	}
 
 	/* verify NT and NTS headers */
 	if (memptr_cmp(&nt_hdr, "upnp:event") != 0 ||
-	    memptr_cmp(&nts_hdr, "upnp:propchange") != 0) {
+		memptr_cmp(&nts_hdr, "upnp:propchange") != 0) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, event);
 		goto exit_function;
 	}
 
 	/* parse the content (should be XML) */
-	if (!has_xml_content_type(event) ||
-	    event->msg.length == 0 ||
-	    ixmlParseBufferEx(event->entity.buf, &ChangedVars) != IXML_SUCCESS) {
+	if (!has_xml_content_type(event) || event->msg.length == 0 ||
+		ixmlParseBufferEx(event->entity.buf, &ChangedVars) !=
+			IXML_SUCCESS) {
 		error_respond(info, HTTP_BAD_REQUEST, event);
 		goto exit_function;
 	}
@@ -756,7 +790,8 @@ void gena_process_notification_event(
 	HandleLock();
 
 	/* get client info */
-	if (GetClientHandleInfo(&client_handle_start, &handle_info) != HND_CLIENT) {
+	if (GetClientHandleInfo(&client_handle_start, &handle_info) !=
+		HND_CLIENT) {
 		error_respond(info, HTTP_PRECONDITION_FAILED, event);
 		HandleUnlock();
 		goto exit_function;
@@ -764,81 +799,88 @@ void gena_process_notification_event(
 
 	HandleUnlock();
 
-	for (client_handle = client_handle_start; client_handle < NUM_HANDLE; client_handle++) {
-	HandleLock();
+	for (client_handle = client_handle_start; client_handle < NUM_HANDLE;
+		client_handle++) {
+		HandleLock();
 
-	/* get client info */
-	if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
-		HandleUnlock();
-		continue;
-	}
-
-	/* get subscription based on SID */
-	subscription = GetClientSubActualSID(handle_info->ClientSubList, &sid);
-	if (subscription == NULL) {
-		if (eventKey == 0) {
-			/* wait until we've finished processing a subscription  */
-			/*   (if we are in the middle) */
-			/* this is to avoid mistakenly rejecting the first event if we  */
-			/*   receive it before the subscription response */
-			HandleUnlock();
-
-			/* try and get Subscription Lock  */
-			/*   (in case we are in the process of subscribing) */
-			SubscribeLock();
-
-			/* get HandleLock again */
-			HandleLock();
-
-			if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
-				SubscribeUnlock();
-				HandleUnlock();
-				continue;
-			}
-
-			subscription = GetClientSubActualSID(handle_info->ClientSubList, &sid);
-			if (subscription == NULL) {
-				SubscribeUnlock();
-				HandleUnlock();
-				continue;
-			}
-
-			SubscribeUnlock();
-		} else {
+		/* get client info */
+		if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
 			HandleUnlock();
 			continue;
 		}
+
+		/* get subscription based on SID */
+		subscription =
+			GetClientSubActualSID(handle_info->ClientSubList, &sid);
+		if (subscription == NULL) {
+			if (eventKey == 0) {
+				/* wait until we've finished processing a
+				 * subscription  */
+				/*   (if we are in the middle) */
+				/* this is to avoid mistakenly rejecting the
+				 * first event if we  */
+				/*   receive it before the subscription response
+				 */
+				HandleUnlock();
+
+				/* try and get Subscription Lock  */
+				/*   (in case we are in the process of
+				 * subscribing) */
+				SubscribeLock();
+
+				/* get HandleLock again */
+				HandleLock();
+
+				if (GetHandleInfo(client_handle,
+					    &handle_info) != HND_CLIENT) {
+					SubscribeUnlock();
+					HandleUnlock();
+					continue;
+				}
+
+				subscription = GetClientSubActualSID(
+					handle_info->ClientSubList, &sid);
+				if (subscription == NULL) {
+					SubscribeUnlock();
+					HandleUnlock();
+					continue;
+				}
+
+				SubscribeUnlock();
+			} else {
+				HandleUnlock();
+				continue;
+			}
+		}
+
+		/* success */
+		err_ret = HTTP_OK;
+
+		/* fill event struct */
+		UpnpEvent_set_EventKey(event_struct, eventKey);
+		UpnpEvent_set_ChangedVariables(event_struct, ChangedVars);
+		UpnpEvent_set_SID(event_struct,
+			GenlibClientSubscription_get_SID(subscription));
+
+		/* copy callback */
+		callback = handle_info->Callback;
+		cookie = handle_info->Cookie;
+
+		HandleUnlock();
+
+		/* make callback with event struct */
+		/* In future, should find a way of mainting */
+		/* that the handle is not unregistered in the middle of a */
+		/* callback */
+		callback(UPNP_EVENT_RECEIVED, event_struct, cookie);
 	}
 
-	/* success */
-	err_ret = HTTP_OK;
-
-	/* fill event struct */
-	UpnpEvent_set_EventKey(event_struct, eventKey);
-	UpnpEvent_set_ChangedVariables(event_struct, ChangedVars);
-	UpnpEvent_set_SID(event_struct, GenlibClientSubscription_get_SID(subscription));
-
-	/* copy callback */
-	callback = handle_info->Callback;
-	cookie = handle_info->Cookie;
-
-	HandleUnlock();
-
-	/* make callback with event struct */
-	/* In future, should find a way of mainting */
-	/* that the handle is not unregistered in the middle of a */
-	/* callback */
-	callback(UPNP_EVENT_RECEIVED, event_struct, cookie);
-	}
-
-	error_respond( info, err_ret, event );
+	error_respond(info, err_ret, event);
 
 exit_function:
 	ixmlDocument_free(ChangedVars);
 	UpnpEvent_delete(event_struct);
 }
 
-
-#endif /* INCLUDE_CLIENT_APIS */
-#endif /* EXCLUDE_GENA */
-
+	#endif /* INCLUDE_CLIENT_APIS */
+#endif         /* EXCLUDE_GENA */

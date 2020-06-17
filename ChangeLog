@@ -2,6 +2,23 @@
 Version 1.14.0
 *******************************************************************************
 
+2020-06-17 Marcelo Jimenez <marcelo.jimenez(at)gmail.com>
+
+        Removed template classes.
+
+        The files generated through template classes had some drawbacks:
+
+        1 - You could not read the code.
+	2 - You could not step through the code with a debugger.
+	3 - Doxygen was unable to document it.
+
+        This patch removes the templates and creates an auto generator for these
+	boilplate generated code in the same spirit of the templates, but solves
+	the above problems.
+
+        Still, dealing with documentation still needs some work, but should be
+	much easier now.
+
 2020-06-11 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
 
         upnpapic.c: retrieve gIF_IPV4_NETMASK with BSD

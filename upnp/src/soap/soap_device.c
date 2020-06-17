@@ -39,7 +39,7 @@
 #ifdef INCLUDE_DEVICE_APIS
 	#if EXCLUDE_SOAP == 0
 
-		#include "ActionRequest.h"
+		#include "UpnpActionRequest.h"
 		#include "httpparser.h"
 		#include "httpreadwrite.h"
 		#include "parsetools.h"
@@ -428,7 +428,8 @@ static void handle_invoke_action(
 	UpnpActionRequest_set_CtrlPtIPAddr(action, &info->foreign_sockaddr);
 
 	if (httpmsg_find_hdr(request, HDR_USER_AGENT, &hdr_value) != NULL) {
-		UpnpActionRequest_strncpy_Os(action, hdr_value.buf, hdr_value.length);
+		UpnpActionRequest_strncpy_Os(
+			action, hdr_value.buf, hdr_value.length);
 	}
 
 	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");

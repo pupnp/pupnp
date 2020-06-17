@@ -4,7 +4,7 @@
 # Copyright (C) 2005 Rémi Turboult <r3mi@users.sourceforge.net>
 #
 
-SUBDIRS = . sample unittest
+SUBDIRS = . sample
 
 AM_CPPFLAGS = \
 	-I$(srcdir)/inc \
@@ -17,21 +17,18 @@ LDADD = \
 
 upnpincludedir = $(includedir)/upnp
 upnpinclude_HEADERS = \
-	inc/ActionComplete.h \
-	inc/ActionRequest.h \
+        inc/UpnpActionComplete.h \
+	inc/UpnpActionRequest.h \
 	inc/Callback.h \
-	inc/Discovery.h \
-	inc/Event.h \
-	inc/EventSubscribe.h \
-	inc/ExtraHeaders.h \
-	inc/FileInfo.h \
+	inc/UpnpDiscovery.h \
+	inc/UpnpEvent.h \
+	inc/UpnpEventSubscribe.h \
+	inc/UpnpExtraHeaders.h \
+	inc/UpnpFileInfo.h \
 	inc/list.h \
-	inc/StateVarComplete.h \
-	inc/StateVarRequest.h \
-	inc/SubscriptionRequest.h \
-	inc/TemplateInclude.h \
-	inc/TemplateSource.h \
-	inc/TemplateUndef.h \
+	inc/UpnpStateVarComplete.h \
+	inc/UpnpStateVarRequest.h \
+	inc/UpnpSubscriptionRequest.h \
 	inc/UpnpString.h \
 	inc/upnp.h \
 	inc/upnpdebug.h \
@@ -66,10 +63,10 @@ endif
 libupnp_la_SOURCES = \
 	src/inc/config.h \
 	src/inc/client_table.h \
-	src/inc/ClientSubscription.h \
 	src/inc/gena.h \
 	src/inc/gena_ctrlpt.h \
 	src/inc/gena_device.h \
+	src/inc/GenlibClientSubscription.h \
 	src/inc/httpparser.h \
 	src/inc/httpreadwrite.h \
 	src/inc/md5.h \
@@ -113,8 +110,10 @@ libupnp_la_SOURCES += \
 # ssdp
 if ENABLE_SSDP
 libupnp_la_SOURCES += \
-	src/ssdp/ssdp_ResultData.c \
-	src/ssdp/ssdp_ResultData.h \
+        src/ssdp/SSDPResultData.c \
+	src/ssdp/SSDPResultData.h \
+	src/ssdp/SSDPResultDataCallback.c \
+	src/ssdp/SSDPResultDataCallback.h \
 	src/ssdp/ssdp_device.c \
 	src/ssdp/ssdp_ctrlpt.c \
 	src/ssdp/ssdp_server.c
@@ -132,7 +131,7 @@ endif
 libupnp_la_SOURCES += \
 	src/genlib/miniserver/miniserver.c \
 	src/genlib/client_table/client_table.c \
-	src/genlib/client_table/ClientSubscription.c \
+	src/genlib/client_table/GenlibClientSubscription.c \
 	src/genlib/service_table/service_table.c \
 	src/genlib/util/membuffer.c \
 	src/genlib/util/strintmap.c \
@@ -157,16 +156,16 @@ endif
 
 # api
 libupnp_la_SOURCES += \
-	src/api/ActionComplete.c \
-	src/api/ActionRequest.c \
-	src/api/Discovery.c \
-	src/api/Event.c \
-	src/api/EventSubscribe.c \
-	src/api/ExtraHeaders.c \
-	src/api/FileInfo.c \
-	src/api/StateVarComplete.c \
-	src/api/StateVarRequest.c \
-	src/api/SubscriptionRequest.c \
+        src/api/UpnpActionComplete.c \
+	src/api/UpnpActionRequest.c \
+	src/api/UpnpDiscovery.c \
+	src/api/UpnpEvent.c \
+	src/api/UpnpEventSubscribe.c \
+	src/api/UpnpExtraHeaders.c \
+	src/api/UpnpFileInfo.c \
+	src/api/UpnpStateVarComplete.c \
+	src/api/UpnpStateVarRequest.c \
+	src/api/UpnpSubscriptionRequest.c \
 	src/api/UpnpString.c \
 	src/api/upnpapi.c
 

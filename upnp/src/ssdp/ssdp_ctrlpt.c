@@ -42,26 +42,27 @@
 #include "upnputil.h"
 
 #ifdef INCLUDE_CLIENT_APIS
-#if EXCLUDE_SSDP == 0
+	#if EXCLUDE_SSDP == 0
 
-#include "httpparser.h"
-#include "httpreadwrite.h"
-#include "ssdp_ResultData.h"
-#include "ssdplib.h"
-#include "statcodes.h"
-#include "unixutil.h"
-#include "upnpapi.h"
-#include "UpnpInet.h"
-#include "ThreadPool.h"
+		#include "SSDPResultData.h"
+		#include "SSDPResultDataCallback.h"
+		#include "ThreadPool.h"
+		#include "UpnpInet.h"
+		#include "httpparser.h"
+		#include "httpreadwrite.h"
+		#include "ssdplib.h"
+		#include "statcodes.h"
+		#include "unixutil.h"
+		#include "upnpapi.h"
 
-#include <stdio.h>
+		#include <stdio.h>
 
-#ifdef _WIN32
-#include <string.h>
-#if defined(_MSC_VER) && _MSC_VER < 1900
-#define snprintf _snprintf
-#endif
-#endif /* _WIN32 */
+		#ifdef _WIN32
+			#include <string.h>
+			#if defined(_MSC_VER) && _MSC_VER < 1900
+				#define snprintf _snprintf
+			#endif
+		#endif /* _WIN32 */
 
 /*!
  * \brief Sends a callback to the control point application with a SEARCH
@@ -78,9 +79,7 @@ static void send_search_result(
 }
 
 void ssdp_handle_ctrlpt_msg(
-	http_message_t *hmsg,
-	struct sockaddr_storage *dest_addr,
-	int timeout)
+	http_message_t *hmsg, struct sockaddr_storage *dest_addr, int timeout)
 {
 	int handle;
 	int handle_start;
@@ -105,7 +104,8 @@ void ssdp_handle_ctrlpt_msg(
 	SSDPResultData *threadData = NULL;
 	ThreadPoolJob job;
 
-	/* we are assuming that there can be only one client supported at a time */
+	/* we are assuming that there can be only one client supported at a time
+	 */
 	HandleReadLock();
 
 	if (GetClientHandleInfo(&handle_start, &ctrlpt_info) != HND_CLIENT) {
@@ -128,7 +128,9 @@ void ssdp_handle_ctrlpt_msg(
 			ctrlpt_cookie = ctrlpt_info->Cookie;
 			HandleUnlock();
 
-			ctrlpt_callback(UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, ctrlpt_cookie);
+			ctrlpt_callback(UPNP_DISCOVERY_SEARCH_TIMEOUT,
+				NULL,
+				ctrlpt_cookie);
 		}
 		goto end_ssdp_handle_ctrlpt_msg;
 	}
@@ -138,8 +140,10 @@ void ssdp_handle_ctrlpt_msg(
 	expires = -1;
 	UpnpDiscovery_set_Expires(param, expires);
 	if (httpmsg_find_hdr(hmsg, HDR_CACHE_CONTROL, &hdr_value) != NULL) {
-		ret = matchstr(hdr_value.buf, hdr_value.length,
-			"%imax-age = %d%0", &expires);
+		ret = matchstr(hdr_value.buf,
+			hdr_value.length,
+			"%imax-age = %d%0",
+			&expires);
 		UpnpDiscovery_set_Expires(param, expires);
 		if (ret != PARSE_OK)
 			goto end_ssdp_handle_ctrlpt_msg;
@@ -152,19 +156,19 @@ void ssdp_handle_ctrlpt_msg(
 	UpnpDiscovery_set_DestAddr(param, dest_addr);
 	/* EXT */
 	if (httpmsg_find_hdr(hmsg, HDR_EXT, &hdr_value) != NULL) {
-		UpnpDiscovery_strncpy_Ext(param, hdr_value.buf,
-					  hdr_value.length);
+		UpnpDiscovery_strncpy_Ext(
+			param, hdr_value.buf, hdr_value.length);
 	}
 	/* LOCATION */
 	if (httpmsg_find_hdr(hmsg, HDR_LOCATION, &hdr_value) != NULL) {
-		UpnpDiscovery_strncpy_Location(param, hdr_value.buf,
-					       hdr_value.length);
+		UpnpDiscovery_strncpy_Location(
+			param, hdr_value.buf, hdr_value.length);
 	}
 	/* SERVER / USER-AGENT */
 	if (httpmsg_find_hdr(hmsg, HDR_SERVER, &hdr_value) != NULL ||
-	    httpmsg_find_hdr(hmsg, HDR_USER_AGENT, &hdr_value) != NULL) {
-		UpnpDiscovery_strncpy_Os(param, hdr_value.buf,
-					 hdr_value.length);
+		httpmsg_find_hdr(hmsg, HDR_USER_AGENT, &hdr_value) != NULL) {
+		UpnpDiscovery_strncpy_Os(
+			param, hdr_value.buf, hdr_value.length);
 	}
 	/* clear everything */
 	event.UDN[0] = '\0';
@@ -214,11 +218,13 @@ void ssdp_handle_ctrlpt_msg(
 		} else {
 			/* check advertisement.
 			 * Expires is valid if positive. This is for testing
-			 * only. Expires should be greater than 1800 (30 mins) */
-			if (!nt_found ||
-			    !usn_found ||
-			    UpnpString_get_Length(UpnpDiscovery_get_Location(param)) == 0 ||
-			    UpnpDiscovery_get_Expires(param) <= 0) {
+			 * only. Expires should be greater than 1800 (30 mins)
+			 */
+			if (!nt_found || !usn_found ||
+				UpnpString_get_Length(
+					UpnpDiscovery_get_Location(param)) ==
+					0 ||
+				UpnpDiscovery_get_Expires(param) <= 0) {
 				/* bad advertisement */
 				goto end_ssdp_handle_ctrlpt_msg;
 			}
@@ -248,13 +254,14 @@ void ssdp_handle_ctrlpt_msg(
 			save_char = hdr_value.buf[hdr_value.length];
 			hdr_value.buf[hdr_value.length] = '\0';
 			st_found =
-			    ssdp_request_type(hdr_value.buf, &event) == 0;
+				ssdp_request_type(hdr_value.buf, &event) == 0;
 			hdr_value.buf[hdr_value.length] = save_char;
 		}
 		if (hmsg->status_code != HTTP_OK ||
-		    UpnpDiscovery_get_Expires(param) <= 0 ||
-		    UpnpString_get_Length(UpnpDiscovery_get_Location(param)) == 0 ||
-		    !usn_found || !st_found) {
+			UpnpDiscovery_get_Expires(param) <= 0 ||
+			UpnpString_get_Length(
+				UpnpDiscovery_get_Location(param)) == 0 ||
+			!usn_found || !st_found) {
 			/* bad reply */
 			goto end_ssdp_handle_ctrlpt_msg;
 		}
@@ -277,38 +284,40 @@ void ssdp_handle_ctrlpt_msg(
 			/*hdr_value.buf[ hdr_value.length ] = '\0'; */
 			while (node != NULL) {
 				searchArg = node->item;
-				/* check for match of ST header and search target */
+				/* check for match of ST header and search
+				 * target */
 				switch (searchArg->requestType) {
 				case SSDP_ALL:
 					matched = 1;
 					break;
 				case SSDP_ROOTDEVICE:
-					matched =
-					    (event.RequestType == SSDP_ROOTDEVICE);
+					matched = (event.RequestType ==
+						   SSDP_ROOTDEVICE);
 					break;
 				case SSDP_DEVICEUDN:
-					matched = !strncmp(searchArg->searchTarget,
-							   hdr_value.buf,
-							   hdr_value.length);
+					matched = !strncmp(
+						searchArg->searchTarget,
+						hdr_value.buf,
+						hdr_value.length);
 					break;
-				case SSDP_DEVICETYPE:{
-						size_t m = min(hdr_value.length,
-							       strlen
-							       (searchArg->searchTarget));
-						matched =
-						    !strncmp(searchArg->searchTarget,
-							     hdr_value.buf, m);
-						break;
-					}
-				case SSDP_SERVICE:{
-						size_t m = min(hdr_value.length,
-							       strlen
-							       (searchArg->searchTarget));
-						matched =
-						    !strncmp(searchArg->searchTarget,
-							     hdr_value.buf, m);
-						break;
-					}
+				case SSDP_DEVICETYPE: {
+					size_t m = min(hdr_value.length,
+						strlen(searchArg->searchTarget));
+					matched = !strncmp(
+						searchArg->searchTarget,
+						hdr_value.buf,
+						m);
+					break;
+				}
+				case SSDP_SERVICE: {
+					size_t m = min(hdr_value.length,
+						strlen(searchArg->searchTarget));
+					matched = !strncmp(
+						searchArg->searchTarget,
+						hdr_value.buf,
+						m);
+					break;
+				}
 				default:
 					matched = 0;
 					break;
@@ -317,32 +326,40 @@ void ssdp_handle_ctrlpt_msg(
 					/* schedule call back */
 					threadData = SSDPResultData_new();
 					if (threadData != NULL) {
-						SSDPResultData_set_Param(threadData,
-									 param);
-						SSDPResultData_set_Cookie(threadData,
-									  searchArg->
-									  cookie);
-						SSDPResultData_set_CtrlptCallback
-						    (threadData, ctrlpt_callback);
+						SSDPResultData_set_Param(
+							threadData, param);
+						SSDPResultData_set_Cookie(
+							threadData,
+							searchArg->cookie);
+						SSDPResultData_set_CtrlptCallback(
+							threadData,
+							ctrlpt_callback);
 						memset(&job, 0, sizeof(job));
 
-						TPJobInit(&job, (start_routine)
-							  send_search_result,
-							  threadData);
-						TPJobSetPriority(&job, MED_PRIORITY);
+						TPJobInit(&job,
+							(start_routine)
+								send_search_result,
+							threadData);
+						TPJobSetPriority(
+							&job, MED_PRIORITY);
 						TPJobSetFreeFunction(&job,
-								     (free_routine)
-								     free);
-						if (ThreadPoolAdd(&gRecvThreadPool, &job, NULL) != 0) {
-							SSDPResultData_delete(threadData);
+							(free_routine)free);
+						if (ThreadPoolAdd(
+							    &gRecvThreadPool,
+							    &job,
+							    NULL) != 0) {
+							SSDPResultData_delete(
+								threadData);
 						}
 					}
 				}
-				node = ListNext(&ctrlpt_info->SsdpSearchList, node);
+				node = ListNext(
+					&ctrlpt_info->SsdpSearchList, node);
 			}
 
 			HandleUnlock();
-			/*ctrlpt_callback( UPNP_DISCOVERY_SEARCH_RESULT, param, ctrlpt_cookie ); */
+			/*ctrlpt_callback( UPNP_DISCOVERY_SEARCH_RESULT, param,
+			 * ctrlpt_cookie ); */
 		}
 	}
 
@@ -378,17 +395,23 @@ static int CreateClientRequestPacket(
 
 	switch (AddressFamily) {
 	case AF_INET:
-		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: %s:%d\r\n", SSDP_IP,
+		rc = snprintf(TempBuf,
+			sizeof(TempBuf),
+			"HOST: %s:%d\r\n",
+			SSDP_IP,
 			SSDP_PORT);
 		break;
 	case AF_INET6:
-		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: [%s]:%d\r\n",
-			SSDP_IPV6_LINKLOCAL, SSDP_PORT);
+		rc = snprintf(TempBuf,
+			sizeof(TempBuf),
+			"HOST: [%s]:%d\r\n",
+			SSDP_IPV6_LINKLOCAL,
+			SSDP_PORT);
 		break;
 	default:
 		return UPNP_E_INVALID_ARGUMENT;
 	}
-	if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+	if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
 		return UPNP_E_INTERNAL_ERROR;
 
 	if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
@@ -401,7 +424,7 @@ static int CreateClientRequestPacket(
 
 	if (Mx > 0) {
 		rc = snprintf(TempBuf, sizeof(TempBuf), "MX: %d\r\n", Mx);
-		if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+		if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
 			return UPNP_E_INTERNAL_ERROR;
 		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
 			return UPNP_E_BUFFER_TOO_SMALL;
@@ -409,8 +432,9 @@ static int CreateClientRequestPacket(
 	}
 
 	if (SearchTarget != NULL) {
-		rc = snprintf(TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
-		if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+		rc = snprintf(
+			TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
+		if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
 			return UPNP_E_INTERNAL_ERROR;
 		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
 			return UPNP_E_BUFFER_TOO_SMALL;
@@ -423,10 +447,10 @@ static int CreateClientRequestPacket(
 	return UPNP_E_SUCCESS;
 }
 
-/*!
- * \brief
- */
-#ifdef UPNP_ENABLE_IPV6
+		/*!
+		 * \brief
+		 */
+		#ifdef UPNP_ENABLE_IPV6
 static int CreateClientRequestPacketUlaGua(
 	/*! [in,out] . */
 	char *RqstBuf,
@@ -450,17 +474,23 @@ static int CreateClientRequestPacketUlaGua(
 	strcpy(RqstBuf, command);
 	switch (AddressFamily) {
 	case AF_INET:
-		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: %s:%d\r\n", SSDP_IP,
+		rc = snprintf(TempBuf,
+			sizeof(TempBuf),
+			"HOST: %s:%d\r\n",
+			SSDP_IP,
 			SSDP_PORT);
 		break;
 	case AF_INET6:
-		rc = snprintf(TempBuf, sizeof(TempBuf), "HOST: [%s]:%d\r\n",
-			SSDP_IPV6_SITELOCAL, SSDP_PORT);
+		rc = snprintf(TempBuf,
+			sizeof(TempBuf),
+			"HOST: [%s]:%d\r\n",
+			SSDP_IPV6_SITELOCAL,
+			SSDP_PORT);
 		break;
 	default:
 		return UPNP_E_INVALID_ARGUMENT;
 	}
-	if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+	if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
 		return UPNP_E_INTERNAL_ERROR;
 
 	if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
@@ -473,15 +503,16 @@ static int CreateClientRequestPacketUlaGua(
 
 	if (Mx > 0) {
 		rc = snprintf(TempBuf, sizeof(TempBuf), "MX: %d\r\n", Mx);
-		if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+		if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
 			return UPNP_E_INTERNAL_ERROR;
 		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
 			return UPNP_E_BUFFER_TOO_SMALL;
 		strcat(RqstBuf, TempBuf);
 	}
 	if (SearchTarget) {
-		rc = snprintf(TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
-		if (rc < 0 || (unsigned int) rc >= sizeof(TempBuf))
+		rc = snprintf(
+			TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
+		if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
 			return UPNP_E_INTERNAL_ERROR;
 		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
 			return UPNP_E_BUFFER_TOO_SMALL;
@@ -493,7 +524,7 @@ static int CreateClientRequestPacketUlaGua(
 
 	return UPNP_E_SUCCESS;
 }
-#endif /* UPNP_ENABLE_IPV6 */
+		#endif /* UPNP_ENABLE_IPV6 */
 
 /*!
  * \brief
@@ -524,7 +555,7 @@ static void searchExpired(
 	ctrlpt_callback = ctrlpt_info->Callback;
 	node = ListHead(&ctrlpt_info->SsdpSearchList);
 	while (node != NULL) {
-		item = (SsdpSearchArg *) node->item;
+		item = (SsdpSearchArg *)node->item;
 		if (item->timeoutEventId == id) {
 			free(item->searchTarget);
 			cookie = item->cookie;
@@ -550,18 +581,18 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 	int *id = NULL;
 	int ret = 0;
 	char ReqBufv4[BUFSIZE];
-#ifdef UPNP_ENABLE_IPV6
+		#ifdef UPNP_ENABLE_IPV6
 	char ReqBufv6[BUFSIZE];
 	char ReqBufv6UlaGua[BUFSIZE];
-#endif
+		#endif
 	struct sockaddr_storage __ss_v4;
-#ifdef UPNP_ENABLE_IPV6
+		#ifdef UPNP_ENABLE_IPV6
 	struct sockaddr_storage __ss_v6;
-#endif
+		#endif
 	struct sockaddr_in *destAddr4 = (struct sockaddr_in *)&__ss_v4;
-#ifdef UPNP_ENABLE_IPV6
+		#ifdef UPNP_ENABLE_IPV6
 	struct sockaddr_in6 *destAddr6 = (struct sockaddr_in6 *)&__ss_v6;
-#endif
+		#endif
 	fd_set wrSet;
 	SsdpSearchArg *newArg = NULL;
 	SsdpSearchExpArg *expArg = NULL;
@@ -584,37 +615,43 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 	requestType = ssdp_request_type1(St);
 	if (requestType == SSDP_SERROR)
 		return UPNP_E_INVALID_PARAM;
-	UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-		   "Inside SearchByTarget\n");
+	UpnpPrintf(
+		UPNP_INFO, SSDP, __FILE__, __LINE__, "Inside SearchByTarget\n");
 	timeTillRead = Mx;
 	if (timeTillRead < MIN_SEARCH_TIME)
 		timeTillRead = MIN_SEARCH_TIME;
 	else if (timeTillRead > MAX_SEARCH_TIME)
 		timeTillRead = MAX_SEARCH_TIME;
-	retVal = CreateClientRequestPacket(ReqBufv4, sizeof(ReqBufv4), timeTillRead, St, AF_INET);
+	retVal = CreateClientRequestPacket(
+		ReqBufv4, sizeof(ReqBufv4), timeTillRead, St, AF_INET);
 	if (retVal != UPNP_E_SUCCESS)
 		return retVal;
-#ifdef UPNP_ENABLE_IPV6
-	retVal = CreateClientRequestPacket(ReqBufv6, sizeof(ReqBufv6), timeTillRead, St, AF_INET6);
+		#ifdef UPNP_ENABLE_IPV6
+	retVal = CreateClientRequestPacket(
+		ReqBufv6, sizeof(ReqBufv6), timeTillRead, St, AF_INET6);
 	if (retVal != UPNP_E_SUCCESS)
 		return retVal;
-	retVal = CreateClientRequestPacketUlaGua(ReqBufv6UlaGua, sizeof(ReqBufv6UlaGua), timeTillRead, St, AF_INET6);
+	retVal = CreateClientRequestPacketUlaGua(ReqBufv6UlaGua,
+		sizeof(ReqBufv6UlaGua),
+		timeTillRead,
+		St,
+		AF_INET6);
 	if (retVal != UPNP_E_SUCCESS)
 		return retVal;
-#endif
+		#endif
 
 	memset(&__ss_v4, 0, sizeof(__ss_v4));
 	destAddr4->sin_family = (sa_family_t)AF_INET;
 	inet_pton(AF_INET, SSDP_IP, &destAddr4->sin_addr);
 	destAddr4->sin_port = htons(SSDP_PORT);
 
-#ifdef UPNP_ENABLE_IPV6
+		#ifdef UPNP_ENABLE_IPV6
 	memset(&__ss_v6, 0, sizeof(__ss_v6));
 	destAddr6->sin6_family = (sa_family_t)AF_INET6;
 	inet_pton(AF_INET6, SSDP_IPV6_SITELOCAL, &destAddr6->sin6_addr);
 	destAddr6->sin6_port = htons(SSDP_PORT);
 	destAddr6->sin6_scope_id = gIF_INDEX;
-#endif
+		#endif
 
 	/* add search criteria to list */
 	HandleLock();
@@ -622,7 +659,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 		HandleUnlock();
 		return UPNP_E_INTERNAL_ERROR;
 	}
-	newArg = (SsdpSearchArg *) malloc(sizeof(SsdpSearchArg));
+	newArg = (SsdpSearchArg *)malloc(sizeof(SsdpSearchArg));
 	newArg->searchTarget = strdup(St);
 	newArg->cookie = Cookie;
 	newArg->requestType = requestType;
@@ -630,12 +667,12 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 	expArg = (SsdpSearchExpArg *)malloc(sizeof(SsdpSearchExpArg));
 	expArg->handle = Hnd;
 	id = (int *)&(expArg->timeoutEventId);
-	TPJobInit(&job, (start_routine) searchExpired, expArg);
+	TPJobInit(&job, (start_routine)searchExpired, expArg);
 	TPJobSetPriority(&job, MED_PRIORITY);
-	TPJobSetFreeFunction(&job, (free_routine) free);
+	TPJobSetFreeFunction(&job, (free_routine)free);
 	/* Schedule a timeout event to remove search Arg */
-	TimerThreadSchedule(&gTimerThread, timeTillRead,
-			    REL_SEC, &job, SHORT_TERM, id);
+	TimerThreadSchedule(
+		&gTimerThread, timeTillRead, REL_SEC, &job, SHORT_TERM, id);
 	newArg->timeoutEventId = *id;
 	ListAddTail(&ctrlpt_info->SsdpSearchList, newArg);
 	HandleUnlock();
@@ -643,72 +680,97 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 
 	FD_ZERO(&wrSet);
 	if (gSsdpReqSocket4 != INVALID_SOCKET) {
-		setsockopt(gSsdpReqSocket4, IPPROTO_IP, IP_MULTICAST_IF,
-			   (char *)&addrv4, sizeof(addrv4));
+		setsockopt(gSsdpReqSocket4,
+			IPPROTO_IP,
+			IP_MULTICAST_IF,
+			(char *)&addrv4,
+			sizeof(addrv4));
 		FD_SET(gSsdpReqSocket4, &wrSet);
 		max_fd = max(max_fd, gSsdpReqSocket4);
 	}
-#ifdef UPNP_ENABLE_IPV6
+		#ifdef UPNP_ENABLE_IPV6
 	if (gSsdpReqSocket6 != INVALID_SOCKET) {
-		setsockopt(gSsdpReqSocket6, IPPROTO_IPV6, IPV6_MULTICAST_IF,
-			   (char *)&gIF_INDEX, sizeof(gIF_INDEX));
+		setsockopt(gSsdpReqSocket6,
+			IPPROTO_IPV6,
+			IPV6_MULTICAST_IF,
+			(char *)&gIF_INDEX,
+			sizeof(gIF_INDEX));
 		FD_SET(gSsdpReqSocket6, &wrSet);
 		max_fd = max(max_fd, gSsdpReqSocket6);
 	}
-#endif
+		#endif
 	ret = select(max_fd + 1, NULL, &wrSet, NULL, NULL);
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-			   "SSDP_LIB: Error in select(): %s\n", errorBuffer);
+		UpnpPrintf(UPNP_INFO,
+			SSDP,
+			__FILE__,
+			__LINE__,
+			"SSDP_LIB: Error in select(): %s\n",
+			errorBuffer);
 		UpnpCloseSocket(gSsdpReqSocket4);
-#ifdef UPNP_ENABLE_IPV6
+		#ifdef UPNP_ENABLE_IPV6
 		UpnpCloseSocket(gSsdpReqSocket6);
-#endif
+		#endif
 		return UPNP_E_INTERNAL_ERROR;
 	}
-#ifdef UPNP_ENABLE_IPV6
+		#ifdef UPNP_ENABLE_IPV6
 	if (gSsdpReqSocket6 != INVALID_SOCKET &&
-	    FD_ISSET(gSsdpReqSocket6, &wrSet)) {
+		FD_ISSET(gSsdpReqSocket6, &wrSet)) {
 		int NumCopy = 0;
 
 		while (NumCopy < NUM_SSDP_COPY) {
-			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-				   ">>> SSDP SEND M-SEARCH >>>\n%s\n",
-				   ReqBufv6UlaGua);
+			UpnpPrintf(UPNP_INFO,
+				SSDP,
+				__FILE__,
+				__LINE__,
+				">>> SSDP SEND M-SEARCH >>>\n%s\n",
+				ReqBufv6UlaGua);
 			sendto(gSsdpReqSocket6,
-			       ReqBufv6UlaGua, strlen(ReqBufv6UlaGua), 0,
-			       (struct sockaddr *)&__ss_v6,
-			       sizeof(struct sockaddr_in6));
+				ReqBufv6UlaGua,
+				strlen(ReqBufv6UlaGua),
+				0,
+				(struct sockaddr *)&__ss_v6,
+				sizeof(struct sockaddr_in6));
 			NumCopy++;
 			imillisleep(SSDP_PAUSE);
 		}
 		NumCopy = 0;
 		inet_pton(AF_INET6, SSDP_IPV6_LINKLOCAL, &destAddr6->sin6_addr);
 		while (NumCopy < NUM_SSDP_COPY) {
-			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-				   ">>> SSDP SEND M-SEARCH >>>\n%s\n",
-				   ReqBufv6);
+			UpnpPrintf(UPNP_INFO,
+				SSDP,
+				__FILE__,
+				__LINE__,
+				">>> SSDP SEND M-SEARCH >>>\n%s\n",
+				ReqBufv6);
 			sendto(gSsdpReqSocket6,
-			       ReqBufv6, strlen(ReqBufv6), 0,
-			       (struct sockaddr *)&__ss_v6,
-			       sizeof(struct sockaddr_in6));
+				ReqBufv6,
+				strlen(ReqBufv6),
+				0,
+				(struct sockaddr *)&__ss_v6,
+				sizeof(struct sockaddr_in6));
 			NumCopy++;
 			imillisleep(SSDP_PAUSE);
 		}
 	}
-#endif /* IPv6 */
+		#endif /* IPv6 */
 	if (gSsdpReqSocket4 != INVALID_SOCKET &&
-	    FD_ISSET(gSsdpReqSocket4, &wrSet)) {
+		FD_ISSET(gSsdpReqSocket4, &wrSet)) {
 		int NumCopy = 0;
 		while (NumCopy < NUM_SSDP_COPY) {
-			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-				   ">>> SSDP SEND M-SEARCH >>>\n%s\n",
-				   ReqBufv4);
+			UpnpPrintf(UPNP_INFO,
+				SSDP,
+				__FILE__,
+				__LINE__,
+				">>> SSDP SEND M-SEARCH >>>\n%s\n",
+				ReqBufv4);
 			sendto(gSsdpReqSocket4,
-			       ReqBufv4, strlen(ReqBufv4), 0,
-			       (struct sockaddr *)&__ss_v4,
-			       sizeof(struct sockaddr_in));
+				ReqBufv4,
+				strlen(ReqBufv4),
+				0,
+				(struct sockaddr *)&__ss_v4,
+				sizeof(struct sockaddr_in));
 			NumCopy++;
 			imillisleep(SSDP_PAUSE);
 		}
@@ -716,7 +778,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 
 	return 1;
 }
-#endif /* EXCLUDE_SSDP */
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* EXCLUDE_SSDP */
+#endif         /* INCLUDE_CLIENT_APIS */
 
 /* @} SSDPlib */

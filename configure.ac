@@ -813,7 +813,6 @@ AC_CONFIG_FILES([
 	ixml/Makefile
 	upnp/Makefile
 	upnp/sample/Makefile
-	upnp/unittest/Makefile
 	libupnp.pc
 	])
 

@@ -43,8 +43,8 @@
 
 	#include "webserver.h"
 
-	#include "ExtraHeaders.h"
-	#include "FileInfo.h"
+	#include "UpnpExtraHeaders.h"
+	#include "UpnpFileInfo.h"
 	#include "UpnpIntTypes.h"
 	#include "UpnpStdInt.h"
 	#include "VirtualDir.h"
@@ -560,9 +560,9 @@ static int get_file_info(
 		HTTP,
 		__FILE__,
 		__LINE__,
-	        "file info: %s, length: %" PRId64 ", last_mod=%s readable=%d\n",
+		"file info: %s, length: %" PRId64 ", last_mod=%s readable=%d\n",
 		filename,
-	        (int64_t)UpnpFileInfo_get_FileLength(info),
+		(int64_t)UpnpFileInfo_get_FileLength(info),
 		web_server_asctime_r(
 			http_gmtime_r(&aux_LastModified, &date), buffer),
 		UpnpFileInfo_get_IsReadable(info));
@@ -835,8 +835,8 @@ static int CreateHTTPRangeResponseHeader(
 	Ptr = Ptr + 1;
 	if (FileLength < 0) {
 		int ret = HTTP_REQUEST_RANGE_NOT_SATISFIABLE;
-		if ((*Ptr == '0') && (*(Ptr+1) == '-') && (*(Ptr+2) == '\0'))
-		{
+		if ((*Ptr == '0') && (*(Ptr + 1) == '-') &&
+			(*(Ptr + 2) == '\0')) {
 			Instr->IsRangeActive = 0;
 			ret = HTTP_OK;
 		}
@@ -1237,10 +1237,13 @@ static int process_request(
 				goto error_handler;
 			}
 
-			UpnpFileInfo_set_CtrlPtIPAddr(finfo, &info->foreign_sockaddr);
+			UpnpFileInfo_set_CtrlPtIPAddr(
+				finfo, &info->foreign_sockaddr);
 
-			if (httpmsg_find_hdr(req, HDR_USER_AGENT, &hdr_value) != NULL) {
-				UpnpFileInfo_strncpy_Os(finfo, hdr_value.buf, hdr_value.length);
+			if (httpmsg_find_hdr(req, HDR_USER_AGENT, &hdr_value) !=
+				NULL) {
+				UpnpFileInfo_strncpy_Os(
+					finfo, hdr_value.buf, hdr_value.length);
 			}
 
 			/* get file info */

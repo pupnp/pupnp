@@ -397,15 +397,15 @@
  * the internal implementation of these data structures without breaking
  * the API.
  */
-#include "ActionComplete.h"
-#include "ActionRequest.h"
-#include "Discovery.h"
-#include "Event.h"
-#include "EventSubscribe.h"
-#include "FileInfo.h"
-#include "StateVarComplete.h"
-#include "StateVarRequest.h"
-#include "SubscriptionRequest.h"
+#include "UpnpActionComplete.h"
+#include "UpnpActionRequest.h"
+#include "UpnpDiscovery.h"
+#include "UpnpEvent.h"
+#include "UpnpEventSubscribe.h"
+#include "UpnpFileInfo.h"
+#include "UpnpStateVarComplete.h"
+#include "UpnpStateVarRequest.h"
+#include "UpnpSubscriptionRequest.h"
 
 /*!
  * \name Constants and Types
@@ -2757,8 +2757,8 @@ EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback);
  *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
  *       \li \c UPNP_E_OUTOF_MEMORY: The web server could not be started due to
  *		an out-of-memory condition.
- *		 \li \c UPNP_E_NO_WEB_SERVER: The internal web server has been compiled
- *		out so it can't be enabled or disabled.
+ *		 \li \c UPNP_E_NO_WEB_SERVER: The internal web server has been
+ *compiled out so it can't be enabled or disabled.
  */
 EXPORT_SPEC int UpnpEnableWebserver(
 	/*! [in] \c 1 to enable, \c 0 to disable. */
