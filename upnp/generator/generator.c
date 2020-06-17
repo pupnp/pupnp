@@ -11,11 +11,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define IXML_H "ixml.h"
+
 static struct s_Member UpnpActionComplete_members[] = {
 	INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0),
 	INIT_MEMBER(CtrlUrl, TYPE_STRING, 0, 0),
-	INIT_MEMBER(ActionRequest, TYPE_INTEGER, IXML_Document *, 0),
-	INIT_MEMBER(ActionResult, TYPE_INTEGER, IXML_Document *, 0),
+	INIT_MEMBER(ActionRequest, TYPE_INTEGER, IXML_Document *, IXML_H),
+	INIT_MEMBER(ActionResult, TYPE_INTEGER, IXML_Document *, IXML_H),
 };
 
 static struct s_Member UpnpActionRequest_members[] = {
@@ -25,9 +27,9 @@ static struct s_Member UpnpActionRequest_members[] = {
 	INIT_MEMBER(ActionName, TYPE_STRING, 0, 0),
 	INIT_MEMBER(DevUDN, TYPE_STRING, 0, 0),
 	INIT_MEMBER(ServiceID, TYPE_STRING, 0, 0),
-	INIT_MEMBER(ActionRequest, TYPE_INTEGER, IXML_Document *, 0),
-	INIT_MEMBER(ActionResult, TYPE_INTEGER, IXML_Document *, 0),
-	INIT_MEMBER(SoapHeader, TYPE_INTEGER, IXML_Document *, 0),
+	INIT_MEMBER(ActionRequest, TYPE_INTEGER, IXML_Document *, IXML_H),
+	INIT_MEMBER(ActionResult, TYPE_INTEGER, IXML_Document *, IXML_H),
+	INIT_MEMBER(SoapHeader, TYPE_INTEGER, IXML_Document *, IXML_H),
 	INIT_MEMBER(CtrlPtIPAddr,
 		TYPE_BUFFER,
 		struct sockaddr_storage,
@@ -52,7 +54,7 @@ static struct s_Member UpnpDiscovery_members[] = {
 
 static struct s_Member UpnpEvent_members[] = {
 	INIT_MEMBER(EventKey, TYPE_INTEGER, int, 0),
-	INIT_MEMBER(ChangedVariables, TYPE_INTEGER, IXML_Document *, 0),
+	INIT_MEMBER(ChangedVariables, TYPE_INTEGER, IXML_Document *, IXML_H),
 	INIT_MEMBER(SID, TYPE_STRING, 0, 0),
 };
 
@@ -298,10 +300,83 @@ static int write_prototype(FILE *fp, const char *class_name, struct s_Member *m)
 	return 1;
 }
 
+/* Returns the name of the include if needed, or 0 if not needed. */
+static const char *member_needs_include(const struct s_Member *m)
+{
+	const char *ret = 0;
+
+	if (m->header) {
+		ret = m->header;
+	} else {
+		switch (m->type) {
+		case TYPE_CLASS:
+			break;
+		case TYPE_INTEGER:
+			break;
+		case TYPE_BUFFER:
+			break;
+		case TYPE_LIST:
+			ret = "list.h";
+			break;
+		case TYPE_STRING:
+			ret = "UpnpString.h";
+			break;
+		case TYPE_DOMSTRING:
+			ret = "ixml.h";
+			break;
+		default:
+			printf("%s(): Error! Unknown type: %d.\n",
+				__func__,
+				m->type);
+			return 0;
+		}
+	}
+
+	return ret;
+}
+
+size_t included_headers_used;
+size_t included_headers_size;
+const char **included_headers;
+
+/* Checks if the header has already been used and includes it in the array if
+ * not. */
+static int already_included(const char *header)
+{
+	int ret = 0;
+	int i;
+
+	/* Realloc if needed. */
+	if (included_headers_used == included_headers_size) {
+		included_headers_size += 16;
+		included_headers = realloc(included_headers,
+			included_headers_size * sizeof(const char *));
+		if (!included_headers_size) {
+			printf("%s(): Error! realloc() failed.\n", __func__);
+			exit(1);
+		}
+	}
+	i = 0;
+	while (i < (int)included_headers_used) {
+		if (!strcmp(header, included_headers[i])) {
+			ret = 1;
+			break;
+		}
+		++i;
+	}
+	if (!ret) {
+		included_headers[included_headers_used] = header;
+		++included_headers_used;
+	}
+
+	return ret;
+}
+
 static int write_header(FILE *fp, struct s_Class *c)
 {
 	int i;
 	int ok = 1;
+	const char *header;
 	struct s_Member *m;
 	int len = strlen(c->name);
 	char *class_name_upr = malloc(len + 1);
@@ -310,7 +385,9 @@ static int write_header(FILE *fp, struct s_Class *c)
 		return 0;
 	}
 	strupr(strcpy(class_name_upr, c->name));
-
+	included_headers_used = 0;
+	included_headers_size = 16;
+	included_headers = calloc(included_headers_size, sizeof(const char *));
 	fprintf(fp,
 		"#ifndef %s_H\n"
 		"#define %s_H\n"
@@ -327,29 +404,28 @@ static int write_header(FILE *fp, struct s_Class *c)
 		" */\n"
 		"#include <stdlib.h> /* for size_t */\n"
 		"\n"
-		"#include \"ixml.h\"       /* for DOMString, "
-		"IXML_Document */\n"
-		"#include \"list.h\"\n"
 		"#include \"UpnpGlobal.h\" /* for EXPORT_SPEC */\n"
-		"#include \"UpnpString.h\"\n"
 		"\n",
 		class_name_upr,
 		class_name_upr,
 		c->name);
 
-	/* Include files */
+	/* Include files: look for which members need includes and only include
+	 * them once. */
 	for (i = 0; i < (int)c->n_members; ++i) {
 		m = c->members + i;
-		if (m->header) {
-			if (m->header[0] == '<') {
-				fprintf(fp, "#include %s\n", m->header);
+		header = member_needs_include(m);
+		if (header && !already_included(header)) {
+			if (header[0] == '<') {
+				fprintf(fp, "#include %s\n", header);
 			} else {
-				fprintf(fp, "#include \"%s\"\n", m->header);
+				fprintf(fp, "#include \"%s\"\n", header);
 			}
 		}
 	}
 
 	fprintf(fp,
+		"\n"
 		"#ifdef __cplusplus\n"
 		"extern \"C\" {\n"
 		"#endif /* __cplusplus */\n"
@@ -385,6 +461,7 @@ static int write_header(FILE *fp, struct s_Class *c)
 		ok = ok && write_prototype(fp, c->name, c->members + i);
 	}
 	fprintf(fp, "#endif /* %s_H */\n\n", class_name_upr);
+	free(included_headers);
 	free(class_name_upr);
 
 	return ok;

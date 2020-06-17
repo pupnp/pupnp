@@ -12,14 +12,15 @@
  */
 #include <stdlib.h> /* for size_t */
 
-#include "ixml.h"       /* for DOMString, IXML_Document */
-#include "list.h"
 #include "UpnpGlobal.h" /* for EXPORT_SPEC */
-#include "UpnpString.h"
 
 #include <sys/types.h>
 #include <time.h>
+#include "ixml.h"
+#include "list.h"
 #include "UpnpInet.h"
+#include "UpnpString.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

@@ -12,9 +12,9 @@
  */
 #include <stdlib.h> /* for size_t */
 
-#include "ixml.h"       /* for DOMString, IXML_Document */
-#include "list.h"
 #include "UpnpGlobal.h" /* for EXPORT_SPEC */
+
+#include "ixml.h"
 #include "UpnpString.h"
 
 #ifdef __cplusplus
