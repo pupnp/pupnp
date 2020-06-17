@@ -3542,12 +3542,13 @@ int UpnpDownloadXmlDoc(const char *url, IXML_Document **xmlDoc)
 	}
 }
 
+#if (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__)
 /*!
  * \brief Computes prefix length from IPv6 netmask.
  *
  * \return The IPv6 prefix length.
  */
-int UpnpComputeIpv6PrefixLength(struct sockaddr_in6 *Netmask)
+static unsigned UpnpComputeIpv6PrefixLength(struct sockaddr_in6 *Netmask)
 {
 	unsigned prefix_length = 0;
 	size_t i = 0;
@@ -3555,16 +3556,16 @@ int UpnpComputeIpv6PrefixLength(struct sockaddr_in6 *Netmask)
 	if (Netmask == NULL) {
 		return prefix_length;
 	}
-
 	for (i = 0; i < sizeof(Netmask->sin6_addr); i++) {
 		while (Netmask->sin6_addr.s6_addr[i]) {
-			prefix_length +=
-				(Netmask->sin6_addr.s6_addr[i] & 0x01);
+			prefix_length += (Netmask->sin6_addr.s6_addr[i] & 0x01);
 			Netmask->sin6_addr.s6_addr[i] >>= 1;
 		}
 	}
+
 	return prefix_length;
 }
+#endif
 
 int UpnpGetIfInfo(const char *IfName)
 {
@@ -3803,13 +3804,14 @@ int UpnpGetIfInfo(const char *IfName)
 						 ->sin6_addr,
 					sizeof(v6ulagua_addr));
 				v6ulagua_prefix = UpnpComputeIpv6PrefixLength(
-					(struct sockaddr_in6 *)(ifa->ifa_netmask));
+					(struct sockaddr_in6
+							*)(ifa->ifa_netmask));
 				valid_addr_found = 1;
 			} else if (IN6_IS_ADDR_GLOBAL(
-				    &((struct sockaddr_in6 *)(ifa->ifa_addr))
-					     ->sin6_addr) &&
-					strlen(gIF_IPV6_ULA_GUA) ==
-						   (size_t)0) {
+					   &((struct sockaddr_in6
+							     *)(ifa->ifa_addr))
+						    ->sin6_addr) &&
+				   strlen(gIF_IPV6_ULA_GUA) == (size_t)0) {
 				/* got a GUA, should store it
 				 * while no ULA is found */
 				memcpy(&v6ulagua_addr,
@@ -3818,18 +3820,21 @@ int UpnpGetIfInfo(const char *IfName)
 						 ->sin6_addr,
 					sizeof(v6ulagua_addr));
 				v6ulagua_prefix = UpnpComputeIpv6PrefixLength(
-					(struct sockaddr_in6 *)(ifa->ifa_netmask));
+					(struct sockaddr_in6
+							*)(ifa->ifa_netmask));
 				valid_addr_found = 1;
 			} else if (IN6_IS_ADDR_LINKLOCAL(
-				    &((struct sockaddr_in6 *)(ifa->ifa_addr))
-					     ->sin6_addr)) {
+					   &((struct sockaddr_in6
+							     *)(ifa->ifa_addr))
+						    ->sin6_addr)) {
 				memcpy(&v6_addr,
 					&((struct sockaddr_in6
 							  *)(ifa->ifa_addr))
 						 ->sin6_addr,
 					sizeof(v6_addr));
 				v6_prefix = UpnpComputeIpv6PrefixLength(
-					(struct sockaddr_in6 *)(ifa->ifa_netmask));
+					(struct sockaddr_in6
+							*)(ifa->ifa_netmask));
 				valid_addr_found = 1;
 			}
 			break;
@@ -3863,7 +3868,10 @@ int UpnpGetIfInfo(const char *IfName)
 	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
 	gIF_IPV6_PREFIX_LENGTH = v6_prefix;
 	gIF_INDEX = if_nametoindex(gIF_NAME);
-	inet_ntop(AF_INET6, &v6ulagua_addr, gIF_IPV6_ULA_GUA, sizeof(gIF_IPV6_ULA_GUA));
+	inet_ntop(AF_INET6,
+		&v6ulagua_addr,
+		gIF_IPV6_ULA_GUA,
+		sizeof(gIF_IPV6_ULA_GUA));
 	gIF_IPV6_ULA_GUA_PREFIX_LENGTH = v6ulagua_prefix;
 #else /* (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__) */ /* _WIN32 */
 	struct ifreq ifArray[MAX_INTERFACES];
@@ -4049,7 +4057,8 @@ int UpnpGetIfInfo(const char *IfName)
 							buf,
 							sizeof(gIF_IPV6_ULA_GUA) -
 								1);
-						gIF_IPV6_ULA_GUA_PREFIX_LENGTH = if_prefix;
+						gIF_IPV6_ULA_GUA_PREFIX_LENGTH =
+							if_prefix;
 					} else if (IN6_IS_ADDR_GLOBAL(
 							   &v6_addr) &&
 						   strlen(gIF_IPV6_ULA_GUA) ==
@@ -4063,7 +4072,8 @@ int UpnpGetIfInfo(const char *IfName)
 							buf,
 							sizeof(gIF_IPV6_ULA_GUA) -
 								1);
-						gIF_IPV6_ULA_GUA_PREFIX_LENGTH = if_prefix;
+						gIF_IPV6_ULA_GUA_PREFIX_LENGTH =
+							if_prefix;
 					} else if (IN6_IS_ADDR_LINKLOCAL(
 							   &v6_addr) &&
 						   strlen(gIF_IPV6) ==
@@ -4076,7 +4086,8 @@ int UpnpGetIfInfo(const char *IfName)
 						strncpy(gIF_IPV6,
 							buf,
 							sizeof(gIF_IPV6) - 1);
-						gIF_IPV6_PREFIX_LENGTH = if_prefix;
+						gIF_IPV6_PREFIX_LENGTH =
+							if_prefix;
 					}
 				}
 			}
