@@ -161,7 +161,7 @@ static void UpnpDisplayFileAndLine(FILE *fp,
 	char timebuf[26];
 	time_t now = time(NULL);
 	struct tm *timeinfo;
-	char *smod;
+	const char *smod;
 	#if 0
 	char *slev;
 	/* Code kept around in case, but I think it's actually more convenient
