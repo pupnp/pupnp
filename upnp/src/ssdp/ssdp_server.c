@@ -548,7 +548,7 @@ end_function:
 
 int unique_service_name(char *cmd, SsdpEvent *Evt)
 {
-	char TempBuf[COMMAND_LEN];
+	char TempBuf[LINE_SIZE - 3];
 	char *TempPtr = NULL;
 	char *Ptr = NULL;
 	char *ptr1 = NULL;
