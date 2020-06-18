@@ -1,30 +1,30 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -42,8 +42,8 @@
 
 #include <errno.h>
 #include <stdarg.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #ifdef DEBUG
@@ -64,7 +64,7 @@ static int initwascalled;
 /* Name of the output file. We keep a copy */
 static char *fileName;
 
-/* This is called from UpnpInit2(). So the user must call setLogFileName() 
+/* This is called from UpnpInit2(). So the user must call setLogFileName()
  * before. This can be called again, for example to rotate the log
  * file, and we try to avoid multiple calls to the mutex init, with a
  * risk of race, probably not a problem, and not worth fixing. */
@@ -88,8 +88,10 @@ int UpnpInitLog(void)
 	is_stderr = 0;
 	if (fileName) {
 		if ((fp = fopen(fileName, "a")) == NULL) {
-			fprintf(stderr, "Failed to open fileName (%s): %s\n",
-					fileName, strerror(errno));
+			fprintf(stderr,
+				"Failed to open fileName (%s): %s\n",
+				fileName,
+				strerror(errno));
 		}
 	}
 	if (fp == NULL) {
@@ -141,24 +143,26 @@ static int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module)
 	(void)Module;
 
 	return (DLevel <= g_log_level) &&
-		(DEBUG_ALL ||
-		 (Module == SSDP && DEBUG_SSDP) ||
-		 (Module == SOAP && DEBUG_SOAP) ||
-		 (Module == GENA && DEBUG_GENA) ||
-		 (Module == TPOOL && DEBUG_TPOOL) ||
-		 (Module == MSERV && DEBUG_MSERV) ||
-		 (Module == DOM && DEBUG_DOM) || (Module == HTTP && DEBUG_HTTP));
+	       (DEBUG_ALL || (Module == SSDP && DEBUG_SSDP) ||
+		       (Module == SOAP && DEBUG_SOAP) ||
+		       (Module == GENA && DEBUG_GENA) ||
+		       (Module == TPOOL && DEBUG_TPOOL) ||
+		       (Module == MSERV && DEBUG_MSERV) ||
+		       (Module == DOM && DEBUG_DOM) ||
+		       (Module == HTTP && DEBUG_HTTP));
 }
 
-static void UpnpDisplayFileAndLine(
-	FILE *fp, const char *DbgFileName,
-	int DbgLineNo, Upnp_LogLevel DLevel, Dbg_Module Module)
+static void UpnpDisplayFileAndLine(FILE *fp,
+	const char *DbgFileName,
+	int DbgLineNo,
+	Upnp_LogLevel DLevel,
+	Dbg_Module Module)
 {
 	char timebuf[26];
 	time_t now = time(NULL);
 	struct tm *timeinfo;
 	char *smod;
-#if 0
+	#if 0
 	char *slev;
 	/* Code kept around in case, but I think it's actually more convenient
 	   to display a numeric level */
@@ -169,42 +173,69 @@ static void UpnpDisplayFileAndLine(
 	case UPNP_ALL: slev="ALL";break;
 	default: slev="UNK";break;
 	}
-#else
+	#else
 	char slev[25];
 	snprintf(slev, 25, "%d", DLevel);
-#endif
-		
-	switch(Module) {
-	case SSDP: smod="SSDP";break;
-	case SOAP: smod="SOAP";break;
-	case GENA: smod="GENA";break;
-	case TPOOL: smod="TPOL";break;
-	case MSERV: smod="MSER";break;
-	case DOM: smod="DOM_";break;
-	case API: smod="API_";break;
-	case HTTP: smod="HTTP";break;
-	default: smod="UNKN";break;
+	#endif
+
+	switch (Module) {
+	case SSDP:
+		smod = "SSDP";
+		break;
+	case SOAP:
+		smod = "SOAP";
+		break;
+	case GENA:
+		smod = "GENA";
+		break;
+	case TPOOL:
+		smod = "TPOL";
+		break;
+	case MSERV:
+		smod = "MSER";
+		break;
+	case DOM:
+		smod = "DOM_";
+		break;
+	case API:
+		smod = "API_";
+		break;
+	case HTTP:
+		smod = "HTTP";
+		break;
+	default:
+		smod = "UNKN";
+		break;
 	}
 
 	timeinfo = localtime(&now);
 	strftime(timebuf, 26, "%Y-%m-%d %H:%M:%S", timeinfo);
 
-	fprintf(fp, "%s UPNP-%s-%s: Thread:0x%lX [%s:%d]: ", timebuf, smod, slev,
-#ifdef __PTW32_DLLPORT
+	fprintf(fp,
+		"%s UPNP-%s-%s: Thread:0x%lX [%s:%d]: ",
+		timebuf,
+		smod,
+		slev,
+	#ifdef __PTW32_DLLPORT
 		(unsigned long int)ithread_self().p
-#else
+	#else
 		(unsigned long int)ithread_self()
-#endif
-	, DbgFileName, DbgLineNo);
+	#endif
+		,
+		DbgFileName,
+		DbgLineNo);
 	fflush(fp);
 }
 
-void UpnpPrintf(
-	Upnp_LogLevel DLevel, Dbg_Module Module,
-	const char *DbgFileName, int DbgLineNo, const char *FmtStr, ...)
+void UpnpPrintf(Upnp_LogLevel DLevel,
+	Dbg_Module Module,
+	const char *DbgFileName,
+	int DbgLineNo,
+	const char *FmtStr,
+	...)
 {
-	/*fprintf(stderr, "UpnpPrintf: fp %p level %d glev %d mod %d DEBUG_ALL %d\n",
-	  fp, DLevel, g_log_level, Module, DEBUG_ALL);*/
+	/*fprintf(stderr, "UpnpPrintf: fp %p level %d glev %d mod %d DEBUG_ALL
+	  %d\n", fp, DLevel, g_log_level, Module, DEBUG_ALL);*/
 	va_list ArgList;
 
 	if (!DebugAtThisLevel(DLevel, Module))
@@ -217,7 +248,8 @@ void UpnpPrintf(
 
 	va_start(ArgList, FmtStr);
 	if (DbgFileName) {
-		UpnpDisplayFileAndLine(fp, DbgFileName, DbgLineNo, DLevel, Module);
+		UpnpDisplayFileAndLine(
+			fp, DbgFileName, DbgLineNo, DLevel, Module);
 		vfprintf(fp, FmtStr, ArgList);
 		fflush(fp);
 	}
@@ -230,11 +262,10 @@ void UpnpPrintf(
 FILE *UpnpGetDebugFile(Upnp_LogLevel DLevel, Dbg_Module Module)
 {
 	if (!DebugAtThisLevel(DLevel, Module)) {
-		return	NULL;
+		return NULL;
 	} else {
 		return fp;
 	}
 }
-
 
 #endif /* DEBUG */
