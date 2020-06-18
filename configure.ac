@@ -221,6 +221,43 @@ AC_PROG_EGREP
 echo "--------------------- Default compilation flags -------------------------------"
 echo host is $host
 echo host_os is $host_os
+
+build_linux=no
+build_windows=no
+build_mac=no
+build_freebsd=no
+
+# Detect the target system
+case "${host_os}" in
+linux*)
+        build_linux=yes
+	AC_MSG_NOTICE([Building for Linux])
+	;;
+cygwin*|mingw*)
+        build_windows=yes
+	AC_MSG_NOTICE([Building for Windows])
+	;;
+darwin*)
+        build_mac=yes
+	AC_MSG_NOTICE([Building for Mac])
+	;;
+freebsd*)
+        build_freebsd=yes
+	AC_MSG_NOTICE([Building for FreeBSD])
+	;;
+#*)
+#        AC_MSG_ERROR(["OS $host_os is not supported"])
+#	;;
+esac
+
+# Pass the conditionals to automake
+AM_CONDITIONAL([LINUX], [test "$build_linux" = "yes"])
+AM_CONDITIONAL([WINDOWS], [test "$build_windows" = "yes"])
+AM_CONDITIONAL([OSX], [test "$build_mac" = "yes"])
+AM_CONDITIONAL([FREEBSD], [test "$build_freebsd" = "yes"])
+
+################################################################################
+
 case $host_os in
 freebsd*)
 	echo "Using FreeBSD specific compiler settings"
@@ -243,6 +280,7 @@ esac
 
 AX_CFLAGS_WARN_ALL
 AX_CFLAGS_GCC_OPTION([-Wextra -Wpedantic])
+
 echo "-------------------------------------------------------------------------------"
 
 

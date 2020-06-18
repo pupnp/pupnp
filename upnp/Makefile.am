@@ -194,10 +194,12 @@ endif
 libupnp_la_SOURCES += src/urlconfig/urlconfig.c
 
 
+if WINDOWS
 # inet_pton (needed on Win32, compiles to nothing elsewhere)
 libupnp_la_SOURCES += \
 	src/inet_pton.c \
 	src/inc/inet_pton.h
+endif
 
 
 # check / distcheck tests
