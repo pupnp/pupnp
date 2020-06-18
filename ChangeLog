@@ -4301,3 +4301,431 @@ FORK FROM DEAD libupnp
 	
 	* importing "libupnp-1.2.1a" as baseline
 	
+--------------------------------------------------------------------------------
+
+History of configure.ac:
+
+dnl # Release 1.4.1:
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:2:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [2:2:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [2:2:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.4.6:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in ixml
+dnl #	revision: 2 -> 3
+dnl # - Code has changed in threadutil
+dnl #	revision: 2 -> 3
+dnl # - Interface added in threadutil
+dnl #	current: 2 -> 3
+dnl #	revisiion: 3 -> 0
+dnl #	age: 0 -> 1
+dnl # - Code has changed in upnp
+dnl #	revision: 2 -> 3
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:3:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [3:0:1])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [2:3:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.0:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in ixml
+dnl #	revision: 3 -> 4
+dnl # - Code has changed in threadutil
+dnl #	revision: 0 -> 1
+dnl # - Code has changed in upnp
+dnl #	revision: 3 -> 4
+dnl # - Interface changed in upnp
+dnl #	current: 2 -> 3
+dnl #	revision: 4 -> 0
+dnl # - Interface removed in upnp
+dnl #	age: 0 -> 0
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [3:1:1])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:0:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.1:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in threadutil
+dnl #	revision: 1 -> 2
+dnl # - Interface added in threadutil
+dnl #	current: 3 -> 4
+dnl #	revision: 2 -> 0
+dnl # - Interface added in threadutil
+dnl #	age: 1 -> 2
+dnl # - Code has changed in upnp
+dnl #	revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:0:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:1:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.2:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #	revision: 1 -> 2
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:0:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:2:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.3:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in threadutil
+dnl #	revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:1:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:2:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.4:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in threadutil
+dnl #	revision: 1 -> 2
+dnl # - Code has changed in upnp
+dnl #	revision: 2 -> 3
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:2:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:3:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.5:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #	revision: 3 -> 4
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:2:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:4:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.6:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in threadutil
+dnl #	revision: 2 -> 3
+dnl # - Code has changed in upnp
+dnl #	revision: 4 -> 5
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [4:3:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.7:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in threadutil
+dnl #	revision: 3 -> 4
+dnl # - Code has changed in upnp
+dnl #	revision: 5 -> 6
+dnl # - Interfaces have been changed, added and removed in upnp
+dnl #	current: 3 -> 4
+dnl #   revision: 6 -> 0
+dnl # - Interfaces removed in upnp:
+dnl #   age: -> 0
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:0:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
+dnl #
+dnl # Obs.: 1.6.7 was released with a version error, the correct nubers should
+dnl # have been:
+dnl #AC_SUBST([LT_VERSION_UPNP],       [4:0:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.8:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in ixml
+dnl #	revision: 4 -> 5
+dnl # - Code has changed in threadutil
+dnl #	revision: 0 -> 1
+dnl # - Code has changed in upnp
+dnl #	revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:5:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:1:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [4:1:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.9:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in threadutil
+dnl #	revision: 1 -> 2
+dnl # - Code has changed in upnp
+dnl #	revision: 1 -> 2
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:5:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:2:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [4:2:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.10:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in ixml
+dnl #	revision: 5 -> 6
+dnl # - Code has changed in threadutil
+dnl #	revision: 2 -> 3
+dnl # - Code has changed in upnp
+dnl #	revision: 2 -> 3
+dnl # - interface has changed in upnp
+dnl #   current: 4 -> 5
+dnl #   revision: 3 -> 0
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
+dnl ############################################################################
+dnl # Release 1.6.11:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in threadutil
+dnl #	revision: 3 -> 4
+dnl # - Code has changed in upnp
+dnl #	revision: 3 -> 4
+dnl # - interface has changed in upnp
+dnl #   current: 5 -> 6
+dnl #   revision: 4 -> 0
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:4:2])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [6:0:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.12:
+dnl # "current:revision:age"
+dnl #
+dnl # - interface added in threadutil
+dnl #   current: 5 -> 6
+dnl #   revision: 4 - > 0
+dnl #   age: 2 -> 3
+dnl # - interfaces removed in threadutil
+dnl #   age: 3 -> 0
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [6:0:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.13:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #	revision: 0 -> 1
+dnl # - interface added in upnp
+dnl #   current: 6 -> 7
+dnl #   revision: 1 - > 0
+dnl #   age: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [7:0:1])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.14:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #	revision: 0 -> 1
+dnl # - interface added in upnp
+dnl #   current: 7 -> 8
+dnl #   revision: 1 - > 0
+dnl #   age: 1 -> 2
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [8:0:2])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.15:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #	revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:6:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [8:1:2])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.16:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in ixml
+dnl #	revision: 6 -> 7
+dnl # - Code has changed in threadutil
+dnl #   revision: 0 -> 1
+dnl # - Code has changed in upnp
+dnl #	revision: 1 -> 2
+dnl # - interface changed/added/removed in upnp
+dnl #   current++(9); revision = 0
+dnl # - interface added in upnp
+dnl #   age++(3)
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:7:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:1:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [9:0:3])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.17:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in threadutil
+dnl #   revision: 1 -> 2
+dnl # - Code has changed in upnp
+dnl #   revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [2:7:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [6:2:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [9:1:3])
+dnl #
+dnl ############################################################################
+dnl # Release 1.6.18:
+dnl # "current:revision:age"
+dnl #
+dnl # -
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [::])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [::])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
+dnl #
+dnl ############################################################################
+dnl # Release 1.8.0:
+dnl # "current:revision:age"
+dnl #
+dnl # - Start from a new ground.
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [10:0:0])
+dnl #AC_SUBST([LT_VERSION_THREADUTIL], [10:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [10:0:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.8.1:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in ixml
+dnl #   revision: 0 -> 1
+dnl # - Code has changed in upnp
+dnl #   revision: 0 -> 1
+dnl # - interface changed/added/removed in upnp
+dnl #   current++(11); revision = 0
+dnl # - interface added in upnp
+dnl #   age++(1)
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [10:1:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [11:0:1])
+dnl #
+dnl ############################################################################
+dnl # Release 1.8.2:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #   revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [10:1:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [11:1:1])
+dnl #
+dnl ############################################################################
+dnl # Release 1.8.3:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #   revision: 1 -> 2
+dnl # - interfaces changed/added/removed:
+dnl #   current: 11 -> 12, revision 2 -> 0
+dnl # - interfaces added:
+dnl #   age: 1 -> 2
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [10:1:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [12:0:2])
+dnl #
+dnl ############################################################################
+dnl # Release 1.8.4:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #   revision: 0 -> 1
+dnl # - interfaces changed/added/removed:
+dnl #   current: 12 -> 13, revision 1 -> 0
+dnl # - interfaces removed:
+dnl #   age: 2 -> 0
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [10:1:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [13:0:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.8.5:
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in ixml
+dnl #   revision: 1 -> 2
+dnl # - Code has changed in upnp
+dnl #   revision: 0 -> 1
+dnl # - interfaces changed/added/removed:
+dnl #   current: 13 -> 14, revision 1 -> 0
+dnl # - interfaces added:
+dnl #   age: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [10:2:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [14:0:1])
+dnl #
+dnl ############################################################################
+dnl # Release 1.8.6:
+dnl # "current:revision:age"
+dnl #
+dnl # -
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [::])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [::])
+dnl #
+dnl ############################################################################
+dnl # Release 1.10.0:
+dnl # "current:revision:age"
+dnl #
+dnl # - First release of 1.10
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [11:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [15:0:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.10.1
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #   revision: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [11:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [15:1:0])
+dnl #
+dnl ############################################################################
+dnl # Release 1.12.0
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #   revision: 1 -> 2
+dnl # - interfaces changed/added/removed:
+dnl #   current: 15 -> 16
+dnl #   revision: 2 -> 0
+dnl # 	- interfaces removed or changed:
+dnl #   age: 0 -> 0
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [11:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [16:0:0])
+dnl #
+dnl ############################################################################
