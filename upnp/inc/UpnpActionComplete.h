@@ -65,5 +65,9 @@ EXPORT_SPEC IXML_Document * UpnpActionComplete_get_ActionResult(const UpnpAction
 /*! UpnpActionComplete_set_ActionResult */
 EXPORT_SPEC int UpnpActionComplete_set_ActionResult(UpnpActionComplete *p, IXML_Document * n);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* UPNPACTIONCOMPLETE_H */
 

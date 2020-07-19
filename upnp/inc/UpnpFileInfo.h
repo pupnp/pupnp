@@ -95,5 +95,9 @@ EXPORT_SPEC int UpnpFileInfo_strncpy_Os(UpnpFileInfo *p, const char *s, size_t n
 /*! UpnpFileInfo_clear_Os */
 EXPORT_SPEC void UpnpFileInfo_clear_Os(UpnpFileInfo *p); 
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* UPNPFILEINFO_H */
 

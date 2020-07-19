@@ -460,7 +460,13 @@ static int write_header(FILE *fp, struct s_Class *c)
 	for (i = 0; i < (int)c->n_members; ++i) {
 		ok = ok && write_prototype(fp, c->name, c->members + i);
 	}
-	fprintf(fp, "#endif /* %s_H */\n\n", class_name_upr);
+	fprintf(fp,
+		"#ifdef __cplusplus\n"
+		"}\n"
+		"#endif /* __cplusplus */\n"
+		"\n"
+		"#endif /* %s_H */\n\n",
+		class_name_upr);
 	free(included_headers);
 	free(class_name_upr);
 

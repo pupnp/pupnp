@@ -172,5 +172,9 @@ EXPORT_SPEC int UpnpDiscovery_set_DestAddr(UpnpDiscovery *p, const struct sockad
 /*! UpnpDiscovery_get_DestAddr */
 EXPORT_SPEC void UpnpDiscovery_clear_DestAddr(UpnpDiscovery *p); 
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* UPNPDISCOVERY_H */
 

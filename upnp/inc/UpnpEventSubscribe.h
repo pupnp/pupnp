@@ -74,5 +74,9 @@ EXPORT_SPEC int UpnpEventSubscribe_strncpy_PublisherUrl(UpnpEventSubscribe *p, c
 /*! UpnpEventSubscribe_clear_PublisherUrl */
 EXPORT_SPEC void UpnpEventSubscribe_clear_PublisherUrl(UpnpEventSubscribe *p); 
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* UPNPEVENTSUBSCRIBE_H */
 

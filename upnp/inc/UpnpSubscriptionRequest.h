@@ -79,5 +79,9 @@ EXPORT_SPEC int UpnpSubscriptionRequest_strncpy_SID(UpnpSubscriptionRequest *p, 
 /*! UpnpSubscriptionRequest_clear_SID */
 EXPORT_SPEC void UpnpSubscriptionRequest_clear_SID(UpnpSubscriptionRequest *p); 
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* UPNPSUBSCRIPTIONREQUEST_H */
 

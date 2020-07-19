@@ -120,5 +120,9 @@ EXPORT_SPEC int UpnpStateVarRequest_set_CurrentVal(UpnpStateVarRequest *p, const
 /*! UpnpStateVarRequest_get_CurrentVal_cstr */
 EXPORT_SPEC const char *UpnpStateVarRequest_get_CurrentVal_cstr(const UpnpStateVarRequest *p); 
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* UPNPSTATEVARREQUEST_H */
 

@@ -143,5 +143,9 @@ EXPORT_SPEC int UpnpActionRequest_strncpy_Os(UpnpActionRequest *p, const char *s
 /*! UpnpActionRequest_clear_Os */
 EXPORT_SPEC void UpnpActionRequest_clear_Os(UpnpActionRequest *p); 
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* UPNPACTIONREQUEST_H */
 

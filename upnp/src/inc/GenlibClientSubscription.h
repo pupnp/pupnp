@@ -89,5 +89,9 @@ EXPORT_SPEC GenlibClientSubscription * GenlibClientSubscription_get_Next(const G
 /*! GenlibClientSubscription_set_Next */
 EXPORT_SPEC int GenlibClientSubscription_set_Next(GenlibClientSubscription *p, GenlibClientSubscription * n);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* GENLIBCLIENTSUBSCRIPTION_H */
 

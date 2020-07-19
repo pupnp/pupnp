@@ -80,5 +80,9 @@ EXPORT_SPEC int UpnpExtraHeaders_set_resp(UpnpExtraHeaders *p, const DOMString s
 /*! UpnpExtraHeaders_get_resp_cstr */
 EXPORT_SPEC const char *UpnpExtraHeaders_get_resp_cstr(const UpnpExtraHeaders *p); 
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* UPNPEXTRAHEADERS_H */
 

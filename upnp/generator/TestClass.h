@@ -94,5 +94,9 @@ EXPORT_SPEC int TestClass_set_TheDomString(TestClass *p, const DOMString s);
 /*! TestClass_get_TheDomString_cstr */
 EXPORT_SPEC const char *TestClass_get_TheDomString_cstr(const TestClass *p); 
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* TESTCLASS_H */
 

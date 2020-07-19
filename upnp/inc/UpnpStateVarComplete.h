@@ -77,5 +77,9 @@ EXPORT_SPEC int UpnpStateVarComplete_set_CurrentVal(UpnpStateVarComplete *p, con
 /*! UpnpStateVarComplete_get_CurrentVal_cstr */
 EXPORT_SPEC const char *UpnpStateVarComplete_get_CurrentVal_cstr(const UpnpStateVarComplete *p); 
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* UPNPSTATEVARCOMPLETE_H */
 

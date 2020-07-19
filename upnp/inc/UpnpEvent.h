@@ -60,5 +60,9 @@ EXPORT_SPEC int UpnpEvent_strncpy_SID(UpnpEvent *p, const char *s, size_t n);
 /*! UpnpEvent_clear_SID */
 EXPORT_SPEC void UpnpEvent_clear_SID(UpnpEvent *p); 
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* UPNPEVENT_H */
 

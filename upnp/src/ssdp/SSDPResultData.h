@@ -50,5 +50,9 @@ EXPORT_SPEC Upnp_FunPtr SSDPResultData_get_CtrlptCallback(const SSDPResultData *
 /*! SSDPResultData_set_CtrlptCallback */
 EXPORT_SPEC int SSDPResultData_set_CtrlptCallback(SSDPResultData *p, Upnp_FunPtr n);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* SSDPRESULTDATA_H */
 
