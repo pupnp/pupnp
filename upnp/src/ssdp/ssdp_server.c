@@ -1200,6 +1200,7 @@ static int create_ssdp_sock_v6(
 		sizeof(ssdpMcastAddr));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+		uint32_t *p = (uint32_t *)&ssdpMcastAddr.ipv6mr_multiaddr;
 		UpnpPrintf(UPNP_CRITICAL,
 			SSDP,
 			__FILE__,
@@ -1213,10 +1214,10 @@ static int create_ssdp_sock_v6(
 			errorBuffer,
 			SSDP_IPV6_LINKLOCAL,
 			ssdpMcastAddr.ipv6mr_interface,
-			ssdpMcastAddr.ipv6mr_multiaddr.__in6_u.__u6_addr32[0],
-			ssdpMcastAddr.ipv6mr_multiaddr.__in6_u.__u6_addr32[1],
-			ssdpMcastAddr.ipv6mr_multiaddr.__in6_u.__u6_addr32[2],
-			ssdpMcastAddr.ipv6mr_multiaddr.__in6_u.__u6_addr32[3]);
+			p[0],
+			p[1],
+			p[2],
+			p[3]);
 		ret = UPNP_E_SOCKET_ERROR;
 		goto error_handler;
 	}
