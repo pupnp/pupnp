@@ -817,17 +817,13 @@ static int get_miniserver_sockets(
 	MiniServerSockArray *out,
 	/*! [in] port on which the server is listening for incoming IPv4
 	 * connections. */
-	uint16_t listen_port4
-#ifdef UPNP_ENABLE_IPV6
-	,
+	uint16_t listen_port4,
 	/*! [in] port on which the server is listening for incoming IPv6
 	 * ULA connections. */
 	uint16_t listen_port6,
 	/*! [in] port on which the server is listening for incoming
 	 * IPv6 ULA or GUA connections. */
-	uint16_t listen_port6UlaGua
-#endif
-)
+	uint16_t listen_port6UlaGua)
 {
 	int ret_val;
 	int err_init_4;
@@ -1034,14 +1030,8 @@ int StartMiniServer(
 	InitMiniServerSockArray(miniSocket);
 #ifdef INTERNAL_WEB_SERVER
 	/* V4 and V6 http listeners. */
-	ret_code = get_miniserver_sockets(miniSocket,
-		*listen_port4
-#ifdef UPNP_ENABLE_IPV6
-		,
-		*listen_port6,
-		*listen_port6UlaGua
-#endif
-	);
+	ret_code = get_miniserver_sockets(
+		miniSocket, *listen_port4, *listen_port6, *listen_port6UlaGua);
 	if (ret_code != UPNP_E_SUCCESS) {
 		free(miniSocket);
 		return ret_code;
