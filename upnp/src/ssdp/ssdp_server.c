@@ -1205,8 +1205,18 @@ static int create_ssdp_sock_v6(
 			__FILE__,
 			__LINE__,
 			"Error in setsockopt() IPV6_JOIN_GROUP (join multicast "
-			"group): %s\n",
-			errorBuffer);
+			"group): %s.\n"
+			"SSDP_IPV6_LINKLOCAL = %s,\n"
+			"ipv6mr_interface = %u,\n"
+			"ipv6mr_multiaddr[0,1,2,3] = "
+			"0x%08X:0x%08X:0x%08X:0x%08X\n",
+			errorBuffer,
+			SSDP_IPV6_LINKLOCAL,
+			ssdpMcastAddr.ipv6mr_interface,
+			ssdpMcastAddr.ipv6mr_multiaddr.__in6_u.__u6_addr32[0],
+			ssdpMcastAddr.ipv6mr_multiaddr.__in6_u.__u6_addr32[1],
+			ssdpMcastAddr.ipv6mr_multiaddr.__in6_u.__u6_addr32[2],
+			ssdpMcastAddr.ipv6mr_multiaddr.__in6_u.__u6_addr32[3]);
 		ret = UPNP_E_SOCKET_ERROR;
 		goto error_handler;
 	}
