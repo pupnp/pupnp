@@ -206,7 +206,18 @@ void UpnpPrintf(
 	__attribute__((format(__printf__, 5, 6)))
 #endif
 	;
-#else  /* DEBUG */
+#else /* DEBUG */
+static UPNP_INLINE void UpnpPrintf(Upnp_LogLevel DLevel,
+	Dbg_Module Module,
+	const char *DbgFileName,
+	int DbgLineNo,
+	const char *FmtStr,
+	...)
+#if (__GNUC__ >= 3)
+	/* This enables printf like format checking by the compiler. */
+	__attribute__((format(__printf__, 5, 6)))
+#endif
+	;
 static UPNP_INLINE void UpnpPrintf(Upnp_LogLevel DLevel,
 	Dbg_Module Module,
 	const char *DbgFileName,
