@@ -66,6 +66,7 @@ ixml/test/testdata/xmlconf/059.xml
 ixml/test/testdata/xmlconf/111.xml
 ixml/test/testdata/xmlconf/element.xml
 libupnp.pc.in
+libupnp.spec
 m4/ax_cflags_gcc_option.m4
 m4/ax_cflags_warn_all.m4
 m4/ax_pthread.m4
