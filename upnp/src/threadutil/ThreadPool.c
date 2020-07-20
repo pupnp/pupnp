@@ -260,8 +260,10 @@ static int SetPolicyType(
 	int retVal = 0;
 #ifdef __CYGWIN__
 	/* TODO not currently working... */
+	(void)in;
 	retVal = 0;
 #elif defined(__APPLE__) || defined(__NetBSD__)
+	(void)in;
 	setpriority(PRIO_PROCESS, 0, 0);
 	retVal = 0;
 #elif defined(__PTW32_DLLPORT)
