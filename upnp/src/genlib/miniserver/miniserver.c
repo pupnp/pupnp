@@ -569,6 +569,7 @@ static int init_socket_suff(
 	char errorBuffer[ERROR_BUFFER_LEN];
 	int sockError;
 	sa_family_t domain;
+	void *addr;
 	int reuseaddr_on = MINISERVER_REUSEADDR;
 
 	memset(s, 0, sizeof *s);
@@ -581,7 +582,7 @@ static int init_socket_suff(
 		domain = AF_INET;
 		s->serverAddr4->sin_family = domain;
 		s->address_len = sizeof *s->serverAddr4;
-		inet_pton(domain, text_addr, &s->serverAddr4->sin_addr);
+		addr = &s->serverAddr4->sin_addr;
 		break;
 	case 6:
 		if (!ENABLE_IPV6) {
@@ -590,7 +591,7 @@ static int init_socket_suff(
 		domain = AF_INET6;
 		s->serverAddr6->sin6_family = domain;
 		s->address_len = sizeof *s->serverAddr6;
-		inet_pton(AF_INET6, text_addr, &s->serverAddr6->sin6_addr);
+		addr = &s->serverAddr6->sin6_addr;
 		break;
 	default:
 		UpnpPrintf(UPNP_INFO,
@@ -602,6 +603,7 @@ static int init_socket_suff(
 		goto error;
 		break;
 	}
+	inet_pton(domain, text_addr, addr);
 	s->fd = socket(domain, SOCK_STREAM, 0);
 	if (s->fd == INVALID_SOCKET) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
