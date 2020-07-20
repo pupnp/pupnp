@@ -1191,7 +1191,7 @@ static int create_ssdp_sock_v6(
 	}
 	memset((void *)&ssdpMcastAddr, 0, sizeof(ssdpMcastAddr));
 #if defined(__APPLE__)
-	ssdpMcastAddr.ipv6mr_interface = 0;
+	// ssdpMcastAddr.ipv6mr_interface = 0;
 #else
 	ssdpMcastAddr.ipv6mr_interface = gIF_INDEX;
 #endif
@@ -1214,14 +1214,16 @@ static int create_ssdp_sock_v6(
 			"SSDP_IPV6_LINKLOCAL = %s,\n"
 			"ipv6mr_interface = %u,\n"
 			"ipv6mr_multiaddr[0,1,2,3] = "
-			"0x%08X:0x%08X:0x%08X:0x%08X\n",
+			"0x%08X:0x%08X:0x%08X:0x%08X\n"
+			"gIF_NAME = %s\n",
 			errorBuffer,
 			SSDP_IPV6_LINKLOCAL,
 			ssdpMcastAddr.ipv6mr_interface,
 			p[0],
 			p[1],
 			p[2],
-			p[3]);
+			p[3],
+			gIF_NAME);
 		ret = UPNP_E_SOCKET_ERROR;
 		goto error_handler;
 	}
