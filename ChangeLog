@@ -2,6 +2,13 @@
 Version 1.14.0
 *******************************************************************************
 
+2020-07-19 Marcelo Jimenez <marcelo.jimenez(at)gmail.com>
+
+        Reworked the miniserver code to deal with SO_REUSEADDR
+
+        Factored the common socket code and test for EADDRINUSE returning from
+	listen() when SO_REUSEADDR is turned on.
+
 2020-06-17 Marcelo Jimenez <marcelo.jimenez(at)gmail.com>
 
         Removed template classes.
