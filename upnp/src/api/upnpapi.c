@@ -58,8 +58,8 @@
 #include "service_table.h"
 
 #ifdef INTERNAL_WEB_SERVER
-#include "urlconfig.h"
 #include "VirtualDir.h"
+#include "urlconfig.h"
 #include "webserver.h"
 #endif /* INTERNAL_WEB_SERVER */
 
@@ -502,7 +502,7 @@ int UpnpInit2(const char *IfName, unsigned short DestPort)
 		__FILE__,
 		__LINE__,
 		"UpnpInit2 with IfName=%s, DestPort=%d.\n",
-		IfName ? IfName : "",
+		IfName ? IfName : "NULL",
 		DestPort);
 
 	/* Retrieve interface information (Addresses, index, etc). */
@@ -3944,8 +3944,7 @@ int UpnpGetIfInfo(const char *IfName)
 				ifReq.ifr_name);
 		}
 		/* Skip LOOPBACK interfaces, DOWN interfaces and interfaces that
-		 */
-		/* don't support MULTICAST. */
+		 * don't support MULTICAST. */
 		if ((ifReq.ifr_flags & IFF_LOOPBACK) ||
 			(!(ifReq.ifr_flags & IFF_UP)) ||
 			(!(ifReq.ifr_flags & IFF_MULTICAST))) {
