@@ -1190,7 +1190,11 @@ static int create_ssdp_sock_v6(
 		goto error_handler;
 	}
 	memset((void *)&ssdpMcastAddr, 0, sizeof(ssdpMcastAddr));
+#if defined(__APPLE__)
+	ssdpMcastAddr.ipv6mr_interface = 0;
+#else
 	ssdpMcastAddr.ipv6mr_interface = gIF_INDEX;
+#endif
 	inet_pton(
 		AF_INET6, SSDP_IPV6_LINKLOCAL, &ssdpMcastAddr.ipv6mr_multiaddr);
 	ret = setsockopt(*ssdpSock,
