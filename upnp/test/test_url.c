@@ -13,9 +13,24 @@ struct test
 	int line;
 	int error;
 };
+
+/*
 #define TEST(BaseURL, RelURL, expect, ...) \
 	{ \
 		BaseURL, RelURL, expect, __LINE__, ##__VA_ARGS__ \
+	}
+*/
+
+#define TEST(BaseURL, RelURL, expectURL) \
+	{ \
+		.base = BaseURL, .rel = RelURL, .expect = expectURL, \
+		.line = __LINE__ \
+	}
+
+#define TEST_ERROR(BaseURL, RelURL, expectURL, error_code) \
+	{ \
+		.base = BaseURL, .rel = RelURL, .expect = expectURL, \
+		.line = __LINE__, .error = error_code \
 	}
 
 static int result(const struct test *test)
@@ -45,16 +60,16 @@ static int result(const struct test *test)
 /* The URLs must be resolvale! */
 static const char ABS_URL1[] = "http://pupnp.sourceforge.net/path1/";
 static const char ABS_URL2[] = "http://pupnp.sourceforge.net/path1/path1";
-static const char ABS_URL3[] = "http://localhost/path1/";
-static const char ABS_URL4[] = "http://127.0.0.1/path1/";
-static const char ABS_URL5[] = "http://127.0.0.1:6544/path1/";
-static const char ABS_URL6[] = "http://[::1]:6544/path1/";
+// static const char ABS_URL3[] = "http://localhost/path1/";
+// static const char ABS_URL4[] = "http://127.0.0.1/path1/";
+// static const char ABS_URL5[] = "http://127.0.0.1:6544/path1/";
+// static const char ABS_URL6[] = "http://[::1]:6544/path1/";
 
 static const char REL_URL1[] = "//localhost/path2";
 static const char REL_URL2[] = "/path3";
 static const char REL_URL3[] = "path4";
 static const char REL_URL4[] = "../path5";
-static const char REL_URL5[] = "?query1";
+// static const char REL_URL5[] = "?query1";
 static const char REL_URL6[] = "#frag1";
 
 static const char ABS_RFC[] = "http://localhost/b/c/d;p?q";
@@ -65,9 +80,9 @@ s,//g\>,//127.0.0.1,
 
 static const struct test RFC3986[] = {
 	/* Errors */
-	TEST(NULL, NULL, NULL, UPNP_E_INVALID_PARAM),
-	TEST(ABS_URL1, NULL, NULL, UPNP_E_INVALID_PARAM),
-	TEST("foo", "bar", NULL, UPNP_E_INVALID_URL),
+	TEST_ERROR(NULL, NULL, NULL, UPNP_E_INVALID_PARAM),
+	TEST_ERROR(ABS_URL1, NULL, NULL, UPNP_E_INVALID_PARAM),
+	TEST_ERROR("foo", "bar", NULL, UPNP_E_INVALID_URL),
 	/* Custom */
 	TEST(NULL, ABS_URL1, ABS_URL1),
 	TEST(ABS_URL1, ABS_URL2, ABS_URL2),
@@ -135,11 +150,11 @@ static const struct test RFC3986[] = {
 };
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof *(a))
 
-int main(int argc, char *argv[])
+int main()
 {
 	int i, ret = 0;
 
-	for (i = 0; i < ARRAY_SIZE(RFC3986); i++)
+	for (i = 0; i < (int)ARRAY_SIZE(RFC3986); i++)
 		ret += result(&RFC3986[i]);
 
 	exit(ret ? EXIT_FAILURE : EXIT_SUCCESS);
