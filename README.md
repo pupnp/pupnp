@@ -34,7 +34,7 @@ See LICENSE for details.
 
 Release Number | Date | History
 ---------------|------|--------
-1.14.0 | 2020-06-xx | [Portable UPnP SDK][Portable UPnP SDK]
+1.14.0 | 2020-07-20 | [Portable UPnP SDK][Portable UPnP SDK]
 1.12.1 | 2020-04-07 | [Portable UPnP SDK][Portable UPnP SDK]
 1.12.0 | 2020-01-22 | [Portable UPnP SDK][Portable UPnP SDK]
 1.10.1 | 2019-11-20 | [Portable UPnP SDK][Portable UPnP SDK]
