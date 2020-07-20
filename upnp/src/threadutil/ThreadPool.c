@@ -1,31 +1,31 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -35,7 +35,7 @@
  */
 
 #if !defined(_WIN32)
-	#include <sys/param.h>
+#include <sys/param.h>
 #endif
 
 #include "ThreadPool.h"
@@ -43,9 +43,9 @@
 #include "FreeList.h"
 
 #include <assert.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>	/* for memset()*/
+#include <stdlib.h>
+#include <string.h> /* for memset()*/
 
 /*!
  * \brief Returns the difference in milliseconds between two timeval structures.
@@ -103,7 +103,7 @@ static void StatsInit(
 }
 
 /*!
- * \brief 
+ * \brief
  *
  * \internal
  */
@@ -118,7 +118,7 @@ static void StatsAccountLQ(
 }
 
 /*!
- * \brief 
+ * \brief
  *
  * \internal
  */
@@ -133,7 +133,7 @@ static void StatsAccountMQ(
 }
 
 /*!
- * \brief 
+ * \brief
  *
  * \internal
  */
@@ -188,7 +188,7 @@ static void CalcWaitTime(
 }
 
 /*!
- * \brief 
+ * \brief
  *
  * \internal
  */
@@ -204,12 +204,15 @@ static time_t StatsTime(
 
 	return tv.tv_sec;
 }
-#else /* STATS */
+#else  /* STATS */
 static UPNP_INLINE void StatsInit(ThreadPoolStats *stats) {}
 static UPNP_INLINE void StatsAccountLQ(ThreadPool *tp, long diffTime) {}
 static UPNP_INLINE void StatsAccountMQ(ThreadPool *tp, long diffTime) {}
 static UPNP_INLINE void StatsAccountHQ(ThreadPool *tp, long diffTime) {}
-static UPNP_INLINE void CalcWaitTime(ThreadPool *tp, ThreadPriority p, ThreadPoolJob *job) {}
+static UPNP_INLINE void CalcWaitTime(
+	ThreadPool *tp, ThreadPriority p, ThreadPoolJob *job)
+{
+}
 static UPNP_INLINE time_t StatsTime(time_t *t) { return 0; }
 #endif /* STATS */
 
@@ -218,9 +221,7 @@ static UPNP_INLINE time_t StatsTime(time_t *t) { return 0; }
  *
  * \internal
  */
-static int CmpThreadPoolJob(
-	void *jobA,
-	void *jobB)
+static int CmpThreadPoolJob(void *jobA, void *jobB)
 {
 	ThreadPoolJob *a = (ThreadPoolJob *)jobA;
 	ThreadPoolJob *b = (ThreadPoolJob *)jobB;
@@ -246,7 +247,7 @@ static void FreeThreadPoolJob(
  * \brief Sets the scheduling policy of the current process.
  *
  * \internal
- * 
+ *
  * \return
  * 	\li \c 0 on success.
  *      \li \c result of GetLastError() on failure.
@@ -284,7 +285,7 @@ static int SetPolicyType(
  * \brief Sets the priority of the currently running thread.
  *
  * \internal
- * 
+ *
  * \return
  *	\li \c 0 on success.
  *      \li \c EINVAL invalid priority or the result of GerLastError.
@@ -324,7 +325,8 @@ static int SetPriority(
 
 	newPriority.sched_priority = actPriority;
 
-	sched_result = pthread_setschedparam(ithread_self(), currentPolicy, &newPriority);
+	sched_result = pthread_setschedparam(
+		ithread_self(), currentPolicy, &newPriority);
 	retVal = (sched_result == 0 || errno == EPERM) ? 0 : sched_result;
 exit_function:
 	return retVal;
@@ -341,7 +343,7 @@ exit_function:
  * tp->mutex must be locked.
  *
  * \internal
- * 
+ *
  * \return
  */
 static void BumpPriority(
@@ -353,16 +355,18 @@ static void BumpPriority(
 	long diffTime = 0;
 	ThreadPoolJob *tempJob = NULL;
 
-	gettimeofday(&now, NULL);	
+	gettimeofday(&now, NULL);
 	while (!done) {
 		if (tp->medJobQ.size) {
 			tempJob = (ThreadPoolJob *)tp->medJobQ.head.next->item;
 			diffTime = DiffMillis(&now, &tempJob->requestTime);
 			if (diffTime >= tp->attr.starvationTime) {
-				/* If job has waited longer than the starvation time
-				* bump priority (add to higher priority Q) */
+				/* If job has waited longer than the starvation
+				 * time
+				 * bump priority (add to higher priority Q) */
 				StatsAccountMQ(tp, diffTime);
-				ListDelNode(&tp->medJobQ, tp->medJobQ.head.next, 0);
+				ListDelNode(
+					&tp->medJobQ, tp->medJobQ.head.next, 0);
 				ListAddTail(&tp->highJobQ, tempJob);
 				continue;
 			}
@@ -371,10 +375,12 @@ static void BumpPriority(
 			tempJob = (ThreadPoolJob *)tp->lowJobQ.head.next->item;
 			diffTime = DiffMillis(&now, &tempJob->requestTime);
 			if (diffTime >= tp->attr.maxIdleTime) {
-				/* If job has waited longer than the starvation time
+				/* If job has waited longer than the starvation
+				 * time
 				 * bump priority (add to higher priority Q) */
 				StatsAccountLQ(tp, diffTime);
-				ListDelNode(&tp->lowJobQ, tp->lowJobQ.head.next, 0);
+				ListDelNode(
+					&tp->lowJobQ, tp->lowJobQ.head.next, 0);
 				ListAddTail(&tp->medJobQ, tempJob);
 				continue;
 			}
@@ -413,17 +419,22 @@ static void SetRelTimeout(
 static void SetSeed(void)
 {
 	struct timeval t;
-  
+
 	gettimeofday(&t, NULL);
 #if defined(__PTW32_DLLPORT)
-	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id().p);
+	srand((unsigned int)t.tv_usec +
+		(unsigned int)ithread_get_current_thread_id().p);
 #elif defined(BSD) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
-	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id());
-#elif defined(__linux__) || defined(__sun) || defined(__CYGWIN__) || defined(__GLIBC__)
-	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id());
+	srand((unsigned int)t.tv_usec +
+		(unsigned int)ithread_get_current_thread_id());
+#elif defined(__linux__) || defined(__sun) || defined(__CYGWIN__) || \
+	defined(__GLIBC__)
+	srand((unsigned int)t.tv_usec +
+		(unsigned int)ithread_get_current_thread_id());
 #else
 	{
-		volatile union {
+		volatile union
+		{
 			volatile pthread_t tid;
 			volatile unsigned i;
 		} idu;
@@ -455,7 +466,7 @@ static void *WorkerThread(
 	struct timespec timeout;
 	int retCode = 0;
 	int persistent = -1;
-	ThreadPool *tp = (ThreadPool *) arg;
+	ThreadPool *tp = (ThreadPool *)arg;
 
 	ithread_initialize_thread();
 
@@ -477,7 +488,8 @@ static void *WorkerThread(
 		}
 		retCode = 0;
 		tp->stats.idleThreads++;
-		tp->stats.totalWorkTime += (double)StatsTime(NULL) - (double)start;
+		tp->stats.totalWorkTime +=
+			(double)StatsTime(NULL) - (double)start;
 		StatsTime(&start);
 		if (persistent == 0) {
 			tp->stats.workerThreads--;
@@ -487,18 +499,18 @@ static void *WorkerThread(
 		}
 
 		/* Check for a job or shutdown */
-		while (tp->lowJobQ.size  == 0 &&
-		       tp->medJobQ.size  == 0 &&
-		       tp->highJobQ.size == 0 &&
-		       !tp->persistentJob && !tp->shutdown) {
+		while (tp->lowJobQ.size == 0 && tp->medJobQ.size == 0 &&
+			tp->highJobQ.size == 0 && !tp->persistentJob &&
+			!tp->shutdown) {
 			/* If wait timed out and we currently have more than the
 			 * min threads, or if we have more than the max threads
 			 * (only possible if the attributes have been reset)
 			 * let this thread die. */
 			if ((retCode == ETIMEDOUT &&
-			    tp->totalThreads > tp->attr.minThreads) ||
-			    (tp->attr.maxThreads != -1 &&
-			     tp->totalThreads > tp->attr.maxThreads)) {
+				    tp->totalThreads > tp->attr.minThreads) ||
+				(tp->attr.maxThreads != -1 &&
+					tp->totalThreads >
+						tp->attr.maxThreads)) {
 				tp->stats.idleThreads--;
 				goto exit_function;
 			}
@@ -510,7 +522,8 @@ static void *WorkerThread(
 		}
 		tp->stats.idleThreads--;
 		/* idle time */
-		tp->stats.totalIdleTime += (double)StatsTime(NULL) - (double)start;
+		tp->stats.totalIdleTime +=
+			(double)StatsTime(NULL) - (double)start;
 		/* work time */
 		StatsTime(&start);
 		/* bump priority of starved jobs */
@@ -536,7 +549,7 @@ static void *WorkerThread(
 						tp->stats.workerThreads--;
 						goto exit_function;
 					}
-					job = (ThreadPoolJob *) head->item;
+					job = (ThreadPoolJob *)head->item;
 					CalcWaitTime(tp, HIGH_PRIORITY, job);
 					ListDelNode(&tp->highJobQ, head, 0);
 				} else if (tp->medJobQ.size > 0) {
@@ -545,7 +558,7 @@ static void *WorkerThread(
 						tp->stats.workerThreads--;
 						goto exit_function;
 					}
-					job = (ThreadPoolJob *) head->item;
+					job = (ThreadPoolJob *)head->item;
 					CalcWaitTime(tp, MED_PRIORITY, job);
 					ListDelNode(&tp->medJobQ, head, 0);
 				} else if (tp->lowJobQ.size > 0) {
@@ -554,7 +567,7 @@ static void *WorkerThread(
 						tp->stats.workerThreads--;
 						goto exit_function;
 					}
-					job = (ThreadPoolJob *) head->item;
+					job = (ThreadPoolJob *)head->item;
 					CalcWaitTime(tp, LOW_PRIORITY, job);
 					ListDelNode(&tp->lowJobQ, head, 0);
 				} else {
@@ -636,13 +649,14 @@ static int CreateWorker(
 	int rc = 0;
 	ithread_attr_t attr;
 
-	/* if a new worker is the process of starting, wait until it fully starts */
+	/* if a new worker is the process of starting, wait until it fully
+	 * starts */
 	while (tp->pendingWorkerThreadStart) {
 		ithread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
 	}
 
 	if (tp->attr.maxThreads != INFINITE_THREADS &&
-	    tp->totalThreads + 1 > tp->attr.maxThreads) {
+		tp->totalThreads + 1 > tp->attr.maxThreads) {
 		return EMAXTHREADS;
 	}
 	ithread_attr_init(&attr);
@@ -682,9 +696,8 @@ static void AddWorker(
 
 	jobs = tp->highJobQ.size + tp->lowJobQ.size + tp->medJobQ.size;
 	threads = tp->totalThreads - tp->persistentThreads;
-	while (threads == 0 ||
-	       (jobs / threads) >= tp->attr.jobsPerThread ||
-	       (tp->totalThreads == tp->busyThreads) ) {
+	while (threads == 0 || (jobs / threads) >= tp->attr.jobsPerThread ||
+		(tp->totalThreads == tp->busyThreads)) {
 		if (CreateWorker(tp) != 0) {
 			return;
 		}
@@ -822,7 +835,9 @@ int ThreadPoolAdd(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
 
 	totalJobs = tp->highJobQ.size + tp->lowJobQ.size + tp->medJobQ.size;
 	if (totalJobs >= tp->attr.maxJobsTotal) {
-		fprintf(stderr, "libupnp ThreadPoolAdd too many jobs: %ld\n", totalJobs);
+		fprintf(stderr,
+			"libupnp ThreadPoolAdd too many jobs: %ld\n",
+			totalJobs);
 		goto exit_function;
 	}
 	if (!jobId)
@@ -959,7 +974,7 @@ int ThreadPoolSetAttr(ThreadPool *tp, ThreadPoolAttr *attr)
 		}
 	}
 	/* signal changes */
-	ithread_cond_signal(&tp->condition); 
+	ithread_cond_signal(&tp->condition);
 
 	ithread_mutex_unlock(&tp->mutex);
 
@@ -1035,14 +1050,17 @@ int ThreadPoolShutdown(ThreadPool *tp)
 	while (tp->totalThreads > 0)
 		ithread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
 	/* destroy condition */
-	while (ithread_cond_destroy(&tp->condition) != 0) {}
-	while (ithread_cond_destroy(&tp->start_and_shutdown) != 0) {}
+	while (ithread_cond_destroy(&tp->condition) != 0) {
+	}
+	while (ithread_cond_destroy(&tp->start_and_shutdown) != 0) {
+	}
 	FreeListDestroy(&tp->jobFreeList);
 
 	ithread_mutex_unlock(&tp->mutex);
 
 	/* destroy mutex */
-	while (ithread_mutex_destroy(&tp->mutex) != 0) {}
+	while (ithread_mutex_destroy(&tp->mutex) != 0) {
+	}
 
 	return 0;
 }
@@ -1051,14 +1069,14 @@ int TPAttrInit(ThreadPoolAttr *attr)
 {
 	if (!attr)
 		return EINVAL;
-	attr->jobsPerThread  = DEFAULT_JOBS_PER_THREAD;
-	attr->maxIdleTime    = DEFAULT_IDLE_TIME;
-	attr->maxThreads     = DEFAULT_MAX_THREADS;
-	attr->minThreads     = DEFAULT_MIN_THREADS;
-	attr->stackSize      = DEFAULT_STACK_SIZE;
-	attr->schedPolicy    = DEFAULT_POLICY;
+	attr->jobsPerThread = DEFAULT_JOBS_PER_THREAD;
+	attr->maxIdleTime = DEFAULT_IDLE_TIME;
+	attr->maxThreads = DEFAULT_MAX_THREADS;
+	attr->minThreads = DEFAULT_MIN_THREADS;
+	attr->stackSize = DEFAULT_STACK_SIZE;
+	attr->schedPolicy = DEFAULT_POLICY;
 	attr->starvationTime = DEFAULT_STARVATION_TIME;
-	attr->maxJobsTotal   = DEFAULT_MAX_JOBS_TOTAL;
+	attr->maxJobsTotal = DEFAULT_MAX_JOBS_TOTAL;
 
 	return 0;
 }
@@ -1092,7 +1110,7 @@ int TPJobSetPriority(ThreadPoolJob *job, ThreadPriority priority)
 
 int TPJobSetFreeFunction(ThreadPoolJob *job, free_routine func)
 {
-	if(!job)
+	if (!job)
 		return EINVAL;
 	job->free_func = func;
 
@@ -1119,11 +1137,11 @@ int TPAttrSetMinThreads(ThreadPoolAttr *attr, int minThreads)
 
 int TPAttrSetStackSize(ThreadPoolAttr *attr, size_t stackSize)
 {
-        if (!attr)
-                return EINVAL;
-        attr->stackSize = stackSize;
+	if (!attr)
+		return EINVAL;
+	attr->stackSize = stackSize;
 
-        return 0;
+	return 0;
 }
 
 int TPAttrSetIdleTime(ThreadPoolAttr *attr, int idleTime)
@@ -1176,21 +1194,36 @@ void ThreadPoolPrintStats(ThreadPoolStats *stats)
 {
 	if (!stats)
 		return;
-	/* some OSses time_t length may depending on platform, promote it to long for safety */
-	fprintf(stderr,"ThreadPoolStats at Time: %ld\n", (long)StatsTime(NULL));
-	fprintf(stderr,"High Jobs pending: %d\n", stats->currentJobsHQ);
-	fprintf(stderr,"Med Jobs Pending: %d\n", stats->currentJobsMQ);
-	fprintf(stderr,"Low Jobs Pending: %d\n", stats->currentJobsLQ);
-	fprintf(stderr,"Average Wait in High Priority Q in milliseconds: %f\n", stats->avgWaitHQ);
-	fprintf(stderr,"Average Wait in Med Priority Q in milliseconds: %f\n", stats->avgWaitMQ);
-	fprintf(stderr,"Averate Wait in Low Priority Q in milliseconds: %f\n", stats->avgWaitLQ);
-	fprintf(stderr,"Max Threads Active: %d\n", stats->maxThreads);
-	fprintf(stderr,"Current Worker Threads: %d\n", stats->workerThreads);
-	fprintf(stderr,"Current Persistent Threads: %d\n", stats->persistentThreads);
-	fprintf(stderr,"Current Idle Threads: %d\n", stats->idleThreads);
-	fprintf(stderr,"Total Threads : %d\n", stats->totalThreads);
-	fprintf(stderr,"Total Time spent Working in seconds: %f\n", stats->totalWorkTime);
-	fprintf(stderr,"Total Time spent Idle in seconds : %f\n", stats->totalIdleTime);
+	/* some OSses time_t length may depending on platform, promote it to
+	 * long for safety */
+	fprintf(stderr,
+		"ThreadPoolStats at Time: %ld\n",
+		(long)StatsTime(NULL));
+	fprintf(stderr, "High Jobs pending: %d\n", stats->currentJobsHQ);
+	fprintf(stderr, "Med Jobs Pending: %d\n", stats->currentJobsMQ);
+	fprintf(stderr, "Low Jobs Pending: %d\n", stats->currentJobsLQ);
+	fprintf(stderr,
+		"Average Wait in High Priority Q in milliseconds: %f\n",
+		stats->avgWaitHQ);
+	fprintf(stderr,
+		"Average Wait in Med Priority Q in milliseconds: %f\n",
+		stats->avgWaitMQ);
+	fprintf(stderr,
+		"Averate Wait in Low Priority Q in milliseconds: %f\n",
+		stats->avgWaitLQ);
+	fprintf(stderr, "Max Threads Active: %d\n", stats->maxThreads);
+	fprintf(stderr, "Current Worker Threads: %d\n", stats->workerThreads);
+	fprintf(stderr,
+		"Current Persistent Threads: %d\n",
+		stats->persistentThreads);
+	fprintf(stderr, "Current Idle Threads: %d\n", stats->idleThreads);
+	fprintf(stderr, "Total Threads : %d\n", stats->totalThreads);
+	fprintf(stderr,
+		"Total Time spent Working in seconds: %f\n",
+		stats->totalWorkTime);
+	fprintf(stderr,
+		"Total Time spent Idle in seconds : %f\n",
+		stats->totalIdleTime);
 }
 
 int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
@@ -1203,15 +1236,18 @@ int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
 
 	*stats = tp->stats;
 	if (stats->totalJobsHQ > 0)
-		stats->avgWaitHQ = stats->totalTimeHQ / (double)stats->totalJobsHQ;
+		stats->avgWaitHQ =
+			stats->totalTimeHQ / (double)stats->totalJobsHQ;
 	else
 		stats->avgWaitHQ = 0.0;
 	if (stats->totalJobsMQ > 0)
-		stats->avgWaitMQ = stats->totalTimeMQ / (double)stats->totalJobsMQ;
+		stats->avgWaitMQ =
+			stats->totalTimeMQ / (double)stats->totalJobsMQ;
 	else
 		stats->avgWaitMQ = 0.0;
 	if (stats->totalJobsLQ > 0)
-		stats->avgWaitLQ = stats->totalTimeLQ / (double)stats->totalJobsLQ;
+		stats->avgWaitLQ =
+			stats->totalTimeLQ / (double)stats->totalJobsLQ;
 	else
 		stats->avgWaitLQ = 0.0;
 	stats->totalThreads = tp->totalThreads;
@@ -1229,40 +1265,40 @@ int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
 #endif /* STATS */
 
 #ifdef _WIN32
-	#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-		#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
-	#else
-		#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
-	#endif
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#define DELTA_EPOCH_IN_MICROSECS 11644473600000000Ui64
+#else
+#define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
+#endif
 
-	int gettimeofday(struct timeval *tv, struct timezone *tz)
-	{
-		FILETIME ft;
-		unsigned __int64 tmpres = 0;
-		static int tzflag;
+int gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+	FILETIME ft;
+	unsigned __int64 tmpres = 0;
+	static int tzflag;
 
-		if (tv) {
-			GetSystemTimeAsFileTime(&ft);
+	if (tv) {
+		GetSystemTimeAsFileTime(&ft);
 
-			tmpres |= ft.dwHighDateTime;
-			tmpres <<= 32;
-			tmpres |= ft.dwLowDateTime;
+		tmpres |= ft.dwHighDateTime;
+		tmpres <<= 32;
+		tmpres |= ft.dwLowDateTime;
 
-			/*converting file time to unix epoch*/
-			tmpres /= 10;  /*convert into microseconds*/
-			tmpres -= DELTA_EPOCH_IN_MICROSECS; 
-			tv->tv_sec = (long)(tmpres / 1000000UL);
-			tv->tv_usec = (long)(tmpres % 1000000UL);
-		}
-		if (tz) {
-			if (!tzflag) {
-				_tzset();
-				tzflag++;
-			}
-			tz->tz_minuteswest = _timezone / 60;
-			tz->tz_dsttime = _daylight;
-		}
-
-		return 0;
+		/*converting file time to unix epoch*/
+		tmpres /= 10; /*convert into microseconds*/
+		tmpres -= DELTA_EPOCH_IN_MICROSECS;
+		tv->tv_sec = (long)(tmpres / 1000000UL);
+		tv->tv_usec = (long)(tmpres % 1000000UL);
 	}
+	if (tz) {
+		if (!tzflag) {
+			_tzset();
+			tzflag++;
+		}
+		tz->tz_minuteswest = _timezone / 60;
+		tz->tz_dsttime = _daylight;
+	}
+
+	return 0;
+}
 #endif /* _WIN32 */
