@@ -2,7 +2,7 @@
 
 branch|status
 ------|------
-Master| ![master](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg)
+master| ![master](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg)
 branch-1.12.x | ![1.10.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.12.x)
 branch-1.10.x | ![1.10.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.10.x)
 branch-1.8.x | ![1.8.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.8.x)
