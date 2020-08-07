@@ -2661,8 +2661,7 @@ int UpnpAcceptSubscription(UpnpDevice_Handle Hnd,
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
-/* Now accepts an empty state list, so the code below is
- * commented out */
+/* Now accepts an empty state list, so the code below is commented out */
 #if 0
 	if (VarName == NULL || NewVal == NULL || cVariables < 0) {
 		HandleUnlock();
@@ -2742,8 +2741,7 @@ int UpnpAcceptSubscriptionExt(UpnpDevice_Handle Hnd,
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
-/* Now accepts an empty state list, so the code below is
- * commented out */
+/* Now accepts an empty state list, so the code below is commented out */
 #if 0
 	if (PropSet == NULL) {
 		HandleUnlock();
