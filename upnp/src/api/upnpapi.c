@@ -3639,6 +3639,7 @@ int UpnpGetIfInfo(const char *IfName)
 	/* Copy interface name, if it was provided. */
 	if (IfName != NULL) {
 		if (strlen(IfName) > sizeof(gIF_NAME)) {
+			free(adapts);
 			return UPNP_E_INVALID_INTERFACE;
 		}
 
@@ -3744,6 +3745,7 @@ int UpnpGetIfInfo(const char *IfName)
 			break;
 		}
 	}
+	free(adapts);
 	/* Failed to find a valid interface, or valid address. */
 	if (ifname_found == 0 || valid_addr_found == 0) {
 		UpnpPrintf(UPNP_CRITICAL,
