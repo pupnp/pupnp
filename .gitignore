@@ -10,6 +10,7 @@
 # Normal rules
 #
 .*
+!.clang-format
 *.o
 *.o.*
 *.a
@@ -31,9 +32,6 @@ modules.builtin
 *.patch
 *.gcno
 *.sha1
-*.pro
-*.pro.user
-*.creator.user
 
 #
 # Top-level generic files
@@ -81,12 +79,16 @@ GSYMS
 GTAGS
 
 # QT-Creator files
-Makefile.am.user
-pupnp.config
-pupnp.creator
-pupnp.creator.user
-pupnp.files
-pupnp.includes
+/*.cflags
+/*.config
+/*.creator
+/*.creator.user
+/*.cxxflags
+/*.files
+/*.includes
+/*.pro
+/*.pro.user
+/Makefile.am.user
 
 *.orig
 *~
