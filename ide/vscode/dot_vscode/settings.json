@@ -1,0 +1,21 @@
+{
+  "files.associations": {
+    "list.h": "c",
+    "upnputil.h": "c",
+    "upnp.h": "c",
+    "upnpglobal.h": "c",
+    "upnpinet.h": "c",
+    "upnpunistd.h": "c",
+    "unistd.h": "c"
+  },
+  "C_Cpp.default.compilerPath": "/usr/bin",
+  "C_Cpp.default.includePath": [
+    "${workspaceFolder}",
+    "${workspaceFolder}/upnp/inc",
+    "${workspaceFolder}/upnp/src/inc",
+    "${workspaceFolder}/upnp/src/threadutil",
+    "${workspaceFolder}/ixml/inc"
+  ],
+  "C_Cpp.default.cppStandard": "c++11",
+  "C_Cpp.default.cStandard": "c11"
+}
