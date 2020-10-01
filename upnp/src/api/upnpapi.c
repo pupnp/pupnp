@@ -78,6 +78,12 @@
 #include <sys/types.h>
 #endif
 
+// ifr_netmask is not defined on eg OmniOS/Solaris, but since ifru_netmask/ifru_addr are all
+// just union members, this should work
+#ifndef ifr_netmask     // it's a define if it exists
+    #define ifr_netmask ifr_addr
+#endif
+
 #ifdef UPNP_ENABLE_OPEN_SSL
 #include <openssl/ssl.h>
 #endif
