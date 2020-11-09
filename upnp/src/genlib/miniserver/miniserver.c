@@ -854,10 +854,10 @@ static int get_miniserver_sockets(
 	}
 	/* As per the IANA specifications for the use of ports by applications
 	 * override the listen port passed in with the first available. */
-	if (listen_port4 < APPLICATION_LISTENING_PORT) {
+	if (listen_port4 == 0) {
 		listen_port4 = (uint16_t)APPLICATION_LISTENING_PORT;
 	}
-	if (listen_port6 < APPLICATION_LISTENING_PORT) {
+	if (listen_port6 == 0) {
 		listen_port6 = (uint16_t)APPLICATION_LISTENING_PORT;
 	}
 	if (listen_port6UlaGua < APPLICATION_LISTENING_PORT) {
