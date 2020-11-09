@@ -159,6 +159,11 @@ if test "x$enable_optssdp" = xyes ; then
 	enable_uuid=yes
 fi
 
+RT_BOOL_ARG_ENABLE([portrestriction], [yes], [minimum port number of 49152])
+if test "x$enable_portrestriction" = xno ; then
+        AC_DEFINE(UPNP_NO_PORT_RESTRICTION, 1, [see upnpconfig.h])
+fi
+
 RT_BOOL_ARG_ENABLE([soap], [yes], [SOAP part])
 if test "x$enable_soap" = xyes ; then
         AC_DEFINE(UPNP_HAVE_SOAP, 1, [see upnpconfig.h])

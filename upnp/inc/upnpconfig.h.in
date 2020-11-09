@@ -97,6 +97,10 @@
  *  (i.e. configure --enable-soap) */
 #undef UPNP_HAVE_SOAP
 
+/** Defined to 1 if the library has been compiled without the restriction port >= 49152
+ *  (i.e. configure --disable-port-restriction) */
+#undef UPNP_NO_PORT_RESTRICTION
+
 /** Defined to 1 if the library has been compiled with the GENA part enabled
  *  (i.e. configure --enable-gena) */
 #undef UPNP_HAVE_GENA
