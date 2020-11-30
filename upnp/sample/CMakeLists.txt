@@ -1,5 +1,6 @@
 IF (client)
 	ADD_EXECUTABLE (tv_ctrlpt
+		EXCLUDE_FROM_ALL
 		common/sample_util.c
 		common/tv_ctrlpt.c
 		linux/tv_ctrlpt_main.c
@@ -17,6 +18,7 @@ ENDIF (client)
 
 IF (client AND device)
 	ADD_EXECUTABLE (tv_combo
+		EXCLUDE_FROM_ALL
 		common/sample_util.c
 		common/tv_ctrlpt.c
 		common/tv_device.c
@@ -35,6 +37,7 @@ ENDIF (client AND device)
 
 IF (device)
 	ADD_EXECUTABLE (tv_device
+		EXCLUDE_FROM_ALL
 		common/sample_util.c
 		common/tv_device.c
 		linux/tv_device_main.c
