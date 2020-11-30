@@ -6,8 +6,8 @@ IF (client)
 	)
 
 	TARGET_INCLUDE_DIRECTORIES (tv_ctrlpt
-		PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/common
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/common
+		PRIVATE ${UPNP_BINARY_DIR}/$<CONFIG>/upnp/sample/common
 	)
 
 	TARGET_LINK_LIBRARIES (tv_ctrlpt
@@ -24,8 +24,8 @@ IF (client AND device)
 	)
 
 	TARGET_INCLUDE_DIRECTORIES (tv_combo
-		PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/common
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/common
+		PRIVATE ${UPNP_BINARY_DIR}/$<CONFIG>/upnp/sample/common
 	)
 
 	TARGET_LINK_LIBRARIES (tv_combo
@@ -41,8 +41,8 @@ IF (device)
 	)
 
 	TARGET_INCLUDE_DIRECTORIES (tv_device
-		PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/common
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/common
+		PRIVATE ${UPNP_BINARY_DIR}/$<CONFIG>/upnp/sample/common
 	)
 
 	TARGET_LINK_LIBRARIES (tv_device
