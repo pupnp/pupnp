@@ -72,10 +72,24 @@ ENDIF (EXISTS "${CMAKE_SOURCE_DIR}/.git")
 
 # Set the possible values of build type for cmake-gui
 IF (CMAKE_CONFIGURATION_TYPES)
+	SET (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE
+		STRING "Semicolon separated list of supported configuration types, only supports debug and release, anything else will be ignored" FORCE
+	)
+
 	SET_PROPERTY (CACHE CMAKE_CONFIGURATION_TYPES PROPERTY STRINGS
 		"Debug" "Release"
 	)
 ENDIF (CMAKE_CONFIGURATION_TYPES)
+
+IF (DEFINED debug AND debug)
+	SET (CMAKE_BUILD_TYPE "Debug" CACHE
+		STRING "Choose the type of build." FORCE)
+	MESSAGE (STATUS "Setting build type to Debug as specified.")
+ELSEIF (DEFINED debug AND NOT debug)
+	SET (CMAKE_BUILD_TYPE "Release" CACHE
+		STRING "Choose the type of build." FORCE)
+	MESSAGE (STATUS "Setting build type to Release as specified.")
+ENDIF (DEFINED debug AND debug)
 
 IF (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	MESSAGE (STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
