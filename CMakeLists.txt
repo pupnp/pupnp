@@ -10,6 +10,7 @@ IF (NOT UPNP_VERSION_STRING)
 
 	FOREACH (MACROFILE ${MACROFILES})
 		FILE (STRINGS ${MACROFILE} configure)
+		FILE (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm)
 
 		FOREACH (line ${configure})
 			STRING (REGEX REPLACE "\\]" "" line ${line})
