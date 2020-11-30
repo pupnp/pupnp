@@ -107,18 +107,6 @@ ELSE (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	OPTION (debug "extra debugging code" OFF)
 ENDIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-IF (debug)
-	SET (UPNP_HAVE_DEBUG 1) #see upnpconfig.h
-ENDIF (debug)
-
-IF (debug)
-	ADD_COMPILE_DEFINITIONS (DEBUG)
-	SET (DEBUG 1) #Define to 1 to compile debug code
-ELSE (debug)
-	ADD_COMPILE_DEFINITIONS (NDEBUG)
-	SET (NDEBUG 1) #Define to 1 to prevent compilation of assert()
-ENDIF (debug)
-
 #
 # Check for libupnp subsets
 #
@@ -381,10 +369,18 @@ IF (open_ssl)
 	ENDIF (NOT OPENSSL_FOUND)
 ENDIF (open_ssl)
 
-
-CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/upnp/inc/upnpconfig.h.cm ${CMAKE_CURRENT_BINARY_DIR}/upnp/inc/upnpconfig.h)
-CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/upnp/sample/common/config_sample.h.cm ${CMAKE_CURRENT_BINARY_DIR}/upnp/sample/common/config_sample.h)
-CONFIGURE_FILE (${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h)
+SET (DEBUG 1) #Define to 1 to compile debug code
+SET (NDEBUG 0) #Define to 1 to prevent compilation of assert()
+SET (UPNP_HAVE_DEBUG 1) #see upnpconfig.h
+CONFIGURE_FILE (${UPNP_SOURCE_DIR}/upnp/inc/upnpconfig.h.cm ${UPNP_BINARY_DIR}/Debug/upnp/inc/upnpconfig.h)
+CONFIGURE_FILE (${UPNP_SOURCE_DIR}/upnp/sample/common/config_sample.h.cm ${UPNP_BINARY_DIR}/Debug/upnp/sample/common/config_sample.h)
+CONFIGURE_FILE (${UPNP_BINARY_DIR}/autoconfig.h.cm ${UPNP_BINARY_DIR}/Debug/autoconfig.h)
+SET (UPNP_HAVE_DEBUG 0) #see upnpconfig.h
+SET (DEBUG 0) #Define to 1 to compile debug code
+SET (NDEBUG 1) #Define to 1 to prevent compilation of assert()
+CONFIGURE_FILE (${UPNP_SOURCE_DIR}/upnp/inc/upnpconfig.h.cm ${UPNP_BINARY_DIR}/Release/upnp/inc/upnpconfig.h)
+CONFIGURE_FILE (${UPNP_SOURCE_DIR}/upnp/sample/common/config_sample.h.cm ${UPNP_BINARY_DIR}/Release/upnp/sample/common/config_sample.h)
+CONFIGURE_FILE (${UPNP_BINARY_DIR}/autoconfig.h.cm ${UPNP_BINARY_DIR}/Release/autoconfig.h)
 
 ADD_SUBDIRECTORY (ixml)
 ADD_SUBDIRECTORY (upnp)
