@@ -173,6 +173,10 @@ IF (WIN32)
 	)
 ENDIF (WIN32)
 
+TARGET_LINK_LIBRARIES (upnp_shared
+	PUBLIC ixml_shared
+	PUBLIC Threads::Threads
+)
 
 IF (UPNP_ENABLE_OPEN_SSL)
 	TARGET_LINK_LIBRARIES (upnp_shared
