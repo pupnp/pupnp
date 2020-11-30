@@ -100,15 +100,6 @@ IF (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 ENDIF (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 
 #
-# Check for DEBUG flag
-#
-IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	OPTION (debug "extra debugging code" ON)
-ELSE (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	OPTION (debug "extra debugging code" OFF)
-ENDIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
-
-#
 # Check for libupnp subsets
 #
 OPTION (client "control point code (client)" ON)

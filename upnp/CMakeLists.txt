@@ -24,6 +24,7 @@ SET (UPNP_SOURCES
 	src/api/SubscriptionRequest.c
 	src/api/UpnpString.c
 	src/api/upnpapi.c
+	src/api/upnpdebug.c
 	src/genlib/client_table/ClientSubscription.c
 	src/genlib/client_table/client_table.c
 	src/genlib/miniserver/miniserver.c
@@ -46,12 +47,6 @@ SET (UPNP_SOURCES
 	src/threadutil/TimerThread.c
 	src/urlconfig/urlconfig.c
 )
-
-IF (debug)
-	LIST (APPEND UPNP_SOURCES
-		src/api/upnpdebug.c 
-	)
-ENDIF (debug)
 
 IF (gena)
 	LIST (APPEND UPNP_SOURCES
