@@ -11,7 +11,7 @@ IF (samples)
 	ADD_SUBDIRECTORY (sample)
 ENDIF (samples)
 
-ADD_LIBRARY (upnp_objects OBJECT
+SET (UPNP_SOURCES
 	src/api/ActionComplete.c
 	src/api/ActionRequest.c
 	src/api/Discovery.c
@@ -47,83 +47,70 @@ ADD_LIBRARY (upnp_objects OBJECT
 	src/urlconfig/urlconfig.c
 )
 
-TARGET_INCLUDE_DIRECTORIES (upnp_objects
-	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/inc/
-	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc/
-	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/inc/
-	PUBLIC ${UPNP_BINARY_DIR}
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
-)
-
-TARGET_LINK_LIBRARIES (upnp_objects
-	PUBLIC ixml_objects
-)
-
 IF (debug)
-	SET_PROPERTY (TARGET upnp_objects
-		APPEND PROPERTY SOURCES
-			src/api/upnpdebug.c 
-	)
-
-	TARGET_COMPILE_DEFINITIONS (upnp_objects
-		PRIVATE STATS
+	LIST (APPEND UPNP_SOURCES
+		src/api/upnpdebug.c 
 	)
 ENDIF (debug)
 
 IF (gena)
-	SET_PROPERTY (TARGET upnp_objects
-		APPEND PROPERTY SOURCES
-			src/gena/gena_device.c
-			src/gena/gena_ctrlpt.c
-			src/gena/gena_callback2.c
+	LIST (APPEND UPNP_SOURCES
+		src/gena/gena_device.c
+		src/gena/gena_ctrlpt.c
+		src/gena/gena_callback2.c
 	)
 ENDIF (gena)
 
 IF (soap)
-	SET_PROPERTY (TARGET upnp_objects
-		APPEND PROPERTY SOURCES
-			src/soap/soap_device.c
-			src/soap/soap_ctrlpt.c
-			src/soap/soap_common.c
+	LIST (APPEND UPNP_SOURCES
+		src/soap/soap_device.c
+		src/soap/soap_ctrlpt.c
+		src/soap/soap_common.c
 	)
 ENDIF (soap)
 
 IF (ssdp)
-	SET_PROPERTY (TARGET upnp_objects
-		APPEND PROPERTY SOURCES
-			src/ssdp/ssdp_ResultData.c
-			src/ssdp/ssdp_ResultData.h
-			src/ssdp/ssdp_device.c
-			src/ssdp/ssdp_ctrlpt.c
-			src/ssdp/ssdp_server.c
+	LIST (APPEND UPNP_SOURCES
+		src/ssdp/ssdp_ResultData.c
+		src/ssdp/ssdp_device.c
+		src/ssdp/ssdp_ctrlpt.c
+		src/ssdp/ssdp_server.c
 	)
 ENDIF (ssdp)
 
 IF (tools)
-	SET_PROPERTY (TARGET upnp_objects
-		APPEND PROPERTY SOURCES
-			src/api/upnptools.c
+	LIST (APPEND UPNP_SOURCES
+		src/api/upnptools.c
 	)
 ENDIF (tools)
 
 IF (uuid)
-	SET_PROPERTY (TARGET upnp_objects
-		APPEND PROPERTY SOURCES
-			src/uuid/md5.c
-			src/uuid/sysdep.c
-			src/uuid/uuid.c
+	LIST (APPEND UPNP_SOURCES
+		src/uuid/md5.c
+		src/uuid/sysdep.c
+		src/uuid/uuid.c
 	)
 ENDIF (uuid)
 
-SET_TARGET_PROPERTIES (upnp_objects PROPERTIES
-	POSITION_INDEPENDENT_CODE 1
-)
-
 ADD_LIBRARY (upnp_shared SHARED
-	$<TARGET_OBJECTS:upnp_objects>
+	${UPNP_SOURCES}
 )
 
 ADD_LIBRARY (UPNP::SHARED ALIAS upnp_shared)
+
+TARGET_COMPILE_DEFINITIONS (upnp_shared
+	PRIVATE $<$<CONFIG:Debug>:STATS>
+	PRIVATE $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+)
+
+TARGET_INCLUDE_DIRECTORIES (upnp_shared
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
+	PRIVATE $<TARGET_PROPERTY:ixml_static,INTERFACE_INCLUDE_DIRECTORIES>
+	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
+	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
+	PUBLIC $<BUILD_INTERFACE:${UPNP_BINARY_DIR}/$<CONFIG>>
+	PUBLIC $<BUILD_INTERFACE:${UPNP_BINARY_DIR}/$<CONFIG>/upnp/inc/>
+)
 
 LIST (APPEND UPNP_HEADERS
 	inc/ActionComplete.h
@@ -144,12 +131,13 @@ LIST (APPEND UPNP_HEADERS
 	inc/TemplateUndef.h
 	inc/UpnpString.h
 	inc/upnp.h
-	inc/upnpdebug.h
 	inc/UpnpGlobal.h
 	inc/UpnpInet.h
 	inc/UpnpIntTypes.h
 	inc/UpnpStdInt.h
 	inc/UpnpUniStd.h
+	$<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/inc/upnpdebug.h>
+	${UPNP_BINARY_DIR}/Release/upnp/inc/upnpconfig.h
 )
 
 IF (ENABLE_TOOLS)
@@ -166,14 +154,33 @@ SET_TARGET_PROPERTIES (upnp_shared PROPERTIES
 	PUBLIC_HEADER "${UPNP_HEADERS}"
 )
 
-TARGET_INCLUDE_DIRECTORIES (upnp_shared
-	INTERFACE $<BUILD_INTERFACE:$<TARGET_PROPERTY:upnp_objects,INTERFACE_INCLUDE_DIRECTORIES>>
+TARGET_COMPILE_DEFINITIONS (upnp_shared
+	PRIVATE $<$<CONFIG:Debug>:STATS>
+	PRIVATE $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	PRIVATE $<TARGET_PROPERTY:ixml_shared,INTERFACE_COMPILE_DEFINITIONS>
 )
 
-TARGET_LINK_LIBRARIES (upnp_shared
-	INTERFACE ixml_shared
-	INTERFACE Threads::Threads
+TARGET_INCLUDE_DIRECTORIES (upnp_shared
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
+#OTHER	PRIVATE $<TARGET_PROPERTY:ixml_static,INTERFACE_INCLUDE_DIRECTORIES>
+	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
+	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
+	PUBLIC $<BUILD_INTERFACE:${UPNP_BINARY_DIR}/$<CONFIG>>
+	PUBLIC $<BUILD_INTERFACE:${UPNP_BINARY_DIR}/$<CONFIG>/upnp/inc/>
+	PRIVATE $<TARGET_PROPERTY:Threads::Threads,INTERFACE_INCLUDE_DIRECTORIES>
 )
+
+#IF (WIN32)
+#	TARGET_LINK_LIBRARIES (upnp_shared
+#		PRIVATE ixml_shared
+#		PRIVATE Threads::Static
+#	)
+#ELSE (WIN32)
+	TARGET_LINK_LIBRARIES (upnp_shared
+		INTERFACE ixml_shared
+		INTERFACE Threads::Threads
+	)
+#ENDIF (WIN32)
 
 IF (UPNP_ENABLE_OPEN_SSL)
 	TARGET_LINK_LIBRARIES (upnp_shared
@@ -189,23 +196,44 @@ INSTALL (TARGETS upnp_shared
 )
 
 ADD_LIBRARY (upnp_static STATIC
-	$<TARGET_OBJECTS:upnp_objects>
+	${UPNP_SOURCES}
 )
 
 ADD_LIBRARY (UPNP::STATIC ALIAS upnp_static)
+
+TARGET_COMPILE_DEFINITIONS (upnp_static
+	PRIVATE UPNP_STATIC_LIB
+	PRIVATE $<$<CONFIG:Debug>:STATS>
+	PRIVATE $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	PRIVATE $<TARGET_PROPERTY:ixml_static,INTERFACE_COMPILE_DEFINITIONS>
+)
+
+TARGET_INCLUDE_DIRECTORIES (upnp_static
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
+	PRIVATE $<TARGET_PROPERTY:ixml_static,INTERFACE_INCLUDE_DIRECTORIES>
+	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
+	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
+	PUBLIC $<BUILD_INTERFACE:${UPNP_BINARY_DIR}/$<CONFIG>>
+	PUBLIC $<BUILD_INTERFACE:${UPNP_BINARY_DIR}/$<CONFIG>/upnp/inc/>
+	PRIVATE $<TARGET_PROPERTY:Threads::Threads,INTERFACE_INCLUDE_DIRECTORIES>
+)
 
 SET_TARGET_PROPERTIES(upnp_static PROPERTIES
 	OUTPUT_NAME upnp
 	EXPORT_NAME UPNP::STATIC
 )
 
-TARGET_INCLUDE_DIRECTORIES (upnp_static
-	INTERFACE $<BUILD_INTERFACE:$<TARGET_PROPERTY:upnp_objects,INTERFACE_INCLUDE_DIRECTORIES>>
-)
-
-TARGET_LINK_LIBRARIES (upnp_static
-	INTERFACE ixml_static
-)
+#IF (WIN32)
+#	TARGET_LINK_LIBRARIES (upnp_static
+#		PUBLIC ixml_static
+#		PRIVATE Threads::Static
+#	)
+#ELSE (WIN32)
+	TARGET_LINK_LIBRARIES (upnp_static
+		INTERFACE ixml_static
+		INTERFACE Threads::Threads
+	)
+#ENDIF (WIN32)
 
 IF (UPNP_ENABLE_OPEN_SSL)
 	TARGET_LINK_LIBRARIES (upnp_static

@@ -2,43 +2,38 @@
 
 ADD_SUBDIRECTORY (test)
 
-ADD_LIBRARY (ixml_objects OBJECT
+SET (IXML_SOURCES
 	src/attr.c
 	src/document.c
 	src/element.c
-	src/inc/ixmlmembuf.h
-	src/inc/ixmlparser.h
 	src/ixml.c
 	src/ixmldebug.c
-	src/ixmlparser.c
 	src/ixmlmembuf.c
+	src/ixmlparser.c
 	src/namedNodeMap.c
 	src/node.c
 	src/nodeList.c
 )
 
-IF (script_support)
-	TARGET_COMPILE_DEFINITIONS (
-		PRIVATE IXML_HAVE_SCRIPTSUPPORT
-	)
-ENDIF (script_support)
-
-TARGET_INCLUDE_DIRECTORIES (ixml_objects
-	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc/
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/inc/
-	PRIVATE ${UPNP_BINARY_DIR}/
-	PRIVATE ${UPNP_SOURCE_DIR}/upnp/inc/
-)
-
-SET_PROPERTY (TARGET ixml_objects
-	PROPERTY POSITION_INDEPENDENT_CODE 1
-)
-
 ADD_LIBRARY (ixml_shared SHARED
-	$<TARGET_OBJECTS:ixml_objects>
+	${IXML_SOURCES}
 )
 
 ADD_LIBRARY (IXML::SHARED ALIAS ixml_shared)
+
+TARGET_COMPILE_DEFINITIONS (ixml_shared
+	PRIVATE $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	PRIVATE $<$<BOOL:${script_support}>:IXML_HAVE_SCRIPTSUPPORT>
+	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
+	PUBLIC $<$<BOOL:${MSVC}>:LIBUPNP_EXPORTS>
+)
+
+TARGET_INCLUDE_DIRECTORIES (ixml_shared
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/inc/
+	PRIVATE ${UPNP_BINARY_DIR}/$<CONFIG>/
+	PRIVATE ${UPNP_SOURCE_DIR}/upnp/inc/
+	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
+)
 
 LIST (APPEND IXML_HEADERS
 	inc/ixml.h
@@ -61,13 +56,35 @@ INSTALL (TARGETS ixml_shared
 )
 
 ADD_LIBRARY (ixml_static STATIC
-	$<TARGET_OBJECTS:ixml_objects>
+	${IXML_SOURCES}
 )
 
 ADD_LIBRARY (IXML::STATIC ALIAS ixml_static)
+
 SET_TARGET_PROPERTIES(ixml_static PROPERTIES
 	OUTPUT_NAME ixml
 	EXPORT_NAME IXML::STATIC
+)
+
+TARGET_COMPILE_DEFINITIONS (ixml_static
+	PRIVATE UPNP_STATIC_LIB
+	PRIVATE $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	PRIVATE $<$<BOOL:${script_support}>:IXML_HAVE_SCRIPTSUPPORT>
+	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
+
+)
+
+IF (script_support)
+	TARGET_COMPILE_DEFINITIONS (ixml_static
+		PRIVATE IXML_HAVE_SCRIPTSUPPORT
+	)
+ENDIF (script_support)
+
+TARGET_INCLUDE_DIRECTORIES (ixml_static
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/inc/
+	PRIVATE ${UPNP_BINARY_DIR}/$<CONFIG>/
+	PRIVATE ${UPNP_SOURCE_DIR}/upnp/inc/
+	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
 )
 
 INSTALL (TARGETS ixml_static
