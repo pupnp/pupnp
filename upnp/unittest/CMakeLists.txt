@@ -1,4 +1,5 @@
 ADD_EXECUTABLE (test_upnp_unittest
+	EXCLUDE_FROM_ALL
 	main.c
 	templates/FirstObject.c
 	templates/templates.c
@@ -10,6 +11,7 @@ TARGET_LINK_LIBRARIES (test_upnp_unittest
 )
 
 ADD_EXECUTABLE (test_upnp_unittest_static
+	EXCLUDE_FROM_ALL
 	main.c
 	templates/FirstObject.c
 	templates/templates.c
