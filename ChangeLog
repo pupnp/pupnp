@@ -4,7 +4,13 @@ Version 1.14.1
 
 2020-11-30 Marcelo Jimenez <marcelo.jimenez(at)gmail.com>
 
-        GitHub #203 by Vollstrecker
+        GitHub #203 by Vollstrecker, part 2.
+
+        Fixes the inclusion of alloca.h in WIN32.
+
+2020-11-30 Marcelo Jimenez <marcelo.jimenez(at)gmail.com>
+
+        GitHub #203 by Vollstrecker, part 1.
 
         Remove the now unused file ClientSubscription.c.
 
