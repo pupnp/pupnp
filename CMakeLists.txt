@@ -391,38 +391,73 @@ FILE (GLOB XML_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/ixml/test/testdata/*.xml
 )
 
-ADD_CUSTOM_TARGET (check
-	COMMAND ${CMAKE_CTEST_COMMAND}
-	DEPENDS ixml_test
-		test_init
-		test_list
-		test_log
-		test_url
-		unittest
+IF (NOT TARGET check)
+	ADD_CUSTOM_TARGET (check
+		COMMAND ${CMAKE_CTEST_COMMAND}
+	)
+ENDIF (NOT TARGET check)
+
+ADD_DEPENDENCIES (check
+	test_ixml_shared
+	test_ixml_static
+	test_upnp_init
+	test_upnp_init_static
+	test_upnp_list
+	test_upnp_list_static
+	test_upnp_log
+	test_upnp_log_static
+	test_upnp_url
+	test_upnp_url_static
+	test_upnp_unittest
+	test_upnp_unittest_static
 )
 
-ADD_TEST (NAME IXML_TEST
-	COMMAND ixml_test ${XML_FILES}
+ADD_TEST (NAME TEST_IXML_SHARED
+	COMMAND test_ixml_shared ${XML_FILES}
 )
 
-ADD_TEST (NAME UPNP_INIT
-	COMMAND test_init
+ADD_TEST (NAME TEST_IXML_STATIC
+	COMMAND test_ixml_static ${XML_FILES}
 )
 
-ADD_TEST (NAME UPNP_LIST
-	COMMAND test_list
+ADD_TEST (NAME TEST_UPNP_INIT
+	COMMAND test_upnp_init
 )
 
-ADD_TEST (NAME UPNP_LOG
-	COMMAND test_log
+ADD_TEST (NAME TEST_UPNP_INIT_STATIC
+	COMMAND test_upnp_init_static
 )
 
-ADD_TEST (NAME UPNP_URL
-	COMMAND test_url
+ADD_TEST (NAME TEST_UPNP_LIST
+	COMMAND test_upnp_list
 )
 
-ADD_TEST (NAME UNITTEST
-	COMMAND unittest
+ADD_TEST (NAME TEST_UPNP_LIST_STATIC
+	COMMAND test_upnp_list_static
+)
+
+ADD_TEST (NAME TEST_UPNP_LOG
+	COMMAND test_upnp_log
+)
+
+ADD_TEST (NAME TEST_UPNP_LOG_STATIC
+	COMMAND test_upnp_log_static
+)
+
+ADD_TEST (NAME TEST_UPNP_URL
+	COMMAND test_upnp_url
+)
+
+ADD_TEST (NAME TEST_UPNP_URL_STATIC
+	COMMAND test_upnp_url_static
+)
+
+ADD_TEST (NAME TEST_UPNP_UNITTEST
+	COMMAND test_upnp_unittest
+)
+
+ADD_TEST (NAME TEST_UPNP_UNITTEST_STATIC
+	COMMAND test_upnp_unittest_static
 )
 
 INSTALL (EXPORT UPNP-Export
