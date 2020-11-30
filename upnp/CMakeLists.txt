@@ -228,7 +228,7 @@ SET_TARGET_PROPERTIES(upnp_static PROPERTIES
 #ELSE (WIN32)
 	TARGET_LINK_LIBRARIES (upnp_static
 		INTERFACE ixml_static
-		INTERFACE Threads::Threads
+		INTERFACE Threads::Static
 	)
 #ENDIF (WIN32)
 
