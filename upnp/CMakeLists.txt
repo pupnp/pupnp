@@ -211,8 +211,8 @@ SET_TARGET_PROPERTIES(upnp_static PROPERTIES
 )
 
 TARGET_LINK_LIBRARIES (upnp_static
-	INTERFACE ixml_static
-	INTERFACE Threads::Static
+	PUBLIC ixml_static
+	PUBLIC Threads::Static
 )
 
 IF (UPNP_ENABLE_OPEN_SSL)
