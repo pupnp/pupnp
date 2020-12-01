@@ -216,17 +216,10 @@ SET_TARGET_PROPERTIES(upnp_static PROPERTIES
 	EXPORT_NAME UPNP::STATIC
 )
 
-#IF (WIN32)
-#	TARGET_LINK_LIBRARIES (upnp_static
-#		PUBLIC ixml_static
-#		PRIVATE Threads::Static
-#	)
-#ELSE (WIN32)
-	TARGET_LINK_LIBRARIES (upnp_static
-		INTERFACE ixml_static
-		INTERFACE Threads::Static
-	)
-#ENDIF (WIN32)
+TARGET_LINK_LIBRARIES (upnp_static
+	INTERFACE ixml_static
+	INTERFACE Threads::Static
+)
 
 IF (UPNP_ENABLE_OPEN_SSL)
 	TARGET_LINK_LIBRARIES (upnp_static
