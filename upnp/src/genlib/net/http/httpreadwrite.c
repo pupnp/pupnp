@@ -2285,7 +2285,7 @@ void get_sdk_info(char *info, size_t infoSize)
 		snprintf(info,
 			infoSize,
 			"%d.%d.%d %d/%s, UPnP/1.0, Portable SDK for UPnP "
-			"devices/" PACKAGE_VERSION "\r\n",
+			"devices/" UPNP_VERSION_STRING "\r\n",
 			versioninfo.dwMajorVersion,
 			versioninfo.dwMinorVersion,
 			versioninfo.dwBuildNumber,
@@ -2303,7 +2303,7 @@ void get_sdk_info(char *info, size_t infoSize)
 	snprintf(info,
 		infoSize,
 		"%s/%s, UPnP/1.0, Portable SDK for UPnP "
-		"devices/" PACKAGE_VERSION "\r\n",
+		"devices/" UPNP_VERSION_STRING "\r\n",
 		sys_info.sysname,
 		sys_info.release);
 	#endif
