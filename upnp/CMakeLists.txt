@@ -11,16 +11,16 @@ IF (samples)
 ENDIF (samples)
 
 SET (UPNP_SOURCES
-	src/api/UPNPActionComplete.c
-	src/api/UPNPActionRequest.c
-	src/api/UPNPDiscovery.c
-	src/api/UPNPEvent.c
-	src/api/UPNPEventSubscribe.c
-	src/api/UPNPExtraHeaders.c
-	src/api/UPNPFileInfo.c
-	src/api/UPNPStateVarComplete.c
-	src/api/UPNPStateVarRequest.c
-	src/api/UPNPSubscriptionRequest.c
+	src/api/UpnpActionComplete.c
+	src/api/UpnpActionRequest.c
+	src/api/UpnpDiscovery.c
+	src/api/UpnpEvent.c
+	src/api/UpnpEventSubscribe.c
+	src/api/UpnpExtraHeaders.c
+	src/api/UpnpFileInfo.c
+	src/api/UpnpStateVarComplete.c
+	src/api/UpnpStateVarRequest.c
+	src/api/UpnpSubscriptionRequest.c
 	src/api/UpnpString.c
 	src/api/upnpapi.c
 	src/api/upnpdebug.c
@@ -111,8 +111,8 @@ LIST (APPEND UPNP_HEADERS
 	inc/ithread.h
 	inc/list.h
 	inc/upnp.h
-	inc/UPNPActionComplete.h
-	inc/UPNPActionRequest.h
+	inc/UpnpActionComplete.h
+	inc/UpnpActionRequest.h
 	inc/UpnpDiscovery.h
 	inc/UpnpEvent.h
 	inc/UpnpEventSubscribe.h
