@@ -129,7 +129,7 @@ LIST (APPEND UPNP_HEADERS
 	inc/UpnpSubscriptionRequest.h
 	inc/UpnpUniStd.h
 	$<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/inc/upnpdebug.h>
-	${UPNP_BINARY_DIR}/Release/upnp/inc/upnpconfig.h
+	${UPNP_BINARY_DIR}/upnp/inc/upnpconfig.h
 )
 
 IF (ENABLE_TOOLS)
