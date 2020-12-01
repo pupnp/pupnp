@@ -5,27 +5,26 @@
 # #
 
 ADD_SUBDIRECTORY (test)
-ADD_SUBDIRECTORY (unittest)
 
 IF (samples)
 	ADD_SUBDIRECTORY (sample)
 ENDIF (samples)
 
 SET (UPNP_SOURCES
-	src/api/ActionComplete.c
-	src/api/ActionRequest.c
-	src/api/Discovery.c
-	src/api/Event.c
-	src/api/EventSubscribe.c
-	src/api/ExtraHeaders.c
-	src/api/FileInfo.c
-	src/api/StateVarComplete.c
-	src/api/StateVarRequest.c
-	src/api/SubscriptionRequest.c
+	src/api/UPNPActionComplete.c
+	src/api/UPNPActionRequest.c
+	src/api/UPNPDiscovery.c
+	src/api/UPNPEvent.c
+	src/api/UPNPEventSubscribe.c
+	src/api/UPNPExtraHeaders.c
+	src/api/UPNPFileInfo.c
+	src/api/UPNPStateVarComplete.c
+	src/api/UPNPStateVarRequest.c
+	src/api/UPNPSubscriptionRequest.c
 	src/api/UpnpString.c
 	src/api/upnpapi.c
 	src/api/upnpdebug.c
-	src/genlib/client_table/ClientSubscription.c
+	src/genlib/client_table/GenlibClientSubscription.c
 	src/genlib/client_table/client_table.c
 	src/genlib/miniserver/miniserver.c
 	src/genlib/net/sock.c
@@ -66,7 +65,8 @@ ENDIF (soap)
 
 IF (ssdp)
 	LIST (APPEND UPNP_SOURCES
-		src/ssdp/ssdp_ResultData.c
+		src/ssdp/SSDPResultData.c
+		src/ssdp/SSDPResultDataCallback.c
 		src/ssdp/ssdp_device.c
 		src/ssdp/ssdp_ctrlpt.c
 		src/ssdp/ssdp_server.c
@@ -108,28 +108,25 @@ TARGET_INCLUDE_DIRECTORIES (upnp_shared
 )
 
 LIST (APPEND UPNP_HEADERS
-	inc/ActionComplete.h
-	inc/ActionRequest.h
 	inc/Callback.h
-	inc/Discovery.h
-	inc/Event.h
-	inc/EventSubscribe.h
-	inc/ExtraHeaders.h
-	inc/FileInfo.h
 	inc/ithread.h
 	inc/list.h
-	inc/StateVarComplete.h
-	inc/StateVarRequest.h
-	inc/SubscriptionRequest.h
-	inc/TemplateInclude.h
-	inc/TemplateSource.h
-	inc/TemplateUndef.h
-	inc/UpnpString.h
 	inc/upnp.h
+	inc/UPNPActionComplete.h
+	inc/UPNPActionRequest.h
+	inc/UpnpDiscovery.h
+	inc/UpnpEvent.h
+	inc/UpnpEventSubscribe.h
+	inc/UpnpExtraHeaders.h
+	inc/UpnpFileInfo.h
 	inc/UpnpGlobal.h
 	inc/UpnpInet.h
 	inc/UpnpIntTypes.h
+	inc/UpnpStateVarComplete.h
+	inc/UpnpStateVarRequest.h
 	inc/UpnpStdInt.h
+	inc/UpnpString.h
+	inc/UpnpSubscriptionRequest.h
 	inc/UpnpUniStd.h
 	$<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/inc/upnpdebug.h>
 	${UPNP_BINARY_DIR}/Release/upnp/inc/upnpconfig.h

@@ -393,8 +393,6 @@ ADD_DEPENDENCIES (check
 	test_upnp_log_static
 	test_upnp_url
 	test_upnp_url_static
-	test_upnp_unittest
-	test_upnp_unittest_static
 )
 
 ADD_TEST (NAME TEST_IXML_SHARED
