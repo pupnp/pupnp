@@ -128,7 +128,7 @@ LIST (APPEND UPNP_HEADERS
 	inc/UpnpString.h
 	inc/UpnpSubscriptionRequest.h
 	inc/UpnpUniStd.h
-	$<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/inc/upnpdebug.h>
+	${CMAKE_CURRENT_SOURCE_DIR}/inc/upnpdebug.h
 	${UPNP_BINARY_DIR}/upnp/inc/upnpconfig.h
 )
 
