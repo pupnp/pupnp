@@ -236,14 +236,3 @@ INSTALL (TARGETS upnp_static
 INSTALL (EXPORT UPNPCONFIG
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
 )
-
-# # inet_pton (needed on Win32, compiles to nothing elsewhere)
-# libupnp_la_SOURCES += \
-# 	src/inet_pton.c \
-# 	src/inc/inet_pton.h
-# 
-# EXTRA_DIST = \
-# 	m4/libupnp.m4 \
-# 	src/win_dll.c
-# 
-# CLEANFILES = libupnp_err.log libupnp_info.log
