@@ -75,10 +75,6 @@
  * optional features have been included in the installed library.
  */
 
-/** Defined to 1 if the library has been compiled with DEBUG enabled
- *  (i.e. configure --enable-debug) : <upnp/upnpdebug.h> file is available */
-#cmakedefine UPNP_HAVE_DEBUG 1
-
 /** Defined to 1 if the library has been compiled with client API enabled
  *  (i.e. configure --enable-client) */
 #cmakedefine UPNP_HAVE_CLIENT 1

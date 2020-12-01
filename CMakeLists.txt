@@ -8,6 +8,8 @@ IF (NOT UPNP_VERSION_STRING)
 	)
 
 	LIST (APPEND MACROFILES ${CMAKE_CURRENT_SOURCE_DIR}/configure.ac)
+	LIST (APPEND WRITTEN_VARS DEBUG)
+	LIST (APPEND WRITTEN_VARS NDEBUG)
 
 	FOREACH (MACROFILE ${MACROFILES})
 		FILE (STRINGS ${MACROFILE} configure)
@@ -354,18 +356,9 @@ IF (open_ssl)
 	ENDIF (NOT OPENSSL_FOUND)
 ENDIF (open_ssl)
 
-SET (DEBUG 1) #Define to 1 to compile debug code
-SET (NDEBUG 0) #Define to 1 to prevent compilation of assert()
-SET (UPNP_HAVE_DEBUG 1) #see upnpconfig.h
-CONFIGURE_FILE (${UPNP_SOURCE_DIR}/upnp/inc/upnpconfig.h.cm ${UPNP_BINARY_DIR}/Debug/upnp/inc/upnpconfig.h)
-CONFIGURE_FILE (${UPNP_SOURCE_DIR}/upnp/sample/common/config_sample.h.cm ${UPNP_BINARY_DIR}/Debug/upnp/sample/common/config_sample.h)
-CONFIGURE_FILE (${UPNP_BINARY_DIR}/autoconfig.h.cm ${UPNP_BINARY_DIR}/Debug/autoconfig.h)
-SET (UPNP_HAVE_DEBUG 0) #see upnpconfig.h
-SET (DEBUG 0) #Define to 1 to compile debug code
-SET (NDEBUG 1) #Define to 1 to prevent compilation of assert()
-CONFIGURE_FILE (${UPNP_SOURCE_DIR}/upnp/inc/upnpconfig.h.cm ${UPNP_BINARY_DIR}/Release/upnp/inc/upnpconfig.h)
-CONFIGURE_FILE (${UPNP_SOURCE_DIR}/upnp/sample/common/config_sample.h.cm ${UPNP_BINARY_DIR}/Release/upnp/sample/common/config_sample.h)
-CONFIGURE_FILE (${UPNP_BINARY_DIR}/autoconfig.h.cm ${UPNP_BINARY_DIR}/Release/autoconfig.h)
+CONFIGURE_FILE (${UPNP_SOURCE_DIR}/upnp/inc/upnpconfig.h.cm ${UPNP_BINARY_DIR}/upnp/inc/upnpconfig.h)
+CONFIGURE_FILE (${UPNP_SOURCE_DIR}/upnp/sample/common/config_sample.h.cm ${UPNP_BINARY_DIR}/upnp/sample/common/config_sample.h)
+CONFIGURE_FILE (${UPNP_BINARY_DIR}/autoconfig.h.cm ${UPNP_BINARY_DIR}/autoconfig.h)
 
 ADD_SUBDIRECTORY (ixml)
 ADD_SUBDIRECTORY (upnp)
