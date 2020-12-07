@@ -1,9 +1,3 @@
-# #
-# # "Makefile.am" for "libupnp/upnp"
-# #
-# # Copyright (C) 2005 Rémi Turboult <r3mi@users.sourceforge.net>
-# #
-
 IF (BUILD_TESTING)
 	ADD_SUBDIRECTORY (test)
 ENDIF (BUILD_TESTING)
