@@ -403,29 +403,9 @@ CONFIGURE_FILE (${UPNP_BINARY_DIR}/autoconfig.h.cm ${UPNP_BINARY_DIR}/autoconfig
 ADD_SUBDIRECTORY (ixml)
 ADD_SUBDIRECTORY (upnp)
 
-ENABLE_TESTING()
 
 FILE (GLOB XML_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/ixml/test/testdata/*.xml
-)
-
-IF (NOT TARGET check)
-	ADD_CUSTOM_TARGET (check
-		COMMAND ${CMAKE_CTEST_COMMAND}
-	)
-ENDIF (NOT TARGET check)
-
-ADD_DEPENDENCIES (check
-	test_ixml_shared
-	test_ixml_static
-	test_upnp_init
-	test_upnp_init_static
-	test_upnp_list
-	test_upnp_list_static
-	test_upnp_log
-	test_upnp_log_static
-	test_upnp_url
-	test_upnp_url_static
 )
 
 ADD_TEST (NAME TEST_IXML_SHARED
