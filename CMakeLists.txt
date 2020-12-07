@@ -403,19 +403,6 @@ CONFIGURE_FILE (${UPNP_BINARY_DIR}/autoconfig.h.cm ${UPNP_BINARY_DIR}/autoconfig
 ADD_SUBDIRECTORY (ixml)
 ADD_SUBDIRECTORY (upnp)
 
-
-FILE (GLOB XML_FILES
-	${CMAKE_CURRENT_SOURCE_DIR}/ixml/test/testdata/*.xml
-)
-
-ADD_TEST (NAME TEST_IXML_SHARED
-	COMMAND test_ixml_shared ${XML_FILES}
-)
-
-ADD_TEST (NAME TEST_IXML_STATIC
-	COMMAND test_ixml_static ${XML_FILES}
-)
-
 ADD_TEST (NAME TEST_UPNP_INIT
 	COMMAND test_upnp_init
 )
