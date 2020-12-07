@@ -4,7 +4,9 @@
 # # Copyright (C) 2005 Rémi Turboult <r3mi@users.sourceforge.net>
 # #
 
-ADD_SUBDIRECTORY (test)
+IF (BUILD_TESTING)
+	ADD_SUBDIRECTORY (test)
+ENDIF (BUILD_TESTING)
 
 IF (samples)
 	ADD_SUBDIRECTORY (sample)
