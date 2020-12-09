@@ -324,6 +324,24 @@ For building a static library instead of a DLL and for using the static pthreads
 UPNP_STATIC_LIB - for creating a statically linkable UPnP-library
 PTW32_STATIC_LIB - for using the static pthreads32 library
 
+### 5.7 - CMake Build
+
+In Order to build everything using the cmake buildsystem, you just need to install cmake for your plattform.
+Standalone cmake is recommended, IDE's like Visial Studio have built-in support which works, but as cmake in general
+encourages out-of-source builds and VS writes it's config into the source, cmake-gui should be used on windows.
+
+All known options have the same meaning as stated in point 5.2. In Addition 2 options have been added.
+
+- DOWNLOAD_AND_BUILD_DEP: This option is only available if a useable git programm was found on your system.
+  With this option on, the pthread4w package will be downloaded while configuring the build-env, then it will be build and installed along with upnp.
+
+- BUILD_TESTING: This option activates the tests.
+
+If you don't want to build pthreads4w in the same build as upnp, you can download it from <https://github.com/Vollstrecker/pthreads4w>.
+Just build and install it. The libs and headers will be found, if you set CMAKE_INSTALL_PREFIX (the base install dir) to the same location.
+
+For Informations on general usage of the cmake-buildsystem see: <https://cmake.org/cmake/help/v3.19/guide/user-interaction/index.html>
+
 ## 6. Install/Uninstall Instructions
 
 ### 6.1 - Install
