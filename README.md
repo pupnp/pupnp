@@ -269,7 +269,7 @@ This will invoke the "arm-linux-gcc" cross compiler to build the library.
 
 ### 5.4 - Samples
 
-The SDK contains two samples: a TV device application and a control point that talks with the TV device.  They are found in the $(LIBUPNP)/upnp/sample directory.  
+The SDK contains two samples: a TV device application and a control point that talks with the TV device.  They are found in the $(LIBUPNP)/upnp/sample directory.
 
 To build the samples (note: this is the default behaviour):
 
@@ -373,7 +373,7 @@ See [ChangeLog file](https://github.com/pupnp/pupnp/blob/master/ChangeLog).
 
 ## 9. Support and Contact Information
 
-Intel is not providing support for the SDK for UPnP Devices. Mailing lists and discussion boards can be found at <http://www.libupnp.org/>.
+Intel is not providing support for the SDK for UPnP Devices. Mailing lists and discussion boards can be found at <https://github.com/pupnp/pupnp/discussions>.
 
 If you find this SDK useful, please send an email to upnp@intel.com and let us know.
 
