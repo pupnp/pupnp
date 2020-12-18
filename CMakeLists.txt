@@ -73,6 +73,7 @@ INCLUDE (GNUInstallDirs)
 
 IF (WIN32)
 	SET (CMAKE_DEBUG_POSTFIX d)
+	SET (STATIC_POSTFIX s)
 ENDIF()
 
 OPTION (BUILD_TESTING "Run Tests after compile" ON)
