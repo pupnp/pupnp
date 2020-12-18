@@ -46,8 +46,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef DEBUG
-
 /*! Mutex to synchronize all the log file operations in the debug mode */
 static ithread_mutex_t GlobalDebugMutex;
 
@@ -68,7 +66,7 @@ static char *fileName;
  * before. This can be called again, for example to rotate the log
  * file, and we try to avoid multiple calls to the mutex init, with a
  * risk of race, probably not a problem, and not worth fixing. */
-int UpnpInitLog(void)
+int Debug_UpnpInitLog(void)
 {
 	if (!initwascalled) {
 		ithread_mutex_init(&GlobalDebugMutex, NULL);
@@ -101,13 +99,13 @@ int UpnpInitLog(void)
 	return UPNP_E_SUCCESS;
 }
 
-void UpnpSetLogLevel(Upnp_LogLevel log_level)
+void Debug_UpnpSetLogLevel(Upnp_LogLevel log_level)
 {
 	g_log_level = log_level;
 	setlogwascalled = 1;
 }
 
-void UpnpCloseLog(void)
+void Debug_UpnpCloseLog(void)
 {
 	/* Calling lock() assumes that someone called UpnpInitLog(), but
 	 * this is reasonable as it is called from UpnpInit2(). We risk a
@@ -123,7 +121,7 @@ void UpnpCloseLog(void)
 	ithread_mutex_destroy(&GlobalDebugMutex);
 }
 
-void UpnpSetLogFileNames(const char *newFileName, const char *ignored)
+void Debug_UpnpSetLogFileNames(const char *newFileName, const char *ignored)
 {
 	(void)ignored;
 
@@ -227,7 +225,7 @@ static void UpnpDisplayFileAndLine(FILE *fp,
 	fflush(fp);
 }
 
-void UpnpPrintf(Upnp_LogLevel DLevel,
+void Debug_UpnpPrintf(Upnp_LogLevel DLevel,
 	Dbg_Module Module,
 	const char *DbgFileName,
 	int DbgLineNo,
@@ -259,7 +257,7 @@ void UpnpPrintf(Upnp_LogLevel DLevel,
 
 /* No locking here, the app should be careful about not calling
    closelog from a separate thread... */
-FILE *UpnpGetDebugFile(Upnp_LogLevel DLevel, Dbg_Module Module)
+FILE *Debug_UpnpGetDebugFile(Upnp_LogLevel DLevel, Dbg_Module Module)
 {
 	if (!DebugAtThisLevel(DLevel, Module)) {
 		return NULL;
@@ -267,5 +265,3 @@ FILE *UpnpGetDebugFile(Upnp_LogLevel DLevel, Dbg_Module Module)
 		return fp;
 	}
 }
-
-#endif /* DEBUG */
