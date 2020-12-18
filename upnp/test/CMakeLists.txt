@@ -10,6 +10,10 @@ ADD_EXECUTABLE (test-upnp-init ${WIN_EXE}
 	test_init.c
 )
 
+TARGET_COMPILE_DEFINITIONS (test-upnp-init
+	PRIVATE $<$<CONFIG:Debug>:UPNP_HAVE_DEBUG>
+)
+
 TARGET_LINK_LIBRARIES (test-upnp-init
 	upnp_shared
 )
@@ -28,6 +32,10 @@ ADD_EXECUTABLE (test-upnp-init-static
 
 TARGET_LINK_LIBRARIES (test-upnp-init-static
 	upnp_static
+)
+
+TARGET_COMPILE_DEFINITIONS (test-upnp-init-static
+	PRIVATE $<$<CONFIG:Debug>:UPNP_HAVE_DEBUG>
 )
 
 ADD_TEST (NAME test-upnp-init-static
@@ -66,6 +74,10 @@ ADD_EXECUTABLE (test-upnp-log
 	test_log.c
 )
 
+TARGET_COMPILE_DEFINITIONS (test-upnp-log
+	PRIVATE $<$<CONFIG:Debug>:UPNP_HAVE_DEBUG>
+)
+
 TARGET_LINK_LIBRARIES (test-upnp-log
 	upnp_shared
 )
@@ -80,6 +92,10 @@ SET_TESTS_PROPERTIES (test-upnp-log PROPERTIES
 
 ADD_EXECUTABLE (test-upnp-log-static
 	test_log.c
+)
+
+TARGET_COMPILE_DEFINITIONS (test-upnp-log-static
+	PRIVATE $<$<CONFIG:Debug>:UPNP_HAVE_DEBUG>
 )
 
 TARGET_LINK_LIBRARIES (test-upnp-log-static
