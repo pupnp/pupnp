@@ -520,7 +520,7 @@ int TvDeviceDecreaseBrightness(
 int TvDeviceStart(
 	/*! [in] interface to initialize the sdk (may be NULL)
 	 * if null, then the first non null interface is used. */
-	char *interface,
+	char *iface,
 	/*! [in] port number to initialize the sdk (may be 0)
 	 * if zero, then a random number is used. */
 	unsigned short port,
