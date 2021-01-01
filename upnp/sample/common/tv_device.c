@@ -1350,7 +1350,7 @@ int TvDeviceCallbackEventHandler(
 	return 0;
 }
 
-int TvDeviceStart(char *interface,
+int TvDeviceStart(char *iface,
 	unsigned short port,
 	const char *desc_doc_name,
 	const char *web_dir_path,
@@ -1368,9 +1368,9 @@ int TvDeviceStart(char *interface,
 	SampleUtil_Initialize(pfun);
 	SampleUtil_Print("Initializing UPnP Sdk with\n"
 			 "\tinterface = %s port = %u\n",
-		interface ? interface : "{NULL}",
+		iface ? iface : "{NULL}",
 		port);
-	ret = UpnpInit2(interface, port);
+	ret = UpnpInit2(iface, port);
 	if (ret != UPNP_E_SUCCESS) {
 		SampleUtil_Print("Error with UpnpInit2 -- %d\n", ret);
 		UpnpFinish();
@@ -1520,7 +1520,7 @@ void *TvDeviceCommandLoop(void *args)
 int device_main(int argc, char *argv[])
 {
 	unsigned int portTemp = 0;
-	char *interface = NULL;
+	char *iface = NULL;
 	char *desc_doc_name = NULL;
 	char *web_dir_path = NULL;
 	unsigned short port = 0;
@@ -1531,7 +1531,7 @@ int device_main(int argc, char *argv[])
 	/* Parse options */
 	for (i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-i") == 0) {
-			interface = argv[++i];
+			iface = argv[++i];
 		} else if (strcmp(argv[i], "-port") == 0) {
 			sscanf(argv[++i], "%u", &portTemp);
 		} else if (strcmp(argv[i], "-desc") == 0) {
@@ -1568,7 +1568,7 @@ int device_main(int argc, char *argv[])
 	}
 	port = (unsigned short)portTemp;
 	return TvDeviceStart(
-		interface, port, desc_doc_name, web_dir_path, ip_mode, linux_print, 0);
+		iface, port, desc_doc_name, web_dir_path, ip_mode, linux_print, 0);
 }
 
 /*! @} Device Sample Module */
