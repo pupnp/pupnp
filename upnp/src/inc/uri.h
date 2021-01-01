@@ -70,17 +70,12 @@
 extern "C" {
 #endif
 
-/*! length for HTTP DATE: "DATE: Sun, 01 Jul 2000 08:15:23 GMT<cr><lf>" */
-#define HTTP_DATE_LENGTH 37
-
-#define SEPARATORS "()<>@,;:\\\"/[]?={} \t"
 #define MARK "-_.!~*'()"
 
 /*! added {} for compatibility */
 #define RESERVED ";/?:@&=+$,{}"
 
 #define HTTP_SUCCESS 1
-#define SOCKET_BUFFER_SIZE 5000
 
 enum hostType {
 	HOSTNAME,
@@ -235,23 +230,9 @@ int token_string_casecmp(
 	const char *in2);
 
 /*!
- * \brief Compares a null terminated string to a token (exact).
- *
- * \return 
- * 	\li < 0, if string1 is less than string2.
- * 	\li == 0, if string1 is identical to string2 .
- * 	\li > 0, if string1 is greater than string2.
- */
-int token_string_cmp(
-	/*! [in] Token object whose buffer is to be compared. */
-	token *in1,
-	/*! [in] String of characters to compare with. */
-	char *in2);
-
-/*!
  * \brief Compares two tokens.
  *
- * \return 
+ * \return
  * 	\li < 0, if string1 is less than string2.
  * 	\li == 0, if string1 is identical to string2 .
  * 	\li > 0, if string1 is greater than string2.
@@ -346,25 +327,9 @@ int parse_uri(
 	uri_type *out);
 
 /*!
- * \brief Same as parse_uri(), except that all strings are unescaped
- * (%XX replaced by chars).
+ * \brief
  *
- * \note This modifies 'pathquery' and 'fragment' parts of the input.
- *
- * \return 
- */
-int parse_uri_and_unescape(
-	/*! [in] Character string containing uri information to be parsed. */
-	char *in,
-	/*! [in] Maximum limit on the number of characters. */
-	size_t max,
-	/*! [out] Output parameter which will have the parsed uri information. */
-	uri_type *out);
-
-/*!
- * \brief 
- *
- * \return 
+ * \return
  */
 int parse_token(
 	/*! [in] . */
@@ -373,163 +338,6 @@ int parse_token(
 	token *out,
 	/*! [in] . */
 	int max_size);
-
-/* Commented #defines, functions and typdefs */
-
-#if 0
-#define HTTP_E_BAD_URL UPNP_E_INVALID_URL
-#define HTTP_E_READ_SOCKET  UPNP_E_SOCKET_READ
-#define HTTP_E_BIND_SOCKET  UPNP_E_SOCKET_BIND
-#define HTTP_E_WRITE_SOCKET  UPNP_E_SOCKET_WRITE
-#define HTTP_E_CONNECT_SOCKET  UPNP_E_SOCKET_CONNECT
-#define HTTP_E_SOCKET    UPNP_E_OUTOF_SOCKET
-#define HTTP_E_BAD_RESPONSE UPNP_E_BAD_RESPONSE
-#define HTTP_E_BAD_REQUEST UPNP_E_BAD_REQUEST
-#define HTTP_E_BAD_IP_ADDRESS UPNP_E_INVALID_URL
-
-#define RESPONSE_TIMEOUT 30
-#endif
-
-#if 0
-/*!
- * Buffer used to store data read from a socket during an http transfer in
- * function read_bytes.
- */
-typedef struct SOCKET_BUFFER{
-	char buff[SOCKET_BUFFER_SIZE];
-	int size;
-	struct SOCKET_BUFFER *next;
-} socket_buffer;
-
-
-typedef struct HTTP_HEADER {
-	token header;
-	token value;
-	struct HTTP_HEADER * next;
-} http_header;
-
-
-typedef struct HTTP_STATUS_LINE{
-	token http_version;
-	token status_code;
-	token reason_phrase;
-} http_status;
-
-
-typedef struct HTTP_REQUEST_LINE {
-	token http_version;
-	uri_type request_uri;
-	token method;
-} http_request;
-
-
-/*!
- * Represents a parsed HTTP_MESSAGE head_list is dynamically allocated
- */
-typedef struct HTTP_MESSAGE {
-	http_status status;
-	http_request request;
-	http_header * header_list;
-	token content;
-} http_message;
-#endif
-
-
-#if 0
-int transferHTTP(
-	char *request,
-	char *toSend, 
-	int toSendSize,
-	char **out,
-	char *Url);
-
-
-int transferHTTPRaw(
-	char *toSend,
-	int toSendSize, 
-	char **out,
-	char *URL);
-
-
-/*!
- * \brief helper function.
- */
-int transferHTTPparsedURL(
-	char *request, 
-	char *toSend,
-	int toSendSize, 
-	char **out,
-	uri_type *URL);
-
-
-/*!
- * \brief assumes that char * out has enough space ( 38 characters)
- * outputs the current time in the following null terminated string:
- * "DATE: Sun, Jul 06 2000 08:53:01 GMT\r\n"
- */
-void currentTmToHttpDate(
-	char *out);
-
-
-int parse_http_response(
-	char *in,
-	http_message *out,
-	int max_len);
-
-
-int parse_http_request(
-	char *in,
-	http_message *out,
-	int max_len);
-
-
-void print_http_message(
-	http_message *message);
-
-
-int search_for_header(
-	http_message *in,
-	char *header,
-	token *out_value);
-
-
-void print_status_line(
-	http_status *in);
-
-
-void print_request_line(
-	http_request *in);
-
-
-int parse_http_line(
-	char *in,
-	int max_size);
-
-
-int parse_not_LWS(
-	char *in,
-	token *out,
-	int max_size);
-
-
-int parse_LWS(
-	char *in,
-	int max_size);
-
-
-size_t write_bytes(
-	int fd,
-	char *bytes,
-	size_t n,
-	int timeout);
-
-
-void free_http_message(
-	http_message *message);
-
-
-#endif
-
 
 #ifdef __cplusplus
 }
