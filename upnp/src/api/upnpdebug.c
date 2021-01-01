@@ -107,6 +107,10 @@ void UpnpSetLogLevel(Upnp_LogLevel log_level)
 
 void UpnpCloseLog(void)
 {
+    if (!initwascalled) {
+	    return;
+    }
+
 	/* Calling lock() assumes that someone called UpnpInitLog(), but
 	 * this is reasonable as it is called from UpnpInit2(). We risk a
 	 * crash if we do this without a lock.*/
@@ -117,6 +121,7 @@ void UpnpCloseLog(void)
 	}
 	fp = NULL;
 	is_stderr = 0;
+	initwascalled = 0;
 	ithread_mutex_unlock(&GlobalDebugMutex);
 	ithread_mutex_destroy(&GlobalDebugMutex);
 }
@@ -235,6 +240,10 @@ void UpnpPrintf(Upnp_LogLevel DLevel,
 	/*fprintf(stderr, "UpnpPrintf: fp %p level %d glev %d mod %d DEBUG_ALL
 	  %d\n", fp, DLevel, g_log_level, Module, DEBUG_ALL);*/
 	va_list ArgList;
+
+    if (!initwascalled) {
+        return;
+    }
 
 	if (!DebugAtThisLevel(DLevel, Module))
 		return;
