@@ -289,15 +289,6 @@ int token_string_casecmp(token *in1, const char *in2)
 		return strncasecmp(in1->buff, in2, in1->size);
 }
 
-int token_string_cmp(token *in1, char *in2)
-{
-	size_t in2_length = strlen(in2);
-	if (in1->size != in2_length)
-		return 1;
-	else
-		return strncmp(in1->buff, in2, in1->size);
-}
-
 int token_cmp(token *in1, token *in2)
 {
 	if (in1->size != in2->size)
@@ -778,26 +769,6 @@ int parse_uri(const char *in, size_t max, uri_type *out)
 	} else {
 		out->fragment.buff = NULL;
 		out->fragment.size = (size_t)0;
-	}
-
-	return HTTP_SUCCESS;
-}
-
-int parse_uri_and_unescape(char *in, size_t max, uri_type *out)
-{
-	int ret = parse_uri(in, max, out);
-
-	if (ret != HTTP_SUCCESS) {
-		return ret;
-	}
-
-	if (out->pathquery.size > (size_t)0) {
-		remove_escaped_chars(
-			(char *)out->pathquery.buff, &out->pathquery.size);
-	}
-	if (out->fragment.size > (size_t)0) {
-		remove_escaped_chars(
-			(char *)out->fragment.buff, &out->fragment.size);
 	}
 
 	return HTTP_SUCCESS;
