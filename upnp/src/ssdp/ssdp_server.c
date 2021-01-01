@@ -1173,21 +1173,40 @@ static int create_ssdp_sock_v6(
 	memset(&__ss, 0, sizeof(__ss));
 	ssdpAddr6->sin6_family = (sa_family_t)AF_INET6;
 	ssdpAddr6->sin6_addr = in6addr_any;
+#ifndef _WIN32
 	ssdpAddr6->sin6_scope_id = gIF_INDEX;
+#endif
 	ssdpAddr6->sin6_port = htons(SSDP_PORT);
 	ret = bind(*ssdpSock, (struct sockaddr *)ssdpAddr6, sizeof(*ssdpAddr6));
 	if (ret == -1) {
+#ifndef _WIN32
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+                UpnpPrintf(UPNP_CRITICAL,
+                        SSDP,
+                        __FILE__,
+                        __LINE__,
+                        "Error in bind(), addr=%s, index=%d, port=%d: %s\n",
+                        gIF_IPV6,
+                        gIF_INDEX,
+                        SSDP_PORT,
+                        errorBuffer);
+                ret = UPNP_E_SOCKET_BIND;
+                goto error_handler;
+#else
+                int wsa_err = WSAGetLastError();
 		UpnpPrintf(UPNP_CRITICAL,
 			SSDP,
 			__FILE__,
 			__LINE__,
-			"Error in bind(), addr=0x%032lX, port=%d: %s\n",
-			0lu,
+			"Error in bind(), addr=%s, index=%d, port=%d: %d\n",
+			gIF_IPV6,
+                        gIF_INDEX,
 			SSDP_PORT,
-			errorBuffer);
+			wsa_err);
 		ret = UPNP_E_SOCKET_BIND;
 		goto error_handler;
+#endif
+
 	}
 	memset((void *)&ssdpMcastAddr, 0, sizeof(ssdpMcastAddr));
 	ssdpMcastAddr.ipv6mr_interface = gIF_INDEX;
