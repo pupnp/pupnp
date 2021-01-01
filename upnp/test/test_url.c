@@ -43,7 +43,7 @@ static int result(const struct test *test)
 		(test->expect == NULL || strcmp(test->expect, absurl) == 0)) {
 		ret = 0;
 	} else {
-		printf("%s:%d:  '%s' | '%s' -> '%s' != '%s' (%d)\n",
+		printf("%s:%d: '%s' + '%s' != '%s' (expected '%s') (%d)\n",
 			__FILE__,
 			test->line,
 			test->base,
@@ -57,7 +57,7 @@ static int result(const struct test *test)
 	return ret;
 }
 
-/* The URLs must be resolvale! */
+/* The URLs must be resolvable! */
 static const char ABS_URL1[] = "http://pupnp.sourceforge.net/path1/";
 static const char ABS_URL2[] = "http://pupnp.sourceforge.net/path1/path1";
 // static const char ABS_URL3[] = "http://localhost/path1/";
