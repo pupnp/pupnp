@@ -3870,14 +3870,16 @@ int UpnpGetIfInfo(const char *IfName)
 		&v4_netmask,
 		gIF_IPV4_NETMASK,
 		sizeof(gIF_IPV4_NETMASK));
-	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
-	gIF_IPV6_PREFIX_LENGTH = v6_prefix;
 	gIF_INDEX = if_nametoindex(gIF_NAME);
-	inet_ntop(AF_INET6,
-		&v6ulagua_addr,
-		gIF_IPV6_ULA_GUA,
-		sizeof(gIF_IPV6_ULA_GUA));
-	gIF_IPV6_ULA_GUA_PREFIX_LENGTH = v6ulagua_prefix;
+	if (!IN6_IS_ADDR_UNSPECIFIED(&v6_addr)) {
+		inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
+		gIF_IPV6_PREFIX_LENGTH = v6_prefix;
+		inet_ntop(AF_INET6,
+			&v6ulagua_addr,
+			gIF_IPV6_ULA_GUA,
+			sizeof(gIF_IPV6_ULA_GUA));
+		gIF_IPV6_ULA_GUA_PREFIX_LENGTH = v6ulagua_prefix;
+	}
 #else /* (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__) */ /* _WIN32 */
 	struct ifreq ifArray[MAX_INTERFACES];
 	struct ifconf ifConf;
