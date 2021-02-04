@@ -338,8 +338,40 @@ ENDIF (Solaris)
 if (NOT WIN32)
 	set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 	include (FindThreads)
-	add_library (Threads::Shared ALIAS Threads::Threads)
-	add_library (Threads::Static ALIAS Threads::Threads)
+	if (NOT DOWNLOAD_AND_BUILD_DEPS)
+		if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
+			add_library (Threads::Shared ALIAS Threads::Threads)
+			add_library (Threads::Static ALIAS Threads::Threads)
+		else ()
+			add_library (Threads::Shared INTERFACE IMPORTED)
+			add_library (Threads::Static INTERFACE IMPORTED)
+
+			# The following two blocks replicate the original FindThreads
+			if (THREADS_HAVE_PTHREAD_ARG)
+				set_property (TARGET Threads::Shared PROPERTY
+					INTERFACE_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:-Xcompiler -pthread>"
+												"$<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:-pthread>"
+				)
+
+				set_property (TARGET Threads::Static PROPERTY
+					INTERFACE_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:-Xcompiler -pthread>"
+												"$<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:-pthread>"
+				)
+			endif()
+
+			if (CMAKE_THREAD_LIBS_INIT)
+				get_target_property (thread_location Threads::Threads INTERFACE_LINK_LIBRARIES)
+
+				set_target_properties(Threads::Shared PROPERTIES
+					INTERFACE_LINK_LIBRARIES ${thread_location}
+				)
+
+				set_target_properties(Threads::Static PROPERTIES
+					INTERFACE_LINK_LIBRARIES ${thread_location}
+				)
+			endif()
+		endif()
+	endif()
 else()
 	set (PTHREADS4W_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/)
 
@@ -353,7 +385,6 @@ else()
 		endif()
 	endif()
 endif()
-
 #
 # Determine if pthread_rwlock_t is available
 #
@@ -372,14 +403,6 @@ IF (TARGET Threads::Threads)
 	UNSET (CMAKE_EXTRA_INCLUDE_FILES)
 	UNSET (CMAKE_REQUIRED_INCLUDES)
 ENDIF (TARGET Threads::Threads)
-
-IF (TARGET Threads::Threads AND NOT TARGET Threads::Static)
-	SET_TARGET_PROPERTIES (Threads::Threads PROPERTIES
-		IMPORTED_GLOBAL TRUE
-	)
-
-	ADD_LIBRARY (Threads::Static ALIAS Threads::Threads)
-ENDIF (TARGET Threads::Threads AND NOT TARGET Threads::Static)
 
 IF (open_ssl)
 	INCLUDE (FindOpenSSL)
