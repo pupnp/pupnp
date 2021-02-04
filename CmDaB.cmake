@@ -45,7 +45,15 @@ if (DOWNLOAD_AND_BUILD_DEPS)
 
 	FetchContent_GetProperties(CmDaB)
 
-	if (NOT CmDaB_cmdab_POPULATED)
-		FetchContent_MakeAvailable (CmDaB)
+	if (NOT cmdab_POPULATED)
+		if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.14)
+			FetchContent_MakeAvailable (CmDaB)
+		else()
+			FetchContent_Populate (CmDaB)
+
+			add_subdirectory (${cmdab_SOURCE_DIR}
+				${cmdab_BINARY_DIR}
+			)
+		endif()
 	endif()
 endif()
