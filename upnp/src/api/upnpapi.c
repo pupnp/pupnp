@@ -66,7 +66,6 @@
 #include <sys/stat.h>
 
 #include <assert.h>
-#include <ifaddrs.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
@@ -74,6 +73,7 @@
 #ifdef _WIN32
 /* Do not include these files */
 #else
+#include <ifaddrs.h>
 #include <sys/ioctl.h>
 #include <sys/param.h>
 #include <sys/types.h>
