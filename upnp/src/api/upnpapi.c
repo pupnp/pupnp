@@ -66,6 +66,7 @@
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <ifaddrs.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
@@ -3544,7 +3545,6 @@ int UpnpDownloadXmlDoc(const char *url, IXML_Document **xmlDoc)
 	}
 }
 
-#if (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__)
 /*!
  * \brief Computes prefix length from IPv6 netmask.
  *
@@ -3567,7 +3567,6 @@ static unsigned UpnpComputeIpv6PrefixLength(struct sockaddr_in6 *Netmask)
 
 	return prefix_length;
 }
-#endif
 
 int UpnpGetIfInfo(const char *IfName)
 {
@@ -3731,8 +3730,7 @@ int UpnpGetIfInfo(const char *IfName)
 	}
 	inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
 	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
-#elif (defined(BSD) && BSD >= 199306) || \
-	defined(__FreeBSD_kernel__) /* _WIN32 */
+#else
 	struct ifaddrs *ifap, *ifa;
 	struct in_addr v4_addr = {0};
 	struct in_addr v4_netmask = {0};
@@ -3880,227 +3878,7 @@ int UpnpGetIfInfo(const char *IfName)
 			sizeof(gIF_IPV6_ULA_GUA));
 		gIF_IPV6_ULA_GUA_PREFIX_LENGTH = v6ulagua_prefix;
 	}
-#else /* (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__) */ /* _WIN32 */
-	struct ifreq ifArray[MAX_INTERFACES];
-	struct ifconf ifConf;
-	struct ifreq ifReq;
-	FILE *inet6_procfd;
-	int i;
-	int LocalSock;
-	struct in6_addr v6_addr;
-	unsigned if_idx;
-	unsigned if_prefix;
-	char addr6[8][5];
-	char buf[INET6_ADDRSTRLEN];
-	int ifname_found = 0;
-	int valid_addr_found = 0;
-
-	/* Copy interface name, if it was provided. */
-	if (IfName != NULL) {
-		if (strlen(IfName) > sizeof(gIF_NAME))
-			return UPNP_E_INVALID_INTERFACE;
-
-		memset(gIF_NAME, 0, sizeof(gIF_NAME));
-		strncpy(gIF_NAME, IfName, sizeof(gIF_NAME) - 1);
-		ifname_found = 1;
-	}
-	/* Create an unbound datagram socket to do the SIOCGIFADDR ioctl on.  */
-	if ((LocalSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) ==
-		INVALID_SOCKET) {
-		UpnpPrintf(UPNP_ALL,
-			API,
-			__FILE__,
-			__LINE__,
-			"Can't create addrlist socket\n");
-		return UPNP_E_INIT;
-	}
-	/* Get the interface configuration information...  */
-	ifConf.ifc_len = (int)sizeof ifArray;
-	ifConf.ifc_ifcu.ifcu_buf = (char *)ifArray;
-
-	if (ioctl(LocalSock, SIOCGIFCONF, &ifConf) < 0) {
-		UpnpPrintf(UPNP_ALL,
-			API,
-			__FILE__,
-			__LINE__,
-			"DiscoverInterfaces: SIOCGIFCONF returned error\n");
-		close(LocalSock);
-		return UPNP_E_INIT;
-	}
-	if (ifConf.ifc_len == sizeof ifArray) {
-		UpnpPrintf(UPNP_ALL,
-			API,
-			__FILE__,
-			__LINE__,
-			"DiscoverInterfaces: ifConf.ifc_len == sizeof ifArray, "
-			"an overflow might have occurred, "
-			"operation should be retried with a bigger buffer.\n");
-	}
-	/* Cycle through the list of interfaces looking for IP addresses.  */
-	for (i = 0; i < ifConf.ifc_len; i += (int)(sizeof(struct ifreq))) {
-		struct ifreq *pifReq = (struct ifreq *)(ifConf.ifc_buf + i);
-		/* See if this is the sort of interface we want to deal with. */
-		memset(ifReq.ifr_name, 0, sizeof(ifReq.ifr_name));
-		strncpy(ifReq.ifr_name,
-			pifReq->ifr_name,
-			sizeof(ifReq.ifr_name) - 1);
-		if (ioctl(LocalSock, SIOCGIFFLAGS, &ifReq) < 0) {
-			UpnpPrintf(UPNP_ALL,
-				API,
-				__FILE__,
-				__LINE__,
-				"Can't get interface flags for %s:\n",
-				ifReq.ifr_name);
-		}
-		/* Skip LOOPBACK interfaces, DOWN interfaces and interfaces that
-		 * don't support MULTICAST. */
-		if ((ifReq.ifr_flags & IFF_LOOPBACK) ||
-			(!(ifReq.ifr_flags & IFF_UP)) ||
-			(!(ifReq.ifr_flags & IFF_MULTICAST))) {
-			continue;
-		}
-		if (ifname_found == 0) {
-			/* We have found a valid interface name. Keep it. */
-			memset(gIF_NAME, 0, sizeof(gIF_NAME));
-			strncpy(gIF_NAME,
-				pifReq->ifr_name,
-				sizeof(gIF_NAME) - 1);
-			ifname_found = 1;
-		} else {
-			if (strncmp(gIF_NAME,
-				    pifReq->ifr_name,
-				    sizeof(gIF_NAME)) != 0) {
-				/* This is not the interface we're looking for.
-				 */
-				continue;
-			}
-		}
-		/* Check address family. */
-		if (pifReq->ifr_addr.sa_family == AF_INET) {
-			/* Copy interface name, IPv4 address, IPv4 netmask and
-			 * interface index. */
-			memset(gIF_NAME, 0, sizeof(gIF_NAME));
-			strncpy(gIF_NAME,
-				pifReq->ifr_name,
-				sizeof(gIF_NAME) - 1);
-			inet_ntop(AF_INET,
-				&((struct sockaddr_in *)&pifReq->ifr_addr)
-					 ->sin_addr,
-				gIF_IPV4,
-				sizeof(gIF_IPV4));
-			if (ioctl(LocalSock, SIOCGIFNETMASK, &ifReq) < 0) {
-				UpnpPrintf(UPNP_ALL,
-					API,
-					__FILE__,
-					__LINE__,
-					"Can't get interface netmask for %s:\n",
-					ifReq.ifr_name);
-			}
-			inet_ntop(AF_INET,
-				&((struct sockaddr_in *)&ifReq.ifr_netmask)
-					 ->sin_addr,
-				gIF_IPV4_NETMASK,
-				sizeof(gIF_IPV4_NETMASK));
-			gIF_INDEX = if_nametoindex(gIF_NAME);
-			valid_addr_found = 1;
-			break;
-		} else {
-			/* Address is not IPv4 */
-			ifname_found = 0;
-		}
-	}
-	close(LocalSock);
-	/* Failed to find a valid interface, or valid address. */
-	if (ifname_found == 0 || valid_addr_found == 0) {
-		UpnpPrintf(UPNP_CRITICAL,
-			API,
-			__FILE__,
-			__LINE__,
-			"Failed to find an adapter with valid IP addresses for "
-			"use.\n");
-
-		return UPNP_E_INVALID_INTERFACE;
-	}
-	/* Try to get the IPv6 address for the same interface  */
-	/* from "/proc/net/if_inet6", if possible. */
-	inet6_procfd = fopen("/proc/net/if_inet6", "r");
-	if (inet6_procfd) {
-		while (fscanf(inet6_procfd,
-			       "%4s%4s%4s%4s%4s%4s%4s%4s %02x %02x %*02x "
-			       "%*02x %*20s\n",
-			       addr6[0],
-			       addr6[1],
-			       addr6[2],
-			       addr6[3],
-			       addr6[4],
-			       addr6[5],
-			       addr6[6],
-			       addr6[7],
-			       &if_idx,
-			       &if_prefix) != EOF) {
-			/* Get same interface as IPv4 address retrieved. */
-			if (gIF_INDEX == if_idx) {
-				snprintf(buf,
-					sizeof(buf),
-					"%s:%s:%s:%s:%s:%s:%s:%s",
-					addr6[0],
-					addr6[1],
-					addr6[2],
-					addr6[3],
-					addr6[4],
-					addr6[5],
-					addr6[6],
-					addr6[7]);
-				/* Validate formed address and check for
-				 * link-local. */
-				if (inet_pton(AF_INET6, buf, &v6_addr) > 0) {
-					if (IN6_IS_ADDR_ULA(&v6_addr)) {
-						/* Got valid IPv6 ula. */
-						memset(gIF_IPV6_ULA_GUA,
-							0,
-							sizeof(gIF_IPV6_ULA_GUA));
-						strncpy(gIF_IPV6_ULA_GUA,
-							buf,
-							sizeof(gIF_IPV6_ULA_GUA) -
-								1);
-						gIF_IPV6_ULA_GUA_PREFIX_LENGTH =
-							if_prefix;
-					} else if (IN6_IS_ADDR_GLOBAL(
-							   &v6_addr) &&
-						   strlen(gIF_IPV6_ULA_GUA) ==
-							   (size_t)0) {
-						/* got a GUA, should store it
-						 * while no ULA is found */
-						memset(gIF_IPV6_ULA_GUA,
-							0,
-							sizeof(gIF_IPV6_ULA_GUA));
-						strncpy(gIF_IPV6_ULA_GUA,
-							buf,
-							sizeof(gIF_IPV6_ULA_GUA) -
-								1);
-						gIF_IPV6_ULA_GUA_PREFIX_LENGTH =
-							if_prefix;
-					} else if (IN6_IS_ADDR_LINKLOCAL(
-							   &v6_addr) &&
-						   strlen(gIF_IPV6) ==
-							   (size_t)0) {
-						/* got a Link local IPv6
-						 * address. */
-						memset(gIF_IPV6,
-							0,
-							sizeof(gIF_IPV6));
-						strncpy(gIF_IPV6,
-							buf,
-							sizeof(gIF_IPV6) - 1);
-						gIF_IPV6_PREFIX_LENGTH =
-							if_prefix;
-					}
-				}
-			}
-		}
-		fclose(inet6_procfd);
-	}
-#endif /* (defined(BSD) && BSD >= 199306) || defined(__FreeBSD_kernel__) */ /* _WIN32 */
+#endif
 	UpnpPrintf(UPNP_INFO,
 		API,
 		__FILE__,
