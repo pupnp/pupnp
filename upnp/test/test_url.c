@@ -154,6 +154,13 @@ int main()
 {
 	int i, ret = 0;
 
+	/*
+	 * Init the SDK before testing
+	 * on Win we need to setup winsock before using it
+	 * and as this test does DNS lookups it will fail otherwise
+	 */
+	UpnpInit2(NULL, 0);
+
 	for (i = 0; i < (int)ARRAY_SIZE(RFC3986); i++)
 		ret += result(&RFC3986[i]);
 
