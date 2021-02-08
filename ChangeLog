@@ -2,6 +2,22 @@
 Version 1.14.1
 *******************************************************************************
 
+2021-02-05 Ian Whyman <ian(at)gerbera.io>
+
+        CMake Github Actions, including windows build.
+
+2021-02-05 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
+
+        upnpapi.c: assume that getifaddrs is available
+
+        Assume that getifaddrs is available even if it is not POSIX-compliant,
+        this will simplify the code and, as a side effect, this allow pupnp to
+        work on an interface that does not have an IPv4 address.
+
+2020-12-09 Vollstrecker <github@vollstreckernet.de>
+
+        CMake support.
+
 2020-11-30 Marcelo Jimenez <marcelo.jimenez(at)gmail.com>
 
         GitHub #203 by Vollstrecker, part 2.
@@ -13,6 +29,10 @@ Version 1.14.1
         GitHub #203 by Vollstrecker, part 1.
 
         Remove the now unused file ClientSubscription.c.
+
+2020-11-09 Thomas Mitterfellner <thomas.mitterfellner(at)gmail.com>
+
+        Remove port >= 49152 restriction.
 
 *******************************************************************************
 Version 1.14.0
@@ -132,7 +152,7 @@ Version 1.12.1
 	GitHub PR #164
 
 	Do not use usleep when using newer POSIX C source.
-    
+
     	usleep is deprecated and is optionally unavailable with uClibc-ng.
 
 2020-03-29 pamapa <pamapa(at)github>
@@ -160,7 +180,7 @@ Version 1.12.0
 2020-01-22 Stephen Bash <scbash(at)github>
 
     Reduce spurious HTTP 416 errors due to ill-defined bytes header
-    
+
     I (re)discovered this behavior trying to use the Gerbera media server
     with Chromecast (built in to my Vizio P55-F1 TV).  Chromecast specifies
     "bytes:0-" with no end range, which caused pupnp to return
@@ -171,7 +191,7 @@ Version 1.12.0
     restarted as Gerbera, pupnp was removed from the local tree in favor of
     using the upstream version, and the patch was lost which lead to me
     rediscovering it recently.
-    
+
     This is Jin's original patch applied to pupnp 1.8.  This teaches punp to
     ignore the bytes header if it matches "0-" and return HTTP_OK.
 
@@ -187,7 +207,7 @@ Version 1.12.0
   	^~~~~~~~~~~~
 
 	This patch fixes compilation for the --disable-device case.
-	
+
 
 2019-11-20 ePirat Marvin Scholz <epirat07(at)gmail.com>
 
@@ -398,7 +418,7 @@ Version 1.8.2
 2015-02-06 Jean-Francois Dockes <jf@dockes.org>
 
 	Queue events on their subscription object instead of adding them to the
-	thread pool immediately. 
+	thread pool immediately.
 
 	Events destined for a non-responding control point would flood the
 	thread pool and prevent correct dispatching to other clients, sometimes
@@ -623,7 +643,7 @@ Version 1.8.0
 	SF Patch Tracker [ 2836704 ] Search for nested serviceList (not
 	stopping at the first lis
 	Submitted By: zephyrus ( zephyrus00jp )
-	
+
 	Internet Gateway Device description contains nested serviceList (rootdevice
 	-> servicelist, subdevice
 	and subdevice has the lower-level serviceList, etc..)
@@ -658,7 +678,7 @@ Version 1.8.0
 	* SF Patch Tracker [ 2962606 ] Autorenewal errors: invalid SID,
 	too-short renewal interval
 	Submitted By: Nick Leverton (leveret)
-	
+
 	Auto-renewals send an invalid SID due to a missing UpnpString_get_String
 	call. They also send a renewal interval of 0 instead of copying it from
 	the original subscription.
@@ -666,20 +686,20 @@ Version 1.8.0
 2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2964685 ] patch for avoiding inet_ntoa (1.8.0)
 	Submitted By: Nick Leverton (leveret)
-	
+
 	Seems like SF's tracker won't let me add a patch to someone else's issue ?!
 	This refers to https://sourceforge.net/support/tracker.php?aid=2724578
-	
+
 	The calls to inet_ntoa are in getlocalhostname(), which is called from
-	UpnpInit when it is returning the bound IP address. 
+	UpnpInit when it is returning the bound IP address.
 	UpnpInit/getlocalhostname hasn't been updated to IPv6, I presume this is
 	deliberate so that it doesn't start returning IPv6 addresses and
 	overwriting the caller's IPv4-sized allocation.
-	
+
 	The attached patch just updates getlocalhostname to use inet_ntop instead
 	of inet_ntoa, and also documents the fact that UpnpInit is IPv4 only whilst
 	UpnpInnit2 is both IPv4 and IPv6.
-	
+
 	A fuller solution might be to change UpnpInit to use some variant on
 	UpnpGetIfInfo. UpnpInit could still be left as IPv4 only if desired -
 	perhaps UpnpGetIfInfo could take an option for the desired address family.
@@ -690,7 +710,7 @@ Version 1.8.0
 2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2724578 ] patch for avoiding memory leaks when
 	add devices
-	
+
 	each time a device been added, UpnpInit() is called, on exit, UpnpFinish()
 	is called, but the memories allocated by ThreadPoolInit() may lost because
 	there's no code to call ThreadPoolShutdown() to release the memories. And
@@ -703,7 +723,7 @@ Version 1.8.0
 
 	As per email to pupnp-devel, this is the patch to add the _strget_
 	accessors for string-like objects in the interface.
-	
+
 	Will add a further patch shortly to udpate the sample programs.
 
 2008-06-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -752,7 +772,7 @@ Version 1.8.0
 	instead of:
 	<?xml version="1.0"?>
 	<root xmlns="urn:schemas-upnp-org:device-1-0"></root>
-	
+
 	Code:
 
 	#include <stdlib.h>
@@ -768,7 +788,7 @@ Version 1.8.0
 		printf(wString);
 		free(wString);
 		ixmlDocument_free(wDoc);
-		
+
 		return 0;
 	}
 
@@ -926,7 +946,7 @@ Version 1.6.20
 	    HEADER_LINE_3,
 	    HEADER_LINE_4);
 
-	HEADER_LINE_2A is "CONTENT-LENGTH: ". 
+	HEADER_LINE_2A is "CONTENT-LENGTH: ".
 	The following value should be strlen(propertySet) + 2
 
 2016-01-07 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
@@ -975,7 +995,7 @@ Version 1.6.20
 	"Error in shutdown: Transport endpoint is not connected"
 	This is because shutdown() is not supported for UDP sockets and under
 	recent UNIX specifications it returns ENOTCONN if used.
-	
+
 2016-01-07 Nick Leverton <nick(at)leverton.org>
 
 	SF Bug Tracker #127, Creator: Klaus Fischer
@@ -1164,10 +1184,10 @@ Version 1.6.19
 
 	Hi,
 
-	I had found some bugs about memory leak on libupnp-1.6.18. 
+	I had found some bugs about memory leak on libupnp-1.6.18.
 
 	It may lead to memory leak  when calling ThreadPoolAdd() or
-	ThreadPoolAddPersistent() which does not return 0. 
+	ThreadPoolAddPersistent() which does not return 0.
 
 	See the attachment for patch.
 
@@ -1629,7 +1649,7 @@ Version 1.6.16
 	Remove more implicit casts in upnp part
 
 	Remove more "implicit integer or enum conversions" errors as well as
-	dead code. 
+	dead code.
 
 2012-03-11 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
@@ -1659,7 +1679,7 @@ Version 1.6.16
 
 	Remove lock in ThreadPoolInit
 
-	If ThreadPoolInit returned EAGAIN, tp->lock was not freed. 
+	If ThreadPoolInit returned EAGAIN, tp->lock was not freed.
 
 2012-03-10 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
@@ -1680,7 +1700,7 @@ Version 1.6.16
 	  from SearchByTarget and detect overflow.
 	* Handle SearchByTarget error in UpnpSearchAsync.
 	* Pass output buffer size to addrToString and detect overflow.
-	* Handle addrToString error in configure_urlbase. 
+	* Handle addrToString error in configure_urlbase.
 	* Handle overflow in http_SendMessage.
 	* Respect unique_service_name error in ssdp_request_type
 	  so as not to touch non-terminated buffer under Evt.
@@ -1701,7 +1721,7 @@ Version 1.6.16
 
 	Synchronize autoconfig.h with upnpconfig.h.
 
-	It fixes WIN32 build where configure is not invoked. 
+	It fixes WIN32 build where configure is not invoked.
 
 2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
@@ -2320,7 +2340,7 @@ Version 1.6.12
 2011-02-08 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Undo the "incorrectly exported include files".
-	
+
 	Legacy applications like linux-igd and igd2-for-linux are using those
 	API to create a thread pool for managing their GENA events.
 
@@ -2670,7 +2690,7 @@ Version 1.6.9
 
 	Removing unused NUM_COPY variable.
 
-	Previously, NUM_COPY was used in ssdp_device.c to send multiple copies 
+	Previously, NUM_COPY was used in ssdp_device.c to send multiple copies
 	of each advertisements but also multiple replies to each M-SEARCH
 	request. As sending multiple replies is not compliant with HTTPU/MU
 	spec, NUM_COPY has been set to 1 in an older patch. However, as this
@@ -2705,7 +2725,7 @@ Version 1.6.8
 2010-10-19 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
 	Bug fix in select of miniserver.c
-	
+
 	Fix a bug in miniserver.c, in which maxMiniSock was wrongly declared as
 	unsigned int and as a result it was beeng set to ((unsigned int)(-1)).
 	As a result, after beeing incremented, it became zero, and this value
@@ -2844,7 +2864,7 @@ Version 1.6.7
 	flag appropriately.  However, this flag is not referenced at all in the
 	source code, and thus the code does not compile on systems that don't
 	have the pthread_rwlock_t type (such as Android).
-	
+
 	Please find attached a patch (against the current 1.6.x head) that checks
 	the value of this flag and falls back on using mutexes if read-write
 	locks are not available.
@@ -2858,7 +2878,7 @@ Version 1.6.7
 2010-09-10 Chandra Penke <chandrapenke(at)mcntech.com>
 	* SF Patch Tracker [ 2854711 ] Patch for Solaris10 compilation and usage
 	Submitted By: zephyrus ( zephyrus00jp )
-	
+
 	Patch for Solaris10 compilation and usage.
 
 2010-09-10 Chandra Penke <chandrapenke(at)mcntech.com>
@@ -2890,7 +2910,7 @@ Version 1.6.7
 	into memory. The fix modifies the existing logic to discard data after
 	it's been read; there's no reason to keep it around since the caller
 	of UpnpReadHttpGet already has a copy of it.
-	
+
 	This issue exists in 1.6.6 as well as the latest sources.
 
 	Patch submitted by Chandra (inactiveneurons).
@@ -2937,27 +2957,27 @@ Version 1.6.7
 	* upnp/src/ssdp/ssdp_device.c: Fix for IPV6 ULA/GUA issues.
 	* upnp/src/ssdp/ssdp_ctrlpt.c: Fix for IPV6 ULA/GUA issues.
 	* upnp/src/ssdp/ssdp_server.c: Fix for IPV6 ULA/GUA issues.
-	
+
 	Patch submitted by Ronan Menard.
 
 2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* upnp/src/genlib/miniserver/miniserver.c: Fix for IPV6 ULA/GUA issues.
-	
+
 	Patch submitted by Ronan Menard.
 
 2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* gena_subscribe(): Fix for IPV6 ULA/GUA issues.
-	
+
 	Patch submitted by Ronan Menard.
 
 2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SOCKET ssdpSock6UlaGua: created variable for later use.
-	
+
 	Patch submitted by Ronan Menard.
 
 2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SSDP_IPV6_SITELOCAL: new macro.
-	
+
 	Patch submitted by Ronan Menard.
 
 2010-08-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -2977,12 +2997,12 @@ Version 1.6.7
 	* UpnpRegisterRootDevice3(): Change to the test of already registered
 	devices for IPV6.
 	* UpnpGetIfInfo(): gua/ula issues.
-	
+
 	Patch submitted by Ronan Menard.
 
 2010-08-19 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* libUPnP does support IPV6 now.
-	
+
 	Patch submitted by Ronan Menard.
 
 2010-08-19 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -3002,7 +3022,7 @@ Version 1.6.7
 
 	static const char *SERVICELIST_STR = "serviceList";
 
-	During internal code review of the final patch, it was pointed out that 
+	During internal code review of the final patch, it was pointed out that
 	sizeof(SERVICELIST_STR) == 4 since SERVICELIST_STR is now declared as
 	a pointer instead of an array.
 
@@ -3243,12 +3263,12 @@ Version 1.6.7
 	I am just raising a flag here.
 
 	TIA
-	
+
 2010-03-20 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2836704 ] Search for nested serviceList (not
 	stopping at the first lis
 	Submitted By: zephyrus ( zephyrus00jp )
-	
+
 	Internet Gateway Device description contains nested serviceList (rootdevice
 	-> servicelist, subdevice
 	and subdevice has the lower-level serviceList, etc..)
@@ -3268,7 +3288,7 @@ Version 1.6.7
 	Patch against 1.6.6
 
 	TIA.
-	
+
 2010-03-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patch Tracker [ 2203721 ] timeb.h check obsolete
 
@@ -3276,7 +3296,7 @@ Version 1.6.7
 	* SF Patch Tracker [ 2970872 ] Update ErrorMessages for latest return
 	code list
 	Submitted By: Nick Leverton ( leveret )
-	
+
 	ErrorMessage[] in upnptools.c has got a bit out of sync, the attached
 	patch (generated from grep 'define UPNP_E_') should bring it up to date.
 
@@ -3284,7 +3304,7 @@ Version 1.6.7
 	* SF Patch Tracker [ 2857611 ] Declare a few functions to have proper
 	(void) argument list.
 	Submitted By: zephyrus ( zephyrus00jp )
-	
+
 	In a publicly installed headers, a few functions are declared without any
 	arguments at all, a la "()".
 	When I used gcc's -Wimplict and -Wstrict-prototypes to check for the
@@ -3305,9 +3325,9 @@ Version 1.6.7
 
 	There is something going wrong in soap_ctrlpt.c at line 931 (based on
 	version 1.6.6 release).
-	
+
 	The http_Makemessage call looks as follows:
-	
+
 	if (http_MakeMessage(
 	&request, 1, 1,
 	"Q" "sbc" "N" "s" "s" "Ucc" "sss",
@@ -3320,7 +3340,7 @@ Version 1.6.7
 	xml_start, var_name, xml_end ) != 0 ) {
 	return UPNP_E_OUTOF_MEMORY;
 	}
-	
+
 	This will result in the SOAPACTION header to be immediately followed by the
 	User-Agent header, while a cr-lf should separate the two. I propose to fix
 	this by changing the second "s" to "sc" to force the addition of a cr-lf
@@ -3608,7 +3628,7 @@ Version 1.6.1
 	GlobalHndMutex, which was a mutex is now GlobalHndRWLock, which is a
 	rwlock. HandleLock() is mapped to HandleWriteLock() while all other
 	instances have not been checked. One instance in AdvertiseAndReply()
-	has been changed to HandleReadLock(). Thanks to Alex (afaucher) for the 
+	has been changed to HandleReadLock(). Thanks to Alex (afaucher) for the
 	bug report and suggestions.
 
 2007-11-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -3844,7 +3864,7 @@ Version 1.4.4
 2007-04-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Tracker [ 1652827 ] UpnpRegisterRootDevice returned -104
 	Submitted By: Michael Andersen - miwer
-	
+
 	Issue was found to be related to sizeof (size_t) != sizeof (int)
 	on AMD64 systems. Emil Ljungdahl's AMD64 patch has been applied along
 	with some other fixes. Original user report follows:
@@ -3880,32 +3900,32 @@ Version 1.4.3
 	links, and a simple UPnP device application can initialise. I'm not sure
 	if it actually works yet, but this is definitely a step in the right
 	direction.
-	
+
 	Patch is against the 1.4.1 release. Changes are:
-	
+
 	* threadutil/inc/ithread.h: Fix the ithread mutex support to use
 	documented, portable APIs (if present) rather than the Non-Portable (_NP)
 	ones it uses now. This is required because Cygwin implements only the
 	portable API.
-	
+
 	* threadutil/src/ThreadPool.c: Fake SetPolicyType() to do nothing on Cygwin
 	because otherwise it fails. Should probably investigate why it fails and
 	add a proper implementation later.
-	
+
 	* upnp/src/api/upnpapi.c: On Cygwin, zero out the GlobalHndMutex structure
 	before initialising it. Without this, the initialisation fails. This
 	appears to be a bug in Cygwin.
-	
+
 	* upnp/src/genlib/net/uri/uri.c: Use gethostbyname() on Cygwin.
-	
+
 2007-03-05 Oxy <oxygenic(at)users.sourceforge.net>
 	* Code adapted and typedefs added to compile cleanly under Windows
 	with Borland C++ Builder and MS Visual C++
 
 2007-03-03 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-	
+
 	* Fixed nasty segmentation fault bug on membuffer.c.
-	
+
 *******************************************************************************
 Version 1.4.2
 *******************************************************************************
@@ -3945,7 +3965,7 @@ Version 1.4.2
 	when no default router has been configured.
 	2) Explicitly set the multicast interface through setsockopt
 	IP_MULTICAST_IF. Avoids socket error -207 in some cases.
-	
+
 	* SF Tracker [ 1628590 ] XML parsing segfault patch
 	Submitted By: Fredrik Svensson - svefredrik
 	This patch fixes a segmentation fault problem that occurrs
@@ -3955,17 +3975,17 @@ Version 1.4.2
 
 	* SF Tracker [ 1628552 ] XML white space patch
 	Submitted By: Fredrik Svensson - svefredrik
-	
+
 	* SF Tracker [ 1628562 ] Maximum total jobs patch
 	Submitted By: Fredrik Svensson - svefredrik
 	Also, I incremented the libray versions and included some
 	comments in the file configure.ac so that we do not bump
 	the library version excessively, only the necessary numbers
 	on the next release.
-	
+
 	* SF Tracker [ 1628575 ] Linksys WRT54G patch
 	Submitted By: Fredrik Svensson - svefredrik
-	
+
 	* SF Tracker [ 1628636 ] SSDP packet copy patch
 	Submitted By: Fredrik Svensson - svefredrik
 	Changed NUM_COPY to 1 since, according to section 9.2 of the
@@ -3981,20 +4001,20 @@ Version 1.4.2
 	interface. In rev.79, the "N" format parameter must be an off_t.
 	Every call of this function with an "N" format parameter and an
 	int passed on the stack would fail terribly.
-	
+
 	* SF Bug tracker [ 1590469 ]
 	Typo in ixmlparser.c
 	Submitted By: Erik Johansson - erijo
-	
+
 	* SF Bug Tracker [ 1590466 ] Invalid xml output
 	Submitted By: Erik Johansson - erijo
-	
+
 	* SF Patch tracker [ 1581161 ] VStudio2005 patch
 	Submitted By: David Maass - darkservant
-	
+
 	* SF Patch tracker [ 1587272 ] const-ified ixml
 	Submitted By: Erik Johansson
-	
+
 	* Finished const-ifications as suggested by Erik Johansson in
 	SF Patch tracker [ 1587272 ].
 
@@ -4022,7 +4042,7 @@ Version 1.4.1
 
 2006-07-05 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
 
-	* Include prebuilt documentation (html,pdf), dropping doc++ 
+	* Include prebuilt documentation (html,pdf), dropping doc++
 	dependancy.
 
 2006-07-03 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -4062,13 +4082,13 @@ Version 1.4.0
 2006-05-18 Oxy <virtual_worlds(at)gmx.de>
 
 	* DSM-320 patch added (fetched from project MediaTomb)
-	
+
 	* httpGet additons atch added, Added proxy support by introducing
 	  UpnpOpenHttpGetProxy. UpnpOpenHttpGet now just calls
 	  UpnpOpenHttpGetProxy with the proxy url set to NULL.
-	  
+
 	* Bugfix for typo ("\0" / "0") in ixmlparser.c
-	
+
 	* Bugfix for M-Search packet
 
 *******************************************************************************
@@ -4084,8 +4104,8 @@ FORK FROM DEAD libupnp
 
 2006-04-08  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
-	* upnp/doc/UPnP_Programming_Guide.pdf: replace this document with 
-	  the one in libupnp-doc-1.2.1 because current CVS version 
+	* upnp/doc/UPnP_Programming_Guide.pdf: replace this document with
+	  the one in libupnp-doc-1.2.1 because current CVS version
 	  was corrupted.
 
 2006-04-06
@@ -4110,7 +4130,7 @@ FORK FROM DEAD libupnp
 
 	* ixml/src/ixmlparser.c (Parser_processCDSect): fix bug which prevents
 	  CDATA sections which contain a 0 (zero) to be parsed (instead the
-	  parsing of the whole document is aborted). Patch by Arno Willig 
+	  parsing of the whole document is aborted). Patch by Arno Willig
 	  (Patch # 1432124).
 
 	* configure.ac, upnp/Makefile.am: add "--disable-samples" configure
@@ -4119,11 +4139,11 @@ FORK FROM DEAD libupnp
 
 2006-03-25  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
-	* upnp/src/genlib/miniserver/miniserver.c (get_miniserver_sockets): 
+	* upnp/src/genlib/miniserver/miniserver.c (get_miniserver_sockets):
 	  fix bug if new socket created has fd 0 (can only occur when stdin
 	  has been closed). Patch by Oskar Liljeblad 2004-07-02 :
 	  http://sourceforge.net/mailarchive/message.php?msg_id=8870528
-	
+
 2006-03-21  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/test/test_init.c: add some version checks and exit if failure
@@ -4140,7 +4160,7 @@ FORK FROM DEAD libupnp
 	  in the library (else header file is not installed)
 
 	* upnp/Makefile.am (libupnp_la_LDFLAGS): add inter-library libtool
-	  dependencies between upnp and ixml / threadutil, so that programs 
+	  dependencies between upnp and ixml / threadutil, so that programs
 	  linking against upnp only still work.
 
 2006-03-04  Rémi Turboult  <r3mi(at)users.sourceforge.net>
@@ -4161,7 +4181,7 @@ FORK FROM DEAD libupnp
 	  UPNP_HAVE_xx instead of INCLUDE_yyy_APIS and INTERNAL_WEB_SERVER
 
 	* upnp/Makefile.am, ixml/Makefile.am: add -export-symbols-regex to
-	  the librarie LDFLAGS in order to export only the symbols defined 
+	  the librarie LDFLAGS in order to export only the symbols defined
 	  in the API
 
 2006-02-27  Rémi Turboult  <r3mi(at)users.sourceforge.net>
@@ -4170,7 +4190,7 @@ FORK FROM DEAD libupnp
 
 	* ixml/src/ixml.c (copy_with_escape): add missing 'static' to function
 
-	* threadutil/src/ThreadPool.c (SetSeed): add missing 'static' 
+	* threadutil/src/ThreadPool.c (SetSeed): add missing 'static'
 
 2006-02-26  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
@@ -4189,7 +4209,7 @@ FORK FROM DEAD libupnp
 
 	* upnp/src/api/config.c: rename to upnp/src/api/upnpdebug.c
 
-	* upnp/inc/upnpconfig.h.in: new file to contain information on    
+	* upnp/inc/upnpconfig.h.in: new file to contain information on
 	  the configuration of the installed libraries (generates installed
 	  file <upnp/upnpconfig.h>)
 
@@ -4204,7 +4224,7 @@ FORK FROM DEAD libupnp
 
 	* import all modifications below from libupnp in djmount 0.51
 	  into official libupnp
-	
+
 2006-01-17  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* threadutil/Makefile.am (libthreadutil_la_SOURCES): remove extraneous
@@ -4220,8 +4240,8 @@ FORK FROM DEAD libupnp
 	* m4/type_socklen_t.m4: added new check for socklen_t (fallback to
 	  int if not defined)
 
-	* upnp/src/genlib/miniserver/miniserver.c, 
-	  upnp/src/ssdp/ssdp_server.c: use socklen_t where appropriate 
+	* upnp/src/genlib/miniserver/miniserver.c,
+	  upnp/src/ssdp/ssdp_server.c: use socklen_t where appropriate
 	  (instead of int)
 
 	* upnp/src/genlib/net/http/httpreadwrite.c (get_sdk_info): remove
@@ -4236,8 +4256,8 @@ FORK FROM DEAD libupnp
 
 2006-01-11  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
-	* upnp/inc/config.h, upnp/src/inc/upnpapi.h, 
-	  upnp/src/inc/httpreadwrite.h: remove internal configuration variable 
+	* upnp/inc/config.h, upnp/src/inc/upnpapi.h,
+	  upnp/src/inc/httpreadwrite.h: remove internal configuration variable
 	  MINIMUM_DELAY (no clear purpose)
 
 2005-12-05  Rémi Turboult  <r3mi(at)users.sourceforge.net>
@@ -4256,8 +4276,8 @@ FORK FROM DEAD libupnp
 2005-10-18  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/src/makefile: fix location of DEBUG STATIC libupnp library
-	
-	* upnp/sample/tvctrlpt/linux/Makefile, 
+
+	* upnp/sample/tvctrlpt/linux/Makefile,
 	  upnp/sample/tvdevice/linux/Makefile: fix STATIC library support
 
 2005-10-16  Rémi Turboult  <r3mi(at)users.sourceforge.net>
@@ -4273,30 +4293,30 @@ FORK FROM DEAD libupnp
 
 2005-08-02  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
-	* ixml/src/Makefile: correct bug for static library being incorrectly 
+	* ixml/src/Makefile: correct bug for static library being incorrectly
 	  stripped when building non-debug
 
 2005-06-09  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
-	* ixml/src/element.c (ixmlElement_removeAttributeNode): 
+	* ixml/src/element.c (ixmlElement_removeAttributeNode):
 	  remove some compilation warning
 
-	* ixml/inc/ixml.h, ixml/src/document.c : 
-	  add some missing const's in public API 
+	* ixml/inc/ixml.h, ixml/src/document.c :
+	  add some missing const's in public API
 
-	* upnp/inc/upnptools.h, upnp/src/api/upnptools.c : 
+	* upnp/inc/upnptools.h, upnp/src/api/upnptools.c :
 	  add missing const's in public API
 
 2005-05-28  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/inc/config.h: suppress HTTP_READ_BYTES (unused)
 	  and replace by DEFAULT_SOAP_CONTENT_LENGTH (previously in upnpapi.h)
-	
-	* upnp/inc/upnp.h, upnp/src/api/upnpapi.c : replace 
-	  UpnpSetContentLength (which was not using its Handle argument) 
-	  by global function UpnpSetMaxContentLength. 
+
+	* upnp/inc/upnp.h, upnp/src/api/upnpapi.c : replace
+	  UpnpSetContentLength (which was not using its Handle argument)
+	  by global function UpnpSetMaxContentLength.
 	  Remove "hard" limitation to 32K (not suitable for using in UPnP AV).
-	
+
 	* upnp/src/inc/upnpapi.h : removed DEFAULT_SOAP_CONTENT_LENGTH
 	  (moved to config.h) and MAX_SOAP_CONTENT_LENGTH (now unused)
 
@@ -4307,23 +4327,23 @@ FORK FROM DEAD libupnp
 
 	* upnp/src/genlib/net/http/httpreadwrite.c : corrected an incorrect
 	  sprintf format
-	
+
 2005-05-27  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
-	* upnp/makefile, upnp/src/makefile, 
-	  ixml/Makefile, ixml/src/Makefile, 
-	  threadutil/Makefile, threadutil/src/Makefile : 
-	  implement STATIC library support (from patch at 
+	* upnp/makefile, upnp/src/makefile,
+	  ixml/Makefile, ixml/src/Makefile,
+	  threadutil/Makefile, threadutil/src/Makefile :
+	  implement STATIC library support (from patch at
 	  http://sourceforge.net/tracker/?group_id=7189&atid=307189 )
 
 2005-05-26  Rémi Turboult  <r3mi(at)users.sourceforge.net>
 
 	* upnp/src/api/upnpapi.c, upnp/src/soap/soap_device.c,
-	  upnp/src/soap/makefile : 
+	  upnp/src/soap/makefile :
 	  corrections for compilation with CLIENT=1 only
-	
+
 	* importing "libupnp-1.2.1a" as baseline
-	
+
 --------------------------------------------------------------------------------
 
 History of configure.ac:

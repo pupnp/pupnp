@@ -1,13 +1,13 @@
 # Portable SDK for UPnP\* Devices (libupnp)
 
-branch|status
-------|------
-master| ![master](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg)
-branch-1.12.x | ![1.10.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.12.x)
-branch-1.10.x | ![1.10.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.10.x)
-branch-1.8.x | ![1.8.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.8.x)
-branch-1.6.x | ![1.6.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.6.x)
-branch-1.4.x | ![1.4.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.4.x)
+| branch        | status                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------- |
+| master        | ![master](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg)                      |
+| branch-1.12.x | ![1.10.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.12.x) |
+| branch-1.10.x | ![1.10.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.10.x) |
+| branch-1.8.x  | ![1.8.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.8.x)   |
+| branch-1.6.x  | ![1.6.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.6.x)   |
+| branch-1.4.x  | ![1.4.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.4.x)   |
 
 Copyright (c) 2000-2003 Intel Corporation - All Rights Reserved.
 
@@ -32,65 +32,66 @@ See LICENSE for details.
 
 ## 1. Release List
 
-Release Number | Date | History
----------------|------|--------
-1.14.0 | 2020-07-20 | [Portable UPnP SDK][Portable UPnP SDK]
-1.12.1 | 2020-04-07 | [Portable UPnP SDK][Portable UPnP SDK]
-1.12.0 | 2020-01-22 | [Portable UPnP SDK][Portable UPnP SDK]
-1.10.1 | 2019-11-20 | [Portable UPnP SDK][Portable UPnP SDK]
-1.10.0 | 2019-11-01 | [Portable UPnP SDK][Portable UPnP SDK]
-1.8.7  | 2020-04-07 | [Portable UPnP SDK][Portable UPnP SDK]
-1.8.6  | 2019-11-20 | [Portable UPnP SDK][Portable UPnP SDK]
-1.8.5  | 2019-11-01 | [Portable UPnP SDK][Portable UPnP SDK]
-1.8.4  | 2018-10-25 | [Portable UPnP SDK][Portable UPnP SDK]
-1.8.3  | 2017-11-12 | [Portable UPnP SDK][Portable UPnP SDK]
-1.8.2  | 2017-11-12 | [Portable UPnP SDK][Portable UPnP SDK]
-1.8.1  | 2017-05-24 | [Portable UPnP SDK][Portable UPnP SDK]
-1.8.0  | 2017-01-04 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.25 | 2016-02-10 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.24 | 2017-11-19 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.23 | 2017-11-19 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.22 | 2017-05-30 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.21 | 2016-12-21 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.20 | 2016-07-07 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.19 | 2013-11-15 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.18 | 2013-01-29 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.17 | 2012-04-03 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.16 | 2012-03-21 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.15 | 2012-01-25 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.14 | 2011-11-17 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.13 | 2011-03-17 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.12 | 2011-02-08 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.11 | 2011-02-07 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.10 | 2011-01-30 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.9  | 2010-11-07 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.8  | 2010-10-21 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.7  | 2010-10-04 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.6  | 2008-04-25 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.5  | 2008-02-02 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.4  | 2008-01-26 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.3  | 2007-12-26 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.2  | 2007-12-10 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.1  | 2007-11-08 | [Portable UPnP SDK][Portable UPnP SDK]
-1.6.0  | 2007-06-23 | [Portable UPnP SDK][Portable UPnP SDK]
-1.4.6  | 2007-04-30 | [Portable UPnP SDK][Portable UPnP SDK]
-1.4.5  | 2007-04-28 | [Portable UPnP SDK][Portable UPnP SDK]
-1.4.4  | 2007-04-17 | [Portable UPnP SDK][Portable UPnP SDK]
-1.4.3  | 2007-03-06 | [Portable UPnP SDK][Portable UPnP SDK]
-1.4.2  | 2007-02-16 | [Portable UPnP SDK][Portable UPnP SDK]
-1.4.1  | 2006-08-11 | [Portable UPnP SDK][Portable UPnP SDK]
-1.4.0  | 2006-06-12 | [Portable UPnP SDK][Portable UPnP SDK]
-1.3.1  | 2006-03-05 | [UPnP SDK for Linux][UPnP SDK for Linux]
-1.3.0  | 2006-03-04 | [UPnP SDK for Linux][UPnP SDK for Linux]
-1.2.1a | 2003-11-08 | [UPnP SDK for Linux][UPnP SDK for Linux]
-1.2.1  | 2003-02-13 | [UPnP SDK for Linux][UPnP SDK for Linux]
-1.0.4  | 2001-08-15 | [UPnP SDK for Linux][UPnP SDK for Linux]
-1.0.3  | 2001-06-12 | [UPnP SDK for Linux][UPnP SDK for Linux]
-1.0.2  | 2001-02-07 | [UPnP SDK for Linux][UPnP SDK for Linux]
-1.0.1  | 2000-10-13 | [UPnP SDK for Linux][UPnP SDK for Linux]
-1.0.0  | 2000-08-31 | [UPnP SDK for Linux][UPnP SDK for Linux]
-0.9.1  | 2000-08-17 | [UPnP SDK for Linux][UPnP SDK for Linux]
-0.9.0  | 2000-08-01 | [UPnP SDK for Linux][UPnP SDK for Linux]
+| Release Number | Date       | History                                  |
+| -------------- | ---------- | ---------------------------------------- |
+| 1.14.1         | 2021-02-08 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.14.0         | 2020-07-20 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.12.1         | 2020-04-07 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.12.0         | 2020-01-22 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.10.1         | 2019-11-20 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.10.0         | 2019-11-01 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.8.7          | 2020-04-07 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.8.6          | 2019-11-20 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.8.5          | 2019-11-01 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.8.4          | 2018-10-25 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.8.3          | 2017-11-12 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.8.2          | 2017-11-12 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.8.1          | 2017-05-24 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.8.0          | 2017-01-04 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.25         | 2016-02-10 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.24         | 2017-11-19 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.23         | 2017-11-19 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.22         | 2017-05-30 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.21         | 2016-12-21 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.20         | 2016-07-07 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.19         | 2013-11-15 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.18         | 2013-01-29 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.17         | 2012-04-03 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.16         | 2012-03-21 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.15         | 2012-01-25 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.14         | 2011-11-17 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.13         | 2011-03-17 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.12         | 2011-02-08 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.11         | 2011-02-07 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.10         | 2011-01-30 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.9          | 2010-11-07 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.8          | 2010-10-21 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.7          | 2010-10-04 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.6          | 2008-04-25 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.5          | 2008-02-02 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.4          | 2008-01-26 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.3          | 2007-12-26 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.2          | 2007-12-10 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.1          | 2007-11-08 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.6.0          | 2007-06-23 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.4.6          | 2007-04-30 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.4.5          | 2007-04-28 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.4.4          | 2007-04-17 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.4.3          | 2007-03-06 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.4.2          | 2007-02-16 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.4.1          | 2006-08-11 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.4.0          | 2006-06-12 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.3.1          | 2006-03-05 | [UPnP SDK for Linux][UPnP SDK for Linux] |
+| 1.3.0          | 2006-03-04 | [UPnP SDK for Linux][UPnP SDK for Linux] |
+| 1.2.1a         | 2003-11-08 | [UPnP SDK for Linux][UPnP SDK for Linux] |
+| 1.2.1          | 2003-02-13 | [UPnP SDK for Linux][UPnP SDK for Linux] |
+| 1.0.4          | 2001-08-15 | [UPnP SDK for Linux][UPnP SDK for Linux] |
+| 1.0.3          | 2001-06-12 | [UPnP SDK for Linux][UPnP SDK for Linux] |
+| 1.0.2          | 2001-02-07 | [UPnP SDK for Linux][UPnP SDK for Linux] |
+| 1.0.1          | 2000-10-13 | [UPnP SDK for Linux][UPnP SDK for Linux] |
+| 1.0.0          | 2000-08-31 | [UPnP SDK for Linux][UPnP SDK for Linux] |
+| 0.9.1          | 2000-08-17 | [UPnP SDK for Linux][UPnP SDK for Linux] |
+| 0.9.0          | 2000-08-01 | [UPnP SDK for Linux][UPnP SDK for Linux] |
 
 [UPnP SDK for Linux]: https://sourceforge.net/projects/upnp/
 [Portable UPnP SDK]: https://sourceforge.net/projects/pupnp/
@@ -103,35 +104,35 @@ The Portable SDK for UPnP Devices is an SDK for development of UPnP device and c
 
 The SDK for UPnP Devices contains the following:
 
-Path/File   | Description
-------------|-------------------------------------------------------------
-README      | This file.  Contains the installation and build instructions.
-LICENSE     | The licensing terms the SDK is distributed under.
-NEWS        | Changes and new features.
-ixml\doc    | The files for generating the XML parser documentation from the source code.
-ixml\inc    | The public include files required to use the XML parser.
-ixml\src    | The source code to the XML parser library.
-upnp\doc    | The files for generating the SDK documentation from the source code.
-upnp\inc    | The public include files required to use the SDK.
-upnp\src    | The source files comprising the SDK, libupnp.so.
-upnp\sample | A sample device and control point application, illustrating the usage of the SDK.
+| Path/File   | Description                                                                       |
+| ----------- | --------------------------------------------------------------------------------- |
+| README      | This file.  Contains the installation and build instructions.                     |
+| LICENSE     | The licensing terms the SDK is distributed under.                                 |
+| NEWS        | Changes and new features.                                                         |
+| ixml\doc    | The files for generating the XML parser documentation from the source code.       |
+| ixml\inc    | The public include files required to use the XML parser.                          |
+| ixml\src    | The source code to the XML parser library.                                        |
+| upnp\doc    | The files for generating the SDK documentation from the source code.              |
+| upnp\inc    | The public include files required to use the SDK.                                 |
+| upnp\src    | The source files comprising the SDK, libupnp.so.                                  |
+| upnp\sample | A sample device and control point application, illustrating the usage of the SDK. |
 
 ## 4. System Requirements
 
 The SDK for UPnP Devices is designed to compile and run under several operating systems.  It does, however, have dependencies on some packages that may not be installed by default.  All packages that it requires are listed below.
 
-Dependency  | Description
-------------|-------------------------------------------------------------
-libpthread  | The header and library are installed as part of the glibc-devel package (or equivalent).
+| Dependency | Description                                                                              |
+| ---------- | ---------------------------------------------------------------------------------------- |
+| libpthread | The header and library are installed as part of the glibc-devel package (or equivalent). |
 
 Additionally, the documentation for the SDK can be auto-generated from the upnp.h header file using Doxygen, a documentation system for C, C++, IDL, and Java\*.  Doxygen generates the documentation in HTML or TeX format. Using some additional tools, the TeX output can be converted into a PDF file. To generate the documentation these tools are required:
 
-Package   | Description
-----------|--------------------------------------------------------------
-Doxygen   | The homepage for Doxygen is <https://www.doxygen.nl/index.html>. The current version as of this release of the SDK is version 3.4.9. Doxygen is the only requirement for generating the HTML documentation.
-LaTeX/TeX | To generate the PDF documentation, LaTeX and TeX tools are necessary. The tetex and tetex-latex packages provide these tools.
-dvips     | dvips converts the DVI file produced by LaTeX into a PostScript\* file. The tetex-dvips package provides this tool.
-ps2pdf    | The final step to making the PDF is converting the PostStript\* into Portable Document Format. The ghostscript package provides this tool.
+| Package   | Description                                                                                                                                                                                                 |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Doxygen   | The homepage for Doxygen is <https://www.doxygen.nl/index.html>. The current version as of this release of the SDK is version 3.4.9. Doxygen is the only requirement for generating the HTML documentation. |
+| LaTeX/TeX | To generate the PDF documentation, LaTeX and TeX tools are necessary. The tetex and tetex-latex packages provide these tools.                                                                               |
+| dvips     | dvips converts the DVI file produced by LaTeX into a PostScript\* file. The tetex-dvips package provides this tool.                                                                                         |
+| ps2pdf    | The final step to making the PDF is converting the PostStript\* into Portable Document Format. The ghostscript package provides this tool.                                                                  |
 
 For the UPnP library to function correctly, networking must be configured properly for multicasting.  To do this:
 
