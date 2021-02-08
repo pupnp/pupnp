@@ -3739,7 +3739,9 @@ int UpnpGetIfInfo(const char *IfName)
 	unsigned v6_prefix = 0;
 	unsigned v6ulagua_prefix = 0;
 	int ifname_found = 0;
-	int valid_addr_found = 0;
+	int valid_v4_addr_found = 0;
+	int valid_v6_addr_found = 0;
+	int valid_v6ulagua_addr_found = 0;
 
 	/* Copy interface name, if it was provided. */
 	if (IfName != NULL) {
@@ -3794,7 +3796,7 @@ int UpnpGetIfInfo(const char *IfName)
 				&((struct sockaddr_in *)(ifa->ifa_netmask))
 					 ->sin_addr,
 				sizeof(v4_netmask));
-			valid_addr_found = 1;
+			valid_v4_addr_found = 1;
 			break;
 		case AF_INET6:
 			if (IN6_IS_ADDR_ULA(
@@ -3809,7 +3811,7 @@ int UpnpGetIfInfo(const char *IfName)
 				v6ulagua_prefix = UpnpComputeIpv6PrefixLength(
 					(struct sockaddr_in6
 							*)(ifa->ifa_netmask));
-				valid_addr_found = 1;
+				valid_v6ulagua_addr_found = 1;
 			} else if (IN6_IS_ADDR_GLOBAL(
 					   &((struct sockaddr_in6
 							     *)(ifa->ifa_addr))
@@ -3825,7 +3827,7 @@ int UpnpGetIfInfo(const char *IfName)
 				v6ulagua_prefix = UpnpComputeIpv6PrefixLength(
 					(struct sockaddr_in6
 							*)(ifa->ifa_netmask));
-				valid_addr_found = 1;
+				valid_v6ulagua_addr_found = 1;
 			} else if (IN6_IS_ADDR_LINKLOCAL(
 					   &((struct sockaddr_in6
 							     *)(ifa->ifa_addr))
@@ -3838,11 +3840,13 @@ int UpnpGetIfInfo(const char *IfName)
 				v6_prefix = UpnpComputeIpv6PrefixLength(
 					(struct sockaddr_in6
 							*)(ifa->ifa_netmask));
-				valid_addr_found = 1;
+				valid_v6_addr_found = 1;
 			}
 			break;
 		default:
-			if (valid_addr_found == 0) {
+			if (IfName == NULL && valid_v4_addr_found == 0 &&
+				valid_v6ulagua_addr_found == 0 &&
+				valid_v6_addr_found == 0) {
 				/* Address is not IPv4 or IPv6 and no valid
 				 * address has  */
 				/* yet been found for this interface. Discard
@@ -3854,7 +3858,8 @@ int UpnpGetIfInfo(const char *IfName)
 	}
 	freeifaddrs(ifap);
 	/* Failed to find a valid interface, or valid address. */
-	if (ifname_found == 0 || valid_addr_found == 0) {
+	if (ifname_found == 0 || (valid_v4_addr_found == 0 &&
+		valid_v6_addr_found == 0 && valid_v6ulagua_addr_found == 0)) {
 		UpnpPrintf(UPNP_CRITICAL,
 			API,
 			__FILE__,
@@ -3863,20 +3868,26 @@ int UpnpGetIfInfo(const char *IfName)
 			"use.\n");
 		return UPNP_E_INVALID_INTERFACE;
 	}
-	inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
-	inet_ntop(AF_INET,
-		&v4_netmask,
-		gIF_IPV4_NETMASK,
-		sizeof(gIF_IPV4_NETMASK));
+	if (valid_v4_addr_found) {
+		inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
+		inet_ntop(AF_INET,
+			&v4_netmask,
+			gIF_IPV4_NETMASK,
+			sizeof(gIF_IPV4_NETMASK));
+	}
 	gIF_INDEX = if_nametoindex(gIF_NAME);
 	if (!IN6_IS_ADDR_UNSPECIFIED(&v6_addr)) {
-		inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
-		gIF_IPV6_PREFIX_LENGTH = v6_prefix;
-		inet_ntop(AF_INET6,
-			&v6ulagua_addr,
-			gIF_IPV6_ULA_GUA,
-			sizeof(gIF_IPV6_ULA_GUA));
-		gIF_IPV6_ULA_GUA_PREFIX_LENGTH = v6ulagua_prefix;
+		if (valid_v6_addr_found) {
+			inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
+			gIF_IPV6_PREFIX_LENGTH = v6_prefix;
+		}
+		if (valid_v6ulagua_addr_found) {
+			inet_ntop(AF_INET6,
+				&v6ulagua_addr,
+				gIF_IPV6_ULA_GUA,
+				sizeof(gIF_IPV6_ULA_GUA));
+			gIF_IPV6_ULA_GUA_PREFIX_LENGTH = v6ulagua_prefix;
+		}
 	}
 #endif
 	UpnpPrintf(UPNP_INFO,

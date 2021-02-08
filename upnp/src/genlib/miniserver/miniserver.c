@@ -889,6 +889,8 @@ static int get_miniserver_sockets(
 		if (ret_val) {
 			goto error;
 		}
+	}
+	if (ss6UlaGua.fd != INVALID_SOCKET) {
 		ret_val = do_bind_listen(&ss6UlaGua);
 		if (ret_val) {
 			goto error;

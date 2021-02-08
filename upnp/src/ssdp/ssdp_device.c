@@ -196,7 +196,8 @@ static int NewRequestHandler(
 	char buf_ntop[INET6_ADDRSTRLEN];
 	int ret = UPNP_E_SUCCESS;
 
-	if (!inet_pton(AF_INET, gIF_IPV4, &replyAddr)) {
+	if (strlen(gIF_IPV4) > (size_t)0 &&
+		!inet_pton(AF_INET, gIF_IPV4, &replyAddr)) {
 		return UPNP_E_INVALID_PARAM;
 	}
 
