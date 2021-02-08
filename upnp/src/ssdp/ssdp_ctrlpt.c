@@ -606,7 +606,8 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 	/*ThreadData *ThData; */
 	ThreadPoolJob job;
 
-	if (!inet_pton(AF_INET, gIF_IPV4, &addrv4)) {
+	if (strlen(gIF_IPV4) > (size_t)0 &&
+		!inet_pton(AF_INET, gIF_IPV4, &addrv4)) {
 		return UPNP_E_INVALID_PARAM;
 	}
 
