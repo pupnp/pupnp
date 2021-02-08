@@ -9,7 +9,7 @@
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.14.1], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp], [1.14.2], [mroberto@users.sourceforge.net])
 dnl ############################################################################
 dnl # *Independently* of the above libupnp package version, the libtool version
 dnl # of the 3 libraries need to be updated whenever there is a change released:
@@ -57,8 +57,18 @@ dnl #AC_SUBST([LT_VERSION_IXML],       [11:0:0])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [17:1:0])
 dnl #
 dnl ############################################################################
+dnl # Release 1.14.2
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #   revision: 1 -> 2
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [11:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [17:2:0])
+dnl #
+dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [11:0:0])
-AC_SUBST([LT_VERSION_UPNP],       [17:1:0])
+AC_SUBST([LT_VERSION_UPNP],       [17:2:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
@@ -87,10 +97,10 @@ AC_CANONICAL_HOST
 # There are 3 configuration files :
 # 1) "./autoconfig.h" is auto-generated and used only internally during build
 #    (usually named "config.h" but conflicts with the file below)
-# 2) "./upnp/src/inc/config.h" is static and contains some compile-time 
-#    parameters. This file was previously in "./upnp/inc" but is no longer 
+# 2) "./upnp/src/inc/config.h" is static and contains some compile-time
+#    parameters. This file was previously in "./upnp/inc" but is no longer
 #    installed (contains internal definitions only).
-# 3) "./upnp/inc/upnpconfig.h" is auto-generated and installed with the 
+# 3) "./upnp/inc/upnpconfig.h" is auto-generated and installed with the
 #    libraries : it contains information on the configuration of the
 #    installed libraries.
 #
@@ -138,9 +148,9 @@ if test "x$enable_device" = xyes ; then
 fi
 
 
-if test "x$enable_device" = xno ; then 
+if test "x$enable_device" = xno ; then
 	enable_webserver=no
-else 
+else
 	RT_BOOL_ARG_ENABLE([webserver], [yes], [integrated web server])
 fi
 AM_CONDITIONAL(ENABLE_WEBSERVER, test x"$enable_webserver" = xyes)
@@ -345,7 +355,7 @@ fi
 
 #
 # Checks for typedefs, structures, and compiler characteristics
-#	
+#
 AC_C_CONST
 AC_C_BIGENDIAN
 

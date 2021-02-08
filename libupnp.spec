@@ -1,4 +1,4 @@
-Version: 1.14.1
+Version: 1.14.2
 Summary: Universal Plug and Play (UPnP) SDK
 Name: libupnp-1.14
 Release: 1%{?dist}
@@ -11,8 +11,8 @@ Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %define docdeveldir %{_docdir}/%{name}-devel-%{version}
 
 %description
-The Universal Plug and Play (UPnP) SDK for Linux provides 
-support for building UPnP-compliant control points, devices, 
+The Universal Plug and Play (UPnP) SDK for Linux provides
+support for building UPnP-compliant control points, devices,
 and bridges on Linux.
 
 %package devel
@@ -114,6 +114,5 @@ rm -rf %{buildroot}
 - Devel now require full version-release of main package
 
 * Thu Dec 22 2005 Eric Tanguy 1.2.1a-1
-- Modify spec file from 
+- Modify spec file from
 http://rpm.pbone.net/index.php3/stat/4/idpl/2378737/com/libupnp-1.2.1a_DSM320-3.i386.rpm.html
-
