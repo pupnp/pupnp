@@ -1265,26 +1265,24 @@ void *TvCtrlPointTimerLoop(void *args)
  *
  * \return TV_SUCCESS if everything went well, else TV_ERROR.
  */
-int TvCtrlPointStart(print_string printFunctionPtr,
+int TvCtrlPointStart(char *iface,
 	state_update updateFunctionPtr,
 	int combo)
 {
 	ithread_t timer_thread;
 	int rc;
 	unsigned short port = 0;
-	char *ip_address = NULL;
 
-	SampleUtil_Initialize(printFunctionPtr);
 	SampleUtil_RegisterUpdateFunction(updateFunctionPtr);
 
 	ithread_mutex_init(&DeviceListMutex, 0);
 
 	SampleUtil_Print("Initializing UPnP Sdk with\n"
-			 "\tipaddress = %s port = %u\n",
-		ip_address ? ip_address : "{NULL}",
+			 "\tinterface = %s port = %u\n",
+		iface ? iface : "{NULL}",
 		port);
 
-	rc = UpnpInit2(ip_address, port);
+	rc = UpnpInit2(iface, port);
 	if (rc != UPNP_E_SUCCESS) {
 		SampleUtil_Print("WinCEStart: UpnpInit2() Error: %d\n", rc);
 		if (!combo) {
@@ -1293,17 +1291,14 @@ int TvCtrlPointStart(print_string printFunctionPtr,
 			return TV_ERROR;
 		}
 	}
-	if (!ip_address) {
-		ip_address = UpnpGetServerIpAddress();
-	}
-	if (!port) {
-		port = UpnpGetServerPort();
-	}
 
 	SampleUtil_Print("UPnP Initialized\n"
-			 "\tipaddress = %s port = %u\n",
-		ip_address ? ip_address : "{NULL}",
-		port);
+			 "\tipv4 address = %s port = %u\n"
+			 "\tipv6 address = %s port = %u\n"
+			 "\tipv6ulagua address = %s port = %u\n",
+		UpnpGetServerIpAddress(), UpnpGetServerPort(),
+		UpnpGetServerIp6Address(), UpnpGetServerPort6(),
+		UpnpGetServerUlaGuaIp6Address(), UpnpGetServerUlaGuaPort6());
 	SampleUtil_Print("Registering Control Point\n");
 	rc = UpnpRegisterClient(TvCtrlPointCallbackEventHandler,
 		&ctrlpt_handle,

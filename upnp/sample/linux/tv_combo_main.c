@@ -38,8 +38,10 @@
 
 int main(int argc, char *argv[])
 {
+	char *iface = NULL;
 	int rc;
 	ithread_t cmdloop_thread;
+	int i = 0;
 #ifdef _WIN32
 #else
 	int sig;
@@ -47,8 +49,24 @@ int main(int argc, char *argv[])
 #endif
 	int code;
 
+	SampleUtil_Initialize(linux_print);
+	/* Parse options */
+	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-i") == 0) {
+			iface = argv[++i];
+		} else if (strcmp(argv[i], "-help") == 0) {
+			SampleUtil_Print(
+				"Usage: %s -i interface -help (this message)\n",
+				argv[0]);
+			SampleUtil_Print(
+				"\tinterface:     interface address of the control point\n"
+				"\t\te.g.: eth0\n");
+			return 1;
+		}
+	}
+
 	device_main(argc, argv);
-	rc = TvCtrlPointStart(linux_print, NULL, 1);
+	rc = TvCtrlPointStart(iface, NULL, 1);
 	if (rc != TV_SUCCESS) {
 		SampleUtil_Print("Error starting UPnP TV Control Point\n");
 		return rc;
