@@ -182,7 +182,7 @@ void TvCtrlPointVerifyTimeouts(
 
 void	TvCtrlPointPrintCommands(void);
 void*	TvCtrlPointCommandLoop(void *);
-int		TvCtrlPointStart(print_string printFunctionPtr, state_update updateFunctionPtr, int combo);
+int		TvCtrlPointStart(char* iface, state_update updateFunctionPtr, int combo);
 int		TvCtrlPointStop(void);
 int		TvCtrlPointProcessCommand(char *cmdline);
 
