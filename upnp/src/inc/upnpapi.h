@@ -221,6 +221,7 @@ extern unsigned gIF_INDEX;
 
 extern unsigned short LOCAL_PORT_V4;
 extern unsigned short LOCAL_PORT_V6;
+extern unsigned short LOCAL_PORT_V6_ULA_GUA;
 
 
 /*! NLS uuid. */
