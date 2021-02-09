@@ -1,14 +1,14 @@
 # Portable SDK for UPnP\* Devices (libupnp)
 
-| branch        | status                                                                                                  |
-| ------------- | ------------------------------------------------------------------------------------------------------- |
-| master        | ![master](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg)                      |
-| branch-1.14.x | ![1.14.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.14.x) |
-| branch-1.12.x | ![1.12.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.12.x) |
-| branch-1.10.x | ![1.10.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.10.x) |
-| branch-1.8.x  | ![1.8.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.8.x)   |
-| branch-1.6.x  | ![1.6.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.6.x)   |
-| branch-1.4.x  | ![1.4.x](https://github.com/mrjimenez/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.4.x)   |
+| branch        | status                                                                                              |
+| ------------- | --------------------------------------------------------------------------------------------------- |
+| master        | ![master](https://github.com/pupnp/pupnp/workflows/Build/badge.svg)                                 |
+| branch-1.14.x | ![1.14.x](https://github.com/pupnp/pupnp/workflows/Build/badge.svg?branch=branch-1.14.x)            |
+| branch-1.12.x | ![1.12.x](https://github.com/pupnp/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.12.x) |
+| branch-1.10.x | ![1.10.x](https://github.com/pupnp/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.10.x) |
+| branch-1.8.x  | ![1.8.x](https://github.com/pupnp/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.8.x)   |
+| branch-1.6.x  | ![1.6.x](https://github.com/pupnp/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.6.x)   |
+| branch-1.4.x  | ![1.4.x](https://github.com/pupnp/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.4.x)   |
 
 Copyright (c) 2000-2003 Intel Corporation - All Rights Reserved.
 
@@ -274,7 +274,7 @@ This will invoke the "arm-linux-gcc" cross compiler to build the library.
 
 The SDK contains two samples: a TV device application and a control point that talks with the TV device.  They are found in the $(LIBUPNP)/upnp/sample directory.
 
-To build the samples (note: this is the default behaviour):
+To build the samples (note: this is the default behavior):
 
 ```bash
 % ./configure --enable-samples
@@ -329,13 +329,13 @@ PTW32_STATIC_LIB - for using the static pthreads32 library
 
 ### 5.7 - CMake Build
 
-In Order to build everything using the cmake buildsystem, you just need to install cmake for your plattform.
-Standalone cmake is recommended, IDE's like Visial Studio have built-in support which works, but as cmake in general
+In Order to build everything using the cmake build system, you just need to install cmake for your platform.
+Standalone cmake is recommended, IDE's like Visual Studio have built-in support which works, but as cmake in general
 encourages out-of-source builds and VS writes it's config into the source, cmake-gui should be used on windows.
 
 All known options have the same meaning as stated in point 5.2. In Addition 2 options have been added.
 
-- DOWNLOAD_AND_BUILD_DEP: This option is only available if a useable git programm was found on your system.
+- DOWNLOAD_AND_BUILD_DEP: This option is only available if a useable git program was found on your system.
   With this option on, the pthread4w package will be downloaded while configuring the build-env, then it will be build and installed along with upnp.
 
 - BUILD_TESTING: This option activates the tests.
@@ -343,7 +343,7 @@ All known options have the same meaning as stated in point 5.2. In Addition 2 op
 If you don't want to build pthreads4w in the same build as upnp, you can download it from <https://github.com/Vollstrecker/pthreads4w>.
 Just build and install it. The libs and headers will be found, if you set CMAKE_INSTALL_PREFIX (the base install dir) to the same location.
 
-For Informations on general usage of the cmake-buildsystem see: <https://cmake.org/cmake/help/v3.19/guide/user-interaction/index.html>
+For information on general usage of the cmake build system see: <https://cmake.org/cmake/help/v3.19/guide/user-interaction/index.html>
 
 ## 6. Install/Uninstall Instructions
 
@@ -382,23 +382,23 @@ If you find this SDK useful, please send an email to upnp@intel.com and let us k
 
 \* Other brands, names, and trademarks are the property of their respective owners.
 
-## 10. IXML support for scriptinglanguages
+## 10. IXML support for scripting languages
 
-The treestructure of XML documents created by IXML is hard to maintain when creating a binding for a scripting language. Even when many elements may never be used on the script side, it requires copying the entire tree structure once you start accessing elements several levels deep.Hence scriptsupport was added. To enable it compile while IXML_HAVE_SCRIPTSUPPORT has been defined (enabled by default). This allows control using only a list instead of a tree-like structure, and only nodes actually accessed need to be created instead of all the nodes in the tree.
+The tree structure of XML documents created by IXML is hard to maintain when creating a binding for a scripting language. Even when many elements may never be used on the script side, it requires copying the entire tree structure once you start accessing elements several levels deep.Hence scriptsupport was added. To enable it compile while IXML_HAVE_SCRIPTSUPPORT has been defined (enabled by default). This allows control using only a list instead of a tree-like structure, and only nodes actually accessed need to be created instead of all the nodes in the tree.
 
 Here's how its supposed to work:
 
 - The scriptsupport allows you to add a callback when a node is freed on the C side, so appropriate action can be taken on the script side, see function ixmlSetBeforeFree().
 - Instead of recreating the tree structure, an intermediate object should be created only for the nodes actually accessed. The object should be containing a pointer to the node and a 'valid flag' which is initially set to TRUE (the valid flag, can simply be the pointer to the node being NULL or not). Before creating the intermediate object, the custom tag 'ctag' can be used to check whether one was already created.
-- the node object gets an extra 'void\* ctag' field, a custom tag to make a ross reference to the script side intermediate object. It can be set using ixmlNode_setCTag(), and read using ixmlNode_getCTag(). Whenever a new intermediate object is created, the ctag of the coirresponding node should be set to point to this intermediate object.
+- the node object gets an extra 'void\* ctag' field, a custom tag to make a ross reference to the script side intermediate object. It can be set using ixmlNode_setCTag(), and read using ixmlNode_getCTag(). Whenever a new intermediate object is created, the ctag of the corresponding node should be set to point to this intermediate object.
 - The tree structure traversal is done on the C side (looking up parents, children and siblings)
 - Every intermediate object created should be kept in a list (preferably a key-value list, where the key is the pointer to the node and the value is the pointer to the intermediate object)
 - when the callback is called, the node should be looked up in the list, the flag set to false, the pointer to the C-side node be cleared and on the C-side the ctag should be cleared.
 - whenever the intermediate object is accessed and its flag is set to False, an error should be thrown that the XML document has been closed.
 
-Freeing resources can be done in 2 ways, C side by simply calling the free node methods, or script side by the garbage collector of the scriptengine.
+Freeing resources can be done in 2 ways, C side by simply calling the free node methods, or script side by the garbage collector of the script engine.
 
-Scriptside steps:
+Script side steps:
 
 - if the valid flag is set to False (XML document is closed), then the intermediate object can be destroyed, no further action.
 - if the node has a parent, then the intermediate object can be destroyed after the ctag on the corresponding node has been cleared. Nothing needs to be freed on the C-side.

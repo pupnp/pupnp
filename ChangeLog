@@ -60,15 +60,15 @@ Version 1.14.0
 	3 - Doxygen was unable to document it.
 
         This patch removes the templates and creates an auto generator for these
-	boilplate generated code in the same spirit of the templates, but solves
-	the above problems.
+	boilerplate generated code in the same spirit of the templates, but
+        solves the above problems.
 
         Still, dealing with documentation still needs some work, but should be
 	much easier now.
 
 2020-06-11 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
 
-        upnpapic.c: retrieve gIF_IPV4_NETMASK with BSD
+        upnpapi.c: retrieve gIF_IPV4_NETMASK with BSD
 	GitHub #183
 
         BSD is using getifaddrs, update the code to retrieve the IPv4 netmask
@@ -196,7 +196,7 @@ Version 1.12.0
     using the upstream version, and the patch was lost which lead to me
     rediscovering it recently.
 
-    This is Jin's original patch applied to pupnp 1.8.  This teaches punp to
+    This is Jin's original patch applied to pupnp 1.8.  This teaches pupnp to
     ignore the bytes header if it matches "0-" and return HTTP_OK.
 
 2020-01-22 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -276,7 +276,7 @@ Version 1.10.0
 
 2019-07-19 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
-	Fix sed command for upnppatch in configure.ac
+	Fix sed command for upnp patch in configure.ac
 
 2019-04-03 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
@@ -290,7 +290,7 @@ Version 1.10.0
 Version 1.8.6
 *******************************************************************************
 
-2019-11-20 KarlStraussberger (Karlchen@github)
+2019-11-20 Karl Straussberger (Karlchen@github)
 
 	Fix format string for ExtraHeaders #122
 
@@ -327,7 +327,7 @@ Version 1.8.4
 	If only the cookie argument was added, you could probably get away with
 	this because all that would happen is that a garbage value is passed
 	around without being used. With the addition of oldcookie, any old
-	programs will not initialise this value and will probably segfault when
+	programs will not initialize this value and will probably segfault when
 	libupnp tries to write to it.
 
 *******************************************************************************
@@ -336,10 +336,10 @@ Version 1.8.3
 
 2017-09-07 Dave Overton <david(at)insomniavisions.com>
 
-	Add userdata/cookie to virtualDir callbacks
+	Add user data/cookie to virtualDir callbacks
 
 	As with the main Device APIs (UpnpRegisterRootDevice etc), it is useful
-	to have a userdata/cookie pointer returned with each callback.
+	to have a user data/cookie pointer returned with each callback.
 
 	This patch allows one cookie per registered path which enables a variety
 	of functionality in client apps.
@@ -349,7 +349,7 @@ Version 1.8.3
 	Fix large file system support
 
 	libupnp uses large file support (if available). If a program linking to
-	libupnp does not however it creates mismatches in callframes. See
+	libupnp does not however it creates mismatches in call frames. See
 	Issue #51 for the results.
 
 	This simplifies LFS support by using AC_SYS_LARGEFILE_SENSITIVE instead of
@@ -410,7 +410,7 @@ Version 1.8.2
 2014-11-14 Philippe <philippe44ca(at)users.sourceforge.net>
 
 	Hi - I recently compiled libupnp on C++ Builder XE7 and had to do a few
-	changes to make it work. In thase this helps, I've generated a small
+	changes to make it work. In case this helps, I've generated a small
 	patch file.
 
 2015-04-30 Hugo Beauzée-Luyssen <chouquette(at)users.sourceforge.net>
@@ -501,7 +501,7 @@ Version 1.8.0
 
 	There is a problem, perhaps, during downloading a document by
 	UpnpDownloadXmlDoc. During debugging i've found that in an not exported
-	api (unfortunately i forgot the code line...) where it is setted a
+	api (unfortunately i forgot the code line...) where it is set a
 	local variable "int timeout" to -1 then passed directly to another
 	function for sending data through tcp socket. I patched this setting it
 	to 0 (there is an IF section that exits if timeout < 0). It is normal
@@ -545,7 +545,7 @@ Version 1.8.0
 	The following features are added:
 
 	- Support for persistent HTTP connections (reusing HTTP
-	  connections). Tthis is still a work in progress and relies on
+	  connections). This is still a work in progress and relies on
 	  applications to interpret the 'Connection' header
 	  appropriately.
 
@@ -618,7 +618,7 @@ Version 1.8.0
 	Separation of the ClientSubscription object.
 
 2010-04-24 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-	Protect the object destructors agains null pointers on deletion, which
+	Protect the object destructors against null pointers on deletion, which
 	should be something valid.
 
 2010-03-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -652,7 +652,7 @@ Version 1.8.0
 	-> servicelist, subdevice
 	and subdevice has the lower-level serviceList, etc..)
 
-	Unfrotunately, the sample code sample_util.c used by tv_device sample,
+	Unfortunately, the sample code sample_util.c used by tv_device sample,
 	etc.
 	has a code that looks for only the first top-level serviceList.
 	This results in the failure to read all the services of an IGD xml
@@ -728,7 +728,7 @@ Version 1.8.0
 	As per email to pupnp-devel, this is the patch to add the _strget_
 	accessors for string-like objects in the interface.
 
-	Will add a further patch shortly to udpate the sample programs.
+	Will add a further patch shortly to update the sample programs.
 
 2008-06-27 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Nicholas Kraft's patch to fix some IPv6 copy/paste issues. He
@@ -736,7 +736,7 @@ Version 1.8.0
 
 2008-06-13 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 1984541 ]
-	ixmlDocumenttoString does not render the namespace tag.
+	ixmlDocumentToString does not render the namespace tag.
 	Submitted By: Beliveau - belivo
 
 	Undoing the patch that fixed this problem. In fact, there was no
@@ -751,7 +751,7 @@ Version 1.8.0
 	I have found an inconsistency regarding the text/xml content-type
 	returned by libupnp. It looks like only subscription responses send
 	"text/xml" where all other messages contain "text/xml; charset="utf-8"".
-	Since I'm working on an DLNA device the latter behaviour is mandatory.
+	Since I'm working on an DLNA device the latter behavior is mandatory.
 	I changed the according lines in gena_device.c (see attached patch).
 	I'm not sure if it would be ok for other device to have the charset
 	field but it would help me a lot :)
@@ -761,11 +761,11 @@ Version 1.8.0
 
 2008-06-04 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 1984541 ]
-	ixmlDocumenttoString does not render the namespace tag.
+	ixmlDocumentToString does not render the namespace tag.
 	Submitted By: Beliveau - belivo
 
 	The problem occurs when converting a xml document using
-	ixmlDocumenttoString containing a namespace tag created with
+	ixmlDocumentToString containing a namespace tag created with
 	ixmlDocument_createElementNS. The namespace tag doesn't get rendered.
 
 	example: The following code fragment prints:
@@ -788,7 +788,7 @@ Version 1.8.0
 		IXML_Element* wRoot = ixmlDocument_createElementNS(wDoc,
 			"urn:schemas-upnp-org:device-1-0", "root");
 		ixmlNode_appendChild((IXML_Node *)wDoc,(IXML_Node *)wRoot);
-		DOMString wString = ixmlDocumenttoString(wDoc);
+		DOMString wString = ixmlDocumentToString(wDoc);
 		printf(wString);
 		free(wString);
 		ixmlDocument_free(wDoc);
@@ -825,7 +825,7 @@ Version 1.6.22
 
 2017-07-07 James Cowgill <james410(at)cowgill.org.uk>
 
-	Replace MD5 impmplementation with public-domain version
+	Replace MD5 implementation with public-domain version
 
 	Currently the RSA MD5 implementation is used. Unfortunately the license
 	has some potential issues:
@@ -879,7 +879,7 @@ Version 1.6.21
 	Linux requires to have sin6_scope_id hold the interface id when binding to
 	link-local addresses. This is already in use in other parts of upnp, so
 	portability shouldn't be in the way here. Without this bind(2) fails with
-	errno=EINVAL (although ipv6(7) from manpages 4.08 specifies ENODEV in this
+	errno=EINVAL (although ipv6(7) from man pages 4.08 specifies ENODEV in this
 	case).
 
 	Fixes: https://bugs.debian.org/813249
@@ -965,7 +965,7 @@ Version 1.6.20
 	on the system (for example because the ipv6 code is not loaded in a Linux
 	kernel as is the case by default on Raspbian), the ipv6 socket creation
 	call will fail in miniserver.c and the library init will fail, even if
-	the ipv4 initialisation would have succeeded.
+	the ipv4 initialization would have succeeded.
 
 	Let a library configured with --enable-ipv6 initialize in ipv4-only
 	mode if ipv6 is not available instead of failing. This can happen
@@ -1052,7 +1052,7 @@ Version 1.6.20
 	$ configure --enable-debug
 	$ make CFLAGS='-g -pthread -O0' Define NO_STRING_INLINES
 	$ export CFLAGS="-DNO_STRING_INLINES -O2"
-	$ ./configure --enagble-debug
+	$ ./configure --enable-debug
 	$ make
 
 	Fix
@@ -1119,7 +1119,7 @@ Version 1.6.19
 
 	1) remove redundant free
 	2) avoid user-provided ErrStr being overwritten by the default one
-	3) eliminated memory leak possiblity in handle_query_variable
+	3) eliminated memory leak possibility in handle_query_variable
 
 2013-11-08 Peng <howtofly(at)gmail.com>
 
@@ -1226,7 +1226,7 @@ Version 1.6.19
 
 2013-08-13 Peng <howtofly(at)gmail.com>
 
-	Patch to fix behaviou when char is signed
+	Patch to fix behavior when char is signed
 
 	it seems to me that there is still something wrong:
 
@@ -1302,7 +1302,7 @@ Version 1.6.18
 	Security fix for CERT issue VU#922681
 
 	This patch addresses three possible buffer overflows in function
-	unique_service_name(). The three issues have the folowing CVE numbers:
+	unique_service_name(). The three issues have the following CVE numbers:
 
 	CVE-2012-5958 Issue #2: Stack buffer overflow of Tempbuf
 	CVE-2012-5959 Issue #4: Stack buffer overflow of Event->UDN
@@ -1409,7 +1409,7 @@ Version 1.6.18
 
 2012-04-03 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
-	Compilation optimisation
+	Compilation optimization
 
 	Do not compile the code related to the webserver in http_SendMessage
 	when --disable-webserver is set
@@ -1447,7 +1447,7 @@ Version 1.6.17
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-29 07:36:34 PDT
 
-	Miniserver is disabled if ECXLUDE_GENA, EXCLUDE_SOAP and
+	Miniserver is disabled if EXCLUDE_GENA, EXCLUDE_SOAP and
 	EXCLUDE_WEBSERVER are set.
 	However, SSDP needs the Miniserver to answer to M-SEARCH requests.
 	So, MiniServer should not be disabled if EXCLUDE_SSDP is not also set.
@@ -1466,7 +1466,7 @@ Version 1.6.17
 
 	Submitted: Yoichi NAKAYAMA ( yoichi ) - 2012-03-25 18:14:34 PDT
 
-	There are typos in upnp/src/inc/config.h "EXCLUDE_SSSDP" (shold be
+	There are typos in upnp/src/inc/config.h "EXCLUDE_SSSDP" (should be
 	EXCLUDE_SSDP), therefore EXCLUDE_SSDP is always 0, and --disable-ssdp
 	has no effect.
 
@@ -1591,16 +1591,16 @@ Version 1.6.16
 
 2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
-	Use switch insted of if with enums in ixml
+	Use switch instead of if with enums in ixml
 
 	Replace if statements with switch when using enums in ixml.
-	Remove uneeded initialization in ixmlAttr_init, Parser_init and
+	Remove unneeded initialization in ixmlAttr_init, Parser_init and
 	ixmlNode_init which was added by wrongly added in commit
 	06660b6383c438e4e2c9ca9854077cecc4da9e5d.
 
 2012-03-14 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
-	Use switch insted of if with enums in threadutil
+	Use switch instead of if with enums in threadutil
 
 	Replace if statements with switch when using enums in threadutil.
 
@@ -1636,7 +1636,8 @@ Version 1.6.16
 
 2012-03-14 Yoichi NAKAYAMA <yoichi.nakayama(at)gmail.com>
 
-	SF Bug Tracker id 3502958 - The commit 5944960e prevents a pupnp client (amule) from receiving replies from an IGD device.
+	SF Bug Tracker id 3502958 - The commit 5944960e prevents a pupnp client
+        (amule) from receiving replies from an IGD device.
 
 	Previous change broke the feature. The error of unique_service_name
 	in ssdp_request_type should be ignored.
@@ -1729,7 +1730,7 @@ Version 1.6.16
 
 2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
-	More compilaton optimisation
+	More compilation optimization
 
 	Do not compile most of service_table.c and client_table.c if
 	--disable-gena is used.
@@ -1738,7 +1739,7 @@ Version 1.6.16
 
 2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
-	Optimisation of --disable-webserver
+	Optimization of --disable-webserver
 
 	Do not compile webserver.c if --disable-webserver is used.
 
@@ -1751,7 +1752,7 @@ Version 1.6.16
 
 2012-03-09 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
-	Optimisation of --disable-webserver
+	Optimization of --disable-webserver
 
 	Do not compile miniserver.c if --disable-webserver is used.
 
@@ -1918,7 +1919,7 @@ Version 1.6.16
 	Details: The recent codebase merge has removed a significant API call
 	which is used by several pupnp devices such as mediatomb and gmediaserver.
 	UpnpSetVirtualDirCallbacks() has been replaced by individual routines to
-	set each callback. Essentially this means that 1.6.7 will in fact be a majo
+	set each callback. Essentially this means that 1.6.7 will in fact be a major
 	bump and 1.6.6 devices can no longer link against it. Could we have the call
 	reinstated please, perhaps as a wrapper around the individual calls ? As
 	it is, all distros will have to patch their 1.6.x apps, rebuild and re-link them.
@@ -2017,7 +2018,7 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
-	Bug fix of lastest commit (parse_hostport)
+	Bug fix of latest commit (parse_hostport)
 
 	Missing parenthesis in memset.
 
@@ -2074,7 +2075,7 @@ Version 1.6.16
 
 2012-03-05 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
-	SF Bug Tracker id 3496938 - Missing structures initialisation in some functions
+	SF Bug Tracker id 3496938 - Missing structures initialization in some functions
 
 	Submitted: Fabrice Fontaine ( ffontaine ) - 2012-03-05 01:31:16 PST
 
@@ -2247,7 +2248,7 @@ Version 1.6.15
 	and UpnpResolveURL2 it shows that the ExitFunction: always returns
 	UPNP_E_SUCCESS.
 
-	I'm farily sure it's a simple mistake that should have been "return ret;"
+	I'm fairly sure it's a simple mistake that should have been "return ret;"
 	in both cases.
 
 	Br,
@@ -2264,7 +2265,7 @@ Version 1.6.14
 	Adding two new functions (UpnpSendAdvertisementLowPower and
 	UpnpUnRegisterRootDeviceLowPower) which can be used to specify values
 	for the three SSDP headers defined by UPnP Low Power. Those headers are
-	Powerstate, SleepPeriod and RegistrationState.
+	PowerState, SleepPeriod and RegistrationState.
 
 2011-10-24 Fabrice Fontaine <fabrice.fontaine(at)orange.com>
 
@@ -2609,7 +2610,7 @@ to be interpreted as a buffer size to be alloc'd/copied, hence the 32 GB.)
 
 	Added the convenience function UpnpResolveURL2() to upnptools.c.
 
-	This function avoids some unecessary memory allocation.
+	This function avoids some unnecessary memory allocation.
 	The memory alloc'd by this function must be freed later by the caller.
 
 2010-11-10 Fabrice Fontaine <fabrice.fontaine(at)orange-ftgroup.com>
@@ -2619,7 +2620,7 @@ to be interpreted as a buffer size to be alloc'd/copied, hence the 32 GB.)
 	Currently, in notify_send_and_recv function, pupnp waits for
 	HTTP_DEFAULT_TIMEOUT seconds when trying to send a GENA notification.
 	When there is a lot of notifications with CPs which was disconnected
-	without unsusbcribing, all the pupnp threads are blocked on this
+	without unsubscribing, all the pupnp threads are blocked on this
 	timeout. To correct, this issue, this patch adds a new variable,
 	GENA_NOTIFICATION_SENDING_TIMEOUT, which can be used to lower the
 	timeout so GENA threads return quickly when writing is impossible. By
@@ -2633,7 +2634,7 @@ to be interpreted as a buffer size to be alloc'd/copied, hence the 32 GB.)
 
 	Currently, pupnp is using a blocking connect to sends GENA
 	notifications. As a result, when there is a lot of notifications with
-	CPs which were disconnected without unsusbcribing, all the pupnp
+	CPs which were disconnected without unsubscribing, all the pupnp
 	threads are blocked for 20s (timeout). To correct this issue, this
 	patch replace the call to connect with a call to private_connect and add
 	a compilation flag to disable blocking TCP connections, so if we are not
@@ -2731,9 +2732,9 @@ Version 1.6.8
 	Bug fix in select of miniserver.c
 
 	Fix a bug in miniserver.c, in which maxMiniSock was wrongly declared as
-	unsigned int and as a result it was beeng set to ((unsigned int)(-1)).
-	As a result, after beeing incremented, it became zero, and this value
-	was beeing used in the select() call.
+	unsigned int and as a result it was being set to ((unsigned int)(-1)).
+	As a result, after being incremented, it became zero, and this value
+	was being used in the select() call.
 
 	Thanks to Fabrice Fontaine for helping and testing with this issue.
 
@@ -2784,12 +2785,12 @@ Version 1.6.7
 
 	Original SF Tracker issue follows:
 
-	SF Tracker [ 2688125 ] v1.6.6 crashes on subdevices without services
+	SF Tracker [ 2688125 ] v1.6.6 crashes on sub devices without services
 	Submitted by: Arno Willig ( akw ) - 2009-03-15 22:45:23 BRT
 
 	I discovered a bug, which will make libupnp (1.6.6) segfault, when you
 	create a upnp description document with multiple devices which have
-	subdevices, but no own services.
+	sub devices, but no own services.
 
 	The crash occurs in genlib/service_table.c in line 977:
 	end->next =
@@ -2900,8 +2901,8 @@ Version 1.6.7
 	such as OS X and iOS. This might be broken in other OSes to but didn't
 	verify.
 
-	The fix is to modify the socket lenght argument of sendto to use the correct
-	sockaddr lenght dependng on whether the socket is IPV4 or IPV6.
+	The fix is to modify the socket length argument of sendto to use the correct
+	sockaddr length depending on whether the socket is IPV4 or IPV6.
 
 	Also added some error checks and debugging related to the issue
 
@@ -2922,7 +2923,7 @@ Version 1.6.7
 2010-09-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	In the latest sources, http_RequestAndResponse and other methods that
 	use connect() are broken. More specifically, connect() in these methods
-	is returning with an EINVAL. The programatic cause is that the address_len
+	is returning with an EINVAL. The programmatic cause is that the address_len
 	argument passed to connect() is different in IPV4 vs IPV6 (as described in:
 	http://www.opengroup.org/onlinepubs/009695399/functions/connect.html).
 	The current code always uses the IPV6 size. The fix modifies each use of
@@ -3159,12 +3160,12 @@ Version 1.6.7
 	(ssdp/ssdp_server.c) in libupnp 1.6.6
 
 	There are continue statements in many places in AdvertiseAndReply. In some
-	of those error handling cases the variable nodelist is not free'ed before
+	of those error handling cases the variable nodelist is not freed before
 	continuing to the next iteration. The next iteration will take care of
-	free'ing the nodelist from the previous iteration in most cases, but not
+	freeing the nodelist from the previous iteration in most cases, but not
 	when breaking out of the for loop after the last element.
 
-	I belive this memory leak can be solved by makeing sure that the rows
+	I believe this memory leak can be solved by making sure that the rows
 
 	ixmlNodeList_free( nodeList );
 	nodeList = NULL;
@@ -3183,12 +3184,12 @@ Version 1.6.7
 
 2010-03-21 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* libupnp and multi-flows scenario patch
-	Submited by Carlo Parata from STMicroelectronics.
+	Submitted by Carlo Parata from STMicroelectronics.
 
 	Hi Roberto and Nektarios,
 	after an analysis of the problem of libupnp with a multi-flows scenario, I
 	noticed that the only cause of the freezed system is the ThreadPool
-	management. There are not mutex problems. In practise, if all threads in the
+	management. There are not mutex problems. In practice, if all threads in the
 	thread pool are busy executing jobs, a new worker thread should be created if
 	a job is scheduled (I inspired to tombupnp library). So I solved the problem
 	with a little patch in threadutil library that you can find attached in this
@@ -3201,7 +3202,7 @@ Version 1.6.7
 
 	Full error:
 	/usr/bin/install: will not overwrite just-created
-	`/tmp/buildd/libupnp-1.6.6/debian/tmp/usr/share/doc/libupnp3-dev/examples/s
+	`/tmp/build/libupnp-1.6.6/debian/tmp/usr/share/doc/libupnp3-dev/examples/s
 	ample_util.c' with `common/sample_util.c'
 
 	This seems to be from Automake 1.11 which doesn't like having duplicate
@@ -3220,7 +3221,7 @@ Version 1.6.7
 	* SF Patch Tracker [ 2836704 ] Patch for Solaris10 compilation and usage.
 	Submitted By: zephyrus ( zephyrus00jp )
 	Obs by Marcelo: The issue with linking with -lsocket -lnsl -lrt is not
-	covered in this changeset beacuse I don't have solaris to test. I will
+	covered in this changeset because I don't have solaris to test. I will
 	need some help from zephyrus in this regard. The issue will be addressed
 	in a future changeset.
 
@@ -3238,7 +3239,7 @@ Version 1.6.7
 
 	Without the fix, UpnpInit() fails immediately.
 
-	upnpp/src/api/upnpai.c
+	upnp/src/api/upnpapi.c
 
 	There is a typo of a macro name "__sun" in one of the
 	CPP conditional.
@@ -3248,7 +3249,7 @@ Version 1.6.7
 	A few structs and an array is not properly initialized.
 	Well, I think it may be safe as is, but when I checked it
 	using purify evaluation version, it was reported that
-	uninitizlied iszBuffer may cause read of uninitialized memory.
+	uninitialized iszBuffer may cause read of uninitialized memory.
 	So play it safe.
 
 	Configure issue.
@@ -3277,7 +3278,7 @@ Version 1.6.7
 	-> servicelist, subdevice
 	and subdevice has the lower-level serviceList, etc..)
 
-	Unfrotunately, the sample code sample_util.c used by tv_device sample,
+	Unfortunately, the sample code sample_util.c used by tv_device sample,
 	etc.
 	has a code that looks for only the first top-level serviceList.
 	This results in the failure to read all the services of an IGD xml
@@ -3342,7 +3343,7 @@ Version 1.6.7
 	"SOAPACTION:
 	\"urn:schemas-upnp-org:control-1-0#QueryStateVariable\"",
 	xml_start, var_name, xml_end ) != 0 ) {
-	return UPNP_E_OUTOF_MEMORY;
+	return UPNP_E_OUT_OF_MEMORY;
 	}
 
 	This will result in the SOAPACTION header to be immediately followed by the
@@ -3364,7 +3365,7 @@ Version 1.6.7
 	* SF Bug Tracker [ 2026431 ] pupnp does not build on GNU/KfreeBSD.
 	Submitted By: Nick Leverton - leveret
 	Gnu/KFreeBSD is one of the Debian architectures, it includes a FreeBSD
-	kernel with GNU userspace (glibc etc). The Gnu/KfreeBSD developers
+	kernel with GNU user space (glibc etc). The Gnu/KfreeBSD developers
 	provided the attached patch to test the appropriate #define and allow pupnp
 	to build in their environment, and asked me to forward it to you.
 
@@ -3381,7 +3382,7 @@ Version 1.6.7
 
 2008-06-11 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fixed a buffer overflow due to a bug in the calculation of the
-	CONTENT-TYPE header line size, the length was beeing calculated with
+	CONTENT-TYPE header line size, the length was being calculated with
 	the wrong string, there was a missing colon.
 
 2008-06-02 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -3429,11 +3430,11 @@ Version 1.6.7
 	functions.
 
 	But the UpnpAccept functions don't muck with the subscription table, and
-	it's more work than it's worth to move that code from the gena fucntions to
+	it's more work than it's worth to move that code from the gena functions to
 	the upnpapi functions.
 
 	So--- what I've done to correct this problem is to modify both
-	UpnpAcceptSubscription<...> functions (in upnppapi.c) to accept an empty
+	UpnpAcceptSubscription<...> functions (in upnpapi.c) to accept an empty
 	state list and still call the gena layer functions. The gena layer
 	genaInitNotify<...> functions (gena_device.c) then mark the subscription as
 	"active" *before* checking for an empty state set.
@@ -3444,7 +3445,7 @@ Version 1.6.7
 	list is not an error). The same check is made for "PropSet == 0" in
 	genaInitNotifyExt (just after the "subs->active = 1;" line).
 
-	I've modifified my proxy layer to call UpnpAcceptSubscriptionExt even when
+	I've modified my proxy layer to call UpnpAcceptSubscriptionExt even when
 	there is no state data to send. With the suggested changes to
 	gena_device.c, later state changes are sent correctly.
 
@@ -3487,8 +3488,8 @@ Version 1.6.6
 
 2008-03-08 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fixed a printf format problem on the upnp_tv_device.c from both
-	upnp/sample/tvdevie and upnp/sample/tvcombo directories. The variable
-	port was a short int instead of an unsigned short and it was beeing
+	upnp/sample/tvdevice and upnp/sample/tvcombo directories. The variable
+	port was a short int instead of an unsigned short and it was being
 	print as a negative value.
 
 2008-03-08 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -3523,7 +3524,7 @@ Version 1.6.5
 *******************************************************************************
 
 2008-02-02 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-	* Peter Hartley's fix for wrong sized variable beeing passed to
+	* Peter Hartley's fix for wrong sized variable being passed to
 	http_MakeMessage() on 64 bit architectures.
 
 
@@ -3560,9 +3561,8 @@ Version 1.6.4
 2008-01-07 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Patches Tracker [ 1865812 ] typo in docs comment
 	Submitted By: Hartmut Holzgraefe - hholzgra
-	typo in docs comment ACCAPTED instead of ACCEPTED in
-	@name UPNP_E_UNSUBSCRIBE_UNACCAPTED [-302]
-	Also, the documentation file name was mispelled and was corrected in
+	typo in docs comment [-302]
+	Also, the documentation file name was misspelled and was corrected in
 	the Makefile.am.
 
 *******************************************************************************
@@ -3576,8 +3576,8 @@ Version 1.6.3
 
 2007-12-24 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Added a configure test to check if pthread_rwlock_t is available.
-	Define _GNU_SOURCE if needed. The fallback behaviou will only be
-	implemented if _GNU_SOURCE prooves to be insufficient on some
+	Define _GNU_SOURCE if needed. The fallback behavior will only be
+	implemented if _GNU_SOURCE proves to be insufficient on some
 	platforms. Thanks to Jonathan Casiot (no_dice) and Robert Gingher
 	(robsbox).
 
@@ -3639,7 +3639,7 @@ Version 1.6.1
 	* Added support for rwlocks.
 
 2007-11-05 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-	* SF Bug Tracker [ 1825929 ] woker thread still alive after UpnpFinish()
+	* SF Bug Tracker [ 1825929 ] worker thread still alive after UpnpFinish()
 	Submitted By: Luke Kim - nereusuj
 	Worker thread still alive after calling UpnpFinish() because
 	ThreadPoolShutdown() is in the #ifdef DEBUG block.
@@ -3667,11 +3667,11 @@ Version 1.6.1
 
 	Impact:
 	Varies depending on client. The Xbox 360 kills the connection when it
-	realises.
+	realizes.
 
 	Solution:
 	GetNextRange function (webserver.c) is updated to handle large file sizes.
-	Fix should also recognise when built on a 32bit platform rather than 64 and
+	Fix should also recognize when built on a 32bit platform rather than 64 and
 	handle accordingly.
 
 2007-08-05 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -3717,15 +3717,15 @@ Version 1.6.0
 	m4/type_socklen_t.m4.
 
 2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-	* Fixed an issue with the instalation of the file upnpdebug.h. Since
-	the last modifications that removed the macro DEBUV_ONLY, this file
+	* Fixed an issue with the installation of the file upnpdebug.h. Since
+	the last modifications that removed the macro DEBUG_ONLY, this file
 	must be installed even on a non-debug build.
 
 2007-05-26 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* SF Bug Tracker [ 1711325 ] Bad DestAddr in Upnp_Discovery structure
 	Submitted By: Bob Ciora
 	The field DestAddr of the structure Upnp_Discovery is now a full
-	SOCKADDRIN instead of a pointer to SOCKADDRIN. Commented code sugests
+	SOCKADDRIN instead of a pointer to SOCKADDRIN. Commented code suggests
 	that in a previous moment, the function ssdp_handle_ctrlpt_msg() did
 	not use a postponed thread to call ctrlpt_callback(). Now the code
 	uses a thread, and most probably the original data would get lost and
@@ -3790,7 +3790,7 @@ Version 1.4.7
 
 2007-05-17 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* Fixed a bug in UpnpPrintf, function could call va_start() and return
-	befor calling va_end().
+	before calling va_end().
 
 2007-05-15 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 	* EXPORT_SPEC missing on some declarations in ixml/inc/ixml.h.
@@ -3838,7 +3838,7 @@ Version 1.4.5
 	patch.
 
 2007-04-07 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
-	* Fix for a bug in makeAction where va_arg was beeing called one
+	* Fix for a bug in makeAction where va_arg was being called one
 	extra time.
 
 2007-04-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -3848,9 +3848,9 @@ Version 1.4.5
 	gethostbyaddr_r when supported.
 
 2007-04-28 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
-	* [pupnp-devel] Type mixup on x86_64 causes UPNP_E_OUTOF_MEMORY
+	* [pupnp-devel] Type mixup on x86_64 causes UPNP_E_OUT_OF_MEMORY
 	Submitted By: Glen Masgai
-	after an UpnpSendActionAsync() for example, i get UPNP_E_OUTOF_MEMORY
+	after an UpnpSendActionAsync() for example, i get UPNP_E_OUT_OF_MEMORY
 	in the callback using 1.4.4 on a x86_64 system. This happens in
 	http_MakeMessage(), which in some cases get called with wrong types
 	(int instead of size_t) in combination with format "b" and "Q".
@@ -3873,7 +3873,7 @@ Version 1.4.4
 	on AMD64 systems. Emil Ljungdahl's AMD64 patch has been applied along
 	with some other fixes. Original user report follows:
 
-	When I run upnpd I get the above mentioned error (UPNP_E_OUTOF_MEMORY).
+	When I run upnpd I get the above mentioned error (UPNP_E_OUT_OF_MEMORY).
 	I've tried with 1.4.1 and 1.4.2-RC3, it's the same. I don't understand why,
 	because I have plenty of RAM, and I even tried closing some applications,
 	but it didn't help.
@@ -3887,7 +3887,7 @@ Version 1.4.4
 
 
 	I tried enabling debugging and it looks like it cannot allocate memory
-	through the membuffer_append function. It's wierd because it's only a few
+	through the membuffer_append function. It's weird because it's only a few
 	bytes.
 
 	Please note, that I enabled some extra debugging lines that were commented,
@@ -3901,7 +3901,7 @@ Version 1.4.3
 	* SF Tracker [ 1663004 ] Compile on Cygwin
 	Submitted By: Jon Foster - jongfoster
 	This patch gives basic support for building under Cygwin - it compiles,
-	links, and a simple UPnP device application can initialise. I'm not sure
+	links, and a simple UPnP device application can initialize. I'm not sure
 	if it actually works yet, but this is definitely a step in the right
 	direction.
 
@@ -3917,7 +3917,7 @@ Version 1.4.3
 	add a proper implementation later.
 
 	* upnp/src/api/upnpapi.c: On Cygwin, zero out the GlobalHndMutex structure
-	before initialising it. Without this, the initialisation fails. This
+	before initializing it. Without this, the initialization fails. This
 	appears to be a bug in Cygwin.
 
 	* upnp/src/genlib/net/uri/uri.c: Use gethostbyname() on Cygwin.
@@ -3972,7 +3972,7 @@ Version 1.4.2
 
 	* SF Tracker [ 1628590 ] XML parsing segfault patch
 	Submitted By: Fredrik Svensson - svefredrik
-	This patch fixes a segmentation fault problem that occurrs
+	This patch fixes a segmentation fault problem that occurs
 	when parsing XML code than some routers produce.
 
 2007-01-06 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
@@ -3982,7 +3982,7 @@ Version 1.4.2
 
 	* SF Tracker [ 1628562 ] Maximum total jobs patch
 	Submitted By: Fredrik Svensson - svefredrik
-	Also, I incremented the libray versions and included some
+	Also, I incremented the library versions and included some
 	comments in the file configure.ac so that we do not bump
 	the library version excessively, only the necessary numbers
 	on the next release.
@@ -4016,10 +4016,10 @@ Version 1.4.2
 	* SF Patch tracker [ 1581161 ] VStudio2005 patch
 	Submitted By: David Maass - darkservant
 
-	* SF Patch tracker [ 1587272 ] const-ified ixml
+	* SF Patch tracker [ 1587272 ] constified ixml
 	Submitted By: Erik Johansson
 
-	* Finished const-ifications as suggested by Erik Johansson in
+	* Finished constifications as suggested by Erik Johansson in
 	SF Patch tracker [ 1587272 ].
 
 2006-07-05 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
@@ -4047,7 +4047,7 @@ Version 1.4.1
 2006-07-05 Nektarios K. Papadopoulos <npapadop(at)inaccessnetworks.com>
 
 	* Include prebuilt documentation (html,pdf), dropping doc++
-	dependancy.
+	dependency.
 
 2006-07-03 Marcelo Jimenez <mroberto(at)users.sourceforge.net>
 
@@ -4081,13 +4081,13 @@ Version 1.4.0
 
 2006-05-19 Oxy <virtual_worlds(at)gmx.de>
 
-	* Patch added for bug: ixml parser colapsed on empty args (arg="")
+	* Patch added for bug: ixml parser collapsed on empty args (arg="")
 
 2006-05-18 Oxy <virtual_worlds(at)gmx.de>
 
 	* DSM-320 patch added (fetched from project MediaTomb)
 
-	* httpGet additons atch added, Added proxy support by introducing
+	* httpGet additions added, Added proxy support by introducing
 	  UpnpOpenHttpGetProxy. UpnpOpenHttpGet now just calls
 	  UpnpOpenHttpGetProxy with the proxy url set to NULL.
 
@@ -4185,7 +4185,7 @@ FORK FROM DEAD libupnp
 	  UPNP_HAVE_xx instead of INCLUDE_yyy_APIS and INTERNAL_WEB_SERVER
 
 	* upnp/Makefile.am, ixml/Makefile.am: add -export-symbols-regex to
-	  the librarie LDFLAGS in order to export only the symbols defined
+	  the library LDFLAGS in order to export only the symbols defined
 	  in the API
 
 2006-02-27  Rémi Turboult  <r3mi(at)users.sourceforge.net>
@@ -4326,7 +4326,7 @@ FORK FROM DEAD libupnp
 
 	* upnp/src/api/upnptools.c : add more error message strings
 
-	* upnp/src/genlib/net/http/httpreadwrite.c : return OUTOF_BOUNDS
+	* upnp/src/genlib/net/http/httpreadwrite.c : return OUT_OF_BOUNDS
 	  instead of BAD_HTTPMSG when allowed Content Length is exceeded.
 
 	* upnp/src/genlib/net/http/httpreadwrite.c : corrected an incorrect
@@ -4367,7 +4367,7 @@ dnl # - Code has changed in threadutil
 dnl #	revision: 2 -> 3
 dnl # - Interface added in threadutil
 dnl #	current: 2 -> 3
-dnl #	revisiion: 3 -> 0
+dnl #	revision: 3 -> 0
 dnl #	age: 0 -> 1
 dnl # - Code has changed in upnp
 dnl #	revision: 2 -> 3
@@ -4491,7 +4491,7 @@ dnl #AC_SUBST([LT_VERSION_IXML],       [2:4:0])
 dnl #AC_SUBST([LT_VERSION_THREADUTIL], [5:0:2])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [3:5:0])
 dnl #
-dnl # Obs.: 1.6.7 was released with a version error, the correct nubers should
+dnl # Obs.: 1.6.7 was released with a version error, the correct numbers should
 dnl # have been:
 dnl #AC_SUBST([LT_VERSION_UPNP],       [4:0:0])
 dnl #
