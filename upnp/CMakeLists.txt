@@ -138,7 +138,7 @@ if (tools)
 endif()
 
 set_target_properties (upnp_shared PROPERTIES
-	OUTPUT_NAME pupnp
+	OUTPUT_NAME upnp
 	EXPORT_NAME UPNP::Shared
 	VERSION ${UPNP_VERSION}
 	SOVERSION ${UPNP_VERSION_MAJOR}
