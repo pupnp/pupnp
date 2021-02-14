@@ -1,9 +1,8 @@
-#SUBDIRS 		= doc
-IF (BUILD_TESTING)
-	ADD_SUBDIRECTORY (test)
-ENDIF (BUILD_TESTING)
+if (BUILD_TESTING)
+	add_subdirectory (test)
+endif()
 
-SET (IXML_SOURCES
+set (IXML_SOURCES
 	src/attr.c
 	src/document.c
 	src/element.c
@@ -16,32 +15,32 @@ SET (IXML_SOURCES
 	src/nodeList.c
 )
 
-ADD_LIBRARY (ixml_shared SHARED
+add_library (ixml_shared SHARED
 	${IXML_SOURCES}
 )
 
-ADD_LIBRARY (IXML::Shared ALIAS ixml_shared)
+add_library (IXML::Shared ALIAS ixml_shared)
 
-TARGET_COMPILE_DEFINITIONS (ixml_shared
+target_compile_definitions (ixml_shared
 	PRIVATE $<$<BOOL:${script_support}>:IXML_HAVE_SCRIPTSUPPORT>
 	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
 	PUBLIC $<$<BOOL:${MSVC}>:LIBUPNP_EXPORTS>
 )
 
-TARGET_INCLUDE_DIRECTORIES (ixml_shared
-	PRIVATE ${UPNP_BINARY_DIR}/
+target_include_directories (ixml_shared
+	PRIVATE ${PUPNP_BINARY_DIR}/
 	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
 	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
-	PUBLIC $<BUILD_INTERFACE:${UPNP_SOURCE_DIR}/upnp/inc/>
+	PUBLIC $<BUILD_INTERFACE:${PUPNP_SOURCE_DIR}/upnp/inc/>
 )
 
-LIST (APPEND IXML_HEADERS
+list (APPEND IXML_HEADERS
 	inc/ixml.h
 	inc/ixmldebug.h
 )
 
-SET_TARGET_PROPERTIES(ixml_shared PROPERTIES
+set_target_properties (ixml_shared PROPERTIES
 	OUTPUT_NAME ixml
 	EXPORT_NAME IXML::Shared
 	VERSION ${IXML_VERSION}
@@ -49,50 +48,50 @@ SET_TARGET_PROPERTIES(ixml_shared PROPERTIES
 	PUBLIC_HEADER "${IXML_HEADERS}"
 )
 
-INSTALL (TARGETS ixml_shared
+install (TARGETS ixml_shared
 	EXPORT IXML
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
 	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
 )
 
-ADD_LIBRARY (ixml_static STATIC
+add_library (ixml_static STATIC
 	${IXML_SOURCES}
 )
 
-ADD_LIBRARY (IXML::Static ALIAS ixml_static)
+add_library (IXML::Static ALIAS ixml_static)
 
-SET_TARGET_PROPERTIES(ixml_static PROPERTIES
+set_target_properties (ixml_static PROPERTIES
 	OUTPUT_NAME ixml${STATIC_POSTFIX}
 	EXPORT_NAME IXML::Static
 )
 
-TARGET_COMPILE_DEFINITIONS (ixml_static
+target_compile_definitions (ixml_static
 	PRIVATE $<$<BOOL:${script_support}>:IXML_HAVE_SCRIPTSUPPORT>
 	PUBLIC UPNP_STATIC_LIB
 	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
 	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 )
 
-IF (script_support)
-	TARGET_COMPILE_DEFINITIONS (ixml_static
+if (script_support)
+	target_compile_definitions (ixml_static
 		PRIVATE IXML_HAVE_SCRIPTSUPPORT
 	)
-ENDIF (script_support)
+endif()
 
-TARGET_INCLUDE_DIRECTORIES (ixml_static
-	PRIVATE ${UPNP_BINARY_DIR}/
+target_include_directories (ixml_static
+	PRIVATE ${PUPNP_BINARY_DIR}/
 	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
 	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
-	PUBLIC $<BUILD_INTERFACE:${UPNP_SOURCE_DIR}/upnp/inc/>
+	PUBLIC $<BUILD_INTERFACE:${PUPNP_SOURCE_DIR}/upnp/inc/>
 )
 
-INSTALL (TARGETS ixml_static
+install (TARGETS ixml_static
 	EXPORT IXML
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
 )
 
-INSTALL (EXPORT IXML
+install (EXPORT IXML
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/IXML
 )
