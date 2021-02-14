@@ -4,12 +4,13 @@ on: [push, pull_request]
 
 jobs:
   linux:
-    name: Build (${{ matrix.os }})
+    name: Build (${{ matrix.os }}) - ${{ matrix.conf }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         os: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04]
+        conf: [Debug, Release]
       fail-fast: false
 
     steps:
@@ -22,7 +23,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake -G Ninja -DBUILD_TESTING=ON -S . -B build
+          cmake -G Ninja -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ conf }} -S . -B build
           cmake --build build
 
       - name: Test
@@ -31,12 +32,13 @@ jobs:
           ctest --output-on-failure
 
   windows:
-    name: Build (${{ matrix.os }})
+    name: Build (${{ matrix.os }})  - ${{ matrix.conf }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         os: [windows-2016, windows-2019]
+        conf: [Debug, Release]
       fail-fast: false
 
     steps:
@@ -55,7 +57,7 @@ jobs:
               set-content env:\"$name" $value
             }
           }
-          cmake -G Ninja -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -S . -B build
+          cmake -G Ninja -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ conf }} -S . -B build
           cmake --build build
 
       - name: Test
