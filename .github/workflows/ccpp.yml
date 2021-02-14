@@ -23,7 +23,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake -G Ninja -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ conf }} -S . -B build
+          cmake -G Ninja -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
           cmake --build build
 
       - name: Test
@@ -57,7 +57,7 @@ jobs:
               set-content env:\"$name" $value
             }
           }
-          cmake -G Ninja -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ conf }} -S . -B build
+          cmake -G Ninja -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
           cmake --build build
 
       - name: Test
