@@ -3772,6 +3772,10 @@ int UpnpGetIfInfo(const char *IfName)
 			(!(ifa->ifa_flags & IFF_MULTICAST))) {
 			continue;
 		}
+		/* Entries may be provided for non-existent addresses. */
+		if (ifa->ifa_addr == NULL) {
+			continue;
+		}
 		if (ifname_found == 0) {
 			/* We have found a valid interface name. Keep it. */
 			memset(gIF_NAME, 0, sizeof(gIF_NAME));
