@@ -3763,10 +3763,11 @@ int UpnpGetIfInfo(const char *IfName)
 	}
 	/* cycle through available interfaces and their addresses. */
 	for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next) {
-		/* Skip LOOPBACK interfaces, DOWN interfaces and interfaces that
-		 */
-		/* don't support MULTICAST. */
-		if ((ifa->ifa_flags & IFF_LOOPBACK) ||
+		/* Skip LOOPBACK interfaces, DOWN interfaces, */
+		/* interfaces without address (e.g. bonded)*/
+		/* and interfaces that don't support MULTICAST. */
+		if (!ifa->ifa_addr ||
+		        (ifa->ifa_flags & IFF_LOOPBACK) ||
 			(!(ifa->ifa_flags & IFF_UP)) ||
 			(!(ifa->ifa_flags & IFF_MULTICAST))) {
 			continue;
