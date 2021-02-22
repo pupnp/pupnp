@@ -6,6 +6,60 @@ Version 1.16.0
 Version 1.14.2
 *******************************************************************************
 
+2021-02-17 Jim Broadus <jbroadus(at)gmail.com>
+
+        upnpapi.c: Fix crash in UpnpGetIfInfo
+
+        Per getifaddrs documentation, the ifa_addr field of an ifaddrs structure
+        can be null. In a real world example, an entry may be provided for the
+        non-existent hardware address of a tunnel device. This behavior was
+        observed with the netlink based getifaddrs implementation in glibc.
+
+2021-02-17 Karlchen <k_straussberger(at)netzland.net>
+
+        Handle interfaces without address
+
+        I got a crash on gerbera startup because at least one interface did not have `ifa_addr` set.
+
+        The reason is quite simple: they are the physical interfaces which are part of my channel ������
+        ```
+        2: eth1: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc fq_codel master bond0 state UP group default qlen 1000
+            link/ether xx:xx:xx:xx:xx:xx brd ff:ff:ff:ff:ff:ff
+        3: eth0: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc fq_codel master bond0 state UP group default qlen 1000
+            link/ether xx:xx:xx:xx:xx:xx brd ff:ff:ff:ff:ff:ff
+        4: bond0: <BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+            link/ether xx:xx:xx:xx:xx:xx brd ff:ff:ff:ff:ff:ff
+        ```
+
+
+2021-02-14 Vollstrecker <github(at)vollstreckernet.de>
+
+        CMake:
+        - Fix tests for all occasions. (Hopefully)
+        - Set right so-version and don't yell commands. Fixes #231
+        - Reverted libname-change till decided
+
+2021-02-09 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
+
+        Fix IPv6 GENA subscription
+
+        Use LOCAL_PORT_V6_ULA_GUA or LOCAL_PORT_V6 depending on the IPv6 address
+
+2021-02-08 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
+
+        samples: allow the user to specify the control point interface
+
+        This is useful to test UPnP on specific interface (e.g. IPv6-only).
+        This was already possible on the device sample.
+
+2021-02-08 Fabrice Fontaine <fontaine.fabrice(at)gmail.com>
+
+        upnp/src/api/upnpapi.c: don't set gIF_IPV4 if there is no IPv4
+
+        Don't set gIF_IPV4 if no IPv4 is found to keep the default value of '\0'
+        otherwise SSDP will try to register IPv4 multicast with address 0.0.0.0
+        which will result in a runtime failure
+
 *******************************************************************************
 Version 1.14.1
 *******************************************************************************
@@ -22,7 +76,7 @@ Version 1.14.1
         this will simplify the code and, as a side effect, this allow pupnp to
         work on an interface that does not have an IPv4 address.
 
-2020-12-09 Vollstrecker <github@vollstreckernet.de>
+2020-12-09 Vollstrecker <github(at)vollstreckernet.de>
 
         CMake support.
 
