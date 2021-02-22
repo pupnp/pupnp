@@ -58,9 +58,9 @@
 #include "service_table.h"
 
 #ifdef INTERNAL_WEB_SERVER
-#include "VirtualDir.h"
-#include "urlconfig.h"
-#include "webserver.h"
+	#include "VirtualDir.h"
+	#include "urlconfig.h"
+	#include "webserver.h"
 #endif /* INTERNAL_WEB_SERVER */
 
 #include <sys/stat.h>
@@ -73,32 +73,34 @@
 #ifdef _WIN32
 /* Do not include these files */
 #else
-#include <ifaddrs.h>
-#include <sys/ioctl.h>
-#include <sys/param.h>
-#include <sys/types.h>
+	#include <ifaddrs.h>
+	#include <sys/ioctl.h>
+	#include <sys/param.h>
+	#include <sys/types.h>
 #endif
 
-// ifr_netmask is not defined on eg OmniOS/Solaris, but since ifru_netmask/ifru_addr are all
-// just union members, this should work
-#ifndef ifr_netmask     // it's a define if it exists
-    #define ifr_netmask ifr_addr
+// ifr_netmask is not defined on eg OmniOS/Solaris, but since
+// ifru_netmask/ifru_addr are all just union members, this should work
+#ifndef ifr_netmask // it's a define if it exists
+	#define ifr_netmask ifr_addr
 #endif
 
 #ifdef UPNP_ENABLE_OPEN_SSL
-#include <openssl/ssl.h>
+	#include <openssl/ssl.h>
 #endif
 
 #ifndef IN6_IS_ADDR_GLOBAL
-#define IN6_IS_ADDR_GLOBAL(a) \
-	((((__const uint32_t *)(a))[0] & htonl((uint32_t)0x70000000)) == \
-		htonl((uint32_t)0x20000000))
+	#define IN6_IS_ADDR_GLOBAL(a) \
+		((((__const uint32_t *)(a))[0] & \
+			 htonl((uint32_t)0x70000000)) == \
+			htonl((uint32_t)0x20000000))
 #endif /* IS ADDR GLOBAL */
 
 #ifndef IN6_IS_ADDR_ULA
-#define IN6_IS_ADDR_ULA(a) \
-	((((__const uint32_t *)(a))[0] & htonl((uint32_t)0xfe000000)) == \
-		htonl((uint32_t)0xfc000000))
+	#define IN6_IS_ADDR_ULA(a) \
+		((((__const uint32_t *)(a))[0] & \
+			 htonl((uint32_t)0xfe000000)) == \
+			htonl((uint32_t)0xfc000000))
 #endif /* IS ADDR ULA */
 
 /*! This structure is for virtual directory callbacks */
@@ -404,15 +406,15 @@ static int UpnpInitPreamble(void)
 	}
 
 #ifdef INCLUDE_DEVICE_APIS
-#if EXCLUDE_SOAP == 0
+	#if EXCLUDE_SOAP == 0
 	SetSoapCallback(soap_device_callback);
-#endif
+	#endif
 #endif /* INCLUDE_DEVICE_APIS */
 
 #ifdef INTERNAL_WEB_SERVER
-#if EXCLUDE_GENA == 0
+	#if EXCLUDE_GENA == 0
 	SetGenaCallback(genaCallback);
-#endif
+	#endif
 #endif /* INTERNAL_WEB_SERVER */
 
 	/* Initialize the SDK timer thread. */
@@ -605,9 +607,9 @@ void PrintThreadPoolStats(
 		stats.totalIdleTime);
 }
 #else
-#define PrintThreadPoolStats(tp, DbgFileName, DbgLineNo, msg) \
-	do { \
-	} while (0)
+	#define PrintThreadPoolStats(tp, DbgFileName, DbgLineNo, msg) \
+		do { \
+		} while (0)
 #endif /* DEBUG */
 
 int UpnpFinish(void)
@@ -839,9 +841,9 @@ int UpnpRegisterRootDevice(const char *DescUrl,
 {
 	struct Handle_Info *HInfo = NULL;
 	int retVal = 0;
-#if EXCLUDE_GENA == 0
+	#if EXCLUDE_GENA == 0
 	int hasServiceTable = 0;
-#endif /* EXCLUDE_GENA */
+	#endif /* EXCLUDE_GENA */
 
 	HandleLock();
 
@@ -900,10 +902,10 @@ int UpnpRegisterRootDevice(const char *DescUrl,
 	HInfo->DeviceList = NULL;
 	HInfo->ServiceList = NULL;
 	HInfo->DescDocument = NULL;
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 	ListInit(&HInfo->SsdpSearchList, NULL, NULL);
 	HInfo->ClientSubList = NULL;
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 	HInfo->MaxSubscriptions = UPNP_INFINITE;
 	HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 	HInfo->DeviceAf = AF_INET;
@@ -917,9 +919,9 @@ int UpnpRegisterRootDevice(const char *DescUrl,
 			"UpnpRegisterRootDevice: error downloading Document: "
 			"%d\n",
 			retVal);
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 		ListDestroy(&HInfo->SsdpSearchList, 0);
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 		FreeHandle(*Hnd);
 		goto exit_function;
 	}
@@ -934,9 +936,9 @@ int UpnpRegisterRootDevice(const char *DescUrl,
 	HInfo->DeviceList = ixmlDocument_getElementsByTagName(
 		HInfo->DescDocument, "device");
 	if (!HInfo->DeviceList) {
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 		ListDestroy(&HInfo->SsdpSearchList, 0);
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 		ixmlDocument_free(HInfo->DescDocument);
 		FreeHandle(*Hnd);
 		UpnpPrintf(UPNP_CRITICAL,
@@ -960,7 +962,7 @@ int UpnpRegisterRootDevice(const char *DescUrl,
 			"RootDevice\n");
 	}
 
-#if EXCLUDE_GENA == 0
+	#if EXCLUDE_GENA == 0
 	/*
 	 * GENA SET UP
 	 */
@@ -988,7 +990,7 @@ int UpnpRegisterRootDevice(const char *DescUrl,
 			__LINE__,
 			"\nUpnpRegisterRootDevice: Empty service table\n");
 	}
-#endif /* EXCLUDE_GENA */
+	#endif /* EXCLUDE_GENA */
 
 	UpnpSdkDeviceRegisteredV4 = 1;
 
@@ -1035,9 +1037,9 @@ int UpnpRegisterRootDevice2(Upnp_DescType descriptionType,
 {
 	struct Handle_Info *HInfo = NULL;
 	int retVal = 0;
-#if EXCLUDE_GENA == 0
+	#if EXCLUDE_GENA == 0
 	int hasServiceTable = 0;
-#endif /* EXCLUDE_GENA */
+	#endif /* EXCLUDE_GENA */
 	char *description = (char *)description_const;
 	(void)bufferLen;
 
@@ -1104,10 +1106,10 @@ int UpnpRegisterRootDevice2(Upnp_DescType descriptionType,
 	HInfo->MaxAge = DEFAULT_MAXAGE;
 	HInfo->DeviceList = NULL;
 	HInfo->ServiceList = NULL;
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 	ListInit(&HInfo->SsdpSearchList, NULL, NULL);
 	HInfo->ClientSubList = NULL;
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 	HInfo->MaxSubscriptions = UPNP_INFINITE;
 	HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 	HInfo->DeviceAf = AF_INET;
@@ -1123,9 +1125,9 @@ int UpnpRegisterRootDevice2(Upnp_DescType descriptionType,
 	HInfo->DeviceList = ixmlDocument_getElementsByTagName(
 		HInfo->DescDocument, "device");
 	if (!HInfo->DeviceList) {
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 		ListDestroy(&HInfo->SsdpSearchList, 0);
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 		ixmlDocument_free(HInfo->DescDocument);
 		FreeHandle(*Hnd);
 		UpnpPrintf(UPNP_ALL,
@@ -1149,7 +1151,7 @@ int UpnpRegisterRootDevice2(Upnp_DescType descriptionType,
 			"RootDevice\n");
 	}
 
-#if EXCLUDE_GENA == 0
+	#if EXCLUDE_GENA == 0
 	/*
 	 * GENA SET UP
 	 */
@@ -1177,7 +1179,7 @@ int UpnpRegisterRootDevice2(Upnp_DescType descriptionType,
 			__LINE__,
 			"\nUpnpRegisterRootDevice2: Empty service table\n");
 	}
-#endif /* EXCLUDE_GENA */
+	#endif /* EXCLUDE_GENA */
 
 	UpnpSdkDeviceRegisteredV4 = 1;
 
@@ -1223,9 +1225,9 @@ int UpnpRegisterRootDevice4(const char *DescUrl,
 {
 	struct Handle_Info *HInfo;
 	int retVal = 0;
-#if EXCLUDE_GENA == 0
+	#if EXCLUDE_GENA == 0
 	int hasServiceTable = 0;
-#endif /* EXCLUDE_GENA */
+	#endif /* EXCLUDE_GENA */
 
 	HandleLock();
 
@@ -1286,18 +1288,18 @@ int UpnpRegisterRootDevice4(const char *DescUrl,
 	HInfo->DeviceList = NULL;
 	HInfo->ServiceList = NULL;
 	HInfo->DescDocument = NULL;
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 	ListInit(&HInfo->SsdpSearchList, NULL, NULL);
 	HInfo->ClientSubList = NULL;
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 	HInfo->MaxSubscriptions = UPNP_INFINITE;
 	HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
 	HInfo->DeviceAf = AddressFamily;
 	retVal = UpnpDownloadXmlDoc(HInfo->DescURL, &(HInfo->DescDocument));
 	if (retVal != UPNP_E_SUCCESS) {
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 		ListDestroy(&HInfo->SsdpSearchList, 0);
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 		FreeHandle(*Hnd);
 		goto exit_function;
 	}
@@ -1312,9 +1314,9 @@ int UpnpRegisterRootDevice4(const char *DescUrl,
 	HInfo->DeviceList = ixmlDocument_getElementsByTagName(
 		HInfo->DescDocument, "device");
 	if (!HInfo->DeviceList) {
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 		ListDestroy(&HInfo->SsdpSearchList, 0);
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 		ixmlDocument_free(HInfo->DescDocument);
 		FreeHandle(*Hnd);
 		UpnpPrintf(UPNP_CRITICAL,
@@ -1338,7 +1340,7 @@ int UpnpRegisterRootDevice4(const char *DescUrl,
 			"RootDevice\n");
 	}
 
-#if EXCLUDE_GENA == 0
+	#if EXCLUDE_GENA == 0
 	/*
 	 * GENA SET UP
 	 */
@@ -1366,7 +1368,7 @@ int UpnpRegisterRootDevice4(const char *DescUrl,
 			__LINE__,
 			"\nUpnpRegisterRootDevice4: Empty service table\n");
 	}
-#endif /* EXCLUDE_GENA */
+	#endif /* EXCLUDE_GENA */
 
 	switch (AddressFamily) {
 	case AF_INET:
@@ -1417,10 +1419,10 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd,
 		__FILE__,
 		__LINE__,
 		"Inside UpnpUnRegisterRootDeviceLowPower\n");
-#if EXCLUDE_GENA == 0
+	#if EXCLUDE_GENA == 0
 	if (genaUnregisterDevice(Hnd) != UPNP_E_SUCCESS)
 		return UPNP_E_INVALID_HANDLE;
-#endif
+	#endif
 
 	HandleLock();
 	switch (GetHandleInfo(Hnd, &HInfo)) {
@@ -1437,7 +1439,7 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd,
 	HInfo->RegistrationState = RegistrationState;
 	HandleUnlock();
 
-#if EXCLUDE_SSDP == 0
+	#if EXCLUDE_SSDP == 0
 	retVal = AdvertiseAndReply(-1,
 		Hnd,
 		(enum SsdpSearchType)0,
@@ -1446,7 +1448,7 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd,
 		(char *)NULL,
 		(char *)NULL,
 		HInfo->MaxAge);
-#endif
+	#endif
 
 	HandleLock();
 	switch (GetHandleInfo(Hnd, &HInfo)) {
@@ -1459,13 +1461,13 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd,
 	ixmlNodeList_free(HInfo->DeviceList);
 	ixmlNodeList_free(HInfo->ServiceList);
 	ixmlDocument_free(HInfo->DescDocument);
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 	ListDestroy(&HInfo->SsdpSearchList, 0);
-#endif /* INCLUDE_CLIENT_APIS */
-#ifdef INTERNAL_WEB_SERVER
+	#endif /* INCLUDE_CLIENT_APIS */
+	#ifdef INTERNAL_WEB_SERVER
 	if (HInfo->aliasInstalled)
 		web_server_set_alias(NULL, NULL, 0, 0);
-#endif /* INTERNAL_WEB_SERVER */
+	#endif /* INTERNAL_WEB_SERVER */
 	switch (HInfo->DeviceAf) {
 	case AF_INET:
 		UpnpSdkDeviceRegisteredV4 = 0;
@@ -1526,11 +1528,11 @@ int UpnpRegisterClient(
 	HInfo->Cookie = (void *)Cookie;
 	HInfo->ClientSubList = NULL;
 	ListInit(&HInfo->SsdpSearchList, NULL, NULL);
-#ifdef INCLUDE_DEVICE_APIS
+	#ifdef INCLUDE_DEVICE_APIS
 	HInfo->MaxAge = 0;
 	HInfo->MaxSubscriptions = UPNP_INFINITE;
 	HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
-#endif
+	#endif
 	HandleTable[*Hnd] = HInfo;
 	UpnpSdkClientRegistered += 1;
 	HandleUnlock();
@@ -1567,10 +1569,10 @@ int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 	}
 	HandleUnlock();
 
-#if EXCLUDE_GENA == 0
+	#if EXCLUDE_GENA == 0
 	if (genaUnregisterClient(Hnd) != UPNP_E_SUCCESS)
 		return UPNP_E_INVALID_HANDLE;
-#endif
+	#endif
 	HandleLock();
 	switch (GetHandleInfo(Hnd, &HInfo)) {
 	case HND_INVALID:
@@ -1606,7 +1608,7 @@ int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 #endif /* INCLUDE_CLIENT_APIS */
 
 #ifdef INCLUDE_DEVICE_APIS
-#ifdef INTERNAL_WEB_SERVER
+	#ifdef INTERNAL_WEB_SERVER
 /*!
  * \brief Determines alias for given name which is a file name or URL.
  *
@@ -1789,7 +1791,7 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
 	return UPNP_E_SUCCESS;
 }
 
-#else /* INTERNAL_WEB_SERVER */ /* no web server */
+	#else /* INTERNAL_WEB_SERVER */ /* no web server */
 static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
 	char *description,
 	int config_baseURL,
@@ -1821,8 +1823,8 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
 
 	return UPNP_E_SUCCESS;
 }
-#endif                          /* INTERNAL_WEB_SERVER */
-#endif                          /* INCLUDE_DEVICE_APIS */
+	#endif                          /* INTERNAL_WEB_SERVER */
+#endif                                  /* INCLUDE_DEVICE_APIS */
 
 /*******************************************************************************
  *
@@ -1831,7 +1833,7 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
  ******************************************************************************/
 
 #ifdef INCLUDE_DEVICE_APIS
-#if EXCLUDE_SSDP == 0
+	#if EXCLUDE_SSDP == 0
 int UpnpSendAdvertisement(UpnpDevice_Handle Hnd, int Exp)
 {
 	UpnpPrintf(UPNP_ALL,
@@ -1918,7 +1920,7 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 		free(ptrMx);
 		return UPNP_E_INVALID_HANDLE;
 	}
-#ifdef SSDP_PACKET_DISTRIBUTE
+		#ifdef SSDP_PACKET_DISTRIBUTE
 	TPJobInit(&job, (start_routine)AutoAdvertise, adEvent);
 	TPJobSetFreeFunction(&job, (free_routine)free_upnp_timeout);
 	TPJobSetPriority(&job, MED_PRIORITY);
@@ -1933,7 +1935,7 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 		free(ptrMx);
 		return retVal;
 	}
-#else
+		#else
 	TPJobInit(&job, (start_routine)AutoAdvertise, adEvent);
 	TPJobSetFreeFunction(&job, (free_routine)free_upnp_timeout);
 	TPJobSetPriority(&job, MED_PRIORITY);
@@ -1948,7 +1950,7 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 		free(ptrMx);
 		return retVal;
 	}
-#endif
+		#endif
 
 	HandleUnlock();
 	UpnpPrintf(UPNP_ALL,
@@ -1959,11 +1961,11 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 
 	return retVal;
 }
-#endif /* EXCLUDE_SSDP == 0 */
-#endif /* INCLUDE_DEVICE_APIS */
+	#endif /* EXCLUDE_SSDP == 0 */
+#endif         /* INCLUDE_DEVICE_APIS */
 
 #if EXCLUDE_SSDP == 0
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 
 int UpnpSearchAsync(UpnpClient_Handle Hnd,
 	int Mx,
@@ -2010,7 +2012,7 @@ int UpnpSearchAsync(UpnpClient_Handle Hnd,
 
 	return UPNP_E_SUCCESS;
 }
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 #endif
 
 /*******************************************************************************
@@ -2020,7 +2022,7 @@ int UpnpSearchAsync(UpnpClient_Handle Hnd,
  ******************************************************************************/
 
 #if EXCLUDE_GENA == 0
-#ifdef INCLUDE_DEVICE_APIS
+	#ifdef INCLUDE_DEVICE_APIS
 int UpnpSetMaxSubscriptions(UpnpDevice_Handle Hnd, int MaxSubscriptions)
 {
 	struct Handle_Info *SInfo = NULL;
@@ -2058,9 +2060,9 @@ int UpnpSetMaxSubscriptions(UpnpDevice_Handle Hnd, int MaxSubscriptions)
 
 	return UPNP_E_SUCCESS;
 }
-#endif /* INCLUDE_DEVICE_APIS */
+	#endif /* INCLUDE_DEVICE_APIS */
 
-#ifdef INCLUDE_DEVICE_APIS
+	#ifdef INCLUDE_DEVICE_APIS
 int UpnpSetMaxSubscriptionTimeOut(
 	UpnpDevice_Handle Hnd, int MaxSubscriptionTimeOut)
 {
@@ -2102,9 +2104,9 @@ int UpnpSetMaxSubscriptionTimeOut(
 
 	return UPNP_E_SUCCESS;
 }
-#endif /* INCLUDE_DEVICE_APIS */
+	#endif /* INCLUDE_DEVICE_APIS */
 
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 int UpnpSubscribeAsync(UpnpClient_Handle Hnd,
 	const char *EvtUrl_const,
 	int TimeOut,
@@ -2179,9 +2181,9 @@ int UpnpSubscribeAsync(UpnpClient_Handle Hnd,
 
 	return UPNP_E_SUCCESS;
 }
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 int UpnpSubscribe(UpnpClient_Handle Hnd,
 	const char *EvtUrl_const,
 	int *TimeOut,
@@ -2252,9 +2254,9 @@ exit_function:
 
 	return retVal;
 }
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 int UpnpUnSubscribe(UpnpClient_Handle Hnd, const Upnp_SID SubsId)
 {
 	struct Handle_Info *SInfo = NULL;
@@ -2304,9 +2306,9 @@ exit_function:
 
 	return retVal;
 }
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 int UpnpUnSubscribeAsync(UpnpClient_Handle Hnd,
 	Upnp_SID SubsId,
 	Upnp_FunPtr Fun,
@@ -2379,9 +2381,9 @@ exit_function:
 
 	return retVal;
 }
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 int UpnpRenewSubscription(
 	UpnpClient_Handle Hnd, int *TimeOut, const Upnp_SID SubsId)
 {
@@ -2440,9 +2442,9 @@ exit_function:
 
 	return retVal;
 }
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 int UpnpRenewSubscriptionAsync(UpnpClient_Handle Hnd,
 	int TimeOut,
 	Upnp_SID SubsId,
@@ -2515,9 +2517,9 @@ int UpnpRenewSubscriptionAsync(UpnpClient_Handle Hnd,
 
 	return UPNP_E_SUCCESS;
 }
-#endif /* INCLUDE_CLIENT_APIS */
+	#endif /* INCLUDE_CLIENT_APIS */
 
-#ifdef INCLUDE_DEVICE_APIS
+	#ifdef INCLUDE_DEVICE_APIS
 int UpnpNotify(UpnpDevice_Handle Hnd,
 	const char *DevID_const,
 	const char *ServName_const,
@@ -2608,9 +2610,9 @@ int UpnpNotifyExt(UpnpDevice_Handle Hnd,
 
 	return retVal;
 }
-#endif /* INCLUDE_DEVICE_APIS */
+	#endif /* INCLUDE_DEVICE_APIS */
 
-#ifdef INCLUDE_DEVICE_APIS
+	#ifdef INCLUDE_DEVICE_APIS
 int UpnpAcceptSubscription(UpnpDevice_Handle Hnd,
 	const char *DevID_const,
 	const char *ServName_const,
@@ -2668,15 +2670,16 @@ int UpnpAcceptSubscription(UpnpDevice_Handle Hnd,
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
-/* Now accepts an empty state list, so the code below is commented out */
-#if 0
+		/* Now accepts an empty state list, so the code below is
+		 * commented out */
+		#if 0
 	if (VarName == NULL || NewVal == NULL || cVariables < 0) {
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
-#endif
+		#endif
 
 	HandleUnlock();
 
@@ -2748,15 +2751,16 @@ int UpnpAcceptSubscriptionExt(UpnpDevice_Handle Hnd,
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
-/* Now accepts an empty state list, so the code below is commented out */
-#if 0
+		/* Now accepts an empty state list, so the code below is
+		 * commented out */
+		#if 0
 	if (PropSet == NULL) {
 		HandleUnlock();
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
-#endif
+		#endif
 
 	HandleUnlock();
 
@@ -2773,8 +2777,8 @@ exit_function:
 
 	return ret;
 }
-#endif /* INCLUDE_DEVICE_APIS */
-#endif /* EXCLUDE_GENA == 0 */
+	#endif /* INCLUDE_DEVICE_APIS */
+#endif         /* EXCLUDE_GENA == 0 */
 
 /*******************************************************************************
  *
@@ -2783,7 +2787,7 @@ exit_function:
  ******************************************************************************/
 
 #if EXCLUDE_SOAP == 0
-#ifdef INCLUDE_CLIENT_APIS
+	#ifdef INCLUDE_CLIENT_APIS
 int UpnpSendAction(UpnpClient_Handle Hnd,
 	const char *ActionURL_const,
 	const char *ServiceType_const,
@@ -3249,8 +3253,8 @@ int UpnpGetServiceVarStatus(UpnpClient_Handle Hnd,
 
 	return retVal;
 }
-#endif /* INCLUDE_CLIENT_APIS */
-#endif /* EXCLUDE_SOAP */
+	#endif /* INCLUDE_CLIENT_APIS */
+#endif         /* EXCLUDE_SOAP */
 
 /*******************************************************************************
  *
@@ -3766,8 +3770,7 @@ int UpnpGetIfInfo(const char *IfName)
 		/* Skip LOOPBACK interfaces, DOWN interfaces, */
 		/* interfaces without address (e.g. bonded)*/
 		/* and interfaces that don't support MULTICAST. */
-		if (!ifa->ifa_addr ||
-		        (ifa->ifa_flags & IFF_LOOPBACK) ||
+		if (!ifa->ifa_addr || (ifa->ifa_flags & IFF_LOOPBACK) ||
 			(!(ifa->ifa_flags & IFF_UP)) ||
 			(!(ifa->ifa_flags & IFF_MULTICAST))) {
 			continue;
@@ -3863,8 +3866,9 @@ int UpnpGetIfInfo(const char *IfName)
 	}
 	freeifaddrs(ifap);
 	/* Failed to find a valid interface, or valid address. */
-	if (ifname_found == 0 || (valid_v4_addr_found == 0 &&
-		valid_v6_addr_found == 0 && valid_v6ulagua_addr_found == 0)) {
+	if (ifname_found == 0 ||
+		(valid_v4_addr_found == 0 && valid_v6_addr_found == 0 &&
+			valid_v6ulagua_addr_found == 0)) {
 		UpnpPrintf(UPNP_CRITICAL,
 			API,
 			__FILE__,
@@ -3883,7 +3887,8 @@ int UpnpGetIfInfo(const char *IfName)
 	gIF_INDEX = if_nametoindex(gIF_NAME);
 	if (!IN6_IS_ADDR_UNSPECIFIED(&v6_addr)) {
 		if (valid_v6_addr_found) {
-			inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
+			inet_ntop(
+				AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
 			gIF_IPV6_PREFIX_LENGTH = v6_prefix;
 		}
 		if (valid_v6ulagua_addr_found) {
@@ -3924,7 +3929,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 		"Inside UpnpThreadDistribution \n");
 
 	switch (Param->FunName) {
-#if EXCLUDE_GENA == 0
+	#if EXCLUDE_GENA == 0
 	case SUBSCRIBE: {
 		UpnpEventSubscribe *evt = UpnpEventSubscribe_new();
 		UpnpString *Sid = UpnpString_new();
@@ -3969,8 +3974,8 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 		free(Param);
 		break;
 	}
-#endif /* EXCLUDE_GENA == 0 */
-#if EXCLUDE_SOAP == 0
+	#endif /* EXCLUDE_GENA == 0 */
+	#if EXCLUDE_SOAP == 0
 	case ACTION: {
 		UpnpActionComplete *Evt = UpnpActionComplete_new();
 		IXML_Document *actionResult = NULL;
@@ -4001,7 +4006,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 		UpnpStateVarComplete_delete(Evt);
 		break;
 	}
-#endif /* EXCLUDE_SOAP == 0 */
+	#endif /* EXCLUDE_SOAP == 0 */
 	default:
 		break;
 	}
@@ -4196,7 +4201,7 @@ int PrintHandleInfo(UpnpClient_Handle Hnd)
 }
 
 #ifdef INCLUDE_DEVICE_APIS
-#if EXCLUDE_SSDP == 0
+	#if EXCLUDE_SSDP == 0
 void AutoAdvertise(void *input)
 {
 	upnp_timeout *event = (upnp_timeout *)input;
@@ -4204,8 +4209,8 @@ void AutoAdvertise(void *input)
 	UpnpSendAdvertisement(event->handle, *((int *)event->Event));
 	free_upnp_timeout(event);
 }
-#endif /* EXCLUDE_SSDP == 0 */
-#endif /* INCLUDE_DEVICE_APIS */
+	#endif /* EXCLUDE_SSDP == 0 */
+#endif         /* INCLUDE_DEVICE_APIS */
 
 #ifdef INTERNAL_WEB_SERVER
 int UpnpSetWebServerRootDir(const char *rootDir)
