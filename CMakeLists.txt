@@ -73,7 +73,7 @@ if (NOT PUPNP_VERSION_STRING)
 	endforeach()
 endif()
 
-project (PUPNP VERSION ${PUPNP_VERSION_STRING} LANGUAGES C)
+project (PUPNP VERSION ${PUPNP_VERSION_STRING})
 include (GNUInstallDirs)
 
 if (WIN32)
@@ -82,10 +82,6 @@ if (WIN32)
 endif()
 
 option (BUILD_TESTING "Run Tests after compile" ON)
-
-if (BUILD_TESTING)
-	enable_testing()
-endif()
 
 if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
 	set (DEFAULT_BUILD_TYPE "Debug")
@@ -333,6 +329,7 @@ endif()
 if (NOT WIN32)
 	set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 	include (FindThreads)
+
 	if (NOT DOWNLOAD_AND_BUILD_DEPS)
 		if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
 			add_library (Threads::Shared ALIAS Threads::Threads)
@@ -412,6 +409,20 @@ endif()
 configure_file (${PUPNP_SOURCE_DIR}/upnp/inc/upnpconfig.h.cm ${PUPNP_BINARY_DIR}/upnp/inc/upnpconfig.h)
 configure_file (${PUPNP_SOURCE_DIR}/upnp/sample/common/config_sample.h.cm ${PUPNP_BINARY_DIR}/upnp/sample/common/config_sample.h)
 configure_file (${PUPNP_BINARY_DIR}/autoconfig.h.cm ${PUPNP_BINARY_DIR}/autoconfig.h)
+
+if (BUILD_TESTING)
+	enable_testing()
+	set (GTEST_NEEDS_GMOCK TRUE)
+	include (FindGTest)
+
+	if (TARGET GTest::Gtest AND NOT TARGET GTest::gtest)
+		add_library (GTest::gtest ALIAS GTest::GTest)
+	endif()
+
+	if (GTEST_FOUND)
+		#add_subdirectory (gtest)
+	endif()
+endif()
 
 add_subdirectory (ixml)
 add_subdirectory (upnp)

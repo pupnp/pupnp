@@ -99,9 +99,9 @@ target_compile_definitions (upnp_shared
 )
 
 target_include_directories (upnp_shared
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
 	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
 	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
+	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/>
 	PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
 	PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
 )
@@ -196,9 +196,9 @@ target_compile_definitions (upnp_static
 )
 
 target_include_directories (upnp_static
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
 	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
 	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
+	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/>
 	PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
 	PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
 )
