@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="Author" content="Marcelo Roberto Jimenez" />
+    <meta name="copyright" content="Copyright(c) Marcelo Roberto Jimenez" />
+    <meta name="Description" content="Home Page of Portable UPnP" />
+    <title>libupnp.org - Developer resources for the portable UPnP&trade; library</title>
+    <link rel="stylesheet" href="index.css" />
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <h2>Portable SDK for UPnP Devices</h2>
+    <h3>A Portable Open Source UPnP Development Kit</h3>
+    <h4><a href="https://github.com/mrjimenez/pupnp">GitHub project page</a></h4>
+    <h4><a href="https://www.sf.net/projects/pupnp/">SourceForge.net project page</a></h4>
+
+    <p>
+        The portable SDK for UPnP&trade; Devices (libupnp) provides developers
+        with an API and open source code for building control points, devices,
+        and bridges that are compliant with Version 1.0 of the
+        <a href="http://www.upnp.org/resources/upnpresources.zip">
+            Universal Plug and Play Device Architecture Specification</a>
+        and support several operating systems like Linux, *BSD, Solaris and others.
+    </p>
+
+    <ul>
+        <li><a href="#info">General information</a> about the SDK</li>
+        <li><a href="https://sourceforge.net/project/showfiles.php?group_id=166957">
+                Download</a> the latest version of the SDK</li>
+        <li><a href="ChangeLog">Changelog</a> of the latest version</li>
+        <li><a href="https://sourceforge.net/projects/pupnp/">
+                SourceForge project page </a></li>
+        <li><a href="#docs">Documentation</a> for the SDK</li>
+        <li><a href="#projects">Other projects that are using</a> the SDK</li>
+        <li>Visit the SDK <a href="https://github.com/mrjimenez/pupnp/issues">
+                Discussions and Help lists</a></li>
+        <li><a href="#license">License conditions</a> under which you may use the SDK</li>
+    </ul>
+
+    <hr />
+
+    <p class="noident"><b><a id="info">General information</a></b></p>
+
+    <p>
+        UPnP&trade; is an architecture that enables
+        discovery, event notification, and control of devices on a network,
+        independent of operating system, programming language, or physical
+        network connection.&nbsp; UPnP&trade; is based on common Internet
+        standards and specifications such as TCP/IP, HTTP, and XML. For
+        detailed information about UPnP&trade;, including the UPnP&trade;
+        Device Architecture Specification, please visit the
+        <a href="http://www.upnp.org/"> UPnP&trade; Forum web site</a>.
+    </p>
+
+    <p>
+        In 2000, Intel created the first version of the Linux SDK for
+        UPnP&trade; Devices and subsequently released it to the open source
+        community to foster growth of UPnP&trade;.&nbsp; To learn more
+        about&nbsp; Intel's involvement with both UPnP&trade; and the SDK,
+        please visit <a href="http://www.intel.com/cd/ids/developer/asmo-na/eng/downloads/upnp/index.htm">
+            Intel's Universal Plug and Play web site</a>.
+    </p>
+
+    <p>
+        In 2006 - after some years of stagnation and mismanagement - this 100%
+        compatible fork of the original project was created to bring it back to
+        life, support further development and to avoid that all the useful and
+        important patches and efforts that have been provided by developers get
+        lost because none of the original project maintainers/project developers
+        were willing or able to integrate them into the source tree. This way,
+        the project now continues using the name "Portable UPnP&trade;" and as
+        a project that is more open to contributions of the community. The main
+        goal is the availability of the project for all important platforms to
+        become a standard for UPnP&trade;.
+    </p>
+
+    <hr />
+
+    <p class="noident"><a id="docs"><b>Documentation</b></a></p>
+    <p>
+        Documentation is available in PDF format from the
+        <a href="http://sourceforge.net/project/showfiles.php?group_id=166957">
+            downloads</a> section.&nbsp; The documentation actually resides inside
+        the source code itself and is built into the PDF file by an automated
+        process.&nbsp; Documentation for each function resides in a comment
+        section immediately preceding the function.
+    </p>
+
+    <hr />
+
+    <p class="noident"><a id="projects"><b>Other projects that are using the SDK
+            </b></a></p>
+
+    <p>
+        This is a list of some of the projects and products hat are based on
+        the SDK for UPnP&trade; Devices.&nbsp; Please let us know if you are
+        working on a project and would like to see it listed here!
+    </p>
+
+    <ul>
+        <li><a href="http://sourceforge.net/projects/libmcupnp">
+                libmcupnp</a> is a Free UPnP(v1) library for easy
+            "MediaServer:1 Client" implementations. The library is built on top of
+            libupnp..</li>
+        <li><a href="http://www.z500series.com/">
+                HD Network DVD Media Player</a>.</li>
+        <li>Recent <a href="http://www.amule.org/">aMule CVS tarballs</a>
+            have libupnp support to perform port forwarding.</li>
+        <li><a href="http://emulemorph.sourceforge.net/">eMule Morph</a>
+            uses libupnp to forward ports automatically.</li>
+        <li><a href="http://www.peerstream.net/">
+                PeerStream Audio Video Server</a>.</li>
+        <li><a href="http://ushare.geexbox.org/">
+                GeeXboX uShare&trade;</a> A/V media server.</li>
+        <li><a href="https://gerbera.io/">
+                Gerbera</a> UPnP&trade; media server.</li>
+        <li><a href="http://mediatomb.sourceforge.net/">
+                MediaTomb</a> UPnP&trade; media server.</li>
+        <li>The <a href="http://linux-igd.sourceforge.net/">
+                Linux UPnP&trade; Internet Gateway Device</a>:
+            This project is a daemon that emulates Microsoft's Internet Connection
+            Service (ICS). It implements the UPnP&trade; Internet Gateway Device
+            (IGD) specification and allows UPnP&trade;-aware clients, such as MSN
+            Messenger, to work properly from behind a NAT firewall.</li>
+        <li>FreeBSD ports of both the
+            <a href="http://www.freebsd.org/cgi/cvsweb.cgi/ports/devel/upnp">
+                SDK for UPnP&trade; Devices</a> and the
+            <a href="http://www.freebsd.org/cgi/query-pr.cgi?pr=41295">
+                Linux UPnP&trade; IGD</a>
+            were contributed to the FreeBSD ports collection by
+            <a href="http://www.leeym.com">Yen-Ming Lee</a>.
+        </li>
+        <li><a href="http://pseudoicsd.sf.net">PseudoICSD</a> is
+            another daemon that provides UPnP&trade; Internet Gateway Device
+            functionality on Linux systems.</li>
+        <li><a href="http://gitorious.org/igd2-for-linux/">IGD2 for linux</a>
+            is an updated version of Linux-IGD implementation
+            <a href=http://linux-igd.sourceforge.net>http://linux-igd.sourceforge.net</a>.
+            This new version is created on base of UPnP IGD:2 specifications
+            available from
+            <a href=http://upnp.org/specs/gw/igd2>http://upnp.org/specs/gw/igd2</a>.
+            You can find more information about this project
+            <a href=http://gitorious.org/igd2-for-linux/pages/Home>here</a>.
+        </li>
+    </ul>
+
+    <p><small>
+            The links listed here point to external pages that are not under our
+            control, that means we do not have any influence on their contents.
+            Some jurisdictions have the point of view that the owner of a internet
+            page is responsible for links to other webpages and the contents that
+            can be found there.
+            (Landgericht Hamburg, Judgement from 12th May 1998, 312 O 85/98).
+            <br />
+            <br />
+            Because of that, the operator of these pages is dissociating explicitly
+            from all links made from here. If we are informed about pages with
+            penal relevant names, links, contents or something else we'll remove
+            links to these pages immediately in case that is technically possible
+            and reasonable.
+        </small></p>
+
+    <hr />
+
+    <p class="noident"><a id="license"><b>License conditions</b></a></p>
+    <p>
+        The Portable SDK for UPnP&trade; Devices is distributed under the BSD
+        (Berkeley Standard Distribution) license. This license allows you to
+        use the source code royalty free and does not place any restrictions on
+        what you do with source code derived from the SDK. For full details on
+        the license conditions, please consult the
+        <a href="LICENSE">LICENSE</a> file located inside the SDK
+        distribution.
+    </p>
+
+    <hr />
+
+    <p>
+        We wish to thank <a href="https://www.jetbrains.com/?from=pupnp">JetBrains</a>
+        for kindly providing us with open source licenses of their amazing products.
+    </p>
+
+    <a href="https://www.jetbrains.com/?from=pupnp">
+        <img src="jetbrains.svg" alt="Jetbrains Logo">
+    </a>
+
+    <hr />
+
+    <p>
+        *Other brands, names, or trademarks are the property of their respective
+        owners.
+    </p>
+
+    <!--#include file="footer.shtml" -->
+    <hr />
+
+    <table class="footer">
+        <tbody>
+            <tr>
+                <td class="left" style="width:40%">
+                    <address>
+                        If you have comments or suggestions,
+                        email us at <br />
+                        pupnp-devel &lt;at&gt; lists.sourceforge.net
+                    </address>
+                </td>
+                <td style="width:60%">
+                    <address>
+                        Last updated: $
+                        <!--#flastmod file="$DOCUMENT_NAME" --> $
+                    </address>
+                    <br />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>
+                    <a href="http://validator.w3.org/check/referer">
+                        <img src="HTML5_Logo_32.png" alt="HTML5 Powered with CSS3 / Styling"
+                            title="HTML5 Powered with CSS3 / Styling">
+                    </a>
+                    <a href="http://jigsaw.w3.org/css-validator/">
+                        <img style="border:0;width:88px;height:31px" src="vcss.png" alt="Valid CSS!" />
+                    </a>
+                    <a href="http://sourceforge.net">
+                        <img style="width:88px;height:31px;border:0"
+                            src="http://sourceforge.net/sflogo.php?group_id=75790&amp;type=1"
+                            alt="SourceForge.net Logo" />
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+
+</html>
