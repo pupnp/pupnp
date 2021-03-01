@@ -1,4 +1,4 @@
-Version: 1.14.2
+Version: 1.14.3
 Summary: Universal Plug and Play (UPnP) SDK
 Name: libupnp-1.14
 Release: 1%{?dist}

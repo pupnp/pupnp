@@ -9,7 +9,7 @@
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.14.2], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp], [1.14.3], [mroberto@users.sourceforge.net])
 dnl ############################################################################
 dnl # *Independently* of the above libupnp package version, the libtool version
 dnl # of the 3 libraries need to be updated whenever there is a change released:
@@ -67,8 +67,18 @@ dnl #AC_SUBST([LT_VERSION_IXML],       [11:0:0])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [17:2:0])
 dnl #
 dnl ############################################################################
+dnl # Release 1.14.3
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #   revision: 2 -> 3
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [11:0:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [17:3:0])
+dnl #
+dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [11:0:0])
-AC_SUBST([LT_VERSION_UPNP],       [17:2:0])
+AC_SUBST([LT_VERSION_UPNP],       [17:3:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
@@ -77,7 +87,6 @@ dnl # 	- interfaces added: 			age++
 dnl # 	- interfaces removed or changed:	age=0
 dnl # *please update only once, before a formal release, not for each change*
 dnl ############################################################################
-
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
