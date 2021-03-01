@@ -1,4 +1,7 @@
-# Portable SDK for UPnP\* Devices (libupnp) <!-- omit in toc -->
+# The Portable SDK for UPnP\* Devices (libupnp) <!-- omit in toc -->
+
+- [The GitHub project page](https://github.com/pupnp/pupnp) is where all the real action happens.
+- [The old Source Forge project page is linked here.](https://sourceforge.net/projects/pupnp)
 
 | branch        | status                                                                                              |
 | ------------- | --------------------------------------------------------------------------------------------------- |
@@ -16,7 +19,7 @@ Copyright (c) 2005-2006 Rémi Turboult <r3mi@users.sourceforge.net>
 
 Copyright (c) 2006 Michel Pfeiffer and others <virtual_worlds@gmx.de>
 
-See LICENSE for details.
+See [LICENSE](site/LICENSE) for details.
 
 ## Table of Contents <!-- omit in toc -->
 
@@ -88,7 +91,7 @@ Because of that, the operator of these pages is dissociating explicitly from all
 
 ## 6. License Conditions
 
-The Portable SDK for UPnP&trade; Devices is distributed under the BSD (Berkeley Standard Distribution) license. This license allows you to use the source code royalty free and does not place any restrictions on what you do with source code derived from the SDK. For full details on the license conditions, please consult the [LICENSE](LICENSE) file located inside the SDK distribution.
+The Portable SDK for UPnP&trade; Devices is distributed under the BSD (Berkeley Standard Distribution) license. This license allows you to use the source code royalty free and does not place any restrictions on what you do with source code derived from the SDK. For full details on the license conditions, please consult the [LICENSE](site/LICENSE) file located inside the SDK distribution.
 
 ## 7. Release List
 
@@ -166,13 +169,13 @@ The SDK for UPnP Devices contains the following:
 | README      | This file.  Contains the installation and build instructions.                     |
 | LICENSE     | The licensing terms the SDK is distributed under.                                 |
 | NEWS        | Changes and new features.                                                         |
-| ixml\doc    | The files for generating the XML parser documentation from the source code.       |
-| ixml\inc    | The public include files required to use the XML parser.                          |
-| ixml\src    | The source code to the XML parser library.                                        |
-| upnp\doc    | The files for generating the SDK documentation from the source code.              |
-| upnp\inc    | The public include files required to use the SDK.                                 |
-| upnp\src    | The source files comprising the SDK, libupnp.so.                                  |
-| upnp\sample | A sample device and control point application, illustrating the usage of the SDK. |
+| ixml/doc    | The files for generating the XML parser documentation from the source code.       |
+| ixml/inc    | The public include files required to use the XML parser.                          |
+| ixml/src    | The source code to the XML parser library.                                        |
+| upnp/doc    | The files for generating the SDK documentation from the source code.              |
+| upnp/inc    | The public include files required to use the SDK.                                 |
+| upnp/src    | The source files comprising the SDK, libupnp.so.                                  |
+| upnp/sample | A sample device and control point application, illustrating the usage of the SDK. |
 
 ## 9. System Requirements
 
