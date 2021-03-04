@@ -30,106 +30,100 @@
  ******************************************************************************/
 
 /************************************************************************
-* Purpose: This file contains string to integer and integer to string 
-*	conversion functions 
-************************************************************************/
+ * Purpose: This file contains string to integer and integer to string
+ *	conversion functions
+ ************************************************************************/
 
-#include "config.h"
 #include "strintmap.h"
+#include "config.h"
 #include "membuffer.h"
 
 /************************************************************************
-*	Function :	map_str_to_int
-*
-*	Parameters :
-*		IN const char* name ;	string containing the name to be matched
-*		IN size_t name_len ;	size of the string to be matched
-*		IN str_int_entry* table ;	table of entries that need to be 
-*					matched.
-*		IN int num_entries ; number of entries in the table that need 
-*					to be searched.
-*		IN int case_sensitive ; whether the case should be case
-*					sensitive or not
-*
-*	Description : Match the given name with names from the entries in the 
-*		table. Returns the index of the table when the entry is found.
-*
-*	Return : int ;
-*		index - On Success
-*		-1 - On failure
-*
-*	Note :
-************************************************************************/
-int
-map_str_to_int( const char *name,
-                size_t name_len,
-                str_int_entry * table,
-                int num_entries,
-                int case_sensitive )
+ *	Function :	map_str_to_int
+ *
+ *	Parameters :
+ *		IN const char* name ;	string containing the name to be matched
+ *		IN size_t name_len ;	size of the string to be matched
+ *		IN str_int_entry* table ;	table of entries that need to be
+ *					matched.
+ *		IN int num_entries ; number of entries in the table that need
+ *					to be searched.
+ *		IN int case_sensitive ; whether the case should be case
+ *					sensitive or not
+ *
+ *	Description : Match the given name with names from the entries in the
+ *		table. Returns the index of the table when the entry is found.
+ *
+ *	Return : int ;
+ *		index - On Success
+ *		-1 - On failure
+ *
+ *	Note :
+ ************************************************************************/
+int map_str_to_int(const char *name,
+        size_t name_len,
+        str_int_entry *table,
+        int num_entries,
+        int case_sensitive)
 {
-    int top,
-      mid,
-      bot;
-    int cmp;
-    memptr name_ptr;
+        int top, mid, bot;
+        int cmp;
+        memptr name_ptr;
 
-    name_ptr.buf = ( char * )name;
-    name_ptr.length = name_len;
+        name_ptr.buf = (char *)name;
+        name_ptr.length = name_len;
 
-    top = 0;
-    bot = num_entries - 1;
+        top = 0;
+        bot = num_entries - 1;
 
-    while( top <= bot ) {
-        mid = ( top + bot ) / 2;
-        if( case_sensitive ) {
-            /*cmp = strcmp( name, table[mid].name ); */
-            cmp = memptr_cmp( &name_ptr, table[mid].name );
-        } else {
-            /*cmp = strcasecmp( name, table[mid].name ); */
-            cmp = memptr_cmp_nocase( &name_ptr, table[mid].name );
+        while (top <= bot) {
+                mid = (top + bot) / 2;
+                if (case_sensitive) {
+                        /*cmp = strcmp( name, table[mid].name ); */
+                        cmp = memptr_cmp(&name_ptr, table[mid].name);
+                } else {
+                        /*cmp = strcasecmp( name, table[mid].name ); */
+                        cmp = memptr_cmp_nocase(&name_ptr, table[mid].name);
+                }
+
+                if (cmp > 0) {
+                        top = mid + 1; /* look below mid */
+                } else if (cmp < 0) {
+                        bot = mid - 1; /* look above mid */
+                } else                 /* cmp == 0 */
+                {
+                        return mid; /* match; return table index */
+                }
         }
 
-        if( cmp > 0 ) {
-            top = mid + 1;      /* look below mid */
-        } else if( cmp < 0 ) {
-            bot = mid - 1;      /* look above mid */
-        } else                  /* cmp == 0 */
-        {
-            return mid;         /* match; return table index */
-        }
-    }
-
-    return -1;                  /* header name not found */
+        return -1; /* header name not found */
 }
 
 /************************************************************************
-*	Function :	map_int_to_str
-*
-*	Parameters :
-*		IN int id ;	ID to be matched
-*		IN str_int_entry* table ;	table of entries that need to be 
-*					matched.
-*		IN int num_entries ; number of entries in the table that need 
-*					to be searched.
-*
-*	Description : Returns the index from the table where the id matches 
-*		the entry from the table.
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int
-map_int_to_str( int id,
-                str_int_entry * table,
-                int num_entries )
+ *	Function :	map_int_to_str
+ *
+ *	Parameters :
+ *		IN int id ;	ID to be matched
+ *		IN str_int_entry* table ;	table of entries that need to be
+ *					matched.
+ *		IN int num_entries ; number of entries in the table that need
+ *					to be searched.
+ *
+ *	Description : Returns the index from the table where the id matches
+ *		the entry from the table.
+ *
+ *	Return : int ;
+ *
+ *	Note :
+ ************************************************************************/
+int map_int_to_str(int id, str_int_entry *table, int num_entries)
 {
-    int i;
+        int i;
 
-    for( i = 0; i < num_entries; i++ ) {
-        if( table[i].id == id ) {
-            return i;
+        for (i = 0; i < num_entries; i++) {
+                if (table[i].id == id) {
+                        return i;
+                }
         }
-    }
-    return -1;
+        return -1;
 }

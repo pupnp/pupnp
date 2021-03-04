@@ -36,8 +36,8 @@
  * \file
  */
 
-#include "upnputil.h"
 #include "httpparser.h"
+#include "upnputil.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,12 +50,11 @@ extern "C" {
  * \return boolean.
  */
 int has_xml_content_type(
-	/*! [in] HTTP Message object. */
-	http_message_t *hmsg);
+        /*! [in] HTTP Message object. */
+        http_message_t *hmsg);
 
 #ifdef __cplusplus
 } /* extern C */
 #endif
 
 #endif /* GENLIB_NET_HTTP_PARSETOOLS_H */
-

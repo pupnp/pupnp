@@ -23,50 +23,51 @@
 #include "sysdep.h"
 
 /*! . */
-typedef struct _uuid_upnp {
-	/*! . */
-	uint32_t time_low;
-	/*! . */
-	uint16_t time_mid;
-	/*! . */
-	uint16_t time_hi_and_version;
-	/*! . */
-	uint8_t clock_seq_hi_and_reserved;
-	/*! . */
-	uint8_t clock_seq_low;
-	/*! . */
-	uint8_t node[6];
+typedef struct _uuid_upnp
+{
+        /*! . */
+        uint32_t time_low;
+        /*! . */
+        uint16_t time_mid;
+        /*! . */
+        uint16_t time_hi_and_version;
+        /*! . */
+        uint8_t clock_seq_hi_and_reserved;
+        /*! . */
+        uint8_t clock_seq_low;
+        /*! . */
+        uint8_t node[6];
 } uuid_upnp;
 
 /*!
  * \brief Generate a UUID.
  */
 int uuid_create(
-	/*! . */
-	uuid_upnp * id);
+        /*! . */
+        uuid_upnp *id);
 
 /*!
  * \brief Out will be xxxx-xx-xx-xx-xxxxxx format.
  */
 void upnp_uuid_unpack(
-	/*! . */
-	uuid_upnp * u,
-	/*! . */
-	char *out);
+        /*! . */
+        uuid_upnp *u,
+        /*! . */
+        char *out);
 
 /*!
  * \brief Create a UUID using a "name" from a "name space"
  */
 void uuid_create_from_name(
-	/*! Resulting UUID. */
-	uuid_upnp * uid,
-	/*! UUID to serve as context, so identical names from different name
-	* spaces generate different UUIDs. */
-	uuid_upnp nsid,
-	/*! The name from which to generate a UUID. */
-	void *name,
-	/*! The length of the name. */
-	int namelen);
+        /*! Resulting UUID. */
+        uuid_upnp *uid,
+        /*! UUID to serve as context, so identical names from different name
+         * spaces generate different UUIDs. */
+        uuid_upnp nsid,
+        /*! The name from which to generate a UUID. */
+        void *name,
+        /*! The length of the name. */
+        int namelen);
 
 /*!
  * \brief Compare two UUID's "lexically".
@@ -79,8 +80,8 @@ void uuid_create_from_name(
  * \note Lexical ordering is not temporal ordering!
  */
 int uuid_compare(
-	/*! . */
-	uuid_upnp * u1,
-	/*! . */
-	uuid_upnp * u2);
+        /*! . */
+        uuid_upnp *u1,
+        /*! . */
+        uuid_upnp *u2);
 #endif /* UUID_H */

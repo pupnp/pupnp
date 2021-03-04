@@ -38,7 +38,7 @@
  */
 
 #if !defined(_WIN32)
-	#include <sys/param.h>
+        #include <sys/param.h>
 #endif
 
 #include "UpnpGlobal.h" /* For UPNP_INLINE, EXPORT_SPEC */
@@ -51,20 +51,20 @@ extern "C" {
 #include <pthread.h>
 
 #if defined(BSD) && !defined(__GNU__)
-	#define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
+        #define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
 #endif
 
 #if defined(PTHREAD_MUTEX_RECURSIVE) || defined(__DragonFly__)
-	/* This system has SuS2-compliant mutex attributes.
-	 * E.g. on Cygwin, where we don't have the old nonportable (NP) symbols
-	 */
-	#define ITHREAD_MUTEX_FAST_NP PTHREAD_MUTEX_NORMAL
-	#define ITHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
-	#define ITHREAD_MUTEX_ERRORCHECK_NP PTHREAD_MUTEX_ERRORCHECK
+        /* This system has SuS2-compliant mutex attributes.
+         * E.g. on Cygwin, where we don't have the old nonportable (NP) symbols
+         */
+        #define ITHREAD_MUTEX_FAST_NP PTHREAD_MUTEX_NORMAL
+        #define ITHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
+        #define ITHREAD_MUTEX_ERRORCHECK_NP PTHREAD_MUTEX_ERRORCHECK
 #else /* PTHREAD_MUTEX_RECURSIVE */
-	#define ITHREAD_MUTEX_FAST_NP PTHREAD_MUTEX_FAST_NP
-	#define ITHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE_NP
-	#define ITHREAD_MUTEX_ERRORCHECK_NP PTHREAD_MUTEX_ERRORCHECK_NP
+        #define ITHREAD_MUTEX_FAST_NP PTHREAD_MUTEX_FAST_NP
+        #define ITHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE_NP
+        #define ITHREAD_MUTEX_ERRORCHECK_NP PTHREAD_MUTEX_ERRORCHECK_NP
 #endif /* PTHREAD_MUTEX_RECURSIVE */
 
 #define ITHREAD_PROCESS_PRIVATE PTHREAD_PROCESS_PRIVATE
@@ -186,9 +186,9 @@ typedef ithread_mutex_t ithread_rwlock_t;
  ***************************************************************************/
 static UPNP_INLINE int ithread_initialize_library(void)
 {
-	int ret = 0;
+        int ret = 0;
 
-	return ret;
+        return ret;
 }
 
 /****************************************************************************
@@ -204,9 +204,9 @@ static UPNP_INLINE int ithread_initialize_library(void)
  ***************************************************************************/
 static UPNP_INLINE int ithread_cleanup_library(void)
 {
-	int ret = 0;
+        int ret = 0;
 
-	return ret;
+        return ret;
 }
 
 /****************************************************************************
@@ -222,13 +222,13 @@ static UPNP_INLINE int ithread_cleanup_library(void)
  ***************************************************************************/
 static UPNP_INLINE int ithread_initialize_thread(void)
 {
-	int ret = 0;
+        int ret = 0;
 
 #if defined(_WIN32) && defined(PTW32_STATIC_LIB)
-	ret = !pthread_win32_thread_attach_np();
+        ret = !pthread_win32_thread_attach_np();
 #endif
 
-	return ret;
+        return ret;
 }
 
 /****************************************************************************
@@ -244,13 +244,13 @@ static UPNP_INLINE int ithread_initialize_thread(void)
  ***************************************************************************/
 static UPNP_INLINE int ithread_cleanup_thread(void)
 {
-	int ret = 0;
+        int ret = 0;
 
 #if defined(_WIN32) && defined(PTW32_STATIC_LIB)
-	ret = !pthread_win32_thread_detach_np();
+        ret = !pthread_win32_thread_detach_np();
 #endif
 
-	return ret;
+        return ret;
 }
 
 /****************************************************************************
@@ -305,9 +305,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      See man page for pthread_mutexattr_setkind_np
  *****************************************************************************/
 #if defined(PTHREAD_MUTEX_RECURSIVE) || defined(__DragonFly__)
-	#define ithread_mutexattr_setkind_np pthread_mutexattr_settype
+        #define ithread_mutexattr_setkind_np pthread_mutexattr_settype
 #else
-	#define ithread_mutexattr_setkind_np pthread_mutexattr_setkind_np
+        #define ithread_mutexattr_setkind_np pthread_mutexattr_setkind_np
 #endif /* UPNP_USE_RWLOCK */
 
 /****************************************************************************
@@ -330,9 +330,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      See man page for pthread_mutexattr_getkind_np
  *****************************************************************************/
 #if defined(PTHREAD_MUTEX_RECURSIVE) || defined(__DragonFly__)
-	#define ithread_mutexattr_getkind_np pthread_mutexattr_gettype
+        #define ithread_mutexattr_getkind_np pthread_mutexattr_gettype
 #else
-	#define ithread_mutexattr_getkind_np pthread_mutexattr_getkind_np
+        #define ithread_mutexattr_getkind_np pthread_mutexattr_getkind_np
 #endif /* UPNP_USE_RWLOCK */
 
 /****************************************************************************
@@ -422,7 +422,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      See man page for pthread_rwlockattr_init
  ***************************************************************************/
 #if UPNP_USE_RWLOCK
-	#define ithread_rwlockattr_init pthread_rwlockattr_init
+        #define ithread_rwlockattr_init pthread_rwlockattr_init
 #endif /* UPNP_USE_RWLOCK */
 
 /****************************************************************************
@@ -439,7 +439,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      See man page for pthread_rwlockattr_destroy
  ***************************************************************************/
 #if UPNP_USE_RWLOCK
-	#define ithread_rwlockattr_destroy pthread_rwlockattr_destroy
+        #define ithread_rwlockattr_destroy pthread_rwlockattr_destroy
 #endif /* UPNP_USE_RWLOCK */
 
 /****************************************************************************
@@ -461,7 +461,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      See man page for pthread_rwlockattr_setkind_np
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
-	#define ithread_rwlockatttr_setpshared pthread_rwlockatttr_setpshared
+        #define ithread_rwlockatttr_setpshared pthread_rwlockatttr_setpshared
 #endif /* UPNP_USE_RWLOCK */
 
 /****************************************************************************
@@ -483,7 +483,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      See man page for pthread_rwlockatttr_getpshared
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
-	#define ithread_rwlockatttr_getpshared pthread_rwlockatttr_getpshared
+        #define ithread_rwlockatttr_getpshared pthread_rwlockatttr_getpshared
 #endif /* UPNP_USE_RWLOCK */
 
 /****************************************************************************
@@ -504,10 +504,10 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      See man page for pthread_rwlock_init
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
-	#define ithread_rwlock_init pthread_rwlock_init
+        #define ithread_rwlock_init pthread_rwlock_init
 #else
-	/* Read-write locks aren't available: use mutex instead. */
-	#define ithread_rwlock_init ithread_mutex_init
+        /* Read-write locks aren't available: use mutex instead. */
+        #define ithread_rwlock_init ithread_mutex_init
 #endif
 
 /****************************************************************************
@@ -525,10 +525,10 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      See man page for pthread_rwlock_rdlock
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
-	#define ithread_rwlock_rdlock pthread_rwlock_rdlock
+        #define ithread_rwlock_rdlock pthread_rwlock_rdlock
 #else
-	/* Read-write locks aren't available: use mutex instead. */
-	#define ithread_rwlock_rdlock ithread_mutex_lock
+        /* Read-write locks aren't available: use mutex instead. */
+        #define ithread_rwlock_rdlock ithread_mutex_lock
 #endif /* UPNP_USE_RWLOCK */
 
 /****************************************************************************
@@ -546,10 +546,10 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      See man page for pthread_rwlock_wrlock
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
-	#define ithread_rwlock_wrlock pthread_rwlock_wrlock
+        #define ithread_rwlock_wrlock pthread_rwlock_wrlock
 #else
-	/* Read-write locks aren't available: use mutex instead. */
-	#define ithread_rwlock_wrlock ithread_mutex_lock
+        /* Read-write locks aren't available: use mutex instead. */
+        #define ithread_rwlock_wrlock ithread_mutex_lock
 #endif /* UPNP_USE_RWLOCK */
 
 /****************************************************************************
@@ -568,10 +568,10 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      See man page for pthread_rwlock_unlock
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
-	#define ithread_rwlock_unlock pthread_rwlock_unlock
+        #define ithread_rwlock_unlock pthread_rwlock_unlock
 #else
-	/* Read-write locks aren't available: use mutex instead. */
-	#define ithread_rwlock_unlock ithread_mutex_unlock
+        /* Read-write locks aren't available: use mutex instead. */
+        #define ithread_rwlock_unlock ithread_mutex_unlock
 #endif /* UPNP_USE_RWLOCK */
 
 /****************************************************************************
@@ -594,10 +594,10 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      See man page for pthread_rwlock_destroy
  *****************************************************************************/
 #if UPNP_USE_RWLOCK
-	#define ithread_rwlock_destroy pthread_rwlock_destroy
+        #define ithread_rwlock_destroy pthread_rwlock_destroy
 #else
-	/* Read-write locks aren't available: use mutex instead. */
-	#define ithread_rwlock_destroy ithread_mutex_destroy
+        /* Read-write locks aren't available: use mutex instead. */
+        #define ithread_rwlock_destroy ithread_mutex_destroy
 #endif /* UPNP_USE_RWLOCK */
 
 /****************************************************************************
@@ -877,9 +877,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *              See man page for sleep (man 3 sleep)
  *****************************************************************************/
 #ifdef _WIN32
-	#define isleep(x) Sleep((x)*1000)
+        #define isleep(x) Sleep((x)*1000)
 #else
-	#define isleep sleep
+        #define isleep sleep
 #endif
 
 /****************************************************************************
@@ -896,26 +896,27 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *              See man page for sleep (man 3 sleep)
  *****************************************************************************/
 #ifdef _WIN32
-	#define imillisleep Sleep
+        #define imillisleep Sleep
 #else
-#if _POSIX_C_SOURCE < 200809L
-	#define imillisleep(x) usleep(1000 * x)
-#else
-	#define imillisleep(x) \
-		do { \
-			const struct timespec req = {0, x * 1000 * 1000}; \
-			nanosleep(&req, NULL); \
-		} while(0)
-#endif
+        #if _POSIX_C_SOURCE < 200809L
+                #define imillisleep(x) usleep(1000 * x)
+        #else
+                #define imillisleep(x) \
+                        do { \
+                                const struct timespec req = { \
+                                        0, x * 1000 * 1000}; \
+                                nanosleep(&req, NULL); \
+                        } while (0)
+        #endif
 #endif
 
 #if !defined(PTHREAD_MUTEX_RECURSIVE) && !defined(__DragonFly__) && \
-	!defined(UPNP_USE_MSVCPP)
+        !defined(UPNP_USE_MSVCPP)
 /* !defined(UPNP_USE_MSVCPP) should probably also have pthreads version check -
  * but it's not clear if that is possible */
 /* NK: Added for satisfying the gcc compiler */
 EXPORT_SPEC int pthread_mutexattr_setkind_np(
-	pthread_mutexattr_t *attr, int kind);
+        pthread_mutexattr_t *attr, int kind);
 #endif
 
 #ifdef __cplusplus

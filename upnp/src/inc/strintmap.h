@@ -32,15 +32,15 @@
 #ifndef GENLIB_UTIL_STRINTMAP_H
 #define GENLIB_UTIL_STRINTMAP_H
 
-#include <stdlib.h>
 #include "upnputil.h"
+#include <stdlib.h>
 
 /* Util to map from a string to an integer and vice versa */
 
 typedef struct /* str_int_entry */
 {
-	const char *name;	/* a value in string form */
-	int  id;		/* same value in integer form */
+        const char *name; /* a value in string form */
+        int id;           /* same value in integer form */
 } str_int_entry;
 
 #ifdef __cplusplus
@@ -48,56 +48,54 @@ extern "C" {
 #endif
 
 /************************************************************************
-*	Function :	map_str_to_int
-*
-*	Parameters :
-*		IN const char* name ;	string containing the name to be matched
-*		IN size_t name_len ;	size of the string to be matched
-*		IN str_int_entry* table ;	table of entries that need to be 
-*					matched.
-*		IN int num_entries ; number of entries in the table that need 
-*					to be searched.
-*		IN int case_sensitive ; whether the case should be case
-*					sensitive or not
-*
-*	Description : Match the given name with names from the entries in the 
-*		table. Returns the index of the table when the entry is found.
-*
-*	Return : int ;
-*		index - On Success
-*		-1 - On failure
-*
-*	Note :
-************************************************************************/
-int map_str_to_int( const char* name, size_t name_len,
-		str_int_entry* table, int num_entries, 
-		int case_sensitive );
-
+ *	Function :	map_str_to_int
+ *
+ *	Parameters :
+ *		IN const char* name ;	string containing the name to be matched
+ *		IN size_t name_len ;	size of the string to be matched
+ *		IN str_int_entry* table ;	table of entries that need to be
+ *					matched.
+ *		IN int num_entries ; number of entries in the table that need
+ *					to be searched.
+ *		IN int case_sensitive ; whether the case should be case
+ *					sensitive or not
+ *
+ *	Description : Match the given name with names from the entries in the
+ *		table. Returns the index of the table when the entry is found.
+ *
+ *	Return : int ;
+ *		index - On Success
+ *		-1 - On failure
+ *
+ *	Note :
+ ************************************************************************/
+int map_str_to_int(const char *name,
+        size_t name_len,
+        str_int_entry *table,
+        int num_entries,
+        int case_sensitive);
 
 /************************************************************************
-*	Function :	map_int_to_str
-*
-*	Parameters :
-*		IN int id ;	ID to be matched
-*		IN str_int_entry* table ;	table of entries that need to be 
-*					matched.
-*		IN int num_entries ; number of entries in the table that need 
-*					to be searched.
-*
-*	Description : Returns the index from the table where the id matches 
-*		the entry from the table.
-*
-*	Return : int ;
-*
-*	Note :
-************************************************************************/
-int map_int_to_str( int id, str_int_entry* table,
-		int num_entries );
+ *	Function :	map_int_to_str
+ *
+ *	Parameters :
+ *		IN int id ;	ID to be matched
+ *		IN str_int_entry* table ;	table of entries that need to be
+ *					matched.
+ *		IN int num_entries ; number of entries in the table that need
+ *					to be searched.
+ *
+ *	Description : Returns the index from the table where the id matches
+ *		the entry from the table.
+ *
+ *	Return : int ;
+ *
+ *	Note :
+ ************************************************************************/
+int map_int_to_str(int id, str_int_entry *table, int num_entries);
 
 #ifdef __cplusplus
 } /* extern C */
 #endif
 
-
 #endif /* GENLIB_UTIL_STRINTMAP_H */
-

@@ -36,53 +36,56 @@
  * \file
  */
 
-#include "sock.h"
-#include "httpparser.h"
 #include "UpnpStdInt.h"
+#include "httpparser.h"
+#include "sock.h"
 
 extern SOCKET gMiniServerStopSock;
 
-typedef struct MServerSockArray {
-	/*! IPv4 socket for listening for miniserver requests. */
-	SOCKET miniServerSock4;
-	/*! IPv6 LLA Socket for listening for miniserver requests. */
-	SOCKET miniServerSock6;
-	/*! IPv6 ULA or GUA Socket for listening for miniserver requests. */
-	SOCKET miniServerSock6UlaGua;
-	/*! Socket for stopping miniserver */
-	SOCKET miniServerStopSock;
-	/*! IPv4 SSDP Socket for incoming advertisments and search requests. */
-	SOCKET ssdpSock4;
-	/*! IPv6 LLA SSDP Socket for incoming advertisments and search requests. */
-	SOCKET ssdpSock6;
-	/*! IPv6 ULA or GUA SSDP Socket for incoming advertisments and search requests. */
-	SOCKET ssdpSock6UlaGua;
-	/* ! . */
-	uint16_t stopPort;
-	/* ! . */
-	uint16_t miniServerPort4;
-	/* ! . */
-	uint16_t miniServerPort6;
-	/* ! . */
-	uint16_t miniServerPort6UlaGua;
+typedef struct MServerSockArray
+{
+        /*! IPv4 socket for listening for miniserver requests. */
+        SOCKET miniServerSock4;
+        /*! IPv6 LLA Socket for listening for miniserver requests. */
+        SOCKET miniServerSock6;
+        /*! IPv6 ULA or GUA Socket for listening for miniserver requests. */
+        SOCKET miniServerSock6UlaGua;
+        /*! Socket for stopping miniserver */
+        SOCKET miniServerStopSock;
+        /*! IPv4 SSDP Socket for incoming advertisments and search requests. */
+        SOCKET ssdpSock4;
+        /*! IPv6 LLA SSDP Socket for incoming advertisments and search requests.
+         */
+        SOCKET ssdpSock6;
+        /*! IPv6 ULA or GUA SSDP Socket for incoming advertisments and search
+         * requests. */
+        SOCKET ssdpSock6UlaGua;
+        /* ! . */
+        uint16_t stopPort;
+        /* ! . */
+        uint16_t miniServerPort4;
+        /* ! . */
+        uint16_t miniServerPort6;
+        /* ! . */
+        uint16_t miniServerPort6UlaGua;
 #ifdef INCLUDE_CLIENT_APIS
-	/*! IPv4 SSDP socket for sending search requests and receiving search
-	 * replies */
-	SOCKET ssdpReqSock4;
-	/*! IPv6 SSDP socket for sending search requests and receiving search
-	 * replies */
-	SOCKET ssdpReqSock6;
+        /*! IPv4 SSDP socket for sending search requests and receiving search
+         * replies */
+        SOCKET ssdpReqSock4;
+        /*! IPv6 SSDP socket for sending search requests and receiving search
+         * replies */
+        SOCKET ssdpReqSock6;
 #endif /* INCLUDE_CLIENT_APIS */
 } MiniServerSockArray;
 
 /*! . */
-typedef void (*MiniServerCallback) (
-	/* ! [in] . */
-	http_parser_t * parser,
-	/* ! [in] . */
-	http_message_t * request,
-	/* ! [in] . */
-	SOCKINFO * info);
+typedef void (*MiniServerCallback)(
+        /* ! [in] . */
+        http_parser_t *parser,
+        /* ! [in] . */
+        http_message_t *request,
+        /* ! [in] . */
+        SOCKINFO *info);
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,25 +95,25 @@ extern "C" {
  * \brief Set HTTP Get Callback.
  */
 void SetHTTPGetCallback(
-	/*! [in] HTTP Callback to be invoked . */
-	MiniServerCallback callback);
+        /*! [in] HTTP Callback to be invoked . */
+        MiniServerCallback callback);
 
 /*!
  * \brief Set SOAP Callback.
  */
 #ifdef INCLUDE_DEVICE_APIS
 void SetSoapCallback(
-	/*! [in] SOAP Callback to be invoked . */
-	MiniServerCallback callback);
-#else /* INCLUDE_DEVICE_APIS */
-	static UPNP_INLINE void SetSoapCallback(MiniServerCallback callback) {}
+        /*! [in] SOAP Callback to be invoked . */
+        MiniServerCallback callback);
+#else  /* INCLUDE_DEVICE_APIS */
+static UPNP_INLINE void SetSoapCallback(MiniServerCallback callback) {}
 #endif /* INCLUDE_DEVICE_APIS */
 /*!
  * \brief Set GENA Callback.
  */
 void SetGenaCallback(
-	/*! [in] GENA Callback to be invoked. */
-	MiniServerCallback callback);
+        /*! [in] GENA Callback to be invoked. */
+        MiniServerCallback callback);
 
 /*!
  * \brief Initialize the sockets functionality for the Miniserver.
@@ -120,7 +123,7 @@ void SetGenaCallback(
  *
  * If listen port is 0, port is dynamically picked.
  *
- * Use timer mechanism to start the MiniServer, failure to meet the 
+ * Use timer mechanism to start the MiniServer, failure to meet the
  * allowed delay aborts the attempt to launch the MiniServer.
  *
  * \return
@@ -128,15 +131,15 @@ void SetGenaCallback(
  *	\li On error: UPNP_E_XXX.
  */
 int StartMiniServer(
-	/*! [in,out] Port on which the server listens for incoming IPv4
-	 * connections. */
-	uint16_t *listen_port4,
-	/*! [in,out] Port on which the server listens for incoming IPv6
-	 * LLA connections. */
-	uint16_t *listen_port6,
-	/*! [in,out] Port on which the server listens for incoming
-	 * IPv6 ULA or GUA connections. */
-	uint16_t *listen_port6UlaGua);
+        /*! [in,out] Port on which the server listens for incoming IPv4
+         * connections. */
+        uint16_t *listen_port4,
+        /*! [in,out] Port on which the server listens for incoming IPv6
+         * LLA connections. */
+        uint16_t *listen_port6,
+        /*! [in,out] Port on which the server listens for incoming
+         * IPv6 ULA or GUA connections. */
+        uint16_t *listen_port6UlaGua);
 
 /*!
  * \brief Stop and Shutdown the MiniServer and free socket resources.
