@@ -35,6 +35,7 @@ static struct s_Member UpnpActionRequest_members[] = {
 		struct sockaddr_storage,
 		"UpnpInet.h"),
 	INIT_MEMBER(Os, TYPE_STRING, 0, 0),
+	INIT_MEMBER(ExtraHeadersList, TYPE_LIST, 0, 0),
 };
 
 static struct s_Member UpnpDiscovery_members[] = {

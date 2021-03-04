@@ -28,6 +28,7 @@ struct s_UpnpActionRequest
 	IXML_Document * m_SoapHeader;
 	struct sockaddr_storage m_CtrlPtIPAddr;
 	UpnpString *m_Os;
+	UpnpListHead m_ExtraHeadersList;
 };
 
 UpnpActionRequest *UpnpActionRequest_new()
@@ -47,6 +48,7 @@ UpnpActionRequest *UpnpActionRequest_new()
 	/*p->m_SoapHeader = 0;*/
 	/* memset(&p->m_CtrlPtIPAddr, 0, sizeof (struct sockaddr_storage)); */
 	p->m_Os = UpnpString_new();
+	UpnpListInit(&p->m_ExtraHeadersList);
 
 	return (UpnpActionRequest *)p;
 }
@@ -57,6 +59,7 @@ void UpnpActionRequest_delete(UpnpActionRequest *q)
 
 	if (!p) return;
 
+	UpnpListInit(&p->m_ExtraHeadersList);
 	UpnpString_delete(p->m_Os);
 	p->m_Os = 0;
 	memset(&p->m_CtrlPtIPAddr, 0, sizeof (struct sockaddr_storage));
@@ -93,6 +96,7 @@ int UpnpActionRequest_assign(UpnpActionRequest *p, const UpnpActionRequest *q)
 		ok = ok && UpnpActionRequest_set_SoapHeader(p, UpnpActionRequest_get_SoapHeader(q));
 		ok = ok && UpnpActionRequest_set_CtrlPtIPAddr(p, UpnpActionRequest_get_CtrlPtIPAddr(q));
 		ok = ok && UpnpActionRequest_set_Os(p, UpnpActionRequest_get_Os(q));
+		ok = ok && UpnpActionRequest_set_ExtraHeadersList(p, UpnpActionRequest_get_ExtraHeadersList(q));
 	}
 
 	return ok;
@@ -369,5 +373,23 @@ int UpnpActionRequest_strncpy_Os(UpnpActionRequest *p, const char *s, size_t n)
 void UpnpActionRequest_clear_Os(UpnpActionRequest *p)
 {
 	UpnpString_clear(p->m_Os);
+}
+
+const UpnpListHead *UpnpActionRequest_get_ExtraHeadersList(const UpnpActionRequest *p)
+{
+	return &p->m_ExtraHeadersList;
+}
+
+int UpnpActionRequest_set_ExtraHeadersList(UpnpActionRequest *p, const UpnpListHead *q)
+{
+	p->m_ExtraHeadersList = *q;
+
+	return 1;
+}
+
+void UpnpActionRequest_add_to_list_ExtraHeadersList(UpnpActionRequest *p, struct UpnpListHead *head)
+{
+	UpnpListHead *list = &p->m_ExtraHeadersList;
+	UpnpListInsert(list, UpnpListEnd(list), head);
 }
 

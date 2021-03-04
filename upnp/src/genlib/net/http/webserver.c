@@ -1056,71 +1056,6 @@ static int CheckOtherHTTPHeaders(
 	return RetCode;
 }
 
-static void FreeExtraHTTPHeaders(
-	/*! [in] extra HTTP headers to free. */
-	UpnpListHead *extraHeadersList)
-{
-	UpnpListIter pos;
-	UpnpExtraHeaders *extra;
-
-	for (pos = UpnpListBegin(extraHeadersList);
-		pos != UpnpListEnd(extraHeadersList);) {
-		extra = (UpnpExtraHeaders *)pos;
-		pos = UpnpListErase(extraHeadersList, pos);
-		UpnpExtraHeaders_delete(extra);
-	}
-}
-
-/*!
- * \brief Build an array of unrecognized headers.
- *
- * \return nothing
- */
-static int ExtraHTTPHeaders(
-	/*! [in] HTTP Request message. */
-	http_message_t *Req,
-	UpnpListHead *extraHeadersList)
-{
-	http_header_t *header;
-	ListNode *node;
-	int index;
-	UpnpExtraHeaders *extraHeader;
-	UpnpListHead *extraHeaderNode;
-
-	node = ListHead(&Req->headers);
-	while (node != NULL) {
-		header = (http_header_t *)node->item;
-		/* find header type. */
-		index = map_str_to_int((const char *)header->name.buf,
-			header->name.length,
-			Http_Header_Names,
-			NUM_HTTP_HEADER_NAMES,
-			0);
-		if (index < 0) {
-			extraHeader = UpnpExtraHeaders_new();
-			if (!extraHeader) {
-				FreeExtraHTTPHeaders(extraHeadersList);
-				return HTTP_INTERNAL_SERVER_ERROR;
-			}
-			extraHeaderNode =
-				(UpnpListHead *)UpnpExtraHeaders_get_node(
-					extraHeader);
-			UpnpListInsert(extraHeadersList,
-				UpnpListEnd(extraHeadersList),
-				extraHeaderNode);
-			UpnpExtraHeaders_strncpy_name(extraHeader,
-				header->name.buf,
-				header->name.length);
-			UpnpExtraHeaders_strncpy_value(extraHeader,
-				header->value.buf,
-				header->value.length);
-		}
-		node = ListNext(&Req->headers, node);
-	}
-
-	return HTTP_OK;
-}
-
 /*!
  * \brief Processes the request and returns the result in the output parameters.
  *
@@ -1229,7 +1164,7 @@ static int process_request(
 	}
 	if (using_virtual_dir) {
 		if (req->method != HTTPMETHOD_POST) {
-			if ((code = ExtraHTTPHeaders(req,
+			if ((code = parser_get_unknown_headers(req,
 				     (UpnpListHead *)
 					     UpnpFileInfo_get_ExtraHeadersList(
 						     finfo))) != HTTP_OK) {
@@ -1514,7 +1449,7 @@ static int process_request(
 
 error_handler:
 	free(request_doc);
-	FreeExtraHTTPHeaders(
+	free_http_headers_list(
 		(UpnpListHead *)UpnpFileInfo_get_ExtraHeadersList(finfo));
 	UpnpFileInfo_delete(finfo);
 	if (err_code != HTTP_OK && alias_grabbed) {

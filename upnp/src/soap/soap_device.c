@@ -432,6 +432,13 @@ static void handle_invoke_action(
 			action, hdr_value.buf, hdr_value.length);
 	}
 
+	if ((err_code = parser_get_unknown_headers(request,
+		     (UpnpListHead *)UpnpActionRequest_get_ExtraHeadersList(
+			     action))) != HTTP_OK) {
+		err_code = SOAP_ACTION_FAILED;
+		goto error_handler;
+	}
+
 	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
 	soap_info->callback(
 		UPNP_CONTROL_ACTION_REQUEST, action, soap_info->cookie);
@@ -460,6 +467,8 @@ error_handler:
 	ixmlDocument_free(actionResultDoc);
 	ixmlDocument_free(actionRequestDoc);
 	ixmlFreeDOMString(act_node);
+	free_http_headers_list(
+		(UpnpListHead *)UpnpActionRequest_get_ExtraHeadersList(action));
 	/* restore */
 	action_name.buf[action_name.length] = save_char;
 	if (err_code != 0)
