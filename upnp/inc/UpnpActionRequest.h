@@ -17,6 +17,7 @@
 #include "UpnpString.h"
 #include "ixml.h"
 #include "UpnpInet.h"
+#include "list.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -142,6 +143,13 @@ EXPORT_SPEC int UpnpActionRequest_strcpy_Os(UpnpActionRequest *p, const char *s)
 EXPORT_SPEC int UpnpActionRequest_strncpy_Os(UpnpActionRequest *p, const char *s, size_t n); 
 /*! UpnpActionRequest_clear_Os */
 EXPORT_SPEC void UpnpActionRequest_clear_Os(UpnpActionRequest *p); 
+
+/*! UpnpActionRequest_get_ExtraHeadersList */
+EXPORT_SPEC const UpnpListHead *UpnpActionRequest_get_ExtraHeadersList(const UpnpActionRequest *p);
+/*! UpnpActionRequest_set_ExtraHeadersList */
+EXPORT_SPEC int UpnpActionRequest_set_ExtraHeadersList(UpnpActionRequest *p, const UpnpListHead *q);
+/*! UpnpActionRequest_add_to_list_ExtraHeadersList */
+EXPORT_SPEC void UpnpActionRequest_add_to_list_ExtraHeadersList(UpnpActionRequest *p, UpnpListHead *head);
 
 #ifdef __cplusplus
 }
