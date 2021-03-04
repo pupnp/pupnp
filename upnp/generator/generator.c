@@ -966,7 +966,7 @@ int main(int argc, const char *argv[])
 		if (!fp) {
 			continue;
 		}
-		printf("Writting %s ... ", c[i].header);
+		printf("Writing %s ... ", c[i].header);
 		write_header(fp, c + i);
 		fclose(fp);
 		printf("done!\n");
@@ -975,7 +975,7 @@ int main(int argc, const char *argv[])
 		if (!fp) {
 			continue;
 		}
-		printf("Writting %s ... ", c[i].source);
+		printf("Writing %s ... ", c[i].source);
 		write_source(fp, c + i);
 		fclose(fp);
 		printf("done!\n");
