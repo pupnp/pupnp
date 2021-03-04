@@ -32,6 +32,8 @@
 #ifndef SOAPLIB_H
 #define SOAPLIB_H
 
+#include "sock.h"
+
 /*!
  * \file
  */

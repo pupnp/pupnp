@@ -1,7 +1,7 @@
-
-
 #ifndef VIRTUALDIR_H
 #define VIRTUALDIR_H
+
+#include "upnp.h"
 
 /** The \b VirtualDirCallbacks structure contains the pointers to
  *  file-related callback functions a device application can register to
