@@ -552,7 +552,7 @@ static void CreateServicePacket(
                         return;
                 }
         } else if (msg_type == MSGTYPE_ADVERTISEMENT ||
-                   msg_type == MSGTYPE_SHUTDOWN) {
+                msg_type == MSGTYPE_SHUTDOWN) {
                 const char *host = NULL;
 
                 if (msg_type == MSGTYPE_ADVERTISEMENT)
@@ -1328,6 +1328,6 @@ error_handler:
         return ret_code;
 }
         #endif /* EXCLUDE_SSDP */
-#endif         /* INCLUDE_DEVICE_APIS */
+#endif /* INCLUDE_DEVICE_APIS */
 
 /* @} SSDPlib */

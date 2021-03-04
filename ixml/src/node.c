@@ -452,13 +452,13 @@ int ixmlNode_compare(
         assert(srcNode != NULL && destNode != NULL);
 
         return srcNode == destNode ||
-               (strcmp(srcNode->nodeName, destNode->nodeName) == 0 &&
-                       strcmp(srcNode->nodeValue, destNode->nodeValue) == 0 &&
-                       srcNode->nodeType == destNode->nodeType &&
-                       strcmp(srcNode->namespaceURI, destNode->namespaceURI) ==
-                               0 &&
-                       strcmp(srcNode->prefix, destNode->prefix) == 0 &&
-                       strcmp(srcNode->localName, destNode->localName) == 0);
+                (strcmp(srcNode->nodeName, destNode->nodeName) == 0 &&
+                        strcmp(srcNode->nodeValue, destNode->nodeValue) == 0 &&
+                        srcNode->nodeType == destNode->nodeType &&
+                        strcmp(srcNode->namespaceURI, destNode->namespaceURI) ==
+                                0 &&
+                        strcmp(srcNode->prefix, destNode->prefix) == 0 &&
+                        strcmp(srcNode->localName, destNode->localName) == 0);
 }
 
 int ixmlNode_insertBefore(

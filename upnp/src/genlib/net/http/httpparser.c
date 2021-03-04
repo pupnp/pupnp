@@ -194,7 +194,7 @@ static UPNP_INLINE int is_qdtext_char(int c)
         assert(c != '"');
 
         return (c >= 32 && c != 127) || c < 0 || c == TOKCHAR_CR ||
-               c == TOKCHAR_LF || c == '\t';
+                c == TOKCHAR_LF || c == '\t';
 }
 
 /************************************************************************
@@ -360,7 +360,7 @@ static int httpmsg_compare(void *param1, void *param2)
         assert(param2 != NULL);
 
         return ((http_header_t *)param1)->name_id ==
-               ((http_header_t *)param2)->name_id;
+                ((http_header_t *)param2)->name_id;
 }
 
 /************************************************************************
@@ -526,8 +526,8 @@ static UPNP_INLINE parse_status_t skip_blank_lines(scanner_t *scanner)
         do {
                 status = scanner_get_token(scanner, &token, &tok_type);
         } while (status == (parse_status_t)PARSE_OK &&
-                 (tok_type == (token_type_t)TT_WHITESPACE ||
-                         tok_type == (token_type_t)TT_CRLF));
+                (tok_type == (token_type_t)TT_WHITESPACE ||
+                        tok_type == (token_type_t)TT_CRLF));
         if (status == (parse_status_t)PARSE_OK) {
                 /* pushback a non-whitespace token */
                 scanner->cursor -= token.length;
@@ -837,7 +837,7 @@ static UPNP_INLINE parse_status_t read_until_crlf(
         do {
                 status = scanner_get_token(scanner, &token, &tok_type);
         } while (status == (parse_status_t)PARSE_OK &&
-                 tok_type != (token_type_t)TT_CRLF);
+                tok_type != (token_type_t)TT_CRLF);
 
         if (status == (parse_status_t)PARSE_OK) {
                 /* pushback crlf in stream */
@@ -1610,8 +1610,7 @@ static UPNP_INLINE parse_status_t parser_parse_entity_using_clen(
 
         /* determine entity (i.e. body) length so far */
         parser->msg.entity.length = parser->msg.msg.length -
-                                    parser->entity_start_position +
-                                    parser->msg.amount_discarded;
+                parser->entity_start_position + parser->msg.amount_discarded;
 
         if (parser->msg.entity.length < parser->content_length) {
                 /* more data to be read */
@@ -1620,9 +1619,8 @@ static UPNP_INLINE parse_status_t parser_parse_entity_using_clen(
                 if (parser->msg.entity.length > parser->content_length) {
                         /* silently discard extra data */
                         parser->msg.msg.buf[parser->entity_start_position +
-                                            parser->content_length -
-                                            parser->msg.amount_discarded] =
-                                '\0';
+                                parser->content_length -
+                                parser->msg.amount_discarded] = '\0';
                 }
                 /* save entity length */
                 parser->msg.entity.length = parser->content_length;
@@ -1770,8 +1768,8 @@ static UPNP_INLINE parse_status_t parser_parse_chunky_entity(
         if (parser->chunk_size == (size_t)0) {
                 /* done reading entity; determine length of entity */
                 parser->msg.entity.length = parser->scanner.cursor -
-                                            parser->entity_start_position +
-                                            parser->msg.amount_discarded;
+                        parser->entity_start_position +
+                        parser->msg.amount_discarded;
 
                 /* read entity headers */
                 parser->ent_position = ENTREAD_CHUNKY_HEADERS;
@@ -1806,7 +1804,7 @@ static UPNP_INLINE parse_status_t parser_parse_entity_until_close(
 
         /* update entity length */
         parser->msg.entity.length = cursor - parser->entity_start_position +
-                                    parser->msg.amount_discarded;
+                parser->msg.amount_discarded;
 
         /* update pointer */
         parser->msg.entity.buf =

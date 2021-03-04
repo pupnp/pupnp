@@ -218,7 +218,7 @@ static uint16_t true_random(void)
                 get_system_time(&time_now);
                 time_now = time_now / UUIDS_PER_TICK;
                 srand((unsigned int)(((time_now >> 32) ^ time_now) &
-                                     0xffffffff));
+                        0xffffffff));
                 inited = 1;
         };
 

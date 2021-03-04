@@ -75,19 +75,24 @@ int TestClass_assign(TestClass *p, const TestClass *q)
         if (p != q) {
                 ok = ok && TestClass_set_TheList(p, TestClass_get_TheList(q));
                 ok = ok &&
-                     TestClass_set_TheInteger(p, TestClass_get_TheInteger(q));
-                ok = ok && TestClass_set_TheUnsignedLong(
-                                   p, TestClass_get_TheUnsignedLong(q));
-                ok = ok && TestClass_set_TheCharPointer(
-                                   p, TestClass_get_TheCharPointer(q));
+                        TestClass_set_TheInteger(
+                                p, TestClass_get_TheInteger(q));
                 ok = ok &&
-                     TestClass_set_TheBuffer(p, TestClass_get_TheBuffer(q));
-                ok = ok && TestClass_set_TheActionComplete(
-                                   p, TestClass_get_TheActionComplete(q));
+                        TestClass_set_TheUnsignedLong(
+                                p, TestClass_get_TheUnsignedLong(q));
                 ok = ok &&
-                     TestClass_set_TheString(p, TestClass_get_TheString(q));
-                ok = ok && TestClass_set_TheDomString(
-                                   p, TestClass_get_TheDomString(q));
+                        TestClass_set_TheCharPointer(
+                                p, TestClass_get_TheCharPointer(q));
+                ok = ok &&
+                        TestClass_set_TheBuffer(p, TestClass_get_TheBuffer(q));
+                ok = ok &&
+                        TestClass_set_TheActionComplete(
+                                p, TestClass_get_TheActionComplete(q));
+                ok = ok &&
+                        TestClass_set_TheString(p, TestClass_get_TheString(q));
+                ok = ok &&
+                        TestClass_set_TheDomString(
+                                p, TestClass_get_TheDomString(q));
         }
 
         return ok;

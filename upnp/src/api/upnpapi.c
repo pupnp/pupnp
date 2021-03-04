@@ -1703,7 +1703,7 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
                         return retVal;
                 last_modified = time(NULL);
         } else if (descriptionType ==
-                   (enum Upnp_DescType_e)UPNPREG_FILENAME_DESC) {
+                (enum Upnp_DescType_e)UPNPREG_FILENAME_DESC) {
                 retVal = stat(description, &file_info);
                 if (retVal == -1)
                         return UPNP_E_FILE_NOT_FOUND;
@@ -1823,8 +1823,8 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
 
         return UPNP_E_SUCCESS;
 }
-        #endif                          /* INTERNAL_WEB_SERVER */
-#endif                                  /* INCLUDE_DEVICE_APIS */
+        #endif /* INTERNAL_WEB_SERVER */
+#endif /* INCLUDE_DEVICE_APIS */
 
 /*******************************************************************************
  *
@@ -1962,7 +1962,7 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
         return retVal;
 }
         #endif /* EXCLUDE_SSDP == 0 */
-#endif         /* INCLUDE_DEVICE_APIS */
+#endif /* INCLUDE_DEVICE_APIS */
 
 #if EXCLUDE_SSDP == 0
         #ifdef INCLUDE_CLIENT_APIS
@@ -2778,7 +2778,7 @@ exit_function:
         return ret;
 }
         #endif /* INCLUDE_DEVICE_APIS */
-#endif         /* EXCLUDE_GENA == 0 */
+#endif /* EXCLUDE_GENA == 0 */
 
 /*******************************************************************************
  *
@@ -3254,7 +3254,7 @@ int UpnpGetServiceVarStatus(UpnpClient_Handle Hnd,
         return retVal;
 }
         #endif /* INCLUDE_CLIENT_APIS */
-#endif         /* EXCLUDE_SOAP */
+#endif /* EXCLUDE_SOAP */
 
 /*******************************************************************************
  *
@@ -3820,7 +3820,7 @@ int UpnpGetIfInfo(const char *IfName)
                                            &((struct sockaddr_in6
                                                              *)(ifa->ifa_addr))
                                                     ->sin6_addr) &&
-                                   strlen(gIF_IPV6_ULA_GUA) == (size_t)0) {
+                                strlen(gIF_IPV6_ULA_GUA) == (size_t)0) {
                                 /* got a GUA, should store it
                                  * while no ULA is found */
                                 memcpy(&v6ulagua_addr,
@@ -4206,7 +4206,7 @@ void AutoAdvertise(void *input)
         free_upnp_timeout(event);
 }
         #endif /* EXCLUDE_SSDP == 0 */
-#endif         /* INCLUDE_DEVICE_APIS */
+#endif /* INCLUDE_DEVICE_APIS */
 
 #ifdef INTERNAL_WEB_SERVER
 int UpnpSetWebServerRootDir(const char *rootDir)
@@ -4380,7 +4380,7 @@ int UpnpEnableWebserver(int enable)
         }
 
         return UPNP_E_SUCCESS;
-#else  /* Internal web server disabled */
+#else /* Internal web server disabled */
         return UPNP_E_NO_WEB_SERVER;
 #endif /* INTERNAL_WEB_SERVER */
 }

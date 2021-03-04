@@ -45,7 +45,7 @@
 #include "sock.h"
 
 #include "UpnpStdInt.h" /* for ssize_t */
-#include "unixutil.h"   /* for socklen_t, EAFNOSUPPORT */
+#include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
 #include "upnp.h"
 
 #include "upnpdebug.h"
@@ -308,7 +308,7 @@ int sock_make_no_blocking(SOCKET sock)
 #ifdef _WIN32
         u_long val = 1;
         return ioctlsocket(sock, FIONBIO, &val);
-#else  /* _WIN32 */
+#else /* _WIN32 */
         int val;
 
         val = fcntl(sock, F_GETFL, 0);

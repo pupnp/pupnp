@@ -301,8 +301,8 @@ SOCKET http_Connect(uri_type *destination_url, uri_type *url)
                 return (SOCKET)(UPNP_E_OUTOF_SOCKET);
         }
         sockaddr_len = (socklen_t)(url->hostport.IPaddress.ss_family == AF_INET6
-                                           ? sizeof(struct sockaddr_in6)
-                                           : sizeof(struct sockaddr_in));
+                        ? sizeof(struct sockaddr_in6)
+                        : sizeof(struct sockaddr_in));
         ret_connect = private_connect(connfd,
                 (struct sockaddr *)&url->hostport.IPaddress,
                 sockaddr_len);
@@ -493,9 +493,8 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
                                 amount_to_be_read = (off_t)Data_Buf_Size;
                         if (amount_to_be_read < (off_t)WEB_SERVER_BUF_SIZE)
                                 Data_Buf_Size = (size_t)amount_to_be_read;
-                        ChunkBuf = malloc(
-                                (size_t)(Data_Buf_Size + CHUNK_HEADER_SIZE +
-                                         CHUNK_TAIL_SIZE));
+                        ChunkBuf = malloc((size_t)(Data_Buf_Size +
+                                CHUNK_HEADER_SIZE + CHUNK_TAIL_SIZE));
                         if (!ChunkBuf) {
                                 RetVal = UPNP_E_OUTOF_MEMORY;
                                 goto ExitFunction;
@@ -535,11 +534,10 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
                         while (amount_to_be_read) {
                                 if (Instr) {
                                         int nr;
-                                        size_t n =
-                                                amount_to_be_read >=
-                                                                (off_t)Data_Buf_Size
-                                                        ? Data_Buf_Size
-                                                        : (size_t)amount_to_be_read;
+                                        size_t n = amount_to_be_read >=
+                                                        (off_t)Data_Buf_Size
+                                                ? Data_Buf_Size
+                                                : (size_t)amount_to_be_read;
                                         if (Instr->IsVirtualFile) {
                                                 nr = virtualDirCallback.read(Fp,
                                                         file_buf,
@@ -739,8 +737,8 @@ int http_RequestAndResponse(uri_type *destination,
         }
         /* connect */
         sockaddr_len = destination->hostport.IPaddress.ss_family == AF_INET6
-                               ? sizeof(struct sockaddr_in6)
-                               : sizeof(struct sockaddr_in);
+                ? sizeof(struct sockaddr_in6)
+                : sizeof(struct sockaddr_in);
         ret_code = private_connect(info.socket,
                 (struct sockaddr *)&(destination->hostport.IPaddress),
                 (socklen_t)sockaddr_len);
@@ -890,8 +888,8 @@ int http_Download(const char *url_str,
                 } else {
                         /* safety */
                         copy_len = ctype.length < LINE_SIZE - (size_t)1
-                                           ? ctype.length
-                                           : LINE_SIZE - (size_t)1;
+                                ? ctype.length
+                                : LINE_SIZE - (size_t)1;
 
                         memcpy(content_type, ctype.buf, copy_len);
                         content_type[copy_len] = '\0';
@@ -1268,8 +1266,8 @@ int http_OpenHttpConnection(const char *url_str, void **Handle, int timeout)
                 goto errorHandler;
         }
         sockaddr_len = url.hostport.IPaddress.ss_family == AF_INET6
-                               ? sizeof(struct sockaddr_in6)
-                               : sizeof(struct sockaddr_in);
+                ? sizeof(struct sockaddr_in6)
+                : sizeof(struct sockaddr_in);
         ret_code = private_connect(handle->sock_info.socket,
                 (struct sockaddr *)&(url.hostport.IPaddress),
                 (socklen_t)sockaddr_len);
@@ -1482,7 +1480,7 @@ int http_ReadHttpResponse(void *Handle, char *buf, size_t *size, int timeout)
                 /* read until close */
                 ok_on_close = 1;
         else if ((status != PARSE_SUCCESS) && (status != PARSE_CONTINUE_1) &&
-                 (status != PARSE_INCOMPLETE)) {
+                (status != PARSE_INCOMPLETE)) {
                 /*error */
                 *size = 0;
                 return UPNP_E_BAD_RESPONSE;
@@ -1510,8 +1508,8 @@ int http_ReadHttpResponse(void *Handle, char *buf, size_t *size, int timeout)
                                 /* read until close */
                                 ok_on_close = 1;
                         } else if ((status != PARSE_SUCCESS) &&
-                                   (status != PARSE_CONTINUE_1) &&
-                                   (status != PARSE_INCOMPLETE)) {
+                                (status != PARSE_CONTINUE_1) &&
+                                (status != PARSE_INCOMPLETE)) {
                                 /*error */
                                 *size = 0;
                                 return UPNP_E_BAD_RESPONSE;
@@ -1887,8 +1885,8 @@ int http_MakeMessage(membuffer *buf,
                                     http_major_version,
                                     http_minor_version,
                                     "NTcs",
-                                    bignum,       /* content-length */
-                                    "text/html",  /* content-type */
+                                    bignum, /* content-length */
+                                    "text/html", /* content-type */
                                     tempbuf) != 0 /* body */
                         )
                                 goto error_handler;
@@ -2196,8 +2194,8 @@ int http_OpenHttpGetEx(const char *url_str,
                         break;
                 }
                 sockaddr_len = url.hostport.IPaddress.ss_family == AF_INET6
-                                       ? sizeof(struct sockaddr_in6)
-                                       : sizeof(struct sockaddr_in);
+                        ? sizeof(struct sockaddr_in6)
+                        : sizeof(struct sockaddr_in);
                 errCode = private_connect(handle->sock_info.socket,
                         (struct sockaddr *)&(url.hostport.IPaddress),
                         (socklen_t)sockaddr_len);

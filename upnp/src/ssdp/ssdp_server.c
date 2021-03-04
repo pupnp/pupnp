@@ -69,7 +69,7 @@ SOCKET gSsdpReqSocket4 = INVALID_SOCKET;
                 #ifdef UPNP_ENABLE_IPV6
 SOCKET gSsdpReqSocket6 = INVALID_SOCKET;
                 #endif /* UPNP_ENABLE_IPV6 */
-        #endif         /* INCLUDE_CLIENT_APIS */
+        #endif /* INCLUDE_CLIENT_APIS */
 
 void RequestHandler();
 
@@ -839,7 +839,7 @@ void readFromSSDPSocket(SOCKET socket)
                         parser_response_init(&data->parser, HTTPMETHOD_MSEARCH);
                 else
                         parser_request_init(&data->parser);
-        #else  /* INCLUDE_CLIENT_APIS */
+        #else /* INCLUDE_CLIENT_APIS */
                 parser_request_init(&data->parser);
         #endif /* INCLUDE_CLIENT_APIS */
                 /* set size of parser buffer */
@@ -1458,7 +1458,7 @@ static int create_ssdp_sock_reqv6(
         return UPNP_E_SUCCESS;
 }
                 #endif /* IPv6 */
-        #endif         /* INCLUDE_CLIENT_APIS */
+        #endif /* INCLUDE_CLIENT_APIS */
 
 int get_ssdp_sockets(MiniServerSockArray *out)
 {
@@ -1489,7 +1489,7 @@ int get_ssdp_sockets(MiniServerSockArray *out)
         } else
                 out->ssdpReqSock6 = INVALID_SOCKET;
                 #endif /* IPv6 */
-        #endif         /* INCLUDE_CLIENT_APIS */
+        #endif /* INCLUDE_CLIENT_APIS */
         /* Create the IPv4 socket for SSDP */
         if (strlen(gIF_IPV4) > (size_t)0) {
                 retVal = create_ssdp_sock_v4(&out->ssdpSock4);

@@ -137,9 +137,8 @@ static void send_error_response(
         memset(err_code_str, 0, sizeof(err_code_str));
         snprintf(err_code_str, sizeof(err_code_str), "%d", error_code);
         /* calc body len */
-        content_length =
-                (off_t)(strlen(start_body) + strlen(err_code_str) +
-                        strlen(mid_body) + strlen(err_msg) + strlen(end_body));
+        content_length = (off_t)(strlen(start_body) + strlen(err_code_str) +
+                strlen(mid_body) + strlen(err_msg) + strlen(end_body));
         http_CalcResponseVersion(
                 hmsg->major_version, hmsg->minor_version, &major, &minor);
         /* make headers */
@@ -638,8 +637,8 @@ static int check_soapaction_hdr(
                 /* for action invocation, update the version information */
                 namecopy(soap_info->service_type, serv_type);
         } else if (strcmp(serv_type, QUERY_STATE_VAR_URN) == 0 &&
-                   memptr_cmp(&soap_info->action_name, "QueryStateVariable") ==
-                           0) {
+                memptr_cmp(&soap_info->action_name, "QueryStateVariable") ==
+                        0) {
                 /* query variable */
                 soap_info->action_name.buf = NULL;
                 soap_info->action_name.length = 0;

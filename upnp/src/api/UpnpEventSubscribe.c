@@ -62,14 +62,18 @@ int UpnpEventSubscribe_assign(
         int ok = 1;
 
         if (p != q) {
-                ok = ok && UpnpEventSubscribe_set_ErrCode(
-                                   p, UpnpEventSubscribe_get_ErrCode(q));
-                ok = ok && UpnpEventSubscribe_set_TimeOut(
-                                   p, UpnpEventSubscribe_get_TimeOut(q));
-                ok = ok && UpnpEventSubscribe_set_SID(
-                                   p, UpnpEventSubscribe_get_SID(q));
-                ok = ok && UpnpEventSubscribe_set_PublisherUrl(
-                                   p, UpnpEventSubscribe_get_PublisherUrl(q));
+                ok = ok &&
+                        UpnpEventSubscribe_set_ErrCode(
+                                p, UpnpEventSubscribe_get_ErrCode(q));
+                ok = ok &&
+                        UpnpEventSubscribe_set_TimeOut(
+                                p, UpnpEventSubscribe_get_TimeOut(q));
+                ok = ok &&
+                        UpnpEventSubscribe_set_SID(
+                                p, UpnpEventSubscribe_get_SID(q));
+                ok = ok &&
+                        UpnpEventSubscribe_set_PublisherUrl(
+                                p, UpnpEventSubscribe_get_PublisherUrl(q));
         }
 
         return ok;

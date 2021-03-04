@@ -671,9 +671,9 @@ static int Parser_skipMisc(
                 } else if (strncasecmp(xmlParser->curPtr,
                                    (char *)XMLDECL,
                                    strlen(XMLDECL)) == 0 ||
-                           strncasecmp(xmlParser->curPtr,
-                                   (char *)XMLDECL2,
-                                   strlen(XMLDECL2)) == 0) {
+                        strncasecmp(xmlParser->curPtr,
+                                (char *)XMLDECL2,
+                                strlen(XMLDECL2)) == 0) {
                         /* <?xml or <?xml? */
                         rc = IXML_SYNTAX_ERR;
                 } else if (strncasecmp(xmlParser->curPtr,
@@ -715,9 +715,10 @@ static int Parser_skipProlog(
         }
 
         rc = Parser_skipMisc(xmlParser);
-        if ((rc == IXML_SUCCESS) && strncmp(xmlParser->curPtr,
-                                            (char *)BEGIN_DOCTYPE,
-                                            strlen(BEGIN_DOCTYPE)) == 0) {
+        if ((rc == IXML_SUCCESS) &&
+                strncmp(xmlParser->curPtr,
+                        (char *)BEGIN_DOCTYPE,
+                        strlen(BEGIN_DOCTYPE)) == 0) {
                 /* <! DOCTYPE */
                 xmlParser->curPtr++;
                 rc = Parser_skipDocType(&(xmlParser->curPtr));
@@ -784,35 +785,35 @@ static int Parser_UTF8ToInt(
                 *len = 2;
                 return ((c & 0x1f) << 6) | (s[1] & 0x3f);
         } else if ((c & 0xF0) == 0xE0 && (s[1] & 0xc0) == 0x80 &&
-                   (s[2] & 0xc0) == 0x80) {
+                (s[2] & 0xc0) == 0x80) {
                 /* a sequence of 1110xxxx,10xxxxxx and 10xxxxxx ? */
                 *len = 3;
                 return ((c & 0x0f) << 12) | ((s[1] & 0x3f) << 6) |
-                       (s[2] & 0x3f);
+                        (s[2] & 0x3f);
         } else if ((c & 0xf8) == 0xf0 && (s[1] & 0xc0) == 0x80 &&
-                   (s[2] & 0xc0) == 0x80 && (s[3] & 0xc0) == 0x80) {
+                (s[2] & 0xc0) == 0x80 && (s[3] & 0xc0) == 0x80) {
                 /* a sequence of 11110xxx,10xxxxxx,10xxxxxx and 10xxxxxx ? */
                 *len = 4;
                 return ((c & 0x07) << 18) | ((s[1] & 0x3f) << 12) |
-                       ((s[2] & 0x3f) << 6) | (s[3] & 0x3f);
+                        ((s[2] & 0x3f) << 6) | (s[3] & 0x3f);
         } else if ((c & 0xfc) == 0xf8 && (s[1] & 0xc0) == 0x80 &&
-                   (s[2] & 0xc0) == 0x80 && (s[3] & 0xc0) == 0x80 &&
-                   (s[4] & 0xc0) == 0x80) {
+                (s[2] & 0xc0) == 0x80 && (s[3] & 0xc0) == 0x80 &&
+                (s[4] & 0xc0) == 0x80) {
                 /* a sequence of 111110xx,10xxxxxx,10xxxxxx,10xxxxxx,10xxxxxx ?
                  */
                 *len = 5;
                 return ((c & 0x03) << 24) | ((s[1] & 0x3f) << 18) |
-                       ((s[2] & 0x3f) << 12) | ((s[3] & 0x3f) << 6) |
-                       (s[4] & 0x3f);
+                        ((s[2] & 0x3f) << 12) | ((s[3] & 0x3f) << 6) |
+                        (s[4] & 0x3f);
         } else if ((c & 0xfe) == 0xfc && (s[1] & 0xc0) == 0x80 &&
-                   (s[2] & 0xc0) == 0x80 && (s[3] & 0xc0) == 0x80 &&
-                   (s[4] & 0xc0) == 0x80 && (s[5] & 0xc0) == 0x80) {
+                (s[2] & 0xc0) == 0x80 && (s[3] & 0xc0) == 0x80 &&
+                (s[4] & 0xc0) == 0x80 && (s[5] & 0xc0) == 0x80) {
                 /* a sequence of 1111110x,10xxxxxx,10xxxxxx,10xxxxxx,10xxxxxx
                  * and 10xxxxxx ? */
                 *len = 6;
                 return ((c & 0x01) << 30) | ((s[1] & 0x3f) << 24) |
-                       ((s[2] & 0x3f) << 18) | ((s[3] & 0x3f) << 12) |
-                       ((s[4] & 0x3f) << 6) | (s[5] & 0x3f);
+                        ((s[2] & 0x3f) << 18) | ((s[3] & 0x3f) << 12) |
+                        ((s[4] & 0x3f) << 6) | (s[5] & 0x3f);
         } else {
                 /* none of above, error */
                 int ret = 0;
@@ -891,7 +892,7 @@ static int Parser_isXmlChar(
         int c)
 {
         return c == 0x9 || c == 0xA || c == 0xD || (c >= 0x20 && c <= 0xD7FF) ||
-               (c >= 0xE000 && c <= 0xFFFD) || (c >= 0x10000 && c <= 0x10FFFF);
+                (c >= 0xE000 && c <= 0xFFFD) || (c >= 0x10000 && c <= 0x10FFFF);
 }
 
 /*!
@@ -1747,7 +1748,7 @@ static int Parser_xmlNamespace(
                         goto ExitFunction;
                 }
         } else if (strncmp(newNode->nodeName, "xmlns:", strlen("xmlns:")) ==
-                   0) {
+                0) {
                 /* namespace definition */
                 ret = Parser_setNodePrefixAndLocalName(newNode);
                 if (ret != IXML_SUCCESS) {

@@ -193,7 +193,7 @@ static UPNP_INLINE int calc_descURL(
         assert(alias != NULL && strlen(alias) > 0);
 
         len = strlen(http_scheme) + strlen(ipPortStr) + strlen(alias) +
-              (size_t)1;
+                (size_t)1;
         if (len > (size_t)LINE_SIZE)
                 return UPNP_E_URL_TOO_BIG;
         snprintf(descURL, len, "%s%s%s", http_scheme, ipPortStr, alias);
@@ -429,4 +429,4 @@ error_handler:
         return err_code;
 }
         #endif /* INCLUDE_DEVICE_APIS */
-#endif         /* INTERNAL_WEB_SERVER */
+#endif /* INTERNAL_WEB_SERVER */

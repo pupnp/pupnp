@@ -35,7 +35,7 @@ void IxmlPrintf(
         __attribute__((format(__printf__, 4, 5)))
         #endif
         ;
-#else  /* DEBUG */
+#else /* DEBUG */
 static UPNP_INLINE void IxmlPrintf(const char *FmtStr, ...) { (void)FmtStr; }
 #endif /* DEBUG */
 

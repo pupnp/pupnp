@@ -61,14 +61,18 @@ int UpnpActionComplete_assign(
         int ok = 1;
 
         if (p != q) {
-                ok = ok && UpnpActionComplete_set_ErrCode(
-                                   p, UpnpActionComplete_get_ErrCode(q));
-                ok = ok && UpnpActionComplete_set_CtrlUrl(
-                                   p, UpnpActionComplete_get_CtrlUrl(q));
-                ok = ok && UpnpActionComplete_set_ActionRequest(
-                                   p, UpnpActionComplete_get_ActionRequest(q));
-                ok = ok && UpnpActionComplete_set_ActionResult(
-                                   p, UpnpActionComplete_get_ActionResult(q));
+                ok = ok &&
+                        UpnpActionComplete_set_ErrCode(
+                                p, UpnpActionComplete_get_ErrCode(q));
+                ok = ok &&
+                        UpnpActionComplete_set_CtrlUrl(
+                                p, UpnpActionComplete_get_CtrlUrl(q));
+                ok = ok &&
+                        UpnpActionComplete_set_ActionRequest(
+                                p, UpnpActionComplete_get_ActionRequest(q));
+                ok = ok &&
+                        UpnpActionComplete_set_ActionResult(
+                                p, UpnpActionComplete_get_ActionResult(q));
         }
 
         return ok;

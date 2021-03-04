@@ -77,22 +77,30 @@ int UpnpStateVarRequest_assign(
         int ok = 1;
 
         if (p != q) {
-                ok = ok && UpnpStateVarRequest_set_ErrCode(
-                                   p, UpnpStateVarRequest_get_ErrCode(q));
-                ok = ok && UpnpStateVarRequest_set_Socket(
-                                   p, UpnpStateVarRequest_get_Socket(q));
-                ok = ok && UpnpStateVarRequest_set_ErrStr(
-                                   p, UpnpStateVarRequest_get_ErrStr(q));
-                ok = ok && UpnpStateVarRequest_set_DevUDN(
-                                   p, UpnpStateVarRequest_get_DevUDN(q));
-                ok = ok && UpnpStateVarRequest_set_ServiceID(
-                                   p, UpnpStateVarRequest_get_ServiceID(q));
-                ok = ok && UpnpStateVarRequest_set_StateVarName(
-                                   p, UpnpStateVarRequest_get_StateVarName(q));
-                ok = ok && UpnpStateVarRequest_set_CtrlPtIPAddr(
-                                   p, UpnpStateVarRequest_get_CtrlPtIPAddr(q));
-                ok = ok && UpnpStateVarRequest_set_CurrentVal(
-                                   p, UpnpStateVarRequest_get_CurrentVal(q));
+                ok = ok &&
+                        UpnpStateVarRequest_set_ErrCode(
+                                p, UpnpStateVarRequest_get_ErrCode(q));
+                ok = ok &&
+                        UpnpStateVarRequest_set_Socket(
+                                p, UpnpStateVarRequest_get_Socket(q));
+                ok = ok &&
+                        UpnpStateVarRequest_set_ErrStr(
+                                p, UpnpStateVarRequest_get_ErrStr(q));
+                ok = ok &&
+                        UpnpStateVarRequest_set_DevUDN(
+                                p, UpnpStateVarRequest_get_DevUDN(q));
+                ok = ok &&
+                        UpnpStateVarRequest_set_ServiceID(
+                                p, UpnpStateVarRequest_get_ServiceID(q));
+                ok = ok &&
+                        UpnpStateVarRequest_set_StateVarName(
+                                p, UpnpStateVarRequest_get_StateVarName(q));
+                ok = ok &&
+                        UpnpStateVarRequest_set_CtrlPtIPAddr(
+                                p, UpnpStateVarRequest_get_CtrlPtIPAddr(q));
+                ok = ok &&
+                        UpnpStateVarRequest_set_CurrentVal(
+                                p, UpnpStateVarRequest_get_CurrentVal(q));
         }
 
         return ok;

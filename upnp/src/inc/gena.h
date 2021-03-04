@@ -57,7 +57,7 @@
         #ifndef EXTERN_C
                 #define EXTERN_C
         #endif /* EXTERN_C */
-#endif         /* __cplusplus */
+#endif /* __cplusplus */
 
 /*!
  * \brief XML version comment. Not used because it is not interopeable with

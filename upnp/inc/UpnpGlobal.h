@@ -31,8 +31,8 @@
                         #else /* LIBUPNP_EXPORTS */
                                 #define EXPORT_SPEC __declspec(dllimport)
                         #endif /* LIBUPNP_EXPORTS */
-                #endif         /* UPNP_STATIC_LIB */
-        #else                  /* _MSC_VER || __BORLANDC__ */
+                #endif /* UPNP_STATIC_LIB */
+        #else /* _MSC_VER || __BORLANDC__ */
                 #define EXPORT_SPEC
         #endif /* _MSC_VER || __BORLANDC__ */
 

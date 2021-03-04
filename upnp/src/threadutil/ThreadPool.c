@@ -204,7 +204,7 @@ static time_t StatsTime(
 
         return tv.tv_sec;
 }
-#else  /* STATS */
+#else /* STATS */
 static UPNP_INLINE void StatsInit(ThreadPoolStats *stats) {}
 static UPNP_INLINE void StatsAccountLQ(ThreadPool *tp, long diffTime) {}
 static UPNP_INLINE void StatsAccountMQ(ThreadPool *tp, long diffTime) {}
@@ -1052,17 +1052,14 @@ int ThreadPoolShutdown(ThreadPool *tp)
         while (tp->totalThreads > 0)
                 ithread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
         /* destroy condition */
-        while (ithread_cond_destroy(&tp->condition) != 0) {
-        }
-        while (ithread_cond_destroy(&tp->start_and_shutdown) != 0) {
-        }
+        while (ithread_cond_destroy(&tp->condition) != 0) {}
+        while (ithread_cond_destroy(&tp->start_and_shutdown) != 0) {}
         FreeListDestroy(&tp->jobFreeList);
 
         ithread_mutex_unlock(&tp->mutex);
 
         /* destroy mutex */
-        while (ithread_mutex_destroy(&tp->mutex) != 0) {
-        }
+        while (ithread_mutex_destroy(&tp->mutex) != 0) {}
 
         return 0;
 }

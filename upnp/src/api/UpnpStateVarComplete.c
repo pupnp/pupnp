@@ -63,14 +63,18 @@ int UpnpStateVarComplete_assign(
         int ok = 1;
 
         if (p != q) {
-                ok = ok && UpnpStateVarComplete_set_ErrCode(
-                                   p, UpnpStateVarComplete_get_ErrCode(q));
-                ok = ok && UpnpStateVarComplete_set_CtrlUrl(
-                                   p, UpnpStateVarComplete_get_CtrlUrl(q));
-                ok = ok && UpnpStateVarComplete_set_StateVarName(
-                                   p, UpnpStateVarComplete_get_StateVarName(q));
-                ok = ok && UpnpStateVarComplete_set_CurrentVal(
-                                   p, UpnpStateVarComplete_get_CurrentVal(q));
+                ok = ok &&
+                        UpnpStateVarComplete_set_ErrCode(
+                                p, UpnpStateVarComplete_get_ErrCode(q));
+                ok = ok &&
+                        UpnpStateVarComplete_set_CtrlUrl(
+                                p, UpnpStateVarComplete_get_CtrlUrl(q));
+                ok = ok &&
+                        UpnpStateVarComplete_set_StateVarName(
+                                p, UpnpStateVarComplete_get_StateVarName(q));
+                ok = ok &&
+                        UpnpStateVarComplete_set_CurrentVal(
+                                p, UpnpStateVarComplete_get_CurrentVal(q));
         }
 
         return ok;

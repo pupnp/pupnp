@@ -164,7 +164,7 @@ subscription *GetNextSubscription(service_info *service, subscription *current)
                         notDone = 0;
                         next = current;
                 } else if (current->expireTime &&
-                           current->expireTime < current_time) {
+                        current->expireTime < current_time) {
                         previous->next = current->next;
                         current->next = NULL;
                         freeSubscriptionList(current);

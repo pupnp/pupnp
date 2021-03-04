@@ -63,13 +63,17 @@ int UpnpExtraHeaders_assign(UpnpExtraHeaders *p, const UpnpExtraHeaders *q)
 
         if (p != q) {
                 ok = ok &&
-                     UpnpExtraHeaders_set_node(p, UpnpExtraHeaders_get_node(q));
+                        UpnpExtraHeaders_set_node(
+                                p, UpnpExtraHeaders_get_node(q));
                 ok = ok &&
-                     UpnpExtraHeaders_set_name(p, UpnpExtraHeaders_get_name(q));
-                ok = ok && UpnpExtraHeaders_set_value(
-                                   p, UpnpExtraHeaders_get_value(q));
+                        UpnpExtraHeaders_set_name(
+                                p, UpnpExtraHeaders_get_name(q));
                 ok = ok &&
-                     UpnpExtraHeaders_set_resp(p, UpnpExtraHeaders_get_resp(q));
+                        UpnpExtraHeaders_set_value(
+                                p, UpnpExtraHeaders_get_value(q));
+                ok = ok &&
+                        UpnpExtraHeaders_set_resp(
+                                p, UpnpExtraHeaders_get_resp(q));
         }
 
         return ok;

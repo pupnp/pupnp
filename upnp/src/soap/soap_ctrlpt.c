@@ -87,7 +87,7 @@ static int dom_cmp_name(
                          "%s:%s%0",
                          &dummy,
                          &nameptr) == PARSE_OK &&
-                 strcmp(nameptr.buf, name) == 0)
+                strcmp(nameptr.buf, name) == 0)
                 ret_code = 0;
         else
                 /* names are not the same */
@@ -769,10 +769,9 @@ int SoapSendActionEx(char *action_url,
 
         /* make request msg */
         request.size_inc = 50;
-        content_length =
-                (off_t)(xml_start_len + xml_header_start_len +
-                        xml_header_str_len + xml_header_end_len +
-                        xml_body_start_len + action_str_len + xml_end_len);
+        content_length = (off_t)(xml_start_len + xml_header_start_len +
+                xml_header_str_len + xml_header_end_len + xml_body_start_len +
+                action_str_len + xml_end_len);
         if (http_MakeMessage(&request,
                     1,
                     1,
@@ -954,4 +953,4 @@ int SoapGetServiceVarStatus(char *action_url, char *var_name, char **var_value)
 }
 
         #endif /* EXCLUDE_SOAP */
-#endif         /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */

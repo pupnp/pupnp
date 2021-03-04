@@ -292,7 +292,7 @@ void ssdp_handle_ctrlpt_msg(
                                         break;
                                 case SSDP_ROOTDEVICE:
                                         matched = (event.RequestType ==
-                                                   SSDP_ROOTDEVICE);
+                                                SSDP_ROOTDEVICE);
                                         break;
                                 case SSDP_DEVICEUDN:
                                         matched = !strncmp(
@@ -780,6 +780,6 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
         return 1;
 }
         #endif /* EXCLUDE_SSDP */
-#endif         /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
 
 /* @} SSDPlib */

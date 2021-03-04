@@ -57,8 +57,9 @@ int UpnpEvent_assign(UpnpEvent *p, const UpnpEvent *q)
 
         if (p != q) {
                 ok = ok && UpnpEvent_set_EventKey(p, UpnpEvent_get_EventKey(q));
-                ok = ok && UpnpEvent_set_ChangedVariables(
-                                   p, UpnpEvent_get_ChangedVariables(q));
+                ok = ok &&
+                        UpnpEvent_set_ChangedVariables(
+                                p, UpnpEvent_get_ChangedVariables(q));
                 ok = ok && UpnpEvent_set_SID(p, UpnpEvent_get_SID(q));
         }
 

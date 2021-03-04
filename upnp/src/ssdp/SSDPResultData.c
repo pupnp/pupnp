@@ -57,11 +57,14 @@ int SSDPResultData_assign(SSDPResultData *p, const SSDPResultData *q)
 
         if (p != q) {
                 ok = ok &&
-                     SSDPResultData_set_Param(p, SSDPResultData_get_Param(q));
+                        SSDPResultData_set_Param(
+                                p, SSDPResultData_get_Param(q));
                 ok = ok &&
-                     SSDPResultData_set_Cookie(p, SSDPResultData_get_Cookie(q));
-                ok = ok && SSDPResultData_set_CtrlptCallback(
-                                   p, SSDPResultData_get_CtrlptCallback(q));
+                        SSDPResultData_set_Cookie(
+                                p, SSDPResultData_get_Cookie(q));
+                ok = ok &&
+                        SSDPResultData_set_CtrlptCallback(
+                                p, SSDPResultData_get_CtrlptCallback(q));
         }
 
         return ok;

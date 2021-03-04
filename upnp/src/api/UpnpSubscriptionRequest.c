@@ -61,12 +61,15 @@ int UpnpSubscriptionRequest_assign(
         int ok = 1;
 
         if (p != q) {
-                ok = ok && UpnpSubscriptionRequest_set_ServiceId(
-                                   p, UpnpSubscriptionRequest_get_ServiceId(q));
-                ok = ok && UpnpSubscriptionRequest_set_UDN(
-                                   p, UpnpSubscriptionRequest_get_UDN(q));
-                ok = ok && UpnpSubscriptionRequest_set_SID(
-                                   p, UpnpSubscriptionRequest_get_SID(q));
+                ok = ok &&
+                        UpnpSubscriptionRequest_set_ServiceId(
+                                p, UpnpSubscriptionRequest_get_ServiceId(q));
+                ok = ok &&
+                        UpnpSubscriptionRequest_set_UDN(
+                                p, UpnpSubscriptionRequest_get_UDN(q));
+                ok = ok &&
+                        UpnpSubscriptionRequest_set_SID(
+                                p, UpnpSubscriptionRequest_get_SID(q));
         }
 
         return ok;

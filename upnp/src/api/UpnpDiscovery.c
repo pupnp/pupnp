@@ -88,24 +88,32 @@ int UpnpDiscovery_assign(UpnpDiscovery *p, const UpnpDiscovery *q)
 
         if (p != q) {
                 ok = ok &&
-                     UpnpDiscovery_set_ErrCode(p, UpnpDiscovery_get_ErrCode(q));
+                        UpnpDiscovery_set_ErrCode(
+                                p, UpnpDiscovery_get_ErrCode(q));
                 ok = ok &&
-                     UpnpDiscovery_set_Expires(p, UpnpDiscovery_get_Expires(q));
-                ok = ok && UpnpDiscovery_set_DeviceID(
-                                   p, UpnpDiscovery_get_DeviceID(q));
-                ok = ok && UpnpDiscovery_set_DeviceType(
-                                   p, UpnpDiscovery_get_DeviceType(q));
-                ok = ok && UpnpDiscovery_set_ServiceType(
-                                   p, UpnpDiscovery_get_ServiceType(q));
-                ok = ok && UpnpDiscovery_set_ServiceVer(
-                                   p, UpnpDiscovery_get_ServiceVer(q));
-                ok = ok && UpnpDiscovery_set_Location(
-                                   p, UpnpDiscovery_get_Location(q));
+                        UpnpDiscovery_set_Expires(
+                                p, UpnpDiscovery_get_Expires(q));
+                ok = ok &&
+                        UpnpDiscovery_set_DeviceID(
+                                p, UpnpDiscovery_get_DeviceID(q));
+                ok = ok &&
+                        UpnpDiscovery_set_DeviceType(
+                                p, UpnpDiscovery_get_DeviceType(q));
+                ok = ok &&
+                        UpnpDiscovery_set_ServiceType(
+                                p, UpnpDiscovery_get_ServiceType(q));
+                ok = ok &&
+                        UpnpDiscovery_set_ServiceVer(
+                                p, UpnpDiscovery_get_ServiceVer(q));
+                ok = ok &&
+                        UpnpDiscovery_set_Location(
+                                p, UpnpDiscovery_get_Location(q));
                 ok = ok && UpnpDiscovery_set_Os(p, UpnpDiscovery_get_Os(q));
                 ok = ok && UpnpDiscovery_set_Date(p, UpnpDiscovery_get_Date(q));
                 ok = ok && UpnpDiscovery_set_Ext(p, UpnpDiscovery_get_Ext(q));
-                ok = ok && UpnpDiscovery_set_DestAddr(
-                                   p, UpnpDiscovery_get_DestAddr(q));
+                ok = ok &&
+                        UpnpDiscovery_set_DestAddr(
+                                p, UpnpDiscovery_get_DestAddr(q));
         }
 
         return ok;

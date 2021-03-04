@@ -90,7 +90,7 @@ int map_str_to_int(const char *name,
                         top = mid + 1; /* look below mid */
                 } else if (cmp < 0) {
                         bot = mid - 1; /* look above mid */
-                } else                 /* cmp == 0 */
+                } else /* cmp == 0 */
                 {
                         return mid; /* match; return table index */
                 }

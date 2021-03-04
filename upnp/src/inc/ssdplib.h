@@ -169,7 +169,7 @@ extern SOCKET gSsdpReqSocket4;
         #ifdef UPNP_ENABLE_IPV6
 extern SOCKET gSsdpReqSocket6;
         #endif /* UPNP_ENABLE_IPV6 */
-#endif         /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
 typedef int (*ParserFun)(char *, SsdpEvent *);
 
 /*!
@@ -331,7 +331,7 @@ void ssdp_handle_device_request(
         http_message_t *hmsg,
         /* [in] . */
         struct sockaddr_storage *dest_addr);
-#else  /* INCLUDE_DEVICE_APIS */
+#else /* INCLUDE_DEVICE_APIS */
 static UPNP_INLINE void ssdp_handle_device_request(
         /* [in] . */
         http_message_t *hmsg,

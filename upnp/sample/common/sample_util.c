@@ -610,7 +610,7 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc,
         int found = 0;
         int ret;
 #ifdef OLD_FIND_SERVICE_CODE
-#else  /* OLD_FIND_SERVICE_CODE */
+#else /* OLD_FIND_SERVICE_CODE */
         unsigned int sindex = 0;
 #endif /* OLD_FIND_SERVICE_CODE */
         char *tempServiceType = NULL;
@@ -628,7 +628,7 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc,
                 base = location;
 #ifdef OLD_FIND_SERVICE_CODE
         serviceList = SampleUtil_GetFirstServiceList(DescDoc);
-#else  /* OLD_FIND_SERVICE_CODE */
+#else /* OLD_FIND_SERVICE_CODE */
         for (sindex = 0; (serviceList = SampleUtil_GetNthServiceList(
                                   DescDoc, sindex)) != NULL;
                 sindex++) {
@@ -680,7 +680,7 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc,
                 ixmlNodeList_free(serviceList);
         serviceList = NULL;
 #ifdef OLD_FIND_SERVICE_CODE
-#else  /* OLD_FIND_SERVICE_CODE */
+#else /* OLD_FIND_SERVICE_CODE */
         }
 #endif /* OLD_FIND_SERVICE_CODE */
         free(baseURL);

@@ -88,30 +88,42 @@ int UpnpActionRequest_assign(UpnpActionRequest *p, const UpnpActionRequest *q)
         int ok = 1;
 
         if (p != q) {
-                ok = ok && UpnpActionRequest_set_ErrCode(
-                                   p, UpnpActionRequest_get_ErrCode(q));
-                ok = ok && UpnpActionRequest_set_Socket(
-                                   p, UpnpActionRequest_get_Socket(q));
-                ok = ok && UpnpActionRequest_set_ErrStr(
-                                   p, UpnpActionRequest_get_ErrStr(q));
-                ok = ok && UpnpActionRequest_set_ActionName(
-                                   p, UpnpActionRequest_get_ActionName(q));
-                ok = ok && UpnpActionRequest_set_DevUDN(
-                                   p, UpnpActionRequest_get_DevUDN(q));
-                ok = ok && UpnpActionRequest_set_ServiceID(
-                                   p, UpnpActionRequest_get_ServiceID(q));
-                ok = ok && UpnpActionRequest_set_ActionRequest(
-                                   p, UpnpActionRequest_get_ActionRequest(q));
-                ok = ok && UpnpActionRequest_set_ActionResult(
-                                   p, UpnpActionRequest_get_ActionResult(q));
-                ok = ok && UpnpActionRequest_set_SoapHeader(
-                                   p, UpnpActionRequest_get_SoapHeader(q));
-                ok = ok && UpnpActionRequest_set_CtrlPtIPAddr(
-                                   p, UpnpActionRequest_get_CtrlPtIPAddr(q));
                 ok = ok &&
-                     UpnpActionRequest_set_Os(p, UpnpActionRequest_get_Os(q));
-                ok = ok && UpnpActionRequest_set_ExtraHeadersList(p,
-                                   UpnpActionRequest_get_ExtraHeadersList(q));
+                        UpnpActionRequest_set_ErrCode(
+                                p, UpnpActionRequest_get_ErrCode(q));
+                ok = ok &&
+                        UpnpActionRequest_set_Socket(
+                                p, UpnpActionRequest_get_Socket(q));
+                ok = ok &&
+                        UpnpActionRequest_set_ErrStr(
+                                p, UpnpActionRequest_get_ErrStr(q));
+                ok = ok &&
+                        UpnpActionRequest_set_ActionName(
+                                p, UpnpActionRequest_get_ActionName(q));
+                ok = ok &&
+                        UpnpActionRequest_set_DevUDN(
+                                p, UpnpActionRequest_get_DevUDN(q));
+                ok = ok &&
+                        UpnpActionRequest_set_ServiceID(
+                                p, UpnpActionRequest_get_ServiceID(q));
+                ok = ok &&
+                        UpnpActionRequest_set_ActionRequest(
+                                p, UpnpActionRequest_get_ActionRequest(q));
+                ok = ok &&
+                        UpnpActionRequest_set_ActionResult(
+                                p, UpnpActionRequest_get_ActionResult(q));
+                ok = ok &&
+                        UpnpActionRequest_set_SoapHeader(
+                                p, UpnpActionRequest_get_SoapHeader(q));
+                ok = ok &&
+                        UpnpActionRequest_set_CtrlPtIPAddr(
+                                p, UpnpActionRequest_get_CtrlPtIPAddr(q));
+                ok = ok &&
+                        UpnpActionRequest_set_Os(
+                                p, UpnpActionRequest_get_Os(q));
+                ok = ok &&
+                        UpnpActionRequest_set_ExtraHeadersList(
+                                p, UpnpActionRequest_get_ExtraHeadersList(q));
         }
 
         return ok;

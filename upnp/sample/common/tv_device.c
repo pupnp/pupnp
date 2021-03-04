@@ -439,10 +439,9 @@ int TvDeviceHandleActionRequest(UpnpActionRequest *ca_event)
                 /* Request for action in the TvDevice Control Service. */
                 service = TV_SERVICE_CONTROL;
         } else if (strcmp(devUDN, tv_service_table[TV_SERVICE_PICTURE].UDN) ==
-                           0 &&
-                   strcmp(serviceID,
-                           tv_service_table[TV_SERVICE_PICTURE].ServiceId) ==
-                           0) {
+                        0 &&
+                strcmp(serviceID,
+                        tv_service_table[TV_SERVICE_PICTURE].ServiceId) == 0) {
                 /* Request for action in the TvDevice Picture Service. */
                 service = TV_SERVICE_PICTURE;
         }
@@ -450,7 +449,7 @@ int TvDeviceHandleActionRequest(UpnpActionRequest *ca_event)
          * Each action name has an associated procedure stored in the
          * service table. These are set at initialization. */
         for (i = 0; i < TV_MAXACTIONS &&
-                    tv_service_table[service].ActionNames[i] != NULL;
+                tv_service_table[service].ActionNames[i] != NULL;
                 i++) {
                 if (!strcmp(actionName,
                             tv_service_table[service].ActionNames[i])) {

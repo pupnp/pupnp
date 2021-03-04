@@ -68,16 +68,20 @@ int GenlibClientSubscription_assign(
 
         if (p != q) {
                 ok = ok &&
-                     GenlibClientSubscription_set_RenewEventId(
-                             p, GenlibClientSubscription_get_RenewEventId(q));
-                ok = ok && GenlibClientSubscription_set_SID(
-                                   p, GenlibClientSubscription_get_SID(q));
-                ok = ok && GenlibClientSubscription_set_ActualSID(p,
-                                   GenlibClientSubscription_get_ActualSID(q));
-                ok = ok && GenlibClientSubscription_set_EventURL(
-                                   p, GenlibClientSubscription_get_EventURL(q));
-                ok = ok && GenlibClientSubscription_set_Next(
-                                   p, GenlibClientSubscription_get_Next(q));
+                        GenlibClientSubscription_set_RenewEventId(p,
+                                GenlibClientSubscription_get_RenewEventId(q));
+                ok = ok &&
+                        GenlibClientSubscription_set_SID(
+                                p, GenlibClientSubscription_get_SID(q));
+                ok = ok &&
+                        GenlibClientSubscription_set_ActualSID(
+                                p, GenlibClientSubscription_get_ActualSID(q));
+                ok = ok &&
+                        GenlibClientSubscription_set_EventURL(
+                                p, GenlibClientSubscription_get_EventURL(q));
+                ok = ok &&
+                        GenlibClientSubscription_set_Next(
+                                p, GenlibClientSubscription_get_Next(q));
         }
 
         return ok;

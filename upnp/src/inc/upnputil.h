@@ -113,6 +113,6 @@ void linecopylen(
                 #define max(a, b) (((a) > (b)) ? (a) : (b))
                 #define min(a, b) (((a) < (b)) ? (a) : (b))
         #endif /* _WIN32 */
-#endif         /* !defined(__cplusplus) || defined(UPNP_USE_MSVCPP) */
+#endif /* !defined(__cplusplus) || defined(UPNP_USE_MSVCPP) */
 
 #endif /* UTIL_H */

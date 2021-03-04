@@ -75,9 +75,9 @@ void get_system_time(uuid_time_t *uuid_time)
            + 18 years and 5 leap days.
          */
         time.QuadPart += (unsigned __int64)(1000 * 1000 * 10) /* seconds */
-                         * (unsigned __int64)(60 * 60 * 24)   /* days */
-                         * (unsigned __int64)(17 + 30 + 31 + 365 * 18 +
-                                              5); /* # of days */
+                * (unsigned __int64)(60 * 60 * 24) /* days */
+                *
+                (unsigned __int64)(17 + 30 + 31 + 365 * 18 + 5); /* # of days */
         *uuid_time = time.QuadPart;
 };
 
@@ -102,7 +102,7 @@ void get_system_time(uuid_time_t *uuid_time)
          * UUID UTC base time is October 15, 1582.
          * Unix base time is January 1, 1970. */
         *uuid_time = (uuid_time_t)tp.tv_sec * 10000000 +
-                     (uuid_time_t)tp.tv_usec * 10 + 0x01B21DD213814000L;
+                (uuid_time_t)tp.tv_usec * 10 + 0x01B21DD213814000L;
 }
 
 void get_random_info(unsigned char seed[16])

@@ -46,7 +46,7 @@
  * @{
  */
 
-#include "ixml.h"       /* for IXML_Document */
+#include "ixml.h" /* for IXML_Document */
 #include "upnpconfig.h" /* for UPNP_HAVE_TOOLS */
 
 /* Function declarations only if tools compiled into the library */

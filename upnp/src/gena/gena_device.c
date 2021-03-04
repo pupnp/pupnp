@@ -441,8 +441,8 @@ static char *AllocGenaHeaders(
         int rc = 0;
 
         headers_size = strlen(HEADER_LINE_1) + strlen(HEADER_LINE_2A) +
-                       MAX_CONTENT_LENGTH + strlen(HEADER_LINE_2B) +
-                       strlen(HEADER_LINE_3) + strlen(HEADER_LINE_4) + 1;
+                MAX_CONTENT_LENGTH + strlen(HEADER_LINE_2B) +
+                strlen(HEADER_LINE_3) + strlen(HEADER_LINE_4) + 1;
         headers = (char *)malloc(headers_size);
         if (headers == NULL) {
                 line = __LINE__;
@@ -1482,7 +1482,7 @@ void gena_process_subscription_request(SOCKINFO *info, http_message_t *request)
                             &time_out) == PARSE_OK) {
                         /* nothing */
                 } else if (memptr_cmp_nocase(&timeout_hdr, "Second-infinite") ==
-                           0) {
+                        0) {
                         /* infinite timeout */
                         time_out = -1;
                 } else {
@@ -1627,7 +1627,7 @@ void gena_process_subscription_renewal_request(
                         /*nothing */
 
                 } else if (memptr_cmp_nocase(&timeout_hdr, "Second-infinite") ==
-                           0) {
+                        0) {
 
                         time_out = -1; /* inifinite timeout */
 
@@ -1721,4 +1721,4 @@ void gena_process_unsubscribe_request(SOCKINFO *info, http_message_t *request)
 }
 
         #endif /* INCLUDE_DEVICE_APIS */
-#endif         /* EXCLUDE_GENA */
+#endif /* EXCLUDE_GENA */

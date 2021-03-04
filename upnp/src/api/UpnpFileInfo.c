@@ -72,20 +72,27 @@ int UpnpFileInfo_assign(UpnpFileInfo *p, const UpnpFileInfo *q)
         int ok = 1;
 
         if (p != q) {
-                ok = ok && UpnpFileInfo_set_FileLength(
-                                   p, UpnpFileInfo_get_FileLength(q));
-                ok = ok && UpnpFileInfo_set_LastModified(
-                                   p, UpnpFileInfo_get_LastModified(q));
-                ok = ok && UpnpFileInfo_set_IsDirectory(
-                                   p, UpnpFileInfo_get_IsDirectory(q));
-                ok = ok && UpnpFileInfo_set_IsReadable(
-                                   p, UpnpFileInfo_get_IsReadable(q));
-                ok = ok && UpnpFileInfo_set_ContentType(
-                                   p, UpnpFileInfo_get_ContentType(q));
-                ok = ok && UpnpFileInfo_set_ExtraHeadersList(
-                                   p, UpnpFileInfo_get_ExtraHeadersList(q));
-                ok = ok && UpnpFileInfo_set_CtrlPtIPAddr(
-                                   p, UpnpFileInfo_get_CtrlPtIPAddr(q));
+                ok = ok &&
+                        UpnpFileInfo_set_FileLength(
+                                p, UpnpFileInfo_get_FileLength(q));
+                ok = ok &&
+                        UpnpFileInfo_set_LastModified(
+                                p, UpnpFileInfo_get_LastModified(q));
+                ok = ok &&
+                        UpnpFileInfo_set_IsDirectory(
+                                p, UpnpFileInfo_get_IsDirectory(q));
+                ok = ok &&
+                        UpnpFileInfo_set_IsReadable(
+                                p, UpnpFileInfo_get_IsReadable(q));
+                ok = ok &&
+                        UpnpFileInfo_set_ContentType(
+                                p, UpnpFileInfo_get_ContentType(q));
+                ok = ok &&
+                        UpnpFileInfo_set_ExtraHeadersList(
+                                p, UpnpFileInfo_get_ExtraHeadersList(q));
+                ok = ok &&
+                        UpnpFileInfo_set_CtrlPtIPAddr(
+                                p, UpnpFileInfo_get_CtrlPtIPAddr(q));
                 ok = ok && UpnpFileInfo_set_Os(p, UpnpFileInfo_get_Os(q));
         }
 

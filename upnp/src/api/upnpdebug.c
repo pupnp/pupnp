@@ -146,13 +146,13 @@ static int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module)
         (void)Module;
 
         return (DLevel <= g_log_level) &&
-               (DEBUG_ALL || (Module == SSDP && DEBUG_SSDP) ||
-                       (Module == SOAP && DEBUG_SOAP) ||
-                       (Module == GENA && DEBUG_GENA) ||
-                       (Module == TPOOL && DEBUG_TPOOL) ||
-                       (Module == MSERV && DEBUG_MSERV) ||
-                       (Module == DOM && DEBUG_DOM) ||
-                       (Module == HTTP && DEBUG_HTTP));
+                (DEBUG_ALL || (Module == SSDP && DEBUG_SSDP) ||
+                        (Module == SOAP && DEBUG_SOAP) ||
+                        (Module == GENA && DEBUG_GENA) ||
+                        (Module == TPOOL && DEBUG_TPOOL) ||
+                        (Module == MSERV && DEBUG_MSERV) ||
+                        (Module == DOM && DEBUG_DOM) ||
+                        (Module == HTTP && DEBUG_HTTP));
 }
 
 static void UpnpDisplayFileAndLine(FILE *fp,

@@ -861,13 +861,14 @@ static int CreateHTTPRangeResponseHeader(
                                 (int64_t)FirstByte,
                                 (int64_t)LastByte,
                                 (int64_t)FileLength);
-                        if (rc < 0 || (unsigned int)rc >=
-                                              sizeof(Instr->RangeHeader)) {
+                        if (rc < 0 ||
+                                (unsigned int)rc >=
+                                        sizeof(Instr->RangeHeader)) {
                                 free(RangeInput);
                                 return HTTP_INTERNAL_SERVER_ERROR;
                         }
                 } else if (FirstByte >= 0 && LastByte == -1 &&
-                           FirstByte < FileLength) {
+                        FirstByte < FileLength) {
                         Instr->RangeOffset = FirstByte;
                         Instr->ReadSendSize = FileLength - FirstByte;
                         rc = snprintf(Instr->RangeHeader,
@@ -877,8 +878,9 @@ static int CreateHTTPRangeResponseHeader(
                                 (int64_t)FirstByte,
                                 (int64_t)(FileLength - 1),
                                 (int64_t)FileLength);
-                        if (rc < 0 || (unsigned int)rc >=
-                                              sizeof(Instr->RangeHeader)) {
+                        if (rc < 0 ||
+                                (unsigned int)rc >=
+                                        sizeof(Instr->RangeHeader)) {
                                 free(RangeInput);
                                 return HTTP_INTERNAL_SERVER_ERROR;
                         }
@@ -903,8 +905,9 @@ static int CreateHTTPRangeResponseHeader(
                                         (int64_t)FileLength - 1,
                                         (int64_t)FileLength);
                         }
-                        if (rc < 0 || (unsigned int)rc >=
-                                              sizeof(Instr->RangeHeader)) {
+                        if (rc < 0 ||
+                                (unsigned int)rc >=
+                                        sizeof(Instr->RangeHeader)) {
                                 free(RangeInput);
                                 return HTTP_INTERNAL_SERVER_ERROR;
                         }
@@ -1326,8 +1329,8 @@ static int process_request(
                             HTTP_PARTIAL_CONTENT, /* status code */
                             UpnpFileInfo_get_ContentType(
                                     finfo), /* content type */
-                            RespInstr,      /* range info */
-                            RespInstr,      /* language info */
+                            RespInstr, /* range info */
+                            RespInstr, /* language info */
                             "LAST-MODIFIED: ",
                             &aux_LastModified,
                             X_USER_AGENT,
@@ -1347,12 +1350,12 @@ static int process_request(
                             "tcS"
                             "Xc"
                             "ECc",
-                            HTTP_PARTIAL_CONTENT,    /* status code */
+                            HTTP_PARTIAL_CONTENT, /* status code */
                             RespInstr->ReadSendSize, /* content length */
                             UpnpFileInfo_get_ContentType(
                                     finfo), /* content type */
-                            RespInstr,      /* range info */
-                            RespInstr,      /* language info */
+                            RespInstr, /* range info */
+                            RespInstr, /* language info */
                             "LAST-MODIFIED: ",
                             &aux_LastModified,
                             X_USER_AGENT,
@@ -1373,7 +1376,7 @@ static int process_request(
                             HTTP_OK, /* status code */
                             UpnpFileInfo_get_ContentType(
                                     finfo), /* content type */
-                            RespInstr,      /* language info */
+                            RespInstr, /* language info */
                             "LAST-MODIFIED: ",
                             &aux_LastModified,
                             X_USER_AGENT,
@@ -1398,7 +1401,7 @@ static int process_request(
                                             ->ReadSendSize, /* content length */
                                     UpnpFileInfo_get_ContentType(
                                             finfo), /* content type */
-                                    RespInstr,      /* language info */
+                                    RespInstr, /* language info */
                                     "LAST-MODIFIED: ",
                                     &aux_LastModified,
                                     X_USER_AGENT,
@@ -1419,7 +1422,7 @@ static int process_request(
                                     HTTP_OK, /* status code */
                                     UpnpFileInfo_get_ContentType(
                                             finfo), /* content type */
-                                    RespInstr,      /* language info */
+                                    RespInstr, /* language info */
                                     "LAST-MODIFIED: ",
                                     &aux_LastModified,
                                     X_USER_AGENT,
@@ -1515,8 +1518,8 @@ static int http_RecvPostMessage(
                         /* read until close */
                         ok_on_close = 1;
                 } else if ((status != PARSE_SUCCESS) &&
-                           (status != PARSE_CONTINUE_1) &&
-                           (status != PARSE_INCOMPLETE)) {
+                        (status != PARSE_CONTINUE_1) &&
+                        (status != PARSE_INCOMPLETE)) {
                         /* error */
                         ret_code = HTTP_BAD_REQUEST;
                         goto ExitFunction;
@@ -1542,8 +1545,8 @@ static int http_RecvPostMessage(
                                         /* read until close */
                                         ok_on_close = 1;
                                 } else if ((status != PARSE_SUCCESS) &&
-                                           (status != PARSE_CONTINUE_1) &&
-                                           (status != PARSE_INCOMPLETE)) {
+                                        (status != PARSE_CONTINUE_1) &&
+                                        (status != PARSE_INCOMPLETE)) {
                                         ret_code = HTTP_BAD_REQUEST;
                                         goto ExitFunction;
                                 }
@@ -1577,7 +1580,7 @@ static int http_RecvPostMessage(
                 }
                 memcpy(Buf,
                         &parser->msg.msg.buf[parser->entity_start_position +
-                                             entity_offset],
+                                entity_offset],
                         Data_Buf_Size);
                 entity_offset += Data_Buf_Size;
                 if (Instr && Instr->IsVirtualFile) {
@@ -1598,7 +1601,7 @@ static int http_RecvPostMessage(
                         }
                 }
         } while (parser->position != POS_COMPLETE ||
-                 entity_offset != parser->msg.entity.length);
+                entity_offset != parser->msg.entity.length);
 ExitFunction:
         if (Instr && Instr->IsVirtualFile) {
                 virtualDirCallback.close(

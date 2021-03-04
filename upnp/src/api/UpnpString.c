@@ -42,8 +42,8 @@ static size_t strnlen(const char *s, size_t n)
         return p ? p - s : n;
 }
                 #endif /* !HAVE_STRNLEN */
-        #endif         /* UPNP_USE_BCBPP */
-#endif                 /* _WIN32 */
+        #endif /* UPNP_USE_BCBPP */
+#endif /* _WIN32 */
 
 /* strndup() is a GNU extension. */
 #if !HAVE_STRNDUP || defined(_WIN32)

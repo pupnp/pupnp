@@ -40,7 +40,7 @@
 typedef struct /* str_int_entry */
 {
         const char *name; /* a value in string form */
-        int id;           /* same value in integer form */
+        int id; /* same value in integer form */
 } str_int_entry;
 
 #ifdef __cplusplus

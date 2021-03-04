@@ -532,7 +532,7 @@ int remove_dots(char *buf, size_t size)
                         in[0] = '/';
                         /* case 2.C: */
                 } else if (strncmp(in, "/../", 4) == 0 ||
-                           (strncmp(in, "/..", 3) == 0 && is_end_path(in[3]))) {
+                        (strncmp(in, "/..", 3) == 0 && is_end_path(in[3]))) {
                         /* Make the next character in the input buffer a '/': */
                         if (is_end_path(in[3])) { /* terminating "/.." case */
                                 in += 2;
@@ -757,7 +757,7 @@ int parse_uri(const char *in, size_t max, uri_type *out)
         begin_fragment = parse_uric(&in[begin_path],
                                  max - (size_t)begin_path,
                                  &out->pathquery) +
-                         (size_t)begin_path;
+                (size_t)begin_path;
         if (out->pathquery.size && out->pathquery.buff[0] == '/') {
                 out->path_type = ABS_PATH;
         }

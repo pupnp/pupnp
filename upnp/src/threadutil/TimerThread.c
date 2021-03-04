@@ -393,11 +393,9 @@ int TimerThreadShutdown(TimerThread *timer)
         ithread_mutex_unlock(&timer->mutex);
 
         /* destroy condition. */
-        while (ithread_cond_destroy(&timer->condition) != 0) {
-        }
+        while (ithread_cond_destroy(&timer->condition) != 0) {}
         /* destroy mutex. */
-        while (ithread_mutex_destroy(&timer->mutex) != 0) {
-        }
+        while (ithread_mutex_destroy(&timer->mutex) != 0) {}
 
         return 0;
 }
