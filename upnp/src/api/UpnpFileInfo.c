@@ -10,10 +10,10 @@
  */
 #include "config.h"
 
+#include "UpnpFileInfo.h"
+
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
-
-#include "UpnpFileInfo.h"
 
 struct s_UpnpFileInfo
 {

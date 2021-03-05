@@ -15,9 +15,10 @@
 #include "UpnpUniStd.h" /* for close() */
 
 #ifdef _WIN32
+        #include <winsock2.h>
+
         #include <iphlpapi.h>
         #include <stdarg.h>
-        #include <winsock2.h>
         #include <ws2tcpip.h>
 
         #define UpnpCloseSocket closesocket

@@ -36,8 +36,6 @@
 /*
  * \file
  */
-
-#include "config.h"
 #include "httpparser.h"
 #include "sock.h"
 #include "upnputil.h"

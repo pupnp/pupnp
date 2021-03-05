@@ -27,9 +27,8 @@
         #define _CRT_RAND_S
 #endif
 
-#include "sysdep.h"
-
 #include "UpnpInet.h"
+#include "sysdep.h"
 
 #include <stdio.h>
 #include <string.h>

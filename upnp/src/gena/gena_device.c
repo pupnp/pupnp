@@ -39,8 +39,6 @@
 #if EXCLUDE_GENA == 0
         #ifdef INCLUDE_DEVICE_APIS
 
-                #include <assert.h>
-
                 #include "gena.h"
                 #include "httpparser.h"
                 #include "httpreadwrite.h"
@@ -51,6 +49,8 @@
                 #include "unixutil.h"
                 #include "upnpapi.h"
                 #include "uuid.h"
+
+                #include <assert.h>
 
                 #ifdef _WIN32
                         #if defined(_MSC_VER) && _MSC_VER < 1900

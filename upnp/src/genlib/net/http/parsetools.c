@@ -37,12 +37,15 @@
  * an http message and then matches the data with XML data.
  */
 
-#include "parsetools.h"
 #include "config.h"
+
+#include "parsetools.h"
+
 #include "httpparser.h"
 #include "membuffer.h"
 #include "statcodes.h"
 #include "upnputil.h"
+
 #include <assert.h>
 
 int has_xml_content_type(http_message_t *hmsg)

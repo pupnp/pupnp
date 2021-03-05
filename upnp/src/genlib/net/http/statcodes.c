@@ -36,9 +36,12 @@
  **
  ************************************************************************/
 
-#include "statcodes.h"
 #include "config.h"
+
+#include "statcodes.h"
+
 #include "upnputil.h"
+
 #include <stdio.h>
 #include <string.h>
 

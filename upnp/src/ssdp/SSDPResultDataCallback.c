@@ -9,8 +9,9 @@
 
 #include "config.h"
 
-#include "SSDPResultData.h"
 #include "SSDPResultDataCallback.h"
+
+#include "SSDPResultData.h"
 
 void SSDPResultData_Callback(const SSDPResultData *p)
 {

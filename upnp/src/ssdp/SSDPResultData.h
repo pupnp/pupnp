@@ -11,12 +11,11 @@
  *
  * \author Marcelo Roberto Jimenez
  */
-#include <stdlib.h> /* for size_t */
-
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
-
 #include "Callback.h"
 #include "UpnpDiscovery.h"
+#include "UpnpGlobal.h" /* for EXPORT_SPEC */
+
+#include <stdlib.h> /* for size_t */
 
 #ifdef __cplusplus
 extern "C" {

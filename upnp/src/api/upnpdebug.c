@@ -35,10 +35,11 @@
 #define UPNP_DEBUG_C
 #include "config.h"
 
+#include "upnpdebug.h"
+
 #include "ithread.h"
 #include "ixml.h"
 #include "upnp.h"
-#include "upnpdebug.h"
 
 #include <errno.h>
 #include <stdarg.h>

@@ -10,10 +10,10 @@
  */
 #include "config.h"
 
+#include "UpnpExtraHeaders.h"
+
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
-
-#include "UpnpExtraHeaders.h"
 
 struct s_UpnpExtraHeaders
 {

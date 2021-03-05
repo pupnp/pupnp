@@ -10,10 +10,10 @@
  */
 #include "config.h"
 
+#include "UpnpActionComplete.h"
+
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
-
-#include "UpnpActionComplete.h"
 
 struct s_UpnpActionComplete
 {

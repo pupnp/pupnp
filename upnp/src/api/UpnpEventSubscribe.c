@@ -10,10 +10,10 @@
  */
 #include "config.h"
 
+#include "UpnpEventSubscribe.h"
+
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
-
-#include "UpnpEventSubscribe.h"
 
 struct s_UpnpEventSubscribe
 {

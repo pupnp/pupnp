@@ -10,10 +10,10 @@
  */
 #include "config.h"
 
+#include "GenlibClientSubscription.h"
+
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
-
-#include "GenlibClientSubscription.h"
 
 struct s_GenlibClientSubscription
 {

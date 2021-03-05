@@ -10,10 +10,10 @@
  */
 #include "config.h"
 
+#include "UpnpDiscovery.h"
+
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
-
-#include "UpnpDiscovery.h"
 
 struct s_UpnpDiscovery
 {

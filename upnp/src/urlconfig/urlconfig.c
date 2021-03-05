@@ -35,6 +35,7 @@
  */
 
 #include "config.h"
+#include "urlconfig.h"
 
 #include "UpnpInet.h"
 #include "membuffer.h"
@@ -43,7 +44,6 @@
 #include "upnpdebug.h"
 #include "upnputil.h"
 #include "uri.h"
-#include "urlconfig.h"
 #include "webserver.h"
 
 #include <assert.h>

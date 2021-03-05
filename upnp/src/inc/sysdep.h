@@ -28,15 +28,13 @@
 
 /* change to point to where MD5 .h's live */
 /* get MD5 sample implementation from RFC 1321 */
-#include "md5.h"
-
 #include "UpnpStdInt.h"
+#include "md5.h"
 
 #include <sys/types.h>
 
-#ifdef _WIN32
+#ifndef _WIN32
         /* Do not #include <sys/time.h> */
-#else
         #include <sys/time.h>
 #endif
 

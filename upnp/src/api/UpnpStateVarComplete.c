@@ -10,10 +10,10 @@
  */
 #include "config.h"
 
+#include "UpnpStateVarComplete.h"
+
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
-
-#include "UpnpStateVarComplete.h"
 
 struct s_UpnpStateVarComplete
 {

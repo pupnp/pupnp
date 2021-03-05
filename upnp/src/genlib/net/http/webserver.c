@@ -41,8 +41,6 @@
 
 #if EXCLUDE_WEB_SERVER == 0
 
-        #include "webserver.h"
-
         #include "UpnpExtraHeaders.h"
         #include "UpnpFileInfo.h"
         #include "UpnpIntTypes.h"
@@ -59,6 +57,7 @@
         #include "upnp.h"
         #include "upnpapi.h"
         #include "upnputil.h"
+        #include "webserver.h"
 
         #include <assert.h>
         #include <fcntl.h>

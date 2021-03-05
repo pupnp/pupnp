@@ -37,10 +37,13 @@
  * allocation, re-allocation, and modification of the memory
  */
 
-#include "membuffer.h"
 #include "config.h"
+
+#include "membuffer.h"
+
 #include "unixutil.h"
 #include "upnp.h"
+
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>

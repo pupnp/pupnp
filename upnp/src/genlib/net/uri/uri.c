@@ -47,13 +47,12 @@
                 #define snprintf _snprintf
         #endif
 #endif
-#include <assert.h>
-
 #include "config.h"
 
+#include "upnpapi.h"
 #include "uri.h"
 
-#include "upnpapi.h"
+#include <assert.h>
 
 /*!
  * \brief Returns a 1 if a char is a RESERVED char as defined in

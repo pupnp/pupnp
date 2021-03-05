@@ -58,17 +58,17 @@
 #include "service_table.h"
 
 #ifdef INTERNAL_WEB_SERVER
-        #include "VirtualDir.h"
         #include "urlconfig.h"
+
+        #include "VirtualDir.h"
         #include "webserver.h"
 #endif /* INTERNAL_WEB_SERVER */
-
-#include <sys/stat.h>
 
 #include <assert.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #ifdef _WIN32
 /* Do not include these files */

@@ -40,7 +40,6 @@
 
         #include "upnp.h"
         #include "upnptools.h"
-
         #include "uri.h"
 
         #include <stdarg.h>

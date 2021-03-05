@@ -51,9 +51,8 @@
 extern "C" {
 #endif
 
-#include "sample_util.h"
-
 #include "ithread.h"
+#include "sample_util.h"
 #include "upnp.h"
 
 #include <stdlib.h>

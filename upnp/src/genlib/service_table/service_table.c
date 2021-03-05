@@ -37,8 +37,9 @@
  * service
  ************************************************************************/
 
-#include "service_table.h"
 #include "config.h"
+
+#include "service_table.h"
 
 #ifdef INCLUDE_DEVICE_APIS
 

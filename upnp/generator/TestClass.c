@@ -10,10 +10,10 @@
  */
 #include "config.h"
 
+#include "TestClass.h"
+
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
-
-#include "TestClass.h"
 
 struct s_TestClass
 {

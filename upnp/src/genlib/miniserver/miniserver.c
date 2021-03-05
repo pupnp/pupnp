@@ -47,11 +47,10 @@
  *
  */
 
-        #include "miniserver.h"
-
         #include "ThreadPool.h"
         #include "httpreadwrite.h"
         #include "ithread.h"
+        #include "miniserver.h"
         #include "ssdplib.h"
         #include "statcodes.h"
         #include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */

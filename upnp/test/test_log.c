@@ -28,9 +28,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *************************************************************************/
-#include "upnp.h"
 #include "upnpconfig.h"
+
+#include "upnp.h"
 #include "upnpdebug.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

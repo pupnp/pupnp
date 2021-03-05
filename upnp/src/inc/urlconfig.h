@@ -33,6 +33,8 @@
 #define URLCONFIG_H
 
 #include "UpnpInet.h"
+#include "ixml.h"
+#include "upnp.h"
 
 /* functions available only if the web server is included */
 

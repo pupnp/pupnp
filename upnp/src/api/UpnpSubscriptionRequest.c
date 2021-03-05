@@ -10,10 +10,10 @@
  */
 #include "config.h"
 
+#include "UpnpSubscriptionRequest.h"
+
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
-
-#include "UpnpSubscriptionRequest.h"
 
 struct s_UpnpSubscriptionRequest
 {

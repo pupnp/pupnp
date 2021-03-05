@@ -38,9 +38,8 @@
         #include <sys/param.h>
 #endif
 
-#include "ThreadPool.h"
-
 #include "FreeList.h"
+#include "ThreadPool.h"
 
 #include <assert.h>
 #include <stdio.h>

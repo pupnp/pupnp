@@ -34,8 +34,10 @@
  *	conversion functions
  ************************************************************************/
 
-#include "strintmap.h"
 #include "config.h"
+
+#include "strintmap.h"
+
 #include "membuffer.h"
 
 /************************************************************************

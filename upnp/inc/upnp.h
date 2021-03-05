@@ -44,7 +44,6 @@
 #include "UpnpGlobal.h"
 #include "UpnpInet.h"
 #include "ixml.h"
-#include "upnpconfig.h"
 
 /*
  * \todo Document the exact reason of these include files and solve this

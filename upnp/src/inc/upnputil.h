@@ -38,6 +38,7 @@
  */
 
 #include "upnp.h"
+
 #include <errno.h>
 
 #define GEMD_OUT_OF_MEMORY -1

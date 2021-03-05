@@ -34,7 +34,6 @@
         #include "gena.h"
         #include "gena_ctrlpt.h"
         #include "gena_device.h"
-
         #include "httpparser.h"
         #include "httpreadwrite.h"
         #include "statcodes.h"

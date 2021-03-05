@@ -50,14 +50,13 @@
 
 #if EXCLUDE_SSDP == 0
 
-        #include "ssdplib.h"
-
         #include "ThreadPool.h"
         #include "httpparser.h"
         #include "httpreadwrite.h"
         #include "membuffer.h"
         #include "miniserver.h"
         #include "sock.h"
+        #include "ssdplib.h"
         #include "upnpapi.h"
 
         #include <stdio.h>

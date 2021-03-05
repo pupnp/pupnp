@@ -41,8 +41,9 @@
 extern "C" {
 #endif
 
-#include "LinkedList.h"
 #include "config.h"
+
+#include "LinkedList.h"
 #include "ixml.h"
 #include "upnp.h"
 #include "upnpdebug.h"

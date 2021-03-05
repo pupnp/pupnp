@@ -48,9 +48,8 @@
 extern "C" {
 #endif
 
-#include "sample_util.h"
-
 #include "UpnpString.h"
+#include "sample_util.h"
 #include "upnp.h"
 #include "upnptools.h"
 

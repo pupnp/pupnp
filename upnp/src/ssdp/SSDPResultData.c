@@ -10,10 +10,10 @@
  */
 #include "config.h"
 
+#include "SSDPResultData.h"
+
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
-
-#include "SSDPResultData.h"
 
 struct s_SSDPResultData
 {

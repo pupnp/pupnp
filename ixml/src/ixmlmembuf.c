@@ -35,6 +35,7 @@
  */
 
 #include "ixmlmembuf.h"
+
 #include "ixml.h"
 
 #include <assert.h>

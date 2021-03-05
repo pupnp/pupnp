@@ -42,8 +42,9 @@
 
 #include "config.h"
 
-#include "UpnpExtraHeaders.h"
 #include "httpparser.h"
+
+#include "UpnpExtraHeaders.h"
 #include "list.h"
 #include "statcodes.h"
 #include "strintmap.h"
