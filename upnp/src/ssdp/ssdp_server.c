@@ -39,36 +39,36 @@
  */
 
 #ifndef _WIN32
-        #include <sys/param.h>
+#include <sys/param.h>
 #else
-        #if defined(_MSC_VER) && _MSC_VER < 1900
-                #define snprintf _snprintf
-        #endif
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
 #endif /* _WIN32 */
 
 #include "config.h"
 
 #if EXCLUDE_SSDP == 0
 
-        #include "ThreadPool.h"
-        #include "httpparser.h"
-        #include "httpreadwrite.h"
-        #include "membuffer.h"
-        #include "miniserver.h"
-        #include "sock.h"
-        #include "ssdplib.h"
-        #include "upnpapi.h"
+#include "ThreadPool.h"
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "membuffer.h"
+#include "miniserver.h"
+#include "sock.h"
+#include "ssdplib.h"
+#include "upnpapi.h"
 
-        #include <stdio.h>
+#include <stdio.h>
 
-        #define MAX_TIME_TOREAD 45
+#define MAX_TIME_TOREAD 45
 
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
 SOCKET gSsdpReqSocket4 = INVALID_SOCKET;
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
 SOCKET gSsdpReqSocket6 = INVALID_SOCKET;
-                #endif /* UPNP_ENABLE_IPV6 */
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* UPNP_ENABLE_IPV6 */
+#endif /* INCLUDE_CLIENT_APIS */
 
 void RequestHandler();
 
@@ -83,13 +83,13 @@ struct SSDPSockArray
 {
         /*! socket for incoming advertisments and search requests */
         SOCKET ssdpSock;
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
         /*! socket for sending search requests and receiving search replies */
         int ssdpReqSock;
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
 };
 
-        #ifdef INCLUDE_DEVICE_APIS
+#ifdef INCLUDE_DEVICE_APIS
 static const char SERVICELIST_STR[] = "serviceList";
 
 int AdvertiseAndReply(int AdFlag,
@@ -543,7 +543,7 @@ end_function:
 
         return retVal;
 }
-        #endif /* INCLUDE_DEVICE_APIS */
+#endif /* INCLUDE_DEVICE_APIS */
 
 int unique_service_name(char *cmd, SsdpEvent *Evt)
 {
@@ -799,9 +799,9 @@ static void ssdp_event_handler_thread(
         /* send msg to device or ctrlpt */
         if (hmsg->method == (http_method_t)HTTPMETHOD_NOTIFY ||
                 hmsg->request_method == (http_method_t)HTTPMETHOD_MSEARCH) {
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
                 ssdp_handle_ctrlpt_msg(hmsg, &data->dest_addr, 0);
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
         } else {
                 ssdp_handle_device_request(hmsg, &data->dest_addr);
         }
@@ -829,18 +829,18 @@ void readFromSSDPSocket(SOCKET socket)
         data = malloc(sizeof(ssdp_thread_data));
         if (data) {
                 /* initialize parser */
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
                 if (socket == gSsdpReqSocket4
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
                         || socket == gSsdpReqSocket6
-                #endif /* UPNP_ENABLE_IPV6 */
+#endif /* UPNP_ENABLE_IPV6 */
                 )
                         parser_response_init(&data->parser, HTTPMETHOD_MSEARCH);
                 else
                         parser_request_init(&data->parser);
-        #else /* INCLUDE_CLIENT_APIS */
+#else /* INCLUDE_CLIENT_APIS */
                 parser_request_init(&data->parser);
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
                 /* set size of parser buffer */
                 if (membuffer_set_size(&data->parser.msg.msg, BUFSIZE) == 0)
                         /* use this as the buffer for recv */
@@ -865,14 +865,14 @@ void readFromSSDPSocket(SOCKET socket)
                                 ntop_buf,
                                 sizeof(ntop_buf));
                         break;
-        #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
                 case AF_INET6:
                         inet_ntop(AF_INET6,
                                 &((struct sockaddr_in6 *)&__ss)->sin6_addr,
                                 ntop_buf,
                                 sizeof(ntop_buf));
                         break;
-        #endif /* UPNP_ENABLE_IPV6 */
+#endif /* UPNP_ENABLE_IPV6 */
                 default:
                         memset(ntop_buf, 0, sizeof(ntop_buf));
                         strncpy(ntop_buf,
@@ -950,7 +950,7 @@ static int create_ssdp_sock_v4(
                 ret = UPNP_E_SOCKET_ERROR;
                 goto error_handler;
         }
-        #if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
+#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
         onOff = 1;
         ret = setsockopt(*ssdpSock,
                 SOL_SOCKET,
@@ -968,7 +968,7 @@ static int create_ssdp_sock_v4(
                 ret = UPNP_E_SOCKET_ERROR;
                 goto error_handler;
         }
-        #endif /* BSD, __APPLE__ */
+#endif /* BSD, __APPLE__ */
         memset(&__ss, 0, sizeof(__ss));
         ssdpAddr4->sin_family = (sa_family_t)AF_INET;
         ssdpAddr4->sin_addr.s_addr = htonl(INADDR_ANY);
@@ -1056,7 +1056,7 @@ error_handler:
         return ret;
 }
 
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
 /*!
  * \brief Creates the SSDP IPv4 socket to be used by the control point.
  *
@@ -1087,9 +1087,9 @@ static int create_ssdp_sock_reqv4(
 
         return UPNP_E_SUCCESS;
 }
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
 
-        #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
 /*!
  * \brief This function ...
  */
@@ -1133,7 +1133,7 @@ static int create_ssdp_sock_v6(
                 ret = UPNP_E_SOCKET_ERROR;
                 goto error_handler;
         }
-                #if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
+#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
         onOff = 1;
         ret = setsockopt(*ssdpSock,
                 SOL_SOCKET,
@@ -1151,7 +1151,7 @@ static int create_ssdp_sock_v6(
                 ret = UPNP_E_SOCKET_ERROR;
                 goto error_handler;
         }
-                #endif /* BSD, __APPLE__ */
+#endif /* BSD, __APPLE__ */
         onOff = 1;
         ret = setsockopt(*ssdpSock,
                 IPPROTO_IPV6,
@@ -1172,13 +1172,13 @@ static int create_ssdp_sock_v6(
         memset(&__ss, 0, sizeof(__ss));
         ssdpAddr6->sin6_family = (sa_family_t)AF_INET6;
         ssdpAddr6->sin6_addr = in6addr_any;
-                #ifndef _WIN32
+#ifndef _WIN32
         ssdpAddr6->sin6_scope_id = gIF_INDEX;
-                #endif
+#endif
         ssdpAddr6->sin6_port = htons(SSDP_PORT);
         ret = bind(*ssdpSock, (struct sockaddr *)ssdpAddr6, sizeof(*ssdpAddr6));
         if (ret == -1) {
-                #ifndef _WIN32
+#ifndef _WIN32
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
                 UpnpPrintf(UPNP_CRITICAL,
                         SSDP,
@@ -1191,7 +1191,7 @@ static int create_ssdp_sock_v6(
                         errorBuffer);
                 ret = UPNP_E_SOCKET_BIND;
                 goto error_handler;
-                #else
+#else
                 int wsa_err = WSAGetLastError();
                 UpnpPrintf(UPNP_CRITICAL,
                         SSDP,
@@ -1204,7 +1204,7 @@ static int create_ssdp_sock_v6(
                         wsa_err);
                 ret = UPNP_E_SOCKET_BIND;
                 goto error_handler;
-                #endif
+#endif
         }
         memset((void *)&ssdpMcastAddr, 0, sizeof(ssdpMcastAddr));
         ssdpMcastAddr.ipv6mr_interface = gIF_INDEX;
@@ -1267,9 +1267,9 @@ error_handler:
 
         return ret;
 }
-        #endif /* IPv6 */
+#endif /* IPv6 */
 
-        #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
 /*!
  * \brief This function ...
  */
@@ -1313,7 +1313,7 @@ static int create_ssdp_sock_v6_ula_gua(
                 ret = UPNP_E_SOCKET_ERROR;
                 goto error_handler;
         }
-                #if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
+#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
         onOff = 1;
         ret = setsockopt(*ssdpSock,
                 SOL_SOCKET,
@@ -1331,7 +1331,7 @@ static int create_ssdp_sock_v6_ula_gua(
                 ret = UPNP_E_SOCKET_ERROR;
                 goto error_handler;
         }
-                #endif /* BSD, __APPLE__ */
+#endif /* BSD, __APPLE__ */
         onOff = 1;
         ret = setsockopt(*ssdpSock,
                 IPPROTO_IPV6,
@@ -1417,10 +1417,10 @@ error_handler:
 
         return ret;
 }
-        #endif /* IPv6 */
+#endif /* IPv6 */
 
-        #ifdef INCLUDE_CLIENT_APIS
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef INCLUDE_CLIENT_APIS
+#ifdef UPNP_ENABLE_IPV6
 /*!
  * \brief Creates the SSDP IPv6 socket to be used by the control
  * point.
@@ -1456,14 +1456,14 @@ static int create_ssdp_sock_reqv6(
 
         return UPNP_E_SUCCESS;
 }
-                #endif /* IPv6 */
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* IPv6 */
+#endif /* INCLUDE_CLIENT_APIS */
 
 int get_ssdp_sockets(MiniServerSockArray *out)
 {
         int retVal;
 
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
         out->ssdpReqSock4 = INVALID_SOCKET;
         out->ssdpReqSock6 = INVALID_SOCKET;
         /* Create the IPv4 socket for SSDP REQUESTS */
@@ -1475,8 +1475,8 @@ int get_ssdp_sockets(MiniServerSockArray *out)
                 gSsdpReqSocket4 = out->ssdpReqSock4;
         } else
                 out->ssdpReqSock4 = INVALID_SOCKET;
-                        /* Create the IPv6 socket for SSDP REQUESTS */
-                #ifdef UPNP_ENABLE_IPV6
+                /* Create the IPv6 socket for SSDP REQUESTS */
+#ifdef UPNP_ENABLE_IPV6
         if (strlen(gIF_IPV6) > (size_t)0) {
                 retVal = create_ssdp_sock_reqv6(&out->ssdpReqSock6);
                 if (retVal != UPNP_E_SUCCESS) {
@@ -1487,30 +1487,30 @@ int get_ssdp_sockets(MiniServerSockArray *out)
                 gSsdpReqSocket6 = out->ssdpReqSock6;
         } else
                 out->ssdpReqSock6 = INVALID_SOCKET;
-                #endif /* IPv6 */
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* IPv6 */
+#endif /* INCLUDE_CLIENT_APIS */
         /* Create the IPv4 socket for SSDP */
         if (strlen(gIF_IPV4) > (size_t)0) {
                 retVal = create_ssdp_sock_v4(&out->ssdpSock4);
                 if (retVal != UPNP_E_SUCCESS) {
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
                         UpnpCloseSocket(out->ssdpReqSock4);
                         UpnpCloseSocket(out->ssdpReqSock6);
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
                         return retVal;
                 }
         } else
                 out->ssdpSock4 = INVALID_SOCKET;
-        #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
         /* Create the IPv6 socket for SSDP */
         if (strlen(gIF_IPV6) > (size_t)0) {
                 retVal = create_ssdp_sock_v6(&out->ssdpSock6);
                 if (retVal != UPNP_E_SUCCESS) {
                         UpnpCloseSocket(out->ssdpSock4);
-                #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
                         UpnpCloseSocket(out->ssdpReqSock4);
                         UpnpCloseSocket(out->ssdpReqSock6);
-                #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
                         return retVal;
                 }
         } else
@@ -1520,15 +1520,15 @@ int get_ssdp_sockets(MiniServerSockArray *out)
                 if (retVal != UPNP_E_SUCCESS) {
                         UpnpCloseSocket(out->ssdpSock4);
                         UpnpCloseSocket(out->ssdpSock6);
-                #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
                         UpnpCloseSocket(out->ssdpReqSock4);
                         UpnpCloseSocket(out->ssdpReqSock6);
-                #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
                         return retVal;
                 }
         } else
                 out->ssdpSock6UlaGua = INVALID_SOCKET;
-        #endif /* UPNP_ENABLE_IPV6 */
+#endif /* UPNP_ENABLE_IPV6 */
 
         return UPNP_E_SUCCESS;
 }

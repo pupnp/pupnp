@@ -23,26 +23,26 @@
 #include <string.h> /* for strlen(), strdup() */
 
 #ifdef _WIN32
-        #define strcasecmp stricmp
+#define strcasecmp stricmp
 #else
 /* Other systems have strncasecmp */
 #endif
 
 #ifndef UPNP_USE_MSVCPP
-        #ifdef UPNP_USE_BCBPP
+#ifdef UPNP_USE_BCBPP
 static size_t strnlen(const char *s, size_t n) { return strnlen_s(s, n); }
-        #else
-                /* VC has strnlen which is already included but with
-                 * (potentially) different linkage */
-                /* strnlen() is a GNU extension. */
-                #if !HAVE_STRNLEN
+#else
+/* VC has strnlen which is already included but with
+ * (potentially) different linkage */
+/* strnlen() is a GNU extension. */
+#if !HAVE_STRNLEN
 static size_t strnlen(const char *s, size_t n)
 {
         const char *p = (const char *)memchr(s, 0, n);
         return p ? p - s : n;
 }
-                #endif /* !HAVE_STRNLEN */
-        #endif /* UPNP_USE_BCBPP */
+#endif /* !HAVE_STRNLEN */
+#endif /* UPNP_USE_BCBPP */
 #endif /* _WIN32 */
 
 /* strndup() is a GNU extension. */

@@ -34,8 +34,8 @@
 #include <sys/types.h>
 
 #ifndef _WIN32
-        /* Do not #include <sys/time.h> */
-        #include <sys/time.h>
+/* Do not #include <sys/time.h> */
+#include <sys/time.h>
 #endif
 
 /*! set the following to the number of 100ns ticks of the actual resolution of

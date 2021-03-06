@@ -52,11 +52,11 @@
 #include <time.h>
 
 #ifdef __cplusplus
-        #define EXTERN_C extern "C"
+#define EXTERN_C extern "C"
 #else /* __cplusplus */
-        #ifndef EXTERN_C
-                #define EXTERN_C
-        #endif /* EXTERN_C */
+#ifndef EXTERN_C
+#define EXTERN_C
+#endif /* EXTERN_C */
 #endif /* __cplusplus */
 
 /*!

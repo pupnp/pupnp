@@ -376,9 +376,9 @@
 #define EXCLUDE_MINISERVER 0
 #define EXCLUDE_WEB_SERVER 0
 #ifdef USE_JNI
-        #define EXCLUDE_JNI 0
+#define EXCLUDE_JNI 0
 #else
-        #define EXCLUDE_JNI 1
+#define EXCLUDE_JNI 1
 #endif
 /* @} */
 
@@ -417,69 +417,69 @@
 
 /* configure --enable-client */
 #if UPNP_HAVE_CLIENT
-        #define INCLUDE_CLIENT_APIS 1
+#define INCLUDE_CLIENT_APIS 1
 #endif
 
 /* configure --enable-device */
 #if UPNP_HAVE_DEVICE
-        #define INCLUDE_DEVICE_APIS 1
+#define INCLUDE_DEVICE_APIS 1
 #endif
 
 /* configure --enable-webserver */
 #if UPNP_HAVE_WEBSERVER
-        #define INTERNAL_WEB_SERVER 1
+#define INTERNAL_WEB_SERVER 1
 #endif
 
 /* configure --enable-ssdp */
 #undef EXCLUDE_SSDP
 #if UPNP_HAVE_SSDP
-        #define EXCLUDE_SSDP 0
+#define EXCLUDE_SSDP 0
 #else
-        #define EXCLUDE_SSDP 1
+#define EXCLUDE_SSDP 1
 #endif
 
 /* configure --enable-soap */
 #undef EXCLUDE_SOAP
 #if UPNP_HAVE_SOAP
-        #define EXCLUDE_SOAP 0
+#define EXCLUDE_SOAP 0
 #else
-        #define EXCLUDE_SOAP 1
+#define EXCLUDE_SOAP 1
 #endif
 
 /* configure --enable-gena */
 #undef EXCLUDE_GENA
 #if UPNP_HAVE_GENA
-        #define EXCLUDE_GENA 0
+#define EXCLUDE_GENA 0
 #else
-        #define EXCLUDE_GENA 1
+#define EXCLUDE_GENA 1
 #endif
 
 #undef EXCLUDE_WEB_SERVER
 #undef EXCLUDE_MINISERVER
 #ifdef INTERNAL_WEB_SERVER
-        #define EXCLUDE_WEB_SERVER 0
-        #define EXCLUDE_MINISERVER 0
+#define EXCLUDE_WEB_SERVER 0
+#define EXCLUDE_MINISERVER 0
 #else
-        #define EXCLUDE_WEB_SERVER 1
-        #define EXCLUDE_MINISERVER 1
+#define EXCLUDE_WEB_SERVER 1
+#define EXCLUDE_MINISERVER 1
 #endif
 
 #if EXCLUDE_SSDP == 1 && EXCLUDE_GENA == 1 && EXCLUDE_SOAP == 1 && \
         EXCLUDE_WEB_SERVER == 1
-        #undef EXCLUDE_MINISERVER
-        #define EXCLUDE_MINISERVER 1
-        #if INTERNAL_WEB_SERVER
-                #error "conflicting settings: use configure --disable-webserver"
-        #endif
+#undef EXCLUDE_MINISERVER
+#define EXCLUDE_MINISERVER 1
+#if INTERNAL_WEB_SERVER
+#error "conflicting settings: use configure --disable-webserver"
+#endif
 #endif
 
 #if EXCLUDE_SSDP == 0 || EXCLUDE_GENA == 0 || EXCLUDE_SOAP == 0 || \
         EXCLUDE_WEB_SERVER == 0
-        #undef EXCLUDE_MINISERVER
-        #define EXCLUDE_MINISERVER 0
-        #if EXCLUDE_WEB_SERVER == 0 && !defined INTERNAL_WEB_SERVER
-                #error "conflicting settings : use configure --enable-webserver"
-        #endif
+#undef EXCLUDE_MINISERVER
+#define EXCLUDE_MINISERVER 0
+#if EXCLUDE_WEB_SERVER == 0 && !defined INTERNAL_WEB_SERVER
+#error "conflicting settings : use configure --enable-webserver"
+#endif
 #endif
 
 /*

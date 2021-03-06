@@ -46,14 +46,14 @@
 #include "UpnpGlobal.h" /* for UPNP_INLINE */
 #include "UpnpInet.h" /* for SOCKET, netinet/in */
 #ifdef UPNP_ENABLE_OPEN_SSL
-        #include <openssl/ssl.h>
+#include <openssl/ssl.h>
 #endif
 
 /* The following are not defined under winsock.h */
 #ifndef SD_RECEIVE
-        #define SD_RECEIVE 0x00
-        #define SD_SEND 0x01
-        #define SD_BOTH 0x02
+#define SD_RECEIVE 0x00
+#define SD_SEND 0x01
+#define SD_BOTH 0x02
 #endif
 
 /*! */

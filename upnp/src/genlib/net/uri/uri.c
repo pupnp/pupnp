@@ -37,15 +37,15 @@
  */
 
 #ifdef __FreeBSD__
-        #include <osreldate.h>
-        #if __FreeBSD_version < 601103
-                #include <lwres/netdb.h>
-        #endif
+#include <osreldate.h>
+#if __FreeBSD_version < 601103
+#include <lwres/netdb.h>
+#endif
 #endif
 #ifdef _WIN32
-        #if defined(_MSC_VER) && _MSC_VER < 1900
-                #define snprintf _snprintf
-        #endif
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
 #endif
 #include "config.h"
 

@@ -33,14 +33,14 @@
 #include "LinkedList.h"
 
 #ifndef _WIN32
-        /* Do not #include <sys/param.h> on Windows */
-        #include <sys/param.h>
+/* Do not #include <sys/param.h> on Windows */
+#include <sys/param.h>
 #endif
 
 #if (defined(BSD) && BSD >= 199306) || defined(__APPLE__)
-        #include <stdlib.h>
+#include <stdlib.h>
 #else
-        #include <malloc.h>
+#include <malloc.h>
 #endif
 
 #include <assert.h>

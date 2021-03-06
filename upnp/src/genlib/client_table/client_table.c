@@ -12,7 +12,7 @@
 
 #ifdef INCLUDE_CLIENT_APIS
 
-        #include <stdlib.h> /* for calloc(), free() */
+#include <stdlib.h> /* for calloc(), free() */
 
 void free_client_subscription(GenlibClientSubscription *sub)
 {

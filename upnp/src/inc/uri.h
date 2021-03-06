@@ -37,7 +37,7 @@
  */
 
 #if !defined(_WIN32)
-        #include <sys/param.h>
+#include <sys/param.h>
 #endif
 
 #include "UpnpGlobal.h" /* for */
@@ -52,18 +52,18 @@
 #include <time.h>
 
 #ifdef _WIN32
-        #if !defined(UPNP_USE_MSVCPP) && !defined(UPNP_USE_BCBPP)
-                /* VC Winsocks2 includes these functions */
-                #include "inet_pton.h"
-        #endif
+#if !defined(UPNP_USE_MSVCPP) && !defined(UPNP_USE_BCBPP)
+/* VC Winsocks2 includes these functions */
+#include "inet_pton.h"
+#endif
 #else
-        #include <netdb.h> /* for struct addrinfo */
+#include <netdb.h> /* for struct addrinfo */
 #endif
 
 #ifdef _WIN32
-        #define strncasecmp strnicmp
+#define strncasecmp strnicmp
 #else
-        /* Other systems have strncasecmp */
+/* Other systems have strncasecmp */
 #endif
 
 #ifdef __cplusplus
@@ -209,9 +209,9 @@ void print_uri(
         /*! [in] URI object to print. */
         uri_type *in);
 #else
-        #define print_uri(in) \
-                do { \
-                } while (0)
+#define print_uri(in) \
+        do { \
+        } while (0)
 #endif
 
 /*!
@@ -222,9 +222,9 @@ void print_token(
         /*! [in] Token object to print. */
         token *in);
 #else
-        #define print_token(in) \
-                do { \
-                } while (0)
+#define print_token(in) \
+        do { \
+        } while (0)
 #endif
 
 /*!

@@ -47,7 +47,7 @@
 #include <string.h>
 
 #ifdef _WIN32
-        #define strncasecmp strnicmp
+#define strncasecmp strnicmp
 #endif
 
 static char g_error_char = '\0';

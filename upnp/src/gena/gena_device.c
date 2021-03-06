@@ -37,28 +37,28 @@
 #include "config.h"
 
 #if EXCLUDE_GENA == 0
-        #ifdef INCLUDE_DEVICE_APIS
+#ifdef INCLUDE_DEVICE_APIS
 
-                #include "gena.h"
-                #include "httpparser.h"
-                #include "httpreadwrite.h"
-                #include "parsetools.h"
-                #include "ssdplib.h"
-                #include "statcodes.h"
-                #include "sysdep.h"
-                #include "unixutil.h"
-                #include "upnpapi.h"
-                #include "uuid.h"
+#include "gena.h"
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "parsetools.h"
+#include "ssdplib.h"
+#include "statcodes.h"
+#include "sysdep.h"
+#include "unixutil.h"
+#include "upnpapi.h"
+#include "uuid.h"
 
-                #include <assert.h>
+#include <assert.h>
 
-                #ifdef _WIN32
-                        #if defined(_MSC_VER) && _MSC_VER < 1900
-                                #define snprintf _snprintf
-                        #endif
-                #endif
+#ifdef _WIN32
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
+#endif
 
-                #define STALE_JOBID (INVALID_JOB_ID - 1)
+#define STALE_JOBID (INVALID_JOB_ID - 1)
 
 /*!
  * \brief Unregisters a device.
@@ -1720,5 +1720,5 @@ void gena_process_unsubscribe_request(SOCKINFO *info, http_message_t *request)
         HandleUnlock();
 }
 
-        #endif /* INCLUDE_DEVICE_APIS */
+#endif /* INCLUDE_DEVICE_APIS */
 #endif /* EXCLUDE_GENA */

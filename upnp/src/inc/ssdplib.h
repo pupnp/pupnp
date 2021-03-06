@@ -53,13 +53,13 @@
 
 #ifdef _WIN32
 #else /* _WIN32 */
-        #include <syslog.h>
-        #ifndef __APPLE__
-                #include <netinet/in_systm.h>
-                #include <netinet/ip.h>
-                #include <netinet/ip_icmp.h>
-        #endif /* __APPLE__ */
-        #include <sys/time.h>
+#include <syslog.h>
+#ifndef __APPLE__
+#include <netinet/in_systm.h>
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
+#endif /* __APPLE__ */
+#include <sys/time.h>
 #endif /* _WIN32 */
 
 /*! Enumeration to define all different types of ssdp searches */
@@ -85,13 +85,13 @@ typedef enum SsdpSearchType
 
 /*! can be overwritten by configure CFLAGS argument. */
 #ifndef X_USER_AGENT
-        /*! @name X_USER_AGENT
-         *  The {\tt X_USER_AGENT} constant specifies the value of the
-         * X-User-Agent: HTTP header. The value "redsonic" is needed for the
-         * DSM-320. See https://sourceforge.net/forum/message.php?msg_id=3166856
-         * for more information
-         */
-        #define X_USER_AGENT "redsonic"
+/*! @name X_USER_AGENT
+ *  The {\tt X_USER_AGENT} constant specifies the value of the
+ * X-User-Agent: HTTP header. The value "redsonic" is needed for the
+ * DSM-320. See https://sourceforge.net/forum/message.php?msg_id=3166856
+ * for more information
+ */
+#define X_USER_AGENT "redsonic"
 #endif
 
 /*! Error codes. */
@@ -166,9 +166,9 @@ typedef struct
 
 #ifdef INCLUDE_CLIENT_APIS
 extern SOCKET gSsdpReqSocket4;
-        #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
 extern SOCKET gSsdpReqSocket6;
-        #endif /* UPNP_ENABLE_IPV6 */
+#endif /* UPNP_ENABLE_IPV6 */
 #endif /* INCLUDE_CLIENT_APIS */
 typedef int (*ParserFun)(char *, SsdpEvent *);
 

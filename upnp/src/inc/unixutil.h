@@ -37,15 +37,15 @@
 #include "UpnpInet.h"
 
 #ifdef _WIN32
-        #include <errno.h>
+#include <errno.h>
 
 typedef int socklen_t;
-        #ifndef EAFNOSUPPORT /* VS2010 has this defined */
-                #define EAFNOSUPPORT 97
-        #endif
+#ifndef EAFNOSUPPORT /* VS2010 has this defined */
+#define EAFNOSUPPORT 97
+#endif
 #else
-        #include <sys/time.h>
-        #include <sys/wait.h>
+#include <sys/time.h>
+#include <sys/wait.h>
 #endif
 
 #endif /* GENLIB_NET_UNIXUTIL_H */

@@ -38,21 +38,21 @@
 
 #if EXCLUDE_DOM == 0
 
-        #include "upnp.h"
-        #include "upnptools.h"
-        #include "uri.h"
+#include "upnp.h"
+#include "upnptools.h"
+#include "uri.h"
 
-        #include <stdarg.h>
-        #include <stdio.h>
+#include <stdarg.h>
+#include <stdio.h>
 
-        /*! Maximum action header buffer length. */
-        #define HEADER_LENGTH 2000
+/*! Maximum action header buffer length. */
+#define HEADER_LENGTH 2000
 
-        #ifdef _WIN32
-                #if defined(_MSC_VER) && _MSC_VER < 1900
-                        #define snprintf _snprintf
-                #endif
-        #endif
+#ifdef _WIN32
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
+#endif
 
 /*!
  * \brief Structure to maintain a error code and string associated with the

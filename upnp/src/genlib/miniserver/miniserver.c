@@ -47,25 +47,25 @@
  *
  */
 
-        #include "ThreadPool.h"
-        #include "httpreadwrite.h"
-        #include "ithread.h"
-        #include "miniserver.h"
-        #include "ssdplib.h"
-        #include "statcodes.h"
-        #include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
-        #include "upnpapi.h"
-        #include "upnputil.h"
+#include "ThreadPool.h"
+#include "httpreadwrite.h"
+#include "ithread.h"
+#include "miniserver.h"
+#include "ssdplib.h"
+#include "statcodes.h"
+#include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
+#include "upnpapi.h"
+#include "upnputil.h"
 
-        #include <assert.h>
-        #include <errno.h>
-        #include <stdio.h>
-        #include <stdlib.h>
-        #include <string.h>
-        #include <sys/types.h>
+#include <assert.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 
-        /*! . */
-        #define APPLICATION_LISTENING_PORT 49152
+/*! . */
+#define APPLICATION_LISTENING_PORT 49152
 
 struct mserv_request_t
 {
@@ -93,24 +93,24 @@ uint16_t miniStopSockPort;
  * module vars
  */
 static MiniServerState gMServState = MSERV_IDLE;
-        #ifdef INTERNAL_WEB_SERVER
+#ifdef INTERNAL_WEB_SERVER
 static MiniServerCallback gGetCallback = NULL;
 static MiniServerCallback gSoapCallback = NULL;
 static MiniServerCallback gGenaCallback = NULL;
 
 static const int ENABLE_IPV6 =
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
         1;
-                #else
+#else
         0;
-                #endif
+#endif
 
 static const int MINISERVER_REUSEADDR =
-                #ifdef UPNP_MINISERVER_REUSEADDR
+#ifdef UPNP_MINISERVER_REUSEADDR
         1;
-                #else
+#else
         0;
-                #endif
+#endif
 
 struct s_SocketStuff
 {
@@ -134,9 +134,9 @@ void SetHTTPGetCallback(MiniServerCallback callback)
         gGetCallback = callback;
 }
 
-                #ifdef INCLUDE_DEVICE_APIS
+#ifdef INCLUDE_DEVICE_APIS
 void SetSoapCallback(MiniServerCallback callback) { gSoapCallback = callback; }
-                #endif /* INCLUDE_DEVICE_APIS */
+#endif /* INCLUDE_DEVICE_APIS */
 
 void SetGenaCallback(MiniServerCallback callback) { gGenaCallback = callback; }
 
@@ -338,7 +338,7 @@ static UPNP_INLINE void schedule_request_job(
                 return;
         }
 }
-        #endif
+#endif
 
 static UPNP_INLINE void fdset_if_valid(SOCKET sock, fd_set *set)
 {
@@ -349,7 +349,7 @@ static UPNP_INLINE void fdset_if_valid(SOCKET sock, fd_set *set)
 
 static void web_server_accept(SOCKET lsock, fd_set *set)
 {
-        #ifdef INTERNAL_WEB_SERVER
+#ifdef INTERNAL_WEB_SERVER
         SOCKET asock;
         socklen_t clientLen;
         struct sockaddr_storage clientAddr;
@@ -372,7 +372,7 @@ static void web_server_accept(SOCKET lsock, fd_set *set)
                                 asock, (struct sockaddr *)&clientAddr);
                 }
         }
-        #endif /* INTERNAL_WEB_SERVER */
+#endif /* INTERNAL_WEB_SERVER */
 }
 
 static void ssdp_read(SOCKET rsock, fd_set *set)
@@ -453,10 +453,10 @@ static void RunMiniServer(
         maxMiniSock = max(maxMiniSock, miniSock->ssdpSock4);
         maxMiniSock = max(maxMiniSock, miniSock->ssdpSock6);
         maxMiniSock = max(maxMiniSock, miniSock->ssdpSock6UlaGua);
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
         maxMiniSock = max(maxMiniSock, miniSock->ssdpReqSock4);
         maxMiniSock = max(maxMiniSock, miniSock->ssdpReqSock6);
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
         ++maxMiniSock;
 
         gMServState = MSERV_RUNNING;
@@ -472,10 +472,10 @@ static void RunMiniServer(
                 fdset_if_valid(miniSock->ssdpSock4, &rdSet);
                 fdset_if_valid(miniSock->ssdpSock6, &rdSet);
                 fdset_if_valid(miniSock->ssdpSock6UlaGua, &rdSet);
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
                 fdset_if_valid(miniSock->ssdpReqSock4, &rdSet);
                 fdset_if_valid(miniSock->ssdpReqSock6, &rdSet);
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
                 /* select() */
                 ret = select((int)maxMiniSock, &rdSet, NULL, &expSet, NULL);
                 if (ret == SOCKET_ERROR && errno == EINTR) {
@@ -495,10 +495,10 @@ static void RunMiniServer(
                         web_server_accept(miniSock->miniServerSock6, &rdSet);
                         web_server_accept(
                                 miniSock->miniServerSock6UlaGua, &rdSet);
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
                         ssdp_read(miniSock->ssdpReqSock4, &rdSet);
                         ssdp_read(miniSock->ssdpReqSock6, &rdSet);
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
                         ssdp_read(miniSock->ssdpSock4, &rdSet);
                         ssdp_read(miniSock->ssdpSock6, &rdSet);
                         ssdp_read(miniSock->ssdpSock6UlaGua, &rdSet);
@@ -514,10 +514,10 @@ static void RunMiniServer(
         sock_close(miniSock->ssdpSock4);
         sock_close(miniSock->ssdpSock6);
         sock_close(miniSock->ssdpSock6UlaGua);
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
         sock_close(miniSock->ssdpReqSock4);
         sock_close(miniSock->ssdpReqSock6);
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
         /* Free minisock. */
         free(miniSock);
         gMServState = MSERV_IDLE;
@@ -561,7 +561,7 @@ static int get_port(
         return 0;
 }
 
-        #ifdef INTERNAL_WEB_SERVER
+#ifdef INTERNAL_WEB_SERVER
 static int init_socket_suff(
         struct s_SocketStuff *s, const char *text_addr, int ip_version)
 {
@@ -693,11 +693,11 @@ static int do_bind(struct s_SocketStuff *s)
                 }
                 bind_error = bind(s->fd, s->serverAddr, s->address_len);
                 if (bind_error == SOCKET_ERROR) {
-                #ifdef _WIN32
+#ifdef _WIN32
                         errCode = WSAGetLastError();
-                #else
+#else
                         errCode = errno;
-                #endif
+#endif
                         if (errno == EADDRINUSE) {
                                 errCode = 1;
                         }
@@ -922,7 +922,7 @@ error:
 
         return ret_val;
 }
-        #endif /* INTERNAL_WEB_SERVER */
+#endif /* INTERNAL_WEB_SERVER */
 
 /*!
  * \brief Creates the miniserver STOP socket. This socket is created and
@@ -994,10 +994,10 @@ static UPNP_INLINE void InitMiniServerSockArray(MiniServerSockArray *miniSocket)
         miniSocket->miniServerPort4 = 0u;
         miniSocket->miniServerPort6 = 0u;
         miniSocket->miniServerPort6UlaGua = 0u;
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
         miniSocket->ssdpReqSock4 = INVALID_SOCKET;
         miniSocket->ssdpReqSock6 = INVALID_SOCKET;
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
 }
 
 int StartMiniServer(
@@ -1031,7 +1031,7 @@ int StartMiniServer(
                 return UPNP_E_OUTOF_MEMORY;
         }
         InitMiniServerSockArray(miniSocket);
-        #ifdef INTERNAL_WEB_SERVER
+#ifdef INTERNAL_WEB_SERVER
         /* V4 and V6 http listeners. */
         ret_code = get_miniserver_sockets(
                 miniSocket, *listen_port4, *listen_port6, *listen_port6UlaGua);
@@ -1039,7 +1039,7 @@ int StartMiniServer(
                 free(miniSocket);
                 return ret_code;
         }
-        #endif
+#endif
         /* Stop socket (To end miniserver processing). */
         ret_code = get_miniserver_stopsock(miniSocket);
         if (ret_code != UPNP_E_SUCCESS) {
@@ -1071,10 +1071,10 @@ int StartMiniServer(
                 sock_close(miniSocket->ssdpSock4);
                 sock_close(miniSocket->ssdpSock6);
                 sock_close(miniSocket->ssdpSock6UlaGua);
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
                 sock_close(miniSocket->ssdpReqSock4);
                 sock_close(miniSocket->ssdpReqSock6);
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
                 free(miniSocket);
                 return UPNP_E_OUTOF_MEMORY;
         }
@@ -1095,17 +1095,17 @@ int StartMiniServer(
                 sock_close(miniSocket->ssdpSock4);
                 sock_close(miniSocket->ssdpSock6);
                 sock_close(miniSocket->ssdpSock6UlaGua);
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
                 sock_close(miniSocket->ssdpReqSock4);
                 sock_close(miniSocket->ssdpReqSock6);
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
                 return UPNP_E_INTERNAL_ERROR;
         }
-        #ifdef INTERNAL_WEB_SERVER
+#ifdef INTERNAL_WEB_SERVER
         *listen_port4 = miniSocket->miniServerPort4;
         *listen_port6 = miniSocket->miniServerPort6;
         *listen_port6UlaGua = miniSocket->miniServerPort6UlaGua;
-        #endif
+#endif
 
         return UPNP_E_SUCCESS;
 }

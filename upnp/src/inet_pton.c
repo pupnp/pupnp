@@ -22,9 +22,9 @@
 /* This file is _WIN32 only */
 #ifdef _WIN32
 
-        #include "inet_pton.h"
+#include "inet_pton.h"
 
-        #if (NTDDI_VERSION < NTDDI_VISTA)
+#if (NTDDI_VERSION < NTDDI_VISTA)
 
 /*!
  * \brief format an IPv4 address
@@ -69,7 +69,7 @@ static const char *inet_ntop4(const u_char *src, char *dst, socklen_t size)
         return strcpy(dst, tmp);
 }
 
-                #ifdef INET_IPV6
+#ifdef INET_IPV6
 /*!
  * \brief convert IPv6 binary address into presentation (printable) format
  */
@@ -159,7 +159,7 @@ static const char *inet_ntop6(const u_char *src, char *dst, socklen_t size)
         }
         return strcpy(dst, tmp);
 }
-                #endif /* INET_IPV6 */
+#endif /* INET_IPV6 */
 
 /*!
  * \brief like inet_aton() but without all the hexadecimal and shorthand.
@@ -201,7 +201,7 @@ static int inet_pton4(const char *src, u_char *dst)
         return 1;
 }
 
-                #ifdef INET_IPV6
+#ifdef INET_IPV6
 /*!
  * \brief convert presentation level address to network order binary form.
  *
@@ -292,17 +292,17 @@ static int inet_pton6(const char *src, u_char *dst)
         memcpy(dst, tmp, 16);
         return (1);
 }
-                #endif /* INET_IPV6 */
+#endif /* INET_IPV6 */
 
 const char *inet_ntop(int af, const void *src, char *dst, socklen_t size)
 {
         switch (af) {
         case AF_INET:
                 return inet_ntop4(src, dst, size);
-                #ifdef INET_IPV6
+#ifdef INET_IPV6
         case AF_INET6:
                 return inet_ntop6(src, dst, size);
-                #endif
+#endif
         default:
                 /*__set_errno(EAFNOSUPPORT);*/
                 return NULL;
@@ -315,10 +315,10 @@ int inet_pton(int af, const char *src, void *dst)
         switch (af) {
         case AF_INET:
                 return inet_pton4(src, dst);
-                #ifdef INET_IPV6
+#ifdef INET_IPV6
         case AF_INET6:
                 return inet_pton6(src, dst);
-                #endif
+#endif
         default:
                 /*__set_errno(EAFNOSUPPORT);*/
                 return -1;
@@ -326,6 +326,6 @@ int inet_pton(int af, const char *src, void *dst)
         /* NOTREACHED */
 }
 
-        #endif /* NTDDI_VERSION < NTDDI_VISTA */
+#endif /* NTDDI_VERSION < NTDDI_VISTA */
 
 #endif /* _WIN32 */

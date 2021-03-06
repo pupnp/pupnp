@@ -60,18 +60,18 @@
 #include <string.h>
 
 #ifdef _WIN32
-        #include <malloc.h>
-        #define fseeko fseek
-        #if defined(_MSC_VER) && _MSC_VER < 1900
-                #define snprintf _snprintf
-        #endif
+#include <malloc.h>
+#define fseeko fseek
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
 #else /* _WIN32 */
-        #include <alloca.h>
-        #include <arpa/inet.h>
-        #include <sys/time.h>
-        #include <sys/types.h>
-        #include <sys/utsname.h>
-        #include <sys/wait.h>
+#include <alloca.h>
+#include <arpa/inet.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/utsname.h>
+#include <sys/wait.h>
 #endif /* _WIN32 */
 
 /*
@@ -87,8 +87,8 @@ const int CHUNK_TAIL_SIZE = 10;
 
 #ifndef UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS
 
-        /* in seconds */
-        #define DEFAULT_TCP_CONNECT_TIMEOUT 5
+/* in seconds */
+#define DEFAULT_TCP_CONNECT_TIMEOUT 5
 
 /*!
  * \brief Checks socket connection and wait if it is not connected.
@@ -104,33 +104,33 @@ static int Check_Connect_And_Wait_Connection(
 {
         struct timeval tmvTimeout = {DEFAULT_TCP_CONNECT_TIMEOUT, 0};
         int result;
-        #ifdef _WIN32
+#ifdef _WIN32
         struct fd_set fdSet;
-        #else
+#else
         fd_set fdSet;
-        #endif
+#endif
         FD_ZERO(&fdSet);
         FD_SET(sock, &fdSet);
 
         if (connect_res < 0) {
-        #ifdef _WIN32
+#ifdef _WIN32
                 if (WSAEWOULDBLOCK == WSAGetLastError()) {
-        #else
+#else
                 if (EINPROGRESS == errno) {
-        #endif
+#endif
                         result = select(
                                 sock + 1, NULL, &fdSet, NULL, &tmvTimeout);
                         if (result < 0) {
-        #ifdef _WIN32
-                                        /* WSAGetLastError(); */
-        #else
-                                        /* errno */
-        #endif
+#ifdef _WIN32
+                                /* WSAGetLastError(); */
+#else
+                                /* errno */
+#endif
                                 return -1;
                         } else if (result == 0) {
                                 /* timeout */
                                 return -1;
-        #ifndef _WIN32
+#ifndef _WIN32
                         } else {
                                 int valopt = 0;
                                 socklen_t len = sizeof(valopt);
@@ -145,7 +145,7 @@ static int Check_Connect_And_Wait_Connection(
                                         /* delayed error = valopt */
                                         return -1;
                                 }
-        #endif
+#endif
                         }
                 }
         }
@@ -2275,7 +2275,7 @@ void get_sdk_info(char *info, size_t infoSize)
 #ifdef UPNP_ENABLE_UNSPECIFIED_SERVER
         snprintf(info, infoSize, "Unspecified, UPnP/1.0, Unspecified\r\n");
 #else /* UPNP_ENABLE_UNSPECIFIED_SERVER */
-        #ifdef _WIN32
+#ifdef _WIN32
         OSVERSIONINFO versioninfo;
         versioninfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
@@ -2291,7 +2291,7 @@ void get_sdk_info(char *info, size_t infoSize)
                         versioninfo.szCSDVersion);
         else
                 *info = '\0';
-        #else
+#else
         int ret_code;
         struct utsname sys_info;
 
@@ -2304,6 +2304,6 @@ void get_sdk_info(char *info, size_t infoSize)
                 "devices/" UPNP_VERSION_STRING "\r\n",
                 sys_info.sysname,
                 sys_info.release);
-        #endif
+#endif
 #endif /* UPNP_ENABLE_UNSPECIFIED_SERVER */
 }

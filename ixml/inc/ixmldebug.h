@@ -30,10 +30,10 @@ void IxmlPrintf(
         /*! [in] Printf like Variable number of arguments that will go in the
          * debug statement. */
         ...)
-        #if (__GNUC__ >= 3)
+#if (__GNUC__ >= 3)
         /* This enables printf like format checking by the compiler */
         __attribute__((format(__printf__, 4, 5)))
-        #endif
+#endif
         ;
 #else /* DEBUG */
 static UPNP_INLINE void IxmlPrintf(const char *FmtStr, ...) { (void)FmtStr; }

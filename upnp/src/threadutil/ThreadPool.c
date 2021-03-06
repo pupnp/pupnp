@@ -35,7 +35,7 @@
  */
 
 #if !defined(_WIN32)
-        #include <sys/param.h>
+#include <sys/param.h>
 #endif
 
 #include "FreeList.h"
@@ -1263,11 +1263,11 @@ int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
 #endif /* STATS */
 
 #ifdef _WIN32
-        #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-                #define DELTA_EPOCH_IN_MICROSECS 11644473600000000Ui64
-        #else
-                #define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
-        #endif
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#define DELTA_EPOCH_IN_MICROSECS 11644473600000000Ui64
+#else
+#define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
+#endif
 
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {

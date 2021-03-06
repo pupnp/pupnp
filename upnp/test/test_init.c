@@ -38,7 +38,7 @@
 #include <stdlib.h>
 
 #if UPNP_HAVE_TOOLS
-        #include "upnptools.h"
+#include "upnptools.h"
 #endif
 #include "upnpdebug.h"
 

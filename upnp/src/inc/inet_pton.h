@@ -3,17 +3,17 @@
 
 #ifdef _WIN32
 
-        #ifdef IPV6_
-                #define INET_IPV6
-        #endif
+#ifdef IPV6_
+#define INET_IPV6
+#endif
 
-        #include "unixutil.h"
+#include "unixutil.h"
 
-        #include <errno.h>
-        #include <stdio.h>
-        #include <string.h>
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
 
-        #if (NTDDI_VERSION < NTDDI_VISTA)
+#if (NTDDI_VERSION < NTDDI_VISTA)
 
 /*!
  * \file
@@ -48,7 +48,7 @@ extern const char *inet_ntop(
  */
 extern int inet_pton(int af, const char *src, void *dst);
 
-        #endif /* NTDDI_VERSION < NTDDI_VISTA */
+#endif /* NTDDI_VERSION < NTDDI_VISTA */
 
 #endif /* _WIN32 */
 

@@ -50,18 +50,18 @@
  * include mess in an include file like UpnpTime.h
  */
 #ifdef _WIN32
-        #include <time.h>
-        #if defined(UPNP_USE_MSVCPP) || defined(UPNP_USE_BCBPP)
-                #include <sys/types.h> /* needed for off_t */
-        #endif
+#include <time.h>
+#if defined(UPNP_USE_MSVCPP) || defined(UPNP_USE_BCBPP)
+#include <sys/types.h> /* needed for off_t */
+#endif
 #elif (defined(BSD) && BSD >= 199306)
-        #include <time.h>
+#include <time.h>
 #else
-        /* Other systems ??? */
+/* Other systems ??? */
 #endif
 
 #ifdef UPNP_ENABLE_OPEN_SSL
-        #include <openssl/ssl.h>
+#include <openssl/ssl.h>
 #endif
 
 #define LINE_SIZE (size_t)180

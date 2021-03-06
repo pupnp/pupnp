@@ -3,8 +3,8 @@
 
 #if !defined(UPNP_USE_BCBPP)
 
-        /* Printf format for integers. */
-        #include <inttypes.h>
+/* Printf format for integers. */
+#include <inttypes.h>
 
 #endif /* !defined(UPNP_USE_BCBPP) */
 

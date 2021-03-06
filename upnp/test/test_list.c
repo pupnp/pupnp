@@ -1,6 +1,6 @@
 /* Force asserts enabled for the test */
 #ifdef NDEBUG
-        #undef NDEBUG
+#undef NDEBUG
 #endif
 
 #include "list.h"

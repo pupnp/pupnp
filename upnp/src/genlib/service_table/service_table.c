@@ -43,7 +43,7 @@
 
 #ifdef INCLUDE_DEVICE_APIS
 
-        #if EXCLUDE_GENA == 0
+#if EXCLUDE_GENA == 0
 /************************************************************************
  *	Function :	copy_subscription
  *
@@ -306,23 +306,23 @@ service_info *FindServiceEventURLPath(
 
         return NULL;
 }
-        #endif /* EXCLUDE_GENA */
+#endif /* EXCLUDE_GENA */
 
-        /***********************************************************************
-         * Function: FindServiceControlURLPath
-         *
-         * Parameters:
-         *    service_table *table; service table
-         *    char *controlURLPath; control URL path used to find a service from
-         *                          the table
-         *
-         * Description: Traverses the service table and finds the node whose
-         *    control URL Path matches a know value
-         *
-         * Return: service_info *:  pointer to the service list node from the
-         *    service table whose control URL Path matches a known value.
-         **********************************************************************/
-        #if EXCLUDE_SOAP == 0
+/***********************************************************************
+ * Function: FindServiceControlURLPath
+ *
+ * Parameters:
+ *    service_table *table; service table
+ *    char *controlURLPath; control URL path used to find a service from
+ *                          the table
+ *
+ * Description: Traverses the service table and finds the node whose
+ *    control URL Path matches a know value
+ *
+ * Return: service_info *:  pointer to the service list node from the
+ *    service table whose control URL Path matches a known value.
+ **********************************************************************/
+#if EXCLUDE_SOAP == 0
 service_info *FindServiceControlURLPath(
         service_table *table, const char *controlURLPath)
 {
@@ -353,22 +353,22 @@ service_info *FindServiceControlURLPath(
 
         return NULL;
 }
-        #endif /* EXCLUDE_SOAP */
+#endif /* EXCLUDE_SOAP */
 
-        /***********************************************************************
-         * Function: printService
-         *
-         * Parameters:
-         *    service_info *service; Service whose information is to be printed
-         *    Upnp_LogLevel level;  Debug level specified to the print function
-         *    Dbg_Module module;    Debug module specified to the print function
-         *
-         * Description: For debugging purposes prints information from the
-         *    service passed into the function.
-         *
-         * Return: void
-         **********************************************************************/
-        #ifdef DEBUG
+/***********************************************************************
+ * Function: printService
+ *
+ * Parameters:
+ *    service_info *service; Service whose information is to be printed
+ *    Upnp_LogLevel level;  Debug level specified to the print function
+ *    Dbg_Module module;    Debug module specified to the print function
+ *
+ * Description: For debugging purposes prints information from the
+ *    service passed into the function.
+ *
+ * Return: void
+ **********************************************************************/
+#ifdef DEBUG
 void printService(service_info *service, Upnp_LogLevel level, Dbg_Module module)
 {
         if (service) {
@@ -435,22 +435,22 @@ void printService(service_info *service, Upnp_LogLevel level, Dbg_Module module)
                 }
         }
 }
-        #endif
+#endif
 
-        /************************************************************************
-         * Function: printServiceList
-         *
-         * Parameters:
-         *    service_info *service; Service whose information is to be printed
-         *    Upnp_LogLevel level;   Debug level specified to the print function
-         *    Dbg_Module module;    Debug module specified to the print function
-         *
-         * Description: For debugging purposes prints information of each
-         *    service from the service table passed into the function.
-         *
-         * Return: void
-         ************************************************************************/
-        #ifdef DEBUG
+/************************************************************************
+ * Function: printServiceList
+ *
+ * Parameters:
+ *    service_info *service; Service whose information is to be printed
+ *    Upnp_LogLevel level;   Debug level specified to the print function
+ *    Dbg_Module module;    Debug module specified to the print function
+ *
+ * Description: For debugging purposes prints information of each
+ *    service from the service table passed into the function.
+ *
+ * Return: void
+ ************************************************************************/
+#ifdef DEBUG
 void printServiceList(
         service_info *service, Upnp_LogLevel level, Dbg_Module module)
 {
@@ -519,23 +519,23 @@ void printServiceList(
                 service = service->next;
         }
 }
-        #endif
+#endif
 
-        /************************************************************************
-         * Function: printServiceTable
-         *
-         * Parameters:
-         *    service_table *table; Service table to be printed
-         *    Upnp_LogLevel level;  Debug level specified to the print function
-         *    Dbg_Module module;    Debug module specified to the print function
-         *
-         * Description: For debugging purposes prints the URL base of the table
-         *    and information of each service from the service table passed into
-         *    the function.
-         *
-         * Return: void
-         ************************************************************************/
-        #ifdef DEBUG
+/************************************************************************
+ * Function: printServiceTable
+ *
+ * Parameters:
+ *    service_table *table; Service table to be printed
+ *    Upnp_LogLevel level;  Debug level specified to the print function
+ *    Dbg_Module module;    Debug module specified to the print function
+ *
+ * Description: For debugging purposes prints the URL base of the table
+ *    and information of each service from the service table passed into
+ *    the function.
+ *
+ * Return: void
+ ************************************************************************/
+#ifdef DEBUG
 void printServiceTable(
         service_table *table, Upnp_LogLevel level, Dbg_Module module)
 {
@@ -548,9 +548,9 @@ void printServiceTable(
         UpnpPrintf(level, module, __FILE__, __LINE__, "Services: \n");
         printServiceList(table->serviceList, level, module);
 }
-        #endif
+#endif
 
-        #if EXCLUDE_GENA == 0
+#if EXCLUDE_GENA == 0
 /************************************************************************
  *	Function :	freeService
  *
@@ -1102,6 +1102,6 @@ int getServiceTable(
 
         return 0;
 }
-        #endif /* EXCLUDE_GENA */
+#endif /* EXCLUDE_GENA */
 
 #endif /* INCLUDE_DEVICE_APIS */

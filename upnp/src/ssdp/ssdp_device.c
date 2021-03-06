@@ -41,30 +41,30 @@
 #include "config.h"
 
 #ifdef INCLUDE_DEVICE_APIS
-        #if EXCLUDE_SSDP == 0
+#if EXCLUDE_SSDP == 0
 
-                #include "ThreadPool.h"
-                #include "UpnpInet.h"
-                #include "httpparser.h"
-                #include "httpreadwrite.h"
-                #include "ssdplib.h"
-                #include "statcodes.h"
-                #include "unixutil.h"
-                #include "upnpapi.h"
+#include "ThreadPool.h"
+#include "UpnpInet.h"
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "ssdplib.h"
+#include "statcodes.h"
+#include "unixutil.h"
+#include "upnpapi.h"
 
-                #include <assert.h>
-                #include <stdio.h>
-                #include <string.h>
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
 
-                #ifdef _WIN32
-                        #if defined(_MSC_VER) && _MSC_VER < 1900
-                                #define snprintf _snprintf
-                        #endif
-                #endif
+#ifdef _WIN32
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
+#endif
 
-                #define MSGTYPE_SHUTDOWN 0
-                #define MSGTYPE_ADVERTISEMENT 1
-                #define MSGTYPE_REPLY 2
+#define MSGTYPE_SHUTDOWN 0
+#define MSGTYPE_ADVERTISEMENT 1
+#define MSGTYPE_REPLY 2
 
 void advertiseAndReplyThread(void *data)
 {
@@ -81,11 +81,11 @@ void advertiseAndReplyThread(void *data)
         free(arg);
 }
 
-                #ifdef INCLUDE_DEVICE_APIS
+#ifdef INCLUDE_DEVICE_APIS
 void ssdp_handle_device_request(
         http_message_t *hmsg, struct sockaddr_storage *dest_addr)
 {
-                        #define MX_FUDGE_FACTOR 10
+#define MX_FUDGE_FACTOR 10
         int handle, start;
         struct Handle_Info *dev_info = NULL;
         memptr hdr_value;
@@ -197,7 +197,7 @@ void ssdp_handle_device_request(
                 start = handle;
         }
 }
-                #endif
+#endif
 
 /*!
  * \brief Works as a request handler which passes the HTTP request string
@@ -220,9 +220,9 @@ static int NewRequestHandler(
         struct in_addr replyAddr;
         /* a/c to UPNP Spec */
         int ttl = 4;
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
         int hops = 1;
-                #endif
+#endif
         char buf_ntop[INET6_ADDRSTRLEN];
         int ret = UPNP_E_SUCCESS;
 
@@ -263,7 +263,7 @@ static int NewRequestHandler(
                         sizeof(int));
                 socklen = sizeof(struct sockaddr_in);
                 break;
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
         case AF_INET6:
                 inet_ntop(AF_INET6,
                         &((struct sockaddr_in6 *)DestAddr)->sin6_addr,
@@ -280,7 +280,7 @@ static int NewRequestHandler(
                         (char *)&hops,
                         sizeof(hops));
                 break;
-                #endif
+#endif
         default:
                 UpnpPrintf(UPNP_CRITICAL,
                         SSDP,
@@ -422,7 +422,7 @@ static void CreateServicePacket(
         *packet = NULL;
         if (msg_type == MSGTYPE_REPLY) {
                 if (PowerState > 0) {
-                #ifdef UPNP_HAVE_OPTSSDP
+#ifdef UPNP_HAVE_OPTSSDP
                         ret_code = http_MakeMessage(&buf,
                                 1,
                                 1,
@@ -461,7 +461,7 @@ static void CreateServicePacket(
                                 SleepPeriod,
                                 "RegistrationState: ",
                                 RegistrationState);
-                #else
+#else
                         ret_code = http_MakeMessage(&buf,
                                 1,
                                 1,
@@ -492,9 +492,9 @@ static void CreateServicePacket(
                                 SleepPeriod,
                                 "RegistrationState: ",
                                 RegistrationState);
-                #endif /* UPNP_HAVE_OPTSSDP */
+#endif /* UPNP_HAVE_OPTSSDP */
                 } else {
-                #ifdef UPNP_HAVE_OPTSSDP
+#ifdef UPNP_HAVE_OPTSSDP
                         ret_code = http_MakeMessage(&buf,
                                 1,
                                 1,
@@ -524,7 +524,7 @@ static void CreateServicePacket(
                                 nt,
                                 "USN: ",
                                 usn);
-                #else
+#else
                         ret_code = http_MakeMessage(&buf,
                                 1,
                                 1,
@@ -546,7 +546,7 @@ static void CreateServicePacket(
                                 nt,
                                 "USN: ",
                                 usn);
-                #endif /* UPNP_HAVE_OPTSSDP */
+#endif /* UPNP_HAVE_OPTSSDP */
                 }
                 if (ret_code != 0) {
                         return;
@@ -574,7 +574,7 @@ static void CreateServicePacket(
                                 host = "[" SSDP_IPV6_LINKLOCAL "]";
                 }
                 if (PowerState > 0) {
-                #ifdef UPNP_HAVE_OPTSSDP
+#ifdef UPNP_HAVE_OPTSSDP
                         ret_code = http_MakeMessage(&buf,
                                 1,
                                 1,
@@ -620,7 +620,7 @@ static void CreateServicePacket(
                                 SleepPeriod,
                                 "RegistrationState: ",
                                 RegistrationState);
-                #else
+#else
                         ret_code = http_MakeMessage(&buf,
                                 1,
                                 1,
@@ -658,9 +658,9 @@ static void CreateServicePacket(
                                 SleepPeriod,
                                 "RegistrationState: ",
                                 RegistrationState);
-                #endif /* UPNP_HAVE_OPTSSDP */
+#endif /* UPNP_HAVE_OPTSSDP */
                 } else {
-                #ifdef UPNP_HAVE_OPTSSDP
+#ifdef UPNP_HAVE_OPTSSDP
                         ret_code = http_MakeMessage(&buf,
                                 1,
                                 1,
@@ -697,7 +697,7 @@ static void CreateServicePacket(
                                 X_USER_AGENT,
                                 "USN: ",
                                 usn);
-                #else
+#else
                         ret_code = http_MakeMessage(&buf,
                                 1,
                                 1,
@@ -726,7 +726,7 @@ static void CreateServicePacket(
                                 nts,
                                 "USN: ",
                                 usn);
-                #endif /* UPNP_HAVE_OPTSSDP */
+#endif /* UPNP_HAVE_OPTSSDP */
                 }
                 if (ret_code)
                         return;
@@ -1327,7 +1327,7 @@ error_handler:
 
         return ret_code;
 }
-        #endif /* EXCLUDE_SSDP */
+#endif /* EXCLUDE_SSDP */
 #endif /* INCLUDE_DEVICE_APIS */
 
 /* @} SSDPlib */

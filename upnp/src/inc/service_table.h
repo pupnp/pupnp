@@ -206,11 +206,11 @@ service_info *FindServiceControlURLPath(
         /*! [in] Control URL path used to find a service from the table. */
         const char *controlURLPath);
 
-        /*!
-         * \brief For debugging purposes prints information from the service
-         * passed into the function.
-         */
-        #ifdef DEBUG
+/*!
+ * \brief For debugging purposes prints information from the service
+ * passed into the function.
+ */
+#ifdef DEBUG
 void printService(
         /*! [in] Service whose information is to be printed. */
         service_info *service,
@@ -218,17 +218,17 @@ void printService(
         Upnp_LogLevel level,
         /*! [in] Debug module specified to the print function. */
         Dbg_Module module);
-        #else
-                #define printService(service, level, module) \
-                        do { \
-                        } while (0)
-        #endif
+#else
+#define printService(service, level, module) \
+        do { \
+        } while (0)
+#endif
 
-        /*!
-         * \brief For debugging purposes prints information of each service from
-         * the service table passed into the function.
-         */
-        #ifdef DEBUG
+/*!
+ * \brief For debugging purposes prints information of each service from
+ * the service table passed into the function.
+ */
+#ifdef DEBUG
 void printServiceList(
         /*! [in] Service whose information is to be printed. */
         service_info *service,
@@ -236,18 +236,18 @@ void printServiceList(
         Upnp_LogLevel level,
         /*! [in] Debug module specified to the print function. */
         Dbg_Module module);
-        #else
-                #define printServiceList(service, level, module) \
-                        do { \
-                        } while (0)
-        #endif
+#else
+#define printServiceList(service, level, module) \
+        do { \
+        } while (0)
+#endif
 
-        /*!
-         * \brief For debugging purposes prints the URL base of the table and
-         * information of each service from the service table passed into the
-         * function.
-         */
-        #ifdef DEBUG
+/*!
+ * \brief For debugging purposes prints the URL base of the table and
+ * information of each service from the service table passed into the
+ * function.
+ */
+#ifdef DEBUG
 void printServiceTable(
         /*! [in] Service table to be printed. */
         service_table *table,
@@ -255,11 +255,11 @@ void printServiceTable(
         Upnp_LogLevel level,
         /*! [in] Debug module specified to the print function. */
         Dbg_Module module);
-        #else
-                #define printServiceTable(table, level, module) \
-                        do { \
-                        } while (0)
-        #endif
+#else
+#define printServiceTable(table, level, module) \
+        do { \
+        } while (0)
+#endif
 
 /*!
  * \brief Free's memory allocated for the various components of the service

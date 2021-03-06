@@ -31,31 +31,31 @@
 
 #include "config.h"
 #ifdef INCLUDE_CLIENT_APIS
-        #if EXCLUDE_SOAP == 0
+#if EXCLUDE_SOAP == 0
 
-                #include "httpparser.h"
-                #include "httpreadwrite.h"
-                #include "membuffer.h"
-                #include "miniserver.h"
-                #include "parsetools.h"
-                #include "soaplib.h"
-                #include "statcodes.h"
-                #include "unixutil.h"
-                #include "upnp.h"
-                #include "upnpapi.h"
-                #include "uri.h"
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "membuffer.h"
+#include "miniserver.h"
+#include "parsetools.h"
+#include "soaplib.h"
+#include "statcodes.h"
+#include "unixutil.h"
+#include "upnp.h"
+#include "upnpapi.h"
+#include "uri.h"
 
-                #include <assert.h>
-                #include <ctype.h>
-                #include <stdarg.h>
-                #include <stdio.h>
-                #include <stdlib.h>
+#include <assert.h>
+#include <ctype.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-                #define SOAP_ACTION_RESP 1
-                #define SOAP_VAR_RESP 2
-                /*#define SOAP_ERROR_RESP       3*/
-                #define SOAP_ACTION_RESP_ERROR 3
-                #define SOAP_VAR_RESP_ERROR 4
+#define SOAP_ACTION_RESP 1
+#define SOAP_VAR_RESP 2
+/*#define SOAP_ERROR_RESP       3*/
+#define SOAP_ACTION_RESP_ERROR 3
+#define SOAP_VAR_RESP_ERROR 4
 
 /*!
  * \brief Compares 'name' and node's name.
@@ -951,5 +951,5 @@ int SoapGetServiceVarStatus(char *action_url, char *var_name, char **var_value)
         }
 }
 
-        #endif /* EXCLUDE_SOAP */
+#endif /* EXCLUDE_SOAP */
 #endif /* INCLUDE_CLIENT_APIS */

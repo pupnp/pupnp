@@ -41,33 +41,33 @@
 
 #if EXCLUDE_WEB_SERVER == 0
 
-        #include "UpnpExtraHeaders.h"
-        #include "UpnpFileInfo.h"
-        #include "UpnpIntTypes.h"
-        #include "UpnpStdInt.h"
-        #include "VirtualDir.h"
-        #include "httpparser.h"
-        #include "httpreadwrite.h"
-        #include "ithread.h"
-        #include "membuffer.h"
-        #include "ssdplib.h"
-        #include "statcodes.h"
-        #include "strintmap.h"
-        #include "unixutil.h"
-        #include "upnp.h"
-        #include "upnpapi.h"
-        #include "upnputil.h"
-        #include "webserver.h"
+#include "UpnpExtraHeaders.h"
+#include "UpnpFileInfo.h"
+#include "UpnpIntTypes.h"
+#include "UpnpStdInt.h"
+#include "VirtualDir.h"
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "ithread.h"
+#include "membuffer.h"
+#include "ssdplib.h"
+#include "statcodes.h"
+#include "strintmap.h"
+#include "unixutil.h"
+#include "upnp.h"
+#include "upnpapi.h"
+#include "upnputil.h"
+#include "webserver.h"
 
-        #include <assert.h>
-        #include <fcntl.h>
-        #include <sys/stat.h>
+#include <assert.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
-        #ifdef _WIN32
-                #if defined(_MSC_VER) && _MSC_VER < 1900
-                        #define snprintf _snprintf
-                #endif
-        #endif
+#ifdef _WIN32
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
+#endif
 
 /*!
  * Response Types.
@@ -118,27 +118,27 @@ static const char *gMediaTypes[] = {
         /*! 5. */
         "text"};
 
-        /*
-         * Defines.
-         */
+/*
+ * Defines.
+ */
 
-        /* index into 'gMediaTypes' */
-        #define AUDIO_STR "\1"
-        #define VIDEO_STR "\2"
-        #define IMAGE_STR "\3"
-        #define APPLICATION_STR "\4"
-        #define TEXT_STR "\5"
+/* index into 'gMediaTypes' */
+#define AUDIO_STR "\1"
+#define VIDEO_STR "\2"
+#define IMAGE_STR "\3"
+#define APPLICATION_STR "\4"
+#define TEXT_STR "\5"
 
-        /* int index */
-        #define APPLICATION_INDEX 4
-        #define TEXT_INDEX 5
+/* int index */
+#define APPLICATION_INDEX 4
+#define TEXT_INDEX 5
 
-        /* general */
-        #define NUM_MEDIA_TYPES 70
-        #define NUM_HTTP_HEADER_NAMES 33
+/* general */
+#define NUM_MEDIA_TYPES 70
+#define NUM_HTTP_HEADER_NAMES 33
 
-        #define ASCTIME_R_BUFFER_SIZE 26
-        #ifdef _WIN32
+#define ASCTIME_R_BUFFER_SIZE 26
+#ifdef _WIN32
 static char *web_server_asctime_r(const struct tm *tm, char *buf)
 {
         if (tm == NULL || buf == NULL)
@@ -147,9 +147,9 @@ static char *web_server_asctime_r(const struct tm *tm, char *buf)
         asctime_s(buf, ASCTIME_R_BUFFER_SIZE, tm);
         return buf;
 }
-        #else
-                #define web_server_asctime_r asctime_r
-        #endif
+#else
+#define web_server_asctime_r asctime_r
+#endif
 
 /* sorted by file extension; must have 'NUM_MEDIA_TYPES' extensions */
 static const char *gEncodedMediaTypes =
@@ -1500,13 +1500,13 @@ static int http_RecvPostMessage(
                 if (Fp == NULL)
                         return HTTP_INTERNAL_SERVER_ERROR;
         } else {
-        #ifdef UPNP_ENABLE_POST_WRITE
+#ifdef UPNP_ENABLE_POST_WRITE
                 Fp = fopen(filename, "wb");
                 if (Fp == NULL)
                         return HTTP_UNAUTHORIZED;
-        #else
+#else
                 return HTTP_NOT_FOUND;
-        #endif
+#endif
         }
         parser->position = POS_ENTITY;
         do {

@@ -37,23 +37,23 @@
  */
 
 #if EXCLUDE_GENA == 0
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
 
-                #include "UpnpEventSubscribe.h"
-                #include "gena.h"
-                #include "httpparser.h"
-                #include "httpreadwrite.h"
-                #include "parsetools.h"
-                #include "statcodes.h"
-                #include "sysdep.h"
-                #include "upnpapi.h"
-                #include "uuid.h"
+#include "UpnpEventSubscribe.h"
+#include "gena.h"
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "parsetools.h"
+#include "statcodes.h"
+#include "sysdep.h"
+#include "upnpapi.h"
+#include "uuid.h"
 
-                #ifdef _WIN32
-                        #if defined(_MSC_VER) && _MSC_VER < 1900
-                                #define snprintf _snprintf
-                        #endif
-                #endif
+#ifdef _WIN32
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
+#endif
 
 extern ithread_mutex_t GlobalClientSubscribeMutex;
 
@@ -493,7 +493,7 @@ exit_function:
         return return_code;
 }
 
-                #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
 int genaUnSubscribe(UpnpClient_Handle client_handle, const UpnpString *in_sid)
 {
         GenlibClientSubscription *sub = NULL;
@@ -540,9 +540,9 @@ exit_function:
         GenlibClientSubscription_delete(sub_copy);
         return return_code;
 }
-                #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
 
-                #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
 int genaSubscribe(UpnpClient_Handle client_handle,
         const UpnpString *PublisherURL,
         int *TimeOut,
@@ -635,7 +635,7 @@ error_handler:
 
         return return_code;
 }
-                #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
 
 int genaRenewSubscription(
         UpnpClient_Handle client_handle, const UpnpString *in_sid, int *TimeOut)
@@ -885,5 +885,5 @@ exit_function:
         UpnpEvent_delete(event_struct);
 }
 
-        #endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS */
 #endif /* EXCLUDE_GENA */

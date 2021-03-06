@@ -31,13 +31,13 @@
 
 #include "config.h"
 #if EXCLUDE_GENA == 0
-        #include "gena.h"
-        #include "gena_ctrlpt.h"
-        #include "gena_device.h"
-        #include "httpparser.h"
-        #include "httpreadwrite.h"
-        #include "statcodes.h"
-        #include "unixutil.h"
+#include "gena.h"
+#include "gena_ctrlpt.h"
+#include "gena_device.h"
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "statcodes.h"
+#include "unixutil.h"
 
 /************************************************************************
  * Function : error_respond
@@ -87,7 +87,7 @@ void genaCallback(
         (void)parser;
 
         if (request->method == HTTPMETHOD_SUBSCRIBE) {
-        #ifdef INCLUDE_DEVICE_APIS
+#ifdef INCLUDE_DEVICE_APIS
                 found_function = 1;
                 if (httpmsg_find_hdr(request, HDR_NT, NULL) == NULL) {
                         /* renew subscription */
@@ -106,13 +106,13 @@ void genaCallback(
                 found_function = 1;
                 /* unsubscribe */
                 gena_process_unsubscribe_request(info, request);
-        #endif
+#endif
         } else if (request->method == HTTPMETHOD_NOTIFY) {
-        #ifdef INCLUDE_CLIENT_APIS
+#ifdef INCLUDE_CLIENT_APIS
                 found_function = 1;
                 /* notify */
                 gena_process_notification_event(info, request);
-        #endif
+#endif
         }
 
         if (!found_function) {

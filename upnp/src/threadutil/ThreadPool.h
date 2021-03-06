@@ -46,22 +46,22 @@
 #include <errno.h>
 
 #ifdef _WIN32
-        #include <time.h>
+#include <time.h>
 
-        #ifndef _TIMEZONE_DEFINED
+#ifndef _TIMEZONE_DEFINED
 struct timezone
 {
         int tz_minuteswest; /* minutes W of Greenwich */
         int tz_dsttime; /* type of dst correction */
 };
 int gettimeofday(struct timeval *tv, struct timezone *tz);
-        #endif
+#endif
 #else /* _WIN32 */
-        #include <sys/param.h>
-        #include <sys/time.h> /* for gettimeofday() */
-        #if defined(__APPLE__) || defined(__NetBSD__)
-                #include <sys/resource.h> /* for setpriority() */
-        #endif
+#include <sys/param.h>
+#include <sys/time.h> /* for gettimeofday() */
+#if defined(__APPLE__) || defined(__NetBSD__)
+#include <sys/resource.h> /* for setpriority() */
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -129,7 +129,7 @@ typedef enum priority
 #define STATS 1
 
 #ifdef _DEBUG
-        #define DEBUG 1
+#define DEBUG 1
 #endif
 
 typedef int PolicyType;

@@ -53,9 +53,9 @@
 /* Function declarations only if tools compiled into the library */
 #if UPNP_HAVE_TOOLS
 
-        #ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-        #endif
+#endif
 
 /*!
  * \brief Converts an SDK error code into a string error message suitable for
@@ -262,11 +262,11 @@ EXPORT_SPEC int UpnpAddToPropertySet(
         /*! [in] The status variable value. */
         const char *ArgVal);
 
-        #ifdef __cplusplus
+#ifdef __cplusplus
 }
-        #endif
+#endif
 
-        /*! @} */
+/*! @} */
 
 #endif /* UPNP_HAVE_TOOLS */
 

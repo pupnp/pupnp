@@ -50,15 +50,15 @@
 #include <stdio.h>
 
 #ifdef _WIN32
-        #if defined(_MSC_VER) && _MSC_VER < 1900
-                #define snprintf _snprintf
-        #endif
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
 #else
-        #include <sys/types.h>
+#include <sys/types.h>
 #endif
 
 #ifdef INCLUDE_DEVICE_APIS
-        #ifdef INTERNAL_WEB_SERVER
+#ifdef INTERNAL_WEB_SERVER
 
 /************************************************************************
  *	Function :	addrToString
@@ -428,5 +428,5 @@ error_handler:
         }
         return err_code;
 }
-        #endif /* INCLUDE_DEVICE_APIS */
+#endif /* INCLUDE_DEVICE_APIS */
 #endif /* INTERNAL_WEB_SERVER */

@@ -42,27 +42,27 @@
 #include "upnputil.h"
 
 #ifdef INCLUDE_CLIENT_APIS
-        #if EXCLUDE_SSDP == 0
+#if EXCLUDE_SSDP == 0
 
-                #include "SSDPResultData.h"
-                #include "SSDPResultDataCallback.h"
-                #include "ThreadPool.h"
-                #include "UpnpInet.h"
-                #include "httpparser.h"
-                #include "httpreadwrite.h"
-                #include "ssdplib.h"
-                #include "statcodes.h"
-                #include "unixutil.h"
-                #include "upnpapi.h"
+#include "SSDPResultData.h"
+#include "SSDPResultDataCallback.h"
+#include "ThreadPool.h"
+#include "UpnpInet.h"
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "ssdplib.h"
+#include "statcodes.h"
+#include "unixutil.h"
+#include "upnpapi.h"
 
-                #include <stdio.h>
+#include <stdio.h>
 
-                #ifdef _WIN32
-                        #include <string.h>
-                        #if defined(_MSC_VER) && _MSC_VER < 1900
-                                #define snprintf _snprintf
-                        #endif
-                #endif /* _WIN32 */
+#ifdef _WIN32
+#include <string.h>
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
+#endif /* _WIN32 */
 
 /*!
  * \brief Sends a callback to the control point application with a SEARCH
@@ -447,10 +447,10 @@ static int CreateClientRequestPacket(
         return UPNP_E_SUCCESS;
 }
 
-                /*!
-                 * \brief
-                 */
-                #ifdef UPNP_ENABLE_IPV6
+/*!
+ * \brief
+ */
+#ifdef UPNP_ENABLE_IPV6
 static int CreateClientRequestPacketUlaGua(
         /*! [in,out] . */
         char *RqstBuf,
@@ -524,7 +524,7 @@ static int CreateClientRequestPacketUlaGua(
 
         return UPNP_E_SUCCESS;
 }
-                #endif /* UPNP_ENABLE_IPV6 */
+#endif /* UPNP_ENABLE_IPV6 */
 
 /*!
  * \brief
@@ -581,18 +581,18 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
         int *id = NULL;
         int ret = 0;
         char ReqBufv4[BUFSIZE];
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
         char ReqBufv6[BUFSIZE];
         char ReqBufv6UlaGua[BUFSIZE];
-                #endif
+#endif
         struct sockaddr_storage __ss_v4;
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
         struct sockaddr_storage __ss_v6;
-                #endif
+#endif
         struct sockaddr_in *destAddr4 = (struct sockaddr_in *)&__ss_v4;
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
         struct sockaddr_in6 *destAddr6 = (struct sockaddr_in6 *)&__ss_v6;
-                #endif
+#endif
         fd_set wrSet;
         SsdpSearchArg *newArg = NULL;
         SsdpSearchExpArg *expArg = NULL;
@@ -627,7 +627,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
                 ReqBufv4, sizeof(ReqBufv4), timeTillRead, St, AF_INET);
         if (retVal != UPNP_E_SUCCESS)
                 return retVal;
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
         retVal = CreateClientRequestPacket(
                 ReqBufv6, sizeof(ReqBufv6), timeTillRead, St, AF_INET6);
         if (retVal != UPNP_E_SUCCESS)
@@ -639,20 +639,20 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
                 AF_INET6);
         if (retVal != UPNP_E_SUCCESS)
                 return retVal;
-                #endif
+#endif
 
         memset(&__ss_v4, 0, sizeof(__ss_v4));
         destAddr4->sin_family = (sa_family_t)AF_INET;
         inet_pton(AF_INET, SSDP_IP, &destAddr4->sin_addr);
         destAddr4->sin_port = htons(SSDP_PORT);
 
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
         memset(&__ss_v6, 0, sizeof(__ss_v6));
         destAddr6->sin6_family = (sa_family_t)AF_INET6;
         inet_pton(AF_INET6, SSDP_IPV6_SITELOCAL, &destAddr6->sin6_addr);
         destAddr6->sin6_port = htons(SSDP_PORT);
         destAddr6->sin6_scope_id = gIF_INDEX;
-                #endif
+#endif
 
         /* add search criteria to list */
         HandleLock();
@@ -689,7 +689,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
                 FD_SET(gSsdpReqSocket4, &wrSet);
                 max_fd = max(max_fd, gSsdpReqSocket4);
         }
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
         if (gSsdpReqSocket6 != INVALID_SOCKET) {
                 setsockopt(gSsdpReqSocket6,
                         IPPROTO_IPV6,
@@ -699,7 +699,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
                 FD_SET(gSsdpReqSocket6, &wrSet);
                 max_fd = max(max_fd, gSsdpReqSocket6);
         }
-                #endif
+#endif
         ret = select(max_fd + 1, NULL, &wrSet, NULL, NULL);
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -710,12 +710,12 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
                         "SSDP_LIB: Error in select(): %s\n",
                         errorBuffer);
                 UpnpCloseSocket(gSsdpReqSocket4);
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
                 UpnpCloseSocket(gSsdpReqSocket6);
-                #endif
+#endif
                 return UPNP_E_INTERNAL_ERROR;
         }
-                #ifdef UPNP_ENABLE_IPV6
+#ifdef UPNP_ENABLE_IPV6
         if (gSsdpReqSocket6 != INVALID_SOCKET &&
                 FD_ISSET(gSsdpReqSocket6, &wrSet)) {
                 int NumCopy = 0;
@@ -755,7 +755,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
                         imillisleep(SSDP_PAUSE);
                 }
         }
-                #endif /* IPv6 */
+#endif /* IPv6 */
         if (gSsdpReqSocket4 != INVALID_SOCKET &&
                 FD_ISSET(gSsdpReqSocket4, &wrSet)) {
                 int NumCopy = 0;
@@ -779,7 +779,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 
         return 1;
 }
-        #endif /* EXCLUDE_SSDP */
+#endif /* EXCLUDE_SSDP */
 #endif /* INCLUDE_CLIENT_APIS */
 
 /* @} SSDPlib */

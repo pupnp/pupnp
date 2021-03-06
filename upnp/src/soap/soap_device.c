@@ -37,40 +37,40 @@
 #include "config.h"
 
 #ifdef INCLUDE_DEVICE_APIS
-        #if EXCLUDE_SOAP == 0
+#if EXCLUDE_SOAP == 0
 
-                #include "UpnpActionRequest.h"
-                #include "httpparser.h"
-                #include "httpreadwrite.h"
-                #include "parsetools.h"
-                #include "soaplib.h"
-                #include "ssdplib.h"
-                #include "statcodes.h"
-                #include "unixutil.h"
-                #include "upnpapi.h"
+#include "UpnpActionRequest.h"
+#include "httpparser.h"
+#include "httpreadwrite.h"
+#include "parsetools.h"
+#include "soaplib.h"
+#include "ssdplib.h"
+#include "statcodes.h"
+#include "unixutil.h"
+#include "upnpapi.h"
 
-                #include <assert.h>
-                #include <string.h>
+#include <assert.h>
+#include <string.h>
 
-                #ifdef _WIN32
-                        #if defined(_MSC_VER) && _MSC_VER < 1900
-                                #define snprintf _snprintf
-                        #endif
-                #endif
+#ifdef _WIN32
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
+#endif
 
-                /*! timeout duration in secs for transmission/reception */
-                #define SOAP_TIMEOUT UPNP_TIMEOUT
+/*! timeout duration in secs for transmission/reception */
+#define SOAP_TIMEOUT UPNP_TIMEOUT
 
-                #define SREQ_HDR_NOT_FOUND -1
-                #define SREQ_BAD_HDR_FORMAT -2
-                #define SREQ_NOT_EXTENDED -3
+#define SREQ_HDR_NOT_FOUND -1
+#define SREQ_BAD_HDR_FORMAT -2
+#define SREQ_NOT_EXTENDED -3
 
-                #define SOAP_INVALID_ACTION 401
-                #define SOAP_INVALID_ARGS 402
-                #define SOAP_OUT_OF_SYNC 403
-                #define SOAP_INVALID_VAR 404
-                #define SOAP_ACTION_FAILED 501
-                #define SOAP_MEMORY_OUT 603
+#define SOAP_INVALID_ACTION 401
+#define SOAP_INVALID_ARGS 402
+#define SOAP_OUT_OF_SYNC 403
+#define SOAP_INVALID_VAR 404
+#define SOAP_ACTION_FAILED 501
+#define SOAP_MEMORY_OUT 603
 
 static const char *SOAP_BODY = "Body";
 static const char *SOAP_URN = "http:/"
@@ -830,6 +830,6 @@ error_handler:
         return;
 }
 
-        #endif /* EXCLUDE_SOAP */
+#endif /* EXCLUDE_SOAP */
 
 #endif /* INCLUDE_DEVICE_APIS */

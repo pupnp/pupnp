@@ -57,11 +57,11 @@
 #include <time.h>
 
 #ifdef UPNP_ENABLE_OPEN_SSL
-        #include <openssl/ssl.h>
+#include <openssl/ssl.h>
 #endif
 
 #ifndef MSG_NOSIGNAL
-        #define MSG_NOSIGNAL 0
+#define MSG_NOSIGNAL 0
 #endif
 
 #ifdef UPNP_ENABLE_OPEN_SSL
