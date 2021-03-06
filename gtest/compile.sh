@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-BUILD_DIR=".."
+BUILD_DIR="$HOME/devel/pupnp-dev/pupnp"
 TESTNAME=$(/usr/bin/basename -s.cpp "$1")
 /usr/bin/g++ -std=c++11 -pedantic-errors -Wall \
 -o"$TESTNAME".a \
@@ -14,7 +14,7 @@ TESTNAME=$(/usr/bin/basename -s.cpp "$1")
 -DUPNP_ENABLE_IPV6 \
 "$1" \
 "$BUILD_DIR"/lib/libgtestd.a \
+"$BUILD_DIR"/lib/libgmockd.a \
 "$BUILD_DIR"/upnp/libupnp.a \
 "$BUILD_DIR"/ixml/libixml.a \
--lpthread \
-&& ./"$TESTNAME".a
+-lpthread
