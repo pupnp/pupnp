@@ -38,11 +38,12 @@
  */
 
 #include "upnp.h"
+
 #include <errno.h>
 
 #define GEMD_OUT_OF_MEMORY -1
 #define EVENT_TIMEDOUT -2
-#define EVENT_TERMINATE	-3
+#define EVENT_TERMINATE -3
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,20 +54,20 @@ extern "C" {
  * source buffer. Null terminate the destination buffer.
  */
 void linecopy(
-	/*! [out] output buffer. */
-	char dest[LINE_SIZE],
-	/*! [in] input buffer. */
-	const char *src);
+        /*! [out] output buffer. */
+        char dest[LINE_SIZE],
+        /*! [in] input buffer. */
+        const char *src);
 
 /*!
  * \brief Copy no of bytes spcified by the NAME_SIZE constant, from the
  * source buffer. Null terminate the destination buffer
  */
 void namecopy(
-	/*! [out] output buffer. */
-	char dest[NAME_SIZE],
-	/*! [in] input buffer. */
-	const char *src);
+        /*! [out] output buffer. */
+        char dest[NAME_SIZE],
+        /*! [in] input buffer. */
+        const char *src);
 
 /*!
  * \brief Determine if the srclen passed in paramter is less than the
@@ -77,12 +78,12 @@ void namecopy(
  * buffer. Null terminate the destination buffer.
  */
 void linecopylen(
-	/*! [out] output buffer. */
-	char dest[LINE_SIZE],
-	/*! [in] input buffer. */
-	const char *src,
-	/*! [in] bytes to be copied. */
-	size_t srclen);
+        /*! [out] output buffer. */
+        char dest[LINE_SIZE],
+        /*! [in] input buffer. */
+        const char *src,
+        /*! [in] bytes to be copied. */
+        size_t srclen);
 
 #ifdef __cplusplus
 }
@@ -94,26 +95,25 @@ void linecopylen(
 /* C specific */
 /* VC needs these in C++ mode too (do other compilers?) */
 #if !defined(__cplusplus) || defined(UPNP_USE_MSVCPP)
-	#ifdef _WIN32
-		#ifndef S_ISREG
-			#define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
-		#endif
-		#ifndef S_ISDIR
-			#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
-		#endif
-		#ifndef EADDRINUSE		/* VS2010 has this defined */
-			#define EADDRINUSE		WSAEADDRINUSE
-		#endif
-		#define strcasecmp		stricmp
-		#define strncasecmp		strnicmp
-		#define sleep(a)		Sleep((a)*1000)
-		#define usleep(a)		Sleep((a)/1000)
-		#define strerror_r(a,b,c)	(strerror_s((b),(c),(a)))
-	#else
-		#define max(a, b)   (((a)>(b))? (a):(b))
-		#define min(a, b)   (((a)<(b))? (a):(b))
-	#endif /* _WIN32 */
+#ifdef _WIN32
+#ifndef S_ISREG
+#define S_ISREG(m) (((m)&S_IFMT) == S_IFREG)
+#endif
+#ifndef S_ISDIR
+#define S_ISDIR(m) (((m)&S_IFMT) == S_IFDIR)
+#endif
+#ifndef EADDRINUSE /* VS2010 has this defined */
+#define EADDRINUSE WSAEADDRINUSE
+#endif
+#define strcasecmp stricmp
+#define strncasecmp strnicmp
+#define sleep(a) Sleep((a)*1000)
+#define usleep(a) Sleep((a) / 1000)
+#define strerror_r(a, b, c) (strerror_s((b), (c), (a)))
+#else
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#endif /* _WIN32 */
 #endif /* !defined(__cplusplus) || defined(UPNP_USE_MSVCPP) */
 
 #endif /* UTIL_H */
-

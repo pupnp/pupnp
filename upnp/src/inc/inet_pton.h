@@ -33,8 +33,8 @@
  * \return
  *	pointer to presentation format address (`dst'), or NULL (see errno).
  */
-extern const char *inet_ntop(int af, const void *src, char *dst,
-			     socklen_t size);
+extern const char *inet_ntop(
+        int af, const void *src, char *dst, socklen_t size);
 
 /*!
  * \brief convert from presentation format (which usually means ASCII printable)
@@ -43,7 +43,8 @@ extern const char *inet_ntop(int af, const void *src, char *dst,
  * \return
  *	\li 1 if the address was valid for the specified address family
  *	\li 0 if the address wasn't valid (`dst' is untouched in this case)
- *	\li -1 if some other error occurred (`dst' is untouched in this case, too)
+ *	\li -1 if some other error occurred (`dst' is untouched in this case,
+ *too)
  */
 extern int inet_pton(int af, const char *src, void *dst);
 
