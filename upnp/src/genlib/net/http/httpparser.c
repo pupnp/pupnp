@@ -46,6 +46,8 @@
 #include "statcodes.h"
 #include "strintmap.h"
 #include "unixutil.h"
+#include "UpnpExtraHeaders.h"
+#include "list.h"
 #include "upnpdebug.h"
 
 #include <assert.h>
@@ -2208,6 +2210,84 @@ const char *method_to_str(http_method_t method)
 	assert(index != -1);
 
 	return index == -1 ? NULL : Http_Method_Table[index].name;
+}
+
+/************************************************************************
+* Function: parser_get_unknown_headers
+*
+* Parameters:
+*	IN http_message_t req ;		HTTP request
+*	INOUT UpnpListHead list ;   Extra headers list
+*
+* Description: Append unknown HTTP headers to the list.
+*
+* Returns:
+*	HTTP_OK
+*	HTTP_INTERNAL_SERVER_ERROR
+************************************************************************/
+int parser_get_unknown_headers(http_message_t *req, UpnpListHead *list)
+{
+	http_header_t *header;
+	ListNode *node;
+	int index;
+	UpnpExtraHeaders *extraHeader;
+	UpnpListHead *extraHeaderNode;
+
+	node = ListHead(&req->headers);
+	while (node != NULL) {
+		header = (http_header_t *)node->item;
+		/* find header type. */
+		index = map_str_to_int((const char *)header->name.buf,
+			header->name.length,
+			Http_Header_Names,
+			NUM_HTTP_HEADER_NAMES,
+			0);
+		if (index < 0) {
+			extraHeader = UpnpExtraHeaders_new();
+			if (!extraHeader) {
+				free_http_headers_list(list);
+				return HTTP_INTERNAL_SERVER_ERROR;
+			}
+			extraHeaderNode =
+				(UpnpListHead *)UpnpExtraHeaders_get_node(
+					extraHeader);
+			UpnpListInsert(list, UpnpListEnd(list), extraHeaderNode);
+			UpnpExtraHeaders_strncpy_name(extraHeader,
+				header->name.buf,
+				header->name.length);
+			UpnpExtraHeaders_strncpy_value(extraHeader,
+				header->value.buf,
+				header->value.length);
+		}
+		node = ListNext(&req->headers, node);
+	}
+
+	return HTTP_OK;
+}
+
+/************************************************************************
+* Function: free_http_headers_list
+*
+* Parameters:
+*	IN UpnpListHead list ;   Extra headers list
+*
+* Description: Free all extra headers nodes in the given list.
+*
+* Returns:
+*	HTTP_OK
+*	HTTP_INTERNAL_SERVER_ERROR
+************************************************************************/
+void free_http_headers_list(UpnpListHead *list)
+{
+	UpnpListIter pos;
+	UpnpExtraHeaders *extra;
+
+	for (pos = UpnpListBegin(list);
+		pos != UpnpListEnd(list);) {
+		extra = (UpnpExtraHeaders *)pos;
+		pos = UpnpListErase(list, pos);
+		UpnpExtraHeaders_delete(extra);
+	}
 }
 
 #ifdef DEBUG

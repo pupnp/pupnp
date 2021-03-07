@@ -35,6 +35,7 @@ static struct s_Member UpnpActionRequest_members[] = {
 		struct sockaddr_storage,
 		"UpnpInet.h"),
 	INIT_MEMBER(Os, TYPE_STRING, 0, 0),
+	INIT_MEMBER(ExtraHeadersList, TYPE_LIST, 0, 0),
 };
 
 static struct s_Member UpnpDiscovery_members[] = {
@@ -965,7 +966,7 @@ int main(int argc, const char *argv[])
 		if (!fp) {
 			continue;
 		}
-		printf("Writting %s ... ", c[i].header);
+		printf("Writing %s ... ", c[i].header);
 		write_header(fp, c + i);
 		fclose(fp);
 		printf("done!\n");
@@ -974,7 +975,7 @@ int main(int argc, const char *argv[])
 		if (!fp) {
 			continue;
 		}
-		printf("Writting %s ... ", c[i].source);
+		printf("Writing %s ... ", c[i].source);
 		write_source(fp, c + i);
 		fclose(fp);
 		printf("done!\n");
