@@ -214,7 +214,7 @@ if test "x$enable_open_ssl" = xyes ; then
         AC_DEFINE(UPNP_ENABLE_OPEN_SSL, 1, [see upnpconfig.h])
 fi
 
-RT_BOOL_ARG_ENABLE([blocking_tcp_connections], [yes], [blocking TCP connections])
+RT_BOOL_ARG_ENABLE([blocking_tcp_connections], [no], [blocking TCP connections])
 if test "x$enable_blocking_tcp_connections" = xyes ; then
         AC_DEFINE(UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS, 1, [see upnpconfig.h])
 fi
@@ -224,12 +224,7 @@ if test "x$enable_scriptsupport" = xyes ; then
         AC_DEFINE(IXML_HAVE_SCRIPTSUPPORT, 1, [see upnpconfig.h])
 fi
 
-RT_BOOL_ARG_ENABLE([postwrite], [no], [write to the filesystem on otherwise unhandled POST requests])
-if test "x$enable_postwrite" = xyes ; then
-        AC_DEFINE(UPNP_ENABLE_POST_WRITE, 1, [see upnpconfig.h])
-fi
-
-RT_BOOL_ARG_ENABLE([reuseaddr], [no], [bind the miniserver socket with reuseaddr to allow clean restarts])
+RT_BOOL_ARG_ENABLE([reuseaddr], [yes], [bind the miniserver socket with reuseaddr to allow clean restarts])
 if test "x$enable_reuseaddr" = xyes ; then
         AC_DEFINE(UPNP_MINISERVER_REUSEADDR, 1, [see upnpconfig.h])
 fi
