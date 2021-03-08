@@ -184,19 +184,19 @@ if (open_ssl)
 	endif()
 endif()
 
-option (blocking_tcp_connections "blocking TCP connections" ON)
-
+option (blocking_tcp_connections "blocking TCP connections" OFF)
 if (blocking_tcp_connections)
 	set (UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS 1) #see upnpconfig.h
 endif()
 
 option (scriptsupport "script support for IXML document tree, see ixml.h" ON)
 set (IXML_HAVE_SCRIPTSUPPORT ${scriptsupport}) #see upnpconfig.h
-option (postwrite "write to the filesystem on otherwise unhandled POST requests" OFF)
-set (UPNP_ENABLE_POST_WRITE ${postwrite}) #see upnpconfig.h
-option (reuseaddr "bind the miniserver socket with reuseaddr to allow clean restarts" OFF)
+
+option (reuseaddr "Bind the miniserver socket with SO_REUSEADDR to allow clean restarts" ON)
 set (UPNP_MINISERVER_REUSEADDR ${reuseaddr}) #see upnpconfig.h
+
 option (samples "compilation of upnp/sample/ code" ON)
+
 find_package (Git)
 cmake_dependent_option (DOWNLOAD_AND_BUILD_DEPS "Get all missing stuff" OFF ${Git_FOUND} OFF)
 
