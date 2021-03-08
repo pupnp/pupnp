@@ -1563,13 +1563,7 @@ static int http_RecvPostMessage(
 		if (Fp == NULL)
 			return HTTP_INTERNAL_SERVER_ERROR;
 	} else {
-	#ifdef UPNP_ENABLE_POST_WRITE
-		Fp = fopen(filename, "wb");
-		if (Fp == NULL)
-			return HTTP_UNAUTHORIZED;
-	#else
-		return HTTP_NOT_FOUND;
-	#endif
+		return HTTP_NOT_IMPLEMENTED;
 	}
 	parser->position = POS_ENTITY;
 	do {

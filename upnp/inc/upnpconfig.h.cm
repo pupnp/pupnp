@@ -123,10 +123,6 @@
  * calls (i.e. configure --enable_blocking_tcp_connections) */
 #cmakedefine UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS 1
 
-/** Defined to 1 if the library has been compiled to support filesystem writes
- * on POST (i.e. configure --enable-postwrite) */
-#cmakedefine UPNP_ENABLE_POST_WRITE 1
-
 /** Defined to 1 if the library has been compiled bind the miniserver socket
  * with SO_REUSEADDR (i.e. configure --enable_reuseaddr) */
 #cmakedefine UPNP_MINISERVER_REUSEADDR 1
