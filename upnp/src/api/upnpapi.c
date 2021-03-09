@@ -1776,12 +1776,11 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
                 }
         } else {
                 /* Manual */
-                if (strlen(description) > LINE_SIZE - 1) {
+                if (strlen(description) >= LINE_SIZE) {
                         ixmlDocument_free(*xmlDoc);
                         return UPNP_E_URL_TOO_BIG;
                 }
-                strncpy(descURL, description, LINE_SIZE - 1);
-                descURL[LINE_SIZE - 1] = '\0';
+                strncpy(descURL, description, LINE_SIZE);
         }
 
         assert(*xmlDoc != NULL);
@@ -1808,11 +1807,10 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
                 return UPNP_E_INVALID_PARAM;
         }
 
-        if (strlen(description) > LINE_SIZE - (size_t)1) {
+        if (strlen(description) >= LINE_SIZE) {
                 return UPNP_E_URL_TOO_BIG;
         }
-        strncpy(descURL, description, LINE_SIZE - 1);
-        descURL[LINE_SIZE - 1] = '\0';
+        strncpy(descURL, description, LINE_SIZE);
 
         retVal = UpnpDownloadXmlDoc(description, xmlDoc);
         if (retVal != UPNP_E_SUCCESS) {
