@@ -118,9 +118,9 @@ int AdvertiseAndReply(int AdFlag,
         const DOMString dbgStr;
         int NumCopy = 0;
 
-        memset(UDNstr, 0, sizeof(UDNstr));
-        memset(devType, 0, sizeof(devType));
-        memset(servType, 0, sizeof(servType));
+        UDNstr[0] = 0;
+        devType[0] = 0;
+        servType[0] = 0;
 
         UpnpPrintf(UPNP_ALL,
                 API,
@@ -196,7 +196,8 @@ int AdvertiseAndReply(int AdFlag,
                         tmpStr = ixmlNode_getNodeValue(textNode);
                         if (!tmpStr)
                                 continue;
-                        strncpy(devType, tmpStr, sizeof(devType) - 1);
+                        strncpy(devType, tmpStr, sizeof devType);
+                        devType[sizeof devType - 1] = 0;
                         UpnpPrintf(UPNP_ALL,
                                 API,
                                 __FILE__,
@@ -255,7 +256,8 @@ int AdvertiseAndReply(int AdFlag,
                                         "UDN not found!\n");
                                 continue;
                         }
-                        strncpy(UDNstr, tmpStr, sizeof(UDNstr) - 1);
+                        strncpy(UDNstr, tmpStr, sizeof UDNstr);
+                        UDNstr[sizeof UDNstr - 1] = 0;
                         UpnpPrintf(UPNP_INFO,
                                 API,
                                 __FILE__,
@@ -439,7 +441,8 @@ int AdvertiseAndReply(int AdFlag,
                                 tmpStr = ixmlNode_getNodeValue(textNode);
                                 if (!tmpStr)
                                         continue;
-                                strncpy(servType, tmpStr, sizeof(servType) - 1);
+                                strncpy(servType, tmpStr, sizeof servType);
+                                servType[sizeof servType - 1] = 0;
                                 UpnpPrintf(UPNP_INFO,
                                         API,
                                         __FILE__,
@@ -598,26 +601,26 @@ int unique_service_name(char *cmd, SsdpEvent *Evt)
                         strncpy(Evt->UDN, TempPtr, n);
                         Evt->UDN[n] = '\0';
                 } else {
-                        memset(Evt->UDN, 0, sizeof(Evt->UDN));
-                        strncpy(Evt->UDN, TempPtr, sizeof Evt->UDN - 1);
+                        strncpy(Evt->UDN, TempPtr, sizeof Evt->UDN);
+                        Evt->UDN[sizeof Evt->UDN - 1] = 0;
                 }
                 CommandFound = 1;
         }
         if (strstr(cmd, "urn:") != NULL && strstr(cmd, ":service:") != NULL) {
                 if ((TempPtr = strstr(cmd, "urn")) != NULL) {
-                        memset(Evt->ServiceType, 0, sizeof Evt->ServiceType);
                         strncpy(Evt->ServiceType,
                                 TempPtr,
-                                sizeof Evt->ServiceType - 1);
+                                sizeof Evt->ServiceType);
+                        Evt->ServiceType[sizeof Evt->ServiceType - 1] = 0;
                         CommandFound = 1;
                 }
         }
         if (strstr(cmd, "urn:") != NULL && strstr(cmd, ":device:") != NULL) {
                 if ((TempPtr = strstr(cmd, "urn")) != NULL) {
-                        memset(Evt->DeviceType, 0, sizeof Evt->DeviceType);
                         strncpy(Evt->DeviceType,
                                 TempPtr,
-                                sizeof Evt->DeviceType - 1);
+                                sizeof Evt->DeviceType);
+                        Evt->DeviceType[sizeof Evt->DeviceType - 1] = 0;
                         CommandFound = 1;
                 }
         }
@@ -874,10 +877,10 @@ void readFromSSDPSocket(SOCKET socket)
                         break;
 #endif /* UPNP_ENABLE_IPV6 */
                 default:
-                        memset(ntop_buf, 0, sizeof(ntop_buf));
                         strncpy(ntop_buf,
                                 "<Invalid address family>",
-                                sizeof(ntop_buf) - 1);
+                                sizeof(ntop_buf));
+                        ntop_buf[sizeof ntop_buf - 1] = 0;
                 }
                 /* clang-format off */
 		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
