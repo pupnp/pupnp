@@ -4233,54 +4233,54 @@ int UpnpAddVirtualDir(
                 /* SDK is not initialized */
                 return UPNP_E_FINISH;
         }
-
-        if ((newDirName == NULL) || (strlen(newDirName) == (size_t)0)) {
+        if (!newDirName || !strlen(newDirName)) {
                 return UPNP_E_INVALID_PARAM;
         }
-
         if (*newDirName != '/') {
-                if (strlen(newDirName) > sizeof(dirName) - 2)
+                if (strlen(newDirName) >= sizeof(dirName) - 1) {
                         return UPNP_E_INVALID_PARAM;
+                }
                 dirName[0] = '/';
-                strncpy(dirName + 1, newDirName, sizeof(dirName) - 2);
+                strncpy(dirName + 1, newDirName, sizeof(dirName) - 1);
         } else {
-                if (strlen(newDirName) > sizeof(dirName) - 1)
+                if (strlen(newDirName) >= sizeof(dirName)) {
                         return UPNP_E_INVALID_PARAM;
-                strncpy(dirName, newDirName, sizeof(dirName) - 1);
+                }
+                strncpy(dirName, newDirName, sizeof(dirName));
         }
+        /* dirName is now properly filled. All .dirName fields have the same
+         * size, so strncpy() properly zero fills everything. */
 
         pCurVirtualDir = pVirtualDirList;
-        while (pCurVirtualDir != NULL) {
+        while (pCurVirtualDir) {
                 /* already has this entry */
                 if (strcmp(pCurVirtualDir->dirName, dirName) == 0) {
-                        if (oldcookie != NULL)
+                        if (oldcookie) {
                                 *oldcookie = pCurVirtualDir->cookie;
+                        }
                         pCurVirtualDir->cookie = cookie;
                         return UPNP_E_SUCCESS;
                 }
-
                 pCurVirtualDir = pCurVirtualDir->next;
         }
 
         pNewVirtualDir = (virtualDirList *)malloc(sizeof(virtualDirList));
-        if (pNewVirtualDir == NULL) {
+        if (!pNewVirtualDir) {
                 return UPNP_E_OUTOF_MEMORY;
         }
         pNewVirtualDir->next = NULL;
-        if (oldcookie != NULL)
+        if (oldcookie) {
                 *oldcookie = NULL;
+        }
         pNewVirtualDir->cookie = cookie;
-        memset(pNewVirtualDir->dirName, 0, sizeof(pNewVirtualDir->dirName));
         strncpy(pNewVirtualDir->dirName,
                 dirName,
-                sizeof(pNewVirtualDir->dirName) - 1);
-        *(pNewVirtualDir->dirName + strlen(dirName)) = 0;
-
-        if (pVirtualDirList == NULL) { /* first virtual dir */
+                sizeof(pNewVirtualDir->dirName));
+        if (!pVirtualDirList) { /* first virtual dir */
                 pVirtualDirList = pNewVirtualDir;
         } else {
                 pLast = pVirtualDirList;
-                while (pLast->next != NULL) {
+                while (pLast->next) {
                         pLast = pLast->next;
                 }
                 pLast->next = pNewVirtualDir;
