@@ -49,13 +49,13 @@ static size_t strnlen(const char *s, size_t n)
 #if !HAVE_STRNDUP || defined(_WIN32)
 static char *strndup(const char *__string, size_t __n)
 {
-        size_t strsize = strnlen(__string, __n);
-        char *newstr = (char *)malloc(strsize + 1);
-        if (newstr == NULL)
+        size_t strsize = strnlen(__string, __n) + 1;
+        char *newstr = (char *)malloc(strsize);
+        if (newstr == NULL) {
                 return NULL;
-
+        }
         strncpy(newstr, __string, strsize);
-        newstr[strsize] = 0;
+        newstr[strsize - 1] = 0;
 
         return newstr;
 }
