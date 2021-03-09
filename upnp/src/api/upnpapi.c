@@ -3747,11 +3747,11 @@ int UpnpGetIfInfo(const char *IfName)
 
         /* Copy interface name, if it was provided. */
         if (IfName != NULL) {
-                if (strlen(IfName) > sizeof(gIF_NAME))
+                if (strlen(IfName) >= sizeof(gIF_NAME)) {
                         return UPNP_E_INVALID_INTERFACE;
-
-                memset(gIF_NAME, 0, sizeof(gIF_NAME));
-                strncpy(gIF_NAME, IfName, sizeof(gIF_NAME) - 1);
+                }
+                /* strncpy() zero fills the remaining destination bytes. */
+                strncpy(gIF_NAME, IfName, sizeof(gIF_NAME));
                 ifname_found = 1;
         }
         /* Get system interface addresses. */
