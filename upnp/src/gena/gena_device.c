@@ -597,7 +597,7 @@ static int genaInitNotifyCommon(UpnpDevice_Handle device_handle,
 
         thread_struct =
                 (notify_thread_struct *)malloc(sizeof(notify_thread_struct));
-        if (thread_struct == NULL) {
+        if (!thread_struct) {
                 line = __LINE__;
                 ret = UPNP_E_OUTOF_MEMORY;
         } else {
@@ -606,10 +606,8 @@ static int genaInitNotifyCommon(UpnpDevice_Handle device_handle,
                 thread_struct->UDN = UDN_copy;
                 thread_struct->headers = headers;
                 thread_struct->propertySet = propertySet;
-                memset(thread_struct->sid, 0, sizeof(thread_struct->sid));
-                strncpy(thread_struct->sid,
-                        sid,
-                        sizeof(thread_struct->sid) - 1);
+                strncpy(thread_struct->sid, sid, sizeof thread_struct->sid);
+                thread_struct->sid[sizeof thread_struct->sid - 1] = 0;
                 thread_struct->ctime = time(0);
                 thread_struct->reference_count = reference_count;
                 thread_struct->device_handle = device_handle;
@@ -815,7 +813,7 @@ static int genaNotifyAllCommon(UpnpDevice_Handle device_handle,
         char *UDN_copy = NULL;
         char *servId_copy = NULL;
         char *headers = NULL;
-        notify_thread_struct *thread_struct = NULL;
+        notify_thread_struct *thread_s = NULL;
 
         subscription *finger = NULL;
         service_info *service = NULL;
@@ -871,34 +869,31 @@ static int genaNotifyAllCommon(UpnpDevice_Handle device_handle,
                                 ThreadPoolJob *job = NULL;
                                 ListNode *node;
 
-                                thread_struct = (notify_thread_struct *)malloc(
+                                thread_s = (notify_thread_struct *)malloc(
                                         sizeof(notify_thread_struct));
-                                if (thread_struct == NULL) {
+                                if (thread_s == NULL) {
                                         line = __LINE__;
                                         ret = UPNP_E_OUTOF_MEMORY;
                                         break;
                                 }
 
                                 (*reference_count)++;
-                                thread_struct->reference_count =
-                                        reference_count;
-                                thread_struct->UDN = UDN_copy;
-                                thread_struct->servId = servId_copy;
-                                thread_struct->headers = headers;
-                                thread_struct->propertySet = propertySet;
-                                memset(thread_struct->sid,
-                                        0,
-                                        sizeof(thread_struct->sid));
-                                strncpy(thread_struct->sid,
+                                thread_s->reference_count = reference_count;
+                                thread_s->UDN = UDN_copy;
+                                thread_s->servId = servId_copy;
+                                thread_s->headers = headers;
+                                thread_s->propertySet = propertySet;
+                                strncpy(thread_s->sid,
                                         finger->sid,
-                                        sizeof(thread_struct->sid) - 1);
-                                thread_struct->ctime = time(0);
-                                thread_struct->device_handle = device_handle;
+                                        sizeof thread_s->sid);
+                                thread_s->sid[sizeof thread_s->sid - 1] = 0;
+                                thread_s->ctime = time(0);
+                                thread_s->device_handle = device_handle;
 
                                 maybeDiscardEvents(&finger->outgoing);
                                 job = (ThreadPoolJob *)malloc(
                                         sizeof(ThreadPoolJob));
-                                if (job == NULL) {
+                                if (!job) {
                                         line = __LINE__;
                                         ret = UPNP_E_OUTOF_MEMORY;
                                         break;
@@ -906,7 +901,7 @@ static int genaNotifyAllCommon(UpnpDevice_Handle device_handle,
                                 memset(job, 0, sizeof(ThreadPoolJob));
                                 TPJobInit(job,
                                         (start_routine)genaNotifyThread,
-                                        thread_struct);
+                                        thread_s);
                                 TPJobSetFreeFunction(
                                         job, (free_routine)free_notify_struct);
                                 TPJobSetPriority(job, MED_PRIORITY);
@@ -1080,10 +1075,9 @@ static int respond_ok(
                         "TIMEOUT: Second-%d",
                         time_out);
         } else {
-                memset(timeout_str, 0, sizeof(timeout_str));
                 strncpy(timeout_str,
                         "TIMEOUT: Second-infinite",
-                        sizeof(timeout_str) - 1);
+                        sizeof timeout_str);
         }
         if (rc < 0 || (unsigned int)rc >= sizeof(timeout_str)) {
                 error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
