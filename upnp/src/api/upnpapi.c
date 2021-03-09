@@ -3622,14 +3622,12 @@ int UpnpGetIfInfo(const char *IfName)
                 return UPNP_E_INIT;
         }
         /* Copy interface name, if it was provided. */
-        if (IfName != NULL) {
-                if (strlen(IfName) > sizeof(gIF_NAME)) {
+        if (IfName) {
+                if (strlen(IfName) >= sizeof(gIF_NAME)) {
                         free(adapts);
                         return UPNP_E_INVALID_INTERFACE;
                 }
-
-                memset(gIF_NAME, 0, sizeof(gIF_NAME));
-                strncpy(gIF_NAME, IfName, sizeof(gIF_NAME) - 1);
+                strncpy(gIF_NAME, IfName, sizeof(gIF_NAME));
                 ifname_found = 1;
         }
         for (adapts_item = adapts; adapts_item != NULL;
@@ -3638,7 +3636,7 @@ int UpnpGetIfInfo(const char *IfName)
                         adapts_item->OperStatus != IfOperStatusUp) {
                         continue;
                 }
-                if (ifname_found == 0) {
+                if (ifname_found) {
                         /* We have found a valid interface name. Keep it. */
                         /*
                          * Partial fix for Windows: Friendly name is wchar
