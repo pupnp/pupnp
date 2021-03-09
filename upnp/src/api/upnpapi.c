@@ -3636,7 +3636,7 @@ int UpnpGetIfInfo(const char *IfName)
                         adapts_item->OperStatus != IfOperStatusUp) {
                         continue;
                 }
-                if (ifname_found) {
+                if (!ifname_found) {
                         /* We have found a valid interface name. Keep it. */
                         /*
                          * Partial fix for Windows: Friendly name is wchar
