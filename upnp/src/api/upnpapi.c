@@ -3771,17 +3771,20 @@ int UpnpGetIfInfo(const char *IfName)
                         (!(ifa->ifa_flags & IFF_MULTICAST))) {
                         continue;
                 }
-                if (ifname_found == 0) {
-                        /* We have found a valid interface name. Keep it. */
-                        memset(gIF_NAME, 0, sizeof(gIF_NAME));
-                        strncpy(gIF_NAME, ifa->ifa_name, sizeof(gIF_NAME) - 1);
-                        ifname_found = 1;
+                if (!ifname_found) {
+                        if (strlen(ifa->ifa_name) < sizeof(gIF_NAME)) {
+                                /* We have found a valid interface name.
+                                 * Keep it. */
+                                strncpy(gIF_NAME,
+                                        ifa->ifa_name,
+                                        sizeof(gIF_NAME));
+                                ifname_found = 1;
+                        }
                 } else {
                         if (strncmp(gIF_NAME,
                                     ifa->ifa_name,
                                     sizeof(gIF_NAME)) != 0) {
-                                /* This is not the interface we're looking for.
-                                 */
+                                /* Not the interface we're looking for. */
                                 continue;
                         }
                 }
