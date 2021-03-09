@@ -187,20 +187,26 @@ struct tm *http_gmtime_r(const time_t *clock, struct tm *result)
 
 static int get_hoststr(const char *url_str, char **hoststr, size_t *hostlen)
 {
-        char *urlPath = alloca(strlen(url_str) + 1);
+        char *urlPath;
         char *temp;
-        memset(urlPath, 0, strlen(url_str) + 1);
-        strncpy(urlPath, url_str, strlen(url_str));
+        size_t urlPathSize;
+
+        urlPathSize = strlen(url_str) + 1;
+        urlPath = alloca(urlPathSize);
+        strncpy(urlPath, url_str, urlPathSize);
         *hoststr = strstr(urlPath, "//");
-        if (*hoststr == NULL)
+        if (!*hoststr) {
                 return UPNP_E_INVALID_URL;
+        }
         *hoststr += 2;
         temp = strchr(*hoststr, '/');
-        if (temp == NULL)
+        if (!temp) {
                 return UPNP_E_INVALID_URL;
+        }
         *temp = '\0';
         *hostlen = strlen(*hoststr);
         *temp = '/';
+
         return UPNP_E_SUCCESS;
 }
 
@@ -802,25 +808,31 @@ int http_Download(const char *url_str,
         memptr ctype;
         size_t copy_len;
         membuffer request;
-        char *urlPath = alloca(strlen(url_str) + (size_t)1);
+        size_t url_str_len;
+        size_t urlPathSize;
+        char *urlPath;
 
-        /*ret_code = parse_uri( (char*)url_str, strlen(url_str), &url ); */
+        url_str_len = strlen(url_str);
+        /*ret_code = parse_uri( (char*)url_str, url_str_len, &url ); */
         UpnpPrintf(UPNP_INFO,
                 HTTP,
                 __FILE__,
                 __LINE__,
                 "DOWNLOAD URL : %s\n",
                 url_str);
-        ret_code = http_FixStrUrl((char *)url_str, strlen(url_str), &url);
-        if (ret_code != UPNP_E_SUCCESS)
+        ret_code = http_FixStrUrl((char *)url_str, url_str_len, &url);
+        if (ret_code != UPNP_E_SUCCESS) {
                 return ret_code;
+        }
         /* make msg */
         membuffer_init(&request);
-        memset(urlPath, 0, strlen(url_str) + (size_t)1);
-        strncpy(urlPath, url_str, strlen(url_str));
+        urlPathSize = url_str_len + 1;
+        urlPath = alloca(urlPathSize);
+        strncpy(urlPath, url_str, urlPathSize);
         hoststr = strstr(urlPath, "//");
-        if (hoststr == NULL)
+        if (!hoststr) {
                 return UPNP_E_INVALID_URL;
+        }
         hoststr += 2;
         temp = strchr(hoststr, '/');
         if (temp) {
@@ -2011,11 +2023,14 @@ int MakeGetMessageEx(const char *url_str,
         uri_type *url,
         struct SendInstruction *pRangeSpecifier)
 {
+        size_t url_str_len;
         int errCode = UPNP_E_SUCCESS;
         char *urlPath = NULL;
+        size_t urlPathSize = 0;
         size_t hostlen = (size_t)0;
         char *hoststr, *temp;
 
+        url_str_len = strlen(url_str);
         do {
                 UpnpPrintf(UPNP_INFO,
                         HTTP,
@@ -2023,28 +2038,27 @@ int MakeGetMessageEx(const char *url_str,
                         __LINE__,
                         "DOWNLOAD URL : %s\n",
                         url_str);
-                if ((errCode = http_FixStrUrl(
-                             (char *)url_str, strlen(url_str), url)) !=
-                        UPNP_E_SUCCESS) {
+                errCode = http_FixStrUrl(url_str, url_str_len, url);
+                if (errCode != UPNP_E_SUCCESS) {
                         break;
                 }
                 /* make msg */
                 membuffer_init(request);
-                urlPath = alloca(strlen(url_str) + (size_t)1);
+                urlPathSize = url_str_len + 1;
+                urlPath = alloca(urlPathSize);
                 if (!urlPath) {
                         errCode = UPNP_E_OUTOF_MEMORY;
                         break;
                 }
-                memset(urlPath, 0, strlen(url_str) + (size_t)1);
-                strncpy(urlPath, url_str, strlen(url_str));
+                strncpy(urlPath, url_str, urlPathSize);
                 hoststr = strstr(urlPath, "//");
-                if (hoststr == NULL) {
+                if (!hoststr) {
                         errCode = UPNP_E_INVALID_URL;
                         break;
                 }
                 hoststr += 2;
                 temp = strchr(hoststr, '/');
-                if (temp == NULL) {
+                if (!temp) {
                         errCode = UPNP_E_INVALID_URL;
                         break;
                 }
