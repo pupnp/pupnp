@@ -75,7 +75,7 @@ if (NOT PUPNP_VERSION_STRING)
 	endforeach()
 endif()
 
-project (PUPNP VERSION ${PUPNP_VERSION_STRING} LANGUAGES C)
+project (PUPNP VERSION ${PUPNP_VERSION_STRING})
 include (GNUInstallDirs)
 
 if (WIN32)
@@ -87,6 +87,17 @@ option (BUILD_TESTING "Run Tests after compile" ON)
 
 if (BUILD_TESTING)
 	enable_testing()
+
+	if (NOT WIN32)
+		find_package (GTest CONFIG)
+
+		if (GTest_FOUND)
+			add_subdirectory (gtest)
+		elseif (DOWNLOAD_AND_BUILD_DEPS AND NOT GTest_FOUND)
+			CmDaB_install (googletest)
+			add_subdirectory (gtest)
+		endif()
+	endif()
 endif()
 
 if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -95,17 +106,21 @@ endif (EXISTS "${CMAKE_SOURCE_DIR}/.git")
 
 # Set the possible values of build type for cmake-gui
 if (CMAKE_CONFIGURATION_TYPES)
-	set (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE
-		STRING "Semicolon separated list of supported configuration types, only supports debug and release, anything else will be ignored" FORCE
+	set (CMAKE_CONFIGURATION_TYPES "Debug;Release"
+		CACHE STRING
+		"Semicolon separated list of supported configuration types, only supports debug and release, anything else will be ignored"
+		FORCE
 	)
 
-	set_property (CACHE CMAKE_CONFIGURATION_TYPES PROPERTY STRINGS
+	set_property (CACHE CMAKE_CONFIGURATION_TYPES
+		PROPERTY STRINGS
 		"Debug" "Release"
 	)
 endif()
 
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	message (STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
+
 	set (CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}" CACHE
 		STRING "Choose the type of build." FORCE
 	)
@@ -472,35 +487,3 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/libupnp.pc.in ${CMAKE_CURRENT_BINARY
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libupnp.pc
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
-
-# Download and unpack googletest at configure time
-configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "Build step for googletest failed: ${result}")
-endif()
-
-# Prevent overriding the parent project's compiler/linker
-# settings on Windows
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-# Add googletest directly to our build. This defines
-# the gtest and gtest_main targets.
-add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
-                 ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
-                 EXCLUDE_FROM_ALL)
-
-# The gtest/gtest_main targets carry header search path
-# dependencies automatically when using CMake 2.8.11 or
-# later. Otherwise we have to add them here ourselves.
-if (CMAKE_VERSION VERSION_LESS 2.8.11)
-  include_directories("${gtest_SOURCE_DIR}/include")
-endif()

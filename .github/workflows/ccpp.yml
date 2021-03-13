@@ -23,7 +23,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake -G Ninja -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
+          cmake -G Ninja -DDOWNLOAD_AND_BUILD_DEPS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
           cmake --build build
 
       - name: Test
@@ -63,7 +63,7 @@ jobs:
       - name: Test
         run: |
           cd build
-          ctest -E pthread4w --output-on-failure # Exclude pthread4w tests on windows
+          ctest --output-on-failure
 
   macos:
     name: Build (${{ matrix.os }})
