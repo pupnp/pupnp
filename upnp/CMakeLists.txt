@@ -35,7 +35,6 @@ set (UPNP_SOURCES
 	src/genlib/util/membuffer.c
 	src/genlib/util/strintmap.c
 	src/genlib/util/upnp_timeout.c
-	src/genlib/util/util.c
 	src/threadutil/FreeList.c
 	src/threadutil/LinkedList.c
 	src/threadutil/ThreadPool.c

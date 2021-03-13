@@ -44,7 +44,6 @@
 #include "httpparser.h"
 #include "membuffer.h"
 #include "statcodes.h"
-#include "upnputil.h"
 
 #include <assert.h>
 

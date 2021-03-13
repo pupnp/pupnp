@@ -48,7 +48,7 @@
 #include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
 #include "upnp.h"
 #include "upnpdebug.h"
-#include "upnputil.h"
+#include "winutil.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -118,7 +118,7 @@ int sock_ssl_connect(SOCKINFO *info)
 int sock_destroy(SOCKINFO *info, int ShutdownMethod)
 {
         int ret = UPNP_E_SUCCESS;
-        char errorBuffer[ERROR_BUFFER_LEN];
+        char errorBuffer[256];
 
         if (info->socket != INVALID_SOCKET) {
 #ifdef UPNP_ENABLE_OPEN_SSL
@@ -129,7 +129,7 @@ int sock_destroy(SOCKINFO *info, int ShutdownMethod)
                 }
 #endif
                 if (shutdown(info->socket, ShutdownMethod) == -1) {
-                        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+                        strerror_r(errno, errorBuffer, sizeof errorBuffer);
                         UpnpPrintf(UPNP_INFO,
                                 HTTP,
                                 __FILE__,

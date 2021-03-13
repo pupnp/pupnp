@@ -1,3 +1,6 @@
+#ifndef WINUTIL_H
+#define WINUTIL_H
+
 /*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation
@@ -32,38 +35,32 @@
 
 /*!
  * \file
- *
- * Purpose: This file contains functions for copying strings based on
- * different options.
  */
 
-#include "config.h"
+/* C specific */
+/* VC needs these in C++ mode too (do other compilers?) */
+#if !defined(__cplusplus) || defined(UPNP_USE_MSVCPP)
 
-#include "upnp.h"
-#include "upnputil.h"
+#ifdef _WIN32
 
-#include <string.h>
+#ifndef S_ISREG
+#define S_ISREG(m) (((m)&S_IFMT) == S_IFREG)
+#endif
 
-void linecopy(char dest[LINE_SIZE], const char *src)
-{
-        strncpy(dest, src, LINE_SIZE - (size_t)1);
-        /* null-terminate if len(src) >= LINE_SIZE. */
-        dest[LINE_SIZE - 1] = '\0';
-}
+#ifndef S_ISDIR
+#define S_ISDIR(m) (((m)&S_IFMT) == S_IFDIR)
+#endif
 
-void namecopy(char dest[NAME_SIZE], const char *src)
-{
-        strncpy(dest, src, NAME_SIZE - (size_t)1);
-        /* null-terminate if len(src) >= NAME_SIZE. */
-        dest[NAME_SIZE - 1] = '\0';
-}
+#ifndef EADDRINUSE /* VS2010 has this defined */
+#define EADDRINUSE WSAEADDRINUSE
+#endif
 
-void linecopylen(char dest[LINE_SIZE], const char *src, size_t srclen)
-{
-        size_t len;
+#define strcasecmp stricmp
+#define strncasecmp strnicmp
+#define strerror_r(a, b, c) (strerror_s((b), (c), (a)))
 
-        len = srclen < (LINE_SIZE - (size_t)1) ? srclen
-                                               : (LINE_SIZE - (size_t)1);
-        strncpy(dest, src, len);
-        dest[len] = '\0';
-}
+#endif /* _WIN32 */
+
+#endif /* !defined(__cplusplus) || defined(UPNP_USE_MSVCPP) */
+
+#endif /* WINUTIL_H */

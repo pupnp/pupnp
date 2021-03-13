@@ -55,7 +55,7 @@
 #include "statcodes.h"
 #include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
 #include "upnpapi.h"
-#include "upnputil.h"
+#include "winutil.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -64,8 +64,20 @@
 #include <string.h>
 #include <sys/types.h>
 
+static UPNP_INLINE int max_int(int a, int b)
+{
+        if (a > b) {
+                return a;
+        } else {
+                return b;
+        }
+}
+
 /*! . */
 #define APPLICATION_LISTENING_PORT 49152
+
+/* Size of the errorBuffer variable, passed to the strerror_r() function */
+#define ERROR_BUFFER_LEN (size_t)256
 
 struct mserv_request_t
 {
@@ -446,16 +458,16 @@ static void RunMiniServer(
         int stopSock = 0;
 
         maxMiniSock = 0;
-        maxMiniSock = max(maxMiniSock, miniSock->miniServerSock4);
-        maxMiniSock = max(maxMiniSock, miniSock->miniServerSock6);
-        maxMiniSock = max(maxMiniSock, miniSock->miniServerSock6UlaGua);
-        maxMiniSock = max(maxMiniSock, miniSock->miniServerStopSock);
-        maxMiniSock = max(maxMiniSock, miniSock->ssdpSock4);
-        maxMiniSock = max(maxMiniSock, miniSock->ssdpSock6);
-        maxMiniSock = max(maxMiniSock, miniSock->ssdpSock6UlaGua);
+        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerSock4);
+        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerSock6);
+        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerSock6UlaGua);
+        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerStopSock);
+        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpSock4);
+        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpSock6);
+        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpSock6UlaGua);
 #ifdef INCLUDE_CLIENT_APIS
-        maxMiniSock = max(maxMiniSock, miniSock->ssdpReqSock4);
-        maxMiniSock = max(maxMiniSock, miniSock->ssdpReqSock6);
+        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpReqSock4);
+        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpReqSock6);
 #endif /* INCLUDE_CLIENT_APIS */
         ++maxMiniSock;
 

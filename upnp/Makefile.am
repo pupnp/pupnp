@@ -87,7 +87,7 @@ libupnp_la_SOURCES = \
 	src/inc/upnp_timeout.h \
 	src/inc/uri.h \
 	src/inc/urlconfig.h \
-	src/inc/upnputil.h \
+        src/inc/winutil.h \
 	src/inc/uuid.h \
 	src/inc/VirtualDir.h \
 	src/inc/webserver.h
@@ -136,7 +136,6 @@ libupnp_la_SOURCES += \
 	src/genlib/util/membuffer.c \
 	src/genlib/util/strintmap.c \
 	src/genlib/util/upnp_timeout.c \
-	src/genlib/util/util.c \
 	src/genlib/util/list.c \
 	src/genlib/net/sock.c \
 	src/genlib/net/http/httpparser.c \

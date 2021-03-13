@@ -514,9 +514,16 @@ static int get_dev_service(
         if (!serv_info)
                 goto error_handler;
 
-        namecopy(soap_info->dev_udn, serv_info->UDN);
-        namecopy(soap_info->service_type, serv_info->serviceType);
-        namecopy(soap_info->service_id, serv_info->serviceId);
+        strncpy(soap_info->dev_udn, serv_info->UDN, sizeof soap_info->dev_udn);
+        soap_info->dev_udn[sizeof soap_info->dev_udn - 1] = 0;
+        strncpy(soap_info->service_type,
+                serv_info->serviceType,
+                sizeof soap_info->service_type);
+        soap_info->service_type[sizeof soap_info->service_type - 1] = 0;
+        strncpy(soap_info->service_id,
+                serv_info->serviceId,
+                sizeof soap_info->service_id);
+        soap_info->service_id[sizeof soap_info->service_id - 1] = 0;
         soap_info->callback = device_info->Callback;
         soap_info->cookie = device_info->Cookie;
         ret_code = 0;
@@ -635,7 +642,10 @@ static int check_soapaction_hdr(
         if (col_pos2 - soap_info->service_type == col_pos1 - serv_type &&
                 strncmp(soap_info->service_type, serv_type, cp1_diff) == 0) {
                 /* for action invocation, update the version information */
-                namecopy(soap_info->service_type, serv_type);
+                strncpy(soap_info->service_type,
+                        serv_type,
+                        sizeof soap_info->service_type);
+                soap_info->service_type[sizeof soap_info->service_type - 1] = 0;
         } else if (strcmp(serv_type, QUERY_STATE_VAR_URN) == 0 &&
                 memptr_cmp(&soap_info->action_name, "QueryStateVariable") ==
                         0) {

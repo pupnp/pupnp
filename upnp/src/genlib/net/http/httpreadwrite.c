@@ -54,6 +54,7 @@
 #include "upnpapi.h"
 #include "uri.h"
 #include "webserver.h"
+#include "winutil.h"
 
 #include <assert.h>
 #include <stdarg.h>
@@ -298,7 +299,7 @@ SOCKET http_Connect(uri_type *destination_url, uri_type *url)
         SOCKET connfd;
         socklen_t sockaddr_len;
         int ret_connect;
-        char errorBuffer[ERROR_BUFFER_LEN];
+        char errorBuffer[256];
 
         http_FixUrl(destination_url, url);
 
@@ -322,7 +323,7 @@ SOCKET http_Connect(uri_type *destination_url, uri_type *url)
                         WSAGetLastError());
 #endif
                 if (shutdown(connfd, SD_BOTH) == -1) {
-                        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+                        strerror_r(errno, errorBuffer, sizeof errorBuffer);
                         UpnpPrintf(UPNP_INFO,
                                 HTTP,
                                 __FILE__,

@@ -52,6 +52,7 @@
 #include "statcodes.h"
 #include "unixutil.h"
 #include "upnpapi.h"
+#include "winutil.h"
 
 #include <stdio.h>
 
