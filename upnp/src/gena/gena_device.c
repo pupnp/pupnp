@@ -894,6 +894,7 @@ static int genaNotifyAllCommon(UpnpDevice_Handle device_handle,
                                 job = (ThreadPoolJob *)malloc(
                                         sizeof(ThreadPoolJob));
                                 if (!job) {
+                                        free(thread_s);
                                         line = __LINE__;
                                         ret = UPNP_E_OUTOF_MEMORY;
                                         break;
