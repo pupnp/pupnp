@@ -63,7 +63,7 @@ jobs:
       - name: Test
         run: |
           cd build
-          ctest -E pthread4w --output-on-failure # Exclude pthread4w tests on windows
+          ctest --output-on-failure
 
   macos:
     name: Build (${{ matrix.os }})
