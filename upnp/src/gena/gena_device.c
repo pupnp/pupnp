@@ -815,7 +815,7 @@ static int genaNotifyAllCommon(UpnpDevice_Handle device_handle,
 	char *UDN_copy = NULL;
 	char *servId_copy = NULL;
 	char *headers = NULL;
-	notify_thread_struct *thread_struct = NULL;
+	notify_thread_struct *thread_s = NULL;
 
 	subscription *finger = NULL;
 	service_info *service = NULL;
@@ -871,34 +871,32 @@ static int genaNotifyAllCommon(UpnpDevice_Handle device_handle,
 				ThreadPoolJob *job = NULL;
 				ListNode *node;
 
-				thread_struct = (notify_thread_struct *)malloc(
+				thread_s = (notify_thread_struct *)malloc(
 					sizeof(notify_thread_struct));
-				if (thread_struct == NULL) {
+				if (thread_s == NULL) {
 					line = __LINE__;
 					ret = UPNP_E_OUTOF_MEMORY;
 					break;
 				}
 
 				(*reference_count)++;
-				thread_struct->reference_count =
-					reference_count;
-				thread_struct->UDN = UDN_copy;
-				thread_struct->servId = servId_copy;
-				thread_struct->headers = headers;
-				thread_struct->propertySet = propertySet;
-				memset(thread_struct->sid,
-					0,
-					sizeof(thread_struct->sid));
-				strncpy(thread_struct->sid,
+				thread_s->reference_count = reference_count;
+				thread_s->UDN = UDN_copy;
+				thread_s->servId = servId_copy;
+				thread_s->headers = headers;
+				thread_s->propertySet = propertySet;
+				strncpy(thread_s->sid,
 					finger->sid,
-					sizeof(thread_struct->sid) - 1);
-				thread_struct->ctime = time(0);
-				thread_struct->device_handle = device_handle;
+					sizeof thread_s->sid);
+				thread_s->sid[sizeof thread_s->sid - 1] = 0;
+				thread_s->ctime = time(0);
+				thread_s->device_handle = device_handle;
 
 				maybeDiscardEvents(&finger->outgoing);
 				job = (ThreadPoolJob *)malloc(
 					sizeof(ThreadPoolJob));
-				if (job == NULL) {
+				if (!job) {
+					free(thread_s);
 					line = __LINE__;
 					ret = UPNP_E_OUTOF_MEMORY;
 					break;
@@ -906,7 +904,7 @@ static int genaNotifyAllCommon(UpnpDevice_Handle device_handle,
 				memset(job, 0, sizeof(ThreadPoolJob));
 				TPJobInit(job,
 					(start_routine)genaNotifyThread,
-					thread_struct);
+					thread_s);
 				TPJobSetFreeFunction(
 					job, (free_routine)free_notify_struct);
 				TPJobSetPriority(job, MED_PRIORITY);
@@ -1260,23 +1258,27 @@ int gena_validate_delivery_urls(
 		}
 
 		for (i = 0; i < url_list->size; i++) {
-			deliveryAddr4 = (struct sockaddr_in *)
-				&url_list->parsedURLs[i].hostport.IPaddress;
-			if ((deliveryAddr4->sin_addr.s_addr & genaNetmask.s_addr)
-				!= (genaAddr4.s_addr & genaNetmask.s_addr)) {
-				inet_ntop(AF_INET, &deliveryAddr4->sin_addr,
-					deliveryAddrString, sizeof(deliveryAddrString));
+			deliveryAddr4 =
+				(struct sockaddr_in *)&url_list->parsedURLs[i]
+					.hostport.IPaddress;
+			if ((deliveryAddr4->sin_addr.s_addr &
+				    genaNetmask.s_addr) !=
+				(genaAddr4.s_addr & genaNetmask.s_addr)) {
+				inet_ntop(AF_INET,
+					&deliveryAddr4->sin_addr,
+					deliveryAddrString,
+					sizeof(deliveryAddrString));
 				UpnpPrintf(UPNP_CRITICAL,
 					GENA,
 					__FILE__,
 					__LINE__,
 					"DeliveryURL %s is invalid.\n"
-					"It is not in the expected network segment (IPv4: %s, netmask: %s)\n",
+					"It is not in the expected network "
+					"segment (IPv4: %s, netmask: %s)\n",
 					deliveryAddrString,
 					gIF_IPV4,
-					gIF_IPV4_NETMASK
-					);
-			      return -1;
+					gIF_IPV4_NETMASK);
+				return -1;
 			}
 		}
 		break;
@@ -1290,8 +1292,9 @@ int gena_validate_delivery_urls(
 		}
 
 		for (i = 0; i < url_list->size; i++) {
-			deliveryAddr6 = (struct sockaddr_in6 *)
-				&url_list->parsedURLs[i].hostport.IPaddress;
+			deliveryAddr6 =
+				(struct sockaddr_in6 *)&url_list->parsedURLs[i]
+					.hostport.IPaddress;
 			if (IN6_IS_ADDR_LINKLOCAL(&deliveryAddr6->sin6_addr)) {
 				genaAddr6 = &genaAddr6Lla;
 				if_prefix = gIF_IPV6_PREFIX_LENGTH;
@@ -1301,20 +1304,26 @@ int gena_validate_delivery_urls(
 			}
 			/* We assume that IPv6 prefix is a multiple of 8 */
 			if (memcmp(deliveryAddr6->sin6_addr.s6_addr,
-				genaAddr6->s6_addr, if_prefix / 8)) {
-				inet_ntop(AF_INET6, &deliveryAddr6->sin6_addr,
-					deliveryAddrString, sizeof(deliveryAddrString));
+				    genaAddr6->s6_addr,
+				    if_prefix / 8)) {
+				inet_ntop(AF_INET6,
+					&deliveryAddr6->sin6_addr,
+					deliveryAddrString,
+					sizeof(deliveryAddrString));
 				UpnpPrintf(UPNP_CRITICAL,
 					GENA,
 					__FILE__,
 					__LINE__,
 					"DeliveryURL %s is invalid.\n"
-					"It is not in the expected network segment (IPv6: %s, prefix: %d)\n",
+					"It is not in the expected network "
+					"segment (IPv6: %s, prefix: %d)\n",
 					deliveryAddrString,
-					IN6_IS_ADDR_LINKLOCAL(&deliveryAddr6->sin6_addr)?gIF_IPV6:gIF_IPV6_ULA_GUA,
-					if_prefix
-					);
-			      return -1;
+					IN6_IS_ADDR_LINKLOCAL(
+						&deliveryAddr6->sin6_addr)
+						? gIF_IPV6
+						: gIF_IPV6_ULA_GUA,
+					if_prefix);
+				return -1;
 			}
 		}
 		break;
@@ -1710,4 +1719,4 @@ void gena_process_unsubscribe_request(SOCKINFO *info, http_message_t *request)
 }
 
 	#endif /* INCLUDE_DEVICE_APIS */
-#endif         /* EXCLUDE_GENA */
+#endif /* EXCLUDE_GENA */
