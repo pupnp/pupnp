@@ -38,7 +38,6 @@
  */
 #include "httpparser.h"
 #include "sock.h"
-#include "upnputil.h"
 
 /*! timeout in secs. */
 #define HTTP_DEFAULT_TIMEOUT 30

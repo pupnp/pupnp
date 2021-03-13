@@ -51,6 +51,7 @@
 #include "statcodes.h"
 #include "unixutil.h"
 #include "upnpapi.h"
+#include "winutil.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -61,6 +62,9 @@
 #define snprintf _snprintf
 #endif
 #endif
+
+/* Size of the errorBuffer variable, passed to the strerror_r() function */
+#define ERROR_BUFFER_LEN (size_t)256
 
 #define MSGTYPE_SHUTDOWN 0
 #define MSGTYPE_ADVERTISEMENT 1

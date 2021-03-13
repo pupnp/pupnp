@@ -43,6 +43,7 @@
 
 #include "unixutil.h"
 #include "upnp.h"
+#include "winutil.h"
 
 #include <assert.h>
 #include <stdlib.h>

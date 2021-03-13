@@ -42,7 +42,6 @@
 #include "unixutil.h"
 #include "upnp.h"
 #include "upnpdebug.h"
-#include "upnputil.h"
 #include "uri.h"
 #include "webserver.h"
 

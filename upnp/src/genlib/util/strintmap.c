@@ -81,10 +81,8 @@ int map_str_to_int(const char *name,
         while (top <= bot) {
                 mid = (top + bot) / 2;
                 if (case_sensitive) {
-                        /*cmp = strcmp( name, table[mid].name ); */
                         cmp = memptr_cmp(&name_ptr, table[mid].name);
                 } else {
-                        /*cmp = strcasecmp( name, table[mid].name ); */
                         cmp = memptr_cmp_nocase(&name_ptr, table[mid].name);
                 }
 

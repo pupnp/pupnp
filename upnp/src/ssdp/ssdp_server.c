@@ -58,10 +58,14 @@
 #include "sock.h"
 #include "ssdplib.h"
 #include "upnpapi.h"
+#include "winutil.h"
 
 #include <stdio.h>
 
 #define MAX_TIME_TOREAD 45
+
+/* Size of the errorBuffer variable, passed to the strerror_r() function */
+#define ERROR_BUFFER_LEN (size_t)256
 
 #ifdef INCLUDE_CLIENT_APIS
 SOCKET gSsdpReqSocket4 = INVALID_SOCKET;

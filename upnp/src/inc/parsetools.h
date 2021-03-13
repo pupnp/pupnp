@@ -37,7 +37,6 @@
  */
 
 #include "httpparser.h"
-#include "upnputil.h"
 
 #ifdef __cplusplus
 extern "C" {

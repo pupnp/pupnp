@@ -40,7 +40,7 @@
 
 #include "statcodes.h"
 
-#include "upnputil.h"
+#include "UpnpGlobal.h"
 
 #include <stdio.h>
 #include <string.h>

@@ -37,8 +37,6 @@
  * \file
  */
 
-#include "upnputil.h"
-
 #include <stdlib.h>
 
 #define MINVAL(a, b) ((a) < (b) ? (a) : (b))

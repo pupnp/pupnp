@@ -56,8 +56,8 @@
 #include "unixutil.h"
 #include "upnp.h"
 #include "upnpapi.h"
-#include "upnputil.h"
 #include "webserver.h"
+#include "winutil.h"
 
 #include <assert.h>
 #include <fcntl.h>

@@ -51,6 +51,7 @@
 #include "ssdplib.h"
 #include "sysdep.h"
 #include "uuid.h"
+#include "winutil.h"
 
 /* Needed for GENA */
 #include "gena.h"
@@ -3286,7 +3287,7 @@ int UpnpCloseHttpPost(void *handle, int *httpStatus, int timeout)
 {
         int status = http_EndHttpRequest(handle, timeout);
         if (status == UPNP_E_SUCCESS) {
-                status = http_GetHttpResponse(
+                /* status = */ http_GetHttpResponse(
                         handle, NULL, NULL, NULL, httpStatus, timeout);
         }
         status = http_CloseHttpConnection(handle);
