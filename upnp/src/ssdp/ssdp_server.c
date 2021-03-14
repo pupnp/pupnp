@@ -51,6 +51,7 @@
 #if EXCLUDE_SSDP == 0
 
 #include "ThreadPool.h"
+#include "UpnpLib.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
 #include "membuffer.h"
@@ -96,7 +97,8 @@ struct SSDPSockArray
 #ifdef INCLUDE_DEVICE_APIS
 static const char SERVICELIST_STR[] = "serviceList";
 
-int AdvertiseAndReply(int AdFlag,
+int AdvertiseAndReply(UpnpLib *p,
+        int AdFlag,
         UpnpDevice_Handle Hnd,
         enum SsdpSearchType SearchType,
         struct sockaddr *DestAddr,
@@ -135,7 +137,7 @@ int AdvertiseAndReply(int AdFlag,
 
         /* Use a read lock */
         HandleReadLock();
-        if (GetHandleInfo(Hnd, &SInfo) != HND_DEVICE) {
+        if (GetHandleInfo(p, Hnd, &SInfo) != HND_DEVICE) {
                 retVal = UPNP_E_INVALID_HANDLE;
                 goto end_function;
         }
@@ -271,7 +273,8 @@ int AdvertiseAndReply(int AdFlag,
                         if (AdFlag) {
                                 /* send the device advertisement */
                                 if (AdFlag == 1) {
-                                        DeviceAdvertisement(devType,
+                                        DeviceAdvertisement(p,
+                                                devType,
                                                 i == 0lu,
                                                 UDNstr,
                                                 SInfo->DescURL,
@@ -282,7 +285,8 @@ int AdvertiseAndReply(int AdFlag,
                                                 SInfo->RegistrationState);
                                 } else {
                                         /* AdFlag == -1 */
-                                        DeviceShutdown(devType,
+                                        DeviceShutdown(p,
+                                                devType,
                                                 i == 0lu,
                                                 UDNstr,
                                                 SInfo->DescURL,
@@ -295,7 +299,8 @@ int AdvertiseAndReply(int AdFlag,
                         } else {
                                 switch (SearchType) {
                                 case SSDP_ALL:
-                                        DeviceReply(DestAddr,
+                                        DeviceReply(p,
+                                                DestAddr,
                                                 devType,
                                                 i == 0lu,
                                                 UDNstr,
@@ -307,7 +312,8 @@ int AdvertiseAndReply(int AdFlag,
                                         break;
                                 case SSDP_ROOTDEVICE:
                                         if (i == 0lu) {
-                                                SendReply(DestAddr,
+                                                SendReply(p,
+                                                        DestAddr,
                                                         devType,
                                                         1,
                                                         UDNstr,
@@ -330,7 +336,7 @@ int AdvertiseAndReply(int AdFlag,
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								"DeviceUDN=%s and search UDN=%s MATCH\n",
 								UDNstr, DeviceUDN);
-							SendReply(DestAddr, devType, 0, UDNstr, SInfo->DescURL, defaultExp, 0,
+                                                        SendReply(p, DestAddr, devType, 0, UDNstr, SInfo->DescURL, defaultExp, 0,
 								SInfo->PowerState,
 								SInfo->SleepPeriod,
 								SInfo->RegistrationState);
@@ -350,7 +356,7 @@ int AdvertiseAndReply(int AdFlag,
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								   "DeviceType=%s and search devType=%s MATCH\n",
 								   devType, DeviceType);
-							SendReply(DestAddr, DeviceType, 0, UDNstr, SInfo->LowerDescURL,
+                                                        SendReply(p, DestAddr, DeviceType, 0, UDNstr, SInfo->LowerDescURL,
 								  defaultExp, 1,
 								  SInfo->PowerState,
 								  SInfo->SleepPeriod,
@@ -360,7 +366,7 @@ int AdvertiseAndReply(int AdFlag,
 							UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 								   "DeviceType=%s and search devType=%s MATCH\n",
 								   devType, DeviceType);
-							SendReply(DestAddr, DeviceType, 0, UDNstr, SInfo->DescURL,
+                                                        SendReply(p, DestAddr, DeviceType, 0, UDNstr, SInfo->DescURL,
 								  defaultExp, 1,
 								  SInfo->PowerState,
 								  SInfo->SleepPeriod,
@@ -455,7 +461,8 @@ int AdvertiseAndReply(int AdFlag,
                                         servType);
                                 if (AdFlag) {
                                         if (AdFlag == 1) {
-                                                ServiceAdvertisement(UDNstr,
+                                                ServiceAdvertisement(p,
+                                                        UDNstr,
                                                         servType,
                                                         SInfo->DescURL,
                                                         Exp,
@@ -465,7 +472,8 @@ int AdvertiseAndReply(int AdFlag,
                                                         SInfo->RegistrationState);
                                         } else {
                                                 /* AdFlag == -1 */
-                                                ServiceShutdown(UDNstr,
+                                                ServiceShutdown(p,
+                                                        UDNstr,
                                                         servType,
                                                         SInfo->DescURL,
                                                         Exp,
@@ -477,7 +485,8 @@ int AdvertiseAndReply(int AdFlag,
                                 } else {
                                         switch (SearchType) {
                                         case SSDP_ALL:
-                                                ServiceReply(DestAddr,
+                                                ServiceReply(p,
+                                                        DestAddr,
                                                         servType,
                                                         UDNstr,
                                                         SInfo->DescURL,
@@ -498,7 +507,7 @@ int AdvertiseAndReply(int AdFlag,
 									UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 										   "ServiceType=%s and search servType=%s MATCH\n",
 										   ServiceType, servType);
-									SendReply(DestAddr, ServiceType, 0, UDNstr, SInfo->LowerDescURL,
+                                                                        SendReply(p, DestAddr, ServiceType, 0, UDNstr, SInfo->LowerDescURL,
 										  defaultExp, 1,
 										  SInfo->PowerState,
 										  SInfo->SleepPeriod,
@@ -508,7 +517,7 @@ int AdvertiseAndReply(int AdFlag,
 									UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
 										   "ServiceType=%s and search servType=%s MATCH\n",
 										   ServiceType, servType);
-									SendReply(DestAddr, ServiceType, 0, UDNstr, SInfo->DescURL,
+                                                                        SendReply(p, DestAddr, ServiceType, 0, UDNstr, SInfo->DescURL,
 										  defaultExp, 1,
 										  SInfo->PowerState,
 										  SInfo->SleepPeriod,
@@ -745,6 +754,8 @@ static UPNP_INLINE int valid_ssdp_msg(
  * \return 0 if successful, -1 if error.
  */
 static UPNP_INLINE int start_event_handler(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] ssdp_thread_data structure. This structure contains SSDP
          * request message. */
         void *Data)
@@ -754,7 +765,7 @@ static UPNP_INLINE int start_event_handler(
         ssdp_thread_data *data = (ssdp_thread_data *)Data;
 
         parser = &data->parser;
-        status = parser_parse(parser);
+        status = parser_parse(p, parser);
         if (status == (parse_status_t)PARSE_FAILURE) {
                 if (parser->msg.method != (http_method_t)HTTPMETHOD_NOTIFY ||
                         !parser->valid_ssdp_notify_hack) {
@@ -794,6 +805,8 @@ error_handler:
  * \brief This function is a thread that handles SSDP requests.
  */
 static void ssdp_event_handler_thread(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [] ssdp_thread_data structure. This structure contains SSDP
          * request message. */
         void *the_data)
@@ -801,23 +814,23 @@ static void ssdp_event_handler_thread(
         ssdp_thread_data *data = (ssdp_thread_data *)the_data;
         http_message_t *hmsg = &data->parser.msg;
 
-        if (start_event_handler(the_data) != 0)
+        if (start_event_handler(p, the_data) != 0)
                 return;
         /* send msg to device or ctrlpt */
         if (hmsg->method == (http_method_t)HTTPMETHOD_NOTIFY ||
                 hmsg->request_method == (http_method_t)HTTPMETHOD_MSEARCH) {
 #ifdef INCLUDE_CLIENT_APIS
-                ssdp_handle_ctrlpt_msg(hmsg, &data->dest_addr, 0);
+                ssdp_handle_ctrlpt_msg(p, hmsg, &data->dest_addr, 0);
 #endif /* INCLUDE_CLIENT_APIS */
         } else {
-                ssdp_handle_device_request(hmsg, &data->dest_addr);
+                ssdp_handle_device_request(p, hmsg, &data->dest_addr);
         }
 
         /* free data */
         free_ssdp_event_handler_data(data);
 }
 
-void readFromSSDPSocket(SOCKET socket)
+void readFromSSDPSocket(UpnpLib *p, SOCKET socket)
 {
         char *requestBuf = NULL;
         char staticBuf[BUFSIZE];
@@ -899,13 +912,13 @@ void readFromSSDPSocket(SOCKET socket)
                         /* null-terminate */
                         data->parser.msg.msg.buf[byteReceived] = 0;
                         memcpy(&data->dest_addr, &__ss, sizeof(__ss));
-                        TPJobInit(&job,
-                                (start_routine)ssdp_event_handler_thread,
-                                data);
+                        TPJobInit(&job, ssdp_event_handler_thread, data);
                         TPJobSetFreeFunction(
                                 &job, free_ssdp_event_handler_data);
                         TPJobSetPriority(&job, MED_PRIORITY);
-                        if (ThreadPoolAdd(&gRecvThreadPool, &job, NULL) != 0)
+                        if (ThreadPoolAdd(UpnpLib_getnc_gRecvThreadPool(p),
+                                    &job,
+                                    NULL) != 0)
                                 free_ssdp_event_handler_data(data);
                 }
         } else
@@ -916,6 +929,8 @@ void readFromSSDPSocket(SOCKET socket)
  * \brief
  */
 static int create_ssdp_sock_v4(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [] SSDP IPv4 socket to be created. */
         SOCKET *ssdpSock)
 {
@@ -927,6 +942,7 @@ static int create_ssdp_sock_v4(
         struct sockaddr_in *ssdpAddr4 = (struct sockaddr_in *)&__ss;
         int ret = 0;
         struct in_addr addr;
+        const char *lIF_IPV4 = UpnpLib_get_gIF_IPV4_cstr(p);
 
         *ssdpSock = socket(AF_INET, SOCK_DGRAM, 0);
         if (*ssdpSock == INVALID_SOCKET) {
@@ -995,7 +1011,7 @@ static int create_ssdp_sock_v4(
                 goto error_handler;
         }
         memset((void *)&ssdpMcastAddr, 0, sizeof(struct ip_mreq));
-        ssdpMcastAddr.imr_interface.s_addr = inet_addr(gIF_IPV4);
+        ssdpMcastAddr.imr_interface.s_addr = inet_addr(lIF_IPV4);
         ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr(SSDP_IP);
         ret = setsockopt(*ssdpSock,
                 IPPROTO_IP,
@@ -1016,7 +1032,7 @@ static int create_ssdp_sock_v4(
         }
         /* Set multicast interface. */
         memset((void *)&addr, 0, sizeof(struct in_addr));
-        addr.s_addr = inet_addr(gIF_IPV4);
+        addr.s_addr = inet_addr(lIF_IPV4);
         ret = setsockopt(*ssdpSock,
                 IPPROTO_IP,
                 IP_MULTICAST_IF,
@@ -1101,6 +1117,8 @@ static int create_ssdp_sock_reqv4(
  * \brief This function ...
  */
 static int create_ssdp_sock_v6(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [] SSDP IPv6 socket to be created. */
         SOCKET *ssdpSock)
 {
@@ -1110,6 +1128,9 @@ static int create_ssdp_sock_v6(
         struct sockaddr_in6 *ssdpAddr6 = (struct sockaddr_in6 *)&__ss;
         int onOff;
         int ret = 0;
+        const char *lIF_NAME = UpnpLib_get_gIF_NAME_cstr(p);
+        const char *lIF_IPV6 = UpnpLib_get_gIF_IPV6_cstr(p);
+        unsigned lIF_INDEX = UpnpLib_get_gIF_INDEX(p);
 
         *ssdpSock = socket(AF_INET6, SOCK_DGRAM, 0);
         if (*ssdpSock == INVALID_SOCKET) {
@@ -1180,7 +1201,7 @@ static int create_ssdp_sock_v6(
         ssdpAddr6->sin6_family = (sa_family_t)AF_INET6;
         ssdpAddr6->sin6_addr = in6addr_any;
 #ifndef _WIN32
-        ssdpAddr6->sin6_scope_id = gIF_INDEX;
+        ssdpAddr6->sin6_scope_id = lIF_INDEX;
 #endif
         ssdpAddr6->sin6_port = htons(SSDP_PORT);
         ret = bind(*ssdpSock, (struct sockaddr *)ssdpAddr6, sizeof(*ssdpAddr6));
@@ -1192,8 +1213,8 @@ static int create_ssdp_sock_v6(
                         __FILE__,
                         __LINE__,
                         "Error in bind(), addr=%s, index=%d, port=%d: %s\n",
-                        gIF_IPV6,
-                        gIF_INDEX,
+                        lIF_IPV6,
+                        lIF_INDEX,
                         SSDP_PORT,
                         errorBuffer);
                 ret = UPNP_E_SOCKET_BIND;
@@ -1214,7 +1235,7 @@ static int create_ssdp_sock_v6(
 #endif
         }
         memset((void *)&ssdpMcastAddr, 0, sizeof(ssdpMcastAddr));
-        ssdpMcastAddr.ipv6mr_interface = gIF_INDEX;
+        ssdpMcastAddr.ipv6mr_interface = lIF_INDEX;
         inet_pton(
                 AF_INET6, SSDP_IPV6_LINKLOCAL, &ssdpMcastAddr.ipv6mr_multiaddr);
         ret = setsockopt(*ssdpSock,
@@ -1243,7 +1264,7 @@ static int create_ssdp_sock_v6(
                         p[1],
                         p[2],
                         p[3],
-                        gIF_NAME);
+                        lIF_NAME);
                 ret = UPNP_E_SOCKET_ERROR;
                 goto error_handler;
         }
@@ -1281,6 +1302,8 @@ error_handler:
  * \brief This function ...
  */
 static int create_ssdp_sock_v6_ula_gua(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [] SSDP IPv6 socket to be created. */
         SOCKET *ssdpSock)
 {
@@ -1290,6 +1313,7 @@ static int create_ssdp_sock_v6_ula_gua(
         struct sockaddr_in6 *ssdpAddr6 = (struct sockaddr_in6 *)&__ss;
         int onOff;
         int ret = 0;
+        unsigned lIF_INDEX = UpnpLib_get_gIF_INDEX(p);
 
         *ssdpSock = socket(AF_INET6, SOCK_DGRAM, 0);
         if (*ssdpSock == INVALID_SOCKET) {
@@ -1359,7 +1383,7 @@ static int create_ssdp_sock_v6_ula_gua(
         memset(&__ss, 0, sizeof(__ss));
         ssdpAddr6->sin6_family = (sa_family_t)AF_INET6;
         ssdpAddr6->sin6_addr = in6addr_any;
-        ssdpAddr6->sin6_scope_id = gIF_INDEX;
+        ssdpAddr6->sin6_scope_id = lIF_INDEX;
         ssdpAddr6->sin6_port = htons(SSDP_PORT);
         ret = bind(*ssdpSock, (struct sockaddr *)ssdpAddr6, sizeof(*ssdpAddr6));
         if (ret == -1) {
@@ -1376,7 +1400,7 @@ static int create_ssdp_sock_v6_ula_gua(
                 goto error_handler;
         }
         memset((void *)&ssdpMcastAddr, 0, sizeof(ssdpMcastAddr));
-        ssdpMcastAddr.ipv6mr_interface = gIF_INDEX;
+        ssdpMcastAddr.ipv6mr_interface = lIF_INDEX;
         /* SITE LOCAL */
         inet_pton(
                 AF_INET6, SSDP_IPV6_SITELOCAL, &ssdpMcastAddr.ipv6mr_multiaddr);
@@ -1466,15 +1490,18 @@ static int create_ssdp_sock_reqv6(
 #endif /* IPv6 */
 #endif /* INCLUDE_CLIENT_APIS */
 
-int get_ssdp_sockets(MiniServerSockArray *out)
+int get_ssdp_sockets(UpnpLib *p, MiniServerSockArray *out)
 {
         int retVal;
+        const char *lIF_IPV4 = UpnpLib_get_gIF_IPV4_cstr(p);
+        const char *lIF_IPV6 = UpnpLib_get_gIF_IPV6_cstr(p);
+        const char *lIF_IPV6_ULA_GUA = UpnpLib_get_gIF_IPV6_ULA_GUA_cstr(p);
 
 #ifdef INCLUDE_CLIENT_APIS
         out->ssdpReqSock4 = INVALID_SOCKET;
         out->ssdpReqSock6 = INVALID_SOCKET;
         /* Create the IPv4 socket for SSDP REQUESTS */
-        if (strlen(gIF_IPV4) > (size_t)0) {
+        if (strlen(lIF_IPV4) > 0) {
                 retVal = create_ssdp_sock_reqv4(&out->ssdpReqSock4);
                 if (retVal != UPNP_E_SUCCESS)
                         return retVal;
@@ -1484,7 +1511,7 @@ int get_ssdp_sockets(MiniServerSockArray *out)
                 out->ssdpReqSock4 = INVALID_SOCKET;
                 /* Create the IPv6 socket for SSDP REQUESTS */
 #ifdef UPNP_ENABLE_IPV6
-        if (strlen(gIF_IPV6) > (size_t)0) {
+        if (strlen(lIF_IPV6) > 0) {
                 retVal = create_ssdp_sock_reqv6(&out->ssdpReqSock6);
                 if (retVal != UPNP_E_SUCCESS) {
                         UpnpCloseSocket(out->ssdpReqSock4);
@@ -1497,8 +1524,8 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 #endif /* IPv6 */
 #endif /* INCLUDE_CLIENT_APIS */
         /* Create the IPv4 socket for SSDP */
-        if (strlen(gIF_IPV4) > (size_t)0) {
-                retVal = create_ssdp_sock_v4(&out->ssdpSock4);
+        if (strlen(lIF_IPV4) > 0) {
+                retVal = create_ssdp_sock_v4(p, &out->ssdpSock4);
                 if (retVal != UPNP_E_SUCCESS) {
 #ifdef INCLUDE_CLIENT_APIS
                         UpnpCloseSocket(out->ssdpReqSock4);
@@ -1510,8 +1537,8 @@ int get_ssdp_sockets(MiniServerSockArray *out)
                 out->ssdpSock4 = INVALID_SOCKET;
 #ifdef UPNP_ENABLE_IPV6
         /* Create the IPv6 socket for SSDP */
-        if (strlen(gIF_IPV6) > (size_t)0) {
-                retVal = create_ssdp_sock_v6(&out->ssdpSock6);
+        if (strlen(lIF_IPV6) > 0) {
+                retVal = create_ssdp_sock_v6(p, &out->ssdpSock6);
                 if (retVal != UPNP_E_SUCCESS) {
                         UpnpCloseSocket(out->ssdpSock4);
 #ifdef INCLUDE_CLIENT_APIS
@@ -1522,8 +1549,8 @@ int get_ssdp_sockets(MiniServerSockArray *out)
                 }
         } else
                 out->ssdpSock6 = INVALID_SOCKET;
-        if (strlen(gIF_IPV6_ULA_GUA) > (size_t)0) {
-                retVal = create_ssdp_sock_v6_ula_gua(&out->ssdpSock6UlaGua);
+        if (strlen(lIF_IPV6_ULA_GUA) > 0) {
+                retVal = create_ssdp_sock_v6_ula_gua(p, &out->ssdpSock6UlaGua);
                 if (retVal != UPNP_E_SUCCESS) {
                         UpnpCloseSocket(out->ssdpSock4);
                         UpnpCloseSocket(out->ssdpSock6);

@@ -28,8 +28,9 @@ UpnpExtraHeaders *UpnpExtraHeaders_new()
         struct s_UpnpExtraHeaders *p =
                 calloc(1, sizeof(struct s_UpnpExtraHeaders));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpListInit(&p->m_node);
         p->m_name = UpnpString_new();
@@ -43,8 +44,9 @@ void UpnpExtraHeaders_delete(UpnpExtraHeaders *q)
 {
         struct s_UpnpExtraHeaders *p = (struct s_UpnpExtraHeaders *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         ixmlFreeDOMString(p->m_resp);
         p->m_resp = 0;
@@ -83,8 +85,9 @@ UpnpExtraHeaders *UpnpExtraHeaders_dup(const UpnpExtraHeaders *q)
 {
         UpnpExtraHeaders *p = UpnpExtraHeaders_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpExtraHeaders_assign(p, q);
 

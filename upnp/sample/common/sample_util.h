@@ -141,6 +141,8 @@ int SampleUtil_PrintEvent(
  * the service definitions are full URLs.  Relative URLs are not handled here.
  */
 int SampleUtil_FindAndParseService(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The DOM description document. */
         IXML_Document *DescDoc,
         /*! [in] The location of the description document. */

@@ -587,7 +587,7 @@ static void *WorkerThread(
                 } else {
                 }
                 /* run the job */
-                job->func(job->arg);
+                job->func(tp->upnp_lib, job->arg);
                 /* return to Normal */
                 SetPriority(DEFAULT_PRIORITY);
         }
@@ -610,7 +610,7 @@ exit_function:
  */
 static ThreadPoolJob *CreateThreadPoolJob(
         /*! job is copied. */
-        ThreadPoolJob *job,
+        const ThreadPoolJob *job,
         /*! id of job. */
         int id,
         /*! . */
@@ -822,7 +822,7 @@ exit_function:
         return ret;
 }
 
-int ThreadPoolAdd(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
+int ThreadPoolAdd(ThreadPool *tp, const ThreadPoolJob *job, int *jobId)
 {
         int rc = EOUTOFMEM;
         int tempId = -1;
@@ -1081,8 +1081,9 @@ int TPAttrInit(ThreadPoolAttr *attr)
 
 int TPJobInit(ThreadPoolJob *job, start_routine func, void *arg)
 {
-        if (!job || !func)
+        if (!job || !func) {
                 return EINVAL;
+        }
         job->func = func;
         job->arg = arg;
         job->priority = DEFAULT_PRIORITY;

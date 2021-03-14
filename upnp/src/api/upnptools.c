@@ -135,7 +135,8 @@ const char *UpnpGetErrorMessage(int rc)
  * because of the way resolve_rel_url() was originally written and used. In the
  * future it would be nice to clean this up.
  */
-int UpnpResolveURL(const char *BaseURL, const char *RelURL, char *AbsURL)
+int UpnpResolveURL(
+        UpnpLib *p, const char *BaseURL, const char *RelURL, char *AbsURL)
 {
         int ret = UPNP_E_SUCCESS;
         char *tempRel = NULL;
@@ -144,7 +145,7 @@ int UpnpResolveURL(const char *BaseURL, const char *RelURL, char *AbsURL)
                 ret = UPNP_E_INVALID_PARAM;
                 goto ExitFunction;
         }
-        tempRel = resolve_rel_url((char *)BaseURL, (char *)RelURL);
+        tempRel = resolve_rel_url(p, (char *)BaseURL, (char *)RelURL);
         if (tempRel) {
                 strcpy(AbsURL, tempRel);
                 free(tempRel);
@@ -155,7 +156,8 @@ ExitFunction:
         return ret;
 }
 
-int UpnpResolveURL2(const char *BaseURL, const char *RelURL, char **AbsURL)
+int UpnpResolveURL2(
+        UpnpLib *p, const char *BaseURL, const char *RelURL, char **AbsURL)
 {
         int ret = UPNP_E_SUCCESS;
 
@@ -163,7 +165,7 @@ int UpnpResolveURL2(const char *BaseURL, const char *RelURL, char **AbsURL)
                 ret = UPNP_E_INVALID_PARAM;
                 goto ExitFunction;
         }
-        *AbsURL = resolve_rel_url((char *)BaseURL, (char *)RelURL);
+        *AbsURL = resolve_rel_url(p, (char *)BaseURL, (char *)RelURL);
         if (!*AbsURL)
                 ret = UPNP_E_INVALID_URL;
 

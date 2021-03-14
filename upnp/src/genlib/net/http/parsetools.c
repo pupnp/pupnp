@@ -47,7 +47,7 @@
 
 #include <assert.h>
 
-int has_xml_content_type(http_message_t *hmsg)
+int has_xml_content_type(UpnpLib *p, http_message_t *hmsg)
 {
         memptr hdr_value;
 
@@ -56,7 +56,7 @@ int has_xml_content_type(http_message_t *hmsg)
         /* find 'content-type' header which must have text/xml */
         if (httpmsg_find_hdr(hmsg, HDR_CONTENT_TYPE, &hdr_value)) {
                 switch (matchstr(
-                        hdr_value.buf, hdr_value.length, "%itext%w/%wxml")) {
+                        p, hdr_value.buf, hdr_value.length, "%itext%w/%wxml")) {
                 case PARSE_OK:
                         return 1;
                 default:

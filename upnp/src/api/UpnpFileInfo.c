@@ -31,8 +31,9 @@ UpnpFileInfo *UpnpFileInfo_new()
 {
         struct s_UpnpFileInfo *p = calloc(1, sizeof(struct s_UpnpFileInfo));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         /*p->m_FileLength = 0;*/
         /*p->m_LastModified = 0;*/
@@ -50,8 +51,9 @@ void UpnpFileInfo_delete(UpnpFileInfo *q)
 {
         struct s_UpnpFileInfo *p = (struct s_UpnpFileInfo *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         UpnpString_delete(p->m_Os);
         p->m_Os = 0;
@@ -103,8 +105,9 @@ UpnpFileInfo *UpnpFileInfo_dup(const UpnpFileInfo *q)
 {
         UpnpFileInfo *p = UpnpFileInfo_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpFileInfo_assign(p, q);
 
@@ -201,6 +204,11 @@ void UpnpFileInfo_add_to_list_ExtraHeadersList(
 
 const struct sockaddr_storage *UpnpFileInfo_get_CtrlPtIPAddr(
         const UpnpFileInfo *p)
+{
+        return &p->m_CtrlPtIPAddr;
+}
+
+struct sockaddr_storage *UpnpFileInfo_getnc_CtrlPtIPAddr(UpnpFileInfo *p)
 {
         return &p->m_CtrlPtIPAddr;
 }

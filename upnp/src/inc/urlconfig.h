@@ -64,7 +64,8 @@ extern "C" {
  * 	UPNP_E_SUCCESS - On Success
  * 	UPNP_E_OUTOF_MEMORY - Default Error
  ****************************************************************************/
-int configure_urlbase(IXML_Document *doc,
+int configure_urlbase(UpnpLib *p,
+        IXML_Document *doc,
         const struct sockaddr *serverAddr,
         const char *alias,
         time_t last_modified,

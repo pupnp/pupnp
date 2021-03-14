@@ -57,6 +57,8 @@
 extern "C" {
 #endif
 
+typedef struct s_UpnpLib UpnpLib;
+
 /*!
  * \brief Converts an SDK error code into a string error message suitable for
  * display. The memory returned from this function should NOT be freed.
@@ -83,6 +85,8 @@ EXPORT_SPEC const char *UpnpGetErrorMessage(
  *              complete this operation.
  */
 EXPORT_SPEC int UpnpResolveURL(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The base URL to combine. */
         const char *BaseURL,
         /*! [in] The relative URL to \b BaseURL. */
@@ -105,6 +109,8 @@ EXPORT_SPEC int UpnpResolveURL(
  *              complete this operation.
  */
 EXPORT_SPEC int UpnpResolveURL2(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The base URL to combine. */
         const char *BaseURL,
         /*! [in] The relative URL to \b BaseURL. */

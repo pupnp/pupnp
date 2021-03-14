@@ -227,8 +227,10 @@ static UPNP_INLINE int calc_descURL(
  *
  *	Note :
  ************************************************************************/
-static int config_description_doc(
-        IXML_Document *doc, const char *ip_str, char **root_path_str)
+static int config_description_doc(UpnpLib *p,
+        IXML_Document *doc,
+        const char *ip_str,
+        char **root_path_str)
 {
         IXML_NodeList *baseList;
         IXML_Element *element = NULL;
@@ -293,7 +295,7 @@ static int config_description_doc(
                         err_code = UPNP_E_INVALID_URL;
                         goto error_handler;
                 }
-                len = parse_uri(domStr, strlen(domStr), &uri);
+                len = parse_uri(p, domStr, strlen(domStr), &uri);
                 if (len < 0 || uri.type != ABSOLUTE) {
                         err_code = UPNP_E_INVALID_URL;
                         goto error_handler;
@@ -372,7 +374,8 @@ error_handler:
  *
  *	Note :
  ************************************************************************/
-int configure_urlbase(IXML_Document *doc,
+int configure_urlbase(UpnpLib *p,
+        IXML_Document *doc,
         const struct sockaddr *serverAddr,
         const char *alias,
         time_t last_modified,
@@ -391,7 +394,7 @@ int configure_urlbase(IXML_Document *doc,
         }
 
         /* config url-base in 'doc' */
-        err_code = config_description_doc(doc, ipaddr_port, &root_path);
+        err_code = config_description_doc(p, doc, ipaddr_port, &root_path);
         if (err_code != UPNP_E_SUCCESS) {
                 goto error_handler;
         }
@@ -416,7 +419,7 @@ int configure_urlbase(IXML_Document *doc,
         UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "doc = %s\n", xml_str);
         /* store in web server */
         err_code = web_server_set_alias(
-                new_alias, xml_str, strlen(xml_str), last_modified);
+                p, new_alias, xml_str, strlen(xml_str), last_modified);
 
 error_handler:
         free(root_path);

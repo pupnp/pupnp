@@ -45,7 +45,9 @@
 #include "UpnpFileInfo.h"
 #include "UpnpInet.h"
 #include "UpnpIntTypes.h"
+#include "UpnpLib.h"
 #include "UpnpStdInt.h"
+#include "VirtualDir.h"
 #include "membuffer.h"
 #include "sock.h"
 #include "statcodes.h"
@@ -268,11 +270,12 @@ int http_FixUrl(uri_type *url, uri_type *fixed_url)
         return UPNP_E_SUCCESS;
 }
 
-int http_FixStrUrl(const char *urlstr, size_t urlstrlen, uri_type *fixed_url)
+int http_FixStrUrl(
+        UpnpLib *p, const char *urlstr, size_t urlstrlen, uri_type *fixed_url)
 {
         uri_type url;
 
-        if (parse_uri(urlstr, urlstrlen, &url) != HTTP_SUCCESS) {
+        if (parse_uri(p, urlstr, urlstrlen, &url) != HTTP_SUCCESS) {
                 return UPNP_E_INVALID_URL;
         }
 
@@ -356,7 +359,8 @@ SOCKET http_Connect(uri_type *destination_url, uri_type *url)
  * 	 UPNP_E_SUCCESS
  *	 UPNP_E_BAD_HTTPMSG
  */
-int http_RecvMessage(SOCKINFO *info,
+int http_RecvMessage(UpnpLib *p,
+        SOCKINFO *info,
         http_parser_t *parser,
         http_method_t request_method,
         int *timeout_secs,
@@ -379,7 +383,8 @@ int http_RecvMessage(SOCKINFO *info,
                 num_read = sock_read(info, buf, sizeof buf, timeout_secs);
                 if (num_read > 0) {
                         /* got data */
-                        status = parser_append(parser, buf, (size_t)num_read);
+                        status =
+                                parser_append(p, parser, buf, (size_t)num_read);
                         switch (status) {
                         case PARSE_SUCCESS:
                                 UpnpPrintf(UPNP_INFO,
@@ -390,10 +395,11 @@ int http_RecvMessage(SOCKINFO *info,
                                         "<<<\n%s\n-----------------\n",
                                         parser->msg.msg.buf);
                                 print_http_headers(&parser->msg);
-                                if (g_maxContentLength > (size_t)0 &&
+                                if (UpnpLib_get_g_maxContentLength(p) > 0 &&
                                         parser->content_length >
                                                 (unsigned int)
-                                                        g_maxContentLength) {
+                                                        UpnpLib_get_g_maxContentLength(
+                                                                p)) {
                                         *http_error_code =
                                                 HTTP_REQ_ENTITY_TOO_LARGE;
                                         line = __LINE__;
@@ -464,7 +470,8 @@ ExitFunction:
         return ret;
 }
 
-int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
+int http_SendMessage(
+        UpnpLib *p, SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 {
 #if EXCLUDE_WEB_SERVER == 0
         FILE *Fp;
@@ -485,6 +492,8 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
         int RetVal = 0;
         size_t buf_length;
         size_t num_written;
+        struct VirtualDirCallbacks *virtualDirCallback =
+                UpnpLib_getnc_virtualDirCallback(p);
 
 #if EXCLUDE_WEB_SERVER == 0
         memset(Chunk_Header, 0, sizeof(Chunk_Header));
@@ -511,7 +520,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
                         /* file name */
                         filename = va_arg(argp, char *);
                         if (Instr && Instr->IsVirtualFile)
-                                Fp = (virtualDirCallback.open)(filename,
+                                Fp = (virtualDirCallback->open)(filename,
                                         UPNP_READ,
                                         Instr->Cookie,
                                         Instr->RequestCookie);
@@ -523,7 +532,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
                         }
                         if (Instr && Instr->IsRangeActive &&
                                 Instr->IsVirtualFile) {
-                                if (virtualDirCallback.seek(Fp,
+                                if (virtualDirCallback->seek(Fp,
                                             Instr->RangeOffset,
                                             SEEK_CUR,
                                             Instr->Cookie,
@@ -546,7 +555,8 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
                                                 ? Data_Buf_Size
                                                 : (size_t)amount_to_be_read;
                                         if (Instr->IsVirtualFile) {
-                                                nr = virtualDirCallback.read(Fp,
+                                                nr = virtualDirCallback->read(
+                                                        Fp,
                                                         file_buf,
                                                         n,
                                                         Instr->Cookie,
@@ -574,6 +584,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
                                         /* EOF so no more to send. */
                                         if (Instr && Instr->IsChunkActive) {
                                                 const char *str = "0\r\n\r\n";
+                                                /* TODO: nw is never read. */
                                                 nw = sock_write(info,
                                                         str,
                                                         strlen(str),
@@ -652,7 +663,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
                         } /* while */
                 Cleanup_File:
                         if (Instr && Instr->IsVirtualFile) {
-                                virtualDirCallback.close(Fp,
+                                virtualDirCallback->close(Fp,
                                         Instr->Cookie,
                                         Instr->RequestCookie);
                         } else {
@@ -718,7 +729,8 @@ ExitFunction:
  *	Error Codes returned by http_SendMessage
  *	Error Codes returned by http_RecvMessage
  ************************************************************************/
-int http_RequestAndResponse(uri_type *destination,
+int http_RequestAndResponse(UpnpLib *p,
+        uri_type *destination,
         const char *request,
         size_t request_length,
         http_method_t req_method,
@@ -756,14 +768,18 @@ int http_RequestAndResponse(uri_type *destination,
         }
         /* send request */
         ret_code = http_SendMessage(
-                &info, &timeout_secs, "b", request, request_length);
+                p, &info, &timeout_secs, "b", request, request_length);
         if (ret_code != 0) {
                 parser_response_init(response, req_method);
                 goto end_function;
         }
         /* recv response */
-        ret_code = http_RecvMessage(
-                &info, response, req_method, &timeout_secs, &http_error_code);
+        ret_code = http_RecvMessage(p,
+                &info,
+                response,
+                req_method,
+                &timeout_secs,
+                &http_error_code);
 
 end_function:
         /* should shutdown completely */
@@ -791,7 +807,8 @@ end_function:
  *	UPNP_E_SUCCESS
  *	UPNP_E_INVALID_URL
  ************************************************************************/
-int http_Download(const char *url_str,
+int http_Download(UpnpLib *p,
+        const char *url_str,
         int timeout_secs,
         char **document,
         size_t *doc_length,
@@ -821,7 +838,7 @@ int http_Download(const char *url_str,
                 __LINE__,
                 "DOWNLOAD URL : %s\n",
                 url_str);
-        ret_code = http_FixStrUrl((char *)url_str, url_str_len, &url);
+        ret_code = http_FixStrUrl(p, (char *)url_str, url_str_len, &url);
         if (ret_code != UPNP_E_SUCCESS) {
                 return ret_code;
         }
@@ -879,7 +896,8 @@ int http_Download(const char *url_str,
                 "----------END--------\n",
                 request.buf);
         /* get doc msg */
-        ret_code = http_RequestAndResponse(&url,
+        ret_code = http_RequestAndResponse(p,
+                &url,
                 request.buf,
                 request.length,
                 HTTPMETHOD_GET,
@@ -970,7 +988,8 @@ int http_Download(const char *url_str,
  * 	UPNP_E_INVALID_PARAM
  *	UPNP_E_SUCCESS
  ************************************************************************/
-int MakeGenericMessage(http_method_t method,
+static int MakeGenericMessage(UpnpLib *p,
+        http_method_t method,
         const char *url_str,
         membuffer *request,
         uri_type *url,
@@ -989,7 +1008,7 @@ int MakeGenericMessage(http_method_t method,
                 "URL: %s method: %d\n",
                 url_str,
                 method);
-        ret_code = http_FixStrUrl(url_str, strlen(url_str), url);
+        ret_code = http_FixStrUrl(p, url_str, strlen(url_str), url);
         if (ret_code != UPNP_E_SUCCESS)
                 return ret_code;
         /* make msg */
@@ -1087,6 +1106,8 @@ typedef struct HTTPCONNECTIONHANDLE
  *	\li \c UPNP_E_BAD_HTTPMSG - Socker read() returns an error
  */
 static int ReadResponseLineAndHeaders(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! Socket information object. */
         SOCKINFO *info,
         /*! HTTP Parser object. */
@@ -1103,7 +1124,7 @@ static int ReadResponseLineAndHeaders(
         int ret_code = 0;
 
         /*read response line */
-        status = parser_parse_responseline(parser);
+        status = parser_parse_responseline(p, parser);
         switch (status) {
         case PARSE_OK:
                 done = 1;
@@ -1127,7 +1148,7 @@ static int ReadResponseLineAndHeaders(
                                         HTTP_INTERNAL_SERVER_ERROR;
                                 return PARSE_FAILURE;
                         }
-                        status = parser_parse_responseline(parser);
+                        status = parser_parse_responseline(p, parser);
                         switch (status) {
                         case PARSE_OK:
                                 done = 1;
@@ -1148,7 +1169,7 @@ static int ReadResponseLineAndHeaders(
                         return num_read;
                 }
         }
-        status = parser_parse_headers(parser);
+        status = parser_parse_headers(p, parser);
         if ((status == (parse_status_t)PARSE_OK) &&
                 (parser->position == (parser_pos_t)POS_ENTITY))
                 done = 1;
@@ -1170,7 +1191,7 @@ static int ReadResponseLineAndHeaders(
                                         HTTP_INTERNAL_SERVER_ERROR;
                                 return PARSE_FAILURE;
                         }
-                        status = parser_parse_headers(parser);
+                        status = parser_parse_headers(p, parser);
                         if (status == (parse_status_t)PARSE_OK &&
                                 parser->position == (parser_pos_t)POS_ENTITY)
                                 done = 1;
@@ -1244,7 +1265,8 @@ int http_CancelHttpGet(void *Handle)
         return UPNP_E_SUCCESS;
 }
 
-int http_OpenHttpConnection(const char *url_str, void **Handle, int timeout)
+int http_OpenHttpConnection(
+        UpnpLib *p, const char *url_str, void **Handle, int timeout)
 {
         int ret_code;
         size_t sockaddr_len;
@@ -1256,7 +1278,7 @@ int http_OpenHttpConnection(const char *url_str, void **Handle, int timeout)
                 return UPNP_E_INVALID_PARAM;
         *Handle = handle;
         /* parse url_str */
-        ret_code = http_FixStrUrl(url_str, strlen(url_str), &url);
+        ret_code = http_FixStrUrl(p, url_str, strlen(url_str), &url);
         if (ret_code != UPNP_E_SUCCESS)
                 return ret_code;
         /* create the handle */
@@ -1304,7 +1326,8 @@ errorHandler:
         return ret_code;
 }
 
-int http_MakeHttpRequest(Upnp_HttpMethod method,
+int http_MakeHttpRequest(UpnpLib *p,
+        Upnp_HttpMethod method,
         const char *url_str,
         void *Handle,
         UpnpString *headers,
@@ -1324,7 +1347,8 @@ int http_MakeHttpRequest(Upnp_HttpMethod method,
         }
         handle->requestStarted = 1;
         handle->cancel = 0;
-        ret_code = MakeGenericMessage((http_method_t)method,
+        ret_code = MakeGenericMessage(p,
+                (http_method_t)method,
                 url_str,
                 &request,
                 &url,
@@ -1334,8 +1358,12 @@ int http_MakeHttpRequest(Upnp_HttpMethod method,
         if (ret_code != UPNP_E_SUCCESS)
                 return ret_code;
         /* send request */
-        ret_code = http_SendMessage(
-                &handle->sock_info, &timeout, "b", request.buf, request.length);
+        ret_code = http_SendMessage(p,
+                &handle->sock_info,
+                &timeout,
+                "b",
+                request.buf,
+                request.length);
         membuffer_destroy(&request);
         httpmsg_destroy(&handle->response.msg);
         parser_response_init(&handle->response, (http_method_t)method);
@@ -1407,7 +1435,8 @@ int http_EndHttpRequest(void *Handle, int timeout)
         return retc >= 0 ? UPNP_E_SUCCESS : UPNP_E_SOCKET_WRITE;
 }
 
-int http_GetHttpResponse(void *Handle,
+int http_GetHttpResponse(UpnpLib *p,
+        void *Handle,
         UpnpString *headers,
         char **contentType,
         int *contentLength,
@@ -1420,7 +1449,8 @@ int http_GetHttpResponse(void *Handle,
         http_connection_handle_t *handle = Handle;
         parse_status_t status;
 
-        status = ReadResponseLineAndHeaders(&handle->sock_info,
+        status = ReadResponseLineAndHeaders(p,
+                &handle->sock_info,
                 &handle->response,
                 &timeout,
                 &http_error_code);
@@ -1470,7 +1500,8 @@ errorHandler:
         return ret_code;
 }
 
-int http_ReadHttpResponse(void *Handle, char *buf, size_t *size, int timeout)
+int http_ReadHttpResponse(
+        UpnpLib *p, void *Handle, char *buf, size_t *size, int timeout)
 {
         http_connection_handle_t *handle = Handle;
         parse_status_t status;
@@ -1486,7 +1517,7 @@ int http_ReadHttpResponse(void *Handle, char *buf, size_t *size, int timeout)
         }
         /* first parse what has already been gotten */
         if (handle->response.position != POS_COMPLETE)
-                status = parser_parse_entity(&handle->response);
+                status = parser_parse_entity(p, &handle->response);
         else
                 status = PARSE_SUCCESS;
         if (status == PARSE_INCOMPLETE_ENTITY)
@@ -1516,7 +1547,7 @@ int http_ReadHttpResponse(void *Handle, char *buf, size_t *size, int timeout)
                                 *size = 0;
                                 return PARSE_FAILURE;
                         }
-                        status = parser_parse_entity(&handle->response);
+                        status = parser_parse_entity(p, &handle->response);
                         if (status == PARSE_INCOMPLETE_ENTITY) {
                                 /* read until close */
                                 ok_on_close = 1;
@@ -1607,7 +1638,8 @@ int http_CloseHttpConnection(void *Handle)
  *	UPNP_E_SOCKET_WRITE
  *	UPNP_E_TIMEDOUT
  ************************************************************************/
-int http_SendStatusResponse(SOCKINFO *info,
+int http_SendStatusResponse(UpnpLib *p,
+        SOCKINFO *info,
         int http_status_code,
         int request_major_version,
         int request_minor_version)
@@ -1633,7 +1665,7 @@ int http_SendStatusResponse(SOCKINFO *info,
         if (ret == 0) {
                 timeout = HTTP_DEFAULT_TIMEOUT;
                 ret = http_SendMessage(
-                        info, &timeout, "b", membuf.buf, membuf.length);
+                        p, info, &timeout, "b", membuf.buf, membuf.length);
         }
         membuffer_destroy(&membuf);
 
@@ -2019,7 +2051,8 @@ void http_CalcResponseVersion(int request_major_vers,
  * 	Error Codes returned by http_MakeMessage
  *	UPNP_E_SUCCESS
  ************************************************************************/
-int MakeGetMessageEx(const char *url_str,
+static int MakeGetMessageEx(UpnpLib *p,
+        const char *url_str,
         membuffer *request,
         uri_type *url,
         struct SendInstruction *pRangeSpecifier)
@@ -2039,7 +2072,7 @@ int MakeGetMessageEx(const char *url_str,
                         __LINE__,
                         "DOWNLOAD URL : %s\n",
                         url_str);
-                errCode = http_FixStrUrl(url_str, url_str_len, url);
+                errCode = http_FixStrUrl(p, url_str, url_str_len, url);
                 if (errCode != UPNP_E_SUCCESS) {
                         break;
                 }
@@ -2135,7 +2168,8 @@ int MakeGetMessageEx(const char *url_str,
  *	UPNP_E_SOCKET_ERROR
  *	UPNP_E_BAD_RESPONSE
  ************************************************************************/
-int http_OpenHttpGetEx(const char *url_str,
+int http_OpenHttpGetEx(UpnpLib *p,
+        const char *url_str,
         void **Handle,
         char **contentType,
         int *contentLength,
@@ -2183,7 +2217,8 @@ int http_OpenHttpGetEx(const char *url_str,
                 if (rc < 0 || (unsigned int)rc >= sizeof(rangeBuf.RangeHeader))
                         break;
                 membuffer_init(&request);
-                errCode = MakeGetMessageEx(url_str, &request, &url, &rangeBuf);
+                errCode =
+                        MakeGetMessageEx(p, url_str, &request, &url, &rangeBuf);
                 if (errCode != UPNP_E_SUCCESS)
                         break;
                 handle = (http_connection_handle_t *)malloc(
@@ -2221,7 +2256,8 @@ int http_OpenHttpGetEx(const char *url_str,
                         break;
                 }
                 /* send request */
-                errCode = http_SendMessage(&handle->sock_info,
+                errCode = http_SendMessage(p,
+                        &handle->sock_info,
                         &timeout,
                         "b",
                         request.buf,
@@ -2231,7 +2267,8 @@ int http_OpenHttpGetEx(const char *url_str,
                         free(handle);
                         break;
                 }
-                if (ReadResponseLineAndHeaders(&handle->sock_info,
+                if (ReadResponseLineAndHeaders(p,
+                            &handle->sock_info,
                             &handle->response,
                             &timeout,
                             &http_error_code) != (int)PARSE_OK) {

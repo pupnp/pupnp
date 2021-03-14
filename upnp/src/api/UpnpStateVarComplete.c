@@ -28,8 +28,9 @@ UpnpStateVarComplete *UpnpStateVarComplete_new()
         struct s_UpnpStateVarComplete *p =
                 calloc(1, sizeof(struct s_UpnpStateVarComplete));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         /*p->m_ErrCode = 0;*/
         p->m_CtrlUrl = UpnpString_new();
@@ -43,8 +44,9 @@ void UpnpStateVarComplete_delete(UpnpStateVarComplete *q)
 {
         struct s_UpnpStateVarComplete *p = (struct s_UpnpStateVarComplete *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         ixmlFreeDOMString(p->m_CurrentVal);
         p->m_CurrentVal = 0;
@@ -84,8 +86,9 @@ UpnpStateVarComplete *UpnpStateVarComplete_dup(const UpnpStateVarComplete *q)
 {
         UpnpStateVarComplete *p = UpnpStateVarComplete_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpStateVarComplete_assign(p, q);
 

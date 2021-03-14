@@ -215,6 +215,8 @@ typedef struct TPOOLSTATS
  */
 typedef struct THREADPOOL
 {
+        /*! Library handle. */
+        void *upnp_lib;
         /*! Mutex to protect job qs. */
         ithread_mutex_t mutex;
         /*! Condition variable to signal Q. */
@@ -330,11 +332,10 @@ int ThreadPoolSetAttr(
  * 	\li \c 0 on success, nonzero on failure.
  * 	\li \c EOUTOFMEM if not enough memory to add job.
  */
-int ThreadPoolAdd(
-        /*! valid thread pool pointer. */
+int ThreadPoolAdd(/*! valid thread pool pointer. */
         ThreadPool *tp,
         /*! . */
-        ThreadPoolJob *job,
+        const ThreadPoolJob *job,
         /*! id of job. */
         int *jobId);
 

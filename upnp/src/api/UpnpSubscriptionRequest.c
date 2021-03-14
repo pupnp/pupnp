@@ -27,8 +27,9 @@ UpnpSubscriptionRequest *UpnpSubscriptionRequest_new()
         struct s_UpnpSubscriptionRequest *p =
                 calloc(1, sizeof(struct s_UpnpSubscriptionRequest));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         p->m_ServiceId = UpnpString_new();
         p->m_UDN = UpnpString_new();
@@ -42,8 +43,9 @@ void UpnpSubscriptionRequest_delete(UpnpSubscriptionRequest *q)
         struct s_UpnpSubscriptionRequest *p =
                 (struct s_UpnpSubscriptionRequest *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         UpnpString_delete(p->m_SID);
         p->m_SID = 0;
@@ -80,8 +82,9 @@ UpnpSubscriptionRequest *UpnpSubscriptionRequest_dup(
 {
         UpnpSubscriptionRequest *p = UpnpSubscriptionRequest_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpSubscriptionRequest_assign(p, q);
 

@@ -34,8 +34,9 @@ UpnpDiscovery *UpnpDiscovery_new()
 {
         struct s_UpnpDiscovery *p = calloc(1, sizeof(struct s_UpnpDiscovery));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         /*p->m_ErrCode = 0;*/
         /*p->m_Expires = 0;*/
@@ -56,8 +57,9 @@ void UpnpDiscovery_delete(UpnpDiscovery *q)
 {
         struct s_UpnpDiscovery *p = (struct s_UpnpDiscovery *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         memset(&p->m_DestAddr, 0, sizeof(struct sockaddr_storage));
         UpnpString_delete(p->m_Ext);
@@ -123,8 +125,9 @@ UpnpDiscovery *UpnpDiscovery_dup(const UpnpDiscovery *q)
 {
         UpnpDiscovery *p = UpnpDiscovery_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpDiscovery_assign(p, q);
 
@@ -438,6 +441,11 @@ void UpnpDiscovery_clear_Ext(UpnpDiscovery *p) { UpnpString_clear(p->m_Ext); }
 
 const struct sockaddr_storage *UpnpDiscovery_get_DestAddr(
         const UpnpDiscovery *p)
+{
+        return &p->m_DestAddr;
+}
+
+struct sockaddr_storage *UpnpDiscovery_getnc_DestAddr(UpnpDiscovery *p)
 {
         return &p->m_DestAddr;
 }

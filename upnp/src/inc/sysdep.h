@@ -42,11 +42,8 @@
  * your system's clock */
 #define UUIDS_PER_TICK 1024
 
-/*! Set the following to a call to acquire a system wide global lock. */
-extern ithread_mutex_t gUUIDMutex;
-
-#define UUIDLock() ithread_mutex_lock(&gUUIDMutex)
-#define UUIDUnlock() ithread_mutex_unlock(&gUUIDMutex)
+#define UUIDLock() ithread_mutex_lock(UpnpLib_getnc_gUUIDMutex(p))
+#define UUIDUnlock() ithread_mutex_unlock(UpnpLib_getnc_gUUIDMutex(p))
 
 typedef uint64_t uuid_time_t;
 

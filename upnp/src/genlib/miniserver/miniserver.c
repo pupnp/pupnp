@@ -48,6 +48,7 @@
  */
 
 #include "ThreadPool.h"
+#include "UpnpLib.h"
 #include "httpreadwrite.h"
 #include "ithread.h"
 #include "miniserver.h"
@@ -158,6 +159,8 @@ void SetGenaCallback(MiniServerCallback callback) { gGenaCallback = callback; }
  * \return 0 on Success or HTTP_INTERNAL_SERVER_ERROR if Callback is NULL.
  */
 static int dispatch_request(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Socket Information object. */
         SOCKINFO *info,
         /*! [in] HTTP parser object. */
@@ -196,7 +199,7 @@ static int dispatch_request(
         if (callback == NULL) {
                 return HTTP_INTERNAL_SERVER_ERROR;
         }
-        callback(hparser, &hparser->msg, info);
+        callback(p, hparser, &hparser->msg, info);
 
         return 0;
 }
@@ -205,6 +208,8 @@ static int dispatch_request(
  * \brief Send Error Message.
  */
 static UPNP_INLINE void handle_error(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Socket Information object. */
         SOCKINFO *info,
         /*! [in] HTTP Error Code. */
@@ -214,7 +219,7 @@ static UPNP_INLINE void handle_error(
         /*! [in] Minor Version Number. */
         int minor)
 {
-        http_SendStatusResponse(info, http_error_code, major, minor);
+        http_SendStatusResponse(p, info, http_error_code, major, minor);
 }
 
 /*!
@@ -235,6 +240,8 @@ static void free_handle_request_arg(
  * \brief Receive the request and dispatch it for handling.
  */
 static void handle_request(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Request Message to be handled. */
         void *args)
 {
@@ -265,8 +272,12 @@ static void handle_request(
                 return;
         }
         /* read */
-        ret_code = http_RecvMessage(
-                &info, &parser, HTTPMETHOD_UNKNOWN, &timeout, &http_error_code);
+        ret_code = http_RecvMessage(p,
+                &info,
+                &parser,
+                HTTPMETHOD_UNKNOWN,
+                &timeout,
+                &http_error_code);
         if (ret_code != 0) {
                 goto error_handler;
         }
@@ -277,7 +288,7 @@ static void handle_request(
                 "miniserver %d: PROCESSING...\n",
                 connfd);
         /* dispatch */
-        http_error_code = dispatch_request(&info, &parser);
+        http_error_code = dispatch_request(p, &info, &parser);
         if (http_error_code != 0) {
                 goto error_handler;
         }
@@ -289,7 +300,7 @@ error_handler:
                         major = hmsg->major_version;
                         minor = hmsg->minor_version;
                 }
-                handle_error(&info, http_error_code, major, minor);
+                handle_error(p, &info, http_error_code, major, minor);
         }
         sock_destroy(&info, SD_BOTH);
         httpmsg_destroy(hmsg);
@@ -308,6 +319,8 @@ error_handler:
  * job and adds the job to the thread pool.
  */
 static UPNP_INLINE void schedule_request_job(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Socket Descriptor on which connection is accepted. */
         SOCKET connfd,
         /*! [in] Clients Address information. */
@@ -316,7 +329,7 @@ static UPNP_INLINE void schedule_request_job(
         struct mserv_request_t *request;
         ThreadPoolJob job;
 
-        memset(&job, 0, sizeof(job));
+        memset(&job, 0, sizeof job);
 
         request = (struct mserv_request_t *)malloc(
                 sizeof(struct mserv_request_t));
@@ -335,10 +348,11 @@ static UPNP_INLINE void schedule_request_job(
         memcpy(&request->foreign_sockaddr,
                 clientAddr,
                 sizeof(request->foreign_sockaddr));
-        TPJobInit(&job, (start_routine)handle_request, (void *)request);
+        TPJobInit(&job, handle_request, (void *)request);
         TPJobSetFreeFunction(&job, free_handle_request_arg);
         TPJobSetPriority(&job, MED_PRIORITY);
-        if (ThreadPoolAdd(&gMiniServerThreadPool, &job, NULL) != 0) {
+        if (ThreadPoolAdd(UpnpLib_getnc_gMiniServerThreadPool(p), &job, NULL) !=
+                0) {
                 UpnpPrintf(UPNP_INFO,
                         MSERV,
                         __FILE__,
@@ -359,7 +373,7 @@ static UPNP_INLINE void fdset_if_valid(SOCKET sock, fd_set *set)
         }
 }
 
-static void web_server_accept(SOCKET lsock, fd_set *set)
+static void web_server_accept(UpnpLib *p, SOCKET lsock, fd_set *set)
 {
 #ifdef INTERNAL_WEB_SERVER
         SOCKET asock;
@@ -381,16 +395,16 @@ static void web_server_accept(SOCKET lsock, fd_set *set)
                                 errorBuffer);
                 } else {
                         schedule_request_job(
-                                asock, (struct sockaddr *)&clientAddr);
+                                p, asock, (struct sockaddr *)&clientAddr);
                 }
         }
 #endif /* INTERNAL_WEB_SERVER */
 }
 
-static void ssdp_read(SOCKET rsock, fd_set *set)
+static void ssdp_read(UpnpLib *p, SOCKET rsock, fd_set *set)
 {
         if (rsock != INVALID_SOCKET && FD_ISSET(rsock, set)) {
-                readFromSSDPSocket(rsock);
+                readFromSSDPSocket(p, rsock);
         }
 }
 
@@ -447,8 +461,10 @@ static int receive_from_stopSock(SOCKET ssock, fd_set *set)
  * shutdown actions for the Miniserver and SSDP sockets.
  */
 static void RunMiniServer(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Socket Array. */
-        MiniServerSockArray *miniSock)
+        void *ms)
 {
         char errorBuffer[ERROR_BUFFER_LEN];
         fd_set expSet;
@@ -456,6 +472,7 @@ static void RunMiniServer(
         SOCKET maxMiniSock;
         int ret = 0;
         int stopSock = 0;
+        MiniServerSockArray *miniSock = ms;
 
         maxMiniSock = 0;
         maxMiniSock = max_int(maxMiniSock, miniSock->miniServerSock4);
@@ -503,17 +520,17 @@ static void RunMiniServer(
                                 errorBuffer);
                         continue;
                 } else {
-                        web_server_accept(miniSock->miniServerSock4, &rdSet);
-                        web_server_accept(miniSock->miniServerSock6, &rdSet);
+                        web_server_accept(p, miniSock->miniServerSock4, &rdSet);
+                        web_server_accept(p, miniSock->miniServerSock6, &rdSet);
                         web_server_accept(
-                                miniSock->miniServerSock6UlaGua, &rdSet);
+                                p, miniSock->miniServerSock6UlaGua, &rdSet);
 #ifdef INCLUDE_CLIENT_APIS
-                        ssdp_read(miniSock->ssdpReqSock4, &rdSet);
-                        ssdp_read(miniSock->ssdpReqSock6, &rdSet);
+                        ssdp_read(p, miniSock->ssdpReqSock4, &rdSet);
+                        ssdp_read(p, miniSock->ssdpReqSock6, &rdSet);
 #endif /* INCLUDE_CLIENT_APIS */
-                        ssdp_read(miniSock->ssdpSock4, &rdSet);
-                        ssdp_read(miniSock->ssdpSock6, &rdSet);
-                        ssdp_read(miniSock->ssdpSock6UlaGua, &rdSet);
+                        ssdp_read(p, miniSock->ssdpSock4, &rdSet);
+                        ssdp_read(p, miniSock->ssdpSock6, &rdSet);
+                        ssdp_read(p, miniSock->ssdpSock6UlaGua, &rdSet);
                         stopSock = receive_from_stopSock(
                                 miniSock->miniServerStopSock, &rdSet);
                 }
@@ -826,6 +843,8 @@ error:
  *	\li UPNP_E_SUCCESS: Success.
  */
 static int get_miniserver_sockets(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Socket Array. */
         MiniServerSockArray *out,
         /*! [in] port on which the server is listening for incoming IPv4
@@ -846,13 +865,17 @@ static int get_miniserver_sockets(
         struct s_SocketStuff ss4;
         struct s_SocketStuff ss6;
         struct s_SocketStuff ss6UlaGua;
+        const char *lIF_IPV4 = UpnpLib_get_gIF_IPV4_cstr(p);
+        const char *lIF_IPV6 = UpnpLib_get_gIF_IPV6_cstr(p);
+        const char *lIF_IPV6_ULA_GUA = UpnpLib_get_gIF_IPV6_ULA_GUA_cstr(p);
+        unsigned lIF_INDEX = UpnpLib_get_gIF_INDEX(p);
 
         /* Create listen socket for IPv4/IPv6. An error here may indicate
          * that we don't have an IPv4/IPv6 stack. */
-        err_init_4 = init_socket_suff(&ss4, gIF_IPV4, 4);
-        err_init_6 = init_socket_suff(&ss6, gIF_IPV6, 6);
-        err_init_6UlaGua = init_socket_suff(&ss6UlaGua, gIF_IPV6_ULA_GUA, 6);
-        ss6.serverAddr6->sin6_scope_id = gIF_INDEX;
+        err_init_4 = init_socket_suff(&ss4, lIF_IPV4, 4);
+        err_init_6 = init_socket_suff(&ss6, lIF_IPV6, 6);
+        err_init_6UlaGua = init_socket_suff(&ss6UlaGua, lIF_IPV6_ULA_GUA, 6);
+        ss6.serverAddr6->sin6_scope_id = lIF_INDEX;
         /* Check what happened. */
         if (err_init_4 && (err_init_6 || err_init_6UlaGua)) {
                 UpnpPrintf(UPNP_CRITICAL,
@@ -1013,15 +1036,8 @@ static UPNP_INLINE void InitMiniServerSockArray(MiniServerSockArray *miniSocket)
 }
 
 int StartMiniServer(
-        /*! [in,out] Port on which the server listens for incoming IPv4
-         * connections. */
-        uint16_t *listen_port4,
-        /*! [in,out] Port on which the server listens for incoming IPv6
-         * LLA connections. */
-        uint16_t *listen_port6,
-        /*! [in,out] Port on which the server listens for incoming
-         * IPv6 ULA or GUA connections. */
-        uint16_t *listen_port6UlaGua)
+        /*! Library handle. */
+        UpnpLib *p)
 {
         int ret_code;
         int count;
@@ -1045,8 +1061,11 @@ int StartMiniServer(
         InitMiniServerSockArray(miniSocket);
 #ifdef INTERNAL_WEB_SERVER
         /* V4 and V6 http listeners. */
-        ret_code = get_miniserver_sockets(
-                miniSocket, *listen_port4, *listen_port6, *listen_port6UlaGua);
+        ret_code = get_miniserver_sockets(p,
+                miniSocket,
+                UpnpLib_get_LOCAL_PORT_V4(p),
+                UpnpLib_get_LOCAL_PORT_V6(p),
+                UpnpLib_get_LOCAL_PORT_V6_ULA_GUA(p));
         if (ret_code != UPNP_E_SUCCESS) {
                 free(miniSocket);
                 return ret_code;
@@ -1062,7 +1081,7 @@ int StartMiniServer(
                 return ret_code;
         }
         /* SSDP socket for discovery/advertising. */
-        ret_code = get_ssdp_sockets(miniSocket);
+        ret_code = get_ssdp_sockets(p, miniSocket);
         if (ret_code != UPNP_E_SUCCESS) {
                 sock_close(miniSocket->miniServerSock4);
                 sock_close(miniSocket->miniServerSock6);
@@ -1071,10 +1090,11 @@ int StartMiniServer(
                 free(miniSocket);
                 return ret_code;
         }
-        TPJobInit(&job, (start_routine)RunMiniServer, (void *)miniSocket);
+        TPJobInit(&job, RunMiniServer, miniSocket);
         TPJobSetPriority(&job, MED_PRIORITY);
         TPJobSetFreeFunction(&job, (free_routine)free);
-        ret_code = ThreadPoolAddPersistent(&gMiniServerThreadPool, &job, NULL);
+        ret_code = ThreadPoolAddPersistent(
+                UpnpLib_getnc_gMiniServerThreadPool(p), &job, NULL);
         if (ret_code < 0) {
                 sock_close(miniSocket->miniServerSock4);
                 sock_close(miniSocket->miniServerSock6);
@@ -1114,9 +1134,9 @@ int StartMiniServer(
                 return UPNP_E_INTERNAL_ERROR;
         }
 #ifdef INTERNAL_WEB_SERVER
-        *listen_port4 = miniSocket->miniServerPort4;
-        *listen_port6 = miniSocket->miniServerPort6;
-        *listen_port6UlaGua = miniSocket->miniServerPort6UlaGua;
+        UpnpLib_set_LOCAL_PORT_V4(p, miniSocket->miniServerPort4);
+        UpnpLib_set_LOCAL_PORT_V6(p, miniSocket->miniServerPort6);
+        UpnpLib_set_LOCAL_PORT_V6_ULA_GUA(p, miniSocket->miniServerPort6UlaGua);
 #endif
 
         return UPNP_E_SUCCESS;

@@ -188,6 +188,8 @@ service_info *FindServiceId(
  * URL matches a known event URL.
  */
 service_info *FindServiceEventURLPath(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Service table. */
         service_table *table,
         /*! [in] Event URL path used to find a service from the table. */
@@ -201,6 +203,8 @@ service_info *FindServiceEventURLPath(
  * URL Path matches a known value.
  */
 service_info *FindServiceControlURLPath(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Service table. */
         service_table *table,
         /*! [in] Control URL path used to find a service from the table. */
@@ -303,6 +307,8 @@ int removeServiceTable(
  * \brief Add Service to the table.
  */
 int addServiceTable(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] XML node information. */
         IXML_Node *node,
         /*! [in] Service table that will be initialized with services. */
@@ -317,6 +323,8 @@ int addServiceTable(
  * \return An integer
  */
 int getServiceTable(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] XML node information. */
         IXML_Node *node,
         /*! [in] Output parameter which will contain the service list and URL.

@@ -54,7 +54,8 @@
  * Returns: int
  *	UPNP_E_SUCCESS if successful else appropriate error
  ***************************************************************************/
-void error_respond(SOCKINFO *info, int error_code, http_message_t *hmsg)
+void error_respond(
+        UpnpLib *p, SOCKINFO *info, int error_code, http_message_t *hmsg)
 {
         int major, minor;
 
@@ -62,7 +63,7 @@ void error_respond(SOCKINFO *info, int error_code, http_message_t *hmsg)
         http_CalcResponseVersion(
                 hmsg->major_version, hmsg->minor_version, &major, &minor);
 
-        http_SendStatusResponse(info, error_code, major, minor);
+        http_SendStatusResponse(p, info, error_code, major, minor);
 }
 
 /************************************************************************
@@ -80,11 +81,14 @@ void error_respond(SOCKINFO *info, int error_code, http_message_t *hmsg)
  * Returns: int
  *	UPNP_E_SUCCESS if successful else appropriate error
  ***************************************************************************/
-void genaCallback(
-        http_parser_t *parser, http_message_t *request, SOCKINFO *info)
+void genaCallback(UpnpLib *p,
+        http_parser_t *parser,
+        http_message_t *request,
+        SOCKINFO *info)
 {
         int found_function = 0;
         (void)parser;
+        (void)p;
 
         if (request->method == HTTPMETHOD_SUBSCRIBE) {
 #ifdef INCLUDE_DEVICE_APIS
@@ -117,7 +121,7 @@ void genaCallback(
 
         if (!found_function) {
                 /* handle missing functions of device or ctrl pt */
-                error_respond(info, HTTP_NOT_IMPLEMENTED, request);
+                error_respond(p, info, HTTP_NOT_IMPLEMENTED, request);
         }
         return;
 }

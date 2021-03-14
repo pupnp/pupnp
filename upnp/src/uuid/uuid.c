@@ -28,6 +28,7 @@
 #include "uuid.h"
 
 #include "UpnpInet.h"
+#include "UpnpLib.h"
 #include "UpnpStdInt.h"
 
 #include <stdio.h>
@@ -51,7 +52,7 @@ static uint16_t true_random(void);
 /*!
  * \brief Generator of a UUID.
  */
-int uuid_create(uuid_upnp *uid)
+int uuid_create(UpnpLib *p, uuid_upnp *uid)
 {
         uuid_time_t timestamp;
         uuid_time_t last_time;

@@ -35,6 +35,7 @@ UpnpSubscriptionRequest
 FILES_OTHERS=(
 GenlibClientSubscription
 SSDPResultData
+UpnpLib
 )
 
 FILES_TEST=(
@@ -44,9 +45,16 @@ TestClass
 ALL_FILES=("${FILES_API[@]}" "${FILES_OTHERS[@]}" "${FILES_TEST[@]}")
 
 echo
-INCLUDES="-I. -I../.. -I../../upnp/src/inc -I../../ixml/inc -I../../upnp/inc/"
+INCLUDES="-I."
+INCLUDES="${INCLUDES} -I../.."
+INCLUDES="${INCLUDES} -I../../upnp/src/inc"
+INCLUDES="${INCLUDES} -I../../ixml/inc"
+INCLUDES="${INCLUDES} -I../../upnp/inc"
+INCLUDES="${INCLUDES} -I../../upnp/src/threadutil"
 for FILE in "${ALL_FILES[@]}"; do
 	compile $FILE
+        clang-format -i --style=file $FILE.c
+        clang-format -i --style=file $FILE.h
 done
 
 rm *.o
@@ -68,3 +76,6 @@ FILE=${FILES_OTHERS[1]}
 movefile $FILE.h ../src/ssdp
 movefile $FILE.c ../src/ssdp
 
+FILE=${FILES_OTHERS[2]}
+movefile $FILE.h ../src/inc
+movefile $FILE.c ../src

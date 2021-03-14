@@ -42,6 +42,7 @@
 
 #include "UpnpGlobal.h" /* for */
 #include "UpnpInet.h"
+#include "upnp.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -313,6 +314,8 @@ int remove_dots(
  * \return
  */
 char *resolve_rel_url(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Base URL. */
         char *base_url,
         /*! [in] Relative URL. */
@@ -331,6 +334,8 @@ char *resolve_rel_url(
  * \return
  */
 int parse_uri(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Character string containing uri information to be parsed. */
         const char *in,
         /*! [in] Maximum limit on the number of characters. */

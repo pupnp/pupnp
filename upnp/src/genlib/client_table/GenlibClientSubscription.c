@@ -29,8 +29,9 @@ GenlibClientSubscription *GenlibClientSubscription_new()
         struct s_GenlibClientSubscription *p =
                 calloc(1, sizeof(struct s_GenlibClientSubscription));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         /*p->m_RenewEventId = 0;*/
         p->m_SID = UpnpString_new();
@@ -46,8 +47,9 @@ void GenlibClientSubscription_delete(GenlibClientSubscription *q)
         struct s_GenlibClientSubscription *p =
                 (struct s_GenlibClientSubscription *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         p->m_Next = 0;
         UpnpString_delete(p->m_EventURL);
@@ -92,8 +94,9 @@ GenlibClientSubscription *GenlibClientSubscription_dup(
 {
         GenlibClientSubscription *p = GenlibClientSubscription_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         GenlibClientSubscription_assign(p, q);
 

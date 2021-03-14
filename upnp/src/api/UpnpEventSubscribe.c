@@ -28,8 +28,9 @@ UpnpEventSubscribe *UpnpEventSubscribe_new()
         struct s_UpnpEventSubscribe *p =
                 calloc(1, sizeof(struct s_UpnpEventSubscribe));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         /*p->m_ErrCode = 0;*/
         /*p->m_TimeOut = 0;*/
@@ -43,8 +44,9 @@ void UpnpEventSubscribe_delete(UpnpEventSubscribe *q)
 {
         struct s_UpnpEventSubscribe *p = (struct s_UpnpEventSubscribe *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         UpnpString_delete(p->m_PublisherUrl);
         p->m_PublisherUrl = 0;
@@ -83,8 +85,9 @@ UpnpEventSubscribe *UpnpEventSubscribe_dup(const UpnpEventSubscribe *q)
 {
         UpnpEventSubscribe *p = UpnpEventSubscribe_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpEventSubscribe_assign(p, q);
 

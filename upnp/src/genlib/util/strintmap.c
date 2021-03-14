@@ -64,7 +64,7 @@
  ************************************************************************/
 int map_str_to_int(const char *name,
         size_t name_len,
-        str_int_entry *table,
+        const str_int_entry *table,
         int num_entries,
         int case_sensitive)
 {
@@ -116,7 +116,7 @@ int map_str_to_int(const char *name,
  *
  *	Note :
  ************************************************************************/
-int map_int_to_str(int id, str_int_entry *table, int num_entries)
+int map_int_to_str(int id, const str_int_entry *table, int num_entries)
 {
         int i;
 

@@ -26,8 +26,9 @@ SSDPResultData *SSDPResultData_new()
 {
         struct s_SSDPResultData *p = calloc(1, sizeof(struct s_SSDPResultData));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         p->m_Param = UpnpDiscovery_new();
         /*p->m_Cookie = 0;*/
@@ -40,8 +41,9 @@ void SSDPResultData_delete(SSDPResultData *q)
 {
         struct s_SSDPResultData *p = (struct s_SSDPResultData *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         p->m_CtrlptCallback = 0;
         p->m_Cookie = 0;
@@ -74,8 +76,9 @@ SSDPResultData *SSDPResultData_dup(const SSDPResultData *q)
 {
         SSDPResultData *p = SSDPResultData_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         SSDPResultData_assign(p, q);
 

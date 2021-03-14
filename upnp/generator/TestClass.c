@@ -31,8 +31,9 @@ TestClass *TestClass_new()
 {
         struct s_TestClass *p = calloc(1, sizeof(struct s_TestClass));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpListInit(&p->m_TheList);
         /*p->m_TheInteger = 0;*/
@@ -50,8 +51,9 @@ void TestClass_delete(TestClass *q)
 {
         struct s_TestClass *p = (struct s_TestClass *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         ixmlFreeDOMString(p->m_TheDomString);
         p->m_TheDomString = 0;
@@ -102,8 +104,9 @@ TestClass *TestClass_dup(const TestClass *q)
 {
         TestClass *p = TestClass_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         TestClass_assign(p, q);
 
@@ -162,6 +165,11 @@ int TestClass_set_TheCharPointer(TestClass *p, char *n)
 }
 
 const struct TheStruct *TestClass_get_TheBuffer(const TestClass *p)
+{
+        return &p->m_TheBuffer;
+}
+
+struct TheStruct *TestClass_getnc_TheBuffer(TestClass *p)
 {
         return &p->m_TheBuffer;
 }

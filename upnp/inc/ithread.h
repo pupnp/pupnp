@@ -103,7 +103,8 @@ typedef pthread_attr_t ithread_attr_t;
  *      Thread start routine
  *      Internal Use Only.
  ***************************************************************************/
-typedef void (*start_routine)(void *arg);
+typedef struct s_UpnpLib UpnpLib;
+typedef void (*start_routine)(UpnpLib *p, void *arg);
 
 /****************************************************************************
  * Name: ithread_cond_t

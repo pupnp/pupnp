@@ -44,6 +44,7 @@ int main(int argc, char **argv)
         int rc;
         ithread_t cmdloop_thread;
         int i = 0;
+        UpnpLib *p;
 #ifdef _WIN32
 #else
         int sig;
@@ -67,14 +68,13 @@ int main(int argc, char **argv)
                 }
         }
 
-        rc = TvCtrlPointStart(iface, NULL, 0);
+        rc = TvCtrlPointStart(&p, iface, NULL, 0);
         if (rc != TV_SUCCESS) {
                 SampleUtil_Print("Error starting UPnP TV Control Point\n");
                 return rc;
         }
         /* start a command loop thread */
-        code = ithread_create(
-                &cmdloop_thread, NULL, TvCtrlPointCommandLoop, NULL);
+        code = ithread_create(&cmdloop_thread, NULL, TvCtrlPointCommandLoop, p);
         if (code != 0) {
                 return UPNP_E_INTERNAL_ERROR;
         }
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
         sigwait(&sigs_to_catch, &sig);
         SampleUtil_Print("Shutting down on signal %d...\n", sig);
 #endif
-        rc = TvCtrlPointStop();
+        rc = TvCtrlPointStop(p);
 
         return rc;
 }

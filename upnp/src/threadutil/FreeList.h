@@ -40,9 +40,8 @@
 extern "C" {
 #endif
 
-#include "ithread.h"
-
 #include <errno.h>
+#include <stdio.h>
 
 /*!
  * Free list node. points to next free item.

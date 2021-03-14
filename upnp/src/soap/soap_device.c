@@ -40,6 +40,7 @@
 #if EXCLUDE_SOAP == 0
 
 #include "UpnpActionRequest.h"
+#include "UpnpLib.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
 #include "parsetools.h"
@@ -97,6 +98,8 @@ typedef struct soap_devserv_t
  * \brief Sends SOAP error response.
  */
 static void send_error_response(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Socket info. */
         SOCKINFO *info,
         /*! [in] Error code. */
@@ -163,7 +166,8 @@ static void send_error_response(
                 return;
         }
         /* send err msg */
-        http_SendMessage(info, &timeout_secs, "b", headers.buf, headers.length);
+        http_SendMessage(
+                p, info, &timeout_secs, "b", headers.buf, headers.length);
         membuffer_destroy(&headers);
 }
 
@@ -171,6 +175,8 @@ static void send_error_response(
  * \brief Sends response of get var status.
  */
 static UPNP_INLINE void send_var_query_response(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Socket info. */
         SOCKINFO *info,
         /*! [in] Value of the state variable. */
@@ -222,7 +228,7 @@ static UPNP_INLINE void send_var_query_response(
         }
         /* send msg */
         http_SendMessage(
-                info, &timeout_secs, "b", response.buf, response.length);
+                p, info, &timeout_secs, "b", response.buf, response.length);
         membuffer_destroy(&response);
 }
 
@@ -230,6 +236,8 @@ static UPNP_INLINE void send_var_query_response(
  * \brief Sends the SOAP action response.
  */
 static UPNP_INLINE void send_action_response(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Socket info. */
         SOCKINFO *info,
         /*! [in] The response document. */
@@ -275,7 +283,8 @@ static UPNP_INLINE void send_action_response(
                 goto error_handler;
         }
         /* send whole msg */
-        ret_code = http_SendMessage(info,
+        ret_code = http_SendMessage(p,
+                info,
                 &timeout_secs,
                 "bbbb",
                 headers.buf,
@@ -302,7 +311,7 @@ error_handler:
         if (err_code != 0) {
                 /* only one type of error to worry about - out of mem */
                 send_error_response(
-                        info, SOAP_ACTION_FAILED, "Out of memory", request);
+                        p, info, SOAP_ACTION_FAILED, "Out of memory", request);
         }
 }
 
@@ -311,6 +320,8 @@ error_handler:
  * This functionality has been deprecated in the UPnP V1.0 architecture.
  */
 static UPNP_INLINE void handle_query_variable(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Socket info. */
         SOCKINFO *info,
         /*! [in] HTTP Request. */
@@ -344,7 +355,7 @@ static UPNP_INLINE void handle_query_variable(
 
         /* send event */
         soap_info->callback(
-                UPNP_CONTROL_GET_VAR_REQUEST, variable, soap_info->cookie);
+                p, UPNP_CONTROL_GET_VAR_REQUEST, variable, soap_info->cookie);
         UpnpPrintf(UPNP_INFO,
                 SOAP,
                 __FILE__,
@@ -363,20 +374,22 @@ static UPNP_INLINE void handle_query_variable(
         }
         /* send response */
         send_var_query_response(
-                info, UpnpStateVarRequest_get_CurrentVal(variable), request);
+                p, info, UpnpStateVarRequest_get_CurrentVal(variable), request);
         err_code = 0;
 
         /* error handling and cleanup */
 error_handler:
         UpnpStateVarRequest_delete(variable);
         if (err_code != 0)
-                send_error_response(info, err_code, err_str, request);
+                send_error_response(p, info, err_code, err_str, request);
 }
 
 /*!
  * \brief Handles the SOAP action request.
  */
 static void handle_invoke_action(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Socket info. */
         SOCKINFO *info,
         /*! [in] HTTP Request. */
@@ -391,7 +404,7 @@ static void handle_invoke_action(
         IXML_Document *actionRequestDoc = NULL;
         IXML_Document *actionResultDoc = NULL;
         int err_code;
-        const char *err_str;
+        const char *err_str = "not initialized";
         memptr action_name;
         DOMString act_node = NULL;
         memptr hdr_value;
@@ -431,16 +444,16 @@ static void handle_invoke_action(
                         action, hdr_value.buf, hdr_value.length);
         }
 
-        if ((err_code = parser_get_unknown_headers(request,
-                     (UpnpListHead *)UpnpActionRequest_get_ExtraHeadersList(
-                             action))) != HTTP_OK) {
+        err_code = parser_get_unknown_headers(request,
+                (UpnpListHead *)UpnpActionRequest_get_ExtraHeadersList(action));
+        if (err_code != HTTP_OK) {
                 err_code = SOAP_ACTION_FAILED;
                 goto error_handler;
         }
 
         UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
         soap_info->callback(
-                UPNP_CONTROL_ACTION_REQUEST, action, soap_info->cookie);
+                p, UPNP_CONTROL_ACTION_REQUEST, action, soap_info->cookie);
         err_code = UpnpActionRequest_get_ErrCode(action);
         if (err_code != UPNP_E_SUCCESS) {
                 err_str = UpnpActionRequest_get_ErrStr_cstr(action);
@@ -458,7 +471,7 @@ static void handle_invoke_action(
                 goto error_handler;
         }
         /* send response */
-        send_action_response(info, actionResultDoc, request);
+        send_action_response(p, info, actionResultDoc, request);
         err_code = 0;
 
         /* error handling and cleanup */
@@ -470,8 +483,9 @@ error_handler:
                 (UpnpListHead *)UpnpActionRequest_get_ExtraHeadersList(action));
         /* restore */
         action_name.buf[action_name.length] = save_char;
-        if (err_code != 0)
-                send_error_response(info, err_code, err_str, request);
+        if (err_code != 0) {
+                send_error_response(p, info, err_code, err_str, request);
+        }
         UpnpActionRequest_delete(action);
 }
 
@@ -483,6 +497,8 @@ error_handler:
  * \return 0 if OK, -1 on error.
  */
 static int get_dev_service(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] HTTP request. */
         http_message_t *request,
         /*! [in] Address family: AF_INET or AF_INET6. */
@@ -505,7 +521,8 @@ static int get_dev_service(
 
         HandleReadLock();
 
-        if (GetDeviceHandleInfoForPath(control_url,
+        if (GetDeviceHandleInfoForPath(p,
+                    control_url,
                     AddressFamily,
                     &device_hnd,
                     &device_info,
@@ -541,6 +558,8 @@ error_handler:
  * \return UPNP_E_SUCCESS if OK, error number on failure.
  */
 static int get_mpost_acton_hdrval(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] HTTP request. */
         http_message_t *request,
         /*! [out] Buffer to get the header value */
@@ -554,7 +573,8 @@ static int get_mpost_acton_hdrval(
         hdr = httpmsg_find_hdr(request, HDR_MAN, &value);
         if (NULL == hdr)
                 return SREQ_NOT_EXTENDED;
-        if (matchstr(value.buf,
+        if (matchstr(p,
+                    value.buf,
                     value.length,
                     "%q%i ; ns = %s",
                     &dummy_quote,
@@ -586,6 +606,8 @@ static int get_mpost_acton_hdrval(
  * \return UPNP_E_SUCCESS if OK, error number on failure.
  */
 static int check_soapaction_hdr(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] HTTP request. */
         http_message_t *request,
         /*! [in, out] SOAP device/service information. */
@@ -603,7 +625,7 @@ static int check_soapaction_hdr(
                 if (!httpmsg_find_hdr(request, HDR_SOAPACTION, &value))
                         return SREQ_HDR_NOT_FOUND;
         } else {
-                ret_code = get_mpost_acton_hdrval(request, &value);
+                ret_code = get_mpost_acton_hdrval(p, request, &value);
                 if (ret_code != UPNP_E_SUCCESS) {
                         return ret_code;
                 }
@@ -619,7 +641,8 @@ static int check_soapaction_hdr(
                 goto error_handler;
         }
         *hash_pos = '\0';
-        if (matchstr(hash_pos + 1,
+        if (matchstr(p,
+                    hash_pos + 1,
                     value.length - (size_t)(hash_pos + 1 - value.buf),
                     "%s",
                     &soap_info->action_name) != PARSE_OK) {
@@ -759,6 +782,8 @@ error_handler:
  * to start SOAP processing.
  */
 void soap_device_callback(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Parsed request received by the device. */
         http_parser_t *parser,
         /*! [in] HTTP request. */
@@ -779,17 +804,18 @@ void soap_device_callback(
                 goto error_handler;
         }
         if (get_dev_service(
-                    request, info->foreign_sockaddr.ss_family, soap_info) < 0) {
+                    p, request, info->foreign_sockaddr.ss_family, soap_info) <
+                0) {
                 err_code = HTTP_NOT_FOUND;
                 goto error_handler;
         }
         /* validate: content-type == text/xml */
-        if (!has_xml_content_type(request)) {
+        if (!has_xml_content_type(p, request)) {
                 err_code = HTTP_UNSUPPORTED_MEDIA_TYPE;
                 goto error_handler;
         }
         /* check SOAPACTION HTTP header */
-        err_code = check_soapaction_hdr(request, soap_info);
+        err_code = check_soapaction_hdr(p, request, soap_info);
         if (err_code != UPNP_E_SUCCESS) {
                 switch (err_code) {
                 case SREQ_NOT_EXTENDED:
@@ -821,10 +847,10 @@ void soap_device_callback(
         /* process SOAP request */
         if (NULL == soap_info->action_name.buf)
                 /* query var */
-                handle_query_variable(info, request, soap_info, req_node);
+                handle_query_variable(p, info, request, soap_info, req_node);
         else
                 /* invoke action */
-                handle_invoke_action(info, request, soap_info, req_node);
+                handle_invoke_action(p, info, request, soap_info, req_node);
 
         err_code = HTTP_OK;
 
@@ -832,7 +858,8 @@ error_handler:
         ixmlDocument_free(xml_doc);
         free(soap_info);
         if (err_code != HTTP_OK) {
-                http_SendStatusResponse(info,
+                http_SendStatusResponse(p,
+                        info,
                         err_code,
                         request->major_version,
                         request->minor_version);

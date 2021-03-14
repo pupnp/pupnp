@@ -218,7 +218,7 @@ int SetActionTable(int serviceType, struct TvService *out)
         return 0;
 }
 
-int TvDeviceStateTableInit(char *DescDocURL)
+int TvDeviceStateTableInit(UpnpLib *p, char *DescDocURL)
 {
         IXML_Document *DescDoc = NULL;
         int ret = UPNP_E_SUCCESS;
@@ -231,7 +231,7 @@ int TvDeviceStateTableInit(char *DescDocURL)
         char *udn = NULL;
 
         /*Download description document */
-        if (UpnpDownloadXmlDoc(DescDocURL, &DescDoc) != UPNP_E_SUCCESS) {
+        if (UpnpDownloadXmlDoc(p, DescDocURL, &DescDoc) != UPNP_E_SUCCESS) {
                 SampleUtil_Print("TvDeviceStateTableInit -- Error Parsing %s\n",
                         DescDocURL);
                 ret = UPNP_E_INVALID_DESC;
@@ -239,7 +239,8 @@ int TvDeviceStateTableInit(char *DescDocURL)
         }
         udn = SampleUtil_GetFirstDocumentItem(DescDoc, "UDN");
         /* Find the Tv Control Service identifiers */
-        if (!SampleUtil_FindAndParseService(DescDoc,
+        if (!SampleUtil_FindAndParseService(p,
+                    DescDoc,
                     DescDocURL,
                     TvServiceType[TV_SERVICE_CONTROL],
                     &servid_ctrl,
@@ -259,7 +260,8 @@ int TvDeviceStateTableInit(char *DescDocURL)
                 &tv_service_table[TV_SERVICE_CONTROL]);
 
         /* Find the Tv Picture Service identifiers */
-        if (!SampleUtil_FindAndParseService(DescDoc,
+        if (!SampleUtil_FindAndParseService(p,
+                    DescDoc,
                     DescDocURL,
                     TvServiceType[TV_SERVICE_PICTURE],
                     &servid_pict,
@@ -300,7 +302,8 @@ error_handler:
         return (ret);
 }
 
-int TvDeviceHandleSubscriptionRequest(const UpnpSubscriptionRequest *sr_event)
+int TvDeviceHandleSubscriptionRequest(
+        UpnpLib *p, const UpnpSubscriptionRequest *sr_event)
 {
         unsigned int i = 0;
         int cmp1 = 0;
@@ -340,7 +343,8 @@ int TvDeviceHandleSubscriptionRequest(const UpnpSubscriptionRequest *sr_event)
 			/* free document */
 			Document_free(PropSet);
 #endif
-                        UpnpAcceptSubscription(device_handle,
+                        UpnpAcceptSubscription(p,
+                                device_handle,
                                 l_udn,
                                 l_serviceId,
                                 (const char **)tv_service_table[i].VariableName,
@@ -412,7 +416,7 @@ int TvDeviceHandleGetVarRequest(UpnpStateVarRequest *cgv_event)
         return UpnpStateVarRequest_get_ErrCode(cgv_event) == UPNP_E_SUCCESS;
 }
 
-int TvDeviceHandleActionRequest(UpnpActionRequest *ca_event)
+int TvDeviceHandleActionRequest(UpnpLib *p, UpnpActionRequest *ca_event)
 {
         /* Defaults if action not found. */
         int action_found = 0;
@@ -458,6 +462,7 @@ int TvDeviceHandleActionRequest(UpnpActionRequest *ca_event)
                                     "1") ||
                                 !strcmp(actionName, "PowerOn")) {
                                 retCode = tv_service_table[service].actions[i](
+                                        p,
                                         UpnpActionRequest_get_ActionRequest(
                                                 ca_event),
                                         &actionResult,
@@ -498,7 +503,8 @@ int TvDeviceHandleActionRequest(UpnpActionRequest *ca_event)
         return UpnpActionRequest_get_ErrCode(ca_event);
 }
 
-int TvDeviceSetServiceTableVar(unsigned int service, int variable, char *value)
+int TvDeviceSetServiceTableVar(
+        UpnpLib *p, unsigned int service, int variable, char *value)
 {
         /* IXML_Document  *PropSet= NULL; */
         if (service >= TV_SERVICE_SERVCOUNT ||
@@ -519,7 +525,8 @@ int TvDeviceSetServiceTableVar(unsigned int service, int variable, char *value)
 	/* Free created property set */
 	Document_free(PropSet);
 #endif
-        UpnpNotify(device_handle,
+        UpnpNotify(p,
+                device_handle,
                 tv_service_table[service].UDN,
                 tv_service_table[service].ServiceId,
                 (const char **)&tv_service_table[service]
@@ -539,6 +546,8 @@ int TvDeviceSetServiceTableVar(unsigned int service, int variable, char *value)
  * updated state.
  */
 static int TvDeviceSetPower(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] If 1, turn power on. If 0, turn power off. */
         int on)
 {
@@ -554,20 +563,22 @@ static int TvDeviceSetPower(
 
         sprintf(value, "%d", on);
         ret = TvDeviceSetServiceTableVar(
-                TV_SERVICE_CONTROL, TV_CONTROL_POWER, value);
+                p, TV_SERVICE_CONTROL, TV_CONTROL_POWER, value);
 
         return ret;
 }
 
-int TvDevicePowerOn(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDevicePowerOn(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
         (void)in;
 
         (*out) = NULL;
         (*errorString) = NULL;
 
-        if (TvDeviceSetPower(POWER_ON)) {
+        if (TvDeviceSetPower(p, POWER_ON)) {
                 /* create a response */
                 if (UpnpAddToActionResponse(out,
                             "PowerOn",
@@ -585,14 +596,16 @@ int TvDevicePowerOn(
         }
 }
 
-int TvDevicePowerOff(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDevicePowerOff(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
         (void)in;
 
         (*out) = NULL;
         (*errorString) = NULL;
-        if (TvDeviceSetPower(POWER_OFF)) {
+        if (TvDeviceSetPower(p, POWER_OFF)) {
                 /*create a response */
 
                 if (UpnpAddToActionResponse(out,
@@ -610,8 +623,10 @@ int TvDevicePowerOff(
         return UPNP_E_INTERNAL_ERROR;
 }
 
-int TvDeviceSetChannel(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceSetChannel(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
         char *value = NULL;
         int channel = 0;
@@ -632,7 +647,7 @@ int TvDeviceSetChannel(
         }
         /* Vendor-specific code to set the channel goes here. */
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_CONTROL, TV_CONTROL_CHANNEL, value)) {
+                    p, TV_SERVICE_CONTROL, TV_CONTROL_CHANNEL, value)) {
                 if (UpnpAddToActionResponse(out,
                             "SetChannel",
                             TvServiceType[TV_SERVICE_CONTROL],
@@ -652,7 +667,8 @@ int TvDeviceSetChannel(
         }
 }
 
-int IncrementChannel(int incr,
+int IncrementChannel(UpnpLib *p,
+        int incr,
         IXML_Document *in,
         IXML_Document **out,
         const char **errorString)
@@ -685,7 +701,7 @@ int IncrementChannel(int incr,
         /* Vendor-specific code to set the channel goes here. */
         sprintf(value, "%d", newchannel);
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_CONTROL, TV_CONTROL_CHANNEL, value)) {
+                    p, TV_SERVICE_CONTROL, TV_CONTROL_CHANNEL, value)) {
                 if (UpnpAddToActionResponse(out,
                             actionName,
                             TvServiceType[TV_SERVICE_CONTROL],
@@ -702,20 +718,26 @@ int IncrementChannel(int incr,
         }
 }
 
-int TvDeviceDecreaseChannel(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceDecreaseChannel(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementChannel(-1, in, out, errorString);
+        return IncrementChannel(p, -1, in, out, errorString);
 }
 
-int TvDeviceIncreaseChannel(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceIncreaseChannel(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementChannel(1, in, out, errorString);
+        return IncrementChannel(p, 1, in, out, errorString);
 }
 
-int TvDeviceSetVolume(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceSetVolume(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
         char *value = NULL;
         int volume = 0;
@@ -734,7 +756,7 @@ int TvDeviceSetVolume(
         }
         /* Vendor-specific code to set the volume goes here. */
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_CONTROL, TV_CONTROL_VOLUME, value)) {
+                    p, TV_SERVICE_CONTROL, TV_CONTROL_VOLUME, value)) {
                 if (UpnpAddToActionResponse(out,
                             "SetVolume",
                             TvServiceType[TV_SERVICE_CONTROL],
@@ -759,6 +781,8 @@ int TvDeviceSetVolume(
  * add the increment, and then change the volume.
  */
 static int IncrementVolume(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The increment by which to change the volume. */
         int incr,
         /*! [in] Action request document. */
@@ -795,7 +819,7 @@ static int IncrementVolume(
         /* Vendor-specific code to set the volume goes here. */
         sprintf(value, "%d", newvolume);
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_CONTROL, TV_CONTROL_VOLUME, value)) {
+                    p, TV_SERVICE_CONTROL, TV_CONTROL_VOLUME, value)) {
                 if (UpnpAddToActionResponse(out,
                             actionName,
                             TvServiceType[TV_SERVICE_CONTROL],
@@ -812,20 +836,26 @@ static int IncrementVolume(
         }
 }
 
-int TvDeviceIncreaseVolume(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceIncreaseVolume(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementVolume(1, in, out, errorString);
+        return IncrementVolume(p, 1, in, out, errorString);
 }
 
-int TvDeviceDecreaseVolume(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceDecreaseVolume(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementVolume(-1, in, out, errorString);
+        return IncrementVolume(p, -1, in, out, errorString);
 }
 
-int TvDeviceSetColor(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceSetColor(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
         char *value = NULL;
         int color = 0;
@@ -844,7 +874,7 @@ int TvDeviceSetColor(
         }
         /* Vendor-specific code to set the volume goes here. */
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_PICTURE, TV_PICTURE_COLOR, value)) {
+                    p, TV_SERVICE_PICTURE, TV_PICTURE_COLOR, value)) {
                 if (UpnpAddToActionResponse(out,
                             "SetColor",
                             TvServiceType[TV_SERVICE_PICTURE],
@@ -869,6 +899,8 @@ int TvDeviceSetColor(
  * table, add the increment, and then change the color.
  */
 static int IncrementColor(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The increment by which to change the volume. */
         int incr,
         /*! [in] Action request document. */
@@ -904,7 +936,7 @@ static int IncrementColor(
         /* Vendor-specific code to set the volume goes here. */
         sprintf(value, "%d", newcolor);
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_PICTURE, TV_PICTURE_COLOR, value)) {
+                    p, TV_SERVICE_PICTURE, TV_PICTURE_COLOR, value)) {
                 if (UpnpAddToActionResponse(out,
                             actionName,
                             TvServiceType[TV_SERVICE_PICTURE],
@@ -921,20 +953,26 @@ static int IncrementColor(
         }
 }
 
-int TvDeviceDecreaseColor(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceDecreaseColor(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementColor(-1, in, out, errorString);
+        return IncrementColor(p, -1, in, out, errorString);
 }
 
-int TvDeviceIncreaseColor(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceIncreaseColor(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementColor(1, in, out, errorString);
+        return IncrementColor(p, 1, in, out, errorString);
 }
 
-int TvDeviceSetTint(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceSetTint(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
         char *value = NULL;
         int tint = -1;
@@ -953,7 +991,7 @@ int TvDeviceSetTint(
         }
         /* Vendor-specific code to set the volume goes here. */
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_PICTURE, TV_PICTURE_TINT, value)) {
+                    p, TV_SERVICE_PICTURE, TV_PICTURE_TINT, value)) {
                 if (UpnpAddToActionResponse(out,
                             "SetTint",
                             TvServiceType[TV_SERVICE_PICTURE],
@@ -987,7 +1025,8 @@ int TvDeviceSetTint(
  *    [out] IXML_Document **out - action result document
  *    [out] char **errorString - errorString (in case action was unsuccessful)
  *****************************************************************************/
-int IncrementTint(int incr,
+int IncrementTint(UpnpLib *p,
+        int incr,
         IXML_Document *in,
         IXML_Document **out,
         const char **errorString)
@@ -1018,7 +1057,7 @@ int IncrementTint(int incr,
         /* Vendor-specific code to set the volume goes here. */
         sprintf(value, "%d", newtint);
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_PICTURE, TV_PICTURE_TINT, value)) {
+                    p, TV_SERVICE_PICTURE, TV_PICTURE_TINT, value)) {
                 if (UpnpAddToActionResponse(out,
                             actionName,
                             TvServiceType[TV_SERVICE_PICTURE],
@@ -1048,10 +1087,12 @@ int IncrementTint(int incr,
  *    [out] char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceIncreaseTint(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceIncreaseTint(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementTint(1, in, out, errorString);
+        return IncrementTint(p, 1, in, out, errorString);
 }
 
 /******************************************************************************
@@ -1067,10 +1108,12 @@ int TvDeviceIncreaseTint(
  *    [out] char **errorString - errorString (in case action was unsuccessful)
  *
  *****************************************************************************/
-int TvDeviceDecreaseTint(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceDecreaseTint(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementTint(-1, in, out, errorString);
+        return IncrementTint(p, -1, in, out, errorString);
 }
 
 /*****************************************************************************
@@ -1088,8 +1131,10 @@ int TvDeviceDecreaseTint(
  *    [out] char **errorString - errorString (in case action was unsuccessful)
  *
  ****************************************************************************/
-int TvDeviceSetContrast(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceSetContrast(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
         char *value = NULL;
         int contrast = -1;
@@ -1110,7 +1155,7 @@ int TvDeviceSetContrast(
         }
         /* Vendor-specific code to set the volume goes here. */
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_PICTURE, TV_PICTURE_CONTRAST, value)) {
+                    p, TV_SERVICE_PICTURE, TV_PICTURE_CONTRAST, value)) {
                 if (UpnpAddToActionResponse(out,
                             "SetContrast",
                             TvServiceType[TV_SERVICE_PICTURE],
@@ -1135,6 +1180,8 @@ int TvDeviceSetContrast(
  * table, add the increment, and then change the contrast.
  */
 static int IncrementContrast(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The increment by which to change the volume. */
         int incr,
         /*! [in] Action request document. */
@@ -1171,7 +1218,7 @@ static int IncrementContrast(
         /* Vendor-specific code to set the channel goes here. */
         sprintf(value, "%d", newcontrast);
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_PICTURE, TV_PICTURE_CONTRAST, value)) {
+                    p, TV_SERVICE_PICTURE, TV_PICTURE_CONTRAST, value)) {
                 if (UpnpAddToActionResponse(out,
                             actionName,
                             TvServiceType[TV_SERVICE_PICTURE],
@@ -1188,20 +1235,26 @@ static int IncrementContrast(
         }
 }
 
-int TvDeviceIncreaseContrast(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceIncreaseContrast(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementContrast(1, in, out, errorString);
+        return IncrementContrast(p, 1, in, out, errorString);
 }
 
-int TvDeviceDecreaseContrast(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceDecreaseContrast(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementContrast(-1, in, out, errorString);
+        return IncrementContrast(p, -1, in, out, errorString);
 }
 
-int TvDeviceSetBrightness(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceSetBrightness(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
         char *value = NULL;
         int brightness = -1;
@@ -1221,7 +1274,7 @@ int TvDeviceSetBrightness(
         }
         /* Vendor-specific code to set the volume goes here. */
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_PICTURE, TV_PICTURE_BRIGHTNESS, value)) {
+                    p, TV_SERVICE_PICTURE, TV_PICTURE_BRIGHTNESS, value)) {
                 if (UpnpAddToActionResponse(out,
                             "SetBrightness",
                             TvServiceType[TV_SERVICE_PICTURE],
@@ -1246,6 +1299,8 @@ int TvDeviceSetBrightness(
  * table, add the increment, and then change the brightness.
  */
 static int IncrementBrightness(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The increment by which to change the brightness. */
         int incr,
         /*! [in] action request document. */
@@ -1282,7 +1337,7 @@ static int IncrementBrightness(
         /* Vendor-specific code to set the channel goes here. */
         sprintf(value, "%d", newbrightness);
         if (TvDeviceSetServiceTableVar(
-                    TV_SERVICE_PICTURE, TV_PICTURE_BRIGHTNESS, value)) {
+                    p, TV_SERVICE_PICTURE, TV_PICTURE_BRIGHTNESS, value)) {
                 if (UpnpAddToActionResponse(out,
                             actionName,
                             TvServiceType[TV_SERVICE_PICTURE],
@@ -1299,32 +1354,36 @@ static int IncrementBrightness(
         }
 }
 
-int TvDeviceIncreaseBrightness(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceIncreaseBrightness(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementBrightness(1, in, out, errorString);
+        return IncrementBrightness(p, 1, in, out, errorString);
 }
 
-int TvDeviceDecreaseBrightness(
-        IXML_Document *in, IXML_Document **out, const char **errorString)
+int TvDeviceDecreaseBrightness(UpnpLib *p,
+        IXML_Document *in,
+        IXML_Document **out,
+        const char **errorString)
 {
-        return IncrementBrightness(-1, in, out, errorString);
+        return IncrementBrightness(p, -1, in, out, errorString);
 }
 
 int TvDeviceCallbackEventHandler(
-        Upnp_EventType EventType, const void *Event, void *Cookie)
+        UpnpLib *p, Upnp_EventType EventType, const void *Event, void *Cookie)
 {
         (void)Cookie;
         switch (EventType) {
         case UPNP_EVENT_SUBSCRIPTION_REQUEST:
                 TvDeviceHandleSubscriptionRequest(
-                        (UpnpSubscriptionRequest *)Event);
+                        p, (UpnpSubscriptionRequest *)Event);
                 break;
         case UPNP_CONTROL_GET_VAR_REQUEST:
                 TvDeviceHandleGetVarRequest((UpnpStateVarRequest *)Event);
                 break;
         case UPNP_CONTROL_ACTION_REQUEST:
-                TvDeviceHandleActionRequest((UpnpActionRequest *)Event);
+                TvDeviceHandleActionRequest(p, (UpnpActionRequest *)Event);
                 break;
                 /* ignore these cases, since this is not a control point */
         case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
@@ -1349,7 +1408,8 @@ int TvDeviceCallbackEventHandler(
         return 0;
 }
 
-int TvDeviceStart(char *iface,
+int TvDeviceStart(UpnpLib **pp,
+        char *iface,
         unsigned short port,
         const char *desc_doc_name,
         const char *web_dir_path,
@@ -1359,8 +1419,9 @@ int TvDeviceStart(char *iface,
 {
         int ret = UPNP_E_SUCCESS;
         char desc_doc_url[DESC_URL_SIZE];
-        char *ip_address = NULL;
+        const char *ip_address = NULL;
         int address_family = AF_INET;
+        UpnpLib *p;
 
         ithread_mutex_init(&TVDevMutex, NULL);
 
@@ -1369,27 +1430,28 @@ int TvDeviceStart(char *iface,
                          "\tinterface = %s port = %u\n",
                 iface ? iface : "{NULL}",
                 port);
-        ret = UpnpInit2(iface, port);
+        ret = UpnpInit2(&p, iface, port);
         if (ret != UPNP_E_SUCCESS) {
                 SampleUtil_Print("Error with UpnpInit2 -- %d\n", ret);
-                UpnpFinish();
+                UpnpFinish(p);
 
                 return ret;
         }
+        *pp = p;
         switch (ip_mode) {
         case IP_MODE_IPV4:
-                ip_address = UpnpGetServerIpAddress();
-                port = UpnpGetServerPort();
+                ip_address = UpnpGetServerIpAddress(p);
+                port = UpnpGetServerPort(p);
                 address_family = AF_INET;
                 break;
         case IP_MODE_IPV6_LLA:
-                ip_address = UpnpGetServerIp6Address();
-                port = UpnpGetServerPort6();
+                ip_address = UpnpGetServerIp6Address(p);
+                port = UpnpGetServerPort6(p);
                 address_family = AF_INET6;
                 break;
         case IP_MODE_IPV6_ULA_GUA:
-                ip_address = UpnpGetServerUlaGuaIp6Address();
-                port = UpnpGetServerUlaGuaPort6();
+                ip_address = UpnpGetServerUlaGuaIp6Address(p);
+                port = UpnpGetServerUlaGuaPort6(p);
                 address_family = AF_INET6;
                 break;
         default:
@@ -1432,20 +1494,21 @@ int TvDeviceStart(char *iface,
         }
         SampleUtil_Print("Specifying the webserver root directory -- %s\n",
                 web_dir_path);
-        ret = UpnpSetWebServerRootDir(web_dir_path);
+        ret = UpnpSetWebServerRootDir(p, web_dir_path);
         if (ret != UPNP_E_SUCCESS) {
                 SampleUtil_Print(
                         "Error specifying webserver root directory -- %s: %d\n",
                         web_dir_path,
                         ret);
-                UpnpFinish();
+                UpnpFinish(p);
 
                 return ret;
         }
         SampleUtil_Print("Registering the RootDevice\n"
                          "\t with desc_doc_url: %s\n",
                 desc_doc_url);
-        ret = UpnpRegisterRootDevice3(desc_doc_url,
+        ret = UpnpRegisterRootDevice3(p,
+                desc_doc_url,
                 TvDeviceCallbackEventHandler,
                 &device_handle,
                 &device_handle,
@@ -1453,19 +1516,20 @@ int TvDeviceStart(char *iface,
         if (ret != UPNP_E_SUCCESS) {
                 SampleUtil_Print(
                         "Error registering the rootdevice : %d\n", ret);
-                UpnpFinish();
+                UpnpFinish(p);
 
                 return ret;
         } else {
                 SampleUtil_Print("RootDevice Registered\n"
                                  "Initializing State Table\n");
-                TvDeviceStateTableInit(desc_doc_url);
+                TvDeviceStateTableInit(p, desc_doc_url);
                 SampleUtil_Print("State Table Initialized\n");
-                ret = UpnpSendAdvertisement(device_handle, default_advr_expire);
+                ret = UpnpSendAdvertisement(
+                        p, device_handle, default_advr_expire);
                 if (ret != UPNP_E_SUCCESS) {
                         SampleUtil_Print(
                                 "Error sending advertisements : %d\n", ret);
-                        UpnpFinish();
+                        UpnpFinish(p);
 
                         return ret;
                 }
@@ -1475,10 +1539,10 @@ int TvDeviceStart(char *iface,
         return UPNP_E_SUCCESS;
 }
 
-int TvDeviceStop(void)
+int TvDeviceStop(UpnpLib *p)
 {
-        UpnpUnRegisterRootDevice(device_handle);
-        UpnpFinish();
+        UpnpUnRegisterRootDevice(p, device_handle);
+        UpnpFinish(p);
         SampleUtil_Finish();
         ithread_mutex_destroy(&TVDevMutex);
 
@@ -1491,7 +1555,7 @@ void *TvDeviceCommandLoop(void *args)
         char cmdline[100];
         char cmd[100];
         char *s;
-        (void)args;
+        UpnpLib *p = (UpnpLib *)args;
 
         while (!stoploop) {
                 sprintf(cmdline, " ");
@@ -1504,7 +1568,7 @@ void *TvDeviceCommandLoop(void *args)
                 sscanf(cmdline, "%s", cmd);
                 if (strcasecmp(cmd, "exit") == 0) {
                         SampleUtil_Print("Shutting down...\n");
-                        TvDeviceStop();
+                        TvDeviceStop(p);
                         exit(0);
                 } else {
                         SampleUtil_Print("\n   Unknown command: %s\n\n", cmd);
@@ -1516,7 +1580,7 @@ void *TvDeviceCommandLoop(void *args)
         return NULL;
 }
 
-int device_main(int argc, char *argv[])
+int device_main(int argc, char *argv[], UpnpLib **p)
 {
         unsigned int portTemp = 0;
         char *iface = NULL;
@@ -1567,7 +1631,8 @@ int device_main(int argc, char *argv[])
                 }
         }
         port = (unsigned short)portTemp;
-        return TvDeviceStart(iface,
+        return TvDeviceStart(p,
+                iface,
                 port,
                 desc_doc_name,
                 web_dir_path,

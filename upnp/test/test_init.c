@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
         int a, b, c;
         (void)argc;
         (void)argv;
+        UpnpLib *p;
 
         /*
          * Check library version (and formats)
@@ -108,10 +109,11 @@ int main(int argc, char *argv[])
         printf("\n");
         printf("Initializing UPnP ... \n");
         UpnpSetLogFileNames(0, 0);
-        rc = UpnpInit2(NULL, 0);
+        p = 0;
+        rc = UpnpInit2(&p, NULL, 0);
         if (UPNP_E_SUCCESS == rc) {
-                const char *ip_address = UpnpGetServerIpAddress();
-                unsigned short port = UpnpGetServerPort();
+                const char *ip_address = UpnpGetServerIpAddress(p);
+                unsigned short port = UpnpGetServerPort(p);
 
                 printf("UPnP Initialized OK ip=%s, port=%d\n",
                         (ip_address ? ip_address : "UNKNOWN"),
@@ -125,7 +127,7 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
         }
 
-        (void)UpnpFinish();
+        UpnpFinish(p);
         printf("\n");
 
         exit(EXIT_SUCCESS);

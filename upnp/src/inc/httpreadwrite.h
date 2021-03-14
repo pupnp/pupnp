@@ -75,6 +75,8 @@ int http_FixUrl(
  * 	\li \c UPNP_E_SUCCESS
  */
 int http_FixStrUrl(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Character string as a URL. */
         const char *urlstr,
         /*! [in] Length of the character string. */
@@ -116,7 +118,8 @@ SOCKET http_Connect(
  *	 UPNP_E_BAD_HTTPMSG
  * 	 UPNP_E_SUCCESS
  ************************************************************************/
-int http_RecvMessage(SOCKINFO *info,
+int http_RecvMessage(UpnpLib *p,
+        SOCKINFO *info,
         http_parser_t *parser,
         http_method_t request_method,
         int *timeout_secs,
@@ -145,6 +148,8 @@ int http_RecvMessage(SOCKINFO *info,
  * \li \c UPNP_E_SUCCESS
  */
 int http_SendMessage(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] Socket information object. */
         SOCKINFO *info,
         /* [in,out] Time out value. */
@@ -176,7 +181,8 @@ int http_SendMessage(
  *	Error Codes returned by http_SendMessage
  *	Error Codes returned by http_RecvMessage
  ************************************************************************/
-int http_RequestAndResponse(uri_type *destination,
+int http_RequestAndResponse(UpnpLib *p,
+        uri_type *destination,
         const char *request,
         size_t request_length,
         http_method_t req_method,
@@ -214,7 +220,8 @@ int http_RequestAndResponse(uri_type *destination,
  *	UPNP_E_SUCCESS
  *	UPNP_E_INVALID_URL
  ************************************************************************/
-int http_Download(const char *url,
+int http_Download(UpnpLib *p,
+        const char *url,
         int timeout_secs,
         char **document,
         size_t *doc_length,
@@ -261,6 +268,8 @@ int http_HttpGetProgress(void *Handle, size_t *length, size_t *total);
  *              allocated.
  */
 EXPORT_SPEC int http_OpenHttpConnection(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The URL which contains the host, and the scheme to make the
            connection. */
         const char *url,
@@ -299,6 +308,8 @@ EXPORT_SPEC int http_OpenHttpConnection(
  *              allocated.
  */
 EXPORT_SPEC int http_MakeHttpRequest(
+        /*! Library handle. */
+        UpnpLib *p,
         /* ![in] The method to use to make the request. */
         Upnp_HttpMethod method,
         /*! [in] The URL to use to make the request. The URL should use the same
@@ -406,6 +417,8 @@ EXPORT_SPEC int http_EndHttpRequest(
  *             remote server.
  */
 EXPORT_SPEC int http_GetHttpResponse(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The handle of the connection created by the call to
          * \b UpnpOpenHttpConnection. */
         void *handle,
@@ -443,6 +456,8 @@ EXPORT_SPEC int http_GetHttpResponse(
  *        value.
  */
 EXPORT_SPEC int http_ReadHttpResponse(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The handle of the connection created by the call to
          * \b UpnpOpenHttpConnection. */
         void *handle,
@@ -493,7 +508,8 @@ EXPORT_SPEC int http_CloseHttpConnection(
  *	UPNP_E_SOCKET_WRITE
  *	UPNP_E_TIMEDOUT
  ************************************************************************/
-int http_SendStatusResponse(SOCKINFO *info,
+int http_SendStatusResponse(UpnpLib *p,
+        SOCKINFO *info,
         int http_status_code,
         int request_major_version,
         int request_minor_version);
@@ -594,7 +610,8 @@ void http_CalcResponseVersion(int request_major_vers,
  *	UPNP_E_SOCKET_ERROR
  *	UPNP_E_BAD_RESPONSE
  ************************************************************************/
-int http_OpenHttpGetEx(const char *url_str,
+int http_OpenHttpGetEx(UpnpLib *p,
+        const char *url_str,
         void **Handle,
         char **contentType,
         int *contentLength,

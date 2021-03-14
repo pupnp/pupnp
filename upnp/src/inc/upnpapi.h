@@ -43,6 +43,8 @@
 
 #define MAX_INTERFACES 256
 
+#define MAX_IF_NAME_SIZE 180
+
 #define DEV_LIMIT 200
 
 #define DEFAULT_MX 5
@@ -51,12 +53,6 @@
 
 #define DEFAULT_SOAP_CONTENT_LENGTH 16000
 #define MAX_SOAP_CONTENT_LENGTH (size_t)32000
-
-#define NUM_HANDLE 200
-
-extern size_t g_maxContentLength;
-extern int g_UpnpSdkEQMaxLen;
-extern int g_UpnpSdkEQMaxAge;
 
 /* 30-second timeout */
 #define UPNP_TIMEOUT 30
@@ -122,14 +118,14 @@ struct Handle_Info
 #endif
 };
 
-extern ithread_rwlock_t GlobalHndRWLock;
-
 /*!
  * \brief Get handle information.
  *
  * \return HND_DEVICE, UPNP_E_INVALID_HANDLE
  */
 Upnp_Handle_Type GetHandleInfo(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! handle pointer (key for the client handle structure). */
         int Hnd,
         /*! handle structure passed by this function. */
@@ -140,18 +136,18 @@ Upnp_Handle_Type GetHandleInfo(
 #define HandleWriteLock() \
         UpnpPrintf( \
                 UPNP_INFO, API, __FILE__, __LINE__, "Trying a write lock\n"); \
-        ithread_rwlock_wrlock(&GlobalHndRWLock); \
+        ithread_rwlock_wrlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
         UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Write lock acquired\n");
 
 #define HandleReadLock() \
         UpnpPrintf( \
                 UPNP_INFO, API, __FILE__, __LINE__, "Trying a read lock\n"); \
-        ithread_rwlock_rdlock(&GlobalHndRWLock); \
+        ithread_rwlock_rdlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
         UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Read lock acquired\n");
 
 #define HandleUnlock() \
         UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying Unlock\n"); \
-        ithread_rwlock_unlock(&GlobalHndRWLock); \
+        ithread_rwlock_unlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
         UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Unlocked rwlock\n");
 
 /*!
@@ -162,6 +158,8 @@ Upnp_Handle_Type GetHandleInfo(
  * \return HND_CLIENT, HND_INVALID
  */
 Upnp_Handle_Type GetClientHandleInfo(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] client handle pointer (key for the client handle structure). */
         int *client_handle_out,
         /*! [out] Client handle structure passed by this function. */
@@ -175,6 +173,8 @@ Upnp_Handle_Type GetClientHandleInfo(
  * \return HND_DEVICE or HND_INVALID
  */
 Upnp_Handle_Type GetDeviceHandleInfo(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] place to start the search (i.e. last value returned). */
         UpnpDevice_Handle start,
         /*! [in] Address family. */
@@ -192,6 +192,8 @@ Upnp_Handle_Type GetDeviceHandleInfo(
  * \return HND_DEVICE or HND_INVALID
  */
 Upnp_Handle_Type GetDeviceHandleInfoForPath(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! The Uri path. */
         const char *path,
         /*! [in] Address family. */
@@ -202,29 +204,6 @@ Upnp_Handle_Type GetDeviceHandleInfoForPath(
         struct Handle_Info **HndInfo,
         /*! [out] Service info for found path. */
         service_info **serv_info);
-
-extern char gIF_NAME[LINE_SIZE];
-extern char gIF_IPV4[INET_ADDRSTRLEN];
-extern char gIF_IPV4_NETMASK[INET_ADDRSTRLEN];
-extern char gIF_IPV6[INET6_ADDRSTRLEN];
-extern unsigned gIF_IPV6_PREFIX_LENGTH;
-
-extern char gIF_IPV6_ULA_GUA[INET6_ADDRSTRLEN];
-extern unsigned gIF_IPV6_ULA_GUA_PREFIX_LENGTH;
-
-extern unsigned gIF_INDEX;
-
-extern unsigned short LOCAL_PORT_V4;
-extern unsigned short LOCAL_PORT_V6;
-extern unsigned short LOCAL_PORT_V6_ULA_GUA;
-
-/*! NLS uuid. */
-extern Upnp_SID gUpnpSdkNLSuuid;
-
-extern TimerThread gTimerThread;
-extern ThreadPool gRecvThreadPool;
-extern ThreadPool gSendThreadPool;
-extern ThreadPool gMiniServerThreadPool;
 
 typedef enum
 {
@@ -260,9 +239,6 @@ struct UpnpNonblockParam
         struct DevDesc *Devdesc;
 };
 
-extern virtualDirList *pVirtualDirList;
-extern struct VirtualDirCallbacks virtualDirCallback;
-
 typedef enum
 {
         WEB_SERVER_DISABLED,
@@ -291,16 +267,20 @@ typedef enum
  * \return UPNP_E_SUCCESS on success.
  */
 int UpnpGetIfInfo(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Interface name (can be NULL). */
         const char *IfName);
 
-void UpnpThreadDistribution(struct UpnpNonblockParam *Param);
+void UpnpThreadDistribution(UpnpLib *p, void *in);
 
 /*!
  * \brief This function is a timer thread scheduled by UpnpSendAdvertisement
  * to the send advetisement again.
  */
 void AutoAdvertise(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Information provided to the thread. */
         void *input);
 
@@ -310,9 +290,9 @@ void AutoAdvertise(
  * \return UPNP_E_SUCCESS if successful, otherwise returns appropriate error.
  */
 int PrintHandleInfo(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Handle index. */
         UpnpClient_Handle Hnd);
-
-extern WebServerState bWebServerState;
 
 #endif /* UPNPAPI_H */

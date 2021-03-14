@@ -13,10 +13,11 @@
 
 #include "SSDPResultData.h"
 
-void SSDPResultData_Callback(const SSDPResultData *p)
+void SSDPResultData_Callback(UpnpLib *p, const SSDPResultData *rd)
 {
-        Upnp_FunPtr callback = SSDPResultData_get_CtrlptCallback(p);
-        callback(UPNP_DISCOVERY_SEARCH_RESULT,
-                SSDPResultData_get_Param(p),
-                SSDPResultData_get_Cookie(p));
+        Upnp_FunPtr callback = SSDPResultData_get_CtrlptCallback(rd);
+        callback(p,
+                UPNP_DISCOVERY_SEARCH_RESULT,
+                SSDPResultData_get_Param(rd),
+                SSDPResultData_get_Cookie(rd));
 }

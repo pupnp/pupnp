@@ -28,8 +28,9 @@ UpnpActionComplete *UpnpActionComplete_new()
         struct s_UpnpActionComplete *p =
                 calloc(1, sizeof(struct s_UpnpActionComplete));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         /*p->m_ErrCode = 0;*/
         p->m_CtrlUrl = UpnpString_new();
@@ -43,8 +44,9 @@ void UpnpActionComplete_delete(UpnpActionComplete *q)
 {
         struct s_UpnpActionComplete *p = (struct s_UpnpActionComplete *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         p->m_ActionResult = 0;
         p->m_ActionRequest = 0;
@@ -82,8 +84,9 @@ UpnpActionComplete *UpnpActionComplete_dup(const UpnpActionComplete *q)
 {
         UpnpActionComplete *p = UpnpActionComplete_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpActionComplete_assign(p, q);
 

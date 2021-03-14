@@ -14,132 +14,207 @@
 #define IXML_H "ixml.h"
 
 static struct s_Member UpnpActionComplete_members[] = {
-        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(CtrlUrl, TYPE_STRING, 0, 0),
-        INIT_MEMBER(ActionRequest, TYPE_INTEGER, IXML_Document *, IXML_H),
-        INIT_MEMBER(ActionResult, TYPE_INTEGER, IXML_Document *, IXML_H),
+        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(CtrlUrl, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(ActionRequest, TYPE_INTEGER, IXML_Document *, IXML_H, 0),
+        INIT_MEMBER(ActionResult, TYPE_INTEGER, IXML_Document *, IXML_H, 0),
 };
 
 static struct s_Member UpnpActionRequest_members[] = {
-        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(Socket, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(ErrStr, TYPE_STRING, 0, 0),
-        INIT_MEMBER(ActionName, TYPE_STRING, 0, 0),
-        INIT_MEMBER(DevUDN, TYPE_STRING, 0, 0),
-        INIT_MEMBER(ServiceID, TYPE_STRING, 0, 0),
-        INIT_MEMBER(ActionRequest, TYPE_INTEGER, IXML_Document *, IXML_H),
-        INIT_MEMBER(ActionResult, TYPE_INTEGER, IXML_Document *, IXML_H),
-        INIT_MEMBER(SoapHeader, TYPE_INTEGER, IXML_Document *, IXML_H),
+        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(Socket, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(ErrStr, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(ActionName, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(DevUDN, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(ServiceID, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(ActionRequest, TYPE_INTEGER, IXML_Document *, IXML_H, 0),
+        INIT_MEMBER(ActionResult, TYPE_INTEGER, IXML_Document *, IXML_H, 0),
+        INIT_MEMBER(SoapHeader, TYPE_INTEGER, IXML_Document *, IXML_H, 0),
         INIT_MEMBER(CtrlPtIPAddr,
                 TYPE_BUFFER,
                 struct sockaddr_storage,
-                "UpnpInet.h"),
-        INIT_MEMBER(Os, TYPE_STRING, 0, 0),
-        INIT_MEMBER(ExtraHeadersList, TYPE_LIST, 0, 0),
+                "UpnpInet.h",
+                0),
+        INIT_MEMBER(Os, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(ExtraHeadersList, TYPE_LIST, 0, 0, 0),
 };
 
 static struct s_Member UpnpDiscovery_members[] = {
-        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(Expires, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(DeviceID, TYPE_STRING, 0, 0),
-        INIT_MEMBER(DeviceType, TYPE_STRING, 0, 0),
-        INIT_MEMBER(ServiceType, TYPE_STRING, 0, 0),
-        INIT_MEMBER(ServiceVer, TYPE_STRING, 0, 0),
-        INIT_MEMBER(Location, TYPE_STRING, 0, 0),
-        INIT_MEMBER(Os, TYPE_STRING, 0, 0),
-        INIT_MEMBER(Date, TYPE_STRING, 0, 0),
-        INIT_MEMBER(Ext, TYPE_STRING, 0, 0),
-        INIT_MEMBER(
-                DestAddr, TYPE_BUFFER, struct sockaddr_storage, "UpnpInet.h"),
+        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(Expires, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(DeviceID, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(DeviceType, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(ServiceType, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(ServiceVer, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(Location, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(Os, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(Date, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(Ext, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(DestAddr,
+                TYPE_BUFFER,
+                struct sockaddr_storage,
+                "UpnpInet.h",
+                0),
 };
 
 static struct s_Member UpnpEvent_members[] = {
-        INIT_MEMBER(EventKey, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(ChangedVariables, TYPE_INTEGER, IXML_Document *, IXML_H),
-        INIT_MEMBER(SID, TYPE_STRING, 0, 0),
+        INIT_MEMBER(EventKey, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(ChangedVariables, TYPE_INTEGER, IXML_Document *, IXML_H, 0),
+        INIT_MEMBER(SID, TYPE_STRING, 0, 0, 0),
 };
 
 static struct s_Member UpnpEventSubscribe_members[] = {
-        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(TimeOut, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(SID, TYPE_STRING, 0, 0),
-        INIT_MEMBER(PublisherUrl, TYPE_STRING, 0, 0),
+        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(TimeOut, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(SID, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(PublisherUrl, TYPE_STRING, 0, 0, 0),
 };
 
 static struct s_Member UpnpExtraHeaders_members[] = {
-        INIT_MEMBER(node, TYPE_LIST, 0, 0),
-        INIT_MEMBER(name, TYPE_STRING, 0, 0),
-        INIT_MEMBER(value, TYPE_STRING, 0, 0),
-        INIT_MEMBER(resp, TYPE_DOMSTRING, 0, 0),
+        INIT_MEMBER(node, TYPE_LIST, 0, 0, 0),
+        INIT_MEMBER(name, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(value, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(resp, TYPE_DOMSTRING, 0, 0, 0),
 };
 
 static struct s_Member UpnpFileInfo_members[] = {
-        INIT_MEMBER(FileLength, TYPE_INTEGER, off_t, "<sys/types.h>"),
-        INIT_MEMBER(LastModified, TYPE_INTEGER, time_t, "<time.h>"),
-        INIT_MEMBER(IsDirectory, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(IsReadable, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(ContentType, TYPE_DOMSTRING, 0, 0),
-        INIT_MEMBER(ExtraHeadersList, TYPE_LIST, 0, 0),
+        INIT_MEMBER(FileLength, TYPE_INTEGER, off_t, "<sys/types.h>", 0),
+        INIT_MEMBER(LastModified, TYPE_INTEGER, time_t, "<time.h>", 0),
+        INIT_MEMBER(IsDirectory, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(IsReadable, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(ContentType, TYPE_DOMSTRING, 0, 0, 0),
+        INIT_MEMBER(ExtraHeadersList, TYPE_LIST, 0, 0, 0),
         INIT_MEMBER(CtrlPtIPAddr,
                 TYPE_BUFFER,
                 struct sockaddr_storage,
-                "UpnpInet.h"),
-        INIT_MEMBER(Os, TYPE_STRING, 0, 0),
+                "UpnpInet.h",
+                0),
+        INIT_MEMBER(Os, TYPE_STRING, 0, 0, 0),
+};
+
+static struct s_Member UpnpLib_members[] = {
+        INIT_MEMBER(virtualDirCallback,
+                TYPE_BUFFER,
+                struct VirtualDirCallbacks,
+                "VirtualDir.h",
+                0),
+        INIT_MEMBER(pVirtualDirList,
+                TYPE_INTEGER,
+                virtualDirList *,
+                "VirtualDir.h",
+                0),
+        INIT_MEMBER(GlobalClientSubscribeMutex,
+                TYPE_BUFFER,
+                ithread_mutex_t,
+                "ithread.h",
+                0),
+        INIT_MEMBER(
+                GlobalHndRWLock, TYPE_BUFFER, ithread_rwlock_t, "ithread.h", 0),
+        INIT_MEMBER(gUUIDMutex, TYPE_BUFFER, ithread_mutex_t, "ithread.h", 0),
+        INIT_MEMBER(
+                gSDKInitMutex, TYPE_BUFFER, ithread_mutex_t, "ithread.h", 0),
+        INIT_MEMBER(gTimerThread, TYPE_BUFFER, TimerThread, "TimerThread.h", 0),
+        INIT_MEMBER(
+                gSendThreadPool, TYPE_BUFFER, ThreadPool, "ThreadPool.h", 0),
+        INIT_MEMBER(
+                gRecvThreadPool, TYPE_BUFFER, ThreadPool, "ThreadPool.h", 0),
+        INIT_MEMBER(gMiniServerThreadPool,
+                TYPE_BUFFER,
+                ThreadPool,
+                "ThreadPool.h",
+                0),
+        INIT_MEMBER(
+                bWebServerState, TYPE_INTEGER, WebServerState, "upnpapi.h", 0),
+        INIT_MEMBER(gIF_NAME, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(gIF_IPV4, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(gIF_IPV4_NETMASK, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(gIF_IPV6, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(gIF_IPV6_PREFIX_LENGTH, TYPE_INTEGER, unsigned, 0, 0),
+        INIT_MEMBER(gIF_IPV6_ULA_GUA, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(
+                gIF_IPV6_ULA_GUA_PREFIX_LENGTH, TYPE_INTEGER, unsigned, 0, 0),
+        INIT_MEMBER(gIF_INDEX, TYPE_INTEGER, unsigned, 0, "(unsigned)-1"),
+        INIT_MEMBER(LOCAL_PORT_V4, TYPE_INTEGER, unsigned short, 0, 0),
+        INIT_MEMBER(LOCAL_PORT_V6, TYPE_INTEGER, unsigned short, 0, 0),
+        INIT_MEMBER(LOCAL_PORT_V6_ULA_GUA, TYPE_INTEGER, unsigned short, 0, 0),
+        INIT_MEMBER(
+                HandleTable, TYPE_BUFFER, handle_table_t, "handle_table.h", 0),
+        /*--------------------------------------------------------------------*/
+        INIT_MEMBER(gMediaTypeArray,
+                TYPE_BUFFER,
+                doc_type_array_t,
+                "document_type.h",
+                0),
+        INIT_MEMBER(gAliasDoc, TYPE_BUFFER, xml_alias_t, "xml_alias.h", 0),
+        INIT_MEMBER(gWebMutex, TYPE_BUFFER, ithread_mutex_t, "ithread.h", 0),
+        /*--------------------------------------------------------------------*/
+        INIT_MEMBER(gDocumentRootDir, TYPE_BUFFER, membuffer, "membuffer.h", 0),
+        INIT_MEMBER(g_maxContentLength, TYPE_INTEGER, size_t, 0, 0),
+        INIT_MEMBER(g_UpnpSdkEQMaxLen, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(g_UpnpSdkEQMaxAge, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(UpnpSdkInit, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(UpnpSdkClientRegistered, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(UpnpSdkDeviceRegisteredV4, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(UpnpSdkDeviceRegisteredV6, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(gUpnpSdkNLSuuid, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(gSslCtx, TYPE_INTEGER, SSL_CTX *, "<openssl/ssl.h>", 0),
 };
 
 static struct s_Member UpnpStateVarComplete_members[] = {
-        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(CtrlUrl, TYPE_STRING, 0, 0),
-        INIT_MEMBER(StateVarName, TYPE_STRING, 0, 0),
-        INIT_MEMBER(CurrentVal, TYPE_DOMSTRING, 0, 0),
+        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(CtrlUrl, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(StateVarName, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(CurrentVal, TYPE_DOMSTRING, 0, 0, 0),
 };
 
 static struct s_Member UpnpStateVarRequest_members[] = {
-        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(Socket, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(ErrStr, TYPE_STRING, 0, 0),
-        INIT_MEMBER(DevUDN, TYPE_STRING, 0, 0),
-        INIT_MEMBER(ServiceID, TYPE_STRING, 0, 0),
-        INIT_MEMBER(StateVarName, TYPE_STRING, 0, 0),
+        INIT_MEMBER(ErrCode, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(Socket, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(ErrStr, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(DevUDN, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(ServiceID, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(StateVarName, TYPE_STRING, 0, 0, 0),
         INIT_MEMBER(CtrlPtIPAddr,
                 TYPE_BUFFER,
                 struct sockaddr_storage,
-                "UpnpInet.h"),
-        INIT_MEMBER(CurrentVal, TYPE_DOMSTRING, 0, 0),
+                "UpnpInet.h",
+                0),
+        INIT_MEMBER(CurrentVal, TYPE_DOMSTRING, 0, 0, 0),
 };
 
 static struct s_Member UpnpSubscriptionRequest_members[] = {
-        INIT_MEMBER(ServiceId, TYPE_STRING, 0, 0),
-        INIT_MEMBER(UDN, TYPE_STRING, 0, 0),
-        INIT_MEMBER(SID, TYPE_STRING, 0, 0),
+        INIT_MEMBER(ServiceId, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(UDN, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(SID, TYPE_STRING, 0, 0, 0),
 };
 
 static struct s_Member GenlibClientSubscription_members[] = {
-        INIT_MEMBER(RenewEventId, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(SID, TYPE_STRING, 0, 0),
-        INIT_MEMBER(ActualSID, TYPE_STRING, 0, 0),
-        INIT_MEMBER(EventURL, TYPE_STRING, 0, 0),
-        INIT_MEMBER(Next, TYPE_INTEGER, GenlibClientSubscription *, 0),
+        INIT_MEMBER(RenewEventId, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(SID, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(ActualSID, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(EventURL, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(Next, TYPE_INTEGER, GenlibClientSubscription *, 0, 0),
 };
 
 static struct s_Member SSDPResultData_members[] = {
-        INIT_MEMBER(Param, TYPE_CLASS, UpnpDiscovery, "UpnpDiscovery.h"),
-        INIT_MEMBER(Cookie, TYPE_INTEGER, void *, 0),
-        INIT_MEMBER(CtrlptCallback, TYPE_INTEGER, Upnp_FunPtr, "Callback.h"),
+        INIT_MEMBER(Param, TYPE_CLASS, UpnpDiscovery, "UpnpDiscovery.h", 0),
+        INIT_MEMBER(Cookie, TYPE_INTEGER, void *, 0, 0),
+        INIT_MEMBER(CtrlptCallback, TYPE_INTEGER, Upnp_FunPtr, "Callback.h", 0),
 };
 
 static struct s_Member TestClass_members[] = {
-        INIT_MEMBER(TheList, TYPE_LIST, 0, 0),
-        INIT_MEMBER(TheInteger, TYPE_INTEGER, int, 0),
-        INIT_MEMBER(TheUnsignedLong, TYPE_INTEGER, unsigned long, 0),
-        INIT_MEMBER(TheCharPointer, TYPE_INTEGER, char *, 0),
-        INIT_MEMBER(TheBuffer, TYPE_BUFFER, struct TheStruct, "TheStruct.h"),
+        INIT_MEMBER(TheList, TYPE_LIST, 0, 0, 0),
+        INIT_MEMBER(TheInteger, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(TheUnsignedLong, TYPE_INTEGER, unsigned long, 0, 0),
+        INIT_MEMBER(TheCharPointer, TYPE_INTEGER, char *, 0, 0),
+        INIT_MEMBER(TheBuffer, TYPE_BUFFER, struct TheStruct, "TheStruct.h", 0),
         INIT_MEMBER(TheActionComplete,
                 TYPE_CLASS,
                 UpnpActionComplete,
-                "UpnpActionComplete.h"),
-        INIT_MEMBER(TheString, TYPE_STRING, 0, 0),
-        INIT_MEMBER(TheDomString, TYPE_DOMSTRING, 0, 0),
+                "UpnpActionComplete.h",
+                0),
+        INIT_MEMBER(TheString, TYPE_STRING, 0, 0, 0),
+        INIT_MEMBER(TheDomString, TYPE_DOMSTRING, 0, 0, 0),
 };
 
 static struct s_Class my_classes[] = {
@@ -150,6 +225,7 @@ static struct s_Class my_classes[] = {
         INIT_CLASS(UpnpEventSubscribe),
         INIT_CLASS(UpnpExtraHeaders),
         INIT_CLASS(UpnpFileInfo),
+        INIT_CLASS(UpnpLib),
         INIT_CLASS(UpnpStateVarComplete),
         INIT_CLASS(UpnpStateVarRequest),
         INIT_CLASS(UpnpSubscriptionRequest),
@@ -204,16 +280,20 @@ static int write_prototype(FILE *fp, const char *class_name, struct s_Member *m)
         case TYPE_BUFFER:
                 /* clang-format off */
 		fprintf(fp,
-			"/*! %s_get_%s */\n"
-			"EXPORT_SPEC const %s *%s_get_%s(const %s *p);\n"
-			"/*! %s_get_%s */\n"
+                        "/*! %s_get_%s */\n"
+                        "EXPORT_SPEC const %s *%s_get_%s(const %s *p);\n"
+                        "/*! %s_getnc_%s */\n"
+                        "EXPORT_SPEC %s *%s_getnc_%s(%s *p);\n"
+                        "/*! %s_get_%s */\n"
 			"EXPORT_SPEC int %s_set_%s(%s *p, const %s *buf); \n"
 			"/*! %s_get_%s */\n"
 			"EXPORT_SPEC void %s_clear_%s(%s *p); \n"
 			"\n",
 			class_name, m->name,
 			m->type_name, class_name, m->name, class_name,
-			class_name, m->name,
+                        class_name, m->name,
+                        m->type_name, class_name, m->name, class_name,
+                        class_name, m->name,
 			class_name, m->name, class_name, m->type_name,
 			class_name, m->name,
 			class_name, m->name, class_name
@@ -379,13 +459,13 @@ static int write_header(FILE *fp, struct s_Class *c)
         int ok = 1;
         const char *header;
         struct s_Member *m;
-        int len = strlen(c->name);
-        char *class_name_upr = malloc(len + 1);
+        int name_size = strlen(c->name) + 1;
+        char *class_name_upr = malloc(name_size);
 
         if (!class_name_upr) {
                 return 0;
         }
-        strupr(strcpy(class_name_upr, c->name));
+        strupr(strncpy(class_name_upr, c->name, name_size));
         included_headers_used = 0;
         included_headers_size = 16;
         included_headers = calloc(included_headers_size, sizeof(const char *));
@@ -398,17 +478,26 @@ static int write_header(FILE *fp, struct s_Class *c)
                 " *\n"
                 " * \\brief Header file for %s methods.\n"
                 " *\n"
-                " * Do not edit this file, it is automatically generated. "
-                "Please look at generator.c.\n"
+                " * Do not edit this file, it is automatically generated. \n"
+                " * Please look at generator.c.\n"
                 " *\n"
                 " * \\author Marcelo Roberto Jimenez\n"
                 " */\n"
+                "\n"
+                "/*!\n"
+                " * %s\n"
+                " */\n"
+                "typedef struct s_%s %s;\n"
+                "\n"
                 "#include <stdlib.h> /* for size_t */\n"
                 "\n"
                 "#include \"UpnpGlobal.h\" /* for EXPORT_SPEC */\n"
                 "\n",
                 class_name_upr,
                 class_name_upr,
+                c->name,
+                c->name,
+                c->name,
                 c->name);
 
         /* Include files: look for which members need includes and only include
@@ -431,11 +520,6 @@ static int write_header(FILE *fp, struct s_Class *c)
                 "extern \"C\" {\n"
                 "#endif /* __cplusplus */\n"
                 "\n"
-                "/*!\n"
-                " * %s\n"
-                " */\n"
-                "typedef struct s_%s %s;\n"
-                "\n"
                 "/*! Constructor */\n"
                 "EXPORT_SPEC %s *%s_new();\n"
                 "/*! Destructor */\n"
@@ -445,9 +529,6 @@ static int write_header(FILE *fp, struct s_Class *c)
                 "/*! Assignment operator */\n"
                 "EXPORT_SPEC int %s_assign(%s *p, const %s *q);\n"
                 "\n",
-                c->name,
-                c->name,
-                c->name,
                 c->name,
                 c->name,
                 c->name,
@@ -514,7 +595,9 @@ static int write_constructor(FILE *fp, struct s_Class *c)
 		"{\n"
 		"\tstruct s_%s *p = calloc(1, sizeof (struct s_%s));\n"
 		"\n"
-		"\tif (!p) return 0;\n"
+                "\tif (!p) {\n"
+                "\t\treturn 0;\n"
+                "\t}\n"
 		"\n",
 		c->name, c->name, c->name, c->name);
         /* clang-format on */
@@ -528,7 +611,14 @@ static int write_constructor(FILE *fp, struct s_Class *c)
                                 m->type_name);
                         break;
                 case TYPE_INTEGER:
-                        fprintf(fp, "\t/*p->m_%s = 0;*/\n", m->name);
+                        if (m->initial_value) {
+                                fprintf(fp,
+                                        "\tp->m_%s = %s;\n",
+                                        m->name,
+                                        m->initial_value);
+                        } else {
+                                fprintf(fp, "\t/*p->m_%s = 0;*/\n", m->name);
+                        }
                         break;
                 case TYPE_BUFFER:
                         fprintf(fp,
@@ -574,7 +664,9 @@ static int write_destructor(FILE *fp, struct s_Class *c)
 		"{\n"
 		"\tstruct s_%s *p = (struct s_%s *)q;\n"
 		"\n"
-		"\tif (!p) return;\n"
+                "\tif (!p) {\n"
+                "\t\treturn;\n"
+                "\t}\n"
 		"\n",
 		c->name, c->name, c->name, c->name
 	);
@@ -591,7 +683,14 @@ static int write_destructor(FILE *fp, struct s_Class *c)
                                 m->name);
                         break;
                 case TYPE_INTEGER:
-                        fprintf(fp, "\tp->m_%s = 0;\n", m->name);
+                        if (m->initial_value) {
+                                fprintf(fp,
+                                        "\tp->m_%s = %s;\n",
+                                        m->name,
+                                        m->initial_value);
+                        } else {
+                                fprintf(fp, "\tp->m_%s = 0;\n", m->name);
+                        }
                         break;
                 case TYPE_BUFFER:
                         fprintf(fp,
@@ -671,13 +770,15 @@ static int write_copy_constructor(FILE *fp, struct s_Class *c)
         fprintf(fp,
                 "%s *%s_dup(const %s *q)\n"
                 "{\n"
-                "	%s *p = %s_new();\n"
+                "\t%s *p = %s_new();\n"
                 "\n"
-                "	if (!p) return 0;\n"
+                "\tif (!p) {\n"
+                "\t\treturn 0;\n"
+                "\t}\n"
                 "\n"
-                "	%s_assign(p, q);\n"
+                "\t%s_assign(p, q);\n"
                 "\n"
-                "	return p;\n"
+                "\treturn p;\n"
                 "}\n",
                 c->name,
                 c->name,
@@ -749,7 +850,12 @@ static int write_methods(FILE *fp, const char *class_name, struct s_Member *m)
 			"\treturn &p->m_%s;\n"
 			"}\n"
 			"\n"
-			"int %s_set_%s(%s *p, const %s *buf)\n"
+                        "%s *%s_getnc_%s(%s *p)\n"
+                        "{\n"
+                        "\treturn &p->m_%s;\n"
+                        "}\n"
+                        "\n"
+                        "int %s_set_%s(%s *p, const %s *buf)\n"
 			"{\n"
 			"\tp->m_%s = *buf;\n"
 			"\n"
@@ -761,9 +867,11 @@ static int write_methods(FILE *fp, const char *class_name, struct s_Member *m)
 			"\tmemset(&p->m_%s, 0, sizeof(%s));\n"
 			"}\n"
 			"\n",
-			m->type_name, class_name, m->name, class_name,
-			m->name,
-			class_name, m->name, class_name, m->type_name,
+                        m->type_name, class_name, m->name, class_name,
+                        m->name,
+                        m->type_name, class_name, m->name, class_name,
+                        m->name,
+                        class_name, m->name, class_name, m->type_name,
 			m->name,
 			class_name, m->name, class_name,
 			m->name, m->type_name

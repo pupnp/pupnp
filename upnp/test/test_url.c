@@ -34,12 +34,12 @@ struct test
                 .line = __LINE__, .error = error_code \
         }
 
-static int result(const struct test *test)
+static int result(UpnpLib *p, const struct test *test)
 {
         char *absurl = NULL;
         int ret = 0;
 
-        ret = UpnpResolveURL2(test->base, test->rel, &absurl);
+        ret = UpnpResolveURL2(p, test->base, test->rel, &absurl);
         if (ret == test->error &&
                 (test->expect == NULL || strcmp(test->expect, absurl) == 0)) {
                 ret = 0;
@@ -154,16 +154,18 @@ static const struct test RFC3986[] = {
 int main()
 {
         int i, ret = 0;
+        UpnpLib *p;
 
         /*
          * Init the SDK before testing
          * on Win we need to setup winsock before using it
          * and as this test does DNS lookups it will fail otherwise
          */
-        UpnpInit2(NULL, 0);
+        p = 0;
+        UpnpInit2(&p, NULL, 0);
 
         for (i = 0; i < (int)ARRAY_SIZE(RFC3986); i++)
-                ret += result(&RFC3986[i]);
+                ret += result(p, &RFC3986[i]);
 
         exit(ret ? EXIT_FAILURE : EXIT_SUCCESS);
 }

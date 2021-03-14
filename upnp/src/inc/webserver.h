@@ -73,14 +73,14 @@ struct SendInstruction
  * \li \c 0 - OK
  * \li \c UPNP_E_OUTOF_MEMORY
  */
-int web_server_init(void);
+int web_server_init(UpnpLib *p);
 
 /*!
  * \brief Release memory allocated for the global web server root
  * directory and the global XML document. Resets the flag bWebServerState
  * to WEB_SERVER_DISABLED.
  */
-void web_server_destroy(void);
+void web_server_destroy(UpnpLib *p);
 
 /*!
  * \brief Replaces current alias with the given alias. To remove the current
@@ -93,6 +93,8 @@ void web_server_destroy(void);
  * \li \c UPNP_E_OUTOF_MEMORY
  */
 int web_server_set_alias(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Webserver name of alias; created by caller and freed by caller
          * (doesn't even have to be malloc()d. */
         const char *alias_name,
@@ -113,6 +115,8 @@ int web_server_set_alias(
  * \return Integer.
  */
 int web_server_set_root_dir(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] String having the root directory for the document. */
         const char *root_dir);
 
@@ -121,6 +125,8 @@ int web_server_set_root_dir(
  * requests.
  */
 void web_server_callback(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] . */
         http_parser_t *parser,
         /*! [in] . */

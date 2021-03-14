@@ -169,6 +169,14 @@ libupnp_la_SOURCES += \
 	src/api/upnpapi.c \
 	src/api/upnpdebug.c
 
+# internal
+libupnp_la_SOURCES += \
+        src/UpnpLib.c \
+        src/inc/UpnpLib.h \
+        src/inc/document_type.h \
+        src/inc/handle_table.h \
+        src/inc/xml_alias.h
+
 if ENABLE_TOOLS
 libupnp_la_SOURCES += src/api/upnptools.c
 endif

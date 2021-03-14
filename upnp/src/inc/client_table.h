@@ -22,8 +22,6 @@ extern "C" {
 #include <stdlib.h>
 #include <time.h>
 
-extern TimerThread gTimerThread;
-
 #ifdef INCLUDE_CLIENT_APIS
 
 /*!
@@ -32,6 +30,8 @@ extern TimerThread gTimerThread;
  * Remove timer thread associated with this subscription event.
  */
 void free_client_subscription(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Client subscription to be freed. */
         GenlibClientSubscription *sub);
 
@@ -39,6 +39,8 @@ void free_client_subscription(
  * \brief Free the client subscription table.
  */
 void freeClientSubList(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Client subscription list to be freed. */
         GenlibClientSubscription *list);
 
@@ -48,6 +50,8 @@ void freeClientSubList(
  * update the table.
  */
 void RemoveClientSubClientSID(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Head of the subscription list. */
         GenlibClientSubscription **head,
         /*! [in] Subscription ID to be mactched. */

@@ -63,6 +63,8 @@
  * \return 0 if both are equal; 1 if not equal, and UPNP_E_OUTOF_MEMORY.
  */
 static int dom_cmp_name(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] lookup name. */
         const char *name,
         /* [in] xml node. */
@@ -81,7 +83,8 @@ static int dom_cmp_name(
                 return UPNP_E_OUTOF_MEMORY;
         if (strcmp(name, node_name) == 0)
                 ret_code = 0;
-        else if (matchstr((char *)node_name,
+        else if (matchstr(p,
+                         (char *)node_name,
                          strlen(node_name),
                          "%s:%s%0",
                          &dummy,
@@ -102,6 +105,8 @@ static int dom_cmp_name(
  * \return UPNP_E_SUCCESS if successful else returns appropriate error.
  */
 static int dom_find_node(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] name of the node. */
         const char *node_name,
         /* [in] complete xml node. */
@@ -117,7 +122,7 @@ static int dom_find_node(
         node = ixmlNode_getFirstChild(start_node);
         while (node != NULL) {
                 /* match name */
-                if (dom_cmp_name(node_name, node) == 0) {
+                if (dom_cmp_name(p, node_name, node) == 0) {
                         *matching_node = node;
                         return UPNP_E_SUCCESS;
                 }
@@ -134,6 +139,8 @@ static int dom_find_node(
  * \return UPNP_E_SUCCESS if successful, else returns appropriate error.
  */
 static int dom_find_deep_node(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] array of names. */
         const char *names[],
         /* [in] size of array. */
@@ -150,14 +157,14 @@ static int dom_find_deep_node(
         assert(num_names > 0);
 
         node = start_node;
-        if (dom_cmp_name(names[0], start_node) == 0) {
+        if (dom_cmp_name(p, names[0], start_node) == 0) {
                 if (num_names == 1) {
                         *matching_node = start_node;
                         return UPNP_E_SUCCESS;
                 }
         }
         for (i = 1; i < num_names; i++) {
-                if (dom_find_node(names[i], node, &match_node) !=
+                if (dom_find_node(p, names[i], node, &match_node) !=
                         UPNP_E_SUCCESS)
                         return UPNP_E_NOT_FOUND;
                 if (i == num_names - 1) {
@@ -216,10 +223,13 @@ static const DOMString get_node_value(IXML_Node *node)
  *
  *	Note :
  ****************************************************************************/
-static UPNP_INLINE int get_host_and_path(
-        char *ctrl_url, const memptr *host, const memptr *path, uri_type *url)
+static UPNP_INLINE int get_host_and_path(UpnpLib *p,
+        char *ctrl_url,
+        const memptr *host,
+        const memptr *path,
+        uri_type *url)
 {
-        if (parse_uri(ctrl_url, strlen(ctrl_url), url) != HTTP_SUCCESS) {
+        if (parse_uri(p, ctrl_url, strlen(ctrl_url), url) != HTTP_SUCCESS) {
                 return -1;
         }
         /* This is done to ensure that the buffer is kept const */
@@ -246,12 +256,12 @@ static UPNP_INLINE int get_host_and_path(
  *
  *	Note :
  ****************************************************************************/
-static UPNP_INLINE int get_action_name(char *action, memptr *name)
+static UPNP_INLINE int get_action_name(UpnpLib *p, char *action, memptr *name)
 {
         memptr dummy;
         int ret_code;
 
-        ret_code = matchstr(action, strlen(action), " <%s:%s", &dummy, name);
+        ret_code = matchstr(p, action, strlen(action), " <%s:%s", &dummy, name);
 
         return ret_code == PARSE_OK ? 0 : -1;
 }
@@ -300,12 +310,15 @@ static UPNP_INLINE int add_man_header(
  *
  *	Note :
  ****************************************************************************/
-static int soap_request_and_response(
-        membuffer *request, uri_type *destination_url, http_parser_t *response)
+static int soap_request_and_response(UpnpLib *p,
+        membuffer *request,
+        uri_type *destination_url,
+        http_parser_t *response)
 {
         int ret_code;
 
-        ret_code = http_RequestAndResponse(destination_url,
+        ret_code = http_RequestAndResponse(p,
+                destination_url,
                 request->buf,
                 request->length,
                 SOAPMETHOD_POST,
@@ -325,7 +338,8 @@ static int soap_request_and_response(
                 httpmsg_destroy(&response->msg); /* about to reuse response */
 
                 /* try again */
-                ret_code = http_RequestAndResponse(destination_url,
+                ret_code = http_RequestAndResponse(p,
+                        destination_url,
                         request->buf,
                         request->length,
                         HTTPMETHOD_MPOST,
@@ -361,7 +375,8 @@ static int soap_request_and_response(
  *
  *	Note :
  ****************************************************************************/
-static int get_response_value(http_message_t *hmsg,
+static int get_response_value(UpnpLib *p,
+        http_message_t *hmsg,
         int code,
         char *name,
         int *upnp_error_code,
@@ -383,7 +398,7 @@ static int get_response_value(http_message_t *hmsg,
         /* only 200 and 500 status codes are relevant */
         if ((hmsg->status_code != HTTP_OK &&
                     hmsg->status_code != HTTP_INTERNAL_SERVER_ERROR) ||
-                !has_xml_content_type(hmsg))
+                !has_xml_content_type(p, hmsg))
                 goto error_handler;
         if (ixmlParseBufferEx(hmsg->entity.buf, &doc) != IXML_SUCCESS)
                 goto error_handler;
@@ -398,7 +413,7 @@ static int get_response_value(http_message_t *hmsg,
                 names[0] = "Envelope";
                 names[1] = "Body";
                 names[2] = name;
-                if (dom_find_deep_node(names, 3, root_node, &node) ==
+                if (dom_find_deep_node(p, names, 3, root_node, &node) ==
                         UPNP_E_SUCCESS) {
                         node_str = ixmlPrintNode(node);
                         if (node_str == NULL) {
@@ -423,7 +438,7 @@ static int get_response_value(http_message_t *hmsg,
                 names[1] = "Body";
                 names[2] = "QueryStateVariableResponse";
                 names[3] = "return";
-                if (dom_find_deep_node(names, 4, root_node, &node) ==
+                if (dom_find_deep_node(p, names, 4, root_node, &node) ==
                         UPNP_E_SUCCESS) {
                         nodeValue = get_node_value(node);
                         if (nodeValue == NULL)
@@ -441,10 +456,10 @@ static int get_response_value(http_message_t *hmsg,
                 names[2] = "Fault";
                 names[3] = "detail";
                 names[4] = "UPnPError";
-                if (dom_find_deep_node(names, 5, root_node, &error_node) !=
+                if (dom_find_deep_node(p, names, 5, root_node, &error_node) !=
                         UPNP_E_SUCCESS)
                         goto error_handler;
-                if (dom_find_node("errorCode", error_node, &node) !=
+                if (dom_find_node(p, "errorCode", error_node, &node) !=
                         UPNP_E_SUCCESS)
                         goto error_handler;
                 temp_str = get_node_value(node);
@@ -456,9 +471,9 @@ static int get_response_value(http_message_t *hmsg,
                         goto error_handler; /* bad SOAP error code */
                 }
                 if (code == SOAP_VAR_RESP) {
-                        if (dom_find_node("errorDescription",
-                                    error_node,
-                                    &node) != UPNP_E_SUCCESS) {
+                        if (dom_find_node(
+                                    p, "errorDescription", error_node, &node) !=
+                                UPNP_E_SUCCESS) {
                                 goto error_handler;
                         }
                         nodeValue = get_node_value(node);
@@ -511,7 +526,8 @@ error_handler:
  *		returns UPNP_E_SUCCESS if successful else returns appropriate
  *error Note :
  ****************************************************************************/
-int SoapSendAction(char *action_url,
+int SoapSendAction(UpnpLib *p,
+        char *action_url,
         char *service_type,
         IXML_Document *action_node,
         IXML_Document **response_node)
@@ -560,12 +576,12 @@ int SoapSendAction(char *action_url,
                 goto error_handler;
         }
         /* get action name */
-        if (get_action_name(action_str, &name) != 0) {
+        if (get_action_name(p, action_str, &name) != 0) {
                 err_code = UPNP_E_INVALID_ACTION;
                 goto error_handler;
         }
         /* parse url */
-        if (http_FixStrUrl(action_url, strlen(action_url), &url) != 0) {
+        if (http_FixStrUrl(p, action_url, strlen(action_url), &url) != 0) {
                 err_code = UPNP_E_INVALID_URL;
                 goto error_handler;
         }
@@ -617,7 +633,7 @@ int SoapSendAction(char *action_url,
                 goto error_handler;
         }
 
-        ret_code = soap_request_and_response(&request, &url, &response);
+        ret_code = soap_request_and_response(p, &request, &url, &response);
         got_response = 1;
         if (ret_code != UPNP_E_SUCCESS) {
                 err_code = ret_code;
@@ -629,7 +645,8 @@ int SoapSendAction(char *action_url,
                 goto error_handler;
         }
         /* get action node from the response */
-        ret_code = get_response_value(&response.msg,
+        ret_code = get_response_value(p,
+                &response.msg,
                 SOAP_ACTION_RESP,
                 responsename.buf,
                 &upnp_error_code,
@@ -676,7 +693,8 @@ the *		the SoapSendAction with only difference that it allows users to
 *		returns UPNP_E_SUCCESS if successful else returns appropriate
 error *	Note :
 ****************************************************************************/
-int SoapSendActionEx(char *action_url,
+int SoapSendActionEx(UpnpLib *p,
+        char *action_url,
         char *service_type,
         IXML_Document *header,
         IXML_Document *action_node,
@@ -737,12 +755,12 @@ int SoapSendActionEx(char *action_url,
                 goto error_handler;
         }
         /* get action name */
-        if (get_action_name(action_str, &name) != 0) {
+        if (get_action_name(p, action_str, &name) != 0) {
                 err_code = UPNP_E_INVALID_ACTION;
                 goto error_handler;
         }
         /* parse url */
-        if (http_FixStrUrl(action_url, strlen(action_url), &url) != 0) {
+        if (http_FixStrUrl(p, action_url, strlen(action_url), &url) != 0) {
                 err_code = UPNP_E_INVALID_URL;
                 goto error_handler;
         }
@@ -813,7 +831,7 @@ int SoapSendActionEx(char *action_url,
                 goto error_handler;
         }
 
-        ret_code = soap_request_and_response(&request, &url, &response);
+        ret_code = soap_request_and_response(p, &request, &url, &response);
         got_response = 1;
         if (ret_code != UPNP_E_SUCCESS) {
                 err_code = ret_code;
@@ -825,7 +843,8 @@ int SoapSendActionEx(char *action_url,
                 goto error_handler;
         }
         /* get action node from the response */
-        ret_code = get_response_value(&response.msg,
+        ret_code = get_response_value(p,
+                &response.msg,
                 SOAP_ACTION_RESP,
                 responsename.buf,
                 &upnp_error_code,
@@ -869,7 +888,8 @@ error_handler:
  *
  *	Note :
  ****************************************************************************/
-int SoapGetServiceVarStatus(char *action_url, char *var_name, char **var_value)
+int SoapGetServiceVarStatus(
+        UpnpLib *p, char *action_url, char *var_name, char **var_value)
 {
         const memptr host; /* value for HOST header */
         const memptr path; /* ctrl path in first line in msg */
@@ -896,7 +916,7 @@ int SoapGetServiceVarStatus(char *action_url, char *var_name, char **var_value)
         *var_value = NULL; /* return NULL in case of an error */
         membuffer_init(&request);
         /* get host hdr and url path */
-        if (get_host_and_path(action_url, &host, &path, &url) == -1) {
+        if (get_host_and_path(p, action_url, &host, &path, &url) == -1) {
                 return UPNP_E_INVALID_URL;
         }
         /* make headers */
@@ -929,13 +949,14 @@ int SoapGetServiceVarStatus(char *action_url, char *var_name, char **var_value)
                 return UPNP_E_OUTOF_MEMORY;
         }
         /* send msg and get reply */
-        ret_code = soap_request_and_response(&request, &url, &response);
+        ret_code = soap_request_and_response(p, &request, &url, &response);
         membuffer_destroy(&request);
         if (ret_code != UPNP_E_SUCCESS) {
                 return ret_code;
         }
         /* get variable value from the response */
-        ret_code = get_response_value(&response.msg,
+        ret_code = get_response_value(p,
+                &response.msg,
                 SOAP_VAR_RESP,
                 NULL,
                 &upnp_error_code,

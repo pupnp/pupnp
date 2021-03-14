@@ -36,8 +36,9 @@ UpnpActionRequest *UpnpActionRequest_new()
         struct s_UpnpActionRequest *p =
                 calloc(1, sizeof(struct s_UpnpActionRequest));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         /*p->m_ErrCode = 0;*/
         /*p->m_Socket = 0;*/
@@ -59,8 +60,9 @@ void UpnpActionRequest_delete(UpnpActionRequest *q)
 {
         struct s_UpnpActionRequest *p = (struct s_UpnpActionRequest *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         UpnpListInit(&p->m_ExtraHeadersList);
         UpnpString_delete(p->m_Os);
@@ -133,8 +135,9 @@ UpnpActionRequest *UpnpActionRequest_dup(const UpnpActionRequest *q)
 {
         UpnpActionRequest *p = UpnpActionRequest_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpActionRequest_assign(p, q);
 
@@ -355,6 +358,12 @@ int UpnpActionRequest_set_SoapHeader(UpnpActionRequest *p, IXML_Document *n)
 
 const struct sockaddr_storage *UpnpActionRequest_get_CtrlPtIPAddr(
         const UpnpActionRequest *p)
+{
+        return &p->m_CtrlPtIPAddr;
+}
+
+struct sockaddr_storage *UpnpActionRequest_getnc_CtrlPtIPAddr(
+        UpnpActionRequest *p)
 {
         return &p->m_CtrlPtIPAddr;
 }
