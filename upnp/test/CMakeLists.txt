@@ -1,3 +1,10 @@
+set_source_files_properties (test_init.c
+	test_list.c
+	test_log.c
+	test_url.c
+	PROPERTIES LANGUAGE CXX
+)
+
 if (WIN32)
 	set (TEST_ENV "PATH=$<TARGET_FILE_DIR:upnp_shared>\;$<TARGET_FILE_DIR:ixml_shared>\;")
 	string (APPEND TEST_ENV "$<TARGET_FILE_DIR:Threads::Threads>\;")

@@ -82,6 +82,8 @@ if (uuid)
 	)
 endif()
 
+set_source_files_properties (${UPNP_SOURCES} PROPERTIES LANGUAGE CXX)
+
 add_library (upnp_shared SHARED
 	${UPNP_SOURCES}
 )
