@@ -16,14 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install build tools
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y ninja-build
-
       - name: Build
         run: |
-          cmake -G Ninja -DDOWNLOAD_AND_BUILD_DEPS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
+          cmake -DDOWNLOAD_AND_BUILD_DEPS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
           cmake --build build
 
       - name: Test
