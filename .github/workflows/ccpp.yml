@@ -23,7 +23,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake -G Ninja -DDOWNLOAD_AND_BUILD_DEPS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
+          cmake -G Ninja -DDOWNLOAD_AND_BUILD_DEPS=ON -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
           cmake --build build
 
       - name: Test
