@@ -29,9 +29,7 @@ typedef struct s_UpnpLib UpnpLib;
 #include "upnpapi.h"
 #include "xml_alias.h"
 
-#ifdef UPNP_ENABLE_OPEN_SSL
 #include <openssl/ssl.h>
-#endif
 #include <stdlib.h> /* for size_t */
 
 #ifdef __cplusplus
