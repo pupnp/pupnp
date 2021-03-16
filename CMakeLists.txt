@@ -88,7 +88,8 @@ option (BUILD_TESTING "Run Tests after compile" ON)
 if (BUILD_TESTING)
 	enable_testing()
 
-	if (NOT WIN32)
+	#if (NOT WIN32)
+	if (FALSE)
 		find_package (GTest CONFIG)
 
 		if (GTest_FOUND)
