@@ -48,9 +48,9 @@ extern "C" {
 
 #ifdef _WIN32
 struct tm *http_gmtime_r(const time_t *clock, struct tm *result);
-#else
+#else /* _WIN32 */
 #define http_gmtime_r gmtime_r
-#endif
+#endif /* _WIN32 */
 
 int http_CancelHttpGet(/* IN */ void *Handle);
 

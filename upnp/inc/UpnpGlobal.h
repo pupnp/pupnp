@@ -13,7 +13,7 @@
 #warning libupnp requires largefile mode - use AC_SYS_LARGEFILE
 #elif !defined _WIN32
 #error libupnp requires largefile mode - use AC_SYS_LARGEFILE
-#endif
+#endif /* __GNUC__, _WIN32 */
 #endif
 
 #ifdef _WIN32

@@ -38,7 +38,7 @@
 
 #if !defined(_WIN32)
 #include <sys/param.h>
-#endif
+#endif /* _WIN32 */
 
 #include "UpnpGlobal.h" /* for */
 #include "UpnpInet.h"
@@ -57,15 +57,15 @@
 /* VC Winsocks2 includes these functions */
 #include "inet_pton.h"
 #endif
-#else
+#else /* _WIN32 */
 #include <netdb.h> /* for struct addrinfo */
-#endif
+#endif /* _WIN32 */
 
 #ifdef _WIN32
 #define strncasecmp strnicmp
-#else
+#else /* _WIN32 */
 /* Other systems have strncasecmp */
-#endif
+#endif /* _WIN32 */
 
 #ifdef __cplusplus
 extern "C" {
@@ -98,13 +98,13 @@ enum uriType
         absolute,
         relative
 };
-#else
+#else /* _WIN32 */
 enum uriType
 {
         ABSOLUTE,
         RELATIVE
 };
-#endif
+#endif /* _WIN32 */
 
 /*!
  * \brief Buffer used in parsinghttp messages, urls, etc. generally this simply

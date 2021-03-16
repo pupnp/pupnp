@@ -47,7 +47,7 @@
 
 #ifdef _WIN32
 #include "unixutil.h"
-#endif
+#endif /* _WIN32 */
 
 #define NUM_1XX_CODES 2
 static const char *Http1xxCodes[NUM_1XX_CODES];

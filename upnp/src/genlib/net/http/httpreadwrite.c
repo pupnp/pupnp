@@ -109,26 +109,26 @@ static int Check_Connect_And_Wait_Connection(
         int result;
 #ifdef _WIN32
         struct fd_set fdSet;
-#else
+#else /* _WIN32 */
         fd_set fdSet;
-#endif
+#endif /* _WIN32 */
         FD_ZERO(&fdSet);
         FD_SET(sock, &fdSet);
 
         if (connect_res < 0) {
 #ifdef _WIN32
                 if (WSAEWOULDBLOCK == WSAGetLastError()) {
-#else
+#else /* _WIN32 */
                 if (EINPROGRESS == errno) {
-#endif
+#endif /* _WIN32 */
                         result = select(
                                 sock + 1, NULL, &fdSet, NULL, &tmvTimeout);
                         if (result < 0) {
 #ifdef _WIN32
                                 /* WSAGetLastError(); */
-#else
+#else /* _WIN32 */
                                 /* errno */
-#endif
+#endif /* _WIN32 */
                                 return -1;
                         } else if (result == 0) {
                                 /* timeout */
@@ -148,7 +148,7 @@ static int Check_Connect_And_Wait_Connection(
                                         /* delayed error = valopt */
                                         return -1;
                                 }
-#endif
+#endif /* _WIN32 */
                         }
                 }
         }
@@ -186,7 +186,7 @@ struct tm *http_gmtime_r(const time_t *clock, struct tm *result)
         *result = *gmtime(clock);
         return result;
 }
-#endif
+#endif /* _WIN32 */
 
 static int get_hoststr(const char *url_str, char **hoststr, size_t *hostlen)
 {
@@ -2343,7 +2343,7 @@ void get_sdk_info(char *info, size_t infoSize)
                         versioninfo.szCSDVersion);
         else
                 *info = '\0';
-#else
+#else /* _WIN32 */
         int ret_code;
         struct utsname sys_info;
 
@@ -2356,6 +2356,6 @@ void get_sdk_info(char *info, size_t infoSize)
                 "devices/" UPNP_VERSION_STRING "\r\n",
                 sys_info.sysname,
                 sys_info.release);
-#endif
+#endif /* _WIN32 */
 #endif /* UPNP_ENABLE_UNSPECIFIED_SERVER */
 }

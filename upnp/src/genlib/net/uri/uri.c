@@ -46,7 +46,7 @@
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
 #endif
-#endif
+#endif /* _WIN32 */
 #include "config.h"
 
 #include "UpnpLib.h"

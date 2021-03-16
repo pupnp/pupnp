@@ -70,7 +70,7 @@
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
 #endif
-#endif
+#endif /* _WIN32 */
 
 /*!
  * Response Types.
@@ -126,9 +126,9 @@ static char *web_server_asctime_r(const struct tm *tm, char *buf)
         asctime_s(buf, ASCTIME_R_BUFFER_SIZE, tm);
         return buf;
 }
-#else
+#else /* _WIN32 */
 #define web_server_asctime_r asctime_r
-#endif
+#endif /* _WIN32 */
 
 /* sorted by file extension; must have 'NUM_MEDIA_TYPES' extensions */
 static const char *gEncodedMediaTypes =

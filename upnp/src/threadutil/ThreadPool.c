@@ -36,7 +36,7 @@
 
 #if !defined(_WIN32)
 #include <sys/param.h>
-#endif
+#endif /* _WIN32 */
 
 #include "FreeList.h"
 #include "ThreadPool.h"

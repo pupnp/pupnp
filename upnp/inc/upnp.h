@@ -56,9 +56,9 @@
 #endif
 #elif (defined(BSD) && BSD >= 199306)
 #include <time.h>
-#else
+#else /* _WIN32 */
 /* Other systems ??? */
-#endif
+#endif /* _WIN32 */
 
 #ifdef UPNP_ENABLE_OPEN_SSL
 #include <openssl/ssl.h>
