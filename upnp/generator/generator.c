@@ -157,7 +157,12 @@ static struct s_Member UpnpLib_members[] = {
         INIT_MEMBER(UpnpSdkDeviceRegisteredV4, TYPE_INTEGER, int, 0, 0),
         INIT_MEMBER(UpnpSdkDeviceRegisteredV6, TYPE_INTEGER, int, 0, 0),
         INIT_MEMBER(gUpnpSdkNLSuuid, TYPE_STRING, 0, 0, 0),
-        INIT_MEMBER(gSslCtx, TYPE_INTEGER, SSL_CTX *, "<openssl/ssl.h>", 0),
+        INIT_MEMBER_CONDITIONAL(gSslCtx,
+                TYPE_INTEGER,
+                SSL_CTX *,
+                "<openssl/ssl.h>",
+                0,
+                "#ifdef UPNP_ENABLE_OPEN_SSL"),
 };
 
 static struct s_Member UpnpStateVarComplete_members[] = {
@@ -244,8 +249,23 @@ static char *strupr(char *s)
         return s;
 }
 
+static void write_conditional_start(FILE *fp, struct s_Member *m)
+{
+        if (m->conditional) {
+                fprintf(fp, "%s\n", m->conditional);
+        }
+}
+
+static void write_conditional_end(FILE *fp, struct s_Member *m)
+{
+        if (m->conditional) {
+                fprintf(fp, "#endif\n");
+        }
+}
+
 static int write_prototype(FILE *fp, const char *class_name, struct s_Member *m)
 {
+        write_conditional_start(fp, m);
         switch (m->type) {
         case TYPE_CLASS:
                 /* clang-format off */
@@ -377,6 +397,7 @@ static int write_prototype(FILE *fp, const char *class_name, struct s_Member *m)
                 printf("%s(): Error! Unknown type: %d.\n", __func__, m->type);
                 return 0;
         }
+        write_conditional_end(fp, m);
 
         return 1;
 }
@@ -506,11 +527,13 @@ static int write_header(FILE *fp, struct s_Class *c)
                 m = c->members + i;
                 header = member_needs_include(m);
                 if (header && !already_included(header)) {
+                        write_conditional_start(fp, m);
                         if (header[0] == '<') {
                                 fprintf(fp, "#include %s\n", header);
                         } else {
                                 fprintf(fp, "#include \"%s\"\n", header);
                         }
+                        write_conditional_end(fp, m);
                 }
         }
 
@@ -557,6 +580,7 @@ static int write_header(FILE *fp, struct s_Class *c)
 
 static int write_definition(FILE *fp, struct s_Member *m)
 {
+        write_conditional_start(fp, m);
         switch (m->type) {
         case TYPE_CLASS:
                 fprintf(fp, "\t%s *m_%s;\n", m->type_name, m->name);
@@ -580,6 +604,7 @@ static int write_definition(FILE *fp, struct s_Member *m)
                 printf("%s(): Error! Unknown type: %d.\n", __func__, m->type);
                 return 0;
         }
+        write_conditional_end(fp, m);
 
         return 1;
 }
@@ -603,6 +628,7 @@ static int write_constructor(FILE *fp, struct s_Class *c)
         /* clang-format on */
         for (i = 0; i < (int)c->n_members; ++i) {
                 m = c->members + i;
+                write_conditional_start(fp, m);
                 switch (m->type) {
                 case TYPE_CLASS:
                         fprintf(fp,
@@ -641,6 +667,7 @@ static int write_constructor(FILE *fp, struct s_Class *c)
                                 m->type);
                         return 0;
                 }
+                write_conditional_end(fp, m);
         }
         /* clang-format off */
 	fprintf(fp,
@@ -673,6 +700,7 @@ static int write_destructor(FILE *fp, struct s_Class *c)
         /* clang-format on */
         for (i = c->n_members - 1; i >= 0; --i) {
                 m = c->members + i;
+                write_conditional_start(fp, m);
                 switch (m->type) {
                 case TYPE_CLASS:
                         fprintf(fp,
@@ -721,6 +749,7 @@ static int write_destructor(FILE *fp, struct s_Class *c)
                                 m->type);
                         return 0;
                 }
+                write_conditional_end(fp, m);
         }
         /* clang-format off */
 	fprintf(fp,
@@ -749,12 +778,14 @@ static int write_assignment_operator(FILE *fp, struct s_Class *c)
                 c->name);
         for (i = 0; i < (int)c->n_members; ++i) {
                 m = c->members + i;
+                write_conditional_start(fp, m);
                 fprintf(fp,
                         "\t\tok = ok && %s_set_%s(p, %s_get_%s(q));\n",
                         c->name,
                         m->name,
                         c->name,
                         m->name);
+                write_conditional_end(fp, m);
         }
         fprintf(fp,
                 "\t}\n"
@@ -792,6 +823,7 @@ static int write_copy_constructor(FILE *fp, struct s_Class *c)
 
 static int write_methods(FILE *fp, const char *class_name, struct s_Member *m)
 {
+        write_conditional_start(fp, m);
         switch (m->type) {
         case TYPE_CLASS:
                 /* clang-format off */
@@ -1002,6 +1034,7 @@ static int write_methods(FILE *fp, const char *class_name, struct s_Member *m)
                 printf("%s(): Error! Unknown type: %d.\n", __func__, m->type);
                 return 0;
         }
+        write_conditional_end(fp, m);
 
         return 1;
 }

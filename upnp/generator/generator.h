@@ -25,6 +25,7 @@ struct s_Member
         const char *type_name;
         const char *header;
         const char *initial_value;
+        const char *conditional;
 };
 
 /* clang-format off */
@@ -36,6 +37,16 @@ struct s_Member
                 .header = HEADER, \
                 .initial_value = INIT_VAL \
 	}
+
+#define INIT_MEMBER_CONDITIONAL(NAME, TYPE, TYPE_NAME, HEADER, INIT_VAL, CONDITIONAL) \
+        { \
+                .name = #NAME, \
+                .type = TYPE, \
+                .type_name = #TYPE_NAME, \
+                .header = HEADER, \
+                .initial_value = INIT_VAL, \
+                .conditional = CONDITIONAL \
+        }
 /* clang-format on */
 
 struct s_Class

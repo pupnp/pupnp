@@ -29,8 +29,10 @@ typedef struct s_UpnpLib UpnpLib;
 #include "upnpapi.h"
 #include "xml_alias.h"
 
-#include <openssl/ssl.h>
 #include <stdlib.h> /* for size_t */
+#ifdef UPNP_ENABLE_OPEN_SSL
+#include <openssl/ssl.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -354,11 +356,13 @@ EXPORT_SPEC int UpnpLib_strncpy_gUpnpSdkNLSuuid(
 /*! UpnpLib_clear_gUpnpSdkNLSuuid */
 EXPORT_SPEC void UpnpLib_clear_gUpnpSdkNLSuuid(UpnpLib *p);
 
+#ifdef UPNP_ENABLE_OPEN_SSL
 /*! UpnpLib_get_gSslCtx */
 EXPORT_SPEC SSL_CTX *UpnpLib_get_gSslCtx(const UpnpLib *p);
 /*! UpnpLib_set_gSslCtx */
 EXPORT_SPEC int UpnpLib_set_gSslCtx(UpnpLib *p, SSL_CTX *n);
 
+#endif
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

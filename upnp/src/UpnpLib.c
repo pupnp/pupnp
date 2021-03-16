@@ -52,7 +52,9 @@ struct s_UpnpLib
         int m_UpnpSdkDeviceRegisteredV4;
         int m_UpnpSdkDeviceRegisteredV6;
         UpnpString *m_gUpnpSdkNLSuuid;
+#ifdef UPNP_ENABLE_OPEN_SSL
         SSL_CTX *m_gSslCtx;
+#endif
 };
 
 UpnpLib *UpnpLib_new()
@@ -100,7 +102,9 @@ UpnpLib *UpnpLib_new()
         /*p->m_UpnpSdkDeviceRegisteredV4 = 0;*/
         /*p->m_UpnpSdkDeviceRegisteredV6 = 0;*/
         p->m_gUpnpSdkNLSuuid = UpnpString_new();
+#ifdef UPNP_ENABLE_OPEN_SSL
         /*p->m_gSslCtx = 0;*/
+#endif
 
         return (UpnpLib *)p;
 }
@@ -113,7 +117,9 @@ void UpnpLib_delete(UpnpLib *q)
                 return;
         }
 
+#ifdef UPNP_ENABLE_OPEN_SSL
         p->m_gSslCtx = 0;
+#endif
         UpnpString_delete(p->m_gUpnpSdkNLSuuid);
         p->m_gUpnpSdkNLSuuid = 0;
         p->m_UpnpSdkDeviceRegisteredV6 = 0;
@@ -253,7 +259,9 @@ int UpnpLib_assign(UpnpLib *p, const UpnpLib *q)
                 ok = ok &&
                         UpnpLib_set_gUpnpSdkNLSuuid(
                                 p, UpnpLib_get_gUpnpSdkNLSuuid(q));
+#ifdef UPNP_ENABLE_OPEN_SSL
                 ok = ok && UpnpLib_set_gSslCtx(p, UpnpLib_get_gSslCtx(q));
+#endif
         }
 
         return ok;
@@ -964,6 +972,7 @@ void UpnpLib_clear_gUpnpSdkNLSuuid(UpnpLib *p)
         UpnpString_clear(p->m_gUpnpSdkNLSuuid);
 }
 
+#ifdef UPNP_ENABLE_OPEN_SSL
 SSL_CTX *UpnpLib_get_gSslCtx(const UpnpLib *p) { return p->m_gSslCtx; }
 
 int UpnpLib_set_gSslCtx(UpnpLib *p, SSL_CTX *n)
@@ -972,3 +981,5 @@ int UpnpLib_set_gSslCtx(UpnpLib *p, SSL_CTX *n)
 
         return 1;
 }
+
+#endif
