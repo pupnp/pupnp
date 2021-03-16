@@ -262,6 +262,8 @@ typedef struct THREADPOOL
  * \li \c EMAXTHREADS if minimum threads is greater than maximum threads.
  */
 int ThreadPoolInit(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! Must be valid, non null, pointer to ThreadPool. */
         ThreadPool *tp,
         /*! Can be null. if not null then attr contains the following fields:

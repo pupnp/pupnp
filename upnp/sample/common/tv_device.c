@@ -43,6 +43,8 @@
 
 #include "tv_device.h"
 
+#include "upnpdebug.h"
+
 #include <assert.h>
 
 #define DEFAULT_WEB_DIR "./web"
@@ -1430,6 +1432,9 @@ int TvDeviceStart(UpnpLib **pp,
                          "\tinterface = %s port = %u\n",
                 iface ? iface : "{NULL}",
                 port);
+        /* If you want logging, enable it here. */
+        /* UpnpSetLogFileNames(0, 0); */
+        p = 0;
         ret = UpnpInit2(&p, iface, port);
         if (ret != UPNP_E_SUCCESS) {
                 SampleUtil_Print("Error with UpnpInit2 -- %d\n", ret);
@@ -1638,7 +1643,7 @@ int device_main(int argc, char *argv[], UpnpLib **p)
                 web_dir_path,
                 ip_mode,
                 linux_print,
-                0);
+                1);
 }
 
 /*! @} Device Sample Module */

@@ -66,8 +66,12 @@ int main(int argc, char *argv[])
                         return 1;
                 }
         }
-
+        /* Start the device. */
         device_main(argc, argv, &p_device);
+        /* This is how it used to work before the library became reentrant,
+         * so it should still work. */
+        p_ctrlpt = p_device;
+        /* Start the control point. */
         rc = TvCtrlPointStart(&p_ctrlpt, iface, NULL, 1);
         if (rc != TV_SUCCESS) {
                 SampleUtil_Print("Error starting UPnP TV Control Point\n");

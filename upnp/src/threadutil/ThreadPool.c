@@ -706,7 +706,7 @@ static void AddWorker(
         }
 }
 
-int ThreadPoolInit(ThreadPool *tp, ThreadPoolAttr *attr)
+int ThreadPoolInit(UpnpLib *p, ThreadPool *tp, ThreadPoolAttr *attr)
 {
         int retCode = 0;
         int i = 0;
@@ -756,6 +756,7 @@ int ThreadPoolInit(ThreadPool *tp, ThreadPoolAttr *attr)
                 tp->busyThreads = 0;
                 tp->persistentThreads = 0;
                 tp->pendingWorkerThreadStart = 0;
+                tp->upnp_lib = p;
                 for (i = 0; i < tp->attr.minThreads; ++i) {
                         retCode = CreateWorker(tp);
                         if (retCode) {

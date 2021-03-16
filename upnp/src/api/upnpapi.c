@@ -192,19 +192,19 @@ static int UpnpInitThreadPools(UpnpLib *p)
         TPAttrSetIdleTime(&attr, THREAD_IDLE_TIME);
         TPAttrSetMaxJobsTotal(&attr, MAX_JOBS_TOTAL);
 
-        if (ThreadPoolInit(UpnpLib_getnc_gSendThreadPool(p), &attr) !=
+        if (ThreadPoolInit(p, UpnpLib_getnc_gSendThreadPool(p), &attr) !=
                 UPNP_E_SUCCESS) {
                 ret = UPNP_E_INIT_FAILED;
                 goto exit_function;
         }
 
-        if (ThreadPoolInit(UpnpLib_getnc_gRecvThreadPool(p), &attr) !=
+        if (ThreadPoolInit(p, UpnpLib_getnc_gRecvThreadPool(p), &attr) !=
                 UPNP_E_SUCCESS) {
                 ret = UPNP_E_INIT_FAILED;
                 goto exit_function;
         }
 
-        if (ThreadPoolInit(UpnpLib_getnc_gMiniServerThreadPool(p), &attr) !=
+        if (ThreadPoolInit(p, UpnpLib_getnc_gMiniServerThreadPool(p), &attr) !=
                 UPNP_E_SUCCESS) {
                 ret = UPNP_E_INIT_FAILED;
                 goto exit_function;
