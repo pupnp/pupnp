@@ -3573,6 +3573,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
         ULONG ret;
         int ifname_found = 0;
         int valid_addr_found = 0;
+        char inet_addr4[INET_ADDRSTRLEN];
+        char inet_addr6[INET6_ADDRSTRLEN];
 
         /* Get Adapters addresses required size. */
         ret = GetAdaptersAddresses(AF_UNSPEC,
@@ -3612,11 +3614,11 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
         }
         /* Copy interface name, if it was provided. */
         if (IfName) {
-                if (strlen(IfName) >= sizeof p->gIF_NAME) {
+                if (strlen(IfName) >= LINE_SIZE) {
                         free(adapts);
                         return UPNP_E_INVALID_INTERFACE;
                 }
-                strncpy(p->gIF_NAME, IfName, sizeof p->gIF_NAME);
+                UpnpLib_strcpy_gIF_NAME(p, IfName);
                 ifname_found = 1;
         }
         for (adapts_item = adapts; adapts_item != NULL;
@@ -3625,34 +3627,29 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                         adapts_item->OperStatus != IfOperStatusUp) {
                         continue;
                 }
+                /*
+                 * Partial fix for Windows: Friendly name is wchar
+                 * string, but currently p->gIF_NAME is char string. For
+                 * now try to convert it, which will work with many (but
+                 * not all) adapters. A full fix would require a lot of
+                 * big changes (p->gIF_NAME to wchar string?).
+                 */
                 if (!ifname_found) {
                         /* We have found a valid interface name. Keep it. */
-                        /*
-                         * Partial fix for Windows: Friendly name is wchar
-                         * string, but currently p->gIF_NAME is char string. For
-                         * now try to convert it, which will work with many (but
-                         * not all) adapters. A full fix would require a lot of
-                         * big changes (p->gIF_NAME to wchar string?).
-                         */
-                        wcstombs(p->gIF_NAME,
+                        char tmpIfName[LINE_SIZE];
+                        wcstombs(tmpIfName,
                                 adapts_item->FriendlyName,
-                                sizeof p->gIF_NAME);
+                                LINE_SIZE);
+                        UpnpLib_strcpy_gIF_NAME(p, tmpIfName);
                         ifname_found = 1;
                 } else {
-                        /*
-                         * Partial fix for Windows: Friendly name is wchar
-                         * string, but currently p->gIF_NAME is char string. For
-                         * now try to convert it, which will work with many (but
-                         * not all) adapters. A full fix would require a lot of
-                         * big changes (p->gIF_NAME to wchar string?).
-                         */
                         char tmpIfName[LINE_SIZE] = {0};
                         wcstombs(tmpIfName,
                                 adapts_item->FriendlyName,
                                 sizeof(tmpIfName));
-                        if (strncmp(p->gIF_NAME,
+                        if (strncmp(UpnpLib_get_gIF_NAME_cstr(p),
                                     tmpIfName,
-                                    sizeof p->gIF_NAME) != 0) {
+                                    LINE_SIZE) != 0) {
                                 /* This is not the interface we're looking for.
                                  */
                                 continue;
@@ -3701,7 +3698,7 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                         uni_addr = uni_addr->Next;
                 }
                 if (valid_addr_found == 1) {
-                        p->gIF_INDEX = adapts_item->IfIndex;
+                        UpnpLib_set_gIF_INDEX(p, adapts_item->IfIndex);
                         break;
                 }
         }
@@ -3716,8 +3713,10 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                         "use.\n");
                 return UPNP_E_INVALID_INTERFACE;
         }
-        inet_ntop(AF_INET, &v4_addr, p->gIF_IPV4, sizeof p->gIF_IPV4);
-        inet_ntop(AF_INET6, &v6_addr, p->gIF_IPV6, sizeof p->gIF_IPV6);
+        inet_ntop(AF_INET, &v4_addr, inet_addr4, sizeof inet_addr4);
+        UpnpLib_strcpy_gIF_IPV4(p, inet_addr4);
+        inet_ntop(AF_INET6, &v6_addr, inet_addr6, sizeof inet_addr6);
+        UpnpLib_strcpy_gIF_IPV6(p, inet_addr6);
 #else
         struct ifaddrs *ifap, *ifa;
         struct in_addr v4_addr = {0};
