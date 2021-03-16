@@ -114,13 +114,31 @@ int main(int argc, char *argv[])
         if (UPNP_E_SUCCESS == rc) {
                 const char *ip_address = UpnpGetServerIpAddress(p);
                 unsigned short port = UpnpGetServerPort(p);
-
+                UpnpPrintf(UPNP_INFO,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        "UPnP Initialized OK ip=%s, port=%d\n",
+                        (ip_address ? ip_address : "UNKNOWN"),
+                        port);
                 printf("UPnP Initialized OK ip=%s, port=%d\n",
                         (ip_address ? ip_address : "UNKNOWN"),
                         port);
         } else {
+                UpnpPrintf(UPNP_INFO,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        "** ERROR UpnpInit2(): %d",
+                        rc);
                 printf("** ERROR UpnpInit2(): %d", rc);
 #if UPNP_HAVE_TOOLS
+                UpnpPrintf(UPNP_INFO,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        " %s",
+                        UpnpGetErrorMessage(rc));
                 printf(" %s", UpnpGetErrorMessage(rc));
 #endif
                 printf("\n");
