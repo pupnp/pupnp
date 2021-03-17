@@ -63,10 +63,11 @@ jobs:
       - name: Test
         run: |
           cd build
-          cd bin
-          test-upnp-init
-          type test_init.log
           ctest --output-on-failure
+          type test_init.log
+          type bin\test_init.log
+          bin\test-upnp-init.exe
+          type test_init.log
 
   macos:
     name: Build (${{ matrix.os }})
