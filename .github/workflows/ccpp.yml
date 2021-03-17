@@ -63,7 +63,7 @@ jobs:
       - name: Test
         run: |
           cd build/bin
-          test_init
+          test-upnp-init
           type test_init.log
           ctest --output-on-failure
 
