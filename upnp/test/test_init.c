@@ -114,7 +114,17 @@ int main(int argc, char *argv[])
         p = 0;
         rc = UpnpInit2(&p, NULL, 0);
         if (UPNP_E_SUCCESS == rc) {
+                UpnpPrintf(UPNP_INFO,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        "Will call UpnpGetServerIpAddress(p);\n");
                 const char *ip_address = UpnpGetServerIpAddress(p);
+                UpnpPrintf(UPNP_INFO,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        "Will call UpnpGetServerPort(p);\n");
                 unsigned short port = UpnpGetServerPort(p);
                 UpnpPrintf(UPNP_INFO,
                         API,
