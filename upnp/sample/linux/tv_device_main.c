@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         int code;
         UpnpLib *p;
 
-        rc = device_main(argc, argv, &p);
+        rc = device_main(&p, argc, argv, 0);
         if (rc != UPNP_E_SUCCESS) {
                 return rc;
         }

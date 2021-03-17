@@ -622,7 +622,7 @@ void *TvDeviceCommandLoop(void *args);
  *	\li \c -webdir web_dir_path
  *	\li \c -help
  */
-int device_main(int argc, char *argv[], UpnpLib **p);
+int device_main(UpnpLib **p, int argc, char *argv[], int combo);
 
 #ifdef __cplusplus
 }

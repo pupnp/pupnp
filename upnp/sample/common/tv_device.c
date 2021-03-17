@@ -1585,7 +1585,7 @@ void *TvDeviceCommandLoop(void *args)
         return NULL;
 }
 
-int device_main(int argc, char *argv[], UpnpLib **p)
+int device_main(UpnpLib **p, int argc, char *argv[], int combo)
 {
         unsigned int portTemp = 0;
         char *iface = NULL;
@@ -1643,7 +1643,7 @@ int device_main(int argc, char *argv[], UpnpLib **p)
                 web_dir_path,
                 ip_mode,
                 linux_print,
-                1);
+                combo);
 }
 
 /*! @} Device Sample Module */

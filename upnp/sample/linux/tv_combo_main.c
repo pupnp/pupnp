@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
                 }
         }
         /* Start the device. */
-        device_main(argc, argv, &p_device);
+        device_main(&p_device, argc, argv, 1);
         /* This is how it used to work before the library became reentrant,
          * so it should still work. */
         p_ctrlpt = p_device;
