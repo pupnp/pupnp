@@ -64,10 +64,7 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure
-          type bin\test_init.log
-          type test_init.log
-          bin\test-upnp-init.exe
-          type test_init.log
+          type upnp/test/test_init.log
 
   macos:
     name: Build (${{ matrix.os }})
