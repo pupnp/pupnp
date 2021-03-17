@@ -29,6 +29,8 @@ jobs:
       - name: Test
         run: |
           cd build
+          test_init
+          type test_init.log
           ctest --output-on-failure
 
   windows:
