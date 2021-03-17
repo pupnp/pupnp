@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
                 }
         }
 
-        device_main(argc, argv);
+        device_main(argc, argv, 1);
         rc = TvCtrlPointStart(iface, NULL, 1);
         if (rc != TV_SUCCESS) {
                 SampleUtil_Print("Error starting UPnP TV Control Point\n");

@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 #endif
         int code;
 
-        rc = device_main(argc, argv);
+        rc = device_main(argc, argv, 0);
         if (rc != UPNP_E_SUCCESS) {
                 return rc;
         }
