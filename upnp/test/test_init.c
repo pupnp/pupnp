@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
         int a, b, c;
         (void)argc;
         (void)argv;
+        const char *log_file_name = "test_init.log";
         UpnpLib *p;
 
         /*
@@ -104,11 +105,12 @@ int main(int argc, char *argv[])
 #endif
 
         /*
-         * Test library initialisation
+         * Test library initialization
          */
         printf("\n");
         printf("Initializing UPnP ... \n");
-        UpnpSetLogFileNames(0, 0);
+        unlink(log_file_name);
+        UpnpSetLogFileNames(log_file_name, 0);
         p = 0;
         rc = UpnpInit2(&p, NULL, 0);
         if (UPNP_E_SUCCESS == rc) {
