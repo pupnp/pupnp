@@ -64,8 +64,8 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure
-          type test_init.log
           type bin\test_init.log
+          type test_init.log
           bin\test-upnp-init.exe
           type test_init.log
 
