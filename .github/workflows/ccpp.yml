@@ -60,11 +60,18 @@ jobs:
           cmake -G Ninja -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
           cmake --build build
 
-      - name: Test
+      - name: Test Debug
+        if: $${{ matrix.conf == 'Debug' }}
         run: |
           cd build
           ctest --output-on-failure
           type upnp/test/test_init.log
+
+      - name: Test Release
+        if: $${{ matrix.conf == 'Release' }}
+        run: |
+          cd build
+          ctest --output-on-failure
 
   macos:
     name: Build (${{ matrix.os }})
