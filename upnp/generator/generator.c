@@ -107,12 +107,19 @@ static struct s_Member UpnpLib_members[] = {
                 TYPE_BUFFER,
                 ithread_mutex_t,
                 "ithread.h",
-                0),
+                "pthread_mutex_init(&p->m_GlobalClientSubscribeMutex, 0);"),
         INIT_MEMBER(
                 GlobalHndRWLock, TYPE_BUFFER, ithread_rwlock_t, "ithread.h", 0),
-        INIT_MEMBER(gUUIDMutex, TYPE_BUFFER, ithread_mutex_t, "ithread.h", 0),
-        INIT_MEMBER(
-                gSDKInitMutex, TYPE_BUFFER, ithread_mutex_t, "ithread.h", 0),
+        INIT_MEMBER(gUUIDMutex,
+                TYPE_BUFFER,
+                ithread_mutex_t,
+                "ithread.h",
+                "pthread_mutex_init(&p->m_gUUIDMutex, 0);"),
+        INIT_MEMBER(gSDKInitMutex,
+                TYPE_BUFFER,
+                ithread_mutex_t,
+                "ithread.h",
+                "pthread_mutex_init(&p->m_gSDKInitMutex, 0);"),
         INIT_MEMBER(gTimerThread, TYPE_BUFFER, TimerThread, "TimerThread.h", 0),
         INIT_MEMBER(
                 gSendThreadPool, TYPE_BUFFER, ThreadPool, "ThreadPool.h", 0),
@@ -146,7 +153,11 @@ static struct s_Member UpnpLib_members[] = {
                 "document_type.h",
                 0),
         INIT_MEMBER(gAliasDoc, TYPE_BUFFER, xml_alias_t, "xml_alias.h", 0),
-        INIT_MEMBER(gWebMutex, TYPE_BUFFER, ithread_mutex_t, "ithread.h", 0),
+        INIT_MEMBER(gWebMutex,
+                TYPE_BUFFER,
+                ithread_mutex_t,
+                "ithread.h",
+                "pthread_mutex_init(&p->m_gWebMutex, 0);"),
         /*--------------------------------------------------------------------*/
         INIT_MEMBER(gDocumentRootDir, TYPE_BUFFER, membuffer, "membuffer.h", 0),
         INIT_MEMBER(g_maxContentLength, TYPE_INTEGER, size_t, 0, 0),
@@ -647,10 +658,15 @@ static int write_constructor(FILE *fp, struct s_Class *c)
                         }
                         break;
                 case TYPE_BUFFER:
-                        fprintf(fp,
-                                "\t/* memset(&p->m_%s, 0, sizeof (%s)); */\n",
-                                m->name,
-                                m->type_name);
+                        if (m->initial_value) {
+                                fprintf(fp, "%s;\n", m->initial_value);
+                        } else {
+                                fprintf(fp,
+                                        "\t/* memset(&p->m_%s, 0, sizeof "
+                                        "(%s)); */\n",
+                                        m->name,
+                                        m->type_name);
+                        }
                         break;
                 case TYPE_LIST:
                         fprintf(fp, "\tUpnpListInit(&p->m_%s);\n", m->name);

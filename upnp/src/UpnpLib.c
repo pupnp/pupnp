@@ -68,11 +68,13 @@ UpnpLib *UpnpLib_new()
         /* memset(&p->m_virtualDirCallback, 0, sizeof (struct
          * VirtualDirCallbacks)); */
         /*p->m_pVirtualDirList = 0;*/
-        /* memset(&p->m_GlobalClientSubscribeMutex, 0, sizeof
-         * (ithread_mutex_t)); */
+        pthread_mutex_init(&p->m_GlobalClientSubscribeMutex, 0);
+        ;
         /* memset(&p->m_GlobalHndRWLock, 0, sizeof (ithread_rwlock_t)); */
-        /* memset(&p->m_gUUIDMutex, 0, sizeof (ithread_mutex_t)); */
-        /* memset(&p->m_gSDKInitMutex, 0, sizeof (ithread_mutex_t)); */
+        pthread_mutex_init(&p->m_gUUIDMutex, 0);
+        ;
+        pthread_mutex_init(&p->m_gSDKInitMutex, 0);
+        ;
         /* memset(&p->m_gTimerThread, 0, sizeof (TimerThread)); */
         /* memset(&p->m_gSendThreadPool, 0, sizeof (ThreadPool)); */
         /* memset(&p->m_gRecvThreadPool, 0, sizeof (ThreadPool)); */
@@ -92,7 +94,8 @@ UpnpLib *UpnpLib_new()
         /* memset(&p->m_HandleTable, 0, sizeof (handle_table_t)); */
         /* memset(&p->m_gMediaTypeArray, 0, sizeof (doc_type_array_t)); */
         /* memset(&p->m_gAliasDoc, 0, sizeof (xml_alias_t)); */
-        /* memset(&p->m_gWebMutex, 0, sizeof (ithread_mutex_t)); */
+        pthread_mutex_init(&p->m_gWebMutex, 0);
+        ;
         /* memset(&p->m_gDocumentRootDir, 0, sizeof (membuffer)); */
         /*p->m_g_maxContentLength = 0;*/
         /*p->m_g_UpnpSdkEQMaxLen = 0;*/
