@@ -1373,7 +1373,7 @@ void gena_process_subscription_request(
         subscription *sub;
         uuid_upnp uid;
         struct Handle_Info *handle_info;
-        void *cookie;
+        const void *cookie;
         Upnp_FunPtr callback_fun;
         UpnpDevice_Handle device_handle;
         memptr nt_hdr;

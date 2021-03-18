@@ -33,6 +33,10 @@
 #ifndef UPNPAPI_H
 #define UPNPAPI_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /*!
  * \file
  */
@@ -72,7 +76,7 @@ struct Handle_Info
         /*! Callback function pointer. */
         Upnp_FunPtr Callback;
         /*! . */
-        char *Cookie;
+        const char *Cookie;
         /*! 0 = not installed; otherwise installed. */
         int aliasInstalled;
 
@@ -232,7 +236,7 @@ struct UpnpNonblockParam
         char ServiceVer[NAME_SIZE];
         char Url[NAME_SIZE];
         Upnp_SID SubsId;
-        char *Cookie;
+        const char *Cookie;
         Upnp_FunPtr Fun;
         IXML_Document *Header;
         IXML_Document *Act;
@@ -294,5 +298,9 @@ int PrintHandleInfo(
         UpnpLib *p,
         /*! [in] Handle index. */
         UpnpClient_Handle Hnd);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* UPNPAPI_H */

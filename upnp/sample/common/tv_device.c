@@ -1372,8 +1372,10 @@ int TvDeviceDecreaseBrightness(UpnpLib *p,
         return IncrementBrightness(p, -1, in, out, errorString);
 }
 
-int TvDeviceCallbackEventHandler(
-        UpnpLib *p, Upnp_EventType EventType, const void *Event, void *Cookie)
+int TvDeviceCallbackEventHandler(UpnpLib *p,
+        Upnp_EventType EventType,
+        const void *Event,
+        const void *Cookie)
 {
         (void)Cookie;
         switch (EventType) {

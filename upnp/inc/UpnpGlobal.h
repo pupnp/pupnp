@@ -88,7 +88,11 @@ typedef __int64 int64_t;
  * definition upon declaration or it will not be exported on WIN32
  * DLLs.
  */
+#ifdef __cplusplus
+#define EXPORT_SPEC extern "C"
+#else
 #define EXPORT_SPEC
+#endif
 
 /*!
  * \brief Declares an inline function.

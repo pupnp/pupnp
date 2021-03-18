@@ -1044,8 +1044,10 @@ void TvCtrlPointHandleGetVar(
  *   Cookie -- Optional data specified during callback registration
  *
  ********************************************************************************/
-int TvCtrlPointCallbackEventHandler(
-        UpnpLib *p, Upnp_EventType EventType, const void *Event, void *Cookie)
+int TvCtrlPointCallbackEventHandler(UpnpLib *p,
+        Upnp_EventType EventType,
+        const void *Event,
+        const void *Cookie)
 {
         int errCode = 0;
         (void)Cookie;

@@ -1,6 +1,10 @@
 #ifndef SSDPLIB_H
 #define SSDPLIB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /**************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation
@@ -550,5 +554,9 @@ int DeviceShutdown(
 /* @} SSDP Device Functions */
 
 /* @} SSDPlib SSDP Library */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* SSDPLIB_H */

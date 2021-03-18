@@ -119,7 +119,7 @@ void ssdp_handle_ctrlpt_msg(UpnpLib *p,
         char save_char;
         Upnp_EventType event_type;
         Upnp_FunPtr ctrlpt_callback;
-        void *ctrlpt_cookie;
+        const void *ctrlpt_cookie;
         ListNode *node = NULL;
         SsdpSearchArg *searchArg = NULL;
         int matched = 0;

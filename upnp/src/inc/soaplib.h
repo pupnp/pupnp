@@ -32,6 +32,10 @@
 #ifndef SOAPLIB_H
 #define SOAPLIB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #include "httpparser.h"
 #include "ixml.h"
 #include "sock.h"
@@ -127,5 +131,9 @@ int SoapGetServiceVarStatus(
         UpnpLib *p, char *ActionURL, DOMString VarName, DOMString *StVar);
 
 extern const char *ContentTypeHeader;
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* SOAPLIB_H */

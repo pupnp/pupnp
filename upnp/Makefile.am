@@ -166,7 +166,7 @@ libupnp_la_SOURCES += \
 	src/api/UpnpStateVarRequest.c \
 	src/api/UpnpSubscriptionRequest.c \
 	src/api/UpnpString.c \
-	src/api/upnpapi.c \
+        src/api/upnpapi.cpp \
 	src/api/upnpdebug.c
 
 # internal
