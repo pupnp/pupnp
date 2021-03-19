@@ -473,9 +473,9 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libupnp.pc
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
 
-#if (BUILD_TESTING)
-#	enable_testing()
-#
+if (BUILD_TESTING)
+	enable_testing()
+
 #	if (NOT WIN32)
 #		find_package (GTest CONFIG)
 #
@@ -486,4 +486,4 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libupnp.pc
 #			add_subdirectory (gtest)
 #		endif()
 #	endif()
-#endif()
+endif()
