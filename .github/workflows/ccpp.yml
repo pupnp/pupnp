@@ -44,20 +44,20 @@ jobs:
         run: cmake -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
 
       - name: Build
-        run: cmake --build build
+        run: cmake --build build --config ${{ matrix.conf }}
 
       - name: Test Debug
         if: ${{ matrix.conf == 'Debug' }}
         run: |
           cd build
-          ctest --output-on-failure
+          ctest --output-on-failure -C ${{ matrix.conf }}
           type upnp/test/test_init.log
 
       - name: Test Release
         if: ${{ matrix.conf == 'Release' }}
         run: |
           cd build
-          ctest --output-on-failure
+          ctest --output-on-failure -C ${{ matrix.conf }}
 
   macos:
     name: Build (${{ matrix.os }})
