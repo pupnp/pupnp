@@ -1,5 +1,3 @@
-if (BUILD_TESTING)
-	add_subdirectory (test)
 endif()
 
 if (samples)
@@ -235,3 +233,8 @@ install (TARGETS upnp_static
 install (EXPORT UPNP
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP
 )
+
+if (BUILD_TESTING)
+	enable_testing()
+	add_subdirectory (test)
+endif()

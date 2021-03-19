@@ -85,21 +85,6 @@ endif()
 
 option (BUILD_TESTING "Run Tests after compile" ON)
 
-if (BUILD_TESTING)
-	enable_testing()
-
-	#if (NOT WIN32)
-	if (FALSE)
-		find_package (GTest CONFIG)
-
-		if (GTest_FOUND)
-			add_subdirectory (gtest)
-		elseif (DOWNLOAD_AND_BUILD_DEPS AND NOT GTest_FOUND)
-			CmDaB_install (googletest)
-			add_subdirectory (gtest)
-		endif()
-	endif()
-endif()
 
 if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
 	set (DEFAULT_BUILD_TYPE "Debug")
@@ -488,3 +473,18 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/libupnp.pc.in ${CMAKE_CURRENT_BINARY
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libupnp.pc
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
+
+#if (BUILD_TESTING)
+#	enable_testing()
+#
+#	if (NOT WIN32)
+#		find_package (GTest CONFIG)
+#
+#		if (GTest_FOUND)
+#			add_subdirectory (gtest)
+#		elseif (DOWNLOAD_AND_BUILD_DEPS AND NOT GTest_FOUND)
+#			CmDaB_install (googletest)
+#			add_subdirectory (gtest)
+#		endif()
+#	endif()
+#endif()
