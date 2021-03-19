@@ -1,3 +1,6 @@
+#ifndef UPNPAPI_H
+#define UPNPAPI_H
+
 /*******************************************************************************
  *
  * Copyright (c) 2000-2003 Intel Corporation
@@ -30,13 +33,6 @@
  *
  ******************************************************************************/
 
-#ifndef UPNPAPI_H
-#define UPNPAPI_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 /*!
  * \file
  */
@@ -44,6 +40,10 @@ extern "C" {
 #include "VirtualDir.h" /* for struct VirtualDirCallbacks */
 #include "client_table.h"
 #include "upnp.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 #define MAX_INTERFACES 256
 

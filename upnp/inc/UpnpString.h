@@ -1,5 +1,3 @@
-
-
 #ifndef STRING_H
 #define STRING_H
 
@@ -21,16 +19,26 @@
 
 #include "UpnpGlobal.h" /* for EXPORT_SPEC */
 
-#include <stdlib.h> /* for size_t */
-
 #ifdef __cplusplus
+
+#include <string>
+
+class UpnpString : public std::string
+{
+};
+
 extern "C" {
-#endif /* __cplusplus */
+
+#else /* __cplusplus */
+
+#include <stdlib.h> /* for size_t */
 
 /*!
  * \brief Type of the string objects inside libupnp.
  */
 typedef struct s_UpnpString UpnpString;
+
+#endif /* __cplusplus */
 
 /*!
  * \brief Constructor.
@@ -72,16 +80,6 @@ EXPORT_SPEC void UpnpString_assign(
 EXPORT_SPEC size_t UpnpString_get_Length(
         /*! [in] The \em \b this pointer. */
         const UpnpString *p);
-
-/*!
- * \brief Truncates the string to the specified lenght, or does nothing
- * if the current lenght is less than or equal to the requested length.
- * */
-EXPORT_SPEC void UpnpString_set_Length(
-        /*! [in] The \em \b this pointer. */
-        UpnpString *p,
-        /*! [in] The requested length. */
-        size_t n);
 
 /*!
  * \brief Returns the pointer to char.
@@ -126,9 +124,9 @@ EXPORT_SPEC void UpnpString_clear(
  */
 EXPORT_SPEC int UpnpString_cmp(
         /*! [in] The \em \b the first string. */
-        UpnpString *p,
+        const UpnpString *p,
         /*! [in] The \em \b the second string. */
-        UpnpString *q);
+        const UpnpString *q);
 
 /*!
  * \brief Compares two strings for equality. Case does not matter.
@@ -137,9 +135,9 @@ EXPORT_SPEC int UpnpString_cmp(
  */
 EXPORT_SPEC int UpnpString_casecmp(
         /*! [in] The \em \b the first string. */
-        UpnpString *p,
+        const UpnpString *p,
         /*! [in] The \em \b the second string. */
-        UpnpString *q);
+        const UpnpString *q);
 
 #ifdef __cplusplus
 }

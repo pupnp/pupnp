@@ -8,6 +8,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/upnp/inc \
 	-I$(top_srcdir)/ixml/inc
 
+AM_LDFLAGS = -lstdc++
+
 LDADD = \
 	$(top_builddir)/upnp/libupnp.la \
 	$(top_builddir)/ixml/libixml.la
