@@ -1,8 +1,6 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.11)
 CMAKE_POLICY (VERSION 3.13)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 include (cmake/CmDaB.cmake)
 include (cmake/test-functions.cmake)
 
