@@ -236,6 +236,7 @@ RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 #
 AC_PROG_CC
 AM_PROG_CC_C_O
+AC_PROG_CXX
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL

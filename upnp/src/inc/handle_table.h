@@ -5,7 +5,7 @@
 
 typedef struct s_handle_table
 {
-        void *handle[HANDLE_TABLE_MAX_NUM_ELEMENTS];
+        struct Handle_Info *handle[HANDLE_TABLE_MAX_NUM_ELEMENTS];
 } handle_table_t;
 
 #endif /* HANDLE_TABLE_H */

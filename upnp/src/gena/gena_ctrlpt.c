@@ -68,7 +68,7 @@ static void GenaAutoRenewSubscription(
 {
         upnp_timeout *event = (upnp_timeout *)input;
         UpnpEventSubscribe *sub_struct = (UpnpEventSubscribe *)event->Event;
-        void *cookie;
+        const void *cookie;
         Upnp_FunPtr callback_fun;
         struct Handle_Info *handle_info;
         int send_callback = 0;
@@ -775,7 +775,7 @@ void gena_process_notification_event(
         token sid;
         GenlibClientSubscription *subscription = NULL;
         struct Handle_Info *handle_info;
-        void *cookie;
+        const void *cookie;
         Upnp_FunPtr callback;
         UpnpClient_Handle client_handle;
         UpnpClient_Handle client_handle_start;

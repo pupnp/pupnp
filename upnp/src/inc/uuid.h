@@ -1,6 +1,10 @@
 #ifndef UUID_H
 #define UUID_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /*
  * Copyright (c) 1990- 1993, 1996 Open Software Foundation, Inc.
  * Copyright (c) 1989 by Hewlett-Packard Company, Palo Alto, Ca. &
@@ -86,4 +90,9 @@ int uuid_compare(
         uuid_upnp *u1,
         /*! . */
         uuid_upnp *u2);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* UUID_H */

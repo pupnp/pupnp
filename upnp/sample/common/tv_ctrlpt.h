@@ -174,7 +174,7 @@ void TvStateUpdate(
 void TvCtrlPointHandleEvent(const char *, int, IXML_Document *);
 void TvCtrlPointHandleSubscribeUpdate(const char *, const Upnp_SID, int);
 int TvCtrlPointCallbackEventHandler(
-        UpnpLib *p, Upnp_EventType, const void *, void *);
+        UpnpLib *p, Upnp_EventType, const void *Event, const void *Cookie);
 
 /*!
  * \brief Checks the advertisement each device in the global device list.

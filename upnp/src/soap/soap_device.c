@@ -91,7 +91,7 @@ typedef struct soap_devserv_t
         char service_id[NAME_SIZE];
         memptr action_name;
         Upnp_FunPtr callback;
-        void *cookie;
+        const void *cookie;
 } soap_devserv_t;
 
 /*!

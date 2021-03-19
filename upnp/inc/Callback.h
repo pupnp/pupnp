@@ -152,6 +152,6 @@ typedef int (*Upnp_FunPtr)(
         /*! [in] .*/
         const void *Event,
         /*! [in] .*/
-        void *Cookie);
+        const void *Cookie);
 
 #endif /* CALLBACK_H */
