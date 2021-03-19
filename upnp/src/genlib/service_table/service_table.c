@@ -277,7 +277,7 @@ service_info *FindServiceId(
  *	Note :
  ************************************************************************/
 service_info *FindServiceEventURLPath(
-        service_table *table, const char *eventURLPath)
+        UpnpLib *p, service_table *table, const char *eventURLPath)
 {
         service_info *finger = NULL;
         uri_type parsed_url;
@@ -286,12 +286,13 @@ service_info *FindServiceEventURLPath(
         if (!table || !eventURLPath) {
                 return NULL;
         }
-        if (parse_uri(eventURLPath, strlen(eventURLPath), &parsed_url_in) ==
+        if (parse_uri(p, eventURLPath, strlen(eventURLPath), &parsed_url_in) ==
                 HTTP_SUCCESS) {
                 finger = table->serviceList;
                 while (finger) {
                         if (finger->eventURL) {
-                                if (parse_uri(finger->eventURL,
+                                if (parse_uri(p,
+                                            finger->eventURL,
                                             strlen(finger->eventURL),
                                             &parsed_url) == HTTP_SUCCESS) {
                                         if (!token_cmp(&parsed_url.pathquery,
@@ -324,7 +325,7 @@ service_info *FindServiceEventURLPath(
  **********************************************************************/
 #if EXCLUDE_SOAP == 0
 service_info *FindServiceControlURLPath(
-        service_table *table, const char *controlURLPath)
+        UpnpLib *p, service_table *table, const char *controlURLPath)
 {
         service_info *finger = NULL;
         uri_type parsed_url;
@@ -333,12 +334,15 @@ service_info *FindServiceControlURLPath(
         if (!table || !controlURLPath) {
                 return NULL;
         }
-        if (parse_uri(controlURLPath, strlen(controlURLPath), &parsed_url_in) ==
-                HTTP_SUCCESS) {
+        if (parse_uri(p,
+                    controlURLPath,
+                    strlen(controlURLPath),
+                    &parsed_url_in) == HTTP_SUCCESS) {
                 finger = table->serviceList;
                 while (finger) {
                         if (finger->controlURL) {
-                                if (parse_uri(finger->controlURL,
+                                if (parse_uri(p,
+                                            finger->controlURL,
                                             strlen(finger->controlURL),
                                             &parsed_url) == HTTP_SUCCESS) {
                                         if (!token_cmp(&parsed_url.pathquery,
@@ -736,7 +740,8 @@ int getSubElement(const char *element_name, IXML_Node *node, IXML_Node **out)
  *
  * Return: service_info *: pointer to the service info node
  ******************************************************************************/
-service_info *getServiceList(IXML_Node *node, service_info **end, char *URLBase)
+service_info *getServiceList(
+        UpnpLib *p, IXML_Node *node, service_info **end, char *URLBase)
 {
         IXML_Node *serviceList = NULL;
         IXML_Node *current_service = NULL;
@@ -810,7 +815,7 @@ service_info *getServiceList(IXML_Node *node, service_info **end, char *URLBase)
                                         !(tempDOMString = getElementValue(
                                                   SCPDURL)) ||
                                         !(current->SCPDURL = resolve_rel_url(
-                                                  URLBase, tempDOMString)))
+                                                  p, URLBase, tempDOMString)))
                                         fail = 1;
                                 ixmlFreeDOMString(tempDOMString);
                                 tempDOMString = NULL;
@@ -820,7 +825,7 @@ service_info *getServiceList(IXML_Node *node, service_info **end, char *URLBase)
                                         !(tempDOMString = getElementValue(
                                                   controlURL)) ||
                                         !(current->controlURL = resolve_rel_url(
-                                                  URLBase, tempDOMString))) {
+                                                  p, URLBase, tempDOMString))) {
                                         UpnpPrintf(UPNP_INFO,
                                                 GENA,
                                                 __FILE__,
@@ -843,7 +848,7 @@ service_info *getServiceList(IXML_Node *node, service_info **end, char *URLBase)
                                         !(tempDOMString = getElementValue(
                                                   eventURL)) ||
                                         !(current->eventURL = resolve_rel_url(
-                                                  URLBase, tempDOMString))) {
+                                                  p, URLBase, tempDOMString))) {
                                         UpnpPrintf(UPNP_INFO,
                                                 GENA,
                                                 __FILE__,
@@ -893,7 +898,7 @@ service_info *getServiceList(IXML_Node *node, service_info **end, char *URLBase)
  * Return: service_info *
  ******************************************************************************/
 service_info *getAllServiceList(
-        IXML_Node *node, char *URLBase, service_info **out_end)
+        UpnpLib *p, IXML_Node *node, char *URLBase, service_info **out_end)
 {
         service_info *head = NULL;
         service_info *end = NULL;
@@ -913,12 +918,12 @@ service_info *getAllServiceList(
                         currentDevice = ixmlNodeList_item(deviceList, i);
                         if (head) {
                                 end->next = getServiceList(
-                                        currentDevice, &next_end, URLBase);
+                                        p, currentDevice, &next_end, URLBase);
                                 if (next_end)
                                         end = next_end;
                         } else {
                                 head = getServiceList(
-                                        currentDevice, &end, URLBase);
+                                        p, currentDevice, &end, URLBase);
                         }
                 }
                 ixmlNodeList_free(deviceList);
@@ -1028,8 +1033,10 @@ int removeServiceTable(IXML_Node *node, service_table *in)
  *
  * Return: int
  ******************************************************************************/
-int addServiceTable(
-        IXML_Node *node, service_table *in, const char *DefaultURLBase)
+int addServiceTable(UpnpLib *p,
+        IXML_Node *node,
+        service_table *in,
+        const char *DefaultURLBase)
 {
         IXML_Node *root = NULL;
         IXML_Node *URLBase = NULL;
@@ -1051,7 +1058,7 @@ int addServiceTable(
                         }
                 }
                 if ((in->endServiceList->next = getAllServiceList(
-                             root, in->URLBase, &tempEnd))) {
+                             p, root, in->URLBase, &tempEnd))) {
                         in->endServiceList = tempEnd;
                         return 1;
                 }
@@ -1076,8 +1083,10 @@ int addServiceTable(
  *
  * Note :
  ************************************************************************/
-int getServiceTable(
-        IXML_Node *node, service_table *out, const char *DefaultURLBase)
+int getServiceTable(UpnpLib *p,
+        IXML_Node *node,
+        service_table *out,
+        const char *DefaultURLBase)
 {
         IXML_Node *root = NULL;
         IXML_Node *URLBase = NULL;
@@ -1094,7 +1103,7 @@ int getServiceTable(
                         }
                 }
                 out->serviceList = getAllServiceList(
-                        root, out->URLBase, &out->endServiceList);
+                        p, root, out->URLBase, &out->endServiceList);
                 if (out->serviceList) {
                         return 1;
                 }

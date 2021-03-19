@@ -23,7 +23,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake -G Ninja -DDOWNLOAD_AND_BUILD_DEPS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
+          cmake -G Ninja -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
           cmake --build build
 
       - name: Test
@@ -60,7 +60,15 @@ jobs:
           cmake -G Ninja -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
           cmake --build build
 
-      - name: Test
+      - name: Test Debug
+        if: ${{ matrix.conf == 'Debug' }}
+        run: |
+          cd build
+          ctest --output-on-failure
+          type upnp/test/test_init.log
+
+      - name: Test Release
+        if: ${{ matrix.conf == 'Release' }}
         run: |
           cd build
           ctest --output-on-failure
@@ -105,6 +113,12 @@ jobs:
     - name: make
       run: make
     - name: make check (upnp)
-      run: cd upnp && make check || (cat test-suite.log && exit 1)
+      run: |
+        cd upnp
+        make check
+        ret=$?
+        cat test_init.log
+        exit $ret
     - name: make check (ixml)
-      run: cd ixml && make check || (cat test-suite.log && exit 1)
+      run: |
+        cd ixml && make check || (cat test-suite.log && exit 1)

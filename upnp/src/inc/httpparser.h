@@ -339,7 +339,7 @@ void parser_response_init(http_parser_t *parser, http_method_t request_method);
  * Returns:
  *	 void
  ************************************************************************/
-parse_status_t parser_parse(http_parser_t *parser);
+parse_status_t parser_parse(UpnpLib *p, http_parser_t *parser);
 
 /************************************************************************
  * Function: parser_parse_responseline
@@ -354,7 +354,7 @@ parse_status_t parser_parse(http_parser_t *parser);
  *	PARSE_SUCCESS
  *	PARSE_FAILURE
  ************************************************************************/
-parse_status_t parser_parse_responseline(http_parser_t *parser);
+parse_status_t parser_parse_responseline(UpnpLib *p, http_parser_t *parser);
 
 /************************************************************************
  * Function: parser_parse_headers
@@ -369,7 +369,7 @@ parse_status_t parser_parse_responseline(http_parser_t *parser);
  *	PARSE_SUCCESS
  *	PARSE_FAILURE
  ************************************************************************/
-parse_status_t parser_parse_headers(http_parser_t *parser);
+parse_status_t parser_parse_headers(UpnpLib *p, http_parser_t *parser);
 
 /************************************************************************
  * Function: parser_parse_entity
@@ -384,7 +384,7 @@ parse_status_t parser_parse_headers(http_parser_t *parser);
  * 	 PARSE_FAILURE
  *	 PARSE_COMPLETE	-- no more reading to do
  ************************************************************************/
-parse_status_t parser_parse_entity(http_parser_t *parser);
+parse_status_t parser_parse_entity(UpnpLib *p, http_parser_t *parser);
 
 /************************************************************************
  * Function: parser_get_entity_read_method
@@ -417,7 +417,7 @@ parse_status_t parser_get_entity_read_method(http_parser_t *parser);
  *	 void
  ************************************************************************/
 parse_status_t parser_append(
-        http_parser_t *parser, const char *buf, size_t buf_length);
+        UpnpLib *p, http_parser_t *parser, const char *buf, size_t buf_length);
 
 /************************************************************************
  * Function: parser_get_unknown_headers
@@ -466,7 +466,8 @@ void free_http_headers_list(UpnpListHead *list);
  *   PARSE_NO_MATCH -- failure to match pattern 'fmt'
  *   PARSE_FAILURE	-- 'str' is bad input
  ************************************************************************/
-parse_status_t matchstr(char *str, size_t slen, const char *fmt, ...);
+parse_status_t matchstr(
+        UpnpLib *p, char *str, size_t slen, const char *fmt, ...);
 
 /************************************************************************
  * Function: raw_to_int

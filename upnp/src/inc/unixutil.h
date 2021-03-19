@@ -43,9 +43,9 @@ typedef int socklen_t;
 #ifndef EAFNOSUPPORT /* VS2010 has this defined */
 #define EAFNOSUPPORT 97
 #endif
-#else
+#else /* _WIN32 */
 #include <sys/time.h>
 #include <sys/wait.h>
-#endif
+#endif /* _WIN32 */
 
 #endif /* GENLIB_NET_UNIXUTIL_H */

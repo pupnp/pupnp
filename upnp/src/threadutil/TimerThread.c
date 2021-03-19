@@ -58,6 +58,8 @@ static void FreeTimerEvent(
  * Waits for next event to occur and schedules associated job into threadpool.
  */
 static void TimerThreadWorker(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] arg is cast to (TimerThread *). */
         void *arg)
 {
@@ -68,6 +70,7 @@ static void TimerThreadWorker(
         time_t nextEventTime = 0;
         struct timespec timeToWait;
         int tempId;
+        (void)p;
 
         assert(timer != NULL);
 

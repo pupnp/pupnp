@@ -117,6 +117,8 @@ enum Upnp_EventType_e
 
 typedef enum Upnp_EventType_e Upnp_EventType;
 
+typedef struct s_UpnpLib UpnpLib;
+
 /*!
  *  All callback functions share the same prototype, documented below.
  *  Note that any memory passed to the callback function
@@ -143,6 +145,8 @@ typedef enum Upnp_EventType_e Upnp_EventType;
  *  in the future to communicate results back to the SDK.
  */
 typedef int (*Upnp_FunPtr)(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] .*/
         Upnp_EventType EventType,
         /*! [in] .*/

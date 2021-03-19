@@ -24,16 +24,29 @@ struct s_Member
         enum e_Type type;
         const char *type_name;
         const char *header;
+        const char *initial_value;
+        const char *conditional;
 };
 
 /* clang-format off */
-#define INIT_MEMBER(NAME, TYPE, TYPE_NAME, HEADER) \
+#define INIT_MEMBER(NAME, TYPE, TYPE_NAME, HEADER, INIT_VAL) \
 	{ \
 		.name = #NAME, \
 		.type = TYPE, \
 		.type_name = #TYPE_NAME, \
-		.header = HEADER \
+                .header = HEADER, \
+                .initial_value = INIT_VAL \
 	}
+
+#define INIT_MEMBER_CONDITIONAL(NAME, TYPE, TYPE_NAME, HEADER, INIT_VAL, CONDITIONAL) \
+        { \
+                .name = #NAME, \
+                .type = TYPE, \
+                .type_name = #TYPE_NAME, \
+                .header = HEADER, \
+                .initial_value = INIT_VAL, \
+                .conditional = CONDITIONAL \
+        }
 /* clang-format on */
 
 struct s_Class

@@ -26,8 +26,9 @@ UpnpEvent *UpnpEvent_new()
 {
         struct s_UpnpEvent *p = calloc(1, sizeof(struct s_UpnpEvent));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         /*p->m_EventKey = 0;*/
         /*p->m_ChangedVariables = 0;*/
@@ -40,8 +41,9 @@ void UpnpEvent_delete(UpnpEvent *q)
 {
         struct s_UpnpEvent *p = (struct s_UpnpEvent *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         UpnpString_delete(p->m_SID);
         p->m_SID = 0;
@@ -70,8 +72,9 @@ UpnpEvent *UpnpEvent_dup(const UpnpEvent *q)
 {
         UpnpEvent *p = UpnpEvent_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpEvent_assign(p, q);
 

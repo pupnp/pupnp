@@ -291,14 +291,14 @@ int sock_make_blocking(SOCKET sock)
 #ifdef _WIN32
         u_long val = 0;
         return ioctlsocket(sock, FIONBIO, &val);
-#else
+#else /* _WIN32 */
         int val;
 
         val = fcntl(sock, F_GETFL, 0);
         if (fcntl(sock, F_SETFL, val & ~O_NONBLOCK) == -1) {
                 return -1;
         }
-#endif
+#endif /* _WIN32 */
         return 0;
 }
 

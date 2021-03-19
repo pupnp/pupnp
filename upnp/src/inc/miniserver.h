@@ -80,6 +80,8 @@ typedef struct MServerSockArray
 
 /*! . */
 typedef void (*MiniServerCallback)(
+        /*! Library handle. */
+        UpnpLib *p,
         /* ! [in] . */
         http_parser_t *parser,
         /* ! [in] . */
@@ -131,15 +133,8 @@ void SetGenaCallback(
  *	\li On error: UPNP_E_XXX.
  */
 int StartMiniServer(
-        /*! [in,out] Port on which the server listens for incoming IPv4
-         * connections. */
-        uint16_t *listen_port4,
-        /*! [in,out] Port on which the server listens for incoming IPv6
-         * LLA connections. */
-        uint16_t *listen_port6,
-        /*! [in,out] Port on which the server listens for incoming
-         * IPv6 ULA or GUA connections. */
-        uint16_t *listen_port6UlaGua);
+        /*! Library handle. */
+        UpnpLib *p);
 
 /*!
  * \brief Stop and Shutdown the MiniServer and free socket resources.

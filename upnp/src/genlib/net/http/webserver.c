@@ -44,8 +44,10 @@
 #include "UpnpExtraHeaders.h"
 #include "UpnpFileInfo.h"
 #include "UpnpIntTypes.h"
+#include "UpnpLib.h"
 #include "UpnpStdInt.h"
 #include "VirtualDir.h"
+#include "document_type.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
 #include "ithread.h"
@@ -58,6 +60,7 @@
 #include "upnpapi.h"
 #include "webserver.h"
 #include "winutil.h"
+#include "xml_alias.h"
 
 #include <assert.h>
 #include <fcntl.h>
@@ -67,7 +70,7 @@
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
 #endif
-#endif
+#endif /* _WIN32 */
 
 /*!
  * Response Types.
@@ -79,29 +82,6 @@ enum resp_type
         RESP_HEADERS,
         RESP_WEBDOC,
         RESP_POST
-};
-
-/* mapping of file extension to content-type of document */
-struct document_type_t
-{
-        /*! . */
-        const char *file_ext;
-        /*! . */
-        const char *content_type;
-        /*! . */
-        const char *content_subtype;
-};
-
-struct xml_alias_t
-{
-        /*! name of DOC from root; e.g.: /foo/bar/mydesc.xml */
-        membuffer name;
-        /*! the XML document contents */
-        membuffer doc;
-        /*! . */
-        time_t last_modified;
-        /*! . */
-        int *ct;
 };
 
 static const char *gMediaTypes[] = {
@@ -134,7 +114,6 @@ static const char *gMediaTypes[] = {
 #define TEXT_INDEX 5
 
 /* general */
-#define NUM_MEDIA_TYPES 70
 #define NUM_HTTP_HEADER_NAMES 33
 
 #define ASCTIME_R_BUFFER_SIZE 26
@@ -147,9 +126,9 @@ static char *web_server_asctime_r(const struct tm *tm, char *buf)
         asctime_s(buf, ASCTIME_R_BUFFER_SIZE, tm);
         return buf;
 }
-#else
+#else /* _WIN32 */
 #define web_server_asctime_r asctime_r
-#endif
+#endif /* _WIN32 */
 
 /* sorted by file extension; must have 'NUM_MEDIA_TYPES' extensions */
 static const char *gEncodedMediaTypes =
@@ -230,27 +209,22 @@ static const char *gEncodedMediaTypes =
  * module variables - Globals, static and externs.
  */
 
-static struct document_type_t gMediaTypeList[NUM_MEDIA_TYPES];
-
-/*! Global variable. A local dir which serves as webserver root. */
-membuffer gDocumentRootDir;
-
 /*! XML document. */
-static struct xml_alias_t gAliasDoc;
-static ithread_mutex_t gWebMutex;
-extern str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES];
+extern const str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES];
 
 /*!
  * \brief Decodes list and stores it in gMediaTypeList.
  */
-static UPNP_INLINE void media_list_init(void)
+static UPNP_INLINE void media_list_init(UpnpLib *p)
 {
         int i;
         const char *s = gEncodedMediaTypes;
-        struct document_type_t *doc_type;
+        document_type_t *gMediaTypeArray =
+                UpnpLib_getnc_gMediaTypeArray(p)->doc;
+        document_type_t *doc_type;
 
         for (i = 0; *s != '\0'; i++) {
-                doc_type = &gMediaTypeList[i];
+                doc_type = gMediaTypeArray + i;
                 doc_type->file_ext = s;
                 /* point to type. */
                 s += strlen(s) + 1;
@@ -273,6 +247,8 @@ static UPNP_INLINE void media_list_init(void)
  * \li \c -1 on error
  */
 static UPNP_INLINE int search_extension(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] . */
         const char *extension,
         /*! [out] . */
@@ -282,13 +258,15 @@ static UPNP_INLINE int search_extension(
 {
         int top, mid, bot;
         int cmp;
+        document_type_t *gMediaTypeArray =
+                UpnpLib_getnc_gMediaTypeArray(p)->doc;
 
         top = 0;
         bot = NUM_MEDIA_TYPES - 1;
 
         while (top <= bot) {
                 mid = (top + bot) / 2;
-                cmp = strcasecmp(extension, gMediaTypeList[mid].file_ext);
+                cmp = strcasecmp(extension, gMediaTypeArray[mid].file_ext);
                 if (cmp > 0) {
                         /* look below mid. */
                         top = mid + 1;
@@ -297,8 +275,8 @@ static UPNP_INLINE int search_extension(
                         bot = mid - 1;
                 } else {
                         /* cmp == 0 */
-                        *con_type = gMediaTypeList[mid].content_type;
-                        *con_subtype = gMediaTypeList[mid].content_subtype;
+                        *con_type = gMediaTypeArray[mid].content_type;
+                        *con_subtype = gMediaTypeArray[mid].content_subtype;
                         return 0;
                 }
         }
@@ -316,6 +294,8 @@ static UPNP_INLINE int search_extension(
  * \li \c UPNP_E_OUTOF_MEMORY - on memory allocation failures.
  */
 static UPNP_INLINE int get_content_type(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] . */
         const char *filename,
         /*! [out] . */
@@ -333,7 +313,7 @@ static UPNP_INLINE int get_content_type(
         /* get ext */
         extension = strrchr(filename, '.');
         if (extension != NULL)
-                if (search_extension(extension + 1, &type, &subtype) == 0)
+                if (search_extension(p, extension + 1, &type, &subtype) == 0)
                         ctype_found = 1;
         if (!ctype_found) {
                 /* unknown content type */
@@ -361,9 +341,9 @@ static UPNP_INLINE int get_content_type(
  * \brief Initialize the global XML document. Allocate buffers for the XML
  * document.
  */
-static UPNP_INLINE void glob_alias_init(void)
+static UPNP_INLINE void glob_alias_init(UpnpLib *p)
 {
-        struct xml_alias_t *alias = &gAliasDoc;
+        xml_alias_t *alias = UpnpLib_getnc_gAliasDoc(p);
 
         membuffer_init(&alias->doc);
         membuffer_init(&alias->name);
@@ -378,7 +358,7 @@ static UPNP_INLINE void glob_alias_init(void)
  */
 static UPNP_INLINE int is_valid_alias(
         /*! [in] XML alias object. */
-        const struct xml_alias_t *alias)
+        const xml_alias_t *alias)
 {
         return alias->doc.buf != NULL;
 }
@@ -388,14 +368,18 @@ static UPNP_INLINE int is_valid_alias(
  * parameter.
  */
 static void alias_grab(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [out] XML alias object. */
-        struct xml_alias_t *alias)
+        xml_alias_t *alias)
 {
-        ithread_mutex_lock(&gWebMutex);
-        assert(is_valid_alias(&gAliasDoc));
-        memcpy(alias, &gAliasDoc, sizeof(struct xml_alias_t));
+        xml_alias_t *gAliasDoc = UpnpLib_getnc_gAliasDoc(p);
+
+        ithread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
+        assert(is_valid_alias(gAliasDoc));
+        memcpy(alias, gAliasDoc, sizeof(xml_alias_t));
         *alias->ct = *alias->ct + 1;
-        ithread_mutex_unlock(&gWebMutex);
+        ithread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
 }
 
 /*!
@@ -403,13 +387,15 @@ static void alias_grab(
  * the allocated buffers associated with this object.
  */
 static void alias_release(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] XML alias object. */
-        struct xml_alias_t *alias)
+        xml_alias_t *alias)
 {
-        ithread_mutex_lock(&gWebMutex);
+        ithread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
         /* ignore invalid alias */
         if (!is_valid_alias(alias)) {
-                ithread_mutex_unlock(&gWebMutex);
+                ithread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
                 return;
         }
         assert(*alias->ct > 0);
@@ -419,19 +405,21 @@ static void alias_release(
                 membuffer_destroy(&alias->name);
                 free(alias->ct);
         }
-        ithread_mutex_unlock(&gWebMutex);
+        ithread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
 }
 
-int web_server_set_alias(const char *alias_name,
+int web_server_set_alias(UpnpLib *p,
+        const char *alias_name,
         const char *alias_content,
         size_t alias_content_length,
         time_t last_modified)
 {
         int ret_code;
-        struct xml_alias_t alias;
+        xml_alias_t alias;
+        xml_alias_t *gAliasDoc = UpnpLib_getnc_gAliasDoc(p);
 
-        alias_release(&gAliasDoc);
-        if (alias_name == NULL) {
+        alias_release(p, gAliasDoc);
+        if (!alias_name) {
                 /* don't serve aliased doc anymore */
                 return 0;
         }
@@ -455,9 +443,9 @@ int web_server_set_alias(const char *alias_name,
                         alias_content_length);
                 alias.last_modified = last_modified;
                 /* save in module var */
-                ithread_mutex_lock(&gWebMutex);
-                gAliasDoc = alias;
-                ithread_mutex_unlock(&gWebMutex);
+                ithread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
+                *gAliasDoc = alias;
+                ithread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
 
                 return 0;
         } while (0);
@@ -470,46 +458,52 @@ int web_server_set_alias(const char *alias_name,
         return UPNP_E_OUTOF_MEMORY;
 }
 
-int web_server_init()
+int web_server_init(UpnpLib *p)
 {
         int ret = UPNP_E_SUCCESS;
+        struct VirtualDirCallbacks *vdcb = UpnpLib_getnc_virtualDirCallback(p);
 
-        if (bWebServerState == WEB_SERVER_DISABLED) {
+        if (UpnpLib_get_bWebServerState(p) == WEB_SERVER_DISABLED) {
                 /* decode media list */
-                media_list_init();
-                membuffer_init(&gDocumentRootDir);
-                glob_alias_init();
-                pVirtualDirList = NULL;
+                media_list_init(p);
+                membuffer_init(UpnpLib_getnc_gDocumentRootDir(p));
+                glob_alias_init(p);
+                UpnpLib_set_pVirtualDirList(p, NULL);
 
                 /* Initialize callbacks */
-                virtualDirCallback.get_info = NULL;
-                virtualDirCallback.open = NULL;
-                virtualDirCallback.read = NULL;
-                virtualDirCallback.write = NULL;
-                virtualDirCallback.seek = NULL;
-                virtualDirCallback.close = NULL;
+                vdcb->get_info = NULL;
+                vdcb->open = NULL;
+                vdcb->read = NULL;
+                vdcb->write = NULL;
+                vdcb->seek = NULL;
+                vdcb->close = NULL;
 
-                if (ithread_mutex_init(&gWebMutex, NULL) == -1)
+                if (ithread_mutex_init(UpnpLib_getnc_gWebMutex(p), NULL) ==
+                        -1) {
                         ret = UPNP_E_OUTOF_MEMORY;
-                else
-                        bWebServerState = WEB_SERVER_ENABLED;
+                } else {
+                        UpnpLib_set_bWebServerState(p, WEB_SERVER_ENABLED);
+                }
         }
 
         return ret;
 }
 
-void web_server_destroy(void)
+void web_server_destroy(UpnpLib *p)
 {
-        if (bWebServerState == WEB_SERVER_ENABLED) {
-                membuffer_destroy(&gDocumentRootDir);
-                alias_release(&gAliasDoc);
+        if (UpnpLib_get_bWebServerState(p) == WEB_SERVER_ENABLED) {
+                membuffer *gDocumentRootDir = UpnpLib_getnc_gDocumentRootDir(p);
+                xml_alias_t *gAliasDoc = UpnpLib_getnc_gAliasDoc(p);
 
-                ithread_mutex_lock(&gWebMutex);
-                memset(&gAliasDoc, 0, sizeof(struct xml_alias_t));
-                ithread_mutex_unlock(&gWebMutex);
+                membuffer_destroy(gDocumentRootDir);
+                alias_release(p, gAliasDoc);
 
-                ithread_mutex_destroy(&gWebMutex);
-                bWebServerState = WEB_SERVER_DISABLED;
+                ithread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
+                memset(gAliasDoc, 0, sizeof(xml_alias_t));
+                ithread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
+
+                ithread_mutex_destroy(UpnpLib_getnc_gWebMutex(p));
+                UpnpLib_set_bWebServerState(p, WEB_SERVER_DISABLED);
         }
 }
 
@@ -521,6 +515,8 @@ void web_server_destroy(void)
  * \return Integer.
  */
 static int get_file_info(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Filename having the description document. */
         const char *filename,
         /*! [out] File information object having file attributes such as
@@ -538,14 +534,16 @@ static int get_file_info(
 
         UpnpFileInfo_set_ContentType(info, NULL);
         code = stat(filename, &s);
-        if (code == -1)
+        if (code == -1) {
                 return -1;
-        if (S_ISDIR(s.st_mode))
+        }
+        if (S_ISDIR(s.st_mode)) {
                 UpnpFileInfo_set_IsDirectory(info, 1);
-        else if (S_ISREG(s.st_mode))
+        } else if (S_ISREG(s.st_mode)) {
                 UpnpFileInfo_set_IsDirectory(info, 0);
-        else
+        } else {
                 return -1;
+        }
         /* check readable */
         fp = fopen(filename, "r");
         UpnpFileInfo_set_IsReadable(info, fp != NULL);
@@ -553,7 +551,7 @@ static int get_file_info(
                 fclose(fp);
         UpnpFileInfo_set_FileLength(info, s.st_size);
         UpnpFileInfo_set_LastModified(info, s.st_mtime);
-        rc = get_content_type(filename, info);
+        rc = get_content_type(p, filename, info);
         aux_LastModified = UpnpFileInfo_get_LastModified(info);
         UpnpPrintf(UPNP_INFO,
                 HTTP,
@@ -569,19 +567,20 @@ static int get_file_info(
         return rc;
 }
 
-int web_server_set_root_dir(const char *root_dir)
+int web_server_set_root_dir(UpnpLib *p, const char *root_dir)
 {
         size_t index;
         int ret;
+        membuffer *gDocumentRootDir = UpnpLib_getnc_gDocumentRootDir(p);
 
-        ret = membuffer_assign_str(&gDocumentRootDir, root_dir);
+        ret = membuffer_assign_str(gDocumentRootDir, root_dir);
         if (ret != 0)
                 return ret;
         /* remove trailing '/', if any */
-        if (gDocumentRootDir.length > 0) {
-                index = gDocumentRootDir.length - 1; /* last char */
-                if (gDocumentRootDir.buf[index] == '/')
-                        membuffer_delete(&gDocumentRootDir, index, 1);
+        if (gDocumentRootDir->length > 0) {
+                index = gDocumentRootDir->length - 1; /* last char */
+                if (gDocumentRootDir->buf[index] == '/')
+                        membuffer_delete(gDocumentRootDir, index, 1);
         }
 
         return 0;
@@ -599,7 +598,7 @@ static UPNP_INLINE int get_alias(
         /*! [in] request file passed in to be compared with. */
         const char *request_file,
         /*! [out] xml alias object which has a file name stored. */
-        struct xml_alias_t *alias,
+        xml_alias_t *alias,
         /*! [out] File information object which will be filled up if the file
          * comparison succeeds. */
         UpnpFileInfo *info)
@@ -622,6 +621,8 @@ static UPNP_INLINE int get_alias(
  * \return int.
  */
 static int isFileInVirtualDir(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Directory path to be tested for virtual directory. */
         char *filePath,
         /*! [out] The cookie registered with this virtual directory, if matched.
@@ -629,10 +630,11 @@ static int isFileInVirtualDir(
         const void **cookie)
 {
         virtualDirList *pCurVirtualDir;
+        virtualDirList *pVirtualDirList = UpnpLib_get_pVirtualDirList(p);
         size_t webDirLen;
 
         pCurVirtualDir = pVirtualDirList;
-        while (pCurVirtualDir != NULL) {
+        while (pCurVirtualDir) {
                 webDirLen = strlen(pCurVirtualDir->dirName);
                 if (webDirLen) {
                         if (pCurVirtualDir->dirName[webDirLen - 1] == '/') {
@@ -1071,6 +1073,8 @@ static int CheckOtherHTTPHeaders(
  * \li \c HTTP_OK
  */
 static int process_request(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Socket info. */
         SOCKINFO *info,
         /*! [in] HTTP Request message. */
@@ -1082,7 +1086,7 @@ static int process_request(
         /*! [out] Get filename from request document. */
         membuffer *filename,
         /*! [out] Xml alias document from the request document. */
-        struct xml_alias_t *alias,
+        xml_alias_t *alias,
         /*! [out] Send Instruction object where the response is set up. */
         struct SendInstruction *RespInstr)
 {
@@ -1101,6 +1105,10 @@ static int process_request(
         int alias_grabbed;
         size_t dummy;
         memptr hdr_value;
+        xml_alias_t *gAliasDoc = UpnpLib_getnc_gAliasDoc(p);
+        struct VirtualDirCallbacks *virtualDirCallback =
+                UpnpLib_getnc_virtualDirCallback(p);
+        membuffer *gDocumentRootDir = UpnpLib_getnc_gDocumentRootDir(p);
 
         print_http_headers(req);
         url = &req->uri;
@@ -1142,7 +1150,7 @@ static int process_request(
                 err_code = HTTP_BAD_REQUEST;
                 goto error_handler;
         }
-        if (isFileInVirtualDir(request_doc, &RespInstr->Cookie)) {
+        if (isFileInVirtualDir(p, request_doc, &RespInstr->Cookie)) {
                 using_virtual_dir = 1;
                 RespInstr->IsVirtualFile = 1;
                 if (membuffer_assign_str(filename, request_doc) != 0) {
@@ -1150,8 +1158,8 @@ static int process_request(
                 }
         } else {
                 /* try using alias */
-                if (is_valid_alias(&gAliasDoc)) {
-                        alias_grab(alias);
+                if (is_valid_alias(gAliasDoc)) {
+                        alias_grab(p, alias);
                         alias_grabbed = 1;
                         using_alias = get_alias(request_doc, alias, finfo);
                         if (using_alias == 1) {
@@ -1184,7 +1192,7 @@ static int process_request(
                         }
 
                         /* get file info */
-                        if (virtualDirCallback.get_info(filename->buf,
+                        if (virtualDirCallback->get_info(filename->buf,
                                     finfo,
                                     RespInstr->Cookie,
                                     &RespInstr->RequestCookie) != 0) {
@@ -1204,7 +1212,7 @@ static int process_request(
                                         goto error_handler;
                                 }
                                 /* get info */
-                                if (virtualDirCallback.get_info(filename->buf,
+                                if (virtualDirCallback->get_info(filename->buf,
                                             finfo,
                                             RespInstr->Cookie,
                                             &RespInstr->RequestCookie) !=
@@ -1227,7 +1235,7 @@ static int process_request(
                         /* } */
                 }
         } else if (!using_alias) {
-                if (gDocumentRootDir.length == 0) {
+                if (gDocumentRootDir->length == 0) {
                         goto error_handler;
                 }
                 /* */
@@ -1235,7 +1243,8 @@ static int process_request(
                 /* */
 
                 /* filename str */
-                if (membuffer_assign_str(filename, gDocumentRootDir.buf) != 0 ||
+                if (membuffer_assign_str(filename, gDocumentRootDir->buf) !=
+                                0 ||
                         membuffer_append_str(filename, request_doc) != 0) {
                         goto error_handler; /* out of mem */
                 }
@@ -1246,7 +1255,7 @@ static int process_request(
                 }
                 if (req->method != HTTPMETHOD_POST) {
                         /* get info on file */
-                        if (get_file_info(filename->buf, finfo) != 0) {
+                        if (get_file_info(p, filename->buf, finfo) != 0) {
                                 err_code = HTTP_NOT_FOUND;
                                 goto error_handler;
                         }
@@ -1263,7 +1272,8 @@ static int process_request(
                                         goto error_handler;
                                 }
                                 /* get info */
-                                if (get_file_info(filename->buf, finfo) != 0 ||
+                                if (get_file_info(p, filename->buf, finfo) !=
+                                                0 ||
                                         UpnpFileInfo_get_IsDirectory(finfo)) {
                                         err_code = HTTP_NOT_FOUND;
                                         goto error_handler;
@@ -1455,7 +1465,7 @@ error_handler:
                 (UpnpListHead *)UpnpFileInfo_get_ExtraHeadersList(finfo));
         UpnpFileInfo_delete(finfo);
         if (err_code != HTTP_OK && alias_grabbed) {
-                alias_release(alias);
+                alias_release(p, alias);
         }
 
         return err_code;
@@ -1472,6 +1482,8 @@ error_handler:
  * \li \c HTTP_OK
  */
 static int http_RecvPostMessage(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! HTTP Parser object. */
         http_parser_t *parser,
         /*! [in] Socket Information object. */
@@ -1491,9 +1503,11 @@ static int http_RecvPostMessage(
         size_t entity_offset = 0;
         int num_read = 0;
         int ret_code = HTTP_OK;
+        const struct VirtualDirCallbacks *virtualDirCallback =
+                UpnpLib_get_virtualDirCallback(p);
 
         if (Instr && Instr->IsVirtualFile) {
-                Fp = (virtualDirCallback.open)(filename,
+                Fp = (virtualDirCallback->open)(filename,
                         UPNP_WRITE,
                         Instr->Cookie,
                         Instr->RequestCookie);
@@ -1506,7 +1520,7 @@ static int http_RecvPostMessage(
         do {
                 /* first parse what has already been gotten */
                 if (parser->position != POS_COMPLETE)
-                        status = parser_parse_entity(parser);
+                        status = parser_parse_entity(p, parser);
                 if (status == PARSE_INCOMPLETE_ENTITY) {
                         /* read until close */
                         ok_on_close = 1;
@@ -1533,7 +1547,7 @@ static int http_RecvPostMessage(
                                         ret_code = HTTP_INTERNAL_SERVER_ERROR;
                                         goto ExitFunction;
                                 }
-                                status = parser_parse_entity(parser);
+                                status = parser_parse_entity(p, parser);
                                 if (status == PARSE_INCOMPLETE_ENTITY) {
                                         /* read until close */
                                         ok_on_close = 1;
@@ -1577,7 +1591,7 @@ static int http_RecvPostMessage(
                         Data_Buf_Size);
                 entity_offset += Data_Buf_Size;
                 if (Instr && Instr->IsVirtualFile) {
-                        int n = virtualDirCallback.write(Fp,
+                        int n = virtualDirCallback->write(Fp,
                                 Buf,
                                 Data_Buf_Size,
                                 Instr->Cookie,
@@ -1597,7 +1611,7 @@ static int http_RecvPostMessage(
                 entity_offset != parser->msg.entity.length);
 ExitFunction:
         if (Instr && Instr->IsVirtualFile) {
-                virtualDirCallback.close(
+                virtualDirCallback->close(
                         Fp, Instr->Cookie, Instr->RequestCookie);
         } else {
                 fclose(Fp);
@@ -1606,15 +1620,17 @@ ExitFunction:
         return ret_code;
 }
 
-void web_server_callback(
-        http_parser_t *parser, /* INOUT */ http_message_t *req, SOCKINFO *info)
+void web_server_callback(UpnpLib *p,
+        http_parser_t *parser,
+        /* INOUT */ http_message_t *req,
+        SOCKINFO *info)
 {
         int ret;
         int timeout = -1;
         enum resp_type rtype = 0;
         membuffer headers;
         membuffer filename;
-        struct xml_alias_t xmldoc;
+        xml_alias_t xmldoc;
         struct SendInstruction RespInstr;
 
         /* init */
@@ -1626,16 +1642,17 @@ void web_server_callback(
          * on the */
         /*the type of request. */
         ret = process_request(
-                info, req, &rtype, &headers, &filename, &xmldoc, &RespInstr);
+                p, info, req, &rtype, &headers, &filename, &xmldoc, &RespInstr);
         if (ret != HTTP_OK) {
                 /* send error code */
                 http_SendStatusResponse(
-                        info, ret, req->major_version, req->minor_version);
+                        p, info, ret, req->major_version, req->minor_version);
         } else {
                 /* send response */
                 switch (rtype) {
                 case RESP_FILEDOC:
-                        http_SendMessage(info,
+                        http_SendMessage(p,
+                                info,
                                 &timeout,
                                 "Ibf",
                                 &RespInstr,
@@ -1644,7 +1661,8 @@ void web_server_callback(
                                 filename.buf);
                         break;
                 case RESP_XMLDOC:
-                        http_SendMessage(info,
+                        http_SendMessage(p,
+                                info,
                                 &timeout,
                                 "Ibb",
                                 &RespInstr,
@@ -1652,14 +1670,15 @@ void web_server_callback(
                                 headers.length,
                                 xmldoc.doc.buf,
                                 xmldoc.doc.length);
-                        alias_release(&xmldoc);
+                        alias_release(p, &xmldoc);
                         break;
                 case RESP_WEBDOC:
                         /*http_SendVirtualDirDoc(info, &timeout, "Ibf",
                                 &RespInstr,
                                 headers.buf, headers.length,
                                 filename.buf);*/
-                        http_SendMessage(info,
+                        http_SendMessage(p,
+                                info,
                                 &timeout,
                                 "Ibf",
                                 &RespInstr,
@@ -1669,7 +1688,8 @@ void web_server_callback(
                         break;
                 case RESP_HEADERS:
                         /* headers only */
-                        http_SendMessage(info,
+                        http_SendMessage(p,
+                                info,
                                 &timeout,
                                 "b",
                                 headers.buf,
@@ -1678,7 +1698,7 @@ void web_server_callback(
                 case RESP_POST:
                         /* headers only */
                         ret = http_RecvPostMessage(
-                                parser, info, filename.buf, &RespInstr);
+                                p, parser, info, filename.buf, &RespInstr);
                         /* Send response. */
                         http_MakeMessage(&headers,
                                 1,
@@ -1688,7 +1708,8 @@ void web_server_callback(
                                 "text/html",
                                 &RespInstr,
                                 X_USER_AGENT);
-                        http_SendMessage(info,
+                        http_SendMessage(p,
+                                info,
                                 &timeout,
                                 "b",
                                 headers.buf,

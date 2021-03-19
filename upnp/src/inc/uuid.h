@@ -43,6 +43,8 @@ typedef struct _uuid_upnp
  * \brief Generate a UUID.
  */
 int uuid_create(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! . */
         uuid_upnp *id);
 

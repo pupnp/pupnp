@@ -598,7 +598,8 @@ int SampleUtil_PrintEvent(Upnp_EventType EventType, const void *Event)
         return 0;
 }
 
-int SampleUtil_FindAndParseService(IXML_Document *DescDoc,
+int SampleUtil_FindAndParseService(UpnpLib *p,
+        IXML_Document *DescDoc,
         const char *location,
         const char *serviceType,
         char **serviceId,
@@ -652,13 +653,14 @@ int SampleUtil_FindAndParseService(IXML_Document *DescDoc,
                                 service, "controlURL");
                         releventURL = SampleUtil_GetFirstElementItem(
                                 service, "eventSubURL");
-                        ret = UpnpResolveURL2(base, relcontrolURL, controlURL);
+                        ret = UpnpResolveURL2(
+                                p, base, relcontrolURL, controlURL);
                         if (ret != UPNP_E_SUCCESS)
                                 SampleUtil_Print("Error generating controlURL "
                                                  "from %s + %s\n",
                                         base,
                                         relcontrolURL);
-                        ret = UpnpResolveURL2(base, releventURL, eventURL);
+                        ret = UpnpResolveURL2(p, base, releventURL, eventURL);
                         if (ret != UPNP_E_SUCCESS)
                                 SampleUtil_Print("Error generating eventURL "
                                                  "from %s + %s\n",

@@ -62,7 +62,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz);
 #if defined(__APPLE__) || defined(__NetBSD__)
 #include <sys/resource.h> /* for setpriority() */
 #endif
-#endif
+#endif /* _WIN32 */
 
 #ifdef __cplusplus
 extern "C" {
@@ -215,6 +215,8 @@ typedef struct TPOOLSTATS
  */
 typedef struct THREADPOOL
 {
+        /*! Library handle. */
+        void *upnp_lib;
         /*! Mutex to protect job qs. */
         ithread_mutex_t mutex;
         /*! Condition variable to signal Q. */
@@ -260,6 +262,8 @@ typedef struct THREADPOOL
  * \li \c EMAXTHREADS if minimum threads is greater than maximum threads.
  */
 int ThreadPoolInit(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! Must be valid, non null, pointer to ThreadPool. */
         ThreadPool *tp,
         /*! Can be null. if not null then attr contains the following fields:
@@ -330,11 +334,10 @@ int ThreadPoolSetAttr(
  * 	\li \c 0 on success, nonzero on failure.
  * 	\li \c EOUTOFMEM if not enough memory to add job.
  */
-int ThreadPoolAdd(
-        /*! valid thread pool pointer. */
+int ThreadPoolAdd(/*! valid thread pool pointer. */
         ThreadPool *tp,
         /*! . */
-        ThreadPoolJob *job,
+        const ThreadPoolJob *job,
         /*! id of job. */
         int *jobId);
 

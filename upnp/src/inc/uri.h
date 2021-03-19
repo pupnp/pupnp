@@ -38,10 +38,11 @@
 
 #if !defined(_WIN32)
 #include <sys/param.h>
-#endif
+#endif /* _WIN32 */
 
 #include "UpnpGlobal.h" /* for */
 #include "UpnpInet.h"
+#include "upnp.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -56,15 +57,15 @@
 /* VC Winsocks2 includes these functions */
 #include "inet_pton.h"
 #endif
-#else
+#else /* _WIN32 */
 #include <netdb.h> /* for struct addrinfo */
-#endif
+#endif /* _WIN32 */
 
 #ifdef _WIN32
 #define strncasecmp strnicmp
-#else
+#else /* _WIN32 */
 /* Other systems have strncasecmp */
-#endif
+#endif /* _WIN32 */
 
 #ifdef __cplusplus
 extern "C" {
@@ -97,13 +98,13 @@ enum uriType
         absolute,
         relative
 };
-#else
+#else /* _WIN32 */
 enum uriType
 {
         ABSOLUTE,
         RELATIVE
 };
-#endif
+#endif /* _WIN32 */
 
 /*!
  * \brief Buffer used in parsinghttp messages, urls, etc. generally this simply
@@ -313,6 +314,8 @@ int remove_dots(
  * \return
  */
 char *resolve_rel_url(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Base URL. */
         char *base_url,
         /*! [in] Relative URL. */
@@ -331,6 +334,8 @@ char *resolve_rel_url(
  * \return
  */
 int parse_uri(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Character string containing uri information to be parsed. */
         const char *in,
         /*! [in] Maximum limit on the number of characters. */

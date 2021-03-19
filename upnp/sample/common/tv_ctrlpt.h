@@ -118,39 +118,41 @@ extern ithread_mutex_t DeviceListMutex;
 extern UpnpClient_Handle ctrlpt_handle;
 
 void TvCtrlPointPrintHelp(void);
-int TvCtrlPointDeleteNode(struct TvDeviceNode *);
-int TvCtrlPointRemoveDevice(const char *);
-int TvCtrlPointRemoveAll(void);
-int TvCtrlPointRefresh(void);
+int TvCtrlPointDeleteNode(UpnpLib *p, struct TvDeviceNode *);
+int TvCtrlPointRemoveDevice(UpnpLib *p, const char *);
+int TvCtrlPointRemoveAll(UpnpLib *p);
+int TvCtrlPointRefresh(UpnpLib *p);
 
-int TvCtrlPointSendAction(int, int, const char *, const char **, char **, int);
-int TvCtrlPointSendActionNumericArg(int devnum,
+int TvCtrlPointSendAction(
+        UpnpLib *p, int, int, const char *, const char **, char **, int);
+int TvCtrlPointSendActionNumericArg(UpnpLib *p,
+        int devnum,
         int service,
         const char *actionName,
         const char *paramName,
         int paramValue);
-int TvCtrlPointSendPowerOn(int devnum);
-int TvCtrlPointSendPowerOff(int devnum);
-int TvCtrlPointSendSetChannel(int, int);
-int TvCtrlPointSendSetVolume(int, int);
-int TvCtrlPointSendSetColor(int, int);
-int TvCtrlPointSendSetTint(int, int);
-int TvCtrlPointSendSetContrast(int, int);
-int TvCtrlPointSendSetBrightness(int, int);
+int TvCtrlPointSendPowerOn(UpnpLib *p, int devnum);
+int TvCtrlPointSendPowerOff(UpnpLib *p, int devnum);
+int TvCtrlPointSendSetChannel(UpnpLib *p, int, int);
+int TvCtrlPointSendSetVolume(UpnpLib *p, int, int);
+int TvCtrlPointSendSetColor(UpnpLib *p, int, int);
+int TvCtrlPointSendSetTint(UpnpLib *p, int, int);
+int TvCtrlPointSendSetContrast(UpnpLib *p, int, int);
+int TvCtrlPointSendSetBrightness(UpnpLib *p, int, int);
 
-int TvCtrlPointGetVar(int, int, const char *);
-int TvCtrlPointGetPower(int devnum);
-int TvCtrlPointGetChannel(int);
-int TvCtrlPointGetVolume(int);
-int TvCtrlPointGetColor(int);
-int TvCtrlPointGetTint(int);
-int TvCtrlPointGetContrast(int);
-int TvCtrlPointGetBrightness(int);
+int TvCtrlPointGetVar(UpnpLib *p, int, int, const char *);
+int TvCtrlPointGetPower(UpnpLib *p, int devnum);
+int TvCtrlPointGetChannel(UpnpLib *p, int);
+int TvCtrlPointGetVolume(UpnpLib *p, int);
+int TvCtrlPointGetColor(UpnpLib *p, int);
+int TvCtrlPointGetTint(UpnpLib *p, int);
+int TvCtrlPointGetContrast(UpnpLib *p, int);
+int TvCtrlPointGetBrightness(UpnpLib *p, int);
 
 int TvCtrlPointGetDevice(int, struct TvDeviceNode **);
 int TvCtrlPointPrintList(void);
 int TvCtrlPointPrintDevice(int);
-void TvCtrlPointAddDevice(IXML_Document *, const char *, int);
+void TvCtrlPointAddDevice(UpnpLib *p, IXML_Document *, const char *, int);
 void TvCtrlPointHandleGetVar(const char *, const char *, const DOMString);
 
 /*!
@@ -171,7 +173,8 @@ void TvStateUpdate(
 
 void TvCtrlPointHandleEvent(const char *, int, IXML_Document *);
 void TvCtrlPointHandleSubscribeUpdate(const char *, const Upnp_SID, int);
-int TvCtrlPointCallbackEventHandler(Upnp_EventType, const void *, void *);
+int TvCtrlPointCallbackEventHandler(
+        UpnpLib *p, Upnp_EventType, const void *, void *);
 
 /*!
  * \brief Checks the advertisement each device in the global device list.
@@ -182,15 +185,19 @@ int TvCtrlPointCallbackEventHandler(Upnp_EventType, const void *, void *);
  * device.
  */
 void TvCtrlPointVerifyTimeouts(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The increment to subtract from the timeouts each time the
          * function is called. */
         int incr);
 
 void TvCtrlPointPrintCommands(void);
-void *TvCtrlPointCommandLoop(void *);
-int TvCtrlPointStart(char *iface, state_update updateFunctionPtr, int combo);
-int TvCtrlPointStop(void);
-int TvCtrlPointProcessCommand(char *cmdline);
+int TvCtrlPointStart(UpnpLib **LibraryHandle,
+        char *iface,
+        state_update updateFunctionPtr,
+        int combo);
+int TvCtrlPointStop(UpnpLib *p);
+int TvCtrlPointProcessCommand(UpnpLib *p, char *cmdline);
 
 /*!
  * \brief Print help info for this application.
@@ -217,7 +224,7 @@ void *TvCtrlPointCommandLoop(void *args);
 /*!
  * \brief
  */
-int TvCtrlPointProcessCommand(char *cmdline);
+int TvCtrlPointProcessCommand(UpnpLib *p, char *cmdline);
 
 #ifdef __cplusplus
 };

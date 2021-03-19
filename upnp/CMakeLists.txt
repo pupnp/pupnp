@@ -7,6 +7,7 @@ if (samples)
 endif()
 
 set (UPNP_SOURCES
+        src/UpnpLib.c
 	src/api/UpnpActionComplete.c
 	src/api/UpnpActionRequest.c
 	src/api/UpnpDiscovery.c

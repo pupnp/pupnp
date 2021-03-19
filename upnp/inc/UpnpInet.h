@@ -39,7 +39,8 @@ typedef ADDRESS_FAMILY sa_family_t;
 /* Do not move or remove the include below for "sys/socket"!
  * Will break FreeBSD builds. */
 #include <sys/socket.h>
-#endif
+#endif /* __sun */
+
 #include <arpa/inet.h> /* for inet_pton() */
 #include <net/if.h>
 #include <netinet/in.h>

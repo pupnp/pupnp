@@ -36,7 +36,7 @@
 
 #if !defined(_WIN32)
 #include <sys/param.h>
-#endif
+#endif /* _WIN32 */
 
 #include "FreeList.h"
 #include "ThreadPool.h"
@@ -587,7 +587,7 @@ static void *WorkerThread(
                 } else {
                 }
                 /* run the job */
-                job->func(job->arg);
+                job->func(tp->upnp_lib, job->arg);
                 /* return to Normal */
                 SetPriority(DEFAULT_PRIORITY);
         }
@@ -610,7 +610,7 @@ exit_function:
  */
 static ThreadPoolJob *CreateThreadPoolJob(
         /*! job is copied. */
-        ThreadPoolJob *job,
+        const ThreadPoolJob *job,
         /*! id of job. */
         int id,
         /*! . */
@@ -706,7 +706,7 @@ static void AddWorker(
         }
 }
 
-int ThreadPoolInit(ThreadPool *tp, ThreadPoolAttr *attr)
+int ThreadPoolInit(UpnpLib *p, ThreadPool *tp, ThreadPoolAttr *attr)
 {
         int retCode = 0;
         int i = 0;
@@ -756,6 +756,7 @@ int ThreadPoolInit(ThreadPool *tp, ThreadPoolAttr *attr)
                 tp->busyThreads = 0;
                 tp->persistentThreads = 0;
                 tp->pendingWorkerThreadStart = 0;
+                tp->upnp_lib = p;
                 for (i = 0; i < tp->attr.minThreads; ++i) {
                         retCode = CreateWorker(tp);
                         if (retCode) {
@@ -822,7 +823,7 @@ exit_function:
         return ret;
 }
 
-int ThreadPoolAdd(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
+int ThreadPoolAdd(ThreadPool *tp, const ThreadPoolJob *job, int *jobId)
 {
         int rc = EOUTOFMEM;
         int tempId = -1;
@@ -1081,8 +1082,9 @@ int TPAttrInit(ThreadPoolAttr *attr)
 
 int TPJobInit(ThreadPoolJob *job, start_routine func, void *arg)
 {
-        if (!job || !func)
+        if (!job || !func) {
                 return EINVAL;
+        }
         job->func = func;
         job->arg = arg;
         job->priority = DEFAULT_PRIORITY;

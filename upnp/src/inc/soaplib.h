@@ -32,7 +32,10 @@
 #ifndef SOAPLIB_H
 #define SOAPLIB_H
 
+#include "httpparser.h"
+#include "ixml.h"
 #include "sock.h"
+#include "upnp.h"
 
 /*!
  * \file
@@ -46,6 +49,8 @@
  * It calls handle_invoke_action to handle the SOAP action.
  */
 void soap_device_callback(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Parsed request received by the device. */
         http_parser_t *parser,
         /*! [in] HTTP request. */
@@ -70,7 +75,8 @@ void soap_device_callback(
  *	returns UPNP_E_SUCCESS if successful else returns appropriate error
  * Note:
  ****************************************************************************/
-int SoapSendAction(char *action_url,
+int SoapSendAction(UpnpLib *p,
+        char *action_url,
         char *service_type,
         IXML_Document *action_node,
         IXML_Document **response_node);
@@ -95,7 +101,8 @@ int SoapSendAction(char *action_url,
  *	returns UPNP_E_SUCCESS if successful else returns appropriate error
  * Note:
  ****************************************************************************/
-int SoapSendActionEx(char *ActionURL,
+int SoapSendActionEx(UpnpLib *p,
+        char *ActionURL,
         char *ServiceType,
         IXML_Document *Header,
         IXML_Document *ActNode,
@@ -117,7 +124,7 @@ int SoapSendActionEx(char *ActionURL,
  * Note:
  ****************************************************************************/
 int SoapGetServiceVarStatus(
-        char *ActionURL, DOMString VarName, DOMString *StVar);
+        UpnpLib *p, char *ActionURL, DOMString VarName, DOMString *StVar);
 
 extern const char *ContentTypeHeader;
 

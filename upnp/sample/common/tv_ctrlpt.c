@@ -92,7 +92,7 @@ struct TvDeviceNode *GlobalDeviceList = NULL;
  *   node -- The device node
  *
  ********************************************************************************/
-int TvCtrlPointDeleteNode(struct TvDeviceNode *node)
+int TvCtrlPointDeleteNode(UpnpLib *p, struct TvDeviceNode *node)
 {
         int rc, service, var;
 
@@ -107,7 +107,8 @@ int TvCtrlPointDeleteNode(struct TvDeviceNode *node)
                    If we have a valid control SID, then unsubscribe
                  */
                 if (strcmp(node->device.TvService[service].SID, "") != 0) {
-                        rc = UpnpUnSubscribe(ctrlpt_handle,
+                        rc = UpnpUnSubscribe(p,
+                                ctrlpt_handle,
                                 node->device.TvService[service].SID);
                         if (UPNP_E_SUCCESS == rc) {
                                 SampleUtil_Print("Unsubscribed from Tv %s "
@@ -149,7 +150,7 @@ int TvCtrlPointDeleteNode(struct TvDeviceNode *node)
  *   UDN -- The Unique Device Name for the device to remove
  *
  ********************************************************************************/
-int TvCtrlPointRemoveDevice(const char *UDN)
+int TvCtrlPointRemoveDevice(UpnpLib *p, const char *UDN)
 {
         struct TvDeviceNode *curdevnode;
         struct TvDeviceNode *prevdevnode;
@@ -163,14 +164,14 @@ int TvCtrlPointRemoveDevice(const char *UDN)
         } else {
                 if (0 == strcmp(curdevnode->device.UDN, UDN)) {
                         GlobalDeviceList = curdevnode->next;
-                        TvCtrlPointDeleteNode(curdevnode);
+                        TvCtrlPointDeleteNode(p, curdevnode);
                 } else {
                         prevdevnode = curdevnode;
                         curdevnode = curdevnode->next;
                         while (curdevnode) {
                                 if (strcmp(curdevnode->device.UDN, UDN) == 0) {
                                         prevdevnode->next = curdevnode->next;
-                                        TvCtrlPointDeleteNode(curdevnode);
+                                        TvCtrlPointDeleteNode(p, curdevnode);
                                         break;
                                 }
                                 prevdevnode = curdevnode;
@@ -194,7 +195,7 @@ int TvCtrlPointRemoveDevice(const char *UDN)
  *   None
  *
  ********************************************************************************/
-int TvCtrlPointRemoveAll(void)
+int TvCtrlPointRemoveAll(UpnpLib *p)
 {
         struct TvDeviceNode *curdevnode, *next;
 
@@ -205,7 +206,7 @@ int TvCtrlPointRemoveAll(void)
 
         while (curdevnode) {
                 next = curdevnode->next;
-                TvCtrlPointDeleteNode(curdevnode);
+                TvCtrlPointDeleteNode(p, curdevnode);
                 curdevnode = next;
         }
 
@@ -225,14 +226,14 @@ int TvCtrlPointRemoveAll(void)
  *   None
  *
  ********************************************************************************/
-int TvCtrlPointRefresh(void)
+int TvCtrlPointRefresh(UpnpLib *p)
 {
         int rc;
 
-        TvCtrlPointRemoveAll();
+        TvCtrlPointRemoveAll(p);
         /* Search for all devices of type tvdevice version 1,
          * waiting for up to 5 seconds for the response */
-        rc = UpnpSearchAsync(ctrlpt_handle, 5, TvDeviceType, NULL);
+        rc = UpnpSearchAsync(p, ctrlpt_handle, 5, TvDeviceType, NULL);
         if (UPNP_E_SUCCESS != rc) {
                 SampleUtil_Print("Error sending search request%d\n", rc);
 
@@ -255,7 +256,7 @@ int TvCtrlPointRefresh(void)
  *   varname -- The name of the variable to request.
  *
  ********************************************************************************/
-int TvCtrlPointGetVar(int service, int devnum, const char *varname)
+int TvCtrlPointGetVar(UpnpLib *p, int service, int devnum, const char *varname)
 {
         struct TvDeviceNode *devnode;
         int rc;
@@ -265,7 +266,8 @@ int TvCtrlPointGetVar(int service, int devnum, const char *varname)
         rc = TvCtrlPointGetDevice(devnum, &devnode);
 
         if (TV_SUCCESS == rc) {
-                rc = UpnpGetServiceVarStatusAsync(ctrlpt_handle,
+                rc = UpnpGetServiceVarStatusAsync(p,
+                        ctrlpt_handle,
                         devnode->device.TvService[service].ControlURL,
                         varname,
                         TvCtrlPointCallbackEventHandler,
@@ -283,39 +285,39 @@ int TvCtrlPointGetVar(int service, int devnum, const char *varname)
         return rc;
 }
 
-int TvCtrlPointGetPower(int devnum)
+int TvCtrlPointGetPower(UpnpLib *p, int devnum)
 {
-        return TvCtrlPointGetVar(TV_SERVICE_CONTROL, devnum, "Power");
+        return TvCtrlPointGetVar(p, TV_SERVICE_CONTROL, devnum, "Power");
 }
 
-int TvCtrlPointGetChannel(int devnum)
+int TvCtrlPointGetChannel(UpnpLib *p, int devnum)
 {
-        return TvCtrlPointGetVar(TV_SERVICE_CONTROL, devnum, "Channel");
+        return TvCtrlPointGetVar(p, TV_SERVICE_CONTROL, devnum, "Channel");
 }
 
-int TvCtrlPointGetVolume(int devnum)
+int TvCtrlPointGetVolume(UpnpLib *p, int devnum)
 {
-        return TvCtrlPointGetVar(TV_SERVICE_CONTROL, devnum, "Volume");
+        return TvCtrlPointGetVar(p, TV_SERVICE_CONTROL, devnum, "Volume");
 }
 
-int TvCtrlPointGetColor(int devnum)
+int TvCtrlPointGetColor(UpnpLib *p, int devnum)
 {
-        return TvCtrlPointGetVar(TV_SERVICE_PICTURE, devnum, "Color");
+        return TvCtrlPointGetVar(p, TV_SERVICE_PICTURE, devnum, "Color");
 }
 
-int TvCtrlPointGetTint(int devnum)
+int TvCtrlPointGetTint(UpnpLib *p, int devnum)
 {
-        return TvCtrlPointGetVar(TV_SERVICE_PICTURE, devnum, "Tint");
+        return TvCtrlPointGetVar(p, TV_SERVICE_PICTURE, devnum, "Tint");
 }
 
-int TvCtrlPointGetContrast(int devnum)
+int TvCtrlPointGetContrast(UpnpLib *p, int devnum)
 {
-        return TvCtrlPointGetVar(TV_SERVICE_PICTURE, devnum, "Contrast");
+        return TvCtrlPointGetVar(p, TV_SERVICE_PICTURE, devnum, "Contrast");
 }
 
-int TvCtrlPointGetBrightness(int devnum)
+int TvCtrlPointGetBrightness(UpnpLib *p, int devnum)
 {
-        return TvCtrlPointGetVar(TV_SERVICE_PICTURE, devnum, "Brightness");
+        return TvCtrlPointGetVar(p, TV_SERVICE_PICTURE, devnum, "Brightness");
 }
 
 /********************************************************************************
@@ -334,7 +336,8 @@ int TvCtrlPointGetBrightness(int devnum)
  *   param_count -- The number of parameters
  *
  ********************************************************************************/
-int TvCtrlPointSendAction(int service,
+int TvCtrlPointSendAction(UpnpLib *p,
+        int service,
         int devnum,
         const char *actionname,
         const char **param_name,
@@ -370,7 +373,8 @@ int TvCtrlPointSendAction(int service,
                         }
                 }
 
-                rc = UpnpSendActionAsync(ctrlpt_handle,
+                rc = UpnpSendActionAsync(p,
+                        ctrlpt_handle,
                         devnode->device.TvService[service].ControlURL,
                         TvServiceType[service],
                         NULL,
@@ -407,7 +411,8 @@ int TvCtrlPointSendAction(int service,
  *   paramValue -- Actual value of the parameter being passed
  *
  ********************************************************************************/
-int TvCtrlPointSendActionNumericArg(int devnum,
+int TvCtrlPointSendActionNumericArg(UpnpLib *p,
+        int devnum,
         int service,
         const char *actionName,
         const char *paramName,
@@ -418,57 +423,63 @@ int TvCtrlPointSendActionNumericArg(int devnum,
 
         sprintf(param_val_a, "%d", paramValue);
         return TvCtrlPointSendAction(
-                service, devnum, actionName, &paramName, &param_val, 1);
+                p, service, devnum, actionName, &paramName, &param_val, 1);
 }
 
-int TvCtrlPointSendPowerOn(int devnum)
+int TvCtrlPointSendPowerOn(UpnpLib *p, int devnum)
 {
         return TvCtrlPointSendAction(
-                TV_SERVICE_CONTROL, devnum, "PowerOn", NULL, NULL, 0);
+                p, TV_SERVICE_CONTROL, devnum, "PowerOn", NULL, NULL, 0);
 }
 
-int TvCtrlPointSendPowerOff(int devnum)
+int TvCtrlPointSendPowerOff(UpnpLib *p, int devnum)
 {
         return TvCtrlPointSendAction(
-                TV_SERVICE_CONTROL, devnum, "PowerOff", NULL, NULL, 0);
+                p, TV_SERVICE_CONTROL, devnum, "PowerOff", NULL, NULL, 0);
 }
 
-int TvCtrlPointSendSetChannel(int devnum, int channel)
+int TvCtrlPointSendSetChannel(UpnpLib *p, int devnum, int channel)
+{
+        return TvCtrlPointSendActionNumericArg(p,
+                devnum,
+                TV_SERVICE_CONTROL,
+                "SetChannel",
+                "Channel",
+                channel);
+}
+
+int TvCtrlPointSendSetVolume(UpnpLib *p, int devnum, int volume)
 {
         return TvCtrlPointSendActionNumericArg(
-                devnum, TV_SERVICE_CONTROL, "SetChannel", "Channel", channel);
+                p, devnum, TV_SERVICE_CONTROL, "SetVolume", "Volume", volume);
 }
 
-int TvCtrlPointSendSetVolume(int devnum, int volume)
+int TvCtrlPointSendSetColor(UpnpLib *p, int devnum, int color)
 {
         return TvCtrlPointSendActionNumericArg(
-                devnum, TV_SERVICE_CONTROL, "SetVolume", "Volume", volume);
+                p, devnum, TV_SERVICE_PICTURE, "SetColor", "Color", color);
 }
 
-int TvCtrlPointSendSetColor(int devnum, int color)
+int TvCtrlPointSendSetTint(UpnpLib *p, int devnum, int tint)
 {
         return TvCtrlPointSendActionNumericArg(
-                devnum, TV_SERVICE_PICTURE, "SetColor", "Color", color);
+                p, devnum, TV_SERVICE_PICTURE, "SetTint", "Tint", tint);
 }
 
-int TvCtrlPointSendSetTint(int devnum, int tint)
+int TvCtrlPointSendSetContrast(UpnpLib *p, int devnum, int contrast)
 {
-        return TvCtrlPointSendActionNumericArg(
-                devnum, TV_SERVICE_PICTURE, "SetTint", "Tint", tint);
-}
-
-int TvCtrlPointSendSetContrast(int devnum, int contrast)
-{
-        return TvCtrlPointSendActionNumericArg(devnum,
+        return TvCtrlPointSendActionNumericArg(p,
+                devnum,
                 TV_SERVICE_PICTURE,
                 "SetContrast",
                 "Contrast",
                 contrast);
 }
 
-int TvCtrlPointSendSetBrightness(int devnum, int brightness)
+int TvCtrlPointSendSetBrightness(UpnpLib *p, int devnum, int brightness)
 {
-        return TvCtrlPointSendActionNumericArg(devnum,
+        return TvCtrlPointSendActionNumericArg(p,
+                devnum,
                 TV_SERVICE_PICTURE,
                 "SetBrightness",
                 "Brightness",
@@ -651,7 +662,7 @@ int TvCtrlPointPrintDevice(int devnum)
  *
  ********************************************************************************/
 void TvCtrlPointAddDevice(
-        IXML_Document *DescDoc, const char *location, int expires)
+        UpnpLib *p, IXML_Document *DescDoc, const char *location, int expires)
 {
         char *deviceType = NULL;
         char *friendlyName = NULL;
@@ -682,7 +693,8 @@ void TvCtrlPointAddDevice(
         baseURL = SampleUtil_GetFirstDocumentItem(DescDoc, "URLBase");
         relURL = SampleUtil_GetFirstDocumentItem(DescDoc, "presentationURL");
 
-        ret = UpnpResolveURL2((baseURL ? baseURL : location), relURL, &presURL);
+        ret = UpnpResolveURL2(
+                p, (baseURL ? baseURL : location), relURL, &presURL);
 
         if (UPNP_E_SUCCESS != ret)
                 SampleUtil_Print("Error generating presURL from %s + %s\n",
@@ -709,7 +721,8 @@ void TvCtrlPointAddDevice(
                 } else {
                         for (service = 0; service < TV_SERVICE_SERVCOUNT;
                                 service++) {
-                                if (SampleUtil_FindAndParseService(DescDoc,
+                                if (SampleUtil_FindAndParseService(p,
+                                            DescDoc,
                                             location,
                                             TvServiceType[service],
                                             &serviceId[service],
@@ -718,7 +731,8 @@ void TvCtrlPointAddDevice(
                                         SampleUtil_Print("Subscribing to "
                                                          "EventURL %s...\n",
                                                 eventURL[service]);
-                                        ret = UpnpSubscribe(ctrlpt_handle,
+                                        ret = UpnpSubscribe(p,
+                                                ctrlpt_handle,
                                                 eventURL[service],
                                                 &TimeOut[service],
                                                 eventSID[service]);
@@ -1031,7 +1045,7 @@ void TvCtrlPointHandleGetVar(
  *
  ********************************************************************************/
 int TvCtrlPointCallbackEventHandler(
-        Upnp_EventType EventType, const void *Event, void *Cookie)
+        UpnpLib *p, Upnp_EventType EventType, const void *Event, void *Cookie)
 {
         int errCode = 0;
         (void)Cookie;
@@ -1053,14 +1067,15 @@ int TvCtrlPointCallbackEventHandler(
 
                 location = UpnpString_get_String(
                         UpnpDiscovery_get_Location(d_event));
-                errCode = UpnpDownloadXmlDoc(location, &DescDoc);
+                errCode = UpnpDownloadXmlDoc(p, location, &DescDoc);
                 if (errCode != UPNP_E_SUCCESS) {
                         SampleUtil_Print("Error obtaining device description "
                                          "from %s -- error = %d\n",
                                 location,
                                 errCode);
                 } else {
-                        TvCtrlPointAddDevice(DescDoc,
+                        TvCtrlPointAddDevice(p,
+                                DescDoc,
                                 location,
                                 UpnpDiscovery_get_Expires(d_event));
                 }
@@ -1085,7 +1100,7 @@ int TvCtrlPointCallbackEventHandler(
                                 errCode);
                 }
                 SampleUtil_Print("Received ByeBye for Device: %s\n", deviceId);
-                TvCtrlPointRemoveDevice(deviceId);
+                TvCtrlPointRemoveDevice(p, deviceId);
                 SampleUtil_Print("After byebye:\n");
                 TvCtrlPointPrintList();
                 break;
@@ -1157,7 +1172,8 @@ int TvCtrlPointCallbackEventHandler(
                 int TimeOut = default_timeout;
                 Upnp_SID newSID;
 
-                errCode = UpnpSubscribe(ctrlpt_handle,
+                errCode = UpnpSubscribe(p,
+                        ctrlpt_handle,
                         UpnpString_get_String(
                                 UpnpEventSubscribe_get_PublisherUrl(es_event)),
                         &TimeOut,
@@ -1188,7 +1204,7 @@ int TvCtrlPointCallbackEventHandler(
         return 0;
 }
 
-void TvCtrlPointVerifyTimeouts(int incr)
+void TvCtrlPointVerifyTimeouts(UpnpLib *p, int incr)
 {
         struct TvDeviceNode *prevdevnode;
         struct TvDeviceNode *curdevnode;
@@ -1209,7 +1225,7 @@ void TvCtrlPointVerifyTimeouts(int incr)
                                 GlobalDeviceList = curdevnode->next;
                         else
                                 prevdevnode->next = curdevnode->next;
-                        TvCtrlPointDeleteNode(curdevnode);
+                        TvCtrlPointDeleteNode(p, curdevnode);
                         if (prevdevnode)
                                 curdevnode = prevdevnode->next;
                         else
@@ -1219,7 +1235,8 @@ void TvCtrlPointVerifyTimeouts(int incr)
                                 /* This advertisement is about to expire, so
                                  * send out a search request for this device
                                  * UDN to try to renew */
-                                ret = UpnpSearchAsync(ctrlpt_handle,
+                                ret = UpnpSearchAsync(p,
+                                        ctrlpt_handle,
                                         incr,
                                         curdevnode->device.UDN,
                                         NULL);
@@ -1248,11 +1265,11 @@ void *TvCtrlPointTimerLoop(void *args)
 {
         /* how often to verify the timeouts, in seconds */
         int incr = 30;
-        (void)args;
+        UpnpLib *p = (UpnpLib *)args;
 
         while (TvCtrlPointTimerLoopRun) {
                 isleep((unsigned int)incr);
-                TvCtrlPointVerifyTimeouts(incr);
+                TvCtrlPointVerifyTimeouts(p, incr);
         }
 
         return NULL;
@@ -1265,11 +1282,15 @@ void *TvCtrlPointTimerLoop(void *args)
  *
  * \return TV_SUCCESS if everything went well, else TV_ERROR.
  */
-int TvCtrlPointStart(char *iface, state_update updateFunctionPtr, int combo)
+int TvCtrlPointStart(UpnpLib **LibraryHandle,
+        char *iface,
+        state_update updateFunctionPtr,
+        int combo)
 {
         ithread_t timer_thread;
         int rc;
         unsigned short port = 0;
+        UpnpLib *p;
 
         SampleUtil_RegisterUpdateFunction(updateFunctionPtr);
 
@@ -1280,11 +1301,15 @@ int TvCtrlPointStart(char *iface, state_update updateFunctionPtr, int combo)
                 iface ? iface : "{NULL}",
                 port);
 
-        rc = UpnpInit2(iface, port);
-        if (rc != UPNP_E_SUCCESS) {
-                SampleUtil_Print("WinCEStart: UpnpInit2() Error: %d\n", rc);
-                if (!combo) {
-                        UpnpFinish();
+        if (combo) {
+                p = *LibraryHandle;
+        } else {
+                rc = UpnpInit2(&p, iface, port);
+                if (rc != UPNP_E_SUCCESS) {
+                        SampleUtil_Print(
+                                "TvCtrlPointStart: UpnpInit2() Error: %d\n",
+                                rc);
+                        UpnpFinish(p);
 
                         return TV_ERROR;
                 }
@@ -1294,41 +1319,43 @@ int TvCtrlPointStart(char *iface, state_update updateFunctionPtr, int combo)
                          "\tipv4 address = %s port = %u\n"
                          "\tipv6 address = %s port = %u\n"
                          "\tipv6ulagua address = %s port = %u\n",
-                UpnpGetServerIpAddress(),
-                UpnpGetServerPort(),
-                UpnpGetServerIp6Address(),
-                UpnpGetServerPort6(),
-                UpnpGetServerUlaGuaIp6Address(),
-                UpnpGetServerUlaGuaPort6());
+                UpnpGetServerIpAddress(p),
+                UpnpGetServerPort(p),
+                UpnpGetServerIp6Address(p),
+                UpnpGetServerPort6(p),
+                UpnpGetServerUlaGuaIp6Address(p),
+                UpnpGetServerUlaGuaPort6(p));
         SampleUtil_Print("Registering Control Point\n");
-        rc = UpnpRegisterClient(TvCtrlPointCallbackEventHandler,
+        rc = UpnpRegisterClient(p,
+                TvCtrlPointCallbackEventHandler,
                 &ctrlpt_handle,
                 &ctrlpt_handle);
         if (rc != UPNP_E_SUCCESS) {
                 SampleUtil_Print("Error registering CP: %d\n", rc);
-                UpnpFinish();
+                UpnpFinish(p);
 
                 return TV_ERROR;
         }
 
         SampleUtil_Print("Control Point Registered\n");
 
-        TvCtrlPointRefresh();
+        TvCtrlPointRefresh(p);
 
         /* start a timer thread */
-        ithread_create(&timer_thread, NULL, TvCtrlPointTimerLoop, NULL);
+        ithread_create(&timer_thread, NULL, TvCtrlPointTimerLoop, p);
         ithread_detach(timer_thread);
+        *LibraryHandle = p;
 
         return TV_SUCCESS;
 }
 
-int TvCtrlPointStop(void)
+int TvCtrlPointStop(UpnpLib *p)
 {
         TvCtrlPointTimerLoopRun = 0;
-        TvCtrlPointRemoveAll();
-        UpnpUnRegisterClient(ctrlpt_handle);
-        UpnpFinish();
-        SampleUtil_Finish();
+        TvCtrlPointRemoveAll(p);
+        UpnpUnRegisterClient(p, ctrlpt_handle);
+        UpnpFinish(p);
+        SampleUtil_Finish(p);
 
         return TV_SUCCESS;
 }
@@ -1531,20 +1558,20 @@ void *TvCtrlPointCommandLoop(void *args)
 {
         char cmdline[100];
         char *s;
-        (void)args;
+        UpnpLib *p = (UpnpLib *)args;
 
         while (1) {
                 SampleUtil_Print("\n>> ");
                 s = fgets(cmdline, 100, stdin);
                 if (!s)
                         break;
-                TvCtrlPointProcessCommand(cmdline);
+                TvCtrlPointProcessCommand(p, cmdline);
         }
 
         return NULL;
 }
 
-int TvCtrlPointProcessCommand(char *cmdline)
+int TvCtrlPointProcessCommand(UpnpLib *p, char *cmdline)
 {
         char cmd[100];
         char strarg[100];
@@ -1585,34 +1612,35 @@ int TvCtrlPointProcessCommand(char *cmdline)
                 TvCtrlPointPrintLongHelp();
                 break;
         case POWON:
-                TvCtrlPointSendPowerOn(arg1);
+                TvCtrlPointSendPowerOn(p, arg1);
                 break;
         case POWOFF:
-                TvCtrlPointSendPowerOff(arg1);
+                TvCtrlPointSendPowerOff(p, arg1);
                 break;
         case SETCHAN:
-                TvCtrlPointSendSetChannel(arg1, arg2);
+                TvCtrlPointSendSetChannel(p, arg1, arg2);
                 break;
         case SETVOL:
-                TvCtrlPointSendSetVolume(arg1, arg2);
+                TvCtrlPointSendSetVolume(p, arg1, arg2);
                 break;
         case SETCOL:
-                TvCtrlPointSendSetColor(arg1, arg2);
+                TvCtrlPointSendSetColor(p, arg1, arg2);
                 break;
         case SETTINT:
-                TvCtrlPointSendSetTint(arg1, arg2);
+                TvCtrlPointSendSetTint(p, arg1, arg2);
                 break;
         case SETCONT:
-                TvCtrlPointSendSetContrast(arg1, arg2);
+                TvCtrlPointSendSetContrast(p, arg1, arg2);
                 break;
         case SETBRT:
-                TvCtrlPointSendSetBrightness(arg1, arg2);
+                TvCtrlPointSendSetBrightness(p, arg1, arg2);
                 break;
         case CTRLACTION:
                 /* re-parse commandline since second arg is string. */
                 validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
                 if (validargs == 3)
-                        TvCtrlPointSendAction(TV_SERVICE_CONTROL,
+                        TvCtrlPointSendAction(p,
+                                TV_SERVICE_CONTROL,
                                 arg1,
                                 strarg,
                                 NULL,
@@ -1625,7 +1653,8 @@ int TvCtrlPointProcessCommand(char *cmdline)
                 /* re-parse commandline since second arg is string. */
                 validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
                 if (validargs == 3)
-                        TvCtrlPointSendAction(TV_SERVICE_PICTURE,
+                        TvCtrlPointSendAction(p,
+                                TV_SERVICE_PICTURE,
                                 arg1,
                                 strarg,
                                 NULL,
@@ -1638,7 +1667,7 @@ int TvCtrlPointProcessCommand(char *cmdline)
                 /* re-parse commandline since second arg is string. */
                 validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
                 if (validargs == 3)
-                        TvCtrlPointGetVar(TV_SERVICE_CONTROL, arg1, strarg);
+                        TvCtrlPointGetVar(p, TV_SERVICE_CONTROL, arg1, strarg);
                 else
                         invalidargs++;
                 break;
@@ -1646,7 +1675,7 @@ int TvCtrlPointProcessCommand(char *cmdline)
                 /* re-parse commandline since second arg is string. */
                 validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
                 if (validargs == 3)
-                        TvCtrlPointGetVar(TV_SERVICE_PICTURE, arg1, strarg);
+                        TvCtrlPointGetVar(p, TV_SERVICE_PICTURE, arg1, strarg);
                 else
                         invalidargs++;
                 break;
@@ -1657,10 +1686,10 @@ int TvCtrlPointProcessCommand(char *cmdline)
                 TvCtrlPointPrintList();
                 break;
         case REFRESH:
-                TvCtrlPointRefresh();
+                TvCtrlPointRefresh(p);
                 break;
         case EXITCMD:
-                rc = TvCtrlPointStop();
+                rc = TvCtrlPointStop(p);
                 exit(rc);
                 break;
         default:

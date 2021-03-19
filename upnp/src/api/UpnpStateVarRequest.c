@@ -32,8 +32,9 @@ UpnpStateVarRequest *UpnpStateVarRequest_new()
         struct s_UpnpStateVarRequest *p =
                 calloc(1, sizeof(struct s_UpnpStateVarRequest));
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         /*p->m_ErrCode = 0;*/
         /*p->m_Socket = 0;*/
@@ -51,8 +52,9 @@ void UpnpStateVarRequest_delete(UpnpStateVarRequest *q)
 {
         struct s_UpnpStateVarRequest *p = (struct s_UpnpStateVarRequest *)q;
 
-        if (!p)
+        if (!p) {
                 return;
+        }
 
         ixmlFreeDOMString(p->m_CurrentVal);
         p->m_CurrentVal = 0;
@@ -110,8 +112,9 @@ UpnpStateVarRequest *UpnpStateVarRequest_dup(const UpnpStateVarRequest *q)
 {
         UpnpStateVarRequest *p = UpnpStateVarRequest_new();
 
-        if (!p)
+        if (!p) {
                 return 0;
+        }
 
         UpnpStateVarRequest_assign(p, q);
 
@@ -302,6 +305,12 @@ void UpnpStateVarRequest_clear_StateVarName(UpnpStateVarRequest *p)
 
 const struct sockaddr_storage *UpnpStateVarRequest_get_CtrlPtIPAddr(
         const UpnpStateVarRequest *p)
+{
+        return &p->m_CtrlPtIPAddr;
+}
+
+struct sockaddr_storage *UpnpStateVarRequest_getnc_CtrlPtIPAddr(
+        UpnpStateVarRequest *p)
 {
         return &p->m_CtrlPtIPAddr;
 }

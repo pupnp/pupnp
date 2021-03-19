@@ -45,6 +45,7 @@
 
 #include "ThreadPool.h"
 #include "UpnpInet.h"
+#include "UpnpLib.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
 #include "ssdplib.h"
@@ -70,11 +71,12 @@
 #define MSGTYPE_ADVERTISEMENT 1
 #define MSGTYPE_REPLY 2
 
-void advertiseAndReplyThread(void *data)
+void advertiseAndReplyThread(UpnpLib *p, void *data)
 {
         SsdpSearchReply *arg = (SsdpSearchReply *)data;
 
-        AdvertiseAndReply(0,
+        AdvertiseAndReply(p,
+                0,
                 arg->handle,
                 arg->event.RequestType,
                 (struct sockaddr *)&arg->dest_addr,
@@ -87,7 +89,7 @@ void advertiseAndReplyThread(void *data)
 
 #ifdef INCLUDE_DEVICE_APIS
 void ssdp_handle_device_request(
-        http_message_t *hmsg, struct sockaddr_storage *dest_addr)
+        UpnpLib *p, http_message_t *hmsg, struct sockaddr_storage *dest_addr)
 {
 #define MX_FUDGE_FACTOR 10
         int handle, start;
@@ -129,8 +131,11 @@ void ssdp_handle_device_request(
         for (;;) {
                 HandleLock();
                 /* device info. */
-                switch (GetDeviceHandleInfo(
-                        start, (int)dest_addr->ss_family, &handle, &dev_info)) {
+                switch (GetDeviceHandleInfo(p,
+                        start,
+                        (int)dest_addr->ss_family,
+                        &handle,
+                        &dev_info)) {
                 case HND_DEVICE:
                         break;
                 default:
@@ -192,7 +197,7 @@ void ssdp_handle_device_request(
                 if (mx < 1)
                         mx = 1;
                 replyTime = rand() % mx;
-                TimerThreadSchedule(&gTimerThread,
+                TimerThreadSchedule(UpnpLib_getnc_gTimerThread(p),
                         replyTime,
                         REL_SEC,
                         &job,
@@ -209,7 +214,7 @@ void ssdp_handle_device_request(
  *
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
-static int NewRequestHandler(
+static int NewRequestHandler(UpnpLib *p,
         /*! [in] Ip address, to send the reply. */
         struct sockaddr *DestAddr,
         /*! [in] Number of packet to be sent. */
@@ -229,9 +234,10 @@ static int NewRequestHandler(
 #endif
         char buf_ntop[INET6_ADDRSTRLEN];
         int ret = UPNP_E_SUCCESS;
+        const char *lIF_IPV4 = UpnpLib_get_gIF_IPV4_cstr(p);
+        unsigned lIF_INDEX = UpnpLib_get_gIF_INDEX(p);
 
-        if (strlen(gIF_IPV4) > (size_t)0 &&
-                !inet_pton(AF_INET, gIF_IPV4, &replyAddr)) {
+        if (strlen(lIF_IPV4) > 0 && !inet_pton(AF_INET, lIF_IPV4, &replyAddr)) {
                 return UPNP_E_INVALID_PARAM;
         }
 
@@ -276,8 +282,8 @@ static int NewRequestHandler(
                 setsockopt(ReplySock,
                         IPPROTO_IPV6,
                         IPV6_MULTICAST_IF,
-                        (char *)&gIF_INDEX,
-                        sizeof(gIF_INDEX));
+                        (char *)&lIF_INDEX,
+                        sizeof lIF_INDEX);
                 setsockopt(ReplySock,
                         IPPROTO_IPV6,
                         IPV6_MULTICAST_HOPS,
@@ -392,6 +398,8 @@ static int isUrlV6UlaGua(char *descdocUrl)
  * request etc.
  */
 static void CreateServicePacket(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] type of the message (Search Reply, Advertisement
          * or Shutdown). */
         int msg_type,
@@ -453,7 +461,7 @@ static void CreateServicePacket(
                                 "OPT: ",
                                 "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
                                 "01-NLS: ",
-                                gUpnpSdkNLSuuid,
+                                UpnpLib_get_gUpnpSdkNLSuuid(p),
                                 X_USER_AGENT,
                                 "ST: ",
                                 nt,
@@ -522,7 +530,7 @@ static void CreateServicePacket(
                                 "OPT: ",
                                 "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
                                 "01-NLS: ",
-                                gUpnpSdkNLSuuid,
+                                UpnpLib_get_gUpnpSdkNLSuuid(p),
                                 X_USER_AGENT,
                                 "ST: ",
                                 nt,
@@ -610,7 +618,7 @@ static void CreateServicePacket(
                                 "OPT: ",
                                 "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
                                 "01-NLS: ",
-                                gUpnpSdkNLSuuid,
+                                UpnpLib_get_gUpnpSdkNLSuuid(p),
                                 "NT: ",
                                 nt,
                                 "NTS: ",
@@ -693,7 +701,7 @@ static void CreateServicePacket(
                                 "OPT: ",
                                 "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
                                 "01-NLS: ",
-                                gUpnpSdkNLSuuid,
+                                UpnpLib_get_gUpnpSdkNLSuuid(p),
                                 "NT: ",
                                 nt,
                                 "NTS: ",
@@ -744,7 +752,8 @@ static void CreateServicePacket(
         return;
 }
 
-int DeviceAdvertisement(char *DevType,
+int DeviceAdvertisement(UpnpLib *p,
+        char *DevType,
         int RootDev,
         char *Udn,
         char *Location,
@@ -782,7 +791,7 @@ int DeviceAdvertisement(char *DevType,
                                                   : SSDP_IPV6_LINKLOCAL,
                         &DestAddr6->sin6_addr);
                 DestAddr6->sin6_port = htons(SSDP_PORT);
-                DestAddr6->sin6_scope_id = gIF_INDEX;
+                DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
                 UpnpPrintf(UPNP_CRITICAL,
@@ -801,7 +810,8 @@ int DeviceAdvertisement(char *DevType,
                         Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice", Udn);
                 if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
                         goto error_handler;
-                CreateServicePacket(MSGTYPE_ADVERTISEMENT,
+                CreateServicePacket(p,
+                        MSGTYPE_ADVERTISEMENT,
                         "upnp:rootdevice",
                         Mil_Usn,
                         Location,
@@ -813,7 +823,8 @@ int DeviceAdvertisement(char *DevType,
                         RegistrationState);
         }
         /* both root and sub-devices need to send these two messages */
-        CreateServicePacket(MSGTYPE_ADVERTISEMENT,
+        CreateServicePacket(p,
+                MSGTYPE_ADVERTISEMENT,
                 Udn,
                 Udn,
                 Location,
@@ -826,7 +837,8 @@ int DeviceAdvertisement(char *DevType,
         rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn, DevType);
         if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
                 goto error_handler;
-        CreateServicePacket(MSGTYPE_ADVERTISEMENT,
+        CreateServicePacket(p,
+                MSGTYPE_ADVERTISEMENT,
                 DevType,
                 Mil_Usn,
                 Location,
@@ -845,12 +857,12 @@ int DeviceAdvertisement(char *DevType,
         if (RootDev) {
                 /* send 3 msg types */
                 ret_code = NewRequestHandler(
-                        (struct sockaddr *)&__ss, 3, &msgs[0]);
+                        p, (struct sockaddr *)&__ss, 3, &msgs[0]);
         } else { /* sub-device */
 
                 /* send 2 msg types */
                 ret_code = NewRequestHandler(
-                        (struct sockaddr *)&__ss, 2, &msgs[1]);
+                        p, (struct sockaddr *)&__ss, 2, &msgs[1]);
         }
 
 error_handler:
@@ -862,7 +874,8 @@ error_handler:
         return ret_code;
 }
 
-int SendReply(struct sockaddr *DestAddr,
+int SendReply(UpnpLib *p,
+        struct sockaddr *DestAddr,
         char *DevType,
         int RootDev,
         char *Udn,
@@ -890,7 +903,8 @@ int SendReply(struct sockaddr *DestAddr,
                         Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice", Udn);
                 if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
                         goto error_handler;
-                CreateServicePacket(MSGTYPE_REPLY,
+                CreateServicePacket(p,
+                        MSGTYPE_REPLY,
                         "upnp:rootdevice",
                         Mil_Usn,
                         Location,
@@ -906,7 +920,8 @@ int SendReply(struct sockaddr *DestAddr,
 
                 /*NK: FIX for extra response when someone searches by udn */
                 if (!ByType) {
-                        CreateServicePacket(MSGTYPE_REPLY,
+                        CreateServicePacket(p,
+                                MSGTYPE_REPLY,
                                 Udn,
                                 Udn,
                                 Location,
@@ -924,7 +939,8 @@ int SendReply(struct sockaddr *DestAddr,
                                 DevType);
                         if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
                                 goto error_handler;
-                        CreateServicePacket(MSGTYPE_REPLY,
+                        CreateServicePacket(p,
+                                MSGTYPE_REPLY,
                                 DevType,
                                 Mil_Usn,
                                 Location,
@@ -943,7 +959,7 @@ int SendReply(struct sockaddr *DestAddr,
                 }
         }
         /* send msgs */
-        ret_code = NewRequestHandler(DestAddr, num_msgs, msgs);
+        ret_code = NewRequestHandler(p, DestAddr, num_msgs, msgs);
 
 error_handler:
         for (i = 0; i < num_msgs; i++) {
@@ -954,7 +970,8 @@ error_handler:
         return ret_code;
 }
 
-int DeviceReply(struct sockaddr *DestAddr,
+int DeviceReply(UpnpLib *p,
+        struct sockaddr *DestAddr,
         char *DevType,
         int RootDev,
         char *Udn,
@@ -979,7 +996,8 @@ int DeviceReply(struct sockaddr *DestAddr,
                         Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice", Udn);
                 if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
                         goto error_handler;
-                CreateServicePacket(MSGTYPE_REPLY,
+                CreateServicePacket(p,
+                        MSGTYPE_REPLY,
                         Mil_Nt,
                         Mil_Usn,
                         Location,
@@ -996,7 +1014,8 @@ int DeviceReply(struct sockaddr *DestAddr,
         rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s", Udn);
         if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
                 goto error_handler;
-        CreateServicePacket(MSGTYPE_REPLY,
+        CreateServicePacket(p,
+                MSGTYPE_REPLY,
                 Mil_Nt,
                 Mil_Usn,
                 Location,
@@ -1012,7 +1031,8 @@ int DeviceReply(struct sockaddr *DestAddr,
         rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn, DevType);
         if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
                 goto error_handler;
-        CreateServicePacket(MSGTYPE_REPLY,
+        CreateServicePacket(p,
+                MSGTYPE_REPLY,
                 Mil_Nt,
                 Mil_Usn,
                 Location,
@@ -1029,9 +1049,9 @@ int DeviceReply(struct sockaddr *DestAddr,
         }
         /* send replies */
         if (RootDev) {
-                RetVal = NewRequestHandler(DestAddr, 3, szReq);
+                RetVal = NewRequestHandler(p, DestAddr, 3, szReq);
         } else {
-                RetVal = NewRequestHandler(DestAddr, 2, &szReq[1]);
+                RetVal = NewRequestHandler(p, DestAddr, 2, &szReq[1]);
         }
 
 error_handler:
@@ -1043,7 +1063,8 @@ error_handler:
         return RetVal;
 }
 
-int ServiceAdvertisement(char *Udn,
+int ServiceAdvertisement(UpnpLib *p,
+        char *Udn,
         char *ServType,
         char *Location,
         int Duration,
@@ -1075,7 +1096,7 @@ int ServiceAdvertisement(char *Udn,
                                                   : SSDP_IPV6_LINKLOCAL,
                         &DestAddr6->sin6_addr);
                 DestAddr6->sin6_port = htons(SSDP_PORT);
-                DestAddr6->sin6_scope_id = gIF_INDEX;
+                DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
                 UpnpPrintf(UPNP_CRITICAL,
@@ -1089,7 +1110,8 @@ int ServiceAdvertisement(char *Udn,
                 goto error_handler;
         /* CreateServiceRequestPacket(1,szReq[0],Mil_Nt,Mil_Usn,
          * Server,Location,Duration); */
-        CreateServicePacket(MSGTYPE_ADVERTISEMENT,
+        CreateServicePacket(p,
+                MSGTYPE_ADVERTISEMENT,
                 ServType,
                 Mil_Usn,
                 Location,
@@ -1102,7 +1124,7 @@ int ServiceAdvertisement(char *Udn,
         if (szReq[0] == NULL) {
                 goto error_handler;
         }
-        RetVal = NewRequestHandler((struct sockaddr *)&__ss, 1, szReq);
+        RetVal = NewRequestHandler(p, (struct sockaddr *)&__ss, 1, szReq);
 
 error_handler:
         free(szReq[0]);
@@ -1110,7 +1132,8 @@ error_handler:
         return RetVal;
 }
 
-int ServiceReply(struct sockaddr *DestAddr,
+int ServiceReply(UpnpLib *p,
+        struct sockaddr *DestAddr,
         char *ServType,
         char *Udn,
         char *Location,
@@ -1128,7 +1151,8 @@ int ServiceReply(struct sockaddr *DestAddr,
         rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn, ServType);
         if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
                 goto error_handler;
-        CreateServicePacket(MSGTYPE_REPLY,
+        CreateServicePacket(p,
+                MSGTYPE_REPLY,
                 ServType,
                 Mil_Usn,
                 Location,
@@ -1140,7 +1164,7 @@ int ServiceReply(struct sockaddr *DestAddr,
                 RegistrationState);
         if (szReq[0] == NULL)
                 goto error_handler;
-        RetVal = NewRequestHandler(DestAddr, 1, szReq);
+        RetVal = NewRequestHandler(p, DestAddr, 1, szReq);
 
 error_handler:
         free(szReq[0]);
@@ -1148,7 +1172,8 @@ error_handler:
         return RetVal;
 }
 
-int ServiceShutdown(char *Udn,
+int ServiceShutdown(UpnpLib *p,
+        char *Udn,
         char *ServType,
         char *Location,
         int Duration,
@@ -1180,7 +1205,7 @@ int ServiceShutdown(char *Udn,
                                                   : SSDP_IPV6_LINKLOCAL,
                         &DestAddr6->sin6_addr);
                 DestAddr6->sin6_port = htons(SSDP_PORT);
-                DestAddr6->sin6_scope_id = gIF_INDEX;
+                DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
                 UpnpPrintf(UPNP_CRITICAL,
@@ -1195,7 +1220,8 @@ int ServiceShutdown(char *Udn,
                 goto error_handler;
         /* CreateServiceRequestPacket(0,szReq[0],Mil_Nt,Mil_Usn,
          * Server,Location,Duration); */
-        CreateServicePacket(MSGTYPE_SHUTDOWN,
+        CreateServicePacket(p,
+                MSGTYPE_SHUTDOWN,
                 ServType,
                 Mil_Usn,
                 Location,
@@ -1207,7 +1233,7 @@ int ServiceShutdown(char *Udn,
                 RegistrationState);
         if (szReq[0] == NULL)
                 goto error_handler;
-        RetVal = NewRequestHandler((struct sockaddr *)&__ss, 1, szReq);
+        RetVal = NewRequestHandler(p, (struct sockaddr *)&__ss, 1, szReq);
 
 error_handler:
         free(szReq[0]);
@@ -1215,7 +1241,8 @@ error_handler:
         return RetVal;
 }
 
-int DeviceShutdown(char *DevType,
+int DeviceShutdown(UpnpLib *p,
+        char *DevType,
         int RootDev,
         char *Udn,
         char *Location,
@@ -1250,7 +1277,7 @@ int DeviceShutdown(char *DevType,
                                                   : SSDP_IPV6_LINKLOCAL,
                         &DestAddr6->sin6_addr);
                 DestAddr6->sin6_port = htons(SSDP_PORT);
-                DestAddr6->sin6_scope_id = gIF_INDEX;
+                DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
                 UpnpPrintf(UPNP_CRITICAL,
@@ -1265,7 +1292,8 @@ int DeviceShutdown(char *DevType,
                         Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice", Udn);
                 if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
                         goto error_handler;
-                CreateServicePacket(MSGTYPE_SHUTDOWN,
+                CreateServicePacket(p,
+                        MSGTYPE_SHUTDOWN,
                         "upnp:rootdevice",
                         Mil_Usn,
                         Location,
@@ -1282,7 +1310,8 @@ int DeviceShutdown(char *DevType,
                 __LINE__,
                 "In function DeviceShutdown\n");
         /* both root and sub-devices need to send these two messages */
-        CreateServicePacket(MSGTYPE_SHUTDOWN,
+        CreateServicePacket(p,
+                MSGTYPE_SHUTDOWN,
                 Udn,
                 Udn,
                 Location,
@@ -1295,7 +1324,8 @@ int DeviceShutdown(char *DevType,
         rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn, DevType);
         if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
                 goto error_handler;
-        CreateServicePacket(MSGTYPE_SHUTDOWN,
+        CreateServicePacket(p,
+                MSGTYPE_SHUTDOWN,
                 DevType,
                 Mil_Usn,
                 Location,
@@ -1314,12 +1344,12 @@ int DeviceShutdown(char *DevType,
         if (RootDev) {
                 /* send 3 msg types */
                 ret_code = NewRequestHandler(
-                        (struct sockaddr *)&__ss, 3, &msgs[0]);
+                        p, (struct sockaddr *)&__ss, 3, &msgs[0]);
         } else {
                 /* sub-device */
                 /* send 2 msg types */
                 ret_code = NewRequestHandler(
-                        (struct sockaddr *)&__ss, 2, &msgs[1]);
+                        p, (struct sockaddr *)&__ss, 2, &msgs[1]);
         }
 
 error_handler:

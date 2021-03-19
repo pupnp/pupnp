@@ -184,6 +184,8 @@ typedef int (*ParserFun)(char *, SsdpEvent *);
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
 int AdvertiseAndReply(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] -1 = Send shutdown, 0 = send reply, 1 = Send Advertisement. */
         int AdFlag,
         /* [in] Device handle. */
@@ -241,6 +243,8 @@ int ssdp_request_type(
  * \brief This function reads the data from the ssdp socket.
  */
 void readFromSSDPSocket(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] SSDP socket. */
         SOCKET socket);
 
@@ -251,6 +255,8 @@ void readFromSSDPSocket(
  * \return UPNP_E_SUCCESS if successful else returns appropriate error.
  */
 int get_ssdp_sockets(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [out] Array of SSDP sockets. */
         MiniServerSockArray *out);
 
@@ -268,6 +274,8 @@ int get_ssdp_sockets(
  * and bye byes.
  */
 void ssdp_handle_ctrlpt_msg(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] SSDP message from the device. */
         http_message_t *hmsg,
         /* [in] Address of the device. */
@@ -294,6 +302,8 @@ void ssdp_handle_ctrlpt_msg(
  * \return 1 if successful else appropriate error.
  */
 int SearchByTarget(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] The handle of the client performing the search. */
         int Hnd,
         /* [in] Number of seconds to wait, to collect all the responses. */
@@ -317,6 +327,8 @@ int SearchByTarget(
  * control point.
  */
 void advertiseAndReplyThread(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] Structure containing the search request. */
         void *data);
 
@@ -327,6 +339,8 @@ void advertiseAndReplyThread(
  */
 #ifdef INCLUDE_DEVICE_APIS
 void ssdp_handle_device_request(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] . */
         http_message_t *hmsg,
         /* [in] . */
@@ -348,6 +362,8 @@ static UPNP_INLINE void ssdp_handle_device_request(
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
 int DeviceAdvertisement(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] type of the device. */
         char *DevType,
         /* [in] flag to indicate if the device is root device. */
@@ -374,6 +390,8 @@ int DeviceAdvertisement(
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
 int SendReply(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] destination IP address. */
         struct sockaddr *DestAddr,
         /* [in] Device type. */
@@ -402,6 +420,8 @@ int SendReply(
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
 int DeviceReply(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] destination IP address. */
         struct sockaddr *DestAddr,
         /* [in] Device type. */
@@ -428,6 +448,8 @@ int DeviceReply(
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
 int ServiceAdvertisement(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] Device UDN. */
         char *Udn,
         /* [in] Service Type. */
@@ -452,6 +474,8 @@ int ServiceAdvertisement(
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
 int ServiceReply(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] . */
         struct sockaddr *DestAddr,
         /* [in] Service Type. */
@@ -476,6 +500,8 @@ int ServiceReply(
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
 int ServiceShutdown(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] Device UDN. */
         char *Udn,
         /* [in] Service Type. */
@@ -500,6 +526,8 @@ int ServiceShutdown(
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
 int DeviceShutdown(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] Device Type. */
         char *DevType,
         /* [in] 1 means root device. */

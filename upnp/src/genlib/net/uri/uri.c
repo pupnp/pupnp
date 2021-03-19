@@ -46,9 +46,10 @@
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
 #endif
-#endif
+#endif /* _WIN32 */
 #include "config.h"
 
+#include "UpnpLib.h"
 #include "upnpapi.h"
 #include "uri.h"
 
@@ -304,6 +305,8 @@ int token_cmp(token *in1, token *in2)
  * Uses gethostbyname.
  */
 static int parse_hostport(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] String of characters representing host and port. */
         const char *in,
         /*! [out] Output parameter where the host and port are represented as
@@ -323,6 +326,7 @@ static int parse_hostport(
         size_t hostport_size;
         int has_port = 0;
         int ret;
+        unsigned lIF_INDEX = UpnpLib_get_gIF_INDEX(p);
 
         memset(out, 0, sizeof(hostport_type));
         /* Work on a copy of the input string. */
@@ -420,7 +424,7 @@ static int parse_hostport(
         case AF_INET6:
                 sai6->sin6_family = (sa_family_t)af;
                 sai6->sin6_port = htons(port);
-                sai6->sin6_scope_id = gIF_INDEX;
+                sai6->sin6_scope_id = lIF_INDEX;
                 ret = inet_pton(AF_INET6, srvname, &sai6->sin6_addr);
                 break;
         default:
@@ -575,7 +579,7 @@ int remove_dots(char *buf, size_t size)
         return UPNP_E_SUCCESS;
 }
 
-char *resolve_rel_url(char *base_url, char *rel_url)
+char *resolve_rel_url(UpnpLib *p, char *base_url, char *rel_url)
 {
         uri_type base;
         uri_type rel;
@@ -596,13 +600,13 @@ char *resolve_rel_url(char *base_url, char *rel_url)
         }
 
         len_rel = strlen(rel_url);
-        if (parse_uri(rel_url, len_rel, &rel) != HTTP_SUCCESS)
+        if (parse_uri(p, rel_url, len_rel, &rel) != HTTP_SUCCESS)
                 return NULL;
         if (rel.type == (enum uriType)ABSOLUTE)
                 return strdup(rel_url);
 
         len_base = strlen(base_url);
-        if ((parse_uri(base_url, len_base, &base) != HTTP_SUCCESS) ||
+        if ((parse_uri(p, base_url, len_base, &base) != HTTP_SUCCESS) ||
                 (base.type != (enum uriType)ABSOLUTE))
                 return NULL;
         if (len_rel == (size_t)0)
@@ -709,7 +713,7 @@ char *resolve_rel_url(char *base_url, char *rel_url)
         if (rv < 0 || rv >= (int)len)
                 goto error;
         out_finger += rv;
-        len -= (size_t)rv;
+        /* len -= (size_t)rv; */
 
         if (remove_dots(path, (size_t)(out_finger - path)) != UPNP_E_SUCCESS)
                 goto error;
@@ -721,7 +725,7 @@ error:
         return NULL;
 }
 
-int parse_uri(const char *in, size_t max, uri_type *out)
+int parse_uri(UpnpLib *p, const char *in, size_t max, uri_type *out)
 {
         int begin_path = 0;
         size_t begin_hostport = (size_t)0;
@@ -744,7 +748,7 @@ int parse_uri(const char *in, size_t max, uri_type *out)
                         defaultPort = 443;
                 }
                 begin_path = parse_hostport(
-                        &in[begin_hostport], defaultPort, &out->hostport);
+                        p, &in[begin_hostport], defaultPort, &out->hostport);
                 if (begin_path >= 0) {
                         begin_path += (int)begin_hostport;
                 } else

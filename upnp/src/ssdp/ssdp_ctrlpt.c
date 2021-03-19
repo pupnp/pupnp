@@ -46,6 +46,7 @@
 #include "SSDPResultDataCallback.h"
 #include "ThreadPool.h"
 #include "UpnpInet.h"
+#include "UpnpLib.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
 #include "ssdplib.h"
@@ -68,12 +69,14 @@
  * result.
  */
 static void send_search_result(
+        /*! Library handle. */
+        UpnpLib *p,
         /* [in] Search reply from the device. */
         void *data)
 {
         SSDPResultData *temp = (SSDPResultData *)data;
 
-        SSDPResultData_Callback(temp);
+        SSDPResultData_Callback(p, temp);
         SSDPResultData_delete(temp);
 }
 
@@ -95,8 +98,10 @@ static UPNP_INLINE size_t min_size_t(size_t a, size_t b)
         }
 }
 
-void ssdp_handle_ctrlpt_msg(
-        http_message_t *hmsg, struct sockaddr_storage *dest_addr, int timeout)
+void ssdp_handle_ctrlpt_msg(UpnpLib *p,
+        http_message_t *hmsg,
+        struct sockaddr_storage *dest_addr,
+        int timeout)
 {
         int handle;
         int handle_start;
@@ -125,18 +130,21 @@ void ssdp_handle_ctrlpt_msg(
          */
         HandleReadLock();
 
-        if (GetClientHandleInfo(&handle_start, &ctrlpt_info) != HND_CLIENT) {
+        if (GetClientHandleInfo(p, &handle_start, &ctrlpt_info) != HND_CLIENT) {
                 HandleUnlock();
                 goto end_ssdp_handle_ctrlpt_msg;
         }
         HandleUnlock();
         /* search timeout */
         if (timeout) {
-                for (handle = handle_start; handle < NUM_HANDLE; handle++) {
+                for (handle = handle_start;
+                        handle < HANDLE_TABLE_MAX_NUM_ELEMENTS;
+                        handle++) {
                         HandleLock();
 
                         /* get client info */
-                        if (GetHandleInfo(handle, &ctrlpt_info) != HND_CLIENT) {
+                        if (GetHandleInfo(p, handle, &ctrlpt_info) !=
+                                HND_CLIENT) {
                                 HandleUnlock();
                                 continue;
                         }
@@ -145,7 +153,8 @@ void ssdp_handle_ctrlpt_msg(
                         ctrlpt_cookie = ctrlpt_info->Cookie;
                         HandleUnlock();
 
-                        ctrlpt_callback(UPNP_DISCOVERY_SEARCH_TIMEOUT,
+                        ctrlpt_callback(p,
+                                UPNP_DISCOVERY_SEARCH_TIMEOUT,
                                 NULL,
                                 ctrlpt_cookie);
                 }
@@ -157,7 +166,8 @@ void ssdp_handle_ctrlpt_msg(
         expires = -1;
         UpnpDiscovery_set_Expires(param, expires);
         if (httpmsg_find_hdr(hmsg, HDR_CACHE_CONTROL, &hdr_value) != NULL) {
-                ret = matchstr(hdr_value.buf,
+                ret = matchstr(p,
+                        hdr_value.buf,
                         hdr_value.length,
                         "%imax-age = %d%0",
                         &expires);
@@ -248,11 +258,14 @@ void ssdp_handle_ctrlpt_msg(
                         event_type = UPNP_DISCOVERY_ADVERTISEMENT_ALIVE;
                 }
                 /* call callback */
-                for (handle = handle_start; handle < NUM_HANDLE; handle++) {
+                for (handle = handle_start;
+                        handle < HANDLE_TABLE_MAX_NUM_ELEMENTS;
+                        handle++) {
                         HandleLock();
 
                         /* get client info */
-                        if (GetHandleInfo(handle, &ctrlpt_info) != HND_CLIENT) {
+                        if (GetHandleInfo(p, handle, &ctrlpt_info) !=
+                                HND_CLIENT) {
                                 HandleUnlock();
                                 continue;
                         }
@@ -261,7 +274,7 @@ void ssdp_handle_ctrlpt_msg(
                         ctrlpt_cookie = ctrlpt_info->Cookie;
                         HandleUnlock();
 
-                        ctrlpt_callback(event_type, param, ctrlpt_cookie);
+                        ctrlpt_callback(p, event_type, param, ctrlpt_cookie);
                 }
         } else {
                 /* reply (to a SEARCH) */
@@ -283,11 +296,14 @@ void ssdp_handle_ctrlpt_msg(
                         goto end_ssdp_handle_ctrlpt_msg;
                 }
                 /* check each current search */
-                for (handle = handle_start; handle < NUM_HANDLE; handle++) {
+                for (handle = handle_start;
+                        handle < HANDLE_TABLE_MAX_NUM_ELEMENTS;
+                        handle++) {
                         HandleLock();
 
                         /* get client info */
-                        if (GetHandleInfo(handle, &ctrlpt_info) != HND_CLIENT) {
+                        if (GetHandleInfo(p, handle, &ctrlpt_info) !=
+                                HND_CLIENT) {
                                 HandleUnlock();
                                 continue;
                         }
@@ -364,7 +380,8 @@ void ssdp_handle_ctrlpt_msg(
                                                 TPJobSetFreeFunction(&job,
                                                         (free_routine)free);
                                                 if (ThreadPoolAdd(
-                                                            &gRecvThreadPool,
+                                                            UpnpLib_getnc_gRecvThreadPool(
+                                                                    p),
                                                             &job,
                                                             NULL) != 0) {
                                                         SSDPResultData_delete(
@@ -486,7 +503,7 @@ static int CreateClientRequestPacket(
 /*!
  * \brief
  */
-static void searchExpired(
+static void searchExpired(UpnpLib *p,
         /* [in] . */
         void *arg)
 {
@@ -504,7 +521,7 @@ static void searchExpired(
         HandleLock();
 
         /* remove search target from search list */
-        if (GetHandleInfo(handle, &ctrlpt_info) != HND_CLIENT) {
+        if (GetHandleInfo(p, handle, &ctrlpt_info) != HND_CLIENT) {
                 free(arg);
                 HandleUnlock();
                 return;
@@ -526,13 +543,14 @@ static void searchExpired(
         }
         HandleUnlock();
 
-        if (found)
-                ctrlpt_callback(UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie);
+        if (found) {
+                ctrlpt_callback(p, UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie);
+        }
 
         free(arg);
 }
 
-int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
+int SearchByTarget(UpnpLib *p, int Hnd, int Mx, char *St, void *Cookie)
 {
         char errorBuffer[256];
         int *id = NULL;
@@ -559,12 +577,13 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
         struct in_addr addrv4;
         SOCKET max_fd = 0;
         int retVal;
+        const char *lIF_IPV4 = UpnpLib_get_gIF_IPV4_cstr(p);
+        unsigned lIF_INDEX = UpnpLib_get_gIF_INDEX(p);
 
         /*ThreadData *ThData; */
         ThreadPoolJob job;
 
-        if (strlen(gIF_IPV4) > (size_t)0 &&
-                !inet_pton(AF_INET, gIF_IPV4, &addrv4)) {
+        if (strlen(lIF_IPV4) > 0 && !inet_pton(AF_INET, lIF_IPV4, &addrv4)) {
                 return UPNP_E_INVALID_PARAM;
         }
 
@@ -609,12 +628,12 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
         destAddr6->sin6_family = (sa_family_t)AF_INET6;
         inet_pton(AF_INET6, SSDP_IPV6_SITELOCAL, &destAddr6->sin6_addr);
         destAddr6->sin6_port = htons(SSDP_PORT);
-        destAddr6->sin6_scope_id = gIF_INDEX;
+        destAddr6->sin6_scope_id = lIF_INDEX;
 #endif
 
         /* add search criteria to list */
         HandleLock();
-        if (GetHandleInfo(Hnd, &ctrlpt_info) != HND_CLIENT) {
+        if (GetHandleInfo(p, Hnd, &ctrlpt_info) != HND_CLIENT) {
                 HandleUnlock();
                 return UPNP_E_INTERNAL_ERROR;
         }
@@ -626,12 +645,16 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
         expArg = (SsdpSearchExpArg *)malloc(sizeof(SsdpSearchExpArg));
         expArg->handle = Hnd;
         id = (int *)&(expArg->timeoutEventId);
-        TPJobInit(&job, (start_routine)searchExpired, expArg);
+        TPJobInit(&job, searchExpired, expArg);
         TPJobSetPriority(&job, MED_PRIORITY);
         TPJobSetFreeFunction(&job, (free_routine)free);
         /* Schedule a timeout event to remove search Arg */
-        TimerThreadSchedule(
-                &gTimerThread, timeTillRead, REL_SEC, &job, SHORT_TERM, id);
+        TimerThreadSchedule(UpnpLib_getnc_gTimerThread(p),
+                timeTillRead,
+                REL_SEC,
+                &job,
+                SHORT_TERM,
+                id);
         newArg->timeoutEventId = *id;
         ListAddTail(&ctrlpt_info->SsdpSearchList, newArg);
         HandleUnlock();
@@ -652,8 +675,8 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
                 setsockopt(gSsdpReqSocket6,
                         IPPROTO_IPV6,
                         IPV6_MULTICAST_IF,
-                        (char *)&gIF_INDEX,
-                        sizeof(gIF_INDEX));
+                        (char *)&lIF_INDEX,
+                        sizeof lIF_INDEX);
                 FD_SET(gSsdpReqSocket6, &wrSet);
                 max_fd = max_int(max_fd, gSsdpReqSocket6);
         }

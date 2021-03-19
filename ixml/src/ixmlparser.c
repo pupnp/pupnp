@@ -48,7 +48,7 @@
 
 #ifdef _WIN32
 #define strncasecmp strnicmp
-#endif
+#endif /* _WIN32 */
 
 static char g_error_char = '\0';
 #ifdef IXML_HAVE_SCRIPTSUPPORT

@@ -10,11 +10,13 @@
 
 #include "client_table.h"
 
+#include "UpnpLib.h"
+
 #ifdef INCLUDE_CLIENT_APIS
 
 #include <stdlib.h> /* for calloc(), free() */
 
-void free_client_subscription(GenlibClientSubscription *sub)
+void free_client_subscription(UpnpLib *p, GenlibClientSubscription *sub)
 {
         upnp_timeout *event;
         ThreadPoolJob tempJob;
@@ -26,7 +28,7 @@ void free_client_subscription(GenlibClientSubscription *sub)
                 if (renewEventId != -1) {
                         /* do not remove timer event of copy */
                         /* invalid timer event id */
-                        if (TimerThreadRemove(&gTimerThread,
+                        if (TimerThreadRemove(UpnpLib_getnc_gTimerThread(p),
                                     renewEventId,
                                     &tempJob) == 0) {
                                 event = (upnp_timeout *)tempJob.arg;
@@ -37,11 +39,11 @@ void free_client_subscription(GenlibClientSubscription *sub)
         }
 }
 
-void freeClientSubList(GenlibClientSubscription *list)
+void freeClientSubList(UpnpLib *p, GenlibClientSubscription *list)
 {
         GenlibClientSubscription *next;
         while (list) {
-                free_client_subscription(list);
+                free_client_subscription(p, list);
                 next = GenlibClientSubscription_get_Next(list);
                 GenlibClientSubscription_delete(list);
                 list = next;
@@ -49,7 +51,7 @@ void freeClientSubList(GenlibClientSubscription *list)
 }
 
 void RemoveClientSubClientSID(
-        GenlibClientSubscription **head, const UpnpString *sid)
+        UpnpLib *p, GenlibClientSubscription **head, const UpnpString *sid)
 {
         GenlibClientSubscription *finger = *head;
         GenlibClientSubscription *previous = NULL;
@@ -67,7 +69,7 @@ void RemoveClientSubClientSID(
                                         finger);
                         }
                         GenlibClientSubscription_set_Next(finger, NULL);
-                        freeClientSubList(finger);
+                        freeClientSubList(p, finger);
                         finger = NULL;
                 } else {
                         previous = finger;

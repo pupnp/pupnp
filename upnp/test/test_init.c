@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
         int a, b, c;
         (void)argc;
         (void)argv;
+        const char *log_file_name = "test_init.log";
+        UpnpLib *p;
 
         /*
          * Check library version (and formats)
@@ -103,29 +105,59 @@ int main(int argc, char *argv[])
 #endif
 
         /*
-         * Test library initialisation
+         * Test library initialization
          */
         printf("\n");
         printf("Initializing UPnP ... \n");
-        UpnpSetLogFileNames(0, 0);
-        rc = UpnpInit2(NULL, 0);
+        unlink(log_file_name);
+        UpnpSetLogFileNames(log_file_name, 0);
+        p = 0;
+        rc = UpnpInit2(&p, NULL, 0);
         if (UPNP_E_SUCCESS == rc) {
-                const char *ip_address = UpnpGetServerIpAddress();
-                unsigned short port = UpnpGetServerPort();
-
+                UpnpPrintf(UPNP_INFO,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        "Will call UpnpGetServerIpAddress(p);\n");
+                const char *ip_address = UpnpGetServerIpAddress(p);
+                UpnpPrintf(UPNP_INFO,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        "Will call UpnpGetServerPort(p);\n");
+                unsigned short port = UpnpGetServerPort(p);
+                UpnpPrintf(UPNP_INFO,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        "UPnP Initialized OK ip=%s, port=%d\n",
+                        (ip_address ? ip_address : "UNKNOWN"),
+                        port);
                 printf("UPnP Initialized OK ip=%s, port=%d\n",
                         (ip_address ? ip_address : "UNKNOWN"),
                         port);
         } else {
+                UpnpPrintf(UPNP_INFO,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        "** ERROR UpnpInit2(): %d",
+                        rc);
                 printf("** ERROR UpnpInit2(): %d", rc);
 #if UPNP_HAVE_TOOLS
+                UpnpPrintf(UPNP_INFO,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        " %s",
+                        UpnpGetErrorMessage(rc));
                 printf(" %s", UpnpGetErrorMessage(rc));
 #endif
                 printf("\n");
                 exit(EXIT_FAILURE);
         }
 
-        (void)UpnpFinish();
+        UpnpFinish(p);
         printf("\n");
 
         exit(EXIT_SUCCESS);

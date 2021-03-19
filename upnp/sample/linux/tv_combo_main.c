@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
         sigset_t sigs_to_catch;
 #endif
         int code;
+        UpnpLib *p_ctrlpt;
+        UpnpLib *p_device;
 
         SampleUtil_Initialize(linux_print);
         /* Parse options */
@@ -64,9 +66,13 @@ int main(int argc, char *argv[])
                         return 1;
                 }
         }
-
-        device_main(argc, argv, 1);
-        rc = TvCtrlPointStart(iface, NULL, 1);
+        /* Start the device. */
+        device_main(&p_device, argc, argv, 1);
+        /* This is how it used to work before the library became reentrant,
+         * so it should still work. */
+        p_ctrlpt = p_device;
+        /* Start the control point. */
+        rc = TvCtrlPointStart(&p_ctrlpt, iface, NULL, 1);
         if (rc != TV_SUCCESS) {
                 SampleUtil_Print("Error starting UPnP TV Control Point\n");
                 return rc;
@@ -86,8 +92,8 @@ int main(int argc, char *argv[])
         sigwait(&sigs_to_catch, &sig);
         SampleUtil_Print("Shutting down on signal %d...\n", sig);
 #endif
-        TvDeviceStop();
-        rc = TvCtrlPointStop();
+        TvDeviceStop(p_device);
+        rc = TvCtrlPointStop(p_ctrlpt);
 
         return rc;
 }

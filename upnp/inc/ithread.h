@@ -39,7 +39,7 @@
 
 #if !defined(_WIN32)
 #include <sys/param.h>
-#endif
+#endif /* _WIN32 */
 
 #include "UpnpGlobal.h" /* For UPNP_INLINE, EXPORT_SPEC */
 #include "UpnpUniStd.h" /* for close() */
@@ -103,7 +103,8 @@ typedef pthread_attr_t ithread_attr_t;
  *      Thread start routine
  *      Internal Use Only.
  ***************************************************************************/
-typedef void (*start_routine)(void *arg);
+typedef struct s_UpnpLib UpnpLib;
+typedef void (*start_routine)(UpnpLib *p, void *arg);
 
 /****************************************************************************
  * Name: ithread_cond_t
@@ -226,7 +227,7 @@ static UPNP_INLINE int ithread_initialize_thread(void)
 
 #if defined(_WIN32) && defined(PTW32_STATIC_LIB)
         ret = !pthread_win32_thread_attach_np();
-#endif
+#endif /* _WIN32 */
 
         return ret;
 }
@@ -248,7 +249,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
 
 #if defined(_WIN32) && defined(PTW32_STATIC_LIB)
         ret = !pthread_win32_thread_detach_np();
-#endif
+#endif /* _WIN32 */
 
         return ret;
 }
@@ -878,9 +879,9 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *****************************************************************************/
 #ifdef _WIN32
 #define isleep(x) Sleep((x)*1000)
-#else
+#else /* _WIN32 */
 #define isleep sleep
-#endif
+#endif /* _WIN32 */
 
 /****************************************************************************
  * Function: isleep
@@ -897,7 +898,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *****************************************************************************/
 #ifdef _WIN32
 #define imillisleep Sleep
-#else
+#else /* _WIN32 */
 #if _POSIX_C_SOURCE < 200809L
 #define imillisleep(x) usleep(1000 * x)
 #else
@@ -907,7 +908,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
                 nanosleep(&req, NULL); \
         } while (0)
 #endif
-#endif
+#endif /* _WIN32 */
 
 #if !defined(PTHREAD_MUTEX_RECURSIVE) && !defined(__DragonFly__) && \
         !defined(UPNP_USE_MSVCPP)

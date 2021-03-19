@@ -100,15 +100,13 @@
 #define CALLBACK_SUCCESS 0
 #define DEFAULT_TIMEOUT 1801
 
-extern ithread_mutex_t GlobalClientSubscribeMutex;
-
 /*!
  * \brief Locks the subscription.
  */
 #define SubscribeLock() \
         UpnpPrintf( \
                 UPNP_INFO, GENA, __FILE__, __LINE__, "Trying Subscribe Lock"); \
-        ithread_mutex_lock(&GlobalClientSubscribeMutex); \
+        ithread_mutex_lock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
         UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "Subscribe Lock");
 
 /*!
@@ -120,7 +118,7 @@ extern ithread_mutex_t GlobalClientSubscribeMutex;
                 __FILE__, \
                 __LINE__, \
                 "Trying Subscribe UnLock"); \
-        ithread_mutex_unlock(&GlobalClientSubscribeMutex); \
+        ithread_mutex_unlock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
         UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "Subscribe UnLock");
 
 /*!
@@ -145,6 +143,8 @@ typedef struct NOTIFY_THREAD_STRUCT
  * \return UPNP_E_SUCCESS if successful, otherwise appropriate error code.
  */
 EXTERN_C void genaCallback(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] represents the parse state of the request */
         http_parser_t *parser,
         /*! [in] HTTP message containing GENA request */
@@ -164,6 +164,8 @@ EXTERN_C void genaCallback(
  */
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaSubscribe(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The client handle. */
         UpnpClient_Handle client_handle,
         /*! [in] Of the form: "http://134.134.156.80:4000/RedBulb/Event */
@@ -189,6 +191,8 @@ EXTERN_C int genaSubscribe(
  */
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaUnSubscribe(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] UPnP client handle. */
         UpnpClient_Handle client_handle,
         /*! [in] The subscription ID. */
@@ -206,6 +210,8 @@ EXTERN_C int genaUnSubscribe(
  */
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaUnregisterClient(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Handle containing all the control point related information. */
         UpnpClient_Handle client_handle);
 #endif /* INCLUDE_CLIENT_APIS */
@@ -221,6 +227,8 @@ EXTERN_C int genaUnregisterClient(
  */
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaUnregisterDevice(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Handle of the root device */
         UpnpDevice_Handle device_handle);
 #endif /* INCLUDE_CLIENT_APIS */
@@ -236,7 +244,7 @@ EXTERN_C int genaUnregisterDevice(
  * 	appropriate error code.
  */
 #ifdef INCLUDE_CLIENT_APIS
-EXTERN_C int genaRenewSubscription(
+EXTERN_C int genaRenewSubscription(UpnpLib *p,
         /*! [in] Client handle. */
         UpnpClient_Handle client_handle,
         /*! [in] Subscription ID. */
@@ -256,6 +264,8 @@ EXTERN_C int genaRenewSubscription(
  */
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaNotifyAll(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Device handle. */
         UpnpDevice_Handle device_handle,
         /*! [in] Device udn. */
@@ -280,6 +290,8 @@ EXTERN_C int genaNotifyAll(
  */
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaNotifyAllExt(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Device handle. */
         UpnpDevice_Handle device_handle,
         /*! [in] Device udn. */
@@ -300,6 +312,8 @@ EXTERN_C int genaNotifyAllExt(
  */
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaInitNotify(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Device handle. */
         UpnpDevice_Handle device_handle,
         /*! [in] Device udn. */
@@ -328,6 +342,8 @@ EXTERN_C int genaInitNotify(
  */
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaInitNotifyExt(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Device handle. */
         UpnpDevice_Handle device_handle,
         /*! [in] Device udn. */
@@ -347,6 +363,8 @@ EXTERN_C int genaInitNotifyExt(
  * \return UPNP_E_SUCCESS if successful, otherwise appropriate error code.
  */
 void error_respond(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Structure containing information about the socket. */
         SOCKINFO *info,
         /*! [in] error code that will be in the GENA response. */
