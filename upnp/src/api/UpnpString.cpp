@@ -19,8 +19,7 @@
 
 #include "UpnpString.h"
 
-#include <stdlib.h> /* for calloc(), free() */
-#include <string.h> /* for strlen(), strdup() */
+#include <cctype> /* for std::tolower on Windows */
 
 #ifdef _WIN32
 #define strcasecmp stricmp
