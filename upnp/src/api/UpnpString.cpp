@@ -21,61 +21,6 @@
 
 #include <cctype> /* for std::tolower on Windows */
 
-#ifdef _WIN32
-#define strcasecmp stricmp
-#else
-/* Other systems have strncasecmp */
-#endif
-
-#ifndef UPNP_USE_MSVCPP
-#ifdef UPNP_USE_BCBPP
-static size_t strnlen(const char *s, size_t n) { return strnlen_s(s, n); }
-#else
-/* VC has strnlen which is already included but with
- * (potentially) different linkage */
-/* strnlen() is a GNU extension. */
-#if !HAVE_STRNLEN
-static size_t strnlen(const char *s, size_t n)
-{
-        const char *p = (const char *)memchr(s, 0, n);
-        return p ? p - s : n;
-}
-#endif /* !HAVE_STRNLEN */
-#endif /* UPNP_USE_BCBPP */
-#endif /* _WIN32 */
-
-/* strndup() is a GNU extension. */
-#if !HAVE_STRNDUP || defined(_WIN32)
-static char *strndup(const char *__string, size_t __n)
-{
-        size_t strsize = strnlen(__string, __n) + 1;
-        char *newstr = (char *)malloc(strsize);
-        if (newstr == NULL) {
-                return NULL;
-        }
-        strncpy(newstr, __string, strsize);
-        newstr[strsize - 1] = 0;
-
-        return newstr;
-}
-#endif /* HAVE_STRNDUP && !defined(_WIN32) */
-
-/*!
- * \brief Internal implementation of the class UpnpString.
- *
- * \internal
- */
-#if 0
-struct s_UpnpString
-{
-        /*! \brief Length of the string. */
-        size_t m_length;
-        /*! \brief Pointer to a dynamically allocated area that holds the NULL
-         * terminated string. */
-        char *m_string;
-};
-#endif
-
 UpnpString *UpnpString_new() { return new UpnpString(); }
 
 void UpnpString_delete(UpnpString *p) { delete p; }

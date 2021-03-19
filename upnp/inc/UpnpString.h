@@ -1,5 +1,5 @@
-#ifndef STRING_H
-#define STRING_H
+#ifndef UPNPSTRING_H
+#define UPNPSTRING_H
 
 /*!
  * \defgroup UpnpString The UpnpString Class
@@ -8,7 +8,7 @@
  *
  * \author Marcelo Roberto Jimenez
  *
- * \version 1.0
+ * \version 2.0
  *
  * @{
  *
@@ -145,4 +145,4 @@ EXPORT_SPEC int UpnpString_casecmp(
 
 /* @} UpnpString The UpnpString API */
 
-#endif /* STRING_H */
+#endif /* UPNPSTRING_H */
