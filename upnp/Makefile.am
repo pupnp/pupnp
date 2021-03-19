@@ -10,6 +10,8 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/inc \
 	-I$(top_srcdir)/ixml/inc
 
+AM_LDFLAGS = -lstdc++
+
 LDADD = \
 	libupnp.la \
 	$(top_builddir)/ixml/libixml.la
@@ -165,7 +167,7 @@ libupnp_la_SOURCES += \
 	src/api/UpnpStateVarComplete.c \
 	src/api/UpnpStateVarRequest.c \
 	src/api/UpnpSubscriptionRequest.c \
-	src/api/UpnpString.c \
+        src/api/UpnpString.cpp \
         src/api/upnpapi.cpp \
 	src/api/upnpdebug.c
 
