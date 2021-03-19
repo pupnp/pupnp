@@ -97,7 +97,7 @@ function (findTestEnv testName resultVar)
 	set (tempEnv "PATH=")
 
 	foreach (entry IN ITEMS ${${resultVar}})
-		string (APPEND tempEnv "${entry}\;")
+		string (APPEND tempEnv "${entry}\\\;")
 	endforeach()
 
 	string (APPEND tempEnv "%PATH%")
