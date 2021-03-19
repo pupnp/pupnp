@@ -1,5 +1,5 @@
-if (BUILD_TESTING)
-	add_subdirectory (test)
+if (WIN32)
+	set (WIN_PREFIX "lib")
 endif()
 
 if (samples)
@@ -138,7 +138,7 @@ if (tools)
 endif()
 
 set_target_properties (upnp_shared PROPERTIES
-	OUTPUT_NAME upnp
+	OUTPUT_NAME ${WIN_PREFIX}upnp
 	EXPORT_NAME UPNP::Shared
 	VERSION ${UPNP_VERSION}
 	SOVERSION ${UPNP_VERSION_MAJOR}
@@ -211,7 +211,7 @@ if (WIN32)
 endif()
 
 set_target_properties (upnp_static PROPERTIES
-	OUTPUT_NAME upnp${STATIC_POSTFIX}
+	OUTPUT_NAME ${WIN_PREFIX}upnp${STATIC_POSTFIX}
 	EXPORT_NAME UPNP::Static
 )
 
@@ -235,3 +235,8 @@ install (TARGETS upnp_static
 install (EXPORT UPNP
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP
 )
+
+if (BUILD_TESTING)
+	enable_testing()
+	add_subdirectory (test)
+endif()
