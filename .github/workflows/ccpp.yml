@@ -60,27 +60,28 @@ jobs:
           ctest --output-on-failure -C ${{ matrix.conf }}
 
   macos:
-    name: Build (${{ matrix.os }})
+    name: Build (${{ matrix.os }}) - ${{ matrix.conf }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         os: [macos-latest] # macos-10.15, macos-11.0
+        conf: [Debug, Release]
       fail-fast: false
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Configure
-        run: cmake -DBUILD_TESTING=ON -S . -B build
+        run: cmake -DBUILD_TESTING=ON -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.conf }}
 
       - name: Build
-        run: cmake --build build
+        run: cmake --build build --config ${{ matrix.conf }}
 
       - name: Test
         run: |
           cd build
-          ctest --output-on-failure
+          ctest --output-on-failure --C ${{ matrix.conf }}
 
   build_asan:
     name: Sanitizer build (ubuntu-20.04)
