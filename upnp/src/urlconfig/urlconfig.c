@@ -38,10 +38,10 @@
 #include "urlconfig.h"
 
 #include "UpnpInet.h"
+#include "UpnpLog.h"
 #include "membuffer.h"
 #include "unixutil.h"
 #include "upnp.h"
-#include "upnpdebug.h"
 #include "uri.h"
 #include "webserver.h"
 

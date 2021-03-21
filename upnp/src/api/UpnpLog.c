@@ -35,7 +35,7 @@
 #define UPNP_DEBUG_C
 #include "config.h"
 
-#include "upnpdebug.h"
+#include "UpnpLog.h"
 
 #include "ithread.h"
 #include "ixml.h"

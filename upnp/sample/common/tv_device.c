@@ -43,7 +43,7 @@
 
 #include "tv_device.h"
 
-#include "upnpdebug.h"
+#include "UpnpLog.h"
 
 #include <assert.h>
 

@@ -30,8 +30,8 @@
  *************************************************************************/
 #include "upnpconfig.h"
 
+#include "UpnpLog.h"
 #include "upnp.h"
-#include "upnpdebug.h"
 
 #include <stdio.h>
 #include <stdlib.h>

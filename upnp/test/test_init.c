@@ -40,7 +40,7 @@
 #if UPNP_HAVE_TOOLS
 #include "upnptools.h"
 #endif
-#include "upnpdebug.h"
+#include "UpnpLog.h"
 
 int main(int argc, char *argv[])
 {

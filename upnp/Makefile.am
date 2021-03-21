@@ -27,18 +27,18 @@ upnpinclude_HEADERS = \
 	inc/UpnpEventSubscribe.h \
 	inc/UpnpExtraHeaders.h \
 	inc/UpnpFileInfo.h \
-	inc/list.h \
+        inc/UpnpLog.h \
 	inc/UpnpStateVarComplete.h \
 	inc/UpnpStateVarRequest.h \
 	inc/UpnpSubscriptionRequest.h \
 	inc/UpnpString.h \
-	inc/upnp.h \
-	inc/upnpdebug.h \
 	inc/UpnpGlobal.h \
 	inc/UpnpInet.h \
 	inc/UpnpIntTypes.h \
 	inc/UpnpStdInt.h \
-	inc/UpnpUniStd.h
+        inc/UpnpUniStd.h \
+        inc/list.h \
+        inc/upnp.h
 
 nodist_upnpinclude_HEADERS = inc/upnpconfig.h 
 if ENABLE_TOOLS
@@ -164,12 +164,12 @@ libupnp_la_SOURCES += \
 	src/api/UpnpEventSubscribe.c \
 	src/api/UpnpExtraHeaders.c \
 	src/api/UpnpFileInfo.c \
-	src/api/UpnpStateVarComplete.c \
+        src/api/UpnpLog.c \
+        src/api/UpnpStateVarComplete.c \
 	src/api/UpnpStateVarRequest.c \
 	src/api/UpnpSubscriptionRequest.c \
         src/api/UpnpString.cpp \
-        src/api/upnpapi.cpp \
-	src/api/upnpdebug.c
+        src/api/upnpapi.cpp
 
 # internal
 libupnp_la_SOURCES += \

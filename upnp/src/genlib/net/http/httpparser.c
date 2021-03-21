@@ -45,11 +45,11 @@
 #include "httpparser.h"
 
 #include "UpnpExtraHeaders.h"
+#include "UpnpLog.h"
 #include "list.h"
 #include "statcodes.h"
 #include "strintmap.h"
 #include "unixutil.h"
-#include "upnpdebug.h"
 
 #include <assert.h>
 #include <ctype.h>

@@ -258,7 +258,7 @@ void free_URL_list(URL_list *list)
         list->size = (size_t)0;
 }
 
-/* This should use upnpdebug. Failing that, disable by default */
+/* This should use UpnpLog. Failing that, disable by default */
 #ifdef DEBUG_URI
 void print_uri(uri_type *in)
 {

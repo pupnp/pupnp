@@ -44,9 +44,9 @@ extern "C" {
 #include "config.h"
 
 #include "LinkedList.h"
+#include "UpnpLog.h"
 #include "ixml.h"
 #include "upnp.h"
-#include "upnpdebug.h"
 #include "uri.h"
 
 #include <stdio.h>
