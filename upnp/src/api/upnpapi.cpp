@@ -517,7 +517,7 @@ void PrintThreadPoolStats(
                 stats.totalIdleTime);
 }
 #else
-#define PrintThreadPoolStats(tp, DbgFileName, DbgLineNo, msg) \
+#define PrintThreadPoolStats(p, tp, DbgFileName, DbgLineNo, msg) \
         do { \
         } while (0)
 #endif /* DEBUG */

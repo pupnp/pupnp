@@ -266,7 +266,7 @@ void printServiceTable(
         /*! [in] Debug module specified to the print function. */
         Dbg_Module module);
 #else
-#define printServiceTable(table, level, module) \
+#define printServiceTable(p, table, level, module) \
         do { \
         } while (0)
 #endif
