@@ -373,11 +373,15 @@ service_info *FindServiceControlURLPath(
  * Return: void
  **********************************************************************/
 #ifdef DEBUG
-void printService(service_info *service, Upnp_LogLevel level, Dbg_Module module)
+void printService(UpnpLib *p,
+        service_info *service,
+        Upnp_LogLevel level,
+        Dbg_Module module)
 {
         if (service) {
                 if (service->serviceType) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -385,7 +389,8 @@ void printService(service_info *service, Upnp_LogLevel level, Dbg_Module module)
                                 service->serviceType);
                 }
                 if (service->serviceId) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -393,7 +398,8 @@ void printService(service_info *service, Upnp_LogLevel level, Dbg_Module module)
                                 service->serviceId);
                 }
                 if (service->SCPDURL) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -401,7 +407,8 @@ void printService(service_info *service, Upnp_LogLevel level, Dbg_Module module)
                                 service->SCPDURL);
                 }
                 if (service->controlURL) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -409,7 +416,8 @@ void printService(service_info *service, Upnp_LogLevel level, Dbg_Module module)
                                 service->controlURL);
                 }
                 if (service->eventURL) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -417,7 +425,8 @@ void printService(service_info *service, Upnp_LogLevel level, Dbg_Module module)
                                 service->eventURL);
                 }
                 if (service->UDN) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -425,13 +434,15 @@ void printService(service_info *service, Upnp_LogLevel level, Dbg_Module module)
                                 service->UDN);
                 }
                 if (service->active) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
                                 "Service is active\n");
                 } else {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -455,12 +466,15 @@ void printService(service_info *service, Upnp_LogLevel level, Dbg_Module module)
  * Return: void
  ************************************************************************/
 #ifdef DEBUG
-void printServiceList(
-        service_info *service, Upnp_LogLevel level, Dbg_Module module)
+void printServiceList(UpnpLib *p,
+        service_info *service,
+        Upnp_LogLevel level,
+        Dbg_Module module)
 {
         while (service) {
                 if (service->serviceType) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -468,7 +482,8 @@ void printServiceList(
                                 service->serviceType);
                 }
                 if (service->serviceId) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -476,7 +491,8 @@ void printServiceList(
                                 service->serviceId);
                 }
                 if (service->SCPDURL) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -484,7 +500,8 @@ void printServiceList(
                                 service->SCPDURL);
                 }
                 if (service->controlURL) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -492,7 +509,8 @@ void printServiceList(
                                 service->controlURL);
                 }
                 if (service->eventURL) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -500,7 +518,8 @@ void printServiceList(
                                 service->eventURL);
                 }
                 if (service->UDN) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -508,13 +527,15 @@ void printServiceList(
                                 service->UDN);
                 }
                 if (service->active) {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
                                 "Service is active\n");
                 } else {
-                        UpnpPrintf(level,
+                        UpnpPrintf(p,
+                                level,
                                 module,
                                 __FILE__,
                                 __LINE__,
@@ -540,17 +561,20 @@ void printServiceList(
  * Return: void
  ************************************************************************/
 #ifdef DEBUG
-void printServiceTable(
-        service_table *table, Upnp_LogLevel level, Dbg_Module module)
+void printServiceTable(UpnpLib *p,
+        service_table *table,
+        Upnp_LogLevel level,
+        Dbg_Module module)
 {
-        UpnpPrintf(level,
+        UpnpPrintf(p,
+                level,
                 module,
                 __FILE__,
                 __LINE__,
                 "URL_BASE: %s\n",
                 table->URLBase);
-        UpnpPrintf(level, module, __FILE__, __LINE__, "Services: \n");
-        printServiceList(table->serviceList, level, module);
+        UpnpPrintf(p, level, module, __FILE__, __LINE__, "Services: \n");
+        printServiceList(p, table->serviceList, level, module);
 }
 #endif
 
@@ -826,12 +850,14 @@ service_info *getServiceList(
                                                   controlURL)) ||
                                         !(current->controlURL = resolve_rel_url(
                                                   p, URLBase, tempDOMString))) {
-                                        UpnpPrintf(UPNP_INFO,
+                                        UpnpPrintf(p,
+                                                UPNP_INFO,
                                                 GENA,
                                                 __FILE__,
                                                 __LINE__,
                                                 "BAD OR MISSING CONTROL URL");
-                                        UpnpPrintf(UPNP_INFO,
+                                        UpnpPrintf(p,
+                                                UPNP_INFO,
                                                 GENA,
                                                 __FILE__,
                                                 __LINE__,
@@ -849,12 +875,14 @@ service_info *getServiceList(
                                                   eventURL)) ||
                                         !(current->eventURL = resolve_rel_url(
                                                   p, URLBase, tempDOMString))) {
-                                        UpnpPrintf(UPNP_INFO,
+                                        UpnpPrintf(p,
+                                                UPNP_INFO,
                                                 GENA,
                                                 __FILE__,
                                                 __LINE__,
                                                 "BAD OR MISSING EVENT URL");
-                                        UpnpPrintf(UPNP_INFO,
+                                        UpnpPrintf(p,
+                                                UPNP_INFO,
                                                 GENA,
                                                 __FILE__,
                                                 __LINE__,

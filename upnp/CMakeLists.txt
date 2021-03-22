@@ -15,12 +15,12 @@ set (UPNP_SOURCES
 	src/api/UpnpEventSubscribe.c
 	src/api/UpnpExtraHeaders.c
 	src/api/UpnpFileInfo.c
-	src/api/UpnpStateVarComplete.c
+        src/api/UpnpLog.c
+        src/api/UpnpStateVarComplete.c
 	src/api/UpnpStateVarRequest.c
 	src/api/UpnpSubscriptionRequest.c
 	src/api/UpnpString.cpp
 	src/api/upnpapi.cpp
-	src/api/upnpdebug.c
 	src/genlib/client_table/GenlibClientSubscription.c
 	src/genlib/client_table/client_table.c
 	src/genlib/miniserver/miniserver.c
@@ -127,7 +127,7 @@ list (APPEND UPNP_HEADERS
 	inc/UpnpString.h
 	inc/UpnpSubscriptionRequest.h
 	inc/UpnpUniStd.h
-	${CMAKE_CURRENT_SOURCE_DIR}/inc/upnpdebug.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/inc/UpnpLog.h
 	${PUPNP_BINARY_DIR}/upnp/inc/upnpconfig.h
 )
 

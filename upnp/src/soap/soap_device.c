@@ -146,7 +146,8 @@ static void send_error_response(
                 hmsg->major_version, hmsg->minor_version, &major, &minor);
         /* make headers */
         membuffer_init(&headers);
-        if (http_MakeMessage(&headers,
+        if (http_MakeMessage(p,
+                    &headers,
                     major,
                     minor,
                     "RNsDsSXcc"
@@ -209,7 +210,8 @@ static UPNP_INLINE void send_var_query_response(
                 strlen(start_body) + strlen(var_value) + strlen(end_body));
         /* make headers */
         membuffer_init(&response);
-        if (http_MakeMessage(&response,
+        if (http_MakeMessage(p,
+                    &response,
                     major,
                     minor,
                     "RNsDsSXcc"
@@ -271,7 +273,8 @@ static UPNP_INLINE void send_action_response(
         content_length = (off_t)(
                 strlen(start_body) + strlen(xml_response) + strlen(end_body));
         /* make headers */
-        if (http_MakeMessage(&headers,
+        if (http_MakeMessage(p,
+                    &headers,
                     major,
                     minor,
                     "RNsDsSXcc",
@@ -296,7 +299,8 @@ static UPNP_INLINE void send_action_response(
                 end_body,
                 strlen(end_body));
         if (ret_code != 0) {
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         SOAP,
                         __FILE__,
                         __LINE__,
@@ -356,7 +360,8 @@ static UPNP_INLINE void handle_query_variable(
         /* send event */
         soap_info->callback(
                 p, UPNP_CONTROL_GET_VAR_REQUEST, variable, soap_info->cookie);
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 SOAP,
                 __FILE__,
                 __LINE__,
@@ -451,7 +456,8 @@ static void handle_invoke_action(
                 goto error_handler;
         }
 
-        UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
+        UpnpPrintf(
+                p, UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
         soap_info->callback(
                 p, UPNP_CONTROL_ACTION_REQUEST, action, soap_info->cookie);
         err_code = UpnpActionRequest_get_ErrCode(action);

@@ -30,8 +30,8 @@
  *************************************************************************/
 #include "upnpconfig.h"
 
+#include "UpnpLog.h"
 #include "upnp.h"
-#include "upnpdebug.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,53 +41,68 @@ int main()
 {
 #if UPNP_HAVE_DEBUG
         int i;
+        /* Hopefully big enough buffer */
+        static char upnplib_buffer[4096];
+        UpnpLib *p = (UpnpLib *)&upnplib_buffer;
 
+        if (!p) {
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        "Insuficient memory!\n");
+                exit(1);
+        }
         /* Try a few random calls (let's crash it...) */
-        UpnpCloseLog();
-        UpnpCloseLog();
-        UpnpPrintf(UPNP_CRITICAL,
+        UpnpCloseLog(p);
+        UpnpCloseLog(p);
+        UpnpPrintf(p,
+                UPNP_CRITICAL,
                 API,
                 __FILE__,
                 __LINE__,
-                "This should not be printed !\n");
-        FILE *fp = UpnpGetDebugFile(UPNP_CRITICAL, API);
+                "This should not be printed!\n");
+        FILE *fp = UpnpGetDebugFile(p, UPNP_CRITICAL, API);
         if (fp) {
-                fprintf(stderr, "Log FP not NULL before init was called !\n");
+                fprintf(stderr, "Log FP not NULL before init was called!\n");
                 exit(1);
         }
 
         /* Let's really init. Request log to stderr */
-        UpnpSetLogFileNames(NULL, NULL);
-        UpnpSetLogLevel(UPNP_ERROR);
-        UpnpInitLog();
+        UpnpSetLogFileNames(p, NULL, NULL);
+        UpnpSetLogLevel(p, UPNP_ERROR);
+        UpnpInitLog(p);
 
-        UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__, "Hello LOG !\n");
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p, UPNP_CRITICAL, API, __FILE__, __LINE__, "Hello LOG!\n");
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
-                "This should not be here !\n");
+                "This should not be here!\n");
 
         /* Let's try to a file */
-        UpnpSetLogFileNames("libupnp_err.log", NULL);
-        UpnpInitLog();
-        UpnpPrintf(UPNP_CRITICAL,
+        UpnpSetLogFileNames(p, "libupnp_err.log", 0);
+        UpnpInitLog(p);
+        UpnpPrintf(p,
+                UPNP_CRITICAL,
                 API,
                 __FILE__,
                 __LINE__,
                 "Hello from the log file\n");
 
         /* Close and retry stuff */
-        UpnpCloseLog();
-        UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Not here either!\n");
-        UpnpSetLogFileNames(NULL, NULL);
-        UpnpInitLog();
-        UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__, "I'm back !\n");
+        UpnpCloseLog(p);
+        UpnpPrintf(p, UPNP_INFO, API, __FILE__, __LINE__, "Not here either!\n");
+        UpnpSetLogFileNames(p, 0, 0);
+        UpnpInitLog(p);
+        UpnpPrintf(p, UPNP_CRITICAL, API, __FILE__, __LINE__, "I'm back!\n");
         for (i = 0; i < 10000; i++) {
-                UpnpInitLog();
-                UpnpCloseLog();
+                UpnpInitLog(p);
+                UpnpCloseLog(p);
         }
-        UpnpCloseLog();
+        UpnpCloseLog(p);
 #else
         printf("DEBUG is not configured\n");
 #endif

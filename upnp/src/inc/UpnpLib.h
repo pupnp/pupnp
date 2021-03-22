@@ -33,6 +33,7 @@ typedef struct s_UpnpLib UpnpLib;
 #ifdef UPNP_ENABLE_OPEN_SSL
 #include <openssl/ssl.h>
 #endif
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -363,6 +364,45 @@ EXPORT_SPEC SSL_CTX *UpnpLib_get_gSslCtx(const UpnpLib *p);
 EXPORT_SPEC int UpnpLib_set_gSslCtx(UpnpLib *p, SSL_CTX *n);
 
 #endif
+/*! UpnpLib_get_gLogMutex */
+EXPORT_SPEC const ithread_mutex_t *UpnpLib_get_gLogMutex(const UpnpLib *p);
+/*! UpnpLib_getnc_gLogMutex */
+EXPORT_SPEC ithread_mutex_t *UpnpLib_getnc_gLogMutex(UpnpLib *p);
+/*! UpnpLib_get_gLogMutex */
+EXPORT_SPEC int UpnpLib_set_gLogMutex(UpnpLib *p, const ithread_mutex_t *buf);
+/*! UpnpLib_get_gLogMutex */
+EXPORT_SPEC void UpnpLib_clear_gLogMutex(UpnpLib *p);
+
+/*! UpnpLib_get_gLogLevel */
+EXPORT_SPEC Upnp_LogLevel UpnpLib_get_gLogLevel(const UpnpLib *p);
+/*! UpnpLib_set_gLogLevel */
+EXPORT_SPEC int UpnpLib_set_gLogLevel(UpnpLib *p, Upnp_LogLevel n);
+
+/*! UpnpLib_get_gLogFp */
+EXPORT_SPEC FILE *UpnpLib_get_gLogFp(const UpnpLib *p);
+/*! UpnpLib_set_gLogFp */
+EXPORT_SPEC int UpnpLib_set_gLogFp(UpnpLib *p, FILE *n);
+
+/*! UpnpLib_get_gLogIsStderr */
+EXPORT_SPEC int UpnpLib_get_gLogIsStderr(const UpnpLib *p);
+/*! UpnpLib_set_gLogIsStderr */
+EXPORT_SPEC int UpnpLib_set_gLogIsStderr(UpnpLib *p, int n);
+
+/*! UpnpLib_get_gSetLogWasCalled */
+EXPORT_SPEC int UpnpLib_get_gSetLogWasCalled(const UpnpLib *p);
+/*! UpnpLib_set_gSetLogWasCalled */
+EXPORT_SPEC int UpnpLib_set_gSetLogWasCalled(UpnpLib *p, int n);
+
+/*! UpnpLib_get_gLogInitWasCalled */
+EXPORT_SPEC int UpnpLib_get_gLogInitWasCalled(const UpnpLib *p);
+/*! UpnpLib_set_gLogInitWasCalled */
+EXPORT_SPEC int UpnpLib_set_gLogInitWasCalled(UpnpLib *p, int n);
+
+/*! UpnpLib_get_gLogFileName */
+EXPORT_SPEC char *UpnpLib_get_gLogFileName(const UpnpLib *p);
+/*! UpnpLib_set_gLogFileName */
+EXPORT_SPEC int UpnpLib_set_gLogFileName(UpnpLib *p, char *n);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

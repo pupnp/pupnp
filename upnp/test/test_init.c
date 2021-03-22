@@ -40,7 +40,7 @@
 #if UPNP_HAVE_TOOLS
 #include "upnptools.h"
 #endif
-#include "upnpdebug.h"
+#include "UpnpLog.h"
 
 int main(int argc, char *argv[])
 {
@@ -110,23 +110,25 @@ int main(int argc, char *argv[])
         printf("\n");
         printf("Initializing UPnP ... \n");
         unlink(log_file_name);
-        UpnpSetLogFileNames(log_file_name, 0);
         p = 0;
-        rc = UpnpInit2(&p, NULL, 0);
+        rc = UpnpInit2(&p, NULL, 0, log_file_name);
         if (UPNP_E_SUCCESS == rc) {
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
                         "Will call UpnpGetServerIpAddress(p);\n");
                 const char *ip_address = UpnpGetServerIpAddress(p);
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
                         "Will call UpnpGetServerPort(p);\n");
                 unsigned short port = UpnpGetServerPort(p);
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
@@ -137,7 +139,8 @@ int main(int argc, char *argv[])
                         (ip_address ? ip_address : "UNKNOWN"),
                         port);
         } else {
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
@@ -145,7 +148,8 @@ int main(int argc, char *argv[])
                         rc);
                 printf("** ERROR UpnpInit2(): %d", rc);
 #if UPNP_HAVE_TOOLS
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,

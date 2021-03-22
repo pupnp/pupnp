@@ -93,6 +93,8 @@ int http_FixStrUrl(
  * 	\li \c UPNP_E_SOCKET_CONNECT
  */
 SOCKET http_Connect(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] URL containing destination information. */
         uri_type *destination_url,
         /*! [out] Fixed and corrected URL. */
@@ -484,6 +486,8 @@ EXPORT_SPEC int http_ReadHttpResponse(
  *             allocated.
  */
 EXPORT_SPEC int http_CloseHttpConnection(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The handle of the connection to close, created by the call to
          * \b UpnpOpenHttpPost. */
         void *handle);
@@ -555,6 +559,8 @@ X-User-Agent: useragent \endverbatim
  * 	\li \c UPNP_E_INVALID_URL
  */
 int http_MakeMessage(
+        /*! Library handle. */
+        UpnpLib *LibraryHandle,
         /* [in,out] Buffer with the contents of the message. */
         membuffer *buf,
         /* [in] HTTP major version. */

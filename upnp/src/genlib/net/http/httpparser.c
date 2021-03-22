@@ -45,11 +45,11 @@
 #include "httpparser.h"
 
 #include "UpnpExtraHeaders.h"
+#include "UpnpLog.h"
 #include "list.h"
 #include "statcodes.h"
 #include "strintmap.h"
 #include "unixutil.h"
-#include "upnpdebug.h"
 
 #include <assert.h>
 #include <ctype.h>
@@ -1761,7 +1761,8 @@ static UPNP_INLINE parse_status_t parser_parse_chunky_entity(
         status = match(p, scanner, "%x%L%c", &parser->chunk_size, &dummy);
         if (status != (parse_status_t)PARSE_OK) {
                 scanner->cursor = save_pos;
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         HTTP,
                         __FILE__,
                         __LINE__,
@@ -1836,7 +1837,7 @@ static UPNP_INLINE parse_status_t parser_parse_entity_until_close(
  * 	 PARSE_FAILURE
  *	 PARSE_SUCCESS	-- no more reading to do
  ************************************************************************/
-parse_status_t parser_get_entity_read_method(http_parser_t *parser)
+parse_status_t parser_get_entity_read_method(UpnpLib *p, http_parser_t *parser)
 {
         http_message_t *hmsg = &parser->msg;
         int response_code;
@@ -1896,7 +1897,8 @@ parse_status_t parser_get_entity_read_method(http_parser_t *parser)
                 if (raw_find_str(&hdr_value, "chunked") >= 0) {
                         /* read method to use chunked transfer encoding */
                         parser->ent_position = ENTREAD_USING_CHUNKED;
-                        UpnpPrintf(UPNP_INFO,
+                        UpnpPrintf(p,
+                                UPNP_INFO,
                                 HTTP,
                                 __FILE__,
                                 __LINE__,
@@ -1974,7 +1976,7 @@ parse_status_t parser_parse_entity(UpnpLib *p, http_parser_t *parser)
                         break;
 
                 case ENTREAD_DETERMINE_READ_METHOD:
-                        status = parser_get_entity_read_method(parser);
+                        status = parser_get_entity_read_method(p, parser);
                         break;
 
                 default:
@@ -2297,7 +2299,7 @@ void free_http_headers_list(UpnpListHead *list)
 }
 
 #ifdef DEBUG
-void print_http_headers(http_message_t *hmsg)
+void print_http_headers(UpnpLib *p, http_message_t *hmsg)
 {
         ListNode *node;
         /* NNS:	 dlist_node *node; */
@@ -2305,7 +2307,8 @@ void print_http_headers(http_message_t *hmsg)
 
         /* print start line */
         if (hmsg->is_request) {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         HTTP,
                         __FILE__,
                         __LINE__,
@@ -2316,7 +2319,8 @@ void print_http_headers(http_message_t *hmsg)
                         (int)hmsg->uri.pathquery.size,
                         hmsg->uri.pathquery.buff);
         } else {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         HTTP,
                         __FILE__,
                         __LINE__,
@@ -2335,7 +2339,8 @@ void print_http_headers(http_message_t *hmsg)
         while (node != NULL) {
                 header = (http_header_t *)node->item;
                 /* NNS: header = (http_header_t *)node->data; */
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         HTTP,
                         __FILE__,
                         __LINE__,

@@ -553,7 +553,8 @@ static int get_file_info(
         UpnpFileInfo_set_LastModified(info, s.st_mtime);
         rc = get_content_type(p, filename, info);
         aux_LastModified = UpnpFileInfo_get_LastModified(info);
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 HTTP,
                 __FILE__,
                 __LINE__,
@@ -1110,7 +1111,7 @@ static int process_request(
                 UpnpLib_getnc_virtualDirCallback(p);
         membuffer *gDocumentRootDir = UpnpLib_getnc_gDocumentRootDir(p);
 
-        print_http_headers(req);
+        print_http_headers(p, req);
         url = &req->uri;
         assert(req->method == HTTPMETHOD_GET ||
                 req->method == HTTPMETHOD_HEAD ||
@@ -1325,7 +1326,8 @@ static int process_request(
         if (RespInstr->IsRangeActive && RespInstr->IsChunkActive) {
                 /* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
                 /* Transfer-Encoding: chunked */
-                if (http_MakeMessage(headers,
+                if (http_MakeMessage(p,
+                            headers,
                             resp_major,
                             resp_minor,
                             "R"
@@ -1348,7 +1350,8 @@ static int process_request(
                 }
         } else if (RespInstr->IsRangeActive && !RespInstr->IsChunkActive) {
                 /* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
-                if (http_MakeMessage(headers,
+                if (http_MakeMessage(p,
+                            headers,
                             resp_major,
                             resp_minor,
                             "R"
@@ -1373,7 +1376,8 @@ static int process_request(
                 }
         } else if (!RespInstr->IsRangeActive && RespInstr->IsChunkActive) {
                 /* Transfer-Encoding: chunked */
-                if (http_MakeMessage(headers,
+                if (http_MakeMessage(p,
+                            headers,
                             resp_major,
                             resp_minor,
                             "RK"
@@ -1395,7 +1399,8 @@ static int process_request(
         } else {
                 /* !RespInstr->IsRangeActive && !RespInstr->IsChunkActive */
                 if (RespInstr->ReadSendSize >= 0) {
-                        if (http_MakeMessage(headers,
+                        if (http_MakeMessage(p,
+                                    headers,
                                     resp_major,
                                     resp_minor,
                                     "R"
@@ -1419,7 +1424,8 @@ static int process_request(
                                 goto error_handler;
                         }
                 } else {
-                        if (http_MakeMessage(headers,
+                        if (http_MakeMessage(p,
+                                    headers,
                                     resp_major,
                                     resp_minor,
                                     "R"
@@ -1559,14 +1565,15 @@ static int http_RecvPostMessage(
                                 }
                         } else if (num_read == 0) {
                                 if (ok_on_close) {
-                                        UpnpPrintf(UPNP_INFO,
+                                        UpnpPrintf(p,
+                                                UPNP_INFO,
                                                 HTTP,
                                                 __FILE__,
                                                 __LINE__,
                                                 "<<< (RECVD) "
                                                 "<<<\n%s\n-----------------\n",
                                                 parser->msg.msg.buf);
-                                        print_http_headers(&parser->msg);
+                                        print_http_headers(p, &parser->msg);
                                         parser->position = POS_COMPLETE;
                                 } else {
                                         /* partial msg or response */
@@ -1700,7 +1707,8 @@ void web_server_callback(UpnpLib *p,
                         ret = http_RecvPostMessage(
                                 p, parser, info, filename.buf, &RespInstr);
                         /* Send response. */
-                        http_MakeMessage(&headers,
+                        http_MakeMessage(p,
+                                &headers,
                                 1,
                                 1,
                                 "RTLSXcCc",
@@ -1716,7 +1724,8 @@ void web_server_callback(UpnpLib *p,
                                 headers.length);
                         break;
                 default:
-                        UpnpPrintf(UPNP_INFO,
+                        UpnpPrintf(p,
+                                UPNP_INFO,
                                 HTTP,
                                 __FILE__,
                                 __LINE__,
@@ -1724,7 +1733,8 @@ void web_server_callback(UpnpLib *p,
                         assert(0);
                 }
         }
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 HTTP,
                 __FILE__,
                 __LINE__,

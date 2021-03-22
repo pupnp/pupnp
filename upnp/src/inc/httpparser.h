@@ -399,7 +399,7 @@ parse_status_t parser_parse_entity(UpnpLib *p, http_parser_t *parser);
  * 	 PARSE_FAILURE
  *	 PARSE_COMPLETE	-- no more reading to do
  ************************************************************************/
-parse_status_t parser_get_entity_read_method(http_parser_t *parser);
+parse_status_t parser_get_entity_read_method(UpnpLib *p, http_parser_t *parser);
 
 /************************************************************************
  * Function: parser_append
@@ -519,10 +519,12 @@ const char *method_to_str(http_method_t method);
 
 #ifdef DEBUG
 void print_http_headers(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] HTTP Message object. */
         http_message_t *hmsg);
 #else
-#define print_http_headers(hmsg) \
+#define print_http_headers(p, hmsg) \
         do { \
         } while (0)
 #endif
