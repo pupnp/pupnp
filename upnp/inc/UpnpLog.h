@@ -143,7 +143,7 @@ void UpnpCloseLog(
 
 #if defined NDEBUG && !defined UPNP_DEBUG_C
 #define UpnpCloseLog UpnpCloseLog_Inlined
-static UPNP_INLINE void UpnpCloseLog_Inlined(void) {}
+static UPNP_INLINE void UpnpCloseLog_Inlined(UpnpLib *p) {}
 #endif
 
 /*!
