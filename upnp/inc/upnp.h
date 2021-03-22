@@ -544,8 +544,7 @@ extern "C" {
  *     \li \c UPNP_E_INVALID_INTERFACE: IfName is invalid or does not
  *             have a valid IPv4 or IPv6 addresss configured.
  */
-EXPORT_SPEC int UpnpInit2(
-        /*! Library handle. */
+EXPORT_SPEC int UpnpInit2(/*! Library handle. */
         UpnpLib **LibraryHandle,
         /*! The interface name to use by the UPnP SDK operations.
          * Examples: "eth0", "xl0", "Local Area Connection", \c NULL to
@@ -553,7 +552,9 @@ EXPORT_SPEC int UpnpInit2(
         const char *IfName,
         /*!  Local Port to listen for incoming connections.
          * \c NULL will pick an arbitrary free port. */
-        unsigned short DestPort);
+        unsigned short DestPort,
+        /*! Log file name. NULL if no logging. */
+        const char *logFileName);
 
 /*!
  * \brief Initializes the OpenSSL library, and the OpenSSL context for use

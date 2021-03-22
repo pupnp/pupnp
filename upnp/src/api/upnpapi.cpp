@@ -369,8 +369,10 @@ static int UpnpInitStartServers(
         return UPNP_E_SUCCESS;
 }
 
-int UpnpInit2(
-        UpnpLib **LibraryHandle, const char *IfName, unsigned short DestPort)
+int UpnpInit2(UpnpLib **LibraryHandle,
+        const char *IfName,
+        unsigned short DestPort,
+        const char *logFileName)
 {
         int retVal;
         UpnpLib *p = *LibraryHandle;
@@ -381,13 +383,11 @@ int UpnpInit2(
         /* Require that *LibraryHandle is NULL to make sure it is not a
          * reinitialization or something worse. */
         if (p) {
-                UpnpPrintf(p,
-                        UPNP_INFO,
-                        API,
+                printf("%s(%d): UpnpInit2 with IfName=%s, DestPort=%d. Error, "
+                       "Library "
+                       "Handle is not NULL\n",
                         __FILE__,
                         __LINE__,
-                        "UpnpInit2 with IfName=%s, DestPort=%d. Error, Library "
-                        "Handle is not NULL\n",
                         IfName ? IfName : "NULL",
                         DestPort);
                 retVal = UPNP_E_INIT;
@@ -395,6 +395,7 @@ int UpnpInit2(
         }
 
         p = UpnpLib_new();
+        UpnpSetLogFileNames(p, logFileName, 0);
         ithread_mutex_lock(UpnpLib_getnc_gSDKInitMutex(p));
 
         /* Check if we're already initialized. (Should never happen now) */
@@ -474,7 +475,8 @@ void PrintThreadPoolStats(
         /*! [in] The file name that called this function, use the macro
          * __FILE__. */
         const char *DbgFileName,
-        /*! [in] The line number that the function was called, use the macro
+        /*! [in] The line number that the function was called, use the
+         * macro
          * __LINE__. */
         int DbgLineNo,
         /*! [in] The message. */
@@ -705,12 +707,13 @@ const char *UpnpGetServerUlaGuaIp6Address(UpnpLib *p)
 /*!
  * \brief Get a free handle.
  *
- * \return On success, an integer greater than zero or UPNP_E_OUTOF_HANDLE on
- * 	failure.
+ * \return On success, an integer greater than zero or
+ * UPNP_E_OUTOF_HANDLE on failure.
  */
 static int GetFreeHandle(UpnpLib *p)
 {
-        /* Handle 0 is not used as NULL translates to 0 when passed as a handle
+        /* Handle 0 is not used as NULL translates to 0 when passed as a
+         * handle
          */
         int i = 1;
         handle_table_t *HandleTable = UpnpLib_getnc_HandleTable(p);
@@ -843,7 +846,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
                 API,
                 __FILE__,
                 __LINE__,
-                "Following Root Device URL will be used when answering to "
+                "Following Root Device URL will be used when answering "
+                "to "
                 "legacy CPs %s\n",
                 HInfo->LowerDescURL);
         HInfo->Callback = Fun;
@@ -867,7 +871,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
                         API,
                         __FILE__,
                         __LINE__,
-                        "UpnpRegisterRootDevice: error downloading Document: "
+                        "UpnpRegisterRootDevice: error downloading "
+                        "Document: "
                         "%d\n",
                         retVal);
 #ifdef INCLUDE_CLIENT_APIS
@@ -946,7 +951,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
                         API,
                         __FILE__,
                         __LINE__,
-                        "\nUpnpRegisterRootDevice: Empty service table\n");
+                        "\nUpnpRegisterRootDevice: Empty service "
+                        "table\n");
         }
 #endif /* EXCLUDE_GENA */
 
@@ -1062,7 +1068,8 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
                 API,
                 __FILE__,
                 __LINE__,
-                "Following Root Device URL will be used when answering to "
+                "Following Root Device URL will be used when answering "
+                "to "
                 "legacy CPs %s\n",
                 HInfo->LowerDescURL);
         HInfo->aliasInstalled = config_baseURL != 0;
@@ -1116,7 +1123,8 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
                         API,
                         __FILE__,
                         __LINE__,
-                        "UpnpRegisterRootDevice2: No services found for "
+                        "UpnpRegisterRootDevice2: No services found "
+                        "for "
                         "RootDevice\n");
         }
 
@@ -1150,7 +1158,8 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
                         API,
                         __FILE__,
                         __LINE__,
-                        "\nUpnpRegisterRootDevice2: Empty service table\n");
+                        "\nUpnpRegisterRootDevice2: Empty service "
+                        "table\n");
         }
 #endif /* EXCLUDE_GENA */
 
@@ -1260,7 +1269,8 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
                 API,
                 __FILE__,
                 __LINE__,
-                "Following Root Device URL will be used when answering to "
+                "Following Root Device URL will be used when answering "
+                "to "
                 "legacy CPs %s\n",
                 HInfo->LowerDescURL);
         HInfo->Callback = Fun;
@@ -1320,7 +1330,8 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
                         API,
                         __FILE__,
                         __LINE__,
-                        "UpnpRegisterRootDevice4: No services found for "
+                        "UpnpRegisterRootDevice4: No services found "
+                        "for "
                         "RootDevice\n");
         }
 
@@ -1354,7 +1365,8 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
                         API,
                         __FILE__,
                         __LINE__,
-                        "\nUpnpRegisterRootDevice4: Empty service table\n");
+                        "\nUpnpRegisterRootDevice4: Empty service "
+                        "table\n");
         }
 #endif /* EXCLUDE_GENA */
 
@@ -3604,10 +3616,10 @@ int UpnpDownloadXmlDoc(UpnpLib *p, const char *url, IXML_Document **xmlDoc)
                         "Not text/xml\n");
                 /* Linksys WRT54G router returns
                  * "CONTENT-TYPE: application/octet-stream".
-                 * Let's be nice to Linksys and try to parse document anyway.
-                 * If the data sended is not a xml file, ixmlParseBufferEx
-                 * will fail and the function will return UPNP_E_INVALID_DESC
-                 * too. */
+                 * Let's be nice to Linksys and try to parse document
+                 * anyway. If the data sent is not a xml file,
+                 * ixmlParseBufferEx will fail and the function will
+                 * return UPNP_E_INVALID_DESC too. */
 #if 0
 		free(xml_buf);
 		return UPNP_E_INVALID_DESC;
@@ -3632,7 +3644,8 @@ int UpnpDownloadXmlDoc(UpnpLib *p, const char *url, IXML_Document **xmlDoc)
                                 API,
                                 __FILE__,
                                 __LINE__,
-                                "Invalid Description, ixml error code: %d\n",
+                                "Invalid Description, ixml error code: "
+                                "%d\n",
                                 ret_code);
                         return UPNP_E_INVALID_DESC;
                 }
@@ -3769,7 +3782,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                  * big changes (p->gIF_NAME to wchar string?).
                  */
                 if (!ifname_found) {
-                        /* We have found a valid interface name. Keep it. */
+                        /* We have found a valid interface name. Keep
+                         * it. */
                         char tmpIfName[LINE_SIZE];
                         wcstombs(tmpIfName,
                                 adapts_item->FriendlyName,
@@ -3784,7 +3798,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                         if (strncmp(UpnpLib_get_gIF_NAME_cstr(p),
                                     tmpIfName,
                                     LINE_SIZE) != 0) {
-                                /* This is not the interface we're looking for.
+                                /* This is not the interface we're
+                                 * looking for.
                                  */
                                 continue;
                         }
@@ -3803,9 +3818,10 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                                 valid_addr_found = 1;
                                 break;
                         case AF_INET6:
-                                /* TODO: Retrieve IPv6 ULA or GUA address and
-                                 * its prefix */
-                                /* Only keep IPv6 link-local addresses. */
+                                /* TODO: Retrieve IPv6 ULA or GUA
+                                 * address and its prefix */
+                                /* Only keep IPv6 link-local addresses.
+                                 */
                                 if (IN6_IS_ADDR_LINKLOCAL(
                                             &((struct sockaddr_in6 *)ip_addr)
                                                      ->sin6_addr)) {
@@ -3814,15 +3830,17 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                                                                 ip_addr)
                                                          ->sin6_addr,
                                                 sizeof(v6_addr));
-                                        /* TODO: Retrieve IPv6 LLA prefix */
+                                        /* TODO: Retrieve IPv6 LLA
+                                         * prefix */
                                         valid_addr_found = 1;
                                 }
                                 break;
                         default:
                                 if (valid_addr_found == 0) {
-                                        /* Address is not IPv4 or IPv6 and no
-                                         * valid address has  */
-                                        /* yet been found for this interface.
+                                        /* Address is not IPv4 or IPv6
+                                         * and no valid address has  */
+                                        /* yet been found for this
+                                         * interface.
                                          * Discard interface name. */
                                         ifname_found = 0;
                                 }
@@ -3844,7 +3862,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                         API,
                         __FILE__,
                         __LINE__,
-                        "Failed to find an adapter with valid IP addresses for "
+                        "Failed to find an adapter with valid IP "
+                        "addresses for "
                         "use.\n");
                 return UPNP_E_INVALID_INTERFACE;
         }
@@ -3874,7 +3893,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                 if (strlen(IfName) >= MAX_IF_NAME_SIZE) {
                         return UPNP_E_INVALID_INTERFACE;
                 }
-                /* strncpy() zero fills the remaining destination bytes. */
+                /* strncpy() zero fills the remaining destination bytes.
+                 */
                 UpnpLib_strcpy_gIF_NAME(p, IfName);
                 ifname_found = 1;
         }
@@ -3885,7 +3905,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                         API,
                         __FILE__,
                         __LINE__,
-                        "getifaddrs failed to find list of addresses\n");
+                        "getifaddrs failed to find list of "
+                        "addresses\n");
                 return UPNP_E_INIT;
         }
         /* cycle through available interfaces and their addresses. */
@@ -3909,7 +3930,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                         if (strncmp(UpnpLib_get_gIF_NAME_cstr(p),
                                     ifa->ifa_name,
                                     MAX_IF_NAME_SIZE) != 0) {
-                                /* Not the interface we're looking for. */
+                                /* Not the interface we're looking for.
+                                 */
                                 continue;
                         }
                 }
@@ -3975,10 +3997,10 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                         if (IfName == NULL && valid_v4_addr_found == 0 &&
                                 valid_v6ulagua_addr_found == 0 &&
                                 valid_v6_addr_found == 0) {
-                                /* Address is not IPv4 or IPv6 and no valid
-                                 * address has  */
-                                /* yet been found for this interface. Discard
-                                 * interface name. */
+                                /* Address is not IPv4 or IPv6 and no
+                                 * valid address has  */
+                                /* yet been found for this interface.
+                                 * Discard interface name. */
                                 ifname_found = 0;
                         }
                         break;
@@ -3994,7 +4016,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                         API,
                         __FILE__,
                         __LINE__,
-                        "Failed to find an adapter with valid IP addresses for "
+                        "Failed to find an adapter with valid IP "
+                        "addresses for "
                         "use.\n");
                 return UPNP_E_INVALID_INTERFACE;
         }
@@ -4048,7 +4071,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                 API,
                 __FILE__,
                 __LINE__,
-                "Interface name=%s, index=%d, v4=%s, v6=%s, ULA or GUA v6=%s\n",
+                "Interface name=%s, index=%d, v4=%s, v6=%s, ULA or GUA "
+                "v6=%s\n",
                 UpnpLib_get_gIF_NAME_cstr(p),
                 UpnpLib_get_gIF_INDEX(p),
                 UpnpLib_get_gIF_IPV4_cstr(p),
@@ -4423,8 +4447,8 @@ int UpnpAddVirtualDir(UpnpLib *p,
                 }
                 strncpy(dirName, newDirName, sizeof(dirName));
         }
-        /* dirName is now properly filled. All .dirName fields have the same
-         * size, so strncpy() properly zero fills everything. */
+        /* dirName is now properly filled. All .dirName fields have the
+         * same size, so strncpy() properly zero fills everything. */
 
         pCurVirtualDir = pVirtualDirList;
         while (pCurVirtualDir) {
