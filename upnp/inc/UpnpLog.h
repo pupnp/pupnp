@@ -169,8 +169,9 @@ void UpnpSetLogFileNames(
 #if defined NDEBUG && !defined UPNP_DEBUG_C
 #define UpnpSetLogFileNames UpnpSetLogFileNames_Inlined
 static UPNP_INLINE void UpnpSetLogFileNames_Inlined(
-        const char *ErrFileName, const char *ignored)
+        UpnpLib *p, const char *ErrFileName, const char *ignored)
 {
+        (void)p;
         (void)ErrFileName;
         (void)ignored;
         return;
