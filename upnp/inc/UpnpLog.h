@@ -116,7 +116,9 @@ int UpnpInitLog(
 #define UpnpInitLog UpnpInitLog_Inlined
 static UPNP_INLINE int UpnpInitLog_Inlined(UpnpLib *p)
 {
-        return UPNP_E_SUCCESS;
+        (void)p;
+
+        return 0;
 }
 #endif
 /*!
