@@ -492,6 +492,7 @@ int http_SendMessage(
         int RetVal = 0;
         size_t buf_length;
         size_t num_written;
+        int I_fmt_processed = 0;
         struct VirtualDirCallbacks *virtualDirCallback =
                 UpnpLib_getnc_virtualDirCallback(p);
 
@@ -501,7 +502,8 @@ int http_SendMessage(
         va_start(argp, fmt);
         while ((c = *fmt++)) {
 #if EXCLUDE_WEB_SERVER == 0
-                if (c == 'I') {
+                if (c == 'I' && !I_fmt_processed) {
+                        I_fmt_processed = 1;
                         Instr = va_arg(argp, struct SendInstruction *);
                         if (Instr->ReadSendSize >= 0)
                                 amount_to_be_read = Instr->ReadSendSize;
