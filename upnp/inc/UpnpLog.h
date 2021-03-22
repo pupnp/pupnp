@@ -114,7 +114,10 @@ int UpnpInitLog(
 
 #if defined NDEBUG && !defined UPNP_DEBUG_C
 #define UpnpInitLog UpnpInitLog_Inlined
-static UPNP_INLINE int UpnpInitLog_Inlined(void) { return UPNP_E_SUCCESS; }
+static UPNP_INLINE int UpnpInitLog_Inlined(UpnpLib *p)
+{
+        return UPNP_E_SUCCESS;
+}
 #endif
 /*!
  * \brief Set the log level (see \c Upnp_LogLevel).
@@ -127,8 +130,10 @@ void UpnpSetLogLevel(
 
 #if defined NDEBUG && !defined UPNP_DEBUG_C
 #define UpnpSetLogLevel UpnpSetLogLevel_Inlined
-static UPNP_INLINE void UpnpSetLogLevel_Inlined(Upnp_LogLevel log_level)
+static UPNP_INLINE void UpnpSetLogLevel_Inlined(
+        UpnpLib *p, Upnp_LogLevel log_level)
 {
+        (void)p;
         (void)log_level;
         return;
 }
@@ -143,7 +148,7 @@ void UpnpCloseLog(
 
 #if defined NDEBUG && !defined UPNP_DEBUG_C
 #define UpnpCloseLog UpnpCloseLog_Inlined
-static UPNP_INLINE void UpnpCloseLog_Inlined(UpnpLib *p) {}
+static UPNP_INLINE void UpnpCloseLog_Inlined(UpnpLib *p) { (void)p; }
 #endif
 
 /*!
