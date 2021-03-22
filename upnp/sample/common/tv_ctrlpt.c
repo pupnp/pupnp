@@ -1306,7 +1306,7 @@ int TvCtrlPointStart(UpnpLib **LibraryHandle,
         if (combo) {
                 p = *LibraryHandle;
         } else {
-                rc = UpnpInit2(&p, iface, port);
+                rc = UpnpInit2(&p, iface, port, 0);
                 if (rc != UPNP_E_SUCCESS) {
                         SampleUtil_Print(
                                 "TvCtrlPointStart: UpnpInit2() Error: %d\n",

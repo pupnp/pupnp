@@ -111,9 +111,8 @@ int main(int argc, char *argv[])
         printf("Initializing UPnP ... \n");
         unlink(log_file_name);
         p = 0;
-        rc = UpnpInit2(&p, NULL, 0);
+        rc = UpnpInit2(&p, NULL, 0, log_file_name);
         if (UPNP_E_SUCCESS == rc) {
-                UpnpSetLogFileNames(p, log_file_name, 0);
                 UpnpPrintf(p,
                         UPNP_INFO,
                         API,

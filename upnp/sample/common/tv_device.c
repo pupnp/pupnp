@@ -1437,7 +1437,7 @@ int TvDeviceStart(UpnpLib **pp,
         /* If you want logging, enable it here. */
         /* UpnpSetLogFileNames(0, 0); */
         p = 0;
-        ret = UpnpInit2(&p, iface, port);
+        ret = UpnpInit2(&p, iface, port, 0);
         if (ret != UPNP_E_SUCCESS) {
                 SampleUtil_Print("Error with UpnpInit2 -- %d\n", ret);
                 UpnpFinish(p);

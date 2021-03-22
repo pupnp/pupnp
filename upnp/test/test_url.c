@@ -162,7 +162,7 @@ int main()
          * and as this test does DNS lookups it will fail otherwise
          */
         p = 0;
-        UpnpInit2(&p, NULL, 0);
+        UpnpInit2(&p, NULL, 0, 0);
 
         for (i = 0; i < (int)ARRAY_SIZE(RFC3986); i++)
                 ret += result(p, &RFC3986[i]);
