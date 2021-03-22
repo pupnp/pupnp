@@ -561,7 +561,8 @@ int SoapSendAction(UpnpLib *p,
 
         err_code = UPNP_E_OUTOF_MEMORY; /* default error */
 
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 SOAP,
                 __FILE__,
                 __LINE__,
@@ -586,7 +587,8 @@ int SoapSendAction(UpnpLib *p,
                 goto error_handler;
         }
 
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 SOAP,
                 __FILE__,
                 __LINE__,
@@ -603,7 +605,8 @@ int SoapSendAction(UpnpLib *p,
         /* make request msg */
         request.size_inc = 50;
         content_length = (off_t)(xml_start_len + action_str_len + xml_end_len);
-        if (http_MakeMessage(&request,
+        if (http_MakeMessage(p,
+                    &request,
                     1,
                     1,
                     "q"
@@ -735,7 +738,8 @@ int SoapSendActionEx(UpnpLib *p,
 
         err_code = UPNP_E_OUTOF_MEMORY; /* default error */
 
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 SOAP,
                 __FILE__,
                 __LINE__,
@@ -765,7 +769,8 @@ int SoapSendActionEx(UpnpLib *p,
                 goto error_handler;
         }
 
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 SOAP,
                 __FILE__,
                 __LINE__,
@@ -789,7 +794,8 @@ int SoapSendActionEx(UpnpLib *p,
         content_length = (off_t)(xml_start_len + xml_header_start_len +
                 xml_header_str_len + xml_header_end_len + xml_body_start_len +
                 action_str_len + xml_end_len);
-        if (http_MakeMessage(&request,
+        if (http_MakeMessage(p,
+                    &request,
                     1,
                     1,
                     "q"
@@ -923,7 +929,8 @@ int SoapGetServiceVarStatus(
         request.size_inc = 50;
         content_length =
                 (off_t)(strlen(xml_start) + strlen(var_name) + strlen(xml_end));
-        if (http_MakeMessage(&request,
+        if (http_MakeMessage(p,
+                    &request,
                     1,
                     1,
                     "Q"

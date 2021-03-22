@@ -49,6 +49,8 @@
 #include <openssl/ssl.h>
 #endif
 
+typedef struct s_UpnpLib UpnpLib;
+
 /* The following are not defined under winsock.h */
 #ifndef SD_RECEIVE
 #define SD_RECEIVE 0x00
@@ -83,8 +85,9 @@ static UPNP_INLINE int sock_close(
 {
         int ret = -1;
 
-        if (sock != INVALID_SOCKET)
+        if (sock != INVALID_SOCKET) {
                 ret = UpnpCloseSocket(sock);
+        }
 
         return ret;
 }
@@ -147,6 +150,8 @@ int sock_ssl_connect(
  * \li \c UPNP_E_SUCCESS on success.
  */
 int sock_destroy(
+        /*! Library Handle. */
+        UpnpLib *p,
         /*! [in,out] Socket Information Object. */
         SOCKINFO *info,
         /*! [in] How to shutdown the socket. Used by sockets's shutdown(). */

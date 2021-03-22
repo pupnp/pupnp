@@ -247,13 +247,14 @@ static int UpnpInitPreamble(UpnpLib *p)
         srand((unsigned int)time(NULL));
 
         /* Initialize debug output. */
-        retVal = UpnpInitLog();
+        retVal = UpnpInitLog(p);
         if (retVal != UPNP_E_SUCCESS) {
                 /* UpnpInitLog does not return a valid UPNP_E_*. */
                 return UPNP_E_INIT_FAILED;
         }
 
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
@@ -325,7 +326,8 @@ static int UpnpInitStartServers(
         int retVal = 0;
 #endif
 
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
@@ -337,7 +339,8 @@ static int UpnpInitStartServers(
         UpnpLib_set_LOCAL_PORT_V6_ULA_GUA(p, DestPort);
         retVal = StartMiniServer(p);
         if (retVal != UPNP_E_SUCCESS) {
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -356,7 +359,8 @@ static int UpnpInitStartServers(
         }
 #endif
 
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
@@ -377,7 +381,8 @@ int UpnpInit2(
         /* Require that *LibraryHandle is NULL to make sure it is not a
          * reinitialization or something worse. */
         if (p) {
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
@@ -404,7 +409,8 @@ int UpnpInit2(
                 goto exit_function;
         }
 
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
@@ -461,6 +467,8 @@ int UpnpInitSslContext(
  * \brief Prints thread pool statistics.
  */
 void PrintThreadPoolStats(
+        /*! Library Handle. */
+        UpnpLib *p,
         /*! [in] The thread pool. */
         ThreadPool *tp,
         /*! [in] The file name that called this function, use the macro
@@ -474,7 +482,8 @@ void PrintThreadPoolStats(
 {
         ThreadPoolStats stats;
         ThreadPoolGetStats(tp, &stats);
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 DbgFileName,
                 DbgLineNo,
@@ -531,28 +540,33 @@ int UpnpFinish(UpnpLib *p)
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 return UPNP_E_FINISH;
         }
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
                 "Inside UpnpFinish: UpnpSdkInit is %d\n",
                 UpnpLib_get_UpnpSdkInit(p));
         if (UpnpLib_get_UpnpSdkInit(p) == 1) {
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
                         "UpnpFinish: UpnpSdkInit is ONE\n");
         }
-        PrintThreadPoolStats(UpnpLib_getnc_gSendThreadPool(p),
+        PrintThreadPoolStats(p,
+                UpnpLib_getnc_gSendThreadPool(p),
                 __FILE__,
                 __LINE__,
                 "Send Thread Pool");
-        PrintThreadPoolStats(UpnpLib_getnc_gRecvThreadPool(p),
+        PrintThreadPoolStats(p,
+                UpnpLib_getnc_gRecvThreadPool(p),
                 __FILE__,
                 __LINE__,
                 "Recv Thread Pool");
-        PrintThreadPoolStats(UpnpLib_getnc_gMiniServerThreadPool(p),
+        PrintThreadPoolStats(p,
+                UpnpLib_getnc_gMiniServerThreadPool(p),
                 __FILE__,
                 __LINE__,
                 "MiniServer Thread Pool");
@@ -573,23 +587,26 @@ int UpnpFinish(UpnpLib *p)
 #endif
         TimerThreadShutdown(UpnpLib_getnc_gTimerThread(p));
 #if EXCLUDE_MINISERVER == 0
-        StopMiniServer();
+        StopMiniServer(p);
 #endif
 #if EXCLUDE_WEB_SERVER == 0
         web_server_destroy(p);
 #endif
         ThreadPoolShutdown(UpnpLib_getnc_gMiniServerThreadPool(p));
-        PrintThreadPoolStats(UpnpLib_getnc_gMiniServerThreadPool(p),
+        PrintThreadPoolStats(p,
+                UpnpLib_getnc_gMiniServerThreadPool(p),
                 __FILE__,
                 __LINE__,
                 "MiniServer Thread Pool");
         ThreadPoolShutdown(UpnpLib_getnc_gRecvThreadPool(p));
-        PrintThreadPoolStats(UpnpLib_getnc_gRecvThreadPool(p),
+        PrintThreadPoolStats(p,
+                UpnpLib_getnc_gRecvThreadPool(p),
                 __FILE__,
                 __LINE__,
                 "Send Thread Pool");
         ThreadPoolShutdown(UpnpLib_getnc_gSendThreadPool(p));
-        PrintThreadPoolStats(UpnpLib_getnc_gRecvThreadPool(p),
+        PrintThreadPoolStats(p,
+                UpnpLib_getnc_gRecvThreadPool(p),
                 __FILE__,
                 __LINE__,
                 "Recv Thread Pool");
@@ -601,13 +618,14 @@ int UpnpFinish(UpnpLib *p)
         /* remove all virtual dirs */
         UpnpRemoveAllVirtualDirs(p);
         UpnpLib_set_UpnpSdkInit(p, 0);
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
                 "Exiting UpnpFinish: UpnpSdkInit is :%d:\n",
                 UpnpLib_get_UpnpSdkInit(p));
-        UpnpCloseLog();
+        UpnpCloseLog(p);
         /* Clean-up ithread library resources */
         ithread_cleanup_library();
 
@@ -721,21 +739,24 @@ static int FreeHandle(
         int ret = UPNP_E_INVALID_HANDLE;
         handle_table_t *HandleTable = UpnpLib_getnc_HandleTable(p);
 
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
                 "FreeHandle: entering, Handle is %d\n",
                 Upnp_Handle);
         if (Upnp_Handle < 1 || Upnp_Handle >= HANDLE_TABLE_MAX_NUM_ELEMENTS) {
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
                         "FreeHandle: Handle %d is out of range\n",
                         Upnp_Handle);
         } else if (!HandleTable->handle[Upnp_Handle]) {
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -746,7 +767,8 @@ static int FreeHandle(
                 HandleTable->handle[Upnp_Handle] = NULL;
                 ret = UPNP_E_SUCCESS;
         }
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -772,7 +794,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
 
         HandleLock();
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -803,7 +826,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
         memset(HInfo, 0, sizeof(struct Handle_Info));
         HandleTable->handle[*Hnd] = HInfo;
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -814,7 +838,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
         HInfo->HType = HND_DEVICE;
         strncpy(HInfo->DescURL, DescUrl, sizeof(HInfo->DescURL) - 1);
         strncpy(HInfo->LowerDescURL, DescUrl, sizeof(HInfo->LowerDescURL) - 1);
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -837,7 +862,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
 
         retVal = UpnpDownloadXmlDoc(p, HInfo->DescURL, &(HInfo->DescDocument));
         if (retVal != UPNP_E_SUCCESS) {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -850,7 +876,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
                 FreeHandle(p, *Hnd);
                 goto exit_function;
         }
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -866,7 +893,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
 #endif /* INCLUDE_CLIENT_APIS */
                 ixmlDocument_free(HInfo->DescDocument);
                 FreeHandle(p, *Hnd);
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -879,7 +907,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
         HInfo->ServiceList = ixmlDocument_getElementsByTagName(
                 HInfo->DescDocument, "serviceList");
         if (!HInfo->ServiceList) {
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -891,7 +920,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
         /*
          * GENA SET UP
          */
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -902,15 +932,17 @@ int UpnpRegisterRootDevice(UpnpLib *p,
                 &HInfo->ServiceTable,
                 HInfo->DescURL);
         if (hasServiceTable) {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
                         "UpnpRegisterRootDevice: GENA Service Table\n"
                         "Here are the known services:\n");
-                printServiceTable(&HInfo->ServiceTable, UPNP_ALL, API);
+                printServiceTable(p, &HInfo->ServiceTable, UPNP_ALL, API);
         } else {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -923,7 +955,8 @@ int UpnpRegisterRootDevice(UpnpLib *p,
         retVal = UPNP_E_SUCCESS;
 
 exit_function:
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -975,7 +1008,8 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
 
         HandleLock();
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1023,7 +1057,8 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
         strncpy(HInfo->LowerDescURL,
                 HInfo->DescURL,
                 sizeof(HInfo->LowerDescURL) - 1);
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1045,7 +1080,8 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
         HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
         HInfo->DeviceAf = AF_INET;
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1061,7 +1097,8 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
 #endif /* INCLUDE_CLIENT_APIS */
                 ixmlDocument_free(HInfo->DescDocument);
                 FreeHandle(p, *Hnd);
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -1074,7 +1111,8 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
         HInfo->ServiceList = ixmlDocument_getElementsByTagName(
                 HInfo->DescDocument, "serviceList");
         if (!HInfo->ServiceList) {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -1086,7 +1124,8 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
         /*
          * GENA SET UP
          */
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1097,15 +1136,17 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
                 &HInfo->ServiceTable,
                 HInfo->DescURL);
         if (hasServiceTable) {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
                         "UpnpRegisterRootDevice2: GENA Service Table\n"
                         "Here are the known services: \n");
-                printServiceTable(&HInfo->ServiceTable, UPNP_ALL, API);
+                printServiceTable(p, &HInfo->ServiceTable, UPNP_ALL, API);
         } else {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -1118,7 +1159,8 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
         retVal = UPNP_E_SUCCESS;
 
 exit_function:
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1138,7 +1180,8 @@ int UpnpRegisterRootDevice3(UpnpLib *p,
         UpnpDevice_Handle *Hnd,
         int AddressFamily)
 {
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1166,7 +1209,8 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
 
         HandleLock();
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1193,7 +1237,8 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
         }
         memset(HInfo, 0, sizeof(struct Handle_Info));
         HandleTable->handle[*Hnd] = HInfo;
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1210,7 +1255,8 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
                 strncpy(HInfo->LowerDescURL,
                         LowerDescUrl,
                         sizeof(HInfo->LowerDescURL) - 1);
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1238,7 +1284,8 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
                 FreeHandle(p, *Hnd);
                 goto exit_function;
         }
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1254,7 +1301,8 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
 #endif /* INCLUDE_CLIENT_APIS */
                 ixmlDocument_free(HInfo->DescDocument);
                 FreeHandle(p, *Hnd);
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -1267,7 +1315,8 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
         HInfo->ServiceList = ixmlDocument_getElementsByTagName(
                 HInfo->DescDocument, "serviceList");
         if (!HInfo->ServiceList) {
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -1279,7 +1328,8 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
         /*
          * GENA SET UP
          */
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1290,15 +1340,17 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
                 &HInfo->ServiceTable,
                 HInfo->DescURL);
         if (hasServiceTable) {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
                         "UpnpRegisterRootDevice4: GENA Service Table \n"
                         "Here are the known services: \n");
-                printServiceTable(&HInfo->ServiceTable, UPNP_ALL, API);
+                printServiceTable(p, &HInfo->ServiceTable, UPNP_ALL, API);
         } else {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -1317,7 +1369,8 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
         retVal = UPNP_E_SUCCESS;
 
 exit_function:
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1332,7 +1385,8 @@ exit_function:
 #ifdef INCLUDE_DEVICE_APIS
 int UpnpUnRegisterRootDevice(UpnpLib *p, UpnpDevice_Handle Hnd)
 {
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1352,7 +1406,8 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpLib *p,
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 return UPNP_E_FINISH;
         }
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1420,7 +1475,8 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpLib *p,
         FreeHandle(p, Hnd);
         HandleUnlock();
 
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1440,7 +1496,8 @@ int UpnpRegisterClient(
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 return UPNP_E_FINISH;
         }
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1480,7 +1537,8 @@ int UpnpRegisterClient(
                 p, UpnpLib_get_UpnpSdkClientRegistered(p) + 1);
         HandleUnlock();
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1500,7 +1558,8 @@ int UpnpUnRegisterClient(UpnpLib *p, UpnpClient_Handle Hnd)
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 return UPNP_E_FINISH;
         }
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1542,7 +1601,8 @@ int UpnpUnRegisterClient(UpnpLib *p, UpnpClient_Handle Hnd)
                 p, UpnpLib_get_UpnpSdkClientRegistered(p) - 1);
         HandleUnlock();
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1785,7 +1845,8 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
 #if EXCLUDE_SSDP == 0
 int UpnpSendAdvertisement(UpnpLib *p, UpnpDevice_Handle Hnd, int Exp)
 {
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1811,7 +1872,8 @@ int UpnpSendAdvertisementLowPower(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1904,7 +1966,8 @@ int UpnpSendAdvertisementLowPower(UpnpLib *p,
 #endif
 
         HandleUnlock();
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1932,8 +1995,12 @@ int UpnpSearchAsync(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(
-                UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpSearchAsync\n");
+        UpnpPrintf(p,
+                UPNP_ALL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Inside UpnpSearchAsync\n");
 
         HandleReadLock();
         switch (GetHandleInfo(p, Hnd, &SInfo)) {
@@ -1956,7 +2023,8 @@ int UpnpSearchAsync(UpnpLib *p,
         if (retVal != 1)
                 return retVal;
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -1984,7 +2052,8 @@ int UpnpSetMaxSubscriptions(
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2005,7 +2074,8 @@ int UpnpSetMaxSubscriptions(
         SInfo->MaxSubscriptions = MaxSubscriptions;
         HandleUnlock();
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2025,7 +2095,8 @@ int UpnpSetMaxSubscriptionTimeOut(
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2049,7 +2120,8 @@ int UpnpSetMaxSubscriptionTimeOut(
         SInfo->MaxSubscriptionTimeOut = MaxSubscriptionTimeOut;
         HandleUnlock();
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2078,7 +2150,8 @@ int UpnpSubscribeAsync(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2127,7 +2200,8 @@ int UpnpSubscribeAsync(UpnpLib *p,
                 free(Param);
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2149,7 +2223,8 @@ int UpnpSubscribe(UpnpLib *p,
         UpnpString *EvtUrl = UpnpString_new();
         UpnpString *SubsIdTmp = UpnpString_new();
 
-        UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpSubscribe\n");
+        UpnpPrintf(
+                p, UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpSubscribe\n");
 
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 retVal = UPNP_E_FINISH;
@@ -2197,7 +2272,8 @@ int UpnpSubscribe(UpnpLib *p,
         strncpy(SubsId, UpnpString_get_String(SubsIdTmp), sizeof(Upnp_SID) - 1);
 
 exit_function:
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2218,8 +2294,12 @@ int UpnpUnSubscribe(UpnpLib *p, UpnpClient_Handle Hnd, const Upnp_SID SubsId)
         int retVal;
         UpnpString *SubsIdTmp = UpnpString_new();
 
-        UpnpPrintf(
-                UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpUnSubscribe\n");
+        UpnpPrintf(p,
+                UPNP_ALL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Inside UpnpUnSubscribe\n");
 
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 retVal = UPNP_E_FINISH;
@@ -2249,7 +2329,8 @@ int UpnpUnSubscribe(UpnpLib *p, UpnpClient_Handle Hnd, const Upnp_SID SubsId)
         retVal = genaUnSubscribe(p, Hnd, SubsIdTmp);
 
 exit_function:
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2276,7 +2357,8 @@ int UpnpUnSubscribeAsync(UpnpLib *p,
 
         memset(&job, 0, sizeof(job));
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2328,7 +2410,8 @@ int UpnpUnSubscribeAsync(UpnpLib *p,
         }
 
 exit_function:
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2346,7 +2429,8 @@ int UpnpRenewSubscription(
         int retVal;
         UpnpString *SubsIdTmp = UpnpString_new();
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2385,7 +2469,8 @@ int UpnpRenewSubscription(
         retVal = genaRenewSubscription(p, Hnd, SubsIdTmp, TimeOut);
 
 exit_function:
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2416,7 +2501,8 @@ int UpnpRenewSubscriptionAsync(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2464,7 +2550,8 @@ int UpnpRenewSubscriptionAsync(UpnpLib *p,
                 free(Param);
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2494,7 +2581,7 @@ int UpnpNotify(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpNotify\n");
+        UpnpPrintf(p, UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpNotify\n");
 
         HandleReadLock();
         switch (GetHandleInfo(p, Hnd, &SInfo)) {
@@ -2521,7 +2608,8 @@ int UpnpNotify(UpnpLib *p,
         retVal = genaNotifyAll(
                 p, Hnd, DevID, ServName, VarName, NewVal, cVariables);
 
-        UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Exiting UpnpNotify\n");
+        UpnpPrintf(
+                p, UPNP_ALL, API, __FILE__, __LINE__, "Exiting UpnpNotify\n");
 
         return retVal;
 }
@@ -2541,7 +2629,8 @@ int UpnpNotifyExt(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpNotify \n");
+        UpnpPrintf(
+                p, UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpNotify \n");
 
         HandleReadLock();
         switch (GetHandleInfo(p, Hnd, &SInfo)) {
@@ -2563,7 +2652,8 @@ int UpnpNotifyExt(UpnpLib *p,
         HandleUnlock();
         retVal = genaNotifyAllExt(p, Hnd, DevID, ServName, PropSet);
 
-        UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Exiting UpnpNotify \n");
+        UpnpPrintf(
+                p, UPNP_ALL, API, __FILE__, __LINE__, "Exiting UpnpNotify \n");
 
         return retVal;
 }
@@ -2587,7 +2677,8 @@ int UpnpAcceptSubscription(UpnpLib *p,
         char **VarName = (char **)VarName_const;
         char **NewVal = (char **)NewVal_const;
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2646,7 +2737,8 @@ int UpnpAcceptSubscription(UpnpLib *p,
                 p, Hnd, DevID, ServName, VarName, NewVal, cVariables, SubsId);
 
 exit_function:
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 line,
@@ -2669,7 +2761,8 @@ int UpnpAcceptSubscriptionExt(UpnpLib *p,
         char *DevID = (char *)DevID_const;
         char *ServName = (char *)ServName_const;
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2727,7 +2820,8 @@ int UpnpAcceptSubscriptionExt(UpnpLib *p,
         ret = genaInitNotifyExt(p, Hnd, DevID, ServName, PropSet, SubsId);
 
 exit_function:
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 line,
@@ -2766,10 +2860,15 @@ int UpnpSendAction(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(
-                UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpSendAction\n");
+        UpnpPrintf(p,
+                UPNP_ALL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Inside UpnpSendAction\n");
         if (DevUDN_const != NULL) {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -2799,8 +2898,12 @@ int UpnpSendAction(UpnpLib *p,
 
         retVal = SoapSendAction(p, ActionURL, ServiceType, Action, RespNodePtr);
 
-        UpnpPrintf(
-                UPNP_ALL, API, __FILE__, __LINE__, "Exiting UpnpSendAction\n");
+        UpnpPrintf(p,
+                UPNP_ALL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Exiting UpnpSendAction\n");
 
         return retVal;
 }
@@ -2825,8 +2928,12 @@ int UpnpSendActionEx(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(
-                UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpSendActionEx\n");
+        UpnpPrintf(p,
+                UPNP_ALL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Inside UpnpSendActionEx\n");
 
         if (Header == NULL) {
                 retVal = UpnpSendAction(p,
@@ -2859,8 +2966,12 @@ int UpnpSendActionEx(UpnpLib *p,
         retVal = SoapSendActionEx(
                 p, ActionURL, ServiceType, Header, Action, RespNodePtr);
 
-        UpnpPrintf(
-                UPNP_ALL, API, __FILE__, __LINE__, "Exiting UpnpSendAction \n");
+        UpnpPrintf(p,
+                UPNP_ALL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Exiting UpnpSendAction \n");
 
         return retVal;
 }
@@ -2890,7 +3001,8 @@ int UpnpSendActionAsync(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2956,7 +3068,8 @@ int UpnpSendActionAsync(UpnpLib *p,
                 free(Param);
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -2990,7 +3103,8 @@ int UpnpSendActionExAsync(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -3087,7 +3201,8 @@ int UpnpSendActionExAsync(UpnpLib *p,
                 free(Param);
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -3115,7 +3230,8 @@ int UpnpGetServiceVarStatusAsync(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -3160,7 +3276,8 @@ int UpnpGetServiceVarStatusAsync(UpnpLib *p,
                 free(Param);
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -3185,7 +3302,8 @@ int UpnpGetServiceVarStatus(UpnpLib *p,
                 return UPNP_E_FINISH;
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -3212,7 +3330,8 @@ int UpnpGetServiceVarStatus(UpnpLib *p,
         retVal = SoapGetServiceVarStatus(p, ActionURL, VarName, &StVarPtr);
         *StVar = StVarPtr;
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -3262,7 +3381,7 @@ int UpnpCloseHttpPost(UpnpLib *p, void *handle, int *httpStatus, int timeout)
                 /* status = */ http_GetHttpResponse(
                         p, handle, NULL, NULL, NULL, httpStatus, timeout);
         }
-        status = http_CloseHttpConnection(handle);
+        status = http_CloseHttpConnection(p, handle);
         return status;
 }
 
@@ -3358,7 +3477,10 @@ int UpnpOpenHttpGetEx(UpnpLib *p,
 
 int UpnpCancelHttpGet(void *Handle) { return http_CancelHttpGet(Handle); }
 
-int UpnpCloseHttpGet(void *Handle) { return UpnpCloseHttpConnection(Handle); }
+int UpnpCloseHttpGet(UpnpLib *p, void *Handle)
+{
+        return UpnpCloseHttpConnection(p, Handle);
+}
 
 int UpnpReadHttpGet(
         UpnpLib *p, void *Handle, char *buf, size_t *size, int timeout)
@@ -3429,9 +3551,9 @@ int UpnpReadHttpResponse(
         return http_ReadHttpResponse(p, handle, buf, size, timeout);
 }
 
-int UpnpCloseHttpConnection(void *handle)
+int UpnpCloseHttpConnection(UpnpLib *p, void *handle)
 {
-        return http_CloseHttpConnection(handle);
+        return http_CloseHttpConnection(p, handle);
 }
 
 int UpnpDownloadUrlItem(
@@ -3463,7 +3585,8 @@ int UpnpDownloadXmlDoc(UpnpLib *p, const char *url, IXML_Document **xmlDoc)
 
         ret_code = UpnpDownloadUrlItem(p, url, &xml_buf, content_type);
         if (ret_code != UPNP_E_SUCCESS) {
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -3473,8 +3596,12 @@ int UpnpDownloadXmlDoc(UpnpLib *p, const char *url, IXML_Document **xmlDoc)
         }
 
         if (strncasecmp(content_type, "text/xml", strlen("text/xml"))) {
-                UpnpPrintf(
-                        UPNP_INFO, API, __FILE__, __LINE__, "Not text/xml\n");
+                UpnpPrintf(p,
+                        UPNP_INFO,
+                        API,
+                        __FILE__,
+                        __LINE__,
+                        "Not text/xml\n");
                 /* Linksys WRT54G router returns
                  * "CONTENT-TYPE: application/octet-stream".
                  * Let's be nice to Linksys and try to parse document anyway.
@@ -3491,7 +3618,8 @@ int UpnpDownloadXmlDoc(UpnpLib *p, const char *url, IXML_Document **xmlDoc)
         free(xml_buf);
         if (ret_code != IXML_SUCCESS) {
                 if (ret_code == IXML_INSUFFICIENT_MEMORY) {
-                        UpnpPrintf(UPNP_CRITICAL,
+                        UpnpPrintf(p,
+                                UPNP_CRITICAL,
                                 API,
                                 __FILE__,
                                 __LINE__,
@@ -3499,7 +3627,8 @@ int UpnpDownloadXmlDoc(UpnpLib *p, const char *url, IXML_Document **xmlDoc)
                                 ret_code);
                         return UPNP_E_OUTOF_MEMORY;
                 } else {
-                        UpnpPrintf(UPNP_CRITICAL,
+                        UpnpPrintf(p,
+                                UPNP_CRITICAL,
                                 API,
                                 __FILE__,
                                 __LINE__,
@@ -3510,13 +3639,15 @@ int UpnpDownloadXmlDoc(UpnpLib *p, const char *url, IXML_Document **xmlDoc)
         } else {
 #ifdef DEBUG
                 xml_buf = ixmlPrintNode((IXML_Node *)*xmlDoc);
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
                         "Printing the Parsed xml document \n %s\n",
                         xml_buf);
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -3524,7 +3655,8 @@ int UpnpDownloadXmlDoc(UpnpLib *p, const char *url, IXML_Document **xmlDoc)
                         "*****************\n");
                 ixmlFreeDOMString(xml_buf);
 #endif
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -3583,7 +3715,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                 adapts,
                 &adapts_sz);
         if (ret != ERROR_BUFFER_OVERFLOW) {
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -3604,7 +3737,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                 &adapts_sz);
         if (ret != ERROR_SUCCESS) {
                 free(adapts);
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -3705,7 +3839,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
         free(adapts);
         /* Failed to find a valid interface, or valid address. */
         if (ifname_found == 0 || valid_addr_found == 0) {
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -3745,7 +3880,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
         }
         /* Get system interface addresses. */
         if (getifaddrs(&ifap) != 0) {
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -3853,7 +3989,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
         if (ifname_found == 0 ||
                 (valid_v4_addr_found == 0 && valid_v6_addr_found == 0 &&
                         valid_v6ulagua_addr_found == 0)) {
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -3906,7 +4043,8 @@ int UpnpGetIfInfo(UpnpLib *p, const char *IfName)
                 }
         }
 #endif
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 API,
                 __FILE__,
                 __LINE__,
@@ -3929,7 +4067,8 @@ void UpnpThreadDistribution(UpnpLib *p, void *in)
         int errCode = 0;
         struct UpnpNonblockParam *Param = (struct UpnpNonblockParam *)in;
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -4024,7 +4163,8 @@ void UpnpThreadDistribution(UpnpLib *p, void *in)
                 break;
         }
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -4145,7 +4285,8 @@ Upnp_Handle_Type GetHandleInfo(
         handle_table_t *HandleTable = UpnpLib_getnc_HandleTable(p);
         Upnp_Handle_Type ret = HND_INVALID;
 
-        UpnpPrintf(UPNP_ALL,
+        UpnpPrintf(p,
+                UPNP_ALL,
                 API,
                 __FILE__,
                 __LINE__,
@@ -4153,13 +4294,15 @@ Upnp_Handle_Type GetHandleInfo(
                 Hnd);
 
         if (Hnd < 1 || Hnd >= HANDLE_TABLE_MAX_NUM_ELEMENTS) {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
                         "GetHandleInfo: Handle out of range\n");
         } else if (!HandleTable->handle[Hnd]) {
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -4170,8 +4313,12 @@ Upnp_Handle_Type GetHandleInfo(
                 ret = ((struct Handle_Info *)*HndInfo)->HType;
         }
 
-        UpnpPrintf(
-                UPNP_ALL, API, __FILE__, __LINE__, "GetHandleInfo: exiting\n");
+        UpnpPrintf(p,
+                UPNP_ALL,
+                API,
+                __FILE__,
+                __LINE__,
+                "GetHandleInfo: exiting\n");
 
         return ret;
 }
@@ -4183,13 +4330,15 @@ int PrintHandleInfo(UpnpLib *p, UpnpClient_Handle Hnd)
 
         if (HandleTable->handle[Hnd]) {
                 HndInfo = HandleTable->handle[Hnd];
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
                         "Printing information for Handle_%d\n",
                         Hnd);
-                UpnpPrintf(UPNP_ALL,
+                UpnpPrintf(p,
+                        UPNP_ALL,
                         API,
                         __FILE__,
                         __LINE__,
@@ -4200,7 +4349,8 @@ int PrintHandleInfo(UpnpLib *p, UpnpClient_Handle Hnd)
                 case HND_CLIENT:
                         break;
                 default:
-                        UpnpPrintf(UPNP_ALL,
+                        UpnpPrintf(p,
+                                UPNP_ALL,
                                 API,
                                 __FILE__,
                                 __LINE__,

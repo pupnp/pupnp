@@ -141,7 +141,9 @@ int StartMiniServer(
  *
  * \return Always returns 0.
  */
-int StopMiniServer();
+int StopMiniServer(
+        /*! Library Handle. */
+        UpnpLib *p);
 
 #ifdef __cplusplus
 } /* extern C */

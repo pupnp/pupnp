@@ -146,31 +146,36 @@ void ssdp_handle_device_request(
                 maxAge = dev_info->MaxAge;
                 HandleUnlock();
 
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
                         "MAX-AGE     =  %d\n",
                         maxAge);
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
                         "MX     =  %d\n",
                         event.Mx);
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
                         "DeviceType   =  %s\n",
                         event.DeviceType);
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
                         "DeviceUuid   =  %s\n",
                         event.UDN);
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
@@ -244,7 +249,8 @@ static int NewRequestHandler(UpnpLib *p,
         ReplySock = socket((int)DestAddr->sa_family, SOCK_DGRAM, 0);
         if (ReplySock == INVALID_SOCKET) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         SSDP,
                         __FILE__,
                         __LINE__,
@@ -292,7 +298,8 @@ static int NewRequestHandler(UpnpLib *p,
                 break;
 #endif
         default:
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         SSDP,
                         __FILE__,
                         __LINE__,
@@ -303,7 +310,8 @@ static int NewRequestHandler(UpnpLib *p,
 
         for (Index = 0; Index < NumPacket; Index++) {
                 ssize_t rc;
-                UpnpPrintf(UPNP_INFO,
+                UpnpPrintf(p,
+                        UPNP_INFO,
                         SSDP,
                         __FILE__,
                         __LINE__,
@@ -318,7 +326,8 @@ static int NewRequestHandler(UpnpLib *p,
                         socklen);
                 if (rc == -1) {
                         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                        UpnpPrintf(UPNP_INFO,
+                        UpnpPrintf(p,
+                                UPNP_INFO,
                                 SSDP,
                                 __FILE__,
                                 __LINE__,
@@ -435,7 +444,8 @@ static void CreateServicePacket(
         if (msg_type == MSGTYPE_REPLY) {
                 if (PowerState > 0) {
 #ifdef UPNP_HAVE_OPTSSDP
-                        ret_code = http_MakeMessage(&buf,
+                        ret_code = http_MakeMessage(p,
+                                &buf,
                                 1,
                                 1,
                                 "R"
@@ -474,7 +484,8 @@ static void CreateServicePacket(
                                 "RegistrationState: ",
                                 RegistrationState);
 #else
-                        ret_code = http_MakeMessage(&buf,
+                        ret_code = http_MakeMessage(p,
+                                &buf,
                                 1,
                                 1,
                                 "R"
@@ -507,7 +518,8 @@ static void CreateServicePacket(
 #endif /* UPNP_HAVE_OPTSSDP */
                 } else {
 #ifdef UPNP_HAVE_OPTSSDP
-                        ret_code = http_MakeMessage(&buf,
+                        ret_code = http_MakeMessage(p,
+                                &buf,
                                 1,
                                 1,
                                 "R"
@@ -537,7 +549,8 @@ static void CreateServicePacket(
                                 "USN: ",
                                 usn);
 #else
-                        ret_code = http_MakeMessage(&buf,
+                        ret_code = http_MakeMessage(p,
+                                &buf,
                                 1,
                                 1,
                                 "R"
@@ -587,7 +600,8 @@ static void CreateServicePacket(
                 }
                 if (PowerState > 0) {
 #ifdef UPNP_HAVE_OPTSSDP
-                        ret_code = http_MakeMessage(&buf,
+                        ret_code = http_MakeMessage(p,
+                                &buf,
                                 1,
                                 1,
                                 "Q"
@@ -633,7 +647,8 @@ static void CreateServicePacket(
                                 "RegistrationState: ",
                                 RegistrationState);
 #else
-                        ret_code = http_MakeMessage(&buf,
+                        ret_code = http_MakeMessage(p,
+                                &buf,
                                 1,
                                 1,
                                 "Q"
@@ -673,7 +688,8 @@ static void CreateServicePacket(
 #endif /* UPNP_HAVE_OPTSSDP */
                 } else {
 #ifdef UPNP_HAVE_OPTSSDP
-                        ret_code = http_MakeMessage(&buf,
+                        ret_code = http_MakeMessage(p,
+                                &buf,
                                 1,
                                 1,
                                 "Q"
@@ -710,7 +726,8 @@ static void CreateServicePacket(
                                 "USN: ",
                                 usn);
 #else
-                        ret_code = http_MakeMessage(&buf,
+                        ret_code = http_MakeMessage(p,
+                                &buf,
                                 1,
                                 1,
                                 "Q"
@@ -772,7 +789,8 @@ int DeviceAdvertisement(UpnpLib *p,
         int ret_code = UPNP_E_OUTOF_MEMORY;
         int rc = 0;
 
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 SSDP,
                 __FILE__,
                 __LINE__,
@@ -794,7 +812,8 @@ int DeviceAdvertisement(UpnpLib *p,
                 DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         SSDP,
                         __FILE__,
                         __LINE__,
@@ -1099,7 +1118,8 @@ int ServiceAdvertisement(UpnpLib *p,
                 DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         SSDP,
                         __FILE__,
                         __LINE__,
@@ -1208,7 +1228,8 @@ int ServiceShutdown(UpnpLib *p,
                 DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         SSDP,
                         __FILE__,
                         __LINE__,
@@ -1280,7 +1301,8 @@ int DeviceShutdown(UpnpLib *p,
                 DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
-                UpnpPrintf(UPNP_CRITICAL,
+                UpnpPrintf(p,
+                        UPNP_CRITICAL,
                         SSDP,
                         __FILE__,
                         __LINE__,
@@ -1304,7 +1326,8 @@ int DeviceShutdown(UpnpLib *p,
                         SleepPeriod,
                         RegistrationState);
         }
-        UpnpPrintf(UPNP_INFO,
+        UpnpPrintf(p,
+                UPNP_INFO,
                 SSDP,
                 __FILE__,
                 __LINE__,

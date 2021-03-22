@@ -174,6 +174,22 @@ static struct s_Member UpnpLib_members[] = {
                 "<openssl/ssl.h>",
                 0,
                 "#ifdef UPNP_ENABLE_OPEN_SSL"),
+        /* Log stuff ---------------------------------------------------------*/
+        INIT_MEMBER(gLogMutex,
+                TYPE_BUFFER,
+                ithread_mutex_t,
+                "ithread.h",
+                "pthread_mutex_init(&p->m_gSDKInitMutex, 0);"),
+        INIT_MEMBER(gLogLevel,
+                TYPE_INTEGER,
+                Upnp_LogLevel,
+                0,
+                "UPNP_DEFAULT_LOG_LEVEL"),
+        INIT_MEMBER(gLogFp, TYPE_INTEGER, FILE *, "<stdio.h>", 0),
+        INIT_MEMBER(gLogIsStderr, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(gSetLogWasCalled, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(gLogInitWasCalled, TYPE_INTEGER, int, 0, 0),
+        INIT_MEMBER(gLogFileName, TYPE_INTEGER, char *, 0, 0),
 };
 
 static struct s_Member UpnpStateVarComplete_members[] = {

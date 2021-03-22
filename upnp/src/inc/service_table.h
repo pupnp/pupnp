@@ -216,6 +216,8 @@ service_info *FindServiceControlURLPath(
  */
 #ifdef DEBUG
 void printService(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] Service whose information is to be printed. */
         service_info *service,
         /*! [in] Debug level specified to the print function. */
@@ -234,6 +236,8 @@ void printService(
  */
 #ifdef DEBUG
 void printServiceList(
+        /*! Library Handle. */
+        UpnpLib *p,
         /*! [in] Service whose information is to be printed. */
         service_info *service,
         /*! [in] Debug level specified to the print function. */
@@ -253,6 +257,8 @@ void printServiceList(
  */
 #ifdef DEBUG
 void printServiceTable(
+        /*! Library Handle. */
+        UpnpLib *p,
         /*! [in] Service table to be printed. */
         service_table *table,
         /*! [in] Debug level specified to the print function. */

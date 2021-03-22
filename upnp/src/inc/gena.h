@@ -103,23 +103,28 @@
 /*!
  * \brief Locks the subscription.
  */
-#define SubscribeLock() \
-        UpnpPrintf( \
-                UPNP_INFO, GENA, __FILE__, __LINE__, "Trying Subscribe Lock"); \
+#define SubscribeLock(p) \
+        UpnpPrintf(p, \
+                UPNP_INFO, \
+                GENA, \
+                __FILE__, \
+                __LINE__, \
+                "Trying Subscribe Lock"); \
         ithread_mutex_lock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
-        UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "Subscribe Lock");
+        UpnpPrintf(p, UPNP_INFO, GENA, __FILE__, __LINE__, "Subscribe Lock");
 
 /*!
  * \brief Unlocks the subscription.
  */
-#define SubscribeUnlock() \
-        UpnpPrintf(UPNP_INFO, \
+#define SubscribeUnlock(p) \
+        UpnpPrintf(p, \
+                UPNP_INFO, \
                 GENA, \
                 __FILE__, \
                 __LINE__, \
                 "Trying Subscribe UnLock"); \
         ithread_mutex_unlock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
-        UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "Subscribe UnLock");
+        UpnpPrintf(p, UPNP_INFO, GENA, __FILE__, __LINE__, "Subscribe UnLock");
 
 /*!
  * Structure to send NOTIFY message to all subscribed control points

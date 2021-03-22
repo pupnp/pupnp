@@ -115,7 +115,7 @@ int sock_ssl_connect(SOCKINFO *info)
 }
 #endif
 
-int sock_destroy(SOCKINFO *info, int ShutdownMethod)
+int sock_destroy(UpnpLib *p, SOCKINFO *info, int ShutdownMethod)
 {
         int ret = UPNP_E_SUCCESS;
         char errorBuffer[256];
@@ -130,7 +130,8 @@ int sock_destroy(SOCKINFO *info, int ShutdownMethod)
 #endif
                 if (shutdown(info->socket, ShutdownMethod) == -1) {
                         strerror_r(errno, errorBuffer, sizeof errorBuffer);
-                        UpnpPrintf(UPNP_INFO,
+                        UpnpPrintf(p,
+                                UPNP_INFO,
                                 HTTP,
                                 __FILE__,
                                 __LINE__,

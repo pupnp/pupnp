@@ -182,8 +182,10 @@ static UPNP_INLINE int calc_alias(
  *
  *	Note :
  ************************************************************************/
-static UPNP_INLINE int calc_descURL(
-        const char *ipPortStr, const char *alias, char descURL[LINE_SIZE])
+static UPNP_INLINE int calc_descURL(UpnpLib *p,
+        const char *ipPortStr,
+        const char *alias,
+        char descURL[LINE_SIZE])
 {
         size_t len;
         const char *http_scheme = "http://";
@@ -196,8 +198,13 @@ static UPNP_INLINE int calc_descURL(
         if (len > (size_t)LINE_SIZE)
                 return UPNP_E_URL_TOO_BIG;
         snprintf(descURL, len, "%s%s%s", http_scheme, ipPortStr, alias);
-        UpnpPrintf(
-                UPNP_INFO, API, __FILE__, __LINE__, "desc url: %s\n", descURL);
+        UpnpPrintf(p,
+                UPNP_INFO,
+                API,
+                __FILE__,
+                __LINE__,
+                "desc url: %s\n",
+                descURL);
 
         return UPNP_E_SUCCESS;
 }
@@ -404,7 +411,7 @@ int configure_urlbase(UpnpLib *p,
                 goto error_handler;
         }
         /* calc full url for desc doc */
-        err_code = calc_descURL(ipaddr_port, new_alias, docURL);
+        err_code = calc_descURL(p, ipaddr_port, new_alias, docURL);
         if (err_code != UPNP_E_SUCCESS) {
                 goto error_handler;
         }
@@ -414,9 +421,15 @@ int configure_urlbase(UpnpLib *p,
                 goto error_handler;
         }
 
+        UpnpPrintf(p,
+                UPNP_INFO,
+                API,
+                __FILE__,
+                __LINE__,
+                "desc url: %s\n",
+                docURL);
         UpnpPrintf(
-                UPNP_INFO, API, __FILE__, __LINE__, "desc url: %s\n", docURL);
-        UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "doc = %s\n", xml_str);
+                p, UPNP_INFO, API, __FILE__, __LINE__, "doc = %s\n", xml_str);
         /* store in web server */
         err_code = web_server_set_alias(
                 p, new_alias, xml_str, strlen(xml_str), last_modified);

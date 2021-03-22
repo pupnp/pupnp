@@ -2272,6 +2272,8 @@ EXPORT_SPEC int UpnpCancelHttpGet(
  *      \li \c UPNP_E_INVALID_PARAM: \b handle is not a valid pointer.
  */
 EXPORT_SPEC int UpnpCloseHttpGet(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The handle of the connection created by the call to
          * \b UpnpOpenHttpGet. */
         void *handle);
@@ -2613,6 +2615,8 @@ EXPORT_SPEC int UpnpReadHttpResponse(
  *             allocated.
  */
 EXPORT_SPEC int UpnpCloseHttpConnection(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [in] The handle of the connection to close, created by the call to
          * \b UpnpOpenHttpPost. */
         void *handle);
