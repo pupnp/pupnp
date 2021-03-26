@@ -25,7 +25,7 @@ UpnpActionRequest
 UpnpDiscovery
 UpnpEvent
 UpnpEventSubscribe
-UpnpExtraHeaders
+UpnpHttpHeaders
 UpnpFileInfo
 UpnpStateVarComplete
 UpnpStateVarRequest

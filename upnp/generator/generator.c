@@ -36,7 +36,7 @@ static struct s_Member UpnpActionRequest_members[] = {
                 "UpnpInet.h",
                 0),
         INIT_MEMBER(Os, TYPE_STRING, 0, 0, 0),
-        INIT_MEMBER(ExtraHeadersList, TYPE_LIST, 0, 0, 0),
+        INIT_MEMBER(HttpHeadersList, TYPE_LIST, 0, 0, 0),
 };
 
 static struct s_Member UpnpDiscovery_members[] = {
@@ -70,7 +70,7 @@ static struct s_Member UpnpEventSubscribe_members[] = {
         INIT_MEMBER(PublisherUrl, TYPE_STRING, 0, 0, 0),
 };
 
-static struct s_Member UpnpExtraHeaders_members[] = {
+static struct s_Member UpnpHttpHeaders_members[] = {
         INIT_MEMBER(node, TYPE_LIST, 0, 0, 0),
         INIT_MEMBER(name, TYPE_STRING, 0, 0, 0),
         INIT_MEMBER(value, TYPE_STRING, 0, 0, 0),
@@ -83,7 +83,7 @@ static struct s_Member UpnpFileInfo_members[] = {
         INIT_MEMBER(IsDirectory, TYPE_INTEGER, int, 0, 0),
         INIT_MEMBER(IsReadable, TYPE_INTEGER, int, 0, 0),
         INIT_MEMBER(ContentType, TYPE_DOMSTRING, 0, 0, 0),
-        INIT_MEMBER(ExtraHeadersList, TYPE_LIST, 0, 0, 0),
+        INIT_MEMBER(HttpHeadersList, TYPE_LIST, 0, 0, 0),
         INIT_MEMBER(CtrlPtIPAddr,
                 TYPE_BUFFER,
                 struct sockaddr_storage,
@@ -240,7 +240,7 @@ static struct s_Class my_classes[] = {
         INIT_CLASS(UpnpDiscovery),
         INIT_CLASS(UpnpEvent),
         INIT_CLASS(UpnpEventSubscribe),
-        INIT_CLASS(UpnpExtraHeaders),
+        INIT_CLASS(UpnpHttpHeaders),
         INIT_CLASS(UpnpFileInfo),
         INIT_CLASS(UpnpLib),
         INIT_CLASS(UpnpStateVarComplete),

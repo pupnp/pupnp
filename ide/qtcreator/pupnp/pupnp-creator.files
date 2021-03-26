@@ -96,7 +96,7 @@ upnp/inc/Callback.h
 upnp/inc/UpnpDiscovery.h
 upnp/inc/UpnpEvent.h
 upnp/inc/UpnpEventSubscribe.h
-upnp/inc/UpnpExtraHeaders.h
+upnp/inc/UpnpHttpHeaders.h
 upnp/inc/UpnpFileInfo.h
 upnp/inc/UpnpLog.h
 upnp/inc/UpnpStateVarComplete.h
@@ -138,7 +138,7 @@ upnp/src/api/UpnpActionRequest.c
 upnp/src/api/UpnpDiscovery.c
 upnp/src/api/UpnpEvent.c
 upnp/src/api/UpnpEventSubscribe.c
-upnp/src/api/UpnpExtraHeaders.c
+upnp/src/api/UpnpHttpHeaders.c
 upnp/src/api/UpnpFileInfo.c
 upnp/src/api/UpnpLog.c
 upnp/src/api/UpnpStateVarComplete.c
