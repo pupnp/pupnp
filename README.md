@@ -397,9 +397,9 @@ In Order to build everything using the cmake build system, you just need to inst
 Standalone cmake is recommended, IDE's like Visual Studio have built-in support which works, but as cmake in general
 encourages out-of-source builds and VS writes it's config into the source, cmake-gui should be used on windows.
 
-All known options have the same meaning as stated in point 5.2. In Addition 2 options have been added.
+All known options have the same meaning as stated in point 10.2. In Addition 2 options have been added.
 
-- DOWNLOAD_AND_BUILD_DEP: This option is only available if a useable git program was found on your system.
+- DOWNLOAD_AND_BUILD_DEPS: This option is only available if a useable git program was found on your system.
   With this option on, the pthread4w package will be downloaded while configuring the build-env, then it will be build and installed along with upnp.
 
 - BUILD_TESTING: This option activates the tests.
