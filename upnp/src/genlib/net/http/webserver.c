@@ -1175,7 +1175,7 @@ static int process_request(
         }
         if (using_virtual_dir) {
                 if (req->method != HTTPMETHOD_POST) {
-                        if ((code = parser_get_unknown_headers(req,
+                        if ((code = httpmsg_list_headers(req,
                                      (UpnpListHead *)
                                              UpnpFileInfo_get_HttpHeadersList(
                                                      finfo))) != HTTP_OK) {
