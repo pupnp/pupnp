@@ -13,7 +13,7 @@ set (UPNP_SOURCES
 	src/api/UpnpDiscovery.c
 	src/api/UpnpEvent.c
 	src/api/UpnpEventSubscribe.c
-  src/api/UpnpHttpHeaders.c
+	src/api/UpnpHttpHeaders.c
 	src/api/UpnpFileInfo.c
 	src/api/UpnpLog.cpp
         src/api/UpnpStateVarComplete.c
@@ -93,7 +93,7 @@ list (APPEND UPNP_HEADERS
 	inc/UpnpDiscovery.h
 	inc/UpnpEvent.h
 	inc/UpnpEventSubscribe.h
-  inc/UpnpHttpHeaders.h
+	inc/UpnpHttpHeaders.h
 	inc/UpnpFileInfo.h
 	inc/UpnpGlobal.h
 	inc/UpnpInet.h

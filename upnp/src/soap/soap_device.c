@@ -449,7 +449,7 @@ static void handle_invoke_action(
                         action, hdr_value.buf, hdr_value.length);
         }
 
-        err_code = parser_get_unknown_headers(request,
+        err_code = httpmsg_list_headers(request,
                 (UpnpListHead *)UpnpActionRequest_get_HttpHeadersList(action));
         if (err_code != HTTP_OK) {
                 err_code = SOAP_ACTION_FAILED;
