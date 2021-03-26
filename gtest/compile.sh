@@ -3,8 +3,8 @@ BUILD_DIR="$HOME/devel/pupnp-dev/pupnp"
 TESTNAME=$(/usr/bin/basename -s.cpp "$1")
 /usr/bin/g++ -std=c++11 -pedantic-errors -Wall \
 -o"$TESTNAME".a \
--I"$BUILD_DIR"/googletest-src/googletest/include \
--I"$BUILD_DIR"/googletest-src/googlemock/include \
+-I"$BUILD_DIR"/_deps/googletest-src/googletest/include \
+-I"$BUILD_DIR"/_deps/googletest-src/googlemock/include \
 -I"$BUILD_DIR" \
 -I"$BUILD_DIR"/upnp/src \
 -I"$BUILD_DIR"/upnp/inc \
