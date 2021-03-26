@@ -44,7 +44,7 @@
 
 #include "httpparser.h"
 
-#include "UpnpExtraHeaders.h"
+#include "UpnpHttpHeaders.h"
 #include "UpnpLib.h"
 #include "UpnpLog.h"
 #include "list.h"
@@ -2239,7 +2239,7 @@ int parser_get_unknown_headers(http_message_t *req, UpnpListHead *list)
         http_header_t *header;
         ListNode *node;
         int index;
-        UpnpExtraHeaders *extraHeader;
+        UpnpHttpHeaders *extraHeader;
         UpnpListHead *extraHeaderNode;
 
         node = ListHead(&req->headers);
@@ -2252,20 +2252,20 @@ int parser_get_unknown_headers(http_message_t *req, UpnpListHead *list)
                         NUM_HTTP_HEADER_NAMES,
                         0);
                 if (index < 0) {
-                        extraHeader = UpnpExtraHeaders_new();
+                        extraHeader = UpnpHttpHeaders_new();
                         if (!extraHeader) {
                                 free_http_headers_list(list);
                                 return HTTP_INTERNAL_SERVER_ERROR;
                         }
                         extraHeaderNode =
-                                (UpnpListHead *)UpnpExtraHeaders_get_node(
+                                (UpnpListHead *)UpnpHttpHeaders_get_node(
                                         extraHeader);
                         UpnpListInsert(
                                 list, UpnpListEnd(list), extraHeaderNode);
-                        UpnpExtraHeaders_strncpy_name(extraHeader,
+                        UpnpHttpHeaders_strncpy_name(extraHeader,
                                 header->name.buf,
                                 header->name.length);
-                        UpnpExtraHeaders_strncpy_value(extraHeader,
+                        UpnpHttpHeaders_strncpy_value(extraHeader,
                                 header->value.buf,
                                 header->value.length);
                 }
@@ -2290,12 +2290,12 @@ int parser_get_unknown_headers(http_message_t *req, UpnpListHead *list)
 void free_http_headers_list(UpnpListHead *list)
 {
         UpnpListIter pos;
-        UpnpExtraHeaders *extra;
+        UpnpHttpHeaders *extra;
 
         for (pos = UpnpListBegin(list); pos != UpnpListEnd(list);) {
-                extra = (UpnpExtraHeaders *)pos;
+                extra = (UpnpHttpHeaders *)pos;
                 pos = UpnpListErase(list, pos);
-                UpnpExtraHeaders_delete(extra);
+                UpnpHttpHeaders_delete(extra);
         }
 }
 

@@ -69,14 +69,14 @@ EXPORT_SPEC int UpnpFileInfo_set_ContentType(
 EXPORT_SPEC const char *UpnpFileInfo_get_ContentType_cstr(
         const UpnpFileInfo *p);
 
-/*! UpnpFileInfo_get_ExtraHeadersList */
-EXPORT_SPEC const UpnpListHead *UpnpFileInfo_get_ExtraHeadersList(
+/*! UpnpFileInfo_get_HttpHeadersList */
+EXPORT_SPEC const UpnpListHead *UpnpFileInfo_get_HttpHeadersList(
         const UpnpFileInfo *p);
-/*! UpnpFileInfo_set_ExtraHeadersList */
-EXPORT_SPEC int UpnpFileInfo_set_ExtraHeadersList(
+/*! UpnpFileInfo_set_HttpHeadersList */
+EXPORT_SPEC int UpnpFileInfo_set_HttpHeadersList(
         UpnpFileInfo *p, const UpnpListHead *q);
-/*! UpnpFileInfo_add_to_list_ExtraHeadersList */
-EXPORT_SPEC void UpnpFileInfo_add_to_list_ExtraHeadersList(
+/*! UpnpFileInfo_add_to_list_HttpHeadersList */
+EXPORT_SPEC void UpnpFileInfo_add_to_list_HttpHeadersList(
         UpnpFileInfo *p, UpnpListHead *head);
 
 /*! UpnpFileInfo_get_CtrlPtIPAddr */

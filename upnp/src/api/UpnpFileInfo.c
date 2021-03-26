@@ -22,7 +22,7 @@ struct s_UpnpFileInfo
         int m_IsDirectory;
         int m_IsReadable;
         DOMString m_ContentType;
-        UpnpListHead m_ExtraHeadersList;
+        UpnpListHead m_HttpHeadersList;
         struct sockaddr_storage m_CtrlPtIPAddr;
         UpnpString *m_Os;
 };
@@ -40,7 +40,7 @@ UpnpFileInfo *UpnpFileInfo_new()
         /*p->m_IsDirectory = 0;*/
         /*p->m_IsReadable = 0;*/
         /*p->m_ContentType = 0;*/
-        UpnpListInit(&p->m_ExtraHeadersList);
+        UpnpListInit(&p->m_HttpHeadersList);
         /* memset(&p->m_CtrlPtIPAddr, 0, sizeof (struct sockaddr_storage)); */
         p->m_Os = UpnpString_new();
 
@@ -58,7 +58,7 @@ void UpnpFileInfo_delete(UpnpFileInfo *q)
         UpnpString_delete(p->m_Os);
         p->m_Os = 0;
         memset(&p->m_CtrlPtIPAddr, 0, sizeof(struct sockaddr_storage));
-        UpnpListInit(&p->m_ExtraHeadersList);
+        UpnpListInit(&p->m_HttpHeadersList);
         ixmlFreeDOMString(p->m_ContentType);
         p->m_ContentType = 0;
         p->m_IsReadable = 0;
@@ -90,8 +90,8 @@ int UpnpFileInfo_assign(UpnpFileInfo *p, const UpnpFileInfo *q)
                         UpnpFileInfo_set_ContentType(
                                 p, UpnpFileInfo_get_ContentType(q));
                 ok = ok &&
-                        UpnpFileInfo_set_ExtraHeadersList(
-                                p, UpnpFileInfo_get_ExtraHeadersList(q));
+                        UpnpFileInfo_set_HttpHeadersList(
+                                p, UpnpFileInfo_get_HttpHeadersList(q));
                 ok = ok &&
                         UpnpFileInfo_set_CtrlPtIPAddr(
                                 p, UpnpFileInfo_get_CtrlPtIPAddr(q));
@@ -183,22 +183,22 @@ const char *UpnpFileInfo_get_ContentType_cstr(const UpnpFileInfo *p)
         return (const char *)UpnpFileInfo_get_ContentType(p);
 }
 
-const UpnpListHead *UpnpFileInfo_get_ExtraHeadersList(const UpnpFileInfo *p)
+const UpnpListHead *UpnpFileInfo_get_HttpHeadersList(const UpnpFileInfo *p)
 {
-        return &p->m_ExtraHeadersList;
+        return &p->m_HttpHeadersList;
 }
 
-int UpnpFileInfo_set_ExtraHeadersList(UpnpFileInfo *p, const UpnpListHead *q)
+int UpnpFileInfo_set_HttpHeadersList(UpnpFileInfo *p, const UpnpListHead *q)
 {
-        p->m_ExtraHeadersList = *q;
+        p->m_HttpHeadersList = *q;
 
         return 1;
 }
 
-void UpnpFileInfo_add_to_list_ExtraHeadersList(
+void UpnpFileInfo_add_to_list_HttpHeadersList(
         UpnpFileInfo *p, struct UpnpListHead *head)
 {
-        UpnpListHead *list = &p->m_ExtraHeadersList;
+        UpnpListHead *list = &p->m_HttpHeadersList;
         UpnpListInsert(list, UpnpListEnd(list), head);
 }
 

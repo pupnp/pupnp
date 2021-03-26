@@ -41,8 +41,8 @@
 
 #include "httpreadwrite.h"
 
-#include "UpnpExtraHeaders.h"
 #include "UpnpFileInfo.h"
+#include "UpnpHttpHeaders.h"
 #include "UpnpInet.h"
 #include "UpnpIntTypes.h"
 #include "UpnpLib.h"
@@ -1743,15 +1743,15 @@ int http_MakeMessage(UpnpLib *p,
                         /* list of extra headers */
                         UpnpListIter pos;
                         UpnpListHead *head;
-                        UpnpExtraHeaders *extra;
+                        UpnpHttpHeaders *extra;
                         const DOMString resp;
                         head = (UpnpListHead *)va_arg(argp, UpnpListHead *);
                         if (head) {
                                 for (pos = UpnpListBegin(head);
                                         pos != UpnpListEnd(head);
                                         pos = UpnpListNext(head, pos)) {
-                                        extra = (UpnpExtraHeaders *)pos;
-                                        resp = UpnpExtraHeaders_get_resp(extra);
+                                        extra = (UpnpHttpHeaders *)pos;
+                                        resp = UpnpHttpHeaders_get_resp(extra);
                                         if (resp) {
                                                 if (membuffer_append(buf,
                                                             resp,

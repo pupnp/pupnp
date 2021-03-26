@@ -25,7 +25,7 @@ upnpinclude_HEADERS = \
 	inc/UpnpDiscovery.h \
 	inc/UpnpEvent.h \
 	inc/UpnpEventSubscribe.h \
-	inc/UpnpExtraHeaders.h \
+	inc/UpnpHttpHeaders.h \
 	inc/UpnpFileInfo.h \
         inc/UpnpLog.h \
 	inc/UpnpStateVarComplete.h \
@@ -162,7 +162,7 @@ libupnp_la_SOURCES += \
 	src/api/UpnpDiscovery.c \
 	src/api/UpnpEvent.c \
 	src/api/UpnpEventSubscribe.c \
-	src/api/UpnpExtraHeaders.c \
+	src/api/UpnpHttpHeaders.c \
 	src/api/UpnpFileInfo.c \
 	src/api/UpnpLog.cpp \
         src/api/UpnpStateVarComplete.c \
