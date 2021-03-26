@@ -1,188 +1,300 @@
 // Mock network interfaces
+// For further information look at https://stackoverflow.com/a/66498073/5014688
 // Author: 2021-03-06 - Ingo Höft <Ingo@Hoeft-online.de>
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "./tools/ifaddrs.cpp"
-
-// for TestSuites needing headers linked against the static C library
-extern "C" {
-    #include "upnp.h"
-    #include "upnpapi.h"
-}
+#include "upnpapi.h"
+#include "upnptools.h"
+#include "tools/tools.cpp"
+#include "UpnpLib.h"
 
 using ::testing::_;
 using ::testing::Return;
 using ::testing::DoAll;
 using ::testing::SetArgPointee;
-using ::testing::MatchesRegex;
+using ::testing::AtLeast;
 
 
 // --- mock getifaddrs -------------------------------------
-class getifaddrsInterface {
+class MockGetifaddrs {
 public:
-    virtual ~getifaddrsInterface() {}
-    virtual int getifaddrs(struct ifaddrs**) = 0;
+    MOCK_METHOD(int, getifaddrs, (struct ifaddrs**));
 };
 
-class GetifaddrsMock : public getifaddrsInterface {
-public:
-    virtual ~GetifaddrsMock() {}
-    MOCK_METHOD(int, getifaddrs, (struct ifaddrs**), (override));
-};
-
-// Pointer Will be initialized later in the test body
-// For further information look at https://stackoverflow.com/a/66498073/5014688
-getifaddrsInterface* ptrGetifaddrsMockObj = nullptr;
+MockGetifaddrs* ptrMockGetifaddrsObj = nullptr;
 int getifaddrs(struct ifaddrs** ifap) {
-    return ptrGetifaddrsMockObj->getifaddrs(ifap);
+    return ptrMockGetifaddrsObj->getifaddrs(ifap);
 }
 
 // --- mock freeifaddrs ------------------------------------
-class FreeifaddrsInterface {
+class MockFreeifaddrs {
 public:
-    virtual ~FreeifaddrsInterface() {}
-    virtual void freeifaddrs(struct ifaddrs*) = 0;
+    MOCK_METHOD(void, freeifaddrs, (struct ifaddrs*));
 };
 
-class FreeifaddrsMock : public FreeifaddrsInterface {
-public:
-    virtual ~FreeifaddrsMock() {}
-    MOCK_METHOD(void, freeifaddrs, (struct ifaddrs*), (override));
-};
-
-FreeifaddrsInterface* ptrFreeifaddrsMockObj = nullptr;
+MockFreeifaddrs* ptrMockFreeifaddrObj = nullptr;
 void freeifaddrs(struct ifaddrs* ifap) {
-    return ptrFreeifaddrsMockObj->freeifaddrs(ifap);
+    return ptrMockFreeifaddrObj->freeifaddrs(ifap);
+}
+
+// --- mock bind -------------------------------------------
+class MockBind {
+public:
+    MOCK_METHOD(int, bind, (int, const struct sockaddr*, socklen_t));
+};
+
+MockBind* ptrMockBindObj = nullptr;
+int bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen) {
+    return ptrMockBindObj->bind(sockfd, addr, addrlen);
 }
 
 // --- mock if_nametoindex ---------------------------------
-class If_nametoindexInterface {
+class MockIf_nametoindex {
 public:
-    virtual ~If_nametoindexInterface() {}
-    virtual unsigned int if_nametoindex(const char*) = 0;
+    MOCK_METHOD(unsigned int, if_nametoindex, (const char*));
 };
 
-class If_nametoindexMock : public If_nametoindexInterface {
-public:
-    virtual ~If_nametoindexMock() {}
-    MOCK_METHOD(unsigned int, if_nametoindex, (const char*), (override));
-};
-
-If_nametoindexInterface* ptrIf_nametoindexMockObj = nullptr;
+MockIf_nametoindex* ptrMockIf_nametoindexObj = nullptr;
 unsigned int if_nametoindex(const char* ifname) {
-    return ptrIf_nametoindexMockObj->if_nametoindex(ifname);
+    return ptrMockIf_nametoindexObj->if_nametoindex(ifname);
+}
+
+// --- mock listen -----------------------------------------
+class MockListen {
+public:
+    MOCK_METHOD(int, listen, (int, int));
+};
+
+MockListen* ptrMockListenObj = nullptr;
+int listen(int sockfd, int backlog) {
+    return ptrMockListenObj->listen(sockfd, backlog);
+}
+
+// --- mock select -----------------------------------------
+class MockSelect {
+public:
+    MOCK_METHOD(int, select, (int nfds, fd_set* readfds, fd_set* writefds,
+                              fd_set *exceptfds, struct timeval* timeout));
+};
+
+MockSelect* ptrMockSelectObj = nullptr;
+int select(int nfds, fd_set* readfds, fd_set* writefds,
+           fd_set* exceptfds, struct timeval* timeout) {
+    return ptrMockSelectObj->select(nfds, readfds, writefds,
+                                    exceptfds, timeout);
+}
+
+// --- mock accept -----------------------------------------
+class MockAccept {
+public:
+    MOCK_METHOD(int, accept, (int sockfd, struct sockaddr* addr,
+                              socklen_t* addrlen));
+};
+
+MockAccept* ptrMockAcceptObj = nullptr;
+int accept(int sockfd, struct sockaddr* addr, socklen_t* addrlen) {
+    return ptrMockAcceptObj->accept(sockfd, addr, addrlen);
+}
+
+// --- mock getsockname ------------------------------------
+// If needed
+
+
+// --- mock setsockopt--------------------------------------
+class MockSetsockopt {
+public:
+    MOCK_METHOD(int, setsockopt, (int sockfd, int level, int optname,
+                                  const void* optval, socklen_t optlen));
+};
+
+MockSetsockopt* ptrMockSetsockoptObj = nullptr;
+int setsockopt(int sockfd, int level, int optname, const void* optval,
+               socklen_t optlen) {
+    return ptrMockSetsockoptObj->setsockopt(sockfd, level, optname,
+                                            optval, optlen);
 }
 
 
 // UpnpApi Testsuite for IP4
-//--------------------------
+//==========================
 class UpnpApiIPv4TestSuite: public ::testing::Test
+// Fixtures for this Testsuite
 {
 protected:
-    // Fixtures for this Testsuite
     unsigned short PORT = 51515;
+
+    // Instantiate the mock objects.
+    // The global pointer to them are set in the constructor below.
+    MockGetifaddrs mockGetifaddrsObj;
+    MockFreeifaddrs mockFreeifaddrsObj;
+    MockBind mockBindObj;
+    MockIf_nametoindex mockIf_nametoindexObj;
+    MockListen mockListenObj;
+    MockSelect mockSelectObj;
+    MockAccept mockAcceptObj;
+    MockSetsockopt mockSetsockoptObj;
+
+    UpnpApiIPv4TestSuite()
+    {
+        // set the global pointer to the mock objects
+        ptrMockGetifaddrsObj = &mockGetifaddrsObj;
+        ptrMockFreeifaddrObj = &mockFreeifaddrsObj;
+        ptrMockBindObj = &mockBindObj;
+        ptrMockIf_nametoindexObj = &mockIf_nametoindexObj;
+        ptrMockListenObj = &mockListenObj;
+        ptrMockSelectObj = &mockSelectObj;
+        ptrMockAcceptObj = &mockAcceptObj;
+        ptrMockSetsockoptObj = &mockSetsockoptObj;
+    }
 };
 
 
-TEST_F(UpnpApiIPv4TestSuite, UpnpGetIfInfo)
+TEST_F(UpnpApiIPv4TestSuite, UpnpGetIfInfo_called_with_valid_interface)
 {
+    // provide a network interface
     struct ifaddrs* ifaddr = nullptr;
+    CIfaddr4 ifaddr4Obj;
+    ifaddr4Obj.set("if0v4", "192.168.99.3/11");
+    ifaddr = ifaddr4Obj.get();
 
-    Ifaddr4 ifaddr4;
-    ifaddr = ifaddr4.get();
-
-    GetifaddrsMock getifaddrsMockObj;
-    ptrGetifaddrsMockObj = &getifaddrsMockObj;
-
-    FreeifaddrsMock freeifaddrsMockObj;
-    ptrFreeifaddrsMockObj = &freeifaddrsMockObj;
-
-    If_nametoindexMock if_nametoindexMockObj;
-    ptrIf_nametoindexMockObj = &if_nametoindexMockObj;
-
-    EXPECT_CALL(getifaddrsMockObj, getifaddrs(_))
+    EXPECT_CALL(mockGetifaddrsObj, getifaddrs(_))
         .WillOnce(DoAll(SetArgPointee<0>(ifaddr), Return(0)));
-    EXPECT_CALL(freeifaddrsMockObj, freeifaddrs(ifaddr))
+    EXPECT_CALL(mockFreeifaddrsObj, freeifaddrs(ifaddr))
         .Times(1);
-    EXPECT_CALL(if_nametoindexMockObj, if_nametoindex(_))
-        .WillOnce(Return(1));
+    EXPECT_CALL(mockIf_nametoindexObj, if_nametoindex(_))
+        .WillOnce(Return(2));
 
-    EXPECT_EQ(UpnpGetIfInfo(ifaddr->ifa_name), UPNP_E_SUCCESS);
-    EXPECT_STREQ(gIF_NAME, ifaddr->ifa_name);
-    EXPECT_THAT(gIF_IPV4, MatchesRegex("[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}"));
-    EXPECT_STREQ(gIF_IPV6, "");
-    EXPECT_STREQ(gIF_IPV6_ULA_GUA, "");
-    EXPECT_EQ(gIF_INDEX, (const unsigned int)1);
+    UpnpLib* p = UpnpLib_new();
+
+    EXPECT_STREQ(UpnpGetErrorMessage(
+                  UpnpGetIfInfo(p, "if0v4")),
+                  "UPNP_E_SUCCESS");
+
+    // gIF_NAME mocked with getifaddrs above
+    EXPECT_EQ(*UpnpLib_get_gIF_NAME(p), *&"if0v4");
+    // gIF_IPV4 mocked with getifaddrs above
+    EXPECT_EQ(*UpnpLib_get_gIF_IPV4(p), *&"192.168.99.3");
+    //EXPECT_THAT(gIF_IPV4, MatchesRegex("[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}"));
+    EXPECT_EQ(*UpnpLib_get_gIF_IPV4_NETMASK(p), *&"255.224.0.0");
+    EXPECT_EQ(*UpnpLib_get_gIF_IPV6(p), *&"");
+    EXPECT_EQ(UpnpLib_get_gIF_IPV6_PREFIX_LENGTH(p), (unsigned)0);
+    EXPECT_EQ(*UpnpLib_get_gIF_IPV6_ULA_GUA(p), *&"");
+    EXPECT_EQ(UpnpLib_get_gIF_IPV6_ULA_GUA_PREFIX_LENGTH(p), (unsigned)0);
+    // index mocked with if_nametoindex above
+    EXPECT_EQ(UpnpLib_get_gIF_INDEX(p), (unsigned)2);
+    EXPECT_EQ(UpnpLib_get_LOCAL_PORT_V4(p), (unsigned short)0);
+    EXPECT_EQ(UpnpLib_get_LOCAL_PORT_V6(p), (unsigned short)0);
+    EXPECT_EQ(UpnpLib_get_LOCAL_PORT_V6_ULA_GUA(p), (unsigned short)0);
+
+    UpnpLib_delete(p);
 }
 
-TEST_F(UpnpApiIPv4TestSuite, UpnpInit2)
+
+TEST_F(UpnpApiIPv4TestSuite, UpnpGetIfInfo_called_with_unknown_interface)
 {
-    //GTEST_SKIP();
+    // provide a network interface
     struct ifaddrs* ifaddr = nullptr;
+    CIfaddr4 ifaddr4Obj;
+    ifaddr4Obj.set("eth0", "192.168.77.48/22");
+    ifaddr = ifaddr4Obj.get();
 
-    Ifaddr4 ifaddr4;
-    ifaddr = ifaddr4.get();
-
-    GetifaddrsMock getifaddrsMockObj;
-    ptrGetifaddrsMockObj = &getifaddrsMockObj;
-
-    FreeifaddrsMock freeifaddrsMockObj;
-    ptrFreeifaddrsMockObj = &freeifaddrsMockObj;
-
-    If_nametoindexMock if_nametoindexMockObj;
-    ptrIf_nametoindexMockObj = &if_nametoindexMockObj;
-
-    EXPECT_CALL(getifaddrsMockObj, getifaddrs(_))
+    EXPECT_CALL(mockGetifaddrsObj, getifaddrs(_))
         .WillOnce(DoAll(SetArgPointee<0>(ifaddr), Return(0)));
-    EXPECT_CALL(freeifaddrsMockObj, freeifaddrs(ifaddr))
+    EXPECT_CALL(mockFreeifaddrsObj, freeifaddrs(ifaddr))
         .Times(1);
-    EXPECT_CALL(if_nametoindexMockObj, if_nametoindex(_))
+    EXPECT_CALL(mockIf_nametoindexObj, if_nametoindex(_))
+        .Times(0);
+
+    UpnpLib* p = UpnpLib_new();
+
+    EXPECT_STREQ(UpnpGetErrorMessage(
+                  UpnpGetIfInfo(p, "ethO")),
+                  "UPNP_E_INVALID_INTERFACE");
+
+    // gIF_NAME mocked with getifaddrs above
+    EXPECT_EQ(*UpnpLib_get_gIF_NAME(p), *&"")
+        << "ATTENTION! There is a wrong upper case 'O', not zero in \"ethO\"\n";
+    // gIF_IPV4 mocked with getifaddrs above
+    EXPECT_EQ(*UpnpLib_get_gIF_IPV4(p), *&"");
+    //EXPECT_THAT(gIF_IPV4, MatchesRegex("[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}"));
+    EXPECT_EQ(*UpnpLib_get_gIF_IPV4_NETMASK(p), *&"");
+    EXPECT_EQ(*UpnpLib_get_gIF_IPV6(p), *&"");
+    EXPECT_EQ(UpnpLib_get_gIF_IPV6_PREFIX_LENGTH(p), (unsigned)0);
+    EXPECT_EQ(*UpnpLib_get_gIF_IPV6_ULA_GUA(p), *&"");
+    EXPECT_EQ(UpnpLib_get_gIF_IPV6_ULA_GUA_PREFIX_LENGTH(p), (unsigned)0);
+    // index mocked with if_nametoindex above
+    EXPECT_EQ(UpnpLib_get_gIF_INDEX(p), (unsigned)4294967295)
+                          << "    Which is: (unsigned)-1";
+    EXPECT_EQ(UpnpLib_get_LOCAL_PORT_V4(p), (unsigned short)0);
+    EXPECT_EQ(UpnpLib_get_LOCAL_PORT_V6(p), (unsigned short)0);
+    EXPECT_EQ(UpnpLib_get_LOCAL_PORT_V6_ULA_GUA(p), (unsigned short)0);
+
+    UpnpLib_delete(p);
+}
+
+
+TEST_F(UpnpApiIPv4TestSuite, initialize_default_UpnpInit2)
+{
+    // provide a network interface
+    struct ifaddrs* ifaddr = nullptr;
+    CIfaddr4 ifaddr4Obj;
+    ifaddr4Obj.set("if0v4", "192.168.99.3/20");
+    ifaddr = ifaddr4Obj.get();
+
+    // expect calls to system functions (which are mocked)
+    EXPECT_CALL(mockGetifaddrsObj, getifaddrs(_))
+        .WillOnce(DoAll(SetArgPointee<0>(ifaddr), Return(0)));
+    EXPECT_CALL(mockFreeifaddrsObj, freeifaddrs(ifaddr))
+        .Times(1); EXPECT_CALL(mockBindObj, bind(_,_,_))
+        .Times(5);
+    EXPECT_CALL(mockIf_nametoindexObj, if_nametoindex(_))
         .Times(1);
+    EXPECT_CALL(mockListenObj, listen(_,_))
+        .Times(3);
+    EXPECT_CALL(mockSelectObj, select(_,_,_,_,_))
+//        .Times(7);
+        .Times(AtLeast(1));
+    EXPECT_CALL(mockAcceptObj, accept(_,_,_))
+        .Times(3);
+    EXPECT_CALL(mockSetsockoptObj, setsockopt(_,_,_,_,_))
+        .Times(11);
 
-    int return_value = UpnpInit2(ifaddr->ifa_name, PORT);
-    EXPECT_EQ(return_value, UPNP_E_SOCKET_BIND);
+    UpnpLib* libStruct = nullptr;
+
+    // Initialize capturing of the stderr output
+    CCaptureFd captFdObj;
+    captFdObj.capture(2);   // 1 = stdout, 2 = stderr
+
+    EXPECT_STREQ(UpnpGetErrorMessage(
+                  UpnpInit2(&libStruct, NULL, 0, NULL)),
+                  "UPNP_E_SUCCESS");
+
+    EXPECT_FALSE(captFdObj.print(std::cerr))
+        << "Output to stderr is true. There should not be any output to stderr.\n";
+
+    UpnpLib_delete(libStruct);
 }
 
-
-/* first tests with IP6 not working anymore with mocking, will be improved next
-// UpnpApi Testsuite for IP6
-//--------------------------
-class UpnpApiIPv6TestSuite: public ::testing::Test
-{
-    // Fixtures for this Testsuite
-    protected:
-    std::string interface = "ens1";
-    unsigned short PORT = 51515;
-};
-
-TEST_F(UpnpApiIPv6TestSuite, UpnpGetIfInfo)
-{
-    EXPECT_EQ(UpnpGetIfInfo(interface.c_str()), UPNP_E_SUCCESS);
-    EXPECT_STREQ(gIF_NAME, interface.c_str());
-    EXPECT_STREQ(gIF_IPV4, "");
-    //strncpy(gIF_IPV6, "fe80::5054:ff:fe40:50f6", 24); //testing the regex
-    EXPECT_THAT(gIF_IPV6, MatchesRegex("([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4}"));
-    EXPECT_THAT(gIF_IPV6_ULA_GUA, MatchesRegex("([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4}"));
-    EXPECT_IN_RANGE((int)gIF_INDEX, 1, 20);
-}
-
-TEST_F(UpnpApiIPv6TestSuite, UpnpInit2)
-{
-    //GTEST_SKIP();
-    int return_value = UpnpInit2(interface.c_str(), PORT);
-    EXPECT_EQ(return_value, UPNP_E_SUCCESS);
-}
-*/
 
 // UpnpApi common Testsuite
 //-------------------------
-TEST(UpnpApiTestSuite, GetHandleInfo)
+TEST(UpnpApiTestSuite, get_handle_info)
 {
+    UpnpLib* p = UpnpLib_new();
+
     Handle_Info **HndInfo = 0;
-    EXPECT_EQ(GetHandleInfo(0, HndInfo), HND_INVALID);
-    EXPECT_EQ(GetHandleInfo(1, HndInfo), HND_INVALID);
-    EXPECT_EQ(GetHandleInfo(NUM_HANDLE, HndInfo), HND_INVALID);
+    EXPECT_EQ(GetHandleInfo(p, 0, HndInfo), HND_INVALID);
+    EXPECT_EQ(GetHandleInfo(p, 1, HndInfo), HND_INVALID);
+
+    UpnpLib_delete(p);
+}
+
+TEST(UpnpApiTestSuite, get_error_message)
+{
+    EXPECT_STREQ(UpnpGetErrorMessage(0), "UPNP_E_SUCCESS");
+    EXPECT_STREQ(UpnpGetErrorMessage(-121), "UPNP_E_INVALID_INTERFACE");
+    EXPECT_STREQ(UpnpGetErrorMessage(1), "Unknown error code");
 }
 
 

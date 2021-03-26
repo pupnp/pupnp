@@ -21,6 +21,7 @@ extern "C" {
 //----------------------------------
 TEST(EmptyTestSuite, empty_gtest)
 {
+    GTEST_SKIP();
 }
 
 
