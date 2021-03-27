@@ -134,18 +134,9 @@ ixml/test/test_document.sh.log
 ixml/test/test_document.sh.trs
 ixml/test_document
 upnp/test-suite.log
-upnp/test_init
-upnp/test_init.log
-upnp/test_init.trs
-upnp/test_url
-upnp/test_url.log
-upnp/test_url.trs
-upnp/test_list
-upnp/test_list.log
-upnp/test_list.trs
-upnp/test_log
-upnp/test_log.log
-upnp/test_log.trs
+upnp/test_*
+upnp/test_*.log
+upnp/test_*.trs
 
 upnp/generator/generator
 
