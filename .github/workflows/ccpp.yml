@@ -102,7 +102,7 @@ jobs:
         cd upnp
         make check
         ret=$?
-        cat test_init.log
+        cat test_*.log
         exit $ret
     - name: make check (ixml)
       run: |
