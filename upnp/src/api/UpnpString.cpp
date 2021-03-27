@@ -20,6 +20,7 @@
 #include "UpnpString.h"
 
 #include <cctype> /* for std::tolower on Windows */
+#include <locale>
 
 UpnpString *UpnpString_new() { return new UpnpString(); }
 
@@ -35,14 +36,22 @@ const char *UpnpString_get_String(const UpnpString *p) { return p->c_str(); }
 
 int UpnpString_set_String(UpnpString *p, const char *s)
 {
-        p->assign(s);
+        if (s) {
+                p->assign(s);
+        } else {
+                p->assign("");
+        }
 
         return true;
 }
 
 int UpnpString_set_StringN(UpnpString *p, const char *s, size_t n)
 {
-        p->assign(s, n);
+        if (s) {
+                p->assign(s, n);
+        } else {
+                p->assign("", n);
+        }
 
         return true;
 }
@@ -54,18 +63,22 @@ int UpnpString_cmp(const UpnpString *p, const UpnpString *q)
         return p->compare(*q);
 }
 
-static bool icase(unsigned char a, unsigned char b)
-{
-        return std::tolower(a) == std::tolower(b);
-}
-
 int UpnpString_casecmp(const UpnpString *p, const UpnpString *q)
 {
-        if (p->length() == q->length()) {
-                return std::equal(q->begin(), q->end(), p->begin(), icase);
-        } else {
-                return false;
+        const std::locale loc = std::locale();
+        const char *a = UpnpString_get_String(p);
+        const char *b = UpnpString_get_String(q);
+        while (*a || *b) {
+                char c = std::toupper(*a++, loc);
+                char d = std::toupper(*b++, loc);
+                if (c < d) {
+                        return -1;
+                }
+                if (c > d) {
+                        return 1;
+                }
         }
+        return 0;
 }
 
 /* @} UpnpString */
