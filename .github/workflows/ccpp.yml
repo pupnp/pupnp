@@ -99,11 +99,7 @@ jobs:
       run: make
     - name: make check (upnp)
       run: |
-        cd upnp
-        make check
-        ret=$?
-        cat test_init.log
-        exit $ret
+        cd upnp && make check || (cat test-suite.log && exit 1)
     - name: make check (ixml)
       run: |
         cd ixml && make check || (cat test-suite.log && exit 1)
