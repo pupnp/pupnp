@@ -48,10 +48,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* This is called from UpnpInit2(). So the user must call setLoggLogFileName()
- * before. This can be called again, for example to rotate the log
- * file, and we try to avoid multiple calls to the mutex init, with a
- * risk of race, probably not a problem, and not worth fixing. */
+/* This routine is called from UpnpInit2().
+ * It can be called again, for example to rotate the log file, and we try to
+ * avoid multiple calls to the mutex init, with a risk of race, probably not a
+ * problem, and not worth fixing. */
 int UpnpInitLog(UpnpLib *p)
 {
         const char *fname;
