@@ -72,6 +72,12 @@ int main()
         if (UpnpString_casecmp(s, w)) {
                 PRINTF_GOTO("Strings should have compared equal", 6);
         }
+        UpnpString_set_String(s, 0);
+        if (UpnpString_get_Length(s) != 0) {
+                PRINTF_GOTO("Using NULL in the set string parameter should "
+                            "have cleaned the string",
+                        6);
+        }
 
         ret_code = EXIT_SUCCESS;
 
