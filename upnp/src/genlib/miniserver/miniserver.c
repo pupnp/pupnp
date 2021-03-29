@@ -256,6 +256,7 @@ static void handle_request(
         int timeout = HTTP_DEFAULT_TIMEOUT;
         struct mserv_request_t *request = (struct mserv_request_t *)args;
         SOCKET connfd = request->connfd;
+        int line = 0;
 
         UpnpPrintf(p,
                 UPNP_INFO,
@@ -269,6 +270,13 @@ static void handle_request(
         ret_code = sock_init_with_ip(
                 &info, connfd, (struct sockaddr *)&request->foreign_sockaddr);
         if (ret_code != UPNP_E_SUCCESS) {
+                UpnpPrintf(p,
+                        UPNP_INFO,
+                        MSERV,
+                        __FILE__,
+                        __LINE__,
+                        "miniserver %d: error in sock_init_with_ip()\n",
+                        connfd);
                 free(request);
                 httpmsg_destroy(hmsg);
                 return;
@@ -281,6 +289,7 @@ static void handle_request(
                 &timeout,
                 &http_error_code);
         if (ret_code != 0) {
+                line = __LINE__;
                 goto error_handler;
         }
         UpnpPrintf(p,
@@ -293,17 +302,28 @@ static void handle_request(
         /* dispatch */
         http_error_code = dispatch_request(p, &info, &parser);
         if (http_error_code != 0) {
+                line = __LINE__;
                 goto error_handler;
         }
         http_error_code = 0;
 
 error_handler:
         if (http_error_code > 0) {
-                if (hmsg) {
+                if (hmsg && hmsg->major_version > 0) {
                         major = hmsg->major_version;
                         minor = hmsg->minor_version;
                 }
                 handle_error(p, &info, http_error_code, major, minor);
+                UpnpPrintf(p,
+                        UPNP_INFO,
+                        MSERV,
+                        __FILE__,
+                        line,
+                        "miniserver %d: error handler called, major = %d, "
+                        "minor = %d.\n",
+                        connfd,
+                        major,
+                        minor);
         }
         sock_destroy(p, &info, SD_BOTH);
         httpmsg_destroy(hmsg);
