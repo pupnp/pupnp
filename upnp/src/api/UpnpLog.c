@@ -47,6 +47,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if linux
+#include <sys/syscall.h>
+#endif
 
 /* This routine is called from UpnpInit2().
  * It can be called again, for example to rotate the log file, and we try to
@@ -160,16 +163,16 @@ static void UpnpDisplayFileAndLine(FILE *fp,
         struct tm *timeinfo;
         const char *smod;
 #if 0
-	char *slev;
-	/* Code kept around in case, but I think it's actually more convenient
-	   to display a numeric level */
-	switch (DLevel) {
-	case UPNP_CRITICAL: slev="CRI";break;
-	case UPNP_ERROR: slev="ERR";break;
-	case UPNP_INFO: slev="INF";break;
-	case UPNP_ALL: slev="ALL";break;
-	default: slev="UNK";break;
-	}
+    char *slev;
+    /* Code kept around in case, but I think it's actually more convenient
+       to display a numeric level */
+    switch (DLevel) {
+    case UPNP_CRITICAL: slev="CRI";break;
+    case UPNP_ERROR: slev="ERR";break;
+    case UPNP_INFO: slev="INF";break;
+    case UPNP_ALL: slev="ALL";break;
+    default: slev="UNK";break;
+    }
 #else
         char slev[25];
         snprintf(slev, 25, "%d", DLevel);
@@ -209,14 +212,18 @@ static void UpnpDisplayFileAndLine(FILE *fp,
         strftime(timebuf, 26, "%Y-%m-%d %H:%M:%S", timeinfo);
 
         fprintf(fp,
-                "%s UPNP-%s-%s: Thread:0x%lX [%s:%d]: ",
+                "%s UPNP-%s-%s: Thread:0x%016lX [%s:%d]: ",
                 timebuf,
                 smod,
                 slev,
 #ifdef __PTW32_DLLPORT
                 (unsigned long int)ithread_self().p
 #else
+#if linux
+                (unsigned long int)syscall(__NR_gettid)
+#else
                 (unsigned long int)ithread_self()
+#endif
 #endif
                 ,
                 DbggLogFileName,
