@@ -36,6 +36,8 @@ See LICENSE for details.
 | Release Number | Date       | History                                  |
 | -------------- | ---------- | ---------------------------------------- |
 | 1.16.0         | TBA        | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.14.3         | 2021-03-29 | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.14.2         | 2021-02-28 | [Portable UPnP SDK][Portable UPnP SDK]   |
 | 1.14.1         | 2021-02-08 | [Portable UPnP SDK][Portable UPnP SDK]   |
 | 1.14.0         | 2020-07-20 | [Portable UPnP SDK][Portable UPnP SDK]   |
 | 1.12.1         | 2020-04-07 | [Portable UPnP SDK][Portable UPnP SDK]   |
