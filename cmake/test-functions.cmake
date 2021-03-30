@@ -55,6 +55,12 @@ function (addTestExecutable testName sourceFile)
 		PRIVATE upnp_shared
 	)
 
+	if (HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(${testName}
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+		)
+	endif()
+
 	add_executable (${testName}-static
 		${sourceFile}
 	)
@@ -62,6 +68,12 @@ function (addTestExecutable testName sourceFile)
 	target_link_libraries (${testName}-static
 		PRIVATE upnp_static
 	)
+
+	if (HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(${testName}-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+		)
+	endif()
 endfunction()
 
 function (addUnitTest testName sourceFile)

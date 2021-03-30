@@ -41,6 +41,7 @@
 #include "UpnpGlobal.h" /* for UPNP_INLINE */
 
 #include <stdio.h>
+#include <string.h>
 
 typedef struct s_UpnpLib UpnpLib;
 
@@ -62,12 +63,12 @@ extern "C" {
  *  allocation errors. The remaining three levels are just for debugging
  *  purposes. Error will show recoverable errors.
  *  Info Level displays the other important operational information
- *  regarding the working of the library. If the user selects All,
- *  then the library displays all the debugging information that it has.
+ *  regarding the working of the library. If the user selects Debug,
  *    \li \c UPNP_CRITICAL [0]
  *    \li \c UPNP_ERROR [1]
  *    \li \c UPNP_INFO [2]
- *    \li \c UPNP_ALL [3]
+ *    \li \c UPNP_DEBUG [3]
+ *    \li \c UPNP_NONE [4]
  */
 typedef enum Upnp_Module
 {
@@ -87,7 +88,8 @@ typedef enum Upnp_LogLevel_e
         UPNP_CRITICAL,
         UPNP_ERROR,
         UPNP_INFO,
-        UPNP_ALL
+        UPNP_DEBUG,
+        UPNP_NONE
 } Upnp_LogLevel;
 /*@}*/
 
@@ -98,24 +100,32 @@ typedef enum Upnp_LogLevel_e
 */
 #define UPNP_PACKET UPNP_ERROR
 
+/* Backwards compat to help any apps that happened to use this logging before
+ * it was promoted
+ */
+#define UPNP_ALL UPNP_DEBUG
+
 /*!
  * Default log level : see \c Upnp_LogLevel
  */
-#define UPNP_DEFAULT_LOG_LEVEL UPNP_ALL
+#define UPNP_DEFAULT_LOG_LEVEL UPNP_DEBUG
+
+EXPORT_SPEC const char *UpnpLogLevelToStr(Upnp_LogLevel level);
+EXPORT_SPEC Upnp_LogLevel UpnpLogLevelFromStr(char *level);
 
 /*!
  * \brief Initialize the log files.
  *
  * \return -1 if fails or UPNP_E_SUCCESS if succeeds.
  */
-int UpnpInitLog(
+EXPORT_SPEC int UpnpInitLog(
         /*! Library Handle */
         UpnpLib *p);
 
 /*!
  * \brief Set the log level (see \c Upnp_LogLevel).
  */
-void UpnpSetLogLevel(
+EXPORT_SPEC void UpnpSetLogLevel(
         /*! Library Handle */
         UpnpLib *p,
         /*! [in] Log level. */
@@ -124,7 +134,7 @@ void UpnpSetLogLevel(
 /*!
  * \brief Closes the log files.
  */
-void UpnpCloseLog(
+EXPORT_SPEC void UpnpCloseLog(
         /*! Library Handle */
         UpnpLib *p);
 
@@ -133,13 +143,11 @@ void UpnpCloseLog(
  * second parameter has been kept for compatibility but is ignored.
  * Use a NULL file name for logging to stderr.
  */
-void UpnpSetLogFileNames(
+EXPORT_SPEC void UpnpSetLogFileName(
         /*! Library Handle */
         UpnpLib *p,
         /*! [in] Name of the log file. */
-        const char *fileName,
-        /*! [in] Ignored. */
-        const char *Ignored);
+        const char *fileName);
 
 /*!
  * \brief Check if the module is turned on for debug and returns the file
@@ -148,7 +156,7 @@ void UpnpSetLogFileNames(
  * \return NULL if the module is turn off for debug otherwise returns the
  *	right FILE pointer.
  */
-FILE *UpnpGetDebugFile(
+EXPORT_SPEC FILE *UpnpGetDebugFile(
         /*! Library Handle */
         UpnpLib *p,
         /*! [in] The level of the debug logging. It will decide whether debug
@@ -161,7 +169,7 @@ FILE *UpnpGetDebugFile(
  * \brief Prints the debug statement either on the standard output or log file
  * along with the information from where this debug statement is coming.
  */
-void UpnpPrintf(
+EXPORT_SPEC void UpnpPrintf(
         /*! Library Handle */
         UpnpLib *p,
         /*! [in] The level of the debug logging. It will decide whether debug

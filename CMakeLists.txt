@@ -320,6 +320,9 @@ endif()
 check_function_exists (strnlen HAVE_STRNLEN)
 check_function_exists (strndup HAVE_STRNDUP)
 
+include(CheckCCompilerFlag)
+check_c_compiler_flag(-fmacro-prefix-map=from=to HAVE_MACRO_PREFIX_MAP)
+
 if (Solaris)
 	set (CMAKE_REQUIRED_LIBRARIES socket)
 	check_function_exists (bind HAVE_SOCKET)

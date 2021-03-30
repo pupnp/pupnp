@@ -51,6 +51,57 @@
 #include <sys/syscall.h>
 #endif
 
+const char *UpnpLogLevelToStr(Upnp_LogLevel level)
+{
+        switch (level) {
+        case UPNP_CRITICAL:
+                return "CRIT";
+        case UPNP_ERROR:
+                return "ERRO";
+        case UPNP_INFO:
+                return "INFO";
+        case UPNP_DEBUG:
+                return "DEBG";
+        default:
+                return "UNKN";
+        }
+}
+
+Upnp_LogLevel UpnpLogLevelFromStr(char *level)
+{
+        if (strcmp(level, "CRIT") == 0) {
+                return UPNP_CRITICAL;
+        }
+        if (strcmp(level, "ERRO") == 0) {
+                return UPNP_ERROR;
+        }
+        if (strcmp(level, "INFO") == 0) {
+                return UPNP_INFO;
+        }
+        if (strcmp(level, "DEBUG") == 0) {
+                return UPNP_DEBUG;
+        }
+        if (strcmp(level, "NONE") == 0) {
+                return UPNP_NONE;
+        }
+        return -1;
+}
+
+static void UpnpSetLogConfigFromEnvironment(UpnpLib *p)
+{
+        char *logFile = getenv("UPNP_LOG_FILE");
+        if (logFile) {
+                UpnpSetLogFileName(p, strdup(logFile));
+        }
+
+        char *logLevel = getenv("UPNP_LOG_LEVEL");
+        if (logLevel) {
+                Upnp_LogLevel mapped = UpnpLogLevelFromStr(logLevel);
+                if (mapped != -1)
+                        UpnpSetLogLevel(p, mapped);
+        }
+}
+
 /* This routine is called from UpnpInit2().
  * It can be called again, for example to rotate the log file, and we try to
  * avoid multiple calls to the mutex init, with a risk of race, probably not a
@@ -64,10 +115,15 @@ int UpnpInitLog(UpnpLib *p)
                 ithread_mutex_init(UpnpLib_getnc_LogMutex(p), NULL);
                 UpnpLib_set_LogInitWasCalled(p, 1);
         }
+
+        /* Env vars override other config */
+        UpnpSetLogConfigFromEnvironment(p);
+
         /* If the user did not ask for logging do nothing */
         if (!UpnpLib_get_SetLogWasCalled(p)) {
                 return UPNP_E_SUCCESS;
         }
+
         if (UpnpLib_get_LogFp(p)) {
                 if (!UpnpLib_get_LogIsStderr(p)) {
                         fclose(UpnpLib_get_LogFp(p));
@@ -121,11 +177,8 @@ void UpnpCloseLog(UpnpLib *p)
         ithread_mutex_destroy(UpnpLib_getnc_LogMutex(p));
 }
 
-void UpnpSetLogFileNames(
-        UpnpLib *p, const char *newgLogFileName, const char *ignored)
+void UpnpSetLogFileName(UpnpLib *p, const char *newgLogFileName)
 {
-        (void)ignored;
-
         if (UpnpLib_get_LogFileName(p)) {
                 free(UpnpLib_get_LogFileName(p));
                 UpnpLib_set_LogFileName(p, 0);
@@ -160,21 +213,6 @@ static void UpnpDisplayFileAndLine(FILE *fp,
         time_t now = time(NULL);
         struct tm *timeinfo;
         const char *smod;
-#if 0
-    char *slev;
-    /* Code kept around in case, but I think it's actually more convenient
-       to display a numeric level */
-    switch (DLevel) {
-    case UPNP_CRITICAL: slev="CRI";break;
-    case UPNP_ERROR: slev="ERR";break;
-    case UPNP_INFO: slev="INF";break;
-    case UPNP_ALL: slev="ALL";break;
-    default: slev="UNK";break;
-    }
-#else
-        char slev[25];
-        snprintf(slev, 25, "%d", DLevel);
-#endif
 
         switch (Module) {
         case SSDP:
@@ -193,10 +231,10 @@ static void UpnpDisplayFileAndLine(FILE *fp,
                 smod = "MSER";
                 break;
         case DOM:
-                smod = "DOM_";
+                smod = "DOM ";
                 break;
         case API:
-                smod = "API_";
+                smod = "API ";
                 break;
         case HTTP:
                 smod = "HTTP";
@@ -210,10 +248,10 @@ static void UpnpDisplayFileAndLine(FILE *fp,
         strftime(timebuf, 26, "%Y-%m-%d %H:%M:%S", timeinfo);
 
         fprintf(fp,
-                "%s UPNP-%s-%s: Thread:0x%016lX [%s:%d]: ",
+                "%s %s UPNP:%s [0x%016lX][%s:%d] ",
                 timebuf,
+                UpnpLogLevelToStr(DLevel),
                 smod,
-                slev,
 #ifdef __PTW32_DLLPORT
                 (unsigned long int)ithread_self().p
 #else

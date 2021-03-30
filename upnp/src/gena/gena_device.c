@@ -198,7 +198,7 @@ static UPNP_INLINE int notify_send_and_recv(
 
         /* connect */
         UpnpPrintf(p,
-                UPNP_ALL,
+                UPNP_DEBUG,
                 GENA,
                 __FILE__,
                 __LINE__,
@@ -478,7 +478,7 @@ static char *AllocGenaHeaders(
 ExitFunction:
         if (headers == NULL || rc < 0 || (unsigned int)rc >= headers_size) {
                 UpnpPrintf(p,
-                        UPNP_ALL,
+                        UPNP_DEBUG,
                         GENA,
                         __FILE__,
                         line,

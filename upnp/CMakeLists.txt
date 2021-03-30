@@ -146,9 +146,13 @@ set_target_properties (upnp_shared PROPERTIES
 )
 
 target_compile_definitions (upnp_shared
-	PRIVATE $<$<CONFIG:Debug>:STATS>
+	PRIVATE "$<$<CONFIG:Debug>:STATS>"
 	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 )
+
+if (HAVE_MACRO_PREFIX_MAP)
+	target_compile_options(upnp_shared PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=)
+endif()
 
 target_include_directories (upnp_shared
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
@@ -194,6 +198,10 @@ target_compile_definitions (upnp_static
 	PRIVATE $<$<CONFIG:Debug>:STATS>
 	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 )
+
+if (HAVE_MACRO_PREFIX_MAP)
+	target_compile_options(upnp_static PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=)
+endif()
 
 target_include_directories (upnp_static
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
