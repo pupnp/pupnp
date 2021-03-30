@@ -60,65 +60,65 @@ int UpnpInitLog(UpnpLib *p)
         const char *fname;
         FILE *fp = 0;
 
-        if (!UpnpLib_get_gLogInitWasCalled(p)) {
-                ithread_mutex_init(UpnpLib_getnc_gLogMutex(p), NULL);
-                UpnpLib_set_gLogInitWasCalled(p, 1);
+        if (!UpnpLib_get_LogInitWasCalled(p)) {
+                ithread_mutex_init(UpnpLib_getnc_LogMutex(p), NULL);
+                UpnpLib_set_LogInitWasCalled(p, 1);
         }
         /* If the user did not ask for logging do nothing */
-        if (!UpnpLib_get_gSetLogWasCalled(p)) {
+        if (!UpnpLib_get_SetLogWasCalled(p)) {
                 return UPNP_E_SUCCESS;
         }
-        if (UpnpLib_get_gLogFp(p)) {
-                if (!UpnpLib_get_gLogIsStderr(p)) {
-                        fclose(UpnpLib_get_gLogFp(p));
-                        UpnpLib_set_gLogFp(p, 0);
+        if (UpnpLib_get_LogFp(p)) {
+                if (!UpnpLib_get_LogIsStderr(p)) {
+                        fclose(UpnpLib_get_LogFp(p));
+                        UpnpLib_set_LogFp(p, 0);
                 }
         }
-        UpnpLib_set_gLogIsStderr(p, 0);
-        fname = UpnpLib_get_gLogFileName(p);
+        UpnpLib_set_LogIsStderr(p, 0);
+        fname = UpnpLib_get_LogFileName(p);
         if (fname) {
                 fp = fopen(fname, "a");
-                UpnpLib_set_gLogFp(p, fp);
+                UpnpLib_set_LogFp(p, fp);
                 if (!fp) {
                         fprintf(stderr,
                                 "Failed to open gLogFileName (%s): %s\n",
-                                UpnpLib_get_gLogFileName(p),
+                                UpnpLib_get_LogFileName(p),
                                 strerror(errno));
                 }
         }
         if (!fp) {
-                UpnpLib_set_gLogFp(p, stderr);
-                UpnpLib_set_gLogIsStderr(p, 1);
+                UpnpLib_set_LogFp(p, stderr);
+                UpnpLib_set_LogIsStderr(p, 1);
         }
         return UPNP_E_SUCCESS;
 }
 
 void UpnpSetLogLevel(UpnpLib *p, Upnp_LogLevel log_level)
 {
-        UpnpLib_set_gLogLevel(p, log_level);
-        UpnpLib_set_gSetLogWasCalled(p, 1);
+        UpnpLib_set_LogLevel(p, log_level);
+        UpnpLib_set_SetLogWasCalled(p, 1);
 }
 
 void UpnpCloseLog(UpnpLib *p)
 {
         FILE *fp;
-        if (!UpnpLib_get_gLogInitWasCalled(p)) {
+        if (!UpnpLib_get_LogInitWasCalled(p)) {
                 return;
         }
 
         /* Calling lock() assumes that someone called UpnpInitLog(), but
          * this is reasonable as it is called from UpnpInit2(). We risk a
          * crash if we do this without a lock.*/
-        ithread_mutex_lock(UpnpLib_getnc_gLogMutex(p));
-        fp = UpnpLib_get_gLogFp(p);
-        if (fp && !UpnpLib_get_gLogIsStderr(p)) {
+        ithread_mutex_lock(UpnpLib_getnc_LogMutex(p));
+        fp = UpnpLib_get_LogFp(p);
+        if (fp && !UpnpLib_get_LogIsStderr(p)) {
                 fclose(fp);
         }
-        UpnpLib_set_gLogFp(p, 0);
-        UpnpLib_set_gLogIsStderr(p, 0);
-        UpnpLib_set_gLogInitWasCalled(p, 0);
-        ithread_mutex_unlock(UpnpLib_getnc_gLogMutex(p));
-        ithread_mutex_destroy(UpnpLib_getnc_gLogMutex(p));
+        UpnpLib_set_LogFp(p, 0);
+        UpnpLib_set_LogIsStderr(p, 0);
+        UpnpLib_set_LogInitWasCalled(p, 0);
+        ithread_mutex_unlock(UpnpLib_getnc_LogMutex(p));
+        ithread_mutex_destroy(UpnpLib_getnc_LogMutex(p));
 }
 
 void UpnpSetLogFileNames(
@@ -126,23 +126,21 @@ void UpnpSetLogFileNames(
 {
         (void)ignored;
 
-        if (UpnpLib_get_gLogFileName(p)) {
-                free(UpnpLib_get_gLogFileName(p));
-                UpnpLib_set_gLogFileName(p, 0);
+        if (UpnpLib_get_LogFileName(p)) {
+                free(UpnpLib_get_LogFileName(p));
+                UpnpLib_set_LogFileName(p, 0);
         }
         if (newgLogFileName && *newgLogFileName) {
-                UpnpLib_set_gLogFileName(p, strdup(newgLogFileName));
+                UpnpLib_set_LogFileName(p, strdup(newgLogFileName));
         }
-        UpnpLib_set_gSetLogWasCalled(p, 1);
-
-        return;
+        UpnpLib_set_SetLogWasCalled(p, 1);
 }
 
 static int DebugAtThisLevel(UpnpLib *p, Upnp_LogLevel DLevel, Dbg_Module Module)
 {
         (void)Module;
 
-        return (DLevel <= UpnpLib_get_gLogLevel(p)) &&
+        return (DLevel <= UpnpLib_get_LogLevel(p)) &&
                 (DEBUG_ALL || (Module == SSDP && DEBUG_SSDP) ||
                         (Module == SOAP && DEBUG_SOAP) ||
                         (Module == GENA && DEBUG_GENA) ||
@@ -245,19 +243,19 @@ void UpnpPrintf(UpnpLib *p,
           %d\n", fp, DLevel, gLogLevel, Module, DEBUG_ALL);*/
         va_list ArgList;
 
-        if (!UpnpLib_get_gLogInitWasCalled(p)) {
+        if (!UpnpLib_get_LogInitWasCalled(p)) {
                 return;
         }
 
         if (!DebugAtThisLevel(p, DLevel, Module))
                 return;
 
-        fp = UpnpLib_get_gLogFp(p);
+        fp = UpnpLib_get_LogFp(p);
         if (!fp) {
                 return;
         }
 
-        ithread_mutex_lock(UpnpLib_getnc_gLogMutex(p));
+        ithread_mutex_lock(UpnpLib_getnc_LogMutex(p));
         va_start(ArgList, FmtStr);
         if (DbggLogFileName) {
                 UpnpDisplayFileAndLine(
@@ -266,7 +264,7 @@ void UpnpPrintf(UpnpLib *p,
                 fflush(fp);
         }
         va_end(ArgList);
-        ithread_mutex_unlock(UpnpLib_getnc_gLogMutex(p));
+        ithread_mutex_unlock(UpnpLib_getnc_LogMutex(p));
 }
 
 /* No locking here, the app should be careful about not calling
@@ -276,6 +274,6 @@ FILE *UpnpGetDebugFile(UpnpLib *p, Upnp_LogLevel DLevel, Dbg_Module Module)
         if (!DebugAtThisLevel(p, DLevel, Module)) {
                 return NULL;
         } else {
-                return UpnpLib_get_gLogFp(p);
+                return UpnpLib_get_LogFp(p);
         }
 }

@@ -364,44 +364,44 @@ EXPORT_SPEC SSL_CTX *UpnpLib_get_gSslCtx(const UpnpLib *p);
 EXPORT_SPEC int UpnpLib_set_gSslCtx(UpnpLib *p, SSL_CTX *n);
 
 #endif
-/*! UpnpLib_get_gLogMutex */
-EXPORT_SPEC const ithread_mutex_t *UpnpLib_get_gLogMutex(const UpnpLib *p);
-/*! UpnpLib_getnc_gLogMutex */
-EXPORT_SPEC ithread_mutex_t *UpnpLib_getnc_gLogMutex(UpnpLib *p);
-/*! UpnpLib_get_gLogMutex */
-EXPORT_SPEC int UpnpLib_set_gLogMutex(UpnpLib *p, const ithread_mutex_t *buf);
-/*! UpnpLib_get_gLogMutex */
-EXPORT_SPEC void UpnpLib_clear_gLogMutex(UpnpLib *p);
+/*! UpnpLib_get_LogMutex */
+EXPORT_SPEC const ithread_mutex_t *UpnpLib_get_LogMutex(const UpnpLib *p);
+/*! UpnpLib_getnc_LogMutex */
+EXPORT_SPEC ithread_mutex_t *UpnpLib_getnc_LogMutex(UpnpLib *p);
+/*! UpnpLib_get_LogMutex */
+EXPORT_SPEC int UpnpLib_set_LogMutex(UpnpLib *p, const ithread_mutex_t *buf);
+/*! UpnpLib_get_LogMutex */
+EXPORT_SPEC void UpnpLib_clear_LogMutex(UpnpLib *p);
 
-/*! UpnpLib_get_gLogLevel */
-EXPORT_SPEC Upnp_LogLevel UpnpLib_get_gLogLevel(const UpnpLib *p);
-/*! UpnpLib_set_gLogLevel */
-EXPORT_SPEC int UpnpLib_set_gLogLevel(UpnpLib *p, Upnp_LogLevel n);
+/*! UpnpLib_get_LogLevel */
+EXPORT_SPEC Upnp_LogLevel UpnpLib_get_LogLevel(const UpnpLib *p);
+/*! UpnpLib_set_LogLevel */
+EXPORT_SPEC int UpnpLib_set_LogLevel(UpnpLib *p, Upnp_LogLevel n);
 
-/*! UpnpLib_get_gLogFp */
-EXPORT_SPEC FILE *UpnpLib_get_gLogFp(const UpnpLib *p);
-/*! UpnpLib_set_gLogFp */
-EXPORT_SPEC int UpnpLib_set_gLogFp(UpnpLib *p, FILE *n);
+/*! UpnpLib_get_LogFp */
+EXPORT_SPEC FILE *UpnpLib_get_LogFp(const UpnpLib *p);
+/*! UpnpLib_set_LogFp */
+EXPORT_SPEC int UpnpLib_set_LogFp(UpnpLib *p, FILE *n);
 
-/*! UpnpLib_get_gLogIsStderr */
-EXPORT_SPEC int UpnpLib_get_gLogIsStderr(const UpnpLib *p);
-/*! UpnpLib_set_gLogIsStderr */
-EXPORT_SPEC int UpnpLib_set_gLogIsStderr(UpnpLib *p, int n);
+/*! UpnpLib_get_LogIsStderr */
+EXPORT_SPEC int UpnpLib_get_LogIsStderr(const UpnpLib *p);
+/*! UpnpLib_set_LogIsStderr */
+EXPORT_SPEC int UpnpLib_set_LogIsStderr(UpnpLib *p, int n);
 
-/*! UpnpLib_get_gSetLogWasCalled */
-EXPORT_SPEC int UpnpLib_get_gSetLogWasCalled(const UpnpLib *p);
-/*! UpnpLib_set_gSetLogWasCalled */
-EXPORT_SPEC int UpnpLib_set_gSetLogWasCalled(UpnpLib *p, int n);
+/*! UpnpLib_get_SetLogWasCalled */
+EXPORT_SPEC int UpnpLib_get_SetLogWasCalled(const UpnpLib *p);
+/*! UpnpLib_set_SetLogWasCalled */
+EXPORT_SPEC int UpnpLib_set_SetLogWasCalled(UpnpLib *p, int n);
 
-/*! UpnpLib_get_gLogInitWasCalled */
-EXPORT_SPEC int UpnpLib_get_gLogInitWasCalled(const UpnpLib *p);
-/*! UpnpLib_set_gLogInitWasCalled */
-EXPORT_SPEC int UpnpLib_set_gLogInitWasCalled(UpnpLib *p, int n);
+/*! UpnpLib_get_LogInitWasCalled */
+EXPORT_SPEC int UpnpLib_get_LogInitWasCalled(const UpnpLib *p);
+/*! UpnpLib_set_LogInitWasCalled */
+EXPORT_SPEC int UpnpLib_set_LogInitWasCalled(UpnpLib *p, int n);
 
-/*! UpnpLib_get_gLogFileName */
-EXPORT_SPEC char *UpnpLib_get_gLogFileName(const UpnpLib *p);
-/*! UpnpLib_set_gLogFileName */
-EXPORT_SPEC int UpnpLib_set_gLogFileName(UpnpLib *p, char *n);
+/*! UpnpLib_get_LogFileName */
+EXPORT_SPEC char *UpnpLib_get_LogFileName(const UpnpLib *p);
+/*! UpnpLib_set_LogFileName */
+EXPORT_SPEC int UpnpLib_set_LogFileName(UpnpLib *p, char *n);
 
 #ifdef __cplusplus
 }
