@@ -544,7 +544,8 @@ extern "C" {
  *     \li \c UPNP_E_INVALID_INTERFACE: IfName is invalid or does not
  *             have a valid IPv4 or IPv6 addresss configured.
  */
-EXPORT_SPEC int UpnpInit2(/*! Library handle. */
+EXPORT_SPEC int UpnpInit2(
+        /*! Library handle. */
         UpnpLib **LibraryHandle,
         /*! The interface name to use by the UPnP SDK operations.
          * Examples: "eth0", "xl0", "Local Area Connection", \c NULL to
