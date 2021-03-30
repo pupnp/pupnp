@@ -83,29 +83,6 @@ if (uuid)
 	)
 endif()
 
-add_library (upnp_shared SHARED
-	${UPNP_SOURCES}
-)
-
-add_library (UPNP::Shared ALIAS upnp_shared)
-
-set_target_properties (upnp_shared PROPERTIES
-	WINDOWS_EXPORT_ALL_SYMBOLS TRUE
-)
-
-target_compile_definitions (upnp_shared
-	PRIVATE $<$<CONFIG:Debug>:STATS>
-	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
-)
-
-target_include_directories (upnp_shared
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
-	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
-	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
-	PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
-	PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
-)
-
 list (APPEND UPNP_HEADERS
 	inc/Callback.h
 	inc/ithread.h
@@ -137,100 +114,129 @@ if (tools)
 	)
 endif()
 
-set_target_properties (upnp_shared PROPERTIES
-	OUTPUT_NAME ${WIN_PREFIX}upnp
-	EXPORT_NAME UPNP::Shared
-	VERSION ${UPNP_VERSION}
-	SOVERSION ${UPNP_VERSION_MAJOR}
-	PUBLIC_HEADER "${UPNP_HEADERS}"
-)
+if (UPNP_BUILD_SHARED)
+	add_library (upnp_shared SHARED
+		${UPNP_SOURCES}
+	)
 
-target_compile_definitions (upnp_shared
-	PRIVATE $<$<CONFIG:Debug>:STATS>
-	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
-)
+	add_library (UPNP::Shared ALIAS upnp_shared)
 
-target_include_directories (upnp_shared
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
-	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
-	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
-	PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
-	PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
-)
+	set_target_properties (upnp_shared PROPERTIES
+		WINDOWS_EXPORT_ALL_SYMBOLS TRUE
+	)
 
-if (WIN32)
+	target_compile_definitions (upnp_shared
+		PRIVATE $<$<CONFIG:Debug>:STATS>
+		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	)
+
+	target_include_directories (upnp_shared
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
+	)
+
+	set_target_properties (upnp_shared PROPERTIES
+		OUTPUT_NAME ${WIN_PREFIX}upnp
+		EXPORT_NAME UPNP::Shared
+		VERSION ${UPNP_VERSION}
+		SOVERSION ${UPNP_VERSION_MAJOR}
+		PUBLIC_HEADER "${UPNP_HEADERS}"
+	)
+
+	target_compile_definitions (upnp_shared
+		PRIVATE $<$<CONFIG:Debug>:STATS>
+		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	)
+
+	target_include_directories (upnp_shared
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
+	)
+
+	if (WIN32)
+		target_link_libraries (upnp_shared
+			PRIVATE ws2_32
+			PRIVATE iphlpapi
+		)
+	endif()
+
 	target_link_libraries (upnp_shared
-		PRIVATE ws2_32
-		PRIVATE iphlpapi
+		PUBLIC ixml_shared
+		PUBLIC Threads::Shared
+	)
+
+	if (UPNP_ENABLE_OPEN_SSL)
+		target_link_libraries (upnp_shared
+			PRIVATE OpenSSL::SSL
+		)
+	endif()
+
+	install (TARGETS upnp_shared
+		EXPORT UPNP
+		DESTINATION ${CMAKE_INSTALL_LIBDIR}
+		INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
+		PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
 	)
 endif()
 
-target_link_libraries (upnp_shared
-	PUBLIC ixml_shared
-	PUBLIC Threads::Shared
-)
-
-if (UPNP_ENABLE_OPEN_SSL)
-	target_link_libraries (upnp_shared
-		PRIVATE OpenSSL::SSL
+if (UPNP_BUILD_STATIC)
+	add_library (upnp_static STATIC
+		${UPNP_SOURCES}
 	)
-endif()
 
-install (TARGETS upnp_shared
-	EXPORT UPNP
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
-	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
-)
+	add_library (UPNP::Static ALIAS upnp_static)
 
-add_library (upnp_static STATIC
-	${UPNP_SOURCES}
-)
+	target_compile_definitions (upnp_static
+		PRIVATE UPNP_STATIC_LIB
+		PRIVATE $<$<CONFIG:Debug>:STATS>
+		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	)
 
-add_library (UPNP::Static ALIAS upnp_static)
+	target_include_directories (upnp_static
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
+	)
 
-target_compile_definitions (upnp_static
-	PRIVATE UPNP_STATIC_LIB
-	PRIVATE $<$<CONFIG:Debug>:STATS>
-	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
-)
+	if (WIN32)
+		target_link_libraries (upnp_static
+			INTERFACE ws2_32
+			INTERFACE iphlpapi
+		)
+	endif()
 
-target_include_directories (upnp_static
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
-	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
-	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
-	PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
-	PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
-)
+	set_target_properties (upnp_static PROPERTIES
+		OUTPUT_NAME ${WIN_PREFIX}upnp${STATIC_POSTFIX}
+		EXPORT_NAME UPNP::Static
+		PUBLIC_HEADER "${UPNP_HEADERS}"
+	)
 
-if (WIN32)
 	target_link_libraries (upnp_static
-		INTERFACE ws2_32
-		INTERFACE iphlpapi
+		PUBLIC ixml_static
+		PUBLIC Threads::Static
+	)
+
+	if (UPNP_ENABLE_OPEN_SSL)
+		target_link_libraries (upnp_static
+			PRIVATE OpenSSL::SSL
+		)
+	endif()
+
+	install (TARGETS upnp_static
+		EXPORT UPNP
+		DESTINATION ${CMAKE_INSTALL_LIBDIR}
+		INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
+		PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
 	)
 endif()
-
-set_target_properties (upnp_static PROPERTIES
-	OUTPUT_NAME ${WIN_PREFIX}upnp${STATIC_POSTFIX}
-	EXPORT_NAME UPNP::Static
-)
-
-target_link_libraries (upnp_static
-	PUBLIC ixml_static
-	PUBLIC Threads::Static
-)
-
-if (UPNP_ENABLE_OPEN_SSL)
-	target_link_libraries (upnp_static
-		PRIVATE OpenSSL::SSL
-	)
-endif()
-
-install (TARGETS upnp_static
-	EXPORT UPNP
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
-)
 
 install (EXPORT UPNP
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP

@@ -82,6 +82,8 @@ if (WIN32)
 	set (STATIC_POSTFIX s)
 endif()
 
+option (UPNP_BUILD_SHARED "Build shared libraries" ON)
+option (UPNP_BUILD_STATIC "Build static libraries" ON)
 option (BUILD_TESTING "Run Tests after compile" ON)
 
 
