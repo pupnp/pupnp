@@ -1338,7 +1338,7 @@ int http_OpenHttpConnection(
         if (token_string_casecmp(&url.scheme, "https") == 0) {
                 ret_code = sock_ssl_connect(&handle->sock_info);
                 if (ret_code != UPNP_E_SUCCESS) {
-                        sock_destroy(&handle->sock_info, SD_BOTH);
+                        sock_destroy(p, &handle->sock_info, SD_BOTH);
                         goto errorHandler;
                 }
         }

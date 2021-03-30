@@ -447,7 +447,7 @@ exit_function:
 int UpnpInitSslContext(
         UpnpLib *p, int initOpenSslLib, const SSL_METHOD *sslMethod)
 {
-        if (p->gSslCtx) {
+        if (UpnpLib_get_gSslCtx(p)) {
                 return UPNP_E_INIT;
         }
         if (initOpenSslLib) {
@@ -455,10 +455,11 @@ int UpnpInitSslContext(
                 SSL_library_init();
                 OpenSSL_add_all_algorithms();
         }
-        p->gSslCtx = SSL_CTX_new(sslMethod);
-        if (!p->gSslCtx) {
+        UpnpLib_set_gSslCtx(p, SSL_CTX_new(sslMethod));
+        if (!UpnpLib_get_gSslCtx(p)) {
                 return UPNP_E_INIT_FAILED;
         }
+
         return UPNP_E_SUCCESS;
 }
 #endif
@@ -534,9 +535,11 @@ int UpnpFinish(UpnpLib *p)
 #endif
         struct Handle_Info *temp;
 #ifdef UPNP_ENABLE_OPEN_SSL
-        if (gSslCtx) {
-                SSL_CTX_free(gSslCtx);
-                gSslCtx = NULL;
+        SSL_CTX *ctx = UpnpLib_get_gSslCtx(p);
+
+        if (ctx) {
+                SSL_CTX_free(ctx);
+                UpnpLib_set_gSslCtx(p, 0);
         }
 #endif
         if (!UpnpLib_get_UpnpSdkInit(p)) {
