@@ -135,9 +135,8 @@ AC_DEFINE_UNQUOTED([UPNP_VERSION_PATCH], $upnppatch, [see upnpconfig.h])
 #
 # Check for DEBUG flag
 #
-RT_BOOL_ARG_ENABLE([debug], [no], [extra debugging code])
+RT_BOOL_ARG_ENABLE([debug], [no], [Enable asserting])
 if test "x$enable_debug" = xyes ; then
-	AC_DEFINE(UPNP_HAVE_DEBUG, 1, [see upnpconfig.h])
 	AC_DEFINE(DEBUG, 1, [Define to 1 to compile debug code])
 else
 	AC_DEFINE(NDEBUG, 1, [Define to 1 to prevent compilation of assert()])

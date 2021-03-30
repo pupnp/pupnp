@@ -51,20 +51,12 @@ function (addTestExecutable testName sourceFile)
 		${sourceFile}
 	)
 
-	target_compile_definitions (${testName}
-		PRIVATE $<$<CONFIG:Debug>:UPNP_HAVE_DEBUG>
-	)
-
 	target_link_libraries (${testName}
 		PRIVATE upnp_shared
 	)
 
 	add_executable (${testName}-static
 		${sourceFile}
-	)
-
-	target_compile_definitions (${testName}-static
-		PRIVATE $<$<CONFIG:Debug>:UPNP_HAVE_DEBUG>
 	)
 
 	target_link_libraries (${testName}-static

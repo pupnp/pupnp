@@ -184,7 +184,7 @@ libupnp_la_SOURCES += src/api/upnptools.c
 endif
 
 if ENABLE_DEBUG
-AM_CPPFLAGS         += -DDEBUG -DUPNP_HAVE_DEBUG -DSTATS
+AM_CPPFLAGS         += -DDEBUG -DSTATS
 else
 AM_CPPFLAGS         += -DNDEBUG
 endif

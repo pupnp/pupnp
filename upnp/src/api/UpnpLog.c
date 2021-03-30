@@ -32,7 +32,6 @@
 /*!
  * \file
  */
-#define UPNP_DEBUG_C
 #include "config.h"
 
 #include "UpnpLog.h"
@@ -47,6 +46,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #if linux
 #include <sys/syscall.h>
 #endif
@@ -220,7 +220,7 @@ static void UpnpDisplayFileAndLine(FILE *fp,
                 (unsigned long int)ithread_self().p
 #else
 #if linux
-                (unsigned long int)syscall(__NR_gettid)
+                (unsigned long int)syscall(SYS_gettid)
 #else
                 (unsigned long int)ithread_self()
 #endif

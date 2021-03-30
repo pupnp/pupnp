@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *************************************************************************/
-#include "upnpconfig.h"
+#include "autoconfig.h"
 
 #include "UpnpLog.h"
 #include "upnp.h"
@@ -39,7 +39,6 @@
 
 int main()
 {
-#if UPNP_HAVE_DEBUG
         int i;
         /* Hopefully big enough buffer */
         static char upnplib_buffer[4096];
@@ -103,9 +102,6 @@ int main()
                 UpnpCloseLog(p);
         }
         UpnpCloseLog(p);
-#else
-        printf("DEBUG is not configured\n");
-#endif
 
         exit(0);
 }
