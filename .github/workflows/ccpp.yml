@@ -86,10 +86,6 @@ jobs:
   build_openssl:
     name: OpenSSL build (ubuntu-20.04)
     runs-on: ubuntu-20.04
-
-  build_asan:
-    name: Sanitizer build (ubuntu-20.04)
-    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v1
     - name: bootstrap and configure
@@ -106,6 +102,10 @@ jobs:
     - name: make check (ixml)
       run: |
         cd ixml && make check || (cat test-suite.log && exit 1)
+
+  build_asan:
+    name: Sanitizer build (ubuntu-20.04)
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v1
