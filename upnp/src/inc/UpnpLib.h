@@ -399,9 +399,20 @@ EXPORT_SPEC int UpnpLib_get_LogInitWasCalled(const UpnpLib *p);
 EXPORT_SPEC int UpnpLib_set_LogInitWasCalled(UpnpLib *p, int n);
 
 /*! UpnpLib_get_LogFileName */
-EXPORT_SPEC char *UpnpLib_get_LogFileName(const UpnpLib *p);
+EXPORT_SPEC const UpnpString *UpnpLib_get_LogFileName(const UpnpLib *p);
 /*! UpnpLib_set_LogFileName */
-EXPORT_SPEC int UpnpLib_set_LogFileName(UpnpLib *p, char *n);
+EXPORT_SPEC int UpnpLib_set_LogFileName(UpnpLib *p, const UpnpString *s);
+/*! UpnpLib_get_LogFileName_Length */
+EXPORT_SPEC size_t UpnpLib_get_LogFileName_Length(const UpnpLib *p);
+/*! UpnpLib_get_LogFileName_cstr */
+EXPORT_SPEC const char *UpnpLib_get_LogFileName_cstr(const UpnpLib *p);
+/*! UpnpLib_strcpy_LogFileName */
+EXPORT_SPEC int UpnpLib_strcpy_LogFileName(UpnpLib *p, const char *s);
+/*! UpnpLib_strncpy_LogFileName */
+EXPORT_SPEC int UpnpLib_strncpy_LogFileName(
+        UpnpLib *p, const char *s, size_t n);
+/*! UpnpLib_clear_LogFileName */
+EXPORT_SPEC void UpnpLib_clear_LogFileName(UpnpLib *p);
 
 #ifdef __cplusplus
 }

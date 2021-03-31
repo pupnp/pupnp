@@ -91,7 +91,7 @@ static void UpnpSetLogConfigFromEnvironment(UpnpLib *p)
 {
         char *logFile = getenv("UPNP_LOG_FILE");
         if (logFile) {
-                UpnpSetLogFileName(p, strdup(logFile));
+                UpnpSetLogFileName(p, logFile);
         }
 
         char *logLevel = getenv("UPNP_LOG_LEVEL");
@@ -132,14 +132,14 @@ int UpnpInitLog(UpnpLib *p)
                 }
         }
         UpnpLib_set_LogIsStderr(p, 0);
-        fname = UpnpLib_get_LogFileName(p);
+        fname = UpnpLib_get_LogFileName_cstr(p);
         if (fname) {
                 fp = fopen(fname, "a");
                 UpnpLib_set_LogFp(p, fp);
                 if (!fp) {
                         fprintf(stderr,
-                                "Failed to open gLogFileName (%s): %s\n",
-                                UpnpLib_get_LogFileName(p),
+                                "Failed to open LogFileName (%s): %s\n",
+                                fname,
                                 strerror(errno));
                 }
         }
@@ -181,11 +181,10 @@ void UpnpCloseLog(UpnpLib *p)
 void UpnpSetLogFileName(UpnpLib *p, const char *newgLogFileName)
 {
         if (UpnpLib_get_LogFileName(p)) {
-                free(UpnpLib_get_LogFileName(p));
                 UpnpLib_set_LogFileName(p, 0);
         }
         if (newgLogFileName && *newgLogFileName) {
-                UpnpLib_set_LogFileName(p, strdup(newgLogFileName));
+                UpnpLib_strcpy_LogFileName(p, newgLogFileName);
         }
         UpnpLib_set_SetLogWasCalled(p, 1);
 }
