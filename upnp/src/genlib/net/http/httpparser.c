@@ -2308,7 +2308,7 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
         /* print start line */
         if (hmsg->is_request) {
                 UpnpPrintf(p,
-                        UPNP_ALL,
+                        UPNP_DEBUG,
                         HTTP,
                         __FILE__,
                         __LINE__,
@@ -2320,7 +2320,7 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
                         hmsg->uri.pathquery.buff);
         } else {
                 UpnpPrintf(p,
-                        UPNP_ALL,
+                        UPNP_DEBUG,
                         HTTP,
                         __FILE__,
                         __LINE__,
@@ -2340,7 +2340,7 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
                 header = (http_header_t *)node->item;
                 /* NNS: header = (http_header_t *)node->data; */
                 UpnpPrintf(p,
-                        UPNP_ALL,
+                        UPNP_DEBUG,
                         HTTP,
                         __FILE__,
                         __LINE__,

@@ -151,6 +151,10 @@ if (UPNP_BUILD_SHARED)
 		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 	)
 
+if (HAVE_MACRO_PREFIX_MAP)
+	target_compile_options(upnp_shared PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=)
+endif()
+
 	target_include_directories (upnp_shared
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
 		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
@@ -197,6 +201,10 @@ if (UPNP_BUILD_STATIC)
 		PRIVATE $<$<CONFIG:Debug>:STATS>
 		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 	)
+
+if (HAVE_MACRO_PREFIX_MAP)
+	target_compile_options(upnp_static PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=)
+endif()
 
 	target_include_directories (upnp_static
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
