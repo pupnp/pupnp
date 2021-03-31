@@ -97,8 +97,9 @@ static void UpnpSetLogConfigFromEnvironment(UpnpLib *p)
         char *logLevel = getenv("UPNP_LOG_LEVEL");
         if (logLevel) {
                 Upnp_LogLevel mapped = UpnpLogLevelFromStr(logLevel);
-                if (mapped != -1)
+                if (mapped != UPNP_LOG_LEVEL_ERROR) {
                         UpnpSetLogLevel(p, mapped);
+                }
         }
 }
 
