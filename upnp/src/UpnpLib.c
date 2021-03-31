@@ -58,7 +58,7 @@ struct s_UpnpLib
         ithread_mutex_t m_LogMutex;
         Upnp_LogLevel m_LogLevel;
         FILE *m_LogFp;
-        int m_gLogIsStderr;
+        int m_LogIsStderr;
         int m_SetLogWasCalled;
         int m_LogInitWasCalled;
         char *m_LogFileName;
@@ -119,7 +119,7 @@ UpnpLib *UpnpLib_new()
         ;
         p->m_LogLevel = UPNP_DEFAULT_LOG_LEVEL;
         /*p->m_LogFp = 0;*/
-        /*p->m_gLogIsStderr = 0;*/
+        /*p->m_LogIsStderr = 0;*/
         /*p->m_SetLogWasCalled = 0;*/
         /*p->m_LogInitWasCalled = 0;*/
         /*p->m_LogFileName = 0;*/
@@ -138,7 +138,7 @@ void UpnpLib_delete(UpnpLib *q)
         p->m_LogFileName = 0;
         p->m_LogInitWasCalled = 0;
         p->m_SetLogWasCalled = 0;
-        p->m_gLogIsStderr = 0;
+        p->m_LogIsStderr = 0;
         p->m_LogFp = 0;
         p->m_LogLevel = UPNP_DEFAULT_LOG_LEVEL;
         memset(&p->m_LogMutex, 0, sizeof(ithread_mutex_t));
@@ -1058,11 +1058,11 @@ int UpnpLib_set_LogFp(UpnpLib *p, FILE *n)
         return 1;
 }
 
-int UpnpLib_get_LogIsStderr(const UpnpLib *p) { return p->m_gLogIsStderr; }
+int UpnpLib_get_LogIsStderr(const UpnpLib *p) { return p->m_LogIsStderr; }
 
 int UpnpLib_set_LogIsStderr(UpnpLib *p, int n)
 {
-        p->m_gLogIsStderr = n;
+        p->m_LogIsStderr = n;
 
         return 1;
 }
