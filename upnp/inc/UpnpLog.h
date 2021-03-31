@@ -85,6 +85,7 @@ typedef enum Upnp_Module
 /*@{*/
 typedef enum Upnp_LogLevel_e
 {
+        UPNP_LOG_LEVEL_ERROR = -1,
         UPNP_CRITICAL,
         UPNP_ERROR,
         UPNP_INFO,
