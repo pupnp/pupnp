@@ -102,7 +102,7 @@ void genaCallback(UpnpLib *p,
                         gena_process_subscription_request(info, request);
                 }
                 UpnpPrintf(p,
-                        UPNP_ALL,
+                        UPNP_DEBUG,
                         GENA,
                         __FILE__,
                         __LINE__,

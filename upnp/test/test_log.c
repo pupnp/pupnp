@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *************************************************************************/
-#include "upnpconfig.h"
+#include "autoconfig.h"
 
 #include "UpnpLog.h"
 #include "upnp.h"
@@ -39,7 +39,6 @@
 
 int main()
 {
-#if UPNP_HAVE_DEBUG
         int i;
         /* Hopefully big enough buffer */
         static char upnplib_buffer[4096];
@@ -70,7 +69,7 @@ int main()
         }
 
         /* Let's really init. Request log to stderr */
-        UpnpSetLogFileNames(p, NULL, NULL);
+        UpnpSetLogFileName(p, NULL);
         UpnpSetLogLevel(p, UPNP_ERROR);
         UpnpInitLog(p);
 
@@ -83,7 +82,7 @@ int main()
                 "This should not be here!\n");
 
         /* Let's try to a file */
-        UpnpSetLogFileNames(p, "libupnp_err.log", 0);
+        UpnpSetLogFileName(p, "libupnp_err.log");
         UpnpInitLog(p);
         UpnpPrintf(p,
                 UPNP_CRITICAL,
@@ -95,7 +94,7 @@ int main()
         /* Close and retry stuff */
         UpnpCloseLog(p);
         UpnpPrintf(p, UPNP_INFO, API, __FILE__, __LINE__, "Not here either!\n");
-        UpnpSetLogFileNames(p, 0, 0);
+        UpnpSetLogFileName(p, NULL);
         UpnpInitLog(p);
         UpnpPrintf(p, UPNP_CRITICAL, API, __FILE__, __LINE__, "I'm back!\n");
         for (i = 0; i < 10000; i++) {
@@ -103,9 +102,6 @@ int main()
                 UpnpCloseLog(p);
         }
         UpnpCloseLog(p);
-#else
-        printf("DEBUG is not configured\n");
-#endif
 
         exit(0);
 }

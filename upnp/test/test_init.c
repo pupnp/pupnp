@@ -74,12 +74,6 @@ int main(int argc, char *argv[])
          */
         printf("\n");
 
-#if UPNP_HAVE_DEBUG
-        printf("UPNP_HAVE_DEBUG \t= yes\n");
-#else
-        printf("UPNP_HAVE_DEBUG \t= no\n");
-#endif
-
 #if UPNP_HAVE_CLIENT
         printf("UPNP_HAVE_CLIENT\t= yes\n");
 #else

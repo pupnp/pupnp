@@ -129,7 +129,7 @@ int AdvertiseAndReply(UpnpLib *p,
         servType[0] = 0;
 
         UpnpPrintf(p,
-                UPNP_ALL,
+                UPNP_DEBUG,
                 API,
                 __FILE__,
                 __LINE__,
@@ -150,7 +150,7 @@ int AdvertiseAndReply(UpnpLib *p,
                 NumCopy++;
                 for (i = 0lu;; i++) {
                         UpnpPrintf(p,
-                                UPNP_ALL,
+                                UPNP_DEBUG,
                                 API,
                                 __FILE__,
                                 __LINE__,
@@ -159,7 +159,7 @@ int AdvertiseAndReply(UpnpLib *p,
                         tmpNode = ixmlNodeList_item(SInfo->DeviceList, i);
                         if (!tmpNode) {
                                 UpnpPrintf(p,
-                                        UPNP_ALL,
+                                        UPNP_DEBUG,
                                         API,
                                         __FILE__,
                                         __LINE__,
@@ -182,14 +182,14 @@ int AdvertiseAndReply(UpnpLib *p,
                         if (!nodeList)
                                 continue;
                         UpnpPrintf(p,
-                                UPNP_ALL,
+                                UPNP_DEBUG,
                                 API,
                                 __FILE__,
                                 __LINE__,
                                 "Extracting UDN for %s\n",
                                 dbgStr);
                         UpnpPrintf(p,
-                                UPNP_ALL,
+                                UPNP_DEBUG,
                                 API,
                                 __FILE__,
                                 __LINE__,
@@ -201,7 +201,7 @@ int AdvertiseAndReply(UpnpLib *p,
                         if (!textNode)
                                 continue;
                         UpnpPrintf(p,
-                                UPNP_ALL,
+                                UPNP_DEBUG,
                                 API,
                                 __FILE__,
                                 __LINE__,
@@ -212,7 +212,7 @@ int AdvertiseAndReply(UpnpLib *p,
                         strncpy(devType, tmpStr, sizeof devType);
                         devType[sizeof devType - 1] = 0;
                         UpnpPrintf(p,
-                                UPNP_ALL,
+                                UPNP_DEBUG,
                                 API,
                                 __FILE__,
                                 __LINE__,
@@ -220,7 +220,7 @@ int AdvertiseAndReply(UpnpLib *p,
                                 devType);
                         if (!tmpNode) {
                                 UpnpPrintf(p,
-                                        UPNP_ALL,
+                                        UPNP_DEBUG,
                                         API,
                                         __FILE__,
                                         __LINE__,
@@ -228,7 +228,7 @@ int AdvertiseAndReply(UpnpLib *p,
                         }
                         dbgStr = ixmlNode_getNodeName(tmpNode);
                         UpnpPrintf(p,
-                                UPNP_ALL,
+                                UPNP_DEBUG,
                                 API,
                                 __FILE__,
                                 __LINE__,
@@ -570,7 +570,7 @@ end_function:
         ixmlNodeList_free(tmpNodeList);
         ixmlNodeList_free(nodeList);
         UpnpPrintf(p,
-                UPNP_ALL,
+                UPNP_DEBUG,
                 API,
                 __FILE__,
                 __LINE__,

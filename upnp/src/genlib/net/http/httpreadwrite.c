@@ -463,7 +463,7 @@ int http_RecvMessage(UpnpLib *p,
 ExitFunction:
         if (ret != UPNP_E_SUCCESS) {
                 UpnpPrintf(p,
-                        UPNP_ALL,
+                        UPNP_DEBUG,
                         HTTP,
                         __FILE__,
                         line,
@@ -1763,7 +1763,7 @@ int http_MakeMessage(UpnpLib *p,
                         s = (char *)va_arg(argp, char *);
                         assert(s);
                         UpnpPrintf(p,
-                                UPNP_ALL,
+                                UPNP_DEBUG,
                                 HTTP,
                                 __FILE__,
                                 __LINE__,
@@ -1792,7 +1792,7 @@ int http_MakeMessage(UpnpLib *p,
                         /* mem buffer */
                         s = (char *)va_arg(argp, char *);
                         UpnpPrintf(p,
-                                UPNP_ALL,
+                                UPNP_DEBUG,
                                 HTTP,
                                 __FILE__,
                                 __LINE__,
