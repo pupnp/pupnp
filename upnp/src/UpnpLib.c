@@ -62,6 +62,7 @@ struct s_UpnpLib
         int m_SetLogWasCalled;
         int m_LogInitWasCalled;
         char *m_LogFileName;
+        LogCallback m_LogCallback;
 };
 
 UpnpLib *UpnpLib_new()
@@ -1096,6 +1097,15 @@ char *UpnpLib_get_LogFileName(const UpnpLib *p) { return p->m_LogFileName; }
 int UpnpLib_set_LogFileName(UpnpLib *p, char *n)
 {
         p->m_LogFileName = n;
+
+        return 1;
+}
+
+LogCallback UpnpLib_get_LogCallback(UpnpLib *p) { return p->m_LogCallback; }
+
+int UpnpLib_set_LogCallback(UpnpLib *p, LogCallback callback)
+{
+        p->m_LogCallback = callback;
 
         return 1;
 }

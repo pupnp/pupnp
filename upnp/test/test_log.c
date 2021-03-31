@@ -37,6 +37,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+void test_callback(Upnp_LogLevel level,
+        Dbg_Module module,
+        const char *sourceFile,
+        const int *sourceLine,
+        const char *log)
+{
+
+        fprintf(stderr,
+                "Hello, from the test callback. Level is: %s, Message is: "
+                "'%s'\n",
+                UpnpLogLevelToStr(level),
+                log);
+}
+
 int main()
 {
         int i;
@@ -102,6 +116,38 @@ int main()
                 UpnpCloseLog(p);
         }
         UpnpCloseLog(p);
+
+        /* Callback */
+        UpnpInitLog(p);
+        UpnpSetLogCallback(p, test_callback);
+        UpnpPrintf(p,
+                UPNP_CRITICAL,
+                API,
+                __FILE__,
+                __LINE__,
+                "And we'd better not risk another frontal assault, that "
+                "rabbit's dynamite.\n");
+        UpnpPrintf(p,
+                UPNP_CRITICAL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Would it help to confuse it if we run away more?\n");
+        UpnpSetLogCallback(p, NULL);
+        UpnpPrintf(p,
+                UPNP_CRITICAL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Oh, shut up and go and change your armor.\n");
+        UpnpSetLogCallback(p, test_callback);
+        UpnpPrintf(p,
+                UPNP_CRITICAL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Let us taunt it! It may become so cross that it will make a "
+                "mistake.\n");
 
         exit(0);
 }
