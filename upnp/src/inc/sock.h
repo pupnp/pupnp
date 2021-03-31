@@ -134,6 +134,8 @@ int sock_init_with_ip(
  */
 #ifdef UPNP_ENABLE_OPEN_SSL
 int sock_ssl_connect(
+        /*! Library handle. */
+        UpnpLib *p,
         /*! [out] Socket Information Object. */
         SOCKINFO *info);
 #endif

@@ -44,6 +44,7 @@
 
 #include "sock.h"
 
+#include "UpnpLib.h"
 #include "UpnpLog.h"
 #include "UpnpStdInt.h" /* for ssize_t */
 #include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
@@ -62,11 +63,6 @@
 
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0
-#endif
-
-#ifdef UPNP_ENABLE_OPEN_SSL
-/* OpenSSL context defined in upnpapi.c */
-extern SSL_CTX *gSslCtx;
 #endif
 
 int sock_init(SOCKINFO *info, SOCKET sockfd)
@@ -97,10 +93,10 @@ int sock_init_with_ip(
 }
 
 #ifdef UPNP_ENABLE_OPEN_SSL
-int sock_ssl_connect(SOCKINFO *info)
+int sock_ssl_connect(UpnpLib *p, SOCKINFO *info)
 {
         int status = 0;
-        info->ssl = SSL_new(gSslCtx);
+        info->ssl = SSL_new(UpnpLib_get_gSslCtx(p));
         if (!info->ssl) {
                 return UPNP_E_SOCKET_ERROR;
         }

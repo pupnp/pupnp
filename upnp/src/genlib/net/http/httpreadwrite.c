@@ -1336,7 +1336,7 @@ int http_OpenHttpConnection(
 #ifdef UPNP_ENABLE_OPEN_SSL
         /* For HTTPS connections start the TLS/SSL handshake. */
         if (token_string_casecmp(&url.scheme, "https") == 0) {
-                ret_code = sock_ssl_connect(&handle->sock_info);
+                ret_code = sock_ssl_connect(p, &handle->sock_info);
                 if (ret_code != UPNP_E_SUCCESS) {
                         sock_destroy(p, &handle->sock_info, SD_BOTH);
                         goto errorHandler;
