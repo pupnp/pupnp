@@ -70,7 +70,7 @@ Documentation is available in PDF format from the [downloads](http://sourceforge
 
 ## 5. Other projects that are using the SDK
 
-This is a list of some of the projects and products hat are based on the SDK for UPnP&trade; Devices.&nbsp; Please let us know if you are working on a project and would like to see it listed here!
+This is a list of some of the projects and products that are based on the SDK for UPnP&trade; Devices.&nbsp; Please let us know if you are working on a project and would like to see it listed here!
 
 - [aMule](http://www.amule.org) has libupnp support to perform port forwarding.
 - [Gerbera](https://gerbera.io) UPnP&trade; media server.
@@ -78,12 +78,15 @@ This is a list of some of the projects and products hat are based on the SDK for
 - [HD Network DVD Media Player](http://www.z500series.com)
 - [eMule Morph](http://emulemorph.sourceforge.net) uses libupnp to forward ports automatically.
 - [PeerStream Audio Video Server](http://www.peerstream.net).
-- [GeeXboX uShare&trade;](http://ushare.geexbox.org) A/V media server.
+- [GeeXboX uShare&trade;](https://github.com/ddugovic/uShare) A/V media server.
 - [MediaTomb](http://mediatomb.sourceforge.net) UPnP&trade; media server.
 - The [Linux UPnP&trade; Internet Gateway Device](http://linux-igd.sourceforge.net) This project is a daemon that emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP&trade; Internet Gateway Device (IGD) specification and allows UPnP&trade;-aware clients, such as MSN Messenger, to work properly from behind a NAT firewall.
 - FreeBSD ports of both the [SDK for UPnP&trade; Devices](http://www.freebsd.org/cgi/cvsweb.cgi/ports/devel/upnp)"> and the [Linux UPnP&trade; IGD](http://www.freebsd.org/cgi/query-pr.cgi?pr=41295)" were contributed to the FreeBSD ports collection by [Yen-Ming Lee](http://www.leeym.com).
 - [PseudoICSD](http://pseudoicsd.sf.net) is another daemon that provides UPnP&trade; Internet Gateway Device functionality on Linux systems.
-- [IGD2 for linux](http://gitorious.org/igd2-for-linux) is an updated version of [Linux-IGD implementation](http://linux-igd.sourceforge.net>http://linux-igd.sourceforge.net). This new version is created on top of UPnP IGD:2 specifications available from [http://upnp.org/specs/gw/igd2](http://upnp.org/specs/gw/igd2). You can find more information about this project [here](http://gitorious.org/igd2-for-linux/pages/Home).
+- [IGD2 for linux](https://github.com/Orange-OpenSource/igd2-for-linux) is an updated version of [Linux-IGD implementation](http://linux-igd.sourceforge.net>http://linux-igd.sourceforge.net). This new version is created on top of UPnP IGD:2 specifications available from [https://openconnectivity.org/developer/specifications/upnp-resources/upnp/internet-gateway-device-igd-v-2-0](https://openconnectivity.org/developer/specifications/upnp-resources/upnp/internet-gateway-device-igd-v-2-0).
+- [gmrender-resurrect](https://github.com/hzeller/gmrender-resurrect) is a resource efficient UPnP/DLNA renderer, optimal for Raspberry Pi, CuBox or a general MediaServer. Fork of GMediaRenderer to add some features to make it usable.
+- [Music Player Daemon](https://github.com/MusicPlayerDaemon/MPD) uses libupnp to browse and play music stored on an UPnP Media Server.
+- [VLC media player](http://www.videolan.org/vlc) uses libupnp for services discovery.
 
 The links listed here point to external pages that are not under our control, that means we do not have any influence on their contents. Some jurisdictions have the point of view that the owner of a internet page is responsible for links to other webpages and the contents that can be found there. (Landgericht Hamburg, Judgement from 12th May 1998, 312 O 85/98).
 
