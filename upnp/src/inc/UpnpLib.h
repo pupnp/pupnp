@@ -403,6 +403,11 @@ EXPORT_SPEC char *UpnpLib_get_LogFileName(const UpnpLib *p);
 /*! UpnpLib_set_LogFileName */
 EXPORT_SPEC int UpnpLib_set_LogFileName(UpnpLib *p, char *n);
 
+/*! UpnpLib_set_LogCallback */
+EXPORT_SPEC LogCallback UpnpLib_get_LogCallback(UpnpLib *p);
+/*! UpnpLib_set_LogCallback */
+EXPORT_SPEC int UpnpLib_set_LogCallback(UpnpLib *p, LogCallback callback);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

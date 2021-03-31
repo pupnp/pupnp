@@ -277,33 +277,53 @@ void UpnpPrintf(UpnpLib *p,
         ...)
 {
         FILE *fp;
+        va_list ArgList;
 
         /*fprintf(stderr, "UpnpPrintf: fp %p level %d glev %d mod %d DEBUG_ALL
           %d\n", fp, DLevel, gLogLevel, Module, DEBUG_ALL);*/
-        va_list ArgList;
-
         if (!UpnpLib_get_LogInitWasCalled(p)) {
                 return;
         }
 
+        va_start(ArgList, FmtStr);
+        ithread_mutex_lock(UpnpLib_getnc_LogMutex(p));
+
+        if (UpnpLib_get_LogCallback(p)) {
+                char *buffer;
+                int size;
+#ifndef _WIN32
+                size = vsnprintf(NULL, 0, FmtStr, ArgList) + 1;
+#else
+                size = _vscprintf(FmtStr, ArgList) + 1;
+#endif
+                buffer = (char *)malloc(size);
+                if (!buffer) {
+                        goto exit_function;
+                }
+                vsnprintf(buffer, size, FmtStr, ArgList);
+                UpnpLib_get_LogCallback(p)(
+                        DLevel, Module, DbggLogFileName, &DbgLineNo, buffer);
+                free(buffer);
+        }
+
         if (!DebugAtThisLevel(p, DLevel, Module))
-                return;
+                goto exit_function;
 
         fp = UpnpLib_get_LogFp(p);
         if (!fp) {
-                return;
+                goto exit_function;
         }
 
-        ithread_mutex_lock(UpnpLib_getnc_LogMutex(p));
-        va_start(ArgList, FmtStr);
         if (DbggLogFileName) {
                 UpnpDisplayFileAndLine(
                         fp, DbggLogFileName, DbgLineNo, DLevel, Module);
                 vfprintf(fp, FmtStr, ArgList);
                 fflush(fp);
         }
-        va_end(ArgList);
+
+exit_function:
         ithread_mutex_unlock(UpnpLib_getnc_LogMutex(p));
+        va_end(ArgList);
 }
 
 /* No locking here, the app should be careful about not calling
@@ -315,4 +335,9 @@ FILE *UpnpGetDebugFile(UpnpLib *p, Upnp_LogLevel DLevel, Dbg_Module Module)
         } else {
                 return UpnpLib_get_LogFp(p);
         }
+}
+
+int UpnpSetLogCallback(UpnpLib *p, LogCallback callback)
+{
+        UpnpLib_set_LogCallback(p, callback);
 }

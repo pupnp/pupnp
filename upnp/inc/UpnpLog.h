@@ -194,6 +194,28 @@ EXPORT_SPEC void UpnpPrintf(
 #endif
         ;
 
+/*!
+ * \brief Log callback function prototype.
+ */
+typedef void (*LogCallback)(
+        /*! [in] Level of the log. */
+        Upnp_LogLevel level,
+        Dbg_Module module,
+        const char *sourceFile,
+        const int *sourceLine,
+        const char *log);
+
+/*!
+ * \brief Set the logging callback.
+ *
+ * \return -1 if fails or UPNP_E_SUCCESS if succeeds.
+ */
+EXPORT_SPEC int UpnpSetLogCallback(
+        /*! Library Handle */
+        UpnpLib *p,
+        /*! [in] Callback to be called for each log produced by the library. */
+        LogCallback callback);
+
 #ifdef __cplusplus
 }
 #endif
