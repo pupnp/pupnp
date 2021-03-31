@@ -61,7 +61,7 @@ struct s_UpnpLib
         int m_LogIsStderr;
         int m_SetLogWasCalled;
         int m_LogInitWasCalled;
-        char *m_LogFileName;
+        UpnpString *m_LogFileName;
         LogCallback m_LogCallback;
 };
 
@@ -123,7 +123,7 @@ UpnpLib *UpnpLib_new()
         /*p->m_LogIsStderr = 0;*/
         /*p->m_SetLogWasCalled = 0;*/
         /*p->m_LogInitWasCalled = 0;*/
-        /*p->m_LogFileName = 0;*/
+        p->m_LogFileName = UpnpString_new();
 
         return (UpnpLib *)p;
 }
@@ -136,6 +136,7 @@ void UpnpLib_delete(UpnpLib *q)
                 return;
         }
 
+        UpnpString_delete(p->m_LogFileName);
         p->m_LogFileName = 0;
         p->m_LogInitWasCalled = 0;
         p->m_SetLogWasCalled = 0;
@@ -1092,13 +1093,41 @@ int UpnpLib_set_LogInitWasCalled(UpnpLib *p, int n)
         return 1;
 }
 
-char *UpnpLib_get_LogFileName(const UpnpLib *p) { return p->m_LogFileName; }
-
-int UpnpLib_set_LogFileName(UpnpLib *p, char *n)
+const UpnpString *UpnpLib_get_LogFileName(const UpnpLib *p)
 {
-        p->m_LogFileName = n;
+        return p->m_LogFileName;
+}
 
-        return 1;
+int UpnpLib_set_LogFileName(UpnpLib *p, const UpnpString *s)
+{
+        const char *q = UpnpString_get_String(s);
+
+        return UpnpString_set_String(p->m_LogFileName, q);
+}
+
+size_t UpnpLib_get_LogFileName_Length(const UpnpLib *p)
+{
+        return UpnpString_get_Length(UpnpLib_get_LogFileName(p));
+}
+
+const char *UpnpLib_get_LogFileName_cstr(const UpnpLib *p)
+{
+        return UpnpString_get_String(UpnpLib_get_LogFileName(p));
+}
+
+int UpnpLib_strcpy_LogFileName(UpnpLib *p, const char *s)
+{
+        return UpnpString_set_String(p->m_LogFileName, s);
+}
+
+int UpnpLib_strncpy_LogFileName(UpnpLib *p, const char *s, size_t n)
+{
+        return UpnpString_set_StringN(p->m_LogFileName, s, n);
+}
+
+void UpnpLib_clear_LogFileName(UpnpLib *p)
+{
+        UpnpString_clear(p->m_LogFileName);
 }
 
 LogCallback UpnpLib_get_LogCallback(UpnpLib *p) { return p->m_LogCallback; }

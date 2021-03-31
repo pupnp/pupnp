@@ -189,7 +189,7 @@ static struct s_Member UpnpLib_members[] = {
         INIT_MEMBER(LogIsStderr, TYPE_INTEGER, int, 0, 0),
         INIT_MEMBER(SetLogWasCalled, TYPE_INTEGER, int, 0, 0),
         INIT_MEMBER(LogInitWasCalled, TYPE_INTEGER, int, 0, 0),
-        INIT_MEMBER(LogFileName, TYPE_INTEGER, char *, 0, 0),
+        INIT_MEMBER(LogFileName, TYPE_STRING, 0, 0, 0),
         INIT_MEMBER(logCallback, TYPE_INTEGER, LogCallback, "UpnpLog.h", 0),
 };
 
