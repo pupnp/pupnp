@@ -1,3 +1,9 @@
+IF (UPNP_BUILD_SHARED)
+	set (UPNP_LIBRARY upnp_shared)
+ELSE ()
+	set (UPNP_LIBRARY upnp_static)
+ENDIF (UPNP_BUILD_SHARED)
+
 IF (client)
 	ADD_EXECUTABLE (tv_ctrlpt
 		common/sample_util.c
@@ -11,7 +17,7 @@ IF (client)
 	)
 
 	TARGET_LINK_LIBRARIES (tv_ctrlpt
-		upnp_shared
+		${UPNP_LIBRARY}
 	)
 
 	INSTALL (TARGETS tv_ctrlpt
@@ -33,7 +39,7 @@ IF (client AND device)
 	)
 
 	TARGET_LINK_LIBRARIES (tv_combo
-		upnp_shared
+		${UPNP_LIBRARY}
 	)
 
 	INSTALL (TARGETS tv_combo
@@ -54,7 +60,7 @@ IF (device)
 	)
 
 	TARGET_LINK_LIBRARIES (tv_device
-		upnp_shared
+		${UPNP_LIBRARY}
 	)
 
 	INSTALL (TARGETS tv_device
