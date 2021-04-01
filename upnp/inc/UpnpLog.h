@@ -138,7 +138,11 @@ public:
                 const char *file,
                 int DbgLineNo,
                 const char *FmtStr,
-                ...) __attribute__((format(__printf__, 6, 7)));
+                ...)
+#if (__GNUC__ >= 3)
+                __attribute__((format(__printf__, 6, 7)))
+#endif
+                ;
 
         Upnp_LogLevel logLevel() const { return m_logLevel; }
         void setLogLevel(Upnp_LogLevel n) { m_logLevel = n; }
