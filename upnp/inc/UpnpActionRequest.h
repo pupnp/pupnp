@@ -187,14 +187,14 @@ EXPORT_SPEC int UpnpActionRequest_strncpy_Os(
 /*! UpnpActionRequest_clear_Os */
 EXPORT_SPEC void UpnpActionRequest_clear_Os(UpnpActionRequest *p);
 
-/*! UpnpActionRequest_get_ExtraHeadersList */
-EXPORT_SPEC const UpnpListHead *UpnpActionRequest_get_ExtraHeadersList(
+/*! UpnpActionRequest_get_HttpHeadersList */
+EXPORT_SPEC const UpnpListHead *UpnpActionRequest_get_HttpHeadersList(
         const UpnpActionRequest *p);
-/*! UpnpActionRequest_set_ExtraHeadersList */
-EXPORT_SPEC int UpnpActionRequest_set_ExtraHeadersList(
+/*! UpnpActionRequest_set_HttpHeadersList */
+EXPORT_SPEC int UpnpActionRequest_set_HttpHeadersList(
         UpnpActionRequest *p, const UpnpListHead *q);
-/*! UpnpActionRequest_add_to_list_ExtraHeadersList */
-EXPORT_SPEC void UpnpActionRequest_add_to_list_ExtraHeadersList(
+/*! UpnpActionRequest_add_to_list_HttpHeadersList */
+EXPORT_SPEC void UpnpActionRequest_add_to_list_HttpHeadersList(
         UpnpActionRequest *p, UpnpListHead *head);
 
 #ifdef __cplusplus

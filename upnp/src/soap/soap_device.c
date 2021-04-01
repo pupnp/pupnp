@@ -449,8 +449,8 @@ static void handle_invoke_action(
                         action, hdr_value.buf, hdr_value.length);
         }
 
-        err_code = parser_get_unknown_headers(request,
-                (UpnpListHead *)UpnpActionRequest_get_ExtraHeadersList(action));
+        err_code = httpmsg_list_headers(request,
+                (UpnpListHead *)UpnpActionRequest_get_HttpHeadersList(action));
         if (err_code != HTTP_OK) {
                 err_code = SOAP_ACTION_FAILED;
                 goto error_handler;
@@ -490,7 +490,7 @@ error_handler:
         ixmlDocument_free(actionRequestDoc);
         ixmlFreeDOMString(act_node);
         free_http_headers_list(
-                (UpnpListHead *)UpnpActionRequest_get_ExtraHeadersList(action));
+                (UpnpListHead *)UpnpActionRequest_get_HttpHeadersList(action));
         /* restore */
         action_name.buf[action_name.length] = save_char;
         if (err_code != 0) {

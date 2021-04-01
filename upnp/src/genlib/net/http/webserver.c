@@ -41,8 +41,8 @@
 
 #if EXCLUDE_WEB_SERVER == 0
 
-#include "UpnpExtraHeaders.h"
 #include "UpnpFileInfo.h"
+#include "UpnpHttpHeaders.h"
 #include "UpnpIntTypes.h"
 #include "UpnpLib.h"
 #include "UpnpStdInt.h"
@@ -1175,9 +1175,9 @@ static int process_request(
         }
         if (using_virtual_dir) {
                 if (req->method != HTTPMETHOD_POST) {
-                        if ((code = parser_get_unknown_headers(req,
+                        if ((code = httpmsg_list_headers(req,
                                      (UpnpListHead *)
-                                             UpnpFileInfo_get_ExtraHeadersList(
+                                             UpnpFileInfo_get_HttpHeadersList(
                                                      finfo))) != HTTP_OK) {
                                 err_code = code;
                                 goto error_handler;
@@ -1345,7 +1345,7 @@ static int process_request(
                             "LAST-MODIFIED: ",
                             &aux_LastModified,
                             X_USER_AGENT,
-                            UpnpFileInfo_get_ExtraHeadersList(finfo)) != 0) {
+                            UpnpFileInfo_get_HttpHeadersList(finfo)) != 0) {
                         goto error_handler;
                 }
         } else if (RespInstr->IsRangeActive && !RespInstr->IsChunkActive) {
@@ -1371,7 +1371,7 @@ static int process_request(
                             "LAST-MODIFIED: ",
                             &aux_LastModified,
                             X_USER_AGENT,
-                            UpnpFileInfo_get_ExtraHeadersList(finfo)) != 0) {
+                            UpnpFileInfo_get_HttpHeadersList(finfo)) != 0) {
                         goto error_handler;
                 }
         } else if (!RespInstr->IsRangeActive && RespInstr->IsChunkActive) {
@@ -1393,7 +1393,7 @@ static int process_request(
                             "LAST-MODIFIED: ",
                             &aux_LastModified,
                             X_USER_AGENT,
-                            UpnpFileInfo_get_ExtraHeadersList(finfo)) != 0) {
+                            UpnpFileInfo_get_HttpHeadersList(finfo)) != 0) {
                         goto error_handler;
                 }
         } else {
@@ -1419,7 +1419,7 @@ static int process_request(
                                     "LAST-MODIFIED: ",
                                     &aux_LastModified,
                                     X_USER_AGENT,
-                                    UpnpFileInfo_get_ExtraHeadersList(finfo)) !=
+                                    UpnpFileInfo_get_HttpHeadersList(finfo)) !=
                                 0) {
                                 goto error_handler;
                         }
@@ -1441,7 +1441,7 @@ static int process_request(
                                     "LAST-MODIFIED: ",
                                     &aux_LastModified,
                                     X_USER_AGENT,
-                                    UpnpFileInfo_get_ExtraHeadersList(finfo)) !=
+                                    UpnpFileInfo_get_HttpHeadersList(finfo)) !=
                                 0) {
                                 goto error_handler;
                         }
@@ -1468,7 +1468,7 @@ static int process_request(
 error_handler:
         free(request_doc);
         free_http_headers_list(
-                (UpnpListHead *)UpnpFileInfo_get_ExtraHeadersList(finfo));
+                (UpnpListHead *)UpnpFileInfo_get_HttpHeadersList(finfo));
         UpnpFileInfo_delete(finfo);
         if (err_code != HTTP_OK && alias_grabbed) {
                 alias_release(p, alias);

@@ -28,7 +28,7 @@ struct s_UpnpActionRequest
         IXML_Document *m_SoapHeader;
         struct sockaddr_storage m_CtrlPtIPAddr;
         UpnpString *m_Os;
-        UpnpListHead m_ExtraHeadersList;
+        UpnpListHead m_HttpHeadersList;
 };
 
 UpnpActionRequest *UpnpActionRequest_new()
@@ -51,7 +51,7 @@ UpnpActionRequest *UpnpActionRequest_new()
         /*p->m_SoapHeader = 0;*/
         /* memset(&p->m_CtrlPtIPAddr, 0, sizeof (struct sockaddr_storage)); */
         p->m_Os = UpnpString_new();
-        UpnpListInit(&p->m_ExtraHeadersList);
+        UpnpListInit(&p->m_HttpHeadersList);
 
         return (UpnpActionRequest *)p;
 }
@@ -64,7 +64,7 @@ void UpnpActionRequest_delete(UpnpActionRequest *q)
                 return;
         }
 
-        UpnpListInit(&p->m_ExtraHeadersList);
+        UpnpListInit(&p->m_HttpHeadersList);
         UpnpString_delete(p->m_Os);
         p->m_Os = 0;
         memset(&p->m_CtrlPtIPAddr, 0, sizeof(struct sockaddr_storage));
@@ -124,8 +124,8 @@ int UpnpActionRequest_assign(UpnpActionRequest *p, const UpnpActionRequest *q)
                         UpnpActionRequest_set_Os(
                                 p, UpnpActionRequest_get_Os(q));
                 ok = ok &&
-                        UpnpActionRequest_set_ExtraHeadersList(
-                                p, UpnpActionRequest_get_ExtraHeadersList(q));
+                        UpnpActionRequest_set_HttpHeadersList(
+                                p, UpnpActionRequest_get_HttpHeadersList(q));
         }
 
         return ok;
@@ -418,23 +418,23 @@ void UpnpActionRequest_clear_Os(UpnpActionRequest *p)
         UpnpString_clear(p->m_Os);
 }
 
-const UpnpListHead *UpnpActionRequest_get_ExtraHeadersList(
+const UpnpListHead *UpnpActionRequest_get_HttpHeadersList(
         const UpnpActionRequest *p)
 {
-        return &p->m_ExtraHeadersList;
+        return &p->m_HttpHeadersList;
 }
 
-int UpnpActionRequest_set_ExtraHeadersList(
+int UpnpActionRequest_set_HttpHeadersList(
         UpnpActionRequest *p, const UpnpListHead *q)
 {
-        p->m_ExtraHeadersList = *q;
+        p->m_HttpHeadersList = *q;
 
         return 1;
 }
 
-void UpnpActionRequest_add_to_list_ExtraHeadersList(
+void UpnpActionRequest_add_to_list_HttpHeadersList(
         UpnpActionRequest *p, struct UpnpListHead *head)
 {
-        UpnpListHead *list = &p->m_ExtraHeadersList;
+        UpnpListHead *list = &p->m_HttpHeadersList;
         UpnpListInsert(list, UpnpListEnd(list), head);
 }
