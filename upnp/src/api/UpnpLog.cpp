@@ -17,13 +17,14 @@
 #endif
 
 UpnpLog::UpnpLog()
-: m_logLevel(UPNP_NONE)
+: m_logLevel(UPNP_DEFAULT_LOG_LEVEL)
 , m_logFp(0)
 , m_logIsStderr(false)
 , m_logFileName()
 , m_logCallback(0)
 {
         ithread_mutex_init(&m_logMutex, NULL);
+        InitLog();
 }
 
 UpnpLog::~UpnpLog() { ithread_mutex_destroy(&m_logMutex); }
@@ -168,17 +169,14 @@ void UpnpLog::Printf(Upnp_LogLevel DLevel,
         const char *file,
         int line,
         const char *FmtStr,
-        ...)
+        va_list argList)
 {
-        va_list ArgList;
-
-        va_start(ArgList, FmtStr);
         logMutexLock();
         if (logCallback()) {
                 char *buffer;
                 int size;
 #ifndef _WIN32
-                size = vsnprintf(NULL, 0, FmtStr, ArgList) + 1;
+                size = vsnprintf(NULL, 0, FmtStr, argList) + 1;
 #else
                 size = _vscprintf(FmtStr, ArgList) + 1;
 #endif
@@ -186,7 +184,7 @@ void UpnpLog::Printf(Upnp_LogLevel DLevel,
                 if (!buffer) {
                         goto exit_function;
                 }
-                vsnprintf(buffer, size, FmtStr, ArgList);
+                vsnprintf(buffer, size, FmtStr, argList);
                 logCallback()(DLevel, Module, file, &line, buffer);
                 delete[] buffer;
         }
@@ -198,13 +196,26 @@ void UpnpLog::Printf(Upnp_LogLevel DLevel,
         }
         if (file) {
                 DisplayFileAndLine(file, line, DLevel, Module);
-                vfprintf(logFp(), FmtStr, ArgList);
+                vfprintf(logFp(), FmtStr, argList);
                 fflush(logFp());
         }
 
 exit_function:
         logMutexUnlock();
-        va_end(ArgList);
+}
+
+void UpnpLog::Printf(Upnp_LogLevel DLevel,
+        Dbg_Module Module,
+        const char *file,
+        int line,
+        const char *FmtStr,
+        ...)
+{
+        va_list argList;
+
+        va_start(argList, FmtStr);
+        Printf(DLevel, Module, file, line, FmtStr, argList);
+        va_end(argList);
 }
 
 /*

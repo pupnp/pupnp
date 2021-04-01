@@ -133,6 +133,13 @@ public:
 
         int InitLog();
         void CloseLog();
+
+        void Printf(Upnp_LogLevel DLevel,
+                Dbg_Module Module,
+                const char *file,
+                int line,
+                const char *FmtStr,
+                va_list argList);
         void Printf(Upnp_LogLevel DLevel,
                 Dbg_Module Module,
                 const char *file,

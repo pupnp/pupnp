@@ -401,8 +401,8 @@ int UpnpInit2(UpnpLib **LibraryHandle,
                 UpnpLib_delete(p);
                 goto exit_function;
         }
-        UpnpLib_set_Log(p, l);
         UpnpSetLogFileName(l, logFileName);
+        UpnpLib_set_Log(p, l);
         ithread_mutex_lock(UpnpLib_getnc_gSDKInitMutex(p));
 
         /* Check if we're already initialized. (Should never happen now) */
