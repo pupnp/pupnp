@@ -73,7 +73,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Configure
-        run: cmake -DBUILD_TESTING=ON -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.conf }}
+        run: cmake -DBUILD_TESTING=ON -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -DDOWNLOAD_AND_BUILD_DEPS=ON
 
       - name: Build
         run: cmake --build build --config ${{ matrix.conf }}
