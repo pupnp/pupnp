@@ -41,6 +41,8 @@
 
 #include "service_table.h"
 
+#include "UpnpLib.h"
+
 #ifdef INCLUDE_DEVICE_APIS
 
 #if EXCLUDE_GENA == 0
@@ -380,7 +382,7 @@ void printService(UpnpLib *p,
 {
         if (service) {
                 if (service->serviceType) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -389,7 +391,7 @@ void printService(UpnpLib *p,
                                 service->serviceType);
                 }
                 if (service->serviceId) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -398,7 +400,7 @@ void printService(UpnpLib *p,
                                 service->serviceId);
                 }
                 if (service->SCPDURL) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -407,7 +409,7 @@ void printService(UpnpLib *p,
                                 service->SCPDURL);
                 }
                 if (service->controlURL) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -416,7 +418,7 @@ void printService(UpnpLib *p,
                                 service->controlURL);
                 }
                 if (service->eventURL) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -425,7 +427,7 @@ void printService(UpnpLib *p,
                                 service->eventURL);
                 }
                 if (service->UDN) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -434,14 +436,14 @@ void printService(UpnpLib *p,
                                 service->UDN);
                 }
                 if (service->active) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
                                 __LINE__,
                                 "Service is active\n");
                 } else {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -473,7 +475,7 @@ void printServiceList(UpnpLib *p,
 {
         while (service) {
                 if (service->serviceType) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -482,7 +484,7 @@ void printServiceList(UpnpLib *p,
                                 service->serviceType);
                 }
                 if (service->serviceId) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -491,7 +493,7 @@ void printServiceList(UpnpLib *p,
                                 service->serviceId);
                 }
                 if (service->SCPDURL) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -500,7 +502,7 @@ void printServiceList(UpnpLib *p,
                                 service->SCPDURL);
                 }
                 if (service->controlURL) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -509,7 +511,7 @@ void printServiceList(UpnpLib *p,
                                 service->controlURL);
                 }
                 if (service->eventURL) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -518,7 +520,7 @@ void printServiceList(UpnpLib *p,
                                 service->eventURL);
                 }
                 if (service->UDN) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -527,14 +529,14 @@ void printServiceList(UpnpLib *p,
                                 service->UDN);
                 }
                 if (service->active) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
                                 __LINE__,
                                 "Service is active\n");
                 } else {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 level,
                                 module,
                                 __FILE__,
@@ -566,14 +568,19 @@ void printServiceTable(UpnpLib *p,
         Upnp_LogLevel level,
         Dbg_Module module)
 {
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 level,
                 module,
                 __FILE__,
                 __LINE__,
                 "URL_BASE: %s\n",
                 table->URLBase);
-        UpnpPrintf(p, level, module, __FILE__, __LINE__, "Services: \n");
+        UpnpPrintf(UpnpLib_get_Log(p),
+                level,
+                module,
+                __FILE__,
+                __LINE__,
+                "Services: \n");
         printServiceList(p, table->serviceList, level, module);
 }
 #endif
@@ -850,13 +857,13 @@ service_info *getServiceList(
                                                   controlURL)) ||
                                         !(current->controlURL = resolve_rel_url(
                                                   p, URLBase, tempDOMString))) {
-                                        UpnpPrintf(p,
+                                        UpnpPrintf(UpnpLib_get_Log(p),
                                                 UPNP_INFO,
                                                 GENA,
                                                 __FILE__,
                                                 __LINE__,
                                                 "BAD OR MISSING CONTROL URL");
-                                        UpnpPrintf(p,
+                                        UpnpPrintf(UpnpLib_get_Log(p),
                                                 UPNP_INFO,
                                                 GENA,
                                                 __FILE__,
@@ -875,13 +882,13 @@ service_info *getServiceList(
                                                   eventURL)) ||
                                         !(current->eventURL = resolve_rel_url(
                                                   p, URLBase, tempDOMString))) {
-                                        UpnpPrintf(p,
+                                        UpnpPrintf(UpnpLib_get_Log(p),
                                                 UPNP_INFO,
                                                 GENA,
                                                 __FILE__,
                                                 __LINE__,
                                                 "BAD OR MISSING EVENT URL");
-                                        UpnpPrintf(p,
+                                        UpnpPrintf(UpnpLib_get_Log(p),
                                                 UPNP_INFO,
                                                 GENA,
                                                 __FILE__,

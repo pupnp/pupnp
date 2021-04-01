@@ -126,7 +126,7 @@ int sock_destroy(UpnpLib *p, SOCKINFO *info, int ShutdownMethod)
 #endif
                 if (shutdown(info->socket, ShutdownMethod) == -1) {
                         strerror_r(errno, errorBuffer, sizeof errorBuffer);
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 HTTP,
                                 __FILE__,

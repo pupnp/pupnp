@@ -55,14 +55,7 @@ struct s_UpnpLib
 #ifdef UPNP_ENABLE_OPEN_SSL
         SSL_CTX *m_gSslCtx;
 #endif
-        ithread_mutex_t m_LogMutex;
-        Upnp_LogLevel m_LogLevel;
-        FILE *m_LogFp;
-        int m_gLogIsStderr;
-        int m_SetLogWasCalled;
-        int m_LogInitWasCalled;
-        char *m_LogFileName;
-        LogCallback m_LogCallback;
+        UpnpLog *m_Log;
 };
 
 UpnpLib *UpnpLib_new()
@@ -116,14 +109,7 @@ UpnpLib *UpnpLib_new()
 #ifdef UPNP_ENABLE_OPEN_SSL
         /*p->m_gSslCtx = 0;*/
 #endif
-        pthread_mutex_init(&p->m_gSDKInitMutex, 0);
-        ;
-        p->m_LogLevel = UPNP_DEFAULT_LOG_LEVEL;
-        /*p->m_LogFp = 0;*/
-        /*p->m_gLogIsStderr = 0;*/
-        /*p->m_SetLogWasCalled = 0;*/
-        /*p->m_LogInitWasCalled = 0;*/
-        /*p->m_LogFileName = 0;*/
+        /*p->m_Log = 0;*/
 
         return (UpnpLib *)p;
 }
@@ -136,13 +122,7 @@ void UpnpLib_delete(UpnpLib *q)
                 return;
         }
 
-        p->m_LogFileName = 0;
-        p->m_LogInitWasCalled = 0;
-        p->m_SetLogWasCalled = 0;
-        p->m_gLogIsStderr = 0;
-        p->m_LogFp = 0;
-        p->m_LogLevel = UPNP_DEFAULT_LOG_LEVEL;
-        memset(&p->m_LogMutex, 0, sizeof(ithread_mutex_t));
+        p->m_Log = 0;
 #ifdef UPNP_ENABLE_OPEN_SSL
         p->m_gSslCtx = 0;
 #endif
@@ -288,19 +268,7 @@ int UpnpLib_assign(UpnpLib *p, const UpnpLib *q)
 #ifdef UPNP_ENABLE_OPEN_SSL
                 ok = ok && UpnpLib_set_gSslCtx(p, UpnpLib_get_gSslCtx(q));
 #endif
-                ok = ok && UpnpLib_set_LogMutex(p, UpnpLib_get_LogMutex(q));
-                ok = ok && UpnpLib_set_LogLevel(p, UpnpLib_get_LogLevel(q));
-                ok = ok && UpnpLib_set_LogFp(p, UpnpLib_get_LogFp(q));
-                ok = ok &&
-                        UpnpLib_set_LogIsStderr(p, UpnpLib_get_LogIsStderr(q));
-                ok = ok &&
-                        UpnpLib_set_SetLogWasCalled(
-                                p, UpnpLib_get_SetLogWasCalled(q));
-                ok = ok &&
-                        UpnpLib_set_LogInitWasCalled(
-                                p, UpnpLib_get_LogInitWasCalled(q));
-                ok = ok &&
-                        UpnpLib_set_LogFileName(p, UpnpLib_get_LogFileName(q));
+                ok = ok && UpnpLib_set_Log(p, UpnpLib_get_Log(q));
         }
 
         return ok;
@@ -1022,90 +990,11 @@ int UpnpLib_set_gSslCtx(UpnpLib *p, SSL_CTX *n)
 }
 
 #endif
-const ithread_mutex_t *UpnpLib_get_LogMutex(const UpnpLib *p)
+UpnpLog *UpnpLib_get_Log(const UpnpLib *p) { return p->m_Log; }
+
+int UpnpLib_set_Log(UpnpLib *p, UpnpLog *n)
 {
-        return &p->m_LogMutex;
-}
-
-ithread_mutex_t *UpnpLib_getnc_LogMutex(UpnpLib *p) { return &p->m_LogMutex; }
-
-int UpnpLib_set_LogMutex(UpnpLib *p, const ithread_mutex_t *buf)
-{
-        p->m_LogMutex = *buf;
-
-        return 1;
-}
-
-void UpnpLib_clear_LogMutex(UpnpLib *p)
-{
-        memset(&p->m_LogMutex, 0, sizeof(ithread_mutex_t));
-}
-
-Upnp_LogLevel UpnpLib_get_LogLevel(const UpnpLib *p) { return p->m_LogLevel; }
-
-int UpnpLib_set_LogLevel(UpnpLib *p, Upnp_LogLevel n)
-{
-        p->m_LogLevel = n;
-
-        return 1;
-}
-
-FILE *UpnpLib_get_LogFp(const UpnpLib *p) { return p->m_LogFp; }
-
-int UpnpLib_set_LogFp(UpnpLib *p, FILE *n)
-{
-        p->m_LogFp = n;
-
-        return 1;
-}
-
-int UpnpLib_get_LogIsStderr(const UpnpLib *p) { return p->m_gLogIsStderr; }
-
-int UpnpLib_set_LogIsStderr(UpnpLib *p, int n)
-{
-        p->m_gLogIsStderr = n;
-
-        return 1;
-}
-
-int UpnpLib_get_SetLogWasCalled(const UpnpLib *p)
-{
-        return p->m_SetLogWasCalled;
-}
-
-int UpnpLib_set_SetLogWasCalled(UpnpLib *p, int n)
-{
-        p->m_SetLogWasCalled = n;
-
-        return 1;
-}
-
-int UpnpLib_get_LogInitWasCalled(const UpnpLib *p)
-{
-        return p->m_LogInitWasCalled;
-}
-
-int UpnpLib_set_LogInitWasCalled(UpnpLib *p, int n)
-{
-        p->m_LogInitWasCalled = n;
-
-        return 1;
-}
-
-char *UpnpLib_get_LogFileName(const UpnpLib *p) { return p->m_LogFileName; }
-
-int UpnpLib_set_LogFileName(UpnpLib *p, char *n)
-{
-        p->m_LogFileName = n;
-
-        return 1;
-}
-
-LogCallback UpnpLib_get_LogCallback(UpnpLib *p) { return p->m_LogCallback; }
-
-int UpnpLib_set_LogCallback(UpnpLib *p, LogCallback callback)
-{
-        p->m_LogCallback = callback;
+        p->m_Log = n;
 
         return 1;
 }
