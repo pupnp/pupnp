@@ -168,7 +168,7 @@ void UpnpLog::Printf(Upnp_LogLevel DLevel,
         Dbg_Module Module,
         const char *file,
         int line,
-        const char *FmtStr,
+        const char *fmtStr,
         va_list argList)
 {
         logMutexLock();
@@ -176,15 +176,15 @@ void UpnpLog::Printf(Upnp_LogLevel DLevel,
                 char *buffer;
                 int size;
 #ifndef _WIN32
-                size = vsnprintf(NULL, 0, FmtStr, argList) + 1;
+                size = vsnprintf(NULL, 0, fmtStr, argList) + 1;
 #else
-                size = _vscprintf(FmtStr, ArgList) + 1;
+                size = _vscprintf(fmtStr, argList) + 1;
 #endif
                 buffer = new char[size]();
                 if (!buffer) {
                         goto exit_function;
                 }
-                vsnprintf(buffer, size, FmtStr, argList);
+                vsnprintf(buffer, size, fmtStr, argList);
                 logCallback()(DLevel, Module, file, &line, buffer);
                 delete[] buffer;
         }
@@ -196,7 +196,7 @@ void UpnpLog::Printf(Upnp_LogLevel DLevel,
         }
         if (file) {
                 DisplayFileAndLine(file, line, DLevel, Module);
-                vfprintf(logFp(), FmtStr, argList);
+                vfprintf(logFp(), fmtStr, argList);
                 fflush(logFp());
         }
 
@@ -208,13 +208,13 @@ void UpnpLog::Printf(Upnp_LogLevel DLevel,
         Dbg_Module Module,
         const char *file,
         int line,
-        const char *FmtStr,
+        const char *fmtStr,
         ...)
 {
         va_list argList;
 
-        va_start(argList, FmtStr);
-        Printf(DLevel, Module, file, line, FmtStr, argList);
+        va_start(argList, fmtStr);
+        Printf(DLevel, Module, file, line, fmtStr, argList);
         va_end(argList);
 }
 
@@ -290,21 +290,21 @@ void UpnpPrintf(UpnpLog *p,
         Dbg_Module Module,
         const char *DbggLogFileName,
         int DbgLineNo,
-        const char *FmtStr,
+        const char *fmtStr,
         ...)
 {
         va_list argList;
 
-        va_start(argList, FmtStr);
+        va_start(argList, fmtStr);
         if (p) {
                 p->Printf(DLevel,
                         Module,
                         DbggLogFileName,
                         DbgLineNo,
-                        FmtStr,
+                        fmtStr,
                         argList);
         } else {
-                vprintf(FmtStr, argList);
+                vprintf(fmtStr, argList);
         }
         va_end(argList);
 }

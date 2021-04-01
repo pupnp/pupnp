@@ -138,13 +138,13 @@ public:
                 Dbg_Module Module,
                 const char *file,
                 int line,
-                const char *FmtStr,
+                const char *fmtStr,
                 va_list argList);
         void Printf(Upnp_LogLevel DLevel,
                 Dbg_Module Module,
                 const char *file,
-                int DbgLineNo,
-                const char *FmtStr,
+                int line,
+                const char *fmtStr,
                 ...)
 #if (__GNUC__ >= 3)
                 __attribute__((format(__printf__, 6, 7)))
@@ -274,7 +274,7 @@ EXPORT_SPEC void UpnpPrintf(
          */
         int DbgLineNo,
         /*! [in] Printf like format specification. */
-        const char *FmtStr,
+        const char *fmtStr,
         /*! [in] Printf like Variable number of arguments that will go in the
          * debug statement. */
         ...)
