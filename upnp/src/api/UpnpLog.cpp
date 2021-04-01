@@ -131,12 +131,12 @@ int UpnpLog::InitLog()
                 }
         }
         setLogIsStderr(false);
-        const char *fname = logFileName().c_str();
-        if (fname) {
+        if (!logFileName().empty()) {
+                const char *fname = logFileName().c_str();
                 setLogFp(fopen(fname, "a"));
                 if (!logFp()) {
                         fprintf(stderr,
-                                "Failed to open LogFileName (%s): %s\n",
+                                "Failed to open log file '%s': %s\n",
                                 fname,
                                 strerror(errno));
                 }
