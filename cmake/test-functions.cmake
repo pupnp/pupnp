@@ -1,4 +1,4 @@
-function (addGMock testName sourceFile)
+function (addGTest testName sourceFile)
 	cmake_parse_arguments (PARSE_ARGV 2 "agm" "" "" "ADDITIONAL_INCLUDE_DIRS")
 
 	if (agm_UNPARSED_ARGUMENTS)
