@@ -2238,7 +2238,6 @@ int httpmsg_list_headers(http_message_t *req, UpnpListHead *list)
 {
         http_header_t *header;
         ListNode *node;
-        int index;
         UpnpHttpHeaders *headerList;
         UpnpListHead *headerNode;
 
