@@ -128,8 +128,8 @@ int UpnpLog::InitLog()
         if (logFp()) {
                 if (!logIsStderr()) {
                         fclose(logFp());
-                        setLogFp(0);
                 }
+                setLogFp(0);
         }
         setLogIsStderr(false);
         if (!logFileName().empty()) {
