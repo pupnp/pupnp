@@ -165,6 +165,7 @@ public:
                 } else {
                         m_logFileName = s;
                 }
+                InitLog();
         }
 
         LogCallback logCallback() const { return m_logCallback; }
