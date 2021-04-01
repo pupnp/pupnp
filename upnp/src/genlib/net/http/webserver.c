@@ -553,7 +553,7 @@ static int get_file_info(
         UpnpFileInfo_set_LastModified(info, s.st_mtime);
         rc = get_content_type(p, filename, info);
         aux_LastModified = UpnpFileInfo_get_LastModified(info);
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 HTTP,
                 __FILE__,
@@ -1565,7 +1565,7 @@ static int http_RecvPostMessage(
                                 }
                         } else if (num_read == 0) {
                                 if (ok_on_close) {
-                                        UpnpPrintf(p,
+                                        UpnpPrintf(UpnpLib_get_Log(p),
                                                 UPNP_INFO,
                                                 HTTP,
                                                 __FILE__,
@@ -1724,7 +1724,7 @@ void web_server_callback(UpnpLib *p,
                                 headers.length);
                         break;
                 default:
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 HTTP,
                                 __FILE__,
@@ -1733,7 +1733,7 @@ void web_server_callback(UpnpLib *p,
                         assert(0);
                 }
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 HTTP,
                 __FILE__,

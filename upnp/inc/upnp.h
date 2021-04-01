@@ -43,6 +43,7 @@
 
 #include "UpnpGlobal.h"
 #include "UpnpInet.h"
+#include "UpnpLog.h"
 #include "ixml.h"
 
 /*
@@ -511,6 +512,11 @@ extern "C" {
  *
  * @{
  */
+
+/*!
+ * \brief
+ */
+EXPORT_SPEC UpnpLog *UpnpGetLog(UpnpLib *p);
 
 /*!
  * \brief Initializes the Linux SDK for UPnP Devices (IPv4 or IPv6).

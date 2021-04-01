@@ -33,7 +33,7 @@ typedef struct s_UpnpLib UpnpLib;
 #ifdef UPNP_ENABLE_OPEN_SSL
 #include <openssl/ssl.h>
 #endif
-#include <stdio.h>
+#include "UpnpLog.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -364,60 +364,10 @@ EXPORT_SPEC SSL_CTX *UpnpLib_get_gSslCtx(const UpnpLib *p);
 EXPORT_SPEC int UpnpLib_set_gSslCtx(UpnpLib *p, SSL_CTX *n);
 
 #endif
-/*! UpnpLib_get_LogMutex */
-EXPORT_SPEC const ithread_mutex_t *UpnpLib_get_LogMutex(const UpnpLib *p);
-/*! UpnpLib_getnc_LogMutex */
-EXPORT_SPEC ithread_mutex_t *UpnpLib_getnc_LogMutex(UpnpLib *p);
-/*! UpnpLib_get_LogMutex */
-EXPORT_SPEC int UpnpLib_set_LogMutex(UpnpLib *p, const ithread_mutex_t *buf);
-/*! UpnpLib_get_LogMutex */
-EXPORT_SPEC void UpnpLib_clear_LogMutex(UpnpLib *p);
-
-/*! UpnpLib_get_LogLevel */
-EXPORT_SPEC Upnp_LogLevel UpnpLib_get_LogLevel(const UpnpLib *p);
-/*! UpnpLib_set_LogLevel */
-EXPORT_SPEC int UpnpLib_set_LogLevel(UpnpLib *p, Upnp_LogLevel n);
-
-/*! UpnpLib_get_LogFp */
-EXPORT_SPEC FILE *UpnpLib_get_LogFp(const UpnpLib *p);
-/*! UpnpLib_set_LogFp */
-EXPORT_SPEC int UpnpLib_set_LogFp(UpnpLib *p, FILE *n);
-
-/*! UpnpLib_get_LogIsStderr */
-EXPORT_SPEC int UpnpLib_get_LogIsStderr(const UpnpLib *p);
-/*! UpnpLib_set_LogIsStderr */
-EXPORT_SPEC int UpnpLib_set_LogIsStderr(UpnpLib *p, int n);
-
-/*! UpnpLib_get_SetLogWasCalled */
-EXPORT_SPEC int UpnpLib_get_SetLogWasCalled(const UpnpLib *p);
-/*! UpnpLib_set_SetLogWasCalled */
-EXPORT_SPEC int UpnpLib_set_SetLogWasCalled(UpnpLib *p, int n);
-
-/*! UpnpLib_get_LogInitWasCalled */
-EXPORT_SPEC int UpnpLib_get_LogInitWasCalled(const UpnpLib *p);
-/*! UpnpLib_set_LogInitWasCalled */
-EXPORT_SPEC int UpnpLib_set_LogInitWasCalled(UpnpLib *p, int n);
-
-/*! UpnpLib_get_LogFileName */
-EXPORT_SPEC const UpnpString *UpnpLib_get_LogFileName(const UpnpLib *p);
-/*! UpnpLib_set_LogFileName */
-EXPORT_SPEC int UpnpLib_set_LogFileName(UpnpLib *p, const UpnpString *s);
-/*! UpnpLib_get_LogFileName_Length */
-EXPORT_SPEC size_t UpnpLib_get_LogFileName_Length(const UpnpLib *p);
-/*! UpnpLib_get_LogFileName_cstr */
-EXPORT_SPEC const char *UpnpLib_get_LogFileName_cstr(const UpnpLib *p);
-/*! UpnpLib_strcpy_LogFileName */
-EXPORT_SPEC int UpnpLib_strcpy_LogFileName(UpnpLib *p, const char *s);
-/*! UpnpLib_strncpy_LogFileName */
-EXPORT_SPEC int UpnpLib_strncpy_LogFileName(
-        UpnpLib *p, const char *s, size_t n);
-/*! UpnpLib_clear_LogFileName */
-EXPORT_SPEC void UpnpLib_clear_LogFileName(UpnpLib *p);
-
-/*! UpnpLib_set_LogCallback */
-EXPORT_SPEC LogCallback UpnpLib_get_LogCallback(UpnpLib *p);
-/*! UpnpLib_set_LogCallback */
-EXPORT_SPEC int UpnpLib_set_LogCallback(UpnpLib *p, LogCallback callback);
+/*! UpnpLib_get_Log */
+EXPORT_SPEC UpnpLog *UpnpLib_get_Log(const UpnpLib *p);
+/*! UpnpLib_set_Log */
+EXPORT_SPEC int UpnpLib_set_Log(UpnpLib *p, UpnpLog *n);
 
 #ifdef __cplusplus
 }

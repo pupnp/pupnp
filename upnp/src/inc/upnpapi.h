@@ -138,14 +138,14 @@ Upnp_Handle_Type GetHandleInfo(
 #define HandleLock() HandleWriteLock()
 
 #define HandleWriteLock() \
-        UpnpPrintf(p, \
+        UpnpPrintf(UpnpLib_get_Log(p), \
                 UPNP_DEBUG, \
                 API, \
                 __FILE__, \
                 __LINE__, \
                 "Trying a write lock\n"); \
         ithread_rwlock_wrlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
-        UpnpPrintf(p, \
+        UpnpPrintf(UpnpLib_get_Log(p), \
                 UPNP_DEBUG, \
                 API, \
                 __FILE__, \
@@ -153,14 +153,14 @@ Upnp_Handle_Type GetHandleInfo(
                 "Write lock acquired\n");
 
 #define HandleReadLock() \
-        UpnpPrintf(p, \
+        UpnpPrintf(UpnpLib_get_Log(p), \
                 UPNP_DEBUG, \
                 API, \
                 __FILE__, \
                 __LINE__, \
                 "Trying a read lock\n"); \
         ithread_rwlock_rdlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
-        UpnpPrintf(p, \
+        UpnpPrintf(UpnpLib_get_Log(p), \
                 UPNP_DEBUG, \
                 API, \
                 __FILE__, \
@@ -168,9 +168,19 @@ Upnp_Handle_Type GetHandleInfo(
                 "Read lock acquired\n");
 
 #define HandleUnlock() \
-        UpnpPrintf(p, UPNP_DEBUG, API, __FILE__, __LINE__, "Trying Unlock\n"); \
+        UpnpPrintf(UpnpLib_get_Log(p), \
+                UPNP_DEBUG, \
+                API, \
+                __FILE__, \
+                __LINE__, \
+                "Trying Unlock\n"); \
         ithread_rwlock_unlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
-        UpnpPrintf(p, UPNP_DEBUG, API, __FILE__, __LINE__, "Unlocked rwlock\n");
+        UpnpPrintf(UpnpLib_get_Log(p), \
+                UPNP_DEBUG, \
+                API, \
+                __FILE__, \
+                __LINE__, \
+                "Unlocked rwlock\n");
 
 /*!
  * \brief Get client handle info.

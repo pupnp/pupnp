@@ -46,14 +46,14 @@ BreakBeforeInheritanceComma: false
 BreakInheritanceList: BeforeColon
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: false
-BreakConstructorInitializers: BeforeColon
+BreakConstructorInitializers: BeforeComma
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
 ColumnLimit: 80
 CommentPragmas: '^ IWYU pragma:'
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
-ConstructorInitializerIndentWidth: 8
+ConstructorInitializerIndentWidth: 0
 ContinuationIndentWidth: 8
 Cpp11BracedListStyle: true
 DerivePointerAlignment: false

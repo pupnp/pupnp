@@ -164,7 +164,7 @@ libupnp_la_SOURCES += \
 	src/api/UpnpEventSubscribe.c \
 	src/api/UpnpExtraHeaders.c \
 	src/api/UpnpFileInfo.c \
-        src/api/UpnpLog.c \
+	src/api/UpnpLog.cpp \
         src/api/UpnpStateVarComplete.c \
 	src/api/UpnpStateVarRequest.c \
 	src/api/UpnpSubscriptionRequest.c \
