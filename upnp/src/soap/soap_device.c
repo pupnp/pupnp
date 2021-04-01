@@ -299,7 +299,7 @@ static UPNP_INLINE void send_action_response(
                 end_body,
                 strlen(end_body));
         if (ret_code != 0) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         SOAP,
                         __FILE__,
@@ -360,7 +360,7 @@ static UPNP_INLINE void handle_query_variable(
         /* send event */
         soap_info->callback(
                 p, UPNP_CONTROL_GET_VAR_REQUEST, variable, soap_info->cookie);
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 SOAP,
                 __FILE__,
@@ -456,8 +456,12 @@ static void handle_invoke_action(
                 goto error_handler;
         }
 
-        UpnpPrintf(
-                p, UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
+        UpnpPrintf(UpnpLib_get_Log(p),
+                UPNP_INFO,
+                SOAP,
+                __FILE__,
+                __LINE__,
+                "Calling Callback\n");
         soap_info->callback(
                 p, UPNP_CONTROL_ACTION_REQUEST, action, soap_info->cookie);
         err_code = UpnpActionRequest_get_ErrCode(action);

@@ -45,6 +45,7 @@
 #include "httpparser.h"
 
 #include "UpnpExtraHeaders.h"
+#include "UpnpLib.h"
 #include "UpnpLog.h"
 #include "list.h"
 #include "statcodes.h"
@@ -1761,7 +1762,7 @@ static UPNP_INLINE parse_status_t parser_parse_chunky_entity(
         status = match(p, scanner, "%x%L%c", &parser->chunk_size, &dummy);
         if (status != (parse_status_t)PARSE_OK) {
                 scanner->cursor = save_pos;
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         HTTP,
                         __FILE__,
@@ -1897,7 +1898,7 @@ parse_status_t parser_get_entity_read_method(UpnpLib *p, http_parser_t *parser)
                 if (raw_find_str(&hdr_value, "chunked") >= 0) {
                         /* read method to use chunked transfer encoding */
                         parser->ent_position = ENTREAD_USING_CHUNKED;
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 HTTP,
                                 __FILE__,
@@ -2307,7 +2308,7 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
 
         /* print start line */
         if (hmsg->is_request) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_DEBUG,
                         HTTP,
                         __FILE__,
@@ -2319,7 +2320,7 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
                         (int)hmsg->uri.pathquery.size,
                         hmsg->uri.pathquery.buff);
         } else {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_DEBUG,
                         HTTP,
                         __FILE__,
@@ -2339,7 +2340,7 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
         while (node != NULL) {
                 header = (http_header_t *)node->item;
                 /* NNS: header = (http_header_t *)node->data; */
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_DEBUG,
                         HTTP,
                         __FILE__,

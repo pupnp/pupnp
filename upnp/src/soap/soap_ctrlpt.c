@@ -30,6 +30,9 @@
  ******************************************************************************/
 
 #include "config.h"
+
+#include "UpnpLib.h"
+
 #ifdef INCLUDE_CLIENT_APIS
 #if EXCLUDE_SOAP == 0
 
@@ -561,7 +564,7 @@ int SoapSendAction(UpnpLib *p,
 
         err_code = UPNP_E_OUTOF_MEMORY; /* default error */
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 SOAP,
                 __FILE__,
@@ -587,7 +590,7 @@ int SoapSendAction(UpnpLib *p,
                 goto error_handler;
         }
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 SOAP,
                 __FILE__,
@@ -738,7 +741,7 @@ int SoapSendActionEx(UpnpLib *p,
 
         err_code = UPNP_E_OUTOF_MEMORY; /* default error */
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 SOAP,
                 __FILE__,
@@ -769,7 +772,7 @@ int SoapSendActionEx(UpnpLib *p,
                 goto error_handler;
         }
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 SOAP,
                 __FILE__,
