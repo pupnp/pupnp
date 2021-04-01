@@ -7,8 +7,10 @@
 
 #include "ithread.h"
 
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #if linux
 #include <sys/syscall.h>
