@@ -40,6 +40,7 @@
 
 #include "UpnpGlobal.h" /* for UPNP_INLINE */
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
