@@ -80,7 +80,7 @@ static void send_search_result(
         SSDPResultData_delete(temp);
 }
 
-static UPNP_INLINE int max_int(int a, int b)
+static UPNP_INLINE int max_SOCKET(SOCKET a, SOCKET b)
 {
         if (a > b) {
                 return a;
@@ -672,7 +672,7 @@ int SearchByTarget(UpnpLib *p, int Hnd, int Mx, char *St, void *Cookie)
                         (char *)&addrv4,
                         sizeof(addrv4));
                 FD_SET(gSsdpReqSocket4, &wrSet);
-                max_fd = max_int(max_fd, gSsdpReqSocket4);
+                max_fd = max_SOCKET(max_fd, gSsdpReqSocket4);
         }
 #ifdef UPNP_ENABLE_IPV6
         if (gSsdpReqSocket6 != INVALID_SOCKET) {
@@ -682,7 +682,7 @@ int SearchByTarget(UpnpLib *p, int Hnd, int Mx, char *St, void *Cookie)
                         (char *)&lIF_INDEX,
                         sizeof lIF_INDEX);
                 FD_SET(gSsdpReqSocket6, &wrSet);
-                max_fd = max_int(max_fd, gSsdpReqSocket6);
+                max_fd = max_SOCKET(max_fd, gSsdpReqSocket6);
         }
 #endif
         ret = select(max_fd + 1, NULL, &wrSet, NULL, NULL);

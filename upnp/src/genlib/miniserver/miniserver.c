@@ -65,7 +65,7 @@
 #include <string.h>
 #include <sys/types.h>
 
-static UPNP_INLINE int max_int(int a, int b)
+static UPNP_INLINE int max_SOCKET(SOCKET a, SOCKET b)
 {
         if (a > b) {
                 return a;
@@ -504,16 +504,16 @@ static void RunMiniServer(
         MiniServerSockArray *miniSock = ms;
 
         maxMiniSock = 0;
-        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerSock4);
-        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerSock6);
-        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerSock6UlaGua);
-        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerStopSock);
-        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpSock4);
-        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpSock6);
-        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpSock6UlaGua);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->miniServerSock4);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->miniServerSock6);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->miniServerSock6UlaGua);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->miniServerStopSock);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->ssdpSock4);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->ssdpSock6);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->ssdpSock6UlaGua);
 #ifdef INCLUDE_CLIENT_APIS
-        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpReqSock4);
-        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpReqSock6);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->ssdpReqSock4);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->ssdpReqSock6);
 #endif /* INCLUDE_CLIENT_APIS */
         ++maxMiniSock;
 
