@@ -2372,3 +2372,140 @@ void get_sdk_info(char *info, size_t infoSize)
 #endif /* _WIN32 */
 #endif /* UPNP_ENABLE_UNSPECIFIED_SERVER */
 }
+
+typedef struct s_url_test
+{
+        const char *url;
+        const char *hoststr;
+        size_t hostlen;
+        int result;
+} UrlTest;
+
+#define ARRAY_SIZE(a) (sizeof a / sizeof(0 [a]))
+
+static int test_ok(const char *msg, const UrlTest *a, UrlTest *b)
+{
+        int ok = 0;
+        const char *res_str = " FAIL ";
+        const char *res_reason = "No problems";
+
+        if (!a || !b) {
+                res_reason = "NULL pointer passed on test function parameters";
+                goto end_function;
+        }
+        if (!a->url || !b->url) {
+                res_reason = "url: NULL pointer";
+                goto end_function;
+        }
+        if (strcmp(a->url, b->url)) {
+                res_reason = "url: strings are different";
+                goto end_function;
+        }
+        if ((a->hoststr && !b->hoststr) || (!a->hoststr && b->hoststr)) {
+                res_reason = "hoststr: NULL pointer";
+                goto end_function;
+        }
+        if (a->hoststr && b->hoststr && strcmp(a->hoststr, b->hoststr)) {
+                res_reason = "hoststr: strings are different";
+                goto end_function;
+        }
+        if (a->hostlen != b->hostlen) {
+                res_reason = "hostlen: different numbers";
+                goto end_function;
+        }
+        if (a->result != b->result) {
+                res_reason = "result: different results";
+                goto end_function;
+        }
+        ok = 1;
+        res_str = "  OK  ";
+
+end_function:
+        printf("\t[%s] %s:\n"
+               "\t\tresult = %d, url = %s, hoststr = %s, hostlen = %lu\n"
+               "\t\tresult = %d, url = %s, hoststr = %s, hostlen = %lu\n"
+               "\t\t%s\n",
+                res_str,
+                msg,
+                a->result,
+                a->url,
+                a->hoststr,
+                a->hostlen,
+                b->result,
+                b->url,
+                b->hoststr,
+                b->hostlen,
+                res_reason);
+        return ok;
+}
+
+int unit_test_httpwrite(void)
+{
+        int ok = 1;
+        unsigned long i;
+        UrlTest t;
+        static const UrlTest url_test[] = {
+                {
+                        .url = "",
+                        .hoststr = 0,
+                        .hostlen = (size_t)-1,
+                        .result = UPNP_E_INVALID_URL,
+                },
+                {
+                        .url = "/",
+                        .hoststr = 0,
+                        .hostlen = (size_t)-1,
+                        .result = UPNP_E_INVALID_URL,
+                },
+                {
+                        .url = "//",
+                        .hoststr = "",
+                        .hostlen = 0,
+                        .result = UPNP_E_SUCCESS,
+                },
+                {
+                        .url = "http://",
+                        .hoststr = "",
+                        .hostlen = 0,
+                        .result = UPNP_E_SUCCESS,
+                },
+                {
+                        .url = "http://a",
+                        .hoststr = "a",
+                        .hostlen = 1,
+                        .result = UPNP_E_SUCCESS,
+                },
+                {
+                        .url = "http:///",
+                        .hoststr = "/",
+                        .hostlen = 0,
+                        .result = UPNP_E_SUCCESS,
+                },
+                {
+                        .url = "http://a/",
+                        .hoststr = "a/",
+                        .hostlen = 1,
+                        .result = UPNP_E_SUCCESS,
+                },
+                {
+                        .url = "http://a/b.c",
+                        .hoststr = "a/b.c",
+                        .hostlen = 1,
+                        .result = UPNP_E_SUCCESS,
+                },
+        };
+
+        printf("***************************************************************"
+               "*****************\n"
+               "httpreadwrite.c internal unit test\n\n");
+        for (i = 0; i < ARRAY_SIZE(url_test); ++i) {
+                printf("i = %2lu ", i);
+                t.url = url_test[i].url;
+                t.hoststr = 0;
+                t.hostlen = (size_t)-1;
+                t.result = get_hoststr(t.url, &t.hoststr, &t.hostlen);
+                ok = ok && test_ok("new ", &url_test[i], &t);
+        }
+
+        return ok;
+}

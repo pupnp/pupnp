@@ -2936,6 +2936,8 @@ EXPORT_SPEC void UpnpRemoveAllVirtualDirs(
 
 /* @} Web Server API */
 
+EXPORT_SPEC int UpnpInternalUnitTest(const char *test_name);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
