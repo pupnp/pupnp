@@ -150,7 +150,7 @@ protected:
 };
 
 
-TEST_F(UpnpApiIPv4TestSuite, UpnpGetIfInfo_called_with_valid_interface)
+TEST_F(UpnpApiIPv4TestSuite, DISABLED_UpnpGetIfInfo_called_with_valid_interface)
 {
     // provide a network interface
     struct ifaddrs* ifaddr = nullptr;
@@ -191,10 +191,10 @@ TEST_F(UpnpApiIPv4TestSuite, UpnpGetIfInfo_called_with_valid_interface)
 }
 
 
-TEST_F(UpnpApiIPv4TestSuite, UpnpGetIfInfo_called_with_unknown_interface)
+TEST_F(UpnpApiIPv4TestSuite, DISABLED_UpnpGetIfInfo_called_with_unknown_interface)
 {
-    GTEST_SKIP() << "due to failed github sanity check because of issue #247.\n"
-                 << "Comment GTEST_SKIP() in the TestSuite to enable this test.";
+//    GTEST_SKIP() << "due to failed github sanity check because of issue #247.\n"
+//                 << "Comment GTEST_SKIP() in the TestSuite to enable this test.";
 
     // provide a network interface
     struct ifaddrs* ifaddr = nullptr;
@@ -237,10 +237,10 @@ TEST_F(UpnpApiIPv4TestSuite, UpnpGetIfInfo_called_with_unknown_interface)
 }
 
 
-TEST_F(UpnpApiIPv4TestSuite, initialize_default_UpnpInit2)
+TEST_F(UpnpApiIPv4TestSuite, DISABLED_initialize_default_UpnpInit2)
 {
-    GTEST_SKIP() << "due to failed github sanity check because of issue #272.\n"
-                 << "Comment GTEST_SKIP() in the TestSuite to enable this test.";
+//    GTEST_SKIP() << "due to failed github sanity check because of issue #272.\n"
+//                 << "Comment GTEST_SKIP() in the TestSuite to enable this test.";
 
     // provide a network interface
     struct ifaddrs* ifaddr = nullptr;
