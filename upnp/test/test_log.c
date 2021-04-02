@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *************************************************************************/
-#include "upnpconfig.h"
+#include "autoconfig.h"
 
 #include "UpnpLog.h"
 #include "upnp.h"
@@ -37,16 +37,30 @@
 #include <stdlib.h>
 #include <string.h>
 
+void test_callback(Upnp_LogLevel level,
+        Dbg_Module module,
+        const char *sourceFile,
+        const int *sourceLine,
+        const char *log)
+{
+        (void)module;
+        (void)sourceFile;
+        (void)sourceLine;
+
+        fprintf(stderr,
+                "Hello, from the test callback. Level is: %s, Message is: "
+                "'%s'\n",
+                UpnpLogLevelToStr(level),
+                log);
+}
+
 int main()
 {
-#if UPNP_HAVE_DEBUG
         int i;
-        /* Hopefully big enough buffer */
-        static char upnplib_buffer[4096];
-        UpnpLib *p = (UpnpLib *)&upnplib_buffer;
+        UpnpLog *l = UpnpLog_new();
 
-        if (!p) {
-                UpnpPrintf(p,
+        if (!l) {
+                UpnpPrintf(0,
                         UPNP_CRITICAL,
                         API,
                         __FILE__,
@@ -55,27 +69,21 @@ int main()
                 exit(1);
         }
         /* Try a few random calls (let's crash it...) */
-        UpnpCloseLog(p);
-        UpnpCloseLog(p);
-        UpnpPrintf(p,
+        UpnpCloseLog(l);
+        UpnpCloseLog(l);
+        UpnpPrintf(l,
                 UPNP_CRITICAL,
                 API,
                 __FILE__,
                 __LINE__,
                 "This should not be printed!\n");
-        FILE *fp = UpnpGetDebugFile(p, UPNP_CRITICAL, API);
-        if (fp) {
-                fprintf(stderr, "Log FP not NULL before init was called!\n");
-                exit(1);
-        }
 
         /* Let's really init. Request log to stderr */
-        UpnpSetLogFileNames(p, NULL, NULL);
-        UpnpSetLogLevel(p, UPNP_ERROR);
-        UpnpInitLog(p);
-
-        UpnpPrintf(p, UPNP_CRITICAL, API, __FILE__, __LINE__, "Hello LOG!\n");
-        UpnpPrintf(p,
+        UpnpSetLogFileName(l, NULL);
+        UpnpSetLogLevel(l, UPNP_ERROR);
+        UpnpInitLog(l);
+        UpnpPrintf(l, UPNP_CRITICAL, API, __FILE__, __LINE__, "Hello LOG!\n");
+        UpnpPrintf(l,
                 UPNP_INFO,
                 API,
                 __FILE__,
@@ -83,9 +91,9 @@ int main()
                 "This should not be here!\n");
 
         /* Let's try to a file */
-        UpnpSetLogFileNames(p, "libupnp_err.log", 0);
-        UpnpInitLog(p);
-        UpnpPrintf(p,
+        UpnpSetLogFileName(l, "libupnp_err.log");
+        UpnpInitLog(l);
+        UpnpPrintf(l,
                 UPNP_CRITICAL,
                 API,
                 __FILE__,
@@ -93,19 +101,48 @@ int main()
                 "Hello from the log file\n");
 
         /* Close and retry stuff */
-        UpnpCloseLog(p);
-        UpnpPrintf(p, UPNP_INFO, API, __FILE__, __LINE__, "Not here either!\n");
-        UpnpSetLogFileNames(p, 0, 0);
-        UpnpInitLog(p);
-        UpnpPrintf(p, UPNP_CRITICAL, API, __FILE__, __LINE__, "I'm back!\n");
+        UpnpCloseLog(l);
+        UpnpPrintf(l, UPNP_INFO, API, __FILE__, __LINE__, "Not here either!\n");
+        UpnpSetLogFileName(l, NULL);
+        UpnpInitLog(l);
+        UpnpPrintf(l, UPNP_CRITICAL, API, __FILE__, __LINE__, "I'm back!\n");
         for (i = 0; i < 10000; i++) {
-                UpnpInitLog(p);
-                UpnpCloseLog(p);
+                UpnpInitLog(l);
+                UpnpCloseLog(l);
         }
-        UpnpCloseLog(p);
-#else
-        printf("DEBUG is not configured\n");
-#endif
+        UpnpCloseLog(l);
+
+        /* Callback */
+        UpnpInitLog(l);
+        UpnpSetLogCallback(l, test_callback);
+        UpnpPrintf(l,
+                UPNP_CRITICAL,
+                API,
+                __FILE__,
+                __LINE__,
+                "And we'd better not risk another frontal assault, that "
+                "rabbit's dynamite.\n");
+        UpnpPrintf(l,
+                UPNP_CRITICAL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Would it help to confuse it if we run away more?\n");
+        UpnpSetLogCallback(l, NULL);
+        UpnpPrintf(l,
+                UPNP_CRITICAL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Oh, shut up and go and change your armor.\n");
+        UpnpSetLogCallback(l, test_callback);
+        UpnpPrintf(l,
+                UPNP_CRITICAL,
+                API,
+                __FILE__,
+                __LINE__,
+                "Let us taunt it! It may become so cross that it will make a "
+                "mistake.\n");
 
         exit(0);
 }

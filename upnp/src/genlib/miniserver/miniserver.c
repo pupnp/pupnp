@@ -65,7 +65,7 @@
 #include <string.h>
 #include <sys/types.h>
 
-static UPNP_INLINE int max_int(int a, int b)
+static UPNP_INLINE int max_SOCKET(SOCKET a, SOCKET b)
 {
         if (a > b) {
                 return a;
@@ -178,7 +178,7 @@ static int dispatch_request(
         case HTTPMETHOD_NOTIFY:
         case HTTPMETHOD_SUBSCRIBE:
         case HTTPMETHOD_UNSUBSCRIBE:
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         MSERV,
                         __FILE__,
@@ -256,8 +256,9 @@ static void handle_request(
         int timeout = HTTP_DEFAULT_TIMEOUT;
         struct mserv_request_t *request = (struct mserv_request_t *)args;
         SOCKET connfd = request->connfd;
+        int line = 0;
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 MSERV,
                 __FILE__,
@@ -269,6 +270,13 @@ static void handle_request(
         ret_code = sock_init_with_ip(
                 &info, connfd, (struct sockaddr *)&request->foreign_sockaddr);
         if (ret_code != UPNP_E_SUCCESS) {
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_INFO,
+                        MSERV,
+                        __FILE__,
+                        __LINE__,
+                        "miniserver %d: error in sock_init_with_ip()\n",
+                        connfd);
                 free(request);
                 httpmsg_destroy(hmsg);
                 return;
@@ -281,9 +289,10 @@ static void handle_request(
                 &timeout,
                 &http_error_code);
         if (ret_code != 0) {
+                line = __LINE__;
                 goto error_handler;
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 MSERV,
                 __FILE__,
@@ -293,23 +302,34 @@ static void handle_request(
         /* dispatch */
         http_error_code = dispatch_request(p, &info, &parser);
         if (http_error_code != 0) {
+                line = __LINE__;
                 goto error_handler;
         }
         http_error_code = 0;
 
 error_handler:
         if (http_error_code > 0) {
-                if (hmsg) {
+                if (hmsg && hmsg->major_version > 0) {
                         major = hmsg->major_version;
                         minor = hmsg->minor_version;
                 }
                 handle_error(p, &info, http_error_code, major, minor);
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_INFO,
+                        MSERV,
+                        __FILE__,
+                        line,
+                        "miniserver %d: error handler called, major = %d, "
+                        "minor = %d.\n",
+                        connfd,
+                        major,
+                        minor);
         }
         sock_destroy(p, &info, SD_BOTH);
         httpmsg_destroy(hmsg);
         free(request);
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 MSERV,
                 __FILE__,
@@ -338,7 +358,7 @@ static UPNP_INLINE void schedule_request_job(
         request = (struct mserv_request_t *)malloc(
                 sizeof(struct mserv_request_t));
         if (request == NULL) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         MSERV,
                         __FILE__,
@@ -358,7 +378,7 @@ static UPNP_INLINE void schedule_request_job(
         TPJobSetPriority(&job, MED_PRIORITY);
         if (ThreadPoolAdd(UpnpLib_getnc_gMiniServerThreadPool(p), &job, NULL) !=
                 0) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         MSERV,
                         __FILE__,
@@ -393,7 +413,7 @@ static void web_server_accept(UpnpLib *p, SOCKET lsock, fd_set *set)
                         lsock, (struct sockaddr *)&clientAddr, &clientLen);
                 if (asock == INVALID_SOCKET) {
                         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 MSERV,
                                 __FILE__,
@@ -438,7 +458,7 @@ static int receive_from_stopSock(UpnpLib *p, SOCKET ssock, fd_set *set)
                                 &((struct sockaddr_in *)&clientAddr)->sin_addr,
                                 buf_ntop,
                                 sizeof(buf_ntop));
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 MSERV,
                                 __FILE__,
@@ -446,7 +466,7 @@ static int receive_from_stopSock(UpnpLib *p, SOCKET ssock, fd_set *set)
                                 "Received response: %s From host %s \n",
                                 requestBuf,
                                 buf_ntop);
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_PACKET,
                                 MSERV,
                                 __FILE__,
@@ -484,16 +504,16 @@ static void RunMiniServer(
         MiniServerSockArray *miniSock = ms;
 
         maxMiniSock = 0;
-        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerSock4);
-        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerSock6);
-        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerSock6UlaGua);
-        maxMiniSock = max_int(maxMiniSock, miniSock->miniServerStopSock);
-        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpSock4);
-        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpSock6);
-        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpSock6UlaGua);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->miniServerSock4);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->miniServerSock6);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->miniServerSock6UlaGua);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->miniServerStopSock);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->ssdpSock4);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->ssdpSock6);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->ssdpSock6UlaGua);
 #ifdef INCLUDE_CLIENT_APIS
-        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpReqSock4);
-        maxMiniSock = max_int(maxMiniSock, miniSock->ssdpReqSock6);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->ssdpReqSock4);
+        maxMiniSock = max_SOCKET(maxMiniSock, miniSock->ssdpReqSock6);
 #endif /* INCLUDE_CLIENT_APIS */
         ++maxMiniSock;
 
@@ -521,7 +541,7 @@ static void RunMiniServer(
                 }
                 if (ret == SOCKET_ERROR) {
                         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_CRITICAL,
                                 SSDP,
                                 __FILE__,
@@ -591,7 +611,7 @@ static int get_port(
         } else if (sockinfo.ss_family == AF_INET6) {
                 *port = ntohs(((struct sockaddr_in6 *)&sockinfo)->sin6_port);
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 MSERV,
                 __FILE__,
@@ -637,7 +657,7 @@ static int init_socket_suff(UpnpLib *p,
                 addr = &s->serverAddr6->sin6_addr;
                 break;
         default:
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         MSERV,
                         __FILE__,
@@ -651,7 +671,7 @@ static int init_socket_suff(UpnpLib *p,
         s->fd = socket(domain, SOCK_STREAM, 0);
         if (s->fd == INVALID_SOCKET) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         MSERV,
                         __FILE__,
@@ -671,7 +691,7 @@ static int init_socket_suff(UpnpLib *p,
                         sizeof(onOff));
                 if (sockError == SOCKET_ERROR) {
                         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 MSERV,
                                 __FILE__,
@@ -695,7 +715,7 @@ static int init_socket_suff(UpnpLib *p,
                         sizeof(int));
                 if (sockError == SOCKET_ERROR) {
                         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 MSERV,
                                 __FILE__,
@@ -755,7 +775,7 @@ static int do_bind(UpnpLib *p, struct s_SocketStuff *s)
         } while (errCode != 0 && s->try_port >= original_listen_port);
         if (bind_error == SOCKET_ERROR) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         MSERV,
                         __FILE__,
@@ -785,7 +805,7 @@ static int do_listen(UpnpLib *p, struct s_SocketStuff *s)
         listen_error = listen(s->fd, SOMAXCONN);
         if (listen_error == SOCKET_ERROR) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         MSERV,
                         __FILE__,
@@ -798,7 +818,7 @@ static int do_listen(UpnpLib *p, struct s_SocketStuff *s)
         }
         port_error = get_port(p, s->fd, &s->actual_port);
         if (port_error < 0) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         MSERV,
                         __FILE__,
@@ -900,7 +920,7 @@ static int get_miniserver_sockets(
         ss6.serverAddr6->sin6_scope_id = lIF_INDEX;
         /* Check what happened. */
         if (err_init_4 && (err_init_6 || err_init_6UlaGua)) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_CRITICAL,
                         MSERV,
                         __FILE__,
@@ -929,7 +949,7 @@ static int get_miniserver_sockets(
                  * AFTER OUR SERVER HAS BEEN CLOSED
                  * THIS MAY CAUSE TCP TO BECOME LESS RELIABLE
                  * HOWEVER IT HAS BEEN SUGESTED FOR TCP SERVERS. */
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         MSERV,
                         __FILE__,
@@ -954,7 +974,7 @@ static int get_miniserver_sockets(
                         goto error;
                 }
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 MSERV,
                 __FILE__,
@@ -1008,7 +1028,7 @@ static int get_miniserver_stopsock(
         miniServerStopSock = socket(AF_INET, SOCK_DGRAM, 0);
         if (miniServerStopSock == INVALID_SOCKET) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_CRITICAL,
                         MSERV,
                         __FILE__,
@@ -1025,7 +1045,7 @@ static int get_miniserver_stopsock(
                 (struct sockaddr *)&stop_sockaddr,
                 sizeof(stop_sockaddr));
         if (ret == SOCKET_ERROR) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_CRITICAL,
                         MSERV,
                         __FILE__,
@@ -1190,7 +1210,7 @@ int StopMiniServer(UpnpLib *p)
         sock = socket(AF_INET, SOCK_DGRAM, 0);
         if (sock == INVALID_SOCKET) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         SSDP,
                         __FILE__,

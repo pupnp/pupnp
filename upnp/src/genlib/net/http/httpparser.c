@@ -44,7 +44,8 @@
 
 #include "httpparser.h"
 
-#include "UpnpExtraHeaders.h"
+#include "UpnpHttpHeaders.h"
+#include "UpnpLib.h"
 #include "UpnpLog.h"
 #include "list.h"
 #include "statcodes.h"
@@ -1761,7 +1762,7 @@ static UPNP_INLINE parse_status_t parser_parse_chunky_entity(
         status = match(p, scanner, "%x%L%c", &parser->chunk_size, &dummy);
         if (status != (parse_status_t)PARSE_OK) {
                 scanner->cursor = save_pos;
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         HTTP,
                         __FILE__,
@@ -1897,7 +1898,7 @@ parse_status_t parser_get_entity_read_method(UpnpLib *p, http_parser_t *parser)
                 if (raw_find_str(&hdr_value, "chunked") >= 0) {
                         /* read method to use chunked transfer encoding */
                         parser->ent_position = ENTREAD_USING_CHUNKED;
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 HTTP,
                                 __FILE__,
@@ -2221,53 +2222,40 @@ const char *method_to_str(http_method_t method)
 }
 
 /************************************************************************
- * Function: parser_get_unknown_headers
+ * Function: httpmsg_list_headers
  *
  * Parameters:
  *	IN http_message_t req ;		HTTP request
- *	INOUT UpnpListHead list ;   Extra headers list
+ *	INOUT UpnpListHead list ;   HTTP headers list
  *
- * Description: Append unknown HTTP headers to the list.
+ * Description: Append message's HTTP headers to the list.
  *
  * Returns:
  *	HTTP_OK
  *	HTTP_INTERNAL_SERVER_ERROR
  ************************************************************************/
-int parser_get_unknown_headers(http_message_t *req, UpnpListHead *list)
+int httpmsg_list_headers(http_message_t *req, UpnpListHead *list)
 {
         http_header_t *header;
         ListNode *node;
-        int index;
-        UpnpExtraHeaders *extraHeader;
-        UpnpListHead *extraHeaderNode;
+        UpnpHttpHeaders *headerList;
+        UpnpListHead *headerNode;
 
         node = ListHead(&req->headers);
         while (node != NULL) {
                 header = (http_header_t *)node->item;
-                /* find header type. */
-                index = map_str_to_int((const char *)header->name.buf,
-                        header->name.length,
-                        Http_Header_Names,
-                        NUM_HTTP_HEADER_NAMES,
-                        0);
-                if (index < 0) {
-                        extraHeader = UpnpExtraHeaders_new();
-                        if (!extraHeader) {
-                                free_http_headers_list(list);
-                                return HTTP_INTERNAL_SERVER_ERROR;
-                        }
-                        extraHeaderNode =
-                                (UpnpListHead *)UpnpExtraHeaders_get_node(
-                                        extraHeader);
-                        UpnpListInsert(
-                                list, UpnpListEnd(list), extraHeaderNode);
-                        UpnpExtraHeaders_strncpy_name(extraHeader,
-                                header->name.buf,
-                                header->name.length);
-                        UpnpExtraHeaders_strncpy_value(extraHeader,
-                                header->value.buf,
-                                header->value.length);
+                headerList = UpnpHttpHeaders_new();
+                if (!headerList) {
+                        free_http_headers_list(list);
+                        return HTTP_INTERNAL_SERVER_ERROR;
                 }
+                headerNode =
+                        (UpnpListHead *)UpnpHttpHeaders_get_node(headerList);
+                UpnpListInsert(list, UpnpListEnd(list), headerNode);
+                UpnpHttpHeaders_strncpy_name(
+                        headerList, header->name.buf, header->name.length);
+                UpnpHttpHeaders_strncpy_value(
+                        headerList, header->value.buf, header->value.length);
                 node = ListNext(&req->headers, node);
         }
 
@@ -2289,12 +2277,12 @@ int parser_get_unknown_headers(http_message_t *req, UpnpListHead *list)
 void free_http_headers_list(UpnpListHead *list)
 {
         UpnpListIter pos;
-        UpnpExtraHeaders *extra;
+        UpnpHttpHeaders *extra;
 
         for (pos = UpnpListBegin(list); pos != UpnpListEnd(list);) {
-                extra = (UpnpExtraHeaders *)pos;
+                extra = (UpnpHttpHeaders *)pos;
                 pos = UpnpListErase(list, pos);
-                UpnpExtraHeaders_delete(extra);
+                UpnpHttpHeaders_delete(extra);
         }
 }
 
@@ -2307,8 +2295,8 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
 
         /* print start line */
         if (hmsg->is_request) {
-                UpnpPrintf(p,
-                        UPNP_ALL,
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_DEBUG,
                         HTTP,
                         __FILE__,
                         __LINE__,
@@ -2319,8 +2307,8 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
                         (int)hmsg->uri.pathquery.size,
                         hmsg->uri.pathquery.buff);
         } else {
-                UpnpPrintf(p,
-                        UPNP_ALL,
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_DEBUG,
                         HTTP,
                         __FILE__,
                         __LINE__,
@@ -2339,8 +2327,8 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
         while (node != NULL) {
                 header = (http_header_t *)node->item;
                 /* NNS: header = (http_header_t *)node->data; */
-                UpnpPrintf(p,
-                        UPNP_ALL,
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_DEBUG,
                         HTTP,
                         __FILE__,
                         __LINE__,

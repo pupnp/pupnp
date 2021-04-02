@@ -78,7 +78,7 @@ static void GenaAutoRenewSubscription(
         (void)p;
 
         if (AUTO_RENEW_TIME == 0) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         GENA,
                         __FILE__,
@@ -88,7 +88,7 @@ static void GenaAutoRenewSubscription(
                 send_callback = 1;
                 eventType = UPNP_EVENT_SUBSCRIPTION_EXPIRED;
         } else {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         GENA,
                         __FILE__,
@@ -116,7 +116,7 @@ static void GenaAutoRenewSubscription(
                         free_upnp_timeout(event);
                         goto end_function;
                 }
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         GENA,
                         __FILE__,
@@ -603,8 +603,12 @@ int genaSubscribe(UpnpLib *p,
         memset(temp_sid, 0, sizeof(temp_sid));
         memset(temp_sid2, 0, sizeof(temp_sid2));
 
-        UpnpPrintf(
-                p, UPNP_INFO, GENA, __FILE__, __LINE__, "GENA SUBSCRIBE BEGIN");
+        UpnpPrintf(UpnpLib_get_Log(p),
+                UPNP_INFO,
+                GENA,
+                __FILE__,
+                __LINE__,
+                "GENA SUBSCRIBE BEGIN");
 
         UpnpString_clear(out_sid);
 
@@ -622,7 +626,7 @@ int genaSubscribe(UpnpLib *p,
         return_code = gena_subscribe(p, PublisherURL, TimeOut, NULL, ActualSID);
         HandleLock();
         if (return_code != UPNP_E_SUCCESS) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_CRITICAL,
                         GENA,
                         __FILE__,
@@ -717,7 +721,7 @@ int genaRenewSubscription(UpnpLib *p,
                 free_upnp_timeout((upnp_timeout *)tempJob.arg);
         }
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,

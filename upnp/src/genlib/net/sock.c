@@ -44,6 +44,7 @@
 
 #include "sock.h"
 
+#include "UpnpLib.h"
 #include "UpnpLog.h"
 #include "UpnpStdInt.h" /* for ssize_t */
 #include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
@@ -62,11 +63,6 @@
 
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0
-#endif
-
-#ifdef UPNP_ENABLE_OPEN_SSL
-/* OpenSSL context defined in upnpapi.c */
-extern SSL_CTX *gSslCtx;
 #endif
 
 int sock_init(SOCKINFO *info, SOCKET sockfd)
@@ -97,10 +93,10 @@ int sock_init_with_ip(
 }
 
 #ifdef UPNP_ENABLE_OPEN_SSL
-int sock_ssl_connect(SOCKINFO *info)
+int sock_ssl_connect(UpnpLib *p, SOCKINFO *info)
 {
         int status = 0;
-        info->ssl = SSL_new(gSslCtx);
+        info->ssl = SSL_new(UpnpLib_get_gSslCtx(p));
         if (!info->ssl) {
                 return UPNP_E_SOCKET_ERROR;
         }
@@ -130,7 +126,7 @@ int sock_destroy(UpnpLib *p, SOCKINFO *info, int ShutdownMethod)
 #endif
                 if (shutdown(info->socket, ShutdownMethod) == -1) {
                         strerror_r(errno, errorBuffer, sizeof errorBuffer);
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 HTTP,
                                 __FILE__,
@@ -219,7 +215,7 @@ static int sock_read_write(
 #ifdef UPNP_ENABLE_OPEN_SSL
                         if (info->ssl) {
                                 numBytes = (long)SSL_read(
-                                        info->ssl, buffer, (size_t)bufsize);
+                                        info->ssl, buffer, (int)bufsize);
                         } else {
 #endif
                                 /* read data. */
@@ -236,7 +232,7 @@ static int sock_read_write(
                                 if (info->ssl) {
                                         num_written = SSL_write(info->ssl,
                                                 buffer + bytes_sent,
-                                                byte_left);
+                                                (int)byte_left);
                                 } else {
 #endif
                                         /* write data. */

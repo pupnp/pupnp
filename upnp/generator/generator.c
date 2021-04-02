@@ -36,7 +36,7 @@ static struct s_Member UpnpActionRequest_members[] = {
                 "UpnpInet.h",
                 0),
         INIT_MEMBER(Os, TYPE_STRING, 0, 0, 0),
-        INIT_MEMBER(ExtraHeadersList, TYPE_LIST, 0, 0, 0),
+        INIT_MEMBER(HttpHeadersList, TYPE_LIST, 0, 0, 0),
 };
 
 static struct s_Member UpnpDiscovery_members[] = {
@@ -70,7 +70,7 @@ static struct s_Member UpnpEventSubscribe_members[] = {
         INIT_MEMBER(PublisherUrl, TYPE_STRING, 0, 0, 0),
 };
 
-static struct s_Member UpnpExtraHeaders_members[] = {
+static struct s_Member UpnpHttpHeaders_members[] = {
         INIT_MEMBER(node, TYPE_LIST, 0, 0, 0),
         INIT_MEMBER(name, TYPE_STRING, 0, 0, 0),
         INIT_MEMBER(value, TYPE_STRING, 0, 0, 0),
@@ -83,7 +83,7 @@ static struct s_Member UpnpFileInfo_members[] = {
         INIT_MEMBER(IsDirectory, TYPE_INTEGER, int, 0, 0),
         INIT_MEMBER(IsReadable, TYPE_INTEGER, int, 0, 0),
         INIT_MEMBER(ContentType, TYPE_DOMSTRING, 0, 0, 0),
-        INIT_MEMBER(ExtraHeadersList, TYPE_LIST, 0, 0, 0),
+        INIT_MEMBER(HttpHeadersList, TYPE_LIST, 0, 0, 0),
         INIT_MEMBER(CtrlPtIPAddr,
                 TYPE_BUFFER,
                 struct sockaddr_storage,
@@ -174,22 +174,7 @@ static struct s_Member UpnpLib_members[] = {
                 "<openssl/ssl.h>",
                 0,
                 "#ifdef UPNP_ENABLE_OPEN_SSL"),
-        /* Log stuff ---------------------------------------------------------*/
-        INIT_MEMBER(gLogMutex,
-                TYPE_BUFFER,
-                ithread_mutex_t,
-                "ithread.h",
-                "pthread_mutex_init(&p->m_gSDKInitMutex, 0);"),
-        INIT_MEMBER(gLogLevel,
-                TYPE_INTEGER,
-                Upnp_LogLevel,
-                0,
-                "UPNP_DEFAULT_LOG_LEVEL"),
-        INIT_MEMBER(gLogFp, TYPE_INTEGER, FILE *, "<stdio.h>", 0),
-        INIT_MEMBER(gLogIsStderr, TYPE_INTEGER, int, 0, 0),
-        INIT_MEMBER(gSetLogWasCalled, TYPE_INTEGER, int, 0, 0),
-        INIT_MEMBER(gLogInitWasCalled, TYPE_INTEGER, int, 0, 0),
-        INIT_MEMBER(gLogFileName, TYPE_INTEGER, char *, 0, 0),
+        INIT_MEMBER(Log, TYPE_INTEGER, UpnpLog *, "UpnpLog.h", 0),
 };
 
 static struct s_Member UpnpStateVarComplete_members[] = {
@@ -255,7 +240,7 @@ static struct s_Class my_classes[] = {
         INIT_CLASS(UpnpDiscovery),
         INIT_CLASS(UpnpEvent),
         INIT_CLASS(UpnpEventSubscribe),
-        INIT_CLASS(UpnpExtraHeaders),
+        INIT_CLASS(UpnpHttpHeaders),
         INIT_CLASS(UpnpFileInfo),
         INIT_CLASS(UpnpLib),
         INIT_CLASS(UpnpStateVarComplete),

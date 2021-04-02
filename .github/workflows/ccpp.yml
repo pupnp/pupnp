@@ -83,6 +83,26 @@ jobs:
           cd build
           ctest --output-on-failure --C ${{ matrix.conf }}
 
+  build_openssl:
+    name: OpenSSL build (ubuntu-20.04)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: bootstrap and configure
+      run: |
+        ./bootstrap
+        ./configure --enable-debug --enable-open_ssl \
+          CFLAGS="-fsanitize=address,leak" \
+          LDFLAGS="-fsanitize=address,leak"
+    - name: make
+      run: make
+    - name: make check (upnp)
+      run: |
+        cd upnp && make check && cat test_init.log || (cat test-suite.log test_init.log && exit 1)
+    - name: make check (ixml)
+      run: |
+        cd ixml && make check || (cat test-suite.log && exit 1)
+
   build_asan:
     name: Sanitizer build (ubuntu-20.04)
     runs-on: ubuntu-20.04
@@ -99,11 +119,7 @@ jobs:
       run: make
     - name: make check (upnp)
       run: |
-        cd upnp
-        make check
-        ret=$?
-        cat test_init.log
-        exit $ret
+        cd upnp && make check && cat test_init.log || (cat test-suite.log test_init.log && exit 1)
     - name: make check (ixml)
       run: |
         cd ixml && make check || (cat test-suite.log && exit 1)

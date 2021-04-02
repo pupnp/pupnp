@@ -77,7 +77,7 @@ int genaUnregisterDevice(
 
         HandleLock();
         if (GetHandleInfo(p, device_handle, &handle_info) != HND_DEVICE) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_CRITICAL,
                         GENA,
                         __FILE__,
@@ -197,8 +197,8 @@ static UPNP_INLINE int notify_send_and_recv(
         const char *CRLF = "\r\n";
 
         /* connect */
-        UpnpPrintf(p,
-                UPNP_ALL,
+        UpnpPrintf(UpnpLib_get_Log(p),
+                UPNP_DEBUG,
                 GENA,
                 __FILE__,
                 __LINE__,
@@ -477,8 +477,8 @@ static char *AllocGenaHeaders(
 
 ExitFunction:
         if (headers == NULL || rc < 0 || (unsigned int)rc >= headers_size) {
-                UpnpPrintf(p,
-                        UPNP_ALL,
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_DEBUG,
                         GENA,
                         __FILE__,
                         line,
@@ -533,7 +533,7 @@ static int genaInitNotifyCommon(UpnpLib *p,
         struct Handle_Info *handle_info;
         ThreadPoolJob *job = NULL;
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -584,7 +584,7 @@ static int genaInitNotifyCommon(UpnpLib *p,
                 ret = GENA_E_BAD_SERVICE;
                 goto ExitFunction;
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -599,7 +599,7 @@ static int genaInitNotifyCommon(UpnpLib *p,
                 ret = GENA_E_BAD_SID;
                 goto ExitFunction;
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -672,7 +672,7 @@ ExitFunction:
 
         HandleUnlock();
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -696,7 +696,7 @@ int genaInitNotify(UpnpLib *p,
         int line = 0;
         DOMString propertySet = NULL;
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -714,7 +714,7 @@ int genaInitNotify(UpnpLib *p,
                 line = __LINE__;
                 goto ExitFunction;
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -727,7 +727,7 @@ int genaInitNotify(UpnpLib *p,
 
 ExitFunction:
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -750,7 +750,7 @@ int genaInitNotifyExt(UpnpLib *p,
 
         DOMString propertySet = NULL;
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -769,7 +769,7 @@ int genaInitNotifyExt(UpnpLib *p,
                 ret = UPNP_E_INVALID_PARAM;
                 goto ExitFunction;
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -782,7 +782,7 @@ int genaInitNotifyExt(UpnpLib *p,
 
 ExitFunction:
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -852,7 +852,7 @@ static int genaNotifyAllCommon(UpnpLib *p,
         service_info *service = NULL;
         struct Handle_Info *handle_info;
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -985,7 +985,7 @@ ExitFunction:
 
         HandleUnlock();
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -1007,7 +1007,7 @@ int genaNotifyAllExt(UpnpLib *p,
 
         DOMString propertySet = NULL;
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -1020,7 +1020,7 @@ int genaNotifyAllExt(UpnpLib *p,
                 ret = UPNP_E_INVALID_PARAM;
                 goto ExitFunction;
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -1032,7 +1032,7 @@ int genaNotifyAllExt(UpnpLib *p,
 
 ExitFunction:
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -1056,7 +1056,7 @@ int genaNotifyAll(UpnpLib *p,
 
         DOMString propertySet = NULL;
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -1068,7 +1068,7 @@ int genaNotifyAll(UpnpLib *p,
                 line = __LINE__;
                 goto ExitFunction;
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -1080,7 +1080,7 @@ int genaNotifyAll(UpnpLib *p,
 
 ExitFunction:
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -1325,7 +1325,7 @@ static int gena_validate_delivery_urls(
                                         &deliveryAddr4->sin_addr,
                                         deliveryAddrString,
                                         sizeof(deliveryAddrString));
-                                UpnpPrintf(p,
+                                UpnpPrintf(UpnpLib_get_Log(p),
                                         UPNP_CRITICAL,
                                         GENA,
                                         __FILE__,
@@ -1371,7 +1371,7 @@ static int gena_validate_delivery_urls(
                                         &deliveryAddr6->sin6_addr,
                                         deliveryAddrString,
                                         sizeof(deliveryAddrString));
-                                UpnpPrintf(p,
+                                UpnpPrintf(UpnpLib_get_Log(p),
                                         UPNP_CRITICAL,
                                         GENA,
                                         __FILE__,
@@ -1413,7 +1413,7 @@ void gena_process_subscription_request(
         memptr timeout_hdr;
         int rc = 0;
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -1447,7 +1447,7 @@ void gena_process_subscription_request(
                 goto exit_function;
         }
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -1476,7 +1476,7 @@ void gena_process_subscription_request(
                 goto exit_function;
         }
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,
@@ -1670,7 +1670,7 @@ void gena_process_subscription_renewal_request(
                 return;
         }
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 GENA,
                 __FILE__,

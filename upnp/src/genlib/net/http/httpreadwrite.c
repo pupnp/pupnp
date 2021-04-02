@@ -41,8 +41,8 @@
 
 #include "httpreadwrite.h"
 
-#include "UpnpExtraHeaders.h"
 #include "UpnpFileInfo.h"
+#include "UpnpHttpHeaders.h"
 #include "UpnpInet.h"
 #include "UpnpIntTypes.h"
 #include "UpnpLib.h"
@@ -318,7 +318,7 @@ SOCKET http_Connect(UpnpLib *p, uri_type *destination_url, uri_type *url)
                 sockaddr_len);
         if (ret_connect == -1) {
 #ifdef _WIN32
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_CRITICAL,
                         HTTP,
                         __FILE__,
@@ -328,7 +328,7 @@ SOCKET http_Connect(UpnpLib *p, uri_type *destination_url, uri_type *url)
 #endif
                 if (shutdown(connfd, SD_BOTH) == -1) {
                         strerror_r(errno, errorBuffer, sizeof errorBuffer);
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 HTTP,
                                 __FILE__,
@@ -389,7 +389,7 @@ int http_RecvMessage(UpnpLib *p,
                                 parser_append(p, parser, buf, (size_t)num_read);
                         switch (status) {
                         case PARSE_SUCCESS:
-                                UpnpPrintf(p,
+                                UpnpPrintf(UpnpLib_get_Log(p),
                                         UPNP_INFO,
                                         HTTP,
                                         __FILE__,
@@ -432,7 +432,7 @@ int http_RecvMessage(UpnpLib *p,
                         }
                 } else if (num_read == 0) {
                         if (ok_on_close) {
-                                UpnpPrintf(p,
+                                UpnpPrintf(UpnpLib_get_Log(p),
                                         UPNP_INFO,
                                         HTTP,
                                         __FILE__,
@@ -462,8 +462,8 @@ int http_RecvMessage(UpnpLib *p,
 
 ExitFunction:
         if (ret != UPNP_E_SUCCESS) {
-                UpnpPrintf(p,
-                        UPNP_ALL,
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_DEBUG,
                         HTTP,
                         __FILE__,
                         line,
@@ -629,7 +629,8 @@ int http_SendMessage(
                                         /* on the top of the buffer. */
                                         /*file_buf[num_read+strlen(Chunk_Header)]
                                          * = NULL; */
-                                        /*UpnpPrintf(p, "Sending
+                                        /*UpnpPrintf(UpnpLib_get_Log(p),
+                                         * "Sending
                                          * %s\n",file_buf-strlen(Chunk_Header));*/
                                         nw = sock_write(info,
                                                 file_buf - strlen(Chunk_Header),
@@ -652,7 +653,7 @@ int http_SendMessage(
                                                 file_buf,
                                                 num_read,
                                                 TimeOut);
-                                        UpnpPrintf(p,
+                                        UpnpPrintf(UpnpLib_get_Log(p),
                                                 UPNP_INFO,
                                                 HTTP,
                                                 __FILE__,
@@ -687,7 +688,7 @@ int http_SendMessage(
                         if (buf_length > (size_t)0) {
                                 nw = sock_write(info, buf, buf_length, TimeOut);
                                 num_written = (size_t)nw;
-                                UpnpPrintf(p,
+                                UpnpPrintf(UpnpLib_get_Log(p),
                                         UPNP_INFO,
                                         HTTP,
                                         __FILE__,
@@ -841,7 +842,7 @@ int http_Download(UpnpLib *p,
 
         url_str_len = strlen(url_str);
         /*ret_code = parse_uri( (char*)url_str, url_str_len, &url ); */
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 HTTP,
                 __FILE__,
@@ -870,7 +871,7 @@ int http_Download(UpnpLib *p,
         } else {
                 hostlen = strlen(hoststr);
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 HTTP,
                 __FILE__,
@@ -892,7 +893,7 @@ int http_Download(UpnpLib *p,
                 hoststr,
                 hostlen);
         if (ret_code != 0) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         HTTP,
                         __FILE__,
@@ -901,7 +902,7 @@ int http_Download(UpnpLib *p,
                 membuffer_destroy(&request);
                 return ret_code;
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 HTTP,
                 __FILE__,
@@ -923,7 +924,12 @@ int http_Download(UpnpLib *p,
                 membuffer_destroy(&request);
                 return ret_code;
         }
-        UpnpPrintf(p, UPNP_INFO, HTTP, __FILE__, __LINE__, "Response\n");
+        UpnpPrintf(UpnpLib_get_Log(p),
+                UPNP_INFO,
+                HTTP,
+                __FILE__,
+                __LINE__,
+                "Response\n");
         print_http_headers(p, &response.msg);
         /* optional content-type */
         if (content_type) {
@@ -961,7 +967,7 @@ int http_Download(UpnpLib *p,
                 assert(msg_length > *doc_length);
                 assert(*document != NULL);
                 if (msg_length <= *doc_length || *document == NULL)
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 HTTP,
                                 __FILE__,
@@ -1016,7 +1022,7 @@ static int MakeGenericMessage(UpnpLib *p,
         size_t hostlen = (size_t)0;
         char *hoststr;
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 HTTP,
                 __FILE__,
@@ -1050,7 +1056,7 @@ static int MakeGenericMessage(UpnpLib *p,
                         ret_code = get_hoststr(url_str, &hoststr, &hostlen);
                         if (ret_code != UPNP_E_SUCCESS)
                                 return ret_code;
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 HTTP,
                                 __FILE__,
@@ -1087,7 +1093,7 @@ static int MakeGenericMessage(UpnpLib *p,
                         ret_code = UPNP_E_INVALID_PARAM;
         }
         if (ret_code != 0) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         HTTP,
                         __FILE__,
@@ -1096,7 +1102,7 @@ static int MakeGenericMessage(UpnpLib *p,
                 membuffer_destroy(request);
                 return ret_code;
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 HTTP,
                 __FILE__,
@@ -1336,9 +1342,9 @@ int http_OpenHttpConnection(
 #ifdef UPNP_ENABLE_OPEN_SSL
         /* For HTTPS connections start the TLS/SSL handshake. */
         if (token_string_casecmp(&url.scheme, "https") == 0) {
-                ret_code = sock_ssl_connect(&handle->sock_info);
+                ret_code = sock_ssl_connect(p, &handle->sock_info);
                 if (ret_code != UPNP_E_SUCCESS) {
-                        sock_destroy(&handle->sock_info, SD_BOTH);
+                        sock_destroy(p, &handle->sock_info, SD_BOTH);
                         goto errorHandler;
                 }
         }
@@ -1582,7 +1588,7 @@ int http_ReadHttpResponse(
                         }
                 } else if (num_read == 0) {
                         if (ok_on_close) {
-                                UpnpPrintf(p,
+                                UpnpPrintf(UpnpLib_get_Log(p),
                                         UPNP_INFO,
                                         HTTP,
                                         __FILE__,
@@ -1737,15 +1743,15 @@ int http_MakeMessage(UpnpLib *p,
                         /* list of extra headers */
                         UpnpListIter pos;
                         UpnpListHead *head;
-                        UpnpExtraHeaders *extra;
+                        UpnpHttpHeaders *extra;
                         const DOMString resp;
                         head = (UpnpListHead *)va_arg(argp, UpnpListHead *);
                         if (head) {
                                 for (pos = UpnpListBegin(head);
                                         pos != UpnpListEnd(head);
                                         pos = UpnpListNext(head, pos)) {
-                                        extra = (UpnpExtraHeaders *)pos;
-                                        resp = UpnpExtraHeaders_get_resp(extra);
+                                        extra = (UpnpHttpHeaders *)pos;
+                                        resp = UpnpHttpHeaders_get_resp(extra);
                                         if (resp) {
                                                 if (membuffer_append(buf,
                                                             resp,
@@ -1762,8 +1768,8 @@ int http_MakeMessage(UpnpLib *p,
                         /* C string */
                         s = (char *)va_arg(argp, char *);
                         assert(s);
-                        UpnpPrintf(p,
-                                UPNP_ALL,
+                        UpnpPrintf(UpnpLib_get_Log(p),
+                                UPNP_DEBUG,
                                 HTTP,
                                 __FILE__,
                                 __LINE__,
@@ -1791,8 +1797,8 @@ int http_MakeMessage(UpnpLib *p,
                 } else if (c == 'b') {
                         /* mem buffer */
                         s = (char *)va_arg(argp, char *);
-                        UpnpPrintf(p,
-                                UPNP_ALL,
+                        UpnpPrintf(UpnpLib_get_Log(p),
+                                UPNP_DEBUG,
                                 HTTP,
                                 __FILE__,
                                 __LINE__,
@@ -2102,7 +2108,7 @@ static int MakeGetMessageEx(UpnpLib *p,
 
         url_str_len = strlen(url_str);
         do {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         HTTP,
                         __FILE__,
@@ -2136,7 +2142,7 @@ static int MakeGetMessageEx(UpnpLib *p,
                 *temp = '\0';
                 hostlen = strlen(hoststr);
                 *temp = '/';
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         HTTP,
                         __FILE__,
@@ -2160,7 +2166,7 @@ static int MakeGetMessageEx(UpnpLib *p,
                         hostlen,
                         pRangeSpecifier);
                 if (errCode != 0) {
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 HTTP,
                                 __FILE__,
@@ -2170,7 +2176,7 @@ static int MakeGetMessageEx(UpnpLib *p,
                         return errCode;
                 }
         } while (0);
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 HTTP,
                 __FILE__,

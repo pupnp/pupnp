@@ -299,7 +299,7 @@ static UPNP_INLINE void send_action_response(
                 end_body,
                 strlen(end_body));
         if (ret_code != 0) {
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         SOAP,
                         __FILE__,
@@ -360,7 +360,7 @@ static UPNP_INLINE void handle_query_variable(
         /* send event */
         soap_info->callback(
                 p, UPNP_CONTROL_GET_VAR_REQUEST, variable, soap_info->cookie);
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 SOAP,
                 __FILE__,
@@ -449,15 +449,19 @@ static void handle_invoke_action(
                         action, hdr_value.buf, hdr_value.length);
         }
 
-        err_code = parser_get_unknown_headers(request,
-                (UpnpListHead *)UpnpActionRequest_get_ExtraHeadersList(action));
+        err_code = httpmsg_list_headers(request,
+                (UpnpListHead *)UpnpActionRequest_get_HttpHeadersList(action));
         if (err_code != HTTP_OK) {
                 err_code = SOAP_ACTION_FAILED;
                 goto error_handler;
         }
 
-        UpnpPrintf(
-                p, UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
+        UpnpPrintf(UpnpLib_get_Log(p),
+                UPNP_INFO,
+                SOAP,
+                __FILE__,
+                __LINE__,
+                "Calling Callback\n");
         soap_info->callback(
                 p, UPNP_CONTROL_ACTION_REQUEST, action, soap_info->cookie);
         err_code = UpnpActionRequest_get_ErrCode(action);
@@ -486,7 +490,7 @@ error_handler:
         ixmlDocument_free(actionRequestDoc);
         ixmlFreeDOMString(act_node);
         free_http_headers_list(
-                (UpnpListHead *)UpnpActionRequest_get_ExtraHeadersList(action));
+                (UpnpListHead *)UpnpActionRequest_get_HttpHeadersList(action));
         /* restore */
         action_name.buf[action_name.length] = save_char;
         if (err_code != 0) {

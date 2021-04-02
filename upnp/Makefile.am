@@ -25,7 +25,7 @@ upnpinclude_HEADERS = \
 	inc/UpnpDiscovery.h \
 	inc/UpnpEvent.h \
 	inc/UpnpEventSubscribe.h \
-	inc/UpnpExtraHeaders.h \
+	inc/UpnpHttpHeaders.h \
 	inc/UpnpFileInfo.h \
         inc/UpnpLog.h \
 	inc/UpnpStateVarComplete.h \
@@ -162,9 +162,9 @@ libupnp_la_SOURCES += \
 	src/api/UpnpDiscovery.c \
 	src/api/UpnpEvent.c \
 	src/api/UpnpEventSubscribe.c \
-	src/api/UpnpExtraHeaders.c \
+	src/api/UpnpHttpHeaders.c \
 	src/api/UpnpFileInfo.c \
-        src/api/UpnpLog.c \
+	src/api/UpnpLog.cpp \
         src/api/UpnpStateVarComplete.c \
 	src/api/UpnpStateVarRequest.c \
 	src/api/UpnpSubscriptionRequest.c \
@@ -184,7 +184,7 @@ libupnp_la_SOURCES += src/api/upnptools.c
 endif
 
 if ENABLE_DEBUG
-AM_CPPFLAGS         += -DDEBUG -DUPNP_HAVE_DEBUG -DSTATS
+AM_CPPFLAGS         += -DDEBUG -DSTATS
 else
 AM_CPPFLAGS         += -DNDEBUG
 endif
@@ -212,12 +212,13 @@ endif
 
 
 # check / distcheck tests
-check_PROGRAMS = test_init test_url test_log test_list
-TESTS = test_init test_url test_log test_list
+check_PROGRAMS = test_init test_url test_log test_list test_upnpstring
+TESTS = test_init test_url test_log test_list test_upnpstring
 test_init_SOURCES = test/test_init.c
 test_url_SOURCES = test/test_url.c
 test_log_SOURCES = test/test_log.c
 test_list_SOURCES = test/test_list.c
+test_upnpstring_SOURCES = test/test_upnpstring.c
 
 
 EXTRA_DIST = \

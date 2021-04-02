@@ -30,6 +30,9 @@
  ******************************************************************************/
 
 #include "config.h"
+
+#include "UpnpLib.h"
+
 #if EXCLUDE_GENA == 0
 #include "gena.h"
 #include "gena_ctrlpt.h"
@@ -101,8 +104,8 @@ void genaCallback(UpnpLib *p,
                         /* subscribe */
                         gena_process_subscription_request(info, request);
                 }
-                UpnpPrintf(p,
-                        UPNP_ALL,
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_DEBUG,
                         GENA,
                         __FILE__,
                         __LINE__,

@@ -420,20 +420,19 @@ parse_status_t parser_append(
         UpnpLib *p, http_parser_t *parser, const char *buf, size_t buf_length);
 
 /************************************************************************
- * Function: parser_get_unknown_headers
+ * Function: httpmsg_list_headers
  *
  * Parameters:
  *	IN http_message_t req ;		HTTP request
- *	INOUT UpnpListHead list ;   Extra headers list
+ *	INOUT UpnpListHead list ;   HTTP headers list
  *
- * Description: Append unknown HTTP headers to the list.
+ * Description: Append message's HTTP headers to the list.
  *
  * Returns:
  *	HTTP_OK
  *	HTTP_INTERNAL_SERVER_ERROR
  ************************************************************************/
-
-int parser_get_unknown_headers(http_message_t *req, UpnpListHead *list);
+int httpmsg_list_headers(http_message_t *req, UpnpListHead *list);
 
 /************************************************************************
  * Function: free_http_headers_list

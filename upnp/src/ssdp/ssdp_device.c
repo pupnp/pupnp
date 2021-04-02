@@ -146,35 +146,35 @@ void ssdp_handle_device_request(
                 maxAge = dev_info->MaxAge;
                 HandleUnlock();
 
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
                         "MAX-AGE     =  %d\n",
                         maxAge);
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
                         "MX     =  %d\n",
                         event.Mx);
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
                         "DeviceType   =  %s\n",
                         event.DeviceType);
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         API,
                         __FILE__,
                         __LINE__,
                         "DeviceUuid   =  %s\n",
                         event.UDN);
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         API,
                         __FILE__,
@@ -249,7 +249,7 @@ static int NewRequestHandler(UpnpLib *p,
         ReplySock = socket((int)DestAddr->sa_family, SOCK_DGRAM, 0);
         if (ReplySock == INVALID_SOCKET) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         SSDP,
                         __FILE__,
@@ -298,7 +298,7 @@ static int NewRequestHandler(UpnpLib *p,
                 break;
 #endif
         default:
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_CRITICAL,
                         SSDP,
                         __FILE__,
@@ -310,7 +310,7 @@ static int NewRequestHandler(UpnpLib *p,
 
         for (Index = 0; Index < NumPacket; Index++) {
                 ssize_t rc;
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         SSDP,
                         __FILE__,
@@ -326,7 +326,7 @@ static int NewRequestHandler(UpnpLib *p,
                         socklen);
                 if (rc == -1) {
                         strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                        UpnpPrintf(p,
+                        UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 SSDP,
                                 __FILE__,
@@ -789,7 +789,7 @@ int DeviceAdvertisement(UpnpLib *p,
         int ret_code = UPNP_E_OUTOF_MEMORY;
         int rc = 0;
 
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 SSDP,
                 __FILE__,
@@ -812,7 +812,7 @@ int DeviceAdvertisement(UpnpLib *p,
                 DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_CRITICAL,
                         SSDP,
                         __FILE__,
@@ -1118,7 +1118,7 @@ int ServiceAdvertisement(UpnpLib *p,
                 DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_CRITICAL,
                         SSDP,
                         __FILE__,
@@ -1228,7 +1228,7 @@ int ServiceShutdown(UpnpLib *p,
                 DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_CRITICAL,
                         SSDP,
                         __FILE__,
@@ -1301,7 +1301,7 @@ int DeviceShutdown(UpnpLib *p,
                 DestAddr6->sin6_scope_id = UpnpLib_get_gIF_INDEX(p);
                 break;
         default:
-                UpnpPrintf(p,
+                UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_CRITICAL,
                         SSDP,
                         __FILE__,
@@ -1326,7 +1326,7 @@ int DeviceShutdown(UpnpLib *p,
                         SleepPeriod,
                         RegistrationState);
         }
-        UpnpPrintf(p,
+        UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
                 SSDP,
                 __FILE__,

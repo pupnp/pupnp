@@ -14,6 +14,17 @@ SUBDIRS = \
 	docs
 
 EXTRA_DIST = \
+	CMakeLists.txt \
+	CmDaB.cmake \
+	IXML.cmake.in \
+	UPNP.cmake.in \
+	ixml/CMakeLists.txt \
+	ixml/test/CMakeLists.txt \
+	upnp/CMakeLists.txt \
+	upnp/test/CMakeLists.txt \
+	upnp/sample/CMakeLists.txt \
+	upnp/inc/upnpconfig.h.cm \
+	upnp/sample/common/config_sample.h.cm \
 	docs/Doxyfile \
 	libupnp.pc.in \
 	libupnp.spec \
