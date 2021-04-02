@@ -212,12 +212,24 @@ endif
 
 
 # check / distcheck tests
-check_PROGRAMS = test_init test_url test_log test_list test_upnpstring
-TESTS = test_init test_url test_log test_list test_upnpstring
+check_PROGRAMS = \
+        test_init \
+        test_url \
+        test_log \
+        test_list \
+        test_internal \
+        test_upnpstring
+TESTS = test_init \
+        test_url \
+        test_log \
+        test_list \
+        test_internal \
+        test_upnpstring
 test_init_SOURCES = test/test_init.c
 test_url_SOURCES = test/test_url.c
 test_log_SOURCES = test/test_log.c
 test_list_SOURCES = test/test_list.c
+test_internal_SOURCES = test/test_internal.c
 test_upnpstring_SOURCES = test/test_upnpstring.c
 
 

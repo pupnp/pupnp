@@ -4758,4 +4758,18 @@ int UpnpSetEventQueueLimits(UpnpLib *p, int maxLen, int maxAge)
         return UPNP_E_SUCCESS;
 }
 
+/* Internal Unit tests */
+
+#include "httpreadwrite.h"
+
+int UpnpInternalUnitTest(const char *test_name)
+{
+        if (!strcmp(test_name, "httpreadwrite")) {
+                return unit_test_httpwrite();
+        }
+        printf("Test name was not recognized: %s\n", test_name);
+
+        return 0;
+}
+
 /* @} UPnPAPI */

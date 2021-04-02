@@ -641,6 +641,8 @@ int http_OpenHttpGetEx(UpnpLib *p,
  ************************************************************************/
 void get_sdk_info(char *info, size_t infoSize);
 
+int unit_test_httpwrite(void);
+
 #ifdef __cplusplus
 } /* #extern "C" */
 #endif
