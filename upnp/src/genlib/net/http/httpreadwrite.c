@@ -188,29 +188,29 @@ struct tm *http_gmtime_r(const time_t *clock, struct tm *result)
 }
 #endif /* _WIN32 */
 
-static int get_hoststr(const char *url_str, char **hoststr, size_t *hostlen)
+static int get_hoststr(
+        const char *url_str, const char **hoststr, size_t *hostlen)
 {
-        char *urlPath;
-        char *temp;
-        size_t urlPathSize;
+        const char *start;
+        const char *finish;
+        int ret_code = UPNP_E_INVALID_URL;
 
-        urlPathSize = strlen(url_str) + 1;
-        urlPath = alloca(urlPathSize);
-        strncpy(urlPath, url_str, urlPathSize);
-        *hoststr = strstr(urlPath, "//");
-        if (!*hoststr) {
-                return UPNP_E_INVALID_URL;
+        start = strstr(url_str, "//");
+        if (!start) {
+                goto end_function;
         }
-        *hoststr += 2;
-        temp = strchr(*hoststr, '/');
-        if (!temp) {
-                return UPNP_E_INVALID_URL;
+        start += 2;
+        finish = strchr(start, '/');
+        if (!finish) {
+                goto end_function;
         }
-        *temp = '\0';
-        *hostlen = strlen(*hoststr);
-        *temp = '/';
 
-        return UPNP_E_SUCCESS;
+        *hoststr = start;
+        *hostlen = (size_t)(finish - start);
+        ret_code = UPNP_E_SUCCESS;
+
+end_function:
+        return ret_code;
 }
 
 static void copy_msg_headers(LinkedList *msgHeaders, UpnpString *headers)
@@ -1019,8 +1019,8 @@ static int MakeGenericMessage(UpnpLib *p,
         const UpnpString *headers)
 {
         int ret_code = 0;
-        size_t hostlen = (size_t)0;
-        char *hoststr;
+        size_t hostlen = 0;
+        const char *hoststr;
 
         UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
