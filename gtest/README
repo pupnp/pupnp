@@ -1,0 +1,10 @@
+Compile the tests with "cmake --build ."
+
+To run all tests use option --gtest_also_run_disabled_tests, for example:
+
+./test_upnpapi-static --gtest_also_run_disabled_tests
+
+If the output is messed up with logging information from the library,
+redirect stderr to /dev/null:
+
+./test_upnpapi-static 2>/dev/null
