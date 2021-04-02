@@ -4,8 +4,10 @@ General
 -------
 * Make tests running on new library interface with UpnpLib structure
     finished 2021-03-25
-+ Running tests on the shared libupnp library
+* Running tests on the shared libupnp library
+    finished 2021-04-02
 * Replace compile.sh scripts with scripts for cmake if useful
+    finished 2021-04-02
 * Make available tests more specific with Matchers and Actions
 
 IPv4 Gtests for the Unix platform
