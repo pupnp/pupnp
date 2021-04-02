@@ -69,7 +69,6 @@
 #define snprintf _snprintf
 #endif
 #else /* _WIN32 */
-#include <alloca.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -201,12 +200,13 @@ static int get_hoststr(
         }
         start += 2;
         finish = strchr(start, '/');
-        if (!finish) {
-                goto end_function;
+        if (finish) {
+                *hostlen = (size_t)(finish - start);
+        } else {
+                *hostlen = strlen(start);
         }
-
         *hoststr = start;
-        *hostlen = (size_t)(finish - start);
+
         ret_code = UPNP_E_SUCCESS;
 
 end_function:
@@ -828,8 +828,7 @@ int http_Download(UpnpLib *p,
         uri_type url;
         char *msg_start;
         char *entity_start;
-        char *hoststr;
-        char *temp;
+        const char *hoststr;
         http_parser_t response;
         size_t msg_length;
         size_t hostlen;
@@ -837,8 +836,6 @@ int http_Download(UpnpLib *p,
         size_t copy_len;
         membuffer request;
         size_t url_str_len;
-        size_t urlPathSize;
-        char *urlPath;
 
         url_str_len = strlen(url_str);
         /*ret_code = parse_uri( (char*)url_str, url_str_len, &url ); */
@@ -855,21 +852,9 @@ int http_Download(UpnpLib *p,
         }
         /* make msg */
         membuffer_init(&request);
-        urlPathSize = url_str_len + 1;
-        urlPath = alloca(urlPathSize);
-        strncpy(urlPath, url_str, urlPathSize);
-        hoststr = strstr(urlPath, "//");
-        if (!hoststr) {
-                return UPNP_E_INVALID_URL;
-        }
-        hoststr += 2;
-        temp = strchr(hoststr, '/');
-        if (temp) {
-                *temp = '\0';
-                hostlen = strlen(hoststr);
-                *temp = '/';
-        } else {
-                hostlen = strlen(hoststr);
+        ret_code = get_hoststr(url_str, &hoststr, &hostlen);
+        if (ret_code != UPNP_E_SUCCESS) {
+                return ret_code;
         }
         UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_INFO,
@@ -2100,11 +2085,9 @@ static int MakeGetMessageEx(UpnpLib *p,
         struct SendInstruction *pRangeSpecifier)
 {
         size_t url_str_len;
-        int errCode = UPNP_E_SUCCESS;
-        char *urlPath = NULL;
-        size_t urlPathSize = 0;
-        size_t hostlen = (size_t)0;
-        char *hoststr, *temp;
+        int ret_code = UPNP_E_SUCCESS;
+        size_t hostlen = 0;
+        const char *hoststr;
 
         url_str_len = strlen(url_str);
         do {
@@ -2115,33 +2098,16 @@ static int MakeGetMessageEx(UpnpLib *p,
                         __LINE__,
                         "DOWNLOAD URL : %s\n",
                         url_str);
-                errCode = http_FixStrUrl(p, url_str, url_str_len, url);
-                if (errCode != UPNP_E_SUCCESS) {
+                ret_code = http_FixStrUrl(p, url_str, url_str_len, url);
+                if (ret_code != UPNP_E_SUCCESS) {
                         break;
                 }
                 /* make msg */
                 membuffer_init(request);
-                urlPathSize = url_str_len + 1;
-                urlPath = alloca(urlPathSize);
-                if (!urlPath) {
-                        errCode = UPNP_E_OUTOF_MEMORY;
+                ret_code = get_hoststr(url_str, &hoststr, &hostlen);
+                if (ret_code != UPNP_E_SUCCESS) {
                         break;
                 }
-                strncpy(urlPath, url_str, urlPathSize);
-                hoststr = strstr(urlPath, "//");
-                if (!hoststr) {
-                        errCode = UPNP_E_INVALID_URL;
-                        break;
-                }
-                hoststr += 2;
-                temp = strchr(hoststr, '/');
-                if (!temp) {
-                        errCode = UPNP_E_INVALID_URL;
-                        break;
-                }
-                *temp = '\0';
-                hostlen = strlen(hoststr);
-                *temp = '/';
                 UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         HTTP,
@@ -2150,7 +2116,7 @@ static int MakeGetMessageEx(UpnpLib *p,
                         "HOSTNAME : %s Length : %" PRIzu "\n",
                         hoststr,
                         hostlen);
-                errCode = http_MakeMessage(p,
+                ret_code = http_MakeMessage(p,
                         request,
                         1,
                         1,
@@ -2165,7 +2131,7 @@ static int MakeGetMessageEx(UpnpLib *p,
                         hoststr,
                         hostlen,
                         pRangeSpecifier);
-                if (errCode != 0) {
+                if (ret_code != 0) {
                         UpnpPrintf(UpnpLib_get_Log(p),
                                 UPNP_INFO,
                                 HTTP,
@@ -2173,7 +2139,7 @@ static int MakeGetMessageEx(UpnpLib *p,
                                 __LINE__,
                                 "HTTP Makemessage failed\n");
                         membuffer_destroy(request);
-                        return errCode;
+                        return ret_code;
                 }
         } while (0);
         UpnpPrintf(UpnpLib_get_Log(p),
@@ -2185,7 +2151,7 @@ static int MakeGetMessageEx(UpnpLib *p,
                 "----------END--------\n",
                 request->buf);
 
-        return errCode;
+        return ret_code;
 }
 
 #define SIZE_RANGE_BUFFER 50
