@@ -481,7 +481,7 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libupnp.pc
 if (BUILD_TESTING)
 	enable_testing()
 
-	if (NOT WIN32)
+	#if (NOT WIN32)
 		find_package (GTest CONFIG)
 
 		if (GTest_FOUND)
@@ -490,5 +490,5 @@ if (BUILD_TESTING)
 			CmDaB_install (googletest)
 			add_subdirectory (gtest)
 		endif()
-	endif()
+	#endif()
 endif()
