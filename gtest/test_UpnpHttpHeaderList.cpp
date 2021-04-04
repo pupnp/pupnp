@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-
 #include <array>
 #include <utility>
 
@@ -12,7 +11,7 @@ extern "C" {
 
 class HttpHeaderList : public ::testing::Test
 {
-      protected:
+protected:
         http_message_t msg;
         UpnpListHead header_list;
 
