@@ -149,11 +149,4 @@ upnp/test_log.trs
 
 upnp/generator/generator
 
-/build/vc10/out.vc9.Win32/Debug
-/build/vc10/out.vc10.Win32
-/build/vc10/out.vc10.x64
-/pthreads
-/build/vc10/ipch
-/build/vc10/IUpnpErrFile.txt
-/build/vc10/IUpnpInfoFile.txt
-/build/vc10/*.opensdf
+/build
