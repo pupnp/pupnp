@@ -1,13 +1,11 @@
+#include "LinkedList.h"
+#include "UpnpHttpHeaders.h"
+#include "httpparser.h"
+#include "list.h"
+
 #include "gtest/gtest.h"
 #include <array>
 #include <utility>
-
-extern "C" {
-#include <LinkedList.h>
-#include <UpnpHttpHeaders.h>
-#include <httpparser.h>
-#include <list.h>
-}
 
 class HttpHeaderList : public ::testing::Test
 {
