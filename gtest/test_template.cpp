@@ -1,4 +1,6 @@
-// This test should run, reporting no failure
+// This test should always run, reporting no failure
+// Author: 2021-03-06 - Ingo Höft <Ingo@Hoeft-online.de>
+// Last modified: 2021-04-05
 
 #include "gtest/gtest.h"
 
@@ -21,7 +23,8 @@ extern "C" {
 //----------------------------------
 TEST(EmptyTestSuite, empty_gtest)
 {
-    GTEST_SKIP();
+    //GTEST_SKIP();
+    GTEST_SKIP_("to show this feature");
 }
 
 
