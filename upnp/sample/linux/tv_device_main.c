@@ -61,6 +61,8 @@ int main(int argc, char *argv[])
 #else
 	/* Catch Ctrl-C and properly shutdown */
 	sigemptyset(&sigs_to_catch);
+	/* Comment the line below if you are running gdb, otherwise you will be
+	 * unable to interrupt with CTRL-C. */
 	sigaddset(&sigs_to_catch, SIGINT);
 	sigwait(&sigs_to_catch, &sig);
 	SampleUtil_Print("Shutting down on signal %d...\n", sig);
