@@ -104,7 +104,7 @@ list (APPEND UPNP_HEADERS
 	inc/UpnpString.h
 	inc/UpnpSubscriptionRequest.h
 	inc/UpnpUniStd.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/inc/UpnpLog.h
+	${CMAKE_CURRENT_SOURCE_DIR}/inc/UpnpLog.h
 	${PUPNP_BINARY_DIR}/upnp/inc/upnpconfig.h
 )
 
