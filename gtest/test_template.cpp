@@ -24,7 +24,14 @@ extern "C" {
 TEST(EmptyTestSuite, empty_gtest)
 {
     //GTEST_SKIP();
-    GTEST_SKIP_("to show this feature");
+    //GTEST_SKIP_("to show this feature");
+
+    char* github_action = std::getenv("GITHUB_ACTIONS");
+    if(github_action) { GTEST_SKIP()
+        << "  due to issues with googlemock";
+    }
+
+    EXPECT_TRUE(false);
 }
 
 
