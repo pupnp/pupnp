@@ -2,7 +2,7 @@
 # command after changing this file, to see if there are
 # any tracked files which get ignored after the change.
 #
-!test_*.cpp
 test_*
+!test_*.cpp
 *.cmake
 CMakeFiles/

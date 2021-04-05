@@ -1,6 +1,6 @@
 // This test should always run, reporting no failure
 // Author: 2021-03-06 - Ingo Höft <Ingo@Hoeft-online.de>
-// Last modified: 2021-04-05
+// Last modified: 2021-04-06
 
 #include "gtest/gtest.h"
 
@@ -26,7 +26,7 @@ TEST(EmptyTestSuite, empty_gtest)
     //GTEST_SKIP();
     //GTEST_SKIP_("to show this feature");
 
-    char* github_action = std::getenv("xxx");
+    char* github_action = std::getenv("GITHUB_ACTIONS");
     if(github_action) { GTEST_SKIP()
         << "  due to issues with googlemock";
     }
