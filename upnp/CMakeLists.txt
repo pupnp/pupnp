@@ -146,9 +146,9 @@ if (UPNP_BUILD_SHARED)
 		PUBLIC_HEADER "${UPNP_HEADERS}"
 	)
 
-if (HAVE_MACRO_PREFIX_MAP)
-	target_compile_options(upnp_shared PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=)
-endif()
+	if (HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(upnp_shared PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=)
+	endif()
 
 	if (WIN32)
 		target_link_libraries (upnp_shared
@@ -189,9 +189,9 @@ if (UPNP_BUILD_STATIC)
 		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 	)
 
-if (HAVE_MACRO_PREFIX_MAP)
-	target_compile_options(upnp_static PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=)
-endif()
+	if (HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(upnp_static PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=)
+	endif()
 
 	target_include_directories (upnp_static
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
