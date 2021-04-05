@@ -36,7 +36,7 @@
  * \file
  */
 
-#include "upnpconfig.h"
+#include <upnpconfig.h>
 
 #include "UpnpGlobal.h" /* for UPNP_INLINE */
 
