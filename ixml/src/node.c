@@ -133,24 +133,24 @@ void ixmlNode_free(IXML_Node *nodeptr)
         if (nodeptr) {
 #ifdef IXML_HAVE_SCRIPTSUPPORT
                 IXML_BeforeFreeNode_t hndlr = Parser_getBeforeFree();
-                if (hndlr) {
-                        hndlr(nodeptr);
-                }
 #endif
                 prev_child = nodeptr;
                 next_child = nodeptr->firstChild;
                 do {
                         curr_child = next_child;
-                        while (curr_child) {
+                        do {
                                 while (curr_child) {
                                         prev_child = curr_child;
                                         curr_child = curr_child->firstChild;
                                 }
-                                if (curr_child) {
+                                curr_child = prev_child;
+                                while (curr_child) {
                                         prev_child = curr_child;
                                         curr_child = curr_child->nextSibling;
                                 }
-                        }
+                                curr_child = prev_child;
+                                next_child = curr_child->firstChild;
+                        } while (next_child);
                         curr_child = prev_child;
                         /* current is now the last sibling of the last child. */
                         /* Delete the attribute nodes of this child */
@@ -172,6 +172,11 @@ void ixmlNode_free(IXML_Node *nodeptr)
                                         next_child->firstChild = 0;
                                 }
                         }
+#ifdef IXML_HAVE_SCRIPTSUPPORT
+                        if (hndlr) {
+                                hndlr(curr_child);
+                        }
+#endif
                         ixmlNode_freeSingleNode(curr_child);
                 } while (curr_child != nodeptr);
         }
