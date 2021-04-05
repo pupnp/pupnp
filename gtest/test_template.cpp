@@ -26,7 +26,7 @@ TEST(EmptyTestSuite, empty_gtest)
     //GTEST_SKIP();
     //GTEST_SKIP_("to show this feature");
 
-    char* github_action = std::getenv("GITHUB_ACTIONS");
+    char* github_action = std::getenv("xxx");
     if(github_action) { GTEST_SKIP()
         << "  due to issues with googlemock";
     }
