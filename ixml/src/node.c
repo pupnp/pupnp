@@ -96,7 +96,14 @@ static void ixmlNode_freeSingleNode(
         }
 }
 
-void ixmlNode_free(IXML_Node *nodeptr)
+#if 0
+/*
+ * Old implementation of ixmlNode_free(). Due to its recursive nature, it was
+ * succeptible to attacks overflowing the stack.
+ *
+ * void ixmlNode_free(IXML_Node *nodeptr)
+ */
+void ixmlNode_recursive_free(IXML_Node *nodeptr)
 {
         if (nodeptr != NULL) {
 #ifdef IXML_HAVE_SCRIPTSUPPORT
@@ -108,6 +115,65 @@ void ixmlNode_free(IXML_Node *nodeptr)
                 ixmlNode_free(nodeptr->nextSibling);
                 ixmlNode_free(nodeptr->firstAttr);
                 ixmlNode_freeSingleNode(nodeptr);
+        }
+}
+#endif
+
+/*
+ *  void ixmlNode_non_recursive_free(IXML_Node *nodeptr)
+ */
+void ixmlNode_free(IXML_Node *nodeptr)
+{
+        IXML_Node *curr_child;
+        IXML_Node *prev_child;
+        IXML_Node *next_child;
+        IXML_Node *curr_attr;
+        IXML_Node *next_attr;
+
+        if (nodeptr) {
+#ifdef IXML_HAVE_SCRIPTSUPPORT
+                IXML_BeforeFreeNode_t hndlr = Parser_getBeforeFree();
+                if (hndlr) {
+                        hndlr(nodeptr);
+                }
+#endif
+                prev_child = nodeptr;
+                next_child = nodeptr->firstChild;
+                do {
+                        curr_child = next_child;
+                        while (curr_child) {
+                                while (curr_child) {
+                                        prev_child = curr_child;
+                                        curr_child = curr_child->firstChild;
+                                }
+                                if (curr_child) {
+                                        prev_child = curr_child;
+                                        curr_child = curr_child->nextSibling;
+                                }
+                        }
+                        curr_child = prev_child;
+                        /* current is now the last sibling of the last child. */
+                        /* Delete the attribute nodes of this child */
+                        /* Attribute nodes only have siblings. */
+                        curr_attr = curr_child->firstAttr;
+                        while (curr_attr) {
+                                next_attr = curr_attr->nextSibling;
+                                ixmlNode_freeSingleNode(curr_attr);
+                                curr_attr = next_attr;
+                        }
+                        curr_child->firstAttr = 0;
+                        /* Return */
+                        if (curr_child != nodeptr) {
+                                if (curr_child->prevSibling) {
+                                        next_child = curr_child->prevSibling;
+                                        next_child->nextSibling = 0;
+                                } else {
+                                        next_child = curr_child->parentNode;
+                                        next_child->firstChild = 0;
+                                }
+                        }
+                        ixmlNode_freeSingleNode(curr_child);
+                } while (curr_child != nodeptr);
         }
 }
 
