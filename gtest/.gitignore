@@ -4,5 +4,4 @@
 #
 test_*
 !test_*.cpp
-*.cmake
 CMakeFiles/
