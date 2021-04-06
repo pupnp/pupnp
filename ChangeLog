@@ -2,6 +2,11 @@
 Version 1.16.0
 *******************************************************************************
 
+2021-03-14 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+        The library now gives the user a handle to its internal state so that
+        it uses less shared global data.
+
 *******************************************************************************
 Version 1.14.5
 *******************************************************************************
