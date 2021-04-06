@@ -371,7 +371,7 @@ configure_package_config_file (
 )
 
 write_basic_package_version_file (IXMLConfigVersion.cmake
-	VERSION ${IXML_VERSION}
+	VERSION ${PUPNP_VERSION}
 	COMPATIBILITY SameMajorVersion
 )
 
@@ -381,7 +381,7 @@ configure_package_config_file (
 )
 
 write_basic_package_version_file (UPNPConfigVersion.cmake
-	VERSION ${UPNP_VERSION}
+	VERSION ${PUPNP_VERSION}
 	COMPATIBILITY SameMajorVersion
 )
 
@@ -397,7 +397,7 @@ install (FILES
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP/
 )
 
-set (VERSION ${UPNP_VERSION_STRING})
+set (VERSION ${PUPNP_VERSION_STRING})
 set (prefix ${CMAKE_INSTALL_PREFIX})
 set (exec_prefix "\${prefix}")
 set (libdir "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")
