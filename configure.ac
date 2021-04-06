@@ -90,14 +90,16 @@ dnl ############################################################################
 dnl # Release 1.14.5
 dnl # "current:revision:age"
 dnl #
+dnl # - Code has changed in ixml
+dnl #   revision: 0 -> 1
 dnl # - Code has changed in upnp
 dnl #   revision: 4 -> 5
 dnl #
-dnl #AC_SUBST([LT_VERSION_IXML],       [11:0:0])
+dnl #AC_SUBST([LT_VERSION_IXML],       [11:1:0])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [17:5:0])
 dnl #
 dnl ############################################################################
-AC_SUBST([LT_VERSION_IXML],       [11:0:0])
+AC_SUBST([LT_VERSION_IXML],       [11:1:0])
 AC_SUBST([LT_VERSION_UPNP],       [17:5:0])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
