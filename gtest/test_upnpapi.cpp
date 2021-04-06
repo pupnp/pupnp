@@ -1,6 +1,7 @@
 // Mock network interfaces
 // For further information look at https://stackoverflow.com/a/66498073/5014688
-// Author: 2021-03-06 - Ingo Höft <Ingo@Hoeft-online.de>
+// Author: 2021-03-06 - Ingo Höft
+// Last modified: 2021-04-06
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
@@ -150,8 +151,14 @@ protected:
 };
 
 
-TEST_F(UpnpApiIPv4TestSuite, DISABLED_UpnpGetIfInfo_called_with_valid_interface)
+TEST_F(UpnpApiIPv4TestSuite, UpnpGetIfInfo_called_with_valid_interface)
 {
+    // SKIP on Github Actions
+    char* github_action = std::getenv("GITHUB_ACTIONS");
+    if(github_action) { GTEST_SKIP()
+        << "  due to issues with googlemock";
+    }
+
     // provide a network interface
     struct ifaddrs* ifaddr = nullptr;
     CIfaddr4 ifaddr4Obj;
@@ -191,8 +198,14 @@ TEST_F(UpnpApiIPv4TestSuite, DISABLED_UpnpGetIfInfo_called_with_valid_interface)
 }
 
 
-TEST_F(UpnpApiIPv4TestSuite, DISABLED_UpnpGetIfInfo_called_with_unknown_interface)
+TEST_F(UpnpApiIPv4TestSuite, UpnpGetIfInfo_called_with_unknown_interface)
 {
+    // SKIP on Github Actions
+    char* github_action = std::getenv("GITHUB_ACTIONS");
+    if(github_action) { GTEST_SKIP()
+        << "  due to issues with googlemock";
+    }
+
 //    GTEST_SKIP() << "due to failed github sanity check because of issue #247.\n"
 //                 << "Comment GTEST_SKIP() in the TestSuite to enable this test.";
 
@@ -217,7 +230,7 @@ TEST_F(UpnpApiIPv4TestSuite, DISABLED_UpnpGetIfInfo_called_with_unknown_interfac
 
     // gIF_NAME mocked with getifaddrs above
     EXPECT_EQ(*UpnpLib_get_gIF_NAME(p), *&"")
-        << "ATTENTION! There is a wrong upper case 'O', not zero in \"ethO\"\n";
+        << "ATTENTION! There is a wrong upper case 'O', not zero in \"ethO\"";
     // gIF_IPV4 mocked with getifaddrs above
     EXPECT_EQ(*UpnpLib_get_gIF_IPV4(p), *&"");
     //EXPECT_THAT(gIF_IPV4, MatchesRegex("[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}"));
@@ -237,10 +250,13 @@ TEST_F(UpnpApiIPv4TestSuite, DISABLED_UpnpGetIfInfo_called_with_unknown_interfac
 }
 
 
-TEST_F(UpnpApiIPv4TestSuite, DISABLED_initialize_default_UpnpInit2)
+TEST_F(UpnpApiIPv4TestSuite, initialize_default_UpnpInit2)
 {
-//    GTEST_SKIP() << "due to failed github sanity check because of issue #272.\n"
-//                 << "Comment GTEST_SKIP() in the TestSuite to enable this test.";
+    // SKIP on Github Actions
+    char* github_action = std::getenv("GITHUB_ACTIONS");
+    if(github_action) { GTEST_SKIP()
+        << "  due to failed github sanity check because of issue #272";
+    }
 
     // provide a network interface
     struct ifaddrs* ifaddr = nullptr;
@@ -277,7 +293,7 @@ TEST_F(UpnpApiIPv4TestSuite, DISABLED_initialize_default_UpnpInit2)
                   "UPNP_E_SUCCESS");
 
     EXPECT_FALSE(captFdObj.print(std::cerr))
-        << "Output to stderr is true. There should not be any output to stderr.\n";
+        << "Output to stderr is true. There should not be any output to stderr";
 
     UpnpLib_delete(libStruct);
 }
