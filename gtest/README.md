@@ -28,6 +28,5 @@ you can execute the test for example with:
 
     GITHUB_ACTIONS="true" ./test_template-static
 
-.
-// Author: 2021-04-06 - Ingo Höft <Ingo@Hoeft-online.de>
+<br />
 // Last modified: 2021-04-06
