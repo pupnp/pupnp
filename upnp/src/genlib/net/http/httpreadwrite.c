@@ -66,11 +66,11 @@
 		#define snprintf _snprintf
 	#endif
 #else /* _WIN32 */
-        #include <arpa/inet.h>
-        #include <sys/time.h>
-        #include <sys/types.h>
-        #include <sys/utsname.h>
-        #include <sys/wait.h>
+	#include <arpa/inet.h>
+	#include <sys/time.h>
+	#include <sys/types.h>
+	#include <sys/utsname.h>
+	#include <sys/wait.h>
 #endif /* _WIN32 */
 
 /*
@@ -185,29 +185,29 @@ struct tm *http_gmtime_r(const time_t *clock, struct tm *result)
 #endif
 
 static int get_hoststr(
-        const char *url_str, const char **hoststr, size_t *hostlen)
+	const char *url_str, const char **hoststr, size_t *hostlen)
 {
-        const char *start;
-        const char *finish;
-        int ret_code = UPNP_E_INVALID_URL;
+	const char *start;
+	const char *finish;
+	int ret_code = UPNP_E_INVALID_URL;
 
-        start = strstr(url_str, "//");
-        if (!start) {
-                goto end_function;
-        }
-        start += 2;
-        finish = strchr(start, '/');
-        if (finish) {
-                *hostlen = (size_t)(finish - start);
-        } else {
-                *hostlen = strlen(start);
-        }
-        *hoststr = start;
+	start = strstr(url_str, "//");
+	if (!start) {
+		goto end_function;
+	}
+	start += 2;
+	finish = strchr(start, '/');
+	if (finish) {
+		*hostlen = (size_t)(finish - start);
+	} else {
+		*hostlen = strlen(start);
+	}
+	*hoststr = start;
 
-        ret_code = UPNP_E_SUCCESS;
+	ret_code = UPNP_E_SUCCESS;
 
 end_function:
-        return ret_code;
+	return ret_code;
 }
 
 static void copy_msg_headers(LinkedList *msgHeaders, UpnpString *headers)
@@ -366,8 +366,14 @@ int http_RecvMessage(SOCKINFO *info,
 	parse_status_t status;
 	int num_read;
 	int ok_on_close = 0;
-	char buf[2 * 1024];
+	char *buf;
+	size_t buf_len = 1024;
 
+	buf = malloc(buf_len);
+	if (!buf) {
+		ret = UPNP_E_OUTOF_MEMORY;
+		goto ExitFunction;
+	}
 	if (request_method == (http_method_t)HTTPMETHOD_UNKNOWN) {
 		parser_request_init(parser);
 	} else {
@@ -375,7 +381,15 @@ int http_RecvMessage(SOCKINFO *info,
 	}
 
 	while (1) {
-		num_read = sock_read(info, buf, sizeof buf, timeout_secs);
+		/* Double the bet */
+		free(buf);
+		buf_len = 2 * buf_len;
+		buf = malloc(buf_len);
+		if (!buf) {
+			ret = UPNP_E_OUTOF_MEMORY;
+			goto ExitFunction;
+		}
+		num_read = sock_read(info, buf, buf_len, timeout_secs);
 		if (num_read > 0) {
 			/* got data */
 			status = parser_append(parser, buf, (size_t)num_read);
@@ -389,7 +403,7 @@ int http_RecvMessage(SOCKINFO *info,
 					"<<<\n%s\n-----------------\n",
 					parser->msg.msg.buf);
 				print_http_headers(&parser->msg);
-				if (g_maxContentLength > (size_t)0 &&
+				if (g_maxContentLength > 0 &&
 					parser->content_length >
 						(unsigned int)
 							g_maxContentLength) {
@@ -450,6 +464,7 @@ int http_RecvMessage(SOCKINFO *info,
 	}
 
 ExitFunction:
+	free(buf);
 	if (ret != UPNP_E_SUCCESS) {
 		UpnpPrintf(UPNP_ALL,
 			HTTP,
@@ -484,7 +499,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 	int RetVal = 0;
 	size_t buf_length;
 	size_t num_written;
-        int I_fmt_processed = 0;
+	int I_fmt_processed = 0;
 
 #if EXCLUDE_WEB_SERVER == 0
 	memset(Chunk_Header, 0, sizeof(Chunk_Header));
@@ -492,8 +507,8 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 	va_start(argp, fmt);
 	while ((c = *fmt++)) {
 #if EXCLUDE_WEB_SERVER == 0
-                if (c == 'I' && !I_fmt_processed) {
-                        I_fmt_processed = 1;
+		if (c == 'I' && !I_fmt_processed) {
+			I_fmt_processed = 1;
 			Instr = va_arg(argp, struct SendInstruction *);
 			if (Instr->ReadSendSize >= 0)
 				amount_to_be_read = Instr->ReadSendSize;
@@ -800,140 +815,140 @@ int http_Download(const char *url_str,
 	size_t *doc_length,
 	char *content_type)
 {
-        int ret_code;
-        uri_type url;
-        char *msg_start;
-        char *entity_start;
-        const char *hoststr;
-        http_parser_t response;
-        size_t msg_length;
-        size_t hostlen;
-        memptr ctype;
-        size_t copy_len;
-        membuffer request;
-        size_t url_str_len;
+	int ret_code;
+	uri_type url;
+	char *msg_start;
+	char *entity_start;
+	const char *hoststr;
+	http_parser_t response;
+	size_t msg_length;
+	size_t hostlen;
+	memptr ctype;
+	size_t copy_len;
+	membuffer request;
+	size_t url_str_len;
 
-        url_str_len = strlen(url_str);
-        /*ret_code = parse_uri( (char*)url_str, url_str_len, &url ); */
-        UpnpPrintf(UPNP_INFO,
-                HTTP,
-                __FILE__,
-                __LINE__,
-                "DOWNLOAD URL : %s\n",
-                url_str);
-        ret_code = http_FixStrUrl((char *)url_str, url_str_len, &url);
-        if (ret_code != UPNP_E_SUCCESS) {
-                return ret_code;
-        }
-        /* make msg */
-        membuffer_init(&request);
-        ret_code = get_hoststr(url_str, &hoststr, &hostlen);
-        if (ret_code != UPNP_E_SUCCESS) {
-                return ret_code;
-        }
-        UpnpPrintf(UPNP_INFO,
-                HTTP,
-                __FILE__,
-                __LINE__,
-                "HOSTNAME : %s Length : %" PRIzu "\n",
-                hoststr,
-                hostlen);
-        ret_code = http_MakeMessage(&request,
-                1,
-                1,
-                "Q"
-                "s"
-                "bcDCUc",
-                HTTPMETHOD_GET,
-                url.pathquery.buff,
-                url.pathquery.size,
-                "HOST: ",
-                hoststr,
-                hostlen);
-        if (ret_code != 0) {
-                UpnpPrintf(UPNP_INFO,
-                        HTTP,
-                        __FILE__,
-                        __LINE__,
-                        "HTTP Makemessage failed\n");
-                membuffer_destroy(&request);
-                return ret_code;
-        }
-        UpnpPrintf(UPNP_INFO,
-                HTTP,
-                __FILE__,
-                __LINE__,
-                "HTTP Buffer:\n%s\n"
-                "----------END--------\n",
-                request.buf);
-        /* get doc msg */
-        ret_code = http_RequestAndResponse(&url,
-                request.buf,
-                request.length,
-                HTTPMETHOD_GET,
-                timeout_secs,
-                &response);
+	url_str_len = strlen(url_str);
+	/*ret_code = parse_uri( (char*)url_str, url_str_len, &url ); */
+	UpnpPrintf(UPNP_INFO,
+		HTTP,
+		__FILE__,
+		__LINE__,
+		"DOWNLOAD URL : %s\n",
+		url_str);
+	ret_code = http_FixStrUrl((char *)url_str, url_str_len, &url);
+	if (ret_code != UPNP_E_SUCCESS) {
+		return ret_code;
+	}
+	/* make msg */
+	membuffer_init(&request);
+	ret_code = get_hoststr(url_str, &hoststr, &hostlen);
+	if (ret_code != UPNP_E_SUCCESS) {
+		return ret_code;
+	}
+	UpnpPrintf(UPNP_INFO,
+		HTTP,
+		__FILE__,
+		__LINE__,
+		"HOSTNAME : %s Length : %" PRIzu "\n",
+		hoststr,
+		hostlen);
+	ret_code = http_MakeMessage(&request,
+		1,
+		1,
+		"Q"
+		"s"
+		"bcDCUc",
+		HTTPMETHOD_GET,
+		url.pathquery.buff,
+		url.pathquery.size,
+		"HOST: ",
+		hoststr,
+		hostlen);
+	if (ret_code != 0) {
+		UpnpPrintf(UPNP_INFO,
+			HTTP,
+			__FILE__,
+			__LINE__,
+			"HTTP Makemessage failed\n");
+		membuffer_destroy(&request);
+		return ret_code;
+	}
+	UpnpPrintf(UPNP_INFO,
+		HTTP,
+		__FILE__,
+		__LINE__,
+		"HTTP Buffer:\n%s\n"
+		"----------END--------\n",
+		request.buf);
+	/* get doc msg */
+	ret_code = http_RequestAndResponse(&url,
+		request.buf,
+		request.length,
+		HTTPMETHOD_GET,
+		timeout_secs,
+		&response);
 
-        if (ret_code != 0) {
-                httpmsg_destroy(&response.msg);
-                membuffer_destroy(&request);
-                return ret_code;
-        }
-        UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__, "Response\n");
-        print_http_headers(&response.msg);
-        /* optional content-type */
-        if (content_type) {
-                if (httpmsg_find_hdr(&response.msg, HDR_CONTENT_TYPE, &ctype) ==
-                        NULL) {
-                        *content_type = '\0'; /* no content-type */
-                } else {
-                        /* safety */
-                        copy_len = ctype.length < LINE_SIZE - (size_t)1
-                                           ? ctype.length
-                                           : LINE_SIZE - (size_t)1;
+	if (ret_code != 0) {
+		httpmsg_destroy(&response.msg);
+		membuffer_destroy(&request);
+		return ret_code;
+	}
+	UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__, "Response\n");
+	print_http_headers(&response.msg);
+	/* optional content-type */
+	if (content_type) {
+		if (httpmsg_find_hdr(&response.msg, HDR_CONTENT_TYPE, &ctype) ==
+			NULL) {
+			*content_type = '\0'; /* no content-type */
+		} else {
+			/* safety */
+			copy_len = ctype.length < LINE_SIZE - (size_t)1
+					   ? ctype.length
+					   : LINE_SIZE - (size_t)1;
 
-                        memcpy(content_type, ctype.buf, copy_len);
-                        content_type[copy_len] = '\0';
-                }
-        }
-        /* extract doc from msg */
-        if ((*doc_length = response.msg.entity.length) == (size_t)0) {
-                /* 0-length msg */
-                *document = NULL;
-        } else if (response.msg.status_code == HTTP_OK) {
-                /*LEAK_FIX_MK */
-                /* copy entity */
-                entity_start = response.msg.entity.buf; /* what we want */
-                msg_length = response.msg.msg.length; /* save for posterity   */
-                msg_start = membuffer_detach(&response.msg.msg); /* whole msg */
-                /* move entity to the start; copy null-terminator too */
-                memmove(msg_start, entity_start, *doc_length + (size_t)1);
-                /* save mem for body only */
-                *document = realloc(
-                        msg_start, *doc_length + (size_t)1); /*LEAK_FIX_MK */
-                /* *document = Realloc( msg_start,msg_length, *doc_length + 1 );
-                 * LEAK_FIX_MK */
-                /* shrink can't fail */
-                assert(msg_length > *doc_length);
-                assert(*document != NULL);
-                if (msg_length <= *doc_length || *document == NULL)
-                        UpnpPrintf(UPNP_INFO,
-                                HTTP,
-                                __FILE__,
-                                __LINE__,
-                                "msg_length(%" PRIzu ") <= *doc_length(%" PRIzu
-                                ") or document is NULL",
-                                msg_length,
-                                *doc_length);
-        }
-        if (response.msg.status_code == HTTP_OK) {
-                ret_code = 0; /* success */
-        } else {
-                /* server sent error msg (not requested doc) */
-                ret_code = response.msg.status_code;
-        }
-        httpmsg_destroy(&response.msg);
-        membuffer_destroy(&request);
+			memcpy(content_type, ctype.buf, copy_len);
+			content_type[copy_len] = '\0';
+		}
+	}
+	/* extract doc from msg */
+	if ((*doc_length = response.msg.entity.length) == (size_t)0) {
+		/* 0-length msg */
+		*document = NULL;
+	} else if (response.msg.status_code == HTTP_OK) {
+		/*LEAK_FIX_MK */
+		/* copy entity */
+		entity_start = response.msg.entity.buf; /* what we want */
+		msg_length = response.msg.msg.length; /* save for posterity   */
+		msg_start = membuffer_detach(&response.msg.msg); /* whole msg */
+		/* move entity to the start; copy null-terminator too */
+		memmove(msg_start, entity_start, *doc_length + (size_t)1);
+		/* save mem for body only */
+		*document = realloc(
+			msg_start, *doc_length + (size_t)1); /*LEAK_FIX_MK */
+		/* *document = Realloc( msg_start,msg_length, *doc_length + 1 );
+		 * LEAK_FIX_MK */
+		/* shrink can't fail */
+		assert(msg_length > *doc_length);
+		assert(*document != NULL);
+		if (msg_length <= *doc_length || *document == NULL)
+			UpnpPrintf(UPNP_INFO,
+				HTTP,
+				__FILE__,
+				__LINE__,
+				"msg_length(%" PRIzu ") <= *doc_length(%" PRIzu
+				") or document is NULL",
+				msg_length,
+				*doc_length);
+	}
+	if (response.msg.status_code == HTTP_OK) {
+		ret_code = 0; /* success */
+	} else {
+		/* server sent error msg (not requested doc) */
+		ret_code = response.msg.status_code;
+	}
+	httpmsg_destroy(&response.msg);
+	membuffer_destroy(&request);
 
 	return ret_code;
 }
@@ -967,8 +982,8 @@ int MakeGenericMessage(http_method_t method,
 	const UpnpString *headers)
 {
 	int ret_code = 0;
-        size_t hostlen = 0;
-        const char *hoststr;
+	size_t hostlen = 0;
+	const char *hoststr;
 
 	UpnpPrintf(UPNP_INFO,
 		HTTP,
@@ -2012,69 +2027,69 @@ int MakeGetMessageEx(const char *url_str,
 	uri_type *url,
 	struct SendInstruction *pRangeSpecifier)
 {
-        size_t url_str_len;
-        int ret_code = UPNP_E_SUCCESS;
-        size_t hostlen = 0;
-        const char *hoststr;
+	size_t url_str_len;
+	int ret_code = UPNP_E_SUCCESS;
+	size_t hostlen = 0;
+	const char *hoststr;
 
-        url_str_len = strlen(url_str);
-        do {
-                UpnpPrintf(UPNP_INFO,
-                        HTTP,
-                        __FILE__,
-                        __LINE__,
-                        "DOWNLOAD URL : %s\n",
-                        url_str);
-                ret_code = http_FixStrUrl(url_str, url_str_len, url);
-                if (ret_code != UPNP_E_SUCCESS) {
-                        break;
-                }
-                /* make msg */
-                membuffer_init(request);
-                ret_code = get_hoststr(url_str, &hoststr, &hostlen);
-                if (ret_code != UPNP_E_SUCCESS) {
-                        break;
-                }
-                UpnpPrintf(UPNP_INFO,
-                        HTTP,
-                        __FILE__,
-                        __LINE__,
-                        "HOSTNAME : %s Length : %" PRIzu "\n",
-                        hoststr,
-                        hostlen);
-                ret_code = http_MakeMessage(request,
-                        1,
-                        1,
-                        "Q"
-                        "s"
-                        "bc"
-                        "GDCUc",
-                        HTTPMETHOD_GET,
-                        url->pathquery.buff,
-                        url->pathquery.size,
-                        "HOST: ",
-                        hoststr,
-                        hostlen,
-                        pRangeSpecifier);
-                if (ret_code != 0) {
-                        UpnpPrintf(UPNP_INFO,
-                                HTTP,
-                                __FILE__,
-                                __LINE__,
-                                "HTTP Makemessage failed\n");
-                        membuffer_destroy(request);
-                        return ret_code;
-                }
-        } while (0);
-        UpnpPrintf(UPNP_INFO,
-                HTTP,
-                __FILE__,
-                __LINE__,
-                "HTTP Buffer:\n%s\n"
-                "----------END--------\n",
-                request->buf);
+	url_str_len = strlen(url_str);
+	do {
+		UpnpPrintf(UPNP_INFO,
+			HTTP,
+			__FILE__,
+			__LINE__,
+			"DOWNLOAD URL : %s\n",
+			url_str);
+		ret_code = http_FixStrUrl(url_str, url_str_len, url);
+		if (ret_code != UPNP_E_SUCCESS) {
+			break;
+		}
+		/* make msg */
+		membuffer_init(request);
+		ret_code = get_hoststr(url_str, &hoststr, &hostlen);
+		if (ret_code != UPNP_E_SUCCESS) {
+			break;
+		}
+		UpnpPrintf(UPNP_INFO,
+			HTTP,
+			__FILE__,
+			__LINE__,
+			"HOSTNAME : %s Length : %" PRIzu "\n",
+			hoststr,
+			hostlen);
+		ret_code = http_MakeMessage(request,
+			1,
+			1,
+			"Q"
+			"s"
+			"bc"
+			"GDCUc",
+			HTTPMETHOD_GET,
+			url->pathquery.buff,
+			url->pathquery.size,
+			"HOST: ",
+			hoststr,
+			hostlen,
+			pRangeSpecifier);
+		if (ret_code != 0) {
+			UpnpPrintf(UPNP_INFO,
+				HTTP,
+				__FILE__,
+				__LINE__,
+				"HTTP Makemessage failed\n");
+			membuffer_destroy(request);
+			return ret_code;
+		}
+	} while (0);
+	UpnpPrintf(UPNP_INFO,
+		HTTP,
+		__FILE__,
+		__LINE__,
+		"HTTP Buffer:\n%s\n"
+		"----------END--------\n",
+		request->buf);
 
-        return ret_code;
+	return ret_code;
 }
 
 #define SIZE_RANGE_BUFFER 50
