@@ -1,5 +1,5 @@
 // Tools and helper classes to manage gtests
-// Author: 2021-03-12 - Ingo Höft <Ingo@Hoeft-online.de>
+// Author: 2021-03-12 - Ingo Höft
 
 #include <ifaddrs.h>
 #include <arpa/inet.h>

@@ -1,5 +1,5 @@
 // This test should always run, reporting no failure
-// Author: 2021-03-06 - Ingo Höft <Ingo@Hoeft-online.de>
+// Author: 2021-03-06 - Ingo Höft
 // Last modified: 2021-04-06
 
 #include "gtest/gtest.h"

@@ -1,5 +1,5 @@
 // Testing the tools, of course ;-)
-// Author: 2021-03-12 - Ingo Höft <Ingo@Hoeft-online.de>
+// Author: 2021-03-12 - Ingo Höft
 
 #include "gtest/gtest.h"
 #include "tools.cpp"

@@ -1,4 +1,4 @@
-// Author: 2021-03-17 - Ingo Höft <Ingo@Hoeft-online.de>
+// Author: 2021-03-17 - Ingo Höft
 
 Additional helper programs to initialize and improve tests.
 You can compile it with ./compile.sh test_tools.cpp.
