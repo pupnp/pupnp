@@ -376,6 +376,7 @@ int http_RecvMessage(UpnpLib *p,
         char *buf;
         size_t buf_len = 1024;
 
+        *http_error_code = HTTP_INTERNAL_SERVER_ERROR;
         buf = malloc(buf_len);
         if (!buf) {
                 ret = UPNP_E_OUTOF_MEMORY;
