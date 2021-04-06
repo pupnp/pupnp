@@ -6,6 +6,14 @@ Version 1.16.0
 Version 1.14.5
 *******************************************************************************
 
+2021-04-06 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+        Avoid potential memory leak in http_SendMessage()
+
+2021-04-06 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+        Get rid of alloca()'s.
+
 2021-04-05 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
         Non-recursive version of ixmlNode_free() avoids stack overflow attack.
