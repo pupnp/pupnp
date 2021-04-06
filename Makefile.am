@@ -27,9 +27,7 @@ EXTRA_DIST = \
 	upnp/sample/common/config_sample.h.cm \
 	docs/Doxyfile \
 	libupnp.pc.in \
-	libupnp.spec \
-	build/msvc/inttypes.h \
-	build/msvc/stdint.h
+	libupnp.spec
 
 
 # This variable must have 'exec' in its name, in order to be installed 
