@@ -16,15 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install build tools
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y ninja-build
+      - name: Configure
+        run: cmake -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
 
       - name: Build
-        run: |
-          cmake -G Ninja -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
-          cmake --build build
+        run: cmake --build build
 
       - name: Test
         run: |
@@ -44,51 +40,68 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install build tools
-        run: |
-          choco install ninja vswhere
+      - name: Configure
+        run: cmake -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
 
       - name: Build
-        run: |
-          $installationPath = vswhere.exe -prerelease -latest -property installationPath
-          if ($installationPath -and (test-path "$installationPath\Common7\Tools\vsdevcmd.bat")) {
-            & "${env:COMSPEC}" /s /c "`"$installationPath\Common7\Tools\vsdevcmd.bat`" -no_logo && set" | foreach-object {
-              $name, $value = $_ -split '=', 2
-              set-content env:\"$name" $value
-            }
-          }
-          cmake -G Ninja -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
-          cmake --build build
+        run: cmake --build build --config ${{ matrix.conf }}
 
-      - name: Test
+      - name: Test Debug
+        if: ${{ matrix.conf == 'Debug' }}
         run: |
           cd build
-          ctest -E pthread4w --output-on-failure # Exclude pthread4w tests on windows
+          ctest --output-on-failure -C ${{ matrix.conf }}
+          type upnp/test/test_init.log
+
+      - name: Test Release
+        if: ${{ matrix.conf == 'Release' }}
+        run: |
+          cd build
+          ctest --output-on-failure -C ${{ matrix.conf }}
 
   macos:
-    name: Build (${{ matrix.os }})
+    name: Build (${{ matrix.os }}) - ${{ matrix.conf }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         os: [macos-latest] # macos-10.15, macos-11.0
+        conf: [Debug, Release]
       fail-fast: false
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install build tools
-        run: brew install pkg-config cmake ninja
+      - name: Configure
+        run: cmake -DBUILD_TESTING=ON -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -DDOWNLOAD_AND_BUILD_DEPS=ON
 
       - name: Build
-        run: |
-          cmake -G Ninja -DBUILD_TESTING=ON -S . -B build
-          cmake --build build
+        run: cmake --build build --config ${{ matrix.conf }}
 
       - name: Test
         run: |
           cd build
-          ctest --output-on-failure
+          ctest --output-on-failure --C ${{ matrix.conf }}
+
+  build_openssl:
+    name: OpenSSL build (ubuntu-20.04)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: bootstrap and configure
+      run: |
+        ./bootstrap
+        ./configure --enable-debug --enable-open_ssl \
+          CFLAGS="-fsanitize=address,leak" \
+          LDFLAGS="-fsanitize=address,leak"
+    - name: make
+      run: make
+    - name: make check (upnp)
+      run: |
+        cd upnp && make check && cat test_init.log || (cat test-suite.log test_init.log && exit 1)
+    - name: make check (ixml)
+      run: |
+        cd ixml && make check || (cat test-suite.log && exit 1)
 
   build_asan:
     name: Sanitizer build (ubuntu-20.04)
@@ -105,6 +118,8 @@ jobs:
     - name: make
       run: make
     - name: make check (upnp)
-      run: cd upnp && make check || (cat test-suite.log && exit 1)
+      run: |
+        cd upnp && make check && cat test_init.log || (cat test-suite.log test_init.log && exit 1)
     - name: make check (ixml)
-      run: cd ixml && make check || (cat test-suite.log && exit 1)
+      run: |
+        cd ixml && make check || (cat test-suite.log && exit 1)
