@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
 	int a, b, c;
 	(void)argc;
 	(void)argv;
+	const char *log_file_name = "test_init.log";
 
 	/*
 	 * Check library version (and formats)
@@ -105,7 +106,8 @@ int main(int argc, char *argv[])
 	 */
 	printf("\n");
 	printf("Initializing UPnP ... \n");
-	UpnpSetLogFileNames(0, 0);
+	unlink(log_file_name);
+	UpnpSetLogFileNames(log_file_name, 0);
 	rc = UpnpInit2(NULL, 0);
 	if (UPNP_E_SUCCESS == rc) {
 		const char *ip_address = UpnpGetServerIpAddress();
