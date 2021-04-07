@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Configure
-        run: cmake -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
+        run: cmake -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -Dunspecified_server=ON -Dopen_ssl=ON -Dblocking_tcp_connections=ON -S . -B build
 
       - name: Build
         run: cmake --build build
@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Configure
-        run: cmake -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -S . -B build
+        run: cmake -DBUILD_TESTING=ON -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -Dunspecified_server=ON -Dblocking_tcp_connections=ON -S . -B build
 
       - name: Build
         run: cmake --build build --config ${{ matrix.conf }}
@@ -52,7 +52,6 @@ jobs:
           cd build
           ctest --output-on-failure -C ${{ matrix.conf }}
           type upnp/test/test_init.log
-
       - name: Test Release
         if: ${{ matrix.conf == 'Release' }}
         run: |
@@ -73,7 +72,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Configure
-        run: cmake -DBUILD_TESTING=ON -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -DDOWNLOAD_AND_BUILD_DEPS=ON
+        run: cmake -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -DDOWNLOAD_AND_BUILD_DEPS=ON -Dunspecified_server=ON -Dblocking_tcp_connections=ON -S . -B build 
 
       - name: Build
         run: cmake --build build --config ${{ matrix.conf }}
@@ -82,44 +81,46 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure --C ${{ matrix.conf }}
-
-  build_openssl:
-    name: OpenSSL build (ubuntu-20.04)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v1
-    - name: bootstrap and configure
-      run: |
-        ./bootstrap
-        ./configure --enable-debug --enable-open_ssl \
-          CFLAGS="-fsanitize=address,leak" \
-          LDFLAGS="-fsanitize=address,leak"
-    - name: make
-      run: make
-    - name: make check (upnp)
-      run: |
-        cd upnp && make check && cat test_init.log || (cat test-suite.log test_init.log && exit 1)
-    - name: make check (ixml)
-      run: |
-        cd ixml && make check || (cat test-suite.log && exit 1)
-
   build_asan:
-    name: Sanitizer build (ubuntu-20.04)
+    name: Sanitizer build (ubuntu-20.04) - ${{ matrix.tool }}
     runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        tool: [autotools, cmake]
 
     steps:
     - uses: actions/checkout@v1
+
     - name: bootstrap and configure
+      if: ${{ matrix.tool == 'autotools' }}
       run: |
         ./bootstrap
         ./configure --enable-debug \
           CFLAGS="-fsanitize=address,leak" \
           LDFLAGS="-fsanitize=address,leak"
+    - name: configure (cmake)
+      if: ${{ matrix.tool == 'cmake' }}
+      run: cmake -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=${{ matrix.conf }} -DDOWNLOAD_AND_BUILD_DEPS=ON -DCMAKE_C_FLAGS=-fsanitize=address,leak -DCMAKE_CXX_FLAGS=-fsanitize=address,leak -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,leak -Dunspecified_server=ON -Dopen_ssl=ON -Dblocking_tcp_connections=ON -S . -B build 
+
     - name: make
+      if: ${{ matrix.tool == 'autotools' }}
       run: make
+
+    - name: build
+      if: ${{ matrix.tool == 'cmake' }}
+      run: cmake --build build
+
     - name: make check (upnp)
-      run: |
-        cd upnp && make check && cat test_init.log || (cat test-suite.log test_init.log && exit 1)
+      if: ${{ matrix.tool == 'autotools' }}
+      run: cd upnp && make check && cat test_init.log || (cat test-suite.log test_init.log && exit 1)
+
     - name: make check (ixml)
+      if: ${{ matrix.tool == 'autotools' }}
+      run: cd ixml && make check || (cat test-suite.log && exit 1)
+
+    - name: make test
+      if: ${{ matrix.tool == 'cmake' }}
       run: |
-        cd ixml && make check || (cat test-suite.log && exit 1)
+          cd build
+          ctest --output-on-failure
