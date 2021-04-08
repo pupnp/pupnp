@@ -134,7 +134,7 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.conf }}
         -DDOWNLOAD_AND_BUILD_DEPS=ON
         -Dopen_ssl=ON
-        ${{ env.cmake_extra_flags }}
+        ${{ env.cmake_extra_flags }} \
         ${{ env.cmake_sanitizer_flags }}
     - name: build (autotools)
       if: ${{ matrix.tool == 'autotools' }}
