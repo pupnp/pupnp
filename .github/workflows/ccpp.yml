@@ -6,24 +6,18 @@ on: [push, pull_request]
 # Some repeated stuff
 #
 env:
-  sanitizer_autotools_flags: >
-    '
+  sanitizer_autotools_flags: '
     CFLAGS="-fsanitize=address,leak"
-    LDFLAGS="-fsanitize=address,leak"
-    '
+    LDFLAGS="-fsanitize=address,leak"'
 
-  cmake_sanitizer_flags: >
-    '
+  cmake_sanitizer_flags: "
     -DCMAKE_C_FLAGS=-fsanitize=address,leak
     -DCMAKE_CXX_FLAGS=-fsanitize=address,leak
-    -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,leak
-    '
+    -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,leak"
 
-  cmake_extra_flags: >
-    '
+  cmake_extra_flags: "
     -Dunspecified_server=ON
-    -Dblocking_tcp_connections=ON
-    '
+    -Dblocking_tcp_connections=ON"
 
 jobs:
   # Linux builds
