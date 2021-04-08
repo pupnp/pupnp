@@ -22,6 +22,7 @@ IF (client)
 
 	INSTALL (TARGETS tv_ctrlpt
 		DESTINATION ${CMAKE_INSTALL_BINDIR}
+			COMPONENT UPNP_samples
 	)
 ENDIF (client)
 
@@ -44,6 +45,7 @@ IF (client AND device)
 
 	INSTALL (TARGETS tv_combo
 		DESTINATION ${CMAKE_INSTALL_BINDIR}
+			COMPONENT UPNP_samples
 	)
 ENDIF (client AND device)
 
@@ -65,9 +67,11 @@ IF (device)
 
 	INSTALL (TARGETS tv_device
 		DESTINATION ${CMAKE_INSTALL_BINDIR}
+			COMPONENT UPNP_samples
 	)
 
 	INSTALL (DIRECTORY web/
 		DESTINATION ${CMAKE_INSTALL_DATADIR}/upnp
+			COMPONENT UPNP_samples
 	)
 ENDIF (device)
