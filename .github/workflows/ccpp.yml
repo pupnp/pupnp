@@ -7,17 +7,23 @@ on: [push, pull_request]
 #
 env:
   sanitizer_autotools_flags: >
+    '
     CFLAGS="-fsanitize=address,leak"
     LDFLAGS="-fsanitize=address,leak"
+    '
 
   cmake_sanitizer_flags: >
+    '
     -DCMAKE_C_FLAGS=-fsanitize=address,leak
     -DCMAKE_CXX_FLAGS=-fsanitize=address,leak
     -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,leak
+    '
 
   cmake_extra_flags: >
+    '
     -Dunspecified_server=ON
     -Dblocking_tcp_connections=ON
+    '
 
 jobs:
   # Linux builds
@@ -132,10 +138,10 @@ jobs:
         -B build
         -DBUILD_TESTING=ON
         -DCMAKE_BUILD_TYPE=${{ matrix.conf }}
-        ${{ env.cmake_extra_flags }}
-        ${{ env.cmake_sanitizer_flags }}
         -DDOWNLOAD_AND_BUILD_DEPS=ON
         -Dopen_ssl=ON
+        ${{ env.cmake_sanitizer_flags }}
+        ${{ env.cmake_extra_flags }}
     - name: build (autotools)
       if: ${{ matrix.tool == 'autotools' }}
       run: make
