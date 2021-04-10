@@ -6,94 +6,109 @@ function (addGTest testName sourceFile)
 	endif()
 
 	addTestExecutable (${testName} ${sourceFile})
-	if (agm_ADDITIONAL_INCLUDE_DIRS)
-		target_include_directories (${testName}
-			PRIVATE ${agm_ADDITIONAL_INCLUDE_DIRS}
+
+	if (UPNP_BUILD_SHARED)
+		if (agm_ADDITIONAL_INCLUDE_DIRS)
+			target_include_directories (${testName}
+				PRIVATE ${agm_ADDITIONAL_INCLUDE_DIRS}
+			)
+
+		endif()
+
+		target_link_libraries (${testName}
+			PRIVATE GTest::gmock
 		)
 
-		target_include_directories (${testName}-static
-			PRIVATE ${agm_ADDITIONAL_INCLUDE_DIRS}
+		gtest_add_tests (TARGET ${testName}
+			TEST_PREFIX test-upnp-
+			TEST_LIST GTEST_${testName}
 		)
-	endif()
 
-	target_link_libraries (${testName}
-		PRIVATE GTest::gmock
-	)
+		if (WIN32)
+			findTestEnv (${testName} TEST_ENV)
 
-	target_link_libraries (${testName}-static
-		PRIVATE GTest::gmock
-	)
+			set_tests_properties (${GTEST_${testName}} PROPERTIES
+				ENVIRONMENT "${TEST_ENV}"
+			)
+		endif()
 
-
-	gtest_add_tests (TARGET ${testName}
-		TEST_PREFIX test-upnp-
-		TEST_LIST GTEST_${testName}
-	)
-
-	if (WIN32)
 		findTestEnv (${testName} TEST_ENV)
-
-		set_tests_properties (${GTEST_${testName}} PROPERTIES
-			ENVIRONMENT "${TEST_ENV}"
-		)
 	endif()
 
-	gtest_add_tests (TARGET ${testName}-static
-		TEST_PREFIX test-upnp-
-		TEST_SUFFIX -static
-	)
+	if (UPNP_BUILD_STATIC)
+		if (agm_ADDITIONAL_INCLUDE_DIRS)
+			target_include_directories (${testName}-static
+				PRIVATE ${agm_ADDITIONAL_INCLUDE_DIRS}
+			)
+		endif()
 
-	findTestEnv (${testName} TEST_ENV)
+		target_link_libraries (${testName}-static
+			PRIVATE GTest::gmock
+		)
+
+		gtest_add_tests (TARGET ${testName}-static
+			TEST_PREFIX test-upnp-
+			TEST_SUFFIX -static
+		)
+	endif()
 endfunction()
 
 function (addTestExecutable testName sourceFile)
-	add_executable (${testName}
-		${sourceFile}
-	)
-
-	target_link_libraries (${testName}
-		PRIVATE upnp_shared
-	)
-
-	if (HAVE_MACRO_PREFIX_MAP)
-		target_compile_options(${testName}
-			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+	if (UPNP_BUILD_SHARED)
+		add_executable (${testName}
+			${sourceFile}
 		)
+
+		target_link_libraries (${testName}
+			PRIVATE upnp_shared
+		)
+
+		if (HAVE_MACRO_PREFIX_MAP)
+			target_compile_options(${testName}
+				PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+			)
+		endif()
 	endif()
 
-	add_executable (${testName}-static
-		${sourceFile}
-	)
-
-	target_link_libraries (${testName}-static
-		PRIVATE upnp_static
-	)
-
-	if (HAVE_MACRO_PREFIX_MAP)
-		target_compile_options(${testName}-static
-			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+	if (UPNP_BUILD_STATIC)
+		add_executable (${testName}-static
+			${sourceFile}
 		)
+
+		target_link_libraries (${testName}-static
+			PRIVATE upnp_static
+		)
+
+		if (HAVE_MACRO_PREFIX_MAP)
+			target_compile_options(${testName}-static
+				PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+			)
+		endif()
 	endif()
 endfunction()
 
 function (addUnitTest testName sourceFile)
 	addTestExecutable (${testName} ${sourceFile})
 
-	add_test (NAME ${testName}
-		COMMAND ${testName}
-	)
-
-	if (WIN32)
-		findTestEnv (${testName} TEST_ENV)
-
-		set_tests_properties (${testName} PROPERTIES
-			ENVIRONMENT "${TEST_ENV}"
+	if (UPNP_BUILD_SHARED)
+		add_test (NAME ${testName}
+			COMMAND ${testName}
 		)
+
+		if (WIN32)
+			findTestEnv (${testName} TEST_ENV)
+
+			set_tests_properties (${testName} PROPERTIES
+				ENVIRONMENT "${TEST_ENV}"
+			)
+		endif()
 	endif()
 
-	add_test (NAME ${testName}-static
-		COMMAND ${testName}-static
-	)
+	if (UPNP_BUILD_STATIC)
+		add_test (NAME ${testName}-static
+			COMMAND ${testName}-static
+		)
+	endif()
 endfunction()
 
 function (findTestEnv testName resultVar)
