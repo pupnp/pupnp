@@ -11,7 +11,7 @@
 
 ## Reporting a Vulnerability
 
-If you have a security vulnerability to report, please send an e-mail to pupnp.github@gmail.com.
+If you have a security vulnerability to report, please send an e-mail to pupnp.github@gmail.com with the word `security` in the subject.
 
 Your report will be analysed we will search for a way to solve the issue.
 
