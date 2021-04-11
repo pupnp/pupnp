@@ -538,7 +538,7 @@ static int genaInitNotifyCommon(UpnpLib *p,
                 GENA,
                 __FILE__,
                 __LINE__,
-                "GENA BEGIN INITIAL NOTIFY COMMON");
+                "GENA BEGIN INITIAL NOTIFY COMMON\n");
 
         job = (ThreadPoolJob *)malloc(sizeof(ThreadPoolJob));
         if (job == NULL) {
@@ -677,7 +677,7 @@ ExitFunction:
                 GENA,
                 __FILE__,
                 line,
-                "GENA END INITIAL NOTIFY COMMON, ret = %d",
+                "GENA END INITIAL NOTIFY COMMON, ret = %d\n",
                 ret);
 
         return ret;
@@ -701,7 +701,7 @@ int genaInitNotify(UpnpLib *p,
                 GENA,
                 __FILE__,
                 __LINE__,
-                "GENA BEGIN INITIAL NOTIFY");
+                "GENA BEGIN INITIAL NOTIFY\n");
 
         if (var_count <= 0) {
                 line = __LINE__;
@@ -732,7 +732,7 @@ ExitFunction:
                 GENA,
                 __FILE__,
                 line,
-                "GENA END INITIAL NOTIFY, ret = %d",
+                "GENA END INITIAL NOTIFY, ret = %d\n",
                 ret);
 
         return ret;
@@ -755,7 +755,7 @@ int genaInitNotifyExt(UpnpLib *p,
                 GENA,
                 __FILE__,
                 __LINE__,
-                "GENA BEGIN INITIAL NOTIFY EXT");
+                "GENA BEGIN INITIAL NOTIFY EXT\n");
 
         if (PropSet == 0) {
                 line = __LINE__;
@@ -787,7 +787,7 @@ ExitFunction:
                 GENA,
                 __FILE__,
                 line,
-                "GENA END INITIAL NOTIFY EXT, ret = %d",
+                "GENA END INITIAL NOTIFY EXT, ret = %d\n",
                 ret);
 
         return ret;
@@ -990,7 +990,7 @@ ExitFunction:
                 GENA,
                 __FILE__,
                 line,
-                "GENA END NOTIFY ALL COMMON, ret = %d",
+                "GENA END NOTIFY ALL COMMON, ret = %d\n",
                 ret);
 
         return ret;
@@ -1037,7 +1037,7 @@ ExitFunction:
                 GENA,
                 __FILE__,
                 line,
-                "GENA END NOTIFY ALL EXT, ret = %d",
+                "GENA END NOTIFY ALL EXT, ret = %d\n",
                 ret);
 
         return ret;
@@ -1085,7 +1085,7 @@ ExitFunction:
                 GENA,
                 __FILE__,
                 line,
-                "GENA END NOTIFY ALL, ret = %d",
+                "GENA END NOTIFY ALL, ret = %d\n",
                 ret);
 
         return ret;
