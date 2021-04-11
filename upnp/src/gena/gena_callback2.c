@@ -102,7 +102,7 @@ void genaCallback(UpnpLib *p,
                                 info, request);
                 } else {
                         /* subscribe */
-                        gena_process_subscription_request(info, request);
+                        gena_process_subscription_request(p, info, request);
                 }
                 UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_DEBUG,
@@ -113,13 +113,13 @@ void genaCallback(UpnpLib *p,
         } else if (request->method == HTTPMETHOD_UNSUBSCRIBE) {
                 found_function = 1;
                 /* unsubscribe */
-                gena_process_unsubscribe_request(info, request);
+		gena_process_unsubscribe_request(p, info, request);
 #endif
         } else if (request->method == HTTPMETHOD_NOTIFY) {
 #ifdef INCLUDE_CLIENT_APIS
                 found_function = 1;
                 /* notify */
-                gena_process_notification_event(info, request);
+		gena_process_notification_event(p, info, request);
 #endif
         }
 
