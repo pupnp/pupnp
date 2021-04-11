@@ -132,6 +132,13 @@ static struct s_Member UpnpLib_members[] = {
                 0),
         INIT_MEMBER(
                 bWebServerState, TYPE_INTEGER, WebServerState, "upnpapi.h", 0),
+        INIT_MEMBER(webCallback_HostValidate,
+                TYPE_INTEGER,
+                WebCallback_HostValidate,
+                0,
+                0),
+        INIT_MEMBER(webCallback_HostValidateCookie, TYPE_INTEGER, void *, 0, 0),
+        INIT_MEMBER(allowLiteralHostRedirection, TYPE_INTEGER, int, 0, 0),
         INIT_MEMBER(gIF_NAME, TYPE_STRING, 0, 0, 0),
         INIT_MEMBER(gIF_IPV4, TYPE_STRING, 0, 0, 0),
         INIT_MEMBER(gIF_IPV4_NETMASK, TYPE_STRING, 0, 0, 0),

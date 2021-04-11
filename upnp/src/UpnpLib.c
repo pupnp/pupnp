@@ -28,6 +28,9 @@ struct s_UpnpLib
         ThreadPool m_gRecvThreadPool;
         ThreadPool m_gMiniServerThreadPool;
         WebServerState m_bWebServerState;
+        WebCallback_HostValidate m_webCallback_HostValidate;
+        void *m_webCallback_HostValidateCookie;
+        int m_allowLiteralHostRedirection;
         UpnpString *m_gIF_NAME;
         UpnpString *m_gIF_IPV4;
         UpnpString *m_gIF_IPV4_NETMASK;
@@ -81,6 +84,9 @@ UpnpLib *UpnpLib_new()
         /* memset(&p->m_gRecvThreadPool, 0, sizeof (ThreadPool)); */
         /* memset(&p->m_gMiniServerThreadPool, 0, sizeof (ThreadPool)); */
         /*p->m_bWebServerState = 0;*/
+        /*p->m_webCallback_HostValidate = 0;*/
+        /*p->m_webCallback_HostValidateCookie = 0;*/
+        /*p->m_allowLiteralHostRedirection = 0;*/
         p->m_gIF_NAME = UpnpString_new();
         p->m_gIF_IPV4 = UpnpString_new();
         p->m_gIF_IPV4_NETMASK = UpnpString_new();
@@ -156,6 +162,9 @@ void UpnpLib_delete(UpnpLib *q)
         p->m_gIF_IPV4 = 0;
         UpnpString_delete(p->m_gIF_NAME);
         p->m_gIF_NAME = 0;
+        p->m_allowLiteralHostRedirection = 0;
+        p->m_webCallback_HostValidateCookie = 0;
+        p->m_webCallback_HostValidate = 0;
         p->m_bWebServerState = 0;
         memset(&p->m_gMiniServerThreadPool, 0, sizeof(ThreadPool));
         memset(&p->m_gRecvThreadPool, 0, sizeof(ThreadPool));
@@ -207,6 +216,15 @@ int UpnpLib_assign(UpnpLib *p, const UpnpLib *q)
                 ok = ok &&
                         UpnpLib_set_bWebServerState(
                                 p, UpnpLib_get_bWebServerState(q));
+                ok = ok &&
+                        UpnpLib_set_webCallback_HostValidate(
+                                p, UpnpLib_get_webCallback_HostValidate(q));
+                ok = ok &&
+                        UpnpLib_set_webCallback_HostValidateCookie(p,
+                                UpnpLib_get_webCallback_HostValidateCookie(q));
+                ok = ok &&
+                        UpnpLib_set_allowLiteralHostRedirection(
+                                p, UpnpLib_get_allowLiteralHostRedirection(q));
                 ok = ok && UpnpLib_set_gIF_NAME(p, UpnpLib_get_gIF_NAME(q));
                 ok = ok && UpnpLib_set_gIF_IPV4(p, UpnpLib_get_gIF_IPV4(q));
                 ok = ok &&
@@ -508,6 +526,42 @@ WebServerState UpnpLib_get_bWebServerState(const UpnpLib *p)
 int UpnpLib_set_bWebServerState(UpnpLib *p, WebServerState n)
 {
         p->m_bWebServerState = n;
+
+        return 1;
+}
+
+WebCallback_HostValidate UpnpLib_get_webCallback_HostValidate(const UpnpLib *p)
+{
+        return p->m_webCallback_HostValidate;
+}
+
+int UpnpLib_set_webCallback_HostValidate(UpnpLib *p, WebCallback_HostValidate n)
+{
+        p->m_webCallback_HostValidate = n;
+
+        return 1;
+}
+
+void *UpnpLib_get_webCallback_HostValidateCookie(const UpnpLib *p)
+{
+        return p->m_webCallback_HostValidateCookie;
+}
+
+int UpnpLib_set_webCallback_HostValidateCookie(UpnpLib *p, void *n)
+{
+        p->m_webCallback_HostValidateCookie = n;
+
+        return 1;
+}
+
+int UpnpLib_get_allowLiteralHostRedirection(const UpnpLib *p)
+{
+        return p->m_allowLiteralHostRedirection;
+}
+
+int UpnpLib_set_allowLiteralHostRedirection(UpnpLib *p, int n)
+{
+        p->m_allowLiteralHostRedirection = n;
 
         return 1;
 }

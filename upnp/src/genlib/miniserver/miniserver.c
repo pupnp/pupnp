@@ -63,6 +63,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <sys/types.h>
 
 static UPNP_INLINE int max_SOCKET(SOCKET a, SOCKET b)
@@ -153,6 +154,84 @@ void SetSoapCallback(MiniServerCallback callback) { gSoapCallback = callback; }
 
 void SetGenaCallback(MiniServerCallback callback) { gGenaCallback = callback; }
 
+static int host_header_is_numeric(
+        UpnpLib *p, char *host_port, size_t host_port_size)
+{
+        int rc = 0;
+        struct in6_addr addr;
+        char *s;
+        (void)p;
+
+        /* Remove the port part. */
+        s = host_port + host_port_size - 1;
+        while (s != host_port && *s != ':') {
+                --s;
+        }
+        *s = 0;
+        /* Try IPV4 */
+        rc = inet_pton(AF_INET, host_port, &addr);
+        if (rc == 1) {
+                goto ExitFunction;
+        }
+        /* Try IPV6 */
+        /* Check for and remove the square brackets. */
+        if (strlen(host_port) < 3 || host_port[0] != '[' || *(s - 1) != ']') {
+                rc = 0;
+                goto ExitFunction;
+        }
+        *(s - 1) = '\0';
+        rc = inet_pton(AF_INET6, host_port + 1, &addr) == 1;
+
+ExitFunction:
+        return rc;
+}
+
+static int getNumericHostRedirection(
+        int socket, char *host_port, size_t hp_size)
+{
+        int rc;
+        const char *rcp;
+        struct sockaddr_storage addr;
+        struct sockaddr_in *addr4 = (struct sockaddr_in *)&addr;
+        struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&addr;
+        socklen_t addr_len = sizeof addr;
+        in_port_t port;
+        char host[NAME_SIZE];
+        int n;
+
+        rc = getsockname(socket, (struct sockaddr *)&addr, &addr_len);
+        if (rc) {
+                goto ExitFunction;
+        }
+        switch (addr.ss_family) {
+        case AF_INET6:
+                rcp = inet_ntop(AF_INET6, &addr6->sin6_addr, host, sizeof host);
+                if (!rcp) {
+                        rc = -1;
+                        goto ExitFunction;
+                }
+                port = ntohs(addr6->sin6_port);
+                n = snprintf(host_port, hp_size, "[%s]:%d", host, port);
+                break;
+        case AF_INET:
+        default:
+                rcp = inet_ntop(AF_INET, &addr4->sin_addr, host, sizeof host);
+                if (!rcp) {
+                        rc = -1;
+                        goto ExitFunction;
+                }
+                port = ntohs(addr4->sin_port);
+                n = snprintf(host_port, hp_size, "%s:%d", host, port);
+                break;
+        }
+        if (n < 0) {
+                rc = -1;
+        }
+
+ExitFunction:
+        return rc == 0;
+}
+
 /*!
  * \brief Based on the type pf message, appropriate callback is issued.
  *
@@ -166,18 +245,34 @@ static int dispatch_request(
         /*! [in] HTTP parser object. */
         http_parser_t *hparser)
 {
+        memptr header;
+        size_t min_size;
+        http_message_t *request;
         MiniServerCallback callback;
+        WebCallback_HostValidate host_validate_callback = 0;
+        void *cookie;
+        int rc = UPNP_E_SUCCESS;
+        /* If it does not fit in here, it is likely invalid anyway. */
+        char host_port[NAME_SIZE];
 
         switch (hparser->msg.method) {
         /* Soap Call */
         case SOAPMETHOD_POST:
         case HTTPMETHOD_MPOST:
                 callback = gSoapCallback;
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_INFO,
+                        MSERV,
+                        __FILE__,
+                        __LINE__,
+                        "miniserver %d: got SOAP msg\n",
+                        info->socket);
                 break;
         /* Gena Call */
         case HTTPMETHOD_NOTIFY:
         case HTTPMETHOD_SUBSCRIBE:
         case HTTPMETHOD_UNSUBSCRIBE:
+                callback = gGenaCallback;
                 UpnpPrintf(UpnpLib_get_Log(p),
                         UPNP_INFO,
                         MSERV,
@@ -185,7 +280,6 @@ static int dispatch_request(
                         __LINE__,
                         "miniserver %d: got GENA msg\n",
                         info->socket);
-                callback = gGenaCallback;
                 break;
         /* HTTP server call */
         case HTTPMETHOD_GET:
@@ -193,16 +287,85 @@ static int dispatch_request(
         case HTTPMETHOD_HEAD:
         case HTTPMETHOD_SIMPLEGET:
                 callback = gGetCallback;
+                host_validate_callback =
+                        UpnpLib_get_webCallback_HostValidate(p);
+                cookie = UpnpLib_get_webCallback_HostValidateCookie(p);
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_INFO,
+                        MSERV,
+                        __FILE__,
+                        __LINE__,
+                        "miniserver %d: got WEB server msg\n",
+                        info->socket);
                 break;
         default:
-                callback = NULL;
+                callback = 0;
         }
-        if (callback == NULL) {
-                return HTTP_INTERNAL_SERVER_ERROR;
+        if (!callback) {
+                rc = HTTP_INTERNAL_SERVER_ERROR;
+                goto ExitFunction;
         }
-        callback(p, hparser, &hparser->msg, info);
+        request = &hparser->msg;
+#ifdef DEBUG_REDIRECT
+        getNumericHostRedirection(info->socket, host_port, sizeof host_port);
+        UpnpPrintf(UPNP_INFO,
+                MSERV,
+                __FILE__,
+                __LINE__,
+                "DEBUG TEST: Redirect host_port = %s.\n",
+                host_port);
+#endif
+        /* chech HOST header for an IP number -- prevents DNS rebinding. */
+        if (!httpmsg_find_hdr(request, HDR_HOST, &header)) {
+                rc = UPNP_E_BAD_HTTPMSG;
+                goto ExitFunction;
+        }
+        min_size = header.length < ((sizeof host_port) - 1)
+                ? header.length
+                : (sizeof host_port) - 1;
+        memcpy(host_port, header.buf, min_size);
+        host_port[min_size] = 0;
+        if (host_validate_callback) {
+                rc = host_validate_callback(host_port, cookie);
+        } else if (!host_header_is_numeric(p, host_port, min_size)) {
+                int allowLiteralHostRedirection =
+                        UpnpLib_get_allowLiteralHostRedirection(p);
+                if (!allowLiteralHostRedirection) {
+                        rc = UPNP_E_BAD_HTTPMSG;
+                        UpnpPrintf(UpnpLib_get_Log(p),
+                                UPNP_INFO,
+                                MSERV,
+                                __FILE__,
+                                __LINE__,
+                                "Possible DNS Rebind attack prevented.\n");
+                        goto ExitFunction;
+                } else {
+                        membuffer redir_buf;
+                        static const char *redir_fmt =
+                                "HTTP/1.1 307 Temporary Redirect\r\n"
+                                "Location: http://%s\r\n\r\n";
+                        char redir_str[NAME_SIZE];
+                        int timeout = HTTP_DEFAULT_TIMEOUT;
 
-        return 0;
+                        getNumericHostRedirection(
+                                info->socket, host_port, sizeof host_port);
+                        membuffer_init(&redir_buf);
+                        snprintf(redir_str, NAME_SIZE, redir_fmt, host_port);
+                        membuffer_append_str(&redir_buf, redir_str);
+                        rc = http_SendMessage(p,
+                                info,
+                                &timeout,
+                                "b",
+                                redir_buf.buf,
+                                redir_buf.length);
+                        membuffer_destroy(&redir_buf);
+                        goto ExitFunction;
+                }
+        }
+        callback(p, hparser, request, info);
+
+ExitFunction:
+        return rc;
 }
 
 /*!

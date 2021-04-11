@@ -150,6 +150,23 @@ EXPORT_SPEC WebServerState UpnpLib_get_bWebServerState(const UpnpLib *p);
 /*! UpnpLib_set_bWebServerState */
 EXPORT_SPEC int UpnpLib_set_bWebServerState(UpnpLib *p, WebServerState n);
 
+/*! UpnpLib_get_webCallback_HostValidate */
+EXPORT_SPEC WebCallback_HostValidate UpnpLib_get_webCallback_HostValidate(
+        const UpnpLib *p);
+/*! UpnpLib_set_webCallback_HostValidate */
+EXPORT_SPEC int UpnpLib_set_webCallback_HostValidate(
+        UpnpLib *p, WebCallback_HostValidate n);
+
+/*! UpnpLib_get_webCallback_HostValidateCookie */
+EXPORT_SPEC void *UpnpLib_get_webCallback_HostValidateCookie(const UpnpLib *p);
+/*! UpnpLib_set_webCallback_HostValidateCookie */
+EXPORT_SPEC int UpnpLib_set_webCallback_HostValidateCookie(UpnpLib *p, void *n);
+
+/*! UpnpLib_get_allowLiteralHostRedirection */
+EXPORT_SPEC int UpnpLib_get_allowLiteralHostRedirection(const UpnpLib *p);
+/*! UpnpLib_set_allowLiteralHostRedirection */
+EXPORT_SPEC int UpnpLib_set_allowLiteralHostRedirection(UpnpLib *p, int n);
+
 /*! UpnpLib_get_gIF_NAME */
 EXPORT_SPEC const UpnpString *UpnpLib_get_gIF_NAME(const UpnpLib *p);
 /*! UpnpLib_set_gIF_NAME */

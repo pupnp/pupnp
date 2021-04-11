@@ -4635,6 +4635,18 @@ int UpnpIsWebserverEnabled(UpnpLib *p)
         return UpnpLib_get_bWebServerState(p) == WEB_SERVER_ENABLED;
 }
 
+void UpnpSetHostValidateCallback(
+        UpnpLib *p, WebCallback_HostValidate callback, void *cookie)
+{
+        UpnpLib_set_webCallback_HostValidate(p, callback);
+        UpnpLib_set_webCallback_HostValidateCookie(p, cookie);
+}
+
+void UpnpSetAllowLiteralHostRedirection(UpnpLib *p, int enable)
+{
+        UpnpLib_set_allowLiteralHostRedirection(p, enable);
+}
+
 int UpnpVirtualDir_set_GetInfoCallback(UpnpLib *p, VDCallback_GetInfo callback)
 {
         int ret = UPNP_E_SUCCESS;
