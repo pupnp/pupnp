@@ -857,7 +857,7 @@ static int genaNotifyAllCommon(UpnpLib *p,
                 GENA,
                 __FILE__,
                 __LINE__,
-                "GENA BEGIN NOTIFY ALL COMMON");
+                "GENA BEGIN NOTIFY ALL COMMON\n");
 
         /* Keep this allocation first */
         reference_count = (int *)malloc(sizeof(int));
@@ -1012,7 +1012,7 @@ int genaNotifyAllExt(UpnpLib *p,
                 GENA,
                 __FILE__,
                 __LINE__,
-                "GENA BEGIN NOTIFY ALL EXT");
+                "GENA BEGIN NOTIFY ALL EXT\n");
 
         propertySet = ixmlPrintNode((IXML_Node *)PropSet);
         if (propertySet == NULL) {
@@ -1061,7 +1061,7 @@ int genaNotifyAll(UpnpLib *p,
                 GENA,
                 __FILE__,
                 __LINE__,
-                "GENA BEGIN NOTIFY ALL");
+                "GENA BEGIN NOTIFY ALL\n");
 
         ret = GeneratePropertySet(VarNames, VarValues, var_count, &propertySet);
         if (ret != XML_SUCCESS) {
