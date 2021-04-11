@@ -387,19 +387,19 @@ int UpnpInit2(UpnpLib **LibraryHandle,
                         __LINE__,
                         IfName ? IfName : "NULL",
                         DestPort);
-                goto exit_function;
+                goto exit_function_no_mutex_unlock;
         }
 
         p = UpnpLib_new();
         if (!p) {
                 retVal = UPNP_E_OUTOF_MEMORY;
-                goto exit_function;
+                goto exit_function_no_mutex_unlock;
         }
         l = UpnpLog_new();
         if (!l) {
                 retVal = UPNP_E_OUTOF_MEMORY;
                 UpnpLib_delete(p);
-                goto exit_function;
+                goto exit_function_no_mutex_unlock;
         }
         UpnpSetLogFileName(l, logFileName);
         UpnpLib_set_Log(p, l);
@@ -446,6 +446,7 @@ int UpnpInit2(UpnpLib **LibraryHandle,
 
 exit_function:
         ithread_mutex_unlock(UpnpLib_getnc_gSDKInitMutex(p));
+exit_function_no_mutex_unlock:
 
         return retVal;
 }
