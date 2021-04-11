@@ -2773,6 +2773,33 @@ EXPORT_SPEC int UpnpEnableWebserver(
  */
 EXPORT_SPEC int UpnpIsWebserverEnabled(void);
 
+/*
+ * \brief Callback for validating HTTP requests HOST header values.
+ *
+ * @param hostname the value in the request HOST header.
+ * @return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: a request with the HOST header set to hostname
+ *                            should be processed.
+ *     \li \c UPNP_E_BAD_HTTPMSG the request should be rejected.
+ */
+typedef int (*WebCallback_HostValidate)(const char *hostname, void *cookie);
+
+/*
+ * \brief Set callback for validating HTTP requests HOST header values.
+ *
+ * @param callback the host validating callback function or NULL.
+ * @param cookie the chocolate you like.
+ */
+EXPORT_SPEC void UpnpSetHostValidateCallback(
+	WebCallback_HostValidate callback, void *cookie);
+
+/*
+ * \brief Enable or disable literal IP redirection.
+ *
+ * @param enable Zero to disable (default) non-zero to enable.
+ */
+EXPORT_SPEC void UpnpSetAllowLiteralHostRedirection(int enable);
+
 /*!
  * \brief Adds a virtual directory mapping.
  *

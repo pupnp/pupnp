@@ -1,49 +1,44 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (C) 2011-2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (C) 2011-2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * * Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * * Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * * Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
 
-
 #ifndef UPNPAPI_H
 #define UPNPAPI_H
-
 
 /*!
  * \file
  */
 
-
+#include "VirtualDir.h" /* for struct VirtualDirCallbacks */
 #include "client_table.h"
-#include "upnp.h"
-#include "VirtualDir.h"		/* for struct VirtualDirCallbacks */
-
 
 #define MAX_INTERFACES 256
 
@@ -63,9 +58,14 @@ extern int g_UpnpSdkEQMaxLen;
 extern int g_UpnpSdkEQMaxAge;
 
 /* 30-second timeout */
-#define UPNP_TIMEOUT	30
+#define UPNP_TIMEOUT 30
 
-typedef enum {HND_INVALID=-1,HND_CLIENT,HND_DEVICE} Upnp_Handle_Type;
+typedef enum
+{
+	HND_INVALID = -1,
+	HND_CLIENT,
+	HND_DEVICE
+} Upnp_Handle_Type;
 
 /* Data to be stored in handle table for */
 struct Handle_Info
@@ -73,21 +73,21 @@ struct Handle_Info
 	/*! . */
 	Upnp_Handle_Type HType;
 	/*! Callback function pointer. */
-	Upnp_FunPtr  Callback;
+	Upnp_FunPtr Callback;
 	/*! . */
 	char *Cookie;
 	/*! 0 = not installed; otherwise installed. */
-	int   aliasInstalled;
+	int aliasInstalled;
 
 	/* Device Only */
 #ifdef INCLUDE_DEVICE_APIS
 	/*! URL for the use of SSDP. */
-	char  DescURL[LINE_SIZE];
+	char DescURL[LINE_SIZE];
 	/*! URL for the use of SSDP when answering to legacy CPs (CP searching
 	 * for a v1 when the device is v2). */
-	char  LowerDescURL[LINE_SIZE];
+	char LowerDescURL[LINE_SIZE];
 	/*! XML file path for device description. */
-	char  DescXML[LINE_SIZE];
+	char DescXML[LINE_SIZE];
 	/* Advertisement timeout */
 	int MaxAge;
 	/* Power State as defined by UPnP Low Power. */
@@ -132,29 +132,26 @@ Upnp_Handle_Type GetHandleInfo(
 	/*! handle pointer (key for the client handle structure). */
 	int Hnd,
 	/*! handle structure passed by this function. */
-	struct Handle_Info **HndInfo); 
-
+	struct Handle_Info **HndInfo);
 
 #define HandleLock() HandleWriteLock()
 
-
-#define HandleWriteLock()  \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying a write lock\n"); \
+#define HandleWriteLock() \
+	UpnpPrintf( \
+		UPNP_INFO, API, __FILE__, __LINE__, "Trying a write lock\n"); \
 	ithread_rwlock_wrlock(&GlobalHndRWLock); \
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Write lock acquired\n");
 
-
-#define HandleReadLock()  \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying a read lock\n"); \
+#define HandleReadLock() \
+	UpnpPrintf( \
+		UPNP_INFO, API, __FILE__, __LINE__, "Trying a read lock\n"); \
 	ithread_rwlock_rdlock(&GlobalHndRWLock); \
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Read lock acquired\n");
 
-
 #define HandleUnlock() \
-	UpnpPrintf(UPNP_INFO, API,__FILE__, __LINE__, "Trying Unlock\n"); \
+	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying Unlock\n"); \
 	ithread_rwlock_unlock(&GlobalHndRWLock); \
 	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Unlocked rwlock\n");
-
 
 /*!
  * \brief Get client handle info.
@@ -165,24 +162,24 @@ Upnp_Handle_Type GetHandleInfo(
  */
 Upnp_Handle_Type GetClientHandleInfo(
 	/*! [in] client handle pointer (key for the client handle structure). */
-	int *client_handle_out, 
+	int *client_handle_out,
 	/*! [out] Client handle structure passed by this function. */
 	struct Handle_Info **HndInfo);
 /*!
  * \brief Retrieves the device handle and information of the first device of
- * 	the address family specified. The search begins at the 'start' index, which should
- *  be 0 for the first call, then the last successful value returned. This allows 
- *  listing all entries for the address family.
+ * 	the address family specified. The search begins at the 'start' index,
+ * which should be 0 for the first call, then the last successful value
+ * returned. This allows listing all entries for the address family.
  *
  * \return HND_DEVICE or HND_INVALID
  */
 Upnp_Handle_Type GetDeviceHandleInfo(
 	/*! [in] place to start the search (i.e. last value returned). */
-	UpnpDevice_Handle start, 
+	UpnpDevice_Handle start,
 	/*! [in] Address family. */
 	int AddressFamily,
 	/*! [out] Device handle pointer. */
-	int *device_handle_out, 
+	int *device_handle_out,
 	/*! [out] Device handle structure passed by this function. */
 	struct Handle_Info **HndInfo);
 
@@ -195,17 +192,15 @@ Upnp_Handle_Type GetDeviceHandleInfo(
  */
 Upnp_Handle_Type GetDeviceHandleInfoForPath(
 	/*! The Uri path. */
-	const char *path, 
+	const char *path,
 	/*! [in] Address family. */
 	int AddressFamily,
 	/*! [out] Device handle pointer. */
-	int *device_handle_out, 
+	int *device_handle_out,
 	/*! [out] Device handle structure passed by this function. */
 	struct Handle_Info **HndInfo,
 	/*! [out] Service info for found path. */
-	service_info **serv_info
-	);
-
+	service_info **serv_info);
 
 extern char gIF_NAME[LINE_SIZE];
 extern char gIF_IPV4[INET_ADDRSTRLEN];
@@ -218,23 +213,20 @@ extern unsigned gIF_IPV6_ULA_GUA_PREFIX_LENGTH;
 
 extern unsigned gIF_INDEX;
 
-
 extern unsigned short LOCAL_PORT_V4;
 extern unsigned short LOCAL_PORT_V6;
 extern unsigned short LOCAL_PORT_V6_ULA_GUA;
 
-
 /*! NLS uuid. */
 extern Upnp_SID gUpnpSdkNLSuuid;
-
 
 extern TimerThread gTimerThread;
 extern ThreadPool gRecvThreadPool;
 extern ThreadPool gSendThreadPool;
 extern ThreadPool gMiniServerThreadPool;
 
-
-typedef enum {
+typedef enum
+{
 	SUBSCRIBE,
 	UNSUBSCRIBE,
 	DK_NOTIFY,
@@ -247,8 +239,7 @@ typedef enum {
 	RENEW
 } UpnpFunName;
 
-
-struct  UpnpNonblockParam 
+struct UpnpNonblockParam
 {
 	UpnpFunName FunName;
 	int Handle;
@@ -268,19 +259,16 @@ struct  UpnpNonblockParam
 	struct DevDesc *Devdesc;
 };
 
-
 extern virtualDirList *pVirtualDirList;
 extern struct VirtualDirCallbacks virtualDirCallback;
 
-
-typedef enum {
+typedef enum
+{
 	WEB_SERVER_DISABLED,
 	WEB_SERVER_ENABLED
 } WebServerState;
 
-
 #define E_HTTP_SYNTAX -6
-
 
 /*!
  * \brief Retrieve interface information and keep it in global variables.
@@ -305,9 +293,7 @@ int UpnpGetIfInfo(
 	/*! [in] Interface name (can be NULL). */
 	const char *IfName);
 
-
-void UpnpThreadDistribution(struct UpnpNonblockParam * Param);
-
+void UpnpThreadDistribution(struct UpnpNonblockParam *Param);
 
 /*!
  * \brief This function is a timer thread scheduled by UpnpSendAdvertisement
@@ -315,21 +301,27 @@ void UpnpThreadDistribution(struct UpnpNonblockParam * Param);
  */
 void AutoAdvertise(
 	/*! [in] Information provided to the thread. */
-	void *input); 
-
+	void *input);
 
 /*!
  * \brief Print handle info.
- *	
+ *
  * \return UPNP_E_SUCCESS if successful, otherwise returns appropriate error.
  */
 int PrintHandleInfo(
 	/*! [in] Handle index. */
 	UpnpClient_Handle Hnd);
 
-
+/*! */
 extern WebServerState bWebServerState;
 
+/*! */
+extern WebCallback_HostValidate gWebCallback_HostValidate;
+
+/*! */
+extern void *gWebCallback_HostValidateCookie;
+
+/*! */
+extern int gAllowLiteralHostRedirection;
 
 #endif /* UPNPAPI_H */
-

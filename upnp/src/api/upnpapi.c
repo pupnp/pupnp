@@ -138,6 +138,15 @@ ThreadPool gMiniServerThreadPool;
 /*! Flag to indicate the state of web server */
 WebServerState bWebServerState = WEB_SERVER_DISABLED;
 
+/*! webCallback for HOST validation. */
+WebCallback_HostValidate gWebCallback_HostValidate = 0;
+
+/*! Cookie to the webCallback for HOST validation. */
+void *gWebCallback_HostValidateCookie = 0;
+
+/*! Allow literal host names redirection to numeric host names. */
+int gAllowLiteralHostRedirection = 0;
+
 /*! Static buffer to contain interface name. (extern'ed in upnp.h) */
 char gIF_NAME[LINE_SIZE] = {'\0'};
 
@@ -4397,6 +4406,18 @@ int UpnpIsWebserverEnabled(void)
 	}
 
 	return bWebServerState == (WebServerState)WEB_SERVER_ENABLED;
+}
+
+void UpnpSetHostValidateCallback(
+	WebCallback_HostValidate callback, void *cookie)
+{
+	gWebCallback_HostValidate = callback;
+	gWebCallback_HostValidateCookie = cookie;
+}
+
+void UpnpSetAllowLiteralHostRedirection(int enable)
+{
+	gAllowLiteralHostRedirection = enable;
 }
 
 int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback)
