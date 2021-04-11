@@ -4339,9 +4339,11 @@ Upnp_Handle_Type GetHandleInfo(
 {
         handle_table_t *HandleTable = UpnpLib_getnc_HandleTable(p);
         Upnp_Handle_Type ret = HND_INVALID;
+        // Upnp_LogLevel logLevel = UPNP_DEBUG;
+        Upnp_LogLevel logLevel = UPNP_NONE;
 
         UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_DEBUG,
+                logLevel,
                 API,
                 __FILE__,
                 __LINE__,
@@ -4350,26 +4352,29 @@ Upnp_Handle_Type GetHandleInfo(
 
         if (Hnd < 1 || Hnd >= HANDLE_TABLE_MAX_NUM_ELEMENTS) {
                 UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_DEBUG,
+                        logLevel,
                         API,
                         __FILE__,
                         __LINE__,
                         "GetHandleInfo: Handle out of range\n");
-        } else if (!HandleTable->handle[Hnd]) {
+                goto ExitFunction;
+        }
+        if (!HandleTable->handle[Hnd]) {
                 UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_DEBUG,
+                        logLevel,
                         API,
                         __FILE__,
                         __LINE__,
                         "GetHandleInfo: HandleTable[%d] is NULL\n",
                         Hnd);
-        } else if (HandleTable->handle[Hnd]) {
-                *HndInfo = (struct Handle_Info *)HandleTable->handle[Hnd];
-                ret = ((struct Handle_Info *)*HndInfo)->HType;
+                goto ExitFunction;
         }
+        *HndInfo = (struct Handle_Info *)HandleTable->handle[Hnd];
+        ret = ((struct Handle_Info *)*HndInfo)->HType;
 
+ExitFunction:
         UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_DEBUG,
+                logLevel,
                 API,
                 __FILE__,
                 __LINE__,
