@@ -326,24 +326,24 @@ int TvDeviceHandleSubscriptionRequest(
                 cmp2 = strcmp(l_serviceId, tv_service_table[i].ServiceId);
                 if (cmp1 == 0 && cmp2 == 0) {
 #if 0
-			PropSet = NULL;
+                        PropSet = NULL;
 
-			for (j = 0; j < tv_service_table[i].VariableCount; ++j) {
-				/* add each variable to the property set */
-				/* for initial state dump */
-				UpnpAddToPropertySet(&PropSet,
-						     tv_service_table[i].
-						     VariableName[j],
-						     tv_service_table[i].
-						     VariableStrVal[j]);
-			}
+                        for (j = 0; j < tv_service_table[i].VariableCount; ++j) {
+                                /* add each variable to the property set */
+                                /* for initial state dump */
+                                UpnpAddToPropertySet(&PropSet,
+                                                     tv_service_table[i].
+                                                     VariableName[j],
+                                                     tv_service_table[i].
+                                                     VariableStrVal[j]);
+                        }
 
-			/* dump initial state  */
-			UpnpAcceptSubscriptionExt(device_handle,
-						  l_udn,
-						  l_serviceId, PropSet, l_sid);
-			/* free document */
-			Document_free(PropSet);
+                        /* dump initial state  */
+                        UpnpAcceptSubscriptionExt(device_handle,
+                                                  l_udn,
+                                                  l_serviceId, PropSet, l_sid);
+                        /* free document */
+                        Document_free(PropSet);
 #endif
                         UpnpAcceptSubscription(p,
                                 device_handle,
@@ -518,14 +518,14 @@ int TvDeviceSetServiceTableVar(
 
         strcpy(tv_service_table[service].VariableStrVal[variable], value);
 #if 0
-	/* Using utility api */
-	PropSet = UpnpCreatePropertySet(1,
-		tv_service_table[service].VariableName[variable],
-		tv_service_table[service].VariableStrVal[variable]);
-	UpnpNotifyExt(device_handle, tv_service_table[service].UDN,
-		tv_service_table[service].ServiceId, PropSet);
-	/* Free created property set */
-	Document_free(PropSet);
+        /* Using utility api */
+        PropSet = UpnpCreatePropertySet(1,
+                tv_service_table[service].VariableName[variable],
+                tv_service_table[service].VariableStrVal[variable]);
+        UpnpNotifyExt(device_handle, tv_service_table[service].UDN,
+                tv_service_table[service].ServiceId, PropSet);
+        /* Free created property set */
+        Document_free(PropSet);
 #endif
         UpnpNotify(p,
                 device_handle,
