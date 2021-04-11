@@ -518,7 +518,7 @@ static int genaInitNotifyCommon(UpnpDevice_Handle device_handle,
 		GENA,
 		__FILE__,
 		__LINE__,
-		"GENA BEGIN INITIAL NOTIFY COMMON");
+		"GENA BEGIN INITIAL NOTIFY COMMON\n");
 
 	job = (ThreadPoolJob *)malloc(sizeof(ThreadPoolJob));
 	if (job == NULL) {
@@ -655,7 +655,7 @@ ExitFunction:
 		GENA,
 		__FILE__,
 		line,
-		"GENA END INITIAL NOTIFY COMMON, ret = %d",
+		"GENA END INITIAL NOTIFY COMMON, ret = %d\n",
 		ret);
 
 	return ret;
@@ -677,7 +677,7 @@ int genaInitNotify(UpnpDevice_Handle device_handle,
 		GENA,
 		__FILE__,
 		__LINE__,
-		"GENA BEGIN INITIAL NOTIFY");
+		"GENA BEGIN INITIAL NOTIFY\n");
 
 	if (var_count <= 0) {
 		line = __LINE__;
@@ -706,7 +706,7 @@ ExitFunction:
 		GENA,
 		__FILE__,
 		line,
-		"GENA END INITIAL NOTIFY, ret = %d",
+		"GENA END INITIAL NOTIFY, ret = %d\n",
 		ret);
 
 	return ret;
@@ -727,7 +727,7 @@ int genaInitNotifyExt(UpnpDevice_Handle device_handle,
 		GENA,
 		__FILE__,
 		__LINE__,
-		"GENA BEGIN INITIAL NOTIFY EXT");
+		"GENA BEGIN INITIAL NOTIFY EXT\n");
 
 	if (PropSet == 0) {
 		line = __LINE__;
@@ -757,7 +757,7 @@ ExitFunction:
 		GENA,
 		__FILE__,
 		line,
-		"GENA END INITIAL NOTIFY EXT, ret = %d",
+		"GENA END INITIAL NOTIFY EXT, ret = %d\n",
 		ret);
 
 	return ret;
@@ -825,7 +825,7 @@ static int genaNotifyAllCommon(UpnpDevice_Handle device_handle,
 		GENA,
 		__FILE__,
 		__LINE__,
-		"GENA BEGIN NOTIFY ALL COMMON");
+		"GENA BEGIN NOTIFY ALL COMMON\n");
 
 	/* Keep this allocation first */
 	reference_count = (int *)malloc(sizeof(int));
@@ -956,7 +956,7 @@ ExitFunction:
 		GENA,
 		__FILE__,
 		line,
-		"GENA END NOTIFY ALL COMMON, ret = %d",
+		"GENA END NOTIFY ALL COMMON, ret = %d\n",
 		ret);
 
 	return ret;
@@ -976,7 +976,7 @@ int genaNotifyAllExt(UpnpDevice_Handle device_handle,
 		GENA,
 		__FILE__,
 		__LINE__,
-		"GENA BEGIN NOTIFY ALL EXT");
+		"GENA BEGIN NOTIFY ALL EXT\n");
 
 	propertySet = ixmlPrintNode((IXML_Node *)PropSet);
 	if (propertySet == NULL) {
@@ -999,7 +999,7 @@ ExitFunction:
 		GENA,
 		__FILE__,
 		line,
-		"GENA END NOTIFY ALL EXT, ret = %d",
+		"GENA END NOTIFY ALL EXT, ret = %d\n",
 		ret);
 
 	return ret;
@@ -1018,7 +1018,7 @@ int genaNotifyAll(UpnpDevice_Handle device_handle,
 	DOMString propertySet = NULL;
 
 	UpnpPrintf(
-		UPNP_INFO, GENA, __FILE__, __LINE__, "GENA BEGIN NOTIFY ALL");
+		UPNP_INFO, GENA, __FILE__, __LINE__, "GENA BEGIN NOTIFY ALL\n");
 
 	ret = GeneratePropertySet(VarNames, VarValues, var_count, &propertySet);
 	if (ret != XML_SUCCESS) {
@@ -1040,7 +1040,7 @@ ExitFunction:
 		GENA,
 		__FILE__,
 		line,
-		"GENA END NOTIFY ALL, ret = %d",
+		"GENA END NOTIFY ALL, ret = %d\n",
 		ret);
 
 	return ret;
@@ -1719,4 +1719,4 @@ void gena_process_unsubscribe_request(SOCKINFO *info, http_message_t *request)
 }
 
 	#endif /* INCLUDE_DEVICE_APIS */
-#endif /* EXCLUDE_GENA */
+#endif         /* EXCLUDE_GENA */
