@@ -1440,7 +1440,6 @@ int TvDeviceStart(UpnpLib **pp,
         ret = UpnpInit2(&p, iface, port, 0);
         if (ret != UPNP_E_SUCCESS) {
                 SampleUtil_Print("Error with UpnpInit2 -- %d\n", ret);
-                UpnpFinish(p);
 
                 return ret;
         }

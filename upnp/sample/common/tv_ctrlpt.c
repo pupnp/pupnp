@@ -1306,12 +1306,12 @@ int TvCtrlPointStart(UpnpLib **LibraryHandle,
         if (combo) {
                 p = *LibraryHandle;
         } else {
+                p = 0;
                 rc = UpnpInit2(&p, iface, port, 0);
                 if (rc != UPNP_E_SUCCESS) {
                         SampleUtil_Print(
                                 "TvCtrlPointStart: UpnpInit2() Error: %d\n",
                                 rc);
-                        UpnpFinish(p);
 
                         return TV_ERROR;
                 }
