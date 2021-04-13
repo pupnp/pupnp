@@ -47,6 +47,9 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure
+          cd ..
+      - name: Debug output
+        run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
   # Windows builds
   windows:
     name: Build (${{ matrix.os }})  - ${{ matrix.conf }}
