@@ -43,6 +43,8 @@
 
 #include "tv_device.h"
 
+#include "upnpdebug.h"
+
 #include <assert.h>
 
 #define DEFAULT_WEB_DIR "./web"
@@ -1360,11 +1362,13 @@ int TvDeviceStart(char *iface,
 {
 	int ret = UPNP_E_SUCCESS;
 	char desc_doc_url[DESC_URL_SIZE];
-	char* ip_address = NULL;
+	char *ip_address = NULL;
 	int address_family = AF_INET;
 
 	ithread_mutex_init(&TVDevMutex, NULL);
-
+	UpnpSetLogFileNames(NULL, NULL);
+	UpnpSetLogLevel(UPNP_ALL);
+	UpnpInitLog();
 	SampleUtil_Initialize(pfun);
 	SampleUtil_Print("Initializing UPnP Sdk with\n"
 			 "\tinterface = %s port = %u\n",
@@ -1414,19 +1418,19 @@ int TvDeviceStart(char *iface,
 	switch (address_family) {
 	case AF_INET:
 		snprintf(desc_doc_url,
-		DESC_URL_SIZE,
-		"http://%s:%d/%s",
-		ip_address,
-		port,
-		desc_doc_name);
+			DESC_URL_SIZE,
+			"http://%s:%d/%s",
+			ip_address,
+			port,
+			desc_doc_name);
 		break;
 	case AF_INET6:
 		snprintf(desc_doc_url,
-		DESC_URL_SIZE,
-		"http://[%s]:%d/%s",
-		ip_address,
-		port,
-		desc_doc_name);
+			DESC_URL_SIZE,
+			"http://[%s]:%d/%s",
+			ip_address,
+			port,
+			desc_doc_name);
 		break;
 	default:
 		return UPNP_E_INTERNAL_ERROR;
@@ -1547,7 +1551,8 @@ int device_main(int argc, char *argv[])
 				" -m ip_mode -help (this message)\n",
 				argv[0]);
 			SampleUtil_Print(
-				"\tinterface:     interface address of the device"
+				"\tinterface:     interface address of the "
+				"device"
 				" (must match desc. doc)\n"
 				"\t\te.g.: eth0\n"
 				"\tport:          Port number to use for"
@@ -1567,8 +1572,13 @@ int device_main(int argc, char *argv[])
 		}
 	}
 	port = (unsigned short)portTemp;
-	return TvDeviceStart(
-		iface, port, desc_doc_name, web_dir_path, ip_mode, linux_print, 0);
+	return TvDeviceStart(iface,
+		port,
+		desc_doc_name,
+		web_dir_path,
+		ip_mode,
+		linux_print,
+		0);
 }
 
 /*! @} Device Sample Module */
