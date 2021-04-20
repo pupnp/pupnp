@@ -11,6 +11,18 @@ Version 1.16.0
 Version 1.14.6
 *******************************************************************************
 
+2021-04-19 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+        Fix for a DNS Rebind exploit. A special thanks for the collaboration
+        of the following people:
+        - Alaric Senat
+        - Fabrice Fontaine
+        - Gabriel Corona
+        - Ian Whyman
+        - Jean-Francois Dockes
+        - Marvin Scholz
+        - Werner Mahr
+
 2021-04-06 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
         Fix for Github #250:
@@ -73,7 +85,7 @@ Version 1.14.2
 
         I got a crash on gerbera startup because at least one interface did not have `ifa_addr` set.
 
-        The reason is quite simple: they are the physical interfaces which are part of my channel ������
+        The reason is quite simple: they are the physical interfaces which are part of my channel
         ```
         2: eth1: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc fq_codel master bond0 state UP group default qlen 1000
             link/ether xx:xx:xx:xx:xx:xx brd ff:ff:ff:ff:ff:ff
