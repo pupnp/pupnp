@@ -1563,6 +1563,18 @@ void *TvDeviceCommandLoop(void *args)
         char *s;
         UpnpLib *p = (UpnpLib *)args;
 
+        /* To use a GUI debugger you might want to define this to 1. */
+#if 0
+	while (!stoploop) {
+		s = fgets(cmdline, 100, stdin);
+		sscanf(cmdline, "%s", cmd);
+		if (strcasecmp(cmd, "exit") == 0) {
+			SampleUtil_Print("Shutting down...\n");
+			TvDeviceStop(p);
+			exit(0);
+		}
+	}
+#else
         while (!stoploop) {
                 sprintf(cmdline, " ");
                 sprintf(cmd, " ");
@@ -1582,6 +1594,7 @@ void *TvDeviceCommandLoop(void *args)
                                          "     Exit\n\n");
                 }
         }
+#endif
 
         return NULL;
 }

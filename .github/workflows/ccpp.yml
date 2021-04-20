@@ -47,13 +47,16 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure
+          cd ..
+      - name: Debug output
+        run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
   # Windows builds
   windows:
     name: Build (${{ matrix.os }})  - ${{ matrix.conf }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2016, windows-2019]
+        os: [windows-2016, windows-2019, macos-latest]
         conf: [Debug, Release]
       fail-fast: false
     steps:
@@ -65,39 +68,6 @@ jobs:
           -B build
           -DCMAKE_BUILD_TYPE=${{ matrix.conf }}
           -DBUILD_TESTING=ON
-          -DDOWNLOAD_AND_BUILD_DEPS=ON
-          ${{ env.cmake_extra_flags }}
-      - name: Build
-        run: cmake --build build --config ${{ matrix.conf }}
-      - name: Test Debug
-        if: ${{ matrix.conf == 'Debug' }}
-        run: |
-          cd build
-          ctest --output-on-failure -C ${{ matrix.conf }}
-          type upnp/test/test_init.log
-      - name: Test Release
-        if: ${{ matrix.conf == 'Release' }}
-        run: |
-          cd build
-          ctest --output-on-failure -C ${{ matrix.conf }}
-  # Macos builds
-  macos:
-    name: Build (${{ matrix.os }}) - ${{ matrix.conf }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest] # macos-10.15, macos-11.0
-        conf: [Debug, Release]
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: >
-          cmake
-          -S .
-          -B build
-          -DBUILD_TESTING=ON
-          -DCMAKE_BUILD_TYPE=${{ matrix.conf }}
           -DDOWNLOAD_AND_BUILD_DEPS=ON
           ${{ env.cmake_extra_flags }}
       - name: Build
@@ -105,7 +75,10 @@ jobs:
       - name: Test
         run: |
           cd build
-          ctest --output-on-failure --C ${{ matrix.conf }}
+          ctest --output-on-failure -C ${{ matrix.conf }}
+          cd ..
+      - name: Debug output
+        run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
   # Linux sanitizer builds
   build_asan:
     name: Sanitizer build (ubuntu-20.04) - ${{ matrix.tool }}
