@@ -113,13 +113,13 @@ void genaCallback(UpnpLib *p,
         } else if (request->method == HTTPMETHOD_UNSUBSCRIBE) {
                 found_function = 1;
                 /* unsubscribe */
-		gena_process_unsubscribe_request(p, info, request);
+                gena_process_unsubscribe_request(p, info, request);
 #endif
         } else if (request->method == HTTPMETHOD_NOTIFY) {
 #ifdef INCLUDE_CLIENT_APIS
                 found_function = 1;
                 /* notify */
-		gena_process_notification_event(p, info, request);
+                gena_process_notification_event(p, info, request);
 #endif
         }
 
