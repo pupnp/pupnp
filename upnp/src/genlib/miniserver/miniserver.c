@@ -63,7 +63,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
 #include <sys/types.h>
 
 static UPNP_INLINE int max_SOCKET(SOCKET a, SOCKET b)
