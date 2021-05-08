@@ -7,6 +7,10 @@ Version 1.16.0
         The library now gives the user a handle to its internal state so that
         it uses less shared global data.
 
+2021-05-08 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+        Fixes broken windows build.
+
 *******************************************************************************
 Version 1.14.6
 *******************************************************************************
