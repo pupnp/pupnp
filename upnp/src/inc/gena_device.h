@@ -67,8 +67,8 @@ void gena_process_subscription_renewal_request(
  * The connection is not destroyed on return.
  */
 void gena_process_unsubscribe_request(
-	/*! [in] Library Handle. */
-	UpnpLib *p,
+        /*! [in] Library Handle. */
+        UpnpLib *p,
         /*! [in] Socket info of the device. */
         SOCKINFO *info,
         /*! [in] UNSUBSCRIBE request from the control point. */
