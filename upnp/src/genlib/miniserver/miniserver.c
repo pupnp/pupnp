@@ -64,7 +64,6 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include <sys/types.h>
-	#include <sys/socket.h>
 
 	/*! . */
 	#define APPLICATION_LISTENING_PORT 49152
