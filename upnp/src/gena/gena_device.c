@@ -36,13 +36,14 @@
 
 #include "config.h"
 
+#include "gena_device.h"
+
 #if EXCLUDE_GENA == 0
 	#ifdef INCLUDE_DEVICE_APIS
 
 		#include <assert.h>
 
 		#include "gena.h"
-		#include "httpparser.h"
 		#include "httpreadwrite.h"
 		#include "parsetools.h"
 		#include "ssdplib.h"
