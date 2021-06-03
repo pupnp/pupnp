@@ -36,6 +36,8 @@
 
 #include "config.h"
 
+#include "gena_device.h"
+
 #if EXCLUDE_GENA == 0
 #ifdef INCLUDE_DEVICE_APIS
 

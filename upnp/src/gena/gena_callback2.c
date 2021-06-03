@@ -99,7 +99,7 @@ void genaCallback(UpnpLib *p,
                 if (httpmsg_find_hdr(request, HDR_NT, NULL) == NULL) {
                         /* renew subscription */
                         gena_process_subscription_renewal_request(
-                                info, request);
+                                p, info, request);
                 } else {
                         /* subscribe */
                         gena_process_subscription_request(p, info, request);
