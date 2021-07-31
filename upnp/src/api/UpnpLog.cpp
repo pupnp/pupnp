@@ -174,18 +174,23 @@ void UpnpLog::Printf(Upnp_LogLevel DLevel,
         if (logCallback()) {
                 char *buffer;
                 int size;
+                va_list outCopy, sizeCopy;
+                va_copy(sizeCopy, argList);
+                va_copy(outCopy, argList);
 #ifndef _WIN32
-                size = vsnprintf(NULL, 0, fmtStr, argList) + 1;
+                size = vsnprintf(NULL, 0, fmtStr, sizeCopy) + 1;
 #else
                 size = _vscprintf(fmtStr, argList) + 1;
 #endif
+                va_end(sizeCopy);
                 buffer = new char[size]();
                 if (!buffer) {
                         goto exit_function;
                 }
-                vsnprintf(buffer, size, fmtStr, argList);
+                vsnprintf(buffer, size, fmtStr, outCopy);
                 logCallback()(DLevel, Module, file, &line, buffer);
                 delete[] buffer;
+                va_end(outCopy);
         }
         if (!DebugAtThisLevel(DLevel, Module)) {
                 goto exit_function;
