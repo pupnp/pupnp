@@ -304,11 +304,8 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      Returns EINVAL if the kind is not supported.
  *      See man page for pthread_mutexattr_setkind_np
  *****************************************************************************/
-#if defined(PTHREAD_MUTEX_RECURSIVE) || defined(__DragonFly__)
-	#define ithread_mutexattr_setkind_np pthread_mutexattr_settype
-#else
-	#define ithread_mutexattr_setkind_np pthread_mutexattr_setkind_np
-#endif /* UPNP_USE_RWLOCK */
+#define ithread_mutexattr_setkind_np pthread_mutexattr_settype
+#define ithread_mutexattr_settype pthread_mutexattr_settype
 
 /****************************************************************************
  * Function: ithread_mutexattr_getkind_np
@@ -329,11 +326,8 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *      Always returns 0.
  *      See man page for pthread_mutexattr_getkind_np
  *****************************************************************************/
-#if defined(PTHREAD_MUTEX_RECURSIVE) || defined(__DragonFly__)
-	#define ithread_mutexattr_getkind_np pthread_mutexattr_gettype
-#else
-	#define ithread_mutexattr_getkind_np pthread_mutexattr_getkind_np
-#endif /* UPNP_USE_RWLOCK */
+#define ithread_mutexattr_getkind_np pthread_mutexattr_gettype
+#define ithread_mutexattr_gettype pthread_mutexattr_gettype
 
 /****************************************************************************
  * Function: ithread_mutex_init
@@ -898,15 +892,16 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
 #ifdef _WIN32
 	#define imillisleep Sleep
 #else
-#if _POSIX_C_SOURCE < 200809L
-	#define imillisleep(x) usleep(1000 * x)
-#else
-	#define imillisleep(x) \
-		do { \
-			const struct timespec req = {0, x * 1000 * 1000}; \
-			nanosleep(&req, NULL); \
-		} while(0)
-#endif
+	#if _POSIX_C_SOURCE < 200809L
+		#define imillisleep(x) usleep(1000 * x)
+	#else
+		#define imillisleep(x) \
+			do { \
+				const struct timespec req = { \
+					0, x * 1000 * 1000}; \
+				nanosleep(&req, NULL); \
+			} while (0)
+	#endif
 #endif
 
 #if !defined(PTHREAD_MUTEX_RECURSIVE) && !defined(__DragonFly__) && \
