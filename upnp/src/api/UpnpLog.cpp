@@ -7,9 +7,9 @@
 
 #include "ithread.h"
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
 
 #if linux
 #include <sys/syscall.h>
@@ -17,12 +17,12 @@
 
 UpnpLog::UpnpLog()
 : m_logLevel(UPNP_DEFAULT_LOG_LEVEL)
-, m_logFp(0)
+, m_logFp(nullptr)
 , m_logIsStderr(false)
-, m_logFileName()
-, m_logCallback(0)
+, m_logFileName(UPNP_DEFAULT_LOG_FILE)
+, m_logCallback(nullptr)
 {
-        ithread_mutex_init(&m_logMutex, NULL);
+        ithread_mutex_init(&m_logMutex, nullptr);
         InitLog();
 }
 
@@ -128,7 +128,7 @@ int UpnpLog::InitLog()
                 if (!logIsStderr()) {
                         fclose(logFp());
                 }
-                setLogFp(0);
+                setLogFp(nullptr);
         }
         setLogIsStderr(false);
         if (!logFileName().empty()) {
@@ -140,10 +140,9 @@ int UpnpLog::InitLog()
                                 fname,
                                 strerror(errno));
                 }
-        }
-        if (!logFp()) {
-                setLogFp(stderr);
-                setLogIsStderr(true);
+                if (logFileName() == "stderr") {
+                        setLogIsStderr(true);
+                }
         }
 
         return 0;
@@ -171,6 +170,9 @@ void UpnpLog::Printf(Upnp_LogLevel DLevel,
         va_list argList)
 {
         logMutexLock();
+        if (!DebugAtThisLevel(DLevel, Module)) {
+                goto exit_function;
+        }
         if (logCallback()) {
                 char *buffer;
                 int size;
@@ -178,7 +180,7 @@ void UpnpLog::Printf(Upnp_LogLevel DLevel,
                 va_copy(sizeCopy, argList);
                 va_copy(outCopy, argList);
 #ifndef _WIN32
-                size = vsnprintf(NULL, 0, fmtStr, sizeCopy) + 1;
+                size = vsnprintf(nullptr, 0, fmtStr, sizeCopy) + 1;
 #else
                 size = _vscprintf(fmtStr, argList) + 1;
 #endif
@@ -191,9 +193,6 @@ void UpnpLog::Printf(Upnp_LogLevel DLevel,
                 logCallback()(DLevel, Module, file, &line, buffer);
                 delete[] buffer;
                 va_end(outCopy);
-        }
-        if (!DebugAtThisLevel(DLevel, Module)) {
-                goto exit_function;
         }
         if (!logFp()) {
                 goto exit_function;
@@ -279,13 +278,10 @@ void UpnpSetLogLevel(UpnpLog *p, Upnp_LogLevel log_level)
 
 void UpnpCloseLog(UpnpLog *p) { p->CloseLog(); }
 
-void UpnpSetLogFileName(UpnpLog *p, const char *newgLogFileName)
+void UpnpSetLogFileName(UpnpLog *p, const char *newLogFileName)
 {
-        if (!p->logFileName().empty()) {
-                p->setLogFileName(0);
-        }
-        if (newgLogFileName && *newgLogFileName) {
-                p->setLogFileName(newgLogFileName);
+        if (newLogFileName && *newLogFileName) {
+                p->setLogFileName(newLogFileName);
         }
 }
 

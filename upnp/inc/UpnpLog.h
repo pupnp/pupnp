@@ -107,7 +107,9 @@ typedef enum Upnp_LogLevel_e
 /*!
  * Default log level : see \c Upnp_LogLevel
  */
-#define UPNP_DEFAULT_LOG_LEVEL UPNP_DEBUG
+#define UPNP_DEFAULT_LOG_LEVEL UPNP_NONE
+#define UPNP_DEFAULT_LOG_FILE "stderr"
+#define UPNP_DEFAULT_LOG_IS_STDERR true
 
 /*!
  * \brief Log callback function prototype.
@@ -256,7 +258,7 @@ EXPORT_SPEC void UpnpSetLogFileName(
         /*! Library Handle */
         UpnpLog *p,
         /*! [in] Name of the log file. */
-        const char *fileName);
+        const char *newLogFileName);
 
 /*!
  * \brief Prints the debug statement either on the standard output or log file

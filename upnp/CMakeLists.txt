@@ -16,7 +16,7 @@ set (UPNP_SOURCES
 	src/api/UpnpHttpHeaders.c
 	src/api/UpnpFileInfo.c
 	src/api/UpnpLog.cpp
-        src/api/UpnpStateVarComplete.c
+	src/api/UpnpStateVarComplete.c
 	src/api/UpnpStateVarRequest.c
 	src/api/UpnpSubscriptionRequest.c
 	src/api/UpnpString.cpp

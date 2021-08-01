@@ -4340,8 +4340,7 @@ Upnp_Handle_Type GetHandleInfo(
 {
         handle_table_t *HandleTable = UpnpLib_getnc_HandleTable(p);
         Upnp_Handle_Type ret = HND_INVALID;
-        // Upnp_LogLevel logLevel = UPNP_DEBUG;
-        Upnp_LogLevel logLevel = UPNP_NONE;
+        Upnp_LogLevel logLevel = UPNP_DEBUG;
 
         UpnpPrintf(UpnpLib_get_Log(p),
                 logLevel,
