@@ -124,13 +124,15 @@ dnl # "current:revision:age"
 dnl #
 dnl # - Code has changed in upnp
 dnl #   revision: 7 -> 8
+dnl # - interfaces added in upnp
+dnl #   age: 0 -> 1
 dnl #
 dnl #AC_SUBST([LT_VERSION_IXML],       [11:1:0])
-dnl #AC_SUBST([LT_VERSION_UPNP],       [17:7:0])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [17:8:1])
 dnl #
 dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [11:1:0])
-AC_SUBST([LT_VERSION_UPNP],       [17:8:0])
+AC_SUBST([LT_VERSION_UPNP],       [17:8:1])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
