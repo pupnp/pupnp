@@ -140,7 +140,7 @@ endif()
 set_target_properties (upnp_shared PROPERTIES
 	OUTPUT_NAME upnp
 	EXPORT_NAME UPNP::Shared
-	VERSION ${UPNP_VERSION}
+	VERSION ${UPNP_SOMAJOR}
 	SOVERSION ${UPNP_VERSION_MAJOR}
 	PUBLIC_HEADER "${UPNP_HEADERS}"
 )
@@ -213,6 +213,7 @@ endif()
 set_target_properties (upnp_static PROPERTIES
 	OUTPUT_NAME upnp${STATIC_POSTFIX}
 	EXPORT_NAME UPNP::Static
+	VERSION ${UPNP_SOMAJOR}
 )
 
 target_link_libraries (upnp_static
