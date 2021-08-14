@@ -43,7 +43,7 @@ list (APPEND IXML_HEADERS
 set_target_properties (ixml_shared PROPERTIES
 	OUTPUT_NAME ixml
 	EXPORT_NAME IXML::Shared
-	VERSION ${IXML_VERSION}
+	VERSION ${IXML_SOMAJOR}
 	SOVERSION ${IXML_VERSION_MAJOR}
 	PUBLIC_HEADER "${IXML_HEADERS}"
 )
@@ -64,6 +64,7 @@ add_library (IXML::Static ALIAS ixml_static)
 set_target_properties (ixml_static PROPERTIES
 	OUTPUT_NAME ixml${STATIC_POSTFIX}
 	EXPORT_NAME IXML::Static
+	VERSION ${IXML_SOMAJOR}
 )
 
 target_compile_definitions (ixml_static
