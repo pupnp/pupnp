@@ -158,12 +158,16 @@ dnl # "current:revision:age"
 dnl #
 dnl # - Code has changed in upnp
 dnl #   revision: 1 -> 2
+dnl # - Fix for cmake soname bump in ixml
+dnl #   current: 11 -> 12
+dnl #   age: 0 -> 1
+dnl #   revision: 1 -> 1
 dnl #
-dnl #AC_SUBST([LT_VERSION_IXML],       [11:1:0])
+dnl #AC_SUBST([LT_VERSION_IXML],       [12:1:1])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [18:2:1])
 dnl #
 dnl ############################################################################
-AC_SUBST([LT_VERSION_IXML],       [11:1:0])
+AC_SUBST([LT_VERSION_IXML],       [12:1:1])
 AC_SUBST([LT_VERSION_UPNP],       [18:2:1])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
