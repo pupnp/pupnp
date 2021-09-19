@@ -11,10 +11,6 @@ include (cmake/test-functions.cmake)
 include (cmake/autoheader.cmake)
 
 project (PUPNP VERSION ${PUPNP_VERSION_STRING})
-set (UPNP_VERSION_MAJOR ${PUPNP_VERSION_MAJOR})
-set (UPNP_VERSION_MINOR ${PUPNP_VERSION_MINOR})
-set (UPNP_VERSION_PATCH ${PUPNP_VERSION_PATCH})
-set (UPNP_VERSION_STRING ${PUPNP_VERSION_STRING})
 
 include (GNUInstallDirs)
 
