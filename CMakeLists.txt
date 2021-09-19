@@ -372,7 +372,7 @@ configure_package_config_file (
 )
 
 write_basic_package_version_file (IXMLConfigVersion.cmake
-	VERSION ${PUPNP_VERSION}
+	VERSION ${IXML_VERSION_STRING}
 	COMPATIBILITY SameMajorVersion
 )
 
@@ -382,7 +382,7 @@ configure_package_config_file (
 )
 
 write_basic_package_version_file (UPNPConfigVersion.cmake
-	VERSION ${PUPNP_VERSION}
+	VERSION ${UPNP_VERSION_STRING}
 	COMPATIBILITY SameMajorVersion
 )
 
