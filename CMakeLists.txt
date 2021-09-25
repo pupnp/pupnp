@@ -468,7 +468,7 @@ install (FILES
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP/
 )
 
-set (VERSION ${UPNP_VERSION_STRING})
+set (VERSION ${PUPNP_VERSION_STRING})
 set (prefix ${CMAKE_INSTALL_PREFIX})
 set (exec_prefix "\${prefix}")
 set (libdir "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")
