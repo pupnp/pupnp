@@ -46,6 +46,12 @@ if (NOT PUPNP_VERSION_STRING)
 						file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine01 ${SAVED_MATCH}\n\n")
 					else()
 						file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine ${SAVED_MATCH} \$\{${SAVED_MATCH}\}\n\n")
+
+						if (SAVED_MATCH STREQUAL "UPNP_VERSION_MINOR" OR SAVED_MATCH STREQUAL "UPNP_VERSION_PATCH")
+							file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#ifndef ${SAVED_MATCH}\n")
+							file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#       define ${SAVED_MATCH} 0\n")
+							file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#endif\n\n")
+						endif()
 					endif()
 				endif()
 
@@ -61,24 +67,24 @@ if (NOT PUPNP_VERSION_STRING)
  				list (APPEND WRITTEN_VARS ${CMAKE_MATCH_1})
 			elseif (line MATCHES "^AC_SUBST.*LT_VERSION_IXML, ([0-9]*):([0-9]*):([0-9]*).*")
 				math (EXPR IXML_MAJ "${CMAKE_MATCH_1} - ${CMAKE_MATCH_3}")
-				set (IXML_SOMAJOR ${IXML_MAJ} CACHE STRING "Major version of ixml" FORCE)
-				set (IXML_SOVERSION ${IXML_MAJ}.${CMAKE_MATCH_3}.${CMAKE_MATCH_2} CACHE STRING "Version of libixml" FORCE)
-				message (STATUS "Setting ixml-soversion to ${IXML_SOVERSION}")
+				set (IXML_VERSION_MAJOR ${IXML_MAJ} CACHE STRING "Major version of ixml" FORCE)
+				set (IXML_VERSION_MINOR ${CMAKE_MATCH_3} CACHE STRING "Minor version of ixml" FORCE)
+				set (IXML_VERSION_PATCH ${CMAKE_MATCH_2} CACHE STRING "Patch version of ixml" FORCE)
+				set (IXML_VERSION_STRING ${IXML_MAJ}.${CMAKE_MATCH_3}.${CMAKE_MATCH_2} CACHE STRING "Version of libixml" FORCE)
+				message (STATUS "Setting ixml-soversion to ${IXML_VERSION_STRING}")
 			elseif (line MATCHES "^AC_SUBST.*LT_VERSION_UPNP, ([0-9]*):([0-9]*):([0-9]*).*")
 				math (EXPR UPNP_MAJ "${CMAKE_MATCH_1} - ${CMAKE_MATCH_3}")
-				set (UPNP_SOMAJOR ${UPNP_MAJ} CACHE STRING "Major version of upnp" FORCE)
-				set (UPNP_SOVERSION ${UPNP_MAJ}.${CMAKE_MATCH_3}.${CMAKE_MATCH_2} CACHE STRING "Version of libupnp" FORCE)
-				message (STATUS "Setting upnp-soversion to ${UPNP_SOVERSION}")
+				set (UPNP_VERSION_MAJOR ${UPNP_MAJ} CACHE STRING "Major version of upnp" FORCE)
+				set (UPNP_VERSION_MINOR ${CMAKE_MATCH_3} CACHE STRING "Minor version of upnp" FORCE)
+				set (UPNP_VERSION_PATCH ${CMAKE_MATCH_2} CACHE STRING "Patch version of upnp" FORCE)
+				set (UPNP_VERSION_STRING ${UPNP_MAJ}.${CMAKE_MATCH_3}.${CMAKE_MATCH_2} CACHE STRING "Version of libupnp" FORCE)
+				message (STATUS "Setting upnp-soversion to ${UPNP_VERSION_STRING}")
 			endif()
 		endforeach()
 	endforeach()
 endif()
 
 project (PUPNP VERSION ${PUPNP_VERSION_STRING} LANGUAGES C)
-set (UPNP_VERSION_MAJOR ${PUPNP_VERSION_MAJOR})
-set (UPNP_VERSION_MINOR ${PUPNP_VERSION_MINOR})
-set (UPNP_VERSION_PATCH ${PUPNP_VERSION_PATCH})
-set (UPNP_VERSION_STRING ${PUPNP_VERSION_STRING})
 
 include (GNUInstallDirs)
 
@@ -434,7 +440,7 @@ configure_package_config_file (
 )
 
 write_basic_package_version_file (IXMLConfigVersion.cmake
-	VERSION ${IXML_VERSION}
+	VERSION ${IXML_VERSION_STRING}
 	COMPATIBILITY SameMajorVersion
 )
 
@@ -444,7 +450,7 @@ configure_package_config_file (
 )
 
 write_basic_package_version_file (UPNPConfigVersion.cmake
-	VERSION ${UPNP_VERSION}
+	VERSION ${UPNP_VERSION_STRING}
 	COMPATIBILITY SameMajorVersion
 )
 
