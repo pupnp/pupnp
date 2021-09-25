@@ -39,19 +39,21 @@ if (NOT PUPNP_VERSION_STRING)
 				string (STRIP ${CMAKE_MATCH_3} ${CMAKE_MATCH_3})
 				file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "/* ${CMAKE_MATCH_3} */\n")
 
-				if (FIRSTCHAR STREQUAL "\"")
-					file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine ${CMAKE_MATCH_1} \"\$\{${CMAKE_MATCH_1}\}\"\n\n")
+				if (FIRSTCHAR STREQUAL "\"") #Should only trigger on UPNP_VERSION_STRING
+					file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine ${CMAKE_MATCH_1} \"\$\{P${CMAKE_MATCH_1}\}\"\n\n")
 				else()
-					if (${CMAKE_MATCH_1} MATCHES VERSION AND NOT ${${CMAKE_MATCH_1}})
-						file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine01 ${SAVED_MATCH}\n\n")
-					else()
-						file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine ${SAVED_MATCH} \$\{${SAVED_MATCH}\}\n\n")
+					string (SUBSTRING ${SAVED_MATCH} 0 1 FIRSTCHAR)
+
+					if (FIRSTCHAR STREQUAL "U") #Should trigger only on UPNP_VERSION*
+						file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine ${SAVED_MATCH} \$\{P${SAVED_MATCH}\}\n\n")
 
 						if (SAVED_MATCH STREQUAL "UPNP_VERSION_MINOR" OR SAVED_MATCH STREQUAL "UPNP_VERSION_PATCH")
 							file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#ifndef ${SAVED_MATCH}\n")
 							file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#       define ${SAVED_MATCH} 0\n")
 							file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#endif\n\n")
 						endif()
+					else()
+						file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine ${SAVED_MATCH} \$\{${SAVED_MATCH}\}\n\n")
 					endif()
 				endif()
 
@@ -440,7 +442,7 @@ configure_package_config_file (
 )
 
 write_basic_package_version_file (IXMLConfigVersion.cmake
-	VERSION ${IXML_VERSION_STRING}
+	VERSION ${PUPNP_VERSION_STRING}
 	COMPATIBILITY SameMajorVersion
 )
 
@@ -450,7 +452,7 @@ configure_package_config_file (
 )
 
 write_basic_package_version_file (UPNPConfigVersion.cmake
-	VERSION ${UPNP_VERSION_STRING}
+	VERSION ${PUPNP_VERSION_STRING}
 	COMPATIBILITY SameMajorVersion
 )
 
