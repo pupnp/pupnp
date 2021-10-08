@@ -75,7 +75,6 @@ This is a list of some of the projects and products that are based on the SDK fo
 - [aMule](http://www.amule.org) has libupnp support to perform port forwarding.
 - [Gerbera](https://gerbera.io) UPnP&trade; media server.
 - [libmcupnp](http://sourceforge.net/projects/libmcupnp) is a Free UPnP(v1) library for easy "MediaServer:1 Client" implementations. The library is built on top of libupnp.
-- [HD Network DVD Media Player](http://www.z500series.com)
 - [eMule Morph](http://emulemorph.sourceforge.net) uses libupnp to forward ports automatically.
 - [PeerStream Audio Video Server](http://www.peerstream.net).
 - [GeeXboX uShare&trade;](https://github.com/ddugovic/uShare) A/V media server.
