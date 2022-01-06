@@ -26,6 +26,8 @@ target_compile_definitions (ixml_shared
 	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
 	PUBLIC $<$<BOOL:${MSVC}>:LIBUPNP_EXPORTS>
+	PUBLIC $<$<BOOL:${UPNP_LARGEFILE_SENSITIVE}>:_LARGE_FILES>
+	PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64>
 )
 
 target_include_directories (ixml_shared
@@ -73,6 +75,8 @@ target_compile_definitions (ixml_static
 	PUBLIC UPNP_STATIC_LIB
 	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
 	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	PUBLIC $<$<BOOL:${UPNP_LARGEFILE_SENSITIVE}>:_LARGE_FILES>
+	PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64> 
 )
 
 if (script_support)
