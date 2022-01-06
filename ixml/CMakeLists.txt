@@ -28,6 +28,8 @@ if (UPNP_BUILD_SHARED)
 		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 		PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
 		PUBLIC $<$<BOOL:${MSVC}>:LIBUPNP_EXPORTS>
+		PUBLIC $<$<BOOL:${UPNP_LARGEFILE_SENSITIVE}>:_LARGE_FILES>
+		PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64> # A bit hacky, either it is defined to 64 or not defined at all, everything other than 0 is true
 	)
 
 	target_include_directories (ixml_shared
@@ -99,6 +101,8 @@ if (UPNP_BUILD_STATIC)
 		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
 		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
 		PUBLIC $<BUILD_INTERFACE:${PUPNP_SOURCE_DIR}/upnp/inc/>
+		PUBLIC $<$<BOOL:${UPNP_LARGEFILE_SENSITIVE}>:_LARGE_FILES>
+		PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64> # A bit hacky, either it is defined to 64 or not defined at all, everything other than 0 is true
 	)
 
 	install (TARGETS ixml_static
