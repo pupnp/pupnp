@@ -283,15 +283,15 @@ endif()
 #
 # Checks for large-file-sensitivity
 #
-if (NOT OFF_T_SIZE)
+if (NOT HAVE_OFF_T_SIZE)
 	check_type_size (off_t OFF_T_SIZE)
 	set (UPNP_LARGEFILE_SENSITIVE FALSE CACHE BOOL "whether the system defaults to 32bit off_t but can do 64bit when requested" FORCE)
 
 	if (OFF_T_SIZE EQUAL 8)
 		message (STATUS "System uses 64 bit, no flags needed")
 	else()
-		unset (OFF_T_SIZE CACHE)
-		set (CMAKE_REQUIRED_DEFINITIONS _FILE_OFFSET_BITS=64)
+		unset (HAVE_OFF_T_SIZE CACHE)
+		set (CMAKE_REQUIRED_DEFINITIONS -D_FILE_OFFSET_BITS=64)
 		check_type_size (off_t OFF_T_SIZE)
 
 		if (OFF_T_SIZE EQUAL 8)
@@ -299,8 +299,8 @@ if (NOT OFF_T_SIZE)
 			set (UPNP_LARGEFILE_SENSITIVE TRUE CACHE BOOL "whether the system defaults to 32bit off_t but can do 64bit when requested" FORCE)
 			set (_FILE_OFFSET_BITS 64 CACHE BOOL "Number of bits in a file offset, on hosts where this is settable" FORCE)
 		else()
-			unset (OFF_T_SIZE CACHE)
-			set (CMAKE_REQUIRED_DEFINITIONS _LARGE_FILES)
+			unset (HAVE_OFF_T_SIZE CACHE)
+			set (CMAKE_REQUIRED_DEFINITIONS -D_LARGE_FILES)
 			check_type_size (off_t OFF_T_SIZE)
 
 			if (OFF_T_SIZE EQUAL 8)
