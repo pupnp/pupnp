@@ -326,6 +326,9 @@ static int dispatch_request(
         host_port[min_size] = 0;
         if (host_validate_callback) {
                 rc = host_validate_callback(host_port, cookie);
+                if (rc == UPNP_E_BAD_HTTPMSG) {
+                        goto ExitFunction;
+                }
         } else if (!host_header_is_numeric(p, host_port, min_size)) {
                 int allowLiteralHostRedirection =
                         UpnpLib_get_allowLiteralHostRedirection(p);
