@@ -275,7 +275,7 @@ endif()
 #
 # Checks for POSIX Threads
 #
-if (NOT WIN32)
+if (NOT MSVC)
 	set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 	include (FindThreads)
 	if (NOT DOWNLOAD_AND_BUILD_DEPS)
