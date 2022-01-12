@@ -90,7 +90,8 @@ project (PUPNP VERSION ${PUPNP_VERSION_STRING} LANGUAGES C)
 
 include (GNUInstallDirs)
 
-if (WIN32)
+# Only set library postfix with MSVC toolchain
+if (MSVC)
 	set (CMAKE_DEBUG_POSTFIX d)
 	set (STATIC_POSTFIX s)
 endif()
