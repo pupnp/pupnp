@@ -64,7 +64,7 @@
  * Large file support
  ***************************************************************************/
 
-#cmakedefine UPNP_LARGEFILE_SENSITIVE
+#cmakedefine UPNP_LARGEFILE_SENSITIVE 1
 
 /***************************************************************************
  * Library optional features
