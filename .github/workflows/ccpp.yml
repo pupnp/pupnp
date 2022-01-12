@@ -50,8 +50,8 @@ jobs:
           cd ..
       - name: Debug output
         run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
-  # Windows builds
-  windows:
+  # Windows Visual Studio builds
+  windows-msvc:
     name: Build (${{ matrix.os }})  - ${{ matrix.conf }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -79,6 +79,36 @@ jobs:
           cd ..
       - name: Debug output
         run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
+  # Windows msys2 builds
+  windows-msys2:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        conf: [Debug, Release]
+        msystem: [MINGW64, MINGW32]
+    name: Build (${{ matrix.msystem }}) - ${{ matrix.conf }}
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          update: true
+          pacboy: cc:p cmake:p ninja:p
+      - name: Configure
+        run: >
+          cmake
+          -S .
+          -B build
+          -DCMAKE_BUILD_TYPE=${{ matrix.conf }}
+          -DBUILD_TESTING=ON
+          -DDOWNLOAD_AND_BUILD_DEPS=ON
+          ${{ env.cmake_extra_flags }}
+      - name: Build
+        run: cmake --build build
   # Linux sanitizer builds
   build_asan:
     name: Sanitizer build (ubuntu-20.04) - ${{ matrix.tool }}
