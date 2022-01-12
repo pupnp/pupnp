@@ -2,6 +2,11 @@ if (BUILD_TESTING)
 	add_subdirectory (test)
 endif()
 
+# Only set library prefix with MSVC toolchain
+if (MSVC)
+	set (WIN_PREFIX "lib")
+endif()
+
 if (samples)
 	add_subdirectory (sample)
 endif()
