@@ -1,4 +1,4 @@
-if (WIN32)
+if (MSVC)
 	set (TEST_ENV "PATH=$<TARGET_FILE_DIR:upnp_shared>\;$<TARGET_FILE_DIR:ixml_shared>\;")
 	string (APPEND TEST_ENV "$<TARGET_FILE_DIR:Threads::Threads>\;")
 	string (APPEND TEST_ENV "%PATH%")
