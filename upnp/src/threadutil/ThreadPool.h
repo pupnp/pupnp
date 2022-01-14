@@ -43,6 +43,7 @@
 #include "UpnpInet.h"
 
 #include <errno.h>
+#include <pthread.h>
 
 #ifdef _WIN32
 #include <time.h>
