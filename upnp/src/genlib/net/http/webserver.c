@@ -50,8 +50,8 @@
 #include "document_type.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
-#include "ithread.h"
 #include "membuffer.h"
+#include "pthread.h"
 #include "ssdplib.h"
 #include "statcodes.h"
 #include "strintmap.h"
@@ -375,11 +375,11 @@ static void alias_grab(
 {
         xml_alias_t *gAliasDoc = UpnpLib_getnc_gAliasDoc(p);
 
-        ithread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
+        pthread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
         assert(is_valid_alias(gAliasDoc));
         memcpy(alias, gAliasDoc, sizeof(xml_alias_t));
         *alias->ct = *alias->ct + 1;
-        ithread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
+        pthread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
 }
 
 /*!
@@ -392,10 +392,10 @@ static void alias_release(
         /*! [in] XML alias object. */
         xml_alias_t *alias)
 {
-        ithread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
+        pthread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
         /* ignore invalid alias */
         if (!is_valid_alias(alias)) {
-                ithread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
+                pthread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
                 return;
         }
         assert(*alias->ct > 0);
@@ -405,7 +405,7 @@ static void alias_release(
                 membuffer_destroy(&alias->name);
                 free(alias->ct);
         }
-        ithread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
+        pthread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
 }
 
 int web_server_set_alias(UpnpLib *p,
@@ -443,9 +443,9 @@ int web_server_set_alias(UpnpLib *p,
                         alias_content_length);
                 alias.last_modified = last_modified;
                 /* save in module var */
-                ithread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
+                pthread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
                 *gAliasDoc = alias;
-                ithread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
+                pthread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
 
                 return 0;
         } while (0);
@@ -478,7 +478,7 @@ int web_server_init(UpnpLib *p)
                 vdcb->seek = NULL;
                 vdcb->close = NULL;
 
-                if (ithread_mutex_init(UpnpLib_getnc_gWebMutex(p), NULL) ==
+                if (pthread_mutex_init(UpnpLib_getnc_gWebMutex(p), NULL) ==
                         -1) {
                         ret = UPNP_E_OUTOF_MEMORY;
                 } else {
@@ -498,11 +498,11 @@ void web_server_destroy(UpnpLib *p)
                 membuffer_destroy(gDocumentRootDir);
                 alias_release(p, gAliasDoc);
 
-                ithread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
+                pthread_mutex_lock(UpnpLib_getnc_gWebMutex(p));
                 memset(gAliasDoc, 0, sizeof(xml_alias_t));
-                ithread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
+                pthread_mutex_unlock(UpnpLib_getnc_gWebMutex(p));
 
-                ithread_mutex_destroy(UpnpLib_getnc_gWebMutex(p));
+                pthread_mutex_destroy(UpnpLib_getnc_gWebMutex(p));
                 UpnpLib_set_bWebServerState(p, WEB_SERVER_DISABLED);
         }
 }

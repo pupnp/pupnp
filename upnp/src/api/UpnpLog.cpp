@@ -5,7 +5,7 @@
 
 #include "UpnpLog.h"
 
-#include "ithread.h"
+#include "pthread.h"
 
 #include <cerrno>
 #include <cstdio>
@@ -22,11 +22,11 @@ UpnpLog::UpnpLog()
 , m_logFileName(UPNP_DEFAULT_LOG_FILE)
 , m_logCallback(nullptr)
 {
-        ithread_mutex_init(&m_logMutex, nullptr);
+        pthread_mutex_init(&m_logMutex, nullptr);
         InitLog();
 }
 
-UpnpLog::~UpnpLog() { ithread_mutex_destroy(&m_logMutex); }
+UpnpLog::~UpnpLog() { pthread_mutex_destroy(&m_logMutex); }
 
 int UpnpLog::DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module)
 {
@@ -101,12 +101,12 @@ void UpnpLog::DisplayFileAndLine(
                 UpnpLogLevelToStr(DLevel),
                 smod,
 #ifdef __PTW32_DLLPORT
-                (unsigned long int)ithread_self().p
+                (unsigned long int)pthread_self().p
 #else
 #if linux
                 (unsigned long int)syscall(SYS_gettid)
 #else
-                (unsigned long int)ithread_self()
+                (unsigned long int)pthread_self()
 #endif
 #endif
                 ,

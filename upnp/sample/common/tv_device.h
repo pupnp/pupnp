@@ -51,7 +51,7 @@
 extern "C" {
 #endif
 
-#include "ithread.h"
+#include "pthread.h"
 #include "sample_util.h"
 #include "upnp.h"
 
@@ -186,7 +186,7 @@ extern UpnpDevice_Handle device_handle;
  * in a multi-threaded, asynchronous environment.
  * All functions should lock this mutex before reading
  * or writing the state table data. */
-extern ithread_mutex_t TVDevMutex;
+extern pthread_mutex_t TVDevMutex;
 
 /*!
  * \brief Initializes the action table for the specified service.

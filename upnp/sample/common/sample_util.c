@@ -57,21 +57,22 @@ print_string gPrintFun = NULL;
 state_update gStateUpdateFun = NULL;
 
 /*! mutex to control displaying of events */
-ithread_mutex_t display_mutex;
+pthread_mutex_t display_mutex;
 
 int SampleUtil_Initialize(print_string print_function)
 {
         if (initialize_init) {
-                ithread_mutexattr_t attr;
+                pthread_mutexattr_t attr;
 
-                ithread_mutexattr_init(&attr);
-                ithread_mutexattr_setkind_np(&attr, ITHREAD_MUTEX_RECURSIVE_NP);
-                ithread_mutex_init(&display_mutex, &attr);
-                ithread_mutexattr_destroy(&attr);
+                pthread_mutexattr_init(&attr);
+                pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+                pthread_mutex_init(&display_mutex, &attr);
+                pthread_mutexattr_destroy(&attr);
                 /* To shut up valgrind mutex warning. */
-                ithread_mutex_lock(&display_mutex);
+                pthread_mutex_lock(&display_mutex);
                 gPrintFun = print_function;
-                ithread_mutex_unlock(&display_mutex);
+                pthread_mutex_unlock(&display_mutex);
+
                 /* Finished initializing. */
                 initialize_init = 0;
         }
@@ -91,7 +92,7 @@ int SampleUtil_RegisterUpdateFunction(state_update update_function)
 
 int SampleUtil_Finish()
 {
-        ithread_mutex_destroy(&display_mutex);
+        pthread_mutex_destroy(&display_mutex);
         gPrintFun = NULL;
         gStateUpdateFun = NULL;
         initialize_init = 1;
@@ -344,7 +345,7 @@ void SampleUtil_PrintEventType(Upnp_EventType S)
 
 int SampleUtil_PrintEvent(Upnp_EventType EventType, const void *Event)
 {
-        ithread_mutex_lock(&display_mutex);
+        pthread_mutex_lock(&display_mutex);
 
         SampleUtil_Print("====================================================="
                          "=================\n"
@@ -593,7 +594,7 @@ int SampleUtil_PrintEvent(Upnp_EventType EventType, const void *Event)
                          "=================\n"
                          "\n\n\n");
 
-        ithread_mutex_unlock(&display_mutex);
+        pthread_mutex_unlock(&display_mutex);
 
         return 0;
 }
@@ -698,7 +699,7 @@ int SampleUtil_Print(const char *fmt, ...)
         int rc;
 
         /* Protect both the display and the static buffer with the mutex */
-        ithread_mutex_lock(&display_mutex);
+        pthread_mutex_lock(&display_mutex);
 
         va_start(ap, fmt);
         rc = vsnprintf(buf, MAX_BUF, fmt, ap);
@@ -706,7 +707,7 @@ int SampleUtil_Print(const char *fmt, ...)
         if (gPrintFun)
                 gPrintFun("%s", buf);
 
-        ithread_mutex_unlock(&display_mutex);
+        pthread_mutex_unlock(&display_mutex);
 
         return rc;
 }

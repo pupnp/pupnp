@@ -41,7 +41,6 @@
 #include "LinkedList.h"
 #include "UpnpGlobal.h" /* for UPNP_INLINE, EXPORT_SPEC */
 #include "UpnpInet.h"
-#include "ithread.h"
 
 #include <errno.h>
 
@@ -163,6 +162,9 @@ typedef struct THREADPOOLATTR
         PolicyType schedPolicy;
 } ThreadPoolAttr;
 
+typedef struct s_UpnpLib UpnpLib;
+typedef void (*start_routine)(UpnpLib *p, void *arg);
+
 /*! Internal ThreadPool Job. */
 typedef struct THREADPOOLJOB
 {
@@ -218,11 +220,11 @@ typedef struct THREADPOOL
         /*! Library handle. */
         void *upnp_lib;
         /*! Mutex to protect job qs. */
-        ithread_mutex_t mutex;
+        pthread_mutex_t mutex;
         /*! Condition variable to signal Q. */
-        ithread_cond_t condition;
+        pthread_cond_t condition;
         /*! Condition variable for start and stop. */
-        ithread_cond_t start_and_shutdown;
+        pthread_cond_t start_and_shutdown;
         /*! ids for jobs */
         int lastJobId;
         /*! whether or not we are shutting down */

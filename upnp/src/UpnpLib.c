@@ -19,10 +19,10 @@ struct s_UpnpLib
 {
         struct VirtualDirCallbacks m_virtualDirCallback;
         virtualDirList *m_pVirtualDirList;
-        ithread_mutex_t m_GlobalClientSubscribeMutex;
-        ithread_rwlock_t m_GlobalHndRWLock;
-        ithread_mutex_t m_gUUIDMutex;
-        ithread_mutex_t m_gSDKInitMutex;
+        pthread_mutex_t m_GlobalClientSubscribeMutex;
+        pthread_rwlock_t m_GlobalHndRWLock;
+        pthread_mutex_t m_gUUIDMutex;
+        pthread_mutex_t m_gSDKInitMutex;
         TimerThread m_gTimerThread;
         ThreadPool m_gSendThreadPool;
         ThreadPool m_gRecvThreadPool;
@@ -45,7 +45,7 @@ struct s_UpnpLib
         handle_table_t m_HandleTable;
         doc_type_array_t m_gMediaTypeArray;
         xml_alias_t m_gAliasDoc;
-        ithread_mutex_t m_gWebMutex;
+        pthread_mutex_t m_gWebMutex;
         membuffer m_gDocumentRootDir;
         size_t m_g_maxContentLength;
         int m_g_UpnpSdkEQMaxLen;
@@ -74,7 +74,7 @@ UpnpLib *UpnpLib_new()
         /*p->m_pVirtualDirList = 0;*/
         pthread_mutex_init(&p->m_GlobalClientSubscribeMutex, 0);
         ;
-        /* memset(&p->m_GlobalHndRWLock, 0, sizeof (ithread_rwlock_t)); */
+        /* memset(&p->m_GlobalHndRWLock, 0, sizeof (pthread_rwlock_t)); */
         pthread_mutex_init(&p->m_gUUIDMutex, 0);
         ;
         pthread_mutex_init(&p->m_gSDKInitMutex, 0);
@@ -142,7 +142,7 @@ void UpnpLib_delete(UpnpLib *q)
         p->m_g_UpnpSdkEQMaxLen = 0;
         p->m_g_maxContentLength = 0;
         memset(&p->m_gDocumentRootDir, 0, sizeof(membuffer));
-        memset(&p->m_gWebMutex, 0, sizeof(ithread_mutex_t));
+        memset(&p->m_gWebMutex, 0, sizeof(pthread_mutex_t));
         memset(&p->m_gAliasDoc, 0, sizeof(xml_alias_t));
         memset(&p->m_gMediaTypeArray, 0, sizeof(doc_type_array_t));
         memset(&p->m_HandleTable, 0, sizeof(handle_table_t));
@@ -170,10 +170,10 @@ void UpnpLib_delete(UpnpLib *q)
         memset(&p->m_gRecvThreadPool, 0, sizeof(ThreadPool));
         memset(&p->m_gSendThreadPool, 0, sizeof(ThreadPool));
         memset(&p->m_gTimerThread, 0, sizeof(TimerThread));
-        memset(&p->m_gSDKInitMutex, 0, sizeof(ithread_mutex_t));
-        memset(&p->m_gUUIDMutex, 0, sizeof(ithread_mutex_t));
-        memset(&p->m_GlobalHndRWLock, 0, sizeof(ithread_rwlock_t));
-        memset(&p->m_GlobalClientSubscribeMutex, 0, sizeof(ithread_mutex_t));
+        memset(&p->m_gSDKInitMutex, 0, sizeof(pthread_mutex_t));
+        memset(&p->m_gUUIDMutex, 0, sizeof(pthread_mutex_t));
+        memset(&p->m_GlobalHndRWLock, 0, sizeof(pthread_rwlock_t));
+        memset(&p->m_GlobalClientSubscribeMutex, 0, sizeof(pthread_mutex_t));
         p->m_pVirtualDirList = 0;
         memset(&p->m_virtualDirCallback, 0, sizeof(struct VirtualDirCallbacks));
 
@@ -341,18 +341,18 @@ int UpnpLib_set_pVirtualDirList(UpnpLib *p, virtualDirList *n)
         return 1;
 }
 
-const ithread_mutex_t *UpnpLib_get_GlobalClientSubscribeMutex(const UpnpLib *p)
+const pthread_mutex_t *UpnpLib_get_GlobalClientSubscribeMutex(const UpnpLib *p)
 {
         return &p->m_GlobalClientSubscribeMutex;
 }
 
-ithread_mutex_t *UpnpLib_getnc_GlobalClientSubscribeMutex(UpnpLib *p)
+pthread_mutex_t *UpnpLib_getnc_GlobalClientSubscribeMutex(UpnpLib *p)
 {
         return &p->m_GlobalClientSubscribeMutex;
 }
 
 int UpnpLib_set_GlobalClientSubscribeMutex(
-        UpnpLib *p, const ithread_mutex_t *buf)
+        UpnpLib *p, const pthread_mutex_t *buf)
 {
         p->m_GlobalClientSubscribeMutex = *buf;
 
@@ -361,20 +361,20 @@ int UpnpLib_set_GlobalClientSubscribeMutex(
 
 void UpnpLib_clear_GlobalClientSubscribeMutex(UpnpLib *p)
 {
-        memset(&p->m_GlobalClientSubscribeMutex, 0, sizeof(ithread_mutex_t));
+        memset(&p->m_GlobalClientSubscribeMutex, 0, sizeof(pthread_mutex_t));
 }
 
-const ithread_rwlock_t *UpnpLib_get_GlobalHndRWLock(const UpnpLib *p)
+const pthread_rwlock_t *UpnpLib_get_GlobalHndRWLock(const UpnpLib *p)
 {
         return &p->m_GlobalHndRWLock;
 }
 
-ithread_rwlock_t *UpnpLib_getnc_GlobalHndRWLock(UpnpLib *p)
+pthread_rwlock_t *UpnpLib_getnc_GlobalHndRWLock(UpnpLib *p)
 {
         return &p->m_GlobalHndRWLock;
 }
 
-int UpnpLib_set_GlobalHndRWLock(UpnpLib *p, const ithread_rwlock_t *buf)
+int UpnpLib_set_GlobalHndRWLock(UpnpLib *p, const pthread_rwlock_t *buf)
 {
         p->m_GlobalHndRWLock = *buf;
 
@@ -383,20 +383,20 @@ int UpnpLib_set_GlobalHndRWLock(UpnpLib *p, const ithread_rwlock_t *buf)
 
 void UpnpLib_clear_GlobalHndRWLock(UpnpLib *p)
 {
-        memset(&p->m_GlobalHndRWLock, 0, sizeof(ithread_rwlock_t));
+        memset(&p->m_GlobalHndRWLock, 0, sizeof(pthread_rwlock_t));
 }
 
-const ithread_mutex_t *UpnpLib_get_gUUIDMutex(const UpnpLib *p)
+const pthread_mutex_t *UpnpLib_get_gUUIDMutex(const UpnpLib *p)
 {
         return &p->m_gUUIDMutex;
 }
 
-ithread_mutex_t *UpnpLib_getnc_gUUIDMutex(UpnpLib *p)
+pthread_mutex_t *UpnpLib_getnc_gUUIDMutex(UpnpLib *p)
 {
         return &p->m_gUUIDMutex;
 }
 
-int UpnpLib_set_gUUIDMutex(UpnpLib *p, const ithread_mutex_t *buf)
+int UpnpLib_set_gUUIDMutex(UpnpLib *p, const pthread_mutex_t *buf)
 {
         p->m_gUUIDMutex = *buf;
 
@@ -405,20 +405,20 @@ int UpnpLib_set_gUUIDMutex(UpnpLib *p, const ithread_mutex_t *buf)
 
 void UpnpLib_clear_gUUIDMutex(UpnpLib *p)
 {
-        memset(&p->m_gUUIDMutex, 0, sizeof(ithread_mutex_t));
+        memset(&p->m_gUUIDMutex, 0, sizeof(pthread_mutex_t));
 }
 
-const ithread_mutex_t *UpnpLib_get_gSDKInitMutex(const UpnpLib *p)
+const pthread_mutex_t *UpnpLib_get_gSDKInitMutex(const UpnpLib *p)
 {
         return &p->m_gSDKInitMutex;
 }
 
-ithread_mutex_t *UpnpLib_getnc_gSDKInitMutex(UpnpLib *p)
+pthread_mutex_t *UpnpLib_getnc_gSDKInitMutex(UpnpLib *p)
 {
         return &p->m_gSDKInitMutex;
 }
 
-int UpnpLib_set_gSDKInitMutex(UpnpLib *p, const ithread_mutex_t *buf)
+int UpnpLib_set_gSDKInitMutex(UpnpLib *p, const pthread_mutex_t *buf)
 {
         p->m_gSDKInitMutex = *buf;
 
@@ -427,7 +427,7 @@ int UpnpLib_set_gSDKInitMutex(UpnpLib *p, const ithread_mutex_t *buf)
 
 void UpnpLib_clear_gSDKInitMutex(UpnpLib *p)
 {
-        memset(&p->m_gSDKInitMutex, 0, sizeof(ithread_mutex_t));
+        memset(&p->m_gSDKInitMutex, 0, sizeof(pthread_mutex_t));
 }
 
 const TimerThread *UpnpLib_get_gTimerThread(const UpnpLib *p)
@@ -874,14 +874,14 @@ void UpnpLib_clear_gAliasDoc(UpnpLib *p)
         memset(&p->m_gAliasDoc, 0, sizeof(xml_alias_t));
 }
 
-const ithread_mutex_t *UpnpLib_get_gWebMutex(const UpnpLib *p)
+const pthread_mutex_t *UpnpLib_get_gWebMutex(const UpnpLib *p)
 {
         return &p->m_gWebMutex;
 }
 
-ithread_mutex_t *UpnpLib_getnc_gWebMutex(UpnpLib *p) { return &p->m_gWebMutex; }
+pthread_mutex_t *UpnpLib_getnc_gWebMutex(UpnpLib *p) { return &p->m_gWebMutex; }
 
-int UpnpLib_set_gWebMutex(UpnpLib *p, const ithread_mutex_t *buf)
+int UpnpLib_set_gWebMutex(UpnpLib *p, const pthread_mutex_t *buf)
 {
         p->m_gWebMutex = *buf;
 
@@ -890,7 +890,7 @@ int UpnpLib_set_gWebMutex(UpnpLib *p, const ithread_mutex_t *buf)
 
 void UpnpLib_clear_gWebMutex(UpnpLib *p)
 {
-        memset(&p->m_gWebMutex, 0, sizeof(ithread_mutex_t));
+        memset(&p->m_gWebMutex, 0, sizeof(pthread_mutex_t));
 }
 
 const membuffer *UpnpLib_get_gDocumentRootDir(const UpnpLib *p)

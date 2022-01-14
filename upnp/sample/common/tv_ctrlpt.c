@@ -50,7 +50,7 @@
  * asynchronous environment. All functions should lock this mutex before
  * reading or writing the device list.
  */
-ithread_mutex_t DeviceListMutex;
+pthread_mutex_t DeviceListMutex;
 
 UpnpClient_Handle ctrlpt_handle = -1;
 
@@ -155,7 +155,7 @@ int TvCtrlPointRemoveDevice(UpnpLib *p, const char *UDN)
         struct TvDeviceNode *curdevnode;
         struct TvDeviceNode *prevdevnode;
 
-        ithread_mutex_lock(&DeviceListMutex);
+        pthread_mutex_lock(&DeviceListMutex);
 
         curdevnode = GlobalDeviceList;
         if (!curdevnode) {
@@ -180,7 +180,7 @@ int TvCtrlPointRemoveDevice(UpnpLib *p, const char *UDN)
                 }
         }
 
-        ithread_mutex_unlock(&DeviceListMutex);
+        pthread_mutex_unlock(&DeviceListMutex);
 
         return TV_SUCCESS;
 }
@@ -199,7 +199,7 @@ int TvCtrlPointRemoveAll(UpnpLib *p)
 {
         struct TvDeviceNode *curdevnode, *next;
 
-        ithread_mutex_lock(&DeviceListMutex);
+        pthread_mutex_lock(&DeviceListMutex);
 
         curdevnode = GlobalDeviceList;
         GlobalDeviceList = NULL;
@@ -210,7 +210,7 @@ int TvCtrlPointRemoveAll(UpnpLib *p)
                 curdevnode = next;
         }
 
-        ithread_mutex_unlock(&DeviceListMutex);
+        pthread_mutex_unlock(&DeviceListMutex);
 
         return TV_SUCCESS;
 }
@@ -261,7 +261,7 @@ int TvCtrlPointGetVar(UpnpLib *p, int service, int devnum, const char *varname)
         struct TvDeviceNode *devnode;
         int rc;
 
-        ithread_mutex_lock(&DeviceListMutex);
+        pthread_mutex_lock(&DeviceListMutex);
 
         rc = TvCtrlPointGetDevice(devnum, &devnode);
 
@@ -280,7 +280,7 @@ int TvCtrlPointGetVar(UpnpLib *p, int service, int devnum, const char *varname)
                 }
         }
 
-        ithread_mutex_unlock(&DeviceListMutex);
+        pthread_mutex_unlock(&DeviceListMutex);
 
         return rc;
 }
@@ -349,7 +349,7 @@ int TvCtrlPointSendAction(UpnpLib *p,
         int rc = TV_SUCCESS;
         int param;
 
-        ithread_mutex_lock(&DeviceListMutex);
+        pthread_mutex_lock(&DeviceListMutex);
 
         rc = TvCtrlPointGetDevice(devnum, &devnode);
         if (TV_SUCCESS == rc) {
@@ -389,7 +389,7 @@ int TvCtrlPointSendAction(UpnpLib *p,
                 }
         }
 
-        ithread_mutex_unlock(&DeviceListMutex);
+        pthread_mutex_unlock(&DeviceListMutex);
 
         if (actionNode)
                 ixmlDocument_free(actionNode);
@@ -537,7 +537,7 @@ int TvCtrlPointPrintList()
         struct TvDeviceNode *tmpdevnode;
         int i = 0;
 
-        ithread_mutex_lock(&DeviceListMutex);
+        pthread_mutex_lock(&DeviceListMutex);
 
         SampleUtil_Print("TvCtrlPointPrintList:\n");
         tmpdevnode = GlobalDeviceList;
@@ -546,7 +546,7 @@ int TvCtrlPointPrintList()
                 tmpdevnode = tmpdevnode->next;
         }
         SampleUtil_Print("\n");
-        ithread_mutex_unlock(&DeviceListMutex);
+        pthread_mutex_unlock(&DeviceListMutex);
 
         return TV_SUCCESS;
 }
@@ -576,7 +576,7 @@ int TvCtrlPointPrintDevice(int devnum)
                 return TV_ERROR;
         }
 
-        ithread_mutex_lock(&DeviceListMutex);
+        pthread_mutex_lock(&DeviceListMutex);
 
         SampleUtil_Print("TvCtrlPointPrintDevice:\n");
         tmpdevnode = GlobalDeviceList;
@@ -643,7 +643,7 @@ int TvCtrlPointPrintDevice(int devnum)
                 }
         }
         SampleUtil_Print("\n");
-        ithread_mutex_unlock(&DeviceListMutex);
+        pthread_mutex_unlock(&DeviceListMutex);
 
         return TV_SUCCESS;
 }
@@ -684,7 +684,7 @@ void TvCtrlPointAddDevice(
 
         TimeOut[0] = default_timeout;
         TimeOut[1] = default_timeout;
-        ithread_mutex_lock(&DeviceListMutex);
+        pthread_mutex_lock(&DeviceListMutex);
 
         /* Read key elements from description document */
         UDN = SampleUtil_GetFirstDocumentItem(DescDoc, "UDN");
@@ -817,7 +817,7 @@ void TvCtrlPointAddDevice(
                 }
         }
 
-        ithread_mutex_unlock(&DeviceListMutex);
+        pthread_mutex_unlock(&DeviceListMutex);
 
         if (deviceType)
                 free(deviceType);
@@ -927,7 +927,7 @@ void TvCtrlPointHandleEvent(
         struct TvDeviceNode *tmpdevnode;
         int service;
 
-        ithread_mutex_lock(&DeviceListMutex);
+        pthread_mutex_lock(&DeviceListMutex);
 
         tmpdevnode = GlobalDeviceList;
         while (tmpdevnode) {
@@ -951,7 +951,7 @@ void TvCtrlPointHandleEvent(
                 tmpdevnode = tmpdevnode->next;
         }
 
-        ithread_mutex_unlock(&DeviceListMutex);
+        pthread_mutex_unlock(&DeviceListMutex);
 }
 
 /********************************************************************************
@@ -975,7 +975,7 @@ void TvCtrlPointHandleSubscribeUpdate(
         int service;
         (void)timeout;
 
-        ithread_mutex_lock(&DeviceListMutex);
+        pthread_mutex_lock(&DeviceListMutex);
 
         tmpdevnode = GlobalDeviceList;
         while (tmpdevnode) {
@@ -997,7 +997,7 @@ void TvCtrlPointHandleSubscribeUpdate(
                 tmpdevnode = tmpdevnode->next;
         }
 
-        ithread_mutex_unlock(&DeviceListMutex);
+        pthread_mutex_unlock(&DeviceListMutex);
 
         return;
 }
@@ -1009,7 +1009,7 @@ void TvCtrlPointHandleGetVar(
         struct TvDeviceNode *tmpdevnode;
         int service;
 
-        ithread_mutex_lock(&DeviceListMutex);
+        pthread_mutex_lock(&DeviceListMutex);
 
         tmpdevnode = GlobalDeviceList;
         while (tmpdevnode) {
@@ -1027,7 +1027,7 @@ void TvCtrlPointHandleGetVar(
                 tmpdevnode = tmpdevnode->next;
         }
 
-        ithread_mutex_unlock(&DeviceListMutex);
+        pthread_mutex_unlock(&DeviceListMutex);
 }
 
 /********************************************************************************
@@ -1212,7 +1212,7 @@ void TvCtrlPointVerifyTimeouts(UpnpLib *p, int incr)
         struct TvDeviceNode *curdevnode;
         int ret;
 
-        ithread_mutex_lock(&DeviceListMutex);
+        pthread_mutex_lock(&DeviceListMutex);
 
         prevdevnode = NULL;
         curdevnode = GlobalDeviceList;
@@ -1255,7 +1255,7 @@ void TvCtrlPointVerifyTimeouts(UpnpLib *p, int incr)
                 }
         }
 
-        ithread_mutex_unlock(&DeviceListMutex);
+        pthread_mutex_unlock(&DeviceListMutex);
 }
 
 /*!
@@ -1270,7 +1270,7 @@ void *TvCtrlPointTimerLoop(void *args)
         UpnpLib *p = (UpnpLib *)args;
 
         while (TvCtrlPointTimerLoopRun) {
-                isleep((unsigned int)incr);
+                sleep(incr);
                 TvCtrlPointVerifyTimeouts(p, incr);
         }
 
@@ -1289,14 +1289,14 @@ int TvCtrlPointStart(UpnpLib **LibraryHandle,
         state_update updateFunctionPtr,
         int combo)
 {
-        ithread_t timer_thread;
+        pthread_t timer_thread;
         int rc;
         unsigned short port = 0;
         UpnpLib *p;
 
         SampleUtil_RegisterUpdateFunction(updateFunctionPtr);
 
-        ithread_mutex_init(&DeviceListMutex, 0);
+        pthread_mutex_init(&DeviceListMutex, 0);
 
         SampleUtil_Print("Initializing UPnP Sdk with\n"
                          "\tinterface = %s port = %u\n",
@@ -1344,8 +1344,8 @@ int TvCtrlPointStart(UpnpLib **LibraryHandle,
         TvCtrlPointRefresh(p);
 
         /* start a timer thread */
-        ithread_create(&timer_thread, NULL, TvCtrlPointTimerLoop, p);
-        ithread_detach(timer_thread);
+        pthread_create(&timer_thread, NULL, TvCtrlPointTimerLoop, p);
+        pthread_detach(timer_thread);
         *LibraryHandle = p;
 
         return TV_SUCCESS;

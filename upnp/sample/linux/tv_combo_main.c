@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 {
         char *iface = NULL;
         int rc;
-        ithread_t cmdloop_thread;
+        pthread_t cmdloop_thread;
         int i = 0;
 #ifdef _WIN32
 #else
@@ -78,13 +78,13 @@ int main(int argc, char *argv[])
                 return rc;
         }
         /* start a command loop thread */
-        code = ithread_create(
+        code = pthread_create(
                 &cmdloop_thread, NULL, TvCtrlPointCommandLoop, NULL);
         if (code != 0) {
                 return UPNP_E_INTERNAL_ERROR;
         }
 #ifdef _WIN32
-        ithread_join(cmdloop_thread, NULL);
+        pthread_join(cmdloop_thread, NULL);
 #else
         /* Catch Ctrl-C and properly shutdown */
         sigemptyset(&sigs_to_catch);

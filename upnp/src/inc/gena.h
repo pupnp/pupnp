@@ -110,7 +110,7 @@
                 __FILE__, \
                 __LINE__, \
                 "Trying Subscribe Lock"); \
-        ithread_mutex_lock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
+        pthread_mutex_lock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
         UpnpPrintf(UpnpLib_get_Log(p), \
                 UPNP_INFO, \
                 GENA, \
@@ -128,7 +128,7 @@
                 __FILE__, \
                 __LINE__, \
                 "Trying Subscribe UnLock"); \
-        ithread_mutex_unlock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
+        pthread_mutex_unlock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
         UpnpPrintf(UpnpLib_get_Log(p), \
                 UPNP_INFO, \
                 GENA, \

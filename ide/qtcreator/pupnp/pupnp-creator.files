@@ -108,7 +108,6 @@ upnp/inc/UpnpIntTypes.h
 upnp/inc/UpnpStdInt.h
 upnp/inc/UpnpString.h
 upnp/inc/UpnpUniStd.h
-upnp/inc/ithread.h
 upnp/inc/list.h
 upnp/inc/upnp.h
 upnp/inc/upnpconfig.h.cm

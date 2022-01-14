@@ -157,16 +157,16 @@ static int UpnpInitMutexes(UpnpLib *p)
         /* TODO: Fix Cygwin so we don't need this memset(). */
         UpnpLib_clear_GlobalHndRWLock(p);
 #endif
-        if (ithread_rwlock_init(UpnpLib_getnc_GlobalHndRWLock(p), NULL)) {
+        if (pthread_rwlock_init(UpnpLib_getnc_GlobalHndRWLock(p), NULL)) {
                 return UPNP_E_INIT_FAILED;
         }
 
-        if (ithread_mutex_init(UpnpLib_getnc_gUUIDMutex(p), NULL)) {
+        if (pthread_mutex_init(UpnpLib_getnc_gUUIDMutex(p), NULL)) {
                 return UPNP_E_INIT_FAILED;
         }
         /* initialize subscribe mutex. */
 #ifdef INCLUDE_CLIENT_APIS
-        if (ithread_mutex_init(
+        if (pthread_mutex_init(
                     UpnpLib_getnc_GlobalClientSubscribeMutex(p), NULL) != 0) {
                 return UPNP_E_INIT_FAILED;
         }
@@ -374,9 +374,6 @@ int UpnpInit2(UpnpLib **LibraryHandle,
         UpnpLib *p = *LibraryHandle;
         UpnpLog *l;
 
-        /* Initializes the ithread library */
-        ithread_initialize_library();
-
         /* Require that *LibraryHandle is NULL to make sure it is not a
          * reinitialization or something worse. */
         if (p) {
@@ -403,7 +400,7 @@ int UpnpInit2(UpnpLib **LibraryHandle,
         }
         UpnpSetLogFileName(l, logFileName);
         UpnpLib_set_Log(p, l);
-        ithread_mutex_lock(UpnpLib_getnc_gSDKInitMutex(p));
+        pthread_mutex_lock(UpnpLib_getnc_gSDKInitMutex(p));
 
         /* Check if we're already initialized. (Should never happen now) */
         if (UpnpLib_get_UpnpSdkInit(p)) {
@@ -445,7 +442,7 @@ int UpnpInit2(UpnpLib **LibraryHandle,
         *LibraryHandle = p;
 
 exit_function:
-        ithread_mutex_unlock(UpnpLib_getnc_gSDKInitMutex(p));
+        pthread_mutex_unlock(UpnpLib_getnc_gSDKInitMutex(p));
 exit_function_no_mutex_unlock:
 
         return retVal;
@@ -624,10 +621,10 @@ int UpnpFinish(UpnpLib *p)
                 __LINE__,
                 "Recv Thread Pool");
 #ifdef INCLUDE_CLIENT_APIS
-        ithread_mutex_destroy(UpnpLib_getnc_GlobalClientSubscribeMutex(p));
+        pthread_mutex_destroy(UpnpLib_getnc_GlobalClientSubscribeMutex(p));
 #endif
-        ithread_rwlock_destroy(UpnpLib_getnc_GlobalHndRWLock(p));
-        ithread_mutex_destroy(UpnpLib_getnc_gUUIDMutex(p));
+        pthread_rwlock_destroy(UpnpLib_getnc_GlobalHndRWLock(p));
+        pthread_mutex_destroy(UpnpLib_getnc_gUUIDMutex(p));
         /* remove all virtual dirs */
         UpnpRemoveAllVirtualDirs(p);
         UpnpLib_set_UpnpSdkInit(p, 0);
@@ -639,8 +636,6 @@ int UpnpFinish(UpnpLib *p)
                 "Exiting UpnpFinish: UpnpSdkInit is :%d:\n",
                 UpnpLib_get_UpnpSdkInit(p));
         UpnpCloseLog(UpnpLib_get_Log(p));
-        /* Clean-up ithread library resources */
-        ithread_cleanup_library();
 
         return UPNP_E_SUCCESS;
 }
