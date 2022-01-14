@@ -1270,7 +1270,11 @@ void *TvCtrlPointTimerLoop(void *args)
         UpnpLib *p = (UpnpLib *)args;
 
         while (TvCtrlPointTimerLoopRun) {
+#ifdef _WIN32
+                Sleep(incr);
+#else
                 sleep(incr);
+#endif
                 TvCtrlPointVerifyTimeouts(p, incr);
         }
 
