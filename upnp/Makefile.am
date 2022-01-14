@@ -80,7 +80,6 @@ libupnp_la_SOURCES = \
 	src/inc/soaplib.h \
 	src/inc/sock.h \
 	src/inc/statcodes.h \
-	src/inc/statuscodes.h \
 	src/inc/strintmap.h \
 	src/inc/ssdplib.h \
 	src/inc/sysdep.h \

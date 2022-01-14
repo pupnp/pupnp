@@ -187,7 +187,6 @@ upnp/src/inc/soaplib.h
 upnp/src/inc/sock.h
 upnp/src/inc/ssdplib.h
 upnp/src/inc/statcodes.h
-upnp/src/inc/statuscodes.h
 upnp/src/inc/strintmap.h
 upnp/src/inc/sysdep.h
 upnp/src/inc/unixutil.h
