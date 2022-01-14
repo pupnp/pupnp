@@ -113,7 +113,7 @@ struct TvDeviceNode
         struct TvDeviceNode *next;
 };
 
-extern ithread_mutex_t DeviceListMutex;
+extern pthread_mutex_t DeviceListMutex;
 
 extern UpnpClient_Handle ctrlpt_handle;
 

@@ -39,7 +39,7 @@
 #include "FreeList.h"
 #include "LinkedList.h"
 #include "ThreadPool.h"
-#include "ithread.h"
+#include "pthread.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,8 +67,8 @@ typedef enum timeoutType
  */
 typedef struct TIMERTHREAD
 {
-        ithread_mutex_t mutex;
-        ithread_cond_t condition;
+        pthread_mutex_t mutex;
+        pthread_cond_t condition;
         int lastEventId;
         LinkedList eventQ;
         int shutdown;

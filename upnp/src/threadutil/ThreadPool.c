@@ -42,6 +42,7 @@
 #include "ThreadPool.h"
 
 #include <assert.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> /* for memset()*/
@@ -305,7 +306,7 @@ static int SetPriority(
         struct sched_param newPriority;
         int sched_result;
 
-        pthread_getschedparam(ithread_self(), &currentPolicy, &newPriority);
+        pthread_getschedparam(pthread_self(), &currentPolicy, &newPriority);
         minPriority = sched_get_priority_min(currentPolicy);
         maxPriority = sched_get_priority_max(currentPolicy);
         midPriority = (maxPriority - minPriority) / 2;
@@ -327,7 +328,7 @@ static int SetPriority(
         newPriority.sched_priority = actPriority;
 
         sched_result = pthread_setschedparam(
-                ithread_self(), currentPolicy, &newPriority);
+                pthread_self(), currentPolicy, &newPriority);
         retVal = (sched_result == 0 || errno == EPERM) ? 0 : sched_result;
 exit_function:
         return retVal;
@@ -424,14 +425,14 @@ static void SetSeed(void)
         gettimeofday(&t, NULL);
 #if defined(__PTW32_DLLPORT)
         srand((unsigned int)t.tv_usec +
-                (unsigned int)ithread_get_current_thread_id().p);
+                (unsigned int)pthread_get_current_thread_id().p);
 #elif defined(BSD) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
         srand((unsigned int)t.tv_usec +
-                (unsigned int)ithread_get_current_thread_id());
+                (unsigned int)pthread_threadid_np(NULL, NULL));
 #elif defined(__linux__) || defined(__sun) || defined(__CYGWIN__) || \
         defined(__GLIBC__)
         srand((unsigned int)t.tv_usec +
-                (unsigned int)ithread_get_current_thread_id());
+                (unsigned int)pthread_get_current_thread_id());
 #else
         {
                 volatile union
@@ -440,7 +441,7 @@ static void SetSeed(void)
                         volatile unsigned i;
                 } idu;
 
-                idu.tid = ithread_get_current_thread_id();
+                idu.tid = pthread_get_current_thread_id();
                 srand((unsigned int)t.tv_usec + idu.i);
         }
 #endif
@@ -469,19 +470,17 @@ static void *WorkerThread(
         int persistent = -1;
         ThreadPool *tp = (ThreadPool *)arg;
 
-        ithread_initialize_thread();
-
         /* Increment total thread count */
-        ithread_mutex_lock(&tp->mutex);
+        pthread_mutex_lock(&tp->mutex);
         tp->totalThreads++;
         tp->pendingWorkerThreadStart = 0;
-        ithread_cond_broadcast(&tp->start_and_shutdown);
-        ithread_mutex_unlock(&tp->mutex);
+        pthread_cond_broadcast(&tp->start_and_shutdown);
+        pthread_mutex_unlock(&tp->mutex);
 
         SetSeed();
         StatsTime(&start);
         while (1) {
-                ithread_mutex_lock(&tp->mutex);
+                pthread_mutex_lock(&tp->mutex);
                 if (job) {
                         tp->busyThreads--;
                         FreeThreadPoolJob(tp, job);
@@ -518,7 +517,7 @@ static void *WorkerThread(
                         SetRelTimeout(&timeout, tp->attr.maxIdleTime);
 
                         /* wait for a job up to the specified max time */
-                        retCode = ithread_cond_timedwait(
+                        retCode = pthread_cond_timedwait(
                                 &tp->condition, &tp->mutex, &timeout);
                 }
                 tp->stats.idleThreads--;
@@ -539,7 +538,7 @@ static void *WorkerThread(
                                 tp->persistentJob = NULL;
                                 tp->persistentThreads++;
                                 persistent = 1;
-                                ithread_cond_broadcast(&tp->start_and_shutdown);
+                                pthread_cond_broadcast(&tp->start_and_shutdown);
                         } else {
                                 tp->stats.workerThreads++;
                                 persistent = 0;
@@ -580,7 +579,7 @@ static void *WorkerThread(
                 }
 
                 tp->busyThreads++;
-                ithread_mutex_unlock(&tp->mutex);
+                pthread_mutex_unlock(&tp->mutex);
 
                 /* In the future can log info */
                 if (SetPriority(job->priority) != 0) {
@@ -594,9 +593,8 @@ static void *WorkerThread(
 
 exit_function:
         tp->totalThreads--;
-        ithread_cond_broadcast(&tp->start_and_shutdown);
-        ithread_mutex_unlock(&tp->mutex);
-        ithread_cleanup_thread();
+        pthread_cond_broadcast(&tp->start_and_shutdown);
+        pthread_mutex_unlock(&tp->mutex);
 
         return NULL;
 }
@@ -646,30 +644,30 @@ static int CreateWorker(
         /*! A pointer to the ThreadPool object. */
         ThreadPool *tp)
 {
-        ithread_t temp;
+        pthread_t temp;
         int rc = 0;
-        ithread_attr_t attr;
+        pthread_attr_t attr;
 
         /* if a new worker is the process of starting, wait until it fully
          * starts */
         while (tp->pendingWorkerThreadStart) {
-                ithread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
+                pthread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
         }
 
         if (tp->attr.maxThreads != INFINITE_THREADS &&
                 tp->totalThreads + 1 > tp->attr.maxThreads) {
                 return EMAXTHREADS;
         }
-        ithread_attr_init(&attr);
-        ithread_attr_setstacksize(&attr, tp->attr.stackSize);
-        ithread_attr_setdetachstate(&attr, ITHREAD_CREATE_DETACHED);
-        rc = ithread_create(&temp, &attr, WorkerThread, tp);
-        ithread_attr_destroy(&attr);
+        pthread_attr_init(&attr);
+        pthread_attr_setstacksize(&attr, tp->attr.stackSize);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+        rc = pthread_create(&temp, &attr, WorkerThread, tp);
+        pthread_attr_destroy(&attr);
         if (rc == 0) {
                 tp->pendingWorkerThreadStart = 1;
                 /* wait until the new worker thread starts */
                 while (tp->pendingWorkerThreadStart) {
-                        ithread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
+                        pthread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
                 }
         }
         if (tp->stats.maxThreads < tp->totalThreads) {
@@ -715,16 +713,16 @@ int ThreadPoolInit(UpnpLib *p, ThreadPool *tp, ThreadPoolAttr *attr)
                 return EINVAL;
         }
 
-        retCode += ithread_mutex_init(&tp->mutex, NULL);
-        retCode += ithread_mutex_lock(&tp->mutex);
+        retCode += pthread_mutex_init(&tp->mutex, NULL);
+        retCode += pthread_mutex_lock(&tp->mutex);
 
-        retCode += ithread_cond_init(&tp->condition, NULL);
-        retCode += ithread_cond_init(&tp->start_and_shutdown, NULL);
+        retCode += pthread_cond_init(&tp->condition, NULL);
+        retCode += pthread_cond_init(&tp->start_and_shutdown, NULL);
         if (retCode) {
-                ithread_mutex_unlock(&tp->mutex);
-                ithread_mutex_destroy(&tp->mutex);
-                ithread_cond_destroy(&tp->condition);
-                ithread_cond_destroy(&tp->start_and_shutdown);
+                pthread_mutex_unlock(&tp->mutex);
+                pthread_mutex_destroy(&tp->mutex);
+                pthread_cond_destroy(&tp->condition);
+                pthread_cond_destroy(&tp->start_and_shutdown);
                 return EAGAIN;
         }
         if (attr) {
@@ -733,10 +731,10 @@ int ThreadPoolInit(UpnpLib *p, ThreadPool *tp, ThreadPoolAttr *attr)
                 TPAttrInit(&tp->attr);
         }
         if (SetPolicyType(tp->attr.schedPolicy) != 0) {
-                ithread_mutex_unlock(&tp->mutex);
-                ithread_mutex_destroy(&tp->mutex);
-                ithread_cond_destroy(&tp->condition);
-                ithread_cond_destroy(&tp->start_and_shutdown);
+                pthread_mutex_unlock(&tp->mutex);
+                pthread_mutex_destroy(&tp->mutex);
+                pthread_cond_destroy(&tp->condition);
+                pthread_cond_destroy(&tp->start_and_shutdown);
 
                 return INVALID_POLICY;
         }
@@ -765,7 +763,7 @@ int ThreadPoolInit(UpnpLib *p, ThreadPool *tp, ThreadPoolAttr *attr)
                 }
         }
 
-        ithread_mutex_unlock(&tp->mutex);
+        pthread_mutex_unlock(&tp->mutex);
 
         if (retCode) {
                 /* clean up if the min threads could not be created */
@@ -789,7 +787,7 @@ int ThreadPoolAddPersistent(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
         }
         *jobId = INVALID_JOB_ID;
 
-        ithread_mutex_lock(&tp->mutex);
+        pthread_mutex_lock(&tp->mutex);
 
         /* Create A worker if less than max threads running */
         if (tp->totalThreads < tp->attr.maxThreads) {
@@ -810,15 +808,15 @@ int ThreadPoolAddPersistent(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
         tp->persistentJob = temp;
 
         /* Notify a waiting thread */
-        ithread_cond_signal(&tp->condition);
+        pthread_cond_signal(&tp->condition);
 
         /* wait until long job has been picked up */
         while (tp->persistentJob)
-                ithread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
+                pthread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
         *jobId = tp->lastJobId++;
 
 exit_function:
-        ithread_mutex_unlock(&tp->mutex);
+        pthread_mutex_unlock(&tp->mutex);
 
         return ret;
 }
@@ -833,7 +831,7 @@ int ThreadPoolAdd(ThreadPool *tp, const ThreadPoolJob *job, int *jobId)
         if (!tp || !job)
                 return EINVAL;
 
-        ithread_mutex_lock(&tp->mutex);
+        pthread_mutex_lock(&tp->mutex);
 
         totalJobs = tp->highJobQ.size + tp->lowJobQ.size + tp->medJobQ.size;
         if (totalJobs >= tp->attr.maxJobsTotal) {
@@ -865,13 +863,13 @@ int ThreadPoolAdd(ThreadPool *tp, const ThreadPoolJob *job, int *jobId)
         AddWorker(tp);
         /* Notify a waiting thread */
         if (rc == 0)
-                ithread_cond_signal(&tp->condition);
+                pthread_cond_signal(&tp->condition);
         else
                 FreeThreadPoolJob(tp, temp);
         *jobId = tp->lastJobId++;
 
 exit_function:
-        ithread_mutex_unlock(&tp->mutex);
+        pthread_mutex_unlock(&tp->mutex);
 
         return rc;
 }
@@ -889,7 +887,7 @@ int ThreadPoolRemove(ThreadPool *tp, int jobId, ThreadPoolJob *out)
                 out = &dummy;
         dummy.jobId = jobId;
 
-        ithread_mutex_lock(&tp->mutex);
+        pthread_mutex_lock(&tp->mutex);
 
         tempNode = ListFind(&tp->highJobQ, NULL, &dummy);
         if (tempNode) {
@@ -928,7 +926,7 @@ int ThreadPoolRemove(ThreadPool *tp, int jobId, ThreadPoolJob *out)
         }
 
 exit_function:
-        ithread_mutex_unlock(&tp->mutex);
+        pthread_mutex_unlock(&tp->mutex);
 
         return ret;
 }
@@ -938,10 +936,10 @@ int ThreadPoolGetAttr(ThreadPool *tp, ThreadPoolAttr *out)
         if (!tp || !out)
                 return EINVAL;
         if (!tp->shutdown)
-                ithread_mutex_lock(&tp->mutex);
+                pthread_mutex_lock(&tp->mutex);
         *out = tp->attr;
         if (!tp->shutdown)
-                ithread_mutex_unlock(&tp->mutex);
+                pthread_mutex_unlock(&tp->mutex);
 
         return 0;
 }
@@ -955,14 +953,14 @@ int ThreadPoolSetAttr(ThreadPool *tp, ThreadPoolAttr *attr)
         if (!tp)
                 return EINVAL;
 
-        ithread_mutex_lock(&tp->mutex);
+        pthread_mutex_lock(&tp->mutex);
 
         if (attr)
                 temp = *attr;
         else
                 TPAttrInit(&temp);
         if (SetPolicyType(temp.schedPolicy) != 0) {
-                ithread_mutex_unlock(&tp->mutex);
+                pthread_mutex_unlock(&tp->mutex);
                 return INVALID_POLICY;
         }
         tp->attr = temp;
@@ -976,9 +974,9 @@ int ThreadPoolSetAttr(ThreadPool *tp, ThreadPoolAttr *attr)
                 }
         }
         /* signal changes */
-        ithread_cond_signal(&tp->condition);
+        pthread_cond_signal(&tp->condition);
 
-        ithread_mutex_unlock(&tp->mutex);
+        pthread_mutex_unlock(&tp->mutex);
 
         if (retCode != 0)
                 /* clean up if the min threads could not be created */
@@ -994,12 +992,12 @@ int ThreadPoolShutdown(ThreadPool *tp)
 
         if (!tp)
                 return EINVAL;
-        ithread_mutex_lock(&tp->mutex);
+        pthread_mutex_lock(&tp->mutex);
         /* clean up high priority jobs */
         while (tp->highJobQ.size) {
                 head = ListHead(&tp->highJobQ);
                 if (head == NULL) {
-                        ithread_mutex_unlock(&tp->mutex);
+                        pthread_mutex_unlock(&tp->mutex);
                         return EINVAL;
                 }
                 temp = (ThreadPoolJob *)head->item;
@@ -1013,7 +1011,7 @@ int ThreadPoolShutdown(ThreadPool *tp)
         while (tp->medJobQ.size) {
                 head = ListHead(&tp->medJobQ);
                 if (head == NULL) {
-                        ithread_mutex_unlock(&tp->mutex);
+                        pthread_mutex_unlock(&tp->mutex);
                         return EINVAL;
                 }
                 temp = (ThreadPoolJob *)head->item;
@@ -1027,7 +1025,7 @@ int ThreadPoolShutdown(ThreadPool *tp)
         while (tp->lowJobQ.size) {
                 head = ListHead(&tp->lowJobQ);
                 if (head == NULL) {
-                        ithread_mutex_unlock(&tp->mutex);
+                        pthread_mutex_unlock(&tp->mutex);
                         return EINVAL;
                 }
                 temp = (ThreadPoolJob *)head->item;
@@ -1047,19 +1045,19 @@ int ThreadPoolShutdown(ThreadPool *tp)
         }
         /* signal shutdown */
         tp->shutdown = 1;
-        ithread_cond_broadcast(&tp->condition);
+        pthread_cond_broadcast(&tp->condition);
         /* wait for all threads to finish */
         while (tp->totalThreads > 0)
-                ithread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
+                pthread_cond_wait(&tp->start_and_shutdown, &tp->mutex);
         /* destroy condition */
-        while (ithread_cond_destroy(&tp->condition) != 0) {}
-        while (ithread_cond_destroy(&tp->start_and_shutdown) != 0) {}
+        while (pthread_cond_destroy(&tp->condition) != 0) {}
+        while (pthread_cond_destroy(&tp->start_and_shutdown) != 0) {}
         FreeListDestroy(&tp->jobFreeList);
 
-        ithread_mutex_unlock(&tp->mutex);
+        pthread_mutex_unlock(&tp->mutex);
 
         /* destroy mutex */
-        while (ithread_mutex_destroy(&tp->mutex) != 0) {}
+        while (pthread_mutex_destroy(&tp->mutex) != 0) {}
 
         return 0;
 }
@@ -1232,7 +1230,7 @@ int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
                 return EINVAL;
         /* if not shutdown then acquire mutex */
         if (!tp->shutdown)
-                ithread_mutex_lock(&tp->mutex);
+                pthread_mutex_lock(&tp->mutex);
 
         *stats = tp->stats;
         if (stats->totalJobsHQ > 0)
@@ -1258,7 +1256,7 @@ int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)
 
         /* if not shutdown then release mutex */
         if (!tp->shutdown)
-                ithread_mutex_unlock(&tp->mutex);
+                pthread_mutex_unlock(&tp->mutex);
 
         return 0;
 }

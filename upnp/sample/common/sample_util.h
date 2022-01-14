@@ -45,8 +45,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 #include "config_sample.h"
-#include "ithread.h"
 #include "ixml.h" /* for IXML_Document, IXML_Element */
+#include "pthread.h"
 #include "upnp.h" /* for Upnp_EventType */
 #include "upnptools.h"
 
@@ -62,7 +62,7 @@ extern const char *TvServiceType[];
 #endif /* SAMPLE_UTIL_C */
 
 /* mutex to control displaying of events */
-extern ithread_mutex_t display_mutex;
+extern pthread_mutex_t display_mutex;
 
 typedef enum
 {

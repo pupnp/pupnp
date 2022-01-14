@@ -93,10 +93,6 @@ libupnp_la_SOURCES = \
 	src/inc/VirtualDir.h \
 	src/inc/webserver.h
 
-# threadutil
-upnpinclude_HEADERS += \
-	inc/ithread.h
-
 libupnp_la_CPPFLAGS += -I$(srcdir)/src/threadutil
 libupnp_la_SOURCES += \
 	src/threadutil/FreeList.h \

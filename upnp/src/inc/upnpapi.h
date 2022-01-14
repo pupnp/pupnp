@@ -144,7 +144,7 @@ Upnp_Handle_Type GetHandleInfo(
                 __FILE__, \
                 __LINE__, \
                 "Trying a write lock\n"); \
-        ithread_rwlock_wrlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
+        pthread_rwlock_wrlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
         UpnpPrintf(UpnpLib_get_Log(p), \
                 UPNP_DEBUG, \
                 API, \
@@ -159,7 +159,7 @@ Upnp_Handle_Type GetHandleInfo(
                 __FILE__, \
                 __LINE__, \
                 "Trying a read lock\n"); \
-        ithread_rwlock_rdlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
+        pthread_rwlock_rdlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
         UpnpPrintf(UpnpLib_get_Log(p), \
                 UPNP_DEBUG, \
                 API, \
@@ -174,7 +174,7 @@ Upnp_Handle_Type GetHandleInfo(
                 __FILE__, \
                 __LINE__, \
                 "Trying Unlock\n"); \
-        ithread_rwlock_unlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
+        pthread_rwlock_unlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
         UpnpPrintf(UpnpLib_get_Log(p), \
                 UPNP_DEBUG, \
                 API, \

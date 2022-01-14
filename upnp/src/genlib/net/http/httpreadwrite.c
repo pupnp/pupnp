@@ -698,31 +698,32 @@ int http_SendMessage(
                 } else
 #endif /* EXCLUDE_WEB_SERVER */
                         if (c == 'b') {
-                        /* memory buffer */
-                        buf = va_arg(argp, char *);
-                        buf_length = va_arg(argp, size_t);
-                        if (buf_length > (size_t)0) {
-                                nw = sock_write(info, buf, buf_length, TimeOut);
-                                num_written = (size_t)nw;
-                                UpnpPrintf(UpnpLib_get_Log(p),
-                                        UPNP_INFO,
-                                        HTTP,
-                                        __FILE__,
-                                        __LINE__,
-                                        ">>> (SENT) >>>\n"
-                                        "%.*s\nbuf_length=%" PRIzd
-                                        ", num_written=%" PRIzd "\n"
-                                        "------------\n",
-                                        (int)buf_length,
-                                        buf,
-                                        buf_length,
-                                        num_written);
-                                if (num_written != buf_length) {
-                                        RetVal = 0;
-                                        goto ExitFunction;
+                                /* memory buffer */
+                                buf = va_arg(argp, char *);
+                                buf_length = va_arg(argp, size_t);
+                                if (buf_length > (size_t)0) {
+                                        nw = sock_write(
+                                                info, buf, buf_length, TimeOut);
+                                        num_written = (size_t)nw;
+                                        UpnpPrintf(UpnpLib_get_Log(p),
+                                                UPNP_INFO,
+                                                HTTP,
+                                                __FILE__,
+                                                __LINE__,
+                                                ">>> (SENT) >>>\n"
+                                                "%.*s\nbuf_length=%" PRIzd
+                                                ", num_written=%" PRIzd "\n"
+                                                "------------\n",
+                                                (int)buf_length,
+                                                buf,
+                                                buf_length,
+                                                num_written);
+                                        if (num_written != buf_length) {
+                                                RetVal = 0;
+                                                goto ExitFunction;
+                                        }
                                 }
                         }
-                }
         }
 
 ExitFunction:

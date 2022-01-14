@@ -50,8 +50,9 @@
 #include "ThreadPool.h"
 #include "UpnpLib.h"
 #include "httpreadwrite.h"
-#include "ithread.h"
 #include "miniserver.h"
+#include "pthread.h"
+#include "sleep.h"
 #include "ssdplib.h"
 #include "statcodes.h"
 #include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
@@ -1329,7 +1330,8 @@ int StartMiniServer(
         while (gMServState != (MiniServerState)MSERV_RUNNING &&
                 count < max_count) {
                 /* 0.05s */
-                imillisleep(50);
+
+                sleep_ms(50);
                 count++;
         }
         if (count >= max_count) {
@@ -1394,11 +1396,11 @@ int StopMiniServer(UpnpLib *p)
                         0,
                         (struct sockaddr *)&ssdpAddr,
                         socklen);
-                imillisleep(1);
+                sleep_ms(1);
                 if (gMServState == (MiniServerState)MSERV_IDLE) {
                         break;
                 }
-                isleep(1u);
+                sleep_ms(1000);
         }
         sock_close(sock);
 

@@ -24,7 +24,7 @@
  * \file
  */
 
-#include "ithread.h"
+#include "pthread.h"
 
 /* change to point to where MD5 .h's live */
 /* get MD5 sample implementation from RFC 1321 */
@@ -42,8 +42,8 @@
  * your system's clock */
 #define UUIDS_PER_TICK 1024
 
-#define UUIDLock() ithread_mutex_lock(UpnpLib_getnc_gUUIDMutex(p))
-#define UUIDUnlock() ithread_mutex_unlock(UpnpLib_getnc_gUUIDMutex(p))
+#define UUIDLock() pthread_mutex_lock(UpnpLib_getnc_gUUIDMutex(p))
+#define UUIDUnlock() pthread_mutex_unlock(UpnpLib_getnc_gUUIDMutex(p))
 
 typedef uint64_t uuid_time_t;
 

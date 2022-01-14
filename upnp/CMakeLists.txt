@@ -86,7 +86,6 @@ endif()
 
 list (APPEND UPNP_HEADERS
 	inc/Callback.h
-	inc/ithread.h
 	inc/list.h
 	inc/upnp.h
 	inc/UpnpActionComplete.h

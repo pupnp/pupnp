@@ -124,7 +124,7 @@ typedef void (*LogCallback)(
 
 #ifdef __cplusplus
 
-#include "ithread.h"
+#include "pthread.h"
 
 #include <string>
 
@@ -175,15 +175,15 @@ public:
         void setLogCallback(LogCallback p) { m_logCallback = p; }
 
 private:
-        ithread_mutex_t m_logMutex;
+        pthread_mutex_t m_logMutex;
         Upnp_LogLevel m_logLevel;
         FILE *m_logFp;
         int m_logIsStderr;
         std::string m_logFileName;
         LogCallback m_logCallback;
 
-        void logMutexLock() { ithread_mutex_lock(&m_logMutex); }
-        void logMutexUnlock() { ithread_mutex_unlock(&m_logMutex); }
+        void logMutexLock() { pthread_mutex_lock(&m_logMutex); }
+        void logMutexUnlock() { pthread_mutex_unlock(&m_logMutex); }
 
         FILE *logFp() const { return m_logFp; }
         void setLogFp(FILE *fp) { m_logFp = fp; }

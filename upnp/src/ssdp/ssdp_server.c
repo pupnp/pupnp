@@ -56,6 +56,7 @@
 #include "httpreadwrite.h"
 #include "membuffer.h"
 #include "miniserver.h"
+#include "sleep.h"
 #include "sock.h"
 #include "ssdplib.h"
 #include "upnpapi.h"
@@ -146,7 +147,7 @@ int AdvertiseAndReply(UpnpLib *p,
         /* parse the device list and send advertisements/replies */
         while (NumCopy == 0 || (AdFlag && NumCopy < NUM_SSDP_COPY)) {
                 if (NumCopy != 0)
-                        imillisleep(SSDP_PAUSE);
+                        sleep_ms(SSDP_PAUSE);
                 NumCopy++;
                 for (i = 0lu;; i++) {
                         UpnpPrintf(UpnpLib_get_Log(p),

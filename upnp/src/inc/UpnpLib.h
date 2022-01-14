@@ -24,8 +24,8 @@ typedef struct s_UpnpLib UpnpLib;
 #include "VirtualDir.h"
 #include "document_type.h"
 #include "handle_table.h"
-#include "ithread.h"
 #include "membuffer.h"
+#include "pthread.h"
 #include "upnpapi.h"
 #include "xml_alias.h"
 
@@ -66,44 +66,44 @@ EXPORT_SPEC virtualDirList *UpnpLib_get_pVirtualDirList(const UpnpLib *p);
 EXPORT_SPEC int UpnpLib_set_pVirtualDirList(UpnpLib *p, virtualDirList *n);
 
 /*! UpnpLib_get_GlobalClientSubscribeMutex */
-EXPORT_SPEC const ithread_mutex_t *UpnpLib_get_GlobalClientSubscribeMutex(
+EXPORT_SPEC const pthread_mutex_t *UpnpLib_get_GlobalClientSubscribeMutex(
         const UpnpLib *p);
 /*! UpnpLib_getnc_GlobalClientSubscribeMutex */
-EXPORT_SPEC ithread_mutex_t *UpnpLib_getnc_GlobalClientSubscribeMutex(
+EXPORT_SPEC pthread_mutex_t *UpnpLib_getnc_GlobalClientSubscribeMutex(
         UpnpLib *p);
 /*! UpnpLib_get_GlobalClientSubscribeMutex */
 EXPORT_SPEC int UpnpLib_set_GlobalClientSubscribeMutex(
-        UpnpLib *p, const ithread_mutex_t *buf);
+        UpnpLib *p, const pthread_mutex_t *buf);
 /*! UpnpLib_get_GlobalClientSubscribeMutex */
 EXPORT_SPEC void UpnpLib_clear_GlobalClientSubscribeMutex(UpnpLib *p);
 
 /*! UpnpLib_get_GlobalHndRWLock */
-EXPORT_SPEC const ithread_rwlock_t *UpnpLib_get_GlobalHndRWLock(
+EXPORT_SPEC const pthread_rwlock_t *UpnpLib_get_GlobalHndRWLock(
         const UpnpLib *p);
 /*! UpnpLib_getnc_GlobalHndRWLock */
-EXPORT_SPEC ithread_rwlock_t *UpnpLib_getnc_GlobalHndRWLock(UpnpLib *p);
+EXPORT_SPEC pthread_rwlock_t *UpnpLib_getnc_GlobalHndRWLock(UpnpLib *p);
 /*! UpnpLib_get_GlobalHndRWLock */
 EXPORT_SPEC int UpnpLib_set_GlobalHndRWLock(
-        UpnpLib *p, const ithread_rwlock_t *buf);
+        UpnpLib *p, const pthread_rwlock_t *buf);
 /*! UpnpLib_get_GlobalHndRWLock */
 EXPORT_SPEC void UpnpLib_clear_GlobalHndRWLock(UpnpLib *p);
 
 /*! UpnpLib_get_gUUIDMutex */
-EXPORT_SPEC const ithread_mutex_t *UpnpLib_get_gUUIDMutex(const UpnpLib *p);
+EXPORT_SPEC const pthread_mutex_t *UpnpLib_get_gUUIDMutex(const UpnpLib *p);
 /*! UpnpLib_getnc_gUUIDMutex */
-EXPORT_SPEC ithread_mutex_t *UpnpLib_getnc_gUUIDMutex(UpnpLib *p);
+EXPORT_SPEC pthread_mutex_t *UpnpLib_getnc_gUUIDMutex(UpnpLib *p);
 /*! UpnpLib_get_gUUIDMutex */
-EXPORT_SPEC int UpnpLib_set_gUUIDMutex(UpnpLib *p, const ithread_mutex_t *buf);
+EXPORT_SPEC int UpnpLib_set_gUUIDMutex(UpnpLib *p, const pthread_mutex_t *buf);
 /*! UpnpLib_get_gUUIDMutex */
 EXPORT_SPEC void UpnpLib_clear_gUUIDMutex(UpnpLib *p);
 
 /*! UpnpLib_get_gSDKInitMutex */
-EXPORT_SPEC const ithread_mutex_t *UpnpLib_get_gSDKInitMutex(const UpnpLib *p);
+EXPORT_SPEC const pthread_mutex_t *UpnpLib_get_gSDKInitMutex(const UpnpLib *p);
 /*! UpnpLib_getnc_gSDKInitMutex */
-EXPORT_SPEC ithread_mutex_t *UpnpLib_getnc_gSDKInitMutex(UpnpLib *p);
+EXPORT_SPEC pthread_mutex_t *UpnpLib_getnc_gSDKInitMutex(UpnpLib *p);
 /*! UpnpLib_get_gSDKInitMutex */
 EXPORT_SPEC int UpnpLib_set_gSDKInitMutex(
-        UpnpLib *p, const ithread_mutex_t *buf);
+        UpnpLib *p, const pthread_mutex_t *buf);
 /*! UpnpLib_get_gSDKInitMutex */
 EXPORT_SPEC void UpnpLib_clear_gSDKInitMutex(UpnpLib *p);
 
@@ -306,11 +306,11 @@ EXPORT_SPEC int UpnpLib_set_gAliasDoc(UpnpLib *p, const xml_alias_t *buf);
 EXPORT_SPEC void UpnpLib_clear_gAliasDoc(UpnpLib *p);
 
 /*! UpnpLib_get_gWebMutex */
-EXPORT_SPEC const ithread_mutex_t *UpnpLib_get_gWebMutex(const UpnpLib *p);
+EXPORT_SPEC const pthread_mutex_t *UpnpLib_get_gWebMutex(const UpnpLib *p);
 /*! UpnpLib_getnc_gWebMutex */
-EXPORT_SPEC ithread_mutex_t *UpnpLib_getnc_gWebMutex(UpnpLib *p);
+EXPORT_SPEC pthread_mutex_t *UpnpLib_getnc_gWebMutex(UpnpLib *p);
 /*! UpnpLib_get_gWebMutex */
-EXPORT_SPEC int UpnpLib_set_gWebMutex(UpnpLib *p, const ithread_mutex_t *buf);
+EXPORT_SPEC int UpnpLib_set_gWebMutex(UpnpLib *p, const pthread_mutex_t *buf);
 /*! UpnpLib_get_gWebMutex */
 EXPORT_SPEC void UpnpLib_clear_gWebMutex(UpnpLib *p);
 

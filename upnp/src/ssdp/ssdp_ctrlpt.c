@@ -49,6 +49,7 @@
 #include "UpnpLib.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
+#include "sleep.h"
 #include "ssdplib.h"
 #include "statcodes.h"
 #include "unixutil.h"
@@ -721,7 +722,7 @@ int SearchByTarget(UpnpLib *p, int Hnd, int Mx, char *St, void *Cookie)
                                 (struct sockaddr *)&__ss_v6,
                                 sizeof(struct sockaddr_in6));
                         NumCopy++;
-                        imillisleep(SSDP_PAUSE);
+                        sleep_ms(SSDP_PAUSE);
                 }
                 NumCopy = 0;
                 inet_pton(AF_INET6, SSDP_IPV6_LINKLOCAL, &destAddr6->sin6_addr);
@@ -740,7 +741,7 @@ int SearchByTarget(UpnpLib *p, int Hnd, int Mx, char *St, void *Cookie)
                                 (struct sockaddr *)&__ss_v6,
                                 sizeof(struct sockaddr_in6));
                         NumCopy++;
-                        imillisleep(SSDP_PAUSE);
+                        sleep_ms(SSDP_PAUSE);
                 }
         }
 #endif /* IPv6 */
@@ -762,7 +763,7 @@ int SearchByTarget(UpnpLib *p, int Hnd, int Mx, char *St, void *Cookie)
                                 (struct sockaddr *)&__ss_v4,
                                 sizeof(struct sockaddr_in));
                         NumCopy++;
-                        imillisleep(SSDP_PAUSE);
+                        sleep_ms(SSDP_PAUSE);
                 }
         }
 

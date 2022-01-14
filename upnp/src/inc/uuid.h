@@ -24,6 +24,7 @@ extern "C" {
  * this software for any purpose.
  */
 
+#include "UpnpLib.h"
 #include "sysdep.h"
 
 /*! . */

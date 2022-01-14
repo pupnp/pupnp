@@ -113,7 +113,7 @@
  * SDK will create.  These threads are used for both callbacks into
  * applications built on top of the library and also for making connections
  * to other control points and devices.  This value will not be used if it
- * is lower than ITHREAD_STACK_MIN or greater than a system-imposed limit.
+ * is lower than pthread_STACK_MIN or greater than a system-imposed limit.
  * This value can be used to lower memory overhead in embedded systems.
  * The default value is 0 (so it is not used by default).
  *
