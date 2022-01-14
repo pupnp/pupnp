@@ -424,26 +424,9 @@ static void SetSeed(void)
 
         gettimeofday(&t, NULL);
 #if defined(__PTW32_DLLPORT)
-        srand((unsigned int)t.tv_usec +
-                (unsigned int)pthread_get_current_thread_id().p);
-#elif defined(BSD) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
-        srand((unsigned int)t.tv_usec +
-                (unsigned int)pthread_threadid_np(NULL, NULL));
-#elif defined(__linux__) || defined(__sun) || defined(__CYGWIN__) || \
-        defined(__GLIBC__)
-        srand((unsigned int)t.tv_usec +
-                (unsigned int)pthread_get_current_thread_id());
+        srand((unsigned int)t.tv_usec + (unsigned int)pthread_self().p);
 #else
-        {
-                volatile union
-                {
-                        volatile pthread_t tid;
-                        volatile unsigned i;
-                } idu;
-
-                idu.tid = pthread_get_current_thread_id();
-                srand((unsigned int)t.tv_usec + idu.i);
-        }
+        srand((unsigned int)t.tv_usec + (unsigned int)pthread_self());
 #endif
 }
 
