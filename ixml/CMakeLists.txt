@@ -21,13 +21,17 @@ add_library (ixml_shared SHARED
 
 add_library (IXML::Shared ALIAS ixml_shared)
 
+
 target_compile_definitions (ixml_shared
 	PRIVATE $<$<BOOL:${script_support}>:IXML_HAVE_SCRIPTSUPPORT>
 	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
 	PUBLIC $<$<BOOL:${MSVC}>:LIBUPNP_EXPORTS>
+	PUBLIC $<$<BOOL:${MSVC}>:_CRT_SECURE_NO_WARNINGS>
+	PUBLIC $<$<BOOL:${MSVC}>:_CRT_NONSTDC_NO_DEPRECATE>
+	PUBLIC $<$<BOOL:${MSVC}>:_CRT_SECURE_NO_DEPRECATE>
 	PUBLIC $<$<BOOL:${_LARGE_FILES}>:_LARGE_FILES>
-	PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64>
+	PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64> # A bit hacky, either it is defined to 64 or not defined at all, everything other than 0 is true
 )
 
 target_include_directories (ixml_shared
@@ -75,15 +79,12 @@ target_compile_definitions (ixml_static
 	PUBLIC UPNP_STATIC_LIB
 	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
 	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	PUBLIC $<$<BOOL:${MSVC}>:_CRT_SECURE_NO_WARNINGS>
+	PUBLIC $<$<BOOL:${MSVC}>:_CRT_NONSTDC_NO_DEPRECATE>
+	PUBLIC $<$<BOOL:${MSVC}>:_CRT_SECURE_NO_DEPRECATE>
 	PUBLIC $<$<BOOL:${_LARGE_FILES}>:_LARGE_FILES>
-	PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64> 
+	PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64> # A bit hacky, either it is defined to 64 or not defined at all, everything other than 0 is true
 )
-
-if (script_support)
-	target_compile_definitions (ixml_static
-		PRIVATE IXML_HAVE_SCRIPTSUPPORT
-	)
-endif()
 
 target_include_directories (ixml_static
 	PRIVATE ${PUPNP_BINARY_DIR}/
