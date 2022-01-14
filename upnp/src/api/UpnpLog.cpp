@@ -13,6 +13,7 @@
 
 #if linux
 #include <sys/syscall.h>
+#include <unistd.h>
 #endif
 
 UpnpLog::UpnpLog()
