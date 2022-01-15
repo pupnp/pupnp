@@ -1691,6 +1691,7 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
 	char aliasStr[LINE_SIZE];
 	char *temp_str = NULL;
 	FILE *fp = NULL;
+	int fd;
 	size_t fileLen;
 	size_t num_read;
 	time_t last_modified;
@@ -1713,29 +1714,53 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
 		last_modified = time(NULL);
 	} else if (descriptionType ==
 		   (enum Upnp_DescType_e)UPNPREG_FILENAME_DESC) {
-		retVal = stat(description, &file_info);
-		if (retVal == -1)
-			return UPNP_E_FILE_NOT_FOUND;
+		int ret = 0;
+
+		fp = fopen(description, "rb");
+		if (!fp) {
+			rc = UPNP_E_FILE_NOT_FOUND;
+			ret = 1;
+			goto exit_function1;
+		}
+		fd = fileno(fp);
+		if (fd == -1) {
+			rc = UPNP_E_FILE_NOT_FOUND;
+			ret = 1;
+			goto exit_function1;
+		}
+		retVal = fstat(fd, &file_info);
+		if (retVal == -1) {
+			rc = UPNP_E_FILE_NOT_FOUND;
+			ret = 1;
+			goto exit_function1;
+		}
 		fileLen = (size_t)file_info.st_size;
 		last_modified = file_info.st_mtime;
-		fp = fopen(description, "rb");
-		if (fp == NULL)
-			return UPNP_E_FILE_NOT_FOUND;
 		membuf = (char *)malloc(fileLen + (size_t)1);
-		if (membuf == NULL) {
-			fclose(fp);
-			return UPNP_E_OUTOF_MEMORY;
+		if (!membuf) {
+			rc = UPNP_E_OUTOF_MEMORY;
+			ret = 1;
+			goto exit_function1;
 		}
 		num_read = fread(membuf, (size_t)1, fileLen, fp);
 		if (num_read != fileLen) {
-			fclose(fp);
-			free(membuf);
-			return UPNP_E_FILE_READ_ERROR;
+			rc = UPNP_E_FILE_READ_ERROR;
+			ret = 1;
+			goto exit_function2;
 		}
 		membuf[fileLen] = 0;
-		fclose(fp);
 		rc = ixmlParseBufferEx(membuf, xmlDoc);
-		free(membuf);
+	exit_function2:
+		if (membuf) {
+			free(membuf);
+		}
+	exit_function1:
+		if (fp) {
+			fclose(fp);
+		}
+		if (ret) {
+			return rc;
+		}
 	} else if (descriptionType == (enum Upnp_DescType_e)UPNPREG_BUF_DESC) {
 		last_modified = time(NULL);
 		rc = ixmlParseBufferEx(description, xmlDoc);
