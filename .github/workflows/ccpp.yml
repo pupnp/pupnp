@@ -97,7 +97,7 @@ jobs:
         with:
           msystem: ${{ matrix.msystem }}
           update: true
-          pacboy: cc:p cmake:p ninja:p
+          pacboy: cc:p cmake:p gtest:p ninja:p
       - name: Configure
         run: >
           cmake
@@ -109,6 +109,13 @@ jobs:
           ${{ env.cmake_extra_flags }}
       - name: Build
         run: cmake --build build
+      - name: Test
+        run: |
+          cd build
+          PATH=$PWD/ixml:$PWD/upnp:$PATH ctest --output-on-failure
+          cd ..
+      - name: Debug output
+        run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
   # Linux sanitizer builds
   build_asan:
     name: Sanitizer build (ubuntu-20.04) - ${{ matrix.tool }}
