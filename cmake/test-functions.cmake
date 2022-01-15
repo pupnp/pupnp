@@ -24,7 +24,7 @@ function (addGTest testName sourceFile)
 			TEST_LIST GTEST_${testName}
 		)
 
-		if (WIN32)
+		if (MSVC)
 			findTestEnv (${testName} TEST_ENV)
 
 			set_tests_properties (${GTEST_${testName}} PROPERTIES
@@ -95,7 +95,7 @@ function (addUnitTest testName sourceFile)
 			COMMAND ${testName}
 		)
 
-		if (WIN32)
+		if (MSVC)
 			findTestEnv (${testName} TEST_ENV)
 
 			set_tests_properties (${testName} PROPERTIES
@@ -111,6 +111,7 @@ function (addUnitTest testName sourceFile)
 	endif()
 endfunction()
 
+# For MSVC toolchain only
 function (findTestEnv testName resultVar)
 	findTestLibs (${testName} ${resultVar})
 	set (tempEnv "PATH=")
