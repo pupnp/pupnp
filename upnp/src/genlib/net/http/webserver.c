@@ -527,28 +527,39 @@ static int get_file_info(
         int code;
         struct stat s;
         FILE *fp;
+        int fd;
         int rc = 0;
         time_t aux_LastModified;
         struct tm date;
         char buffer[ASCTIME_R_BUFFER_SIZE];
 
         UpnpFileInfo_set_ContentType(info, NULL);
-        code = stat(filename, &s);
-        if (code == -1) {
-                return -1;
+        fp = fopen(filename, "r");
+        /* check readable */
+        UpnpFileInfo_set_IsReadable(info, fp != NULL);
+        if (!fp) {
+                rc = -1;
+                goto exit_function;
         }
+        fd = fileno(fp);
+        if (fd == -1) {
+                rc = -1;
+                goto exit_function;
+        }
+        code = fstat(fd, &s);
+        if (code == -1) {
+                rc = -1;
+                goto exit_function;
+        }
+        fclose(fp);
         if (S_ISDIR(s.st_mode)) {
                 UpnpFileInfo_set_IsDirectory(info, 1);
         } else if (S_ISREG(s.st_mode)) {
                 UpnpFileInfo_set_IsDirectory(info, 0);
         } else {
-                return -1;
+                rc = -1;
+                goto exit_function;
         }
-        /* check readable */
-        fp = fopen(filename, "r");
-        UpnpFileInfo_set_IsReadable(info, fp != NULL);
-        if (fp)
-                fclose(fp);
         UpnpFileInfo_set_FileLength(info, s.st_size);
         UpnpFileInfo_set_LastModified(info, s.st_mtime);
         rc = get_content_type(p, filename, info);
@@ -565,6 +576,10 @@ static int get_file_info(
                         http_gmtime_r(&aux_LastModified, &date), buffer),
                 UpnpFileInfo_get_IsReadable(info));
 
+exit_function:
+        if (fp) {
+                fclose(fp);
+        }
         return rc;
 }
 
