@@ -588,8 +588,9 @@ int web_server_set_root_dir(UpnpLib *p, const char *root_dir)
 }
 
 /*!
- * \brief Compare the files names between the one on the XML alias the one
- * passed in as the input parameter. If equal extract file information.
+ * \brief Compare the files names between the one on the XML alias the
+ * one passed in as the input parameter. If equal extract file
+ * information.
  *
  * \return
  * \li \c 1 - On Success
@@ -600,8 +601,8 @@ static UPNP_INLINE int get_alias(
         const char *request_file,
         /*! [out] xml alias object which has a file name stored. */
         xml_alias_t *alias,
-        /*! [out] File information object which will be filled up if the file
-         * comparison succeeds. */
+        /*! [out] File information object which will be filled up if the
+         * file comparison succeeds. */
         UpnpFileInfo *info)
 {
         int cmp = strcmp(alias->name.buf, request_file);
@@ -616,8 +617,8 @@ static UPNP_INLINE int get_alias(
 }
 
 /*!
- * \brief Compares filePath with paths from the list of virtual directory
- * lists.
+ * \brief Compares filePath with paths from the list of virtual
+ * directory lists.
  *
  * \return int.
  */
@@ -626,7 +627,8 @@ static int isFileInVirtualDir(
         UpnpLib *p,
         /*! [in] Directory path to be tested for virtual directory. */
         char *filePath,
-        /*! [out] The cookie registered with this virtual directory, if matched.
+        /*! [out] The cookie registered with this virtual directory, if
+         * matched.
          */
         const void **cookie)
 {
@@ -796,8 +798,8 @@ static int GetNextRange(
 }
 
 /*!
- * \brief Fills in the Offset, read size and contents to send out as an HTTP
- * Range Response.
+ * \brief Fills in the Offset, read size and contents to send out as an
+ * HTTP Range Response.
  *
  * \return
  * \li \c HTTP_BAD_REQUEST
@@ -810,8 +812,8 @@ static int CreateHTTPRangeResponseHeader(
         char *ByteRangeSpecifier,
         /*! Length of the file. */
         off_t FileLength,
-        /*! [out] SendInstruction object where the range operations will be
-           stored. */
+        /*! [out] SendInstruction object where the range operations will
+           be stored. */
         struct SendInstruction *Instr)
 {
         off_t FirstByte, LastByte;
@@ -892,8 +894,8 @@ static int CreateHTTPRangeResponseHeader(
                                 Instr->ReadSendSize = FileLength;
                                 rc = snprintf(Instr->RangeHeader,
                                         sizeof(Instr->RangeHeader),
-                                        "CONTENT-RANGE: bytes 0-%" PRId64
-                                        "/%" PRId64 "\r\n",
+                                        "CONTENT-RANGE: bytes "
+                                        "0-%" PRId64 "/%" PRId64 "\r\n",
                                         (int64_t)(FileLength - 1),
                                         (int64_t)FileLength);
                         } else {
@@ -979,7 +981,8 @@ static int CheckOtherHTTPHeaders(
                                 RespInstr->IsChunkActive = 1;
 
                                 if (strlen(TmpBuf) > strlen("gzip")) {
-                                        /* means client will accept trailer. */
+                                        /* means client will accept
+                                         * trailer. */
                                         if (StrStr(TmpBuf, "trailers") !=
                                                 NULL) {
                                                 RespInstr->IsTrailers = 1;
@@ -1062,7 +1065,8 @@ static int CheckOtherHTTPHeaders(
 }
 
 /*!
- * \brief Processes the request and returns the result in the output parameters.
+ * \brief Processes the request and returns the result in the output
+ * parameters.
  *
  * \return
  * \li \c HTTP_BAD_REQUEST
@@ -1088,7 +1092,8 @@ static int process_request(
         membuffer *filename,
         /*! [out] Xml alias document from the request document. */
         xml_alias_t *alias,
-        /*! [out] Send Instruction object where the response is set up. */
+        /*! [out] Send Instruction object where the response is set up.
+         */
         struct SendInstruction *RespInstr)
 {
         int code;
@@ -1229,7 +1234,8 @@ static int process_request(
                                 goto error_handler;
                         }
                         /* finally, get content type */
-                        /* if ( get_content_type(filename->buf, &content_type)
+                        /* if ( get_content_type(filename->buf,
+                         * &content_type)
                          * != 0 ) */
                         /*{ */
                         /*  goto error_handler; */
@@ -1287,7 +1293,8 @@ static int process_request(
                         }
                 }
                 /* finally, get content type */
-                /*      if ( get_content_type(filename->buf, &content_type) != 0
+                /*      if ( get_content_type(filename->buf,
+                 * &content_type) != 0
                  * ) */
                 /*      { */
                 /*          goto error_handler; */
@@ -1310,13 +1317,15 @@ static int process_request(
         /* Check if chunked encoding should be used. */
         if (using_virtual_dir &&
                 UpnpFileInfo_get_FileLength(finfo) == UPNP_USING_CHUNKED) {
-                /* Chunked encoding is only supported by HTTP 1.1 clients */
+                /* Chunked encoding is only supported by HTTP 1.1
+                 * clients */
                 if (resp_major == 1 && resp_minor == 1) {
                         RespInstr->IsChunkActive = 1;
                 } else {
-                        /* The virtual callback indicates that we should use
-                         * chunked encoding however the client doesn't support
-                         * it. Return with an internal server error. */
+                        /* The virtual callback indicates that we should
+                         * use chunked encoding however the client
+                         * doesn't support it. Return with an internal
+                         * server error. */
                         err_code = HTTP_NOT_ACCEPTABLE;
                         goto error_handler;
                 }
@@ -1324,7 +1333,8 @@ static int process_request(
 
         aux_LastModified = UpnpFileInfo_get_LastModified(finfo);
         if (RespInstr->IsRangeActive && RespInstr->IsChunkActive) {
-                /* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
+                /* Content-Range: bytes 222-3333/4000
+                 * HTTP_PARTIAL_CONTENT */
                 /* Transfer-Encoding: chunked */
                 if (http_MakeMessage(p,
                             headers,
@@ -1349,7 +1359,8 @@ static int process_request(
                         goto error_handler;
                 }
         } else if (RespInstr->IsRangeActive && !RespInstr->IsChunkActive) {
-                /* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
+                /* Content-Range: bytes 222-3333/4000
+                 * HTTP_PARTIAL_CONTENT */
                 if (http_MakeMessage(p,
                             headers,
                             resp_major,
@@ -1397,7 +1408,8 @@ static int process_request(
                         goto error_handler;
                 }
         } else {
-                /* !RespInstr->IsRangeActive && !RespInstr->IsChunkActive */
+                /* !RespInstr->IsRangeActive &&
+                 * !RespInstr->IsChunkActive */
                 if (RespInstr->ReadSendSize >= 0) {
                         if (http_MakeMessage(p,
                                     headers,
@@ -1411,8 +1423,8 @@ static int process_request(
                                     "Xc"
                                     "ECc",
                                     HTTP_OK, /* status code */
-                                    RespInstr
-                                            ->ReadSendSize, /* content length */
+                                    RespInstr->ReadSendSize, /* content
+                                                                length */
                                     UpnpFileInfo_get_ContentType(
                                             finfo), /* content type */
                                     RespInstr, /* language info */
@@ -1496,8 +1508,8 @@ static int http_RecvPostMessage(
         SOCKINFO *info,
         /*! File where received data is copied to. */
         char *filename,
-        /*! Send Instruction object which gives information whether the file
-         * is a virtual file or not. */
+        /*! Send Instruction object which gives information whether the
+         * file is a virtual file or not. */
         struct SendInstruction *Instr)
 {
         size_t Data_Buf_Size = 1024;
@@ -1571,7 +1583,8 @@ static int http_RecvPostMessage(
                                                 __FILE__,
                                                 __LINE__,
                                                 "<<< (RECVD) "
-                                                "<<<\n%s\n-----------------\n",
+                                                "<<<\n%s\n-------------"
+                                                "----\n",
                                                 parser->msg.msg.buf);
                                         print_http_headers(p, &parser->msg);
                                         parser->position = POS_COMPLETE;
@@ -1645,9 +1658,8 @@ void web_server_callback(UpnpLib *p,
         membuffer_init(&headers);
         membuffer_init(&filename);
 
-        /*Process request should create the different kind of header depending
-         * on the */
-        /*the type of request. */
+	/* Process request should create the different kind of header
+	 * depending on the type of request. */
         ret = process_request(
                 p, info, req, &rtype, &headers, &filename, &xmldoc, &RespInstr);
         if (ret != HTTP_OK) {
@@ -1729,7 +1741,8 @@ void web_server_callback(UpnpLib *p,
                                 HTTP,
                                 __FILE__,
                                 __LINE__,
-                                "webserver: Invalid response type received.\n");
+                                "webserver: Invalid response type "
+                                "received.\n");
                         assert(0);
                 }
         }
