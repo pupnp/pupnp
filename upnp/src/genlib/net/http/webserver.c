@@ -1708,9 +1708,8 @@ void web_server_callback(
 	membuffer_init(&headers);
 	membuffer_init(&filename);
 
-	/*Process request should create the different kind of header depending
-	 * on the */
-	/*the type of request. */
+	/* Process request should create the different kind of header depending
+	 * on the type of request. */
 	ret = process_request(
 		info, req, &rtype, &headers, &filename, &xmldoc, &RespInstr);
 	if (ret != HTTP_OK) {
