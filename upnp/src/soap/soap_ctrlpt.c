@@ -38,6 +38,7 @@
 
 #include "httpparser.h"
 #include "httpreadwrite.h"
+#include "logger.h"
 #include "membuffer.h"
 #include "miniserver.h"
 #include "parsetools.h"
@@ -564,12 +565,7 @@ int SoapSendAction(UpnpLib *p,
 
         err_code = UPNP_E_OUTOF_MEMORY; /* default error */
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                SOAP,
-                __FILE__,
-                __LINE__,
-                "Inside SoapSendAction():");
+        log_info(SOAP, "Inside SoapSendAction():");
         /* init */
         membuffer_init(&request);
         membuffer_init(&responsename);
@@ -590,11 +586,7 @@ int SoapSendAction(UpnpLib *p,
                 goto error_handler;
         }
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                SOAP,
-                __FILE__,
-                __LINE__,
+        log_info(SOAP,
                 "path=%.*s, hostport=%.*s\n",
                 (int)url.pathquery.size,
                 url.pathquery.buff,
@@ -741,12 +733,7 @@ int SoapSendActionEx(UpnpLib *p,
 
         err_code = UPNP_E_OUTOF_MEMORY; /* default error */
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                SOAP,
-                __FILE__,
-                __LINE__,
-                "Inside SoapSendActionEx():");
+        log_info(SOAP, "Inside SoapSendActionEx():");
         /* init */
         membuffer_init(&request);
         membuffer_init(&responsename);
@@ -772,11 +759,7 @@ int SoapSendActionEx(UpnpLib *p,
                 goto error_handler;
         }
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                SOAP,
-                __FILE__,
-                __LINE__,
+        log_info(SOAP,
                 "path=%.*s, hostport=%.*s\n",
                 (int)url.pathquery.size,
                 url.pathquery.buff,

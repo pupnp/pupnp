@@ -54,6 +54,7 @@
 #include "UpnpLib.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
+#include "logger.h"
 #include "membuffer.h"
 #include "miniserver.h"
 #include "sleep.h"
@@ -129,13 +130,7 @@ int AdvertiseAndReply(UpnpLib *p,
         devType[0] = 0;
         servType[0] = 0;
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_DEBUG,
-                API,
-                __FILE__,
-                __LINE__,
-                "Inside AdvertiseAndReply with AdFlag = %d\n",
-                AdFlag);
+        log_debug(API, "Inside AdvertiseAndReply with AdFlag = %d\n", AdFlag);
 
         /* Use a read lock */
         HandleReadLock();
@@ -150,31 +145,19 @@ int AdvertiseAndReply(UpnpLib *p,
                         sleep_ms(SSDP_PAUSE);
                 NumCopy++;
                 for (i = 0lu;; i++) {
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_DEBUG,
-                                API,
-                                __FILE__,
-                                __LINE__,
+                        log_debug(API,
                                 "Entering new device list with i = %lu\n\n",
                                 i);
                         tmpNode = ixmlNodeList_item(SInfo->DeviceList, i);
                         if (!tmpNode) {
-                                UpnpPrintf(UpnpLib_get_Log(p),
-                                        UPNP_DEBUG,
-                                        API,
-                                        __FILE__,
-                                        __LINE__,
+                                log_debug(API,
                                         "Exiting new device list with i = "
                                         "%lu\n\n",
                                         i);
                                 break;
                         }
                         dbgStr = ixmlNode_getNodeName(tmpNode);
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_INFO,
-                                API,
-                                __FILE__,
-                                __LINE__,
+                        log_info(API,
                                 "Extracting device type once for %s\n",
                                 dbgStr);
                         ixmlNodeList_free(nodeList);
@@ -182,110 +165,52 @@ int AdvertiseAndReply(UpnpLib *p,
                                 (IXML_Element *)tmpNode, "deviceType");
                         if (!nodeList)
                                 continue;
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_DEBUG,
-                                API,
-                                __FILE__,
-                                __LINE__,
-                                "Extracting UDN for %s\n",
-                                dbgStr);
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_DEBUG,
-                                API,
-                                __FILE__,
-                                __LINE__,
-                                "Extracting device type\n");
+                        log_debug(API, "Extracting UDN for %s\n", dbgStr);
+                        log_debug(API, "Extracting device type\n");
                         tmpNode2 = ixmlNodeList_item(nodeList, 0lu);
                         if (!tmpNode2)
                                 continue;
                         textNode = ixmlNode_getFirstChild(tmpNode2);
                         if (!textNode)
                                 continue;
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_DEBUG,
-                                API,
-                                __FILE__,
-                                __LINE__,
-                                "Extracting device type \n");
+                        log_debug(API, "Extracting device type \n");
                         tmpStr = ixmlNode_getNodeValue(textNode);
                         if (!tmpStr)
                                 continue;
                         strncpy(devType, tmpStr, sizeof devType);
                         devType[sizeof devType - 1] = 0;
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_DEBUG,
-                                API,
-                                __FILE__,
-                                __LINE__,
-                                "Extracting device type = %s\n",
-                                devType);
+                        log_debug(
+                                API, "Extracting device type = %s\n", devType);
                         if (!tmpNode) {
-                                UpnpPrintf(UpnpLib_get_Log(p),
-                                        UPNP_DEBUG,
-                                        API,
-                                        __FILE__,
-                                        __LINE__,
-                                        "TempNode is NULL\n");
+                                log_debug(API, "TempNode is NULL\n");
                         }
                         dbgStr = ixmlNode_getNodeName(tmpNode);
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_DEBUG,
-                                API,
-                                __FILE__,
-                                __LINE__,
-                                "Extracting UDN for %s\n",
-                                dbgStr);
+                        log_debug(API, "Extracting UDN for %s\n", dbgStr);
                         ixmlNodeList_free(nodeList);
                         nodeList = ixmlElement_getElementsByTagName(
                                 (IXML_Element *)tmpNode, "UDN");
                         if (!nodeList) {
-                                UpnpPrintf(UpnpLib_get_Log(p),
-                                        UPNP_CRITICAL,
-                                        API,
-                                        __FILE__,
-                                        __LINE__,
-                                        "UDN not found!\n");
+                                log_critical(API, "UDN not found!\n");
                                 continue;
                         }
                         tmpNode2 = ixmlNodeList_item(nodeList, 0lu);
                         if (!tmpNode2) {
-                                UpnpPrintf(UpnpLib_get_Log(p),
-                                        UPNP_CRITICAL,
-                                        API,
-                                        __FILE__,
-                                        __LINE__,
-                                        "UDN not found!\n");
+                                log_critical(API, "UDN not found!\n");
                                 continue;
                         }
                         textNode = ixmlNode_getFirstChild(tmpNode2);
                         if (!textNode) {
-                                UpnpPrintf(UpnpLib_get_Log(p),
-                                        UPNP_CRITICAL,
-                                        API,
-                                        __FILE__,
-                                        __LINE__,
-                                        "UDN not found!\n");
+                                log_critical(API, "UDN not found!\n");
                                 continue;
                         }
                         tmpStr = ixmlNode_getNodeValue(textNode);
                         if (!tmpStr) {
-                                UpnpPrintf(UpnpLib_get_Log(p),
-                                        UPNP_CRITICAL,
-                                        API,
-                                        __FILE__,
-                                        __LINE__,
-                                        "UDN not found!\n");
+                                log_critical(API, "UDN not found!\n");
                                 continue;
                         }
                         strncpy(UDNstr, tmpStr, sizeof UDNstr);
                         UDNstr[sizeof UDNstr - 1] = 0;
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_INFO,
-                                API,
-                                __FILE__,
-                                __LINE__,
-                                "Sending UDNStr = %s \n",
-                                UDNstr);
+                        log_info(API, "Sending UDNStr = %s \n", UDNstr);
                         if (AdFlag) {
                                 /* send the device advertisement */
                                 if (AdFlag == 1) {
@@ -345,12 +270,10 @@ int AdvertiseAndReply(UpnpLib *p,
                                         /* clang-format off */
 					if (DeviceUDN && strlen(DeviceUDN) != (size_t)0) {
 						if (strcasecmp(DeviceUDN, UDNstr)) {
-                                                        UpnpPrintf(UpnpLib_get_Log(p), UPNP_INFO, API, __FILE__, __LINE__,
-								"DeviceUDN=%s and search UDN=%s DID NOT match\n",
+                                                        log_info(API, "DeviceUDN=%s and search UDN=%s DID NOT match\n",
 								UDNstr, DeviceUDN);
 						} else {
-                                                        UpnpPrintf(UpnpLib_get_Log(p), UPNP_INFO, API, __FILE__, __LINE__,
-								"DeviceUDN=%s and search UDN=%s MATCH\n",
+                                                        log_info(API, "DeviceUDN=%s and search UDN=%s MATCH\n",
 								UDNstr, DeviceUDN);
                                                         SendReply(p, DestAddr, devType, 0, UDNstr, SInfo->DescURL, defaultExp, 0,
 								SInfo->PowerState,
@@ -369,8 +292,7 @@ int AdvertiseAndReply(UpnpLib *p,
 							/* the requested version is lower than the device version
 							 * must reply with the lower version number and the lower
 							 * description URL */
-                                                        UpnpPrintf(UpnpLib_get_Log(p), UPNP_INFO, API, __FILE__, __LINE__,
-								   "DeviceType=%s and search devType=%s MATCH\n",
+                                                        log_info(API, "DeviceType=%s and search devType=%s MATCH\n",
 								   devType, DeviceType);
                                                         SendReply(p, DestAddr, DeviceType, 0, UDNstr, SInfo->LowerDescURL,
 								  defaultExp, 1,
@@ -379,8 +301,7 @@ int AdvertiseAndReply(UpnpLib *p,
 								  SInfo->RegistrationState);
 						} else if (atoi(strrchr(DeviceType, ':') + 1)
 							   == atoi(&devType[strlen(devType) - (size_t)1])) {
-                                                        UpnpPrintf(UpnpLib_get_Log(p), UPNP_INFO, API, __FILE__, __LINE__,
-								   "DeviceType=%s and search devType=%s MATCH\n",
+                                                        log_info(API, "DeviceType=%s and search devType=%s MATCH\n",
 								   devType, DeviceType);
                                                         SendReply(p, DestAddr, DeviceType, 0, UDNstr, SInfo->DescURL,
 								  defaultExp, 1,
@@ -388,13 +309,11 @@ int AdvertiseAndReply(UpnpLib *p,
 								  SInfo->SleepPeriod,
 								  SInfo->RegistrationState);
 						} else {
-                                                        UpnpPrintf(UpnpLib_get_Log(p), UPNP_INFO, API, __FILE__, __LINE__,
-								   "DeviceType=%s and search devType=%s DID NOT MATCH\n",
+                                                        log_info(API, "DeviceType=%s and search devType=%s DID NOT MATCH\n",
 								   devType, DeviceType);
 						}
 					} else {
-                                                UpnpPrintf(UpnpLib_get_Log(p), UPNP_INFO, API, __FILE__, __LINE__,
-							   "DeviceType=%s and search devType=%s DID NOT MATCH\n",
+                                                log_info(API, "DeviceType=%s and search devType=%s DID NOT MATCH\n",
 							   devType, DeviceType);
 					}
                                         /* clang-format on */
@@ -406,12 +325,7 @@ int AdvertiseAndReply(UpnpLib *p,
                         }
                         /* send service advertisements for services
                          * corresponding to the same device */
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_INFO,
-                                API,
-                                __FILE__,
-                                __LINE__,
-                                "Sending service Advertisement\n");
+                        log_info(API, "Sending service Advertisement\n");
                         /* Correct service traversal such that each device's
                          * serviceList is directly traversed as a child of its
                          * parent device. This ensures that the service's alive
@@ -434,12 +348,7 @@ int AdvertiseAndReply(UpnpLib *p,
                         nodeList = ixmlElement_getElementsByTagName(
                                 (IXML_Element *)tmpNode, "service");
                         if (!nodeList) {
-                                UpnpPrintf(UpnpLib_get_Log(p),
-                                        UPNP_INFO,
-                                        API,
-                                        __FILE__,
-                                        __LINE__,
-                                        "Service not found 3\n");
+                                log_info(API, "Service not found 3\n");
                                 continue;
                         }
                         for (j = 0lu;; j++) {
@@ -451,11 +360,7 @@ int AdvertiseAndReply(UpnpLib *p,
                                 tmpNodeList = ixmlElement_getElementsByTagName(
                                         (IXML_Element *)tmpNode, "serviceType");
                                 if (!tmpNodeList) {
-                                        UpnpPrintf(UpnpLib_get_Log(p),
-                                                UPNP_CRITICAL,
-                                                API,
-                                                __FILE__,
-                                                __LINE__,
+                                        log_critical(API,
                                                 "ServiceType not found \n");
                                         continue;
                                 }
@@ -472,13 +377,7 @@ int AdvertiseAndReply(UpnpLib *p,
                                         continue;
                                 strncpy(servType, tmpStr, sizeof servType);
                                 servType[sizeof servType - 1] = 0;
-                                UpnpPrintf(UpnpLib_get_Log(p),
-                                        UPNP_INFO,
-                                        API,
-                                        __FILE__,
-                                        __LINE__,
-                                        "ServiceType = %s\n",
-                                        servType);
+                                log_info(API, "ServiceType = %s\n", servType);
                                 if (AdFlag) {
                                         if (AdFlag == 1) {
                                                 ServiceAdvertisement(p,
@@ -524,8 +423,7 @@ int AdvertiseAndReply(UpnpLib *p,
 									/* the requested version is lower than the service version
 									 * must reply with the lower version number and the lower
 									 * description URL */
-                                                                        UpnpPrintf(UpnpLib_get_Log(p), UPNP_INFO, API, __FILE__, __LINE__,
-										   "ServiceType=%s and search servType=%s MATCH\n",
+                                                                        log_info(API, "ServiceType=%s and search servType=%s MATCH\n",
 										   ServiceType, servType);
                                                                         SendReply(p, DestAddr, ServiceType, 0, UDNstr, SInfo->LowerDescURL,
 										  defaultExp, 1,
@@ -534,8 +432,7 @@ int AdvertiseAndReply(UpnpLib *p,
 										  SInfo->RegistrationState);
 								} else if (atoi(strrchr (ServiceType, ':') + 1) ==
 									   atoi(&servType[strlen(servType) - (size_t)1])) {
-                                                                        UpnpPrintf(UpnpLib_get_Log(p), UPNP_INFO, API, __FILE__, __LINE__,
-										   "ServiceType=%s and search servType=%s MATCH\n",
+                                                                        log_info(API, "ServiceType=%s and search servType=%s MATCH\n",
 										   ServiceType, servType);
                                                                         SendReply(p, DestAddr, ServiceType, 0, UDNstr, SInfo->DescURL,
 										  defaultExp, 1,
@@ -543,13 +440,11 @@ int AdvertiseAndReply(UpnpLib *p,
 										  SInfo->SleepPeriod,
 										  SInfo->RegistrationState);
 								} else {
-                                                                        UpnpPrintf(UpnpLib_get_Log(p), UPNP_INFO, API, __FILE__, __LINE__,
-									   "ServiceType=%s and search servType=%s DID NOT MATCH\n",
+                                                                        log_info(API, "ServiceType=%s and search servType=%s DID NOT MATCH\n",
 									   ServiceType, servType);
 								}
 							} else {
-                                                                UpnpPrintf(UpnpLib_get_Log(p), UPNP_INFO, API, __FILE__, __LINE__,
-									   "ServiceType=%s and search servType=%s DID NOT MATCH\n",
+                                                                log_info(API, "ServiceType=%s and search servType=%s DID NOT MATCH\n",
 									   ServiceType, servType);
 							}
 						}
@@ -570,12 +465,7 @@ int AdvertiseAndReply(UpnpLib *p,
 end_function:
         ixmlNodeList_free(tmpNodeList);
         ixmlNodeList_free(nodeList);
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_DEBUG,
-                API,
-                __FILE__,
-                __LINE__,
-                "Exiting AdvertiseAndReply.\n");
+        log_debug(API, "Exiting AdvertiseAndReply.\n");
         HandleUnlock();
 
         return retVal;
@@ -756,11 +646,7 @@ static UPNP_INLINE int valid_ssdp_msg(
                                 memptr_cmp(&hdr_value, "[FF05::C]:1900") != 0 &&
                                 memptr_cmp(&hdr_value, "[ff05::c]:1900") !=
                                         0)) {
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_INFO,
-                                SSDP,
-                                __FILE__,
-                                __LINE__,
+                        log_info(SSDP,
                                 "Invalid HOST header from SSDP message\n");
 
                         return 0;
@@ -793,25 +679,14 @@ static UPNP_INLINE int start_event_handler(
         if (status == (parse_status_t)PARSE_FAILURE) {
                 if (parser->msg.method != (http_method_t)HTTPMETHOD_NOTIFY ||
                         !parser->valid_ssdp_notify_hack) {
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_INFO,
-                                SSDP,
-                                __FILE__,
-                                __LINE__,
-                                "SSDP recvd bad msg code = %d\n",
-                                status);
+                        log_info(
+                                SSDP, "SSDP recvd bad msg code = %d\n", status);
                         /* ignore bad msg, or not enuf mem */
                         goto error_handler;
                 }
                 /* valid notify msg */
         } else if (status != (parse_status_t)PARSE_SUCCESS) {
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_INFO,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
-                        "SSDP recvd bad msg code = %d\n",
-                        status);
+                log_info(SSDP, "SSDP recvd bad msg code = %d\n", status);
 
                 goto error_handler;
         }
@@ -926,8 +801,7 @@ void readFromSSDPSocket(UpnpLib *p, SOCKET socket)
                         ntop_buf[sizeof ntop_buf - 1] = 0;
                 }
                 /* clang-format off */
-                UpnpPrintf(UpnpLib_get_Log(p), UPNP_INFO, SSDP, __FILE__, __LINE__,
-			   "Start of received response ----------------------------------------------------\n"
+                log_info(SSDP, "Start of received response ----------------------------------------------------\n"
 			   "%s\n"
 			   "End of received response ------------------------------------------------------\n"
 			   "From host %s\n", requestBuf, ntop_buf);
@@ -973,13 +847,7 @@ static int create_ssdp_sock_v4(
         *ssdpSock = socket(AF_INET, SOCK_DGRAM, 0);
         if (*ssdpSock == INVALID_SOCKET) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
-                        "Error in socket(): %s\n",
-                        errorBuffer);
+                log_critical(SSDP, "Error in socket(): %s\n", errorBuffer);
 
                 return UPNP_E_OUTOF_SOCKET;
         }
@@ -991,11 +859,7 @@ static int create_ssdp_sock_v4(
                 sizeof(onOff));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() SO_REUSEADDR: %s\n",
                         errorBuffer);
                 ret = UPNP_E_SOCKET_ERROR;
@@ -1010,11 +874,7 @@ static int create_ssdp_sock_v4(
                 sizeof(onOff));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() SO_REUSEPORT: %s\n",
                         errorBuffer);
                 ret = UPNP_E_SOCKET_ERROR;
@@ -1028,11 +888,7 @@ static int create_ssdp_sock_v4(
         ret = bind(*ssdpSock, (struct sockaddr *)ssdpAddr4, sizeof(*ssdpAddr4));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in bind(), addr=0x%08X, port=%d: %s\n",
                         INADDR_ANY,
                         SSDP_PORT,
@@ -1050,11 +906,7 @@ static int create_ssdp_sock_v4(
                 sizeof(struct ip_mreq));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() IP_ADD_MEMBERSHIP (join "
                         "multicast group): %s\n",
                         errorBuffer);
@@ -1071,11 +923,7 @@ static int create_ssdp_sock_v4(
                 sizeof addr);
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_INFO,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_info(SSDP,
                         "Error in setsockopt() IP_MULTICAST_IF (set multicast "
                         "interface): %s\n",
                         errorBuffer);
@@ -1091,11 +939,7 @@ static int create_ssdp_sock_v4(
                 sizeof(onOff));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() SO_BROADCAST (set broadcast): "
                         "%s\n",
                         errorBuffer);
@@ -1130,13 +974,7 @@ static int create_ssdp_sock_reqv4(
         *ssdpReqSock = socket(AF_INET, SOCK_DGRAM, 0);
         if (*ssdpReqSock == INVALID_SOCKET) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
-                        "Error in socket(): %s\n",
-                        errorBuffer);
+                log_critical(SSDP, "Error in socket(): %s\n", errorBuffer);
                 return UPNP_E_OUTOF_SOCKET;
         }
         setsockopt(
@@ -1171,13 +1009,7 @@ static int create_ssdp_sock_v6(
         *ssdpSock = socket(AF_INET6, SOCK_DGRAM, 0);
         if (*ssdpSock == INVALID_SOCKET) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
-                        "Error in socket(): %s\n",
-                        errorBuffer);
+                log_critical(SSDP, "Error in socket(): %s\n", errorBuffer);
 
                 return UPNP_E_OUTOF_SOCKET;
         }
@@ -1189,11 +1021,7 @@ static int create_ssdp_sock_v6(
                 sizeof(onOff));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() SO_REUSEADDR: %s\n",
                         errorBuffer);
                 ret = UPNP_E_SOCKET_ERROR;
@@ -1208,11 +1036,7 @@ static int create_ssdp_sock_v6(
                 sizeof(onOff));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() SO_REUSEPORT: %s\n",
                         errorBuffer);
                 ret = UPNP_E_SOCKET_ERROR;
@@ -1227,11 +1051,7 @@ static int create_ssdp_sock_v6(
                 sizeof(onOff));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() IPV6_V6ONLY: %s\n",
                         errorBuffer);
                 ret = UPNP_E_SOCKET_ERROR;
@@ -1248,11 +1068,7 @@ static int create_ssdp_sock_v6(
         if (ret == -1) {
 #ifndef _WIN32
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in bind(), addr=%s, index=%d, port=%d: %s\n",
                         lIF_IPV6,
                         lIF_INDEX,
@@ -1262,11 +1078,7 @@ static int create_ssdp_sock_v6(
                 goto error_handler;
 #else /* _WIN32 */
                 int wsa_err = WSAGetLastError();
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in bind(), addr=%s, index=%d, port=%d: %d\n",
                         lIF_IPV6,
                         lIF_INDEX,
@@ -1288,11 +1100,7 @@ static int create_ssdp_sock_v6(
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
                 uint32_t *ipv6ma = (uint32_t *)&ssdpMcastAddr.ipv6mr_multiaddr;
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() IPV6_JOIN_GROUP (join multicast "
                         "group): %s.\n"
                         "SSDP_IPV6_LINKLOCAL = %s,\n"
@@ -1319,11 +1127,7 @@ static int create_ssdp_sock_v6(
                 sizeof(onOff));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() SO_BROADCAST (set broadcast): "
                         "%s\n",
                         errorBuffer);
@@ -1362,13 +1166,7 @@ static int create_ssdp_sock_v6_ula_gua(
         *ssdpSock = socket(AF_INET6, SOCK_DGRAM, 0);
         if (*ssdpSock == INVALID_SOCKET) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
-                        "Error in socket(): %s\n",
-                        errorBuffer);
+                log_critical(SSDP, "Error in socket(): %s\n", errorBuffer);
 
                 return UPNP_E_OUTOF_SOCKET;
         }
@@ -1380,11 +1178,7 @@ static int create_ssdp_sock_v6_ula_gua(
                 sizeof(onOff));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() SO_REUSEADDR: %s\n",
                         errorBuffer);
                 ret = UPNP_E_SOCKET_ERROR;
@@ -1399,11 +1193,7 @@ static int create_ssdp_sock_v6_ula_gua(
                 sizeof(onOff));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() SO_REUSEPORT: %s\n",
                         errorBuffer);
                 ret = UPNP_E_SOCKET_ERROR;
@@ -1418,11 +1208,7 @@ static int create_ssdp_sock_v6_ula_gua(
                 sizeof(onOff));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() IPV6_V6ONLY: %s\n",
                         errorBuffer);
                 ret = UPNP_E_SOCKET_ERROR;
@@ -1436,11 +1222,7 @@ static int create_ssdp_sock_v6_ula_gua(
         ret = bind(*ssdpSock, (struct sockaddr *)ssdpAddr6, sizeof(*ssdpAddr6));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in bind(), addr=0x%032lX, port=%d: %s\n",
                         0lu,
                         SSDP_PORT,
@@ -1460,11 +1242,7 @@ static int create_ssdp_sock_v6_ula_gua(
                 sizeof(ssdpMcastAddr));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() IPV6_JOIN_GROUP (join multicast "
                         "group): %s\n",
                         errorBuffer);
@@ -1479,11 +1257,7 @@ static int create_ssdp_sock_v6_ula_gua(
                 sizeof(onOff));
         if (ret == -1) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
+                log_critical(SSDP,
                         "Error in setsockopt() SO_BROADCAST (set broadcast): "
                         "%s\n",
                         errorBuffer);
@@ -1519,13 +1293,7 @@ static int create_ssdp_sock_reqv6(
         *ssdpReqSock = socket(AF_INET6, SOCK_DGRAM, 0);
         if (*ssdpReqSock == INVALID_SOCKET) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        SSDP,
-                        __FILE__,
-                        __LINE__,
-                        "Error in socket(): %s\n",
-                        errorBuffer);
+                log_critical(SSDP, "Error in socket(): %s\n", errorBuffer);
                 return UPNP_E_OUTOF_SOCKET;
         }
         /* MUST use scoping of IPv6 addresses to control the propagation os SSDP

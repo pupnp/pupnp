@@ -47,6 +47,7 @@
 #include "UpnpLib.h"
 #include "UpnpLog.h"
 #include "UpnpStdInt.h" /* for ssize_t */
+#include "logger.h"
 #include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
 #include "upnp.h"
 #include "winutil.h"
@@ -126,13 +127,7 @@ int sock_destroy(UpnpLib *p, SOCKINFO *info, int ShutdownMethod)
 #endif
                 if (shutdown(info->socket, ShutdownMethod) == -1) {
                         strerror_r(errno, errorBuffer, sizeof errorBuffer);
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_INFO,
-                                HTTP,
-                                __FILE__,
-                                __LINE__,
-                                "Error in shutdown: %s\n",
-                                errorBuffer);
+                        log_info(HTTP, "Error in shutdown: %s\n", errorBuffer);
                 }
                 if (sock_close(info->socket) == -1) {
                         ret = UPNP_E_SOCKET_ERROR;

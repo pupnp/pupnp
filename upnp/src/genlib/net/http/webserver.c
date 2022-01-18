@@ -50,6 +50,7 @@
 #include "document_type.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
+#include "logger.h"
 #include "membuffer.h"
 #include "pthread.h"
 #include "ssdplib.h"
@@ -564,11 +565,7 @@ static int get_file_info(
         UpnpFileInfo_set_LastModified(info, s.st_mtime);
         rc = get_content_type(p, filename, info);
         aux_LastModified = UpnpFileInfo_get_LastModified(info);
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                HTTP,
-                __FILE__,
-                __LINE__,
+        log_info(HTTP,
                 "file info: %s, length: %" PRId64 ", last_mod=%s readable=%d\n",
                 filename,
                 (int64_t)UpnpFileInfo_get_FileLength(info),
@@ -1592,11 +1589,7 @@ static int http_RecvPostMessage(
                                 }
                         } else if (num_read == 0) {
                                 if (ok_on_close) {
-                                        UpnpPrintf(UpnpLib_get_Log(p),
-                                                UPNP_INFO,
-                                                HTTP,
-                                                __FILE__,
-                                                __LINE__,
+                                        log_info(HTTP,
                                                 "<<< (RECVD) "
                                                 "<<<\n%s\n-------------"
                                                 "----\n",
@@ -1751,22 +1744,13 @@ void web_server_callback(UpnpLib *p,
                                 headers.length);
                         break;
                 default:
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_INFO,
-                                HTTP,
-                                __FILE__,
-                                __LINE__,
+                        log_info(HTTP,
                                 "webserver: Invalid response type "
                                 "received.\n");
                         assert(0);
                 }
         }
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                HTTP,
-                __FILE__,
-                __LINE__,
-                "webserver: request processed...\n");
+        log_info(HTTP, "webserver: request processed...\n");
         membuffer_destroy(&headers);
         membuffer_destroy(&filename);
 }

@@ -40,6 +40,7 @@
 #include "UpnpInet.h"
 #include "UpnpLib.h"
 #include "UpnpLog.h"
+#include "logger.h"
 #include "membuffer.h"
 #include "unixutil.h"
 #include "upnp.h"
@@ -199,13 +200,7 @@ static UPNP_INLINE int calc_descURL(UpnpLib *p,
         if (len > (size_t)LINE_SIZE)
                 return UPNP_E_URL_TOO_BIG;
         snprintf(descURL, len, "%s%s%s", http_scheme, ipPortStr, alias);
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                API,
-                __FILE__,
-                __LINE__,
-                "desc url: %s\n",
-                descURL);
+        log_info(API, "desc url: %s\n", descURL);
 
         return UPNP_E_SUCCESS;
 }
@@ -422,20 +417,8 @@ int configure_urlbase(UpnpLib *p,
                 goto error_handler;
         }
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                API,
-                __FILE__,
-                __LINE__,
-                "desc url: %s\n",
-                docURL);
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                API,
-                __FILE__,
-                __LINE__,
-                "doc = %s\n",
-                xml_str);
+        log_info(API, "desc url: %s\n", docURL);
+        log_info(API, "doc = %s\n", xml_str);
         /* store in web server */
         err_code = web_server_set_alias(
                 p, new_alias, xml_str, strlen(xml_str), last_modified);

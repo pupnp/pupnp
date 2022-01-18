@@ -43,6 +43,7 @@
 #include "UpnpLib.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
+#include "logger.h"
 #include "parsetools.h"
 #include "soaplib.h"
 #include "ssdplib.h"
@@ -299,11 +300,7 @@ static UPNP_INLINE void send_action_response(
                 end_body,
                 strlen(end_body));
         if (ret_code != 0) {
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_INFO,
-                        SOAP,
-                        __FILE__,
-                        __LINE__,
+                log_info(SOAP,
                         "Failed to send response: err code = %d\n",
                         ret_code);
         }
@@ -360,12 +357,7 @@ static UPNP_INLINE void handle_query_variable(
         /* send event */
         soap_info->callback(
                 p, UPNP_CONTROL_GET_VAR_REQUEST, variable, soap_info->cookie);
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                SOAP,
-                __FILE__,
-                __LINE__,
-                "Return from callback for var request\n");
+        log_info(SOAP, "Return from callback for var request\n");
         /* validate, and handle result */
         if (UpnpStateVarRequest_get_CurrentVal(variable) == NULL)
                 goto error_handler;
@@ -456,12 +448,7 @@ static void handle_invoke_action(
                 goto error_handler;
         }
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                SOAP,
-                __FILE__,
-                __LINE__,
-                "Calling Callback\n");
+        log_info(SOAP, "Calling Callback\n");
         soap_info->callback(
                 p, UPNP_CONTROL_ACTION_REQUEST, action, soap_info->cookie);
         err_code = UpnpActionRequest_get_ErrCode(action);

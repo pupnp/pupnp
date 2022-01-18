@@ -48,6 +48,7 @@
 #include "UpnpLib.h"
 #include "UpnpLog.h"
 #include "list.h"
+#include "logger.h"
 #include "statcodes.h"
 #include "strintmap.h"
 #include "unixutil.h"
@@ -1762,12 +1763,7 @@ static UPNP_INLINE parse_status_t parser_parse_chunky_entity(
         status = match(p, scanner, "%x%L%c", &parser->chunk_size, &dummy);
         if (status != (parse_status_t)PARSE_OK) {
                 scanner->cursor = save_pos;
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_INFO,
-                        HTTP,
-                        __FILE__,
-                        __LINE__,
-                        "CHUNK COULD NOT BE PARSED\n");
+                log_info(HTTP, "CHUNK COULD NOT BE PARSED\n");
                 return status;
         }
         /* remove chunk info just matched; just retain data */
@@ -1898,12 +1894,7 @@ parse_status_t parser_get_entity_read_method(UpnpLib *p, http_parser_t *parser)
                 if (raw_find_str(&hdr_value, "chunked") >= 0) {
                         /* read method to use chunked transfer encoding */
                         parser->ent_position = ENTREAD_USING_CHUNKED;
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_INFO,
-                                HTTP,
-                                __FILE__,
-                                __LINE__,
-                                "Found Chunked Encoding ....\n");
+                        log_info(HTTP, "Found Chunked Encoding ....\n");
 
                         return PARSE_CONTINUE_1;
                 }
@@ -2295,11 +2286,7 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
 
         /* print start line */
         if (hmsg->is_request) {
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_DEBUG,
-                        HTTP,
-                        __FILE__,
-                        __LINE__,
+                log_debug(HTTP,
                         "method = %d, version = %d.%d, url = %.*s\n",
                         hmsg->method,
                         hmsg->major_version,
@@ -2307,11 +2294,7 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
                         (int)hmsg->uri.pathquery.size,
                         hmsg->uri.pathquery.buff);
         } else {
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_DEBUG,
-                        HTTP,
-                        __FILE__,
-                        __LINE__,
+                log_debug(HTTP,
                         "resp status = %d, version = %d.%d, status msg = "
                         "%.*s\n",
                         hmsg->status_code,
@@ -2327,11 +2310,7 @@ void print_http_headers(UpnpLib *p, http_message_t *hmsg)
         while (node != NULL) {
                 header = (http_header_t *)node->item;
                 /* NNS: header = (http_header_t *)node->data; */
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_DEBUG,
-                        HTTP,
-                        __FILE__,
-                        __LINE__,
+                log_debug(HTTP,
                         "hdr name: %.*s, value: %.*s\n",
                         (int)header->name.length,
                         header->name.buf,

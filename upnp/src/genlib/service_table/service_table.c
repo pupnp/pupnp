@@ -42,6 +42,7 @@
 #include "service_table.h"
 
 #include "UpnpLib.h"
+#include "logger.h"
 
 #ifdef INCLUDE_DEVICE_APIS
 
@@ -857,17 +858,9 @@ service_info *getServiceList(
                                                   controlURL)) ||
                                         !(current->controlURL = resolve_rel_url(
                                                   p, URLBase, tempDOMString))) {
-                                        UpnpPrintf(UpnpLib_get_Log(p),
-                                                UPNP_INFO,
-                                                GENA,
-                                                __FILE__,
-                                                __LINE__,
+                                        log_info(GENA,
                                                 "BAD OR MISSING CONTROL URL");
-                                        UpnpPrintf(UpnpLib_get_Log(p),
-                                                UPNP_INFO,
-                                                GENA,
-                                                __FILE__,
-                                                __LINE__,
+                                        log_info(GENA,
                                                 "CONTROL URL SET TO NULL IN "
                                                 "SERVICE INFO");
                                         current->controlURL = NULL;
@@ -882,17 +875,9 @@ service_info *getServiceList(
                                                   eventURL)) ||
                                         !(current->eventURL = resolve_rel_url(
                                                   p, URLBase, tempDOMString))) {
-                                        UpnpPrintf(UpnpLib_get_Log(p),
-                                                UPNP_INFO,
-                                                GENA,
-                                                __FILE__,
-                                                __LINE__,
+                                        log_info(GENA,
                                                 "BAD OR MISSING EVENT URL");
-                                        UpnpPrintf(UpnpLib_get_Log(p),
-                                                UPNP_INFO,
-                                                GENA,
-                                                __FILE__,
-                                                __LINE__,
+                                        log_info(GENA,
                                                 "EVENT URL SET TO NULL IN "
                                                 "SERVICE INFO");
                                         current->eventURL = NULL;

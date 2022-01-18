@@ -39,6 +39,7 @@
 #include "gena_device.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
+#include "logger.h"
 #include "statcodes.h"
 #include "unixutil.h"
 
@@ -104,12 +105,7 @@ void genaCallback(UpnpLib *p,
                         /* subscribe */
                         gena_process_subscription_request(p, info, request);
                 }
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_DEBUG,
-                        GENA,
-                        __FILE__,
-                        __LINE__,
-                        "got subscription request\n");
+                log_debug(GENA, "got subscription request\n");
         } else if (request->method == HTTPMETHOD_UNSUBSCRIBE) {
                 found_function = 1;
                 /* unsubscribe */

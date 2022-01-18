@@ -45,6 +45,7 @@
 #include "gena.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
+#include "logger.h"
 #include "parsetools.h"
 #include "ssdplib.h"
 #include "statcodes.h"
@@ -79,11 +80,7 @@ int genaUnregisterDevice(
 
         HandleLock();
         if (GetHandleInfo(p, device_handle, &handle_info) != HND_DEVICE) {
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_CRITICAL,
-                        GENA,
-                        __FILE__,
-                        __LINE__,
+                log_critical(GENA,
                         "genaUnregisterDevice: BAD Handle: %d\n",
                         device_handle);
                 ret = GENA_E_BAD_HANDLE;
@@ -199,11 +196,7 @@ static UPNP_INLINE int notify_send_and_recv(
         const char *CRLF = "\r\n";
 
         /* connect */
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_DEBUG,
-                GENA,
-                __FILE__,
-                __LINE__,
+        log_debug(GENA,
                 "gena notify to: %.*s\n",
                 (int)destination_url->hostport.text.size,
                 destination_url->hostport.text.buff);
@@ -535,12 +528,7 @@ static int genaInitNotifyCommon(UpnpLib *p,
         struct Handle_Info *handle_info;
         ThreadPoolJob *job = NULL;
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
-                "GENA BEGIN INITIAL NOTIFY COMMON\n");
+        log_info(GENA, "GENA BEGIN INITIAL NOTIFY COMMON\n");
 
         job = (ThreadPoolJob *)malloc(sizeof(ThreadPoolJob));
         if (job == NULL) {
@@ -586,11 +574,7 @@ static int genaInitNotifyCommon(UpnpLib *p,
                 ret = GENA_E_BAD_SERVICE;
                 goto ExitFunction;
         }
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
+        log_info(GENA,
                 "FOUND SERVICE IN INIT NOTFY: UDN %s, ServID: %s",
                 UDN,
                 servId);
@@ -601,13 +585,7 @@ static int genaInitNotifyCommon(UpnpLib *p,
                 ret = GENA_E_BAD_SID;
                 goto ExitFunction;
         }
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
-                "FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s",
-                sid);
+        log_info(GENA, "FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s", sid);
         sub->active = 1;
 
         headers = AllocGenaHeaders(p, propertySet);
@@ -698,12 +676,7 @@ int genaInitNotify(UpnpLib *p,
         int line = 0;
         DOMString propertySet = NULL;
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
-                "GENA BEGIN INITIAL NOTIFY\n");
+        log_info(GENA, "GENA BEGIN INITIAL NOTIFY\n");
 
         if (var_count <= 0) {
                 line = __LINE__;
@@ -716,13 +689,8 @@ int genaInitNotify(UpnpLib *p,
                 line = __LINE__;
                 goto ExitFunction;
         }
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
-                "GENERATED PROPERTY SET IN INIT NOTIFY: %s",
-                propertySet);
+        log_info(
+                GENA, "GENERATED PROPERTY SET IN INIT NOTIFY: %s", propertySet);
 
         ret = genaInitNotifyCommon(
                 p, device_handle, UDN, servId, propertySet, sid);
@@ -752,12 +720,7 @@ int genaInitNotifyExt(UpnpLib *p,
 
         DOMString propertySet = NULL;
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
-                "GENA BEGIN INITIAL NOTIFY EXT\n");
+        log_info(GENA, "GENA BEGIN INITIAL NOTIFY EXT\n");
 
         if (PropSet == 0) {
                 line = __LINE__;
@@ -771,11 +734,7 @@ int genaInitNotifyExt(UpnpLib *p,
                 ret = UPNP_E_INVALID_PARAM;
                 goto ExitFunction;
         }
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
+        log_info(GENA,
                 "GENERATED PROPERTY SET IN INIT EXT NOTIFY: %s",
                 propertySet);
 
@@ -854,12 +813,7 @@ static int genaNotifyAllCommon(UpnpLib *p,
         service_info *service = NULL;
         struct Handle_Info *handle_info;
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
-                "GENA BEGIN NOTIFY ALL COMMON\n");
+        log_info(GENA, "GENA BEGIN NOTIFY ALL COMMON\n");
 
         /* Keep this allocation first */
         reference_count = (int *)malloc(sizeof(int));
@@ -1009,12 +963,7 @@ int genaNotifyAllExt(UpnpLib *p,
 
         DOMString propertySet = NULL;
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
-                "GENA BEGIN NOTIFY ALL EXT\n");
+        log_info(GENA, "GENA BEGIN NOTIFY ALL EXT\n");
 
         propertySet = ixmlPrintNode((IXML_Node *)PropSet);
         if (propertySet == NULL) {
@@ -1022,13 +971,7 @@ int genaNotifyAllExt(UpnpLib *p,
                 ret = UPNP_E_INVALID_PARAM;
                 goto ExitFunction;
         }
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
-                "GENERATED PROPERTY SET IN EXT NOTIFY: %s",
-                propertySet);
+        log_info(GENA, "GENERATED PROPERTY SET IN EXT NOTIFY: %s", propertySet);
 
         ret = genaNotifyAllCommon(p, device_handle, UDN, servId, propertySet);
 
@@ -1058,25 +1001,14 @@ int genaNotifyAll(UpnpLib *p,
 
         DOMString propertySet = NULL;
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
-                "GENA BEGIN NOTIFY ALL\n");
+        log_info(GENA, "GENA BEGIN NOTIFY ALL\n");
 
         ret = GeneratePropertySet(VarNames, VarValues, var_count, &propertySet);
         if (ret != XML_SUCCESS) {
                 line = __LINE__;
                 goto ExitFunction;
         }
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
-                "GENERATED PROPERTY SET IN EXT NOTIFY: %s",
-                propertySet);
+        log_info(GENA, "GENERATED PROPERTY SET IN EXT NOTIFY: %s", propertySet);
 
         ret = genaNotifyAllCommon(p, device_handle, UDN, servId, propertySet);
 
@@ -1327,11 +1259,7 @@ static int gena_validate_delivery_urls(
                                         &deliveryAddr4->sin_addr,
                                         deliveryAddrString,
                                         sizeof(deliveryAddrString));
-                                UpnpPrintf(UpnpLib_get_Log(p),
-                                        UPNP_CRITICAL,
-                                        GENA,
-                                        __FILE__,
-                                        __LINE__,
+                                log_critical(GENA,
                                         "DeliveryURL %s is invalid.\n"
                                         "It is not in the expected network "
                                         "segment (IPv4: %s, netmask: %s)\n",
@@ -1373,11 +1301,7 @@ static int gena_validate_delivery_urls(
                                         &deliveryAddr6->sin6_addr,
                                         deliveryAddrString,
                                         sizeof(deliveryAddrString));
-                                UpnpPrintf(UpnpLib_get_Log(p),
-                                        UPNP_CRITICAL,
-                                        GENA,
-                                        __FILE__,
-                                        __LINE__,
+                                log_critical(GENA,
                                         "DeliveryURL %s is invalid.\n"
                                         "It is not in the expected network "
                                         "segment (IPv6: %s, prefix: %d)\n",
@@ -1415,12 +1339,7 @@ void gena_process_subscription_request(
         memptr timeout_hdr;
         int rc = 0;
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
-                "Subscription Request Received:\n");
+        log_info(GENA, "Subscription Request Received:\n");
 
         if (httpmsg_find_hdr(request, HDR_NT, &nt_hdr) == NULL) {
                 error_respond(p, info, HTTP_BAD_REQUEST, request);
@@ -1449,11 +1368,7 @@ void gena_process_subscription_request(
                 goto exit_function;
         }
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
+        log_info(GENA,
                 "SubscriptionRequest for event URL path: %s\n",
                 event_url_path);
 
@@ -1478,11 +1393,7 @@ void gena_process_subscription_request(
                 goto exit_function;
         }
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
+        log_info(GENA,
                 "Subscription Request: Number of Subscriptions already %d\n "
                 "Max Subscriptions allowed: %d\n",
                 service->TotalSubscriptions,
@@ -1672,11 +1583,7 @@ void gena_process_subscription_renewal_request(
                 return;
         }
 
-        UpnpPrintf(UpnpLib_get_Log(p),
-                UPNP_INFO,
-                GENA,
-                __FILE__,
-                __LINE__,
+        log_info(GENA,
                 "Renew request: Number of subscriptions already: %d\n "
                 "Max Subscriptions allowed:%d\n",
                 service->TotalSubscriptions,
