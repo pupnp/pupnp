@@ -34,8 +34,8 @@
 
 void UpnpListInit(UpnpListHead *list)
 {
-        list->next = list;
-        list->prev = list;
+	list->next = list;
+	list->prev = list;
 }
 
 UpnpListIter UpnpListBegin(UpnpListHead *list) { return list->next; }
@@ -44,25 +44,25 @@ UpnpListIter UpnpListEnd(UpnpListHead *list) { return list; }
 
 UpnpListIter UpnpListNext(UpnpListHead *list, UpnpListIter pos)
 {
-        (void)list;
-        return pos->next;
+	(void)list;
+	return pos->next;
 }
 
 UpnpListIter UpnpListInsert(
-        UpnpListHead *list, UpnpListIter pos, UpnpListHead *elt)
+	UpnpListHead *list, UpnpListIter pos, UpnpListHead *elt)
 {
-        (void)list;
-        elt->prev = pos->prev;
-        elt->next = pos;
-        pos->prev->next = elt;
-        pos->prev = elt;
-        return elt;
+	(void)list;
+	elt->prev = pos->prev;
+	elt->next = pos;
+	pos->prev->next = elt;
+	pos->prev = elt;
+	return elt;
 }
 
 UpnpListIter UpnpListErase(UpnpListHead *list, UpnpListIter pos)
 {
-        (void)list;
-        pos->prev->next = pos->next;
-        pos->next->prev = pos->prev;
-        return pos->next;
+	(void)list;
+	pos->prev->next = pos->next;
+	pos->next->prev = pos->prev;
+	return pos->next;
 }

@@ -63,40 +63,40 @@
  *	Note :
  ************************************************************************/
 int map_str_to_int(const char *name,
-        size_t name_len,
-        const str_int_entry *table,
-        int num_entries,
-        int case_sensitive)
+	size_t name_len,
+	const str_int_entry *table,
+	int num_entries,
+	int case_sensitive)
 {
-        int top, mid, bot;
-        int cmp;
-        memptr name_ptr;
+	int top, mid, bot;
+	int cmp;
+	memptr name_ptr;
 
-        name_ptr.buf = (char *)name;
-        name_ptr.length = name_len;
+	name_ptr.buf = (char *)name;
+	name_ptr.length = name_len;
 
-        top = 0;
-        bot = num_entries - 1;
+	top = 0;
+	bot = num_entries - 1;
 
-        while (top <= bot) {
-                mid = (top + bot) / 2;
-                if (case_sensitive) {
-                        cmp = memptr_cmp(&name_ptr, table[mid].name);
-                } else {
-                        cmp = memptr_cmp_nocase(&name_ptr, table[mid].name);
-                }
+	while (top <= bot) {
+		mid = (top + bot) / 2;
+		if (case_sensitive) {
+			cmp = memptr_cmp(&name_ptr, table[mid].name);
+		} else {
+			cmp = memptr_cmp_nocase(&name_ptr, table[mid].name);
+		}
 
-                if (cmp > 0) {
-                        top = mid + 1; /* look below mid */
-                } else if (cmp < 0) {
-                        bot = mid - 1; /* look above mid */
-                } else /* cmp == 0 */
-                {
-                        return mid; /* match; return table index */
-                }
-        }
+		if (cmp > 0) {
+			top = mid + 1; /* look below mid */
+		} else if (cmp < 0) {
+			bot = mid - 1; /* look above mid */
+		} else /* cmp == 0 */
+		{
+			return mid; /* match; return table index */
+		}
+	}
 
-        return -1; /* header name not found */
+	return -1; /* header name not found */
 }
 
 /************************************************************************
@@ -118,12 +118,12 @@ int map_str_to_int(const char *name,
  ************************************************************************/
 int map_int_to_str(int id, const str_int_entry *table, int num_entries)
 {
-        int i;
+	int i;
 
-        for (i = 0; i < num_entries; i++) {
-                if (table[i].id == id) {
-                        return i;
-                }
-        }
-        return -1;
+	for (i = 0; i < num_entries; i++) {
+		if (table[i].id == id) {
+			return i;
+		}
+	}
+	return -1;
 }

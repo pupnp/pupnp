@@ -36,24 +36,24 @@ EXPORT_SPEC void UpnpHttpHeaders_delete(UpnpHttpHeaders *p);
 EXPORT_SPEC UpnpHttpHeaders *UpnpHttpHeaders_dup(const UpnpHttpHeaders *p);
 /*! Assignment operator */
 EXPORT_SPEC int UpnpHttpHeaders_assign(
-        UpnpHttpHeaders *p, const UpnpHttpHeaders *q);
+	UpnpHttpHeaders *p, const UpnpHttpHeaders *q);
 
 /*! UpnpHttpHeaders_get_node */
 EXPORT_SPEC const UpnpListHead *UpnpHttpHeaders_get_node(
-        const UpnpHttpHeaders *p);
+	const UpnpHttpHeaders *p);
 /*! UpnpHttpHeaders_set_node */
 EXPORT_SPEC int UpnpHttpHeaders_set_node(
-        UpnpHttpHeaders *p, const UpnpListHead *q);
+	UpnpHttpHeaders *p, const UpnpListHead *q);
 /*! UpnpHttpHeaders_add_to_list_node */
 EXPORT_SPEC void UpnpHttpHeaders_add_to_list_node(
-        UpnpHttpHeaders *p, UpnpListHead *head);
+	UpnpHttpHeaders *p, UpnpListHead *head);
 
 /*! UpnpHttpHeaders_get_name */
 EXPORT_SPEC const UpnpString *UpnpHttpHeaders_get_name(
-        const UpnpHttpHeaders *p);
+	const UpnpHttpHeaders *p);
 /*! UpnpHttpHeaders_set_name */
 EXPORT_SPEC int UpnpHttpHeaders_set_name(
-        UpnpHttpHeaders *p, const UpnpString *s);
+	UpnpHttpHeaders *p, const UpnpString *s);
 /*! UpnpHttpHeaders_get_name_Length */
 EXPORT_SPEC size_t UpnpHttpHeaders_get_name_Length(const UpnpHttpHeaders *p);
 /*! UpnpHttpHeaders_get_name_cstr */
@@ -62,26 +62,26 @@ EXPORT_SPEC const char *UpnpHttpHeaders_get_name_cstr(const UpnpHttpHeaders *p);
 EXPORT_SPEC int UpnpHttpHeaders_strcpy_name(UpnpHttpHeaders *p, const char *s);
 /*! UpnpHttpHeaders_strncpy_name */
 EXPORT_SPEC int UpnpHttpHeaders_strncpy_name(
-        UpnpHttpHeaders *p, const char *s, size_t n);
+	UpnpHttpHeaders *p, const char *s, size_t n);
 /*! UpnpHttpHeaders_clear_name */
 EXPORT_SPEC void UpnpHttpHeaders_clear_name(UpnpHttpHeaders *p);
 
 /*! UpnpHttpHeaders_get_value */
 EXPORT_SPEC const UpnpString *UpnpHttpHeaders_get_value(
-        const UpnpHttpHeaders *p);
+	const UpnpHttpHeaders *p);
 /*! UpnpHttpHeaders_set_value */
 EXPORT_SPEC int UpnpHttpHeaders_set_value(
-        UpnpHttpHeaders *p, const UpnpString *s);
+	UpnpHttpHeaders *p, const UpnpString *s);
 /*! UpnpHttpHeaders_get_value_Length */
 EXPORT_SPEC size_t UpnpHttpHeaders_get_value_Length(const UpnpHttpHeaders *p);
 /*! UpnpHttpHeaders_get_value_cstr */
 EXPORT_SPEC const char *UpnpHttpHeaders_get_value_cstr(
-        const UpnpHttpHeaders *p);
+	const UpnpHttpHeaders *p);
 /*! UpnpHttpHeaders_strcpy_value */
 EXPORT_SPEC int UpnpHttpHeaders_strcpy_value(UpnpHttpHeaders *p, const char *s);
 /*! UpnpHttpHeaders_strncpy_value */
 EXPORT_SPEC int UpnpHttpHeaders_strncpy_value(
-        UpnpHttpHeaders *p, const char *s, size_t n);
+	UpnpHttpHeaders *p, const char *s, size_t n);
 /*! UpnpHttpHeaders_clear_value */
 EXPORT_SPEC void UpnpHttpHeaders_clear_value(UpnpHttpHeaders *p);
 

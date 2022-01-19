@@ -70,25 +70,25 @@ typedef struct s_UpnpLib UpnpLib;
  */
 typedef enum Upnp_Module
 {
-        SSDP,
-        SOAP,
-        GENA,
-        TPOOL,
-        MSERV,
-        DOM,
-        API,
-        HTTP
+	SSDP,
+	SOAP,
+	GENA,
+	TPOOL,
+	MSERV,
+	DOM,
+	API,
+	HTTP
 } Dbg_Module;
 
 /*@{*/
 typedef enum Upnp_LogLevel_e
 {
-        UPNP_LOG_LEVEL_ERROR = -1,
-        UPNP_CRITICAL,
-        UPNP_ERROR,
-        UPNP_INFO,
-        UPNP_DEBUG,
-        UPNP_NONE
+	UPNP_LOG_LEVEL_ERROR = -1,
+	UPNP_CRITICAL,
+	UPNP_ERROR,
+	UPNP_INFO,
+	UPNP_DEBUG,
+	UPNP_NONE
 } Upnp_LogLevel;
 /*@}*/
 
@@ -115,12 +115,12 @@ typedef enum Upnp_LogLevel_e
  * \brief Log callback function prototype.
  */
 typedef void (*LogCallback)(
-        /*! [in] Level of the log. */
-        Upnp_LogLevel level,
-        Dbg_Module module,
-        const char *sourceFile,
-        const int *sourceLine,
-        const char *log);
+	/*! [in] Level of the log. */
+	Upnp_LogLevel level,
+	Dbg_Module module,
+	const char *sourceFile,
+	const int *sourceLine,
+	const char *log);
 
 #ifdef __cplusplus
 
@@ -131,69 +131,69 @@ typedef void (*LogCallback)(
 class UpnpLog
 {
 public:
-        UpnpLog();
-        ~UpnpLog();
+	UpnpLog();
+	~UpnpLog();
 
-        int InitLog();
-        void CloseLog();
+	int InitLog();
+	void CloseLog();
 
-        void Printf(Upnp_LogLevel DLevel,
-                Dbg_Module Module,
-                const char *file,
-                int line,
-                const char *fmtStr,
-                va_list argList);
-        void Printf(Upnp_LogLevel DLevel,
-                Dbg_Module Module,
-                const char *file,
-                int line,
-                const char *fmtStr,
-                ...)
+	void Printf(Upnp_LogLevel DLevel,
+		Dbg_Module Module,
+		const char *file,
+		int line,
+		const char *fmtStr,
+		va_list argList);
+	void Printf(Upnp_LogLevel DLevel,
+		Dbg_Module Module,
+		const char *file,
+		int line,
+		const char *fmtStr,
+		...)
 #if (__GNUC__ >= 3)
-                __attribute__((format(__printf__, 6, 7)))
+		__attribute__((format(__printf__, 6, 7)))
 #endif
-                ;
+		;
 
-        Upnp_LogLevel logLevel() const { return m_logLevel; }
-        void setLogLevel(Upnp_LogLevel n) { m_logLevel = n; }
+	Upnp_LogLevel logLevel() const { return m_logLevel; }
+	void setLogLevel(Upnp_LogLevel n) { m_logLevel = n; }
 
-        int logIsStderr() const { return m_logIsStderr; }
-        void setLogIsStderr(int n) { m_logIsStderr = n; }
+	int logIsStderr() const { return m_logIsStderr; }
+	void setLogIsStderr(int n) { m_logIsStderr = n; }
 
-        const std::string &logFileName() const { return m_logFileName; }
-        void setLogFileName(const char *s)
-        {
-                if (!s) {
-                        m_logFileName.clear();
-                } else {
-                        m_logFileName = s;
-                }
-                InitLog();
-        }
+	const std::string &logFileName() const { return m_logFileName; }
+	void setLogFileName(const char *s)
+	{
+		if (!s) {
+			m_logFileName.clear();
+		} else {
+			m_logFileName = s;
+		}
+		InitLog();
+	}
 
-        LogCallback logCallback() const { return m_logCallback; }
-        void setLogCallback(LogCallback p) { m_logCallback = p; }
+	LogCallback logCallback() const { return m_logCallback; }
+	void setLogCallback(LogCallback p) { m_logCallback = p; }
 
 private:
-        pthread_mutex_t m_logMutex;
-        Upnp_LogLevel m_logLevel;
-        FILE *m_logFp;
-        int m_logIsStderr;
-        std::string m_logFileName;
-        LogCallback m_logCallback;
+	pthread_mutex_t m_logMutex;
+	Upnp_LogLevel m_logLevel;
+	FILE *m_logFp;
+	int m_logIsStderr;
+	std::string m_logFileName;
+	LogCallback m_logCallback;
 
-        void logMutexLock() { pthread_mutex_lock(&m_logMutex); }
-        void logMutexUnlock() { pthread_mutex_unlock(&m_logMutex); }
+	void logMutexLock() { pthread_mutex_lock(&m_logMutex); }
+	void logMutexUnlock() { pthread_mutex_unlock(&m_logMutex); }
 
-        FILE *logFp() const { return m_logFp; }
-        void setLogFp(FILE *fp) { m_logFp = fp; }
+	FILE *logFp() const { return m_logFp; }
+	void setLogFp(FILE *fp) { m_logFp = fp; }
 
-        int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module);
-        void SetLogConfigFromEnvironment();
-        void DisplayFileAndLine(const char *file,
-                int line,
-                Upnp_LogLevel DLevel,
-                Dbg_Module Module);
+	int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module);
+	void SetLogConfigFromEnvironment();
+	void DisplayFileAndLine(const char *file,
+		int line,
+		Upnp_LogLevel DLevel,
+		Dbg_Module Module);
 };
 
 extern "C" {
@@ -230,24 +230,24 @@ EXPORT_SPEC Upnp_LogLevel UpnpLogLevelFromStr(char *level);
  * \return -1 if fails or UPNP_E_SUCCESS if succeeds.
  */
 EXPORT_SPEC int UpnpInitLog(
-        /*! Library Handle */
-        UpnpLog *p);
+	/*! Library Handle */
+	UpnpLog *p);
 
 /*!
  * \brief Set the log level (see \c Upnp_LogLevel).
  */
 EXPORT_SPEC void UpnpSetLogLevel(
-        /*! Library Handle */
-        UpnpLog *p,
-        /*! [in] Log level. */
-        Upnp_LogLevel log_level);
+	/*! Library Handle */
+	UpnpLog *p,
+	/*! [in] Log level. */
+	Upnp_LogLevel log_level);
 
 /*!
  * \brief Closes the log files.
  */
 EXPORT_SPEC void UpnpCloseLog(
-        /*! Library Handle */
-        UpnpLog *p);
+	/*! Library Handle */
+	UpnpLog *p);
 
 /*!
  * \brief Set the name for the log file. There used to be 2 separate files. The
@@ -255,47 +255,47 @@ EXPORT_SPEC void UpnpCloseLog(
  * Use a NULL file name for logging to stderr.
  */
 EXPORT_SPEC void UpnpSetLogFileName(
-        /*! Library Handle */
-        UpnpLog *p,
-        /*! [in] Name of the log file. */
-        const char *newLogFileName);
+	/*! Library Handle */
+	UpnpLog *p,
+	/*! [in] Name of the log file. */
+	const char *newLogFileName);
 
 /*!
  * \brief Prints the debug statement either on the standard output or log file
  * along with the information from where this debug statement is coming.
  */
 EXPORT_SPEC void UpnpPrintf(
-        /*! Library Handle */
-        UpnpLog *p,
-        /*! [in] The level of the debug logging. It will decide whether debug
-         * statement will go to standard output, or any of the log files. */
-        Upnp_LogLevel DLevel,
-        /*! [in] debug will go in the name of this module. */
-        Dbg_Module Module,
-        /*! [in] Name of the file from where debug statement is coming. */
-        const char *DbgFileName,
-        /*! [in] Line number of the file from where debug statement is coming.
-         */
-        int DbgLineNo,
-        /*! [in] Printf like format specification. */
-        const char *fmtStr,
-        /*! [in] Printf like Variable number of arguments that will go in the
-         * debug statement. */
-        ...)
+	/*! Library Handle */
+	UpnpLog *p,
+	/*! [in] The level of the debug logging. It will decide whether debug
+	 * statement will go to standard output, or any of the log files. */
+	Upnp_LogLevel DLevel,
+	/*! [in] debug will go in the name of this module. */
+	Dbg_Module Module,
+	/*! [in] Name of the file from where debug statement is coming. */
+	const char *DbgFileName,
+	/*! [in] Line number of the file from where debug statement is coming.
+	 */
+	int DbgLineNo,
+	/*! [in] Printf like format specification. */
+	const char *fmtStr,
+	/*! [in] Printf like Variable number of arguments that will go in the
+	 * debug statement. */
+	...)
 #if (__GNUC__ >= 3)
-        /* This enables printf like format checking by the compiler. */
-        __attribute__((format(__printf__, 6, 7)))
+	/* This enables printf like format checking by the compiler. */
+	__attribute__((format(__printf__, 6, 7)))
 #endif
-        ;
+	;
 
 /*!
  * \brief Set the logging callback.
  */
 EXPORT_SPEC void UpnpSetLogCallback(
-        /*! Library Handle */
-        UpnpLog *p,
-        /*! [in] Callback to be called for each log produced by the library. */
-        LogCallback callback);
+	/*! Library Handle */
+	UpnpLog *p,
+	/*! [in] Callback to be called for each log produced by the library. */
+	LogCallback callback);
 
 #ifdef __cplusplus
 }

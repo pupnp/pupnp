@@ -38,8 +38,8 @@
 
 typedef struct /* str_int_entry */
 {
-        const char *name; /* a value in string form */
-        int id; /* same value in integer form */
+	const char *name; /* a value in string form */
+	int id; /* same value in integer form */
 } str_int_entry;
 
 #ifdef __cplusplus
@@ -69,10 +69,10 @@ extern "C" {
  *	Note :
  ************************************************************************/
 int map_str_to_int(const char *name,
-        size_t name_len,
-        const str_int_entry *table,
-        int num_entries,
-        int case_sensitive);
+	size_t name_len,
+	const str_int_entry *table,
+	int num_entries,
+	int case_sensitive);
 
 /************************************************************************
  *	Function :	map_int_to_str

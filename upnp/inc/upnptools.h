@@ -67,8 +67,8 @@ typedef struct s_UpnpLib UpnpLib;
  * 	with the error code or the string "Unknown error code"
  */
 EXPORT_SPEC const char *UpnpGetErrorMessage(
-        /*! [in] The SDK error code to convert. */
-        int errorcode);
+	/*! [in] The SDK error code to convert. */
+	int errorcode);
 
 /*!
  * \brief Combines a base URL and a relative URL into a single absolute URL.
@@ -85,14 +85,14 @@ EXPORT_SPEC const char *UpnpGetErrorMessage(
  *              complete this operation.
  */
 EXPORT_SPEC int UpnpResolveURL(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] The base URL to combine. */
-        const char *BaseURL,
-        /*! [in] The relative URL to \b BaseURL. */
-        const char *RelURL,
-        /*! [out] A pointer to a buffer to store the absolute URL. */
-        char *AbsURL);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] The base URL to combine. */
+	const char *BaseURL,
+	/*! [in] The relative URL to \b BaseURL. */
+	const char *RelURL,
+	/*! [out] A pointer to a buffer to store the absolute URL. */
+	char *AbsURL);
 
 /*!
  * \brief Combines a base URL and a relative URL into a single absolute URL.
@@ -109,15 +109,15 @@ EXPORT_SPEC int UpnpResolveURL(
  *              complete this operation.
  */
 EXPORT_SPEC int UpnpResolveURL2(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] The base URL to combine. */
-        const char *BaseURL,
-        /*! [in] The relative URL to \b BaseURL. */
-        const char *RelURL,
-        /*! [out] A pointer to a pointer to a buffer to store the
-         * absolute URL. Must be freed later by the caller. */
-        char **AbsURL);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] The base URL to combine. */
+	const char *BaseURL,
+	/*! [in] The relative URL to \b BaseURL. */
+	const char *RelURL,
+	/*! [out] A pointer to a pointer to a buffer to store the
+	 * absolute URL. Must be freed later by the caller. */
+	char **AbsURL);
 
 /*!
  * \brief Creates an action request packet based on its input parameters
@@ -133,16 +133,16 @@ EXPORT_SPEC int UpnpResolveURL2(
  * 	operation failed.
  */
 EXPORT_SPEC IXML_Document *UpnpMakeAction(
-        /*! [in] Name of the action request or response. */
-        const char *ActionName,
-        /*! [in] The service type. */
-        const char *ServType,
-        /*! [in] Number of argument pairs to be passed. */
-        int NumArg,
-        /*! [in] pointer to the first argument. */
-        const char *Arg,
-        /*! [in] Argument list. */
-        ...);
+	/*! [in] Name of the action request or response. */
+	const char *ActionName,
+	/*! [in] The service type. */
+	const char *ServType,
+	/*! [in] Number of argument pairs to be passed. */
+	int NumArg,
+	/*! [in] pointer to the first argument. */
+	const char *Arg,
+	/*! [in] Argument list. */
+	...);
 
 /*!
  * \brief Ceates an action response packet based on its output parameters
@@ -158,16 +158,16 @@ EXPORT_SPEC IXML_Document *UpnpMakeAction(
  * 	operation failed.
  */
 EXPORT_SPEC IXML_Document *UpnpMakeActionResponse(
-        /*! [in] The action name. */
-        const char *ActionName,
-        /*! [in] The service type.. */
-        const char *ServType,
-        /*! [in] The number of argument pairs passed. */
-        int NumArg,
-        /*! [in] The status variable name and value pair. */
-        const char *Arg,
-        /*! [in] Other status variable name and value pairs. */
-        ...);
+	/*! [in] The action name. */
+	const char *ActionName,
+	/*! [in] The service type.. */
+	const char *ServType,
+	/*! [in] The number of argument pairs passed. */
+	int NumArg,
+	/*! [in] The status variable name and value pair. */
+	const char *Arg,
+	/*! [in] Other status variable name and value pairs. */
+	...);
 
 /*!
  * \brief Adds the argument in the action request.
@@ -187,16 +187,16 @@ EXPORT_SPEC IXML_Document *UpnpMakeActionResponse(
  *		complete this operation.
  */
 EXPORT_SPEC int UpnpAddToAction(
-        /*! [in,out] A pointer to store the action document node. */
-        IXML_Document **ActionDoc,
-        /*! [in] The action name. */
-        const char *ActionName,
-        /*! [in] The service type. */
-        const char *ServType,
-        /*! [in] The status variable name. */
-        const char *ArgName,
-        /*! [in] The status variable value. */
-        const char *ArgVal);
+	/*! [in,out] A pointer to store the action document node. */
+	IXML_Document **ActionDoc,
+	/*! [in] The action name. */
+	const char *ActionName,
+	/*! [in] The service type. */
+	const char *ServType,
+	/*! [in] The status variable name. */
+	const char *ArgName,
+	/*! [in] The status variable value. */
+	const char *ArgVal);
 
 /*!
  * \brief Creates an action response packet based on its output parameters
@@ -217,16 +217,16 @@ EXPORT_SPEC int UpnpAddToAction(
  *		complete this operation.
  */
 EXPORT_SPEC int UpnpAddToActionResponse(
-        /*! [in,out] Pointer to a document to store the action document node. */
-        IXML_Document **ActionResponse,
-        /*! [in] The action name. */
-        const char *ActionName,
-        /*! [in] The service type. */
-        const char *ServType,
-        /*! [in] The status variable name. */
-        const char *ArgName,
-        /*! [in] The status variable value. */
-        const char *ArgVal);
+	/*! [in,out] Pointer to a document to store the action document node. */
+	IXML_Document **ActionResponse,
+	/*! [in] The action name. */
+	const char *ActionName,
+	/*! [in] The service type. */
+	const char *ServType,
+	/*! [in] The status variable name. */
+	const char *ArgName,
+	/*! [in] The status variable value. */
+	const char *ArgVal);
 
 /*!
  * \brief Creates a property set message packet.
@@ -237,12 +237,12 @@ EXPORT_SPEC int UpnpAddToActionResponse(
  * \return <tt>NULL</tt> on failure, or the property-set document node.
  */
 EXPORT_SPEC IXML_Document *UpnpCreatePropertySet(
-        /*! [in] The number of argument pairs passed. */
-        int NumArg,
-        /*! [in] The status variable name and value pair. */
-        const char *Arg,
-        /*! [in] Variable sized list with the rest of the parameters. */
-        ...);
+	/*! [in] The number of argument pairs passed. */
+	int NumArg,
+	/*! [in] The status variable name and value pair. */
+	const char *Arg,
+	/*! [in] Variable sized list with the rest of the parameters. */
+	...);
 
 /*!
  * \brief Can be used when an application needs to transfer the status of many
@@ -260,13 +260,13 @@ EXPORT_SPEC IXML_Document *UpnpCreatePropertySet(
  *		complete this operation.
  */
 EXPORT_SPEC int UpnpAddToPropertySet(
-        /*! [in,out] A pointer to the document containing the property set
-           document node. */
-        IXML_Document **PropSet,
-        /*! [in] The status variable name. */
-        const char *ArgName,
-        /*! [in] The status variable value. */
-        const char *ArgVal);
+	/*! [in,out] A pointer to the document containing the property set
+	   document node. */
+	IXML_Document **PropSet,
+	/*! [in] The status variable name. */
+	const char *ArgName,
+	/*! [in] The status variable value. */
+	const char *ArgVal);
 
 #ifdef __cplusplus
 }

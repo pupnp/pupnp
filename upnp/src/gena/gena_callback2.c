@@ -58,15 +58,15 @@
  *	UPNP_E_SUCCESS if successful else appropriate error
  ***************************************************************************/
 void error_respond(
-        UpnpLib *p, SOCKINFO *info, int error_code, http_message_t *hmsg)
+	UpnpLib *p, SOCKINFO *info, int error_code, http_message_t *hmsg)
 {
-        int major, minor;
+	int major, minor;
 
-        /* retrieve the minor and major version from the GENA request */
-        http_CalcResponseVersion(
-                hmsg->major_version, hmsg->minor_version, &major, &minor);
+	/* retrieve the minor and major version from the GENA request */
+	http_CalcResponseVersion(
+		hmsg->major_version, hmsg->minor_version, &major, &minor);
 
-        http_SendStatusResponse(p, info, error_code, major, minor);
+	http_SendStatusResponse(p, info, error_code, major, minor);
 }
 
 /************************************************************************
@@ -85,48 +85,48 @@ void error_respond(
  *	UPNP_E_SUCCESS if successful else appropriate error
  ***************************************************************************/
 void genaCallback(UpnpLib *p,
-        http_parser_t *parser,
-        http_message_t *request,
-        SOCKINFO *info)
+	http_parser_t *parser,
+	http_message_t *request,
+	SOCKINFO *info)
 {
-        int found_function = 0;
-        (void)parser;
-        (void)p;
+	int found_function = 0;
+	(void)parser;
+	(void)p;
 
-        if (request->method == HTTPMETHOD_SUBSCRIBE) {
+	if (request->method == HTTPMETHOD_SUBSCRIBE) {
 #ifdef INCLUDE_DEVICE_APIS
-                found_function = 1;
-                if (httpmsg_find_hdr(request, HDR_NT, NULL) == NULL) {
-                        /* renew subscription */
-                        gena_process_subscription_renewal_request(
-                                p, info, request);
-                } else {
-                        /* subscribe */
-                        gena_process_subscription_request(p, info, request);
-                }
-                UpnpPrintf(UpnpLib_get_Log(p),
-                        UPNP_DEBUG,
-                        GENA,
-                        __FILE__,
-                        __LINE__,
-                        "got subscription request\n");
-        } else if (request->method == HTTPMETHOD_UNSUBSCRIBE) {
-                found_function = 1;
-                /* unsubscribe */
-                gena_process_unsubscribe_request(p, info, request);
+		found_function = 1;
+		if (httpmsg_find_hdr(request, HDR_NT, NULL) == NULL) {
+			/* renew subscription */
+			gena_process_subscription_renewal_request(
+				p, info, request);
+		} else {
+			/* subscribe */
+			gena_process_subscription_request(p, info, request);
+		}
+		UpnpPrintf(UpnpLib_get_Log(p),
+			UPNP_DEBUG,
+			GENA,
+			__FILE__,
+			__LINE__,
+			"got subscription request\n");
+	} else if (request->method == HTTPMETHOD_UNSUBSCRIBE) {
+		found_function = 1;
+		/* unsubscribe */
+		gena_process_unsubscribe_request(p, info, request);
 #endif
-        } else if (request->method == HTTPMETHOD_NOTIFY) {
+	} else if (request->method == HTTPMETHOD_NOTIFY) {
 #ifdef INCLUDE_CLIENT_APIS
-                found_function = 1;
-                /* notify */
-                gena_process_notification_event(p, info, request);
+		found_function = 1;
+		/* notify */
+		gena_process_notification_event(p, info, request);
 #endif
-        }
+	}
 
-        if (!found_function) {
-                /* handle missing functions of device or ctrl pt */
-                error_respond(p, info, HTTP_NOT_IMPLEMENTED, request);
-        }
-        return;
+	if (!found_function) {
+		/* handle missing functions of device or ctrl pt */
+		error_respond(p, info, HTTP_NOT_IMPLEMENTED, request);
+	}
+	return;
 }
 #endif /* EXCLUDE_GENA */

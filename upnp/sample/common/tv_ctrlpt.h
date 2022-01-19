@@ -87,30 +87,30 @@ extern char TvVarCount[];
 
 struct tv_service
 {
-        char ServiceId[NAME_SIZE];
-        char ServiceType[NAME_SIZE];
-        char *VariableStrVal[TV_MAXVARS];
-        char EventURL[NAME_SIZE];
-        char ControlURL[NAME_SIZE];
-        char SID[NAME_SIZE];
+	char ServiceId[NAME_SIZE];
+	char ServiceType[NAME_SIZE];
+	char *VariableStrVal[TV_MAXVARS];
+	char EventURL[NAME_SIZE];
+	char ControlURL[NAME_SIZE];
+	char SID[NAME_SIZE];
 };
 
 extern struct TvDeviceNode *GlobalDeviceList;
 
 struct TvDevice
 {
-        char UDN[250];
-        char DescDocURL[250];
-        char FriendlyName[250];
-        char PresURL[250];
-        int AdvrTimeOut;
-        struct tv_service TvService[TV_SERVICE_SERVCOUNT];
+	char UDN[250];
+	char DescDocURL[250];
+	char FriendlyName[250];
+	char PresURL[250];
+	int AdvrTimeOut;
+	struct tv_service TvService[TV_SERVICE_SERVCOUNT];
 };
 
 struct TvDeviceNode
 {
-        struct TvDevice device;
-        struct TvDeviceNode *next;
+	struct TvDevice device;
+	struct TvDeviceNode *next;
 };
 
 extern pthread_mutex_t DeviceListMutex;
@@ -124,13 +124,13 @@ int TvCtrlPointRemoveAll(UpnpLib *p);
 int TvCtrlPointRefresh(UpnpLib *p);
 
 int TvCtrlPointSendAction(
-        UpnpLib *p, int, int, const char *, const char **, char **, int);
+	UpnpLib *p, int, int, const char *, const char **, char **, int);
 int TvCtrlPointSendActionNumericArg(UpnpLib *p,
-        int devnum,
-        int service,
-        const char *actionName,
-        const char *paramName,
-        int paramValue);
+	int devnum,
+	int service,
+	const char *actionName,
+	const char *paramName,
+	int paramValue);
 int TvCtrlPointSendPowerOn(UpnpLib *p, int devnum);
 int TvCtrlPointSendPowerOff(UpnpLib *p, int devnum);
 int TvCtrlPointSendSetChannel(UpnpLib *p, int, int);
@@ -162,19 +162,19 @@ void TvCtrlPointHandleGetVar(const char *, const char *, const DOMString);
  * function that has locked the global device list.
  **/
 void TvStateUpdate(
-        /*! [in] The UDN of the parent device. */
-        char *UDN,
-        /*! [in] The service state table to update. */
-        int Service,
-        /*! [out] DOM document representing the XML received with the event. */
-        IXML_Document *ChangedVariables,
-        /*! [out] pointer to the state table for the Tv  service to update. */
-        char **State);
+	/*! [in] The UDN of the parent device. */
+	char *UDN,
+	/*! [in] The service state table to update. */
+	int Service,
+	/*! [out] DOM document representing the XML received with the event. */
+	IXML_Document *ChangedVariables,
+	/*! [out] pointer to the state table for the Tv  service to update. */
+	char **State);
 
 void TvCtrlPointHandleEvent(const char *, int, IXML_Document *);
 void TvCtrlPointHandleSubscribeUpdate(const char *, const Upnp_SID, int);
 int TvCtrlPointCallbackEventHandler(
-        UpnpLib *p, Upnp_EventType, const void *Event, const void *Cookie);
+	UpnpLib *p, Upnp_EventType, const void *Event, const void *Cookie);
 
 /*!
  * \brief Checks the advertisement each device in the global device list.
@@ -185,17 +185,17 @@ int TvCtrlPointCallbackEventHandler(
  * device.
  */
 void TvCtrlPointVerifyTimeouts(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] The increment to subtract from the timeouts each time the
-         * function is called. */
-        int incr);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] The increment to subtract from the timeouts each time the
+	 * function is called. */
+	int incr);
 
 void TvCtrlPointPrintCommands(void);
 int TvCtrlPointStart(UpnpLib **LibraryHandle,
-        char *iface,
-        state_update updateFunctionPtr,
-        int combo);
+	char *iface,
+	state_update updateFunctionPtr,
+	int combo);
 int TvCtrlPointStop(UpnpLib *p);
 int TvCtrlPointProcessCommand(UpnpLib *p, char *cmdline);
 

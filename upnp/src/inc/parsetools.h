@@ -49,10 +49,10 @@ extern "C" {
  * \return boolean.
  */
 int has_xml_content_type(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] HTTP Message object. */
-        http_message_t *hmsg);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] HTTP Message object. */
+	http_message_t *hmsg);
 
 #ifdef __cplusplus
 } /* extern C */

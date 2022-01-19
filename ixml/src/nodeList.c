@@ -41,101 +41,101 @@
 
 void ixmlNodeList_init(IXML_NodeList *nList)
 {
-        assert(nList != NULL);
+	assert(nList != NULL);
 
-        memset(nList, 0, sizeof(IXML_NodeList));
+	memset(nList, 0, sizeof(IXML_NodeList));
 }
 
 IXML_Node *ixmlNodeList_item(IXML_NodeList *nList, unsigned long index)
 {
-        IXML_NodeList *next;
-        unsigned int i;
+	IXML_NodeList *next;
+	unsigned int i;
 
-        /* if the list ptr is NULL */
-        if (nList == NULL) {
-                return NULL;
-        }
-        /* if index is more than list length */
-        if (index > ixmlNodeList_length(nList) - 1lu) {
-                return NULL;
-        }
+	/* if the list ptr is NULL */
+	if (nList == NULL) {
+		return NULL;
+	}
+	/* if index is more than list length */
+	if (index > ixmlNodeList_length(nList) - 1lu) {
+		return NULL;
+	}
 
-        next = nList;
-        for (i = 0u; i < index && next != NULL; ++i) {
-                next = next->next;
-        }
+	next = nList;
+	for (i = 0u; i < index && next != NULL; ++i) {
+		next = next->next;
+	}
 
-        if (next == NULL) {
-                return NULL;
-        }
+	if (next == NULL) {
+		return NULL;
+	}
 
-        return next->nodeItem;
+	return next->nodeItem;
 }
 
 int ixmlNodeList_addToNodeList(IXML_NodeList **nList, IXML_Node *add)
 {
-        IXML_NodeList *traverse = NULL;
-        IXML_NodeList *p = NULL;
-        IXML_NodeList *newListItem;
+	IXML_NodeList *traverse = NULL;
+	IXML_NodeList *p = NULL;
+	IXML_NodeList *newListItem;
 
-        assert(add != NULL);
+	assert(add != NULL);
 
-        if (add == NULL) {
-                return IXML_FAILED;
-        }
+	if (add == NULL) {
+		return IXML_FAILED;
+	}
 
-        if (*nList == NULL) {
-                /* nodelist is empty */
-                *nList = (IXML_NodeList *)malloc(sizeof(IXML_NodeList));
-                if (*nList == NULL) {
-                        return IXML_INSUFFICIENT_MEMORY;
-                }
+	if (*nList == NULL) {
+		/* nodelist is empty */
+		*nList = (IXML_NodeList *)malloc(sizeof(IXML_NodeList));
+		if (*nList == NULL) {
+			return IXML_INSUFFICIENT_MEMORY;
+		}
 
-                ixmlNodeList_init(*nList);
-        }
+		ixmlNodeList_init(*nList);
+	}
 
-        if ((*nList)->nodeItem == NULL) {
-                (*nList)->nodeItem = add;
-        } else {
-                traverse = *nList;
-                while (traverse != NULL) {
-                        p = traverse;
-                        traverse = traverse->next;
-                }
+	if ((*nList)->nodeItem == NULL) {
+		(*nList)->nodeItem = add;
+	} else {
+		traverse = *nList;
+		while (traverse != NULL) {
+			p = traverse;
+			traverse = traverse->next;
+		}
 
-                newListItem = (IXML_NodeList *)malloc(sizeof(IXML_NodeList));
-                if (newListItem == NULL) {
-                        return IXML_INSUFFICIENT_MEMORY;
-                }
-                p->next = newListItem;
-                newListItem->nodeItem = add;
-                newListItem->next = NULL;
-        }
+		newListItem = (IXML_NodeList *)malloc(sizeof(IXML_NodeList));
+		if (newListItem == NULL) {
+			return IXML_INSUFFICIENT_MEMORY;
+		}
+		p->next = newListItem;
+		newListItem->nodeItem = add;
+		newListItem->next = NULL;
+	}
 
-        return IXML_SUCCESS;
+	return IXML_SUCCESS;
 }
 
 unsigned long ixmlNodeList_length(IXML_NodeList *nList)
 {
-        IXML_NodeList *list;
-        unsigned long length = 0lu;
+	IXML_NodeList *list;
+	unsigned long length = 0lu;
 
-        list = nList;
-        while (list != NULL) {
-                ++length;
-                list = list->next;
-        }
+	list = nList;
+	while (list != NULL) {
+		++length;
+		list = list->next;
+	}
 
-        return length;
+	return length;
 }
 
 void ixmlNodeList_free(IXML_NodeList *nList)
 {
-        IXML_NodeList *next;
+	IXML_NodeList *next;
 
-        while (nList != NULL) {
-                next = nList->next;
-                free(nList);
-                nList = next;
-        }
+	while (nList != NULL) {
+		next = nList->next;
+		free(nList);
+		nList = next;
+	}
 }

@@ -67,80 +67,80 @@
 
 int sock_init(SOCKINFO *info, SOCKET sockfd)
 {
-        assert(info);
+	assert(info);
 
-        memset(info, 0, sizeof(SOCKINFO));
-        info->socket = sockfd;
+	memset(info, 0, sizeof(SOCKINFO));
+	info->socket = sockfd;
 
-        return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 
 int sock_init_with_ip(
-        SOCKINFO *info, SOCKET sockfd, struct sockaddr *foreign_sockaddr)
+	SOCKINFO *info, SOCKET sockfd, struct sockaddr *foreign_sockaddr)
 {
-        int ret;
+	int ret;
 
-        ret = sock_init(info, sockfd);
-        if (ret != UPNP_E_SUCCESS) {
-                return ret;
-        }
+	ret = sock_init(info, sockfd);
+	if (ret != UPNP_E_SUCCESS) {
+		return ret;
+	}
 
-        memcpy(&info->foreign_sockaddr,
-                foreign_sockaddr,
-                sizeof(info->foreign_sockaddr));
+	memcpy(&info->foreign_sockaddr,
+		foreign_sockaddr,
+		sizeof(info->foreign_sockaddr));
 
-        return UPNP_E_SUCCESS;
+	return UPNP_E_SUCCESS;
 }
 
 #ifdef UPNP_ENABLE_OPEN_SSL
 int sock_ssl_connect(UpnpLib *p, SOCKINFO *info)
 {
-        int status = 0;
-        info->ssl = SSL_new(UpnpLib_get_gSslCtx(p));
-        if (!info->ssl) {
-                return UPNP_E_SOCKET_ERROR;
-        }
-        status = SSL_set_fd(info->ssl, info->socket);
-        if (status == 1) {
-                status = SSL_connect(info->ssl);
-        }
-        if (status == 1) {
-                return UPNP_E_SUCCESS;
-        }
-        return UPNP_E_SOCKET_ERROR;
+	int status = 0;
+	info->ssl = SSL_new(UpnpLib_get_gSslCtx(p));
+	if (!info->ssl) {
+		return UPNP_E_SOCKET_ERROR;
+	}
+	status = SSL_set_fd(info->ssl, info->socket);
+	if (status == 1) {
+		status = SSL_connect(info->ssl);
+	}
+	if (status == 1) {
+		return UPNP_E_SUCCESS;
+	}
+	return UPNP_E_SOCKET_ERROR;
 }
 #endif
 
 int sock_destroy(UpnpLib *p, SOCKINFO *info, int ShutdownMethod)
 {
-        int ret = UPNP_E_SUCCESS;
-        char errorBuffer[256];
+	int ret = UPNP_E_SUCCESS;
+	char errorBuffer[256];
 
-        if (info->socket != INVALID_SOCKET) {
+	if (info->socket != INVALID_SOCKET) {
 #ifdef UPNP_ENABLE_OPEN_SSL
-                if (info->ssl) {
-                        SSL_shutdown(info->ssl);
-                        SSL_free(info->ssl);
-                        info->ssl = NULL;
-                }
+		if (info->ssl) {
+			SSL_shutdown(info->ssl);
+			SSL_free(info->ssl);
+			info->ssl = NULL;
+		}
 #endif
-                if (shutdown(info->socket, ShutdownMethod) == -1) {
-                        strerror_r(errno, errorBuffer, sizeof errorBuffer);
-                        UpnpPrintf(UpnpLib_get_Log(p),
-                                UPNP_INFO,
-                                HTTP,
-                                __FILE__,
-                                __LINE__,
-                                "Error in shutdown: %s\n",
-                                errorBuffer);
-                }
-                if (sock_close(info->socket) == -1) {
-                        ret = UPNP_E_SOCKET_ERROR;
-                }
-                info->socket = INVALID_SOCKET;
-        }
+		if (shutdown(info->socket, ShutdownMethod) == -1) {
+			strerror_r(errno, errorBuffer, sizeof errorBuffer);
+			UpnpPrintf(UpnpLib_get_Log(p),
+				UPNP_INFO,
+				HTTP,
+				__FILE__,
+				__LINE__,
+				"Error in shutdown: %s\n",
+				errorBuffer);
+		}
+		if (sock_close(info->socket) == -1) {
+			ret = UPNP_E_SOCKET_ERROR;
+		}
+		info->socket = INVALID_SOCKET;
+	}
 
-        return ret;
+	return ret;
 }
 
 /*!
@@ -153,166 +153,166 @@ int sock_destroy(UpnpLib *p, SOCKINFO *info, int ShutdownMethod)
  *	\li \c UPNP_E_SOCKET_ERROR - Error on socket calls
  */
 static int sock_read_write(
-        /*! [in] Socket Information Object. */
-        SOCKINFO *info,
-        /*! [out] Buffer to get data to or send data from. */
-        char *buffer,
-        /*! [in] Size of the buffer. */
-        size_t bufsize,
-        /*! [in] timeout value. */
-        int *timeoutSecs,
-        /*! [in] Boolean value specifying read or write option. */
-        int bRead)
+	/*! [in] Socket Information Object. */
+	SOCKINFO *info,
+	/*! [out] Buffer to get data to or send data from. */
+	char *buffer,
+	/*! [in] Size of the buffer. */
+	size_t bufsize,
+	/*! [in] timeout value. */
+	int *timeoutSecs,
+	/*! [in] Boolean value specifying read or write option. */
+	int bRead)
 {
-        int retCode;
-        fd_set readSet;
-        fd_set writeSet;
-        struct timeval timeout;
-        long numBytes;
-        time_t start_time = time(NULL);
-        SOCKET sockfd = info->socket;
-        long bytes_sent = 0;
-        size_t byte_left = (size_t)0;
-        ssize_t num_written;
+	int retCode;
+	fd_set readSet;
+	fd_set writeSet;
+	struct timeval timeout;
+	long numBytes;
+	time_t start_time = time(NULL);
+	SOCKET sockfd = info->socket;
+	long bytes_sent = 0;
+	size_t byte_left = (size_t)0;
+	ssize_t num_written;
 
-        FD_ZERO(&readSet);
-        FD_ZERO(&writeSet);
-        if (bRead)
-                FD_SET(sockfd, &readSet);
-        else
-                FD_SET(sockfd, &writeSet);
-        timeout.tv_sec = *timeoutSecs;
-        timeout.tv_usec = 0;
-        while (1) {
-                if (*timeoutSecs < 0)
-                        retCode = select(
-                                sockfd + 1, &readSet, &writeSet, NULL, NULL);
-                else
-                        retCode = select(sockfd + 1,
-                                &readSet,
-                                &writeSet,
-                                NULL,
-                                &timeout);
-                if (retCode == 0)
-                        return UPNP_E_TIMEDOUT;
-                if (retCode == -1) {
-                        if (errno == EINTR)
-                                continue;
-                        return UPNP_E_SOCKET_ERROR;
-                } else
-                        /* read or write. */
-                        break;
-        }
+	FD_ZERO(&readSet);
+	FD_ZERO(&writeSet);
+	if (bRead)
+		FD_SET(sockfd, &readSet);
+	else
+		FD_SET(sockfd, &writeSet);
+	timeout.tv_sec = *timeoutSecs;
+	timeout.tv_usec = 0;
+	while (1) {
+		if (*timeoutSecs < 0)
+			retCode = select(
+				sockfd + 1, &readSet, &writeSet, NULL, NULL);
+		else
+			retCode = select(sockfd + 1,
+				&readSet,
+				&writeSet,
+				NULL,
+				&timeout);
+		if (retCode == 0)
+			return UPNP_E_TIMEDOUT;
+		if (retCode == -1) {
+			if (errno == EINTR)
+				continue;
+			return UPNP_E_SOCKET_ERROR;
+		} else
+			/* read or write. */
+			break;
+	}
 #ifdef SO_NOSIGPIPE
-        {
-                int old;
-                int set = 1;
-                socklen_t olen = sizeof(old);
-                getsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, &olen);
-                setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof(set));
+	{
+		int old;
+		int set = 1;
+		socklen_t olen = sizeof(old);
+		getsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, &olen);
+		setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof(set));
 #endif
-                if (bRead) {
+		if (bRead) {
 #ifdef UPNP_ENABLE_OPEN_SSL
-                        if (info->ssl) {
-                                numBytes = (long)SSL_read(
-                                        info->ssl, buffer, (int)bufsize);
-                        } else {
+			if (info->ssl) {
+				numBytes = (long)SSL_read(
+					info->ssl, buffer, (int)bufsize);
+			} else {
 #endif
-                                /* read data. */
-                                numBytes = (long)recv(
-                                        sockfd, buffer, bufsize, MSG_NOSIGNAL);
+				/* read data. */
+				numBytes = (long)recv(
+					sockfd, buffer, bufsize, MSG_NOSIGNAL);
 #ifdef UPNP_ENABLE_OPEN_SSL
-                        }
+			}
 #endif
-                } else {
-                        byte_left = bufsize;
-                        bytes_sent = 0;
-                        while (byte_left != (size_t)0) {
+		} else {
+			byte_left = bufsize;
+			bytes_sent = 0;
+			while (byte_left != (size_t)0) {
 #ifdef UPNP_ENABLE_OPEN_SSL
-                                if (info->ssl) {
-                                        num_written = SSL_write(info->ssl,
-                                                buffer + bytes_sent,
-                                                (int)byte_left);
-                                } else {
+				if (info->ssl) {
+					num_written = SSL_write(info->ssl,
+						buffer + bytes_sent,
+						(int)byte_left);
+				} else {
 #endif
-                                        /* write data. */
-                                        num_written = send(sockfd,
-                                                buffer + bytes_sent,
-                                                byte_left,
-                                                MSG_DONTROUTE | MSG_NOSIGNAL);
+					/* write data. */
+					num_written = send(sockfd,
+						buffer + bytes_sent,
+						byte_left,
+						MSG_DONTROUTE | MSG_NOSIGNAL);
 #ifdef UPNP_ENABLE_OPEN_SSL
-                                }
+				}
 #endif
-                                if (num_written == -1) {
+				if (num_written == -1) {
 #ifdef SO_NOSIGPIPE
-                                        setsockopt(sockfd,
-                                                SOL_SOCKET,
-                                                SO_NOSIGPIPE,
-                                                &old,
-                                                olen);
+					setsockopt(sockfd,
+						SOL_SOCKET,
+						SO_NOSIGPIPE,
+						&old,
+						olen);
 #endif
-                                        return (int)num_written;
-                                }
-                                byte_left -= (size_t)num_written;
-                                bytes_sent += num_written;
-                        }
-                        numBytes = bytes_sent;
-                }
+					return (int)num_written;
+				}
+				byte_left -= (size_t)num_written;
+				bytes_sent += num_written;
+			}
+			numBytes = bytes_sent;
+		}
 #ifdef SO_NOSIGPIPE
-                setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, olen);
-        }
+		setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, olen);
+	}
 #endif
-        if (numBytes < 0)
-                return UPNP_E_SOCKET_ERROR;
-        /* subtract time used for reading/writing. */
-        if (*timeoutSecs != 0)
-                *timeoutSecs -= (int)(time(NULL) - start_time);
+	if (numBytes < 0)
+		return UPNP_E_SOCKET_ERROR;
+	/* subtract time used for reading/writing. */
+	if (*timeoutSecs != 0)
+		*timeoutSecs -= (int)(time(NULL) - start_time);
 
-        return (int)numBytes;
+	return (int)numBytes;
 }
 
 int sock_read(SOCKINFO *info, char *buffer, size_t bufsize, int *timeoutSecs)
 {
-        return sock_read_write(info, buffer, bufsize, timeoutSecs, 1);
+	return sock_read_write(info, buffer, bufsize, timeoutSecs, 1);
 }
 
 int sock_write(
-        SOCKINFO *info, const char *buffer, size_t bufsize, int *timeoutSecs)
+	SOCKINFO *info, const char *buffer, size_t bufsize, int *timeoutSecs)
 {
-        /* Consciently removing constness. */
-        return sock_read_write(info, (char *)buffer, bufsize, timeoutSecs, 0);
+	/* Consciently removing constness. */
+	return sock_read_write(info, (char *)buffer, bufsize, timeoutSecs, 0);
 }
 
 int sock_make_blocking(SOCKET sock)
 {
 #ifdef _WIN32
-        u_long val = 0;
-        return ioctlsocket(sock, FIONBIO, &val);
+	u_long val = 0;
+	return ioctlsocket(sock, FIONBIO, &val);
 #else /* _WIN32 */
-        int val;
+	int val;
 
-        val = fcntl(sock, F_GETFL, 0);
-        if (fcntl(sock, F_SETFL, val & ~O_NONBLOCK) == -1) {
-                return -1;
-        }
+	val = fcntl(sock, F_GETFL, 0);
+	if (fcntl(sock, F_SETFL, val & ~O_NONBLOCK) == -1) {
+		return -1;
+	}
 #endif /* _WIN32 */
-        return 0;
+	return 0;
 }
 
 int sock_make_no_blocking(SOCKET sock)
 {
 #ifdef _WIN32
-        u_long val = 1;
-        return ioctlsocket(sock, FIONBIO, &val);
+	u_long val = 1;
+	return ioctlsocket(sock, FIONBIO, &val);
 #else /* _WIN32 */
-        int val;
+	int val;
 
-        val = fcntl(sock, F_GETFL, 0);
-        if (fcntl(sock, F_SETFL, val | O_NONBLOCK) == -1) {
-                return -1;
-        }
+	val = fcntl(sock, F_GETFL, 0);
+	if (fcntl(sock, F_SETFL, val | O_NONBLOCK) == -1) {
+		return -1;
+	}
 #endif /* _WIN32 */
-        return 0;
+	return 0;
 }
 
 /* @} Sock */

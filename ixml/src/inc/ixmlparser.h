@@ -50,50 +50,50 @@
 
 typedef struct _IXML_NamespaceURI
 {
-        char *nsURI;
-        char *prefix;
-        struct _IXML_NamespaceURI *nextNsURI;
+	char *nsURI;
+	char *prefix;
+	struct _IXML_NamespaceURI *nextNsURI;
 } IXML_NamespaceURI;
 
 typedef struct _IXML_ElementStack
 {
-        char *element;
-        char *prefix;
-        char *namespaceUri;
-        IXML_NamespaceURI *pNsURI;
-        struct _IXML_ElementStack *nextElement;
+	char *element;
+	char *prefix;
+	char *namespaceUri;
+	IXML_NamespaceURI *pNsURI;
+	struct _IXML_ElementStack *nextElement;
 } IXML_ElementStack;
 
 typedef enum
 {
-        eELEMENT,
-        eATTRIBUTE,
-        eCONTENT
+	eELEMENT,
+	eATTRIBUTE,
+	eCONTENT
 } PARSER_STATE;
 
 typedef struct _Parser
 {
-        /*! Data buffer. */
-        char *dataBuffer;
-        /*! Pointer to the token parsed. */
-        char *curPtr;
-        /*! Saves for backup. */
-        char *savePtr;
-        ixml_membuf lastElem;
-        ixml_membuf tokenBuf;
-        IXML_Node *pNeedPrefixNode;
-        IXML_ElementStack *pCurElement;
-        IXML_Node *currentNodePtr;
-        PARSER_STATE state;
-        int bHasTopLevel;
+	/*! Data buffer. */
+	char *dataBuffer;
+	/*! Pointer to the token parsed. */
+	char *curPtr;
+	/*! Saves for backup. */
+	char *savePtr;
+	ixml_membuf lastElem;
+	ixml_membuf tokenBuf;
+	IXML_Node *pNeedPrefixNode;
+	IXML_ElementStack *pCurElement;
+	IXML_Node *currentNodePtr;
+	PARSER_STATE state;
+	int bHasTopLevel;
 } Parser;
 
 /*!
  * \brief Check to see whether name is a valid xml name.
  */
 int Parser_isValidXmlName(
-        /*! [in] The string to be checked. */
-        const DOMString name);
+	/*! [in] The string to be checked. */
+	const DOMString name);
 
 /*!
  * \brief Sets the error character.
@@ -107,8 +107,8 @@ int Parser_isValidXmlName(
  * untranslated. The parsing is then allowed to continue.
  */
 void Parser_setErrorChar(
-        /*! [in] The character to become the error character. */
-        char c);
+	/*! [in] The character to become the error character. */
+	char c);
 
 #ifdef IXML_HAVE_SCRIPTSUPPORT
 /*!
@@ -120,8 +120,8 @@ void Parser_setErrorChar(
  * own tree structure.
  */
 void Parser_setBeforeFree(
-        /*! [in] The handler callback to call before each node to be freed. */
-        IXML_BeforeFreeNode_t hndlr);
+	/*! [in] The handler callback to call before each node to be freed. */
+	IXML_BeforeFreeNode_t hndlr);
 
 /*!
  * \brief Gets the handler to call before a node is freed.
@@ -133,8 +133,8 @@ IXML_BeforeFreeNode_t Parser_getBeforeFree();
  * \brief Fees a node contents.
  */
 void Parser_freeNodeContent(
-        /*! [in] The Node to process. */
-        IXML_Node *IXML_Nodeptr);
+	/*! [in] The Node to process. */
+	IXML_Node *IXML_Nodeptr);
 
 int Parser_LoadDocument(IXML_Document **retDoc, const char *xmlFile, int file);
 
@@ -152,17 +152,17 @@ void ixmlAttr_init(IXML_Attr *attrNode);
  * 		buffer for the element's tagname.
  */
 int ixmlElement_setTagName(
-        /*! [in] The element to change the tagname. */
-        IXML_Element *element,
-        /*! [in] The new tagName for the element. */
-        const char *tagName);
+	/*! [in] The element to change the tagname. */
+	IXML_Element *element,
+	/*! [in] The new tagName for the element. */
+	const char *tagName);
 
 /*!
  * \brief Initializes a NamedNodeMap object.
  */
 void ixmlNamedNodeMap_init(
-        /*! [in] The named node map to process. */
-        IXML_NamedNodeMap *nnMap);
+	/*! [in] The named node map to process. */
+	IXML_NamedNodeMap *nnMap);
 
 /*!
  * \brief Add a node to a NamedNodeMap.
@@ -170,26 +170,26 @@ void ixmlNamedNodeMap_init(
  * \return IXML_SUCCESS or failure.
  */
 int ixmlNamedNodeMap_addToNamedNodeMap(
-        /* [in] The named node map. */
-        IXML_NamedNodeMap **nnMap,
-        /* [in] The node to add. */
-        IXML_Node *add);
+	/* [in] The named node map. */
+	IXML_NamedNodeMap **nnMap,
+	/* [in] The node to add. */
+	IXML_Node *add);
 
 /*!
  * \brief Add a node to nodelist.
  */
 int ixmlNodeList_addToNodeList(
-        /*! [in] The pointer to the nodelist. */
-        IXML_NodeList **nList,
-        /*! [in] The node to add. */
-        IXML_Node *add);
+	/*! [in] The pointer to the nodelist. */
+	IXML_NodeList **nList,
+	/*! [in] The node to add. */
+	IXML_Node *add);
 
 /*!
  * \brief Intializes a node.
  */
 void ixmlNode_init(
-        /*! [in] The \b Node to iniatialize. */
-        IXML_Node *nodeptr);
+	/*! [in] The \b Node to iniatialize. */
+	IXML_Node *nodeptr);
 
 /*!
  * \brief Compare two nodes to see whether they are the same node.
@@ -200,10 +200,10 @@ void ixmlNode_init(
  * 	\li 0, the two nodes are not the same.
  */
 int ixmlNode_compare(
-        /*! [in] The first \b Node. */
-        IXML_Node *srcNode,
-        /*! [in] The second \b Node. */
-        IXML_Node *destNode);
+	/*! [in] The first \b Node. */
+	IXML_Node *srcNode,
+	/*! [in] The second \b Node. */
+	IXML_Node *destNode);
 
 /*!
  * \brief Returns a nodeList of all descendant Elements with a given tagName,
@@ -211,12 +211,12 @@ int ixmlNode_compare(
  * tree.
  */
 void ixmlNode_getElementsByTagName(
-        /*! [in] The \b Node tree. */
-        IXML_Node *n,
-        /*! [in] The tag name to match. */
-        const char *tagname,
-        /*! [out] The output \b NodeList. */
-        IXML_NodeList **list);
+	/*! [in] The \b Node tree. */
+	IXML_Node *n,
+	/*! [in] The tag name to match. */
+	const char *tagname,
+	/*! [out] The output \b NodeList. */
+	IXML_NodeList **list);
 
 /*!
  * \brief Returns a nodeList of all the descendant Elements with a given local
@@ -224,14 +224,14 @@ void ixmlNode_getElementsByTagName(
  * preorder traversal of this Elememt tree.
  */
 void ixmlNode_getElementsByTagNameNS(
-        /*! [in] The \b Element tree. */
-        IXML_Node *n,
-        /*! [in] The name space to match. */
-        const char *namespaceURI,
-        /*! [in] The local name to match. */
-        const char *localName,
-        /*! [out] The output \b NodeList. */
-        IXML_NodeList **list);
+	/*! [in] The \b Element tree. */
+	IXML_Node *n,
+	/*! [in] The name space to match. */
+	const char *namespaceURI,
+	/*! [in] The local name to match. */
+	const char *localName,
+	/*! [out] The output \b NodeList. */
+	IXML_NodeList **list);
 
 /*!
  * \brief
@@ -239,10 +239,10 @@ void ixmlNode_getElementsByTagNameNS(
  * \return
  */
 int ixmlNode_setNodeName(
-        /*! [in] The \b Node. */
-        IXML_Node *node,
-        /*! [in] . */
-        const DOMString qualifiedName);
+	/*! [in] The \b Node. */
+	IXML_Node *node,
+	/*! [in] . */
+	const DOMString qualifiedName);
 
 /*!
  * \brief
@@ -250,16 +250,16 @@ int ixmlNode_setNodeName(
  * \return
  */
 int ixmlNode_setNodeProperties(
-        /*! [in] . */
-        IXML_Node *destNode,
-        /*! [in] . */
-        IXML_Node *src);
+	/*! [in] . */
+	IXML_Node *destNode,
+	/*! [in] . */
+	IXML_Node *src);
 
 /*!
  * \brief Initializes a nodelist
  */
 void ixmlNodeList_init(
-        /*! [in,out] The \b NodeList to initialize. */
-        IXML_NodeList *nList);
+	/*! [in,out] The \b NodeList to initialize. */
+	IXML_NodeList *nList);
 
 #endif /* IXMLPARSER_H */

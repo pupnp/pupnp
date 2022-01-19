@@ -34,7 +34,7 @@
  *	pointer to presentation format address (`dst'), or NULL (see errno).
  */
 extern const char *inet_ntop(
-        int af, const void *src, char *dst, socklen_t size);
+	int af, const void *src, char *dst, socklen_t size);
 
 /*!
  * \brief convert from presentation format (which usually means ASCII printable)

@@ -52,11 +52,11 @@
  * \note called by genacallback()
  */
 void gena_process_notification_event(
-        /*! [in] Library Handle. */
-        UpnpLib *p,
-        /*! [in] Socket info of the device. */
-        SOCKINFO *info,
-        /*! [in] The http message contains the GENA notification. */
-        http_message_t *event);
+	/*! [in] Library Handle. */
+	UpnpLib *p,
+	/*! [in] Socket info of the device. */
+	SOCKINFO *info,
+	/*! [in] The http message contains the GENA notification. */
+	http_message_t *event);
 
 #endif /* GENA_CTRLPT_H */
