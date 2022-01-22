@@ -37,13 +37,13 @@
  * an http message and then matches the data with XML data.
  */
 
-#include "config.h"
-#include <assert.h>
-#include "upnputil.h"
-#include "membuffer.h"
-#include "httpparser.h"
-#include "statcodes.h"
 #include "parsetools.h"
+#include "config.h"
+#include "httpparser.h"
+#include "membuffer.h"
+#include "statcodes.h"
+#include "upnputil.h"
+#include <assert.h>
 
 int has_xml_content_type(http_message_t *hmsg)
 {
@@ -53,7 +53,8 @@ int has_xml_content_type(http_message_t *hmsg)
 
 	/* find 'content-type' header which must have text/xml */
 	if (httpmsg_find_hdr(hmsg, HDR_CONTENT_TYPE, &hdr_value)) {
-		switch (matchstr(hdr_value.buf, hdr_value.length, "%itext%w/%wxml" )) {
+		switch (matchstr(
+			hdr_value.buf, hdr_value.length, "%itext%w/%wxml")) {
 		case PARSE_OK:
 			return 1;
 		default:
@@ -62,4 +63,3 @@ int has_xml_content_type(http_message_t *hmsg)
 	}
 	return 0;
 }
-

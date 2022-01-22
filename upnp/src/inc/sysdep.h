@@ -47,17 +47,18 @@
 /*! Set the following to a call to acquire a system wide global lock. */
 extern ithread_mutex_t gUUIDMutex;
 
-#define UUIDLock()      ithread_mutex_lock(&gUUIDMutex)
-#define UUIDUnlock()    ithread_mutex_unlock(&gUUIDMutex)
+#define UUIDLock() ithread_mutex_lock(&gUUIDMutex)
+#define UUIDUnlock() ithread_mutex_unlock(&gUUIDMutex)
 
 typedef uint64_t uuid_time_t;
 
-typedef struct {
+typedef struct
+{
 	char nodeID[6];
 } uuid_node_t;
 
-void get_ieee_node_identifier(uuid_node_t * node);
-void get_system_time(uuid_time_t * uuid_time);
+void get_ieee_node_identifier(uuid_node_t *node);
+void get_system_time(uuid_time_t *uuid_time);
 void get_random_info(unsigned char seed[16]);
 
 #endif /* SYSDEP_H */

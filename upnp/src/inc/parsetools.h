@@ -36,8 +36,8 @@
  * \file
  */
 
-#include "upnputil.h"
 #include "httpparser.h"
+#include "upnputil.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,4 +58,3 @@ int has_xml_content_type(
 #endif
 
 #endif /* GENLIB_NET_HTTP_PARSETOOLS_H */
-

@@ -41,47 +41,51 @@
 #include "config.h"
 
 #ifdef INCLUDE_DEVICE_APIS
-#if EXCLUDE_SSDP == 0
+	#if EXCLUDE_SSDP == 0
 
-#include "httpparser.h"
-#include "httpreadwrite.h"
-#include "ssdplib.h"
-#include "statcodes.h"
-#include "ThreadPool.h"
-#include "unixutil.h"
-#include "upnpapi.h"
-#include "UpnpInet.h"
+		#include "ThreadPool.h"
+		#include "UpnpInet.h"
+		#include "httpparser.h"
+		#include "httpreadwrite.h"
+		#include "ssdplib.h"
+		#include "statcodes.h"
+		#include "unixutil.h"
+		#include "upnpapi.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
+		#include <assert.h>
+		#include <stdio.h>
+		#include <string.h>
 
-#ifdef _WIN32
-	#if defined(_MSC_VER) && _MSC_VER < 1900
-		#define snprintf _snprintf
-	#endif
-#endif
+		#ifdef _WIN32
+			#if defined(_MSC_VER) && _MSC_VER < 1900
+				#define snprintf _snprintf
+			#endif
+		#endif
 
-#define MSGTYPE_SHUTDOWN	0
-#define MSGTYPE_ADVERTISEMENT	1
-#define MSGTYPE_REPLY		2
+		#define MSGTYPE_SHUTDOWN 0
+		#define MSGTYPE_ADVERTISEMENT 1
+		#define MSGTYPE_REPLY 2
 
 void advertiseAndReplyThread(void *data)
 {
-	SsdpSearchReply *arg = (SsdpSearchReply *) data;
+	SsdpSearchReply *arg = (SsdpSearchReply *)data;
 
-	AdvertiseAndReply(0, arg->handle,
-			  arg->event.RequestType,
-			  (struct sockaddr *)&arg->dest_addr,
-			  arg->event.DeviceType,
-			  arg->event.UDN, arg->event.ServiceType, arg->MaxAge);
+	AdvertiseAndReply(0,
+		arg->handle,
+		arg->event.RequestType,
+		(struct sockaddr *)&arg->dest_addr,
+		arg->event.DeviceType,
+		arg->event.UDN,
+		arg->event.ServiceType,
+		arg->MaxAge);
 	free(arg);
 }
 
-#ifdef INCLUDE_DEVICE_APIS
-void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *dest_addr)
+		#ifdef INCLUDE_DEVICE_APIS
+void ssdp_handle_device_request(
+	http_message_t *hmsg, struct sockaddr_storage *dest_addr)
 {
-#define MX_FUDGE_FACTOR 10
+			#define MX_FUDGE_FACTOR 10
 	int handle, start;
 	struct Handle_Info *dev_info = NULL;
 	memptr hdr_value;
@@ -98,12 +102,12 @@ void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *d
 
 	/* check man hdr. */
 	if (httpmsg_find_hdr(hmsg, HDR_MAN, &hdr_value) == NULL ||
-	    memptr_cmp(&hdr_value, "\"ssdp:discover\"") != 0)
+		memptr_cmp(&hdr_value, "\"ssdp:discover\"") != 0)
 		/* bad or missing hdr. */
 		return;
 	/* MX header. */
 	if (httpmsg_find_hdr(hmsg, HDR_MX, &hdr_value) == NULL ||
-	    (mx = raw_to_int(&hdr_value, 10)) < 0)
+		(mx = raw_to_int(&hdr_value, 10)) < 0)
 		return;
 	/* ST header. */
 	if (httpmsg_find_hdr(hmsg, HDR_ST, &hdr_value) == NULL)
@@ -121,8 +125,8 @@ void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *d
 	for (;;) {
 		HandleLock();
 		/* device info. */
-		switch (GetDeviceHandleInfo(start, (int)dest_addr->ss_family,
-									&handle, &dev_info)) {
+		switch (GetDeviceHandleInfo(
+			start, (int)dest_addr->ss_family, &handle, &dev_info)) {
 		case HND_DEVICE:
 			break;
 		default:
@@ -133,41 +137,67 @@ void ssdp_handle_device_request(http_message_t *hmsg, struct sockaddr_storage *d
 		maxAge = dev_info->MaxAge;
 		HandleUnlock();
 
-		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-				   "MAX-AGE     =  %d\n", maxAge);
-		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-				   "MX     =  %d\n", event.Mx);
-		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-				   "DeviceType   =  %s\n", event.DeviceType);
-		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-				   "DeviceUuid   =  %s\n", event.UDN);
-		UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
-				   "ServiceType =  %s\n", event.ServiceType);
+		UpnpPrintf(UPNP_INFO,
+			API,
+			__FILE__,
+			__LINE__,
+			"MAX-AGE     =  %d\n",
+			maxAge);
+		UpnpPrintf(UPNP_INFO,
+			API,
+			__FILE__,
+			__LINE__,
+			"MX     =  %d\n",
+			event.Mx);
+		UpnpPrintf(UPNP_INFO,
+			API,
+			__FILE__,
+			__LINE__,
+			"DeviceType   =  %s\n",
+			event.DeviceType);
+		UpnpPrintf(UPNP_INFO,
+			API,
+			__FILE__,
+			__LINE__,
+			"DeviceUuid   =  %s\n",
+			event.UDN);
+		UpnpPrintf(UPNP_INFO,
+			API,
+			__FILE__,
+			__LINE__,
+			"ServiceType =  %s\n",
+			event.ServiceType);
 		threadArg = (SsdpSearchReply *)malloc(sizeof(SsdpSearchReply));
 		if (threadArg == NULL)
 			return;
 		threadArg->handle = handle;
-		memcpy(&threadArg->dest_addr, dest_addr, sizeof(threadArg->dest_addr));
+		memcpy(&threadArg->dest_addr,
+			dest_addr,
+			sizeof(threadArg->dest_addr));
 		threadArg->event = event;
 		threadArg->MaxAge = maxAge;
 
 		TPJobInit(&job, advertiseAndReplyThread, threadArg);
-		TPJobSetFreeFunction(&job, (free_routine) free);
+		TPJobSetFreeFunction(&job, (free_routine)free);
 
-		/* Subtract a percentage from the mx to allow for network and processing
-		 * delays (i.e. if search is for 30 seconds, respond
+		/* Subtract a percentage from the mx to allow for network and
+		 * processing delays (i.e. if search is for 30 seconds, respond
 		 * within 0 - 27 seconds). */
 		if (mx >= 2)
 			mx -= MAXVAL(1, mx / MX_FUDGE_FACTOR);
 		if (mx < 1)
 			mx = 1;
 		replyTime = rand() % mx;
-		TimerThreadSchedule(&gTimerThread, replyTime, REL_SEC, &job,
-							SHORT_TERM, NULL);
+		TimerThreadSchedule(&gTimerThread,
+			replyTime,
+			REL_SEC,
+			&job,
+			SHORT_TERM,
+			NULL);
 		start = handle;
 	}
 }
-#endif
+		#endif
 
 /*!
  * \brief Works as a request handler which passes the HTTP request string
@@ -190,9 +220,9 @@ static int NewRequestHandler(
 	struct in_addr replyAddr;
 	/* a/c to UPNP Spec */
 	int ttl = 4;
-#ifdef UPNP_ENABLE_IPV6
+		#ifdef UPNP_ENABLE_IPV6
 	int hops = 1;
-#endif
+		#endif
 	char buf_ntop[INET6_ADDRSTRLEN];
 	int ret = UPNP_E_SUCCESS;
 
@@ -204,59 +234,93 @@ static int NewRequestHandler(
 	ReplySock = socket((int)DestAddr->sa_family, SOCK_DGRAM, 0);
 	if (ReplySock == INVALID_SOCKET) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-			   "SSDP_LIB: New Request Handler:"
-			   "Error in socket(): %s\n", errorBuffer);
+		UpnpPrintf(UPNP_INFO,
+			SSDP,
+			__FILE__,
+			__LINE__,
+			"SSDP_LIB: New Request Handler:"
+			"Error in socket(): %s\n",
+			errorBuffer);
 
 		return UPNP_E_OUTOF_SOCKET;
 	}
 
 	switch (DestAddr->sa_family) {
 	case AF_INET:
-		inet_ntop(AF_INET, &((struct sockaddr_in *)DestAddr)->sin_addr,
-			  buf_ntop, sizeof(buf_ntop));
-		setsockopt(ReplySock, IPPROTO_IP, IP_MULTICAST_IF,
-			   (char *)&replyAddr, sizeof(replyAddr));
-		setsockopt(ReplySock, IPPROTO_IP, IP_MULTICAST_TTL,
-			   (char *)&ttl, sizeof(int));
+		inet_ntop(AF_INET,
+			&((struct sockaddr_in *)DestAddr)->sin_addr,
+			buf_ntop,
+			sizeof(buf_ntop));
+		setsockopt(ReplySock,
+			IPPROTO_IP,
+			IP_MULTICAST_IF,
+			(char *)&replyAddr,
+			sizeof(replyAddr));
+		setsockopt(ReplySock,
+			IPPROTO_IP,
+			IP_MULTICAST_TTL,
+			(char *)&ttl,
+			sizeof(int));
 		socklen = sizeof(struct sockaddr_in);
 		break;
-#ifdef UPNP_ENABLE_IPV6
+		#ifdef UPNP_ENABLE_IPV6
 	case AF_INET6:
 		inet_ntop(AF_INET6,
-			  &((struct sockaddr_in6 *)DestAddr)->sin6_addr,
-			  buf_ntop, sizeof(buf_ntop));
-		setsockopt(ReplySock, IPPROTO_IPV6, IPV6_MULTICAST_IF,
-			   (char *)&gIF_INDEX, sizeof(gIF_INDEX));
-		setsockopt(ReplySock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
-			   (char *)&hops, sizeof(hops));
+			&((struct sockaddr_in6 *)DestAddr)->sin6_addr,
+			buf_ntop,
+			sizeof(buf_ntop));
+		setsockopt(ReplySock,
+			IPPROTO_IPV6,
+			IPV6_MULTICAST_IF,
+			(char *)&gIF_INDEX,
+			sizeof(gIF_INDEX));
+		setsockopt(ReplySock,
+			IPPROTO_IPV6,
+			IPV6_MULTICAST_HOPS,
+			(char *)&hops,
+			sizeof(hops));
 		break;
-#endif
+		#endif
 	default:
-		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-			   "Invalid destination address specified.");
+		UpnpPrintf(UPNP_CRITICAL,
+			SSDP,
+			__FILE__,
+			__LINE__,
+			"Invalid destination address specified.");
 		ret = UPNP_E_NETWORK_ERROR;
 		goto end_NewRequestHandler;
 	}
 
 	for (Index = 0; Index < NumPacket; Index++) {
 		ssize_t rc;
-		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-			   ">>> SSDP SEND to %s >>>\n%s\n",
-			   buf_ntop, *(RqPacket + Index));
-		rc = sendto(ReplySock, *(RqPacket + Index),
-			    strlen(*(RqPacket + Index)), 0, DestAddr, socklen);
+		UpnpPrintf(UPNP_INFO,
+			SSDP,
+			__FILE__,
+			__LINE__,
+			">>> SSDP SEND to %s >>>\n%s\n",
+			buf_ntop,
+			*(RqPacket + Index));
+		rc = sendto(ReplySock,
+			*(RqPacket + Index),
+			strlen(*(RqPacket + Index)),
+			0,
+			DestAddr,
+			socklen);
 		if (rc == -1) {
 			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-			UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-				   "SSDP_LIB: New Request Handler:"
-				   "Error in socket(): %s\n", errorBuffer);
+			UpnpPrintf(UPNP_INFO,
+				SSDP,
+				__FILE__,
+				__LINE__,
+				"SSDP_LIB: New Request Handler:"
+				"Error in socket(): %s\n",
+				errorBuffer);
 			ret = UPNP_E_SOCKET_WRITE;
 			goto end_NewRequestHandler;
 		}
 	}
 
- end_NewRequestHandler:
+end_NewRequestHandler:
 	UpnpCloseSocket(ReplySock);
 
 	return ret;
@@ -296,7 +360,7 @@ static int extractIPv6address(char *url, char *address)
 		ret = 1;
 	}
 
- exit_function:
+exit_function:
 	return ret;
 }
 
@@ -358,54 +422,131 @@ static void CreateServicePacket(
 	*packet = NULL;
 	if (msg_type == MSGTYPE_REPLY) {
 		if (PowerState > 0) {
-#ifdef UPNP_HAVE_OPTSSDP
-			ret_code = http_MakeMessage(&buf, 1, 1,
-					    "R" "sdc" "D" "sc" "ssc" "ssc" "ssc"
-					    "S" "Xc" "ssc" "ssc"
-					    "sdc" "sdc" "sdcc", HTTP_OK,
-					    "CACHE-CONTROL: max-age=", duration,
-					    "EXT:", "LOCATION: ", location,
-					    "OPT: ",
-					    "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
-					    "01-NLS: ", gUpnpSdkNLSuuid,
-					    X_USER_AGENT, "ST: ", nt, "USN: ",
-					    usn, "Powerstate: ", PowerState,
-					    "SleepPeriod: ", SleepPeriod,
-					    "RegistrationState: ",
-					    RegistrationState);
-#else
-			ret_code = http_MakeMessage(&buf, 1, 1,
-					    "R" "sdc" "D" "sc" "ssc"
-					    "S" "ssc" "ssc"
-					    "sdc" "sdc" "sdcc", HTTP_OK,
-					    "CACHE-CONTROL: max-age=", duration,
-					    "EXT:", "LOCATION: ", location,
-					    "ST: ", nt, "USN: ",
-					    usn, "Powerstate: ", PowerState,
-					    "SleepPeriod: ", SleepPeriod,
-					    "RegistrationState: ",
-					    RegistrationState);
-#endif /* UPNP_HAVE_OPTSSDP */
+		#ifdef UPNP_HAVE_OPTSSDP
+			ret_code = http_MakeMessage(&buf,
+				1,
+				1,
+				"R"
+				"sdc"
+				"D"
+				"sc"
+				"ssc"
+				"ssc"
+				"ssc"
+				"S"
+				"Xc"
+				"ssc"
+				"ssc"
+				"sdc"
+				"sdc"
+				"sdcc",
+				HTTP_OK,
+				"CACHE-CONTROL: max-age=",
+				duration,
+				"EXT:",
+				"LOCATION: ",
+				location,
+				"OPT: ",
+				"\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
+				"01-NLS: ",
+				gUpnpSdkNLSuuid,
+				X_USER_AGENT,
+				"ST: ",
+				nt,
+				"USN: ",
+				usn,
+				"Powerstate: ",
+				PowerState,
+				"SleepPeriod: ",
+				SleepPeriod,
+				"RegistrationState: ",
+				RegistrationState);
+		#else
+			ret_code = http_MakeMessage(&buf,
+				1,
+				1,
+				"R"
+				"sdc"
+				"D"
+				"sc"
+				"ssc"
+				"S"
+				"ssc"
+				"ssc"
+				"sdc"
+				"sdc"
+				"sdcc",
+				HTTP_OK,
+				"CACHE-CONTROL: max-age=",
+				duration,
+				"EXT:",
+				"LOCATION: ",
+				location,
+				"ST: ",
+				nt,
+				"USN: ",
+				usn,
+				"Powerstate: ",
+				PowerState,
+				"SleepPeriod: ",
+				SleepPeriod,
+				"RegistrationState: ",
+				RegistrationState);
+		#endif /* UPNP_HAVE_OPTSSDP */
 		} else {
-#ifdef UPNP_HAVE_OPTSSDP
-			ret_code = http_MakeMessage(&buf, 1, 1,
-					    "R" "sdc" "D" "sc" "ssc" "ssc" "ssc"
-					    "S" "Xc" "ssc" "sscc", HTTP_OK,
-					    "CACHE-CONTROL: max-age=", duration,
-					    "EXT:", "LOCATION: ", location,
-					    "OPT: ",
-					    "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
-					    "01-NLS: ", gUpnpSdkNLSuuid,
-					    X_USER_AGENT, "ST: ", nt, "USN: ",
-					    usn);
-#else
-			ret_code = http_MakeMessage(&buf, 1, 1,
-					    "R" "sdc" "D" "sc" "ssc"
-					    "S" "ssc" "sscc", HTTP_OK,
-					    "CACHE-CONTROL: max-age=", duration,
-					    "EXT:", "LOCATION: ", location,
-					    "ST: ", nt, "USN: ", usn);
-#endif /* UPNP_HAVE_OPTSSDP */
+		#ifdef UPNP_HAVE_OPTSSDP
+			ret_code = http_MakeMessage(&buf,
+				1,
+				1,
+				"R"
+				"sdc"
+				"D"
+				"sc"
+				"ssc"
+				"ssc"
+				"ssc"
+				"S"
+				"Xc"
+				"ssc"
+				"sscc",
+				HTTP_OK,
+				"CACHE-CONTROL: max-age=",
+				duration,
+				"EXT:",
+				"LOCATION: ",
+				location,
+				"OPT: ",
+				"\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
+				"01-NLS: ",
+				gUpnpSdkNLSuuid,
+				X_USER_AGENT,
+				"ST: ",
+				nt,
+				"USN: ",
+				usn);
+		#else
+			ret_code = http_MakeMessage(&buf,
+				1,
+				1,
+				"R"
+				"sdc"
+				"D"
+				"sc"
+				"ssc"
+				"S"
+				"ssc"
+				"sscc",
+				HTTP_OK,
+				"CACHE-CONTROL: max-age=",
+				duration,
+				"EXT:",
+				"LOCATION: ",
+				location,
+				"ST: ",
+				nt,
+				"USN: ",
+				usn);
+		#endif /* UPNP_HAVE_OPTSSDP */
 		}
 		if (ret_code != 0) {
 			return;
@@ -419,7 +560,8 @@ static void CreateServicePacket(
 		else
 			/* shutdown */
 			nts = "ssdp:byebye";
-		/* NOTE: The CACHE-CONTROL and LOCATION headers are not present in
+		/* NOTE: The CACHE-CONTROL and LOCATION headers are not present
+		 * in
 		 * a shutdown msg, but are present here for MS WinMe interop. */
 		switch (AddressFamily) {
 		case AF_INET:
@@ -432,60 +574,159 @@ static void CreateServicePacket(
 				host = "[" SSDP_IPV6_LINKLOCAL "]";
 		}
 		if (PowerState > 0) {
-#ifdef UPNP_HAVE_OPTSSDP
-			ret_code = http_MakeMessage(&buf, 1, 1,
-					    "Q" "sssdc" "sdc" "ssc" "ssc" "ssc"
-					    "ssc" "ssc" "S" "Xc" "ssc"
-					    "sdc" "sdc" "sdcc",
-					    HTTPMETHOD_NOTIFY, "*", (size_t) 1,
-					    "HOST: ", host, ":", SSDP_PORT,
-					    "CACHE-CONTROL: max-age=", duration,
-					    "LOCATION: ", location, "OPT: ",
-					    "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
-					    "01-NLS: ", gUpnpSdkNLSuuid, "NT: ",
-					    nt, "NTS: ", nts, X_USER_AGENT,
-					    "USN: ", usn, "Powerstate: ",
-					    PowerState, "SleepPeriod: ",
-					    SleepPeriod, "RegistrationState: ",
-					    RegistrationState);
-#else
-			ret_code = http_MakeMessage(&buf, 1, 1,
-					    "Q" "sssdc" "sdc" "ssc"
-					    "ssc" "ssc" "S" "ssc"
-					    "sdc" "sdc" "sdcc",
-					    HTTPMETHOD_NOTIFY, "*", (size_t) 1,
-					    "HOST: ", host, ":", SSDP_PORT,
-					    "CACHE-CONTROL: max-age=", duration,
-					    "LOCATION: ", location, "NT: ", nt,
-					    "NTS: ", nts,
-					    "USN: ", usn, "Powerstate: ",
-					    PowerState, "SleepPeriod: ",
-					    SleepPeriod, "RegistrationState: ",
-					    RegistrationState);
-#endif /* UPNP_HAVE_OPTSSDP */
+		#ifdef UPNP_HAVE_OPTSSDP
+			ret_code = http_MakeMessage(&buf,
+				1,
+				1,
+				"Q"
+				"sssdc"
+				"sdc"
+				"ssc"
+				"ssc"
+				"ssc"
+				"ssc"
+				"ssc"
+				"S"
+				"Xc"
+				"ssc"
+				"sdc"
+				"sdc"
+				"sdcc",
+				HTTPMETHOD_NOTIFY,
+				"*",
+				(size_t)1,
+				"HOST: ",
+				host,
+				":",
+				SSDP_PORT,
+				"CACHE-CONTROL: max-age=",
+				duration,
+				"LOCATION: ",
+				location,
+				"OPT: ",
+				"\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
+				"01-NLS: ",
+				gUpnpSdkNLSuuid,
+				"NT: ",
+				nt,
+				"NTS: ",
+				nts,
+				X_USER_AGENT,
+				"USN: ",
+				usn,
+				"Powerstate: ",
+				PowerState,
+				"SleepPeriod: ",
+				SleepPeriod,
+				"RegistrationState: ",
+				RegistrationState);
+		#else
+			ret_code = http_MakeMessage(&buf,
+				1,
+				1,
+				"Q"
+				"sssdc"
+				"sdc"
+				"ssc"
+				"ssc"
+				"ssc"
+				"S"
+				"ssc"
+				"sdc"
+				"sdc"
+				"sdcc",
+				HTTPMETHOD_NOTIFY,
+				"*",
+				(size_t)1,
+				"HOST: ",
+				host,
+				":",
+				SSDP_PORT,
+				"CACHE-CONTROL: max-age=",
+				duration,
+				"LOCATION: ",
+				location,
+				"NT: ",
+				nt,
+				"NTS: ",
+				nts,
+				"USN: ",
+				usn,
+				"Powerstate: ",
+				PowerState,
+				"SleepPeriod: ",
+				SleepPeriod,
+				"RegistrationState: ",
+				RegistrationState);
+		#endif /* UPNP_HAVE_OPTSSDP */
 		} else {
-#ifdef UPNP_HAVE_OPTSSDP
-			ret_code = http_MakeMessage(&buf, 1, 1,
-					    "Q" "sssdc" "sdc" "ssc" "ssc" "ssc"
-					    "ssc" "ssc" "S" "Xc" "sscc",
-					    HTTPMETHOD_NOTIFY, "*", (size_t) 1,
-					    "HOST: ", host, ":", SSDP_PORT,
-					    "CACHE-CONTROL: max-age=", duration,
-					    "LOCATION: ", location, "OPT: ",
-					    "\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
-					    "01-NLS: ", gUpnpSdkNLSuuid, "NT: ",
-					    nt, "NTS: ", nts, X_USER_AGENT,
-					    "USN: ", usn);
-#else
-			ret_code = http_MakeMessage(&buf, 1, 1,
-					    "Q" "sssdc" "sdc" "ssc"
-					    "ssc" "ssc" "S" "sscc",
-					    HTTPMETHOD_NOTIFY, "*", (size_t) 1,
-					    "HOST: ", host, ":", SSDP_PORT,
-					    "CACHE-CONTROL: max-age=", duration,
-					    "LOCATION: ", location, "NT: ", nt,
-					    "NTS: ", nts, "USN: ", usn);
-#endif /* UPNP_HAVE_OPTSSDP */
+		#ifdef UPNP_HAVE_OPTSSDP
+			ret_code = http_MakeMessage(&buf,
+				1,
+				1,
+				"Q"
+				"sssdc"
+				"sdc"
+				"ssc"
+				"ssc"
+				"ssc"
+				"ssc"
+				"ssc"
+				"S"
+				"Xc"
+				"sscc",
+				HTTPMETHOD_NOTIFY,
+				"*",
+				(size_t)1,
+				"HOST: ",
+				host,
+				":",
+				SSDP_PORT,
+				"CACHE-CONTROL: max-age=",
+				duration,
+				"LOCATION: ",
+				location,
+				"OPT: ",
+				"\"http://schemas.upnp.org/upnp/1/0/\"; ns=01",
+				"01-NLS: ",
+				gUpnpSdkNLSuuid,
+				"NT: ",
+				nt,
+				"NTS: ",
+				nts,
+				X_USER_AGENT,
+				"USN: ",
+				usn);
+		#else
+			ret_code = http_MakeMessage(&buf,
+				1,
+				1,
+				"Q"
+				"sssdc"
+				"sdc"
+				"ssc"
+				"ssc"
+				"ssc"
+				"S"
+				"sscc",
+				HTTPMETHOD_NOTIFY,
+				"*",
+				(size_t)1,
+				"HOST: ",
+				host,
+				":",
+				SSDP_PORT,
+				"CACHE-CONTROL: max-age=",
+				duration,
+				"LOCATION: ",
+				location,
+				"NT: ",
+				nt,
+				"NTS: ",
+				nts,
+				"USN: ",
+				usn);
+		#endif /* UPNP_HAVE_OPTSSDP */
 		}
 		if (ret_code)
 			return;
@@ -499,9 +740,15 @@ static void CreateServicePacket(
 	return;
 }
 
-int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
-			int Duration, int AddressFamily, int PowerState,
-			int SleepPeriod, int RegistrationState)
+int DeviceAdvertisement(char *DevType,
+	int RootDev,
+	char *Udn,
+	char *Location,
+	int Duration,
+	int AddressFamily,
+	int PowerState,
+	int SleepPeriod,
+	int RegistrationState)
 {
 	struct sockaddr_storage __ss;
 	struct sockaddr_in *DestAddr4 = (struct sockaddr_in *)&__ss;
@@ -512,8 +759,11 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 	int ret_code = UPNP_E_OUTOF_MEMORY;
 	int rc = 0;
 
-	UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-		   "In function DeviceAdvertisement\n");
+	UpnpPrintf(UPNP_INFO,
+		SSDP,
+		__FILE__,
+		__LINE__,
+		"In function DeviceAdvertisement\n");
 	memset(&__ss, 0, sizeof(__ss));
 	switch (AddressFamily) {
 	case AF_INET:
@@ -524,14 +774,18 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 	case AF_INET6:
 		DestAddr6->sin6_family = (sa_family_t)AF_INET6;
 		inet_pton(AF_INET6,
-			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
-			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
+			(isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL
+						  : SSDP_IPV6_LINKLOCAL,
+			&DestAddr6->sin6_addr);
 		DestAddr6->sin6_port = htons(SSDP_PORT);
 		DestAddr6->sin6_scope_id = gIF_INDEX;
 		break;
 	default:
-		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-			   "Invalid device address family.\n");
+		UpnpPrintf(UPNP_CRITICAL,
+			SSDP,
+			__FILE__,
+			__LINE__,
+			"Invalid device address family.\n");
 	}
 	msgs[0] = NULL;
 	msgs[1] = NULL;
@@ -539,39 +793,60 @@ int DeviceAdvertisement(char *DevType, int RootDev, char *Udn, char *Location,
 	/* If deviceis a root device , here we need to send 3 advertisement
 	 * or reply */
 	if (RootDev) {
-		rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice",
-			Udn);
-		if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+		rc = snprintf(
+			Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice", Udn);
+		if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 			goto error_handler;
-		CreateServicePacket(MSGTYPE_ADVERTISEMENT, "upnp:rootdevice",
-				    Mil_Usn, Location, Duration, &msgs[0],
-				    AddressFamily, PowerState, SleepPeriod,
-				    RegistrationState);
+		CreateServicePacket(MSGTYPE_ADVERTISEMENT,
+			"upnp:rootdevice",
+			Mil_Usn,
+			Location,
+			Duration,
+			&msgs[0],
+			AddressFamily,
+			PowerState,
+			SleepPeriod,
+			RegistrationState);
 	}
 	/* both root and sub-devices need to send these two messages */
-	CreateServicePacket(MSGTYPE_ADVERTISEMENT, Udn, Udn,
-			    Location, Duration, &msgs[1], AddressFamily,
-			    PowerState, SleepPeriod, RegistrationState);
+	CreateServicePacket(MSGTYPE_ADVERTISEMENT,
+		Udn,
+		Udn,
+		Location,
+		Duration,
+		&msgs[1],
+		AddressFamily,
+		PowerState,
+		SleepPeriod,
+		RegistrationState);
 	rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn, DevType);
-	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+	if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 		goto error_handler;
-	CreateServicePacket(MSGTYPE_ADVERTISEMENT, DevType, Mil_Usn,
-			    Location, Duration, &msgs[2], AddressFamily,
-			    PowerState, SleepPeriod, RegistrationState);
+	CreateServicePacket(MSGTYPE_ADVERTISEMENT,
+		DevType,
+		Mil_Usn,
+		Location,
+		Duration,
+		&msgs[2],
+		AddressFamily,
+		PowerState,
+		SleepPeriod,
+		RegistrationState);
 	/* check error */
-	if ((RootDev && msgs[0] == NULL) || msgs[1] == NULL || msgs[2] == NULL) {
+	if ((RootDev && msgs[0] == NULL) || msgs[1] == NULL ||
+		msgs[2] == NULL) {
 		goto error_handler;
 	}
 	/* send packets */
 	if (RootDev) {
 		/* send 3 msg types */
-		ret_code =
-		    NewRequestHandler((struct sockaddr *)&__ss, 3, &msgs[0]);
-	} else {		/* sub-device */
+		ret_code = NewRequestHandler(
+			(struct sockaddr *)&__ss, 3, &msgs[0]);
+	} else { /* sub-device */
 
 		/* send 2 msg types */
-		ret_code =
-		    NewRequestHandler((struct sockaddr *)&__ss, 2, &msgs[1]);
+		ret_code = NewRequestHandler(
+			(struct sockaddr *)&__ss, 2, &msgs[1]);
 	}
 
 error_handler:
@@ -583,9 +858,16 @@ error_handler:
 	return ret_code;
 }
 
-int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
-	      char *Udn, char *Location, int Duration, int ByType,
-	      int PowerState, int SleepPeriod, int RegistrationState)
+int SendReply(struct sockaddr *DestAddr,
+	char *DevType,
+	int RootDev,
+	char *Udn,
+	char *Location,
+	int Duration,
+	int ByType,
+	int PowerState,
+	int SleepPeriod,
+	int RegistrationState)
 {
 	int ret_code = UPNP_E_OUTOF_MEMORY;
 	char *msgs[2];
@@ -600,33 +882,54 @@ int SendReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 		/* one msg for root device */
 		num_msgs = 1;
 
-		rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice",
-			Udn);
-		if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+		rc = snprintf(
+			Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice", Udn);
+		if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 			goto error_handler;
-		CreateServicePacket(MSGTYPE_REPLY, "upnp:rootdevice",
-				    Mil_Usn, Location, Duration, &msgs[0],
-				    (int)DestAddr->sa_family, PowerState,
-				    SleepPeriod, RegistrationState);
+		CreateServicePacket(MSGTYPE_REPLY,
+			"upnp:rootdevice",
+			Mil_Usn,
+			Location,
+			Duration,
+			&msgs[0],
+			(int)DestAddr->sa_family,
+			PowerState,
+			SleepPeriod,
+			RegistrationState);
 	} else {
 		/* two msgs for embedded devices */
 		num_msgs = 1;
 
 		/*NK: FIX for extra response when someone searches by udn */
 		if (!ByType) {
-			CreateServicePacket(MSGTYPE_REPLY, Udn, Udn, Location,
-					    Duration, &msgs[0],
-					    (int)DestAddr->sa_family, PowerState,
-					    SleepPeriod, RegistrationState);
+			CreateServicePacket(MSGTYPE_REPLY,
+				Udn,
+				Udn,
+				Location,
+				Duration,
+				&msgs[0],
+				(int)DestAddr->sa_family,
+				PowerState,
+				SleepPeriod,
+				RegistrationState);
 		} else {
-			rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn,
+			rc = snprintf(Mil_Usn,
+				sizeof(Mil_Usn),
+				"%s::%s",
+				Udn,
 				DevType);
-			if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+			if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 				goto error_handler;
-			CreateServicePacket(MSGTYPE_REPLY, DevType, Mil_Usn,
-					    Location, Duration, &msgs[0],
-					    (int)DestAddr->sa_family, PowerState,
-					    SleepPeriod, RegistrationState);
+			CreateServicePacket(MSGTYPE_REPLY,
+				DevType,
+				Mil_Usn,
+				Location,
+				Duration,
+				&msgs[0],
+				(int)DestAddr->sa_family,
+				PowerState,
+				SleepPeriod,
+				RegistrationState);
 		}
 	}
 	/* check error */
@@ -647,9 +950,15 @@ error_handler:
 	return ret_code;
 }
 
-int DeviceReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
-		char *Udn, char *Location, int Duration, int PowerState,
-		int SleepPeriod, int RegistrationState)
+int DeviceReply(struct sockaddr *DestAddr,
+	char *DevType,
+	int RootDev,
+	char *Udn,
+	char *Location,
+	int Duration,
+	int PowerState,
+	int SleepPeriod,
+	int RegistrationState)
 {
 	char *szReq[3], Mil_Nt[LINE_SIZE], Mil_Usn[LINE_SIZE];
 	int RetVal = UPNP_E_OUTOF_MEMORY;
@@ -663,35 +972,56 @@ int DeviceReply(struct sockaddr *DestAddr, char *DevType, int RootDev,
 		/* 3 replies for root device */
 		memset(Mil_Nt, 0, sizeof(Mil_Nt));
 		strncpy(Mil_Nt, "upnp:rootdevice", sizeof(Mil_Nt) - 1);
-		rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice", Udn);
-		if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+		rc = snprintf(
+			Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice", Udn);
+		if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 			goto error_handler;
-		CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
-				    Location, Duration, &szReq[0],
-				    (int)DestAddr->sa_family, PowerState,
-				    SleepPeriod, RegistrationState);
+		CreateServicePacket(MSGTYPE_REPLY,
+			Mil_Nt,
+			Mil_Usn,
+			Location,
+			Duration,
+			&szReq[0],
+			(int)DestAddr->sa_family,
+			PowerState,
+			SleepPeriod,
+			RegistrationState);
 	}
 	rc = snprintf(Mil_Nt, sizeof(Mil_Nt), "%s", Udn);
-	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Nt))
+	if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Nt))
 		goto error_handler;
 	rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s", Udn);
-	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+	if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 		goto error_handler;
-	CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
-			    Location, Duration, &szReq[1], (int)DestAddr->sa_family,
-			    PowerState, SleepPeriod, RegistrationState);
+	CreateServicePacket(MSGTYPE_REPLY,
+		Mil_Nt,
+		Mil_Usn,
+		Location,
+		Duration,
+		&szReq[1],
+		(int)DestAddr->sa_family,
+		PowerState,
+		SleepPeriod,
+		RegistrationState);
 	rc = snprintf(Mil_Nt, sizeof(Mil_Nt), "%s", DevType);
-	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Nt))
+	if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Nt))
 		goto error_handler;
 	rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn, DevType);
-	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+	if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 		goto error_handler;
-	CreateServicePacket(MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
-			    Location, Duration, &szReq[2], (int)DestAddr->sa_family,
-			    PowerState, SleepPeriod, RegistrationState);
+	CreateServicePacket(MSGTYPE_REPLY,
+		Mil_Nt,
+		Mil_Usn,
+		Location,
+		Duration,
+		&szReq[2],
+		(int)DestAddr->sa_family,
+		PowerState,
+		SleepPeriod,
+		RegistrationState);
 	/* check error */
-	if ((RootDev && szReq[0] == NULL) ||
-	    szReq[1] == NULL || szReq[2] == NULL) {
+	if ((RootDev && szReq[0] == NULL) || szReq[1] == NULL ||
+		szReq[2] == NULL) {
 		goto error_handler;
 	}
 	/* send replies */
@@ -710,9 +1040,14 @@ error_handler:
 	return RetVal;
 }
 
-int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
-			 int Duration, int AddressFamily,
-			 int PowerState, int SleepPeriod, int RegistrationState)
+int ServiceAdvertisement(char *Udn,
+	char *ServType,
+	char *Location,
+	int Duration,
+	int AddressFamily,
+	int PowerState,
+	int SleepPeriod,
+	int RegistrationState)
 {
 	char Mil_Usn[LINE_SIZE];
 	char *szReq[1];
@@ -733,23 +1068,34 @@ int ServiceAdvertisement(char *Udn, char *ServType, char *Location,
 	case AF_INET6:
 		DestAddr6->sin6_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET6,
-			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
-			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
+			(isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL
+						  : SSDP_IPV6_LINKLOCAL,
+			&DestAddr6->sin6_addr);
 		DestAddr6->sin6_port = htons(SSDP_PORT);
 		DestAddr6->sin6_scope_id = gIF_INDEX;
 		break;
 	default:
-		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-			   "Invalid device address family.\n");
+		UpnpPrintf(UPNP_CRITICAL,
+			SSDP,
+			__FILE__,
+			__LINE__,
+			"Invalid device address family.\n");
 	}
 	rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn, ServType);
-	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+	if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 		goto error_handler;
 	/* CreateServiceRequestPacket(1,szReq[0],Mil_Nt,Mil_Usn,
 	 * Server,Location,Duration); */
-	CreateServicePacket(MSGTYPE_ADVERTISEMENT, ServType, Mil_Usn,
-			    Location, Duration, &szReq[0], AddressFamily,
-			    PowerState, SleepPeriod, RegistrationState);
+	CreateServicePacket(MSGTYPE_ADVERTISEMENT,
+		ServType,
+		Mil_Usn,
+		Location,
+		Duration,
+		&szReq[0],
+		AddressFamily,
+		PowerState,
+		SleepPeriod,
+		RegistrationState);
 	if (szReq[0] == NULL) {
 		goto error_handler;
 	}
@@ -761,9 +1107,14 @@ error_handler:
 	return RetVal;
 }
 
-int ServiceReply(struct sockaddr *DestAddr, char *ServType, char *Udn,
-		 char *Location, int Duration, int PowerState, int SleepPeriod,
-		 int RegistrationState)
+int ServiceReply(struct sockaddr *DestAddr,
+	char *ServType,
+	char *Udn,
+	char *Location,
+	int Duration,
+	int PowerState,
+	int SleepPeriod,
+	int RegistrationState)
 {
 	char Mil_Usn[LINE_SIZE];
 	char *szReq[1];
@@ -772,11 +1123,18 @@ int ServiceReply(struct sockaddr *DestAddr, char *ServType, char *Udn,
 
 	szReq[0] = NULL;
 	rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn, ServType);
-	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+	if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 		goto error_handler;
-	CreateServicePacket(MSGTYPE_REPLY, ServType, Mil_Usn,
-			    Location, Duration, &szReq[0], (int)DestAddr->sa_family,
-			    PowerState, SleepPeriod, RegistrationState);
+	CreateServicePacket(MSGTYPE_REPLY,
+		ServType,
+		Mil_Usn,
+		Location,
+		Duration,
+		&szReq[0],
+		(int)DestAddr->sa_family,
+		PowerState,
+		SleepPeriod,
+		RegistrationState);
 	if (szReq[0] == NULL)
 		goto error_handler;
 	RetVal = NewRequestHandler(DestAddr, 1, szReq);
@@ -787,9 +1145,14 @@ error_handler:
 	return RetVal;
 }
 
-int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
-		    int AddressFamily, int PowerState,
-		    int SleepPeriod, int RegistrationState)
+int ServiceShutdown(char *Udn,
+	char *ServType,
+	char *Location,
+	int Duration,
+	int AddressFamily,
+	int PowerState,
+	int SleepPeriod,
+	int RegistrationState)
 {
 	char Mil_Usn[LINE_SIZE];
 	char *szReq[1];
@@ -810,24 +1173,35 @@ int ServiceShutdown(char *Udn, char *ServType, char *Location, int Duration,
 	case AF_INET6:
 		DestAddr6->sin6_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET6,
-			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
-			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
+			(isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL
+						  : SSDP_IPV6_LINKLOCAL,
+			&DestAddr6->sin6_addr);
 		DestAddr6->sin6_port = htons(SSDP_PORT);
 		DestAddr6->sin6_scope_id = gIF_INDEX;
 		break;
 	default:
-		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-			   "Invalid device address family.\n");
+		UpnpPrintf(UPNP_CRITICAL,
+			SSDP,
+			__FILE__,
+			__LINE__,
+			"Invalid device address family.\n");
 	}
 	/* sprintf(Mil_Nt,"%s",ServType); */
 	rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn, ServType);
-	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+	if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 		goto error_handler;
 	/* CreateServiceRequestPacket(0,szReq[0],Mil_Nt,Mil_Usn,
 	 * Server,Location,Duration); */
-	CreateServicePacket(MSGTYPE_SHUTDOWN, ServType, Mil_Usn,
-			    Location, Duration, &szReq[0], AddressFamily,
-			    PowerState, SleepPeriod, RegistrationState);
+	CreateServicePacket(MSGTYPE_SHUTDOWN,
+		ServType,
+		Mil_Usn,
+		Location,
+		Duration,
+		&szReq[0],
+		AddressFamily,
+		PowerState,
+		SleepPeriod,
+		RegistrationState);
 	if (szReq[0] == NULL)
 		goto error_handler;
 	RetVal = NewRequestHandler((struct sockaddr *)&__ss, 1, szReq);
@@ -838,9 +1212,15 @@ error_handler:
 	return RetVal;
 }
 
-int DeviceShutdown(char *DevType, int RootDev, char *Udn,
-		   char *Location, int Duration, int AddressFamily,
-		   int PowerState, int SleepPeriod, int RegistrationState)
+int DeviceShutdown(char *DevType,
+	int RootDev,
+	char *Udn,
+	char *Location,
+	int Duration,
+	int AddressFamily,
+	int PowerState,
+	int SleepPeriod,
+	int RegistrationState)
 {
 	struct sockaddr_storage __ss;
 	struct sockaddr_in *DestAddr4 = (struct sockaddr_in *)&__ss;
@@ -863,52 +1243,80 @@ int DeviceShutdown(char *DevType, int RootDev, char *Udn,
 	case AF_INET6:
 		DestAddr6->sin6_family = (sa_family_t)AddressFamily;
 		inet_pton(AF_INET6,
-			  (isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL :
-			  SSDP_IPV6_LINKLOCAL, &DestAddr6->sin6_addr);
+			(isUrlV6UlaGua(Location)) ? SSDP_IPV6_SITELOCAL
+						  : SSDP_IPV6_LINKLOCAL,
+			&DestAddr6->sin6_addr);
 		DestAddr6->sin6_port = htons(SSDP_PORT);
 		DestAddr6->sin6_scope_id = gIF_INDEX;
 		break;
 	default:
-		UpnpPrintf(UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
-			   "Invalid device address family.\n");
+		UpnpPrintf(UPNP_CRITICAL,
+			SSDP,
+			__FILE__,
+			__LINE__,
+			"Invalid device address family.\n");
 	}
 	/* root device has one extra msg */
 	if (RootDev) {
-		rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice",
-			Udn);
-		if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+		rc = snprintf(
+			Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice", Udn);
+		if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 			goto error_handler;
-		CreateServicePacket(MSGTYPE_SHUTDOWN, "upnp:rootdevice",
-				    Mil_Usn, Location, Duration, &msgs[0],
-				    AddressFamily, PowerState, SleepPeriod,
-				    RegistrationState);
+		CreateServicePacket(MSGTYPE_SHUTDOWN,
+			"upnp:rootdevice",
+			Mil_Usn,
+			Location,
+			Duration,
+			&msgs[0],
+			AddressFamily,
+			PowerState,
+			SleepPeriod,
+			RegistrationState);
 	}
-	UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
-		   "In function DeviceShutdown\n");
+	UpnpPrintf(UPNP_INFO,
+		SSDP,
+		__FILE__,
+		__LINE__,
+		"In function DeviceShutdown\n");
 	/* both root and sub-devices need to send these two messages */
-	CreateServicePacket(MSGTYPE_SHUTDOWN, Udn, Udn,
-			    Location, Duration, &msgs[1], AddressFamily,
-			    PowerState, SleepPeriod, RegistrationState);
+	CreateServicePacket(MSGTYPE_SHUTDOWN,
+		Udn,
+		Udn,
+		Location,
+		Duration,
+		&msgs[1],
+		AddressFamily,
+		PowerState,
+		SleepPeriod,
+		RegistrationState);
 	rc = snprintf(Mil_Usn, sizeof(Mil_Usn), "%s::%s", Udn, DevType);
-	if (rc < 0 || (unsigned int) rc >= sizeof(Mil_Usn))
+	if (rc < 0 || (unsigned int)rc >= sizeof(Mil_Usn))
 		goto error_handler;
-	CreateServicePacket(MSGTYPE_SHUTDOWN, DevType, Mil_Usn,
-			    Location, Duration, &msgs[2], AddressFamily,
-			    PowerState, SleepPeriod, RegistrationState);
+	CreateServicePacket(MSGTYPE_SHUTDOWN,
+		DevType,
+		Mil_Usn,
+		Location,
+		Duration,
+		&msgs[2],
+		AddressFamily,
+		PowerState,
+		SleepPeriod,
+		RegistrationState);
 	/* check error */
-	if ((RootDev && msgs[0] == NULL) || msgs[1] == NULL || msgs[2] == NULL) {
+	if ((RootDev && msgs[0] == NULL) || msgs[1] == NULL ||
+		msgs[2] == NULL) {
 		goto error_handler;
 	}
 	/* send packets */
 	if (RootDev) {
 		/* send 3 msg types */
-		ret_code =
-		    NewRequestHandler((struct sockaddr *)&__ss, 3, &msgs[0]);
+		ret_code = NewRequestHandler(
+			(struct sockaddr *)&__ss, 3, &msgs[0]);
 	} else {
 		/* sub-device */
 		/* send 2 msg types */
-		ret_code =
-		    NewRequestHandler((struct sockaddr *)&__ss, 2, &msgs[1]);
+		ret_code = NewRequestHandler(
+			(struct sockaddr *)&__ss, 2, &msgs[1]);
 	}
 
 error_handler:
@@ -919,7 +1327,7 @@ error_handler:
 
 	return ret_code;
 }
-#endif /* EXCLUDE_SSDP */
-#endif /* INCLUDE_DEVICE_APIS */
+	#endif /* EXCLUDE_SSDP */
+#endif	       /* INCLUDE_DEVICE_APIS */
 
 /* @} SSDPlib */

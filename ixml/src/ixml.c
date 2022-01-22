@@ -1,48 +1,44 @@
 /**************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **************************************************************************/
-
 
 /*!
  * \file
  */
 
-
 #include "ixmldebug.h"
 #include "ixmlmembuf.h"
 #include "ixmlparser.h"
 
-
 #include <stdlib.h> /* for free() */
 #include <string.h>
-
 
 /*!
  * \brief Appends a string to a buffer, substituting some characters by escape
@@ -84,7 +80,6 @@ static void copy_with_escape(
 	}
 }
 
-
 /*!
  * \brief Recursive function to print all the node in a tree.
  * Internal to parser only.
@@ -97,13 +92,12 @@ static void ixmlPrintDomTreeRecursive(
 {
 	const char *nodeName = NULL;
 	const char *nodeValue = NULL;
-	IXML_Node *child = NULL,
-	*sibling = NULL;
+	IXML_Node *child = NULL, *sibling = NULL;
 
 	if (nodeptr != NULL) {
 		nodeName = (const char *)ixmlNode_getNodeName(nodeptr);
 		nodeValue = ixmlNode_getNodeValue(nodeptr);
-		
+
 		switch (ixmlNode_getNodeType(nodeptr)) {
 		case eTEXT_NODE:
 			copy_with_escape(buf, nodeValue);
@@ -135,7 +129,8 @@ static void ixmlPrintDomTreeRecursive(
 			ixml_membuf_append_str(buf, "\"");
 			if (nodeptr->nextSibling != NULL) {
 				ixml_membuf_append_str(buf, " ");
-				ixmlPrintDomTreeRecursive(nodeptr->nextSibling, buf);
+				ixmlPrintDomTreeRecursive(
+					nodeptr->nextSibling, buf);
 			}
 			break;
 
@@ -144,11 +139,12 @@ static void ixmlPrintDomTreeRecursive(
 			ixml_membuf_append_str(buf, nodeName);
 			if (nodeptr->firstAttr != NULL) {
 				ixml_membuf_append_str(buf, " ");
-				ixmlPrintDomTreeRecursive(nodeptr->firstAttr, buf);
+				ixmlPrintDomTreeRecursive(
+					nodeptr->firstAttr, buf);
 			}
 			child = ixmlNode_getFirstChild(nodeptr);
 			if (child != NULL &&
-			    ixmlNode_getNodeType(child) == eELEMENT_NODE) {
+				ixmlNode_getNodeType(child) == eELEMENT_NODE) {
 				ixml_membuf_append_str(buf, ">\r\n");
 			} else {
 				ixml_membuf_append_str(buf, ">");
@@ -163,24 +159,25 @@ static void ixmlPrintDomTreeRecursive(
 
 			sibling = ixmlNode_getNextSibling(nodeptr);
 			if (sibling != NULL &&
-			    ixmlNode_getNodeType(sibling) == eTEXT_NODE) {
-				ixml_membuf_append_str( buf, ">" );
+				ixmlNode_getNodeType(sibling) == eTEXT_NODE) {
+				ixml_membuf_append_str(buf, ">");
 			} else {
-				ixml_membuf_append_str( buf, ">\r\n" );
+				ixml_membuf_append_str(buf, ">\r\n");
 			}
 			ixmlPrintDomTreeRecursive(
 				ixmlNode_getNextSibling(nodeptr), buf);
 			break;
 
 		default:
-			IxmlPrintf(__FILE__, __LINE__, "ixmlPrintDomTreeRecursive",
+			IxmlPrintf(__FILE__,
+				__LINE__,
+				"ixmlPrintDomTreeRecursive",
 				"Warning, unknown node type %d\n",
 				(int)ixmlNode_getNodeType(nodeptr));
 			break;
 		}
 	}
 }
-
 
 /*!
  * \brief Print a DOM tree.
@@ -228,15 +225,14 @@ static void ixmlPrintDomTree(
 		}
 		child = ixmlNode_getFirstChild(nodeptr);
 		if (child != NULL &&
-		    ixmlNode_getNodeType(child) == eELEMENT_NODE) {
+			ixmlNode_getNodeType(child) == eELEMENT_NODE) {
 			ixml_membuf_append_str(buf, ">\r\n");
 		} else {
 			ixml_membuf_append_str(buf, ">");
 		}
 
 		/* output the children */
-		ixmlPrintDomTreeRecursive(
-			ixmlNode_getFirstChild(nodeptr), buf);
+		ixmlPrintDomTreeRecursive(ixmlNode_getFirstChild(nodeptr), buf);
 
 		/* Done with children. Output the end tag. */
 		ixml_membuf_append_str(buf, "</");
@@ -245,13 +241,14 @@ static void ixmlPrintDomTree(
 		break;
 
 	default:
-		IxmlPrintf(__FILE__, __LINE__, "ixmlPrintDomTree",
+		IxmlPrintf(__FILE__,
+			__LINE__,
+			"ixmlPrintDomTree",
 			"Warning, unknown node type %d\n",
 			(int)ixmlNode_getNodeType(nodeptr));
 		break;
 	}
 }
-
 
 /*!
  * \brief Converts a DOM tree into a text string.
@@ -287,7 +284,7 @@ static void ixmlDomTreetoString(
 	case eATTRIBUTE_NODE:
 		ixml_membuf_append_str(buf, nodeName);
 		ixml_membuf_append_str(buf, "=\"");
-		copy_with_escape(buf, nodeValue );
+		copy_with_escape(buf, nodeValue);
 		ixml_membuf_append_str(buf, "\"");
 		break;
 
@@ -300,7 +297,7 @@ static void ixmlDomTreetoString(
 		}
 		child = ixmlNode_getFirstChild(nodeptr);
 		if (child != NULL &&
-		    ixmlNode_getNodeType(child) == eELEMENT_NODE) {
+			ixmlNode_getNodeType(child) == eELEMENT_NODE) {
 			ixml_membuf_append_str(buf, ">");
 		} else {
 			ixml_membuf_append_str(buf, ">");
@@ -316,13 +313,14 @@ static void ixmlDomTreetoString(
 		break;
 
 	default:
-		IxmlPrintf(__FILE__, __LINE__, "ixmlPrintDomTreeRecursive",
+		IxmlPrintf(__FILE__,
+			__LINE__,
+			"ixmlPrintDomTreeRecursive",
 			"Warning, unknown node type %d\n",
 			(int)ixmlNode_getNodeType(nodeptr));
 		break;
 	}
 }
-
 
 int ixmlLoadDocumentEx(const char *xmlFile, IXML_Document **doc)
 {
@@ -333,7 +331,6 @@ int ixmlLoadDocumentEx(const char *xmlFile, IXML_Document **doc)
 	return Parser_LoadDocument(doc, xmlFile, 1);
 }
 
-
 IXML_Document *ixmlLoadDocument(const char *xmlFile)
 {
 	IXML_Document *doc = NULL;
@@ -343,14 +340,13 @@ IXML_Document *ixmlLoadDocument(const char *xmlFile)
 	return doc;
 }
 
-
 DOMString ixmlPrintDocument(IXML_Document *doc)
 {
-	IXML_Node* rootNode = (IXML_Node *)doc;
+	IXML_Node *rootNode = (IXML_Node *)doc;
 	ixml_membuf memBuf;
 	ixml_membuf *buf = &memBuf;
 
-	if(rootNode == NULL) {
+	if (rootNode == NULL) {
 		return NULL;
 	}
 
@@ -360,7 +356,6 @@ DOMString ixmlPrintDocument(IXML_Document *doc)
 
 	return buf->buf;
 }
-
 
 DOMString ixmlPrintNode(IXML_Node *node)
 {
@@ -377,14 +372,13 @@ DOMString ixmlPrintNode(IXML_Node *node)
 	return buf->buf;
 }
 
-
 DOMString ixmlDocumenttoString(IXML_Document *doc)
 {
-	IXML_Node* rootNode = (IXML_Node *)doc;
+	IXML_Node *rootNode = (IXML_Node *)doc;
 	ixml_membuf memBuf;
 	ixml_membuf *buf = &memBuf;
 
-	if(rootNode == NULL) {
+	if (rootNode == NULL) {
 		return NULL;
 	}
 
@@ -394,7 +388,6 @@ DOMString ixmlDocumenttoString(IXML_Document *doc)
 
 	return buf->buf;
 }
-
 
 DOMString ixmlNodetoString(IXML_Node *node)
 {
@@ -411,11 +404,7 @@ DOMString ixmlNodetoString(IXML_Node *node)
 	return buf->buf;
 }
 
-
-void ixmlRelaxParser(char errorChar)
-{
-	Parser_setErrorChar(errorChar);
-}
+void ixmlRelaxParser(char errorChar) { Parser_setErrorChar(errorChar); }
 
 #ifdef IXML_HAVE_SCRIPTSUPPORT
 void ixmlSetBeforeFree(IXML_BeforeFreeNode_t hndlr)
@@ -423,7 +412,6 @@ void ixmlSetBeforeFree(IXML_BeforeFreeNode_t hndlr)
 	Parser_setBeforeFree(hndlr);
 }
 #endif
-
 
 int ixmlParseBufferEx(const char *buffer, IXML_Document **retDoc)
 {
@@ -438,7 +426,6 @@ int ixmlParseBufferEx(const char *buffer, IXML_Document **retDoc)
 	return Parser_LoadDocument(retDoc, buffer, 0);
 }
 
-
 IXML_Document *ixmlParseBuffer(const char *buffer)
 {
 	IXML_Document *doc = NULL;
@@ -447,7 +434,6 @@ IXML_Document *ixmlParseBuffer(const char *buffer)
 
 	return doc;
 }
-
 
 DOMString ixmlCloneDOMString(const DOMString src)
 {
@@ -458,11 +444,9 @@ DOMString ixmlCloneDOMString(const DOMString src)
 	return strdup(src);
 }
 
-
 void ixmlFreeDOMString(DOMString buf)
 {
 	if (buf != NULL) {
 		free(buf);
 	}
 }
-

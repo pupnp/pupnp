@@ -1720,4 +1720,4 @@ void gena_process_unsubscribe_request(SOCKINFO *info, http_message_t *request)
 }
 
 	#endif /* INCLUDE_DEVICE_APIS */
-#endif         /* EXCLUDE_GENA */
+#endif	       /* EXCLUDE_GENA */

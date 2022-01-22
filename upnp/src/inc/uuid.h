@@ -23,7 +23,8 @@
 #include "sysdep.h"
 
 /*! . */
-typedef struct _uuid_upnp {
+typedef struct _uuid_upnp
+{
 	/*! . */
 	uint32_t time_low;
 	/*! . */
@@ -43,14 +44,14 @@ typedef struct _uuid_upnp {
  */
 int uuid_create(
 	/*! . */
-	uuid_upnp * id);
+	uuid_upnp *id);
 
 /*!
  * \brief Out will be xxxx-xx-xx-xx-xxxxxx format.
  */
 void upnp_uuid_unpack(
 	/*! . */
-	uuid_upnp * u,
+	uuid_upnp *u,
 	/*! . */
 	char *out);
 
@@ -59,9 +60,9 @@ void upnp_uuid_unpack(
  */
 void uuid_create_from_name(
 	/*! Resulting UUID. */
-	uuid_upnp * uid,
+	uuid_upnp *uid,
 	/*! UUID to serve as context, so identical names from different name
-	* spaces generate different UUIDs. */
+	 * spaces generate different UUIDs. */
 	uuid_upnp nsid,
 	/*! The name from which to generate a UUID. */
 	void *name,
@@ -80,7 +81,7 @@ void uuid_create_from_name(
  */
 int uuid_compare(
 	/*! . */
-	uuid_upnp * u1,
+	uuid_upnp *u1,
 	/*! . */
-	uuid_upnp * u2);
+	uuid_upnp *u2);
 #endif /* UUID_H */

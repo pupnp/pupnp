@@ -25,39 +25,40 @@
 #ifdef _WIN32
 	#define strcasecmp stricmp
 #else
-	/* Other systems have strncasecmp */
+/* Other systems have strncasecmp */
 #endif
 
 #ifndef UPNP_USE_MSVCPP
 	#ifdef UPNP_USE_BCBPP
-		static size_t strnlen(const char *s, size_t n) { return strnlen_s(s, n); }
+static size_t strnlen(const char *s, size_t n) { return strnlen_s(s, n); }
 	#else
-		/* VC has strnlen which is already included but with (potentially) different linkage */
+		/* VC has strnlen which is already included but with
+		 * (potentially) different linkage */
 		/* strnlen() is a GNU extension. */
 		#if !HAVE_STRNLEN
-			static size_t strnlen(const char *s, size_t n)
-			{
-				const char *p = (const char *)memchr(s, 0, n);
-				return p ? p - s : n;
-			}
+static size_t strnlen(const char *s, size_t n)
+{
+	const char *p = (const char *)memchr(s, 0, n);
+	return p ? p - s : n;
+}
 		#endif /* !HAVE_STRNLEN */
-	#endif /* UPNP_USE_BCBPP */
-#endif /* _WIN32 */
+	#endif	       /* UPNP_USE_BCBPP */
+#endif		       /* _WIN32 */
 
 /* strndup() is a GNU extension. */
 #if !HAVE_STRNDUP || defined(_WIN32)
-	static char *strndup(const char *__string, size_t __n)
-	{
-		size_t strsize = strnlen(__string, __n);
-		char *newstr = (char *)malloc(strsize + 1);
-		if (newstr == NULL)
-			return NULL;
+static char *strndup(const char *__string, size_t __n)
+{
+	size_t strsize = strnlen(__string, __n);
+	char *newstr = (char *)malloc(strsize + 1);
+	if (newstr == NULL)
+		return NULL;
 
-		strncpy(newstr, __string, strsize);
-		newstr[strsize] = 0;
+	strncpy(newstr, __string, strsize);
+	newstr[strsize] = 0;
 
-		return newstr;
-	}
+	return newstr;
+}
 #endif /* HAVE_STRNDUP && !defined(_WIN32) */
 
 /*!
@@ -77,7 +78,7 @@ struct SUpnpString
 UpnpString *UpnpString_new()
 {
 	/* All bytes are zero, and so is the length of the string. */
-	struct SUpnpString *p = calloc((size_t)1, sizeof (struct SUpnpString));
+	struct SUpnpString *p = calloc((size_t)1, sizeof(struct SUpnpString));
 	if (p == NULL) {
 		goto error_handler1;
 	}
@@ -103,8 +104,9 @@ error_handler1:
 void UpnpString_delete(UpnpString *p)
 {
 	struct SUpnpString *q = (struct SUpnpString *)p;
-		
-	if (!q) return;
+
+	if (!q)
+		return;
 
 	q->m_length = (size_t)0;
 
@@ -116,7 +118,7 @@ void UpnpString_delete(UpnpString *p)
 
 UpnpString *UpnpString_dup(const UpnpString *p)
 {
-	struct SUpnpString *q = calloc((size_t)1, sizeof (struct SUpnpString));
+	struct SUpnpString *q = calloc((size_t)1, sizeof(struct SUpnpString));
 	if (q == NULL) {
 		goto error_handler1;
 	}
@@ -164,7 +166,8 @@ const char *UpnpString_get_String(const UpnpString *p)
 int UpnpString_set_String(UpnpString *p, const char *s)
 {
 	char *q = strdup(s);
-	if (!q) goto error_handler1;
+	if (!q)
+		goto error_handler1;
 	free(((struct SUpnpString *)p)->m_string);
 	((struct SUpnpString *)p)->m_length = strlen(q);
 	((struct SUpnpString *)p)->m_string = q;
@@ -176,7 +179,8 @@ error_handler1:
 int UpnpString_set_StringN(UpnpString *p, const char *s, size_t n)
 {
 	char *q = strndup(s, n);
-	if (!q) goto error_handler1;
+	if (!q)
+		goto error_handler1;
 	free(((struct SUpnpString *)p)->m_string);
 	((struct SUpnpString *)p)->m_length = strlen(q);
 	((struct SUpnpString *)p)->m_string = q;

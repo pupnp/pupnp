@@ -1408,8 +1408,8 @@ static int process_request(
 			    HTTP_PARTIAL_CONTENT, /* status code */
 			    UpnpFileInfo_get_ContentType(
 				    finfo), /* content type */
-			    RespInstr,      /* range info */
-			    RespInstr,      /* language info */
+			    RespInstr,	    /* range info */
+			    RespInstr,	    /* language info */
 			    "LAST-MODIFIED: ",
 			    &aux_LastModified,
 			    X_USER_AGENT,
@@ -1433,8 +1433,8 @@ static int process_request(
 			    RespInstr->ReadSendSize, /* content length */
 			    UpnpFileInfo_get_ContentType(
 				    finfo), /* content type */
-			    RespInstr,      /* range info */
-			    RespInstr,      /* language info */
+			    RespInstr,	    /* range info */
+			    RespInstr,	    /* language info */
 			    "LAST-MODIFIED: ",
 			    &aux_LastModified,
 			    X_USER_AGENT,
@@ -1455,7 +1455,7 @@ static int process_request(
 			    HTTP_OK, /* status code */
 			    UpnpFileInfo_get_ContentType(
 				    finfo), /* content type */
-			    RespInstr,      /* language info */
+			    RespInstr,	    /* language info */
 			    "LAST-MODIFIED: ",
 			    &aux_LastModified,
 			    X_USER_AGENT,
@@ -1480,7 +1480,7 @@ static int process_request(
 					    ->ReadSendSize, /* content length */
 				    UpnpFileInfo_get_ContentType(
 					    finfo), /* content type */
-				    RespInstr,      /* language info */
+				    RespInstr,	    /* language info */
 				    "LAST-MODIFIED: ",
 				    &aux_LastModified,
 				    X_USER_AGENT,
@@ -1501,7 +1501,7 @@ static int process_request(
 				    HTTP_OK, /* status code */
 				    UpnpFileInfo_get_ContentType(
 					    finfo), /* content type */
-				    RespInstr,      /* language info */
+				    RespInstr,	    /* language info */
 				    "LAST-MODIFIED: ",
 				    &aux_LastModified,
 				    X_USER_AGENT,

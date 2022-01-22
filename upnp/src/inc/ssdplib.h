@@ -41,15 +41,15 @@
  * \file
  */
 
+#include "UpnpInet.h"
 #include "httpparser.h"
 #include "httpreadwrite.h"
 #include "miniserver.h"
-#include "UpnpInet.h"
 
-#include <sys/types.h>
-#include <signal.h>
-#include <setjmp.h>
 #include <errno.h>
+#include <setjmp.h>
+#include <signal.h>
+#include <sys/types.h>
 
 #ifdef _WIN32
 #else /* _WIN32 */
@@ -63,7 +63,8 @@
 #endif /* _WIN32 */
 
 /*! Enumeration to define all different types of ssdp searches */
-typedef enum SsdpSearchType {
+typedef enum SsdpSearchType
+{
 	/*! Unknown search command. */
 	SSDP_SERROR = -1,
 	SSDP_ALL,
@@ -73,42 +74,43 @@ typedef enum SsdpSearchType {
 	SSDP_SERVICE
 } SType;
 
-#define BUFSIZE   (size_t)2500
-#define SSDP_IP   "239.255.255.250"
+#define BUFSIZE (size_t)2500
+#define SSDP_IP "239.255.255.250"
 #define SSDP_IPV6_LINKLOCAL "FF02::C"
 #define SSDP_IPV6_SITELOCAL "FF05::C"
 #define SSDP_PORT 1900
 #define NUM_TRY 3
 #define THREAD_LIMIT 50
-#define COMMAND_LEN  300
+#define COMMAND_LEN 300
 
 /*! can be overwritten by configure CFLAGS argument. */
 #ifndef X_USER_AGENT
 	/*! @name X_USER_AGENT
-	 *  The {\tt X_USER_AGENT} constant specifies the value of the X-User-Agent:
-	 *  HTTP header. The value "redsonic" is needed for the DSM-320. See
-	 *  https://sourceforge.net/forum/message.php?msg_id=3166856 for more
-	 * information
+	 *  The {\tt X_USER_AGENT} constant specifies the value of the
+	 * X-User-Agent: HTTP header. The value "redsonic" is needed for the
+	 * DSM-320. See https://sourceforge.net/forum/message.php?msg_id=3166856
+	 * for more information
 	 */
 	#define X_USER_AGENT "redsonic"
 #endif
 
 /*! Error codes. */
-#define NO_ERROR_FOUND    0
-#define E_REQUEST_INVALID  	-3
-#define E_RES_EXPIRED		-4
-#define E_MEM_ALLOC		-5
-#define E_HTTP_SYNTEX		-6
-#define E_SOCKET 		-7
+#define NO_ERROR_FOUND 0
+#define E_REQUEST_INVALID -3
+#define E_RES_EXPIRED -4
+#define E_MEM_ALLOC -5
+#define E_HTTP_SYNTEX -6
+#define E_SOCKET -7
 
-#define RQST_TIMEOUT    20
+#define RQST_TIMEOUT 20
 
 /*! Structure to store the SSDP information */
-typedef struct SsdpEventStruct {
+typedef struct SsdpEventStruct
+{
 	enum SsdpSearchType RequestType;
-	int  ErrCode;
-	int  MaxAge;
-	int  Mx;
+	int ErrCode;
+	int MaxAge;
+	int Mx;
 	char UDN[LINE_SIZE];
 	char DeviceType[LINE_SIZE];
 	/* NT or ST */
@@ -119,16 +121,16 @@ typedef struct SsdpEventStruct {
 	char Ext[LINE_SIZE];
 	char Date[LINE_SIZE];
 	struct sockaddr *DestAddr;
-	void * Cookie;
+	void *Cookie;
 } SsdpEvent;
 
-typedef void (* SsdpFunPtr)(SsdpEvent *);
+typedef void (*SsdpFunPtr)(SsdpEvent *);
 
 typedef struct TData
 {
 	int Mx;
-	void * Cookie;
-	char * Data;
+	void *Cookie;
+	char *Data;
 	struct sockaddr_storage DestAddr;
 } ThreadData;
 
@@ -143,7 +145,7 @@ typedef struct ssdpsearchreply
 typedef struct ssdpsearcharg
 {
 	int timeoutEventId;
-	char * searchTarget;
+	char *searchTarget;
 	void *cookie;
 	enum SsdpSearchType requestType;
 } SsdpSearchArg;
@@ -163,11 +165,11 @@ typedef struct
 /* globals */
 
 #ifdef INCLUDE_CLIENT_APIS
-	extern SOCKET gSsdpReqSocket4;
+extern SOCKET gSsdpReqSocket4;
 	#ifdef UPNP_ENABLE_IPV6
-		extern SOCKET gSsdpReqSocket6;
+extern SOCKET gSsdpReqSocket6;
 	#endif /* UPNP_ENABLE_IPV6 */
-#endif /* INCLUDE_CLIENT_APIS */
+#endif	       /* INCLUDE_CLIENT_APIS */
 typedef int (*ParserFun)(char *, SsdpEvent *);
 
 /*!
@@ -329,12 +331,14 @@ void ssdp_handle_device_request(
 	http_message_t *hmsg,
 	/* [in] . */
 	struct sockaddr_storage *dest_addr);
-#else /* INCLUDE_DEVICE_APIS */
+#else  /* INCLUDE_DEVICE_APIS */
 static UPNP_INLINE void ssdp_handle_device_request(
 	/* [in] . */
 	http_message_t *hmsg,
 	/* [in] . */
-	struct sockaddr_storage *dest_addr) {}
+	struct sockaddr_storage *dest_addr)
+{
+}
 #endif /* INCLUDE_DEVICE_APIS */
 
 /*!

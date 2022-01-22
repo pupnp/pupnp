@@ -3,31 +3,31 @@
 
 /**************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **************************************************************************/
@@ -44,8 +44,8 @@
  * \file
  */
 
-#include <stdio.h>
 #include <signal.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -88,37 +88,37 @@ extern "C" {
 #define MIN_CHANNEL 1
 
 /*! Number of services. */
-#define TV_SERVICE_SERVCOUNT  2
+#define TV_SERVICE_SERVCOUNT 2
 
 /*! Index of control service */
-#define TV_SERVICE_CONTROL    0
+#define TV_SERVICE_CONTROL 0
 
 /*! Index of picture service */
-#define TV_SERVICE_PICTURE    1
+#define TV_SERVICE_PICTURE 1
 
 /*! Number of control variables */
-#define TV_CONTROL_VARCOUNT   3
+#define TV_CONTROL_VARCOUNT 3
 
 /*! Index of power variable */
-#define TV_CONTROL_POWER      0
+#define TV_CONTROL_POWER 0
 
 /*! Index of channel variable */
-#define TV_CONTROL_CHANNEL    1
+#define TV_CONTROL_CHANNEL 1
 
 /*! Index of volume variable */
-#define TV_CONTROL_VOLUME     2
+#define TV_CONTROL_VOLUME 2
 
 /*! Number of picture variables */
-#define TV_PICTURE_VARCOUNT   4
+#define TV_PICTURE_VARCOUNT 4
 
 /*! Index of color variable */
-#define TV_PICTURE_COLOR      0
+#define TV_PICTURE_COLOR 0
 
 /*! Index of tint variable */
-#define TV_PICTURE_TINT       1
+#define TV_PICTURE_TINT 1
 
 /*! Index of contrast variable */
-#define TV_PICTURE_CONTRAST   2
+#define TV_PICTURE_CONTRAST 2
 
 /*! Index of brightness variable */
 #define TV_PICTURE_BRIGHTNESS 3
@@ -137,13 +137,13 @@ extern "C" {
 #define IP_MODE_IPV6_ULA_GUA 3
 
 /*!
- * \brief Prototype for all actions. For each action that a service 
+ * \brief Prototype for all actions. For each action that a service
  * implements, there is a corresponding function with this prototype.
  *
  * Pointers to these functions, along with action names, are stored
  * in the service table. When an action request comes in the action
  * name is matched, and the appropriate function is called.
- * Each function returns UPNP_E_SUCCESS, on success, and a nonzero 
+ * Each function returns UPNP_E_SUCCESS, on success, and a nonzero
  * error code on failure.
  */
 typedef int (*upnp_action)(
@@ -155,7 +155,8 @@ typedef int (*upnp_action)(
 	const char **errorString);
 
 /*! Structure for storing Tv Service identifiers and state table. */
-struct TvService {
+struct TvService
+{
 	/*! Universally Unique Device Name. */
 	char UDN[NAME_SIZE];
 	/*! . */
@@ -163,7 +164,7 @@ struct TvService {
 	/*! . */
 	char ServiceType[NAME_SIZE];
 	/*! . */
-	const char *VariableName[TV_MAXVARS]; 
+	const char *VariableName[TV_MAXVARS];
 	/*! . */
 	char *VariableStrVal[TV_MAXVARS];
 	/*! . */
@@ -245,10 +246,10 @@ int TvDeviceHandleActionRequest(
  * root device.
  *
  * Dispatches the request to the appropriate procedure
- * based on the value of EventType. The four requests handled by the 
- * device are: 
- *	\li 1) Event Subscription requests.  
- *	\li 2) Get Variable requests. 
+ * based on the value of EventType. The four requests handled by the
+ * device are:
+ *	\li 1) Event Subscription requests.
+ *	\li 2) Get Variable requests.
  *	\li 3) Action requests.
  */
 int TvDeviceCallbackEventHandler(
@@ -268,7 +269,8 @@ int TvDeviceCallbackEventHandler(
  * function that currently has this mutex locked.
  */
 int TvDeviceSetServiceTableVar(
-	/*! [in] The service number (TV_SERVICE_CONTROL or TV_SERVICE_PICTURE). */
+	/*! [in] The service number (TV_SERVICE_CONTROL or TV_SERVICE_PICTURE).
+	 */
 	unsigned int service,
 	/*! [in] The variable number (TV_CONTROL_POWER, TV_CONTROL_CHANNEL,
 	 * TV_CONTROL_VOLUME, TV_PICTURE_COLOR, TV_PICTURE_TINT,
@@ -315,7 +317,7 @@ int TvDeviceSetChannel(
 	const char **errorString);
 
 /*!
- * \brief Increase the channel.  
+ * \brief Increase the channel.
  */
 int TvDeviceIncreaseChannel(
 	/*! [in] Document of action request. */
@@ -326,7 +328,7 @@ int TvDeviceIncreaseChannel(
 	const char **errorString);
 
 /*!
- * \brief Decrease the channel.  
+ * \brief Decrease the channel.
  */
 int TvDeviceDecreaseChannel(
 	/*! [in] Document of action request. */
@@ -350,7 +352,7 @@ int TvDeviceSetVolume(
 	const char **errorString);
 
 /*!
- * \brief Increase the volume. 
+ * \brief Increase the volume.
  */
 int TvDeviceIncreaseVolume(
 	/*! [in] Document of action request. */
@@ -398,7 +400,7 @@ int TvDeviceIncreaseColor(
 	const char **errorString);
 
 /*!
- * \brief Decrease the color.  
+ * \brief Decrease the color.
  */
 int TvDeviceDecreaseColor(
 	/*! [in] Document of action request. */

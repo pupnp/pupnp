@@ -1,31 +1,31 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -37,13 +37,13 @@
  * allocation, re-allocation, and modification of the memory
  */
 
+#include "membuffer.h"
 #include "config.h"
+#include "unixutil.h"
+#include "upnp.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "membuffer.h"
-#include "upnp.h"
-#include "unixutil.h"
 
 char *str_alloc(const char *str, size_t str_len)
 {
@@ -51,7 +51,7 @@ char *str_alloc(const char *str, size_t str_len)
 
 	s = (char *)malloc(str_len + (size_t)1);
 	if (s == NULL) {
-		return NULL;	/* no mem */
+		return NULL; /* no mem */
 	}
 
 	memcpy(s, str, str_len);
@@ -60,7 +60,7 @@ char *str_alloc(const char *str, size_t str_len)
 	return s;
 }
 
-int memptr_cmp(memptr * m, const char *s)
+int memptr_cmp(memptr *m, const char *s)
 {
 	int cmp;
 
@@ -75,7 +75,7 @@ int memptr_cmp(memptr * m, const char *s)
 	return cmp;
 }
 
-int memptr_cmp_nocase(memptr * m, const char *s)
+int memptr_cmp_nocase(memptr *m, const char *s)
 {
 	int cmp;
 
@@ -107,15 +107,15 @@ int membuffer_set_size(membuffer *m, size_t new_length)
 	size_t alloc_len;
 	char *temp_buf;
 
-	if (new_length >= m->length) {	/* increase length */
+	if (new_length >= m->length) { /* increase length */
 		/* need more mem? */
 		if (new_length <= m->capacity) {
-			return 0;	/* have enough mem; done */
+			return 0; /* have enough mem; done */
 		}
 
 		diff = new_length - m->length;
 		alloc_len = MAXVAL(m->size_inc, diff) + m->capacity;
-	} else {		/* decrease length */
+	} else { /* decrease length */
 
 		assert(new_length <= m->length);
 
@@ -129,15 +129,17 @@ int membuffer_set_size(membuffer *m, size_t new_length)
 
 	assert(alloc_len >= new_length);
 
-	temp_buf = realloc(m->buf, alloc_len + (size_t)1);	/*LEAK_FIX_MK */
+	temp_buf = realloc(m->buf, alloc_len + (size_t)1); /*LEAK_FIX_MK */
 
 	/*temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );LEAK_FIX_MK */
 
 	if (temp_buf == NULL) {
 		/* try smaller size */
 		alloc_len = new_length;
-		temp_buf = realloc(m->buf, alloc_len + (size_t)1);	/*LEAK_FIX_MK */
-		/*temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );LEAK_FIX_MK */
+		temp_buf =
+			realloc(m->buf, alloc_len + (size_t)1); /*LEAK_FIX_MK */
+		/*temp_buf = Realloc( m->buf,m->length, alloc_len + 1
+		 * );LEAK_FIX_MK */
 
 		if (temp_buf == NULL) {
 			return UPNP_E_OUTOF_MEMORY;
@@ -185,7 +187,7 @@ int membuffer_assign(membuffer *m, const void *buf, size_t buf_len)
 	/* copy */
 	if (buf_len) {
 		memcpy(m->buf, buf, buf_len);
-		m->buf[buf_len] = 0;	/* null-terminate */
+		m->buf[buf_len] = 0; /* null-terminate */
 	}
 	m->length = buf_len;
 
@@ -209,8 +211,8 @@ int membuffer_append_str(membuffer *m, const char *c_str)
 	return membuffer_insert(m, c_str, strlen(c_str), m->length);
 }
 
-int membuffer_insert(membuffer * m, const void *buf, size_t buf_len,
-		     size_t index)
+int membuffer_insert(
+	membuffer *m, const void *buf, size_t buf_len, size_t index)
 {
 	int return_code;
 
@@ -237,7 +239,7 @@ int membuffer_insert(membuffer * m, const void *buf, size_t buf_len,
 	return 0;
 }
 
-void membuffer_delete(membuffer * m, size_t index, size_t num_bytes)
+void membuffer_delete(membuffer *m, size_t index, size_t num_bytes)
 {
 	int return_value;
 	size_t new_length;

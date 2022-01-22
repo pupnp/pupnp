@@ -1,30 +1,30 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -57,7 +57,7 @@
 		#include "inet_pton.h"
 	#endif
 #else
-	#include <netdb.h>      /* for struct addrinfo */
+	#include <netdb.h> /* for struct addrinfo */
 #endif
 
 #ifdef _WIN32
@@ -77,35 +77,40 @@ extern "C" {
 
 #define HTTP_SUCCESS 1
 
-enum hostType {
+enum hostType
+{
 	HOSTNAME,
 	IPv4address
 };
 
-enum pathType {
+enum pathType
+{
 	ABS_PATH,
 	REL_PATH,
 	OPAQUE_PART
 };
 
 #ifdef _WIN32
-	/* there is a conflict in windows with other symbols. */
-	enum uriType  {
-		absolute,
-		relative
-	};
+/* there is a conflict in windows with other symbols. */
+enum uriType
+{
+	absolute,
+	relative
+};
 #else
-	enum uriType  {
-		ABSOLUTE,
-		RELATIVE
-	};
+enum uriType
+{
+	ABSOLUTE,
+	RELATIVE
+};
 #endif
 
-/*! 
+/*!
  * \brief Buffer used in parsinghttp messages, urls, etc. generally this simply
  * holds a pointer into a larger array.
  */
-typedef struct TOKEN {
+typedef struct TOKEN
+{
 	const char *buff;
 	size_t size;
 } token;
@@ -114,7 +119,8 @@ typedef struct TOKEN {
  * \brief Represents a host port: e.g. "127.127.0.1:80" text is a token
  * pointing to the full string representation.
  */
-typedef struct HOSTPORT {
+typedef struct HOSTPORT
+{
 	/*! Full host port. */
 	token text;
 	/* Network Byte Order */
@@ -124,7 +130,8 @@ typedef struct HOSTPORT {
 /*!
  * \brief Represents a URI used in parse_uri and elsewhere
  */
-typedef struct URI{
+typedef struct URI
+{
 	enum uriType type;
 	token scheme;
 	enum pathType path_type;
@@ -137,7 +144,8 @@ typedef struct URI{
  * \brief Represents a list of URLs as in the "callback" header of SUBSCRIBE
  * message in GENA. "char *" URLs holds dynamic memory.
  */
-typedef struct URL_LIST {
+typedef struct URL_LIST
+{
 	/*! */
 	size_t size;
 	/*! All the urls, delimited by <> */
@@ -156,7 +164,7 @@ typedef struct URL_LIST {
  * sequence it is replaced, the other characters in the string are shifted
  * over, and NULL characters are placed at the end of the string.
  *
- * \return 
+ * \return
  */
 int replace_escaped(
 	/*! [in,out] String of characters. */
@@ -201,7 +209,9 @@ void print_uri(
 	/*! [in] URI object to print. */
 	uri_type *in);
 #else
-#define print_uri(in) do {} while (0)
+	#define print_uri(in) \
+		do { \
+		} while (0)
 #endif
 
 /*!
@@ -212,13 +222,15 @@ void print_token(
 	/*! [in] Token object to print. */
 	token *in);
 #else
-#define print_token(in) do {} while (0)
+	#define print_token(in) \
+		do { \
+		} while (0)
 #endif
 
 /*!
  * \brief Compares buffer in the token object with the buffer in in2.
  *
- * \return 
+ * \return
  * 	\li < 0, if string1 is less than string2.
  * 	\li == 0, if string1 is identical to string2 .
  * 	\li > 0, if string1 is greater than string2.
@@ -270,12 +282,12 @@ int remove_escaped_chars(
  * 	char path[30]="/../hello";
  * 	remove_dots(path, strlen(path)) -> UPNP_E_INVALID_URL
  * 	char path[30]="/./hello";
- * 	remove_dots(path, strlen(path)) -> UPNP_E_SUCCESS, 
+ * 	remove_dots(path, strlen(path)) -> UPNP_E_SUCCESS,
  * 	in = "/hello"
- * 	char path[30]="/./hello/foo/../goodbye" -> 
+ * 	char path[30]="/./hello/foo/../goodbye" ->
  * 	UPNP_E_SUCCESS, in = "/hello/goodbye"
  *
- * \return 
+ * \return
  * 	\li UPNP_E_SUCCESS - On Success.
  * 	\li UPNP_E_OUTOF_MEMORY - On failure to allocate memory.
  * 	\li UPNP_E_INVALID_URL - Failure to resolve URL.
@@ -298,7 +310,7 @@ int remove_dots(
  *
  * The resolution of '..' is NOT implemented, but '.' is resolved.
  *
- * \return 
+ * \return
  */
 char *resolve_rel_url(
 	/*! [in] Base URL. */
@@ -323,7 +335,8 @@ int parse_uri(
 	const char *in,
 	/*! [in] Maximum limit on the number of characters. */
 	size_t max,
-	/*! [out] Output parameter which will have the parsed uri information. */
+	/*! [out] Output parameter which will have the parsed uri information.
+	 */
 	uri_type *out);
 
 /*!
@@ -343,6 +356,4 @@ int parse_token(
 }
 #endif
 
-
 #endif /* GENLIB_NET_URI_H */
-

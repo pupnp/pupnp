@@ -3,32 +3,32 @@
 
 /**************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **************************************************************************/
@@ -41,22 +41,22 @@
  * \file
  */
 
+#include "UpnpGlobal.h" /* for UPNP_INLINE */
+#include "UpnpInet.h"	/* for SOCKET, netinet/in */
 #include "autoconfig.h"
-#include "UpnpInet.h"		/* for SOCKET, netinet/in */
-#include "UpnpGlobal.h"		/* for UPNP_INLINE */
 #ifdef UPNP_ENABLE_OPEN_SSL
-#include <openssl/ssl.h>
+	#include <openssl/ssl.h>
 #endif
 
 /* The following are not defined under winsock.h */
 #ifndef SD_RECEIVE
-	#define SD_RECEIVE      0x00
-	#define SD_SEND         0x01
-	#define SD_BOTH         0x02
+	#define SD_RECEIVE 0x00
+	#define SD_SEND 0x01
+	#define SD_BOTH 0x02
 #endif
 
 /*! */
-typedef struct 
+typedef struct
 {
 	/*! Handle/descriptor to a socket. */
 	SOCKET socket;
@@ -93,7 +93,7 @@ static UPNP_INLINE int sock_close(
  * SOCKINFO structure.
  *
  * \return Integer:
- * \li \c UPNP_E_SUCCESS	
+ * \li \c UPNP_E_SUCCESS
  * \li \c UPNP_E_OUTOF_MEMORY
  * \li \c UPNP_E_SOCKET_ERROR
  */
@@ -108,17 +108,17 @@ int sock_init(
  * and port to the IP address and port in the SOCKINFO structure.
  *
  * \return Integer:
- * \li \c UPNP_E_SUCCESS	
+ * \li \c UPNP_E_SUCCESS
  * \li \c UPNP_E_OUTOF_MEMORY
  * \li \c UPNP_E_SOCKET_ERROR
  */
 int sock_init_with_ip(
 	/*! [out] Socket Information Object. */
-	SOCKINFO* info,
+	SOCKINFO *info,
 	/*! [in] Socket Descriptor. */
-	SOCKET sockfd, 
+	SOCKET sockfd,
 	/*! [in] Remote socket address. */
-        struct sockaddr *foreign_sockaddr);
+	struct sockaddr *foreign_sockaddr);
 
 /*!
  * \brief Associates an SSL object with the socket and begins
@@ -131,7 +131,7 @@ int sock_init_with_ip(
 #ifdef UPNP_ENABLE_OPEN_SSL
 int sock_ssl_connect(
 	/*! [out] Socket Information Object. */
-	SOCKINFO* info);
+	SOCKINFO *info);
 #endif
 
 /*!
@@ -147,7 +147,7 @@ int sock_ssl_connect(
  */
 int sock_destroy(
 	/*! [in,out] Socket Information Object. */
-	SOCKINFO* info,
+	SOCKINFO *info,
 	/*! [in] How to shutdown the socket. Used by sockets's shutdown(). */
 	int ShutdownMethod);
 
@@ -163,7 +163,7 @@ int sock_read(
 	/*! [in] Socket Information Object. */
 	SOCKINFO *info,
 	/*! [out] Buffer to get data to. */
-	char* buffer,
+	char *buffer,
 	/*! [in] Size of the buffer. */
 	size_t bufsize,
 	/*! [in,out] timeout value. */
@@ -189,7 +189,7 @@ int sock_write(
 
 /*!
  * \brief Make socket blocking.
- * 
+ *
  * \return 0 if successful, -1 otherwise.
  */
 int sock_make_blocking(
@@ -198,7 +198,7 @@ int sock_make_blocking(
 
 /*!
  * \brief Make socket non-blocking.
- * 
+ *
  * \return 0 if successful, -1 otherwise.
  */
 int sock_make_no_blocking(
@@ -206,7 +206,7 @@ int sock_make_no_blocking(
 	SOCKET sock);
 
 #ifdef __cplusplus
-}	/* #extern "C" */
+} /* #extern "C" */
 #endif
 
 /* @} Sock Network Socket Library */

@@ -1,49 +1,45 @@
 /**************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **************************************************************************/
-
 
 /*!
  * \file
  */
 
-
 #include "ixmlmembuf.h"
 #include "ixml.h"
-
 
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 /*!
  * \brief Increases or decreases buffer capacity so that at least 'new_length'
@@ -104,7 +100,6 @@ static int ixml_membuf_set_size(
 	return 0;
 }
 
-
 void ixml_membuf_init(ixml_membuf *m)
 {
 	assert(m != NULL);
@@ -114,7 +109,6 @@ void ixml_membuf_init(ixml_membuf *m)
 	m->length = (size_t)0;
 	m->capacity = (size_t)0;
 }
-
 
 void ixml_membuf_destroy(ixml_membuf *m)
 {
@@ -126,11 +120,7 @@ void ixml_membuf_destroy(ixml_membuf *m)
 	ixml_membuf_init(m);
 }
 
-
-int ixml_membuf_assign(
-	ixml_membuf *m,
-	const void *buf,
-	size_t buf_len)
+int ixml_membuf_assign(ixml_membuf *m, const void *buf, size_t buf_len)
 {
 	int return_code;
 
@@ -157,14 +147,10 @@ int ixml_membuf_assign(
 	return IXML_SUCCESS;
 }
 
-
-int ixml_membuf_assign_str(
-	ixml_membuf *m,
-	const char *c_str)
+int ixml_membuf_assign_str(ixml_membuf *m, const char *c_str)
 {
 	return ixml_membuf_assign(m, c_str, strlen(c_str));
 }
-
 
 int ixml_membuf_append(
 	/*! [in,out] The memory buffer */
@@ -177,7 +163,6 @@ int ixml_membuf_append(
 	return ixml_membuf_insert(m, buf, (size_t)1, m->length);
 }
 
-
 int ixml_membuf_append_str(
 	/*! [in,out] The memory buffer */
 	ixml_membuf *m,
@@ -186,7 +171,6 @@ int ixml_membuf_append_str(
 {
 	return ixml_membuf_insert(m, c_str, strlen(c_str), m->length);
 }
-
 
 int ixml_membuf_insert(
 	/*! [in,out] The memory buffer */
@@ -224,4 +208,3 @@ int ixml_membuf_insert(
 
 	return 0;
 }
-

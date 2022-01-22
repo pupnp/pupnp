@@ -4,14 +4,15 @@
 /*!
  * \file
  *
- * \brief Defines constants that for some reason are not defined on some systems.
+ * \brief Defines constants that for some reason are not defined on some
+ * systems.
  */
 
-#if defined UPNP_LARGEFILE_SENSITIVE && _FILE_OFFSET_BITS+0 != 64
+#if defined UPNP_LARGEFILE_SENSITIVE && _FILE_OFFSET_BITS + 0 != 64
 	#if defined __GNUC__
 		#warning libupnp requires largefile mode - use AC_SYS_LARGEFILE
 	#elif !defined _WIN32
-		#error  libupnp requires largefile mode - use AC_SYS_LARGEFILE
+		#error libupnp requires largefile mode - use AC_SYS_LARGEFILE
 	#endif
 #endif
 
@@ -24,14 +25,14 @@
 			#define EXPORT_SPEC
 		#else /* UPNP_STATIC_LIB */
 			#ifdef LIBUPNP_EXPORTS
-				/*! set up declspec for dll export to make functions
-				 * visible to library users */
+				/*! set up declspec for dll export to make
+				 * functions visible to library users */
 				#define EXPORT_SPEC __declspec(dllexport)
 			#else /* LIBUPNP_EXPORTS */
 				#define EXPORT_SPEC __declspec(dllimport)
 			#endif /* LIBUPNP_EXPORTS */
-		#endif /* UPNP_STATIC_LIB */
-	#else /* _MSC_VER || __BORLANDC__ */
+		#endif	       /* UPNP_STATIC_LIB */
+	#else		       /* _MSC_VER || __BORLANDC__ */
 		#define EXPORT_SPEC
 	#endif /* _MSC_VER || __BORLANDC__ */
 
@@ -45,7 +46,7 @@
 	#ifdef UPNP_USE_MSVCPP
 		/* define some things the M$ VC++ doesn't know */
 		#define UPNP_INLINE _inline
-		typedef __int64 int64_t;
+typedef __int64 int64_t;
 		#define PRId64 "I64d"
 		#define PRIzd "ld"
 		#define PRIzu "lu"
@@ -54,13 +55,12 @@
 
 	#ifdef UPNP_USE_BCBPP
 		/* define some things Borland Builder doesn't know */
-/* inconsistency between the httpparser.h and the .c file definition.
-   Header is missing UPNP_INLINE prefix, so compiler is confused ...
-   better remove it
-		#define UPNP_INLINE inline
- */
+		/* inconsistency between the httpparser.h and the .c file
+		   definition. Header is missing UPNP_INLINE prefix, so compiler
+		   is confused ... better remove it #define UPNP_INLINE inline
+		 */
 		#define UPNP_INLINE
-		typedef __int64 int64_t;
+typedef __int64 int64_t;
 		#warning The Borland C compiler is probably broken on PRId64,
 		#warning please someone provide a proper fix here
 		#define PRId64 "Ld"
@@ -81,7 +81,7 @@
 		#define PRIzx "lx"
 	#endif /* __GNUC__ */
 #else
-	/*! 
+	/*!
 	 * \brief Export functions on WIN32 DLLs.
 	 *
 	 * Every funtion that belongs to the library API must use this

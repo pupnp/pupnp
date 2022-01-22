@@ -780,6 +780,6 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 	return 1;
 }
 	#endif /* EXCLUDE_SSDP */
-#endif         /* INCLUDE_CLIENT_APIS */
+#endif	       /* INCLUDE_CLIENT_APIS */
 
 /* @} SSDPlib */

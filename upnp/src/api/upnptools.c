@@ -1,78 +1,71 @@
 /**************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
  * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **************************************************************************/
 
-
 #include "config.h"
-
 
 /*!
  * \file
  */
 
-
 #if EXCLUDE_DOM == 0
 
+	#include "upnp.h"
+	#include "upnptools.h"
 
-#include "upnp.h"
-#include "upnptools.h"
+	#include "uri.h"
 
+	#include <stdarg.h>
+	#include <stdio.h>
 
-#include "uri.h"
+	/*! Maximum action header buffer length. */
+	#define HEADER_LENGTH 2000
 
-
-#include <stdarg.h>
-#include <stdio.h>
-
-
-/*! Maximum action header buffer length. */
-#define HEADER_LENGTH 2000
-
-#ifdef _WIN32
-	#if defined(_MSC_VER) && _MSC_VER < 1900
-		#define snprintf _snprintf
+	#ifdef _WIN32
+		#if defined(_MSC_VER) && _MSC_VER < 1900
+			#define snprintf _snprintf
+		#endif
 	#endif
-#endif
 
 /*!
  * \brief Structure to maintain a error code and string associated with the
  * error code.
  */
-struct ErrorString {
+struct ErrorString
+{
 	/*! Error code. */
 	int rc;
 	/*! Error description. */
 	const char *rcError;
 };
-
 
 /*!
  * \brief Array of error structures.
@@ -129,7 +122,7 @@ const char *UpnpGetErrorMessage(int rc)
 {
 	size_t i;
 
-	for (i = 0; i < sizeof (ErrorMessages) / sizeof (ErrorMessages[0]); ++i) {
+	for (i = 0; i < sizeof(ErrorMessages) / sizeof(ErrorMessages[0]); ++i) {
 		if (rc == ErrorMessages[i].rc) {
 			return ErrorMessages[i].rcError;
 		}
@@ -143,10 +136,7 @@ const char *UpnpGetErrorMessage(int rc)
  * because of the way resolve_rel_url() was originally written and used. In the
  * future it would be nice to clean this up.
  */
-int UpnpResolveURL(
-	const char *BaseURL,
-	const char *RelURL,
-	char *AbsURL)
+int UpnpResolveURL(const char *BaseURL, const char *RelURL, char *AbsURL)
 {
 	int ret = UPNP_E_SUCCESS;
 	char *tempRel = NULL;
@@ -166,11 +156,7 @@ ExitFunction:
 	return ret;
 }
 
-
-int UpnpResolveURL2(
-	const char *BaseURL,
-	const char *RelURL,
-	char **AbsURL)
+int UpnpResolveURL2(const char *BaseURL, const char *RelURL, char **AbsURL)
 {
 	int ret = UPNP_E_SUCCESS;
 
@@ -185,7 +171,6 @@ int UpnpResolveURL2(
 ExitFunction:
 	return ret;
 }
-
 
 /*!
  * \brief Adds the argument in the action request or response.
@@ -226,15 +211,22 @@ static int addToAction(
 		}
 
 		if (response) {
-			rc = snprintf(ActBuff, HEADER_LENGTH,
-				"<u:%sResponse xmlns:u=\"%s\">\r\n</u:%sResponse>",
-				ActionName, ServType, ActionName);
+			rc = snprintf(ActBuff,
+				HEADER_LENGTH,
+				"<u:%sResponse "
+				"xmlns:u=\"%s\">\r\n</u:%sResponse>",
+				ActionName,
+				ServType,
+				ActionName);
 		} else {
-			rc = snprintf(ActBuff, HEADER_LENGTH,
+			rc = snprintf(ActBuff,
+				HEADER_LENGTH,
 				"<u:%s xmlns:u=\"%s\">\r\n</u:%s>",
-				ActionName, ServType, ActionName);
+				ActionName,
+				ServType,
+				ActionName);
 		}
-		if (rc < 0 || (unsigned int) rc >= HEADER_LENGTH) {
+		if (rc < 0 || (unsigned int)rc >= HEADER_LENGTH) {
 			free(ActBuff);
 			return UPNP_E_OUTOF_MEMORY;
 		}
@@ -253,7 +245,7 @@ static int addToAction(
 	if (ArgName != NULL /*&& ArgValue != NULL */) {
 		node = ixmlNode_getFirstChild((IXML_Node *)*ActionDoc);
 		Ele = ixmlDocument_createElement(*ActionDoc, ArgName);
-		if(ArgValue) {
+		if (ArgValue) {
 			Txt = ixmlDocument_createTextNode(*ActionDoc, ArgValue);
 			ixmlNode_appendChild((IXML_Node *)Ele, Txt);
 		}
@@ -262,7 +254,6 @@ static int addToAction(
 
 	return UPNP_E_SUCCESS;
 }
-
 
 /*!
  * \brief Creates the action request or response from the argument list.
@@ -304,36 +295,46 @@ static IXML_Document *makeAction(
 	}
 
 	if (response) {
-		rc = snprintf(ActBuff, HEADER_LENGTH,
+		rc = snprintf(ActBuff,
+			HEADER_LENGTH,
 			"<u:%sResponse xmlns:u=\"%s\">\r\n</u:%sResponse>",
-			ActionName, ServType, ActionName);
+			ActionName,
+			ServType,
+			ActionName);
 	} else {
-		rc = snprintf(ActBuff, HEADER_LENGTH,
+		rc = snprintf(ActBuff,
+			HEADER_LENGTH,
 			"<u:%s xmlns:u=\"%s\">\r\n</u:%s>",
-			ActionName, ServType, ActionName);
+			ActionName,
+			ServType,
+			ActionName);
 	}
-	if (rc < 0 || (unsigned int) rc >= HEADER_LENGTH ||
+	if (rc < 0 || (unsigned int)rc >= HEADER_LENGTH ||
 		ixmlParseBufferEx(ActBuff, &ActionDoc) != IXML_SUCCESS) {
 		free(ActBuff);
 		return NULL;
 	}
 
 	free(ActBuff);
-	if(ActionDoc == NULL) {
+	if (ActionDoc == NULL) {
 		return NULL;
 	}
 
 	if (NumArg > 0) {
 		/*va_start(ArgList, Arg); */
 		ArgName = Arg;
-		for ( ; ; ) {
+		for (;;) {
 			ArgValue = va_arg(ArgList, const char *);
 			if (ArgName != NULL) {
-				node = ixmlNode_getFirstChild((IXML_Node *)ActionDoc);
-				Ele = ixmlDocument_createElement(ActionDoc, ArgName);
+				node = ixmlNode_getFirstChild(
+					(IXML_Node *)ActionDoc);
+				Ele = ixmlDocument_createElement(
+					ActionDoc, ArgName);
 				if (ArgValue) {
-					Txt = ixmlDocument_createTextNode(ActionDoc, ArgValue);
-					ixmlNode_appendChild((IXML_Node *)Ele, Txt);
+					Txt = ixmlDocument_createTextNode(
+						ActionDoc, ArgValue);
+					ixmlNode_appendChild(
+						(IXML_Node *)Ele, Txt);
 				}
 				ixmlNode_appendChild(node, (IXML_Node *)Ele);
 			}
@@ -349,9 +350,7 @@ static IXML_Document *makeAction(
 	return ActionDoc;
 }
 
-
-IXML_Document *UpnpMakeAction(
-	const char *ActionName,
+IXML_Document *UpnpMakeAction(const char *ActionName,
 	const char *ServType,
 	int NumArg,
 	const char *Arg,
@@ -367,9 +366,7 @@ IXML_Document *UpnpMakeAction(
 	return out;
 }
 
-
-IXML_Document *UpnpMakeActionResponse(
-	const char *ActionName,
+IXML_Document *UpnpMakeActionResponse(const char *ActionName,
 	const char *ServType,
 	int NumArg,
 	const char *Arg,
@@ -385,48 +382,41 @@ IXML_Document *UpnpMakeActionResponse(
 	return out;
 }
 
-
-int UpnpAddToAction(
-	IXML_Document **ActionDoc,
+int UpnpAddToAction(IXML_Document **ActionDoc,
 	const char *ActionName,
 	const char *ServType,
 	const char *ArgName,
 	const char *ArgValue)
 {
-	return addToAction(0, ActionDoc, ActionName, ServType, ArgName, ArgValue);
+	return addToAction(
+		0, ActionDoc, ActionName, ServType, ArgName, ArgValue);
 }
 
-
-int UpnpAddToActionResponse(
-	IXML_Document **ActionResponse,
+int UpnpAddToActionResponse(IXML_Document **ActionResponse,
 	const char *ActionName,
 	const char *ServType,
 	const char *ArgName,
 	const char *ArgValue)
 {
-	return addToAction(1, ActionResponse, ActionName, ServType, ArgName, ArgValue);
+	return addToAction(
+		1, ActionResponse, ActionName, ServType, ArgName, ArgValue);
 }
 
-
-IXML_Document *UpnpCreatePropertySet(
-	int NumArg,
-	const char *Arg,
-	...)
+IXML_Document *UpnpCreatePropertySet(int NumArg, const char *Arg, ...)
 {
 	va_list ArgList;
 	int Idx = 0;
 	char BlankDoc[] =
 		"<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">"
 		"</e:propertyset>";
-	const char *ArgName,
-	*ArgValue;
+	const char *ArgName, *ArgValue;
 	IXML_Node *node;
 	IXML_Element *Ele;
 	IXML_Element *Ele1;
 	IXML_Node *Txt;
 	IXML_Document *PropSet;
 
-	if(ixmlParseBufferEx(BlankDoc, &PropSet) != IXML_SUCCESS) {
+	if (ixmlParseBufferEx(BlankDoc, &PropSet) != IXML_SUCCESS) {
 		return NULL;
 	}
 
@@ -440,14 +430,17 @@ IXML_Document *UpnpCreatePropertySet(
 		ArgValue = va_arg(ArgList, const char *);
 		if (ArgName != NULL /*&& ArgValue != NULL */) {
 			node = ixmlNode_getFirstChild((IXML_Node *)PropSet);
-			Ele1 = ixmlDocument_createElement(PropSet, "e:property");
+			Ele1 = ixmlDocument_createElement(
+				PropSet, "e:property");
 			Ele = ixmlDocument_createElement(PropSet, ArgName);
 			if (ArgValue) {
-				Txt = ixmlDocument_createTextNode(PropSet, ArgValue);
+				Txt = ixmlDocument_createTextNode(
+					PropSet, ArgValue);
 				ixmlNode_appendChild((IXML_Node *)Ele, Txt);
 			}
-			ixmlNode_appendChild((IXML_Node *)Ele1, (IXML_Node *)Ele);
-			ixmlNode_appendChild(             node, (IXML_Node *)Ele1);
+			ixmlNode_appendChild(
+				(IXML_Node *)Ele1, (IXML_Node *)Ele);
+			ixmlNode_appendChild(node, (IXML_Node *)Ele1);
 		}
 		ArgName = va_arg(ArgList, const char *);
 	}
@@ -456,11 +449,8 @@ IXML_Document *UpnpCreatePropertySet(
 	return PropSet;
 }
 
-
 int UpnpAddToPropertySet(
-	IXML_Document **PropSet,
-	const char *ArgName,
-	const char *ArgValue)
+	IXML_Document **PropSet, const char *ArgName, const char *ArgValue)
 {
 	char BlankDoc[] =
 		"<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">"
@@ -498,6 +488,4 @@ int UpnpAddToPropertySet(
 	return UPNP_E_SUCCESS;
 }
 
-
 #endif /* EXCLUDE_DOM == 0 */
-

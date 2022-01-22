@@ -3,31 +3,31 @@
 
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -54,19 +54,18 @@ extern "C" {
 #include <string.h>
 
 #ifdef SAMPLE_UTIL_C
-	/*! Service types for tv services. */
-	const char *TvServiceType[] = {
-		"urn:schemas-upnp-org:service:tvcontrol:1",
-		"urn:schemas-upnp-org:service:tvpicture:1"
-	};
-#else /* SAMPLE_UTIL_C */
-	extern const char *TvServiceType[];
+/*! Service types for tv services. */
+const char *TvServiceType[] = {"urn:schemas-upnp-org:service:tvcontrol:1",
+	"urn:schemas-upnp-org:service:tvpicture:1"};
+#else  /* SAMPLE_UTIL_C */
+extern const char *TvServiceType[];
 #endif /* SAMPLE_UTIL_C */
 
 /* mutex to control displaying of events */
 extern ithread_mutex_t display_mutex;
 
-typedef enum {
+typedef enum
+{
 	STATE_UPDATE = 0,
 	DEVICE_ADDED = 1,
 	DEVICE_REMOVED = 2,
@@ -75,7 +74,7 @@ typedef enum {
 
 /*!
  * \brief Given a DOM node such as <Channel>11</Channel>, this routine
- * extracts the value (e.g., 11) from the node and returns it as 
+ * extracts the value (e.g., 11) from the node and returns it as
  * a string. The string must be freed by the caller using free.
  *
  * \return The DOM node as a string.
@@ -95,7 +94,7 @@ char *SampleUtil_GetElementValue(
  */
 IXML_NodeList *SampleUtil_GetFirstServiceList(
 	/*! [in] The DOM node from which to extract the service list. */
-	IXML_Document *doc); 
+	IXML_Document *doc);
 
 /*!
  * \brief Given a document node, this routine searches for the first element
@@ -106,7 +105,7 @@ char *SampleUtil_GetFirstDocumentItem(
 	/*! [in] The DOM document from which to extract the value. */
 	IXML_Document *doc,
 	/*! [in] The item to search for. */
-	const char *item); 
+	const char *item);
 
 /*!
  * \brief Given a DOM element, this routine searches for the first element
@@ -117,7 +116,7 @@ char *SampleUtil_GetFirstElementItem(
 	/*! [in] The DOM element from which to extract the value. */
 	IXML_Element *element,
 	/*! [in] The item to search for. */
-	const char *item); 
+	const char *item);
 
 /*!
  * \brief Prints a callback event type as a string.
@@ -131,7 +130,7 @@ void SampleUtil_PrintEventType(
  */
 int SampleUtil_PrintEvent(
 	/*! [in] The type of callback event. */
-	Upnp_EventType EventType, 
+	Upnp_EventType EventType,
 	/*! [in] The callback event structure. */
 	const void *Event);
 
@@ -141,15 +140,15 @@ int SampleUtil_PrintEvent(
  * function currently assumes that the eventURL and controlURL values in
  * the service definitions are full URLs.  Relative URLs are not handled here.
  */
-int SampleUtil_FindAndParseService (
+int SampleUtil_FindAndParseService(
 	/*! [in] The DOM description document. */
 	IXML_Document *DescDoc,
 	/*! [in] The location of the description document. */
-	const char *location, 
+	const char *location,
 	/*! [in] The type of service to search for. */
 	const char *serviceType,
 	/*! [out] The service ID. */
-	char **serviceId, 
+	char **serviceId,
 	/*! [out] The event URL for the service. */
 	char **eventURL,
 	/*! [out] The control URL for the service. */
@@ -157,7 +156,7 @@ int SampleUtil_FindAndParseService (
 
 /*!
  * \brief Prototype for displaying strings. All printing done by the device,
- * control point, and sample util, ultimately use this to display strings 
+ * control point, and sample util, ultimately use this to display strings
  * to the user.
  */
 typedef void (*print_string)(
@@ -167,9 +166,9 @@ typedef void (*print_string)(
 	...)
 #if (__GNUC__ >= 3)
 	/* This enables printf like format checking by the compiler */
-	__attribute__((format (__printf__, 1, 2)))
+	__attribute__((format(__printf__, 1, 2)))
 #endif
-;
+	;
 
 /*! global print function used by sample util */
 extern print_string gPrintFun;
@@ -209,7 +208,7 @@ int SampleUtil_Finish();
  *
  * Provides platform-specific print functionality.  This function should be
  * called when you want to print content suitable for console output (i.e.,
- * in a large text box or on a screen).  If your device/operating system is 
+ * in a large text box or on a screen).  If your device/operating system is
  * not supported here, you should add a port.
  *
  * \return The same as printf.
@@ -221,9 +220,9 @@ int SampleUtil_Print(
 	...)
 #if (__GNUC__ >= 3)
 	/* This enables printf like format checking by the compiler */
-	__attribute__((format (__printf__, 1, 2)))
+	__attribute__((format(__printf__, 1, 2)))
 #endif
-;
+	;
 
 /*!
  * \brief
@@ -251,9 +250,9 @@ void SampleUtil_StateUpdate(
 void linux_print(const char *format, ...)
 #if (__GNUC__ >= 3)
 	/* This enables printf like format checking by the compiler */
-	__attribute__((format (__printf__, 1, 2)))
+	__attribute__((format(__printf__, 1, 2)))
 #endif
-;
+	;
 
 #ifdef __cplusplus
 };
@@ -261,12 +260,11 @@ void linux_print(const char *format, ...)
 
 #ifdef _WIN32
 	#if defined(_MSC_VER) && _MSC_VER < 1900
-		#define snprintf	_snprintf
+		#define snprintf _snprintf
 	#endif
-	#define strcasecmp	stricmp
+	#define strcasecmp stricmp
 #endif
 
 /*! @} UpnpSamples */
 
 #endif /* SAMPLE_UTIL_H */
-

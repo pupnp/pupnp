@@ -36,13 +36,14 @@
  * \file
  */
 
-#include "sock.h"
-#include "httpparser.h"
 #include "UpnpStdInt.h"
+#include "httpparser.h"
+#include "sock.h"
 
 extern SOCKET gMiniServerStopSock;
 
-typedef struct MServerSockArray {
+typedef struct MServerSockArray
+{
 	/*! IPv4 socket for listening for miniserver requests. */
 	SOCKET miniServerSock4;
 	/*! IPv6 LLA Socket for listening for miniserver requests. */
@@ -53,9 +54,11 @@ typedef struct MServerSockArray {
 	SOCKET miniServerStopSock;
 	/*! IPv4 SSDP Socket for incoming advertisments and search requests. */
 	SOCKET ssdpSock4;
-	/*! IPv6 LLA SSDP Socket for incoming advertisments and search requests. */
+	/*! IPv6 LLA SSDP Socket for incoming advertisments and search requests.
+	 */
 	SOCKET ssdpSock6;
-	/*! IPv6 ULA or GUA SSDP Socket for incoming advertisments and search requests. */
+	/*! IPv6 ULA or GUA SSDP Socket for incoming advertisments and search
+	 * requests. */
 	SOCKET ssdpSock6UlaGua;
 	/* ! . */
 	uint16_t stopPort;
@@ -76,13 +79,13 @@ typedef struct MServerSockArray {
 } MiniServerSockArray;
 
 /*! . */
-typedef void (*MiniServerCallback) (
+typedef void (*MiniServerCallback)(
 	/* ! [in] . */
-	http_parser_t * parser,
+	http_parser_t *parser,
 	/* ! [in] . */
-	http_message_t * request,
+	http_message_t *request,
 	/* ! [in] . */
-	SOCKINFO * info);
+	SOCKINFO *info);
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,8 +105,8 @@ void SetHTTPGetCallback(
 void SetSoapCallback(
 	/*! [in] SOAP Callback to be invoked . */
 	MiniServerCallback callback);
-#else /* INCLUDE_DEVICE_APIS */
-	static UPNP_INLINE void SetSoapCallback(MiniServerCallback callback) {}
+#else  /* INCLUDE_DEVICE_APIS */
+static UPNP_INLINE void SetSoapCallback(MiniServerCallback callback) {}
 #endif /* INCLUDE_DEVICE_APIS */
 /*!
  * \brief Set GENA Callback.
@@ -120,7 +123,7 @@ void SetGenaCallback(
  *
  * If listen port is 0, port is dynamically picked.
  *
- * Use timer mechanism to start the MiniServer, failure to meet the 
+ * Use timer mechanism to start the MiniServer, failure to meet the
  * allowed delay aborts the attempt to launch the MiniServer.
  *
  * \return
