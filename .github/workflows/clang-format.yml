@@ -1,0 +1,14 @@
+name: lint-clang-format
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: DoozyX/clang-format-lint-action@v0.13
+      with:
+        source: './upnp ./ixml'
+        extensions: 'h,c,cpp'
+        clangFormatVersion: 13
