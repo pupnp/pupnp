@@ -38,6 +38,8 @@
 
 /* SOAP module API to be called in Upnp-Dk API */
 
+#include "sock.h"
+
 /*!
  * \brief This is a callback called by minisever after receiving the request
  * from the control point. This function will start processing the request.
