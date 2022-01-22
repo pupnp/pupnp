@@ -1,30 +1,30 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * * Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * * Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * * Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-#define EOUTOFMEM (-7 & 1<<29)
+#define EOUTOFMEM (-7 & 1 << 29)
 
 #define FREELISTSIZE 100
 #define LIST_SUCCESS 1
@@ -52,7 +52,7 @@ extern "C" {
 typedef void (*free_function)(void *arg);
 
 /*! Function for comparing list items. Returns 1 if itemA==itemB */
-typedef int (*cmp_routine)(void *itemA,void *itemB);
+typedef int (*cmp_routine)(void *itemA, void *itemB);
 
 /*! Linked list node. Stores generic item and pointers to next and prev.
  * \internal
@@ -98,7 +98,7 @@ typedef struct LINKEDLIST
 
 /*!
  * \brief Initializes LinkedList. Must be called first and only once for List.
- * 
+ *
  *  \return
  *	\li \c 0 on success.
  *	\li \c EOUTOFMEM on failure.
@@ -206,7 +206,7 @@ int ListDestroy(
 
 /*!
  * \brief Returns the head of the list.
- *    
+ *
  * Precondition: The list has been initialized.
  *
  * \return The head of the list. NULL if list is empty.
@@ -217,7 +217,7 @@ ListNode *ListHead(
 
 /*!
  * \brief Returns the tail of the list.
- *    
+ *
  * Precondition: The list has been initialized.
  *
  * \return The tail of the list. NULL if list is empty.
@@ -228,7 +228,7 @@ ListNode *ListTail(
 
 /*!
  * \brief Returns the next item in the list.
- *    
+ *
  * Precondition: The list has been initialized.
  *
  * \return The next item in the list. NULL if there are no more items in list.
@@ -241,10 +241,11 @@ ListNode *ListNext(
 
 /*!
  * \brief Returns the previous item in the list.
- *    
+ *
  * Precondition: The list has been initialized.
  *
- * \return The previous item in the list. NULL if there are no more items in list.
+ * \return The previous item in the list. NULL if there are no more items in
+ * list.
  */
 ListNode *ListPrev(
 	/*! Must be valid, non null, pointer to a linked list. */
@@ -262,7 +263,7 @@ ListNode *ListPrev(
  *
  * \return The node containing the item. NULL if no node contains the item.
  */
-ListNode* ListFind(
+ListNode *ListFind(
 	/*! Must be valid, non null, pointer to a linked list. */
 	LinkedList *list,
 	/*! The node to start from, NULL if to start from beginning. */
@@ -279,11 +280,10 @@ ListNode* ListFind(
  */
 long ListSize(
 	/*! Must be valid, non null, pointer to a linked list. */
-	LinkedList* list);
+	LinkedList *list);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* LINKED_LIST_H */
-

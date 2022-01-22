@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2000-2003 Intel Corporation
  * All rights reserved.
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,14 +37,15 @@
  * \file
  */
 
-#include <stdlib.h>
 #include "upnputil.h"
+#include <stdlib.h>
 
-#define MINVAL( a, b ) ( (a) < (b) ? (a) : (b) )
-#define MAXVAL( a, b ) ( (a) > (b) ? (a) : (b) )
+#define MINVAL(a, b) ((a) < (b) ? (a) : (b))
+#define MAXVAL(a, b) ((a) > (b) ? (a) : (b))
 
 /*! pointer to a chunk of memory. */
-typedef struct {
+typedef struct
+{
 	/*! start of memory (read/write). */
 	char *buf;
 	/*! length of memory (read-only). */
@@ -53,7 +54,8 @@ typedef struct {
 
 /*! Maintains a block of dynamically allocated memory
  * note: Total length/capacity should not exceed MAX_INT */
-typedef struct {
+typedef struct
+{
 	/*! mem buffer; must not write beyond buf[length-1] (read/write). */
 	char *buf;
 	/*! length of buffer (read-only). */
@@ -74,7 +76,7 @@ extern "C" {
  * \brief Allocate memory and copy information from the input string to the
  * newly allocated memory.
  *
- * \return Pointer to the newly allocated memory. 
+ * \return Pointer to the newly allocated memory.
  * NULL if memory cannot be allocated.
  */
 char *str_alloc(
@@ -91,7 +93,7 @@ char *str_alloc(
  * \return
  * \li <  0 string1 substring less than string2 substring
  * \li == 0 string1 substring identical to string2 substring
- * \li >  0 string1 substring greater than string2 substring 
+ * \li >  0 string1 substring greater than string2 substring
  */
 int memptr_cmp(
 	/*! [in] Input memory object. */
@@ -109,7 +111,7 @@ int memptr_cmp(
  * \return
  * \li <  0 string1 substring less than string2 substring
  * \li == 0 string1 substring identical to string2 substring
- * \li >  0 string1 substring greater than string2 substring 
+ * \li >  0 string1 substring greater than string2 substring
  */
 int memptr_cmp_nocase(
 	/*! [in] Input memory object. */
@@ -209,8 +211,9 @@ int membuffer_append_str(
  * \return 0 if successful, error code if error.
  */
 int membuffer_insert(
-	/*! [in,out] Buffer whose memory size is to be increased and appended. */
-	membuffer * m,
+	/*! [in,out] Buffer whose memory size is to be increased and appended.
+	 */
+	membuffer *m,
 	/*! [in] source buffer whose contents will be copied. */
 	const void *buf,
 	/*! [in] size of the source buffer. */
@@ -226,7 +229,7 @@ int membuffer_insert(
 void membuffer_delete(
 	/*! [in,out] Buffer whose memory size is to be decreased and copied
 	 * to the modified location. */
-	membuffer * m,
+	membuffer *m,
 	/*! [in] Index to determine bounds while moving data. */
 	size_t index,
 	/*! [in] Number of bytes that the data needs to shrink by. */

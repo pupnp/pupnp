@@ -32,14 +32,13 @@
 #ifndef GENLIB_NET_HTTP_WEBSERVER_H
 #define GENLIB_NET_HTTP_WEBSERVER_H
 
-#include <time.h>
-#include "sock.h"
 #include "httpparser.h"
+#include "sock.h"
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 struct SendInstruction
 {
@@ -62,7 +61,6 @@ struct SendInstruction
 	 * on the requirement.*/
 };
 
-
 /*!
  * \brief Initilialize the different documents. Initialize the memory
  * for root directory for web server. Call to initialize global XML
@@ -76,14 +74,12 @@ struct SendInstruction
  */
 int web_server_init(void);
 
-
 /*!
  * \brief Release memory allocated for the global web server root
  * directory and the global XML document. Resets the flag bWebServerState
  * to WEB_SERVER_DISABLED.
  */
 void web_server_destroy(void);
-
 
 /*!
  * \brief Replaces current alias with the given alias. To remove the current
@@ -98,15 +94,15 @@ void web_server_destroy(void);
 int web_server_set_alias(
 	/*! [in] Webserver name of alias; created by caller and freed by caller
 	 * (doesn't even have to be malloc()d. */
-	const char* alias_name,
+	const char *alias_name,
 	/*! [in] The xml doc; this is allocated by the caller; and freed by
 	 * the web server. */
-	const char* alias_content,
+	const char *alias_content,
 	/*! [in] Length of alias body in bytes. */
 	size_t alias_content_length,
-	/*! [in] Time when the contents of alias were last changed (local time). */
+	/*! [in] Time when the contents of alias were last changed (local time).
+	 */
 	time_t last_modified);
-
 
 /*!
  * \brief Assign the path specfied by the input const char* root_dir parameter
@@ -117,8 +113,7 @@ int web_server_set_alias(
  */
 int web_server_set_root_dir(
 	/*! [in] String having the root directory for the document. */
-	const char* root_dir);
-
+	const char *root_dir);
 
 /*!
  * \brief Main entry point into web server; Handles HTTP GET and HEAD
@@ -132,11 +127,8 @@ void web_server_callback(
 	/*! [in,out] . */
 	SOCKINFO *info);
 
-
 #ifdef __cplusplus
 } /* extern C */
 #endif
 
-
 #endif /* GENLIB_NET_HTTP_WEBSERVER_H */
-

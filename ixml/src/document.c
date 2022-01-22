@@ -1,55 +1,50 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
  * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
-
 
 /*!
  * \file
  */
 
-
 #include "ixmldebug.h"
 #include "ixmlparser.h"
-
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-
 void ixmlDocument_init(IXML_Document *doc)
 {
 	memset(doc, 0, sizeof(IXML_Document));
 }
-
 
 void ixmlDocument_free(IXML_Document *doc)
 {
@@ -58,11 +53,10 @@ void ixmlDocument_free(IXML_Document *doc)
 	}
 }
 
-
 /*!
  * When this function is called first time, nodeptr is the root of the subtree,
  * so it is not necessay to do two steps recursion.
- *  
+ *
  * Internal function called by ixmlDocument_importNode
  */
 static void ixmlDocument_setOwnerDocument(
@@ -80,12 +74,8 @@ static void ixmlDocument_setOwnerDocument(
 	}
 }
 
-
 int ixmlDocument_importNode(
-	IXML_Document *doc,
-	IXML_Node *importNode,
-	int deep,
-	IXML_Node **rtNode)
+	IXML_Document *doc, IXML_Node *importNode, int deep, IXML_Node **rtNode)
 {
 	unsigned short nodeType;
 	IXML_Node *newNode;
@@ -112,11 +102,8 @@ int ixmlDocument_importNode(
 	return IXML_SUCCESS;
 }
 
-
 int ixmlDocument_createElementEx(
-	IXML_Document *doc,
-	const DOMString tagName,
-	IXML_Element **rtElement)
+	IXML_Document *doc, const DOMString tagName, IXML_Element **rtElement)
 {
 	int errCode = IXML_SUCCESS;
 	IXML_Element *newElement = NULL;
@@ -126,7 +113,7 @@ int ixmlDocument_createElementEx(
 		goto ErrorHandler;
 	}
 
-	newElement = (IXML_Element *) malloc(sizeof(IXML_Element));
+	newElement = (IXML_Element *)malloc(sizeof(IXML_Element));
 	if (newElement == NULL) {
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
@@ -159,23 +146,23 @@ ErrorHandler:
 	return errCode;
 }
 
-
 IXML_Element *ixmlDocument_createElement(
-	IXML_Document *doc,
-	const DOMString tagName)
+	IXML_Document *doc, const DOMString tagName)
 {
 	IXML_Element *newElement = NULL;
 	int ret = IXML_SUCCESS;
 
 	ret = ixmlDocument_createElementEx(doc, tagName, &newElement);
 	if (ret != IXML_SUCCESS) {
-                IxmlPrintf(__FILE__, __LINE__, "ixmlDocument_createElement",
-			"Error %d\n", ret);
+		IxmlPrintf(__FILE__,
+			__LINE__,
+			"ixmlDocument_createElement",
+			"Error %d\n",
+			ret);
 		return NULL;
-        }
+	}
 	return newElement;
 }
-
 
 int ixmlDocument_createDocumentEx(IXML_Document **rtDoc)
 {
@@ -183,7 +170,7 @@ int ixmlDocument_createDocumentEx(IXML_Document **rtDoc)
 	int errCode = IXML_SUCCESS;
 
 	doc = NULL;
-	doc = (IXML_Document *)malloc(sizeof (IXML_Document));
+	doc = (IXML_Document *)malloc(sizeof(IXML_Document));
 	if (doc == NULL) {
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
@@ -191,7 +178,7 @@ int ixmlDocument_createDocumentEx(IXML_Document **rtDoc)
 
 	ixmlDocument_init(doc);
 
-	doc->n.nodeName = strdup((const char*)DOCUMENTNODENAME);
+	doc->n.nodeName = strdup((const char *)DOCUMENTNODENAME);
 	if (doc->n.nodeName == NULL) {
 		ixmlDocument_free(doc);
 		doc = NULL;
@@ -207,7 +194,6 @@ ErrorHandler:
 	return errCode;
 }
 
-
 IXML_Document *ixmlDocument_createDocument()
 {
 	IXML_Document *doc = NULL;
@@ -217,11 +203,8 @@ IXML_Document *ixmlDocument_createDocument()
 	return doc;
 }
 
-
 int ixmlDocument_createTextNodeEx(
-	IXML_Document *doc,
-	const DOMString data,
-	IXML_Node **textNode)
+	IXML_Document *doc, const DOMString data, IXML_Node **textNode)
 {
 	IXML_Node *returnNode;
 	int rc = IXML_SUCCESS;
@@ -232,7 +215,7 @@ int ixmlDocument_createTextNodeEx(
 		goto ErrorHandler;
 	}
 
-	returnNode = (IXML_Node *)malloc(sizeof (IXML_Node));
+	returnNode = (IXML_Node *)malloc(sizeof(IXML_Node));
 	if (returnNode == NULL) {
 		rc = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
@@ -240,7 +223,7 @@ int ixmlDocument_createTextNodeEx(
 	/* initialize the node */
 	ixmlNode_init(returnNode);
 
-	returnNode->nodeName = strdup((const char*)TEXTNODENAME);
+	returnNode->nodeName = strdup((const char *)TEXTNODENAME);
 	if (returnNode->nodeName == NULL) {
 		ixmlNode_free(returnNode);
 		returnNode = NULL;
@@ -266,10 +249,7 @@ ErrorHandler:
 	return rc;
 }
 
-
-IXML_Node *ixmlDocument_createTextNode(
-	IXML_Document *doc,
-	const DOMString data)
+IXML_Node *ixmlDocument_createTextNode(IXML_Document *doc, const DOMString data)
 {
 	IXML_Node *returnNode = NULL;
 
@@ -278,16 +258,13 @@ IXML_Node *ixmlDocument_createTextNode(
 	return returnNode;
 }
 
-
 int ixmlDocument_createAttributeEx(
-	IXML_Document *doc,
-	const DOMString name,
-	IXML_Attr **rtAttr)
+	IXML_Document *doc, const DOMString name, IXML_Attr **rtAttr)
 {
 	IXML_Attr *attrNode = NULL;
 	int errCode = IXML_SUCCESS;
 
-	attrNode = (IXML_Attr *)malloc(sizeof (IXML_Attr));
+	attrNode = (IXML_Attr *)malloc(sizeof(IXML_Attr));
 	if (attrNode == NULL) {
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
@@ -319,25 +296,22 @@ ErrorHandler:
 	return errCode;
 }
 
-
 IXML_Attr *ixmlDocument_createAttribute(
-	IXML_Document *doc,
-	const DOMString name)
+	IXML_Document *doc, const DOMString name)
 {
 	IXML_Attr *attrNode = NULL;
 
-	if(ixmlDocument_createAttributeEx(doc, name, &attrNode) != IXML_SUCCESS)
+	if (ixmlDocument_createAttributeEx(doc, name, &attrNode) !=
+		IXML_SUCCESS)
 		return NULL;
 
 	return attrNode;
 }
 
-
-int ixmlDocument_createAttributeNSEx(
-	IXML_Document *doc,
+int ixmlDocument_createAttributeNSEx(IXML_Document *doc,
 	const DOMString namespaceURI,
 	const DOMString qualifiedName,
-	IXML_Attr **rtAttr )
+	IXML_Attr **rtAttr)
 {
 	IXML_Attr *attrNode = NULL;
 	int errCode = IXML_SUCCESS;
@@ -347,8 +321,7 @@ int ixmlDocument_createAttributeNSEx(
 		goto ErrorHandler;
 	}
 
-	errCode =
-		ixmlDocument_createAttributeEx(doc, qualifiedName, &attrNode);
+	errCode = ixmlDocument_createAttributeEx(doc, qualifiedName, &attrNode);
 	if (errCode != IXML_SUCCESS) {
 		goto ErrorHandler;
 	}
@@ -361,8 +334,7 @@ int ixmlDocument_createAttributeNSEx(
 		goto ErrorHandler;
 	}
 	/* set the localName and prefix */
-	errCode =
-		ixmlNode_setNodeName((IXML_Node *)attrNode, qualifiedName);
+	errCode = ixmlNode_setNodeName((IXML_Node *)attrNode, qualifiedName);
 	if (errCode != IXML_SUCCESS) {
 		ixmlAttr_free(attrNode);
 		attrNode = NULL;
@@ -374,9 +346,7 @@ ErrorHandler:
 	return errCode;
 }
 
-
-IXML_Attr *ixmlDocument_createAttributeNS(
-	IXML_Document *doc,
+IXML_Attr *ixmlDocument_createAttributeNS(IXML_Document *doc,
 	const DOMString namespaceURI,
 	const DOMString qualifiedName)
 {
@@ -388,21 +358,18 @@ IXML_Attr *ixmlDocument_createAttributeNS(
 	return attrNode;
 }
 
-
 int ixmlDocument_createCDATASectionEx(
-	IXML_Document *doc,
-	const DOMString data,
-	IXML_CDATASection **rtCD)
+	IXML_Document *doc, const DOMString data, IXML_CDATASection **rtCD)
 {
 	int errCode = IXML_SUCCESS;
 	IXML_CDATASection *cDSectionNode = NULL;
 
-	if(doc == NULL || data == NULL) {
+	if (doc == NULL || data == NULL) {
 		errCode = IXML_INVALID_PARAMETER;
 		goto ErrorHandler;
 	}
 
-	cDSectionNode = (IXML_CDATASection *)malloc(sizeof (IXML_CDATASection));
+	cDSectionNode = (IXML_CDATASection *)malloc(sizeof(IXML_CDATASection));
 	if (cDSectionNode == NULL) {
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
@@ -410,7 +377,7 @@ int ixmlDocument_createCDATASectionEx(
 
 	ixmlCDATASection_init(cDSectionNode);
 	cDSectionNode->n.nodeType = eCDATA_SECTION_NODE;
-	cDSectionNode->n.nodeName = strdup((const char*)CDATANODENAME);
+	cDSectionNode->n.nodeName = strdup((const char *)CDATANODENAME);
 	if (cDSectionNode->n.nodeName == NULL) {
 		ixmlCDATASection_free(cDSectionNode);
 		cDSectionNode = NULL;
@@ -420,7 +387,7 @@ int ixmlDocument_createCDATASectionEx(
 
 	cDSectionNode->n.nodeValue = strdup(data);
 	if (cDSectionNode->n.nodeValue == NULL) {
-		ixmlCDATASection_free( cDSectionNode );
+		ixmlCDATASection_free(cDSectionNode);
 		cDSectionNode = NULL;
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
@@ -433,10 +400,8 @@ ErrorHandler:
 	return errCode;
 }
 
-
 IXML_CDATASection *ixmlDocument_createCDATASection(
-	IXML_Document *doc,
-	const DOMString data)
+	IXML_Document *doc, const DOMString data)
 {
 	IXML_CDATASection *cDSectionNode = NULL;
 
@@ -445,9 +410,7 @@ IXML_CDATASection *ixmlDocument_createCDATASection(
 	return cDSectionNode;
 }
 
-
-int ixmlDocument_createElementNSEx(
-	IXML_Document *doc,
+int ixmlDocument_createElementNSEx(IXML_Document *doc,
 	const DOMString namespaceURI,
 	const DOMString qualifiedName,
 	IXML_Element **rtElement)
@@ -491,29 +454,30 @@ int ixmlDocument_createElementNSEx(
 ErrorHandler:
 	*rtElement = newElement;
 	if (ret != IXML_SUCCESS) {
-		IxmlPrintf(__FILE__, line, "ixmlDocument_createElementNSEx", "Error %d\n", ret);
+		IxmlPrintf(__FILE__,
+			line,
+			"ixmlDocument_createElementNSEx",
+			"Error %d\n",
+			ret);
 	}
 
 	return ret;
 }
 
-
-IXML_Element *ixmlDocument_createElementNS(
-	IXML_Document *doc,
+IXML_Element *ixmlDocument_createElementNS(IXML_Document *doc,
 	const DOMString namespaceURI,
 	const DOMString qualifiedName)
 {
 	IXML_Element *newElement = NULL;
 
-	ixmlDocument_createElementNSEx(doc, namespaceURI, qualifiedName, &newElement);
+	ixmlDocument_createElementNSEx(
+		doc, namespaceURI, qualifiedName, &newElement);
 
 	return newElement;
 }
 
-
 IXML_NodeList *ixmlDocument_getElementsByTagName(
-	IXML_Document *doc,
-	const DOMString tagName)
+	IXML_Document *doc, const DOMString tagName)
 {
 	IXML_NodeList *returnNodeList = NULL;
 
@@ -521,14 +485,13 @@ IXML_NodeList *ixmlDocument_getElementsByTagName(
 		return NULL;
 	}
 
-	ixmlNode_getElementsByTagName((IXML_Node *)doc, tagName, &returnNodeList);
+	ixmlNode_getElementsByTagName(
+		(IXML_Node *)doc, tagName, &returnNodeList);
 
 	return returnNodeList;
 }
 
-
-IXML_NodeList *ixmlDocument_getElementsByTagNameNS(
-	IXML_Document *doc,
+IXML_NodeList *ixmlDocument_getElementsByTagNameNS(IXML_Document *doc,
 	const DOMString namespaceURI,
 	const DOMString localName)
 {
@@ -544,10 +507,8 @@ IXML_NodeList *ixmlDocument_getElementsByTagNameNS(
 	return returnNodeList;
 }
 
-
 IXML_Element *ixmlDocument_getElementById(
-	IXML_Document *doc,
-	const DOMString tagName)
+	IXML_Document *doc, const DOMString tagName)
 {
 	IXML_Element *rtElement = NULL;
 	IXML_Node *nodeptr = (IXML_Node *)doc;
@@ -568,11 +529,14 @@ IXML_Element *ixmlDocument_getElementById(
 			return rtElement;
 		} else {
 			rtElement = ixmlDocument_getElementById(
-				(IXML_Document *)ixmlNode_getFirstChild(nodeptr),
-				tagName );
+				(IXML_Document *)ixmlNode_getFirstChild(
+					nodeptr),
+				tagName);
 			if (rtElement == NULL) {
 				rtElement = ixmlDocument_getElementById(
-					(IXML_Document *)ixmlNode_getNextSibling(nodeptr),
+					(IXML_Document *)
+						ixmlNode_getNextSibling(
+							nodeptr),
 					tagName);
 			}
 		}
@@ -582,11 +546,11 @@ IXML_Element *ixmlDocument_getElementById(
 			tagName);
 		if (rtElement == NULL) {
 			rtElement = ixmlDocument_getElementById(
-				(IXML_Document *)ixmlNode_getNextSibling(nodeptr),
+				(IXML_Document *)ixmlNode_getNextSibling(
+					nodeptr),
 				tagName);
 		}
 	}
 
 	return rtElement;
 }
-

@@ -42,7 +42,7 @@
 
 #define GEMD_OUT_OF_MEMORY -1
 #define EVENT_TIMEDOUT -2
-#define EVENT_TERMINATE	-3
+#define EVENT_TERMINATE -3
 
 #ifdef __cplusplus
 extern "C" {
@@ -96,24 +96,23 @@ void linecopylen(
 #if !defined(__cplusplus) || defined(UPNP_USE_MSVCPP)
 	#ifdef _WIN32
 		#ifndef S_ISREG
-			#define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+			#define S_ISREG(m) (((m)&S_IFMT) == S_IFREG)
 		#endif
 		#ifndef S_ISDIR
-			#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+			#define S_ISDIR(m) (((m)&S_IFMT) == S_IFDIR)
 		#endif
-		#ifndef EADDRINUSE		/* VS2010 has this defined */
-			#define EADDRINUSE		WSAEADDRINUSE
+		#ifndef EADDRINUSE /* VS2010 has this defined */
+			#define EADDRINUSE WSAEADDRINUSE
 		#endif
-		#define strcasecmp		stricmp
-		#define strncasecmp		strnicmp
-		#define sleep(a)		Sleep((a)*1000)
-		#define usleep(a)		Sleep((a)/1000)
-		#define strerror_r(a,b,c)	(strerror_s((b),(c),(a)))
+		#define strcasecmp stricmp
+		#define strncasecmp strnicmp
+		#define sleep(a) Sleep((a)*1000)
+		#define usleep(a) Sleep((a) / 1000)
+		#define strerror_r(a, b, c) (strerror_s((b), (c), (a)))
 	#else
-		#define max(a, b)   (((a)>(b))? (a):(b))
-		#define min(a, b)   (((a)<(b))? (a):(b))
+		#define max(a, b) (((a) > (b)) ? (a) : (b))
+		#define min(a, b) (((a) < (b)) ? (a) : (b))
 	#endif /* _WIN32 */
-#endif /* !defined(__cplusplus) || defined(UPNP_USE_MSVCPP) */
+#endif	       /* !defined(__cplusplus) || defined(UPNP_USE_MSVCPP) */
 
 #endif /* UTIL_H */
-

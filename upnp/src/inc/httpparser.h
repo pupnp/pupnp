@@ -491,9 +491,9 @@ void print_http_headers(
 	/*! [in] HTTP Message object. */
 	http_message_t *hmsg);
 #else
-#define print_http_headers(hmsg) \
-	do { \
-	} while (0)
+	#define print_http_headers(hmsg) \
+		do { \
+		} while (0)
 #endif
 
 #ifdef __cplusplus

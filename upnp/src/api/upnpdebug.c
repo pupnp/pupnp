@@ -107,9 +107,9 @@ void UpnpSetLogLevel(Upnp_LogLevel log_level)
 
 void UpnpCloseLog(void)
 {
-    if (!initwascalled) {
-	    return;
-    }
+	if (!initwascalled) {
+		return;
+	}
 
 	/* Calling lock() assumes that someone called UpnpInitLog(), but
 	 * this is reasonable as it is called from UpnpInit2(). We risk a
@@ -165,7 +165,7 @@ static void UpnpDisplayFileAndLine(FILE *fp,
 	time_t now = time(NULL);
 	struct tm *timeinfo;
 	const char *smod;
-	#if 0
+#if 0
 	char *slev;
 	/* Code kept around in case, but I think it's actually more convenient
 	   to display a numeric level */
@@ -176,10 +176,10 @@ static void UpnpDisplayFileAndLine(FILE *fp,
 	case UPNP_ALL: slev="ALL";break;
 	default: slev="UNK";break;
 	}
-	#else
+#else
 	char slev[25];
 	snprintf(slev, 25, "%d", DLevel);
-	#endif
+#endif
 
 	switch (Module) {
 	case SSDP:
@@ -219,11 +219,11 @@ static void UpnpDisplayFileAndLine(FILE *fp,
 		timebuf,
 		smod,
 		slev,
-	#ifdef __PTW32_DLLPORT
+#ifdef __PTW32_DLLPORT
 		(unsigned long int)ithread_self().p
-	#else
+#else
 		(unsigned long int)ithread_self()
-	#endif
+#endif
 		,
 		DbgFileName,
 		DbgLineNo);
@@ -241,9 +241,9 @@ void UpnpPrintf(Upnp_LogLevel DLevel,
 	  %d\n", fp, DLevel, g_log_level, Module, DEBUG_ALL);*/
 	va_list ArgList;
 
-    if (!initwascalled) {
-        return;
-    }
+	if (!initwascalled) {
+		return;
+	}
 
 	if (!DebugAtThisLevel(DLevel, Module))
 		return;

@@ -1,65 +1,60 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
-
 
 /*!
  * \file
  */
 
-
 #include "ixmlparser.h"
-
 
 #include <assert.h>
 #include <stdlib.h> /* for free() */
 #include <string.h>
 
-
 void ixmlElement_init(IXML_Element *element)
 {
 	if (element != NULL) {
-		memset(element, 0, sizeof (IXML_Element));
+		memset(element, 0, sizeof(IXML_Element));
 	}
 }
 
 const DOMString ixmlElement_getTagName(IXML_Element *element)
 {
-	if( element != NULL ) {
+	if (element != NULL) {
 		return element->tagName;
 	} else {
 		return NULL;
 	}
 }
-
 
 int ixmlElement_setTagName(IXML_Element *element, const char *tagName)
 {
@@ -82,8 +77,8 @@ int ixmlElement_setTagName(IXML_Element *element, const char *tagName)
 	return rc;
 }
 
-
-const DOMString ixmlElement_getAttribute(IXML_Element *element, const DOMString name)
+const DOMString ixmlElement_getAttribute(
+	IXML_Element *element, const DOMString name)
 {
 	IXML_Node *attrNode;
 
@@ -103,11 +98,8 @@ const DOMString ixmlElement_getAttribute(IXML_Element *element, const DOMString 
 	return NULL;
 }
 
-
 int ixmlElement_setAttribute(
-	IXML_Element *element,
-	const DOMString name,
-	const DOMString value)
+	IXML_Element *element, const DOMString name, const DOMString value)
 {
 	IXML_Node *attrNode;
 	IXML_Attr *newAttrNode;
@@ -136,7 +128,9 @@ int ixmlElement_setAttribute(
 	if (attrNode == NULL) {
 		/* Add a new attribute */
 		errCode = ixmlDocument_createAttributeEx(
-			(IXML_Document *)element->n.ownerDocument, name, &newAttrNode);
+			(IXML_Document *)element->n.ownerDocument,
+			name,
+			&newAttrNode);
 		if (errCode != IXML_SUCCESS) {
 			goto ErrorHandler;
 		}
@@ -144,12 +138,13 @@ int ixmlElement_setAttribute(
 		attrNode = (IXML_Node *)newAttrNode;
 		attrNode->nodeValue = strdup(value);
 		if (attrNode->nodeValue == NULL) {
-		ixmlAttr_free(newAttrNode);
-		errCode = IXML_INSUFFICIENT_MEMORY;
+			ixmlAttr_free(newAttrNode);
+			errCode = IXML_INSUFFICIENT_MEMORY;
 			goto ErrorHandler;
 		}
 
-		errCode = ixmlElement_setAttributeNode(element, newAttrNode, NULL);
+		errCode = ixmlElement_setAttributeNode(
+			element, newAttrNode, NULL);
 		if (errCode != IXML_SUCCESS) {
 			ixmlAttr_free(newAttrNode);
 			goto ErrorHandler;
@@ -168,7 +163,6 @@ int ixmlElement_setAttribute(
 ErrorHandler:
 	return errCode;
 }
-
 
 int ixmlElement_removeAttribute(IXML_Element *element, const DOMString name)
 {
@@ -198,8 +192,8 @@ int ixmlElement_removeAttribute(IXML_Element *element, const DOMString name)
 	return IXML_SUCCESS;
 }
 
-
-IXML_Attr *ixmlElement_getAttributeNode(IXML_Element *element, const DOMString name)
+IXML_Attr *ixmlElement_getAttributeNode(
+	IXML_Element *element, const DOMString name)
 {
 	IXML_Node *attrNode;
 
@@ -220,11 +214,8 @@ IXML_Attr *ixmlElement_getAttributeNode(IXML_Element *element, const DOMString n
 	return (IXML_Attr *)attrNode;
 }
 
-
 int ixmlElement_setAttributeNode(
-	IXML_Element *element,
-	IXML_Attr *newAttr,
-	IXML_Attr **rtAttr)
+	IXML_Element *element, IXML_Attr *newAttr, IXML_Attr **rtAttr)
 {
 	IXML_Node *attrNode = NULL;
 	IXML_Node *node = NULL;
@@ -306,7 +297,8 @@ static IXML_Node *ixmlElement_findAttributeNode(
 
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
-		/* parentNode, prevSib, nextSib and ownerDocument doesn't matter */
+		/* parentNode, prevSib, nextSib and ownerDocument doesn't matter
+		 */
 		if (ixmlNode_compare(attrNode, oldAttrNode) == 1) {
 			/* Found it */
 			break;
@@ -318,21 +310,18 @@ static IXML_Node *ixmlElement_findAttributeNode(
 	return attrNode;
 }
 
-
 int ixmlElement_removeAttributeNode(
-	IXML_Element *element,
-	IXML_Attr *oldAttr,
-	IXML_Attr **rtAttr)
+	IXML_Element *element, IXML_Attr *oldAttr, IXML_Attr **rtAttr)
 {
 	IXML_Node *attrNode;
 	IXML_Node *preSib;
 	IXML_Node *nextSib;
 
-	if(element == NULL || oldAttr == NULL) {
+	if (element == NULL || oldAttr == NULL) {
 		return IXML_INVALID_PARAMETER;
 	}
 
-	attrNode = ixmlElement_findAttributeNode( element, oldAttr );
+	attrNode = ixmlElement_findAttributeNode(element, oldAttr);
 	if (attrNode != NULL) {
 		/* Has the attribute */
 		preSib = attrNode->prevSibling;
@@ -356,10 +345,8 @@ int ixmlElement_removeAttributeNode(
 	}
 }
 
-
 IXML_NodeList *ixmlElement_getElementsByTagName(
-	IXML_Element *element,
-	const DOMString tagName)
+	IXML_Element *element, const DOMString tagName)
 {
 	IXML_NodeList *returnNodeList = NULL;
 
@@ -369,7 +356,6 @@ IXML_NodeList *ixmlElement_getElementsByTagName(
 	}
 	return returnNodeList;
 }
-
 
 const DOMString ixmlElement_getAttributeNS(
 	/* IN */ IXML_Element *element,
@@ -385,8 +371,8 @@ const DOMString ixmlElement_getAttributeNS(
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
 		if (strcmp(attrNode->localName, localName) == 0 &&
-		    strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
-		/* Found it */
+			strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
+			/* Found it */
 			return attrNode->nodeValue;
 		} else {
 			attrNode = attrNode->nextSibling;
@@ -396,9 +382,7 @@ const DOMString ixmlElement_getAttributeNS(
 	return NULL;
 }
 
-
-int ixmlElement_setAttributeNS(
-	IXML_Element *element,
+int ixmlElement_setAttributeNS(IXML_Element *element,
 	const DOMString namespaceURI,
 	const DOMString qualifiedName,
 	const DOMString value)
@@ -409,7 +393,7 @@ int ixmlElement_setAttributeNS(
 	int rc;
 
 	if (element == NULL || namespaceURI == NULL || qualifiedName == NULL ||
-	    value == NULL) {
+		value == NULL) {
 		return IXML_INVALID_PARAMETER;
 	}
 
@@ -431,18 +415,21 @@ int ixmlElement_setAttributeNS(
 
 	/* see DOM 2 spec page 59 */
 	if ((newAttrNode.prefix != NULL && namespaceURI == NULL) ||
-	    (newAttrNode.prefix != NULL && strcmp(newAttrNode.prefix, "xml") == 0 &&
-	     strcmp(namespaceURI, "http://www.w3.org/XML/1998/namespace") != 0) ||
-	    (strcmp(qualifiedName, "xmlns") == 0 &&
-	     strcmp(namespaceURI, "http://www.w3.org/2000/xmlns/") != 0)) {
-		Parser_freeNodeContent( &newAttrNode );
+		(newAttrNode.prefix != NULL &&
+			strcmp(newAttrNode.prefix, "xml") == 0 &&
+			strcmp(namespaceURI,
+				"http://www.w3.org/XML/1998/namespace") != 0) ||
+		(strcmp(qualifiedName, "xmlns") == 0 &&
+			strcmp(namespaceURI, "http://www.w3.org/2000/xmlns/") !=
+				0)) {
+		Parser_freeNodeContent(&newAttrNode);
 		return IXML_NAMESPACE_ERR;
 	}
 
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
 		if (strcmp(attrNode->localName, newAttrNode.localName) == 0 &&
-		    strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
+			strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
 			/* Found it */
 			break;
 		} else {
@@ -456,7 +443,7 @@ int ixmlElement_setAttributeNS(
 		}
 		/* replace it with the new prefix */
 		if (newAttrNode.prefix != NULL) {
-			attrNode->prefix = strdup( newAttrNode.prefix );
+			attrNode->prefix = strdup(newAttrNode.prefix);
 			if (attrNode->prefix == NULL) {
 				Parser_freeNodeContent(&newAttrNode);
 				return IXML_INSUFFICIENT_MEMORY;
@@ -490,7 +477,8 @@ int ixmlElement_setAttributeNS(
 			Parser_freeNodeContent(&newAttrNode);
 			return IXML_INSUFFICIENT_MEMORY;
 		}
-		if (ixmlElement_setAttributeNodeNS(element, newAttr, &newAttr) != IXML_SUCCESS) {
+		if (ixmlElement_setAttributeNodeNS(
+			    element, newAttr, &newAttr) != IXML_SUCCESS) {
 			ixmlAttr_free(newAttr);
 			Parser_freeNodeContent(&newAttrNode);
 			return IXML_FAILED;
@@ -501,9 +489,7 @@ int ixmlElement_setAttributeNS(
 	return IXML_SUCCESS;
 }
 
-
-int ixmlElement_removeAttributeNS(
-	IXML_Element *element,
+int ixmlElement_removeAttributeNS(IXML_Element *element,
 	const DOMString namespaceURI,
 	const DOMString localName)
 {
@@ -516,16 +502,16 @@ int ixmlElement_removeAttributeNS(
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
 		if (strcmp(attrNode->localName, localName) == 0 &&
-		    strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
+			strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
 			/* Found it */
 			break;
 		} else {
 			attrNode = attrNode->nextSibling;
 		}
 	}
-	if(attrNode != NULL) {
+	if (attrNode != NULL) {
 		/* Has the attribute */
-		if(attrNode->nodeValue != NULL) {
+		if (attrNode->nodeValue != NULL) {
 			free(attrNode->nodeValue);
 			attrNode->nodeValue = NULL;
 		}
@@ -534,9 +520,7 @@ int ixmlElement_removeAttributeNS(
 	return IXML_SUCCESS;
 }
 
-
-IXML_Attr *ixmlElement_getAttributeNodeNS(
-	IXML_Element *element,
+IXML_Attr *ixmlElement_getAttributeNodeNS(IXML_Element *element,
 	const DOMString namespaceURI,
 	const DOMString localName)
 {
@@ -549,7 +533,7 @@ IXML_Attr *ixmlElement_getAttributeNodeNS(
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
 		if (strcmp(attrNode->localName, localName) == 0 &&
-		    strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
+			strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
 			/* found it */
 			break;
 		} else {
@@ -559,7 +543,6 @@ IXML_Attr *ixmlElement_getAttributeNodeNS(
 
 	return (IXML_Attr *)attrNode;
 }
-
 
 int ixmlElement_setAttributeNodeNS(
 	/* IN */ IXML_Element *element,
@@ -590,7 +573,8 @@ int ixmlElement_setAttributeNodeNS(
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
 		if (strcmp(attrNode->localName, node->localName) == 0 &&
-		    strcmp(attrNode->namespaceURI, node->namespaceURI) == 0) {
+			strcmp(attrNode->namespaceURI, node->namespaceURI) ==
+				0) {
 			/* Found it */
 			break;
 		} else {
@@ -637,16 +621,14 @@ int ixmlElement_setAttributeNodeNS(
 	return IXML_SUCCESS;
 }
 
-
-IXML_NodeList *ixmlElement_getElementsByTagNameNS(
-	IXML_Element *element,
+IXML_NodeList *ixmlElement_getElementsByTagNameNS(IXML_Element *element,
 	const DOMString namespaceURI,
 	const DOMString localName)
 {
 	IXML_Node *node = (IXML_Node *)element;
 	IXML_NodeList *nodeList = NULL;
 
-	if(element != NULL && namespaceURI != NULL && localName != NULL) {
+	if (element != NULL && namespaceURI != NULL && localName != NULL) {
 		ixmlNode_getElementsByTagNameNS(
 			node, namespaceURI, localName, &nodeList);
 	}
@@ -654,10 +636,7 @@ IXML_NodeList *ixmlElement_getElementsByTagNameNS(
 	return nodeList;
 }
 
-
-int ixmlElement_hasAttribute(
-	IXML_Element *element,
-	const DOMString name)
+int ixmlElement_hasAttribute(IXML_Element *element, const DOMString name)
 {
 	IXML_Node *attrNode = NULL;
 
@@ -677,11 +656,9 @@ int ixmlElement_hasAttribute(
 	return 0;
 }
 
-
-int ixmlElement_hasAttributeNS(
-	IXML_Element * element,
+int ixmlElement_hasAttributeNS(IXML_Element *element,
 	const DOMString namespaceURI,
-	const DOMString localName )
+	const DOMString localName)
 {
 	IXML_Node *attrNode = NULL;
 
@@ -692,7 +669,7 @@ int ixmlElement_hasAttributeNS(
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
 		if (strcmp(attrNode->localName, localName) == 0 &&
-		    strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
+			strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
 			return 1;
 		} else {
 			attrNode = attrNode->nextSibling;
@@ -702,11 +679,9 @@ int ixmlElement_hasAttributeNS(
 	return 0;
 }
 
-
 void ixmlElement_free(IXML_Element *element)
 {
 	if (element != NULL) {
 		ixmlNode_free((IXML_Node *)element);
 	}
 }
-

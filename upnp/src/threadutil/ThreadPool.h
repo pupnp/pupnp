@@ -1,31 +1,31 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * * Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * * Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * * Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -38,10 +38,10 @@
  */
 
 #include "FreeList.h"
-#include "ithread.h"
 #include "LinkedList.h"
-#include "UpnpInet.h"
 #include "UpnpGlobal.h" /* for UPNP_INLINE, EXPORT_SPEC */
+#include "UpnpInet.h"
+#include "ithread.h"
 
 #include <errno.h>
 
@@ -49,18 +49,18 @@
 	#include <time.h>
 
 	#ifndef _TIMEZONE_DEFINED
-		struct timezone
-		{
-			int  tz_minuteswest; /* minutes W of Greenwich */
-			int  tz_dsttime;     /* type of dst correction */
-		};
-		int gettimeofday(struct timeval *tv, struct timezone *tz);
+struct timezone
+{
+	int tz_minuteswest; /* minutes W of Greenwich */
+	int tz_dsttime;	    /* type of dst correction */
+};
+int gettimeofday(struct timeval *tv, struct timezone *tz);
 	#endif
 #else /* _WIN32 */
 	#include <sys/param.h>
 	#include <sys/time.h> /* for gettimeofday() */
 	#if defined(__APPLE__) || defined(__NetBSD__)
-		#include <sys/resource.h>	/* for setpriority() */
+		#include <sys/resource.h> /* for setpriority() */
 	#endif
 #endif
 
@@ -73,20 +73,22 @@ extern "C" {
 
 #define INFINITE_THREADS -1
 
-#define EMAXTHREADS (-8 & 1<<29)
+#define EMAXTHREADS (-8 & 1 << 29)
 
 /*! Invalid Policy */
-#define INVALID_POLICY (-9 & 1<<29)
+#define INVALID_POLICY (-9 & 1 << 29)
 
 /*! Invalid JOB Id */
-#define INVALID_JOB_ID (-2 & 1<<29)
+#define INVALID_JOB_ID (-2 & 1 << 29)
 
-typedef enum duration {
+typedef enum duration
+{
 	SHORT_TERM,
 	PERSISTENT
 } Duration;
 
-typedef enum priority {
+typedef enum priority
+{
 	LOW_PRIORITY,
 	MED_PRIORITY,
 	HIGH_PRIORITY
@@ -108,7 +110,7 @@ typedef enum priority {
 #define DEFAULT_JOBS_PER_THREAD 10
 
 /*! default starvation time used by TPAttrInit */
-#define DEFAULT_STARVATION_TIME	500
+#define DEFAULT_STARVATION_TIME 500
 
 /*! default idle time used by TPAttrInit */
 #define DEFAULT_IDLE_TIME 10 * 1000
@@ -136,7 +138,6 @@ typedef int PolicyType;
 
 /*! Function for freeing a thread argument. */
 typedef void (*free_routine)(void *arg);
-
 
 /*! Attributes for thread pool. Used to set and change parameters of thread
  * pool. */
@@ -200,13 +201,13 @@ typedef struct TPOOLSTATS
 /*!
  * \brief A thread pool similar to the thread pool in the UPnP SDK.
  *
- * Allows jobs to be scheduled for running by threads in a 
- * thread pool. The thread pool is initialized with a 
+ * Allows jobs to be scheduled for running by threads in a
+ * thread pool. The thread pool is initialized with a
  * minimum and maximum thread number as well as a max idle time
  * and a jobs per thread ratio. If a worker thread waits the whole
  * max idle time without receiving a job and the thread pool
  * currently has more threads running than the minimum
- * then the worker thread will exit. If when 
+ * then the worker thread will exit. If when
  * scheduling a job the current job to thread ratio
  * becomes greater than the set ratio and the thread pool currently has
  * less than the maximum threads then a new thread will
@@ -282,7 +283,7 @@ int ThreadPoolInit(
  * \brief Adds a persistent job to the thread pool.
  *
  * Job will be run as soon as possible. Call will block until job is scheduled.
- * 
+ *
  * \return
  *	\li \c 0 on success.
  *	\li \c EOUTOFMEM not enough memory to add job.
@@ -290,7 +291,7 @@ int ThreadPoolInit(
  */
 int ThreadPoolAddPersistent(
 	/*! Valid thread pool pointer. */
-	ThreadPool*tp,
+	ThreadPool *tp,
 	/*! Valid thread pool job. */
 	ThreadPoolJob *job,
 	/*! . */
@@ -331,7 +332,7 @@ int ThreadPoolSetAttr(
  */
 int ThreadPoolAdd(
 	/*! valid thread pool pointer. */
-	ThreadPool*tp,
+	ThreadPool *tp,
 	/*! . */
 	ThreadPoolJob *job,
 	/*! id of job. */
@@ -343,7 +344,7 @@ int ThreadPoolAdd(
  *
  * \return
  * 	\li \c 0 on success, nonzero on failure.
- * 	\li \c INVALID_JOB_ID if job not found. 
+ * 	\li \c INVALID_JOB_ID if job not found.
  */
 int ThreadPoolRemove(
 	/*! valid thread pool pointer. */
@@ -505,30 +506,34 @@ int TPAttrSetMaxJobsTotal(
  * \return Always returns 0.
  */
 #ifdef STATS
-	EXPORT_SPEC int ThreadPoolGetStats(
-		/*! Valid initialized threadpool. */
-		ThreadPool *tp,
-		/*! Valid stats, out parameter. */
-		ThreadPoolStats *stats);
+EXPORT_SPEC int ThreadPoolGetStats(
+	/*! Valid initialized threadpool. */
+	ThreadPool *tp,
+	/*! Valid stats, out parameter. */
+	ThreadPoolStats *stats);
 #else
-	static UPNP_INLINE int ThreadPoolGetStats(
-		/*! Valid initialized threadpool. */
-		ThreadPool *tp,
-		/*! Valid stats, out parameter. */
-		ThreadPoolStats *stats) {}
+static UPNP_INLINE int ThreadPoolGetStats(
+	/*! Valid initialized threadpool. */
+	ThreadPool *tp,
+	/*! Valid stats, out parameter. */
+	ThreadPoolStats *stats)
+{
+}
 #endif
 
 /*!
  * \brief
  */
 #ifdef STATS
-	EXPORT_SPEC void ThreadPoolPrintStats(
-		/*! . */
-		ThreadPoolStats *stats);
+EXPORT_SPEC void ThreadPoolPrintStats(
+	/*! . */
+	ThreadPoolStats *stats);
 #else
-	static UPNP_INLINE void ThreadPoolPrintStats(
-		/*! . */
-		ThreadPoolStats *stats) {}
+static UPNP_INLINE void ThreadPoolPrintStats(
+	/*! . */
+	ThreadPoolStats *stats)
+{
+}
 #endif
 
 #ifdef __cplusplus
@@ -536,4 +541,3 @@ int TPAttrSetMaxJobsTotal(
 #endif
 
 #endif /* THREADPOOL_H */
-

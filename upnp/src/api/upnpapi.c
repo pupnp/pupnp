@@ -1857,8 +1857,8 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
 
 	return UPNP_E_SUCCESS;
 }
-	#endif                          /* INTERNAL_WEB_SERVER */
-#endif                                  /* INCLUDE_DEVICE_APIS */
+	#endif				/* INTERNAL_WEB_SERVER */
+#endif					/* INCLUDE_DEVICE_APIS */
 
 /*******************************************************************************
  *
@@ -1996,7 +1996,7 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 	return retVal;
 }
 	#endif /* EXCLUDE_SSDP == 0 */
-#endif         /* INCLUDE_DEVICE_APIS */
+#endif	       /* INCLUDE_DEVICE_APIS */
 
 #if EXCLUDE_SSDP == 0
 	#ifdef INCLUDE_CLIENT_APIS
@@ -2812,7 +2812,7 @@ exit_function:
 	return ret;
 }
 	#endif /* INCLUDE_DEVICE_APIS */
-#endif         /* EXCLUDE_GENA == 0 */
+#endif	       /* EXCLUDE_GENA == 0 */
 
 /*******************************************************************************
  *
@@ -3288,7 +3288,7 @@ int UpnpGetServiceVarStatus(UpnpClient_Handle Hnd,
 	return retVal;
 }
 	#endif /* INCLUDE_CLIENT_APIS */
-#endif         /* EXCLUDE_SOAP */
+#endif	       /* EXCLUDE_SOAP */
 
 /*******************************************************************************
  *
@@ -4240,7 +4240,7 @@ void AutoAdvertise(void *input)
 	free_upnp_timeout(event);
 }
 	#endif /* EXCLUDE_SSDP == 0 */
-#endif         /* INCLUDE_DEVICE_APIS */
+#endif	       /* INCLUDE_DEVICE_APIS */
 
 #ifdef INTERNAL_WEB_SERVER
 int UpnpSetWebServerRootDir(const char *rootDir)

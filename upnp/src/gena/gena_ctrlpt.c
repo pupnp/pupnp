@@ -886,4 +886,4 @@ exit_function:
 }
 
 	#endif /* INCLUDE_CLIENT_APIS */
-#endif         /* EXCLUDE_GENA */
+#endif	       /* EXCLUDE_GENA */

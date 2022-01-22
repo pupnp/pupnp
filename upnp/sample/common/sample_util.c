@@ -45,7 +45,7 @@
 #include <stdio.h>
 
 #if !UPNP_HAVE_TOOLS
-#error "Need upnptools.h to compile samples ; try ./configure --enable-tools"
+	#error "Need upnptools.h to compile samples ; try ./configure --enable-tools"
 #endif
 
 static int initialize_init = 1;

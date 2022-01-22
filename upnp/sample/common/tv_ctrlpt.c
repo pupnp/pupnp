@@ -1265,9 +1265,7 @@ void *TvCtrlPointTimerLoop(void *args)
  *
  * \return TV_SUCCESS if everything went well, else TV_ERROR.
  */
-int TvCtrlPointStart(char *iface,
-	state_update updateFunctionPtr,
-	int combo)
+int TvCtrlPointStart(char *iface, state_update updateFunctionPtr, int combo)
 {
 	ithread_t timer_thread;
 	int rc;
@@ -1296,9 +1294,12 @@ int TvCtrlPointStart(char *iface,
 			 "\tipv4 address = %s port = %u\n"
 			 "\tipv6 address = %s port = %u\n"
 			 "\tipv6ulagua address = %s port = %u\n",
-		UpnpGetServerIpAddress(), UpnpGetServerPort(),
-		UpnpGetServerIp6Address(), UpnpGetServerPort6(),
-		UpnpGetServerUlaGuaIp6Address(), UpnpGetServerUlaGuaPort6());
+		UpnpGetServerIpAddress(),
+		UpnpGetServerPort(),
+		UpnpGetServerIp6Address(),
+		UpnpGetServerPort6(),
+		UpnpGetServerUlaGuaIp6Address(),
+		UpnpGetServerUlaGuaPort6());
 	SampleUtil_Print("Registering Control Point\n");
 	rc = UpnpRegisterClient(TvCtrlPointCallbackEventHandler,
 		&ctrlpt_handle,
