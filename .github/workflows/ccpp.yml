@@ -114,8 +114,8 @@ jobs:
           cd build
           PATH=$PWD/ixml:$PWD/upnp:$PATH ctest --output-on-failure
           cd ..
-      - name: Debug output
-        run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
+#      - name: Debug output
+#        run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
   # Linux sanitizer builds
   build_asan:
     name: Sanitizer build (ubuntu-20.04) - ${{ matrix.tool }}
