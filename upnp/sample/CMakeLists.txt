@@ -4,70 +4,74 @@ else ()
 	set (UPNP_LIBRARY upnp_static)
 endif()
 
-IF (client)
-	ADD_EXECUTABLE (tv_ctrlpt
+if (client)
+	add_executable (tv_ctrlpt
 		common/sample_util.c
 		common/tv_ctrlpt.c
 		linux/tv_ctrlpt_main.c
 	)
 
-	TARGET_INCLUDE_DIRECTORIES (tv_ctrlpt
+	target_include_directories (tv_ctrlpt
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/common
 		PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/common
 	)
 
-	TARGET_LINK_LIBRARIES (tv_ctrlpt
-		upnp_shared
+	target_link_libraries (tv_ctrlpt
+		${UPNP_LIBRARY}
 	)
 
-	INSTALL (TARGETS tv_ctrlpt
+	install (TARGETS tv_ctrlpt
 		DESTINATION ${CMAKE_INSTALL_BINDIR}
+		COMPONENT UPNP_samples
 	)
-ENDIF (client)
+endif()
 
-IF (client AND device)
-	ADD_EXECUTABLE (tv_combo
+if (client AND device)
+	add_executable (tv_combo
 		common/sample_util.c
 		common/tv_ctrlpt.c
 		common/tv_device.c
 		linux/tv_combo_main.c
 	)
 
-	TARGET_INCLUDE_DIRECTORIES (tv_combo
+	target_include_directories (tv_combo
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/common
 		PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/common
 	)
 
-	TARGET_LINK_LIBRARIES (tv_combo
-		upnp_shared
+	target_link_libraries (tv_combo
+		${UPNP_LIBRARY}
 	)
 
-	INSTALL (TARGETS tv_combo
+	install (TARGETS tv_combo
 		DESTINATION ${CMAKE_INSTALL_BINDIR}
+		COMPONENT UPNP_samples
 	)
-ENDIF (client AND device)
+endif()
 
-IF (device)
-	ADD_EXECUTABLE (tv_device
+if (device)
+	add_executable (tv_device
 		common/sample_util.c
 		common/tv_device.c
 		linux/tv_device_main.c
 	)
 
-	TARGET_INCLUDE_DIRECTORIES (tv_device
+	target_include_directories (tv_device
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/common
 		PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/common
 	)
 
-	TARGET_LINK_LIBRARIES (tv_device
-		upnp_shared
+	target_link_libraries (tv_device
+		${UPNP_LIBRARY}
 	)
 
-	INSTALL (TARGETS tv_device
+	install (TARGETS tv_device
 		DESTINATION ${CMAKE_INSTALL_BINDIR}
+		COMPONENT UPNP_samples
 	)
 
-	INSTALL (DIRECTORY web/
+	install (DIRECTORY web/
 		DESTINATION ${CMAKE_INSTALL_DATADIR}/upnp
+		COMPONENT UPNP_samples
 	)
-ENDIF (device)
+endif()
