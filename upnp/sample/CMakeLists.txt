@@ -1,3 +1,9 @@
+if (UPNP_BUILD_SHARED)
+	set (UPNP_LIBRARY upnp_shared)
+else ()
+	set (UPNP_LIBRARY upnp_static)
+endif()
+
 IF (client)
 	ADD_EXECUTABLE (tv_ctrlpt
 		common/sample_util.c

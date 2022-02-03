@@ -1,92 +1,16 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.11)
 CMAKE_POLICY (VERSION 3.13)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+# C++11 is required
+# Set here before we create any targets
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include (cmake/CmDaB.cmake)
+include (cmake/test-functions.cmake)
+include (cmake/autoheader.cmake)
 
-if (NOT PUPNP_VERSION_STRING)
-	file (GLOB_RECURSE MACROFILES
-		${CMAKE_CURRENT_SOURCE_DIR}/
-		*.m4
-	)
-
-	list (APPEND MACROFILES ${CMAKE_CURRENT_SOURCE_DIR}/configure.ac)
-	list (APPEND WRITTEN_VARS DEBUG)
-	list (APPEND WRITTEN_VARS NDEBUG)
-
-	foreach (MACROFILE ${MACROFILES})
-		file (STRINGS ${MACROFILE} configure)
-		file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm)
-
-		foreach (line ${configure})
-			string (REGEX REPLACE "\\]" "" line ${line})
-			string (REGEX REPLACE "\\[" "" line ${line})
-			string (REGEX REPLACE ";" "" line ${line})
-			string (REGEX REPLACE "[ \t\r\n] *" " " line ${line})
-
-			if (line MATCHES "AC_INIT.* ([0-9]*\\.[0-9]*\\.[0-9]*).*")
-				message (STATUS "Setting package-version to ${CMAKE_MATCH_1}")
-				set (PUPNP_VERSION_STRING ${CMAKE_MATCH_1} CACHE STRING "Version of the whole package" FORCE)
-			elseif (line MATCHES "[. \t]*AC_DEFINE_UNQUOTED *\\(([^,]*), *([^,]*), *([^\\)]*)")
-				set (SAVED_MATCH ${CMAKE_MATCH_1})
-
-				if ("${CMAKE_MATCH_1}" IN_LIST WRITTEN_VARS)
-					continue()
-				endif()
-
-				string (SUBSTRING ${CMAKE_MATCH_2} 0 1 FIRSTCHAR)
-				string (STRIP ${CMAKE_MATCH_3} ${CMAKE_MATCH_3})
-				file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "/* ${CMAKE_MATCH_3} */\n")
-
-				if (FIRSTCHAR STREQUAL "\"") #Should only trigger on UPNP_VERSION_STRING
-					file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine ${CMAKE_MATCH_1} \"\$\{P${CMAKE_MATCH_1}\}\"\n\n")
-				else()
-					string (SUBSTRING ${SAVED_MATCH} 0 1 FIRSTCHAR)
-
-					if (FIRSTCHAR STREQUAL "U") #Should trigger only on UPNP_VERSION*
-						file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine ${SAVED_MATCH} \$\{P${SAVED_MATCH}\}\n\n")
-
-						if (SAVED_MATCH STREQUAL "UPNP_VERSION_MINOR" OR SAVED_MATCH STREQUAL "UPNP_VERSION_PATCH")
-							file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#ifndef ${SAVED_MATCH}\n")
-							file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#       define ${SAVED_MATCH} 0\n")
-							file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#endif\n\n")
-						endif()
-					else()
-						file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine ${SAVED_MATCH} \$\{${SAVED_MATCH}\}\n\n")
-					endif()
-				endif()
-
-				list (APPEND WRITTEN_VARS ${SAVED_MATCH})
-			elseif (line MATCHES "[. \t]*AC_DEFINE *\\(([^,]*), *([^,]*), *([^\\)]*)")
-				if ("${CMAKE_MATCH_1}" IN_LIST WRITTEN_VARS)
-					continue()
-				endif()
-
-				string (STRIP ${CMAKE_MATCH_3} ${CMAKE_MATCH_3})
-				file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "/* ${CMAKE_MATCH_3} */\n")
-				file (APPEND ${CMAKE_CURRENT_BINARY_DIR}/autoconfig.h.cm "#cmakedefine ${CMAKE_MATCH_1} 1\n\n")
- 				list (APPEND WRITTEN_VARS ${CMAKE_MATCH_1})
-			elseif (line MATCHES "^AC_SUBST.*LT_VERSION_IXML, ([0-9]*):([0-9]*):([0-9]*).*")
-				math (EXPR IXML_MAJ "${CMAKE_MATCH_1} - ${CMAKE_MATCH_3}")
-				set (IXML_VERSION_MAJOR ${IXML_MAJ} CACHE STRING "Major version of ixml" FORCE)
-				set (IXML_VERSION_MINOR ${CMAKE_MATCH_3} CACHE STRING "Minor version of ixml" FORCE)
-				set (IXML_VERSION_PATCH ${CMAKE_MATCH_2} CACHE STRING "Patch version of ixml" FORCE)
-				set (IXML_VERSION_STRING ${IXML_MAJ}.${CMAKE_MATCH_3}.${CMAKE_MATCH_2} CACHE STRING "Version of libixml" FORCE)
-				message (STATUS "Setting ixml-soversion to ${IXML_VERSION_STRING}")
-			elseif (line MATCHES "^AC_SUBST.*LT_VERSION_UPNP, ([0-9]*):([0-9]*):([0-9]*).*")
-				math (EXPR UPNP_MAJ "${CMAKE_MATCH_1} - ${CMAKE_MATCH_3}")
-				set (UPNP_VERSION_MAJOR ${UPNP_MAJ} CACHE STRING "Major version of upnp" FORCE)
-				set (UPNP_VERSION_MINOR ${CMAKE_MATCH_3} CACHE STRING "Minor version of upnp" FORCE)
-				set (UPNP_VERSION_PATCH ${CMAKE_MATCH_2} CACHE STRING "Patch version of upnp" FORCE)
-				set (UPNP_VERSION_STRING ${UPNP_MAJ}.${CMAKE_MATCH_3}.${CMAKE_MATCH_2} CACHE STRING "Version of libupnp" FORCE)
-				message (STATUS "Setting upnp-soversion to ${UPNP_VERSION_STRING}")
-			endif()
-		endforeach()
-	endforeach()
-endif()
-
-project (PUPNP VERSION ${PUPNP_VERSION_STRING} LANGUAGES C)
+project (PUPNP VERSION ${PUPNP_VERSION_STRING})
 
 include (GNUInstallDirs)
 
@@ -96,11 +20,10 @@ if (MSVC)
 	set (STATIC_POSTFIX s)
 endif()
 
+option (UPNP_BUILD_SHARED "Build shared libraries" ON)
+option (UPNP_BUILD_STATIC "Build static libraries" ON)
 option (BUILD_TESTING "Run Tests after compile" ON)
 
-if (BUILD_TESTING)
-	enable_testing()
-endif()
 
 if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
 	set (DEFAULT_BUILD_TYPE "Debug")
@@ -108,17 +31,21 @@ endif (EXISTS "${CMAKE_SOURCE_DIR}/.git")
 
 # Set the possible values of build type for cmake-gui
 if (CMAKE_CONFIGURATION_TYPES)
-	set (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE
-		STRING "Semicolon separated list of supported configuration types, only supports debug and release, anything else will be ignored" FORCE
+	set (CMAKE_CONFIGURATION_TYPES "Debug;Release"
+		CACHE STRING
+		"Semicolon separated list of supported configuration types, only supports debug and release, anything else will be ignored"
+		FORCE
 	)
 
-	set_property (CACHE CMAKE_CONFIGURATION_TYPES PROPERTY STRINGS
+	set_property (CACHE CMAKE_CONFIGURATION_TYPES
+		PROPERTY STRINGS
 		"Debug" "Release"
 	)
 endif()
 
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	message (STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
+
 	set (CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}" CACHE
 		STRING "Choose the type of build." FORCE
 	)
@@ -197,19 +124,19 @@ if (open_ssl)
 	endif()
 endif()
 
-option (blocking_tcp_connections "blocking TCP connections" ON)
-
+option (blocking_tcp_connections "blocking TCP connections" OFF)
 if (blocking_tcp_connections)
 	set (UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS 1) #see upnpconfig.h
 endif()
 
 option (scriptsupport "script support for IXML document tree, see ixml.h" ON)
 set (IXML_HAVE_SCRIPTSUPPORT ${scriptsupport}) #see upnpconfig.h
-option (postwrite "write to the filesystem on otherwise unhandled POST requests" OFF)
-set (UPNP_ENABLE_POST_WRITE ${postwrite}) #see upnpconfig.h
-option (reuseaddr "bind the miniserver socket with reuseaddr to allow clean restarts" OFF)
+
+option (reuseaddr "Bind the miniserver socket with SO_REUSEADDR to allow clean restarts" ON)
 set (UPNP_MINISERVER_REUSEADDR ${reuseaddr}) #see upnpconfig.h
+
 option (samples "compilation of upnp/sample/ code" ON)
+
 find_package (Git)
 cmake_dependent_option (DOWNLOAD_AND_BUILD_DEPS "Get all missing stuff" OFF ${Git_FOUND} OFF)
 
@@ -333,6 +260,9 @@ endif()
 check_function_exists (strnlen HAVE_STRNLEN)
 check_function_exists (strndup HAVE_STRNDUP)
 
+include(CheckCCompilerFlag)
+check_c_compiler_flag(-fmacro-prefix-map=from=to HAVE_MACRO_PREFIX_MAP)
+
 if (Solaris)
 	set (CMAKE_REQUIRED_LIBRARIES socket)
 	check_function_exists (bind HAVE_SOCKET)
@@ -443,7 +373,7 @@ configure_package_config_file (
 )
 
 write_basic_package_version_file (IXMLConfigVersion.cmake
-	VERSION ${PUPNP_VERSION_STRING}
+	VERSION ${IXML_VERSION_STRING}
 	COMPATIBILITY SameMajorVersion
 )
 
@@ -453,7 +383,7 @@ configure_package_config_file (
 )
 
 write_basic_package_version_file (UPNPConfigVersion.cmake
-	VERSION ${PUPNP_VERSION_STRING}
+	VERSION ${UPNP_VERSION_STRING}
 	COMPATIBILITY SameMajorVersion
 )
 
@@ -485,3 +415,16 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/libupnp.pc.in ${CMAKE_CURRENT_BINARY
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libupnp.pc
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
+
+if (BUILD_TESTING)
+	enable_testing()
+
+	#find_package (GTest CONFIG)
+
+	#if (GTest_FOUND)
+		#add_subdirectory (gtest)
+	#elseif (DOWNLOAD_AND_BUILD_DEPS AND NOT GTest_FOUND)
+		#CmDaB_install (googletest)
+		#add_subdirectory (gtest)
+	#endif()
+endif()
