@@ -48,8 +48,8 @@ jobs:
           cd build
           ctest --output-on-failure
           cd ..
-      #- name: Debug output
-      #  run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
+      - name: Debug output
+        run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
   # Windows Visual Studio builds
   windows-msvc:
     name: Build (${{ matrix.os }})  - ${{ matrix.conf }}
@@ -77,8 +77,8 @@ jobs:
           cd build
           ctest --output-on-failure -C ${{ matrix.conf }}
           cd ..
-      #- name: Debug output
-      #  run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
+      - name: Debug output
+        run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
   # Windows msys2 builds
   windows-msys2:
     runs-on: windows-latest
