@@ -126,12 +126,7 @@ function (UPNP_findTestEnv testName resultVar)
 		string (APPEND tempEnv "${entry}${separator}")
 	endforeach()
 
-	if (MSVC)
-		string (APPEND tempEnv "%PATH%")
-	else()
-		string (APPEND tempEnv "$ENV{PATH}")
-	endif()
-
+	string (APPEND tempEnv "$ENV{PATH}")
 	set (${resultVar} ${tempEnv} PARENT_SCOPE)
 endfunction()
 
