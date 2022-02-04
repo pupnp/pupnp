@@ -97,7 +97,7 @@ function (UPNP_addUnitTest testName sourceFile)
 
 		if (MSVC OR MSYS OR MINGW)
 			UPNP_findTestEnv (${testName} TEST_ENV)
-message(STATUS "Setting test-env to ${TEST_ENV}")
+
 			set_tests_properties (${testName} PROPERTIES
 				ENVIRONMENT "${TEST_ENV}"
 			)
