@@ -95,7 +95,7 @@ function (UPNP_addUnitTest testName sourceFile)
 			COMMAND ${testName}
 		)
 
-		if (MSVC)
+		if (MSVC OR MSYS)
 			UPNP_findTestEnv (${testName} TEST_ENV)
 message(STATUS "Setting test-env to ${TEST_ENV}")
 			set_tests_properties (${testName} PROPERTIES
@@ -116,11 +116,22 @@ function (UPNP_findTestEnv testName resultVar)
 	UPNP_findTestLibs (${testName} ${resultVar})
 	set (tempEnv "PATH=")
 
+	if (MSVC)
+		set (separator "\\\;")
+	else()
+		set (separator ":")
+	endif()
+
 	foreach (entry IN ITEMS ${${resultVar}})
-		string (APPEND tempEnv "${entry}\\\;")
+		string (APPEND tempEnv "${entry}${separator}")
 	endforeach()
 
-	string (APPEND tempEnv "%PATH%")
+	if (MSVC)
+		string (APPEND tempEnv "%PATH%")
+	else()
+		string (APPEND tempEnv "$ENV{PATH}")
+	endif()
+
 	set (${resultVar} ${tempEnv} PARENT_SCOPE)
 endfunction()
 
