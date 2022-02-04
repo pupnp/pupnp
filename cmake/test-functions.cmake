@@ -116,7 +116,7 @@ function (UPNP_findTestEnv testName resultVar)
 	UPNP_findTestLibs (${testName} ${resultVar})
 	set (tempEnv "PATH=")
 
-	if (MSVC)
+	if (MSVC OR MINGW)
 		set (separator "\\\;")
 	else()
 		set (separator ":")
