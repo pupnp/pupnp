@@ -155,7 +155,6 @@ if (NOT WIN32)
 	set (HAVE_STDLIB_H stdlib.h)
 	set (HAVE_STRING_H string.h)
 	set (HAVE_IOCTL_H sys/ioctl.h)
-	set (HAVE_SOCKET_H sys/socket.h)
 	set (HAVE_TIME_H sys/time.h)
 	set (HAVE_SYSLOG_H syslog.h)
 	set (HAVE_UNISTD_H unistd.h)
@@ -170,7 +169,6 @@ if (NOT WIN32)
 		HAVE_STDLIB_H
 		HAVE_STRING_H
 		HAVE_IOCTL_H
-		HAVE_SOCKET_H
 		HAVE_TIME_H
 		HAVE_SYSLOG_H
 		HAVE_UNISTD_H
