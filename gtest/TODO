@@ -1,0 +1,33 @@
+// Author: 2021-03-26 - Ingo Höft
+
+General
+-------
+* Make tests running on new library interface with UpnpLib structure
+    finished 2021-03-25
+* Running tests on the shared libupnp library
+    finished 2021-04-02
+* Replace compile.sh scripts with scripts for cmake if useful
+    finished 2021-04-02
+* Make available tests more specific with Matchers and Actions
+
+IPv4 Gtests for the Unix platform
+---------------------------------
+* First gtest for UpnpGetIfInfo
+    finished 2021-03-07
+* First gtest for UpnpInit2
+    finished 2021-03-16
+* First gtest for StartMiniServer
+* First gtest for StopMiniServer
+* First gtest for UpnpEnableWebserver
+
+Gtests for other platforms
+--------------------------
+* Make IPv4 tests running for MS Windows
+
+IPv6 Gtests for the Unix platform
+---------------------------------
+* First gtest for UpnpGetIfInfo
+* First gtest for UpnpInit2
+* First gtest for StartMiniServer
+* First gtest for StopMiniServer
+* First gtest for UpnpEnableWebserver
