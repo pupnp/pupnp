@@ -19,7 +19,7 @@ function (UPNP_addGTest testName sourceFile)
 			PRIVATE GTest::gmock
 		)
 
-		UPNP_gtest_add_tests (TARGET ${testName}
+		gtest_add_tests (TARGET ${testName}
 			TEST_PREFIX test-upnp-
 			TEST_LIST GTEST_${testName}
 		)
@@ -46,7 +46,7 @@ function (UPNP_addGTest testName sourceFile)
 			PRIVATE GTest::gmock
 		)
 
-		UPNP_gtest_add_tests (TARGET ${testName}-static
+		gtest_add_tests (TARGET ${testName}-static
 			TEST_PREFIX test-upnp-
 			TEST_SUFFIX -static
 		)
