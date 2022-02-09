@@ -1,3 +1,4 @@
+
 if (BUILD_TESTING)
 	add_subdirectory (test)
 endif()
@@ -23,6 +24,7 @@ add_library (IXML::Shared ALIAS ixml_shared)
 
 target_compile_definitions (ixml_shared
 	PRIVATE $<$<BOOL:${script_support}>:IXML_HAVE_SCRIPTSUPPORT>
+	PRIVATE LIBUPNP_EXPORTS
 	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
 	PUBLIC $<$<BOOL:${MSVC}>:LIBUPNP_EXPORTS>
@@ -48,6 +50,7 @@ set_target_properties (ixml_shared PROPERTIES
 	VERSION ${IXML_VERSION_STRING}
 	SOVERSION ${IXML_VERSION_MAJOR}
 	PUBLIC_HEADER "${IXML_HEADERS}"
+	C_VISIBILITY_PRESET "hidden"
 )
 
 install (TARGETS ixml_shared
@@ -68,10 +71,12 @@ set_target_properties (ixml_static PROPERTIES
 	EXPORT_NAME IXML::Static
 	VERSION ${IXML_VERSION_MAJOR}
 	SOVERSION ${IXML_VERSION_STRING}
+	C_VISIBILITY_PRESET "hidden"
 )
 
 target_compile_definitions (ixml_static
 	PRIVATE $<$<BOOL:${script_support}>:IXML_HAVE_SCRIPTSUPPORT>
+	PRIVATE LIBUPNP_EXPORTS
 	PUBLIC UPNP_STATIC_LIB
 	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
 	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
