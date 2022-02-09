@@ -87,7 +87,17 @@ typedef __int64 int64_t;
 	 * Every funtion that belongs to the library API must use this
 	 * definition upon declaration or it will not be exported
 	 */
-	#define EXPORT_SPEC
+	#ifdef UPNP_STATIC_LIB
+		#define UPNP_EXPORT_SPEC
+	#else /* UPNP_STATIC_LIB */
+		#ifdef LIBUPNP_EXPORTS
+			/*! set up default visibility for shared-lib export to make
+			 * functions visible to library users */
+			#define UPNP_EXPORT_SPEC __attribute__((visibility("default")))
+		#else /* LIBUPNP_EXPORTS */
+			#define UPNP_EXPORT_SPEC
+		#endif /* LIBUPNP_EXPORTS */
+	#endif
 
 	/*!
 	 * \brief Declares an inline function.
