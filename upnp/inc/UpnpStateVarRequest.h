@@ -40,14 +40,18 @@ UPNP_EXPORT_SPEC int UpnpStateVarRequest_assign(
 	UpnpStateVarRequest *p, const UpnpStateVarRequest *q);
 
 /*! UpnpStateVarRequest_get_ErrCode */
-UPNP_EXPORT_SPEC int UpnpStateVarRequest_get_ErrCode(const UpnpStateVarRequest *p);
+UPNP_EXPORT_SPEC int UpnpStateVarRequest_get_ErrCode(
+	const UpnpStateVarRequest *p);
 /*! UpnpStateVarRequest_set_ErrCode */
-UPNP_EXPORT_SPEC int UpnpStateVarRequest_set_ErrCode(UpnpStateVarRequest *p, int n);
+UPNP_EXPORT_SPEC int UpnpStateVarRequest_set_ErrCode(
+	UpnpStateVarRequest *p, int n);
 
 /*! UpnpStateVarRequest_get_Socket */
-UPNP_EXPORT_SPEC int UpnpStateVarRequest_get_Socket(const UpnpStateVarRequest *p);
+UPNP_EXPORT_SPEC int UpnpStateVarRequest_get_Socket(
+	const UpnpStateVarRequest *p);
 /*! UpnpStateVarRequest_set_Socket */
-UPNP_EXPORT_SPEC int UpnpStateVarRequest_set_Socket(UpnpStateVarRequest *p, int n);
+UPNP_EXPORT_SPEC int UpnpStateVarRequest_set_Socket(
+	UpnpStateVarRequest *p, int n);
 
 /*! UpnpStateVarRequest_get_ErrStr */
 UPNP_EXPORT_SPEC const UpnpString *UpnpStateVarRequest_get_ErrStr(
@@ -110,7 +114,8 @@ UPNP_EXPORT_SPEC int UpnpStateVarRequest_strcpy_ServiceID(
 UPNP_EXPORT_SPEC int UpnpStateVarRequest_strncpy_ServiceID(
 	UpnpStateVarRequest *p, const char *s, size_t n);
 /*! UpnpStateVarRequest_clear_ServiceID */
-UPNP_EXPORT_SPEC void UpnpStateVarRequest_clear_ServiceID(UpnpStateVarRequest *p);
+UPNP_EXPORT_SPEC void UpnpStateVarRequest_clear_ServiceID(
+	UpnpStateVarRequest *p);
 
 /*! UpnpStateVarRequest_get_StateVarName */
 UPNP_EXPORT_SPEC const UpnpString *UpnpStateVarRequest_get_StateVarName(
@@ -131,16 +136,18 @@ UPNP_EXPORT_SPEC int UpnpStateVarRequest_strcpy_StateVarName(
 UPNP_EXPORT_SPEC int UpnpStateVarRequest_strncpy_StateVarName(
 	UpnpStateVarRequest *p, const char *s, size_t n);
 /*! UpnpStateVarRequest_clear_StateVarName */
-UPNP_EXPORT_SPEC void UpnpStateVarRequest_clear_StateVarName(UpnpStateVarRequest *p);
+UPNP_EXPORT_SPEC void UpnpStateVarRequest_clear_StateVarName(
+	UpnpStateVarRequest *p);
 
 /*! UpnpStateVarRequest_get_CtrlPtIPAddr */
-UPNP_EXPORT_SPEC const struct sockaddr_storage *UpnpStateVarRequest_get_CtrlPtIPAddr(
-	const UpnpStateVarRequest *p);
+UPNP_EXPORT_SPEC const struct sockaddr_storage *
+UpnpStateVarRequest_get_CtrlPtIPAddr(const UpnpStateVarRequest *p);
 /*! UpnpStateVarRequest_get_CtrlPtIPAddr */
 UPNP_EXPORT_SPEC int UpnpStateVarRequest_set_CtrlPtIPAddr(
 	UpnpStateVarRequest *p, const struct sockaddr_storage *buf);
 /*! UpnpStateVarRequest_get_CtrlPtIPAddr */
-UPNP_EXPORT_SPEC void UpnpStateVarRequest_clear_CtrlPtIPAddr(UpnpStateVarRequest *p);
+UPNP_EXPORT_SPEC void UpnpStateVarRequest_clear_CtrlPtIPAddr(
+	UpnpStateVarRequest *p);
 
 /*! UpnpStateVarRequest_get_CurrentVal */
 UPNP_EXPORT_SPEC const DOMString UpnpStateVarRequest_get_CurrentVal(

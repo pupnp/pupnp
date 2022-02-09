@@ -155,13 +155,14 @@ UPNP_EXPORT_SPEC int UpnpActionRequest_set_SoapHeader(
 	UpnpActionRequest *p, IXML_Document *n);
 
 /*! UpnpActionRequest_get_CtrlPtIPAddr */
-UPNP_EXPORT_SPEC const struct sockaddr_storage *UpnpActionRequest_get_CtrlPtIPAddr(
-	const UpnpActionRequest *p);
+UPNP_EXPORT_SPEC const struct sockaddr_storage *
+UpnpActionRequest_get_CtrlPtIPAddr(const UpnpActionRequest *p);
 /*! UpnpActionRequest_get_CtrlPtIPAddr */
 UPNP_EXPORT_SPEC int UpnpActionRequest_set_CtrlPtIPAddr(
 	UpnpActionRequest *p, const struct sockaddr_storage *buf);
 /*! UpnpActionRequest_get_CtrlPtIPAddr */
-UPNP_EXPORT_SPEC void UpnpActionRequest_clear_CtrlPtIPAddr(UpnpActionRequest *p);
+UPNP_EXPORT_SPEC void UpnpActionRequest_clear_CtrlPtIPAddr(
+	UpnpActionRequest *p);
 
 /*! UpnpActionRequest_get_Os */
 UPNP_EXPORT_SPEC const UpnpString *UpnpActionRequest_get_Os(
@@ -170,7 +171,8 @@ UPNP_EXPORT_SPEC const UpnpString *UpnpActionRequest_get_Os(
 UPNP_EXPORT_SPEC int UpnpActionRequest_set_Os(
 	UpnpActionRequest *p, const UpnpString *s);
 /*! UpnpActionRequest_get_Os_Length */
-UPNP_EXPORT_SPEC size_t UpnpActionRequest_get_Os_Length(const UpnpActionRequest *p);
+UPNP_EXPORT_SPEC size_t UpnpActionRequest_get_Os_Length(
+	const UpnpActionRequest *p);
 /*! UpnpActionRequest_get_Os_cstr */
 UPNP_EXPORT_SPEC const char *UpnpActionRequest_get_Os_cstr(
 	const UpnpActionRequest *p);

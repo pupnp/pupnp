@@ -29,7 +29,8 @@ typedef struct s_UpnpSubscriptionRequest UpnpSubscriptionRequest;
 /*! Constructor */
 UPNP_EXPORT_SPEC UpnpSubscriptionRequest *UpnpSubscriptionRequest_new();
 /*! Destructor */
-UPNP_EXPORT_SPEC void UpnpSubscriptionRequest_delete(UpnpSubscriptionRequest *p);
+UPNP_EXPORT_SPEC void UpnpSubscriptionRequest_delete(
+	UpnpSubscriptionRequest *p);
 /*! Copy Constructor */
 UPNP_EXPORT_SPEC UpnpSubscriptionRequest *UpnpSubscriptionRequest_dup(
 	const UpnpSubscriptionRequest *p);
@@ -78,7 +79,8 @@ UPNP_EXPORT_SPEC int UpnpSubscriptionRequest_strcpy_UDN(
 UPNP_EXPORT_SPEC int UpnpSubscriptionRequest_strncpy_UDN(
 	UpnpSubscriptionRequest *p, const char *s, size_t n);
 /*! UpnpSubscriptionRequest_clear_UDN */
-UPNP_EXPORT_SPEC void UpnpSubscriptionRequest_clear_UDN(UpnpSubscriptionRequest *p);
+UPNP_EXPORT_SPEC void UpnpSubscriptionRequest_clear_UDN(
+	UpnpSubscriptionRequest *p);
 
 /*! UpnpSubscriptionRequest_get_SID */
 UPNP_EXPORT_SPEC const UpnpString *UpnpSubscriptionRequest_get_SID(
@@ -99,7 +101,8 @@ UPNP_EXPORT_SPEC int UpnpSubscriptionRequest_strcpy_SID(
 UPNP_EXPORT_SPEC int UpnpSubscriptionRequest_strncpy_SID(
 	UpnpSubscriptionRequest *p, const char *s, size_t n);
 /*! UpnpSubscriptionRequest_clear_SID */
-UPNP_EXPORT_SPEC void UpnpSubscriptionRequest_clear_SID(UpnpSubscriptionRequest *p);
+UPNP_EXPORT_SPEC void UpnpSubscriptionRequest_clear_SID(
+	UpnpSubscriptionRequest *p);
 
 #ifdef __cplusplus
 }

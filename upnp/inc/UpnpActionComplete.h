@@ -39,9 +39,11 @@ UPNP_EXPORT_SPEC int UpnpActionComplete_assign(
 	UpnpActionComplete *p, const UpnpActionComplete *q);
 
 /*! UpnpActionComplete_get_ErrCode */
-UPNP_EXPORT_SPEC int UpnpActionComplete_get_ErrCode(const UpnpActionComplete *p);
+UPNP_EXPORT_SPEC int UpnpActionComplete_get_ErrCode(
+	const UpnpActionComplete *p);
 /*! UpnpActionComplete_set_ErrCode */
-UPNP_EXPORT_SPEC int UpnpActionComplete_set_ErrCode(UpnpActionComplete *p, int n);
+UPNP_EXPORT_SPEC int UpnpActionComplete_set_ErrCode(
+	UpnpActionComplete *p, int n);
 
 /*! UpnpActionComplete_get_CtrlUrl */
 UPNP_EXPORT_SPEC const UpnpString *UpnpActionComplete_get_CtrlUrl(
