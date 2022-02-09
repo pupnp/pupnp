@@ -106,7 +106,7 @@ typedef enum Upnp_LogLevel_e
  *
  * \return -1 if fails or UPNP_E_SUCCESS if succeeds.
  */
-int UpnpInitLog(void);
+UPNP_EXPORT_SPEC int UpnpInitLog(void);
 
 #if defined NDEBUG && !defined UPNP_DEBUG_C
 	#define UpnpInitLog UpnpInitLog_Inlined
@@ -115,7 +115,7 @@ static UPNP_INLINE int UpnpInitLog_Inlined(void) { return UPNP_E_SUCCESS; }
 /*!
  * \brief Set the log level (see \c Upnp_LogLevel).
  */
-void UpnpSetLogLevel(
+UPNP_EXPORT_SPEC void UpnpSetLogLevel(
 	/*! [in] Log level. */
 	Upnp_LogLevel log_level);
 
@@ -143,7 +143,7 @@ static UPNP_INLINE void UpnpCloseLog_Inlined(void) {}
  * second parameter has been kept for compatibility but is ignored.
  * Use a NULL file name for logging to stderr.
  */
-void UpnpSetLogFileNames(
+UPNP_EXPORT_SPEC void UpnpSetLogFileNames(
 	/*! [in] Name of the log file. */
 	const char *fileName,
 	/*! [in] Ignored. */
