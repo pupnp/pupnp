@@ -38,7 +38,8 @@ UPNP_EXPORT_SPEC void UpnpFileInfo_delete(UpnpFileInfo *p);
 /*! Copy Constructor */
 UPNP_EXPORT_SPEC UpnpFileInfo *UpnpFileInfo_dup(const UpnpFileInfo *p);
 /*! Assignment operator */
-UPNP_EXPORT_SPEC int UpnpFileInfo_assign(UpnpFileInfo *p, const UpnpFileInfo *q);
+UPNP_EXPORT_SPEC int UpnpFileInfo_assign(
+	UpnpFileInfo *p, const UpnpFileInfo *q);
 
 /*! UpnpFileInfo_get_FileLength */
 UPNP_EXPORT_SPEC off_t UpnpFileInfo_get_FileLength(const UpnpFileInfo *p);
@@ -61,7 +62,8 @@ UPNP_EXPORT_SPEC int UpnpFileInfo_get_IsReadable(const UpnpFileInfo *p);
 UPNP_EXPORT_SPEC int UpnpFileInfo_set_IsReadable(UpnpFileInfo *p, int n);
 
 /*! UpnpFileInfo_get_ContentType */
-UPNP_EXPORT_SPEC const DOMString UpnpFileInfo_get_ContentType(const UpnpFileInfo *p);
+UPNP_EXPORT_SPEC const DOMString UpnpFileInfo_get_ContentType(
+	const UpnpFileInfo *p);
 /*! UpnpFileInfo_set_ContentType */
 UPNP_EXPORT_SPEC int UpnpFileInfo_set_ContentType(
 	UpnpFileInfo *p, const DOMString s);

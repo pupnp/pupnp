@@ -38,14 +38,18 @@ UPNP_EXPORT_SPEC int UpnpEventSubscribe_assign(
 	UpnpEventSubscribe *p, const UpnpEventSubscribe *q);
 
 /*! UpnpEventSubscribe_get_ErrCode */
-UPNP_EXPORT_SPEC int UpnpEventSubscribe_get_ErrCode(const UpnpEventSubscribe *p);
+UPNP_EXPORT_SPEC int UpnpEventSubscribe_get_ErrCode(
+	const UpnpEventSubscribe *p);
 /*! UpnpEventSubscribe_set_ErrCode */
-UPNP_EXPORT_SPEC int UpnpEventSubscribe_set_ErrCode(UpnpEventSubscribe *p, int n);
+UPNP_EXPORT_SPEC int UpnpEventSubscribe_set_ErrCode(
+	UpnpEventSubscribe *p, int n);
 
 /*! UpnpEventSubscribe_get_TimeOut */
-UPNP_EXPORT_SPEC int UpnpEventSubscribe_get_TimeOut(const UpnpEventSubscribe *p);
+UPNP_EXPORT_SPEC int UpnpEventSubscribe_get_TimeOut(
+	const UpnpEventSubscribe *p);
 /*! UpnpEventSubscribe_set_TimeOut */
-UPNP_EXPORT_SPEC int UpnpEventSubscribe_set_TimeOut(UpnpEventSubscribe *p, int n);
+UPNP_EXPORT_SPEC int UpnpEventSubscribe_set_TimeOut(
+	UpnpEventSubscribe *p, int n);
 
 /*! UpnpEventSubscribe_get_SID */
 UPNP_EXPORT_SPEC const UpnpString *UpnpEventSubscribe_get_SID(
@@ -87,7 +91,8 @@ UPNP_EXPORT_SPEC int UpnpEventSubscribe_strcpy_PublisherUrl(
 UPNP_EXPORT_SPEC int UpnpEventSubscribe_strncpy_PublisherUrl(
 	UpnpEventSubscribe *p, const char *s, size_t n);
 /*! UpnpEventSubscribe_clear_PublisherUrl */
-UPNP_EXPORT_SPEC void UpnpEventSubscribe_clear_PublisherUrl(UpnpEventSubscribe *p);
+UPNP_EXPORT_SPEC void UpnpEventSubscribe_clear_PublisherUrl(
+	UpnpEventSubscribe *p);
 
 #ifdef __cplusplus
 }

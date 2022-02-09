@@ -39,7 +39,8 @@ UPNP_EXPORT_SPEC int UpnpStateVarComplete_assign(
 	UpnpStateVarComplete *p, const UpnpStateVarComplete *q);
 
 /*! UpnpStateVarComplete_get_ErrCode */
-UPNP_EXPORT_SPEC int UpnpStateVarComplete_get_ErrCode(const UpnpStateVarComplete *p);
+UPNP_EXPORT_SPEC int UpnpStateVarComplete_get_ErrCode(
+	const UpnpStateVarComplete *p);
 /*! UpnpStateVarComplete_set_ErrCode */
 UPNP_EXPORT_SPEC int UpnpStateVarComplete_set_ErrCode(
 	UpnpStateVarComplete *p, int n);
@@ -63,7 +64,8 @@ UPNP_EXPORT_SPEC int UpnpStateVarComplete_strcpy_CtrlUrl(
 UPNP_EXPORT_SPEC int UpnpStateVarComplete_strncpy_CtrlUrl(
 	UpnpStateVarComplete *p, const char *s, size_t n);
 /*! UpnpStateVarComplete_clear_CtrlUrl */
-UPNP_EXPORT_SPEC void UpnpStateVarComplete_clear_CtrlUrl(UpnpStateVarComplete *p);
+UPNP_EXPORT_SPEC void UpnpStateVarComplete_clear_CtrlUrl(
+	UpnpStateVarComplete *p);
 
 /*! UpnpStateVarComplete_get_StateVarName */
 UPNP_EXPORT_SPEC const UpnpString *UpnpStateVarComplete_get_StateVarName(

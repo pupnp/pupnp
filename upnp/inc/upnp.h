@@ -2623,7 +2623,8 @@ typedef int (*VDCallback_GetInfo)(
  *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
  *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
  */
-UPNP_EXPORT_SPEC int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback);
+UPNP_EXPORT_SPEC int UpnpVirtualDir_set_GetInfoCallback(
+	VDCallback_GetInfo callback);
 
 /*!
  * \brief Open callback function prototype.
@@ -2697,7 +2698,8 @@ typedef int (*VDCallback_Write)(
  *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
  *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
  */
-UPNP_EXPORT_SPEC int UpnpVirtualDir_set_WriteCallback(VDCallback_Write callback);
+UPNP_EXPORT_SPEC int UpnpVirtualDir_set_WriteCallback(
+	VDCallback_Write callback);
 
 /*!
  * \brief Seek callback function prototype.
@@ -2748,7 +2750,8 @@ typedef int (*VDCallback_Close)(
  *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
  *       \li \c UPNP_E_INVALID_ARGUMENT: \b callback is not a valid pointer.
  */
-UPNP_EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback);
+UPNP_EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(
+	VDCallback_Close callback);
 
 /*!
  * \brief Enables or disables the webserver.

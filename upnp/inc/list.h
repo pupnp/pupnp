@@ -67,14 +67,16 @@ UPNP_EXPORT_SPEC UpnpListIter UpnpListBegin(UpnpListHead *list);
 UPNP_EXPORT_SPEC UpnpListIter UpnpListEnd(UpnpListHead *list);
 
 /** Return iterator pointing to element after pos, or end() */
-UPNP_EXPORT_SPEC UpnpListIter UpnpListNext(UpnpListHead *list, UpnpListIter pos);
+UPNP_EXPORT_SPEC UpnpListIter UpnpListNext(
+	UpnpListHead *list, UpnpListIter pos);
 
 /** Insert element before pos, returns iterator pointing to inserted element. */
 UPNP_EXPORT_SPEC UpnpListIter UpnpListInsert(
 	UpnpListHead *list, UpnpListIter pos, UpnpListHead *elt);
 
 /** Erase element at pos, return next one, or end()*/
-UPNP_EXPORT_SPEC UpnpListIter UpnpListErase(UpnpListHead *list, UpnpListIter pos);
+UPNP_EXPORT_SPEC UpnpListIter UpnpListErase(
+	UpnpListHead *list, UpnpListIter pos);
 
 #ifdef __cplusplus
 }

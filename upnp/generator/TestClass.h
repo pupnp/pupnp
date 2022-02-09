@@ -53,9 +53,11 @@ UPNP_EXPORT_SPEC int TestClass_get_TheInteger(const TestClass *p);
 UPNP_EXPORT_SPEC int TestClass_set_TheInteger(TestClass *p, int n);
 
 /*! TestClass_get_TheUnsignedLong */
-UPNP_EXPORT_SPEC unsigned long TestClass_get_TheUnsignedLong(const TestClass *p);
+UPNP_EXPORT_SPEC unsigned long TestClass_get_TheUnsignedLong(
+	const TestClass *p);
 /*! TestClass_set_TheUnsignedLong */
-UPNP_EXPORT_SPEC int TestClass_set_TheUnsignedLong(TestClass *p, unsigned long n);
+UPNP_EXPORT_SPEC int TestClass_set_TheUnsignedLong(
+	TestClass *p, unsigned long n);
 
 /*! TestClass_get_TheCharPointer */
 UPNP_EXPORT_SPEC char *TestClass_get_TheCharPointer(const TestClass *p);
@@ -63,7 +65,8 @@ UPNP_EXPORT_SPEC char *TestClass_get_TheCharPointer(const TestClass *p);
 UPNP_EXPORT_SPEC int TestClass_set_TheCharPointer(TestClass *p, char *n);
 
 /*! TestClass_get_TheBuffer */
-UPNP_EXPORT_SPEC const struct TheStruct *TestClass_get_TheBuffer(const TestClass *p);
+UPNP_EXPORT_SPEC const struct TheStruct *TestClass_get_TheBuffer(
+	const TestClass *p);
 /*! TestClass_get_TheBuffer */
 UPNP_EXPORT_SPEC int TestClass_set_TheBuffer(
 	TestClass *p, const struct TheStruct *buf);
@@ -96,9 +99,11 @@ UPNP_EXPORT_SPEC void TestClass_clear_TheString(TestClass *p);
 /*! TestClass_get_TheDomString */
 UPNP_EXPORT_SPEC const DOMString TestClass_get_TheDomString(const TestClass *p);
 /*! TestClass_set_TheDomString */
-UPNP_EXPORT_SPEC int TestClass_set_TheDomString(TestClass *p, const DOMString s);
+UPNP_EXPORT_SPEC int TestClass_set_TheDomString(
+	TestClass *p, const DOMString s);
 /*! TestClass_get_TheDomString_cstr */
-UPNP_EXPORT_SPEC const char *TestClass_get_TheDomString_cstr(const TestClass *p);
+UPNP_EXPORT_SPEC const char *TestClass_get_TheDomString_cstr(
+	const TestClass *p);
 
 #ifdef __cplusplus
 }

@@ -91,9 +91,10 @@ typedef __int64 int64_t;
 		#define UPNP_EXPORT_SPEC
 	#else /* UPNP_STATIC_LIB */
 		#ifdef LIBUPNP_EXPORTS
-			/*! set up default visibility for shared-lib export to make
-			 * functions visible to library users */
-			#define UPNP_EXPORT_SPEC __attribute__((visibility("default")))
+			/*! set up default visibility for shared-lib export to
+			 * make functions visible to library users */
+			#define UPNP_EXPORT_SPEC \
+				__attribute__((visibility("default")))
 		#else /* LIBUPNP_EXPORTS */
 			#define UPNP_EXPORT_SPEC
 		#endif /* LIBUPNP_EXPORTS */
