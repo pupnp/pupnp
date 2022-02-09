@@ -85,8 +85,7 @@ typedef __int64 int64_t;
 	 * \brief Export functions on WIN32 DLLs.
 	 *
 	 * Every funtion that belongs to the library API must use this
-	 * definition upon declaration or it will not be exported on WIN32
-	 * DLLs.
+	 * definition upon declaration or it will not be exported
 	 */
 	#define EXPORT_SPEC
 
