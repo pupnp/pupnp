@@ -57,24 +57,24 @@ typedef struct UpnpListHead
 typedef UpnpListHead *UpnpListIter;
 
 /** Initialize empty list */
-EXPORT_SPEC void UpnpListInit(UpnpListHead *list);
+UPNP_EXPORT_SPEC void UpnpListInit(UpnpListHead *list);
 
 /** Return iterator pointing to the first list element, or
  *  UpnpListEnd(list) if the list is empty */
-EXPORT_SPEC UpnpListIter UpnpListBegin(UpnpListHead *list);
+UPNP_EXPORT_SPEC UpnpListIter UpnpListBegin(UpnpListHead *list);
 
 /** Return end of list sentinel iterator (not an element) */
-EXPORT_SPEC UpnpListIter UpnpListEnd(UpnpListHead *list);
+UPNP_EXPORT_SPEC UpnpListIter UpnpListEnd(UpnpListHead *list);
 
 /** Return iterator pointing to element after pos, or end() */
-EXPORT_SPEC UpnpListIter UpnpListNext(UpnpListHead *list, UpnpListIter pos);
+UPNP_EXPORT_SPEC UpnpListIter UpnpListNext(UpnpListHead *list, UpnpListIter pos);
 
 /** Insert element before pos, returns iterator pointing to inserted element. */
-EXPORT_SPEC UpnpListIter UpnpListInsert(
+UPNP_EXPORT_SPEC UpnpListIter UpnpListInsert(
 	UpnpListHead *list, UpnpListIter pos, UpnpListHead *elt);
 
 /** Erase element at pos, return next one, or end()*/
-EXPORT_SPEC UpnpListIter UpnpListErase(UpnpListHead *list, UpnpListIter pos);
+UPNP_EXPORT_SPEC UpnpListIter UpnpListErase(UpnpListHead *list, UpnpListIter pos);
 
 #ifdef __cplusplus
 }

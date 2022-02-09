@@ -13,7 +13,7 @@
  */
 #include <stdlib.h> /* for size_t */
 
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
+#include "UpnpGlobal.h" /* for UPNP_EXPORT_SPEC */
 
 #include "Callback.h"
 #include "UpnpDiscovery.h"
@@ -28,32 +28,32 @@ extern "C" {
 typedef struct s_SSDPResultData SSDPResultData;
 
 /*! Constructor */
-EXPORT_SPEC SSDPResultData *SSDPResultData_new();
+UPNP_EXPORT_SPEC SSDPResultData *SSDPResultData_new();
 /*! Destructor */
-EXPORT_SPEC void SSDPResultData_delete(SSDPResultData *p);
+UPNP_EXPORT_SPEC void SSDPResultData_delete(SSDPResultData *p);
 /*! Copy Constructor */
-EXPORT_SPEC SSDPResultData *SSDPResultData_dup(const SSDPResultData *p);
+UPNP_EXPORT_SPEC SSDPResultData *SSDPResultData_dup(const SSDPResultData *p);
 /*! Assignment operator */
-EXPORT_SPEC int SSDPResultData_assign(
+UPNP_EXPORT_SPEC int SSDPResultData_assign(
 	SSDPResultData *p, const SSDPResultData *q);
 
 /*! SSDPResultData_get_Param */
-EXPORT_SPEC const UpnpDiscovery *SSDPResultData_get_Param(
+UPNP_EXPORT_SPEC const UpnpDiscovery *SSDPResultData_get_Param(
 	const SSDPResultData *p);
 /*! SSDPResultData_set_Param */
-EXPORT_SPEC int SSDPResultData_set_Param(
+UPNP_EXPORT_SPEC int SSDPResultData_set_Param(
 	SSDPResultData *p, const UpnpDiscovery *n);
 
 /*! SSDPResultData_get_Cookie */
-EXPORT_SPEC void *SSDPResultData_get_Cookie(const SSDPResultData *p);
+UPNP_EXPORT_SPEC void *SSDPResultData_get_Cookie(const SSDPResultData *p);
 /*! SSDPResultData_set_Cookie */
-EXPORT_SPEC int SSDPResultData_set_Cookie(SSDPResultData *p, void *n);
+UPNP_EXPORT_SPEC int SSDPResultData_set_Cookie(SSDPResultData *p, void *n);
 
 /*! SSDPResultData_get_CtrlptCallback */
-EXPORT_SPEC Upnp_FunPtr SSDPResultData_get_CtrlptCallback(
+UPNP_EXPORT_SPEC Upnp_FunPtr SSDPResultData_get_CtrlptCallback(
 	const SSDPResultData *p);
 /*! SSDPResultData_set_CtrlptCallback */
-EXPORT_SPEC int SSDPResultData_set_CtrlptCallback(
+UPNP_EXPORT_SPEC int SSDPResultData_set_CtrlptCallback(
 	SSDPResultData *p, Upnp_FunPtr n);
 
 #ifdef __cplusplus
