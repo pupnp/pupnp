@@ -121,10 +121,6 @@ if (UPNP_BUILD_SHARED)
 
 	add_library (UPNP::Shared ALIAS upnp_shared)
 
-	set_target_properties (upnp_shared PROPERTIES
-		WINDOWS_EXPORT_ALL_SYMBOLS TRUE
-	)
-
 	target_compile_definitions (upnp_shared
 		PRIVATE $<$<CONFIG:Debug>:STATS>
 		PRIVATE LIBUPNP_EXPORTS
