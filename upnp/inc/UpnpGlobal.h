@@ -18,22 +18,22 @@
 
 #ifdef _WIN32
 	/*
-	 * EXPORT_SPEC
+	 * UPNP_EXPORT_SPEC
 	 */
 	#if defined _MSC_VER || defined __BORLANDC__
 		#ifdef UPNP_STATIC_LIB
-			#define EXPORT_SPEC
+			#define UPNP_EXPORT_SPEC
 		#else /* UPNP_STATIC_LIB */
 			#ifdef LIBUPNP_EXPORTS
 				/*! set up declspec for dll export to make
 				 * functions visible to library users */
-				#define EXPORT_SPEC __declspec(dllexport)
+				#define UPNP_EXPORT_SPEC __declspec(dllexport)
 			#else /* LIBUPNP_EXPORTS */
-				#define EXPORT_SPEC __declspec(dllimport)
+				#define UPNP_EXPORT_SPEC __declspec(dllimport)
 			#endif /* LIBUPNP_EXPORTS */
 		#endif	       /* UPNP_STATIC_LIB */
 	#else		       /* _MSC_VER || __BORLANDC__ */
-		#define EXPORT_SPEC
+		#define UPNP_EXPORT_SPEC
 	#endif /* _MSC_VER || __BORLANDC__ */
 
 	/*

@@ -19,7 +19,7 @@
  * \brief UpnpString object declaration.
  */
 
-#include "UpnpGlobal.h" /* for EXPORT_SPEC */
+#include "UpnpGlobal.h" /* for UPNP_EXPORT_SPEC */
 
 #include <stdlib.h> /* for size_t */
 
@@ -37,12 +37,12 @@ typedef struct s_UpnpString UpnpString;
  *
  * \return A pointer to a new allocated object.
  */
-EXPORT_SPEC UpnpString *UpnpString_new(void);
+UPNP_EXPORT_SPEC UpnpString *UpnpString_new(void);
 
 /*!
  * \brief Destructor.
  */
-EXPORT_SPEC void UpnpString_delete(
+UPNP_EXPORT_SPEC void UpnpString_delete(
 	/*! [in] The \em \b this pointer. */
 	UpnpString *p);
 
@@ -51,14 +51,14 @@ EXPORT_SPEC void UpnpString_delete(
  *
  * \return A pointer to a new allocated copy of the original object.
  */
-EXPORT_SPEC UpnpString *UpnpString_dup(
+UPNP_EXPORT_SPEC UpnpString *UpnpString_dup(
 	/*! [in] The \em \b this pointer. */
 	const UpnpString *p);
 
 /*!
  * \brief Assignment operator.
  */
-EXPORT_SPEC void UpnpString_assign(
+UPNP_EXPORT_SPEC void UpnpString_assign(
 	/*! [in] The \em \b this pointer. */
 	UpnpString *p,
 	/*! [in] The \em \b that pointer. */
@@ -69,7 +69,7 @@ EXPORT_SPEC void UpnpString_assign(
  *
  * \return The length of the string.
  * */
-EXPORT_SPEC size_t UpnpString_get_Length(
+UPNP_EXPORT_SPEC size_t UpnpString_get_Length(
 	/*! [in] The \em \b this pointer. */
 	const UpnpString *p);
 
@@ -77,7 +77,7 @@ EXPORT_SPEC size_t UpnpString_get_Length(
  * \brief Truncates the string to the specified lenght, or does nothing
  * if the current lenght is less than or equal to the requested length.
  * */
-EXPORT_SPEC void UpnpString_set_Length(
+UPNP_EXPORT_SPEC void UpnpString_set_Length(
 	/*! [in] The \em \b this pointer. */
 	UpnpString *p,
 	/*! [in] The requested length. */
@@ -88,14 +88,14 @@ EXPORT_SPEC void UpnpString_set_Length(
  *
  * \return The pointer to char.
  */
-EXPORT_SPEC const char *UpnpString_get_String(
+UPNP_EXPORT_SPEC const char *UpnpString_get_String(
 	/*! [in] The \em \b this pointer. */
 	const UpnpString *p);
 
 /*!
  * \brief Sets the string from a pointer to char.
  */
-EXPORT_SPEC int UpnpString_set_String(
+UPNP_EXPORT_SPEC int UpnpString_set_String(
 	/*! [in] The \em \b this pointer. */
 	UpnpString *p,
 	/*! [in] (char *) to copy from. */
@@ -104,7 +104,7 @@ EXPORT_SPEC int UpnpString_set_String(
 /*!
  * \brief Sets the string from a pointer to char using a maximum of N chars.
  */
-EXPORT_SPEC int UpnpString_set_StringN(
+UPNP_EXPORT_SPEC int UpnpString_set_StringN(
 	/*! [in] The \em \b this pointer. */
 	UpnpString *p,
 	/*! [in] (char *) to copy from. */
@@ -115,7 +115,7 @@ EXPORT_SPEC int UpnpString_set_StringN(
 /*!
  * \brief Clears the string, sets its size to zero.
  */
-EXPORT_SPEC void UpnpString_clear(
+UPNP_EXPORT_SPEC void UpnpString_clear(
 	/*! [in] The \em \b this pointer. */
 	UpnpString *p);
 
@@ -124,7 +124,7 @@ EXPORT_SPEC void UpnpString_clear(
  *
  * \return The result of strcmp().
  */
-EXPORT_SPEC int UpnpString_cmp(
+UPNP_EXPORT_SPEC int UpnpString_cmp(
 	/*! [in] The \em \b the first string. */
 	UpnpString *p,
 	/*! [in] The \em \b the second string. */
@@ -135,7 +135,7 @@ EXPORT_SPEC int UpnpString_cmp(
  *
  * \return The result of strcasecmp().
  */
-EXPORT_SPEC int UpnpString_casecmp(
+UPNP_EXPORT_SPEC int UpnpString_casecmp(
 	/*! [in] The \em \b the first string. */
 	UpnpString *p,
 	/*! [in] The \em \b the second string. */

@@ -63,7 +63,7 @@ extern "C" {
  * \return An ASCII text string representation of the error message associated
  * 	with the error code or the string "Unknown error code"
  */
-EXPORT_SPEC const char *UpnpGetErrorMessage(
+UPNP_EXPORT_SPEC const char *UpnpGetErrorMessage(
 	/*! [in] The SDK error code to convert. */
 	int errorcode);
 
@@ -81,7 +81,7 @@ EXPORT_SPEC const char *UpnpGetErrorMessage(
  *	\li <tt>UPNP_E_OUTOF_MEMORY</tt>: Insufficient resources exist to
  *              complete this operation.
  */
-EXPORT_SPEC int UpnpResolveURL(
+UPNP_EXPORT_SPEC int UpnpResolveURL(
 	/*! [in] The base URL to combine. */
 	const char *BaseURL,
 	/*! [in] The relative URL to \b BaseURL. */
@@ -103,7 +103,7 @@ EXPORT_SPEC int UpnpResolveURL(
  *	\li <tt>UPNP_E_OUTOF_MEMORY</tt>: Insufficient resources exist to
  *              complete this operation.
  */
-EXPORT_SPEC int UpnpResolveURL2(
+UPNP_EXPORT_SPEC int UpnpResolveURL2(
 	/*! [in] The base URL to combine. */
 	const char *BaseURL,
 	/*! [in] The relative URL to \b BaseURL. */
@@ -125,7 +125,7 @@ EXPORT_SPEC int UpnpResolveURL2(
  * \return The action node of \b Upnp_Document type or <tt>NULL</tt> if the
  * 	operation failed.
  */
-EXPORT_SPEC IXML_Document *UpnpMakeAction(
+UPNP_EXPORT_SPEC IXML_Document *UpnpMakeAction(
 	/*! [in] Name of the action request or response. */
 	const char *ActionName,
 	/*! [in] The service type. */
@@ -150,7 +150,7 @@ EXPORT_SPEC IXML_Document *UpnpMakeAction(
  * \return The action node of \b Upnp_Document type or <tt>NULL</tt> if the
  * 	operation failed.
  */
-EXPORT_SPEC IXML_Document *UpnpMakeActionResponse(
+UPNP_EXPORT_SPEC IXML_Document *UpnpMakeActionResponse(
 	/*! [in] The action name. */
 	const char *ActionName,
 	/*! [in] The service type.. */
@@ -179,7 +179,7 @@ EXPORT_SPEC IXML_Document *UpnpMakeActionResponse(
  *invalid. \li <tt>UPNP_E_OUTOF_MEMORY</tt>: Insufficient resources exist to
  *		complete this operation.
  */
-EXPORT_SPEC int UpnpAddToAction(
+UPNP_EXPORT_SPEC int UpnpAddToAction(
 	/*! [in,out] A pointer to store the action document node. */
 	IXML_Document **ActionDoc,
 	/*! [in] The action name. */
@@ -209,7 +209,7 @@ EXPORT_SPEC int UpnpAddToAction(
  *invalid. \li <tt>UPNP_E_OUTOF_MEMORY</tt>: Insufficient resources exist to
  *		complete this operation.
  */
-EXPORT_SPEC int UpnpAddToActionResponse(
+UPNP_EXPORT_SPEC int UpnpAddToActionResponse(
 	/*! [in,out] Pointer to a document to store the action document node. */
 	IXML_Document **ActionResponse,
 	/*! [in] The action name. */
@@ -229,7 +229,7 @@ EXPORT_SPEC int UpnpAddToActionResponse(
  *
  * \return <tt>NULL</tt> on failure, or the property-set document node.
  */
-EXPORT_SPEC IXML_Document *UpnpCreatePropertySet(
+UPNP_EXPORT_SPEC IXML_Document *UpnpCreatePropertySet(
 	/*! [in] The number of argument pairs passed. */
 	int NumArg,
 	/*! [in] The status variable name and value pair. */
@@ -252,7 +252,7 @@ EXPORT_SPEC IXML_Document *UpnpCreatePropertySet(
  *invalid. \li <tt>UPNP_E_OUTOF_MEMORY</tt>: Insufficient resources exist to
  *		complete this operation.
  */
-EXPORT_SPEC int UpnpAddToPropertySet(
+UPNP_EXPORT_SPEC int UpnpAddToPropertySet(
 	/*! [in,out] A pointer to the document containing the property set
 	   document node. */
 	IXML_Document **PropSet,

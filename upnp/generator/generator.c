@@ -174,9 +174,9 @@ static int write_prototype(FILE *fp, const char *class_name, struct s_Member *m)
 		/* clang-format off */
 		fprintf(fp,
 			"/*! %s_get_%s */\n"
-			"EXPORT_SPEC const %s *%s_get_%s(const %s *p);\n"
+			"UPNP_EXPORT_SPEC const %s *%s_get_%s(const %s *p);\n"
 			"/*! %s_set_%s */\n"
-			"EXPORT_SPEC int %s_set_%s(%s *p, const %s *n);\n"
+			"UPNP_EXPORT_SPEC int %s_set_%s(%s *p, const %s *n);\n"
 			"\n",
 			class_name, m->name,
 			m->type_name, class_name, m->name, class_name,
@@ -189,9 +189,9 @@ static int write_prototype(FILE *fp, const char *class_name, struct s_Member *m)
 		/* clang-format off */
 		fprintf(fp,
 			"/*! %s_get_%s */\n"
-			"EXPORT_SPEC %s %s_get_%s(const %s *p);\n"
+			"UPNP_EXPORT_SPEC %s %s_get_%s(const %s *p);\n"
 			"/*! %s_set_%s */\n"
-			"EXPORT_SPEC int %s_set_%s(%s *p, %s n);\n"
+			"UPNP_EXPORT_SPEC int %s_set_%s(%s *p, %s n);\n"
 			"\n",
 			class_name, m->name,
 			m->type_name, class_name, m->name, class_name,
@@ -204,11 +204,11 @@ static int write_prototype(FILE *fp, const char *class_name, struct s_Member *m)
 		/* clang-format off */
 		fprintf(fp,
 			"/*! %s_get_%s */\n"
-			"EXPORT_SPEC const %s *%s_get_%s(const %s *p);\n"
+			"UPNP_EXPORT_SPEC const %s *%s_get_%s(const %s *p);\n"
 			"/*! %s_get_%s */\n"
-			"EXPORT_SPEC int %s_set_%s(%s *p, const %s *buf); \n"
+			"UPNP_EXPORT_SPEC int %s_set_%s(%s *p, const %s *buf); \n"
 			"/*! %s_get_%s */\n"
-			"EXPORT_SPEC void %s_clear_%s(%s *p); \n"
+			"UPNP_EXPORT_SPEC void %s_clear_%s(%s *p); \n"
 			"\n",
 			class_name, m->name,
 			m->type_name, class_name, m->name, class_name,
@@ -223,11 +223,11 @@ static int write_prototype(FILE *fp, const char *class_name, struct s_Member *m)
 		/* clang-format off */
 		fprintf(fp,
 			"/*! %s_get_%s */\n"
-			"EXPORT_SPEC const UpnpListHead *%s_get_%s(const %s *p);\n"
+			"UPNP_EXPORT_SPEC const UpnpListHead *%s_get_%s(const %s *p);\n"
 			"/*! %s_set_%s */\n"
-			"EXPORT_SPEC int %s_set_%s(%s *p, const UpnpListHead *q);\n"
+			"UPNP_EXPORT_SPEC int %s_set_%s(%s *p, const UpnpListHead *q);\n"
 			"/*! %s_add_to_list_%s */\n"
-			"EXPORT_SPEC void %s_add_to_list_%s(%s *p, UpnpListHead *head);\n"
+			"UPNP_EXPORT_SPEC void %s_add_to_list_%s(%s *p, UpnpListHead *head);\n"
 			"\n",
 			class_name, m->name,
 			class_name, m->name, class_name,
@@ -242,19 +242,19 @@ static int write_prototype(FILE *fp, const char *class_name, struct s_Member *m)
 		/* clang-format off */
 		fprintf(fp,
 			"/*! %s_get_%s */\n"
-			"EXPORT_SPEC const UpnpString *%s_get_%s(const %s *p);\n"
+			"UPNP_EXPORT_SPEC const UpnpString *%s_get_%s(const %s *p);\n"
 			"/*! %s_set_%s */\n"
-			"EXPORT_SPEC int %s_set_%s(%s *p, const UpnpString *s);\n"
+			"UPNP_EXPORT_SPEC int %s_set_%s(%s *p, const UpnpString *s);\n"
 			"/*! %s_get_%s_Length */\n"
-			"EXPORT_SPEC size_t %s_get_%s_Length(const %s *p);\n"
+			"UPNP_EXPORT_SPEC size_t %s_get_%s_Length(const %s *p);\n"
 			"/*! %s_get_%s_cstr */\n"
-			"EXPORT_SPEC const char *%s_get_%s_cstr(const %s *p);\n"
+			"UPNP_EXPORT_SPEC const char *%s_get_%s_cstr(const %s *p);\n"
 			"/*! %s_strcpy_%s */\n"
-			"EXPORT_SPEC int %s_strcpy_%s(%s *p, const char *s);\n"
+			"UPNP_EXPORT_SPEC int %s_strcpy_%s(%s *p, const char *s);\n"
 			"/*! %s_strncpy_%s */\n"
-			"EXPORT_SPEC int %s_strncpy_%s(%s *p, const char *s, size_t n); \n"
+			"UPNP_EXPORT_SPEC int %s_strncpy_%s(%s *p, const char *s, size_t n); \n"
 			"/*! %s_clear_%s */\n"
-			"EXPORT_SPEC void %s_clear_%s(%s *p); \n"
+			"UPNP_EXPORT_SPEC void %s_clear_%s(%s *p); \n"
 			"\n",
 			class_name, m->name,
 			class_name, m->name, class_name,
@@ -277,11 +277,11 @@ static int write_prototype(FILE *fp, const char *class_name, struct s_Member *m)
 		/* clang-format off */
 		fprintf(fp,
 			"/*! %s_get_%s */\n"
-			"EXPORT_SPEC const DOMString %s_get_%s(const %s *p); \n"
+			"UPNP_EXPORT_SPEC const DOMString %s_get_%s(const %s *p); \n"
 			"/*! %s_set_%s */\n"
-			"EXPORT_SPEC int %s_set_%s(%s *p, const DOMString s); \n"
+			"UPNP_EXPORT_SPEC int %s_set_%s(%s *p, const DOMString s); \n"
 			"/*! %s_get_%s_cstr */\n"
-			"EXPORT_SPEC const char *%s_get_%s_cstr(const %s *p); \n"
+			"UPNP_EXPORT_SPEC const char *%s_get_%s_cstr(const %s *p); \n"
 			"\n",
 			class_name, m->name,
 			class_name, m->name, class_name,
@@ -404,7 +404,7 @@ static int write_header(FILE *fp, struct s_Class *c)
 		" */\n"
 		"#include <stdlib.h> /* for size_t */\n"
 		"\n"
-		"#include \"UpnpGlobal.h\" /* for EXPORT_SPEC */\n"
+		"#include \"UpnpGlobal.h\" /* for UPNP_EXPORT_SPEC */\n"
 		"\n",
 		class_name_upr,
 		class_name_upr,
@@ -436,13 +436,13 @@ static int write_header(FILE *fp, struct s_Class *c)
 		"typedef struct s_%s %s;\n"
 		"\n"
 		"/*! Constructor */\n"
-		"EXPORT_SPEC %s *%s_new();\n"
+		"UPNP_EXPORT_SPEC %s *%s_new();\n"
 		"/*! Destructor */\n"
-		"EXPORT_SPEC void %s_delete(%s *p);\n"
+		"UPNP_EXPORT_SPEC void %s_delete(%s *p);\n"
 		"/*! Copy Constructor */\n"
-		"EXPORT_SPEC %s *%s_dup(const %s *p);\n"
+		"UPNP_EXPORT_SPEC %s *%s_dup(const %s *p);\n"
 		"/*! Assignment operator */\n"
-		"EXPORT_SPEC int %s_assign(%s *p, const %s *q);\n"
+		"UPNP_EXPORT_SPEC int %s_assign(%s *p, const %s *q);\n"
 		"\n",
 		c->name,
 		c->name,

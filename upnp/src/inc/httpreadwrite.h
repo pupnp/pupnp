@@ -263,7 +263,7 @@ int http_HttpGetProgress(void *Handle, size_t *length, size_t *total);
  *      \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
  *              allocated.
  */
-EXPORT_SPEC int http_OpenHttpConnection(
+UPNP_EXPORT_SPEC int http_OpenHttpConnection(
 	/*! [in] The URL which contains the host, and the scheme to make the
 	   connection. */
 	const char *url,
@@ -301,7 +301,7 @@ EXPORT_SPEC int http_OpenHttpConnection(
  *      \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
  *              allocated.
  */
-EXPORT_SPEC int http_MakeHttpRequest(
+UPNP_EXPORT_SPEC int http_MakeHttpRequest(
 	/* ![in] The method to use to make the request. */
 	Upnp_HttpMethod method,
 	/*! [in] The URL to use to make the request. The URL should use the same
@@ -340,7 +340,7 @@ EXPORT_SPEC int http_MakeHttpRequest(
  *      \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
  *              allocated.
  */
-EXPORT_SPEC int http_WriteHttpRequest(
+UPNP_EXPORT_SPEC int http_WriteHttpRequest(
 	/*! [in] The handle of the connection created by the call to
 	 * \b UpnpOpenHttpConnection. */
 	void *handle,
@@ -371,7 +371,7 @@ EXPORT_SPEC int http_WriteHttpRequest(
  *      \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
  *              allocated.
  */
-EXPORT_SPEC int http_EndHttpRequest(
+UPNP_EXPORT_SPEC int http_EndHttpRequest(
 	/*! [in] The handle to the connection. */
 	void *handle,
 	/*! [in] The time out value sent with the request during which a
@@ -408,7 +408,7 @@ EXPORT_SPEC int http_EndHttpRequest(
  *     \li \c UPNP_E_BAD_RESPONSE: A bad response was received from the
  *             remote server.
  */
-EXPORT_SPEC int http_GetHttpResponse(
+UPNP_EXPORT_SPEC int http_GetHttpResponse(
 	/*! [in] The handle of the connection created by the call to
 	 * \b UpnpOpenHttpConnection. */
 	void *handle,
@@ -445,7 +445,7 @@ EXPORT_SPEC int http_GetHttpResponse(
  *        in handle value may provide additional information on the return
  *        value.
  */
-EXPORT_SPEC int http_ReadHttpResponse(
+UPNP_EXPORT_SPEC int http_ReadHttpResponse(
 	/*! [in] The handle of the connection created by the call to
 	 * \b UpnpOpenHttpConnection. */
 	void *handle,
@@ -471,7 +471,7 @@ EXPORT_SPEC int http_ReadHttpResponse(
  *     \li \c UPNP_E_OUTOF_SOCKET: Too many sockets are currently
  *             allocated.
  */
-EXPORT_SPEC int http_CloseHttpConnection(
+UPNP_EXPORT_SPEC int http_CloseHttpConnection(
 	/*! [in] The handle of the connection to close, created by the call to
 	 * \b UpnpOpenHttpPost. */
 	void *handle);
