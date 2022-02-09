@@ -207,7 +207,7 @@ endif()
 #
 # Checks for large-file-sensitivity
 #
-if (NOT HAVE_OFF_T_SIZE)
+if (NOT HAVE_OFF_T_SIZE AND NOT MSVC)
 	check_type_size (off_t OFF_T_SIZE)
 	set (UPNP_LARGEFILE_SENSITIVE FALSE CACHE BOOL "whether the system defaults to 32bit off_t but can do 64bit when requested" FORCE)
 
@@ -234,6 +234,9 @@ if (NOT HAVE_OFF_T_SIZE)
 			endif()
 		endif()
 	endif()
+elseif (MSVC)
+	set (_LARGE_FILES TRUE CACHE BOOL "Define for large files, on AIX-style hosts." FORCE)
+	set (UPNP_LARGEFILE_SENSITIVE TRUE CACHE BOOL "whether the system defaults to 32bit off_t but can do 64bit when requested" FORCE)
 endif()
 
 unset (CMAKE_REQUIRED_DEFINITIONS)
