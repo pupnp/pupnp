@@ -51,9 +51,6 @@ if (UPNP_ENABLE_OPEN_SSL)
 	find_package (FindOpenSSL REQUIRED)
 endif()
 
-find_package (Git)
-cmake_dependent_option (DOWNLOAD_AND_BUILD_DEPS "Get all missing stuff" OFF ${Git_FOUND} OFF)
-
 #
 # Checks for header files (which aren't needed on Win32)
 #
