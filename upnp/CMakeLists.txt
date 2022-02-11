@@ -70,12 +70,6 @@ if (UPNP_ENABLE_SSDP)
 	)
 endif()
 
-if (UPNP_ENABLE_HELPER_API_TOOLS)
-	list (APPEND UPNP_SOURCES
-		src/api/upnptools.c
-	)
-endif()
-
 if (UPNP_ENABLE_GENA OR UPNP_ENABLE_OPTIONAL_SSDP_HEADERS)
 	list (APPEND UPNP_SOURCES
 		src/uuid/md5.c
@@ -108,6 +102,10 @@ list (APPEND UPNP_HEADERS
 )
 
 if (UPNP_ENABLE_HELPER_API_TOOLS)
+	list (APPEND UPNP_SOURCES
+		src/api/upnptools.c
+	)
+
 	list (APPEND UPNP_HEADERS
 		inc/upnptools.h
 	)
