@@ -266,14 +266,6 @@ if (TARGET Threads::Threads)
 	unset (CMAKE_REQUIRED_INCLUDES)
 endif()
 
-if (UPNP_ENABLE_OPEN_SSL)
-	include (FindOpenSSL)
-
-	if (NOT OPENSSL_FOUND)
-		message (FATAL_ERROR "openssl not found")
-	endif()
-endif()
-
 configure_file (${PUPNP_SOURCE_DIR}/upnp/inc/upnpconfig.h.cm ${PUPNP_BINARY_DIR}/upnp/inc/upnpconfig.h)
 configure_file (${PUPNP_SOURCE_DIR}/upnp/sample/common/config_sample.h.cm ${PUPNP_BINARY_DIR}/upnp/sample/common/config_sample.h)
 configure_file (${PUPNP_BINARY_DIR}/autoconfig.h.cm ${PUPNP_BINARY_DIR}/autoconfig.h)
