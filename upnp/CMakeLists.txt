@@ -3,7 +3,7 @@ if (MSVC)
 	set (WIN_PREFIX "lib")
 endif()
 
-if (samples)
+if (UPNP_BUILD_SAMPLES)
 	add_subdirectory (sample)
 endif()
 
@@ -44,7 +44,7 @@ set (UPNP_SOURCES
 	src/urlconfig/urlconfig.c
 )
 
-if (gena)
+if (UPNP_ENABLE_GENA)
 	list (APPEND UPNP_SOURCES
 		src/gena/gena_device.c
 		src/gena/gena_ctrlpt.c
@@ -52,7 +52,7 @@ if (gena)
 	)
 endif()
 
-if (soap)
+if (UPNP_ENABLE_SOAP)
 	list (APPEND UPNP_SOURCES
 		src/soap/soap_device.c
 		src/soap/soap_ctrlpt.c
@@ -60,7 +60,7 @@ if (soap)
 	)
 endif()
 
-if (ssdp)
+if (UPNP_ENABLE_SSDP)
 	list (APPEND UPNP_SOURCES
 		src/ssdp/SSDPResultData.c
 		src/ssdp/SSDPResultDataCallback.c
@@ -70,13 +70,13 @@ if (ssdp)
 	)
 endif()
 
-if (tools)
+if (UPNP_ENABLE_HELPER_API_TOOLS)
 	list (APPEND UPNP_SOURCES
 		src/api/upnptools.c
 	)
 endif()
 
-if (uuid)
+if (UPNP_ENABLE_GENA OR UPNP_ENABLE_OPTIONAL_SSDP_HEADERS)
 	list (APPEND UPNP_SOURCES
 		src/uuid/md5.c
 		src/uuid/sysdep.c
@@ -107,7 +107,7 @@ list (APPEND UPNP_HEADERS
 	${PUPNP_BINARY_DIR}/upnp/inc/upnpconfig.h
 )
 
-if (tools)
+if (UPNP_ENABLE_HELPER_API_TOOLS)
 	list (APPEND UPNP_HEADERS
 		inc/upnptools.h
 	)

@@ -1,4 +1,3 @@
-
 if (BUILD_TESTING)
 	add_subdirectory (test)
 endif()
@@ -84,7 +83,7 @@ target_compile_definitions (ixml_static
 	PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64> 
 )
 
-if (script_support)
+if (IXML_ENABLE_SCRIPT_SUPPORT)
 	target_compile_definitions (ixml_static
 		PRIVATE IXML_HAVE_SCRIPTSUPPORT
 	)
