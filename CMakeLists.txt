@@ -224,15 +224,7 @@ if (NOT MSVC)
 		endif()
 	endif()
 else()
-	if (NOT DOWNLOAD_AND_BUILD_DEPS)
-		find_package (PTHREADS4W CONFIG REQUIRED)
-	else()
-		find_package (PTHREADS4W CONFIG)
-
-		if (NOT PTHREADS4W_CONFIG)
-			CmDaB_install (pthreads4w)
-		endif()
-	endif()
+	find_package (PTHREADS4W CONFIG REQUIRED)
 endif()
 #
 # Determine if pthread_rwlock_t is available
