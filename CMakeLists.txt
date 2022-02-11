@@ -48,13 +48,7 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 if (UPNP_ENABLE_OPEN_SSL)
-	include (FindOpenSSL)
-
-	if (OPENSSL_FOUND)
-		set (UPNP_ENABLE_OPEN_SSL 1) #see upnpconfig.h
-	else()
-		message (FATAL_ERROR "openssl not found")
-	endif()
+	find_package (FindOpenSSL REQUIRED)
 endif()
 
 find_package (Git)
