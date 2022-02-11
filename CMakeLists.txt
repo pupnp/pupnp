@@ -47,7 +47,7 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	)
 endif()
 
-if (open_ssl)
+if (UPNP_ENABLE_OPEN_SSL)
 	include (FindOpenSSL)
 
 	if (OPENSSL_FOUND)
@@ -197,6 +197,7 @@ endif()
 if (NOT MSVC)
 	set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 	include (FindThreads)
+
 	if (NOT DOWNLOAD_AND_BUILD_DEPS)
 		if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
 			add_library (Threads::Shared ALIAS Threads::Threads)
@@ -265,7 +266,7 @@ if (TARGET Threads::Threads)
 	unset (CMAKE_REQUIRED_INCLUDES)
 endif()
 
-if (open_ssl)
+if (UPNP_ENABLE_OPEN_SSL)
 	include (FindOpenSSL)
 
 	if (NOT OPENSSL_FOUND)
