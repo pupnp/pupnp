@@ -314,8 +314,5 @@ if (BUILD_TESTING)
 
 	if (GTest_FOUND)
 		add_subdirectory (gtest)
-	elseif (DOWNLOAD_AND_BUILD_DEPS AND NOT GTest_FOUND)
-		CmDaB_install (googletest)
-		add_subdirectory (gtest)
 	endif()
 endif()
