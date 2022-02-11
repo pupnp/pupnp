@@ -309,7 +309,6 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libupnp.pc
 
 if (BUILD_TESTING)
 	enable_testing()
-
 	find_package (GTest CONFIG)
 
 	if (GTest_FOUND)
