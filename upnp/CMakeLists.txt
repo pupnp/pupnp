@@ -93,7 +93,6 @@ list (APPEND UPNP_HEADERS
 	inc/UpnpDiscovery.h
 	inc/UpnpEvent.h
 	inc/UpnpEventSubscribe.h
-	inc/UpnpHttpHeaders.h
 	inc/UpnpFileInfo.h
 	inc/UpnpGlobal.h
 	inc/UpnpInet.h
