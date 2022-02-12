@@ -22,13 +22,13 @@ add_library (ixml_shared SHARED
 add_library (IXML::Shared ALIAS ixml_shared)
 
 target_compile_definitions (ixml_shared
-	PRIVATE $<$<BOOL:${script_support}>:IXML_HAVE_SCRIPTSUPPORT>
+	PRIVATE $<$<BOOL:${IXML_HAVE_SCRIPTSUPPORT}>:IXML_HAVE_SCRIPTSUPPORT>
 	PRIVATE LIBUPNP_EXPORTS
-	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
 	PUBLIC $<$<BOOL:${MSVC}>:LIBUPNP_EXPORTS>
 	PUBLIC $<$<BOOL:${_LARGE_FILES}>:_LARGE_FILES>
 	PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64>
+	PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 )
 
 target_include_directories (ixml_shared
@@ -74,7 +74,7 @@ set_target_properties (ixml_static PROPERTIES
 )
 
 target_compile_definitions (ixml_static
-	PRIVATE $<$<BOOL:${script_support}>:IXML_HAVE_SCRIPTSUPPORT>
+	PRIVATE $<$<BOOL:${IXML_HAVE_SCRIPTSUPPORT}>:IXML_HAVE_SCRIPTSUPPORT>
 	PRIVATE LIBUPNP_EXPORTS
 	PUBLIC UPNP_STATIC_LIB
 	PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
@@ -82,12 +82,6 @@ target_compile_definitions (ixml_static
 	PUBLIC $<$<BOOL:${_LARGE_FILES}>:_LARGE_FILES>
 	PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64> 
 )
-
-if (IXML_ENABLE_SCRIPT_SUPPORT)
-	target_compile_definitions (ixml_static
-		PRIVATE IXML_HAVE_SCRIPTSUPPORT
-	)
-endif()
 
 target_include_directories (ixml_static
 	PRIVATE ${PUPNP_BINARY_DIR}/

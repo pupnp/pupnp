@@ -118,20 +118,6 @@ if (UPNP_BUILD_SHARED)
 
 	add_library (UPNP::Shared ALIAS upnp_shared)
 
-	target_compile_definitions (upnp_shared
-		PRIVATE $<$<CONFIG:Debug>:STATS>
-		PRIVATE LIBUPNP_EXPORTS
-		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
-	)
-
-	target_include_directories (upnp_shared
-		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
-		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
-		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
-		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
-		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
-	)
-
 	set_target_properties (upnp_shared PROPERTIES
 		C_VISIBILITY_PRESET "hidden"
 		EXPORT_NAME UPNP::Shared
@@ -141,27 +127,31 @@ if (UPNP_BUILD_SHARED)
 		VERSION ${UPNP_VERSION_STRING}
 	)
 
-	if (HAVE_MACRO_PREFIX_MAP)
-		target_compile_options(upnp_shared PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=)
-	endif()
+	target_compile_definitions (upnp_shared
+		PRIVATE $<$<CONFIG:Debug>:STATS>
+		PRIVATE LIBUPNP_EXPORTS
+		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	)
 
-	if (WIN32)
-		target_link_libraries (upnp_shared
-			PRIVATE ws2_32
-			PRIVATE iphlpapi
-		)
-	endif()
+	target_compile_options (upnp_shared
+		PRIVATE $<$<BOOL:HAVE_MACRO_PREFIX_MAP>:-fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.>
+	)
+
+	target_include_directories (upnp_shared
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
+	)
 
 	target_link_libraries (upnp_shared
+		PRIVATE $<$<BOOL:${UPNP_ENABLE_OPEN_SSL}>:OpenSSL::SSL>
+		PRIVATE $<$<PLATFORM_ID:Windows>:ws2_32>
+		PRIVATE $<$<PLATFORM_ID:Windows>:iphlpapi>
 		PUBLIC ixml_shared
 		PUBLIC Threads::Shared
 	)
-
-	if (UPNP_ENABLE_OPEN_SSL)
-		target_link_libraries (upnp_shared
-			PRIVATE OpenSSL::SSL
-		)
-	endif()
 
 	install (TARGETS upnp_shared
 		EXPORT UPNP
@@ -186,32 +176,6 @@ if (UPNP_BUILD_STATIC)
 
 	add_library (UPNP::Static ALIAS upnp_static)
 
-	target_compile_definitions (upnp_static
-		PRIVATE UPNP_STATIC_LIB
-		PRIVATE LIBUPNP_EXPORTS
-		PRIVATE $<$<CONFIG:Debug>:STATS>
-		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
-	)
-
-	if (HAVE_MACRO_PREFIX_MAP)
-		target_compile_options(upnp_static PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=)
-	endif()
-
-	target_include_directories (upnp_static
-		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
-		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
-		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
-		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
-		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
-	)
-
-	if (WIN32)
-		target_link_libraries (upnp_static
-			INTERFACE ws2_32
-			INTERFACE iphlpapi
-		)
-	endif()
-
 	set_target_properties (upnp_static PROPERTIES
 		C_VISIBILITY_PRESET "hidden"
 		EXPORT_NAME UPNP::Static
@@ -221,16 +185,32 @@ if (UPNP_BUILD_STATIC)
 		VERSION ${UPNP_VERSION_MAJOR}
 	)
 
+	target_compile_definitions (upnp_static
+		PRIVATE UPNP_STATIC_LIB
+		PRIVATE LIBUPNP_EXPORTS
+		PRIVATE $<$<CONFIG:Debug>:STATS>
+		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	)
+
+	target_compile_options (upnp_static
+		PRIVATE $<$<BOOL:HAVE_MACRO_PREFIX_MAP>:-fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.>
+	)
+
+	target_include_directories (upnp_static
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/threadutil/
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
+	)
+
 	target_link_libraries (upnp_static
+		PRIVATE $<$<BOOL:${UPNP_ENABLE_OPEN_SSL}>:OpenSSL::SSL>
+		PRIVATE $<$<PLATFORM_ID:Windows>:ws2_32>
+		PRIVATE $<$<PLATFORM_ID:Windows>:iphlpapi>
 		PUBLIC ixml_static
 		PUBLIC Threads::Static
 	)
-
-	if (UPNP_ENABLE_OPEN_SSL)
-		target_link_libraries (upnp_static
-			PRIVATE OpenSSL::SSL
-		)
-	endif()
 
 	install (TARGETS upnp_static
 		EXPORT UPNP
