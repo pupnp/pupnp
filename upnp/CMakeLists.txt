@@ -134,7 +134,7 @@ if (UPNP_BUILD_SHARED)
 	)
 
 	target_compile_options (upnp_shared
-		PRIVATE $<$<BOOL:HAVE_MACRO_PREFIX_MAP>:-fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.>
+		PRIVATE $<$<BOOL:${HAVE_MACRO_PREFIX_MAP}>:-fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.>
 	)
 
 	target_include_directories (upnp_shared
@@ -193,7 +193,7 @@ if (UPNP_BUILD_STATIC)
 	)
 
 	target_compile_options (upnp_static
-		PRIVATE $<$<BOOL:HAVE_MACRO_PREFIX_MAP>:-fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.>
+		PRIVATE $<$<BOOL:${HAVE_MACRO_PREFIX_MAP}>:-fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.>
 	)
 
 	target_include_directories (upnp_static
