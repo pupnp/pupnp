@@ -48,7 +48,7 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 if (UPNP_ENABLE_OPEN_SSL)
-	find_package (FindOpenSSL REQUIRED)
+	find_package (OpenSSL REQUIRED)
 endif()
 
 #
