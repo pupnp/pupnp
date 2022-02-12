@@ -15,6 +15,11 @@ set (IXML_SOURCES
 	src/nodeList.c
 )
 
+list (APPEND IXML_HEADERS
+	inc/ixml.h
+	inc/ixmldebug.h
+)
+
 if (UPNP_BUILD_SHARED)
 	add_library (ixml_shared SHARED
 		${IXML_SOURCES}
@@ -37,11 +42,6 @@ if (UPNP_BUILD_SHARED)
 		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
 		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
 		PUBLIC $<BUILD_INTERFACE:${PUPNP_SOURCE_DIR}/upnp/inc/>
-	)
-
-	list (APPEND IXML_HEADERS
-		inc/ixml.h
-		inc/ixmldebug.h
 	)
 
 	set_target_properties (ixml_shared PROPERTIES
@@ -80,6 +80,7 @@ if (UPNP_BUILD_STATIC)
 		C_VISIBILITY_PRESET "hidden"
 		EXPORT_NAME IXML::Static
 		OUTPUT_NAME ixml${STATIC_POSTFIX}
+		PUBLIC_HEADER "${IXML_HEADERS}"
 		SOVERSION ${IXML_VERSION_STRING}
 		VERSION ${IXML_VERSION_MAJOR}
 	)
