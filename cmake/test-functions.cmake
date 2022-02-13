@@ -95,7 +95,7 @@ function (UPNP_addUnitTest testName sourceFile)
 			COMMAND ${testName}
 		)
 
-		if (MSVC OR MSYS OR MINGW)
+		if (MSVC OR MSYS OR MINGW OR CYGWIN)
 			UPNP_findTestEnv (${testName} TEST_ENV)
 
 			set_tests_properties (${testName} PROPERTIES
