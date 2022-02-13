@@ -40,6 +40,7 @@ jobs:
           -DBUILD_TESTING=ON
           -DDOWNLOAD_AND_BUILD_DEPS=ON
           -DUPNP_ENABLE_OPEN_SSL=ON
+          -DCMAKE_INSTALL_PREFIX=${{ GITHUB_WORKSPACE }}/test-install
           ${{ env.cmake_extra_flags }}
       - name: Build
         run: cmake --build build --config ${{matrix.conf}}
@@ -71,6 +72,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=${{ matrix.conf }}
           -DBUILD_TESTING=ON
           -DDOWNLOAD_AND_BUILD_DEPS=ON
+          -DCMAKE_INSTALL_PREFIX=${{ GITHUB_WORKSPACE }}/test-install
           ${{ env.cmake_extra_flags }}
       - name: Build
         run: cmake --build build --config ${{ matrix.conf }}
@@ -125,6 +127,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=${{ matrix.conf }}
           -DBUILD_TESTING=ON
           -DDOWNLOAD_AND_BUILD_DEPS=ON
+          -DCMAKE_INSTALL_PREFIX=${{ GITHUB_WORKSPACE }}/test-install
           ${{ env.cmake_extra_flags }}
       - name: Build
         run: cmake --build build --config ${{matrix.conf}}
