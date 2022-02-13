@@ -42,7 +42,7 @@ jobs:
           -DUPNP_ENABLE_OPEN_SSL=ON
           ${{ env.cmake_extra_flags }}
       - name: Build
-        run: cmake --build build
+        run: cmake --build build --config ${{matrix.conf}}
       - name: Test
         run: |
           cd build
@@ -51,7 +51,7 @@ jobs:
       - name: Debug output
         run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
       - name: install
-        run: cmake --install . -C ${{matrix.conf}}
+        run: cmake --install . --config ${{matrix.conf}}
   # Windows Visual Studio builds
   windows-msvc:
     name: Build (${{ matrix.os }})  - ${{ matrix.conf }}
@@ -82,10 +82,10 @@ jobs:
       - name: Debug output
         run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
       - name: install
-        run: cmake --install . -C ${{matrix.conf}}
+        run: cmake --install . --config ${{matrix.conf}}
   # Windows msys2 builds
   windows-msys2:
-    name: MSys ${{matrix.sys}} - ${{matrix.conf}}
+    name: Build MSys ${{matrix.sys}} - ${{matrix.conf}}
     runs-on: windows-latest
     strategy:
       matrix:
@@ -127,7 +127,7 @@ jobs:
           -DDOWNLOAD_AND_BUILD_DEPS=ON
           ${{ env.cmake_extra_flags }}
       - name: Build
-        run: cmake --build build
+        run: cmake --build build --config ${{matrix.conf}}
       - name: Test
         run: |
           cd build
@@ -136,7 +136,7 @@ jobs:
       - name: Debug output
         run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
       - name: install
-        run: cmake --install . -C ${{matrix.conf}}
+        run: cmake --install . --config ${{matrix.conf}}
   # Linux sanitizer builds
   build_asan:
     name: Sanitizer build (ubuntu-20.04) - ${{ matrix.tool }}
