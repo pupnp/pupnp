@@ -70,6 +70,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "posix_overwrites.h"
+
 #ifdef _WIN32
 /* Do not include these files */
 #else

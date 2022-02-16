@@ -50,10 +50,9 @@
 #include <assert.h>
 
 #include "config.h"
-
 #include "uri.h"
-
 #include "upnpapi.h"
+#include "posix_overwrites.h"
 
 /*!
  * \brief Returns a 1 if a char is a RESERVED char as defined in

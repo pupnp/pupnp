@@ -40,6 +40,8 @@
 #include <stdlib.h> /* for free() */
 #include <string.h>
 
+#include "posix_overwrites.h"
+
 void ixmlElement_init(IXML_Element *element)
 {
 	if (element != NULL) {

@@ -22,11 +22,7 @@
 #include <stdlib.h> /* for calloc(), free() */
 #include <string.h> /* for strlen(), strdup() */
 
-#ifdef _WIN32
-	#define strcasecmp stricmp
-#else
-/* Other systems have strncasecmp */
-#endif
+#include "posix_overwrites.h"
 
 #ifndef UPNP_USE_MSVCPP
 	#ifdef UPNP_USE_BCBPP

@@ -46,9 +46,7 @@
 #include <stdlib.h> /* for free(), malloc() */
 #include <string.h>
 
-#ifdef _WIN32
-	#define strncasecmp strnicmp
-#endif
+#include "posix_overwrites.h"
 
 static char g_error_char = '\0';
 #ifdef IXML_HAVE_SCRIPTSUPPORT
