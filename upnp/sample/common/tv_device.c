@@ -47,6 +47,8 @@
 
 #include <assert.h>
 
+#include "posix_overwrites.h"
+
 #define DEFAULT_WEB_DIR "./web"
 
 #define DESC_URL_SIZE 200
