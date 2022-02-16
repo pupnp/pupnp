@@ -40,6 +40,8 @@
 #include <stdlib.h> /* for free(), malloc() */
 #include <string.h>
 
+#include "posix_overwrites.h"
+
 void ixmlNode_init(IXML_Node *nodeptr)
 {
 	assert(nodeptr != NULL);

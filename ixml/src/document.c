@@ -41,6 +41,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "posix_overwrites.h"
+
 void ixmlDocument_init(IXML_Document *doc)
 {
 	memset(doc, 0, sizeof(IXML_Document));

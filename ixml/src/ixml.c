@@ -40,6 +40,8 @@
 #include <stdlib.h> /* for free() */
 #include <string.h>
 
+#include "posix_overwrites.h"
+
 /*!
  * \brief Appends a string to a buffer, substituting some characters by escape
  * sequences.
