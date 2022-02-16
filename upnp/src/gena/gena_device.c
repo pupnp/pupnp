@@ -53,12 +53,6 @@
 		#include "upnpapi.h"
 		#include "uuid.h"
 
-		#ifdef _WIN32
-			#if defined(_MSC_VER) && _MSC_VER < 1900
-				#define snprintf _snprintf
-			#endif
-		#endif
-
 		#define STALE_JOBID (INVALID_JOB_ID - 1)
 
 /*!
