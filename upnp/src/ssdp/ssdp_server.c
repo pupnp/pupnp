@@ -38,14 +38,6 @@
  * \file
  */
 
-#ifndef _WIN32
-	#include <sys/param.h>
-#else
-	#if defined(_MSC_VER) && _MSC_VER < 1900
-		#define snprintf _snprintf
-	#endif
-#endif /* _WIN32 */
-
 #include "config.h"
 
 #if EXCLUDE_SSDP == 0

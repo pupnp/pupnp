@@ -57,12 +57,6 @@
 
 		#include <stdio.h>
 
-		#ifdef _WIN32
-			#include <string.h>
-			#if defined(_MSC_VER) && _MSC_VER < 1900
-				#define snprintf _snprintf
-			#endif
-		#endif /* _WIN32 */
 
 /*!
  * \brief Sends a callback to the control point application with a SEARCH
