@@ -44,6 +44,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "posix_overwrites.h"
+
 #if !UPNP_HAVE_TOOLS
 	#error "Need upnptools.h to compile samples ; try ./configure --enable-tools"
 #endif

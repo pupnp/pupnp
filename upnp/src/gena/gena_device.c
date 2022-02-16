@@ -52,6 +52,7 @@
 		#include "unixutil.h"
 		#include "upnpapi.h"
 		#include "uuid.h"
+		#include "posix_overwrites.h"
 
 		#define STALE_JOBID (INVALID_JOB_ID - 1)
 

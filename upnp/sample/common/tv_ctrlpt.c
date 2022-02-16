@@ -45,6 +45,8 @@
 
 #include "upnp.h"
 
+#include "posix_overwrites.h"
+
 /*!
  * Mutex for protecting the global device list in a multi-threaded,
  * asynchronous environment. All functions should lock this mutex before

@@ -40,6 +40,8 @@
 #endif
 #include "upnpdebug.h"
 
+#include "posix_overwrites.h"
+
 int main(int argc, char *argv[])
 {
 	int rc;

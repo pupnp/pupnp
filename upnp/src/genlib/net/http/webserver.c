@@ -64,6 +64,7 @@
 	#include <fcntl.h>
 	#include <sys/stat.h>
 
+	#include "posix_overwrites.h"
 
 /*!
  * Response Types.

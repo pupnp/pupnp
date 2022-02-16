@@ -57,6 +57,7 @@
 
 		#include <stdio.h>
 
+		#include "posix_overwrites.h"
 
 /*!
  * \brief Sends a callback to the control point application with a SEARCH
