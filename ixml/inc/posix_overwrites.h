@@ -11,4 +11,4 @@
 	#define strnicmp _strnicmp
 
 #endif /* _WIN32 */
-#endif  /* POSIX_OVERWRTIES_H */
+#endif /* POSIX_OVERWRTIES_H */
