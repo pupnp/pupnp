@@ -50,8 +50,9 @@
 #include <assert.h>
 
 #include "config.h"
-#include "uri.h"
 #include "upnpapi.h"
+#include "uri.h"
+
 #include "posix_overwrites.h"
 
 /*!

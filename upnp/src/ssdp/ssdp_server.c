@@ -62,6 +62,8 @@
 
 	#include <stdio.h>
 
+	#include "posix_overwrites.h"
+
 	#define MAX_TIME_TOREAD 45
 
 	#ifdef INCLUDE_CLIENT_APIS
