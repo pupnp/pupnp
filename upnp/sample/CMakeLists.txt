@@ -4,7 +4,7 @@ else ()
 	set (UPNP_LIBRARY upnp_static)
 endif()
 
-if (client)
+if (UPNP_ENABLE_CLIENT_API)
 	add_executable (tv_ctrlpt
 		common/sample_util.c
 		common/tv_ctrlpt.c
@@ -26,7 +26,7 @@ if (client)
 	)
 endif()
 
-if (client AND device)
+if (UPNP_ENABLE_CLIENT_API AND UPNP_ENABLE_DEVICE_API)
 	add_executable (tv_combo
 		common/sample_util.c
 		common/tv_ctrlpt.c
@@ -49,7 +49,7 @@ if (client AND device)
 	)
 endif()
 
-if (device)
+if (UPNP_ENABLE_DEVICE_API)
 	add_executable (tv_device
 		common/sample_util.c
 		common/tv_device.c
