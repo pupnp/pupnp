@@ -1718,7 +1718,11 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
 		   (enum Upnp_DescType_e)UPNPREG_FILENAME_DESC) {
 		int ret = 0;
 
+#ifdef _WIN32
+		fopen_s(&fp, description, "rb");
+#else
 		fp = fopen(description, "rb");
+#endif
 		if (!fp) {
 			rc = UPNP_E_FILE_NOT_FOUND;
 			ret = 1;

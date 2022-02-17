@@ -2723,7 +2723,11 @@ static int Parser_readFileOrBuffer(
 	FILE *xmlFilePtr = NULL;
 
 	if (file) {
+#ifdef _WIN32
+		fopen_s(&xmlFilePtr, xmlFileName, "rb");
+#else
 		xmlFilePtr = fopen(xmlFileName, "rb");
+#endif
 		if (xmlFilePtr == NULL) {
 			return IXML_NO_SUCH_FILE;
 		} else {

@@ -87,7 +87,12 @@ int UpnpInitLog(void)
 	}
 	is_stderr = 0;
 	if (fileName) {
+#ifdef _WIN32
+		fopen_s(&fp, fileName, "a");
+		if (fp == NULL) {
+#else
 		if ((fp = fopen(fileName, "a")) == NULL) {
+#endif
 			fprintf(stderr,
 				"Failed to open fileName (%s): %s\n",
 				fileName,

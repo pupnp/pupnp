@@ -534,7 +534,11 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 					Instr->Cookie,
 					Instr->RequestCookie);
 			else
+#ifdef _WIN32
+				fopen_s(&Fp, filename, "rb");
+#else
 				Fp = fopen(filename, "rb");
+#endif
 			if (Fp == NULL) {
 				RetVal = UPNP_E_FILE_READ_ERROR;
 				goto ExitFunction;
