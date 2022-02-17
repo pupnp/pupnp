@@ -535,7 +535,11 @@ static int get_file_info(
 	char buffer[ASCTIME_R_BUFFER_SIZE];
 
 	UpnpFileInfo_set_ContentType(info, NULL);
+#ifdef _WIN32
+	fopen_s(&fp, filename, "r");
+#else
 	fp = fopen(filename, "r");
+#endif
 	/* check readable */
 	UpnpFileInfo_set_IsReadable(info, fp != NULL);
 	if (!fp) {
