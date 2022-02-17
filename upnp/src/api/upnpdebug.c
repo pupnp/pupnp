@@ -232,7 +232,7 @@ static void UpnpDisplayFileAndLine(FILE *fp,
 		smod,
 		slev,
 #ifdef __PTW32_DLLPORT
-		(unsigned long int)ithread_self().p
+		*(unsigned long int *)ithread_self().p
 #else
 		(unsigned long int)ithread_self()
 #endif
