@@ -1718,11 +1718,11 @@ static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
 		   (enum Upnp_DescType_e)UPNPREG_FILENAME_DESC) {
 		int ret = 0;
 
-#ifdef _WIN32
+		#ifdef _WIN32
 		fopen_s(&fp, description, "rb");
-#else
+		#else
 		fp = fopen(description, "rb");
-#endif
+		#endif
 		if (!fp) {
 			rc = UPNP_E_FILE_NOT_FOUND;
 			ret = 1;
@@ -3691,9 +3691,14 @@ int UpnpGetIfInfo(const char *IfName)
 			 * not all) adapters. A full fix would require a lot of
 			 * big changes (gIF_NAME to wchar string?).
 			 */
-			wcstombs(gIF_NAME,
+			size_t *s = NULL;
+			wcstombs_s(s,
+				gIF_NAME,
+				sizeof(gIF_NAME),
 				adapts_item->FriendlyName,
 				sizeof(gIF_NAME));
+			free(s);
+
 			ifname_found = 1;
 		} else {
 			/*
@@ -3704,9 +3709,15 @@ int UpnpGetIfInfo(const char *IfName)
 			 * big changes (gIF_NAME to wchar string?).
 			 */
 			char tmpIfName[LINE_SIZE] = {0};
-			wcstombs(tmpIfName,
+			size_t *s = NULL;
+
+			wcstombs_s(s,
+				tmpIfName,
+				sizeof(tmpIfName),
 				adapts_item->FriendlyName,
 				sizeof(tmpIfName));
+			free(s);
+
 			if (strncmp(gIF_NAME, tmpIfName, sizeof(gIF_NAME)) !=
 				0) {
 				/* This is not the interface we're looking for.
