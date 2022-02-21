@@ -695,7 +695,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 		max_fd = max(max_fd, gSsdpReqSocket6);
 	}
 		#endif
-	ret = select(max_fd + 1, NULL, &wrSet, NULL, NULL);
+	ret = select((int)max_fd + 1, NULL, &wrSet, NULL, NULL);
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		UpnpPrintf(UPNP_INFO,
