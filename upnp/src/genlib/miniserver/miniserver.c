@@ -1300,7 +1300,7 @@ int StopMiniServer()
 		ssdpAddr.sin_port = htons(miniStopSockPort);
 		sendto(sock,
 			buf,
-			bufLen,
+			(int)bufLen,
 			0,
 			(struct sockaddr *)&ssdpAddr,
 			socklen);

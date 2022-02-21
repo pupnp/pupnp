@@ -226,8 +226,10 @@ static int sock_read_write(
 			} else {
 #endif
 				/* read data. */
-				numBytes = (long)recv(
-					sockfd, buffer, bufsize, MSG_NOSIGNAL);
+				numBytes = (long)recv(sockfd,
+					buffer,
+					(int)bufsize,
+					MSG_NOSIGNAL);
 #ifdef UPNP_ENABLE_OPEN_SSL
 			}
 #endif
@@ -245,7 +247,7 @@ static int sock_read_write(
 					/* write data. */
 					num_written = send(sockfd,
 						buffer + bytes_sent,
-						byte_left,
+						(int)byte_left,
 						MSG_DONTROUTE | MSG_NOSIGNAL);
 #ifdef UPNP_ENABLE_OPEN_SSL
 				}
@@ -261,7 +263,7 @@ static int sock_read_write(
 					return (int)num_written;
 				}
 				byte_left -= (size_t)num_written;
-				bytes_sent += num_written;
+				bytes_sent += (long)num_written;
 			}
 			numBytes = bytes_sent;
 		}
