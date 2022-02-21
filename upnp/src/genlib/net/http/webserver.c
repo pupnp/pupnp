@@ -787,7 +787,11 @@ static int GetNextRange(
 	if ((Ptr = strstr(Tok, "-")) == NULL)
 		return -1;
 	*Ptr = ' ';
+	#ifdef _WIN32
+	sscanf_s(Tok, "%" SCNd64 "%" SCNd64, &F, &L);
+	#else
 	sscanf(Tok, "%" SCNd64 "%" SCNd64, &F, &L);
+	#endif
 	if (F == -1 || L == -1) {
 		*Ptr = '-';
 		for (i = 0; i < (int)strlen(Tok); i++) {

@@ -37,7 +37,7 @@
  */
 
 #ifndef _GNU_SOURCE
-#define _GNU_SOURCE /* For strcasestr() in string.h */
+	#define _GNU_SOURCE /* For strcasestr() in string.h */
 #endif
 
 #include "config.h"
@@ -1334,7 +1334,11 @@ static parse_status_t parser_parse_requestline(http_parser_t *parser)
 	/* scan version */
 	save_char = version_str.buf[version_str.length];
 	version_str.buf[version_str.length] = '\0'; /* null-terminate */
+#ifdef _WIN32
+	num_scanned = sscanf_s(version_str.buf,
+#else
 	num_scanned = sscanf(version_str.buf,
+#endif
 		"%d . %d",
 		&hmsg->major_version,
 		&hmsg->minor_version);
@@ -1395,8 +1399,12 @@ parse_status_t parser_parse_responseline(http_parser_t *parser)
 		return status;
 	save_char = line.buf[line.length];
 	line.buf[line.length] = '\0'; /* null-terminate */
-	/* scan http version and ret code */
+				      /* scan http version and ret code */
+#ifdef _WIN32
+	num_scanned = sscanf_s(line.buf,
+#else
 	num_scanned = sscanf(line.buf,
+#endif
 		"%d . %d %d",
 		&hmsg->major_version,
 		&hmsg->minor_version,

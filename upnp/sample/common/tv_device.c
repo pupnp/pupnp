@@ -1508,7 +1508,11 @@ void *TvDeviceCommandLoop(void *args)
 		s = fgets(cmdline, 100, stdin);
 		if (!s)
 			break;
+#ifdef _WIN32
+		sscanf_s(cmdline, "%s", cmd, (unsigned)_countof(cmd));
+#else
 		sscanf(cmdline, "%s", cmd);
+#endif
 		if (strcasecmp(cmd, "exit") == 0) {
 			SampleUtil_Print("Shutting down...\n");
 			TvDeviceStop();
@@ -1539,13 +1543,21 @@ int device_main(int argc, char *argv[])
 		if (strcmp(argv[i], "-i") == 0) {
 			iface = argv[++i];
 		} else if (strcmp(argv[i], "-port") == 0) {
+#ifdef WIN32
+			sscanf_s(argv[++i], "%u", &portTemp);
+#else
 			sscanf(argv[++i], "%u", &portTemp);
+#endif
 		} else if (strcmp(argv[i], "-desc") == 0) {
 			desc_doc_name = argv[++i];
 		} else if (strcmp(argv[i], "-webdir") == 0) {
 			web_dir_path = argv[++i];
 		} else if (strcmp(argv[i], "-m") == 0) {
+#ifdef _WIN32
+			sscanf_s(argv[++i], "%d", &ip_mode);
+#else
 			sscanf(argv[++i], "%d", &ip_mode);
+#endif
 		} else if (strcmp(argv[i], "-help") == 0) {
 			SampleUtil_Print(
 				"Usage: %s -i interface -port port"
