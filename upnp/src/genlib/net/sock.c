@@ -189,10 +189,13 @@ static int sock_read_write(
 	timeout.tv_usec = 0;
 	while (1) {
 		if (*timeoutSecs < 0)
-			retCode = select(
-				sockfd + 1, &readSet, &writeSet, NULL, NULL);
+			retCode = select((int)sockfd + 1,
+				&readSet,
+				&writeSet,
+				NULL,
+				NULL);
 		else
-			retCode = select(sockfd + 1,
+			retCode = select((int)sockfd + 1,
 				&readSet,
 				&writeSet,
 				NULL,

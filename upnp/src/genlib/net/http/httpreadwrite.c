@@ -118,7 +118,7 @@ static int Check_Connect_And_Wait_Connection(
 		if (EINPROGRESS == errno) {
 	#endif
 			result = select(
-				sock + 1, NULL, &fdSet, NULL, &tmvTimeout);
+				(int)sock + 1, NULL, &fdSet, NULL, &tmvTimeout);
 			if (result < 0) {
 	#ifdef _WIN32
 					/* WSAGetLastError(); */

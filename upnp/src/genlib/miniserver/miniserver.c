@@ -327,7 +327,7 @@ static int dispatch_request(
 			int timeout = HTTP_DEFAULT_TIMEOUT;
 
 			getNumericHostRedirection(
-				info->socket, host_port, sizeof host_port);
+				(int)info->socket, host_port, sizeof host_port);
 			membuffer_init(&redir_buf);
 			snprintf(redir_str, NAME_SIZE, redir_fmt, host_port);
 			membuffer_append_str(&redir_buf, redir_str);
