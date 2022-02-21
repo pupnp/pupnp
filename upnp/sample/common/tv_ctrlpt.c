@@ -1561,7 +1561,16 @@ int TvCtrlPointProcessCommand(char *cmdline)
 	int invalidargs = 0;
 	int validargs;
 
+#ifdef _WIN32
+	validargs = sscanf_s(cmdline,
+		"%s %d %d",
+		cmd,
+		(unsigned)_countof(cmd),
+		&arg1,
+		&arg2);
+#else
 	validargs = sscanf(cmdline, "%s %d %d", cmd, &arg1, &arg2);
+#endif
 	for (i = 0; i < numofcmds; ++i) {
 		if (strcasecmp(cmd, cmdloop_cmdlist[i].str) == 0) {
 			cmdnum = cmdloop_cmdlist[i].cmdnum;
@@ -1612,7 +1621,17 @@ int TvCtrlPointProcessCommand(char *cmdline)
 		break;
 	case CTRLACTION:
 		/* re-parse commandline since second arg is string. */
+#ifdef _WIN32
+		validargs = sscanf_s(cmdline,
+			"%s %d %s",
+			cmd,
+			(unsigned)_countof(cmd),
+			&arg1,
+			strarg,
+			(unsigned)_countof(strarg));
+#else
 		validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
+#endif
 		if (validargs == 3)
 			TvCtrlPointSendAction(TV_SERVICE_CONTROL,
 				arg1,
@@ -1625,7 +1644,17 @@ int TvCtrlPointProcessCommand(char *cmdline)
 		break;
 	case PICTACTION:
 		/* re-parse commandline since second arg is string. */
+#ifdef _WIN32
+		validargs = sscanf_s(cmdline,
+			"%s %d %s",
+			cmd,
+			(unsigned)_countof(cmd),
+			&arg1,
+			strarg,
+			(unsigned)_countof(strarg));
+#else
 		validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
+#endif
 		if (validargs == 3)
 			TvCtrlPointSendAction(TV_SERVICE_PICTURE,
 				arg1,
@@ -1638,7 +1667,17 @@ int TvCtrlPointProcessCommand(char *cmdline)
 		break;
 	case CTRLGETVAR:
 		/* re-parse commandline since second arg is string. */
+#ifdef _WIN32
+		validargs = sscanf_s(cmdline,
+			"%s %d %s",
+			cmd,
+			(unsigned)_countof(cmd),
+			&arg1,
+			strarg,
+			(unsigned)_countof(strarg));
+#else
 		validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
+#endif
 		if (validargs == 3)
 			TvCtrlPointGetVar(TV_SERVICE_CONTROL, arg1, strarg);
 		else
@@ -1646,7 +1685,17 @@ int TvCtrlPointProcessCommand(char *cmdline)
 		break;
 	case PICTGETVAR:
 		/* re-parse commandline since second arg is string. */
+#ifdef _WIN32
+		validargs = sscanf_s(cmdline,
+			"%s %d %s",
+			cmd,
+			(unsigned)_countof(cmd),
+			&arg1,
+			strarg,
+			(unsigned)_countof(strarg));
+#else
 		validargs = sscanf(cmdline, "%s %d %s", cmd, &arg1, strarg);
+#endif
 		if (validargs == 3)
 			TvCtrlPointGetVar(TV_SERVICE_PICTURE, arg1, strarg);
 		else

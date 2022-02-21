@@ -61,7 +61,11 @@ int main(int argc, char *argv[])
 	printf("UPNP_VERSION_PATCH  = %d\n", UPNP_VERSION_PATCH);
 	printf("UPNP_VERSION        = %d\n", UPNP_VERSION);
 
+#ifdef _WIN32
+	if (sscanf_s(UPNP_VERSION_STRING, "%d.%d.%d", &a, &b, &c) != 3 ||
+#else
 	if (sscanf(UPNP_VERSION_STRING, "%d.%d.%d", &a, &b, &c) != 3 ||
+#endif
 		a != UPNP_VERSION_MAJOR || b != UPNP_VERSION_MINOR ||
 		c != UPNP_VERSION_PATCH) {
 		printf("** ERROR malformed UPNP_VERSION_STRING\n");

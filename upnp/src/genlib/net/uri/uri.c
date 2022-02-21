@@ -136,7 +136,11 @@ int replace_escaped(char *in, size_t index, size_t *max)
 		isxdigit(in[index + (size_t)2])) {
 		/* Note the "%2x", makes sure that we convert a maximum of two
 		 * characters. */
+#ifdef _WIN32
+		if (sscanf_s(&in[index + (size_t)1],
+#else
 		if (sscanf(&in[index + (size_t)1],
+#endif
 			    "%2x",
 			    (unsigned int *)&tempInt) != 1) {
 			return 0;
