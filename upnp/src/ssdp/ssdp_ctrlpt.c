@@ -724,7 +724,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 				ReqBufv6UlaGua);
 			sendto(gSsdpReqSocket6,
 				ReqBufv6UlaGua,
-				strlen(ReqBufv6UlaGua),
+				(int)strlen(ReqBufv6UlaGua),
 				0,
 				(struct sockaddr *)&__ss_v6,
 				sizeof(struct sockaddr_in6));
@@ -742,7 +742,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 				ReqBufv6);
 			sendto(gSsdpReqSocket6,
 				ReqBufv6,
-				strlen(ReqBufv6),
+				(int)strlen(ReqBufv6),
 				0,
 				(struct sockaddr *)&__ss_v6,
 				sizeof(struct sockaddr_in6));
@@ -763,7 +763,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 				ReqBufv4);
 			sendto(gSsdpReqSocket4,
 				ReqBufv4,
-				strlen(ReqBufv4),
+				(int)strlen(ReqBufv4),
 				0,
 				(struct sockaddr *)&__ss_v4,
 				sizeof(struct sockaddr_in));

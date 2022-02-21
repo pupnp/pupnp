@@ -620,7 +620,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 					rc = snprintf(Chunk_Header,
 						sizeof(Chunk_Header),
 						"%" PRIzx "\r\n",
-						num_read);
+						(unsigned long)num_read);
 					if (rc < 0 ||
 						(unsigned int)rc >=
 							sizeof(Chunk_Header)) {
@@ -1759,7 +1759,10 @@ int http_MakeMessage(membuffer *buf,
 		} else if (c == 'd') {
 			/* integer */
 			num = (size_t)va_arg(argp, int);
-			rc = snprintf(tempbuf, sizeof(tempbuf), "%" PRIzu, num);
+			rc = snprintf(tempbuf,
+				sizeof(tempbuf),
+				"%" PRIzu,
+				(unsigned long)num);
 			if (rc < 0 || (unsigned int)rc >= sizeof(tempbuf) ||
 				membuffer_append(buf, tempbuf, strlen(tempbuf)))
 				goto error_handler;
