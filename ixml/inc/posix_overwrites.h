@@ -12,6 +12,7 @@
 	#define strnicmp _strnicmp
 
 	/* Secure versions of functions */
+	#define strcat(arg1, arg2) strcat_s(arg1, sizeof(arg1), arg2)
 	#define strcpy(arg1, arg2) strcpy_s(arg1, _countof(arg1), arg2)
 	#define strncpy(arg1, arg2, arg3) strncpy_s(arg1, arg3, arg2, arg3)
 	#define sprintf(arg1, ...) sprintf_s(arg1, sizeof(arg1), __VA_ARGS__)
