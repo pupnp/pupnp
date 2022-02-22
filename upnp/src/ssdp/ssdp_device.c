@@ -56,11 +56,7 @@
 		#include <stdio.h>
 		#include <string.h>
 
-		#ifdef _WIN32
-			#if defined(_MSC_VER) && _MSC_VER < 1900
-				#define snprintf _snprintf
-			#endif
-		#endif
+		#include "posix_overwrites.h"
 
 		#define MSGTYPE_SHUTDOWN 0
 		#define MSGTYPE_ADVERTISEMENT 1

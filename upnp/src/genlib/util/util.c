@@ -43,6 +43,8 @@
 
 #include <string.h>
 
+#include "posix_overwrites.h"
+
 void linecopy(char dest[LINE_SIZE], const char *src)
 {
 	strncpy(dest, src, LINE_SIZE - (size_t)1);
