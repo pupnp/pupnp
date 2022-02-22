@@ -181,7 +181,7 @@ struct tm *http_gmtime_r(const time_t *clock, struct tm *result)
 		return NULL;
 
 	/* gmtime in VC runtime is thread safe. */
-	*result = *gmtime(clock);
+	gmtime_s(result, clock);
 	return result;
 }
 #endif
