@@ -31,7 +31,6 @@
  **************************************************************************/
 
 #include "config.h"
-
 /*!
  * \file
  */
@@ -46,14 +45,9 @@
 	#include <stdarg.h>
 	#include <stdio.h>
 
+	#include "posix_overwrites.h"
 	/*! Maximum action header buffer length. */
 	#define HEADER_LENGTH 2000
-
-	#ifdef _WIN32
-		#if defined(_MSC_VER) && _MSC_VER < 1900
-			#define snprintf _snprintf
-		#endif
-	#endif
 
 /*!
  * \brief Structure to maintain a error code and string associated with the
