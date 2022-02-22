@@ -59,6 +59,8 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include "posix_overwrites.h"
+
 #ifdef _WIN32
 	#include <malloc.h>
 	#define fseeko fseek
