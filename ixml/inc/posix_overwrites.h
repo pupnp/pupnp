@@ -13,6 +13,7 @@
 
 	/* Secure versions of functions */
 	#define strncpy(arg1, arg2, arg3) strncpy_s(arg1, arg3, arg2, arg3)
+	#define sprintf(arg1, ...) sprintf_s(arg1, sizeof(arg1), __VA_ARGS__)
 
 #endif /* _WIN32 */
 #endif /* POSIX_OVERWRTIES_H */
