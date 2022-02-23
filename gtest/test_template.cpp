@@ -27,7 +27,13 @@ TEST(EmptyTestSuite, empty_gtest)
 	//GTEST_SKIP_("to show this feature");
 
 	// SKIP on Github Actions
-	char* github_action = std::getenv("GITHUB_ACTIONS");
+#ifdef _WIN32
+	char* github_action;
+	size_t len;
+	_dupenv_s(&github_action, &len, "GITHUB_ACTIONS");
+#else
+	char *github_action = std::getenv("GITHUB_ACTIONS");
+#endif
 	if(github_action) { GTEST_SKIP()
 		<< "  to show this feature";
 	}
