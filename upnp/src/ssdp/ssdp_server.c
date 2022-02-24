@@ -983,8 +983,13 @@ static int create_ssdp_sock_v4(
 		goto error_handler;
 	}
 	memset((void *)&ssdpMcastAddr, 0, sizeof(struct ip_mreq));
+	#ifdef _WIN32
+	inet_pton(AF_INET, (PCSTR)gIF_IPV4, &ssdpMcastAddr.imr_interface);
+	inet_pton(AF_INET, (PCSTR)SSDP_IP, &ssdpMcastAddr.imr_multiaddr);
+	#else
 	ssdpMcastAddr.imr_interface.s_addr = inet_addr(gIF_IPV4);
 	ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr(SSDP_IP);
+	#endif
 	ret = setsockopt(*ssdpSock,
 		IPPROTO_IP,
 		IP_ADD_MEMBERSHIP,
@@ -1004,7 +1009,11 @@ static int create_ssdp_sock_v4(
 	}
 	/* Set multicast interface. */
 	memset((void *)&addr, 0, sizeof(struct in_addr));
+	#ifdef _WIN32
+	inet_pton(AF_INET, (PCSTR)gIF_IPV4, &addr);
+	#else
 	addr.s_addr = inet_addr(gIF_IPV4);
+	#endif
 	ret = setsockopt(*ssdpSock,
 		IPPROTO_IP,
 		IP_MULTICAST_IF,
