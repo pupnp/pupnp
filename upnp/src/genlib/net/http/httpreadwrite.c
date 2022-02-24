@@ -2286,21 +2286,10 @@ void get_sdk_info(char *info, size_t infoSize)
 	snprintf(info, infoSize, "Unspecified, UPnP/1.0, Unspecified\r\n");
 #else /* UPNP_ENABLE_UNSPECIFIED_SERVER */
 	#ifdef _WIN32
-	OSVERSIONINFO versioninfo;
-	versioninfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-	if (GetVersionEx(&versioninfo) != 0)
-		snprintf(info,
-			infoSize,
-			"%d.%d.%d %d/%s, UPnP/1.0, Portable SDK for UPnP "
-			"devices/" UPNP_VERSION_STRING "\r\n",
-			versioninfo.dwMajorVersion,
-			versioninfo.dwMinorVersion,
-			versioninfo.dwBuildNumber,
-			versioninfo.dwPlatformId,
-			versioninfo.szCSDVersion);
-	else
-		*info = '\0';
+	snprintf(info,
+		infoSize,
+		"UPnP/1.0, Portable SDK for UPnP devices/" UPNP_VERSION_STRING
+		"on windows\r\n");
 	#else
 	int ret_code;
 	struct utsname sys_info;
