@@ -425,7 +425,7 @@ static void SetSeed(void)
 	gettimeofday(&t, NULL);
 #if defined(__PTW32_DLLPORT)
 	srand((unsigned int)t.tv_usec +
-		(unsigned int)ithread_get_current_thread_id().p);
+		PtrToUint(ithread_get_current_thread_id().p));
 #elif defined(BSD) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
 	srand((unsigned int)t.tv_usec +
 		(unsigned int)ithread_get_current_thread_id());
