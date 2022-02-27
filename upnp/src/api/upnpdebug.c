@@ -175,7 +175,6 @@ static void UpnpDisplayFileAndLine(FILE *fp,
 {
 	char timebuf[26];
 	time_t now = time(NULL);
-	struct tm *timeinfo;
 	const char *smod;
 #if 0
 	char *slev;
@@ -223,8 +222,23 @@ static void UpnpDisplayFileAndLine(FILE *fp,
 		break;
 	}
 
+#ifdef _WIN32
+	struct tm timeinfo = {.tm_sec = 0,
+		.tm_min = 0,
+		.tm_hour = 0,
+		.tm_mday = 0,
+		.tm_mon = 0,
+		.tm_year = 0,
+		.tm_wday = 0,
+		.tm_yday = 0,
+		.tm_isdst = 0};
+	localtime_s(&timeinfo, &now);
+	strftime(timebuf, 26, "%Y-%m-%d %H:%M:%S", &timeinfo);
+#else
+	struct tm *timeinfo;
 	timeinfo = localtime(&now);
 	strftime(timebuf, 26, "%Y-%m-%d %H:%M:%S", timeinfo);
+#endif
 
 	fprintf(fp,
 		"%s UPNP-%s-%s: Thread:0x%lX [%s:%d]: ",
