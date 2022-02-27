@@ -40,6 +40,7 @@ jobs:
           -DBUILD_TESTING=ON
           -DDOWNLOAD_AND_BUILD_DEPS=ON
           -DUPNP_ENABLE_OPEN_SSL=ON
+          -DCMAKE_C_FLAGS="-Wall -Wpedantic"
           -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install
           ${{ env.cmake_extra_flags }}
       - name: Build
