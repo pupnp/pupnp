@@ -47,7 +47,8 @@ See [LICENSE](site/LICENSE) for details.
 - [13. New Features](#13-new-features)
 - [14. Support and Contact Information](#14-support-and-contact-information)
 - [15. IXML support for scripting languages](#15-ixml-support-for-scripting-languages)
-- [16. Thanks](#16-thanks)
+- [16. SourceForge Badges](#16-sourceforge-badges)
+- [17. Thanks](#17-thanks)
 
 ## 1. Overview
 
@@ -477,7 +478,25 @@ Script side steps:
 - if the node has a parent, then the intermediate object can be destroyed after the ctag on the corresponding node has been cleared. Nothing needs to be freed on the C-side.
 - if the node has no parent, then the node must be freed on the C side by calling the corresponding free node methods. This will result in a chain of callbacks closing the node and all underlying nodes.
 
-## 16. Thanks
+## 16. SourceForge Badges
+
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD033 -->
+<div>
+    <img src="https://b.sf-syn.com/badge_img/166957/oss-users-love-us-black" style="width:125px"/>
+    <img src="https://b.sf-syn.com/badge_img/166957/oss-community-choice-black?achievement=oss-community-choice" style="width:125px"/>
+    <img src="https://b.sf-syn.com/badge_img/166957/oss-sf-favorite-black?achievement=oss-sf-favorite" style="width:125px"/>
+    <img src="https://b.sf-syn.com/badge_img/166957/oss-community-leader-black?achievement=oss-community-leader" style="width:125px"/>
+    <img src="https://b.sf-syn.com/badge_img/166957/oss-open-source-excellence-black?achievement=oss-open-source-excellence" style="width:125px"/>
+</div>
+<!-- markdownlint-restore -->
+
+[![Download Portable UPnP SDK](https://img.shields.io/sourceforge/dm/pupnp.svg)](https://sourceforge.net/projects/pupnp/files/latest/download)
+[![Download Portable UPnP SDK](https://img.shields.io/sourceforge/dw/pupnp.svg)](https://sourceforge.net/projects/pupnp/files/latest/download)
+[![Download Portable UPnP SDK](https://img.shields.io/sourceforge/dd/pupnp.svg)](https://sourceforge.net/projects/pupnp/files/latest/download)
+[![Download Portable UPnP SDK](https://img.shields.io/sourceforge/dt/pupnp.svg)](https://sourceforge.net/projects/pupnp/files/latest/download)
+
+## 17. Thanks
 
 - To all the people listed in [the THANKS file](THANKS).
 - To [JetBrains](https://www.jetbrains.com/?from=pupnp) for kindly providing us with open source licenses of their amazing products.
