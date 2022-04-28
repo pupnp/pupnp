@@ -552,6 +552,7 @@ static int get_file_info(
                 goto exit_function;
         }
         fclose(fp);
+        fp = NULL;
         if (S_ISDIR(s.st_mode)) {
                 UpnpFileInfo_set_IsDirectory(info, 1);
         } else if (S_ISREG(s.st_mode)) {
