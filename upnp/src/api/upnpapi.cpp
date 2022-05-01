@@ -827,12 +827,11 @@ int UpnpRegisterRootDevice(UpnpLib *p,
                 goto exit_function;
         }
 
-        HInfo = (struct Handle_Info *)malloc(sizeof(struct Handle_Info));
+        HInfo = (struct Handle_Info *)std::calloc(1, sizeof(struct Handle_Info));
         if (HInfo == NULL) {
                 retVal = UPNP_E_OUTOF_MEMORY;
                 goto exit_function;
         }
-        memset(HInfo, 0, sizeof(struct Handle_Info));
         HandleTable->handle[*Hnd] = HInfo;
 
         UpnpPrintf(UpnpLib_get_Log(p),
@@ -937,7 +936,7 @@ int UpnpRegisterRootDevice(UpnpLib *p,
                 __FILE__,
                 __LINE__,
                 "UpnpRegisterRootDevice: Gena Check\n");
-        memset(&HInfo->ServiceTable, 0, sizeof(HInfo->ServiceTable));
+        HInfo->ServiceTable = {};
         hasServiceTable = getServiceTable(p,
                 (IXML_Node *)HInfo->DescDocument,
                 &HInfo->ServiceTable,
@@ -1043,12 +1042,11 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
                 goto exit_function;
         }
 
-        HInfo = (struct Handle_Info *)malloc(sizeof(struct Handle_Info));
+        HInfo = (struct Handle_Info *)std::calloc(1, sizeof(struct Handle_Info));
         if (HInfo == NULL) {
                 retVal = UPNP_E_OUTOF_MEMORY;
                 goto exit_function;
         }
-        memset(HInfo, 0, sizeof(struct Handle_Info));
         HandleTable->handle[*Hnd] = HInfo;
 
         /* prevent accidental removal of a non-existent alias */
@@ -1144,7 +1142,7 @@ int UpnpRegisterRootDevice2(UpnpLib *p,
                 __FILE__,
                 __LINE__,
                 "UpnpRegisterRootDevice2: Gena Check\n");
-        memset(&HInfo->ServiceTable, 0, sizeof(HInfo->ServiceTable));
+        HInfo->ServiceTable = {};
         hasServiceTable = getServiceTable(p,
                 (IXML_Node *)HInfo->DescDocument,
                 &HInfo->ServiceTable,
@@ -1245,12 +1243,11 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
                 retVal = UPNP_E_OUTOF_MEMORY;
                 goto exit_function;
         }
-        HInfo = (struct Handle_Info *)malloc(sizeof(struct Handle_Info));
+        HInfo = (struct Handle_Info *)std::calloc(1, sizeof(struct Handle_Info));
         if (HInfo == NULL) {
                 retVal = UPNP_E_OUTOF_MEMORY;
                 goto exit_function;
         }
-        memset(HInfo, 0, sizeof(struct Handle_Info));
         HandleTable->handle[*Hnd] = HInfo;
         UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_DEBUG,
@@ -1351,7 +1348,7 @@ int UpnpRegisterRootDevice4(UpnpLib *p,
                 __FILE__,
                 __LINE__,
                 "UpnpRegisterRootDevice4: Gena Check\n");
-        memset(&HInfo->ServiceTable, 0, sizeof(HInfo->ServiceTable));
+        HInfo->ServiceTable = {};
         hasServiceTable = getServiceTable(p,
                 (IXML_Node *)HInfo->DescDocument,
                 &HInfo->ServiceTable,
@@ -1672,7 +1669,7 @@ static void get_server_addr(
 {
         struct sockaddr_in *sa4 = (struct sockaddr_in *)serverAddr;
 
-        memset(serverAddr, 0, sizeof(struct sockaddr_storage));
+        *serverAddr = {};
 
         sa4->sin_family = AF_INET;
         inet_pton(AF_INET, UpnpLib_get_gIF_IPV4_cstr(p), &sa4->sin_addr);
@@ -1690,7 +1687,7 @@ static void get_server_addr6(
 {
         struct sockaddr_in6 *sa6 = (struct sockaddr_in6 *)serverAddr;
 
-        memset(serverAddr, 0, sizeof(struct sockaddr_storage));
+        *serverAddr = {};
 
         sa6->sin6_family = AF_INET6;
         inet_pton(AF_INET6, UpnpLib_get_gIF_IPV6_cstr(p), &sa6->sin6_addr);
@@ -1707,7 +1704,7 @@ static int GetDescDocumentAndURL(UpnpLib *p,
 {
         int retVal = 0;
         char *membuf = NULL;
-        char aliasStr[LINE_SIZE];
+        char aliasStr[LINE_SIZE] = {};
         char *temp_str = NULL;
         FILE *fp = NULL;
         int fd = 0;
@@ -1718,7 +1715,6 @@ static int GetDescDocumentAndURL(UpnpLib *p,
         struct sockaddr_storage serverAddr;
         int rc = UPNP_E_SUCCESS;
 
-        memset(aliasStr, 0, sizeof(aliasStr));
         if (description == NULL)
                 return UPNP_E_INVALID_PARAM;
         /* non-URL description must have configuration specified */
@@ -1907,9 +1903,7 @@ int UpnpSendAdvertisementLowPower(UpnpLib *p,
         struct Handle_Info *SInfo = NULL;
         int retVal = 0, *ptrMx;
         upnp_timeout *adEvent;
-        ThreadPoolJob job;
-
-        memset(&job, 0, sizeof(job));
+        ThreadPoolJob job = {};
 
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 return UPNP_E_FINISH;
@@ -2185,9 +2179,7 @@ int UpnpSubscribeAsync(UpnpLib *p,
         struct Handle_Info *SInfo = NULL;
         struct UpnpNonblockParam *Param;
         char *EvtUrl = (char *)EvtUrl_const;
-        ThreadPoolJob job;
-
-        memset(&job, 0, sizeof(job));
+        ThreadPoolJob job = {};
 
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 return UPNP_E_FINISH;
@@ -2222,12 +2214,11 @@ int UpnpSubscribeAsync(UpnpLib *p,
         }
         HandleUnlock();
 
-        Param = (struct UpnpNonblockParam *)malloc(
+        Param = (struct UpnpNonblockParam *)std::calloc(1,
                 sizeof(struct UpnpNonblockParam));
         if (Param == NULL) {
                 return UPNP_E_OUTOF_MEMORY;
         }
-        memset(Param, 0, sizeof(struct UpnpNonblockParam));
 
         Param->FunName = SUBSCRIBE;
         Param->Handle = Hnd;
@@ -2315,7 +2306,7 @@ int UpnpSubscribe(UpnpLib *p,
         HandleUnlock();
 
         retVal = genaSubscribe(p, Hnd, EvtUrl, TimeOut, SubsIdTmp);
-        memset(SubsId, 0, sizeof(Upnp_SID));
+        *SubsId = {};
         strncpy(SubsId, UpnpString_get_String(SubsIdTmp), sizeof(Upnp_SID) - 1);
 
 exit_function:
@@ -2398,11 +2389,9 @@ int UpnpUnSubscribeAsync(UpnpLib *p,
         const void *Cookie_const)
 {
         int retVal = UPNP_E_SUCCESS;
-        ThreadPoolJob job;
+        ThreadPoolJob job = {};
         struct Handle_Info *SInfo = NULL;
         struct UpnpNonblockParam *Param;
-
-        memset(&job, 0, sizeof(job));
 
         UpnpPrintf(UpnpLib_get_Log(p),
                 UPNP_DEBUG,
@@ -2436,13 +2425,12 @@ int UpnpUnSubscribeAsync(UpnpLib *p,
         }
         HandleUnlock();
 
-        Param = (struct UpnpNonblockParam *)malloc(
+        Param = (struct UpnpNonblockParam *)std::calloc(1,
                 sizeof(struct UpnpNonblockParam));
         if (Param == NULL) {
                 retVal = UPNP_E_OUTOF_MEMORY;
                 goto exit_function;
         }
-        memset(Param, 0, sizeof(struct UpnpNonblockParam));
 
         Param->FunName = UNSUBSCRIBE;
         Param->Handle = Hnd;
@@ -2538,11 +2526,9 @@ int UpnpRenewSubscriptionAsync(UpnpLib *p,
         Upnp_FunPtr Fun,
         const void *Cookie_const)
 {
-        ThreadPoolJob job;
+        ThreadPoolJob job = {};
         struct Handle_Info *SInfo = NULL;
         struct UpnpNonblockParam *Param;
-
-        memset(&job, 0, sizeof(job));
 
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 return UPNP_E_FINISH;
@@ -2576,12 +2562,11 @@ int UpnpRenewSubscriptionAsync(UpnpLib *p,
         }
         HandleUnlock();
 
-        Param = (struct UpnpNonblockParam *)malloc(
+        Param = (struct UpnpNonblockParam *)std::calloc(1,
                 sizeof(struct UpnpNonblockParam));
         if (Param == NULL) {
                 return UPNP_E_OUTOF_MEMORY;
         }
-        memset(Param, 0, sizeof(struct UpnpNonblockParam));
 
         Param->FunName = RENEW;
         Param->Handle = Hnd;
@@ -3050,7 +3035,7 @@ int UpnpSendActionAsync(UpnpLib *p,
         const void *Cookie_const)
 {
         int rc;
-        ThreadPoolJob job;
+        ThreadPoolJob job = {};
         struct Handle_Info *SInfo = NULL;
         struct UpnpNonblockParam *Param;
         DOMString tmpStr;
@@ -3058,8 +3043,6 @@ int UpnpSendActionAsync(UpnpLib *p,
         char *ServiceType = (char *)ServiceType_const;
         /* udn not used? */
         /*char *DevUDN = (char *)DevUDN_const;*/
-
-        memset(&job, 0, sizeof(job));
 
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 return UPNP_E_FINISH;
@@ -3094,14 +3077,13 @@ int UpnpSendActionAsync(UpnpLib *p,
                 return UPNP_E_INVALID_ACTION;
         }
 
-        Param = (struct UpnpNonblockParam *)malloc(
+        Param = (struct UpnpNonblockParam *)std::calloc(1,
                 sizeof(struct UpnpNonblockParam));
 
         if (Param == NULL) {
                 ixmlFreeDOMString(tmpStr);
                 return UPNP_E_OUTOF_MEMORY;
         }
-        memset(Param, 0, sizeof(struct UpnpNonblockParam));
 
         Param->FunName = ACTION;
         Param->Handle = Hnd;
@@ -3158,10 +3140,8 @@ int UpnpSendActionExAsync(UpnpLib *p,
         DOMString headerStr = NULL;
         char *ActionURL = (char *)ActionURL_const;
         char *ServiceType = (char *)ServiceType_const;
-        ThreadPoolJob job;
+        ThreadPoolJob job = {};
         int retVal = 0;
-
-        memset(&job, 0, sizeof(job));
 
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 return UPNP_E_FINISH;
@@ -3211,14 +3191,13 @@ int UpnpSendActionExAsync(UpnpLib *p,
                 return UPNP_E_INVALID_ACTION;
         }
 
-        Param = (struct UpnpNonblockParam *)malloc(
+        Param = (struct UpnpNonblockParam *)std::calloc(1,
                 sizeof(struct UpnpNonblockParam));
         if (Param == NULL) {
                 ixmlFreeDOMString(tmpStr);
                 ixmlFreeDOMString(headerStr);
                 return UPNP_E_OUTOF_MEMORY;
         }
-        memset(Param, 0, sizeof(struct UpnpNonblockParam));
 
         Param->FunName = ACTION;
         Param->Handle = Hnd;
@@ -3282,13 +3261,11 @@ int UpnpGetServiceVarStatusAsync(UpnpLib *p,
         Upnp_FunPtr Fun,
         const void *Cookie_const)
 {
-        ThreadPoolJob job;
+        ThreadPoolJob job = {};
         struct Handle_Info *SInfo = NULL;
         struct UpnpNonblockParam *Param;
         char *ActionURL = (char *)ActionURL_const;
         char *VarName = (char *)VarName_const;
-
-        memset(&job, 0, sizeof(job));
 
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 return UPNP_E_FINISH;
@@ -3317,12 +3294,11 @@ int UpnpGetServiceVarStatusAsync(UpnpLib *p,
         if (VarName == NULL || Fun == NULL)
                 return UPNP_E_INVALID_PARAM;
 
-        Param = (struct UpnpNonblockParam *)malloc(
+        Param = (struct UpnpNonblockParam *)std::calloc(1,
                 sizeof(struct UpnpNonblockParam));
         if (Param == NULL) {
                 return UPNP_E_OUTOF_MEMORY;
         }
-        memset(Param, 0, sizeof(struct UpnpNonblockParam));
 
         Param->FunName = STATUS;
         Param->Handle = Hnd;
@@ -4480,10 +4456,9 @@ int UpnpAddVirtualDir(UpnpLib *p,
         virtualDirList *pNewVirtualDir;
         virtualDirList *pLast;
         virtualDirList *pCurVirtualDir;
-        char dirName[NAME_SIZE];
+        char dirName[NAME_SIZE] = {};
         virtualDirList *pVirtualDirList = UpnpLib_get_pVirtualDirList(p);
 
-        memset(dirName, 0, sizeof(dirName));
         if (!UpnpLib_get_UpnpSdkInit(p)) {
                 /* SDK is not initialized */
                 return UPNP_E_FINISH;
