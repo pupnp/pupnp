@@ -149,10 +149,15 @@ static int host_header_is_numeric(char *host_port, size_t host_port_size)
 
 	/* Remove the port part. */
 	s = host_port + host_port_size - 1;
-	while (s != host_port && *s != ':') {
+	while (s != host_port && *s != ']' && *s != ':') {
 		--s;
 	}
-	*s = 0;
+	if (*s == ':') {
+		*s = 0;
+	} else {
+		s = host_port + host_port_size;
+	}
+
 	/* Try IPV4 */
 	rc = inet_pton(AF_INET, host_port, &addr);
 	if (rc == 1) {
