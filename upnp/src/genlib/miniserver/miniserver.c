@@ -833,7 +833,10 @@ static int init_socket_suff(UpnpLib *p,
                 goto error;
                 break;
         }
-        inet_pton(domain, text_addr, addr);
+
+        if (inet_pton(domain, text_addr, addr) <= 0)
+            goto error;
+
         s->fd = socket(domain, SOCK_STREAM, 0);
         if (s->fd == INVALID_SOCKET) {
                 strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
