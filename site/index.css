@@ -1,0 +1,92 @@
+:link {
+	background-color: #F0F0FA;
+	color: #0000CC
+}
+:visited {
+	background-color: #F0F0FA;
+	color: #660066
+}
+:active {
+	background-color: #F0F0FA;
+	color: #FF0000
+}
+body {
+	background-color: #F0F0FA;
+	color: #000000;
+/*	font-family: Verdana, Helvetica, sans-serif;*/
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+/*
+h1, h2, h3, h4, h5, p, ul {
+	font-family: Verdana, Helvetica, sans-serif;
+}
+*/
+
+h1 {
+	text-align: center;
+	font-weight: bold;
+}
+h2 {
+	text-align: center;
+}
+h3 {
+	text-align: center;
+	text-indent: 1em;
+}
+h4 {
+	text-align: center;
+	text-indent: 1em;
+}
+pre {
+	font-family: monospace;
+}
+p {
+	text-align: justify;
+	text-indent: 2em;
+}
+p.noident {
+	text-indent: 0em;
+}
+p.centered {
+	text-align: center;
+}
+p.centereditalic {
+	text-align: center;
+	font-family: serif;
+	font-size: 75%;
+	font-style: italic;
+}
+table {
+	font-family: Garamond, "Times New Roman", serif;
+}
+table.footer {
+	width: 100%;
+        border-spacing: 0px;
+}
+
+td {
+        padding: 0px;
+        text-align: right;
+}
+
+td.left {
+        padding: 0px;
+        text-align: left;
+}
+
+hr.half {
+	margin-bottom: 3ex;
+	margin-top: 3ex;
+	width: 50%;
+}
+img.left {
+	float: left;
+}
+ol.RomanCaps {
+	list-style-type: upper-roman;
+}
+ol.AlfaSmallCaps {
+	list-style-type: lower-alpha;
+}
