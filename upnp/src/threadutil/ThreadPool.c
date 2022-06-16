@@ -38,8 +38,8 @@
 	#include <sys/param.h>
 #endif /* _WIN32 */
 
-#include "FreeList.h"
 #include "ThreadPool.h"
+#include "FreeList.h"
 
 #include <assert.h>
 #include <pthread.h>
