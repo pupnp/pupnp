@@ -38,56 +38,56 @@
 
 int main(int argc, char **argv)
 {
-        (void)argc;
-        (void)argv;
-        char *iface = NULL;
-        int rc;
-        pthread_t cmdloop_thread;
-        int i = 0;
-        UpnpLib *p;
+	(void)argc;
+	(void)argv;
+	char *iface = NULL;
+	int rc;
+	pthread_t cmdloop_thread;
+	int i = 0;
+	UpnpLib *p;
 #ifdef _WIN32
 #else
-        int sig;
-        sigset_t sigs_to_catch;
+	int sig;
+	sigset_t sigs_to_catch;
 #endif
-        int code;
+	int code;
 
-        SampleUtil_Initialize(linux_print);
-        /* Parse options */
-        for (i = 1; i < argc; i++) {
-                if (strcmp(argv[i], "-i") == 0) {
-                        iface = argv[++i];
-                } else if (strcmp(argv[i], "-help") == 0) {
-                        SampleUtil_Print(
-                                "Usage: %s -i interface -help (this message)\n",
-                                argv[0]);
-                        SampleUtil_Print("\tinterface:     interface address "
-                                         "of the control point\n"
-                                         "\t\te.g.: eth0\n");
-                        return 1;
-                }
-        }
+	SampleUtil_Initialize(linux_print);
+	/* Parse options */
+	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-i") == 0) {
+			iface = argv[++i];
+		} else if (strcmp(argv[i], "-help") == 0) {
+			SampleUtil_Print(
+				"Usage: %s -i interface -help (this message)\n",
+				argv[0]);
+			SampleUtil_Print("\tinterface:     interface address "
+					 "of the control point\n"
+					 "\t\te.g.: eth0\n");
+			return 1;
+		}
+	}
 
-        rc = TvCtrlPointStart(&p, iface, NULL, 0);
-        if (rc != TV_SUCCESS) {
-                SampleUtil_Print("Error starting UPnP TV Control Point\n");
-                return rc;
-        }
-        /* start a command loop thread */
-        code = pthread_create(&cmdloop_thread, NULL, TvCtrlPointCommandLoop, p);
-        if (code != 0) {
-                return UPNP_E_INTERNAL_ERROR;
-        }
+	rc = TvCtrlPointStart(&p, iface, NULL, 0);
+	if (rc != TV_SUCCESS) {
+		SampleUtil_Print("Error starting UPnP TV Control Point\n");
+		return rc;
+	}
+	/* start a command loop thread */
+	code = pthread_create(&cmdloop_thread, NULL, TvCtrlPointCommandLoop, p);
+	if (code != 0) {
+		return UPNP_E_INTERNAL_ERROR;
+	}
 #ifdef _WIN32
-        pthread_join(cmdloop_thread, NULL);
+	pthread_join(cmdloop_thread, NULL);
 #else
-        /* Catch Ctrl-C and properly shutdown */
-        sigemptyset(&sigs_to_catch);
-        sigaddset(&sigs_to_catch, SIGINT);
-        sigwait(&sigs_to_catch, &sig);
-        SampleUtil_Print("Shutting down on signal %d...\n", sig);
+	/* Catch Ctrl-C and properly shutdown */
+	sigemptyset(&sigs_to_catch);
+	sigaddset(&sigs_to_catch, SIGINT);
+	sigwait(&sigs_to_catch, &sig);
+	SampleUtil_Print("Shutting down on signal %d...\n", sig);
 #endif
-        rc = TvCtrlPointStop(p);
+	rc = TvCtrlPointStop(p);
 
-        return rc;
+	return rc;
 }

@@ -36,49 +36,49 @@ const char *UpnpString_get_String(const UpnpString *p) { return p->c_str(); }
 
 int UpnpString_set_String(UpnpString *p, const char *s)
 {
-        if (s) {
-                p->assign(s);
-        } else {
-                p->assign("");
-        }
+	if (s) {
+		p->assign(s);
+	} else {
+		p->assign("");
+	}
 
-        return true;
+	return true;
 }
 
 int UpnpString_set_StringN(UpnpString *p, const char *s, size_t n)
 {
-        if (s) {
-                p->assign(s, n);
-        } else {
-                p->assign("", n);
-        }
+	if (s) {
+		p->assign(s, n);
+	} else {
+		p->assign("", n);
+	}
 
-        return true;
+	return true;
 }
 
 void UpnpString_clear(UpnpString *p) { p->clear(); }
 
 int UpnpString_cmp(const UpnpString *p, const UpnpString *q)
 {
-        return p->compare(*q);
+	return p->compare(*q);
 }
 
 int UpnpString_casecmp(const UpnpString *p, const UpnpString *q)
 {
-        const std::locale loc = std::locale();
-        const char *a = UpnpString_get_String(p);
-        const char *b = UpnpString_get_String(q);
-        while (*a || *b) {
-                char c = std::toupper(*a++, loc);
-                char d = std::toupper(*b++, loc);
-                if (c < d) {
-                        return -1;
-                }
-                if (c > d) {
-                        return 1;
-                }
-        }
-        return 0;
+	const std::locale loc = std::locale();
+	const char *a = UpnpString_get_String(p);
+	const char *b = UpnpString_get_String(q);
+	while (*a || *b) {
+		char c = std::toupper(*a++, loc);
+		char d = std::toupper(*b++, loc);
+		if (c < d) {
+			return -1;
+		}
+		if (c > d) {
+			return 1;
+		}
+	}
+	return 0;
 }
 
 /* @} UpnpString */

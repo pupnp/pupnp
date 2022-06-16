@@ -63,62 +63,62 @@ extern "C" {
 
 typedef enum
 {
-        HND_INVALID = -1,
-        HND_CLIENT,
-        HND_DEVICE
+	HND_INVALID = -1,
+	HND_CLIENT,
+	HND_DEVICE
 } Upnp_Handle_Type;
 
 /* Data to be stored in handle table for */
 struct Handle_Info
 {
-        /*! . */
-        Upnp_Handle_Type HType;
-        /*! Callback function pointer. */
-        Upnp_FunPtr Callback;
-        /*! . */
-        const char *Cookie;
-        /*! 0 = not installed; otherwise installed. */
-        int aliasInstalled;
+	/*! . */
+	Upnp_Handle_Type HType;
+	/*! Callback function pointer. */
+	Upnp_FunPtr Callback;
+	/*! . */
+	const char *Cookie;
+	/*! 0 = not installed; otherwise installed. */
+	int aliasInstalled;
 
-        /* Device Only */
+	/* Device Only */
 #ifdef INCLUDE_DEVICE_APIS
-        /*! URL for the use of SSDP. */
-        char DescURL[LINE_SIZE];
-        /*! URL for the use of SSDP when answering to legacy CPs (CP searching
-         * for a v1 when the device is v2). */
-        char LowerDescURL[LINE_SIZE];
-        /*! XML file path for device description. */
-        char DescXML[LINE_SIZE];
-        /* Advertisement timeout */
-        int MaxAge;
-        /* Power State as defined by UPnP Low Power. */
-        int PowerState;
-        /* Sleep Period as defined by UPnP Low Power. */
-        int SleepPeriod;
-        /* Registration State as defined by UPnP Low Power. */
-        int RegistrationState;
-        /*! Description parsed in terms of DOM document. */
-        IXML_Document *DescDocument;
-        /*! List of devices in the description document. */
-        IXML_NodeList *DeviceList;
-        /*! List of services in the description document. */
-        IXML_NodeList *ServiceList;
-        /*! Table holding subscriptions and URL information. */
-        service_table ServiceTable;
-        /*! . */
-        int MaxSubscriptions;
-        /*! . */
-        int MaxSubscriptionTimeOut;
-        /*! Address family: AF_INET or AF_INET6. */
-        int DeviceAf;
+	/*! URL for the use of SSDP. */
+	char DescURL[LINE_SIZE];
+	/*! URL for the use of SSDP when answering to legacy CPs (CP searching
+	 * for a v1 when the device is v2). */
+	char LowerDescURL[LINE_SIZE];
+	/*! XML file path for device description. */
+	char DescXML[LINE_SIZE];
+	/* Advertisement timeout */
+	int MaxAge;
+	/* Power State as defined by UPnP Low Power. */
+	int PowerState;
+	/* Sleep Period as defined by UPnP Low Power. */
+	int SleepPeriod;
+	/* Registration State as defined by UPnP Low Power. */
+	int RegistrationState;
+	/*! Description parsed in terms of DOM document. */
+	IXML_Document *DescDocument;
+	/*! List of devices in the description document. */
+	IXML_NodeList *DeviceList;
+	/*! List of services in the description document. */
+	IXML_NodeList *ServiceList;
+	/*! Table holding subscriptions and URL information. */
+	service_table ServiceTable;
+	/*! . */
+	int MaxSubscriptions;
+	/*! . */
+	int MaxSubscriptionTimeOut;
+	/*! Address family: AF_INET or AF_INET6. */
+	int DeviceAf;
 #endif
 
-        /* Client only */
+	/* Client only */
 #ifdef INCLUDE_CLIENT_APIS
-        /*! Client subscription list. */
-        GenlibClientSubscription *ClientSubList;
-        /*! Active SSDP searches. */
-        LinkedList SsdpSearchList;
+	/*! Client subscription list. */
+	GenlibClientSubscription *ClientSubList;
+	/*! Active SSDP searches. */
+	LinkedList SsdpSearchList;
 #endif
 };
 
@@ -128,59 +128,59 @@ struct Handle_Info
  * \return HND_DEVICE, UPNP_E_INVALID_HANDLE
  */
 Upnp_Handle_Type GetHandleInfo(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! handle pointer (key for the client handle structure). */
-        int Hnd,
-        /*! handle structure passed by this function. */
-        struct Handle_Info **HndInfo);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! handle pointer (key for the client handle structure). */
+	int Hnd,
+	/*! handle structure passed by this function. */
+	struct Handle_Info **HndInfo);
 
 #define HandleLock() HandleWriteLock()
 
 #define HandleWriteLock() \
-        UpnpPrintf(UpnpLib_get_Log(p), \
-                UPNP_DEBUG, \
-                API, \
-                __FILE__, \
-                __LINE__, \
-                "Trying a write lock\n"); \
-        pthread_rwlock_wrlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
-        UpnpPrintf(UpnpLib_get_Log(p), \
-                UPNP_DEBUG, \
-                API, \
-                __FILE__, \
-                __LINE__, \
-                "Write lock acquired\n");
+	UpnpPrintf(UpnpLib_get_Log(p), \
+		UPNP_DEBUG, \
+		API, \
+		__FILE__, \
+		__LINE__, \
+		"Trying a write lock\n"); \
+	pthread_rwlock_wrlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
+	UpnpPrintf(UpnpLib_get_Log(p), \
+		UPNP_DEBUG, \
+		API, \
+		__FILE__, \
+		__LINE__, \
+		"Write lock acquired\n");
 
 #define HandleReadLock() \
-        UpnpPrintf(UpnpLib_get_Log(p), \
-                UPNP_DEBUG, \
-                API, \
-                __FILE__, \
-                __LINE__, \
-                "Trying a read lock\n"); \
-        pthread_rwlock_rdlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
-        UpnpPrintf(UpnpLib_get_Log(p), \
-                UPNP_DEBUG, \
-                API, \
-                __FILE__, \
-                __LINE__, \
-                "Read lock acquired\n");
+	UpnpPrintf(UpnpLib_get_Log(p), \
+		UPNP_DEBUG, \
+		API, \
+		__FILE__, \
+		__LINE__, \
+		"Trying a read lock\n"); \
+	pthread_rwlock_rdlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
+	UpnpPrintf(UpnpLib_get_Log(p), \
+		UPNP_DEBUG, \
+		API, \
+		__FILE__, \
+		__LINE__, \
+		"Read lock acquired\n");
 
 #define HandleUnlock() \
-        UpnpPrintf(UpnpLib_get_Log(p), \
-                UPNP_DEBUG, \
-                API, \
-                __FILE__, \
-                __LINE__, \
-                "Trying Unlock\n"); \
-        pthread_rwlock_unlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
-        UpnpPrintf(UpnpLib_get_Log(p), \
-                UPNP_DEBUG, \
-                API, \
-                __FILE__, \
-                __LINE__, \
-                "Unlocked rwlock\n");
+	UpnpPrintf(UpnpLib_get_Log(p), \
+		UPNP_DEBUG, \
+		API, \
+		__FILE__, \
+		__LINE__, \
+		"Trying Unlock\n"); \
+	pthread_rwlock_unlock(UpnpLib_getnc_GlobalHndRWLock(p)); \
+	UpnpPrintf(UpnpLib_get_Log(p), \
+		UPNP_DEBUG, \
+		API, \
+		__FILE__, \
+		__LINE__, \
+		"Unlocked rwlock\n");
 
 /*!
  * \brief Get client handle info.
@@ -190,12 +190,12 @@ Upnp_Handle_Type GetHandleInfo(
  * \return HND_CLIENT, HND_INVALID
  */
 Upnp_Handle_Type GetClientHandleInfo(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] client handle pointer (key for the client handle structure). */
-        int *client_handle_out,
-        /*! [out] Client handle structure passed by this function. */
-        struct Handle_Info **HndInfo);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] client handle pointer (key for the client handle structure). */
+	int *client_handle_out,
+	/*! [out] Client handle structure passed by this function. */
+	struct Handle_Info **HndInfo);
 /*!
  * \brief Retrieves the device handle and information of the first device of
  * 	the address family specified. The search begins at the 'start' index,
@@ -205,16 +205,16 @@ Upnp_Handle_Type GetClientHandleInfo(
  * \return HND_DEVICE or HND_INVALID
  */
 Upnp_Handle_Type GetDeviceHandleInfo(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] place to start the search (i.e. last value returned). */
-        UpnpDevice_Handle start,
-        /*! [in] Address family. */
-        int AddressFamily,
-        /*! [out] Device handle pointer. */
-        int *device_handle_out,
-        /*! [out] Device handle structure passed by this function. */
-        struct Handle_Info **HndInfo);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] place to start the search (i.e. last value returned). */
+	UpnpDevice_Handle start,
+	/*! [in] Address family. */
+	int AddressFamily,
+	/*! [out] Device handle pointer. */
+	int *device_handle_out,
+	/*! [out] Device handle structure passed by this function. */
+	struct Handle_Info **HndInfo);
 
 /*!
  * \brief Retrieves the device handle and information of the first device of
@@ -224,57 +224,57 @@ Upnp_Handle_Type GetDeviceHandleInfo(
  * \return HND_DEVICE or HND_INVALID
  */
 Upnp_Handle_Type GetDeviceHandleInfoForPath(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! The Uri path. */
-        const char *path,
-        /*! [in] Address family. */
-        int AddressFamily,
-        /*! [out] Device handle pointer. */
-        int *device_handle_out,
-        /*! [out] Device handle structure passed by this function. */
-        struct Handle_Info **HndInfo,
-        /*! [out] Service info for found path. */
-        service_info **serv_info);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! The Uri path. */
+	const char *path,
+	/*! [in] Address family. */
+	int AddressFamily,
+	/*! [out] Device handle pointer. */
+	int *device_handle_out,
+	/*! [out] Device handle structure passed by this function. */
+	struct Handle_Info **HndInfo,
+	/*! [out] Service info for found path. */
+	service_info **serv_info);
 
 typedef enum
 {
-        SUBSCRIBE,
-        UNSUBSCRIBE,
-        DK_NOTIFY,
-        QUERY,
-        ACTION,
-        STATUS,
-        DEVDESCRIPTION,
-        SERVDESCRIPTION,
-        MINI,
-        RENEW
+	SUBSCRIBE,
+	UNSUBSCRIBE,
+	DK_NOTIFY,
+	QUERY,
+	ACTION,
+	STATUS,
+	DEVDESCRIPTION,
+	SERVDESCRIPTION,
+	MINI,
+	RENEW
 } UpnpFunName;
 
 struct UpnpNonblockParam
 {
-        UpnpFunName FunName;
-        int Handle;
-        int TimeOut;
-        char VarName[NAME_SIZE];
-        char NewVal[NAME_SIZE];
-        char DevType[NAME_SIZE];
-        char DevId[NAME_SIZE];
-        char ServiceType[NAME_SIZE];
-        char ServiceVer[NAME_SIZE];
-        char Url[NAME_SIZE];
-        Upnp_SID SubsId;
-        const char *Cookie;
-        Upnp_FunPtr Fun;
-        IXML_Document *Header;
-        IXML_Document *Act;
-        struct DevDesc *Devdesc;
+	UpnpFunName FunName;
+	int Handle;
+	int TimeOut;
+	char VarName[NAME_SIZE];
+	char NewVal[NAME_SIZE];
+	char DevType[NAME_SIZE];
+	char DevId[NAME_SIZE];
+	char ServiceType[NAME_SIZE];
+	char ServiceVer[NAME_SIZE];
+	char Url[NAME_SIZE];
+	Upnp_SID SubsId;
+	const char *Cookie;
+	Upnp_FunPtr Fun;
+	IXML_Document *Header;
+	IXML_Document *Act;
+	struct DevDesc *Devdesc;
 };
 
 typedef enum
 {
-        WEB_SERVER_DISABLED,
-        WEB_SERVER_ENABLED
+	WEB_SERVER_DISABLED,
+	WEB_SERVER_ENABLED
 } WebServerState;
 
 #define E_HTTP_SYNTAX -6
@@ -299,10 +299,10 @@ typedef enum
  * \return UPNP_E_SUCCESS on success.
  */
 int UpnpGetIfInfo(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Interface name (can be NULL). */
-        const char *IfName);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Interface name (can be NULL). */
+	const char *IfName);
 
 void UpnpThreadDistribution(UpnpLib *p, void *in);
 
@@ -311,10 +311,10 @@ void UpnpThreadDistribution(UpnpLib *p, void *in);
  * to the send advetisement again.
  */
 void AutoAdvertise(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Information provided to the thread. */
-        void *input);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Information provided to the thread. */
+	void *input);
 
 /*!
  * \brief Print handle info.
@@ -322,10 +322,10 @@ void AutoAdvertise(
  * \return UPNP_E_SUCCESS if successful, otherwise returns appropriate error.
  */
 int PrintHandleInfo(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Handle index. */
-        UpnpClient_Handle Hnd);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Handle index. */
+	UpnpClient_Handle Hnd);
 
 #ifdef __cplusplus
 }

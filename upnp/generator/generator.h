@@ -5,27 +5,27 @@
 
 enum e_Type
 {
-        TYPE_CLASS = 0,
-        TYPE_INTEGER,
-        TYPE_BUFFER,
-        TYPE_LIST,
-        TYPE_STRING,
-        TYPE_DOMSTRING
+	TYPE_CLASS = 0,
+	TYPE_INTEGER,
+	TYPE_BUFFER,
+	TYPE_LIST,
+	TYPE_STRING,
+	TYPE_DOMSTRING
 };
 
 struct s_Type_Integer
 {
-        const char *int_type;
+	const char *int_type;
 };
 
 struct s_Member
 {
-        const char *name;
-        enum e_Type type;
-        const char *type_name;
-        const char *header;
-        const char *initial_value;
-        const char *conditional;
+	const char *name;
+	enum e_Type type;
+	const char *type_name;
+	const char *header;
+	const char *initial_value;
+	const char *conditional;
 };
 
 /* clang-format off */
@@ -51,11 +51,11 @@ struct s_Member
 
 struct s_Class
 {
-        const char *name;
-        unsigned n_members;
-        struct s_Member *members;
-        const char *source;
-        const char *header;
+	const char *name;
+	unsigned n_members;
+	struct s_Member *members;
+	const char *source;
+	const char *header;
 };
 
 /* clang-format off */

@@ -65,11 +65,11 @@ extern "C" {
  * 	UPNP_E_OUTOF_MEMORY - Default Error
  ****************************************************************************/
 int configure_urlbase(UpnpLib *p,
-        IXML_Document *doc,
-        const struct sockaddr *serverAddr,
-        const char *alias,
-        time_t last_modified,
-        char docURL[LINE_SIZE]);
+	IXML_Document *doc,
+	const struct sockaddr *serverAddr,
+	const char *alias,
+	time_t last_modified,
+	char docURL[LINE_SIZE]);
 
 #ifdef __cplusplus
 } /* extern C */

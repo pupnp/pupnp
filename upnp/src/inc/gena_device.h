@@ -45,35 +45,35 @@
  * closed on return.
  */
 void gena_process_subscription_request(
-        /*! [in] Library Handle. */
-        UpnpLib *p,
-        /*! [in] Socket info of the device. */
-        SOCKINFO *info,
-        /*! [in] Subscription request from the control point. */
-        http_message_t *request);
+	/*! [in] Library Handle. */
+	UpnpLib *p,
+	/*! [in] Socket info of the device. */
+	SOCKINFO *info,
+	/*! [in] Subscription request from the control point. */
+	http_message_t *request);
 
 /*!
  * \brief Handles a subscription renewal request from a ctrl point.
  * The connection is not destroyed on return.
  */
 void gena_process_subscription_renewal_request(
-        /*! [in] Library Handle. */
-        UpnpLib *p,
-        /*! [in] Socket info of the device. */
-        SOCKINFO *info,
-        /*! [in] Subscription renewal request from the control point. */
-        http_message_t *request);
+	/*! [in] Library Handle. */
+	UpnpLib *p,
+	/*! [in] Socket info of the device. */
+	SOCKINFO *info,
+	/*! [in] Subscription renewal request from the control point. */
+	http_message_t *request);
 
 /*!
  * \brief Handles a subscription cancellation request from a ctrl point.
  * The connection is not destroyed on return.
  */
 void gena_process_unsubscribe_request(
-        /*! [in] Library Handle. */
-        UpnpLib *p,
-        /*! [in] Socket info of the device. */
-        SOCKINFO *info,
-        /*! [in] UNSUBSCRIBE request from the control point. */
-        http_message_t *request);
+	/*! [in] Library Handle. */
+	UpnpLib *p,
+	/*! [in] Socket info of the device. */
+	SOCKINFO *info,
+	/*! [in] UNSUBSCRIBE request from the control point. */
+	http_message_t *request);
 
 #endif /* GENA_DEVICE_H */

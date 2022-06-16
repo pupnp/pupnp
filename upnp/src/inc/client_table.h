@@ -30,19 +30,19 @@ extern "C" {
  * Remove timer thread associated with this subscription event.
  */
 void free_client_subscription(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Client subscription to be freed. */
-        GenlibClientSubscription *sub);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Client subscription to be freed. */
+	GenlibClientSubscription *sub);
 
 /*!
  * \brief Free the client subscription table.
  */
 void freeClientSubList(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Client subscription list to be freed. */
-        GenlibClientSubscription *list);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Client subscription list to be freed. */
+	GenlibClientSubscription *list);
 
 /*!
  * \brief Remove the client subscription matching the subscritpion id
@@ -50,12 +50,12 @@ void freeClientSubList(
  * update the table.
  */
 void RemoveClientSubClientSID(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Head of the subscription list. */
-        GenlibClientSubscription **head,
-        /*! [in] Subscription ID to be mactched. */
-        const UpnpString *sid);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Head of the subscription list. */
+	GenlibClientSubscription **head,
+	/*! [in] Subscription ID to be mactched. */
+	const UpnpString *sid);
 
 /*!
  * \brief Return the client subscription from the client table that matches
@@ -64,10 +64,10 @@ void RemoveClientSubClientSID(
  * \return The matching subscription.
  */
 GenlibClientSubscription *GetClientSubClientSID(
-        /*! [in] Head of the subscription list. */
-        GenlibClientSubscription *head,
-        /*! [in] Subscription ID to be mactched. */
-        const UpnpString *sid);
+	/*! [in] Head of the subscription list. */
+	GenlibClientSubscription *head,
+	/*! [in] Subscription ID to be mactched. */
+	const UpnpString *sid);
 
 /*!
  * \brief Returns the client subscription from the client subscription table
@@ -76,10 +76,10 @@ GenlibClientSubscription *GetClientSubClientSID(
  * \return The matching subscription.
  */
 GenlibClientSubscription *GetClientSubActualSID(
-        /*! [in] Head of the subscription list. */
-        GenlibClientSubscription *head,
-        /*! [in] Subscription ID to be mactched. */
-        token *sid);
+	/*! [in] Head of the subscription list. */
+	GenlibClientSubscription *head,
+	/*! [in] Subscription ID to be mactched. */
+	token *sid);
 
 #endif /* INCLUDE_CLIENT_APIS */
 

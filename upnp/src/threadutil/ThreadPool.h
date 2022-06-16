@@ -46,22 +46,22 @@
 #include <pthread.h>
 
 #ifdef _WIN32
-#include <time.h>
+	#include <time.h>
 
-#ifndef _TIMEZONE_DEFINED
+	#ifndef _TIMEZONE_DEFINED
 struct timezone
 {
-        int tz_minuteswest; /* minutes W of Greenwich */
-        int tz_dsttime; /* type of dst correction */
+	int tz_minuteswest; /* minutes W of Greenwich */
+	int tz_dsttime;	    /* type of dst correction */
 };
-#endif
+	#endif
 int gettimeofday(struct timeval *tv, struct timezone *tz);
 #else /* _WIN32 */
-#include <sys/param.h>
-#include <sys/time.h> /* for gettimeofday() */
-#if defined(__APPLE__) || defined(__NetBSD__)
-#include <sys/resource.h> /* for setpriority() */
-#endif
+	#include <sys/param.h>
+	#include <sys/time.h> /* for gettimeofday() */
+	#if defined(__APPLE__) || defined(__NetBSD__)
+		#include <sys/resource.h> /* for setpriority() */
+	#endif
 #endif /* _WIN32 */
 
 #ifdef __cplusplus
@@ -83,15 +83,15 @@ extern "C" {
 
 typedef enum duration
 {
-        SHORT_TERM,
-        PERSISTENT
+	SHORT_TERM,
+	PERSISTENT
 } Duration;
 
 typedef enum priority
 {
-        LOW_PRIORITY,
-        MED_PRIORITY,
-        HIGH_PRIORITY
+	LOW_PRIORITY,
+	MED_PRIORITY,
+	HIGH_PRIORITY
 } ThreadPriority;
 
 /*! default priority used by TPJobInit */
@@ -129,7 +129,7 @@ typedef enum priority
 #define STATS 1
 
 #ifdef _DEBUG
-#define DEBUG 1
+	#define DEBUG 1
 #endif
 
 typedef int PolicyType;
@@ -143,24 +143,24 @@ typedef void (*free_routine)(void *arg);
  * pool. */
 typedef struct THREADPOOLATTR
 {
-        /*! ThreadPool will always maintain at least this many threads. */
-        int minThreads;
-        /*! ThreadPool will never have more than this number of threads. */
-        int maxThreads;
-        /*! This is the minimum stack size allocated for each thread. */
-        size_t stackSize;
-        /*! This is the maximum time a thread will
-         * remain idle before dying (in milliseconds). */
-        int maxIdleTime;
-        /*! Jobs per thread to maintain. */
-        int jobsPerThread;
-        /*! Maximum number of jobs that can be queued totally. */
-        int maxJobsTotal;
-        /*! the time a low priority or med priority job waits before getting
-         * bumped up a priority (in milliseconds). */
-        int starvationTime;
-        /*! scheduling policy to use. */
-        PolicyType schedPolicy;
+	/*! ThreadPool will always maintain at least this many threads. */
+	int minThreads;
+	/*! ThreadPool will never have more than this number of threads. */
+	int maxThreads;
+	/*! This is the minimum stack size allocated for each thread. */
+	size_t stackSize;
+	/*! This is the maximum time a thread will
+	 * remain idle before dying (in milliseconds). */
+	int maxIdleTime;
+	/*! Jobs per thread to maintain. */
+	int jobsPerThread;
+	/*! Maximum number of jobs that can be queued totally. */
+	int maxJobsTotal;
+	/*! the time a low priority or med priority job waits before getting
+	 * bumped up a priority (in milliseconds). */
+	int starvationTime;
+	/*! scheduling policy to use. */
+	PolicyType schedPolicy;
 } ThreadPoolAttr;
 
 typedef struct s_UpnpLib UpnpLib;
@@ -169,36 +169,36 @@ typedef void (*start_routine)(UpnpLib *p, void *arg);
 /*! Internal ThreadPool Job. */
 typedef struct THREADPOOLJOB
 {
-        start_routine func;
-        void *arg;
-        free_routine free_func;
-        struct timeval requestTime;
-        ThreadPriority priority;
-        int jobId;
+	start_routine func;
+	void *arg;
+	free_routine free_func;
+	struct timeval requestTime;
+	ThreadPriority priority;
+	int jobId;
 } ThreadPoolJob;
 
 /*! Structure to hold statistics. */
 typedef struct TPOOLSTATS
 {
-        double totalTimeHQ;
-        int totalJobsHQ;
-        double avgWaitHQ;
-        double totalTimeMQ;
-        int totalJobsMQ;
-        double avgWaitMQ;
-        double totalTimeLQ;
-        int totalJobsLQ;
-        double avgWaitLQ;
-        double totalWorkTime;
-        double totalIdleTime;
-        int workerThreads;
-        int idleThreads;
-        int persistentThreads;
-        int totalThreads;
-        int maxThreads;
-        int currentJobsHQ;
-        int currentJobsLQ;
-        int currentJobsMQ;
+	double totalTimeHQ;
+	int totalJobsHQ;
+	double avgWaitHQ;
+	double totalTimeMQ;
+	int totalJobsMQ;
+	double avgWaitMQ;
+	double totalTimeLQ;
+	int totalJobsLQ;
+	double avgWaitLQ;
+	double totalWorkTime;
+	double totalIdleTime;
+	int workerThreads;
+	int idleThreads;
+	int persistentThreads;
+	int totalThreads;
+	int maxThreads;
+	int currentJobsHQ;
+	int currentJobsLQ;
+	int currentJobsMQ;
 } ThreadPoolStats;
 
 /*!
@@ -218,40 +218,40 @@ typedef struct TPOOLSTATS
  */
 typedef struct THREADPOOL
 {
-        /*! Library handle. */
-        void *upnp_lib;
-        /*! Mutex to protect job qs. */
-        pthread_mutex_t mutex;
-        /*! Condition variable to signal Q. */
-        pthread_cond_t condition;
-        /*! Condition variable for start and stop. */
-        pthread_cond_t start_and_shutdown;
-        /*! ids for jobs */
-        int lastJobId;
-        /*! whether or not we are shutting down */
-        int shutdown;
-        /*! total number of threads */
-        int totalThreads;
-        /*! flag that's set when waiting for a new worker thread to start */
-        int pendingWorkerThreadStart;
-        /*! number of threads that are currently executing jobs */
-        int busyThreads;
-        /*! number of persistent threads */
-        int persistentThreads;
-        /*! free list of jobs */
-        FreeList jobFreeList;
-        /*! low priority job Q */
-        LinkedList lowJobQ;
-        /*! med priority job Q */
-        LinkedList medJobQ;
-        /*! high priority job Q */
-        LinkedList highJobQ;
-        /*! persistent job */
-        ThreadPoolJob *persistentJob;
-        /*! thread pool attributes */
-        ThreadPoolAttr attr;
-        /*! statistics */
-        ThreadPoolStats stats;
+	/*! Library handle. */
+	void *upnp_lib;
+	/*! Mutex to protect job qs. */
+	pthread_mutex_t mutex;
+	/*! Condition variable to signal Q. */
+	pthread_cond_t condition;
+	/*! Condition variable for start and stop. */
+	pthread_cond_t start_and_shutdown;
+	/*! ids for jobs */
+	int lastJobId;
+	/*! whether or not we are shutting down */
+	int shutdown;
+	/*! total number of threads */
+	int totalThreads;
+	/*! flag that's set when waiting for a new worker thread to start */
+	int pendingWorkerThreadStart;
+	/*! number of threads that are currently executing jobs */
+	int busyThreads;
+	/*! number of persistent threads */
+	int persistentThreads;
+	/*! free list of jobs */
+	FreeList jobFreeList;
+	/*! low priority job Q */
+	LinkedList lowJobQ;
+	/*! med priority job Q */
+	LinkedList medJobQ;
+	/*! high priority job Q */
+	LinkedList highJobQ;
+	/*! persistent job */
+	ThreadPoolJob *persistentJob;
+	/*! thread pool attributes */
+	ThreadPoolAttr attr;
+	/*! statistics */
+	ThreadPoolStats stats;
 } ThreadPool;
 
 /*!
@@ -265,26 +265,26 @@ typedef struct THREADPOOL
  * \li \c EMAXTHREADS if minimum threads is greater than maximum threads.
  */
 int ThreadPoolInit(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! Must be valid, non null, pointer to ThreadPool. */
-        ThreadPool *tp,
-        /*! Can be null. if not null then attr contains the following fields:
-         * \li \c minWorkerThreads - minimum number of worker threads thread
-         * pool will never have less than this number of threads.
-         * \li \c maxWorkerThreads - maximum number of worker threads thread
-         * pool will never have more than this number of threads.
-         * \li \c maxIdleTime - maximum time that a worker thread will spend
-         * idle. If a worker is idle longer than this time and there are more
-         * than the min number of workers running, then the worker thread
-         * exits.
-         * \li \c jobsPerThread - ratio of jobs to thread to try and maintain
-         * if a job is scheduled and the number of jobs per thread is greater
-         * than this number,and if less than the maximum number of workers are
-         * running then a new thread is started to help out with efficiency.
-         * \li \c schedPolicy - scheduling policy to try and set (OS dependent).
-         */
-        ThreadPoolAttr *attr);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! Must be valid, non null, pointer to ThreadPool. */
+	ThreadPool *tp,
+	/*! Can be null. if not null then attr contains the following fields:
+	 * \li \c minWorkerThreads - minimum number of worker threads thread
+	 * pool will never have less than this number of threads.
+	 * \li \c maxWorkerThreads - maximum number of worker threads thread
+	 * pool will never have more than this number of threads.
+	 * \li \c maxIdleTime - maximum time that a worker thread will spend
+	 * idle. If a worker is idle longer than this time and there are more
+	 * than the min number of workers running, then the worker thread
+	 * exits.
+	 * \li \c jobsPerThread - ratio of jobs to thread to try and maintain
+	 * if a job is scheduled and the number of jobs per thread is greater
+	 * than this number,and if less than the maximum number of workers are
+	 * running then a new thread is started to help out with efficiency.
+	 * \li \c schedPolicy - scheduling policy to try and set (OS dependent).
+	 */
+	ThreadPoolAttr *attr);
 
 /*!
  * \brief Adds a persistent job to the thread pool.
@@ -297,12 +297,12 @@ int ThreadPoolInit(
  *	\li \c EMAXTHREADS not enough threads to add persistent job.
  */
 int ThreadPoolAddPersistent(
-        /*! Valid thread pool pointer. */
-        ThreadPool *tp,
-        /*! Valid thread pool job. */
-        ThreadPoolJob *job,
-        /*! . */
-        int *jobId);
+	/*! Valid thread pool pointer. */
+	ThreadPool *tp,
+	/*! Valid thread pool job. */
+	ThreadPoolJob *job,
+	/*! . */
+	int *jobId);
 
 /*!
  * \brief Gets the current set of attributes associated with the thread pool.
@@ -311,10 +311,10 @@ int ThreadPoolAddPersistent(
  * 	\li \c 0 on success, nonzero on failure.
  */
 int ThreadPoolGetAttr(
-        /*! valid thread pool pointer. */
-        ThreadPool *tp,
-        /*! non null pointer to store attributes. */
-        ThreadPoolAttr *out);
+	/*! valid thread pool pointer. */
+	ThreadPool *tp,
+	/*! non null pointer to store attributes. */
+	ThreadPoolAttr *out);
 
 /*!
  * \brief Sets the attributes for the thread pool.
@@ -325,10 +325,10 @@ int ThreadPoolGetAttr(
  * 	\li \c INVALID_POLICY if policy can not be set.
  */
 int ThreadPoolSetAttr(
-        /*! valid thread pool pointer. */
-        ThreadPool *tp,
-        /*! pointer to attributes, null sets attributes to default. */
-        ThreadPoolAttr *attr);
+	/*! valid thread pool pointer. */
+	ThreadPool *tp,
+	/*! pointer to attributes, null sets attributes to default. */
+	ThreadPoolAttr *attr);
 
 /*!
  * \brief Adds a job to the thread pool. Job will be run as soon as possible.
@@ -338,11 +338,11 @@ int ThreadPoolSetAttr(
  * 	\li \c EOUTOFMEM if not enough memory to add job.
  */
 int ThreadPoolAdd(/*! valid thread pool pointer. */
-        ThreadPool *tp,
-        /*! . */
-        const ThreadPoolJob *job,
-        /*! id of job. */
-        int *jobId);
+	ThreadPool *tp,
+	/*! . */
+	const ThreadPoolJob *job,
+	/*! id of job. */
+	int *jobId);
 
 /*!
  * \brief Removes a job from the thread pool. Can only remove jobs which
@@ -353,12 +353,12 @@ int ThreadPoolAdd(/*! valid thread pool pointer. */
  * 	\li \c INVALID_JOB_ID if job not found.
  */
 int ThreadPoolRemove(
-        /*! valid thread pool pointer. */
-        ThreadPool *tp,
-        /*! id of job. */
-        int jobId,
-        /*! space for removed job. */
-        ThreadPoolJob *out);
+	/*! valid thread pool pointer. */
+	ThreadPool *tp,
+	/*! id of job. */
+	int jobId,
+	/*! space for removed job. */
+	ThreadPoolJob *out);
 
 /*!
  * \brief Shuts the thread pool down. Waits for all threads to finish.
@@ -367,8 +367,8 @@ int ThreadPoolRemove(
  * \return 0 on success, nonzero on failure
  */
 int ThreadPoolShutdown(
-        /*! must be valid tp. */
-        ThreadPool *tp);
+	/*! must be valid tp. */
+	ThreadPool *tp);
 
 /*!
  * \brief Initializes thread pool job. Sets the priority to default defined
@@ -377,12 +377,12 @@ int ThreadPoolShutdown(
  * \return Always returns 0.
  */
 int TPJobInit(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolJob *job,
-        /*! function to run, must be valid. */
-        start_routine func,
-        /*! argument to pass to function. */
-        void *arg);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolJob *job,
+	/*! function to run, must be valid. */
+	start_routine func,
+	/*! argument to pass to function. */
+	void *arg);
 
 /*!
  * \brief Sets the max threads for the thread pool attributes.
@@ -390,10 +390,10 @@ int TPJobInit(
  * \return Always returns 0.
  */
 int TPJobSetPriority(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolJob *job,
-        /*! value to set. */
-        ThreadPriority priority);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolJob *job,
+	/*! value to set. */
+	ThreadPriority priority);
 
 /*!
  * \brief Sets the max threads for the thread pool attributes.
@@ -401,10 +401,10 @@ int TPJobSetPriority(
  * \return Always returns 0.
  */
 int TPJobSetFreeFunction(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolJob *job,
-        /*! value to set. */
-        free_routine func);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolJob *job,
+	/*! value to set. */
+	free_routine func);
 
 /*!
  * \brief Initializes thread pool attributes. Sets values to defaults defined
@@ -413,8 +413,8 @@ int TPJobSetFreeFunction(
  * \return Always returns 0.
  */
 int TPAttrInit(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolAttr *attr);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolAttr *attr);
 
 /*!
  * \brief Sets the max threads for the thread pool attributes.
@@ -422,10 +422,10 @@ int TPAttrInit(
  * \return Always returns 0.
  */
 int TPAttrSetMaxThreads(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolAttr *attr,
-        /*! value to set. */
-        int maxThreads);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolAttr *attr,
+	/*! value to set. */
+	int maxThreads);
 
 /*!
  * \brief Sets the min threads for the thread pool attributes.
@@ -433,10 +433,10 @@ int TPAttrSetMaxThreads(
  * \return Always returns 0.
  */
 int TPAttrSetMinThreads(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolAttr *attr,
-        /*! value to set. */
-        int minThreads);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolAttr *attr,
+	/*! value to set. */
+	int minThreads);
 
 /*!
  * \brief Sets the stack size for the thread pool attributes.
@@ -444,10 +444,10 @@ int TPAttrSetMinThreads(
  * \return Always returns 0.
  */
 int TPAttrSetStackSize(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolAttr *attr,
-        /*! value to set. */
-        size_t stackSize);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolAttr *attr,
+	/*! value to set. */
+	size_t stackSize);
 
 /*!
  * \brief Sets the idle time for the thread pool attributes.
@@ -455,10 +455,10 @@ int TPAttrSetStackSize(
  * \return Always returns 0.
  */
 int TPAttrSetIdleTime(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolAttr *attr,
-        /*! . */
-        int idleTime);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolAttr *attr,
+	/*! . */
+	int idleTime);
 
 /*!
  * \brief Sets the jobs per thread ratio
@@ -466,10 +466,10 @@ int TPAttrSetIdleTime(
  * \return Always returns 0.
  */
 int TPAttrSetJobsPerThread(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolAttr *attr,
-        /*! number of jobs per thread to maintain. */
-        int jobsPerThread);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolAttr *attr,
+	/*! number of jobs per thread to maintain. */
+	int jobsPerThread);
 
 /*!
  * \brief Sets the starvation time for the thread pool attributes.
@@ -477,10 +477,10 @@ int TPAttrSetJobsPerThread(
  * \return Always returns 0.
  */
 int TPAttrSetStarvationTime(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolAttr *attr,
-        /*! milliseconds. */
-        int starvationTime);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolAttr *attr,
+	/*! milliseconds. */
+	int starvationTime);
 
 /*!
  * \brief Sets the scheduling policy for the thread pool attributes.
@@ -488,10 +488,10 @@ int TPAttrSetStarvationTime(
  * \return Always returns 0.
  */
 int TPAttrSetSchedPolicy(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolAttr *attr,
-        /*! must be a valid policy type. */
-        PolicyType schedPolicy);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolAttr *attr,
+	/*! must be a valid policy type. */
+	PolicyType schedPolicy);
 
 /*!
  * \brief Sets the maximum number jobs that can be qeued totally.
@@ -499,10 +499,10 @@ int TPAttrSetSchedPolicy(
  * \return Always returns 0.
  */
 int TPAttrSetMaxJobsTotal(
-        /*! must be valid thread pool attributes. */
-        ThreadPoolAttr *attr,
-        /*! maximum number of jobs. */
-        int maxJobsTotal);
+	/*! must be valid thread pool attributes. */
+	ThreadPoolAttr *attr,
+	/*! maximum number of jobs. */
+	int maxJobsTotal);
 
 /*!
  * \brief Returns various statistics about the thread pool.
@@ -513,16 +513,16 @@ int TPAttrSetMaxJobsTotal(
  */
 #ifdef STATS
 EXPORT_SPEC int ThreadPoolGetStats(
-        /*! Valid initialized threadpool. */
-        ThreadPool *tp,
-        /*! Valid stats, out parameter. */
-        ThreadPoolStats *stats);
+	/*! Valid initialized threadpool. */
+	ThreadPool *tp,
+	/*! Valid stats, out parameter. */
+	ThreadPoolStats *stats);
 #else
 static UPNP_INLINE int ThreadPoolGetStats(
-        /*! Valid initialized threadpool. */
-        ThreadPool *tp,
-        /*! Valid stats, out parameter. */
-        ThreadPoolStats *stats)
+	/*! Valid initialized threadpool. */
+	ThreadPool *tp,
+	/*! Valid stats, out parameter. */
+	ThreadPoolStats *stats)
 {
 }
 #endif
@@ -532,12 +532,12 @@ static UPNP_INLINE int ThreadPoolGetStats(
  */
 #ifdef STATS
 EXPORT_SPEC void ThreadPoolPrintStats(
-        /*! . */
-        ThreadPoolStats *stats);
+	/*! . */
+	ThreadPoolStats *stats);
 #else
 static UPNP_INLINE void ThreadPoolPrintStats(
-        /*! . */
-        ThreadPoolStats *stats)
+	/*! . */
+	ThreadPoolStats *stats)
 {
 }
 #endif

@@ -34,8 +34,8 @@
 #include <sys/types.h>
 
 #ifndef _WIN32
-/* Do not #include <sys/time.h> */
-#include <sys/time.h>
+	/* Do not #include <sys/time.h> */
+	#include <sys/time.h>
 #endif
 
 /*! set the following to the number of 100ns ticks of the actual resolution of
@@ -49,7 +49,7 @@ typedef uint64_t uuid_time_t;
 
 typedef struct
 {
-        char nodeID[6];
+	char nodeID[6];
 } uuid_node_t;
 
 void get_ieee_node_identifier(uuid_node_t *node);
