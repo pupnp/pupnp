@@ -53,14 +53,14 @@ extern "C" {
  * It calls handle_invoke_action to handle the SOAP action.
  */
 void soap_device_callback(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Parsed request received by the device. */
-        http_parser_t *parser,
-        /*! [in] HTTP request. */
-        http_message_t *request,
-        /*! [in,out] Socket info. */
-        SOCKINFO *info);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Parsed request received by the device. */
+	http_parser_t *parser,
+	/*! [in] HTTP request. */
+	http_message_t *request,
+	/*! [in,out] Socket info. */
+	SOCKINFO *info);
 
 /****************************************************************************
  * Function: SoapSendAction
@@ -80,10 +80,10 @@ void soap_device_callback(
  * Note:
  ****************************************************************************/
 int SoapSendAction(UpnpLib *p,
-        char *action_url,
-        char *service_type,
-        IXML_Document *action_node,
-        IXML_Document **response_node);
+	char *action_url,
+	char *service_type,
+	IXML_Document *action_node,
+	IXML_Document **response_node);
 
 /****************************************************************************
  * Function: SoapSendActionEx
@@ -106,11 +106,11 @@ int SoapSendAction(UpnpLib *p,
  * Note:
  ****************************************************************************/
 int SoapSendActionEx(UpnpLib *p,
-        char *ActionURL,
-        char *ServiceType,
-        IXML_Document *Header,
-        IXML_Document *ActNode,
-        IXML_Document **RespNode);
+	char *ActionURL,
+	char *ServiceType,
+	IXML_Document *Header,
+	IXML_Document *ActNode,
+	IXML_Document **RespNode);
 
 /****************************************************************************
  * Function: SoapGetServiceVarStatus
@@ -128,7 +128,7 @@ int SoapSendActionEx(UpnpLib *p,
  * Note:
  ****************************************************************************/
 int SoapGetServiceVarStatus(
-        UpnpLib *p, char *ActionURL, DOMString VarName, DOMString *StVar);
+	UpnpLib *p, char *ActionURL, DOMString VarName, DOMString *StVar);
 
 extern const char *ContentTypeHeader;
 

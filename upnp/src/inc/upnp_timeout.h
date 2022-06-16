@@ -41,17 +41,17 @@
  */
 typedef struct UPNP_TIMEOUT
 {
-        int EventType;
-        int handle;
-        int eventId;
-        void *Event;
+	int EventType;
+	int handle;
+	int eventId;
+	void *Event;
 } upnp_timeout;
 
 /*!
  * \brief Free memory associated with event and memory for any sub-elements.
  */
 void free_upnp_timeout(
-        /*! [in] Event which needs to be freed. */
-        upnp_timeout *event);
+	/*! [in] Event which needs to be freed. */
+	upnp_timeout *event);
 
 #endif /* UPNPTIMEOUT_H */
