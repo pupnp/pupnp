@@ -801,103 +801,106 @@ static int init_socket_suff(UpnpLib *p,
 	const char *text_addr,
 	int ip_version)
 {
-	char errorBuffer[ERROR_BUFFER_LEN];
-	int sockError;
-	sa_family_t domain;
-	void *addr;
-	int reuseaddr_on = MINISERVER_REUSEADDR;
+        char errorBuffer[ERROR_BUFFER_LEN];
+        int sockError;
+        sa_family_t domain;
+        void *addr;
+        int reuseaddr_on = MINISERVER_REUSEADDR;
 
-	memset(s, 0, sizeof *s);
-	s->fd = INVALID_SOCKET;
-	s->ip_version = ip_version;
-	s->text_addr = text_addr;
-	s->serverAddr = (struct sockaddr *)&s->ss;
-	switch (ip_version) {
-	case 4:
-		domain = AF_INET;
-		s->serverAddr4->sin_family = domain;
-		s->address_len = sizeof *s->serverAddr4;
-		addr = &s->serverAddr4->sin_addr;
-		break;
-	case 6:
-		if (!ENABLE_IPV6) {
-			goto ok;
-		}
-		domain = AF_INET6;
-		s->serverAddr6->sin6_family = domain;
-		s->address_len = sizeof *s->serverAddr6;
-		addr = &s->serverAddr6->sin6_addr;
-		break;
-	default:
-		UpnpPrintf(UpnpLib_get_Log(p),
-			UPNP_INFO,
-			MSERV,
-			__FILE__,
-			__LINE__,
-			"init_socket_suff(): Invalid IP version: %d.\n",
-			ip_version);
-		goto error;
-		break;
-	}
-	inet_pton(domain, text_addr, addr);
-	s->fd = socket(domain, SOCK_STREAM, 0);
-	if (s->fd == INVALID_SOCKET) {
-		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-		UpnpPrintf(UpnpLib_get_Log(p),
-			UPNP_INFO,
-			MSERV,
-			__FILE__,
-			__LINE__,
-			"init_socket_suff(): IPv%c socket not available: "
-			"%s\n",
-			ip_version,
-			errorBuffer);
-		goto error;
-	} else if (ip_version == 6) {
-		int onOff = 1;
+        memset(s, 0, sizeof *s);
+        s->fd = INVALID_SOCKET;
+        s->ip_version = ip_version;
+        s->text_addr = text_addr;
+        s->serverAddr = (struct sockaddr *)&s->ss;
+        switch (ip_version) {
+        case 4:
+                domain = AF_INET;
+                s->serverAddr4->sin_family = domain;
+                s->address_len = sizeof *s->serverAddr4;
+                addr = &s->serverAddr4->sin_addr;
+                break;
+        case 6:
+                if (!ENABLE_IPV6) {
+                        goto ok;
+                }
+                domain = AF_INET6;
+                s->serverAddr6->sin6_family = domain;
+                s->address_len = sizeof *s->serverAddr6;
+                addr = &s->serverAddr6->sin6_addr;
+                break;
+        default:
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_INFO,
+                        MSERV,
+                        __FILE__,
+                        __LINE__,
+                        "init_socket_suff(): Invalid IP version: %d.\n",
+                        ip_version);
+                goto error;
+                break;
+        }
 
-		sockError = setsockopt(s->fd,
-			IPPROTO_IPV6,
-			IPV6_V6ONLY,
-			(char *)&onOff,
-			sizeof(onOff));
-		if (sockError == SOCKET_ERROR) {
-			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-			UpnpPrintf(UpnpLib_get_Log(p),
-				UPNP_INFO,
-				MSERV,
-				__FILE__,
-				__LINE__,
-				"init_socket_suff(): unable to set IPv6 "
-				"socket protocol: %s\n",
-				errorBuffer);
-			goto error;
-		}
-	}
-	/* Getting away with implementation of re-using address:port and
-	 * instead choosing to increment port numbers.
-	 * Keeping the re-use address code as an optional behaviour that
-	 * can be turned on if necessary.
-	 * TURN ON the reuseaddr_on option to use the option. */
-	if (MINISERVER_REUSEADDR) {
-		sockError = setsockopt(s->fd,
-			SOL_SOCKET,
-			SO_REUSEADDR,
-			(const char *)&reuseaddr_on,
-			sizeof(int));
-		if (sockError == SOCKET_ERROR) {
-			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-			UpnpPrintf(UpnpLib_get_Log(p),
-				UPNP_INFO,
-				MSERV,
-				__FILE__,
-				__LINE__,
-				"init_socket_suff(): unable to set "
-				"SO_REUSEADDR: %s\n",
-				errorBuffer);
-			goto error;
-		}
-	}
+        if (inet_pton(domain, text_addr, addr) <= 0)
+            goto error;
+
+        s->fd = socket(domain, SOCK_STREAM, 0);
+        if (s->fd == INVALID_SOCKET) {
+                strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+                UpnpPrintf(UpnpLib_get_Log(p),
+                        UPNP_INFO,
+                        MSERV,
+                        __FILE__,
+                        __LINE__,
+                        "init_socket_suff(): IPv%c socket not available: "
+                        "%s\n",
+                        ip_version,
+                        errorBuffer);
+                goto error;
+        } else if (ip_version == 6) {
+                int onOff = 1;
+
+                sockError = setsockopt(s->fd,
+                        IPPROTO_IPV6,
+                        IPV6_V6ONLY,
+                        (char *)&onOff,
+                        sizeof(onOff));
+                if (sockError == SOCKET_ERROR) {
+                        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+                        UpnpPrintf(UpnpLib_get_Log(p),
+                                UPNP_INFO,
+                                MSERV,
+                                __FILE__,
+                                __LINE__,
+                                "init_socket_suff(): unable to set IPv6 "
+                                "socket protocol: %s\n",
+                                errorBuffer);
+                        goto error;
+                }
+        }
+        /* Getting away with implementation of re-using address:port and
+         * instead choosing to increment port numbers.
+         * Keeping the re-use address code as an optional behaviour that
+         * can be turned on if necessary.
+         * TURN ON the reuseaddr_on option to use the option. */
+        if (MINISERVER_REUSEADDR) {
+                sockError = setsockopt(s->fd,
+                        SOL_SOCKET,
+                        SO_REUSEADDR,
+                        (const char *)&reuseaddr_on,
+                        sizeof(int));
+                if (sockError == SOCKET_ERROR) {
+                        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+                        UpnpPrintf(UpnpLib_get_Log(p),
+                                UPNP_INFO,
+                                MSERV,
+                                __FILE__,
+                                __LINE__,
+                                "init_socket_suff(): unable to set "
+                                "SO_REUSEADDR: %s\n",
+                                errorBuffer);
+                        goto error;
+                }
+        }
 ok:
 	return 0;
 
