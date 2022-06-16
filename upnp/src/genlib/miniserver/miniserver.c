@@ -158,30 +158,35 @@ void SetGenaCallback(MiniServerCallback callback) { gGenaCallback = callback; }
 static int host_header_is_numeric(
 	UpnpLib *p, char *host_port, size_t host_port_size)
 {
-	int rc = 0;
-	struct in6_addr addr;
-	char *s;
-	(void)p;
+        int rc = 0;
+        struct in6_addr addr;
+        char *s;
+        (void)p;
 
-	/* Remove the port part. */
-	s = host_port + host_port_size - 1;
-	while (s != host_port && *s != ':') {
-		--s;
-	}
-	*s = 0;
-	/* Try IPV4 */
-	rc = inet_pton(AF_INET, host_port, &addr);
-	if (rc == 1) {
-		goto ExitFunction;
-	}
-	/* Try IPV6 */
-	/* Check for and remove the square brackets. */
-	if (strlen(host_port) < 3 || host_port[0] != '[' || *(s - 1) != ']') {
-		rc = 0;
-		goto ExitFunction;
-	}
-	*(s - 1) = '\0';
-	rc = inet_pton(AF_INET6, host_port + 1, &addr) == 1;
+        /* Remove the port part. */
+        s = host_port + host_port_size - 1;
+        while (s != host_port && *s != ']' && *s != ':') {
+                --s;
+        }
+        if (*s == ':') {
+                *s = 0;
+        } else {
+                s = host_port + host_port_size;
+        }
+
+        /* Try IPV4 */
+        rc = inet_pton(AF_INET, host_port, &addr);
+        if (rc == 1) {
+                goto ExitFunction;
+        }
+        /* Try IPV6 */
+        /* Check for and remove the square brackets. */
+        if (strlen(host_port) < 3 || host_port[0] != '[' || *(s - 1) != ']') {
+                rc = 0;
+                goto ExitFunction;
+        }
+        *(s - 1) = '\0';
+        rc = inet_pton(AF_INET6, host_port + 1, &addr) == 1;
 
 ExitFunction:
 	return rc;
