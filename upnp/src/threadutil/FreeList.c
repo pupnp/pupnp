@@ -36,75 +36,75 @@
 
 int FreeListInit(FreeList *free_list, size_t elementSize, int maxFreeListLength)
 {
-        assert(free_list != NULL);
+	assert(free_list != NULL);
 
-        if (free_list == NULL)
-                return EINVAL;
-        free_list->element_size = elementSize;
-        free_list->maxFreeListLength = maxFreeListLength;
-        free_list->head = NULL;
-        free_list->freeListLength = 0;
+	if (free_list == NULL)
+		return EINVAL;
+	free_list->element_size = elementSize;
+	free_list->maxFreeListLength = maxFreeListLength;
+	free_list->head = NULL;
+	free_list->freeListLength = 0;
 
-        return 0;
+	return 0;
 }
 
 void *FreeListAlloc(FreeList *free_list)
 {
-        FreeListNode *ret = NULL;
+	FreeListNode *ret = NULL;
 
-        assert(free_list != NULL);
+	assert(free_list != NULL);
 
-        if (free_list == NULL)
-                return NULL;
+	if (free_list == NULL)
+		return NULL;
 
-        if (free_list->head) {
-                ret = free_list->head;
-                free_list->head = free_list->head->next;
-                free_list->freeListLength--;
-        } else {
-                ret = malloc(free_list->element_size);
-        }
+	if (free_list->head) {
+		ret = free_list->head;
+		free_list->head = free_list->head->next;
+		free_list->freeListLength--;
+	} else {
+		ret = malloc(free_list->element_size);
+	}
 
-        return ret;
+	return ret;
 }
 
 int FreeListFree(FreeList *free_list, void *element)
 {
-        FreeListNode *temp = NULL;
+	FreeListNode *temp = NULL;
 
-        assert(free_list != NULL);
+	assert(free_list != NULL);
 
-        if (free_list == NULL)
-                return EINVAL;
-        if (element != NULL &&
-                free_list->freeListLength + 1 < free_list->maxFreeListLength) {
-                free_list->freeListLength++;
-                temp = (FreeListNode *)element;
-                temp->next = free_list->head;
-                free_list->head = temp;
-        } else {
-                free(element);
-        }
+	if (free_list == NULL)
+		return EINVAL;
+	if (element != NULL &&
+		free_list->freeListLength + 1 < free_list->maxFreeListLength) {
+		free_list->freeListLength++;
+		temp = (FreeListNode *)element;
+		temp->next = free_list->head;
+		free_list->head = temp;
+	} else {
+		free(element);
+	}
 
-        return 0;
+	return 0;
 }
 
 int FreeListDestroy(FreeList *free_list)
 {
-        FreeListNode *temp = NULL;
-        int i = 0;
+	FreeListNode *temp = NULL;
+	int i = 0;
 
-        assert(free_list != NULL);
+	assert(free_list != NULL);
 
-        if (!free_list)
-                return EINVAL;
-        while (free_list->head) {
-                i++;
-                temp = free_list->head->next;
-                free(free_list->head);
-                free_list->head = temp;
-        }
-        free_list->freeListLength = 0;
+	if (!free_list)
+		return EINVAL;
+	while (free_list->head) {
+		i++;
+		temp = free_list->head->next;
+		free(free_list->head);
+		free_list->head = temp;
+	}
+	free_list->freeListLength = 0;
 
-        return 0;
+	return 0;
 }

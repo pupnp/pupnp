@@ -45,7 +45,7 @@ EXPORT_SPEC const UpnpListHead *TestClass_get_TheList(const TestClass *p);
 EXPORT_SPEC int TestClass_set_TheList(TestClass *p, const UpnpListHead *q);
 /*! TestClass_add_to_list_TheList */
 EXPORT_SPEC void TestClass_add_to_list_TheList(
-        TestClass *p, UpnpListHead *head);
+	TestClass *p, UpnpListHead *head);
 
 /*! TestClass_get_TheInteger */
 EXPORT_SPEC int TestClass_get_TheInteger(const TestClass *p);
@@ -68,16 +68,16 @@ EXPORT_SPEC const struct TheStruct *TestClass_get_TheBuffer(const TestClass *p);
 EXPORT_SPEC struct TheStruct *TestClass_getnc_TheBuffer(TestClass *p);
 /*! TestClass_get_TheBuffer */
 EXPORT_SPEC int TestClass_set_TheBuffer(
-        TestClass *p, const struct TheStruct *buf);
+	TestClass *p, const struct TheStruct *buf);
 /*! TestClass_get_TheBuffer */
 EXPORT_SPEC void TestClass_clear_TheBuffer(TestClass *p);
 
 /*! TestClass_get_TheActionComplete */
 EXPORT_SPEC const UpnpActionComplete *TestClass_get_TheActionComplete(
-        const TestClass *p);
+	const TestClass *p);
 /*! TestClass_set_TheActionComplete */
 EXPORT_SPEC int TestClass_set_TheActionComplete(
-        TestClass *p, const UpnpActionComplete *n);
+	TestClass *p, const UpnpActionComplete *n);
 
 /*! TestClass_get_TheString */
 EXPORT_SPEC const UpnpString *TestClass_get_TheString(const TestClass *p);
@@ -91,7 +91,7 @@ EXPORT_SPEC const char *TestClass_get_TheString_cstr(const TestClass *p);
 EXPORT_SPEC int TestClass_strcpy_TheString(TestClass *p, const char *s);
 /*! TestClass_strncpy_TheString */
 EXPORT_SPEC int TestClass_strncpy_TheString(
-        TestClass *p, const char *s, size_t n);
+	TestClass *p, const char *s, size_t n);
 /*! TestClass_clear_TheString */
 EXPORT_SPEC void TestClass_clear_TheString(TestClass *p);
 

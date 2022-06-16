@@ -44,10 +44,10 @@
 
 void free_upnp_timeout(upnp_timeout *event)
 {
-        if (event) {
-                if (event->Event) {
-                        free(event->Event);
-                }
-                free(event);
-        }
+	if (event) {
+		if (event->Event) {
+			free(event->Event);
+		}
+		free(event);
+	}
 }

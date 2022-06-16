@@ -46,69 +46,69 @@
 #include <string.h>
 
 #ifdef _WIN32
-#include "unixutil.h"
+	#include "unixutil.h"
 #endif /* _WIN32 */
 
 #define NUM_1XX_CODES 2
 static const char *Http1xxCodes[NUM_1XX_CODES];
 static const char *Http1xxStr = "Continue\0"
-                                "Switching Protocols\0";
+				"Switching Protocols\0";
 
 #define NUM_2XX_CODES 7
 static const char *Http2xxCodes[NUM_2XX_CODES];
 static const char *Http2xxStr = "OK\0"
-                                "Created\0"
-                                "Accepted\0"
-                                "Non-Authoratative Information\0"
-                                "No Content\0"
-                                "Reset Content\0"
-                                "Partial Content\0";
+				"Created\0"
+				"Accepted\0"
+				"Non-Authoratative Information\0"
+				"No Content\0"
+				"Reset Content\0"
+				"Partial Content\0";
 
 #define NUM_3XX_CODES 8
 static const char *Http3xxCodes[NUM_3XX_CODES];
 static const char *Http3xxStr = "Multiple Choices\0"
-                                "Moved Permanently\0"
-                                "Found\0"
-                                "See Other\0"
-                                "Not Modified\0"
-                                "Use Proxy\0"
-                                "\0"
-                                "Temporary Redirect\0";
+				"Moved Permanently\0"
+				"Found\0"
+				"See Other\0"
+				"Not Modified\0"
+				"Use Proxy\0"
+				"\0"
+				"Temporary Redirect\0";
 
 #define NUM_4XX_CODES 18
 static const char *Http4xxCodes[NUM_4XX_CODES];
 static const char *Http4xxStr = "Bad Request\0"
-                                "Unauthorized\0"
-                                "Payment Required\0"
-                                "Forbidden\0"
-                                "Not Found\0"
-                                "Method Not Allowed\0"
-                                "Not Acceptable\0"
-                                "Proxy Authentication Required\0"
-                                "Request Timeout\0"
-                                "Conflict\0"
-                                "Gone\0"
-                                "Length Required\0"
-                                "Precondition Failed\0"
-                                "Request Entity Too Large\0"
-                                "Request-URI Too Long\0"
-                                "Unsupported Media Type\0"
-                                "Requested Range Not Satisfiable\0"
-                                "Expectation Failed\0";
+				"Unauthorized\0"
+				"Payment Required\0"
+				"Forbidden\0"
+				"Not Found\0"
+				"Method Not Allowed\0"
+				"Not Acceptable\0"
+				"Proxy Authentication Required\0"
+				"Request Timeout\0"
+				"Conflict\0"
+				"Gone\0"
+				"Length Required\0"
+				"Precondition Failed\0"
+				"Request Entity Too Large\0"
+				"Request-URI Too Long\0"
+				"Unsupported Media Type\0"
+				"Requested Range Not Satisfiable\0"
+				"Expectation Failed\0";
 
 #define NUM_5XX_CODES 11
 static const char *Http5xxCodes[NUM_5XX_CODES];
 static const char *Http5xxStr = "Internal Server Error\0"
-                                "Not Implemented\0"
-                                "Bad Gateway\0"
-                                "Service Unavailable\0"
-                                "Gateway Timeout\0"
-                                "HTTP Version Not Supported\0"
-                                "Variant Also Negotiates\0"
-                                "Insufficient Storage\0"
-                                "Loop Detected\0"
-                                "\0"
-                                "Not Extended\0";
+				"Not Implemented\0"
+				"Bad Gateway\0"
+				"Service Unavailable\0"
+				"Gateway Timeout\0"
+				"HTTP Version Not Supported\0"
+				"Variant Also Negotiates\0"
+				"Insufficient Storage\0"
+				"Loop Detected\0"
+				"\0"
+				"Not Extended\0";
 
 static int gInitialized = 0;
 
@@ -133,15 +133,15 @@ static int gInitialized = 0;
  *	 void
  ************************************************************************/
 static UPNP_INLINE void init_table(
-        const char *encoded_str, const char *table[], int tbl_size)
+	const char *encoded_str, const char *table[], int tbl_size)
 {
-        int i;
-        const char *s = encoded_str;
+	int i;
+	const char *s = encoded_str;
 
-        for (i = 0; i < tbl_size; i++) {
-                table[i] = s;
-                s += strlen(s) + (size_t)1; /* next entry */
-        }
+	for (i = 0; i < tbl_size; i++) {
+		table[i] = s;
+		s += strlen(s) + (size_t)1; /* next entry */
+	}
 }
 
 /************************************************************************
@@ -158,13 +158,13 @@ static UPNP_INLINE void init_table(
  ************************************************************************/
 static UPNP_INLINE void init_tables(void)
 {
-        init_table(Http1xxStr, Http1xxCodes, NUM_1XX_CODES);
-        init_table(Http2xxStr, Http2xxCodes, NUM_2XX_CODES);
-        init_table(Http3xxStr, Http3xxCodes, NUM_3XX_CODES);
-        init_table(Http4xxStr, Http4xxCodes, NUM_4XX_CODES);
-        init_table(Http5xxStr, Http5xxCodes, NUM_5XX_CODES);
+	init_table(Http1xxStr, Http1xxCodes, NUM_1XX_CODES);
+	init_table(Http2xxStr, Http2xxCodes, NUM_2XX_CODES);
+	init_table(Http3xxStr, Http3xxCodes, NUM_3XX_CODES);
+	init_table(Http4xxStr, Http4xxCodes, NUM_4XX_CODES);
+	init_table(Http5xxStr, Http5xxCodes, NUM_5XX_CODES);
 
-        gInitialized = 1; /* mark only after complete */
+	gInitialized = 1; /* mark only after complete */
 }
 
 /************************************************************************
@@ -182,39 +182,39 @@ static UPNP_INLINE void init_tables(void)
  ************************************************************************/
 const char *http_get_code_text(int statusCode)
 {
-        int index;
-        int table_num;
+	int index;
+	int table_num;
 
-        if (!gInitialized) {
-                init_tables();
-        }
+	if (!gInitialized) {
+		init_tables();
+	}
 
-        if (statusCode < 100 || statusCode >= 600) {
-                return NULL;
-        }
+	if (statusCode < 100 || statusCode >= 600) {
+		return NULL;
+	}
 
-        index = statusCode % 100;
-        table_num = statusCode / 100;
+	index = statusCode % 100;
+	table_num = statusCode / 100;
 
-        if (table_num == 1 && index < NUM_1XX_CODES) {
-                return Http1xxCodes[index];
-        }
+	if (table_num == 1 && index < NUM_1XX_CODES) {
+		return Http1xxCodes[index];
+	}
 
-        if (table_num == 2 && index < NUM_2XX_CODES) {
-                return Http2xxCodes[index];
-        }
+	if (table_num == 2 && index < NUM_2XX_CODES) {
+		return Http2xxCodes[index];
+	}
 
-        if (table_num == 3 && index < NUM_3XX_CODES) {
-                return Http3xxCodes[index];
-        }
+	if (table_num == 3 && index < NUM_3XX_CODES) {
+		return Http3xxCodes[index];
+	}
 
-        if (table_num == 4 && index < NUM_4XX_CODES) {
-                return Http4xxCodes[index];
-        }
+	if (table_num == 4 && index < NUM_4XX_CODES) {
+		return Http4xxCodes[index];
+	}
 
-        if (table_num == 5 && index < NUM_5XX_CODES) {
-                return Http5xxCodes[index];
-        }
+	if (table_num == 5 && index < NUM_5XX_CODES) {
+		return Http5xxCodes[index];
+	}
 
-        return NULL;
+	return NULL;
 }

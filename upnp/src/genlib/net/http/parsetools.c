@@ -49,19 +49,19 @@
 
 int has_xml_content_type(UpnpLib *p, http_message_t *hmsg)
 {
-        memptr hdr_value;
+	memptr hdr_value;
 
-        assert(hmsg);
+	assert(hmsg);
 
-        /* find 'content-type' header which must have text/xml */
-        if (httpmsg_find_hdr(hmsg, HDR_CONTENT_TYPE, &hdr_value)) {
-                switch (matchstr(
-                        p, hdr_value.buf, hdr_value.length, "%itext%w/%wxml")) {
-                case PARSE_OK:
-                        return 1;
-                default:
-                        break;
-                }
-        }
-        return 0;
+	/* find 'content-type' header which must have text/xml */
+	if (httpmsg_find_hdr(hmsg, HDR_CONTENT_TYPE, &hdr_value)) {
+		switch (matchstr(
+			p, hdr_value.buf, hdr_value.length, "%itext%w/%wxml")) {
+		case PARSE_OK:
+			return 1;
+		default:
+			break;
+		}
+	}
+	return 0;
 }

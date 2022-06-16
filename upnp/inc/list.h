@@ -50,7 +50,7 @@ extern "C" {
  *  does not care. */
 typedef struct UpnpListHead
 {
-        struct UpnpListHead *next, *prev;
+	struct UpnpListHead *next, *prev;
 } UpnpListHead;
 
 /** List iterator. Not strictly necessary, but clarifies the interface. */
@@ -71,7 +71,7 @@ EXPORT_SPEC UpnpListIter UpnpListNext(UpnpListHead *list, UpnpListIter pos);
 
 /** Insert element before pos, returns iterator pointing to inserted element. */
 EXPORT_SPEC UpnpListIter UpnpListInsert(
-        UpnpListHead *list, UpnpListIter pos, UpnpListHead *elt);
+	UpnpListHead *list, UpnpListIter pos, UpnpListHead *elt);
 
 /** Erase element at pos, return next one, or end()*/
 EXPORT_SPEC UpnpListIter UpnpListErase(UpnpListHead *list, UpnpListIter pos);

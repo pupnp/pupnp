@@ -52,12 +52,12 @@
 #include <time.h>
 
 #ifdef __cplusplus
-#define EXTERN_C extern "C"
+	#define EXTERN_C extern "C"
 #else /* __cplusplus */
-#ifndef EXTERN_C
-#define EXTERN_C
-#endif /* EXTERN_C */
-#endif /* __cplusplus */
+	#ifndef EXTERN_C
+		#define EXTERN_C
+	#endif /* EXTERN_C */
+#endif	       /* __cplusplus */
 
 /*!
  * \brief XML version comment. Not used because it is not interopeable with
@@ -65,7 +65,7 @@
  */
 #define XML_VERSION "<?xml version='1.0' encoding='ISO-8859-1' ?>\n"
 #define XML_PROPERTYSET_HEADER \
-        "<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n"
+	"<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n"
 
 #define UNABLE_MEMORY "HTTP/1.1 500 Internal Server Error\r\n\r\n"
 #define UNABLE_SERVICE_UNKNOWN "HTTP/1.1 404 Not Found\r\n\r\n"
@@ -104,51 +104,51 @@
  * \brief Locks the subscription.
  */
 #define SubscribeLock(p) \
-        UpnpPrintf(UpnpLib_get_Log(p), \
-                UPNP_INFO, \
-                GENA, \
-                __FILE__, \
-                __LINE__, \
-                "Trying Subscribe Lock"); \
-        pthread_mutex_lock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
-        UpnpPrintf(UpnpLib_get_Log(p), \
-                UPNP_INFO, \
-                GENA, \
-                __FILE__, \
-                __LINE__, \
-                "Subscribe Lock");
+	UpnpPrintf(UpnpLib_get_Log(p), \
+		UPNP_INFO, \
+		GENA, \
+		__FILE__, \
+		__LINE__, \
+		"Trying Subscribe Lock"); \
+	pthread_mutex_lock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
+	UpnpPrintf(UpnpLib_get_Log(p), \
+		UPNP_INFO, \
+		GENA, \
+		__FILE__, \
+		__LINE__, \
+		"Subscribe Lock");
 
 /*!
  * \brief Unlocks the subscription.
  */
 #define SubscribeUnlock(p) \
-        UpnpPrintf(UpnpLib_get_Log(p), \
-                UPNP_INFO, \
-                GENA, \
-                __FILE__, \
-                __LINE__, \
-                "Trying Subscribe UnLock"); \
-        pthread_mutex_unlock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
-        UpnpPrintf(UpnpLib_get_Log(p), \
-                UPNP_INFO, \
-                GENA, \
-                __FILE__, \
-                __LINE__, \
-                "Subscribe UnLock");
+	UpnpPrintf(UpnpLib_get_Log(p), \
+		UPNP_INFO, \
+		GENA, \
+		__FILE__, \
+		__LINE__, \
+		"Trying Subscribe UnLock"); \
+	pthread_mutex_unlock(UpnpLib_getnc_GlobalClientSubscribeMutex(p)); \
+	UpnpPrintf(UpnpLib_get_Log(p), \
+		UPNP_INFO, \
+		GENA, \
+		__FILE__, \
+		__LINE__, \
+		"Subscribe UnLock");
 
 /*!
  * Structure to send NOTIFY message to all subscribed control points
  */
 typedef struct NOTIFY_THREAD_STRUCT
 {
-        char *headers;
-        DOMString propertySet;
-        char *servId;
-        char *UDN;
-        Upnp_SID sid;
-        time_t ctime;
-        int *reference_count;
-        UpnpDevice_Handle device_handle;
+	char *headers;
+	DOMString propertySet;
+	char *servId;
+	char *UDN;
+	Upnp_SID sid;
+	time_t ctime;
+	int *reference_count;
+	UpnpDevice_Handle device_handle;
 } notify_thread_struct;
 
 /*!
@@ -158,14 +158,14 @@ typedef struct NOTIFY_THREAD_STRUCT
  * \return UPNP_E_SUCCESS if successful, otherwise appropriate error code.
  */
 EXTERN_C void genaCallback(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] represents the parse state of the request */
-        http_parser_t *parser,
-        /*! [in] HTTP message containing GENA request */
-        http_message_t *request,
-        /*! [in,out] Structure containing information about the socket */
-        SOCKINFO *info);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] represents the parse state of the request */
+	http_parser_t *parser,
+	/*! [in] HTTP message containing GENA request */
+	http_message_t *request,
+	/*! [in,out] Structure containing information about the socket */
+	SOCKINFO *info);
 
 /*!
  * \brief This function subscribes to a PublisherURL (also mentioned as EventURL
@@ -179,19 +179,19 @@ EXTERN_C void genaCallback(
  */
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaSubscribe(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] The client handle. */
-        UpnpClient_Handle client_handle,
-        /*! [in] Of the form: "http://134.134.156.80:4000/RedBulb/Event */
-        const UpnpString *PublisherURL,
-        /*! [in,out] requested Duration:
-         * \li if -1, then "infinite".
-         * \li in the OUT case: actual Duration granted by Service,
-         * 	-1 for infinite. */
-        int *TimeOut,
-        /*! [out] sid of subscription, memory passed in by caller. */
-        UpnpString *out_sid);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] The client handle. */
+	UpnpClient_Handle client_handle,
+	/*! [in] Of the form: "http://134.134.156.80:4000/RedBulb/Event */
+	const UpnpString *PublisherURL,
+	/*! [in,out] requested Duration:
+	 * \li if -1, then "infinite".
+	 * \li in the OUT case: actual Duration granted by Service,
+	 * 	-1 for infinite. */
+	int *TimeOut,
+	/*! [out] sid of subscription, memory passed in by caller. */
+	UpnpString *out_sid);
 #endif /* INCLUDE_CLIENT_APIS */
 
 /*!
@@ -206,12 +206,12 @@ EXTERN_C int genaSubscribe(
  */
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaUnSubscribe(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] UPnP client handle. */
-        UpnpClient_Handle client_handle,
-        /*! [in] The subscription ID. */
-        const UpnpString *in_sid);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] UPnP client handle. */
+	UpnpClient_Handle client_handle,
+	/*! [in] The subscription ID. */
+	const UpnpString *in_sid);
 #endif /* INCLUDE_CLIENT_APIS */
 
 /*!
@@ -225,10 +225,10 @@ EXTERN_C int genaUnSubscribe(
  */
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaUnregisterClient(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Handle containing all the control point related information. */
-        UpnpClient_Handle client_handle);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Handle containing all the control point related information. */
+	UpnpClient_Handle client_handle);
 #endif /* INCLUDE_CLIENT_APIS */
 
 /*
@@ -242,10 +242,10 @@ EXTERN_C int genaUnregisterClient(
  */
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaUnregisterDevice(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Handle of the root device */
-        UpnpDevice_Handle device_handle);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Handle of the root device */
+	UpnpDevice_Handle device_handle);
 #endif /* INCLUDE_CLIENT_APIS */
 
 /*!
@@ -260,13 +260,13 @@ EXTERN_C int genaUnregisterDevice(
  */
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaRenewSubscription(UpnpLib *p,
-        /*! [in] Client handle. */
-        UpnpClient_Handle client_handle,
-        /*! [in] Subscription ID. */
-        const UpnpString *in_sid,
-        /*! [in,out] requested Duration, if -1, then "infinite". In the OUT
-         * case: actual Duration granted by Service, -1 for infinite. */
-        int *TimeOut);
+	/*! [in] Client handle. */
+	UpnpClient_Handle client_handle,
+	/*! [in] Subscription ID. */
+	const UpnpString *in_sid,
+	/*! [in,out] requested Duration, if -1, then "infinite". In the OUT
+	 * case: actual Duration granted by Service, -1 for infinite. */
+	int *TimeOut);
 #endif /* INCLUDE_CLIENT_APIS */
 
 /*!
@@ -279,20 +279,20 @@ EXTERN_C int genaRenewSubscription(UpnpLib *p,
  */
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaNotifyAll(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Device handle. */
-        UpnpDevice_Handle device_handle,
-        /*! [in] Device udn. */
-        char *UDN,
-        /*! [in] Service ID. */
-        char *servId,
-        /*! [in] Array of varible names. */
-        char **VarNames,
-        /*! [in] Array of variable values. */
-        char **VarValues,
-        /*! [in] Number of variables. */
-        int var_count);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Device handle. */
+	UpnpDevice_Handle device_handle,
+	/*! [in] Device udn. */
+	char *UDN,
+	/*! [in] Service ID. */
+	char *servId,
+	/*! [in] Array of varible names. */
+	char **VarNames,
+	/*! [in] Array of variable values. */
+	char **VarValues,
+	/*! [in] Number of variables. */
+	int var_count);
 #endif /* INCLUDE_DEVICE_APIS */
 
 /*!
@@ -305,16 +305,16 @@ EXTERN_C int genaNotifyAll(
  */
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaNotifyAllExt(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Device handle. */
-        UpnpDevice_Handle device_handle,
-        /*! [in] Device udn. */
-        char *UDN,
-        /*! [in] Service ID. */
-        char *servId,
-        /*! [in] XML document Event varible property set. */
-        IXML_Document *PropSet);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Device handle. */
+	UpnpDevice_Handle device_handle,
+	/*! [in] Device udn. */
+	char *UDN,
+	/*! [in] Service ID. */
+	char *servId,
+	/*! [in] XML document Event varible property set. */
+	IXML_Document *PropSet);
 #endif /* INCLUDE_DEVICE_APIS */
 
 /*!
@@ -327,22 +327,22 @@ EXTERN_C int genaNotifyAllExt(
  */
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaInitNotify(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Device handle. */
-        UpnpDevice_Handle device_handle,
-        /*! [in] Device udn. */
-        char *UDN,
-        /*! [in] Service ID. */
-        char *servId,
-        /*! [in] Array of variable names. */
-        char **VarNames,
-        /*! [in] Array of variable values. */
-        char **VarValues,
-        /*! [in] Array size. */
-        int var_count,
-        /*! [in] Subscription ID. */
-        const Upnp_SID sid);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Device handle. */
+	UpnpDevice_Handle device_handle,
+	/*! [in] Device udn. */
+	char *UDN,
+	/*! [in] Service ID. */
+	char *servId,
+	/*! [in] Array of variable names. */
+	char **VarNames,
+	/*! [in] Array of variable values. */
+	char **VarValues,
+	/*! [in] Array size. */
+	int var_count,
+	/*! [in] Subscription ID. */
+	const Upnp_SID sid);
 #endif /* INCLUDE_DEVICE_APIS */
 
 /*!
@@ -357,18 +357,18 @@ EXTERN_C int genaInitNotify(
  */
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaInitNotifyExt(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Device handle. */
-        UpnpDevice_Handle device_handle,
-        /*! [in] Device udn. */
-        char *UDN,
-        /*! [in] Service ID. */
-        char *servId,
-        /*! [in] Document of the state table. */
-        IXML_Document *PropSet,
-        /*! [in] subscription ID. */
-        const Upnp_SID sid);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Device handle. */
+	UpnpDevice_Handle device_handle,
+	/*! [in] Device udn. */
+	char *UDN,
+	/*! [in] Service ID. */
+	char *servId,
+	/*! [in] Document of the state table. */
+	IXML_Document *PropSet,
+	/*! [in] subscription ID. */
+	const Upnp_SID sid);
 #endif /* INCLUDE_DEVICE_APIS */
 
 /*!
@@ -378,13 +378,13 @@ EXTERN_C int genaInitNotifyExt(
  * \return UPNP_E_SUCCESS if successful, otherwise appropriate error code.
  */
 void error_respond(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Structure containing information about the socket. */
-        SOCKINFO *info,
-        /*! [in] error code that will be in the GENA response. */
-        int error_code,
-        /*! [in] GENA request Packet. */
-        http_message_t *hmsg);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Structure containing information about the socket. */
+	SOCKINFO *info,
+	/*! [in] error code that will be in the GENA response. */
+	int error_code,
+	/*! [in] GENA request Packet. */
+	http_message_t *hmsg);
 
 #endif /* GENA_H */

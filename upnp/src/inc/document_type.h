@@ -4,12 +4,12 @@
 /*! mapping of file extension to content-type of document */
 struct s_document_type
 {
-        /*! . */
-        const char *file_ext;
-        /*! . */
-        const char *content_type;
-        /*! . */
-        const char *content_subtype;
+	/*! . */
+	const char *file_ext;
+	/*! . */
+	const char *content_type;
+	/*! . */
+	const char *content_subtype;
 };
 
 typedef struct s_document_type document_type_t;
@@ -18,7 +18,7 @@ typedef struct s_document_type document_type_t;
 
 struct s_doc_type_array
 {
-        document_type_t doc[NUM_MEDIA_TYPES];
+	document_type_t doc[NUM_MEDIA_TYPES];
 };
 
 typedef struct s_doc_type_array doc_type_array_t;

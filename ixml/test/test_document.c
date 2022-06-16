@@ -40,97 +40,97 @@
 static const char *get_ixml_error_string(IXML_ERRORCODE code)
 {
 #define CASE(CODE) \
-        case IXML_##CODE: \
-                return #CODE
+	case IXML_##CODE: \
+		return #CODE
 
-        switch (code) {
-                CASE(INDEX_SIZE_ERR);
-                CASE(DOMSTRING_SIZE_ERR);
-                CASE(HIERARCHY_REQUEST_ERR);
-                CASE(WRONG_DOCUMENT_ERR);
-                CASE(INVALID_CHARACTER_ERR);
-                CASE(NO_DATA_ALLOWED_ERR);
-                CASE(NO_MODIFICATION_ALLOWED_ERR);
-                CASE(NOT_FOUND_ERR);
-                CASE(NOT_SUPPORTED_ERR);
-                CASE(INUSE_ATTRIBUTE_ERR);
-                CASE(INVALID_STATE_ERR);
-                CASE(SYNTAX_ERR);
-                CASE(INVALID_MODIFICATION_ERR);
-                CASE(NAMESPACE_ERR);
-                CASE(INVALID_ACCESS_ERR);
-                CASE(SUCCESS);
-                CASE(NO_SUCH_FILE);
-                CASE(INSUFFICIENT_MEMORY);
-                CASE(FILE_DONE);
-                CASE(INVALID_PARAMETER);
-                CASE(FAILED);
-                CASE(INVALID_ITEM_NUMBER);
-        }
-        return "** UNKNOWN EROR CODE !! **";
+	switch (code) {
+		CASE(INDEX_SIZE_ERR);
+		CASE(DOMSTRING_SIZE_ERR);
+		CASE(HIERARCHY_REQUEST_ERR);
+		CASE(WRONG_DOCUMENT_ERR);
+		CASE(INVALID_CHARACTER_ERR);
+		CASE(NO_DATA_ALLOWED_ERR);
+		CASE(NO_MODIFICATION_ALLOWED_ERR);
+		CASE(NOT_FOUND_ERR);
+		CASE(NOT_SUPPORTED_ERR);
+		CASE(INUSE_ATTRIBUTE_ERR);
+		CASE(INVALID_STATE_ERR);
+		CASE(SYNTAX_ERR);
+		CASE(INVALID_MODIFICATION_ERR);
+		CASE(NAMESPACE_ERR);
+		CASE(INVALID_ACCESS_ERR);
+		CASE(SUCCESS);
+		CASE(NO_SUCH_FILE);
+		CASE(INSUFFICIENT_MEMORY);
+		CASE(FILE_DONE);
+		CASE(INVALID_PARAMETER);
+		CASE(FAILED);
+		CASE(INVALID_ITEM_NUMBER);
+	}
+	return "** UNKNOWN EROR CODE !! **";
 
 #undef CASE
 }
 
 int main(int argc, char *argv[])
 {
-        int i;
+	int i;
 
-        if (argc < 2) {
-                fprintf(stderr, "Usage: %s [xml files to load]\n", argv[0]);
-                exit(EXIT_FAILURE);
-        }
+	if (argc < 2) {
+		fprintf(stderr, "Usage: %s [xml files to load]\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
 
-        for (i = 1; i < argc; i++) {
-                int rc;
-                IXML_Document *doc = NULL;
-                DOMString s;
-                char *p;
+	for (i = 1; i < argc; i++) {
+		int rc;
+		IXML_Document *doc = NULL;
+		DOMString s;
+		char *p;
 
-                printf("Test \"%s\" \n", argv[i]);
-                printf("    Loading ... ");
-                fflush(stdout);
+		printf("Test \"%s\" \n", argv[i]);
+		printf("    Loading ... ");
+		fflush(stdout);
 
-                rc = ixmlLoadDocumentEx(argv[i], &doc);
-                if (rc != IXML_SUCCESS) {
-                        fprintf(stderr,
-                                "** error : can't load document %s : "
-                                "error %d (%s)\n",
-                                argv[i],
-                                rc,
-                                get_ixml_error_string(rc));
-                        exit(EXIT_FAILURE);
-                }
+		rc = ixmlLoadDocumentEx(argv[i], &doc);
+		if (rc != IXML_SUCCESS) {
+			fprintf(stderr,
+				"** error : can't load document %s : "
+				"error %d (%s)\n",
+				argv[i],
+				rc,
+				get_ixml_error_string(rc));
+			exit(EXIT_FAILURE);
+		}
 
-                printf("OK\n");
+		printf("OK\n");
 
-                printf("    Printing ... ");
-                fflush(stdout);
+		printf("    Printing ... ");
+		fflush(stdout);
 
-                s = ixmlPrintDocument(doc);
-                if (s == NULL || s[0] == '\0') {
-                        fprintf(stderr,
-                                "** error : can't print loaded document %s\n",
-                                argv[i]);
-                        exit(EXIT_FAILURE);
-                }
-                p = s + strlen(s) - 1;
-                while (isspace(*p) && p > s)
-                        p--;
-                if (*s != '<' || *p != '>') {
-                        fprintf(stderr,
-                                "** error : malformed printed document '%s' :"
-                                "%s\n",
-                                argv[i],
-                                s);
-                        exit(EXIT_FAILURE);
-                }
+		s = ixmlPrintDocument(doc);
+		if (s == NULL || s[0] == '\0') {
+			fprintf(stderr,
+				"** error : can't print loaded document %s\n",
+				argv[i]);
+			exit(EXIT_FAILURE);
+		}
+		p = s + strlen(s) - 1;
+		while (isspace(*p) && p > s)
+			p--;
+		if (*s != '<' || *p != '>') {
+			fprintf(stderr,
+				"** error : malformed printed document '%s' :"
+				"%s\n",
+				argv[i],
+				s);
+			exit(EXIT_FAILURE);
+		}
 
-                printf("OK\n");
+		printf("OK\n");
 
-                ixmlFreeDOMString(s);
-                ixmlDocument_free(doc);
-        }
+		ixmlFreeDOMString(s);
+		ixmlDocument_free(doc);
+	}
 
-        exit(EXIT_SUCCESS);
+	exit(EXIT_SUCCESS);
 }
