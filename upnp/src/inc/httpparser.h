@@ -49,32 +49,32 @@
 /* Used to represent different types of tokens in input. */
 typedef enum
 {
-        TT_IDENTIFIER,
-        TT_WHITESPACE,
-        TT_CRLF,
-        TT_CTRL,
-        TT_SEPARATOR,
-        TT_QUOTEDSTRING
+	TT_IDENTIFIER,
+	TT_WHITESPACE,
+	TT_CRLF,
+	TT_CTRL,
+	TT_SEPARATOR,
+	TT_QUOTEDSTRING
 } token_type_t;
 
 typedef struct
 {
-        /*! raw http msg. */
-        membuffer *msg;
-        /*! current position in buffer. */
-        size_t cursor;
-        /*! set this to 1 if the entire msg is loaded in 'msg';
-         * else 0 if only partial msg in 'msg' (default is 0). */
-        int entire_msg_loaded;
+	/*! raw http msg. */
+	membuffer *msg;
+	/*! current position in buffer. */
+	size_t cursor;
+	/*! set this to 1 if the entire msg is loaded in 'msg';
+	 * else 0 if only partial msg in 'msg' (default is 0). */
+	int entire_msg_loaded;
 } scanner_t;
 
 typedef enum
 {
-        POS_REQUEST_LINE,
-        POS_RESPONSE_LINE,
-        POS_HEADERS,
-        POS_ENTITY,
-        POS_COMPLETE
+	POS_REQUEST_LINE,
+	POS_RESPONSE_LINE,
+	POS_HEADERS,
+	POS_ENTITY,
+	POS_COMPLETE
 } parser_pos_t;
 
 #define ENTREAD_DETERMINE_READ_METHOD 1
@@ -91,19 +91,19 @@ typedef enum
  * those of Upnp_HttpMethod enum defined in upnp.h */
 typedef enum
 {
-        HTTPMETHOD_PUT = UPNP_HTTPMETHOD_PUT,
-        HTTPMETHOD_DELETE = UPNP_HTTPMETHOD_DELETE,
-        HTTPMETHOD_GET = UPNP_HTTPMETHOD_GET,
-        HTTPMETHOD_HEAD = UPNP_HTTPMETHOD_HEAD,
-        HTTPMETHOD_POST = UPNP_HTTPMETHOD_POST,
-        HTTPMETHOD_MPOST,
-        HTTPMETHOD_SUBSCRIBE,
-        HTTPMETHOD_UNSUBSCRIBE,
-        HTTPMETHOD_NOTIFY,
-        HTTPMETHOD_MSEARCH,
-        HTTPMETHOD_UNKNOWN,
-        SOAPMETHOD_POST,
-        HTTPMETHOD_SIMPLEGET
+	HTTPMETHOD_PUT = UPNP_HTTPMETHOD_PUT,
+	HTTPMETHOD_DELETE = UPNP_HTTPMETHOD_DELETE,
+	HTTPMETHOD_GET = UPNP_HTTPMETHOD_GET,
+	HTTPMETHOD_HEAD = UPNP_HTTPMETHOD_HEAD,
+	HTTPMETHOD_POST = UPNP_HTTPMETHOD_POST,
+	HTTPMETHOD_MPOST,
+	HTTPMETHOD_SUBSCRIBE,
+	HTTPMETHOD_UNSUBSCRIBE,
+	HTTPMETHOD_NOTIFY,
+	HTTPMETHOD_MSEARCH,
+	HTTPMETHOD_UNKNOWN,
+	SOAPMETHOD_POST,
+	HTTPMETHOD_SIMPLEGET
 } http_method_t;
 
 /* different types of HTTP headers */
@@ -150,87 +150,87 @@ typedef enum
 /*! status of parsing */
 typedef enum
 {
-        /*! msg was parsed successfully. */
-        PARSE_SUCCESS = 0,
-        /*! need more data to continue. */
-        PARSE_INCOMPLETE,
-        /*! for responses that don't have length specified. */
-        PARSE_INCOMPLETE_ENTITY,
-        /*! parse failed; check status code for details. */
-        PARSE_FAILURE,
-        /*! done partial. */
-        PARSE_OK,
-        /*! token not matched. */
-        PARSE_NO_MATCH,
-        /*! private. */
-        PARSE_CONTINUE_1
+	/*! msg was parsed successfully. */
+	PARSE_SUCCESS = 0,
+	/*! need more data to continue. */
+	PARSE_INCOMPLETE,
+	/*! for responses that don't have length specified. */
+	PARSE_INCOMPLETE_ENTITY,
+	/*! parse failed; check status code for details. */
+	PARSE_FAILURE,
+	/*! done partial. */
+	PARSE_OK,
+	/*! token not matched. */
+	PARSE_NO_MATCH,
+	/*! private. */
+	PARSE_CONTINUE_1
 } parse_status_t;
 
 typedef struct
 {
-        /*! header name as a string. */
-        memptr name;
-        /*! header name id (for a selective group of headers only). */
-        int name_id;
-        /*! raw-value; could be multi-lined; min-length = 0. */
-        membuffer value;
-        /* private. */
-        membuffer name_buf;
+	/*! header name as a string. */
+	memptr name;
+	/*! header name id (for a selective group of headers only). */
+	int name_id;
+	/*! raw-value; could be multi-lined; min-length = 0. */
+	membuffer value;
+	/* private. */
+	membuffer name_buf;
 } http_header_t;
 
 typedef struct
 {
-        int initialized;
-        /*! request only. */
-        http_method_t method;
-        /*! request only. */
-        uri_type uri;
-        /*! response only. */
-        http_method_t request_method;
-        /*! response only. */
-        int status_code;
-        /*! response only. */
-        membuffer status_msg;
-        /*! response only. the amount of data that's been read by the user,
-         * that's no longer in the raw message buffer.
-         */
-        size_t amount_discarded;
-        /* fields used in both request or response messages. */
-        /*! if 1, msg is a request, else response. */
-        int is_request;
-        /* http major version. */
-        int major_version;
-        /* http minor version. */
-        int minor_version;
-        /*! . */
-        LinkedList headers;
-        /*! message body(entity). */
-        memptr entity;
-        /* private fields. */
-        /*! entire raw message. */
-        membuffer msg;
-        /*! storage for url string. */
-        char *urlbuf;
+	int initialized;
+	/*! request only. */
+	http_method_t method;
+	/*! request only. */
+	uri_type uri;
+	/*! response only. */
+	http_method_t request_method;
+	/*! response only. */
+	int status_code;
+	/*! response only. */
+	membuffer status_msg;
+	/*! response only. the amount of data that's been read by the user,
+	 * that's no longer in the raw message buffer.
+	 */
+	size_t amount_discarded;
+	/* fields used in both request or response messages. */
+	/*! if 1, msg is a request, else response. */
+	int is_request;
+	/* http major version. */
+	int major_version;
+	/* http minor version. */
+	int minor_version;
+	/*! . */
+	LinkedList headers;
+	/*! message body(entity). */
+	memptr entity;
+	/* private fields. */
+	/*! entire raw message. */
+	membuffer msg;
+	/*! storage for url string. */
+	char *urlbuf;
 } http_message_t;
 
 typedef struct
 {
-        http_message_t msg;
-        /*! read-only; in case of parse error, this
-         * contains the HTTP error code (4XX or 5XX). */
-        int http_error_code;
-        /*! read-only; this is set to 1 if a NOTIFY request has no
-         * content-length. used to read valid sspd notify msg. */
-        int valid_ssdp_notify_hack;
-        /* private data -- don't touch. */
-        parser_pos_t position;
-        int ent_position;
-        unsigned int content_length;
-        size_t chunk_size;
-        /*! offset in the the raw message buffer, which contains the message
-         * body. preceding this are the headers of the messsage. */
-        size_t entity_start_position;
-        scanner_t scanner;
+	http_message_t msg;
+	/*! read-only; in case of parse error, this
+	 * contains the HTTP error code (4XX or 5XX). */
+	int http_error_code;
+	/*! read-only; this is set to 1 if a NOTIFY request has no
+	 * content-length. used to read valid sspd notify msg. */
+	int valid_ssdp_notify_hack;
+	/* private data -- don't touch. */
+	parser_pos_t position;
+	int ent_position;
+	unsigned int content_length;
+	size_t chunk_size;
+	/*! offset in the the raw message buffer, which contains the message
+	 * body. preceding this are the headers of the messsage. */
+	size_t entity_start_position;
+	scanner_t scanner;
 } http_parser_t;
 
 #ifdef __cplusplus
@@ -280,7 +280,7 @@ void httpmsg_destroy(http_message_t *msg);
  *	Note :
  ************************************************************************/
 http_header_t *httpmsg_find_hdr_str(
-        http_message_t *msg, const char *header_name);
+	http_message_t *msg, const char *header_name);
 
 /************************************************************************
  *	Function :	httpmsg_find_hdr
@@ -298,7 +298,7 @@ http_header_t *httpmsg_find_hdr_str(
  *	Note :
  ************************************************************************/
 http_header_t *httpmsg_find_hdr(
-        http_message_t *msg, int header_name_id, memptr *value);
+	http_message_t *msg, int header_name_id, memptr *value);
 
 /************************************************************************
  * Function: parser_request_init
@@ -417,7 +417,7 @@ parse_status_t parser_get_entity_read_method(UpnpLib *p, http_parser_t *parser);
  *	 void
  ************************************************************************/
 parse_status_t parser_append(
-        UpnpLib *p, http_parser_t *parser, const char *buf, size_t buf_length);
+	UpnpLib *p, http_parser_t *parser, const char *buf, size_t buf_length);
 
 /************************************************************************
  * Function: httpmsg_list_headers
@@ -466,7 +466,7 @@ void free_http_headers_list(UpnpListHead *list);
  *   PARSE_FAILURE	-- 'str' is bad input
  ************************************************************************/
 parse_status_t matchstr(
-        UpnpLib *p, char *str, size_t slen, const char *fmt, ...);
+	UpnpLib *p, char *str, size_t slen, const char *fmt, ...);
 
 /************************************************************************
  * Function: raw_to_int
@@ -518,14 +518,14 @@ const char *method_to_str(http_method_t method);
 
 #ifdef DEBUG
 void print_http_headers(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] HTTP Message object. */
-        http_message_t *hmsg);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] HTTP Message object. */
+	http_message_t *hmsg);
 #else
-#define print_http_headers(p, hmsg) \
-        do { \
-        } while (0)
+	#define print_http_headers(p, hmsg) \
+		do { \
+		} while (0)
 #endif
 
 #ifdef __cplusplus

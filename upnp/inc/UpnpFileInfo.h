@@ -64,30 +64,30 @@ EXPORT_SPEC int UpnpFileInfo_set_IsReadable(UpnpFileInfo *p, int n);
 EXPORT_SPEC const DOMString UpnpFileInfo_get_ContentType(const UpnpFileInfo *p);
 /*! UpnpFileInfo_set_ContentType */
 EXPORT_SPEC int UpnpFileInfo_set_ContentType(
-        UpnpFileInfo *p, const DOMString s);
+	UpnpFileInfo *p, const DOMString s);
 /*! UpnpFileInfo_get_ContentType_cstr */
 EXPORT_SPEC const char *UpnpFileInfo_get_ContentType_cstr(
-        const UpnpFileInfo *p);
+	const UpnpFileInfo *p);
 
 /*! UpnpFileInfo_get_HttpHeadersList */
 EXPORT_SPEC const UpnpListHead *UpnpFileInfo_get_HttpHeadersList(
-        const UpnpFileInfo *p);
+	const UpnpFileInfo *p);
 /*! UpnpFileInfo_set_HttpHeadersList */
 EXPORT_SPEC int UpnpFileInfo_set_HttpHeadersList(
-        UpnpFileInfo *p, const UpnpListHead *q);
+	UpnpFileInfo *p, const UpnpListHead *q);
 /*! UpnpFileInfo_add_to_list_HttpHeadersList */
 EXPORT_SPEC void UpnpFileInfo_add_to_list_HttpHeadersList(
-        UpnpFileInfo *p, UpnpListHead *head);
+	UpnpFileInfo *p, UpnpListHead *head);
 
 /*! UpnpFileInfo_get_CtrlPtIPAddr */
 EXPORT_SPEC const struct sockaddr_storage *UpnpFileInfo_get_CtrlPtIPAddr(
-        const UpnpFileInfo *p);
+	const UpnpFileInfo *p);
 /*! UpnpFileInfo_getnc_CtrlPtIPAddr */
 EXPORT_SPEC struct sockaddr_storage *UpnpFileInfo_getnc_CtrlPtIPAddr(
-        UpnpFileInfo *p);
+	UpnpFileInfo *p);
 /*! UpnpFileInfo_get_CtrlPtIPAddr */
 EXPORT_SPEC int UpnpFileInfo_set_CtrlPtIPAddr(
-        UpnpFileInfo *p, const struct sockaddr_storage *buf);
+	UpnpFileInfo *p, const struct sockaddr_storage *buf);
 /*! UpnpFileInfo_get_CtrlPtIPAddr */
 EXPORT_SPEC void UpnpFileInfo_clear_CtrlPtIPAddr(UpnpFileInfo *p);
 
@@ -103,7 +103,7 @@ EXPORT_SPEC const char *UpnpFileInfo_get_Os_cstr(const UpnpFileInfo *p);
 EXPORT_SPEC int UpnpFileInfo_strcpy_Os(UpnpFileInfo *p, const char *s);
 /*! UpnpFileInfo_strncpy_Os */
 EXPORT_SPEC int UpnpFileInfo_strncpy_Os(
-        UpnpFileInfo *p, const char *s, size_t n);
+	UpnpFileInfo *p, const char *s, size_t n);
 /*! UpnpFileInfo_clear_Os */
 EXPORT_SPEC void UpnpFileInfo_clear_Os(UpnpFileInfo *p);
 

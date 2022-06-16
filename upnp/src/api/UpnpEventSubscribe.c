@@ -17,182 +17,178 @@
 
 struct s_UpnpEventSubscribe
 {
-        int m_ErrCode;
-        int m_TimeOut;
-        UpnpString *m_SID;
-        UpnpString *m_PublisherUrl;
+	int m_ErrCode;
+	int m_TimeOut;
+	UpnpString *m_SID;
+	UpnpString *m_PublisherUrl;
 };
 
 UpnpEventSubscribe *UpnpEventSubscribe_new()
 {
-        struct s_UpnpEventSubscribe *p =
-                calloc(1, sizeof(struct s_UpnpEventSubscribe));
+	struct s_UpnpEventSubscribe *p =
+		calloc(1, sizeof(struct s_UpnpEventSubscribe));
 
-        if (!p) {
-                return 0;
-        }
+	if (!p) {
+		return 0;
+	}
 
-        /*p->m_ErrCode = 0;*/
-        /*p->m_TimeOut = 0;*/
-        p->m_SID = UpnpString_new();
-        p->m_PublisherUrl = UpnpString_new();
+	/*p->m_ErrCode = 0;*/
+	/*p->m_TimeOut = 0;*/
+	p->m_SID = UpnpString_new();
+	p->m_PublisherUrl = UpnpString_new();
 
-        return (UpnpEventSubscribe *)p;
+	return (UpnpEventSubscribe *)p;
 }
 
 void UpnpEventSubscribe_delete(UpnpEventSubscribe *q)
 {
-        struct s_UpnpEventSubscribe *p = (struct s_UpnpEventSubscribe *)q;
+	struct s_UpnpEventSubscribe *p = (struct s_UpnpEventSubscribe *)q;
 
-        if (!p) {
-                return;
-        }
+	if (!p) {
+		return;
+	}
 
-        UpnpString_delete(p->m_PublisherUrl);
-        p->m_PublisherUrl = 0;
-        UpnpString_delete(p->m_SID);
-        p->m_SID = 0;
-        p->m_TimeOut = 0;
-        p->m_ErrCode = 0;
+	UpnpString_delete(p->m_PublisherUrl);
+	p->m_PublisherUrl = 0;
+	UpnpString_delete(p->m_SID);
+	p->m_SID = 0;
+	p->m_TimeOut = 0;
+	p->m_ErrCode = 0;
 
-        free(p);
+	free(p);
 }
 
 int UpnpEventSubscribe_assign(
-        UpnpEventSubscribe *p, const UpnpEventSubscribe *q)
+	UpnpEventSubscribe *p, const UpnpEventSubscribe *q)
 {
-        int ok = 1;
+	int ok = 1;
 
-        if (p != q) {
-                ok = ok &&
-                        UpnpEventSubscribe_set_ErrCode(
-                                p, UpnpEventSubscribe_get_ErrCode(q));
-                ok = ok &&
-                        UpnpEventSubscribe_set_TimeOut(
-                                p, UpnpEventSubscribe_get_TimeOut(q));
-                ok = ok &&
-                        UpnpEventSubscribe_set_SID(
-                                p, UpnpEventSubscribe_get_SID(q));
-                ok = ok &&
-                        UpnpEventSubscribe_set_PublisherUrl(
-                                p, UpnpEventSubscribe_get_PublisherUrl(q));
-        }
+	if (p != q) {
+		ok = ok && UpnpEventSubscribe_set_ErrCode(
+				   p, UpnpEventSubscribe_get_ErrCode(q));
+		ok = ok && UpnpEventSubscribe_set_TimeOut(
+				   p, UpnpEventSubscribe_get_TimeOut(q));
+		ok = ok && UpnpEventSubscribe_set_SID(
+				   p, UpnpEventSubscribe_get_SID(q));
+		ok = ok && UpnpEventSubscribe_set_PublisherUrl(
+				   p, UpnpEventSubscribe_get_PublisherUrl(q));
+	}
 
-        return ok;
+	return ok;
 }
 
 UpnpEventSubscribe *UpnpEventSubscribe_dup(const UpnpEventSubscribe *q)
 {
-        UpnpEventSubscribe *p = UpnpEventSubscribe_new();
+	UpnpEventSubscribe *p = UpnpEventSubscribe_new();
 
-        if (!p) {
-                return 0;
-        }
+	if (!p) {
+		return 0;
+	}
 
-        UpnpEventSubscribe_assign(p, q);
+	UpnpEventSubscribe_assign(p, q);
 
-        return p;
+	return p;
 }
 
 int UpnpEventSubscribe_get_ErrCode(const UpnpEventSubscribe *p)
 {
-        return p->m_ErrCode;
+	return p->m_ErrCode;
 }
 
 int UpnpEventSubscribe_set_ErrCode(UpnpEventSubscribe *p, int n)
 {
-        p->m_ErrCode = n;
+	p->m_ErrCode = n;
 
-        return 1;
+	return 1;
 }
 
 int UpnpEventSubscribe_get_TimeOut(const UpnpEventSubscribe *p)
 {
-        return p->m_TimeOut;
+	return p->m_TimeOut;
 }
 
 int UpnpEventSubscribe_set_TimeOut(UpnpEventSubscribe *p, int n)
 {
-        p->m_TimeOut = n;
+	p->m_TimeOut = n;
 
-        return 1;
+	return 1;
 }
 
 const UpnpString *UpnpEventSubscribe_get_SID(const UpnpEventSubscribe *p)
 {
-        return p->m_SID;
+	return p->m_SID;
 }
 
 int UpnpEventSubscribe_set_SID(UpnpEventSubscribe *p, const UpnpString *s)
 {
-        const char *q = UpnpString_get_String(s);
+	const char *q = UpnpString_get_String(s);
 
-        return UpnpString_set_String(p->m_SID, q);
+	return UpnpString_set_String(p->m_SID, q);
 }
 
 size_t UpnpEventSubscribe_get_SID_Length(const UpnpEventSubscribe *p)
 {
-        return UpnpString_get_Length(UpnpEventSubscribe_get_SID(p));
+	return UpnpString_get_Length(UpnpEventSubscribe_get_SID(p));
 }
 
 const char *UpnpEventSubscribe_get_SID_cstr(const UpnpEventSubscribe *p)
 {
-        return UpnpString_get_String(UpnpEventSubscribe_get_SID(p));
+	return UpnpString_get_String(UpnpEventSubscribe_get_SID(p));
 }
 
 int UpnpEventSubscribe_strcpy_SID(UpnpEventSubscribe *p, const char *s)
 {
-        return UpnpString_set_String(p->m_SID, s);
+	return UpnpString_set_String(p->m_SID, s);
 }
 
 int UpnpEventSubscribe_strncpy_SID(
-        UpnpEventSubscribe *p, const char *s, size_t n)
+	UpnpEventSubscribe *p, const char *s, size_t n)
 {
-        return UpnpString_set_StringN(p->m_SID, s, n);
+	return UpnpString_set_StringN(p->m_SID, s, n);
 }
 
 void UpnpEventSubscribe_clear_SID(UpnpEventSubscribe *p)
 {
-        UpnpString_clear(p->m_SID);
+	UpnpString_clear(p->m_SID);
 }
 
 const UpnpString *UpnpEventSubscribe_get_PublisherUrl(
-        const UpnpEventSubscribe *p)
+	const UpnpEventSubscribe *p)
 {
-        return p->m_PublisherUrl;
+	return p->m_PublisherUrl;
 }
 
 int UpnpEventSubscribe_set_PublisherUrl(
-        UpnpEventSubscribe *p, const UpnpString *s)
+	UpnpEventSubscribe *p, const UpnpString *s)
 {
-        const char *q = UpnpString_get_String(s);
+	const char *q = UpnpString_get_String(s);
 
-        return UpnpString_set_String(p->m_PublisherUrl, q);
+	return UpnpString_set_String(p->m_PublisherUrl, q);
 }
 
 size_t UpnpEventSubscribe_get_PublisherUrl_Length(const UpnpEventSubscribe *p)
 {
-        return UpnpString_get_Length(UpnpEventSubscribe_get_PublisherUrl(p));
+	return UpnpString_get_Length(UpnpEventSubscribe_get_PublisherUrl(p));
 }
 
 const char *UpnpEventSubscribe_get_PublisherUrl_cstr(
-        const UpnpEventSubscribe *p)
+	const UpnpEventSubscribe *p)
 {
-        return UpnpString_get_String(UpnpEventSubscribe_get_PublisherUrl(p));
+	return UpnpString_get_String(UpnpEventSubscribe_get_PublisherUrl(p));
 }
 
 int UpnpEventSubscribe_strcpy_PublisherUrl(UpnpEventSubscribe *p, const char *s)
 {
-        return UpnpString_set_String(p->m_PublisherUrl, s);
+	return UpnpString_set_String(p->m_PublisherUrl, s);
 }
 
 int UpnpEventSubscribe_strncpy_PublisherUrl(
-        UpnpEventSubscribe *p, const char *s, size_t n)
+	UpnpEventSubscribe *p, const char *s, size_t n)
 {
-        return UpnpString_set_StringN(p->m_PublisherUrl, s, n);
+	return UpnpString_set_StringN(p->m_PublisherUrl, s, n);
 }
 
 void UpnpEventSubscribe_clear_PublisherUrl(UpnpEventSubscribe *p)
 {
-        UpnpString_clear(p->m_PublisherUrl);
+	UpnpString_clear(p->m_PublisherUrl);
 }

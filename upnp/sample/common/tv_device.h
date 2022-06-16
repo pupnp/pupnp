@@ -146,34 +146,34 @@ extern "C" {
  * error code on failure.
  */
 typedef int (*upnp_action)(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *request,
-        /*! [out] Action result. */
-        IXML_Document **out,
-        /*! [out] Error string in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *request,
+	/*! [out] Action result. */
+	IXML_Document **out,
+	/*! [out] Error string in case action was unsuccessful. */
+	const char **errorString);
 
 /*! Structure for storing Tv Service identifiers and state table. */
 struct TvService
 {
-        /*! Universally Unique Device Name. */
-        char UDN[NAME_SIZE];
-        /*! . */
-        char ServiceId[NAME_SIZE];
-        /*! . */
-        char ServiceType[NAME_SIZE];
-        /*! . */
-        const char *VariableName[TV_MAXVARS];
-        /*! . */
-        char *VariableStrVal[TV_MAXVARS];
-        /*! . */
-        const char *ActionNames[TV_MAXACTIONS];
-        /*! . */
-        upnp_action actions[TV_MAXACTIONS];
-        /*! . */
-        int VariableCount;
+	/*! Universally Unique Device Name. */
+	char UDN[NAME_SIZE];
+	/*! . */
+	char ServiceId[NAME_SIZE];
+	/*! . */
+	char ServiceType[NAME_SIZE];
+	/*! . */
+	const char *VariableName[TV_MAXVARS];
+	/*! . */
+	char *VariableStrVal[TV_MAXVARS];
+	/*! . */
+	const char *ActionNames[TV_MAXACTIONS];
+	/*! . */
+	upnp_action actions[TV_MAXACTIONS];
+	/*! . */
+	int VariableCount;
 };
 
 /*! Array of service structures */
@@ -195,10 +195,10 @@ extern pthread_mutex_t TVDevMutex;
  * Action names are hardcoded.
  */
 int SetActionTable(
-        /*! [in] one of TV_SERVICE_CONTROL or, TV_SERVICE_PICTURE. */
-        int serviceType,
-        /*! [in,out] service containing action table to set. */
-        struct TvService *out);
+	/*! [in] one of TV_SERVICE_CONTROL or, TV_SERVICE_PICTURE. */
+	int serviceType,
+	/*! [in,out] service containing action table to set. */
+	struct TvService *out);
 
 /*!
  * \brief Initialize the device state table for this TvDevice, pulling
@@ -209,10 +209,10 @@ int SetActionTable(
  * this file rather than being read from service description documents.
  */
 int TvDeviceStateTableInit(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] The description document URL. */
-        char *DescDocURL);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] The description document URL. */
+	char *DescDocURL);
 
 /*!
  * \brief Called during a subscription request callback.
@@ -221,10 +221,10 @@ int TvDeviceStateTableInit(
  * control service or picture service, then accept it.
  */
 int TvDeviceHandleSubscriptionRequest(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] The subscription request event structure. */
-        const UpnpSubscriptionRequest *sr_event);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] The subscription request event structure. */
+	const UpnpSubscriptionRequest *sr_event);
 
 /*!
  * \brief Called during a get variable request callback.
@@ -233,8 +233,8 @@ int TvDeviceHandleSubscriptionRequest(
  * picture service, then respond with the variable value.
  */
 int TvDeviceHandleGetVarRequest(
-        /*! [in,out] The control get variable request event structure. */
-        UpnpStateVarRequest *cgv_event);
+	/*! [in,out] The control get variable request event structure. */
+	UpnpStateVarRequest *cgv_event);
 
 /*!
  * \brief Called during an action request callback.
@@ -243,10 +243,10 @@ int TvDeviceHandleGetVarRequest(
  * or picture service, then perform the action and respond.
  */
 int TvDeviceHandleActionRequest(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in,out] The control action request event structure. */
-        UpnpActionRequest *ca_event);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in,out] The control action request event structure. */
+	UpnpActionRequest *ca_event);
 
 /*!
  * \brief The callback handler registered with the SDK while registering
@@ -260,13 +260,13 @@ int TvDeviceHandleActionRequest(
  *	\li 3) Action requests.
  */
 int TvDeviceCallbackEventHandler(/*! Library handle. */
-        UpnpLib *p,
-        /*! [in] The type of callback event. */
-        Upnp_EventType,
-        /*! [in] Data structure containing event data. */
-        const void *Event,
-        /*! [in] Optional data specified during callback registration. */
-        const void *Cookie);
+	UpnpLib *p,
+	/*! [in] The type of callback event. */
+	Upnp_EventType,
+	/*! [in] Data structure containing event data. */
+	const void *Event,
+	/*! [in] Optional data specified during callback registration. */
+	const void *Cookie);
 
 /*!
  * \brief Update the TvDevice service state table, and notify all subscribed
@@ -277,17 +277,17 @@ int TvDeviceCallbackEventHandler(/*! Library handle. */
  * function that currently has this mutex locked.
  */
 int TvDeviceSetServiceTableVar(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] The service number (TV_SERVICE_CONTROL or TV_SERVICE_PICTURE).
-         */
-        unsigned int service,
-        /*! [in] The variable number (TV_CONTROL_POWER, TV_CONTROL_CHANNEL,
-         * TV_CONTROL_VOLUME, TV_PICTURE_COLOR, TV_PICTURE_TINT,
-         * TV_PICTURE_CONTRAST, or TV_PICTURE_BRIGHTNESS). */
-        int variable,
-        /*! [in] The string representation of the new value. */
-        char *value);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] The service number (TV_SERVICE_CONTROL or TV_SERVICE_PICTURE).
+	 */
+	unsigned int service,
+	/*! [in] The variable number (TV_CONTROL_POWER, TV_CONTROL_CHANNEL,
+	 * TV_CONTROL_VOLUME, TV_PICTURE_COLOR, TV_PICTURE_TINT,
+	 * TV_PICTURE_CONTRAST, or TV_PICTURE_BRIGHTNESS). */
+	int variable,
+	/*! [in] The string representation of the new value. */
+	char *value);
 
 /* Control Service Actions */
 
@@ -295,27 +295,27 @@ int TvDeviceSetServiceTableVar(
  * \brief Turn the power on.
  */
 int TvDevicePowerOn(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Turn the power off.
  */
 int TvDevicePowerOff(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Change the channel, update the TvDevice control service
@@ -323,40 +323,40 @@ int TvDevicePowerOff(
  * updated state.
  */
 int TvDeviceSetChannel(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Increase the channel.
  */
 int TvDeviceIncreaseChannel(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Decrease the channel.
  */
 int TvDeviceDecreaseChannel(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Change the volume, update the TvDevice control service
@@ -364,40 +364,40 @@ int TvDeviceDecreaseChannel(
  *       updated state.
  */
 int TvDeviceSetVolume(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Increase the volume.
  */
 int TvDeviceIncreaseVolume(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Decrease the volume.
  */
 int TvDeviceDecreaseVolume(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*Picture Service Actions */
 
@@ -407,40 +407,40 @@ int TvDeviceDecreaseVolume(
  * updated state.
  */
 int TvDeviceSetColor(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Increase the color.
  */
 int TvDeviceIncreaseColor(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Decrease the color.
  */
 int TvDeviceDecreaseColor(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Change the tint, update the TvDevice picture service
@@ -448,40 +448,40 @@ int TvDeviceDecreaseColor(
  * updated state.
  */
 int TvDeviceSetTint(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Increase tint.
  */
 int TvDeviceIncreaseTint(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Decrease tint.
  */
 int TvDeviceDecreaseTint(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Change the contrast, update the TvDevice picture service
@@ -489,40 +489,40 @@ int TvDeviceDecreaseTint(
  * updated state.
  */
 int TvDeviceSetContrast(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Increase the contrast.
  */
 int TvDeviceIncreaseContrast(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Decrease the contrast.
  */
 int TvDeviceDecreaseContrast(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Change the brightness, update the TvDevice picture service
@@ -530,74 +530,74 @@ int TvDeviceDecreaseContrast(
  * updated state.
  */
 int TvDeviceSetBrightness(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Increase brightnesss.
  */
 int TvDeviceIncreaseBrightness(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Decrease brightnesss.
  */
 int TvDeviceDecreaseBrightness(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Document of action request. */
-        IXML_Document *in,
-        /*! [in] Action result. */
-        IXML_Document **out,
-        /*! [out] ErrorString in case action was unsuccessful. */
-        const char **errorString);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Document of action request. */
+	IXML_Document *in,
+	/*! [in] Action result. */
+	IXML_Document **out,
+	/*! [out] ErrorString in case action was unsuccessful. */
+	const char **errorString);
 
 /*!
  * \brief Initializes the UPnP Sdk, registers the device, and sends out
  * advertisements.
  */
 int TvDeviceStart(
-        /*! Library handle. */
-        UpnpLib **pp,
-        /*! [in] interface to initialize the sdk (may be NULL)
-         * if null, then the first non null interface is used. */
-        char *iface,
-        /*! [in] port number to initialize the sdk (may be 0)
-         * if zero, then a random number is used. */
-        unsigned short port,
-        /*! [in] name of description document.
-         * may be NULL. Default is tvdevicedesc.xml. */
-        const char *desc_doc_name,
-        /*! [in] path of web directory.
-         * may be NULL. Default is ./web (for Linux) or ../tvdevice/web. */
-        const char *web_dir_path,
-        /*! [in] IP mode: IP_MODE_IPV4, IP_MODE_IPV6_LLA or
-         * IP_MODE_IPV6_ULA_GUA. Default is IP_MODE_IPV4. */
-        int ip_mode,
-        /*! [in] print function to use. */
-        print_string pfun,
-        /*! [in] Non-zero if called from the combo application. */
-        int combo);
+	/*! Library handle. */
+	UpnpLib **pp,
+	/*! [in] interface to initialize the sdk (may be NULL)
+	 * if null, then the first non null interface is used. */
+	char *iface,
+	/*! [in] port number to initialize the sdk (may be 0)
+	 * if zero, then a random number is used. */
+	unsigned short port,
+	/*! [in] name of description document.
+	 * may be NULL. Default is tvdevicedesc.xml. */
+	const char *desc_doc_name,
+	/*! [in] path of web directory.
+	 * may be NULL. Default is ./web (for Linux) or ../tvdevice/web. */
+	const char *web_dir_path,
+	/*! [in] IP mode: IP_MODE_IPV4, IP_MODE_IPV6_LLA or
+	 * IP_MODE_IPV6_ULA_GUA. Default is IP_MODE_IPV4. */
+	int ip_mode,
+	/*! [in] print function to use. */
+	print_string pfun,
+	/*! [in] Non-zero if called from the combo application. */
+	int combo);
 
 /*!
  * \brief Stops the device. Uninitializes the sdk.
  */
 int TvDeviceStop(
-        /*! Library handle. */
-        UpnpLib *p);
+	/*! Library handle. */
+	UpnpLib *p);
 
 /*!
  * \brief Function that receives commands from the user at the command prompt

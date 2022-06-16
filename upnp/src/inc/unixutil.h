@@ -37,17 +37,17 @@
 #include "UpnpInet.h"
 
 #ifdef _WIN32
-#include <UpnpStdInt.h>
-#include <errno.h>
+	#include <UpnpStdInt.h>
+	#include <errno.h>
 
 typedef int socklen_t;
 typedef uint16_t in_port_t;
-#ifndef EAFNOSUPPORT /* VS2010 has this defined */
-#define EAFNOSUPPORT 97
-#endif
+	#ifndef EAFNOSUPPORT /* VS2010 has this defined */
+		#define EAFNOSUPPORT 97
+	#endif
 #else /* _WIN32 */
-#include <sys/time.h>
-#include <sys/wait.h>
+	#include <sys/time.h>
+	#include <sys/wait.h>
 #endif /* _WIN32 */
 
 #endif /* GENLIB_NET_UNIXUTIL_H */

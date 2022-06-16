@@ -37,38 +37,38 @@
 
 int main(int argc, char *argv[])
 {
-        int rc;
-        pthread_t cmdloop_thread;
+	int rc;
+	pthread_t cmdloop_thread;
 #ifdef _WIN32
 #else
-        int sig;
-        sigset_t sigs_to_catch;
+	int sig;
+	sigset_t sigs_to_catch;
 #endif
-        int code;
-        UpnpLib *p;
+	int code;
+	UpnpLib *p;
 
-        rc = device_main(&p, argc, argv, 0);
-        if (rc != UPNP_E_SUCCESS) {
-                return rc;
-        }
+	rc = device_main(&p, argc, argv, 0);
+	if (rc != UPNP_E_SUCCESS) {
+		return rc;
+	}
 
-        /* start a command loop thread */
-        code = pthread_create(&cmdloop_thread, NULL, TvDeviceCommandLoop, p);
-        if (code != 0) {
-                return UPNP_E_INTERNAL_ERROR;
-        }
+	/* start a command loop thread */
+	code = pthread_create(&cmdloop_thread, NULL, TvDeviceCommandLoop, p);
+	if (code != 0) {
+		return UPNP_E_INTERNAL_ERROR;
+	}
 #ifdef _WIN32
-        pthread_join(cmdloop_thread, NULL);
+	pthread_join(cmdloop_thread, NULL);
 #else
-        /* Catch Ctrl-C and properly shutdown */
-        sigemptyset(&sigs_to_catch);
-        /* Comment the line below if you are running gdb, otherwise you will be
-         * unable to interrupt with CTRL-C. */
-        sigaddset(&sigs_to_catch, SIGINT);
-        sigwait(&sigs_to_catch, &sig);
-        SampleUtil_Print("Shutting down on signal %d...\n", sig);
+	/* Catch Ctrl-C and properly shutdown */
+	sigemptyset(&sigs_to_catch);
+	/* Comment the line below if you are running gdb, otherwise you will be
+	 * unable to interrupt with CTRL-C. */
+	sigaddset(&sigs_to_catch, SIGINT);
+	sigwait(&sigs_to_catch, &sig);
+	SampleUtil_Print("Shutting down on signal %d...\n", sig);
 #endif
-        rc = TvDeviceStop(p);
+	rc = TvDeviceStop(p);
 
-        return rc;
+	return rc;
 }

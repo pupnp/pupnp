@@ -17,193 +17,189 @@
 
 struct s_UpnpHttpHeaders
 {
-        UpnpListHead m_node;
-        UpnpString *m_name;
-        UpnpString *m_value;
-        DOMString m_resp;
+	UpnpListHead m_node;
+	UpnpString *m_name;
+	UpnpString *m_value;
+	DOMString m_resp;
 };
 
 UpnpHttpHeaders *UpnpHttpHeaders_new()
 {
-        struct s_UpnpHttpHeaders *p =
-                calloc(1, sizeof(struct s_UpnpHttpHeaders));
+	struct s_UpnpHttpHeaders *p =
+		calloc(1, sizeof(struct s_UpnpHttpHeaders));
 
-        if (!p) {
-                return 0;
-        }
+	if (!p) {
+		return 0;
+	}
 
-        UpnpListInit(&p->m_node);
-        p->m_name = UpnpString_new();
-        p->m_value = UpnpString_new();
-        /*p->m_resp = 0;*/
+	UpnpListInit(&p->m_node);
+	p->m_name = UpnpString_new();
+	p->m_value = UpnpString_new();
+	/*p->m_resp = 0;*/
 
-        return (UpnpHttpHeaders *)p;
+	return (UpnpHttpHeaders *)p;
 }
 
 void UpnpHttpHeaders_delete(UpnpHttpHeaders *q)
 {
-        struct s_UpnpHttpHeaders *p = (struct s_UpnpHttpHeaders *)q;
+	struct s_UpnpHttpHeaders *p = (struct s_UpnpHttpHeaders *)q;
 
-        if (!p) {
-                return;
-        }
+	if (!p) {
+		return;
+	}
 
-        ixmlFreeDOMString(p->m_resp);
-        p->m_resp = 0;
-        UpnpString_delete(p->m_value);
-        p->m_value = 0;
-        UpnpString_delete(p->m_name);
-        p->m_name = 0;
-        UpnpListInit(&p->m_node);
+	ixmlFreeDOMString(p->m_resp);
+	p->m_resp = 0;
+	UpnpString_delete(p->m_value);
+	p->m_value = 0;
+	UpnpString_delete(p->m_name);
+	p->m_name = 0;
+	UpnpListInit(&p->m_node);
 
-        free(p);
+	free(p);
 }
 
 int UpnpHttpHeaders_assign(UpnpHttpHeaders *p, const UpnpHttpHeaders *q)
 {
-        int ok = 1;
+	int ok = 1;
 
-        if (p != q) {
-                ok = ok &&
-                        UpnpHttpHeaders_set_node(
-                                p, UpnpHttpHeaders_get_node(q));
-                ok = ok &&
-                        UpnpHttpHeaders_set_name(
-                                p, UpnpHttpHeaders_get_name(q));
-                ok = ok &&
-                        UpnpHttpHeaders_set_value(
-                                p, UpnpHttpHeaders_get_value(q));
-                ok = ok &&
-                        UpnpHttpHeaders_set_resp(
-                                p, UpnpHttpHeaders_get_resp(q));
-        }
+	if (p != q) {
+		ok = ok &&
+		     UpnpHttpHeaders_set_node(p, UpnpHttpHeaders_get_node(q));
+		ok = ok &&
+		     UpnpHttpHeaders_set_name(p, UpnpHttpHeaders_get_name(q));
+		ok = ok &&
+		     UpnpHttpHeaders_set_value(p, UpnpHttpHeaders_get_value(q));
+		ok = ok &&
+		     UpnpHttpHeaders_set_resp(p, UpnpHttpHeaders_get_resp(q));
+	}
 
-        return ok;
+	return ok;
 }
 
 UpnpHttpHeaders *UpnpHttpHeaders_dup(const UpnpHttpHeaders *q)
 {
-        UpnpHttpHeaders *p = UpnpHttpHeaders_new();
+	UpnpHttpHeaders *p = UpnpHttpHeaders_new();
 
-        if (!p) {
-                return 0;
-        }
+	if (!p) {
+		return 0;
+	}
 
-        UpnpHttpHeaders_assign(p, q);
+	UpnpHttpHeaders_assign(p, q);
 
-        return p;
+	return p;
 }
 
 const UpnpListHead *UpnpHttpHeaders_get_node(const UpnpHttpHeaders *p)
 {
-        return &p->m_node;
+	return &p->m_node;
 }
 
 int UpnpHttpHeaders_set_node(UpnpHttpHeaders *p, const UpnpListHead *q)
 {
-        p->m_node = *q;
+	p->m_node = *q;
 
-        return 1;
+	return 1;
 }
 
 void UpnpHttpHeaders_add_to_list_node(
-        UpnpHttpHeaders *p, struct UpnpListHead *head)
+	UpnpHttpHeaders *p, struct UpnpListHead *head)
 {
-        UpnpListHead *list = &p->m_node;
-        UpnpListInsert(list, UpnpListEnd(list), head);
+	UpnpListHead *list = &p->m_node;
+	UpnpListInsert(list, UpnpListEnd(list), head);
 }
 
 const UpnpString *UpnpHttpHeaders_get_name(const UpnpHttpHeaders *p)
 {
-        return p->m_name;
+	return p->m_name;
 }
 
 int UpnpHttpHeaders_set_name(UpnpHttpHeaders *p, const UpnpString *s)
 {
-        const char *q = UpnpString_get_String(s);
+	const char *q = UpnpString_get_String(s);
 
-        return UpnpString_set_String(p->m_name, q);
+	return UpnpString_set_String(p->m_name, q);
 }
 
 size_t UpnpHttpHeaders_get_name_Length(const UpnpHttpHeaders *p)
 {
-        return UpnpString_get_Length(UpnpHttpHeaders_get_name(p));
+	return UpnpString_get_Length(UpnpHttpHeaders_get_name(p));
 }
 
 const char *UpnpHttpHeaders_get_name_cstr(const UpnpHttpHeaders *p)
 {
-        return UpnpString_get_String(UpnpHttpHeaders_get_name(p));
+	return UpnpString_get_String(UpnpHttpHeaders_get_name(p));
 }
 
 int UpnpHttpHeaders_strcpy_name(UpnpHttpHeaders *p, const char *s)
 {
-        return UpnpString_set_String(p->m_name, s);
+	return UpnpString_set_String(p->m_name, s);
 }
 
 int UpnpHttpHeaders_strncpy_name(UpnpHttpHeaders *p, const char *s, size_t n)
 {
-        return UpnpString_set_StringN(p->m_name, s, n);
+	return UpnpString_set_StringN(p->m_name, s, n);
 }
 
 void UpnpHttpHeaders_clear_name(UpnpHttpHeaders *p)
 {
-        UpnpString_clear(p->m_name);
+	UpnpString_clear(p->m_name);
 }
 
 const UpnpString *UpnpHttpHeaders_get_value(const UpnpHttpHeaders *p)
 {
-        return p->m_value;
+	return p->m_value;
 }
 
 int UpnpHttpHeaders_set_value(UpnpHttpHeaders *p, const UpnpString *s)
 {
-        const char *q = UpnpString_get_String(s);
+	const char *q = UpnpString_get_String(s);
 
-        return UpnpString_set_String(p->m_value, q);
+	return UpnpString_set_String(p->m_value, q);
 }
 
 size_t UpnpHttpHeaders_get_value_Length(const UpnpHttpHeaders *p)
 {
-        return UpnpString_get_Length(UpnpHttpHeaders_get_value(p));
+	return UpnpString_get_Length(UpnpHttpHeaders_get_value(p));
 }
 
 const char *UpnpHttpHeaders_get_value_cstr(const UpnpHttpHeaders *p)
 {
-        return UpnpString_get_String(UpnpHttpHeaders_get_value(p));
+	return UpnpString_get_String(UpnpHttpHeaders_get_value(p));
 }
 
 int UpnpHttpHeaders_strcpy_value(UpnpHttpHeaders *p, const char *s)
 {
-        return UpnpString_set_String(p->m_value, s);
+	return UpnpString_set_String(p->m_value, s);
 }
 
 int UpnpHttpHeaders_strncpy_value(UpnpHttpHeaders *p, const char *s, size_t n)
 {
-        return UpnpString_set_StringN(p->m_value, s, n);
+	return UpnpString_set_StringN(p->m_value, s, n);
 }
 
 void UpnpHttpHeaders_clear_value(UpnpHttpHeaders *p)
 {
-        UpnpString_clear(p->m_value);
+	UpnpString_clear(p->m_value);
 }
 
 const DOMString UpnpHttpHeaders_get_resp(const UpnpHttpHeaders *p)
 {
-        return p->m_resp;
+	return p->m_resp;
 }
 
 int UpnpHttpHeaders_set_resp(UpnpHttpHeaders *p, const DOMString s)
 {
-        DOMString q = ixmlCloneDOMString(s);
-        if (!q)
-                return 0;
-        ixmlFreeDOMString(p->m_resp);
-        p->m_resp = q;
+	DOMString q = ixmlCloneDOMString(s);
+	if (!q)
+		return 0;
+	ixmlFreeDOMString(p->m_resp);
+	p->m_resp = q;
 
-        return 1;
+	return 1;
 }
 
 const char *UpnpHttpHeaders_get_resp_cstr(const UpnpHttpHeaders *p)
 {
-        return (const char *)UpnpHttpHeaders_get_resp(p);
+	return (const char *)UpnpHttpHeaders_get_resp(p);
 }

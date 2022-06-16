@@ -31,7 +31,7 @@ typedef struct s_UpnpLib UpnpLib;
 
 #include <stdlib.h> /* for size_t */
 #ifdef UPNP_ENABLE_OPEN_SSL
-#include <openssl/ssl.h>
+	#include <openssl/ssl.h>
 #endif
 #include "UpnpLog.h"
 
@@ -50,13 +50,13 @@ EXPORT_SPEC int UpnpLib_assign(UpnpLib *p, const UpnpLib *q);
 
 /*! UpnpLib_get_virtualDirCallback */
 EXPORT_SPEC const struct VirtualDirCallbacks *UpnpLib_get_virtualDirCallback(
-        const UpnpLib *p);
+	const UpnpLib *p);
 /*! UpnpLib_getnc_virtualDirCallback */
 EXPORT_SPEC struct VirtualDirCallbacks *UpnpLib_getnc_virtualDirCallback(
-        UpnpLib *p);
+	UpnpLib *p);
 /*! UpnpLib_get_virtualDirCallback */
 EXPORT_SPEC int UpnpLib_set_virtualDirCallback(
-        UpnpLib *p, const struct VirtualDirCallbacks *buf);
+	UpnpLib *p, const struct VirtualDirCallbacks *buf);
 /*! UpnpLib_get_virtualDirCallback */
 EXPORT_SPEC void UpnpLib_clear_virtualDirCallback(UpnpLib *p);
 
@@ -67,24 +67,24 @@ EXPORT_SPEC int UpnpLib_set_pVirtualDirList(UpnpLib *p, virtualDirList *n);
 
 /*! UpnpLib_get_GlobalClientSubscribeMutex */
 EXPORT_SPEC const pthread_mutex_t *UpnpLib_get_GlobalClientSubscribeMutex(
-        const UpnpLib *p);
+	const UpnpLib *p);
 /*! UpnpLib_getnc_GlobalClientSubscribeMutex */
 EXPORT_SPEC pthread_mutex_t *UpnpLib_getnc_GlobalClientSubscribeMutex(
-        UpnpLib *p);
+	UpnpLib *p);
 /*! UpnpLib_get_GlobalClientSubscribeMutex */
 EXPORT_SPEC int UpnpLib_set_GlobalClientSubscribeMutex(
-        UpnpLib *p, const pthread_mutex_t *buf);
+	UpnpLib *p, const pthread_mutex_t *buf);
 /*! UpnpLib_get_GlobalClientSubscribeMutex */
 EXPORT_SPEC void UpnpLib_clear_GlobalClientSubscribeMutex(UpnpLib *p);
 
 /*! UpnpLib_get_GlobalHndRWLock */
 EXPORT_SPEC const pthread_rwlock_t *UpnpLib_get_GlobalHndRWLock(
-        const UpnpLib *p);
+	const UpnpLib *p);
 /*! UpnpLib_getnc_GlobalHndRWLock */
 EXPORT_SPEC pthread_rwlock_t *UpnpLib_getnc_GlobalHndRWLock(UpnpLib *p);
 /*! UpnpLib_get_GlobalHndRWLock */
 EXPORT_SPEC int UpnpLib_set_GlobalHndRWLock(
-        UpnpLib *p, const pthread_rwlock_t *buf);
+	UpnpLib *p, const pthread_rwlock_t *buf);
 /*! UpnpLib_get_GlobalHndRWLock */
 EXPORT_SPEC void UpnpLib_clear_GlobalHndRWLock(UpnpLib *p);
 
@@ -103,7 +103,7 @@ EXPORT_SPEC const pthread_mutex_t *UpnpLib_get_gSDKInitMutex(const UpnpLib *p);
 EXPORT_SPEC pthread_mutex_t *UpnpLib_getnc_gSDKInitMutex(UpnpLib *p);
 /*! UpnpLib_get_gSDKInitMutex */
 EXPORT_SPEC int UpnpLib_set_gSDKInitMutex(
-        UpnpLib *p, const pthread_mutex_t *buf);
+	UpnpLib *p, const pthread_mutex_t *buf);
 /*! UpnpLib_get_gSDKInitMutex */
 EXPORT_SPEC void UpnpLib_clear_gSDKInitMutex(UpnpLib *p);
 
@@ -136,12 +136,12 @@ EXPORT_SPEC void UpnpLib_clear_gRecvThreadPool(UpnpLib *p);
 
 /*! UpnpLib_get_gMiniServerThreadPool */
 EXPORT_SPEC const ThreadPool *UpnpLib_get_gMiniServerThreadPool(
-        const UpnpLib *p);
+	const UpnpLib *p);
 /*! UpnpLib_getnc_gMiniServerThreadPool */
 EXPORT_SPEC ThreadPool *UpnpLib_getnc_gMiniServerThreadPool(UpnpLib *p);
 /*! UpnpLib_get_gMiniServerThreadPool */
 EXPORT_SPEC int UpnpLib_set_gMiniServerThreadPool(
-        UpnpLib *p, const ThreadPool *buf);
+	UpnpLib *p, const ThreadPool *buf);
 /*! UpnpLib_get_gMiniServerThreadPool */
 EXPORT_SPEC void UpnpLib_clear_gMiniServerThreadPool(UpnpLib *p);
 
@@ -152,10 +152,10 @@ EXPORT_SPEC int UpnpLib_set_bWebServerState(UpnpLib *p, WebServerState n);
 
 /*! UpnpLib_get_webCallback_HostValidate */
 EXPORT_SPEC WebCallback_HostValidate UpnpLib_get_webCallback_HostValidate(
-        const UpnpLib *p);
+	const UpnpLib *p);
 /*! UpnpLib_set_webCallback_HostValidate */
 EXPORT_SPEC int UpnpLib_set_webCallback_HostValidate(
-        UpnpLib *p, WebCallback_HostValidate n);
+	UpnpLib *p, WebCallback_HostValidate n);
 
 /*! UpnpLib_get_webCallback_HostValidateCookie */
 EXPORT_SPEC void *UpnpLib_get_webCallback_HostValidateCookie(const UpnpLib *p);
@@ -209,7 +209,7 @@ EXPORT_SPEC const char *UpnpLib_get_gIF_IPV4_NETMASK_cstr(const UpnpLib *p);
 EXPORT_SPEC int UpnpLib_strcpy_gIF_IPV4_NETMASK(UpnpLib *p, const char *s);
 /*! UpnpLib_strncpy_gIF_IPV4_NETMASK */
 EXPORT_SPEC int UpnpLib_strncpy_gIF_IPV4_NETMASK(
-        UpnpLib *p, const char *s, size_t n);
+	UpnpLib *p, const char *s, size_t n);
 /*! UpnpLib_clear_gIF_IPV4_NETMASK */
 EXPORT_SPEC void UpnpLib_clear_gIF_IPV4_NETMASK(UpnpLib *p);
 
@@ -245,16 +245,16 @@ EXPORT_SPEC const char *UpnpLib_get_gIF_IPV6_ULA_GUA_cstr(const UpnpLib *p);
 EXPORT_SPEC int UpnpLib_strcpy_gIF_IPV6_ULA_GUA(UpnpLib *p, const char *s);
 /*! UpnpLib_strncpy_gIF_IPV6_ULA_GUA */
 EXPORT_SPEC int UpnpLib_strncpy_gIF_IPV6_ULA_GUA(
-        UpnpLib *p, const char *s, size_t n);
+	UpnpLib *p, const char *s, size_t n);
 /*! UpnpLib_clear_gIF_IPV6_ULA_GUA */
 EXPORT_SPEC void UpnpLib_clear_gIF_IPV6_ULA_GUA(UpnpLib *p);
 
 /*! UpnpLib_get_gIF_IPV6_ULA_GUA_PREFIX_LENGTH */
 EXPORT_SPEC unsigned UpnpLib_get_gIF_IPV6_ULA_GUA_PREFIX_LENGTH(
-        const UpnpLib *p);
+	const UpnpLib *p);
 /*! UpnpLib_set_gIF_IPV6_ULA_GUA_PREFIX_LENGTH */
 EXPORT_SPEC int UpnpLib_set_gIF_IPV6_ULA_GUA_PREFIX_LENGTH(
-        UpnpLib *p, unsigned n);
+	UpnpLib *p, unsigned n);
 
 /*! UpnpLib_get_gIF_INDEX */
 EXPORT_SPEC unsigned UpnpLib_get_gIF_INDEX(const UpnpLib *p);
@@ -287,12 +287,12 @@ EXPORT_SPEC void UpnpLib_clear_HandleTable(UpnpLib *p);
 
 /*! UpnpLib_get_gMediaTypeArray */
 EXPORT_SPEC const doc_type_array_t *UpnpLib_get_gMediaTypeArray(
-        const UpnpLib *p);
+	const UpnpLib *p);
 /*! UpnpLib_getnc_gMediaTypeArray */
 EXPORT_SPEC doc_type_array_t *UpnpLib_getnc_gMediaTypeArray(UpnpLib *p);
 /*! UpnpLib_get_gMediaTypeArray */
 EXPORT_SPEC int UpnpLib_set_gMediaTypeArray(
-        UpnpLib *p, const doc_type_array_t *buf);
+	UpnpLib *p, const doc_type_array_t *buf);
 /*! UpnpLib_get_gMediaTypeArray */
 EXPORT_SPEC void UpnpLib_clear_gMediaTypeArray(UpnpLib *p);
 
@@ -370,7 +370,7 @@ EXPORT_SPEC const char *UpnpLib_get_gUpnpSdkNLSuuid_cstr(const UpnpLib *p);
 EXPORT_SPEC int UpnpLib_strcpy_gUpnpSdkNLSuuid(UpnpLib *p, const char *s);
 /*! UpnpLib_strncpy_gUpnpSdkNLSuuid */
 EXPORT_SPEC int UpnpLib_strncpy_gUpnpSdkNLSuuid(
-        UpnpLib *p, const char *s, size_t n);
+	UpnpLib *p, const char *s, size_t n);
 /*! UpnpLib_clear_gUpnpSdkNLSuuid */
 EXPORT_SPEC void UpnpLib_clear_gUpnpSdkNLSuuid(UpnpLib *p);
 

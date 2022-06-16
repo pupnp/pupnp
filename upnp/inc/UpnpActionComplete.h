@@ -33,10 +33,10 @@ EXPORT_SPEC UpnpActionComplete *UpnpActionComplete_new();
 EXPORT_SPEC void UpnpActionComplete_delete(UpnpActionComplete *p);
 /*! Copy Constructor */
 EXPORT_SPEC UpnpActionComplete *UpnpActionComplete_dup(
-        const UpnpActionComplete *p);
+	const UpnpActionComplete *p);
 /*! Assignment operator */
 EXPORT_SPEC int UpnpActionComplete_assign(
-        UpnpActionComplete *p, const UpnpActionComplete *q);
+	UpnpActionComplete *p, const UpnpActionComplete *q);
 
 /*! UpnpActionComplete_get_ErrCode */
 EXPORT_SPEC int UpnpActionComplete_get_ErrCode(const UpnpActionComplete *p);
@@ -45,38 +45,38 @@ EXPORT_SPEC int UpnpActionComplete_set_ErrCode(UpnpActionComplete *p, int n);
 
 /*! UpnpActionComplete_get_CtrlUrl */
 EXPORT_SPEC const UpnpString *UpnpActionComplete_get_CtrlUrl(
-        const UpnpActionComplete *p);
+	const UpnpActionComplete *p);
 /*! UpnpActionComplete_set_CtrlUrl */
 EXPORT_SPEC int UpnpActionComplete_set_CtrlUrl(
-        UpnpActionComplete *p, const UpnpString *s);
+	UpnpActionComplete *p, const UpnpString *s);
 /*! UpnpActionComplete_get_CtrlUrl_Length */
 EXPORT_SPEC size_t UpnpActionComplete_get_CtrlUrl_Length(
-        const UpnpActionComplete *p);
+	const UpnpActionComplete *p);
 /*! UpnpActionComplete_get_CtrlUrl_cstr */
 EXPORT_SPEC const char *UpnpActionComplete_get_CtrlUrl_cstr(
-        const UpnpActionComplete *p);
+	const UpnpActionComplete *p);
 /*! UpnpActionComplete_strcpy_CtrlUrl */
 EXPORT_SPEC int UpnpActionComplete_strcpy_CtrlUrl(
-        UpnpActionComplete *p, const char *s);
+	UpnpActionComplete *p, const char *s);
 /*! UpnpActionComplete_strncpy_CtrlUrl */
 EXPORT_SPEC int UpnpActionComplete_strncpy_CtrlUrl(
-        UpnpActionComplete *p, const char *s, size_t n);
+	UpnpActionComplete *p, const char *s, size_t n);
 /*! UpnpActionComplete_clear_CtrlUrl */
 EXPORT_SPEC void UpnpActionComplete_clear_CtrlUrl(UpnpActionComplete *p);
 
 /*! UpnpActionComplete_get_ActionRequest */
 EXPORT_SPEC IXML_Document *UpnpActionComplete_get_ActionRequest(
-        const UpnpActionComplete *p);
+	const UpnpActionComplete *p);
 /*! UpnpActionComplete_set_ActionRequest */
 EXPORT_SPEC int UpnpActionComplete_set_ActionRequest(
-        UpnpActionComplete *p, IXML_Document *n);
+	UpnpActionComplete *p, IXML_Document *n);
 
 /*! UpnpActionComplete_get_ActionResult */
 EXPORT_SPEC IXML_Document *UpnpActionComplete_get_ActionResult(
-        const UpnpActionComplete *p);
+	const UpnpActionComplete *p);
 /*! UpnpActionComplete_set_ActionResult */
 EXPORT_SPEC int UpnpActionComplete_set_ActionResult(
-        UpnpActionComplete *p, IXML_Document *n);
+	UpnpActionComplete *p, IXML_Document *n);
 
 #ifdef __cplusplus
 }

@@ -36,14 +36,14 @@
 
 void ixmlAttr_init(IXML_Attr *attr)
 {
-        if (attr != NULL) {
-                memset(attr, 0, sizeof(IXML_Attr));
-        }
+	if (attr != NULL) {
+		memset(attr, 0, sizeof(IXML_Attr));
+	}
 }
 
 void ixmlAttr_free(IXML_Attr *attr)
 {
-        if (attr != NULL) {
-                ixmlNode_free((IXML_Node *)attr);
-        }
+	if (attr != NULL) {
+		ixmlNode_free((IXML_Node *)attr);
+	}
 }

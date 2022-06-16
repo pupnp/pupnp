@@ -43,23 +43,23 @@ extern "C" {
 
 struct SendInstruction
 {
-        int IsVirtualFile;
-        int IsChunkActive;
-        int IsRangeActive;
-        int IsTrailers;
-        char RangeHeader[200];
-        char AcceptLanguageHeader[200];
-        off_t RangeOffset;
-        /*! Read from local source and send on the network. */
-        off_t ReadSendSize;
-        /*! Recv from the network and write into local file. */
-        long RecvWriteSize;
-        /*! Cookie associated with the virtualDir. */
-        const void *Cookie;
-        /*! Cookie associated with the request. */
-        const void *RequestCookie;
-        /* Later few more member could be added depending
-         * on the requirement.*/
+	int IsVirtualFile;
+	int IsChunkActive;
+	int IsRangeActive;
+	int IsTrailers;
+	char RangeHeader[200];
+	char AcceptLanguageHeader[200];
+	off_t RangeOffset;
+	/*! Read from local source and send on the network. */
+	off_t ReadSendSize;
+	/*! Recv from the network and write into local file. */
+	long RecvWriteSize;
+	/*! Cookie associated with the virtualDir. */
+	const void *Cookie;
+	/*! Cookie associated with the request. */
+	const void *RequestCookie;
+	/* Later few more member could be added depending
+	 * on the requirement.*/
 };
 
 /*!
@@ -93,19 +93,19 @@ void web_server_destroy(UpnpLib *p);
  * \li \c UPNP_E_OUTOF_MEMORY
  */
 int web_server_set_alias(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] Webserver name of alias; created by caller and freed by caller
-         * (doesn't even have to be malloc()d. */
-        const char *alias_name,
-        /*! [in] The xml doc; this is allocated by the caller; and freed by
-         * the web server. */
-        const char *alias_content,
-        /*! [in] Length of alias body in bytes. */
-        size_t alias_content_length,
-        /*! [in] Time when the contents of alias were last changed (local time).
-         */
-        time_t last_modified);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] Webserver name of alias; created by caller and freed by caller
+	 * (doesn't even have to be malloc()d. */
+	const char *alias_name,
+	/*! [in] The xml doc; this is allocated by the caller; and freed by
+	 * the web server. */
+	const char *alias_content,
+	/*! [in] Length of alias body in bytes. */
+	size_t alias_content_length,
+	/*! [in] Time when the contents of alias were last changed (local time).
+	 */
+	time_t last_modified);
 
 /*!
  * \brief Assign the path specfied by the input const char* root_dir parameter
@@ -115,24 +115,24 @@ int web_server_set_alias(
  * \return Integer.
  */
 int web_server_set_root_dir(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] String having the root directory for the document. */
-        const char *root_dir);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] String having the root directory for the document. */
+	const char *root_dir);
 
 /*!
  * \brief Main entry point into web server; Handles HTTP GET and HEAD
  * requests.
  */
 void web_server_callback(
-        /*! Library handle. */
-        UpnpLib *p,
-        /*! [in] . */
-        http_parser_t *parser,
-        /*! [in] . */
-        http_message_t *req,
-        /*! [in,out] . */
-        SOCKINFO *info);
+	/*! Library handle. */
+	UpnpLib *p,
+	/*! [in] . */
+	http_parser_t *parser,
+	/*! [in] . */
+	http_message_t *req,
+	/*! [in,out] . */
+	SOCKINFO *info);
 
 #ifdef __cplusplus
 } /* extern C */

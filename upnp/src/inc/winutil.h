@@ -41,25 +41,25 @@
 /* VC needs these in C++ mode too (do other compilers?) */
 #if !defined(__cplusplus) || defined(UPNP_USE_MSVCPP)
 
-#ifdef _WIN32
+	#ifdef _WIN32
 
-#ifndef S_ISREG
-#define S_ISREG(m) (((m)&S_IFMT) == S_IFREG)
-#endif
+		#ifndef S_ISREG
+			#define S_ISREG(m) (((m)&S_IFMT) == S_IFREG)
+		#endif
 
-#ifndef S_ISDIR
-#define S_ISDIR(m) (((m)&S_IFMT) == S_IFDIR)
-#endif
+		#ifndef S_ISDIR
+			#define S_ISDIR(m) (((m)&S_IFMT) == S_IFDIR)
+		#endif
 
-#ifndef EADDRINUSE /* VS2010 has this defined */
-#define EADDRINUSE WSAEADDRINUSE
-#endif
+		#ifndef EADDRINUSE /* VS2010 has this defined */
+			#define EADDRINUSE WSAEADDRINUSE
+		#endif
 
-#define strcasecmp stricmp
-#define strncasecmp strnicmp
-#define strerror_r(a, b, c) (strerror_s((b), (c), (a)))
+		#define strcasecmp stricmp
+		#define strncasecmp strnicmp
+		#define strerror_r(a, b, c) (strerror_s((b), (c), (a)))
 
-#endif /* _WIN32 */
+	#endif /* _WIN32 */
 
 #endif /* !defined(__cplusplus) || defined(UPNP_USE_MSVCPP) */
 
