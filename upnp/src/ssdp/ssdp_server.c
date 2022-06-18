@@ -1,3 +1,4 @@
+// clang-format off
 ///////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2000-2003 Intel Corporation 
@@ -873,7 +874,7 @@ get_ssdp_sockets( MiniServerSockArray * out )
          )
     int onOff = 1;
     u_char ttl = 4;
-    struct ip_mreq ssdpMcastAddr;
+    struct ip_mreqn ssdpMcastAddr;
     struct sockaddr_in ssdpAddr;
     int option = 1;
     struct in_addr addr;
@@ -946,9 +947,15 @@ get_ssdp_sockets( MiniServerSockArray * out )
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
         return UPNP_E_SOCKET_BIND;
     }
-
+    /*
+     * See: https://man7.org/linux/man-pages/man7/ip.7.html
+     * Socket options, IP_ADD_MEMBERSHIP
+     *
+     * This memset actually sets imr_address to INADDR_ANY and
+     * imr_ifindex to zero, which make the system choose the appropriate
+     * interface.
+     */
     memset( ( void * )&ssdpMcastAddr, 0, sizeof( struct ip_mreq ) );
-    ssdpMcastAddr.imr_interface.s_addr = inet_addr( LOCAL_HOST );
     ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr( SSDP_IP );
     if( setsockopt( ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                     ( char * )&ssdpMcastAddr,
@@ -956,7 +963,10 @@ get_ssdp_sockets( MiniServerSockArray * out )
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in joining" " multicast group !!!\n" );
-        shutdown( ssdpSock, SD_BOTH );
+	UpnpPrintf( UPNP_CRITICAL,
+	    SSDP, __FILE__, __LINE__,
+	    "errno = %d, LOCAL_HOST= %s\n", errno, LOCAL_HOST);
+	shutdown( ssdpSock, SD_BOTH );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
         UpnpCloseSocket( ssdpSock );
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
