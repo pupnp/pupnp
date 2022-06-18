@@ -189,11 +189,8 @@ extern "C" {
  *      Returns EINVAL if the kind is not supported.
  *      See man page for pthread_mutexattr_setkind_np
  *****************************************************************************/
-#ifdef PTHREAD_MUTEX_RECURSIVE
 #define ithread_mutexattr_setkind_np pthread_mutexattr_settype
-#else
-#define ithread_mutexattr_setkind_np pthread_mutexattr_setkind_np
-#endif
+#define ithread_mutexattr_settype pthread_mutexattr_settype
 
 /****************************************************************************
  * Function: ithread_mutexattr_getkind_np
@@ -214,12 +211,8 @@ extern "C" {
  *      Always returns 0.
  *      See man page for pthread_mutexattr_getkind_np
  *****************************************************************************/
-#ifdef PTHREAD_MUTEX_RECURSIVE
 #define ithread_mutexattr_getkind_np pthread_mutexattr_gettype
-#else
-#define ithread_mutexattr_getkind_np pthread_mutexattr_getkind_np
-#endif
-
+#define ithread_mutexattr_gettype pthread_mutexattr_gettype
   
 /****************************************************************************
  * Function: ithread_mutex_init

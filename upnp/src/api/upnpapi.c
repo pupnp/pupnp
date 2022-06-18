@@ -105,6 +105,9 @@ CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
 //This structure is for virtual directory callbacks
      struct UpnpVirtualDirCallbacks virtualDirCallback;
 
+/*! Pointer to the virtual directory list. */
+     virtualDirList *pVirtualDirList;
+
 // a local dir which serves as webserver root
      extern membuffer gDocumentRootDir;
 
