@@ -21,7 +21,7 @@ jobs:
     - name: make
       run: make
     - name: make distcheck
-      run: make distcheck || (cd upnp && cat test-suite.log test_init.log && exit 1)
+      run: make distcheck || (cat upnp/test-suite.log upnp/test_init.log && exit 1)
 
   build_asan:
     name: Sanitizer build (ubuntu-20.04)
