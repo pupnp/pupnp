@@ -79,8 +79,8 @@ endif
 
 
 EXTRA_DIST = \
-	tvdevice/web/tvcontrolSCPD.xml \
-	tvdevice/web/tvdevicedesc.xml \
-	tvdevice/web/tvdevicepres.html \
-	tvdevice/web/tvpictureSCPD.xml
+	web/tvcontrolSCPD.xml \
+	web/tvdevicedesc.xml \
+	web/tvdevicepres.html \
+	web/tvpictureSCPD.xml
 
