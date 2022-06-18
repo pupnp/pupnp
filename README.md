@@ -7,11 +7,11 @@
 | ------------- | --------------------------------------------------------------------------------------------------- |
 | main (use 1.14.x) | ![master](https://github.com/pupnp/pupnp/workflows/Build/badge.svg)                                 |
 | branch-1.14.x | ![1.14.x](https://github.com/pupnp/pupnp/workflows/Build/badge.svg?branch=branch-1.14.x)            |
-| branch-1.12.x | ![1.12.x](https://github.com/pupnp/pupnp/workflows/Build/badge.svg?branch=branch-1.12.x) |
-| branch-1.10.x | ![1.10.x](https://github.com/pupnp/pupnp/workflows/Build/badge.svg?branch=branch-1.10.x) |
-| branch-1.8.x  | ![1.8.x](https://github.com/pupnp/pupnp/workflows/Build/badge.svg?branch=branch-1.8.x)   |
-| branch-1.6.x  | ![1.6.x](https://github.com/pupnp/pupnp/workflows/Build/badge.svg?branch=branch-1.6.x)   |
-| branch-1.4.x  | ![1.4.x](https://github.com/pupnp/pupnp/workflows/Build/badge.svg?branch=branch-1.4.x)   |
+| branch-1.12.x | ![1.12.x](https://github.com/pupnp/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.12.x) |
+| branch-1.10.x | ![1.10.x](https://github.com/pupnp/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.10.x) |
+| branch-1.8.x  | ![1.8.x](https://github.com/pupnp/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.8.x)   |
+| branch-1.6.x  | ![1.6.x](https://github.com/pupnp/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.6.x)   |
+| branch-1.4.x  | ![1.4.x](https://github.com/pupnp/pupnp/workflows/C%2FC%2B%2B%20CI/badge.svg?branch=branch-1.4.x)   |
 
 Copyright (c) 2000-2003 Intel Corporation - All Rights Reserved.
 
