@@ -82,11 +82,13 @@ GTAGS
 
 # QT-Creator files
 Makefile.am.user
-pupnp.config
-pupnp.creator
-pupnp.creator.user
-pupnp.files
-pupnp.includes
+*.config
+*.creator
+*.creator.user
+*.files
+*.includes
+*.cflags
+*.cxxflags
 
 *.orig
 *~
