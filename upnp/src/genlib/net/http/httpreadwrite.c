@@ -58,7 +58,11 @@
 	#include <sys/utsname.h>
 #else
 	#include <winsock2.h>
-	#include <malloc.h>
+	#if (defined(BSD) && BSD >= 199306) || defined(__OSX__) || defined(__APPLE__)
+		#include <stdlib.h>
+	#else
+		#include <malloc.h>
+	#endif
 #endif
 #include "unixutil.h"
 #include "upnp.h"
