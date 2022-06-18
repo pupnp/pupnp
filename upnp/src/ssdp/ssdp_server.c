@@ -1,3 +1,4 @@
+// clang-format off
 ///////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2000-2003 Intel Corporation 
@@ -956,7 +957,10 @@ get_ssdp_sockets( MiniServerSockArray * out )
         UpnpPrintf( UPNP_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in joining" " multicast group !!!\n" );
-        shutdown( ssdpSock, SD_BOTH );
+	UpnpPrintf( UPNP_CRITICAL,
+	    SSDP, __FILE__, __LINE__,
+	    "errno = %d, LOCAL_HOST= %s\n", errno, LOCAL_HOST);
+	shutdown( ssdpSock, SD_BOTH );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ) );
         UpnpCloseSocket( ssdpSock );
         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ) );
