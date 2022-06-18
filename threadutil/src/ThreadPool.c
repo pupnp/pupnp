@@ -87,23 +87,34 @@ FreeThreadPoolJob( ThreadPool * tp,
  *      Returns result of GetLastError() on failure.
  *
  *****************************************************************************/
-static int
-SetPolicyType( PolicyType in )
+static int SetPolicyType(
+	/*! . */
+	PolicyType in)
 {
-    #ifdef __CYGWIN__
-     /* TODO not currently working... */
-     return 0;
-    #else
-    #ifdef WIN32
-     return sched_setscheduler( 0, in);
-    #else
-     struct sched_param current;
+	int retVal = 0;
+#ifdef __CYGWIN__
+	/* TODO not currently working... */
+	(void)in;
+	retVal = 0;
+#elif defined(__APPLE__) || defined(__NetBSD__)
+	(void)in;
+	setpriority(PRIO_PROCESS, 0, 0);
+	retVal = 0;
+#elif defined(__PTW32_DLLPORT)
+	retVal = sched_setscheduler(0, in);
+#elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
+	struct sched_param current;
+	int sched_result;
 
-     sched_getparam( 0, &current );
-     current.sched_priority = DEFAULT_SCHED_PARAM;
-     return sched_setscheduler( 0, in, &current );
-    #endif
-    #endif
+	memset(&current, 0, sizeof(current));
+	sched_getparam(0, &current);
+	current.sched_priority = sched_get_priority_min(DEFAULT_POLICY);
+	sched_result = sched_setscheduler(0, in, &current);
+	retVal = (sched_result != -1 || errno == EPERM) ? 0 : errno;
+#else
+	retVal = 0;
+#endif
+	return retVal;
 }
 
 /****************************************************************************
