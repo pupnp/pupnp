@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-16.04]
+        os: [macos-latest, ubuntu-20.04]
     
     steps:
     - uses: actions/checkout@v1
@@ -24,8 +24,8 @@ jobs:
       run: make distcheck
 
   build_asan:
-    name: Sanitizer build (ubuntu-16.04)
-    runs-on: ubuntu-16.04
+    name: Sanitizer build (ubuntu-20.04)
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v1
