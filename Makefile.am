@@ -15,7 +15,7 @@ SUBDIRS = \
 
 EXTRA_DIST = \
 	CMakeLists.txt \
-	CmDaB.cmake \
+	cmake/CmDaB.cmake \
 	IXML.cmake.in \
 	UPNP.cmake.in \
 	ixml/CMakeLists.txt \
