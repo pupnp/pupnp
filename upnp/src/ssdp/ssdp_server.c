@@ -1084,7 +1084,7 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 	 * imr_ifindex to zero, which make the system choose the appropriate
 	 * interface.
 	 */
-	memset((void *)&ssdpMcastAddr, 0, sizeof(struct ip_mreq));
+	memset((void *)&ssdpMcastAddr, 0, sizeof(struct ip_mreqn));
 	ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr(SSDP_IP);
 	if (setsockopt(ssdpSock,
 		    IPPROTO_IP,
