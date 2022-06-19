@@ -982,12 +982,24 @@ static int create_ssdp_sock_v4(
 		ret = UPNP_E_SOCKET_BIND;
 		goto error_handler;
 	}
-	memset((void *)&ssdpMcastAddr, 0, sizeof(struct ip_mreq));
+	/*
+	 * See: https://man7.org/linux/man-pages/man7/ip.7.html
+	 * Socket options, IP_ADD_MEMBERSHIP
+	 *
+	 * This memset actually sets imr_address to INADDR_ANY and
+	 * imr_ifindex to zero, which make the system choose the appropriate
+	 * interface.
+	 *
+	 * Still using "struct ip_mreq" instead of "struct ip_mreqn" because
+	 * windows does not recognize the latter.
+	 */
+	memset((void *)&ssdpMcastAddr, 0, sizeof ssdpMcastAddr);
 	#ifdef _WIN32
 	inet_pton(AF_INET, (PCSTR)gIF_IPV4, &ssdpMcastAddr.imr_interface);
 	inet_pton(AF_INET, (PCSTR)SSDP_IP, &ssdpMcastAddr.imr_multiaddr);
 	#else
 	ssdpMcastAddr.imr_interface.s_addr = inet_addr(gIF_IPV4);
+	/* ssdpMcastAddr.imr_address.s_addr = inet_addr(gIF_IPV4); */
 	ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr(SSDP_IP);
 	#endif
 	ret = setsockopt(*ssdpSock,
