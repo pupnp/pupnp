@@ -1,3 +1,4 @@
+// clang-format off
 ///////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2000-2003 Intel Corporation 
@@ -233,13 +234,14 @@ void UpnpPrintf(
 		}
 		vfprintf(stdout, FmtStr, ArgList);
 		fflush(stdout);
-	} else if (DLevel == 0) {
-		if (DbgFileName) {
-			UpnpDisplayFileAndLine(ErrFileHnd, DbgFileName, DbgLineNo);
-		}
-		vfprintf(ErrFileHnd, FmtStr, ArgList);
-		fflush(ErrFileHnd);
 	} else {
+		if (DLevel == 0) {
+			if (DbgFileName) {
+				UpnpDisplayFileAndLine(ErrFileHnd, DbgFileName, DbgLineNo);
+			}
+			vfprintf(ErrFileHnd, FmtStr, ArgList);
+			fflush(ErrFileHnd);
+		}
 		if (DbgFileName) {
 			UpnpDisplayFileAndLine(InfoFileHnd, DbgFileName, DbgLineNo);
 		}
