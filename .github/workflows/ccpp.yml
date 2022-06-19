@@ -21,7 +21,7 @@ jobs:
     - name: make
       run: make
     - name: make distcheck
-      run: make distcheck || (cd upnp && cat test-suite.log test_init.log && exit 1)
+      run: make distcheck || (pwd && ls -la && find . -name 'test*' && find . -name *.txt && cd libupnp-1.4.8/_build/sub && cat upnp/test-suite.log upnp/test_init.log upnp/IUpnpInfoFile.txt && exit 1)
 
   build_asan:
     name: Sanitizer build (ubuntu-20.04)
@@ -38,6 +38,6 @@ jobs:
     - name: make
       run: make
     - name: make check (upnp)
-      run: cd upnp && make check || (cat test-suite.log && exit 1)
+      run: cd upnp && make check && cat test_init.log || (cat test-suite.log && exit 1)
     - name: make check (ixml)
       run: cd ixml && make check || (cat test-suite.log && exit 1)
