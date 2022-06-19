@@ -874,7 +874,7 @@ get_ssdp_sockets( MiniServerSockArray * out )
          )
     int onOff = 1;
     u_char ttl = 4;
-    struct ip_mreq ssdpMcastAddr;
+    struct ip_mreqn ssdpMcastAddr;
     struct sockaddr_in ssdpAddr;
     int option = 1;
     struct in_addr addr;
@@ -949,7 +949,6 @@ get_ssdp_sockets( MiniServerSockArray * out )
     }
 
     memset( ( void * )&ssdpMcastAddr, 0, sizeof( struct ip_mreq ) );
-    ssdpMcastAddr.imr_interface.s_addr = inet_addr( LOCAL_HOST );
     ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr( SSDP_IP );
     if( setsockopt( ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                     ( char * )&ssdpMcastAddr,
