@@ -910,7 +910,7 @@ static int create_ssdp_sock_v4(
 	char errorBuffer[ERROR_BUFFER_LEN];
 	int onOff;
 	u_char ttl = (u_char)4;
-	struct ip_mreq ssdpMcastAddr;
+	struct ip_mreqn ssdpMcastAddr;
 	struct sockaddr_storage __ss;
 	struct sockaddr_in *ssdpAddr4 = (struct sockaddr_in *)&__ss;
 	int ret = 0;
@@ -982,12 +982,20 @@ static int create_ssdp_sock_v4(
 		ret = UPNP_E_SOCKET_BIND;
 		goto error_handler;
 	}
-	memset((void *)&ssdpMcastAddr, 0, sizeof(struct ip_mreq));
+	/*
+	 * See: https://man7.org/linux/man-pages/man7/ip.7.html
+	 * Socket options, IP_ADD_MEMBERSHIP
+	 *
+	 * This memset actually sets imr_address to INADDR_ANY and
+	 * imr_ifindex to zero, which make the system choose the appropriate
+	 * interface.
+	 */
+	memset((void *)&ssdpMcastAddr, 0, sizeof ssdpMcastAddr);
 	#ifdef _WIN32
 	inet_pton(AF_INET, (PCSTR)gIF_IPV4, &ssdpMcastAddr.imr_interface);
 	inet_pton(AF_INET, (PCSTR)SSDP_IP, &ssdpMcastAddr.imr_multiaddr);
 	#else
-	ssdpMcastAddr.imr_interface.s_addr = inet_addr(gIF_IPV4);
+	ssdpMcastAddr.imr_address.s_addr = inet_addr(gIF_IPV4);
 	ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr(SSDP_IP);
 	#endif
 	ret = setsockopt(*ssdpSock,
