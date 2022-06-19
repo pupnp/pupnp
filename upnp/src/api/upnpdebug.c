@@ -1,3 +1,4 @@
+// clang-format off
 ///////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2000-2003 Intel Corporation 
@@ -226,27 +227,32 @@ void UpnpPrintf(
 	}
 	
 	ithread_mutex_lock(&GlobalDebugMutex);
-	va_start(ArgList, FmtStr);
 	if (!DEBUG_TARGET) {
 		if( DbgFileName ) {
 			UpnpDisplayFileAndLine(stdout, DbgFileName, DbgLineNo);
 		}
+		va_start(ArgList, FmtStr);
 		vfprintf(stdout, FmtStr, ArgList);
+		va_end(ArgList);
 		fflush(stdout);
-	} else if (DLevel == 0) {
-		if (DbgFileName) {
-			UpnpDisplayFileAndLine(ErrFileHnd, DbgFileName, DbgLineNo);
-		}
-		vfprintf(ErrFileHnd, FmtStr, ArgList);
-		fflush(ErrFileHnd);
 	} else {
+		if (DLevel == 0) {
+			if (DbgFileName) {
+				UpnpDisplayFileAndLine(ErrFileHnd, DbgFileName, DbgLineNo);
+			}
+			va_start(ArgList, FmtStr);
+			vfprintf(ErrFileHnd, FmtStr, ArgList);
+			va_end(ArgList);
+			fflush(ErrFileHnd);
+		}
 		if (DbgFileName) {
 			UpnpDisplayFileAndLine(InfoFileHnd, DbgFileName, DbgLineNo);
 		}
+		va_start(ArgList, FmtStr);
 		vfprintf(InfoFileHnd, FmtStr, ArgList);
+		va_end(ArgList);
 		fflush(InfoFileHnd);
 	}
-	va_end(ArgList);
 	ithread_mutex_unlock(&GlobalDebugMutex);
 }
 #endif
