@@ -366,7 +366,7 @@ int http_RecvMessage(SOCKINFO *info,
 	int ret = UPNP_E_SUCCESS;
 	int line = 0;
 	parse_status_t status;
-	int num_read;
+	int num_read = 0;
 	int ok_on_close = 0;
 	char *buf;
 	size_t buf_len = 1024;
@@ -384,13 +384,17 @@ int http_RecvMessage(SOCKINFO *info,
 	}
 
 	while (1) {
-		/* Double the bet */
-		free(buf);
-		buf_len = 2 * buf_len;
-		buf = malloc(buf_len);
-		if (!buf) {
-			ret = UPNP_E_OUTOF_MEMORY;
-			goto ExitFunction;
+		/* Double the bet if needed */
+		/* We should have already exited the loop if the value was <= 0
+		 * so the cast is safe */
+		if ((size_t)num_read >= buf_len) {
+			free(buf);
+			buf_len = 2 * buf_len;
+			buf = malloc(buf_len);
+			if (!buf) {
+				ret = UPNP_E_OUTOF_MEMORY;
+				goto ExitFunction;
+			}
 		}
 		num_read = sock_read(info, buf, buf_len, timeout_secs);
 		if (num_read > 0) {
