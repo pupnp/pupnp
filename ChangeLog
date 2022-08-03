@@ -1,6 +1,26 @@
 *******************************************************************************
+Version 1.18.0
+*******************************************************************************
+
+*******************************************************************************
 Version 1.16.0
 *******************************************************************************
+
+        Aborted.
+
+*******************************************************************************
+Version 1.14.13
+*******************************************************************************
+
+2021-04-28 Hugo Beauzée-Luyssen <hugo(at)beauzee.fr>
+
+        http: RecvMessage: Fix potential allocation failure
+
+        If for whatever reason the server replies without maxing out the buffer,
+        the code would end up doubling the buffer size nonetheless, which can
+        quickly cause malloc to fail, once we try to allocate 2^30 or more bytes
+        This was especially noticeable for large results.
+        Reported as https://code.videolan.org/videolan/vlc/-/issues/27173
 
 *******************************************************************************
 Version 1.14.12
