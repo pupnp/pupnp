@@ -1297,10 +1297,15 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 			_tzset();
 			tzflag++;
 		}
+	#ifdef _UCRT
 		long itz = 0;
 		_get_timezone(&itz);
 		tz->tz_minuteswest = (int)(itz / 60);
 		_get_daylight(&tz->tz_dsttime);
+	#else
+		tz->tz_minuteswest = _timezone / 60;
+		tz->tz_dsttime = _daylight;
+	#endif
 	}
 
 	return 0;
