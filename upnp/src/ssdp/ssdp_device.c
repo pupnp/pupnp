@@ -298,7 +298,7 @@ static int NewRequestHandler(
 			*(RqPacket + Index));
 		rc = sendto(ReplySock,
 			*(RqPacket + Index),
-			(int)strlen(*(RqPacket + Index)),
+			strlen(*(RqPacket + Index)),
 			0,
 			DestAddr,
 			socklen);
