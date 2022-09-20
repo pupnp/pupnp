@@ -74,6 +74,7 @@ static const char *CDSTART = "<![CDATA[";
 static const char *CDEND = "]]>";
 static const char *DEC_NUMBERS = "0123456789";
 static const char *HEX_NUMBERS = "0123456789ABCDEFabcdef";
+static const char *UTF8_BOM = "\xef\xbb\xbf";
 
 typedef struct char_info
 {
@@ -592,6 +593,19 @@ static int Parser_skipString(
 }
 
 /*!
+ * \brief Skip UTF-8 byte order mark
+ */
+static void Parser_skipBom(
+	/*! [in] The XML parser. */
+	Parser *xmlParser)
+{
+	size_t bom_len = strlen(UTF8_BOM);
+
+	if (strncmp(xmlParser->curPtr, UTF8_BOM, bom_len) == 0)
+		xmlParser->curPtr += bom_len;
+}
+
+/*!
  * \brief Skip white spaces.
  */
 static void Parser_skipWhiteSpaces(
@@ -702,6 +716,7 @@ static int Parser_skipProlog(
 		return IXML_FAILED;
 	}
 
+	Parser_skipBom(xmlParser);
 	Parser_skipWhiteSpaces(xmlParser);
 
 	if (strncmp(xmlParser->curPtr, (char *)XMLDECL, strlen(XMLDECL)) == 0) {
