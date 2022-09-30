@@ -12,6 +12,10 @@
 	#define strnicmp _strnicmp
 
 	/* Secure versions of functions */
+	/* Explicitly disable warnings by pragma/define, see:
+	 * https://www.codegrepper.com/code-examples/c/crt+secure+no+warnings */
+	#pragma warning(disable : 4996)
+	#define _CRT_SECURE_NO_WARNINGS
 	#if 0
 		/*
 		 * The current issues with those 4 defines:
