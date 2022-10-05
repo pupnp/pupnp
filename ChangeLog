@@ -12,6 +12,23 @@ Version 1.16.0
 Version 1.14.14
 *******************************************************************************
 
+2022-09-27 philippe44 <philippe44@users.noreply.github.com>
+
+        don't use strxxx_s on Windows
+
+        The use of these fails as 2nd argument is the same as 4th argument.
+        Reading the cpp_reference defintions of these, it can't be right.
+
+2022-09-20 Rex Cheung <93339127+rexcheung21(at)users.noreply.github.com>
+
+        Fix #412
+
+        Skip leading UTF-8 BOM in XML document
+
+2022-08-04 Hugo Beauzée-Luyssen <hugo(at)beauzee.fr>
+
+        ThreadPool: Fix non UCRT builds
+
 *******************************************************************************
 Version 1.14.13
 *******************************************************************************
