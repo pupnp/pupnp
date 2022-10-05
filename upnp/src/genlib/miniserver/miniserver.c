@@ -238,7 +238,7 @@ static int dispatch_request(
 	http_message_t *request;
 	MiniServerCallback callback;
 	WebCallback_HostValidate host_validate_callback = 0;
-	void *cookie;
+	void *cookie = 0;
 	int rc = UPNP_E_SUCCESS;
 	/* If it does not fit in here, it is likely invalid anyway. */
 	char host_port[NAME_SIZE];
