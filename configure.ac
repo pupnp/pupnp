@@ -199,8 +199,18 @@ dnl #AC_SUBST([LT_VERSION_IXML],       [12:2:1])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [18:5:1])
 dnl #
 dnl ############################################################################
+dnl # Release 1.14.15
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #   revision: 5 -> 6
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [12:2:1])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [18:6:1])
+dnl #
+dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [12:2:1])
-AC_SUBST([LT_VERSION_UPNP],       [18:5:1])
+AC_SUBST([LT_VERSION_UPNP],       [18:6:1])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
