@@ -315,3 +315,11 @@ if (BUILD_TESTING)
 		add_subdirectory (gtest)
 	endif()
 endif()
+
+if(FUZZER)
+	if (NOT CMAKE_C_COMPILER_ID STREQUAL "Clang")
+		message(FATAL_ERROR "clang is require for libFuzzer")
+	endif()
+	add_subdirectory(fuzzer)
+
+endif()
