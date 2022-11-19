@@ -318,7 +318,7 @@ endif()
 
 if(FUZZER)
 	if (NOT CMAKE_C_COMPILER_ID STREQUAL "Clang")
-		message(FATAL_ERROR "clang is require for libFuzzer")
+		message(FATAL_ERROR "Compiling with clang is required for libFuzzer")
 	endif()
 	add_subdirectory(fuzzer)
 
