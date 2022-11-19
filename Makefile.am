@@ -16,6 +16,10 @@ SUBDIRS = \
 EXTRA_DIST = \
 	CMakeLists.txt \
 	cmake/CmDaB.cmake \
+	cmake/autoheader.cmake \
+	cmake/options.cmake \
+	cmake/post-test.cmake \
+	cmake/test-functions.cmake \
 	IXML.cmake.in \
 	UPNP.cmake.in \
 	ixml/CMakeLists.txt \
