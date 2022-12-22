@@ -511,6 +511,10 @@ int UpnpInit2(const char *IfName, unsigned short DestPort)
 		goto exit_function;
 	}
 
+	/* Set the UpnpSdkInit flag to 1 to indicate we're successfully
+	 * initialized. */
+	UpnpSdkInit = 1;
+
 	/* Perform initialization preamble. */
 	retVal = UpnpInitPreamble();
 	if (retVal != UPNP_E_SUCCESS) {
@@ -531,18 +535,16 @@ int UpnpInit2(const char *IfName, unsigned short DestPort)
 		goto exit_function;
 	}
 
-	/* Set the UpnpSdkInit flag to 1 to indicate we're successfully
-	 * initialized. */
-	UpnpSdkInit = 1;
-
 	/* Finish initializing the SDK. */
 	retVal = UpnpInitStartServers(DestPort);
 	if (retVal != UPNP_E_SUCCESS) {
-		UpnpSdkInit = 0;
 		goto exit_function;
 	}
 
 exit_function:
+	if (retVal != UPNP_E_SUCCESS) {
+		UpnpFinish();
+	}
 	ithread_mutex_unlock(&gSDKInitMutex);
 
 	return retVal;
