@@ -542,7 +542,7 @@ int UpnpInit2(const char *IfName, unsigned short DestPort)
 	}
 
 exit_function:
-	if (retVal != UPNP_E_SUCCESS) {
+	if (retVal != UPNP_E_SUCCESS && retVal != UPNP_E_INIT) {
 		UpnpFinish();
 	}
 	ithread_mutex_unlock(&gSDKInitMutex);
