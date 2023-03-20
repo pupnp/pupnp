@@ -245,13 +245,13 @@ typedef union
 	{
 		int handle;
 		int eventId;
-		void* Event;
+		void *Event;
 	} advertise;
 	struct UpnpNonblockParam action;
 } job_arg;
 
 /*!
- * \brief Free memory associated with advertise job's argument 
+ * \brief Free memory associated with advertise job's argument
  */
 static void free_advertise_arg(job_arg *arg)
 {
@@ -4300,7 +4300,7 @@ void AutoAdvertise(void *input)
 	job_arg *arg = (job_arg *)input;
 
 	UpnpSendAdvertisement(
-			arg->advertise.handle, *((int *)arg->advertise.Event));
+		arg->advertise.handle, *((int *)arg->advertise.Event));
 	free_advertise_arg(arg);
 }
 	#endif /* EXCLUDE_SSDP == 0 */
