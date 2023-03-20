@@ -16,7 +16,6 @@
 
 void free_client_subscription(GenlibClientSubscription *sub)
 {
-	upnp_timeout *event;
 	ThreadPoolJob tempJob;
 	if (sub) {
 		int renewEventId =
@@ -29,8 +28,7 @@ void free_client_subscription(GenlibClientSubscription *sub)
 			if (TimerThreadRemove(&gTimerThread,
 				    renewEventId,
 				    &tempJob) == 0) {
-				event = (upnp_timeout *)tempJob.arg;
-				free_upnp_timeout(event);
+				tempJob.free_func(tempJob.arg);
 			}
 		}
 		GenlibClientSubscription_set_RenewEventId(sub, -1);

@@ -15,7 +15,6 @@ extern "C" {
 #include "UpnpString.h"
 #include "service_table.h"
 #include "upnp.h"
-#include "upnp_timeout.h"
 #include "uri.h"
 
 #include <stdio.h>

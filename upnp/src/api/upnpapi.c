@@ -239,6 +239,42 @@ Upnp_SID gUpnpSdkNLSuuid;
 SSL_CTX *gSslCtx = NULL;
 #endif
 
+typedef union 
+{
+	struct 
+	{
+		int handle;
+		int eventId;
+		void *Event;
+	} advertise;
+	struct UpnpNonblockParam action;
+} job_arg;
+
+/*!
+ * \brief Free memory associated with advertise job's argument
+ */
+static void free_advertise_arg(job_arg *arg)
+{
+	if (arg->advertise.Event) {
+		free(arg->advertise.Event);
+	}
+	free(arg);
+}
+
+/*!
+ * \brief Free memory associated with an action job's argument
+ */
+static void free_action_arg(job_arg *arg)
+{
+	if (arg->action.Header)	{
+		ixmlDocument_free(arg->action.Header);
+	}
+	if (arg->action.Act) {
+		ixmlDocument_free(arg->action.Act);
+	}
+	free(arg);
+}
+
 /*!
  * \brief (Windows Only) Initializes the Windows Winsock library.
  *
@@ -1894,7 +1930,7 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 {
 	struct Handle_Info *SInfo = NULL;
 	int retVal = 0, *ptrMx;
-	upnp_timeout *adEvent;
+	job_arg *adEvent;
 	ThreadPoolJob job;
 
 	memset(&job, 0, sizeof(job));
@@ -1942,15 +1978,15 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 	ptrMx = (int *)malloc(sizeof(int));
 	if (ptrMx == NULL)
 		return UPNP_E_OUTOF_MEMORY;
-	adEvent = (upnp_timeout *)malloc(sizeof(upnp_timeout));
+	adEvent = (job_arg *)malloc(sizeof(job_arg));
 
 	if (adEvent == NULL) {
 		free(ptrMx);
 		return UPNP_E_OUTOF_MEMORY;
 	}
 	*ptrMx = Exp;
-	adEvent->handle = Hnd;
-	adEvent->Event = ptrMx;
+	adEvent->advertise.handle = Hnd;
+	adEvent->advertise.Event = ptrMx;
 
 	HandleLock();
 	switch (GetHandleInfo(Hnd, &SInfo)) {
@@ -1964,32 +2000,30 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 	}
 		#ifdef SSDP_PACKET_DISTRIBUTE
 	TPJobInit(&job, (start_routine)AutoAdvertise, adEvent);
-	TPJobSetFreeFunction(&job, (free_routine)free_upnp_timeout);
+	TPJobSetFreeFunction(&job, (free_routine)free_advertise_arg);
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if ((retVal = TimerThreadSchedule(&gTimerThread,
 		     ((Exp / 2) - (AUTO_ADVERTISEMENT_TIME)),
 		     REL_SEC,
 		     &job,
 		     SHORT_TERM,
-		     &(adEvent->eventId))) != UPNP_E_SUCCESS) {
+		     &(adEvent->advertise.eventId))) != UPNP_E_SUCCESS) {
 		HandleUnlock();
-		free(adEvent);
-		free(ptrMx);
+		free_advertise_arg(adEvent);
 		return retVal;
 	}
 		#else
 	TPJobInit(&job, (start_routine)AutoAdvertise, adEvent);
-	TPJobSetFreeFunction(&job, (free_routine)free_upnp_timeout);
+	TPJobSetFreeFunction(&job, (free_routine)free_advertise_arg);
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if ((retVal = TimerThreadSchedule(&gTimerThread,
 		     Exp - AUTO_ADVERTISEMENT_TIME,
 		     REL_SEC,
 		     &job,
 		     SHORT_TERM,
-		     &(adEvent->eventId))) != UPNP_E_SUCCESS) {
+		     &(adEvent->advertise.eventId))) != UPNP_E_SUCCESS) {
 		HandleUnlock();
-		free(adEvent);
-		free(ptrMx);
+		free_advertise_arg(adEvent);
 		return retVal;
 	}
 		#endif
@@ -3028,11 +3062,11 @@ int UpnpSendActionAsync(UpnpClient_Handle Hnd,
 	Param->Fun = Fun;
 
 	TPJobInit(&job, (start_routine)UpnpThreadDistribution, Param);
-	TPJobSetFreeFunction(&job, (free_routine)free);
+	TPJobSetFreeFunction(&job, (free_routine)free_action_arg);
 
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if (ThreadPoolAdd(&gSendThreadPool, &job, NULL) != 0) {
-		free(Param);
+		free_action_arg((job_arg *)Param);
 	}
 
 	UpnpPrintf(UPNP_ALL,
@@ -3157,11 +3191,11 @@ int UpnpSendActionExAsync(UpnpClient_Handle Hnd,
 	Param->Fun = Fun;
 
 	TPJobInit(&job, (start_routine)UpnpThreadDistribution, Param);
-	TPJobSetFreeFunction(&job, (free_routine)free);
+	TPJobSetFreeFunction(&job, (free_routine)free_action_arg);
 
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if (ThreadPoolAdd(&gSendThreadPool, &job, NULL) != 0) {
-		free(Param);
+		free_action_arg((job_arg *)Param);
 	}
 
 	UpnpPrintf(UPNP_ALL,
@@ -4028,17 +4062,27 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 	case ACTION: {
 		UpnpActionComplete *Evt = UpnpActionComplete_new();
 		IXML_Document *actionResult = NULL;
-		int errCode = SoapSendAction(Param->Url,
-			Param->ServiceType,
-			Param->Act,
-			&actionResult);
+		int errCode;
+		if (Param->Header) {
+			errCode = SoapSendActionEx(Param->Url,
+				Param->ServiceType,
+				Param->Header,
+				Param->Act,
+				&actionResult);
+		} else {
+			errCode = SoapSendAction(Param->Url,
+				Param->ServiceType,
+				Param->Act,
+				&actionResult);
+		}
 		UpnpActionComplete_set_ErrCode(Evt, errCode);
 		UpnpActionComplete_set_ActionRequest(Evt, Param->Act);
 		UpnpActionComplete_set_ActionResult(Evt, actionResult);
 		UpnpActionComplete_strcpy_CtrlUrl(Evt, Param->Url);
 		Param->Fun(UPNP_CONTROL_ACTION_COMPLETE, Evt, Param->Cookie);
-		free(Param);
 		UpnpActionComplete_delete(Evt);
+		ixmlDocument_free(actionResult);
+		free_action_arg((job_arg *)Param);
 		break;
 	}
 	case STATUS: {
@@ -4253,10 +4297,11 @@ int PrintHandleInfo(UpnpClient_Handle Hnd)
 	#if EXCLUDE_SSDP == 0
 void AutoAdvertise(void *input)
 {
-	upnp_timeout *event = (upnp_timeout *)input;
+	job_arg *arg = (job_arg *)input;
 
-	UpnpSendAdvertisement(event->handle, *((int *)event->Event));
-	free_upnp_timeout(event);
+	UpnpSendAdvertisement(
+		arg->advertise.handle, *((int *)arg->advertise.Event));
+	free_advertise_arg(arg);
 }
 	#endif /* EXCLUDE_SSDP == 0 */
 #endif	       /* INCLUDE_DEVICE_APIS */
