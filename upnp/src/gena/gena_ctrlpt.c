@@ -53,7 +53,8 @@
 
 extern ithread_mutex_t GlobalClientSubscribeMutex;
 
-typedef struct {
+typedef struct 
+{
 	int handle;
 	int eventId;
 	void* Event;
@@ -62,7 +63,7 @@ typedef struct {
 /*!
  * \brief Free memory associated with job's argument 
  */
-static void free_subscribe_arg(job_arg* arg)
+static void free_subscribe_arg(job_arg *arg)
 {
 	if (arg) {
 		if (arg->Event) {

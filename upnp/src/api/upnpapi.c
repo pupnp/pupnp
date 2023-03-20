@@ -239,8 +239,10 @@ Upnp_SID gUpnpSdkNLSuuid;
 SSL_CTX *gSslCtx = NULL;
 #endif
 
-typedef union {
-	struct {
+typedef union 
+{
+	struct 
+	{
 		int handle;
 		int eventId;
 		void* Event;
@@ -251,7 +253,7 @@ typedef union {
 /*!
  * \brief Free memory associated with advertise job's argument 
  */
-static void free_advertise_arg(job_arg* arg)
+static void free_advertise_arg(job_arg *arg)
 {
 	if (arg->advertise.Event) {
 		free(arg->advertise.Event);
@@ -262,7 +264,7 @@ static void free_advertise_arg(job_arg* arg)
 /*!
  * \brief Free memory associated with an action job's argument
  */
-static void free_action_arg(job_arg* arg)
+static void free_action_arg(job_arg *arg)
 {
 	if (arg->action.Header)	{
 		ixmlDocument_free(arg->action.Header);
@@ -3064,7 +3066,7 @@ int UpnpSendActionAsync(UpnpClient_Handle Hnd,
 
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if (ThreadPoolAdd(&gSendThreadPool, &job, NULL) != 0) {
-		free_action_arg((job_arg*)Param);
+		free_action_arg((job_arg *)Param);
 	}
 
 	UpnpPrintf(UPNP_ALL,
@@ -3193,7 +3195,7 @@ int UpnpSendActionExAsync(UpnpClient_Handle Hnd,
 
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if (ThreadPoolAdd(&gSendThreadPool, &job, NULL) != 0) {
-		free_action_arg((job_arg*)Param);
+		free_action_arg((job_arg *)Param);
 	}
 
 	UpnpPrintf(UPNP_ALL,
@@ -4067,7 +4069,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 				Param->Header,
 				Param->Act,
 				&actionResult);
-		} else	{
+		} else {
 			errCode = SoapSendAction(Param->Url,
 				Param->ServiceType,
 				Param->Act,
@@ -4080,7 +4082,7 @@ void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
 		Param->Fun(UPNP_CONTROL_ACTION_COMPLETE, Evt, Param->Cookie);
 		UpnpActionComplete_delete(Evt);
 		ixmlDocument_free(actionResult);
-		free_action_arg((job_arg*)Param);
+		free_action_arg((job_arg *)Param);
 		break;
 	}
 	case STATUS: {
@@ -4297,7 +4299,8 @@ void AutoAdvertise(void *input)
 {
 	job_arg *arg = (job_arg *)input;
 
-	UpnpSendAdvertisement(arg->advertise.handle, *((int *)arg->advertise.Event));
+	UpnpSendAdvertisement(
+			arg->advertise.handle, *((int *)arg->advertise.Event));
 	free_advertise_arg(arg);
 }
 	#endif /* EXCLUDE_SSDP == 0 */
