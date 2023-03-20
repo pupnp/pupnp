@@ -239,9 +239,9 @@ Upnp_SID gUpnpSdkNLSuuid;
 SSL_CTX *gSslCtx = NULL;
 #endif
 
-typedef union 
+typedef union
 {
-	struct 
+	struct
 	{
 		int handle;
 		int eventId;
@@ -266,7 +266,7 @@ static void free_advertise_arg(job_arg *arg)
  */
 static void free_action_arg(job_arg *arg)
 {
-	if (arg->action.Header)	{
+	if (arg->action.Header) {
 		ixmlDocument_free(arg->action.Header);
 	}
 	if (arg->action.Act) {
