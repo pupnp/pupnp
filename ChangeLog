@@ -12,6 +12,59 @@ Version 1.16.0
 Version 1.14.16
 *******************************************************************************
 
+2023-03-19 philippe44 <philippe44@users.noreply.github.com>
+
+        Fix memory leak and ActionExAsync (#426)
+
+        This intends to fix #424. I've found at least 2 memory leaks
+
+        1- When sending Action(Ex)Async
+        The ActionRequest document was not released nor was the ActionResult.
+        I initially tought that this should be done in
+        UpnpActionComplete::UpnpActionComplete_delete() but I was wrong because
+        ActionRequest and ActionResult do not "belong" to the Evt object.
+        The sets methods only set a pointer and modifying generator.c is not the
+        right solution. The reason is that ActionRequest "belongs" to the ACTION
+        job and should be handled as such if we want as well that, when the job
+        is cancelled, the memory is released as well. So I've change the
+        free_func for ACTION to reflect that.
+
+        2- When using event subscription
+        The Event was not released upon Timer termination. So I've done as
+        above, created a special free_func that handles that properly.
+
+        In general, when something prevents the execution/submission of a job,
+        I've also used the actual free function instead of duplicating the
+        individual free(). Note that when terminating a timer, I'm using the
+        job's internal structure free_func() as it was already used to access
+        arg. One can argue that it should be an opaque structure and get/set or
+        the option to call the free function could be use instead.
+
+        Also, I realized that ActionExAsync has never been working properly
+        because when the job is executed, only an Action is made, never an
+        ActionEx although the Header document is in the job's argument. I've
+        fixed that as well and stopped there to not go too deep in that rabbit
+        hole.
+
+        I've also removed the upnp_timeout.c/h files as they were not used
+        anymore (and had a strange names anyway)
+
+2023-01-04 Thoren Paulson <thoren.paulson@gmail.com>
+
+        Handle redundant initialization
+
+2022-12-22 Thoren Paulson <thoren.paulson@gmail.com>
+
+        Clean up after failed initialization.
+
+        Some initialization failures (such as failure in UpnpGetIfInfo) would
+        leave resources like thread pools initialized. This change ensures if
+        UpnpInit2 fails, we call UpnpFinish before returning to clean up those
+        resources.
+
+        To ensure UpnpFinish is effective in this way, we set UpnpSdkInit to 1
+        earlier in UpnpInit2.
+
 *******************************************************************************
 Version 1.14.15
 *******************************************************************************
