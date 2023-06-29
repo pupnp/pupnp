@@ -805,7 +805,7 @@ static void ssdp_event_handler_thread(
 	free_ssdp_event_handler_data(data);
 }
 
-void readFromSSDPSocket(SOCKET socket)
+int readFromSSDPSocket(SOCKET socket)
 {
 	char *requestBuf = NULL;
 	char staticBuf[BUFSIZE];
@@ -896,8 +896,11 @@ void readFromSSDPSocket(SOCKET socket)
 			if (ThreadPoolAdd(&gRecvThreadPool, &job, NULL) != 0)
 				free_ssdp_event_handler_data(data);
 		}
-	} else
+		return 0;
+	} else {
 		free_ssdp_event_handler_data(data);
+		return -1;
+    }
 }
 
 /*!

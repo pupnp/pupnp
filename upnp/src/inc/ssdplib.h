@@ -239,8 +239,10 @@ int ssdp_request_type(
 
 /*!
  * \brief This function reads the data from the ssdp socket.
+ *
+ * \return 0 on success; -1 on error.
  */
-void readFromSSDPSocket(
+int readFromSSDPSocket(
 	/* [in] SSDP socket. */
 	SOCKET socket);
 
