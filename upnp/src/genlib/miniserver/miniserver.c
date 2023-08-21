@@ -546,8 +546,9 @@ static void ssdp_read(SOCKET *rsock, fd_set *set)
 				MSERV,
 				__FILE__,
 				__LINE__,
-				"miniserver: Error in readFromSSDPSocket(%d): closing socket\n",
-                *rsock);
+				"miniserver: Error in readFromSSDPSocket(%d): "
+				"closing socket\n",
+				*rsock);
 			sock_close(*rsock);
 			*rsock = INVALID_SOCKET;
 		}
@@ -593,9 +594,7 @@ static int receive_from_stopSock(SOCKET ssock, fd_set *set)
 			if (NULL != strstr(requestBuf, "ShutDown")) {
 				return 1;
 			}
-		}
-		else
-		{
+		} else {
 			UpnpPrintf(UPNP_INFO,
 				MSERV,
 				__FILE__,

@@ -900,7 +900,7 @@ int readFromSSDPSocket(SOCKET socket)
 	} else {
 		free_ssdp_event_handler_data(data);
 		return -1;
-    }
+	}
 }
 
 /*!
