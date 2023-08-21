@@ -12,6 +12,15 @@ Version 1.16.0
 Version 1.14.18
 *******************************************************************************
 
+2023-06-29 Thomas Guillem <thomas(at)gllm.fr>
+
+        miniserver: fix busy loop on socket error
+
+        In case of a socket error, the socket was not removed from the select
+        pool, causing future select() calls to return immediately, and
+        readFromSSDPSocket() to be called just after on the failing socket. This
+        was causing a high CPU load.
+
 *******************************************************************************
 Version 1.14.17
 *******************************************************************************

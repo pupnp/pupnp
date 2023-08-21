@@ -102,7 +102,8 @@ The Portable SDK for UPnP&trade; Devices is distributed under the BSD (Berkeley 
 | -------------- | ---------- | ---------------------------------------- |
 | 1.18.0         | TBA ?      | [Portable UPnP SDK][Portable UPnP SDK]   |
 | 1.16.0         | aborted    | [Portable UPnP SDK][Portable UPnP SDK]   |
-| 1.14.18        | TBA        | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.14.19        | TBA        | [Portable UPnP SDK][Portable UPnP SDK]   |
+| 1.14.18        | 2023-08-21 | [Portable UPnP SDK][Portable UPnP SDK]   |
 | 1.14.17        | 2023-04-30 | [Portable UPnP SDK][Portable UPnP SDK]   |
 | 1.14.16        | 2023-03-30 | [Portable UPnP SDK][Portable UPnP SDK]   |
 | 1.14.15        | 2022-11-18 | [Portable UPnP SDK][Portable UPnP SDK]   |
