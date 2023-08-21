@@ -9,7 +9,7 @@
 
 AC_PREREQ(2.60)
 
-AC_INIT([libupnp], [1.14.18], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp], [1.14.19], [mroberto@users.sourceforge.net])
 dnl ############################################################################
 dnl # *Independently* of the above libupnp package version, the libtool version
 dnl # of the 3 libraries need to be updated whenever there is a change released:
@@ -239,8 +239,18 @@ dnl #AC_SUBST([LT_VERSION_IXML],       [12:2:1])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [18:9:1])
 dnl #
 dnl ############################################################################
+dnl # Release 1.14.19
+dnl # "current:revision:age"
+dnl #
+dnl # - Code has changed in upnp
+dnl #   revision: 9 -> 10
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML],       [12:2:1])
+dnl #AC_SUBST([LT_VERSION_UPNP],       [18:10:1])
+dnl #
+dnl ############################################################################
 AC_SUBST([LT_VERSION_IXML],       [12:2:1])
-AC_SUBST([LT_VERSION_UPNP],       [18:9:1])
+AC_SUBST([LT_VERSION_UPNP],       [18:10:1])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
 dnl # 	- library code modified:		revision++
