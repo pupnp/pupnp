@@ -7,9 +7,9 @@
 # (C) Copyright 2005-2007 Rémi Turboult <r3mi@users.sourceforge.net>
 #
 
-AC_PREREQ(2.60)
+AC_PREREQ([2.60])
 
-AC_INIT([libupnp], [1.14.19], [mroberto@users.sourceforge.net])
+AC_INIT([libupnp],[1.14.19],[mroberto@users.sourceforge.net])
 dnl ############################################################################
 dnl # *Independently* of the above libupnp package version, the libtool version
 dnl # of the 3 libraries need to be updated whenever there is a change released:
@@ -411,7 +411,7 @@ RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 AC_PROG_CC
 AM_PROG_CC_C_O
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_EGREP
@@ -509,7 +509,15 @@ AM_CONDITIONAL(WIN32, test x"$ac_cv_win32" = xyes)
 #
 # Checks for header files (which aren't needed on Win32)
 #
-AC_HEADER_STDC
+#m4_warn([obsolete],
+#[The preprocessor macro `STDC_HEADERS' is obsolete.
+#  Except in unusual embedded environments, you can safely include all
+#  ISO C90 headers unconditionally.])dnl
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
 if test "$ac_cv_win32" = "no"; then
 # libupnp code doesn't use autoconf variables yet,
 # so just abort if a header file is not found.
