@@ -43,6 +43,7 @@
 
 #include "tv_device.h"
 
+#include "upnp.h"
 #include "upnpdebug.h"
 
 #include <assert.h>
@@ -307,8 +308,8 @@ error_handler:
 int TvDeviceHandleSubscriptionRequest(const UpnpSubscriptionRequest *sr_event)
 {
 	unsigned int i = 0;
-	int cmp1 = 0;
-	int cmp2 = 0;
+	int cmp1;
+	int cmp2;
 	const char *l_serviceId = NULL;
 	const char *l_udn = NULL;
 	const char *l_sid = NULL;
@@ -363,7 +364,7 @@ int TvDeviceHandleSubscriptionRequest(const UpnpSubscriptionRequest *sr_event)
 int TvDeviceHandleGetVarRequest(UpnpStateVarRequest *cgv_event)
 {
 	unsigned int i = 0;
-	int j = 0;
+	int j;
 	int getvar_succeeded = 0;
 
 	UpnpStateVarRequest_set_CurrentVal(cgv_event, NULL);
@@ -1096,43 +1097,50 @@ int TvDeviceDecreaseTint(
 int TvDeviceSetContrast(
 	IXML_Document *in, IXML_Document **out, const char **errorString)
 {
-	char *value = NULL;
-	int contrast = -1;
+	int ret;
+	char *value;
+	int contrast;
 
 	(*out) = NULL;
 	(*errorString) = NULL;
 
-	if (!(value = SampleUtil_GetFirstDocumentItem(in, "Contrast"))) {
+	value = SampleUtil_GetFirstDocumentItem(in, "Contrast");
+	if (!value) {
 		(*errorString) = "Invalid Contrast";
-		return UPNP_E_INVALID_PARAM;
+		ret = UPNP_E_INVALID_PARAM;
+		goto end_function_1;
 	}
 	contrast = atoi(value);
 	if (contrast < MIN_CONTRAST || contrast > MAX_CONTRAST) {
 		SampleUtil_Print(
 			"error: can't change to contrast %d\n", contrast);
 		(*errorString) = "Invalid Contrast";
-		return UPNP_E_INVALID_PARAM;
+		ret = UPNP_E_INVALID_PARAM;
+		goto end_function_2;
 	}
 	/* Vendor-specific code to set the volume goes here. */
-	if (TvDeviceSetServiceTableVar(
+	if (!TvDeviceSetServiceTableVar(
 		    TV_SERVICE_PICTURE, TV_PICTURE_CONTRAST, value)) {
-		if (UpnpAddToActionResponse(out,
-			    "SetContrast",
-			    TvServiceType[TV_SERVICE_PICTURE],
-			    "NewContrast",
-			    value) != UPNP_E_SUCCESS) {
-			(*out) = NULL;
-			(*errorString) = "Internal Error";
-			free(value);
-			return UPNP_E_INTERNAL_ERROR;
-		}
-		free(value);
-		return UPNP_E_SUCCESS;
-	} else {
-		free(value);
 		(*errorString) = "Internal Error";
-		return UPNP_E_INTERNAL_ERROR;
+		ret = UPNP_E_INTERNAL_ERROR;
+		goto end_function_2;
 	}
+	if (UpnpAddToActionResponse(out,
+		    "SetContrast",
+		    TvServiceType[TV_SERVICE_PICTURE],
+		    "NewContrast",
+		    value) != UPNP_E_SUCCESS) {
+		(*out) = NULL;
+		(*errorString) = "Internal Error";
+		ret = UPNP_E_INTERNAL_ERROR;
+		goto end_function_2;
+	}
+	ret = UPNP_E_SUCCESS;
+
+end_function_2:
+	free(value);
+end_function_1:
+	return ret;
 }
 
 /*!
@@ -1494,13 +1502,12 @@ int TvDeviceStop(void)
 
 void *TvDeviceCommandLoop(void *args)
 {
-	int stoploop = 0;
 	char cmdline[100];
 	char cmd[100];
 	char *s;
 	(void)args;
 
-	while (!stoploop) {
+	while (1) {
 		sprintf(cmdline, " ");
 		sprintf(cmd, " ");
 		SampleUtil_Print("\n>> ");
