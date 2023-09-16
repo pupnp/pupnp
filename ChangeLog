@@ -12,6 +12,14 @@ Version 1.16.0
 Version 1.14.19
 *******************************************************************************
 
+2023-09-16 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+        - Fixed memory allocation in `tv_device.c::TvDeviceSetContrast()`.
+
+2023-08-31 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
+
+        - Updated some old AX macro files to fix bootstrap messages.
+
 *******************************************************************************
 Version 1.14.18
 *******************************************************************************
