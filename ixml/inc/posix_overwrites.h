@@ -1,5 +1,6 @@
-#ifndef POSIX_OVERWRTIES_H
-#define POSIX_OVERWRTIES_H
+#ifndef POSIX_OVERWRITES_H
+#define POSIX_OVERWRITES_H
+
 #ifdef _WIN32
 
 	/* POSIX names for functions */
@@ -44,4 +45,5 @@
 	#endif
 
 #endif /* _WIN32 */
-#endif /* POSIX_OVERWRTIES_H */
+
+#endif /* POSIX_OVERWRITES_H */
