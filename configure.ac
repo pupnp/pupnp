@@ -515,7 +515,6 @@ AM_CONDITIONAL(WIN32, test x"$ac_cv_win32" = xyes)
 #  ISO C90 headers unconditionally.])dnl
 # Autoupdate added the next two lines to ensure that your configure
 # script's behavior did not change.  They are probably safe to remove.
-AC_CHECK_INCLUDES_DEFAULT
 AC_PROG_EGREP
 
 if test "$ac_cv_win32" = "no"; then
