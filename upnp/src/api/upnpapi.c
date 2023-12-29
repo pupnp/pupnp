@@ -73,7 +73,7 @@
 #include "posix_overwrites.h"
 
 #ifdef _WIN32
-/* Do not include these files */
+	#include <iphlpapi.h>
 #else
 	#include <ifaddrs.h>
 	#include <sys/ioctl.h>
