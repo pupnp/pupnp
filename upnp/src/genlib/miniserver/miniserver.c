@@ -1140,11 +1140,7 @@ static int get_miniserver_stopsock(
 	/* Bind to local socket. */
 	memset(&stop_sockaddr, 0, sizeof(stop_sockaddr));
 	stop_sockaddr.sin_family = (sa_family_t)AF_INET;
-	#ifdef _WIN32
 	inet_pton(AF_INET, "127.0.0.1", &stop_sockaddr.sin_addr);
-	#else
-	stop_sockaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-	#endif
 	ret = bind(miniServerStopSock,
 		(struct sockaddr *)&stop_sockaddr,
 		sizeof(stop_sockaddr));
@@ -1326,11 +1322,7 @@ int StopMiniServer()
 	}
 	while (gMServState != (MiniServerState)MSERV_IDLE) {
 		ssdpAddr.sin_family = (sa_family_t)AF_INET;
-	#ifdef _WIN32
 		inet_pton(AF_INET, "127.0.0.1", &ssdpAddr.sin_addr);
-	#else
-		ssdpAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-	#endif
 		ssdpAddr.sin_port = htons(miniStopSockPort);
 		sendto(sock,
 			buf,
