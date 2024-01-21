@@ -305,8 +305,6 @@ int token_cmp(token *in1, token *in2)
  * \brief Parses a string representing a host and port (e.g. "127.127.0.1:80"
  * or "localhost") and fills out a hostport_type struct with internet address
  * and a token representing the full host and port.
- *
- * Uses gethostbyname.
  */
 static int parse_hostport(
 	/*! [in] String of characters representing host and port. */

@@ -581,7 +581,6 @@ AC_CHECK_FUNC(strndup,
 #
 # Solaris needs -lsocket -lnsl -lrt
 AC_SEARCH_LIBS([bind],           [socket])
-AC_SEARCH_LIBS([gethostbyname],  [nsl])
 AC_SEARCH_LIBS([sched_getparam], [rt])
 
 
