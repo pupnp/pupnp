@@ -351,7 +351,7 @@ static int already_included(const char *header)
 		included_headers_size += 16;
 		included_headers = realloc(included_headers,
 			included_headers_size * sizeof(const char *));
-		if (!included_headers_size) {
+		if (!included_headers) {
 			printf("%s(): Error! realloc() failed.\n", __func__);
 			exit(1);
 		}
