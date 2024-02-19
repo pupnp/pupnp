@@ -167,7 +167,8 @@ static char *strupr(char *s)
 	return s;
 }
 
-static int write_prototype(FILE *fp, const char *class_name, struct s_Member *m)
+static int write_prototype(
+	FILE *fp, const char *class_name, const struct s_Member *m)
 {
 	switch (m->type) {
 	case TYPE_CLASS:
@@ -376,8 +377,7 @@ static int write_header(FILE *fp, struct s_Class *c)
 {
 	int i;
 	int ok = 1;
-	const char *header;
-	struct s_Member *m;
+	const struct s_Member *m;
 	int len = strlen(c->name);
 	char *class_name_upr = malloc(len + 1);
 
@@ -413,6 +413,7 @@ static int write_header(FILE *fp, struct s_Class *c)
 	/* Include files: look for which members need includes and only include
 	 * them once. */
 	for (i = 0; i < (int)c->n_members; ++i) {
+		const char *header;
 		m = c->members + i;
 		header = member_needs_include(m);
 		if (header && !already_included(header)) {
@@ -473,7 +474,7 @@ static int write_header(FILE *fp, struct s_Class *c)
 	return ok;
 }
 
-static int write_definition(FILE *fp, struct s_Member *m)
+static int write_definition(FILE *fp, const struct s_Member *m)
 {
 	switch (m->type) {
 	case TYPE_CLASS:
@@ -505,7 +506,6 @@ static int write_definition(FILE *fp, struct s_Member *m)
 static int write_constructor(FILE *fp, struct s_Class *c)
 {
 	int i;
-	struct s_Member *m;
 
 	/* clang-format off */
 	fprintf(fp,
@@ -518,7 +518,7 @@ static int write_constructor(FILE *fp, struct s_Class *c)
 		c->name, c->name, c->name, c->name);
 	/* clang-format on */
 	for (i = 0; i < (int)c->n_members; ++i) {
-		m = c->members + i;
+		const struct s_Member *m = c->members + i;
 		switch (m->type) {
 		case TYPE_CLASS:
 			fprintf(fp,
@@ -562,10 +562,9 @@ static int write_constructor(FILE *fp, struct s_Class *c)
 	return 1;
 }
 
-static int write_destructor(FILE *fp, struct s_Class *c)
+static int write_destructor(FILE *fp, const struct s_Class *c)
 {
 	int i;
-	struct s_Member *m;
 
 	/* clang-format off */
 	fprintf(fp,
@@ -579,7 +578,7 @@ static int write_destructor(FILE *fp, struct s_Class *c)
 	);
 	/* clang-format on */
 	for (i = c->n_members - 1; i >= 0; --i) {
-		m = c->members + i;
+		const struct s_Member *m = c->members + i;
 		switch (m->type) {
 		case TYPE_CLASS:
 			fprintf(fp,
@@ -636,7 +635,6 @@ static int write_destructor(FILE *fp, struct s_Class *c)
 static int write_assignment_operator(FILE *fp, struct s_Class *c)
 {
 	int i;
-	struct s_Member *m;
 
 	fprintf(fp,
 		"int %s_assign(%s *p, const %s *q)\n"
@@ -648,7 +646,7 @@ static int write_assignment_operator(FILE *fp, struct s_Class *c)
 		c->name,
 		c->name);
 	for (i = 0; i < (int)c->n_members; ++i) {
-		m = c->members + i;
+		const struct s_Member *m = c->members + i;
 		fprintf(fp,
 			"\t\tok = ok && %s_set_%s(p, %s_get_%s(q));\n",
 			c->name,
@@ -665,7 +663,7 @@ static int write_assignment_operator(FILE *fp, struct s_Class *c)
 	return 1;
 }
 
-static int write_copy_constructor(FILE *fp, struct s_Class *c)
+static int write_copy_constructor(FILE *fp, const struct s_Class *c)
 {
 	fprintf(fp,
 		"%s *%s_dup(const %s *q)\n"
@@ -688,7 +686,8 @@ static int write_copy_constructor(FILE *fp, struct s_Class *c)
 	return 1;
 }
 
-static int write_methods(FILE *fp, const char *class_name, struct s_Member *m)
+static int write_methods(
+	FILE *fp, const char *class_name, const struct s_Member *m)
 {
 	switch (m->type) {
 	case TYPE_CLASS:
@@ -900,7 +899,6 @@ static int write_methods(FILE *fp, const char *class_name, struct s_Member *m)
 static int write_source(FILE *fp, struct s_Class *c)
 {
 	int i;
-	struct s_Member *m;
 
 	fprintf(fp,
 		"/*!\n"
@@ -941,7 +939,7 @@ static int write_source(FILE *fp, struct s_Class *c)
 	fprintf(fp, "\n");
 	/* Member methods */
 	for (i = 0; i < (int)c->n_members; ++i) {
-		m = c->members + i;
+		const struct s_Member *m = c->members + i;
 		write_methods(fp, c->name, m);
 	}
 
@@ -952,7 +950,6 @@ int main(int argc, const char *argv[])
 {
 	(void)argc;
 	(void)argv;
-	FILE *fp;
 	int i;
 	int n;
 	struct s_Class *c = my_classes;
@@ -961,7 +958,7 @@ int main(int argc, const char *argv[])
 	printf("Found %d classes.\n", n);
 	for (i = 0; i < n; ++i) {
 		/* Header file */
-		fp = fopen(c[i].header, "w+");
+		FILE *fp = fopen(c[i].header, "w+");
 		if (!fp) {
 			continue;
 		}
