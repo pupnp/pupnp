@@ -129,6 +129,7 @@ upnp/unittest/unittest-1.8
 upnp/unittest/*.pp.c
 docs/doxygen
 
+upnp/libupnp_err.log
 ixml/test-suite.log
 ixml/test/test_document.sh.log
 ixml/test/test_document.sh.trs
