@@ -92,14 +92,12 @@ int FreeListFree(FreeList *free_list, void *element)
 int FreeListDestroy(FreeList *free_list)
 {
 	FreeListNode *temp = NULL;
-	int i = 0;
 
 	assert(free_list != NULL);
 
 	if (!free_list)
 		return EINVAL;
 	while (free_list->head) {
-		i++;
 		temp = free_list->head->next;
 		free(free_list->head);
 		free_list->head = temp;
