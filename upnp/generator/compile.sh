@@ -1,70 +1,72 @@
 #! /bin/bash
+#
+# Run this script in the generator folder.
+#
 
-#make clean && make && ./generator
+make clean && make && ./generator
 
-function compile
-{
+function compile {
 	local FILE=$1
 	echo -n "Compiling $FILE.c ... "
-	gcc -Wall ${INCLUDES} -c $FILE.c
+	gcc -Wall "${INCLUDES[@]}" -c "$FILE".c
 	echo "done!"
 }
 
-function movefile
-{
+function movefile {
 	local FILE=$1
 	DESTINATION=$2
 	echo -n "Moving ${FILE} to $DESTINATION ... "
-	mv ${FILE} ${DESTINATION}
+	mv "${FILE}" "${DESTINATION}"
 	echo "done!"
 }
 
 FILES_API=(
-UpnpActionComplete
-UpnpActionRequest
-UpnpDiscovery
-UpnpEvent
-UpnpEventSubscribe
-UpnpExtraHeaders
-UpnpFileInfo
-UpnpStateVarComplete
-UpnpStateVarRequest
-UpnpSubscriptionRequest
+	UpnpActionComplete
+	UpnpActionRequest
+	UpnpDiscovery
+	UpnpEvent
+	UpnpEventSubscribe
+	UpnpExtraHeaders
+	UpnpFileInfo
+	UpnpStateVarComplete
+	UpnpStateVarRequest
+	UpnpSubscriptionRequest
 )
 
 FILES_OTHERS=(
-GenlibClientSubscription
-SSDPResultData
+	GenlibClientSubscription
+	SSDPResultData
 )
 
 FILES_TEST=(
-TestClass
+	TestClass
 )
 
 ALL_FILES=("${FILES_API[@]}" "${FILES_OTHERS[@]}" "${FILES_TEST[@]}")
 
 echo
-INCLUDES="-I. -I../.. -I../../upnp/src/inc -I../../ixml/inc -I../../upnp/inc/"
+INCLUDES=("-I." "-I../.." "-I../src/inc" "-I../../upnp/src/inc" "-I../../ixml/inc" "-I../../upnp/inc")
 for FILE in "${ALL_FILES[@]}"; do
-	compile $FILE
+	compile "$FILE"
+	clang-format -i "$FILE".c
+	clang-format -i "$FILE".h
 done
 
-rm *.o
+rm ./*.o
 
 echo
 for FILE in "${FILES_API[@]}"; do
-	movefile $FILE.h ../inc
+	movefile "$FILE".h ../inc
 done
 
 for FILE in "${FILES_API[@]}"; do
-	movefile $FILE.c ../src/api
+	movefile "$FILE".c ../src/api
 done
 
 FILE=${FILES_OTHERS[0]}
-movefile $FILE.h ../src/inc
-movefile $FILE.c ../src/genlib/client_table
+movefile "$FILE".h ../src/inc
+movefile "$FILE".c ../src/genlib/client_table
 
 FILE=${FILES_OTHERS[1]}
-movefile $FILE.h ../src/ssdp
-movefile $FILE.c ../src/ssdp
-
+movefile "$FILE".h ../src/ssdp
+movefile "$FILE".c ../src/ssdp
