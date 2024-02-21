@@ -152,3 +152,8 @@ upnp/generator/generator
 
 /build
 /build.win32
+
+compile_commands.json
+pupnp-cppcheck-build-dir
+pupnp.cppcheck
+
