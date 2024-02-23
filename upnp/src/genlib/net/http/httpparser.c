@@ -286,7 +286,8 @@ static parse_status_t scanner_get_token(
 				break;
 			} else if (c == '\\') {
 				if (cursor < null_terminator) {
-					c = *cursor++;
+					/* c = *cursor++; */
+					cursor++;
 					/* the char after '\\' could be ANY
 					 * octet */
 				}

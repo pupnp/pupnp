@@ -2696,7 +2696,7 @@ void Parser_setBeforeFree(IXML_BeforeFreeNode_t hndlr)
 	Before_Free_callback = hndlr;
 }
 
-IXML_BeforeFreeNode_t Parser_getBeforeFree() { return Before_Free_callback; }
+IXML_BeforeFreeNode_t Parser_getBeforeFree(void) { return Before_Free_callback; }
 #endif
 
 /*!
@@ -2704,7 +2704,7 @@ IXML_BeforeFreeNode_t Parser_getBeforeFree() { return Before_Free_callback; }
  *
  * \return The parser object or \b NULL if there is not enough memory.
  */
-static Parser *Parser_init()
+static Parser *Parser_init(void)
 {
 	Parser *newParser = NULL;
 

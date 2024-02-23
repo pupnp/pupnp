@@ -126,7 +126,7 @@ void Parser_setBeforeFree(
 /*!
  * \brief Gets the handler to call before a node is freed.
  */
-IXML_BeforeFreeNode_t Parser_getBeforeFree();
+	IXML_BeforeFreeNode_t Parser_getBeforeFree(void);
 #endif
 
 /*!
