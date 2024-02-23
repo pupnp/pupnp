@@ -2696,7 +2696,10 @@ void Parser_setBeforeFree(IXML_BeforeFreeNode_t hndlr)
 	Before_Free_callback = hndlr;
 }
 
-IXML_BeforeFreeNode_t Parser_getBeforeFree(void) { return Before_Free_callback; }
+IXML_BeforeFreeNode_t Parser_getBeforeFree(void)
+{
+	return Before_Free_callback;
+}
 #endif
 
 /*!
