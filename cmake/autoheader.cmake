@@ -18,7 +18,7 @@ if (NOT PUPNP_VERSION_STRING)
 			string (REGEX REPLACE ";" "" line ${line})
 			string (REGEX REPLACE "[ \t\r\n] *" " " line ${line})
 
-			if (line MATCHES  "AC_INIT\\\(([^,]*),([0-9]*\.[0-9]*\.[0-9]*)([^\)]*)\\\)")
+			if (line MATCHES  "AC_INIT\\\(([^,]*),([0-9]+\.[0-9]+\.[0-9]+)([^\)]*)\\\)")
 				message (STATUS "Setting package-version to ${CMAKE_MATCH_2}")
 				set (PUPNP_VERSION_STRING ${CMAKE_MATCH_2} CACHE STRING "Version of the whole package" FORCE)
 				#message (STATUS "Extracted package name is ${CMAKE_MATCH_1}")
