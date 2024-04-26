@@ -38,18 +38,22 @@
  ***************************************************************************/
 
 /** The library version (string) e.g. "1.3.0" */
+#undef UPNP_VERSION_STRING
 #cmakedefine UPNP_VERSION_STRING "${UPNP_VERSION_STRING}"
 
 /** Major version of the library */
+#undef UPNP_VERSION_MAJOR
 #cmakedefine UPNP_VERSION_MAJOR ${UPNP_VERSION_MAJOR}
 
 /** Minor version of the library */
+#undef UPNP_VERSION_MINOR
 #cmakedefine UPNP_VERSION_MINOR ${UPNP_VERSION_MINOR}
 #ifndef UPNP_VERSION_MINOR
 #	define UPNP_VERSION_MINOR 0
 #endif
 
 /** Patch version of the library */
+#undef UPNP_VERSION_PATCH
 #cmakedefine UPNP_VERSION_PATCH ${UPNP_VERSION_PATCH}
 #ifndef UPNP_VERSION_PATCH
 #	define UPNP_VERSION_PATCH 0
