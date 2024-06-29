@@ -449,7 +449,7 @@ static char *AllocGenaHeaders(
 		"%s%s%" PRIzu "%s%s%s",
 		HEADER_LINE_1,
 		HEADER_LINE_2A,
-		(unsigned long)strlen(propertySet) + 2,
+		strlen(propertySet) + 2,
 		HEADER_LINE_2B,
 		HEADER_LINE_3,
 		HEADER_LINE_4);
