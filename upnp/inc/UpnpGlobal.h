@@ -44,12 +44,19 @@
 	 * PRIzx
 	 */
 	#ifdef UPNP_USE_MSVCPP
-		/* define some things the M$ VC++ doesn't know */
-		#define UPNP_INLINE _inline
+		#if _MSC_VER > 1900
+			#define UPNP_INLINE inline
+			#define PRIzd "zd"
+			#define PRIzu "zu"
+			#define PRIzx "zx"
+		#else
+			/* define some things the M$ VC++ doesn't know */
+			#define UPNP_INLINE _inline
 typedef __int64 int64_t;
-		#define PRIzd "ld"
-		#define PRIzu "lu"
-		#define PRIzx "lx"
+			#define PRIzd "ld"
+			#define PRIzu "lu"
+			#define PRIzx "lx"
+		#endif
 	#endif /* UPNP_USE_MSVCPP */
 
 	#ifdef UPNP_USE_BCBPP
