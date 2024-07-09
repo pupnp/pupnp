@@ -231,6 +231,8 @@ static struct document_type_t gMediaTypeList[NUM_MEDIA_TYPES];
 
 /*! Global variable. A local dir which serves as webserver root. */
 membuffer gDocumentRootDir;
+/*! Global variable. A string which is set in the header field. */
+membuffer gWebserverCorsString;
 
 /*! XML document. */
 static struct xml_alias_t gAliasDoc;
@@ -475,6 +477,7 @@ int web_server_init()
 		/* decode media list */
 		media_list_init();
 		membuffer_init(&gDocumentRootDir);
+		membuffer_init(&gWebserverCorsString);
 		glob_alias_init();
 		pVirtualDirList = NULL;
 
@@ -499,6 +502,7 @@ void web_server_destroy(void)
 {
 	if (bWebServerState == WEB_SERVER_ENABLED) {
 		membuffer_destroy(&gDocumentRootDir);
+		membuffer_destroy(&gWebserverCorsString);
 		alias_release(&gAliasDoc);
 
 		ithread_mutex_lock(&gWebMutex);
@@ -602,6 +606,17 @@ int web_server_set_root_dir(const char *root_dir)
 		if (gDocumentRootDir.buf[index] == '/')
 			membuffer_delete(&gDocumentRootDir, index, 1);
 	}
+
+	return 0;
+}
+
+int web_server_set_cors(const char *cors_string)
+{
+	int ret;
+
+	ret = membuffer_assign_str(&gWebserverCorsString, cors_string);
+	if (ret != 0)
+		return ret;
 
 	return 0;
 }
@@ -1367,15 +1382,7 @@ static int process_request(
 		/*          goto error_handler; */
 		/*      } */
 	}
-	{
-		UpnpListHead *eHeader =
-			UpnpFileInfo_get_ExtraHeadersList(finfo);
-		UpnpExtraHeaders *h = UpnpExtraHeaders_new();
-		UpnpExtraHeaders_set_resp(h, "Access-Control-Allow-Origin: *");
-		UpnpListInsert(eHeader,
-			UpnpListEnd(eHeader),
-			UpnpExtraHeaders_get_node(h));
-	}
+	RespInstr->CorsHeader = (gWebserverCorsString.length > 0) ? gWebserverCorsString.buf : NULL;
 	RespInstr->ReadSendSize = UpnpFileInfo_get_FileLength(finfo);
 	/* Check other header field. */
 	code = CheckOtherHTTPHeaders(
@@ -1414,7 +1421,7 @@ static int process_request(
 			    resp_minor,
 			    "R"
 			    "T"
-			    "GKLD"
+			    "GKLAD"
 			    "s"
 			    "tcS"
 			    "Xc"
@@ -1424,6 +1431,7 @@ static int process_request(
 				    finfo), /* content type */
 			    RespInstr,	    /* range info */
 			    RespInstr,	    /* language info */
+			    RespInstr,	    /* Access-Control-Allow-Origin */
 			    "LAST-MODIFIED: ",
 			    &aux_LastModified,
 			    X_USER_AGENT,
@@ -1438,7 +1446,7 @@ static int process_request(
 			    "R"
 			    "N"
 			    "T"
-			    "GLD"
+			    "GLAD"
 			    "s"
 			    "tcS"
 			    "Xc"
@@ -1449,6 +1457,7 @@ static int process_request(
 				    finfo), /* content type */
 			    RespInstr,	    /* range info */
 			    RespInstr,	    /* language info */
+			    RespInstr,	    /* Access-Control-Allow-Origin */
 			    "LAST-MODIFIED: ",
 			    &aux_LastModified,
 			    X_USER_AGENT,
@@ -1461,7 +1470,7 @@ static int process_request(
 			    resp_major,
 			    resp_minor,
 			    "RK"
-			    "TLD"
+			    "TLAD"
 			    "s"
 			    "tcS"
 			    "Xc"
@@ -1470,6 +1479,7 @@ static int process_request(
 			    UpnpFileInfo_get_ContentType(
 				    finfo), /* content type */
 			    RespInstr,	    /* language info */
+			    RespInstr,	    /* Access-Control-Allow-Origin */
 			    "LAST-MODIFIED: ",
 			    &aux_LastModified,
 			    X_USER_AGENT,
@@ -1484,7 +1494,7 @@ static int process_request(
 				    resp_minor,
 				    "R"
 				    "N"
-				    "TLD"
+				    "TLAD"
 				    "s"
 				    "tcS"
 				    "Xc"
@@ -1495,6 +1505,7 @@ static int process_request(
 				    UpnpFileInfo_get_ContentType(
 					    finfo), /* content type */
 				    RespInstr,	    /* language info */
+			    RespInstr,	    /* Access-Control-Allow-Origin */
 				    "LAST-MODIFIED: ",
 				    &aux_LastModified,
 				    X_USER_AGENT,
@@ -1507,7 +1518,7 @@ static int process_request(
 				    resp_major,
 				    resp_minor,
 				    "R"
-				    "TLD"
+				    "TLAD"
 				    "s"
 				    "tcS"
 				    "Xc"
@@ -1516,6 +1527,7 @@ static int process_request(
 				    UpnpFileInfo_get_ContentType(
 					    finfo), /* content type */
 				    RespInstr,	    /* language info */
+			    RespInstr,	    /* Access-Control-Allow-Origin */
 				    "LAST-MODIFIED: ",
 				    &aux_LastModified,
 				    X_USER_AGENT,
