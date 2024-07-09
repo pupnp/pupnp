@@ -53,6 +53,8 @@ struct SendInstruction
 	off_t ReadSendSize;
 	/*! Recv from the network and write into local file. */
 	long RecvWriteSize;
+	/*! CorsHeader. */
+	const void *CorsHeader;
 	/*! Cookie associated with the virtualDir. */
 	const void *Cookie;
 	/*! Cookie associated with the request. */
@@ -114,6 +116,16 @@ int web_server_set_alias(
 int web_server_set_root_dir(
 	/*! [in] String having the root directory for the document. */
 	const char *root_dir);
+
+/*!
+ * \brief Assign the Access-Control-Allow-Origin specfied by the input
+ * const char* cors_string parameterto the global CORS string
+ *
+ * \return Integer.
+ */
+int web_server_set_cors(
+	/*! [in] String having the Access-Control-Allow-Origin string. */
+	const char *cors_string);
 
 /*!
  * \brief Main entry point into web server; Handles HTTP GET and HEAD
