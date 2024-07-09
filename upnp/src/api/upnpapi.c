@@ -190,6 +190,9 @@ static void *HandleTable[NUM_HANDLE];
 /*! a local dir which serves as webserver root */
 extern membuffer gDocumentRootDir;
 
+/*! a string which is set in the header field */
+extern membuffer gWebserverCorsString;
+
 /*! Maximum content-length (in bytes) that the SDK will process on an incoming
  * packet. Content-Length exceeding this size will be not processed and
  * error 413 (HTTP Error Code) will be returned to the remote end point. */
@@ -516,6 +519,7 @@ static int UpnpInitStartServers(
 
 #if EXCLUDE_WEB_SERVER == 0
 	membuffer_init(&gDocumentRootDir);
+	membuffer_init(&gWebserverCorsString);
 	retVal = UpnpEnableWebserver(WEB_SERVER_ENABLED);
 	if (retVal != UPNP_E_SUCCESS) {
 		UpnpFinish();
@@ -4318,6 +4322,19 @@ int UpnpSetWebServerRootDir(const char *rootDir)
 	membuffer_destroy(&gDocumentRootDir);
 
 	return web_server_set_root_dir(rootDir);
+}
+
+int UpnpSetWebServerCorsString(const char *corsString)
+{
+	if (UpnpSdkInit == 0)
+		return UPNP_E_FINISH;
+	if ((corsString == NULL) || (strlen(corsString) == 0)) {
+		return UPNP_E_INVALID_PARAM;
+	}
+
+	membuffer_destroy(&gWebserverCorsString);
+
+	return web_server_set_cors(corsString);
 }
 #endif /* INTERNAL_WEB_SERVER */
 
