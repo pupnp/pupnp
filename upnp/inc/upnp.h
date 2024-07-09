@@ -2804,6 +2804,41 @@ UPNP_EXPORT_SPEC void UpnpSetHostValidateCallback(
 UPNP_EXPORT_SPEC void UpnpSetAllowLiteralHostRedirection(int enable);
 
 /*!
+ * \brief Sets the document root directory for the internal web server.
+ *
+ * This directory is considered the root directory (i.e. "/") of the web server.
+ *
+ * This function also activates or deactivates the web server. To disable the
+ * web server, pass \c NULL for \b rootDir; to activate, pass a valid directory
+ * string.
+ *
+ * \note This function is not available when the web server is not compiled
+ * 	into the UPnP Library.
+ *
+ * \return An integer representing one of the following:
+ *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *       \li \c UPNP_E_INVALID_ARGUMENT: \b rootDir is an invalid directory.
+ */
+UPNP_EXPORT_SPEC int UpnpSetWebServerRootDir(
+	/*! [in] Path of the root directory of the web server. */
+	const char *rootDir);
+
+/*!
+ * \brief Assign the Access-Control-Allow-Origin specfied by the input
+ * const char* cors_string parameterto the global CORS string
+ *
+ * \note This function is not available when the web server is not compiled
+ * 	into the UPnP Library.
+ *
+ * \return An integer representing one of the following:
+ *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *       \li \c UPNP_E_INVALID_ARGUMENT: \b rootDir is an invalid directory.
+ */
+UPNP_EXPORT_SPEC int UpnpSetWebServerCorsString(
+	/*! [in] String having the Access-Control-Allow-Origin string. */
+	const char *corsString);
+
+/*!
  * \brief Adds a virtual directory mapping.
  *
  * All webserver requests containing the given directory are read using
