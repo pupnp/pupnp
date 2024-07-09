@@ -1507,7 +1507,7 @@ static int process_request(
 				    UpnpFileInfo_get_ContentType(
 					    finfo), /* content type */
 				    RespInstr,	    /* language info */
-				    RespInstr,	    /* Access-Control-Allow-Origin */
+				    RespInstr, /* Access-Control-Allow-Origin */
 				    "LAST-MODIFIED: ",
 				    &aux_LastModified,
 				    X_USER_AGENT,
@@ -1529,7 +1529,7 @@ static int process_request(
 				    UpnpFileInfo_get_ContentType(
 					    finfo), /* content type */
 				    RespInstr,	    /* language info */
-				    RespInstr,	    /* Access-Control-Allow-Origin */
+				    RespInstr, /* Access-Control-Allow-Origin */
 				    "LAST-MODIFIED: ",
 				    &aux_LastModified,
 				    X_USER_AGENT,
