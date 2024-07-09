@@ -613,9 +613,10 @@ static int check_soapaction_hdr(
 
 	/* check service type */
 	if (value.buf[0] != '\"') {
-		goto error_handler;
+		serv_type = &value.buf[0];
+	} else {
+		serv_type = &value.buf[1];
 	}
-	serv_type = &value.buf[1];
 	col_pos1 = strrchr(serv_type, ':');
 	if (NULL == col_pos1) {
 		goto error_handler;
