@@ -1734,8 +1734,8 @@ int http_MakeMessage(membuffer *buf,
 				goto error_handler;
 		} else if (c == 'K') {
 			/* Add Chunky header */
-			if (membuffer_append_str(buf,
-				    "TRANSFER-ENCODING: chunked\r\n"))
+			if (membuffer_append_str(
+				    buf, "TRANSFER-ENCODING: chunked\r\n"))
 				goto error_handler;
 		} else if (c == 'A') {
 			/* Add Access-Control-Allow-Origin header only if
@@ -1744,7 +1744,8 @@ int http_MakeMessage(membuffer *buf,
 			RespInstr = (struct SendInstruction *)va_arg(
 				argp, struct SendInstruction *);
 			assert(RespInstr);
-			if (RespInstr->CorsHeader && strcmp(RespInstr->CorsHeader, "") &&
+			if (RespInstr->CorsHeader &&
+				strcmp(RespInstr->CorsHeader, "") &&
 				http_MakeMessage(buf,
 					http_major_version,
 					http_minor_version,

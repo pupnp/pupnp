@@ -1382,7 +1382,9 @@ static int process_request(
 		/*          goto error_handler; */
 		/*      } */
 	}
-	RespInstr->CorsHeader = (gWebserverCorsString.length > 0) ? gWebserverCorsString.buf : NULL;
+	RespInstr->CorsHeader = (gWebserverCorsString.length > 0)
+					? gWebserverCorsString.buf
+					: NULL;
 	RespInstr->ReadSendSize = UpnpFileInfo_get_FileLength(finfo);
 	/* Check other header field. */
 	code = CheckOtherHTTPHeaders(
@@ -1505,7 +1507,7 @@ static int process_request(
 				    UpnpFileInfo_get_ContentType(
 					    finfo), /* content type */
 				    RespInstr,	    /* language info */
-			    RespInstr,	    /* Access-Control-Allow-Origin */
+				    RespInstr,	    /* Access-Control-Allow-Origin */
 				    "LAST-MODIFIED: ",
 				    &aux_LastModified,
 				    X_USER_AGENT,
@@ -1527,7 +1529,7 @@ static int process_request(
 				    UpnpFileInfo_get_ContentType(
 					    finfo), /* content type */
 				    RespInstr,	    /* language info */
-			    RespInstr,	    /* Access-Control-Allow-Origin */
+				    RespInstr,	    /* Access-Control-Allow-Origin */
 				    "LAST-MODIFIED: ",
 				    &aux_LastModified,
 				    X_USER_AGENT,
