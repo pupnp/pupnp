@@ -364,7 +364,7 @@ static int UpnpInitThreadPools(void)
 	TPAttrSetStackSize(&attr, THREAD_STACK_SIZE);
 	TPAttrSetJobsPerThread(&attr, JOBS_PER_THREAD);
 	TPAttrSetIdleTime(&attr, THREAD_IDLE_TIME);
-	TPAttrSetMaxJobsTotal(&attr, MAX_JOBS_TOTAL);
+	TPAttrSetMaxJobsTotal(&attr, maxJobsTotal);
 
 	if (ThreadPoolInit(&gSendThreadPool, &attr) != UPNP_E_SUCCESS) {
 		ret = UPNP_E_INIT_FAILED;

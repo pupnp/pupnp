@@ -120,6 +120,7 @@ typedef enum priority
 
 /*! default max jobs used TPAttrInit */
 #define DEFAULT_MAX_JOBS_TOTAL 100
+extern int maxJobsTotal;
 
 /*!
  * \brief Statistics.
@@ -248,6 +249,13 @@ typedef struct THREADPOOL
 	/*! statistics */
 	ThreadPoolStats stats;
 } ThreadPool;
+
+/*!
+ * \brief Sets the maximum number of jobs in the thread pool.
+ * This option is intended for server applications to avoid an overflow of
+ * jobs when serving e.g. many web requests.
+ */
+void TPSetMaxJobsTotal(int mjt);
 
 /*!
  * \brief Initializes and starts ThreadPool. Must be called first and

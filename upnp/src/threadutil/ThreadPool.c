@@ -1067,6 +1067,10 @@ int ThreadPoolShutdown(ThreadPool *tp)
 	return 0;
 }
 
+int maxJobsTotal = DEFAULT_MAX_JOBS_TOTAL;
+
+void TPSetMaxJobsTotal(int mjt) { maxJobsTotal = mjt; }
+
 int TPAttrInit(ThreadPoolAttr *attr)
 {
 	if (!attr)
@@ -1078,7 +1082,7 @@ int TPAttrInit(ThreadPoolAttr *attr)
 	attr->stackSize = DEFAULT_STACK_SIZE;
 	attr->schedPolicy = DEFAULT_POLICY;
 	attr->starvationTime = DEFAULT_STARVATION_TIME;
-	attr->maxJobsTotal = DEFAULT_MAX_JOBS_TOTAL;
+	attr->maxJobsTotal = maxJobsTotal;
 
 	return 0;
 }

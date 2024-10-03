@@ -57,6 +57,13 @@ extern "C" {
 	#endif
 
 /*!
+ * \brief Sets the maximum number of jobs in the internal thread pool.
+ * This option is intended for server applications to avoid an overflow of
+ * jobs when serving e.g. many web requests.
+ */
+UPNP_EXPORT_SPEC void UpnpSetMaxJobsTotal(int mjt);
+
+/*!
  * \brief Converts an SDK error code into a string error message suitable for
  * display. The memory returned from this function should NOT be freed.
  *

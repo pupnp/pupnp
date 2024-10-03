@@ -40,6 +40,8 @@
 	#include "upnp.h"
 	#include "upnptools.h"
 
+	#include "ThreadPool.h"
+
 	#include "uri.h"
 
 	#include <stdarg.h>
@@ -124,6 +126,8 @@ const char *UpnpGetErrorMessage(int rc)
 
 	return "Unknown error code";
 }
+
+void UpnpSetMaxJobsTotal(int mjt) { TPSetMaxJobsTotal(mjt); }
 
 /*!
  * \todo There is some unnecessary allocation and deallocation going on here
