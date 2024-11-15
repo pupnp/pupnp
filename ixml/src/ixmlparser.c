@@ -41,6 +41,7 @@
 #include "ixmldebug.h"
 
 #include <assert.h>
+#include <limits.h>
 #include <stddef.h> /* for ptrdiff_t */
 #include <stdio.h>
 #include <stdlib.h> /* for free(), malloc() */
@@ -996,6 +997,13 @@ static int Parser_getChar(
 		pnum = src + strlen(ESC_DEC);
 		sum = 0;
 		while (strchr(DEC_NUMBERS, (int)*pnum) != 0) {
+			/* Keep away from INT_MAX to avoid overflow. Using 10 in
+			 * this test not enough to avoid overflow, so we use
+			 * 100. */
+			if (sum > INT_MAX / 100) {
+				line = __LINE__;
+				goto fail_entity;
+			}
 			sum = sum * 10 + (*pnum - '0');
 			pnum++;
 		}
