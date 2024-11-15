@@ -22,6 +22,16 @@ run() {
    ./$DIR/FuzzIxml $DIR/FuzzIxml_corpus/ $DIR/FuzzIxml_seed_corpus/
 }
 
+usage() {
+   echo "usage: $0 ASan | UBSan | MSan | Run"
+}
+
+if [ $# -eq 0 ]; then
+   echo "Error: No arguments supplied"
+   usage
+   exit 1
+fi
+
 if [ "$1" == "ASan" ]; then
    build "-O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link"
 elif [ "$1" == "UBSan" ]; then
@@ -31,5 +41,6 @@ elif [ "$1" == "MSan" ]; then
 elif [ "$1" == "Run" ]; then
    run
 else
-   echo "use: ./$0 ASan | UBSan | MSan | Run"
+   echo "Error: Wrong arguments supplied"
+   usage
 fi
