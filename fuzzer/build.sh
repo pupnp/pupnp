@@ -7,7 +7,7 @@ build() {
 
    mkdir -p build && cd build/
    cmake -DFUZZER=ON -DLIB_FUZZING_ENGINE="$LIB_FUZZING_ENGINE" ../../.
-   make -j$(nproc)
+   make -j"$(nproc)"
 
    cd fuzzer/
 
@@ -22,7 +22,7 @@ run() {
    ./$DIR/FuzzIxml $DIR/FuzzIxml_corpus/ $DIR/FuzzIxml_seed_corpus/
 }
 
-if [ $1 == "ASan" ]; then
+if [ "$1" == "ASan" ]; then
    build "-O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link"
 elif [ "$1" == "UBSan" ]; then
    build "-O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=array-bounds,bool,builtin,enum,float-divide-by-zero,function,integer-divide-by-zero,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,unsigned-integer-overflow,unreachable,vla-bound,vptr -fno-sanitize-recover=array-bounds,bool,builtin,enum,float-divide-by-zero,function,integer-divide-by-zero,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,unreachable,vla-bound,vptr -fsanitize=fuzzer-no-link"
