@@ -5,7 +5,9 @@ build() {
    export CXXFLAGS="$1"
    export LIB_FUZZING_ENGINE=-fsanitize=fuzzer
 
-   mkdir -p build && cd build/
+   rm -rf build
+   mkdir -p build
+   cd build/
    cmake -DFUZZER=ON -DLIB_FUZZING_ENGINE="$LIB_FUZZING_ENGINE" ../../.
    make -j"$(nproc)"
 
