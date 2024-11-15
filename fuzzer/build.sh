@@ -28,6 +28,9 @@ usage() {
    echo "usage: $0 ASan | UBSan | MSan | Run"
 }
 
+export CC=clang
+export CXX=clang++
+
 if [ $# -eq 0 ]; then
    echo "Error: No arguments supplied"
    usage
