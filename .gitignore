@@ -150,8 +150,8 @@ upnp/test_log.trs
 
 upnp/generator/generator
 
-/build
-/build.win32
+build
+build.win32
 
 compile_commands.json
 pupnp-cppcheck-build-dir
