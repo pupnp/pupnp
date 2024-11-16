@@ -79,13 +79,13 @@ GSYMS
 GTAGS
 
 # QT-Creator files
-/*.cflags
-/*.config
-/*.creator
-/*.creator.user
-/*.cxxflags
-/*.files
-/*.includes
+*.cflags
+*.config
+*.creator
+*.creator.user
+*.cxxflags
+*.files
+*.includes
 /*.pro
 /*.pro.user
 /Makefile.am.user
