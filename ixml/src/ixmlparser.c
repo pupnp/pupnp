@@ -972,6 +972,10 @@ static int Parser_getChar(
 		/* Read in escape characters of type &#xnn where nn is a
 		 * hexadecimal value */
 		pnum = src + strlen(ESC_HEX);
+		if (!*pnum) {
+			line = __LINE__;
+			goto fail_entity;
+		}
 		sum = 0;
 		while (strchr(HEX_NUMBERS, (int)*pnum) != 0) {
 			c = *pnum;
