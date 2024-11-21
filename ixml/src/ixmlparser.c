@@ -995,6 +995,10 @@ static int Parser_getChar(
 		/* Read in escape characters of type &#nn where nn is a decimal
 		 * value */
 		pnum = src + strlen(ESC_DEC);
+		if (!*pnum) {
+			line = __LINE__;
+			goto fail_entity;
+		}
 		sum = 0;
 		while (strchr(DEC_NUMBERS, (int)*pnum) != 0) {
 			/* Keep away from INT_MAX to avoid overflow. Using 10 in
