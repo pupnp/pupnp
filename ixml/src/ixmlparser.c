@@ -676,21 +676,21 @@ static int Parser_skipMisc(
 
 	while ((done == 0) && (rc == IXML_SUCCESS)) {
 		if (strncasecmp(xmlParser->curPtr,
-			    (char *)BEGIN_COMMENT,
+			    BEGIN_COMMENT,
 			    strlen(BEGIN_COMMENT)) == 0) {
 			/* <!-- */
 			rc = Parser_skipComment(&(xmlParser->curPtr));
 
 		} else if (strncasecmp(xmlParser->curPtr,
-				   (char *)XMLDECL,
+				   XMLDECL,
 				   strlen(XMLDECL)) == 0 ||
 			   strncasecmp(xmlParser->curPtr,
-				   (char *)XMLDECL2,
+				   XMLDECL2,
 				   strlen(XMLDECL2)) == 0) {
 			/* <?xml or <?xml? */
 			rc = IXML_SYNTAX_ERR;
 		} else if (strncasecmp(xmlParser->curPtr,
-				   (char *)BEGIN_PI,
+				   BEGIN_PI,
 				   strlen(BEGIN_PI)) == 0) {
 			/* <? */
 			rc = Parser_skipString(&xmlParser->curPtr, END_PI);
@@ -720,7 +720,7 @@ static int Parser_skipProlog(
 	Parser_skipBom(xmlParser);
 	Parser_skipWhiteSpaces(xmlParser);
 
-	if (strncmp(xmlParser->curPtr, (char *)XMLDECL, strlen(XMLDECL)) == 0) {
+	if (strncmp(xmlParser->curPtr, XMLDECL, strlen(XMLDECL)) == 0) {
 		/* <?xml */
 		rc = Parser_skipXMLDecl(xmlParser);
 		if (rc != IXML_SUCCESS) {
@@ -730,7 +730,7 @@ static int Parser_skipProlog(
 
 	rc = Parser_skipMisc(xmlParser);
 	if ((rc == IXML_SUCCESS) && strncmp(xmlParser->curPtr,
-					    (char *)BEGIN_DOCTYPE,
+					    BEGIN_DOCTYPE,
 					    strlen(BEGIN_DOCTYPE)) == 0) {
 		/* <! DOCTYPE */
 		xmlParser->curPtr++;
@@ -1381,13 +1381,13 @@ static int Parser_skipPI(
 		return IXML_FAILED;
 	}
 
-	if ((strncasecmp(*pSrc, (char *)XMLDECL, strlen(XMLDECL)) == 0) ||
-		(strncasecmp(*pSrc, (char *)XMLDECL2, strlen(XMLDECL2)) == 0)) {
+	if ((strncasecmp(*pSrc, XMLDECL, strlen(XMLDECL)) == 0) ||
+		(strncasecmp(*pSrc, XMLDECL2, strlen(XMLDECL2)) == 0)) {
 		/* not allowed */
 		return IXML_SYNTAX_ERR;
 	}
 
-	if (strncasecmp(*pSrc, (char *)BEGIN_PI, strlen(BEGIN_PI)) == 0) {
+	if (strncasecmp(*pSrc, BEGIN_PI, strlen(BEGIN_PI)) == 0) {
 		pEnd = strstr(*pSrc, END_PI);
 		if ((pEnd != NULL) && (pEnd != *pSrc)) {
 			*pSrc = pEnd + strlen(BEGIN_PI);
@@ -1484,8 +1484,7 @@ static int Parser_processContent(
 
 	pEndContent = xmlParser->curPtr;
 	if (*pEndContent == LESSTHAN) {
-		if (strncmp(pEndContent, (char *)CDSTART, strlen(CDSTART)) ==
-			0) {
+		if (strncmp(pEndContent, CDSTART, strlen(CDSTART)) == 0) {
 			if (Parser_processCDSect(&pEndContent, node) !=
 				IXML_SUCCESS) {
 				line = __LINE__;
@@ -1495,7 +1494,7 @@ static int Parser_processContent(
 				xmlParser->curPtr = pEndContent;
 			}
 		} else if (strncmp(pEndContent,
-				   (char *)BEGIN_COMMENT,
+				   BEGIN_COMMENT,
 				   strlen(BEGIN_COMMENT)) == 0) {
 			if (Parser_skipComment(&pEndContent) != IXML_SUCCESS) {
 				line = __LINE__;
