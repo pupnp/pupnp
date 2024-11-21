@@ -2193,6 +2193,10 @@ static int Parser_setElementNamespace(
 	/*! [in] The name space string. */
 	const char *nsURI)
 {
+	if (!nsURI) {
+		/* Nothing to do */
+		goto end_function;
+	}
 	if (newElement != NULL) {
 		if (newElement->n.namespaceURI != NULL) {
 			return IXML_SYNTAX_ERR;
@@ -2204,6 +2208,7 @@ static int Parser_setElementNamespace(
 		}
 	}
 
+end_function:
 	return IXML_SUCCESS;
 }
 
