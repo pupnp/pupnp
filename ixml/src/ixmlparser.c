@@ -2607,6 +2607,7 @@ static int Parser_parseDocument(
 						xmlParser->currentNodePtr,
 						tempNode);
 					if (rc != IXML_SUCCESS) {
+						ixmlNode_free(tempNode);
 						goto ErrorHandler;
 					}
 
