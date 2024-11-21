@@ -268,12 +268,14 @@ dnl # "current:revision:age"
 dnl #
 dnl # - Code has changed in upnp
 dnl #   revision: 0 -> 1
+dnl # - Code has changed in ixml
+dnl #   revision: 2 -> 3
 dnl #
-dnl #AC_SUBST([LT_VERSION_IXML],       [12:2:1])
+dnl #AC_SUBST([LT_VERSION_IXML],       [12:3:1])
 dnl #AC_SUBST([LT_VERSION_UPNP],       [19:1:2])
 dnl #
 dnl ############################################################################
-AC_SUBST([LT_VERSION_IXML],       [12:2:1])
+AC_SUBST([LT_VERSION_IXML],       [12:3:1])
 AC_SUBST([LT_VERSION_UPNP],       [19:1:2])
 dnl ############################################################################
 dnl # Repeating the algorithm to place it closer to the modificatin place:
