@@ -1405,22 +1405,26 @@ static int Parser_processCDSect(
 	char *pEnd;
 	size_t tokenLength = (size_t)0;
 	char *pCDataStart;
+	int found_cdend = 0;
+	int isXMLchar = 0;
 
 	if (*pSrc == NULL) {
 		return IXML_FAILED;
 	}
-
 	pCDataStart = *pSrc + strlen(CDSTART);
 	pEnd = pCDataStart;
-	while ((Parser_isXmlChar((int)*pEnd)) && (*pEnd != '\0')) {
+	while ((isXMLchar = Parser_isXmlChar((int)*pEnd)) && (*pEnd != '\0')) {
 		if (strncmp(pEnd, CDEND, strlen(CDEND)) == 0) {
+			found_cdend = 1;
 			break;
 		} else {
 			pEnd++;
 		}
 	}
-
-	if ((pEnd - pCDataStart > 0) && (*pEnd != '\0')) {
+	if (!isXMLchar) {
+		return IXML_SYNTAX_ERR;
+	}
+	if ((pEnd - pCDataStart > 0) && (*pEnd != '\0') && found_cdend) {
 		tokenLength = (size_t)pEnd - (size_t)pCDataStart;
 		node->nodeValue = (char *)malloc(tokenLength + (size_t)1);
 		if (node->nodeValue == NULL) {
