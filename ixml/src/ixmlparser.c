@@ -613,10 +613,11 @@ static void Parser_skipWhiteSpaces(
 	/*! [in] The XML parser. */
 	Parser *xmlParser)
 {
-	while ((*(xmlParser->curPtr) != 0) &&
-		(strchr(WHITESPACE, (int)*(xmlParser->curPtr)) != NULL)) {
-		xmlParser->curPtr++;
+	char *p = xmlParser->curPtr;
+	while (*p && strchr(WHITESPACE, *p)) {
+		++p;
 	}
+	xmlParser->curPtr = p;
 }
 
 /*!
@@ -977,7 +978,7 @@ static int Parser_getChar(
 			goto fail_entity;
 		}
 		sum = 0;
-		while (strchr(HEX_NUMBERS, (int)*pnum) != 0) {
+		while (*pnum && strchr(HEX_NUMBERS, *pnum) != 0) {
 			/* Keep away from INT_MAX to avoid overflow. Using 16 in
 			 * this test not enough to avoid overflow, so we use
 			 * 256. */
@@ -1011,7 +1012,7 @@ static int Parser_getChar(
 			goto fail_entity;
 		}
 		sum = 0;
-		while (strchr(DEC_NUMBERS, (int)*pnum) != 0) {
+		while (*pnum && strchr(DEC_NUMBERS, *pnum) != 0) {
 			/* Keep away from INT_MAX to avoid overflow. Using 10 in
 			 * this test not enough to avoid overflow, so we use
 			 * 100. */
