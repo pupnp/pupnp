@@ -978,6 +978,13 @@ static int Parser_getChar(
 		}
 		sum = 0;
 		while (strchr(HEX_NUMBERS, (int)*pnum) != 0) {
+			/* Keep away from INT_MAX to avoid overflow. Using 16 in
+			 * this test not enough to avoid overflow, so we use
+			 * 256. */
+			if (sum > INT_MAX / 256) {
+				line = __LINE__;
+				goto fail_entity;
+			}
 			c = *pnum;
 			if (c <= '9') {
 				sum = sum * 16 + (c - '0');
