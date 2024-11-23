@@ -341,7 +341,7 @@ int ixmlNode_setNodeValue(IXML_Node *nodeptr, const char *newNodeValue)
 unsigned short ixmlNode_getNodeType(IXML_Node *nodeptr)
 {
 	if (nodeptr != NULL) {
-		return nodeptr->nodeType;
+		return (unsigned short)nodeptr->nodeType;
 	} else {
 		return (unsigned short)eINVALID_NODE;
 	}
