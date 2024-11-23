@@ -152,7 +152,6 @@ void ixmlNode_free(IXML_Node *nodeptr)
 				curr_child = prev_child;
 				next_child = curr_child->firstChild;
 			} while (next_child);
-			curr_child = prev_child;
 			/* current is now the last sibling of the last child. */
 			/* Delete the attribute nodes of this child */
 			/* Attribute nodes only have siblings. */
