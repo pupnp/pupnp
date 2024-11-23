@@ -47,7 +47,7 @@
 #include <stdlib.h> /* for free(), malloc() */
 #include <string.h>
 
-#include "posix_overwrites.h"
+#include "posix_overwrites.h" // IWYU pragma: keep
 
 static char g_error_char = '\0';
 #ifdef IXML_HAVE_SCRIPTSUPPORT
@@ -2640,11 +2640,12 @@ static int Parser_parseDocument(
 					if (rc != IXML_SUCCESS) {
 						goto ErrorHandler;
 					}
-
 					rc = ixmlNode_appendChild(
 						xmlParser->currentNodePtr,
-						&(cdataSecNode->n));
+						(IXML_Node *)cdataSecNode);
 					if (rc != IXML_SUCCESS) {
+						ixmlNode_free((IXML_Node *)
+								cdataSecNode);
 						goto ErrorHandler;
 					}
 					break;
