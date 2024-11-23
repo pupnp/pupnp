@@ -1128,24 +1128,24 @@ static IXML_Node *ixmlNode_cloneNodeTree(
 
 IXML_Node *ixmlNode_cloneNode(IXML_Node *nodeptr, int deep)
 {
-	IXML_Node *newNode;
-	IXML_Attr *newAttrNode;
+	IXML_Node *node = 0;
 
-	if (nodeptr == NULL) {
-		return NULL;
+	if (!nodeptr) {
+		goto end_function;
 	}
 
 	switch (nodeptr->nodeType) {
 	case eATTRIBUTE_NODE:
-		newAttrNode = ixmlNode_cloneAttrDirect((IXML_Attr *)nodeptr);
-		return (IXML_Node *)newAttrNode;
+		node = (IXML_Node *)ixmlNode_cloneAttrDirect(
+			(IXML_Attr *)nodeptr);
 		break;
-
 	default:
-		newNode = ixmlNode_cloneNodeTree(nodeptr, deep);
-		return newNode;
+		node = ixmlNode_cloneNodeTree(nodeptr, deep);
 		break;
 	}
+
+end_function:
+	return node;
 }
 
 IXML_NodeList *ixmlNode_getChildNodes(IXML_Node *nodeptr)
