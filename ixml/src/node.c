@@ -498,6 +498,7 @@ static int ixmlNode_allowChildren(
 		default:
 			return 0;
 		}
+		break;
 
 	default:
 		break;
