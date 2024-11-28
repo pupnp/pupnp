@@ -44,7 +44,7 @@
 #include "UpnpGlobal.h"
 #include "UpnpInet.h"
 #include "ixml.h"
-#include "upnpconfig.h"
+#include "upnpconfig.h" // IWYU pragma: keep
 
 /*
  * \todo Document the exact reason of these include files and solve this
@@ -397,15 +397,15 @@
  * the internal implementation of these data structures without breaking
  * the API.
  */
-#include "UpnpActionComplete.h"
-#include "UpnpActionRequest.h"
-#include "UpnpDiscovery.h"
-#include "UpnpEvent.h"
-#include "UpnpEventSubscribe.h"
-#include "UpnpFileInfo.h"
-#include "UpnpStateVarComplete.h"
-#include "UpnpStateVarRequest.h"
-#include "UpnpSubscriptionRequest.h"
+#include "UpnpActionComplete.h"	     // IWYU pragma: keep
+#include "UpnpActionRequest.h"	     // IWYU pragma: keep
+#include "UpnpDiscovery.h"	     // IWYU pragma: keep
+#include "UpnpEvent.h"		     // IWYU pragma: keep
+#include "UpnpEventSubscribe.h"	     // IWYU pragma: keep
+#include "UpnpFileInfo.h"	     // IWYU pragma: keep
+#include "UpnpStateVarComplete.h"    // IWYU pragma: keep
+#include "UpnpStateVarRequest.h"     // IWYU pragma: keep
+#include "UpnpSubscriptionRequest.h" // IWYU pragma: keep
 
 /*!
  * \name Constants and Types

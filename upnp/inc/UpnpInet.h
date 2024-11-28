@@ -12,7 +12,7 @@
  * functions.
  */
 
-#include "UpnpUniStd.h" /* for close() */
+#include "UpnpUniStd.h" /* for close() */ // IWYU pragma: keep
 
 #ifdef _WIN32
 	#include <stdarg.h>
