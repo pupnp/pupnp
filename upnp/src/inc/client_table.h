@@ -14,12 +14,9 @@ extern "C" {
 #include "TimerThread.h"
 #include "UpnpString.h"
 #include "config.h"
-#include "upnp.h"
 #include "uri.h"
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 extern TimerThread gTimerThread;
 
