@@ -41,8 +41,8 @@
 #include <time.h>
 
 #include "UpnpString.h"
-#include "client_table.h"
 #include "httpparser.h"
+#include "ithread.h"
 #include "sock.h"
 #include "upnp.h"
 

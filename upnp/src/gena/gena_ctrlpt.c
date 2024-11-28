@@ -40,6 +40,7 @@
 	#ifdef INCLUDE_CLIENT_APIS
 
 		#include "UpnpEventSubscribe.h"
+		#include "client_table.h"
 		#include "gena.h"
 		#include "httpparser.h"
 		#include "httpreadwrite.h"
