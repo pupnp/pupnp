@@ -109,7 +109,7 @@ extern ithread_mutex_t GlobalClientSubscribeMutex;
 	UpnpPrintf( \
 		UPNP_INFO, GENA, __FILE__, __LINE__, "Trying Subscribe Lock"); \
 	ithread_mutex_lock(&GlobalClientSubscribeMutex); \
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "Subscribe Lock");
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "Subscribe Lock")
 
 /*!
  * \brief Unlocks the subscription.
@@ -121,7 +121,7 @@ extern ithread_mutex_t GlobalClientSubscribeMutex;
 		__LINE__, \
 		"Trying Subscribe UnLock"); \
 	ithread_mutex_unlock(&GlobalClientSubscribeMutex); \
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "Subscribe UnLock");
+	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "Subscribe UnLock")
 
 /*!
  * Structure to send NOTIFY message to all subscribed control points
