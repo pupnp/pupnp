@@ -40,7 +40,6 @@
 extern "C" {
 #endif
 
-#include <errno.h>
 #include <sys/types.h>
 
 /*!

@@ -44,6 +44,7 @@
 #endif
 
 #include <assert.h>
+#include <errno.h>
 
 static int freeListNode(ListNode *node, LinkedList *list)
 {

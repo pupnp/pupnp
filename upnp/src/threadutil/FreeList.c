@@ -32,6 +32,7 @@
 #include "FreeList.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
 
 int FreeListInit(FreeList *free_list, size_t elementSize, int maxFreeListLength)
