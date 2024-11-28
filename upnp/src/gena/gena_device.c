@@ -46,13 +46,13 @@
 		#include "gena.h"
 		#include "httpreadwrite.h"
 		#include "parsetools.h"
+		#include "posix_overwrites.h" // IWYU pragma: keep
 		#include "ssdplib.h"
 		#include "statcodes.h"
 		#include "sysdep.h"
 		#include "unixutil.h"
 		#include "upnpapi.h"
 		#include "uuid.h"
-		#include "posix_overwrites.h" // IWYU pragma: keep
 
 		#define STALE_JOBID (INVALID_JOB_ID - 1)
 
@@ -771,6 +771,7 @@ static void maybeDiscardEvents(LinkedList *listp)
 {
 	time_t now = time(0L);
 	notify_thread_struct *ntsp;
+	ThreadPoolJob *p;
 
 	while (ListSize(listp) > 1) {
 		ListNode *node = ListHead(listp);
@@ -783,8 +784,8 @@ static void maybeDiscardEvents(LinkedList *listp)
 			break;
 		}
 
-		ntsp = (notify_thread_struct *)(((ThreadPoolJob *)node->item)
-							->arg);
+		p = (ThreadPoolJob *)node->item;
+		ntsp = (notify_thread_struct *)(p->arg);
 		if (ListSize(listp) > g_UpnpSdkEQMaxLen ||
 			now - ntsp->ctime > g_UpnpSdkEQMaxAge) {
 			free_notify_struct(ntsp);
