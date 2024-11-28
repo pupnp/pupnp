@@ -48,7 +48,6 @@ extern "C" {
 #include "upnpdebug.h"
 #include "uri.h"
 
-#include <stdio.h>
 #include <time.h>
 
 #define SID_SIZE (size_t)41
