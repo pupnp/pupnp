@@ -196,7 +196,7 @@ ErrorHandler:
 	return errCode;
 }
 
-IXML_Document *ixmlDocument_createDocument()
+IXML_Document *ixmlDocument_createDocument(void)
 {
 	IXML_Document *doc = NULL;
 
