@@ -34,16 +34,16 @@ int CheckXML(char *filename)
 
 extern int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 {
+	int ret;
+	char filename[256];
+	FILE *fp;
 
 	if (Size < kMinInputLength || Size > kMaxInputLength) {
 		return 1;
 	}
 
-	int ret;
-	char filename[256];
-
 	sprintf(filename, "/tmp/libfuzzer.%d", getpid());
-	FILE *fp = fopen(filename, "wb");
+	fp = fopen(filename, "wb");
 	if (!fp) {
 		return 0;
 	}
