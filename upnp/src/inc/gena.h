@@ -38,17 +38,13 @@
 
 #include "config.h"
 
-#include <string.h>
 #include <time.h>
 
-#include "ThreadPool.h"
 #include "UpnpString.h"
 #include "client_table.h"
 #include "httpparser.h"
-#include "miniserver.h"
 #include "sock.h"
 #include "upnp.h"
-#include "uri.h"
 
 #ifdef __cplusplus
 	#define EXTERN_C extern "C"

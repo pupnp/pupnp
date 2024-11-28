@@ -38,7 +38,6 @@
 	#include "httpparser.h"
 	#include "httpreadwrite.h"
 	#include "statcodes.h"
-	#include "unixutil.h"
 	#include "upnpdebug.h"
 
 /************************************************************************
