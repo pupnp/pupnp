@@ -49,7 +49,6 @@
 		#include "httpreadwrite.h"
 		#include "ssdplib.h"
 		#include "statcodes.h"
-		#include "unixutil.h"
 		#include "upnpapi.h"
 
 		#include <assert.h>
