@@ -13,7 +13,7 @@ extern "C" {
 #include "GenlibClientSubscription.h"
 #include "TimerThread.h"
 #include "UpnpString.h"
-#include "service_table.h"
+#include "config.h"
 #include "upnp.h"
 #include "uri.h"
 
