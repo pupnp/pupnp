@@ -45,7 +45,6 @@
 		#include "httpreadwrite.h"
 		#include "parsetools.h"
 		#include "statcodes.h"
-		#include "sysdep.h"
 		#include "upnpapi.h"
 		#include "uuid.h"
 
@@ -63,13 +62,14 @@ typedef struct
 /*!
  * \brief Free memory associated with job's argument
  */
-static void free_subscribe_arg(job_arg *arg)
+static void free_subscribe_arg(void *arg)
 {
 	if (arg) {
-		if (arg->Event) {
-			UpnpEventSubscribe_delete(arg->Event);
+		job_arg *p = arg;
+		if (p->Event) {
+			UpnpEventSubscribe_delete(p->Event);
 		}
-		free(arg);
+		free(p);
 	}
 }
 
@@ -87,7 +87,7 @@ static void GenaAutoRenewSubscription(
 	Upnp_FunPtr callback_fun;
 	struct Handle_Info *handle_info;
 	int send_callback = 0;
-	int eventType = 0;
+	Upnp_EventType eventType = 0;
 	int timeout = 0;
 	int errCode = 0;
 
@@ -299,7 +299,7 @@ static int gena_subscribe(
 	UpnpString *sid)
 {
 	int return_code;
-	int parse_ret = 0;
+	parse_status_t parse_ret = 0;
 	int local_timeout = CP_MINIMUM_SUBSCRIPTION_TIME;
 	memptr sid_hdr;
 	memptr timeout_hdr;
