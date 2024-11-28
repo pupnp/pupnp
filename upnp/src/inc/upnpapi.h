@@ -37,8 +37,10 @@
  * \file
  */
 
+#include "GenlibClientSubscription.h"
+#include "TimerThread.h"
 #include "VirtualDir.h" /* for struct VirtualDirCallbacks */
-#include "client_table.h"
+#include "service_table.h"
 
 #define MAX_INTERFACES 256
 
