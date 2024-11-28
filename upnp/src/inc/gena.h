@@ -46,7 +46,6 @@
 #include "client_table.h"
 #include "httpparser.h"
 #include "miniserver.h"
-#include "service_table.h"
 #include "sock.h"
 #include "upnp.h"
 #include "uri.h"
