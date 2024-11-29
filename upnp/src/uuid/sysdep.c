@@ -27,7 +27,7 @@
 
 #include "sysdep.h"
 
-#include "UpnpInet.h"
+#include "UpnpInet.h" // IWYU pragma: keep
 
 #include <string.h>
 
