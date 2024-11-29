@@ -28,9 +28,9 @@
 
 /* change to point to where MD5 .h's live */
 /* get MD5 sample implementation from RFC 1321 */
-#include "md5.h"
+#include "md5.h" // IWYU pragma: keep
 
-#include "UpnpStdInt.h"
+#include "UpnpStdInt.h" // IWYU pragma: keep
 
 #include <sys/types.h>
 

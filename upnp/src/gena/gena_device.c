@@ -45,12 +45,9 @@
 
 		#include "gena.h"
 		#include "httpreadwrite.h"
-		#include "parsetools.h"
 		#include "posix_overwrites.h" // IWYU pragma: keep
 		#include "ssdplib.h"
 		#include "statcodes.h"
-		#include "sysdep.h"
-		#include "unixutil.h"
 		#include "upnpapi.h"
 		#include "uuid.h"
 

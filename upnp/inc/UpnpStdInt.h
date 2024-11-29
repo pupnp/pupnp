@@ -2,7 +2,7 @@
 #define UPNPSTDINT_H
 
 /* Sized integer types. */
-#include <stdint.h>
+#include <stdint.h> // IWYU pragma: keep
 
 #if !defined(UPNP_USE_BCBPP)
 
