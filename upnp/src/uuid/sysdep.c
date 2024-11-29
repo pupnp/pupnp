@@ -50,7 +50,7 @@ void get_ieee_node_identifier(uuid_node_t *node)
 		seed[0] |= 0x80;
 		memcpy(&saved_node, seed, sizeof(uuid_node_t));
 		inited = 1;
-	};
+	}
 	*node = saved_node;
 }
 
