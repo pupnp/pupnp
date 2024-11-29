@@ -144,17 +144,19 @@ static int GeneratePropertySet(
  */
 static void free_notify_struct(
 	/*! [in] Notify structure. */
-	notify_thread_struct *input)
+	void *input)
 {
-	(*input->reference_count)--;
-	if (*input->reference_count == 0) {
-		free(input->headers);
-		ixmlFreeDOMString(input->propertySet);
-		free(input->servId);
-		free(input->UDN);
-		free(input->reference_count);
+	notify_thread_struct *p = input;
+
+	(*p->reference_count)--;
+	if (*p->reference_count == 0) {
+		free(p->headers);
+		ixmlFreeDOMString(p->propertySet);
+		free(p->servId);
+		free(p->UDN);
+		free(p->reference_count);
 	}
-	free(input);
+	free(p);
 }
 
 /*!
