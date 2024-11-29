@@ -105,6 +105,8 @@ void get_system_time(uuid_time_t *uuid_time)
 		     (uuid_time_t)tp.tv_usec * 10 + 0x01B21DD213814000L;
 }
 
+	#define HOSTNAME_LENGTH 255
+
 void get_random_info(unsigned char seed[16])
 {
 	MD5_CTX c;
@@ -112,7 +114,7 @@ void get_random_info(unsigned char seed[16])
 	{
 		/*struct sysinfo s; */
 		struct timeval t;
-		char hostname[257];
+		char hostname[HOSTNAME_LENGTH + 1];
 	} randomness;
 	randomness r;
 
@@ -121,7 +123,7 @@ void get_random_info(unsigned char seed[16])
 
 	/* Get some random stuff. */
 	gettimeofday(&r.t, (struct timezone *)0);
-	gethostname(r.hostname, 256);
+	gethostname(r.hostname, HOSTNAME_LENGTH);
 
 	/* MD5 it */
 	MD5Init(&c);
