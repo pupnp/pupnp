@@ -31,7 +31,6 @@
 
 #include "UpnpInet.h"
 
-#include <stdio.h>
 #include <string.h>
 
 /*!
