@@ -29,7 +29,7 @@ extern "C" {
 typedef struct s_UpnpExtraHeaders UpnpExtraHeaders;
 
 /*! Constructor */
-UPNP_EXPORT_SPEC UpnpExtraHeaders *UpnpExtraHeaders_new();
+UPNP_EXPORT_SPEC UpnpExtraHeaders *UpnpExtraHeaders_new(void);
 /*! Destructor */
 UPNP_EXPORT_SPEC void UpnpExtraHeaders_delete(UpnpExtraHeaders *p);
 /*! Copy Constructor */

@@ -27,7 +27,7 @@ extern "C" {
 typedef struct s_UpnpEventSubscribe UpnpEventSubscribe;
 
 /*! Constructor */
-UPNP_EXPORT_SPEC UpnpEventSubscribe *UpnpEventSubscribe_new();
+UPNP_EXPORT_SPEC UpnpEventSubscribe *UpnpEventSubscribe_new(void);
 /*! Destructor */
 UPNP_EXPORT_SPEC void UpnpEventSubscribe_delete(UpnpEventSubscribe *p);
 /*! Copy Constructor */

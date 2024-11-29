@@ -8,10 +8,10 @@
  *
  * \author Marcelo Roberto Jimenez
  */
-#include "config.h"
+#include "config.h" // IWYU pragma: keep
 
-#include <stdlib.h> /* for calloc(), free() */
-#include <string.h> /* for strlen(), strdup() */
+#include <stdlib.h> /* for calloc(), free() */		   // IWYU pragma: keep
+#include <string.h> /* for strlen(), strdup(), memset() */ // IWYU pragma: keep
 
 #include "UpnpExtraHeaders.h"
 
@@ -23,7 +23,7 @@ struct s_UpnpExtraHeaders
 	DOMString m_resp;
 };
 
-UpnpExtraHeaders *UpnpExtraHeaders_new()
+UpnpExtraHeaders *UpnpExtraHeaders_new(void)
 {
 	struct s_UpnpExtraHeaders *p =
 		calloc(1, sizeof(struct s_UpnpExtraHeaders));

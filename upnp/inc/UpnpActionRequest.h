@@ -29,7 +29,7 @@ extern "C" {
 typedef struct s_UpnpActionRequest UpnpActionRequest;
 
 /*! Constructor */
-UPNP_EXPORT_SPEC UpnpActionRequest *UpnpActionRequest_new();
+UPNP_EXPORT_SPEC UpnpActionRequest *UpnpActionRequest_new(void);
 /*! Destructor */
 UPNP_EXPORT_SPEC void UpnpActionRequest_delete(UpnpActionRequest *p);
 /*! Copy Constructor */

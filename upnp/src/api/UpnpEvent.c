@@ -8,10 +8,10 @@
  *
  * \author Marcelo Roberto Jimenez
  */
-#include "config.h"
+#include "config.h" // IWYU pragma: keep
 
-#include <stdlib.h> /* for calloc(), free() */
-#include <string.h> /* for strlen(), strdup() */
+#include <stdlib.h> /* for calloc(), free() */		   // IWYU pragma: keep
+#include <string.h> /* for strlen(), strdup(), memset() */ // IWYU pragma: keep
 
 #include "UpnpEvent.h"
 
@@ -22,7 +22,7 @@ struct s_UpnpEvent
 	UpnpString *m_SID;
 };
 
-UpnpEvent *UpnpEvent_new()
+UpnpEvent *UpnpEvent_new(void)
 {
 	struct s_UpnpEvent *p = calloc(1, sizeof(struct s_UpnpEvent));
 

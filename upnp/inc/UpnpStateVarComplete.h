@@ -28,7 +28,7 @@ extern "C" {
 typedef struct s_UpnpStateVarComplete UpnpStateVarComplete;
 
 /*! Constructor */
-UPNP_EXPORT_SPEC UpnpStateVarComplete *UpnpStateVarComplete_new();
+UPNP_EXPORT_SPEC UpnpStateVarComplete *UpnpStateVarComplete_new(void);
 /*! Destructor */
 UPNP_EXPORT_SPEC void UpnpStateVarComplete_delete(UpnpStateVarComplete *p);
 /*! Copy Constructor */

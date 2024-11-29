@@ -8,10 +8,10 @@
  *
  * \author Marcelo Roberto Jimenez
  */
-#include "config.h"
+#include "config.h" // IWYU pragma: keep
 
-#include <stdlib.h> /* for calloc(), free() */
-#include <string.h> /* for strlen(), strdup() */
+#include <stdlib.h> /* for calloc(), free() */		   // IWYU pragma: keep
+#include <string.h> /* for strlen(), strdup(), memset() */ // IWYU pragma: keep
 
 #include "GenlibClientSubscription.h"
 
@@ -24,7 +24,7 @@ struct s_GenlibClientSubscription
 	GenlibClientSubscription *m_Next;
 };
 
-GenlibClientSubscription *GenlibClientSubscription_new()
+GenlibClientSubscription *GenlibClientSubscription_new(void)
 {
 	struct s_GenlibClientSubscription *p =
 		calloc(1, sizeof(struct s_GenlibClientSubscription));

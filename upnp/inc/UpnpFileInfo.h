@@ -32,7 +32,7 @@ extern "C" {
 typedef struct s_UpnpFileInfo UpnpFileInfo;
 
 /*! Constructor */
-UPNP_EXPORT_SPEC UpnpFileInfo *UpnpFileInfo_new();
+UPNP_EXPORT_SPEC UpnpFileInfo *UpnpFileInfo_new(void);
 /*! Destructor */
 UPNP_EXPORT_SPEC void UpnpFileInfo_delete(UpnpFileInfo *p);
 /*! Copy Constructor */

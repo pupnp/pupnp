@@ -27,7 +27,7 @@ extern "C" {
 typedef struct s_GenlibClientSubscription GenlibClientSubscription;
 
 /*! Constructor */
-UPNP_EXPORT_SPEC GenlibClientSubscription *GenlibClientSubscription_new();
+UPNP_EXPORT_SPEC GenlibClientSubscription *GenlibClientSubscription_new(void);
 /*! Destructor */
 UPNP_EXPORT_SPEC void GenlibClientSubscription_delete(
 	GenlibClientSubscription *p);

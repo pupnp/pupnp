@@ -28,7 +28,7 @@ extern "C" {
 typedef struct s_SSDPResultData SSDPResultData;
 
 /*! Constructor */
-UPNP_EXPORT_SPEC SSDPResultData *SSDPResultData_new();
+UPNP_EXPORT_SPEC SSDPResultData *SSDPResultData_new(void);
 /*! Destructor */
 UPNP_EXPORT_SPEC void SSDPResultData_delete(SSDPResultData *p);
 /*! Copy Constructor */

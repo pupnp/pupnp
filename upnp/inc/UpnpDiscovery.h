@@ -28,7 +28,7 @@ extern "C" {
 typedef struct s_UpnpDiscovery UpnpDiscovery;
 
 /*! Constructor */
-UPNP_EXPORT_SPEC UpnpDiscovery *UpnpDiscovery_new();
+UPNP_EXPORT_SPEC UpnpDiscovery *UpnpDiscovery_new(void);
 /*! Destructor */
 UPNP_EXPORT_SPEC void UpnpDiscovery_delete(UpnpDiscovery *p);
 /*! Copy Constructor */

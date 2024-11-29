@@ -161,7 +161,7 @@ static char *strupr(char *s)
 {
 	char *p = s;
 	for (; *p; ++p) {
-		*p = toupper(*p);
+		*p = (char)toupper(*p);
 	}
 
 	return s;
@@ -336,9 +336,9 @@ static const char *member_needs_include(const struct s_Member *m)
 	return ret;
 }
 
-size_t included_headers_used;
-size_t included_headers_size;
-const char **included_headers;
+static size_t included_headers_used;
+static size_t included_headers_size;
+static const char **included_headers;
 
 /* Checks if the header has already been used and includes it in the array if
  * not. */
@@ -378,7 +378,7 @@ static int write_header(FILE *fp, struct s_Class *c)
 	int i;
 	int ok = 1;
 	const struct s_Member *m;
-	int len = strlen(c->name);
+	size_t len = strlen(c->name);
 	char *class_name_upr = malloc(len + 1);
 
 	if (!class_name_upr) {
@@ -412,7 +412,7 @@ static int write_header(FILE *fp, struct s_Class *c)
 
 	/* Include files: look for which members need includes and only include
 	 * them once. */
-	for (i = 0; i < (int)c->n_members; ++i) {
+	for (i = 0; i < c->n_members; ++i) {
 		const char *header;
 		m = c->members + i;
 		header = member_needs_include(m);
@@ -437,7 +437,7 @@ static int write_header(FILE *fp, struct s_Class *c)
 		"typedef struct s_%s %s;\n"
 		"\n"
 		"/*! Constructor */\n"
-		"UPNP_EXPORT_SPEC %s *%s_new();\n"
+		"UPNP_EXPORT_SPEC %s *%s_new(void);\n"
 		"/*! Destructor */\n"
 		"UPNP_EXPORT_SPEC void %s_delete(%s *p);\n"
 		"/*! Copy Constructor */\n"
@@ -458,7 +458,7 @@ static int write_header(FILE *fp, struct s_Class *c)
 		c->name,
 		c->name,
 		c->name);
-	for (i = 0; i < (int)c->n_members; ++i) {
+	for (i = 0; i < c->n_members; ++i) {
 		ok = ok && write_prototype(fp, c->name, c->members + i);
 	}
 	fprintf(fp,
@@ -509,7 +509,7 @@ static int write_constructor(FILE *fp, struct s_Class *c)
 
 	/* clang-format off */
 	fprintf(fp,
-		"%s *%s_new()\n"
+		"%s *%s_new(void)\n"
 		"{\n"
 		"\tstruct s_%s *p = calloc(1, sizeof (struct s_%s));\n"
 		"\n"
@@ -517,7 +517,7 @@ static int write_constructor(FILE *fp, struct s_Class *c)
 		"\n",
 		c->name, c->name, c->name, c->name);
 	/* clang-format on */
-	for (i = 0; i < (int)c->n_members; ++i) {
+	for (i = 0; i < c->n_members; ++i) {
 		const struct s_Member *m = c->members + i;
 		switch (m->type) {
 		case TYPE_CLASS:
@@ -645,7 +645,7 @@ static int write_assignment_operator(FILE *fp, struct s_Class *c)
 		c->name,
 		c->name,
 		c->name);
-	for (i = 0; i < (int)c->n_members; ++i) {
+	for (i = 0; i < c->n_members; ++i) {
 		const struct s_Member *m = c->members + i;
 		fprintf(fp,
 			"\t\tok = ok && %s_set_%s(p, %s_get_%s(q));\n",
@@ -900,6 +900,7 @@ static int write_source(FILE *fp, struct s_Class *c)
 {
 	int i;
 
+	// clang-format off
 	fprintf(fp,
 		"/*!\n"
 		" * \\file\n"
@@ -911,12 +912,13 @@ static int write_source(FILE *fp, struct s_Class *c)
 		" *\n"
 		" * \\author Marcelo Roberto Jimenez\n"
 		" */\n"
-		"#include \"config.h\"\n"
+		"#include \"config.h\" // IWYU pragma: keep\n"
 		"\n"
-		"#include <stdlib.h> /* for calloc(), free() */\n"
-		"#include <string.h> /* for strlen(), strdup() */\n"
+		"#include <stdlib.h> /* for calloc(), free() */ // IWYU pragma: keep\n"
+		"#include <string.h> /* for strlen(), strdup(), memset() */ // IWYU pragma: keep\n"
 		"\n",
 		c->name);
+	// clang-format on
 	fprintf(fp,
 		"\n"
 		"#include \"%s\"\n"
@@ -925,7 +927,7 @@ static int write_source(FILE *fp, struct s_Class *c)
 		"{\n",
 		c->header,
 		c->name);
-	for (i = 0; i < (int)c->n_members; ++i) {
+	for (i = 0; i < c->n_members; ++i) {
 		write_definition(fp, c->members + i);
 	}
 	fprintf(fp, "};\n\n");
@@ -938,7 +940,7 @@ static int write_source(FILE *fp, struct s_Class *c)
 	write_copy_constructor(fp, c);
 	fprintf(fp, "\n");
 	/* Member methods */
-	for (i = 0; i < (int)c->n_members; ++i) {
+	for (i = 0; i < c->n_members; ++i) {
 		const struct s_Member *m = c->members + i;
 		write_methods(fp, c->name, m);
 	}
@@ -948,11 +950,11 @@ static int write_source(FILE *fp, struct s_Class *c)
 
 int main(int argc, const char *argv[])
 {
-	(void)argc;
-	(void)argv;
 	int i;
 	int n;
 	struct s_Class *c = my_classes;
+	(void)argc;
+	(void)argv;
 
 	n = (int)ARRAY_SIZE(my_classes);
 	printf("Found %d classes.\n", n);

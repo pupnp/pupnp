@@ -31,7 +31,7 @@ extern "C" {
 typedef struct s_TestClass TestClass;
 
 /*! Constructor */
-UPNP_EXPORT_SPEC TestClass *TestClass_new();
+UPNP_EXPORT_SPEC TestClass *TestClass_new(void);
 /*! Destructor */
 UPNP_EXPORT_SPEC void TestClass_delete(TestClass *p);
 /*! Copy Constructor */

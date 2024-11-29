@@ -28,7 +28,7 @@ extern "C" {
 typedef struct s_UpnpActionComplete UpnpActionComplete;
 
 /*! Constructor */
-UPNP_EXPORT_SPEC UpnpActionComplete *UpnpActionComplete_new();
+UPNP_EXPORT_SPEC UpnpActionComplete *UpnpActionComplete_new(void);
 /*! Destructor */
 UPNP_EXPORT_SPEC void UpnpActionComplete_delete(UpnpActionComplete *p);
 /*! Copy Constructor */

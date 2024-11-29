@@ -39,7 +39,7 @@ struct s_Member
 struct s_Class
 {
 	const char *name;
-	unsigned n_members;
+	int n_members;
 	struct s_Member *members;
 	const char *source;
 	const char *header;

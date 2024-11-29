@@ -27,7 +27,7 @@ extern "C" {
 typedef struct s_UpnpSubscriptionRequest UpnpSubscriptionRequest;
 
 /*! Constructor */
-UPNP_EXPORT_SPEC UpnpSubscriptionRequest *UpnpSubscriptionRequest_new();
+UPNP_EXPORT_SPEC UpnpSubscriptionRequest *UpnpSubscriptionRequest_new(void);
 /*! Destructor */
 UPNP_EXPORT_SPEC void UpnpSubscriptionRequest_delete(
 	UpnpSubscriptionRequest *p);
