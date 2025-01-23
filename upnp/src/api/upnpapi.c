@@ -3663,8 +3663,10 @@ int UpnpGetIfInfo(const char *IfName)
 	PIP_ADAPTER_UNICAST_ADDRESS uni_addr;
 	SOCKADDR *ip_addr;
 	struct in_addr v4_addr;
+	struct in_addr v4_netmask;
 	struct in6_addr v6_addr;
 	ULONG adapts_sz = 0;
+	ULONG mask = 0;
 	ULONG ret;
 	int ifname_found = 0;
 	int valid_addr_found = 0;
@@ -3775,7 +3777,8 @@ int UpnpGetIfInfo(const char *IfName)
 					&((struct sockaddr_in *)ip_addr)
 						 ->sin_addr,
 					sizeof(v4_addr));
-				/* TODO: Retrieve IPv4 netmask */
+				mask = htonl(ULONG_MAX << (32 - uni_addr->OnLinkPrefixLength));
+				memcpy(&v4_netmask, &mask, sizeof(v4_netmask));
 				valid_addr_found = 1;
 				break;
 			case AF_INET6:
@@ -3824,6 +3827,7 @@ int UpnpGetIfInfo(const char *IfName)
 		return UPNP_E_INVALID_INTERFACE;
 	}
 	inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
+	inet_ntop(AF_INET, &v4_netmask, gIF_IPV4_NETMASK, sizeof(gIF_IPV4_NETMASK));
 	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
 #else
 	struct ifaddrs *ifap, *ifa;
