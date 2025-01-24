@@ -1484,7 +1484,7 @@ int get_ssdp_sockets(MiniServerSockArray *out)
 		gSsdpReqSocket4 = out->ssdpReqSock4;
 	} else
 		out->ssdpReqSock4 = INVALID_SOCKET;
-			/* Create the IPv6 socket for SSDP REQUESTS */
+		/* Create the IPv6 socket for SSDP REQUESTS */
 		#ifdef UPNP_ENABLE_IPV6
 	if (strlen(gIF_IPV6) > (size_t)0) {
 		retVal = create_ssdp_sock_reqv6(&out->ssdpReqSock6);

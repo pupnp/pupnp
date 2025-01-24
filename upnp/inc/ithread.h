@@ -871,7 +871,7 @@ static UPNP_INLINE int ithread_cleanup_thread(void)
  *              See man page for sleep (man 3 sleep)
  *****************************************************************************/
 #ifdef _WIN32
-	#define isleep(x) Sleep((x)*1000)
+	#define isleep(x) Sleep((x) * 1000)
 #else
 	#define isleep sleep
 #endif

@@ -22,16 +22,14 @@ struct test
 */
 
 #define TEST(BaseURL, RelURL, expectURL) \
-	{ \
-		.base = BaseURL, .rel = RelURL, .expect = expectURL, \
-		.line = __LINE__ \
-	}
+	{.base = BaseURL, .rel = RelURL, .expect = expectURL, .line = __LINE__}
 
 #define TEST_ERROR(BaseURL, RelURL, expectURL, error_code) \
-	{ \
-		.base = BaseURL, .rel = RelURL, .expect = expectURL, \
-		.line = __LINE__, .error = error_code \
-	}
+	{.base = BaseURL, \
+		.rel = RelURL, \
+		.expect = expectURL, \
+		.line = __LINE__, \
+		.error = error_code}
 
 static int result(const struct test *test)
 {

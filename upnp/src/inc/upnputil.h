@@ -96,15 +96,15 @@ void linecopylen(
 #if !defined(__cplusplus) || defined(UPNP_USE_MSVCPP)
 	#ifdef _WIN32
 		#ifndef S_ISREG
-			#define S_ISREG(m) (((m)&S_IFMT) == S_IFREG)
+			#define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
 		#endif
 		#ifndef S_ISDIR
-			#define S_ISDIR(m) (((m)&S_IFMT) == S_IFDIR)
+			#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 		#endif
 		#ifndef EADDRINUSE /* VS2010 has this defined */
 			#define EADDRINUSE WSAEADDRINUSE
 		#endif
-		#define sleep(a) Sleep((a)*1000)
+		#define sleep(a) Sleep((a) * 1000)
 		#define usleep(a) Sleep((a) / 1000)
 		#define strerror_r(a, b, c) (strerror_s((b), (c), (a)))
 	#else

@@ -677,7 +677,7 @@ int IncrementChannel(int incr,
 
 	ithread_mutex_lock(&TVDevMutex);
 	curchannel = atoi(tv_service_table[TV_SERVICE_CONTROL]
-				  .VariableStrVal[TV_CONTROL_CHANNEL]);
+			.VariableStrVal[TV_CONTROL_CHANNEL]);
 	ithread_mutex_unlock(&TVDevMutex);
 
 	newchannel = curchannel + incr;
@@ -796,7 +796,7 @@ static int IncrementVolume(
 
 	ithread_mutex_lock(&TVDevMutex);
 	curvolume = atoi(tv_service_table[TV_SERVICE_CONTROL]
-				 .VariableStrVal[TV_CONTROL_VOLUME]);
+			.VariableStrVal[TV_CONTROL_VOLUME]);
 	ithread_mutex_unlock(&TVDevMutex);
 
 	newvolume = curvolume + incr;
@@ -914,7 +914,7 @@ static int IncrementColor(
 
 	ithread_mutex_lock(&TVDevMutex);
 	curcolor = atoi(tv_service_table[TV_SERVICE_PICTURE]
-				.VariableStrVal[TV_PICTURE_COLOR]);
+			.VariableStrVal[TV_PICTURE_COLOR]);
 	ithread_mutex_unlock(&TVDevMutex);
 
 	newcolor = curcolor + incr;
@@ -1036,7 +1036,7 @@ int IncrementTint(int incr,
 
 	ithread_mutex_lock(&TVDevMutex);
 	curtint = atoi(tv_service_table[TV_SERVICE_PICTURE]
-			       .VariableStrVal[TV_PICTURE_TINT]);
+			.VariableStrVal[TV_PICTURE_TINT]);
 	ithread_mutex_unlock(&TVDevMutex);
 
 	newtint = curtint + incr;
@@ -1195,7 +1195,7 @@ static int IncrementContrast(
 
 	ithread_mutex_lock(&TVDevMutex);
 	curcontrast = atoi(tv_service_table[TV_SERVICE_PICTURE]
-				   .VariableStrVal[TV_PICTURE_CONTRAST]);
+			.VariableStrVal[TV_PICTURE_CONTRAST]);
 	ithread_mutex_unlock(&TVDevMutex);
 
 	newcontrast = curcontrast + incr;
@@ -1314,7 +1314,7 @@ static int IncrementBrightness(
 
 	ithread_mutex_lock(&TVDevMutex);
 	curbrightness = atoi(tv_service_table[TV_SERVICE_PICTURE]
-				     .VariableStrVal[TV_PICTURE_BRIGHTNESS]);
+			.VariableStrVal[TV_PICTURE_BRIGHTNESS]);
 	ithread_mutex_unlock(&TVDevMutex);
 
 	newbrightness = curbrightness + incr;

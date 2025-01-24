@@ -3775,9 +3775,11 @@ int UpnpGetIfInfo(const char *IfName)
 			case AF_INET:
 				memcpy(&v4_addr,
 					&((struct sockaddr_in *)ip_addr)
-						 ->sin_addr,
+						->sin_addr,
 					sizeof(v4_addr));
-				mask = htonl(ULONG_MAX << (32 - uni_addr->OnLinkPrefixLength));
+				mask = htonl(
+					ULONG_MAX
+					<< (32 - uni_addr->OnLinkPrefixLength));
 				memcpy(&v4_netmask, &mask, sizeof(v4_netmask));
 				valid_addr_found = 1;
 				break;
@@ -3787,11 +3789,11 @@ int UpnpGetIfInfo(const char *IfName)
 				/* Only keep IPv6 link-local addresses. */
 				if (IN6_IS_ADDR_LINKLOCAL(
 					    &((struct sockaddr_in6 *)ip_addr)
-						     ->sin6_addr)) {
+						    ->sin6_addr)) {
 					memcpy(&v6_addr,
 						&((struct sockaddr_in6 *)
 								ip_addr)
-							 ->sin6_addr,
+							->sin6_addr,
 						sizeof(v6_addr));
 					/* TODO: Retrieve IPv6 LLA prefix */
 					valid_addr_found = 1;
@@ -3827,7 +3829,10 @@ int UpnpGetIfInfo(const char *IfName)
 		return UPNP_E_INVALID_INTERFACE;
 	}
 	inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
-	inet_ntop(AF_INET, &v4_netmask, gIF_IPV4_NETMASK, sizeof(gIF_IPV4_NETMASK));
+	inet_ntop(AF_INET,
+		&v4_netmask,
+		gIF_IPV4_NETMASK,
+		sizeof(gIF_IPV4_NETMASK));
 	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
 #else
 	struct ifaddrs *ifap, *ifa;
@@ -3889,56 +3894,56 @@ int UpnpGetIfInfo(const char *IfName)
 		case AF_INET:
 			memcpy(&v4_addr,
 				&((struct sockaddr_in *)(ifa->ifa_addr))
-					 ->sin_addr,
+					->sin_addr,
 				sizeof(v4_addr));
 			memcpy(&v4_netmask,
 				&((struct sockaddr_in *)(ifa->ifa_netmask))
-					 ->sin_addr,
+					->sin_addr,
 				sizeof(v4_netmask));
 			valid_v4_addr_found = 1;
 			break;
 		case AF_INET6:
 			if (IN6_IS_ADDR_ULA(
 				    &((struct sockaddr_in6 *)(ifa->ifa_addr))
-					     ->sin6_addr)) {
+					    ->sin6_addr)) {
 				/* Got valid IPv6 ula. */
 				memcpy(&v6ulagua_addr,
-					&((struct sockaddr_in6
-							  *)(ifa->ifa_addr))
-						 ->sin6_addr,
+					&((struct sockaddr_in6 *)(ifa
+							  ->ifa_addr))
+						->sin6_addr,
 					sizeof(v6ulagua_addr));
 				v6ulagua_prefix = UpnpComputeIpv6PrefixLength(
-					(struct sockaddr_in6
-							*)(ifa->ifa_netmask));
+					(struct sockaddr_in6 *)(ifa
+							->ifa_netmask));
 				valid_v6ulagua_addr_found = 1;
 			} else if (IN6_IS_ADDR_GLOBAL(
-					   &((struct sockaddr_in6
-							     *)(ifa->ifa_addr))
-						    ->sin6_addr) &&
+					   &((struct sockaddr_in6 *)(ifa
+							     ->ifa_addr))
+						   ->sin6_addr) &&
 				   strlen(gIF_IPV6_ULA_GUA) == (size_t)0) {
 				/* got a GUA, should store it
 				 * while no ULA is found */
 				memcpy(&v6ulagua_addr,
-					&((struct sockaddr_in6
-							  *)(ifa->ifa_addr))
-						 ->sin6_addr,
+					&((struct sockaddr_in6 *)(ifa
+							  ->ifa_addr))
+						->sin6_addr,
 					sizeof(v6ulagua_addr));
 				v6ulagua_prefix = UpnpComputeIpv6PrefixLength(
-					(struct sockaddr_in6
-							*)(ifa->ifa_netmask));
+					(struct sockaddr_in6 *)(ifa
+							->ifa_netmask));
 				valid_v6ulagua_addr_found = 1;
 			} else if (IN6_IS_ADDR_LINKLOCAL(
-					   &((struct sockaddr_in6
-							     *)(ifa->ifa_addr))
-						    ->sin6_addr)) {
+					   &((struct sockaddr_in6 *)(ifa
+							     ->ifa_addr))
+						   ->sin6_addr)) {
 				memcpy(&v6_addr,
-					&((struct sockaddr_in6
-							  *)(ifa->ifa_addr))
-						 ->sin6_addr,
+					&((struct sockaddr_in6 *)(ifa
+							  ->ifa_addr))
+						->sin6_addr,
 					sizeof(v6_addr));
 				v6_prefix = UpnpComputeIpv6PrefixLength(
-					(struct sockaddr_in6
-							*)(ifa->ifa_netmask));
+					(struct sockaddr_in6 *)(ifa
+							->ifa_netmask));
 				valid_v6_addr_found = 1;
 			}
 			break;

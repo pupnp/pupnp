@@ -1580,7 +1580,7 @@ int http_ReadHttpResponse(void *Handle, char *buf, size_t *size, int timeout)
 	if (*size > 0) {
 		memcpy(buf,
 			&handle->response.msg.msg
-				 .buf[handle->response.entity_start_position],
+				.buf[handle->response.entity_start_position],
 			*size);
 		membuffer_delete(&handle->response.msg.msg,
 			handle->response.entity_start_position,
