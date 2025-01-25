@@ -7,7 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: DoozyX/clang-format-lint-action@v0.18
+    # - uses: DoozyX/clang-format-lint-action@v0.18
+    - uses: d-griet/clang-format-lint-action@99a106be2f3f1a92d9783ea7c744fde62d8ce1fa
       with:
         source: './upnp ./ixml'
         extensions: 'h,c,cpp'
+        clangFormatVersion: 19
