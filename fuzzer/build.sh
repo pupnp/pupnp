@@ -17,7 +17,7 @@ build() {
 
    rm -rf "${BUILD_DIR}"
    # cmake --fresh -DFUZZER=ON -DLIB_FUZZING_ENGINE="$LIB_FUZZING_ENGINE" -B build &&
-   cmake --fresh -DLIB_FUZZING_ENGINE="$LIB_FUZZING_ENGINE" -B "${BUILD_DIR}" &&
+   cmake --fresh -DLIB_FUZZING_ENGINE="$LIB_FUZZING_ENGINE" -DLOCAL_RUN=1 -B "${BUILD_DIR}" &&
       cmake --build "${BUILD_DIR}"
 
    cd "${BUILD_DIR}"
