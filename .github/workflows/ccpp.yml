@@ -26,7 +26,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
+        os: [ubuntu-latest]
         conf: [Debug, Release]
       fail-fast: false
     steps:
@@ -143,8 +143,8 @@ jobs:
         run: cmake --install build --config ${{matrix.conf}}
   # Linux sanitizer builds
   build_asan:
-    name: Sanitizer build (ubuntu-20.04) - ${{ matrix.tool }}
-    runs-on: ubuntu-20.04
+    name: Sanitizer build (ubuntu-latest) - ${{ matrix.tool }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         tool: [autotools, cmake]
