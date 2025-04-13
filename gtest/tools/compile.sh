@@ -5,10 +5,10 @@ if [ "$#" -ne 1 ]; then
     >&2 echo 'Set BUILD_DIR to point to the pupnp build directory'
 fi
 
-BUILD_DIR="../.."
+BUILD_DIR="../../build"
 
 TESTNAME=$(/usr/bin/basename -s.cpp "$1")
-/usr/bin/g++ -std=c++11 -pedantic-errors -Wall \
+/usr/bin/g++ -std=c++14 -pedantic-errors -Wall \
 -o"$TESTNAME".a \
 -I"$BUILD_DIR"/_deps/googletest-src/googletest/include \
 -I"$BUILD_DIR"/_deps/googletest-src/googlemock/include \

@@ -1,9 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.11)
 CMAKE_POLICY(VERSION 3.13)
 
-# C++11 is required
+# C++14 is required
 # Set here before we create any targets
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(cmake/CmDaB.cmake)
