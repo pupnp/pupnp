@@ -37,17 +37,17 @@ public:
 		// set network address
 		ifa_addr.sin_family = AF_INET;
 		//ifa_addr.sin_port = htons(MYPORT);
-		inet_aton("127.0.0.1", &(ifa_addr.sin_addr));
+		inet_pton(AF_INET, "127.0.0.1", &(ifa_addr.sin_addr));
 
 		// set netmask
 		ifa_netmask.sin_family = AF_INET;
 		//ifa_netmask.sin_port = htons(MYPORT);
-		inet_aton("255.0.0.0", &(ifa_netmask.sin_addr));
+		inet_pton(AF_INET, "255.0.0.0", &(ifa_netmask.sin_addr));
 
 		// set broadcast address or Point-to-point destination address
 		ifa_ifu.sin_family = AF_INET;
 		//ifa_ifu.sin_port = htons(MYPORT);
-		inet_aton("0.0.0.0", &(ifa_ifu.sin_addr));
+		inet_pton(AF_INET, "0.0.0.0", &(ifa_ifu.sin_addr));
 
 		ifaddr.ifa_next = nullptr; 	// pointer to next ifaddrs structure
 		ifaddr.ifa_name = (char*)"lo";
@@ -87,9 +87,9 @@ public:
 		//			<< netmasks[std::stoi(bitmask)] << ", slashpos: " << slashpos << "\n";
 
 		// convert address strings to numbers and store them
-		inet_aton(address.c_str(), &(ifa_addr.sin_addr));
+		inet_pton(AF_INET, address.c_str(), &(ifa_addr.sin_addr));
 		std::string netmask = netmasks[std::stoi(bitmask)];
-		inet_aton(netmask.c_str(), &(ifa_netmask.sin_addr));
+		inet_pton(AF_INET, netmask.c_str(), &(ifa_netmask.sin_addr));
 		ifaddr.ifa_flags = 0 | IFF_UP | IFF_BROADCAST | IFF_MULTICAST;
 
 		// calculate broadcast address as follows: broadcast = ip | ( ~ subnet )
