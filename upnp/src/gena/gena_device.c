@@ -563,7 +563,7 @@ static int genaInitNotifyCommon(UpnpDevice_Handle device_handle,
 		GENA,
 		__FILE__,
 		__LINE__,
-		"FOUND SERVICE IN INIT NOTFY: UDN %s, ServID: %s",
+		"FOUND SERVICE IN INIT NOTFY: UDN %s, ServID: %s\n",
 		UDN,
 		servId);
 
@@ -577,7 +577,7 @@ static int genaInitNotifyCommon(UpnpDevice_Handle device_handle,
 		GENA,
 		__FILE__,
 		__LINE__,
-		"FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s",
+		"FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s\n",
 		sid);
 	sub->active = 1;
 
@@ -689,7 +689,7 @@ int genaInitNotify(UpnpDevice_Handle device_handle,
 		GENA,
 		__FILE__,
 		__LINE__,
-		"GENERATED PROPERTY SET IN INIT NOTIFY: %s",
+		"GENERATED PROPERTY SET IN INIT NOTIFY: %s\n",
 		propertySet);
 
 	ret = genaInitNotifyCommon(
@@ -740,7 +740,7 @@ int genaInitNotifyExt(UpnpDevice_Handle device_handle,
 		GENA,
 		__FILE__,
 		__LINE__,
-		"GENERATED PROPERTY SET IN INIT EXT NOTIFY: %s",
+		"GENERATED PROPERTY SET IN INIT EXT NOTIFY: %s\n",
 		propertySet);
 
 	ret = genaInitNotifyCommon(
@@ -984,7 +984,7 @@ int genaNotifyAllExt(UpnpDevice_Handle device_handle,
 		GENA,
 		__FILE__,
 		__LINE__,
-		"GENERATED PROPERTY SET IN EXT NOTIFY: %s",
+		"GENERATED PROPERTY SET IN EXT NOTIFY: %s\n",
 		propertySet);
 
 	ret = genaNotifyAllCommon(device_handle, UDN, servId, propertySet);
@@ -1025,7 +1025,7 @@ int genaNotifyAll(UpnpDevice_Handle device_handle,
 		GENA,
 		__FILE__,
 		__LINE__,
-		"GENERATED PROPERTY SET IN EXT NOTIFY: %s",
+		"GENERATED PROPERTY SET IN EXT NOTIFY: %s\n",
 		propertySet);
 
 	ret = genaNotifyAllCommon(device_handle, UDN, servId, propertySet);

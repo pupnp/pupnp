@@ -97,13 +97,16 @@ static void GenaAutoRenewSubscription(
 			GENA,
 			__FILE__,
 			__LINE__,
-			"GENA SUB EXPIRED");
+			"GENA SUB EXPIRED\n");
 		UpnpEventSubscribe_set_ErrCode(sub_struct, UPNP_E_SUCCESS);
 		send_callback = 1;
 		eventType = UPNP_EVENT_SUBSCRIPTION_EXPIRED;
 	} else {
-		UpnpPrintf(
-			UPNP_INFO, GENA, __FILE__, __LINE__, "GENA AUTO RENEW");
+		UpnpPrintf(UPNP_INFO,
+			GENA,
+			__FILE__,
+			__LINE__,
+			"GENA AUTO RENEW\n");
 		timeout = UpnpEventSubscribe_get_TimeOut(sub_struct);
 		errCode = genaRenewSubscription(arg->handle,
 			UpnpEventSubscribe_get_SID(sub_struct),
@@ -124,8 +127,11 @@ static void GenaAutoRenewSubscription(
 			free_subscribe_arg(arg);
 			goto end_function;
 		}
-		UpnpPrintf(
-			UPNP_INFO, GENA, __FILE__, __LINE__, "HANDLE IS VALID");
+		UpnpPrintf(UPNP_INFO,
+			GENA,
+			__FILE__,
+			__LINE__,
+			"HANDLE IS VALID\n");
 
 		/* make callback */
 		callback_fun = handle_info->Callback;
@@ -577,7 +583,8 @@ int genaSubscribe(UpnpClient_Handle client_handle,
 	memset(temp_sid, 0, sizeof(temp_sid));
 	memset(temp_sid2, 0, sizeof(temp_sid2));
 
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, "GENA SUBSCRIBE BEGIN");
+	UpnpPrintf(
+		UPNP_INFO, GENA, __FILE__, __LINE__, "GENA SUBSCRIBE BEGIN\n");
 
 	UpnpString_clear(out_sid);
 
@@ -691,7 +698,7 @@ int genaRenewSubscription(
 		GENA,
 		__FILE__,
 		__LINE__,
-		"REMOVED AUTO RENEW  EVENT");
+		"REMOVED AUTO RENEW  EVENT\n");
 
 	GenlibClientSubscription_set_RenewEventId(sub, -1);
 	GenlibClientSubscription_assign(sub_copy, sub);
