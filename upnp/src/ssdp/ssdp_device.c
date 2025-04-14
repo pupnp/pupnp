@@ -194,6 +194,32 @@ void ssdp_handle_device_request(
 }
 		#endif
 
+static void ProcessSocketError(
+	const char *file, int line, const char *function_name)
+{
+	char errorBuffer[ERROR_BUFFER_LEN];
+
+	strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+	UpnpPrintf(UPNP_INFO,
+		SSDP,
+		file,
+		line,
+		"SSDP_LIB: New Request Handler:"
+		"Error in %s(): %s\n",
+		function_name,
+		errorBuffer);
+}
+
+		#define PROCESS_SOCKET_ERROR(file, line, error, func_name) \
+			do { \
+				if (rc == -1) { \
+					ProcessSocketError( \
+						file, line, func_name); \
+					ret = error; \
+					goto end_NewRequestHandler; \
+				} \
+			} while (0)
+
 /*!
  * \brief Works as a request handler which passes the HTTP request string
  * to multicast channel.
@@ -208,11 +234,13 @@ static int NewRequestHandler(
 	/*! [in] . */
 	char **RqPacket)
 {
-	char errorBuffer[ERROR_BUFFER_LEN];
+	int rc;
 	SOCKET ReplySock;
 	socklen_t socklen = sizeof(struct sockaddr_storage);
 	int Index;
 	struct in_addr replyAddr;
+	struct addrinfo hints, *res;
+	int yes = 1;
 	/* a/c to UPNP Spec */
 	int ttl = 4;
 		#ifdef UPNP_ENABLE_IPV6
@@ -226,36 +254,44 @@ static int NewRequestHandler(
 		return UPNP_E_INVALID_PARAM;
 	}
 
-	ReplySock = socket((int)DestAddr->sa_family, SOCK_DGRAM, 0);
+	hints.ai_family = DestAddr->sa_family;
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_flags = AI_PASSIVE;
+	getaddrinfo(NULL, SSDP_PORT_STR, &hints, &res);
+	ReplySock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (ReplySock == INVALID_SOCKET) {
-		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-		UpnpPrintf(UPNP_INFO,
-			SSDP,
-			__FILE__,
-			__LINE__,
-			"SSDP_LIB: New Request Handler:"
-			"Error in socket(): %s\n",
-			errorBuffer);
-
+		ProcessSocketError(__FILE__, __LINE__, "socket");
 		return UPNP_E_OUTOF_SOCKET;
 	}
-
+	rc = setsockopt(ReplySock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes);
+	PROCESS_SOCKET_ERROR(
+		__FILE__, __LINE__, UPNP_E_SOCKET_ERROR, "setsockopt-1");
+	rc = bind(ReplySock, res->ai_addr, res->ai_addrlen);
+	PROCESS_SOCKET_ERROR(__FILE__, __LINE__, UPNP_E_SOCKET_BIND, "bind");
 	switch (DestAddr->sa_family) {
 	case AF_INET:
 		inet_ntop(AF_INET,
 			&((struct sockaddr_in *)DestAddr)->sin_addr,
 			buf_ntop,
 			sizeof(buf_ntop));
-		setsockopt(ReplySock,
+		rc = setsockopt(ReplySock,
 			IPPROTO_IP,
 			IP_MULTICAST_IF,
-			(char *)&replyAddr,
+			&replyAddr,
 			sizeof(replyAddr));
-		setsockopt(ReplySock,
+		PROCESS_SOCKET_ERROR(__FILE__,
+			__LINE__,
+			UPNP_E_SOCKET_ERROR,
+			"setsockopt-2");
+		rc = setsockopt(ReplySock,
 			IPPROTO_IP,
 			IP_MULTICAST_TTL,
-			(char *)&ttl,
+			&ttl,
 			sizeof(int));
+		PROCESS_SOCKET_ERROR(__FILE__,
+			__LINE__,
+			UPNP_E_SOCKET_ERROR,
+			"setsockopt-3");
 		socklen = sizeof(struct sockaddr_in);
 		break;
 		#ifdef UPNP_ENABLE_IPV6
@@ -264,16 +300,24 @@ static int NewRequestHandler(
 			&((struct sockaddr_in6 *)DestAddr)->sin6_addr,
 			buf_ntop,
 			sizeof(buf_ntop));
-		setsockopt(ReplySock,
+		rc = setsockopt(ReplySock,
 			IPPROTO_IPV6,
 			IPV6_MULTICAST_IF,
-			(char *)&gIF_INDEX,
+			&gIF_INDEX,
 			sizeof(gIF_INDEX));
-		setsockopt(ReplySock,
+		PROCESS_SOCKET_ERROR(__FILE__,
+			__LINE__,
+			UPNP_E_SOCKET_ERROR,
+			"setsockopt-2");
+		rc = setsockopt(ReplySock,
 			IPPROTO_IPV6,
 			IPV6_MULTICAST_HOPS,
-			(char *)&hops,
+			&hops,
 			sizeof(hops));
+		PROCESS_SOCKET_ERROR(__FILE__,
+			__LINE__,
+			UPNP_E_SOCKET_ERROR,
+			"setsockopt-3");
 		break;
 		#endif
 	default:
@@ -301,18 +345,8 @@ static int NewRequestHandler(
 			0,
 			DestAddr,
 			socklen);
-		if (rc == -1) {
-			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-			UpnpPrintf(UPNP_INFO,
-				SSDP,
-				__FILE__,
-				__LINE__,
-				"SSDP_LIB: New Request Handler:"
-				"Error in socket(): %s\n",
-				errorBuffer);
-			ret = UPNP_E_SOCKET_WRITE;
-			goto end_NewRequestHandler;
-		}
+		PROCESS_SOCKET_ERROR(
+			__FILE__, __LINE__, UPNP_E_SOCKET_WRITE, "sendto");
 	}
 
 end_NewRequestHandler:
