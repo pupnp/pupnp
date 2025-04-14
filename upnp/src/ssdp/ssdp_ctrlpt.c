@@ -101,27 +101,27 @@ void ssdp_handle_ctrlpt_msg(
 
 	/* we are assuming that there can be only one client supported at a time
 	 */
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 
 	if (GetClientHandleInfo(&handle_start, &ctrlpt_info) != HND_CLIENT) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		goto end_ssdp_handle_ctrlpt_msg;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 	/* search timeout */
 	if (timeout) {
 		for (handle = handle_start; handle < NUM_HANDLE; handle++) {
-			HandleLock();
+			HandleLock(__FILE__, __LINE__);
 
 			/* get client info */
 			if (GetHandleInfo(handle, &ctrlpt_info) != HND_CLIENT) {
-				HandleUnlock();
+				HandleUnlock(__FILE__, __LINE__);
 				continue;
 			}
 			/* copy */
 			ctrlpt_callback = ctrlpt_info->Callback;
 			ctrlpt_cookie = ctrlpt_info->Cookie;
-			HandleUnlock();
+			HandleUnlock(__FILE__, __LINE__);
 
 			ctrlpt_callback(UPNP_DISCOVERY_SEARCH_TIMEOUT,
 				NULL,
@@ -227,17 +227,17 @@ void ssdp_handle_ctrlpt_msg(
 		}
 		/* call callback */
 		for (handle = handle_start; handle < NUM_HANDLE; handle++) {
-			HandleLock();
+			HandleLock(__FILE__, __LINE__);
 
 			/* get client info */
 			if (GetHandleInfo(handle, &ctrlpt_info) != HND_CLIENT) {
-				HandleUnlock();
+				HandleUnlock(__FILE__, __LINE__);
 				continue;
 			}
 			/* copy */
 			ctrlpt_callback = ctrlpt_info->Callback;
 			ctrlpt_cookie = ctrlpt_info->Cookie;
-			HandleUnlock();
+			HandleUnlock(__FILE__, __LINE__);
 
 			ctrlpt_callback(event_type, param, ctrlpt_cookie);
 		}
@@ -262,11 +262,11 @@ void ssdp_handle_ctrlpt_msg(
 		}
 		/* check each current search */
 		for (handle = handle_start; handle < NUM_HANDLE; handle++) {
-			HandleLock();
+			HandleLock(__FILE__, __LINE__);
 
 			/* get client info */
 			if (GetHandleInfo(handle, &ctrlpt_info) != HND_CLIENT) {
-				HandleUnlock();
+				HandleUnlock(__FILE__, __LINE__);
 				continue;
 			}
 			/* copy */
@@ -352,7 +352,7 @@ void ssdp_handle_ctrlpt_msg(
 					&ctrlpt_info->SsdpSearchList, node);
 			}
 
-			HandleUnlock();
+			HandleUnlock(__FILE__, __LINE__);
 			/*ctrlpt_callback( UPNP_DISCOVERY_SEARCH_RESULT, param,
 			 * ctrlpt_cookie ); */
 		}
@@ -539,12 +539,12 @@ static void searchExpired(
 	void *cookie = NULL;
 	int found = 0;
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 
 	/* remove search target from search list */
 	if (GetHandleInfo(handle, &ctrlpt_info) != HND_CLIENT) {
 		free(arg);
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return;
 	}
 	ctrlpt_callback = ctrlpt_info->Callback;
@@ -562,7 +562,7 @@ static void searchExpired(
 		}
 		node = ListNext(&ctrlpt_info->SsdpSearchList, node);
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	if (found)
 		ctrlpt_callback(UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie);
@@ -650,9 +650,9 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 		#endif
 
 	/* add search criteria to list */
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 	if (GetHandleInfo(Hnd, &ctrlpt_info) != HND_CLIENT) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INTERNAL_ERROR;
 	}
 	newArg = (SsdpSearchArg *)malloc(sizeof(SsdpSearchArg));
@@ -671,7 +671,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 		&gTimerThread, timeTillRead, REL_SEC, &job, SHORT_TERM, id);
 	newArg->timeoutEventId = *id;
 	ListAddTail(&ctrlpt_info->SsdpSearchList, newArg);
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 	/* End of lock */
 
 	FD_ZERO(&wrSet);

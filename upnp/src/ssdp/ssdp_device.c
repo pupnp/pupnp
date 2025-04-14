@@ -118,19 +118,19 @@ void ssdp_handle_device_request(
 
 	start = 0;
 	for (;;) {
-		HandleLock();
+		HandleLock(__FILE__, __LINE__);
 		/* device info. */
 		switch (GetDeviceHandleInfo(
 			start, (int)dest_addr->ss_family, &handle, &dev_info)) {
 		case HND_DEVICE:
 			break;
 		default:
-			HandleUnlock();
+			HandleUnlock(__FILE__, __LINE__);
 			/* no info found. */
 			return;
 		}
 		maxAge = dev_info->MaxAge;
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 
 		UpnpPrintf(UPNP_INFO,
 			API,

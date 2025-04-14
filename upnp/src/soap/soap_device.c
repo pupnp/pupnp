@@ -495,7 +495,7 @@ static int get_dev_service(
 	save_char = control_url[request->uri.pathquery.size];
 	((char *)control_url)[request->uri.pathquery.size] = '\0';
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 
 	if (GetDeviceHandleInfoForPath(control_url,
 		    AddressFamily,
@@ -516,7 +516,7 @@ static int get_dev_service(
 error_handler:
 	/* restore */
 	((char *)control_url)[request->uri.pathquery.size] = save_char;
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 	return ret_code;
 }
 

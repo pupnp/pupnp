@@ -125,7 +125,7 @@ int AdvertiseAndReply(int AdFlag,
 		AdFlag);
 
 	/* Use a read lock */
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	if (GetHandleInfo(Hnd, &SInfo) != HND_DEVICE) {
 		retVal = UPNP_E_INVALID_HANDLE;
 		goto end_function;
@@ -534,7 +534,7 @@ end_function:
 		__FILE__,
 		__LINE__,
 		"Exiting AdvertiseAndReply.\n");
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	return retVal;
 }

@@ -130,30 +130,41 @@ extern ithread_rwlock_t GlobalHndRWLock;
  *
  * \return HND_DEVICE, UPNP_E_INVALID_HANDLE
  */
+static enum Upnp_LogLevel_e debug_handle = UPNP_NEVER;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
 Upnp_Handle_Type GetHandleInfo(
 	/*! handle pointer (key for the client handle structure). */
 	int Hnd,
 	/*! handle structure passed by this function. */
 	struct Handle_Info **HndInfo);
 
-#define HandleLock() HandleWriteLock()
+static void HandleUnlock(const char *file, int line)
+{
+	UpnpPrintf(debug_handle, API, file, line, "Trying Unlock\n");
+	ithread_rwlock_unlock(&GlobalHndRWLock);
+	UpnpPrintf(debug_handle, API, file, line, "Unlocked rwlock\n");
+}
 
-#define HandleWriteLock() \
-	UpnpPrintf( \
-		UPNP_INFO, API, __FILE__, __LINE__, "Trying a write lock\n"); \
-	ithread_rwlock_wrlock(&GlobalHndRWLock); \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Write lock acquired\n")
+static void HandleReadLock(const char *file, int line)
+{
+	UpnpPrintf(debug_handle, API, file, line, "Trying a read lock\n");
+	ithread_rwlock_rdlock(&GlobalHndRWLock);
+	UpnpPrintf(debug_handle, API, file, line, "Read lock acquired\n");
+}
 
-#define HandleReadLock() \
-	UpnpPrintf( \
-		UPNP_INFO, API, __FILE__, __LINE__, "Trying a read lock\n"); \
-	ithread_rwlock_rdlock(&GlobalHndRWLock); \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Read lock acquired\n")
+static void HandleWriteLock(const char *file, int line)
+{
+	UpnpPrintf(debug_handle, API, file, line, "Trying a write lock\n");
+	ithread_rwlock_wrlock(&GlobalHndRWLock);
+	UpnpPrintf(debug_handle, API, file, line, "Write lock acquired\n");
+}
 
-#define HandleUnlock() \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying Unlock\n"); \
-	ithread_rwlock_unlock(&GlobalHndRWLock); \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Unlocked rwlock\n")
+static void HandleLock(const char *file, int line)
+{
+	HandleWriteLock(file, line);
+}
+#pragma GCC diagnostic pop
 
 /*!
  * \brief Get client handle info.

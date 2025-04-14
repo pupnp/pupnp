@@ -85,7 +85,9 @@ typedef enum Upnp_LogLevel_e
 	UPNP_CRITICAL,
 	UPNP_ERROR,
 	UPNP_INFO,
-	UPNP_ALL
+	UPNP_ALL,
+	/* Always the last, please. */
+	UPNP_NEVER
 } Upnp_LogLevel;
 /*@}*/
 

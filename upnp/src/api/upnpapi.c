@@ -443,11 +443,11 @@ static int UpnpInitPreamble(void)
 #endif /* UPNP_HAVE_OPTSSDP */
 
 	/* Initializes the handle list. */
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 	for (i = 0; i < NUM_HANDLE; ++i) {
 		HandleTable[i] = NULL;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	/* Initialize SDK global thread pools. */
 	retVal = UpnpInitThreadPools();
@@ -898,7 +898,7 @@ int UpnpRegisterRootDevice(const char *DescUrl,
 	int hasServiceTable = 0;
 	#endif /* EXCLUDE_GENA */
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 
 	UpnpPrintf(UPNP_ALL,
 		API,
@@ -1056,7 +1056,7 @@ exit_function:
 		__LINE__,
 		"Exiting RegisterRootDevice, return value == %d\n",
 		retVal);
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	return retVal;
 }
@@ -1096,7 +1096,7 @@ int UpnpRegisterRootDevice2(Upnp_DescType descriptionType,
 	char *description = (char *)description_const;
 	(void)bufferLen;
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 
 	UpnpPrintf(UPNP_ALL,
 		API,
@@ -1245,7 +1245,7 @@ exit_function:
 		__LINE__,
 		"Exiting RegisterRootDevice2, return value == %d\n",
 		retVal);
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	return retVal;
 }
@@ -1282,7 +1282,7 @@ int UpnpRegisterRootDevice4(const char *DescUrl,
 	int hasServiceTable = 0;
 	#endif /* EXCLUDE_GENA */
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 
 	UpnpPrintf(UPNP_ALL,
 		API,
@@ -1440,7 +1440,7 @@ exit_function:
 		__LINE__,
 		"Exiting RegisterRootDevice4, return value == %d\n",
 		retVal);
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	return retVal;
 }
@@ -1477,10 +1477,10 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd,
 		return UPNP_E_INVALID_HANDLE;
 	#endif
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &HInfo)) {
 	case HND_INVALID:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	default:
 		break;
@@ -1490,7 +1490,7 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd,
 		SleepPeriod = -1;
 	HInfo->SleepPeriod = SleepPeriod;
 	HInfo->RegistrationState = RegistrationState;
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	#if EXCLUDE_SSDP == 0
 	retVal = AdvertiseAndReply(-1,
@@ -1503,10 +1503,10 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd,
 		HInfo->MaxAge);
 	#endif
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &HInfo)) {
 	case HND_INVALID:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	default:
 		break;
@@ -1532,7 +1532,7 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd,
 		break;
 	}
 	FreeHandle(Hnd);
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	UpnpPrintf(UPNP_INFO,
 		API,
@@ -1560,20 +1560,20 @@ int UpnpRegisterClient(
 	if (Fun == NULL || Hnd == NULL)
 		return UPNP_E_INVALID_PARAM;
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 	if ((NUM_HANDLE - 1) <=
 		(UpnpSdkClientRegistered + UpnpSdkDeviceRegisteredV4 +
 			UpnpSdkDeviceregisteredV6)) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_ALREADY_REGISTERED;
 	}
 	if ((*Hnd = GetFreeHandle()) == UPNP_E_OUTOF_HANDLE) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_OUTOF_MEMORY;
 	}
 	HInfo = (struct Handle_Info *)malloc(sizeof(struct Handle_Info));
 	if (HInfo == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_OUTOF_MEMORY;
 	}
 	HInfo->HType = HND_CLIENT;
@@ -1588,7 +1588,7 @@ int UpnpRegisterClient(
 	#endif
 	HandleTable[*Hnd] = HInfo;
 	UpnpSdkClientRegistered += 1;
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	UpnpPrintf(UPNP_ALL,
 		API,
@@ -1615,21 +1615,21 @@ int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 		__LINE__,
 		"Inside UpnpUnRegisterClient \n");
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 	if (!UpnpSdkClientRegistered) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	#if EXCLUDE_GENA == 0
 	if (genaUnregisterClient(Hnd) != UPNP_E_SUCCESS)
 		return UPNP_E_INVALID_HANDLE;
 	#endif
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &HInfo)) {
 	case HND_INVALID:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	default:
 		break;
@@ -1648,7 +1648,7 @@ int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 	ListDestroy(&HInfo->SsdpSearchList, 0);
 	FreeHandle(Hnd);
 	UpnpSdkClientRegistered -= 1;
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	UpnpPrintf(UPNP_ALL,
 		API,
@@ -1949,12 +1949,12 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 		__LINE__,
 		"Inside UpnpSendAdvertisementLowPower \n");
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_DEVICE:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
 	if (Exp < 1)
@@ -1967,7 +1967,7 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 		SleepPeriod = -1;
 	SInfo->SleepPeriod = SleepPeriod;
 	SInfo->RegistrationState = RegistrationState;
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 	retVal = AdvertiseAndReply(1,
 		Hnd,
 		(enum SsdpSearchType)0,
@@ -1992,12 +1992,12 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 	adEvent->advertise.handle = Hnd;
 	adEvent->advertise.Event = ptrMx;
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_DEVICE:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		free(adEvent);
 		free(ptrMx);
 		return UPNP_E_INVALID_HANDLE;
@@ -2012,7 +2012,7 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 		     &job,
 		     SHORT_TERM,
 		     &(adEvent->advertise.eventId))) != UPNP_E_SUCCESS) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		free_advertise_arg(adEvent);
 		return retVal;
 	}
@@ -2026,13 +2026,13 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 		     &job,
 		     SHORT_TERM,
 		     &(adEvent->advertise.eventId))) != UPNP_E_SUCCESS) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		free_advertise_arg(adEvent);
 		return retVal;
 	}
 		#endif
 
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 	UpnpPrintf(UPNP_ALL,
 		API,
 		__FILE__,
@@ -2063,23 +2063,23 @@ int UpnpSearchAsync(UpnpClient_Handle Hnd,
 	UpnpPrintf(
 		UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpSearchAsync\n");
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
 	if (Mx < 1)
 		Mx = DEFAULT_MX;
 
 	if (Target == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
 
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 	retVal = SearchByTarget(Hnd, Mx, Target, (void *)Cookie_const);
 	if (retVal != 1)
 		return retVal;
@@ -2117,20 +2117,20 @@ int UpnpSetMaxSubscriptions(UpnpDevice_Handle Hnd, int MaxSubscriptions)
 		__LINE__,
 		"Inside UpnpSetMaxSubscriptions \n");
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_DEVICE:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
 	if ((MaxSubscriptions != UPNP_INFINITE) && (MaxSubscriptions < 0)) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
 	SInfo->MaxSubscriptions = MaxSubscriptions;
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	UpnpPrintf(UPNP_ALL,
 		API,
@@ -2158,23 +2158,23 @@ int UpnpSetMaxSubscriptionTimeOut(
 		__LINE__,
 		"Inside UpnpSetMaxSubscriptionTimeOut\n");
 
-	HandleLock();
+	HandleLock(__FILE__, __LINE__);
 
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_DEVICE:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
 	if ((MaxSubscriptionTimeOut != UPNP_INFINITE) &&
 		(MaxSubscriptionTimeOut < 0)) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
 
 	SInfo->MaxSubscriptionTimeOut = MaxSubscriptionTimeOut;
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	UpnpPrintf(UPNP_ALL,
 		API,
@@ -2210,27 +2210,27 @@ int UpnpSubscribeAsync(UpnpClient_Handle Hnd,
 		__LINE__,
 		"Inside UpnpSubscribeAsync\n");
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
 	if (EvtUrl == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
 	if (TimeOut != UPNP_INFINITE && TimeOut < 1) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
 	if (Fun == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	Param = (struct UpnpNonblockParam *)malloc(
 		sizeof(struct UpnpNonblockParam));
@@ -2306,16 +2306,16 @@ int UpnpSubscribe(UpnpClient_Handle Hnd,
 		goto exit_function;
 	}
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		retVal = UPNP_E_INVALID_HANDLE;
 		goto exit_function;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	retVal = genaSubscribe(Hnd, EvtUrl, TimeOut, SubsIdTmp);
 	memset(SubsId, 0, sizeof(Upnp_SID));
@@ -2361,16 +2361,16 @@ int UpnpUnSubscribe(UpnpClient_Handle Hnd, const Upnp_SID SubsId)
 	}
 	UpnpString_set_String(SubsIdTmp, SubsId);
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		retVal = UPNP_E_INVALID_HANDLE;
 		goto exit_function;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	retVal = genaUnSubscribe(Hnd, SubsIdTmp);
 
@@ -2421,16 +2421,16 @@ int UpnpUnSubscribeAsync(UpnpClient_Handle Hnd,
 		goto exit_function;
 	}
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		retVal = UPNP_E_INVALID_HANDLE;
 		goto exit_function;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	Param = (struct UpnpNonblockParam *)malloc(
 		sizeof(struct UpnpNonblockParam));
@@ -2497,16 +2497,16 @@ int UpnpRenewSubscription(
 		goto exit_function;
 	}
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		retVal = UPNP_E_INVALID_HANDLE;
 		goto exit_function;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	retVal = genaRenewSubscription(Hnd, SubsIdTmp, TimeOut);
 
@@ -2546,27 +2546,27 @@ int UpnpRenewSubscriptionAsync(UpnpClient_Handle Hnd,
 		__FILE__,
 		__LINE__,
 		"Inside UpnpRenewSubscriptionAsync\n");
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
 	if (TimeOut != UPNP_INFINITE && TimeOut < 1) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
 	if (SubsId == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
 	if (Fun == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	Param = (struct UpnpNonblockParam *)malloc(
 		sizeof(struct UpnpNonblockParam));
@@ -2620,28 +2620,28 @@ int UpnpNotify(UpnpDevice_Handle Hnd,
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpNotify\n");
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_DEVICE:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
 	if (DevID == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
 	if (ServName == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
 	if (VarName == NULL || NewVal == NULL || cVariables < 0) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
 
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 	retVal = genaNotifyAll(
 		Hnd, DevID, ServName, VarName, NewVal, cVariables);
 
@@ -2666,24 +2666,24 @@ int UpnpNotifyExt(UpnpDevice_Handle Hnd,
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Inside UpnpNotify \n");
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_DEVICE:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
 	if (DevID == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
 	if (ServName == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_PARAM;
 	}
 
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 	retVal = genaNotifyAllExt(Hnd, DevID, ServName, PropSet);
 
 	UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "Exiting UpnpNotify \n");
@@ -2721,31 +2721,31 @@ int UpnpAcceptSubscription(UpnpDevice_Handle Hnd,
 		goto exit_function;
 	}
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_DEVICE:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		line = __LINE__;
 		ret = UPNP_E_INVALID_HANDLE;
 		goto exit_function;
 	}
 	if (DevID == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
 	if (ServName == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
 	if (SubsId == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
@@ -2754,14 +2754,14 @@ int UpnpAcceptSubscription(UpnpDevice_Handle Hnd,
 		 * commented out */
 		#if 0
 	if (VarName == NULL || NewVal == NULL || cVariables < 0) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
 		#endif
 
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	line = __LINE__;
 	ret = genaInitNotify(
@@ -2802,31 +2802,31 @@ int UpnpAcceptSubscriptionExt(UpnpDevice_Handle Hnd,
 		goto exit_function;
 	}
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_DEVICE:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		line = __LINE__;
 		ret = UPNP_E_INVALID_HANDLE;
 		goto exit_function;
 	}
 	if (DevID == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
 	if (ServName == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
 	if (SubsId == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
@@ -2835,14 +2835,14 @@ int UpnpAcceptSubscriptionExt(UpnpDevice_Handle Hnd,
 		 * commented out */
 		#if 0
 	if (PropSet == NULL) {
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		line = __LINE__;
 		ret = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
 		#endif
 
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	line = __LINE__;
 	ret = genaInitNotifyExt(Hnd, DevID, ServName, PropSet, SubsId);
@@ -2897,15 +2897,15 @@ int UpnpSendAction(UpnpClient_Handle Hnd,
 	}
 	DevUDN_const = NULL;
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	if (ActionURL == NULL) {
 		return UPNP_E_INVALID_PARAM;
@@ -2957,15 +2957,15 @@ int UpnpSendActionEx(UpnpClient_Handle Hnd,
 		return retVal;
 	}
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	if (ActionURL == NULL) {
 		return UPNP_E_INVALID_PARAM;
@@ -3013,15 +3013,15 @@ int UpnpSendActionAsync(UpnpClient_Handle Hnd,
 		__LINE__,
 		"Inside UpnpSendActionAsync\n");
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	if (ActionURL == NULL) {
 		return UPNP_E_INVALID_PARAM;
@@ -3123,15 +3123,15 @@ int UpnpSendActionExAsync(UpnpClient_Handle Hnd,
 		return retVal;
 	}
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	if (ActionURL == NULL) {
 		return UPNP_E_INVALID_PARAM;
@@ -3235,15 +3235,15 @@ int UpnpGetServiceVarStatusAsync(UpnpClient_Handle Hnd,
 		__LINE__,
 		"Inside UpnpGetServiceVarStatusAsync\n");
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	if (ActionURL == NULL) {
 		return UPNP_E_INVALID_PARAM;
@@ -3304,16 +3304,16 @@ int UpnpGetServiceVarStatus(UpnpClient_Handle Hnd,
 		__LINE__,
 		"Inside UpnpGetServiceVarStatus\n");
 
-	HandleReadLock();
+	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
 		break;
 	default:
-		HandleUnlock();
+		HandleUnlock(__FILE__, __LINE__);
 		return UPNP_E_INVALID_HANDLE;
 	}
 
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 
 	if (ActionURL == NULL) {
 		return UPNP_E_INVALID_PARAM;
@@ -4623,13 +4623,13 @@ int UpnpSetContentLength(UpnpClient_Handle Hnd, size_t contentLength)
 			break;
 		}
 
-		HandleLock();
+		HandleLock(__FILE__, __LINE__);
 
 		switch (GetHandleInfo(Hnd, &HInfo)) {
 		case HND_DEVICE:
 			break;
 		default:
-			HandleUnlock();
+			HandleUnlock(__FILE__, __LINE__);
 			return UPNP_E_INVALID_HANDLE;
 		}
 		if (contentLength > MAX_SOAP_CONTENT_LENGTH) {
@@ -4639,7 +4639,7 @@ int UpnpSetContentLength(UpnpClient_Handle Hnd, size_t contentLength)
 		g_maxContentLength = contentLength;
 	} while (0);
 
-	HandleUnlock();
+	HandleUnlock(__FILE__, __LINE__);
 	return errCode;
 }
 
