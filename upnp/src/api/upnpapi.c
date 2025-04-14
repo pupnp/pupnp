@@ -4238,13 +4238,14 @@ Upnp_Handle_Type GetHandleInfo(
 {
 	Upnp_Handle_Type ret = HND_INVALID;
 
+#if 0
 	UpnpPrintf(UPNP_ALL,
 		API,
 		__FILE__,
 		__LINE__,
 		"GetHandleInfo: entering, Handle is %d\n",
 		Hnd);
-
+#endif
 	if (Hnd < 1 || Hnd >= NUM_HANDLE) {
 		UpnpPrintf(UPNP_ALL,
 			API,
@@ -4252,19 +4253,23 @@ Upnp_Handle_Type GetHandleInfo(
 			__LINE__,
 			"GetHandleInfo: Handle out of range\n");
 	} else if (HandleTable[Hnd] == NULL) {
+#if 0
 		UpnpPrintf(UPNP_ALL,
 			API,
 			__FILE__,
 			__LINE__,
 			"GetHandleInfo: HandleTable[%d] is NULL\n",
 			Hnd);
+#endif
 	} else if (HandleTable[Hnd] != NULL) {
 		*HndInfo = (struct Handle_Info *)HandleTable[Hnd];
 		ret = ((struct Handle_Info *)*HndInfo)->HType;
 	}
 
+#if 0
 	UpnpPrintf(
 		UPNP_ALL, API, __FILE__, __LINE__, "GetHandleInfo: exiting\n");
+#endif
 
 	return ret;
 }
