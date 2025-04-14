@@ -759,6 +759,9 @@ int DeviceAdvertisement(char *DevType,
 		__FILE__,
 		__LINE__,
 		"In function DeviceAdvertisement\n");
+	msgs[0] = NULL;
+	msgs[1] = NULL;
+	msgs[2] = NULL;
 	memset(&__ss, 0, sizeof(__ss));
 	switch (AddressFamily) {
 	case AF_INET:
@@ -781,10 +784,9 @@ int DeviceAdvertisement(char *DevType,
 			__FILE__,
 			__LINE__,
 			"Invalid device address family.\n");
+		ret_code = UPNP_E_INVALID_PARAM;
+		goto error_handler;
 	}
-	msgs[0] = NULL;
-	msgs[1] = NULL;
-	msgs[2] = NULL;
 	/* If deviceis a root device , here we need to send 3 advertisement
 	 * or reply */
 	if (RootDev) {
