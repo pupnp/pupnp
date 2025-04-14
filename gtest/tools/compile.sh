@@ -8,7 +8,11 @@ fi
 BUILD_DIR="../../build"
 
 TESTNAME=$(/usr/bin/basename -s.cpp "$1")
-/usr/bin/g++ -std=c++14 -pedantic-errors -Wall \
+
+compile_flags=(\
+-std=c++14 \
+-pedantic-errors \
+-Wall \
 -o"$TESTNAME".a \
 -I"$BUILD_DIR"/_deps/googletest-src/googletest/include \
 -I"$BUILD_DIR"/_deps/googletest-src/googlemock/include \
@@ -24,4 +28,19 @@ TESTNAME=$(/usr/bin/basename -s.cpp "$1")
 "$BUILD_DIR"/lib/libgmockd.a \
 "$BUILD_DIR"/upnp/libupnp.a \
 "$BUILD_DIR"/ixml/libixml.a \
--lpthread
+-lpthread \
+)
+
+#
+# compile_flags.txt did not work for clangd, I'll leave it commented
+#
+if false; then
+    truncate -s 0 compile_flags.txt
+    for i in "${!compile_flags[@]}"; do
+        echo "${compile_flags[$i]}" >> compile_flags.txt
+    done
+    echo >> compile_flags.txt
+fi
+
+/usr/bin/g++ "${compile_flags[@]}"
+
