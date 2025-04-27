@@ -1,0 +1,91 @@
+name: New Release
+
+#on: [push]
+on:
+  push:
+    tags:
+      - "release-*"
+
+jobs:
+  new_release:
+    name: Create release ${{ github.ref_name }}
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Checkout
+        # Checkout the repo
+        uses: actions/checkout@v3
+      - name: Preparation
+        # Prepare some usefull environment variables
+        run: |
+          #
+          # Parse the tag name
+          #
+          # These variables must exist in the parent process so that
+          # the sourced code may alter them.
+          curr_release=
+          next_release=
+          source scripts/parse_release.sh ${{ github.ref_name }}
+          #
+          # Copy the resulting variables to the environment
+          echo "curr_release=${curr_release}" >> "$GITHUB_ENV"
+          echo "next_release=${next_release}" >> "$GITHUB_ENV"
+          #
+          # Debug, print them in the step summary
+          echo >> $GITHUB_STEP_SUMMARY
+          echo "curr_release=${curr_release}" >> $GITHUB_STEP_SUMMARY
+          echo "next_release=${next_release}" >> $GITHUB_STEP_SUMMARY
+      - name: Configure
+        run: >
+          ./bootstrap &&
+          ./configure
+      - name: Build
+        run: |
+          #
+          # Build and run checks
+          make distcheck
+          #
+          # Find out bz2 name
+          bz2_name=
+          source scripts/find_out_bz2_name.sh
+          #
+          # Save and print
+          echo "bz2_name=${bz2_name}" >> "$GITHUB_ENV"
+          echo >> $GITHUB_STEP_SUMMARY
+          echo "bz2_name=${bz2_name}" >> $GITHUB_STEP_SUMMARY
+      - name: SHA1
+        #
+        # Calculate the checksum
+        run: |
+          sha1sum ${bz2_name} > ${bz2_name}.sha1
+      - name: List files in the repository root
+        run: |
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          #ls -la ${{ github.workspace }} >> $GITHUB_STEP_SUMMARY
+          #echo >> $GITHUB_STEP_SUMMARY
+          #ls libupnp-*.tar.bz2 >> $GITHUB_STEP_SUMMARY
+          #echo >> $GITHUB_STEP_SUMMARY
+          ls -la >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+#      - name: Release
+#        #
+#        # This action uploads the generated release files to GitHub
+#        uses: softprops/action-gh-release@v2
+#        with:
+#         files: |
+#            ${bz2_name}
+#            ${bz2_name}.sha1
+      - name: Homekeeping
+        run: |
+          #
+          # Edit some files
+          source scripts/homekeeping.sh
+          #
+          # Configure git
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'github_action@users.noreply.github.com'
+          # Commit
+          git status >> $GITHUB_STEP_SUMMARY
+          git add -A
+          git commit -am "Homekeeping for the next release"
+          git status >> $GITHUB_STEP_SUMMARY
+          git push origin HEAD:wfl-release
