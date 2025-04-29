@@ -6,7 +6,7 @@ Version 1.18.0
 Version 1.16.0
 *******************************************************************************
 
-        Aborted.
+	Aborted.
 
 *******************************************************************************
 Version 1.14.21
@@ -14,8 +14,8 @@ Version 1.14.21
 
 2024-11-21 Marcelo Roberto Jimenez <mroberto(at)users.sourceforge.net>
 
-        - Lots of IXML fuzzer fixes
-        - ssdp_device.c: Bind SSDP UDP response to 1900
+	- Lots of IXML fuzzer fixes
+	- ssdp_device.c: Bind SSDP UDP response to 1900
 
 *******************************************************************************
 Version 1.14.20
