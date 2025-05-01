@@ -15,7 +15,7 @@ jobs:
         # Checkout the repo
         uses: actions/checkout@v3
       - name: Preparation
-        # Prepare some usefull environment variables
+        # Prepare some useful environment variables
         run: |
           #
           # Parse the tag name
