@@ -494,7 +494,7 @@ freebsd*)
 		# Use -O0 in debug so that variables do not get optimized out
 		AX_CFLAGS_GCC_OPTION([-O0, -g])
 	else
-		# add optimise for size
+		# add optimize for size
 		AX_CFLAGS_GCC_OPTION([-Os])
 	fi
 	;;
@@ -510,7 +510,7 @@ AC_TYPE_SIZE_T
 
 
 #
-# Are we targetting Win32?
+# Are we targeting Win32?
 #
 AC_MSG_CHECKING([for Win32])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
