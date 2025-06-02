@@ -68,8 +68,8 @@ sed -i -E \
 }" configure.ac
 
 pattern="(.*,\s\[).*(\]\))"
-sed -i -E "$((line+1)) s/$pattern/\1$current_ixml.$revision_ixml.$age_ixml\2/" configure.ac
-sed -i -E "$((line+2)) s/$pattern/\1$current_upnp.$revision_upnp.$age_upnp\2/" configure.ac
+sed -i -E "$((line+1)) s/$pattern/\1$current_ixml:$revision_ixml:$age_ixml\2/" configure.ac
+sed -i -E "$((line+2)) s/$pattern/\1$current_upnp:$revision_upnp:$age_upnp\2/" configure.ac
 sed -i -E "$((line+2)) r docs/configure_ac_template.txt" configure.ac
 
 #AC_INIT([libupnp],[1.14.21],[mroberto@users.sourceforge.net])

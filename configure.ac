@@ -24,8 +24,8 @@ dnl # *please update only once, before a formal release, not for each change*
 dnl #
 dnl ############################################################################
 AC_INIT([libupnp],[1.14.22],[mroberto@users.sourceforge.net])
-AC_SUBST([LT_VERSION_IXML], [12.3.1])
-AC_SUBST([LT_VERSION_UPNP], [19.2.2])
+AC_SUBST([LT_VERSION_IXML], [12:3:1])
+AC_SUBST([LT_VERSION_UPNP], [19:2:2])
 dnl ############################################################################
 dnl # Release 1.14.22
 dnl # "current:revision:age"
