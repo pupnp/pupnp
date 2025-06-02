@@ -44,11 +44,11 @@
 #endif
 
 #include <assert.h>
-#include <errno.h>
+#include <errno.h> // IWYU pragma: keep
 
 static int freeListNode(ListNode *node, LinkedList *list)
 {
-	assert(list != NULL);
+	assert(list != 0);
 
 	return FreeListFree(&list->freeNodeList, node);
 }
@@ -59,7 +59,7 @@ static int freeListNode(ListNode *node, LinkedList *list)
  *  Parameters:
  *      void * item - the item to store
  *  Returns:
- *      The new node, NULL on failure.
+ *      The new node, 0 on failure.
  */
 static ListNode *CreateListNode(
 	/*! the item to store. */
@@ -67,14 +67,14 @@ static ListNode *CreateListNode(
 	/*! The list to add it to. */
 	LinkedList *list)
 {
-	ListNode *temp = NULL;
+	ListNode *temp = 0;
 
-	assert(list != NULL);
+	assert(list != 0);
 
 	temp = (ListNode *)FreeListAlloc(&list->freeNodeList);
 	if (temp) {
-		temp->prev = NULL;
-		temp->next = NULL;
+		temp->prev = 0;
+		temp->next = 0;
 		temp->item = item;
 	}
 
@@ -85,7 +85,7 @@ int ListInit(LinkedList *list, cmp_routine cmp_func, free_function free_func)
 {
 	int retCode = 0;
 
-	assert(list != NULL);
+	assert(list != 0);
 
 	if (!list)
 		return EINVAL;
@@ -97,44 +97,44 @@ int ListInit(LinkedList *list, cmp_routine cmp_func, free_function free_func)
 
 	assert(retCode == 0);
 
-	list->head.item = NULL;
+	list->head.item = 0;
 	list->head.next = &list->tail;
-	list->head.prev = NULL;
-	list->tail.item = NULL;
+	list->head.prev = 0;
+	list->tail.item = 0;
 	list->tail.prev = &list->head;
-	list->tail.next = NULL;
+	list->tail.next = 0;
 
 	return retCode;
 }
 
 ListNode *ListAddHead(LinkedList *list, void *item)
 {
-	assert(list != NULL);
+	assert(list != 0);
 
-	if (list == NULL)
-		return NULL;
+	if (!list)
+		return 0;
 
 	return ListAddAfter(list, item, &list->head);
 }
 
 ListNode *ListAddTail(LinkedList *list, void *item)
 {
-	assert(list != NULL);
+	assert(list != 0);
 
 	if (!list)
-		return NULL;
+		return 0;
 
 	return ListAddBefore(list, item, &list->tail);
 }
 
 ListNode *ListAddAfter(LinkedList *list, void *item, ListNode *bnode)
 {
-	ListNode *newNode = NULL;
+	ListNode *newNode = 0;
 
-	assert(list != NULL);
+	assert(list != 0);
 
 	if (!list || !bnode)
-		return NULL;
+		return 0;
 	newNode = CreateListNode(item, list);
 	if (newNode) {
 		ListNode *temp = bnode->next;
@@ -148,17 +148,17 @@ ListNode *ListAddAfter(LinkedList *list, void *item, ListNode *bnode)
 		return newNode;
 	}
 
-	return NULL;
+	return 0;
 }
 
 ListNode *ListAddBefore(LinkedList *list, void *item, ListNode *anode)
 {
-	ListNode *newNode = NULL;
+	ListNode *newNode = 0;
 
-	assert(list != NULL);
+	assert(list != 0);
 
 	if (!list || !anode)
-		return NULL;
+		return 0;
 	newNode = CreateListNode(item, list);
 	if (newNode) {
 		ListNode *temp = anode->prev;
@@ -172,19 +172,19 @@ ListNode *ListAddBefore(LinkedList *list, void *item, ListNode *anode)
 		return newNode;
 	}
 
-	return NULL;
+	return 0;
 }
 
 void *ListDelNode(LinkedList *list, ListNode *dnode, int freeItem)
 {
 	void *temp;
 
-	assert(list != NULL);
+	assert(list != 0);
 	assert(dnode != &list->head);
 	assert(dnode != &list->tail);
 
 	if (!list || dnode == &list->head || dnode == &list->tail || !dnode)
-		return NULL;
+		return 0;
 	temp = dnode->item;
 	dnode->prev->next = dnode->next;
 	dnode->next->prev = dnode->prev;
@@ -192,7 +192,7 @@ void *ListDelNode(LinkedList *list, ListNode *dnode, int freeItem)
 	list->size--;
 	if (freeItem && list->free_func) {
 		list->free_func(temp);
-		temp = NULL;
+		temp = 0;
 	}
 
 	return temp;
@@ -200,8 +200,8 @@ void *ListDelNode(LinkedList *list, ListNode *dnode, int freeItem)
 
 int ListDestroy(LinkedList *list, int freeItem)
 {
-	ListNode *dnode = NULL;
-	ListNode *temp = NULL;
+	ListNode *dnode = 0;
+	ListNode *temp = 0;
 
 	if (!list)
 		return EINVAL;
@@ -219,63 +219,63 @@ int ListDestroy(LinkedList *list, int freeItem)
 
 ListNode *ListHead(LinkedList *list)
 {
-	assert(list != NULL);
+	assert(list != 0);
 
 	if (!list)
-		return NULL;
+		return 0;
 
 	if (!list->size)
-		return NULL;
+		return 0;
 	else
 		return list->head.next;
 }
 
 ListNode *ListTail(LinkedList *list)
 {
-	assert(list != NULL);
+	assert(list != 0);
 
 	if (!list)
-		return NULL;
+		return 0;
 
 	if (!list->size)
-		return NULL;
+		return 0;
 	else
 		return list->tail.prev;
 }
 
 ListNode *ListNext(LinkedList *list, ListNode *node)
 {
-	assert(list != NULL);
-	assert(node != NULL);
+	assert(list != 0);
+	assert(node != 0);
 
 	if (!list || !node)
-		return NULL;
+		return 0;
 	if (node->next == &list->tail)
-		return NULL;
+		return 0;
 	else
 		return node->next;
 }
 
 ListNode *ListPrev(LinkedList *list, ListNode *node)
 {
-	assert(list != NULL);
-	assert(node != NULL);
+	assert(list != 0);
+	assert(node != 0);
 
 	if (!list || !node)
-		return NULL;
+		return 0;
 
 	if (node->prev == &list->head)
-		return NULL;
+		return 0;
 	else
 		return node->prev;
 }
 
 ListNode *ListFind(LinkedList *list, ListNode *start, void *item)
 {
-	ListNode *finger = NULL;
+	ListNode *finger = 0;
 
 	if (!list)
-		return NULL;
+		return 0;
 	if (!start)
 		start = &list->head;
 
@@ -296,12 +296,12 @@ ListNode *ListFind(LinkedList *list, ListNode *start, void *item)
 		finger = finger->next;
 	}
 
-	return NULL;
+	return 0;
 }
 
 long ListSize(LinkedList *list)
 {
-	assert(list != NULL);
+	assert(list != 0);
 
 	if (!list)
 		return EINVAL;
