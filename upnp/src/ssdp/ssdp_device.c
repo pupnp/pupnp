@@ -254,10 +254,17 @@ static int NewRequestHandler(
 		return UPNP_E_INVALID_PARAM;
 	}
 
+	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = DestAddr->sa_family;
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_flags = AI_PASSIVE;
-	getaddrinfo(NULL, SSDP_PORT_STR, &hints, &res);
+	if ((rc = getaddrinfo(NULL, SSDP_PORT_STR, &hints, &res)) != 0) {
+		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+			"SSDP_LIB: New Request Handler:"
+			"Error in getaddrinfo(): %s\n", gai_strerror(rc));
+		ret = UPNP_E_SOCKET_ERROR;
+		goto end_NewRequestHandler;
+	}
 	ReplySock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (ReplySock == INVALID_SOCKET) {
 		ProcessSocketError(__FILE__, __LINE__, "socket");
