@@ -259,9 +259,13 @@ static int NewRequestHandler(
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_flags = AI_PASSIVE;
 	if ((rc = getaddrinfo(NULL, SSDP_PORT_STR, &hints, &res)) != 0) {
-		UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__,
+		UpnpPrintf(UPNP_INFO,
+			SSDP,
+			__FILE__,
+			__LINE__,
 			"SSDP_LIB: New Request Handler:"
-			"Error in getaddrinfo(): %s\n", gai_strerror(rc));
+			"Error in getaddrinfo(): %s\n",
+			gai_strerror(rc));
 		ret = UPNP_E_SOCKET_ERROR;
 		goto end_NewRequestHandler;
 	}
