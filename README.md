@@ -40,6 +40,7 @@ See [LICENSE](site/LICENSE) for details.
   - [10.5. Solaris Build](#105-solaris-build)
   - [10.6. Windows Build](#106-windows-build)
   - [10.7. CMake Build](#107-cmake-build)
+  - [10.8. OpenHarmony Build](#108-openharmony-build)
 - [11. Install/Uninstall Instructions](#11-installuninstall-instructions)
   - [11.1. Install](#111-install)
   - [11.2. Uninstall](#112-uninstall)
@@ -413,6 +414,10 @@ If you don't want to build pthreads4w in the same build as upnp, you can downloa
 Just build and install it. The libs and headers will be found, if you set CMAKE_INSTALL_PREFIX (the base install dir) to the same location.
 
 For information on general usage of the cmake build system see: <https://cmake.org/cmake/help/v3.19/guide/user-interaction/index.html>
+
+### 10.8. OpenHarmony Build
+
+See [Cross Compilation Guide for OpenHarmony](https://gitcode.com/openharmony-sig/tpc_c_cplusplus/blob/master/Cross_Compilation_Guide_for_Open_Source_Third_Party_Libraries_in_OpenHarmony_en.md)
 
 ## 11. Install/Uninstall Instructions
 
