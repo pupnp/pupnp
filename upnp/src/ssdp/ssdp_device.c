@@ -274,7 +274,8 @@ static int NewRequestHandler(
 		ProcessSocketError(__FILE__, __LINE__, "socket");
 		return UPNP_E_OUTOF_SOCKET;
 	}
-	rc = setsockopt(ReplySock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes);
+	rc = setsockopt(
+		ReplySock, SOL_SOCKET, SO_REUSEADDR, (char *)&yes, sizeof yes);
 	PROCESS_SOCKET_ERROR(
 		__FILE__, __LINE__, UPNP_E_SOCKET_ERROR, "setsockopt-1");
 	rc = bind(ReplySock, res->ai_addr, res->ai_addrlen);
@@ -288,7 +289,7 @@ static int NewRequestHandler(
 		rc = setsockopt(ReplySock,
 			IPPROTO_IP,
 			IP_MULTICAST_IF,
-			&replyAddr,
+			(char *)&replyAddr,
 			sizeof(replyAddr));
 		PROCESS_SOCKET_ERROR(__FILE__,
 			__LINE__,
@@ -297,7 +298,7 @@ static int NewRequestHandler(
 		rc = setsockopt(ReplySock,
 			IPPROTO_IP,
 			IP_MULTICAST_TTL,
-			&ttl,
+			(char *)&ttl,
 			sizeof(int));
 		PROCESS_SOCKET_ERROR(__FILE__,
 			__LINE__,
@@ -314,7 +315,7 @@ static int NewRequestHandler(
 		rc = setsockopt(ReplySock,
 			IPPROTO_IPV6,
 			IPV6_MULTICAST_IF,
-			&gIF_INDEX,
+			(char *)&gIF_INDEX,
 			sizeof(gIF_INDEX));
 		PROCESS_SOCKET_ERROR(__FILE__,
 			__LINE__,
@@ -323,7 +324,7 @@ static int NewRequestHandler(
 		rc = setsockopt(ReplySock,
 			IPPROTO_IPV6,
 			IPV6_MULTICAST_HOPS,
-			&hops,
+			(char *)&hops,
 			sizeof(hops));
 		PROCESS_SOCKET_ERROR(__FILE__,
 			__LINE__,
