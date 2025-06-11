@@ -935,7 +935,7 @@ static int create_ssdp_sock_v4(
 	ret = setsockopt(*ssdpSock,
 		SOL_SOCKET,
 		SO_REUSEADDR,
-		(char *)&onOff,
+		(OPTION_VALUE_CAST)&onOff,
 		sizeof(onOff));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -953,7 +953,7 @@ static int create_ssdp_sock_v4(
 	ret = setsockopt(*ssdpSock,
 		SOL_SOCKET,
 		SO_REUSEPORT,
-		(char *)&onOff,
+		(OPTION_VALUE_CAST)&onOff,
 		sizeof(onOff));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1002,7 +1002,7 @@ static int create_ssdp_sock_v4(
 	ret = setsockopt(*ssdpSock,
 		IPPROTO_IP,
 		IP_ADD_MEMBERSHIP,
-		(char *)&ssdpMcastAddr,
+		(OPTION_VALUE_CAST)&ssdpMcastAddr,
 		sizeof(struct ip_mreq));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1022,7 +1022,7 @@ static int create_ssdp_sock_v4(
 	ret = setsockopt(*ssdpSock,
 		IPPROTO_IP,
 		IP_MULTICAST_IF,
-		(char *)&addr,
+		(OPTION_VALUE_CAST)&addr,
 		sizeof addr);
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1036,12 +1036,16 @@ static int create_ssdp_sock_v4(
 		/* This is probably not a critical error, so let's continue. */
 	}
 	/* result is not checked becuase it will fail in WinMe and Win9x. */
-	setsockopt(*ssdpSock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl));
+	setsockopt(*ssdpSock,
+		IPPROTO_IP,
+		IP_MULTICAST_TTL,
+		(OPTION_VALUE_CAST)&ttl,
+		sizeof(ttl));
 	onOff = 1;
 	ret = setsockopt(*ssdpSock,
 		SOL_SOCKET,
 		SO_BROADCAST,
-		(char *)&onOff,
+		(OPTION_VALUE_CAST)&onOff,
 		sizeof(onOff));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1089,8 +1093,11 @@ static int create_ssdp_sock_reqv4(
 			errorBuffer);
 		return UPNP_E_OUTOF_SOCKET;
 	}
-	setsockopt(
-		*ssdpReqSock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl));
+	setsockopt(*ssdpReqSock,
+		IPPROTO_IP,
+		IP_MULTICAST_TTL,
+		(OPTION_VALUE_CAST)&ttl,
+		sizeof(ttl));
 	/* just do it, regardless if fails or not. */
 	sock_make_no_blocking(*ssdpReqSock);
 
@@ -1129,7 +1136,7 @@ static int create_ssdp_sock_v6(
 	ret = setsockopt(*ssdpSock,
 		SOL_SOCKET,
 		SO_REUSEADDR,
-		(char *)&onOff,
+		(OPTION_VALUE_CAST)&onOff,
 		sizeof(onOff));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1147,7 +1154,7 @@ static int create_ssdp_sock_v6(
 	ret = setsockopt(*ssdpSock,
 		SOL_SOCKET,
 		SO_REUSEPORT,
-		(char *)&onOff,
+		(OPTION_VALUE_CAST)&onOff,
 		sizeof(onOff));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1165,7 +1172,7 @@ static int create_ssdp_sock_v6(
 	ret = setsockopt(*ssdpSock,
 		IPPROTO_IPV6,
 		IPV6_V6ONLY,
-		(char *)&onOff,
+		(OPTION_VALUE_CAST)&onOff,
 		sizeof(onOff));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1222,7 +1229,7 @@ static int create_ssdp_sock_v6(
 	ret = setsockopt(*ssdpSock,
 		IPPROTO_IPV6,
 		IPV6_JOIN_GROUP,
-		(char *)&ssdpMcastAddr,
+		(OPTION_VALUE_CAST)&ssdpMcastAddr,
 		sizeof(ssdpMcastAddr));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1253,7 +1260,7 @@ static int create_ssdp_sock_v6(
 	ret = setsockopt(*ssdpSock,
 		SOL_SOCKET,
 		SO_BROADCAST,
-		(char *)&onOff,
+		(OPTION_VALUE_CAST)&onOff,
 		sizeof(onOff));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1309,7 +1316,7 @@ static int create_ssdp_sock_v6_ula_gua(
 	ret = setsockopt(*ssdpSock,
 		SOL_SOCKET,
 		SO_REUSEADDR,
-		(char *)&onOff,
+		(OPTION_VALUE_CAST)&onOff,
 		sizeof(onOff));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1327,7 +1334,7 @@ static int create_ssdp_sock_v6_ula_gua(
 	ret = setsockopt(*ssdpSock,
 		SOL_SOCKET,
 		SO_REUSEPORT,
-		(char *)&onOff,
+		(OPTION_VALUE_CAST)&onOff,
 		sizeof(onOff));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1345,7 +1352,7 @@ static int create_ssdp_sock_v6_ula_gua(
 	ret = setsockopt(*ssdpSock,
 		IPPROTO_IPV6,
 		IPV6_V6ONLY,
-		(char *)&onOff,
+		(OPTION_VALUE_CAST)&onOff,
 		sizeof(onOff));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1385,7 +1392,7 @@ static int create_ssdp_sock_v6_ula_gua(
 	ret = setsockopt(*ssdpSock,
 		IPPROTO_IPV6,
 		IPV6_JOIN_GROUP,
-		(char *)&ssdpMcastAddr,
+		(OPTION_VALUE_CAST)&ssdpMcastAddr,
 		sizeof(ssdpMcastAddr));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1403,7 +1410,7 @@ static int create_ssdp_sock_v6_ula_gua(
 	ret = setsockopt(*ssdpSock,
 		SOL_SOCKET,
 		SO_BROADCAST,
-		(char *)&onOff,
+		(OPTION_VALUE_CAST)&onOff,
 		sizeof(onOff));
 	if (ret == -1) {
 		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1458,7 +1465,7 @@ static int create_ssdp_sock_reqv6(
 	setsockopt(*ssdpReqSock,
 		IPPROTO_IPV6,
 		IPV6_MULTICAST_HOPS,
-		&hops,
+		(OPTION_VALUE_CAST)&hops,
 		sizeof(hops));
 	/* just do it, regardless if fails or not. */
 	sock_make_no_blocking(*ssdpReqSock);

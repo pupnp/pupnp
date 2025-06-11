@@ -27,6 +27,8 @@ typedef short sa_family_t;
 typedef ADDRESS_FAMILY sa_family_t;
 	#endif
 
+	#define OPTION_VALUE_CAST const char *
+
 #else /* _WIN32 */
 	#include <sys/param.h>
 	#if defined(__sun)
@@ -55,6 +57,36 @@ typedef int SOCKET;
 
 	/*! Alias to close() to make code more WIN32 tolerant. */
 	#define UpnpCloseSocket close
+
+	/*!
+	 * Winsock declares setsockopt() like this:
+	 *
+	 * int setsockopt(
+	 *	[in] SOCKET     s,
+	 *	[in] int        level,
+	 *	[in] int        optname,
+	 *	[in] const char *optval,
+	 *	[in] int        optlen
+	 * );
+	 *
+	 * While POSIX declares it like this:
+	 *
+	 * #include <sys/socket.h>
+	 *
+	 * int setsockopt(
+	 *	int socket,
+	 *	int level,
+	 *	int option_name,
+	 *	const void *option_value,
+	 *	socklen_t option_len
+	 * );
+	 *
+	 * They diverge on the declaration of option_value, which causes
+	 * troubles on Windows compilation. The following define addresses
+	 * this issue.
+	 */
+	#define OPTION_VALUE_CAST const void *
+
 #endif /* _WIN32 */
 
 /* @} Sock */
