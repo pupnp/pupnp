@@ -12,6 +12,10 @@ Version 1.16.0
 Version 1.14.24
 *******************************************************************************
 
+2025-06-11 Marcelo Roberto Jimenez <mrjimenez(at)github.com>
+
+	Fix possible close() on non-initialized socket.
+
 2025-06-11 Benjamin Gilbert <bgilbert(at)backtick.net>
 
 	ssdp_device.c: Fix missing casts in setsockopt()

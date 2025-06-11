@@ -267,12 +267,13 @@ static int NewRequestHandler(
 			"Error in getaddrinfo(): %s\n",
 			gai_strerror(rc));
 		ret = UPNP_E_SOCKET_ERROR;
-		goto end_NewRequestHandler;
+		goto end_NewRequestHandlerDontClose;
 	}
 	ReplySock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (ReplySock == INVALID_SOCKET) {
 		ProcessSocketError(__FILE__, __LINE__, "socket");
-		return UPNP_E_OUTOF_SOCKET;
+		ret = UPNP_E_OUTOF_SOCKET;
+		goto end_NewRequestHandlerDontClose;
 	}
 	rc = setsockopt(ReplySock,
 		SOL_SOCKET,
@@ -366,6 +367,7 @@ static int NewRequestHandler(
 
 end_NewRequestHandler:
 	UpnpCloseSocket(ReplySock);
+end_NewRequestHandlerDontClose:
 
 	return ret;
 }
