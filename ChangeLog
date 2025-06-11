@@ -12,6 +12,14 @@ Version 1.16.0
 Version 1.14.24
 *******************************************************************************
 
+2025-06-11 Benjamin Gilbert <bgilbert(at)backtick.net>
+
+	ssdp_device.c: Fix missing casts in setsockopt()
+
+	Windows thinks argument 4 of setsockopt() is a const char *.  Add casts
+	to avoid build errors with GCC.
+
+	Fixes: 52cb6b52d2 ("ssdp_device.c: Bind SSDP UDP response to 1900")
 
 *******************************************************************************
 Version 1.14.23
