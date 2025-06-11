@@ -1232,8 +1232,8 @@ static int create_ssdp_sock_v6(
 		(OPTION_VALUE_CAST)&ssdpMcastAddr,
 		sizeof(ssdpMcastAddr));
 	if (ret == -1) {
-		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		uint32_t *p = (uint32_t *)&ssdpMcastAddr.ipv6mr_multiaddr;
+		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 		UpnpPrintf(UPNP_CRITICAL,
 			SSDP,
 			__FILE__,
