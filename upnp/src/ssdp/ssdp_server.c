@@ -750,7 +750,7 @@ static UPNP_INLINE int start_event_handler(
 				SSDP,
 				__FILE__,
 				__LINE__,
-				"SSDP recvd bad msg code = %d\n",
+				"SSDP recvd bad msg code = %u\n",
 				status);
 			/* ignore bad msg, or not enuf mem */
 			goto error_handler;
@@ -761,7 +761,7 @@ static UPNP_INLINE int start_event_handler(
 			SSDP,
 			__FILE__,
 			__LINE__,
-			"SSDP recvd bad msg code = %d\n",
+			"SSDP recvd bad msg code = %u\n",
 			status);
 
 		goto error_handler;
@@ -1200,7 +1200,7 @@ static int create_ssdp_sock_v6(
 			SSDP,
 			__FILE__,
 			__LINE__,
-			"Error in bind(), addr=%s, index=%d, port=%d: %s\n",
+			"Error in bind(), addr=%s, index=%u, port=%d: %s\n",
 			gIF_IPV6,
 			gIF_INDEX,
 			SSDP_PORT,
@@ -1213,7 +1213,7 @@ static int create_ssdp_sock_v6(
 			SSDP,
 			__FILE__,
 			__LINE__,
-			"Error in bind(), addr=%s, index=%d, port=%d: %d\n",
+			"Error in bind(), addr=%s, index=%u, port=%d: %d\n",
 			gIF_IPV6,
 			gIF_INDEX,
 			SSDP_PORT,
