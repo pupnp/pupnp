@@ -225,7 +225,7 @@ static void ProcessSocketError(
  *
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
-static int SendToCaller(struct addrinfo* res,
+static int SendToCaller(struct addrinfo *res,
 	/*! [in] Socket address, to send the reply. */
 	struct sockaddr *DestAddr,
 	/*! [in] Number of packet to be sent. */
@@ -233,7 +233,7 @@ static int SendToCaller(struct addrinfo* res,
 	/*! [in] Request content */
 	char **RqPacket,
 	/*! [in] Ip address, to send the reply. */
-	struct in_addr* replyAddr)
+	struct in_addr *replyAddr)
 {
 	int rc;
 	SOCKET ReplySock;
@@ -262,7 +262,8 @@ static int SendToCaller(struct addrinfo* res,
 	PROCESS_SOCKET_ERROR(
 		__FILE__, __LINE__, rc, UPNP_E_SOCKET_ERROR, "setsockopt-1");
 	rc = bind(ReplySock, res->ai_addr, res->ai_addrlen);
-	PROCESS_SOCKET_ERROR(__FILE__, __LINE__, rc, UPNP_E_SOCKET_BIND, "bind");
+	PROCESS_SOCKET_ERROR(
+		__FILE__, __LINE__, rc, UPNP_E_SOCKET_BIND, "bind");
 
 	switch (DestAddr->sa_family) {
 	case AF_INET:
@@ -276,7 +277,8 @@ static int SendToCaller(struct addrinfo* res,
 			(OPTION_VALUE_CAST)replyAddr,
 			sizeof(replyAddr));
 		PROCESS_SOCKET_ERROR(__FILE__,
-			__LINE__, rc,
+			__LINE__,
+			rc,
 			UPNP_E_SOCKET_ERROR,
 			"setsockopt-2");
 		rc = setsockopt(ReplySock,
@@ -285,7 +287,8 @@ static int SendToCaller(struct addrinfo* res,
 			(OPTION_VALUE_CAST)&ttl,
 			sizeof(int));
 		PROCESS_SOCKET_ERROR(__FILE__,
-			__LINE__, rc,
+			__LINE__,
+			rc,
 			UPNP_E_SOCKET_ERROR,
 			"setsockopt-3");
 		socklen = sizeof(struct sockaddr_in);
@@ -311,7 +314,8 @@ static int SendToCaller(struct addrinfo* res,
 			(OPTION_VALUE_CAST)&hops,
 			sizeof(hops));
 		PROCESS_SOCKET_ERROR(__FILE__,
-			__LINE__, rc,
+			__LINE__,
+			rc,
 			UPNP_E_SOCKET_ERROR,
 			"setsockopt-3");
 		break;
@@ -333,8 +337,11 @@ static int SendToCaller(struct addrinfo* res,
 			0,
 			DestAddr,
 			socklen);
-		PROCESS_SOCKET_ERROR(
-			__FILE__, __LINE__, sendrc, UPNP_E_SOCKET_WRITE, "sendto");
+		PROCESS_SOCKET_ERROR(__FILE__,
+			__LINE__,
+			sendrc,
+			UPNP_E_SOCKET_WRITE,
+			"sendto");
 	}
 
 end_NewRequestHandler:
@@ -374,7 +381,7 @@ static int NewRequestHandler(
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	if(DestAddr->sa_family != AF_INET6 && DestAddr->sa_family == AF_INET) {
+	if (DestAddr->sa_family != AF_INET6 && DestAddr->sa_family == AF_INET) {
 		UpnpPrintf(UPNP_CRITICAL,
 			SSDP,
 			__FILE__,
@@ -401,8 +408,11 @@ static int NewRequestHandler(
 	}
 
 	for (res = result; res != NULL; res = res->ai_next) {
-		if (SendToCaller(res, DestAddr, NumPacket, RqPacket, &replyAddr) == UPNP_E_SUCCESS)
-			ret = UPNP_E_SUCCESS; // one successful send makes response successful
+		if (SendToCaller(
+				res, DestAddr, NumPacket, RqPacket, &replyAddr) ==
+			UPNP_E_SUCCESS)
+			ret = UPNP_E_SUCCESS; // one successful send makes
+					      // response successful
 	}
 	freeaddrinfo(result);
 
@@ -1415,6 +1425,6 @@ error_handler:
 	return ret_code;
 }
 	#endif /* EXCLUDE_SSDP */
-#endif     /* INCLUDE_DEVICE_APIS */
+#endif         /* INCLUDE_DEVICE_APIS */
 
 /* @} SSDPlib */
