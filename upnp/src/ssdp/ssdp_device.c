@@ -1415,6 +1415,6 @@ error_handler:
 	return ret_code;
 }
 	#endif /* EXCLUDE_SSDP */
-#endif		   /* INCLUDE_DEVICE_APIS */
+#endif     /* INCLUDE_DEVICE_APIS */
 
 /* @} SSDPlib */
