@@ -386,7 +386,7 @@ static int NewRequestHandler(
 	if (DestAddr->sa_family != AF_INET6 && DestAddr->sa_family == AF_INET)
 		#else
 	if (DestAddr->sa_family == AF_INET)
-		#fi
+		#endif
 	{
 		UpnpPrintf(UPNP_CRITICAL,
 			SSDP,
