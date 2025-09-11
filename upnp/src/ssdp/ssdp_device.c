@@ -235,18 +235,18 @@ static int SendToCaller(struct addrinfo* res,
 	/*! [in] Ip address, to send the reply. */
 	struct in_addr* replyAddr)
 {
-	socklen_t socklen = sizeof(struct sockaddr_storage);
-	SOCKET ReplySock;
 	int rc;
+	SOCKET ReplySock;
+	socklen_t socklen = sizeof(struct sockaddr_storage);
 	int Index;
-	int ret = UPNP_E_SUCCESS;
 	static const int yes = 1;
-	char buf_ntop[INET6_ADDRSTRLEN];
 	/* a/c to UPNP Spec */
-	int ttl = 4;
+	static const int ttl = 4;
 		#ifdef UPNP_ENABLE_IPV6
-	int hops = 1;
+	static const int hops = 1;
 		#endif
+	char buf_ntop[INET6_ADDRSTRLEN];
+	int ret = UPNP_E_SUCCESS;
 
 	ReplySock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (ReplySock == INVALID_SOCKET) {
