@@ -136,13 +136,13 @@ void ssdp_handle_device_request(
 			API,
 			__FILE__,
 			__LINE__,
-			"MAX-AGE     =  %d\n",
+			"MAX-AGE	 =  %d\n",
 			maxAge);
 		UpnpPrintf(UPNP_INFO,
 			API,
 			__FILE__,
 			__LINE__,
-			"MX     =  %d\n",
+			"MX	 =  %d\n",
 			event.Mx);
 		UpnpPrintf(UPNP_INFO,
 			API,
@@ -210,7 +210,7 @@ static void ProcessSocketError(
 		errorBuffer);
 }
 
-		#define PROCESS_SOCKET_ERROR(file, line, error, func_name) \
+		#define PROCESS_SOCKET_ERROR(file, line, rc, error, func_name) \
 			do { \
 				if (rc == -1) { \
 					ProcessSocketError( \
@@ -221,54 +221,33 @@ static void ProcessSocketError(
 			} while (0)
 
 /*!
- * \brief Works as a request handler which passes the HTTP request string
- * to multicast channel.
+ * \brief Handles the request for one potential target port
  *
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
-static int NewRequestHandler(
-	/*! [in] Ip address, to send the reply. */
+static int SendToCaller(struct addrinfo* res,
+	/*! [in] Socket address, to send the reply. */
 	struct sockaddr *DestAddr,
 	/*! [in] Number of packet to be sent. */
 	int NumPacket,
-	/*! [in] . */
-	char **RqPacket)
+	/*! [in] Request content */
+	char **RqPacket,
+	/*! [in] Ip address, to send the reply. */
+	struct in_addr* replyAddr)
 {
-	int rc;
-	SOCKET ReplySock;
 	socklen_t socklen = sizeof(struct sockaddr_storage);
+	SOCKET ReplySock;
+	int rc;
 	int Index;
-	struct in_addr replyAddr;
-	struct addrinfo hints, *res;
-	int yes = 1;
+	int ret = UPNP_E_SUCCESS;
+	static const int yes = 1;
+	char buf_ntop[INET6_ADDRSTRLEN];
 	/* a/c to UPNP Spec */
 	int ttl = 4;
 		#ifdef UPNP_ENABLE_IPV6
 	int hops = 1;
 		#endif
-	char buf_ntop[INET6_ADDRSTRLEN];
-	int ret = UPNP_E_SUCCESS;
 
-	if (strlen(gIF_IPV4) > (size_t)0 &&
-		!inet_pton(AF_INET, gIF_IPV4, &replyAddr)) {
-		return UPNP_E_INVALID_PARAM;
-	}
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = DestAddr->sa_family;
-	hints.ai_socktype = SOCK_DGRAM;
-	hints.ai_flags = AI_PASSIVE;
-	if ((rc = getaddrinfo(NULL, SSDP_PORT_STR, &hints, &res)) != 0) {
-		UpnpPrintf(UPNP_INFO,
-			SSDP,
-			__FILE__,
-			__LINE__,
-			"SSDP_LIB: New Request Handler:"
-			"Error in getaddrinfo(): %s\n",
-			gai_strerror(rc));
-		ret = UPNP_E_SOCKET_ERROR;
-		goto end_NewRequestHandlerDontClose;
-	}
 	ReplySock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (ReplySock == INVALID_SOCKET) {
 		ProcessSocketError(__FILE__, __LINE__, "socket");
@@ -281,9 +260,10 @@ static int NewRequestHandler(
 		(OPTION_VALUE_CAST)&yes,
 		sizeof yes);
 	PROCESS_SOCKET_ERROR(
-		__FILE__, __LINE__, UPNP_E_SOCKET_ERROR, "setsockopt-1");
+		__FILE__, __LINE__, rc, UPNP_E_SOCKET_ERROR, "setsockopt-1");
 	rc = bind(ReplySock, res->ai_addr, res->ai_addrlen);
-	PROCESS_SOCKET_ERROR(__FILE__, __LINE__, UPNP_E_SOCKET_BIND, "bind");
+	PROCESS_SOCKET_ERROR(__FILE__, __LINE__, rc, UPNP_E_SOCKET_BIND, "bind");
+
 	switch (DestAddr->sa_family) {
 	case AF_INET:
 		inet_ntop(AF_INET,
@@ -293,10 +273,10 @@ static int NewRequestHandler(
 		rc = setsockopt(ReplySock,
 			IPPROTO_IP,
 			IP_MULTICAST_IF,
-			(OPTION_VALUE_CAST)&replyAddr,
+			(OPTION_VALUE_CAST)replyAddr,
 			sizeof(replyAddr));
 		PROCESS_SOCKET_ERROR(__FILE__,
-			__LINE__,
+			__LINE__, rc,
 			UPNP_E_SOCKET_ERROR,
 			"setsockopt-2");
 		rc = setsockopt(ReplySock,
@@ -305,7 +285,7 @@ static int NewRequestHandler(
 			(OPTION_VALUE_CAST)&ttl,
 			sizeof(int));
 		PROCESS_SOCKET_ERROR(__FILE__,
-			__LINE__,
+			__LINE__, rc,
 			UPNP_E_SOCKET_ERROR,
 			"setsockopt-3");
 		socklen = sizeof(struct sockaddr_in);
@@ -322,7 +302,7 @@ static int NewRequestHandler(
 			(OPTION_VALUE_CAST)&gIF_INDEX,
 			sizeof(gIF_INDEX));
 		PROCESS_SOCKET_ERROR(__FILE__,
-			__LINE__,
+			__LINE__, rc,
 			UPNP_E_SOCKET_ERROR,
 			"setsockopt-2");
 		rc = setsockopt(ReplySock,
@@ -331,12 +311,70 @@ static int NewRequestHandler(
 			(OPTION_VALUE_CAST)&hops,
 			sizeof(hops));
 		PROCESS_SOCKET_ERROR(__FILE__,
-			__LINE__,
+			__LINE__, rc,
 			UPNP_E_SOCKET_ERROR,
 			"setsockopt-3");
 		break;
 		#endif
-	default:
+	}
+
+	for (Index = 0; Index < NumPacket; Index++) {
+		ssize_t sendrc;
+		UpnpPrintf(UPNP_INFO,
+			SSDP,
+			__FILE__,
+			__LINE__,
+			">>> SSDP SEND to %s >>>\n%s\n",
+			buf_ntop,
+			*(RqPacket + Index));
+		sendrc = sendto(ReplySock,
+			*(RqPacket + Index),
+			strlen(*(RqPacket + Index)),
+			0,
+			DestAddr,
+			socklen);
+		PROCESS_SOCKET_ERROR(
+			__FILE__, __LINE__, sendrc, UPNP_E_SOCKET_WRITE, "sendto");
+	}
+
+end_NewRequestHandler:
+	UpnpCloseSocket(ReplySock);
+
+end_NewRequestHandlerDontClose:
+
+	return ret;
+}
+
+/*!
+ * \brief Works as a request handler which passes the HTTP request string
+ * to multicast channel.
+ *
+ * \return UPNP_E_SUCCESS if successful else appropriate error.
+ */
+static int NewRequestHandler(
+	/*! [in] Ip address, to send the reply. */
+	struct sockaddr *DestAddr,
+	/*! [in] Number of packet to be sent. */
+	int NumPacket,
+	/*! [in] Request content */
+	char **RqPacket)
+{
+	int rc;
+	struct in_addr replyAddr;
+	struct addrinfo hints, *result, *res;
+	int ret = UPNP_E_SOCKET_ERROR;
+
+	if (strlen(gIF_IPV4) > (size_t)0 &&
+		!inet_pton(AF_INET, gIF_IPV4, &replyAddr)) {
+		return UPNP_E_INVALID_PARAM;
+	}
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = DestAddr->sa_family;
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_flags = AI_PASSIVE;
+
+	if(DestAddr->sa_family != AF_INET6 && DestAddr->sa_family == AF_INET) {
 		UpnpPrintf(UPNP_CRITICAL,
 			SSDP,
 			__FILE__,
@@ -346,28 +384,29 @@ static int NewRequestHandler(
 		goto end_NewRequestHandler;
 	}
 
-	for (Index = 0; Index < NumPacket; Index++) {
-		ssize_t rc;
+	// getaddrinfo() returns a list of address structures.
+	// Try each address until we successfully bind(2).
+	// If socket(2) (or bind(2)) fails, we (close the socket
+	// and) try the next address
+	if ((rc = getaddrinfo(NULL, SSDP_PORT_STR, &hints, &result)) != 0) {
 		UpnpPrintf(UPNP_INFO,
 			SSDP,
 			__FILE__,
 			__LINE__,
-			">>> SSDP SEND to %s >>>\n%s\n",
-			buf_ntop,
-			*(RqPacket + Index));
-		rc = sendto(ReplySock,
-			*(RqPacket + Index),
-			strlen(*(RqPacket + Index)),
-			0,
-			DestAddr,
-			socklen);
-		PROCESS_SOCKET_ERROR(
-			__FILE__, __LINE__, UPNP_E_SOCKET_WRITE, "sendto");
+			"SSDP_LIB: New Request Handler:"
+			"Error in getaddrinfo(): %s\n",
+			gai_strerror(rc));
+		ret = UPNP_E_SOCKET_ERROR;
+		goto end_NewRequestHandler;
 	}
 
+	for (res = result; res != NULL; res = res->ai_next) {
+		if (SendToCaller(res, DestAddr, NumPacket, RqPacket, &replyAddr) == UPNP_E_SUCCESS)
+			ret = UPNP_E_SUCCESS; // one successful send makes response successful
+	}
+	freeaddrinfo(result);
+
 end_NewRequestHandler:
-	UpnpCloseSocket(ReplySock);
-end_NewRequestHandlerDontClose:
 
 	return ret;
 }
@@ -1376,6 +1415,6 @@ error_handler:
 	return ret_code;
 }
 	#endif /* EXCLUDE_SSDP */
-#endif	       /* INCLUDE_DEVICE_APIS */
+#endif		   /* INCLUDE_DEVICE_APIS */
 
 /* @} SSDPlib */
