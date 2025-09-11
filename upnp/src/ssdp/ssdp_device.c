@@ -305,7 +305,8 @@ static int SendToCaller(struct addrinfo *res,
 			(OPTION_VALUE_CAST)&gIF_INDEX,
 			sizeof(gIF_INDEX));
 		PROCESS_SOCKET_ERROR(__FILE__,
-			__LINE__, rc,
+			__LINE__,
+			rc,
 			UPNP_E_SOCKET_ERROR,
 			"setsockopt-2");
 		rc = setsockopt(ReplySock,
@@ -409,7 +410,7 @@ static int NewRequestHandler(
 
 	for (res = result; res != NULL; res = res->ai_next) {
 		if (SendToCaller(
-				res, DestAddr, NumPacket, RqPacket, &replyAddr) ==
+			    res, DestAddr, NumPacket, RqPacket, &replyAddr) ==
 			UPNP_E_SUCCESS)
 			ret = UPNP_E_SUCCESS; // one successful send makes
 					      // response successful
@@ -1425,6 +1426,6 @@ error_handler:
 	return ret_code;
 }
 	#endif /* EXCLUDE_SSDP */
-#endif         /* INCLUDE_DEVICE_APIS */
+#endif	       /* INCLUDE_DEVICE_APIS */
 
 /* @} SSDPlib */
