@@ -275,7 +275,7 @@ static int SendToCaller(struct addrinfo *res,
 			IPPROTO_IP,
 			IP_MULTICAST_IF,
 			(OPTION_VALUE_CAST)replyAddr,
-			sizeof(replyAddr));
+			sizeof(*replyAddr));
 		PROCESS_SOCKET_ERROR(__FILE__,
 			__LINE__,
 			rc,
@@ -285,7 +285,7 @@ static int SendToCaller(struct addrinfo *res,
 			IPPROTO_IP,
 			IP_MULTICAST_TTL,
 			(OPTION_VALUE_CAST)&ttl,
-			sizeof(int));
+			sizeof(ttl));
 		PROCESS_SOCKET_ERROR(__FILE__,
 			__LINE__,
 			rc,
@@ -383,9 +383,9 @@ static int NewRequestHandler(
 	hints.ai_flags = AI_PASSIVE;
 
 		#ifdef UPNP_ENABLE_IPV6
-	if (DestAddr->sa_family != AF_INET6 && DestAddr->sa_family == AF_INET)
+	if (DestAddr->sa_family != AF_INET6 && DestAddr->sa_family != AF_INET)
 		#else
-	if (DestAddr->sa_family == AF_INET)
+	if (DestAddr->sa_family != AF_INET)
 		#endif
 	{
 		UpnpPrintf(UPNP_CRITICAL,
