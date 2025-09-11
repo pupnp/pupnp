@@ -136,13 +136,13 @@ void ssdp_handle_device_request(
 			API,
 			__FILE__,
 			__LINE__,
-			"MAX-AGE	 =  %d\n",
+			"MAX-AGE     =  %d\n",
 			maxAge);
 		UpnpPrintf(UPNP_INFO,
 			API,
 			__FILE__,
 			__LINE__,
-			"MX	 =  %d\n",
+			"MX          =  %d\n",
 			event.Mx);
 		UpnpPrintf(UPNP_INFO,
 			API,
