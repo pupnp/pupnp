@@ -382,7 +382,12 @@ static int NewRequestHandler(
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	if (DestAddr->sa_family != AF_INET6 && DestAddr->sa_family == AF_INET) {
+		#ifdef UPNP_ENABLE_IPV6
+	if (DestAddr->sa_family != AF_INET6 && DestAddr->sa_family == AF_INET)
+		#else
+	if (DestAddr->sa_family == AF_INET)
+		#fi
+	{
 		UpnpPrintf(UPNP_CRITICAL,
 			SSDP,
 			__FILE__,
