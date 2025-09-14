@@ -257,7 +257,7 @@ static int SendToCaller(
 		goto end_SendToCallerDontClose;
 	}
 		#if (defined(BSD) && !defined(__GNU__)) || \
-		 defined(__APPLE__) || defined(__linux__)
+			defined(__APPLE__) || defined(__linux__)
 	rc = setsockopt(ReplySock,
 		SOL_SOCKET,
 		SO_REUSEPORT,
