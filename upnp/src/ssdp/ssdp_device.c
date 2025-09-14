@@ -256,13 +256,14 @@ static int SendToCaller(
 		ret = UPNP_E_OUTOF_SOCKET;
 		goto end_SendToCallerDontClose;
 	}
-		#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__) || defined(__linux__)
+		#if (defined(BSD) && !defined(__GNU__)) || \
+		 defined(__APPLE__) || defined(__linux__)
 	rc = setsockopt(ReplySock,
 		SOL_SOCKET,
 		SO_REUSEPORT,
 		(OPTION_VALUE_CAST)&yes,
 		sizeof(yes));
-                #else
+		#else
 	rc = setsockopt(ReplySock,
 		SOL_SOCKET,
 		SO_REUSEADDR,
