@@ -256,11 +256,19 @@ static int SendToCaller(
 		ret = UPNP_E_OUTOF_SOCKET;
 		goto end_SendToCallerDontClose;
 	}
-	rc = setsockopt(ReplySock,
-		SOL_SOCKET,
-		SO_REUSEPORT,
-		(OPTION_VALUE_CAST)&yes,
-		sizeof yes);
+		#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__) || defined(__linux__)
+        rc = setsockopt(ReplySock,
+                SOL_SOCKET,
+                SO_REUSEPORT,
+                (OPTION_VALUE_CAST)&yes,
+                sizeof(yes));
+                #else
+        rc = setsockopt(ReplySock,
+                SOL_SOCKET,
+                SO_REUSEADDR,
+                (OPTION_VALUE_CAST)&yes,
+                sizeof(yes));
+                #endif
 	PROCESS_SOCKET_ERROR(
 		__FILE__, __LINE__, rc, UPNP_E_SOCKET_ERROR, "setsockopt-1");
 	ssize_t bindrc = bind(ReplySock, res->ai_addr, res->ai_addrlen);
