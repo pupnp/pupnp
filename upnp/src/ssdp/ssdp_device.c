@@ -263,9 +263,9 @@ static int SendToCaller(
 		sizeof yes);
 	PROCESS_SOCKET_ERROR(
 		__FILE__, __LINE__, rc, UPNP_E_SOCKET_ERROR, "setsockopt-1");
-	rc = bind(ReplySock, res->ai_addr, res->ai_addrlen);
+	ssize_t bindrc = bind(ReplySock, res->ai_addr, res->ai_addrlen);
 	PROCESS_SOCKET_ERROR(
-		__FILE__, __LINE__, rc, UPNP_E_SOCKET_BIND, "bind");
+		__FILE__, __LINE__, bindrc, UPNP_E_SOCKET_BIND, "bind");
 
 	switch (DestAddr->sa_family) {
 	case AF_INET:
