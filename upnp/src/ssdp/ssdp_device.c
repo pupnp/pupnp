@@ -216,7 +216,7 @@ static void ProcessSocketError(
 					ProcessSocketError( \
 						file, line, func_name); \
 					ret = error; \
-					goto end_NewRequestHandler; \
+					goto end_SendToCaller; \
 				} \
 			} while (0)
 
@@ -225,7 +225,9 @@ static void ProcessSocketError(
  *
  * \return UPNP_E_SUCCESS if successful else appropriate error.
  */
-static int SendToCaller(struct addrinfo *res,
+static int SendToCaller(
+	/*! [in] Address detail for socket */
+	struct addrinfo *res,
 	/*! [in] Socket address, to send the reply. */
 	struct sockaddr *DestAddr,
 	/*! [in] Number of packet to be sent. */
@@ -252,11 +254,11 @@ static int SendToCaller(struct addrinfo *res,
 	if (ReplySock == INVALID_SOCKET) {
 		ProcessSocketError(__FILE__, __LINE__, "socket");
 		ret = UPNP_E_OUTOF_SOCKET;
-		goto end_NewRequestHandlerDontClose;
+		goto end_SendToCallerDontClose;
 	}
 	rc = setsockopt(ReplySock,
 		SOL_SOCKET,
-		SO_REUSEADDR,
+		SO_REUSEPORT,
 		(OPTION_VALUE_CAST)&yes,
 		sizeof yes);
 	PROCESS_SOCKET_ERROR(
@@ -345,10 +347,10 @@ static int SendToCaller(struct addrinfo *res,
 			"sendto");
 	}
 
-end_NewRequestHandler:
+end_SendToCaller:
 	UpnpCloseSocket(ReplySock);
 
-end_NewRequestHandlerDontClose:
+end_SendToCallerDontClose:
 
 	return ret;
 }
@@ -381,6 +383,10 @@ static int NewRequestHandler(
 	hints.ai_family = DestAddr->sa_family;
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_flags = AI_PASSIVE;
+	hints.ai_protocol = 0;
+	hints.ai_canonname = NULL;
+	hints.ai_addr = NULL;
+	hints.ai_next = NULL;
 
 		#ifdef UPNP_ENABLE_IPV6
 	if (DestAddr->sa_family != AF_INET6 && DestAddr->sa_family != AF_INET)
