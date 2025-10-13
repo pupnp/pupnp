@@ -3723,6 +3723,38 @@ int UpnpGetIfInfo(const char *IfName)
 			adapts_item->OperStatus != IfOperStatusUp) {
 			continue;
 		}
+
+		/* Skip VPN and tunnel interfaces when no specific interface is
+		 * requested */
+		if (IfName == NULL) {
+			/* Check for common VPN interface types */
+			if (adapts_item->IfType == IF_TYPE_TUNNEL ||
+				adapts_item->IfType == IF_TYPE_PPP ||
+				adapts_item->IfType ==
+					131 /* IF_TYPE_TUNNEL */) {
+				continue;
+			}
+
+			/* Check for common VPN interface names */
+			char tmpIfName[256] = {0};
+			size_t *s = NULL;
+			wcstombs_s(s,
+				tmpIfName,
+				sizeof(tmpIfName),
+				adapts_item->FriendlyName,
+				sizeof(tmpIfName));
+			free(s);
+
+			/* Skip interfaces with VPN-related names */
+			if (strstr(tmpIfName, "VPN") ||
+				strstr(tmpIfName, "Tunnel") ||
+				strstr(tmpIfName, "Meta") ||
+				strstr(tmpIfName, "TAP") ||
+				strstr(tmpIfName, "OpenVPN") ||
+				strstr(tmpIfName, "WireGuard")) {
+				continue;
+			}
+		}
 		if (ifname_found == 0) {
 			/* We have found a valid interface name. Keep it. */
 			/*
