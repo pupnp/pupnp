@@ -148,6 +148,12 @@ int StartMiniServer(
  */
 int StopMiniServer();
 
+/*!
+ * \brief Shutdown all active socket connections to interrupt blocking
+ * operations.
+ */
+void shutdown_all_active_connections(void);
+
 #ifdef __cplusplus
 } /* extern C */
 #endif
