@@ -323,7 +323,7 @@ static int SetPriority(
 	default:
 		retVal = EINVAL;
 		goto exit_function;
-	};
+	}
 
 	newPriority.sched_priority = actPriority;
 
@@ -491,7 +491,7 @@ static void *WorkerThread(
 		retCode = 0;
 		tp->stats.idleThreads++;
 		tp->stats.totalWorkTime +=
-			(double)StatsTime(NULL) - (double)start;
+			(double)(StatsTime(NULL)) - (double)start;
 		StatsTime(&start);
 		if (persistent == 0) {
 			tp->stats.workerThreads--;
@@ -525,7 +525,7 @@ static void *WorkerThread(
 		tp->stats.idleThreads--;
 		/* idle time */
 		tp->stats.totalIdleTime +=
-			(double)StatsTime(NULL) - (double)start;
+			(double)(StatsTime(NULL)) - (double)start;
 		/* work time */
 		StatsTime(&start);
 		/* bump priority of starved jobs */
