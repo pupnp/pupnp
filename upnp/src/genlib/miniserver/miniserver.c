@@ -381,12 +381,37 @@ static UPNP_INLINE void handle_error(
 }
 
 /*!
+ * \brief Compare function for active connections, return true if equal (found)
+ */
+static int active_connection_cmp(void *first, void *second)
+{
+	struct active_connection_t *conn1 = (struct active_connection_t *)first;
+	struct active_connection_t *conn2 =
+		(struct active_connection_t *)second;
+
+	/* Return non-zero (true) if sockets match */
+	return (conn1->socket == conn2->socket);
+}
+
+/*!
+ * \brief Free function for active connections
+ */
+static void active_connection_free(void *item)
+{
+	if (item) {
+		free(item);
+	}
+}
+
+/*!
  * \brief Add a socket to the active connections list
  */
 static void add_active_connection(SOCKET sock)
 {
 	if (!gActiveConnectionsInitialized) {
-		ListInit(&gActiveConnections, NULL, NULL);
+		ListInit(&gActiveConnections,
+			active_connection_cmp,
+			active_connection_free);
 		ithread_mutex_init(&gActiveConnectionsMutex, NULL);
 		gActiveConnectionsInitialized = 1;
 	}
@@ -418,23 +443,21 @@ static void remove_active_connection(SOCKET sock)
 	if (!gActiveConnectionsInitialized)
 		return;
 
+	/* Create a temporary connection structure for searching */
+	struct active_connection_t search_conn;
+	search_conn.socket = sock;
+	search_conn.connect_time = 0; /* Not used for comparison */
+
 	ithread_mutex_lock(&gActiveConnectionsMutex);
-	ListNode *node = ListHead(&gActiveConnections);
-	while (node) {
-		struct active_connection_t *conn =
-			(struct active_connection_t *)node->item;
-		if (conn && conn->socket == sock) {
-			ListDelNode(&gActiveConnections, node, 1);
-			free(conn);
-			UpnpPrintf(UPNP_INFO,
-				MSERV,
-				__FILE__,
-				__LINE__,
-				"Removed active connection: socket %d\n",
-				sock);
-			break;
-		}
-		node = ListNext(&gActiveConnections, node);
+	ListNode *node = ListFind(&gActiveConnections, NULL, &search_conn);
+	if (node) {
+		ListDelNode(&gActiveConnections, node, 1);
+		UpnpPrintf(UPNP_INFO,
+			MSERV,
+			__FILE__,
+			__LINE__,
+			"Removed active connection: socket %d\n",
+			sock);
 	}
 	ithread_mutex_unlock(&gActiveConnectionsMutex);
 }
@@ -471,13 +494,18 @@ void shutdown_all_active_connections(void)
 		}
 		node = ListNext(&gActiveConnections, node);
 	}
+
+	/* Destroy the list and reset state */
+	ListDestroy(&gActiveConnections, 1);
+	gActiveConnectionsInitialized = 0;
 	ithread_mutex_unlock(&gActiveConnectionsMutex);
+	ithread_mutex_destroy(&gActiveConnectionsMutex);
 
 	UpnpPrintf(UPNP_INFO,
 		MSERV,
 		__FILE__,
 		__LINE__,
-		"Shutdown %d active socket connections\n",
+		"Shutdown %d active socket connections and clean\n",
 		count);
 }
 
