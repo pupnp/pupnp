@@ -394,24 +394,12 @@ static int active_connection_cmp(void *first, void *second)
 }
 
 /*!
- * \brief Free function for active connections
- */
-static void active_connection_free(void *item)
-{
-	if (item) {
-		free(item);
-	}
-}
-
-/*!
  * \brief Add a socket to the active connections list
  */
 static void add_active_connection(SOCKET sock)
 {
 	if (!gActiveConnectionsInitialized) {
-		ListInit(&gActiveConnections,
-			active_connection_cmp,
-			active_connection_free);
+		ListInit(&gActiveConnections, active_connection_cmp, free);
 		ithread_mutex_init(&gActiveConnectionsMutex, NULL);
 		gActiveConnectionsInitialized = 1;
 	}
