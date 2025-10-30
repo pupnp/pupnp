@@ -3964,6 +3964,19 @@ int UpnpGetIfInfo(const char *IfName)
 	if (ifname_found == 0 ||
 		(valid_v4_addr_found == 0 && valid_v6_addr_found == 0 &&
 			valid_v6ulagua_addr_found == 0)) {
+		/* If no interface name was specified and we failed to find a
+		 * valid interface, try using "en0" as a fallback (common on
+		 * macOS/BSD systems) */
+		if (IfName == NULL) {
+			UpnpPrintf(UPNP_INFO,
+				API,
+				__FILE__,
+				__LINE__,
+				"No valid interface found, trying fallback to "
+				"en0\n");
+			return UpnpGetIfInfo("en0");
+		}
+
 		UpnpPrintf(UPNP_CRITICAL,
 			API,
 			__FILE__,
