@@ -551,29 +551,23 @@ int ixmlElement_setAttributeNodeNS(
 	/* IN */ IXML_Attr *newAttr,
 	/* OUT */ IXML_Attr **rtAttr)
 {
-	IXML_Node *attrNode = NULL;
 	IXML_Node *node = NULL;
-	IXML_Node *prevAttr = NULL;
-	IXML_Node *nextAttr = NULL;
-	IXML_Node *preSib = NULL;
-	IXML_Node *nextSib = NULL;
+	IXML_Node *attrNode = NULL;
 
-	if (element == NULL || newAttr == NULL) {
+	if (!element || !newAttr) {
 		return IXML_INVALID_PARAMETER;
 	}
-
 	if (newAttr->n.ownerDocument != element->n.ownerDocument) {
 		return IXML_WRONG_DOCUMENT_ERR;
 	}
-
-	if (newAttr->ownerElement != NULL && newAttr->ownerElement != element) {
+	if (newAttr->ownerElement && newAttr->ownerElement != element) {
 		return IXML_INUSE_ATTRIBUTE_ERR;
 	}
 
 	newAttr->ownerElement = element;
 	node = (IXML_Node *)newAttr;
 	attrNode = element->n.firstAttr;
-	while (attrNode != NULL) {
+	while (attrNode) {
 		if (attrNode->localName && node->localName &&
 			attrNode->namespaceURI && node->namespaceURI &&
 			strcmp(attrNode->localName, node->localName) == 0 &&
@@ -584,14 +578,14 @@ int ixmlElement_setAttributeNodeNS(
 		}
 		attrNode = attrNode->nextSibling;
 	}
-	if (attrNode != NULL) {
+	if (attrNode) {
 		/* already present, will replace by newAttr */
-		preSib = attrNode->prevSibling;
-		nextSib = attrNode->nextSibling;
-		if (preSib != NULL) {
+		IXML_Node *preSib = attrNode->prevSibling;
+		IXML_Node *nextSib = attrNode->nextSibling;
+		if (preSib) {
 			preSib->nextSibling = node;
 		}
-		if (nextSib != NULL) {
+		if (nextSib) {
 			nextSib->prevSibling = node;
 		}
 		if (element->n.firstAttr == attrNode) {
@@ -603,9 +597,9 @@ int ixmlElement_setAttributeNodeNS(
 		/* Add this attribute  */
 		if (element->n.firstAttr != NULL) {
 			/* Element has attribute already */
-			prevAttr = element->n.firstAttr;
-			nextAttr = prevAttr->nextSibling;
-			while (nextAttr != NULL) {
+			IXML_Node *prevAttr = element->n.firstAttr;
+			IXML_Node *nextAttr = prevAttr->nextSibling;
+			while (nextAttr) {
 				prevAttr = nextAttr;
 				nextAttr = prevAttr->nextSibling;
 			}
@@ -616,7 +610,7 @@ int ixmlElement_setAttributeNodeNS(
 			node->prevSibling = NULL;
 			node->nextSibling = NULL;
 		}
-		if (rtAttr != NULL) {
+		if (rtAttr) {
 			*rtAttr = NULL;
 		}
 	}
