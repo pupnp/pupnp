@@ -146,7 +146,7 @@ int StartMiniServer(
  *
  * \return Always returns 0.
  */
-int StopMiniServer();
+int StopMiniServer(void);
 
 /*!
  * \brief Shutdown all active socket connections to interrupt blocking

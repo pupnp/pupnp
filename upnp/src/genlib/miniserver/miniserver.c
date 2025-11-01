@@ -54,7 +54,7 @@
 	#include "ithread.h"
 	#include "ssdplib.h"
 	#include "statcodes.h"
-	#include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */
+	#include "unixutil.h" /* for socklen_t, EAFNOSUPPORT */ // IWYU pragma: keep
 	#include "upnpapi.h"
 	#include "upnputil.h"
 
@@ -88,7 +88,7 @@ typedef enum
 } MiniServerState;
 
 /*! . */
-uint16_t miniStopSockPort;
+static uint16_t miniStopSockPort;
 
 /*!
  * module vars
@@ -338,16 +338,17 @@ static int dispatch_request(
 			goto ExitFunction;
 		} else {
 			membuffer redir_buf;
-			static const char *redir_fmt =
-				"HTTP/1.1 307 Temporary Redirect\r\n"
-				"Location: http://%s\r\n\r\n";
-			char redir_str[NAME_SIZE];
+			char redir_str[2 * NAME_SIZE];
 			int timeout = HTTP_DEFAULT_TIMEOUT;
 
 			getNumericHostRedirection(
 				(int)info->socket, host_port, sizeof host_port);
 			membuffer_init(&redir_buf);
-			snprintf(redir_str, NAME_SIZE, redir_fmt, host_port);
+			snprintf(redir_str,
+				sizeof redir_str,
+				"HTTP/1.1 307 Temporary Redirect\r\n"
+				"Location: http://%s\r\n\r\n",
+				host_port);
 			membuffer_append_str(&redir_buf, redir_str);
 			rc = http_SendMessage(info,
 				&timeout,
@@ -398,14 +399,16 @@ static int active_connection_cmp(void *first, void *second)
  */
 static void add_active_connection(SOCKET sock)
 {
+	struct active_connection_t *conn;
+
 	if (!gActiveConnectionsInitialized) {
 		ListInit(&gActiveConnections, active_connection_cmp, free);
 		ithread_mutex_init(&gActiveConnectionsMutex, NULL);
 		gActiveConnectionsInitialized = 1;
 	}
 
-	struct active_connection_t *conn =
-		malloc(sizeof(struct active_connection_t));
+	conn = (struct active_connection_t *)malloc(
+		sizeof(struct active_connection_t));
 	if (conn) {
 		conn->socket = sock;
 		conn->connect_time = time(NULL);
@@ -428,16 +431,18 @@ static void add_active_connection(SOCKET sock)
  */
 static void remove_active_connection(SOCKET sock)
 {
-	if (!gActiveConnectionsInitialized)
-		return;
-
-	/* Create a temporary connection structure for searching */
 	struct active_connection_t search_conn;
+	ListNode *node;
+
+	if (!gActiveConnectionsInitialized) {
+		return;
+	}
+	/* Create a temporary connection structure for searching */
 	search_conn.socket = sock;
 	search_conn.connect_time = 0; /* Not used for comparison */
 
 	ithread_mutex_lock(&gActiveConnectionsMutex);
-	ListNode *node = ListFind(&gActiveConnections, NULL, &search_conn);
+	node = ListFind(&gActiveConnections, NULL, &search_conn);
 	if (node) {
 		ListDelNode(&gActiveConnections, node, 1);
 		UpnpPrintf(UPNP_INFO,
@@ -455,9 +460,12 @@ static void remove_active_connection(SOCKET sock)
  */
 void shutdown_all_active_connections(void)
 {
-	if (!gActiveConnectionsInitialized)
-		return;
+	ListNode *node;
+	int count;
 
+	if (!gActiveConnectionsInitialized) {
+		return;
+	}
 	UpnpPrintf(UPNP_INFO,
 		MSERV,
 		__FILE__,
@@ -465,8 +473,8 @@ void shutdown_all_active_connections(void)
 		"Shutting down all active socket connections\n");
 
 	ithread_mutex_lock(&gActiveConnectionsMutex);
-	ListNode *node = ListHead(&gActiveConnections);
-	int count = 0;
+	node = ListHead(&gActiveConnections);
+	count = 0;
 	while (node) {
 		struct active_connection_t *conn =
 			(struct active_connection_t *)node->item;
@@ -601,7 +609,7 @@ static UPNP_INLINE void schedule_request_job(
 
 	request = (struct mserv_request_t *)malloc(
 		sizeof(struct mserv_request_t));
-	if (request == NULL) {
+	if (!request) {
 		UpnpPrintf(UPNP_INFO,
 			MSERV,
 			__FILE__,
@@ -920,7 +928,6 @@ static int init_socket_suff(
 			"init_socket_suff(): Invalid IP version: %d.\n",
 			ip_version);
 		goto error;
-		break;
 	}
 
 	if (inet_pton(domain, text_addr, addr) <= 0)
@@ -1433,7 +1440,7 @@ int StartMiniServer(
 	return UPNP_E_SUCCESS;
 }
 
-int StopMiniServer()
+int StopMiniServer(void)
 {
 	char errorBuffer[ERROR_BUFFER_LEN];
 	socklen_t socklen = sizeof(struct sockaddr_in);
