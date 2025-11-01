@@ -534,7 +534,8 @@ IXML_Attr *ixmlElement_getAttributeNodeNS(IXML_Element *element,
 
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
-		if (strcmp(attrNode->localName, localName) == 0 &&
+		if (attrNode->localName && attrNode->namespaceURI &&
+			strcmp(attrNode->localName, localName) == 0 &&
 			strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
 			/* found it */
 			break;
