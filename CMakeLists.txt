@@ -23,7 +23,7 @@ endif()
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
 	set(DEFAULT_BUILD_TYPE "Debug")
-endif(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+endif()
 
 # Set the possible values of build type for cmake-gui
 if(CMAKE_CONFIGURATION_TYPES)
@@ -92,7 +92,7 @@ if(NOT WIN32)
 			message(FATAL_ERROR "Header-file ${${header}} not found")
 		endif()
 	endforeach()
-endif(NOT WIN32)
+endif()
 
 #
 # Checks for typedefs, structures, and compiler characteristics
