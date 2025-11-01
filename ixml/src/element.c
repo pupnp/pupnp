@@ -574,7 +574,9 @@ int ixmlElement_setAttributeNodeNS(
 	node = (IXML_Node *)newAttr;
 	attrNode = element->n.firstAttr;
 	while (attrNode != NULL) {
-		if (strcmp(attrNode->localName, node->localName) == 0 &&
+		if (attrNode->localName && node->localName &&
+			attrNode->namespaceURI && node->namespaceURI &&
+			strcmp(attrNode->localName, node->localName) == 0 &&
 			strcmp(attrNode->namespaceURI, node->namespaceURI) ==
 				0) {
 			/* Found it */
