@@ -539,9 +539,8 @@ IXML_Attr *ixmlElement_getAttributeNodeNS(IXML_Element *element,
 			strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
 			/* found it */
 			break;
-		} else {
-			attrNode = attrNode->nextSibling;
 		}
+		attrNode = attrNode->nextSibling;
 	}
 
 	return (IXML_Attr *)attrNode;
@@ -582,9 +581,8 @@ int ixmlElement_setAttributeNodeNS(
 				0) {
 			/* Found it */
 			break;
-		} else {
-			attrNode = attrNode->nextSibling;
 		}
+		attrNode = attrNode->nextSibling;
 	}
 	if (attrNode != NULL) {
 		/* already present, will replace by newAttr */
