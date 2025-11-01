@@ -37,7 +37,6 @@
 #include "ixmldebug.h"
 #include "ixmlparser.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
