@@ -49,7 +49,7 @@ void ixmlDocument_init(IXML_Document *doc)
 
 void ixmlDocument_free(IXML_Document *doc)
 {
-	if (doc != NULL) {
+	if (doc) {
 		ixmlNode_free((IXML_Node *)doc);
 	}
 }
@@ -66,7 +66,7 @@ static void ixmlDocument_setOwnerDocument(
 	/*! [in] \todo documentation. */
 	IXML_Node *nodeptr)
 {
-	if (nodeptr != NULL) {
+	if (nodeptr) {
 		nodeptr->ownerDocument = doc;
 		ixmlDocument_setOwnerDocument(
 			doc, ixmlNode_getFirstChild(nodeptr));
@@ -83,7 +83,7 @@ int ixmlDocument_importNode(
 
 	*rtNode = NULL;
 
-	if (doc == NULL || importNode == NULL) {
+	if (!doc || !importNode) {
 		return IXML_INVALID_PARAMETER;
 	}
 
@@ -93,7 +93,7 @@ int ixmlDocument_importNode(
 	}
 
 	newNode = ixmlNode_cloneNode(importNode, deep);
-	if (newNode == NULL) {
+	if (!newNode) {
 		return IXML_FAILED;
 	}
 
@@ -109,20 +109,20 @@ int ixmlDocument_createElementEx(
 	int errCode = IXML_SUCCESS;
 	IXML_Element *newElement = NULL;
 
-	if (doc == NULL || tagName == NULL) {
+	if (!doc || !tagName) {
 		errCode = IXML_INVALID_PARAMETER;
 		goto ErrorHandler;
 	}
 
 	newElement = (IXML_Element *)malloc(sizeof(IXML_Element));
-	if (newElement == NULL) {
+	if (!newElement) {
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
 
 	ixmlElement_init(newElement);
 	newElement->tagName = strdup(tagName);
-	if (newElement->tagName == NULL) {
+	if (!newElement->tagName) {
 		ixmlElement_free(newElement);
 		newElement = NULL;
 		errCode = IXML_INSUFFICIENT_MEMORY;
@@ -131,7 +131,7 @@ int ixmlDocument_createElementEx(
 	/* set the node fields */
 	newElement->n.nodeType = eELEMENT_NODE;
 	newElement->n.nodeName = strdup(tagName);
-	if (newElement->n.nodeName == NULL) {
+	if (!newElement->n.nodeName) {
 		free(newElement->tagName);
 		ixmlElement_free(newElement);
 		newElement = NULL;
@@ -172,7 +172,7 @@ int ixmlDocument_createDocumentEx(IXML_Document **rtDoc)
 
 	doc = NULL;
 	doc = (IXML_Document *)malloc(sizeof(IXML_Document));
-	if (doc == NULL) {
+	if (!doc) {
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
@@ -180,7 +180,7 @@ int ixmlDocument_createDocumentEx(IXML_Document **rtDoc)
 	ixmlDocument_init(doc);
 
 	doc->n.nodeName = strdup((const char *)DOCUMENTNODENAME);
-	if (doc->n.nodeName == NULL) {
+	if (!doc->n.nodeName) {
 		ixmlDocument_free(doc);
 		doc = NULL;
 		errCode = IXML_INSUFFICIENT_MEMORY;
@@ -211,13 +211,13 @@ int ixmlDocument_createTextNodeEx(
 	int rc = IXML_SUCCESS;
 
 	returnNode = NULL;
-	if (doc == NULL || data == NULL) {
+	if (!doc || !data) {
 		rc = IXML_INVALID_PARAMETER;
 		goto ErrorHandler;
 	}
 
 	returnNode = (IXML_Node *)malloc(sizeof(IXML_Node));
-	if (returnNode == NULL) {
+	if (!returnNode) {
 		rc = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
@@ -225,16 +225,16 @@ int ixmlDocument_createTextNodeEx(
 	ixmlNode_init(returnNode);
 
 	returnNode->nodeName = strdup((const char *)TEXTNODENAME);
-	if (returnNode->nodeName == NULL) {
+	if (!returnNode->nodeName) {
 		ixmlNode_free(returnNode);
 		returnNode = NULL;
 		rc = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
 	/* add in node value */
-	if (data != NULL) {
+	if (data) {
 		returnNode->nodeValue = strdup(data);
-		if (returnNode->nodeValue == NULL) {
+		if (!returnNode->nodeValue) {
 			ixmlNode_free(returnNode);
 			returnNode = NULL;
 			rc = IXML_INSUFFICIENT_MEMORY;
@@ -266,12 +266,12 @@ int ixmlDocument_createAttributeEx(
 	int errCode = IXML_SUCCESS;
 
 	attrNode = (IXML_Attr *)malloc(sizeof(IXML_Attr));
-	if (attrNode == NULL) {
+	if (!attrNode) {
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
 
-	if (doc == NULL || name == NULL) {
+	if (!doc || !name) {
 		ixmlAttr_free(attrNode);
 		attrNode = NULL;
 		errCode = IXML_INVALID_PARAMETER;
@@ -283,7 +283,7 @@ int ixmlDocument_createAttributeEx(
 
 	/* set the node fields */
 	attrNode->n.nodeName = strdup(name);
-	if (attrNode->n.nodeName == NULL) {
+	if (!attrNode->n.nodeName) {
 		ixmlAttr_free(attrNode);
 		attrNode = NULL;
 		errCode = IXML_INSUFFICIENT_MEMORY;
@@ -317,7 +317,7 @@ int ixmlDocument_createAttributeNSEx(IXML_Document *doc,
 	IXML_Attr *attrNode = NULL;
 	int errCode = IXML_SUCCESS;
 
-	if (doc == NULL || namespaceURI == NULL || qualifiedName == NULL) {
+	if (!doc || !namespaceURI || !qualifiedName) {
 		errCode = IXML_INVALID_PARAMETER;
 		goto ErrorHandler;
 	}
@@ -328,7 +328,7 @@ int ixmlDocument_createAttributeNSEx(IXML_Document *doc,
 	}
 	/* set the namespaceURI field */
 	attrNode->n.namespaceURI = strdup(namespaceURI);
-	if (attrNode->n.namespaceURI == NULL) {
+	if (!attrNode->n.namespaceURI) {
 		ixmlAttr_free(attrNode);
 		attrNode = NULL;
 		errCode = IXML_INSUFFICIENT_MEMORY;
@@ -365,13 +365,13 @@ int ixmlDocument_createCDATASectionEx(
 	int errCode = IXML_SUCCESS;
 	IXML_CDATASection *cDSectionNode = NULL;
 
-	if (doc == NULL || data == NULL) {
+	if (!doc || !data) {
 		errCode = IXML_INVALID_PARAMETER;
 		goto ErrorHandler;
 	}
 
 	cDSectionNode = (IXML_CDATASection *)malloc(sizeof(IXML_CDATASection));
-	if (cDSectionNode == NULL) {
+	if (!cDSectionNode) {
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
@@ -379,7 +379,7 @@ int ixmlDocument_createCDATASectionEx(
 	ixmlCDATASection_init(cDSectionNode);
 	cDSectionNode->n.nodeType = eCDATA_SECTION_NODE;
 	cDSectionNode->n.nodeName = strdup((const char *)CDATANODENAME);
-	if (cDSectionNode->n.nodeName == NULL) {
+	if (!cDSectionNode->n.nodeName) {
 		ixmlCDATASection_free(cDSectionNode);
 		cDSectionNode = NULL;
 		errCode = IXML_INSUFFICIENT_MEMORY;
@@ -387,7 +387,7 @@ int ixmlDocument_createCDATASectionEx(
 	}
 
 	cDSectionNode->n.nodeValue = strdup(data);
-	if (cDSectionNode->n.nodeValue == NULL) {
+	if (!cDSectionNode->n.nodeValue) {
 		ixmlCDATASection_free(cDSectionNode);
 		cDSectionNode = NULL;
 		errCode = IXML_INSUFFICIENT_MEMORY;
@@ -420,7 +420,7 @@ int ixmlDocument_createElementNSEx(IXML_Document *doc,
 	int ret = IXML_SUCCESS;
 	int line = 0;
 
-	if (doc == NULL || namespaceURI == NULL || qualifiedName == NULL) {
+	if (!doc || !namespaceURI || !qualifiedName) {
 		line = __LINE__;
 		ret = IXML_INVALID_PARAMETER;
 		goto ErrorHandler;
@@ -433,7 +433,7 @@ int ixmlDocument_createElementNSEx(IXML_Document *doc,
 	}
 	/* set the namespaceURI field */
 	newElement->n.namespaceURI = strdup(namespaceURI);
-	if (newElement->n.namespaceURI == NULL) {
+	if (!newElement->n.namespaceURI) {
 		line = __LINE__;
 		ixmlElement_free(newElement);
 		newElement = NULL;
@@ -482,7 +482,7 @@ IXML_NodeList *ixmlDocument_getElementsByTagName(
 {
 	IXML_NodeList *returnNodeList = NULL;
 
-	if (doc == NULL || tagName == NULL) {
+	if (!doc || !tagName) {
 		return NULL;
 	}
 
@@ -498,7 +498,7 @@ IXML_NodeList *ixmlDocument_getElementsByTagNameNS(IXML_Document *doc,
 {
 	IXML_NodeList *returnNodeList = NULL;
 
-	if (doc == NULL || namespaceURI == NULL || localName == NULL) {
+	if (!doc || !namespaceURI || !localName) {
 		return NULL;
 	}
 
@@ -515,13 +515,13 @@ IXML_Element *ixmlDocument_getElementById(
 	IXML_Node *nodeptr = (IXML_Node *)doc;
 	const char *name;
 
-	if (nodeptr == NULL || tagName == NULL) {
+	if (!nodeptr || !tagName) {
 		return rtElement;
 	}
 
 	if (ixmlNode_getNodeType(nodeptr) == eELEMENT_NODE) {
 		name = ixmlNode_getNodeName(nodeptr);
-		if (name == NULL) {
+		if (!name) {
 			return rtElement;
 		}
 
@@ -533,7 +533,7 @@ IXML_Element *ixmlDocument_getElementById(
 				(IXML_Document *)ixmlNode_getFirstChild(
 					nodeptr),
 				tagName);
-			if (rtElement == NULL) {
+			if (!rtElement) {
 				rtElement = ixmlDocument_getElementById(
 					(IXML_Document *)
 						ixmlNode_getNextSibling(
@@ -545,7 +545,7 @@ IXML_Element *ixmlDocument_getElementById(
 		rtElement = ixmlDocument_getElementById(
 			(IXML_Document *)ixmlNode_getFirstChild(nodeptr),
 			tagName);
-		if (rtElement == NULL) {
+		if (!rtElement) {
 			rtElement = ixmlDocument_getElementById(
 				(IXML_Document *)ixmlNode_getNextSibling(
 					nodeptr),
