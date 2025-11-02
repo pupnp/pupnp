@@ -84,11 +84,11 @@ static int ixml_membuf_set_size(
 
 	assert(alloc_len >= new_length);
 
-	temp_buf = realloc(m->buf, alloc_len + (size_t)1);
+	temp_buf = (char *)realloc(m->buf, alloc_len + (size_t)1);
 	if (temp_buf == NULL) {
 		/* try smaller size */
 		alloc_len = new_length;
-		temp_buf = realloc(m->buf, alloc_len + (size_t)1);
+		temp_buf = (char *)realloc(m->buf, alloc_len + (size_t)1);
 		if (temp_buf == NULL) {
 			return IXML_INSUFFICIENT_MEMORY;
 		}

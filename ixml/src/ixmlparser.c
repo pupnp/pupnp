@@ -1512,7 +1512,7 @@ static int Parser_processContent(
 				xmlParser->curPtr = pEndContent;
 			}
 		} else if (strncmp(pEndContent,
-				   (char *)BEGIN_PI,
+				   (const char *)BEGIN_PI,
 				   strlen(BEGIN_PI)) == 0) {
 			if (Parser_skipPI(&pEndContent) != IXML_SUCCESS) {
 				line = __LINE__;
@@ -2005,7 +2005,7 @@ static int Parser_processAttribute(
 	} else {
 		/* if attribute doesn't have value, like a=""
 		 * somewhere on other places is this copied */
-		node->nodeValue = malloc(sizeof(char));
+		node->nodeValue = (char *)malloc(sizeof(char));
 		*(node->nodeValue) = '\0';
 	}
 	node->nodeType = eATTRIBUTE_NODE;
@@ -2904,7 +2904,7 @@ int Parser_setNodePrefixAndLocalName(
 		/* fill in the local name and prefix */
 		pLocalName = (char *)pStrPrefix + 1;
 		nPrefix = pStrPrefix - node->nodeName;
-		node->prefix = malloc((size_t)nPrefix + (size_t)1);
+		node->prefix = (char *)malloc((size_t)nPrefix + (size_t)1);
 		if (!node->prefix) {
 			return IXML_INSUFFICIENT_MEMORY;
 		}
