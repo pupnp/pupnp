@@ -18,8 +18,8 @@ int main(void)
 	IXML_Attr *repl2;
 
 	puts("\n\t1. Creates a document");
-	doc = ixmlDocument_createDocument();
-	if (!doc) {
+	ixml_err = ixmlDocument_createDocumentEx(&doc);
+	if (ixml_err != IXML_SUCCESS) {
 		err = 1;
 		goto end_1;
 	}
