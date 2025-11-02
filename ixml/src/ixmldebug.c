@@ -44,7 +44,7 @@ void printNodes(IXML_Node *tmpRoot, int depth)
 	NodeList1 = ixmlNode_getChildNodes(tmpRoot);
 	for (i = 0; i < 100; ++i) {
 		ChildNode1 = ixmlNodeList_item(NodeList1, i);
-		if (ChildNode1 == NULL) {
+		if (!ChildNode1) {
 			break;
 		}
 
