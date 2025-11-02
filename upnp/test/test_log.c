@@ -28,17 +28,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *************************************************************************/
-#include "upnp.h"
-#include "upnpconfig.h"
-#include "upnpdebug.h"
+
+#ifdef UPNP_HAVE_DEBUG
+	#include "upnpdebug.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#ifdef UPNP_HAVE_DEBUG
+	#include <string.h>
+#endif
 
-int main()
+int main(void)
 {
-#if UPNP_HAVE_DEBUG
+#ifdef UPNP_HAVE_DEBUG
 	int i;
+	FILE *fp;
 
 	/* Try a few random calls (let's crash it...) */
 	UpnpCloseLog();
@@ -48,7 +53,7 @@ int main()
 		__FILE__,
 		__LINE__,
 		"This should not be printed !\n");
-	FILE *fp = UpnpGetDebugFile(UPNP_CRITICAL, API);
+	fp = UpnpGetDebugFile(UPNP_CRITICAL, API);
 	if (fp) {
 		fprintf(stderr, "Log FP not NULL before init was called !\n");
 		exit(1);

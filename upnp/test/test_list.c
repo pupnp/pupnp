@@ -17,7 +17,8 @@ struct list_test_item
 
 struct list_test_item *list_test_item__new(int i)
 {
-	struct list_test_item *p = calloc(1, sizeof(*p));
+	struct list_test_item *p =
+		(struct list_test_item *)calloc(1, sizeof(*p));
 	assert(p != NULL);
 
 	p->index = i;
@@ -28,6 +29,8 @@ int main(void)
 {
 	int i;
 	UpnpListHead list;
+	UpnpListIter list_iter;
+
 	UpnpListInit(&list);
 
 	/* Fill list with items */
@@ -80,7 +83,7 @@ int main(void)
 	/* Verify list is cleared */
 	assert(UpnpListBegin(&list) == UpnpListEnd(&list));
 
-	UpnpListIter list_iter = UpnpListBegin(&list);
+	list_iter = UpnpListBegin(&list);
 	assert(UpnpListNext(&list, list_iter) == UpnpListEnd(&list));
 	assert(list_iter == UpnpListEnd(&list));
 

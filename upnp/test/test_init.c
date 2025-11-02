@@ -46,9 +46,9 @@ int main(int argc, char *argv[])
 {
 	int rc;
 	int a, b, c;
+	const char *log_file_name = "test_init.log";
 	(void)argc;
 	(void)argv;
-	const char *log_file_name = "test_init.log";
 
 	/*
 	 * Check library version (and formats)
@@ -77,31 +77,31 @@ int main(int argc, char *argv[])
 	 */
 	printf("\n");
 
-#if UPNP_HAVE_DEBUG
+#ifdef UPNP_HAVE_DEBUG
 	printf("UPNP_HAVE_DEBUG \t= yes\n");
 #else
 	printf("UPNP_HAVE_DEBUG \t= no\n");
 #endif
 
-#if UPNP_HAVE_CLIENT
+#ifdef UPNP_HAVE_CLIENT
 	printf("UPNP_HAVE_CLIENT\t= yes\n");
 #else
 	printf("UPNP_HAVE_CLIENT\t= no\n");
 #endif
 
-#if UPNP_HAVE_DEVICE
+#ifdef UPNP_HAVE_DEVICE
 	printf("UPNP_HAVE_DEVICE\t= yes\n");
 #else
 	printf("UPNP_HAVE_DEVICE\t= no\n");
 #endif
 
-#if UPNP_HAVE_WEBSERVER
+#ifdef UPNP_HAVE_WEBSERVER
 	printf("UPNP_HAVE_WEBSERVER\t= yes\n");
 #else
 	printf("UPNP_HAVE_WEBSERVER\t= no\n");
 #endif
 
-#if UPNP_HAVE_TOOLS
+#ifdef UPNP_HAVE_TOOLS
 	printf("UPNP_HAVE_TOOLS \t= yes\n");
 #else
 	printf("UPNP_HAVE_TOOLS \t= no\n");
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
 			port);
 	} else {
 		printf("** ERROR UpnpInit2(): %d", rc);
-#if UPNP_HAVE_TOOLS
+#ifdef UPNP_HAVE_TOOLS
 		printf(" %s", UpnpGetErrorMessage(rc));
 #endif
 		printf("\n");

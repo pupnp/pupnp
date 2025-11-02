@@ -148,7 +148,7 @@ static const struct test RFC3986[] = {
 };
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof *(a))
 
-int main()
+int main(void)
 {
 	int i, ret = 0;
 
