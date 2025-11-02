@@ -263,25 +263,20 @@ IXML_Node *ixmlDocument_createTextNode(IXML_Document *doc, const DOMString data)
 int ixmlDocument_createAttributeEx(
 	IXML_Document *doc, const DOMString name, IXML_Attr **rtAttr)
 {
-	IXML_Attr *attrNode = NULL;
 	int errCode = IXML_SUCCESS;
+	IXML_Attr *attrNode = NULL;
 
+	if (!doc || !name) {
+		errCode = IXML_INVALID_PARAMETER;
+		goto ErrorHandler;
+	}
 	attrNode = (IXML_Attr *)malloc(sizeof(IXML_Attr));
 	if (!attrNode) {
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
-
-	if (!doc || !name) {
-		ixmlAttr_free(attrNode);
-		attrNode = NULL;
-		errCode = IXML_INVALID_PARAMETER;
-		goto ErrorHandler;
-	}
-
 	ixmlAttr_init(attrNode);
 	attrNode->n.nodeType = eATTRIBUTE_NODE;
-
 	/* set the node fields */
 	attrNode->n.nodeName = strdup(name);
 	if (!attrNode->n.nodeName) {
@@ -290,7 +285,6 @@ int ixmlDocument_createAttributeEx(
 		errCode = IXML_INSUFFICIENT_MEMORY;
 		goto ErrorHandler;
 	}
-
 	attrNode->n.ownerDocument = doc;
 
 ErrorHandler:
@@ -315,8 +309,8 @@ int ixmlDocument_createAttributeNSEx(IXML_Document *doc,
 	const DOMString qualifiedName,
 	IXML_Attr **rtAttr)
 {
-	IXML_Attr *attrNode = NULL;
 	int errCode = IXML_SUCCESS;
+	IXML_Attr *attrNode = NULL;
 
 	if (!doc || !namespaceURI || !qualifiedName) {
 		errCode = IXML_INVALID_PARAMETER;
