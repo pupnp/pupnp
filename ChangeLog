@@ -16,6 +16,7 @@ Version 1.14.26
 	- readFromSSDPSocket: Don't return error when sockets receive zero
 	length packet (#501)
 	- shutdown sockets in finish routine (#504)
+	- Fix segfault on ixml, thanks to Harrison Green (hgarrereyn) (#506)
 
 *******************************************************************************
 Version 1.14.25
