@@ -85,11 +85,11 @@ static int ixml_membuf_set_size(
 	assert(alloc_len >= new_length);
 
 	temp_buf = (char *)realloc(m->buf, alloc_len + (size_t)1);
-	if (temp_buf == NULL) {
+	if (!temp_buf) {
 		/* try smaller size */
 		alloc_len = new_length;
 		temp_buf = (char *)realloc(m->buf, alloc_len + (size_t)1);
-		if (temp_buf == NULL) {
+		if (!temp_buf) {
 			return IXML_INSUFFICIENT_MEMORY;
 		}
 	}
@@ -112,7 +112,7 @@ void ixml_membuf_init(ixml_membuf *m)
 
 void ixml_membuf_destroy(ixml_membuf *m)
 {
-	if (m == NULL) {
+	if (!m) {
 		return;
 	}
 
@@ -127,7 +127,7 @@ int ixml_membuf_assign(ixml_membuf *m, const void *buf, size_t buf_len)
 	assert(m != NULL);
 
 	/* set value to null */
-	if (buf == NULL) {
+	if (!buf) {
 		ixml_membuf_destroy(m);
 		return IXML_SUCCESS;
 	}
@@ -190,7 +190,7 @@ int ixml_membuf_insert(
 		return IXML_INDEX_SIZE_ERR;
 	}
 
-	if (buf == NULL || buf_len == (size_t)0) {
+	if (!buf || buf_len == (size_t)0) {
 		return 0;
 	}
 	/* alloc mem */
