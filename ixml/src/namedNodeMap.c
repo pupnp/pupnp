@@ -52,13 +52,13 @@ static unsigned long ixmlNamedNodeMap_getItemNumber(
 	IXML_Node *tempNode;
 	unsigned long returnItemNo = 0lu;
 
-	assert(nnMap != NULL && name != NULL);
-	if (nnMap == NULL || name == NULL) {
+	assert(nnMap && name);
+	if (!nnMap || !name) {
 		return (unsigned long)IXML_INVALID_ITEM_NUMBER;
 	}
 
 	tempNode = nnMap->nodeItem;
-	while (tempNode != NULL) {
+	while (tempNode) {
 		if (strcmp(name, tempNode->nodeName) == 0) {
 			return returnItemNo;
 		}
@@ -71,7 +71,7 @@ static unsigned long ixmlNamedNodeMap_getItemNumber(
 
 void ixmlNamedNodeMap_init(IXML_NamedNodeMap *nnMap)
 {
-	assert(nnMap != NULL);
+	assert(nnMap);
 
 	memset(nnMap, 0, sizeof(IXML_NamedNodeMap));
 }
@@ -81,7 +81,7 @@ IXML_Node *ixmlNamedNodeMap_getNamedItem(
 {
 	unsigned long index;
 
-	if (nnMap == NULL || name == NULL) {
+	if (!nnMap || !name) {
 		return NULL;
 	}
 
@@ -100,7 +100,7 @@ IXML_Node *ixmlNamedNodeMap_item(
 	IXML_Node *tempNode;
 	unsigned int i;
 
-	if (nnMap == NULL) {
+	if (!nnMap) {
 		return NULL;
 	}
 
@@ -109,7 +109,7 @@ IXML_Node *ixmlNamedNodeMap_item(
 	}
 
 	tempNode = nnMap->nodeItem;
-	for (i = 0u; i < index && tempNode != NULL; ++i) {
+	for (i = 0u; i < index && tempNode; ++i) {
 		tempNode = tempNode->nextSibling;
 	}
 
@@ -121,9 +121,9 @@ unsigned long ixmlNamedNodeMap_getLength(IXML_NamedNodeMap *nnMap)
 	IXML_Node *tempNode;
 	unsigned long length = 0lu;
 
-	if (nnMap != NULL) {
+	if (nnMap) {
 		tempNode = nnMap->nodeItem;
-		for (length = 0lu; tempNode != NULL; ++length) {
+		for (length = 0lu; tempNode; ++length) {
 			tempNode = tempNode->nextSibling;
 		}
 	}
@@ -135,7 +135,7 @@ void ixmlNamedNodeMap_free(IXML_NamedNodeMap *nnMap)
 {
 	IXML_NamedNodeMap *pNext;
 
-	while (nnMap != NULL) {
+	while (nnMap) {
 		pNext = nnMap->next;
 		free(nnMap);
 		nnMap = pNext;
@@ -149,30 +149,30 @@ int ixmlNamedNodeMap_addToNamedNodeMap(
 	IXML_NamedNodeMap *p = NULL;
 	IXML_NamedNodeMap *newItem = NULL;
 
-	if (add == NULL) {
+	if (!add) {
 		return IXML_SUCCESS;
 	}
 
-	if (*nnMap == NULL) {
+	if (!*nnMap) {
 		/* nodelist is empty */
 		*nnMap = (IXML_NamedNodeMap *)malloc(sizeof(IXML_NamedNodeMap));
-		if (*nnMap == NULL) {
+		if (!*nnMap) {
 			return IXML_INSUFFICIENT_MEMORY;
 		}
 		ixmlNamedNodeMap_init(*nnMap);
 	}
-	if ((*nnMap)->nodeItem == NULL) {
+	if (!(*nnMap)->nodeItem) {
 		(*nnMap)->nodeItem = add;
 	} else {
 		traverse = *nnMap;
 		p = traverse;
-		while (traverse != NULL) {
+		while (traverse) {
 			p = traverse;
 			traverse = traverse->next;
 		}
 		newItem =
 			(IXML_NamedNodeMap *)malloc(sizeof(IXML_NamedNodeMap));
-		if (newItem == NULL) {
+		if (!newItem) {
 			return IXML_INSUFFICIENT_MEMORY;
 		}
 		p->next = newItem;
