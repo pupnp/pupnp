@@ -24,7 +24,7 @@ dnl # *please update only once, before a formal release, not for each change*
 dnl #
 dnl ############################################################################
 AC_INIT([libupnp],[1.14.26],[mroberto@users.sourceforge.net])
-AC_SUBST([LT_VERSION_IXML], [12:3:1])
+AC_SUBST([LT_VERSION_IXML], [12:4:1])
 AC_SUBST([LT_VERSION_UPNP], [19:6:2])
 dnl ############################################################################
 dnl # Release 1.14.26
@@ -41,7 +41,7 @@ dnl # - interfaces removed or changed in upnp
 dnl #   age: eee_1_1 -> 0
 dnl #
 dnl # - Code has changed in ixml
-dnl #   revision: aaa_2_1 -> aaa_2_2
+dnl #   revision: 3 -> 4
 dnl # - interfaces changed/added/removed in ixml
 dnl #   current: bbb_1_1 -> bbb_1_2
 dnl #   revision: ccc_1_1 -> 0
@@ -50,7 +50,7 @@ dnl #   age: ddd_1_1 -> ddd_1_2
 dnl # - interfaces removed or changed in ixml
 dnl #   age: eee_1_1 -> 0
 dnl #
-dnl #AC_SUBST([LT_VERSION_IXML], [12:3:1])
+dnl #AC_SUBST([LT_VERSION_IXML], [12:4:1])
 dnl #AC_SUBST([LT_VERSION_UPNP], [19:6:2])
 dnl ############################################################################
 dnl # Release 1.14.25
