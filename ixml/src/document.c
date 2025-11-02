@@ -191,6 +191,7 @@ int ixmlDocument_createDocumentEx(IXML_Document **rtDoc)
 	doc->n.ownerDocument = doc;
 
 ErrorHandler:
+	/* doc is NULL on failure */
 	*rtDoc = doc;
 	return errCode;
 }
