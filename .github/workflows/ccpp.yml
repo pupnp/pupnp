@@ -30,7 +30,7 @@ jobs:
         conf: [Debug, Release]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Configure
         run: >
           cmake
@@ -63,7 +63,7 @@ jobs:
         conf: [Debug, Release]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: vmactions/omnios-vm@v1
         with:
           prepare: |
@@ -95,7 +95,7 @@ jobs:
         conf: [Debug, Release]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Configure
         run: >
           cmake
@@ -150,7 +150,7 @@ jobs:
         with:
           msystem: ${{matrix.sys}}
           install: mingw-w64-clang-x86_64-cmake mingw-w64-clang-x86_64-make git mingw-w64-clang-x86_64-gcc
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Configure
         run: >
           cmake
@@ -181,7 +181,7 @@ jobs:
         tool: [autotools, cmake]
         conf: [Debug]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: bootstrap and configure (autotools)
       if: ${{ matrix.tool == 'autotools' }}
       run: >

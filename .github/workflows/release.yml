@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Checkout
         # Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Preparation
         # Prepare some useful environment variables
         run: |
