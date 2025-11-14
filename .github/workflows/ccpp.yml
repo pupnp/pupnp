@@ -54,6 +54,37 @@ jobs:
         run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
       - name: install
         run: cmake --install build --config ${{matrix.conf}}
+  omnios:
+    name: Build OmniOS - ${{ matrix.conf }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        conf: [Debug, Release]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/omnios-vm@v1
+        with:
+          prepare: |
+            pkg install cmake gcc14 make
+          run: |
+            cmake \
+            -S . \
+            -B build \
+            -DCMAKE_BUILD_TYPE=${{ matrix.conf }} \
+            -DBUILD_TESTING=ON \
+            -DDOWNLOAD_AND_BUILD_DEPS=ON \
+            -DUPNP_ENABLE_OPEN_SSL=ON \
+            -DCMAKE_C_FLAGS="-Wall -Wpedantic" \
+            -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install \
+            ${{ env.cmake_extra_flags }}
+            cmake --build build --config ${{matrix.conf}}
+            cd build
+            ctest --output-on-failure
+            cd ..
+            cmake -DBUILD_DIR=build -P cmake/post-test.cmake
+            cmake --install build --config ${{matrix.conf}}
   # Windows Visual Studio builds
   windows-msvc:
     name: Build (${{ matrix.os }})  - ${{ matrix.conf }}
