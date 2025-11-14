@@ -144,6 +144,15 @@ static char *web_server_asctime_r(const struct tm *tm, char *buf)
 	asctime_s(buf, ASCTIME_R_BUFFER_SIZE, tm);
 	return buf;
 }
+	#elif defined(__sun__)
+static char *web_server_asctime_r(const struct tm *tm, char *buf)
+{
+	if (tm == NULL || buf == NULL)
+		return NULL;
+
+	asctime_r(tm, buf, ASCTIME_R_BUFFER_SIZE);
+	return buf;
+}
 	#else
 		#define web_server_asctime_r asctime_r
 	#endif
