@@ -34,12 +34,22 @@
  * \file
  */
 
+#include "ixml.h"
 #include "ixmlparser.h"
 
 #include <stdlib.h> /* for free() */
 #include <string.h>
 
 #include "posix_overwrites.h" // IWYU pragma: keep
+
+typedef struct s_extra_parameters
+{
+	const void *p1;
+	const void *p2;
+} Extra_Parameters_t;
+
+typedef int (*Find_Condition_t)(
+	const IXML_Node *n, const Extra_Parameters_t *p);
 
 void ixmlElement_init(IXML_Element *element)
 {
@@ -76,115 +86,129 @@ int ixmlElement_setTagName(IXML_Element *element, const char *tagName)
 	return rc;
 }
 
-const DOMString ixmlElement_getAttribute(
-	IXML_Element *element, const DOMString name)
+static int find_condition_name(const IXML_Node *n, const Extra_Parameters_t *p)
 {
-	IXML_Node *attrNode;
+	const DOMString name;
+	int ret;
 
-	if (!element || !name) {
-		return NULL;
-	}
+	name = (const DOMString)p->p1;
+	ret = n->nodeName && //
+	      strcmp(n->nodeName, name) == 0;
 
-	attrNode = element->n.firstAttr;
-	while (attrNode) {
-		if (attrNode->nodeName &&
-			strcmp(attrNode->nodeName, name) == 0) {
-			return attrNode->nodeValue;
+	return ret;
+}
+
+static IXML_Node *get_attribute_node( //
+	Find_Condition_t condition,
+	IXML_Element *element,
+	Extra_Parameters_t *p)
+{
+	IXML_Node *n = element->n.firstAttr;
+
+	while (n) {
+		if (condition(n, p)) {
+			return n;
 		}
-		attrNode = attrNode->nextSibling;
+		n = n->nextSibling;
 	}
 
 	return NULL;
 }
 
-int ixmlElement_setAttribute(
-	IXML_Element *element, const DOMString name, const DOMString value)
+const DOMString ixmlElement_getAttribute(
+	IXML_Element *element, const DOMString name)
 {
 	IXML_Node *attrNode;
-	int errCode = IXML_SUCCESS;
+	Extra_Parameters_t p;
+
+	if (!element || !name) {
+		return NULL;
+	}
+	p.p1 = name;
+	p.p2 = NULL;
+	attrNode = get_attribute_node(find_condition_name, element, &p);
+	if (attrNode) {
+		return attrNode->nodeValue;
+	}
+
+	return NULL;
+}
+
+int ixmlElement_setAttribute( //
+	IXML_Element *element,
+	const DOMString name,
+	const DOMString value)
+{
+	int error_code = IXML_SUCCESS;
+	IXML_Node *attrNode = NULL;
+	Extra_Parameters_t p;
 
 	if (!element || !name || !value) {
-		errCode = IXML_INVALID_PARAMETER;
-		goto ErrorHandler;
+		return IXML_INVALID_PARAMETER;
 	}
 	if (Parser_isValidXmlName(name) == 0) {
-		errCode = IXML_INVALID_CHARACTER_ERR;
-		goto ErrorHandler;
+		return IXML_INVALID_CHARACTER_ERR;
 	}
-
-	attrNode = element->n.firstAttr;
-	while (attrNode) {
-		if (attrNode->nodeName &&
-			strcmp(attrNode->nodeName, name) == 0) {
-			/* Found it */
-			break;
-		}
-		attrNode = attrNode->nextSibling;
-	}
-	if (!attrNode) {
-		IXML_Attr *newAttrNode;
-
-		/* Add a new attribute */
-		errCode = ixmlDocument_createAttributeEx(
-			(IXML_Document *)element->n.ownerDocument,
-			name,
-			&newAttrNode);
-		if (errCode != IXML_SUCCESS) {
-			goto ErrorHandler;
-		}
-		attrNode = (IXML_Node *)newAttrNode;
-		attrNode->nodeValue = strdup(value);
-		if (!attrNode->nodeValue) {
-			ixmlAttr_free(newAttrNode);
-			errCode = IXML_INSUFFICIENT_MEMORY;
-			goto ErrorHandler;
-		}
-
-		errCode = ixmlElement_setAttributeNode(
-			element, newAttrNode, NULL);
-		if (errCode != IXML_SUCCESS) {
-			ixmlAttr_free(newAttrNode);
-			goto ErrorHandler;
-		}
-	} else {
+	p.p1 = name;
+	p.p2 = NULL;
+	attrNode = get_attribute_node(find_condition_name, element, &p);
+	if (attrNode) {
 		if (attrNode->nodeValue) {
 			/* Attribute name has a value already */
 			free(attrNode->nodeValue);
 		}
 		attrNode->nodeValue = strdup(value);
 		if (!attrNode->nodeValue) {
-			errCode = IXML_INSUFFICIENT_MEMORY;
+			error_code = IXML_INSUFFICIENT_MEMORY;
+			goto ErrorHandler;
+		}
+	} else {
+		/* attrNode was not found */
+		IXML_Attr *newAttr;
+
+		/* Add a new attribute */
+		error_code = ixmlDocument_createAttributeEx(
+			(IXML_Document *)element->n.ownerDocument,
+			name,
+			&newAttr);
+		if (error_code != IXML_SUCCESS) {
+			goto ErrorHandler;
+		}
+		newAttr->n.nodeValue = strdup(value);
+		if (!newAttr->n.nodeValue) {
+			ixmlAttr_free(newAttr);
+			error_code = IXML_INSUFFICIENT_MEMORY;
+			goto ErrorHandler;
+		}
+		error_code = ixmlElement_setAttributeNode( //
+			element,
+			newAttr,
+			NULL);
+		if (error_code != IXML_SUCCESS) {
+			ixmlAttr_free(newAttr);
+			goto ErrorHandler;
 		}
 	}
 
 ErrorHandler:
-	return errCode;
+	return error_code;
 }
 
 int ixmlElement_removeAttribute(IXML_Element *element, const DOMString name)
 {
 	IXML_Node *attrNode;
+	Extra_Parameters_t p;
 
 	if (!element || !name) {
 		return IXML_INVALID_PARAMETER;
 	}
-
-	attrNode = element->n.firstAttr;
-	while (attrNode) {
-		if (attrNode->nodeName &&
-			strcmp(attrNode->nodeName, name) == 0) {
-			/* Found it */
-			break;
-		} else {
-			attrNode = attrNode->nextSibling;
-		}
-	}
-	if (attrNode) {
+	p.p1 = name;
+	p.p2 = NULL;
+	attrNode = get_attribute_node(find_condition_name, element, &p);
+	if (attrNode && attrNode->nodeValue) {
 		/* Has the attribute */
-		if (attrNode->nodeValue) {
-			free(attrNode->nodeValue);
-			attrNode->nodeValue = NULL;
-		}
+		free(attrNode->nodeValue);
+		attrNode->nodeValue = NULL;
 	}
 
 	return IXML_SUCCESS;
@@ -193,30 +217,26 @@ int ixmlElement_removeAttribute(IXML_Element *element, const DOMString name)
 IXML_Attr *ixmlElement_getAttributeNode(
 	IXML_Element *element, const DOMString name)
 {
-	IXML_Node *attrNode;
+	Extra_Parameters_t p;
 
 	if (!element || !name) {
 		return NULL;
 	}
-
-	attrNode = element->n.firstAttr;
-	while (attrNode) {
-		if (attrNode->nodeName &&
-			strcmp(attrNode->nodeName, name) == 0) {
-			/* found it */
-			break;
-		}
-		attrNode = attrNode->nextSibling;
-	}
-
-	return (IXML_Attr *)attrNode;
+	p.p1 = name;
+	p.p2 = NULL;
+	return (IXML_Attr *)get_attribute_node(
+		find_condition_name, element, &p);
 }
 
-int ixmlElement_setAttributeNode(
-	IXML_Element *element, IXML_Attr *newAttr, IXML_Attr **rtAttr)
+static int ixmlElement_setAttributeNode_common(
+	/* IN */ Find_Condition_t find_condition,
+	/* IN */ IXML_Element *element,
+	/* IN */ IXML_Attr *newAttr,
+	/* OUT */ IXML_Attr **rtAttr)
 {
-	IXML_Node *attrNode = NULL;
 	IXML_Node *node = NULL;
+	IXML_Node *attrNode = NULL;
+	Extra_Parameters_t p;
 
 	if (!element || !newAttr) {
 		return IXML_INVALID_PARAMETER;
@@ -224,27 +244,20 @@ int ixmlElement_setAttributeNode(
 	if (newAttr->n.ownerDocument != element->n.ownerDocument) {
 		return IXML_WRONG_DOCUMENT_ERR;
 	}
-	if (newAttr->ownerElement) {
+	if (newAttr->ownerElement && newAttr->ownerElement != element) {
 		return IXML_INUSE_ATTRIBUTE_ERR;
 	}
-
 	newAttr->ownerElement = element;
-	node = (IXML_Node *)newAttr;
-	attrNode = element->n.firstAttr;
-	while (attrNode) {
-		if (attrNode->nodeName && node->nodeName &&
-			!strcmp(attrNode->nodeName, node->nodeName)) {
-			/* Found it */
-			break;
-		}
-		attrNode = attrNode->nextSibling;
-	}
+	node = &newAttr->n;
+	p.p1 = node;
+	p.p2 = NULL;
+	attrNode = get_attribute_node(find_condition, element, &p);
 	if (attrNode) {
-		/* Already present, will replace by newAttr */
-		IXML_Node *preSib = attrNode->prevSibling;
+		/* Already present, will be replaced by newAttr */
+		IXML_Node *prevSib = attrNode->prevSibling;
 		IXML_Node *nextSib = attrNode->nextSibling;
-		if (preSib) {
-			preSib->nextSibling = node;
+		if (prevSib) {
+			prevSib->nextSibling = node;
 		}
 		if (nextSib) {
 			nextSib->prevSibling = node;
@@ -252,7 +265,11 @@ int ixmlElement_setAttributeNode(
 		if (element->n.firstAttr == attrNode) {
 			element->n.firstAttr = node;
 		}
+		node->parentNode = attrNode->parentNode;
+		node->firstChild = attrNode->firstChild; // Should be NULL
+		node->firstAttr = attrNode->firstAttr;	 // Should be NULL
 		if (rtAttr) {
+			attrNode->parentNode = NULL;
 			*rtAttr = (IXML_Attr *)attrNode;
 		} else {
 			ixmlAttr_free((IXML_Attr *)attrNode);
@@ -260,6 +277,7 @@ int ixmlElement_setAttributeNode(
 	} else {
 		/* Add this attribute */
 		if (element->n.firstAttr) {
+			/* Element already has an attribute, go to the end */
 			IXML_Node *prevAttr = element->n.firstAttr;
 			IXML_Node *nextAttr = prevAttr->nextSibling;
 			while (nextAttr) {
@@ -273,6 +291,7 @@ int ixmlElement_setAttributeNode(
 			element->n.firstAttr = node;
 			node->prevSibling = NULL;
 			node->nextSibling = NULL;
+			node->parentNode = &element->n;
 		}
 		if (rtAttr) {
 			*rtAttr = NULL;
@@ -282,59 +301,56 @@ int ixmlElement_setAttributeNode(
 	return IXML_SUCCESS;
 }
 
-/*!
- * \brief Find a attribute node whose contents are the same as the oldAttr.
- *
- * \return If found, the attribute node is returned, otherwise \b NULL is
- * returned.
- */
-static IXML_Node *ixmlElement_findAttributeNode(
-	/*! [in] The element to search for the attribute. */
-	IXML_Element *element,
-	/*! [in] The attribute node to match. */
-	IXML_Attr *oldAttr)
+static int find_condition_node_name(
+	const IXML_Node *n1, const Extra_Parameters_t *p)
 {
-	IXML_Node *attrNode;
-	IXML_Node *oldAttrNode;
+	const IXML_Node *n2 = (const IXML_Node *)p->p1;
+	int ret;
 
-	if (!element || !oldAttr) {
-		return NULL;
-	}
+	ret = n1->nodeName && //
+	      n2->nodeName && //
+	      !strcmp(n1->nodeName, n2->nodeName);
 
-	attrNode = element->n.firstAttr;
-	oldAttrNode = (IXML_Node *)oldAttr;
-	while (attrNode) {
-		/* parentNode, prevSib, nextSib and ownerDocument don't matter
-		 */
-		if (ixmlNode_compare(attrNode, oldAttrNode) == 1) {
-			/* Found it */
-			break;
-		}
-		attrNode = attrNode->nextSibling;
-	}
+	return ret;
+}
 
-	return attrNode;
+int ixmlElement_setAttributeNode(
+	/* IN */ IXML_Element *element,
+	/* IN */ IXML_Attr *newAttr,
+	/* OUT */ IXML_Attr **rtAttr)
+{
+	return ixmlElement_setAttributeNode_common(
+		find_condition_node_name, element, newAttr, rtAttr);
+}
+
+static int find_condition_node(const IXML_Node *n1, const Extra_Parameters_t *p)
+{
+	const IXML_Node *n2 = (const IXML_Node *)p->p1;
+
+	return ixmlNode_compare(n1, n2);
 }
 
 int ixmlElement_removeAttributeNode(
 	IXML_Element *element, IXML_Attr *oldAttr, IXML_Attr **rtAttr)
 {
 	IXML_Node *attrNode;
+	Extra_Parameters_t p;
 
 	if (!element || !oldAttr) {
 		return IXML_INVALID_PARAMETER;
 	}
-
-	attrNode = ixmlElement_findAttributeNode(element, oldAttr);
+	p.p1 = oldAttr;
+	p.p2 = NULL;
+	attrNode = get_attribute_node(find_condition_node, element, &p);
 	if (attrNode) {
 		/* Has the attribute */
-		IXML_Node *preSib = attrNode->prevSibling;
+		IXML_Node *prevSib = attrNode->prevSibling;
 		IXML_Node *nextSib = attrNode->nextSibling;
-		if (preSib) {
-			preSib->nextSibling = nextSib;
+		if (prevSib) {
+			prevSib->nextSibling = nextSib;
 		}
 		if (nextSib) {
-			nextSib->prevSibling = preSib;
+			nextSib->prevSibling = prevSib;
 		}
 		if (element->n.firstAttr == attrNode) {
 			element->n.firstAttr = nextSib;
@@ -358,7 +374,22 @@ IXML_NodeList *ixmlElement_getElementsByTagName(
 		ixmlNode_getElementsByTagName(
 			(IXML_Node *)element, tagName, &returnNodeList);
 	}
+
 	return returnNodeList;
+}
+
+static int find_condition_ns_ln(const IXML_Node *n, const Extra_Parameters_t *p)
+{
+	const DOMString namespaceURI = (const DOMString)p->p1;
+	const DOMString localName = (const DOMString)p->p2;
+	int ret;
+
+	ret = n->localName &&			      //
+	      n->namespaceURI &&		      //
+	      strcmp(n->localName, localName) == 0 && //
+	      strcmp(n->namespaceURI, namespaceURI) == 0;
+
+	return ret;
 }
 
 const DOMString ixmlElement_getAttributeNS(
@@ -366,35 +397,52 @@ const DOMString ixmlElement_getAttributeNS(
 	/* IN */ const DOMString namespaceURI,
 	/* IN */ const DOMString localName)
 {
-	IXML_Node *attrNode;
+	IXML_Node *n;
+	Extra_Parameters_t p;
 
 	if (!element || !namespaceURI || !localName) {
 		return NULL;
 	}
-
-	attrNode = element->n.firstAttr;
-	while (attrNode) {
-		if (attrNode->localName && attrNode->namespaceURI &&
-			strcmp(attrNode->localName, localName) == 0 &&
-			strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
-			/* Found it */
-			return attrNode->nodeValue;
-		}
-		attrNode = attrNode->nextSibling;
+	p.p1 = namespaceURI;
+	p.p2 = localName;
+	n = get_attribute_node(find_condition_ns_ln, element, &p);
+	if (n) {
+		return n->nodeValue;
 	}
 
 	return NULL;
 }
 
-int ixmlElement_setAttributeNS(IXML_Element *element,
+static int check_namespace_error(IXML_Node *n,
+	const DOMString namespaceURI,
+	const DOMString qualifiedName)
+{
+	/* see DOM 2 spec page 59 */
+	/* clang-format off */
+	return //
+		(n->prefix &&
+		 !namespaceURI)
+		||
+		(n->prefix &&
+		 strcmp(n->prefix, "xml") == 0 &&
+		 strcmp(namespaceURI, "http://www.w3.org/XML/1998/namespace") != 0)
+		||
+		(strcmp(qualifiedName, "xmlns") == 0 &&
+		 strcmp(namespaceURI, "http://www.w3.org/2000/xmlns/") != 0);
+	/* clang-format on */
+}
+
+int ixmlElement_setAttributeNS( //
+	IXML_Element *element,
 	const DOMString namespaceURI,
 	const DOMString qualifiedName,
 	const DOMString value)
 {
+	int error_code = IXML_SUCCESS;
 	IXML_Node *attrNode = NULL;
 	IXML_Node newAttrNode;
-	IXML_Attr *newAttr;
-	int rc;
+	int namespace_error;
+	Extra_Parameters_t p;
 
 	if (!element || !namespaceURI || !qualifiedName || !value) {
 		return IXML_INVALID_PARAMETER;
@@ -407,35 +455,19 @@ int ixmlElement_setAttributeNS(IXML_Element *element,
 	if (!newAttrNode.nodeName) {
 		return IXML_INSUFFICIENT_MEMORY;
 	}
-	rc = Parser_setNodePrefixAndLocalName(&newAttrNode);
-	if (rc != IXML_SUCCESS) {
-		Parser_freeNodeContent(&newAttrNode);
-		return rc;
+	error_code = Parser_setNodePrefixAndLocalName(&newAttrNode);
+	if (error_code != IXML_SUCCESS) {
+		goto ErrorHandler;
 	}
-
-	/* see DOM 2 spec page 59 */
-	if ((newAttrNode.prefix && !namespaceURI) ||
-		(newAttrNode.prefix && strcmp(newAttrNode.prefix, "xml") == 0 &&
-			strcmp(namespaceURI,
-				"http://www.w3.org/XML/1998/namespace") != 0) ||
-		(strcmp(qualifiedName, "xmlns") == 0 &&
-			strcmp(namespaceURI, "http://www.w3.org/2000/xmlns/") !=
-				0)) {
-		Parser_freeNodeContent(&newAttrNode);
-		return IXML_NAMESPACE_ERR;
+	namespace_error = check_namespace_error(
+		&newAttrNode, namespaceURI, qualifiedName);
+	if (namespace_error) {
+		error_code = IXML_NAMESPACE_ERR;
+		goto ErrorHandler;
 	}
-
-	attrNode = element->n.firstAttr;
-	while (attrNode) {
-		if (attrNode->localName && attrNode->namespaceURI &&
-			strcmp(attrNode->localName, newAttrNode.localName) ==
-				0 &&
-			strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
-			/* Found it */
-			break;
-		}
-		attrNode = attrNode->nextSibling;
-	}
+	p.p1 = namespaceURI;
+	p.p2 = newAttrNode.localName;
+	attrNode = get_attribute_node(find_condition_ns_ln, element, &p);
 	if (attrNode) {
 		if (attrNode->prefix) {
 			/* Remove the old prefix */
@@ -445,48 +477,55 @@ int ixmlElement_setAttributeNS(IXML_Element *element,
 		if (newAttrNode.prefix) {
 			attrNode->prefix = strdup(newAttrNode.prefix);
 			if (!attrNode->prefix) {
-				Parser_freeNodeContent(&newAttrNode);
-				return IXML_INSUFFICIENT_MEMORY;
+				error_code = IXML_INSUFFICIENT_MEMORY;
+				goto ErrorHandler;
 			}
 		} else {
 			attrNode->prefix = newAttrNode.prefix;
 		}
 		if (attrNode->nodeValue) {
+			/* Attribute name has a value already */
 			free(attrNode->nodeValue);
 		}
 		attrNode->nodeValue = strdup(value);
 		if (!attrNode->nodeValue) {
 			free(attrNode->prefix);
-			Parser_freeNodeContent(&newAttrNode);
-			return IXML_INSUFFICIENT_MEMORY;
+			error_code = IXML_INSUFFICIENT_MEMORY;
+			goto ErrorHandler;
 		}
 	} else {
+		/* attrNode was not found */
+		IXML_Attr *newAttr;
+
 		/* Add a new attribute */
-		rc = ixmlDocument_createAttributeNSEx(
+		error_code = ixmlDocument_createAttributeNSEx(
 			(IXML_Document *)element->n.ownerDocument,
 			namespaceURI,
 			qualifiedName,
 			&newAttr);
-		if (rc != IXML_SUCCESS) {
-			Parser_freeNodeContent(&newAttrNode);
-			return rc;
+		if (error_code != IXML_SUCCESS) {
+			goto ErrorHandler;
 		}
 		newAttr->n.nodeValue = strdup(value);
 		if (!newAttr->n.nodeValue) {
 			ixmlAttr_free(newAttr);
-			Parser_freeNodeContent(&newAttrNode);
-			return IXML_INSUFFICIENT_MEMORY;
+			error_code = IXML_INSUFFICIENT_MEMORY;
+			goto ErrorHandler;
 		}
-		if (ixmlElement_setAttributeNodeNS(
-			    element, newAttr, &newAttr) != IXML_SUCCESS) {
+		error_code = ixmlElement_setAttributeNodeNS( //
+			element,
+			newAttr,
+			NULL);
+		if (error_code != IXML_SUCCESS) {
 			ixmlAttr_free(newAttr);
-			Parser_freeNodeContent(&newAttrNode);
-			return IXML_FAILED;
+			goto ErrorHandler;
 		}
 	}
+
+ErrorHandler:
 	Parser_freeNodeContent(&newAttrNode);
 
-	return IXML_SUCCESS;
+	return error_code;
 }
 
 int ixmlElement_removeAttributeNS(IXML_Element *element,
@@ -524,24 +563,15 @@ IXML_Attr *ixmlElement_getAttributeNodeNS(IXML_Element *element,
 	const DOMString namespaceURI,
 	const DOMString localName)
 {
-	IXML_Node *attrNode = NULL;
+	Extra_Parameters_t p;
 
 	if (!element || !namespaceURI || !localName) {
 		return NULL;
 	}
-
-	attrNode = element->n.firstAttr;
-	while (attrNode) {
-		if (attrNode->localName && attrNode->namespaceURI &&
-			strcmp(attrNode->localName, localName) == 0 &&
-			strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
-			/* found it */
-			break;
-		}
-		attrNode = attrNode->nextSibling;
-	}
-
-	return (IXML_Attr *)attrNode;
+	p.p1 = namespaceURI;
+	p.p2 = localName;
+	return (IXML_Attr *)get_attribute_node(
+		find_condition_ns_ln, element, &p);
 }
 
 int ixmlElement_setAttributeNodeNS(
@@ -549,71 +579,8 @@ int ixmlElement_setAttributeNodeNS(
 	/* IN */ IXML_Attr *newAttr,
 	/* OUT */ IXML_Attr **rtAttr)
 {
-	IXML_Node *node = NULL;
-	IXML_Node *attrNode = NULL;
-
-	if (!element || !newAttr) {
-		return IXML_INVALID_PARAMETER;
-	}
-	if (newAttr->n.ownerDocument != element->n.ownerDocument) {
-		return IXML_WRONG_DOCUMENT_ERR;
-	}
-	if (newAttr->ownerElement && newAttr->ownerElement != element) {
-		return IXML_INUSE_ATTRIBUTE_ERR;
-	}
-
-	newAttr->ownerElement = element;
-	node = (IXML_Node *)newAttr;
-	attrNode = element->n.firstAttr;
-	while (attrNode) {
-		if (attrNode->localName && node->localName &&
-			attrNode->namespaceURI && node->namespaceURI &&
-			strcmp(attrNode->localName, node->localName) == 0 &&
-			strcmp(attrNode->namespaceURI, node->namespaceURI) ==
-				0) {
-			/* Found it */
-			break;
-		}
-		attrNode = attrNode->nextSibling;
-	}
-	if (attrNode) {
-		/* already present, will replace by newAttr */
-		IXML_Node *preSib = attrNode->prevSibling;
-		IXML_Node *nextSib = attrNode->nextSibling;
-		if (preSib) {
-			preSib->nextSibling = node;
-		}
-		if (nextSib) {
-			nextSib->prevSibling = node;
-		}
-		if (element->n.firstAttr == attrNode) {
-			element->n.firstAttr = node;
-		}
-		*rtAttr = (IXML_Attr *)attrNode;
-
-	} else {
-		/* Add this attribute  */
-		if (element->n.firstAttr) {
-			/* Element has attribute already */
-			IXML_Node *prevAttr = element->n.firstAttr;
-			IXML_Node *nextAttr = prevAttr->nextSibling;
-			while (nextAttr) {
-				prevAttr = nextAttr;
-				nextAttr = prevAttr->nextSibling;
-			}
-			prevAttr->nextSibling = node;
-		} else {
-			/* This is the first attribute node */
-			element->n.firstAttr = node;
-			node->prevSibling = NULL;
-			node->nextSibling = NULL;
-		}
-		if (rtAttr) {
-			*rtAttr = NULL;
-		}
-	}
-
-	return IXML_SUCCESS;
+	return ixmlElement_setAttributeNode_common(
+		find_condition_ns_ln, element, newAttr, rtAttr);
 }
 
 IXML_NodeList *ixmlElement_getElementsByTagNameNS(IXML_Element *element,
