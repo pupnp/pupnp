@@ -43,6 +43,12 @@ set(UPNP_SOURCES
 	src/urlconfig/urlconfig.c
 )
 
+if(WIN32)
+	list (APPEND UPNP_SOURCES
+		src/inet_pton.c
+	)
+endif()
+
 if(UPNP_ENABLE_GENA)
 	list(APPEND UPNP_SOURCES src/gena/gena_device.c src/gena/gena_ctrlpt.c
 		src/gena/gena_callback2.c
