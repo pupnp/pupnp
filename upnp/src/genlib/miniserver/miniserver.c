@@ -63,6 +63,7 @@
 	#ifndef _WIN32
 		#include <netinet/tcp.h> /* TCP_NODELAY */
 	#endif
+	#include <poll.h>
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
@@ -660,14 +661,19 @@ void shutdown_all_active_connections(void)
 	/*--------------------------------------------------------------------*/
 }
 
-static UPNP_INLINE void fdset_if_valid(SOCKET sock, fd_set *set)
+static UPNP_INLINE void pollfd_if_valid(
+	SOCKET sock, struct pollfd *pfd, short events)
 {
 	if (sock != INVALID_SOCKET) {
-		FD_SET(sock, set);
+		pfd->fd = sock;
+		pfd->events = events;
+		pfd->revents = 0;
+	} else {
+		pfd->fd = -1;
 	}
 }
 
-static void web_server_accept(SOCKET listen_sock, fd_set *set)
+static void web_server_accept(SOCKET listen_sock, struct pollfd *pfd)
 {
 	/*--------------------------------------------------------------------*/
 	#ifdef INTERNAL_WEB_SERVER
@@ -676,11 +682,12 @@ static void web_server_accept(SOCKET listen_sock, fd_set *set)
 	struct sockaddr_storage clientAddr;
 	char errorBuffer[ERROR_BUFFER_LEN];
 
-	if (listen_sock != INVALID_SOCKET && FD_ISSET(listen_sock, set)) {
+	if (listen_sock != INVALID_SOCKET && (pfd->revents & POLLIN)) {
+
 		clientLen = sizeof(clientAddr);
-		asock = accept(listen_sock,
-			(struct sockaddr *)&clientAddr,
-			&clientLen);
+		asock = accept(
+			listen_sock, (struct sockaddr *)&clientAddr, &clientLen);
+
 		if (asock == INVALID_SOCKET) {
 			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 			UpnpPrintf(UPNP_INFO,
@@ -704,9 +711,10 @@ static void web_server_accept(SOCKET listen_sock, fd_set *set)
 	/*--------------------------------------------------------------------*/
 }
 
-static void ssdp_read(SOCKET *read_sock, fd_set *set)
+static void ssdp_read(SOCKET *read_sock, struct pollfd *pfd)
 {
-	if (*read_sock != INVALID_SOCKET && FD_ISSET(*read_sock, set)) {
+	if (*read_sock != INVALID_SOCKET && (pfd->revents & POLLIN)) {
+
 		int ret = readFromSSDPSocket(*read_sock);
 		if (ret != 0) {
 			UpnpPrintf(UPNP_INFO,
@@ -722,7 +730,7 @@ static void ssdp_read(SOCKET *read_sock, fd_set *set)
 	}
 }
 
-static int receive_from_stopSock(SOCKET ssock, fd_set *set)
+static int receive_from_stopSock(SOCKET ssock, struct pollfd *pfd)
 {
 	ssize_t byteReceived;
 	socklen_t clientLen;
@@ -730,21 +738,27 @@ static int receive_from_stopSock(SOCKET ssock, fd_set *set)
 	char requestBuf[256];
 	char buf_ntop[INET6_ADDRSTRLEN];
 
-	if (FD_ISSET(ssock, set)) {
+	if (ssock != INVALID_SOCKET && (pfd->revents & POLLIN)) {
+
 		clientLen = sizeof(clientAddr);
-		memset((char *)&clientAddr, 0, sizeof(clientAddr));
+		memset(&clientAddr, 0, sizeof(clientAddr));
+
 		byteReceived = recvfrom(ssock,
 			requestBuf,
 			(size_t)25,
 			0,
 			(struct sockaddr *)&clientAddr,
 			&clientLen);
+
 		if (byteReceived > 0) {
 			requestBuf[byteReceived] = '\0';
+
+			/* Convert IPv4 address to string */
 			inet_ntop(AF_INET,
 				&((struct sockaddr_in *)&clientAddr)->sin_addr,
 				buf_ntop,
 				sizeof(buf_ntop));
+
 			UpnpPrintf(UPNP_INFO,
 				MSERV,
 				__FILE__,
@@ -752,15 +766,18 @@ static int receive_from_stopSock(SOCKET ssock, fd_set *set)
 				"Received response: %s From host %s \n",
 				requestBuf,
 				buf_ntop);
+
 			UpnpPrintf(UPNP_PACKET,
 				MSERV,
 				__FILE__,
 				__LINE__,
 				"Received multicast packet: \n %s\n",
 				requestBuf);
-			if (NULL != strstr(requestBuf, "ShutDown")) {
+
+			if (strstr(requestBuf, "ShutDown") != NULL) {
 				return 1;
 			}
+
 		} else {
 			UpnpPrintf(UPNP_INFO,
 				MSERV,
@@ -774,6 +791,7 @@ static int receive_from_stopSock(SOCKET ssock, fd_set *set)
 	return 0;
 }
 
+	#define MINI_SERVER_MAX_PFDS 9
 /*!
  * \brief Run the miniserver.
  *
@@ -786,72 +804,77 @@ static void RunMiniServer(
 	MiniServerSockArray *mini_sock)
 {
 	char errorBuffer[ERROR_BUFFER_LEN];
-	fd_set expSet;
-	fd_set rdSet;
-	SOCKET maxMiniSock;
 	int ret = 0;
 	int stopSock = 0;
 
-	maxMiniSock = 0;
-	maxMiniSock = max(maxMiniSock, mini_sock->miniServerSock4);
-	maxMiniSock = max(maxMiniSock, mini_sock->miniServerSock6);
-	maxMiniSock = max(maxMiniSock, mini_sock->miniServerSock6UlaGua);
-	maxMiniSock = max(maxMiniSock, mini_sock->miniServerStopSock);
-	maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock4);
-	maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock6);
-	maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock6UlaGua);
-	#ifdef INCLUDE_CLIENT_APIS
-	maxMiniSock = max(maxMiniSock, mini_sock->ssdpReqSock4);
-	maxMiniSock = max(maxMiniSock, mini_sock->ssdpReqSock6);
-	#endif /* INCLUDE_CLIENT_APIS */
-	++maxMiniSock;
+	struct pollfd fds[MINI_SERVER_MAX_PFDS];
+	int nfds = 0;
 
 	gMServState = MSERV_RUNNING;
+
 	while (!stopSock) {
-		FD_ZERO(&rdSet);
-		FD_ZERO(&expSet);
-		/* FD_SET()'s */
-		FD_SET(mini_sock->miniServerStopSock, &expSet);
-		FD_SET(mini_sock->miniServerStopSock, &rdSet);
-		fdset_if_valid(mini_sock->miniServerSock4, &rdSet);
-		fdset_if_valid(mini_sock->miniServerSock6, &rdSet);
-		fdset_if_valid(mini_sock->miniServerSock6UlaGua, &rdSet);
-		fdset_if_valid(mini_sock->ssdpSock4, &rdSet);
-		fdset_if_valid(mini_sock->ssdpSock6, &rdSet);
-		fdset_if_valid(mini_sock->ssdpSock6UlaGua, &rdSet);
+		nfds = 0;
+
+		/* Stop socket: watch for read + error */
+		pollfd_if_valid(mini_sock->miniServerStopSock,
+			&fds[nfds++],
+			POLLIN | POLLERR | POLLHUP);
+
+		pollfd_if_valid(
+			mini_sock->miniServerSock4, &fds[nfds++], POLLIN);
+
+		pollfd_if_valid(
+			mini_sock->miniServerSock6, &fds[nfds++], POLLIN);
+
+		pollfd_if_valid(
+			mini_sock->miniServerSock6UlaGua, &fds[nfds++], POLLIN);
+
+		pollfd_if_valid(mini_sock->ssdpSock4, &fds[nfds++], POLLIN);
+
+		pollfd_if_valid(mini_sock->ssdpSock6, &fds[nfds++], POLLIN);
+
+		pollfd_if_valid(
+			mini_sock->ssdpSock6UlaGua, &fds[nfds++], POLLIN);
+
 	#ifdef INCLUDE_CLIENT_APIS
-		fdset_if_valid(mini_sock->ssdpReqSock4, &rdSet);
-		fdset_if_valid(mini_sock->ssdpReqSock6, &rdSet);
+		pollfd_if_valid(mini_sock->ssdpReqSock4, &fds[nfds++], POLLIN);
+
+		pollfd_if_valid(mini_sock->ssdpReqSock6, &fds[nfds++], POLLIN);
 	#endif /* INCLUDE_CLIENT_APIS */
-		/* select() */
-		ret = select((int)maxMiniSock, &rdSet, NULL, &expSet, NULL);
-		if (ret == SOCKET_ERROR && errno == EINTR) {
+
+		/* poll() */
+		ret = poll(fds, nfds, -1);
+
+		if (ret < 0 && errno == EINTR) {
 			continue;
 		}
-		if (ret == SOCKET_ERROR) {
+
+		if (ret < 0) {
 			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
 			UpnpPrintf(UPNP_CRITICAL,
 				SSDP,
 				__FILE__,
 				__LINE__,
-				"Error in select(): %s\n",
+				"Error in poll(): %s\n",
 				errorBuffer);
 			continue;
-		} else {
-			web_server_accept(mini_sock->miniServerSock4, &rdSet);
-			web_server_accept(mini_sock->miniServerSock6, &rdSet);
-			web_server_accept(
-				mini_sock->miniServerSock6UlaGua, &rdSet);
-	#ifdef INCLUDE_CLIENT_APIS
-			ssdp_read(&mini_sock->ssdpReqSock4, &rdSet);
-			ssdp_read(&mini_sock->ssdpReqSock6, &rdSet);
-	#endif /* INCLUDE_CLIENT_APIS */
-			ssdp_read(&mini_sock->ssdpSock4, &rdSet);
-			ssdp_read(&mini_sock->ssdpSock6, &rdSet);
-			ssdp_read(&mini_sock->ssdpSock6UlaGua, &rdSet);
-			stopSock = receive_from_stopSock(
-				mini_sock->miniServerStopSock, &rdSet);
 		}
+
+		web_server_accept(mini_sock->miniServerSock4, &fds[1]);
+		web_server_accept(mini_sock->miniServerSock6, &fds[2]);
+		web_server_accept(mini_sock->miniServerSock6UlaGua, &fds[3]);
+
+	#ifdef INCLUDE_CLIENT_APIS
+		ssdp_read(&mini_sock->ssdpReqSock4, &fds[7]);
+		ssdp_read(&mini_sock->ssdpReqSock6, &fds[8]);
+	#endif /* INCLUDE_CLIENT_APIS */
+
+		ssdp_read(&mini_sock->ssdpSock4, &fds[4]);
+		ssdp_read(&mini_sock->ssdpSock6, &fds[5]);
+		ssdp_read(&mini_sock->ssdpSock6UlaGua, &fds[6]);
+
+		stopSock = receive_from_stopSock(
+			mini_sock->miniServerStopSock, &fds[0]);
 	}
 
 	/* shutdown connections */
@@ -869,6 +892,7 @@ static void RunMiniServer(
 	sock_close(mini_sock->ssdpReqSock4);
 	sock_close(mini_sock->ssdpReqSock6);
 	#endif /* INCLUDE_CLIENT_APIS */
+
 	/* Free mini_sock. */
 	free(mini_sock);
 	gMServState = MSERV_IDLE;
@@ -1334,22 +1358,22 @@ static int get_miniserver_stopsock(
 	return UPNP_E_SUCCESS;
 }
 
-static UPNP_INLINE void InitMiniServerSockArray(MiniServerSockArray *miniSocket)
+static UPNP_INLINE void InitMiniServerSockArray(MiniServerSockArray *mini_socket)
 {
-	miniSocket->miniServerSock4 = INVALID_SOCKET;
-	miniSocket->miniServerSock6 = INVALID_SOCKET;
-	miniSocket->miniServerSock6UlaGua = INVALID_SOCKET;
-	miniSocket->miniServerStopSock = INVALID_SOCKET;
-	miniSocket->ssdpSock4 = INVALID_SOCKET;
-	miniSocket->ssdpSock6 = INVALID_SOCKET;
-	miniSocket->ssdpSock6UlaGua = INVALID_SOCKET;
-	miniSocket->stopPort = 0u;
-	miniSocket->miniServerPort4 = 0u;
-	miniSocket->miniServerPort6 = 0u;
-	miniSocket->miniServerPort6UlaGua = 0u;
+	mini_socket->miniServerSock4 = INVALID_SOCKET;
+	mini_socket->miniServerSock6 = INVALID_SOCKET;
+	mini_socket->miniServerSock6UlaGua = INVALID_SOCKET;
+	mini_socket->miniServerStopSock = INVALID_SOCKET;
+	mini_socket->ssdpSock4 = INVALID_SOCKET;
+	mini_socket->ssdpSock6 = INVALID_SOCKET;
+	mini_socket->ssdpSock6UlaGua = INVALID_SOCKET;
+	mini_socket->stopPort = 0u;
+	mini_socket->miniServerPort4 = 0u;
+	mini_socket->miniServerPort6 = 0u;
+	mini_socket->miniServerPort6UlaGua = 0u;
 	#ifdef INCLUDE_CLIENT_APIS
-	miniSocket->ssdpReqSock4 = INVALID_SOCKET;
-	miniSocket->ssdpReqSock6 = INVALID_SOCKET;
+	mini_socket->ssdpReqSock4 = INVALID_SOCKET;
+	mini_socket->ssdpReqSock6 = INVALID_SOCKET;
 	#endif /* INCLUDE_CLIENT_APIS */
 }
 
@@ -1367,7 +1391,7 @@ int StartMiniServer(
 	int ret_code;
 	int count;
 	int max_count = 10000;
-	MiniServerSockArray *miniSocket;
+	MiniServerSockArray *mini_socket;
 	ThreadPoolJob job;
 
 	memset(&job, 0, sizeof(job));
@@ -1379,56 +1403,56 @@ int StartMiniServer(
 		/* miniserver running. */
 		return UPNP_E_INTERNAL_ERROR;
 	}
-	miniSocket = (MiniServerSockArray *)malloc(sizeof(MiniServerSockArray));
-	if (!miniSocket) {
+	mini_socket = (MiniServerSockArray *)malloc(sizeof(MiniServerSockArray));
+	if (!mini_socket) {
 		return UPNP_E_OUTOF_MEMORY;
 	}
-	InitMiniServerSockArray(miniSocket);
+	InitMiniServerSockArray(mini_socket);
 	#ifdef INTERNAL_WEB_SERVER
 	/* V4 and V6 http listeners. */
 	ret_code = get_miniserver_sockets(
-		miniSocket, *listen_port4, *listen_port6, *listen_port6UlaGua);
+		mini_socket, *listen_port4, *listen_port6, *listen_port6UlaGua);
 	if (ret_code != UPNP_E_SUCCESS) {
-		free(miniSocket);
+		free(mini_socket);
 		return ret_code;
 	}
 	#endif /* INTERNAL_WEB_SERVER */
 	/* Stop socket (To end miniserver processing). */
-	ret_code = get_miniserver_stopsock(miniSocket);
+	ret_code = get_miniserver_stopsock(mini_socket);
 	if (ret_code != UPNP_E_SUCCESS) {
-		sock_close(miniSocket->miniServerSock4);
-		sock_close(miniSocket->miniServerSock6);
-		sock_close(miniSocket->miniServerSock6UlaGua);
-		free(miniSocket);
+		sock_close(mini_socket->miniServerSock4);
+		sock_close(mini_socket->miniServerSock6);
+		sock_close(mini_socket->miniServerSock6UlaGua);
+		free(mini_socket);
 		return ret_code;
 	}
 	/* SSDP socket for discovery/advertising. */
-	ret_code = get_ssdp_sockets(miniSocket);
+	ret_code = get_ssdp_sockets(mini_socket);
 	if (ret_code != UPNP_E_SUCCESS) {
-		sock_close(miniSocket->miniServerSock4);
-		sock_close(miniSocket->miniServerSock6);
-		sock_close(miniSocket->miniServerSock6UlaGua);
-		sock_close(miniSocket->miniServerStopSock);
-		free(miniSocket);
+		sock_close(mini_socket->miniServerSock4);
+		sock_close(mini_socket->miniServerSock6);
+		sock_close(mini_socket->miniServerSock6UlaGua);
+		sock_close(mini_socket->miniServerStopSock);
+		free(mini_socket);
 		return ret_code;
 	}
-	TPJobInit(&job, (start_routine)RunMiniServer, (void *)miniSocket);
+	TPJobInit(&job, (start_routine)RunMiniServer, (void *)mini_socket);
 	TPJobSetPriority(&job, MED_PRIORITY);
 	TPJobSetFreeFunction(&job, (free_routine)free);
 	ret_code = ThreadPoolAddPersistent(&gMiniServerThreadPool, &job, NULL);
 	if (ret_code < 0) {
-		sock_close(miniSocket->miniServerSock4);
-		sock_close(miniSocket->miniServerSock6);
-		sock_close(miniSocket->miniServerSock6UlaGua);
-		sock_close(miniSocket->miniServerStopSock);
-		sock_close(miniSocket->ssdpSock4);
-		sock_close(miniSocket->ssdpSock6);
-		sock_close(miniSocket->ssdpSock6UlaGua);
+		sock_close(mini_socket->miniServerSock4);
+		sock_close(mini_socket->miniServerSock6);
+		sock_close(mini_socket->miniServerSock6UlaGua);
+		sock_close(mini_socket->miniServerStopSock);
+		sock_close(mini_socket->ssdpSock4);
+		sock_close(mini_socket->ssdpSock6);
+		sock_close(mini_socket->ssdpSock6UlaGua);
 	#ifdef INCLUDE_CLIENT_APIS
-		sock_close(miniSocket->ssdpReqSock4);
-		sock_close(miniSocket->ssdpReqSock6);
+		sock_close(mini_socket->ssdpReqSock4);
+		sock_close(mini_socket->ssdpReqSock6);
 	#endif /* INCLUDE_CLIENT_APIS */
-		free(miniSocket);
+		free(mini_socket);
 		return UPNP_E_OUTOF_MEMORY;
 	}
 	/* Wait for miniserver to start. */
@@ -1441,23 +1465,23 @@ int StartMiniServer(
 	}
 	if (count >= max_count) {
 		/* Took it too long to start that thread. */
-		sock_close(miniSocket->miniServerSock4);
-		sock_close(miniSocket->miniServerSock6);
-		sock_close(miniSocket->miniServerSock6UlaGua);
-		sock_close(miniSocket->miniServerStopSock);
-		sock_close(miniSocket->ssdpSock4);
-		sock_close(miniSocket->ssdpSock6);
-		sock_close(miniSocket->ssdpSock6UlaGua);
+		sock_close(mini_socket->miniServerSock4);
+		sock_close(mini_socket->miniServerSock6);
+		sock_close(mini_socket->miniServerSock6UlaGua);
+		sock_close(mini_socket->miniServerStopSock);
+		sock_close(mini_socket->ssdpSock4);
+		sock_close(mini_socket->ssdpSock6);
+		sock_close(mini_socket->ssdpSock6UlaGua);
 	#ifdef INCLUDE_CLIENT_APIS
-		sock_close(miniSocket->ssdpReqSock4);
-		sock_close(miniSocket->ssdpReqSock6);
+		sock_close(mini_socket->ssdpReqSock4);
+		sock_close(mini_socket->ssdpReqSock6);
 	#endif /* INCLUDE_CLIENT_APIS */
 		return UPNP_E_INTERNAL_ERROR;
 	}
 	#ifdef INTERNAL_WEB_SERVER
-	*listen_port4 = miniSocket->miniServerPort4;
-	*listen_port6 = miniSocket->miniServerPort6;
-	*listen_port6UlaGua = miniSocket->miniServerPort6UlaGua;
+	*listen_port4 = mini_socket->miniServerPort4;
+	*listen_port6 = mini_socket->miniServerPort6;
+	*listen_port6UlaGua = mini_socket->miniServerPort6UlaGua;
 	#endif /* INTERNAL_WEB_SERVER */
 
 	return UPNP_E_SUCCESS;

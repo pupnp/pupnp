@@ -55,6 +55,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <string.h>
+#include <poll.h>
 
 #include "posix_overwrites.h" // IWYU pragma: keep
 
@@ -98,61 +99,39 @@ const int CHUNK_TAIL_SIZE = 10;
  *
  * \return 0 if successful, else -1.
  */
-static int Check_Connect_And_Wait_Connection(
-	/*! [in] socket. */
-	SOCKET sock,
-	/*! [in] result of connect. */
-	int connect_res)
-{
-	struct timeval tmvTimeout = {DEFAULT_TCP_CONNECT_TIMEOUT, 0};
-	int result;
-	#ifdef _WIN32
-	struct fd_set fdSet;
-	#else
-	fd_set fdSet;
-	#endif
-	FD_ZERO(&fdSet);
-	FD_SET(sock, &fdSet);
+static int Check_Connect_And_Wait_Connection(SOCKET sock, int connect_res) {
+    struct timeval tmvTimeout = {DEFAULT_TCP_CONNECT_TIMEOUT, 0};
+    int result;
+    struct pollfd fds[1];
 
-	if (connect_res < 0) {
-	#ifdef _WIN32
-		if (WSAEWOULDBLOCK == WSAGetLastError()) {
-	#else
-		if (EINPROGRESS == errno) {
-	#endif
-			result = select(
-				(int)sock + 1, NULL, &fdSet, NULL, &tmvTimeout);
-			if (result < 0) {
-	#ifdef _WIN32
-					/* WSAGetLastError(); */
-	#else
-					/* errno */
-	#endif
-				return -1;
-			} else if (result == 0) {
-				/* timeout */
-				return -1;
-	#ifndef _WIN32
-			} else {
-				int valopt = 0;
-				socklen_t len = sizeof(valopt);
-				if (getsockopt(sock,
-					    SOL_SOCKET,
-					    SO_ERROR,
-					    (void *)&valopt,
-					    &len) < 0) {
-					/* failed to read delayed error */
-					return -1;
-				} else if (valopt) {
-					/* delayed error = valopt */
-					return -1;
-				}
-	#endif
-			}
-		}
-	}
+    fds[0].fd = sock;
+    fds[0].events = POLLOUT;
 
-	return 0;
+    if (connect_res < 0) {
+        result = poll(fds, 1, tmvTimeout.tv_sec * 1000 + tmvTimeout.tv_usec / 1000);
+
+        if (result < 0) {
+            /* Error in poll */
+            return -1;
+        } else if (result == 0) {
+            /* Timeout */
+            return -1;
+        } else {
+            int valopt = 0;
+            socklen_t len = sizeof(valopt);
+
+            /* Check if the socket is now writable (connected) */
+            if (getsockopt(sock, SOL_SOCKET, SO_ERROR, (void *)&valopt, &len) < 0) {
+                /* Failed to read delayed error */
+                return -1;
+            } else if (valopt) {
+                /* Delayed error = valopt */
+                return -1;
+            }
+        }
+    }
+
+    return 0;
 }
 #endif /* UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS */
 

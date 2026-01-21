@@ -56,6 +56,7 @@
 #include <fcntl.h> /* for F_GETFL, F_SETFL, O_NONBLOCK */
 #include <string.h>
 #include <time.h>
+#include <poll.h>
 
 #ifdef UPNP_ENABLE_OPEN_SSL
 	#include <openssl/ssl.h>
@@ -156,85 +157,59 @@ int sock_destroy(SOCKINFO *info, int ShutdownMethod)
  *	\li \c UPNP_E_TIMEDOUT - Timeout
  *	\li \c UPNP_E_SOCKET_ERROR - Error on socket calls
  */
-static int sock_read_write(
-	/*! [in] Socket Information Object. */
-	SOCKINFO *info,
-	/*! [out] Buffer to get data to or send data from. */
-	char *buffer,
-	/*! [in] Size of the buffer. */
-	size_t bufsize,
-	/*! [in] timeout value. */
-	int *timeoutSecs,
-	/*! [in] Boolean value specifying read or write option. */
-	int bRead)
-{
-	int retCode;
-	fd_set readSet;
-	fd_set writeSet;
-	struct timeval timeout;
-	long numBytes;
-	time_t start_time = time(NULL);
-	SOCKET sockfd = info->socket;
-	long bytes_sent = 0;
-	size_t byte_left = 0;
-	ssize_t num_written;
+static int sock_read_write(SOCKINFO *info, char *buffer, size_t bufsize, int *timeoutSecs, int bRead) {
+    int retCode;
+    struct pollfd fds[1];
+    time_t start_time = time(NULL);
+    SOCKET sockfd = info->socket;
+    long bytes_sent = 0;
+    size_t byte_left = 0;
+    ssize_t num_written;
+    long numBytes;
 
-	FD_ZERO(&readSet);
-	FD_ZERO(&writeSet);
-	if (bRead)
-		FD_SET(sockfd, &readSet);
-	else
-		FD_SET(sockfd, &writeSet);
-	timeout.tv_sec = *timeoutSecs;
-	timeout.tv_usec = 0;
-	while (1) {
-		if (*timeoutSecs < 0)
-			retCode = select((int)sockfd + 1,
-				&readSet,
-				&writeSet,
-				NULL,
-				NULL);
-		else
-			retCode = select((int)sockfd + 1,
-				&readSet,
-				&writeSet,
-				NULL,
-				&timeout);
-		if (retCode == 0)
-			return UPNP_E_TIMEDOUT;
-		if (retCode == -1) {
-			if (errno == EINTR)
-				continue;
-			return UPNP_E_SOCKET_ERROR;
-		} else
-			/* read or write. */
-			break;
-	}
+    fds[0].fd = sockfd;
+    fds[0].events = (bRead ? POLLIN : POLLOUT);
+
+    while (1) {
+        int timeoutMillis = (*timeoutSecs < 0) ? -1 : (*timeoutSecs * 1000);
+
+        retCode = poll(fds, 1, timeoutMillis);
+
+        if (retCode == 0)
+            return UPNP_E_TIMEDOUT;
+        else if (retCode == -1) {
+            if (errno == EINTR)
+                continue;
+            return UPNP_E_SOCKET_ERROR;
+        } else
+            /* read or write. */
+            break;
+    }
+
 #ifdef SO_NOSIGPIPE
-	{
-		int old;
-		int set = 1;
-		socklen_t olen = sizeof(old);
-		getsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, &olen);
-		setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof(set));
+    {
+        int old;
+        int set = 1;
+        socklen_t olen = sizeof(old);
+        getsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &old, &olen);
+        setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof(set));
 #endif
 		if (bRead) {
 #ifdef UPNP_ENABLE_OPEN_SSL
 			if (info->ssl) {
 				numBytes = (long)SSL_read(
-					info->ssl, buffer, (size_t)bufsize);
+					info->ssl, buffer, bufsize);
 			} else {
 #endif
 				/* read data. */
-				numBytes = (long)recv(
-					sockfd, buffer, bufsize, MSG_NOSIGNAL);
+				numBytes = (long)recv(sockfd, buffer, (int)bufsize, MSG_NOSIGNAL);
 #ifdef UPNP_ENABLE_OPEN_SSL
 			}
 #endif
 		} else {
 			byte_left = bufsize;
 			bytes_sent = 0;
-			while (byte_left != (size_t)0) {
+			while (byte_left != 0) {
 #ifdef UPNP_ENABLE_OPEN_SSL
 				if (info->ssl) {
 					num_written = SSL_write(info->ssl,
