@@ -697,8 +697,9 @@ static void web_server_accept(SOCKET listen_sock, struct pollfd *pfd)
 	if (listen_sock != INVALID_SOCKET && (pfd->revents & POLLIN)) {
 
 		clientLen = sizeof(clientAddr);
-		asock = accept(
-			listen_sock, (struct sockaddr *)&clientAddr, &clientLen);
+		asock = accept(listen_sock,
+			(struct sockaddr *)&clientAddr,
+			&clientLen);
 
 		if (asock == INVALID_SOCKET) {
 			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
@@ -1370,7 +1371,8 @@ static int get_miniserver_stopsock(
 	return UPNP_E_SUCCESS;
 }
 
-static UPNP_INLINE void InitMiniServerSockArray(MiniServerSockArray *mini_socket)
+static UPNP_INLINE void InitMiniServerSockArray(
+	MiniServerSockArray *mini_socket)
 {
 	mini_socket->miniServerSock4 = INVALID_SOCKET;
 	mini_socket->miniServerSock6 = INVALID_SOCKET;
@@ -1415,7 +1417,8 @@ int StartMiniServer(
 		/* miniserver running. */
 		return UPNP_E_INTERNAL_ERROR;
 	}
-	mini_socket = (MiniServerSockArray *)malloc(sizeof(MiniServerSockArray));
+	mini_socket =
+		(MiniServerSockArray *)malloc(sizeof(MiniServerSockArray));
 	if (!mini_socket) {
 		return UPNP_E_OUTOF_MEMORY;
 	}

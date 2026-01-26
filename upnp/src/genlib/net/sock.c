@@ -191,7 +191,7 @@ static int sock_read_write(SOCKINFO *info,
 		int timeoutMillis =
 			(*timeoutSecs < 0) ? -1 : (*timeoutSecs * 1000);
 
-		retCode = poll(fds, 1, timeoutMillis);
+		retCode = _poll(fds, 1, timeoutMillis);
 
 		if (retCode == 0)
 			return UPNP_E_TIMEDOUT;

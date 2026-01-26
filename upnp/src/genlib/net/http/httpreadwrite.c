@@ -113,7 +113,7 @@ static int Check_Connect_And_Wait_Connection(SOCKET sock, int connect_res)
 	fds[0].events = POLLOUT;
 
 	if (connect_res < 0) {
-		result = poll(fds,
+		result = _poll(fds,
 			1,
 			tmvTimeout.tv_sec * 1000 + tmvTimeout.tv_usec / 1000);
 
@@ -1565,7 +1565,7 @@ int http_ReadHttpResponse(void *Handle, char *buf, size_t *size, int timeout)
 	if (*size > 0) {
 		memcpy(buf,
 			&handle->response.msg.msg
-				 .buf[handle->response.entity_start_position],
+				.buf[handle->response.entity_start_position],
 			*size);
 		membuffer_delete(&handle->response.msg.msg,
 			handle->response.entity_start_position,
