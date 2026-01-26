@@ -63,11 +63,23 @@
 	#ifndef _WIN32
 		#include <netinet/tcp.h> /* TCP_NODELAY */
 	#endif
-	#include <poll.h>
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
 	#include <sys/types.h>
+
+	#ifdef _WIN32
+		#include <winsock2.h>
+		#include <ws2tcpip.h>
+	#else
+		#include <poll.h>
+	#endif
+
+	#ifdef _WIN32
+		#define _poll(fds, nfds, timeout) WSAPoll(fds, nfds, timeout)
+	#else
+		#define _poll(fds, nfds, timeout) poll(fds, nfds, timeout)
+	#endif
 
 	/*! . */
 	#define APPLICATION_LISTENING_PORT 49152
@@ -843,7 +855,7 @@ static void RunMiniServer(
 	#endif /* INCLUDE_CLIENT_APIS */
 
 		/* poll() */
-		ret = poll(fds, nfds, -1);
+		ret = _poll(fds, nfds, -1);
 
 		if (ret < 0 && errno == EINTR) {
 			continue;
