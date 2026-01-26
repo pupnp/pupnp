@@ -55,18 +55,21 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <string.h>
-#include <poll.h>
 
 #include "posix_overwrites.h" // IWYU pragma: keep
 
 #ifdef _WIN32
 	#include <malloc.h>
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
 	#define fseeko fseek
 	#if defined(_MSC_VER) && _MSC_VER < 1900
 		#define snprintf _snprintf
 	#endif
+	#define _poll(fds, nfds, timeout) WSAPoll(fds, nfds, timeout)
 #else /* _WIN32 */
 	#include <arpa/inet.h>
+	#include <poll.h>
 	#include <sys/time.h>
 	#include <sys/types.h>
 	#include <sys/utsname.h>
@@ -75,6 +78,7 @@
 		(!defined(__USE_FILE_OFFSET64) || __ANDROID_API__ < 24)
 		#define fseeko fseek
 	#endif
+	#define _poll(fds, nfds, timeout) poll(fds, nfds, timeout)
 #endif /* _WIN32 */
 
 /*
@@ -99,39 +103,46 @@ const int CHUNK_TAIL_SIZE = 10;
  *
  * \return 0 if successful, else -1.
  */
-static int Check_Connect_And_Wait_Connection(SOCKET sock, int connect_res) {
-    struct timeval tmvTimeout = {DEFAULT_TCP_CONNECT_TIMEOUT, 0};
-    int result;
-    struct pollfd fds[1];
+static int Check_Connect_And_Wait_Connection(SOCKET sock, int connect_res)
+{
+	struct timeval tmvTimeout = {DEFAULT_TCP_CONNECT_TIMEOUT, 0};
+	int result;
+	struct pollfd fds[1];
 
-    fds[0].fd = sock;
-    fds[0].events = POLLOUT;
+	fds[0].fd = sock;
+	fds[0].events = POLLOUT;
 
-    if (connect_res < 0) {
-        result = poll(fds, 1, tmvTimeout.tv_sec * 1000 + tmvTimeout.tv_usec / 1000);
+	if (connect_res < 0) {
+		result = poll(fds,
+			1,
+			tmvTimeout.tv_sec * 1000 + tmvTimeout.tv_usec / 1000);
 
-        if (result < 0) {
-            /* Error in poll */
-            return -1;
-        } else if (result == 0) {
-            /* Timeout */
-            return -1;
-        } else {
-            int valopt = 0;
-            socklen_t len = sizeof(valopt);
+		if (result < 0) {
+			/* Error in poll */
+			return -1;
+		} else if (result == 0) {
+			/* Timeout */
+			return -1;
+		} else {
+			int valopt = 0;
+			socklen_t len = sizeof(valopt);
 
-            /* Check if the socket is now writable (connected) */
-            if (getsockopt(sock, SOL_SOCKET, SO_ERROR, (void *)&valopt, &len) < 0) {
-                /* Failed to read delayed error */
-                return -1;
-            } else if (valopt) {
-                /* Delayed error = valopt */
-                return -1;
-            }
-        }
-    }
+			/* Check if the socket is now writable (connected) */
+			if (getsockopt(sock,
+				    SOL_SOCKET,
+				    SO_ERROR,
+				    (void *)&valopt,
+				    &len) < 0) {
+				/* Failed to read delayed error */
+				return -1;
+			} else if (valopt) {
+				/* Delayed error = valopt */
+				return -1;
+			}
+		}
+	}
 
-    return 0;
+	return 0;
 }
 #endif /* UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS */
 
@@ -1554,7 +1565,7 @@ int http_ReadHttpResponse(void *Handle, char *buf, size_t *size, int timeout)
 	if (*size > 0) {
 		memcpy(buf,
 			&handle->response.msg.msg
-				.buf[handle->response.entity_start_position],
+				 .buf[handle->response.entity_start_position],
 			*size);
 		membuffer_delete(&handle->response.msg.msg,
 			handle->response.entity_start_position,

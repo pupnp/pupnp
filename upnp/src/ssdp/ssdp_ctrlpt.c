@@ -40,7 +40,19 @@
 #include "config.h"
 
 #include "upnputil.h"
-#include <poll.h>
+
+#ifdef _WIN32
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
+#else
+	#include <poll.h>
+#endif
+
+#ifdef _WIN32
+	#define _poll(fds, nfds, timeout) WSAPoll(fds, nfds, timeout)
+#else
+	#define _poll(fds, nfds, timeout) poll(fds, nfds, timeout)
+#endif
 
 #ifdef INCLUDE_CLIENT_APIS
 	#if EXCLUDE_SSDP == 0
@@ -662,55 +674,101 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 	/* End of lock */
 
 	struct pollfd fds[2];
-    int nfds = 0;
+	int nfds = 0;
 
-    if (gSsdpReqSocket4 != INVALID_SOCKET) {
-        setsockopt(gSsdpReqSocket4, IPPROTO_IP, IP_MULTICAST_IF, (char *)&addrv4, sizeof(addrv4));
-        fds[nfds].fd = gSsdpReqSocket4;
-        fds[nfds].events = POLLOUT;
-        nfds++;
-    }
-#ifdef UPNP_ENABLE_IPV6
-    if (gSsdpReqSocket6 != INVALID_SOCKET) {
-        setsockopt(gSsdpReqSocket6, IPPROTO_IPV6, IPV6_MULTICAST_IF, (char *)&gIF_INDEX, sizeof(gIF_INDEX));
-        fds[nfds].fd = gSsdpReqSocket6;
-        fds[nfds].events = POLLOUT;
-        nfds++;
-    }
-#endif
-    ret = poll(fds, nfds, -1); // Wait indefinitely for the sockets to become writable
-    if (ret == -1) {
-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
-        UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, "SSDP_LIB: Error in poll(): %s\n", errorBuffer);
-        UpnpCloseSocket(gSsdpReqSocket4);
-#ifdef UPNP_ENABLE_IPV6
-        UpnpCloseSocket(gSsdpReqSocket6);
-#endif
-        return UPNP_E_INTERNAL_ERROR;
-    }
-#ifdef UPNP_ENABLE_IPV6
-    if (gSsdpReqSocket6 != INVALID_SOCKET && (fds[nfds - 1].revents & POLLOUT)) {
-        for (numCopies = 0; numCopies < NUM_SSDP_COPY; numCopies++) {
-            UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, ">>> SSDP SEND M-SEARCH >>>\n%s\n", ReqBufv6UlaGua);
-            sendto(gSsdpReqSocket6, ReqBufv6UlaGua, (int)strlen(ReqBufv6UlaGua), 0, (struct sockaddr *)&__ss_v6, sizeof(struct sockaddr_in6));
-            imillisleep(SSDP_PAUSE);
-        }
-        inet_pton(AF_INET6, SSDP_IPV6_LINKLOCAL, &destAddr6->sin6_addr);
-        for (numCopies = 0; numCopies < NUM_SSDP_COPY; numCopies++) {
-            UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, ">>> SSDP SEND M-SEARCH >>>\n%s\n", ReqBufv6);
-            sendto(gSsdpReqSocket6, ReqBufv6, (int)strlen(ReqBufv6), 0, (struct sockaddr *)&__ss_v6, sizeof(struct sockaddr_in6));
-            imillisleep(SSDP_PAUSE);
-        }
-    }
-#endif /* IPv6 */
-    if (gSsdpReqSocket4 != INVALID_SOCKET && (fds[0].revents & POLLOUT)) {
-        for (numCopies = 0; numCopies < NUM_SSDP_COPY; numCopies++) {
-            UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, ">>> SSDP SEND M-SEARCH >>>\n%s\n", ReqBufv4);
-            sendto(gSsdpReqSocket4, ReqBufv4, (int)strlen(ReqBufv4), 0, (struct sockaddr *)&__ss_v4, sizeof(struct sockaddr_in));
-            imillisleep(SSDP_PAUSE);
-        }
-    }
-    return 1;
+	if (gSsdpReqSocket4 != INVALID_SOCKET) {
+		setsockopt(gSsdpReqSocket4,
+			IPPROTO_IP,
+			IP_MULTICAST_IF,
+			(char *)&addrv4,
+			sizeof(addrv4));
+		fds[nfds].fd = gSsdpReqSocket4;
+		fds[nfds].events = POLLOUT;
+		nfds++;
+	}
+		#ifdef UPNP_ENABLE_IPV6
+	if (gSsdpReqSocket6 != INVALID_SOCKET) {
+		setsockopt(gSsdpReqSocket6,
+			IPPROTO_IPV6,
+			IPV6_MULTICAST_IF,
+			(char *)&gIF_INDEX,
+			sizeof(gIF_INDEX));
+		fds[nfds].fd = gSsdpReqSocket6;
+		fds[nfds].events = POLLOUT;
+		nfds++;
+	}
+		#endif
+	ret = _poll(fds,
+		nfds,
+		-1); // Wait indefinitely for the sockets to become writable
+	if (ret == -1) {
+		strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+		UpnpPrintf(UPNP_INFO,
+			SSDP,
+			__FILE__,
+			__LINE__,
+			"SSDP_LIB: Error in _poll(): %s\n",
+			errorBuffer);
+		UpnpCloseSocket(gSsdpReqSocket4);
+		#ifdef UPNP_ENABLE_IPV6
+		UpnpCloseSocket(gSsdpReqSocket6);
+		#endif
+		return UPNP_E_INTERNAL_ERROR;
+	}
+		#ifdef UPNP_ENABLE_IPV6
+	if (gSsdpReqSocket6 != INVALID_SOCKET &&
+		(fds[nfds - 1].revents & POLLOUT)) {
+		for (numCopies = 0; numCopies < NUM_SSDP_COPY; numCopies++) {
+			UpnpPrintf(UPNP_INFO,
+				SSDP,
+				__FILE__,
+				__LINE__,
+				">>> SSDP SEND M-SEARCH >>>\n%s\n",
+				ReqBufv6UlaGua);
+			sendto(gSsdpReqSocket6,
+				ReqBufv6UlaGua,
+				(int)strlen(ReqBufv6UlaGua),
+				0,
+				(struct sockaddr *)&__ss_v6,
+				sizeof(struct sockaddr_in6));
+			imillisleep(SSDP_PAUSE);
+		}
+		inet_pton(AF_INET6, SSDP_IPV6_LINKLOCAL, &destAddr6->sin6_addr);
+		for (numCopies = 0; numCopies < NUM_SSDP_COPY; numCopies++) {
+			UpnpPrintf(UPNP_INFO,
+				SSDP,
+				__FILE__,
+				__LINE__,
+				">>> SSDP SEND M-SEARCH >>>\n%s\n",
+				ReqBufv6);
+			sendto(gSsdpReqSocket6,
+				ReqBufv6,
+				(int)strlen(ReqBufv6),
+				0,
+				(struct sockaddr *)&__ss_v6,
+				sizeof(struct sockaddr_in6));
+			imillisleep(SSDP_PAUSE);
+		}
+	}
+		#endif /* IPv6 */
+	if (gSsdpReqSocket4 != INVALID_SOCKET && (fds[0].revents & POLLOUT)) {
+		for (numCopies = 0; numCopies < NUM_SSDP_COPY; numCopies++) {
+			UpnpPrintf(UPNP_INFO,
+				SSDP,
+				__FILE__,
+				__LINE__,
+				">>> SSDP SEND M-SEARCH >>>\n%s\n",
+				ReqBufv4);
+			sendto(gSsdpReqSocket4,
+				ReqBufv4,
+				(int)strlen(ReqBufv4),
+				0,
+				(struct sockaddr *)&__ss_v4,
+				sizeof(struct sockaddr_in));
+			imillisleep(SSDP_PAUSE);
+		}
+	}
+	return 1;
 }
 	#endif /* EXCLUDE_SSDP */
 #endif	       /* INCLUDE_CLIENT_APIS */
