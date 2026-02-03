@@ -169,7 +169,11 @@ void ixmlNode_free(IXML_Node *nodeptr)
 					next_child->nextSibling = 0;
 				} else {
 					next_child = curr_child->parentNode;
+					// Should always be true. Maybe not on
+					// Root node?
+					// if (next_child) {
 					next_child->firstChild = 0;
+					//}
 				}
 			}
 #ifdef IXML_HAVE_SCRIPTSUPPORT

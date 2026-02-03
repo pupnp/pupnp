@@ -256,6 +256,9 @@ static int ixmlElement_setAttributeNode_common(
 		/* Already present, will be replaced by newAttr */
 		IXML_Node *prevSib = attrNode->prevSibling;
 		IXML_Node *nextSib = attrNode->nextSibling;
+
+		node->prevSibling = prevSib;
+		node->nextSibling = nextSib;
 		if (prevSib) {
 			prevSib->nextSibling = node;
 		}
@@ -268,8 +271,13 @@ static int ixmlElement_setAttributeNode_common(
 		node->parentNode = attrNode->parentNode;
 		node->firstChild = attrNode->firstChild; // Should be NULL
 		node->firstAttr = attrNode->firstAttr;	 // Should be NULL
+		attrNode->parentNode = NULL;
+		attrNode->prevSibling = NULL;
+		attrNode->nextSibling = NULL;
+		attrNode->firstChild = NULL;
+		attrNode->firstAttr = NULL;
+		((IXML_Attr *)attrNode)->ownerElement = NULL;
 		if (rtAttr) {
-			attrNode->parentNode = NULL;
 			*rtAttr = (IXML_Attr *)attrNode;
 		} else {
 			ixmlAttr_free((IXML_Attr *)attrNode);
@@ -286,6 +294,7 @@ static int ixmlElement_setAttributeNode_common(
 			}
 			prevAttr->nextSibling = node;
 			node->prevSibling = prevAttr;
+			node->parentNode = &element->n;
 		} else {
 			/* This is the first attribute node */
 			element->n.firstAttr = node;
