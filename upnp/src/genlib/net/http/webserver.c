@@ -135,27 +135,17 @@ static const char *gMediaTypes[] = {
 	#define NUM_HTTP_HEADER_NAMES 33
 
 	#define ASCTIME_R_BUFFER_SIZE 26
-	#ifdef _WIN32
+
 static char *web_server_asctime_r(const struct tm *tm, char *buf)
 {
-	if (tm == NULL || buf == NULL)
+	if (!tm || !buf)
 		return NULL;
 
-	asctime_s(buf, ASCTIME_R_BUFFER_SIZE, tm);
-	return buf;
-}
-	#elif defined(__sun__) && !defined(_POSIX_PTHREAD_SEMANTICS)
-static char *web_server_asctime_r(const struct tm *tm, char *buf)
-{
-	if (tm == NULL || buf == NULL)
+	if (!strftime(buf, ASCTIME_R_BUFFER_SIZE, "%a %b %d %H:%M:%S %Y\n", tm))
 		return NULL;
 
-	asctime_r(tm, buf, ASCTIME_R_BUFFER_SIZE);
 	return buf;
 }
-	#else
-		#define web_server_asctime_r asctime_r
-	#endif
 
 /* sorted by file extension; must have 'NUM_MEDIA_TYPES' extensions */
 static const char *gEncodedMediaTypes =
