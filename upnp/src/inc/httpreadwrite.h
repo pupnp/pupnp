@@ -50,7 +50,8 @@ extern "C" {
 #endif
 
 #ifdef _WIN32
-struct tm *http_gmtime_r(const time_t *clock, struct tm *result);
+	#define http_gmtime_r(clock, result) \
+		(gmtime_s(result, clock) ? NULL : result)
 #else
 	#define http_gmtime_r gmtime_r
 #endif

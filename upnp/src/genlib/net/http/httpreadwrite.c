@@ -178,18 +178,6 @@ static int private_connect(
 #endif /* UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS */
 }
 
-#ifdef _WIN32
-struct tm *http_gmtime_r(const time_t *clock, struct tm *result)
-{
-	if (clock == NULL || *clock < 0 || result == NULL)
-		return NULL;
-
-	/* gmtime in VC runtime is thread safe. */
-	gmtime_s(result, clock);
-	return result;
-}
-#endif
-
 static int get_hoststr(
 	const char *url_str, const char **hoststr, size_t *hostlen)
 {
