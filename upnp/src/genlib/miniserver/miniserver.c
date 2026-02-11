@@ -459,56 +459,6 @@ static void remove_active_connection(SOCKET sock)
 }
 
 /*!
- * \brief Shutdown all active socket connections
- */
-void shutdown_all_active_connections(void)
-{
-	ListNode *node;
-	int count;
-
-	if (!gActiveConnectionsInitialized) {
-		return;
-	}
-	UpnpPrintf(UPNP_INFO,
-		MSERV,
-		__FILE__,
-		__LINE__,
-		"Shutting down all active socket connections\n");
-
-	ithread_mutex_lock(&gActiveConnectionsMutex);
-	node = ListHead(&gActiveConnections);
-	count = 0;
-	while (node) {
-		struct active_connection_t *conn =
-			(struct active_connection_t *)node->item;
-		if (conn && conn->socket != INVALID_SOCKET) {
-			UpnpPrintf(UPNP_INFO,
-				MSERV,
-				__FILE__,
-				__LINE__,
-				"Force shutting down socket %d\n",
-				conn->socket);
-			shutdown(conn->socket, SD_BOTH);
-			count++;
-		}
-		node = ListNext(&gActiveConnections, node);
-	}
-
-	/* Destroy the list and reset state */
-	ListDestroy(&gActiveConnections, 1);
-	gActiveConnectionsInitialized = 0;
-	ithread_mutex_unlock(&gActiveConnectionsMutex);
-	ithread_mutex_destroy(&gActiveConnectionsMutex);
-
-	UpnpPrintf(UPNP_INFO,
-		MSERV,
-		__FILE__,
-		__LINE__,
-		"Shutdown %d active socket connections and clean\n",
-		count);
-}
-
-/*!
  * \brief Free memory assigned for handling request and uninitialize socket
  * functionality.
  */
@@ -648,6 +598,61 @@ static UPNP_INLINE void schedule_request_job(
 	}
 }
 	#endif /* INTERNAL_WEB_SERVER */
+/*--------------------------------------------------------------------*/
+
+/*!
+ * \brief Shutdown all active socket connections
+ */
+void shutdown_all_active_connections(void)
+{
+	/*--------------------------------------------------------------------*/
+	#ifdef INTERNAL_WEB_SERVER
+	ListNode *node;
+	int count;
+
+	if (!gActiveConnectionsInitialized) {
+		return;
+	}
+	UpnpPrintf(UPNP_INFO,
+		MSERV,
+		__FILE__,
+		__LINE__,
+		"Shutting down all active socket connections\n");
+
+	ithread_mutex_lock(&gActiveConnectionsMutex);
+	node = ListHead(&gActiveConnections);
+	count = 0;
+	while (node) {
+		struct active_connection_t *conn =
+			(struct active_connection_t *)node->item;
+		if (conn && conn->socket != INVALID_SOCKET) {
+			UpnpPrintf(UPNP_INFO,
+				MSERV,
+				__FILE__,
+				__LINE__,
+				"Force shutting down socket %d\n",
+				conn->socket);
+			shutdown(conn->socket, SD_BOTH);
+			count++;
+		}
+		node = ListNext(&gActiveConnections, node);
+	}
+
+	/* Destroy the list and reset state */
+	ListDestroy(&gActiveConnections, 1);
+	gActiveConnectionsInitialized = 0;
+	ithread_mutex_unlock(&gActiveConnectionsMutex);
+	ithread_mutex_destroy(&gActiveConnectionsMutex);
+
+	UpnpPrintf(UPNP_INFO,
+		MSERV,
+		__FILE__,
+		__LINE__,
+		"Shutdown %d active socket connections and clean\n",
+		count);
+	#endif /* INTERNAL_WEB_SERVER */
+	/*--------------------------------------------------------------------*/
+}
 
 static UPNP_INLINE void fdset_if_valid(SOCKET sock, fd_set *set)
 {
