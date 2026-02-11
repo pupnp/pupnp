@@ -107,6 +107,7 @@ struct active_connection_t
 	time_t connect_time;
 };
 
+/*----------------------------------------------------------------------------*/
 	#ifdef INTERNAL_WEB_SERVER
 static MiniServerCallback gGetCallback = NULL;
 static MiniServerCallback gSoapCallback = NULL;
@@ -115,16 +116,16 @@ static MiniServerCallback gGenaCallback = NULL;
 static const int ENABLE_IPV6 =
 		#ifdef UPNP_ENABLE_IPV6
 	1;
-		#else
+		#else  /* UPNP_ENABLE_IPV6 */
 	0;
-		#endif
+		#endif /* UPNP_ENABLE_IPV6 */
 
 static const int MINISERVER_REUSEADDR =
 		#ifdef UPNP_MINISERVER_REUSEADDR
 	1;
-		#else
+		#else  /* UPNP_MINISERVER_REUSEADDR */
 	0;
-		#endif
+		#endif /* UPNP_MINISERVER_REUSEADDR */
 
 struct s_SocketStuff
 {
@@ -304,6 +305,7 @@ static int dispatch_request(
 	}
 	request = &parser->msg;
 		#ifdef DEBUG_REDIRECT
+	/*--------------------------------------------------------------------*/
 	getNumericHostRedirection(info->socket, host_port, sizeof host_port);
 	UpnpPrintf(UPNP_INFO,
 		MSERV,
@@ -311,7 +313,8 @@ static int dispatch_request(
 		__LINE__,
 		"DEBUG TEST: Redirect host_port = %s.\n",
 		host_port);
-		#endif
+		#endif /* DEBUG_REDIRECT */
+	/*--------------------------------------------------------------------*/
 	/* check HOST header for an IP number -- prevents DNS rebinding. */
 	if (!httpmsg_find_hdr(request, HDR_HOST, &header)) {
 		rc = UPNP_E_BAD_HTTPMSG;
@@ -644,7 +647,7 @@ static UPNP_INLINE void schedule_request_job(
 		return;
 	}
 }
-	#endif
+	#endif /* INTERNAL_WEB_SERVER */
 
 static UPNP_INLINE void fdset_if_valid(SOCKET sock, fd_set *set)
 {
@@ -655,6 +658,7 @@ static UPNP_INLINE void fdset_if_valid(SOCKET sock, fd_set *set)
 
 static void web_server_accept(SOCKET listen_sock, fd_set *set)
 {
+	/*--------------------------------------------------------------------*/
 	#ifdef INTERNAL_WEB_SERVER
 	SOCKET asock;
 	socklen_t clientLen;
@@ -680,6 +684,7 @@ static void web_server_accept(SOCKET listen_sock, fd_set *set)
 		}
 	}
 	#endif /* INTERNAL_WEB_SERVER */
+	/*--------------------------------------------------------------------*/
 }
 
 static void ssdp_read(SOCKET *read_sock, fd_set *set)
@@ -1026,9 +1031,9 @@ static int do_bind(struct s_SocketStuff *s)
 		if (bind_error == SOCKET_ERROR) {
 		#ifdef _WIN32
 			errCode = WSAGetLastError();
-		#else
+		#else  /* _WIN32 */
 			errCode = errno;
-		#endif
+		#endif /* _WIN32 */
 			if (errno == EADDRINUSE) {
 				errCode = 1;
 			}
@@ -1370,7 +1375,7 @@ int StartMiniServer(
 		free(miniSocket);
 		return ret_code;
 	}
-	#endif
+	#endif /* INTERNAL_WEB_SERVER */
 	/* Stop socket (To end miniserver processing). */
 	ret_code = get_miniserver_stopsock(miniSocket);
 	if (ret_code != UPNP_E_SUCCESS) {
@@ -1436,7 +1441,7 @@ int StartMiniServer(
 	*listen_port4 = miniSocket->miniServerPort4;
 	*listen_port6 = miniSocket->miniServerPort6;
 	*listen_port6UlaGua = miniSocket->miniServerPort6UlaGua;
-	#endif
+	#endif /* INTERNAL_WEB_SERVER */
 
 	return UPNP_E_SUCCESS;
 }
