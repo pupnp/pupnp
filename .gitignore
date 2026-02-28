@@ -78,6 +78,10 @@ GRTAGS
 GSYMS
 GTAGS
 
+# VScode files
+*.code-workspace
+.vscode
+
 # QT-Creator files
 *.cflags
 *.config
