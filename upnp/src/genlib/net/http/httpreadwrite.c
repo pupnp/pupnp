@@ -570,7 +570,7 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 							n,
 							Instr->Cookie,
 							Instr->RequestCookie);
-						if (nr < 0) {                                                                                   
+						if (nr < 0) {
 							RetVal =
 								UPNP_E_FILE_READ_ERROR;
 							goto Cleanup_File;
