@@ -558,18 +558,21 @@ int http_SendMessage(SOCKINFO *info, int *TimeOut, const char *fmt, ...)
 			}
 			while (amount_to_be_read) {
 				if (Instr) {
-					int nr;
 					size_t n =
 						amount_to_be_read >=
 								(off_t)Data_Buf_Size
 							? Data_Buf_Size
 							: (size_t)amount_to_be_read;
 					if (Instr->IsVirtualFile) {
-						nr = virtualDirCallback.read(Fp,
+						int nr = virtualDirCallback.read(Fp,
 							file_buf,
 							n,
 							Instr->Cookie,
 							Instr->RequestCookie);
+						if (nr < 0) {                                                                                   
+							RetVal = UPNP_E_FILE_READ_ERROR;
+							goto Cleanup_File;
+						}
 						num_read = (size_t)nr;
 					} else {
 						num_read = fread(file_buf,
