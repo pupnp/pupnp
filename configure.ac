@@ -581,6 +581,7 @@ RT_BOOL_ARG_ENABLE([samples], [yes], [compilation of upnp/sample/ code])
 # Checks for programs
 #
 AC_PROG_CC
+AC_PROG_CXX
 AM_PROG_CC_C_O
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 LT_INIT

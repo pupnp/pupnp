@@ -36,6 +36,8 @@ EXTRA_DIST = \
 	gtest/test_template.cpp \
 	gtest/test_upnpapi.cpp \
 	gtest/TODO \
+	scripts/comp-autotools.sh \
+	scripts/comp-cmake.sh \
 	scripts/find_out_bz2_name.sh \
 	scripts/home_keeping.sh \
 	scripts/parse_release.sh \

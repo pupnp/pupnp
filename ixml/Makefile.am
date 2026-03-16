@@ -53,15 +53,19 @@ upnpinclude_HEADERS	= \
 
 check_PROGRAMS          = \
 			test_document \
-			poc_gh_506
+			poc_gh_506 \
+			poc_gh_517
 
 TESTS                   = \
 			test/test_document.sh \
-			poc_gh_506
+			poc_gh_506 \
+			poc_gh_517
 
 test_document_SOURCES 	= test/test_document.c
 
 poc_gh_506_SOURCES      = test/poc_gh_506.c
+
+poc_gh_517_SOURCES      = test/poc_gh_517.cpp
 
 EXTRA_DIST		= test/test_document.sh test/testdata
 
