@@ -909,8 +909,8 @@ int DeviceAdvertisement(char *DevType,
 		ret_code = UPNP_E_INVALID_PARAM;
 		goto error_handler;
 	}
-	/* If deviceis a root device , here we need to send 3 advertisement
-	 * or reply */
+	/* If device is a root device, here we need to send 3 advertisements or
+	 * reply */
 	if (RootDev) {
 		rc = snprintf(
 			Mil_Usn, sizeof(Mil_Usn), "%s::upnp:rootdevice", Udn);
