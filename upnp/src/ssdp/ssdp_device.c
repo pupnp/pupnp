@@ -249,6 +249,7 @@ static int SendToCaller(
 		#endif
 	char buf_ntop[INET6_ADDRSTRLEN];
 	int ret = UPNP_E_SUCCESS;
+	int bindrc = 0;
 
 	ReplySock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (ReplySock == INVALID_SOCKET) {
@@ -264,7 +265,8 @@ static int SendToCaller(
 	PROCESS_SOCKET_ERROR(
 		__FILE__, __LINE__, rc, UPNP_E_SOCKET_ERROR, "setsockopt-1");
 		#if (defined(BSD) && !defined(__GNU__)) || \
-			defined(__APPLE__) || defined(__linux__)
+			defined(__APPLE__) || \
+			(defined(__linux__) && defined(SO_REUSEPORT))
 	rc = setsockopt(ReplySock,
 		SOL_SOCKET,
 		SO_REUSEPORT,
@@ -272,8 +274,9 @@ static int SendToCaller(
 		sizeof(yes));
 	PROCESS_SOCKET_ERROR(
 		__FILE__, __LINE__, rc, UPNP_E_SOCKET_ERROR, "setsockopt-1x");
-		#endif /* BSD, __APPLE__, __linux__ */
-	ssize_t bindrc = bind(ReplySock, res->ai_addr, res->ai_addrlen);
+		#endif /* (BSD && !__GNU__) || __APPLE__ || (__linux__ && \
+			  SO_REUSEPORT) */
+	bindrc = bind(ReplySock, res->ai_addr, res->ai_addrlen);
 	PROCESS_SOCKET_ERROR(
 		__FILE__, __LINE__, bindrc, UPNP_E_SOCKET_BIND, "bind");
 
