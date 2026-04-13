@@ -91,7 +91,7 @@ jobs:
         # https://github.com/softprops/action-gh-release
         # https://docs.github.com/rest/releases/releases#generate-release-notes-content-for-a-release
         if: ${{ env.RUN_RELEASE  == 'true' }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           draft: true
           generate_release_notes: true
