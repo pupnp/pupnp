@@ -10,6 +10,12 @@ if(UPNP_BUILD_SHARED)
 		test_parse_uri_impl.c
 	)
 	target_link_libraries(test-upnp-parse-uri PRIVATE upnp_shared)
+	# On Windows, Winsock2 functions (htons, getaddrinfo, freeaddrinfo, inet_pton)
+	# used in parse_hostport() are not linked automatically. We must explicitly link
+	# against ws2_32 to resolve these symbols at link time.
+	if(WIN32)
+		target_link_libraries(test-upnp-parse-uri PRIVATE ws2_32)
+	endif()
 	target_include_directories(
 		test-upnp-parse-uri
 		PRIVATE ${PUPNP_BINARY_DIR}
@@ -35,6 +41,12 @@ if(UPNP_BUILD_STATIC)
 		test_parse_uri_impl.c
 	)
 	target_link_libraries(test-upnp-parse-uri-static PRIVATE upnp_static)
+	# On Windows, Winsock2 functions (htons, getaddrinfo, freeaddrinfo, inet_pton)
+	# used in parse_hostport() are not linked automatically. We must explicitly link
+	# against ws2_32 to resolve these symbols at link time.
+	if(WIN32)
+		target_link_libraries(test-upnp-parse-uri-static PRIVATE ws2_32)
+	endif()
 	target_include_directories(
 		test-upnp-parse-uri-static
 		PRIVATE ${PUPNP_BINARY_DIR}
