@@ -19,6 +19,11 @@ if(UPNP_BUILD_SHARED)
 		test_parse_uri_impl.c
 	)
 	# Link against the Solaris socket/nsl libraries when they were found.
+	#
+	# On Windows, Winsock2 functions (htons, getaddrinfo, freeaddrinfo, inet_pton)
+	# used in parse_hostport() are not linked automatically. We must explicitly link
+	# against ws2_32 to resolve these symbols at link time.
+	#
 	# The generator expression $<$<BOOL:${VAR}>:${VAR}> works as follows:
 	#   - The inner $<BOOL:${VAR}> evaluates to 1 when VAR is a non-empty,
 	#     non-false value (i.e. when find_library found the library), and to
