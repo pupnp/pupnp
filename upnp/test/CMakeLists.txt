@@ -29,6 +29,7 @@ if(UPNP_BUILD_SHARED)
 	target_link_libraries(test-upnp-parse-uri PRIVATE upnp_shared
 		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+		$<$<PLATFORM_ID:Windows>:ws2_32>
 	)
 	target_include_directories(
 		test-upnp-parse-uri
@@ -57,6 +58,7 @@ if(UPNP_BUILD_STATIC)
 	target_link_libraries(test-upnp-parse-uri-static PRIVATE upnp_static
 		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+		$<$<PLATFORM_ID:Windows>:ws2_32>
 	)
 	target_include_directories(
 		test-upnp-parse-uri-static
