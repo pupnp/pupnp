@@ -403,10 +403,13 @@ static int parse_hostport(
 		srvport = c;
 		while (*c != '\0' && isdigit(*c))
 			c++;
-		port = (unsigned short int)atoi(srvport);
-		if (port == 0)
-			/* Bad port number. */
-			return UPNP_E_INVALID_URL;
+		{
+			long port_l = strtol(srvport, NULL, 10);
+			if (port_l <= 0 || port_l > 65535)
+				/* Bad port number. */
+				return UPNP_E_INVALID_URL;
+			port = (unsigned short int)port_l;
+		}
 	} else
 		/* Port was not specified, use default port. */
 		port = defaultPort;
