@@ -169,3 +169,16 @@ UPNPConfigVersion.cmake
 fuzzer_testcases
 
 __pycache__
+
+# AI coding assistants
+*.local.md
+.claude/
+.cursor/
+.windsurf/
+.copilot/
+.continue/
+.codeium/
+.tabnine/
+.gemini/
+.devin/
+.aider*
