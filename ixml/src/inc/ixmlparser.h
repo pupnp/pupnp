@@ -114,14 +114,14 @@ void Parser_setErrorChar(
 /*!
  * \brief Sets the handler to call before a node is freed.
  *
- * If \b hndlr is set to a function, it will be called before any
+ * If \b handler is set to a function, it will be called before any
  * node is freed, with the node as its parameter. This allows scripting
  * languages to do their garbage collection, without maintaining their
  * own tree structure.
  */
 void Parser_setBeforeFree(
 	/*! [in] The handler callback to call before each node to be freed. */
-	IXML_BeforeFreeNode_t hndlr);
+	IXML_BeforeFreeNode_t handler);
 
 /*!
  * \brief Gets the handler to call before a node is freed.
@@ -146,7 +146,7 @@ void ixmlAttr_init(IXML_Attr *attrNode);
  * \brief Set the given element's tagName.
  *
  * \return One of the following:
- * 	\li \b IXML_SUCCESS, if successfull.
+ * 	\li \b IXML_SUCCESS, if successful.
  * 	\li \b IXML_FAILED, if element of tagname is \b NULL.
  * 	\li \b IXML_INSUFFICIENT_MEMORY, if there is no memory to allocate the
  * 		buffer for the element's tagname.
@@ -185,10 +185,10 @@ int ixmlNodeList_addToNodeList(
 	IXML_Node *add);
 
 /*!
- * \brief Intializes a node.
+ * \brief Initializes a node.
  */
 void ixmlNode_init(
-	/*! [in] The \b Node to iniatialize. */
+	/*! [in] The \b Node to initialize. */
 	IXML_Node *nodeptr);
 
 /*!
@@ -221,7 +221,7 @@ void ixmlNode_getElementsByTagName(
 /*!
  * \brief Returns a nodeList of all the descendant Elements with a given local
  * name and namespace URI in the order in which they are encountered in a
- * preorder traversal of this Elememt tree.
+ * preorder traversal of this Element tree.
  */
 void ixmlNode_getElementsByTagNameNS(
 	/*! [in] The \b Element tree. */
