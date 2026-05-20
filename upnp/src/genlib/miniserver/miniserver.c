@@ -533,6 +533,7 @@ error_handler:
 		}
 		handle_error(&info, http_error_code, major, minor);
 	}
+	remove_active_connection(info.socket);
 	sock_destroy(&info, SD_BOTH);
 	httpmsg_destroy(h_msg);
 	free(request);
