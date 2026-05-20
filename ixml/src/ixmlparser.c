@@ -303,7 +303,7 @@ static char_info_t Letter[] = {{0x003A, 0x003A}, /* character ":" */
 /*!
  * \brief The size of the letter table array.
  */
-#define LETTERTABLESIZE (sizeof(Letter) / sizeof(Letter[0]))
+#define LETTER_TABLE_SIZE (sizeof(Letter) / sizeof(Letter[0]))
 
 /*!
  * \brief The NameChar table contains CombiningChar, Extender, Digit,
@@ -886,7 +886,7 @@ static int Parser_isNameChar(
 	/*! [in] 1 if you also want to check in the NameChar table. */
 	int bNameChar)
 {
-	if (Parser_isCharInTable(c, Letter, (int)LETTERTABLESIZE)) {
+	if (Parser_isCharInTable(c, Letter, (int)LETTER_TABLE_SIZE)) {
 		return 1;
 	}
 
@@ -1154,7 +1154,7 @@ static int Parser_copyToken(
 	Parser *xmlParser,
 	/*! [in] The string to copy from. */
 	const char *src,
-	/*! [in] The lenght to copy. */
+	/*! [in] The length to copy. */
 	ptrdiff_t len)
 {
 	int ret = IXML_SUCCESS;
@@ -1235,7 +1235,7 @@ static ptrdiff_t Parser_getNextToken(
 	if (rc != IXML_SUCCESS) {
 		return 0;
 	}
-	/* Attribute value logic must come first, since all text untokenized
+	/* Attribute value logic must come first, since all text "un-tokenized"
 	 * until end-quote */
 	if (*(xmlParser->curPtr) == QUOTE) {
 		tokenLength = 1;
@@ -1451,7 +1451,7 @@ static int Parser_processCDSect(
 
 		node->nodeName = safe_strdup(CDATANODENAME);
 		if (node->nodeName == NULL) {
-			/* no need to free node->nodeValue at all, bacause node
+			/* no need to free node->nodeValue at all, because node
 			 * contents will be freed by the main loop. */
 			return IXML_INSUFFICIENT_MEMORY;
 		}
@@ -1687,7 +1687,7 @@ static int Parser_parseReference(
 #endif
 
 /*!
- * \brief Return the namespce as defined as prefix.
+ * \brief Return the namespace as defined as prefix.
  */
 static char *Parser_getNameSpace(
 	/*! [in] The XML parser. */
@@ -1859,7 +1859,7 @@ static int Parser_xmlNamespace(
 					pPrevNs->nextNsURI = pNewNs;
 				}
 			} else {
-				/* udpate the namespace */
+				/* update the namespace */
 				if (pNs->nsURI != NULL) {
 					free(pNs->nsURI);
 				}
@@ -2525,7 +2525,7 @@ static void Parser_popElement(
 }
 
 /*!
- * \brief Verifies endof element tag is the same as the openning element tag.
+ * \brief Verifies endof element tag is the same as the opening element tag.
  */
 static int Parser_eTagVerification(
 	/*! [in] The XML parser. */
@@ -2725,9 +2725,9 @@ int Parser_isValidXmlName(const DOMString name)
 void Parser_setErrorChar(char c) { g_error_char = c; }
 
 #ifdef IXML_HAVE_SCRIPTSUPPORT
-void Parser_setBeforeFree(IXML_BeforeFreeNode_t hndlr)
+void Parser_setBeforeFree(IXML_BeforeFreeNode_t handler)
 {
-	Before_Free_callback = hndlr;
+	Before_Free_callback = handler;
 }
 
 IXML_BeforeFreeNode_t Parser_getBeforeFree(void)
