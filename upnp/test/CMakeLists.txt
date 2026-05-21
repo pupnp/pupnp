@@ -41,6 +41,29 @@ endif()
 find_library(SOCKET_LIBRARY NAMES socket)
 find_library(NSL_LIBRARY NAMES nsl)
 
+# Both GENA issue-#435 tests call socket(), connect(), send(), recv() directly.
+# On Solaris/illumos those symbols live in libsocket, not libc; link explicitly.
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-gena-subscribe-dos PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+	target_link_libraries(test-upnp-gena-subscribe-pressure PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-gena-subscribe-dos-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+	target_link_libraries(test-upnp-gena-subscribe-pressure-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 if(UPNP_BUILD_SHARED)
 	add_executable(
 		test-upnp-parse-uri
