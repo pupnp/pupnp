@@ -39,6 +39,7 @@
 #endif
 
 #include "ThreadPool.h"
+#include "config.h"
 
 #include "FreeList.h"
 
@@ -46,6 +47,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> /* for memset()*/
+
+#ifdef HAVE_BACKTRACE
+	#include <execinfo.h>
+	#include <unistd.h>
+#endif
 
 /*!
  * \brief Returns the difference in milliseconds between two timeval structures.
@@ -839,11 +845,19 @@ int ThreadPoolAdd(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
 
 	totalJobs = tp->highJobQ.size + tp->lowJobQ.size + tp->medJobQ.size;
 	if (totalJobs >= tp->attr.maxJobsTotal) {
-		if (tp->stats.droppedJobs == 0)
+		if (tp->stats.droppedJobs == 0) {
 			fprintf(stderr,
 				"libupnp ThreadPoolAdd too many jobs: %ld"
 				" (dropping; further messages suppressed)\n",
 				totalJobs);
+#ifdef HAVE_BACKTRACE
+			{
+				void *frames[20];
+				int n = backtrace(frames, 20);
+				backtrace_symbols_fd(frames, n, STDERR_FILENO);
+			}
+#endif
+		}
 		tp->stats.droppedJobs++;
 		goto exit_function;
 	}

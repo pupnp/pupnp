@@ -25,6 +25,7 @@ UPNP_deprecated_option (ssdp UPNP_ENABLE_SSDP "SSDP part" ON)
 UPNP_deprecated_option (unspecified_server UPNP_ENABLE_UNSPECIFIED_SERVER "unspecified SERVER header" OFF)
 UPNP_deprecated_option (webserver UPNP_ENABLE_WEBSERVER "integrated web server" ${UPNP_ENABLE_DEVICE_API})
 UPNP_deprecated_option (reuseaddr UPNP_MINISERVER_REUSEADDR "Bind the miniserver socket with SO_REUSEADDR to allow clean restarts" ON)
+option (UPNP_ENABLE_BACKTRACE "Print backtrace on first thread pool overflow" ON)
 
 if (UPNP_ENABLE_WEBSERVER AND NOT UPNP_ENABLE_DEVICE_API)
 	message (FATAL_ERROR "The webserver does not work without the device-api code")

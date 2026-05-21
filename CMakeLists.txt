@@ -172,6 +172,13 @@ endif()
 check_function_exists(strnlen HAVE_STRNLEN)
 check_function_exists(strndup HAVE_STRNDUP)
 
+if(UPNP_ENABLE_BACKTRACE AND NOT WIN32)
+	check_include_file(execinfo.h HAVE_EXECINFO_H)
+	if(HAVE_EXECINFO_H)
+		check_function_exists(backtrace HAVE_BACKTRACE)
+	endif()
+endif()
+
 include(CheckCCompilerFlag)
 check_c_compiler_flag(-fmacro-prefix-map=from=to HAVE_MACRO_PREFIX_MAP)
 

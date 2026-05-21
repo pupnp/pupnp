@@ -778,6 +778,12 @@ AC_CHECK_FUNC(strnlen,
 	AC_DEFINE(HAVE_STRNLEN, 1, [Defines if strnlen is available on your system]))
 AC_CHECK_FUNC(strndup,
 	AC_DEFINE(HAVE_STRNDUP, 1, [Defines if strndup is available on your system]))
+RT_BOOL_ARG_ENABLE([backtrace], [yes], [backtrace on thread pool overflow])
+if test "x$enable_backtrace" = xyes ; then
+	AC_CHECK_HEADERS([execinfo.h],
+		[AC_CHECK_FUNC(backtrace,
+			[AC_DEFINE(HAVE_BACKTRACE, 1, [Define if backtrace() is available])])])
+fi
 #
 # Solaris needs -lsocket -lnsl -lrt
 AC_SEARCH_LIBS([bind],           [socket])

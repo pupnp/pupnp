@@ -2,6 +2,59 @@ UPNP_Add_Unit_Test(test-upnp-list test_list.c)
 UPNP_Add_Unit_Test(test-upnp-init test_init.c)
 UPNP_Add_Unit_Test(test-upnp-log test_log.c)
 UPNP_Add_Unit_Test(test-upnp-url test_url.c)
+# test_threadpool_overflow calls internal ThreadPool API (ThreadPoolInit,
+# TPAttrInit, …) that have hidden visibility in the shared library.  Compile
+# the three ThreadPool translation units directly into each test variant so
+# both shared and static builds test the same code without needing symbol
+# exports.
+set(TP_OVERFLOW_SOURCES
+	test_threadpool_overflow.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../src/threadutil/ThreadPool.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../src/threadutil/FreeList.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../src/threadutil/LinkedList.c
+)
+set(TP_OVERFLOW_INCLUDES
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src/threadutil
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src/inc
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../inc
+	PRIVATE ${PUPNP_BINARY_DIR}
+)
+
+if(UPNP_BUILD_SHARED)
+	add_executable(test-upnp-threadpool-overflow ${TP_OVERFLOW_SOURCES})
+	target_include_directories(test-upnp-threadpool-overflow
+		${TP_OVERFLOW_INCLUDES})
+	target_compile_definitions(test-upnp-threadpool-overflow
+		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>)
+	target_link_libraries(test-upnp-threadpool-overflow PRIVATE Threads::Shared)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test-upnp-threadpool-overflow
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.)
+	endif()
+	add_test(NAME test-upnp-threadpool-overflow
+		COMMAND test-upnp-threadpool-overflow)
+	if(MSVC OR MSYS OR MINGW OR CYGWIN)
+		UPNP_Find_Test_Env(test-upnp-threadpool-overflow TEST_ENV)
+		set_tests_properties(test-upnp-threadpool-overflow
+			PROPERTIES ENVIRONMENT "${TEST_ENV}")
+	endif()
+endif()
+
+if(UPNP_BUILD_STATIC)
+	add_executable(test-upnp-threadpool-overflow-static ${TP_OVERFLOW_SOURCES})
+	target_include_directories(test-upnp-threadpool-overflow-static
+		${TP_OVERFLOW_INCLUDES})
+	target_compile_definitions(test-upnp-threadpool-overflow-static
+		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>)
+	target_link_libraries(test-upnp-threadpool-overflow-static
+		PRIVATE Threads::Static)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test-upnp-threadpool-overflow-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.)
+	endif()
+	add_test(NAME test-upnp-threadpool-overflow-static
+		COMMAND test-upnp-threadpool-overflow-static)
+endif()
 UPNP_Add_Unit_Test(test-upnp-gena-subscribe-dos test_gena_subscribe_dos.c)
 UPNP_Add_Unit_Test(test-upnp-gena-subscribe-pressure test_gena_subscribe_pressure.c)
 # Both GENA issue-#435 tests read constants from config.h (a private header).
