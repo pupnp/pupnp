@@ -60,6 +60,9 @@
 
 	#include <assert.h>
 	#include <errno.h>
+	#ifndef _WIN32
+		#include <netinet/tcp.h> /* TCP_NODELAY */
+	#endif
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
@@ -687,6 +690,12 @@ static void web_server_accept(SOCKET listen_sock, fd_set *set)
 				"miniserver: Error in accept(): %s\n",
 				errorBuffer);
 		} else {
+			const int on = 1;
+			setsockopt(asock,
+				IPPROTO_TCP,
+				TCP_NODELAY,
+				(const char *)&on,
+				sizeof(on));
 			schedule_request_job(
 				asock, (struct sockaddr *)&clientAddr);
 		}
