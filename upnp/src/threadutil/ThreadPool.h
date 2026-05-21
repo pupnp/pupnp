@@ -119,7 +119,7 @@ typedef enum priority
 #define DEFAULT_FREE_ROUTINE NULL
 
 /*! default max jobs used TPAttrInit */
-#define DEFAULT_MAX_JOBS_TOTAL 100
+#define DEFAULT_MAX_JOBS_TOTAL 1000
 extern int maxJobsTotal;
 
 /*!

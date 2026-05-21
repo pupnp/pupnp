@@ -2,6 +2,12 @@
 Version 1.18.6
 *******************************************************************************
 
+- Issue #178: ThreadPool: print backtrace on first "too many jobs" via new
+  UPNP_ENABLE_BACKTRACE CMake option / --enable-backtrace configure switch
+  (enabled by default; requires execinfo.h).
+- Issue #178: raise DEFAULT_MAX_JOBS_TOTAL from 100 to 1000 to better handle
+  networks with many UPnP devices.
+
 
 
 *******************************************************************************
