@@ -379,65 +379,57 @@ static int CreateClientRequestPacket(
 	int AddressFamily)
 {
 	int rc;
-	char TempBuf[COMMAND_LEN];
-	const char *command = "M-SEARCH * HTTP/1.1\r\n";
-	const char *man = "MAN: \"ssdp:discover\"\r\n";
-
-	memset(TempBuf, 0, sizeof(TempBuf));
-	if (RqstBufSize <= strlen(command))
-		return UPNP_E_INTERNAL_ERROR;
-	strcpy(RqstBuf, command);
+	size_t offset = 0;
 
 	switch (AddressFamily) {
 	case AF_INET:
-		rc = snprintf(TempBuf,
-			sizeof(TempBuf),
-			"HOST: %s:%d\r\n",
+		rc = snprintf(RqstBuf,
+			RqstBufSize,
+			"M-SEARCH * HTTP/1.1\r\n"
+			"HOST: %s:%d\r\n"
+			"MAN: \"ssdp:discover\"\r\n",
 			SSDP_IP,
 			SSDP_PORT);
 		break;
 	case AF_INET6:
-		rc = snprintf(TempBuf,
-			sizeof(TempBuf),
-			"HOST: [%s]:%d\r\n",
+		rc = snprintf(RqstBuf,
+			RqstBufSize,
+			"M-SEARCH * HTTP/1.1\r\n"
+			"HOST: [%s]:%d\r\n"
+			"MAN: \"ssdp:discover\"\r\n",
 			SSDP_IPV6_LINKLOCAL,
 			SSDP_PORT);
 		break;
 	default:
 		return UPNP_E_INVALID_ARGUMENT;
 	}
-	if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
-		return UPNP_E_INTERNAL_ERROR;
-
-	if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+	if (rc < 0 || (size_t)rc >= RqstBufSize)
 		return UPNP_E_BUFFER_TOO_SMALL;
-	strcat(RqstBuf, TempBuf);
-
-	if (RqstBufSize <= strlen(RqstBuf) + strlen(man))
-		return UPNP_E_BUFFER_TOO_SMALL;
-	strcat(RqstBuf, man);
+	offset = (size_t)rc;
 
 	if (Mx > 0) {
-		rc = snprintf(TempBuf, sizeof(TempBuf), "MX: %d\r\n", Mx);
-		if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
-			return UPNP_E_INTERNAL_ERROR;
-		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+		rc = snprintf(RqstBuf + offset,
+			RqstBufSize - offset,
+			"MX: %d\r\n",
+			Mx);
+		if (rc < 0 || (size_t)rc >= RqstBufSize - offset)
 			return UPNP_E_BUFFER_TOO_SMALL;
-		strcat(RqstBuf, TempBuf);
+		offset += (size_t)rc;
 	}
 
 	if (SearchTarget != NULL) {
-		rc = snprintf(
-			TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
-		if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
-			return UPNP_E_INTERNAL_ERROR;
-		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+		rc = snprintf(RqstBuf + offset,
+			RqstBufSize - offset,
+			"ST: %s\r\n",
+			SearchTarget);
+		if (rc < 0 || (size_t)rc >= RqstBufSize - offset)
 			return UPNP_E_BUFFER_TOO_SMALL;
-		strcat(RqstBuf, TempBuf);
+		offset += (size_t)rc;
 	}
-	if (RqstBufSize <= strlen(RqstBuf) + strlen("\r\n"))
+
+	rc = snprintf(RqstBuf + offset, RqstBufSize - offset, "\r\n");
+	if (rc < 0 || (size_t)rc >= RqstBufSize - offset)
 		return UPNP_E_BUFFER_TOO_SMALL;
-	strcat(RqstBuf, "\r\n");
 
 	return UPNP_E_SUCCESS;
 }
@@ -459,63 +451,57 @@ static int CreateClientRequestPacketUlaGua(
 	int AddressFamily)
 {
 	int rc;
-	char TempBuf[COMMAND_LEN];
-	const char *command = "M-SEARCH * HTTP/1.1\r\n";
-	const char *man = "MAN: \"ssdp:discover\"\r\n";
+	size_t offset = 0;
 
-	memset(TempBuf, 0, sizeof(TempBuf));
-	if (RqstBufSize <= strlen(command))
-		return UPNP_E_INTERNAL_ERROR;
-	strcpy(RqstBuf, command);
 	switch (AddressFamily) {
 	case AF_INET:
-		rc = snprintf(TempBuf,
-			sizeof(TempBuf),
-			"HOST: %s:%d\r\n",
+		rc = snprintf(RqstBuf,
+			RqstBufSize,
+			"M-SEARCH * HTTP/1.1\r\n"
+			"HOST: %s:%d\r\n"
+			"MAN: \"ssdp:discover\"\r\n",
 			SSDP_IP,
 			SSDP_PORT);
 		break;
 	case AF_INET6:
-		rc = snprintf(TempBuf,
-			sizeof(TempBuf),
-			"HOST: [%s]:%d\r\n",
+		rc = snprintf(RqstBuf,
+			RqstBufSize,
+			"M-SEARCH * HTTP/1.1\r\n"
+			"HOST: [%s]:%d\r\n"
+			"MAN: \"ssdp:discover\"\r\n",
 			SSDP_IPV6_SITELOCAL,
 			SSDP_PORT);
 		break;
 	default:
 		return UPNP_E_INVALID_ARGUMENT;
 	}
-	if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
-		return UPNP_E_INTERNAL_ERROR;
-
-	if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+	if (rc < 0 || (size_t)rc >= RqstBufSize)
 		return UPNP_E_BUFFER_TOO_SMALL;
-	strcat(RqstBuf, TempBuf);
-
-	if (RqstBufSize <= strlen(RqstBuf) + strlen(man))
-		return UPNP_E_BUFFER_TOO_SMALL;
-	strcat(RqstBuf, man);
+	offset = (size_t)rc;
 
 	if (Mx > 0) {
-		rc = snprintf(TempBuf, sizeof(TempBuf), "MX: %d\r\n", Mx);
-		if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
-			return UPNP_E_INTERNAL_ERROR;
-		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+		rc = snprintf(RqstBuf + offset,
+			RqstBufSize - offset,
+			"MX: %d\r\n",
+			Mx);
+		if (rc < 0 || (size_t)rc >= RqstBufSize - offset)
 			return UPNP_E_BUFFER_TOO_SMALL;
-		strcat(RqstBuf, TempBuf);
+		offset += (size_t)rc;
 	}
+
 	if (SearchTarget) {
-		rc = snprintf(
-			TempBuf, sizeof(TempBuf), "ST: %s\r\n", SearchTarget);
-		if (rc < 0 || (unsigned int)rc >= sizeof(TempBuf))
-			return UPNP_E_INTERNAL_ERROR;
-		if (RqstBufSize <= strlen(RqstBuf) + strlen(TempBuf))
+		rc = snprintf(RqstBuf + offset,
+			RqstBufSize - offset,
+			"ST: %s\r\n",
+			SearchTarget);
+		if (rc < 0 || (size_t)rc >= RqstBufSize - offset)
 			return UPNP_E_BUFFER_TOO_SMALL;
-		strcat(RqstBuf, TempBuf);
+		offset += (size_t)rc;
 	}
-	if (RqstBufSize <= strlen(RqstBuf) + strlen("\r\n"))
+
+	rc = snprintf(RqstBuf + offset, RqstBufSize - offset, "\r\n");
+	if (rc < 0 || (size_t)rc >= RqstBufSize - offset)
 		return UPNP_E_BUFFER_TOO_SMALL;
-	strcat(RqstBuf, "\r\n");
 
 	return UPNP_E_SUCCESS;
 }
