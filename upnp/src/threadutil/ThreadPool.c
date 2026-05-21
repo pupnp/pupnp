@@ -100,6 +100,7 @@ static void StatsInit(
 	stats->persistentThreads = 0;
 	stats->maxThreads = 0;
 	stats->totalThreads = 0;
+	stats->droppedJobs = 0;
 }
 
 /*!
@@ -744,6 +745,7 @@ int ThreadPoolInit(ThreadPool *tp, ThreadPoolAttr *attr)
 	retCode += FreeListInit(
 		&tp->jobFreeList, sizeof(ThreadPoolJob), JOBFREELISTSIZE);
 	StatsInit(&tp->stats);
+	tp->stats.droppedJobs = 0;
 	retCode += ListInit(&tp->highJobQ, CmpThreadPoolJob, NULL);
 	retCode += ListInit(&tp->medJobQ, CmpThreadPoolJob, NULL);
 	retCode += ListInit(&tp->lowJobQ, CmpThreadPoolJob, NULL);
@@ -837,10 +839,20 @@ int ThreadPoolAdd(ThreadPool *tp, ThreadPoolJob *job, int *jobId)
 
 	totalJobs = tp->highJobQ.size + tp->lowJobQ.size + tp->medJobQ.size;
 	if (totalJobs >= tp->attr.maxJobsTotal) {
-		fprintf(stderr,
-			"libupnp ThreadPoolAdd too many jobs: %ld\n",
-			totalJobs);
+		if (tp->stats.droppedJobs == 0)
+			fprintf(stderr,
+				"libupnp ThreadPoolAdd too many jobs: %ld"
+				" (dropping; further messages suppressed)\n",
+				totalJobs);
+		tp->stats.droppedJobs++;
 		goto exit_function;
+	}
+	if (tp->stats.droppedJobs > 0) {
+		fprintf(stderr,
+			"libupnp ThreadPoolAdd: queue available again,"
+			" %ld job(s) dropped\n",
+			tp->stats.droppedJobs);
+		tp->stats.droppedJobs = 0;
 	}
 	if (!jobId)
 		jobId = &tempId;
@@ -1230,6 +1242,7 @@ void ThreadPoolPrintStats(ThreadPoolStats *stats)
 	fprintf(stderr,
 		"Total Time spent Idle in seconds : %f\n",
 		stats->totalIdleTime);
+	fprintf(stderr, "Jobs dropped (queue full): %ld\n", stats->droppedJobs);
 }
 
 int ThreadPoolGetStats(ThreadPool *tp, ThreadPoolStats *stats)

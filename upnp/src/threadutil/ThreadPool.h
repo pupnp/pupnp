@@ -197,6 +197,7 @@ typedef struct TPOOLSTATS
 	int currentJobsHQ;
 	int currentJobsLQ;
 	int currentJobsMQ;
+	long droppedJobs;
 } ThreadPoolStats;
 
 /*!
