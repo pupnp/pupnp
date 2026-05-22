@@ -2,6 +2,7 @@ UPNP_Add_Unit_Test(test-upnp-list test_list.c)
 UPNP_Add_Unit_Test(test-upnp-init test_init.c)
 UPNP_Add_Unit_Test(test-upnp-log test_log.c)
 UPNP_Add_Unit_Test(test-upnp-url test_url.c)
+UPNP_Add_Unit_Test(test-upnp-sock-io test_sock_io.c)
 # test_threadpool_overflow calls internal ThreadPool API (ThreadPoolInit,
 # TPAttrInit, …) that have hidden visibility in the shared library.  Compile
 # the three ThreadPool translation units directly into each test variant so
