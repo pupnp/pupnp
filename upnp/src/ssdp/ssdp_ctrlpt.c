@@ -404,7 +404,7 @@ static int CreateClientRequestPacket(
 		return UPNP_E_INVALID_ARGUMENT;
 	}
 	if (rc < 0 || (size_t)rc >= RqstBufSize)
-		return UPNP_E_BUFFER_TOO_SMALL;
+		return UPNP_E_INTERNAL_ERROR;
 	offset = (size_t)rc;
 
 	if (Mx > 0) {
@@ -476,7 +476,7 @@ static int CreateClientRequestPacketUlaGua(
 		return UPNP_E_INVALID_ARGUMENT;
 	}
 	if (rc < 0 || (size_t)rc >= RqstBufSize)
-		return UPNP_E_BUFFER_TOO_SMALL;
+		return UPNP_E_INTERNAL_ERROR;
 	offset = (size_t)rc;
 
 	if (Mx > 0) {
