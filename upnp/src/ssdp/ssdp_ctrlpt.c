@@ -417,7 +417,7 @@ static int CreateClientRequestPacket(
 		offset += (size_t)rc;
 	}
 
-	if (SearchTarget != NULL) {
+	if (SearchTarget) {
 		rc = snprintf(RqstBuf + offset,
 			RqstBufSize - offset,
 			"ST: %s\r\n",
