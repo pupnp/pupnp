@@ -66,7 +66,6 @@
 	#if defined(_MSC_VER) && _MSC_VER < 1900
 		#define snprintf _snprintf
 	#endif
-	#define _poll(fds, nfds, timeout) WSAPoll(fds, nfds, timeout)
 #else /* _WIN32 */
 	#include <arpa/inet.h>
 	#include <poll.h>
@@ -107,37 +106,43 @@ static int Check_Connect_And_Wait_Connection(SOCKET sock, int connect_res)
 {
 	struct timeval tmvTimeout = {DEFAULT_TCP_CONNECT_TIMEOUT, 0};
 	int result;
-	struct pollfd fds[1];
-
-	fds[0].fd = sock;
-	fds[0].events = POLLOUT;
+	#ifdef _WIN32
+	struct fd_set fdSet;
+	#else
+	fd_set fdSet;
+	#endif
+	FD_ZERO(&fdSet);
+	FD_SET(sock, &fdSet);
 
 	if (connect_res < 0) {
-		result = _poll(fds,
-			1,
-			tmvTimeout.tv_sec * 1000 + tmvTimeout.tv_usec / 1000);
-
-		if (result < 0) {
-			/* Error in poll */
-			return -1;
-		} else if (result == 0) {
-			/* Timeout */
-			return -1;
-		} else {
-			int valopt = 0;
-			socklen_t len = sizeof(valopt);
-
-			/* Check if the socket is now writable (connected) */
-			if (getsockopt(sock,
-				    SOL_SOCKET,
-				    SO_ERROR,
-				    (void *)&valopt,
-				    &len) < 0) {
-				/* Failed to read delayed error */
+	#ifdef _WIN32
+		if (WSAEWOULDBLOCK == WSAGetLastError()) {
+	#else
+		if (EINPROGRESS == errno) {
+	#endif
+			result = select(
+				(int)sock + 1, NULL, &fdSet, NULL, &tmvTimeout);
+			if (result < 0) {
 				return -1;
-			} else if (valopt) {
-				/* Delayed error = valopt */
+			} else if (result == 0) {
+				/* timeout */
 				return -1;
+	#ifndef _WIN32
+			} else {
+				int valopt = 0;
+				socklen_t len = sizeof(valopt);
+				if (getsockopt(sock,
+					    SOL_SOCKET,
+					    SO_ERROR,
+					    (void *)&valopt,
+					    &len) < 0) {
+					/* failed to read delayed error */
+					return -1;
+				} else if (valopt) {
+					/* delayed error = valopt */
+					return -1;
+				}
+	#endif
 			}
 		}
 	}

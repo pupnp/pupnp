@@ -68,16 +68,8 @@
 	#include <string.h>
 	#include <sys/types.h>
 
-	#ifdef _WIN32
-		#include <winsock2.h>
-		#include <ws2tcpip.h>
-	#else
+	#ifndef _WIN32
 		#include <poll.h>
-	#endif
-
-	#ifdef _WIN32
-		#define _poll(fds, nfds, timeout) WSAPoll(fds, nfds, timeout)
-	#else
 		#define _poll(fds, nfds, timeout) poll(fds, nfds, timeout)
 	#endif
 
@@ -673,6 +665,14 @@ void shutdown_all_active_connections(void)
 	/*--------------------------------------------------------------------*/
 }
 
+	#ifdef _WIN32
+static UPNP_INLINE void fdset_if_valid(SOCKET sock, fd_set *set)
+{
+	if (sock != INVALID_SOCKET) {
+		FD_SET(sock, set);
+	}
+}
+	#else
 static UPNP_INLINE void pollfd_if_valid(
 	SOCKET sock, struct pollfd *pfd, short events)
 {
@@ -684,11 +684,68 @@ static UPNP_INLINE void pollfd_if_valid(
 		pfd->fd = -1;
 	}
 }
+	#endif /* _WIN32 */
 
+	#ifdef _WIN32
+static void ssdp_read(SOCKET *read_sock, fd_set *set)
+{
+	if (*read_sock != INVALID_SOCKET && FD_ISSET(*read_sock, set)) {
+		int ret = readFromSSDPSocket(*read_sock);
+		if (ret != 0) {
+			UpnpPrintf(UPNP_INFO,
+				MSERV,
+				__FILE__,
+				__LINE__,
+				"miniserver: Error in readFromSSDPSocket(%d): "
+				"closing socket\n",
+				*read_sock);
+			sock_close(*read_sock);
+			*read_sock = INVALID_SOCKET;
+		}
+	}
+}
+static void web_server_accept(SOCKET listen_sock, fd_set *set)
+{
+		/*--------------------------------------------------------------------*/
+		#ifdef INTERNAL_WEB_SERVER
+	SOCKET asock;
+	socklen_t clientLen;
+	struct sockaddr_storage clientAddr;
+	char errorBuffer[ERROR_BUFFER_LEN];
+
+	if (listen_sock != INVALID_SOCKET && FD_ISSET(listen_sock, set)) {
+		clientLen = sizeof(clientAddr);
+		asock = accept(listen_sock,
+			(struct sockaddr *)&clientAddr,
+			&clientLen);
+
+		if (asock == INVALID_SOCKET) {
+			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_INFO,
+				MSERV,
+				__FILE__,
+				__LINE__,
+				"miniserver: Error in accept(): %s\n",
+				errorBuffer);
+		} else {
+			const int on = 1;
+			setsockopt(asock,
+				IPPROTO_TCP,
+				TCP_NODELAY,
+				(const char *)&on,
+				sizeof(on));
+			schedule_request_job(
+				asock, (struct sockaddr *)&clientAddr);
+		}
+	}
+		#endif /* INTERNAL_WEB_SERVER */
+	/*--------------------------------------------------------------------*/
+}
+	#else /* _WIN32 */
 static void web_server_accept(SOCKET listen_sock, struct pollfd *pfd)
 {
-	/*--------------------------------------------------------------------*/
-	#ifdef INTERNAL_WEB_SERVER
+		/*--------------------------------------------------------------------*/
+		#ifdef INTERNAL_WEB_SERVER
 	SOCKET asock;
 	socklen_t clientLen;
 	struct sockaddr_storage clientAddr;
@@ -720,10 +777,12 @@ static void web_server_accept(SOCKET listen_sock, struct pollfd *pfd)
 				asock, (struct sockaddr *)&clientAddr);
 		}
 	}
-	#endif /* INTERNAL_WEB_SERVER */
+		#endif /* INTERNAL_WEB_SERVER */
 	/*--------------------------------------------------------------------*/
 }
+	#endif	       /* _WIN32 */
 
+	#ifndef _WIN32
 static void ssdp_read(SOCKET *read_sock, struct pollfd *pfd)
 {
 	if (*read_sock != INVALID_SOCKET && (pfd->revents & POLLIN)) {
@@ -742,7 +801,68 @@ static void ssdp_read(SOCKET *read_sock, struct pollfd *pfd)
 		}
 	}
 }
+	#endif /* _WIN32 */
 
+	#ifdef _WIN32
+static int receive_from_stopSock(SOCKET ssock, fd_set *set)
+{
+	ssize_t byteReceived;
+	socklen_t clientLen;
+	struct sockaddr_storage clientAddr;
+	char requestBuf[256];
+	char buf_ntop[INET6_ADDRSTRLEN];
+
+	if (ssock != INVALID_SOCKET && FD_ISSET(ssock, set)) {
+		clientLen = sizeof(clientAddr);
+		memset(&clientAddr, 0, sizeof(clientAddr));
+
+		byteReceived = recvfrom(ssock,
+			requestBuf,
+			(size_t)25,
+			0,
+			(struct sockaddr *)&clientAddr,
+			&clientLen);
+
+		if (byteReceived > 0) {
+			requestBuf[byteReceived] = '\0';
+
+			/* Convert IPv4 address to string */
+			inet_ntop(AF_INET,
+				&((struct sockaddr_in *)&clientAddr)->sin_addr,
+				buf_ntop,
+				sizeof(buf_ntop));
+
+			UpnpPrintf(UPNP_INFO,
+				MSERV,
+				__FILE__,
+				__LINE__,
+				"Received response: %s From host %s \n",
+				requestBuf,
+				buf_ntop);
+
+			UpnpPrintf(UPNP_PACKET,
+				MSERV,
+				__FILE__,
+				__LINE__,
+				"Received multicast packet: \n %s\n",
+				requestBuf);
+
+			if (strstr(requestBuf, "ShutDown") != NULL) {
+				return 1;
+			}
+		} else {
+			UpnpPrintf(UPNP_INFO,
+				MSERV,
+				__FILE__,
+				__LINE__,
+				"miniserver: stopSock Error, aborting...\n");
+			return 1;
+		}
+	}
+
+	return 0;
+}
+	#else  /* _WIN32 */
 static int receive_from_stopSock(SOCKET ssock, struct pollfd *pfd)
 {
 	ssize_t byteReceived;
@@ -803,6 +923,7 @@ static int receive_from_stopSock(SOCKET ssock, struct pollfd *pfd)
 
 	return 0;
 }
+	#endif /* _WIN32 */
 
 	#define MINI_SERVER_MAX_PFDS 9
 /*!
@@ -819,13 +940,75 @@ static void RunMiniServer(
 	char errorBuffer[ERROR_BUFFER_LEN];
 	int ret = 0;
 	int stopSock = 0;
+	#ifdef _WIN32
+	fd_set expSet;
+	fd_set rdSet;
+	SOCKET maxMiniSock;
 
+	maxMiniSock = 0;
+	maxMiniSock = max(maxMiniSock, mini_sock->miniServerSock4);
+	maxMiniSock = max(maxMiniSock, mini_sock->miniServerSock6);
+	maxMiniSock = max(maxMiniSock, mini_sock->miniServerSock6UlaGua);
+	maxMiniSock = max(maxMiniSock, mini_sock->miniServerStopSock);
+	maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock4);
+	maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock6);
+	maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock6UlaGua);
+		#ifdef INCLUDE_CLIENT_APIS
+	maxMiniSock = max(maxMiniSock, mini_sock->ssdpReqSock4);
+	maxMiniSock = max(maxMiniSock, mini_sock->ssdpReqSock6);
+		#endif /* INCLUDE_CLIENT_APIS */
+	++maxMiniSock;
+	#else  /* _WIN32 */
 	struct pollfd fds[MINI_SERVER_MAX_PFDS];
 	int nfds = 0;
+	#endif /* _WIN32 */
 
 	gMServState = MSERV_RUNNING;
 
 	while (!stopSock) {
+	#ifdef _WIN32
+		FD_ZERO(&rdSet);
+		FD_ZERO(&expSet);
+		FD_SET(mini_sock->miniServerStopSock, &expSet);
+		FD_SET(mini_sock->miniServerStopSock, &rdSet);
+		fdset_if_valid(mini_sock->miniServerSock4, &rdSet);
+		fdset_if_valid(mini_sock->miniServerSock6, &rdSet);
+		fdset_if_valid(mini_sock->miniServerSock6UlaGua, &rdSet);
+		fdset_if_valid(mini_sock->ssdpSock4, &rdSet);
+		fdset_if_valid(mini_sock->ssdpSock6, &rdSet);
+		fdset_if_valid(mini_sock->ssdpSock6UlaGua, &rdSet);
+		#ifdef INCLUDE_CLIENT_APIS
+		fdset_if_valid(mini_sock->ssdpReqSock4, &rdSet);
+		fdset_if_valid(mini_sock->ssdpReqSock6, &rdSet);
+		#endif /* INCLUDE_CLIENT_APIS */
+		/* select() */
+		ret = select((int)maxMiniSock, &rdSet, NULL, &expSet, NULL);
+		if (ret == SOCKET_ERROR && errno == EINTR) {
+			continue;
+		}
+		if (ret == SOCKET_ERROR) {
+			strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+			UpnpPrintf(UPNP_CRITICAL,
+				SSDP,
+				__FILE__,
+				__LINE__,
+				"Error in select(): %s\n",
+				errorBuffer);
+			continue;
+		}
+		web_server_accept(mini_sock->miniServerSock4, &rdSet);
+		web_server_accept(mini_sock->miniServerSock6, &rdSet);
+		web_server_accept(mini_sock->miniServerSock6UlaGua, &rdSet);
+		#ifdef INCLUDE_CLIENT_APIS
+		ssdp_read(&mini_sock->ssdpReqSock4, &rdSet);
+		ssdp_read(&mini_sock->ssdpReqSock6, &rdSet);
+		#endif /* INCLUDE_CLIENT_APIS */
+		ssdp_read(&mini_sock->ssdpSock4, &rdSet);
+		ssdp_read(&mini_sock->ssdpSock6, &rdSet);
+		ssdp_read(&mini_sock->ssdpSock6UlaGua, &rdSet);
+		stopSock = receive_from_stopSock(
+			mini_sock->miniServerStopSock, &rdSet);
+	#else /* _WIN32 */
 		nfds = 0;
 
 		/* Stop socket: watch for read + error */
@@ -849,11 +1032,11 @@ static void RunMiniServer(
 		pollfd_if_valid(
 			mini_sock->ssdpSock6UlaGua, &fds[nfds++], POLLIN);
 
-	#ifdef INCLUDE_CLIENT_APIS
+		#ifdef INCLUDE_CLIENT_APIS
 		pollfd_if_valid(mini_sock->ssdpReqSock4, &fds[nfds++], POLLIN);
 
 		pollfd_if_valid(mini_sock->ssdpReqSock6, &fds[nfds++], POLLIN);
-	#endif /* INCLUDE_CLIENT_APIS */
+		#endif /* INCLUDE_CLIENT_APIS */
 
 		/* poll() */
 		ret = _poll(fds, nfds, -1);
@@ -877,10 +1060,10 @@ static void RunMiniServer(
 		web_server_accept(mini_sock->miniServerSock6, &fds[2]);
 		web_server_accept(mini_sock->miniServerSock6UlaGua, &fds[3]);
 
-	#ifdef INCLUDE_CLIENT_APIS
+		#ifdef INCLUDE_CLIENT_APIS
 		ssdp_read(&mini_sock->ssdpReqSock4, &fds[7]);
 		ssdp_read(&mini_sock->ssdpReqSock6, &fds[8]);
-	#endif /* INCLUDE_CLIENT_APIS */
+		#endif /* INCLUDE_CLIENT_APIS */
 
 		ssdp_read(&mini_sock->ssdpSock4, &fds[4]);
 		ssdp_read(&mini_sock->ssdpSock6, &fds[5]);
@@ -888,6 +1071,7 @@ static void RunMiniServer(
 
 		stopSock = receive_from_stopSock(
 			mini_sock->miniServerStopSock, &fds[0]);
+	#endif	       /* _WIN32 */
 	}
 
 	/* shutdown connections */

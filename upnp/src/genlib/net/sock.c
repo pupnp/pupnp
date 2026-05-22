@@ -57,16 +57,8 @@
 #include <string.h>
 #include <time.h>
 
-#ifdef _WIN32
-	#include <winsock2.h>
-	#include <ws2tcpip.h>
-#else
+#ifndef _WIN32
 	#include <poll.h>
-#endif
-
-#ifdef _WIN32
-	#define _poll(fds, nfds, timeout) WSAPoll(fds, nfds, timeout)
-#else
 	#define _poll(fds, nfds, timeout) poll(fds, nfds, timeout)
 #endif
 
@@ -176,7 +168,6 @@ static int sock_read_write(SOCKINFO *info,
 	int bRead)
 {
 	int retCode;
-	struct pollfd fds[1];
 	time_t start_time = time(NULL);
 	SOCKET sockfd = info->socket;
 	long bytes_sent = 0;
@@ -184,25 +175,62 @@ static int sock_read_write(SOCKINFO *info,
 	ssize_t num_written;
 	long numBytes;
 
-	fds[0].fd = sockfd;
-	fds[0].events = (bRead ? POLLIN : POLLOUT);
-
-	while (1) {
-		int timeoutMillis =
-			(*timeoutSecs < 0) ? -1 : (*timeoutSecs * 1000);
-
-		retCode = _poll(fds, 1, timeoutMillis);
-
-		if (retCode == 0)
-			return UPNP_E_TIMEDOUT;
-		else if (retCode == -1) {
-			if (errno == EINTR)
-				continue;
-			return UPNP_E_SOCKET_ERROR;
-		} else
-			/* read or write. */
-			break;
+#ifndef _WIN32
+	{
+		struct pollfd fds[1];
+		fds[0].fd = sockfd;
+		fds[0].events = (bRead ? POLLIN : POLLOUT);
+		while (1) {
+			int timeoutMillis =
+				(*timeoutSecs < 0) ? -1 : (*timeoutSecs * 1000);
+			retCode = _poll(fds, 1, timeoutMillis);
+			if (retCode == 0)
+				return UPNP_E_TIMEDOUT;
+			else if (retCode == -1) {
+				if (errno == EINTR)
+					continue;
+				return UPNP_E_SOCKET_ERROR;
+			} else
+				break;
+		}
 	}
+#else  /* _WIN32 */
+	{
+		fd_set readSet;
+		fd_set writeSet;
+		struct timeval timeout;
+		FD_ZERO(&readSet);
+		FD_ZERO(&writeSet);
+		if (bRead)
+			FD_SET(sockfd, &readSet);
+		else
+			FD_SET(sockfd, &writeSet);
+		timeout.tv_sec = *timeoutSecs;
+		timeout.tv_usec = 0;
+		while (1) {
+			if (*timeoutSecs < 0)
+				retCode = select((int)sockfd + 1,
+					&readSet,
+					&writeSet,
+					NULL,
+					NULL);
+			else
+				retCode = select((int)sockfd + 1,
+					&readSet,
+					&writeSet,
+					NULL,
+					&timeout);
+			if (retCode == 0)
+				return UPNP_E_TIMEDOUT;
+			if (retCode == -1) {
+				if (errno == EINTR)
+					continue;
+				return UPNP_E_SOCKET_ERROR;
+			} else
+				break;
+		}
+	}
+#endif /* _WIN32 */
 
 #ifdef SO_NOSIGPIPE
 	{
