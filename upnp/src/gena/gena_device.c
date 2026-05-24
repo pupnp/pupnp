@@ -1215,10 +1215,32 @@ static int create_url_list(
 }
 
 /*!
+ * \brief Return 1 if addr is an RFC 1918 private address, 0 otherwise.
+ */
+static int is_rfc1918_addr(struct in_addr addr)
+{
+	uint32_t a = ntohl(addr.s_addr);
+	/* 10.0.0.0/8 */
+	if ((a & 0xFF000000u) == 0x0A000000u)
+		return 1;
+	/* 172.16.0.0/12 */
+	if ((a & 0xFFF00000u) == 0xAC100000u)
+		return 1;
+	/* 192.168.0.0/16 */
+	if ((a & 0xFFFF0000u) == 0xC0A80000u)
+		return 1;
+	return 0;
+}
+
+/*!
  * \brief Validate that the URLs passed by the user are on the same network
  * segment than the device.
  *
  * Note: This is a fix for CallStanger a.k.a. CVE-2020-12695
+ *
+ * For private networks (RFC 1918) the UPnP spec requires that the delivery
+ * URL is within any RFC 1918 range, not necessarily the same subnet.
+ * Strict same-subnet checking is kept for non-private device addresses.
  *
  * \return 0 if all URLs are on the same segment or -1 otherwise.
  */
@@ -1257,6 +1279,13 @@ int gena_validate_delivery_urls(
 			deliveryAddr4 =
 				(struct sockaddr_in *)&url_list->parsedURLs[i]
 					.hostport.IPaddress;
+			/* For RFC 1918 private networks the UPnP spec requires
+			 * the delivery URL to be in any private range, not
+			 * necessarily the same subnet (issue #379). */
+			if (is_rfc1918_addr(genaAddr4) &&
+				is_rfc1918_addr(deliveryAddr4->sin_addr)) {
+				continue;
+			}
 			if ((deliveryAddr4->sin_addr.s_addr &
 				    genaNetmask.s_addr) !=
 				(genaAddr4.s_addr & genaNetmask.s_addr)) {
