@@ -324,6 +324,8 @@ if(BUILD_TESTING)
 	if(GTest_FOUND)
 		add_subdirectory(gtest)
 	endif()
+
+	add_subdirectory(tests)
 endif()
 
 if(FUZZER)
