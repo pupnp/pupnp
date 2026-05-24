@@ -40,3 +40,14 @@ endif()
 set_tests_properties(test-init-py PROPERTIES
 	ENVIRONMENT "${_test_init_py_env}"
 )
+
+add_test(
+	NAME test-issue-110-py
+	COMMAND ${Python3_EXECUTABLE} -m pytest
+		${CMAKE_CURRENT_SOURCE_DIR}/test_issue_110.py
+		-v
+)
+
+set_tests_properties(test-issue-110-py PROPERTIES
+	ENVIRONMENT "${_test_init_py_env}"
+)
