@@ -63,3 +63,25 @@ if (NOT WIN32 AND UPNP_BUILD_STATIC)
 		TEST_SUFFIX -static
 	)
 endif()
+
+# regression test for issue #394 — http_RecvMessage must reject oversized POST
+# bodies before buffering them; accesses internal symbols so static only.
+if (NOT WIN32 AND UPNP_BUILD_STATIC)
+	include(GoogleTest)
+	add_executable(test_httpreadwrite-static test_httpreadwrite.cpp)
+	target_link_libraries(test_httpreadwrite-static PRIVATE upnp_static GTest::gtest)
+	target_include_directories(test_httpreadwrite-static PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/inc/
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/threadutil/
+	)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test_httpreadwrite-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+		)
+	endif()
+	gtest_add_tests(
+		TARGET test_httpreadwrite-static
+		TEST_PREFIX test-upnp-
+		TEST_SUFFIX -static
+	)
+endif()
