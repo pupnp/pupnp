@@ -270,7 +270,7 @@ static int sock_read_write(SOCKINFO *info,
 					num_written = send(sockfd,
 						buffer + bytes_sent,
 						byte_left,
-						MSG_DONTROUTE | MSG_NOSIGNAL);
+						MSG_NOSIGNAL);
 #ifdef UPNP_ENABLE_OPEN_SSL
 				}
 #endif
