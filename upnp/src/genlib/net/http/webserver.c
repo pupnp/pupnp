@@ -404,18 +404,28 @@ static void alias_release(
 	/*! [in] XML alias object. */
 	struct xml_alias_t *alias)
 {
+	int reset_global;
+
 	ithread_mutex_lock(&gWebMutex);
 	/* ignore invalid alias */
 	if (!is_valid_alias(alias)) {
 		ithread_mutex_unlock(&gWebMutex);
 		return;
 	}
+	/* When a local copy (grabbed by an HTTP handler) shares the refcount
+	 * with gAliasDoc and reaches zero, freeing through the local copy
+	 * leaves gAliasDoc with dangling pointers.  Detect this case before
+	 * freeing so we can reset gAliasDoc afterwards. */
+	reset_global = (alias != &gAliasDoc && alias->ct == gAliasDoc.ct);
 	assert(*alias->ct > 0);
 	*alias->ct -= 1;
 	if (*alias->ct <= 0) {
 		membuffer_destroy(&alias->doc);
 		membuffer_destroy(&alias->name);
 		free(alias->ct);
+		alias->ct = NULL;
+		if (reset_global)
+			glob_alias_init();
 	}
 	ithread_mutex_unlock(&gWebMutex);
 }
