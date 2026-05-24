@@ -23,11 +23,22 @@ dnl #
 dnl # *please update only once, before a formal release, not for each change*
 dnl #
 dnl ############################################################################
-AC_INIT([libupnp],[1.18.6],[mroberto@users.sourceforge.net])
+AC_INIT([libupnp],[1.20.0],[mroberto@users.sourceforge.net])
 AC_SUBST([LT_VERSION_IXML], [12:8:1])
-AC_SUBST([LT_VERSION_UPNP], [20:6:0])
+AC_SUBST([LT_VERSION_UPNP], [21:0:1])
 dnl ############################################################################
-dnl # Release 1.18.6
+dnl # Release 1.20.0 (next)
+dnl # "current:revision:age"
+dnl #
+dnl # - Interfaces added in upnp: UpnpGetSsdpReqPort4, UpnpGetSsdpReqPort6
+dnl #   current: 20 -> 21
+dnl #   revision: 6 -> 0
+dnl #   age: 0 -> 1
+dnl #
+dnl #AC_SUBST([LT_VERSION_IXML], [12:8:1])
+dnl #AC_SUBST([LT_VERSION_UPNP], [21:0:1])
+dnl ############################################################################
+dnl # Release 1.20.0
 dnl # "current:revision:age"
 dnl #
 dnl # - Code has changed in upnp
