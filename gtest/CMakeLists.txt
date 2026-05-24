@@ -41,6 +41,29 @@ if (NOT WIN32 AND UPNP_BUILD_STATIC)
 	)
 endif()
 
+# regression test for issue #379 — gena_validate_delivery_urls() must accept
+# cross-subnet delivery URLs when both device and subscriber are on RFC 1918
+# private addresses; accesses internal symbols so only the static variant.
+if (NOT WIN32 AND UPNP_BUILD_STATIC)
+	include(GoogleTest)
+	add_executable(test_gena-static test_gena.cpp)
+	target_link_libraries(test_gena-static PRIVATE upnp_static GTest::gtest)
+	target_include_directories(test_gena-static PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/inc/
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/threadutil/
+	)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test_gena-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+		)
+	endif()
+	gtest_add_tests(
+		TARGET test_gena-static
+		TEST_PREFIX test-upnp-
+		TEST_SUFFIX -static
+	)
+endif()
+
 # regression test for issue #395 — sock_write must not pass MSG_DONTROUTE to
 # send() on TCP sockets; sock_write() is an internal symbol (hidden visibility
 # in the shared library) so only the static variant is built.
