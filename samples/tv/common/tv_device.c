@@ -128,9 +128,9 @@ static int SetServiceTable(
 {
 	int i = 0;
 
-	strcpy(out->UDN, UDN);
-	strcpy(out->ServiceId, serviceId);
-	strcpy(out->ServiceType, serviceTypeS);
+	snprintf(out->UDN, NAME_SIZE, "%s", UDN);
+	snprintf(out->ServiceId, NAME_SIZE, "%s", serviceId);
+	snprintf(out->ServiceType, NAME_SIZE, "%s", serviceTypeS);
 
 	switch (serviceType) {
 	case TV_SERVICE_CONTROL:
@@ -142,9 +142,9 @@ static int SetServiceTable(
 				tvc_varname[i];
 			tv_service_table[TV_SERVICE_CONTROL].VariableStrVal[i] =
 				tvc_varval[i];
-			strcpy(tv_service_table[TV_SERVICE_CONTROL]
+			snprintf(tv_service_table[TV_SERVICE_CONTROL]
 					.VariableStrVal[i],
-				tvc_varval_def[i]);
+				TV_MAX_VAL_LEN, "%s", tvc_varval_def[i]);
 		}
 		break;
 	case TV_SERVICE_PICTURE:
@@ -156,9 +156,9 @@ static int SetServiceTable(
 				tvp_varname[i];
 			tv_service_table[TV_SERVICE_PICTURE].VariableStrVal[i] =
 				tvp_varval[i];
-			strcpy(tv_service_table[TV_SERVICE_PICTURE]
+			snprintf(tv_service_table[TV_SERVICE_PICTURE]
 					.VariableStrVal[i],
-				tvp_varval_def[i]);
+				TV_MAX_VAL_LEN, "%s", tvp_varval_def[i]);
 		}
 		break;
 	default:
@@ -514,7 +514,7 @@ int TvDeviceSetServiceTableVar(unsigned int service, int variable, char *value)
 
 	ithread_mutex_lock(&TVDevMutex);
 
-	strcpy(tv_service_table[service].VariableStrVal[variable], value);
+	snprintf(tv_service_table[service].VariableStrVal[variable], TV_MAX_VAL_LEN, "%s", value);
 #if 0
 	/* Using utility api */
 	PropSet = UpnpCreatePropertySet(1,
@@ -558,7 +558,7 @@ static int TvDeviceSetPower(
 
 	/* Vendor-specific code to turn the power on/off goes here. */
 
-	sprintf(value, "%d", on);
+	snprintf(value, TV_MAX_VAL_LEN, "%d", on);
 	ret = TvDeviceSetServiceTableVar(
 		TV_SERVICE_CONTROL, TV_CONTROL_POWER, value);
 
@@ -689,7 +689,7 @@ int IncrementChannel(int incr,
 		return UPNP_E_INVALID_PARAM;
 	}
 	/* Vendor-specific code to set the channel goes here. */
-	sprintf(value, "%d", newchannel);
+	snprintf(value, TV_MAX_VAL_LEN, "%d", newchannel);
 	if (TvDeviceSetServiceTableVar(
 		    TV_SERVICE_CONTROL, TV_CONTROL_CHANNEL, value)) {
 		if (UpnpAddToActionResponse(out,
@@ -807,7 +807,7 @@ static int IncrementVolume(
 		return UPNP_E_INVALID_PARAM;
 	}
 	/* Vendor-specific code to set the volume goes here. */
-	sprintf(value, "%d", newvolume);
+	snprintf(value, TV_MAX_VAL_LEN, "%d", newvolume);
 	if (TvDeviceSetServiceTableVar(
 		    TV_SERVICE_CONTROL, TV_CONTROL_VOLUME, value)) {
 		if (UpnpAddToActionResponse(out,
@@ -924,7 +924,7 @@ static int IncrementColor(
 		return UPNP_E_INVALID_PARAM;
 	}
 	/* Vendor-specific code to set the volume goes here. */
-	sprintf(value, "%d", newcolor);
+	snprintf(value, TV_MAX_VAL_LEN, "%d", newcolor);
 	if (TvDeviceSetServiceTableVar(
 		    TV_SERVICE_PICTURE, TV_PICTURE_COLOR, value)) {
 		if (UpnpAddToActionResponse(out,
