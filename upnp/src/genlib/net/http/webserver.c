@@ -468,6 +468,36 @@ int web_server_set_alias(const char *alias_name,
 	return UPNP_E_OUTOF_MEMORY;
 }
 
+/* regression: issue #153 — unit-test hooks to simulate an HTTP handler
+ * grabbing and releasing the alias outside of web_server_callback(). */
+static struct xml_alias_t g_ut_alias;
+
+UPNP_EXPORT_SPEC void web_server_ut_grab_alias(void)
+{
+	alias_grab(&g_ut_alias);
+}
+
+UPNP_EXPORT_SPEC void web_server_ut_release_alias(void)
+{
+	alias_release(&g_ut_alias);
+}
+
+UPNP_EXPORT_SPEC int web_server_ut_set_alias(
+	const char *name, const char *content, size_t len)
+{
+	char *copy = NULL;
+
+	if (name != NULL) {
+		copy = (char *)malloc(len + 1);
+		if (!copy)
+			return UPNP_E_OUTOF_MEMORY;
+		if (len > 0 && content)
+			memcpy(copy, content, len);
+		copy[len] = '\0';
+	}
+	return web_server_set_alias(name, copy, len, 0);
+}
+
 int web_server_init()
 {
 	int ret = UPNP_E_SUCCESS;

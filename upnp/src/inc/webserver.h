@@ -32,6 +32,7 @@
 #ifndef GENLIB_NET_HTTP_WEBSERVER_H
 #define GENLIB_NET_HTTP_WEBSERVER_H
 
+#include "UpnpGlobal.h"
 #include "httpparser.h"
 #include "sock.h"
 #include <time.h>
@@ -138,6 +139,13 @@ void web_server_callback(
 	http_message_t *req,
 	/*! [in,out] . */
 	SOCKINFO *info);
+
+/* regression: issue #153 — unit-test hooks to simulate concurrent alias access
+ */
+UPNP_EXPORT_SPEC void web_server_ut_grab_alias(void);
+UPNP_EXPORT_SPEC void web_server_ut_release_alias(void);
+UPNP_EXPORT_SPEC int web_server_ut_set_alias(
+	const char *name, const char *content, size_t len);
 
 #ifdef __cplusplus
 } /* extern C */

@@ -208,6 +208,12 @@ if(UPNP_BUILD_STATIC)
 	add_test(NAME test-upnp-parse-uri-static COMMAND test-upnp-parse-uri-static)
 endif()
 
+# Issue #153: use-after-free in the alias lifecycle when an HTTP handler grabs
+# the alias concurrently with unregistration.  Detected by ASan.
+# The test calls web_server_ut_* hooks exported from libupnp (extern decls
+# in the test file avoid pulling in the internal header chain).
+UPNP_Add_Unit_Test(test-upnp-gh-153 poc_gh_153.c)
+
 # Issue #347: HTTP response headers must use title-case names.
 # Starts the UPnP HTTP server via UpnpInit2, sends a GET request over a raw
 # TCP socket, and verifies title-case header names in the response.
