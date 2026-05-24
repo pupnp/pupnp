@@ -143,8 +143,10 @@ static int SetServiceTable(
 			tv_service_table[TV_SERVICE_CONTROL].VariableStrVal[i] =
 				tvc_varval[i];
 			snprintf(tv_service_table[TV_SERVICE_CONTROL]
-					.VariableStrVal[i],
-				TV_MAX_VAL_LEN, "%s", tvc_varval_def[i]);
+					 .VariableStrVal[i],
+				TV_MAX_VAL_LEN,
+				"%s",
+				tvc_varval_def[i]);
 		}
 		break;
 	case TV_SERVICE_PICTURE:
@@ -157,8 +159,10 @@ static int SetServiceTable(
 			tv_service_table[TV_SERVICE_PICTURE].VariableStrVal[i] =
 				tvp_varval[i];
 			snprintf(tv_service_table[TV_SERVICE_PICTURE]
-					.VariableStrVal[i],
-				TV_MAX_VAL_LEN, "%s", tvp_varval_def[i]);
+					 .VariableStrVal[i],
+				TV_MAX_VAL_LEN,
+				"%s",
+				tvp_varval_def[i]);
 		}
 		break;
 	default:
@@ -514,7 +518,10 @@ int TvDeviceSetServiceTableVar(unsigned int service, int variable, char *value)
 
 	ithread_mutex_lock(&TVDevMutex);
 
-	snprintf(tv_service_table[service].VariableStrVal[variable], TV_MAX_VAL_LEN, "%s", value);
+	snprintf(tv_service_table[service].VariableStrVal[variable],
+		TV_MAX_VAL_LEN,
+		"%s",
+		value);
 #if 0
 	/* Using utility api */
 	PropSet = UpnpCreatePropertySet(1,
