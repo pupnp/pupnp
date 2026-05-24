@@ -3938,6 +3938,13 @@ int UpnpGetIfInfo(const char *IfName)
 		strncpy(gIF_NAME, IfName, sizeof(gIF_NAME) - 1);
 		ifname_found = 1;
 	}
+	/* Clear stale IPv6 addresses from any previous initialization so that
+	 * a network change does not leave gIF_IPV6 pointing at an address
+	 * that no longer exists on the interface (issue #195). */
+	gIF_IPV6[0] = '\0';
+	gIF_IPV6_PREFIX_LENGTH = 0;
+	gIF_IPV6_ULA_GUA[0] = '\0';
+	gIF_IPV6_ULA_GUA_PREFIX_LENGTH = 0;
 	/* Get system interface addresses. */
 	if (getifaddrs(&ifap) != 0) {
 		UpnpPrintf(UPNP_CRITICAL,
