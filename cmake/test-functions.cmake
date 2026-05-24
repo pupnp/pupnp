@@ -28,7 +28,7 @@ function(UPNP_addGTest testName sourceFile)
 			TEST_LIST GTEST_${testName}
 		)
 
-		if(MSVC)
+		if(MSVC OR MSYS OR MINGW OR CYGWIN)
 			UPNP_Find_Test_Env(${testName} TEST_ENV)
 
 			set_tests_properties(
@@ -36,8 +36,6 @@ function(UPNP_addGTest testName sourceFile)
 								"${TEST_ENV}"
 			)
 		endif()
-
-		UPNP_Find_Test_Env(${testName} TEST_ENV)
 	endif()
 
 	if(UPNP_BUILD_STATIC)
