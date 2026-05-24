@@ -787,6 +787,40 @@ unsigned short UpnpGetServerUlaGuaPort6(void)
 #endif
 }
 
+unsigned short UpnpGetSsdpReqPort4(void)
+{
+#ifdef INCLUDE_CLIENT_APIS
+	struct sockaddr_storage ss;
+	socklen_t len = sizeof(ss);
+	if (UpnpSdkInit != 1)
+		return 0u;
+	if (gSsdpReqSocket4 == INVALID_SOCKET)
+		return 0u;
+	if (getsockname(gSsdpReqSocket4, (struct sockaddr *)&ss, &len) != 0)
+		return 0u;
+	return ntohs(((struct sockaddr_in *)&ss)->sin_port);
+#else
+	return 0u;
+#endif
+}
+
+unsigned short UpnpGetSsdpReqPort6(void)
+{
+#if defined(INCLUDE_CLIENT_APIS) && defined(UPNP_ENABLE_IPV6)
+	struct sockaddr_storage ss;
+	socklen_t len = sizeof(ss);
+	if (UpnpSdkInit != 1)
+		return 0u;
+	if (gSsdpReqSocket6 == INVALID_SOCKET)
+		return 0u;
+	if (getsockname(gSsdpReqSocket6, (struct sockaddr *)&ss, &len) != 0)
+		return 0u;
+	return ntohs(((struct sockaddr_in6 *)&ss)->sin6_port);
+#else
+	return 0u;
+#endif
+}
+
 char *UpnpGetServerIpAddress(void)
 {
 	if (UpnpSdkInit != 1)

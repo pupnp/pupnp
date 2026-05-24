@@ -636,6 +636,32 @@ UPNP_EXPORT_SPEC unsigned short UpnpGetServerPort6(void);
 UPNP_EXPORT_SPEC unsigned short UpnpGetServerUlaGuaPort6(void);
 
 /*!
+ * \brief Returns the source IPv4 port used for SSDP M-SEARCH requests.
+ *
+ * The port is assigned by the OS on the first call to \b UpnpSearchAsync.
+ * Call this function after \b UpnpSearchAsync to retrieve the assigned port.
+ *
+ * \return
+ * 	\li On success: The IPv4 source port used for SSDP M-SEARCH requests.
+ * 	\li On error: 0 if \b UpnpInit2 has not succeeded, client APIs are
+ * 		not enabled, or no search has been performed yet.
+ */
+UPNP_EXPORT_SPEC unsigned short UpnpGetSsdpReqPort4(void);
+
+/*!
+ * \brief Returns the source IPv6 port used for SSDP M-SEARCH requests.
+ *
+ * The port is assigned by the OS on the first call to \b UpnpSearchAsync.
+ * Call this function after \b UpnpSearchAsync to retrieve the assigned port.
+ *
+ * \return
+ * 	\li On success: The IPv6 source port used for SSDP M-SEARCH requests.
+ * 	\li On error: 0 if \b UpnpInit2 has not succeeded, IPv6 or client APIs
+ * 		are not enabled, or no search has been performed yet.
+ */
+UPNP_EXPORT_SPEC unsigned short UpnpGetSsdpReqPort6(void);
+
+/*!
  * \brief Returns the local IPv4 listening ip address.
  *
  * If \c NULL is used as the interface in \b UpnpInit2, then this function can
