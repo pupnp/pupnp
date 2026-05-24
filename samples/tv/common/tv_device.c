@@ -128,9 +128,9 @@ static int SetServiceTable(
 {
 	int i = 0;
 
-	strcpy(out->UDN, UDN);
-	strcpy(out->ServiceId, serviceId);
-	strcpy(out->ServiceType, serviceTypeS);
+	snprintf(out->UDN, NAME_SIZE, "%s", UDN);
+	snprintf(out->ServiceId, NAME_SIZE, "%s", serviceId);
+	snprintf(out->ServiceType, NAME_SIZE, "%s", serviceTypeS);
 
 	switch (serviceType) {
 	case TV_SERVICE_CONTROL:
@@ -142,8 +142,8 @@ static int SetServiceTable(
 				tvc_varname[i];
 			tv_service_table[TV_SERVICE_CONTROL].VariableStrVal[i] =
 				tvc_varval[i];
-			strcpy(tv_service_table[TV_SERVICE_CONTROL]
-					.VariableStrVal[i],
+			snprintf(tv_service_table[TV_SERVICE_CONTROL]
+					.VariableStrVal[i], TV_MAX_VAL_LEN, "%s",
 				tvc_varval_def[i]);
 		}
 		break;
@@ -156,8 +156,8 @@ static int SetServiceTable(
 				tvp_varname[i];
 			tv_service_table[TV_SERVICE_PICTURE].VariableStrVal[i] =
 				tvp_varval[i];
-			strcpy(tv_service_table[TV_SERVICE_PICTURE]
-					.VariableStrVal[i],
+			snprintf(tv_service_table[TV_SERVICE_PICTURE]
+					.VariableStrVal[i], TV_MAX_VAL_LEN, "%s",
 				tvp_varval_def[i]);
 		}
 		break;
@@ -514,7 +514,7 @@ int TvDeviceSetServiceTableVar(unsigned int service, int variable, char *value)
 
 	ithread_mutex_lock(&TVDevMutex);
 
-	strcpy(tv_service_table[service].VariableStrVal[variable], value);
+	snprintf(tv_service_table[service].VariableStrVal[variable], TV_MAX_VAL_LEN, "%s", value);
 #if 0
 	/* Using utility api */
 	PropSet = UpnpCreatePropertySet(1,
