@@ -433,6 +433,20 @@ int http_RecvMessage(SOCKINFO *info,
 				ret = PARSE_SUCCESS;
 				goto ExitFunction;
 			default:
+				/* Reject early if Content-Length header already
+				 * exceeds the limit, before the body is
+				 * buffered. */
+				if (g_maxContentLength > 0 &&
+					parser->content_length > 0 &&
+					parser->content_length >
+						(unsigned int)
+							g_maxContentLength) {
+					*http_error_code =
+						HTTP_REQ_ENTITY_TOO_LARGE;
+					line = __LINE__;
+					ret = UPNP_E_OUTOF_BOUNDS;
+					goto ExitFunction;
+				}
 				break;
 			}
 		} else if (num_read == 0) {
