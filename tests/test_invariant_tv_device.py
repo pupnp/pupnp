@@ -1,9 +1,5 @@
 import pytest
-import re
 import struct
-import socket
-import urllib.parse
-from unittest.mock import MagicMock, patch
 
 
 # Simulated UPnP device endpoint handler that mimics tv_device.c behavior
@@ -294,7 +290,6 @@ def test_auth_check_precedes_upnp_processing(payload, tv_device):
     body = payload.get("body", {})
     
     # Track whether auth was checked before string processing
-    auth_checked_first = []
     original_validate_auth = tv_device._validate_auth
     original_validate_string = tv_device._validate_upnp_string
     
