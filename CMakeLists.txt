@@ -317,6 +317,16 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libupnp.pc
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
 
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+	add_custom_target(docs
+		COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/Doxyfile
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs
+		COMMENT "Generating API documentation with Doxygen"
+		VERBATIM
+	)
+endif()
+
 if(BUILD_TESTING)
 	enable_testing()
 	find_package(GTest CONFIG)
