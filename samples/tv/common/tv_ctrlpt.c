@@ -421,7 +421,7 @@ int TvCtrlPointSendActionNumericArg(int devnum,
 	char param_val_a[50];
 	char *param_val = param_val_a;
 
-	sprintf(param_val_a, "%d", paramValue);
+	snprintf(param_val_a, sizeof(param_val_a), "%d", paramValue);
 	return TvCtrlPointSendAction(
 		service, devnum, actionName, &paramName, &param_val, 1);
 }
@@ -602,9 +602,9 @@ int TvCtrlPointPrintDevice(int devnum)
 			tmpdevnode->device.AdvrTimeOut);
 		for (service = 0; service < TV_SERVICE_SERVCOUNT; service++) {
 			if (service < TV_SERVICE_SERVCOUNT - 1)
-				sprintf(spacer, "    |    ");
+				snprintf(spacer, sizeof(spacer), "    |    ");
 			else
-				sprintf(spacer, "         ");
+				snprintf(spacer, sizeof(spacer), "         ");
 			SampleUtil_Print("    |                  \n"
 					 "    +- Tv %s Service\n"
 					 "%s+- ServiceId       = %s\n"
@@ -738,7 +738,7 @@ void TvCtrlPointAddDevice(
 							"Error Subscribing to "
 							"EventURL -- %d\n",
 							ret);
-						strcpy(eventSID[service], "");
+						eventSID[service][0] = '\0';
 					}
 				} else {
 					SampleUtil_Print("Error: Could not "
@@ -749,10 +749,10 @@ void TvCtrlPointAddDevice(
 			/* Create a new device node */
 			deviceNode = (struct TvDeviceNode *)malloc(
 				sizeof(struct TvDeviceNode));
-			strcpy(deviceNode->device.UDN, UDN);
-			strcpy(deviceNode->device.DescDocURL, location);
-			strcpy(deviceNode->device.FriendlyName, friendlyName);
-			strcpy(deviceNode->device.PresURL, presURL);
+			snprintf(deviceNode->device.UDN, sizeof(deviceNode->device.UDN), "%s", UDN);
+			snprintf(deviceNode->device.DescDocURL, sizeof(deviceNode->device.DescDocURL), "%s", location);
+			snprintf(deviceNode->device.FriendlyName, sizeof(deviceNode->device.FriendlyName), "%s", friendlyName);
+			snprintf(deviceNode->device.PresURL, sizeof(deviceNode->device.PresURL), "%s", presURL);
 			deviceNode->device.AdvrTimeOut = expires;
 			for (service = 0; service < TV_SERVICE_SERVCOUNT;
 				service++) {
@@ -760,30 +760,27 @@ void TvCtrlPointAddDevice(
 					/* not found */
 					continue;
 				}
-				strcpy(deviceNode->device.TvService[service]
-						.ServiceId,
-					serviceId[service]);
-				strcpy(deviceNode->device.TvService[service]
-						.ServiceType,
-					TvServiceType[service]);
-				strcpy(deviceNode->device.TvService[service]
-						.ControlURL,
-					controlURL[service]);
-				strcpy(deviceNode->device.TvService[service]
-						.EventURL,
-					eventURL[service]);
-				strcpy(deviceNode->device.TvService[service]
-						.SID,
-					eventSID[service]);
+				snprintf(deviceNode->device.TvService[service].ServiceId,
+					sizeof(deviceNode->device.TvService[service].ServiceId),
+					"%s", serviceId[service]);
+				snprintf(deviceNode->device.TvService[service].ServiceType,
+					sizeof(deviceNode->device.TvService[service].ServiceType),
+					"%s", TvServiceType[service]);
+				snprintf(deviceNode->device.TvService[service].ControlURL,
+					sizeof(deviceNode->device.TvService[service].ControlURL),
+					"%s", controlURL[service]);
+				snprintf(deviceNode->device.TvService[service].EventURL,
+					sizeof(deviceNode->device.TvService[service].EventURL),
+					"%s", eventURL[service]);
+				snprintf(deviceNode->device.TvService[service].SID,
+					sizeof(deviceNode->device.TvService[service].SID),
+					"%s", eventSID[service]);
 				for (var = 0; var < TvVarCount[service];
 					var++) {
 					deviceNode->device.TvService[service]
 						.VariableStrVal[var] =
 						(char *)malloc(TV_MAX_VAL_LEN);
-					strcpy(deviceNode->device
-							.TvService[service]
-							.VariableStrVal[var],
-						"");
+					deviceNode->device.TvService[service].VariableStrVal[var][0] = '\0';
 				}
 			}
 			deviceNode->next = NULL;
