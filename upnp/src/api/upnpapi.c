@@ -605,6 +605,23 @@ int UpnpInitSslContext(int initOpenSslLib, const SSL_METHOD *sslMethod)
 	}
 	return UPNP_E_SUCCESS;
 }
+
+SSL_CTX *UpnpGetSslCtx(void) { return gSslCtx; }
+
+int UpnpSetSslCtx(SSL_CTX *ctx)
+{
+	if (!ctx) {
+		if (gSslCtx) {
+			SSL_CTX_free(gSslCtx);
+			gSslCtx = NULL;
+		}
+		return UPNP_E_SUCCESS;
+	}
+	if (gSslCtx)
+		return UPNP_E_INIT;
+	gSslCtx = ctx;
+	return UPNP_E_SUCCESS;
+}
 #endif
 
 #ifdef DEBUG

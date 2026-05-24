@@ -573,6 +573,40 @@ UPNP_EXPORT_SPEC int UpnpInitSslContext(
 	/*! The SSL_METHOD to use to create the context. See OpenSSL docs
 	 * for more info */
 	const SSL_METHOD *sslMethod);
+
+/*!
+ * \brief Returns the internal OpenSSL context used by pupnp.
+ *
+ * Allows the application to configure the context after
+ * UpnpInitSslContext() has created it (e.g. load certificates and keys).
+ *
+ * \note This method is only enabled if pupnp is compiled with open-ssl support.
+ *
+ * \return The SSL_CTX pointer, or NULL if not yet initialized.
+ */
+UPNP_EXPORT_SPEC SSL_CTX *UpnpGetSslCtx(void);
+
+/*!
+ * \brief Supplies a pre-configured OpenSSL context for pupnp to use,
+ * or clears the current context.
+ *
+ * When \b ctx is non-NULL, pupnp takes ownership and will free it on
+ * UpnpFinish() (or on a subsequent UpnpSetSslCtx(NULL) call). Fails with
+ * UPNP_E_INIT if a context is already set; call UpnpSetSslCtx(NULL) first
+ * to replace it.
+ *
+ * When \b ctx is NULL, the current context is freed and cleared so that
+ * a new one can be set.
+ *
+ * \note This method is only enabled if pupnp is compiled with open-ssl support.
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_INIT: \b ctx is non-NULL but an SSL context is already set.
+ */
+UPNP_EXPORT_SPEC int UpnpSetSslCtx(
+	/*! A fully configured SSL_CTX, or NULL to clear the current context. */
+	SSL_CTX *ctx);
 #endif
 
 /*!
