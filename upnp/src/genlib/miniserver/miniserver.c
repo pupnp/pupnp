@@ -1460,13 +1460,38 @@ static int get_miniserver_sockets(
 	if (ss6.fd != INVALID_SOCKET) {
 		ret_val = do_bind_listen(&ss6);
 		if (ret_val) {
-			goto error;
+			/* IPv6 bind failed. Non-fatal when IPv4 is available
+			 * (issue #193, #195): fall back to IPv4-only. */
+			if (ss4.fd == INVALID_SOCKET) {
+				goto error;
+			}
+			UpnpPrintf(UPNP_INFO,
+				MSERV,
+				__FILE__,
+				__LINE__,
+				"get_miniserver_sockets: IPv6 bind failed, "
+				"continuing with IPv4 only\n");
+			sock_close(ss6.fd);
+			ss6.fd = INVALID_SOCKET;
 		}
 	}
 	if (ss6UlaGua.fd != INVALID_SOCKET) {
 		ret_val = do_bind_listen(&ss6UlaGua);
 		if (ret_val) {
-			goto error;
+			/* IPv6 ULA/GUA bind failed. Non-fatal when IPv4 or
+			 * IPv6 LLA is available. */
+			if (ss4.fd == INVALID_SOCKET &&
+				ss6.fd == INVALID_SOCKET) {
+				goto error;
+			}
+			UpnpPrintf(UPNP_INFO,
+				MSERV,
+				__FILE__,
+				__LINE__,
+				"get_miniserver_sockets: IPv6 ULA/GUA bind "
+				"failed, continuing without it\n");
+			sock_close(ss6UlaGua.fd);
+			ss6UlaGua.fd = INVALID_SOCKET;
 		}
 	}
 	UpnpPrintf(UPNP_INFO,
