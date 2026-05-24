@@ -1,0 +1,9 @@
+CompileFlags:
+  # clangd uses Clang internally but the project builds with GCC; add GCC's
+  # C++ standard library headers so clangd can resolve <cstddef> etc.
+  Add:
+    - -isystem/usr/include/c++/15
+    - -isystem/usr/include/c++/15/x86_64-suse-linux
+    - -isystem/usr/include/c++/15/backward
+    - -isystem/usr/lib64/gcc/x86_64-suse-linux/15/include
+    - -isystem/usr/lib64/gcc/x86_64-suse-linux/15/include-fixed
