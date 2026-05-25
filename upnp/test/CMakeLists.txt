@@ -57,6 +57,18 @@ if(UPNP_BUILD_STATIC)
 	add_test(NAME test-upnp-threadpool-overflow-static
 		COMMAND test-upnp-threadpool-overflow-static)
 endif()
+# Issue #227: SSDP server socket must bind to the selected interface address,
+# not to INADDR_ANY.  Uses /proc/net/udp to verify; skipped on non-Linux.
+UPNP_Add_Unit_Test(test-upnp-ssdp-bind-specific test_ssdp_bind_specific.c)
+if(UPNP_BUILD_SHARED)
+	set_tests_properties(test-upnp-ssdp-bind-specific
+		PROPERTIES SKIP_RETURN_CODE 77)
+endif()
+if(UPNP_BUILD_STATIC)
+	set_tests_properties(test-upnp-ssdp-bind-specific-static
+		PROPERTIES SKIP_RETURN_CODE 77)
+endif()
+
 UPNP_Add_Unit_Test(test-upnp-gena-subscribe-dos test_gena_subscribe_dos.c)
 UPNP_Add_Unit_Test(test-upnp-gena-subscribe-pressure test_gena_subscribe_pressure.c)
 # Both GENA issue-#435 tests read constants from config.h (a private header).
