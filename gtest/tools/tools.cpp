@@ -17,6 +17,7 @@ class CIfaddr4
 	struct sockaddr_in ifa_netmask;	// netmask
 	struct sockaddr_in ifa_ifu;		// broadcast addr or point-to-point dest addr
 	struct ifaddrs ifaddr;
+	std::string m_ifname;
 
 	// the bitmask is the offset in the netmasks array.
 	std::string netmasks[33] = {"0.0.0.0",
@@ -72,7 +73,8 @@ public:
 	// set to an ipv4 UP interface, supporting broadcast and multicast.
 	// Returns true if successful.
 	{
-		ifaddr.ifa_name = (char*)pIfname.c_str();
+		m_ifname = pIfname;
+		ifaddr.ifa_name = (char*)m_ifname.c_str();
 
 		// get the netmask from the bitmask
 		// the bitmask is the offset in the netmasks array.
