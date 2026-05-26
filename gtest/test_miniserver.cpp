@@ -142,6 +142,73 @@ TEST_F(Issue195TestSuite, GetIfInfo_clears_stale_IPv6_when_interface_has_none)
 		   "on every re-initialization after a network change.";
 }
 
+// regression: issue #247
+// UpnpGetIfInfo must not modify gIF_NAME when it returns UPNP_E_INVALID_INTERFACE.
+//
+// Root cause: the Unix implementation writes IfName into gIF_NAME before the
+// getifaddrs loop verifies the interface exists. When the lookup fails the
+// function correctly returns UPNP_E_INVALID_INTERFACE, but gIF_NAME has
+// already been overwritten with the invalid name.
+//
+// Fix: defer the write to gIF_NAME until after the interface is verified.
+
+class Issue247TestSuite : public ::testing::Test
+{
+protected:
+	MockGetifaddrs mockGetifaddrsObj;
+	MockFreeifaddrs mockFreeifaddrObj;
+	MockIf_nametoindex mockIf_nametoindexObj;
+
+	Issue247TestSuite()
+	{
+		ptrMockGetifaddrsObj = &mockGetifaddrsObj;
+		ptrMockFreeifaddrObj = &mockFreeifaddrObj;
+		ptrMockIf_nametoindexObj = &mockIf_nametoindexObj;
+	}
+
+	void SetUp() override { gIF_NAME[0] = '\0'; }
+
+	void TearDown() override
+	{
+		gIF_NAME[0] = '\0';
+		ptrMockGetifaddrsObj = nullptr;
+		ptrMockFreeifaddrObj = nullptr;
+		ptrMockIf_nametoindexObj = nullptr;
+	}
+};
+
+// regression: issue #247
+TEST_F(Issue247TestSuite, GetIfInfo_does_not_corrupt_gIF_NAME_on_invalid_interface)
+{
+	char *github_action = std::getenv("GITHUB_ACTIONS");
+	if (github_action) {
+		GTEST_SKIP() << "due to issues with googlemock";
+	}
+
+	// System has one valid interface (eth0), but caller passes a typo ("ethO")
+	struct ifaddrs *ifaddr = nullptr;
+	CIfaddr4 ifaddr4Obj;
+	ifaddr4Obj.set("eth0", "192.168.77.48/22");
+	ifaddr = ifaddr4Obj.get();
+
+	EXPECT_CALL(mockGetifaddrsObj, getifaddrs(_))
+		.WillOnce(DoAll(SetArgPointee<0>(ifaddr), Return(0)));
+	EXPECT_CALL(mockFreeifaddrObj, freeifaddrs(ifaddr)).Times(1);
+	EXPECT_CALL(mockIf_nametoindexObj, if_nametoindex(_)).Times(0);
+
+	int rc = UpnpGetIfInfo("ethO"); // uppercase O, not zero
+	EXPECT_EQ(rc, UPNP_E_INVALID_INTERFACE);
+
+	// Before fix: gIF_NAME == "ethO" (written before validation)
+	// After fix:  gIF_NAME == "" (not modified on failure)
+	EXPECT_STREQ(gIF_NAME, "")
+		<< "regression issue #247: UpnpGetIfInfo must not modify gIF_NAME "
+		   "when the interface lookup fails. The invalid name was written "
+		   "to gIF_NAME before validation, leaving the library in an "
+		   "inconsistent state even though UPNP_E_INVALID_INTERFACE was "
+		   "returned.";
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
