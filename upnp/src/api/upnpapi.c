@@ -4060,6 +4060,10 @@ int UpnpGetIfInfo(const char *IfName)
 	if (ifname_found == 0 ||
 		(valid_v4_addr_found == 0 && valid_v6_addr_found == 0 &&
 			valid_v6ulagua_addr_found == 0)) {
+		/* Undo the early write so gIF_NAME is not left with a
+		 * name that was never validated (issue #247). */
+		if (IfName != NULL)
+			gIF_NAME[0] = '\0';
 		UpnpPrintf(UPNP_CRITICAL,
 			API,
 			__FILE__,
