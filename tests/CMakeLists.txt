@@ -51,3 +51,14 @@ add_test(
 set_tests_properties(test-issue-110-py PROPERTIES
 	ENVIRONMENT "${_test_init_py_env}"
 )
+
+add_test(
+	NAME test-issue-250-py
+	COMMAND ${Python3_EXECUTABLE} -m pytest
+		${CMAKE_CURRENT_SOURCE_DIR}/test_issue_250.py
+		-v
+)
+
+set_tests_properties(test-issue-250-py PROPERTIES
+	ENVIRONMENT "${_test_init_py_env}"
+)
