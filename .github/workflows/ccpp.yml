@@ -68,6 +68,8 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v6
+      - name: Install Python test dependencies
+        run: pip install pytest
       - name: Configure (create build system)
         run: |
           cmake \
@@ -220,6 +222,9 @@ jobs:
         run: |
           ./bootstrap && \
           ./configure --enable-debug ${{ env.sanitizer_autotools_flags }}
+      - name: Install Python test dependencies
+        if: ${{ matrix.tool == 'cmake' }}
+        run: pip install pytest
       - name: configure (cmake)
         if: ${{ matrix.tool == 'cmake' }}
         run: |
