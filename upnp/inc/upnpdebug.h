@@ -133,7 +133,7 @@ static UPNP_INLINE void UpnpSetLogLevel_Inlined(Upnp_LogLevel log_level)
 /*!
  * \brief Closes the log files.
  */
-void UpnpCloseLog(void);
+UPNP_EXPORT_SPEC void UpnpCloseLog(void);
 
 #if defined NDEBUG && !defined UPNP_DEBUG_C
 	#define UpnpCloseLog UpnpCloseLog_Inlined
@@ -169,7 +169,7 @@ static UPNP_INLINE void UpnpSetLogFileNames_Inlined(
  * \return NULL if the module is turn off for debug otherwise returns the
  *	right FILE pointer.
  */
-FILE *UpnpGetDebugFile(
+UPNP_EXPORT_SPEC FILE *UpnpGetDebugFile(
 	/*! [in] The level of the debug logging. It will decide whether debug
 	 * statement will go to standard output, or any of the log files. */
 	Upnp_LogLevel level,
