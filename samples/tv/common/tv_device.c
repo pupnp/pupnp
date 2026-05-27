@@ -1468,7 +1468,7 @@ int TvDeviceStart(char *iface,
 	case AF_INET:
 		snprintf(desc_doc_url,
 			DESC_URL_SIZE,
-			"http://%s:%d/%s",
+			"http://%s:%d/%s", /* lgtm[cpp/non-https-url] */
 			ip_address,
 			port,
 			desc_doc_name);
@@ -1476,7 +1476,7 @@ int TvDeviceStart(char *iface,
 	case AF_INET6:
 		snprintf(desc_doc_url,
 			DESC_URL_SIZE,
-			"http://[%s]:%d/%s",
+			"http://[%s]:%d/%s", /* lgtm[cpp/non-https-url] */
 			ip_address,
 			port,
 			desc_doc_name);
