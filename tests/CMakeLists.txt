@@ -35,6 +35,7 @@ if(CMAKE_C_FLAGS MATCHES "sanitize=address" OR
 	if(_asan_path AND NOT _asan_path STREQUAL "libasan.so")
 		list(APPEND _test_init_py_env "LD_PRELOAD=${_asan_path}")
 	endif()
+	list(APPEND _test_init_py_env "ASAN_OPTIONS=detect_leaks=0")
 endif()
 
 set_tests_properties(test-init-py PROPERTIES
