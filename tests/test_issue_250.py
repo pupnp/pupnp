@@ -4,6 +4,7 @@ import ctypes.util
 import os
 import socket
 import time
+from typing import Tuple
 import pytest
 
 UPNP_E_SUCCESS = 0
@@ -46,13 +47,13 @@ def upnp(lib):
     lib.UpnpFinish()
 
 
-def _server_addr(lib) -> tuple[str, int]:
+def _server_addr(lib) -> Tuple[str, int]:
     ip = lib.UpnpGetServerIpAddress()
     port = lib.UpnpGetServerPort()
     return (ip.decode() if ip else "127.0.0.1", port)
 
 
-def _http_status(addr: tuple[str, int], headers: bytes, body: bytes = b"") -> str:
+def _http_status(addr: Tuple[str, int], headers: bytes, body: bytes = b"") -> str:
     with socket.create_connection(addr, timeout=5) as s:
         s.sendall(headers + body)
         resp = b""
@@ -70,7 +71,7 @@ def _http_status(addr: tuple[str, int], headers: bytes, body: bytes = b"") -> st
     return resp.decode(errors="replace").split("\r\n")[0]
 
 
-def _soap_headers(addr: tuple[str, int], content_length: int) -> bytes:
+def _soap_headers(addr: Tuple[str, int], content_length: int) -> bytes:
     host, port = addr
     return (
         f"POST /upnp/control/test HTTP/1.1\r\n"
