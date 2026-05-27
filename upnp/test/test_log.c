@@ -39,8 +39,30 @@
 	#include <string.h>
 #endif
 
+/* regression: issue #272 — UpnpInitLog() must not enable logging
+ * when neither UpnpSetLogFileNames nor UpnpSetLogLevel has been
+ * called.  Uses only UPNP_EXPORT_SPEC-exported functions so that
+ * this block compiles against both the shared and static library. */
+#ifndef NDEBUG
+	#include "upnpdebug.h"
+#endif
+
 int main(void)
 {
+#ifndef NDEBUG
+	UpnpInitLog();
+	{
+		FILE *fp = UpnpGetDebugFile(UPNP_CRITICAL, API);
+		if (fp != NULL) {
+			fprintf(stderr,
+				"BUG issue #272: UpnpInitLog() enabled "
+				"logging without user configuration\n");
+			exit(1);
+		}
+	}
+	UpnpCloseLog();
+#endif /* !NDEBUG */
+
 #ifdef UPNP_HAVE_DEBUG
 	int i;
 	FILE *fp;
