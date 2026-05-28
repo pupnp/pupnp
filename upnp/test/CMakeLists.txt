@@ -226,6 +226,26 @@ endif()
 # in the test file avoid pulling in the internal header chain).
 UPNP_Add_Unit_Test(test-upnp-gh-153 poc_gh_153.c)
 
+# Issue #325: crash in alias_release() when UpnpFinish() destroys gWebMutex
+# while a thread pool thread still holds or waits on it.  Detected by TSan.
+# Uses the same web_server_ut_* hooks and requires Threads::Threads because
+# the test spawns a background thread with pthread_create.
+UPNP_Add_Unit_Test(test-upnp-gh-325 poc_gh_325.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-gh-325 PRIVATE
+		Threads::Threads
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-gh-325-static PRIVATE
+		Threads::Threads
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # Issue #347: HTTP response headers must use title-case names.
 # Starts the UPnP HTTP server via UpnpInit2, sends a GET request over a raw
 # TCP socket, and verifies title-case header names in the response.

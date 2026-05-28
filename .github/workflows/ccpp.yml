@@ -43,6 +43,11 @@ env:
     -DCMAKE_CXX_FLAGS="-fsanitize=address,leak" \
     -DCMAKE_SHARED_LINKER_FLAGS="-fsanitize=address,leak"
 
+  cmake_tsan_flags: |-
+    -DCMAKE_C_FLAGS="-fsanitize=thread" \
+    -DCMAKE_CXX_FLAGS="-fsanitize=thread" \
+    -DCMAKE_SHARED_LINKER_FLAGS="-fsanitize=thread"
+
   ctest_flags: |-
     --test-dir build \
     --output-on-failure \
@@ -253,3 +258,28 @@ jobs:
       - name: ctest (cmake)
         if: ${{ matrix.tool == 'cmake' }}
         run: ctest ${{ env.ctest_flags }}
+  # Linux TSan build (cmake only — TSan is incompatible with ASan/LSan)
+  build_tsan:
+    name: TSan build (ubuntu-latest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Python test dependencies
+        run: pip install pytest
+      - name: configure
+        run: |
+          cmake \
+            ${{ env.cmake_common_flags }} \
+            -DCMAKE_BUILD_TYPE=Debug \
+            ${{ env.cmake_tsan_flags }}
+      - name: build
+        run: cmake --build build
+      - name: ctest
+        # libtsan.so needs TLS slots that Python exhausts before dlopen();
+        # preloading it at process start avoids the "static TLS block" error
+        # in the Python ctypes tests.
+        run: |
+          LD_PRELOAD=$(gcc -print-file-name=libtsan.so) \
+          ctest ${{ env.ctest_flags }}
+        env:
+          TSAN_OPTIONS: halt_on_error=1
