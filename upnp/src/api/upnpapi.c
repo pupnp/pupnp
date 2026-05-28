@@ -737,9 +737,6 @@ int UpnpFinish(void)
 #if EXCLUDE_MINISERVER == 0
 	StopMiniServer();
 #endif
-#if EXCLUDE_WEB_SERVER == 0
-	web_server_destroy();
-#endif
 	ThreadPoolShutdown(&gMiniServerThreadPool);
 	PrintThreadPoolStats(&gMiniServerThreadPool,
 		__FILE__,
@@ -751,6 +748,9 @@ int UpnpFinish(void)
 	ThreadPoolShutdown(&gSendThreadPool);
 	PrintThreadPoolStats(
 		&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
+#if EXCLUDE_WEB_SERVER == 0
+	web_server_destroy();
+#endif
 #ifdef INCLUDE_CLIENT_APIS
 	ithread_mutex_destroy(&GlobalClientSubscribeMutex);
 #endif
