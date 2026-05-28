@@ -23,11 +23,20 @@ dnl #
 dnl # *please update only once, before a formal release, not for each change*
 dnl #
 dnl ############################################################################
-AC_INIT([libupnp],[1.20.0],[mroberto@users.sourceforge.net])
+AC_INIT([libupnp],[2.0.0],[mroberto@users.sourceforge.net])
 AC_SUBST([LT_VERSION_IXML], [12:8:1])
-AC_SUBST([LT_VERSION_UPNP], [21:0:1])
+AC_SUBST([LT_VERSION_UPNP], [22:0:0])
 dnl ############################################################################
-dnl # Release 1.20.0 (next)
+dnl # Release 2.0.0 (next)
+dnl # "current:revision:age"
+dnl #
+dnl # - Interface removed: UpnpPrintf removed from public API (issue #365)
+dnl #   current: 21 -> 22
+dnl #   revision: 0
+dnl #   age: 1 -> 0  (interface removed, not backward compatible)
+dnl #
+dnl ############################################################################
+dnl # Release 1.20.0
 dnl # "current:revision:age"
 dnl #
 dnl # - Interfaces added in upnp: UpnpGetSsdpReqPort4, UpnpGetSsdpReqPort6
