@@ -37,47 +37,31 @@ set(UPNP_SOURCES
 	src/threadutil/ThreadPool.c
 	src/threadutil/TimerThread.c
 	src/urlconfig/urlconfig.c
+	$<$<BOOL:${WIN32}>:src/inet_pton.c>
+	$<$<BOOL:${UPNP_ENABLE_GENA}>:src/gena/gena_callback2.c>
+	$<$<BOOL:${UPNP_ENABLE_GENA}>:src/gena/gena_ctrlpt.c>
+	$<$<BOOL:${UPNP_ENABLE_GENA}>:src/gena/gena_device.c>
+	$<$<BOOL:${UPNP_ENABLE_SOAP}>:src/soap/soap_common.c>
+	$<$<BOOL:${UPNP_ENABLE_SOAP}>:src/soap/soap_ctrlpt.c>
+	$<$<BOOL:${UPNP_ENABLE_SOAP}>:src/soap/soap_device.c>
+	$<$<BOOL:${UPNP_ENABLE_SSDP}>:src/ssdp/SSDPResultData.c>
+	$<$<BOOL:${UPNP_ENABLE_SSDP}>:src/ssdp/SSDPResultDataCallback.c>
+	$<$<BOOL:${UPNP_ENABLE_SSDP}>:src/ssdp/ssdp_device.c>
+	$<$<BOOL:${UPNP_ENABLE_SSDP}>:src/ssdp/ssdp_ctrlpt.c>
+	$<$<BOOL:${UPNP_ENABLE_SSDP}>:src/ssdp/ssdp_server.c>
+	$<$<OR:$<BOOL:${UPNP_ENABLE_GENA}>,
+		$<BOOL:${UPNP_ENABLE_OPTIONAL_SSDP_HEADERS}>>:
+		src/uuid/md5.c>
+	$<$<OR:$<BOOL:${UPNP_ENABLE_GENA}>,
+		$<BOOL:${UPNP_ENABLE_OPTIONAL_SSDP_HEADERS}>>:
+		src/uuid/sysdep.c>
+	$<$<OR:$<BOOL:${UPNP_ENABLE_GENA}>,
+		$<BOOL:${UPNP_ENABLE_OPTIONAL_SSDP_HEADERS}>>:
+		src/uuid/uuid.c>
+	$<$<BOOL:${UPNP_ENABLE_HELPER_API_TOOLS}>:src/api/upnptools.c>
 )
 
-if(WIN32)
-	list (APPEND UPNP_SOURCES
-		src/inet_pton.c
-	)
-endif()
-
-if(UPNP_ENABLE_GENA)
-	list(APPEND UPNP_SOURCES src/gena/gena_device.c src/gena/gena_ctrlpt.c
-		src/gena/gena_callback2.c
-	)
-endif()
-
-if(UPNP_ENABLE_SOAP)
-	list(APPEND UPNP_SOURCES src/soap/soap_device.c src/soap/soap_ctrlpt.c
-		src/soap/soap_common.c
-	)
-endif()
-
-if(UPNP_ENABLE_SSDP)
-	list(
-		APPEND
-		UPNP_SOURCES
-		src/ssdp/SSDPResultData.c
-		src/ssdp/SSDPResultDataCallback.c
-		src/ssdp/ssdp_device.c
-		src/ssdp/ssdp_ctrlpt.c
-		src/ssdp/ssdp_server.c
-	)
-endif()
-
-if(UPNP_ENABLE_GENA OR UPNP_ENABLE_OPTIONAL_SSDP_HEADERS)
-	list(APPEND UPNP_SOURCES src/uuid/md5.c src/uuid/sysdep.c
-		src/uuid/uuid.c
-	)
-endif()
-
-list(
-	APPEND
-	UPNP_HEADERS
+set(UPNP_HEADERS
 	inc/Callback.h
 	inc/list.h
 	inc/upnp.h
@@ -98,13 +82,8 @@ list(
 	inc/UpnpSubscriptionRequest.h
 	inc/UpnpUniStd.h
 	${PUPNP_BINARY_DIR}/upnp/inc/upnpconfig.h
+	$<$<BOOL:${UPNP_ENABLE_HELPER_API_TOOLS}>:${PUPNP_SOURCE_DIR}/upnp/inc/upnptools.h>
 )
-
-if(UPNP_ENABLE_HELPER_API_TOOLS)
-	list(APPEND UPNP_SOURCES src/api/upnptools.c)
-
-	list(APPEND UPNP_HEADERS inc/upnptools.h)
-endif()
 
 if(UPNP_BUILD_SHARED)
 	add_library(upnp_shared SHARED ${UPNP_SOURCES} ${UPNP_HEADERS})
