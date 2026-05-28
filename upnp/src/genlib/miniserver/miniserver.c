@@ -98,10 +98,15 @@ typedef enum
 /*! . */
 static uint16_t miniStopSockPort;
 
-/*!
- * module vars
- */
+	/*!
+	 * module vars
+	 */
+	/* MSVC does not implement the C11 _Atomic qualifier. */
+	#ifdef _MSC_VER
 static MiniServerState gMServState = MSERV_IDLE;
+	#else
+static _Atomic MiniServerState gMServState = MSERV_IDLE;
+	#endif
 
 /*! Global list to track active socket connections */
 static LinkedList gActiveConnections;
