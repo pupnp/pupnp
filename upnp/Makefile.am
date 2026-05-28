@@ -206,8 +206,13 @@ test_list_SOURCES = test/test_list.c
 test_parse_uri_SOURCES = test/test_parse_uri.c test/test_parse_uri_impl.c
 test_parse_uri_LDADD = $(LDADD)
 
+# Issue #365: UpnpPrintf must not be a public DSO symbol.  The script exits
+# 77 (automake SKIP) when nm is unavailable or on non-ELF platforms.
+TESTS += test/check_symbol_visibility.sh
+
 EXTRA_DIST = \
 	m4/libupnp.m4 \
-	src/win_dll.c
+	src/win_dll.c \
+	test/check_symbol_visibility.sh
 
 CLEANFILES = libupnp_err.log libupnp_info.log

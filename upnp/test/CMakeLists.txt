@@ -265,3 +265,21 @@ if(UPNP_BUILD_STATIC)
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
 	)
 endif()
+
+# Issue #365: UpnpPrintf must not appear in the shared library's public symbol
+# table.  The script exits 77 (skip) when nm is unavailable or on non-ELF
+# platforms (Windows, macOS).
+if(UPNP_BUILD_SHARED)
+	add_test(
+		NAME test-upnp-UpnpPrintf-not-exported
+		COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/check_symbol_visibility.sh
+			$<TARGET_FILE:upnp_shared>
+	)
+	# Clear LD_PRELOAD so the sh subprocess does not inherit TSan's preload library.
+	# TSan CI sets LD_PRELOAD=libtsan.so globally; sh running under TSan with
+	# TSAN_OPTIONS=halt_on_error=1 causes a SEGFAULT before the script can run.
+	set_tests_properties(test-upnp-UpnpPrintf-not-exported
+		PROPERTIES
+			SKIP_RETURN_CODE 77
+			ENVIRONMENT "LD_PRELOAD=")
+endif()
