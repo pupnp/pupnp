@@ -45,7 +45,7 @@
 #include "UpnpStdInt.h" /* ssize_t on MSVC */ // IWYU pragma: keep
 #include "upnp.h"
 
-#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
 #include "upnputil.h"
 
 #include <assert.h>

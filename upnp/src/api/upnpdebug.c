@@ -38,6 +38,7 @@
 #include "ithread.h"
 #include "upnp.h"
 #include "upnpdebug.h"
+#include "upnpdebug_internal.h"
 
 #include <errno.h>
 #include <stdarg.h>
@@ -256,6 +257,9 @@ static void UpnpDisplayFileAndLine(FILE *fp,
 	fflush(fp);
 }
 
+#if defined(__GNUC__) && __GNUC__ >= 4
+__attribute__((visibility("hidden")))
+#endif
 void UpnpPrintf(Upnp_LogLevel DLevel,
 	Dbg_Module Module,
 	const char *DbgFileName,

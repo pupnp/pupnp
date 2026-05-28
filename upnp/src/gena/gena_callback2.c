@@ -38,7 +38,7 @@
 	#include "httpparser.h"
 	#include "httpreadwrite.h"
 	#include "statcodes.h"
-	#include "upnpdebug.h"
+	#include "upnpdebug_internal.h"
 
 /************************************************************************
  * Function : error_respond

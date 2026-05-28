@@ -45,7 +45,7 @@
 #include "httpparser.h"
 #include "statcodes.h"
 #include "strintmap.h"
-#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
 
 #include <assert.h>
 #include <ctype.h>

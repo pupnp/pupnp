@@ -187,60 +187,9 @@ static UPNP_INLINE FILE *UpnpGetDebugFile_Inlined(
 }
 #endif
 
-/*!
- * \brief Prints the debug statement either on the standard output or log file
- * along with the information from where this debug statement is coming.
- */
-void UpnpPrintf(
-	/*! [in] The level of the debug logging. It will decide whether debug
-	 * statement will go to standard output, or any of the log files. */
-	Upnp_LogLevel DLevel,
-	/*! [in] debug will go in the name of this module. */
-	Dbg_Module Module,
-	/*! [in] Name of the file from where debug statement is coming. */
-	const char *DbgFileName,
-	/*! [in] Line number of the file from where debug statement is coming.
-	 */
-	int DbgLineNo,
-	/*! [in] Printf like format specification. */
-	const char *FmtStr,
-	/*! [in] Printf like Variable number of arguments that will go in the
-	 * debug statement. */
-	...)
-#if (__GNUC__ >= 3)
-	/* This enables printf like format checking by the compiler. */
-	__attribute__((format(__printf__, 5, 6)))
-#endif
-	;
-
-#if defined NDEBUG && !defined UPNP_DEBUG_C
-	#define UpnpPrintf UpnpPrintf_Inlined
-// static UPNP_INLINE void UpnpPrintf_Inlined(Upnp_LogLevel DLevel,
-// 	Dbg_Module Module,
-// 	const char *DbgFileName,
-// 	int DbgLineNo,
-// 	const char *FmtStr,
-// 	...)
-// #if (__GNUC__ >= 3)
-// 	/* This enables printf like format checking by the compiler. */
-// 	__attribute__((format(__printf__, 5, 6)))
-// #endif
-// 	;
-static UPNP_INLINE void UpnpPrintf_Inlined(Upnp_LogLevel DLevel,
-	Dbg_Module Module,
-	const char *DbgFileName,
-	int DbgLineNo,
-	const char *FmtStr,
-	...)
-{
-	(void)DLevel;
-	(void)Module;
-	(void)DbgFileName;
-	(void)DbgLineNo;
-	(void)FmtStr;
-	return;
-}
-#endif /* DEBUG */
+/* UpnpPrintf is an internal function removed from the public API (issue #365).
+ * Library-internal callers: include upnpdebug_internal.h.
+ * External callers: use UpnpGetDebugFile() to obtain the log FILE pointer. */
 
 #ifdef __cplusplus
 }

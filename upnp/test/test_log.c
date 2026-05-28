@@ -64,19 +64,18 @@ int main(void)
 #endif /* !NDEBUG */
 
 #ifdef UPNP_HAVE_DEBUG
+	/* UpnpPrintf is an internal (hidden) symbol as of issue #365.
+	 * This block uses only the public UpnpGetDebugFile() API so that the
+	 * test links correctly whether UpnpPrintf is exported or not. */
 	int i;
-	FILE *fp;
+	FILE *logfp;
 
 	/* Try a few random calls (let's crash it...) */
 	UpnpCloseLog();
 	UpnpCloseLog();
-	UpnpPrintf(UPNP_CRITICAL,
-		API,
-		__FILE__,
-		__LINE__,
-		"This should not be printed !\n");
-	fp = UpnpGetDebugFile(UPNP_CRITICAL, API);
-	if (fp) {
+	/* Before init: any log-level query must return NULL. */
+	logfp = UpnpGetDebugFile(UPNP_CRITICAL, API);
+	if (logfp) {
 		fprintf(stderr, "Log FP not NULL before init was called !\n");
 		exit(1);
 	}
@@ -86,28 +85,36 @@ int main(void)
 	UpnpSetLogLevel(UPNP_ERROR);
 	UpnpInitLog();
 
-	UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__, "Hello LOG !\n");
-	UpnpPrintf(UPNP_INFO,
-		API,
-		__FILE__,
-		__LINE__,
-		"This should not be here !\n");
+	logfp = UpnpGetDebugFile(UPNP_CRITICAL, API);
+	if (logfp)
+		fprintf(logfp, "Hello LOG !\n");
+	/* UPNP_INFO must be filtered when the active level is UPNP_ERROR. */
+	if (UpnpGetDebugFile(UPNP_INFO, API)) {
+		fprintf(stderr,
+			"BUG: UPNP_INFO not filtered at UPNP_ERROR level\n");
+		exit(1);
+	}
 
 	/* Let's try to a file */
 	UpnpSetLogFileNames("libupnp_err.log", NULL);
 	UpnpInitLog();
-	UpnpPrintf(UPNP_CRITICAL,
-		API,
-		__FILE__,
-		__LINE__,
-		"Hello from the log file\n");
+	logfp = UpnpGetDebugFile(UPNP_CRITICAL, API);
+	if (logfp)
+		fprintf(logfp, "Hello from the log file\n");
 
 	/* Close and retry stuff */
 	UpnpCloseLog();
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Not here either!\n");
+	/* After close, log queries must return NULL again. */
+	logfp = UpnpGetDebugFile(UPNP_CRITICAL, API);
+	if (logfp) {
+		fprintf(stderr, "BUG: log FP not NULL after UpnpCloseLog()\n");
+		exit(1);
+	}
 	UpnpSetLogFileNames(NULL, NULL);
 	UpnpInitLog();
-	UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__, "I'm back !\n");
+	logfp = UpnpGetDebugFile(UPNP_CRITICAL, API);
+	if (logfp)
+		fprintf(logfp, "I'm back !\n");
 	for (i = 0; i < 10000; i++) {
 		UpnpInitLog();
 		UpnpCloseLog();

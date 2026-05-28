@@ -40,7 +40,7 @@
 #include "membuffer.h"
 #include "unixutil.h"
 #include "upnp.h"
-#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
 #include "upnputil.h"
 #include "uri.h"
 #include "urlconfig.h"
