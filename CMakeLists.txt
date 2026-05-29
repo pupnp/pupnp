@@ -196,43 +196,47 @@ endif()
 if(NOT MSVC)
 	set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 	include(FindThreads)
-
-	if(NOT DOWNLOAD_AND_BUILD_DEPS)
-		if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
-			add_library(Threads::Shared ALIAS Threads::Threads)
-			add_library(Threads::Static ALIAS Threads::Threads)
-		else()
-			add_library(Threads::Shared INTERFACE IMPORTED)
-			add_library(Threads::Static INTERFACE IMPORTED)
-
-			# The following two blocks replicate the original FindThreads
-			if(THREADS_HAVE_PTHREAD_ARG)
-				set_property(TARGET Threads::Shared PROPERTY
-					INTERFACE_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:-Xcompiler -pthread>"
-					"$<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:-pthread>"
-				)
-
-				set_property(TARGET Threads::Static PROPERTY
-					INTERFACE_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:-Xcompiler -pthread>"
-					"$<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:-pthread>"
-				)
-			endif()
-
-			if(CMAKE_THREAD_LIBS_INIT)
-				get_target_property(thread_location Threads::Threads INTERFACE_LINK_LIBRARIES)
-
-				set_target_properties(Threads::Shared PROPERTIES
-					INTERFACE_LINK_LIBRARIES ${thread_location}
-				)
-
-				set_target_properties(Threads::Static PROPERTIES
-					INTERFACE_LINK_LIBRARIES ${thread_location}
-				)
-			endif()
-		endif()
-	endif()
 else()
 	find_package(PTHREADS4W CONFIG REQUIRED)
+endif()
+
+# Threads::Shared and Threads::Static are convenience aliases used by the
+# upnp and test targets.  They must be created in all configurations,
+# including DOWNLOAD_AND_BUILD_DEPS=ON (where the guard below was previously
+# preventing their creation and causing configure errors on all platforms).
+if(TARGET Threads::Threads AND NOT TARGET Threads::Shared)
+	if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
+		add_library(Threads::Shared ALIAS Threads::Threads)
+		add_library(Threads::Static ALIAS Threads::Threads)
+	else()
+		add_library(Threads::Shared INTERFACE IMPORTED)
+		add_library(Threads::Static INTERFACE IMPORTED)
+
+		# Replicate the flags/libraries from Threads::Threads
+		if(THREADS_HAVE_PTHREAD_ARG)
+			set_property(TARGET Threads::Shared PROPERTY
+				INTERFACE_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:-Xcompiler -pthread>"
+				"$<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:-pthread>"
+			)
+
+			set_property(TARGET Threads::Static PROPERTY
+				INTERFACE_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:-Xcompiler -pthread>"
+				"$<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:-pthread>"
+			)
+		endif()
+
+		if(CMAKE_THREAD_LIBS_INIT)
+			get_target_property(thread_location Threads::Threads INTERFACE_LINK_LIBRARIES)
+
+			set_target_properties(Threads::Shared PROPERTIES
+				INTERFACE_LINK_LIBRARIES ${thread_location}
+			)
+
+			set_target_properties(Threads::Static PROPERTIES
+				INTERFACE_LINK_LIBRARIES ${thread_location}
+			)
+		endif()
+	endif()
 endif()
 
 #
