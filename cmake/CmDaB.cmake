@@ -40,7 +40,7 @@ if (DOWNLOAD_AND_BUILD_DEPS)
 	FetchContent_Declare (
 		CmDaB
 		GIT_REPOSITORY https://github.com/Vollstrecker/CmDaB.git
-		GIT_TAG main
+		GIT_TAG f079cb2  # pin to known-good commit; update when upgrading CmDaB
 	)
 
 	FetchContent_GetProperties(CmDaB)
