@@ -200,10 +200,14 @@ static UPNP_INLINE int calc_descURL(
 		/* len <= LINE_SIZE verified above; GCC cannot prove it
 		 * statically */
 		/* clang-format off */
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
 	snprintf(descURL, LINE_SIZE, "%s%s%s", http_scheme, ipPortStr, alias);
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
+#endif
 	/* clang-format on */
 	UpnpPrintf(
 		UPNP_INFO, API, __FILE__, __LINE__, "desc url: %s\n", descURL);

@@ -131,8 +131,10 @@ extern ithread_rwlock_t GlobalHndRWLock;
  * \return HND_DEVICE, UPNP_E_INVALID_HANDLE
  */
 static enum Upnp_LogLevel_e debug_handle = UPNP_NEVER;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
+#if defined(__GNUC__)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-function"
+#endif
 Upnp_Handle_Type GetHandleInfo(
 	/*! handle pointer (key for the client handle structure). */
 	int Hnd,
@@ -164,7 +166,9 @@ static void HandleLock(const char *file, int line)
 {
 	HandleWriteLock(file, line);
 }
-#pragma GCC diagnostic pop
+#if defined(__GNUC__)
+	#pragma GCC diagnostic pop
+#endif
 
 /*!
  * \brief Get client handle info.
