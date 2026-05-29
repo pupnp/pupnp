@@ -105,6 +105,10 @@
  *  (i.e. configure --enable-tools) : <upnp/upnptools.h> file is available */
 #cmakedefine UPNP_HAVE_TOOLS 1
 
+/** Defined to 1 if the library has been compiled with debug logging enabled
+ *  (i.e. configure --enable-debug or cmake -DUPNP_ENABLE_DEBUG=ON) */
+#cmakedefine UPNP_HAVE_DEBUG 1
+
 /** Defined to 1 if the library has been compiled with ipv6 support
  *  (i.e. configure --enable-ipv6) */
 #cmakedefine UPNP_ENABLE_IPV6 1
