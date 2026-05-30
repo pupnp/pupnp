@@ -58,7 +58,6 @@ add_test(NAME ixml_find_package_configure
 		-B${CMAKE_CURRENT_BINARY_DIR}/findpackage_test_build
 		-DCMAKE_BUILD_TYPE=$<CONFIG>
 		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-		-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
 		-DIXML_ROOT=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
 		-G "${CMAKE_GENERATOR}"
@@ -89,7 +88,6 @@ add_test(NAME ixml_find_package_no_components_configure
 		-B${CMAKE_CURRENT_BINARY_DIR}/findpackage_no_components_test_build
 		-DCMAKE_BUILD_TYPE=$<CONFIG>
 		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-		-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
 		-DIXML_ROOT=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
 		-G "${CMAKE_GENERATOR}"
@@ -108,7 +106,6 @@ add_test(NAME ixml_find_package_wrong_components_configure
 		-B${CMAKE_CURRENT_BINARY_DIR}/findpackage_wrong_components_test_build
 		-DCMAKE_BUILD_TYPE=$<CONFIG>
 		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-		-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
 		-DIXML_ROOT=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
 		-G "${CMAKE_GENERATOR}"
@@ -128,7 +125,6 @@ add_test(NAME ixml_add_subdirectory_configure
 		-B${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test_build
 		-DCMAKE_BUILD_TYPE=$<CONFIG>
 		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-		-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
 		-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
 		-G "${CMAKE_GENERATOR}"
@@ -156,7 +152,6 @@ add_test(NAME ixml_add_subdirectory_exclude_configure
 		-B${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test_build
 		-DCMAKE_BUILD_TYPE=$<CONFIG>
 		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-		-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
 		-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
 		-G "${CMAKE_GENERATOR}"
