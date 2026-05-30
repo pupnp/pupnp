@@ -283,3 +283,177 @@ if(UPNP_BUILD_SHARED)
 			SKIP_RETURN_CODE 77
 			ENVIRONMENT "LD_PRELOAD=")
 endif()
+
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/findpackage_test)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/find_package_no_components_test)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/find_package_wrong_components_test)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test)
+
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/find_package_test.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/findpackage_test/CMakeLists.txt @ONLY)
+
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/find_package_no_components.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/findpackage_no_components_test/CMakeLists.txt
+	@ONLY)
+
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/find_package_wrong_components.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/findpackage_wrong_components_test/CMakeLists.txt
+	@ONLY)
+
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/add_subdirectory.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test/CMakeLists.txt @ONLY)
+
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/add_subdirectory_exclude.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test/CMakeLists.txt
+	@ONLY)
+
+add_test(NAME upnp_install
+	COMMAND ${CMAKE_COMMAND}
+		--install ${PUPNP_BINARY_DIR}
+		--prefix ${CMAKE_CURRENT_BINARY_DIR}/upnp_test_install
+		--config $<CONFIG>
+    WORKING_DIRECTORY ${PUPNP_BINARY_DIR})
+
+set_tests_properties(upnp_install
+	PROPERTIES FIXTURES_SETUP upnp_install)
+
+# CMAKE_GENERATOR_PLATFORM doesn't work in the if
+set(GENERATOR ${CMAKE_GENERATOR_PLATFORM})
+
+if(GENERATOR)
+	set(PLATFORM "-A ${GENERATOR}")
+endif(GENERATOR)
+
+#
+# findpackage_test
+#
+add_test(NAME upnp_find_package_configure
+	COMMAND ${CMAKE_COMMAND}
+		${PLATFORM}
+		-B${CMAKE_CURRENT_BINARY_DIR}/findpackage_test_build
+		-DCMAKE_BUILD_TYPE=$<CONFIG>
+		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+		-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/upnp_test_install
+		-DUPNP_ROOT=${CMAKE_CURRENT_BINARY_DIR}/upnp_test_install
+		-G "${CMAKE_GENERATOR}"
+		-S${CMAKE_CURRENT_BINARY_DIR}/findpackage_test)
+
+add_test(NAME upnp_find_package_build
+	COMMAND ${CMAKE_COMMAND}
+		--build .
+		--config $<CONFIG>
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/findpackage_test_build)
+
+set_tests_properties(upnp_find_package_configure
+	PROPERTIES
+		FIXTURES_REQUIRED upnp_install
+		FIXTURES_SETUP upnp_fp_config)
+
+set_tests_properties(upnp_find_package_build
+	PROPERTIES
+		FIXTURES_REQUIRED upnp_fp_config
+		FIXTURES_SETUP upnp_fp_build)
+
+#
+# findpackage_no_components_test
+#
+add_test(NAME upnp_find_package_no_components_configure
+	COMMAND ${CMAKE_COMMAND}
+		${PLATFORM}
+		-B${CMAKE_CURRENT_BINARY_DIR}/findpackage_no_components_test_build
+		-DCMAKE_BUILD_TYPE=$<CONFIG>
+		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+		-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/upnp_test_install
+		-DUPNP_ROOT=${CMAKE_CURRENT_BINARY_DIR}/upnp_test_install
+		-G "${CMAKE_GENERATOR}"
+		-S${CMAKE_CURRENT_BINARY_DIR}/findpackage_no_components_test)
+
+set_tests_properties(upnp_find_package_no_components_configure
+	PROPERTIES
+		FIXTURES_REQUIRED upnp_install)
+
+#
+# findpackage_no_component_test
+#
+add_test(NAME upnp_find_package_wrong_components_configure
+	COMMAND	${CMAKE_COMMAND}
+		${PLATFORM}
+		-B${CMAKE_CURRENT_BINARY_DIR}/findpackage_wrong_components_test_build
+		-DCMAKE_BUILD_TYPE=$<CONFIG>
+		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+		-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/upnp_test_install
+		-DUPNP_ROOT=${CMAKE_CURRENT_BINARY_DIR}/UPNP_test_install
+		-G "${CMAKE_GENERATOR}"
+		-S${CMAKE_CURRENT_BINARY_DIR}/findpackage_wrong_components_test)
+
+set_tests_properties(upnp_find_package_wrong_components_configure
+	PROPERTIES
+		FIXTURES_REQUIRED upnp_install
+		WILL_FAIL TRUE)
+
+#
+# add_subdirectory_test
+#
+add_test(NAME upnp_add_subdirectory_configure
+	COMMAND ${CMAKE_COMMAND}
+		${PLATFORM}
+		-B${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test_build
+		-DCMAKE_BUILD_TYPE=$<CONFIG>
+		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+		-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/upnp_test_install
+		-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
+		-G "${CMAKE_GENERATOR}"
+		-S${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test)
+
+add_test(NAME upnp_add_subdirectory_build
+	COMMAND ${CMAKE_COMMAND} --build . --config $<CONFIG>
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test_build)
+
+set_tests_properties(upnp_add_subdirectory_configure
+	PROPERTIES
+		FIXTURES_REQUIRED upnp_install
+		FIXTURES_SETUP upnp_as_config)
+
+set_tests_properties(upnp_add_subdirectory_build
+	PROPERTIES
+	FIXTURES_REQUIRED as_config)
+
+#
+# add_subdirectory_exclude_test
+#
+add_test(NAME upnp_add_subdirectory_exclude_configure
+	COMMAND ${CMAKE_COMMAND}
+		${PLATFORM}
+		-B${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test_build
+		-DCMAKE_BUILD_TYPE=$<CONFIG>
+		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+		-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/upnp_test_install
+		-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
+		-G "${CMAKE_GENERATOR}"
+		-S${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test)
+
+add_test(NAME upnp_add_subdirectory_exclude_build
+	COMMAND ${CMAKE_COMMAND} --build . --config $<CONFIG>
+	WORKING_DIRECTORY
+		${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test_build)
+
+
+set_tests_properties(upnp_add_subdirectory_exclude_configure
+	PROPERTIES
+		FIXTURES_REQUIRED upnp_install
+		FIXTURES_SETUP upnp_asx_config)
+
+set_tests_properties(upnp_add_subdirectory_exclude_build
+	PROPERTIES
+		FIXTURES_REQUIRED upnp_as_config)
