@@ -381,7 +381,7 @@ set_tests_properties(upnp_find_package_no_components_configure
 		FIXTURES_REQUIRED upnp_install)
 
 #
-# findpackage_no_component_test
+# findpackage_wrong_component_test
 #
 add_test(NAME upnp_find_package_wrong_components_configure
 	COMMAND	${CMAKE_COMMAND}
@@ -391,7 +391,7 @@ add_test(NAME upnp_find_package_wrong_components_configure
 		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
 		-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/upnp_test_install
-		-DUPNP_ROOT=${CMAKE_CURRENT_BINARY_DIR}/UPNP_test_install
+		-DUPNP_ROOT=${CMAKE_CURRENT_BINARY_DIR}/upnp_test_install
 		-G "${CMAKE_GENERATOR}"
 		-S${CMAKE_CURRENT_BINARY_DIR}/findpackage_wrong_components_test)
 
