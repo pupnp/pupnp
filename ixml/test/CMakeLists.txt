@@ -151,7 +151,7 @@ set_tests_properties(ixml_add_subdirectory_configure
 
 set_tests_properties(ixml_add_subdirectory_build
 	PROPERTIES
-	FIXTURES_REQUIRED as_config)
+	FIXTURES_REQUIRED ixml_as_config)
 
 #
 # add_subdirectory_exclude_test
