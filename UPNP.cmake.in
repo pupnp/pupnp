@@ -43,6 +43,10 @@ if(NOT MSVC)
 	find_dependency (Threads)
 endif()
 
+if(@UPNP_ENABLE_OPEN_SSL@)
+	find_dependency(OpenSSL)
+endif()
+
 include(${CMAKE_CURRENT_LIST_DIR}/UPNP.cmake)
 
 if(NOT UPNP_FIND_COMPONENTS)
