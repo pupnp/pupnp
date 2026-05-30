@@ -127,6 +127,7 @@ add_test(NAME ixml_add_subdirectory_configure
 		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
 		-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
+		-DBUILD_TESTING=OFF
 		-G "${CMAKE_GENERATOR}"
 		-S${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test)
 
@@ -154,6 +155,7 @@ add_test(NAME ixml_add_subdirectory_exclude_configure
 		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
 		-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
+		-DBUILD_TESTING=OFF
 		-G "${CMAKE_GENERATOR}"
 		-S${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test)
 
