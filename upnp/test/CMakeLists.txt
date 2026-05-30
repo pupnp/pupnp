@@ -416,7 +416,7 @@ set_tests_properties(upnp_add_subdirectory_configure
 
 set_tests_properties(upnp_add_subdirectory_build
 	PROPERTIES
-	FIXTURES_REQUIRED as_config)
+	FIXTURES_REQUIRED upnp_as_config)
 
 #
 # add_subdirectory_exclude_test
