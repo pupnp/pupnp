@@ -13,7 +13,7 @@ if(UPNP_BUILD_SHARED)
 	target_link_libraries(test_list_shared UPNP::Shared)
 endif()
 
-if(UPNP_BUILD_SHARED)
+if(UPNP_BUILD_STATIC)
 	find_package(UPNP @UPNP_SOVERSION_STRING@ CONFIG COMPONENTS Static REQUIRED)
 	add_executable(test_list_static @PUPNP_SOURCE_DIR@/upnp/test/test_list.c)
 	target_link_libraries(test_list_static UPNP::Static)

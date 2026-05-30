@@ -14,7 +14,7 @@ if(UPNP_BUILD_SHARED)
 	target_link_libraries(test_document_shared IXML::Shared)
 endif()
 
-if(UPNP_BUILD_SHARED)
+if(UPNP_BUILD_STATIC)
 	add_executable(test_document_static @PUPNP_SOURCE_DIR@/ixml/test/test_document.c)
 	target_link_libraries(test_document_static IXML::Static)
 endif()
