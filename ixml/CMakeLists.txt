@@ -1,3 +1,7 @@
+project(ixml
+	VERSION ${IXML_SOVERSION_STRING}
+	LANGUAGES C)
+
 if(BUILD_TESTING)
 	enable_testing()
 	add_subdirectory(test)
@@ -16,7 +20,9 @@ set(IXML_SOURCES
 	src/nodeList.c
 )
 
-list(APPEND IXML_HEADERS inc/ixml.h inc/ixmldebug.h)
+set(IXML_HEADERS
+	inc/ixml.h
+	inc/ixmldebug.h)
 
 if(UPNP_BUILD_SHARED)
 	add_library(ixml_shared SHARED ${IXML_SOURCES} ${IXML_HEADERS})

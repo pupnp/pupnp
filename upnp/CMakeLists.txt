@@ -1,3 +1,7 @@
+project(upnp
+	VERSION ${UPNP_VERSION_STRING}
+	LANGUAGES C)
+
 # Only set library prefix with MSVC toolchain
 if(MSVC)
 	set(WIN_PREFIX "lib")
