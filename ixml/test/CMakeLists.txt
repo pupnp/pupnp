@@ -121,59 +121,129 @@ set_tests_properties(ixml_find_package_wrong_components_configure
 		WILL_FAIL TRUE)
 
 #
-# add_subdirectory_test
+# add_subdirectory_test_shared
 #
-add_test(NAME ixml_add_subdirectory_configure
-	COMMAND ${CMAKE_COMMAND}
-		${PLATFORM}
-		-B${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test_build
-		-DCMAKE_BUILD_TYPE=$<CONFIG>
-		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
-		-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
-		-DBUILD_TESTING=OFF
-		-G "${CMAKE_GENERATOR}"
-		-S${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test)
+if(UPNP_BUILD_SHARED)
+	add_test(NAME ixml_add_subdirectory_configure_shared
+		COMMAND ${CMAKE_COMMAND}
+			${PLATFORM}
+			-B${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test_build_shared
+			-DCMAKE_BUILD_TYPE=$<CONFIG>
+			-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+			-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
+			-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
+			-DBUILD_TESTING=OFF
+			-DUPNP_BUILD_SHARED=ON
+			-G "${CMAKE_GENERATOR}"
+			-S${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test)
 
-add_test(NAME ixml_add_subdirectory_build
-	COMMAND ${CMAKE_COMMAND} --build . --config $<CONFIG>
-	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test_build)
+	add_test(NAME ixml_add_subdirectory_build_shared
+		COMMAND ${CMAKE_COMMAND} --build . --config $<CONFIG>
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test_build_shared)
 
-set_tests_properties(ixml_add_subdirectory_configure
-	PROPERTIES
-		FIXTURES_REQUIRED ixml_install
-		FIXTURES_SETUP ixml_as_config)
+	set_tests_properties(ixml_add_subdirectory_configure_shared
+		PROPERTIES
+			FIXTURES_REQUIRED ixml_install
+			FIXTURES_SETUP ixml_as_config_shared)
 
-set_tests_properties(ixml_add_subdirectory_build
-	PROPERTIES
-	FIXTURES_REQUIRED ixml_as_config)
+	set_tests_properties(ixml_add_subdirectory_build_shared
+		PROPERTIES
+		FIXTURES_REQUIRED ixml_as_config_shared)
+endif()
 
 #
-# add_subdirectory_exclude_test
+# add_subdirectory_test_static
 #
-add_test(NAME ixml_add_subdirectory_exclude_configure
-	COMMAND ${CMAKE_COMMAND}
-		${PLATFORM}
-		-B${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test_build
-		-DCMAKE_BUILD_TYPE=$<CONFIG>
-		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
-		-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
-		-DBUILD_TESTING=OFF
-		-G "${CMAKE_GENERATOR}"
-		-S${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test)
+if(UPNP_BUILD_STATIC)
+	add_test(NAME ixml_add_subdirectory_configure_static
+		COMMAND ${CMAKE_COMMAND}
+			${PLATFORM}
+			-B${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test_build_static
+			-DCMAKE_BUILD_TYPE=$<CONFIG>
+			-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+			-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
+			-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
+			-DBUILD_TESTING=OFF
+			-DUPNP_BUILD_STATIC=ON
+			-G "${CMAKE_GENERATOR}"
+			-S${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test)
 
-add_test(NAME ixml_add_subdirectory_exclude_build
-	COMMAND ${CMAKE_COMMAND} --build . --config $<CONFIG>
-	WORKING_DIRECTORY
-		${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test_build)
+	add_test(NAME ixml_add_subdirectory_build_static
+		COMMAND ${CMAKE_COMMAND} --build . --config $<CONFIG>
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_test_build_static)
+
+	set_tests_properties(ixml_add_subdirectory_configure_static
+		PROPERTIES
+			FIXTURES_REQUIRED ixml_install
+			FIXTURES_SETUP ixml_as_config_static)
+
+	set_tests_properties(ixml_add_subdirectory_build_static
+		PROPERTIES
+		FIXTURES_REQUIRED ixml_as_config_static)
+endif()
+
+#
+# add_subdirectory_exclude_test_shared
+#
+if(UPNP_BUILD_STATIC)
+	add_test(NAME ixml_add_subdirectory_exclude_configure_shared
+		COMMAND ${CMAKE_COMMAND}
+			${PLATFORM}
+			-B${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test_build_shared
+			-DCMAKE_BUILD_TYPE=$<CONFIG>
+			-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+			-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
+			-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
+			-DBUILD_TESTING=OFF
+			-DUPNP_BUILD_SHARED=ON
+			-G "${CMAKE_GENERATOR}"
+			-S${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test)
+
+	add_test(NAME ixml_add_subdirectory_exclude_build_shared
+		COMMAND ${CMAKE_COMMAND} --build . --config $<CONFIG>
+		WORKING_DIRECTORY
+			${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test_build_shared)
 
 
-set_tests_properties(ixml_add_subdirectory_exclude_configure
-	PROPERTIES
-		FIXTURES_REQUIRED ixml_install
-		FIXTURES_SETUP ixml_asx_config)
+	set_tests_properties(ixml_add_subdirectory_exclude_configure_shared
+		PROPERTIES
+			FIXTURES_REQUIRED ixml_install
+			FIXTURES_SETUP ixml_asx_config_shared)
 
-set_tests_properties(ixml_add_subdirectory_exclude_build
-	PROPERTIES
-		FIXTURES_REQUIRED ixml_as_config)
+	set_tests_properties(ixml_add_subdirectory_exclude_build_shared
+		PROPERTIES
+			FIXTURES_REQUIRED ixml_asx_config_shared)
+endif()
+
+#
+# add_subdirectory_exclude_test_static
+#
+if(UPNP_BUILD_STATIC)
+	add_test(NAME ixml_add_subdirectory_exclude_configure_static
+		COMMAND ${CMAKE_COMMAND}
+			${PLATFORM}
+			-B${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test_build_static
+			-DCMAKE_BUILD_TYPE=$<CONFIG>
+			-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+			-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/ixml_test_install
+			-DDOWNLOAD_AND_BUILD_DEPS=${DOWNLOAD_AND_BUILD_DEPS}
+			-DBUILD_TESTING=OFF
+			-DUPNP_BUILD_STATIC=ON
+			-G "${CMAKE_GENERATOR}"
+			-S${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test)
+
+	add_test(NAME ixml_add_subdirectory_exclude_build_static
+		COMMAND ${CMAKE_COMMAND} --build . --config $<CONFIG>
+		WORKING_DIRECTORY
+			${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_exclude_test_build_static)
+
+
+	set_tests_properties(ixml_add_subdirectory_exclude_configure_static
+		PROPERTIES
+			FIXTURES_REQUIRED ixml_install
+			FIXTURES_SETUP ixml_asx_config_static)
+
+	set_tests_properties(ixml_add_subdirectory_exclude_build_static
+		PROPERTIES
+			FIXTURES_REQUIRED ixml_asx_config_static)
+endif()
