@@ -33,7 +33,6 @@ env:
   cmake_common_flags: |-
     -S . \
     -B build \
-    -DBUILD_TESTING=ON \
     -DDOWNLOAD_AND_BUILD_DEPS=ON \
     -DUPNP_ENABLE_OPEN_SSL=ON \
     -DUPNP_ENABLE_UNSPECIFIED_SERVER=ON
@@ -237,6 +236,8 @@ jobs:
             ${{ env.cmake_common_flags }} \
             -DCMAKE_C_FLAGS="-Wall -Wpedantic" \
             -DCMAKE_BUILD_TYPE=${{ matrix.conf }} \
+            -DIXML_ENABLE_TESTING_INTEGRATION=OFF \
+            -DUPNP_ENABLE_TESTING_INTEGRATION=OFF \
             ${{ env.cmake_sanitizer_flags }}
       - name: build (autotools)
         if: ${{ matrix.tool == 'autotools' }}
@@ -271,6 +272,8 @@ jobs:
           cmake \
             ${{ env.cmake_common_flags }} \
             -DCMAKE_BUILD_TYPE=Debug \
+            -DIXML_ENABLE_TESTING_INTEGRATION=OFF \
+            -DUPNP_ENABLE_TESTING_INTEGRATION=OFF \
             ${{ env.cmake_tsan_flags }}
       - name: build
         run: cmake --build build
