@@ -149,6 +149,8 @@ jobs:
             ${{ env.cmake_common_flags }} \
             -DCMAKE_BUILD_TYPE=${{ matrix.conf }} \
             -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install \
+            -DIXML_ENABLE_TESTING_INTEGRATION=OFF \
+            -DUPNP_ENABLE_TESTING_INTEGRATION=OFF \
             ${OPENSSL_ROOT_DIR:+-DOPENSSL_ROOT_DIR="$OPENSSL_ROOT_DIR"} \
             ${OPENSSL_INCLUDE_DIR:+-DOPENSSL_INCLUDE_DIR="$OPENSSL_INCLUDE_DIR"} \
             ${OPENSSL_CRYPTO_LIBRARY:+-DOPENSSL_CRYPTO_LIBRARY="$OPENSSL_CRYPTO_LIBRARY"} \
@@ -205,6 +207,8 @@ jobs:
           cmake \
             ${{ env.cmake_common_flags }} \
             -DCMAKE_BUILD_TYPE=${{ matrix.conf }} \
+            -DIXML_ENABLE_TESTING_INTEGRATION=OFF \
+            -DUPNP_ENABLE_TESTING_INTEGRATION=OFF \
             -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install
       - name: Build
         run: cmake --build build --config ${{ matrix.conf }}
