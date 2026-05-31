@@ -35,6 +35,7 @@ endif()
 
 set (IXML_HAVE_SCRIPTSUPPORT ${IXML_ENABLE_SCRIPT_SUPPORT}) #see ixml.h
 set (UPNP_HAVE_CLIENT ${UPNP_ENABLE_CLIENT_API}) #see upnpconfig.h
+set (UPNP_HAVE_DEBUG ${UPNP_ENABLE_DEBUG}) #see upnpconfig.h
 set (UPNP_HAVE_DEVICE ${UPNP_ENABLE_DEVICE_API}) #see upnpconfig.h
 set (UPNP_HAVE_GENA ${UPNP_ENABLE_GENA}) #see upnpconfig.h
 set (UPNP_HAVE_OPTSSDP ${UPNP_ENABLE_OPTIONAL_SSDP_HEADERS}) #see upnpconfig.h

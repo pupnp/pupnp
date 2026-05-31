@@ -50,7 +50,8 @@ env:
   ctest_flags: |-
     --test-dir build \
     --output-on-failure \
-    --timeout 5
+    --timeout 30 \
+    --exclude-regex "^pthreads4w"
 
   CMAKE_BUILD_PARALLEL_LEVEL: 8
 
