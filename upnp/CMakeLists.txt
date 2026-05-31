@@ -222,7 +222,7 @@ endif()
 
 install(EXPORT UPNP DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP)
 
-if(BUILD_TESTING)
+if(UPNP_ENABLE_TESTING)
 	enable_testing()
 	add_subdirectory(test)
 endif()

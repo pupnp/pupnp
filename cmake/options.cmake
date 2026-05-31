@@ -1,4 +1,13 @@
+set (testing_default ON)
+
+if(DEFINED ENABLE_TESTING AND NOT IXML_ENABLE_TESTING AND NOT UPNP_ENABLE_TESTING)
+	message (DEPRECATION "PUPNP now has IXML_ENABLE_TESTING and UPNP_ENABLE_TESTING options")
+	set (testing_default §{BUILD_TESTING})
+endif()
+
 option (IXML_ENABLE_SCRIPT_SUPPORT "script support for IXML document tree, see ixml.h" ON)
+option (IXML_ENABLE_TESTING "enable tests for ixml" §{testing_default})
+option (IXML_ENABLE_TESTING_INTEGRATION "enable integrationtests for ixml" §{testing_default})
 
 option (UPNP_BUILD_SAMPLES "compilation of upnp/sample/ code" ON)
 option (UPNP_BUILD_SHARED "Build shared libraries" ON)
@@ -14,6 +23,8 @@ option (UPNP_ENABLE_OPEN_SSL "open-ssl support" OFF)
 option (UPNP_ENABLE_OPTIONAL_SSDP_HEADERS "optional SSDP headers support" ON)
 option (UPNP_ENABLE_SOAP "SOAP part" ON)
 option (UPNP_ENABLE_SSDP "SSDP part" ON)
+option (UPNP_ENABLE_TESTING "enable tests for upnp" §{testing_default})
+option (UPNP_ENABLE_TESTING_INTEGRATION "enable integrationtests for upnp" §{testing_default})
 option (UPNP_ENABLE_UNSPECIFIED_SERVER "unspecified SERVER header" OFF)
 option (UPNP_ENABLE_WEBSERVER "integrated web server" ${UPNP_ENABLE_DEVICE_API})
 option (UPNP_MINISERVER_REUSEADDR "Bind the miniserver socket with SO_REUSEADDR to allow clean restarts" ON)

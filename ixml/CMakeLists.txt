@@ -2,7 +2,7 @@ project(ixml
 	VERSION ${IXML_SOVERSION_STRING}
 	LANGUAGES C)
 
-if(BUILD_TESTING)
+if(IXML_ENABLE_TESTING)
 	enable_testing()
 	add_subdirectory(test)
 endif()

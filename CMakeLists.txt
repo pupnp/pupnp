@@ -324,7 +324,7 @@ if(DOXYGEN_FOUND)
 	)
 endif()
 
-if(BUILD_TESTING)
+if(UPNP_ENABLE_TESTING)
 	enable_testing()
 	enable_language(CXX)
 	find_package(GTest CONFIG)

@@ -284,6 +284,10 @@ if(UPNP_BUILD_SHARED)
 			ENVIRONMENT "LD_PRELOAD=")
 endif()
 
+if(NOT UPNP_ENABLE_TESTING_INTEGRATION)
+	return()
+endif()
+
 configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/find_package_test.cmake.in
 	${CMAKE_CURRENT_BINARY_DIR}/findpackage_test/CMakeLists.txt @ONLY)

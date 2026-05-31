@@ -9,6 +9,10 @@ ixml_add_unit_test(test-ixml-poc-gh-517 poc_gh_517.cpp "")
 ixml_add_unit_test(test-ixml-poc-ghsa-hcx4 poc_ghsa_hcx4.c "")
 ixml_add_unit_test(test-ixml-poc-ghsa-hcx4-utf8 poc_ghsa_hcx4_utf8.c "")
 
+if(NOT IXML_ENABLE_TESTING_INTEGRATION)
+	return()
+endif()
+
 configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/find_package_test.cmake.in
 	${CMAKE_CURRENT_BINARY_DIR}/findpackage_test/CMakeLists.txt @ONLY)
