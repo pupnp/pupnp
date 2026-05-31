@@ -52,6 +52,8 @@ env:
     --output-on-failure \
     --timeout 5
 
+  CMAKE_BUILD_PARALLEL_LEVEL: 8
+
 jobs:
   # Linux builds
   linux:
