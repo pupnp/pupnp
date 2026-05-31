@@ -22,7 +22,6 @@ endif()
 # that have hidden visibility in the shared library, so only the static variant
 # is built.
 if (NOT WIN32 AND UPNP_BUILD_STATIC)
-	include(GoogleTest)
 	add_executable(test_miniserver-static test_miniserver.cpp)
 	target_link_libraries(test_miniserver-static PRIVATE upnp_static GTest::gmock)
 	target_include_directories(test_miniserver-static PRIVATE
@@ -45,7 +44,6 @@ endif()
 # cross-subnet delivery URLs when both device and subscriber are on RFC 1918
 # private addresses; accesses internal symbols so only the static variant.
 if (NOT WIN32 AND UPNP_BUILD_STATIC)
-	include(GoogleTest)
 	add_executable(test_gena-static test_gena.cpp)
 	target_link_libraries(test_gena-static PRIVATE upnp_static GTest::gtest)
 	target_include_directories(test_gena-static PRIVATE
@@ -68,7 +66,6 @@ endif()
 # send() on TCP sockets; sock_write() is an internal symbol (hidden visibility
 # in the shared library) so only the static variant is built.
 if (NOT WIN32 AND UPNP_BUILD_STATIC)
-	include(GoogleTest)
 	add_executable(test_sock-static test_sock.cpp)
 	target_link_libraries(test_sock-static PRIVATE upnp_static GTest::gtest)
 	target_include_directories(test_sock-static PRIVATE
@@ -90,7 +87,6 @@ endif()
 # regression test for issue #394 — http_RecvMessage must reject oversized POST
 # bodies before buffering them; accesses internal symbols so static only.
 if (NOT WIN32 AND UPNP_BUILD_STATIC)
-	include(GoogleTest)
 	add_executable(test_httpreadwrite-static test_httpreadwrite.cpp)
 	target_link_libraries(test_httpreadwrite-static PRIVATE upnp_static GTest::gtest)
 	target_include_directories(test_httpreadwrite-static PRIVATE
