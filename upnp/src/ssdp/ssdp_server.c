@@ -968,7 +968,7 @@ static int create_ssdp_sock_v4(
 	#endif /* BSD, __APPLE__ */
 	memset(&__ss, 0, sizeof(__ss));
 	ssdpAddr4->sin_family = (sa_family_t)AF_INET;
-	inet_pton(AF_INET, gIF_IPV4, &ssdpAddr4->sin_addr);
+	ssdpAddr4->sin_addr.s_addr = htonl(INADDR_ANY);
 	ssdpAddr4->sin_port = htons(SSDP_PORT);
 	ret = bind(*ssdpSock, (struct sockaddr *)ssdpAddr4, sizeof(*ssdpAddr4));
 	if (ret == -1) {
@@ -977,8 +977,8 @@ static int create_ssdp_sock_v4(
 			SSDP,
 			__FILE__,
 			__LINE__,
-			"Error in bind(), addr=%s, port=%d: %s\n",
-			gIF_IPV4,
+			"Error in bind(), addr=0x%08X, port=%d: %s\n",
+			INADDR_ANY,
 			SSDP_PORT,
 			errorBuffer);
 		ret = UPNP_E_SOCKET_BIND;
@@ -1186,7 +1186,7 @@ static int create_ssdp_sock_v6(
 	}
 	memset(&__ss, 0, sizeof(__ss));
 	ssdpAddr6->sin6_family = (sa_family_t)AF_INET6;
-	inet_pton(AF_INET6, gIF_IPV6, &ssdpAddr6->sin6_addr);
+	ssdpAddr6->sin6_addr = in6addr_any;
 		#ifndef _WIN32
 	ssdpAddr6->sin6_scope_id = gIF_INDEX;
 		#endif
@@ -1366,7 +1366,7 @@ static int create_ssdp_sock_v6_ula_gua(
 	}
 	memset(&__ss, 0, sizeof(__ss));
 	ssdpAddr6->sin6_family = (sa_family_t)AF_INET6;
-	inet_pton(AF_INET6, gIF_IPV6_ULA_GUA, &ssdpAddr6->sin6_addr);
+	ssdpAddr6->sin6_addr = in6addr_any;
 	ssdpAddr6->sin6_scope_id = gIF_INDEX;
 	ssdpAddr6->sin6_port = htons(SSDP_PORT);
 	ret = bind(*ssdpSock, (struct sockaddr *)ssdpAddr6, sizeof(*ssdpAddr6));
@@ -1376,8 +1376,8 @@ static int create_ssdp_sock_v6_ula_gua(
 			SSDP,
 			__FILE__,
 			__LINE__,
-			"Error in bind(), addr=%s, port=%d: %s\n",
-			gIF_IPV6_ULA_GUA,
+			"Error in bind(), addr=0x%032lX, port=%d: %s\n",
+			0lu,
 			SSDP_PORT,
 			errorBuffer);
 		ret = UPNP_E_SOCKET_BIND;
