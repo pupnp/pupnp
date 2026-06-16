@@ -97,6 +97,28 @@ endif()
 find_library(SOCKET_LIBRARY NAMES socket)
 find_library(NSL_LIBRARY NAMES nsl)
 
+# Issue #227 regression (PR #579): SSDP socket bound to unicast address cannot
+# receive multicast M-SEARCH queries on Linux.  Skipped on non-Linux platforms.
+UPNP_Add_Unit_Test(test-upnp-ssdp-multicast-recv test_ssdp_multicast_recv.c)
+if(UPNP_BUILD_SHARED)
+	set_tests_properties(test-upnp-ssdp-multicast-recv
+		PROPERTIES SKIP_RETURN_CODE 77)
+	target_link_libraries(test-upnp-ssdp-multicast-recv PRIVATE
+		Threads::Threads
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	set_tests_properties(test-upnp-ssdp-multicast-recv-static
+		PROPERTIES SKIP_RETURN_CODE 77)
+	target_link_libraries(test-upnp-ssdp-multicast-recv-static PRIVATE
+		Threads::Threads
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # Both GENA issue-#435 tests call socket(), connect(), send(), recv() directly.
 # On Solaris/illumos those symbols live in libsocket, not libc; link explicitly.
 if(UPNP_BUILD_SHARED)
