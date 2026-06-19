@@ -119,7 +119,7 @@ jobs:
           HOME_KEEPING_BRANCH=${REF_NAME}-home_keeping
           # Create a new branch, since the actual branch might be protected
           git switch -c $HOME_KEEPING_BRANCH
-          git add ChangeLog configure.ac docs/Doxyfile libupnp.spec
+          git add ChangeLog CMakeLists.txt docs/Doxyfile libupnp.spec
           git commit -m "Home keeping for the next release"
           git status >> "$GITHUB_STEP_SUMMARY"
           git push origin HEAD:$HOME_KEEPING_BRANCH
