@@ -6,10 +6,6 @@ permissions:
   contents: read
 
 env:
-  sanitizer_autotools_flags: |-
-    CFLAGS="-fsanitize=address,leak" \
-    LDFLAGS="-fsanitize=address,leak"
-
   cmake_common_flags: |-
     -S . \
     -B build \

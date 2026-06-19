@@ -1,4 +1,3 @@
 #! /bin/bash
 
-git restore ChangeLog configure.ac libupnp.spec docs/Doxyfile
-
+git restore ChangeLog CMakeLists.txt libupnp.spec docs/Doxyfile

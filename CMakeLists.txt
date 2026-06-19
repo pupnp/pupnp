@@ -3,7 +3,22 @@ CMAKE_POLICY(VERSION 3.13)
 
 include(cmake/CmDaB.cmake)
 include(cmake/test-functions.cmake)
-include(cmake/autoheader.cmake)
+
+# 1. Source of Truth for IXML
+set(IXML_VERSION_MAJOR 11)
+set(IXML_VERSION_MINOR 1)
+set(IXML_VERSION_PATCH 8)
+
+# 2. Source of Truth for UPNP
+set(UPNP_VERSION_MAJOR 22)
+set(UPNP_VERSION_MINOR 0)
+set(UPNP_VERSION_PATCH 3)
+
+# 3. Calculate Umbrella Version
+math(EXPR PUPNP_VERSION_MAJOR "${IXML_VERSION_MAJOR} + ${UPNP_VERSION_MAJOR}")
+math(EXPR PUPNP_VERSION_MINOR "${IXML_VERSION_MINOR} + ${UPNP_VERSION_MINOR}")
+math(EXPR PUPNP_VERSION_PATCH "${IXML_VERSION_PATCH} + ${UPNP_VERSION_PATCH}")
+set(PUPNP_VERSION_STRING "${PUPNP_VERSION_MAJOR}.${PUPNP_VERSION_MINOR}.${PUPNP_VERSION_PATCH}")
 
 project(PUPNP
 	VERSION ${PUPNP_VERSION_STRING}
@@ -257,7 +272,11 @@ endif()
 
 configure_file(${PUPNP_SOURCE_DIR}/upnp/inc/upnpconfig.h.cm ${PUPNP_BINARY_DIR}/upnp/inc/upnpconfig.h)
 configure_file(${PUPNP_SOURCE_DIR}/samples/tv/common/config_sample.h.cm ${PUPNP_BINARY_DIR}/samples/tv/common/config_sample.h)
-configure_file(${PUPNP_BINARY_DIR}/autoconfig.h.cm ${PUPNP_BINARY_DIR}/autoconfig.h)
+if(NOT UPNP_MINISERVER_REUSEADDR)
+	set(UPNP_MINISERVER_REUSEADDR 0)
+endif()
+
+configure_file(cmake/autoconfig.h.in ${PUPNP_BINARY_DIR}/autoconfig.h)
 
 add_subdirectory(ixml)
 add_subdirectory(upnp)
@@ -275,7 +294,7 @@ configure_package_config_file(
 )
 
 write_basic_package_version_file(IXMLConfigVersion.cmake
-	VERSION ${IXML_SOVERSION_STRING}
+	VERSION ${IXML_VERSION_MAJOR}.${IXML_VERSION_MINOR}.${IXML_VERSION_PATCH}
 	COMPATIBILITY SameMajorVersion
 )
 
@@ -285,7 +304,7 @@ configure_package_config_file(
 )
 
 write_basic_package_version_file(UPNPConfigVersion.cmake
-	VERSION ${UPNP_SOVERSION_STRING}
+	VERSION ${UPNP_VERSION_MAJOR}.${UPNP_VERSION_MINOR}.${UPNP_VERSION_PATCH}
 	COMPATIBILITY SameMajorVersion
 )
 
@@ -348,3 +367,21 @@ if(FUZZER)
 
 	add_subdirectory(fuzzer)
 endif()
+
+# ------------------------------------------------------------------------------
+# CPack Source Tarball Configuration (Replacement for 'make dist')
+# ------------------------------------------------------------------------------
+set(CPACK_SOURCE_GENERATOR "TBZ2")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "libupnp-${PUPNP_VERSION_STRING}")
+set(CPACK_SOURCE_IGNORE_FILES
+	"/.git/"
+	"/.github/"
+	"/build/"
+	"/.vscode/"
+	"\\\\.swp$"
+	"\\\\.tar\\\\.bz2$"
+	"\\\\.tar\\\\.gz$"
+	"autom4te.cache/"
+	"/install/"
+)
+include(CPack)

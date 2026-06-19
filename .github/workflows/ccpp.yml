@@ -220,51 +220,24 @@ jobs:
         run: cmake --install build --config ${{ matrix.conf }}
   # Linux sanitizer builds
   build_asan:
-    name: Sanitizer build (ubuntu-latest) - ${{ matrix.tool }}
+    name: Sanitizer build (ubuntu-latest)
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        tool: [ autotools, cmake ]
-        conf: [ Debug ]
     steps:
       - uses: actions/checkout@v6
-      - name: bootstrap and configure (autotools)
-        if: ${{ matrix.tool == 'autotools' }}
-        run: |
-          ./bootstrap && \
-          ./configure --enable-debug ${{ env.sanitizer_autotools_flags }}
       - name: Install Python test dependencies
-        if: ${{ matrix.tool == 'cmake' }}
         run: pip install pytest
-      - name: configure (cmake)
-        if: ${{ matrix.tool == 'cmake' }}
+      - name: configure
         run: |
           cmake \
             ${{ env.cmake_common_flags }} \
             -DCMAKE_C_FLAGS="-Wall -Wpedantic" \
-            -DCMAKE_BUILD_TYPE=${{ matrix.conf }} \
+            -DCMAKE_BUILD_TYPE=Debug \
             -DIXML_ENABLE_TESTING_INTEGRATION=OFF \
             -DUPNP_ENABLE_TESTING_INTEGRATION=OFF \
             ${{ env.cmake_sanitizer_flags }}
-      - name: build (autotools)
-        if: ${{ matrix.tool == 'autotools' }}
-        run: make
-      - name: build (cmake)
-        if: ${{ matrix.tool == 'cmake' }}
+      - name: build
         run: cmake --build build
-      - name: test ixml (autotools)
-        if: ${{ matrix.tool == 'autotools' }}
-        run: >
-          cd ixml && make check || (cat test-suite.log && exit 1)
-      - name: test upnp (autotools)
-        if: ${{ matrix.tool == 'autotools' }}
-        run: |
-          cd upnp && \
-          make check && \
-          cat test_init.log || \
-          (cat test-suite.log test_init.log && exit 1)
-      - name: ctest (cmake)
-        if: ${{ matrix.tool == 'cmake' }}
+      - name: ctest
         run: ctest ${{ env.ctest_flags }}
   # Linux TSan build (cmake only — TSan is incompatible with ASan/LSan)
   build_tsan:

@@ -51,8 +51,7 @@ jobs:
       - name: Configure
         if: ${{ env.RUN_CONFIGURE == 'true' }}
         run: |
-          ./bootstrap && \
-          ./configure
+          cmake -B build
       - name: Build
         if: ${{ env.RUN_BUILD == 'true' }}
         id: build
@@ -60,7 +59,7 @@ jobs:
         #
         # Build and run checks
         run: |
-          make distcheck
+          cpack -G TBZ2 --config build/CPackSourceConfig.cmake
       - name: Find bz2 name
         id: find-bz-name
         #

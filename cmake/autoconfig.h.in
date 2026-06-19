@@ -1,0 +1,66 @@
+/* whether the system defaults to 32bit off_t but can do 64bit when requested */
+#cmakedefine UPNP_LARGEFILE_SENSITIVE 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_HAVE_DEBUG 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_HAVE_CLIENT 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_HAVE_DEVICE 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_HAVE_WEBSERVER 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_HAVE_SSDP 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_HAVE_OPTSSDP 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_HAVE_SOAP 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_HAVE_GENA 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_HAVE_TOOLS 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_ENABLE_IPV6 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_ENABLE_UNSPECIFIED_SERVER 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_ENABLE_OPEN_SSL 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS 1
+
+/* see upnpconfig.h */
+#cmakedefine IXML_HAVE_SCRIPTSUPPORT 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_ENABLE_POST_WRITE 1
+
+/* see upnpconfig.h */
+#cmakedefine UPNP_MINISERVER_REUSEADDR 1
+
+/* Type for storing the length of struct sockaddr */
+#cmakedefine socklen_t 1
+
+/* Defines if strnlen is available on your system */
+#cmakedefine HAVE_STRNLEN 1
+
+/* Defines if strndup is available on your system */
+#cmakedefine HAVE_STRNDUP 1
+
+/* Define if backtrace( */
+#cmakedefine HAVE_BACKTRACE 1
+
+/* Use pthread_rwlock_t */
+#cmakedefine UPNP_USE_RWLOCK 1
+
