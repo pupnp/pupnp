@@ -14,18 +14,43 @@
 #     ./scripts/release.sh
 #
 # What it does:
-#   1. Derives the current PUPNP release version from CMakeLists.txt.
-#   2. Finds the most recent release tag on the repository.
-#   3. Aborts if the current version is not strictly greater than the last
+#   1. Verifies that the current branch is main.
+#   2. Verifies that the working tree is clean (no uncommitted changes).
+#   3. Derives the current PUPNP release version from CMakeLists.txt.
+#   4. Finds the most recent release tag on the repository.
+#   5. Aborts if the current version is not strictly greater than the last
 #      release (same version = forgot to bump; older version = something is wrong).
-#   4. Aborts if the tag already exists locally or on the remote (double-release guard).
-#   5. Shows a summary and asks for explicit confirmation before pushing.
-#   6. Creates and pushes the tag, which starts the release workflow.
+#   6. Aborts if the tag already exists locally or on the remote (double-release guard).
+#   7. Shows a summary and asks for explicit confirmation before pushing.
+#   8. Creates and pushes the tag, which starts the release workflow.
 #
 # After the tag is pushed, monitor the workflow with:
 #   gh run watch --exit-status
 #
 set -e
+
+# ------------------------------------------------------------------------------
+# Sanity checks — catch obvious mistakes before doing any real work.
+# ------------------------------------------------------------------------------
+
+# Releases must be cut from main to keep the tag history linear and ensure
+# the home-keeping branch the workflow creates can be cleanly merged back.
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [[ "$CURRENT_BRANCH" != "main" ]]; then
+    echo "ERROR: You are on branch '${CURRENT_BRANCH}', not 'main'."
+    echo "       Switch to main before releasing."
+    exit 1
+fi
+
+# An unclean tree means uncommitted changes would be missing from the tag.
+# 'git status --porcelain' produces no output when the tree is clean.
+if [[ -n "$(git status --porcelain)" ]]; then
+    echo "ERROR: Working tree has uncommitted changes:"
+    git status --short
+    echo ""
+    echo "       Commit or stash them before releasing."
+    exit 1
+fi
 
 # ------------------------------------------------------------------------------
 # Derive the current PUPNP umbrella version from CMakeLists.txt.
