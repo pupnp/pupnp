@@ -26,12 +26,10 @@ check_release "${next_release:-}" "Next release"
 
 # Creates temporary files
 CHANGELOG_TEMPLATE=$(mktemp) || exit 1
-CONFIGURE_AC_TEMPLATE=$(mktemp) || exit 1
 
 # shellcheck disable=SC2329
 cleanup_on_exit() {
     rm -f "${CHANGELOG_TEMPLATE}"
-    rm -f "${CONFIGURE_AC_TEMPLATE}"
 }
 
 # Makes sure it will be gone
