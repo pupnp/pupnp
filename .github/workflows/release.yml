@@ -48,6 +48,29 @@ jobs:
           fi
           # Parse the tag name and calculate the next release value
           DEBUG=${DEBUG} scripts/parse_release.sh "$TAG_NAME"
+      - name: Validate tag
+        # Guard against a tag whose version doesn't match what CMakeLists.txt
+        # would produce.  The tarball name comes from CMakeLists.txt, so a
+        # mismatch would create a release whose title and tarball version differ.
+        # curr_release was written to GITHUB_ENV by parse_release.sh above.
+        run: |
+          ixml_major=$(grep -E "^set\(IXML_VERSION_MAJOR" CMakeLists.txt | grep -oE '[0-9]+')
+          ixml_minor=$(grep -E "^set\(IXML_VERSION_MINOR" CMakeLists.txt | grep -oE '[0-9]+')
+          ixml_patch=$(grep -E "^set\(IXML_VERSION_PATCH" CMakeLists.txt | grep -oE '[0-9]+')
+          upnp_major=$(grep -E "^set\(UPNP_VERSION_MAJOR" CMakeLists.txt | grep -oE '[0-9]+')
+          upnp_minor=$(grep -E "^set\(UPNP_VERSION_MINOR" CMakeLists.txt | grep -oE '[0-9]+')
+          upnp_patch=$(grep -E "^set\(UPNP_VERSION_PATCH" CMakeLists.txt | grep -oE '[0-9]+')
+          pupnp_major=$((ixml_major + upnp_major))
+          pupnp_minor=$((ixml_minor + upnp_minor))
+          pupnp_patch=$((ixml_patch + upnp_patch))
+          expected="${pupnp_major}.${pupnp_minor}.${pupnp_patch}"
+          if [[ "$curr_release" != "$expected" ]]; then
+            echo "ERROR: tag version '$curr_release' does not match CMakeLists.txt version '$expected'" \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "Tag '$curr_release' matches CMakeLists.txt version '$expected' — OK" \
+            | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Configure
         if: ${{ env.RUN_CONFIGURE == 'true' }}
         run: |
