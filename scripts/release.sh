@@ -11,23 +11,55 @@
 #
 # Usage:
 #   Run from the repository root:
-#     ./scripts/release.sh
+#     ./scripts/release.sh       # full validation + confirmation + push
+#     ./scripts/release.sh -n    # print the tag that would be pushed and exit
 #
 # What it does:
-#   1. Verifies that the current branch is main.
-#   2. Verifies that the working tree is clean (no uncommitted changes).
-#   3. Derives the current PUPNP release version from CMakeLists.txt.
+#   1. Derives the current PUPNP release version from CMakeLists.txt and
+#      prints the tag name (visible even if a later check aborts).
+#   2. Verifies that the current branch is main.
+#   3. Verifies that the working tree is clean (no uncommitted changes).
 #   4. Finds the most recent release tag on the repository.
 #   5. Aborts if the current version is not strictly greater than the last
 #      release (same version = forgot to bump; older version = something is wrong).
 #   6. Aborts if the tag already exists locally or on the remote (double-release guard).
-#   7. Shows a summary and asks for explicit confirmation before pushing.
-#   8. Creates and pushes the tag, which starts the release workflow.
+#   7. In dry-run mode (-n), exits here — all checks passed, nothing pushed.
+#   8. Shows a summary and asks for explicit confirmation before pushing.
+#   9. Creates and pushes the tag, which starts the release workflow.
 #
 # After the tag is pushed, monitor the workflow with:
 #   gh run watch --exit-status
 #
 set -e
+
+# ------------------------------------------------------------------------------
+# Argument parsing.
+# ------------------------------------------------------------------------------
+DRY_RUN=0
+if [[ "${1:-}" == "-n" ]]; then
+    DRY_RUN=1
+fi
+
+# ------------------------------------------------------------------------------
+# Derive the current PUPNP umbrella version from CMakeLists.txt.
+# The umbrella version is the sum of the IXML and UPNP component versions,
+# mirroring the math CMake performs at configure time.
+# Done first so the tag name is always visible, even if a later check aborts.
+# ------------------------------------------------------------------------------
+ixml_major=$(grep -E "^set\(IXML_VERSION_MAJOR" CMakeLists.txt | grep -oE '[0-9]+')
+ixml_minor=$(grep -E "^set\(IXML_VERSION_MINOR" CMakeLists.txt | grep -oE '[0-9]+')
+ixml_patch=$(grep -E "^set\(IXML_VERSION_PATCH" CMakeLists.txt | grep -oE '[0-9]+')
+upnp_major=$(grep -E "^set\(UPNP_VERSION_MAJOR" CMakeLists.txt | grep -oE '[0-9]+')
+upnp_minor=$(grep -E "^set\(UPNP_VERSION_MINOR" CMakeLists.txt | grep -oE '[0-9]+')
+upnp_patch=$(grep -E "^set\(UPNP_VERSION_PATCH" CMakeLists.txt | grep -oE '[0-9]+')
+pupnp_major=$((ixml_major + upnp_major))
+pupnp_minor=$((ixml_minor + upnp_minor))
+pupnp_patch=$((ixml_patch + upnp_patch))
+
+CURRENT_VERSION="${pupnp_major}.${pupnp_minor}.${pupnp_patch}"
+CURRENT_TAG="release-${CURRENT_VERSION}"
+
+echo "Current tag to push is ${CURRENT_TAG}"
 
 # ------------------------------------------------------------------------------
 # Sanity checks — catch obvious mistakes before doing any real work.
@@ -51,24 +83,6 @@ if [[ -n "$(git status --porcelain)" ]]; then
     echo "       Commit or stash them before releasing."
     exit 1
 fi
-
-# ------------------------------------------------------------------------------
-# Derive the current PUPNP umbrella version from CMakeLists.txt.
-# The umbrella version is the sum of the IXML and UPNP component versions,
-# mirroring the math CMake performs at configure time.
-# ------------------------------------------------------------------------------
-ixml_major=$(grep -E "^set\(IXML_VERSION_MAJOR" CMakeLists.txt | grep -oE '[0-9]+')
-ixml_minor=$(grep -E "^set\(IXML_VERSION_MINOR" CMakeLists.txt | grep -oE '[0-9]+')
-ixml_patch=$(grep -E "^set\(IXML_VERSION_PATCH" CMakeLists.txt | grep -oE '[0-9]+')
-upnp_major=$(grep -E "^set\(UPNP_VERSION_MAJOR" CMakeLists.txt | grep -oE '[0-9]+')
-upnp_minor=$(grep -E "^set\(UPNP_VERSION_MINOR" CMakeLists.txt | grep -oE '[0-9]+')
-upnp_patch=$(grep -E "^set\(UPNP_VERSION_PATCH" CMakeLists.txt | grep -oE '[0-9]+')
-pupnp_major=$((ixml_major + upnp_major))
-pupnp_minor=$((ixml_minor + upnp_minor))
-pupnp_patch=$((ixml_patch + upnp_patch))
-
-CURRENT_VERSION="${pupnp_major}.${pupnp_minor}.${pupnp_patch}"
-CURRENT_TAG="release-${CURRENT_VERSION}"
 
 # ------------------------------------------------------------------------------
 # Find the most recent release tag.
@@ -111,6 +125,13 @@ fi
 if git ls-remote --tags origin "refs/tags/${CURRENT_TAG}" | grep -q "${CURRENT_TAG}"; then
     echo "ERROR: Tag ${CURRENT_TAG} already exists on the remote."
     exit 1
+fi
+
+# ------------------------------------------------------------------------------
+# In dry-run mode all checks have now passed — exit without pushing.
+# ------------------------------------------------------------------------------
+if [[ "$DRY_RUN" -eq 1 ]]; then
+    exit 0
 fi
 
 # ------------------------------------------------------------------------------
