@@ -74,7 +74,7 @@ jobs:
             extra_c_flags: ""
       fail-fast: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install Python test dependencies
         run: pip install pytest
       - name: Configure (create build system)
@@ -101,7 +101,7 @@ jobs:
         conf: [ Debug, Release ]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: vmactions/omnios-vm@v1
         with:
           prepare: |
@@ -129,7 +129,7 @@ jobs:
       run:
         shell: bash # Fix PowerShell incompatibility
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install OpenSSL (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
@@ -201,7 +201,7 @@ jobs:
           msystem: ${{ matrix.sys }}
           install: mingw-w64-clang-x86_64-cmake mingw-w64-clang-x86_64-make git
             mingw-w64-clang-x86_64-gcc
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Configure
         run: |
           cmake \
@@ -223,7 +223,7 @@ jobs:
     name: Sanitizer build (ubuntu-latest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install Python test dependencies
         run: pip install pytest
       - name: configure
@@ -244,7 +244,7 @@ jobs:
     name: TSan build (ubuntu-latest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install Python test dependencies
         run: pip install pytest
       - name: configure
