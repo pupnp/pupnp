@@ -4,6 +4,8 @@ CMAKE_POLICY(VERSION 3.13)
 include(cmake/CmDaB.cmake)
 include(cmake/test-functions.cmake)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # 1. Source of Truth for IXML
 set(IXML_VERSION_MAJOR 11)
 set(IXML_VERSION_MINOR 1)
