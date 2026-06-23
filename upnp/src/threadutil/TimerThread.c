@@ -35,8 +35,14 @@
  */
 
 #include "TimerThread.h"
+#include "FreeList.h"
+#include "LinkedList.h"
+#include "ThreadPool.h"
+#include "ithread.h"
 
 #include <assert.h>
+#include <errno.h> // IWYU pragma: keep
+#include <time.h>
 
 /*!
  * \brief Deallocates a dynamically allocated TimerEvent.

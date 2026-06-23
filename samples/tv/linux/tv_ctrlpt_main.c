@@ -29,12 +29,14 @@
  *
  ******************************************************************************/
 
+#include "ithread.h"
 #include "sample_util.h"
 #include "tv_ctrlpt.h"
+#include "upnp.h"
 
 #include <signal.h>
-#include <stdarg.h>
-#include <stdio.h>
+#include <stdarg.h> // IWYU pragma: keep
+#include <stdio.h>  // IWYU pragma: keep
 #include <string.h>
 
 int main(int argc, char **argv)

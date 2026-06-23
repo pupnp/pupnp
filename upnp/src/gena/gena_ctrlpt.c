@@ -30,7 +30,24 @@
  *
  ******************************************************************************/
 
+#include "Callback.h"
+#include "GenlibClientSubscription.h"
+#include "ThreadPool.h"
+#include "TimerThread.h"
+#include "UpnpEvent.h"
+#include "UpnpString.h"
 #include "config.h"
+#include "ithread.h"
+#include "ixml.h"
+#include "membuffer.h"
+#include "sock.h"
+#include "upnp.h"
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
+#include "uri.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*!
  * \file

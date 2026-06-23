@@ -34,7 +34,22 @@
  * \file
  */
 
+#include "Callback.h"
+#include "UpnpGlobal.h"
+#include "UpnpStateVarRequest.h"
+#include "UpnpString.h"
 #include "config.h"
+#include "ixml.h"
+#include "membuffer.h"
+#include "service_table.h"
+#include "sock.h"
+#include "upnp.h"
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
+#include "upnputil.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
 
 #ifdef INCLUDE_DEVICE_APIS
 	#if EXCLUDE_SOAP == 0
@@ -46,7 +61,6 @@
 		#include "soaplib.h"
 		#include "ssdplib.h"
 		#include "statcodes.h"
-		#include "unixutil.h"
 		#include "upnpapi.h"
 
 		#include <assert.h>

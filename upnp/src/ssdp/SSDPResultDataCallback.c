@@ -8,6 +8,7 @@
 
 #include "SSDPResultDataCallback.h"
 
+#include "Callback.h"
 #include "SSDPResultData.h"
 
 void SSDPResultData_Callback(SSDPResultData *p)

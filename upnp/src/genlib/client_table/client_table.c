@@ -6,13 +6,18 @@
  * client
  ************************************************************************/
 
+#include "GenlibClientSubscription.h"
+#include "ThreadPool.h"
+#include "TimerThread.h"
+#include "UpnpString.h"
 #include "config.h"
+#include "uri.h"
+#include <stdlib.h>
+#include <string.h>
 
 #include "client_table.h"
 
 #ifdef INCLUDE_CLIENT_APIS
-
-	#include <stdlib.h> /* for calloc(), free() */
 
 void free_client_subscription(GenlibClientSubscription *sub)
 {

@@ -38,6 +38,7 @@
 
 #include "membuffer.h"
 #include "strintmap.h"
+#include <stddef.h>
 
 /************************************************************************
  *	Function :	map_str_to_int

@@ -23,17 +23,16 @@
  * \file
  */
 
-#include "config.h"
-
 #include "uuid.h"
 
-#include "UpnpInet.h"
-#include "UpnpStdInt.h"
+#include "UpnpInet.h" // IWYU pragma: keep
+#include "md5.h"
+#include "sysdep.h"
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 /* various forward declarations. */
 static int read_state(

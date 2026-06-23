@@ -112,6 +112,11 @@ UPNP_EXPORT_SPEC int UpnpInitLog(void);
 
 #if defined NDEBUG && !defined UPNP_DEBUG_C
 	#define UpnpInitLog UpnpInitLog_Inlined
+	/* UPNP_E_SUCCESS is defined in upnp.h; provide fallback if not yet
+	 * included */
+	#ifndef UPNP_E_SUCCESS
+		#define UPNP_E_SUCCESS 0
+	#endif
 static UPNP_INLINE int UpnpInitLog_Inlined(void) { return UPNP_E_SUCCESS; }
 #endif
 /*!

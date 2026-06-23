@@ -43,12 +43,24 @@
 
 #include "tv_device.h"
 
+#include "Callback.h"
+#include "UpnpActionRequest.h"
+#include "UpnpStateVarRequest.h"
+#include "UpnpString.h"
+#include "UpnpSubscriptionRequest.h"
+#include "ithread.h"
+#include "ixml.h"
+#include "sample_util.h"
 #include "upnp.h"
 #include "upnpdebug.h"
 
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "posix_overwrites.h" // IWYU pragma: keep
+#include "upnptools.h"
 
 #define DEFAULT_WEB_DIR "./web"
 

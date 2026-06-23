@@ -38,7 +38,16 @@
  ************************************************************************/
 
 #include "service_table.h"
+#include "LinkedList.h"
 #include "config.h"
+#include "ixml.h"
+#include "upnp.h"
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
+#include "uri.h"
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 #ifdef INCLUDE_DEVICE_APIS
 

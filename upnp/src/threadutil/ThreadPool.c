@@ -34,9 +34,12 @@
  * \file
  */
 
-#if !defined(_WIN32)
-	#include <sys/param.h>
-#endif
+#include "LinkedList.h"
+#include "ithread.h"
+#include <errno.h>
+#include <pthread.h>
+#include <sched.h>
+#include <time.h>
 
 #include "ThreadPool.h"
 #include "config.h"

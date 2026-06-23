@@ -34,27 +34,29 @@
  * \file
  */
 
+#include "UpnpGlobal.h"
 #include "config.h"
 
-#include "UpnpInet.h"
+#include "ixml.h"
 #include "membuffer.h"
-#include "unixutil.h"
 #include "upnp.h"
+#include "upnpdebug.h"
 #include "upnpdebug_internal.h"
-#include "upnputil.h"
 #include "uri.h"
 #include "urlconfig.h"
 #include "webserver.h"
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 #ifdef _WIN32
 	#if defined(_MSC_VER) && _MSC_VER < 1900
 		#define snprintf _snprintf
 	#endif
 #else
-	#include <sys/types.h>
 #endif
 
 #ifdef INCLUDE_DEVICE_APIS

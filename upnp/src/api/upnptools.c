@@ -31,6 +31,9 @@
  **************************************************************************/
 
 #include "config.h"
+#include "ixml.h"
+#include <stdlib.h>
+#include <string.h>
 /*!
  * \file
  */

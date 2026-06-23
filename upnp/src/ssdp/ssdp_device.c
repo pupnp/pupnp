@@ -38,7 +38,16 @@
  * \file
  */
 
+#include "TimerThread.h"
 #include "config.h"
+#include "membuffer.h"
+#include "upnp.h"
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
+#include "upnputil.h"
+#include <errno.h>
+#include <stdlib.h>
+#include <sys/types.h>
 
 #ifdef INCLUDE_DEVICE_APIS
 	#if EXCLUDE_SSDP == 0

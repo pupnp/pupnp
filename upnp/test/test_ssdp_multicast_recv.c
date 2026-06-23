@@ -28,6 +28,7 @@
  * regression: issue #227
  */
 
+#include "Callback.h"
 #include "upnp.h"
 
 #include <stdio.h>

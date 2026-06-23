@@ -38,7 +38,21 @@
  * \file
  */
 
+#include "UpnpGlobal.h"
+#include "UpnpInet.h"
 #include "config.h"
+#include "ithread.h"
+#include "ixml.h"
+#include "upnp.h"
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
+#include "upnputil.h"
+#include "uri.h"
+#include <errno.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 
 #if EXCLUDE_SSDP == 0
 

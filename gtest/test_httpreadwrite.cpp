@@ -12,7 +12,10 @@
 // so that an oversized Content-Length is rejected immediately after the headers
 // are parsed, without buffering any body bytes.
 
+#include "upnp.h"
 #include "gtest/gtest.h"
+#include <cstddef>
+#include <cstring>
 
 extern "C" {
 #include "httpparser.h"

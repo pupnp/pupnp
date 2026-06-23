@@ -8,7 +8,10 @@
  *
  * \author Marcelo Roberto Jimenez
  */
+#include "UpnpString.h"
 #include "config.h" // IWYU pragma: keep
+#include "ixml.h"
+#include "list.h"
 
 #include <stdlib.h> /* for calloc(), free() */		   // IWYU pragma: keep
 #include <string.h> /* for strlen(), strdup(), memset() */ // IWYU pragma: keep

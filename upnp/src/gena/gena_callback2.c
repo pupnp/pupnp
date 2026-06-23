@@ -30,6 +30,8 @@
  ******************************************************************************/
 
 #include "config.h"
+#include "sock.h"
+#include "upnpdebug.h"
 #if EXCLUDE_GENA == 0
 	#include "gena.h"
 	#include "gena_ctrlpt.h"

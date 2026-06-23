@@ -10,8 +10,11 @@
 // Fix: UpnpGetIfInfo() must clear gIF_IPV6 (and gIF_IPV6_ULA_GUA) before
 // scanning so stale addresses do not persist across re-initializations.
 
+#include "upnp.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include <netinet/in.h>
+#include <sys/socket.h>
 
 // Internal headers — needed for gIF_IPV6 and UpnpGetIfInfo()
 extern "C" {

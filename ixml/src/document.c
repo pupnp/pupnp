@@ -34,6 +34,7 @@
  * \file
  */
 
+#include "ixml.h"
 #include "ixmldebug.h"
 #include "ixmlparser.h"
 

@@ -38,8 +38,7 @@
  */
 
 #include "membuffer.h"
-#include "config.h"
-#include "unixutil.h"
+#include "UpnpGlobal.h"
 #include "upnp.h"
 
 #include <assert.h>

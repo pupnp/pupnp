@@ -34,7 +34,30 @@
  * \file
  */
 
+#include "Callback.h"
+#include "LinkedList.h"
+#include "ThreadPool.h"
+#include "UpnpGlobal.h"
+#include "UpnpInet.h"
+#include "UpnpSubscriptionRequest.h"
 #include "config.h"
+#include "httpparser.h"
+#include "ithread.h"
+#include "ixml.h"
+#include "membuffer.h"
+#include "service_table.h"
+#include "sock.h"
+#include "upnp.h"
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
+#include "uri.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <time.h>
 
 #include "gena_device.h"
 

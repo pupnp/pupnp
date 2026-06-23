@@ -37,7 +37,6 @@
  * different options.
  */
 
-#include "config.h"
 #include "upnp.h"
 #include "upnputil.h"
 

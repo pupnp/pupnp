@@ -35,6 +35,7 @@
  * non-zero ephemeral port for IPv4 (and, when IPv6 is available, for IPv6).
  */
 
+#include "Callback.h"
 #include "upnp.h"
 
 #include <stdio.h>

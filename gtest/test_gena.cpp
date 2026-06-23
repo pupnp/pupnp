@@ -10,6 +10,7 @@
 // the RFC 1918 ranges", not "must be on the same subnet".
 
 #include "gtest/gtest.h"
+#include <sys/socket.h>
 
 extern "C" {
 #include "sock.h"

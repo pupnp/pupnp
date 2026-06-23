@@ -32,7 +32,7 @@
 #include "FreeList.h"
 
 #include <assert.h>
-#include <errno.h>
+#include <errno.h> // IWYU pragma: keep
 #include <stdlib.h>
 
 int FreeListInit(FreeList *free_list, size_t elementSize, int maxFreeListLength)

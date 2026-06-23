@@ -29,12 +29,16 @@
  *
  ******************************************************************************/
 
+#include "UpnpGlobal.h"
 #include "config.h"
+#include "ixml.h"
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
+#include <string.h>
 #ifdef INCLUDE_CLIENT_APIS
 	#if EXCLUDE_SOAP == 0
 
 		#include <assert.h>
-		#include <ctype.h>
 		#include <stdarg.h>
 		#include <stdio.h>
 		#include <stdlib.h>
@@ -42,15 +46,12 @@
 		#include "httpparser.h"
 		#include "httpreadwrite.h"
 		#include "membuffer.h"
-		#include "miniserver.h"
 		#include "parsetools.h"
 		#include "soaplib.h"
 		#include "statcodes.h"
 		#include "upnp.h"
 		#include "upnpapi.h"
 		#include "uri.h"
-
-		#include "unixutil.h"
 
 		#define SOAP_ACTION_RESP 1
 		#define SOAP_VAR_RESP 2

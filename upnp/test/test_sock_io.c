@@ -39,6 +39,7 @@
  *      poll() (non-Windows) / select() (Windows) path in SearchByTarget().
  */
 
+#include "Callback.h"
 #include "upnp.h"
 
 #include <stdio.h>

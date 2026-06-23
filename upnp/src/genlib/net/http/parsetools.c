@@ -38,11 +38,8 @@
  */
 
 #include "parsetools.h"
-#include "config.h"
 #include "httpparser.h"
 #include "membuffer.h"
-#include "statcodes.h"
-#include "upnputil.h"
 #include <assert.h>
 
 int has_xml_content_type(http_message_t *hmsg)

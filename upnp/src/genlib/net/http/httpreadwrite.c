@@ -37,24 +37,39 @@
  * It defines functions to receive messages, process messages, send messages.
  */
 
+#include "LinkedList.h"
+#include "UpnpGlobal.h"
+#include "UpnpString.h"
 #include "config.h"
 
 #include "httpreadwrite.h"
 
 #include "UpnpExtraHeaders.h"
 #include "UpnpInet.h"
+#include "httpparser.h"
+#include "ixml.h"
+#include "list.h"
 #include "membuffer.h"
 #include "sock.h"
 #include "statcodes.h"
 #include "upnp.h"
 #include "upnpapi.h"
+#include "upnpconfig.h" // IWYU pragma: keep
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
+#include "upnputil.h"
 #include "uri.h"
 #include "webserver.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "posix_overwrites.h" // IWYU pragma: keep
 
@@ -67,12 +82,9 @@
 		#define snprintf _snprintf
 	#endif
 #else /* _WIN32 */
-	#include <arpa/inet.h>
 	#include <poll.h>
-	#include <sys/time.h>
 	#include <sys/types.h>
 	#include <sys/utsname.h>
-	#include <sys/wait.h>
 	#if defined(__ANDROID__) && \
 		(!defined(__USE_FILE_OFFSET64) || __ANDROID_API__ < 24)
 		#define fseeko fseek

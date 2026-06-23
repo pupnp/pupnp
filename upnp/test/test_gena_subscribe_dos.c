@@ -35,6 +35,7 @@
  * gena_validate_delivery_urls() passes the subnet check.
  */
 
+#include "Callback.h"
 #include "posix_overwrites.h" /* IWYU pragma: keep */
 #include "upnp.h"
 

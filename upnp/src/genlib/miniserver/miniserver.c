@@ -30,7 +30,19 @@
  *
  **************************************************************************/
 
+#include "LinkedList.h"
+#include "UpnpGlobal.h"
+#include "UpnpInet.h"
 #include "config.h"
+#include "httpparser.h"
+#include "membuffer.h"
+#include "sock.h"
+#include "upnp.h"
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
+#include <errno.h>
+#include <stdint.h>
+#include <time.h>
 
 #if EXCLUDE_MINISERVER == 0
 

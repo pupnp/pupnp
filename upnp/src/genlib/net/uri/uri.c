@@ -36,13 +36,23 @@
  * \brief Contains functions for uri, url parsing utility.
  */
 
+#include "UpnpGlobal.h"
 #include "config.h" // IWYU pragma: keep
 
 #include "posix_overwrites.h" // IWYU pragma: keep
+#include "upnp.h"
 #include "upnpapi.h"
 #include "uri.h"
 
 #include <assert.h>
+#include <ctype.h>
+#ifndef _WIN32
+	#include <netdb.h>
+#endif
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef __FreeBSD__
 	#include <osreldate.h>

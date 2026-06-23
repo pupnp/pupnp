@@ -38,6 +38,7 @@
 
 #include "ixmlparser.h"
 
+#include "ixml.h"
 #include "ixmldebug.h"
 
 #include <assert.h>
@@ -47,6 +48,7 @@
 #include <stdlib.h> /* for free(), malloc() */
 #include <string.h>
 
+#include "ixmlmembuf.h"
 #include "posix_overwrites.h" // IWYU pragma: keep
 
 static char g_error_char = '\0';

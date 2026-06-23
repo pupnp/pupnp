@@ -16,10 +16,11 @@
 
 #include "ThreadPool.h"
 #include "config.h"
+#include "ithread.h"
 
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 
 #ifdef HAVE_BACKTRACE
 	#include <unistd.h>

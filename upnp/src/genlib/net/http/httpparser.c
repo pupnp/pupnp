@@ -39,6 +39,14 @@
 #ifndef _GNU_SOURCE
 	#define _GNU_SOURCE /* For strcasestr() in string.h */
 #endif
+#include "LinkedList.h"
+#include "UpnpGlobal.h"
+#include "membuffer.h"
+#include "upnp.h"
+#include "upnpdebug.h"
+#include "uri.h"
+#include <errno.h>
+#include <stdlib.h>
 
 #include "config.h" /* IWYU pragma: keep */
 

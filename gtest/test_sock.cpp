@@ -7,6 +7,7 @@
 // SSDP UDP sends go through sendto() directly and are unaffected.
 
 #include "gtest/gtest.h"
+#include <stdio.h>
 
 extern "C" {
 #include "sock.h"

@@ -34,9 +34,11 @@
  * \file
  */
 
+#include "ixml.h"
 #include "ixmlparser.h"
 
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 
 void ixmlNodeList_init(IXML_NodeList *nList)

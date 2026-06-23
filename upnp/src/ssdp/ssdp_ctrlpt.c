@@ -37,9 +37,22 @@
  * \file
  */
 
+#include "Callback.h"
+#include "LinkedList.h"
+#include "TimerThread.h"
+#include "UpnpDiscovery.h"
+#include "UpnpString.h"
 #include "config.h"
 
+#include "ithread.h"
+#include "membuffer.h"
+#include "upnp.h"
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
 #include "upnputil.h"
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifndef _WIN32
 	#include <poll.h>

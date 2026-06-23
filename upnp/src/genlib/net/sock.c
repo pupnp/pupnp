@@ -42,19 +42,21 @@
 
 #include "sock.h"
 
+#include "UpnpInet.h"
 #include "UpnpStdInt.h" /* ssize_t on MSVC */ // IWYU pragma: keep
 #include "upnp.h"
 
+#include "upnpdebug.h"
 #include "upnpdebug_internal.h"
 #include "upnputil.h"
 
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h> /* for F_GETFL, F_SETFL, O_NONBLOCK */
 #include <string.h>
 #include <time.h>
 
 #ifndef _WIN32
+	#include <fcntl.h> /* for F_GETFL, F_SETFL, O_NONBLOCK */
 	#include <poll.h>
 	#define _poll(fds, nfds, timeout) poll(fds, nfds, timeout)
 #endif

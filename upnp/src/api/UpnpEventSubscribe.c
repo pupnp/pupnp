@@ -8,6 +8,7 @@
  *
  * \author Marcelo Roberto Jimenez
  */
+#include "UpnpString.h"
 #include "config.h" // IWYU pragma: keep
 
 #include <stdlib.h> /* for calloc(), free() */		   // IWYU pragma: keep

@@ -33,6 +33,7 @@
  * \file
  */
 
+#include "ixml.h"
 #include "ixmldebug.h"
 #include "ixmlmembuf.h"
 #include "ixmlparser.h"

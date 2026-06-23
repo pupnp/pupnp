@@ -18,8 +18,8 @@
  */
 
 #include "md5.h"
-#include "config.h"
 
+#include <stdint.h>
 #include <string.h>
 
 #define PUT_BIT_LE(i, cp, value) \

@@ -8,6 +8,8 @@
  *
  * \author Marcelo Roberto Jimenez
  */
+#include "Callback.h"
+#include "UpnpDiscovery.h"
 #include "config.h" // IWYU pragma: keep
 
 #include <stdlib.h> /* for calloc(), free() */		   // IWYU pragma: keep

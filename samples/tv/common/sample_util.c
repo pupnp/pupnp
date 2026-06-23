@@ -37,6 +37,23 @@
  * \file
  */
 
+#include "Callback.h"
+#include "UpnpActionComplete.h"
+#include "UpnpActionRequest.h"
+#include "UpnpDiscovery.h"
+#include "UpnpEvent.h"
+#include "UpnpEventSubscribe.h"
+#include "UpnpStateVarComplete.h"
+#include "UpnpStateVarRequest.h"
+#include "UpnpString.h"
+#include "UpnpSubscriptionRequest.h"
+#include "ithread.h"
+#include "ixml.h"
+#include "upnp.h"
+#include "upnpconfig.h"
+#include "upnptools.h"
+#include <stdlib.h>
+#include <string.h>
 #define SAMPLE_UTIL_C
 
 #include "sample_util.h"

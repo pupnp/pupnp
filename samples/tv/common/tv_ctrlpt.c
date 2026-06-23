@@ -43,12 +43,25 @@
 
 #include "tv_ctrlpt.h"
 
+#include "Callback.h"
+#include "UpnpActionComplete.h"
+#include "UpnpDiscovery.h"
+#include "UpnpEvent.h"
+#include "UpnpEventSubscribe.h"
+#include "UpnpStateVarComplete.h"
+#include "UpnpString.h"
+#include "ithread.h"
+#include "ixml.h"
+#include "sample_util.h"
 #include "upnp.h"
 
 #include "posix_overwrites.h" // IWYU pragma: keep
+#include "upnptools.h"
 
 #include <signal.h> // IWYU pragma: keep
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*!
  * Mutex for protecting the global device list in a multi-threaded,

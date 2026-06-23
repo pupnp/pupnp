@@ -38,6 +38,14 @@
  * \file
  */
 
+#include "Callback.h"
+#include "LinkedList.h"
+#include "TimerThread.h"
+#include "UpnpActionComplete.h"
+#include "UpnpEventSubscribe.h"
+#include "UpnpInet.h"
+#include "UpnpStateVarComplete.h"
+#include "UpnpString.h"
 #include "config.h"
 
 #include "upnpapi.h"
@@ -46,16 +54,24 @@
 #include "UpnpStdInt.h"			  // IWYU pragma: keep
 #include "UpnpUniStd.h" /* for close() */ // IWYU pragma: keep
 #include "httpreadwrite.h"
+#include "ithread.h"
+#include "ixml.h"
 #include "membuffer.h"
 #include "soaplib.h"
 #include "ssdplib.h"
 #include "sysdep.h"
+#include "upnp.h"
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
 #include "uuid.h"
 
 /* Needed for GENA */
 #include "gena.h"
 #include "miniserver.h"
 #include "service_table.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <time.h>
 
 #ifdef INTERNAL_WEB_SERVER
 	#include "VirtualDir.h"
@@ -74,10 +90,12 @@
 #ifdef _WIN32
 	#include <iphlpapi.h>
 #else
+	#include <arpa/inet.h>
+	#include <fcntl.h>
 	#include <ifaddrs.h>
+	#include <net/if.h>
+	#include <netinet/in.h>
 	#include <sys/ioctl.h>
-	#include <sys/param.h>
-	#include <sys/types.h>
 #endif
 
 // ifr_netmask is not defined on eg OmniOS/Solaris, but since

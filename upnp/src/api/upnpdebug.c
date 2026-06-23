@@ -32,6 +32,7 @@
 /*!
  * \file
  */
+#include <time.h>
 #define UPNP_DEBUG_C
 #include "config.h"
 

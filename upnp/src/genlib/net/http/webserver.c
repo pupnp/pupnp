@@ -37,7 +37,24 @@
  * operations of the Web Server.
  */
 
+#include "LinkedList.h"
+#include "UpnpGlobal.h"
 #include "config.h"
+#include "list.h"
+#include "sock.h"
+#include "upnp.h"
+#include "upnpdebug.h"
+#include "upnpdebug_internal.h"
+#include "uri.h"
+#include <ctype.h>
+#include <inttypes.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <time.h>
 
 #if EXCLUDE_WEB_SERVER == 0
 
@@ -45,8 +62,6 @@
 
 	#include "UpnpExtraHeaders.h"
 	#include "UpnpFileInfo.h"
-	#include "UpnpIntTypes.h"
-	#include "UpnpStdInt.h"
 	#include "VirtualDir.h"
 	#include "httpparser.h"
 	#include "httpreadwrite.h"
@@ -55,10 +70,8 @@
 	#include "ssdplib.h"
 	#include "statcodes.h"
 	#include "strintmap.h"
-	#include "unixutil.h"
 	#include "upnp.h"
 	#include "upnpapi.h"
-	#include "upnputil.h"
 
 	#include <assert.h>
 	#include <fcntl.h>
