@@ -34,6 +34,8 @@
  * \file
  */
 
+#include "config.h" // IWYU pragma: keep - must be first; defines UPNP_USE_RWLOCK before ithread.h
+
 #include "LinkedList.h"
 #include "ithread.h"
 #include <errno.h>
@@ -42,7 +44,6 @@
 #include <time.h>
 
 #include "ThreadPool.h"
-#include "config.h"
 
 #include "FreeList.h"
 

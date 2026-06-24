@@ -14,8 +14,9 @@
  *         backtrace frame line.
  */
 
+#include "config.h" // IWYU pragma: keep - must be first; defines UPNP_USE_RWLOCK before ithread.h
+
 #include "ThreadPool.h"
-#include "config.h"
 #include "ithread.h"
 
 #include <stdio.h>

@@ -6,11 +6,12 @@
  * client
  ************************************************************************/
 
+#include "config.h" // IWYU pragma: keep - must be first; defines UPNP_USE_RWLOCK before ithread.h
+
 #include "GenlibClientSubscription.h"
 #include "ThreadPool.h"
 #include "TimerThread.h"
 #include "UpnpString.h"
-#include "config.h"
 #include "uri.h"
 #include <stdlib.h>
 #include <string.h>

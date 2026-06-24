@@ -30,13 +30,14 @@
  *
  ******************************************************************************/
 
+#include "config.h" // IWYU pragma: keep - must be first; defines UPNP_USE_RWLOCK before ithread.h
+
 #include "Callback.h"
 #include "GenlibClientSubscription.h"
 #include "ThreadPool.h"
 #include "TimerThread.h"
 #include "UpnpEvent.h"
 #include "UpnpString.h"
-#include "config.h"
 #include "ithread.h"
 #include "ixml.h"
 #include "membuffer.h"

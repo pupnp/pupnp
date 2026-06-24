@@ -166,10 +166,18 @@ typedef pthread_rwlockattr_t ithread_rwlockattr_t;
  *      typedef to pthread_rwlock_t
  *      Internal Use Only
  ***************************************************************************/
+/* UPNP_USE_RWLOCK is defined in autoconfig.h, pulled in by config.h.
+ * Include config.h now if the caller has not done so: without it
+ * UPNP_USE_RWLOCK is 0 and ithread_rwlock_t silently becomes
+ * pthread_mutex_t, which causes a deadlock when used in place of the
+ * pthread_rwlock_t that upnpapi.c uses for GlobalHndRWLock. */
+#ifndef INTERNAL_CONFIG_H
+	#include "config.h" /* IWYU pragma: keep */
+#endif
 #if UPNP_USE_RWLOCK
 typedef pthread_rwlock_t ithread_rwlock_t;
 #else
-/* Read-write locks aren't available: use mutex instead. */
+/* Read-write locks aren't available on this platform: use mutex instead. */
 typedef ithread_mutex_t ithread_rwlock_t;
 #endif /* UPNP_USE_RWLOCK */
 

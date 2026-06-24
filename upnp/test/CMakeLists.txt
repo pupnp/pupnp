@@ -58,6 +58,25 @@ if(UPNP_BUILD_STATIC)
 		COMMAND test-upnp-threadpool-overflow-static)
 endif()
 
+# ithread_rwlock_t must allow concurrent readers (not serialize them like a
+# mutex).  The test exits 77 (skip) when UPNP_USE_RWLOCK=0 (mutex fallback is
+# intentional on that platform).
+UPNP_Add_Unit_Test(test-upnp-ithread-rwlock test_ithread_rwlock.c)
+if(UPNP_BUILD_SHARED)
+	target_include_directories(test-upnp-ithread-rwlock
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src/inc)
+	target_link_libraries(test-upnp-ithread-rwlock PRIVATE Threads::Threads)
+	set_tests_properties(test-upnp-ithread-rwlock
+		PROPERTIES SKIP_RETURN_CODE 77)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_include_directories(test-upnp-ithread-rwlock-static
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src/inc)
+	target_link_libraries(test-upnp-ithread-rwlock-static PRIVATE Threads::Threads)
+	set_tests_properties(test-upnp-ithread-rwlock-static
+		PROPERTIES SKIP_RETURN_CODE 77)
+endif()
+
 UPNP_Add_Unit_Test(test-upnp-gena-subscribe-dos test_gena_subscribe_dos.c)
 UPNP_Add_Unit_Test(test-upnp-gena-subscribe-pressure test_gena_subscribe_pressure.c)
 # Both GENA issue-#435 tests read constants from config.h (a private header).

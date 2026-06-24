@@ -34,13 +34,14 @@
  * \file
  */
 
+#include "config.h" // IWYU pragma: keep - must be first; defines UPNP_USE_RWLOCK before ithread.h
+
 #include "Callback.h"
 #include "LinkedList.h"
 #include "ThreadPool.h"
 #include "UpnpGlobal.h"
 #include "UpnpInet.h"
 #include "UpnpSubscriptionRequest.h"
-#include "config.h"
 #include "httpparser.h"
 #include "ithread.h"
 #include "ixml.h"

@@ -37,6 +37,8 @@
  * \file
  */
 
+#include "config.h" // IWYU pragma: keep - must be first; defines UPNP_USE_RWLOCK before ithread.h
+
 #include "Callback.h"
 #include "UpnpActionComplete.h"
 #include "UpnpActionRequest.h"
