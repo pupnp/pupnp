@@ -3,15 +3,17 @@
 include(CMakeFindDependencyMacro)
 
 if(@UPNP_BUILD_SHARED@)
-	list(APPEND _upnp_available_components Shared)
+	list(APPEND _upnp_available_components IXMLShared Shared)
 endif()
 
 if(@UPNP_BUILD_STATIC@)
-	list(APPEND _upnp_available_components Static)
+	list(APPEND _upnp_available_components IXMLStatic Static)
 endif()
 
 if(UPNP_FIND_COMPONENTS)
 	 set(_valid_components
+		IXMLShared
+		IXMLStatic
 		Shared
 		Static)
 
@@ -24,16 +26,19 @@ if(UPNP_FIND_COMPONENTS)
 		endif()
 	endforeach()
 
-	find_dependency (IXML @IXML_SOVERSION_STRING@
-		COMPONENTS ${UPNP_FIND_COMPONENTS})
+	if(Shared IN_LIST UPNP_FIND_COMPONENTS)
+		list(APPEND pt4w_comps Shared)
+	endif()
+
+	if(Static IN_LIST UPNP_FIND_COMPONENTS)
+		list(APPEND pt4w_comps Static)
+	endif()
 
 	if(MSVC)
 		find_dependency (PTHREADS4W
-			COMPONENTS ${UPNP_FIND_COMPONENTS})
+			COMPONENTS ${pt4w_comps})
 	endif()
 else()
-	find_dependency (IXML @IXML_SOVERSION_STRING@)
-
 	if(MSVC)
 		find_dependency (PTHREADS4W)
 	endif()
@@ -47,7 +52,7 @@ if(@UPNP_ENABLE_OPEN_SSL@)
 	find_dependency(OpenSSL)
 endif()
 
-include(${CMAKE_CURRENT_LIST_DIR}/UPNP.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/PUPNP.cmake)
 
 if(NOT UPNP_FIND_COMPONENTS)
 	set(UPNP_FOUND TRUE)
