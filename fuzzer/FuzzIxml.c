@@ -42,7 +42,7 @@ extern int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 		return 1;
 	}
 
-	sprintf(filename, "/tmp/libfuzzer.%d", getpid());
+	snprintf(filename, sizeof(filename), "/tmp/libfuzzer.%d", getpid());
 	fp = fopen(filename, "wb");
 	if (!fp) {
 		return 0;
