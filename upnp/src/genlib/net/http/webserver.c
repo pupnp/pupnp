@@ -913,7 +913,7 @@ static int CreateHTTPRangeResponseHeader(
 	RangeInput = strdup(ByteRangeSpecifier);
 	if (!RangeInput)
 		return HTTP_INTERNAL_SERVER_ERROR;
-	/* CONTENT-RANGE: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
+	/* Content-Range: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT */
 	if (StrStr(RangeInput, "bytes") == NULL ||
 		(Ptr = StrStr(RangeInput, "=")) == NULL) {
 		free(RangeInput);

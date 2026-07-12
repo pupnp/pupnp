@@ -903,7 +903,7 @@ int http_Download(const char *url_str,
 		HTTPMETHOD_GET,
 		url.pathquery.buff,
 		url.pathquery.size,
-		"HOST: ",
+		"Host: ",
 		hoststr,
 		hostlen);
 	if (ret_code != 0) {
@@ -1069,7 +1069,7 @@ int MakeGenericMessage(http_method_t method,
 				1,
 				"s"
 				"bcDCU",
-				"HOST: ",
+				"Host: ",
 				hoststr,
 				hostlen);
 		}
@@ -2004,7 +2004,7 @@ int http_MakeMessage(membuffer *buf,
 				    method,
 				    url.pathquery.buff,
 				    url.pathquery.size,
-				    "HOST: ",
+				    "Host: ",
 				    url.hostport.text.buff,
 				    url.hostport.text.size) != 0)
 				goto error_handler;
@@ -2127,7 +2127,7 @@ int MakeGetMessageEx(const char *url_str,
 			HTTPMETHOD_GET,
 			url->pathquery.buff,
 			url->pathquery.size,
-			"HOST: ",
+			"Host: ",
 			hoststr,
 			hostlen,
 			pRangeSpecifier);

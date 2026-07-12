@@ -276,7 +276,7 @@ static UPNP_INLINE int add_man_header(
 	/* change POST to M-POST */
 	if (membuffer_insert(headers, "M-", 2, 0) != 0)
 		return UPNP_E_OUTOF_MEMORY;
-	soap_action_hdr = strstr(headers->buf, "SOAPACTION:");
+	soap_action_hdr = strstr(headers->buf, "SOAPAction:");
 	/* can't fail */
 	assert(soap_action_hdr != NULL);
 	/* insert MAN header */
@@ -604,7 +604,7 @@ int SoapSendAction(char *action_url,
 		    &url,
 		    content_length,
 		    ContentTypeHeader,
-		    "SOAPACTION: \"",
+		    "SOAPAction: \"",
 		    service_type,
 		    "#",
 		    name.buf,
@@ -793,7 +793,7 @@ int SoapSendActionEx(char *action_url,
 		    &url,
 		    content_length,
 		    ContentTypeHeader,
-		    "SOAPACTION: \"",
+		    "SOAPAction: \"",
 		    service_type,
 		    "#",
 		    name.buf,
@@ -919,12 +919,12 @@ int SoapGetServiceVarStatus(char *action_url, char *var_name, char **var_value)
 		    SOAPMETHOD_POST,
 		    path.buf,
 		    path.length,
-		    "HOST: ",
+		    "Host: ",
 		    host.buf,
 		    host.length,
 		    content_length,
 		    ContentTypeHeader,
-		    "SOAPACTION: "
+		    "SOAPAction: "
 		    "\"urn:schemas-upnp-org:control-1-0#QueryStateVariable\"",
 		    xml_start,
 		    var_name,

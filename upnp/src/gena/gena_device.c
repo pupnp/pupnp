@@ -449,8 +449,8 @@ static char *AllocGenaHeaders(
 	const DOMString propertySet)
 {
 	static const char *HEADER_LINE_1 =
-		"CONTENT-TYPE: text/xml; charset=\"utf-8\"\r\n";
-	static const char *HEADER_LINE_2A = "CONTENT-LENGTH: ";
+		"Content-Type: text/xml; charset=\"utf-8\"\r\n";
+	static const char *HEADER_LINE_2A = "Content-Length: ";
 	static const char *HEADER_LINE_2B = "\r\n";
 	static const char *HEADER_LINE_3 = "NT: upnp:event\r\n";
 	static const char *HEADER_LINE_4 = "NTS: upnp:propchange\r\n";

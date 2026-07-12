@@ -511,10 +511,10 @@ Format types:
 	'B':	arg = int status_code		-- appends content-length,
 content-type and HTML body for given code. 'b':	arg1 = const char *buf; arg2 =
 size_t buf_length memory ptr
-	'C':	(no args)			-- appends a HTTP CONNECTION:
+	'C':	(no args)			-- appends a HTTP Connection:
 close header depending on major, minor version. 'c':	(no args)
 -- appends CRLF "\r\n"
-	'D':	(no args)			-- appends HTTP DATE: header
+	'D':	(no args)			-- appends HTTP Date: header
 	'd':	arg = int number		-- appends decimal number
 	'G':	arg = range information		-- add range header
 	'h':	arg = off_t number		-- appends off_t number
@@ -522,17 +522,17 @@ close header depending on major, minor version. 'c':	(no args)
 	'L':	arg = language information	-- add Content-Language header
 if Accept-Language header is not empty and if WEB_SERVER_CONTENT_LANGUAGE is not
 empty 'N':	arg1 = off_t content_length	-- content-length header 'q':
-arg1 = http_method_t		-- request start line and HOST header arg2 =
+arg1 = http_method_t		-- request start line and Host header arg2 =
 (uri_type *) 'Q':	arg1 = http_method_t;		-- start line of request
 		arg2 = char* url;
 		arg3 = size_t url_length
 	'R':	arg = int status_code		-- adds a response start line
-	'S':	(no args)			-- appends HTTP SERVER: header
+	'S':	(no args)			-- appends HTTP Server: header
 	's':	arg = const char *		-- C_string
 	'T':	arg = char * content_type;	-- format e.g: "text/html";
 content-type header
 	't':	arg = time_t * gmt_time		-- appends time in RFC 1123 fmt
-	'U':	(no args)			-- appends HTTP USER-AGENT:
+	'U':	(no args)			-- appends HTTP User-Agent:
 header
 	'X':	arg = const char *		-- useragent; "redsonic" HTTP
 X-User-Agent: useragent \endverbatim
