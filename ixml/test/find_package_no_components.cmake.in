@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.12...3.31)
 
 project(ixml_add_find_package_no_components_test
 	LANGUAGES C
-	VERSION @IXML_SOVERSION_STRING@)
+	VERSION @PUPNP_VERSION@)
 
 option(UPNP_BUILD_SHARED "" @UPNP_BUILD_SHARED@)
 option(UPNP_BUILD_STATIC "" @UPNP_BUILD_STATIC@)
 
-find_package(IXML @IXML_SOVERSION_STRING@ CONFIG REQUIRED)
+find_package(UPNP @PUPNP_VERSION@ CONFIG REQUIRED)
 
 if(UPNP_BUILD_SHARED)
 	add_executable(test_document_shared @PUPNP_SOURCE_DIR@/ixml/test/test_document.c)
