@@ -2,19 +2,19 @@ cmake_minimum_required(VERSION 3.12...3.31)
 
 project(upnp_add_find_package_test
 	LANGUAGES C
-	VERSION @IXML_SOVERSION_STRING@)
+	VERSION @PUPNP_VERSION@)
 
 option(UPNP_BUILD_SHARED "" @UPNP_BUILD_SHARED@)
 option(UPNP_BUILD_STATIC "" @UPNP_BUILD_STATIC@)
 
 if(UPNP_BUILD_SHARED)
-	find_package(UPNP @UPNP_SOVERSION_STRING@ CONFIG COMPONENTS Shared REQUIRED)
+	find_package(UPNP @PUPNP_VERSION@ CONFIG COMPONENTS Shared REQUIRED)
 	add_executable(test_list_shared @PUPNP_SOURCE_DIR@/upnp/test/test_list.c)
 	target_link_libraries(test_list_shared UPNP::Shared)
 endif()
 
 if(UPNP_BUILD_STATIC)
-	find_package(UPNP @UPNP_SOVERSION_STRING@ CONFIG COMPONENTS Static REQUIRED)
+	find_package(UPNP @PUPNP_VERSION@ CONFIG COMPONENTS Static REQUIRED)
 	add_executable(test_list_static @PUPNP_SOURCE_DIR@/upnp/test/test_list.c)
 	target_link_libraries(test_list_static UPNP::Static)
 endif()

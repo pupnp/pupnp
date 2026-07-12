@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12...3.31)
 
 project(upnp_add_subdirectory_test
 	LANGUAGES C
-	VERSION @UPNP_SOVERSION_STRING@)
+	VERSION @PUPNP_VERSION@)
 
 option(UPNP_BUILD_SHARED "" OFF)
 option(UPNP_BUILD_STATIC "" OFF)

@@ -6,24 +6,8 @@ include(cmake/test-functions.cmake)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# 1. Source of Truth for IXML
-set(IXML_VERSION_MAJOR 11)
-set(IXML_VERSION_MINOR 1)
-set(IXML_VERSION_PATCH 8)
-
-# 2. Source of Truth for UPNP
-set(UPNP_VERSION_MAJOR 22)
-set(UPNP_VERSION_MINOR 0)
-set(UPNP_VERSION_PATCH 3)
-
-# 3. Calculate Umbrella Version
-math(EXPR PUPNP_VERSION_MAJOR "${IXML_VERSION_MAJOR} + ${UPNP_VERSION_MAJOR}")
-math(EXPR PUPNP_VERSION_MINOR "${IXML_VERSION_MINOR} + ${UPNP_VERSION_MINOR}")
-math(EXPR PUPNP_VERSION_PATCH "${IXML_VERSION_PATCH} + ${UPNP_VERSION_PATCH}")
-set(PUPNP_VERSION_STRING "${PUPNP_VERSION_MAJOR}.${PUPNP_VERSION_MINOR}.${PUPNP_VERSION_PATCH}")
-
 project(PUPNP
-	VERSION ${PUPNP_VERSION_STRING}
+	VERSION 22.0.3
 	LANGUAGES C)
 
 include(GNUInstallDirs)
@@ -306,7 +290,7 @@ configure_package_config_file(
 )
 
 write_basic_package_version_file(UPNPConfigVersion.cmake
-	VERSION ${UPNP_VERSION_MAJOR}.${UPNP_VERSION_MINOR}.${UPNP_VERSION_PATCH}
+	VERSION ${PUPNP_VERSION}
 	COMPATIBILITY SameMajorVersion
 )
 
@@ -322,7 +306,6 @@ install(FILES
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP/
 )
 
-set(VERSION ${PUPNP_VERSION_STRING})
 set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix "\${prefix}")
 set(libdir "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12...3.31)
 
 project(upnp_add_find_package_no_components_test
 	LANGUAGES C
-	VERSION @UPNP_SOVERSION_STRING@)
+	VERSION @PUPNP_VERSION@)
 
 option(UPNP_BUILD_SHARED "" @UPNP_BUILD_SHARED@)
 option(UPNP_BUILD_STATIC "" @UPNP_BUILD_STATIC@)
