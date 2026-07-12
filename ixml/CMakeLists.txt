@@ -1,4 +1,4 @@
-if(IXML_ENABLE_TESTING)
+if(UPNP_ENABLE_TESTING)
 	enable_testing()
 	add_subdirectory(test)
 endif()

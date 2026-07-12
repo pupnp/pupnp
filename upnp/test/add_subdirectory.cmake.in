@@ -4,8 +4,8 @@ project(upnp_add_subdirectory_test
 	LANGUAGES C
 	VERSION @PUPNP_VERSION@)
 
-option(UPNP_BUILD_SHARED "" OFF)
-option(UPNP_BUILD_STATIC "" OFF)
+option(UPNP_BUILD_SHARED "" @UPNP_BUILD_SHARED@)
+option(UPNP_BUILD_STATIC "" @UPNP_BUILD_STATIC@)
 
 add_subdirectory(@PUPNP_SOURCE_DIR@ ${CMAKE_CURRENT_BINARY_DIR}/pupnp)
 
