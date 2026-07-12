@@ -268,21 +268,11 @@ add_subdirectory(ixml)
 add_subdirectory(upnp)
 add_subdirectory(samples)
 
-install(EXPORT UPNP
+install(EXPORT PUPNP
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP
 )
 
 include(CMakePackageConfigHelpers)
-
-configure_package_config_file(
-	IXML.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/IXMLConfig.cmake
-	INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/IXML
-)
-
-write_basic_package_version_file(IXMLConfigVersion.cmake
-	VERSION ${IXML_VERSION_MAJOR}.${IXML_VERSION_MINOR}.${IXML_VERSION_PATCH}
-	COMPATIBILITY SameMajorVersion
-)
 
 configure_package_config_file(
 	UPNP.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/UPNPConfig.cmake

@@ -23,12 +23,12 @@ set(IXML_HEADERS
 if(UPNP_BUILD_SHARED)
 	add_library(ixml_shared SHARED ${IXML_SOURCES} ${IXML_HEADERS})
 
-	add_library(IXML::Shared ALIAS ixml_shared)
+	add_library(UPNP::IXMLShared ALIAS ixml_shared)
 
 	set_target_properties(
 		ixml_shared
 		PROPERTIES C_VISIBILITY_PRESET "hidden"
-				EXPORT_NAME IXML::Shared
+				EXPORT_NAME UPNP::IXMLShared
 				OUTPUT_NAME ixml
 				PUBLIC_HEADER "${IXML_HEADERS}"
 				SOVERSION ${PUPNP_VERSION_MAJOR}
@@ -58,7 +58,7 @@ if(UPNP_BUILD_SHARED)
 
 	install(
 		TARGETS ixml_shared
-		EXPORT IXML
+		EXPORT PUPNP
 		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 			COMPONENT UPNP_Development
 		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -75,12 +75,12 @@ endif()
 if(UPNP_BUILD_STATIC)
 	add_library(ixml_static STATIC ${IXML_SOURCES} ${IXML_HEADERS})
 
-	add_library(IXML::Static ALIAS ixml_static)
+	add_library(UPNP::IXMLStatic ALIAS ixml_static)
 
 	set_target_properties(
 		ixml_static
 		PROPERTIES C_VISIBILITY_PRESET "hidden"
-				EXPORT_NAME IXML::Static
+				EXPORT_NAME UPNP::IXMLStatic
 				OUTPUT_NAME ixml${STATIC_POSTFIX}
 				PUBLIC_HEADER "${IXML_HEADERS}"
 				VERSION ${PUPNP_VERSION}
@@ -109,7 +109,7 @@ if(UPNP_BUILD_STATIC)
 
 	install(
 		TARGETS ixml_static
-		EXPORT IXML
+		EXPORT PUPNP
 		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 			COMPONENT UPNP_Development
 		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -122,5 +122,3 @@ if(UPNP_BUILD_STATIC)
 			COMPONENT UPNP_RunTime
 	)
 endif()
-
-install(EXPORT IXML DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/IXML)

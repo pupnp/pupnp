@@ -7,7 +7,7 @@ project(upnp_add_find_package_no_components_test
 option(UPNP_BUILD_SHARED "" @UPNP_BUILD_SHARED@)
 option(UPNP_BUILD_STATIC "" @UPNP_BUILD_STATIC@)
 
-find_package(UPNP @UPNP_SOVERSION_STRING@ CONFIG REQUIRED)
+find_package(UPNP @PUPNP_VERSION@ CONFIG REQUIRED)
 
 if(UPNP_BUILD_SHARED)
 	add_executable(test_list_shared @PUPNP_SOURCE_DIR@/upnp/test/test_list.c)
