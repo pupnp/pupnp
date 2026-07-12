@@ -24,16 +24,11 @@ if(UPNP_FIND_COMPONENTS)
 		endif()
 	endforeach()
 
-	find_dependency (IXML @IXML_SOVERSION_STRING@
-		COMPONENTS ${UPNP_FIND_COMPONENTS})
-
 	if(MSVC)
 		find_dependency (PTHREADS4W
 			COMPONENTS ${UPNP_FIND_COMPONENTS})
 	endif()
 else()
-	find_dependency (IXML @IXML_SOVERSION_STRING@)
-
 	if(MSVC)
 		find_dependency (PTHREADS4W)
 	endif()

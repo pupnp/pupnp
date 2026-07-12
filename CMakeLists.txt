@@ -17,6 +17,7 @@ include(cmake/options.cmake)
 if(MSVC)
 	set(CMAKE_DEBUG_POSTFIX d)
 	set(STATIC_POSTFIX s)
+	set(WIN_PREFIX "lib")
 endif()
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -268,6 +269,146 @@ add_subdirectory(ixml)
 add_subdirectory(upnp)
 add_subdirectory(samples)
 
+if(UPNP_BUILD_SHARED)
+	add_library(upnp_shared SHARED ${UPNP_SOURCES} ${UPNP_HEADERS})
+
+	add_library(UPNP::Shared ALIAS upnp_shared)
+
+	set_target_properties(upnp_shared
+		PROPERTIES
+			C_VISIBILITY_PRESET "hidden"
+			EXPORT_NAME UPNP::Shared
+			OUTPUT_NAME ${WIN_PREFIX}upnp
+			PUBLIC_HEADER "${UPNP_HEADERS}"
+			SOVERSION ${PUPNP_VERSION_MAJOR}
+			VERSION ${PUPNP_VERSION}
+	)
+
+	target_compile_definitions(upnp_shared
+		PRIVATE
+			$<$<BOOL:${IXML_HAVE_SCRIPTSUPPORT}>:IXML_HAVE_SCRIPTSUPPORT>
+		PRIVATE $<$<CONFIG:Debug>:STATS>
+		PRIVATE LIBUPNP_EXPORTS
+		PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
+		PUBLIC $<$<BOOL:${MSVC}>:LIBUPNP_EXPORTS>
+		PUBLIC $<$<BOOL:${_LARGE_FILES}>:_LARGE_FILES>
+		PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64>
+		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	)
+
+	target_compile_options(upnp_shared
+		PRIVATE
+			$<$<BOOL:${HAVE_MACRO_PREFIX_MAP}>:-fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.>
+	)
+
+	target_include_directories(upnp_shared
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/upnp/src/threadutil/
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ixml/inc/>
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ixml/src/inc/>
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/upnp/inc/>
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/upnp/src/inc/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/ixml/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
+		PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/upnp>
+	)
+
+	target_link_libraries(upnp_shared
+		PUBLIC $<$<BOOL:${UPNP_ENABLE_OPEN_SSL}>:OpenSSL::SSL>
+		PRIVATE $<$<PLATFORM_ID:SunOS>:nsl>
+		PRIVATE $<$<PLATFORM_ID:SunOS>:socket>
+		PRIVATE $<$<PLATFORM_ID:Windows>:ws2_32>
+		PRIVATE $<$<PLATFORM_ID:Windows>:iphlpapi>
+		PUBLIC Threads::Shared
+	)
+
+	install(
+		TARGETS upnp_shared
+		EXPORT UPNP
+		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			COMPONENT UPNP_Development
+		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			COMPONENT UPNP_RunTime
+			NAMELINK_COMPONENT UPNP_Development
+		PUBLIC_HEADER
+		        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
+			COMPONENT UPNP_Development
+		RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+			COMPONENT UPNP_RunTime
+	)
+endif()
+
+if(UPNP_BUILD_STATIC)
+	add_library(upnp_static STATIC ${UPNP_SOURCES} ${UPNP_HEADERS})
+
+	add_library(UPNP::Static ALIAS upnp_static)
+
+	set_target_properties(upnp_static
+		PROPERTIES
+			C_VISIBILITY_PRESET "hidden"
+			EXPORT_NAME UPNP::Static
+			OUTPUT_NAME ${WIN_PREFIX}upnp${STATIC_POSTFIX}
+			PUBLIC_HEADER "${UPNP_HEADERS}"
+			VERSION ${PUPNP_VERSION}
+	)
+
+	target_compile_definitions(upnp_static
+		PRIVATE
+			$<$<BOOL:${IXML_HAVE_SCRIPTSUPPORT}>:IXML_HAVE_SCRIPTSUPPORT>
+		PRIVATE UPNP_STATIC_LIB
+		PRIVATE LIBUPNP_EXPORTS
+		PRIVATE $<$<CONFIG:Debug>:STATS>
+		PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
+		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+		PUBLIC $<$<BOOL:${_LARGE_FILES}>:_LARGE_FILES>
+		PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64>
+		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
+	)
+
+	target_compile_options(upnp_static
+		PRIVATE
+			$<$<BOOL:${HAVE_MACRO_PREFIX_MAP}>:-fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.>
+	)
+
+	target_include_directories(upnp_static
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/upnp/src/threadutil/
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ixml/inc/>
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ixml/src/inc/>
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/upnp/inc/>
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/upnp/src/inc/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/ixml/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/>
+		PUBLIC $<BUILD_INTERFACE:${PUPNP_BINARY_DIR}/upnp/inc/>
+		PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/upnp>
+	)
+
+	target_link_libraries(upnp_static
+		PUBLIC $<$<BOOL:${UPNP_ENABLE_OPEN_SSL}>:OpenSSL::SSL>
+		PRIVATE $<$<PLATFORM_ID:SunOS>:nsl>
+		PRIVATE $<$<PLATFORM_ID:SunOS>:socket>
+		PRIVATE $<$<PLATFORM_ID:Windows>:ws2_32>
+		PRIVATE $<$<PLATFORM_ID:Windows>:iphlpapi>
+		PUBLIC Threads::Static
+	)
+
+	install(
+		TARGETS upnp_static
+		EXPORT UPNP
+		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			COMPONENT UPNP_Development
+		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			COMPONENT UPNP_RunTime
+			NAMELINK_COMPONENT UPNP_Development
+		PUBLIC_HEADER
+		        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
+			COMPONENT UPNP_Development
+		RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+			COMPONENT UPNP_RunTime
+	)
+endif()
+
 install(EXPORT UPNP
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP
 )
@@ -275,22 +416,12 @@ install(EXPORT UPNP
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
-	IXML.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/IXMLConfig.cmake
-	INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/IXML
-)
-
-write_basic_package_version_file(IXMLConfigVersion.cmake
-	VERSION ${IXML_VERSION_MAJOR}.${IXML_VERSION_MINOR}.${IXML_VERSION_PATCH}
-	COMPATIBILITY SameMajorVersion
-)
-
-configure_package_config_file(
 	UPNP.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/UPNPConfig.cmake
 	INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP
 )
 
 write_basic_package_version_file(UPNPConfigVersion.cmake
-	VERSION ${UPNP_VERSION_MAJOR}.${UPNP_VERSION_MINOR}.${UPNP_VERSION_PATCH}
+	VERSION ${PUPNP_VERSION}
 	COMPATIBILITY SameMajorVersion
 )
 
@@ -306,7 +437,6 @@ install(FILES
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP/
 )
 
-set(VERSION ${PUPNP_VERSION_STRING})
 set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix "\${prefix}")
 set(libdir "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")
@@ -358,7 +488,7 @@ endif()
 # CPack Source Tarball Configuration (Replacement for 'make dist')
 # ------------------------------------------------------------------------------
 set(CPACK_SOURCE_GENERATOR "TBZ2")
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "libupnp-${PUPNP_VERSION_STRING}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "libupnp-${PUPNP_VERSION}")
 set(CPACK_SOURCE_IGNORE_FILES
 	"/.git/"
 	"/.github/"

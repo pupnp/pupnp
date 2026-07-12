@@ -1,131 +1,24 @@
-project(ixml
-	VERSION ${IXML_VERSION_MAJOR}.${IXML_VERSION_MINOR}.${IXML_VERSION_PATCH}
-	LANGUAGES C)
-
-if(IXML_ENABLE_TESTING)
+if(UPNP_ENABLE_TESTING)
 	enable_testing()
 	add_subdirectory(test)
 endif()
 
-set(IXML_SOURCES
-	src/attr.c
-	src/document.c
-	src/element.c
-	src/ixml.c
-	src/ixmldebug.c
-	src/ixmlmembuf.c
-	src/ixmlparser.c
-	src/namedNodeMap.c
-	src/node.c
-	src/nodeList.c
+list(APPEND UPNP_SOURCES
+	ixml/src/attr.c
+	ixml/src/document.c
+	ixml/src/element.c
+	ixml/src/ixml.c
+	ixml/src/ixmldebug.c
+	ixml/src/ixmlmembuf.c
+	ixml/src/ixmlparser.c
+	ixml/src/namedNodeMap.c
+	ixml/src/node.c
+	ixml/src/nodeList.c
 )
 
-set(IXML_HEADERS
-	inc/ixml.h
-	inc/ixmldebug.h)
+set(UPNP_HEADERS
+	ixml/inc/ixml.h
+	ixml/inc/ixmldebug.h)
 
-if(UPNP_BUILD_SHARED)
-	add_library(ixml_shared SHARED ${IXML_SOURCES} ${IXML_HEADERS})
-
-	add_library(IXML::Shared ALIAS ixml_shared)
-
-	set_target_properties(
-		ixml_shared
-		PROPERTIES C_VISIBILITY_PRESET "hidden"
-				EXPORT_NAME IXML::Shared
-				OUTPUT_NAME ixml
-				PUBLIC_HEADER "${IXML_HEADERS}"
-				SOVERSION ${IXML_VERSION_MAJOR}
-				VERSION ${IXML_VERSION_MAJOR}.${IXML_VERSION_MINOR}.${IXML_VERSION_PATCH}
-	)
-
-	target_compile_definitions(
-		ixml_shared
-		PRIVATE
-			$<$<BOOL:${IXML_HAVE_SCRIPTSUPPORT}>:IXML_HAVE_SCRIPTSUPPORT>
-		PRIVATE LIBUPNP_EXPORTS
-		PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
-		PUBLIC $<$<BOOL:${MSVC}>:LIBUPNP_EXPORTS>
-		PUBLIC $<$<BOOL:${_LARGE_FILES}>:_LARGE_FILES>
-		PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64>
-		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
-	)
-
-	target_include_directories(
-		ixml_shared
-		PRIVATE ${PUPNP_BINARY_DIR}/
-		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
-		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
-		PUBLIC $<BUILD_INTERFACE:${PUPNP_SOURCE_DIR}/upnp/inc/>
-		PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/upnp>
-	)
-
-	install(
-		TARGETS ixml_shared
-		EXPORT IXML
-		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-			COMPONENT UPNP_Development
-		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-			COMPONENT UPNP_RunTime
-			NAMELINK_COMPONENT UPNP_Development
-		PUBLIC_HEADER
-		        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
-			COMPONENT UPNP_Development
-		RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-			COMPONENT UPNP_RunTime
-	)
-endif()
-
-if(UPNP_BUILD_STATIC)
-	add_library(ixml_static STATIC ${IXML_SOURCES} ${IXML_HEADERS})
-
-	add_library(IXML::Static ALIAS ixml_static)
-
-	set_target_properties(
-		ixml_static
-		PROPERTIES C_VISIBILITY_PRESET "hidden"
-				EXPORT_NAME IXML::Static
-				OUTPUT_NAME ixml${STATIC_POSTFIX}
-				PUBLIC_HEADER "${IXML_HEADERS}"
-				SOVERSION ${IXML_VERSION_MAJOR}
-				VERSION ${IXML_VERSION_MAJOR}.${IXML_VERSION_MINOR}.${IXML_VERSION_PATCH}
-	)
-
-	target_compile_definitions(
-		ixml_static
-		PRIVATE
-			$<$<BOOL:${IXML_HAVE_SCRIPTSUPPORT}>:IXML_HAVE_SCRIPTSUPPORT>
-		PRIVATE LIBUPNP_EXPORTS
-		PUBLIC UPNP_STATIC_LIB
-		PUBLIC $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
-		PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
-		PUBLIC $<$<BOOL:${_LARGE_FILES}>:_LARGE_FILES>
-		PUBLIC $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64>
-	)
-
-	target_include_directories(
-		ixml_static
-		PRIVATE ${PUPNP_BINARY_DIR}/
-		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
-		PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/inc/>
-		PUBLIC $<BUILD_INTERFACE:${PUPNP_SOURCE_DIR}/upnp/inc/>
-		PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/upnp>
-	)
-
-	install(
-		TARGETS ixml_static
-		EXPORT IXML
-		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-			COMPONENT UPNP_Development
-		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-			COMPONENT UPNP_RunTime
-			NAMELINK_COMPONENT UPNP_Development
-		PUBLIC_HEADER
-		        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/upnp
-			COMPONENT UPNP_Development
-		RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-			COMPONENT UPNP_RunTime
-	)
-endif()
-
-install(EXPORT IXML DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/IXML)
+set (UPNP_SOURCES ${UPNP_SOURCES} PARENT_SCOPE)
+set (UPNP_HEADERS ${UPNP_HEADERS} PARENT_SCOPE)
