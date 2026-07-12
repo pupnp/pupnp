@@ -285,12 +285,6 @@ write_basic_package_version_file(UPNPConfigVersion.cmake
 )
 
 install(FILES
-	${CMAKE_CURRENT_BINARY_DIR}/IXMLConfig.cmake
-	${CMAKE_CURRENT_BINARY_DIR}/IXMLConfigVersion.cmake
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/IXML/
-)
-
-install(FILES
 	${CMAKE_CURRENT_BINARY_DIR}/UPNPConfig.cmake
 	${CMAKE_CURRENT_BINARY_DIR}/UPNPConfigVersion.cmake
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/UPNP/
