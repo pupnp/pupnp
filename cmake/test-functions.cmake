@@ -178,32 +178,3 @@ function(UPNP_Find_Test_Libs testName resultVar)
 		PARENT_SCOPE
 	)
 endfunction()
-
-function(IXML_add_unit_test testName sourceFile parameters)
-	if(UPNP_BUILD_SHARED)
-		add_executable("${testName}-shared" "${sourceFile}")
-		target_link_libraries("${testName}-shared" PRIVATE ixml_shared)
-		if(MINGW OR MSYS)
-			target_link_options(
-				"${testName}-shared" PRIVATE -static-libstdc++
-							-static-libgcc
-			)
-		endif()
-		add_test(NAME ${testName} COMMAND "${testName}-shared"
-							${parameters}
-		)
-		set_tests_properties(
-			${testName}
-			PROPERTIES ENVIRONMENT
-					"PATH=$<TARGET_FILE_DIR:ixml_shared>\;%PATH%"
-		)
-	endif()
-
-	if(UPNP_BUILD_STATIC)
-		add_executable("${testName}-static" "${sourceFile}")
-		target_link_libraries("${testName}-static" PRIVATE ixml_static)
-		add_test(NAME "${testName}-static" COMMAND "${testName}-static"
-								${parameters}
-		)
-	endif()
-endfunction()
