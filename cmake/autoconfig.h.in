@@ -49,6 +49,10 @@
 /* see upnpconfig.h */
 #cmakedefine UPNP_MINISERVER_REUSEADDR 1
 
+/* On Windows, select the network interface by its adapter name (GUID) instead
+ * of the friendly name (see UpnpGetIfInfo in upnp/src/api/upnpapi.c). */
+#cmakedefine UPNP_ADAPTER_UUID_NAME 1
+
 /* Type for storing the length of struct sockaddr */
 #cmakedefine socklen_t 1
 

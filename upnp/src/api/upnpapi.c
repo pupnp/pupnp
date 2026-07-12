@@ -3826,6 +3826,12 @@ int UpnpGetIfInfo(const char *IfName)
 		}
 		if (ifname_found == 0) {
 			/* We have found a valid interface name. Keep it. */
+	#ifdef UPNP_ADAPTER_UUID_NAME
+			strncpy(gIF_NAME,
+				adapts_item->AdapterName,
+				sizeof(gIF_NAME) - 1);
+			gIF_NAME[sizeof(gIF_NAME) - 1] = 0;
+	#else
 			/*
 			 * Partial fix for Windows: Friendly name is wchar
 			 * string, but currently gIF_NAME is char string. For
@@ -3840,9 +3846,18 @@ int UpnpGetIfInfo(const char *IfName)
 				adapts_item->FriendlyName,
 				sizeof(gIF_NAME));
 			free(s);
-
+	#endif
 			ifname_found = 1;
 		} else {
+	#ifdef UPNP_ADAPTER_UUID_NAME
+			if (strncmp(gIF_NAME,
+				    adapts_item->AdapterName,
+				    sizeof(gIF_NAME)) != 0) {
+				/* This is not the interface we're looking for.
+				 */
+				continue;
+			}
+	#else
 			/*
 			 * Partial fix for Windows: Friendly name is wchar
 			 * string, but currently gIF_NAME is char string. For
@@ -3866,6 +3881,7 @@ int UpnpGetIfInfo(const char *IfName)
 				 */
 				continue;
 			}
+	#endif
 		}
 		/* Loop thru this adapter's unicast IP addresses. */
 		uni_addr = adapts_item->FirstUnicastAddress;

@@ -171,6 +171,12 @@ jobs:
       matrix:
         sys: [ mingw64, mingw32, ucrt64, clang64 ]
         conf: [ Release, Debug ]
+        include:
+          # Exercise the opt-in UPNP_ADAPTER_UUID_NAME option on one
+          # representative toolchain/config combo.
+          - sys: mingw64
+            conf: Release
+            extra_cmake_flags: -DUPNP_ADAPTER_UUID_NAME=ON
     defaults:
       run:
         shell: msys2 {0}
@@ -209,6 +215,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ matrix.conf }} \
             -DIXML_ENABLE_TESTING_INTEGRATION=OFF \
             -DUPNP_ENABLE_TESTING_INTEGRATION=OFF \
+            ${{ matrix.extra_cmake_flags }} \
             -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install
       - name: Build
         run: cmake --build build --config ${{ matrix.conf }}

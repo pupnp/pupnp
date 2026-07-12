@@ -9,6 +9,7 @@ option (IXML_ENABLE_SCRIPT_SUPPORT "script support for IXML document tree, see i
 option (IXML_ENABLE_TESTING "enable tests for ixml" ${testing_default})
 option (IXML_ENABLE_TESTING_INTEGRATION "enable integrationtests for ixml" ${testing_default})
 
+option (UPNP_ADAPTER_UUID_NAME "on Windows, select the network interface by its adapter name (GUID) instead of the friendly name" OFF)
 option (UPNP_BUILD_SAMPLES "compilation of upnp/sample/ code" ON)
 option (UPNP_BUILD_SHARED "Build shared libraries" ON)
 option (UPNP_BUILD_STATIC "Build static libraries" ON)

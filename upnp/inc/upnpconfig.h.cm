@@ -129,4 +129,9 @@
  * with SO_REUSEADDR (i.e. configure --enable_reuseaddr) */
 #cmakedefine UPNP_MINISERVER_REUSEADDR 1
 
+/** Defined to 1 if, on Windows, the library has been compiled to select the
+ *  network interface by its adapter name (GUID) instead of the friendly name
+ *  (i.e. cmake -DUPNP_ADAPTER_UUID_NAME=ON) */
+#cmakedefine UPNP_ADAPTER_UUID_NAME 1
+
 #endif /* UPNP_CONFIG_H */
