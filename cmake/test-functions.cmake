@@ -81,10 +81,17 @@ function(UPNP_Add_Test_Executable testName sourceFile)
 endfunction()
 
 function(UPNP_Add_Unit_Test testName sourceFile)
+	cmake_parse_arguments (
+		TEST
+		""
+		""
+		"ARGS"
+		${ARGN})
+
 	UPNP_Add_Test_Executable(${testName} ${sourceFile})
 
 	if(UPNP_BUILD_SHARED)
-		add_test(NAME ${testName} COMMAND ${testName})
+		add_test(NAME ${testName} COMMAND ${testName} ${TEST_ARGS})
 
 		if(MSVC
 			OR MSYS
@@ -101,7 +108,7 @@ function(UPNP_Add_Unit_Test testName sourceFile)
 	endif()
 
 	if(UPNP_BUILD_STATIC)
-		add_test(NAME ${testName}-static COMMAND ${testName}-static)
+		add_test(NAME ${testName}-static COMMAND ${testName}-static ${TEST_ARGS})
 	endif()
 endfunction()
 
