@@ -6,8 +6,6 @@ if(DEFINED ENABLE_TESTING AND NOT IXML_ENABLE_TESTING AND NOT UPNP_ENABLE_TESTIN
 endif()
 
 option (IXML_ENABLE_SCRIPT_SUPPORT "script support for IXML document tree, see ixml.h" ON)
-option (IXML_ENABLE_TESTING "enable tests for ixml" ${testing_default})
-option (IXML_ENABLE_TESTING_INTEGRATION "enable integrationtests for ixml" ${testing_default})
 
 option (UPNP_BUILD_SAMPLES "compilation of upnp/sample/ code" ON)
 option (UPNP_BUILD_SHARED "Build shared libraries" ON)
