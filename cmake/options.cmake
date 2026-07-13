@@ -5,7 +5,7 @@ if(DEFINED ENABLE_TESTING AND NOT IXML_ENABLE_TESTING AND NOT UPNP_ENABLE_TESTIN
 	set (testing_default §{BUILD_TESTING})
 endif()
 
-option (IXML_ENABLE_SCRIPT_SUPPORT "script support for IXML document tree, see ixml.h" ON)
+option (UPNP_IXML_ENABLE_SCRIPT_SUPPORT "script support for IXML document tree, see ixml.h" ON)
 
 option (UPNP_ADAPTER_UUID_NAME "on Windows, select the network interface by its adapter name (GUID) instead of the friendly name" OFF)
 option (UPNP_BUILD_SAMPLES "compilation of upnp/sample/ code" ON)
@@ -33,7 +33,7 @@ if (UPNP_ENABLE_WEBSERVER AND NOT UPNP_ENABLE_DEVICE_API)
 	message (FATAL_ERROR "The webserver does not work without the device-api code")
 endif()
 
-set (IXML_HAVE_SCRIPTSUPPORT ${IXML_ENABLE_SCRIPT_SUPPORT}) #see ixml.h
+set (IXML_HAVE_SCRIPTSUPPORT ${UPNP_IXML_ENABLE_SCRIPT_SUPPORT}) #see ixml.h
 set (UPNP_HAVE_CLIENT ${UPNP_ENABLE_CLIENT_API}) #see upnpconfig.h
 set (UPNP_HAVE_DEBUG ${UPNP_ENABLE_DEBUG}) #see upnpconfig.h
 set (UPNP_HAVE_DEVICE ${UPNP_ENABLE_DEVICE_API}) #see upnpconfig.h
