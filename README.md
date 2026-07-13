@@ -285,12 +285,14 @@ In Order to build everything using the cmake build system, you just need to inst
 Standalone cmake is recommended, IDE's like Visual Studio have built-in support which works, but as cmake in general
 encourages out-of-source builds and VS writes it's config into the source, cmake-gui should be used on windows.
 
-All known options have the same meaning as stated in point 10.2. In Addition 2 options have been added.
+All known options have the same meaning as stated in point 10.2. In Addition 3 options have been added.
 
 - DOWNLOAD_AND_BUILD_DEPS: This option is only available if a useable git program was found on your system.
   With this option on, the pthread4w package will be downloaded while configuring the build-env, then it will be build and installed along with upnp.
 
-- BUILD_TESTING: This option activates the tests.
+- UPNP_ENABLE_TESTING: This option activates the unit tests.
+
+- UPNP_ENABLE_TESTING_INTEGRATION: This option activates the integration tests (find_package/add_subdirectory consumption checks).
 
 If you don't want to build pthreads4w in the same build as upnp, you can download it from <https://github.com/Vollstrecker/pthreads4w>.
 Just build and install it. The libs and headers will be found, if you set CMAKE_INSTALL_PREFIX (the base install dir) to the same location.
