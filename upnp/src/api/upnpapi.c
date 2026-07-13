@@ -3720,6 +3720,35 @@ static unsigned UpnpComputeIpv6PrefixLength(struct sockaddr_in6 *Netmask)
 	return prefix_length;
 }
 
+/* Only format an address family that was actually found: formatting an
+ * unset v4/v6 storage would encode whatever bytes are in it (possibly
+ * uninitialized) into a syntactically valid but bogus address string,
+ * which downstream code (SSDP, GENA, the miniserver) then treats as
+ * "this protocol is available on the interface". */
+void UpnpSetIfAddrStrings(int valid_v4_addr_found,
+	const struct in_addr *v4_addr,
+	const struct in_addr *v4_netmask,
+	char *out_v4,
+	size_t out_v4_len,
+	char *out_v4_netmask,
+	size_t out_v4_netmask_len,
+	int valid_v6_addr_found,
+	const struct in6_addr *v6_addr,
+	char *out_v6,
+	size_t out_v6_len)
+{
+	if (valid_v4_addr_found) {
+		inet_ntop(AF_INET, v4_addr, out_v4, out_v4_len);
+		inet_ntop(AF_INET,
+			v4_netmask,
+			out_v4_netmask,
+			out_v4_netmask_len);
+	}
+	if (valid_v6_addr_found) {
+		inet_ntop(AF_INET6, v6_addr, out_v6, out_v6_len);
+	}
+}
+
 int UpnpGetIfInfo(const char *IfName)
 {
 #ifdef _WIN32
@@ -3732,12 +3761,20 @@ int UpnpGetIfInfo(const char *IfName)
 	SOCKADDR *ip_addr;
 	struct in_addr v4_addr;
 	struct in_addr v4_netmask;
-	struct in6_addr v6_addr;
+	struct in6_addr v6_addr = {0};
 	ULONG adapts_sz = 0;
 	ULONG mask = 0;
 	ULONG ret;
 	int ifname_found = 0;
 	int valid_addr_found = 0;
+	int valid_v4_addr_found = 0;
+	int valid_v6_addr_found = 0;
+
+	/* Clear stale IPv6 address from any previous initialization so that
+	 * a network change (or IPv6 being disabled on the interface) does
+	 * not leave gIF_IPV6 pointing at an address that is no longer valid
+	 * (issue #195). */
+	gIF_IPV6[0] = '\0';
 
 	/* Get Adapters addresses required size. */
 	ret = GetAdaptersAddresses(AF_UNSPEC,
@@ -3898,6 +3935,7 @@ int UpnpGetIfInfo(const char *IfName)
 					<< (32 - uni_addr->OnLinkPrefixLength));
 				memcpy(&v4_netmask, &mask, sizeof(v4_netmask));
 				valid_addr_found = 1;
+				valid_v4_addr_found = 1;
 				break;
 			case AF_INET6:
 				/* TODO: Retrieve IPv6 ULA or GUA address and
@@ -3913,6 +3951,7 @@ int UpnpGetIfInfo(const char *IfName)
 						sizeof(v6_addr));
 					/* TODO: Retrieve IPv6 LLA prefix */
 					valid_addr_found = 1;
+					valid_v6_addr_found = 1;
 				}
 				break;
 			default:
@@ -3944,12 +3983,17 @@ int UpnpGetIfInfo(const char *IfName)
 			"use.\n");
 		return UPNP_E_INVALID_INTERFACE;
 	}
-	inet_ntop(AF_INET, &v4_addr, gIF_IPV4, sizeof(gIF_IPV4));
-	inet_ntop(AF_INET,
+	UpnpSetIfAddrStrings(valid_v4_addr_found,
+		&v4_addr,
 		&v4_netmask,
+		gIF_IPV4,
+		sizeof(gIF_IPV4),
 		gIF_IPV4_NETMASK,
-		sizeof(gIF_IPV4_NETMASK));
-	inet_ntop(AF_INET6, &v6_addr, gIF_IPV6, sizeof(gIF_IPV6));
+		sizeof(gIF_IPV4_NETMASK),
+		valid_v6_addr_found,
+		&v6_addr,
+		gIF_IPV6,
+		sizeof(gIF_IPV6));
 #else
 	struct ifaddrs *ifap, *ifa;
 	struct in_addr v4_addr = {0};

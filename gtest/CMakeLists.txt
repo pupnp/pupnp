@@ -62,6 +62,31 @@ if (NOT WIN32 AND UPNP_BUILD_STATIC)
 	)
 endif()
 
+# regression test — Windows UpnpGetIfInfo() must not format an address
+# family that was not found on the interface (amule-org/amule#242, #301);
+# UpnpSetIfAddrStrings() is an internal symbol so only the static variant
+# is built.
+if (NOT WIN32 AND UPNP_BUILD_STATIC)
+	add_executable(test_upnpapi_setifaddrstrings-static
+		test_upnpapi_setifaddrstrings.cpp)
+	target_link_libraries(test_upnpapi_setifaddrstrings-static
+		PRIVATE upnp_static GTest::gtest)
+	target_include_directories(test_upnpapi_setifaddrstrings-static PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/inc/
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/threadutil/
+	)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test_upnpapi_setifaddrstrings-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+		)
+	endif()
+	gtest_add_tests(
+		TARGET test_upnpapi_setifaddrstrings-static
+		TEST_PREFIX test-upnp-
+		TEST_SUFFIX -static
+	)
+endif()
+
 # regression test for issue #395 — sock_write must not pass MSG_DONTROUTE to
 # send() on TCP sockets; sock_write() is an internal symbol (hidden visibility
 # in the shared library) so only the static variant is built.

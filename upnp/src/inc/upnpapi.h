@@ -310,6 +310,23 @@ int UpnpGetIfInfo(
 	/*! [in] Interface name (can be NULL). */
 	const char *IfName);
 
+/*!
+ * \brief Format the discovered v4/v6 interface addresses into their
+ * output string buffers, but only for the address families that were
+ * actually found (valid_v4_addr_found / valid_v6_addr_found).
+ */
+void UpnpSetIfAddrStrings(int valid_v4_addr_found,
+	const struct in_addr *v4_addr,
+	const struct in_addr *v4_netmask,
+	char *out_v4,
+	size_t out_v4_len,
+	char *out_v4_netmask,
+	size_t out_v4_netmask_len,
+	int valid_v6_addr_found,
+	const struct in6_addr *v6_addr,
+	char *out_v6,
+	size_t out_v6_len);
+
 void UpnpThreadDistribution(struct UpnpNonblockParam *Param);
 
 /*!
