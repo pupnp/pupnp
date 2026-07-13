@@ -149,7 +149,6 @@ jobs:
             ${{ env.cmake_common_flags }} \
             -DCMAKE_BUILD_TYPE=${{ matrix.conf }} \
             -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install \
-            -DIXML_ENABLE_TESTING_INTEGRATION=OFF \
             -DUPNP_ENABLE_TESTING_INTEGRATION=OFF \
             ${OPENSSL_ROOT_DIR:+-DOPENSSL_ROOT_DIR="$OPENSSL_ROOT_DIR"} \
             ${OPENSSL_INCLUDE_DIR:+-DOPENSSL_INCLUDE_DIR="$OPENSSL_INCLUDE_DIR"} \
@@ -213,7 +212,6 @@ jobs:
           cmake \
             ${{ env.cmake_common_flags }} \
             -DCMAKE_BUILD_TYPE=${{ matrix.conf }} \
-            -DIXML_ENABLE_TESTING_INTEGRATION=OFF \
             -DUPNP_ENABLE_TESTING_INTEGRATION=OFF \
             ${{ matrix.extra_cmake_flags }} \
             -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install
@@ -239,7 +237,6 @@ jobs:
             ${{ env.cmake_common_flags }} \
             -DCMAKE_C_FLAGS="-Wall -Wpedantic" \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DIXML_ENABLE_TESTING_INTEGRATION=OFF \
             -DUPNP_ENABLE_TESTING_INTEGRATION=OFF \
             ${{ env.cmake_sanitizer_flags }}
       - name: build
@@ -259,7 +256,6 @@ jobs:
           cmake \
             ${{ env.cmake_common_flags }} \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DIXML_ENABLE_TESTING_INTEGRATION=OFF \
             -DUPNP_ENABLE_TESTING_INTEGRATION=OFF \
             ${{ env.cmake_tsan_flags }}
       - name: build
