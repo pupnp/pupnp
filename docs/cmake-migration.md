@@ -26,10 +26,7 @@ is the sole build system.
 
 ### Version numbers
 
-Previously the authoritative version was in `configure.ac` (the `AC_INIT`
-line) and `cmake/autoheader.cmake` parsed it at configure time.
-
-Now the version is defined directly in `CMakeLists.txt`, as the single
+The version is defined directly in `CMakeLists.txt`, as the single
 `project(PUPNP ...)` version:
 
 ```cmake
