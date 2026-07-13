@@ -341,7 +341,7 @@ endif()
 # CPack Source Tarball Configuration (Replacement for 'make dist')
 # ------------------------------------------------------------------------------
 set(CPACK_SOURCE_GENERATOR "TBZ2")
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "libupnp-${PUPNP_VERSION_STRING}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "libupnp-${PUPNP_VERSION}")
 set(CPACK_SOURCE_IGNORE_FILES
 	"/.git/"
 	"/.github/"
