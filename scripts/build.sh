@@ -44,7 +44,6 @@ if [ "$asan" -eq 1 ]; then
 	cmake_extra_flags=(
 		-DCMAKE_CXX_FLAGS="-fsanitize=address,leak"
 		-DCMAKE_SHARED_LINKER_FLAGS="-fsanitize=address,leak"
-		-DIXML_ENABLE_TESTING_INTEGRATION=OFF
 		-DUPNP_ENABLE_TESTING_INTEGRATION=OFF
 	)
 fi
