@@ -32,19 +32,9 @@ echo "=========================================="
 echo "    Testing Release Process Locally       "
 echo "=========================================="
 
-# Derive the current PUPNP umbrella version from CMakeLists.txt.
-# CMake computes it as IXML + UPNP for each component; we mirror that math here
-# so the script stays correct as the version advances without manual updates.
-ixml_major=$(grep -E "^set\(IXML_VERSION_MAJOR" CMakeLists.txt | grep -oE '[0-9]+')
-ixml_minor=$(grep -E "^set\(IXML_VERSION_MINOR" CMakeLists.txt | grep -oE '[0-9]+')
-ixml_patch=$(grep -E "^set\(IXML_VERSION_PATCH" CMakeLists.txt | grep -oE '[0-9]+')
-upnp_major=$(grep -E "^set\(UPNP_VERSION_MAJOR" CMakeLists.txt | grep -oE '[0-9]+')
-upnp_minor=$(grep -E "^set\(UPNP_VERSION_MINOR" CMakeLists.txt | grep -oE '[0-9]+')
-upnp_patch=$(grep -E "^set\(UPNP_VERSION_PATCH" CMakeLists.txt | grep -oE '[0-9]+')
-pupnp_major=$((ixml_major + upnp_major))
-pupnp_minor=$((ixml_minor + upnp_minor))
-pupnp_patch=$((ixml_patch + upnp_patch))
-CURRENT_TAG="release-${pupnp_major}.${pupnp_minor}.${pupnp_patch}"
+# Derive the current PUPNP version from CMakeLists.txt.
+CURRENT_VERSION=$(grep -A2 -E '^project\(PUPNP' CMakeLists.txt | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+CURRENT_TAG="release-${CURRENT_VERSION}"
 
 echo "Derived tag from CMakeLists.txt: ${CURRENT_TAG}"
 
