@@ -41,22 +41,10 @@ if [[ "${1:-}" == "-n" ]]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Derive the current PUPNP umbrella version from CMakeLists.txt.
-# The umbrella version is the sum of the IXML and UPNP component versions,
-# mirroring the math CMake performs at configure time.
+# Derive the current PUPNP version from CMakeLists.txt.
 # Done first so the tag name is always visible, even if a later check aborts.
 # ------------------------------------------------------------------------------
-ixml_major=$(grep -E "^set\(IXML_VERSION_MAJOR" CMakeLists.txt | grep -oE '[0-9]+')
-ixml_minor=$(grep -E "^set\(IXML_VERSION_MINOR" CMakeLists.txt | grep -oE '[0-9]+')
-ixml_patch=$(grep -E "^set\(IXML_VERSION_PATCH" CMakeLists.txt | grep -oE '[0-9]+')
-upnp_major=$(grep -E "^set\(UPNP_VERSION_MAJOR" CMakeLists.txt | grep -oE '[0-9]+')
-upnp_minor=$(grep -E "^set\(UPNP_VERSION_MINOR" CMakeLists.txt | grep -oE '[0-9]+')
-upnp_patch=$(grep -E "^set\(UPNP_VERSION_PATCH" CMakeLists.txt | grep -oE '[0-9]+')
-pupnp_major=$((ixml_major + upnp_major))
-pupnp_minor=$((ixml_minor + upnp_minor))
-pupnp_patch=$((ixml_patch + upnp_patch))
-
-CURRENT_VERSION="${pupnp_major}.${pupnp_minor}.${pupnp_patch}"
+CURRENT_VERSION=$(grep -A2 -E '^project\(PUPNP' CMakeLists.txt | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
 CURRENT_TAG="release-${CURRENT_VERSION}"
 
 echo "Current tag to push is ${CURRENT_TAG}"
