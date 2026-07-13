@@ -60,15 +60,19 @@ sed -i "s/^Version:.*/Version: ${next_release}/" libupnp.spec
 ################################################################################
 # Fix the CMakeLists.txt file
 #
-# We automatically increment the UPNP Patch version for the next development cycle.
+# We automatically increment the PUPNP patch version for the next development
+# cycle.
 ################################################################################
 
-# Find out the line number and current patch version of UPNP
-upnp_patch_line=$(grep -n "set(UPNP_VERSION_PATCH " CMakeLists.txt | cut -d: -f1)
-upnp_patch=$(sed -n "${upnp_patch_line}p" CMakeLists.txt | sed -E 's/.*set\(UPNP_VERSION_PATCH ([0-9]+)\).*/\1/')
-new_upnp_patch=$((upnp_patch+1))
+# Find the line number and current version of the project() VERSION field
+version_line=$(grep -n -E '^\s*VERSION [0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt | head -1 | cut -d: -f1)
+current_version=$(sed -n "${version_line}p" CMakeLists.txt | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+major=$(cut -d. -f1 <<< "$current_version")
+minor=$(cut -d. -f2 <<< "$current_version")
+patch=$(cut -d. -f3 <<< "$current_version")
+new_version="${major}.${minor}.$((patch+1))"
 
-# Update the patch version in place
-sed -i -E "${upnp_patch_line}s/(set\\(UPNP_VERSION_PATCH )([0-9]+)(\\))/\\1${new_upnp_patch}\\3/" CMakeLists.txt
+# Update the version in place
+sed -i -E "${version_line}s/[0-9]+\.[0-9]+\.[0-9]+/${new_version}/" CMakeLists.txt
 
 exit 0

@@ -29,27 +29,24 @@ is the sole build system.
 Previously the authoritative version was in `configure.ac` (the `AC_INIT`
 line) and `cmake/autoheader.cmake` parsed it at configure time.
 
-Now the version is defined directly in `CMakeLists.txt`:
+Now the version is defined directly in `CMakeLists.txt`, as the single
+`project(PUPNP ...)` version:
 
 ```cmake
-# Source of Truth for IXML
-set(IXML_VERSION_MAJOR 11)
-set(IXML_VERSION_MINOR 1)
-set(IXML_VERSION_PATCH 8)
-
-# Source of Truth for UPNP
-set(UPNP_VERSION_MAJOR 22)
-set(UPNP_VERSION_MINOR 0)
-set(UPNP_VERSION_PATCH 3)
-
-# Umbrella version (used for the tarball name and project() version)
-math(EXPR PUPNP_VERSION_MAJOR "${IXML_VERSION_MAJOR} + ${UPNP_VERSION_MAJOR}")
-math(EXPR PUPNP_VERSION_MINOR "${IXML_VERSION_MINOR} + ${UPNP_VERSION_MINOR}")
-math(EXPR PUPNP_VERSION_PATCH "${IXML_VERSION_PATCH} + ${UPNP_VERSION_PATCH}")
+project(PUPNP
+	VERSION 22.0.3
+	LANGUAGES C)
 ```
 
-The umbrella `PUPNP_VERSION_STRING` (e.g. `33.1.11`) is the sum of the IXML
-and UPNP component versions, matching the scheme that was already in use.
+ixml is built and installed as a component of the `UPNP` package
+(`UPNP::IXMLShared` / `UPNP::IXMLStatic`) rather than as a separately
+versioned library. Both `libupnp` and `libixml` share this single version
+number and `SOVERSION`; there is no independent ixml version and no
+`find_package(IXML)`. An earlier iteration of this migration gave ixml and
+upnp independent versions and derived a third "umbrella" project version by
+adding them together — that scheme has been replaced by this single version
+to keep the two co-released libraries from drifting apart or producing a
+project version that doesn't correspond to either library's own history.
 
 ### `autoconfig.h`
 
@@ -86,13 +83,14 @@ The Configure and Build steps in the release workflow changed:
 
 After each release this script prepares the tree for the next development
 cycle.  Previously it incremented the libtool revision numbers inside
-`configure.ac`.  Now it increments `UPNP_VERSION_PATCH` in `CMakeLists.txt`:
+`configure.ac`.  Now it increments the patch component of the single
+`project(PUPNP VERSION X.Y.Z ...)` line in `CMakeLists.txt`:
 
 ```sh
 # Old: complex parsing of AC_SUBST([LT_VERSION_*]) lines in configure.ac
-# New: one grep + one sed on CMakeLists.txt
-upnp_patch_line=$(grep -n "set(UPNP_VERSION_PATCH " CMakeLists.txt | cut -d: -f1)
-sed -i -E "${upnp_patch_line}s/(set\(UPNP_VERSION_PATCH )([0-9]+)(\))/\1$((patch+1))\3/" CMakeLists.txt
+# New: locate the "VERSION X.Y.Z" line inside project(PUPNP ...) and bump the patch
+version_line=$(grep -n -E '^\s*VERSION [0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt | head -1 | cut -d: -f1)
+sed -i -E "${version_line}s/[0-9]+\.[0-9]+\.[0-9]+/${new_version}/" CMakeLists.txt
 ```
 
 ### CI workflows
