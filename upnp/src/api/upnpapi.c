@@ -4797,32 +4797,31 @@ int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback)
 
 int UpnpSetContentLength(UpnpClient_Handle Hnd, size_t contentLength)
 {
-	int errCode = UPNP_E_SUCCESS;
 	struct Handle_Info *HInfo = NULL;
+	int errCode = UPNP_E_SUCCESS;
 
-	do {
-		if (UpnpSdkInit != 1) {
-			errCode = UPNP_E_FINISH;
-			break;
-		}
+	if (UpnpSdkInit != 1) {
+		return UPNP_E_FINISH;
+	}
 
-		HandleLock(__FILE__, __LINE__);
+	HandleLock(__FILE__, __LINE__);
 
-		switch (GetHandleInfo(Hnd, &HInfo)) {
-		case HND_DEVICE:
-			break;
-		default:
-			HandleUnlock(__FILE__, __LINE__);
-			return UPNP_E_INVALID_HANDLE;
-		}
-		if (contentLength > MAX_SOAP_CONTENT_LENGTH) {
-			errCode = UPNP_E_OUTOF_BOUNDS;
-			break;
-		}
-		g_maxContentLength = contentLength;
-	} while (0);
+	switch (GetHandleInfo(Hnd, &HInfo)) {
+	case HND_DEVICE:
+		break;
+	default:
+		errCode = UPNP_E_INVALID_HANDLE;
+		goto exit;
+	}
+	if (contentLength > MAX_SOAP_CONTENT_LENGTH) {
+		errCode = UPNP_E_OUTOF_BOUNDS;
+		goto exit;
+	}
+	g_maxContentLength = contentLength;
 
+exit:
 	HandleUnlock(__FILE__, __LINE__);
+
 	return errCode;
 }
 
