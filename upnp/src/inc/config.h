@@ -201,7 +201,7 @@
  *
  * @{
  */
-#define DEFAULT_SOAP_CONTENT_LENGTH 16000
+#define DEFAULT_SOAP_CONTENT_LENGTH 64000
 /* @} */
 
 /*!

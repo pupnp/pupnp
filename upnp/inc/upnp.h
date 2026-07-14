@@ -1099,7 +1099,7 @@ UPNP_EXPORT_SPEC int UpnpSetContentLength(
  * If set to 0 then checking will be disabled.
  *
  * The default maximum content-length is \c DEFAULT_SOAP_CONTENT_LENGTH
- * = 16K bytes.
+ * = 64K bytes.
  *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
