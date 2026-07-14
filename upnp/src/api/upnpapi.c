@@ -4435,7 +4435,9 @@ Upnp_Handle_Type GetHandleInfo(
 			__FILE__,
 			__LINE__,
 			"GetHandleInfo: Handle out of range\n");
-	} else if (HandleTable[Hnd] == NULL) {
+		goto exit;
+	}
+	if (!HandleTable[Hnd]) {
 #if 0
 		UpnpPrintf(UPNP_ALL,
 			API,
@@ -4444,52 +4446,51 @@ Upnp_Handle_Type GetHandleInfo(
 			"GetHandleInfo: HandleTable[%d] is NULL\n",
 			Hnd);
 #endif
-	} else if (HandleTable[Hnd] != NULL) {
-		*HndInfo = (struct Handle_Info *)HandleTable[Hnd];
-		ret = ((struct Handle_Info *)*HndInfo)->HType;
+		goto exit;
 	}
+	*HndInfo = (struct Handle_Info *)HandleTable[Hnd];
+	ret = ((struct Handle_Info *)*HndInfo)->HType;
 
+exit:
 #if 0
 	UpnpPrintf(
 		UPNP_ALL, API, __FILE__, __LINE__, "GetHandleInfo: exiting\n");
 #endif
-
 	return ret;
 }
 
 int PrintHandleInfo(UpnpClient_Handle Hnd)
 {
 	struct Handle_Info *HndInfo;
-	if (Hnd >= 1 && Hnd < NUM_HANDLE && HandleTable[Hnd] != NULL) {
-		HndInfo = HandleTable[Hnd];
-		UpnpPrintf(UPNP_ALL,
-			API,
-			__FILE__,
-			__LINE__,
-			"Printing information for Handle_%d\n",
-			Hnd);
-		UpnpPrintf(UPNP_ALL,
-			API,
-			__FILE__,
-			__LINE__,
-			"HType_%d\n",
-			HndInfo->HType);
-#ifdef INCLUDE_DEVICE_APIS
-		switch (HndInfo->HType) {
-		case HND_CLIENT:
-			break;
-		default:
-			UpnpPrintf(UPNP_ALL,
-				API,
-				__FILE__,
-				__LINE__,
-				"DescURL_%s\n",
-				HndInfo->DescURL);
-		}
-#endif /* INCLUDE_DEVICE_APIS */
-	} else {
+	if (Hnd < 1 || Hnd >= NUM_HANDLE || !HandleTable[Hnd]) {
 		return UPNP_E_INVALID_HANDLE;
 	}
+	HndInfo = HandleTable[Hnd];
+	UpnpPrintf(UPNP_ALL,
+		API,
+		__FILE__,
+		__LINE__,
+		"Printing information for Handle_%d\n",
+		Hnd);
+	UpnpPrintf(UPNP_ALL,
+		API,
+		__FILE__,
+		__LINE__,
+		"HType_%d\n",
+		HndInfo->HType);
+#ifdef INCLUDE_DEVICE_APIS
+	switch (HndInfo->HType) {
+	case HND_CLIENT:
+		break;
+	default:
+		UpnpPrintf(UPNP_ALL,
+			API,
+			__FILE__,
+			__LINE__,
+			"DescURL_%s\n",
+			HndInfo->DescURL);
+	}
+#endif /* INCLUDE_DEVICE_APIS */
 
 	return UPNP_E_SUCCESS;
 }
@@ -4510,12 +4511,12 @@ void AutoAdvertise(void *input)
 #ifdef INTERNAL_WEB_SERVER
 int UpnpSetWebServerRootDir(const char *rootDir)
 {
-	if (UpnpSdkInit == 0)
+	if (UpnpSdkInit == 0) {
 		return UPNP_E_FINISH;
+	}
 	if ((rootDir == NULL) || (strlen(rootDir) == 0)) {
 		return UPNP_E_INVALID_PARAM;
 	}
-
 	membuffer_destroy(&gDocumentRootDir);
 
 	return web_server_set_root_dir(rootDir);
@@ -4523,12 +4524,12 @@ int UpnpSetWebServerRootDir(const char *rootDir)
 
 int UpnpSetWebServerCorsString(const char *corsString)
 {
-	if (UpnpSdkInit == 0)
+	if (UpnpSdkInit == 0) {
 		return UPNP_E_FINISH;
+	}
 	if ((corsString == NULL) || (strlen(corsString) == 0)) {
 		return UPNP_E_INVALID_PARAM;
 	}
-
 	membuffer_destroy(&gWebserverCorsString);
 
 	return web_server_set_cors(corsString);
@@ -4725,74 +4726,62 @@ void UpnpSetAllowLiteralHostRedirection(int enable)
 
 int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback)
 {
-	int ret = UPNP_E_SUCCESS;
 	if (!callback) {
-		ret = UPNP_E_INVALID_PARAM;
-	} else {
-		virtualDirCallback.get_info = callback;
+		return UPNP_E_INVALID_PARAM;
 	}
+	virtualDirCallback.get_info = callback;
 
-	return ret;
+	return UPNP_E_SUCCESS;
 }
 
 int UpnpVirtualDir_set_OpenCallback(VDCallback_Open callback)
 {
-	int ret = UPNP_E_SUCCESS;
 	if (!callback) {
-		ret = UPNP_E_INVALID_PARAM;
-	} else {
-		virtualDirCallback.open = callback;
+		return UPNP_E_INVALID_PARAM;
 	}
+	virtualDirCallback.open = callback;
 
-	return ret;
+	return UPNP_E_SUCCESS;
 }
 
 int UpnpVirtualDir_set_ReadCallback(VDCallback_Read callback)
 {
-	int ret = UPNP_E_SUCCESS;
 	if (!callback) {
-		ret = UPNP_E_INVALID_PARAM;
-	} else {
-		virtualDirCallback.read = callback;
+		return UPNP_E_INVALID_PARAM;
 	}
+	virtualDirCallback.read = callback;
 
-	return ret;
+	return UPNP_E_SUCCESS;
 }
 
 int UpnpVirtualDir_set_WriteCallback(VDCallback_Write callback)
 {
-	int ret = UPNP_E_SUCCESS;
 	if (!callback) {
-		ret = UPNP_E_INVALID_PARAM;
-	} else {
-		virtualDirCallback.write = callback;
+		return UPNP_E_INVALID_PARAM;
 	}
+	virtualDirCallback.write = callback;
 
-	return ret;
+	return UPNP_E_SUCCESS;
 }
 
 int UpnpVirtualDir_set_SeekCallback(VDCallback_Seek callback)
 {
-	int ret = UPNP_E_SUCCESS;
 	if (!callback) {
-		ret = UPNP_E_INVALID_PARAM;
-	} else {
-		virtualDirCallback.seek = callback;
+		return UPNP_E_INVALID_PARAM;
 	}
+	virtualDirCallback.seek = callback;
 
-	return ret;
+	return UPNP_E_SUCCESS;
 }
 
 int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback)
 {
-	int ret = UPNP_E_SUCCESS;
 	if (!callback) {
-		ret = UPNP_E_INVALID_PARAM;
-	} else {
-		virtualDirCallback.close = callback;
+		return UPNP_E_INVALID_PARAM;
 	}
+	virtualDirCallback.close = callback;
 
-	return ret;
+	return UPNP_E_SUCCESS;
 }
 
 int UpnpSetContentLength(UpnpClient_Handle Hnd, size_t contentLength)
@@ -4827,23 +4816,19 @@ exit:
 
 int UpnpSetMaxContentLength(size_t contentLength)
 {
-	int errCode = UPNP_E_SUCCESS;
+	if (UpnpSdkInit != 1) {
+		return UPNP_E_FINISH;
+	}
+	g_maxContentLength = contentLength;
 
-	do {
-		if (UpnpSdkInit != 1) {
-			errCode = UPNP_E_FINISH;
-			break;
-		}
-		g_maxContentLength = contentLength;
-	} while (0);
-
-	return errCode;
+	return UPNP_E_SUCCESS;
 }
 
 int UpnpSetEventQueueLimits(int maxLen, int maxAge)
 {
 	g_UpnpSdkEQMaxLen = maxLen;
 	g_UpnpSdkEQMaxAge = maxAge;
+
 	return UPNP_E_SUCCESS;
 }
 
