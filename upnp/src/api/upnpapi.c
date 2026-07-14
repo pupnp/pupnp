@@ -4460,7 +4460,7 @@ Upnp_Handle_Type GetHandleInfo(
 int PrintHandleInfo(UpnpClient_Handle Hnd)
 {
 	struct Handle_Info *HndInfo;
-	if (HandleTable[Hnd] != NULL) {
+	if (Hnd >= 1 && Hnd < NUM_HANDLE && HandleTable[Hnd] != NULL) {
 		HndInfo = HandleTable[Hnd];
 		UpnpPrintf(UPNP_ALL,
 			API,
