@@ -85,7 +85,7 @@ def _soap_headers(addr: Tuple[str, int], content_length: int) -> bytes:
 
 def test_oversized_soap_body_rejected_with_413(upnp):
     addr = _server_addr(upnp)
-    body = b"<soap>" + b"<a/>" * 5000 + b"</soap>"  # ~20 006 bytes > 16 000
+    body = b"<soap>" + b"<a/>" * 20000 + b"</soap>"  # ~80 006 bytes > 64 000
     status = _http_status(addr, _soap_headers(addr, len(body)), body)
     assert "413" in status, (
         f"Oversized SOAP body should be rejected with HTTP 413, got: {status!r}"
