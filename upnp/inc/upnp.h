@@ -1076,19 +1076,6 @@ UPNP_EXPORT_SPEC int UpnpUnRegisterClient(
 	UpnpClient_Handle Hnd);
 
 /*!
- * \deprecated Use \b UpnpSetMaxContentLength instead.
- *
- * Warning: the Handle argument provided here is not used, so the effect
- * of this function is global to the SDK (= same as \b UpnpSetMaxContentLength).
- */
-UPNP_EXPORT_SPEC int UpnpSetContentLength(
-	/*! [in] The handle of the device instance for which the incoming
-	 * content length needs to be set. */
-	UpnpClient_Handle Hnd,
-	/*! [in] Permissible content length */
-	size_t contentLength);
-
-/*!
  * \brief Sets the maximum content-length that the SDK will process on an
  * incoming SOAP requests or responses.
  *

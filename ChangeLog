@@ -2,7 +2,12 @@
 Version 2.0.3
 *******************************************************************************
 
-
+- Breaking: Removed the deprecated UpnpSetContentLength(Hnd, contentLength).
+  It has been marked obsolete since it entered this codebase in 2006 and
+  never actually used the Hnd argument; its effect was always identical to
+  the global UpnpSetMaxContentLength(contentLength), which remains the
+  supported API. MAX_SOAP_CONTENT_LENGTH, which only existed to bound this
+  function, was removed along with it.
 
 *******************************************************************************
 Version 2.0.2
