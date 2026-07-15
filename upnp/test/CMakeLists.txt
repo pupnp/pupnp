@@ -79,6 +79,7 @@ endif()
 
 UPNP_Add_Unit_Test(test-upnp-gena-subscribe-dos test_gena_subscribe_dos.c)
 UPNP_Add_Unit_Test(test-upnp-gena-subscribe-pressure test_gena_subscribe_pressure.c)
+UPNP_Add_Unit_Test(test-upnp-gena-callback-hostname test_gena_callback_hostname.c)
 # Both GENA issue-#435 tests read constants from config.h (a private header).
 if(UPNP_BUILD_SHARED)
 	target_include_directories(
@@ -138,14 +139,19 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
-# Both GENA issue-#435 tests call socket(), connect(), send(), recv() directly.
-# On Solaris/illumos those symbols live in libsocket, not libc; link explicitly.
+# GENA issue-#435 tests and test-upnp-gena-callback-hostname call socket(),
+# connect(), send(), recv() directly.  On Solaris/illumos those symbols live
+# in libsocket, not libc; link explicitly.
 if(UPNP_BUILD_SHARED)
 	target_link_libraries(test-upnp-gena-subscribe-dos PRIVATE
 		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
 	)
 	target_link_libraries(test-upnp-gena-subscribe-pressure PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+	target_link_libraries(test-upnp-gena-callback-hostname PRIVATE
 		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
 	)
@@ -156,6 +162,10 @@ if(UPNP_BUILD_STATIC)
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
 	)
 	target_link_libraries(test-upnp-gena-subscribe-pressure-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+	target_link_libraries(test-upnp-gena-callback-hostname-static PRIVATE
 		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
 	)
