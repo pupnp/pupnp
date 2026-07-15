@@ -471,7 +471,9 @@ int resolve_hostport(hostport_type *hostport)
 		switch (res->ai_family) {
 		case AF_INET:
 		case AF_INET6:
-			memcpy(&hostport->IPaddress, res->ai_addr, res->ai_addrlen);
+			memcpy(&hostport->IPaddress,
+				res->ai_addr,
+				res->ai_addrlen);
 			goto found;
 		}
 	}

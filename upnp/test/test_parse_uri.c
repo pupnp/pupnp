@@ -177,8 +177,7 @@ static int check_resolve_hostport_localhost(void)
 				(int)ntohs(sai4->sin_port));
 			return 1;
 		}
-	} else if (url.hostport.IPaddress.ss_family ==
-		   (sa_family_t)AF_INET6) {
+	} else if (url.hostport.IPaddress.ss_family == (sa_family_t)AF_INET6) {
 		sai6 = (struct sockaddr_in6 *)&url.hostport.IPaddress;
 		if (ntohs(sai6->sin6_port) != 4321) {
 			printf("%s:%d resolved port = %d, expected 4321\n",
