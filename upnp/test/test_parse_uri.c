@@ -210,6 +210,19 @@ int main(void)
 		TEST_INVALID_PORT("http://127.0.0.1:-65535/"),
 	};
 
+#ifdef _WIN32
+	/* resolve_hostport() calls getaddrinfo(), which requires Winsock to
+	 * be initialized. This test builds uri.c directly rather than going
+	 * through UpnpInit2() (which normally does this), so it must do so
+	 * itself. */
+	WORD wVersionRequested = MAKEWORD(2, 2);
+	WSADATA wsaData;
+	if (WSAStartup(wVersionRequested, &wsaData) != 0) {
+		printf("%s:%d WSAStartup failed\n", __FILE__, __LINE__);
+		return EXIT_FAILURE;
+	}
+#endif
+
 	for (i = 0; i < (int)(sizeof(tests) / sizeof(tests[0])); i++) {
 		failures += run_test(&tests[i]);
 	}
@@ -217,6 +230,10 @@ int main(void)
 	failures += check_no_eager_resolution();
 	failures += check_literal_ip_is_noop();
 	failures += check_resolve_hostport_localhost();
+
+#ifdef _WIN32
+	WSACleanup();
+#endif
 
 	return failures ? EXIT_FAILURE : EXIT_SUCCESS;
 }
