@@ -2,7 +2,16 @@
 Version 22.0.4
 *******************************************************************************
 
-
+- OSS-Fuzz 531780528: Stop resolving DNS during URI/GENA callback parsing.
+  parse_hostport() called getaddrinfo() synchronously on any non-literal-IP
+  host, and parse_uri() runs directly on untrusted input in two places: the
+  HTTP request-line parser (embedded miniserver) and GENA SUBSCRIBE
+  callback-URL parsing. A remote, unauthenticated peer could block a worker
+  thread on DNS resolution (CWE-400). parse_uri()/parse_hostport() no
+  longer perform DNS resolution; the new resolve_hostport() defers it to
+  legitimate outbound-connection points. GENA SUBSCRIBE callback URLs now
+  require a literal IP outright, closing a DNS-rebinding gap in the
+  CVE-2020-12695 (CallStranger) same-subnet check as well.
 
 *******************************************************************************
 Version 22.0.3
