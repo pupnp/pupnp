@@ -1177,7 +1177,9 @@ static int create_url_list(
 			if (((return_code = parse_uri(&URLS->buff[i + 1],
 				      URLS->size - i + 1,
 				      &temp)) == HTTP_SUCCESS) &&
-				(temp.hostport.text.size != 0)) {
+				(temp.hostport.text.size != 0) &&
+				(temp.hostport.IPaddress.ss_family !=
+					(sa_family_t)AF_UNSPEC)) {
 				URLcount++;
 			} else {
 				if (return_code == UPNP_E_OUTOF_MEMORY) {
@@ -1207,7 +1209,11 @@ static int create_url_list(
 					    HTTP_SUCCESS) &&
 					(out->parsedURLs[URLcount2]
 							.hostport.text.size !=
-						0)) {
+						0) &&
+					(out->parsedURLs[URLcount2]
+							.hostport.IPaddress
+							.ss_family !=
+						(sa_family_t)AF_UNSPEC)) {
 					URLcount2++;
 					if (URLcount2 >= URLcount)
 						/*

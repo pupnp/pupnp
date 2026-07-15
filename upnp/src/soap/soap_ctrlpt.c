@@ -224,6 +224,9 @@ static UPNP_INLINE int get_host_and_path(
 	if (parse_uri(ctrl_url, strlen(ctrl_url), url) != HTTP_SUCCESS) {
 		return -1;
 	}
+	if (resolve_hostport(&url->hostport) != HTTP_SUCCESS) {
+		return -1;
+	}
 	/* This is done to ensure that the buffer is kept const */
 	((memptr *)host)->buf = (char *)url->hostport.text.buff;
 	((memptr *)host)->length = url->hostport.text.size;

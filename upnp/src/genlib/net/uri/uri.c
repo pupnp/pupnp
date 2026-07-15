@@ -256,6 +256,8 @@ int copy_URL_list(URL_list *in, URL_list *out)
 		memcpy(&out->parsedURLs[i].hostport.IPaddress,
 			&in->parsedURLs[i].hostport.IPaddress,
 			sizeof(struct sockaddr_storage));
+		out->parsedURLs[i].hostport.port =
+			in->parsedURLs[i].hostport.port;
 	}
 	out->size = in->size;
 
@@ -375,38 +377,12 @@ static int parse_hostport(
 		if (last_dot != NULL && isdigit(*(last_dot + 1)))
 			/* Must be an IPv4 address. */
 			af = AF_INET;
-		else {
-			/* Must be a host name. */
-			struct addrinfo hints, *res, *res0;
-
-			memset(&hints, 0, sizeof(hints));
-			hints.ai_family = AF_UNSPEC;
-			hints.ai_socktype = SOCK_STREAM;
-
-			ret = getaddrinfo(srv_name, NULL, &hints, &res0);
-			if (ret == 0) {
-				for (res = res0; res; res = res->ai_next) {
-					switch (res->ai_family) {
-					case AF_INET:
-					case AF_INET6:
-						/* Found a valid IPv4 or IPv6
-						 * address. */
-						memcpy(&out->IPaddress,
-							res->ai_addr,
-							res->ai_addrlen);
-						goto found;
-					}
-				}
-			found:
-				freeaddrinfo(res0);
-				if (res == NULL)
-					/* Didn't find an AF_INET or AF_INET6
-					 * address. */
-					return UPNP_E_INVALID_URL;
-			} else
-				/* getaddrinfo failed. */
-				return UPNP_E_INVALID_URL;
-		}
+		/* Otherwise it's a host name: leave IPaddress unresolved
+		 * (ss_family == AF_UNSPEC) here. parse_hostport() must never
+		 * perform DNS resolution, since it also runs on untrusted
+		 * text (e.g. an incoming request line); callers that are
+		 * actually about to connect must call resolve_hostport()
+		 * first. */
 	}
 	/* Check if a port is specified. */
 	if (has_port == 1) {
@@ -427,6 +403,7 @@ static int parse_hostport(
 	} else
 		/* Port was not specified, use default port. */
 		port = defaultPort;
+	out->port = port;
 	/* The length of the host and port string can be calculated by */
 	/* subtracting pointers. */
 	hostport_size = (size_t)c - (size_t)workbuf;
@@ -444,12 +421,8 @@ static int parse_hostport(
 		ret = inet_pton(AF_INET6, srv_name, &sai6->sin6_addr);
 		break;
 	default:
-		/* IP address was set by the hostname (getaddrinfo). */
-		/* Override port: */
-		if (out->IPaddress.ss_family == (sa_family_t)AF_INET)
-			sai4->sin_port = htons(port);
-		else
-			sai6->sin6_port = htons(port);
+		/* Host name: IPaddress stays unresolved (AF_UNSPEC) until
+		 * resolve_hostport() is called. */
 		ret = 1;
 	}
 	/* Check if address was converted successfully. */
@@ -459,6 +432,60 @@ static int parse_hostport(
 	out->text.buff = in;
 
 	return (int)hostport_size;
+}
+
+int resolve_hostport(hostport_type *hostport)
+{
+	char workbuf[256];
+	char *c;
+	struct sockaddr_in *sai4 = (struct sockaddr_in *)&hostport->IPaddress;
+	struct sockaddr_in6 *sai6 = (struct sockaddr_in6 *)&hostport->IPaddress;
+	struct addrinfo hints, *res, *res0;
+	size_t len;
+
+	if (hostport->IPaddress.ss_family != (sa_family_t)AF_UNSPEC) {
+		/* Already a literal IP address, resolved during parsing. */
+		return HTTP_SUCCESS;
+	}
+
+	/* Re-derive the bare host name from the already-validated
+	 * "host[:port]" text. */
+	len = hostport->text.size < sizeof(workbuf) - (size_t)1
+		      ? hostport->text.size
+		      : sizeof(workbuf) - (size_t)1;
+	memcpy(workbuf, hostport->text.buff, len);
+	workbuf[len] = '\0';
+	c = strchr(workbuf, ':');
+	if (c != NULL) {
+		*c = '\0';
+	}
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+
+	if (getaddrinfo(workbuf, NULL, &hints, &res0) != 0) {
+		return UPNP_E_INVALID_URL;
+	}
+	for (res = res0; res; res = res->ai_next) {
+		switch (res->ai_family) {
+		case AF_INET:
+		case AF_INET6:
+			memcpy(&hostport->IPaddress, res->ai_addr, res->ai_addrlen);
+			goto found;
+		}
+	}
+found:
+	freeaddrinfo(res0);
+	if (res == NULL) {
+		return UPNP_E_INVALID_URL;
+	}
+	if (hostport->IPaddress.ss_family == (sa_family_t)AF_INET)
+		sai4->sin_port = htons(hostport->port);
+	else
+		sai6->sin6_port = htons(hostport->port);
+
+	return HTTP_SUCCESS;
 }
 
 /*!

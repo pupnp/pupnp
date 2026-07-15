@@ -125,6 +125,10 @@ typedef struct HOSTPORT
 	token text;
 	/* Network Byte Order */
 	struct sockaddr_storage IPaddress;
+	/*! Parsed port number. Valid regardless of whether IPaddress has been
+	 * resolved yet (IPaddress.ss_family == AF_UNSPEC means "not yet
+	 * resolved", see resolve_hostport()). */
+	unsigned short int port;
 } hostport_type;
 
 /*!
@@ -338,6 +342,23 @@ int parse_uri(
 	/*! [out] Output parameter which will have the parsed uri information.
 	 */
 	uri_type *out);
+
+/*!
+ * \brief Resolves a hostport's host to an IP address, performing a DNS
+ * lookup if it isn't already a literal IP address.
+ *
+ * parse_uri()/parse_hostport() never perform DNS resolution themselves, so
+ * that parsing untrusted text (e.g. an incoming request line) can never
+ * block on network I/O. Callers that are actually about to connect to a
+ * parsed URL must call this first.
+ *
+ * \return HTTP_SUCCESS, or UPNP_E_INVALID_URL if the host could not be
+ * resolved.
+ */
+int resolve_hostport(
+	/*! [inout] hostport whose IPaddress should be resolved. A no-op if
+	 * already resolved (e.g. a literal IP address). */
+	hostport_type *hostport);
 
 /*!
  * \brief

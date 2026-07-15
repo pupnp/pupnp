@@ -265,6 +265,9 @@ int http_FixUrl(uri_type *url, uri_type *fixed_url)
 	if (fixed_url->hostport.text.size == (size_t)0) {
 		return UPNP_E_INVALID_URL;
 	}
+	if (resolve_hostport(&fixed_url->hostport) != HTTP_SUCCESS) {
+		return UPNP_E_INVALID_URL;
+	}
 	/* set pathquery to "/" if it is empty */
 	if (fixed_url->pathquery.size == (size_t)0) {
 		fixed_url->pathquery.buff = temp_path;
