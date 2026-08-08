@@ -271,6 +271,13 @@ UPNP_Add_Unit_Test(test-upnp-gh-153 poc_gh_153.c)
 # Uses the same web_server_ut_* hooks and requires Threads::Threads because
 # the test spawns a background thread with pthread_create.
 UPNP_Add_Unit_Test(test-upnp-gh-325 poc_gh_325.c)
+
+# GHSA-279g-pwr2-f8r2: embedded NUL byte (%00) in a request path is decoded
+# to a literal NUL by remove_escaped_chars(), but downstream alias/routing
+# checks in webserver.c use NUL-terminated string functions, so bytes after
+# the NUL are silently dropped and the request wrongly matches a shorter
+# registered alias.  Uses the same web_server_ut_set_alias hook.
+UPNP_Add_Unit_Test(test-upnp-ghsa-f8r2 poc_ghsa_f8r2_nullbyte.c)
 if(UPNP_BUILD_SHARED)
 	target_link_libraries(test-upnp-gh-325 PRIVATE
 		Threads::Threads
