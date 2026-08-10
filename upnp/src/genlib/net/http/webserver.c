@@ -1284,6 +1284,14 @@ static int process_request(
 	request_doc[url->pathquery.size] = '\0';
 	dummy = url->pathquery.size;
 	remove_escaped_chars(request_doc, &dummy);
+	/* Prevent path truncation (NUL byte injection):
+	 * If remove_escaped_chars decoded a %00, strlen will stop early,
+	 * making it strictly less than the actual decoded length (dummy). */
+	if (strlen(request_doc) != dummy) {
+		err_code = HTTP_BAD_REQUEST;
+		goto error_handler;
+	}
+	
 	code = remove_dots(request_doc, url->pathquery.size);
 	if (code != 0) {
 		err_code = HTTP_FORBIDDEN;
