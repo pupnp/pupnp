@@ -1291,7 +1291,7 @@ static int process_request(
 		err_code = HTTP_BAD_REQUEST;
 		goto error_handler;
 	}
-	
+
 	code = remove_dots(request_doc, url->pathquery.size);
 	if (code != 0) {
 		err_code = HTTP_FORBIDDEN;
