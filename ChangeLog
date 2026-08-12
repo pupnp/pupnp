@@ -2,7 +2,23 @@
 Version 22.0.5
 *******************************************************************************
 
-
+- GHSA-279g-pwr2-f8r2: Fix path truncation via embedded NUL byte (%00) in
+  request paths. remove_escaped_chars() correctly decodes %00 to a literal
+  NUL byte, but process_request() then treated the decoded buffer as a
+  NUL-terminated C string in alias/virtual-directory routing checks, so a
+  request for /alias%00.png was silently served as /alias, bypassing
+  extension-based ACL/WAF filters and virtual-directory routing. Fixed by
+  rejecting the request when the decoded string length no longer matches
+  the tracked buffer length.
+- GHSA-hg5x-73vf-vfm2: Fix unbounded memory allocation and integer
+  truncation in chunked Transfer-Encoding parsing. match_int() parsed a hex
+  chunk size into a 64-bit long but only rejected negative values, so a
+  declared size above INT_MAX silently wrapped (e.g. 2^32 wrapped to 0 and
+  was misread as the chunked-entity terminator). Separately, a declared
+  chunk size was never checked against g_maxContentLength before its bytes
+  were buffered, allowing a single oversized chunk to exhaust memory.
+  Fixed by rejecting out-of-range chunk sizes and rejecting a chunk size
+  exceeding g_maxContentLength before any of its body is read.
 
 *******************************************************************************
 Version 22.0.4
