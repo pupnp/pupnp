@@ -6,9 +6,8 @@ Versions currently being supported with security updates:
 
 | Version  | Supported          |
 | -------- | ------------------ |
-| 1.18.x   | :white_check_mark: |
-| 1.14.x   | :x:                |
-| < 1.14.x | :x:                |
+| 22.0.x   | :white_check_mark: |
+| < 22.0.x | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -30,3 +29,12 @@ This is an open source free project and as such we have our limitations.
 
 Nonetheless, we will try to provide a fix for the problem as soon as possible
 and request that you do not disclose the issue publicly until we have released a patch.
+
+If you would like to contribute the fix yourself, we do not accept public pull
+requests for an unpatched vulnerability, since that would expose the issue
+before a fix is available to users. Instead, we can set up a temporary private
+fork attached to the advisory so you can collaborate with us and submit your
+patch there directly.
+
+Once a fix is released, we publish the advisory and request a CVE ID through
+GitHub.
