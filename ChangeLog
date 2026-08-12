@@ -2,7 +2,12 @@
 Version 22.0.6
 *******************************************************************************
 
-
+- Fix OmniOS build failure in test-upnp-ghsa-f8r2. The GHSA-279g-pwr2-f8r2
+  regression test calls socket()/connect()/send()/recv() directly, same as
+  test-upnp-gh-325, but was registered without the SOCKET_LIBRARY/
+  NSL_LIBRARY linkage those symbols need outside glibc (e.g. Solaris/
+  illumos). Also fixes a stray placement bug where its registration had
+  landed between gh-325's registration and gh-325's own linking block.
 
 *******************************************************************************
 Version 22.0.5
