@@ -409,89 +409,94 @@ int http_RecvMessage(SOCKINFO *info,
 		if (num_read > 0) {
 			/* got data */
 			status = parser_append(parser, buf, (size_t)num_read);
-			            switch (status) {
-            case PARSE_SUCCESS:
-                UpnpPrintf(UPNP_INFO,
-                    HTTP,
-                    __FILE__,
-                    __LINE__,
-                    "<<< (RECVD) "
-                    "<<<\n%s\n-----------------\n",
-                    parser->msg.msg.buf);
-                print_http_headers(&parser->msg);
-                if (g_maxContentLength > 0 &&
-                    (parser->content_length >
-                            (unsigned int)
-                                g_maxContentLength ||
-                        parser->msg.entity.length >
-                            g_maxContentLength)) {
-                    *http_error_code =
-                        HTTP_REQ_ENTITY_TOO_LARGE;
-                    line = __LINE__;
-                    ret = UPNP_E_OUTOF_BOUNDS;
-                    goto ExitFunction;
-                }
-                line = __LINE__;
-                ret = 0;
-                goto ExitFunction;
-                        case PARSE_FAILURE:
-            case PARSE_NO_MATCH:
-                *http_error_code = parser->http_error_code;
-                if (*http_error_code == HTTP_REQ_ENTITY_TOO_LARGE) {
-                    ret = UPNP_E_OUTOF_BOUNDS;
-                } else {
-                    ret = UPNP_E_BAD_HTTPMSG;
-                }
-                line = __LINE__;
-                goto ExitFunction;
-            case PARSE_INCOMPLETE_ENTITY:
-                /* read until close */
-                ok_on_close = 1;
-                /* Check content length limit during chunked entity accumulation */
-                if (g_maxContentLength > 0 &&
-                    parser->msg.entity.length >
-                        (unsigned int)g_maxContentLength) {
-                    *http_error_code =
-                        HTTP_REQ_ENTITY_TOO_LARGE;
-                    line = __LINE__;
-                    ret = UPNP_E_OUTOF_BOUNDS;
-                    goto ExitFunction;
-                }
-                break;
-            case PARSE_CONTINUE_1:
-                /* Web post request. */
-                /* Check content length limit for chunked/web post */
-                if (g_maxContentLength > 0 &&
-                    parser->msg.entity.length >
-                        (unsigned int)g_maxContentLength) {
-                    *http_error_code =
-                        HTTP_REQ_ENTITY_TOO_LARGE;
-                    line = __LINE__;
-                    ret = UPNP_E_OUTOF_BOUNDS;
-                    goto ExitFunction;
-                }
-                line = __LINE__;
-                ret = PARSE_SUCCESS;
-                goto ExitFunction;
-            default:
-                /* Reject early if Content-Length header already
-                 * exceeds the limit, before the body is
-                 * buffered. */
-                if (g_maxContentLength > 0 &&
-                    ((parser->content_length > 0 &&
-                         parser->content_length >
-                             (unsigned int)
-                                 g_maxContentLength) ||
-                        parser->msg.entity.length >
-                            g_maxContentLength)) {
-                    *http_error_code =
-                        HTTP_REQ_ENTITY_TOO_LARGE;
-                    line = __LINE__;
-                    ret = UPNP_E_OUTOF_BOUNDS;
-                    goto ExitFunction;
-                }
-                break;
-            }
+			switch (status) {
+			case PARSE_SUCCESS:
+				UpnpPrintf(UPNP_INFO,
+					HTTP,
+					__FILE__,
+					__LINE__,
+					"<<< (RECVD) "
+					"<<<\n%s\n-----------------\n",
+					parser->msg.msg.buf);
+				print_http_headers(&parser->msg);
+				if (g_maxContentLength > 0 &&
+					(parser->content_length >
+							(unsigned int)
+								g_maxContentLength ||
+						parser->msg.entity.length >
+							g_maxContentLength)) {
+					*http_error_code =
+						HTTP_REQ_ENTITY_TOO_LARGE;
+					line = __LINE__;
+					ret = UPNP_E_OUTOF_BOUNDS;
+					goto ExitFunction;
+				}
+				line = __LINE__;
+				ret = 0;
+				goto ExitFunction;
+			case PARSE_FAILURE:
+			case PARSE_NO_MATCH:
+				*http_error_code = parser->http_error_code;
+				if (*http_error_code ==
+					HTTP_REQ_ENTITY_TOO_LARGE) {
+					ret = UPNP_E_OUTOF_BOUNDS;
+				} else {
+					ret = UPNP_E_BAD_HTTPMSG;
+				}
+				line = __LINE__;
+				goto ExitFunction;
+			case PARSE_INCOMPLETE_ENTITY:
+				/* read until close */
+				ok_on_close = 1;
+				/* Check content length limit during chunked
+				 * entity accumulation */
+				if (g_maxContentLength > 0 &&
+					parser->msg.entity.length >
+						(unsigned int)
+							g_maxContentLength) {
+					*http_error_code =
+						HTTP_REQ_ENTITY_TOO_LARGE;
+					line = __LINE__;
+					ret = UPNP_E_OUTOF_BOUNDS;
+					goto ExitFunction;
+				}
+				break;
+			case PARSE_CONTINUE_1:
+				/* Web post request. */
+				/* Check content length limit for chunked/web
+				 * post */
+				if (g_maxContentLength > 0 &&
+					parser->msg.entity.length >
+						(unsigned int)
+							g_maxContentLength) {
+					*http_error_code =
+						HTTP_REQ_ENTITY_TOO_LARGE;
+					line = __LINE__;
+					ret = UPNP_E_OUTOF_BOUNDS;
+					goto ExitFunction;
+				}
+				line = __LINE__;
+				ret = PARSE_SUCCESS;
+				goto ExitFunction;
+			default:
+				/* Reject early if Content-Length header already
+				 * exceeds the limit, before the body is
+				 * buffered. */
+				if (g_maxContentLength > 0 &&
+					((parser->content_length > 0 &&
+						 parser->content_length >
+							 (unsigned int)
+								 g_maxContentLength) ||
+						parser->msg.entity.length >
+							g_maxContentLength)) {
+					*http_error_code =
+						HTTP_REQ_ENTITY_TOO_LARGE;
+					line = __LINE__;
+					ret = UPNP_E_OUTOF_BOUNDS;
+					goto ExitFunction;
+				}
+				break;
+			}
 		} else if (num_read == 0) {
 			if (ok_on_close) {
 				UpnpPrintf(UPNP_INFO,
