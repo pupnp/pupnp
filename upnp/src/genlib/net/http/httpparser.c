@@ -47,6 +47,7 @@
 #include "uri.h"
 #include <errno.h>
 #include <stdlib.h>
+#include "upnpapi.h"
 
 #include "config.h" /* IWYU pragma: keep */
 
@@ -775,41 +776,41 @@ static UPNP_INLINE parse_status_t match_raw_value(
  *   PARSE_INCOMPLETE
  ************************************************************************/
 static UPNP_INLINE parse_status_t match_int(
-	scanner_t *scanner, int base, int *value)
+    scanner_t *scanner, int base, int *value)
 {
-	memptr token;
-	token_type_t tok_type;
-	parse_status_t status;
-	long num;
-	char *end_ptr;
-	size_t save_pos;
+    memptr token;
+    token_type_t tok_type;
+    parse_status_t status;
+    long num;
+    char *end_ptr;
+    size_t save_pos;
 
-	save_pos = scanner->cursor;
-	status = scanner_get_token(scanner, &token, &tok_type);
-	if (status == (parse_status_t)PARSE_OK) {
-		if (tok_type == (token_type_t)TT_IDENTIFIER) {
-			errno = 0;
-			num = strtol(token.buf, &end_ptr, base);
-			/* all and only those chars in token should be used for
-			 * num */
-			if (num < 0 || end_ptr != token.buf + token.length ||
-				((num == LONG_MIN || num == LONG_MAX) &&
-					(errno == ERANGE))) {
-				status = PARSE_NO_MATCH;
-			}
-			/* save result */
-			*value = (int)num;
-		} else {
-			/* token must be an identifier */
-			status = PARSE_NO_MATCH;
-		}
-	}
-	if (status != (parse_status_t)PARSE_OK) {
-		/* restore scanner position for bad values */
-		scanner->cursor = save_pos;
-	}
+    save_pos = scanner->cursor;
+    status = scanner_get_token(scanner, &token, &tok_type);
+    if (status == (parse_status_t)PARSE_OK) {
+        if (tok_type == (token_type_t)TT_IDENTIFIER) {
+            errno = 0;
+            num = strtol(token.buf, &end_ptr, base);
+            /* all and only those chars in token should be used for
+             * num */
+            if (num < 0 || num > INT_MAX || end_ptr != token.buf + token.length ||
+                ((num == LONG_MIN || num == LONG_MAX) &&
+                    (errno == ERANGE))) {
+                status = PARSE_NO_MATCH;
+            }
+            /* save result */
+            *value = (int)num;
+        } else {
+            /* token must be an identifier */
+            status = PARSE_NO_MATCH;
+        }
+    }
+    if (status != (parse_status_t)PARSE_OK) {
+        /* restore scanner position for bad values */
+        scanner->cursor = save_pos;
+    }
 
-	return status;
+    return status;
 }
 
 /************************************************************************
@@ -1666,38 +1667,45 @@ static UPNP_INLINE parse_status_t parser_parse_entity_using_clen(
  *	 PARSE_NO_MATCH
  ************************************************************************/
 static UPNP_INLINE parse_status_t parser_parse_chunky_body(
-	http_parser_t *parser)
+    http_parser_t *parser)
 {
-	parse_status_t status;
-	size_t save_pos;
+    parse_status_t status;
+    size_t save_pos;
 
-	/* if 'chunk_size' of bytes have been read; read next chunk */
-	if ((parser->msg.msg.length - parser->scanner.cursor) >=
-		parser->chunk_size) {
-		/* move to next chunk */
-		parser->scanner.cursor += parser->chunk_size;
-		save_pos = parser->scanner.cursor;
-		/* discard CRLF */
-		status = match(&parser->scanner, "%c");
-		if (status != (parse_status_t)PARSE_OK) {
-			/*move back */
-			parser->scanner.cursor -= parser->chunk_size;
-			/*parser->scanner.cursor = save_pos; */
-			return status;
-		}
-		membuffer_delete(&parser->msg.msg,
-			save_pos,
-			(parser->scanner.cursor - save_pos));
-		parser->scanner.cursor = save_pos;
-		/*update temp  */
-		parser->msg.entity.length += parser->chunk_size;
-		parser->ent_position = ENTREAD_USING_CHUNKED;
-		return PARSE_CONTINUE_1;
-	} else
-		/* need more data for chunk */
-		return PARSE_INCOMPLETE;
+    /* if 'chunk_size' of bytes have been read; read next chunk */
+    if ((parser->msg.msg.length - parser->scanner.cursor) >=
+        parser->chunk_size) {
+        /* move to next chunk */
+        parser->scanner.cursor += parser->chunk_size;
+        save_pos = parser->scanner.cursor;
+        /* discard CRLF */
+        status = match(&parser->scanner, "%c");
+        if (status != (parse_status_t)PARSE_OK) {
+            /*move back */
+            parser->scanner.cursor -= parser->chunk_size;
+            /*parser->scanner.cursor = save_pos; */
+            return status;
+        }
+        membuffer_delete(&parser->msg.msg,
+            save_pos,
+            (parser->scanner.cursor - save_pos));
+        parser->scanner.cursor = save_pos;
+        /*update temp  */
+        parser->msg.entity.length += parser->chunk_size;
+        
+        /* Check content length limit during chunked accumulation */
+        if (g_maxContentLength > 0 &&
+            parser->msg.entity.length > (unsigned int)g_maxContentLength) {
+            parser->http_error_code = HTTP_REQ_ENTITY_TOO_LARGE;
+            return PARSE_FAILURE;
+        }
+        
+        parser->ent_position = ENTREAD_USING_CHUNKED;
+        return PARSE_CONTINUE_1;
+    } else
+        /* need more data for chunk */
+        return PARSE_INCOMPLETE;
 }
-
 /************************************************************************
  * Function: parser_parse_chunky_headers
  *
@@ -1754,49 +1762,59 @@ static UPNP_INLINE parse_status_t parser_parse_chunky_headers(
  *	 PARSE_CONTINUE_1
  ************************************************************************/
 static UPNP_INLINE parse_status_t parser_parse_chunky_entity(
-	http_parser_t *parser)
+    http_parser_t *parser)
 {
-	scanner_t *scanner = &parser->scanner;
-	parse_status_t status;
-	size_t save_pos;
-	memptr dummy;
+    scanner_t *scanner = &parser->scanner;
+    parse_status_t status;
+    size_t save_pos;
+    memptr dummy;
+    int chunk_size; 
 
-	assert(parser->ent_position == ENTREAD_USING_CHUNKED);
+    assert(parser->ent_position == ENTREAD_USING_CHUNKED);
 
-	save_pos = scanner->cursor;
+    save_pos = scanner->cursor;
 
-	/* get size of chunk, discard extension, discard CRLF */
-	status = match(scanner, "%x%L%c", &parser->chunk_size, &dummy);
-	if (status != (parse_status_t)PARSE_OK) {
-		scanner->cursor = save_pos;
-		UpnpPrintf(UPNP_INFO,
-			HTTP,
-			__FILE__,
-			__LINE__,
-			"CHUNK COULD NOT BE PARSED\n");
-		return status;
-	}
-	/* remove chunk info just matched; just retain data */
-	membuffer_delete(
-		&parser->msg.msg, save_pos, (scanner->cursor - save_pos));
-	scanner->cursor = save_pos; /* adjust scanner too */
+    /* get size of chunk, discard extension, discard CRLF */
+    status = match(scanner, "%x%L%c", &chunk_size, &dummy);
+    if (status != (parse_status_t)PARSE_OK) {
+        scanner->cursor = save_pos;
+        UpnpPrintf(UPNP_INFO,
+            HTTP,
+            __FILE__,
+            __LINE__,
+            "CHUNK COULD NOT BE PARSED\n");
+        return status;
+    }
 
-	if (parser->chunk_size == (size_t)0) {
-		/* done reading entity; determine length of entity */
-		parser->msg.entity.length = parser->scanner.cursor -
-					    parser->entity_start_position +
-					    parser->msg.amount_discarded;
 
-		/* read entity headers */
-		parser->ent_position = ENTREAD_CHUNKY_HEADERS;
-	} else {
-		/* read chunk body */
-		parser->ent_position = ENTREAD_CHUNKY_BODY;
-	}
+    parser->chunk_size = (size_t)chunk_size;
 
-	return PARSE_CONTINUE_1; /* continue to reading body */
+    /* remove chunk info just matched; just retain data */
+    membuffer_delete(
+        &parser->msg.msg, save_pos, (scanner->cursor - save_pos));
+    scanner->cursor = save_pos; /* adjust scanner too */
+
+    if (parser->chunk_size == (size_t)0) {
+        /* done reading entity; determine length of entity */
+        parser->msg.entity.length = parser->scanner.cursor -
+                        parser->entity_start_position +
+                        parser->msg.amount_discarded;
+
+        /* read entity headers */
+        parser->ent_position = ENTREAD_CHUNKY_HEADERS;
+    } else {
+        /* Check if this single chunk exceeds the max content length */
+        if (g_maxContentLength > 0 &&
+            parser->chunk_size > (unsigned int)g_maxContentLength) {
+            parser->http_error_code = HTTP_REQ_ENTITY_TOO_LARGE;
+            return PARSE_FAILURE;
+        }
+        /* read chunk body */
+        parser->ent_position = ENTREAD_CHUNKY_BODY;
+    }
+
+    return PARSE_CONTINUE_1; /* continue to reading body */
 }
-
 /************************************************************************
  * Function: parser_parse_entity_until_close
  *
