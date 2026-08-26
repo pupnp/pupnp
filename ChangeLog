@@ -1,7 +1,24 @@
 *******************************************************************************
-Version 22.0.7
+Version 22.1.0
 *******************************************************************************
 
+- GHSA-f86h-hm8r-cqxr: Fix unbounded HTTP header block allowing pre-auth
+  denial of service. g_maxContentLength constrains only the entity, so the
+  request/response line and the header fields that follow it were accepted
+  with no size limit at all: a single unauthenticated request could carry an
+  unbounded number of headers, or one unbounded header value, and drive
+  memory and CPU exhaustion before any handler ran. Header insertion also
+  scans the existing list for a duplicate name, making the cost quadratic in
+  header count — 100,000 small headers occupied a worker for ~34 s and ~20 MB,
+  and a single 64 MB header value for ~34 s and ~131 MB. Both device hosts and
+  control points were affected, since the same parser reads responses.
+  Fixed by bounding the header block in parser_append(), gated on the parser
+  still reading the request/response line or the header fields, so chunked
+  trailer headers remain governed by g_maxContentLength. The limit is
+  deliberately separate from the entity limit, defaults to
+  DEFAULT_MAX_HEADER_SIZE = 16 KB, is adjustable with the new
+  UpnpSetMaxHeaderSize(), and rejects with HTTP 431 Request Header Fields Too
+  Large. Reported by the Kimi Security Team (Moonshot AI).
 
 
 *******************************************************************************
