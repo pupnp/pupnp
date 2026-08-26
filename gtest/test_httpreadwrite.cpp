@@ -16,6 +16,7 @@
 #include "gtest/gtest.h"
 #include <cstddef>
 #include <cstring>
+#include <string>
 
 extern "C" {
 #include "httpparser.h"
@@ -442,6 +443,273 @@ TEST_F(GhsaHg5xTestSuite, ValidChunkSizeIsAccepted)
 	httpmsg_destroy(&parser.msg);
 
 	EXPECT_EQ(ret, UPNP_E_SUCCESS);
+}
+
+// regression: GHSA-f86h-hm8r-cqxr
+// The HTTP header block was accepted with no size limit at all:
+// g_maxContentLength constrains only the entity, so a single unauthenticated
+// request could carry an unbounded number of headers, or one unbounded header
+// value, and drive memory and CPU exhaustion before any handler ran. Header
+// insertion also scans the existing list for a duplicate name, so cost was
+// quadratic in header count.
+//
+// Fixed by bounding the header block in parser_append(), gated on the parser
+// still reading the request/response line or the header fields.
+class GhsaF86hTestSuite : public ::testing::Test
+{
+protected:
+	int sv[2]{-1, -1};
+	size_t saved_header_limit_{};
+	size_t saved_content_limit_{};
+
+	void SetUp() override
+	{
+		saved_header_limit_ = g_maxHeaderSize;
+		saved_content_limit_ = g_maxContentLength;
+		g_maxHeaderSize = 1024; /* 1 KB header block */
+		ASSERT_EQ(socketpair(AF_UNIX, SOCK_STREAM, 0, sv), 0);
+	}
+
+	void TearDown() override
+	{
+		g_maxHeaderSize = saved_header_limit_;
+		g_maxContentLength = saved_content_limit_;
+		if (sv[0] >= 0)
+			close(sv[0]);
+		if (sv[1] >= 0)
+			close(sv[1]);
+	}
+};
+
+// Many small headers whose combined size exceeds the limit must be rejected.
+// Before the fix this was accepted, and the per-header duplicate scan made the
+// cost quadratic in the number of headers.
+TEST_F(GhsaF86hTestSuite, RejectsHeaderBlockExceedingLimitByCount)
+{
+	std::string req = "GET /desc.xml HTTP/1.1\r\n"
+			  "HOST: 127.0.0.1:49152\r\n";
+	/* ~14 bytes each, comfortably past the 1 KB limit */
+	for (int i = 0; i < 200; i++)
+		req += "X-Pad-" + std::to_string(i) + ": v\r\n";
+	req += "\r\n";
+	ASSERT_GT(req.size(), g_maxHeaderSize);
+
+	write(sv[1], req.data(), req.size());
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_UNKNOWN, &timeout, &http_err);
+
+	httpmsg_destroy(&parser.msg);
+
+	EXPECT_EQ(ret, UPNP_E_OUTOF_BOUNDS);
+	EXPECT_EQ(http_err, HTTP_REQ_HEADER_FIELDS_TOO_LARGE);
+}
+
+// A single header line longer than the limit must be rejected while it is
+// still arriving. This is the case a per-header counter inside the
+// parser_parse_headers() loop cannot catch: until the line terminates, match()
+// returns PARSE_INCOMPLETE and the loop body never runs, so the limit has to be
+// enforced in parser_append(). The terminating CRLF is deliberately never
+// sent — rejection must happen on size alone, not at end of message.
+TEST_F(GhsaF86hTestSuite, RejectsSingleOversizedHeaderLine)
+{
+	std::string req = "GET /desc.xml HTTP/1.1\r\n"
+			  "HOST: 127.0.0.1:49152\r\n"
+			  "X-Big: ";
+	req.append(4096, 'A'); /* no CRLF, no end of headers */
+
+	write(sv[1], req.data(), req.size());
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_UNKNOWN, &timeout, &http_err);
+
+	httpmsg_destroy(&parser.msg);
+
+	EXPECT_EQ(ret, UPNP_E_OUTOF_BOUNDS);
+	EXPECT_EQ(http_err, HTTP_REQ_HEADER_FIELDS_TOO_LARGE);
+}
+
+// The same parser handles responses, so a control point talking to a malicious
+// server must be protected too.
+TEST_F(GhsaF86hTestSuite, RejectsOversizedHeaderBlockOnResponse)
+{
+	std::string resp = "HTTP/1.1 200 OK\r\n";
+	for (int i = 0; i < 200; i++)
+		resp += "X-Pad-" + std::to_string(i) + ": v\r\n";
+	resp += "\r\n";
+	ASSERT_GT(resp.size(), g_maxHeaderSize);
+
+	write(sv[1], resp.data(), resp.size());
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_GET, &timeout, &http_err);
+
+	httpmsg_destroy(&parser.msg);
+
+	EXPECT_EQ(ret, UPNP_E_OUTOF_BOUNDS);
+	EXPECT_EQ(http_err, HTTP_REQ_HEADER_FIELDS_TOO_LARGE);
+}
+
+// A header block under the limit must still be accepted.
+TEST_F(GhsaF86hTestSuite, AcceptsHeaderBlockUnderLimit)
+{
+	static const char req[] = "GET /desc.xml HTTP/1.1\r\n"
+				  "HOST: 127.0.0.1:49152\r\n"
+				  "USER-AGENT: test/1.0\r\n"
+				  "\r\n";
+
+	write(sv[1], req, sizeof(req) - 1);
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_UNKNOWN, &timeout, &http_err);
+
+	httpmsg_destroy(&parser.msg);
+
+	EXPECT_EQ(ret, UPNP_E_SUCCESS);
+}
+
+// The default limit must be generous enough for real UPnP traffic: a SUBSCRIBE
+// with a long multi-URL CALLBACK header is the worst realistic case.
+TEST_F(GhsaF86hTestSuite, AcceptsTypicalUpnpRequestAtDefaultLimit)
+{
+	g_maxHeaderSize = DEFAULT_MAX_HEADER_SIZE;
+
+	std::string req = "SUBSCRIBE /upnp/event/service HTTP/1.1\r\n"
+			  "HOST: 192.168.1.1:49152\r\n"
+			  "USER-AGENT: OS/1.0 UPnP/2.0 product/1.0\r\n"
+			  "CALLBACK: ";
+	for (int i = 0; i < 20; i++)
+		req += "<http://192.168.1.100:8080/event/callback/" +
+		       std::to_string(i) + "> ";
+	req += "\r\n"
+	       "NT: upnp:event\r\n"
+	       "TIMEOUT: Second-1800\r\n"
+	       "\r\n";
+	ASSERT_LT(req.size(), g_maxHeaderSize);
+
+	write(sv[1], req.data(), req.size());
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_UNKNOWN, &timeout, &http_err);
+
+	httpmsg_destroy(&parser.msg);
+
+	EXPECT_EQ(ret, UPNP_E_SUCCESS);
+}
+
+// The header limit must not leak into the entity. A chunked body larger than
+// g_maxHeaderSize is entity data, not header data, and is governed by
+// g_maxContentLength — the check is gated on parser position precisely so that
+// chunked trailer headers, parsed at POS_ENTITY, are not caught by it.
+TEST_F(GhsaF86hTestSuite, DoesNotApplyHeaderLimitToEntity)
+{
+	g_maxContentLength = 65536; /* well above the body below */
+
+	static const char hdr[] = "HTTP/1.1 200 OK\r\n"
+				  "Transfer-Encoding: chunked\r\n"
+				  "\r\n";
+	char chunk_data[4096]; /* 4x the 1 KB header limit */
+	memset(chunk_data, 'X', sizeof(chunk_data));
+
+	write(sv[1], hdr, sizeof(hdr) - 1);
+	write(sv[1], "1000\r\n", 6); /* 0x1000 = 4096 bytes */
+	write(sv[1], chunk_data, sizeof(chunk_data));
+	write(sv[1], "\r\n", 2);
+	write(sv[1], "0\r\n\r\n", 5); /* terminator */
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_GET, &timeout, &http_err);
+
+	httpmsg_destroy(&parser.msg);
+
+	EXPECT_EQ(ret, UPNP_E_SUCCESS);
+}
+
+// Setting the limit to 0 disables the check, matching UpnpSetMaxContentLength.
+TEST_F(GhsaF86hTestSuite, ZeroLimitDisablesTheCheck)
+{
+	g_maxHeaderSize = 0;
+
+	std::string req = "GET /desc.xml HTTP/1.1\r\n"
+			  "HOST: 127.0.0.1:49152\r\n";
+	for (int i = 0; i < 200; i++)
+		req += "X-Pad-" + std::to_string(i) + ": v\r\n";
+	req += "\r\n";
+
+	write(sv[1], req.data(), req.size());
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_UNKNOWN, &timeout, &http_err);
+
+	httpmsg_destroy(&parser.msg);
+
+	EXPECT_EQ(ret, UPNP_E_SUCCESS);
+}
+
+// 431 must render a reason phrase: the 4xx table previously stopped at 417,
+// so reaching index 31 required extending it.
+TEST_F(GhsaF86hTestSuite, StatusCode431HasReasonPhrase)
+{
+	const char *text = http_get_code_text(HTTP_REQ_HEADER_FIELDS_TOO_LARGE);
+
+	ASSERT_NE(text, nullptr);
+	EXPECT_STREQ(text, "Request Header Fields Too Large");
 }
 
 int main(int argc, char **argv)

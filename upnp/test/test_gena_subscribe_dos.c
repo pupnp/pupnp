@@ -24,12 +24,22 @@
  *
  * Test cases:
  *   A. Oversized Callback header:
- *      Before fix 1 → HTTP 200 (accepted, 65536-byte alloc) → FAIL
+ *      Before fix 1 → HTTP 200 (accepted, oversized alloc)  → FAIL
  *      After  fix 1 → HTTP 412 (rejected before alloc)      → PASS
  *
  *   B. Subscription count limit (MaxSubscriptions = SMALL_LIMIT):
  *      Before fix 2 → all N+1 requests return HTTP 200      → FAIL
  *      After  fix 2 → requests 1..N return 200, N+1 → 500  → PASS
+ *
+ *   C. Oversized header block (GHSA-f86h-hm8r-cqxr):
+ *      Before      → HTTP 200 (whole block buffered)        → FAIL
+ *      After       → HTTP 431 (rejected on size)            → PASS
+ *
+ * Note that A and C are distinct layers. The Callback path in A is sized to
+ * exceed MAX_SUBSCRIPTION_CALLBACK_HEADER_SIZE while keeping the header block
+ * under DEFAULT_MAX_HEADER_SIZE, so the request still reaches GENA; C uses the
+ * reporter's original 65536-byte path, which the parser now rejects before
+ * GENA is ever consulted.
  *
  * The Callback URL always uses the server's own IP so that
  * gena_validate_delivery_urls() passes the subnet check.
@@ -54,8 +64,16 @@
 /* Path the registered service listens on for SUBSCRIBE. */
 #define EVENT_URL_PATH "/event/dos435"
 
-/* Callback header size that matches the reporter's PoC. */
-#define LARGE_CB_PATH_LEN 0x10000u /* 65536 bytes */
+/* Callback path long enough to exceed MAX_SUBSCRIPTION_CALLBACK_HEADER_SIZE
+ * (5000) while keeping the whole header block under DEFAULT_MAX_HEADER_SIZE
+ * (16384), so that this case still reaches the GENA layer and exercises fix 1
+ * rather than being rejected earlier by the parser's header-block limit. */
+#define LARGE_CB_PATH_LEN 8192u
+
+/* Callback path large enough to push the header block past
+ * DEFAULT_MAX_HEADER_SIZE, which the parser must reject on its own. This is
+ * the size the reporter's original PoC used. */
+#define OVERSIZED_HDR_CB_PATH_LEN 0x10000u /* 65536 bytes */
 
 /* How many subscriptions to accept before capping in test B. */
 #define SMALL_LIMIT 3
@@ -209,6 +227,49 @@ static int test_oversized_callback(
 }
 
 /*
+ * Test C (GHSA-f86h-hm8r-cqxr): a header block larger than
+ * DEFAULT_MAX_HEADER_SIZE must be rejected by the parser with HTTP 431,
+ * before the request is dispatched to GENA at all. Driving this over a real
+ * socket also confirms that 431 reaches the wire with its reason phrase,
+ * which required extending the 4xx status table past 417.
+ */
+static int test_oversized_header_block(
+	const char *server_ip, unsigned short server_port)
+{
+	char *large_path;
+	int status;
+
+	large_path = malloc(OVERSIZED_HDR_CB_PATH_LEN);
+	if (!large_path) {
+		perror("malloc");
+		return -1;
+	}
+	memset(large_path, 'a', OVERSIZED_HDR_CB_PATH_LEN);
+
+	status = send_subscribe(
+		server_ip, server_port, large_path, OVERSIZED_HDR_CB_PATH_LEN);
+	free(large_path);
+
+	printf("Test C: SUBSCRIBE with %u-byte header block -> HTTP %d\n",
+		OVERSIZED_HDR_CB_PATH_LEN,
+		status);
+
+	if (status == 431) {
+		puts("Test C PASS: oversized header block rejected (HTTP "
+		     "431).");
+		return 0;
+	}
+	fprintf(stderr,
+		"Test C FAIL: expected HTTP 431, got %d.\n"
+		"  Anything else means the %u-byte header block was buffered "
+		"instead of\n"
+		"  being rejected on size (GHSA-f86h-hm8r-cqxr).\n",
+		status,
+		OVERSIZED_HDR_CB_PATH_LEN);
+	return -1;
+}
+
+/*
  * Test B: After MaxSubscriptions subscriptions are registered the next
  * SUBSCRIBE must be rejected with HTTP 500.
  * Uses UpnpSetMaxSubscriptions() to force a small limit so the test runs fast.
@@ -313,6 +374,9 @@ int main(void)
 	}
 
 	if (test_oversized_callback(server_ip, server_port) != 0)
+		result = 1;
+
+	if (test_oversized_header_block(server_ip, server_port) != 0)
 		result = 1;
 
 	if (test_subscription_count_limit(handle, server_ip, server_port) != 0)
