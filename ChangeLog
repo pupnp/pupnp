@@ -19,6 +19,11 @@ Version 22.1.0
   DEFAULT_MAX_HEADER_SIZE = 16 KB, is adjustable with the new
   UpnpSetMaxHeaderSize(), and rejects with HTTP 431 Request Header Fields Too
   Large. Reported by the Kimi Security Team (Moonshot AI).
+- Size-limit rejections are now logged at UPNP_ERROR level naming the limit
+  that was hit, the observed sizes and the API that adjusts it
+  (UpnpSetMaxHeaderSize() or UpnpSetMaxContentLength()). Previously such a
+  rejection reached the caller only as UPNP_E_OUTOF_BOUNDS, with nothing to
+  search for. Only sizes are logged, never message bytes.
 
 
 *******************************************************************************
