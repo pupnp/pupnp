@@ -71,7 +71,7 @@ static const char *Http3xxStr = "Multiple Choices\0"
 				"\0"
 				"Temporary Redirect\0";
 
-#define NUM_4XX_CODES 18
+#define NUM_4XX_CODES 32
 static const char *Http4xxCodes[NUM_4XX_CODES];
 static const char *Http4xxStr = "Bad Request\0"
 				"Unauthorized\0"
@@ -90,7 +90,22 @@ static const char *Http4xxStr = "Bad Request\0"
 				"Request-URI Too Long\0"
 				"Unsupported Media Type\0"
 				"Requested Range Not Satisfiable\0"
-				"Expectation Failed\0";
+				"Expectation Failed\0"
+				/* 418 - 430 are unused */
+				"\0"
+				"\0"
+				"\0"
+				"\0"
+				"\0"
+				"\0"
+				"\0"
+				"\0"
+				"\0"
+				"\0"
+				"\0"
+				"\0"
+				"\0"
+				"Request Header Fields Too Large\0";
 
 #define NUM_5XX_CODES 11
 static const char *Http5xxCodes[NUM_5XX_CODES];
