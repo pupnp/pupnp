@@ -538,6 +538,28 @@ ExitFunction:
 			"(http_RecvMessage): Error %d, http_error_code = %d.\n",
 			ret,
 			*http_error_code);
+		/* Every g_maxContentLength rejection converges here, whether
+		 * raised in this function or propagated from the parser, so
+		 * the knob is named once instead of at each of the six sites.
+		 * The caller only sees UPNP_E_OUTOF_BOUNDS, which does not say
+		 * which limit was hit. Sizes only, never the body, which is
+		 * attacker controlled. */
+		if (*http_error_code == HTTP_REQ_ENTITY_TOO_LARGE) {
+			UpnpPrintf(UPNP_ERROR,
+				HTTP,
+				__FILE__,
+				line,
+				"HTTP entity exceeds the %lu byte limit "
+				"(Content-Length %lu, chunk %lu, received "
+				"%lu); rejecting with %d. Raise it with "
+				"UpnpSetMaxContentLength() if this peer is "
+				"legitimate.\n",
+				(unsigned long)g_maxContentLength,
+				(unsigned long)parser->content_length,
+				(unsigned long)parser->chunk_size,
+				(unsigned long)parser->msg.entity.length,
+				HTTP_REQ_ENTITY_TOO_LARGE);
+		}
 	}
 
 	return ret;
