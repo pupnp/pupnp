@@ -438,7 +438,9 @@ int http_RecvMessage(SOCKINFO *info,
 			case PARSE_NO_MATCH:
 				*http_error_code = parser->http_error_code;
 				if (*http_error_code ==
-					HTTP_REQ_ENTITY_TOO_LARGE) {
+						HTTP_REQ_ENTITY_TOO_LARGE ||
+					*http_error_code ==
+						HTTP_REQ_HEADER_FIELDS_TOO_LARGE) {
 					ret = UPNP_E_OUTOF_BOUNDS;
 				} else {
 					ret = UPNP_E_BAD_HTTPMSG;

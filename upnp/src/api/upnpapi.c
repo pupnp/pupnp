@@ -214,6 +214,7 @@ extern membuffer gWebserverCorsString;
  * packet. Content-Length exceeding this size will be not processed and
  * error 413 (HTTP Error Code) will be returned to the remote end point. */
 size_t g_maxContentLength = DEFAULT_SOAP_CONTENT_LENGTH;
+size_t g_maxHeaderSize = DEFAULT_MAX_HEADER_SIZE;
 
 /*! Global variable to determines the maximum number of
  *  events which can be queued for a given subscription before events begin
@@ -4790,6 +4791,16 @@ int UpnpSetMaxContentLength(size_t contentLength)
 		return UPNP_E_FINISH;
 	}
 	g_maxContentLength = contentLength;
+
+	return UPNP_E_SUCCESS;
+}
+
+int UpnpSetMaxHeaderSize(size_t headerSize)
+{
+	if (UpnpSdkInit != 1) {
+		return UPNP_E_FINISH;
+	}
+	g_maxHeaderSize = headerSize;
 
 	return UPNP_E_SUCCESS;
 }

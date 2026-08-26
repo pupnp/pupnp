@@ -52,9 +52,12 @@
 
 #define DEFAULT_SOAP_CONTENT_LENGTH 64000
 
+#define DEFAULT_MAX_HEADER_SIZE 16384
+
 #define NUM_HANDLE 200
 
 extern size_t g_maxContentLength;
+extern size_t g_maxHeaderSize;
 extern int g_UpnpSdkEQMaxLen;
 extern int g_UpnpSdkEQMaxAge;
 

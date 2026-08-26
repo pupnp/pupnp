@@ -205,6 +205,23 @@
 /* @} */
 
 /*!
+ * \name DEFAULT_MAX_HEADER_SIZE
+ *
+ * The HTTP request or response line plus the header fields that follow it
+ * will read at most {\tt DEFAULT_MAX_HEADER_SIZE} bytes. This bounds the
+ * memory a single unauthenticated peer can make the parser allocate before
+ * any request handler runs, and it bounds the linear duplicate-name scan
+ * performed for every header that is added. It is deliberately separate
+ * from {\tt DEFAULT_SOAP_CONTENT_LENGTH}, so that raising the entity limit
+ * does not implicitly grant an equally large header allowance.
+ * This can be adjusted dynamically with {\tt UpnpSetMaxHeaderSize}.
+ *
+ * @{
+ */
+#define DEFAULT_MAX_HEADER_SIZE 16384
+/* @} */
+
+/*!
  * \name NUM_SSDP_COPY
  *
  * This configuration parameter determines how many copies of each SSDP

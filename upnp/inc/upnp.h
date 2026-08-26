@@ -1088,6 +1088,11 @@ UPNP_EXPORT_SPEC int UpnpUnRegisterClient(
  * The default maximum content-length is \c DEFAULT_SOAP_CONTENT_LENGTH
  * = 64K bytes.
  *
+ * \note This limit applies to the entity only. The HTTP header block is
+ * bounded separately by \b UpnpSetMaxHeaderSize.
+ *
+ * \sa UpnpSetMaxHeaderSize
+ *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
  */
@@ -1095,6 +1100,41 @@ UPNP_EXPORT_SPEC int UpnpSetMaxContentLength(
 	/*! [in] The maximum permissible content length for incoming SOAP
 	 * actions, in bytes. */
 	size_t contentLength);
+
+/*!
+ * \brief Sets the maximum size of the HTTP header block that the SDK will
+ * accept on an incoming request or response.
+ *
+ * The header block is the request or response line together with the header
+ * fields that follow it, up to the terminating empty line. Bounding it limits
+ * the memory a single peer can make the parser allocate before any request
+ * handler runs. Chunked trailer headers are part of the entity and are
+ * governed by \b UpnpSetMaxContentLength instead.
+ *
+ * This limit is independent of the content-length limit, so that raising the
+ * permissible entity size does not implicitly grant an equally large header
+ * allowance.
+ *
+ * A request whose header block exceeds this limit is rejected with
+ * HTTP 431 Request Header Fields Too Large.
+ *
+ * If set to 0 then checking will be disabled.
+ *
+ * The default maximum header size is \c DEFAULT_MAX_HEADER_SIZE
+ * = 16K bytes, which is ample for normal UPnP traffic. A peer that
+ * legitimately needs a larger header block is rejected until this is raised;
+ * the rejection is logged at \c UPNP_ERROR level and names this function.
+ *
+ * \sa UpnpSetMaxContentLength
+ *
+ * \return An integer representing one of the following:
+ *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
+ *     \li \c UPNP_E_FINISH: The SDK is not initialized.
+ */
+UPNP_EXPORT_SPEC int UpnpSetMaxHeaderSize(
+	/*! [in] The maximum permissible size of the header block on incoming
+	 * requests and responses, in bytes. */
+	size_t headerSize);
 
 /* @} Initialization and Registration */
 
