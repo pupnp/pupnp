@@ -1,14 +1,16 @@
 name: CIFuzz
 
 on:
+  # CIFuzz builds every target and then fuzzes for 5 minutes, so it is too
+  # expensive to run on every pull request. Run it on demand, and
+  # automatically only when the fuzzing harnesses themselves change.
+  workflow_dispatch:
   pull_request:
     branches:
+      - "**"
       - "!no_ci-*"
     paths:
-      - "**.c"
-      - "**.cpp"
-      - "**.h"
-      - "**.hpp"
+      - "fuzzer/**"
 
 permissions:
   contents: read
