@@ -46,8 +46,8 @@ extern int web_server_ut_set_alias(
 /* The miniserver rejects requests whose Host header isn't a numeric
  * ip:port (DNS-rebinding protection), so the Host header below must
  * match the server's own address. */
-static int get_status_code(const char *ip, unsigned short port,
-	const char *path)
+static int get_status_code(
+	const char *ip, unsigned short port, const char *path)
 {
 	int sock;
 	struct sockaddr_in addr;
@@ -82,8 +82,7 @@ static int get_status_code(const char *ip, unsigned short port,
 	send(sock, req, strlen(req), MSG_NOSIGNAL);
 
 	while (total < sizeof buf - 1 &&
-		(n = recv(sock, buf + total, sizeof buf - 1 - total, 0)) >
-			0) {
+		(n = recv(sock, buf + total, sizeof buf - 1 - total, 0)) > 0) {
 		total += (size_t)n;
 	}
 	buf[total] = '\0';
