@@ -54,7 +54,7 @@ static void walk(IXML_Node *nodeptr, int depth, unsigned long *budget)
 	}
 
 	for (child = ixmlNode_getFirstChild(nodeptr); child;
-			child = ixmlNode_getNextSibling(child)) {
+		child = ixmlNode_getNextSibling(child)) {
 		walk(child, depth + 1, budget);
 	}
 }
@@ -97,7 +97,8 @@ static void query_document(IXML_Document *doc)
 			if (tag) {
 				(void)ixmlElement_getAttribute(element, tag);
 				(void)ixmlElement_hasAttribute(element, tag);
-				(void)ixmlElement_getAttributeNode(element, tag);
+				(void)ixmlElement_getAttributeNode(
+					element, tag);
 			}
 		}
 		ixmlNodeList_free(list);
