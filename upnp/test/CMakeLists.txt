@@ -305,6 +305,23 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# GHSA-7mx2-6v7x-xhv7: a QueryStateVariable SOAP request with a text or
+# CDATA node where <varName> is expected made check_soap_request() pass a
+# NULL local name to strcmp(), crashing the process.
+UPNP_Add_Unit_Test(test-upnp-ghsa-xhv7 poc_ghsa_xhv7_soap_varname.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-ghsa-xhv7 PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-ghsa-xhv7-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # Issue #347: HTTP response headers must use title-case names.
 # Starts the UPnP HTTP server via UpnpInit2, sends a GET request over a raw
 # TCP socket, and verifies title-case header names in the response.
