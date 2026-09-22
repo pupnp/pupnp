@@ -726,7 +726,7 @@ static int check_soap_request(
 			goto error_handler;
 		}
 		local_name = ixmlNode_getLocalName(varname_node);
-		if (strcmp(local_name, "varName") != 0) {
+		if (NULL == local_name || strcmp(local_name, "varName") != 0) {
 			goto error_handler;
 		}
 		nametxt_node = ixmlNode_getFirstChild(varname_node);

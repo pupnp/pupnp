@@ -2,6 +2,15 @@
 Version 22.1.1
 *******************************************************************************
 
+- GHSA-7mx2-6v7x-xhv7: Fix unauthenticated remote crash in SOAP
+  QueryStateVariable handling. check_soap_request() passed the local name of
+  the first child of the QueryStateVariable action node straight to
+  strcmp(), but ixmlNode_getLocalName() returns NULL for text and CDATA
+  nodes. A single POST to any control URL, with the QueryStateVariable
+  SOAPACTION and a text or CDATA node where <varName> is expected, crashed
+  the whole process (CWE-476) before the device callback ran. Fixed by adding
+  the same NULL check the neighbouring local-name checks already use; such
+  requests are now rejected with HTTP 400. Reported by Alex J.
 
 
 *******************************************************************************
