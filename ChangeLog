@@ -2,6 +2,19 @@
 Version 22.1.2
 *******************************************************************************
 
+- GHSA-xr5m-v53v-jfq9: Fix quadratic-time DOM construction in
+  ixmlParseBufferEx() allowing pre-auth denial of service. The parser appended
+  every node by walking its parent's child list from the head, resolved the
+  default namespace and every element prefix by walking the whole stack of
+  open elements, and checked every attribute against all the attributes
+  before it. A well-formed SOAP body within the 64000-byte entity limit, sent
+  unauthenticated to any control URL, could burn up to about 2 s of CPU per
+  request (CWE-407). Children are now appended in constant time, the default
+  namespace in effect is recorded on each element as it is opened, and prefix
+  lookups skip the elements that bind no prefix. Elements are limited to 256
+  attributes, namespace declarations included, and at most 256 namespace
+  prefix bindings may be in scope at once; documents above either limit are
+  rejected with IXML_SYNTAX_ERR. Reported by Denis K.
 
 
 *******************************************************************************
