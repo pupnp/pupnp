@@ -62,6 +62,9 @@ typedef struct _IXML_ElementStack
 	char *namespaceUri;
 	IXML_NamespaceURI *pNsURI;
 	struct _IXML_ElementStack *nextElement;
+	/*! Nearest frame below this one that defines a default namespace,
+	 * NULL if none. */
+	struct _IXML_ElementStack *defaultNsElement;
 } IXML_ElementStack;
 
 typedef enum

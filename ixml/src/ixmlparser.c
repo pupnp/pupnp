@@ -2353,6 +2353,20 @@ static int Parser_pushElement(
 
 		pCurElement = xmlParser->pCurElement;
 
+		/* The parent's attributes, where its namespaces are declared,
+		 * have all been read, so the default namespace in effect below
+		 * it cannot change any more. */
+		if (pCurElement != NULL) {
+			if (pCurElement->prefix == NULL &&
+				pCurElement->namespaceUri != NULL) {
+				pNewStackElement->defaultNsElement =
+					pCurElement;
+			} else {
+				pNewStackElement->defaultNsElement =
+					pCurElement->defaultNsElement;
+			}
+		}
+
 		/* insert the new element into the top of the stack */
 		pNewStackElement->nextElement = pCurElement;
 		xmlParser->pCurElement = pNewStackElement;
@@ -2385,13 +2399,18 @@ static int Parser_hasDefaultNamespace(
 {
 	IXML_ElementStack *pCur = xmlParser->pCurElement;
 
-	while (pCur != NULL) {
-		if ((pCur->prefix == NULL) && (pCur->namespaceUri != NULL)) {
-			*nsURI = pCur->namespaceUri;
-			return 1;
-		} else {
-			pCur = pCur->nextElement;
-		}
+	if (pCur == NULL) {
+		return 0;
+	}
+	/* Only the top frame can still be changing; the default namespace in
+	 * effect below it was recorded when it was pushed. */
+	if ((pCur->prefix == NULL) && (pCur->namespaceUri != NULL)) {
+		*nsURI = pCur->namespaceUri;
+		return 1;
+	}
+	if (pCur->defaultNsElement != NULL) {
+		*nsURI = pCur->defaultNsElement->namespaceUri;
+		return 1;
 	}
 
 	return 0;
