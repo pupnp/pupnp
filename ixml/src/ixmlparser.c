@@ -2276,6 +2276,9 @@ static int Parser_processAttributeName(
 	IXML_Attr *attr = NULL;
 	int rc = IXML_SUCCESS;
 
+	if (++xmlParser->numAttributes > IXML_MAX_ATTRIBUTES) {
+		return IXML_SYNTAX_ERR;
+	}
 	if (isDuplicateAttribute(xmlParser, newNode)) {
 		return IXML_SYNTAX_ERR;
 	}
@@ -2492,6 +2495,7 @@ static int Parser_processElementName(
 
 	xmlParser->currentNodePtr = (IXML_Node *)newElement;
 	xmlParser->lastChild = NULL;
+	xmlParser->numAttributes = 0;
 
 	/* push element to stack */
 	rc = Parser_pushElement(xmlParser, (IXML_Node *)newElement);

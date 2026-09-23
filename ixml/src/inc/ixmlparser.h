@@ -48,6 +48,11 @@
 #define ESC_HEX "&#x"
 #define ESC_DEC "&#"
 
+/*! Maximum number of attributes, namespace declarations included, on one
+ * element. Checking a new attribute for duplicates walks the attributes
+ * before it, so without a cap one element costs O(n^2) to parse. */
+#define IXML_MAX_ATTRIBUTES 256
+
 typedef struct _IXML_NamespaceURI
 {
 	char *nsURI;
@@ -89,6 +94,8 @@ typedef struct _Parser
 	IXML_Node *currentNodePtr;
 	/*! Last child of currentNodePtr, NULL if it has none yet. */
 	IXML_Node *lastChild;
+	/*! Number of attributes read so far on currentNodePtr. */
+	int numAttributes;
 	PARSER_STATE state;
 	int bHasTopLevel;
 } Parser;
