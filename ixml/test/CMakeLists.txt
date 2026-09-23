@@ -14,6 +14,10 @@ ixml_add_unit_test(test-ixml-poc-ghsa-j247-getbytagnamens poc_ghsa_j247_getbytag
 ixml_add_unit_test(test-ixml-poc-ghsa-j247-clonenode poc_ghsa_j247_clonenode.c "")
 ixml_add_unit_test(test-ixml-poc-ghsa-j247-isancestor poc_ghsa_j247_isancestor.c "")
 ixml_add_unit_test(test-ixml-poc-ghsa-q54q poc_ghsa_q54q.c "")
+ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-siblings poc_ghsa_xr5m_siblings.c "")
+ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-depth poc_ghsa_xr5m_depth.c "")
+ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-attributes poc_ghsa_xr5m_attributes.c "")
+ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-prefix poc_ghsa_xr5m_prefix.c "")
 
 if(NOT UPNP_ENABLE_TESTING_INTEGRATION)
 	return()
