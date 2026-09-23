@@ -660,6 +660,12 @@ int ixmlNode_removeChild(
 
 int ixmlNode_appendChild(IXML_Node *nodeptr, IXML_Node *newChild)
 {
+	return ixmlNode_appendChildAfter(nodeptr, newChild, NULL);
+}
+
+int ixmlNode_appendChildAfter(
+	IXML_Node *nodeptr, IXML_Node *newChild, IXML_Node *lastChild)
+{
 	IXML_Node *prev = NULL;
 	IXML_Node *next = NULL;
 
@@ -688,6 +694,12 @@ int ixmlNode_appendChild(IXML_Node *nodeptr, IXML_Node *newChild)
 	/* if the first child */
 	if (!nodeptr->firstChild) {
 		nodeptr->firstChild = newChild;
+	} else if (lastChild && lastChild != newChild &&
+		   lastChild->parentNode == nodeptr &&
+		   !lastChild->nextSibling) {
+		/* The caller knows the end of the list: skip the walk. */
+		lastChild->nextSibling = newChild;
+		newChild->prevSibling = lastChild;
 	} else {
 		prev = nodeptr->firstChild;
 		next = prev->nextSibling;

@@ -84,6 +84,8 @@ typedef struct _Parser
 	IXML_Node *pNeedPrefixNode;
 	IXML_ElementStack *pCurElement;
 	IXML_Node *currentNodePtr;
+	/*! Last child of currentNodePtr, NULL if it has none yet. */
+	IXML_Node *lastChild;
 	PARSER_STATE state;
 	int bHasTopLevel;
 } Parser;
@@ -254,6 +256,23 @@ int ixmlNode_setNodeProperties(
 	IXML_Node *destNode,
 	/*! [in] . */
 	IXML_Node *src);
+
+/*!
+ * \brief Same as ixmlNode_appendChild(), but in constant time when the
+ * caller knows the current last child of nodeptr.
+ *
+ * The hint is used only if it is still the last child of nodeptr; otherwise
+ * the child list is walked as ixmlNode_appendChild() does.
+ *
+ * \return Same as ixmlNode_appendChild().
+ */
+int ixmlNode_appendChildAfter(
+	/*! [in] The parent node. */
+	IXML_Node *nodeptr,
+	/*! [in] The node to append. */
+	IXML_Node *newChild,
+	/*! [in] The last child of nodeptr, or NULL if unknown. */
+	IXML_Node *lastChild);
 
 /*!
  * \brief Initializes a nodelist

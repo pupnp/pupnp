@@ -2463,14 +2463,16 @@ static int Parser_processElementName(
 		}
 	}
 
-	rc = ixmlNode_appendChild(
-		xmlParser->currentNodePtr, (IXML_Node *)newElement);
+	rc = ixmlNode_appendChildAfter(xmlParser->currentNodePtr,
+		(IXML_Node *)newElement,
+		xmlParser->lastChild);
 	if (rc != IXML_SUCCESS) {
 		ixmlElement_free(newElement);
 		return rc;
 	}
 
 	xmlParser->currentNodePtr = (IXML_Node *)newElement;
+	xmlParser->lastChild = NULL;
 
 	/* push element to stack */
 	rc = Parser_pushElement(xmlParser, (IXML_Node *)newElement);
@@ -2553,6 +2555,8 @@ static int Parser_eTagVerification(
 
 	if (strcmp(newNode->nodeName, xmlParser->currentNodePtr->nodeName) ==
 		0) {
+		/* The element being closed is the last child of its parent. */
+		xmlParser->lastChild = xmlParser->currentNodePtr;
 		xmlParser->currentNodePtr =
 			xmlParser->currentNodePtr->parentNode;
 	} else {
@@ -2624,13 +2628,15 @@ static int Parser_parseDocument(
 						goto ErrorHandler;
 					}
 
-					rc = ixmlNode_appendChild(
+					rc = ixmlNode_appendChildAfter(
 						xmlParser->currentNodePtr,
-						tempNode);
+						tempNode,
+						xmlParser->lastChild);
 					if (rc != IXML_SUCCESS) {
 						ixmlNode_free(tempNode);
 						goto ErrorHandler;
 					}
+					xmlParser->lastChild = tempNode;
 
 					break;
 
@@ -2642,14 +2648,17 @@ static int Parser_parseDocument(
 					if (rc != IXML_SUCCESS) {
 						goto ErrorHandler;
 					}
-					rc = ixmlNode_appendChild(
+					rc = ixmlNode_appendChildAfter(
 						xmlParser->currentNodePtr,
-						(IXML_Node *)cdataSecNode);
+						(IXML_Node *)cdataSecNode,
+						xmlParser->lastChild);
 					if (rc != IXML_SUCCESS) {
 						ixmlNode_free((IXML_Node *)
 								cdataSecNode);
 						goto ErrorHandler;
 					}
+					xmlParser->lastChild =
+						(IXML_Node *)cdataSecNode;
 					break;
 
 				case eATTRIBUTE_NODE:
