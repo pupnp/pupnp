@@ -1783,6 +1783,7 @@ static int Parser_xmlNamespace(
 			free(pCur->namespaceUri);
 		}
 		pCur->namespaceUri = safe_strdup(newNode->nodeValue);
+		pCur->prefixInherited = 0;
 		if (pCur->namespaceUri == NULL) {
 			ret = IXML_INSUFFICIENT_MEMORY;
 			line = __LINE__;
@@ -1810,6 +1811,7 @@ static int Parser_xmlNamespace(
 				free(pCur->namespaceUri);
 			}
 			pCur->namespaceUri = safe_strdup(newNode->nodeValue);
+			pCur->prefixInherited = 0;
 			if (pCur->namespaceUri == NULL) {
 				ret = IXML_INSUFFICIENT_MEMORY;
 				line = __LINE__;
@@ -1860,6 +1862,7 @@ static int Parser_xmlNamespace(
 				} else {
 					pPrevNs->nextNsURI = pNewNs;
 				}
+				pCur->numNsURI++;
 			} else {
 				/* update the namespace */
 				if (pNs->nsURI != NULL) {
@@ -2167,6 +2170,20 @@ ExitFunction:
 }
 
 /*!
+ * \brief Counts the namespace prefixes a frame binds.
+ *
+ * Its namespace declarations, plus its own prefix unless that resolved to
+ * what the frames below already bind.
+ */
+static int Parser_numNsBindings(
+	/*! [in] The element stack frame. */
+	const IXML_ElementStack *pCur)
+{
+	return pCur->numNsURI +
+	       (pCur->prefix != NULL && !pCur->prefixInherited ? 1 : 0);
+}
+
+/*!
  * \brief Decides whether element's prefix is already defined.
  */
 static int Parser_ElementPrefixDefined(
@@ -2180,6 +2197,8 @@ static int Parser_ElementPrefixDefined(
 	IXML_ElementStack *pCur = xmlParser->pCurElement;
 	IXML_NamespaceURI *pNsUri;
 
+	/* Frames that bind no prefix would only repeat what the frames below
+	 * them resolve to, so they are skipped. */
 	while (pCur != NULL) {
 		if ((pCur->prefix != NULL) &&
 			(strcmp(pCur->prefix, newNode->prefix) == 0)) {
@@ -2199,7 +2218,7 @@ static int Parser_ElementPrefixDefined(
 			}
 		}
 
-		pCur = pCur->nextElement;
+		pCur = pCur->nsScopeElement;
 	}
 
 	return 0;
@@ -2360,6 +2379,8 @@ static int Parser_pushElement(
 		 * have all been read, so the default namespace in effect below
 		 * it cannot change any more. */
 		if (pCurElement != NULL) {
+			int numBindings = Parser_numNsBindings(pCurElement);
+
 			if (pCurElement->prefix == NULL &&
 				pCurElement->namespaceUri != NULL) {
 				pNewStackElement->defaultNsElement =
@@ -2367,6 +2388,19 @@ static int Parser_pushElement(
 			} else {
 				pNewStackElement->defaultNsElement =
 					pCurElement->defaultNsElement;
+			}
+			if (numBindings > 0) {
+				pNewStackElement->nsScopeElement = pCurElement;
+			} else {
+				pNewStackElement->nsScopeElement =
+					pCurElement->nsScopeElement;
+			}
+			pNewStackElement->nsInScope =
+				pCurElement->nsInScope + numBindings;
+			if (pNewStackElement->nsInScope > IXML_MAX_NAMESPACES) {
+				Parser_freeElementStackItem(pNewStackElement);
+				free(pNewStackElement);
+				return IXML_SYNTAX_ERR;
 			}
 		}
 
@@ -2434,6 +2468,7 @@ static int Parser_processElementName(
 {
 	IXML_Element *newElement = NULL;
 	char *nsURI = NULL;
+	int prefixInherited = 0;
 	int rc = IXML_SUCCESS;
 
 	if (xmlParser->bHasTopLevel) {
@@ -2466,6 +2501,7 @@ static int Parser_processElementName(
 		} else {
 			/* fill in the namespace */
 			Parser_setElementNamespace(newElement, nsURI);
+			prefixInherited = 1;
 		}
 	} else {
 		/* does element has default namespace */
@@ -2499,6 +2535,9 @@ static int Parser_processElementName(
 
 	/* push element to stack */
 	rc = Parser_pushElement(xmlParser, (IXML_Node *)newElement);
+	if (rc == IXML_SUCCESS) {
+		xmlParser->pCurElement->prefixInherited = prefixInherited;
+	}
 	return rc;
 }
 

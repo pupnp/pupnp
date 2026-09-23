@@ -53,6 +53,11 @@
  * before it, so without a cap one element costs O(n^2) to parse. */
 #define IXML_MAX_ATTRIBUTES 256
 
+/*! Maximum number of namespace prefix bindings in scope at once. Resolving a
+ * prefix walks the bindings in scope, so without a cap n prefixed elements
+ * cost O(n^2) to parse. */
+#define IXML_MAX_NAMESPACES 256
+
 typedef struct _IXML_NamespaceURI
 {
 	char *nsURI;
@@ -70,6 +75,15 @@ typedef struct _IXML_ElementStack
 	/*! Nearest frame below this one that defines a default namespace,
 	 * NULL if none. */
 	struct _IXML_ElementStack *defaultNsElement;
+	/*! Number of entries in pNsURI. */
+	int numNsURI;
+	/*! Nonzero if namespaceUri is what the frames below resolve prefix
+	 * to, so that this frame binds nothing new for it. */
+	int prefixInherited;
+	/*! Nearest frame below this one that binds a prefix, NULL if none. */
+	struct _IXML_ElementStack *nsScopeElement;
+	/*! Number of prefix bindings in the frames below this one. */
+	int nsInScope;
 } IXML_ElementStack;
 
 typedef enum
