@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) poc 517",
+            "name": "(gdb) tv_device sample",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}//build/ixml/test/test-ixml-poc-gh-517-shared",
+            "program": "${workspaceFolder}/build/samples/tv/tv_device",
             "args": [],
             "stopAtEntry": true,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}/samples/tv",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -33,10 +33,7 @@
             "request": "launch",
             "name": "Bash-Debug (simplest configuration)",
             "program": "${file}",
-            "args": [
-                "1.14.21",
-                "1.14.22",
-            ],
+            "args": [],
             "cwd": "${workspaceFolder}"
         },
     ]
