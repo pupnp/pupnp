@@ -603,6 +603,45 @@ TEST_F(GhsaF86hTestSuite, AcceptsHeaderBlockUnderLimit)
 	EXPECT_EQ(ret, UPNP_E_SUCCESS);
 }
 
+// A header block under the limit must be accepted even when the body arrives
+// in the same read. The check runs on every append while the headers are still
+// incomplete, so it must not count entity bytes read past the end of the
+// header block. Here the 1400-byte header block is not complete after the
+// first 1 KB read; the second read (2 KB) brings in the rest of the headers
+// plus body, taking the buffer well past the 1500-byte limit.
+TEST_F(GhsaF86hTestSuite, AcceptsHeaderBlockUnderLimitFollowedByBody)
+{
+	g_maxHeaderSize = 1500;
+	g_maxContentLength = 65536;
+
+	std::string req = "POST /control HTTP/1.1\r\n"
+			  "HOST: 127.0.0.1:49152\r\n"
+			  "CONTENT-LENGTH: 2000\r\n"
+			  "X-Pad: ";
+	req.append(1400 - req.size() - 4, 'A');
+	req += "\r\n\r\n";
+	ASSERT_EQ(req.size(), 1400u);
+	req.append(2000, 'B');
+
+	write(sv[1], req.data(), req.size());
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_UNKNOWN, &timeout, &http_err);
+
+	httpmsg_destroy(&parser.msg);
+
+	EXPECT_EQ(ret, UPNP_E_SUCCESS);
+	EXPECT_NE(http_err, HTTP_REQ_HEADER_FIELDS_TOO_LARGE);
+}
+
 // The default limit must be generous enough for real UPnP traffic: a SUBSCRIBE
 // with a long multi-URL CALLBACK header is the worst realistic case.
 TEST_F(GhsaF86hTestSuite, AcceptsTypicalUpnpRequestAtDefaultLimit)
