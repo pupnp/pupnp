@@ -467,7 +467,22 @@ static int gena_subscribe(
 	parse_ret = matchstr(
 		timeout_hdr.buf, timeout_hdr.length, "%iSecond-%d%0", timeout);
 	if (parse_ret == PARSE_OK) {
-		/* nothing to do */
+		/* Apply the same floor as the requested timeout. A shorter
+		 * grant would schedule the auto-renewal AUTO_RENEW_TIME
+		 * seconds before it, possibly in the past, so it would fire at
+		 * once and, against a publisher that keeps granting it, renew
+		 * in a tight loop. */
+		if (*timeout < CP_MINIMUM_SUBSCRIPTION_TIME) {
+			UpnpPrintf(UPNP_INFO,
+				GENA,
+				__FILE__,
+				__LINE__,
+				"Granted subscription timeout %d raised to "
+				"%d\n",
+				*timeout,
+				CP_MINIMUM_SUBSCRIPTION_TIME);
+			*timeout = CP_MINIMUM_SUBSCRIPTION_TIME;
+		}
 	} else if (memptr_cmp_nocase(&timeout_hdr, "Second-infinite") == 0) {
 		*timeout = -1;
 	} else {
