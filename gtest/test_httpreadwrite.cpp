@@ -26,6 +26,9 @@ extern "C" {
 #include "upnpapi.h"
 }
 
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -710,6 +713,148 @@ TEST_F(GhsaF86hTestSuite, StatusCode431HasReasonPhrase)
 
 	ASSERT_NE(text, nullptr);
 	EXPECT_STREQ(text, "Request Header Fields Too Large");
+}
+
+// regression: GHSA-q4rx-xfwj-m2gp
+// The streaming HTTP GET client (UpnpOpenHttpGet() and friends) reads the
+// response line and headers in ReadResponseLineAndHeaders(), which appended to
+// the message buffer directly instead of going through parser_append(), so the
+// GHSA-f86h header-block limit never applied. A malicious server streaming
+// header lines without the terminating blank line grew the client's memory
+// without bound, and the timeout never fired while data kept arriving.
+//
+// The server writes the whole oversized response and keeps the connection
+// open. The fixed client stops reading once the limit is exceeded, leaving the
+// rest unread in its socket; the unfixed client drains everything and then
+// times out.
+class GhsaQ4rxTestSuite : public ::testing::Test
+{
+protected:
+	int listen_fd_{-1};
+	int server_fd_{-1};
+	void *handle_{};
+	size_t saved_header_limit_{};
+
+	void SetUp() override
+	{
+		saved_header_limit_ = g_maxHeaderSize;
+		g_maxHeaderSize = 1024; /* 1 KB header block */
+
+		listen_fd_ = socket(AF_INET, SOCK_STREAM, 0);
+		ASSERT_GE(listen_fd_, 0);
+		sockaddr_in addr{};
+		addr.sin_family = AF_INET;
+		addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+		ASSERT_EQ(bind(listen_fd_,
+				  reinterpret_cast<sockaddr *>(&addr),
+				  sizeof(addr)),
+			0);
+		ASSERT_EQ(listen(listen_fd_, 1), 0);
+		socklen_t len = sizeof(addr);
+		ASSERT_EQ(getsockname(listen_fd_,
+				  reinterpret_cast<sockaddr *>(&addr),
+				  &len),
+			0);
+
+		std::string url = "http://127.0.0.1:" +
+				  std::to_string(ntohs(addr.sin_port)) + "/x";
+		ASSERT_EQ(http_OpenHttpConnection(url.c_str(), &handle_, 5),
+			UPNP_E_SUCCESS);
+		server_fd_ = accept(listen_fd_, nullptr, nullptr);
+		ASSERT_GE(server_fd_, 0);
+		/* Sends the GET and initializes the response parser. */
+		ASSERT_EQ(http_MakeHttpRequest(UPNP_HTTPMETHOD_GET,
+				  url.c_str(),
+				  handle_,
+				  nullptr,
+				  nullptr,
+				  0,
+				  5),
+			UPNP_E_SUCCESS);
+	}
+
+	void TearDown() override
+	{
+		g_maxHeaderSize = saved_header_limit_;
+		if (handle_)
+			http_CloseHttpConnection(handle_);
+		if (server_fd_ >= 0)
+			close(server_fd_);
+		if (listen_fd_ >= 0)
+			close(listen_fd_);
+	}
+
+	// The connection handle is private to httpreadwrite.c, but its first
+	// member is the SOCKINFO, so the handle pointer converts to it.
+	int ClientSocket() const
+	{
+		return static_cast<SOCKINFO *>(handle_)->socket;
+	}
+
+	int Unread() const
+	{
+		int n = 0;
+		ioctl(ClientSocket(), FIONREAD, &n);
+		return n;
+	}
+
+	// Send the response and wait until all of it sits in the client's
+	// receive buffer, so the unread count afterwards is exact.
+	void Send(const std::string &resp)
+	{
+		ASSERT_EQ(write(server_fd_, resp.data(), resp.size()),
+			(ssize_t)resp.size());
+		for (int i = 0; i < 500 && Unread() < (int)resp.size(); i++)
+			usleep(1000);
+		ASSERT_EQ(Unread(), (int)resp.size());
+	}
+};
+
+// Endless header lines after a valid status line must be rejected once the
+// header block exceeds the limit (second read loop).
+TEST_F(GhsaQ4rxTestSuite, RejectsOversizedResponseHeaderBlock)
+{
+	std::string resp = "HTTP/1.1 200 OK\r\n";
+	while (resp.size() < 16 * 1024)
+		resp += "A: b\r\n"; /* never terminated by a blank line */
+	Send(resp);
+
+	int ret = http_GetHttpResponse(
+		handle_, nullptr, nullptr, nullptr, nullptr, 1);
+
+	EXPECT_EQ(ret, UPNP_E_BAD_RESPONSE);
+	EXPECT_GT(Unread(), 0);
+}
+
+// A status line that never ends must be rejected once it exceeds the limit
+// (first read loop).
+TEST_F(GhsaQ4rxTestSuite, RejectsOversizedResponseLine)
+{
+	std::string resp = "HTTP/1.1 200 ";
+	resp.append(16 * 1024, 'A'); /* no CRLF */
+	Send(resp);
+
+	int ret = http_GetHttpResponse(
+		handle_, nullptr, nullptr, nullptr, nullptr, 1);
+
+	EXPECT_EQ(ret, UPNP_E_BAD_RESPONSE);
+	EXPECT_GT(Unread(), 0);
+}
+
+// A normal response under the limit must still be accepted.
+TEST_F(GhsaQ4rxTestSuite, AcceptsResponseUnderLimit)
+{
+	Send("HTTP/1.1 200 OK\r\n"
+	     "Content-Type: text/xml\r\n"
+	     "Content-Length: 0\r\n"
+	     "\r\n");
+
+	int status = 0;
+	int ret = http_GetHttpResponse(
+		handle_, nullptr, nullptr, nullptr, &status, 1);
+
+	EXPECT_EQ(ret, UPNP_E_SUCCESS);
+	EXPECT_EQ(status, HTTP_OK);
 }
 
 int main(int argc, char **argv)
