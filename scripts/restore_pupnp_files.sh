@@ -1,3 +1,3 @@
 #! /bin/bash
 
-git restore ChangeLog CMakeLists.txt libupnp.spec docs/Doxyfile
+git restore ChangeLog CMakeLists.txt docs/Doxyfile

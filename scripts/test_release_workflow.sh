@@ -59,7 +59,7 @@ cleanup() {
     # otherwise they bleed into the working tree of the original branch.
     # Restore only the known files home_keeping.sh touches; a blanket
     # 'git restore .' would also undo any uncommitted changes to other files.
-    git restore CMakeLists.txt ChangeLog docs/Doxyfile libupnp.spec 2>/dev/null || true
+    git restore CMakeLists.txt ChangeLog docs/Doxyfile 2>/dev/null || true
     git checkout "$ORIGINAL_BRANCH" 2>/dev/null || true
     git branch -D "$TEST_BRANCH" 2>/dev/null || true
     [[ -n "$BZ2_NAME" ]] && rm -f "$BZ2_NAME" "${BZ2_NAME}.sha256"
@@ -100,7 +100,7 @@ sha256sum "$BZ2_NAME" > "${BZ2_NAME}.sha256"
 cat "${BZ2_NAME}.sha256"
 
 echo -e "\n[6/6] Running Home Keeping script..."
-# Updates ChangeLog, docs/Doxyfile, libupnp.spec, and bumps UPNP_VERSION_PATCH
+# Updates ChangeLog, docs/Doxyfile, and bumps UPNP_VERSION_PATCH
 # in CMakeLists.txt to prepare the tree for the next development cycle.
 scripts/home_keeping.sh
 

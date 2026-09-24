@@ -52,10 +52,9 @@ cat "${CHANGELOG_TEMPLATE}" ChangeLog > ChangeLog.tmp
 mv ChangeLog.tmp ChangeLog
 
 ################################################################################
-# Fix Doxyfile and spec file using simple sed substitution
+# Fix Doxyfile using simple sed substitution
 ################################################################################
 sed -i "s/^PROJECT_NUMBER.*/PROJECT_NUMBER         = ${next_release}/" docs/Doxyfile
-sed -i "s/^Version:.*/Version: ${next_release}/" libupnp.spec
 
 ################################################################################
 # Fix the CMakeLists.txt file
