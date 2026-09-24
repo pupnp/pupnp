@@ -2,6 +2,19 @@
 Version 22.1.4
 *******************************************************************************
 
+- PR #634: Fix false HTTP 431 on header blocks under the size limit. The
+  GHSA-f86h-hm8r-cqxr header block check ran before parsing and counted the
+  whole receive buffer, including entity bytes that arrived in the same read
+  as the end of the headers, so a legal header block close to
+  g_maxHeaderSize followed by a body could be rejected. The exact header
+  block size is now checked when the blank line ending the headers is
+  parsed, and the buffered-size check runs only after a parse that stops
+  while still reading headers, so an unterminated header line is still
+  rejected.
+- PR #635: Fix a socket and memory leak in http_OpenHttpGetEx(), used by
+  UpnpOpenHttpGetEx(). On a malformed response it freed the connection
+  handle without closing the socket or destroying the response buffer. It
+  now uses http_CloseHttpConnection() for the full teardown.
 
 
 *******************************************************************************
