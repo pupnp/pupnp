@@ -37,12 +37,7 @@ See [LICENSE](site/LICENSE) for details.
 - [9. System Requirements](#9-system-requirements)
 - [10. Build Instructions](#10-build-instructions)
   - [10.1. Pre-requisites](#101-pre-requisites)
-  - [10.2. Core Libraries](#102-core-libraries)
-  - [10.3. Cross Compilation](#103-cross-compilation)
-  - [10.4. Samples](#104-samples)
-  - [10.5. Solaris Build](#105-solaris-build)
-  - [10.6. Windows Build](#106-windows-build)
-  - [10.7. CMake Build](#107-cmake-build)
+  - [10.2. CMake Build](#102-cmake-build)
 - [11. Install/Uninstall Instructions](#11-installuninstall-instructions)
   - [11.1. Install](#111-install)
   - [11.2. Uninstall](#112-uninstall)
@@ -296,7 +291,7 @@ In Order to build everything using the cmake build system, you just need to inst
 Standalone cmake is recommended, IDE's like Visual Studio have built-in support which works, but as cmake in general
 encourages out-of-source builds and VS writes it's config into the source, cmake-gui should be used on windows.
 
-All known options have the same meaning as stated in point 10.2. In Addition 3 options have been added.
+In addition to the standard CMake options, the following options are available:
 
 - DOWNLOAD_AND_BUILD_DEPS: This option is only available if a useable git program was found on your system.
   With this option on, the pthread4w package will be downloaded while configuring the build-env, then it will be build and installed along with upnp.
