@@ -1,6 +1,6 @@
 Version: 22.1.5
 Summary: Universal Plug and Play (UPnP) SDK
-Name: libupnp-1.18
+Name: libupnp
 Release: 1%{?dist}
 License: BSD
 Group: System Environment/Libraries
