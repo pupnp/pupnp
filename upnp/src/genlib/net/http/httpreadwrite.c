@@ -2340,14 +2340,14 @@ int http_OpenHttpGetEx(const char *url_str,
 			    &timeout,
 			    &http_error_code) != (int)PARSE_OK) {
 			errCode = UPNP_E_BAD_RESPONSE;
-			free(handle);
+			http_CloseHttpConnection(handle);
 			break;
 		}
 		status = parser_get_entity_read_method(&handle->response);
 		if (status != (parse_status_t)PARSE_CONTINUE_1 &&
 			status != (parse_status_t)PARSE_SUCCESS) {
 			errCode = UPNP_E_BAD_RESPONSE;
-			free(handle);
+			http_CloseHttpConnection(handle);
 			break;
 		}
 		*httpStatus = handle->response.msg.status_code;
