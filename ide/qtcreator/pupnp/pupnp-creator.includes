@@ -1,9 +1,0 @@
-./
-ixml/inc
-ixml/src/inc
-upnp/inc
-upnp/sample/common
-upnp/src/inc
-upnp/src/ssdp
-upnp/src/threadutil
-upnp/unittest/templates

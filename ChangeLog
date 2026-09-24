@@ -5,6 +5,9 @@ Version 22.1.5
 - Remove libupnp.spec. The RPM spec still built with autotools, which this
   project no longer ships, so it has not worked since the move to CMake.
   Packagers should use their distribution's own spec.
+- Remove the Qt Creator project files under ide/qtcreator. They listed the
+  autotools build files and paths such as upnp/sample that no longer exist.
+  Qt Creator can open the CMake build directly.
 
 
 *******************************************************************************
