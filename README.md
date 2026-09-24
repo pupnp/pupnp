@@ -234,16 +234,19 @@ The SDK for UPnP Devices contains the following:
 
 | Path/File   | Description                                                                       |
 | ----------- | --------------------------------------------------------------------------------- |
-| README      | This file.  Contains the installation and build instructions.                     |
-| LICENSE     | The licensing terms the SDK is distributed under.                                 |
-| NEWS        | Changes and new features.                                                         |
-| ixml/doc    | The files for generating the XML parser documentation from the source code.       |
+| README.md   | This file.  Contains the installation and build instructions.                     |
+| COPYING     | The licensing terms the SDK is distributed under.                                 |
+| ChangeLog   | Changes and new features.                                                         |
+| SECURITY.md | How to report security vulnerabilities.                                           |
+| docs        | The Doxygen configuration, API change notes and the old programming guide.        |
 | ixml/inc    | The public include files required to use the XML parser.                          |
 | ixml/src    | The source code to the XML parser library.                                        |
-| upnp/doc    | The files for generating the SDK documentation from the source code.              |
 | upnp/inc    | The public include files required to use the SDK.                                 |
 | upnp/src    | The source files comprising the SDK, libupnp.so.                                  |
 | samples/tv  | A sample device and control point application, illustrating the usage of the SDK. |
+| gtest       | Unit tests based on GoogleTest.                                                   |
+| tests       | Python integration tests.                                                         |
+| fuzzer      | Fuzzing targets.                                                                  |
 
 ## 9. System Requirements
 
