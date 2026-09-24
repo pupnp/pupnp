@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <cstring>
 #include <string>
+#include <thread>
 
 extern "C" {
 #include "httpparser.h"
@@ -28,6 +29,7 @@ extern "C" {
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <poll.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -855,6 +857,71 @@ TEST_F(GhsaQ4rxTestSuite, AcceptsResponseUnderLimit)
 
 	EXPECT_EQ(ret, UPNP_E_SUCCESS);
 	EXPECT_EQ(status, HTTP_OK);
+}
+
+// http_OpenHttpGetEx() freed its connection handle on a bad response without
+// closing the socket or destroying the response buffer, leaking a file
+// descriptor on every failed call. The server here sends a malformed status
+// line and then waits for the client to close its end; before the fix the
+// client socket stayed open and the wait timed out.
+TEST(OpenHttpGetExTestSuite, ClosesSocketOnBadResponse)
+{
+	int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+	ASSERT_GE(listen_fd, 0);
+	sockaddr_in addr{};
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	ASSERT_EQ(bind(listen_fd,
+			  reinterpret_cast<sockaddr *>(&addr),
+			  sizeof(addr)),
+		0);
+	ASSERT_EQ(listen(listen_fd, 1), 0);
+	socklen_t len = sizeof(addr);
+	ASSERT_EQ(getsockname(
+			  listen_fd, reinterpret_cast<sockaddr *>(&addr), &len),
+		0);
+
+	bool peer_closed = false;
+	std::thread server([listen_fd, &peer_closed] {
+		int fd = accept(listen_fd, nullptr, nullptr);
+		if (fd < 0)
+			return;
+		char buf[1024];
+		(void)read(fd, buf, sizeof(buf)); /* the GET request */
+		static const char resp[] = "garbage\r\n\r\n";
+		(void)write(fd, resp, sizeof(resp) - 1);
+		/* Wait for EOF: the client must close its socket. */
+		pollfd pfd{fd, POLLIN, 0};
+		while (poll(&pfd, 1, 2000) > 0) {
+			if (read(fd, buf, sizeof(buf)) <= 0) {
+				peer_closed = true;
+				break;
+			}
+		}
+		close(fd);
+	});
+
+	std::string url =
+		"http://127.0.0.1:" + std::to_string(ntohs(addr.sin_port)) +
+		"/x";
+	void *handle = nullptr;
+	char *content_type = nullptr;
+	int content_length = 0;
+	int status = 0;
+	int ret = http_OpenHttpGetEx(url.c_str(),
+		&handle,
+		&content_type,
+		&content_length,
+		&status,
+		0,
+		0,
+		5);
+	server.join();
+	close(listen_fd);
+
+	EXPECT_EQ(ret, UPNP_E_BAD_RESPONSE);
+	EXPECT_EQ(handle, nullptr);
+	EXPECT_TRUE(peer_closed);
 }
 
 // regression: GHSA-v5wv-qg6r-f87r
