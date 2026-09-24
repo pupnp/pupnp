@@ -340,9 +340,7 @@ See [ChangeLog file](ChangeLog).
 
 ## 14. Support and Contact Information
 
-Intel is not providing support for the SDK for UPnP Devices. Mailing lists and discussion boards can be found at <https://github.com/pupnp/pupnp/discussions>.
-
-If you find this SDK useful, please send an email to <upnp@intel.com> and let us know.
+Report bugs at <https://github.com/pupnp/pupnp/issues>, and ask questions at <https://github.com/pupnp/pupnp/discussions>. To report a security vulnerability, follow [SECURITY.md](SECURITY.md) instead of opening a public issue.
 
 \* Other brands, names, and trademarks are the property of their respective owners.
 
