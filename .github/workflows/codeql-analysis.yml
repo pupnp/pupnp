@@ -25,9 +25,21 @@ permissions:
 on:
   push:
     branches: [ main, branch-* ]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "COPYING"
+      - "ChangeLog"
+      - "THANKS"
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main ]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "COPYING"
+      - "ChangeLog"
+      - "THANKS"
   schedule:
     - cron: "27 18 * * 4"
 
