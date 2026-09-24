@@ -13,6 +13,8 @@ on:
       - "**.md"
       - "docs/**"
       - "COPYING"
+      - "ChangeLog"
+      - "THANKS"
   pull_request:
     branches:
       - "**"
@@ -21,6 +23,8 @@ on:
       - "**.md"
       - "docs/**"
       - "COPYING"
+      - "ChangeLog"
+      - "THANKS"
 
 #
 # Some repeated stuff
