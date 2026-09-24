@@ -25,10 +25,25 @@
 			"problemMatcher": []
 		},
                 {
-                        "label": "make",
+                        "label": "configure",
                         "type": "shell",
-                        "command": "/usr/bin/make",
+                        "command": "cmake",
                         "args": [
+                                "-B",
+                                "build",
+                                "-DCMAKE_BUILD_TYPE=Debug",
+                                "-DUPNP_ENABLE_TESTING=ON"
+                        ],
+                        "group": "build",
+                        "problemMatcher": []
+                },
+                {
+                        "label": "build",
+                        "type": "shell",
+                        "command": "cmake",
+                        "args": [
+                                "--build",
+                                "build",
                                 "-j8"
                         ],
                         "group": {
@@ -40,10 +55,13 @@
                         ]
                 },
                 {
-                        "label": "make clean",
+                        "label": "clean",
                         "type": "shell",
-                        "command": "/usr/bin/make",
+                        "command": "cmake",
                         "args": [
+                                "--build",
+                                "build",
+                                "--target",
                                 "clean"
                         ],
                         "group": "none"
