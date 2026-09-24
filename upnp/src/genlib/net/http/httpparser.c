@@ -1727,6 +1727,31 @@ static UPNP_INLINE parse_status_t parser_parse_chunky_headers(
 {
 	parse_status_t status;
 	size_t save_pos;
+	size_t trailer_start;
+
+	/* Trailer lines are consumed one at a time but stay buffered until
+	 * the whole block parses, so bound everything buffered since the last
+	 * chunk. g_maxContentLength does not help here: it only counts chunk
+	 * data. The entity bytes still in the buffer are those not yet handed
+	 * out by http_ReadHttpResponse(). */
+	trailer_start = parser->entity_start_position +
+			parser->msg.entity.length -
+			parser->msg.amount_discarded;
+	if (g_maxHeaderSize > 0 &&
+		parser->msg.msg.length - trailer_start > g_maxHeaderSize) {
+		UpnpPrintf(UPNP_ERROR,
+			HTTP,
+			__FILE__,
+			__LINE__,
+			"HTTP chunked trailer block of %lu bytes exceeds the "
+			"%lu byte limit; rejecting with %d. Raise it with "
+			"UpnpSetMaxHeaderSize() if this peer is legitimate.\n",
+			(unsigned long)(parser->msg.msg.length - trailer_start),
+			(unsigned long)g_maxHeaderSize,
+			HTTP_REQ_HEADER_FIELDS_TOO_LARGE);
+		parser->http_error_code = HTTP_REQ_HEADER_FIELDS_TOO_LARGE;
+		return PARSE_FAILURE;
+	}
 
 	save_pos = parser->scanner.cursor;
 	status = parser_parse_headers(parser);
@@ -1780,6 +1805,30 @@ static UPNP_INLINE parse_status_t parser_parse_chunky_entity(
 	status = match(scanner, "%x%L%c", &chunk_size, &dummy);
 	if (status != (parse_status_t)PARSE_OK) {
 		scanner->cursor = save_pos;
+		/* Everything past the cursor is the unterminated chunk-size
+		 * line. Bound it, or a line that never ends would be buffered
+		 * forever: the GHSA-hg5x chunk size check below only runs once
+		 * the line is complete. */
+		if (status == (parse_status_t)PARSE_INCOMPLETE &&
+			g_maxHeaderSize > 0 &&
+			parser->msg.msg.length - save_pos > g_maxHeaderSize) {
+			UpnpPrintf(UPNP_ERROR,
+				HTTP,
+				__FILE__,
+				__LINE__,
+				"HTTP chunk-size line of %lu bytes exceeds the "
+				"%lu byte limit; rejecting with %d. Raise it "
+				"with "
+				"UpnpSetMaxHeaderSize() if this peer is "
+				"legitimate.\n",
+				(unsigned long)(parser->msg.msg.length -
+						save_pos),
+				(unsigned long)g_maxHeaderSize,
+				HTTP_REQ_HEADER_FIELDS_TOO_LARGE);
+			parser->http_error_code =
+				HTTP_REQ_HEADER_FIELDS_TOO_LARGE;
+			return PARSE_FAILURE;
+		}
 		UpnpPrintf(UPNP_INFO,
 			HTTP,
 			__FILE__,
@@ -2137,7 +2186,7 @@ parse_status_t parser_check_header_size(http_parser_t *parser)
 	 *
 	 * Chunked trailer headers are parsed with position == POS_ENTITY, and
 	 * are excluded here because by then the buffer also holds the entity;
-	 * they remain covered by g_maxContentLength. */
+	 * parser_parse_chunky_headers() bounds them separately. */
 	if (g_maxHeaderSize > 0 &&
 		(parser->position == (parser_pos_t)POS_REQUEST_LINE ||
 			parser->position == (parser_pos_t)POS_RESPONSE_LINE ||
