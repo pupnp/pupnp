@@ -1227,14 +1227,15 @@ static int ReadResponseLineAndHeaders(
 					HTTP_INTERNAL_SERVER_ERROR;
 				return PARSE_FAILURE;
 			}
-			if (parser_check_header_size(parser) != PARSE_OK)
-				return PARSE_FAILURE;
 			status = parser_parse_responseline(parser);
 			switch (status) {
 			case PARSE_OK:
 				done = 1;
 				break;
 			case PARSE_INCOMPLETE:
+				if (parser_check_header_size(parser) !=
+					PARSE_OK)
+					return PARSE_FAILURE;
 				done = 0;
 				break;
 			default:
@@ -1274,15 +1275,16 @@ static int ReadResponseLineAndHeaders(
 					HTTP_INTERNAL_SERVER_ERROR;
 				return PARSE_FAILURE;
 			}
-			if (parser_check_header_size(parser) != PARSE_OK)
-				return PARSE_FAILURE;
 			status = parser_parse_headers(parser);
 			if (status == (parse_status_t)PARSE_OK &&
 				parser->position == (parser_pos_t)POS_ENTITY)
 				done = 1;
-			else if (status == (parse_status_t)PARSE_INCOMPLETE)
+			else if (status == (parse_status_t)PARSE_INCOMPLETE) {
+				if (parser_check_header_size(parser) !=
+					PARSE_OK)
+					return PARSE_FAILURE;
 				done = 0;
-			else
+			} else
 				/*error */
 				return (int)status;
 		} else if (num_read == 0) {

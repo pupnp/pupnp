@@ -391,6 +391,36 @@ static void httpheader_free(void *msg)
 	free(hdr);
 }
 
+/*!
+ * \brief Fails if a header block of header_len bytes exceeds
+ * g_maxHeaderSize.
+ */
+static parse_status_t check_header_block_size(
+	http_parser_t *parser, size_t header_len)
+{
+	if (g_maxHeaderSize > 0 && header_len > g_maxHeaderSize) {
+		/* Name the knob in the log: this rejection is new behaviour,
+		 * so a peer that used to work can start failing on upgrade,
+		 * and the caller only sees UPNP_E_OUTOF_BOUNDS. Sizes only,
+		 * never the header bytes themselves, which are attacker
+		 * controlled. */
+		UpnpPrintf(UPNP_ERROR,
+			HTTP,
+			__FILE__,
+			__LINE__,
+			"HTTP header block of %lu bytes exceeds the %lu byte "
+			"limit; rejecting with %d. Raise it with "
+			"UpnpSetMaxHeaderSize() if this peer is legitimate.\n",
+			(unsigned long)header_len,
+			(unsigned long)g_maxHeaderSize,
+			HTTP_REQ_HEADER_FIELDS_TOO_LARGE);
+		parser->http_error_code = HTTP_REQ_HEADER_FIELDS_TOO_LARGE;
+		return PARSE_FAILURE;
+	}
+
+	return PARSE_OK;
+}
+
 /************************************************************************
  * Function :	httpmsg_init
  *
@@ -1500,6 +1530,14 @@ parse_status_t parser_parse_headers(http_parser_t *parser)
 		switch (tok_type) {
 		case TT_CRLF:
 			/* end of headers */
+			/* The cursor is now the exact size of the header
+			 * block; anything buffered past it is entity data
+			 * that arrived in the same read. Chunked trailers
+			 * (POS_ENTITY) are bounded separately. */
+			if (parser->position == (parser_pos_t)POS_HEADERS &&
+				check_header_block_size(
+					parser, scanner->cursor) != PARSE_OK)
+				return PARSE_FAILURE;
 			if ((parser->msg.is_request) &&
 				(parser->msg.method ==
 					(http_method_t)HTTPMETHOD_POST)) {
@@ -2166,8 +2204,8 @@ parse_status_t parser_parse(http_parser_t *parser)
  *	INOUT http_parser_t* parser ;	HTTP Parser Object
  *
  * Description: Fails once the buffered header block exceeds
- *	g_maxHeaderSize. Must be called after every append to the message
- *	buffer.
+ *	g_maxHeaderSize. Must be called after every parse of newly appended
+ *	data that returns PARSE_INCOMPLETE.
  *
  * Returns:
  *	PARSE_OK
@@ -2175,41 +2213,27 @@ parse_status_t parser_parse(http_parser_t *parser)
  ************************************************************************/
 parse_status_t parser_check_header_size(http_parser_t *parser)
 {
-	/* Bound the header block. While the request/response line and the
-	 * header fields are still being read, everything buffered so far is
-	 * header data, so the message buffer length is the header block size.
-	 * The check must happen here rather than inside the header loop of
-	 * parser_parse_headers(): a single unterminated header line keeps
-	 * match() returning PARSE_INCOMPLETE, so the loop body never runs and
-	 * a per-header counter would never advance while the line grows
-	 * without bound.
+	/* Bound the header block. When a parse of the request/response line
+	 * or the header fields stops as incomplete, everything buffered is
+	 * header data, so the message buffer length is a lower bound on the
+	 * header block size. The check must happen here rather than inside
+	 * the header loop of parser_parse_headers(): a single unterminated
+	 * header line keeps match() returning PARSE_INCOMPLETE, so the loop
+	 * body never runs and a per-header counter would never advance while
+	 * the line grows without bound.
+	 *
+	 * It must run after the parse, not before: a read can carry the end
+	 * of the headers plus entity bytes, and those must not be counted.
+	 * Once the headers end, parser_parse_headers() checks their exact
+	 * size instead.
 	 *
 	 * Chunked trailer headers are parsed with position == POS_ENTITY, and
 	 * are excluded here because by then the buffer also holds the entity;
 	 * parser_parse_chunky_headers() bounds them separately. */
-	if (g_maxHeaderSize > 0 &&
-		(parser->position == (parser_pos_t)POS_REQUEST_LINE ||
-			parser->position == (parser_pos_t)POS_RESPONSE_LINE ||
-			parser->position == (parser_pos_t)POS_HEADERS) &&
-		parser->msg.msg.length > g_maxHeaderSize) {
-		/* Name the knob in the log: this rejection is new behaviour,
-		 * so a peer that used to work can start failing on upgrade,
-		 * and the caller only sees UPNP_E_OUTOF_BOUNDS. Sizes only,
-		 * never the header bytes themselves, which are attacker
-		 * controlled. */
-		UpnpPrintf(UPNP_ERROR,
-			HTTP,
-			__FILE__,
-			__LINE__,
-			"HTTP header block of %lu bytes exceeds the %lu byte "
-			"limit; rejecting with %d. Raise it with "
-			"UpnpSetMaxHeaderSize() if this peer is legitimate.\n",
-			(unsigned long)parser->msg.msg.length,
-			(unsigned long)g_maxHeaderSize,
-			HTTP_REQ_HEADER_FIELDS_TOO_LARGE);
-		parser->http_error_code = HTTP_REQ_HEADER_FIELDS_TOO_LARGE;
-		return PARSE_FAILURE;
-	}
+	if (parser->position == (parser_pos_t)POS_REQUEST_LINE ||
+		parser->position == (parser_pos_t)POS_RESPONSE_LINE ||
+		parser->position == (parser_pos_t)POS_HEADERS)
+		return check_header_block_size(parser, parser->msg.msg.length);
 
 	return PARSE_OK;
 }
@@ -2236,6 +2260,7 @@ parse_status_t parser_append(
 	http_parser_t *parser, const char *buf, size_t buf_length)
 {
 	int ret_code;
+	parse_status_t status;
 
 	assert(parser != NULL);
 	assert(buf != NULL);
@@ -2247,10 +2272,12 @@ parse_status_t parser_append(
 		parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
 		return PARSE_FAILURE;
 	}
-	if (parser_check_header_size(parser) != PARSE_OK)
+	status = parser_parse(parser);
+	if (status == (parse_status_t)PARSE_INCOMPLETE &&
+		parser_check_header_size(parser) != PARSE_OK)
 		return PARSE_FAILURE;
 
-	return parser_parse(parser);
+	return status;
 }
 
 /************************************************************************
