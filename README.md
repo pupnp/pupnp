@@ -106,10 +106,6 @@ This is a list of some of the projects and products that are based on the SDK fo
 - [RetroShare](https://retroshare.cc), an encrypted peer-to-peer messaging and file sharing platform, can use libupnp for port forwarding.
 - [vdr-plugin-upnp](https://github.com/vdr-projects/vdr-plugin-upnp) turns the VDR video recorder into a UPnP&trade;/DLNA media server.
 
-The links listed here point to external pages that are not under our control, that means we do not have any influence on their contents. Some jurisdictions have the point of view that the owner of a internet page is responsible for links to other webpages and the contents that can be found there. (Landgericht Hamburg, Judgement from 12th May 1998, 312 O 85/98).
-
-Because of that, the operator of these pages is dissociating explicitly from all links made from here. If we are informed about pages with penal relevant names, links, contents or something else we'll remove links to these pages immediately in case that is technically possible and reasonable.
-
 ## 6. License Conditions
 
 The Portable SDK for UPnP&trade; Devices is distributed under the BSD (Berkeley Standard Distribution) license. This license allows you to use the source code royalty free and does not place any restrictions on what you do with source code derived from the SDK. For full details on the license conditions, please consult the [LICENSE](site/LICENSE) file located inside the SDK distribution.
