@@ -91,15 +91,13 @@ For a fuller reference covering a complete UPnP device and control point, see th
 This is a list of some of the projects and products that are based on the SDK for UPnP&trade; Devices.&nbsp; Please let us know if you are working on a project and would like to see it listed here!
 
 - [aMule](http://www.amule.org) has libupnp support to perform port forwarding.
-- [Gerbera](https://gerbera.io) UPnP&trade; media server.
+- [Gerbera](https://gerbera.io) UPnP&trade; media server, the successor of MediaTomb.
 - [libmcupnp](http://sourceforge.net/projects/libmcupnp) is a Free UPnP(v1) library for easy "MediaServer:1 Client" implementations. The library is built on top of libupnp.
 - [eMule Morph](http://emulemorph.sourceforge.net) uses libupnp to forward ports automatically.
 - [PeerStream Audio Video Server](http://www.peerstream.net).
 - [GeeXboX uShare&trade;](https://github.com/ddugovic/uShare) A/V media server.
-- [MediaTomb](http://mediatomb.sourceforge.net) UPnP&trade; media server.
 - The [Linux UPnP&trade; Internet Gateway Device](http://linux-igd.sourceforge.net) This project is a daemon that emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP&trade; Internet Gateway Device (IGD) specification and allows UPnP&trade;-aware clients, such as MSN Messenger, to work properly from behind a NAT firewall.
-- FreeBSD ports of both the [SDK for UPnP&trade; Devices](http://www.freebsd.org/cgi/cvsweb.cgi/ports/devel/upnp) and the [Linux UPnP&trade; IGD](http://www.freebsd.org/cgi/query-pr.cgi?pr=41295) were contributed to the FreeBSD ports collection by [Yen-Ming Lee](http://www.leeym.com).
-- [PseudoICSD](http://pseudoicsd.sf.net) is another daemon that provides UPnP&trade; Internet Gateway Device functionality on Linux systems.
+- FreeBSD ports of both the [SDK for UPnP&trade; Devices](https://www.freshports.org/devel/upnp/) and the [Linux UPnP&trade; IGD](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=41295) were contributed to the FreeBSD ports collection by [Yen-Ming Lee](http://www.leeym.com).
 - [IGD2 for linux](https://github.com/Orange-OpenSource/igd2-for-linux) is an updated version of [Linux-IGD implementation](http://linux-igd.sourceforge.net). This new version is created on top of UPnP IGD:2 specifications available from [https://openconnectivity.org/developer/specifications/upnp-resources/upnp/internet-gateway-device-igd-v-2-0](https://openconnectivity.org/developer/specifications/upnp-resources/upnp/internet-gateway-device-igd-v-2-0).
 - [gmrender-resurrect](https://github.com/hzeller/gmrender-resurrect) is a resource efficient UPnP/DLNA renderer, optimal for Raspberry Pi, CuBox or a general MediaServer. Fork of GMediaRenderer to add some features to make it usable.
 - [Music Player Daemon](https://github.com/MusicPlayerDaemon/MPD) uses libupnp to browse and play music stored on an UPnP Media Server.
