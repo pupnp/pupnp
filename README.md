@@ -256,19 +256,17 @@ The SDK for UPnP Devices is designed to compile and run under several operating 
 | ---------- | ---------------------------------------------------------------------------------------- |
 | libpthread | The header and library are installed as part of the glibc-devel package (or equivalent). |
 
-Additionally, the documentation for the SDK can be auto-generated from the upnp.h header file using Doxygen, a documentation system for C, C++, IDL, and Java\*.  Doxygen generates the documentation in HTML or TeX format. Using some additional tools, the TeX output can be converted into a PDF file. To generate the documentation these tools are required:
+Additionally, the documentation for the SDK can be auto-generated from the upnp.h header file using Doxygen, a documentation system for C, C++, IDL, and Java\*.  Doxygen generates the documentation in HTML and LaTeX format, and the LaTeX output can be converted into a PDF file. To generate the documentation these tools are required:
 
-| Package   | Description                                                                                                                                                                                                 |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Doxygen   | The homepage for Doxygen is <https://www.doxygen.nl/index.html>. The current version as of this release of the SDK is version 3.4.9. Doxygen is the only requirement for generating the HTML documentation. |
-| LaTeX/TeX | To generate the PDF documentation, LaTeX and TeX tools are necessary. The tetex and tetex-latex packages provide these tools.                                                                               |
-| dvips     | dvips converts the DVI file produced by LaTeX into a PostScript\* file. The tetex-dvips package provides this tool.                                                                                         |
-| ps2pdf    | The final step to making the PDF is converting the PostStript\* into Portable Document Format. The ghostscript package provides this tool.                                                                  |
+| Package | Description                                                                                                                                                                            |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Doxygen | The homepage for Doxygen is <https://www.doxygen.nl/index.html>. Doxygen is the only requirement for generating the HTML documentation.                                                |
+| LaTeX   | To generate the PDF documentation, a LaTeX distribution such as TeX Live is necessary. Run `make` in the generated `docs/doxygen/latex` directory to build `refman.pdf` with pdflatex. |
 
 For the UPnP library to function correctly, networking must be configured properly for multicasting.  To do this:
 
 ```bash
-% route add -net 239.0.0.0 netmask 255.0.0.0 eth0
+% ip route add 239.0.0.0/8 dev eth0
 ```
 
 where 'eth0' is the network adapter that the UPnP library will use.  Without this addition, device advertisements and control point searches will not function.
