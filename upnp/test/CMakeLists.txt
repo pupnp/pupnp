@@ -108,6 +108,28 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# GHSA-gvhr-pxx7-ch7x: reads AUTO_RENEW_TIME and CP_MINIMUM_SUBSCRIPTION_TIME
+# from config.h (a private header) and runs a fake publisher thread.
+UPNP_Add_Unit_Test(test-upnp-gena-granted-timeout test_gena_granted_timeout.c)
+if(UPNP_BUILD_SHARED)
+	target_include_directories(
+		test-upnp-gena-granted-timeout
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src/inc
+	)
+	target_link_libraries(
+		test-upnp-gena-granted-timeout PRIVATE Threads::Threads
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_include_directories(
+		test-upnp-gena-granted-timeout-static
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src/inc
+	)
+	target_link_libraries(
+		test-upnp-gena-granted-timeout-static PRIVATE Threads::Threads
+	)
+endif()
+
 # On Solaris/illumos, getaddrinfo and freeaddrinfo live in libsocket (and
 # sometimes libnsl) rather than in the C library.  find_library() probes for
 # each library at configure time and stores the full path (or "<VAR>-NOTFOUND")
