@@ -857,6 +857,136 @@ TEST_F(GhsaQ4rxTestSuite, AcceptsResponseUnderLimit)
 	EXPECT_EQ(status, HTTP_OK);
 }
 
+// regression: GHSA-v5wv-qg6r-f87r
+// Chunked framing escaped both size limits. Trailer headers are parsed at
+// POS_ENTITY, so the g_maxHeaderSize check skipped them, and g_maxContentLength
+// only counts chunk data, so trailer bytes were never charged. A chunk-size
+// line that is never terminated kept match() at PARSE_INCOMPLETE, so the
+// GHSA-hg5x single-chunk check never ran either. In both cases every received
+// byte stayed buffered, growing memory without bound.
+//
+// Fixed by bounding the trailer block and the chunk-size line by
+// g_maxHeaderSize inside the chunked parser, which also covers callers that
+// parse the entity without going through parser_append().
+using GhsaV5wvTestSuite = GhsaF86hTestSuite;
+
+static const char k_chunked_resp_hdr[] = "HTTP/1.1 200 OK\r\n"
+					 "Transfer-Encoding: chunked\r\n"
+					 "\r\n"
+					 "5\r\nhello\r\n";
+
+// Endless trailer lines after the last chunk must be rejected once the trailer
+// block exceeds the limit. The blank line that ends the trailers is never sent.
+TEST_F(GhsaV5wvTestSuite, RejectsOversizedTrailerBlock)
+{
+	std::string resp = k_chunked_resp_hdr;
+	resp += "0\r\n";
+	for (int i = 0; i < 200; i++)
+		resp += "X-Trailer-" + std::to_string(i) + ": v\r\n";
+	ASSERT_GT(resp.size(), g_maxHeaderSize);
+
+	write(sv[1], resp.data(), resp.size());
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_GET, &timeout, &http_err);
+
+	httpmsg_destroy(&parser.msg);
+
+	EXPECT_EQ(ret, UPNP_E_OUTOF_BOUNDS);
+	EXPECT_EQ(http_err, HTTP_REQ_HEADER_FIELDS_TOO_LARGE);
+}
+
+// A chunk-size line that never ends (here through an endless chunk extension)
+// must be rejected once it exceeds the limit.
+TEST_F(GhsaV5wvTestSuite, RejectsUnterminatedChunkSizeLine)
+{
+	std::string resp = k_chunked_resp_hdr;
+	resp += "5;ext=";
+	resp.append(4096, 'a'); /* no CRLF */
+
+	write(sv[1], resp.data(), resp.size());
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_GET, &timeout, &http_err);
+
+	httpmsg_destroy(&parser.msg);
+
+	EXPECT_EQ(ret, UPNP_E_OUTOF_BOUNDS);
+	EXPECT_EQ(http_err, HTTP_REQ_HEADER_FIELDS_TOO_LARGE);
+}
+
+// Trailers under the limit must still be accepted.
+TEST_F(GhsaV5wvTestSuite, AcceptsTrailersUnderLimit)
+{
+	std::string resp = k_chunked_resp_hdr;
+	resp += "0\r\n"
+		"X-Checksum: abc\r\n"
+		"X-Other: def\r\n"
+		"\r\n";
+
+	write(sv[1], resp.data(), resp.size());
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_GET, &timeout, &http_err);
+
+	EXPECT_EQ(ret, UPNP_E_SUCCESS);
+	EXPECT_EQ(parser.msg.entity.length, 5u);
+
+	httpmsg_destroy(&parser.msg);
+}
+
+// The streaming body reader parses the entity without parser_append(), so the
+// limit must be enforced inside the chunked parser for it to be covered too.
+using GhsaV5wvStreamTestSuite = GhsaQ4rxTestSuite;
+
+TEST_F(GhsaV5wvStreamTestSuite, RejectsOversizedTrailerBlockWhenStreaming)
+{
+	/* The status line and headers are read 2 KB at a time, and the
+	 * header check counts the whole buffer, so the limit must exceed one
+	 * read for the headers to get through. */
+	g_maxHeaderSize = 4096;
+
+	std::string resp = k_chunked_resp_hdr;
+	resp += "0\r\n";
+	while (resp.size() < 16 * 1024)
+		resp += "A: b\r\n"; /* never terminated by a blank line */
+	Send(resp);
+
+	ASSERT_EQ(http_GetHttpResponse(
+			  handle_, nullptr, nullptr, nullptr, nullptr, 1),
+		UPNP_E_SUCCESS);
+	char buf[64];
+	size_t size = sizeof(buf);
+	int ret = http_ReadHttpResponse(handle_, buf, &size, 1);
+
+	EXPECT_EQ(ret, UPNP_E_BAD_RESPONSE);
+	EXPECT_GT(Unread(), 0);
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
