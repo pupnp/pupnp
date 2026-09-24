@@ -2,6 +2,41 @@
 Version 22.1.3
 *******************************************************************************
 
+- GHSA-q4rx-xfwj-m2gp: Fix unbounded response header block in the streaming
+  HTTP GET client allowing a malicious server to exhaust a control point's
+  memory. ReadResponseLineAndHeaders(), used by UpnpOpenHttpGet(),
+  UpnpOpenHttpGetProxy(), UpnpOpenHttpGetEx() and UpnpGetHttpResponse(),
+  appended received data to the message buffer directly instead of going
+  through parser_append(), so the GHSA-f86h-hm8r-cqxr header limit never
+  applied to it. A server that sent a status line followed by an endless
+  stream of header lines grew the client's memory without bound, and the
+  transfer timeout never fired while data kept flowing (CWE-400). The header
+  block check now lives in parser_check_header_size() and runs after every
+  read in both loops, rejecting oversized responses as before. Reported by
+  the Kimi Security Team (Moonshot AI).
+- GHSA-v5wv-qg6r-f87r: Fix chunked trailers and unterminated chunk-size lines
+  bypassing both HTTP size limits, allowing pre-auth denial of service.
+  Trailer headers are parsed after the header block, so g_maxHeaderSize did
+  not apply to them, and g_maxContentLength only counts chunk data, so
+  trailer bytes were never charged. A chunk-size line that never ended kept
+  the parser waiting before the GHSA-hg5x-73vf-vfm2 chunk size check could
+  run. Either way, every byte a peer sent stayed buffered, and a single
+  connection could grow memory without bound on device hosts and control
+  points alike (CWE-400). The trailer block and a pending chunk-size line are
+  now bounded by g_maxHeaderSize inside the chunked parser, which also covers
+  the streaming body reader http_ReadHttpResponse(), and rejected with HTTP
+  431. Reported by the Kimi Security Team (Moonshot AI).
+- GHSA-gvhr-pxx7-ch7x: Fix SUBSCRIBE renewal storm caused by a granted
+  TIMEOUT: Second-0. The control point applied CP_MINIMUM_SUBSCRIPTION_TIME
+  to the timeout it requested but not to the one the publisher granted, and
+  schedules the auto-renewal AUTO_RENEW_TIME seconds before the granted
+  timeout. A grant of Second-0 put the renewal in the past, so it fired at
+  once, received Second-0 again, and looped: a rogue device on the local
+  network could turn one UpnpSubscribe() into tens of thousands of SUBSCRIBE
+  requests per second (CWE-835). Granted timeouts below
+  CP_MINIMUM_SUBSCRIPTION_TIME are now raised to it, and that is the value
+  reported back to the caller. Reported by the Kimi Security Team (Moonshot
+  AI).
 
 
 *******************************************************************************
