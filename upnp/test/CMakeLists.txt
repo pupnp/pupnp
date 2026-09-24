@@ -161,11 +161,16 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
-# GENA issue-#435 tests and test-upnp-gena-callback-hostname call socket(),
-# connect(), send(), recv() directly.  On Solaris/illumos those symbols live
-# in libsocket, not libc; link explicitly.
+# GENA issue-#435 tests, test-upnp-gena-callback-hostname and
+# test-upnp-gena-granted-timeout call socket(), connect(), send(), recv()
+# directly.  On Solaris/illumos those symbols live in libsocket, not libc;
+# link explicitly.
 if(UPNP_BUILD_SHARED)
 	target_link_libraries(test-upnp-gena-subscribe-dos PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+	target_link_libraries(test-upnp-gena-granted-timeout PRIVATE
 		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
 	)
@@ -180,6 +185,10 @@ if(UPNP_BUILD_SHARED)
 endif()
 if(UPNP_BUILD_STATIC)
 	target_link_libraries(test-upnp-gena-subscribe-dos-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+	target_link_libraries(test-upnp-gena-granted-timeout-static PRIVATE
 		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
 	)
