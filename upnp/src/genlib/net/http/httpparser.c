@@ -2111,38 +2111,21 @@ parse_status_t parser_parse(http_parser_t *parser)
 }
 
 /************************************************************************
- * Function: parser_append
+ * Function: parser_check_header_size
  *
  * Parameters:
  *	INOUT http_parser_t* parser ;	HTTP Parser Object
- *	IN const char* buf	;	buffer to be appended to the parser
- *					buffer
- *	IN size_t buf_length ;		Size of the buffer
  *
- * Description: Append date to HTTP parser, and do the parsing.
+ * Description: Fails once the buffered header block exceeds
+ *	g_maxHeaderSize. Must be called after every append to the message
+ *	buffer.
  *
  * Returns:
- *	PARSE_SUCCESS
+ *	PARSE_OK
  *	PARSE_FAILURE
- *	PARSE_INCOMPLETE
- *	PARSE_INCOMPLETE_ENTITY
- *	PARSE_NO_MATCH
  ************************************************************************/
-parse_status_t parser_append(
-	http_parser_t *parser, const char *buf, size_t buf_length)
+parse_status_t parser_check_header_size(http_parser_t *parser)
 {
-	int ret_code;
-
-	assert(parser != NULL);
-	assert(buf != NULL);
-
-	/* append data to buffer */
-	ret_code = membuffer_append(&parser->msg.msg, buf, buf_length);
-	if (ret_code != 0) {
-		/* set failure status */
-		parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
-		return PARSE_FAILURE;
-	}
 	/* Bound the header block. While the request/response line and the
 	 * header fields are still being read, everything buffered so far is
 	 * header data, so the message buffer length is the header block size.
@@ -2178,6 +2161,45 @@ parse_status_t parser_append(
 		parser->http_error_code = HTTP_REQ_HEADER_FIELDS_TOO_LARGE;
 		return PARSE_FAILURE;
 	}
+
+	return PARSE_OK;
+}
+
+/************************************************************************
+ * Function: parser_append
+ *
+ * Parameters:
+ *	INOUT http_parser_t* parser ;	HTTP Parser Object
+ *	IN const char* buf	;	buffer to be appended to the parser
+ *					buffer
+ *	IN size_t buf_length ;		Size of the buffer
+ *
+ * Description: Append date to HTTP parser, and do the parsing.
+ *
+ * Returns:
+ *	PARSE_SUCCESS
+ *	PARSE_FAILURE
+ *	PARSE_INCOMPLETE
+ *	PARSE_INCOMPLETE_ENTITY
+ *	PARSE_NO_MATCH
+ ************************************************************************/
+parse_status_t parser_append(
+	http_parser_t *parser, const char *buf, size_t buf_length)
+{
+	int ret_code;
+
+	assert(parser != NULL);
+	assert(buf != NULL);
+
+	/* append data to buffer */
+	ret_code = membuffer_append(&parser->msg.msg, buf, buf_length);
+	if (ret_code != 0) {
+		/* set failure status */
+		parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
+		return PARSE_FAILURE;
+	}
+	if (parser_check_header_size(parser) != PARSE_OK)
+		return PARSE_FAILURE;
 
 	return parser_parse(parser);
 }

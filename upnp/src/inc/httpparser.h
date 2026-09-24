@@ -401,6 +401,22 @@ parse_status_t parser_parse_entity(http_parser_t *parser);
 parse_status_t parser_get_entity_read_method(http_parser_t *parser);
 
 /************************************************************************
+ * Function: parser_check_header_size
+ *
+ * Parameters:
+ *	INOUT http_parser_t* parser ;	HTTP Parser Object
+ *
+ * Description: Fails once the buffered header block exceeds
+ *	g_maxHeaderSize. Must be called after every append to the message
+ *	buffer.
+ *
+ * Returns:
+ *	PARSE_OK
+ *	PARSE_FAILURE
+ ************************************************************************/
+parse_status_t parser_check_header_size(http_parser_t *parser);
+
+/************************************************************************
  * Function: parser_append
  *
  * Parameters:
