@@ -407,8 +407,8 @@ parse_status_t parser_get_entity_read_method(http_parser_t *parser);
  *	INOUT http_parser_t* parser ;	HTTP Parser Object
  *
  * Description: Fails once the buffered header block exceeds
- *	g_maxHeaderSize. Must be called after every append to the message
- *	buffer.
+ *	g_maxHeaderSize. Must be called after every parse of newly appended
+ *	data that returns PARSE_INCOMPLETE.
  *
  * Returns:
  *	PARSE_OK
