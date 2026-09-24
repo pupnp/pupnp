@@ -66,7 +66,7 @@ In 2000, Intel created the first version of the Linux SDK for UPnP&trade; Device
 In 2006 this 100% compatible fork of the original project was created to
 support further development. This way, the project now continues using the name "Portable UPnP&trade;" and as a project that is more open to contributions of the community. The main goal is the availability of the project for all important platforms to become a standard for UPnP&trade;.
 
-## 3. [Changelog](https://github.com/pupnp/pupnp/blob/branch-1.14.x/ChangeLog)
+## 3. [Changelog](ChangeLog)
 
 ## 4. Documentation
 
@@ -339,7 +339,7 @@ The SDK for UPnP Devices v1.2.1a has these known issues:
 
 ## 13. New Features
 
-See [ChangeLog file](https://github.com/pupnp/pupnp/blob/branch-1.14.x/ChangeLog).
+See [ChangeLog file](ChangeLog).
 
 ## 14. Support and Contact Information
 
