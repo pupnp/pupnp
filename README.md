@@ -104,6 +104,9 @@ This is a list of some of the projects and products that are based on the SDK fo
 - [gmrender-resurrect](https://github.com/hzeller/gmrender-resurrect) is a resource efficient UPnP/DLNA renderer, optimal for Raspberry Pi, CuBox or a general MediaServer. Fork of GMediaRenderer to add some features to make it usable.
 - [Music Player Daemon](https://github.com/MusicPlayerDaemon/MPD) uses libupnp to browse and play music stored on an UPnP Media Server.
 - [VLC media player](http://www.videolan.org/vlc) uses libupnp for services discovery.
+- [Jami](https://jami.net), the GNU distributed communication platform, uses libupnp to set up port forwarding on the local router.
+- [RetroShare](https://retroshare.cc), an encrypted peer-to-peer messaging and file sharing platform, can use libupnp for port forwarding.
+- [vdr-plugin-upnp](https://github.com/vdr-projects/vdr-plugin-upnp) turns the VDR video recorder into a UPnP&trade;/DLNA media server.
 
 The links listed here point to external pages that are not under our control, that means we do not have any influence on their contents. Some jurisdictions have the point of view that the owner of a internet page is responsible for links to other webpages and the contents that can be found there. (Landgericht Hamburg, Judgement from 12th May 1998, 312 O 85/98).
 
