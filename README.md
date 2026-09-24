@@ -309,19 +309,23 @@ For information on general usage of the cmake build system see: <https://cmake.o
 
 ### 11.1. Install
 
-The top-level makefile for the UPnP SDK contains rules to install the necessary components.  To install the SDK, as root:
+After building, install the SDK as root with:
 
 ```bash
-% make install
+% cmake --install build
 ```
+
+The destination is set by `CMAKE_INSTALL_PREFIX` at configure time, or by passing `--prefix` to `cmake --install`.
 
 ### 11.2. Uninstall
 
-Likewise, the top-level makefile contains an uninstall rule, reversing the steps in the install:
+CMake does not provide an uninstall target. The installed files are listed in `build/install_manifest.txt`, so they can be removed, as root, with:
 
 ```bash
-% make uninstall
+% xargs rm < build/install_manifest.txt
 ```
+
+The manifest lists the installed paths without any `DESTDIR` prefix. Only use it after an install done without `DESTDIR`; after a `DESTDIR` install, remove that directory instead.
 
 ## 12. Product Release Notes
 
