@@ -41,12 +41,11 @@ See [LICENSE](site/LICENSE) for details.
 - [11. Install/Uninstall Instructions](#11-installuninstall-instructions)
   - [11.1. Install](#111-install)
   - [11.2. Uninstall](#112-uninstall)
-- [12. Product Release Notes](#12-product-release-notes)
-- [13. New Features](#13-new-features)
-- [14. Support and Contact Information](#14-support-and-contact-information)
-- [15. IXML support for scripting languages](#15-ixml-support-for-scripting-languages)
-- [16. SourceForge Badges](#16-sourceforge-badges)
-- [17. Thanks](#17-thanks)
+- [12. New Features](#12-new-features)
+- [13. Support and Contact Information](#13-support-and-contact-information)
+- [14. IXML support for scripting languages](#14-ixml-support-for-scripting-languages)
+- [15. SourceForge Badges](#15-sourceforge-badges)
+- [16. Thanks](#16-thanks)
 
 ## 1. Overview
 
@@ -327,24 +326,17 @@ CMake does not provide an uninstall target. The installed files are listed in `b
 
 The manifest lists the installed paths without any `DESTDIR` prefix. Only use it after an install done without `DESTDIR`; after a `DESTDIR` install, remove that directory instead.
 
-## 12. Product Release Notes
-
-The SDK for UPnP Devices v1.2.1a has these known issues:
-
-- The UPnP library may not work with older versions of gcc and libstdc++, causing a segmentation fault when the library loads.  It is recommended that gcc version 2.9 or later be used in building library.
-- The UPnP library does not work the glibc 2.1.92-14 that ships with Red Hat 7.0.  For the library to function, you must updated the glibc and glibc-devel packages to 2.1.94-3 or later.  There is some issue with libpthreads that has been resolved in the 2.1.94 version.
-
-## 13. New Features
+## 12. New Features
 
 See [ChangeLog file](ChangeLog).
 
-## 14. Support and Contact Information
+## 13. Support and Contact Information
 
 Report bugs at <https://github.com/pupnp/pupnp/issues>, and ask questions at <https://github.com/pupnp/pupnp/discussions>. To report a security vulnerability, follow [SECURITY.md](SECURITY.md) instead of opening a public issue.
 
 \* Other brands, names, and trademarks are the property of their respective owners.
 
-## 15. IXML support for scripting languages
+## 14. IXML support for scripting languages
 
 The tree structure of XML documents created by IXML is hard to maintain when creating a binding for a scripting language. Even when many elements may never be used on the script side, it requires copying the entire tree structure once you start accessing elements several levels deep.Hence scriptsupport was added. To enable it compile while IXML_HAVE_SCRIPTSUPPORT has been defined (enabled by default). This allows control using only a list instead of a tree-like structure, and only nodes actually accessed need to be created instead of all the nodes in the tree.
 
@@ -366,7 +358,7 @@ Script side steps:
 - if the node has a parent, then the intermediate object can be destroyed after the ctag on the corresponding node has been cleared. Nothing needs to be freed on the C-side.
 - if the node has no parent, then the node must be freed on the C side by calling the corresponding free node methods. This will result in a chain of callbacks closing the node and all underlying nodes.
 
-## 16. SourceForge Badges
+## 15. SourceForge Badges
 
 <!-- markdownlint-capture -->
 <!-- markdownlint-disable MD033 -->
@@ -384,7 +376,7 @@ Script side steps:
 [![Download Portable UPnP SDK](https://img.shields.io/sourceforge/dd/pupnp.svg)](https://sourceforge.net/projects/pupnp/files/latest/download)
 [![Download Portable UPnP SDK](https://img.shields.io/sourceforge/dt/pupnp.svg)](https://sourceforge.net/projects/pupnp/files/latest/download)
 
-## 17. Thanks
+## 16. Thanks
 
 - To all the people listed in [the THANKS file](THANKS).
 - To [JetBrains](https://www.jetbrains.com/?from=pupnp) for kindly providing us with open source licenses of their amazing products.
