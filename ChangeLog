@@ -16,6 +16,11 @@ Version 22.1.5
 - Remove the Qt Creator project files under ide/qtcreator. They listed the
   autotools build files and paths such as upnp/sample that no longer exist.
   Qt Creator can open the CMake build directly.
+- Switch the VS Code tasks and launch target under ide/vscode to CMake. The
+  build task ran make in the source root, which has no Makefile, and the
+  debug configuration launched a test that no longer exists. There is now a
+  configure task, build and clean go through cmake --build, and the debugger
+  runs the tv_device sample.
 
 
 *******************************************************************************
