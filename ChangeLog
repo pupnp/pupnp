@@ -2,6 +2,14 @@
 Version 22.1.5
 *******************************************************************************
 
+- GHSA-ggw2-jjv9-h22c: Fix SID matching for incoming GENA NOTIFY requests.
+  The control point compared the SID header with memcmp() over the header's
+  length, without checking it against the length of the stored SID. A SID
+  made of the stored one, a NUL byte and padding read past the end of the
+  stored string (CWE-125), and any prefix of the stored SID, such as
+  "uuid:", matched the subscription, so events could be injected without
+  knowing the SID. The lengths must now be equal before the bytes are
+  compared.
 - Remove libupnp.spec. The RPM spec still built with autotools, which this
   project no longer ships, so it has not worked since the move to CMake.
   Packagers should use their distribution's own spec.
