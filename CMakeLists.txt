@@ -7,7 +7,7 @@ include(cmake/test-functions.cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(PUPNP
-	VERSION 22.1.5
+	VERSION 22.1.6
 	LANGUAGES C)
 
 include(GNUInstallDirs)
