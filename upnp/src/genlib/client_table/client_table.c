@@ -103,9 +103,14 @@ GenlibClientSubscription *GetClientSubActualSID(
 {
 	GenlibClientSubscription *next = head;
 	while (next) {
-		if (!memcmp(GenlibClientSubscription_get_ActualSID_cstr(next),
-			    sid->buff,
-			    sid->size)) {
+		/* Compare lengths first: sid comes from the network and must
+		 * neither read past ActualSID nor match a prefix of it. */
+		const UpnpString *actual =
+			GenlibClientSubscription_get_ActualSID(next);
+		if (UpnpString_get_Length(actual) == sid->size &&
+			!memcmp(UpnpString_get_String(actual),
+				sid->buff,
+				sid->size)) {
 			break;
 		} else {
 			next = GenlibClientSubscription_get_Next(next);
