@@ -130,6 +130,18 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# GHSA-ggw2-jjv9-h22c: runs a fake publisher thread, then sends NOTIFY
+# requests with malformed SIDs to the control point.
+UPNP_Add_Unit_Test(test-upnp-gena-notify-sid test_gena_notify_sid.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-gena-notify-sid PRIVATE Threads::Threads)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(
+		test-upnp-gena-notify-sid-static PRIVATE Threads::Threads
+	)
+endif()
+
 # On Solaris/illumos, getaddrinfo and freeaddrinfo live in libsocket (and
 # sometimes libnsl) rather than in the C library.  find_library() probes for
 # each library at configure time and stores the full path (or "<VAR>-NOTFOUND")
@@ -161,9 +173,9 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
-# GENA issue-#435 tests, test-upnp-gena-callback-hostname and
-# test-upnp-gena-granted-timeout call socket(), connect(), send(), recv()
-# directly.  On Solaris/illumos those symbols live in libsocket, not libc;
+# GENA issue-#435 tests, test-upnp-gena-callback-hostname,
+# test-upnp-gena-granted-timeout and test-upnp-gena-notify-sid call socket(),
+# connect(), send(), recv() directly.  On Solaris/illumos those symbols live in libsocket, not libc;
 # link explicitly.
 if(UPNP_BUILD_SHARED)
 	target_link_libraries(test-upnp-gena-subscribe-dos PRIVATE
@@ -171,6 +183,10 @@ if(UPNP_BUILD_SHARED)
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
 	)
 	target_link_libraries(test-upnp-gena-granted-timeout PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+	target_link_libraries(test-upnp-gena-notify-sid PRIVATE
 		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
 	)
@@ -189,6 +205,10 @@ if(UPNP_BUILD_STATIC)
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
 	)
 	target_link_libraries(test-upnp-gena-granted-timeout-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+	target_link_libraries(test-upnp-gena-notify-sid-static PRIVATE
 		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
 		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
 	)
