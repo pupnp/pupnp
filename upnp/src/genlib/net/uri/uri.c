@@ -76,7 +76,7 @@ static int is_reserved(
 	/*! [in] Char to be matched for RESERVED characters. */
 	char in)
 {
-	if (strchr(RESERVED, (int)in)) {
+	if (in != '\0' && strchr(RESERVED, (int)in)) {
 		return 1;
 	} else {
 		return 0;
@@ -93,7 +93,7 @@ int is_mark(
 	/*! [in] Char to be matched for MARKED characters. */
 	char in)
 {
-	if (strchr(MARK, (int)in)) {
+	if (in != '\0' && strchr(MARK, (int)in)) {
 		return 1;
 	} else {
 		return 0;
