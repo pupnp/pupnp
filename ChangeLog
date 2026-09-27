@@ -2,6 +2,12 @@
 Version 22.1.6
 *******************************************************************************
 
+- GHSA-mhhw-gm73-c57g: Fix a heap over-read when parsing the Callback header
+  of an incoming GENA SUBSCRIBE request. is_mark() and is_reserved() used
+  strchr(), which also matches the terminating NUL, so URI parsing did not
+  stop at the end of the string, and create_url_list() passed parse_uri() a
+  length two bytes too long. A Callback URL without the closing '>' read one
+  byte past its buffer (CWE-125). Found and fixed by @las7 (#641).
 
 
 *******************************************************************************
