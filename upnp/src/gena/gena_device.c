@@ -1175,7 +1175,7 @@ static int create_url_list(
 	for (i = 0; i < URLS->size; i++) {
 		if ((URLS->buff[i] == '<') && (i + 1 < URLS->size)) {
 			if (((return_code = parse_uri(&URLS->buff[i + 1],
-				      URLS->size - i + 1,
+				      URLS->size - i - 1,
 				      &temp)) == HTTP_SUCCESS) &&
 				(temp.hostport.text.size != 0) &&
 				(temp.hostport.IPaddress.ss_family !=
@@ -1204,7 +1204,7 @@ static int create_url_list(
 		for (i = 0; i < URLS->size; i++) {
 			if ((URLS->buff[i] == '<') && (i + 1 < URLS->size)) {
 				if (((return_code = parse_uri(&out->URLs[i + 1],
-					      URLS->size - i + 1,
+					      URLS->size - i - 1,
 					      &out->parsedURLs[URLcount2])) ==
 					    HTTP_SUCCESS) &&
 					(out->parsedURLs[URLcount2]
@@ -1239,9 +1239,9 @@ static int create_url_list(
 			}
 		}
 	}
-	out->size = URLcount;
+	out->size = URLcount2;
 
-	return (int)URLcount;
+	return (int)URLcount2;
 }
 
 /*!
