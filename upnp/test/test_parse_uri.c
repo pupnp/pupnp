@@ -198,6 +198,42 @@ static int check_resolve_hostport_localhost(void)
 	return 0;
 }
 
+/*
+ * Regression test for PR #641: is_mark() and is_reserved() used
+ * strchr(SET, in), which matches the terminating NUL, so parse_uric() treated
+ * '\0' as a URI character and scanned past the end of the string whenever
+ * the caller's length overshot it. create_url_list() did exactly that with
+ * an unterminated GENA Callback header ("<http://host/path" with no '>'),
+ * causing a heap over-read (CWE-125).
+ *
+ * The length passed here covers the NUL plus one non-uric byte, so the
+ * buffer is never overrun; the path must stop at the NUL ("/a", size 2).
+ */
+static int check_nul_terminates_uri(void)
+{
+	uri_type url;
+	static const char s[] = "http://192.0.2.1/a\0 ";
+
+	if (parse_uri(s, sizeof(s) - 1, &url) != HTTP_SUCCESS) {
+		printf("%s:%d parse_uri('%s') failed to parse a valid URL\n",
+			__FILE__,
+			__LINE__,
+			s);
+		return 1;
+	}
+	if (url.pathquery.size != 2) {
+		printf("%s:%d parse_uri('%s') pathquery.size = %d, expected 2 "
+		       "-- the NUL terminator must not be a URI character\n",
+			__FILE__,
+			__LINE__,
+			s,
+			(int)url.pathquery.size);
+		return 1;
+	}
+
+	return 0;
+}
+
 int main(void)
 {
 	int i;
@@ -230,6 +266,7 @@ int main(void)
 	failures += check_no_eager_resolution();
 	failures += check_literal_ip_is_noop();
 	failures += check_resolve_hostport_localhost();
+	failures += check_nul_terminates_uri();
 
 #ifdef _WIN32
 	WSACleanup();
