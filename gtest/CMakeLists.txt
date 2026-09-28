@@ -62,6 +62,29 @@ if (NOT WIN32 AND UPNP_BUILD_STATIC)
 	)
 endif()
 
+# regression test — freeSubscription() must free the list nodes its event
+# queue parked for reuse; freeSubscription() and copy_subscription() are
+# internal symbols so only the static variant is built.
+if (NOT WIN32 AND UPNP_BUILD_STATIC)
+	add_executable(test_service_table-static test_service_table.cpp)
+	target_link_libraries(test_service_table-static
+		PRIVATE upnp_static GTest::gtest)
+	target_include_directories(test_service_table-static PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/inc/
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/threadutil/
+	)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test_service_table-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+		)
+	endif()
+	gtest_add_tests(
+		TARGET test_service_table-static
+		TEST_PREFIX test-upnp-
+		TEST_SUFFIX -static
+	)
+endif()
+
 # regression test — Windows UpnpGetIfInfo() must not format an address
 # family that was not found on the interface (amule-org/amule#242, #301);
 # UpnpSetIfAddrStrings() is an internal symbol so only the static variant
