@@ -205,6 +205,10 @@ void freeSubscription(subscription *sub)
 	if (sub) {
 		free_URL_list(&sub->DeliveryURLs);
 		freeSubscriptionQueuedEvents(sub);
+		/* ListDelNode() only parks the list nodes on the list's own
+		 * free list for reuse; ListDestroy() is what releases them.
+		 * The items are already freed, so freeItem is 0. */
+		ListDestroy(&sub->outgoing, 0);
 	}
 }
 
