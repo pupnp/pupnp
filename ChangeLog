@@ -2,6 +2,15 @@
 Version 22.1.7
 *******************************************************************************
 
+- GHSA-h9f5-9vwp-h89q: Fix a memory leak when a GENA subscription is freed.
+  The subscription's event queue recycles its list nodes: ListDelNode()
+  keeps them on the list's own free list, and only ListDestroy() releases
+  them. freeSubscription() drained the queue but never called
+  ListDestroy(), so every subscription a device accepted leaked at least
+  one list node when it was torn down, on UNSUBSCRIBE, on expiry or when
+  the device unregistered (CWE-401). A remote peer could repeat
+  SUBSCRIBE/UNSUBSCRIBE without credentials and grow the device's memory
+  without bound. Found and fixed by Damien Plisson (@damien78).
 
 
 *******************************************************************************
