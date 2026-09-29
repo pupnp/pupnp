@@ -29,6 +29,7 @@
 	#include <stddef.h>
 	#include <string.h>
 	#include <sys/socket.h>
+	#include <sys/time.h>
 	#include <unistd.h>
 
 /* regression: issue #325 -- test hook exported from libupnp */
@@ -47,6 +48,12 @@ static void send_one_request(void)
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock < 0)
 		return;
+
+	/* Once UpnpFinish() has released the port, connecting to it can end
+	 * in a TCP self-connect (the port is in the ephemeral range), and
+	 * recv() would then wait forever for a peer that is this socket. */
+	struct timeval tv = {1, 0};
+	setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv);
 
 	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof addr);
