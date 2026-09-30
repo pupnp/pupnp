@@ -356,6 +356,22 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# process_request() leaked a reference on the alias document for requests
+# that were not answered from it, so an uninstalled alias kept being served.
+UPNP_Add_Unit_Test(test-upnp-webserver-alias-leak test_webserver_alias_leak.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-webserver-alias-leak PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-webserver-alias-leak-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # GHSA-7mx2-6v7x-xhv7: a QueryStateVariable SOAP request with a text or
 # CDATA node where <varName> is expected made check_soap_request() pass a
 # NULL local name to strcmp(), crashing the process.
