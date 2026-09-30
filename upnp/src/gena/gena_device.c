@@ -1496,6 +1496,7 @@ void gena_process_subscription_request(SOCKINFO *info, http_message_t *request)
 	sub->DeliveryURLs.parsedURLs = NULL;
 	if (ListInit(&sub->outgoing, 0, free) != 0) {
 		error_respond(info, HTTP_INTERNAL_SERVER_ERROR, request);
+		free(sub);
 		HandleUnlock(__FILE__, __LINE__);
 		goto exit_function;
 	}
