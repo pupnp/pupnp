@@ -2,6 +2,12 @@
 Version 22.1.8
 *******************************************************************************
 
+- GHSA-8pj8-vmhq-qwvj: Cap the MX header of an incoming SSDP M-SEARCH request
+  at 5 seconds, as UDA 1.1 recommends. The reply to a search is scheduled
+  after a random delay in [0, MX) seconds and the queued job keeps a copy of
+  the requester's address, but MX was only checked for being non-negative. A
+  peer could send a stream of searches with a huge MX and pin memory in the
+  timer queue for as long as the process ran (CWE-770).
 
 
 *******************************************************************************
