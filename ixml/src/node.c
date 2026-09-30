@@ -971,6 +971,41 @@ static IXML_Node *ixmlNode_cloneSingleNode(IXML_Node *src)
 }
 
 /*!
+ * \brief Clones the attribute list of src into dest.
+ *
+ * \return IXML_SUCCESS, or IXML_INSUFFICIENT_MEMORY when a clone fails, in
+ * which case the attributes already cloned stay linked to dest.
+ */
+static int ixmlNode_cloneAttrList(
+	/*! [in] The \b Node whose attributes are cloned. */
+	IXML_Node *src,
+	/*! [in] The \b Node that receives the cloned attributes. */
+	IXML_Node *dest)
+{
+	IXML_Node *srcAttr = src->firstAttr;
+	IXML_Node *prevAttr = NULL;
+	IXML_Node *ac;
+
+	while (srcAttr) {
+		ac = (IXML_Node *)ixmlNode_cloneAttr((IXML_Attr *)srcAttr);
+		if (!ac) {
+			return IXML_INSUFFICIENT_MEMORY;
+		}
+		ac->parentNode = dest;
+		if (prevAttr) {
+			prevAttr->nextSibling = ac;
+			ac->prevSibling = prevAttr;
+		} else {
+			dest->firstAttr = ac;
+		}
+		prevAttr = ac;
+		srcAttr = srcAttr->nextSibling;
+	}
+
+	return IXML_SUCCESS;
+}
+
+/*!
  * \brief Iterative function that clones a node tree of nodeptr.
  *
  * \returns The cloned node/tree.
@@ -999,24 +1034,9 @@ static IXML_Node *ixmlNode_cloneNodeTreeRecursive(
 
 	for (;;) {
 		/* Clone attribute list iteratively for element nodes. */
-		if (orig->nodeType == eELEMENT_NODE && orig->firstAttr) {
-			IXML_Node *srcAttr = orig->firstAttr;
-			IXML_Node *prevAttr = NULL;
-			while (srcAttr) {
-				IXML_Node *ac = (IXML_Node *)ixmlNode_cloneAttr(
-					(IXML_Attr *)srcAttr);
-				if (!ac)
-					goto error;
-				if (prevAttr) {
-					prevAttr->nextSibling = ac;
-					ac->prevSibling = prevAttr;
-				} else {
-					cloneCurr->firstAttr = ac;
-				}
-				prevAttr = ac;
-				srcAttr = srcAttr->nextSibling;
-			}
-		}
+		if (orig->nodeType == eELEMENT_NODE && orig->firstAttr &&
+			ixmlNode_cloneAttrList(orig, cloneCurr) != IXML_SUCCESS)
+			goto error;
 
 		/* Descend into firstChild when doing a deep clone. */
 		if (deep && orig->firstChild &&
@@ -1082,8 +1102,11 @@ static IXML_Node *ixmlNode_cloneNodeTree(
 		if (!newElement) {
 			return NULL;
 		}
-		newElement->n.firstAttr = ixmlNode_cloneNodeTreeRecursive(
-			nodeptr->firstAttr, deep);
+		if (ixmlNode_cloneAttrList(nodeptr, (IXML_Node *)newElement) !=
+			IXML_SUCCESS) {
+			ixmlNode_free((IXML_Node *)newElement);
+			return NULL;
+		}
 		if (deep) {
 			newElement->n.firstChild =
 				ixmlNode_cloneNodeTreeRecursive(
