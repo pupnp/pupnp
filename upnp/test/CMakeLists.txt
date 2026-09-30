@@ -172,6 +172,25 @@ endif()
 find_library(SOCKET_LIBRARY NAMES socket)
 find_library(NSL_LIBRARY NAMES nsl)
 
+# A backslash in a request path must not let a request leave the document
+# root on Windows.  The test uses sockets directly: libsocket on illumos and
+# ws2_32 on Windows, so the link blocks come after the find_library() calls.
+UPNP_Add_Unit_Test(test-upnp-webserver-backslash test_webserver_backslash.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-webserver-backslash PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+		$<$<PLATFORM_ID:Windows>:ws2_32>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-webserver-backslash-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+		$<$<PLATFORM_ID:Windows>:ws2_32>
+	)
+endif()
+
 # UpnpFinish() used to hang when the miniserver workers were still serving
 # connections while it stopped.  Raw sockets: on illumos they live in
 # libsocket, so the link blocks have to come after the find_library() calls.

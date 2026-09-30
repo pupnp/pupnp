@@ -1292,6 +1292,21 @@ static int process_request(
 		goto error_handler;
 	}
 
+	#ifdef _WIN32
+	/* The file system takes a backslash for a path separator, but
+	 * remove_dots() only knows the slash, so "..\" would lead out of the
+	 * document root: handle them as slashes. */
+	{
+		char *p;
+
+		for (p = request_doc; *p != '\0' && *p != '?' && *p != '#';
+			p++) {
+			if (*p == '\\') {
+				*p = '/';
+			}
+		}
+	}
+	#endif
 	code = remove_dots(request_doc, url->pathquery.size);
 	if (code != 0) {
 		err_code = HTTP_FORBIDDEN;
@@ -1390,6 +1405,16 @@ static int process_request(
 		if (gDocumentRootDir.length == 0) {
 			goto error_handler;
 		}
+	#ifdef _WIN32
+		/* The path is mapped onto the file system: a colon names a
+		 * drive or an NTFS alternate data stream, which a request must
+		 * not reach. */
+		if (memchr(request_doc, ':', strcspn(request_doc, "?#")) !=
+			NULL) {
+			err_code = HTTP_BAD_REQUEST;
+			goto error_handler;
+		}
+	#endif
 		/* */
 		/* get file name */
 		/* */
