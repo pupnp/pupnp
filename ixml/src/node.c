@@ -459,7 +459,10 @@ static int ixmlNode_isParent(
 	assert(nodeptr && toFind);
 
 	if (nodeptr && toFind) {
-		found = toFind->parentNode == nodeptr;
+		/* An attribute has its element as parentNode, but it is not a
+		 * child of that element. */
+		found = toFind->parentNode == nodeptr &&
+			toFind->nodeType != eATTRIBUTE_NODE;
 	}
 
 	return found;
