@@ -583,13 +583,29 @@ IXML_Attr *ixmlElement_getAttributeNodeNS(IXML_Element *element,
 		find_condition_ns_ln, element, &p);
 }
 
+static int find_condition_node_ns_ln(
+	const IXML_Node *n1, const Extra_Parameters_t *p)
+{
+	const IXML_Node *n2 = (const IXML_Node *)p->p1;
+	int ret;
+
+	ret = n1->localName &&			       //
+	      n1->namespaceURI &&		       //
+	      n2->localName &&			       //
+	      n2->namespaceURI &&		       //
+	      !strcmp(n1->localName, n2->localName) && //
+	      !strcmp(n1->namespaceURI, n2->namespaceURI);
+
+	return ret;
+}
+
 int ixmlElement_setAttributeNodeNS(
 	/* IN */ IXML_Element *element,
 	/* IN */ IXML_Attr *newAttr,
 	/* OUT */ IXML_Attr **rtAttr)
 {
 	return ixmlElement_setAttributeNode_common(
-		find_condition_ns_ln, element, newAttr, rtAttr);
+		find_condition_node_ns_ln, element, newAttr, rtAttr);
 }
 
 IXML_NodeList *ixmlElement_getElementsByTagNameNS(IXML_Element *element,
