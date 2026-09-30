@@ -191,6 +191,22 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# The MX header of an M-SEARCH request must be capped.  Raw sockets, so the
+# link blocks come after the find_library() calls (libsocket on illumos).
+UPNP_Add_Unit_Test(test-upnp-ssdp-mx-cap test_ssdp_mx_cap.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-ssdp-mx-cap PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-ssdp-mx-cap-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # UpnpFinish() used to hang when the miniserver workers were still serving
 # connections while it stopped.  Raw sockets: on illumos they live in
 # libsocket, so the link blocks have to come after the find_library() calls.

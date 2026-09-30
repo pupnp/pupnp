@@ -90,6 +90,8 @@ void ssdp_handle_device_request(
 	http_message_t *hmsg, struct sockaddr_storage *dest_addr)
 {
 			#define MX_FUDGE_FACTOR 10
+			/* UDA 1.1: a device treats MX values above 5 as 5. */
+			#define MX_MAX 5
 	int handle, start;
 	struct Handle_Info *dev_info = NULL;
 	memptr hdr_value;
@@ -184,6 +186,10 @@ void ssdp_handle_device_request(
 		TPJobInit(&job, advertiseAndReplyThread, threadArg);
 		TPJobSetFreeFunction(&job, (free_routine)free);
 
+		/* Cap the mx: a huge value would keep the reply job queued
+		 * (memory pinned) for an unbounded time. */
+		if (mx > MX_MAX)
+			mx = MX_MAX;
 		/* Subtract a percentage from the mx to allow for network and
 		 * processing delays (i.e. if search is for 30 seconds, respond
 		 * within 0 - 27 seconds). */
