@@ -351,7 +351,7 @@ int ixmlElement_removeAttributeNode(
 	IXML_Node *attrNode;
 	Extra_Parameters_t p;
 
-	if (!element || !oldAttr) {
+	if (!element || !oldAttr || !rtAttr) {
 		return IXML_INVALID_PARAMETER;
 	}
 	p.p1 = oldAttr;

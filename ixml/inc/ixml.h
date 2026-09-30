@@ -1157,8 +1157,8 @@ UPNP_EXPORT_SPEC int ixmlElement_setAttributeNode(
  *
  * \return An integer representing one of the following:
  *     \li \c IXML_SUCCESS: The operation completed successfully.
- *     \li \c IXML_INVALID_PARAMETER: Either \b element or
- *           \b oldAttr is \c NULL.
+ *     \li \c IXML_INVALID_PARAMETER: Either \b element, \b oldAttr or
+ *           \b rtAttr is \c NULL.
  *     \li \c IXML_NOT_FOUND_ERR: \b oldAttr is not among the list
  *           attributes of \b element.
  */
