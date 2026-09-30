@@ -8,6 +8,15 @@ Version 22.1.8
   the requester's address, but MX was only checked for being non-negative. A
   peer could send a stream of searches with a huge MX and pin memory in the
   timer queue for as long as the process ran (CWE-770).
+- GHSA-hwrm-c56x-fj22: Fix denial of service of the miniserver worker threads
+  by connections that send nothing. The thread pool did not grow to its
+  maximum for a burst of connections, a connection that sent nothing held a
+  worker for the whole 30 second receive timeout, and a peer could open any
+  number of connections, so a handful of idle connections left no worker for
+  anybody else (CWE-400). The pool now grows while queued jobs outnumber idle
+  threads, a connection has to send its first byte within
+  MINISERVER_FIRST_BYTE_TIMEOUT (5) seconds, and a peer address is limited to
+  MINISERVER_MAX_CONNECTIONS_PER_PEER (6) connections at a time.
 
 
 *******************************************************************************
