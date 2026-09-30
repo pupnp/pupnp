@@ -36,8 +36,11 @@
  **
  ************************************************************************/
 
-#include "statcodes.h"
+#include "config.h" /* IWYU pragma: keep */
+
 #include "UpnpGlobal.h"
+#include "ithread.h"
+#include "statcodes.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -122,6 +125,8 @@ static const char *Http5xxStr = "Internal Server Error\0"
 				"Not Extended\0";
 
 static int gInitialized = 0;
+/* Serializes the lazy initialization of the tables. */
+static ithread_mutex_t gInitMutex = PTHREAD_MUTEX_INITIALIZER;
 
 /************************************************************************
 ************************* Functions *************************************
@@ -196,9 +201,13 @@ const char *http_get_code_text(int statusCode)
 	int index;
 	int table_num;
 
+	/* Called from several threads at once: the tables are only read once
+	 * the mutex has been released after the first initialization. */
+	ithread_mutex_lock(&gInitMutex);
 	if (!gInitialized) {
 		init_tables();
 	}
+	ithread_mutex_unlock(&gInitMutex);
 
 	if (statusCode < 100 || statusCode >= 600) {
 		return NULL;

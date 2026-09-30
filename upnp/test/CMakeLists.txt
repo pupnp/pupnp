@@ -79,6 +79,25 @@ if(UPNP_BUILD_STATIC)
 		PROPERTIES SKIP_RETURN_CODE 77)
 endif()
 
+# The status code tables were initialised lazily without synchronisation.
+# http_get_code_text() has hidden visibility in the shared library, so
+# statcodes.c is compiled into each test variant.
+UPNP_Add_Unit_Test(test-upnp-statcodes-race test_statcodes_race.c)
+set(STATCODES_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/../src/genlib/net/http/statcodes.c)
+if(UPNP_BUILD_SHARED)
+	target_sources(test-upnp-statcodes-race PRIVATE ${STATCODES_SOURCE})
+	target_include_directories(test-upnp-statcodes-race
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src/inc)
+	target_link_libraries(test-upnp-statcodes-race PRIVATE Threads::Shared)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_sources(test-upnp-statcodes-race-static PRIVATE ${STATCODES_SOURCE})
+	target_include_directories(test-upnp-statcodes-race-static
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src/inc)
+	target_link_libraries(test-upnp-statcodes-race-static
+		PRIVATE Threads::Static)
+endif()
+
 UPNP_Add_Unit_Test(test-upnp-gena-subscribe-dos test_gena_subscribe_dos.c)
 UPNP_Add_Unit_Test(test-upnp-gena-subscribe-pressure test_gena_subscribe_pressure.c)
 UPNP_Add_Unit_Test(test-upnp-gena-callback-hostname test_gena_callback_hostname.c)
