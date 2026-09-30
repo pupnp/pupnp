@@ -556,7 +556,7 @@ int ixmlElement_removeAttributeNS(IXML_Element *element,
 
 	attrNode = element->n.firstAttr;
 	while (attrNode) {
-		if (attrNode->localName &&
+		if (attrNode->localName && attrNode->namespaceURI &&
 			strcmp(attrNode->localName, localName) == 0 &&
 			strcmp(attrNode->namespaceURI, namespaceURI) == 0) {
 			/* Found it */
