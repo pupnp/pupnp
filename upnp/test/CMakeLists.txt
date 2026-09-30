@@ -5,6 +5,7 @@ UPNP_Add_Unit_Test(test-upnp-url test_url.c)
 UPNP_Add_Unit_Test(test-upnp-sock-io test_sock_io.c)
 UPNP_Add_Unit_Test(test-upnp-ssdp-req-port test_ssdp_req_port.c)
 UPNP_Add_Unit_Test(test-upnp-virtual-dir test_virtual_dir.c)
+UPNP_Add_Unit_Test(test-upnp-ssdp-multi-device test_ssdp_multi_device.c)
 # test_threadpool_overflow calls internal ThreadPool API (ThreadPoolInit,
 # TPAttrInit, …) that have hidden visibility in the shared library.  Compile
 # the three ThreadPool translation units directly into each test variant so
@@ -151,6 +152,21 @@ endif()
 # which is treated as "not found" by the generator expressions below.
 find_library(SOCKET_LIBRARY NAMES socket)
 find_library(NSL_LIBRARY NAMES nsl)
+
+# test_ssdp_multi_device uses raw sockets: on illumos they live in libsocket,
+# so the link block has to come after the find_library() calls above.
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-ssdp-multi-device PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-ssdp-multi-device-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
 
 # Issue #227 regression (PR #579): SSDP socket bound to unicast address cannot
 # receive multicast M-SEARCH queries on Linux.  Skipped on non-Linux platforms.

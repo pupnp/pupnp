@@ -241,11 +241,11 @@ static int UpnpSdkInit = 0;
 static int UpnpSdkClientRegistered = 0;
 
 /*! Global variable to denote the state of Upnp SDK IPv4 device registration.
- * == 0 if unregistered, == 1 if registered. */
+ * == 0 if unregistered, >= 1 if registered - registered devices count. */
 static int UpnpSdkDeviceRegisteredV4 = 0;
 
 /*! Global variable to denote the state of Upnp SDK IPv6 device registration.
- * == 0 if unregistered, == 1 if registered. */
+ * == 0 if unregistered, >= 1 if registered - registered devices count. */
 static int UpnpSdkDeviceregisteredV6 = 0;
 
 #ifdef UPNP_HAVE_OPTSSDP
@@ -1114,7 +1114,7 @@ int UpnpRegisterRootDevice(const char *DescUrl,
 	}
 	#endif /* EXCLUDE_GENA */
 
-	UpnpSdkDeviceRegisteredV4 = 1;
+	UpnpSdkDeviceRegisteredV4 += 1;
 
 	retVal = UPNP_E_SUCCESS;
 
@@ -1303,7 +1303,7 @@ int UpnpRegisterRootDevice2(Upnp_DescType descriptionType,
 	}
 	#endif /* EXCLUDE_GENA */
 
-	UpnpSdkDeviceRegisteredV4 = 1;
+	UpnpSdkDeviceRegisteredV4 += 1;
 
 	retVal = UPNP_E_SUCCESS;
 
@@ -1494,10 +1494,10 @@ int UpnpRegisterRootDevice4(const char *DescUrl,
 
 	switch (AddressFamily) {
 	case AF_INET:
-		UpnpSdkDeviceRegisteredV4 = 1;
+		UpnpSdkDeviceRegisteredV4 += 1;
 		break;
 	default:
-		UpnpSdkDeviceregisteredV6 = 1;
+		UpnpSdkDeviceregisteredV6 += 1;
 	}
 
 	retVal = UPNP_E_SUCCESS;
@@ -1592,10 +1592,10 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd,
 	#endif /* INTERNAL_WEB_SERVER */
 	switch (HInfo->DeviceAf) {
 	case AF_INET:
-		UpnpSdkDeviceRegisteredV4 = 0;
+		UpnpSdkDeviceRegisteredV4 -= 1;
 		break;
 	case AF_INET6:
-		UpnpSdkDeviceregisteredV6 = 0;
+		UpnpSdkDeviceregisteredV6 -= 1;
 		break;
 	default:
 		break;
