@@ -575,6 +575,10 @@ int ixmlNode_insertBefore(
 	if (ixmlNode_isParent(nodeptr, refChild) == 0) {
 		return IXML_NOT_FOUND_ERR;
 	}
+	if (newChild == refChild) {
+		/* Inserting a child before itself leaves it where it is. */
+		return IXML_SUCCESS;
+	}
 	if (refChild) {
 		if (newChild->parentNode) {
 			ixmlNode_removeChild(
@@ -623,6 +627,13 @@ int ixmlNode_replaceChild(IXML_Node *nodeptr,
 	/* if refChild is not a child of nodeptr */
 	if (ixmlNode_isParent(nodeptr, oldChild) != 1) {
 		return IXML_NOT_FOUND_ERR;
+	}
+	if (newChild == oldChild) {
+		/* Replacing a child with itself leaves it where it is. */
+		if (returnNode) {
+			*returnNode = oldChild;
+		}
+		return IXML_SUCCESS;
 	}
 	ret = ixmlNode_insertBefore(nodeptr, newChild, oldChild);
 	if (ret != IXML_SUCCESS) {
