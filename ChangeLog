@@ -24,6 +24,22 @@ Version 22.1.8
   NTFS alternate data streams (CWE-22). On Windows a backslash is now treated
   as a slash before the dots are removed, and a colon is rejected in a path
   that is mapped onto the file system.
+- PR #644: Fix twelve bugs in the ixml DOM API. Adding a second namespaced
+  attribute with ixmlElement_setAttributeNS() or
+  ixmlElement_setAttributeNodeNS() crashed on a NULL local name. Moving a node
+  that already had another parent left it in two child lists and freed it
+  twice, and ixmlNode_appendChild(e, e) made an element its own child; both
+  are rejected or detached correctly now. ixmlNode_insertBefore() and
+  ixmlNode_replaceChild() leave a child that is its own reference node where
+  it is, and insertBefore() with a NULL reference appends. The attributes of
+  an element are no longer taken for its children. Cloning an element whose
+  attributes were added in different ways, or a text or CDATA node that has
+  siblings, no longer crashes or drags the siblings along.
+  ixmlElement_setAttributeNode() with an attribute the element already owns
+  does nothing, ixmlElement_removeAttributeNode() clears the owner element and
+  returns IXML_INVALID_PARAMETER for a NULL rtAttr, and
+  ixmlElement_removeAttributeNS() no longer crashes on xmlns:prefix
+  declarations.
 
 
 *******************************************************************************
