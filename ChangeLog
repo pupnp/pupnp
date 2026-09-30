@@ -40,6 +40,16 @@ Version 22.1.8
   returns IXML_INVALID_PARAMETER for a NULL rtAttr, and
   ixmlElement_removeAttributeNS() no longer crashes on xmlns:prefix
   declarations.
+- PR #645: Fix four web server and API bugs, and a data race. A GET or HEAD of
+  a regular file, or a HEAD of the alias, leaked a reference on the alias
+  document, which was then still served after it was uninstalled. A Range
+  request that starts at or after the end of the file got a 206 with an
+  impossible Content-Range and now gets a 416. UpnpRemoveVirtualDir() accepts
+  the same names as UpnpAddVirtualDir(), with or without the leading slash.
+  Unregistering one of two root devices no longer stops the other one from
+  answering searches, and UpnpFinish() now unregisters all of them. The status
+  code tables of the HTTP layer were filled in lazily by whichever thread
+  needed them first without any locking; this is now done under a mutex.
 
 
 *******************************************************************************
