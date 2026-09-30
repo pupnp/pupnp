@@ -252,7 +252,13 @@ static int ixmlElement_setAttributeNode_common(
 	p.p1 = node;
 	p.p2 = NULL;
 	attrNode = get_attribute_node(find_condition, element, &p);
-	if (attrNode) {
+	if (attrNode == node) {
+		/* newAttr is already an attribute of element: nothing to do,
+		 * and nothing was replaced. */
+		if (rtAttr) {
+			*rtAttr = NULL;
+		}
+	} else if (attrNode) {
 		/* Already present, will be replaced by newAttr */
 		IXML_Node *prevSib = attrNode->prevSibling;
 		IXML_Node *nextSib = attrNode->nextSibling;
