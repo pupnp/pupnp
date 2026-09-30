@@ -571,8 +571,8 @@ int ixmlNode_insertBefore(
 	if (nodeptr->ownerDocument != newChild->ownerDocument) {
 		return IXML_WRONG_DOCUMENT_ERR;
 	}
-	/* if refChild is not a child of nodeptr */
-	if (ixmlNode_isParent(nodeptr, refChild) == 0) {
+	/* if refChild is not a child of nodeptr (a NULL refChild appends) */
+	if (refChild && ixmlNode_isParent(nodeptr, refChild) == 0) {
 		return IXML_NOT_FOUND_ERR;
 	}
 	if (newChild == refChild) {
