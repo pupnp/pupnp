@@ -1622,7 +1622,9 @@ error_handler:
 	FreeExtraHTTPHeaders(
 		(UpnpListHead *)UpnpFileInfo_get_ExtraHeadersList(finfo));
 	UpnpFileInfo_delete(finfo);
-	if (err_code != HTTP_OK && alias_grabbed) {
+	/* Only a GET answered from the alias hands the reference on to the
+	 * caller, which releases it once the document is sent. */
+	if (alias_grabbed && (err_code != HTTP_OK || *rtype != RESP_XMLDOC)) {
 		alias_release(alias);
 	}
 
