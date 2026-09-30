@@ -4537,6 +4537,33 @@ int UpnpSetWebServerCorsString(const char *corsString)
 }
 #endif /* INTERNAL_WEB_SERVER */
 
+/*!
+ * \brief Builds the name under which a virtual directory is stored: the given
+ * name with a leading '/' added when it is missing.
+ *
+ * \return UPNP_E_SUCCESS, or UPNP_E_INVALID_PARAM when the name is empty or
+ * too long.
+ */
+static int virtual_dir_name(const char *name, char dirName[NAME_SIZE])
+{
+	memset(dirName, 0, NAME_SIZE);
+	if (name == NULL || strlen(name) == (size_t)0) {
+		return UPNP_E_INVALID_PARAM;
+	}
+	if (*name != '/') {
+		if (strlen(name) > NAME_SIZE - 2)
+			return UPNP_E_INVALID_PARAM;
+		dirName[0] = '/';
+		strncpy(dirName + 1, name, NAME_SIZE - 2);
+	} else {
+		if (strlen(name) > NAME_SIZE - 1)
+			return UPNP_E_INVALID_PARAM;
+		strncpy(dirName, name, NAME_SIZE - 1);
+	}
+
+	return UPNP_E_SUCCESS;
+}
+
 int UpnpAddVirtualDir(
 	const char *newDirName, const void *cookie, const void **oldcookie)
 {
@@ -4545,25 +4572,13 @@ int UpnpAddVirtualDir(
 	virtualDirList *pCurVirtualDir;
 	char dirName[NAME_SIZE];
 
-	memset(dirName, 0, sizeof(dirName));
 	if (UpnpSdkInit != 1) {
 		/* SDK is not initialized */
 		return UPNP_E_FINISH;
 	}
 
-	if ((newDirName == NULL) || (strlen(newDirName) == (size_t)0)) {
+	if (virtual_dir_name(newDirName, dirName) != UPNP_E_SUCCESS) {
 		return UPNP_E_INVALID_PARAM;
-	}
-
-	if (*newDirName != '/') {
-		if (strlen(newDirName) > sizeof(dirName) - 2)
-			return UPNP_E_INVALID_PARAM;
-		dirName[0] = '/';
-		strncpy(dirName + 1, newDirName, sizeof(dirName) - 2);
-	} else {
-		if (strlen(newDirName) > sizeof(dirName) - 1)
-			return UPNP_E_INVALID_PARAM;
-		strncpy(dirName, newDirName, sizeof(dirName) - 1);
 	}
 
 	pCurVirtualDir = pVirtualDirList;
@@ -4606,17 +4621,19 @@ int UpnpAddVirtualDir(
 	return UPNP_E_SUCCESS;
 }
 
-int UpnpRemoveVirtualDir(const char *dirName)
+int UpnpRemoveVirtualDir(const char *removeDirName)
 {
 	virtualDirList *pPrev;
 	virtualDirList *pCur;
 	int found = 0;
+	char dirName[NAME_SIZE];
 
 	if (UpnpSdkInit != 1) {
 		return UPNP_E_FINISH;
 	}
 
-	if (dirName == NULL) {
+	/* Same normalisation as UpnpAddVirtualDir(). */
+	if (virtual_dir_name(removeDirName, dirName) != UPNP_E_SUCCESS) {
 		return UPNP_E_INVALID_PARAM;
 	}
 
