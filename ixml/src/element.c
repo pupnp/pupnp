@@ -373,6 +373,7 @@ int ixmlElement_removeAttributeNode(
 		attrNode->parentNode = NULL;
 		attrNode->prevSibling = NULL;
 		attrNode->nextSibling = NULL;
+		((IXML_Attr *)attrNode)->ownerElement = NULL;
 		*rtAttr = (IXML_Attr *)attrNode;
 		return IXML_SUCCESS;
 	} else {
