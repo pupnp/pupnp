@@ -409,7 +409,7 @@ IXML_Document *ixmlNode_getOwnerDocument(IXML_Node *nodeptr)
 }
 
 /*!
- * \brief Check if ancestorNode is ancestor of toFind.
+ * \brief Check if ancestorNode is toFind itself or an ancestor of toFind.
  *
  * \return 1 or 0.
  */
@@ -424,6 +424,8 @@ static int ixmlNode_isAncestor(
 
 	if (!ancestorNode || !toFind)
 		return 0;
+	if (ancestorNode == toFind)
+		return 1;
 
 	fence = ancestorNode->parentNode;
 	node = ancestorNode;
