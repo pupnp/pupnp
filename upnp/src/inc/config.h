@@ -148,6 +148,21 @@
 #define MINISERVER_FIRST_BYTE_TIMEOUT 5
 /* @} */
 
+/*! \name MINISERVER_MAX_CONNECTIONS_PER_PEER
+ *
+ *  The {\tt MINISERVER_MAX_CONNECTIONS_PER_PEER} constant is the number of
+ *  connections, including those still waiting for a worker thread, that the
+ *  miniserver serves at the same time for one peer address. A connection
+ *  that would exceed it is closed at once, so that one peer cannot take all
+ *  the worker threads of the thread pool. Clients that sit behind the same
+ *  address share the limit. The default value is 6, the number of parallel
+ *  connections to one host that web browsers open.
+ *
+ * @{
+ */
+#define MINISERVER_MAX_CONNECTIONS_PER_PEER 6
+/* @} */
+
 /*! \name MAX_SUBSCRIPTION_CALLBACK_HEADER_SIZE
  *
  *  The {\tt MAX_SUBSCRIPTION_CALLBACK_HEADER_SIZE} constant sets the maximum

@@ -63,6 +63,19 @@ endif()
 # Connections that stay silent must not starve the miniserver worker pool.
 UPNP_Add_Unit_Test(test-upnp-miniserver-first-byte test_miniserver_first_byte.c)
 
+# One peer must not be able to take all the workers of the miniserver. The
+# test reads MINISERVER_MAX_CONNECTIONS_PER_PEER from config.h (a private
+# header).
+UPNP_Add_Unit_Test(test-upnp-miniserver-peer-cap test_miniserver_peer_cap.c)
+if(UPNP_BUILD_SHARED)
+	target_include_directories(test-upnp-miniserver-peer-cap
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src/inc)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_include_directories(test-upnp-miniserver-peer-cap-static
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src/inc)
+endif()
+
 # test_threadpool_burst: the pool must grow to run a burst of blocking jobs.
 # Same internal ThreadPool API as the overflow test above, so the same
 # translation units are compiled into each test variant.

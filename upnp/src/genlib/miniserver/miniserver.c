@@ -133,6 +133,8 @@ struct active_connection_t
 {
 	SOCKET socket;
 	time_t connect_time;
+	/*! Address of the peer that opened the connection. */
+	struct sockaddr_storage peer;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -426,17 +428,46 @@ static int active_connection_cmp(void *first, void *second)
 }
 
 /*!
- * \brief Add a socket to the active connections list
+ * \brief Tells whether two socket addresses are the same host, ignoring the
+ * port. The IPv6 socket of the miniserver is IPv6 only, so there are no
+ * IPv4-mapped addresses to take into account.
  */
-static void add_active_connection(SOCKET sock)
+static int same_peer_address(const struct sockaddr *a, const struct sockaddr *b)
+{
+	if (a->sa_family != b->sa_family) {
+		return 0;
+	}
+	if (a->sa_family == AF_INET) {
+		return ((const struct sockaddr_in *)a)->sin_addr.s_addr ==
+		       ((const struct sockaddr_in *)b)->sin_addr.s_addr;
+	}
+	if (a->sa_family == AF_INET6) {
+		return memcmp(&((const struct sockaddr_in6 *)a)->sin6_addr,
+			       &((const struct sockaddr_in6 *)b)->sin6_addr,
+			       sizeof(struct in6_addr)) == 0;
+	}
+
+	return 0;
+}
+
+/*!
+ * \brief Add a socket to the active connections list, unless its peer
+ * already holds MINISERVER_MAX_CONNECTIONS_PER_PEER of them.
+ *
+ * \return 1 if the connection is refused, 0 otherwise.
+ */
+static int add_active_connection(SOCKET sock, const struct sockaddr *peer)
 {
 	struct active_connection_t *conn;
+	ListNode *node;
+	int from_peer = 0;
 
 	conn = (struct active_connection_t *)malloc(
 		sizeof(struct active_connection_t));
 	if (conn) {
 		conn->socket = sock;
 		conn->connect_time = time(NULL);
+		memcpy(&conn->peer, peer, sizeof(conn->peer));
 
 		ithread_mutex_lock(&gActiveConnectionsMutex);
 		if (!gActiveConnectionsInitialized) {
@@ -444,6 +475,24 @@ static void add_active_connection(SOCKET sock)
 				active_connection_cmp,
 				free);
 			gActiveConnectionsInitialized = 1;
+		}
+		/* Count the connections the peer already holds. */
+		for (node = ListHead(&gActiveConnections); node;
+			node = ListNext(&gActiveConnections, node)) {
+			const struct active_connection_t *other =
+				(const struct active_connection_t *)node->item;
+
+			if (same_peer_address(
+				    (const struct sockaddr *)&other->peer,
+				    peer)) {
+				from_peer++;
+			}
+		}
+		if (from_peer >= MINISERVER_MAX_CONNECTIONS_PER_PEER) {
+			ithread_mutex_unlock(&gActiveConnectionsMutex);
+			free(conn);
+
+			return 1;
 		}
 		ListAddTail(&gActiveConnections, conn);
 		ithread_mutex_unlock(&gActiveConnectionsMutex);
@@ -455,6 +504,8 @@ static void add_active_connection(SOCKET sock)
 			"Added active connection: socket %d\n",
 			sock);
 	}
+
+	return 0;
 }
 
 /*!
@@ -662,8 +713,20 @@ static UPNP_INLINE void schedule_request_job(
 	TPJobSetFreeFunction(&job, free_handle_request_arg);
 	TPJobSetPriority(&job, MED_PRIORITY);
 
-	/* Add the connection to active connections list */
-	add_active_connection(sock);
+	/* Add the connection to active connections list, unless its peer
+	 * already holds its share of them. */
+	if (add_active_connection(sock, clientAddr)) {
+		UpnpPrintf(UPNP_INFO,
+			MSERV,
+			__FILE__,
+			__LINE__,
+			"mserv %d: too many connections from this peer, "
+			"closing\n",
+			sock);
+		free(request);
+		sock_close(sock);
+		return;
+	}
 
 	if (ThreadPoolAdd(&gMiniServerThreadPool, &job, NULL) != 0) {
 		UpnpPrintf(UPNP_INFO,
