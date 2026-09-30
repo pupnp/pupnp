@@ -60,6 +60,52 @@ if(UPNP_BUILD_STATIC)
 		COMMAND test-upnp-threadpool-overflow-static)
 endif()
 
+# test_threadpool_burst: the pool must grow to run a burst of blocking jobs.
+# Same internal ThreadPool API as the overflow test above, so the same
+# translation units are compiled into each test variant.
+set(TP_BURST_SOURCES
+	test_threadpool_burst.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../src/threadutil/ThreadPool.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../src/threadutil/FreeList.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../src/threadutil/LinkedList.c
+)
+
+if(UPNP_BUILD_SHARED)
+	add_executable(test-upnp-threadpool-burst ${TP_BURST_SOURCES})
+	target_include_directories(test-upnp-threadpool-burst
+		${TP_OVERFLOW_INCLUDES})
+	target_compile_definitions(test-upnp-threadpool-burst
+		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>)
+	target_link_libraries(test-upnp-threadpool-burst PRIVATE Threads::Shared)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test-upnp-threadpool-burst
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.)
+	endif()
+	add_test(NAME test-upnp-threadpool-burst
+		COMMAND test-upnp-threadpool-burst)
+	if(MSVC OR MSYS OR MINGW OR CYGWIN)
+		UPNP_Find_Test_Env(test-upnp-threadpool-burst TEST_ENV)
+		set_tests_properties(test-upnp-threadpool-burst
+			PROPERTIES ENVIRONMENT "${TEST_ENV}")
+	endif()
+endif()
+
+if(UPNP_BUILD_STATIC)
+	add_executable(test-upnp-threadpool-burst-static ${TP_BURST_SOURCES})
+	target_include_directories(test-upnp-threadpool-burst-static
+		${TP_OVERFLOW_INCLUDES})
+	target_compile_definitions(test-upnp-threadpool-burst-static
+		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>)
+	target_link_libraries(test-upnp-threadpool-burst-static
+		PRIVATE Threads::Static)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test-upnp-threadpool-burst-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=.)
+	endif()
+	add_test(NAME test-upnp-threadpool-burst-static
+		COMMAND test-upnp-threadpool-burst-static)
+endif()
+
 # ithread_rwlock_t must allow concurrent readers (not serialize them like a
 # mutex).  The test exits 77 (skip) when UPNP_USE_RWLOCK=0 (mutex fallback is
 # intentional on that platform).

@@ -706,15 +706,24 @@ static void AddWorker(
 {
 	long jobs = 0;
 	int threads = 0;
+	long idle = 0;
+	long created = 0;
 
 	jobs = tp->highJobQ.size + tp->lowJobQ.size + tp->medJobQ.size;
 	threads = tp->totalThreads - tp->persistentThreads;
+	/* A thread only counts as busy once it has picked a job up, so in a
+	 * burst the queued jobs must be compared with the threads that are
+	 * waiting for one. Both values are taken now, because CreateWorker()
+	 * releases the mutex while it waits. */
+	idle = tp->stats.idleThreads;
 	while (threads == 0 || (jobs / threads) >= tp->attr.jobsPerThread ||
-		(tp->totalThreads == tp->busyThreads)) {
+		(tp->totalThreads == tp->busyThreads) ||
+		jobs > idle + created) {
 		if (CreateWorker(tp) != 0) {
 			return;
 		}
 		threads++;
+		created++;
 	}
 }
 
