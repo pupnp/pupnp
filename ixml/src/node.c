@@ -1123,9 +1123,12 @@ static IXML_Node *ixmlNode_cloneNodeTree(
 		}
 		newNode = (IXML_Node *)newElement;
 		break;
-	case eATTRIBUTE_NODE:
 	case eTEXT_NODE:
 	case eCDATA_SECTION_NODE:
+		/* Leaf nodes: the tree walker would also clone the siblings. */
+		newNode = ixmlNode_cloneSingleNode(nodeptr);
+		break;
+	case eATTRIBUTE_NODE:
 	case eDOCUMENT_NODE:
 		newNode = ixmlNode_cloneNodeTreeRecursive(nodeptr, deep);
 		break;
