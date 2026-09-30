@@ -571,10 +571,9 @@ int ixmlNode_insertBefore(
 		return IXML_NOT_FOUND_ERR;
 	}
 	if (refChild) {
-		if (ixmlNode_isParent(nodeptr, newChild)) {
-			ixmlNode_removeChild(nodeptr, newChild, &newChild);
-			newChild->nextSibling = NULL;
-			newChild->prevSibling = NULL;
+		if (newChild->parentNode) {
+			ixmlNode_removeChild(
+				newChild->parentNode, newChild, &newChild);
 		}
 		newChild->nextSibling = refChild;
 		if (refChild->prevSibling) {
@@ -685,8 +684,8 @@ int ixmlNode_appendChildAfter(
 	if (ixmlNode_allowChildren(nodeptr, newChild) == 0) {
 		return IXML_HIERARCHY_REQUEST_ERR;
 	}
-	if (ixmlNode_isParent(nodeptr, newChild)) {
-		ixmlNode_removeChild(nodeptr, newChild, &newChild);
+	if (newChild->parentNode) {
+		ixmlNode_removeChild(newChild->parentNode, newChild, &newChild);
 	}
 	/* set the parent node pointer */
 	newChild->parentNode = nodeptr;
