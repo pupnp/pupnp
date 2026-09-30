@@ -933,7 +933,7 @@ static int CreateHTTPRangeResponseHeader(
 		return ret;
 	}
 	if (GetNextRange(&Ptr, &FirstByte, &LastByte) != -1) {
-		if (FileLength < FirstByte) {
+		if (FileLength <= FirstByte) {
 			free(RangeInput);
 			return HTTP_REQUEST_RANGE_NOT_SATISFIABLE;
 		}

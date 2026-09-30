@@ -372,6 +372,22 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# A Range request starting at or after the end of the file was answered with
+# 206 and a "Content-Range: bytes 6-5/6" header instead of 416.
+UPNP_Add_Unit_Test(test-upnp-webserver-range test_webserver_range.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-webserver-range PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-webserver-range-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # GHSA-7mx2-6v7x-xhv7: a QueryStateVariable SOAP request with a text or
 # CDATA node where <varName> is expected made check_soap_request() pass a
 # NULL local name to strcmp(), crashing the process.
