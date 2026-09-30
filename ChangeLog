@@ -17,6 +17,13 @@ Version 22.1.8
   threads, a connection has to send its first byte within
   MINISERVER_FIRST_BYTE_TIMEOUT (5) seconds, and a peer address is limited to
   MINISERVER_MAX_CONNECTIONS_PER_PEER (6) connections at a time.
+- GHSA-f8rh-7wq7-v4m7: Fix a path traversal in the web server on Windows. A
+  backslash in the request path, sent as %5c, is not a separator for
+  remove_dots() but is one for the Windows file system, so /..%5csecret.txt
+  returned a file outside the document root without credentials, and so did
+  NTFS alternate data streams (CWE-22). On Windows a backslash is now treated
+  as a slash before the dots are removed, and a colon is rejected in a path
+  that is mapped onto the file system.
 
 
 *******************************************************************************
