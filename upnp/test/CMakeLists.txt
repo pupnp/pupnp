@@ -172,6 +172,23 @@ endif()
 find_library(SOCKET_LIBRARY NAMES socket)
 find_library(NSL_LIBRARY NAMES nsl)
 
+# UpnpFinish() used to hang when the miniserver workers were still serving
+# connections while it stopped.  Raw sockets: on illumos they live in
+# libsocket, so the link blocks have to come after the find_library() calls.
+UPNP_Add_Unit_Test(test-upnp-miniserver-shutdown test_miniserver_shutdown.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-miniserver-shutdown PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-miniserver-shutdown-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # test_ssdp_multi_device uses raw sockets: on illumos they live in libsocket,
 # so the link block has to come after the find_library() calls above.
 if(UPNP_BUILD_SHARED)

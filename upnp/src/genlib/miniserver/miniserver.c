@@ -122,7 +122,10 @@ static _Atomic MiniServerState gMServState = MSERV_IDLE;
 
 /*! Global list to track active socket connections */
 static LinkedList gActiveConnections;
-static ithread_mutex_t gActiveConnectionsMutex;
+/*! Protects gActiveConnections and gActiveConnectionsInitialized. It is never
+ * destroyed: workers that are still serving connections when the miniserver
+ * stops take it to remove their connection from the list. */
+static ithread_mutex_t gActiveConnectionsMutex = PTHREAD_MUTEX_INITIALIZER;
 static int gActiveConnectionsInitialized = 0;
 
 /*! Structure to hold active connection info */
@@ -429,12 +432,6 @@ static void add_active_connection(SOCKET sock)
 {
 	struct active_connection_t *conn;
 
-	if (!gActiveConnectionsInitialized) {
-		ListInit(&gActiveConnections, active_connection_cmp, free);
-		ithread_mutex_init(&gActiveConnectionsMutex, NULL);
-		gActiveConnectionsInitialized = 1;
-	}
-
 	conn = (struct active_connection_t *)malloc(
 		sizeof(struct active_connection_t));
 	if (conn) {
@@ -442,6 +439,12 @@ static void add_active_connection(SOCKET sock)
 		conn->connect_time = time(NULL);
 
 		ithread_mutex_lock(&gActiveConnectionsMutex);
+		if (!gActiveConnectionsInitialized) {
+			ListInit(&gActiveConnections,
+				active_connection_cmp,
+				free);
+			gActiveConnectionsInitialized = 1;
+		}
 		ListAddTail(&gActiveConnections, conn);
 		ithread_mutex_unlock(&gActiveConnectionsMutex);
 
@@ -462,15 +465,15 @@ static void remove_active_connection(SOCKET sock)
 	struct active_connection_t search_conn;
 	ListNode *node;
 
-	if (!gActiveConnectionsInitialized) {
-		return;
-	}
 	/* Create a temporary connection structure for searching */
 	search_conn.socket = sock;
 	search_conn.connect_time = 0; /* Not used for comparison */
 
 	ithread_mutex_lock(&gActiveConnectionsMutex);
-	node = ListFind(&gActiveConnections, NULL, &search_conn);
+	/* The list is gone once the miniserver has stopped. */
+	node = gActiveConnectionsInitialized
+		       ? ListFind(&gActiveConnections, NULL, &search_conn)
+		       : NULL;
 	if (node) {
 		ListDelNode(&gActiveConnections, node, 1);
 		UpnpPrintf(UPNP_INFO,
@@ -638,7 +641,9 @@ void shutdown_all_active_connections(void)
 	ListNode *node;
 	int count;
 
+	ithread_mutex_lock(&gActiveConnectionsMutex);
 	if (!gActiveConnectionsInitialized) {
+		ithread_mutex_unlock(&gActiveConnectionsMutex);
 		return;
 	}
 	UpnpPrintf(UPNP_INFO,
@@ -647,7 +652,6 @@ void shutdown_all_active_connections(void)
 		__LINE__,
 		"Shutting down all active socket connections\n");
 
-	ithread_mutex_lock(&gActiveConnectionsMutex);
 	node = ListHead(&gActiveConnections);
 	count = 0;
 	while (node) {
@@ -666,11 +670,11 @@ void shutdown_all_active_connections(void)
 		node = ListNext(&gActiveConnections, node);
 	}
 
-	/* Destroy the list and reset state */
+	/* Destroy the list and reset state. The mutex stays, workers still use
+	 * it. */
 	ListDestroy(&gActiveConnections, 1);
 	gActiveConnectionsInitialized = 0;
 	ithread_mutex_unlock(&gActiveConnectionsMutex);
-	ithread_mutex_destroy(&gActiveConnectionsMutex);
 
 	UpnpPrintf(UPNP_INFO,
 		MSERV,
