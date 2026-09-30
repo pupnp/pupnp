@@ -502,6 +502,41 @@ static void free_handle_request_arg(
 }
 
 /*!
+ * \brief Waits for the first byte (or the end of file) of a connection.
+ *
+ * \return 1 when the socket can be read, 0 on timeout or error.
+ */
+static int wait_for_first_byte(
+	/*! [in] Connection to wait on. */
+	SOCKET sock,
+	/*! [in] Seconds to wait. */
+	int timeout_secs)
+{
+	int ret;
+		#ifdef _WIN32
+	fd_set readfds;
+	struct timeval tv;
+
+	FD_ZERO(&readfds);
+	FD_SET(sock, &readfds);
+	tv.tv_sec = timeout_secs;
+	tv.tv_usec = 0;
+	ret = select((int)sock + 1, &readfds, NULL, NULL, &tv);
+		#else
+	struct pollfd pfd;
+
+	pfd.fd = sock;
+	pfd.events = POLLIN;
+	do {
+		pfd.revents = 0;
+		ret = _poll(&pfd, 1, timeout_secs * 1000);
+	} while (ret < 0 && errno == EINTR);
+		#endif
+
+	return ret > 0;
+}
+
+/*!
  * \brief Receive the request and dispatch it for handling.
  */
 static void handle_request(
@@ -534,6 +569,21 @@ static void handle_request(
 		sock_close(sock);
 		free(request);
 		httpmsg_destroy(h_msg);
+		return;
+	}
+	/* A client that connects and stays silent must not keep this worker
+	 * busy for the whole receive timeout. */
+	if (!wait_for_first_byte(sock, MINISERVER_FIRST_BYTE_TIMEOUT)) {
+		UpnpPrintf(UPNP_INFO,
+			MSERV,
+			__FILE__,
+			__LINE__,
+			"miniserver %d: no request within %d s, closing\n",
+			sock,
+			MINISERVER_FIRST_BYTE_TIMEOUT);
+		remove_active_connection(sock);
+		sock_destroy(&info, SD_BOTH);
+		free(request);
 		return;
 	}
 	/* read */

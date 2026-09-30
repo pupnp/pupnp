@@ -134,6 +134,20 @@
 #define MAX_JOBS_TOTAL 100
 /* @} */
 
+/*! \name MINISERVER_FIRST_BYTE_TIMEOUT
+ *
+ *  The {\tt MINISERVER_FIRST_BYTE_TIMEOUT} constant is the number of seconds
+ *  the miniserver waits for the first byte of the request of a connection it
+ *  has accepted. A connection that sends nothing in that time is closed, so
+ *  that clients that only connect cannot keep the worker threads busy for the
+ *  whole receive timeout. Each connection carries a single request, which a
+ *  client sends right after connecting. The default value is 5 seconds.
+ *
+ * @{
+ */
+#define MINISERVER_FIRST_BYTE_TIMEOUT 5
+/* @} */
+
 /*! \name MAX_SUBSCRIPTION_CALLBACK_HEADER_SIZE
  *
  *  The {\tt MAX_SUBSCRIPTION_CALLBACK_HEADER_SIZE} constant sets the maximum

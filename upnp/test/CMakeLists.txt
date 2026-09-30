@@ -60,6 +60,9 @@ if(UPNP_BUILD_STATIC)
 		COMMAND test-upnp-threadpool-overflow-static)
 endif()
 
+# Connections that stay silent must not starve the miniserver worker pool.
+UPNP_Add_Unit_Test(test-upnp-miniserver-first-byte test_miniserver_first_byte.c)
+
 # test_threadpool_burst: the pool must grow to run a burst of blocking jobs.
 # Same internal ThreadPool API as the overflow test above, so the same
 # translation units are compiled into each test variant.
