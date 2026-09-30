@@ -50,6 +50,12 @@ Version 22.1.8
   answering searches, and UpnpFinish() now unregisters all of them. The status
   code tables of the HTTP layer were filled in lazily by whichever thread
   needed them first without any locking; this is now done under a mutex.
+- PR #646: Fix a hang in UpnpFinish() when miniserver workers were still
+  serving connections while it stopped. The list of active connections was
+  protected by a mutex that the shutdown destroyed while workers could still
+  lock it, so a worker that finished at that moment blocked forever and
+  UpnpFinish() waited for it. The mutex is now never destroyed, and the list
+  is only used with it held.
 
 
 *******************************************************************************
