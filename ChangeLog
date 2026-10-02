@@ -23,6 +23,10 @@ Version 22.1.9
   were not declared. upnpconfig.h now defines the macro and ixml.h includes
   it. The library binary does not change. Also include config.h in ithread.h
   before the first use of UPNP_USE_RWLOCK.
+- PR #655: Make the FuzzIxml fuzzer return 0 for every input (issue #652). It
+  returned 1 or the IXML error code for a document that did not parse, and
+  libFuzzer keeps an input in the corpus only when the target returns 0, so
+  the fuzzer could not build on inputs that reach the parser's error paths.
 
 
 *******************************************************************************
