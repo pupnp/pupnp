@@ -1,0 +1,13 @@
+1HTTP/1.1 200 OK
+TRANSFER-ENCODING: chunked
+CONTENT-TYPE: text/xml
+
+6
+<root>
+8
+<a>1</a>
+7
+</root>
+0
+X-T: 1
+

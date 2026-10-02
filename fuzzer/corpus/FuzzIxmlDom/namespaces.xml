@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE r [<!ENTITY e "entity">]>
+<?pi target?>
+<!-- comment -->
+<r xmlns="urn:a" xmlns:b="urn:b" xmlns:c="urn:c" b:attr="1" c:attr="2"><b:x xmlns:b="urn:b2" b:y="&amp;&lt;&gt;&quot;&apos;&#65;&#x42;"><c:z xmlns="" attr="v"><![CDATA[<raw & data>]]></c:z></b:x><x xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">t</x><empty/><b:empty b:a='single'/></r>

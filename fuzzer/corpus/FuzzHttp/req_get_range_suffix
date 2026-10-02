@@ -1,0 +1,4 @@
+0GET /media/file.mp3 HTTP/1.1
+HOST: 192.168.1.10:49152
+RANGE: bytes=-500
+

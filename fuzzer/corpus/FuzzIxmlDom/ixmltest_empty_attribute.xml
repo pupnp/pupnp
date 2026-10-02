@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test>
+	<name>Empty XML Attribute</name>
+	<data attr=""/>
+	<data attr="">
+	</data>
+</test>

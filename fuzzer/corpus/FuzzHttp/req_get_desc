@@ -1,0 +1,7 @@
+0GET /tvdevicedesc.xml HTTP/1.1
+HOST: 192.168.1.10:49152
+USER-AGENT: Linux/5.15 UPnP/1.0 Portable SDK for UPnP devices/1.14
+ACCEPT-LANGUAGE: en-US,en;q=0.5
+ACCEPT: text/xml
+CONNECTION: close
+

@@ -1,0 +1,8 @@
+0POST /upnp/control/tvcontrol1 HTTP/1.1
+HOST: 192.168.1.10:49152
+CONTENT-LENGTH: 310
+CONTENT-TYPE: text/xml
+SOAPACTION: "urn:schemas-upnp-org:control-1-0#QueryStateVariable"
+
+<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:QueryStateVariable xmlns:u="urn:schemas-upnp-org:control-1-0"><u:varName>Power</u:varName></u:QueryStateVariable></s:Body></s:Envelope>

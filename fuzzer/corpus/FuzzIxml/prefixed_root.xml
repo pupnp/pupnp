@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<u:root xmlns:u="urn:schemas-upnp-org:device-1-0"><u:specVersion><u:major>1</u:major><u:minor>0</u:minor></u:specVersion><u:device><u:deviceType>urn:schemas-upnp-org:device:tvdevice:1</u:deviceType><u:UDN>uuid:Upnp-TVEmulator-1_0-1234567890001</u:UDN><u:serviceList><u:service><u:serviceType>urn:schemas-upnp-org:service:tvcontrol:1</u:serviceType><u:serviceId>urn:upnp-org:serviceId:tvcontrol1</u:serviceId><u:SCPDURL>/s.xml</u:SCPDURL><u:controlURL>/c</u:controlURL><u:eventSubURL>/e</u:eventSubURL></u:service></u:serviceList></u:device></u:root>
