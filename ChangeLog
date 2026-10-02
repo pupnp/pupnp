@@ -10,6 +10,10 @@ Version 22.1.9
   ixmlElement_setAttributeNode(), another attribute of the element with the
   same name was replaced by the one still linked. Both calls now do nothing in
   that case.
+- PR #653: Add FuzzIxmlOps, a fuzzer for the ixml functions that build and
+  change a DOM tree, with a seed corpus. It applies a sequence of operations
+  to the nodes of a document and checks the child and attribute lists after
+  each one.
 - PR #654: Fix the layout of IXML_Node seen by applications. The member ctag
   only exists with script support (IXML_HAVE_SCRIPTSUPPORT, enabled by
   default), but the macro was a private compile definition of libixml and
