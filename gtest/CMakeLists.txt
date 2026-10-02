@@ -37,7 +37,11 @@ if (NOT WIN32 AND UPNP_BUILD_STATIC)
 		TARGET test_miniserver-static
 		TEST_PREFIX test-upnp-
 		TEST_SUFFIX -static
+		TEST_LIST GTEST_test_miniserver_static
 	)
+	# These tests start the UPnP stack, see UPNP_Add_Unit_Test.
+	set_tests_properties(${GTEST_test_miniserver_static}
+		PROPERTIES RESOURCE_LOCK upnp_stack)
 endif()
 
 # regression test for issue #379 — gena_validate_delivery_urls() must accept

@@ -27,6 +27,9 @@ function(UPNP_addGTest testName sourceFile)
 			TEST_PREFIX test-upnp-
 			TEST_LIST GTEST_${testName}
 		)
+		set_tests_properties(
+			${GTEST_${testName}} PROPERTIES RESOURCE_LOCK upnp_stack
+		)
 
 		if(MSVC OR MSYS OR MINGW OR CYGWIN)
 			UPNP_Find_Test_Env(${testName} TEST_ENV)
@@ -52,6 +55,11 @@ function(UPNP_addGTest testName sourceFile)
 			TARGET ${testName}-static
 			TEST_PREFIX test-upnp-
 			TEST_SUFFIX -static
+			TEST_LIST GTEST_${testName}_static
+		)
+		set_tests_properties(
+			${GTEST_${testName}_static} PROPERTIES RESOURCE_LOCK
+								upnp_stack
 		)
 	endif()
 endfunction()
@@ -80,11 +88,19 @@ function(UPNP_Add_Test_Executable testName sourceFile)
 	endif()
 endfunction()
 
+# Most of the upnp tests start the UPnP stack. Two stacks running at the same
+# time on one host hear each other on the SSDP multicast group and compete for
+# the same ports, so a parallel run (ctest -j) made tests fail at random. The
+# tests added here, and the others that start the stack, share the resource
+# lock upnp_stack: ctest never runs two of them at the same time.
 function(UPNP_Add_Unit_Test testName sourceFile)
 	UPNP_Add_Test_Executable(${testName} ${sourceFile})
 
 	if(UPNP_BUILD_SHARED)
 		add_test(NAME ${testName} COMMAND ${testName})
+		set_tests_properties(
+			${testName} PROPERTIES RESOURCE_LOCK upnp_stack
+		)
 
 		if(MSVC
 			OR MSYS
@@ -102,6 +118,9 @@ function(UPNP_Add_Unit_Test testName sourceFile)
 
 	if(UPNP_BUILD_STATIC)
 		add_test(NAME ${testName}-static COMMAND ${testName}-static)
+		set_tests_properties(
+			${testName}-static PROPERTIES RESOURCE_LOCK upnp_stack
+		)
 	endif()
 endfunction()
 

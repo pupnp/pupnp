@@ -40,6 +40,7 @@ endif()
 
 set_tests_properties(test-init-py PROPERTIES
 	ENVIRONMENT "${_test_init_py_env}"
+	RESOURCE_LOCK upnp_stack
 )
 
 add_test(
@@ -51,6 +52,7 @@ add_test(
 
 set_tests_properties(test-issue-110-py PROPERTIES
 	ENVIRONMENT "${_test_init_py_env}"
+	RESOURCE_LOCK upnp_stack
 )
 
 add_test(
@@ -62,4 +64,5 @@ add_test(
 
 set_tests_properties(test-issue-250-py PROPERTIES
 	ENVIRONMENT "${_test_init_py_env}"
+	RESOURCE_LOCK upnp_stack
 )
