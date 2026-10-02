@@ -192,6 +192,7 @@ jobs:
           - sys: mingw64
             conf: Release
             extra_cmake_flags: -DUPNP_ADAPTER_UUID_NAME=ON
+      fail-fast: false
     defaults:
       run:
         shell: msys2 {0}
