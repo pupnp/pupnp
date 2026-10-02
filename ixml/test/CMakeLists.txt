@@ -141,10 +141,6 @@ set_tests_properties(ixml_find_package_wrong_components_configure
 		FIXTURES_REQUIRED ixml_install
 		WILL_FAIL TRUE)
 
-# The tests named *_add_subdirectory_*build* compile the whole library as a
-# subproject.  They take 20 seconds or more on slow CI machines, close to the
-# 30 second limit CI puts on every test, so they get a timeout of their own.
-
 #
 # add_subdirectory_test_shared
 #
@@ -174,8 +170,7 @@ if(UPNP_BUILD_SHARED)
 
 	set_tests_properties(ixml_add_subdirectory_build_shared
 		PROPERTIES
-		FIXTURES_REQUIRED ixml_as_config_shared
-		TIMEOUT 300)
+		FIXTURES_REQUIRED ixml_as_config_shared)
 endif()
 
 #
@@ -207,8 +202,7 @@ if(UPNP_BUILD_STATIC)
 
 	set_tests_properties(ixml_add_subdirectory_build_static
 		PROPERTIES
-		FIXTURES_REQUIRED ixml_as_config_static
-		TIMEOUT 300)
+		FIXTURES_REQUIRED ixml_as_config_static)
 endif()
 
 #
@@ -241,8 +235,7 @@ if(UPNP_BUILD_STATIC)
 
 	set_tests_properties(ixml_add_subdirectory_exclude_build_shared
 		PROPERTIES
-			FIXTURES_REQUIRED ixml_asx_config_shared
-			TIMEOUT 300)
+			FIXTURES_REQUIRED ixml_asx_config_shared)
 endif()
 
 #
@@ -275,6 +268,5 @@ if(UPNP_BUILD_STATIC)
 
 	set_tests_properties(ixml_add_subdirectory_exclude_build_static
 		PROPERTIES
-			FIXTURES_REQUIRED ixml_asx_config_static
-			TIMEOUT 300)
+			FIXTURES_REQUIRED ixml_asx_config_static)
 endif()
