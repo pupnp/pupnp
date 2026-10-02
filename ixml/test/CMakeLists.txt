@@ -29,6 +29,7 @@ ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-siblings poc_ghsa_xr5m_siblings.c "")
 ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-depth poc_ghsa_xr5m_depth.c "")
 ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-attributes poc_ghsa_xr5m_attributes.c "")
 ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-prefix poc_ghsa_xr5m_prefix.c "")
+ixml_add_unit_test(test-ixml-struct-layout test_struct_layout.c "")
 
 if(NOT UPNP_ENABLE_TESTING_INTEGRATION)
 	return()

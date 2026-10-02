@@ -41,6 +41,7 @@
  */
 
 #include "UpnpGlobal.h" /* For UPNP_EXPORT_SPEC */
+#include "upnpconfig.h" /* For IXML_HAVE_SCRIPTSUPPORT */
 
 /*!
  * \brief The type of DOM strings.

@@ -134,4 +134,9 @@
  *  (i.e. cmake -DUPNP_ADAPTER_UUID_NAME=ON) */
 #cmakedefine UPNP_ADAPTER_UUID_NAME 1
 
+/** Defined to 1 if the library has been compiled with script support for the
+ *  IXML document tree (i.e. cmake -DUPNP_IXML_ENABLE_SCRIPT_SUPPORT=ON). It
+ *  adds a member to IXML_Node, see ixml.h */
+#cmakedefine IXML_HAVE_SCRIPTSUPPORT 1
+
 #endif /* UPNP_CONFIG_H */
