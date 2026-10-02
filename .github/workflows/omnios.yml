@@ -18,7 +18,7 @@ env:
   cmake_sanitizer_flags: |-
     -DCMAKE_C_FLAGS=-fsanitize=address,leak \
     -DCMAKE_CXX_FLAGS=-fsanitize=address,leak \
-    -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,leak"
+    -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,leak
 
   ctest_flags: |-
     --test-dir build \
@@ -55,7 +55,7 @@ jobs:
               ${{ env.cmake_common_flags }} \
               -DCMAKE_C_FLAGS="-Wall -Wpedantic" \
               -DCMAKE_BUILD_TYPE=${{ matrix.conf }} \
-              -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install \
+              -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install
             cmake \
               --build build \
               --config ${{matrix.conf}}
