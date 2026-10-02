@@ -249,16 +249,23 @@ static int ixmlElement_setAttributeNode_common(
 	}
 	newAttr->ownerElement = element;
 	node = &newAttr->n;
+	for (attrNode = element->n.firstAttr; attrNode;
+		attrNode = attrNode->nextSibling) {
+		if (attrNode == node) {
+			/* newAttr is already an attribute of element: nothing
+			 * to do, and nothing was replaced. The search below
+			 * cannot tell, it may find another attribute or none.
+			 */
+			if (rtAttr) {
+				*rtAttr = NULL;
+			}
+			return IXML_SUCCESS;
+		}
+	}
 	p.p1 = node;
 	p.p2 = NULL;
 	attrNode = get_attribute_node(find_condition, element, &p);
-	if (attrNode == node) {
-		/* newAttr is already an attribute of element: nothing to do,
-		 * and nothing was replaced. */
-		if (rtAttr) {
-			*rtAttr = NULL;
-		}
-	} else if (attrNode) {
+	if (attrNode) {
 		/* Already present, will be replaced by newAttr */
 		IXML_Node *prevSib = attrNode->prevSibling;
 		IXML_Node *nextSib = attrNode->nextSibling;

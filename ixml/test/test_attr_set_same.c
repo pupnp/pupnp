@@ -116,6 +116,83 @@ static int test_same_attr_ns(void)
 	return 0;
 }
 
+/* The attribute list of el must be exactly first, second. */
+static int check_two(IXML_Element *el, IXML_Attr *first, IXML_Attr *second)
+{
+	CHECK(el->n.firstAttr == &first->n);
+	CHECK(first->n.prevSibling == NULL);
+	CHECK(first->n.nextSibling == &second->n);
+	CHECK(second->n.prevSibling == &first->n);
+	CHECK(second->n.nextSibling == NULL);
+
+	return 0;
+}
+
+/*
+ * An attribute without a namespace is not found by the namespace search of
+ * ixmlElement_setAttributeNodeNS(), so setting it a second time appended it
+ * to the list again and left a cycle in it.
+ */
+static int test_same_attr_ns_without_namespace(void)
+{
+	IXML_Document *doc;
+	IXML_Element *el;
+	IXML_Attr *a;
+	IXML_Attr *b;
+	IXML_Attr *old = NULL;
+
+	CHECK(ixmlDocument_createDocumentEx(&doc) == IXML_SUCCESS);
+	el = ixmlDocument_createElement(doc, "E");
+	a = ixmlDocument_createAttribute(doc, "a");
+	b = ixmlDocument_createAttribute(doc, "b");
+	CHECK(el && a && b);
+	CHECK(ixmlElement_setAttributeNodeNS(el, a, &old) == IXML_SUCCESS);
+	CHECK(ixmlElement_setAttributeNodeNS(el, b, &old) == IXML_SUCCESS);
+	old = a; /* non-NULL, must be overwritten */
+	CHECK(ixmlElement_setAttributeNodeNS(el, a, &old) == IXML_SUCCESS);
+	CHECK(old == NULL);
+	if (check_two(el, a, b))
+		return 1;
+	ixmlElement_free(el);
+	ixmlDocument_free(doc);
+
+	return 0;
+}
+
+/*
+ * The name search of ixmlElement_setAttributeNode() can find another
+ * attribute of the element that has the same name as newAttr. That one was
+ * replaced by newAttr while newAttr was still linked, which made newAttr its
+ * own sibling.
+ */
+static int test_same_attr_other_with_same_name(void)
+{
+	IXML_Document *doc;
+	IXML_Element *el;
+	IXML_Attr *first;
+	IXML_Attr *second;
+	IXML_Attr *old = NULL;
+
+	CHECK(ixmlDocument_createDocumentEx(&doc) == IXML_SUCCESS);
+	el = ixmlDocument_createElement(doc, "E");
+	CHECK(el);
+	CHECK(ixmlElement_setAttributeNS(el, NS, "a", "1") == IXML_SUCCESS);
+	first = ixmlElement_getAttributeNodeNS(el, NS, "a");
+	second = ixmlDocument_createAttribute(doc, "a");
+	CHECK(first && second);
+	CHECK(ixmlElement_setAttributeNodeNS(el, second, &old) == IXML_SUCCESS);
+	CHECK(old == NULL);
+	old = second; /* non-NULL, must be overwritten */
+	CHECK(ixmlElement_setAttributeNode(el, second, &old) == IXML_SUCCESS);
+	CHECK(old == NULL);
+	if (check_two(el, first, second))
+		return 1;
+	ixmlElement_free(el);
+	ixmlDocument_free(doc);
+
+	return 0;
+}
+
 int main(void)
 {
 	int err = 0;
@@ -123,6 +200,8 @@ int main(void)
 	err |= test_same_attr_with_rtattr();
 	err |= test_same_attr_without_rtattr();
 	err |= test_same_attr_ns();
+	err |= test_same_attr_ns_without_namespace();
+	err |= test_same_attr_other_with_same_name();
 	if (!err)
 		puts("test_attr_set_same: PASS");
 
