@@ -1,0 +1,3 @@
+0GET /index.html HTTP/1.0
+ACCEPT-CHARSET: utf-8
+

@@ -1,0 +1,3 @@
+0GET http://192.168.1.10:49152/tvdevicedesc.xml?x=1 HTTP/1.1
+HOST: 192.168.1.10:49152
+

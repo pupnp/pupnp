@@ -1,0 +1,8 @@
+1HTTP/1.1 200 OK
+CONTENT-TYPE: text/xml; charset="utf-8"
+CONTENT-LENGTH: 665
+SERVER: Linux/5.15 UPnP/1.0 Portable SDK for UPnP devices/1.14
+DATE: Thu, 02 Oct 2026 10:00:00 GMT
+
+<?xml version="1.0"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0"><specVersion><major>1</major><minor>0</minor></specVersion><device><deviceType>urn:schemas-upnp-org:device:tvdevice:1</deviceType><friendlyName>Device</friendlyName><manufacturer>M</manufacturer><modelName>X</modelName><UDN>uuid:Upnp-TVEmulator-1_0-1234567890001</UDN><serviceList><service><serviceType>urn:schemas-upnp-org:service:tvcontrol:1</serviceType><serviceId>urn:upnp-org:serviceId:tvcontrol1</serviceId><SCPDURL>scpd.xml</SCPDURL><controlURL>../../ctl</controlURL><eventSubURL>evt?sid=1</eventSubURL></service></serviceList><presentationURL>/index.html</presentationURL></device></root>

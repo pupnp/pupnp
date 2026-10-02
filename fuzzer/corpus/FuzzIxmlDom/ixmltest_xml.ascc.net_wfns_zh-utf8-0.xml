@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 1998 Academia Sinica Computing Center -->
+<!-- Permission to use and distribute granted under MPL -->
+<!-- Email corrections to ricko@gate.sinica.net.tw -->
+<test xmlns='http://www.ascc.net/xml/test/schema' type="io0">
+	<name>Chinese Test #0: utf-8</name>
+	<data>This file is the null test. It is a UTF-8 encoded
+	file with no non-ASCII characters (i.e. it is also an
+	ASCII or iso-8859-n file).
+	</data>
+	<data>The XML header of this file is
+	&lt;?xml encoding="utf-8"?&gt;.
+	</data>
+</test>

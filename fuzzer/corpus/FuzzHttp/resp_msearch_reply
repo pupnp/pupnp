@@ -1,0 +1,10 @@
+1HTTP/1.1 200 OK
+CACHE-CONTROL: max-age=1800
+DATE: Thu, 02 Oct 2026 10:00:00 GMT
+EXT: 
+LOCATION: http://192.168.1.10:49152/tvdevicedesc.xml
+SERVER: Linux/5.15 UPnP/1.0 Portable SDK for UPnP devices/1.14
+ST: urn:schemas-upnp-org:device:tvdevice:1
+USN: uuid:Upnp-TVEmulator-1_0-1234567890001::urn:schemas-upnp-org:device:tvdevice:1
+CONTENT-LENGTH: 0
+

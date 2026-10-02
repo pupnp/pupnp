@@ -1,0 +1,8 @@
+0GET / HTTP/1.1
+HOST: 192.168.1.10:49152
+USER-AGENT: a
+  continued
+	value
+X-CUSTOM:
+X-EMPTY:   
+

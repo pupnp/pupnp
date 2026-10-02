@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:QueryStateVariable xmlns:u="urn:schemas-upnp-org:control-1-0"><u:varName>Power</u:varName></u:QueryStateVariable></s:Body></s:Envelope>

@@ -1,0 +1,7 @@
+0SUBSCRIBE /upnp/event/tvcontrol1 HTTP/1.1
+HOST: 192.168.1.10:49152
+CALLBACK: <http://192.168.1.30:5000/notify><http://[fe80::2]:5000/n>
+NT: upnp:event
+TIMEOUT: Second-1800
+STATEVAR: Power,Channel
+

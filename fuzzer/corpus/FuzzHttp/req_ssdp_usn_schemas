@@ -1,0 +1,8 @@
+0NOTIFY * HTTP/1.1
+HOST: 239.255.255.250:1900
+NT: uuid:schemas-upnp-org:device:tvdevice:1:abcdef
+NTS: ssdp:alive
+USN: uuid:schemas-upnp-org:device:tvdevice:1:abcdef
+CACHE-CONTROL: max-age=1
+LOCATION: http://192.168.1.10:49152/tvdevicedesc.xml
+

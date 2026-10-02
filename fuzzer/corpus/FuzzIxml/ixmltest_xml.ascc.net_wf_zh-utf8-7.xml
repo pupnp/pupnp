@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 1998 Academia Sinica Computing Center -->
+<!-- Permission to use and distribute granted under MPL -->
+<!-- Email corrections to ricko@gate.sinica.net.tw -->
+<test type="io7">
+	<name>Chinese Test #7: UTF-8</name>
+	<data>This file has CDATA which looks like
+	a hexadecimal numeric character reference. It is a  
+	file with no non-ASCII characters (i.e. it is also a
+	UTF-8, ASCII or iso-8859-n file).
+	</data>
+	<data>The XML header of this file is
+	&lt;?xml encoding="UTF-8"?&gt;.
+	</data>
+	<data><![CDATA[CDATA section is here: [&#x4E2D;].]]>
+	This is not the Chinese character for middle.
+	It should not look like a box with a vertical
+	line through its middle. 
+	</data>
+</test>

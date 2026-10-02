@@ -1,0 +1,7 @@
+1HTTP/1.1 200 OK
+DATE: Thu, 02 Oct 2026 10:00:00 GMT
+SERVER: Linux/5.15 UPnP/1.0 Portable SDK for UPnP devices/1.14
+SID: uuid:6a3f1c2e-0b7d-41ee-9c55-3f1b2a4d5e61
+TIMEOUT: Second-1800
+CONTENT-LENGTH: 0
+
