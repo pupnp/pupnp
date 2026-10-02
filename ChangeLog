@@ -10,6 +10,15 @@ Version 22.1.9
   ixmlElement_setAttributeNode(), another attribute of the element with the
   same name was replaced by the one still linked. Both calls now do nothing in
   that case.
+- PR #654: Fix the layout of IXML_Node seen by applications. The member ctag
+  only exists with script support (IXML_HAVE_SCRIPTSUPPORT, enabled by
+  default), but the macro was a private compile definition of libixml and
+  nothing defined it for whoever included ixml.h. An application saw IXML_Node
+  without ctag, so tagName in IXML_Element, and specified and ownerElement in
+  IXML_Attr, were read at the wrong offset, and the script support functions
+  were not declared. upnpconfig.h now defines the macro and ixml.h includes
+  it. The library binary does not change. Also include config.h in ithread.h
+  before the first use of UPNP_USE_RWLOCK.
 
 
 *******************************************************************************
