@@ -430,6 +430,8 @@ if(UPNP_BUILD_SHARED)
 		)
 	endif()
 	add_test(NAME test-upnp-parse-uri COMMAND test-upnp-parse-uri)
+	set_tests_properties(test-upnp-parse-uri
+		PROPERTIES RESOURCE_LOCK upnp_stack)
 endif()
 
 if(UPNP_BUILD_STATIC)
@@ -459,6 +461,8 @@ if(UPNP_BUILD_STATIC)
 		)
 	endif()
 	add_test(NAME test-upnp-parse-uri-static COMMAND test-upnp-parse-uri-static)
+	set_tests_properties(test-upnp-parse-uri-static
+		PROPERTIES RESOURCE_LOCK upnp_stack)
 endif()
 
 # Issue #153: use-after-free in the alias lifecycle when an HTTP handler grabs
