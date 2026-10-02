@@ -1,8 +1,7 @@
 #!/bin/bash -eu
 
 compile() {
-   cd build/
-   make -j"$(nproc)"
+   cmake --build "${BUILD_DIR}"
 }
 
 build() {
@@ -15,30 +14,20 @@ build() {
    # echo CFLAGS="${CFLAGS}"
    # echo CXXFLAGS="${CXXFLAGS}"
 
+   # The same build OSS-Fuzz does: the whole tree, from the top level.
    rm -rf "${BUILD_DIR}"
-   # cmake --fresh -DFUZZER=ON -DLIB_FUZZING_ENGINE="$LIB_FUZZING_ENGINE" -B build &&
-   cmake --fresh -DLIB_FUZZING_ENGINE="$LIB_FUZZING_ENGINE" -DLOCAL_RUN=1 -B "${BUILD_DIR}" &&
+   cmake --fresh -DFUZZER=ON -DLIB_FUZZING_ENGINE="$LIB_FUZZING_ENGINE" -S .. -B "${BUILD_DIR}" &&
       cmake --build "${BUILD_DIR}"
-
-   cd "${BUILD_DIR}"
-   mkdir FuzzIxml_corpus
-   mkdir FuzzIxml_seed_corpus
-
-   cp ../../ixml/test/testdata/empty_attribute.xml FuzzIxml_seed_corpus/
-   cp ../../ixml/test/testdata/p43pass1.xml FuzzIxml_seed_corpus/
-   cp ../../ixml/test/testdata/xml.ascc.net/wf/zh-utf8-8.xml FuzzIxml_seed_corpus/
-   cp ../../ixml/test/testdata/xml.ascc.net/wfns/zh-utf8-7.xml FuzzIxml_seed_corpus/
-   cp ../../ixml/test/testdata/xmlconf/014.xml FuzzIxml_seed_corpus/
 }
 
+# New inputs go to build/<target>_corpus, the seeds come from corpus/<target>.
 run() {
-   #./"${BUILD_DIR}"/FuzzIxml "${BUILD_DIR}"/FuzzIxml_corpus/ "${BUILD_DIR}"/FuzzIxml_seed_corpus/ -detect_leaks=0
-   ./"${BUILD_DIR}"/FuzzIxml "${BUILD_DIR}"/FuzzIxml_corpus/ "${BUILD_DIR}"/FuzzIxml_seed_corpus/
-   #./"${BUILD_DIR}"/FuzzIxml "${BUILD_DIR}"/FuzzIxml_corpus/ "${BUILD_DIR}"/FuzzIxml_seed_corpus/ >/dev/null 2>&1
+   mkdir -p "${BUILD_DIR}/$1_corpus"
+   ./"${BUILD_DIR}"/fuzzer/"$1" "${BUILD_DIR}/$1_corpus/" corpus/"$1"/
 }
 
 usage() {
-   echo "usage: $0 ASan | UBSan | MSan | Run | compile"
+   echo "usage: $0 ASan | UBSan | MSan | Run [target] | compile"
 }
 
 if [ $# -eq 0 ]; then
@@ -60,7 +49,7 @@ elif [ "$1" == "UBSan" ]; then
 elif [ "$1" == "MSan" ]; then
    build "-g -O0 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize-memory-track-origins -fsanitize=fuzzer-no-link"
 elif [ "$1" == "Run" ]; then
-   run
+   run "${2:-FuzzIxml}"
 elif [ "$1" == "compile" ]; then
    compile
 else
