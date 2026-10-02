@@ -55,7 +55,16 @@ env:
     --test-dir build \
     --output-on-failure \
     --timeout 30 \
-    --exclude-regex "^pthreads4w"
+    --exclude-regex "^pthreads4w|_add_subdirectory_"
+
+  # The *_add_subdirectory_* tests compile the whole library as a subproject,
+  # which takes 20 seconds or more on slow machines, so they run in a separate
+  # ctest call with a longer timeout.
+  ctest_build_flags: |-
+    --test-dir build \
+    --output-on-failure \
+    --timeout 300 \
+    --tests-regex "_add_subdirectory_"
 
   CMAKE_BUILD_PARALLEL_LEVEL: 8
 
@@ -92,6 +101,8 @@ jobs:
         run: cmake --build build --config ${{ matrix.conf }}
       - name: Test
         run: ctest ${{ env.ctest_flags }} -C ${{ matrix.conf }}
+      - name: Test (build as subproject)
+        run: ctest ${{ env.ctest_build_flags }} -C ${{ matrix.conf }}
       - name: Debug output
         run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
       - name: Install
@@ -118,6 +129,7 @@ jobs:
               -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install
             cmake --build build --config ${{ matrix.conf }}
             ctest ${{ env.ctest_flags }} -C ${{ matrix.conf }}
+            ctest ${{ env.ctest_build_flags }} -C ${{ matrix.conf }}
             cmake -DBUILD_DIR=build -P cmake/post-test.cmake
             cmake --install build --config ${{ matrix.conf }}
   # Windows Visual Studio builds
