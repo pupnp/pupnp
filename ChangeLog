@@ -27,6 +27,10 @@ Version 22.1.9
   returned 1 or the IXML error code for a document that did not parse, and
   libFuzzer keeps an input in the corpus only when the target returns 0, so
   the fuzzer could not build on inputs that reach the parser's error paths.
+- PR #656: Make fuzzer/build.sh work again. It looked for the libraries in the
+  directories of the removed autotools build. It now builds the whole tree
+  from the top level with -DFUZZER=ON, as OSS-Fuzz does, and "Run" takes the
+  name of the target and starts from its seed corpus in fuzzer/corpus.
 
 
 *******************************************************************************
