@@ -29,6 +29,8 @@
  *
  *************************************************************************/
 
+#include "upnpconfig.h" /* For UPNP_HAVE_DEBUG */
+
 #ifdef UPNP_HAVE_DEBUG
 	#include "upnpdebug.h"
 #endif
