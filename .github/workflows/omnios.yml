@@ -23,7 +23,17 @@ env:
   ctest_flags: |-
     --test-dir build \
     --output-on-failure \
-    --timeout 30
+    --timeout 30 \
+    --exclude-regex "_add_subdirectory_"
+
+  # The *_add_subdirectory_* tests compile the whole library as a subproject,
+  # which takes 20 seconds or more on slow machines, so they run in a separate
+  # ctest call with a longer timeout.
+  ctest_build_flags: |-
+    --test-dir build \
+    --output-on-failure \
+    --timeout 300 \
+    --tests-regex "_add_subdirectory_"
 
 jobs:
   omnios:
@@ -51,6 +61,10 @@ jobs:
               --config ${{matrix.conf}}
             ctest \
               ${{ env.ctest_flags }} \
+              -C ${{ matrix.conf }}
+            echo "ctest returned status "$?
+            ctest \
+              ${{ env.ctest_build_flags }} \
               -C ${{ matrix.conf }}
             echo "ctest returned status "$?
             cmake \
