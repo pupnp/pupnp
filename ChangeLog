@@ -2,6 +2,14 @@
 Version 22.1.9
 *******************************************************************************
 
+- PR #651: Fix a corrupted attribute list when ixmlElement_setAttributeNode()
+  or ixmlElement_setAttributeNodeNS() was called with an attribute the element
+  already owned and the lookup did not return that same attribute. An
+  attribute without a namespace given twice to ixmlElement_setAttributeNodeNS()
+  was appended again, and freeing the element then read freed memory. With
+  ixmlElement_setAttributeNode(), another attribute of the element with the
+  same name was replaced by the one still linked. Both calls now do nothing in
+  that case.
 
 
 *******************************************************************************
