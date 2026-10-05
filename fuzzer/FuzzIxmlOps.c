@@ -21,6 +21,9 @@
 #define POOL 48
 #define MAX_OPS 160
 #define WALK_LIMIT 4096
+/* Nodes that cloneNode may create in one run. Every other operation creates at
+ * most one node, so no tree ever gets near WALK_LIMIT without a cycle. */
+#define CLONE_BUDGET 2048
 #define NUM_OPS 20
 #define ARRAY_LEN(a) (sizeof(a) / sizeof((a)[0]))
 
@@ -28,6 +31,7 @@ static IXML_Node *pool[POOL];
 static int npool;
 static IXML_Document *doc;
 static int cur_op;
+static int clone_budget;
 
 static const char *g_names[] = {
 	"a", "b", "c", "d", "p:e", "xmlns:p", "x", "q:r"};
@@ -191,6 +195,21 @@ static int subtree_contains(IXML_Node *root, IXML_Node *target)
 	return 0;
 }
 
+/* Number of nodes in the subtree of n (children and attributes). */
+static int subtree_size(IXML_Node *n)
+{
+	IXML_Node *c;
+	int total = 1;
+
+	for (c = n->firstChild; c; c = c->nextSibling) {
+		total += subtree_size(c);
+	}
+	for (c = n->firstAttr; c; c = c->nextSibling) {
+		total += subtree_size(c);
+	}
+	return total;
+}
+
 static void do_op(const uint8_t *op)
 {
 	uint8_t code = op[0] % NUM_OPS;
@@ -289,7 +308,21 @@ static void do_op(const uint8_t *op)
 	case 8: /* cloneNode */
 		x = pick(a);
 		if (x && npool < POOL) {
-			reg(ixmlNode_cloneNode(x, b & 1));
+			int size;
+
+			ret = ixmlNode_cloneNode(x, b & 1);
+			if (!ret) {
+				break;
+			}
+			/* Deep clones double a tree, so a few of them would
+			 * pass WALK_LIMIT with no cycle at all. */
+			size = subtree_size(ret);
+			if (size > clone_budget) {
+				ixmlNode_free(ret);
+				break;
+			}
+			clone_budget -= size;
+			reg(ret);
 		}
 		break;
 	case 9: /* setAttribute */
@@ -423,6 +456,7 @@ extern int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 	}
 
 	npool = 0;
+	clone_budget = CLONE_BUDGET;
 	doc = NULL;
 	if (ixmlDocument_createDocumentEx(&doc) != IXML_SUCCESS || !doc) {
 		return 0;
