@@ -36,6 +36,11 @@ Version 22.1.9
   few deep clones appended to their own source built such a tree with no
   cycle at all. The nodes that cloneNode may create in one run are now
   limited to 2048. The ixml library was not at fault and does not change.
+- PR #659: Fix a dangling pointer in ixmlElement_setAttributeNS() when it ran
+  out of memory. If the element already had the attribute and the copy of the
+  new value failed, the prefix of the attribute was freed and the pointer was
+  left in place. The value is now copied first, and a failure leaves the
+  attribute as it was.
 
 
 *******************************************************************************
