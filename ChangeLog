@@ -31,6 +31,11 @@ Version 22.1.9
   directories of the removed autotools build. It now builds the whole tree
   from the top level with -DFUZZER=ON, as OSS-Fuzz does, and "Run" takes the
   name of the target and starts from its seed corpus in fuzzer/corpus.
+- PR #658: Fix a false alarm of the FuzzIxmlOps fuzzer (OSS-Fuzz issue
+  569581919). It reports a tree with more than 4096 nodes as a cycle, and a
+  few deep clones appended to their own source built such a tree with no
+  cycle at all. The nodes that cloneNode may create in one run are now
+  limited to 2048. The ixml library was not at fault and does not change.
 
 
 *******************************************************************************
