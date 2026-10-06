@@ -492,30 +492,26 @@ int ixmlElement_setAttributeNS( //
 	p.p2 = newAttrNode.localName;
 	attrNode = get_attribute_node(find_condition_ns_ln, element, &p);
 	if (attrNode) {
+		/* Copy the value first, so that a failure leaves the
+		 * attribute as it was. */
+		char *newValue = strdup(value);
+
+		if (!newValue) {
+			error_code = IXML_INSUFFICIENT_MEMORY;
+			goto ErrorHandler;
+		}
 		if (attrNode->prefix) {
 			/* Remove the old prefix */
 			free(attrNode->prefix);
 		}
 		/* replace it with the new prefix */
-		if (newAttrNode.prefix) {
-			attrNode->prefix = strdup(newAttrNode.prefix);
-			if (!attrNode->prefix) {
-				error_code = IXML_INSUFFICIENT_MEMORY;
-				goto ErrorHandler;
-			}
-		} else {
-			attrNode->prefix = newAttrNode.prefix;
-		}
+		attrNode->prefix = newAttrNode.prefix;
+		newAttrNode.prefix = NULL;
 		if (attrNode->nodeValue) {
 			/* Attribute name has a value already */
 			free(attrNode->nodeValue);
 		}
-		attrNode->nodeValue = strdup(value);
-		if (!attrNode->nodeValue) {
-			free(attrNode->prefix);
-			error_code = IXML_INSUFFICIENT_MEMORY;
-			goto ErrorHandler;
-		}
+		attrNode->nodeValue = newValue;
 	} else {
 		/* attrNode was not found */
 		IXML_Attr *newAttr;
