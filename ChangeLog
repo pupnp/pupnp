@@ -41,6 +41,10 @@ Version 22.1.9
   new value failed, the prefix of the attribute was freed and the pointer was
   left in place. The value is now copied first, and a failure leaves the
   attribute as it was.
+- PR #660: Send "Content-Range: bytes */<length>" in the 416 response of the
+  web server to a Range request that cannot be satisfied (RFC 7233, section
+  4.4), so that the client learns the length of the file. Nothing changes when
+  the length is not known.
 
 
 *******************************************************************************
