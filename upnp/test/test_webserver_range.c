@@ -9,6 +9,9 @@
  * 5 and the reply was "206 Partial Content" with the impossible header
  * "Content-Range: bytes 6-5/6".
  *
+ * The 416 reply must also tell the length of the file in a Content-Range
+ * header with an asterisk in place of the range (RFC 7233, section 4.4).
+ *
  * The valid ranges next to it are checked too, so the fix cannot reject
  * more than it should.
  */
@@ -91,7 +94,7 @@ static int get_range(const char *ip,
 	return status;
 }
 
-/* expect_status 416 or 206; for 206 also the exact Content-Range line. */
+/* expect_status 416 or 206, and the exact Content-Range line. */
 static int check_range(const char *ip,
 	unsigned short port,
 	const char *range,
@@ -183,10 +186,20 @@ int main(void)
 			206,
 			"Content-Range: bytes 3-5/6");
 		/* Ranges that start at or after the end: not satisfiable. */
-		err |= check_range(ip, port, "bytes=6-10", 416, NULL);
-		err |= check_range(ip, port, "bytes=6-6", 416, NULL);
-		err |= check_range(ip, port, "bytes=7-10", 416, NULL);
-		err |= check_range(ip, port, "bytes=6-", 416, NULL);
+		err |= check_range(ip,
+			port,
+			"bytes=6-10",
+			416,
+			"Content-Range: bytes */6");
+		err |= check_range(
+			ip, port, "bytes=6-6", 416, "Content-Range: bytes */6");
+		err |= check_range(ip,
+			port,
+			"bytes=7-10",
+			416,
+			"Content-Range: bytes */6");
+		err |= check_range(
+			ip, port, "bytes=6-", 416, "Content-Range: bytes */6");
 	}
 
 	UpnpFinish();

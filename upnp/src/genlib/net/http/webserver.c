@@ -932,6 +932,12 @@ static int CreateHTTPRangeResponseHeader(
 		free(RangeInput);
 		return ret;
 	}
+	/* Content-Range: bytes * /4000  HTTP_REQUEST_RANGE_NOT_SATISFIABLE.
+	 * A satisfiable range overwrites it below. */
+	snprintf(Instr->RangeHeader,
+		sizeof(Instr->RangeHeader),
+		"Content-Range: bytes */%" PRId64 "\r\n",
+		(int64_t)FileLength);
 	if (GetNextRange(&Ptr, &FirstByte, &LastByte) != -1) {
 		if (FileLength <= FirstByte) {
 			free(RangeInput);
@@ -1807,6 +1813,41 @@ ExitFunction:
 	return ret_code;
 }
 
+/*!
+ * \brief Sends the 416 response with the Content-Range header that tells the
+ * length of the file.
+ */
+static void send_range_not_satisfiable(
+	/*! [in] Socket info. */
+	SOCKINFO *info,
+	/*! [in] HTTP request. */
+	http_message_t *req,
+	/*! [in] Send instruction with the range header. */
+	struct SendInstruction *RespInstr)
+{
+	int resp_major;
+	int resp_minor;
+	int timeout = HTTP_DEFAULT_TIMEOUT;
+	membuffer membuf;
+
+	http_CalcResponseVersion(req->major_version,
+		req->minor_version,
+		&resp_major,
+		&resp_minor);
+	membuffer_init(&membuf);
+	if (http_MakeMessage(&membuf,
+		    resp_major,
+		    resp_minor,
+		    "RSGCB",
+		    HTTP_REQUEST_RANGE_NOT_SATISFIABLE,
+		    RespInstr,
+		    HTTP_REQUEST_RANGE_NOT_SATISFIABLE) == 0) {
+		http_SendMessage(
+			info, &timeout, "b", membuf.buf, membuf.length);
+	}
+	membuffer_destroy(&membuf);
+}
+
 void web_server_callback(
 	http_parser_t *parser, /* INOUT */ http_message_t *req, SOCKINFO *info)
 {
@@ -1827,7 +1868,10 @@ void web_server_callback(
 	 * on the type of request. */
 	ret = process_request(
 		info, req, &rtype, &headers, &filename, &xmldoc, &RespInstr);
-	if (ret != HTTP_OK) {
+	if (ret == HTTP_REQUEST_RANGE_NOT_SATISFIABLE &&
+		RespInstr.RangeHeader[0]) {
+		send_range_not_satisfiable(info, req, &RespInstr);
+	} else if (ret != HTTP_OK) {
 		/* send error code */
 		http_SendStatusResponse(
 			info, ret, req->major_version, req->minor_version);
