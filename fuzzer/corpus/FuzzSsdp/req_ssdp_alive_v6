@@ -1,0 +1,8 @@
+0NOTIFY * HTTP/1.1
+HOST: [FF02::C]:1900
+CACHE-CONTROL: max-age = 1800
+LOCATION: http://[fe80::1]:49152/desc.xml
+NT: upnp:rootdevice
+NTS: ssdp:alive
+USN: uuid:0b2c7d4e-1111-2222-3333-444455556666::upnp:rootdevice
+

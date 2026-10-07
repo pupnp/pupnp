@@ -1,0 +1,6 @@
+0NOTIFY * HTTP/1.1
+HOST: 239.255.255.250:1900
+NT: uuid:Upnp-TVEmulator-1_0-1234567890001
+NTS: ssdp:byebye
+USN: uuid:Upnp-TVEmulator-1_0-1234567890001
+
