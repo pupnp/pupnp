@@ -49,6 +49,11 @@ Version 22.1.9
   (a request or an M-SEARCH reply) and runs the device request handler and the
   header parsers of the control point handler on it. It comes with a
   dictionary, an options file and a seed corpus.
+- PR #663: Ship the dictionaries and options of the fuzzers to OSS-Fuzz. Its
+  build script only copies "Fuzz*" from the build directory, so these files
+  never left the source tree; CMake now copies them there. The CIFuzz workflow
+  fails when one of them is missing from the build output, and also runs once
+  a month, since that script is not in this repository.
 
 
 *******************************************************************************
