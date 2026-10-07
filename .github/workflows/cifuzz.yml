@@ -5,6 +5,10 @@ on:
   # expensive to run on every pull request. Run it on demand, and
   # automatically only when the fuzzing harnesses themselves change.
   workflow_dispatch:
+  # The OSS-Fuzz build script is not in this repository: a monthly run notices
+  # when a change there stops shipping the dictionaries and options.
+  schedule:
+    - cron: "17 4 1 * *"
   pull_request:
     branches:
       - "**"
@@ -37,3 +41,24 @@ jobs:
         with:
           name: artifacts
           path: ./out/artifacts
+      # The fuzzing engine only uses a <target>.dict or <target>.options that
+      # sits beside the binary. fuzzer/CMakeLists.txt copies them to the build
+      # directory, from where the OSS-Fuzz build.sh takes "fuzzer/Fuzz*".
+      - name: Checkout the sources
+        if: (success() || failure()) && steps.build.outcome == 'success'
+        uses: actions/checkout@v7
+        with:
+          path: pupnp-src
+      - name: Check that the dictionaries and options were shipped
+        if: (success() || failure()) && steps.build.outcome == 'success'
+        run: |
+          missing=0
+          for f in pupnp-src/fuzzer/*.dict pupnp-src/fuzzer/*.options; do
+            [ -e "$f" ] || continue
+            name=$(basename "$f")
+            if [ ! -f "build-out/$name" ]; then
+              echo "::error file=fuzzer/$name::$name is not in the OSS-Fuzz build output, so the fuzzers run without it. Check the copy in fuzzer/CMakeLists.txt and in projects/pupnp/build.sh of google/oss-fuzz."
+              missing=1
+            fi
+          done
+          exit $missing
