@@ -94,8 +94,7 @@ extern int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 	dest4->sin_port = htons(1900);
 	dest4->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
-	if (parser.msg.is_request &&
-		parser.msg.method == HTTPMETHOD_MSEARCH) {
+	if (parser.msg.is_request && parser.msg.method == HTTPMETHOD_MSEARCH) {
 		ssdp_handle_device_request(&parser.msg, &dest);
 	}
 
