@@ -1,0 +1,4 @@
+GET /description.xml HTTP/1.1
+HOST: 192.168.1.10:49152
+RANGE: bytes=-50
+

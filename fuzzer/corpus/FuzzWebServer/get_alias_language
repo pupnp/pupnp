@@ -1,0 +1,6 @@
+GET /description.xml HTTP/1.1
+HOST: 192.168.1.10:49152
+ACCEPT-LANGUAGE: en-US,en;q=0.8
+USER-AGENT: test/1.0
+TE: trailers
+

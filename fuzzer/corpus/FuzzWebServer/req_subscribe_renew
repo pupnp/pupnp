@@ -1,0 +1,5 @@
+SUBSCRIBE /upnp/event/tvcontrol1 HTTP/1.1
+HOST: 192.168.1.10:49152
+SID: uuid:6a3f1c2e-0b7d-41ee-9c55-3f1b2a4d5e61
+TIMEOUT: Second-infinite
+

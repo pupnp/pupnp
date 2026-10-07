@@ -1,0 +1,14 @@
+POST /upnp/control/tvcontrol1 HTTP/1.1
+HOST: 192.168.1.10:49152
+TRANSFER-ENCODING: chunked
+CONTENT-TYPE: text/xml
+SOAPACTION: "urn:schemas-upnp-org:service:tvcontrol:1#SetChannel"
+
+28
+<?xml version="1.0" encoding="utf-8"?>
+
+fe
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:SetChannel xmlns:u="urn:schemas-upnp-org:service:tvcontrol:1"><Channel>5</Channel></u:SetChannel></s:Body></s:Envelope>
+0
+X-TRAILER: 1
+

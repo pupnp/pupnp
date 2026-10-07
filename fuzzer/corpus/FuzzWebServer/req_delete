@@ -1,0 +1,3 @@
+DELETE /upload.bin HTTP/1.1
+HOST: 192.168.1.10:49152
+
