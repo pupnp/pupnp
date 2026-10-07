@@ -1,0 +1,6 @@
+0M-SEARCH * HTTP/1.1
+HOST: 239.255.255.250:1900
+MAN: "ssdp:discover"
+MX: 2000000000
+ST: urn:schemas-upnp-org:device:tvdevice:1
+

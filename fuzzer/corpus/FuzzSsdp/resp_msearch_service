@@ -1,0 +1,8 @@
+1HTTP/1.1 200 OK
+CACHE-CONTROL: max-age=1800
+EXT:
+LOCATION: http://192.168.1.10:49152/desc.xml
+SERVER: Linux/5.15 UPnP/1.0 test/1.0
+ST: urn:schemas-upnp-org:service:ContentDirectory:1
+USN: uuid:0b2c7d4e-1111-2222-3333-444455556666::urn:schemas-upnp-org:service:ContentDirectory:1
+

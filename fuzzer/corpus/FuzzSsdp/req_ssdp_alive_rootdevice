@@ -1,0 +1,11 @@
+0NOTIFY * HTTP/1.1
+HOST: 239.255.255.250:1900
+CACHE-CONTROL: max-age = 100
+LOCATION: http://192.168.1.10:49152/tvdevicedesc.xml
+NT: upnp:rootdevice
+NTS: ssdp:alive
+SERVER: Linux/5.15 UPnP/1.0 Portable SDK for UPnP devices/1.14
+USN: uuid:Upnp-TVEmulator-1_0-1234567890001::upnp:rootdevice
+BOOTID.UPNP.ORG: 1
+CONFIGID.UPNP.ORG: 1
+

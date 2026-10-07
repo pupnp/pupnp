@@ -1,0 +1,8 @@
+0NOTIFY * HTTP/1.1
+HOST: 239.255.255.250:1900
+CACHE-CONTROL: max-age=1800
+LOCATION: http://192.168.1.10:49152/tvdevicedesc.xml
+NT: urn:schemas-upnp-org:service:tvcontrol:1
+NTS: ssdp:alive
+USN: uuid:Upnp-TVEmulator-1_0-1234567890001::urn:schemas-upnp-org:service:tvcontrol:1
+
