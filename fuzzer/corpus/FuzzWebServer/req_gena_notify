@@ -1,0 +1,11 @@
+NOTIFY /notify HTTP/1.1
+HOST: 192.168.1.30:5000
+CONTENT-TYPE: text/xml; charset="utf-8"
+CONTENT-LENGTH: 225
+NT: upnp:event
+NTS: upnp:propchange
+SID: uuid:6a3f1c2e-0b7d-41ee-9c55-3f1b2a4d5e61
+SEQ: 0
+
+<?xml version="1.0"?>
+<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0"><e:property><Power>1</Power></e:property><e:property><Channel>5</Channel></e:property><e:property><Volume>10</Volume></e:property></e:propertyset>

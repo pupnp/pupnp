@@ -7,6 +7,7 @@ add_executable(FuzzServiceTable FuzzServiceTable.c)
 add_executable(FuzzIxmlDom FuzzIxmlDom.c)
 add_executable(FuzzIxmlOps FuzzIxmlOps.c)
 add_executable(FuzzSsdp FuzzSsdp.c)
+add_executable(FuzzWebServer FuzzWebServer.c)
 
 # OSS-Fuzz takes <target>.dict and <target>.options from beside the binary, and
 # its build.sh only copies Fuzz* from this build directory: put them here.
@@ -29,3 +30,5 @@ target_link_libraries(FuzzIxmlDom ixml_static ${LIB_FUZZING_ENGINE})
 target_link_libraries(FuzzIxmlOps ixml_static ${LIB_FUZZING_ENGINE})
 target_include_directories(FuzzSsdp PRIVATE ${CMAKE_SOURCE_DIR}/upnp/src/threadutil)
 target_link_libraries(FuzzSsdp upnp_static ${LIB_FUZZING_ENGINE})
+target_include_directories(FuzzWebServer PRIVATE ${CMAKE_SOURCE_DIR}/upnp/src/threadutil)
+target_link_libraries(FuzzWebServer upnp_static ${LIB_FUZZING_ENGINE})
