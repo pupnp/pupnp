@@ -45,6 +45,10 @@ Version 22.1.9
   web server to a Range request that cannot be satisfied (RFC 7233, section
   4.4), so that the client learns the length of the file. Nothing changes when
   the length is not known.
+- PR #661: Add the FuzzWebServer fuzzer, which parses its input as an HTTP
+  request and dispatches it the way the miniserver does, to the web server,
+  SOAP and GENA handlers. It comes with a dictionary, an options file and a
+  seed corpus.
 - PR #662: Add the FuzzSsdp fuzzer, which parses its input as an SSDP datagram
   (a request or an M-SEARCH reply) and runs the device request handler and the
   header parsers of the control point handler on it. It comes with a
