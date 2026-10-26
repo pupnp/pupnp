@@ -1093,6 +1093,129 @@ TEST_F(GhsaV5wvStreamTestSuite, RejectsOversizedTrailerBlockWhenStreaming)
 	EXPECT_GT(Unread(), 0);
 }
 
+// The Host header of a client request was copied from the raw URL string, up
+// to the first '/' after "//", while the connection used the parsed host and
+// port. Anything after the port, CR and LF included, went into the request.
+// Such URLs come from devices: the LOCATION header of an SSDP message or the
+// URLs of a description document.
+class HostHeaderTestSuite : public ::testing::Test
+{
+protected:
+	int listen_fd_{-1};
+	sockaddr_in addr_{};
+	std::string request_;
+	std::thread server_;
+
+	void SetUp() override
+	{
+		listen_fd_ = socket(AF_INET, SOCK_STREAM, 0);
+		ASSERT_GE(listen_fd_, 0);
+		addr_.sin_family = AF_INET;
+		addr_.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+		ASSERT_EQ(bind(listen_fd_,
+				  reinterpret_cast<sockaddr *>(&addr_),
+				  sizeof(addr_)),
+			0);
+		ASSERT_EQ(listen(listen_fd_, 1), 0);
+		socklen_t len = sizeof(addr_);
+		ASSERT_EQ(getsockname(listen_fd_,
+				  reinterpret_cast<sockaddr *>(&addr_),
+				  &len),
+			0);
+		server_ = std::thread([this] {
+			int fd = accept(listen_fd_, nullptr, nullptr);
+			if (fd < 0)
+				return;
+			char buf[1024];
+			pollfd pfd{fd, POLLIN, 0};
+			while (request_.find("\r\n\r\n") == std::string::npos &&
+				poll(&pfd, 1, 2000) > 0) {
+				ssize_t n = read(fd, buf, sizeof(buf));
+				if (n <= 0)
+					break;
+				request_.append(buf, (size_t)n);
+			}
+			static const char resp[] = "HTTP/1.1 404 Not Found\r\n"
+						   "Content-Length: 0\r\n"
+						   "\r\n";
+			(void)write(fd, resp, sizeof(resp) - 1);
+			close(fd);
+		});
+	}
+
+	void TearDown() override
+	{
+		if (server_.joinable())
+			server_.join();
+		if (listen_fd_ >= 0)
+			close(listen_fd_);
+	}
+
+	std::string HostPort()
+	{
+		return "127.0.0.1:" + std::to_string(ntohs(addr_.sin_port));
+	}
+
+	std::string Url()
+	{
+		return "http://" + HostPort() + "\r\nX-Injected: 1\r\n/x";
+	}
+
+	void ExpectHostHeader()
+	{
+		server_.join();
+		EXPECT_NE(request_.find("\r\nHost: " + HostPort() + "\r\n"),
+			std::string::npos)
+			<< request_;
+		EXPECT_EQ(request_.find("X-Injected"), std::string::npos)
+			<< request_;
+	}
+};
+
+TEST_F(HostHeaderTestSuite, DownloadUsesParsedHost)
+{
+	char *doc = nullptr;
+	size_t doc_length = 0;
+	(void)http_Download(Url().c_str(), 5, &doc, &doc_length, nullptr);
+	free(doc);
+	ExpectHostHeader();
+}
+
+TEST_F(HostHeaderTestSuite, OpenHttpGetExUsesParsedHost)
+{
+	void *handle = nullptr;
+	char *content_type = nullptr;
+	int content_length = 0;
+	int status = 0;
+	int ret = http_OpenHttpGetEx(Url().c_str(),
+		&handle,
+		&content_type,
+		&content_length,
+		&status,
+		0,
+		0,
+		5);
+	if (ret == UPNP_E_SUCCESS)
+		http_CloseHttpConnection(handle);
+	ExpectHostHeader();
+}
+
+TEST_F(HostHeaderTestSuite, MakeHttpRequestUsesParsedHost)
+{
+	void *handle = nullptr;
+	ASSERT_EQ(http_OpenHttpConnection(Url().c_str(), &handle, 5),
+		UPNP_E_SUCCESS);
+	(void)http_MakeHttpRequest(UPNP_HTTPMETHOD_GET,
+		Url().c_str(),
+		handle,
+		nullptr,
+		nullptr,
+		0,
+		5);
+	http_CloseHttpConnection(handle);
+	ExpectHostHeader();
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
