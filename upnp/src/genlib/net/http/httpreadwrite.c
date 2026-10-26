@@ -191,32 +191,6 @@ static int private_connect(
 #endif /* UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS */
 }
 
-static int get_hoststr(
-	const char *url_str, const char **hoststr, size_t *hostlen)
-{
-	const char *start;
-	const char *finish;
-	int ret_code = UPNP_E_INVALID_URL;
-
-	start = strstr(url_str, "//");
-	if (!start) {
-		goto end_function;
-	}
-	start += 2;
-	finish = strchr(start, '/');
-	if (finish) {
-		*hostlen = (size_t)(finish - start);
-	} else {
-		*hostlen = strlen(start);
-	}
-	*hoststr = start;
-
-	ret_code = UPNP_E_SUCCESS;
-
-end_function:
-	return ret_code;
-}
-
 static void copy_msg_headers(LinkedList *msgHeaders, UpnpString *headers)
 {
 	(void)msgHeaders;
@@ -939,10 +913,8 @@ int http_Download(const char *url_str,
 	}
 	/* make msg */
 	membuffer_init(&request);
-	ret_code = get_hoststr(url_str, &hoststr, &hostlen);
-	if (ret_code != UPNP_E_SUCCESS) {
-		return ret_code;
-	}
+	hoststr = url.hostport.text.buff;
+	hostlen = url.hostport.text.size;
 	UpnpPrintf(UPNP_INFO,
 		HTTP,
 		__FILE__,
@@ -1110,9 +1082,8 @@ int MakeGenericMessage(http_method_t method,
 				"s",
 				UpnpString_get_String(headers));
 		} else {
-			ret_code = get_hoststr(url_str, &hoststr, &hostlen);
-			if (ret_code != UPNP_E_SUCCESS)
-				return ret_code;
+			hoststr = url->hostport.text.buff;
+			hostlen = url->hostport.text.size;
 			UpnpPrintf(UPNP_INFO,
 				HTTP,
 				__FILE__,
@@ -2168,10 +2139,8 @@ int MakeGetMessageEx(const char *url_str,
 		}
 		/* make msg */
 		membuffer_init(request);
-		ret_code = get_hoststr(url_str, &hoststr, &hostlen);
-		if (ret_code != UPNP_E_SUCCESS) {
-			break;
-		}
+		hoststr = url->hostport.text.buff;
+		hostlen = url->hostport.text.size;
 		UpnpPrintf(UPNP_INFO,
 			HTTP,
 			__FILE__,
