@@ -510,6 +510,25 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# GHSA-4pw9-q67x-hfc3: an "HTTP/1.1 0 OK" response made http_Download()
+# return 0 (success) without writing *document, so UpnpDownloadXmlDoc()
+# parsed and freed an uninitialised pointer.
+UPNP_Add_Unit_Test(test-upnp-ghsa-4pw9 poc_ghsa_4pw9_status_zero.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-ghsa-4pw9 PRIVATE
+		Threads::Threads
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-ghsa-4pw9-static PRIVATE
+		Threads::Threads
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # process_request() leaked a reference on the alias document for requests
 # that were not answered from it, so an uninstalled alias kept being served.
 UPNP_Add_Unit_Test(test-upnp-webserver-alias-leak test_webserver_alias_leak.c)
