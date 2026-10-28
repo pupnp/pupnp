@@ -21,6 +21,12 @@
  * On Windows a colon in a path names a drive or an NTFS alternate data
  * stream, so the test also requests a stream of the file in the root and
  * its default data stream, and neither may be served.
+ *
+ * GHSA-gjgg-q6hf-2x3j: the checks above stopped at the first '?' or '#' of
+ * the decoded path, but the whole path was opened. A '#' sent as %23 (or a
+ * '?') followed by "..", a backslash or a colon got past them. Windows
+ * resolves "x#\..\.." without "x#" existing; elsewhere it must be a
+ * directory, so the test creates one.
  */
 
 #include "upnp.h"
@@ -172,6 +178,10 @@ int main(void)
 	char root[1200];
 	char docroot[1300];
 	char sub[1400];
+	char hash_dir[1400];
+#ifndef _WIN32
+	char query_dir[1400];
+#endif
 	char inside[1400];
 	char secret[1300];
 #ifdef _WIN32
@@ -187,11 +197,19 @@ int main(void)
 	snprintf(root, sizeof root, "%s/" TEST_DIR, cwd);
 	snprintf(docroot, sizeof docroot, "%s/docroot", root);
 	snprintf(sub, sizeof sub, "%s/sub", docroot);
+	snprintf(hash_dir, sizeof hash_dir, "%s/x#", docroot);
+#ifndef _WIN32
+	snprintf(query_dir, sizeof query_dir, "%s/x?", docroot);
+#endif
 	snprintf(inside, sizeof inside, "%s/inside.txt", docroot);
 	snprintf(secret, sizeof secret, "%s/secret.txt", root);
 	make_dir(root);
 	make_dir(docroot);
 	make_dir(sub);
+	make_dir(hash_dir);
+#ifndef _WIN32
+	make_dir(query_dir);
+#endif
 #ifdef _WIN32
 	/* A named stream of the file in the document root. */
 	snprintf(stream, sizeof stream, "%s:stream", inside);
@@ -242,10 +260,18 @@ int main(void)
 	err |= check_blocked(ip, port, "/%2e%2e%5csecret.txt");
 	err |= check_blocked(ip, port, "/sub%5c..%5c..%5csecret.txt");
 	err |= check_blocked(ip, port, "/sub/..%5c..%5csecret.txt");
+	/* GHSA-gjgg-q6hf-2x3j: the same after a decoded '#'. */
+	err |= check_blocked(ip, port, "/x%23/../../secret.txt");
+	err |= check_blocked(ip, port, "/x%23%5c..%5c..%5csecret.txt");
+	/* And after a '?', literal or decoded. Windows cannot create "x?" but
+	 * does not need it. */
+	err |= check_blocked(ip, port, "/x?/../../secret.txt");
+	err |= check_blocked(ip, port, "/x%3f/../../secret.txt");
 #ifdef _WIN32
 	/* Alternate data streams of a file in the root. */
 	err |= check_blocked(ip, port, "/inside.txt:stream");
 	err |= check_blocked(ip, port, "/inside.txt::$DATA");
+	err |= check_blocked(ip, port, "/x%23/../inside.txt:stream");
 #endif
 
 finish:
@@ -254,6 +280,10 @@ cleanup:
 	remove_file(inside);
 	remove_file(secret);
 	remove_dir(sub);
+	remove_dir(hash_dir);
+#ifndef _WIN32
+	remove_dir(query_dir);
+#endif
 	remove_dir(docroot);
 	remove_dir(root);
 	if (err > 0) {
