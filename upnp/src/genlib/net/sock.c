@@ -297,9 +297,13 @@ static int sock_read_write(SOCKINFO *info,
 #endif
 	if (numBytes < 0)
 		return UPNP_E_SOCKET_ERROR;
-	/* subtract time used for reading/writing. */
-	if (*timeoutSecs != 0)
+	/* subtract time used for reading/writing. A negative value means
+	 * "no timeout", so a positive budget must not go below zero. */
+	if (*timeoutSecs > 0) {
 		*timeoutSecs -= (int)(time(NULL) - start_time);
+		if (*timeoutSecs < 0)
+			*timeoutSecs = 0;
+	}
 
 	return (int)numBytes;
 }
