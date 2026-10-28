@@ -1172,6 +1172,11 @@ static int create_url_list(
 	out->URLs = NULL;
 	out->parsedURLs = NULL;
 
+	/* copy_URL_list() sizes the copy with strlen(), so a NUL would leave
+	 * the parsed URLs pointing past the copied buffer. */
+	if (memchr(URLS->buff, '\0', URLS->size) != NULL)
+		return 0;
+
 	for (i = 0; i < URLS->size; i++) {
 		if ((URLS->buff[i] == '<') && (i + 1 < URLS->size)) {
 			if (((return_code = parse_uri(&URLS->buff[i + 1],
