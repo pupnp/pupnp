@@ -2,6 +2,25 @@
 Version 22.1.9
 *******************************************************************************
 
+- GHSA-4pw9-q67x-hfc3: Reject an HTTP response whose status code is not three
+  digits. A device that answered a description request with status 0 made
+  UpnpDownloadUrlItem() report success without setting the buffer, and
+  UpnpDownloadXmlDoc() then parsed and freed an uninitialised pointer.
+- GHSA-323w-xv8r-6g77: Fix denial of service of the miniserver worker threads.
+  The receive timeout of a request was charged in whole seconds and could go
+  below zero, which the next wait took as no timeout, so a client that timed
+  one byte just after the deadline held a worker for as long as it liked. A
+  positive timeout now stops at zero.
+- GHSA-9mqx-m85r-46wh: Fix a heap over-read when sending a GENA event. A NUL
+  byte in the Callback header of a SUBSCRIBE was kept in the delivery URL
+  list, and the copy made for each notification was shorter than the URLs
+  that pointed into it. Such a Callback header is now rejected with 412.
+- GHSA-gjgg-q6hf-2x3j: Fix a path traversal in the web server. The checks on a
+  request path stopped at the first '?' or '#', a decoded %23 or %3f included,
+  but the whole path was opened, so "..", a backslash or a colon after it led
+  out of the document root (CWE-22). On Windows a literal '?' was enough; on
+  other systems the document root needed a directory with '?' or '#' in its
+  name. Only the checked part of the path is opened now.
 - PR #651: Fix a corrupted attribute list when ixmlElement_setAttributeNode()
   or ixmlElement_setAttributeNodeNS() was called with an attribute the element
   already owned and the lookup did not return that same attribute. An
