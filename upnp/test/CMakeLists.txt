@@ -529,6 +529,23 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# GHSA-9mqx-m85r-46wh: a NUL byte in the CALLBACK header of a SUBSCRIBE was
+# kept in the delivery URL list, whose copy for a notification was sized with
+# strlen(), so the copied URL tokens pointed past the allocation.
+UPNP_Add_Unit_Test(test-upnp-ghsa-9mqx poc_ghsa_9mqx_callback_nul.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-ghsa-9mqx PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-ghsa-9mqx-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # process_request() leaked a reference on the alias document for requests
 # that were not answered from it, so an uninstalled alias kept being served.
 UPNP_Add_Unit_Test(test-upnp-webserver-alias-leak test_webserver_alias_leak.c)
