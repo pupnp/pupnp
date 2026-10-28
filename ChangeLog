@@ -58,6 +58,12 @@ Version 22.1.9
   never left the source tree; CMake now copies them there. The CIFuzz workflow
   fails when one of them is missing from the build output, and also runs once
   a month, since that script is not in this repository.
+- PR #664: Take the Host header of client requests from the parsed URL.
+  http_Download(), MakeGetMessageEx() and MakeGenericMessage() copied it from
+  the URL string, from "//" up to the next '/', while the connection used the
+  host and port parsed by parse_uri(). A URL announced by a device (an SSDP
+  LOCATION or a URL in a description document) with CR and LF after the port
+  added header lines to the request and could end the header block early.
 
 
 *******************************************************************************
