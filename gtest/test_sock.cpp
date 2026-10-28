@@ -13,6 +13,10 @@ extern "C" {
 #include "sock.h"
 }
 
+#include <chrono>
+#include <thread>
+#include <vector>
+
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -63,6 +67,32 @@ TEST_F(Issue395TestSuite, sock_write_data_received_intact)
 	ssize_t n = recv(sv[1], buf, sizeof(buf), 0);
 	ASSERT_EQ(n, (ssize_t)(sizeof(msg) - 1));
 	EXPECT_STREQ(buf, "hello");
+}
+
+// regression: GHSA-323w-xv8r-6g77
+// sock_read_write() subtracted the elapsed whole seconds from *timeoutSecs
+// without clamping, so a positive budget could become negative, which the
+// next call treats as "no timeout" and poll() waits forever.  A blocking
+// send() to a slow reader takes longer than the budget and overcharges it.
+TEST_F(Issue395TestSuite, ghsa_323w_budget_never_goes_negative)
+{
+	SOCKINFO info{};
+	info.socket = sv[0];
+	int timeout = 1;
+	std::vector<char> big(4 * 1024 * 1024, 'x');
+
+	std::thread reader([this] {
+		char buf[65536];
+		std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+		while (recv(sv[1], buf, sizeof(buf), 0) > 0) {
+		}
+	});
+	int rc = sock_write(&info, big.data(), big.size(), &timeout);
+	shutdown(sv[0], SHUT_WR);
+	reader.join();
+
+	ASSERT_EQ(rc, (int)big.size());
+	EXPECT_GE(timeout, 0);
 }
 
 int main(int argc, char **argv)
