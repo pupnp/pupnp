@@ -1411,6 +1411,9 @@ static int process_request(
 		if (gDocumentRootDir.length == 0) {
 			goto error_handler;
 		}
+		/* The checks above stop at the first '?' or '#', a decoded one
+		 * included: open only the part they checked. */
+		request_doc[strcspn(request_doc, "?#")] = '\0';
 	#ifdef _WIN32
 		/* The path is mapped onto the file system: a colon names a
 		 * drive or an NTFS alternate data stream, which a request must
