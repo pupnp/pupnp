@@ -1450,8 +1450,11 @@ parse_status_t parser_parse_responseline(http_parser_t *parser)
 		&h_msg->minor_version,
 		&h_msg->status_code);
 	line.buf[line.length] = save_char; /* restore */
+	/* status-code is 3DIGIT (RFC 9112); 0 would also collide with
+	 * UPNP_E_SUCCESS in http_Download(). */
 	if (num_scanned != 3 || h_msg->major_version < 0 ||
-		h_msg->minor_version < 0 || h_msg->status_code < 0)
+		h_msg->minor_version < 0 || h_msg->status_code < 100 ||
+		h_msg->status_code > 999)
 		/* bad response line */
 		return PARSE_FAILURE;
 	/* point to status msg */
