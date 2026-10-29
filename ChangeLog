@@ -2,6 +2,13 @@
 Version 22.1.10
 *******************************************************************************
 
+- PR #665: Reject CR and LF in the service type of a SOAP action.
+  SoapSendAction() and SoapSendActionEx() wrote the service type into the
+  SOAPAction header as given. A control point takes it from the serviceType
+  of a description document served by a device, where "&#13;&#10;" decodes to
+  CR LF, so a device could add header lines to the request it sent to the
+  controlURL or end the header block early. UpnpSendAction(),
+  UpnpSendActionEx() and the async variants now return UPNP_E_INVALID_PARAM.
 
 
 *******************************************************************************
