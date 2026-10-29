@@ -156,3 +156,25 @@ if (NOT WIN32 AND UPNP_BUILD_STATIC)
 		TEST_SUFFIX -static
 	)
 endif()
+
+# regression test — SoapSendAction() and SoapSendActionEx() must not write
+# CR or LF from the service type into the SOAPAction header; they are internal
+# symbols so only the static variant is built.
+if (NOT WIN32 AND UPNP_BUILD_STATIC)
+	add_executable(test_soap_ctrlpt-static test_soap_ctrlpt.cpp)
+	target_link_libraries(test_soap_ctrlpt-static PRIVATE upnp_static GTest::gtest)
+	target_include_directories(test_soap_ctrlpt-static PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/inc/
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/threadutil/
+	)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test_soap_ctrlpt-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+		)
+	endif()
+	gtest_add_tests(
+		TARGET test_soap_ctrlpt-static
+		TEST_PREFIX test-upnp-
+		TEST_SUFFIX -static
+	)
+endif()

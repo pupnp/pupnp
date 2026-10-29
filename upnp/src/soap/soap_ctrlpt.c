@@ -559,6 +559,12 @@ int SoapSendAction(char *action_url,
 	membuffer_init(&request);
 	membuffer_init(&responsename);
 
+	/* the service type goes into the SOAPAction header line */
+	if (strpbrk(service_type, "\r\n") != NULL) {
+		err_code = UPNP_E_INVALID_PARAM;
+		goto error_handler;
+	}
+
 	/* print action */
 	action_str = ixmlPrintNode((IXML_Node *)action_node);
 	if (action_str == NULL) {
@@ -730,6 +736,12 @@ int SoapSendActionEx(char *action_url,
 	/* init */
 	membuffer_init(&request);
 	membuffer_init(&responsename);
+
+	/* the service type goes into the SOAPAction header line */
+	if (strpbrk(service_type, "\r\n") != NULL) {
+		err_code = UPNP_E_INVALID_PARAM;
+		goto error_handler;
+	}
 
 	/* header string */
 	xml_header_str = ixmlPrintNode((IXML_Node *)header);
