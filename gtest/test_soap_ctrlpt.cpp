@@ -24,6 +24,7 @@ class SoapActionHeaderTestSuite : public ::testing::Test
 {
 protected:
 	int listen_fd_{-1};
+	int wake_[2]{-1, -1};
 	sockaddr_in addr_{};
 	std::string request_;
 	std::thread server_;
@@ -52,10 +53,14 @@ protected:
 		ASSERT_EQ(ixmlParseBufferEx("<h:Hdr xmlns:h=\"urn:x\"></h:Hdr>",
 				  &header_),
 			IXML_SUCCESS);
+		ASSERT_EQ(pipe(wake_), 0);
 		server_ = std::thread([this] {
-			// Nothing connects when the request is refused.
-			pollfd lpfd{listen_fd_, POLLIN, 0};
-			if (poll(&lpfd, 1, 2000) <= 0)
+			// Nothing connects when the request is refused, so
+			// StopServer() wakes the thread through the pipe.
+			pollfd lpfd[2]{
+				{listen_fd_, POLLIN, 0}, {wake_[0], POLLIN, 0}};
+			if (poll(lpfd, 2, 2000) <= 0 ||
+				!(lpfd[0].revents & POLLIN))
 				return;
 			int fd = accept(listen_fd_, nullptr, nullptr);
 			if (fd < 0)
@@ -79,10 +84,13 @@ protected:
 
 	void TearDown() override
 	{
-		if (server_.joinable())
-			server_.join();
+		StopServer();
 		if (listen_fd_ >= 0)
 			close(listen_fd_);
+		if (wake_[0] >= 0)
+			close(wake_[0]);
+		if (wake_[1] >= 0)
+			close(wake_[1]);
 		ixmlDocument_free(action_);
 		ixmlDocument_free(header_);
 	}
@@ -93,9 +101,17 @@ protected:
 		       std::to_string(ntohs(addr_.sin_port)) + "/ctl";
 	}
 
+	void StopServer()
+	{
+		if (!server_.joinable())
+			return;
+		(void)write(wake_[1], "", 1);
+		server_.join();
+	}
+
 	void ExpectNoInjectedHeader()
 	{
-		server_.join();
+		StopServer();
 		EXPECT_EQ(request_.find("X-Injected"), std::string::npos)
 			<< request_;
 	}
