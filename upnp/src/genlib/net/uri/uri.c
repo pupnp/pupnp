@@ -110,7 +110,7 @@ int is_unreserved(
 	/*! [in] Char to be matched for UNRESERVED characters. */
 	char in)
 {
-	if (isalnum(in) || is_mark(in)) {
+	if (isalnum((unsigned char)in) || is_mark(in)) {
 		return 1;
 	} else {
 		return 0;
@@ -129,7 +129,8 @@ int is_escaped(
 	/*! [in] Char sequence to be matched for ESCAPED characters. */
 	const char *in)
 {
-	if (in[0] == '%' && isxdigit(in[1]) && isxdigit(in[2])) {
+	if (in[0] == '%' && isxdigit((unsigned char)in[1]) &&
+		isxdigit((unsigned char)in[2])) {
 		return 1;
 	} else {
 		return 0;
@@ -143,8 +144,9 @@ int replace_escaped(char *in, size_t index, size_t *max)
 	size_t i = (size_t)0;
 	size_t j = (size_t)0;
 
-	if (in[index] == '%' && isxdigit(in[index + (size_t)1]) &&
-		isxdigit(in[index + (size_t)2])) {
+	if (in[index] == '%' &&
+		isxdigit((unsigned char)in[index + (size_t)1]) &&
+		isxdigit((unsigned char)in[index + (size_t)2])) {
 		/* Note the "%2x", makes sure that we convert a maximum of two
 		 * characters. */
 #ifdef _WIN32
@@ -364,7 +366,8 @@ static int parse_hostport(
 		/* IPv4 address -OR- host name. */
 		srv_name = c;
 		while (*c != ':' && *c != '/' &&
-			(isalnum(*c) || *c == '.' || *c == '-')) {
+			(isalnum((unsigned char)*c) || *c == '.' ||
+				*c == '-')) {
 			if (*c == '.')
 				last_dot = c;
 			c++;
@@ -374,7 +377,7 @@ static int parse_hostport(
 		*c = '\0';
 		if (has_port == 1)
 			c++;
-		if (last_dot != NULL && isdigit(*(last_dot + 1)))
+		if (last_dot != NULL && isdigit((unsigned char)*(last_dot + 1)))
 			/* Must be an IPv4 address. */
 			af = AF_INET;
 		/* Otherwise it's a host name: leave IPaddress unresolved
@@ -388,7 +391,7 @@ static int parse_hostport(
 	if (has_port == 1) {
 		/* Port is specified. */
 		srv_port = c;
-		while (*c != '\0' && isdigit(*c)) {
+		while (*c != '\0' && isdigit((unsigned char)*c)) {
 			c++;
 		}
 		long port_l = strtol(srv_port, NULL, 10);
@@ -513,13 +516,13 @@ static size_t parse_scheme(
 	out->size = (size_t)0;
 	out->buff = NULL;
 
-	if ((max == (size_t)0) || (!isalpha(in[0])))
+	if ((max == (size_t)0) || (!isalpha((unsigned char)in[0])))
 		return (size_t)0;
 
 	i++;
 	while ((i < max) && (in[i] != ':')) {
-		if (!(isalnum(in[i]) || (in[i] == '+') || (in[i] == '-') ||
-			    (in[i] == '.')))
+		if (!(isalnum((unsigned char)in[i]) || (in[i] == '+') ||
+			    (in[i] == '-') || (in[i] == '.')))
 			return (size_t)0;
 		i++;
 	}

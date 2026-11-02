@@ -758,7 +758,7 @@ static void ToUpperCase(
 	char *s)
 {
 	while (*s) {
-		*s = (char)toupper(*s);
+		*s = (char)toupper((unsigned char)*s);
 		++s;
 	}
 }
@@ -865,7 +865,7 @@ static int GetNextRange(
 		for (i = 0; i < (int)strlen(Tok); i++) {
 			if (Tok[i] == '-') {
 				break;
-			} else if (isdigit(Tok[i])) {
+			} else if (isdigit((unsigned char)Tok[i])) {
 				Is_Suffix_byte_Range = 0;
 				break;
 			}

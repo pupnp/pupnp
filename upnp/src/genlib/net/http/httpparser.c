@@ -919,8 +919,10 @@ static UPNP_INLINE parse_status_t match_char(
 	if (case_sensitive) {
 		return c == scan_char ? PARSE_OK : PARSE_NO_MATCH;
 	} else {
-		return tolower(c) == tolower(scan_char) ? PARSE_OK
-							: PARSE_NO_MATCH;
+		return tolower((unsigned char)c) ==
+				       tolower((unsigned char)scan_char)
+			       ? PARSE_OK
+			       : PARSE_NO_MATCH;
 	}
 }
 
@@ -1462,10 +1464,10 @@ parse_status_t parser_parse_responseline(http_parser_t *parser)
 	/* skip 3 ints */
 	for (i = 0; i < 3; i++) {
 		/* go to start of num */
-		while (!isdigit(*p))
+		while (!isdigit((unsigned char)*p))
 			p++;
 		/* skip int */
-		while (isdigit(*p))
+		while (isdigit((unsigned char)*p))
 			p++;
 	}
 	/* whitespace must exist after status code */
@@ -2339,7 +2341,8 @@ int raw_find_str(memptr *raw_value, const char *str)
 
 	/* Make it lowercase */
 	for (i = 0; raw_value->buf[i]; ++i) {
-		raw_value->buf[i] = (char)tolower(raw_value->buf[i]);
+		raw_value->buf[i] =
+			(char)tolower((unsigned char)raw_value->buf[i]);
 	}
 
 	/* null-terminate */
