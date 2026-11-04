@@ -2,6 +2,11 @@
 Version 22.2.1
 *******************************************************************************
 
+- PR #673: Use SSL_set1_dnsname() instead of SSL_set1_host() on OpenSSL 4,
+  which deprecates the old function; the macOS CI job warned about it in
+  sock_ssl_connect(). Older OpenSSL versions still use SSL_set1_host(),
+  and the IP address check is unchanged.
+
 - PR #672: Keep the GHSA-323w socket test from hanging. It writes 4 MB with
   a blocking send() to a reader that starts late, and once hung on macOS
   until ctest killed it. The writing end now has a send timeout and the
