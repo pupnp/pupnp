@@ -2,6 +2,24 @@
 Version 22.2.1
 *******************************************************************************
 
+- PR #670: Call the thread pool jobs and free functions through their own
+  type. RunMiniServer(), UpnpThreadDistribution(), free_advertise_arg() and
+  free_action_arg() took a typed pointer and were registered with a cast to
+  void (*)(void *), which is undefined behaviour (C11 6.3.2.3p8); clang's
+  -fsanitize=function aborted as soon as UpnpInit2() started the
+  miniserver. They now take void *, and the casts are gone, so the
+  compiler checks the types again.
+
+- PR #669: Accept a loopback interface named explicitly in UpnpInit2().
+  UpnpGetIfInfo() skipped loopback interfaces even when the caller named
+  one, so UpnpInit2("lo", 0) failed with UPNP_E_INVALID_INTERFACE. Loopback
+  is still skipped when the interface is chosen automatically; when named,
+  the stack serves local clients only.
+
+- PR #668: Remove the dead UPNP_ENABLE_POST_WRITE code. It was never
+  enabled by the build, so a POST reaches only a virtual directory, as
+  before; a test now checks it.
+
 - PR #667: Reject a NUL or a bare CR in an HTTP header field value
   (RFC 9110, section 5.5). The parser kept them in the value, and even
   classified NUL as a separator because strchr() matches the terminator of
