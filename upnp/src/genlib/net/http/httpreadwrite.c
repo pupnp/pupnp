@@ -285,6 +285,10 @@ SOCKET http_Connect(uri_type *destination_url, uri_type *url)
 	char errorBuffer[ERROR_BUFFER_LEN];
 
 	http_FixUrl(destination_url, url);
+	/* No TLS on this path: never send an https request in clear. */
+	if (token_string_casecmp(&url->scheme, "https") == 0) {
+		return (SOCKET)(UPNP_E_INVALID_URL);
+	}
 
 	http_socket =
 		socket((int)url->hostport.IPaddress.ss_family, SOCK_STREAM, 0);
@@ -820,6 +824,11 @@ int http_RequestAndResponse(uri_type *destination,
 	int http_error_code;
 	SOCKINFO info;
 
+	/* No TLS on this path: never send an https request in clear. */
+	if (token_string_casecmp(&destination->scheme, "https") == 0) {
+		parser_response_init(response, req_method);
+		return UPNP_E_INVALID_URL;
+	}
 	tcp_connection = socket(
 		(int)destination->hostport.IPaddress.ss_family, SOCK_STREAM, 0);
 	if (tcp_connection == INVALID_SOCKET) {
