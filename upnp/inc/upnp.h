@@ -555,6 +555,13 @@ UPNP_EXPORT_SPEC int UpnpInit2(
  * \brief Initializes the OpenSSL library, and the OpenSSL context for use
  * with pupnp
  *
+ * The context authenticates HTTPS servers: it uses \c SSL_VERIFY_PEER with
+ * the system's default trust store, and every connection checks that the
+ * server certificate matches the host of the URL (DNS name or IP address).
+ * A server with a self-signed or otherwise untrusted certificate is
+ * rejected. To trust it, add its certificate or CA to the context returned by
+ * UpnpGetSslCtx() (e.g. with \c SSL_CTX_load_verify_locations()).
+ *
  * \note This method is only enabled if pupnp is compiled with open-ssl support.
  *
  * \return An integer representing one of the following:
@@ -580,6 +587,11 @@ UPNP_EXPORT_SPEC int UpnpInitSslContext(
  * Allows the application to configure the context after
  * UpnpInitSslContext() has created it (e.g. load certificates and keys).
  *
+ * pupnp honors the verify mode of the context. Setting \c SSL_VERIFY_NONE
+ * with \c SSL_CTX_set_verify() disables server authentication, including
+ * the host name check, and exposes HTTPS connections to man-in-the-middle
+ * attacks.
+ *
  * \note This method is only enabled if pupnp is compiled with open-ssl support.
  *
  * \return The SSL_CTX pointer, or NULL if not yet initialized.
@@ -597,6 +609,13 @@ UPNP_EXPORT_SPEC SSL_CTX *UpnpGetSslCtx(void);
  *
  * When \b ctx is NULL, the current context is freed and cleared so that
  * a new one can be set.
+ *
+ * pupnp uses \b ctx as given and honors its verify mode. A context from
+ * \c SSL_CTX_new() does not verify the server (\c SSL_VERIFY_NONE); call
+ * \c SSL_CTX_set_verify() with \c SSL_VERIFY_PEER and load a trust store
+ * (e.g. \c SSL_CTX_set_default_verify_paths()) to authenticate HTTPS servers.
+ * With \c SSL_VERIFY_PEER, the server certificate must also match the host
+ * of the URL.
  *
  * \note This method is only enabled if pupnp is compiled with open-ssl support.
  *

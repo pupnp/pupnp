@@ -622,6 +622,13 @@ int UpnpInitSslContext(int initOpenSslLib, const SSL_METHOD *sslMethod)
 	if (!gSslCtx) {
 		return UPNP_E_INIT_FAILED;
 	}
+	/* Authenticate the server against the system trust store. */
+	SSL_CTX_set_verify(gSslCtx, SSL_VERIFY_PEER, NULL);
+	if (SSL_CTX_set_default_verify_paths(gSslCtx) != 1) {
+		SSL_CTX_free(gSslCtx);
+		gSslCtx = NULL;
+		return UPNP_E_INIT_FAILED;
+	}
 	return UPNP_E_SUCCESS;
 }
 

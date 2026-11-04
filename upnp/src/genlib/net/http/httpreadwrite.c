@@ -1323,6 +1323,36 @@ int http_CancelHttpGet(void *Handle)
 	return UPNP_E_SUCCESS;
 }
 
+#ifdef UPNP_ENABLE_OPEN_SSL
+/*!
+ * \brief Copies the host of a "host[:port]" or "[v6]:port" token, without
+ * port or brackets, as a NUL-terminated string.
+ *
+ * \return 0 on success, -1 if the host is empty or does not fit.
+ */
+static int get_tls_host(const token *hostport, char *host, size_t size)
+{
+	const char *p = hostport->buff;
+	size_t len = hostport->size;
+	size_t n = 0;
+
+	if (len > 0 && p[0] == '[') {
+		p++;
+		len--;
+		while (n < len && p[n] != ']')
+			n++;
+	} else {
+		while (n < len && p[n] != ':')
+			n++;
+	}
+	if (n == 0 || n >= size)
+		return -1;
+	memcpy(host, p, n);
+	host[n] = '\0';
+	return 0;
+}
+#endif
+
 int http_OpenHttpConnection(const char *url_str, void **Handle, int timeout)
 {
 	int ret_code;
@@ -1371,7 +1401,13 @@ int http_OpenHttpConnection(const char *url_str, void **Handle, int timeout)
 #ifdef UPNP_ENABLE_OPEN_SSL
 	/* For HTTPS connections start the TLS/SSL handshake. */
 	if (token_string_casecmp(&url.scheme, "https") == 0) {
-		ret_code = sock_ssl_connect(&handle->sock_info);
+		char host[256];
+		if (get_tls_host(&url.hostport.text, host, sizeof(host)) != 0) {
+			sock_destroy(&handle->sock_info, SD_BOTH);
+			ret_code = UPNP_E_INVALID_URL;
+			goto errorHandler;
+		}
+		ret_code = sock_ssl_connect(&handle->sock_info, host);
 		if (ret_code != UPNP_E_SUCCESS) {
 			sock_destroy(&handle->sock_info, SD_BOTH);
 			goto errorHandler;

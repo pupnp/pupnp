@@ -63,6 +63,7 @@
 
 #ifdef UPNP_ENABLE_OPEN_SSL
 	#include <openssl/ssl.h>
+	#include <openssl/x509v3.h>
 #endif
 
 #ifndef MSG_NOSIGNAL
@@ -102,11 +103,26 @@ int sock_init_with_ip(
 }
 
 #ifdef UPNP_ENABLE_OPEN_SSL
-int sock_ssl_connect(SOCKINFO *info)
+int sock_ssl_connect(SOCKINFO *info, const char *host)
 {
 	int status = 0;
+	ASN1_OCTET_STRING *ip;
+
 	info->ssl = SSL_new(gSslCtx);
 	if (!info->ssl) {
+		return UPNP_E_SOCKET_ERROR;
+	}
+	/* Bind the expected peer identity to this connection. */
+	ip = a2i_IPADDRESS(host);
+	if (ip) {
+		ASN1_OCTET_STRING_free(ip);
+		status = X509_VERIFY_PARAM_set1_ip_asc(
+			SSL_get0_param(info->ssl), host);
+	} else {
+		status = SSL_set_tlsext_host_name(info->ssl, host) == 1 &&
+			 SSL_set1_host(info->ssl, host) == 1;
+	}
+	if (status != 1) {
 		return UPNP_E_SOCKET_ERROR;
 	}
 	status = SSL_set_fd(info->ssl, info->socket);

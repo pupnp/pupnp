@@ -124,6 +124,9 @@ int sock_init_with_ip(
  * \brief Associates an SSL object with the socket and begins
  * the client-side SSL/TLS handshake.
  *
+ * The server certificate must match \b host (a DNS name or an IP literal);
+ * the check takes effect when the context verifies the peer.
+ *
  * \return Integer:
  * \li \c UPNP_E_SUCCESS
  * \li \c UPNP_E_SOCKET_ERROR
@@ -131,7 +134,9 @@ int sock_init_with_ip(
 #ifdef UPNP_ENABLE_OPEN_SSL
 int sock_ssl_connect(
 	/*! [out] Socket Information Object. */
-	SOCKINFO *info);
+	SOCKINFO *info,
+	/*! [in] Host of the URL, without port or brackets. */
+	const char *host);
 #endif
 
 /*!
