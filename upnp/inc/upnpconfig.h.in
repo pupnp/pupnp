@@ -117,10 +117,6 @@
  * calls (i.e. configure --enable_blocking_tcp_connections) */
 #undef UPNP_ENABLE_BLOCKING_TCP_CONNECTIONS
 
-/** Defined to 1 if the library has been compiled to support filesystem writes
- * on POST (i.e. configure --enable-postwrite) */
-#undef UPNP_ENABLE_POST_WRITE
-
 /** Defined to 1 if the library has been compiled bind the miniserver socket
  * with SO_REUSEADDR (i.e. configure --enable_reuseaddr) */
 #undef UPNP_MINISERVER_REUSEADDR
