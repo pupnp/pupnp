@@ -234,6 +234,22 @@ endif()
 find_library(SOCKET_LIBRARY NAMES socket)
 find_library(NSL_LIBRARY NAMES nsl)
 
+# UpnpInit2() must accept a loopback interface named explicitly. getifaddrs()
+# is in libsocket on illumos, so the link blocks come after find_library().
+UPNP_Add_Unit_Test(test-upnp-init-loopback test_init_loopback.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-init-loopback PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-init-loopback-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # A backslash in a request path must not let a request leave the document
 # root on Windows.  The test uses sockets directly: libsocket on illumos and
 # ws2_32 on Windows, so the link blocks come after the find_library() calls.
