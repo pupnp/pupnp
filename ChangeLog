@@ -2,6 +2,12 @@
 Version 22.2.1
 *******************************************************************************
 
+- PR #667: Reject a NUL or a bare CR in an HTTP header field value
+  (RFC 9110, section 5.5). The parser kept them in the value, and even
+  classified NUL as a separator because strchr() matches the terminator of
+  its set, so code that read the value as a C string saw a shorter value
+  than the stored length. The server now answers 400, and a control point
+  gets UPNP_E_BAD_HTTPMSG, for both requests and responses.
 
 
 *******************************************************************************
