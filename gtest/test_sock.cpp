@@ -17,7 +17,10 @@ extern "C" {
 #include <thread>
 #include <vector>
 
+#include <errno.h>
+#include <string.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 class Issue395TestSuite : public ::testing::Test
@@ -74,23 +77,43 @@ TEST_F(Issue395TestSuite, sock_write_data_received_intact)
 // without clamping, so a positive budget could become negative, which the
 // next call treats as "no timeout" and poll() waits forever.  A blocking
 // send() to a slow reader takes longer than the budget and overcharges it.
+//
+// The send() is blocking, so if the reader ever stopped before EOF the test
+// would hang until ctest kills it (seen once on macOS). SO_SNDTIMEO turns
+// that into a failed send(), and the reader retries on EINTR and reports
+// any other error.
 TEST_F(Issue395TestSuite, ghsa_323w_budget_never_goes_negative)
 {
 	SOCKINFO info{};
 	info.socket = sv[0];
 	int timeout = 1;
 	std::vector<char> big(4 * 1024 * 1024, 'x');
+	struct timeval sndtimeo = {5, 0};
+	int reader_errno = 0;
 
-	std::thread reader([this] {
+	ASSERT_EQ(setsockopt(sv[0],
+			  SOL_SOCKET,
+			  SO_SNDTIMEO,
+			  &sndtimeo,
+			  sizeof(sndtimeo)),
+		0);
+	std::thread reader([this, &reader_errno] {
 		char buf[65536];
 		std::this_thread::sleep_for(std::chrono::milliseconds(2500));
-		while (recv(sv[1], buf, sizeof(buf), 0) > 0) {
+		for (;;) {
+			ssize_t n = recv(sv[1], buf, sizeof(buf), 0);
+			if (n > 0 || (n < 0 && errno == EINTR))
+				continue;
+			if (n < 0)
+				reader_errno = errno;
+			break;
 		}
 	});
 	int rc = sock_write(&info, big.data(), big.size(), &timeout);
 	shutdown(sv[0], SHUT_WR);
 	reader.join();
 
+	EXPECT_EQ(reader_errno, 0) << strerror(reader_errno);
 	ASSERT_EQ(rc, (int)big.size());
 	EXPECT_GE(timeout, 0);
 }
