@@ -119,8 +119,13 @@ int sock_ssl_connect(SOCKINFO *info, const char *host)
 		status = X509_VERIFY_PARAM_set1_ip_asc(
 			SSL_get0_param(info->ssl), host);
 	} else {
+	#if OPENSSL_VERSION_NUMBER >= 0x40000000L
+		status = SSL_set_tlsext_host_name(info->ssl, host) == 1 &&
+			 SSL_set1_dnsname(info->ssl, host) == 1;
+	#else
 		status = SSL_set_tlsext_host_name(info->ssl, host) == 1 &&
 			 SSL_set1_host(info->ssl, host) == 1;
+	#endif
 	}
 	if (status != 1) {
 		return UPNP_E_SOCKET_ERROR;
