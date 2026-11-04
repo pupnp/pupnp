@@ -578,6 +578,22 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# A POST is accepted only for a virtual directory, whose callbacks get the
+# body; a POST to a file in the document root is answered with 404.
+UPNP_Add_Unit_Test(test-upnp-webserver-post test_webserver_post.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-webserver-post PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-webserver-post-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # GHSA-7mx2-6v7x-xhv7: a QueryStateVariable SOAP request with a text or
 # CDATA node where <varName> is expected made check_soap_request() pass a
 # NULL local name to strcmp(), crashing the process.
