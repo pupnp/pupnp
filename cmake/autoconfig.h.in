@@ -44,9 +44,6 @@
 #cmakedefine IXML_HAVE_SCRIPTSUPPORT 1
 
 /* see upnpconfig.h */
-#cmakedefine UPNP_ENABLE_POST_WRITE 1
-
-/* see upnpconfig.h */
 #cmakedefine UPNP_MINISERVER_REUSEADDR 1
 
 /* On Windows, select the network interface by its adapter name (GUID) instead

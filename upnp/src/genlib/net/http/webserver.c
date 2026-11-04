@@ -1670,7 +1670,7 @@ error_handler:
  *
  * \return
  * \li \c HTTP_INTERNAL_SERVER_ERROR
- * \li \c HTTP_UNAUTHORIZED
+ * \li \c HTTP_NOT_FOUND
  * \li \c HTTP_BAD_REQUEST
  * \li \c HTTP_SERVICE_UNAVAILABLE
  * \li \c HTTP_OK
@@ -1696,22 +1696,13 @@ static int http_RecvPostMessage(
 	int num_read = 0;
 	int ret_code = HTTP_OK;
 
-	if (Instr && Instr->IsVirtualFile) {
-		Fp = (virtualDirCallback.open)(filename,
-			UPNP_WRITE,
-			Instr->Cookie,
-			Instr->RequestCookie);
-		if (Fp == NULL)
-			return HTTP_INTERNAL_SERVER_ERROR;
-	} else {
-	#ifdef UPNP_ENABLE_POST_WRITE
-		Fp = fopen(filename, "wb");
-		if (Fp == NULL)
-			return HTTP_UNAUTHORIZED;
-	#else
+	/* Only a virtual file can receive a POST. */
+	if (!Instr || !Instr->IsVirtualFile)
 		return HTTP_NOT_FOUND;
-	#endif
-	}
+	Fp = (virtualDirCallback.open)(
+		filename, UPNP_WRITE, Instr->Cookie, Instr->RequestCookie);
+	if (Fp == NULL)
+		return HTTP_INTERNAL_SERVER_ERROR;
 	parser->position = POS_ENTITY;
 	do {
 		/* first parse what has already been gotten */
@@ -1786,32 +1777,18 @@ static int http_RecvPostMessage(
 					     entity_offset],
 			Data_Buf_Size);
 		entity_offset += Data_Buf_Size;
-		if (Instr && Instr->IsVirtualFile) {
-			int n = virtualDirCallback.write(Fp,
-				Buf,
-				Data_Buf_Size,
-				Instr->Cookie,
-				Instr->RequestCookie);
-			if (n < 0) {
-				ret_code = HTTP_INTERNAL_SERVER_ERROR;
-				goto ExitFunction;
-			}
-		} else {
-			size_t n = fwrite(Buf, 1, Data_Buf_Size, Fp);
-			if (n != Data_Buf_Size) {
-				ret_code = HTTP_INTERNAL_SERVER_ERROR;
-				goto ExitFunction;
-			}
+		if (virtualDirCallback.write(Fp,
+			    Buf,
+			    Data_Buf_Size,
+			    Instr->Cookie,
+			    Instr->RequestCookie) < 0) {
+			ret_code = HTTP_INTERNAL_SERVER_ERROR;
+			goto ExitFunction;
 		}
 	} while (parser->position != POS_COMPLETE ||
 		 entity_offset != parser->msg.entity.length);
 ExitFunction:
-	if (Instr && Instr->IsVirtualFile) {
-		virtualDirCallback.close(
-			Fp, Instr->Cookie, Instr->RequestCookie);
-	} else {
-		fclose(Fp);
-	}
+	virtualDirCallback.close(Fp, Instr->Cookie, Instr->RequestCookie);
 
 	return ret_code;
 }
