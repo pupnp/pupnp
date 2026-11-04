@@ -2,6 +2,13 @@
 Version 22.2.1
 *******************************************************************************
 
+- PR #671: Add FuzzDevice, a fuzz target for requests to a registered
+  device. It starts the SDK on the loopback interface, registers a device
+  with one service and a virtual directory, and feeds each input to the
+  request dispatch, so SOAP actions, QueryStateVariable, device-side GENA
+  and the virtual directory callbacks are now fuzzed. It found the issue
+  fixed in PR #670. The fuzzer readme now describes every target.
+
 - PR #670: Call the thread pool jobs and free functions through their own
   type. RunMiniServer(), UpnpThreadDistribution(), free_advertise_arg() and
   free_action_arg() took a typed pointer and were registered with a cast to
