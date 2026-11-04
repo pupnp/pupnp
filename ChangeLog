@@ -2,6 +2,23 @@
 Version 22.2.0
 *******************************************************************************
 
+- GHSA-8rmx-x2cq-xh33: Authenticate the server of HTTPS connections. With
+  UPNP_ENABLE_OPEN_SSL, the client accepted any certificate and never checked
+  the host name, so an on-path attacker or a malicious device could intercept
+  an https:// connection. UpnpInitSslContext() now sets SSL_VERIFY_PEER with
+  the system's default trust store, and every connection checks that the
+  certificate matches the host of the URL (DNS name with SNI, or IP address).
+  SOAP actions, GENA subscriptions and NOTIFY, UpnpDownloadUrlItem() and
+  UpnpDownloadXmlDoc() have no TLS and sent https:// requests in clear; they
+  now return UPNP_E_INVALID_URL.
+  NOTE: this changes the default behaviour. A server with a self-signed or
+  otherwise untrusted certificate is now rejected; add its certificate or CA
+  to the context returned by UpnpGetSslCtx(), e.g. with
+  SSL_CTX_load_verify_locations(). pupnp honours the verify mode of the
+  context: SSL_VERIFY_NONE turns server authentication off, and a context
+  passed to UpnpSetSslCtx() must enable SSL_VERIFY_PEER and load a trust
+  store itself.
+
 - PR #666: Cast to unsigned char before calling the <ctype.h> functions in
   the URI and HTTP parsers. parse_uri(), the HTTP header matching, the Range
   parser and the pre-Vista inet_pton6() passed a plain char, so where char is
