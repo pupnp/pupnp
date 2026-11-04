@@ -6,6 +6,8 @@ UPNP_addGTest (test_template test_template.cpp
 
 if(UPNP_ENABLE_OPEN_SSL)
 	UPNP_addGTest(test_ssl_ctx test_ssl_ctx.cpp)
+	# regression test for GHSA-8rmx-x2cq-xh33 — server authentication
+	UPNP_addGTest(test_ssl_verify test_ssl_verify.cpp)
 endif()
 
 #UPNP_addGTest (test_UpnpHttpHeaderList test_UpnpHttpHeaderList.cpp
