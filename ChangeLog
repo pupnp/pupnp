@@ -2,6 +2,12 @@
 Version 22.1.11
 *******************************************************************************
 
+- PR #666: Cast to unsigned char before calling the <ctype.h> functions in
+  the URI and HTTP parsers. parse_uri(), the HTTP header matching, the Range
+  parser and the pre-Vista inet_pton6() passed a plain char, so where char is
+  signed a byte from 0x80 to 0xFE became a negative int, which is undefined
+  behaviour (C11 7.4). These bytes come from the network: the request line,
+  SSDP LOCATION, description documents and GENA Callback headers.
 
 
 *******************************************************************************
