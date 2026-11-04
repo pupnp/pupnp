@@ -1,0 +1,6 @@
+POST /vd/up.bin HTTP/1.1
+Host: 127.0.0.1:49152
+Content-Type: application/octet-stream
+Content-Length: 64
+
+payload payload payload payload payload payload payload payload 

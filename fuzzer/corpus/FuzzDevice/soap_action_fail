@@ -1,0 +1,7 @@
+POST /control HTTP/1.1
+Host: 127.0.0.1:49152
+Content-Type: text/xml; charset="utf-8"
+SOAPACTION: "urn:schemas-upnp-org:service:fuzz:1#Fail"
+Content-Length: 238
+
+<?xml version="1.0"?><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:Fail xmlns:u="urn:schemas-upnp-org:service:fuzz:1"></u:Fail></s:Body></s:Envelope>

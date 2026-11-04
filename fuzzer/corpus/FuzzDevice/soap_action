@@ -1,0 +1,7 @@
+POST /control HTTP/1.1
+Host: 127.0.0.1:49152
+Content-Type: text/xml; charset="utf-8"
+SOAPACTION: "urn:schemas-upnp-org:service:fuzz:1#Test"
+Content-Length: 256
+
+<?xml version="1.0"?><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:Test xmlns:u="urn:schemas-upnp-org:service:fuzz:1"><A>1</A><B>two</B></u:Test></s:Body></s:Envelope>
