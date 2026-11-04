@@ -1216,6 +1216,127 @@ TEST_F(HostHeaderTestSuite, MakeHttpRequestUsesParsedHost)
 	ExpectHostHeader();
 }
 
+// A header field value with a NUL or a bare CR is invalid (RFC 9110, 5.5) and
+// must be rejected. The parser kept them in the value, so code that reads the
+// value as a C string saw a different value than the length said, and a bare
+// CR is a line end for some peers.
+class HeaderValueCtrlTestSuite : public ::testing::Test
+{
+protected:
+	int sv[2]{-1, -1};
+
+	void SetUp() override
+	{
+		ASSERT_EQ(socketpair(AF_UNIX, SOCK_STREAM, 0, sv), 0);
+	}
+
+	void TearDown() override
+	{
+		if (sv[0] >= 0)
+			close(sv[0]);
+		if (sv[1] >= 0)
+			close(sv[1]);
+	}
+
+	// Parses msg as a request (HTTPMETHOD_UNKNOWN) or as the response to
+	// a GET (HTTPMETHOD_GET).
+	int Recv(const std::string &msg, http_method_t method, int *http_err)
+	{
+		EXPECT_EQ(write(sv[1], msg.data(), msg.size()),
+			(ssize_t)msg.size());
+		close(sv[1]);
+		sv[1] = -1;
+
+		SOCKINFO info{};
+		info.socket = sv[0];
+		http_parser_t parser{};
+		int timeout = 5;
+		*http_err = 0;
+		int ret = http_RecvMessage(
+			&info, &parser, method, &timeout, http_err);
+		httpmsg_destroy(&parser.msg);
+		return ret;
+	}
+};
+
+static const char k_req_nul[] = "GET / HTTP/1.1\r\n"
+				"HOST: 127.0.0.1:49152\r\n"
+				"X-Value: a\0b\r\n"
+				"\r\n";
+
+TEST_F(HeaderValueCtrlTestSuite, RejectsNulInRequestHeaderValue)
+{
+	int http_err;
+	std::string req(k_req_nul, sizeof(k_req_nul) - 1);
+	EXPECT_EQ(Recv(req, HTTPMETHOD_UNKNOWN, &http_err), UPNP_E_BAD_HTTPMSG);
+	EXPECT_EQ(http_err, HTTP_BAD_REQUEST);
+}
+
+TEST_F(HeaderValueCtrlTestSuite, RejectsBareCrInRequestHeaderValue)
+{
+	int http_err;
+	EXPECT_EQ(Recv("GET / HTTP/1.1\r\n"
+		       "HOST: 127.0.0.1:49152\r\n"
+		       "X-Value: a\rb\r\n"
+		       "\r\n",
+			  HTTPMETHOD_UNKNOWN,
+			  &http_err),
+		UPNP_E_BAD_HTTPMSG);
+	EXPECT_EQ(http_err, HTTP_BAD_REQUEST);
+}
+
+static const char k_resp_nul[] = "HTTP/1.1 200 OK\r\n"
+				 "Content-Type: text/xml\0evil\r\n"
+				 "Content-Length: 0\r\n"
+				 "\r\n";
+
+TEST_F(HeaderValueCtrlTestSuite, RejectsNulInResponseHeaderValue)
+{
+	int http_err;
+	std::string resp(k_resp_nul, sizeof(k_resp_nul) - 1);
+	EXPECT_EQ(Recv(resp, HTTPMETHOD_GET, &http_err), UPNP_E_BAD_HTTPMSG);
+}
+
+TEST_F(HeaderValueCtrlTestSuite, RejectsBareCrInResponseHeaderValue)
+{
+	int http_err;
+	EXPECT_EQ(Recv("HTTP/1.1 200 OK\r\n"
+		       "Content-Type: text/xml\rX-Evil: 1\r\n"
+		       "Content-Length: 0\r\n"
+		       "\r\n",
+			  HTTPMETHOD_GET,
+			  &http_err),
+		UPNP_E_BAD_HTTPMSG);
+}
+
+// Other control characters such as TAB inside a value stay accepted.
+TEST_F(HeaderValueCtrlTestSuite, AcceptsTabInHeaderValue)
+{
+	int http_err;
+	EXPECT_EQ(Recv("GET / HTTP/1.1\r\n"
+		       "HOST: 127.0.0.1:49152\r\n"
+		       "X-Value: a\tb\r\n"
+		       "\r\n",
+			  HTTPMETHOD_UNKNOWN,
+			  &http_err),
+		UPNP_E_SUCCESS);
+}
+
+// A folded value (obs-fold, CRLF followed by whitespace) is still accepted:
+// its CRLF is a line end, not a bare CR.
+TEST_F(HeaderValueCtrlTestSuite, AcceptsFoldedHeaderValue)
+{
+	int http_err;
+	EXPECT_EQ(Recv("GET / HTTP/1.1\r\n"
+		       "HOST: 127.0.0.1:49152\r\n"
+		       "X-Value: a\r\n"
+		       " b\r\n"
+		       "\r\n",
+			  HTTPMETHOD_UNKNOWN,
+			  &http_err),
+		UPNP_E_SUCCESS);
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
