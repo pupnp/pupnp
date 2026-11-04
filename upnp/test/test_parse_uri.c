@@ -234,6 +234,52 @@ static int check_nul_terminates_uri(void)
 	return 0;
 }
 
+/*
+ * Regression test for PR #666: bytes from 0x80 to 0xFF in each part of a
+ * URL reach the <ctype.h> calls of uri.c, which test_parse_uri_impl.c wraps
+ * to count arguments outside the unsigned char range. The parse result does
+ * not matter here, only that no call received a negative value.
+ */
+extern int ctype_bad_args;
+
+static int check_high_bytes_ctype(void)
+{
+	static const char *const urls[] = {
+		"\xe9"
+		"ttp://192.0.2.1/", /* parse_scheme(): isalpha */
+		"h\xe9"
+		"tp://192.0.2.1/", /* parse_scheme(): isalnum */
+		"http://h\xe9"
+		"st/",			   /* parse_hostport(): isalnum */
+		"http://192.0.2.\xe9/",	   /* parse_hostport(): isdigit */
+		"http://192.0.2.1:8\xe9/", /* parse_hostport(): port */
+		"http://192.0.2.1/%\xe9"
+		"0",			     /* is_escaped(): isxdigit */
+		"http://192.0.2.1/%0\xe9",   /* is_escaped(): isxdigit */
+		"http://192.0.2.1/\x80\xe9", /* is_unreserved(): isalnum */
+	};
+	uri_type url;
+	int i;
+	int failures = 0;
+
+	for (i = 0; i < (int)(sizeof(urls) / sizeof(urls[0])); i++) {
+		ctype_bad_args = 0;
+		(void)parse_uri(urls[i], strlen(urls[i]), &url);
+		if (ctype_bad_args != 0) {
+			printf("%s:%d parse_uri(urls[%d]) passed %d negative "
+			       "char(s) to <ctype.h> -- cast to unsigned "
+			       "char\n",
+				__FILE__,
+				__LINE__,
+				i,
+				ctype_bad_args);
+			failures++;
+		}
+	}
+
+	return failures;
+}
+
 int main(void)
 {
 	int i;
@@ -267,6 +313,7 @@ int main(void)
 	failures += check_literal_ip_is_noop();
 	failures += check_resolve_hostport_localhost();
 	failures += check_nul_terminates_uri();
+	failures += check_high_bytes_ctype();
 
 #ifdef _WIN32
 	WSACleanup();
