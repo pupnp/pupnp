@@ -524,7 +524,9 @@ extern "C" {
  * different port numbers.
  *
  * If unspecified, the SDK will use the first suitable interface and an
- * arbitrary port.
+ * arbitrary port. Loopback interfaces are never picked automatically, but
+ * on POSIX systems one can be named explicitly (e.g. "lo"); the SDK then
+ * serves local clients only.
  *
  * This call is synchronous.
  *
