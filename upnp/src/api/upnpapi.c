@@ -4042,10 +4042,15 @@ int UpnpGetIfInfo(const char *IfName)
 	}
 	/* cycle through available interfaces and their addresses. */
 	for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next) {
-		/* Skip LOOPBACK interfaces, DOWN interfaces, */
-		/* and interfaces without address (e.g. bonded). */
-		if (!ifa->ifa_addr || (ifa->ifa_flags & IFF_LOOPBACK) ||
-			(!(ifa->ifa_flags & IFF_UP))) {
+		/* Skip DOWN interfaces and interfaces without address (e.g.
+		 * bonded). */
+		if (!ifa->ifa_addr || (!(ifa->ifa_flags & IFF_UP))) {
+			continue;
+		}
+		/* When auto-selecting, skip LOOPBACK interfaces. When the
+		 * caller explicitly names one, honour that choice: the stack
+		 * then serves local clients only. */
+		if (IfName == NULL && (ifa->ifa_flags & IFF_LOOPBACK)) {
 			continue;
 		}
 		/* When auto-selecting, also skip interfaces that don't support
