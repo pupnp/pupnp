@@ -215,8 +215,8 @@ static int ScheduleGenaAutoRenew(
 	arg->handle = client_handle;
 	arg->Event = RenewEvent;
 
-	TPJobInit(&job, (start_routine)GenaAutoRenewSubscription, arg);
-	TPJobSetFreeFunction(&job, (free_routine)free_subscribe_arg);
+	TPJobInit(&job, GenaAutoRenewSubscription, arg);
+	TPJobSetFreeFunction(&job, free_subscribe_arg);
 	TPJobSetPriority(&job, MED_PRIORITY);
 
 	/* Schedule the job */

@@ -348,8 +348,7 @@ void ssdp_handle_ctrlpt_msg(
 						memset(&job, 0, sizeof(job));
 
 						TPJobInit(&job,
-							(start_routine)
-								send_search_result,
+							send_search_result,
 							threadData);
 						TPJobSetPriority(
 							&job, MED_PRIORITY);
@@ -669,7 +668,7 @@ int SearchByTarget(int Hnd, int Mx, char *St, void *Cookie)
 	expArg = (SsdpSearchExpArg *)malloc(sizeof(SsdpSearchExpArg));
 	expArg->handle = Hnd;
 	id = (int *)&(expArg->timeoutEventId);
-	TPJobInit(&job, (start_routine)searchExpired, expArg);
+	TPJobInit(&job, searchExpired, expArg);
 	TPJobSetPriority(&job, MED_PRIORITY);
 	TPJobSetFreeFunction(&job, (free_routine)free);
 	/* Schedule a timeout event to remove search Arg */
