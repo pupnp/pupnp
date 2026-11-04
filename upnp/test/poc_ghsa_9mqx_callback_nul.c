@@ -37,8 +37,10 @@
  * copy with strlen(), so the parsed URL tokens pointed past the allocation
  * and the NOTIFY sender read out of bounds.
  *
- * Test: a SUBSCRIBE whose CALLBACK is "<\0<http://ip:1/cb>" must be rejected
- * with HTTP 412, while the same request without the NUL is accepted.
+ * Test: a SUBSCRIBE whose CALLBACK is "<\0<http://ip:1/cb>" must be rejected,
+ * while the same request without the NUL is accepted. The fix rejected it with
+ * HTTP 412 in create_url_list(); the HTTP parser now rejects a NUL in any
+ * header value first, with HTTP 400.
  */
 
 #include "posix_overwrites.h" /* IWYU pragma: keep */
@@ -214,8 +216,8 @@ int main(void)
 
 	status = send_subscribe(server_ip, server_port, 1);
 	printf("SUBSCRIBE with a NUL in Callback -> HTTP %d\n", status);
-	if (status != 412) {
-		fprintf(stderr, "FAIL: expected HTTP 412, got %d\n", status);
+	if (status != 400) {
+		fprintf(stderr, "FAIL: expected HTTP 400, got %d\n", status);
 		result = 1;
 	}
 

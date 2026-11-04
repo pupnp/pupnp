@@ -154,7 +154,8 @@ static UPNP_INLINE void scanner_init(scanner_t *scanner, membuffer *bufptr)
  ************************************************************************/
 static UPNP_INLINE int is_separator_char(int c)
 {
-	return strchr(" \t()<>@,;:\\\"/[]?={}", c) != 0;
+	/* strchr() would match the terminator for c == 0 */
+	return c != 0 && strchr(" \t()<>@,;:\\\"/[]?={}", c) != 0;
 }
 
 /************************************************************************
@@ -731,6 +732,13 @@ static UPNP_INLINE parse_status_t match_raw_value(
 
 	while (!done) {
 		status = scanner_get_token(scanner, &token, &tok_type);
+		if (status == (parse_status_t)PARSE_OK &&
+			tok_type == (token_type_t)TT_CTRL &&
+			(token.buf[0] == '\0' || token.buf[0] == TOKCHAR_CR)) {
+			/* NUL or bare CR: invalid in a field value
+			 * (RFC 9110, 5.5) */
+			status = PARSE_FAILURE;
+		}
 		if (status == (parse_status_t)PARSE_OK) {
 			if (!saw_crlf) {
 				if (tok_type == (token_type_t)TT_CRLF) {

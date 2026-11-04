@@ -35,8 +35,8 @@
  * memcmp(ActualSID, sid, sid_len), where sid_len is the length of the SID
  * header. Nothing checked that sid_len equals the stored SID length, so:
  *
- *   - a SID longer than the stored one (the stored SID, a NUL byte, then
- *     padding) read past the end of the stored string;
+ *   - a SID longer than the stored one (the stored SID, then padding)
+ *     read past the end of the stored string;
  *   - an empty SID, or any prefix of the stored one, matched the
  *     subscription, so events were accepted without knowing the SID.
  *
@@ -248,9 +248,10 @@ int main(void)
 		return EXIT_FAILURE;
 	}
 
-	/* The stored SID, its NUL terminator, then padding. */
+	/* The stored SID, then padding. No NUL: the HTTP parser rejects a
+	 * NUL in any header value with 400 before the SID is looked up. */
 	memset(oversized, 'A', sizeof(oversized));
-	memcpy(oversized, TEST_SID, sizeof(TEST_SID));
+	memcpy(oversized, TEST_SID, strlen(TEST_SID));
 
 	ok &= check("exact", TEST_SID, strlen(TEST_SID), 200);
 	ok &= check("empty", "", 0, 412);
