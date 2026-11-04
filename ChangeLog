@@ -2,6 +2,11 @@
 Version 22.2.1
 *******************************************************************************
 
+- PR #672: Keep the GHSA-323w socket test from hanging. It writes 4 MB with
+  a blocking send() to a reader that starts late, and once hung on macOS
+  until ctest killed it. The writing end now has a send timeout and the
+  reader retries on EINTR, so such a case fails instead of hanging.
+
 - PR #671: Add FuzzDevice, a fuzz target for requests to a registered
   device. It starts the SDK on the loopback interface, registers a device
   with one service and a virtual directory, and feeds each input to the
