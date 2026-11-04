@@ -6,6 +6,8 @@
 | branch         | status                                                                                              |
 | -------------- | --------------------------------------------------------------------------------------------------- |
 | main  (22.2.x) | ![main](https://github.com/pupnp/pupnp/actions/workflows/ccpp.yml/badge.svg?branch=main)            |
+| branch-22.1.x  | [passing at release-22.1.10](https://github.com/pupnp/pupnp/actions/runs/40946633688)               |
+| branch-22.0.x  | ![22.0.x](https://github.com/pupnp/pupnp/actions/workflows/ccpp.yml/badge.svg?branch=branch-22.0.x) |
 | branch-2.0.x   | ![2.0.x](https://github.com/pupnp/pupnp/actions/workflows/ccpp.yml/badge.svg?branch=branch-2.0.x)   |
 | branch-1.18.x  | ![1.18.x](https://github.com/pupnp/pupnp/actions/workflows/ccpp.yml/badge.svg?branch=branch-1.18.x) |
 | branch-1.14.x  | ![1.14.x](https://github.com/pupnp/pupnp/actions/workflows/ccpp.yml/badge.svg?branch=branch-1.14.x) |
