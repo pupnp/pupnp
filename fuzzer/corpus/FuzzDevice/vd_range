@@ -1,0 +1,4 @@
+GET /vd/file.txt HTTP/1.1
+Host: 127.0.0.1:49152
+Range: bytes=10-20
+
