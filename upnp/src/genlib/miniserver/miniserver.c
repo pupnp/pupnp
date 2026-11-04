@@ -709,7 +709,7 @@ static UPNP_INLINE void schedule_request_job(
 	memcpy(&request->foreign_sockaddr,
 		clientAddr,
 		sizeof(request->foreign_sockaddr));
-	TPJobInit(&job, (start_routine)handle_request, (void *)request);
+	TPJobInit(&job, handle_request, (void *)request);
 	TPJobSetFreeFunction(&job, free_handle_request_arg);
 	TPJobSetPriority(&job, MED_PRIORITY);
 
@@ -1068,9 +1068,10 @@ static int receive_from_stopSock(SOCKET ssock, struct pollfd *pfd)
  * shutdown actions for the Miniserver and SSDP sockets.
  */
 static void RunMiniServer(
-	/*! [in] Socket Array. */
-	MiniServerSockArray *mini_sock)
+	/*! [in] Socket Array (MiniServerSockArray *). */
+	void *input)
 {
+	MiniServerSockArray *mini_sock = (MiniServerSockArray *)input;
 	char errorBuffer[ERROR_BUFFER_LEN];
 	int ret = 0;
 	int stopSock = 0;
@@ -1794,7 +1795,7 @@ int StartMiniServer(
 		free(mini_socket);
 		return ret_code;
 	}
-	TPJobInit(&job, (start_routine)RunMiniServer, (void *)mini_socket);
+	TPJobInit(&job, RunMiniServer, (void *)mini_socket);
 	TPJobSetPriority(&job, MED_PRIORITY);
 	TPJobSetFreeFunction(&job, (free_routine)free);
 	ret_code = ThreadPoolAddPersistent(&gMiniServerThreadPool, &job, NULL);

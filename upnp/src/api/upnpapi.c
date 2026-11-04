@@ -274,8 +274,10 @@ typedef union
 /*!
  * \brief Free memory associated with advertise job's argument
  */
-static void free_advertise_arg(job_arg *arg)
+static void free_advertise_arg(void *input)
 {
+	job_arg *arg = (job_arg *)input;
+
 	if (arg->advertise.Event) {
 		free(arg->advertise.Event);
 	}
@@ -285,8 +287,10 @@ static void free_advertise_arg(job_arg *arg)
 /*!
  * \brief Free memory associated with an action job's argument
  */
-static void free_action_arg(job_arg *arg)
+static void free_action_arg(void *input)
 {
+	job_arg *arg = (job_arg *)input;
+
 	if (arg->action.Header) {
 		ixmlDocument_free(arg->action.Header);
 	}
@@ -2079,8 +2083,8 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 		return UPNP_E_INVALID_HANDLE;
 	}
 		#ifdef SSDP_PACKET_DISTRIBUTE
-	TPJobInit(&job, (start_routine)AutoAdvertise, adEvent);
-	TPJobSetFreeFunction(&job, (free_routine)free_advertise_arg);
+	TPJobInit(&job, AutoAdvertise, adEvent);
+	TPJobSetFreeFunction(&job, free_advertise_arg);
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if ((retVal = TimerThreadSchedule(&gTimerThread,
 		     ((Exp / 2) - (AUTO_ADVERTISEMENT_TIME)),
@@ -2093,8 +2097,8 @@ int UpnpSendAdvertisementLowPower(UpnpDevice_Handle Hnd,
 		return retVal;
 	}
 		#else
-	TPJobInit(&job, (start_routine)AutoAdvertise, adEvent);
-	TPJobSetFreeFunction(&job, (free_routine)free_advertise_arg);
+	TPJobInit(&job, AutoAdvertise, adEvent);
+	TPJobSetFreeFunction(&job, free_advertise_arg);
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if ((retVal = TimerThreadSchedule(&gTimerThread,
 		     Exp - AUTO_ADVERTISEMENT_TIME,
@@ -2322,7 +2326,7 @@ int UpnpSubscribeAsync(UpnpClient_Handle Hnd,
 	Param->Fun = Fun;
 	Param->Cookie = (void *)Cookie_const;
 
-	TPJobInit(&job, (start_routine)UpnpThreadDistribution, Param);
+	TPJobInit(&job, UpnpThreadDistribution, Param);
 	TPJobSetFreeFunction(&job, (free_routine)free);
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if (ThreadPoolAdd(&gSendThreadPool, &job, NULL) != 0) {
@@ -2521,7 +2525,7 @@ int UpnpUnSubscribeAsync(UpnpClient_Handle Hnd,
 	strncpy(Param->SubsId, SubsId, sizeof(Param->SubsId) - 1);
 	Param->Fun = Fun;
 	Param->Cookie = (void *)Cookie_const;
-	TPJobInit(&job, (start_routine)UpnpThreadDistribution, Param);
+	TPJobInit(&job, UpnpThreadDistribution, Param);
 	TPJobSetFreeFunction(&job, (free_routine)free);
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if (ThreadPoolAdd(&gSendThreadPool, &job, NULL) != 0) {
@@ -2658,7 +2662,7 @@ int UpnpRenewSubscriptionAsync(UpnpClient_Handle Hnd,
 	Param->Cookie = (void *)Cookie_const;
 	Param->TimeOut = TimeOut;
 
-	TPJobInit(&job, (start_routine)UpnpThreadDistribution, Param);
+	TPJobInit(&job, UpnpThreadDistribution, Param);
 	TPJobSetFreeFunction(&job, (free_routine)free);
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if (ThreadPoolAdd(&gSendThreadPool, &job, NULL) != 0) {
@@ -3141,8 +3145,8 @@ int UpnpSendActionAsync(UpnpClient_Handle Hnd,
 	Param->Cookie = (void *)Cookie_const;
 	Param->Fun = Fun;
 
-	TPJobInit(&job, (start_routine)UpnpThreadDistribution, Param);
-	TPJobSetFreeFunction(&job, (free_routine)free_action_arg);
+	TPJobInit(&job, UpnpThreadDistribution, Param);
+	TPJobSetFreeFunction(&job, free_action_arg);
 
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if (ThreadPoolAdd(&gSendThreadPool, &job, NULL) != 0) {
@@ -3270,8 +3274,8 @@ int UpnpSendActionExAsync(UpnpClient_Handle Hnd,
 	Param->Cookie = (void *)Cookie_const;
 	Param->Fun = Fun;
 
-	TPJobInit(&job, (start_routine)UpnpThreadDistribution, Param);
-	TPJobSetFreeFunction(&job, (free_routine)free_action_arg);
+	TPJobInit(&job, UpnpThreadDistribution, Param);
+	TPJobSetFreeFunction(&job, free_action_arg);
 
 	TPJobSetPriority(&job, MED_PRIORITY);
 	if (ThreadPoolAdd(&gSendThreadPool, &job, NULL) != 0) {
@@ -3341,7 +3345,7 @@ int UpnpGetServiceVarStatusAsync(UpnpClient_Handle Hnd,
 	Param->Fun = Fun;
 	Param->Cookie = (void *)Cookie_const;
 
-	TPJobInit(&job, (start_routine)UpnpThreadDistribution, Param);
+	TPJobInit(&job, UpnpThreadDistribution, Param);
 	TPJobSetFreeFunction(&job, (free_routine)free);
 
 	TPJobSetPriority(&job, MED_PRIORITY);
@@ -4204,8 +4208,9 @@ int UpnpGetIfInfo(const char *IfName)
  * \brief Schedule async functions in threadpool.
  */
 #ifdef INCLUDE_CLIENT_APIS
-void UpnpThreadDistribution(struct UpnpNonblockParam *Param)
+void UpnpThreadDistribution(void *input)
 {
+	struct UpnpNonblockParam *Param = (struct UpnpNonblockParam *)input;
 	int errCode = 0;
 
 	UpnpPrintf(UPNP_ALL,

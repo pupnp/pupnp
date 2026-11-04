@@ -329,7 +329,9 @@ void UpnpSetIfAddrStrings(int valid_v4_addr_found,
 	char *out_v6,
 	size_t out_v6_len);
 
-void UpnpThreadDistribution(struct UpnpNonblockParam *Param);
+void UpnpThreadDistribution(
+	/*! [in] struct UpnpNonblockParam *. */
+	void *input);
 
 /*!
  * \brief This function is a timer thread scheduled by UpnpSendAdvertisement

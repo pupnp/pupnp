@@ -900,9 +900,7 @@ int readFromSSDPSocket(SOCKET socket)
 			/* null-terminate */
 			data->parser.msg.msg.buf[byteReceived] = 0;
 			memcpy(&data->dest_addr, &__ss, sizeof(__ss));
-			TPJobInit(&job,
-				(start_routine)ssdp_event_handler_thread,
-				data);
+			TPJobInit(&job, ssdp_event_handler_thread, data);
 			TPJobSetFreeFunction(
 				&job, free_ssdp_event_handler_data);
 			TPJobSetPriority(&job, MED_PRIORITY);

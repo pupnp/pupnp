@@ -633,8 +633,8 @@ static int genaInitNotifyCommon(UpnpDevice_Handle device_handle,
 		thread_struct->reference_count = reference_count;
 		thread_struct->device_handle = device_handle;
 
-		TPJobInit(job, (start_routine)genaNotifyThread, thread_struct);
-		TPJobSetFreeFunction(job, (free_routine)free_notify_struct);
+		TPJobInit(job, genaNotifyThread, thread_struct);
+		TPJobSetFreeFunction(job, free_notify_struct);
 		TPJobSetPriority(job, MED_PRIORITY);
 
 		ret = ThreadPoolAdd(&gSendThreadPool, job, NULL);
@@ -922,11 +922,8 @@ static int genaNotifyAllCommon(UpnpDevice_Handle device_handle,
 					break;
 				}
 				memset(job, 0, sizeof(ThreadPoolJob));
-				TPJobInit(job,
-					(start_routine)genaNotifyThread,
-					thread_s);
-				TPJobSetFreeFunction(
-					job, (free_routine)free_notify_struct);
+				TPJobInit(job, genaNotifyThread, thread_s);
+				TPJobSetFreeFunction(job, free_notify_struct);
 				TPJobSetPriority(job, MED_PRIORITY);
 				node = ListAddTail(&finger->outgoing, job);
 
