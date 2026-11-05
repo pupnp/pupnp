@@ -184,3 +184,29 @@ if (NOT WIN32 AND UPNP_BUILD_STATIC)
 		TEST_SUFFIX -static
 	)
 endif()
+
+# regression test for GHSA-mrw2-788c-f6w7 — no search result callback may run
+# after UpnpUnRegisterClient() returns; drives ssdp_handle_ctrlpt_msg() and
+# gRecvThreadPool, which are internal, so only the static variant is built.
+if (NOT WIN32 AND UPNP_BUILD_STATIC)
+	add_executable(test_ssdp_ctrlpt-static test_ssdp_ctrlpt.cpp)
+	target_link_libraries(test_ssdp_ctrlpt-static PRIVATE upnp_static GTest::gtest)
+	target_include_directories(test_ssdp_ctrlpt-static PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/inc/
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/threadutil/
+	)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test_ssdp_ctrlpt-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+		)
+	endif()
+	gtest_add_tests(
+		TARGET test_ssdp_ctrlpt-static
+		TEST_PREFIX test-upnp-
+		TEST_SUFFIX -static
+		TEST_LIST GTEST_test_ssdp_ctrlpt_static
+	)
+	# This test starts the UPnP stack, see UPNP_Add_Unit_Test.
+	set_tests_properties(${GTEST_test_ssdp_ctrlpt_static}
+		PROPERTIES RESOURCE_LOCK upnp_stack)
+endif()
