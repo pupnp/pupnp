@@ -75,18 +75,114 @@
 
 		#include "posix_overwrites.h" // IWYU pragma: keep
 
+/*! A search result queued on gRecvThreadPool. */
+typedef struct
+{
+	SSDPResultData *data;
+	/*! Client handle that started the search. */
+	int handle;
+	/*! timeoutEventId of the search, identifies it in SsdpSearchList. */
+	int searchId;
+} SearchResultJob;
+
+/*! A search result callback that is running, see send_search_result(). */
+typedef struct search_cb
+{
+	int handle;
+	int searchId;
+	ithread_t thread;
+	struct search_cb *next;
+} SearchCallback;
+
+static ithread_mutex_t gSearchCbMutex = PTHREAD_MUTEX_INITIALIZER;
+static ithread_cond_t gSearchCbCond = PTHREAD_COND_INITIALIZER;
+static SearchCallback *gSearchCbs = NULL;
+
+static void free_search_result(void *arg)
+{
+	SearchResultJob *job = (SearchResultJob *)arg;
+
+	SSDPResultData_delete(job->data);
+	free(job);
+}
+
 /*!
  * \brief Sends a callback to the control point application with a SEARCH
- * result.
+ * result, unless the search ended or the client unregistered after the
+ * result was queued.
  */
 static void send_search_result(
 	/* [in] Search reply from the device. */
-	void *data)
+	void *arg)
 {
-	SSDPResultData *temp = (SSDPResultData *)data;
+	SearchResultJob *job = (SearchResultJob *)arg;
+	struct Handle_Info *ctrlpt_info = NULL;
+	SearchCallback self;
+	SearchCallback **pp;
+	ListNode *node = NULL;
+	int active = 0;
 
-	SSDPResultData_Callback(temp);
-	SSDPResultData_delete(temp);
+	self.handle = job->handle;
+	self.searchId = job->searchId;
+	self.thread = ithread_self();
+	HandleReadLock(__FILE__, __LINE__);
+	if (GetHandleInfo(job->handle, &ctrlpt_info) == HND_CLIENT) {
+		for (node = ListHead(&ctrlpt_info->SsdpSearchList);
+			node != NULL;
+			node = ListNext(&ctrlpt_info->SsdpSearchList, node)) {
+			SsdpSearchArg *searchArg = node->item;
+			if (searchArg->timeoutEventId == job->searchId) {
+				active = 1;
+				break;
+			}
+		}
+	}
+	if (active) {
+		/* Registered before the handle lock is released, so whoever
+		 * removes the search afterwards waits for this callback. */
+		ithread_mutex_lock(&gSearchCbMutex);
+		self.next = gSearchCbs;
+		gSearchCbs = &self;
+		ithread_mutex_unlock(&gSearchCbMutex);
+	}
+	HandleUnlock(__FILE__, __LINE__);
+
+	if (active) {
+		SSDPResultData_Callback(job->data);
+		ithread_mutex_lock(&gSearchCbMutex);
+		for (pp = &gSearchCbs; *pp != &self; pp = &(*pp)->next)
+			;
+		*pp = self.next;
+		ithread_cond_broadcast(&gSearchCbCond);
+		ithread_mutex_unlock(&gSearchCbMutex);
+	}
+	free_search_result(job);
+}
+
+void ssdp_wait_search_callbacks(int handle, int searchId)
+{
+	SearchCallback *cb;
+	int busy;
+
+	ithread_mutex_lock(&gSearchCbMutex);
+	for (;;) {
+		busy = 0;
+		for (cb = gSearchCbs; cb != NULL; cb = cb->next) {
+			if (pthread_equal(cb->thread, ithread_self())) {
+				/* Called from a search result callback:
+				 * waiting would never end. */
+				ithread_mutex_unlock(&gSearchCbMutex);
+				return;
+			}
+			if (cb->handle == handle &&
+				(searchId < 0 || cb->searchId == searchId))
+				busy = 1;
+		}
+		if (!busy)
+			break;
+		ithread_cond_wait(&gSearchCbCond, &gSearchCbMutex);
+	}
+	ithread_mutex_unlock(&gSearchCbMutex);
 }
 
 void ssdp_handle_ctrlpt_msg(
@@ -113,6 +209,7 @@ void ssdp_handle_ctrlpt_msg(
 	SsdpSearchArg *searchArg = NULL;
 	int matched = 0;
 	SSDPResultData *threadData = NULL;
+	SearchResultJob *resultJob = NULL;
 	ThreadPoolJob job;
 
 	/* we are assuming that there can be only one client supported at a time
@@ -336,7 +433,18 @@ void ssdp_handle_ctrlpt_msg(
 				if (matched) {
 					/* schedule call back */
 					threadData = SSDPResultData_new();
-					if (threadData != NULL) {
+					resultJob = malloc(sizeof(*resultJob));
+					if (resultJob == NULL) {
+						SSDPResultData_delete(
+							threadData);
+					} else if (threadData == NULL) {
+						free(resultJob);
+					} else {
+						resultJob->data = threadData;
+						resultJob->handle = handle;
+						resultJob->searchId =
+							searchArg
+								->timeoutEventId;
 						SSDPResultData_set_Param(
 							threadData, param);
 						SSDPResultData_set_Cookie(
@@ -349,17 +457,17 @@ void ssdp_handle_ctrlpt_msg(
 
 						TPJobInit(&job,
 							send_search_result,
-							threadData);
+							resultJob);
 						TPJobSetPriority(
 							&job, MED_PRIORITY);
 						TPJobSetFreeFunction(&job,
-							(free_routine)free);
+							free_search_result);
 						if (ThreadPoolAdd(
 							    &gRecvThreadPool,
 							    &job,
 							    NULL) != 0) {
-							SSDPResultData_delete(
-								threadData);
+							free_search_result(
+								resultJob);
 						}
 					}
 				}
@@ -565,8 +673,12 @@ static void searchExpired(
 	}
 	HandleUnlock(__FILE__, __LINE__);
 
-	if (found)
+	if (found) {
+		/* Queued results of this search are dropped now; let the
+		 * running ones finish before the application sees the end. */
+		ssdp_wait_search_callbacks(handle, id);
 		ctrlpt_callback(UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie);
+	}
 
 	free(arg);
 }
