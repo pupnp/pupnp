@@ -85,18 +85,49 @@ typedef struct
 	int searchId;
 } SearchResultJob;
 
-/*! A search result callback that is running, see send_search_result(). */
-typedef struct search_cb
+/*! A discovery callback that is running, see ctrlpt_callback_enter(). */
+typedef struct ctrlpt_cb
 {
 	int handle;
+	/*! timeoutEventId of the search, or -1 for an advertisement. */
 	int searchId;
 	ithread_t thread;
-	struct search_cb *next;
-} SearchCallback;
+	struct ctrlpt_cb *next;
+} CtrlptCallback;
 
-static ithread_mutex_t gSearchCbMutex = PTHREAD_MUTEX_INITIALIZER;
-static ithread_cond_t gSearchCbCond = PTHREAD_COND_INITIALIZER;
-static SearchCallback *gSearchCbs = NULL;
+static ithread_mutex_t gCtrlptCbMutex = PTHREAD_MUTEX_INITIALIZER;
+static ithread_cond_t gCtrlptCbCond = PTHREAD_COND_INITIALIZER;
+static CtrlptCallback *gCtrlptCbs = NULL;
+
+/*!
+ * \brief Marks a discovery callback as running. Called with the handle lock
+ * held, so whoever ends the search or unregisters the client afterwards waits
+ * for the callback.
+ */
+static void ctrlpt_callback_enter(
+	CtrlptCallback *self, int handle, int searchId)
+{
+	self->handle = handle;
+	self->searchId = searchId;
+	self->thread = ithread_self();
+	ithread_mutex_lock(&gCtrlptCbMutex);
+	self->next = gCtrlptCbs;
+	gCtrlptCbs = self;
+	ithread_mutex_unlock(&gCtrlptCbMutex);
+}
+
+/*! \brief Marks a discovery callback as finished. */
+static void ctrlpt_callback_leave(CtrlptCallback *self)
+{
+	CtrlptCallback **pp;
+
+	ithread_mutex_lock(&gCtrlptCbMutex);
+	for (pp = &gCtrlptCbs; *pp != self; pp = &(*pp)->next)
+		;
+	*pp = self->next;
+	ithread_cond_broadcast(&gCtrlptCbCond);
+	ithread_mutex_unlock(&gCtrlptCbMutex);
+}
 
 static void free_search_result(void *arg)
 {
@@ -117,14 +148,10 @@ static void send_search_result(
 {
 	SearchResultJob *job = (SearchResultJob *)arg;
 	struct Handle_Info *ctrlpt_info = NULL;
-	SearchCallback self;
-	SearchCallback **pp;
+	CtrlptCallback self;
 	ListNode *node = NULL;
 	int active = 0;
 
-	self.handle = job->handle;
-	self.searchId = job->searchId;
-	self.thread = ithread_self();
 	HandleReadLock(__FILE__, __LINE__);
 	if (GetHandleInfo(job->handle, &ctrlpt_info) == HND_CLIENT) {
 		for (node = ListHead(&ctrlpt_info->SsdpSearchList);
@@ -137,41 +164,30 @@ static void send_search_result(
 			}
 		}
 	}
-	if (active) {
-		/* Registered before the handle lock is released, so whoever
-		 * removes the search afterwards waits for this callback. */
-		ithread_mutex_lock(&gSearchCbMutex);
-		self.next = gSearchCbs;
-		gSearchCbs = &self;
-		ithread_mutex_unlock(&gSearchCbMutex);
-	}
+	if (active)
+		ctrlpt_callback_enter(&self, job->handle, job->searchId);
 	HandleUnlock(__FILE__, __LINE__);
 
 	if (active) {
 		SSDPResultData_Callback(job->data);
-		ithread_mutex_lock(&gSearchCbMutex);
-		for (pp = &gSearchCbs; *pp != &self; pp = &(*pp)->next)
-			;
-		*pp = self.next;
-		ithread_cond_broadcast(&gSearchCbCond);
-		ithread_mutex_unlock(&gSearchCbMutex);
+		ctrlpt_callback_leave(&self);
 	}
 	free_search_result(job);
 }
 
-void ssdp_wait_search_callbacks(int handle, int searchId)
+void ssdp_wait_ctrlpt_callbacks(int handle, int searchId)
 {
-	SearchCallback *cb;
+	CtrlptCallback *cb;
 	int busy;
 
-	ithread_mutex_lock(&gSearchCbMutex);
+	ithread_mutex_lock(&gCtrlptCbMutex);
 	for (;;) {
 		busy = 0;
-		for (cb = gSearchCbs; cb != NULL; cb = cb->next) {
+		for (cb = gCtrlptCbs; cb != NULL; cb = cb->next) {
 			if (pthread_equal(cb->thread, ithread_self())) {
-				/* Called from a search result callback:
+				/* Called from a discovery callback:
 				 * waiting would never end. */
-				ithread_mutex_unlock(&gSearchCbMutex);
+				ithread_mutex_unlock(&gCtrlptCbMutex);
 				return;
 			}
 			if (cb->handle == handle &&
@@ -180,9 +196,9 @@ void ssdp_wait_search_callbacks(int handle, int searchId)
 		}
 		if (!busy)
 			break;
-		ithread_cond_wait(&gSearchCbCond, &gSearchCbMutex);
+		ithread_cond_wait(&gCtrlptCbCond, &gCtrlptCbMutex);
 	}
-	ithread_mutex_unlock(&gSearchCbMutex);
+	ithread_mutex_unlock(&gCtrlptCbMutex);
 }
 
 void ssdp_handle_ctrlpt_msg(
@@ -210,6 +226,7 @@ void ssdp_handle_ctrlpt_msg(
 	int matched = 0;
 	SSDPResultData *threadData = NULL;
 	SearchResultJob *resultJob = NULL;
+	CtrlptCallback adv_cb;
 	ThreadPoolJob job;
 
 	/* we are assuming that there can be only one client supported at a time
@@ -350,9 +367,11 @@ void ssdp_handle_ctrlpt_msg(
 			/* copy */
 			ctrlpt_callback = ctrlpt_info->Callback;
 			ctrlpt_cookie = ctrlpt_info->Cookie;
+			ctrlpt_callback_enter(&adv_cb, handle, -1);
 			HandleUnlock(__FILE__, __LINE__);
 
 			ctrlpt_callback(event_type, param, ctrlpt_cookie);
+			ctrlpt_callback_leave(&adv_cb);
 		}
 	} else {
 		/* reply (to a SEARCH) */
@@ -676,7 +695,7 @@ static void searchExpired(
 	if (found) {
 		/* Queued results of this search are dropped now; let the
 		 * running ones finish before the application sees the end. */
-		ssdp_wait_search_callbacks(handle, id);
+		ssdp_wait_ctrlpt_callbacks(handle, id);
 		ctrlpt_callback(UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie);
 	}
 
