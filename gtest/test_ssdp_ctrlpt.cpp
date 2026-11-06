@@ -11,6 +11,10 @@
 //
 // The tests fill every gRecvThreadPool worker with a job that waits on a
 // gate, so the search result job stays queued while the search ends.
+//
+// Advertisements (ssdp:alive, ssdp:byebye) are not queued, but their callback
+// ran after the handle lock was released, so UpnpUnRegisterClient() could
+// return while it was still running.
 
 #include "upnp.h"
 #include "gtest/gtest.h"
@@ -200,6 +204,99 @@ TEST(SsdpCtrlptTestSuite, no_search_result_after_timeout)
 
 	EXPECT_EQ(g_late_results, 0);
 	ASSERT_EQ(UpnpUnRegisterClient(handle), UPNP_E_SUCCESS);
+	UpnpFinish();
+}
+
+namespace
+{
+
+// Holds the advertisement callback until the test opens the gate.
+std::mutex g_adv_m;
+std::condition_variable g_adv_cv;
+bool g_adv_entered{false};
+bool g_adv_open{false};
+
+int adv_callback(Upnp_EventType type, void *, void *)
+{
+	if (type != UPNP_DISCOVERY_ADVERTISEMENT_ALIVE)
+		return 0;
+	std::unique_lock<std::mutex> lk(g_adv_m);
+	g_adv_entered = true;
+	g_adv_cv.notify_all();
+	g_adv_cv.wait(lk, [] { return g_adv_open; });
+	return 0;
+}
+
+// Parses an advertisement the way readFromSSDPSocket() does and hands it to
+// the control point.
+void DeliverAlive()
+{
+	static const char req[] = "NOTIFY * HTTP/1.1\r\n"
+				  "HOST: 239.255.255.250:1900\r\n"
+				  "CACHE-CONTROL: max-age=1800\r\n"
+				  "LOCATION: http://127.0.0.1:1/desc.xml\r\n"
+				  "NT: upnp:rootdevice\r\n"
+				  "NTS: ssdp:alive\r\n"
+				  "SERVER: test/1.0 UPnP/1.0\r\n"
+				  "USN: uuid:test::upnp:rootdevice\r\n"
+				  "\r\n";
+	http_parser_t parser;
+	parser_request_init(&parser);
+	parse_status_t status = parser_append(&parser, req, sizeof(req) - 1);
+	// A NOTIFY has no body: start_event_handler() accepts this failure.
+	if (status == PARSE_SUCCESS ||
+		(status == PARSE_FAILURE && parser.valid_ssdp_notify_hack)) {
+		sockaddr_storage from{};
+		auto *sin = reinterpret_cast<sockaddr_in *>(&from);
+		sin->sin_family = AF_INET;
+		sin->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+		sin->sin_port = htons(1900);
+		ssdp_handle_ctrlpt_msg(&parser.msg, &from, 0);
+	}
+	httpmsg_destroy(&parser.msg);
+}
+
+} // namespace
+
+TEST(SsdpCtrlptTestSuite, unregister_waits_for_advertisement_callback)
+{
+	if (UpnpInit2(nullptr, 0) != UPNP_E_SUCCESS)
+		GTEST_SKIP() << "UpnpInit2 failed (no network?)";
+
+	UpnpClient_Handle handle = -1;
+	ASSERT_EQ(UpnpRegisterClient(adv_callback, nullptr, &handle),
+		UPNP_E_SUCCESS);
+
+	std::thread advertiser(DeliverAlive);
+	bool entered;
+	{
+		std::unique_lock<std::mutex> lk(g_adv_m);
+		entered = g_adv_cv.wait_for(lk, std::chrono::seconds(10), [] {
+			return g_adv_entered;
+		});
+	}
+	if (!entered) {
+		advertiser.join();
+		FAIL() << "the advertisement callback did not run";
+	}
+
+	std::atomic<bool> returned{false};
+	std::thread unregister([&] {
+		UpnpUnRegisterClient(handle);
+		returned = true;
+	});
+	// UpnpUnRegisterClient() must still be waiting for the callback.
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	bool returned_early = returned;
+	{
+		std::lock_guard<std::mutex> lk(g_adv_m);
+		g_adv_open = true;
+	}
+	g_adv_cv.notify_all();
+	advertiser.join();
+	unregister.join();
+
+	EXPECT_FALSE(returned_early);
 	UpnpFinish();
 }
 
