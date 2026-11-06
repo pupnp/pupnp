@@ -2,6 +2,16 @@
 Version 22.2.1
 *******************************************************************************
 
+- GHSA-mrw2-788c-f6w7: Stop SSDP search results from reaching the control
+  point after the search ended. A result was queued on the receive thread
+  pool with a copy of the search cookie and delivered without checking the
+  search, so a result queued before UpnpUnRegisterClient() or the search
+  timeout arrived afterwards, with a cookie the application may have
+  freed (use after free). Queued results of an ended search are now
+  dropped, and UpnpUnRegisterClient() and the search timeout wait for the
+  result callbacks that are running. A call to UpnpUnRegisterClient() from
+  inside a search result callback does not wait.
+
 - PR #673: Use SSL_set1_dnsname() instead of SSL_set1_host() on OpenSSL 4,
   which deprecates the old function; the macOS CI job warned about it in
   sock_ssl_connect(). Older OpenSSL versions still use SSL_set1_host(),
