@@ -2,7 +2,11 @@
 Version 22.2.2
 *******************************************************************************
 
-
+- PR #674: Wait for running advertisement callbacks in
+  UpnpUnRegisterClient(). The ssdp:alive and ssdp:byebye callbacks ran
+  after the handle lock was released, so UpnpUnRegisterClient() could
+  return while one was still running. They now use the same tracking as
+  search results (GHSA-mrw2-788c-f6w7).
 
 *******************************************************************************
 Version 22.2.1
