@@ -1730,9 +1730,9 @@ int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 	UpnpSdkClientRegistered -= 1;
 	HandleUnlock(__FILE__, __LINE__);
 	#if EXCLUDE_SSDP == 0
-	/* Queued search results are dropped now; wait for the running ones,
-	 * no callback may follow the return. */
-	ssdp_wait_search_callbacks(Hnd, -1);
+	/* Queued search results are dropped now; wait for the running
+	 * discovery callbacks, no callback may follow the return. */
+	ssdp_wait_ctrlpt_callbacks(Hnd, -1);
 	#endif
 
 	UpnpPrintf(UPNP_ALL,
