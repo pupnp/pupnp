@@ -545,6 +545,25 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# GHSA-7vj7-3hjc-p8q9: a chunked body followed by an extra CRLF left a
+# non-NUL byte after the entity, and http_Download() returned the document
+# without a terminator.
+UPNP_Add_Unit_Test(test-upnp-ghsa-7vj7 poc_ghsa_7vj7_chunked_nul.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-ghsa-7vj7 PRIVATE
+		Threads::Threads
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-ghsa-7vj7-static PRIVATE
+		Threads::Threads
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # GHSA-9mqx-m85r-46wh: a NUL byte in the CALLBACK header of a SUBSCRIBE was
 # kept in the delivery URL list, whose copy for a notification was sized with
 # strlen(), so the copied URL tokens pointed past the allocation.
