@@ -564,6 +564,11 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# GHSA-wcf8-pjfj-w9wv: installing an alias after the previous one was
+# uninstalled while an HTTP handler still held it released the old alias a
+# second time (use after free, double free).  Detected by ASan.
+UPNP_Add_Unit_Test(test-upnp-ghsa-wcf8 poc_ghsa_wcf8_alias_replace.c)
+
 # GHSA-9mqx-m85r-46wh: a NUL byte in the CALLBACK header of a SUBSCRIBE was
 # kept in the delivery URL list, whose copy for a notification was sized with
 # strlen(), so the copied URL tokens pointed past the allocation.
