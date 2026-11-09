@@ -999,8 +999,9 @@ int http_Download(const char *url_str,
 		entity_start = response.msg.entity.buf; /* what we want */
 		msg_length = response.msg.msg.length; /* save for posterity   */
 		msg_start = membuffer_detach(&response.msg.msg); /* whole msg */
-		/* move entity to the start; copy null-terminator too */
-		memmove(msg_start, entity_start, *doc_length + (size_t)1);
+		/* move entity to the start; the byte after the entity is not
+		 * necessarily a NUL (e.g. extra CRLF after a chunked body) */
+		memmove(msg_start, entity_start, *doc_length);
 		/* save mem for body only */
 		*document = realloc(
 			msg_start, *doc_length + (size_t)1); /*LEAK_FIX_MK */
@@ -1009,13 +1010,16 @@ int http_Download(const char *url_str,
 		/* shrink can't fail */
 		assert(msg_length > *doc_length);
 		assert(*document != NULL);
-		if (msg_length <= *doc_length || *document == NULL)
+		if (*document == NULL)
+			*document = msg_start;
+		(*document)[*doc_length] = '\0';
+		if (msg_length <= *doc_length)
 			UpnpPrintf(UPNP_INFO,
 				HTTP,
 				__FILE__,
 				__LINE__,
 				"msg_length(%" PRIzu ") <= *doc_length(%" PRIzu
-				") or document is NULL",
+				")",
 				msg_length,
 				*doc_length);
 	}
