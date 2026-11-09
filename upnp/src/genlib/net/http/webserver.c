@@ -440,6 +440,11 @@ static void alias_release(
 		if (reset_global)
 			glob_alias_init();
 	}
+	/* The global slot no longer owns a reference: forget the alias, so a
+	 * later release of gAliasDoc does not drop a reference still held by
+	 * an HTTP handler.  That handler frees the buffers on its release. */
+	if (alias == &gAliasDoc)
+		glob_alias_init();
 	ithread_mutex_unlock(&gWebMutex);
 }
 
