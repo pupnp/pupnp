@@ -816,6 +816,8 @@ static UPNP_INLINE void pollfd_if_valid(
 		pfd->revents = 0;
 	} else {
 		pfd->fd = -1;
+		pfd->events = 0;
+		pfd->revents = 0;
 	}
 }
 	#endif /* _WIN32 */
