@@ -2,6 +2,20 @@
 Version 22.2.2
 *******************************************************************************
 
+- GHSA-wcf8-pjfj-w9wv: Stop a replaced XML alias from being released twice.
+  When a device was unregistered while an HTTP handler was still sending
+  its description, the global alias kept pointing at the old document, so
+  registering a device again released it a second time. The document was
+  freed while the handler was still sending it, and the handler's own
+  release could free it again (use after free, double free). The global
+  alias is now reset as soon as its reference is released.
+
+- GHSA-7vj7-3hjc-p8q9: Terminate the document returned by http_Download().
+  The entity was copied together with the byte after it, which was assumed
+  to be a NUL. After a chunked body followed by an extra CRLF that byte is
+  '\r', so UpnpDownloadXmlDoc() read past the allocation. The terminator
+  is now written explicitly.
+
 - PR #674: Wait for running advertisement callbacks in
   UpnpUnRegisterClient(). The ssdp:alive and ssdp:byebye callbacks ran
   after the handle lock was released, so UpnpUnRegisterClient() could
