@@ -2,7 +2,11 @@
 Version 22.2.3
 *******************************************************************************
 
-
+- PR #675: Initialise every pollfd entry in RunMiniServer(). An invalid
+  socket got fd = -1 but kept stack garbage in events and revents. The
+  kernel ignores such entries, but MemorySanitizer reported the read in
+  poll(), so the OSS-Fuzz MSan build check failed on FuzzDevice and every
+  OSS-Fuzz build failed from 2026-11-05.
 
 *******************************************************************************
 Version 22.2.2
