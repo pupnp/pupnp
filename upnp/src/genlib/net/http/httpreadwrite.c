@@ -2411,25 +2411,27 @@ int http_OpenHttpGetEx(const char *url_str,
 /* 'info' should have a size of at least 100 bytes */
 void get_sdk_info(char *info, size_t infoSize)
 {
+	/* RFC 7231 7.4.2: product *( RWS ( product / comment ) ) */
 #ifdef UPNP_ENABLE_UNSPECIFIED_SERVER
-	snprintf(info, infoSize, "Unspecified, UPnP/1.0, Unspecified\r\n");
+	snprintf(info, infoSize, "Unspecified UPnP/1.0 libupnp\r\n");
 #else /* UPNP_ENABLE_UNSPECIFIED_SERVER */
 	#ifdef _WIN32
 	snprintf(info,
 		infoSize,
-		"UPnP/1.0, Portable SDK for UPnP devices/" UPNP_VERSION_STRING
-		"on windows\r\n");
+		"Windows UPnP/1.0 libupnp/" UPNP_VERSION_STRING "\r\n");
 	#else
-	int ret_code;
 	struct utsname sys_info;
 
-	ret_code = uname(&sys_info);
-	if (ret_code == -1)
-		*info = '\0';
+	if (uname(&sys_info) == -1) {
+		snprintf(info,
+			infoSize,
+			"Unspecified UPnP/1.0 libupnp/" UPNP_VERSION_STRING
+			"\r\n");
+		return;
+	}
 	snprintf(info,
 		infoSize,
-		"%s/%s, UPnP/1.0, Portable SDK for UPnP "
-		"devices/" UPNP_VERSION_STRING "\r\n",
+		"%s/%s UPnP/1.0 libupnp/" UPNP_VERSION_STRING "\r\n",
 		sys_info.sysname,
 		sys_info.release);
 	#endif
