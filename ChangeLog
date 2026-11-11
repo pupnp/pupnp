@@ -2,6 +2,14 @@
 Version 22.2.3
 *******************************************************************************
 
+- Issue #676: Send the Server, SERVER and User-Agent values as an RFC 7231
+  product list. The old value had commas and spaces inside a product,
+  e.g. "Linux/x.y, UPnP/1.0, Portable SDK for UPnP devices/X.Y.Z". It is
+  now "Linux/x.y UPnP/1.0 libupnp/X.Y.Z", "Windows UPnP/1.0 libupnp/X.Y.Z"
+  on Windows, and "Unspecified UPnP/1.0 libupnp" with
+  UPNP_ENABLE_UNSPECIFIED_SERVER. If uname() fails, the OS product is
+  "Unspecified" instead of uninitialised memory.
+
 - PR #675: Initialise every pollfd entry in RunMiniServer(). An invalid
   socket got fd = -1 but kept stack garbage in events and revents. The
   kernel ignores such entries, but MemorySanitizer reported the read in
