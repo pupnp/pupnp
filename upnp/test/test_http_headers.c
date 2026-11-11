@@ -12,6 +12,7 @@
 
 #include "upnp.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -108,6 +109,111 @@ static int check_present(const char *buf, const char *needle)
 	return 0;
 }
 
+/* regression: issue #676
+ * The Server header value must follow RFC 7231 7.4.2:
+ *   Server  = product *( RWS ( product / comment ) )
+ *   product = token [ "/" product-version ]
+ * and carry the UPnP/1.0 and libupnp[/<version>] products. */
+static int is_tchar(char c)
+{
+	return c != '\0' &&
+	       (isalnum((unsigned char)c) || strchr("!#$%&'*+-.^_`|~", c));
+}
+
+/* Returns a pointer past the token, or NULL if there is no token. */
+static const char *skip_token(const char *p)
+{
+	const char *start = p;
+
+	while (is_tchar(*p))
+		p++;
+	return p == start ? NULL : p;
+}
+
+/* Returns a pointer past a (possibly nested) comment, or NULL. */
+static const char *skip_comment(const char *p)
+{
+	int depth = 0;
+
+	do {
+		if (*p == '\0' || *p == '\r' || *p == '\n')
+			return NULL;
+		if (*p == '\\' && p[1] != '\0')
+			p++;
+		else if (*p == '(')
+			depth++;
+		else if (*p == ')')
+			depth--;
+		p++;
+	} while (depth > 0);
+	return p;
+}
+
+static int check_server_value(const char *headers)
+{
+	const char *line = strstr(headers, "\r\nServer: ");
+	const char *p;
+	const char *end;
+	const char *lib;
+	char value[256];
+	size_t len;
+	int first = 1;
+
+	if (!line) {
+		fprintf(stderr, "FAIL: no Server header\n");
+		return -1;
+	}
+	p = line + strlen("\r\nServer: ");
+	end = strstr(p, "\r\n");
+	len = end ? (size_t)(end - p) : strlen(p);
+	if (len >= sizeof(value))
+		len = sizeof(value) - 1;
+	memcpy(value, p, len);
+	value[len] = '\0';
+	printf("Server value: \"%s\"\n", value);
+
+	p = value;
+	for (;;) {
+		if (*p == '(' && !first) {
+			p = skip_comment(p);
+		} else {
+			p = skip_token(p);
+			if (p && *p == '/')
+				p = skip_token(p + 1);
+		}
+		if (!p)
+			goto bad;
+		first = 0;
+		if (*p == '\0')
+			break;
+		if (*p != ' ' && *p != '\t')
+			goto bad;
+		while (*p == ' ' || *p == '\t')
+			p++;
+		if (*p == '\0')
+			goto bad; /* trailing whitespace */
+	}
+
+	if (!strstr(value, " UPnP/1.0 ")) {
+		fprintf(stderr, "FAIL: Server lacks a UPnP/1.0 product\n");
+		return -1;
+	}
+	/* UPNP_ENABLE_UNSPECIFIED_SERVER sends "libupnp" without a version. */
+	lib = strstr(value, " libupnp");
+	if (!lib || (lib[8] != '/' && lib[8] != ' ' && lib[8] != '\0')) {
+		fprintf(stderr, "FAIL: Server lacks a libupnp product\n");
+		return -1;
+	}
+	return 0;
+
+bad:
+	fprintf(stderr,
+		"FAIL: Server value is not an RFC 7231 product list "
+		"(stopped at offset %d)\n",
+		p ? (int)(p - value) : -1);
+	return -1;
+}
+
 #endif /* !_WIN32 */
 
 int main(void)
@@ -158,6 +264,9 @@ int main(void)
 	result |= check_present(headers, "Content-Length: ");
 	result |= check_present(headers, "Content-Type: ");
 	result |= check_present(headers, "Connection: ");
+
+	/* regression: issue #676 */
+	result |= check_server_value(headers);
 
 	free(headers);
 	UpnpFinish();
