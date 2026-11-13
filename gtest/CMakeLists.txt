@@ -210,3 +210,28 @@ if (NOT WIN32 AND UPNP_BUILD_STATIC)
 	set_tests_properties(${GTEST_test_ssdp_ctrlpt_static}
 		PROPERTIES RESOURCE_LOCK upnp_stack)
 endif()
+
+# regression test — no GENA event callback may run after UpnpUnRegisterClient()
+# returns; the fake publisher uses POSIX sockets.
+if (NOT WIN32 AND UPNP_BUILD_STATIC)
+	add_executable(test_gena_ctrlpt-static test_gena_ctrlpt.cpp)
+	target_link_libraries(test_gena_ctrlpt-static PRIVATE upnp_static GTest::gtest)
+	target_include_directories(test_gena_ctrlpt-static PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/inc/
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/threadutil/
+	)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test_gena_ctrlpt-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+		)
+	endif()
+	gtest_add_tests(
+		TARGET test_gena_ctrlpt-static
+		TEST_PREFIX test-upnp-
+		TEST_SUFFIX -static
+		TEST_LIST GTEST_test_gena_ctrlpt_static
+	)
+	# This test starts the UPnP stack, see UPNP_Add_Unit_Test.
+	set_tests_properties(${GTEST_test_gena_ctrlpt_static}
+		PROPERTIES RESOURCE_LOCK upnp_stack)
+endif()
