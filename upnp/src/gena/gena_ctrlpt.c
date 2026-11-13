@@ -109,6 +109,7 @@ static void GenaAutoRenewSubscription(
 	Upnp_EventType eventType = 0;
 	int timeout = 0;
 	int errCode = 0;
+	CtrlptCallback renew_cb;
 
 	if (AUTO_RENEW_TIME == 0) {
 		UpnpPrintf(UPNP_INFO,
@@ -154,8 +155,10 @@ static void GenaAutoRenewSubscription(
 		/* make callback */
 		callback_fun = handle_info->Callback;
 		cookie = handle_info->Cookie;
+		ctrlpt_callback_enter(&renew_cb, arg->handle, -1);
 		HandleUnlock(__FILE__, __LINE__);
 		callback_fun(eventType, arg->Event, cookie);
+		ctrlpt_callback_leave(&renew_cb);
 	}
 
 	free_subscribe_arg(arg);
@@ -802,6 +805,7 @@ void gena_process_notification_event(SOCKINFO *info, http_message_t *event)
 	UpnpClient_Handle client_handle;
 	UpnpClient_Handle client_handle_start;
 	int err_ret = HTTP_PRECONDITION_FAILED;
+	CtrlptCallback event_cb;
 
 	memptr sid_hdr;
 	memptr nt_hdr, nts_hdr;
@@ -923,14 +927,13 @@ void gena_process_notification_event(SOCKINFO *info, http_message_t *event)
 		/* copy callback */
 		callback = handle_info->Callback;
 		cookie = handle_info->Cookie;
+		ctrlpt_callback_enter(&event_cb, client_handle, -1);
 
 		HandleUnlock(__FILE__, __LINE__);
 
 		/* make callback with event struct */
-		/* In future, should find a way of mainting */
-		/* that the handle is not unregistered in the middle of a */
-		/* callback */
 		callback(UPNP_EVENT_RECEIVED, event_struct, cookie);
+		ctrlpt_callback_leave(&event_cb);
 	}
 
 	error_respond(info, err_ret, event);

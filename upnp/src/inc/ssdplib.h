@@ -280,19 +280,6 @@ void ssdp_handle_ctrlpt_msg(
 	int timeout);
 
 /*!
- * \brief Waits until no discovery callback of the given client is running:
- * search results of the given search, or with searchId -1 every search result
- * and advertisement. Returns at once when called from such a callback. The
- * caller must not hold the handle lock.
- */
-void ssdp_wait_ctrlpt_callbacks(
-	/* [in] Client handle. */
-	int handle,
-	/* [in] timeoutEventId of the search, or -1 for every callback of the
-	 * handle. */
-	int searchId);
-
-/*!
  * \brief Creates and send the search request for a specific URL.
  *
  * This function implements the search request of the discovery phase.
