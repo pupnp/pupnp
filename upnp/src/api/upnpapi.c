@@ -1681,6 +1681,61 @@ int UpnpRegisterClient(
 #endif /* INCLUDE_CLIENT_APIS */
 
 #ifdef INCLUDE_CLIENT_APIS
+static ithread_mutex_t gCtrlptCbMutex = PTHREAD_MUTEX_INITIALIZER;
+static ithread_cond_t gCtrlptCbCond = PTHREAD_COND_INITIALIZER;
+static CtrlptCallback *gCtrlptCbs = NULL;
+
+void ctrlpt_callback_enter(CtrlptCallback *self, int handle, int searchId)
+{
+	self->handle = handle;
+	self->searchId = searchId;
+	self->thread = ithread_self();
+	ithread_mutex_lock(&gCtrlptCbMutex);
+	self->next = gCtrlptCbs;
+	gCtrlptCbs = self;
+	ithread_mutex_unlock(&gCtrlptCbMutex);
+}
+
+void ctrlpt_callback_leave(CtrlptCallback *self)
+{
+	CtrlptCallback **pp;
+
+	ithread_mutex_lock(&gCtrlptCbMutex);
+	for (pp = &gCtrlptCbs; *pp != self; pp = &(*pp)->next)
+		;
+	*pp = self->next;
+	ithread_cond_broadcast(&gCtrlptCbCond);
+	ithread_mutex_unlock(&gCtrlptCbMutex);
+}
+
+void ctrlpt_wait_callbacks(int handle, int searchId, const CtrlptCallback *self)
+{
+	CtrlptCallback *cb;
+	int busy;
+
+	ithread_mutex_lock(&gCtrlptCbMutex);
+	for (;;) {
+		busy = 0;
+		for (cb = gCtrlptCbs; cb != NULL; cb = cb->next) {
+			if (cb == self)
+				continue;
+			if (pthread_equal(cb->thread, ithread_self())) {
+				/* Called from a control point callback:
+				 * waiting would never end. */
+				ithread_mutex_unlock(&gCtrlptCbMutex);
+				return;
+			}
+			if (cb->handle == handle &&
+				(searchId < 0 || cb->searchId == searchId))
+				busy = 1;
+		}
+		if (!busy)
+			break;
+		ithread_cond_wait(&gCtrlptCbCond, &gCtrlptCbMutex);
+	}
+	ithread_mutex_unlock(&gCtrlptCbMutex);
+}
+
 int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 {
 	struct Handle_Info *HInfo;
@@ -1729,11 +1784,9 @@ int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 	FreeHandle(Hnd);
 	UpnpSdkClientRegistered -= 1;
 	HandleUnlock(__FILE__, __LINE__);
-	#if EXCLUDE_SSDP == 0
 	/* Queued search results are dropped now; wait for the running
-	 * discovery callbacks, no callback may follow the return. */
-	ssdp_wait_ctrlpt_callbacks(Hnd, -1);
-	#endif
+	 * callbacks, no callback may follow the return. */
+	ctrlpt_wait_callbacks(Hnd, -1, NULL);
 
 	UpnpPrintf(UPNP_ALL,
 		API,

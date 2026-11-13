@@ -184,6 +184,53 @@ Upnp_Handle_Type GetClientHandleInfo(
 	int *client_handle_out,
 	/*! [out] Client handle structure passed by this function. */
 	struct Handle_Info **HndInfo);
+
+#ifdef INCLUDE_CLIENT_APIS
+/*! A control point callback that is running, see ctrlpt_callback_enter(). */
+typedef struct ctrlpt_cb
+{
+	int handle;
+	/*! timeoutEventId of the search, or -1 for any other callback. */
+	int searchId;
+	ithread_t thread;
+	struct ctrlpt_cb *next;
+} CtrlptCallback;
+
+/*!
+ * \brief Marks a control point callback as running. Called with the handle
+ * lock held, so whoever ends the search or unregisters the client afterwards
+ * waits for the callback.
+ */
+void ctrlpt_callback_enter(
+	/*! [out] Entry for this callback, until ctrlpt_callback_leave(). */
+	CtrlptCallback *self,
+	/*! [in] Client handle. */
+	int handle,
+	/*! [in] timeoutEventId of the search, or -1. */
+	int searchId);
+
+/*! \brief Marks a control point callback as finished. */
+void ctrlpt_callback_leave(
+	/*! [in] Entry passed to ctrlpt_callback_enter(). */
+	CtrlptCallback *self);
+
+/*!
+ * \brief Waits until no callback of the given client is running: the
+ * callbacks of the given search, or with searchId -1 every callback of the
+ * client. Returns at once when called from a running callback other than
+ * \b self. The caller must not hold the handle lock.
+ */
+void ctrlpt_wait_callbacks(
+	/*! [in] Client handle. */
+	int handle,
+	/*! [in] timeoutEventId of the search, or -1 for every callback of the
+	 * handle. */
+	int searchId,
+	/*! [in] The caller's own running callback, which is not waited for, or
+	 * NULL. */
+	const CtrlptCallback *self);
+#endif /* INCLUDE_CLIENT_APIS */
+
 /*!
  * \brief Retrieves the device handle and information of the first device of
  * 	the address family specified. The search begins at the 'start' index,
