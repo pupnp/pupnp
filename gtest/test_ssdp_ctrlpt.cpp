@@ -14,7 +14,8 @@
 //
 // Advertisements (ssdp:alive, ssdp:byebye) are not queued, but their callback
 // ran after the handle lock was released, so UpnpUnRegisterClient() could
-// return while it was still running.
+// return while it was still running. The UPNP_DISCOVERY_SEARCH_TIMEOUT
+// callback of searchExpired() had the same problem.
 
 #include "upnp.h"
 #include "gtest/gtest.h"
@@ -294,6 +295,71 @@ TEST(SsdpCtrlptTestSuite, unregister_waits_for_advertisement_callback)
 	}
 	g_adv_cv.notify_all();
 	advertiser.join();
+	unregister.join();
+
+	EXPECT_FALSE(returned_early);
+	UpnpFinish();
+}
+
+namespace
+{
+
+// Holds the search timeout callback until the test opens the gate.
+std::mutex g_to_m;
+std::condition_variable g_to_cv;
+bool g_to_entered{false};
+bool g_to_open{false};
+
+int timeout_callback(Upnp_EventType type, void *, void *)
+{
+	if (type != UPNP_DISCOVERY_SEARCH_TIMEOUT)
+		return 0;
+	std::unique_lock<std::mutex> lk(g_to_m);
+	g_to_entered = true;
+	g_to_cv.notify_all();
+	g_to_cv.wait(lk, [] { return g_to_open; });
+	return 0;
+}
+
+} // namespace
+
+TEST(SsdpCtrlptTestSuite, unregister_waits_for_search_timeout_callback)
+{
+	if (UpnpInit2(nullptr, 0) != UPNP_E_SUCCESS)
+		GTEST_SKIP() << "UpnpInit2 failed (no network?)";
+
+	UpnpClient_Handle handle = -1;
+	ASSERT_EQ(UpnpRegisterClient(timeout_callback, nullptr, &handle),
+		UPNP_E_SUCCESS);
+	int cookie = 0;
+	// Shortest search: it times out after MIN_SEARCH_TIME seconds.
+	(void)UpnpSearchAsync(handle, 1, "ssdp:all", &cookie);
+
+	bool entered;
+	{
+		std::unique_lock<std::mutex> lk(g_to_m);
+		entered = g_to_cv.wait_for(lk,
+			std::chrono::seconds(MIN_SEARCH_TIME + 10),
+			[] { return g_to_entered; });
+	}
+	if (!entered) {
+		UpnpFinish();
+		FAIL() << "the search timeout callback did not run";
+	}
+
+	std::atomic<bool> returned{false};
+	std::thread unregister([&] {
+		UpnpUnRegisterClient(handle);
+		returned = true;
+	});
+	// UpnpUnRegisterClient() must still be waiting for the callback.
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	bool returned_early = returned;
+	{
+		std::lock_guard<std::mutex> lk(g_to_m);
+		g_to_open = true;
+	}
+	g_to_cv.notify_all();
 	unregister.join();
 
 	EXPECT_FALSE(returned_early);
