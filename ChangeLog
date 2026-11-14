@@ -2,6 +2,14 @@
 Version 22.2.3
 *******************************************************************************
 
+- PR #678: Wait for running GENA and search timeout callbacks in
+  UpnpUnRegisterClient(). The UPNP_EVENT_RECEIVED,
+  UPNP_EVENT_AUTORENEWAL_FAILED, UPNP_EVENT_SUBSCRIPTION_EXPIRED and
+  UPNP_DISCOVERY_SEARCH_TIMEOUT callbacks ran after the handle lock was
+  released, so UpnpUnRegisterClient() could return while one was still
+  running and the application could free the cookie it was using. They
+  now use the same tracking as the discovery callbacks (PR #674).
+
 - Issue #676: Send the Server, SERVER and User-Agent values as an RFC 7231
   product list. The old value had commas and spaces inside a product,
   e.g. "Linux/x.y, UPnP/1.0, Portable SDK for UPnP devices/X.Y.Z". It is
