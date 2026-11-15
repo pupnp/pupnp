@@ -2,6 +2,14 @@
 Version 22.2.3
 *******************************************************************************
 
+- PR #679: Lock the web server settings that requests read. The virtual
+  directory list, the document root and the CORS string were changed by
+  UpnpAddVirtualDir(), UpnpRemoveVirtualDir(), UpnpRemoveAllVirtualDirs(),
+  UpnpSetWebServerRootDir() and UpnpSetWebServerCorsString() without a
+  lock while the miniserver threads read them, so a request served at that
+  moment read freed memory. They are now changed and read under one mutex,
+  and process_request() works on its own copies of the two strings.
+
 - PR #678: Wait for running GENA and search timeout callbacks in
   UpnpUnRegisterClient(). The UPNP_EVENT_RECEIVED,
   UPNP_EVENT_AUTORENEWAL_FAILED, UPNP_EVENT_SUBSCRIPTION_EXPIRED and
