@@ -2,6 +2,13 @@
 Version 22.2.3
 *******************************************************************************
 
+- PR #680: Bring up a loopback of FuzzDevice's own when it runs in an
+  empty network namespace. ClusterFuzz runs the targets under
+  "unshare -c -n", where the loopback is down and cannot be brought up,
+  so FuzzDevice aborted in LLVMFuzzerInitialize (OSS-Fuzz issue
+  584816825). It now creates a user and network namespace of its own and
+  brings "lo" up there.
+
 - PR #679: Lock the web server settings that requests read. The virtual
   directory list, the document root and the CORS string were changed by
   UpnpAddVirtualDir(), UpnpRemoveVirtualDir(), UpnpRemoveAllVirtualDirs(),
