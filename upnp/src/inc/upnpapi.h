@@ -326,6 +326,7 @@ struct UpnpNonblockParam
 };
 
 extern virtualDirList *pVirtualDirList;
+extern ithread_mutex_t gWebServerSettingsMutex;
 extern struct VirtualDirCallbacks virtualDirCallback;
 
 typedef enum
