@@ -128,6 +128,10 @@ struct VirtualDirCallbacks virtualDirCallback;
 /*! Pointer to the virtual directory list. */
 virtualDirList *pVirtualDirList;
 
+/*! Guards the web server settings that the API changes while requests read
+ * them: the virtual directory list, the document root and the CORS string. */
+ithread_mutex_t gWebServerSettingsMutex = PTHREAD_MUTEX_INITIALIZER;
+
 #ifdef INCLUDE_CLIENT_APIS
 /*! Mutex to synchronize the subscription handling at the client side. */
 ithread_mutex_t GlobalClientSubscribeMutex;
@@ -4593,7 +4597,6 @@ int UpnpSetWebServerRootDir(const char *rootDir)
 	if ((rootDir == NULL) || (strlen(rootDir) == 0)) {
 		return UPNP_E_INVALID_PARAM;
 	}
-	membuffer_destroy(&gDocumentRootDir);
 
 	return web_server_set_root_dir(rootDir);
 }
@@ -4606,7 +4609,6 @@ int UpnpSetWebServerCorsString(const char *corsString)
 	if ((corsString == NULL) || (strlen(corsString) == 0)) {
 		return UPNP_E_INVALID_PARAM;
 	}
-	membuffer_destroy(&gWebserverCorsString);
 
 	return web_server_set_cors(corsString);
 }
@@ -4656,6 +4658,7 @@ int UpnpAddVirtualDir(
 		return UPNP_E_INVALID_PARAM;
 	}
 
+	ithread_mutex_lock(&gWebServerSettingsMutex);
 	pCurVirtualDir = pVirtualDirList;
 	while (pCurVirtualDir != NULL) {
 		/* already has this entry */
@@ -4663,6 +4666,7 @@ int UpnpAddVirtualDir(
 			if (oldcookie != NULL)
 				*oldcookie = pCurVirtualDir->cookie;
 			pCurVirtualDir->cookie = cookie;
+			ithread_mutex_unlock(&gWebServerSettingsMutex);
 			return UPNP_E_SUCCESS;
 		}
 
@@ -4671,6 +4675,7 @@ int UpnpAddVirtualDir(
 
 	pNewVirtualDir = (virtualDirList *)malloc(sizeof(virtualDirList));
 	if (pNewVirtualDir == NULL) {
+		ithread_mutex_unlock(&gWebServerSettingsMutex);
 		return UPNP_E_OUTOF_MEMORY;
 	}
 	pNewVirtualDir->next = NULL;
@@ -4692,6 +4697,7 @@ int UpnpAddVirtualDir(
 		}
 		pLast->next = pNewVirtualDir;
 	}
+	ithread_mutex_unlock(&gWebServerSettingsMutex);
 
 	return UPNP_E_SUCCESS;
 }
@@ -4712,7 +4718,9 @@ int UpnpRemoveVirtualDir(const char *removeDirName)
 		return UPNP_E_INVALID_PARAM;
 	}
 
+	ithread_mutex_lock(&gWebServerSettingsMutex);
 	if (pVirtualDirList == NULL) {
+		ithread_mutex_unlock(&gWebServerSettingsMutex);
 		return UPNP_E_INVALID_PARAM;
 	}
 	/* Handle the special case where the directory that we are */
@@ -4721,6 +4729,7 @@ int UpnpRemoveVirtualDir(const char *removeDirName)
 		pPrev = pVirtualDirList;
 		pVirtualDirList = pVirtualDirList->next;
 		free(pPrev);
+		ithread_mutex_unlock(&gWebServerSettingsMutex);
 		return UPNP_E_SUCCESS;
 	}
 
@@ -4738,6 +4747,7 @@ int UpnpRemoveVirtualDir(const char *removeDirName)
 			pCur = pCur->next;
 		}
 	}
+	ithread_mutex_unlock(&gWebServerSettingsMutex);
 
 	if (found == 1)
 		return UPNP_E_SUCCESS;
@@ -4754,6 +4764,7 @@ void UpnpRemoveAllVirtualDirs(void)
 		return;
 	}
 
+	ithread_mutex_lock(&gWebServerSettingsMutex);
 	pCur = pVirtualDirList;
 
 	while (pCur != NULL) {
@@ -4764,6 +4775,7 @@ void UpnpRemoveAllVirtualDirs(void)
 	}
 
 	pVirtualDirList = NULL;
+	ithread_mutex_unlock(&gWebServerSettingsMutex);
 }
 
 int UpnpEnableWebserver(int enable)

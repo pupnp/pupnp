@@ -558,8 +558,10 @@ int web_server_init()
 void web_server_destroy(void)
 {
 	if (bWebServerState == WEB_SERVER_ENABLED) {
+		ithread_mutex_lock(&gWebServerSettingsMutex);
 		membuffer_destroy(&gDocumentRootDir);
 		membuffer_destroy(&gWebserverCorsString);
+		ithread_mutex_unlock(&gWebServerSettingsMutex);
 		alias_release(&gAliasDoc);
 
 		ithread_mutex_lock(&gWebMutex);
@@ -654,15 +656,21 @@ int web_server_set_root_dir(const char *root_dir)
 	size_t index;
 	int ret;
 
+	/* Requests copy the document root under the same lock. */
+	ithread_mutex_lock(&gWebServerSettingsMutex);
+	membuffer_destroy(&gDocumentRootDir);
 	ret = membuffer_assign_str(&gDocumentRootDir, root_dir);
-	if (ret != 0)
+	if (ret != 0) {
+		ithread_mutex_unlock(&gWebServerSettingsMutex);
 		return ret;
+	}
 	/* remove trailing '/', if any */
 	if (gDocumentRootDir.length > 0) {
 		index = gDocumentRootDir.length - 1; /* last char */
 		if (gDocumentRootDir.buf[index] == '/')
 			membuffer_delete(&gDocumentRootDir, index, 1);
 	}
+	ithread_mutex_unlock(&gWebServerSettingsMutex);
 
 	return 0;
 }
@@ -671,7 +679,11 @@ int web_server_set_cors(const char *cors_string)
 {
 	int ret;
 
+	/* Requests copy the CORS string under the same lock. */
+	ithread_mutex_lock(&gWebServerSettingsMutex);
+	membuffer_destroy(&gWebserverCorsString);
 	ret = membuffer_assign_str(&gWebserverCorsString, cors_string);
+	ithread_mutex_unlock(&gWebServerSettingsMutex);
 	if (ret != 0)
 		return ret;
 
@@ -721,7 +733,11 @@ static int isFileInVirtualDir(
 {
 	virtualDirList *pCurVirtualDir;
 	size_t webDirLen;
+	int found = 0;
 
+	/* UpnpAddVirtualDir() and UpnpRemoveVirtualDir() change the list
+	 * while requests are served. */
+	ithread_mutex_lock(&gWebServerSettingsMutex);
 	pCurVirtualDir = pVirtualDirList;
 	while (pCurVirtualDir != NULL) {
 		webDirLen = strlen(pCurVirtualDir->dirName);
@@ -733,7 +749,8 @@ static int isFileInVirtualDir(
 					if (cookie != NULL)
 						*cookie =
 							pCurVirtualDir->cookie;
-					return 1;
+					found = 1;
+					break;
 				}
 			} else {
 				if (strncmp(pCurVirtualDir->dirName,
@@ -745,14 +762,16 @@ static int isFileInVirtualDir(
 					if (cookie != NULL)
 						*cookie =
 							pCurVirtualDir->cookie;
-					return 1;
+					found = 1;
+					break;
 				}
 			}
 		}
 		pCurVirtualDir = pCurVirtualDir->next;
 	}
+	ithread_mutex_unlock(&gWebServerSettingsMutex);
 
-	return 0;
+	return found;
 }
 
 /*!
@@ -1264,6 +1283,7 @@ static int process_request(
 	int alias_grabbed;
 	size_t dummy;
 	memptr hdr_value;
+	membuffer cors;
 
 	print_http_headers(req);
 	url = &req->uri;
@@ -1275,6 +1295,7 @@ static int process_request(
 	memset(&finfo, 0, sizeof(finfo));
 	request_doc = NULL;
 	finfo = UpnpFileInfo_new();
+	membuffer_init(&cors);
 	alias_grabbed = 0;
 	err_code = HTTP_INTERNAL_SERVER_ERROR; /* default error */
 	using_virtual_dir = 0;
@@ -1413,7 +1434,16 @@ static int process_request(
 			/* } */
 		}
 	} else if (!using_alias) {
-		if (gDocumentRootDir.length == 0) {
+		/* UpnpSetWebServerRootDir() can change the document root while
+		 * requests are served: copy it under the lock. */
+		ithread_mutex_lock(&gWebServerSettingsMutex);
+		code = -1;
+		if (gDocumentRootDir.length > 0)
+			code = membuffer_assign(filename,
+				gDocumentRootDir.buf,
+				gDocumentRootDir.length);
+		ithread_mutex_unlock(&gWebServerSettingsMutex);
+		if (code != 0) {
 			goto error_handler;
 		}
 		/* The checks above stop at the first '?' or '#', a decoded one
@@ -1434,8 +1464,7 @@ static int process_request(
 		/* */
 
 		/* filename str */
-		if (membuffer_assign_str(filename, gDocumentRootDir.buf) != 0 ||
-			membuffer_append_str(filename, request_doc) != 0) {
+		if (membuffer_append_str(filename, request_doc) != 0) {
 			goto error_handler; /* out of mem */
 		}
 		/* remove trailing slashes */
@@ -1481,9 +1510,16 @@ static int process_request(
 		/*          goto error_handler; */
 		/*      } */
 	}
-	RespInstr->CorsHeader = (gWebserverCorsString.length > 0)
-					? gWebserverCorsString.buf
-					: NULL;
+	/* Keep a copy: UpnpSetWebServerCorsString() can free the string before
+	 * the headers are made. */
+	ithread_mutex_lock(&gWebServerSettingsMutex);
+	code = membuffer_assign(
+		&cors, gWebserverCorsString.buf, gWebserverCorsString.length);
+	ithread_mutex_unlock(&gWebServerSettingsMutex);
+	if (code != 0) {
+		goto error_handler;
+	}
+	RespInstr->CorsHeader = cors.length > 0 ? cors.buf : NULL;
 	RespInstr->ReadSendSize = UpnpFileInfo_get_FileLength(finfo);
 	/* Check other header field. */
 	code = CheckOtherHTTPHeaders(
@@ -1658,6 +1694,9 @@ static int process_request(
 
 error_handler:
 	free(request_doc);
+	/* Only the headers made above use the copy of the CORS string. */
+	RespInstr->CorsHeader = NULL;
+	membuffer_destroy(&cors);
 	FreeExtraHTTPHeaders(
 		(UpnpListHead *)UpnpFileInfo_get_ExtraHeadersList(finfo));
 	UpnpFileInfo_delete(finfo);
