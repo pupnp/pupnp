@@ -602,6 +602,26 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# The virtual directory list, the document root and the CORS string were
+# changed by the API without a lock while requests read them, so a request
+# served at that moment read freed memory.
+UPNP_Add_Unit_Test(test-upnp-webserver-settings-race
+	test_webserver_settings_race.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-webserver-settings-race PRIVATE
+		Threads::Threads
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-webserver-settings-race-static PRIVATE
+		Threads::Threads
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # A Range request starting at or after the end of the file was answered with
 # 206 and a "Content-Range: bytes 6-5/6" header instead of 416.
 UPNP_Add_Unit_Test(test-upnp-webserver-range test_webserver_range.c)
