@@ -12,6 +12,10 @@
  * fixed values, and never accepts a subscription, so no NOTIFY is sent. The
  * subscriptions a SUBSCRIBE adds are dropped after each input. */
 
+#ifdef __linux__
+	#define _GNU_SOURCE /* unshare() */
+#endif
+
 #include "config.h"
 
 #include "httpparser.h"
@@ -39,6 +43,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef __linux__
+	#include <sched.h>
+#endif
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -261,6 +269,40 @@ static int find_loopback(char *name, size_t size)
 	return found;
 }
 
+/* ClusterFuzz runs the target under "unshare -c -n": a new network namespace
+ * whose loopback is down and has no address, and no capability to bring it
+ * up. A user and network namespace of our own gives us that capability, and
+ * bringing its "lo" up makes the kernel give it 127.0.0.1. Must run before
+ * any thread is started. */
+static void bring_loopback_up(void)
+{
+	#ifdef __linux__
+	struct ifreq ifr;
+	int fd;
+
+	if (unshare(CLONE_NEWUSER | CLONE_NEWNET) != 0) {
+		perror("FuzzDevice: unshare");
+		return;
+	}
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (fd < 0) {
+		perror("FuzzDevice: socket");
+		return;
+	}
+	memset(&ifr, 0, sizeof(ifr));
+	snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", "lo");
+	if (ioctl(fd, SIOCGIFFLAGS, &ifr) != 0) {
+		perror("FuzzDevice: SIOCGIFFLAGS lo");
+	} else if (!(ifr.ifr_flags & IFF_UP)) {
+		ifr.ifr_flags |= IFF_UP;
+		if (ioctl(fd, SIOCSIFFLAGS, &ifr) != 0) {
+			perror("FuzzDevice: SIOCSIFFLAGS lo");
+		}
+	}
+	close(fd);
+	#endif
+}
+
 /* Drops the subscriptions that the last input added. */
 static void reset_subscriptions(void)
 {
@@ -324,6 +366,9 @@ int LLVMFuzzerInitialize(int *argc, char ***argv)
 
 	/* Without a device the target cannot reach what it is for: fail
 	 * loudly rather than fuzz nothing. */
+	if (!find_loopback(ifname, sizeof(ifname))) {
+		bring_loopback_up();
+	}
 	if (!find_loopback(ifname, sizeof(ifname))) {
 		fprintf(stderr, "FuzzDevice: no IPv4 loopback interface\n");
 		abort();
