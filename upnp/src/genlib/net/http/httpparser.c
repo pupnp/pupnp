@@ -1637,6 +1637,11 @@ parse_status_t parser_parse_headers(http_parser_t *parser)
 					HTTP_INTERNAL_SERVER_ERROR;
 				return PARSE_FAILURE;
 			}
+		} else if (parser->position != (parser_pos_t)POS_HEADERS) {
+			/* A chunked trailer field is not merged into a header
+			 * field (RFC 9110, 6.5.1): the value buffer may be
+			 * handed out already, e.g. as the content type of
+			 * http_GetHttpResponse(). Drop it. */
 		} else if (hdr_value.length > (size_t)0) {
 			/* append value to existing header */
 			/* append space */
