@@ -222,6 +222,39 @@ TEST(CtrlptAsyncTestSuite, no_action_complete_callback_after_unregister)
 	UpnpFinish();
 }
 
+// Handles are reused: a client registered right after an unregister gets the
+// same number. The completion callback of a call made by the old client must
+// still not run.
+TEST(CtrlptAsyncTestSuite, no_action_complete_callback_after_handle_reuse)
+{
+	if (UpnpInit2(nullptr, 0) != UPNP_E_SUCCESS)
+		GTEST_SKIP() << "UpnpInit2 failed (no network?)";
+
+	FakeServer server(1000);
+	ASSERT_TRUE(server.Start());
+	ResetCallbackState(false);
+	UpnpClient_Handle handle = -1;
+	ASSERT_EQ(UpnpRegisterClient(client_callback, nullptr, &handle),
+		UPNP_E_SUCCESS);
+	ASSERT_EQ(SendAction(handle, server.Url()), UPNP_E_SUCCESS);
+	ASSERT_EQ(UpnpUnRegisterClient(handle), UPNP_E_SUCCESS);
+	UpnpClient_Handle new_handle = -1;
+	ASSERT_EQ(UpnpRegisterClient(client_callback, nullptr, &new_handle),
+		UPNP_E_SUCCESS);
+	ASSERT_EQ(new_handle, handle) << "the handle was not reused";
+
+	// The server answers after 1 s; give the job time to finish.
+	std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+	int calls;
+	{
+		std::lock_guard<std::mutex> lk(g_m);
+		calls = g_calls;
+	}
+	EXPECT_EQ(calls, 0);
+	UpnpUnRegisterClient(new_handle);
+	UpnpFinish();
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
