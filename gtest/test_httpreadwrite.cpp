@@ -1093,6 +1093,42 @@ TEST_F(GhsaV5wvStreamTestSuite, RejectsOversizedTrailerBlockWhenStreaming)
 	EXPECT_GT(Unread(), 0);
 }
 
+// The content type given out by http_GetHttpResponse() points into the value
+// of the Content-Type header and must stay valid until the handle is closed. A
+// trailer field with the same name was appended to that value, so the buffer
+// was reallocated and freed while the body was read.
+TEST_F(GhsaV5wvStreamTestSuite, TrailerDoesNotChangeContentType)
+{
+	g_maxHeaderSize = 4096;
+
+	std::string resp = "HTTP/1.1 200 OK\r\n"
+			   "Content-Type: text/xml\r\n"
+			   "Transfer-Encoding: chunked\r\n"
+			   "\r\n"
+			   "5\r\nhello\r\n"
+			   "0\r\n"
+			   "Content-Type: ";
+	resp.append(2000, 'a');
+	resp += "\r\n\r\n";
+	Send(resp);
+
+	char *content_type = nullptr;
+	ASSERT_EQ(http_GetHttpResponse(
+			  handle_, nullptr, &content_type, nullptr, nullptr, 1),
+		UPNP_E_SUCCESS);
+	ASSERT_NE(content_type, nullptr);
+	char buf[64];
+	size_t size;
+	int ret;
+	do {
+		size = sizeof(buf);
+		ret = http_ReadHttpResponse(handle_, buf, &size, 1);
+	} while (ret == UPNP_E_SUCCESS && size > 0);
+
+	EXPECT_EQ(ret, UPNP_E_SUCCESS);
+	EXPECT_STREQ(content_type, "text/xml");
+}
+
 // The Host header of a client request was copied from the raw URL string, up
 // to the first '/' after "//", while the connection used the parsed host and
 // port. Anything after the port, CR and LF included, went into the request.
