@@ -2,6 +2,16 @@
 Version 22.2.4
 *******************************************************************************
 
+- PR #681: Do not call back asynchronous completions after
+  UpnpUnRegisterClient(). The *_COMPLETE callbacks of UpnpSubscribeAsync(),
+  UpnpUnSubscribeAsync(), UpnpRenewSubscriptionAsync(),
+  UpnpSendActionAsync(), UpnpSendActionExAsync() and
+  UpnpGetServiceVarStatusAsync() were not waited for and could run after
+  UpnpUnRegisterClient() had returned, also for a new client that got the
+  same handle number. They are now tracked like the other control point
+  callbacks and tied to the generation of the client handle. An
+  application that unregisters with such calls pending no longer gets their
+  callbacks, and has to free their cookies itself.
 
 
 *******************************************************************************
