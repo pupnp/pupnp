@@ -916,8 +916,12 @@ void TvStateUpdate(
 						tmpstate =
 							SampleUtil_GetElementValue(
 								variable);
-						if (tmpstate) {
-							strcpy(State[j],
+						if (tmpstate &&
+							strlen(tmpstate) <
+								TV_MAX_VAL_LEN) {
+							snprintf(State[j],
+								TV_MAX_VAL_LEN,
+								"%s",
 								tmpstate);
 							SampleUtil_Print(
 								" Variable "
