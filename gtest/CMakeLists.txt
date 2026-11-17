@@ -235,3 +235,28 @@ if (NOT WIN32 AND UPNP_BUILD_STATIC)
 	set_tests_properties(${GTEST_test_gena_ctrlpt_static}
 		PROPERTIES RESOURCE_LOCK upnp_stack)
 endif()
+
+# regression test — no asynchronous completion callback may run after
+# UpnpUnRegisterClient() returns; the fake server uses POSIX sockets.
+if (NOT WIN32 AND UPNP_BUILD_STATIC)
+	add_executable(test_ctrlpt_async-static test_ctrlpt_async.cpp)
+	target_link_libraries(test_ctrlpt_async-static PRIVATE upnp_static GTest::gtest)
+	target_include_directories(test_ctrlpt_async-static PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/inc/
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/threadutil/
+	)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test_ctrlpt_async-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+		)
+	endif()
+	gtest_add_tests(
+		TARGET test_ctrlpt_async-static
+		TEST_PREFIX test-upnp-
+		TEST_SUFFIX -static
+		TEST_LIST GTEST_test_ctrlpt_async_static
+	)
+	# This test starts the UPnP stack, see UPNP_Add_Unit_Test.
+	set_tests_properties(${GTEST_test_ctrlpt_async_static}
+		PROPERTIES RESOURCE_LOCK upnp_stack)
+endif()
