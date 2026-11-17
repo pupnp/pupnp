@@ -4266,13 +4266,38 @@ int UpnpGetIfInfo(const char *IfName)
 	return UPNP_E_SUCCESS;
 }
 
+#ifdef INCLUDE_CLIENT_APIS
+/*!
+ * \brief Marks the completion callback of an asynchronous call as running.
+ *
+ * \return 1 if the callback may be made, 0 if the client was unregistered
+ * 	and no callback may follow.
+ */
+static int async_callback_enter(
+	/*! [in] The asynchronous call. */
+	const struct UpnpNonblockParam *Param,
+	/*! [out] Entry for the callback, until ctrlpt_callback_leave(). */
+	CtrlptCallback *cb)
+{
+	struct Handle_Info *HInfo;
+	int ok;
+
+	HandleReadLock(__FILE__, __LINE__);
+	ok = GetHandleInfo(Param->Handle, &HInfo) == HND_CLIENT;
+	if (ok)
+		ctrlpt_callback_enter(cb, Param->Handle, -1);
+	HandleUnlock(__FILE__, __LINE__);
+
+	return ok;
+}
+
 /*!
  * \brief Schedule async functions in threadpool.
  */
-#ifdef INCLUDE_CLIENT_APIS
 void UpnpThreadDistribution(void *input)
 {
 	struct UpnpNonblockParam *Param = (struct UpnpNonblockParam *)input;
+	CtrlptCallback cb;
 	int errCode = 0;
 
 	UpnpPrintf(UPNP_ALL,
@@ -4295,7 +4320,12 @@ void UpnpThreadDistribution(void *input)
 		UpnpEventSubscribe_set_ErrCode(evt, errCode);
 		UpnpEventSubscribe_set_TimeOut(evt, Param->TimeOut);
 		UpnpEventSubscribe_set_SID(evt, Sid);
-		Param->Fun(UPNP_EVENT_SUBSCRIBE_COMPLETE, evt, Param->Cookie);
+		if (async_callback_enter(Param, &cb)) {
+			Param->Fun(UPNP_EVENT_SUBSCRIBE_COMPLETE,
+				evt,
+				Param->Cookie);
+			ctrlpt_callback_leave(&cb);
+		}
 		UpnpString_delete(Sid);
 		UpnpEventSubscribe_delete(evt);
 		free(Param);
@@ -4309,7 +4339,12 @@ void UpnpThreadDistribution(void *input)
 		UpnpEventSubscribe_set_ErrCode(evt, errCode);
 		UpnpEventSubscribe_strcpy_PublisherUrl(evt, "");
 		UpnpEventSubscribe_set_TimeOut(evt, 0);
-		Param->Fun(UPNP_EVENT_UNSUBSCRIBE_COMPLETE, evt, Param->Cookie);
+		if (async_callback_enter(Param, &cb)) {
+			Param->Fun(UPNP_EVENT_UNSUBSCRIBE_COMPLETE,
+				evt,
+				Param->Cookie);
+			ctrlpt_callback_leave(&cb);
+		}
 		UpnpEventSubscribe_delete(evt);
 		free(Param);
 		break;
@@ -4322,7 +4357,12 @@ void UpnpThreadDistribution(void *input)
 			&Param->TimeOut);
 		UpnpEventSubscribe_set_ErrCode(evt, errCode);
 		UpnpEventSubscribe_set_TimeOut(evt, Param->TimeOut);
-		Param->Fun(UPNP_EVENT_RENEWAL_COMPLETE, evt, Param->Cookie);
+		if (async_callback_enter(Param, &cb)) {
+			Param->Fun(UPNP_EVENT_RENEWAL_COMPLETE,
+				evt,
+				Param->Cookie);
+			ctrlpt_callback_leave(&cb);
+		}
 		UpnpEventSubscribe_delete(evt);
 		free(Param);
 		break;
@@ -4349,7 +4389,12 @@ void UpnpThreadDistribution(void *input)
 		UpnpActionComplete_set_ActionRequest(Evt, Param->Act);
 		UpnpActionComplete_set_ActionResult(Evt, actionResult);
 		UpnpActionComplete_strcpy_CtrlUrl(Evt, Param->Url);
-		Param->Fun(UPNP_CONTROL_ACTION_COMPLETE, Evt, Param->Cookie);
+		if (async_callback_enter(Param, &cb)) {
+			Param->Fun(UPNP_CONTROL_ACTION_COMPLETE,
+				Evt,
+				Param->Cookie);
+			ctrlpt_callback_leave(&cb);
+		}
 		UpnpActionComplete_delete(Evt);
 		ixmlDocument_free(actionResult);
 		free_action_arg((job_arg *)Param);
@@ -4364,7 +4409,12 @@ void UpnpThreadDistribution(void *input)
 		UpnpStateVarComplete_strcpy_CtrlUrl(Evt, Param->Url);
 		UpnpStateVarComplete_strcpy_StateVarName(Evt, Param->VarName);
 		UpnpStateVarComplete_set_CurrentVal(Evt, currentVal);
-		Param->Fun(UPNP_CONTROL_GET_VAR_COMPLETE, Evt, Param->Cookie);
+		if (async_callback_enter(Param, &cb)) {
+			Param->Fun(UPNP_CONTROL_GET_VAR_COMPLETE,
+				Evt,
+				Param->Cookie);
+			ctrlpt_callback_leave(&cb);
+		}
 		free(Param);
 		UpnpStateVarComplete_delete(Evt);
 		break;
