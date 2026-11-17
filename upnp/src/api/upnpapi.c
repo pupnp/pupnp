@@ -1629,6 +1629,10 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd,
 #endif /* INCLUDE_DEVICE_APIS */
 
 #ifdef INCLUDE_CLIENT_APIS
+/*! Generation of the last client registered, see Handle_Info.Generation.
+ * Written with the handle lock held for writing. */
+static unsigned int gClientGeneration = 0;
+
 int UpnpRegisterClient(
 	Upnp_FunPtr Fun, const void *Cookie, UpnpClient_Handle *Hnd)
 {
@@ -1661,6 +1665,7 @@ int UpnpRegisterClient(
 		return UPNP_E_OUTOF_MEMORY;
 	}
 	HInfo->HType = HND_CLIENT;
+	HInfo->Generation = ++gClientGeneration;
 	HInfo->Callback = Fun;
 	HInfo->Cookie = (void *)Cookie;
 	HInfo->ClientSubList = NULL;
@@ -2336,6 +2341,7 @@ int UpnpSubscribeAsync(UpnpClient_Handle Hnd,
 	const void *Cookie_const)
 {
 	struct Handle_Info *SInfo = NULL;
+	unsigned int Generation = 0;
 	struct UpnpNonblockParam *Param;
 	char *EvtUrl = (char *)EvtUrl_const;
 	ThreadPoolJob job;
@@ -2355,6 +2361,7 @@ int UpnpSubscribeAsync(UpnpClient_Handle Hnd,
 	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
+		Generation = SInfo->Generation;
 		break;
 	default:
 		HandleUnlock(__FILE__, __LINE__);
@@ -2383,6 +2390,7 @@ int UpnpSubscribeAsync(UpnpClient_Handle Hnd,
 
 	Param->FunName = SUBSCRIBE;
 	Param->Handle = Hnd;
+	Param->Generation = Generation;
 	strncpy(Param->Url, EvtUrl, sizeof(Param->Url) - 1);
 	Param->TimeOut = TimeOut;
 	Param->Fun = Fun;
@@ -2539,6 +2547,7 @@ int UpnpUnSubscribeAsync(UpnpClient_Handle Hnd,
 	int retVal = UPNP_E_SUCCESS;
 	ThreadPoolJob job;
 	struct Handle_Info *SInfo = NULL;
+	unsigned int Generation = 0;
 	struct UpnpNonblockParam *Param;
 
 	memset(&job, 0, sizeof(job));
@@ -2566,6 +2575,7 @@ int UpnpUnSubscribeAsync(UpnpClient_Handle Hnd,
 	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
+		Generation = SInfo->Generation;
 		break;
 	default:
 		HandleUnlock(__FILE__, __LINE__);
@@ -2584,6 +2594,7 @@ int UpnpUnSubscribeAsync(UpnpClient_Handle Hnd,
 
 	Param->FunName = UNSUBSCRIBE;
 	Param->Handle = Hnd;
+	Param->Generation = Generation;
 	strncpy(Param->SubsId, SubsId, sizeof(Param->SubsId) - 1);
 	Param->Fun = Fun;
 	Param->Cookie = (void *)Cookie_const;
@@ -2675,6 +2686,7 @@ int UpnpRenewSubscriptionAsync(UpnpClient_Handle Hnd,
 {
 	ThreadPoolJob job;
 	struct Handle_Info *SInfo = NULL;
+	unsigned int Generation = 0;
 	struct UpnpNonblockParam *Param;
 
 	memset(&job, 0, sizeof(job));
@@ -2691,6 +2703,7 @@ int UpnpRenewSubscriptionAsync(UpnpClient_Handle Hnd,
 	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
+		Generation = SInfo->Generation;
 		break;
 	default:
 		HandleUnlock(__FILE__, __LINE__);
@@ -2719,6 +2732,7 @@ int UpnpRenewSubscriptionAsync(UpnpClient_Handle Hnd,
 
 	Param->FunName = RENEW;
 	Param->Handle = Hnd;
+	Param->Generation = Generation;
 	strncpy(Param->SubsId, SubsId, sizeof(Param->SubsId) - 1);
 	Param->Fun = Fun;
 	Param->Cookie = (void *)Cookie_const;
@@ -3136,6 +3150,7 @@ int UpnpSendActionAsync(UpnpClient_Handle Hnd,
 	int rc;
 	ThreadPoolJob job;
 	struct Handle_Info *SInfo = NULL;
+	unsigned int Generation = 0;
 	struct UpnpNonblockParam *Param;
 	DOMString tmpStr;
 	char *ActionURL = (char *)ActionURL_const;
@@ -3158,6 +3173,7 @@ int UpnpSendActionAsync(UpnpClient_Handle Hnd,
 	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
+		Generation = SInfo->Generation;
 		break;
 	default:
 		HandleUnlock(__FILE__, __LINE__);
@@ -3188,6 +3204,7 @@ int UpnpSendActionAsync(UpnpClient_Handle Hnd,
 
 	Param->FunName = ACTION;
 	Param->Handle = Hnd;
+	Param->Generation = Generation;
 	strncpy(Param->Url, ActionURL, sizeof(Param->Url) - 1);
 	strncpy(Param->ServiceType,
 		ServiceType,
@@ -3234,6 +3251,7 @@ int UpnpSendActionExAsync(UpnpClient_Handle Hnd,
 	const void *Cookie_const)
 {
 	struct Handle_Info *SInfo = NULL;
+	unsigned int Generation = 0;
 	struct UpnpNonblockParam *Param;
 	DOMString tmpStr;
 	DOMString headerStr = NULL;
@@ -3268,6 +3286,7 @@ int UpnpSendActionExAsync(UpnpClient_Handle Hnd,
 	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
+		Generation = SInfo->Generation;
 		break;
 	default:
 		HandleUnlock(__FILE__, __LINE__);
@@ -3301,6 +3320,7 @@ int UpnpSendActionExAsync(UpnpClient_Handle Hnd,
 
 	Param->FunName = ACTION;
 	Param->Handle = Hnd;
+	Param->Generation = Generation;
 	strncpy(Param->Url, ActionURL, sizeof(Param->Url) - 1);
 	strncpy(Param->ServiceType,
 		ServiceType,
@@ -3361,6 +3381,7 @@ int UpnpGetServiceVarStatusAsync(UpnpClient_Handle Hnd,
 {
 	ThreadPoolJob job;
 	struct Handle_Info *SInfo = NULL;
+	unsigned int Generation = 0;
 	struct UpnpNonblockParam *Param;
 	char *ActionURL = (char *)ActionURL_const;
 	char *VarName = (char *)VarName_const;
@@ -3380,6 +3401,7 @@ int UpnpGetServiceVarStatusAsync(UpnpClient_Handle Hnd,
 	HandleReadLock(__FILE__, __LINE__);
 	switch (GetHandleInfo(Hnd, &SInfo)) {
 	case HND_CLIENT:
+		Generation = SInfo->Generation;
 		break;
 	default:
 		HandleUnlock(__FILE__, __LINE__);
@@ -3402,6 +3424,7 @@ int UpnpGetServiceVarStatusAsync(UpnpClient_Handle Hnd,
 
 	Param->FunName = STATUS;
 	Param->Handle = Hnd;
+	Param->Generation = Generation;
 	strncpy(Param->Url, ActionURL, sizeof(Param->Url) - 1);
 	strncpy(Param->VarName, VarName, sizeof(Param->VarName) - 1);
 	Param->Fun = Fun;
@@ -4271,7 +4294,7 @@ int UpnpGetIfInfo(const char *IfName)
  * \brief Marks the completion callback of an asynchronous call as running.
  *
  * \return 1 if the callback may be made, 0 if the client was unregistered
- * 	and no callback may follow.
+ * 	and no callback may follow, also when a new client got the same handle.
  */
 static int async_callback_enter(
 	/*! [in] The asynchronous call. */
@@ -4283,7 +4306,8 @@ static int async_callback_enter(
 	int ok;
 
 	HandleReadLock(__FILE__, __LINE__);
-	ok = GetHandleInfo(Param->Handle, &HInfo) == HND_CLIENT;
+	ok = GetHandleInfo(Param->Handle, &HInfo) == HND_CLIENT &&
+	     HInfo->Generation == Param->Generation;
 	if (ok)
 		ctrlpt_callback_enter(cb, Param->Handle, -1);
 	HandleUnlock(__FILE__, __LINE__);

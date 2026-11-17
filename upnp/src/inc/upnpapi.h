@@ -80,6 +80,10 @@ struct Handle_Info
 	Upnp_FunPtr Callback;
 	/*! . */
 	char *Cookie;
+	/*! Client handles only: differs between two clients that got the same
+	 * handle number one after the other, so a call made by the first one
+	 * never calls back the second. */
+	unsigned int Generation;
 	/*! 0 = not installed; otherwise installed. */
 	int aliasInstalled;
 
@@ -309,6 +313,8 @@ struct UpnpNonblockParam
 {
 	UpnpFunName FunName;
 	int Handle;
+	/*! Generation of the client handle when the call was made. */
+	unsigned int Generation;
 	int TimeOut;
 	char VarName[NAME_SIZE];
 	char NewVal[NAME_SIZE];
