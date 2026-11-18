@@ -671,6 +671,22 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# The SOAP fault for a QueryStateVariable request was made from the error
+# description of the device callback after the request holding it was freed.
+UPNP_Add_Unit_Test(test-upnp-soap-query-var-error test_soap_query_var_error.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-soap-query-var-error PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-soap-query-var-error-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # Issue #347: HTTP response headers must use title-case names.
 # Starts the UPnP HTTP server via UpnpInit2, sends a GET request over a raw
 # TCP socket, and verifies title-case header names in the response.
