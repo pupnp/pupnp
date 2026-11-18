@@ -189,8 +189,10 @@ Upnp_Handle_Type GetClientHandleInfo(
 	/*! [out] Client handle structure passed by this function. */
 	struct Handle_Info **HndInfo);
 
-#ifdef INCLUDE_CLIENT_APIS
-/*! A control point callback that is running, see ctrlpt_callback_enter(). */
+#if defined(INCLUDE_CLIENT_APIS) || defined(INCLUDE_DEVICE_APIS)
+/*! A control point callback that is running, see ctrlpt_callback_enter().
+ * The device callbacks use the same tracking, so that
+ * UpnpUnRegisterRootDevice() waits for them too. */
 typedef struct ctrlpt_cb
 {
 	int handle;
@@ -208,7 +210,7 @@ typedef struct ctrlpt_cb
 void ctrlpt_callback_enter(
 	/*! [out] Entry for this callback, until ctrlpt_callback_leave(). */
 	CtrlptCallback *self,
-	/*! [in] Client handle. */
+	/*! [in] Client or device handle. */
 	int handle,
 	/*! [in] timeoutEventId of the search, or -1. */
 	int searchId);
@@ -225,7 +227,7 @@ void ctrlpt_callback_leave(
  * \b self. The caller must not hold the handle lock.
  */
 void ctrlpt_wait_callbacks(
-	/*! [in] Client handle. */
+	/*! [in] Client or device handle. */
 	int handle,
 	/*! [in] timeoutEventId of the search, or -1 for every callback of the
 	 * handle. */
@@ -233,7 +235,7 @@ void ctrlpt_wait_callbacks(
 	/*! [in] The caller's own running callback, which is not waited for, or
 	 * NULL. */
 	const CtrlptCallback *self);
-#endif /* INCLUDE_CLIENT_APIS */
+#endif /* INCLUDE_CLIENT_APIS || INCLUDE_DEVICE_APIS */
 
 /*!
  * \brief Retrieves the device handle and information of the first device of

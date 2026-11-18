@@ -1400,6 +1400,7 @@ void gena_process_subscription_request(SOCKINFO *info, http_message_t *request)
 	struct Handle_Info *handle_info;
 	void *cookie;
 	Upnp_FunPtr callback_fun;
+	CtrlptCallback sub_cb;
 	UpnpDevice_Handle device_handle;
 	memptr nt_hdr;
 	char *event_url_path = NULL;
@@ -1595,13 +1596,14 @@ void gena_process_subscription_request(SOCKINFO *info, http_message_t *request)
 	/* copy callback */
 	callback_fun = handle_info->Callback;
 	cookie = handle_info->Cookie;
+	/* UpnpUnRegisterRootDevice() waits for the callback. */
+	ctrlpt_callback_enter(&sub_cb, device_handle, -1);
 
 	HandleUnlock(__FILE__, __LINE__);
 
 	/* make call back with request struct */
-	/* in the future should find a way of mainting that the handle */
-	/* is not unregistered in the middle of a callback */
 	callback_fun(UPNP_EVENT_SUBSCRIPTION_REQUEST, request_struct, cookie);
+	ctrlpt_callback_leave(&sub_cb);
 
 exit_function:
 	UpnpSubscriptionRequest_delete(request_struct);

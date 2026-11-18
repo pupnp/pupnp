@@ -105,7 +105,25 @@ typedef struct soap_devserv_t
 	memptr action_name;
 	Upnp_FunPtr callback;
 	void *cookie;
+	/*! The callback is marked as running from the lookup of the device
+	 * until it returns, see get_dev_service(). */
+	CtrlptCallback cb;
+	int cb_running;
 } soap_devserv_t;
+
+/*!
+ * \brief Marks the device callback of the request as finished, so that
+ * UpnpUnRegisterRootDevice() stops waiting for it.
+ */
+static void soap_callback_done(
+	/*! [in,out] SOAP device/service information. */
+	soap_devserv_t *soap_info)
+{
+	if (soap_info->cb_running) {
+		ctrlpt_callback_leave(&soap_info->cb);
+		soap_info->cb_running = 0;
+	}
+}
 
 /*!
  * \brief Sends SOAP error response.
@@ -360,6 +378,7 @@ static UPNP_INLINE void handle_query_variable(
 	/* send event */
 	soap_info->callback(
 		UPNP_CONTROL_GET_VAR_REQUEST, variable, soap_info->cookie);
+	soap_callback_done(soap_info);
 	UpnpPrintf(UPNP_INFO,
 		SOAP,
 		__FILE__,
@@ -450,6 +469,7 @@ static void handle_invoke_action(
 	UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "Calling Callback\n");
 	soap_info->callback(
 		UPNP_CONTROL_ACTION_REQUEST, action, soap_info->cookie);
+	soap_callback_done(soap_info);
 	err_code = UpnpActionRequest_get_ErrCode(action);
 	if (err_code != UPNP_E_SUCCESS) {
 		err_str = UpnpActionRequest_get_ErrStr_cstr(action);
@@ -526,6 +546,9 @@ static int get_dev_service(
 	namecopy(soap_info->service_id, serv_info->serviceId);
 	soap_info->callback = device_info->Callback;
 	soap_info->cookie = device_info->Cookie;
+	/* The callback is called after the handle lock is released. */
+	ctrlpt_callback_enter(&soap_info->cb, device_hnd, -1);
+	soap_info->cb_running = 1;
 	ret_code = 0;
 
 error_handler:
@@ -776,6 +799,7 @@ void soap_device_callback(
 		err_code = HTTP_INTERNAL_SERVER_ERROR;
 		goto error_handler;
 	}
+	soap_info->cb_running = 0;
 	if (get_dev_service(
 		    request, info->foreign_sockaddr.ss_family, soap_info) < 0) {
 		err_code = HTTP_NOT_FOUND;
@@ -828,6 +852,8 @@ void soap_device_callback(
 
 error_handler:
 	ixmlDocument_free(xml_doc);
+	if (soap_info)
+		soap_callback_done(soap_info);
 	free(soap_info);
 	if (err_code != HTTP_OK) {
 		http_SendStatusResponse(info,
