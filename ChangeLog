@@ -13,6 +13,13 @@ Version 22.2.4
   application that unregisters with such calls pending no longer gets their
   callbacks, and has to free their cookies itself.
 
+- PR #684: Send the QueryStateVariable error before freeing its request.
+  When the device callback answered a QueryStateVariable request with a
+  value, an error code and an error description, the SOAP fault was built
+  from the description after the request holding it had been freed (a
+  heap-use-after-free that could leak freed heap memory to the control
+  point).
+
 
 *******************************************************************************
 Version 22.2.3
