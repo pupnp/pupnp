@@ -20,6 +20,12 @@ Version 22.2.4
   heap-use-after-free that could leak freed heap memory to the control
   point).
 
+- PR #683: Bound the event value copied in TvStateUpdate(). The TV sample
+  control point copied the value of each evented state variable into a
+  TV_MAX_VAL_LEN (5 byte) buffer with strcpy(), so a device could overflow
+  it with a longer value. A value that does not fit is now ignored, as the
+  device side already does.
+
 
 *******************************************************************************
 Version 22.2.3
