@@ -26,6 +26,13 @@ Version 22.2.4
   it with a longer value. A value that does not fit is now ignored, as the
   device side already does.
 
+- PR #682: Do not merge chunked trailer fields into the response headers. A
+  trailer field with the name of a header already received was appended to
+  that header's value, reallocating the buffer that http_GetHttpResponse()
+  and UpnpOpenHttpGetEx() had handed out as the content type, so a server
+  could make the application read freed memory while it read the body.
+  Such trailer fields are now dropped (RFC 9110, 6.5.1).
+
 
 *******************************************************************************
 Version 22.2.3
