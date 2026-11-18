@@ -1617,6 +1617,9 @@ int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd,
 	}
 	FreeHandle(Hnd);
 	HandleUnlock(__FILE__, __LINE__);
+	/* No request can reach the device any more; wait for the callbacks
+	 * that are running, no callback may follow the return. */
+	ctrlpt_wait_callbacks(Hnd, -1, NULL);
 
 	UpnpPrintf(UPNP_INFO,
 		API,
@@ -1689,7 +1692,7 @@ int UpnpRegisterClient(
 }
 #endif /* INCLUDE_CLIENT_APIS */
 
-#ifdef INCLUDE_CLIENT_APIS
+#if defined(INCLUDE_CLIENT_APIS) || defined(INCLUDE_DEVICE_APIS)
 static ithread_mutex_t gCtrlptCbMutex = PTHREAD_MUTEX_INITIALIZER;
 static ithread_cond_t gCtrlptCbCond = PTHREAD_COND_INITIALIZER;
 static CtrlptCallback *gCtrlptCbs = NULL;
@@ -1729,8 +1732,8 @@ void ctrlpt_wait_callbacks(int handle, int searchId, const CtrlptCallback *self)
 			if (cb == self)
 				continue;
 			if (pthread_equal(cb->thread, ithread_self())) {
-				/* Called from a control point callback:
-				 * waiting would never end. */
+				/* Called from a control point or device
+				 * callback: waiting would never end. */
 				ithread_mutex_unlock(&gCtrlptCbMutex);
 				return;
 			}
@@ -1744,7 +1747,9 @@ void ctrlpt_wait_callbacks(int handle, int searchId, const CtrlptCallback *self)
 	}
 	ithread_mutex_unlock(&gCtrlptCbMutex);
 }
+#endif /* INCLUDE_CLIENT_APIS || INCLUDE_DEVICE_APIS */
 
+#ifdef INCLUDE_CLIENT_APIS
 int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 {
 	struct Handle_Info *HInfo;
