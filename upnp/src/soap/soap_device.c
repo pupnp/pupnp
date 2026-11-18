@@ -383,9 +383,10 @@ static UPNP_INLINE void handle_query_variable(
 
 	/* error handling and cleanup */
 error_handler:
-	UpnpStateVarRequest_delete(variable);
+	/* err_str can point into variable: send the error before freeing it. */
 	if (err_code != 0)
 		send_error_response(info, err_code, err_str, request);
+	UpnpStateVarRequest_delete(variable);
 }
 
 /*!
