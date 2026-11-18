@@ -6,8 +6,11 @@ Versions currently being supported with security updates:
 
 | Version  | Supported          |
 | -------- | ------------------ |
-| 22.0.x   | :white_check_mark: |
-| < 22.0.x | :x:                |
+| 22.2.x   | :white_check_mark: |
+| < 22.2.x | :x:                |
+
+Security fixes go into the latest release only; they are not backported to
+older series, so please upgrade to the latest release.
 
 ## Reporting a Vulnerability
 
