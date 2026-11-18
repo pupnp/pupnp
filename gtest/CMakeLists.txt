@@ -260,3 +260,28 @@ if (NOT WIN32 AND UPNP_BUILD_STATIC)
 	set_tests_properties(${GTEST_test_ctrlpt_async_static}
 		PROPERTIES RESOURCE_LOCK upnp_stack)
 endif()
+
+# regression test — no device callback may run after UpnpUnRegisterRootDevice()
+# returns; the requests are sent over POSIX sockets.
+if (NOT WIN32 AND UPNP_BUILD_STATIC)
+	add_executable(test_device_unregister-static test_device_unregister.cpp)
+	target_link_libraries(test_device_unregister-static PRIVATE upnp_static GTest::gtest)
+	target_include_directories(test_device_unregister-static PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/inc/
+		${CMAKE_CURRENT_SOURCE_DIR}/../upnp/src/threadutil/
+	)
+	if(HAVE_MACRO_PREFIX_MAP)
+		target_compile_options(test_device_unregister-static
+			PRIVATE -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+		)
+	endif()
+	gtest_add_tests(
+		TARGET test_device_unregister-static
+		TEST_PREFIX test-upnp-
+		TEST_SUFFIX -static
+		TEST_LIST GTEST_test_device_unregister_static
+	)
+	# This test starts the UPnP stack, see UPNP_Add_Unit_Test.
+	set_tests_properties(${GTEST_test_device_unregister_static}
+		PROPERTIES RESOURCE_LOCK upnp_stack)
+endif()
