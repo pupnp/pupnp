@@ -2,6 +2,12 @@
 Version 22.2.5
 *******************************************************************************
 
+- PR #687: Drop all chunked trailer fields. A trailer field whose name was
+  not already a header was added to the message headers, and a SOAPACTION
+  field also made the request a SOAP call, so a chunked NOTIFY, SUBSCRIBE or
+  GET was dispatched to the SOAP handler. Trailer fields are no longer
+  treated as header fields (RFC 9110, 6.5.1); nothing in the stack uses them.
+
 - PR #686: Wait for the device callbacks in UpnpUnRegisterRootDevice().
   The UPNP_CONTROL_ACTION_REQUEST, UPNP_CONTROL_GET_VAR_REQUEST and
   UPNP_EVENT_SUBSCRIPTION_REQUEST callbacks run after the handle lock is
