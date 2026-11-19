@@ -133,7 +133,6 @@ int ixmlDocument_createElementEx(
 	newElement->n.nodeType = eELEMENT_NODE;
 	newElement->n.nodeName = strdup(tagName);
 	if (!newElement->n.nodeName) {
-		free(newElement->tagName);
 		ixmlElement_free(newElement);
 		newElement = NULL;
 		errCode = IXML_INSUFFICIENT_MEMORY;

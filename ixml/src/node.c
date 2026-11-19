@@ -1424,6 +1424,7 @@ int ixmlNode_setNodeName(IXML_Node *node, const DOMString qualifiedName)
 		rc = Parser_setNodePrefixAndLocalName(node);
 		if (rc != IXML_SUCCESS) {
 			free(node->nodeName);
+			node->nodeName = NULL;
 		}
 	}
 
