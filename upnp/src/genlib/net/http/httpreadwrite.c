@@ -1452,6 +1452,7 @@ int http_MakeHttpRequest(Upnp_HttpMethod method,
 	}
 	handle->requestStarted = 1;
 	handle->cancel = 0;
+	handle->contentLength = contentLength;
 	ret_code = MakeGenericMessage((http_method_t)method,
 		url_str,
 		&request,
