@@ -1129,6 +1129,45 @@ TEST_F(GhsaV5wvStreamTestSuite, TrailerDoesNotChangeContentType)
 	EXPECT_STREQ(content_type, "text/xml");
 }
 
+// A chunked trailer field with a new name was added to the headers, and a
+// SOAPACTION field also made the request a SOAP call, so a chunked NOTIFY was
+// dispatched to the SOAP handler. Trailer fields must not be treated as header
+// fields (RFC 9110, 6.5.1); nothing in the stack uses them.
+TEST_F(GhsaV5wvTestSuite, TrailerFieldsAreNotAddedToTheHeaders)
+{
+	std::string req = "NOTIFY /event HTTP/1.1\r\n"
+			  "Transfer-Encoding: chunked\r\n"
+			  "\r\n"
+			  "5\r\nhello\r\n"
+			  "0\r\n"
+			  "SOAPACTION: \"urn:x#y\"\r\n"
+			  "X-Trailer: v\r\n"
+			  "\r\n";
+
+	write(sv[1], req.data(), req.size());
+	close(sv[1]);
+	sv[1] = -1;
+
+	SOCKINFO info{};
+	info.socket = sv[0];
+
+	http_parser_t parser{};
+	int timeout = 5;
+	int http_err = 0;
+	int ret = http_RecvMessage(
+		&info, &parser, HTTPMETHOD_UNKNOWN, &timeout, &http_err);
+
+	EXPECT_EQ(ret, UPNP_E_SUCCESS);
+	EXPECT_EQ(parser.msg.method, HTTPMETHOD_NOTIFY);
+	EXPECT_EQ(httpmsg_find_hdr(&parser.msg, HDR_SOAPACTION, nullptr),
+		nullptr);
+	EXPECT_EQ(httpmsg_find_hdr_str(&parser.msg, "X-Trailer"), nullptr);
+	EXPECT_EQ(std::string(parser.msg.entity.buf, parser.msg.entity.length),
+		"hello");
+
+	httpmsg_destroy(&parser.msg);
+}
+
 // The Host header of a client request was copied from the raw URL string, up
 // to the first '/' after "//", while the connection used the parsed host and
 // port. Anything after the port, CR and LF included, went into the request.
