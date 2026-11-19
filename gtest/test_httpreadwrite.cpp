@@ -1291,6 +1291,116 @@ TEST_F(HostHeaderTestSuite, MakeHttpRequestUsesParsedHost)
 	ExpectHostHeader();
 }
 
+// UpnpOpenHttpPost() passed the address of the caller's handle variable to
+// http_MakeHttpRequest() instead of the handle, and http_MakeHttpRequest()
+// did not store contentLength in the handle, so http_WriteHttpRequest() and
+// http_EndHttpRequest() decided on chunked framing from uninitialised memory.
+class HttpPostTestSuite : public ::testing::Test
+{
+protected:
+	int listen_fd_{-1};
+	sockaddr_in addr_{};
+	std::string request_;
+	std::thread server_;
+
+	void SetUp() override
+	{
+		listen_fd_ = socket(AF_INET, SOCK_STREAM, 0);
+		ASSERT_GE(listen_fd_, 0);
+		addr_.sin_family = AF_INET;
+		addr_.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+		ASSERT_EQ(bind(listen_fd_,
+				  reinterpret_cast<sockaddr *>(&addr_),
+				  sizeof(addr_)),
+			0);
+		ASSERT_EQ(listen(listen_fd_, 1), 0);
+		socklen_t len = sizeof(addr_);
+		ASSERT_EQ(getsockname(listen_fd_,
+				  reinterpret_cast<sockaddr *>(&addr_),
+				  &len),
+			0);
+		server_ = std::thread([this] {
+			int fd = accept(listen_fd_, nullptr, nullptr);
+			if (fd < 0)
+				return;
+			char buf[1024];
+			pollfd pfd{fd, POLLIN, 0};
+			// Read until the peer stops sending; the client waits
+			// for the response, so a short idle timeout ends it.
+			while (poll(&pfd, 1, 500) > 0) {
+				ssize_t n = read(fd, buf, sizeof(buf));
+				if (n <= 0)
+					break;
+				request_.append(buf, (size_t)n);
+			}
+			static const char resp[] = "HTTP/1.1 200 OK\r\n"
+						   "Content-Length: 0\r\n"
+						   "\r\n";
+			(void)write(fd, resp, sizeof(resp) - 1);
+			close(fd);
+		});
+	}
+
+	void TearDown() override
+	{
+		if (server_.joinable())
+			server_.join();
+		if (listen_fd_ >= 0)
+			close(listen_fd_);
+	}
+
+	std::string Url()
+	{
+		return "http://127.0.0.1:" +
+		       std::to_string(ntohs(addr_.sin_port)) + "/x";
+	}
+};
+
+TEST_F(HttpPostTestSuite, OpenHttpPostSendsTheBody)
+{
+	void *handle = nullptr;
+	char body[] = "hello";
+	size_t size = 5;
+	int status = 0;
+	ASSERT_EQ(UpnpOpenHttpPost(Url().c_str(), &handle, "text/plain", 5, 5),
+		UPNP_E_SUCCESS);
+	EXPECT_EQ(UpnpWriteHttpPost(handle, body, &size, 5), UPNP_E_SUCCESS);
+	EXPECT_EQ(size, 5u);
+	EXPECT_EQ(UpnpCloseHttpPost(handle, &status, 5), UPNP_E_SUCCESS);
+	server_.join();
+	EXPECT_EQ(status, 200);
+	EXPECT_EQ(request_.rfind("POST /x HTTP/1.1\r\n", 0), 0u) << request_;
+	EXPECT_NE(request_.find("\r\nContent-Length: 5\r\n"), std::string::npos)
+		<< request_;
+	ASSERT_GE(request_.size(), 9u) << request_;
+	EXPECT_EQ(request_.substr(request_.size() - 9), "\r\n\r\nhello")
+		<< request_;
+}
+
+TEST_F(HttpPostTestSuite, MakeHttpRequestFramesChunkedBody)
+{
+	void *handle = nullptr;
+	char body[] = "hello";
+	size_t size = 5;
+	ASSERT_EQ(UpnpOpenHttpConnection(Url().c_str(), &handle, 5),
+		UPNP_E_SUCCESS);
+	EXPECT_EQ(UpnpMakeHttpRequest(UPNP_HTTPMETHOD_POST,
+			  Url().c_str(),
+			  handle,
+			  nullptr,
+			  "text/plain",
+			  UPNP_USING_CHUNKED,
+			  5),
+		UPNP_E_SUCCESS);
+	EXPECT_EQ(UpnpWriteHttpRequest(handle, body, &size, 5), UPNP_E_SUCCESS);
+	EXPECT_EQ(UpnpEndHttpRequest(handle, 5), UPNP_E_SUCCESS);
+	server_.join();
+	UpnpCloseHttpConnection(handle);
+	EXPECT_NE(request_.find("\r\n\r\n5\r\nhello\r\n0\r\n\r\n"),
+		std::string::npos)
+		<< request_;
+}
+
 // A header field value with a NUL or a bare CR is invalid (RFC 9110, 5.5) and
 // must be rejected. The parser kept them in the value, so code that reads the
 // value as a C string saw a different value than the length said, and a bare
