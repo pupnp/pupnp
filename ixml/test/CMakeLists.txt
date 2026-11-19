@@ -31,9 +31,10 @@ ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-attributes poc_ghsa_xr5m_attributes.c
 ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-prefix poc_ghsa_xr5m_prefix.c "")
 ixml_add_unit_test(test-ixml-struct-layout test_struct_layout.c "")
 
-# This test replaces strdup() with its own definition to make it fail.
+# These tests replace strdup() with their own definition to make it fail.
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	ixml_add_unit_test(test-ixml-attr-set-ns-oom test_attr_set_ns_oom.c "")
+	ixml_add_unit_test(test-ixml-node-name-oom test_node_name_oom.c "")
 endif()
 
 if(NOT UPNP_ENABLE_TESTING_INTEGRATION)
