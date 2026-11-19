@@ -2,6 +2,13 @@
 Version 22.2.5
 *******************************************************************************
 
+- PR #686: Wait for the device callbacks in UpnpUnRegisterRootDevice().
+  The UPNP_CONTROL_ACTION_REQUEST, UPNP_CONTROL_GET_VAR_REQUEST and
+  UPNP_EVENT_SUBSCRIPTION_REQUEST callbacks run after the handle lock is
+  released and were not tracked, so a SOAP or SUBSCRIBE request from the
+  network could keep one running after UpnpUnRegisterRootDevice() had
+  returned, and the application could free the cookie it was using. They
+  now use the same tracking as the control point callbacks.
 
 
 *******************************************************************************
