@@ -5,6 +5,10 @@
  * lookup condition that expects a namespace URI and a local name, but was
  * handed an attribute node. As soon as the element already had one
  * namespaced attribute, adding another one dereferenced a NULL local name.
+ *
+ * Setting an attribute the element already has with a different prefix
+ * changed the prefix but not the qualified name of the attribute, so the
+ * attribute was still found and printed under the old name.
  */
 
 #include "ixml.h"
@@ -36,6 +40,41 @@ static int test_set_attribute_ns(void)
 	CHECK(ixmlElement_setAttributeNS(el, NS, "p:a", "3") == IXML_SUCCESS);
 	CHECK(!strcmp(ixmlElement_getAttributeNS(el, NS, "a"), "3"));
 	CHECK(!strcmp(ixmlElement_getAttributeNS(el, NS, "b"), "2"));
+	ixmlElement_free(el);
+	ixmlDocument_free(doc);
+
+	return 0;
+}
+
+static int test_set_attribute_ns_new_prefix(void)
+{
+	IXML_Document *doc;
+	IXML_Element *el;
+	IXML_Attr *attr;
+	const char *prefix;
+	const char *value;
+	DOMString printed;
+	int found;
+
+	CHECK(ixmlDocument_createDocumentEx(&doc) == IXML_SUCCESS);
+	el = ixmlDocument_createElement(doc, "E");
+	CHECK(el);
+	CHECK(ixmlElement_setAttributeNS(el, NS, "p:a", "1") == IXML_SUCCESS);
+	/* Same namespace and local name: the attribute takes the new name. */
+	CHECK(ixmlElement_setAttributeNS(el, NS, "q:a", "2") == IXML_SUCCESS);
+	attr = ixmlElement_getAttributeNodeNS(el, NS, "a");
+	CHECK(attr);
+	CHECK(!strcmp(ixmlNode_getNodeName((IXML_Node *)attr), "q:a"));
+	prefix = ixmlNode_getPrefix((IXML_Node *)attr);
+	CHECK(prefix && !strcmp(prefix, "q"));
+	value = ixmlElement_getAttribute(el, "q:a");
+	CHECK(value && !strcmp(value, "2"));
+	CHECK(ixmlElement_getAttribute(el, "p:a") == NULL);
+	printed = ixmlPrintNode((IXML_Node *)el);
+	CHECK(printed);
+	found = strstr(printed, "q:a=\"2\"") != NULL;
+	ixmlFreeDOMString(printed);
+	CHECK(found);
 	ixmlElement_free(el);
 	ixmlDocument_free(doc);
 
@@ -79,6 +118,7 @@ int main(void)
 	int err = 0;
 
 	err |= test_set_attribute_ns();
+	err |= test_set_attribute_ns_new_prefix();
 	err |= test_set_attribute_node_ns();
 	if (!err)
 		puts("test_attr_ns: PASS");
