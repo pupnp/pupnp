@@ -2,6 +2,13 @@
 Version 22.2.5
 *******************************************************************************
 
+- PR #688: Do not free a node name twice when ixml runs out of memory.
+  ixmlDocument_createElementEx() freed the tag name before freeing the
+  element, which frees it again, and ixmlNode_setNodeName() freed the node
+  name without clearing the pointer, so the node destructor freed it a
+  second time. An allocation failure while parsing a document ended in a
+  double free instead of IXML_INSUFFICIENT_MEMORY.
+
 - PR #687: Drop all chunked trailer fields. A trailer field whose name was
   not already a header was added to the message headers, and a SOAPACTION
   field also made the request a SOAP call, so a chunked NOTIFY, SUBSCRIBE or
