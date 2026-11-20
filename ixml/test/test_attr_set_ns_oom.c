@@ -1,10 +1,13 @@
 /*
- * Regression test: ixmlElement_setAttributeNS() running out of memory while
- * it sets an attribute that the element already has.
+ * Regression test: ixmlElement_setAttributeNS() and ixmlElement_setAttribute()
+ * running out of memory while they set an attribute that the element already
+ * has.
  *
- * When the copy of the new value failed, the function freed the prefix of
- * the attribute and left the pointer in place. The attribute stayed in the
- * element with a dangling prefix, which was read and freed again later.
+ * When the copy of the new value failed, ixmlElement_setAttributeNS() freed
+ * the prefix of the attribute and left the pointer in place. The attribute
+ * stayed in the element with a dangling prefix, which was read and freed
+ * again later. ixmlElement_setAttribute() freed the old value before the copy,
+ * so a failure left the attribute without a value.
  *
  * The test replaces strdup() to make that one copy fail, so it is built only
  * where a definition in the executable is the one the library calls.
@@ -75,9 +78,33 @@ static int test_set_attribute_ns_value_oom(void)
 	return 0;
 }
 
+static int test_set_attribute_value_oom(void)
+{
+	IXML_Document *doc;
+	IXML_Element *el;
+	const char *value;
+
+	CHECK(ixmlDocument_createDocumentEx(&doc) == IXML_SUCCESS);
+	el = ixmlDocument_createElement(doc, "E");
+	CHECK(el);
+	CHECK(ixmlElement_setAttribute(el, "a", "1") == IXML_SUCCESS);
+	strdup_failures = 0;
+	CHECK(ixmlElement_setAttribute(el, "a", FAIL_VALUE) ==
+		IXML_INSUFFICIENT_MEMORY);
+	CHECK(strdup_failures == 1);
+	/* The attribute keeps the value it had before the failed call. */
+	value = ixmlElement_getAttribute(el, "a");
+	CHECK(value && !strcmp(value, "1"));
+	ixmlElement_free(el);
+	ixmlDocument_free(doc);
+
+	return 0;
+}
+
 int main(void)
 {
-	if (test_set_attribute_ns_value_oom()) {
+	if (test_set_attribute_ns_value_oom() ||
+		test_set_attribute_value_oom()) {
 		return 1;
 	}
 	printf("PASS\n");
