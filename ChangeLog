@@ -2,6 +2,13 @@
 Version 22.2.5
 *******************************************************************************
 
+- PR #689: Fix ixmlElement_setAttribute() and ixmlElement_setAttributeNS()
+  on an attribute the element already has. ixmlElement_setAttribute() freed
+  the old value before copying the new one, so a failed copy left the
+  attribute without a value. ixmlElement_setAttributeNS() with another
+  prefix changed the prefix but kept the old qualified name, so the
+  attribute was still printed and found under the old name.
+
 - PR #688: Do not free a node name twice when ixml runs out of memory.
   ixmlDocument_createElementEx() freed the tag name before freeing the
   element, which frees it again, and ixmlNode_setNodeName() freed the node
