@@ -511,6 +511,10 @@ int ixmlElement_setAttributeNS( //
 		/* replace it with the new prefix */
 		attrNode->prefix = newAttrNode.prefix;
 		newAttrNode.prefix = NULL;
+		/* and the qualified name with the new one */
+		free(attrNode->nodeName);
+		attrNode->nodeName = newAttrNode.nodeName;
+		newAttrNode.nodeName = NULL;
 		if (attrNode->nodeValue) {
 			/* Attribute name has a value already */
 			free(attrNode->nodeValue);
