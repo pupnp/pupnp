@@ -1533,6 +1533,10 @@ static int process_request(
 		err_code = HTTP_OK;
 		goto error_handler;
 	}
+	/* The alias is sent from memory as one buffer of known length, so it
+	 * is never chunked, whatever the TE header asks for. */
+	if (using_alias)
+		RespInstr->IsChunkActive = 0;
 
 	/* Check if chunked encoding should be used. */
 	if (using_virtual_dir &&
@@ -1911,17 +1915,27 @@ void web_server_callback(
 				headers.length,
 				filename.buf);
 			break;
-		case RESP_XMLDOC:
+		case RESP_XMLDOC: {
+			/* The 'b' format sends the buffer as it is: send only
+			 * the range the headers announce. */
+			char *doc = xmldoc.doc.buf;
+			size_t doc_length = xmldoc.doc.length;
+
+			if (RespInstr.IsRangeActive) {
+				doc += RespInstr.RangeOffset;
+				doc_length = (size_t)RespInstr.ReadSendSize;
+			}
 			http_SendMessage(info,
 				&timeout,
 				"Ibb",
 				&RespInstr,
 				headers.buf,
 				headers.length,
-				xmldoc.doc.buf,
-				xmldoc.doc.length);
+				doc,
+				doc_length);
 			alias_release(&xmldoc);
 			break;
+		}
 		case RESP_WEBDOC:
 			/*http_SendVirtualDirDoc(info, &timeout, "Ibf",
 				&RespInstr,
