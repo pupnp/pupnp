@@ -2,6 +2,15 @@
 Version 22.2.5
 *******************************************************************************
 
+- PR #690: Fix UpnpOpenHttpPost() and chunked requests made with
+  UpnpMakeHttpRequest(). UpnpOpenHttpPost() passed the address of the
+  caller's handle variable instead of the handle, so the request state was
+  written around that variable and UpnpCloseHttpPost() used an
+  uninitialised parser. http_MakeHttpRequest() did not store the content
+  length in the handle, so the body framing was chosen from uninitialised
+  memory and a UPNP_USING_CHUNKED body was sent without chunk sizes or the
+  last chunk.
+
 - PR #689: Fix ixmlElement_setAttribute() and ixmlElement_setAttributeNS()
   on an attribute the element already has. ixmlElement_setAttribute() freed
   the old value before copying the new one, so a failed copy left the
