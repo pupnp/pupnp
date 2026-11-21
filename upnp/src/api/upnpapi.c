@@ -3520,13 +3520,17 @@ int UpnpOpenHttpPost(const char *url,
 {
 	int status = http_OpenHttpConnection(url, handle, timeout);
 	if (status == UPNP_E_SUCCESS) {
-		return http_MakeHttpRequest(UPNP_HTTPMETHOD_POST,
+		status = http_MakeHttpRequest(UPNP_HTTPMETHOD_POST,
 			url,
 			*handle,
 			NULL,
 			contentType,
 			contentLength,
 			timeout);
+		if (status != UPNP_E_SUCCESS) {
+			http_CloseHttpConnection(*handle);
+			*handle = NULL;
+		}
 	}
 	return status;
 }
