@@ -2313,6 +2313,7 @@ UPNP_EXPORT_SPEC int UpnpCloseHttpGet(
  *
  * The SDK allocates the memory for \b handle, the
  * application is responsible for freeing this memory.
+ * On failure there is no connection and nothing to free.
  *
  *  \return An integer representing one of the following:
  *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
@@ -2404,6 +2405,7 @@ UPNP_EXPORT_SPEC int UpnpCloseHttpPost(
  *
  * The SDK allocates the memory for \b handle, the
  * application is responsible for freeing this memory.
+ * On failure there is no connection and nothing to free.
  *
  *  \return An integer representing one of the following:
  *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
