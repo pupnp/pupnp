@@ -3522,7 +3522,7 @@ int UpnpOpenHttpPost(const char *url,
 	if (status == UPNP_E_SUCCESS) {
 		return http_MakeHttpRequest(UPNP_HTTPMETHOD_POST,
 			url,
-			handle,
+			*handle,
 			NULL,
 			contentType,
 			contentLength,
