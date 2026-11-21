@@ -1428,6 +1428,10 @@ int http_OpenHttpConnection(const char *url_str, void **Handle, int timeout)
 	}
 #endif
 errorHandler:
+	if (ret_code != UPNP_E_SUCCESS) {
+		free(handle);
+		handle = NULL;
+	}
 	*Handle = handle;
 	return ret_code;
 }
