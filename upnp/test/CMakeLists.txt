@@ -642,6 +642,22 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# The XML alias got the headers of a Range or chunked response but was sent
+# whole, so its body did not match the length or framing they announced.
+UPNP_Add_Unit_Test(test-upnp-webserver-alias-range test_webserver_alias_range.c)
+if(UPNP_BUILD_SHARED)
+	target_link_libraries(test-upnp-webserver-alias-range PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+if(UPNP_BUILD_STATIC)
+	target_link_libraries(test-upnp-webserver-alias-range-static PRIVATE
+		$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+		$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+	)
+endif()
+
 # A POST is accepted only for a virtual directory, whose callbacks get the
 # body; a POST to a file in the document root is answered with 404.
 UPNP_Add_Unit_Test(test-upnp-webserver-post test_webserver_post.c)
