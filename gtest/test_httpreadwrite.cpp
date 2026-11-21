@@ -1401,6 +1401,71 @@ TEST_F(HttpPostTestSuite, MakeHttpRequestFramesChunkedBody)
 		<< request_;
 }
 
+// A failed UpnpOpenHttpConnection() or UpnpOpenHttpPost() returned a handle:
+// http_OpenHttpConnection() did not free it when the connection failed, and
+// UpnpOpenHttpPost() left the connection open when the request could not be
+// made, so a caller that does not close a handle after an error leaked it.
+// Returns a loopback TCP socket bound to an ephemeral port, and its address.
+static int BindLoopback(sockaddr_in &addr)
+{
+	int fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (fd < 0)
+		return -1;
+	addr = sockaddr_in{};
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	socklen_t len = sizeof(addr);
+	if (bind(fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) != 0 ||
+		getsockname(fd, reinterpret_cast<sockaddr *>(&addr), &len) !=
+			0) {
+		close(fd);
+		return -1;
+	}
+	return fd;
+}
+
+static std::string LoopbackUrl(const sockaddr_in &addr)
+{
+	return "http://127.0.0.1:" + std::to_string(ntohs(addr.sin_port)) +
+	       "/x";
+}
+
+TEST(HttpOpenFailureTest, OpenHttpConnectionFailureReturnsNoHandle)
+{
+	sockaddr_in addr;
+	int fd = BindLoopback(addr);
+	ASSERT_GE(fd, 0);
+	// Nothing listens on the port once the socket is closed.
+	close(fd);
+	void *handle = nullptr;
+	EXPECT_EQ(UpnpOpenHttpConnection(LoopbackUrl(addr).c_str(), &handle, 5),
+		UPNP_E_SOCKET_CONNECT);
+	EXPECT_EQ(handle, nullptr);
+	if (handle)
+		UpnpCloseHttpConnection(handle);
+}
+
+TEST(HttpOpenFailureTest, OpenHttpPostFailureReturnsNoHandle)
+{
+	sockaddr_in addr;
+	int fd = BindLoopback(addr);
+	ASSERT_GE(fd, 0);
+	// The connection completes in the backlog; no accept() is needed.
+	ASSERT_EQ(listen(fd, 1), 0);
+	void *handle = nullptr;
+	// -100 is not a valid content length, so the request cannot be made.
+	EXPECT_EQ(UpnpOpenHttpPost(LoopbackUrl(addr).c_str(),
+			  &handle,
+			  "text/plain",
+			  -100,
+			  5),
+		UPNP_E_INVALID_PARAM);
+	EXPECT_EQ(handle, nullptr);
+	if (handle)
+		UpnpCloseHttpConnection(handle);
+	close(fd);
+}
+
 // A header field value with a NUL or a bare CR is invalid (RFC 9110, 5.5) and
 // must be rejected. The parser kept them in the value, so code that reads the
 // value as a C string saw a different value than the length said, and a bare
