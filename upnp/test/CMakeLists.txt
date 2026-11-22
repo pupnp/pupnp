@@ -29,7 +29,8 @@ if(UPNP_BUILD_SHARED)
 	target_include_directories(test-upnp-threadpool-overflow
 		${TP_OVERFLOW_INCLUDES})
 	target_compile_definitions(test-upnp-threadpool-overflow
-		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>)
+		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
+		PRIVATE $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64>)
 	target_link_libraries(test-upnp-threadpool-overflow PRIVATE Threads::Shared)
 	if(HAVE_MACRO_PREFIX_MAP)
 		target_compile_options(test-upnp-threadpool-overflow
@@ -49,7 +50,8 @@ if(UPNP_BUILD_STATIC)
 	target_include_directories(test-upnp-threadpool-overflow-static
 		${TP_OVERFLOW_INCLUDES})
 	target_compile_definitions(test-upnp-threadpool-overflow-static
-		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>)
+		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
+		PRIVATE $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64>)
 	target_link_libraries(test-upnp-threadpool-overflow-static
 		PRIVATE Threads::Static)
 	if(HAVE_MACRO_PREFIX_MAP)
@@ -91,7 +93,8 @@ if(UPNP_BUILD_SHARED)
 	target_include_directories(test-upnp-threadpool-burst
 		${TP_OVERFLOW_INCLUDES})
 	target_compile_definitions(test-upnp-threadpool-burst
-		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>)
+		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
+		PRIVATE $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64>)
 	target_link_libraries(test-upnp-threadpool-burst PRIVATE Threads::Shared)
 	if(HAVE_MACRO_PREFIX_MAP)
 		target_compile_options(test-upnp-threadpool-burst
@@ -111,7 +114,8 @@ if(UPNP_BUILD_STATIC)
 	target_include_directories(test-upnp-threadpool-burst-static
 		${TP_OVERFLOW_INCLUDES})
 	target_compile_definitions(test-upnp-threadpool-burst-static
-		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>)
+		PRIVATE $<$<BOOL:${MSVC}>:UPNP_USE_MSVCPP>
+		PRIVATE $<$<BOOL:${_FILE_OFFSET_BITS}>:_FILE_OFFSET_BITS=64>)
 	target_link_libraries(test-upnp-threadpool-burst-static
 		PRIVATE Threads::Static)
 	if(HAVE_MACRO_PREFIX_MAP)
