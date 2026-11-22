@@ -2,6 +2,11 @@
 Version 22.2.5
 *******************************************************************************
 
+- PR #694: Copy the body in http_Download() instead of shrinking the
+  whole message with realloc(). The old code used the original pointer
+  when realloc() failed, which is valid but made GCC 16 warn
+  (-Wuse-after-free) in every optimised build. No change in behaviour.
+
 - PR #692: A failed UpnpOpenHttpConnection() or UpnpOpenHttpPost() no
   longer returns a handle. http_OpenHttpConnection() did not free the
   handle when the connection failed, and UpnpOpenHttpPost() left the
