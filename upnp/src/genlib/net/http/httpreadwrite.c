@@ -898,6 +898,7 @@ int http_Download(const char *url_str,
 	int ret_code;
 	uri_type url;
 	char *msg_start;
+	char *doc;
 	char *entity_start;
 	const char *hoststr;
 	http_parser_t response;
@@ -999,20 +1000,20 @@ int http_Download(const char *url_str,
 		entity_start = response.msg.entity.buf; /* what we want */
 		msg_length = response.msg.msg.length; /* save for posterity   */
 		msg_start = membuffer_detach(&response.msg.msg); /* whole msg */
-		/* move entity to the start; the byte after the entity is not
-		 * necessarily a NUL (e.g. extra CRLF after a chunked body) */
-		memmove(msg_start, entity_start, *doc_length);
-		/* save mem for body only */
-		*document = realloc(
-			msg_start, *doc_length + (size_t)1); /*LEAK_FIX_MK */
-		/* *document = Realloc( msg_start,msg_length, *doc_length + 1 );
-		 * LEAK_FIX_MK */
-		/* shrink can't fail */
 		assert(msg_length > *doc_length);
-		assert(*document != NULL);
-		if (*document == NULL)
-			*document = msg_start;
-		(*document)[*doc_length] = '\0';
+		/* copy the body only; the byte after the entity is not
+		 * necessarily a NUL (e.g. extra CRLF after a chunked body) */
+		doc = malloc(*doc_length + (size_t)1);
+		if (doc) {
+			memcpy(doc, entity_start, *doc_length);
+			free(msg_start);
+		} else {
+			/* keep the whole message, body moved to the start */
+			memmove(msg_start, entity_start, *doc_length);
+			doc = msg_start;
+		}
+		doc[*doc_length] = '\0';
+		*document = doc;
 		if (msg_length <= *doc_length)
 			UpnpPrintf(UPNP_INFO,
 				HTTP,
