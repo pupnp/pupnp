@@ -107,6 +107,48 @@ jobs:
         run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
       - name: Install
         run: cmake --install build --config ${{ matrix.conf }}
+  # Linux 32-bit build: 32-bit size_t, long and pointers, 64-bit off_t.
+  linux-i386:
+    name: Build (ubuntu-latest, i386) - Debug
+    runs-on: ubuntu-latest
+    env:
+      # Through the environment, not CMAKE_C_FLAGS, so that the projects the
+      # find_package and add_subdirectory tests configure are 32-bit too.
+      CFLAGS: -m32 -Wall -Wpedantic -O1 -D_FORTIFY_SOURCE=2
+      CXXFLAGS: -m32
+      # Otherwise pkg-config gives FindOpenSSL the 64-bit OpenSSL.
+      PKG_CONFIG_LIBDIR: /usr/lib/i386-linux-gnu/pkgconfig:/usr/share/pkgconfig
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install 32-bit toolchain and OpenSSL
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y gcc-multilib g++-multilib libssl-dev:i386
+      - name: Configure (create build system)
+        run: |
+          cmake \
+            ${{ env.cmake_common_flags }} \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install
+      - name: Build
+        run: cmake --build build --config Debug
+      # ctest_flags without its --exclude-regex, which also skips the Python
+      # tests here: they load libupnp with the runner's 64-bit Python.
+      - name: Test
+        run: |
+          ctest \
+            --test-dir build \
+            --output-on-failure \
+            --timeout 30 \
+            --exclude-regex "^pthreads4w|_add_subdirectory_|-py$" \
+            -C Debug
+      - name: Test (build as subproject)
+        run: ctest ${{ env.ctest_build_flags }} -C Debug
+      - name: Debug output
+        run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
+      - name: Install
+        run: cmake --install build --config Debug
   omnios:
     name: Build OmniOS - ${{ matrix.conf }}
     runs-on: ${{ matrix.os }}
