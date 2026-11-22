@@ -2,6 +2,14 @@
 Version 22.2.5
 *******************************************************************************
 
+- PR #692: A failed UpnpOpenHttpConnection() or UpnpOpenHttpPost() no
+  longer returns a handle. http_OpenHttpConnection() did not free the
+  handle when the connection failed, and UpnpOpenHttpPost() left the
+  connection open when the request could not be made, so a caller that
+  does not close a handle after an error leaked the handle and the socket.
+  Both now free what they allocated, and there is nothing to free after a
+  failure.
+
 - PR #690: Fix UpnpOpenHttpPost() and chunked requests made with
   UpnpMakeHttpRequest(). UpnpOpenHttpPost() passed the address of the
   caller's handle variable instead of the handle, so the request state was
