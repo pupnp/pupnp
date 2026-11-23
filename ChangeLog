@@ -2,6 +2,13 @@
 Version 22.2.5
 *******************************************************************************
 
+- PR #696: The XML alias (the description document registered with
+  UpnpRegisterRootDevice2() and a base URL) is sent with the framing its
+  headers announce. A GET with a Range header got "206" and the length of
+  the range followed by the whole document, and a GET with a TE header got
+  a chunked response with no chunks. The alias now sends only the range,
+  and is never chunked, since its length is known.
+
 - PR #694: Copy the body in http_Download() instead of shrinking the
   whole message with realloc(). The old code used the original pointer
   when realloc() failed, which is valid but made GCC 16 warn
