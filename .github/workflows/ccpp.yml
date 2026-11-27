@@ -149,6 +149,33 @@ jobs:
         run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
       - name: Install
         run: cmake --install build --config Debug
+  # Linux build without the internal web server (and so without an HTTP
+  # server): the device API stays on, and the tests that need HTTP are off.
+  linux-no-webserver:
+    name: Build (ubuntu-latest, no web server) - Debug
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Python test dependencies
+        run: pip install pytest
+      - name: Configure (create build system)
+        run: |
+          cmake \
+            ${{ env.cmake_common_flags }} \
+            -DUPNP_ENABLE_WEBSERVER=OFF \
+            -DCMAKE_C_FLAGS="-Wall -Wpedantic" \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_INSTALL_PREFIX=${{ GITHUB.WORKSPACE }}/test-install
+      - name: Build
+        run: cmake --build build --config Debug
+      - name: Test
+        run: ctest ${{ env.ctest_flags }} -C Debug
+      - name: Test (build as subproject)
+        run: ctest ${{ env.ctest_build_flags }} -C Debug
+      - name: Debug output
+        run: cmake -DBUILD_DIR=build -P cmake/post-test.cmake
+      - name: Install
+        run: cmake --install build --config Debug
   omnios:
     name: Build OmniOS - ${{ matrix.conf }}
     runs-on: ${{ matrix.os }}
