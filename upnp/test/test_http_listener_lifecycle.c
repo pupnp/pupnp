@@ -1,5 +1,5 @@
 /* HTTP listeners are optional independently of SSDP. The XML server below
- * belongs to the application, not pupnp. No external network is needed. */
+ * belongs to the application, not pupnp. No external hosts are needed. */
 #include "upnp.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,8 +62,10 @@ static int disable_from_callback(const char *host, void *cookie)
 }
 	#endif
 
-/* Loopback is lo on Linux and lo0 on macOS/BSD. */
-static int find_loopback(char *name, size_t name_size)
+/* Loopback multicast is not portable (e.g. lo0 in illumos CI). Use an up
+ * multicast-capable IPv4 interface; all peers still run locally. */
+static int find_multicast_interface(
+	char *name, size_t name_size, struct in_addr *address)
 {
 	struct ifaddrs *interfaces, *iface;
 	int found = 0;
@@ -71,18 +73,25 @@ static int find_loopback(char *name, size_t name_size)
 		return 0;
 	for (iface = interfaces; iface; iface = iface->ifa_next) {
 		if (!iface->ifa_addr || iface->ifa_addr->sa_family != AF_INET ||
-			!(iface->ifa_flags & IFF_LOOPBACK) ||
+			(iface->ifa_flags & IFF_LOOPBACK) ||
+			!(iface->ifa_flags & IFF_MULTICAST) ||
 			!(iface->ifa_flags & IFF_UP))
 			continue;
-		snprintf(name, name_size, "%s", iface->ifa_name);
+		if (!found)
+			snprintf(name, name_size, "%s", iface->ifa_name);
+		if (strcmp(name, iface->ifa_name) != 0)
+			continue;
+		/* Match the SDK, which keeps the last IPv4 address of the
+		 * selected interface when it has multiple addresses. */
+		*address = ((struct sockaddr_in *)iface->ifa_addr)->sin_addr;
 		found = 1;
-		break;
 	}
 	freeifaddrs(interfaces);
 	return found;
 }
 
-static int tcp_socket(unsigned short port, int listening)
+static int tcp_socket(
+	struct in_addr address, unsigned short port, int listening)
 {
 	struct sockaddr_in addr;
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -94,7 +103,7 @@ static int tcp_socket(unsigned short port, int listening)
 	}
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	addr.sin_addr = address;
 	addr.sin_port = htons(port);
 	if ((listening ? bind(fd, (struct sockaddr *)&addr, sizeof(addr))
 		       : connect(fd, (struct sockaddr *)&addr, sizeof(addr))) <
@@ -146,7 +155,7 @@ static void serve_xml(int listener, pid_t parent)
 	}
 }
 
-static int ssdp_observer(void)
+static int ssdp_observer(struct in_addr address)
 {
 	int fd = socket(AF_INET, SOCK_DGRAM, 0), one = 1;
 	struct sockaddr_in addr;
@@ -172,7 +181,7 @@ static int ssdp_observer(void)
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	memset(&group, 0, sizeof(group));
 	inet_pton(AF_INET, "239.255.255.250", &group.imr_multiaddr);
-	group.imr_interface.s_addr = htonl(INADDR_LOOPBACK);
+	group.imr_interface = address;
 	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) ||
 		setsockopt(fd,
 			IPPROTO_IP,
@@ -204,7 +213,7 @@ static int receive_location(int fd, const char *url, const char *kind)
 	return 0;
 }
 
-static int search_device(const char *url)
+static int search_device(const char *url, struct in_addr address)
 {
 	static const char search[] =
 		"M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\n"
@@ -212,18 +221,29 @@ static int search_device(const char *url)
 		"ST: urn:schemas-upnp-org:device:Basic:1\r\n\r\n";
 	int fd = socket(AF_INET, SOCK_DGRAM, 0), ok;
 	struct sockaddr_in dst, src;
-	struct in_addr iface;
+	unsigned char loop = 1;
 	if (fd < 0)
 		return 0;
 	memset(&src, 0, sizeof(src));
 	src.sin_family = AF_INET;
-	src.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	src.sin_addr = address;
 	if (bind(fd, (struct sockaddr *)&src, sizeof(src))) {
 		close(fd);
 		return 0;
 	}
-	iface.s_addr = htonl(INADDR_LOOPBACK);
-	setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, &iface, sizeof(iface));
+	if (setsockopt(fd,
+		    IPPROTO_IP,
+		    IP_MULTICAST_IF,
+		    &address,
+		    sizeof(address)) ||
+		setsockopt(fd,
+			IPPROTO_IP,
+			IP_MULTICAST_LOOP,
+			&loop,
+			sizeof(loop))) {
+		close(fd);
+		return 0;
+	}
 	memset(&dst, 0, sizeof(dst));
 	dst.sin_family = AF_INET;
 	dst.sin_port = htons(1900);
@@ -274,6 +294,7 @@ int main(void)
 	int external = -1, observer = -1, idle = -1, probe = -1;
 	pid_t child = -1, parent = getpid();
 	unsigned short reserved;
+	struct in_addr address, loopback = {htonl(INADDR_LOOPBACK)};
 	char url[256];
 	char name[IF_NAMESIZE + 1];
 	UpnpDevice_Handle device;
@@ -291,11 +312,11 @@ int main(void)
 	char byte;
 	#endif
 
-	if (!find_loopback(name, sizeof(name))) {
-		puts("SKIP: no IPv4 loopback interface is up");
+	if (!find_multicast_interface(name, sizeof(name), &address)) {
+		puts("SKIP: no multicast-capable IPv4 interface is up");
 		return EXIT_SUCCESS;
 	}
-	printf("Listener lifecycle test on loopback interface %s\n", name);
+	printf("Listener lifecycle test on multicast interface %s\n", name);
 
 	signal(SIGPIPE, SIG_IGN);
 	alarm(60);
@@ -303,7 +324,7 @@ int main(void)
 	CHECK(UpnpInit3(name, 0, ~UPNP_INIT_NO_WEB_SERVER) ==
 		UPNP_E_INVALID_PARAM);
 	CHECK(!UpnpIsWebserverEnabled());
-	external = tcp_socket(0, 1);
+	external = tcp_socket(loopback, 0, 1);
 	CHECK(external >= 0);
 	snprintf(url,
 		sizeof(url),
@@ -315,12 +336,12 @@ int main(void)
 		serve_xml(external, parent);
 	close(external);
 	external = -1;
-	probe = tcp_socket(0, 1);
+	probe = tcp_socket(address, 0, 1);
 	CHECK(probe >= 0);
 	reserved = socket_port(probe);
 	close(probe);
 	probe = -1;
-	observer = ssdp_observer();
+	observer = ssdp_observer(address);
 	CHECK(observer >= 0);
 	CHECK(UpnpInit3(name, reserved, UPNP_INIT_NO_WEB_SERVER) ==
 		UPNP_E_SUCCESS);
@@ -329,8 +350,9 @@ int main(void)
 	CHECK(!UpnpIsWebserverEnabled());
 	CHECK(!UpnpGetServerPort() && !UpnpGetServerPort6() &&
 		!UpnpGetServerUlaGuaPort6());
-	probe = tcp_socket(
-		reserved, 1); /* proves the requested port was not bound */
+	probe = tcp_socket(address,
+		reserved,
+		1); /* proves the requested port was not bound */
 	CHECK(probe >= 0);
 	close(probe);
 	probe = -1;
@@ -346,7 +368,7 @@ int main(void)
 	registered = 1;
 	CHECK(UpnpSendAdvertisement(device, 1800) == UPNP_E_SUCCESS);
 	CHECK(receive_location(observer, url, "ssdp:alive"));
-	CHECK(search_device(url));
+	CHECK(search_device(url, address));
 	CHECK(!UpnpGetServerPort());
 	#ifdef UPNP_HAVE_CLIENT
 	CHECK(UpnpRegisterClient(event, NULL, &client) == UPNP_E_SUCCESS);
@@ -362,7 +384,7 @@ int main(void)
 	CHECK(transition_under_fd_exhaustion(1));
 	for (i = 0; i < 4; ++i) {
 		if (i == 1) {
-			probe = tcp_socket(reserved, 1);
+			probe = tcp_socket(address, reserved, 1);
 			CHECK(probe >= 0);
 		}
 		CHECK(UpnpEnableWebserver(1) == UPNP_E_SUCCESS);
@@ -376,7 +398,7 @@ int main(void)
 		}
 		CHECK(UpnpEnableWebserver(1) == UPNP_E_SUCCESS);
 		CHECK(UpnpGetServerPort() == port);
-		idle = tcp_socket(port, 0);
+		idle = tcp_socket(address, port, 0);
 		CHECK(idle >= 0);
 		usleep(30000); /* let the listener accept the idle connection */
 		if (i == 0)
@@ -393,13 +415,13 @@ int main(void)
 		CHECK(recv(idle, &byte, 1, 0) <= 0);
 		close(idle);
 		idle = -1;
-		probe = tcp_socket(port, 0);
+		probe = tcp_socket(address, port, 0);
 		CHECK(probe < 0);
-		CHECK(search_device(url));
+		CHECK(search_device(url, address));
 	}
 	CHECK(UpnpEnableWebserver(1) == UPNP_E_SUCCESS);
 	UpnpSetHostValidateCallback(disable_from_callback, NULL);
-	idle = tcp_socket(UpnpGetServerPort(), 0);
+	idle = tcp_socket(address, UpnpGetServerPort(), 0);
 	CHECK(idle >= 0);
 	{
 		static const char request[] =
@@ -433,7 +455,7 @@ int main(void)
 		UPNP_E_SUCCESS);
 	registered = 1;
 	CHECK(UpnpSendAdvertisement(device, 1800) == UPNP_E_SUCCESS);
-	CHECK(search_device(url));
+	CHECK(search_device(url, address));
 	CHECK(!UpnpGetServerPort());
 	CHECK(UpnpUnRegisterRootDevice(device) == UPNP_E_SUCCESS);
 	registered = 0;
