@@ -9,6 +9,8 @@
 	#include <arpa/inet.h>
 	#include <errno.h>
 	#include <fcntl.h>
+	#include <ifaddrs.h>
+	#include <net/if.h>
 	#include <poll.h>
 	#include <signal.h>
 	#include <stdatomic.h>
@@ -55,6 +57,26 @@ static int disable_from_callback(const char *host, void *cookie)
 	(void)cookie;
 	atomic_store(&callback_result, UpnpEnableWebserver(0));
 	return UPNP_E_BAD_HTTPMSG;
+}
+
+/* Loopback is lo on Linux and lo0 on macOS/BSD. */
+static int find_loopback(char *name, size_t name_size)
+{
+	struct ifaddrs *interfaces, *iface;
+	int found = 0;
+	if (getifaddrs(&interfaces) != 0)
+		return 0;
+	for (iface = interfaces; iface; iface = iface->ifa_next) {
+		if (!iface->ifa_addr || iface->ifa_addr->sa_family != AF_INET ||
+			!(iface->ifa_flags & IFF_LOOPBACK) ||
+			!(iface->ifa_flags & IFF_UP))
+			continue;
+		snprintf(name, name_size, "%s", iface->ifa_name);
+		found = 1;
+		break;
+	}
+	freeifaddrs(interfaces);
+	return found;
 }
 
 static int tcp_socket(unsigned short port, int listening)
@@ -128,7 +150,19 @@ static int ssdp_observer(void)
 	struct ip_mreq group;
 	if (fd < 0)
 		return -1;
-	setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one))) {
+		close(fd);
+		return -1;
+	}
+	#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
+	/* Match the SDK's SSDP socket: BSD/macOS require SO_REUSEPORT on
+	 * both sockets sharing the multicast port. Do not set it on TCP
+	 * probes, which must still detect an occupied listener port. */
+	if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &one, sizeof(one))) {
+		close(fd);
+		return -1;
+	}
+	#endif
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(1900);
@@ -238,6 +272,7 @@ int main(void)
 	pid_t child = -1, parent = getpid();
 	unsigned short reserved, port;
 	char url[256];
+	char name[IF_NAMESIZE + 1];
 	UpnpDevice_Handle device;
 	UpnpClient_Handle client;
 	Upnp_SID sid;
@@ -245,10 +280,16 @@ int main(void)
 	struct pollfd pfd;
 	char byte;
 
+	if (!find_loopback(name, sizeof(name))) {
+		puts("SKIP: no IPv4 loopback interface is up");
+		return EXIT_SUCCESS;
+	}
+	printf("Listener lifecycle test on loopback interface %s\n", name);
+
 	signal(SIGPIPE, SIG_IGN);
 	alarm(60);
 	CHECK(UpnpEnableWebserver(0) == UPNP_E_FINISH);
-	CHECK(UpnpInit3("lo", 0, ~UPNP_INIT_NO_WEB_SERVER) ==
+	CHECK(UpnpInit3(name, 0, ~UPNP_INIT_NO_WEB_SERVER) ==
 		UPNP_E_INVALID_PARAM);
 	CHECK(!UpnpIsWebserverEnabled());
 	external = tcp_socket(0, 1);
@@ -270,10 +311,10 @@ int main(void)
 	probe = -1;
 	observer = ssdp_observer();
 	CHECK(observer >= 0);
-	CHECK(UpnpInit3("lo", reserved, UPNP_INIT_NO_WEB_SERVER) ==
+	CHECK(UpnpInit3(name, reserved, UPNP_INIT_NO_WEB_SERVER) ==
 		UPNP_E_SUCCESS);
 	initialized = 1;
-	CHECK(UpnpInit2("lo", 0) == UPNP_E_INIT);
+	CHECK(UpnpInit2(name, 0) == UPNP_E_INIT);
 	CHECK(!UpnpIsWebserverEnabled());
 	CHECK(!UpnpGetServerPort() && !UpnpGetServerPort6() &&
 		!UpnpGetServerUlaGuaPort6());
@@ -372,7 +413,7 @@ int main(void)
 	CHECK(!UpnpGetServerPort());
 	CHECK(UpnpInit3("no-such-pupnp-interface", 0, 0) ==
 		UPNP_E_INVALID_INTERFACE);
-	CHECK(UpnpInit2("lo", 0) == UPNP_E_SUCCESS);
+	CHECK(UpnpInit2(name, 0) == UPNP_E_SUCCESS);
 	initialized = 1;
 	#ifdef UPNP_HAVE_WEBSERVER
 	CHECK(UpnpGetServerPort() != 0 && UpnpIsWebserverEnabled());
@@ -388,7 +429,7 @@ int main(void)
 	#endif
 	CHECK(UpnpFinish() == UPNP_E_SUCCESS);
 	initialized = 0;
-	CHECK(UpnpInit3("lo", 0, UPNP_INIT_DEFAULT) == UPNP_E_SUCCESS);
+	CHECK(UpnpInit3(name, 0, UPNP_INIT_DEFAULT) == UPNP_E_SUCCESS);
 	initialized = 1;
 	#ifdef UPNP_HAVE_WEBSERVER
 	CHECK(UpnpGetServerPort() != 0 && UpnpIsWebserverEnabled());
