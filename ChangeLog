@@ -2,6 +2,12 @@
 Version 22.2.6
 *******************************************************************************
 
+- PR #699: Report where the GHSA-323w socket test stops. It hung again on
+  macOS until ctest killed it, so the send() timeout of PR #672 did not
+  cover the hang. A watchdog now prints the stage, what sock_write()
+  returned and what the reader received if the test has not finished
+  after 20 s, and aborts.
+
 - PR #698: Fix the build and the tests without the web server
   (-DUPNP_ENABLE_WEBSERVER=OFF). UpnpSetWebServerRootDir() and
   UpnpSetWebServerCorsString() are declared in every build but were only
