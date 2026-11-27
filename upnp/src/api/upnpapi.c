@@ -481,11 +481,11 @@ static int UpnpInitPreamble(void)
 		return retVal;
 	}
 
-#ifdef INCLUDE_DEVICE_APIS
+#if defined(INCLUDE_DEVICE_APIS) && defined(INTERNAL_WEB_SERVER)
 	#if EXCLUDE_SOAP == 0
 	SetSoapCallback(soap_device_callback);
 	#endif
-#endif /* INCLUDE_DEVICE_APIS */
+#endif /* INCLUDE_DEVICE_APIS && INTERNAL_WEB_SERVER */
 
 #ifdef INTERNAL_WEB_SERVER
 	#if EXCLUDE_GENA == 0
