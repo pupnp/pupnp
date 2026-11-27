@@ -139,6 +139,19 @@ struct active_connection_t
 };
 
 /*----------------------------------------------------------------------------*/
+/* Control requests are processed by the owner of the listener descriptors.
+ * The loopback stop socket wakes both poll() and select(). */
+static ithread_mutex_t gListenerMutex = PTHREAD_MUTEX_INITIALIZER;
+static ithread_cond_t gListenerCond = PTHREAD_COND_INITIALIZER;
+static SOCKET gListenerWakeSocket = INVALID_SOCKET;
+static int gListenerPending;
+static int gListenerEnable;
+static uint16_t gListenerPort;
+static int gListenerResult;
+static int get_miniserver_sockets(
+	MiniServerSockArray *, uint16_t, uint16_t, uint16_t);
+static void update_listeners(MiniServerSockArray *s);
+static ithread_mutex_t gGetCallbackMutex = PTHREAD_MUTEX_INITIALIZER;
 static MiniServerCallback gGetCallback = NULL;
 static MiniServerCallback gSoapCallback = NULL;
 static MiniServerCallback gGenaCallback = NULL;
@@ -176,7 +189,9 @@ struct s_SocketStuff
 
 void SetHTTPGetCallback(MiniServerCallback callback)
 {
+	ithread_mutex_lock(&gGetCallbackMutex);
 	gGetCallback = callback;
+	ithread_mutex_unlock(&gGetCallbackMutex);
 }
 
 		#ifdef INCLUDE_DEVICE_APIS
@@ -316,7 +331,9 @@ static int dispatch_request(
 	case HTTPMETHOD_POST:
 	case HTTPMETHOD_HEAD:
 	case HTTPMETHOD_SIMPLEGET:
+		ithread_mutex_lock(&gGetCallbackMutex);
 		callback = gGetCallback;
+		ithread_mutex_unlock(&gGetCallbackMutex);
 		host_validate_callback = gWebCallback_HostValidate;
 		cookie = gWebCallback_HostValidateCookie;
 		UpnpPrintf(UPNP_INFO,
@@ -521,7 +538,7 @@ static void remove_active_connection(SOCKET sock)
 	search_conn.connect_time = 0; /* Not used for comparison */
 
 	ithread_mutex_lock(&gActiveConnectionsMutex);
-	/* The list is gone once the miniserver has stopped. */
+	/* Entries stay owned by their workers through listener shutdown. */
 	node = gActiveConnectionsInitialized
 		       ? ListFind(&gActiveConnections, NULL, &search_conn)
 		       : NULL;
@@ -783,20 +800,31 @@ void shutdown_all_active_connections(void)
 		node = ListNext(&gActiveConnections, node);
 	}
 
-	/* Destroy the list and reset state. The mutex stays, workers still use
-	 * it. */
-	ListDestroy(&gActiveConnections, 1);
-	gActiveConnectionsInitialized = 0;
+	/* Workers remove their entries and close their sockets. Keeping the
+	 * list prevents an old worker from removing a newly reused socket. */
 	ithread_mutex_unlock(&gActiveConnectionsMutex);
 
 	UpnpPrintf(UPNP_INFO,
 		MSERV,
 		__FILE__,
 		__LINE__,
-		"Shutdown %d active socket connections and clean\n",
+		"Shutdown %d active socket connections\n",
 		count);
 	#endif /* INTERNAL_WEB_SERVER */
 	/*--------------------------------------------------------------------*/
+}
+
+/* Called only after the MiniServer thread pool has joined all workers. */
+void CleanupMiniServer(void)
+{
+#ifdef INTERNAL_WEB_SERVER
+	ithread_mutex_lock(&gActiveConnectionsMutex);
+	if (gActiveConnectionsInitialized) {
+		ListDestroy(&gActiveConnections, 1);
+		gActiveConnectionsInitialized = 0;
+	}
+	ithread_mutex_unlock(&gActiveConnectionsMutex);
+#endif
 }
 
 	#ifdef _WIN32
@@ -1082,19 +1110,6 @@ static void RunMiniServer(
 	fd_set rdSet;
 	SOCKET maxMiniSock;
 
-	maxMiniSock = 0;
-	maxMiniSock = max(maxMiniSock, mini_sock->miniServerSock4);
-	maxMiniSock = max(maxMiniSock, mini_sock->miniServerSock6);
-	maxMiniSock = max(maxMiniSock, mini_sock->miniServerSock6UlaGua);
-	maxMiniSock = max(maxMiniSock, mini_sock->miniServerStopSock);
-	maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock4);
-	maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock6);
-	maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock6UlaGua);
-		#ifdef INCLUDE_CLIENT_APIS
-	maxMiniSock = max(maxMiniSock, mini_sock->ssdpReqSock4);
-	maxMiniSock = max(maxMiniSock, mini_sock->ssdpReqSock6);
-		#endif /* INCLUDE_CLIENT_APIS */
-	++maxMiniSock;
 	#else  /* _WIN32 */
 	struct pollfd fds[MINI_SERVER_MAX_PFDS];
 	nfds_t nfds = 0;
@@ -1104,6 +1119,20 @@ static void RunMiniServer(
 
 	while (!stopSock) {
 	#ifdef _WIN32
+		maxMiniSock = 0;
+		maxMiniSock = max(maxMiniSock, mini_sock->miniServerSock4);
+		maxMiniSock = max(maxMiniSock, mini_sock->miniServerSock6);
+		maxMiniSock =
+			max(maxMiniSock, mini_sock->miniServerSock6UlaGua);
+		maxMiniSock = max(maxMiniSock, mini_sock->miniServerStopSock);
+		maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock4);
+		maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock6);
+		maxMiniSock = max(maxMiniSock, mini_sock->ssdpSock6UlaGua);
+		#ifdef INCLUDE_CLIENT_APIS
+		maxMiniSock = max(maxMiniSock, mini_sock->ssdpReqSock4);
+		maxMiniSock = max(maxMiniSock, mini_sock->ssdpReqSock6);
+		#endif /* INCLUDE_CLIENT_APIS */
+		++maxMiniSock;
 		FD_ZERO(&rdSet);
 		FD_ZERO(&expSet);
 		FD_SET(mini_sock->miniServerStopSock, &expSet);
@@ -1209,10 +1238,25 @@ static void RunMiniServer(
 		stopSock = receive_from_stopSock(
 			mini_sock->miniServerStopSock, &fds[0]);
 	#endif	       /* _WIN32 */
+	#ifdef INTERNAL_WEB_SERVER
+		update_listeners(mini_sock);
+	#endif
 	}
 
 	/* shutdown connections */
 	shutdown_all_active_connections();
+
+	#ifdef INTERNAL_WEB_SERVER
+	ithread_mutex_lock(&gListenerMutex);
+	gMServState = MSERV_STOPPING;
+	gListenerWakeSocket = INVALID_SOCKET;
+	if (gListenerPending) {
+		gListenerResult = UPNP_E_FINISH;
+		gListenerPending = 0;
+		ithread_cond_broadcast(&gListenerCond);
+	}
+	ithread_mutex_unlock(&gListenerMutex);
+	#endif
 
 	/* Close all sockets. */
 	sock_close(mini_sock->miniServerSock4);
@@ -1738,16 +1782,74 @@ static UPNP_INLINE void InitMiniServerSockArray(
 	#endif /* INCLUDE_CLIENT_APIS */
 }
 
-int StartMiniServer(
-	/*! [in,out] Port on which the server listens for incoming IPv4
-	 * connections. */
-	uint16_t *listen_port4,
-	/*! [in,out] Port on which the server listens for incoming IPv6
-	 * LLA connections. */
-	uint16_t *listen_port6,
-	/*! [in,out] Port on which the server listens for incoming
-	 * IPv6 ULA or GUA connections. */
-	uint16_t *listen_port6UlaGua)
+	#ifdef INTERNAL_WEB_SERVER
+static void update_listeners(MiniServerSockArray *s)
+{
+	ithread_mutex_lock(&gListenerMutex);
+	if (gListenerPending) {
+		gListenerResult = UPNP_E_SUCCESS;
+		if (gMServState != MSERV_RUNNING) {
+			gListenerResult = UPNP_E_FINISH;
+		} else if (gListenerEnable) {
+			gListenerResult = get_miniserver_sockets(
+				s, gListenerPort, gListenerPort, gListenerPort);
+		} else {
+			sock_close(s->miniServerSock4);
+			sock_close(s->miniServerSock6);
+			sock_close(s->miniServerSock6UlaGua);
+			s->miniServerSock4 = INVALID_SOCKET;
+			s->miniServerSock6 = INVALID_SOCKET;
+			s->miniServerSock6UlaGua = INVALID_SOCKET;
+			s->miniServerPort4 = 0;
+			s->miniServerPort6 = 0;
+			s->miniServerPort6UlaGua = 0;
+			shutdown_all_active_connections();
+		}
+		LOCAL_PORT_V4 = s->miniServerPort4;
+		LOCAL_PORT_V6 = s->miniServerPort6;
+		LOCAL_PORT_V6_ULA_GUA = s->miniServerPort6UlaGua;
+		gListenerPending = 0;
+		ithread_cond_broadcast(&gListenerCond);
+	}
+	ithread_mutex_unlock(&gListenerMutex);
+}
+
+int SetMiniServerListeners(int enable, uint16_t port)
+{
+	struct sockaddr_in dst;
+	int result;
+	ithread_mutex_lock(&gListenerMutex);
+	/* The public API serializes requests. */
+	if (gMServState != MSERV_RUNNING) {
+		ithread_mutex_unlock(&gListenerMutex);
+		return UPNP_E_FINISH;
+	}
+	memset(&dst, 0, sizeof(dst));
+	dst.sin_family = AF_INET;
+	dst.sin_port = htons(miniStopSockPort);
+	inet_pton(AF_INET, "127.0.0.1", &dst.sin_addr);
+	gListenerEnable = enable;
+	gListenerPort = port;
+	gListenerPending = 1;
+	if (sendto(gListenerWakeSocket,
+		    "Listeners",
+		    9,
+		    0,
+		    (struct sockaddr *)&dst,
+		    sizeof(dst)) < 0) {
+		gListenerPending = 0;
+		ithread_mutex_unlock(&gListenerMutex);
+		return UPNP_E_SOCKET_WRITE;
+	}
+	while (gListenerPending)
+		ithread_cond_wait(&gListenerCond, &gListenerMutex);
+	result = gListenerResult;
+	ithread_mutex_unlock(&gListenerMutex);
+	return result;
+}
+	#endif /* INTERNAL_WEB_SERVER */
+
+int StartMiniServer(void)
 {
 	int ret_code;
 	int count;
@@ -1770,15 +1872,7 @@ int StartMiniServer(
 		return UPNP_E_OUTOF_MEMORY;
 	}
 	InitMiniServerSockArray(mini_socket);
-	#ifdef INTERNAL_WEB_SERVER
-	/* V4 and V6 http listeners. */
-	ret_code = get_miniserver_sockets(
-		mini_socket, *listen_port4, *listen_port6, *listen_port6UlaGua);
-	if (ret_code != UPNP_E_SUCCESS) {
-		free(mini_socket);
-		return ret_code;
-	}
-	#endif /* INTERNAL_WEB_SERVER */
+
 	/* Stop socket (To end miniserver processing). */
 	ret_code = get_miniserver_stopsock(mini_socket);
 	if (ret_code != UPNP_E_SUCCESS) {
@@ -1788,6 +1882,12 @@ int StartMiniServer(
 		free(mini_socket);
 		return ret_code;
 	}
+	#ifdef INTERNAL_WEB_SERVER
+	/* Sending to this bound loopback socket wakes its own receive loop.
+	 * Reuse it so even descriptor exhaustion cannot prevent shutdown. */
+	gListenerWakeSocket = mini_socket->miniServerStopSock;
+	#endif
+
 	/* SSDP socket for discovery/advertising. */
 	ret_code = get_ssdp_sockets(mini_socket);
 	if (ret_code != UPNP_E_SUCCESS) {
@@ -1840,11 +1940,6 @@ int StartMiniServer(
 	#endif /* INCLUDE_CLIENT_APIS */
 		return UPNP_E_INTERNAL_ERROR;
 	}
-	#ifdef INTERNAL_WEB_SERVER
-	*listen_port4 = mini_socket->miniServerPort4;
-	*listen_port6 = mini_socket->miniServerPort6;
-	*listen_port6UlaGua = mini_socket->miniServerPort6UlaGua;
-	#endif /* INTERNAL_WEB_SERVER */
 
 	return UPNP_E_SUCCESS;
 }

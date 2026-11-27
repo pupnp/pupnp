@@ -526,11 +526,13 @@ UPNP_EXPORT_SPEC int web_server_ut_set_alias(
 	return web_server_set_alias(name, copy, len, 0);
 }
 
+static int web_resources_initialized;
+
 int web_server_init()
 {
 	int ret = UPNP_E_SUCCESS;
 
-	if (bWebServerState == WEB_SERVER_DISABLED) {
+	if (!web_resources_initialized) {
 		/* decode media list */
 		media_list_init();
 		membuffer_init(&gDocumentRootDir);
@@ -549,15 +551,17 @@ int web_server_init()
 		if (ithread_mutex_init(&gWebMutex, NULL) == -1)
 			ret = UPNP_E_OUTOF_MEMORY;
 		else
-			bWebServerState = WEB_SERVER_ENABLED;
+			web_resources_initialized = 1;
 	}
 
+	if (ret == UPNP_E_SUCCESS)
+		bWebServerState = WEB_SERVER_ENABLED;
 	return ret;
 }
 
 void web_server_destroy(void)
 {
-	if (bWebServerState == WEB_SERVER_ENABLED) {
+	if (web_resources_initialized) {
 		ithread_mutex_lock(&gWebServerSettingsMutex);
 		membuffer_destroy(&gDocumentRootDir);
 		membuffer_destroy(&gWebserverCorsString);
@@ -569,6 +573,7 @@ void web_server_destroy(void)
 		ithread_mutex_unlock(&gWebMutex);
 
 		ithread_mutex_destroy(&gWebMutex);
+		web_resources_initialized = 0;
 		bWebServerState = WEB_SERVER_DISABLED;
 	}
 }

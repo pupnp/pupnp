@@ -785,6 +785,17 @@ if(UPNP_BUILD_SHARED)
 			ENVIRONMENT "LD_PRELOAD=")
 endif()
 
+# SSDP-only BasicDevice registration with XML on an application-owned server.
+if(UPNP_ENABLE_DEVICE_API AND UPNP_ENABLE_SSDP)
+	UPNP_Add_Unit_Test(test-upnp-http-listener-lifecycle test_http_listener_lifecycle.c)
+	if(UPNP_BUILD_SHARED)
+		set_tests_properties(test-upnp-http-listener-lifecycle PROPERTIES TIMEOUT 65)
+	endif()
+	if(UPNP_BUILD_STATIC)
+		set_tests_properties(test-upnp-http-listener-lifecycle-static PROPERTIES TIMEOUT 65)
+	endif()
+endif()
+
 if(NOT UPNP_ENABLE_TESTING_INTEGRATION)
 	return()
 endif()

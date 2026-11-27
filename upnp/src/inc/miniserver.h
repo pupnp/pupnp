@@ -121,30 +121,12 @@ void SetGenaCallback(
 	MiniServerCallback callback);
 
 /*!
- * \brief Initialize the sockets functionality for the Miniserver.
+ * \brief Start the MiniServer's SSDP and loopback control sockets.
  *
- * Initialize a thread pool job to run the MiniServer and the job to the
- * thread pool.
- *
- * If listen port is 0, port is dynamically picked.
- *
- * Use timer mechanism to start the MiniServer, failure to meet the
- * allowed delay aborts the attempt to launch the MiniServer.
- *
- * \return
- *	\li On success: UPNP_E_SUCCESS.
- *	\li On error: UPNP_E_XXX.
+ * HTTP listeners are enabled separately by SetMiniServerListeners().
+ * \return UPNP_E_SUCCESS, or a socket/thread-pool error.
  */
-int StartMiniServer(
-	/*! [in,out] Port on which the server listens for incoming IPv4
-	 * connections. */
-	uint16_t *listen_port4,
-	/*! [in,out] Port on which the server listens for incoming IPv6
-	 * LLA connections. */
-	uint16_t *listen_port6,
-	/*! [in,out] Port on which the server listens for incoming
-	 * IPv6 ULA or GUA connections. */
-	uint16_t *listen_port6UlaGua);
+int StartMiniServer(void);
 
 /*!
  * \brief Stop and Shutdown the MiniServer and free socket resources.
@@ -152,6 +134,12 @@ int StartMiniServer(
  * \return Always returns 0.
  */
 int StopMiniServer(void);
+
+/* Release connection-list storage after all MiniServer workers have joined. */
+void CleanupMiniServer(void);
+
+/* Change HTTP listeners without restarting SSDP. */
+int SetMiniServerListeners(int enable, uint16_t port);
 
 /*!
  * \brief Shutdown all active socket connections to interrupt blocking

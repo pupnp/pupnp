@@ -513,7 +513,8 @@ extern "C" {
 /*!
  * \brief Initializes the Linux SDK for UPnP Devices (IPv4 or IPv6).
  *
- * This function must be called before any other API function can be called.
+ * Either this function or UpnpInit3() must initialize the SDK before
+ * operational API functions can be called.
  * It should be called only once. Subsequent calls to this API return a
  * \c UPNP_E_INIT error code.
  *
@@ -529,6 +530,19 @@ extern "C" {
  * serves local clients only.
  *
  * This call is synchronous.
+ *
+ * When internal webserver support is compiled in, this function opens HTTP
+ * TCP listeners during initialization, before device/client registration.
+ * Depending on the interface and build, listeners exist for IPv4, IPv6
+ * link-local and IPv6 unique/global addresses. They handle HTTP content,
+ * SOAP control and GENA eventing. DestPort is the preferred port; automatic
+ * selection or a port conflict can select another free port. Use the server
+ * port getters to obtain actual ports.
+ *
+ * Use UpnpInit3() with UPNP_INIT_NO_WEB_SERVER to avoid opening these
+ * listeners. SSDP discovery/advertising uses separate UDP sockets. Outgoing
+ * HTTP requests also remain available. UpnpEnableWebserver(0) after this
+ * function closes HTTP listeners but cannot prevent their initial exposure.
  *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
@@ -550,8 +564,36 @@ UPNP_EXPORT_SPEC int UpnpInit2(
 	 * use the first suitable interface. */
 	const char *IfName,
 	/*!  Local Port to listen for incoming connections.
-	 * \c NULL will pick an arbitrary free port. */
+	 * \c 0 will pick an arbitrary free port. */
 	unsigned short DestPort);
+
+#define UPNP_INIT_DEFAULT 0u
+#define UPNP_INIT_NO_WEB_SERVER (1u << 0)
+
+/*!
+ * \brief Initializes the SDK with optional HTTP listener suppression.
+ *
+ * Like UpnpInit2(), but flags can include UPNP_INIT_NO_WEB_SERVER to avoid
+ * opening any IPv4/IPv6 HTTP TCP listeners, including SOAP and GENA endpoints.
+ * SSDP UDP sockets and outgoing HTTP requests remain available. Registration,
+ * advertisements and port queries do not implicitly open HTTP listeners.
+ * UPNP_INIT_DEFAULT preserves the behavior of UpnpInit2().
+ *
+ * DestPort is remembered for a later UpnpEnableWebserver(1); port getters
+ * return 0 until listeners exist. An explicitly selected port uses the same
+ * port-selection rules as UpnpInit2(). With webserver support compiled out,
+ * neither initialization function opens HTTP listeners.
+ *
+ * \return The errors documented for UpnpInit2(), or UPNP_E_INVALID_PARAM
+ * for unknown flag bits (checked before initializing any SDK resources).
+ */
+UPNP_EXPORT_SPEC int UpnpInit3(
+	/*! [in] Interface name, or NULL for automatic selection. */
+	const char *IfName,
+	/*! [in] Preferred HTTP listening port, or 0 for automatic selection. */
+	unsigned short DestPort,
+	/*! [in] UPNP_INIT_DEFAULT or UPNP_INIT_NO_WEB_SERVER. */
+	unsigned int flags);
 
 /*!
  * \brief Initializes the OpenSSL library, and the OpenSSL context for use
@@ -657,6 +699,10 @@ UPNP_EXPORT_SPEC int UpnpFinish(void);
  * If '0' is used as the port number in \b UpnpInit2, then this function can be
  * used to retrieve the actual port allocated to the SDK.
  *
+ * Returns 0 when the corresponding HTTP TCP listener is closed or
+ * unavailable, including initialization with UPNP_INIT_NO_WEB_SERVER.
+ * Querying the port never opens a listener.
+ *
  * \return
  * 	\li On success: The port on which an internal server is listening for
  *		IPv4 UPnP related requests.
@@ -670,6 +716,10 @@ UPNP_EXPORT_SPEC unsigned short UpnpGetServerPort(void);
  * If '0' is used as the port number in \b UpnpInit2, then this function can be
  * used to retrieve the actual port allocated to the SDK.
  *
+ * Returns 0 when the corresponding HTTP TCP listener is closed or
+ * unavailable, including initialization with UPNP_INIT_NO_WEB_SERVER.
+ * Querying the port never opens a listener.
+ *
  * \return
  * 	\li On success: The port on which an internal server is listening for
  *		IPv6 link-local (LLA) UPnP related requests.
@@ -682,6 +732,10 @@ UPNP_EXPORT_SPEC unsigned short UpnpGetServerPort6(void);
  *
  * If '0' is used as the port number in \b UpnpInit2, then this function can be
  * used to retrieve the actual port allocated to the SDK.
+ *
+ * Returns 0 when the corresponding HTTP TCP listener is closed or
+ * unavailable, including initialization with UPNP_INIT_NO_WEB_SERVER.
+ * Querying the port never opens a listener.
  *
  * \return
  * 	\li On success: The port on which an internal server is listening for
@@ -837,6 +891,10 @@ UPNP_EXPORT_SPEC int UpnpRegisterRootDevice(
 	 description is pointer to a memory buffer
 	 bufferLen == length of memory buffer
    \endverbatim
+ *
+ * Internal description serving requires enabled HTTP listeners. With the
+ * webserver disabled, only UPNPREG_URL_DESC with config_baseURL == 0 is
+ * supported; other modes return UPNP_E_NO_WEB_SERVER.
  *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
@@ -1828,6 +1886,10 @@ UPNP_EXPORT_SPEC int UpnpSetMaxSubscriptionTimeOut(
  *
  * This operation is synchronous.
  *
+ * Requires enabled HTTP listeners for incoming GENA notifications. Returns
+ * UPNP_E_NO_WEB_SERVER if disabled. An asynchronous call rejected this way
+ * queues no work and invokes no completion callback.
+ *
  * \return An integer representing one of the following:
  *     \li \c UPNP_E_SUCCESS: The operation completed successfully.
  *     \li \c UPNP_E_INVALID_HANDLE: The handle is not a valid control
@@ -1873,6 +1935,10 @@ UPNP_EXPORT_SPEC int UpnpSubscribe(
  * returns \c UPNP_E_SUCCESS and the appropriate error code will
  * be in the <b>UpnpEventSubscribe.ErrCode</b> field in the \b Event
  * structure passed to the callback.
+ *
+ * Requires enabled HTTP listeners for incoming GENA notifications. Returns
+ * UPNP_E_NO_WEB_SERVER if disabled. An asynchronous call rejected this way
+ * queues no work and invokes no completion callback.
  *
  *  \return An integer representing one of the following:
  *      \li \c UPNP_E_SUCCESS: The operation completed successfully.
@@ -2865,7 +2931,36 @@ UPNP_EXPORT_SPEC int UpnpVirtualDir_set_CloseCallback(
 /*!
  * \brief Enables or disables the webserver.
  *
+ * Call after successful UpnpInit2() or UpnpInit3(). Enabling opens the IPv4
+ * and available IPv6 HTTP TCP listeners using the preferred port supplied
+ * at initialization, and enables HTTP content serving. Use the server port
+ * getters for actual ports; a port conflict can select another free port.
+ * Repeating the current setting succeeds without changing listeners.
+ *
+ * Disabling closes all SDK HTTP TCP listeners and shuts down their accepted
+ * connections, including SOAP control and GENA event connections. Already
+ * running application callbacks may finish; disabling does not wait for them
+ * and can be called from a callback. Web resources/settings are retained
+ * until UpnpFinish() so existing workers can finish safely.
+ *
+ * SSDP UDP sockets, device/client registrations, advertisements and outgoing
+ * HTTP requests remain available. No registration or port query implicitly
+ * re-enables the server. New GENA subscriptions require enabled listeners;
+ * after re-enabling, applications must recreate needed event subscriptions.
+ * Device descriptions served externally remain usable while disabled.
+ *
+ * Unlike older releases, disabling closes the listeners rather than merely
+ * removing HTTP content serving. Applications relying on SOAP or GENA while
+ * HTTP content serving is disabled must account for this behavior change.
+ * On activation failure, a previously disabled server stays disabled.
+ *
  * \return An integer representing one of the following:
+ *       \li \c UPNP_E_FINISH: The SDK is not initialized.
+ *       \li \c UPNP_E_OUTOF_SOCKET: A socket could not be created.
+ *       \li \c UPNP_E_SOCKET_BIND: A listener could not be bound.
+ *       \li \c UPNP_E_LISTEN: A listener could not be started.
+ *       \li \c UPNP_E_SOCKET_WRITE: The listener control request failed.
+ *       \li \c UPNP_E_INTERNAL_ERROR: Listener setup failed.
  *       \li \c UPNP_E_SUCCESS: The operation completed successfully.
  *       \li \c UPNP_E_OUTOF_MEMORY: The web server could not be started due to
  *		an out-of-memory condition.
@@ -2878,6 +2973,10 @@ UPNP_EXPORT_SPEC int UpnpEnableWebserver(
 
 /*!
  * \brief Returns \c 1 if the webserver is enabled, or \c 0 if it is not.
+ *
+ * Describes the SDK HTTP listener/content-serving state, not SSDP. Returns
+ * 0 before initialization, after UpnpEnableWebserver(0), or when initialized
+ * with UPNP_INIT_NO_WEB_SERVER until explicitly enabled.
  *
  *  \return An integer representing one of the following:
  *       \li \c 1: The webserver is enabled.
