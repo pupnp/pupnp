@@ -817,14 +817,14 @@ void shutdown_all_active_connections(void)
 /* Called only after the MiniServer thread pool has joined all workers. */
 void CleanupMiniServer(void)
 {
-#ifdef INTERNAL_WEB_SERVER
+	#ifdef INTERNAL_WEB_SERVER
 	ithread_mutex_lock(&gActiveConnectionsMutex);
 	if (gActiveConnectionsInitialized) {
 		ListDestroy(&gActiveConnections, 1);
 		gActiveConnectionsInitialized = 0;
 	}
 	ithread_mutex_unlock(&gActiveConnectionsMutex);
-#endif
+	#endif
 }
 
 	#ifdef _WIN32
