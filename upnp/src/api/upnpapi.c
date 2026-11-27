@@ -4671,17 +4671,21 @@ void AutoAdvertise(void *input)
 	#endif /* EXCLUDE_SSDP == 0 */
 #endif	       /* INCLUDE_DEVICE_APIS */
 
-#ifdef INTERNAL_WEB_SERVER
 int UpnpSetWebServerRootDir(const char *rootDir)
 {
 	if (UpnpSdkInit == 0) {
 		return UPNP_E_FINISH;
 	}
+#ifdef INTERNAL_WEB_SERVER
 	if ((rootDir == NULL) || (strlen(rootDir) == 0)) {
 		return UPNP_E_INVALID_PARAM;
 	}
 
 	return web_server_set_root_dir(rootDir);
+#else  /* Internal web server disabled */
+	(void)rootDir;
+	return UPNP_E_NO_WEB_SERVER;
+#endif /* INTERNAL_WEB_SERVER */
 }
 
 int UpnpSetWebServerCorsString(const char *corsString)
@@ -4689,13 +4693,17 @@ int UpnpSetWebServerCorsString(const char *corsString)
 	if (UpnpSdkInit == 0) {
 		return UPNP_E_FINISH;
 	}
+#ifdef INTERNAL_WEB_SERVER
 	if ((corsString == NULL) || (strlen(corsString) == 0)) {
 		return UPNP_E_INVALID_PARAM;
 	}
 
 	return web_server_set_cors(corsString);
-}
+#else  /* Internal web server disabled */
+	(void)corsString;
+	return UPNP_E_NO_WEB_SERVER;
 #endif /* INTERNAL_WEB_SERVER */
+}
 
 /*!
  * \brief Builds the name under which a virtual directory is stored: the given
