@@ -2454,7 +2454,6 @@ int UpnpSubscribe(UpnpClient_Handle Hnd,
 		retVal = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
-	UpnpString_set_String(SubsIdTmp, SubsId);
 
 	if (TimeOut == NULL) {
 		retVal = UPNP_E_INVALID_PARAM;
