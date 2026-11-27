@@ -55,14 +55,17 @@ set_tests_properties(test-issue-110-py PROPERTIES
 	RESOURCE_LOCK upnp_stack
 )
 
-add_test(
-	NAME test-issue-250-py
-	COMMAND ${Python3_EXECUTABLE} -m pytest
-		${CMAKE_CURRENT_SOURCE_DIR}/test_issue_250.py
-		-v
-)
+# Sends SOAP requests to the HTTP server, so it needs the internal web server.
+if(UPNP_ENABLE_WEBSERVER)
+	add_test(
+		NAME test-issue-250-py
+		COMMAND ${Python3_EXECUTABLE} -m pytest
+			${CMAKE_CURRENT_SOURCE_DIR}/test_issue_250.py
+			-v
+	)
 
-set_tests_properties(test-issue-250-py PROPERTIES
-	ENVIRONMENT "${_test_init_py_env}"
-	RESOURCE_LOCK upnp_stack
-)
+	set_tests_properties(test-issue-250-py PROPERTIES
+		ENVIRONMENT "${_test_init_py_env}"
+		RESOURCE_LOCK upnp_stack
+	)
+endif()

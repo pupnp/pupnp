@@ -213,7 +213,7 @@ endif()
 
 # regression test — no GENA event callback may run after UpnpUnRegisterClient()
 # returns; the fake publisher uses POSIX sockets.
-if (NOT WIN32 AND UPNP_BUILD_STATIC)
+if (NOT WIN32 AND UPNP_BUILD_STATIC AND UPNP_ENABLE_WEBSERVER)
 	add_executable(test_gena_ctrlpt-static test_gena_ctrlpt.cpp)
 	target_link_libraries(test_gena_ctrlpt-static PRIVATE upnp_static GTest::gtest)
 	target_include_directories(test_gena_ctrlpt-static PRIVATE
@@ -263,7 +263,7 @@ endif()
 
 # regression test — no device callback may run after UpnpUnRegisterRootDevice()
 # returns; the requests are sent over POSIX sockets.
-if (NOT WIN32 AND UPNP_BUILD_STATIC)
+if (NOT WIN32 AND UPNP_BUILD_STATIC AND UPNP_ENABLE_WEBSERVER)
 	add_executable(test_device_unregister-static test_device_unregister.cpp)
 	target_link_libraries(test_device_unregister-static PRIVATE upnp_static GTest::gtest)
 	target_include_directories(test_device_unregister-static PRIVATE
