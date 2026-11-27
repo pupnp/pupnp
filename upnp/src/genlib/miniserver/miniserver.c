@@ -120,6 +120,7 @@ static MiniServerState gMServState = MSERV_IDLE;
 static _Atomic MiniServerState gMServState = MSERV_IDLE;
 	#endif
 
+	#ifdef INTERNAL_WEB_SERVER
 /*! Global list to track active socket connections */
 static LinkedList gActiveConnections;
 /*! Protects gActiveConnections and gActiveConnectionsInitialized. It is never
@@ -138,7 +139,6 @@ struct active_connection_t
 };
 
 /*----------------------------------------------------------------------------*/
-	#ifdef INTERNAL_WEB_SERVER
 static MiniServerCallback gGetCallback = NULL;
 static MiniServerCallback gSoapCallback = NULL;
 static MiniServerCallback gGenaCallback = NULL;
