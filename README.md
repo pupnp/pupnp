@@ -396,3 +396,6 @@ Script side steps:
 - To [JetBrains](https://www.jetbrains.com/?from=pupnp) for kindly providing us with open source licenses of their amazing products.
 
 ![JetBrains Logo](site/jetbrains.svg)
+
+See [HTTP listeners and SSDP-only devices](docs/http-listeners.md) for optional
+HTTP listener initialization and external device-description hosting.
