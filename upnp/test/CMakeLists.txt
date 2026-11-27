@@ -740,6 +740,7 @@ if(NOT UPNP_ENABLE_WEBSERVER)
 		test-upnp-ssdp-mx-cap
 		test-upnp-gena-subscribe-dos
 		test-upnp-gena-callback-hostname
+		test-upnp-gena-granted-timeout
 		test-upnp-gena-notify-sid
 		test-upnp-webserver-backslash
 		test-upnp-gh-153
