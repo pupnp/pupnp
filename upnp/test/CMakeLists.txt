@@ -5,6 +5,7 @@ UPNP_Add_Unit_Test(test-upnp-url test_url.c)
 UPNP_Add_Unit_Test(test-upnp-sock-io test_sock_io.c)
 UPNP_Add_Unit_Test(test-upnp-ssdp-req-port test_ssdp_req_port.c)
 UPNP_Add_Unit_Test(test-upnp-virtual-dir test_virtual_dir.c)
+UPNP_Add_Unit_Test(test-upnp-webserver-setters test_webserver_setters.c)
 UPNP_Add_Unit_Test(test-upnp-ssdp-multi-device test_ssdp_multi_device.c)
 # test_threadpool_overflow calls internal ThreadPool API (ThreadPoolInit,
 # TPAttrInit, …) that have hidden visibility in the shared library.  Compile
