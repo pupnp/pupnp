@@ -41,7 +41,6 @@ static const char xml[] =
 	"<friendlyName>External BasicDevice</friendlyName>"
 	"<manufacturer>Test</manufacturer><modelName>Test</modelName>"
 	"<UDN>uuid:listener-lifecycle-test</UDN></device></root>";
-static _Atomic int callback_result = 1;
 
 static int event(Upnp_EventType type, void *data, void *cookie)
 {
@@ -51,6 +50,9 @@ static int event(Upnp_EventType type, void *data, void *cookie)
 	return 0;
 }
 
+	#ifdef UPNP_HAVE_WEBSERVER
+static _Atomic int callback_result = 1;
+
 static int disable_from_callback(const char *host, void *cookie)
 {
 	(void)host;
@@ -58,6 +60,7 @@ static int disable_from_callback(const char *host, void *cookie)
 	atomic_store(&callback_result, UpnpEnableWebserver(0));
 	return UPNP_E_BAD_HTTPMSG;
 }
+	#endif
 
 /* Loopback is lo on Linux and lo0 on macOS/BSD. */
 static int find_loopback(char *name, size_t name_size)
@@ -270,15 +273,23 @@ int main(void)
 	int result = EXIT_FAILURE, initialized = 0, registered = 0;
 	int external = -1, observer = -1, idle = -1, probe = -1;
 	pid_t child = -1, parent = getpid();
-	unsigned short reserved, port;
+	unsigned short reserved;
 	char url[256];
 	char name[IF_NAMESIZE + 1];
 	UpnpDevice_Handle device;
+	#ifdef UPNP_HAVE_CLIENT
 	UpnpClient_Handle client;
+		#ifdef UPNP_HAVE_GENA
 	Upnp_SID sid;
-	int timeout = 60, i;
+	int timeout = 60;
+		#endif
+	#endif
+	#ifdef UPNP_HAVE_WEBSERVER
+	unsigned short port;
+	int i;
 	struct pollfd pfd;
 	char byte;
+	#endif
 
 	if (!find_loopback(name, sizeof(name))) {
 		puts("SKIP: no IPv4 loopback interface is up");
