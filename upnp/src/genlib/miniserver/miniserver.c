@@ -1538,9 +1538,6 @@ static int get_miniserver_sockets(
 	uint16_t listen_port6UlaGua)
 {
 	int ret_val;
-	int err_init_4;
-	int err_init_6;
-	int err_init_6UlaGua;
 
 	struct s_SocketStuff ss4;
 	struct s_SocketStuff ss6;
@@ -1548,12 +1545,16 @@ static int get_miniserver_sockets(
 
 	/* Create listen socket for IPv4/IPv6. An error here may indicate
 	 * that we don't have an IPv4/IPv6 stack. */
-	err_init_4 = init_socket_stuff(&ss4, gIF_IPV4, 4);
-	err_init_6 = init_socket_stuff(&ss6, gIF_IPV6, 6);
-	err_init_6UlaGua = init_socket_stuff(&ss6UlaGua, gIF_IPV6_ULA_GUA, 6);
+	init_socket_stuff(&ss4, gIF_IPV4, 4);
+	init_socket_stuff(&ss6, gIF_IPV6, 6);
+	init_socket_stuff(&ss6UlaGua, gIF_IPV6_ULA_GUA, 6);
 	ss6.serverAddr6->sin6_scope_id = gIF_INDEX;
 	/* Check what happened. */
-	if (err_init_4 && (err_init_6 || err_init_6UlaGua)) {
+	/* A disabled address family is not an initialization error, but it
+	 * also cannot supply a listener if the other socket allocations fail.
+	 */
+	if (ss4.fd == INVALID_SOCKET && ss6.fd == INVALID_SOCKET &&
+		ss6UlaGua.fd == INVALID_SOCKET) {
 		UpnpPrintf(UPNP_CRITICAL,
 			MSERV,
 			__FILE__,
