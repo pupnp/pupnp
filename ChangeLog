@@ -2,6 +2,10 @@
 Version 22.2.6
 *******************************************************************************
 
+- PR #697: Fix the link of libupnp built with -DUPNP_ENABLE_WEBSERVER=OFF
+  and the device API on. UpnpInitPreamble() registered the SOAP callback
+  with SetSoapCallback(), which only exists with the internal web server,
+  and the library failed with an undefined reference.
 
 
 *******************************************************************************
