@@ -728,6 +728,45 @@ if(UPNP_BUILD_STATIC)
 	)
 endif()
 
+# Without the internal web server there is no HTTP server: these tests need
+# one to serve a description, a SOAP or GENA request or a file, or they use
+# the web_server_ut_* hooks. Neither build nor run them.
+if(NOT UPNP_ENABLE_WEBSERVER)
+	foreach(_test IN ITEMS
+		test-upnp-miniserver-first-byte
+		test-upnp-miniserver-peer-cap
+		test-upnp-ssdp-multi-device
+		test-upnp-ssdp-multicast-recv
+		test-upnp-ssdp-mx-cap
+		test-upnp-gena-subscribe-dos
+		test-upnp-gena-callback-hostname
+		test-upnp-gena-notify-sid
+		test-upnp-webserver-backslash
+		test-upnp-gh-153
+		test-upnp-gh-325
+		test-upnp-ghsa-f8r2
+		test-upnp-ghsa-wcf8
+		test-upnp-ghsa-9mqx
+		test-upnp-webserver-alias-leak
+		test-upnp-webserver-settings-race
+		test-upnp-webserver-range
+		test-upnp-webserver-alias-range
+		test-upnp-webserver-post
+		test-upnp-ghsa-xhv7
+		test-upnp-soap-query-var-error
+		test-upnp-http-headers
+	)
+		foreach(_variant IN ITEMS ${_test} ${_test}-static)
+			if(TARGET ${_variant})
+				set_target_properties(${_variant}
+					PROPERTIES EXCLUDE_FROM_ALL TRUE)
+				set_tests_properties(${_variant}
+					PROPERTIES DISABLED TRUE)
+			endif()
+		endforeach()
+	endforeach()
+endif()
+
 # Issue #365: UpnpPrintf must not appear in the shared library's public symbol
 # table.  The script exits 77 (skip) when nm is unavailable or on non-ELF
 # platforms (Windows, macOS).

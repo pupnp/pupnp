@@ -116,6 +116,11 @@ def test_init_finish(lib):
         print(f"\nUPnP initialized: ip={ip.decode() if ip else 'UNKNOWN'}, port={port}")
 
         assert ip is not None, "UpnpGetServerIpAddress returned NULL"
-        assert port != 0, "UpnpGetServerPort returned 0"
+        # Without the internal web server no HTTP port is opened.
+        cfg = _parse_config()
+        if cfg is None or cfg["UPNP_HAVE_WEBSERVER"]:
+            assert port != 0, "UpnpGetServerPort returned 0"
+        else:
+            assert port == 0, "UpnpGetServerPort returned a port without a web server"
     finally:
         lib.UpnpFinish()
