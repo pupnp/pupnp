@@ -13,12 +13,17 @@ extern "C" {
 #include "sock.h"
 }
 
+#include <atomic>
 #include <chrono>
+#include <condition_variable>
+#include <mutex>
 #include <thread>
 #include <vector>
 
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -82,6 +87,12 @@ TEST_F(Issue395TestSuite, sock_write_data_received_intact)
 // would hang until ctest kills it (seen once on macOS). SO_SNDTIMEO turns
 // that into a failed send(), and the reader retries on EINTR and reports
 // any other error.
+//
+// It still hung once more on macOS, with nothing printed, so the hang is not
+// in a blocked send(). A watchdog now reports where the test stopped before
+// ctest kills it: if the test has not finished after 20 s (it normally takes
+// about 2.5 s), it prints the stage, what sock_write() returned, what the
+// reader received and what is still unread, and aborts.
 TEST_F(Issue395TestSuite, ghsa_323w_budget_never_goes_negative)
 {
 	SOCKINFO info{};
@@ -97,21 +108,66 @@ TEST_F(Issue395TestSuite, ghsa_323w_budget_never_goes_negative)
 			  &sndtimeo,
 			  sizeof(sndtimeo)),
 		0);
-	std::thread reader([this, &reader_errno] {
+	/* 0 writing, 1 sock_write() returned, 2 shut down, 3 reader joined */
+	std::atomic<int> stage{0};
+	std::atomic<int> writer_rc{0};
+	std::atomic<long> received{0};
+	std::atomic<bool> reader_done{false};
+	std::mutex finished_mutex;
+	std::condition_variable finished_cv;
+	bool finished = false;
+	std::thread watchdog([&] {
+		std::unique_lock<std::mutex> lock(finished_mutex);
+		if (finished_cv.wait_for(lock,
+			    std::chrono::seconds(20),
+			    [&finished] { return finished; }))
+			return;
+		int unread = -1;
+		ioctl(sv[1], FIONREAD, &unread);
+		fprintf(stderr,
+			"ghsa_323w watchdog: not finished after 20 s: stage "
+			"%d, "
+			"sock_write() returned %d, reader got %ld of %zu bytes "
+			"and is %s, %d bytes unread\n",
+			stage.load(),
+			writer_rc.load(),
+			received.load(),
+			big.size(),
+			reader_done.load() ? "done" : "still reading",
+			unread);
+		fflush(stderr);
+		abort();
+	});
+	std::thread reader([this, &reader_errno, &received, &reader_done] {
 		char buf[65536];
 		std::this_thread::sleep_for(std::chrono::milliseconds(2500));
 		for (;;) {
 			ssize_t n = recv(sv[1], buf, sizeof(buf), 0);
-			if (n > 0 || (n < 0 && errno == EINTR))
+			if (n > 0) {
+				received += n;
+				continue;
+			}
+			if (n < 0 && errno == EINTR)
 				continue;
 			if (n < 0)
 				reader_errno = errno;
 			break;
 		}
+		reader_done = true;
 	});
 	int rc = sock_write(&info, big.data(), big.size(), &timeout);
+	writer_rc = rc;
+	stage = 1;
 	shutdown(sv[0], SHUT_WR);
+	stage = 2;
 	reader.join();
+	stage = 3;
+	{
+		std::lock_guard<std::mutex> lock(finished_mutex);
+		finished = true;
+	}
+	finished_cv.notify_one();
+	watchdog.join();
 
 	EXPECT_EQ(reader_errno, 0) << strerror(reader_errno);
 	ASSERT_EQ(rc, (int)big.size());
