@@ -1442,7 +1442,7 @@ static int Parser_processCDSect(
 	if (!isXMLchar) {
 		return IXML_SYNTAX_ERR;
 	}
-	if ((pEnd - pCDataStart > 0) && (*pEnd != '\0') && found_cdend) {
+	if ((*pEnd != '\0') && found_cdend) {
 		tokenLength = (size_t)pEnd - (size_t)pCDataStart;
 		node->nodeValue = (char *)malloc(tokenLength + (size_t)1);
 		if (node->nodeValue == NULL) {

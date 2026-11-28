@@ -30,6 +30,7 @@ ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-depth poc_ghsa_xr5m_depth.c "")
 ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-attributes poc_ghsa_xr5m_attributes.c "")
 ixml_add_unit_test(test-ixml-poc-ghsa-xr5m-prefix poc_ghsa_xr5m_prefix.c "")
 ixml_add_unit_test(test-ixml-struct-layout test_struct_layout.c "")
+ixml_add_unit_test(test-ixml-parse-empty-cdata test_parse_empty_cdata.c "")
 
 # These tests replace strdup() with their own definition to make it fail.
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
