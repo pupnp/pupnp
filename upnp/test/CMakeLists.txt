@@ -740,6 +740,7 @@ if(NOT UPNP_ENABLE_WEBSERVER)
 		test-upnp-ssdp-mx-cap
 		test-upnp-gena-subscribe-dos
 		test-upnp-gena-callback-hostname
+		test-upnp-gena-granted-timeout
 		test-upnp-gena-notify-sid
 		test-upnp-webserver-backslash
 		test-upnp-gh-153
@@ -783,6 +784,26 @@ if(UPNP_BUILD_SHARED)
 		PROPERTIES
 			SKIP_RETURN_CODE 77
 			ENVIRONMENT "LD_PRELOAD=")
+endif()
+
+# SSDP-only BasicDevice registration with XML on an application-owned server.
+# The fixture calls socket/getifaddrs APIs directly: libsocket on illumos.
+if(UPNP_ENABLE_DEVICE_API AND UPNP_ENABLE_SSDP)
+	UPNP_Add_Unit_Test(test-upnp-http-listener-lifecycle test_http_listener_lifecycle.c)
+	if(UPNP_BUILD_SHARED)
+		target_link_libraries(test-upnp-http-listener-lifecycle PRIVATE
+			$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+			$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+		)
+		set_tests_properties(test-upnp-http-listener-lifecycle PROPERTIES TIMEOUT 65)
+	endif()
+	if(UPNP_BUILD_STATIC)
+		target_link_libraries(test-upnp-http-listener-lifecycle-static PRIVATE
+			$<$<BOOL:${SOCKET_LIBRARY}>:${SOCKET_LIBRARY}>
+			$<$<BOOL:${NSL_LIBRARY}>:${NSL_LIBRARY}>
+		)
+		set_tests_properties(test-upnp-http-listener-lifecycle-static PROPERTIES TIMEOUT 65)
+	endif()
 endif()
 
 if(NOT UPNP_ENABLE_TESTING_INTEGRATION)

@@ -405,8 +405,8 @@ static int gena_subscribe(
 				"]:",
 				(IN6_IS_ADDR_LINKLOCAL(&DestAddr6->sin6_addr) ||
 					strlen(gIF_IPV6_ULA_GUA) == 0)
-					? LOCAL_PORT_V6
-					: LOCAL_PORT_V6_ULA_GUA,
+					? UpnpGetServerPort6()
+					: UpnpGetServerUlaGuaPort6(),
 				"/>",
 				"NT: upnp:event",
 				"TIMEOUT: Second-",
@@ -424,7 +424,7 @@ static int gena_subscribe(
 				"CALLBACK: <http://",
 				gIF_IPV4,
 				":",
-				LOCAL_PORT_V4,
+				UpnpGetServerPort(),
 				"/>",
 				"NT: upnp:event",
 				"TIMEOUT: Second-",

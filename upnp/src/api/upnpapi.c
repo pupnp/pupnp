@@ -145,6 +145,9 @@ ithread_mutex_t gUUIDMutex;
 
 /*! Initialization mutex. */
 static ithread_mutex_t gSDKInitMutex = PTHREAD_MUTEX_INITIALIZER;
+/* Serializes listener transitions; never held while waiting for workers. */
+static ithread_mutex_t gWebServerMutex = PTHREAD_MUTEX_INITIALIZER;
+static unsigned short gRequestedServerPort;
 
 /*! Global timer thread. */
 TimerThread gTimerThread;
@@ -514,8 +517,11 @@ static int UpnpInitPreamble(void)
  */
 static int UpnpInitStartServers(
 	/*! [in] Local Port to listen for incoming connections. */
-	unsigned short DestPort)
+	unsigned short DestPort,
+	unsigned int flags)
 {
+	(void)DestPort;
+	(void)flags;
 #if EXCLUDE_MINISERVER == 0 || EXCLUDE_WEB_SERVER == 0
 	int retVal = 0;
 #endif
@@ -527,11 +533,11 @@ static int UpnpInitStartServers(
 		"Entering UpnpInitStartServers\n");
 
 #if EXCLUDE_MINISERVER == 0
-	LOCAL_PORT_V4 = DestPort;
-	LOCAL_PORT_V6 = DestPort;
-	LOCAL_PORT_V6_ULA_GUA = DestPort;
-	retVal = StartMiniServer(
-		&LOCAL_PORT_V4, &LOCAL_PORT_V6, &LOCAL_PORT_V6_ULA_GUA);
+	LOCAL_PORT_V4 = 0;
+	LOCAL_PORT_V6 = 0;
+	LOCAL_PORT_V6_ULA_GUA = 0;
+	gRequestedServerPort = DestPort;
+	retVal = StartMiniServer();
 	if (retVal != UPNP_E_SUCCESS) {
 		UpnpPrintf(UPNP_CRITICAL,
 			API,
@@ -544,9 +550,12 @@ static int UpnpInitStartServers(
 #endif
 
 #if EXCLUDE_WEB_SERVER == 0
-	membuffer_init(&gDocumentRootDir);
-	membuffer_init(&gWebserverCorsString);
-	retVal = UpnpEnableWebserver(WEB_SERVER_ENABLED);
+	/* Initialize settings independently of listener activation, so callers
+	 * can configure content/virtual directories before enabling HTTP. */
+	retVal = web_server_init();
+	bWebServerState = WEB_SERVER_DISABLED;
+	if (retVal == UPNP_E_SUCCESS && !(flags & UPNP_INIT_NO_WEB_SERVER))
+		retVal = UpnpEnableWebserver(WEB_SERVER_ENABLED);
 	if (retVal != UPNP_E_SUCCESS) {
 		UpnpFinish();
 		return retVal;
@@ -564,7 +573,15 @@ static int UpnpInitStartServers(
 
 int UpnpInit2(const char *IfName, unsigned short DestPort)
 {
+	return UpnpInit3(IfName, DestPort, UPNP_INIT_DEFAULT);
+}
+
+int UpnpInit3(const char *IfName, unsigned short DestPort, unsigned int flags)
+{
 	int retVal;
+
+	if (flags & ~UPNP_INIT_NO_WEB_SERVER)
+		return UPNP_E_INVALID_PARAM;
 
 	/* Initializes the ithread library */
 	ithread_initialize_library();
@@ -591,7 +608,7 @@ int UpnpInit2(const char *IfName, unsigned short DestPort)
 		API,
 		__FILE__,
 		__LINE__,
-		"UpnpInit2 with IfName=%s, DestPort=%d.\n",
+		"UpnpInit3 with IfName=%s, DestPort=%d.\n",
 		IfName ? IfName : "NULL",
 		DestPort);
 
@@ -602,7 +619,7 @@ int UpnpInit2(const char *IfName, unsigned short DestPort)
 	}
 
 	/* Finish initializing the SDK. */
-	retVal = UpnpInitStartServers(DestPort);
+	retVal = UpnpInitStartServers(DestPort, flags);
 	if (retVal != UPNP_E_SUCCESS) {
 		goto exit_function;
 	}
@@ -772,6 +789,9 @@ int UpnpFinish(void)
 	StopMiniServer();
 #endif
 	ThreadPoolShutdown(&gMiniServerThreadPool);
+#if EXCLUDE_MINISERVER == 0
+	CleanupMiniServer();
+#endif
 	PrintThreadPoolStats(&gMiniServerThreadPool,
 		__FILE__,
 		__LINE__,
@@ -792,6 +812,8 @@ int UpnpFinish(void)
 	ithread_mutex_destroy(&gUUIDMutex);
 	/* remove all virtual dirs */
 	UpnpRemoveAllVirtualDirs();
+	LOCAL_PORT_V4 = LOCAL_PORT_V6 = LOCAL_PORT_V6_ULA_GUA = 0;
+	gRequestedServerPort = 0;
 	UpnpSdkInit = 0;
 	UpnpPrintf(UPNP_INFO,
 		API,
@@ -811,7 +833,11 @@ unsigned short UpnpGetServerPort(void)
 	if (UpnpSdkInit != 1)
 		return 0u;
 
-	return LOCAL_PORT_V4;
+	unsigned short port;
+	ithread_mutex_lock(&gWebServerMutex);
+	port = LOCAL_PORT_V4;
+	ithread_mutex_unlock(&gWebServerMutex);
+	return port;
 }
 
 unsigned short UpnpGetServerPort6(void)
@@ -820,7 +846,11 @@ unsigned short UpnpGetServerPort6(void)
 	if (UpnpSdkInit != 1)
 		return 0u;
 
-	return LOCAL_PORT_V6;
+	unsigned short port;
+	ithread_mutex_lock(&gWebServerMutex);
+	port = LOCAL_PORT_V6;
+	ithread_mutex_unlock(&gWebServerMutex);
+	return port;
 #else
 	return 0u;
 #endif
@@ -832,7 +862,11 @@ unsigned short UpnpGetServerUlaGuaPort6(void)
 	if (UpnpSdkInit != 1)
 		return 0u;
 
-	return LOCAL_PORT_V6_ULA_GUA;
+	unsigned short port;
+	ithread_mutex_lock(&gWebServerMutex);
+	port = LOCAL_PORT_V6_ULA_GUA;
+	ithread_mutex_unlock(&gWebServerMutex);
+	return port;
 #else
 	return 0u;
 #endif
@@ -1195,6 +1229,12 @@ int UpnpRegisterRootDevice2(Upnp_DescType descriptionType,
 
 	if (Hnd == NULL || Fun == NULL) {
 		retVal = UPNP_E_INVALID_PARAM;
+		goto exit_function;
+	}
+
+	if ((descriptionType != UPNPREG_URL_DESC || config_baseURL) &&
+		!UpnpIsWebserverEnabled()) {
+		retVal = UPNP_E_NO_WEB_SERVER;
 		goto exit_function;
 	}
 
@@ -1856,7 +1896,7 @@ static void get_server_addr(
 
 	sa4->sin_family = AF_INET;
 	inet_pton(AF_INET, gIF_IPV4, &sa4->sin_addr);
-	sa4->sin_port = htons(LOCAL_PORT_V4);
+	sa4->sin_port = htons(UpnpGetServerPort());
 }
 
 /*!
@@ -1872,7 +1912,7 @@ static void get_server_addr6(
 
 	sa6->sin6_family = AF_INET6;
 	inet_pton(AF_INET6, gIF_IPV6, &sa6->sin6_addr);
-	sa6->sin6_port = htons(LOCAL_PORT_V6);
+	sa6->sin6_port = htons(UpnpGetServerPort6());
 }
 
 static int GetDescDocumentAndURL(Upnp_DescType descriptionType,
@@ -2386,6 +2426,9 @@ int UpnpSubscribeAsync(UpnpClient_Handle Hnd,
 	}
 	HandleUnlock(__FILE__, __LINE__);
 
+	if (!UpnpIsWebserverEnabled())
+		return UPNP_E_NO_WEB_SERVER;
+
 	Param = (struct UpnpNonblockParam *)malloc(
 		sizeof(struct UpnpNonblockParam));
 	if (Param == NULL) {
@@ -2454,7 +2497,6 @@ int UpnpSubscribe(UpnpClient_Handle Hnd,
 		retVal = UPNP_E_INVALID_PARAM;
 		goto exit_function;
 	}
-	UpnpString_set_String(SubsIdTmp, SubsId);
 
 	if (TimeOut == NULL) {
 		retVal = UPNP_E_INVALID_PARAM;
@@ -2471,6 +2513,11 @@ int UpnpSubscribe(UpnpClient_Handle Hnd,
 		goto exit_function;
 	}
 	HandleUnlock(__FILE__, __LINE__);
+
+	if (!UpnpIsWebserverEnabled()) {
+		retVal = UPNP_E_NO_WEB_SERVER;
+		goto exit_function;
+	}
 
 	retVal = genaSubscribe(Hnd, EvtUrl, TimeOut, SubsIdTmp);
 	memset(SubsId, 0, sizeof(Upnp_SID));
@@ -4346,10 +4393,13 @@ void UpnpThreadDistribution(void *input)
 		UpnpString *Sid = UpnpString_new();
 
 		UpnpEventSubscribe_strcpy_PublisherUrl(evt, Param->Url);
-		errCode = genaSubscribe(Param->Handle,
-			UpnpEventSubscribe_get_PublisherUrl(evt),
-			(int *)&Param->TimeOut,
-			Sid);
+		errCode = !UpnpIsWebserverEnabled()
+				  ? UPNP_E_NO_WEB_SERVER
+				  : genaSubscribe(Param->Handle,
+					    UpnpEventSubscribe_get_PublisherUrl(
+						    evt),
+					    (int *)&Param->TimeOut,
+					    Sid);
 		UpnpEventSubscribe_set_ErrCode(evt, errCode);
 		UpnpEventSubscribe_set_TimeOut(evt, Param->TimeOut);
 		UpnpEventSubscribe_set_SID(evt, Sid);
@@ -4871,27 +4921,42 @@ void UpnpRemoveAllVirtualDirs(void)
 
 int UpnpEnableWebserver(int enable)
 {
-	if (UpnpSdkInit != 1) {
+	if (UpnpSdkInit != 1)
 		return UPNP_E_FINISH;
-	}
 #ifdef INTERNAL_WEB_SERVER
-	if (enable) {
-		int retVal = web_server_init();
-		if (retVal != UPNP_E_SUCCESS) {
-			return retVal;
-		}
-		bWebServerState = WEB_SERVER_ENABLED;
-		SetHTTPGetCallback(web_server_callback);
-	} else {
-		web_server_destroy();
-		bWebServerState = WEB_SERVER_DISABLED;
-		SetHTTPGetCallback(NULL);
+	int retVal;
+	ithread_mutex_lock(&gWebServerMutex);
+	if (!!enable == (bWebServerState == WEB_SERVER_ENABLED)) {
+		retVal = UPNP_E_SUCCESS;
+		goto exit_function;
 	}
-
-	return UPNP_E_SUCCESS;
-#else  /* Internal web server disabled */
+	if (enable) {
+		retVal = web_server_init();
+		if (retVal != UPNP_E_SUCCESS)
+			goto exit_function;
+		/* Publish the callback before accepting any connections. */
+		SetHTTPGetCallback(web_server_callback);
+		retVal = SetMiniServerListeners(1, gRequestedServerPort);
+		if (retVal != UPNP_E_SUCCESS) {
+			SetHTTPGetCallback(NULL);
+			bWebServerState = WEB_SERVER_DISABLED;
+		}
+	} else {
+		retVal = SetMiniServerListeners(0, gRequestedServerPort);
+		if (retVal == UPNP_E_SUCCESS) {
+			SetHTTPGetCallback(NULL);
+			bWebServerState = WEB_SERVER_DISABLED;
+		}
+	}
+	/* Retain web resources until UpnpFinish has joined the workers. A
+	 * callback may disable the server itself, so waiting here deadlocks. */
+exit_function:
+	ithread_mutex_unlock(&gWebServerMutex);
+	return retVal;
+#else
+	(void)enable;
 	return UPNP_E_NO_WEB_SERVER;
-#endif /* INTERNAL_WEB_SERVER */
+#endif
 }
 
 /*!
@@ -4905,7 +4970,11 @@ int UpnpIsWebserverEnabled(void)
 		return 0;
 	}
 
-	return bWebServerState == (WebServerState)WEB_SERVER_ENABLED;
+	int enabled;
+	ithread_mutex_lock(&gWebServerMutex);
+	enabled = bWebServerState == WEB_SERVER_ENABLED;
+	ithread_mutex_unlock(&gWebServerMutex);
+	return enabled;
 }
 
 void UpnpSetHostValidateCallback(

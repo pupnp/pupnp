@@ -49,14 +49,11 @@ set(UPNP_SOURCES
 	$<$<BOOL:${UPNP_ENABLE_SSDP}>:src/ssdp/ssdp_device.c>
 	$<$<BOOL:${UPNP_ENABLE_SSDP}>:src/ssdp/ssdp_ctrlpt.c>
 	$<$<BOOL:${UPNP_ENABLE_SSDP}>:src/ssdp/ssdp_server.c>
-	$<$<OR:$<BOOL:${UPNP_ENABLE_GENA}>,
-		$<BOOL:${UPNP_ENABLE_OPTIONAL_SSDP_HEADERS}>>:
+	$<$<OR:$<BOOL:${UPNP_ENABLE_GENA}>,$<BOOL:${UPNP_ENABLE_OPTIONAL_SSDP_HEADERS}>>:
 		src/uuid/md5.c>
-	$<$<OR:$<BOOL:${UPNP_ENABLE_GENA}>,
-		$<BOOL:${UPNP_ENABLE_OPTIONAL_SSDP_HEADERS}>>:
+	$<$<OR:$<BOOL:${UPNP_ENABLE_GENA}>,$<BOOL:${UPNP_ENABLE_OPTIONAL_SSDP_HEADERS}>>:
 		src/uuid/sysdep.c>
-	$<$<OR:$<BOOL:${UPNP_ENABLE_GENA}>,
-		$<BOOL:${UPNP_ENABLE_OPTIONAL_SSDP_HEADERS}>>:
+	$<$<OR:$<BOOL:${UPNP_ENABLE_GENA}>,$<BOOL:${UPNP_ENABLE_OPTIONAL_SSDP_HEADERS}>>:
 		src/uuid/uuid.c>
 	$<$<BOOL:${UPNP_ENABLE_HELPER_API_TOOLS}>:src/api/upnptools.c>
 )

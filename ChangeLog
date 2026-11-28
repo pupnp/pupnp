@@ -22,6 +22,15 @@ Version 22.2.6
   with SetSoapCallback(), which only exists with the internal web server,
   and the library failed with an undefined reference.
 
+- Add UpnpInit3() with UPNP_INIT_NO_WEB_SERVER for applications that only
+  announce a BasicDevice through SSDP and serve its XML description from an
+  existing webserver. Avoid unnecessary HTTP listeners and their attack
+  surface without changing UpnpInit2()'s startup default. UpnpEnableWebserver(0)
+  now closes HTTP listeners and shuts down accepted connections, including
+  SOAP and GENA; it previously only disabled HTTP content serving. SSDP and
+  external description hosting remain available. Document listener behavior
+  and the initialization/activation sequence.
+
 
 *******************************************************************************
 Version 22.2.5
